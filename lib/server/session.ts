@@ -66,7 +66,11 @@ export async function getSession():Promise<SessionUser|null>{
  const demo=jar.get("binso_demo")?.value==="1";
  const token=jar.get(demo?"binso_demo_write":env.sessionCookieName)?.value;
  if(!token)return null;
- const result=await query<SessionUser>(
+ const result=await withTransaction(async client=>{
+   const context=(await client.query<{user_id:string;organization_id:string}>("select user_id,organization_id from auth_sessions where token_hash=$1 and expires_at>now() limit 1",[tokenHash(token)])).rows[0];
+   if(!context)return {rows:[] as SessionUser[]};
+   await client.query("select set_config('app.organization_id',$1,true),set_config('app.user_id',$2,true)",[context.organization_id,context.user_id]);
+   return client.query<SessionUser>(
    `select s.id as "sessionId",u.id as "userId",s.organization_id as "organizationId",u.email,u.display_name as name,m.role,o.status as "organizationStatus",o.is_demo as "isDemo",u.mfa_enabled as "mfaEnabled"
       from auth_sessions s
       join app_users u on u.id=s.user_id and u.status='active'
@@ -76,8 +80,9 @@ export async function getSession():Promise<SessionUser|null>{
      limit 1`,
    [tokenHash(token),demo]
  );
+ });
  const session=result.rows[0]||null;
- if(session&&!session.isDemo){const expired=await expireUnpaidTrials(session.organizationId);if(expired?.rows?.length)session.organizationStatus="read_only";}
+ if(session&&!session.isDemo){const expired=await expireUnpaidTrials(session.organizationId,session.userId);if(expired?.rows?.length)session.organizationStatus="read_only";}
  if(session)void query(`update auth_sessions set last_seen_at=now() where id=$1 and last_seen_at<now()-interval '5 minutes'`,[session.sessionId]).catch(()=>{});
  return session;
 }

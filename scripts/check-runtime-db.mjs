@@ -8,4 +8,5 @@ try {
  console.log('Runtime role privileges/ownership passed.');
 } finally {await pool.end();}
 // Reuse the canonical schema, tenant-policy and FORCE RLS gate.
+if(!process.argv.includes('--runtime'))process.argv.push('--runtime');
 await import('./check-db.mjs');

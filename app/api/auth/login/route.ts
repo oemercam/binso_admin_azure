@@ -23,20 +23,22 @@ export async function POST(request:NextRequest){
   const password=stringField(body,"password",{max:256,min:1});
   const mfaCode=body.mfaCode!=null?stringField(body,"mfaCode",{max:64,min:4}):"";
   const emailCode=body.emailCode!=null?stringField(body,"emailCode",{max:6,min:6}):"";
-  const result=await query<{
-   id:string;organization_id:string;name:string;email:string;password_hash:string|null;
-   role:"owner"|"admin"|"finance"|"hr"|"project_manager"|"manager"|"member"|"reader";
+  // Credential lookup is identity-only. Tenant discovery follows password proof.
+  const identity=(await query<{
+   id:string;name:string;email:string;password_hash:string|null;
    language:string;mfa_enabled:boolean;mfa_secret_enc:string|null;recovery_code_hashes:string[];email_verified_at:Date|null
-  }>(`
-   select u.id,m.organization_id,u.display_name as name,u.email,u.password_hash,m.role,
-          u.language,u.mfa_enabled,u.mfa_secret_enc,u.recovery_code_hashes,u.email_verified_at
-     from app_users u
-     join organization_memberships m on m.user_id=u.id and m.status='active'
-     join organizations o on o.id=m.organization_id and o.status in ('trial','active','grace_period','read_only')
-    where lower(u.email)=lower($1) and u.status='active'
-    order by m.created_at asc limit 1`,[email]);
-  const user=result.rows[0];
-  if(!user?.password_hash||!(await verifyPassword(password,user.password_hash)))return json({error:"invalid_credentials",message:"E-Mail oder Passwort ist falsch."},401);
+  }>(`select id,display_name as name,email,password_hash,language,mfa_enabled,mfa_secret_enc,recovery_code_hashes,email_verified_at
+      from app_users where lower(email)=lower($1) and status='active' limit 1`,[email])).rows[0];
+  if(!identity?.password_hash||!(await verifyPassword(password,identity.password_hash)))return json({error:"invalid_credentials",message:"E-Mail oder Passwort ist falsch."},401);
+  const membership=await withTransaction(async client=>{
+   await client.query("select set_config('app.user_id',$1,true)",[identity.id]);
+   return (await client.query<{organization_id:string;role:"owner"|"admin"|"finance"|"hr"|"project_manager"|"manager"|"member"|"reader"}>(`
+    select m.organization_id,m.role from organization_memberships m
+    join organizations o on o.id=m.organization_id and o.status in ('trial','active','grace_period','read_only')
+    where m.user_id=$1 and m.status='active' order by m.created_at asc limit 1`,[identity.id])).rows[0];
+  });
+  if(!membership)return json({error:"invalid_credentials",message:"E-Mail oder Passwort ist falsch."},401);
+  const user={...identity,...membership,password_hash:identity.password_hash};
 
   let verifiedEmailNow=false;
   if(!user.email_verified_at){

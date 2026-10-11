@@ -1,8 +1,8 @@
 import "server-only";
-import {query} from "@/lib/server/db";
+import {query,withTenant} from "@/lib/server/db";
 
-export async function expireUnpaidTrials(organizationId?:string){
-  return query(`
+export async function expireUnpaidTrials(organizationId?:string,userId?:string){
+  const sql=`
     with expired as (
       update organization_subscriptions s
          set status='expired', updated_at=now()
@@ -28,5 +28,7 @@ export async function expireUnpaidTrials(organizationId?:string){
      where p.organization_id in (select organization_id from expired)
     returning p.organization_id)
     select organization_id from expired
-  `,[organizationId??null]);
+  `;
+  if(organizationId&&userId)return withTenant(organizationId,userId,client=>client.query(sql,[organizationId]));
+  return query(sql,[organizationId??null]);
 }

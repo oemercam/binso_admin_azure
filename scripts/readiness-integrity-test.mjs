@@ -16,7 +16,9 @@ try {
  await db.exec('grant dangerous to runtime_probe; set role runtime_probe');
  await assert.rejects(()=>db.exec(sql),/administrative\/RLS-bypass/);await db.exec('rollback; reset role; revoke dangerous from runtime_probe');
  await db.exec('grant schema_owner to runtime_probe; set role runtime_probe');
- await assert.rejects(()=>db.exec(sql),/ownership/);await db.exec('rollback; reset role');
+ await assert.rejects(()=>db.exec(sql),/ownership/);await db.exec('rollback; reset role; revoke schema_owner from runtime_probe');
+ await db.exec('grant create on schema public to runtime_probe; set role runtime_probe');
+ await assert.rejects(()=>db.exec(sql),/public-schema/);await db.exec('rollback; reset role; revoke create on schema public from runtime_probe');
  const fixture=path.join(temp,'auth.json');
  const config={properties:{platform:{enabled:true},identityProviders:{azureActiveDirectory:{enabled:true,registration:{clientId:'test-app',openIdIssuer:'https://login.microsoftonline.com/test-tenant/v2.0'}}}}};
  const auth=()=>spawnSync(process.execPath,['scripts/azure-auth-check.mjs',fixture],{env:{...process.env,AUDIT_ENTRA_TENANT_ID:'test-tenant'},encoding:'utf8'});
@@ -40,5 +42,5 @@ print('/test/app' if q=='id' else os.getenv('COUNT','1'))
  assert.notEqual(monitor({DENIED:'yes'}).status,0);
  assert.notEqual(monitor({COUNT:'0'}).status,0);
  assert.notEqual(monitor({COUNT:'garbage'}).status,0);
- console.log('Runtime role, inherited bypass/ownership, pinned Azure issuer and real Bash monitoring failure gates passed.');
+ console.log('Runtime role, inherited bypass/ownership, public-schema creation denial, pinned Azure issuer and real Bash monitoring failure gates passed.');
 } finally {await db.close();await fs.rm(temp,{recursive:true,force:true});}

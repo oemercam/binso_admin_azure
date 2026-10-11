@@ -83,6 +83,7 @@ jobs:
         run: |
           node scripts/postgres-parallel-test.mjs
           node scripts/auth-integrity-test.mjs --postgres
+          node scripts/registration-test.mjs --postgres
       - run: pnpm lint
       - run: pnpm css:check
       - run: pnpm typecheck

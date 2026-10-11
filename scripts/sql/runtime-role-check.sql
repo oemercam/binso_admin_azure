@@ -10,6 +10,9 @@ BEGIN
   IF unsafe_roles IS NOT NULL THEN
     RAISE EXCEPTION 'Runtime role has or can assume administrative/RLS-bypass privileges: %', unsafe_roles;
   END IF;
+  IF has_schema_privilege(current_user, 'public', 'CREATE') OR has_database_privilege(current_user, current_database(), 'CREATE') THEN
+    RAISE EXCEPTION 'Runtime role can create public-schema objects or database schemas';
+  END IF;
   SELECT string_agg(quote_ident(c.relname), ', ' ORDER BY c.relname)
     INTO owned_tables FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
     WHERE n.nspname='public' AND c.relkind IN ('r','p')

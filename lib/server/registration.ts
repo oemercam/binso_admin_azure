@@ -2,7 +2,7 @@ import "server-only";
 import type {PoolClient} from "pg";
 import {createHash} from "node:crypto";
 import {cookies} from "next/headers";
-import {query} from "./db";
+import {query,withTransaction} from "./db";
 import {env} from "./env";
 import {ApiError} from "./http";
 import {createAuthToken} from "./auth-tokens";
@@ -27,12 +27,17 @@ export async function pendingRegistration(){
  const token=(await cookies()).get(registrationCookie)?.value;
  if(!token||!env.databaseUrl)return null;
  const hash=createHash("sha256").update(token).digest("hex");
- const result=await query<{userId:string;organizationId:string;company:string;email:string;verified:boolean;locale:MailLocale;plan:string;billingCycle:BillingCycle}>(
+ const context=(await query<{user_id:string;organization_id:string}>("select user_id,organization_id from auth_tokens where token_hash=$1 and token_type='verify_email' and metadata->>'registration'='true' and expires_at>now() limit 1",[hash])).rows[0];
+ if(!context)return null;
+ const result=await withTransaction(async client=>{
+  await client.query("select set_config('app.organization_id',$1,true),set_config('app.user_id',$2,true)",[context.organization_id,context.user_id]);
+  return client.query<{userId:string;organizationId:string;company:string;email:string;verified:boolean;locale:MailLocale;plan:string;billingCycle:BillingCycle}>(
   `select u.id as "userId",o.id as "organizationId",o.name as company,u.email,u.email_verified_at is not null as verified,u.language as locale,s.plan,s.billing_interval as "billingCycle"
    from auth_tokens t join app_users u on u.id=t.user_id and u.status='active'
    join organization_memberships m on m.user_id=u.id and m.organization_id=t.organization_id and m.status='active'
    join organizations o on o.id=m.organization_id join organization_subscriptions s on s.organization_id=o.id
    where t.token_hash=$1 and t.token_type='verify_email' and t.metadata->>'registration'='true' and t.expires_at>now() limit 1`,[hash]);
+ });
  return result.rows[0]??null;
 }
 
@@ -53,7 +58,10 @@ export async function sendRegistrationVerification(input:{email:string;userId:st
 
 /** Existing MFA enrollment remains the first privileged step; company setup follows it. */
 export async function registrationHandoff(organizationId:string,role:TenantRole,mfaEnabled=false){
- const result=await query<{complete:boolean}>("select exists(select 1 from organization_milestones where organization_id=$1 and milestone='onboarding_completed') as complete",[organizationId]);
+ const result=await withTransaction(async client=>{
+  await client.query("select set_config('app.organization_id',$1,true)",[organizationId]);
+  return client.query<{complete:boolean}>("select exists(select 1 from organization_milestones where organization_id=$1 and milestone='onboarding_completed') as complete",[organizationId]);
+ });
  const onboardingComplete=result.rows[0]?.complete===true;
  const next=onboardingComplete||!tenantCan(role,"organization:write")?"/dashboard":"/einstellungen/firma?onboarding=1";
  const mfaSetupRequired=["owner","admin","finance"].includes(role)&&!mfaEnabled;
@@ -62,6 +70,7 @@ export async function registrationHandoff(organizationId:string,role:TenantRole,
 
 export type VerifiedMember={organization_id:string;role:TenantRole;name:string;email_verified_at:Date|null;mfa_enabled:boolean};
 export async function completeRegistrationVerification(client:PoolClient,userId:string,email:string,organizationId?:string|null){
+ await client.query("select set_config('app.user_id',$1,true)",[userId]);
  const membership=await client.query<VerifiedMember>(
   `select m.organization_id,m.role,u.display_name as name,u.email_verified_at,u.mfa_enabled from app_users u
    join organization_memberships m on m.user_id=u.id and m.status='active'
@@ -70,6 +79,7 @@ export async function completeRegistrationVerification(client:PoolClient,userId:
    order by m.created_at asc limit 1 for update of u`,[userId,email,organizationId??null]);
  const row=membership.rows[0];
  if(!row)return null;
+ await client.query("select set_config('app.organization_id',$1,true)",[row.organization_id]);
  await client.query("update app_users set email_verified_at=coalesce(email_verified_at,now()),updated_at=now() where id=$1",[userId]);
  if(!row.email_verified_at&&row.role==='owner')await client.query("update organization_subscriptions set trial_until=coalesce(trial_until,now()+($2||' days')::interval),updated_at=now() where organization_id=$1 and status='trial'",[row.organization_id,String(domainConfig.trialDays)]);
  await client.query("update auth_email_codes set consumed_at=coalesce(consumed_at,now()) where user_id=$1 and purpose='verify_email'",[userId]);

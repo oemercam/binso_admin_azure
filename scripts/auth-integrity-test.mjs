@@ -96,7 +96,7 @@ try{
  const nextToken=await tokens.createAuthToken({type:'password_reset',email:'integrity@fixture.invalid',userId:user,ttlMinutes:10});
  const thirdPassword='Synthetic-third-password-after-reset-789';
  const cookiesBeforeStaleLogin=cookieSets;
- const staleLogin=await raceAfterRead(sql=>sql.includes('join organization_memberships m'),()=>login.POST(req({email:'integrity@fixture.invalid',password:resetBody.password,mfaCode:totp.totp(secret)})),async()=>assert.equal((await reset.PATCH(req({token:nextToken,password:thirdPassword}))).status,200));
+ const staleLogin=await raceAfterRead(sql=>sql.includes('select id,display_name as name,email,password_hash'),()=>login.POST(req({email:'integrity@fixture.invalid',password:resetBody.password,mfaCode:totp.totp(secret)})),async()=>assert.equal((await reset.PATCH(req({token:nextToken,password:thirdPassword}))).status,200));
  const lateSessions=(await query('select count(*)::int n from auth_sessions where user_id=$1',[user])).rows[0].n;
  assert.equal(staleLogin.status,401,'An old-password proof cannot mint a session after reset');assert.equal(lateSessions,0,'No late session survives reset');
  assert.equal(cookieSets,cookiesBeforeStaleLogin,'Rejected stale authentication never publishes a new session cookie');

@@ -241,8 +241,9 @@ try{
  console.log('50 independently provisioned trial tenants: read/write/delete isolation passed (non-superuser RLS).');
 
  // Expired unpaid trials must become read-only while paid/Stripe-linked trials stay untouched.
- const lifecycleDb=dataModule('export async function query(text,params=[]){return globalThis.__lifecycleQuery(text,params)}');
+ const lifecycleDb=dataModule('export async function query(text,params=[]){return globalThis.__lifecycleQuery(text,params)} export async function withTenant(org,user,fn){return globalThis.__lifecycleTenant(org,user,fn)}');
  globalThis.__lifecycleQuery=(text,params)=>db.query(text,params);
+ globalThis.__lifecycleTenant=(org,user,fn)=>db.transaction(async c=>{await c.query("select set_config('app.organization_id',$1,true),set_config('app.user_id',$2,true)",[org,user]);return fn(c)});
  const lifecycleSource=(await fs.readFile('lib/server/subscription-lifecycle.ts','utf8')).replace('import "server-only";','').replace('"@/lib/server/db"',JSON.stringify(lifecycleDb));
  const {expireUnpaidTrials}=await import(dataModule(lifecycleSource));
  const expiredTrial=await provisionOrganization({userId:'expired-trial-user',email:'expired-trial@example.invalid',name:'Expired Trial',companyName:'Expired Trial AG',plan:'start',mode:'trial'});
@@ -257,7 +258,7 @@ try{
  await db.query("update organization_subscriptions set trial_until=now()-interval '1 day',billing_subscription_id='sub_pending' where organization_id=$1",[linkedTrial.organizationId]);
  await expireUnpaidTrials();
  assert.equal((await db.query('select status from organization_subscriptions where organization_id=$1',[linkedTrial.organizationId])).rows[0].status,'trial');
- delete globalThis.__lifecycleQuery;
+ delete globalThis.__lifecycleQuery;delete globalThis.__lifecycleTenant;
  // Use the actual Stripe transport/signature code with an isolated HTTP fixture.
  globalThis.__billingEnv={stripeSecretKey:'sk_test_fixture',stripeWebhookSecret:'whsec_fixture',appUrl:'https://example.invalid',stripePrices:{start:{monthly:'price_start_m'},business:{yearly:'price_business_y'},pro:{}}};
  const billingEnv=dataModule('export const env=globalThis.__billingEnv');
