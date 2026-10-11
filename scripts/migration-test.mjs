@@ -38,8 +38,11 @@ try{
  await db.exec('reset role');
  const demoProfiles=(await db.query("select c.id,c.city,c.address,c.email,(select count(*)::int from customer_contacts cc where cc.organization_id=c.organization_id and cc.customer_id=c.id and cc.is_primary and cc.archived_at is null) primary_contacts from customers c where c.organization_id=$1 and c.external_id in ('demo-customer-acme','demo-customer-alpin','demo-customer-nova')",[demo])).rows;
  assert.equal(demoProfiles.length,3);assert.ok(demoProfiles.every(c=>c.city&&c.address&&c.email&&!c.email.endsWith('example.invalid')&&c.primary_contacts===1),'Every canonical demo customer needs a plausible profile and one main contact');
- await db.exec(`create role tenant_probe; grant usage on schema public to tenant_probe; grant select,insert,update,delete on all tables in schema public to tenant_probe;`);
- await db.exec('set role tenant_probe');
+ await db.exec(await fs.readFile('database/operations/provision-runtime-role.sql','utf8'));
+ await db.exec('set role binso_runtime');
+ await db.exec(await fs.readFile('scripts/sql/runtime-role-check.sql','utf8'));
+ await assert.rejects(()=>db.query('select * from schema_migrations'),/permission denied|does not exist/);
+ await assert.rejects(()=>db.exec('alter table invoices add column forbidden_runtime_ddl integer'),/owner/);
  assert.equal((await db.query('select count(*)::int n from invoices')).rows[0].n,0);
  await db.query("select set_config('app.organization_id',$1,false)",[demo]);
  assert.ok((await db.query('select count(*)::int n from invoices')).rows[0].n>20);
@@ -197,7 +200,7 @@ try{
  await db.query("insert into file_contents(file_id,organization_id,body) values($1,$2,convert_to('test','utf8'))",[fileId,sandbox]);
  assert.equal((await db.query("select convert_from(body,'utf8') value from file_contents where file_id=$1",[fileId])).rows[0].value,'test');
  await assert.rejects(db.query("update file_contents set body=convert_to('fail','utf8') where file_id=$1",[fileId]),e=>e.code==='23514');
- await db.exec('set role tenant_probe');await db.query("select set_config('app.organization_id',$1,false)",[demo]);
+ await db.exec('set role binso_runtime');await db.query("select set_config('app.organization_id',$1,false)",[demo]);
  assert.equal((await db.query('select * from file_contents where file_id=$1',[fileId])).rows.length,0);
  await db.exec('reset role');
  assert.equal((await db.query("select count(*)::int n from pg_constraint where contype='f' and not convalidated")).rows[0].n,0);
@@ -222,7 +225,7 @@ try{
   await db.query("insert into customers(organization_id,external_id,customer_no,name) values($1,'same-external-id','K-001',$2)",[trial.organizationId,`Customer ${i}`]);
  }
  assert.equal(new Set(trialTenants).size,50);
- await db.exec('set role tenant_probe');
+ await db.exec('set role binso_runtime');
  for(const [i,organizationId] of trialTenants.entries()){
   await db.query("select set_config('app.organization_id',$1,false)",[organizationId]);
   const visible=await db.query('select organization_id,name from customers');
@@ -328,7 +331,7 @@ try{
  await assert.rejects(globalThis.__provisionTest(c=>processStripeEvent(c,{...invoiceEvent,id:'evt_wrong_mode',livemode:true})),e=>e.code==='stripe_mode_mismatch');
  authoritative={...authoritative,metadata:{organization_id:demo}};
  await assert.rejects(globalThis.__provisionTest(c=>processStripeEvent(c,{...invoiceEvent,id:'evt_wrong_tenant'})),e=>e.code==='subscription_mapping_invalid');
- await db.exec('set role tenant_probe');await db.query("select set_config('app.organization_id',$1,false)",[demo]);
+ await db.exec('set role binso_runtime');await db.query("select set_config('app.organization_id',$1,false)",[demo]);
  assert.equal((await db.query('select * from billing_checkout_sessions')).rows.length,0);
  await db.exec('reset role');
  globalThis.fetch=originalFetch;delete globalThis.__billingEnv;
@@ -515,7 +518,7 @@ try{
  delete globalThis.__invitationMails;delete globalThis.__invitationMailMode;
  console.log('Atomic invitation identity/membership/token/outbox, same-key replay, failed-delivery recovery, ambiguous-delivery protection, roles and database rollback passed.');
 
- for(const table of ['organization_invitations','document_deliveries']){await db.exec('set role tenant_probe');await db.query("select set_config('app.platform_operator','',false)");await db.query("select set_config('app.organization_id',$1,false)",[sandbox]);assert.equal((await db.query('select * from '+table+' where organization_id=$1',[demo])).rows.length,0);await db.exec('reset role');}
+ for(const table of ['organization_invitations','document_deliveries']){await db.exec('set role binso_runtime');await db.query("select set_config('app.platform_operator','',false)");await db.query("select set_config('app.organization_id',$1,false)",[sandbox]);assert.equal((await db.query('select * from '+table+' where organization_id=$1',[demo])).rows.length,0);await db.exec('reset role');}
  await db.query("select set_config('app.organization_id',$1,false)",[demo]);
 
  const processTime=(await db.query("insert into time_entries(organization_id,external_id,customer_id,person_name,worker_type,work_date,hours,description,billable,approved,sales_rate) values($1,'process-time',$2,'Fixture person','employee','2026-10-06',2,'Fixture time',true,true,100) returning id",[demo,documentArgs.p_customer_id])).rows[0].id;

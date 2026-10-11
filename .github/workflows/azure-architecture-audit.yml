@@ -14,8 +14,11 @@ permissions:
 jobs:
   audit:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     environment: production
     steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
       - uses: azure/login@a641126d1b8aa4d1fa005f4f92df94a3a4c4c906 # v3
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
@@ -81,24 +84,28 @@ jobs:
           NODE
 
           echo "=== App Service Authentication / Microsoft Entra ==="
-          az webapp auth show -g "$APP_RG" -n "$APP_NAME" --query "{enabled:platform.enabled,requireAuthentication:globalValidation.requireAuthentication,unauthenticatedClientAction:globalValidation.unauthenticatedClientAction,defaultProvider:globalValidation.redirectToProvider,aadEnabled:identityProviders.azureActiveDirectory.enabled,clientId:identityProviders.azureActiveDirectory.registration.clientId,issuer:identityProviders.azureActiveDirectory.registration.openIdIssuer,clientSecretSettingName:identityProviders.azureActiveDirectory.registration.clientSecretSettingName}" -o json || echo "UNVERIFIED: App Service Authentication configuration unavailable."
+          az webapp auth show -g "$APP_RG" -n "$APP_NAME" --query "{enabled:platform.enabled,requireAuthentication:globalValidation.requireAuthentication,unauthenticatedClientAction:globalValidation.unauthenticatedClientAction,defaultProvider:globalValidation.redirectToProvider,aadEnabled:identityProviders.azureActiveDirectory.enabled,clientId:identityProviders.azureActiveDirectory.registration.clientId,issuer:identityProviders.azureActiveDirectory.registration.openIdIssuer,clientSecretSettingName:identityProviders.azureActiveDirectory.registration.clientSecretSettingName}" -o json
 
           echo "=== App Service Authentication v2 via ARM ==="
           SUBSCRIPTION_ID="$(az account show --query id -o tsv)"
           AUTH_V2_URL="https://management.azure.com/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$APP_RG/providers/Microsoft.Web/sites/$APP_NAME/config/authsettingsV2/list?api-version=2023-12-01"
-          az rest --method post --url "$AUTH_V2_URL" --query "properties.{platformEnabled:platform.enabled,requireAuthentication:globalValidation.requireAuthentication,unauthenticatedClientAction:globalValidation.unauthenticatedClientAction,redirectToProvider:globalValidation.redirectToProvider,aadEnabled:identityProviders.azureActiveDirectory.enabled,clientId:identityProviders.azureActiveDirectory.registration.clientId,openIdIssuer:identityProviders.azureActiveDirectory.registration.openIdIssuer,clientSecretSettingName:identityProviders.azureActiveDirectory.registration.clientSecretSettingName}" -o json || echo "UNVERIFIED: authsettingsV2 ARM read unavailable."
+          AUTH_FILE="$(mktemp)"
+          trap 'rm -f "$AUTH_FILE"' EXIT
+          az rest --method get --url "$AUTH_V2_URL" > "$AUTH_FILE"
+          AUDIT_ENTRA_TENANT_ID="$(az webapp config appsettings list -g "$APP_RG" -n "$APP_NAME" --query "[?name=='OPERATOR_ENTRA_TENANT_ID'].value | [0]" -o tsv)" node scripts/azure-auth-check.mjs "$AUTH_FILE"
 
           echo "=== PostgreSQL connection from configured App Service setting ==="
           DATABASE_URL="$(az webapp config appsettings list -g "$APP_RG" -n "$APP_NAME" --query "[?name=='DATABASE_URL'].value | [0]" -o tsv)"
           if [ -n "$DATABASE_URL" ]; then
             echo "::add-mask::$DATABASE_URL"
-            PGCONNECT_TIMEOUT=10 PGSSLROOTCERT=system psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -Atc "select current_database(),current_user,version();" | sed -E 's/(PostgreSQL [0-9.]+).*/\\1/'
+            PGCONNECT_TIMEOUT=10 PGSSLROOTCERT=system psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -Atc "select current_database(),current_user,version();" | sed -E 's/(PostgreSQL [0-9.]+).*/\1/'
             echo "=== Runtime database privileges (no credentials) ==="
             PGCONNECT_TIMEOUT=10 PGSSLROOTCERT=system psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c "select rolname,rolsuper,rolbypassrls,rolcreatedb,rolcreaterole from pg_roles where rolname=current_user;"
             echo "=== Tenant table RLS inventory ==="
             PGCONNECT_TIMEOUT=10 PGSSLROOTCERT=system psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c "select c.relname,c.relrowsecurity,c.relforcerowsecurity from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname='public' and c.relkind='r' and exists(select 1 from pg_attribute a where a.attrelid=c.oid and a.attname='organization_id' and not a.attisdropped) order by c.relname;"
           else
-            echo "DATABASE_URL is not configured."
+            echo "::error::DATABASE_URL is not configured; runtime isolation cannot be verified."
+            exit 1
           fi
 
           echo "=== PostgreSQL Flexible Servers visible to deployment identity ==="
@@ -111,15 +118,36 @@ jobs:
           fi
 
           echo "=== Storage accounts in App resource group ==="
-          az storage account list -g "$APP_RG" --query "[].{name:name,httpsOnly:enableHttpsTrafficOnly,minTlsVersion:minimumTlsVersion,publicNetworkAccess:publicNetworkAccess,allowBlobPublicAccess:allowBlobPublicAccess,kind:kind,sku:sku.name}" -o json || echo "Deployment identity cannot read Storage resources."
+          az storage account list -g "$APP_RG" --query "[].{name:name,httpsOnly:enableHttpsTrafficOnly,minTlsVersion:minimumTlsVersion,publicNetworkAccess:publicNetworkAccess,allowBlobPublicAccess:allowBlobPublicAccess,kind:kind,sku:sku.name}" -o json
 
           echo "=== Application Insights in App resource group ==="
           az monitor app-insights component show --app "$APP_NAME" -g "$APP_RG" --query "{name:name,provisioningState:provisioningState,location:location}" -o json 2>/dev/null || echo "No App Insights component named $APP_NAME"
           echo "=== Application Insights resources (any name) ==="
-          az resource list -g "$APP_RG" --resource-type Microsoft.Insights/components --query "[].{name:name,location:location}" -o json || echo "UNVERIFIED: Insights resource inventory unavailable."
+          az resource list -g "$APP_RG" --resource-type Microsoft.Insights/components --query "[].{name:name,location:location}" -o json
           echo "=== Metric alerts ==="
-          az monitor metrics alert list -g "$APP_RG" --query "[].{name:name,enabled:enabled,severity:severity,scopes:scopes}" -o json || echo "UNVERIFIED: metric alerts unavailable."
+          az monitor metrics alert list -g "$APP_RG" --query "[].{name:name,enabled:enabled,severity:severity,scopes:scopes}" -o json
           echo "=== Scheduled query alerts ==="
-          az monitor scheduled-query list -g "$APP_RG" --query "[].{name:name,enabled:enabled,severity:severity}" -o json || echo "UNVERIFIED: query alerts unavailable."
+          az monitor scheduled-query list -g "$APP_RG" --query "[].{name:name,enabled:enabled,severity:severity}" -o json
           echo "=== Alert action groups ==="
-          az monitor action-group list -g "$APP_RG" --query "[].{name:name,enabled:enabled}" -o json || echo "UNVERIFIED: action groups unavailable."
+          az monitor action-group list -g "$APP_RG" --query "[].{name:name,enabled:enabled}" -o json
+
+          if [ -z "$PG_RG" ]; then
+            echo "::error::Configured PostgreSQL resource is not visible; backup/network readiness remains unverified."
+            exit 1
+          fi
+
+      - name: Verify production monitoring gate
+        if: ${{ always() }}
+        shell: bash
+        run: bash scripts/production-monitoring-check.sh
+
+      - name: Verify restricted runtime database role
+        if: ${{ always() }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          RG="rg-binso-admin-prod"
+          DATABASE_URL="$(az webapp config appsettings list -g "$RG" -n binso-admin-prod --query "[?name=='DATABASE_URL'].value | [0]" -o tsv)"
+          test -n "$DATABASE_URL"
+          echo "::add-mask::$DATABASE_URL"
+          PGCONNECT_TIMEOUT=10 PGSSLROOTCERT=system psql "$DATABASE_URL" -X -v ON_ERROR_STOP=1 -f scripts/sql/runtime-role-check.sql
