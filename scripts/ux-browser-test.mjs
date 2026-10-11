@@ -683,6 +683,7 @@ try{
    for(const section of await page.locator('.operator-insight-grid>.bo-workspace-section').all())assert.equal(await section.evaluate(el=>getComputedStyle(el).marginTop),'0px','Dashboard grid owns section spacing');
    // The server prototype cookie selects the demo finance endpoint even when
    // the client-renderer fixture switches the other operator APIs to production.
+   await capture(page,{animations:'disabled',path:path.join(output,theme+'-operator-dashboard-production.png')});
    const operatorFinancePattern=/\/api\/(?:operator\/finance|demo\/platform-finance)$/;
    let emptyFinanceRequests=0;
    const emptyOperatorPayments=route=>route.fulfill({json:{items:[]}}),emptyOperatorFinance=route=>{emptyFinanceRequests++;return route.fulfill({json:{payments:[],subscriptions:[],operatingCosts:[]}})};
