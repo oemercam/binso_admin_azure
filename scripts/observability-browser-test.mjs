@@ -16,6 +16,7 @@ try{
  await pool.query("insert into organizations(id,name,slug,is_demo) values($1,'Synthetic customer','observability-synthetic',false)",[org]);
  await pool.query("insert into organization_subscriptions(organization_id,plan,status,billing_interval,unit_amount_chf) values($1,'professional','active','yearly',1200)",[org]);
  await pool.query("insert into platform_billing_payments(organization_id,provider,external_id,payment_date,amount,currency) values($1,'manual','obs-chf',current_date,12.34,'CHF'),($1,'manual','obs-eur',current_date,9999,'EUR')",[org]);
+ await pool.query("insert into web_vitals(metric,value,rating,route,created_at) values('LCP',1200,'good','/operator',now()),('INP',100,'good','/operator',now()),('CLS',0.05,'good','/operator',now())");
  const tokens=new Map();
  for(const role of ['platform_owner','platform_admin','platform_support','platform_billing','platform_auditor']){
   const token=randomBytes(32).toString('base64url'),user='obs-'+role;tokens.set(role,token);
@@ -41,17 +42,17 @@ try{
   for(const profile of ['technical','business','combined']){
    await page.getByLabel('Wallboard-Profil').selectOption(profile);
    if(profile==='business'){assert.equal(await page.locator('[data-metric-id="payments"]').count(),1);assert.equal(await page.locator('.bo-monitor-chart').count(),0);}else assert.equal(await page.locator('.bo-monitor-chart').count(),3);
-   await page.screenshot({path:path.join(output,theme+'-'+width+'-'+profile+'.png'),fullPage:true});results.push({theme,width,profile,passed:true});
+   if(width>=1920)assert.equal(await page.evaluate(()=>document.documentElement.scrollHeight<=innerHeight+1),true,'Wallboard fits 16:9 viewport '+width+' '+profile);await page.screenshot({path:path.join(output,theme+'-'+width+'-'+profile+'.png'),fullPage:true});results.push({theme,width,profile,passed:true});
   }
  }
  await page.setViewportSize({width:390,height:900});await page.goto(base+'/operator/zahlungen');await page.getByText('12.34',{exact:false}).first().waitFor();
  assert.ok((await page.locator('.operator-payment-insights').innerText()).includes('CHF 12.34'),'Foreign currency excluded from CHF KPI');assert.ok((await page.locator('.operator-table-card').innerText()).includes('EUR'),'Original payment currency retained');
  await page.goto(base+'/operator/kunden/'+org);await page.getByText('Synthetic customer',{exact:true}).first().waitFor();assert.ok((await page.locator('.operator-customer-metrics').innerText()).includes('CHF 12.34'),'Customer metrics from actual API');await page.screenshot({path:path.join(output,'customer-actual-data.png'),fullPage:true});
- await page.close();page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));await page.clock.install();await page.clock.setFixedTime(new Date());await page.goto(base+'/operator/wallboard');await page.locator('[data-metric-id="customers"]').waitFor();
+ await page.close();page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));await page.bringToFront();await page.goto(base+'/operator/wallboard');await page.locator('[data-metric-id="customers"]').waitFor();
  await page.setViewportSize({width:1920,height:1080});await page.getByLabel('Wallboard-Profil').selectOption('combined');
- let attempts=0;await page.route('**/api/operator/monitoring',route=>{attempts++;return route.fulfill({status:503,json:{message:'Synthetic API outage'}});});await page.clock.runFor(61000);await page.getByText(/Verbindung unterbrochen/).waitFor();assert.ok(attempts>0,'Auto refresh actually attempted');assert.equal(await page.locator('[data-metric-id="payments"]').getAttribute('data-health'),'unknown');
- await page.unroute('**/api/operator/monitoring');await page.clock.runFor(61000);await page.getByText(/Automatische Aktualisierung/).waitFor();assert.equal(await page.locator('[data-metric-id="payments"]').getAttribute('data-health'),'healthy','Recovery consumes fresh server data');
- await page.getByRole('button',{name:'Hell / Dunkel'}).click();assert.ok(['light','dark'].includes(await page.evaluate(()=>document.documentElement.dataset.theme)));
+ let attempts=0;await page.route('**/api/operator/monitoring',route=>{attempts++;return route.fulfill({status:503,json:{message:'Synthetic API outage'}});});assert.equal(await page.evaluate(()=>document.visibilityState),'visible','Polling requires a visible wallboard');await page.waitForResponse(response=>response.url()===base+'/api/operator/monitoring'&&response.status()===503,{timeout:75000});await page.getByText(/Verbindung unterbrochen/).waitFor();assert.ok(attempts>0,'Auto refresh actually attempted');assert.equal(await page.locator('[data-metric-id="payments"]').getAttribute('data-health'),'unknown');
+ await page.unroute('**/api/operator/monitoring');await page.waitForResponse(response=>response.url()===base+'/api/operator/monitoring'&&response.status()===200,{timeout:75000});await page.getByText(/Automatische Aktualisierung/).waitFor();assert.equal(await page.locator('[data-metric-id="payments"]').getAttribute('data-health'),'healthy','Recovery consumes fresh server data');
+ const previousTheme=await page.evaluate(()=>document.documentElement.dataset.theme);await page.getByRole('button',{name:'Hell / Dunkel'}).click();assert.notEqual(await page.evaluate(()=>document.documentElement.dataset.theme),previousTheme,'Theme button changes the actual theme');
  await context.close();assert.deepEqual(errors,[]);
  console.log('Authenticated wallboard: five real operator roles, anonymous denial, three profiles, light/dark, 390–3840px, automatic refresh, outage and recovery passed.');
 }finally{

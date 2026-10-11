@@ -50,7 +50,7 @@
     ],
     "method": "Existing AST rendering/import graph plus API/workflow closure",
     "expected": "Identify every reachable element and operator API",
-    "actual": "14 views; 20 endpoints; 9 workflows; 2504 element occurrences; no full business acceptance inferred",
+    "actual": "14 views; 20 endpoints; 9 workflows; 2506 element occurrences; no full business acceptance inferred",
     "status": "verified",
     "evidence": [
       "function-inventory.json",
@@ -583,6 +583,39 @@
     "status": "implemented_pending_ci",
     "evidence": [
       "scripts/observability-browser-test.mjs"
+    ]
+  },
+  {
+    "id": "V23-I-005",
+    "requirement": "Announcement creation has a durable audit event",
+    "files": [
+      "app/api/operator/announcements/route.ts",
+      "lib/server/operator/audit.ts"
+    ],
+    "method": "Read actual POST and audit helper call graph",
+    "expected": "Successful administrative creation records actor/action/entity atomically",
+    "actual": "POST inserts announcement with created_by_user_id but does not call platformAudit or insert platform_audit_events; not accepted as complete audit logging",
+    "status": "open_defect",
+    "evidence": [
+      "app/api/operator/announcements/route.ts"
+    ]
+  },
+  {
+    "id": "V23-I-006",
+    "requirement": "Restriction and account status remain atomic",
+    "files": [
+      "app/api/operator/restrictions/route.ts",
+      "app/api/operator/restrictions/[id]/route.ts",
+      "lib/server/database.ts"
+    ],
+    "method": "Trace operatorInsert/operatorUpdate/operatorAudit transaction boundaries",
+    "expected": "Restriction, effective account state and audit commit or roll back together; concurrent updates serialized",
+    "actual": "Each helper opens a separate transaction; failure or concurrent mutation can leave restriction/account/audit inconsistent. Security-critical restriction/reactivation change requires explicit approval; no production mutation attempted",
+    "status": "blocked_security_approval",
+    "evidence": [
+      "lib/server/database.ts#operatorInsert",
+      "lib/server/database.ts#operatorUpdate",
+      "lib/server/database.ts#operatorAudit"
     ]
   }
 ]

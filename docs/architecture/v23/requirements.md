@@ -7,7 +7,7 @@ Vollständige Felder: `requirements.json`. Status bezeichnet den tatsächlichen 
 | V23-A-001 | Current repository and live commit | verified | main=live=e33af01; main CI/deploy green |
 | V23-A-002 | Open PRs and concurrent work | verified | 237 diverged 10 ahead/20 behind; 231/222 reviewed as existing independent work |
 | V23-A-003 | Azure resources and readiness | blocked | App/DB present; storage/Insights/alerts absent; security checks fail |
-| V23-B-001 | Complete source inventory | verified | 14 views; 20 endpoints; 9 workflows; 2504 element occurrences; no full business acceptance inferred |
+| V23-B-001 | Complete source inventory | verified | 14 views; 20 endpoints; 9 workflows; 2506 element occurrences; no full business acceptance inferred |
 | V23-C-001 | Frozen navigation and More | verified | Markup identical; navigation-foundation passes |
 | V23-C-002 | Shared UX foundation | implemented_pending_ci | Existing six CSS files and 760px breakpoint reused; browser CI pending |
 | V23-D-001 | Chart architecture | implemented_pending_ci | Statistics/CashStatistics kept; one new measured hourly time-series component shared by portal/wallboard; no dependency added |
@@ -43,3 +43,6 @@ Vollständige Felder: `requirements.json`. Status bezeichnet den tatsächlichen 
 | V23-M-001 | Traceable acceptance report | partially_verified | Partial verified implementation; blockers and decisions remain explicit |
 | V23-E-007 | Customer metrics must use real authorized data | implemented_pending_ci | Current support cases, CHF-only payments, normalized actual contract and time-effective restrictions; missing grants clearly labelled |
 | V23-E-008 | Payment currency and decimal integrity | implemented_pending_ci | Original currency projected; CHF-only chart/KPI uses sumMoney; KPI explicitly refers to displayed payments |
+
+| V23-I-005 | Durable announcement audit | open_defect | Announcement POST has creator column but no audit event; source proof in requirements.json |
+| V23-I-006 | Atomic restriction/account/audit | blocked_security_approval | Separate transactions; changes to restriction/reactivation require explicit approval |

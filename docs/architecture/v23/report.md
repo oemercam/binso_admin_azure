@@ -56,6 +56,11 @@ Der neuere Audit 38128629567 scheitert ausdrücklich an Easy Auth/AAD-Registrier
 
 Keine direkte authentifizierte Azure-Control-Plane-Verbindung in dieser Arbeitsumgebung. Azure-CPU/RAM/Neustarts, HTTP-Anzahl/Fehlerrate, vollständige Auth-/Registrierungs-/Rechnungsfehlerströme, Log Analytics, Alert-Historie, Deployment-Zeitpunkt/Ergebnis/Post-Deployment-Fehlertrend sind deshalb nicht als verfügbare Messwerte ausgewiesen. Ressourcenbereitstellung, Zugriffsmodell, Kostenrahmen und Betriebskonfiguration sind offene Entscheidungen.
 
+## Weitere belegte Sicherheits- und Integritätsbefunde
+
+- **V23-I-005:** `app/api/operator/announcements/route.ts` speichert Ankündigungen mit `created_by_user_id`, erzeugt aber kein `platform_audit_events`-Ereignis. Die Verwaltungsaktion ist damit nicht vollständig im zentralen Audit protokolliert.
+- **V23-I-006:** Erstellen/Aufheben von Einschränkungen ruft `operatorInsert`, `operatorUpdate` und `operatorAudit` nacheinander auf. Diese Helpers öffnen separate Transaktionen. Fehler oder parallele Änderungen können Einschränkung, Kundenstatus und Audit auseinanderlaufen lassen. Eine atomare, serialisierte Umstellung der Sperr-/Reaktivierungslogik ist sicherheitskritisch und benötigt die verlangte explizite Freigabe; kein Produktionstest dieser Aktionen wurde ausgeführt.
+
 ## Alarmbetrieb und Entscheidungen
 
 Vier lokale Regeln mit stabilen IDs (Deduplizierung), messbaren Bestands-/Zeitfenstern und expliziter Wiederherstellung bei frischen Messwerten. Schwelle eins für erfasste Mail-/Billing-Fehler bzw. unklare/hängende Zustellung. Unknown/Stale wird nicht als Wiederherstellung behandelt.
@@ -68,7 +73,7 @@ Neue `observability-test.mjs`: tatsächlich migriertes PGlite-Schema, Demo-/Wäh
 
 Neue `observability-browser-test.mjs`: leere isolierte PostgreSQL-Datenbank, alle fünf tatsächlichen Operatorrollen, anonymer Zugriff verweigert, drei Profile, beide Themes, 390/768/1920/2560/3840 px, tatsächlicher automatischer Abruf, API-Ausfall und Wiederherstellung. Beide CI-Engines führen diesen zusätzlichen Gate aus; bestehende Gates bleiben erhalten. Der allgemeine Browserkatalog prüft zusätzlich, dass eine Demo-Sitzung die Wallboard-Route nicht öffnet.
 
-Lokale Unit-/Migration-/Architektur-/Navigations-/CSS-/Dokumentationsprüfungen, vollständiger Lint, Typecheck und Build wurden ausgeführt. Nach abschliessenden Änderungen sind CI-Ergebnisse und visuelle Browser-Artefakte massgeblich und im PR nachzutragen. Physische PWA-Geräte, permanente 27-/32-/55-Zoll-Kioskdisplays und Langzeitbetrieb sind nicht abgenommen. CI PostgreSQL 16 beweist nicht automatisch jeden PostgreSQL-18-Produktionsfall.
+Lokale Unit-/Migration-/Architektur-/Navigations-/CSS-/Dokumentationsprüfungen, vollständiger Lint, Typecheck und Build wurden ausgeführt. Quality 38160550332 für Code-Head ebb9e3a: Build/Checks und CodeQL erfolgreich; Chromium einschliesslich authentifizierter Observability erfolgreich. WebKit allgemeine UX erfolgreich, authentifizierter Test beim virtuellen Abruf-/Ausfalltimer fehlgeschlagen. Dieser Timer wird durch reale automatische 60-Sekunden-Abrufe mit Response-Nachweis ersetzt; keine manuelle Refresh-Aktion ersetzt das Gate. Die Artefakte zeigten bei 1920 × 1080 die Alarmzentrale unterhalb des Viewports: kompaktere Wallboard-Abstände und eine gemeinsame zweispaltige Sektionenanordnung korrigieren dies; neue vertikale Fit-Prüfung auch mit tatsächlichen Web-Vitals-Testdaten. Neuer CI-Head muss vor Freigabe erneut vollständig geprüft werden. Physische PWA-Geräte, permanente 27-/32-/55-Zoll-Kioskdisplays und Langzeitbetrieb sind nicht abgenommen. CI PostgreSQL 16 beweist nicht automatisch jeden PostgreSQL-18-Produktionsfall.
 
 ## Freigabe, Rollback und Abnahme
 
