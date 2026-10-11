@@ -2672,6 +2672,16 @@ input:not([type="checkbox"]):not([type="radio"]),
   }
   .page-head-detail{display:none}
 
+ .bo-monitor-chart-tabs{display:block;margin-bottom:12px}
+ .bo-monitoring-portal .bo-monitor-charts{grid-template-columns:1fr}
+ .bo-monitoring-portal .bo-monitor-chart-slot[data-selected="false"]{display:none}
+ .bo-monitoring-portal .bo-monitor-chart svg{max-height:180px}
+ .bo-monitor-services{grid-template-columns:repeat(2,minmax(0,1fr));gap:0 12px}
+ .bo-monitor-services summary{flex-wrap:wrap;justify-content:flex-start;align-content:center;gap:4px;min-height:56px}
+ .bo-monitor-services summary b{flex-basis:100%}
+ .bo-monitoring-portal .bo-metric-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .bo-monitor-detail-metrics summary{flex-wrap:wrap}
+ .bo-monitor-detail-metrics summary>span{flex-basis:100%}
  .bo-monitoring-wallboard{grid-template-columns:1fr}
  .bo-monitoring-wallboard .bo-metric-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
  .bo-monitoring-wallboard .monitoring-list{grid-template-columns:1fr}
