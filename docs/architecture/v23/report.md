@@ -12,7 +12,7 @@ Offene PRs: #237 (Auth/Runtime-Rolle/Readiness; 10 Commits vor und 20 hinter mai
 
 ## Inventar und Nachweisgrenzen
 
-[Funktionsinventar](function-inventory.md), `function-inventory.json`: 14 Adminansichten, 20 Operator-Endpunkte, neun Workflows und 2504 statisch erreichbare JSX-Elementvorkommen samt Props, Bedingungen und Rendering-/Importpfaden. Das ist ein Quellinventar, keine Behauptung vollständig getesteter Geschäftsprozesse. Tabellen- und Testreferenzsuche enthält Kandidaten; exakte Abfragen und vorhandene Rollenprüfungen sind über Dateipfade nachvollziehbar.
+[Funktionsinventar](function-inventory.md), `function-inventory.json`: 14 Adminansichten, 20 Operator-Endpunkte, neun Workflows und 2506 statisch erreichbare JSX-Elementvorkommen samt Props, Bedingungen und Rendering-/Importpfaden. Das ist ein Quellinventar, keine Behauptung vollständig getesteter Geschäftsprozesse. Tabellen- und Testreferenzsuche enthält Kandidaten; exakte Abfragen und vorhandene Rollenprüfungen sind über Dateipfade nachvollziehbar.
 
 [Prüfmatrix](requirements.md), `requirements.json`: eindeutige IDs, Dateien, Methode, Erwartung, tatsächliches Ergebnis, Status und Nachweis. Vollständige End-to-End-Abnahme aller Kunden-/Operator-Mutationen, Provider-Prozesse, Exporte und Audit-Race-Conditions bleibt offen. Keine fehlende Geschäftsregel wurde erfunden. Rückerstattungen und zusätzliche Prozessfunktionen werden nicht allein aus Modulnamen als vorhanden eingestuft.
 
