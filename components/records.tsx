@@ -27,7 +27,7 @@ export function DataTable({children,label,variant="records",owner}:{children:Rea
   const statusIndex=cells.findIndex(cell=>isValidElement(cell)&&cell.type===Status);
   const status=cells[statusIndex];
   const badge=isValidElement<{children:string;tone?:"success"|"warning"|"danger"|"neutral"|"info"}>(status)?status.props:null;
-  return <span className="record-wrapper" key={node.key??index}><ListRow href={node.props.href} onClick={node.props.onClick} title={title} meta={<>{structuredTitle&&<span className="record-table-meta">{primaryParts.slice(1)}</span>}{cells.map((cell,i)=>i===primary||i===statusIndex||i===amountIndex?null:<span className="record-table-meta" key={i}>{headings[i]&&<span>{headings[i]}: </span>}{cell}</span>)}</>} value={amountIndex<0?undefined:cells[amountIndex]} status={badge?.children} tone={badge?.tone}/></span>;
+  return <span className="record-wrapper" key={node.key??index}><ListRow compact valuePlacement="metadata" href={node.props.href} onClick={node.props.onClick} title={title} meta={<>{structuredTitle&&<span className="record-table-meta">{primaryParts.slice(1)}</span>}{cells.map((cell,i)=>i===primary||i===statusIndex||i===amountIndex?null:<span className="record-table-meta" key={i}>{headings[i]&&<span>{headings[i]}: </span>}{cell}</span>)}</>} value={amountIndex<0?undefined:cells[amountIndex]} status={badge?.children} tone={badge?.tone}/></span>;
  })}</div>}</>;
 }
 function tableCells(children:ReactNode,header=false){
@@ -204,6 +204,8 @@ export function RecordRow({
   value,
   status,
   personIdentity,
+  compact=false,
+  valuePlacement="separate",
 }: {
   href?: string;
   icon?: string;
@@ -212,8 +214,10 @@ export function RecordRow({
   value?: string;
   status?: string;
   personIdentity?:string;
+  compact?:boolean;
+  valuePlacement?:"separate"|"metadata";
 }) {
-  return <ListRow href={href} title={personIdentity?<span className="person-record"><Avatar name={title} identity={personIdentity}/><span>{title}</span></span>:title} meta={meta} value={value} status={status} tone={status?tone(status):"neutral"}/>;
+  return <ListRow compact={compact} valuePlacement={valuePlacement} href={href} title={personIdentity?<span className="person-record"><Avatar name={title} identity={personIdentity}/><span>{title}</span></span>:title} meta={meta} value={value} status={status} tone={status?tone(status):"neutral"}/>;
 }
 
 /** Employee ledgers and the time module share the same information layout. */

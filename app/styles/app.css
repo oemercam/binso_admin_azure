@@ -1434,8 +1434,8 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 .document-summary-row>b{min-width:0;overflow-wrap:anywhere}
 .document-summary-row>.status{justify-self:end;max-width:100%;white-space:normal;text-align:right}
 .document-summary-row>small{grid-column:1/-1;color:var(--color-muted);overflow-wrap:anywhere}
-.document-summary-row.has-value>small{grid-column:1;grid-row:2;min-width:0}
-.document-summary-row.has-value>.document-summary-amount{grid-column:2;grid-row:2;align-self:start}
+.document-summary-row.has-value.has-inline-value>small{grid-column:1;grid-row:2;min-width:0}
+.document-summary-row.has-value.has-inline-value>.document-summary-amount{grid-column:2;grid-row:2;align-self:start}
 .document-summary-amount{grid-column:1/-1;display:flex;align-items:baseline;justify-content:space-between;gap:var(--field-label-gap);font-variant-numeric:tabular-nums;min-width:0}
 .document-summary-amount>small{color:var(--color-muted)}
 .document-summary-amount>strong{margin-left:auto;text-align:right;white-space:normal;overflow-wrap:anywhere;min-width:0}
