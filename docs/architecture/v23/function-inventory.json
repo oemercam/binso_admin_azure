@@ -24476,6 +24476,7 @@
       "expectedBehavior": "Administrative Änderungen nachvollziehen",
       "tests": [
         "scripts/migration-test.mjs",
+        "scripts/operator-announcement-test.mjs",
         "scripts/ux-browser-test.mjs"
       ],
       "testEvidence": "Source references only; not a claim of complete function coverage.",
@@ -27909,6 +27910,7 @@
         "scripts/navigation-foundation-test.mjs",
         "scripts/observability-browser-test.mjs",
         "scripts/observability-test.mjs",
+        "scripts/operator-announcement-test.mjs",
         "scripts/pwa-browser-test.mjs",
         "scripts/qa-plan-test.mjs",
         "scripts/ui-foundation-test.mjs",
@@ -37697,9 +37699,19 @@
           "exported": "authorizeOperator"
         },
         {
+          "local": "platformAudit",
+          "target": "lib/server/operator/audit.ts",
+          "exported": "platformAudit"
+        },
+        {
           "local": "query",
           "target": "lib/server/db.ts",
           "exported": "query"
+        },
+        {
+          "local": "withPlatform",
+          "target": "lib/server/db.ts",
+          "exported": "withPlatform"
         },
         {
           "local": "apiError",
@@ -37741,6 +37753,7 @@
         "lib/server/operator/entra.ts",
         "lib/server/http.ts",
         "lib/server/operator/rbac.ts",
+        "lib/server/operator/audit.ts",
         "lib/server/validation.ts"
       ],
       "authorization": [
@@ -37764,10 +37777,12 @@
       "dataSources": [
         "platform_announcements",
         "platform_auth_sessions",
-        "platform_operator_assignments"
+        "platform_operator_assignments",
+        "platform_audit_events"
       ],
       "tests": [
         "scripts/api-tenant-postgres-test.mjs",
+        "scripts/operator-announcement-test.mjs",
         "scripts/ux-browser-test.mjs"
       ],
       "verification": "Authorization expressions and table names are static evidence; method-specific runtime coverage is separate."

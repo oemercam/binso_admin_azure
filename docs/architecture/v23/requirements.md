@@ -44,5 +44,5 @@ Vollständige Felder: `requirements.json`. Status bezeichnet den tatsächlichen 
 | V23-E-007 | Customer metrics must use real authorized data | implemented_pending_ci | Current support cases, CHF-only payments, normalized actual contract and time-effective restrictions; missing grants clearly labelled |
 | V23-E-008 | Payment currency and decimal integrity | implemented_pending_ci | Original currency projected; CHF-only chart/KPI uses sumMoney; KPI explicitly refers to displayed payments |
 
-| V23-I-005 | Durable announcement audit | open_defect | Announcement POST has creator column but no audit event; source proof in requirements.json |
+| V23-I-005 | Durable announcement audit | verified_local_pending_ci | Actual transaction stores announcement and audit; migrated API rollback/RBAC/origin test passed |
 | V23-I-006 | Atomic restriction/account/audit | blocked_security_approval | Separate transactions; changes to restriction/reactivation require explicit approval |

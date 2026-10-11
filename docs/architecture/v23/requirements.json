@@ -594,10 +594,12 @@
     ],
     "method": "Read actual POST and audit helper call graph",
     "expected": "Successful administrative creation records actor/action/entity atomically",
-    "actual": "POST inserts announcement with created_by_user_id but does not call platformAudit or insert platform_audit_events; not accepted as complete audit logging",
-    "status": "open_defect",
+    "actual": "Announcement insert and platformAudit share actual withPlatform transaction; API tests verify RBAC, origin, validation, actor/entity event and rollback on audit failure",
+    "status": "verified_local_pending_ci",
     "evidence": [
-      "app/api/operator/announcements/route.ts"
+      "scripts/operator-announcement-test.mjs",
+      "app/api/operator/announcements/route.ts",
+      "lib/server/operator/audit.ts"
     ]
   },
   {

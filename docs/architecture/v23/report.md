@@ -58,7 +58,7 @@ Keine direkte authentifizierte Azure-Control-Plane-Verbindung in dieser Arbeitsu
 
 ## Weitere belegte Sicherheits- und Integritätsbefunde
 
-- **V23-I-005:** `app/api/operator/announcements/route.ts` speichert Ankündigungen mit `created_by_user_id`, erzeugt aber kein `platform_audit_events`-Ereignis. Die Verwaltungsaktion ist damit nicht vollständig im zentralen Audit protokolliert.
+- **V23-I-005:** `app/api/operator/announcements/route.ts` speichert Ankündigungen mit `created_by_user_id`, erzeugt aber kein `platform_audit_events`-Ereignis. Behoben: Ankündigung und `platform.announcement.created` werden jetzt in derselben `withPlatform`-Transaktion gespeichert. Der zentrale Audit-Helper akzeptiert dafür den vorhandenen Transaktionsclient; alle bisherigen Aufrufer bleiben kompatibel. Ein migrierter Test des tatsächlichen POST, RBAC, Origin und Validierung belegt Actor/Entity-Metadaten und vollständigen Rollback bei Audit-Fehler. Keine Nachricht oder Produktionsankündigung wurde veröffentlicht.
 - **V23-I-006:** Erstellen/Aufheben von Einschränkungen ruft `operatorInsert`, `operatorUpdate` und `operatorAudit` nacheinander auf. Diese Helpers öffnen separate Transaktionen. Fehler oder parallele Änderungen können Einschränkung, Kundenstatus und Audit auseinanderlaufen lassen. Eine atomare, serialisierte Umstellung der Sperr-/Reaktivierungslogik ist sicherheitskritisch und benötigt die verlangte explizite Freigabe; kein Produktionstest dieser Aktionen wurde ausgeführt.
 
 ## Alarmbetrieb und Entscheidungen
