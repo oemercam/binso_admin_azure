@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import {pathToFileURL} from 'node:url';
 import ts from 'typescript';
 import {PGlite} from '@electric-sql/pglite';
 import {pgcrypto} from '@electric-sql/pglite/contrib/pgcrypto';
@@ -43,7 +44,7 @@ const adapters={
  'lib/server/session.ts':uri('export const getSession=async()=>globalThis.__integrity.getSession();export const requireSession=getSession;export const createSession=async input=>globalThis.__integrity.createSession(input);export const endDemoSession=async()=>{}'),
  'lib/server/rate-limit.ts':uri('export const enforceRateLimit=async()=>{}'),
  'lib/server/env.ts':uri('export const env={appEncryptionKey:"isolated-auth-integrity-fixture-only",sessionTtlHours:168,sessionCookieName:"integrity_fixture_cookie"}'),
- 'lib/server/file-scan.ts':uri('export const scanFile=async()=>{globalThis.__integrity.scanCalls++;if(globalThis.__integrity.scanStatus==="unavailable")throw new Response(null,{status:503});return globalThis.__integrity.scanStatus}'),
+ 'lib/server/file-scan.ts':uri(`import {createHash} from 'node:crypto';import {scanBytes} from '${pathToFileURL(path.resolve('lib/server/clamav-protocol.mjs')).href}';export const scanFileWithEvidence=async body=>{globalThis.__integrity.scanCalls++;const status=globalThis.__integrity.scanStatus;if(status==='unavailable')throw new Response(null,{status:503});if(status==='clean'&&process.env.BINSO_REAL_SCANNER_SOCKET)return scanBytes(body,{socketPath:process.env.BINSO_REAL_SCANNER_SOCKET});return {status,evidence:status==='pending'?null:{engine:'ClamAV',engineVersion:'1.4.6',signaturesVersion:1,signaturesAt:new Date().toISOString(),sha256:createHash('sha256').update(body).digest('hex'),startedAt:new Date().toISOString(),completedAt:new Date().toISOString()}}}`),
  'lib/server/email-otp.ts':uri('export const consumeEmailCode=async()=>false;export const issueEmailCode=async()=>{throw Error("unexpected email flow")}'),
  'lib/server/email.ts':uri('export const sendMail=async()=>{throw Error("no external mail in fixtures")};export const mailLayout=()=>""'),
  'lib/server/registration.ts':uri('export const completeRegistrationVerification=async()=>false;export const registrationHandoff=async()=>({next:"/dashboard"});export const sendRegistrationVerification=async()=>false'),
@@ -136,7 +137,9 @@ try{
  globalThis.__integrity.scanStatus='clean';
  const cleanLogoResponse=await files.POST(imageUpload('company_logo','synthetic-clean-logo'));assert.equal(cleanLogoResponse.status,201);const cleanLogo=(await cleanLogoResponse.json()).item;assert.equal(cleanLogo.scanStatus,'clean');
  const cleanAvatarResponse=await files.POST(imageUpload('profile_avatar','synthetic-unavailable-avatar'));assert.equal(cleanAvatarResponse.status,201,'Failed scans do not consume retry keys');const cleanAvatar=(await cleanAvatarResponse.json()).item;
+ const proof=(await query('select scan_evidence,sha256 from file_objects where id=$1',[cleanLogo.id])).rows[0];assert.equal(proof.scan_evidence.sha256,proof.sha256,'Clean upload provenance binds actual persisted bytes');assert.equal(proof.scan_evidence.engine,'ClamAV');
  const cleanBranding={logo:'/api/files/'+cleanLogo.id+'/download',avatar:'/api/files/'+cleanAvatar.id+'/download'};assert.deepEqual(await branding(),cleanBranding);
+ if(process.env.BINSO_REAL_SCANNER_SOCKET){const form=new FormData();form.set('file',new File([Buffer.from('WDVPIVAlQEFQWzRcUFpYNTQoUF4pN0NDKTd9JEVJQ0FSLVNUQU5EQVJELUFOVElWSVJVUy1URVNULUZJTEUhJEgrSCo=','base64')],'synthetic-antivirus-test.txt',{type:'text/plain'}));form.set('purpose','document');const request=new Request('https://fixture.invalid/api/files',{method:'POST',headers:{'idempotency-key':'real-antivirus-test-key'},body:form});assert.equal((await files.POST(request)).status,422,'Actual upload handler rejects real antivirus test signature');assert.deepEqual(await branding(),cleanBranding);}
  const scansBeforeReplay=globalThis.__integrity.scanCalls;globalThis.__integrity.scanStatus='unavailable';assert.equal((await files.POST(imageUpload('company_logo','synthetic-clean-logo'))).status,201);assert.equal(globalThis.__integrity.scanCalls,scansBeforeReplay,'Successful replays do not depend on scanner availability');
  const company=await import(await load('app/api/settings/company/route.ts'));
  for(const [logoUrl,status] of [['https://external.fixture.invalid/logo.png',400],['/api/files/'+pendingLogoId+'/download',423],['/api/files/'+cleanAvatar.id+'/download',404],['/api/files/00000000-0000-4000-8000-000000000001/download',404]]){

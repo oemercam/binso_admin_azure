@@ -11,7 +11,7 @@ test -f /tmp/binso-production-artifact/public/sw.js
 test -f /tmp/binso-production-artifact/public/manifest-app.webmanifest
 (
   cd /tmp/binso-production-artifact
-  PORT=3100 HOSTNAME=127.0.0.1 node server.js > /tmp/binso-artifact.log 2>&1 &
+  PORT=3100 FILE_SCAN_SOCKET=/tmp/binso-scanner/clamd.sock BINSO_SCANNER_SIDECAR=true node scripts/start-scanner-production.mjs > /tmp/binso-artifact.log 2>&1 &
   echo $! > /tmp/binso-artifact.pid
 )
 ARTIFACT_PID="$(cat /tmp/binso-artifact.pid)"
@@ -36,5 +36,8 @@ if [ "$READY" -ne 1 ]; then
 fi
 grep -q "$GITHUB_SHA" /tmp/binso-production-artifact/public/deployment.json
 grep -q '"status":"ok"' /tmp/binso-artifact-health.json
+test -S /tmp/binso-scanner/clamd.sock
+test "$(stat -c %a /tmp/binso-scanner/clamd.sock)" = 600
+test "$(stat -c %a /tmp/binso-scanner)" = 700
 BINSO_BASE_URL=http://127.0.0.1:3100 node scripts/check-deployed-assets.mjs /tmp/binso-production-artifact
 echo "Exact production ZIP starts successfully."
