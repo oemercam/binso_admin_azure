@@ -9,6 +9,15 @@ const url=new URL(process.env.BINSO_OBSERVABILITY_TEST_URL??'');
 assert.ok(['localhost','127.0.0.1'].includes(url.hostname)&&url.pathname==='/binso_observability_test'&&url.username==='binso_test','Only empty isolated observability test DB allowed');
 const pool=new pg.Pool({connectionString:url.href}),output=process.env.BINSO_OBSERVABILITY_OUTPUT??'/tmp/binso-observability-browser';
 const base='http://127.0.0.1:3228';let server,browser;const errors=[],results=[];
+async function navigateOperator(page,route){
+ const target=base+route;
+ if(page.url()===target)return;
+ const links=page.locator('.operator-root a[href='+JSON.stringify(route)+']');
+ if(await links.count()){
+  // Use the existing Next Link handler instead of repeatedly unloading its RSC streams.
+  await links.first().evaluate(link=>link.click());await page.waitForURL(target);
+ }else await page.goto(target);
+}
 const observeErrors=observedPage=>{
  observedPage.on('pageerror',error=>{errors.push(error.message);console.log('Uncaught operator browser error',{url:observedPage.url(),message:error.message,stack:error.stack});});
  observedPage.on('requestfailed',request=>{const target=new URL(request.url());if(target.searchParams.has('_rsc'))console.log('Failed operator RSC request',{route:target.pathname,prefetch:request.headers()['next-router-prefetch']==='1',failure:request.failure()?.errorText});});
@@ -60,13 +69,13 @@ try{
    if(width>=1920)assert.equal(await page.evaluate(()=>document.documentElement.scrollHeight<=innerHeight+1),true,'Wallboard fits 16:9 viewport '+width+' '+profile);await page.screenshot({path:path.join(output,theme+'-'+width+'-'+profile+'.png'),fullPage:true});results.push({theme,width,profile,passed:true});
   }
  }
- await page.setViewportSize({width:390,height:900});await page.goto(base+'/operator/zahlungen');await page.getByText('12.34',{exact:false}).first().waitFor();
+ await page.setViewportSize({width:390,height:900});await navigateOperator(page,'/operator/zahlungen');await page.getByText('12.34',{exact:false}).first().waitFor();
  assert.ok((await page.locator('.operator-payment-insights').innerText()).includes('CHF 12.34'),'Foreign currency excluded from CHF KPI');assert.ok((await page.locator('.operator-table-card').innerText()).includes('EUR'),'Original payment currency retained');
- await page.goto(base+'/operator/kunden/'+org);await page.getByText('Synthetic customer',{exact:true}).first().waitFor();assert.ok((await page.locator('.operator-customer-metrics').innerText()).includes('CHF 12.34'),'Customer metrics from actual API');assert.ok((await page.locator('.operator-customer-metrics').innerText()).includes('Limit nicht verfügbar'),'Missing entitlements never imply an unlimited account');await page.screenshot({path:path.join(output,'customer-actual-data.png'),fullPage:true});
+ await navigateOperator(page,'/operator/kunden/'+org);await page.getByText('Synthetic customer',{exact:true}).first().waitFor();assert.ok((await page.locator('.operator-customer-metrics').innerText()).includes('CHF 12.34'),'Customer metrics from actual API');assert.ok((await page.locator('.operator-customer-metrics').innerText()).includes('Limit nicht verfügbar'),'Missing entitlements never imply an unlimited account');await page.screenshot({path:path.join(output,'customer-actual-data.png'),fullPage:true});
  // Every implemented admin page and both detail views consume real isolated APIs.
  const portalRoutes=['','tickets','tickets/'+supportCase.id,'kunden','kunden/'+org,'zahlungen','finanzen','abonnemente','sperrungen','monitoring','ankuendigungen','sicherheit','audit'];
  for(const theme of ['light','dark'])for(const width of [320,390,820,1440])for(const section of portalRoutes){
-  await page.setViewportSize({width,height:900});await page.goto(base+'/operator'+(section?'/'+section:''));await page.locator('.operator-page-head h1').waitFor();
+  await page.setViewportSize({width,height:900});await navigateOperator(page,'/operator'+(section?'/'+section:''));await page.locator('.operator-page-head h1').waitFor();
   await page.waitForLoadState('networkidle');await page.evaluate(theme=>document.documentElement.dataset.theme=theme,theme);
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,'Admin overflow '+section+' '+width);
   assert.equal(await page.getByText(/Invalid Date|undefined/).count(),0,'Actual admin contract '+section);
@@ -76,7 +85,7 @@ try{
   assert.equal(await page.getByRole('heading',{name:'Keine Berechtigung für diesen Bereich',exact:true}).count(),0,'Owner page accessible '+section);
   await page.screenshot({path:path.join(output,'admin-'+theme+'-'+width+'-'+(section.replaceAll('/','-')||'dashboard')+'.png'),fullPage:true});results.push({theme,width,section,passed:true});
  }
- await page.setViewportSize({width:390,height:900});await page.goto(base+'/operator/tickets/'+supportCase.id);await page.getByText('Original customer message',{exact:true}).waitFor();
+ await page.setViewportSize({width:390,height:900});await navigateOperator(page,'/operator/tickets/'+supportCase.id);await page.getByText('Original customer message',{exact:true}).waitFor();
  await page.getByLabel('Status',{exact:true}).selectOption('waiting_customer');await page.getByLabel('Status',{exact:true}).locator('option[value="waiting_customer"]:checked').waitFor({state:'attached'});
  await page.getByPlaceholder('Antwort an Kunden schreiben...').fill('Real isolated operator reply');await page.getByRole('button',{name:'Senden',exact:true}).click();await page.getByText('Real isolated operator reply',{exact:true}).waitFor();
  assert.equal((await pool.query('select status from support_cases where id=$1',[supportCase.id])).rows[0].status,'waiting_for_customer','Actual ticket status persisted');
