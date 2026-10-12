@@ -99,6 +99,7 @@
 .operator-customer-actions{display:flex;gap:8px;flex-wrap:wrap}
 .operator-customer-metrics,
 .operator-monitor-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:14px 0}
+.operator-customer-metrics .metric small{display:block}
 .operator-customer-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .operator-detail-list>div{display:grid;grid-template-columns:130px 1fr;gap:12px;padding:11px 0;border-bottom:1px solid var(--color-line);font-size:11px}
 .operator-detail-list dt{color:var(--color-muted)}
