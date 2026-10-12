@@ -2,7 +2,11 @@ import { NextRequest } from "next/server";
 import { requireOperatorSession } from "@/lib/server/operator/session";
 import { authorizeOperator } from "@/lib/server/operator/rbac";
 import { apiError, assertSameOrigin, cleanText, json, readJson } from "@/lib/server/http";
-import { operatorAudit, operatorList, operatorUpdate } from "@/lib/server/database";
+import { operatorList } from "@/lib/server/database";
+
+import {withPlatform} from '@/lib/server/db';
+import {platformAudit} from '@/lib/server/operator/audit';
+import {updateOperatorBusiness} from '@/lib/server/repositories/operator-api';
 
 type Body={plan?:unknown;subscriptionStatus?:unknown;accountStatus?:unknown;userLimit?:unknown};
 
@@ -16,7 +20,7 @@ export async function PATCH(request:NextRequest,{params}:{params:Promise<{id:str
     const subscriptionStatus=cleanText(body.subscriptionStatus,40);
     const accountStatus=cleanText(body.accountStatus,40);
     if(plan){
-      if(!["trial","start","business","pro"].includes(plan)) return json({error:"plan_invalid",message:"Ungültiger Plan."},400);
+      if(!["start","business","pro"].includes(plan)) return json({error:"plan_invalid",message:"Ungültiger Plan."},400);
       patch.plan=plan;
     }
     if(subscriptionStatus){
@@ -33,6 +37,10 @@ export async function PATCH(request:NextRequest,{params}:{params:Promise<{id:str
       patch.user_limit=limit;
     }
     if(!Object.keys(patch).length) return json({error:"empty_patch",message:"Keine Änderung angegeben."},400);
+    if(plan||subscriptionStatus){
+      const accounts=await operatorList<{billing_subscription_ref:string|null}>("tenant_accounts","billing_subscription_ref","tenant_id=eq."+encodeURIComponent(id)+"&limit=1");
+      if(accounts[0]?.billing_subscription_ref)return json({error:"stripe_managed",message:"Dieses Abonnement wird über Stripe verwaltet. Plan und Abonnementstatus müssen dort geändert werden."},409);
+    }
     if(accountStatus==="active"){
       const restrictions=await operatorList<{starts_at:string;ends_at:string|null}>("tenant_restrictions","starts_at,ends_at","tenant_id=eq."+encodeURIComponent(id)+"&active=eq.true&limit=100");
       const now=Date.now();
@@ -43,9 +51,13 @@ export async function PATCH(request:NextRequest,{params}:{params:Promise<{id:str
       });
       if(effective) return json({error:"restriction_active",message:"Aktive Einschränkungen müssen zuerst aufgehoben werden."},409);
     }
-    const rows=await operatorUpdate("tenant_accounts","tenant_id=eq."+encodeURIComponent(id),patch);
-    if(!rows[0]) return json({error:"not_found",message:"Konto wurde nicht gefunden."},404);
-    await operatorAudit("tenant.account.updated","tenant",id,patch);
-    return json({item:rows[0]});
+    const item=await withPlatform(async c=>{
+      await c.query('select id from organizations where id::text=$1 for update',[id]);
+      const rows=await updateOperatorBusiness(c,session,"tenant_accounts","tenant_id=eq."+encodeURIComponent(id),patch);
+      if(!rows[0])return null;
+      await platformAudit({userId:session.userId,userEmail:session.email,action:"tenant.account.updated",entityType:"tenant",entityId:id,metadata:patch},c);
+      return rows[0];
+    });
+    return item?json({item}):json({error:"not_found",message:"Konto wurde nicht gefunden."},404);
   }catch(error){return apiError(error);}
 }

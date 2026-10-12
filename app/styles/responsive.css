@@ -2679,6 +2679,8 @@ input:not([type="checkbox"]):not([type="radio"]),
  .bo-monitor-services{grid-template-columns:repeat(2,minmax(0,1fr));gap:0 12px}
  .bo-monitor-services summary{flex-wrap:wrap;justify-content:flex-start;align-content:center;gap:4px;min-height:56px}
  .bo-monitor-services summary b{flex-basis:100%}
+ .bo-monitor-service{flex-wrap:wrap;align-content:center;justify-content:flex-start;gap:6px}
+ .bo-monitor-service b{flex-basis:100%}
  .bo-monitoring-portal .bo-metric-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
  .bo-monitor-detail-metrics summary{flex-wrap:wrap}
  .bo-monitor-detail-metrics summary>span{flex-basis:100%}

@@ -71,7 +71,7 @@ try{
  // Execute the dashboard's actual queries against the fully migrated schema.
  globalThis.operatorDashboardClient=client;
  const runtime=dataModule(`export async function requireOperatorSession(){return {role:'platform_owner'}}; export function authorizeOperator(){}; export async function withPlatform(fn){return fn(globalThis.operatorDashboardClient)}; export const json=Response.json; export function apiError(error){throw error}`);
- const dashboardSource=(await fs.readFile('app/api/operator/dashboard/route.ts','utf8')).replace(/'@\/lib\/server\/(?:operator\/session|operator\/rbac|db|http)'/g,JSON.stringify(runtime));
+ const dashboardSource=(await fs.readFile('app/api/operator/dashboard/route.ts','utf8')).replace("'@/lib/permissions'",JSON.stringify(permissions)).replace(/'@\/lib\/server\/(?:operator\/session|operator\/rbac|db|http)'/g,JSON.stringify(runtime));
  const {GET}=await import(dataModule(dashboardSource));
  await db.exec('begin');
  try{

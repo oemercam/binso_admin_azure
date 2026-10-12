@@ -2,7 +2,11 @@ import { requireOperatorSession } from "@/lib/server/operator/session";
 import { authorizeOperator } from "@/lib/server/operator/rbac";
 import { NextRequest } from "next/server";
 import { apiError, assertSameOrigin, cleanText, json, readJson } from "@/lib/server/http";
-import { operatorAudit, operatorList, operatorUpdate } from "@/lib/server/database";
+import { operatorList } from "@/lib/server/database";
+
+import {withPlatform} from '@/lib/server/db';
+import {platformAudit} from '@/lib/server/operator/audit';
+import {updateOperatorBusiness} from '@/lib/server/repositories/operator-api';
 
 type Body={status?:unknown;priority?:unknown};
 
@@ -41,8 +45,12 @@ export async function PATCH(request:NextRequest,{params}:{params:Promise<{id:str
       patch.priority=priority;
     }
     if(!Object.keys(patch).length) return json({error:"empty_patch",message:"Keine Änderung angegeben."},400);
-    const rows=await operatorUpdate<Record<string,unknown>>("support_tickets","id=eq."+encodeURIComponent(id),patch);
-    await operatorAudit("support.ticket.updated","support_ticket",id,patch);
-    return json({item:rows[0]});
+    const item=await withPlatform(async c=>{
+      const rows=await updateOperatorBusiness(c,session,"support_tickets","id=eq."+encodeURIComponent(id),patch);
+      if(!rows[0])return null;
+      await platformAudit({userId:session.userId,userEmail:session.email,action:"support.ticket.updated",entityType:"support_ticket",entityId:id,metadata:{...patch,organizationId:rows[0].tenant_id}},c);
+      return rows[0];
+    });
+    return item?json({item}):json({error:"not_found",message:"Ticket wurde nicht gefunden."},404);
   }catch(error){return apiError(error);}
 }

@@ -1567,3 +1567,20 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 
 .bo-monitor-headline{min-width:0;margin-bottom:16px}
 .bo-monitor-alert-summary{margin:12px 0;font-size:13px;color:var(--color-fg)}
+
+.bo-monitor-kpi{min-width:0;text-align:left;position:relative;padding:0 0 10px;border:0;border-radius:0;background:transparent;color:var(--color-fg);font:inherit;cursor:pointer}
+.bo-monitor-kpi:focus-visible{outline:2px solid var(--color-fg);outline-offset:4px;border-radius:var(--radius-sm)}
+.bo-monitor-kpi[data-health="critical"] .metric strong{color:var(--color-danger)}
+.bo-monitor-kpi[data-health="warning"] .metric strong{color:var(--status-warning-fg)}
+.bo-monitor-service-dots{display:flex;gap:5px;padding-inline:var(--kpi-padding)}
+.bo-monitor-service-dots i{flex:1;height:4px;max-width:24px;background:var(--color-line);border-radius:2px}
+.bo-monitor-service-dots i[data-health="healthy"]{background:#16a34a}
+.bo-monitor-service-dots i[data-health="critical"]{background:var(--color-danger)}
+.bo-monitor-service-dots i[data-health="warning"]{background:var(--status-warning-fg)}
+.bo-monitor-overview-actions{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.bo-monitor-service{min-width:0;display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:64px;padding:12px 0;background:transparent;color:inherit;border:0;border-bottom:1px solid var(--color-line);font:inherit;cursor:pointer;text-align:left}
+.bo-monitor-service b{font-size:13px;overflow-wrap:anywhere}
+.bo-monitor-service .status{flex-shrink:0;font-size:11px;padding:4px 8px}
+
+.bo-monitor-selected-point{display:block;margin-top:6px;font-size:12px;color:var(--color-muted)}
+.bo-monitoring-wallboard .bo-monitor-selected-point{display:none}

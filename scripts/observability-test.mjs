@@ -37,7 +37,7 @@ try{
  const find=(snapshot,id)=>snapshot.metrics.find(m=>m.id===id);
  assert.equal(find(owner,'mail_failed').value,1,'Demo queues excluded');
  assert.equal(find(owner,'payments').value,12.34,'CHF-only actual platform payments');
- assert.equal(find(owner,'vital_LCP').value,1200,'Measured p75');
+ assert.equal(find(owner,'vital_LCP').value,1800,'Nearest-rank p75 of two measured values');
  assert.ok(owner.series.find(s=>s.id==='LCP').points.length>0,'Real history');
  assert.equal(find(owner,'azure_cpu').dataState,'unavailable');
  assert.equal(owner.services.find(s=>s.key==='storage').state,'unknown','Configured is not healthy');

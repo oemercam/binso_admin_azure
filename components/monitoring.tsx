@@ -5,7 +5,7 @@ import {useEffect,useId,useState} from 'react';
 import {useApiQuery} from '@/lib/client/use-api-query';
 import {useBackendMode} from '@/lib/client/backend';
 import {effectiveMetric,evaluateAlarms,formatMonitoringValue,healthLabels,dataLabels,overallHealth,type MonitoringSnapshot,type MonitoringMetric,type MonitoringSeries,type HealthState,type MonitoringArea} from '@/lib/observability/model';
-import {DetailTabs,MetricTiles,MetricTile,WorkspaceSection} from './binso-ux';
+import {ActionRow,DetailTabs,FormSheet,MetricTiles,MetricTile,WorkspaceSection} from './binso-ux';
 import {Button,EmptyState,ErrorState,LoadingState,SectionTitle,Status,Select} from './ui';
 import {MonitoringChart} from './monitoring-chart';
 
@@ -16,28 +16,43 @@ function MetricReading({metric,wallboard}:{metric:MonitoringMetric;wallboard:boo
  const hint=dataLabels[metric.dataState]+' · '+metric.window;
  return <div className="bo-monitor-reading" data-metric-id={metric.id} data-health={metric.state}><MetricTile label={metric.label} value={formatMonitoringValue(metric)} hint={hint}/>{!wallboard&&<><HealthBadge state={metric.state}/><small>{metric.source}{metric.measuredAt?' · '+new Date(metric.measuredAt).toLocaleTimeString('de-CH'):''}</small><p>{metric.detail}</p>{metric.href&&metric.dataState==='fresh'&&<Link href={metric.href}>Details öffnen</Link>}</>}</div>;
 }
-/** Compact portal overview; source explanations stay available on demand. */
+/** Binso metrics and tabbed workspaces; technical explanations open in the shared sheet. */
 function MonitoringOverview({metrics,services,series,alarms,data,unavailable}:{metrics:MonitoringMetric[];services:MonitoringSnapshot['services'];series:MonitoringSeries[];alarms:ReturnType<typeof evaluateAlarms>;data:MonitoringSnapshot;unavailable:boolean}){
  const [chart,setChart]=useState(series[0]?.id??'');
  const [expanded,setExpanded]=useState(false),detailsId=useId();
- const serviceState=overallHealth(services.map(service=>service.state));
+ const [tab,setTab]=useState('performance'),[area,setArea]=useState<MonitoringArea>('application');
+ const [selection,setSelection]=useState<string|null>(null),[sources,setSources]=useState(false);
+ const selectedMetric=metrics.find(item=>item.id===selection),selectedService=services.find(item=>'service:'+item.key===selection);
  const headline=['db_query_ms','app_errors','mail_failed'].map(id=>metrics.find(item=>item.id===id));
- const headlineLabels=['Datenbank-Abfragezeit','Anwendungsfehler · 24 Stunden','Fehlgeschlagene E-Mails'];
- const active=alarms.filter(item=>item.state==='warning'||item.state==='critical'),unknown=alarms.filter(item=>item.state==='unknown').length;
+ const labels=['Datenbank-Abfrage','Anwendungsfehler','E-Mail-Fehler'];
+ const availableAlarms=alarms.filter(alarm=>metrics.find(metric=>metric.id===data.rules.find(rule=>rule.id===alarm.ruleId)?.metricId)?.dataState!=='no_permission');
+ const active=availableAlarms.filter(item=>item.state==='warning'||item.state==='critical');
+ const unknown=availableAlarms.filter(item=>item.state==='unknown').length;
+ const healthyServices=services.filter(item=>item.state==='healthy').length;
+ const openTab=(value:string)=>{setTab(value);setExpanded(true);};
+ const tabs=[['performance','Performance'],['services','Dienste'],['alarms','Alarme'],['readings','Messwerte']];
  return <>
-  <div className="bo-monitor-headline"><MetricTiles><MetricTile label="Service-Status" value={healthLabels[serviceState]} hint="Aktuelle Service-Prüfungen"/>{headline.map((metric,index)=><MetricTile key={headlineLabels[index]} label={headlineLabels[index]} value={metric?formatMonitoringValue(metric):'—'} hint={metric?dataLabels[metric.dataState]+' · '+healthLabels[metric.state]:'Keine Messdaten'}/>)}</MetricTiles></div>
-  {active.length>0&&<p role="status" className="bo-monitor-alert-summary">{active.length} aktive Warnung(en) oder kritische Meldung(en). Details unter «Mehr anzeigen».</p>}
-  <Button variant="secondary" aria-expanded={expanded} aria-controls={detailsId} onClick={()=>setExpanded(value=>!value)}>{expanded?'Weniger anzeigen':'Mehr anzeigen'}</Button>
+  <div className="bo-monitor-headline"><MetricTiles>
+   <button type="button" className="bo-monitor-kpi" onClick={()=>openTab('services')} aria-label="Service-Status prüfen"><MetricTile label="Erreichbare Dienste" value={healthyServices+' / '+services.length} hint={services.some(item=>item.state==='unknown')?'Prüfungen teilweise offen':'Aktuelle Service-Prüfungen'}/><span className="bo-monitor-service-dots" aria-hidden="true">{services.map(service=><i key={service.key} data-health={service.state}/>)}</span></button>
+   {headline.map((metric,index)=><button type="button" className="bo-monitor-kpi" key={labels[index]} data-health={metric?.state??'unknown'} onClick={()=>metric&&setSelection(metric.id)} disabled={!metric} aria-label={labels[index]+' Details'}><MetricTile label={labels[index]} value={metric?formatMonitoringValue(metric):'—'} hint={metric?metric.dataState==='fresh'?metric.window:dataLabels[metric.dataState]:'Keine Messdaten'}/></button>)}
+  </MetricTiles></div>
+  {active.length>0&&<div className="bo-monitor-alert-summary" role="status"><Button variant="secondary" icon="warning" onClick={()=>openTab('alarms')}>{active.length} {active.length===1?'Meldung prüfen':'Meldungen prüfen'}</Button></div>}
+  <div className="bo-monitor-overview-actions"><Button variant="secondary" aria-expanded={expanded} aria-controls={detailsId} onClick={()=>setExpanded(value=>!value)}>{expanded?'Weniger anzeigen':'Mehr anzeigen'}</Button><Button variant="ghost" onClick={()=>setSources(true)}>Datenquellen</Button></div>
   <div id={detailsId} hidden={!expanded}>
-  <WorkspaceSection><SectionTitle title="Performance im Verlauf"/>
-   <div className="bo-monitor-chart-tabs"><DetailTabs label="Performance-Diagramm">{series.map(item=><button key={item.id} type="button" className={chart===item.id?'active':''} onClick={()=>setChart(item.id)}>{item.label.split(' ')[0]}</button>)}</DetailTabs></div>
-   <div className="bo-monitor-charts">{series.map(item=><div key={item.id} className="bo-monitor-chart-slot" data-selected={chart===item.id}><MonitoringChart series={item} unavailable={unavailable}/></div>)}</div>
-  </WorkspaceSection>
-  <WorkspaceSection className="monitoring-panel"><SectionTitle title="Service-Status"/><div className="bo-monitor-services">{services.map(service=><details key={service.key} data-service-status={service.state}><summary><b>{service.name}</b><HealthBadge state={service.state}/></summary><p>{service.detail}</p></details>)}</div></WorkspaceSection>
-  <WorkspaceSection><SectionTitle title="Alarme"/>{active.length?<div className="bo-monitor-alarms">{active.map(alarm=>{const rule=data.rules.find(item=>item.id===alarm.ruleId)!;return <details key={alarm.id} data-alarm-id={alarm.id}><summary><b>{metrics.find(item=>item.id===rule.metricId)?.label??rule.id}</b><HealthBadge state={alarm.state}/></summary><p>Schwelle ≥ {rule.threshold} · {rule.window} · Wiederherstellung: {rule.recovery} · Zuständigkeit: {rule.owner??'Nicht zugewiesen'} · Eskalation: {rule.escalation??'Nicht eingerichtet'}</p></details>;})}</div>:unknown===0?<p>Keine Regel ausgelöst in den verfügbaren Messdaten.</p>:null}{unknown>0&&<p>{unknown} Prüfungen ohne aktuelle Messdaten. Einzelheiten unter «Messwerte und technische Details».</p>}</WorkspaceSection>
-  <details className="bo-monitor-details"><summary>Messwerte und technische Details</summary>{areas.filter(([area])=>area!=='integrations').map(([area,label])=><WorkspaceSection key={area}><SectionTitle title={label}/><div className="bo-monitor-detail-metrics">{metrics.filter(item=>item.area===area).map(metric=><details key={metric.id} data-metric-id={metric.id} data-health={metric.state}><summary><span>{metric.label}</span><strong>{formatMonitoringValue(metric)}</strong><HealthBadge state={metric.state}/></summary><p>{metric.detail}</p><small>{metric.source} · {dataLabels[metric.dataState]} · {metric.window}</small>{metric.href&&metric.dataState==='fresh'&&<Link href={metric.href}>Details öffnen</Link>}</details>)}</div></WorkspaceSection>)}</details>
-  <details className="bo-monitor-details"><summary>Datenquellen und Grenzen</summary><p>Lokale Regelauswertung · keine aktive Benachrichtigung oder Eskalation.</p>{data.limitations.map(text=><p key={text}>{text}</p>)}<p>Aktiver Worker: <code>{data.build.sha??'Nicht verfügbar'}</code></p></details>
+   <DetailTabs label="Monitoring-Bereiche">{tabs.map(([value,label])=><button key={value} type="button" className={tab===value?'active':''} onClick={()=>setTab(value)}>{label}{value==='alarms'&&active.length?' · '+active.length:''}</button>)}</DetailTabs>
+   {tab==='performance'&&<WorkspaceSection><SectionTitle title="Performance im Verlauf"/><p className="technical-hint">Gemessene Browser-Performance · letzte 24 Stunden</p>
+    <div className="bo-monitor-chart-tabs"><DetailTabs label="Performance-Diagramm">{series.map(item=><button key={item.id} type="button" className={chart===item.id?'active':''} onClick={()=>setChart(item.id)}>{item.label.split(' ')[0]}</button>)}</DetailTabs></div>
+    <div className="bo-monitor-charts">{series.map(item=><div key={item.id} className="bo-monitor-chart-slot" data-selected={chart===item.id}><MonitoringChart series={item} unavailable={unavailable}/></div>)}</div>
+   </WorkspaceSection>}
+   {tab==='services'&&<WorkspaceSection className="monitoring-panel"><SectionTitle title="Service-Status"/><div className="bo-monitor-services">{services.map(service=><button type="button" className="bo-monitor-service" key={service.key} data-service-status={service.state} onClick={()=>setSelection('service:'+service.key)}><b>{service.name}</b><HealthBadge state={service.state}/></button>)}</div></WorkspaceSection>}
+   {tab==='alarms'&&<WorkspaceSection><SectionTitle title="Handlungsbedarf"/>{active.length?<div className="action-list">{active.map(alarm=>{const rule=data.rules.find(item=>item.id===alarm.ruleId)!;const metric=metrics.find(item=>item.id===rule.metricId);return <div key={alarm.id} data-alarm-id={alarm.id}><ActionRow icon="warning" title={metric?.label??rule.id} description={metric?formatMonitoringValue(metric)+' · '+metric.window:rule.window} onClick={()=>setSelection(rule.metricId)} endAdornment={<HealthBadge state={alarm.state}/>}/></div>;})}</div>:<EmptyState compact icon="check" title={unknown?'Keine bestätigten Alarme':'Keine Regel ausgelöst'} text={unknown?unknown+' Prüfungen ohne aktuelle Messdaten.':'Die vorhandenen Regeln zeigen keinen Handlungsbedarf.'}/>}<p className="technical-hint">Regeln werden hier ausgewertet. Automatische Benachrichtigungen sind noch nicht eingerichtet.</p></WorkspaceSection>}
+   {tab==='readings'&&<WorkspaceSection><SectionTitle title="Messwerte"/><Select aria-label="Messbereich" value={area} onChange={event=>setArea(event.target.value as MonitoringArea)}>{areas.map(([value,label])=><option key={value} value={value}>{label}</option>)}</Select><div className="action-list">{metrics.filter(item=>item.area===area).map(metric=><div key={metric.id} data-metric-id={metric.id} data-health={metric.state}><ActionRow icon="chart" title={metric.label} description={dataLabels[metric.dataState]+' · '+metric.window} onClick={()=>setSelection(metric.id)} endAdornment={<strong>{formatMonitoringValue(metric)}</strong>}/></div>)}</div>{!metrics.some(item=>item.area===area)&&<EmptyState compact icon="chart" title="Keine Messwerte in diesem Bereich" text="Weitere Datenquellen sind noch nicht angebunden."/>}</WorkspaceSection>}
   </div>
+  <FormSheet open={Boolean(selectedMetric||selectedService)} onClose={()=>setSelection(null)} label={selectedMetric?.label??selectedService?.name??'Messwert'} dirty={false} actions={<Button variant="secondary" onClick={()=>setSelection(null)}>Schliessen</Button>}>
+   {selectedMetric&&<><MetricTile label={selectedMetric.window} value={formatMonitoringValue(selectedMetric)} hint={dataLabels[selectedMetric.dataState]}/><HealthBadge state={selectedMetric.state}/><p>{selectedMetric.detail}</p><dl className="operator-detail-list"><div><dt>Datenquelle</dt><dd>{selectedMetric.source}</dd></div><div><dt>Gemessen</dt><dd>{selectedMetric.measuredAt?new Date(selectedMetric.measuredAt).toLocaleString('de-CH'):'Nicht verfügbar'}</dd></div></dl>{selectedMetric.href&&selectedMetric.dataState==='fresh'&&<ActionRow href={selectedMetric.href} icon="arrow" title="Bereich öffnen"/>}{data.rules.filter(rule=>rule.metricId===selectedMetric.id).map(rule=><p key={rule.id}>Schwelle ≥ {rule.threshold} · {rule.window}. Wiederherstellung: {rule.recovery}. Zuständigkeit: {rule.owner??'Nicht zugewiesen'}. Eskalation: {rule.escalation??'Nicht eingerichtet'}.</p>)}</>}
+   {selectedService&&<><HealthBadge state={selectedService.state}/><p>{selectedService.detail}</p><p className="technical-hint">{selectedService.source}{selectedService.measuredAt?' · '+new Date(selectedService.measuredAt).toLocaleTimeString('de-CH'):''}</p></>}
+  </FormSheet>
+  <FormSheet open={sources} onClose={()=>setSources(false)} label="Datenquellen und Grenzen" dirty={false} actions={<Button variant="secondary" onClick={()=>setSources(false)}>Schliessen</Button>}>{data.limitations.map(text=><p key={text}>{text}</p>)}<p>Aktive Version: <code>{data.build.sha??'Nicht verfügbar'}</code></p></FormSheet>
  </>;
 }
 /** One endpoint, polling policy and presentation for portal and authenticated wallboard. */
