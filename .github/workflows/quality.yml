@@ -24,7 +24,7 @@ env:
   BINSO_BUILD_SHA: ${{ github.sha }}
 jobs:
   plan:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       level: ${{ steps.scope.outputs.level }}
       routes: ${{ steps.scope.outputs.routes }}
@@ -34,10 +34,10 @@ jobs:
       interactions: ${{ steps.scope.outputs.interactions }}
       browser: ${{ steps.scope.outputs.browser }}
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24
       - name: Select conservative QA scope
@@ -57,7 +57,7 @@ jobs:
           fi
           cat /tmp/qa-plan.json >> "$GITHUB_STEP_SUMMARY"
   checks:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     services:
       postgres:
         image: postgres:16 # Docker Official Image; ECR mirror exceeded its data quota
@@ -71,7 +71,7 @@ jobs:
           --health-interval 5s --health-timeout 5s --health-retries 10
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/setup-node
       - run: pnpm release:check
       - run: pnpm test
@@ -92,7 +92,7 @@ jobs:
           mkdir -p evidence/static
           node --input-type=module -e 'import fs from "node:fs";import {identity} from "./scripts/compliance/identity.mjs";fs.writeFileSync("evidence/static/compliance-lint.json",JSON.stringify({schemaVersion:1,...identity(),route:"customer-app",state:"source",checks:[{id:"UX-ARC-001",status:"passed",observed:{command:"pnpm lint",exit:0,scope:"existing central-ui owner rules; full lint"}}]}));'
       - name: Upload architecture lint evidence
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: ux-static-${{ github.sha }}
           path: evidence/static
@@ -102,7 +102,7 @@ jobs:
       - name: Full dependency audit including development tooling
         run: pnpm security:scan:all
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     services:
       postgres:
         image: postgres:16 # Docker Official Image; ECR mirror exceeded its data quota
@@ -116,10 +116,10 @@ jobs:
           --health-interval 5s --health-timeout 5s --health-retries 10
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/setup-node
       - name: Restore Next compiler cache (never a completed build)
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .next/cache
           key: ${{ runner.os }}-node24-next-${{ hashFiles('pnpm-lock.yaml', 'next.config.*') }}-${{ github.sha }}
@@ -138,7 +138,7 @@ jobs:
         run: bash scripts/package-production.sh
       - name: Smoke test exact production artifact
         run: bash scripts/smoke-production-artifact.sh
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: binso-candidate-${{ github.sha }}
           path: deploy/binso-one.zip
@@ -159,7 +159,7 @@ jobs:
           --health-interval 5s --health-timeout 5s --health-retries 10
     needs: [plan, checks, build]
     if: needs.plan.outputs.browser == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # Full UX, real 60-second recovery polling, registration and PWA gates share this job.
     timeout-minutes: 30
     strategy:
@@ -167,9 +167,9 @@ jobs:
       matrix:
         engine: [chromium, webkit]
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/setup-node
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: binso-candidate-${{ github.sha }}
           path: deploy
@@ -179,7 +179,7 @@ jobs:
           unzip -q deploy/binso-one.zip -d "$RUNNER_TEMP/binso-candidate"
       - name: Restore pinned browser binaries
         id: browser-cache
-        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-${{ runner.arch }}-playwright-1.62.1-${{ matrix.engine }}
@@ -195,7 +195,7 @@ jobs:
           fi
       - name: Save installed browser binaries
         if: steps.browser-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-${{ runner.arch }}-playwright-1.62.1-${{ matrix.engine }}
@@ -284,7 +284,7 @@ jobs:
         run: node scripts/loading-browser-test.mjs
       - name: Upload browser evidence
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: ux-browser-${{ matrix.engine }}-${{ github.sha }}
           path: ${{ runner.temp }}/binso-ux-${{ matrix.engine }}
@@ -293,21 +293,21 @@ jobs:
   ux-compliance:
     needs: [plan, checks, browser]
     if: always()
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/setup-node
       - name: Collect current browser measurements
         continue-on-error: true # Missing evidence is reported; the final quality job still blocks failed browsers.
         if: needs.plan.outputs.browser == 'true'
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           pattern: ux-browser-*-${{ github.sha }}
           path: evidence/ux
       - name: Collect successful architecture lint evidence
         continue-on-error: true # A failed checks job may have no artifact; coverage remains untested.
         if: always()
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: ux-static-${{ github.sha }}
           path: evidence/ux/static
@@ -325,7 +325,7 @@ jobs:
           node scripts/compliance/report.mjs --static --gate "${EXTRA[@]}" evidence/ux --out docs/ux-compliance
       - name: Publish compliance report including failures and missing evidence
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: ux-compliance-${{ github.sha }}
           path: docs/ux-compliance
@@ -335,10 +335,10 @@ jobs:
         if: always()
         run: cat docs/ux-compliance/report.md >> "$GITHUB_STEP_SUMMARY"
   scanner-engine:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/setup-node
       - name: Validate sidecar ARM template without provisioning
         run: az bicep build --file infrastructure/scanner/sidecar.bicep --stdout > "$RUNNER_TEMP/scanner-template.json"
@@ -380,7 +380,7 @@ jobs:
           docker load --input "$RUNNER_TEMP/binso-scanner-image/image.tar.gz"
           test "$(docker image inspect binso-scanner-qualification --format '{{.Id}}')" = "$EXPECTED_ID"
       - name: Upload qualified scanner candidate
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: binso-scanner-candidate-${{ github.sha }}
           path: ${{ runner.temp }}/binso-scanner-image
@@ -396,7 +396,7 @@ jobs:
           docker logs binso-scanner-qualification > "$RUNNER_TEMP/binso-scanner-qualification/scanner.log" 2>&1
       - name: Upload scanner qualification evidence
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: scanner-qualification-${{ github.sha }}
           path: ${{ runner.temp }}/binso-scanner-qualification
@@ -408,7 +408,7 @@ jobs:
     # Keep the existing required job name. Failure, cancellation or an unexpected skip is blocking.
     needs: [plan, checks, build, browser, ux-compliance, scanner-engine]
     if: always()
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Enforce every mandatory result
         env:
@@ -434,13 +434,13 @@ jobs:
           fi
       - name: Download fully verified production candidate
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: binso-candidate-${{ github.sha }}
           path: deploy
       - name: Promote verified artifact for Azure (no rebuild)
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: binso-one-${{ github.sha }}
           path: deploy/binso-one.zip
@@ -449,13 +449,13 @@ jobs:
           retention-days: 2
       - name: Download exact qualified scanner image
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: binso-scanner-candidate-${{ github.sha }}
           path: scanner-image
       - name: Promote qualified scanner for Azure (no rebuild)
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: binso-scanner-${{ github.sha }}
           path: scanner-image
