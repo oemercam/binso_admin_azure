@@ -34,10 +34,10 @@ jobs:
       interactions: ${{ steps.scope.outputs.interactions }}
       browser: ${{ steps.scope.outputs.browser }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 24
       - name: Select conservative QA scope
@@ -71,17 +71,33 @@ jobs:
           --health-interval 5s --health-timeout 5s --health-retries 10
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: ./.github/actions/setup-node
       - run: pnpm release:check
       - run: pnpm test
+      - name: Fast UX compliance contracts
+        run: pnpm ux:compliance:fast
       - name: Real isolated PostgreSQL parallel process gate
         env:
           BINSO_DB_PARALLEL_TEST_URL: postgres://binso_test:binso_test@127.0.0.1:5432/binso_v213_test
-        run: node scripts/postgres-parallel-test.mjs
+        run: |
+          node scripts/postgres-parallel-test.mjs
+          node scripts/auth-integrity-test.mjs --postgres
+          node scripts/registration-test.mjs --postgres
       - run: pnpm lint
       - run: pnpm css:check
       - run: pnpm typecheck
+      - name: Record successful scoped architecture lint evidence
+        run: |
+          mkdir -p evidence/static
+          node --input-type=module -e 'import fs from "node:fs";import {identity} from "./scripts/compliance/identity.mjs";fs.writeFileSync("evidence/static/compliance-lint.json",JSON.stringify({schemaVersion:1,...identity(),route:"customer-app",state:"source",checks:[{id:"UX-ARC-001",status:"passed",observed:{command:"pnpm lint",exit:0,scope:"existing central-ui owner rules; full lint"}}]}));'
+      - name: Upload architecture lint evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ux-static-${{ github.sha }}
+          path: evidence/static
+          if-no-files-found: error
+          retention-days: 7
       - run: pnpm security:scan
       - name: Full dependency audit including development tooling
         run: pnpm security:scan:all
@@ -100,10 +116,10 @@ jobs:
           --health-interval 5s --health-timeout 5s --health-retries 10
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: ./.github/actions/setup-node
       - name: Restore Next compiler cache (never a completed build)
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: .next/cache
           key: ${{ runner.os }}-node24-next-${{ hashFiles('pnpm-lock.yaml', 'next.config.*') }}-${{ github.sha }}
@@ -122,7 +138,7 @@ jobs:
         run: bash scripts/package-production.sh
       - name: Smoke test exact production artifact
         run: bash scripts/smoke-production-artifact.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: binso-candidate-${{ github.sha }}
           path: deploy/binso-one.zip
@@ -151,9 +167,9 @@ jobs:
       matrix:
         engine: [chromium, webkit]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: ./.github/actions/setup-node
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: binso-candidate-${{ github.sha }}
           path: deploy
@@ -163,7 +179,7 @@ jobs:
           unzip -q deploy/binso-one.zip -d "$RUNNER_TEMP/binso-candidate"
       - name: Restore pinned browser binaries
         id: browser-cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-${{ runner.arch }}-playwright-1.62.1-${{ matrix.engine }}
@@ -179,10 +195,15 @@ jobs:
           fi
       - name: Save installed browser binaries
         if: steps.browser-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-${{ runner.arch }}-playwright-1.62.1-${{ matrix.engine }}
+      - name: Scroll endpoint measurement adversaries
+        env:
+          BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs
+          BINSO_UX_BROWSER: ${{ matrix.engine }}
+        run: node scripts/compliance/measure-browser-test.mjs
       - name: Scoped responsive UX and process regression
         env:
           BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs
@@ -196,9 +217,35 @@ jobs:
           BINSO_UX_SCREENSHOTS: ${{ needs.plan.outputs.level == 'full' && '1' || '0' }}
           BINSO_UX_DOM_EVIDENCE: ${{ needs.plan.outputs.level == 'full' && '1' || '0' }}
           BINSO_UX_CAPTURE_ALL: ${{ needs.plan.outputs.level == 'full' && '1' || '0' }}
+          BINSO_UX_COMPLIANCE: '1'
           BINSO_UX_OUTPUT: ${{ runner.temp }}/binso-ux-${{ matrix.engine }}
           BINSO_UX_SERVER_FILE: ${{ runner.temp }}/binso-candidate/server.js
         run: node scripts/browser-shards.mjs
+      - name: Deterministic synthetic data and role variants
+        if: matrix.engine == 'chromium' && needs.plan.outputs.level == 'full'
+        env:
+          BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs
+          BINSO_UX_SERVER_FILE: ${{ runner.temp }}/binso-candidate/server.js
+          BINSO_UX_COMPLIANCE: '1'
+          BINSO_UX_MATRIX_ONLY: '1'
+          BINSO_UX_THEMES: light
+          BINSO_UX_WIDTHS: '390'
+          BINSO_UX_SCREENSHOTS: '0'
+        shell: bash
+        run: |
+          set -euo pipefail
+          INDEX=0
+          for FIXTURE in empty large partial negative no-expenses admin finance employee; do
+            ROUTES=/kunden
+            case "$FIXTURE" in
+              empty) ROUTES=/kunden,/finanzen ;;
+              partial) ROUTES=/rechnungen ;;
+              negative|no-expenses|finance) ROUTES=/finanzen ;;
+              employee) ROUTES=/zeit ;;
+            esac
+            BINSO_UX_FIXTURE_CASE="$FIXTURE" BINSO_UX_ROUTES="$ROUTES" BINSO_UX_PORT="$((3600 + INDEX * 2))" BINSO_UX_OUTPUT="$RUNNER_TEMP/binso-ux-chromium/fixtures/$FIXTURE" node scripts/ux-browser-test.mjs
+            INDEX=$((INDEX + 1))
+          done
       - name: Authenticated observability and wallboard regression
         env:
           BINSO_OBSERVABILITY_TEST_URL: postgres://binso_test:binso_test@127.0.0.1:5432/binso_observability_test
@@ -237,15 +284,129 @@ jobs:
         run: node scripts/loading-browser-test.mjs
       - name: Upload browser evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: ux-browser-${{ matrix.engine }}-${{ github.sha }}
           path: ${{ runner.temp }}/binso-ux-${{ matrix.engine }}
           if-no-files-found: warn
           retention-days: 7
+  ux-compliance:
+    needs: [plan, checks, browser]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: ./.github/actions/setup-node
+      - name: Collect current browser measurements
+        continue-on-error: true # Missing evidence is reported; the final quality job still blocks failed browsers.
+        if: needs.plan.outputs.browser == 'true'
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          pattern: ux-browser-*-${{ github.sha }}
+          path: evidence/ux
+      - name: Collect successful architecture lint evidence
+        continue-on-error: true # A failed checks job may have no artifact; coverage remains untested.
+        if: always()
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: ux-static-${{ github.sha }}
+          path: evidence/ux/static
+      - name: Generate individual requirement coverage and enforce measured failures
+        env:
+          RELEASE_GATE: ${{ github.event_name == 'release' || inputs.level == 'full' }}
+          DEPLOYMENT_GATE: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'pull_request' && needs.plan.outputs.level == 'full') }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          EXTRA=()
+          if [ "$RELEASE_GATE" = true ]; then EXTRA+=(--release); fi
+          if [ "$DEPLOYMENT_GATE" = true ]; then EXTRA+=(--deployment-release); fi
+          node scripts/compliance/visual.mjs evidence/ux ux-compliance/visual-baselines.v1.json evidence/ux/compliance-visual.json
+          node scripts/compliance/report.mjs --static --gate "${EXTRA[@]}" evidence/ux --out docs/ux-compliance
+      - name: Publish compliance report including failures and missing evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ux-compliance-${{ github.sha }}
+          path: docs/ux-compliance
+          if-no-files-found: error
+          retention-days: 30
+      - name: Add coverage summary
+        if: always()
+        run: cat docs/ux-compliance/report.md >> "$GITHUB_STEP_SUMMARY"
+  scanner-engine:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: ./.github/actions/setup-node
+      - name: Validate sidecar ARM template without provisioning
+        run: az bicep build --file infrastructure/scanner/sidecar.bicep --stdout > "$RUNNER_TEMP/scanner-template.json"
+      - name: Resolve official patched ClamAV and build private-loopback runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker pull clamav/clamav:1.4.6
+          BASE_IMAGE="$(docker inspect clamav/clamav:1.4.6 --format '{{index .RepoDigests 0}}')"
+          [[ "$BASE_IMAGE" =~ ^clamav/clamav@sha256:[a-f0-9]{64}$ ]]
+          echo "BINSO_SCANNER_BASE_IMAGE=$BASE_IMAGE" >> "$GITHUB_ENV"
+          docker build --build-arg "CLAMAV_BASE_IMAGE=$BASE_IMAGE" -t binso-scanner-qualification infrastructure/scanner
+          docker run -d --name binso-scanner-qualification --network host --memory 4g --cpus 2 \
+            -e DATABASE_URL=BINSO_CREDENTIAL_SENTINEL -e GRAPH_CLIENT_SECRET=BINSO_CREDENTIAL_SENTINEL \
+            binso-scanner-qualification
+      - name: Real engine, current signatures, limits, outage and recovery
+        env:
+          BINSO_SCANNER_TEST_CONTAINER: binso-scanner-qualification
+          BINSO_SCANNER_OUTPUT: ${{ runner.temp }}/binso-scanner-qualification
+        run: node scripts/scanner-engine-test.mjs
+      - name: Export the exact qualified scanner image
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/binso-scanner-image"
+          docker save binso-scanner-qualification | gzip -1 > "$RUNNER_TEMP/binso-scanner-image/image.tar.gz"
+          export BINSO_SCANNER_IMAGE_ID="$(docker image inspect binso-scanner-qualification --format '{{.Id}}')"
+          python3 - <<'PY'
+          import hashlib,json,os,pathlib
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])
+          qualification=json.loads((root/'binso-scanner-qualification/results.json').read_text())
+          assert qualification['qualified'] is True
+          image=root/'binso-scanner-image/image.tar.gz'
+          with image.open('rb') as stream: digest=hashlib.file_digest(stream,'sha256').hexdigest()
+          metadata={'schemaVersion':1,'sourceSha':os.environ['GITHUB_SHA'],'imageId':os.environ['BINSO_SCANNER_IMAGE_ID'],'archiveSha256':digest,'qualification':qualification}
+          (root/'binso-scanner-image/qualified-image.json').write_text(json.dumps(metadata,indent=2)+'\n')
+          PY
+          EXPECTED_ID="$(node scripts/verify-scanner-image.mjs "$RUNNER_TEMP/binso-scanner-image" "$GITHUB_SHA")"
+          docker load --input "$RUNNER_TEMP/binso-scanner-image/image.tar.gz"
+          test "$(docker image inspect binso-scanner-qualification --format '{{.Id}}')" = "$EXPECTED_ID"
+      - name: Upload qualified scanner candidate
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: binso-scanner-candidate-${{ github.sha }}
+          path: ${{ runner.temp }}/binso-scanner-image
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 2
+      - name: Record scanner runtime and memory evidence
+        if: always()
+        run: |
+          mkdir -p "$RUNNER_TEMP/binso-scanner-qualification"
+          docker inspect binso-scanner-qualification --format '{{json .State}}' > "$RUNNER_TEMP/binso-scanner-qualification/container-state.json"
+          docker stats --no-stream --format '{{json .}}' binso-scanner-qualification > "$RUNNER_TEMP/binso-scanner-qualification/resource-sample.json"
+          docker logs binso-scanner-qualification > "$RUNNER_TEMP/binso-scanner-qualification/scanner.log" 2>&1
+      - name: Upload scanner qualification evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: scanner-qualification-${{ github.sha }}
+          path: ${{ runner.temp }}/binso-scanner-qualification
+          retention-days: 14
+      - name: Stop isolated scanner
+        if: always()
+        run: docker rm -f binso-scanner-qualification
   quality:
     # Keep the existing required job name. Failure, cancellation or an unexpected skip is blocking.
-    needs: [plan, checks, build, browser]
+    needs: [plan, checks, build, browser, ux-compliance, scanner-engine]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -253,12 +414,14 @@ jobs:
         env:
           PLAN_RESULT: ${{ needs.plan.result }}
           CHECKS_RESULT: ${{ needs.checks.result }}
+          UX_COMPLIANCE_RESULT: ${{ needs.ux-compliance.result }}
           BUILD_RESULT: ${{ needs.build.result }}
+          SCANNER_RESULT: ${{ needs.scanner-engine.result }}
           BROWSER_RESULT: ${{ needs.browser.result }}
           BROWSER_REQUIRED: ${{ needs.plan.outputs.browser }}
         run: |
           set -euo pipefail
-          for result in "$PLAN_RESULT" "$CHECKS_RESULT" "$BUILD_RESULT"; do
+          for result in "$PLAN_RESULT" "$CHECKS_RESULT" "$BUILD_RESULT" "$UX_COMPLIANCE_RESULT" "$SCANNER_RESULT"; do
             if [ "$result" != success ]; then echo "::error::Required job ended with $result"; exit 1; fi
           done
           if [ "$BROWSER_REQUIRED" != true ] && [ "$BROWSER_REQUIRED" != false ]; then
@@ -271,16 +434,31 @@ jobs:
           fi
       - name: Download fully verified production candidate
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: binso-candidate-${{ github.sha }}
           path: deploy
       - name: Promote verified artifact for Azure (no rebuild)
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: binso-one-${{ github.sha }}
           path: deploy/binso-one.zip
           if-no-files-found: error
           compression-level: 0
+          retention-days: 2
+      - name: Download exact qualified scanner image
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: binso-scanner-candidate-${{ github.sha }}
+          path: scanner-image
+      - name: Promote qualified scanner for Azure (no rebuild)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: binso-scanner-${{ github.sha }}
+          path: scanner-image
+          compression-level: 0
+          if-no-files-found: error
           retention-days: 2

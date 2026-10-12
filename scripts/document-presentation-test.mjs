@@ -28,11 +28,21 @@ const pdfModuleJs=ts.transpileModule(pdfModuleSource,{compilerOptions:{module:ts
 const {documentPdf}=await import('data:text/javascript;base64,'+Buffer.from(pdfModuleJs).toString('base64'));
 const {getDocument}=await import('pdfjs-dist/legacy/build/pdf.mjs');
 // Execute the tenant-scoped asset resolver with the real image converter.
-const logoModuleSource=(await fs.readFile('lib/server/document-logo.ts','utf8')).replace('import "server-only";','').replace('"sharp"',JSON.stringify(pathToFileURL(require.resolve('sharp')).href)).replace('"./storage"',JSON.stringify('data:text/javascript,export async function getBlobByUrl(){throw Error("Unexpected external fetch")}')).replace('"./document-pdf"',JSON.stringify('data:text/javascript;base64,'+Buffer.from(pdfModuleJs).toString('base64')));
+globalThis.__logoPolicy={};
+const policySource=(await fs.readFile('lib/server/file-access.ts','utf8')).replace('import "server-only";','').replace('"./env"',JSON.stringify('data:text/javascript,export const env={get releaseProfile(){return globalThis.__logoPolicy.releaseProfile},get fileAccessMode(){return globalThis.__logoPolicy.fileAccessMode},get fileScanSocket(){return globalThis.__logoPolicy.fileScanSocket}}'));
+const policyUrl='data:text/javascript;base64,'+Buffer.from(ts.transpileModule(policySource,{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText).toString('base64');
+const logoModuleSource=(await fs.readFile('lib/server/document-logo.ts','utf8')).replace('import "server-only";','').replace('"sharp"',JSON.stringify(pathToFileURL(require.resolve('sharp')).href)).replace('"./storage"',JSON.stringify('data:text/javascript,export async function getBlobByUrl(){throw Error("Unexpected external fetch")}')).replace('"./document-pdf"',JSON.stringify('data:text/javascript;base64,'+Buffer.from(pdfModuleJs).toString('base64'))).replace('"./file-access"',JSON.stringify(policyUrl));
 const {documentLogo}=await import('data:text/javascript;base64,'+Buffer.from(ts.transpileModule(logoModuleSource,{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText).toString('base64'));
 const sharp=(await import('sharp')).default;
 const logoInput=await sharp(await fs.readFile('public/brand/pwa-icon-192.png')).webp().toBuffer();let logoQueries=0;
 const logoClient={query:async(sql,args)=>{logoQueries++;assert.ok(sql.includes("f.purpose='company_logo'"));assert.equal(args[0],'asset-tenant');return {rows:[{content_type:'image/webp',body:logoInput}]}}};
+const ownLogo={logo_url:'/api/files/00000000-0000-4000-8000-000000000001/download'};
+const pendingLogoClient={query:async(sql,args)=>{assert.ok(sql.includes('f.scan_status=any($3::text[])'));assert.equal(args[0],'asset-tenant');assert.ok(!args[2].includes('rejected'));return {rows:args[2].includes('pending')?[{content_type:'image/webp',body:logoInput}]:[]}}};
+assert.equal(await documentLogo(pendingLogoClient,'asset-tenant',{},ownLogo),undefined,'Strict PDF rendering excludes pending logos');
+globalThis.__logoPolicy={releaseProfile:'development-20261012',fileAccessMode:'authenticated-unscanned'};
+const developmentLogo=await documentLogo(pendingLogoClient,'asset-tenant',{},ownLogo);assert.equal(developmentLogo.subarray(1,4).toString(),'PNG','Explicit development access still uses the real raster decoder');
+globalThis.__logoPolicy.fileScanSocket='/private/scanner.sock';assert.equal(await documentLogo(pendingLogoClient,'asset-tenant',{},ownLogo),undefined,'Scanner activation restores strict PDF logo policy');
+delete globalThis.__logoPolicy;globalThis.__logoPolicy={};
 const logo=await documentLogo(logoClient,'asset-tenant',{}, {logo_url:'/api/files/00000000-0000-4000-8000-000000000001/download'});
 assert.equal(logo.subarray(1,4).toString(),'PNG');const queried=logoQueries;
 assert.equal(await documentLogo(logoClient,'asset-tenant',{}, {logo_url:'https://untrusted.example.invalid/logo.png'}),undefined);assert.equal(logoQueries,queried,'Arbitrary URLs never fetch');

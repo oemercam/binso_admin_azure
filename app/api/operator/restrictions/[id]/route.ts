@@ -1,31 +1,22 @@
-import { requireOperatorSession as requireRbacOperatorSession } from "@/lib/server/operator/session";
-import { authorizeOperator } from "@/lib/server/operator/rbac";
-import { NextRequest } from "next/server";
-import { apiError, assertSameOrigin, json } from "@/lib/server/http";
-import { operatorAudit, operatorList, operatorUpdate } from "@/lib/server/database";
-import { requireOperatorSession } from "@/lib/server/operator";
+import {NextRequest} from 'next/server';
+import {requireOperatorSession} from '@/lib/server/operator/session';
+import {authorizeOperator} from '@/lib/server/operator/rbac';
+import {platformAudit} from '@/lib/server/operator/audit';
+import {withPlatform} from '@/lib/server/db';
+import {apiError,assertSameOrigin,json,ApiError} from '@/lib/server/http';
+import {reconcileOperatorRestrictions,updateOperatorBusiness} from '@/lib/server/repositories/operator-api';
 
 export async function PATCH(request:NextRequest,{params}:{params:Promise<{id:string}>}){
-  try{const rbacSession=await requireRbacOperatorSession();authorizeOperator(rbacSession,"restrictions:manage");
-    assertSameOrigin(request);
-    const {id}=await params;
-    const rows=await operatorList<{id:string;tenant_id:string;active:boolean}>("tenant_restrictions","id,tenant_id,active","id=eq."+encodeURIComponent(id)+"&limit=1");
-    if(!rows[0]) return json({error:"not_found",message:"Einschränkung wurde nicht gefunden."},404);
-    const session=await requireOperatorSession();
-    const updated=await operatorUpdate("tenant_restrictions","id=eq."+encodeURIComponent(id),{active:false,removed_at:new Date().toISOString(),removed_by:session.userId});
-    const remaining=await operatorList<{id:string;scope:string;starts_at:string;ends_at:string|null}>("tenant_restrictions","id,scope,starts_at,ends_at","tenant_id=eq."+encodeURIComponent(rows[0].tenant_id)+"&active=eq.true&limit=100");
-    const now=Date.now();
-    const effective=remaining.filter(item=>{
-      const starts=new Date(item.starts_at).getTime();
-      const ends=item.ends_at?new Date(item.ends_at).getTime():Number.POSITIVE_INFINITY;
-      return starts<=now&&ends>now;
-    });
-    const accounts=await operatorList<{account_status:string}>("tenant_accounts","account_status","tenant_id=eq."+encodeURIComponent(rows[0].tenant_id)+"&limit=1");
-    if(accounts[0]&&accounts[0].account_status!=="cancelled"){
-      const nextStatus=effective.some(item=>item.scope==="all")?"suspended":effective.some(item=>item.scope==="write")?"restricted":"active";
-      await operatorUpdate("tenant_accounts","tenant_id=eq."+encodeURIComponent(rows[0].tenant_id),{account_status:nextStatus});
-    }
-    await operatorAudit("tenant.restriction.removed","tenant",rows[0].tenant_id,{restriction_id:id});
-    return json({item:updated[0]});
-  }catch(error){return apiError(error);}
+ try{const session=await requireOperatorSession();authorizeOperator(session,'restrictions:manage');assertSameOrigin(request);
+  const {id}=await params;
+  const item=await withPlatform(async c=>{
+   const restriction=(await c.query('select organization_id from organization_restrictions where id::text=$1',[id])).rows[0];
+   if(!restriction)throw new ApiError(404,'not_found','Einschränkung wurde nicht gefunden.');
+   await c.query('select id from organizations where id=$1 for update',[restriction.organization_id]);
+   const rows=await updateOperatorBusiness(c,session,'tenant_restrictions','id=eq.'+encodeURIComponent(id),{active:false});
+   await reconcileOperatorRestrictions(c,restriction.organization_id);
+   await platformAudit({userId:session.userId,userEmail:session.email,action:'tenant.restriction.removed',entityType:'tenant',entityId:restriction.organization_id,metadata:{restriction_id:id}},c);
+   return rows[0];
+  });return json({item});
+ }catch(error){return apiError(error);}
 }

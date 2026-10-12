@@ -31,8 +31,11 @@ try{
  const response=await POST(request());assert.equal(response.status,201);const item=(await response.json()).item;
  const row=(await db.query('select actor_user_id,actor_email,action,entity_type,entity_id,metadata from platform_audit_events where entity_id=$1',[item.id])).rows[0];
  assert.deepEqual(row,{actor_user_id:'fixture',actor_email:'fixture@invalid.test',action:'platform.announcement.created',entity_type:'announcement',entity_id:item.id,metadata:{kind:'info'}});
+ const organization='00000000-0000-4000-8000-000000000085';await db.query("insert into organizations(id,name,slug,is_demo) values($1,'Announcement target','announcement-contract',false)",[organization]);
+ assert.equal((await POST(request('http://localhost',{title:'Targeted notice',message:'Actual target',kind:'warning',organizationId:organization}))).status,201,'Organization targeting uses the correct audit foreign key');
+ assert.equal((await POST(request('http://localhost',{title:'Invalid notice',message:'Invalid kind',kind:'incident'}))).status,400,'Unsupported kind is a validation error');
  failAudit=true;assert.equal((await POST(request())).status,500);failAudit=false;
- assert.equal(Number((await db.query('select count(*) n from platform_announcements')).rows[0].n),1,'Audit failure rolls back announcement');
- assert.equal(Number((await db.query('select count(*) n from platform_audit_events')).rows[0].n),1,'No orphan or duplicate audit');
+ assert.equal(Number((await db.query('select count(*) n from platform_announcements')).rows[0].n),2,'Audit failure rolls back announcement');
+ assert.equal(Number((await db.query('select count(*) n from platform_audit_events')).rows[0].n),2,'No orphan or duplicate audit');
  console.log('Announcement API: actual RBAC/origin/validation, migrated persistence+audit, real transaction rollback on audit failure passed.');
 }finally{delete globalThis.__binsoPool;delete globalThis.announcementSession;await db.close();}

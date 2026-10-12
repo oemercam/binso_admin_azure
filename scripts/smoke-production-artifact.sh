@@ -11,7 +11,7 @@ test -f /tmp/binso-production-artifact/public/sw.js
 test -f /tmp/binso-production-artifact/public/manifest-app.webmanifest
 (
   cd /tmp/binso-production-artifact
-  PORT=3100 HOSTNAME=127.0.0.1 node server.js > /tmp/binso-artifact.log 2>&1 &
+  PORT=3100 FILE_SCAN_SOCKET=/tmp/binso-scanner/clamd.sock BINSO_SCANNER_SIDECAR=true node scripts/start-scanner-production.mjs > /tmp/binso-artifact.log 2>&1 &
   echo $! > /tmp/binso-artifact.pid
 )
 ARTIFACT_PID="$(cat /tmp/binso-artifact.pid)"
@@ -35,6 +35,10 @@ if [ "$READY" -ne 1 ]; then
   exit 1
 fi
 grep -q "$GITHUB_SHA" /tmp/binso-production-artifact/public/deployment.json
+node --input-type=module -e 'import fs from "node:fs";import {createHash} from "node:crypto";import {validateScope,scopeDigest} from "./scripts/compliance/release-scope.mjs";const raw=fs.readFileSync("/tmp/binso-production-artifact/ux-compliance/release-scope.v1.json");const scope=validateScope(JSON.parse(raw));const meta=JSON.parse(fs.readFileSync("/tmp/binso-production-artifact/public/deployment.json"));if(meta.sha!==process.env.GITHUB_SHA||meta.releaseProfile!==scope.id||meta.productionAcceptance!==false||meta.releaseScopeSha256!==createHash("sha256").update(raw).digest("hex")||meta.releaseScopeSha256!==scopeDigest())throw Error("Exact ZIP release scope mismatch");'
 grep -q '"status":"ok"' /tmp/binso-artifact-health.json
+test -S /tmp/binso-scanner/clamd.sock
+test "$(stat -c %a /tmp/binso-scanner/clamd.sock)" = 600
+test "$(stat -c %a /tmp/binso-scanner)" = 700
 BINSO_BASE_URL=http://127.0.0.1:3100 node scripts/check-deployed-assets.mjs /tmp/binso-production-artifact
 echo "Exact production ZIP starts successfully."

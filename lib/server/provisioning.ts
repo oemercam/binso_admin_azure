@@ -1,5 +1,4 @@
 import "server-only";
-import {randomUUID} from "node:crypto";
 import {seedDatabaseDemo} from "./repositories/demo-fixture";
 import type {PoolClient} from "pg";
 import {withTransaction} from "@/lib/server/db";
@@ -21,16 +20,6 @@ function planDefinition(plan:PlanId){
 }
 
 
-async function uniqueSlug(client:PoolClient,name:string){
- const base=(name||"organisation").normalize("NFKD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"organisation";
- for(let i=0;i<50;i++){
-   const candidate=i===0?base:`${base}-${i+1}`;
-   const exists=await client.query("select 1 from organizations where slug=$1 limit 1",[candidate]);
-   if(!exists.rowCount)return candidate;
- }
- return `${base}-${randomUUID().slice(0,8)}`;
-}
-
 export async function provisionOrganization(input:{
  userId:string;email:string;name:string;companyName:string;plan:PlanId;billingCycle?:BillingCycle;mode:"trial"|"demo"|"subscription";
  passwordHash?:string|null;language?:"de"|"en"|"fr"|"it"|"tr";termsVersion?:string|null;privacyVersion?:string|null;dpaVersion?:string|null;
@@ -39,7 +28,7 @@ export async function provisionOrganization(input:{
    const email=input.email.trim().toLowerCase();
    const displayName=input.name.trim();
    const companyName=input.mode==="demo"?"Alpenblick Digital AG":input.companyName.trim();
-   const slug=await uniqueSlug(client,companyName);
+   const slug=(companyName||"organisation").normalize("NFKD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,160).replace(/-+$/g,"")||"organisation";
    const canonicalPlan=toCanonicalPlan(input.mode==="demo"?"business":input.plan);
    const planId:PlanId=input.mode==="demo"?"business":input.plan;
    const definition=planDefinition(planId);
@@ -57,16 +46,11 @@ export async function provisionOrganization(input:{
      [input.userId,email,displayName,input.passwordHash??null,input.language??"de",input.mode==="demo"?new Date():null,input.termsVersion??null,input.privacyVersion??null]
    );
    const org=await client.query<{id:string}>(
-     `insert into organizations(name,slug,status,country,currency,locale,is_demo)
-      values($1,$2,$3,'Schweiz','CHF','de-CH',$4) returning id`,
-     [companyName,slug,input.mode==="subscription"?"active":"trial",input.mode==="demo"]
+     "select public.bootstrap_organization($1,$2,$3,$4,$5) as id",
+     [input.userId,email,companyName,slug,input.mode]
    );
    const organizationId=org.rows[0].id;
-   await client.query(
-     `insert into organization_memberships(organization_id,user_id,email,role,role_id,status)
-      values($1,$2,$3,'owner',(select id from organization_roles where organization_id=$1 and code='owner' limit 1),'active')`,
-     [organizationId,input.userId,email]
-   );
+   await client.query("select set_config('app.organization_id',$1,true),set_config('app.user_id',$2,true)",[organizationId,input.userId]);
    await client.query(
      `insert into organization_subscriptions(organization_id,plan,status,seats,trial_until,billing_provider,billing_interval,unit_amount_chf)
       values($1,$2,$3,$4,$5,'manual',$6,$7)`,

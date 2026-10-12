@@ -29,21 +29,47 @@ jobs:
     environment: production
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
 
-      - name: Download Quality-verified production artifact
-        if: github.event_name == 'workflow_run'
-        uses: actions/download-artifact@v4
+      - name: Resolve successful Quality artifact for this exact main commit
+        id: verified
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         with:
-          name: binso-one-${{ github.event.workflow_run.head_sha }}
+          script: |
+            const sha = process.env.BINSO_DEPLOY_SHA;
+            const {data: branch} = await github.rest.repos.getBranch({...context.repo, branch: 'main'});
+            if (branch.commit.sha !== sha) throw new Error('Only the current main commit may be promoted');
+            const {data} = await github.rest.actions.listWorkflowRuns({...context.repo, workflow_id: 'quality.yml', branch: 'main', event: 'push', head_sha: sha, per_page: 100});
+            const verified = data.workflow_runs.find(run => run.head_sha === sha && run.status === 'completed' && run.conclusion === 'success');
+            if (!verified) throw new Error('No successful Quality push run for this exact commit; migrations and deployment are blocked');
+            core.setOutput('run_id', String(verified.id));
+
+      - name: Download Quality-verified production artifact
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: binso-one-${{ env.BINSO_DEPLOY_SHA }}
           path: deploy
           github-token: ${{ github.token }}
-          run-id: ${{ github.event.workflow_run.id }}
+          run-id: ${{ steps.verified.outputs.run_id }}
 
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - name: Validate deploy artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s deploy/binso-one.zip
+          unzip -l deploy/binso-one.zip > /tmp/binso-zip-contents.txt
+          grep -q 'server.js' /tmp/binso-zip-contents.txt
+          rm -rf /tmp/binso-artifact
+          mkdir -p /tmp/binso-artifact
+          unzip -q deploy/binso-one.zip -d /tmp/binso-artifact
+          DEPLOY_SHA="${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}"
+          grep -q "$DEPLOY_SHA" /tmp/binso-artifact/public/deployment.json
+          node --input-type=module -e 'import fs from "node:fs";import {createHash} from "node:crypto";import {validateScope,scopeDigest} from "./scripts/compliance/release-scope.mjs";const raw=fs.readFileSync("/tmp/binso-artifact/ux-compliance/release-scope.v1.json");const scope=validateScope(JSON.parse(raw));const meta=JSON.parse(fs.readFileSync("/tmp/binso-artifact/public/deployment.json"));const hash=createHash("sha256").update(raw).digest("hex");if(meta.sha!==process.env.BINSO_DEPLOY_SHA||meta.releaseProfile!==scope.id||meta.productionAcceptance!==false||meta.releaseScopeSha256!==hash||hash!==scopeDigest())throw Error("Release scope/artifact binding mismatch");'
+
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 24
           cache: pnpm
@@ -67,58 +93,26 @@ jobs:
           pnpm db:check
           RETENTION_DRY_RUN=true pnpm retention:cleanup
 
-      - name: Build artifact for manual deployment
-        if: github.event_name == 'workflow_dispatch'
-        env:
-          BINSO_BUILD_SHA: ${{ github.sha }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          pnpm build
-          test -f .next/standalone/server.js
-          rm -rf deploy/app
-          mkdir -p deploy/app/.next
-          cp -R .next/standalone/. deploy/app/
-          rm -rf deploy/runtime
-          mkdir -p deploy/runtime
-          cp package.json pnpm-lock.yaml pnpm-workspace.yaml deploy/runtime/
-          pnpm --dir deploy/runtime install --prod --frozen-lockfile --config.node-linker=hoisted
-          rm -rf deploy/app/node_modules
-          mv deploy/runtime/node_modules deploy/app/node_modules
-          rm -rf deploy/runtime
-          (
-            cd deploy/app
-            node -e "require('next/dist/server/next.js'); require('@next/env'); require('@swc/helpers/_/_interop_require_default')"
-          )
-          mkdir -p deploy/app/.next/static
-          cp -R .next/static/. deploy/app/.next/static/
-          mkdir -p deploy/app/public
-          if [ -d public ]; then cp -R public/. deploy/app/public/; fi
-          printf '{"sha":"%s"}\n' "$GITHUB_SHA" > deploy/app/public/deployment.json
-          cd deploy/app
-          zip -qr ../binso-one.zip .
-          cd ../..
-          test -s deploy/binso-one.zip
-
-      - name: Validate deploy artifact
-        shell: bash
-        run: |
-          set -euo pipefail
-          test -s deploy/binso-one.zip
-          unzip -l deploy/binso-one.zip > /tmp/binso-zip-contents.txt
-          grep -q 'server.js' /tmp/binso-zip-contents.txt
-          rm -rf /tmp/binso-artifact
-          mkdir -p /tmp/binso-artifact
-          unzip -q deploy/binso-one.zip -d /tmp/binso-artifact
-          DEPLOY_SHA="${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}"
-          grep -q "$DEPLOY_SHA" /tmp/binso-artifact/public/deployment.json
-
       - name: Azure login (OIDC)
-        uses: azure/login@v2
+        uses: azure/login@7184910d9eb2b1c5e48f7073824a90609bb9b6d6 # v2
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Verify actual HTTPS and EasyAuth configuration without changing it
+        shell: bash
+        env:
+          AUDIT_ENTRA_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        run: |
+          set -euo pipefail
+          umask 077
+          APP_RESOURCE_ID="$(az webapp show -g "$AZURE_RESOURCE_GROUP" -n "$AZURE_WEBAPP_NAME" --query id -o tsv)"
+          test "$(az webapp show -g "$AZURE_RESOURCE_GROUP" -n "$AZURE_WEBAPP_NAME" --query httpsOnly -o tsv)" = true
+          AUTH_FILE="$(mktemp)"
+          trap 'rm -f "$AUTH_FILE"' EXIT
+          az rest --method get --url "https://management.azure.com$APP_RESOURCE_ID/config/authsettingsV2?api-version=2022-03-01" --output json > "$AUTH_FILE"
+          node scripts/azure-auth-check.mjs "$AUTH_FILE"
 
       - name: Ensure production security and mail settings
         shell: bash
@@ -243,6 +237,80 @@ jobs:
           node -e 'const p=JSON.parse(process.argv[1]);if(!p.access_token)process.exit(1)' "$TOKEN_RESPONSE"
           echo "Microsoft Graph client-credentials authentication passed."
 
+      - name: Inspect explicitly activated scanner configuration
+        id: scanner
+        shell: bash
+        run: |
+          set -euo pipefail
+          ENABLED="$(az webapp config appsettings list -g "$AZURE_RESOURCE_GROUP" -n "$AZURE_WEBAPP_NAME" --query "[?name=='BINSO_SCANNER_SIDECAR'].value | [0]" -o tsv)"
+          if [ "$ENABLED" = true ]; then echo '::error::Permanent scanner activation is outside the approved no-extra-cost development scope.'; exit 1; fi
+          if [ "$ENABLED" != true ]; then
+            echo 'enabled=false' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          PLAN_ID="$(az webapp show -g "$AZURE_RESOURCE_GROUP" -n "$AZURE_WEBAPP_NAME" --query serverFarmId -o tsv)"
+          SKU="$(az appservice plan show --ids "$PLAN_ID" --query sku.name -o tsv)"
+          case "$SKU" in P1v3|P1v4) ;; *) echo '::error::Scanner requires an approved 8 GiB worker plan'; exit 1 ;; esac
+          REGISTRY="$(az webapp config appsettings list -g "$AZURE_RESOURCE_GROUP" -n "$AZURE_WEBAPP_NAME" --query "[?name=='BINSO_SCANNER_REGISTRY'].value | [0]" -o tsv)"
+          IDENTITY="$(az webapp config appsettings list -g "$AZURE_RESOURCE_GROUP" -n "$AZURE_WEBAPP_NAME" --query "[?name=='BINSO_SCANNER_PULL_IDENTITY_CLIENT_ID'].value | [0]" -o tsv)"
+          SOCKET="$(az webapp config appsettings list -g "$AZURE_RESOURCE_GROUP" -n "$AZURE_WEBAPP_NAME" --query "[?name=='FILE_SCAN_SOCKET'].value | [0]" -o tsv)"
+          [[ "$REGISTRY" =~ ^[a-z0-9]{5,50}$ ]]
+          [[ "$IDENTITY" =~ ^[a-fA-F0-9-]{36}$ ]]
+          test "$SOCKET" = /tmp/binso-scanner/clamd.sock
+          az webapp identity show -g "$AZURE_RESOURCE_GROUP" -n "$AZURE_WEBAPP_NAME" --query 'userAssignedIdentities.*.clientId' -o json | jq -e --arg id "$IDENTITY" 'index($id) != null' > /dev/null
+          echo 'enabled=true' >> "$GITHUB_OUTPUT"
+          echo "registry=$REGISTRY" >> "$GITHUB_OUTPUT"
+          echo "identity=$IDENTITY" >> "$GITHUB_OUTPUT"
+
+      - name: Download exact Quality-qualified scanner
+        if: steps.scanner.outputs.enabled == 'true'
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: binso-scanner-${{ env.BINSO_DEPLOY_SHA }}
+          path: scanner-image
+          github-token: ${{ github.token }}
+          run-id: ${{ steps.verified.outputs.run_id }}
+
+      - name: Publish qualified scanner and bind immutable sidecar
+        if: steps.scanner.outputs.enabled == 'true'
+        shell: bash
+        env:
+          SCANNER_REGISTRY: ${{ steps.scanner.outputs.registry }}
+          SCANNER_PULL_IDENTITY: ${{ steps.scanner.outputs.identity }}
+        run: |
+          set -euo pipefail
+          EXPECTED_ID="$(node scripts/verify-scanner-image.mjs scanner-image "$BINSO_DEPLOY_SHA")"
+          docker load --input scanner-image/image.tar.gz
+          test "$(docker image inspect binso-scanner-qualification --format '{{.Id}}')" = "$EXPECTED_ID"
+          az acr login --name "$SCANNER_REGISTRY" --output none
+          IMAGE="$SCANNER_REGISTRY.azurecr.io/binso-scanner:$BINSO_DEPLOY_SHA"
+          docker tag binso-scanner-qualification "$IMAGE"
+          docker push "$IMAGE"
+          DIGEST="$(az acr repository show --name "$SCANNER_REGISTRY" --image "binso-scanner:$BINSO_DEPLOY_SHA" --query digest -o tsv)"
+          [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
+          az deployment group create --resource-group "$AZURE_RESOURCE_GROUP" \
+            --name "scanner-${BINSO_DEPLOY_SHA:0:12}" --mode Incremental \
+            --template-file infrastructure/scanner/sidecar.bicep \
+            --parameters "appName=$AZURE_WEBAPP_NAME" "scannerImage=$SCANNER_REGISTRY.azurecr.io/binso-scanner@$DIGEST" "registryPullIdentityClientId=$SCANNER_PULL_IDENTITY" \
+            --output none
+
+      - name: Validate runtime role and prepare authorized development settings
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +x
+          umask 077
+          RUNTIME_URL="$(az webapp config appsettings list -g "$AZURE_RESOURCE_GROUP" -n "$AZURE_WEBAPP_NAME" --query "[?name=='BINSO_RUNTIME_DATABASE_URL'].value | [0]" -o tsv)"
+          test -n "$RUNTIME_URL"
+          echo "::add-mask::$RUNTIME_URL"
+          DATABASE_URL="$RUNTIME_URL" DATABASE_SSL=true DATABASE_SSL_REJECT_UNAUTHORIZED=true BINSO_EXPECTED_DB_ROLE=binso_runtime node scripts/check-runtime-db.mjs
+          SIDECAR="$(az webapp config appsettings list -g "$AZURE_RESOURCE_GROUP" -n "$AZURE_WEBAPP_NAME" --query "[?name=='BINSO_SCANNER_SIDECAR'].value | [0]" -o tsv)"
+          if [ "$SIDECAR" = true ]; then echo '::error::The approved development scope does not authorize a permanent scanner sidecar.'; exit 1; fi
+          SETTINGS_FILE="$(mktemp)"
+          BINSO_RUNTIME_URL="$RUNTIME_URL" BINSO_SETTINGS_FILE="$SETTINGS_FILE" node --input-type=module -e 'import fs from "node:fs";import {readScope} from "./scripts/compliance/release-scope.mjs";const scope=readScope();fs.writeFileSync(process.env.BINSO_SETTINGS_FILE,JSON.stringify({DATABASE_URL:process.env.BINSO_RUNTIME_URL,BINSO_RELEASE_PROFILE:scope.id,BINSO_FILE_ACCESS_MODE:scope.fileAccessMode,BINSO_SCANNER_SIDECAR:"false",FILE_SCAN_SOCKET:""}),{mode:0o600});'
+          echo "BINSO_DEV_SETTINGS_FILE=$SETTINGS_FILE" >> "$GITHUB_ENV"
+          unset RUNTIME_URL
+
       - name: Inspect production startup entry point
         shell: bash
         run: |
@@ -250,13 +318,23 @@ jobs:
           az webapp config show --resource-group "$AZURE_RESOURCE_GROUP" --name "$AZURE_WEBAPP_NAME" --query appCommandLine -o tsv
 
       - name: Deploy to Azure App Service
-        uses: azure/webapps-deploy@v3
+        uses: azure/webapps-deploy@02a81bead70021f5284939794bcec79c271ab383 # v3
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           package: deploy/binso-one.zip
           # Each release is isolated from files left by earlier deployments.
           target-path: /home/site/wwwroot
-          startup-command: node /home/site/wwwroot/server.js
+          startup-command: node /home/site/wwwroot/scripts/start-scanner-production.mjs
+
+      - name: Promote verified runtime settings after deploying the new auth helpers
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +x
+          test -s "$BINSO_DEV_SETTINGS_FILE"
+          trap 'rm -f "$BINSO_DEV_SETTINGS_FILE"' EXIT
+          az webapp config appsettings set -g "$AZURE_RESOURCE_GROUP" -n "$AZURE_WEBAPP_NAME" --settings "@$BINSO_DEV_SETTINGS_FILE" --output none
+          echo 'Verified binso_runtime connection and explicit development file access configured; no scan verdict changed.'
 
       - name: Wait for deployed worker
         shell: bash
@@ -321,6 +399,7 @@ jobs:
 
           HEALTH_URL="$PRODUCTION_URL/api/health"
           curl -fsS --max-time 20 "$HEALTH_URL" | grep -q '"status":"ok"'
+          curl -fsS --max-time 20 "$HEALTH_URL" | node --input-type=module -e 'import {readScope} from "./scripts/compliance/release-scope.mjs";let body="";for await(const chunk of process.stdin)body+=chunk;const health=JSON.parse(body);if(health.sha!==process.env.BINSO_DEPLOY_SHA||health.releaseProfile!==readScope().id)throw Error("Deployed release scope or commit mismatch");'
           curl -fsS --max-time 20 "$PRODUCTION_URL/api/health/ready" | grep -q '"status":"ready"'
           echo "Binso One production health and readiness checks passed."
 
@@ -392,3 +471,9 @@ jobs:
           echo "::group::Recent App Service logs"
           timeout 60s az webapp log tail --resource-group "$AZURE_RESOURCE_GROUP" --name "$AZURE_WEBAPP_NAME" --provider application || true
           echo "::endgroup::"
+
+      - name: Remove temporary runtime credentials
+        if: always()
+        shell: bash
+        run: |
+          if [ -n "${BINSO_DEV_SETTINGS_FILE:-}" ]; then rm -f "$BINSO_DEV_SETTINGS_FILE"; fi

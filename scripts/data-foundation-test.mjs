@@ -97,7 +97,7 @@ const httpUrl=moduleUrl((await fs.readFile('lib/server/http.ts','utf8')).replace
 const http=await import(httpUrl);
 for(const [code,status] of [['23505',409],['23503',409],['22P02',400],['40001',409],['57014',503]]){const result=http.apiError({code,message:'SECRET_DATABASE_ROW'});assert.equal(result.status,status);assert.ok(!(await result.text()).includes('SECRET'));}
 for(const [status,meaning] of [[401,'not_authenticated'],[403,'forbidden'],[404,'not_found'],[409,'conflict'],[429,'rate_limited'],[503,'service_unavailable']]){const result=http.apiError(new Response('PRIVATE INTERNAL DETAIL',{status}));assert.equal((await result.json()).error,meaning);}
-await assert.rejects(()=>http.readJson({headers:new Headers(),text:async()=>JSON.stringify({name:'ä'.repeat(10)})},20),e=>e.code==='request_too_large');
+await assert.rejects(()=>http.readJson(new Request('https://fixture.invalid',{method:'POST',body:JSON.stringify({name:'ä'.repeat(10)})}),20),e=>e.code==='request_too_large');
 const fields=await import(moduleUrl((await fs.readFile('lib/server/validation.ts','utf8')).replace('import "server-only";','').replace('"./http"',JSON.stringify(httpUrl))));
 for(const check of [()=>fields.asObject([]),()=>fields.stringField({},'name'),()=>fields.stringField({name:42},'name'),()=>fields.emailField({email:'bad'}),()=>fields.enumField({role:'operator'},'role',['member'])]){try{check();assert.fail('Invalid input was accepted');}catch(error){assert.ok(error instanceof http.ApiError);assert.equal(http.apiError(error).status,400);}}
 const validation=await import(moduleUrl((await fs.readFile('lib/server/file-validation.ts','utf8')).replace("'./http'",JSON.stringify(httpUrl))));

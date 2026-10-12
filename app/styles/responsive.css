@@ -2679,6 +2679,8 @@ input:not([type="checkbox"]):not([type="radio"]),
  .bo-monitor-services{grid-template-columns:repeat(2,minmax(0,1fr));gap:0 12px}
  .bo-monitor-services summary{flex-wrap:wrap;justify-content:flex-start;align-content:center;gap:4px;min-height:56px}
  .bo-monitor-services summary b{flex-basis:100%}
+ .bo-monitor-service{flex-wrap:wrap;align-content:center;justify-content:flex-start;gap:6px}
+ .bo-monitor-service b{flex-basis:100%}
  .bo-monitoring-portal .bo-metric-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
  .bo-monitor-detail-metrics summary{flex-wrap:wrap}
  .bo-monitor-detail-metrics summary>span{flex-basis:100%}
@@ -2739,6 +2741,7 @@ input:not([type="checkbox"]):not([type="radio"]),
 
 /* Reduced motion */
 @media (prefers-reduced-motion:reduce){
+.bo-statistics-group{transition:none}
 .app-start-icon,.app-launch-brand .logo{animation:none}
 .hero-copy,.hero-product-preview,.marketing-benefits>article,.feature-showcase-copy,.section-product-shot,.workflow-copy,.product-callout,.pricing-section,.security-split,.faq-section,.marketing-cta,.marketing-mobile-menu{animation:none}
 
@@ -2765,7 +2768,6 @@ input:not([type="checkbox"]):not([type="radio"]),
 .bo-create-action:disabled{opacity:.45;cursor:not-allowed}
 .bo-create-action:focus-visible,.bo-row-actions:focus-visible{outline:2px solid currentColor;outline-offset:3px}
 
-.bo-metric-tiles{grid-template-columns:repeat(4,minmax(0,1fr))}
 
 .bo-row-actions{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border:0;background:transparent;color:inherit;cursor:pointer;margin-left:auto}
 

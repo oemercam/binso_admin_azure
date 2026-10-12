@@ -1,3 +1,6 @@
+import {identity as complianceIdentity} from './compliance/identity.mjs';
+import {measureCompliance} from './compliance/measure.mjs';
+import {fixtureCase} from './compliance/fixtures.mjs';
 import {writeTestOutput} from './test-output.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
@@ -19,11 +22,12 @@ const statisticToday=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Zurich',y
 const [statisticYear,statisticMonth]=statisticToday.split('-').map(Number);
 const previousStatisticFrom=new Date(Date.UTC(statisticYear,statisticMonth-2,1)).toISOString().slice(0,10);
 const previousStatisticTo=new Date(Date.UTC(statisticYear,statisticMonth-1,0)).toISOString().slice(0,10);
-const cashFixture=(income=200)=>({payments:[{payment_date:previousStatisticFrom,amount:120},{payment_date:statisticToday,amount:income}],outflows:[{payment_date:statisticToday,amount:50}],incomplete:false});
+const cashFixture=(income=200)=>process.env.BINSO_UX_FIXTURE_CASE?{...fixtureCase(process.env.BINSO_UX_FIXTURE_CASE).cash,payments:fixtureCase(process.env.BINSO_UX_FIXTURE_CASE).cash.payments.map(p=>({...p,payment_date:statisticToday})),outflows:fixtureCase(process.env.BINSO_UX_FIXTURE_CASE).cash.outflows.map(p=>({...p,payment_date:statisticToday}))}:({payments:[{payment_date:previousStatisticFrom,amount:120},{payment_date:statisticToday,amount:income}],outflows:[{payment_date:statisticToday,amount:50}],incomplete:false});
 
 await fs.mkdir(output,{recursive:true});
 const port=process.env.BINSO_UX_PORT??'3200';
 const base=process.env.BINSO_BASE_URL??'http://127.0.0.1:'+port;
+if(process.env.BINSO_UX_COMPLIANCE==='1'&&!['127.0.0.1','localhost','[::1]'].includes(new URL(base).hostname))throw Error('Compliance fixtures require an isolated loopback test server');
 let server;
 if(!process.env.BINSO_BASE_URL){
   let occupied=false;try{occupied=(await fetch(base+'/api/health')).ok;}catch{}
@@ -46,11 +50,17 @@ const customer={id:'customer-one',customer_no:'K-000001',name:'Prüffirma AG',ci
 const product={id:'product-one',name:'Beratung',kind:'service',unit:'hour',unit_price:125,vat_rate:8.1,status:'active'};
 const employee={id:'employee-one',first_name:'Test',last_name:'Person',email:'mitarbeiterin.mit.langem.namen@internationales-unternehmen.example.invalid',start_date:'2025-01-01',job_title:'ICT',workload_percent:80,weekly_hours:42,status:'active'};
 const expense={id:'expense-one',merchant:'SBB',amount:89,currency:'CHF',expense_date:'2026-10-08',status:'submitted',employee_id:employee.id,employee};
-const invoice={id:'invoice-one',number:'RE-TEST-1',kind:'invoice',customer_id:customer.id,customer,total:135.13,subtotal:125,vat:10.13,paid_amount:100,currency:'CHF',issue_date:'2026-10-08',due_date:'2026-11-08',status:'sent',items:[{description:'Beratung',quantity:1,unit:'hour',unit_price:125,vat_rate:8.1}]};
-const offer={...invoice,id:'offer-one',kind:'offer',number:'AN-TEST-1',status:'sent'};
-const payment={id:'payment-one',amount:135.13,currency:'CHF',paid_on:'2026-10-08',method:'bank',status:'booked',customer_id:customer.id,customer,invoice};
+const invoice={id:'invoice-one',number:'RE-TEST-1',kind:'invoice',customer_id:customer.id,customer,total:135.13,subtotal:125,vat:10.13,paid_amount:100,currency:'CHF',issue_date:'2026-10-08',due_date:'2026-11-08',status:'partial',items:[{description:'Beratung',quantity:1,unit:'hour',unit_price:125,vat_rate:8.1}]};
+const offer={...invoice,id:'offer-one',kind:'offer',number:'AN-TEST-1',status:'sent',paid_amount:0};
+const payment={id:'payment-one',amount:100,currency:'CHF',paid_on:'2026-10-08',method:'bank',status:'booked',customer_id:customer.id,customer,invoice};
 const ticket={id:'ticket-one',case_number:'T-TEST-1',subject:'Testanfrage',status:'open',priority:'normal',created_at:'2026-10-08T10:00:00Z',updated_at:'2026-10-08T10:00:00Z'};
 const collections={customers:[customer],products:[product],employees:[employee],expenses:[expense],payments:[payment],documents:[invoice,offer],projects:[],time_entries:[]};
+if(process.env.BINSO_UX_FIXTURE_CASE){
+ if(process.env.BINSO_UX_MATRIX_ONLY!=='1')throw Error('Alternative fixtures require matrix-only mode; interaction suites own their mutation fixtures');
+ const fixture=fixtureCase(process.env.BINSO_UX_FIXTURE_CASE);
+ collections.customers=fixture.customers.map((item,index)=>({...customer,...item,customer_no:'K-'+String(index+1).padStart(6,'0')}));
+ collections.documents=fixture.invoices.map((item,index)=>({...invoice,...item,customer:{...customer,...fixture.customers[0]},customer_id:fixture.customers[0]?.id??null,number:'RE-UX-'+String(index+1).padStart(4,'0')}));
+}
 function customerListFixture(params){
  const normalize=value=>String(value??'').toLocaleLowerCase().replace(/[^\p{L}\p{N}]/gu,'');
  const query=normalize(params.get('q'));
@@ -75,6 +85,7 @@ const requestedInteractions=process.env.BINSO_UX_INTERACTIONS?.split(',')??['dat
 const hasInteraction=name=>requestedInteractions.includes(name);
 let captureQueue=Promise.resolve();
 async function capture(page,options,target=page){
+ if(process.env.BINSO_UX_COMPLIANCE==='1')await measureCompliance(page,{output:path.join(output,'compliance'),route:new URL(page.url()).pathname,theme:await page.locator('html').getAttribute('data-theme'),width:page.viewportSize().width,state:'interaction:'+path.basename(options.path),engine:process.env.BINSO_UX_BROWSER??'chromium'});
  const pending=captureQueue.then(async()=>{await page.bringToFront();await page.evaluate(()=>document.fonts.ready);await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));if(process.env.BINSO_UX_SCREENSHOTS!=='0'||/error|overflow/.test(options.path))await target.screenshot(process.env.BINSO_UX_BROWSER==='webkit'?{...options,animations:'allow'}:options);if(target===page&&process.env.BINSO_UX_DOM_EVIDENCE==='1')await saveDomEvidence(page,options.path.replace(/\.png$/,'.json'));});
  captureQueue=pending.catch(()=>{});return pending;
 }
@@ -94,7 +105,7 @@ async function actionEvidence(page,name,theme){
  await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${name}-actions.png`)});
 }
 const results=[];const errors=[];const accessibilityFailures=[];let failMutation=false,posts=0,failLedger=false,failSend=false,messagePosts=0,uploads=0,employeeLedgerFixture=false,groupingFixture=false,releaseReceiptScan;
-let policyPosts=0,policyRequired=true,policyRole="owner",policyReadOnly=false,failPolicy=false,teamPosts=0,failTeam=false;
+let policyPosts=0,policyRequired=true,policyRole=process.env.BINSO_UX_FIXTURE_CASE==='employee'?'member':['owner','admin','finance'].includes(process.env.BINSO_UX_FIXTURE_CASE)?process.env.BINSO_UX_FIXTURE_CASE:"owner",policyReadOnly=false,failPolicy=false,teamPosts=0,failTeam=false;
 let failPreferences=false,preferencePosts=0;
 let notificationWrites=0,failNotificationWrite=false,securityUnavailable=false,sessionDeletes=0;
 let dataPaymentMode=false,dataPaymentFailed=false,dataPaymentPosts=0,holdDataRefresh=false,customerIdentityMode=false,losePaymentResponse=false,incompletePaymentResponse=false;const paymentReplays=new Map(),dataRefreshWaiters=[];
@@ -104,6 +115,8 @@ let projectPosts=0,failProjectCreate=false,loseProjectResponse=false;const proje
 let customerPosts=0,failCustomerCreate=false,loseCustomerResponse=false;const customerReplays=new Map();
 let teamMemberRole='member';let supportMessages=[];
 const operatorAccount={tenant_id:'tenant-one',tenant:{name:'Prüffirma AG'},plan:'pro',subscription_status:'active',account_status:'active',user_limit:10,updated_at:'2026-10-09'};
+const settleLayout=page=>page.evaluate(async()=>{await document.fonts.ready;await Promise.all(document.getAnimations().filter(a=>Number.isFinite(a.effect?.getComputedTiming().endTime)).map(a=>a.finished.catch(()=>{})));await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));});
+let releaseOldSearch;
 let context;
 try{
  for(const theme of (process.env.BINSO_UX_THEMES?.split(",")??["light","dark"])){
@@ -167,7 +180,7 @@ try{
 
 
    else if(p==='/api/settings/notifications')data={items:[{kind:'Rechnungen',email:true,push:false}]};
-   else if(p==='/api/search'){const term=url.searchParams.get('q');if(term==='old')await new Promise(resolve=>setTimeout(resolve,450));data={items:term==='none'?[]:[{type:'Kunde',title:term==='old'?'Veraltetes Ergebnis':'Prüffirma AG',meta:'Bern',href:'/kunden/customer-one',icon:'users'},{type:'Rechnung',title:'RE-TEST-1',meta:'Prüffirma AG',href:'/rechnungen/RE-TEST-1',icon:'receipt'}]};}
+   else if(p==='/api/search'){const term=url.searchParams.get('q');if(term==='old')await new Promise(resolve=>{releaseOldSearch=resolve});data={items:term==='none'?[]:[{type:'Kunde',title:term==='old'?'Veraltetes Ergebnis':'Prüffirma AG',meta:'Bern',href:'/kunden/customer-one',icon:'users'},{type:'Rechnung',title:'RE-TEST-1',meta:'Prüffirma AG',href:'/rechnungen/RE-TEST-1',icon:'receipt'}]};}
    else if(p==='/api/settings/documents')data={item:{vat_rate:8.1,payment_terms_days:30,iban:'CH9300762011623852957',qr_iban:'',invoice_intro_text:'Synthetischer Rechnungstext',invoice_footer_text:'Synthetischer Schlusstext',quote_intro_text:'Synthetischer Angebotstext',quote_footer_text:'Synthetischer Schlusstext'}};
    else if(p==='/api/settings/subscription')data={item:{plan:'pro',subscription_status:'active',account_status:'active',unit_amount_chf:79,user_limit:10,storage_limit_bytes:21474836480,current_period_ends_at:'2026-11-09'}};
    else if(p==='/api/integrations/status')data={items:[{key:'billing',configured:false}]};
@@ -222,6 +235,7 @@ try{
     if(route==='/einstellungen/abonnement')await page.locator('.plan-hero').getByText('Aktiv',{exact:true}).waitFor();
     if(route==='/einstellungen/dokumente'){await page.getByRole('heading',{name:'Rechnungsstandard',exact:true}).waitFor();await page.getByText('Synthetischer Rechnungstext',{exact:true}).waitFor();}
     assert.equal(await page.locator('html').getAttribute('data-theme'),theme,`${route}: explicit theme must override system dark mode`);
+    if(process.env.BINSO_UX_COMPLIANCE==='1')await measureCompliance(page,{output:path.join(output,'compliance'),route,theme,width,state:process.env.BINSO_UX_FIXTURE_CASE??'normal',engine:process.env.BINSO_UX_BROWSER??'chromium'});
     const geometry=await page.evaluate(()=>({overflow:[...document.querySelectorAll('body *')].filter(el=>el.getBoundingClientRect().right>innerWidth+1).slice(0,12).map(el=>({tag:el.tagName,cls:el.className,text:el.textContent?.slice(0,80),parent:el.parentElement?.className,right:el.getBoundingClientRect().right})),viewport:innerWidth,scroll:document.documentElement.scrollWidth,body:document.body.scrollWidth,sort:[...document.querySelectorAll('.toolbar .filter-button')].map(el=>el.getBoundingClientRect().width),metricDividers:[...document.querySelectorAll('.metric,.finance-flow-primary,.finance-flow-result,.finance-flow-costs,.finance-flow-costs>div')].map(el=>getComputedStyle(el).borderLeftWidth)}));
     if(geometry.scroll>width+1||geometry.body>width+1){console.log('Overflow details',JSON.stringify(await page.evaluate(()=>[...document.querySelectorAll('body *')].filter(el=>el.scrollWidth>el.clientWidth+2).slice(0,30).map(el=>({tag:el.tagName,cls:el.className,width:el.clientWidth,scroll:el.scrollWidth,overflow:getComputedStyle(el).overflowX,children:[...el.children].map(c=>({tag:c.tagName,width:c.clientWidth,scroll:c.scrollWidth,rect:c.getBoundingClientRect().width,min:getComputedStyle(c).minWidth,grid:getComputedStyle(el).gridTemplateColumns})),rect:JSON.stringify(el.getBoundingClientRect())}))),null,2));await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${width}-overflow.png`)});}
     assert.ok(geometry.scroll<=width+1&&geometry.body<=width+1,`${theme} ${width} ${route}: horizontal overflow ${JSON.stringify(geometry)}`);
@@ -237,8 +251,8 @@ try{
     if(!process.env.BINSO_UX_BASELINE&&['/dashboard','/finanzen','/finanzen/analyse','/kunden/customer-one'].includes(route)){
       assert.equal(await page.locator('.bo-statistics-kpis>div').count(),3,'Migrated statistics have exactly three metrics');
       assert.equal(await page.locator('.bo-statistics').count(),1,'One central statistics surface');
-      assert.equal(await page.locator('.bo-statistics').evaluate(el=>getComputedStyle(el).backgroundColor),'rgb(23, 25, 29)','Statistics retain their dark design in both themes');
-      assert.ok(await page.locator('.bo-statistics-bar').evaluateAll(elements=>elements.some(el=>el.getBoundingClientRect().height>20)),'Actual fixture values produce bars');
+      assert.equal(await page.locator('.bo-statistics').evaluate(el=>getComputedStyle(el).backgroundColor),theme==='light'?'rgb(255, 255, 255)':'rgb(23, 25, 29)','Statistics follow the approved light app background; existing dark variant remains pending review');
+      assert.ok(process.env.BINSO_UX_FIXTURE_CASE==='empty'||await page.locator('.bo-statistics-bar').evaluateAll(elements=>elements.some(el=>el.getBoundingClientRect().height>20)),'Actual fixture values produce bars');
       assert.equal(await page.locator('.revenue-insight,.dashboard-summary,.quick-section,.finance-overview-chart').count(),0,'Migrated pages have no competing KPI/chart layout');
     }
     if(!process.env.BINSO_UX_BASELINE&&route==='/mitarbeiter/employee-one'){await page.getByRole('heading',{name:'Mitarbeiterdetails',exact:true}).waitFor();await page.getByText(employee.email,{exact:true}).waitFor()}
@@ -358,7 +372,7 @@ try{
   assert.equal(await page.getByRole('button',{name:'Speichern',exact:true}).filter({visible:true}).count(),1,'Employee wizard has one final save');
   const employeeSave=await page.locator('.mobile-sticky-save').boundingBox();assert.equal(employeeSave.y,employeeFooter.y,'Full-page wizard actions remain fixed across steps');assert.ok(employeeSave.y+employeeSave.height<=page.viewportSize().height+1,'Wizard save stays in the visible viewport');await page.getByText('Ferientage / Jahr',{exact:true}).scrollIntoViewIfNeeded();
   await page.setViewportSize({width:430,height:400});
-  await page.waitForTimeout(100);
+  await settleLayout(page);
   const shortFooter=await page.locator('.form-wizard .mobile-sticky-save').boundingBox();assert.ok(shortFooter.y>=0&&shortFooter.y+shortFooter.height<=400,'Wizard actions stay visible in a short viewport');
   await page.locator('.wizard-content').evaluate(el=>{el.scrollTop=el.scrollHeight});
   const afterScroll=await page.locator('.form-wizard .mobile-sticky-save').boundingBox();assert.ok(Math.abs(shortFooter.y-afterScroll.y)<2,'Only wizard content scrolls');
@@ -476,7 +490,7 @@ try{
   assert.ok(zoom.page<=zoom.viewport+1&&zoom.document>zoom.viewport,'Zoom scrolls only inside the document area');
   await page.getByRole('button',{name:'Auf Bildschirm einpassen',exact:true}).click();
   await page.locator('.document-page-stage:not(.is-zoomed) canvas[data-rendered-page="1"]').waitFor();
-  await page.setViewportSize({width:430,height:400});await page.waitForTimeout(100);
+  await page.setViewportSize({width:430,height:400});await settleLayout(page);
   const nav=await page.locator('.document-page-navigation').boundingBox(),small=await page.locator('.pdf-page canvas').boundingBox();assert.ok(nav.y+nav.height<=401&&small.y+small.height<=nav.y+1,'Full page and navigation remain reachable at short height');await page.setViewportSize({width:430,height:1000});
   // Deliberately exercise the browser-download capability fallback; no native share UI is simulated.
   await page.evaluate(()=>Object.defineProperty(navigator,'canShare',{value:()=>false,configurable:true}));
@@ -518,7 +532,7 @@ try{
   assert.equal(await dialog.evaluate(el=>el.contains(document.activeElement)),true,'Opening the sheet moves focus inside');
   await page.keyboard.press('Escape');await dialog.waitFor({state:'hidden'});
   assert.equal(await page.evaluate(()=>document.activeElement?.getAttribute('aria-label')),'Produktaktionen','Sheet restores trigger focus');
-  await page.getByRole('button',{name:'Produktaktionen'}).filter({visible:true}).click();await actionEvidence(page,'Produktaktionen',theme);await page.getByRole('dialog',{name:'Produktaktionen'}).getByRole('button',{name:'Bearbeiten',exact:true}).click();await page.getByLabel('Verkaufspreis (CHF)',{exact:true}).fill('130');await page.getByRole('button',{name:'Speichern',exact:true}).filter({visible:true}).first().click();await page.waitForURL(base+'/produkte');await page.locator('.mobile-record-list').getByText('Beratung',{exact:true}).waitFor();await page.waitForTimeout(750);await page.waitForLoadState('networkidle');
+  await page.getByRole('button',{name:'Produktaktionen'}).filter({visible:true}).click();await actionEvidence(page,'Produktaktionen',theme);await page.getByRole('dialog',{name:'Produktaktionen'}).getByRole('button',{name:'Bearbeiten',exact:true}).click();await page.getByLabel('Verkaufspreis (CHF)',{exact:true}).fill('130');await page.getByRole('button',{name:'Speichern',exact:true}).filter({visible:true}).first().click();await page.waitForURL(base+'/produkte');await page.locator('.mobile-record-list').getByText('Beratung',{exact:true}).waitFor();await page.waitForLoadState('networkidle');
   // SPA navigation does not reset Playwright's load state. Allow the destination
   // fixtures and idle link prefetch to settle before the next hard navigation.
   }
@@ -534,7 +548,7 @@ try{
   await page.getByText('Fixture offline',{exact:true}).waitFor();assert.equal(posts,1,'Two rapid clicks must issue one expense write');
   assert.equal(Number(await page.getByLabel('Betrag',{exact:true}).inputValue()),89,'Failed submission preserves input');
   failMutation=false;await page.getByRole('button',{name:'Einreichen',exact:true}).filter({visible:true}).first().click();
-  await page.waitForURL(base+'/spesen');await page.locator('.mobile-record-list').getByText('SBB',{exact:true}).waitFor();await page.waitForTimeout(750);await page.waitForLoadState('networkidle');assert.equal(posts,2,'Failed expense write can be retried');assert.equal(uploads,1,'Receipt is uploaded once after a successful expense save');
+  await page.waitForURL(base+'/spesen');await page.locator('.mobile-record-list').getByText('SBB',{exact:true}).waitFor();await page.waitForLoadState('networkidle');assert.equal(posts,2,'Failed expense write can be retried');assert.equal(uploads,1,'Receipt is uploaded once after a successful expense save');
   }
   if(hasInteraction('employees')){
   failLedger=true;await page.waitForLoadState("networkidle");await navigate(base+'/mitarbeiter/employee-one');await page.waitForLoadState('networkidle');await page.getByRole('tab',{name:'Arbeitszeit',exact:true}).click();
@@ -582,8 +596,8 @@ try{
     const box=await panel.boundingBox(),bar=await header.boundingBox();assert.ok(box.y>=bar.y+bar.height-1&&box.x>=0&&box.x+box.width<=width+1,'Panel begins under the fixed header inside viewport');
     assert.equal(await page.evaluate(()=>document.body.style.overflow),'clip');
     assert.equal(await panel.getByText('Mindestens zwei Zeichen eingeben.',{exact:true}).count(),0);
-    await panel.getByLabel('Suchen',{exact:true}).fill('old');await page.waitForTimeout(220);await panel.getByLabel('Suchen',{exact:true}).fill('Prüffirma');
-    await panel.getByText('Prüffirma AG',{exact:true}).first().waitFor();await page.waitForTimeout(500);assert.equal(await panel.getByText('Veraltetes Ergebnis',{exact:true}).count(),0,'Stale responses never replace current search');
+    const oldRequest=page.waitForRequest(request=>new URL(request.url()).pathname==='/api/search'&&new URL(request.url()).searchParams.get('q')==='old');await panel.getByLabel('Suchen',{exact:true}).fill('old');await oldRequest;await panel.getByLabel('Suchen',{exact:true}).fill('Prüffirma');
+    await panel.getByText('Prüffirma AG',{exact:true}).first().waitFor();releaseOldSearch();releaseOldSearch=null;await page.waitForLoadState('networkidle');assert.equal(await panel.getByText('Veraltetes Ergebnis',{exact:true}).count(),0,'Stale responses never replace current search');
     await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${width}-header-search.png`)});
     await page.setViewportSize({width,height:400});
     const keyboardGeometry=await panel.evaluate(el=>{const root=document.documentElement,previous=root.style.getPropertyValue('--dialog-viewport-height');root.style.setProperty('--dialog-viewport-height','740px');const box=el.getBoundingClientRect();root.style.setProperty('--dialog-viewport-height',previous);return {top:box.top,bottom:box.bottom,height:innerHeight}});
@@ -635,10 +649,34 @@ try{
    if(!hasInteraction(scenario.group))continue;
    await page.setViewportSize({width:390,height:740});await navigate(base+scenario.route);await page.waitForLoadState('networkidle');
    if(scenario.menu){await page.getByRole('button',{name:scenario.menu,exact:true}).filter({visible:true}).click();await page.getByRole('button',{name:'Bearbeiten',exact:true}).filter({visible:true}).click()}
-   const field=page.getByLabel(scenario.field,{exact:true});const original=await field.inputValue();await field.fill(original+' geändert');await field.fill(original);await page.waitForTimeout(100);
+   const field=page.getByLabel(scenario.field,{exact:true});const original=await field.inputValue();await field.fill(original+' geändert');await field.fill(original);await settleLayout(page);
    if(scenario.group==='customers')await page.getByRole('dialog',{name:'Kunde bearbeiten',exact:true}).getByRole('button',{name:'Schliessen',exact:true}).click();else{const sheet=page.getByRole('dialog',{name:scenario.group==='products'?'Produkt bearbeiten':'Mitarbeiter bearbeiten',exact:true});await sheet.getByRole('button',{name:'Schliessen',exact:true}).click();await sheet.waitFor({state:'hidden'});assert.equal(await page.getByRole('alertdialog').count(),0,'Pristine sheet closes without a warning');await page.locator('.mobile-back').click();}await page.waitForURL(base+scenario.back);assert.equal(await page.getByRole('alertdialog').count(),0,scenario.group+': restoring original values is pristine');
   }
   if(hasInteraction('settings')){
+   // Actual settings UI, controlled scanner verdicts; not a live antivirus-engine test.
+   const imageBytes=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jB1kAAAAASUVORK5CYII=','base64');
+   const imageFile={name:'synthetic-branding.png',mimeType:'image/png',buffer:imageBytes};
+   const oldImage='/api/files/00000000-0000-4000-8000-000000000091/download',newImageId='00000000-0000-4000-8000-000000000092';
+   let scanVerdict='pending',scanFailure=0,companyWrites=0;
+   const scanUpload=route=>route.fulfill(scanFailure?{status:scanFailure,json:{message:'Synthetic scan unavailable'}}:{status:201,json:{item:{id:newImageId,scanStatus:scanVerdict}}});
+   const logoResource=route=>route.fulfill({json:{item:{name:'Synthetic Branding Company',logo_url:oldImage}}});
+   const avatarResource=route=>route.fulfill({json:{item:{display_name:'Synthetic Branding User',first_name:'Synthetic',last_name:'Branding User',avatar_url:oldImage,theme,language:'de'},email:'branding@fixture.invalid'}});
+   const logoSettings=route=>{if(route.request().method()==='GET')return logoResource(route);companyWrites++;return route.fulfill({json:{item:{name:'Synthetic Branding Company'}}});};
+   const imageDownload=route=>route.fulfill({contentType:'image/png',body:imageBytes});
+   await context.route('**/api/files',scanUpload);await context.route('**/api/files/*/download',imageDownload);
+   await context.route('**/api/settings/company',logoSettings);await context.route('**/api/settings/profile',avatarResource);
+   await page.setViewportSize({width:390,height:844});await navigate(base+'/einstellungen/konto');await page.locator('.settings-profile h2').getByText('Synthetic Branding User',{exact:true}).waitFor();
+   await page.getByRole('button',{name:'Bearbeiten',exact:true}).filter({visible:true}).first().click();
+   await page.locator('#profile-avatar-upload').setInputFiles(imageFile);await page.getByRole('status').filter({hasText:'Das Profilbild wartet auf die Sicherheitsprüfung.'}).waitFor();
+   assert.equal(await page.locator('.settings-profile img').getAttribute('src'),oldImage,'Quarantined avatar preserves the currently stored image');assert.equal(await page.getByText('Profilbild gespeichert.',{exact:true}).count(),0);
+   scanFailure=503;await page.locator('#profile-avatar-upload').setInputFiles(imageFile);await page.getByRole('status').filter({hasText:'Synthetic scan unavailable'}).waitFor();assert.equal(await page.locator('.settings-profile img').getAttribute('src'),oldImage);
+   scanFailure=0;scanVerdict='clean';await page.locator('#profile-avatar-upload').setInputFiles(imageFile);await page.getByText('Profilbild gespeichert.',{exact:true}).waitFor();assert.equal(await page.locator('.settings-profile img').getAttribute('src'),'/api/files/'+newImageId+'/download');
+   await navigate(base+'/einstellungen/firma');await page.locator('.company-logo-card b').getByText('Synthetic Branding Company',{exact:true}).waitFor();
+   await page.getByRole('button',{name:'Bearbeiten',exact:true}).filter({visible:true}).first().click();await page.locator('#company-logo-upload').setInputFiles(imageFile);
+   scanVerdict='pending';await page.getByRole('button',{name:'Speichern',exact:true}).click();await page.getByRole('status').filter({hasText:'Das Firmenlogo wartet auf die Sicherheitsprüfung.'}).waitFor();assert.equal(companyWrites,0,'Quarantine cannot complete company save');assert.equal(await page.locator('#company-logo-upload').count(),1,'Pending upload retains the edit form for recovery');
+   scanFailure=503;await page.getByRole('button',{name:'Speichern',exact:true}).click();await page.getByRole('status').filter({hasText:'Synthetic scan unavailable'}).waitFor();assert.equal(companyWrites,0);
+   scanFailure=0;scanVerdict='clean';await page.getByRole('button',{name:'Speichern',exact:true}).click();await page.getByText('Firmendaten gespeichert.',{exact:true}).waitFor();assert.equal(companyWrites,1,'Clean scan allows exactly one company save');
+   await context.unroute('**/api/files',scanUpload);await context.unroute('**/api/files/*/download',imageDownload);await context.unroute('**/api/settings/company',logoSettings);await context.unroute('**/api/settings/profile',avatarResource);
    let failDocumentSettings=true;
    const settingsFailure=async route=>{if(failDocumentSettings&&route.request().method()==='GET')return route.fulfill({status:503,json:{message:'Synthetic document settings unavailable'}});return route.fallback()};
    await context.route('**/api/settings/documents',settingsFailure);
@@ -680,8 +718,8 @@ try{
    // Client-renderer fixture only: the server still uses a local demo cookie.
    // All API requests remain intercepted; this does not claim real operator SSO coverage.
    await context.addInitScript(()=>{const selectClient=()=>document.querySelector('[data-operator-demo="true"]')?.setAttribute('data-operator-demo','false');new MutationObserver(selectClient).observe(document,{childList:true,subtree:true,attributes:true,attributeFilter:['data-operator-demo']});selectClient()});
-   await navigate(base+'/operator');await page.getByRole('heading',{name:'Abrechnung',exact:true}).waitFor();const dashboardMetrics=page.locator('.operator-insight-grid .metric');assert.equal(await dashboardMetrics.count(),5,'Dashboard billing/support use shared metrics');for(const metric of await dashboardMetrics.all()){const boxes=await metric.evaluate(el=>({label:el.querySelector('.metric-top').getBoundingClientRect().toJSON(),value:el.querySelector('strong').getBoundingClientRect().toJSON()}));assert.ok(boxes.value.top>=boxes.label.bottom-1,'Dashboard values and labels occupy separate lines');}
-   for(const section of await page.locator('.operator-insight-grid>.bo-workspace-section').all())assert.equal(await section.evaluate(el=>getComputedStyle(el).marginTop),'0px','Dashboard grid owns section spacing');
+   await navigate(base+'/operator');await page.getByRole('heading',{name:'Abrechnung',exact:true}).waitFor();const dashboardMetrics=page.locator('.operator-insight-grid .metric');assert.equal(await dashboardMetrics.count(),2,'Secondary dashboard metrics start in one bounded billing view');await page.getByRole('tab',{name:'Support',exact:true}).click();assert.equal(await dashboardMetrics.count(),3,'Support uses the same central metrics in its own view');await page.getByRole('tab',{name:'Abrechnung',exact:true}).click();for(const metric of await dashboardMetrics.all()){const boxes=await metric.evaluate(el=>({label:el.querySelector('.metric-top').getBoundingClientRect().toJSON(),value:el.querySelector('strong').getBoundingClientRect().toJSON()}));assert.ok(boxes.value.top>=boxes.label.bottom-1,'Dashboard values and labels occupy separate lines');}
+   for(const section of await page.locator('.operator-insight-grid>.bo-workspace-section').all())assert.equal(await section.evaluate(el=>getComputedStyle(el).marginTop),'0px','Dashboard grid owns section spacing');const insightGeometry=await page.locator('.operator-insight-grid').evaluate(el=>({grid:el.getBoundingClientRect().width,section:el.firstElementChild.getBoundingClientRect().width}));assert.ok(insightGeometry.section>=insightGeometry.grid-1,'A single selected dashboard view fills its workspace');
    // The server prototype cookie selects the demo finance endpoint even when
    // the client-renderer fixture switches the other operator APIs to production.
    await capture(page,{animations:'disabled',path:path.join(output,theme+'-operator-dashboard-production.png')});
@@ -697,11 +735,18 @@ try{
     assert.equal(await page.getByRole('heading',{name:'Performance im Verlauf',exact:true}).isVisible(),false,'Additional charts hidden initially');
     assert.equal(await page.locator('.bo-monitor-alert-summary').isVisible(),true,'Critical warnings remain visible before expanding');
     await more.click();await page.getByRole('heading',{name:'Performance im Verlauf',exact:true}).waitFor();
-    const layout=await page.evaluate(()=>({overflow:document.documentElement.scrollWidth>innerWidth+1,charts:document.querySelectorAll('.bo-monitor-chart').length,visibleCharts:[...document.querySelectorAll('.bo-monitor-chart')].filter(el=>el.getBoundingClientRect().height>0).length,disclosures:[...document.querySelectorAll('.bo-monitor-details')].every(el=>!el.open),readings:document.querySelectorAll('[data-metric-id]').length,status:document.querySelector('[data-service-status="unknown"] .status').getBoundingClientRect().right,viewport:innerWidth,border:getComputedStyle(document.querySelector('.monitoring-panel')).borderTopWidth}));
-    assert.equal(layout.overflow,false,'Monitoring has no horizontal overflow at '+width);assert.equal(layout.charts,3,'All three measured vital series are shown');assert.equal(layout.visibleCharts,width<=760?1:3,'Mobile shows one selectable chart; desktop shows three');assert.equal(layout.disclosures,true,'Technical details are collapsed initially');assert.equal(layout.readings,7,'Every synthetic metric rendered exactly once');assert.ok(layout.status<=layout.viewport,'Unknown integration status remains inside viewport');assert.equal(layout.border,'0px','Workspace sections have no card outlines');
-    assert.equal(await page.locator('[data-metric-id="azure_cpu"]').getAttribute('data-health'),'unknown','Missing Azure data is never healthy');
-    assert.equal(await page.locator('[data-alarm-id="mail-failed"] .status').textContent(),'Kritisch','Actual failure fixture triggers alarm');
-    if(width<=760){await page.getByRole('tab',{name:'INP',exact:true}).click();assert.equal(await page.locator('.bo-monitor-chart-slot[data-selected="true"] h3').textContent(),'INP p75 pro Stunde');await page.getByRole('tab',{name:'LCP',exact:true}).click();}
+    const layout=await page.evaluate(()=>({overflow:document.documentElement.scrollWidth>innerWidth+1,charts:document.querySelectorAll('.bo-monitor-chart').length,visibleCharts:[...document.querySelectorAll('.bo-monitor-chart')].filter(el=>el.getBoundingClientRect().height>0).length,tiles:[...document.querySelectorAll('.bo-monitor-headline .metric')].map(el=>el.getBoundingClientRect().toJSON())}));
+    assert.equal(layout.overflow,false,'Monitoring has no horizontal overflow at '+width);assert.equal(layout.charts,3,'All three measured vital series remain available');assert.equal(layout.visibleCharts,width<=760?1:3,'Mobile shows one selectable chart; desktop shows three');
+    if(width<=760){assert.ok(layout.tiles[1].left>layout.tiles[0].left,'Primary monitoring metrics keep a 2x2 grid');await page.getByRole('tab',{name:'INP',exact:true}).click();assert.equal(await page.locator('.bo-monitor-chart-slot[data-selected="true"] h3').textContent(),'INP p75 pro Stunde');await page.getByRole('tab',{name:'LCP',exact:true}).click();}
+    await capture(page,{animations:'disabled',path:path.join(output,theme+'-'+width+'-operator-monitoring-performance.png')});
+    await page.getByRole('tab',{name:'Dienste',exact:true}).click();await page.getByRole('heading',{name:'Service-Status',exact:true}).waitFor();
+    assert.equal(await page.locator('.bo-monitor-chart').count(),0,'Tabs replace sections instead of adding a long list');
+    const serviceGeometry=await page.locator('[data-service-status="unknown"] .status').boundingBox();assert.ok(serviceGeometry.x+serviceGeometry.width<=width+1,'Unknown service status fits the viewport');
+    assert.equal(await page.locator('.monitoring-panel').evaluate(el=>getComputedStyle(el).borderTopWidth),'0px','Workspace has no card outline');
+    await page.getByRole('tab',{name:/^Alarme/}).click();assert.equal(await page.locator('[data-alarm-id="mail-failed"] .status').textContent(),'Kritisch','Actual failure fixture triggers alarm');
+    await page.getByRole('tab',{name:'Messwerte',exact:true}).click();await page.getByLabel('Messbereich',{exact:true}).selectOption('infrastructure');
+    assert.equal(await page.locator('[data-metric-id="azure_cpu"]').getAttribute('data-health'),'unknown','Missing Azure data never becomes healthy');
+    await page.getByRole('button',{name:'Datenquellen',exact:true}).click();const sources=page.getByRole('dialog',{name:'Datenquellen und Grenzen',exact:true});await sources.waitFor();assert.ok(await sources.getByRole('button',{name:'Schliessen',exact:true}).last().isVisible());await page.keyboard.press('Escape');await sources.waitFor({state:'hidden'});
     await capture(page,{animations:'disabled',path:path.join(output,theme+'-'+width+'-operator-monitoring-shared.png')});
     await page.getByRole('button',{name:'Weniger anzeigen',exact:true}).click();assert.equal(await page.getByRole('heading',{name:'Performance im Verlauf',exact:true}).isVisible(),false,'Further statistics collapse again');
    }
@@ -720,7 +765,8 @@ try{
    await page.setViewportSize({width:390,height:740});await navigate(base+'/operator/sperrungen');await page.getByRole('button',{name:'Einschränkung erstellen',exact:true}).click();const restrictionSheet=page.getByRole('dialog',{name:'Einschränkung erstellen',exact:true});await restrictionSheet.waitFor();await restrictionSheet.getByRole('button',{name:'Einschränkung prüfen',exact:true}).click();const restrict=page.getByRole('alertdialog',{name:'Zugriff einschränken?',exact:true});await restrict.waitFor();assert.equal(await restrict.evaluate(el=>el.contains(document.activeElement)),true);await capture(page,{animations:'disabled',path:path.join(output,`${theme}-operator-restriction-confirm.png`)});await restrict.getByRole('button',{name:'Abbrechen',exact:true}).click();await restrict.waitFor({state:'hidden'});await restrictionSheet.getByRole('button',{name:'Schliessen',exact:true}).click();await restrictionSheet.waitFor({state:'hidden'});
    await navigate(base+'/operator/tickets/ticket-one');await page.getByText('Öffentliche Nachricht',{exact:true}).waitFor();assert.equal(await page.getByText('Vertrauliche interne Notiz',{exact:true}).count(),0);await page.getByRole('button',{name:'Interne Notiz',exact:true}).click();await page.getByText('Vertrauliche interne Notiz',{exact:true}).waitFor();assert.equal(await page.getByText('Öffentliche Nachricht',{exact:true}).count(),0);assert.equal(await page.locator('.message').count(),1);await capture(page,{animations:'disabled',path:path.join(output,`${theme}-operator-internal-message.png`)});
    await navigate(base+'/operator/audit');const auditRows=page.locator('.mobile-record-list');await auditRows.getByText('Microsoft-Anmeldung',{exact:true}).waitFor();await auditRows.getByText(/Fixture Operator/).waitFor();assert.equal(await auditRows.getByText(/Invalid Date|undefined/).count(),0,'Audit consumes the camelCase production API contract');await auditRows.getByText(/Zeitpunkt nicht verfügbar · System/).waitFor();await capture(page,{animations:'disabled',path:path.join(output,theme+'-operator-audit-contract.png')});
-   await navigate(base+'/operator/ankuendigungen');await page.getByText('Noch keine Ankündigungen',{exact:true}).waitFor();assert.equal(await page.locator('input[placeholder="Kurzer Titel"]').count(),0,'Creation form stays in the shared sheet');await page.getByRole('button',{name:'Ankündigung erstellen',exact:true}).click();const announcementSheet=page.getByRole('dialog',{name:'Ankündigung erstellen',exact:true});await announcementSheet.waitFor();await announcementSheet.getByLabel('Titel',{exact:true}).waitFor();assert.ok(await announcementSheet.locator('.filter-sheet-actions').getByRole('button',{name:'Veröffentlichen',exact:true}).isVisible(),'Publishing action uses the shared form footer');await capture(page,{animations:'disabled',path:path.join(output,theme+'-operator-announcement-sheet.png')});await announcementSheet.getByRole('button',{name:'Schliessen',exact:true}).click();await announcementSheet.waitFor({state:'hidden'});
+   await navigate(base+'/operator/ankuendigungen');await page.getByText('Noch keine Ankündigungen',{exact:true}).waitFor();assert.equal(await page.locator('input[placeholder="Kurzer Titel"]').count(),0,'Creation form stays in the shared sheet');await page.getByRole('button',{name:'Ankündigung erstellen',exact:true}).click();const announcementSheet=page.getByRole('dialog',{name:'Ankündigung erstellen',exact:true});await announcementSheet.waitFor();await announcementSheet.getByLabel('Titel',{exact:true}).waitFor();assert.ok(await announcementSheet.locator('.filter-sheet-actions').getByRole('button',{name:'Veröffentlichen',exact:true}).isVisible(),'Publishing action uses the shared form footer');await capture(page,{animations:'disabled',path:path.join(output,theme+'-operator-announcement-sheet.png')});let published=null;const announcementContract=async route=>{if(route.request().method()==='POST'){published=route.request().postDataJSON();return route.fulfill({status:201,json:{item:{id:'notice-one'}}})}return route.fulfill({json:{items:published?[{id:'notice-one',title:published.title,message:published.message,kind:published.kind,active:true,organizationId:null,createdAt:'2026-10-12T09:00:00Z'}]:[]}})};await context.route('**/api/operator/announcements',announcementContract);
+   await announcementSheet.getByLabel('Titel',{exact:true}).fill('Geprüfter Hinweis');await announcementSheet.getByLabel('Nachricht',{exact:true}).fill('Geprüfte Nachricht');await announcementSheet.getByLabel('Typ',{exact:true}).selectOption('warning');await announcementSheet.getByRole('button',{name:'Veröffentlichen',exact:true}).click();await announcementSheet.waitFor({state:'hidden'});await page.getByText('Geprüfte Nachricht',{exact:true}).waitFor();assert.deepEqual(published,{title:'Geprüfter Hinweis',message:'Geprüfte Nachricht',kind:'warning',organizationId:null});assert.equal(await page.getByText(/Invalid Date|undefined/).count(),0,'Announcement list consumes the actual API contract');await context.unroute('**/api/operator/announcements',announcementContract);
    let failAccounts=true;const accountFailure=async route=>failAccounts?route.fulfill({status:503,json:{message:'Synthetic operator accounts unavailable'}}):route.fallback();await context.route('**/api/operator/accounts',accountFailure);
    await navigate(base+'/operator/abonnemente');await page.getByText('Synthetic operator accounts unavailable',{exact:true}).waitFor();await page.evaluate(()=>{window.__operatorRetryMarker='same-document'});failAccounts=false;await page.getByRole('button',{name:'Erneut versuchen',exact:true}).click();await page.locator('.mobile-record-list').getByText('Prüffirma AG',{exact:true}).waitFor();assert.equal(await page.evaluate(()=>window.__operatorRetryMarker),'same-document','Operator retry preserves the document and targets the query');await context.unroute('**/api/operator/accounts',accountFailure);
 
@@ -802,6 +848,11 @@ try{
   await context.close();context=null;await browser.close();browser=null;
  }
  assert.deepEqual(accessibilityFailures,[],'Blocking accessibility violations');
+ if(process.env.BINSO_UX_COMPLIANCE==='1'&&process.env.BINSO_UX_MATRIX_ONLY!=='1'){
+  const groups={customers:['UX-INT-001','UX-INT-004'],header:['UX-INT-002'],time:['UX-INT-003'],finance:['UX-FIN-005','UX-FIN-007'],documents:['UX-PDF-001'],data:['UX-FIN-006']};
+  const checks=requestedInteractions.flatMap(group=>(groups[group]??[]).map(id=>({id,status:'partial',observed:{suite:group,completed:true,source:'scripts/ux-browser-test.mjs',limitation:'Existing representative assertion suite passed; individual route/state coverage is incomplete'},selector:null})));
+  await writeTestOutput(path.join(output,'compliance-interactions-'+(process.env.BINSO_UX_BROWSER??'chromium')+'.json'),JSON.stringify({schemaVersion:1,...complianceIdentity(),route:'representative interaction suites',state:'interaction',engine:process.env.BINSO_UX_BROWSER??'chromium',checks},null,2));
+ }
  await writeTestOutput(path.join(output,`results-${process.env.BINSO_UX_THEMES??'light-dark'}.json`),JSON.stringify({browser:process.env.BINSO_UX_BROWSER??'chromium',device:process.env.BINSO_UX_DEVICE??'responsive viewport',scope:'Synthetic API UI fixtures; no production writes',interactions:requestedInteractions,results,errors},null,2));
  await fs.copyFile(path.join(output,`results-${process.env.BINSO_UX_THEMES??'light-dark'}.json`),path.join(output,`results-${process.env.BINSO_UX_BROWSER??'chromium'}-${process.env.BINSO_UX_THEMES??'light-dark'}.json`));
  console.log(`UX browser checks passed: ${results.length} route/theme/viewport combinations ; interactions: ${process.env.BINSO_UX_MATRIX_ONLY==="1"?"matrix only":requestedInteractions.join(",")}. Artifacts: ${output}`);

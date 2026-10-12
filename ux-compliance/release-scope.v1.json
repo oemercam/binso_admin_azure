@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "development-20261012",
+  "phase": "prelaunch-development",
+  "productionAcceptance": false,
+  "additionalRecurringCost": 0,
+  "fileAccessMode": "authenticated-unscanned",
+  "authorization": {
+    "source": "Owner instruction in the deployment conversation",
+    "at": "2026-10-12T18:25:03Z",
+    "quote": "Ja mach alles damit wir entlich deployen können und sperrendie dateien nicht wir machen später scanner richtig"
+  },
+  "deferredProductionEvidence": [
+    "trusted-live-scanner-and-existing-file-rescan",
+    "complete-432-requirement-approval",
+    "named-pixel-and-physical-pwa-approval",
+    "full-ingress-spoof-proof",
+    "runtime-performance-and-historical-domain-review",
+    "alarm-delivery-proof"
+  ],
+  "requiredStaticChecks": ["UX-NAV-001", "UX-NAV-002", "UX-FIX-001", "UX-ARC-001"],
+  "requiredMeasuredChecks": ["UX-LAY-003"],
+  "requiredEngines": ["chromium", "webkit"],
+  "requiredRouteEngines": ["chromium"],
+  "requiredFixtureStates": ["normal", "admin", "employee", "empty", "finance", "large", "negative", "no-expenses", "partial"],
+  "excludedRuntimeRoutes": [
+    {"route": "/dev/ux-lab", "reason": "Development-only laboratory; not a deployed customer route"},
+    {"route": "/operator/wallboard", "reason": "Redirect entry; destination operator surface is measured"}
+  ]
+}

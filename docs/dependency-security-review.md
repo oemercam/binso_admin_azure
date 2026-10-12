@@ -44,3 +44,7 @@ Spätestens bei jedem Upgrade von Next.js, `eslint-config-next`, ESLint oder pnp
 pnpm security:scan
 pnpm security:scan:all
 ```
+
+## V22.4 remediation, 10 October 2026
+
+The existing braces exception is now bound to package braces, version 3.0.3, the exact documented ESLint dependency path, the dev-only manifest root and an expiry of 2026-10-24 UTC. The full audit independently runs the blocking production audit first. Changed paths, versions, severity, package or expired review block CI; no dependency versions were upgraded. Renew only after a documented current upstream review.

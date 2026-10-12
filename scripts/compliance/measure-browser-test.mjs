@@ -1,0 +1,47 @@
+import assert from 'node:assert/strict';
+import {pathToFileURL} from 'node:url';
+import fs from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
+import {measureActionClearance,measureCompliance} from './measure.mjs';
+const engines=await import(process.env.BINSO_PLAYWRIGHT_MODULE?pathToFileURL(process.env.BINSO_PLAYWRIGHT_MODULE).href:'playwright');
+const engine=process.env.BINSO_UX_BROWSER??'chromium';
+const browser=await engines[engine].launch({headless:true,...(engine==='chromium'&&process.env.BINSO_CHROMIUM_EXECUTABLE?{executablePath:process.env.BINSO_CHROMIUM_EXECUTABLE}: {})});
+const output=await fs.mkdtemp(path.join(os.tmpdir(),'binso-header-measure-'));
+try{
+ const page=await browser.newPage({viewport:{width:320,height:1000}});
+ const fixture=padding=>`<style>body{margin:0}.page-container{padding-top:1200px;padding-bottom:${padding}px}.bottom-nav{position:fixed;bottom:0;height:76px;width:100%;background:#eee}button{height:44px}</style><main class="page-container"><button>Action</button></main><nav class="bottom-nav"></nav>`;
+ await page.setContent(fixture(160));
+ await page.evaluate(()=>{const native=window.scrollTo.bind(window);let calls=0;window.scrollTo=(...args)=>{native(...args);if(++calls===1)requestAnimationFrame(()=>native(0,0));};});
+ const settled=await measureActionClearance(page);
+ assert(settled.scrollEndEstablished,'A delayed route scroll reset must be retried');
+ assert(settled.scrollY>0&&settled.lastActionBottom<settled.navigationTop,'Compare the real document endpoint');
+ assert.equal(await page.evaluate(()=>scrollY),0,'Restore the original scroll');
+ await page.setContent(fixture(0));
+ const overlap=await measureActionClearance(page);
+ assert(overlap.scrollEndEstablished&&overlap.lastActionBottom>overlap.navigationTop,'True navigation overlap stays blocking');
+ await page.evaluate(()=>{window.scrollTo=()=>{};});
+ const blocked=await measureActionClearance(page);
+ assert.equal(blocked.scrollEndEstablished,false,'Unreachable endpoint cannot pass as measured geometry');
+ await page.setViewportSize({width:1440,height:1000});
+ const notification='<button class="desktop-notification-button">Bell</button>',avatar='<button class="avatar-button">Account</button>';
+ const header=actions=>`<div class="desktop-appbar"><button>Search</button><div class="desktop-appbar-actions">${actions}</div></div>`;
+ const checkHeader=async(actions,state)=>{
+  await page.setContent(header(actions));
+  const evidence=await measureCompliance(page,{output,route:'/dashboard',theme:'light',width:page.viewportSize().width,state,engine});
+  return evidence.checks.filter(c=>c.id==='UX-LAY-003');
+ };
+ const normal=await checkHeader(notification+avatar,'header-normal');
+ assert.equal(normal.length,1,'The actual desktop action owner must produce evidence');
+ assert.equal(normal[0].status,'passed','Left search is outside the right action group');
+ assert.equal((await checkHeader(notification+avatar+'<button>Extra</button>','header-extra'))[0].status,'failed','A third action must fail');
+ assert.equal((await checkHeader(notification+'<button>Wrong replacement</button>','header-replacement'))[0].status,'failed','Counting two controls cannot approve an unrelated replacement');
+ assert.equal((await checkHeader(notification+avatar+'<a class="desktop-header-timer" href="/zeit">Timer</a>','header-timer'))[0].status,'failed','The registered no-extra-actions criterion has no implicit timer exemption');
+ assert.equal((await checkHeader(notification+avatar+'<button hidden>Hidden</button>','header-hidden'))[0].status,'passed','Hidden controls are excluded from visible actions');
+ await page.setViewportSize({width:1024,height:1000});
+ assert.equal((await checkHeader(notification+avatar,'header-breakpoint'))[0].status,'passed','The desktop criterion includes the exact 1024px breakpoint');
+ await page.setViewportSize({width:1023,height:1000});
+ assert.equal((await checkHeader(notification+avatar+'<button>Mobile</button>','header-mobile')).length,0,'The desktop criterion starts at 1024px');
+ await page.close();
+ console.log('Scroll-end and desktop-header adversaries passed. Engine: '+engine);
+}finally{await browser.close();await fs.rm(output,{recursive:true,force:true});}
