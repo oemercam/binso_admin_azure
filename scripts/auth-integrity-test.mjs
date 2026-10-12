@@ -43,7 +43,7 @@ const adapters={
  'lib/server/db.ts':uri('export const query=(...args)=>globalThis.__integrity.query(...args);export const withTransaction=fn=>globalThis.__integrity.transaction(fn);export const withTenant=(org,user,fn)=>globalThis.__integrity.transaction(async c=>{await c.query("select set_config(\'app.organization_id\',$1,true),set_config(\'app.user_id\',$2,true)",[org,user]);return fn(c)})'),
  'lib/server/session.ts':uri('export const getSession=async()=>globalThis.__integrity.getSession();export const requireSession=getSession;export const createSession=async input=>globalThis.__integrity.createSession(input);export const endDemoSession=async()=>{}'),
  'lib/server/rate-limit.ts':uri('export const enforceRateLimit=async()=>{}'),
- 'lib/server/env.ts':uri('export const env={appEncryptionKey:"isolated-auth-integrity-fixture-only",sessionTtlHours:168,sessionCookieName:"integrity_fixture_cookie"}'),
+ 'lib/server/env.ts':uri('export const env={appEncryptionKey:"isolated-auth-integrity-fixture-only",sessionTtlHours:168,sessionCookieName:"integrity_fixture_cookie",get releaseProfile(){return globalThis.__integrity.releaseProfile},get fileAccessMode(){return globalThis.__integrity.fileAccessMode},get fileScanSocket(){return globalThis.__integrity.fileScanSocket}}'),
  'lib/server/file-scan.ts':uri(`import {createHash} from 'node:crypto';import {scanBytes} from '${pathToFileURL(path.resolve('lib/server/clamav-protocol.mjs')).href}';export const scanFileWithEvidence=async body=>{globalThis.__integrity.scanCalls++;const status=globalThis.__integrity.scanStatus;if(status==='unavailable')throw new Response(null,{status:503});if(status==='clean'&&process.env.BINSO_REAL_SCANNER_SOCKET)return scanBytes(body,{socketPath:process.env.BINSO_REAL_SCANNER_SOCKET});return {status,evidence:status==='pending'?null:{engine:'ClamAV',engineVersion:'1.4.6',signaturesVersion:1,signaturesAt:new Date().toISOString(),sha256:createHash('sha256').update(body).digest('hex'),startedAt:new Date().toISOString(),completedAt:new Date().toISOString()}}}`),
  'lib/server/email-otp.ts':uri('export const consumeEmailCode=async()=>false;export const issueEmailCode=async()=>{throw Error("unexpected email flow")}'),
  'lib/server/email.ts':uri('export const sendMail=async()=>{throw Error("no external mail in fixtures")};export const mailLayout=()=>""'),
@@ -117,7 +117,7 @@ try{
  recorded.length=0;const legacyResponse=await finance.GET(new Request('https://fixture.invalid/api/finance'));assert.equal(legacyResponse.status,200);assert.ok((await legacyResponse.json()).payments,'Default external API contract preserved');assert.equal(recorded.filter(sql=>sql.startsWith('select')&&!sql.includes('set_config')).length,8);
  const files=await import(await load('app/api/files/route.ts'));
  const upload=(text,key)=>{const form=new FormData();form.append('file',new File([text],'synthetic.txt',{type:'text/plain'}));form.append('purpose','document');return new Request('https://fixture.invalid/api/files',{method:'POST',headers:{'idempotency-key':key},body:form});};
- const first=await files.POST(upload('synthetic bytes','synthetic-upload-replay'));assert.equal(first.status,201);const uploaded=(await first.json()).item;
+ const first=await files.POST(upload('synthetic bytes','synthetic-upload-replay'));assert.equal(first.status,201);const uploaded=(await first.json()).item;assert.equal(uploaded.available,false);
  const replay=await files.POST(upload('synthetic bytes','synthetic-upload-replay'));assert.equal(replay.status,201);assert.equal((await replay.json()).item.id,uploaded.id);
  assert.equal((await files.POST(upload('changed bytes','synthetic-upload-replay'))).status,409,'Same key cannot upload changed content');
  assert.equal((await query('select count(*)::int n from file_objects where organization_id=$1 and original_name=$2',[org,'synthetic.txt'])).rows[0].n,1);
@@ -150,5 +150,28 @@ try{
  assert.equal((await company.PATCH(req({logoUrl:'/api/files/'+foreignFile+'/download'}))).status,404,'Clean foreign tenant logo cannot be assigned');
  assert.equal((await company.PATCH(req({logoUrl:cleanBranding.logo}))).status,200);
  assert.equal((await company.PATCH(req({logoUrl:null}))).status,200);assert.equal((await branding()).logo,null,'Explicit logo removal remains supported');
- console.log((native?'PostgreSQL physical parallel clients':'Isolated PGlite')+': MFA replacement denied, locked enrollment, session revocation, same/distinct recovery-code consumption, transactional reset fault/retry/replay, actual session issuance vs reset and MFA/inactive-state guards, stale password-change denial, upload replay/conflict, quarantine-safe branding, scan failure rollback/retry and tenant/purpose-safe logo references passed.');
+ globalThis.__integrity.fileAccessMode='authenticated-unscanned';
+ assert.equal((await download.GET(new Request('https://fixture.invalid'),{params:Promise.resolve({id:pendingLogoId})})).status,423,'A file-access flag alone cannot disable quarantine');
+ globalThis.__integrity.releaseProfile='production';
+ assert.equal((await download.GET(new Request('https://fixture.invalid'),{params:Promise.resolve({id:pendingLogoId})})).status,423,'Production cannot use the development exception');
+ globalThis.__integrity.releaseProfile='development-20261012';
+ const deferred=await download.GET(new Request('https://fixture.invalid'),{params:Promise.resolve({id:pendingLogoId})});
+ assert.equal(deferred.status,200);assert.equal(deferred.headers.get('x-binso-file-scan-status'),'pending');assert.ok(deferred.headers.get('content-disposition').startsWith('attachment;'));assert.equal(deferred.headers.get('cache-control'),'private, no-store');assert.ok(deferred.headers.get('content-security-policy').includes('sandbox'));
+ const persisted=(await query('select scan_status,scan_evidence from file_objects where id=$1',[pendingLogoId])).rows[0];assert.equal(persisted.scan_status,'pending');assert.equal(persisted.scan_evidence,null,'Access does not invent a scanner verdict or proof');
+ assert.equal((await download.GET(new Request('https://fixture.invalid'),{params:Promise.resolve({id:uploaded.id})})).status,423,'Rejected files stay blocked in development');
+ const ownSession=globalThis.__integrity.getSession;
+ globalThis.__integrity.getSession=()=>({...ownSession(),organizationId:foreignOrg});
+ assert.equal((await download.GET(new Request('https://fixture.invalid'),{params:Promise.resolve({id:pendingLogoId})})).status,404,'Development mode retains tenant isolation');
+ globalThis.__integrity.getSession=()=>{throw new Response(null,{status:401})};
+ assert.equal((await download.GET(new Request('https://fixture.invalid'),{params:Promise.resolve({id:pendingLogoId})})).status,401,'Development mode never removes authentication');
+ globalThis.__integrity.getSession=ownSession;
+ assert.equal((await company.PATCH(req({logoUrl:'/api/files/'+pendingLogoId+'/download'}))).status,200,'An own pending image can be referenced in the explicit development mode');
+ globalThis.__integrity.scanStatus='pending';
+ const developmentAvatar=await files.POST(imageUpload('profile_avatar','synthetic-development-avatar'));assert.equal(developmentAvatar.status,201);const devAvatar=(await developmentAvatar.json()).item;assert.equal(devAvatar.scanStatus,'pending');assert.equal(devAvatar.available,true);assert.equal((await branding()).avatar,'/api/files/'+devAvatar.id+'/download');
+ globalThis.__integrity.fileScanSocket='/private/scanner.sock';
+ assert.equal((await download.GET(new Request('https://fixture.invalid'),{params:Promise.resolve({id:pendingLogoId})})).status,423,'Activating a scanner disables the unscanned-access exception');
+ globalThis.__integrity.fileScanSocket=undefined;
+ globalThis.__integrity.fileAccessMode=undefined;globalThis.__integrity.releaseProfile=undefined;
+ assert.equal((await download.GET(new Request('https://fixture.invalid'),{params:Promise.resolve({id:pendingLogoId})})).status,423,'Removing the explicit mode restores quarantine immediately');
+ console.log((native?'PostgreSQL physical parallel clients':'Isolated PGlite')+': auth races, upload replay, strict/default quarantine, explicit development access without verdict mutation, rejected/auth/tenant denial and branding policy passed.');
 }finally{delete globalThis.__integrity;if(native)await db.end();else await db.close();}

@@ -105,8 +105,8 @@
       "proofLimit": "Quellcodebefund; keine Produktivsysteme verändert.",
       "sourceUrl": "https://github.com/oemercam/binso_admin_azure/blob/b398ff7400eb1b2ea90016c25e596261d58c822b/app/api/files/[id]/download/route.ts#L16",
       "remediationStatus": "partial-blocker",
-      "implementation": "Download and PDF-logo quarantine enforced. Central fail-closed local ClamAV INSTREAM integration added; clean-only logo/avatar publication and tenant/purpose-scoped company references protected. Scanner infrastructure, real-engine detection, deployed limits/signatures and legacy pending-file rescan remain unproven.",
-      "verification": "scripts/file-scan-test.mjs (protocol peer only; OS socket in CI), scripts/auth-integrity-test.mjs and settings browser cases; docs/security/file-scanning.md defines remaining live scanner acceptance. No production release claim."
+      "implementation": "Central strict/default quarantine and real ClamAV CI exist. Explicit user-authorized prelaunch-development exception permits authenticated tenant-scoped pending-file access only without an active scanner; no stored verdict or evidence is rewritten. Rejected files remain blocked; enabling a scanner restores strict pending denial. Live scanner qualification and controlled historical rescan remain open.",
+      "verification": "scripts/auth-integrity-test.mjs tests strict and explicitly scoped development behavior, rejected/auth/tenant denial, no verdict mutation and scanner reactivation. scripts/document-presentation-test.mjs exercises real raster conversion and both PDF-logo policies. Full scanner production acceptance remains open; see development-deployment-20261012.md and ux-compliance/release-scope.v1.json."
     },
     {
       "id": "V224-SEC-004",
@@ -693,5 +693,12 @@
     "Reviewed pixel baselines and physical installed iOS/Android keyboard/PWA evidence missing",
     "Azure ingress/EasyAuth, deployed database role/RLS and historical data not inspected"
   ],
-  "protection": "Bottom-navigation markup/logic/icons/styles/transitive tokens unchanged; no productive customer or invoice rows edited"
+  "protection": "Bottom-navigation markup/logic/icons/styles/transitive tokens unchanged; no productive customer or invoice rows edited",
+  "developmentDeployment": {
+    "profile": "development-20261012",
+    "authorization": "Explicit owner instruction 2026-10-12T18:25:03Z",
+    "fileAccessMode": "authenticated-unscanned",
+    "productionAcceptance": false,
+    "status": "prepared; exact current-main Quality and live deployment proofs still required"
+  }
 }

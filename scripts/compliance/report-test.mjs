@@ -4,6 +4,13 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import {aggregate,collectEvidence,matchRoute} from './report.mjs';
+import {readScope,validateScope,developmentDecision} from './release-scope.mjs';
+const scope=readScope();
+const releaseFixture={failures:[],rejectedEvidence:[],coverage:[...scope.requiredStaticChecks.map(id=>({id,status:'passed',checks:[]})),{id:'UX-LAY-003',status:'partial',checks:scope.requiredEngines.map(engine=>({engine,status:'passed'}))}],routes:[{route:'/dashboard',runtimeEvidence:scope.requiredEngines.flatMap(engine=>scope.requiredFixtureStates.map(state=>({engine,state})))},{route:'/dev/ux-lab',runtimeEvidence:[]},{route:'/operator/wallboard',runtimeEvidence:[]}]};
+assert.equal(developmentDecision(releaseFixture,scope).ready,true,'The explicitly limited scope does not claim complete acceptance');
+assert.equal(developmentDecision(releaseFixture,scope).productionAcceptance,false);
+for(const mutate of [x=>x.failures.push({id:'UX-LAY-003'}),x=>x.rejectedEvidence.push({reason:'stale'}),x=>x.coverage[0].status='not-tested',x=>x.coverage.at(-1).checks.pop(),x=>x.routes.push({route:'/kunden',runtimeEvidence:[]}),x=>x.routes[0].runtimeEvidence=x.routes[0].runtimeEvidence.filter(e=>e.state!=='employee')]){const broken=structuredClone(releaseFixture);mutate(broken);assert.equal(developmentDecision(broken,scope).ready,false,'Missing evidence and measured regressions remain blocking in development');}
+for(const mutate of [x=>x.productionAcceptance=true,x=>x.requiredStaticChecks=[],x=>x.excludedRuntimeRoutes.push({route:'/kunden'}),x=>x.authorization.quote='unapproved',x=>x.additionalRecurringCost=74]){const broken=structuredClone(scope);mutate(broken);assert.throws(()=>validateScope(broken),'Scope broadening and forged authorization cannot pass');}
 const r=[{id:'UX-X',method:'browser'},{id:'UX-Y',method:'browser'},{id:'UX-Z',method:'physical'}];
 assert.equal(aggregate(r,[])[0].status,'not-tested');assert.equal(aggregate(r,[])[2].status,'manual-required');
 assert.equal(aggregate(r,[{checks:[{id:'UX-X',status:'passed'}]}])[0].status,'partial','A sampled pass cannot prove full compliance');

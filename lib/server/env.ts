@@ -49,6 +49,8 @@ export const env={
   azureStorageContainer:optional("AZURE_STORAGE_CONTAINER")||"documents",
   azureStorageSas:optional("AZURE_STORAGE_SAS"),
   fileScanSocket:optional("FILE_SCAN_SOCKET"),
+  releaseProfile:optional("BINSO_RELEASE_PROFILE"),
+  fileAccessMode:optional("BINSO_FILE_ACCESS_MODE"),
   smokeTestToken:optional("BINSO_SMOKE_TEST_TOKEN"),
   logLevel:optional("LOG_LEVEL")||"info"
 };

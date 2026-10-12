@@ -313,12 +313,14 @@ jobs:
           path: evidence/ux/static
       - name: Generate individual requirement coverage and enforce measured failures
         env:
-          RELEASE_GATE: ${{ github.event_name == 'release' || (github.event_name == 'push' && github.ref == 'refs/heads/main') || inputs.level == 'full' }}
+          RELEASE_GATE: ${{ github.event_name == 'release' || inputs.level == 'full' }}
+          DEPLOYMENT_GATE: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'pull_request' && needs.plan.outputs.level == 'full') }}
         shell: bash
         run: |
           set -euo pipefail
           EXTRA=()
           if [ "$RELEASE_GATE" = true ]; then EXTRA+=(--release); fi
+          if [ "$DEPLOYMENT_GATE" = true ]; then EXTRA+=(--deployment-release); fi
           node scripts/compliance/visual.mjs evidence/ux ux-compliance/visual-baselines.v1.json evidence/ux/compliance-visual.json
           node scripts/compliance/report.mjs --static --gate "${EXTRA[@]}" evidence/ux --out docs/ux-compliance
       - name: Publish compliance report including failures and missing evidence

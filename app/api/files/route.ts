@@ -2,6 +2,7 @@ import {idempotentBusiness} from "@/lib/server/business-idempotency";
 import {fileRelations} from "@/lib/server/file-relations";
 import {validateFileContent} from "@/lib/server/file-validation";
 import {scanFileWithEvidence} from "@/lib/server/file-scan";
+import {canAccessFile} from "@/lib/server/file-access";
 import {createHash,randomUUID} from "node:crypto";
 import {limitsConfig,megabytes} from "@/config/limits";
 import {NextRequest} from "next/server";
@@ -60,10 +61,10 @@ export async function POST(request:NextRequest){
     values($1,$2,$3,$4,$5,$6,$7,$18,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17) returning ${fileFields}`,[id,s.organizationId,objectKey,file.name.slice(0,240),file.type,file.size,sha256,s.userId,null,purpose,relation?.column==='expense_id'?entityId:null,relation?.column==='support_case_id'?entityId:null,relation?.column==='employee_id'?entityId:null,relation?.column==='customer_id'?entityId:null,relation?.column==='invoice_id'?entityId:null,relation?.column==='quote_id'?entityId:null,relation?.column==='project_id'?entityId:null,scanStatus]);
    await c.query('insert into file_contents(file_id,organization_id,body) values($1,$2,$3)',[id,s.organizationId,buffer]);
    if(scan.evidence)await c.query('update file_objects set scan_evidence=$1::jsonb where id=$2 and organization_id=$3',[JSON.stringify(scan.evidence),id,s.organizationId]);
-   if(scanStatus==='clean'&&purpose==='profile_avatar')await c.query('update app_users set avatar_url=$1,updated_at=now() where id=$2',['/api/files/'+id+'/download',s.userId]);
-   if(scanStatus==='clean'&&purpose==='company_logo')await c.query('update organizations set logo_url=$1,updated_at=now() where id=$2',['/api/files/'+id+'/download',s.organizationId]);
+   if(canAccessFile(scanStatus)&&purpose==='profile_avatar')await c.query('update app_users set avatar_url=$1,updated_at=now() where id=$2',['/api/files/'+id+'/download',s.userId]);
+   if(canAccessFile(scanStatus)&&purpose==='company_logo')await c.query('update organizations set logo_url=$1,updated_at=now() where id=$2',['/api/files/'+id+'/download',s.organizationId]);
    return result.rows[0];
   }));
-  return json({item},201);
+  return json({item:{...item,available:canAccessFile(item.scanStatus)}},201);
  }catch(e){return apiError(e)}
 }

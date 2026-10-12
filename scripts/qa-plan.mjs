@@ -53,7 +53,7 @@ export function planChanges(files,{level='standard'}={}){
  if(paths.some(p=>/permission|role|page-access/.test(p)))suites.add('permission-selfcheck');
  if(paths.some(p=>/database|server\/repositories|app\/api/.test(p)))suites.add('migration-test');
  if(infrastructure||unknown)suites.add('qa-plan-test');
- return {level:full?'full':level,files:paths,global,reason:full?'Release/CI/auth/schema or unknown dependency: full coverage':broad?'Shared/unknown dependency: representative cross-module coverage':'Changed modules only',routes,webkitRoutes:full?webkitFullRoutes:routes,interactions:full||broad?allInteractions:[...new Set(matched.flatMap(g=>g.interactions))],suites:[...suites],widths:full?[320,375,390,430,768,1024,1440]:level==='fast'?[390]:[390,768,1440],webkitWidths:full?[320,375,390,430,768]:[390,768],themes:level==='fast'?['light']:['light','dark']};
+ return {level:full?'full':level,files:paths,global,reason:full?'Release/CI/auth/schema or unknown dependency: full coverage':broad?'Shared/unknown dependency: representative cross-module coverage':'Changed modules only',routes,webkitRoutes:full?webkitFullRoutes:routes,interactions:full||broad?allInteractions:[...new Set(matched.flatMap(g=>g.interactions))],suites:[...suites],widths:full?[320,375,390,430,768,1024,1440]:level==='fast'?[390]:[390,768,1440],webkitWidths:full?[320,375,390,430,768,1024]:[390,768],themes:level==='fast'?['light']:['light','dark']};
 }
 export function changedFiles(base){
  const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).split('\0').filter(Boolean);

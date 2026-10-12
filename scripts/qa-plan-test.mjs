@@ -7,6 +7,7 @@ for(const path of ['.github/workflows/quality.yml','database/migrations/new.sql'
 assert.deepEqual(planChanges(['docs/readme.md']).routes,[]);
 assert.deepEqual(planChanges(['components/documents.tsx']).interactions,['documents']);
 assert.equal(planChanges([],{level:'full'}).routes.length,fullRoutes.length);
+assert(planChanges([],{level:'full'}).webkitWidths.includes(1024),'The release candidate must actually measure the desktop header in WebKit');
 const catalog=JSON.parse(await (await import('node:fs/promises')).readFile('docs/architecture/ux-inventory.json','utf8'));
 for(const entry of catalog.routes){const expression=new RegExp('^'+entry.route.replace(/\[\.\.\.section\]/g,'.+').replace(/\[id\]/g,'[^/]+')+'$');assert.ok(fullRoutes.some(route=>expression.test(route)),'Full QA omits page '+entry.route);}
 assert(planChanges(['components/unmapped.tsx'],{level:'fast'}).routes.includes('/kunden/neu'),'Unknown FAST dependencies must retain representative browser coverage');

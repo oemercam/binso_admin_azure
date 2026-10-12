@@ -10,6 +10,7 @@ export function GET() {
       version: process.env.npm_package_version ?? "0.11.0",
       release: process.env.BINSO_BUILD_SHA?.slice(0, 7) ?? "development",
       sha: process.env.BINSO_BUILD_SHA ?? "development",
+      releaseProfile:process.env.BINSO_RELEASE_PROFILE??"production",
       uptimeSeconds: Math.round(process.uptime()),
     },
     {
