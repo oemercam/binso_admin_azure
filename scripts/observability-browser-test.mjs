@@ -43,7 +43,7 @@ try{
  page.on('request',request=>{const target=new URL(request.url());if(['/operator/ankuendigungen','/operator/sicherheit','/operator/audit'].includes(target.pathname)&&request.headers()['next-router-prefetch']==='1')speculativeGovernance.push(target.pathname);});
  await page.setViewportSize({width:1440,height:900});await page.goto(base+'/operator');await page.locator('.operator-page-head h1').waitFor();await page.waitForLoadState('networkidle');
  assert.deepEqual(speculativeGovernance,[],'Desktop admin navigation does not preload authenticated governance pages');
- await page.locator('.operator-sidebar').getByRole('link',{name:'Sicherheit',exact:true}).click();await page.waitForURL(base+'/operator/sicherheit');await page.locator('.operator-page-head h1').waitFor();await page.waitForLoadState('networkidle');
+ await page.locator('.operator-sidebar a[href="/operator/sicherheit"]').click();await page.waitForURL(base+'/operator/sicherheit');await page.locator('.operator-page-head h1').waitFor();await page.waitForLoadState('networkidle');
  assert.equal(await page.getByRole('heading',{name:'Keine Berechtigung für diesen Bereich',exact:true}).count(),0,'Explicit authenticated sidebar navigation still works');
  for(const theme of ['light','dark'])for(const width of [390,768,1920,2560,3840]){
   await page.setViewportSize({width,height:width>=1920?Math.round(width*9/16):900});await page.goto(base+'/operator/wallboard');await page.getByRole('heading',{name:'Binso One · Monitoring',exact:true}).waitFor();await page.locator('[data-metric-id="customers"]').waitFor();
