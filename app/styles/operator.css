@@ -387,3 +387,6 @@
 .monitoring-chart-title b{min-height:2.6em;line-height:1.3}
 
 .monitoring-head{flex-wrap:wrap;gap:8px 12px}
+
+/* A single selected insight fills the desktop workspace instead of an empty half-grid. */
+.operator-insight-grid:has(>.bo-workspace-section:only-child){grid-template-columns:minmax(0,1fr)}

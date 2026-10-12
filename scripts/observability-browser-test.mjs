@@ -51,7 +51,7 @@ try{
  }
  await page.setViewportSize({width:390,height:900});await page.goto(base+'/operator/zahlungen');await page.getByText('12.34',{exact:false}).first().waitFor();
  assert.ok((await page.locator('.operator-payment-insights').innerText()).includes('CHF 12.34'),'Foreign currency excluded from CHF KPI');assert.ok((await page.locator('.operator-table-card').innerText()).includes('EUR'),'Original payment currency retained');
- await page.goto(base+'/operator/kunden/'+org);await page.getByText('Synthetic customer',{exact:true}).first().waitFor();assert.ok((await page.locator('.operator-customer-metrics').innerText()).includes('CHF 12.34'),'Customer metrics from actual API');await page.screenshot({path:path.join(output,'customer-actual-data.png'),fullPage:true});
+ await page.goto(base+'/operator/kunden/'+org);await page.getByText('Synthetic customer',{exact:true}).first().waitFor();assert.ok((await page.locator('.operator-customer-metrics').innerText()).includes('CHF 12.34'),'Customer metrics from actual API');assert.ok((await page.locator('.operator-customer-metrics').innerText()).includes('Limit nicht verfügbar'),'Missing entitlements never imply an unlimited account');await page.screenshot({path:path.join(output,'customer-actual-data.png'),fullPage:true});
  // Every implemented admin page and both detail views consume real isolated APIs.
  const portalRoutes=['','tickets','tickets/'+supportCase.id,'kunden','kunden/'+org,'zahlungen','finanzen','abonnemente','sperrungen','monitoring','ankuendigungen','sicherheit','audit'];
  for(const theme of ['light','dark'])for(const width of [320,390,820,1440])for(const section of portalRoutes){
