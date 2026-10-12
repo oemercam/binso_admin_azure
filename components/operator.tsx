@@ -23,6 +23,11 @@ import {canOpenOperatorSection} from "@/lib/operator-pages";
 
 const OperatorAccess=createContext<OperatorRole|"readonly">("platform_owner");
 function useOperatorPermission(permission:OperatorPermission){return operatorCan(useContext(OperatorAccess),permission);}
+function useOperatorToast(){
+ const [toast,setMessage]=useState<string|null>(null),[tone,setTone]=useState<"success"|"danger">("success");
+ const setToast=(message:string|null,nextTone:"success"|"danger"="success")=>{setMessage(message);setTone(nextTone);};
+ return [toast,setToast,tone] as const;
+}
 
 const operatorNav = [
   ["","Dashboard","home"],
@@ -269,7 +274,7 @@ function TicketDetail({ticketId}:{ticketId:string}) {
   const [reply,setReply]=useState("");
   const [internal,setInternal]=useState(false);
   const [sending,setSending]=useState(false),[updating,setUpdating]=useState(false);
-  const [toast,setToast]=useState<string|null>(null);
+  const [toast,setToast,toastTone]=useOperatorToast();
   const [ticket,setTicket]=useState<Record<string,unknown>|null>(null);
   const [messages,setMessages]=useState<Array<Record<string,unknown>>>([]);
   useEffect(()=>{if(!resource.data)return;const payload=resource.data;let active=true;queueMicrotask(()=>{if(active){setTicket(payload.item);setMessages(payload.messages)}});return()=>{active=false}},[resource.data]);
@@ -284,7 +289,7 @@ function TicketDetail({ticketId}:{ticketId:string}) {
       setTicket(payload.item);
       setToast("Ticket aktualisiert.");
     }catch(error){
-      setToast(error instanceof Error?error.message:"Ticket konnte nicht aktualisiert werden.");
+      setToast(error instanceof Error?error.message:"Ticket konnte nicht aktualisiert werden.","danger");
     }
     setUpdating(false);
     window.setTimeout(()=>setToast(null),2200);
@@ -301,7 +306,7 @@ function TicketDetail({ticketId}:{ticketId:string}) {
       setReply("");
       setToast(internal?"Interne Notiz gespeichert.":"Antwort gesendet.");
     }catch(error){
-      setToast(error instanceof Error?error.message:"Nachricht konnte nicht gespeichert werden.");
+      setToast(error instanceof Error?error.message:"Nachricht konnte nicht gespeichert werden.","danger");
     }
     setSending(false);
     window.setTimeout(()=>setToast(null),2200);
@@ -316,7 +321,7 @@ function TicketDetail({ticketId}:{ticketId:string}) {
       <MessageBubble outgoing={true} time={<>10:37</>} author={<>Binso Support</>}>Guten Tag Herr Meier. Vielen Dank für die Anfrage. Ich prüfe die Rechnung gerne und melde mich in Kürze bei Ihnen.</MessageBubble>
       <div className="operator-reply"><Textarea value={reply} onChange={e=>setReply(e.target.value)} placeholder="Antwort schreiben..."/><div><Button onClick={()=>void send()}>Senden</Button></div></div>
     </WorkspaceSection>
-    <aside className="surface customer-context"><SectionTitle title="Kunde"/><h3>Acme AG</h3><p>Demo-Kontext</p></aside>{toast&&<Toast title={toast}/>}
+    <aside className="surface customer-context"><SectionTitle title="Kunde"/><h3>Acme AG</h3><p>Demo-Kontext</p></aside>{toast&&<Toast title={toast} tone={toastTone}/>}
   </div>;
 
   if(!ticket) return <WorkspaceSection><EmptyState compact icon="support" title="Ticket wird geladen" text="Die Ticketdaten werden abgerufen."/></WorkspaceSection>;
@@ -341,7 +346,7 @@ function TicketDetail({ticketId}:{ticketId:string}) {
       {Boolean(tenant?.id)&&<Link href={"/operator/kunden/"+String(tenant?.id)}>Kundendetails öffnen →</Link>}
       <div className="context-block"><small>Support-Zugriff</small><b>Nicht verfügbar</b><span>Der direkte Zugriff auf Kundenkonten ist noch nicht verfügbar.</span><Button variant="secondary" disabled>Zugriff starten</Button></div>
     </aside>
-    {toast&&<Toast title={toast} tone={toast.includes("konnte")?"danger":"success"}/>}
+    {toast&&<Toast title={toast} tone={toastTone}/>}
   </div>;
 }
 
@@ -359,7 +364,6 @@ function OperatorCustomerDetail({tenantId}:{tenantId:string}) {
   const canRestrict=useOperatorPermission("restrictions:manage");
   const production=useBackendMode();
   
-  const [toast,setToast]=useState<string|null>(null);
   const resource=useApiQuery<{overview?:Record<string,unknown>;tickets?:Array<Record<string,unknown>>;audit?:Array<Record<string,unknown>>}>(production?"/api/operator/customers/"+encodeURIComponent(tenantId):null);
   const data=resource.data??{};
   const loading=resource.loading,loadError=resource.error,refresh=resource.refresh;
@@ -372,7 +376,6 @@ function OperatorCustomerDetail({tenantId}:{tenantId:string}) {
   if(!production&&demoCustomer) return <>
     <div className="operator-customer-hero"><div className="operator-customer-main"><span className="record-avatar large">{demoCustomer.name[0]}</span><div><h2>{demoCustomer.name}</h2><p>Demo-Kunde</p></div></div><div className="operator-customer-actions"><Status tone={demoCustomer.status==="Aktiv"?"success":"warning"}>{demoCustomer.status}</Status><Button variant="secondary" disabled>Support-Zugriff nicht verfügbar</Button>{canRestrict&&<Button href="/operator/sperrungen" variant="danger">Einschränken</Button>}</div></div>
     <div className="operator-customer-metrics"><Metric label="Plan" value={demoCustomer.plan} hint="Demo" icon="card"/><Metric label="Benutzer" value="—" hint="Demo" icon="users"/><Metric label="Offene Tickets" value={String(tickets.filter(item=>item[2]===demoCustomer.name&&item[3]!=="Gelöst").length)} hint="Demo" icon="support"/><Metric label="Zahlungsstatus" value="—" hint="Demo" icon="wallet"/></div>
-    {toast&&<Toast title={toast}/>}
   </>;
 
   const overview=data.overview??{};
@@ -402,7 +405,6 @@ function OperatorCustomerDetail({tenantId}:{tenantId:string}) {
       <WorkspaceSection><SectionTitle title="Support"/>{!access?.support?<p>Keine Berechtigung für Supportfälle.</p>:(data.tickets??[]).length?<div className="compact-list">{(data.tickets??[]).map(ticket=><Link href={"/operator/tickets/"+String(ticket.id)} key={String(ticket.id)}><b>{"#"+String(ticket.id).slice(0,8)+" · "+String(ticket.subject??"")}</b><span>{new Date(String(ticket.updated_at)).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"})}</span><Status tone={String(ticket.status)==="resolved"?"success":"warning"}>{operatorStatus(String(ticket.status))}</Status></Link>)}</div>:<EmptyState compact icon="support" title="Keine Tickets" text="Für diesen Kunden sind keine Tickets vorhanden."/>}</WorkspaceSection>
       <WorkspaceSection><SectionTitle title="Audit"/>{!access?.audit?<p>Keine Berechtigung für Audit-Einträge.</p>:(data.audit??[]).length?<div className="audit-list">{(data.audit??[]).map(item=><span key={String(item.id)}><b>{new Date(String(item.created_at)).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"})}</b> {String(item.action)}</span>)}</div>:<p>Noch keine tenant-spezifischen Audit-Einträge.</p>}</WorkspaceSection>
     </div>
-    {toast&&<Toast title={toast}/>}
   </>;
 }
 
@@ -485,7 +487,7 @@ function SubscriptionsView() {
   const items=resource.data?.items??[];
   const loading=resource.loading,loadError=resource.error,refresh=resource.refresh;
   const [selected,setSelected]=useState<Record<string,unknown>|null>(null);
-  const [toast,setToast]=useState<string|null>(null);
+  const [toast,setToast,toastTone]=useOperatorToast();
   const [saving,setSaving]=useState(false);
 
   const load=refresh;
@@ -500,7 +502,7 @@ function SubscriptionsView() {
       setSelected(current=>current?{...current,...payload.item}:current);
       await load();
       setToast("Abonnementstatus aktualisiert.");
-    }catch(error){setToast(error instanceof Error?error.message:"Abonnement konnte nicht aktualisiert werden.");}
+    }catch(error){setToast(error instanceof Error?error.message:"Abonnement konnte nicht aktualisiert werden.","danger");}
     setSaving(false);
     window.setTimeout(()=>setToast(null),2400);
   };
@@ -518,7 +520,7 @@ function SubscriptionsView() {
       <DataTable variant="operator" label="Operator-Daten"><DataTableHead className="operator-table-head customer"><span>Kunde</span><span>Plan</span><span>Abonnement</span><span>Konto</span><span>Aktualisiert</span></DataTableHead>{items.map(item=>{const tenant=item.tenant as {name?:string}|undefined;return <DataTableRow className="operator-table-row customer" key={String(item.tenant_id)} onClick={()=>setSelected(item)}><span><b>{tenant?.name??"Kunde"}</b></span><span>{operatorPlan(String(item.plan))}</span><span><Status tone={item.subscription_status==="active"?"success":"warning"}>{operatorStatus(String(item.subscription_status))}</Status></span><span><Status tone={item.account_status==="active"?"success":"warning"}>{operatorStatus(String(item.account_status))}</Status></span><span>{new Date(String(item.updated_at)).toLocaleDateString("de-CH")}</span></DataTableRow>})}</DataTable>
     </WorkspaceSection>
     {selected&&<FormSheet open={Boolean(selected)} label={String((selected?.tenant as {name?:string}|undefined)?.name??"Kunde")} description="Plan und interner Kontostatus. Stripe-Abonnements werden über Stripe verwaltet; interne Kontosperren ändern keine Stripe-Zahlungen." dirty={false} onClose={()=>setSelected(null)} actions={<><Button variant="secondary" onClick={()=>setSelected(null)}>Schliessen</Button><Button href={"/operator/kunden/"+String(selected?.tenant_id)}>Kunde öffnen</Button></>}><Field label="Plan"><Select disabled={saving||!canManage||Boolean(selected.billing_subscription_ref)} value={String(selected.plan)} onChange={e=>void updateSelected({plan:e.target.value})}><option value="trial" disabled>Testphase</option><option value="start">Start</option><option value="business">Business</option><option value="pro">Pro</option></Select></Field><Field label="Abonnement"><Select disabled={saving||!canManage||Boolean(selected.billing_subscription_ref)} value={String(selected.subscription_status)} onChange={e=>void updateSelected({subscriptionStatus:e.target.value})}><option value="trial">Testphase</option><option value="active">Aktiv</option><option value="past_due">Überfällig</option><option value="suspended">Pausiert</option><option value="cancelled">Gekündigt</option></Select></Field><Field label="Benutzerlimit"><Input disabled={saving||!canManage} type="number" min="1" max="10000" value={String(selected.user_limit??3)} onChange={e=>setSelected(current=>current?{...current,user_limit:Number(e.target.value)}:current)} onBlur={()=>void updateSelected({userLimit:Number(selected.user_limit??3)})}/></Field></FormSheet>}
-    {toast&&<Toast title={toast} tone={toast.includes("konnte")?"danger":"success"}/>}
+    {toast&&<Toast title={toast} tone={toastTone}/>}
   </>;
 }
 
@@ -537,7 +539,7 @@ function RestrictionsView({open,onClose}:{open:boolean;onClose:()=>void}) {
   const [confirm,setConfirm]=useState<"create"|string|null>(null);
   const [busy,setBusy]=useState(false),[now,setNow]=useState(0);
   useEffect(()=>{const update=()=>setNow(Date.now());update();const timer=window.setInterval(update,60000);return()=>window.clearInterval(timer);},[]);
-  const [toast,setToast]=useState<string|null>(null);
+  const [toast,setToast,toastTone]=useOperatorToast();
 
   const load=refresh;
 
@@ -553,7 +555,7 @@ function RestrictionsView({open,onClose}:{open:boolean;onClose:()=>void}) {
       setConfirm(null);setNote("");setEndsAt("");onClose();
       await load();
       setToast("Einschränkung erstellt und im Audit protokolliert.");
-    }catch(error){setToast(error instanceof Error?error.message:"Einschränkung konnte nicht erstellt werden.");}
+    }catch(error){setToast(error instanceof Error?error.message:"Einschränkung konnte nicht erstellt werden.","danger");}
     setBusy(false);
     window.setTimeout(()=>setToast(null),2600);
   };
@@ -565,7 +567,7 @@ function RestrictionsView({open,onClose}:{open:boolean;onClose:()=>void}) {
     try{
       await apiPatch("/api/operator/restrictions/"+encodeURIComponent(id),{active:false});
       setConfirm(null);await load();setToast("Einschränkung aufgehoben.");
-    }catch(error){setToast(error instanceof Error?error.message:"Einschränkung konnte nicht aufgehoben werden.");}
+    }catch(error){setToast(error instanceof Error?error.message:"Einschränkung konnte nicht aufgehoben werden.","danger");}
     setBusy(false);
     window.setTimeout(()=>setToast(null),2600);
   };
@@ -588,7 +590,7 @@ function RestrictionsView({open,onClose}:{open:boolean;onClose:()=>void}) {
         {production?(active.length?active.map(item=>{const tenant=item.tenant as {name?:string}|undefined;return <div className="notice" key={String(item.id)}><Status tone="warning">{item.scope==="all"?"Gesperrt":"Eingeschränkt"}</Status><b>{tenant?.name??"Kunde"}</b><span>{String(item.reason??"")} · seit {new Date(String(item.starts_at)).toLocaleDateString("de-CH")}</span><Button variant="secondary" onClick={()=>setConfirm(String(item.id))}>Aufheben</Button></div>}):<EmptyState compact icon="lock" title="Keine aktiven Einschränkungen" text="Keine aktuell wirksame Operator-Einschränkung erfasst."/>):<div className="notice"><Status tone="warning">Demo</Status><b>Meier Handel AG</b><span>Zahlungsausstand · Beispiel</span><Button variant="secondary" onClick={()=>setConfirm("demo")}>Aufheben</Button></div>}
       </WorkspaceSection>
     {confirm&&<ConfirmDialog open={Boolean(confirm)} title={confirm==="create"?"Zugriff einschränken?":"Einschränkung aufheben?"} message={confirm==="create"?"Der Zugriff wird gemäss Umfang eingeschränkt. Grund, Operator und Zeitpunkt werden im Audit protokolliert.":"Der normale Zugriff wird wiederhergestellt, sofern keine weitere aktive Einschränkung besteht."} confirmLabel={confirm==="create"?"Einschränken":"Aufheben"} danger={confirm==="create"} busy={busy} onCancel={()=>setConfirm(null)} onConfirm={()=>confirm==="create"?void createRestriction():confirm&&void removeRestriction(confirm)}/>}
-    {toast&&<Toast title={toast} tone={toast.includes("konnte")?"danger":"success"}/>}
+    {toast&&<Toast title={toast} tone={toastTone}/>}
   </>;
 }
 
@@ -607,7 +609,7 @@ function AnnouncementsView({open,onClose}:{open:boolean;onClose:()=>void}) {
   const {items:announcementCustomers}=useOperatorCustomers();
   const [publishing,setPublishing]=useState(false);
   const [body,setBody]=useState("");
-  const [toast,setToast]=useState<string|null>(null);
+  const [toast,setToast,toastTone]=useOperatorToast();
 
   const load=refresh;
 
@@ -616,7 +618,7 @@ function AnnouncementsView({open,onClose}:{open:boolean;onClose:()=>void}) {
   const publish=async()=>{
     if(publishing)return;
     if(title.trim().length<2||body.trim().length<2){
-      setToast("Titel und Nachricht sind erforderlich.");
+      setToast("Titel und Nachricht sind erforderlich.","danger");
       window.setTimeout(()=>setToast(null),2200);
       return;
     }
@@ -632,7 +634,7 @@ function AnnouncementsView({open,onClose}:{open:boolean;onClose:()=>void}) {
       setTitle("");setBody("");onClose();
       setToast("Ankündigung veröffentlicht.");
     }catch(error){
-      setToast(error instanceof Error?error.message:"Ankündigung konnte nicht veröffentlicht werden.");
+      setToast(error instanceof Error?error.message:"Ankündigung konnte nicht veröffentlicht werden.","danger");
     }
     setPublishing(false);
     window.setTimeout(()=>setToast(null),2400);
@@ -650,7 +652,7 @@ function AnnouncementsView({open,onClose}:{open:boolean;onClose:()=>void}) {
     <WorkspaceSection>
       {production?(items.length?<div>{items.map(item=><div className="announcement-card" key={String(item.id)}><Status tone={item.active===true?"success":"neutral"}>{item.active===true?"Veröffentlicht":"Entwurf"}</Status><b>{String(item.title??"")}</b><p>{String(item.message??"")}</p><small>{kindLabel[String(item.kind)]??String(item.kind)} · {item.organizationId?(audienceLabel[String(item.organizationId)]??"Einzelner Kunde"):"Alle Kunden"} · {new Date(String(item.createdAt)).toLocaleString("de-CH")}</small></div>)}</div>:<EmptyState compact icon="bell" title="Noch keine Ankündigungen" text="Veröffentlichte Hinweise erscheinen hier."/>):<div className="announcement-card"><Status tone="info">Demo</Status><b>Neue Rechnungsansicht</b><p>Beispiel-Ankündigung ohne Backend.</p><small>Demo · alle Kunden</small></div>}
     </WorkspaceSection>
-    {toast&&<Toast title={toast} tone={toast.includes("erforderlich")||toast.includes("konnte")?"danger":"success"}/>}
+    {toast&&<Toast title={toast} tone={toastTone}/>}
   </>;
 }
 
