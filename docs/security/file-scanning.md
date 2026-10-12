@@ -55,3 +55,5 @@ Erst der explizite zweite Aufruf mit `--apply` prüft genau die ausgewählten, u
 - Der ZIP-Smoke startet die tatsächlich verpackte Bridge und den Startup-Wrapper und prüft Socket-Rechte. Die übrigen Build-/Browser-Gates und Main-Release-Freigaben bleiben verpflichtend.
 
 Offizielle Betriebsgrundlagen: [ClamAV-Docker und RAM](https://docs.clamav.net/manual/Installing/Docker.html), [Azure-Code-App-Sidecars](https://learn.microsoft.com/en-us/azure/app-service/configure-sidecar).
+
+Der erste echte Engine-Lauf 38281573947 fand einen ZIP-Grenzfall: ClamAV 1.4.6 kürzt extrahierte Einträge am MaxFileSize-Limit, ohne zwingend FOUND zu melden. Die Konfiguration setzt deshalb MaxFileSize 20 MiB **oberhalb** des kumulativen MaxScanSize-Budgets von 10 MiB. So muss auch eine abgeschnittene große Extraktion die kumulative Grenze auslösen. Der verpflichtende echte Test verwendet eine 30-MiB-Extraktion; die negative Assertion bleibt erhalten. Ein erfolgreicher korrigierter CI-Lauf ist noch erforderlich.

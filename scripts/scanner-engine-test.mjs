@@ -20,8 +20,8 @@ try{
  // Standard harmless antivirus detection test string, never a real malicious file.
  const eicar=Buffer.from('WDVPIVAlQEFQWzRcUFpYNTQoUF4pN0NDKTd9JEVJQ0FSLVNUQU5EQVJELUFOVElWSVJVUy1URVNULUZJTEUhJEgrSCo=','base64');
  assert.equal((await scanBytes(eicar,{socketPath})).status,'rejected');report.cases.push('official antivirus test signature rejected');
- const archive=execFileSync('python3',['-c',"import io,sys,zipfile; b=io.BytesIO(); z=zipfile.ZipFile(b,'w',zipfile.ZIP_DEFLATED); z.writestr('synthetic-limit.txt',b'A'*(20*1024*1024)); z.close(); sys.stdout.buffer.write(b.getvalue())"]);
- assert.equal((await scanBytes(archive,{socketPath})).status,'rejected','Exceeded embedded-file limit cannot return clean');report.cases.push('archive scan limit fails closed');
+ const archive=execFileSync('python3',['-c',"import io,sys,zipfile; b=io.BytesIO(); z=zipfile.ZipFile(b,'w',zipfile.ZIP_DEFLATED); z.writestr('synthetic-limit.txt',b'A'*(30*1024*1024)); z.close(); sys.stdout.buffer.write(b.getvalue())"]);
+ assert.equal((await scanBytes(archive,{socketPath})).status,'rejected','Exceeded extraction/aggregate limit cannot return clean');report.cases.push('archive scan limit fails closed');
  const parallel=await Promise.all([clean,Buffer.from('another synthetic clean file')].map(body=>scanBytes(body,{socketPath})));assert.ok(parallel.every(result=>result.status==='clean'));report.cases.push('parallel exact-byte scans');
  for(const script of ['scripts/auth-integrity-test.mjs','scripts/file-rescan-test.mjs'])await new Promise((resolve,reject)=>{const child=spawn(process.execPath,[script],{env:{...process.env,BINSO_REAL_SCANNER_SOCKET:socketPath},stdio:'inherit'});child.once('error',reject);child.once('exit',code=>code===0?resolve():reject(Error('Real upload handler / database / engine integration failed')));});report.cases.push('actual upload handler, byte-bound DB provenance and harmless signature rejection');
  execFileSync('docker',['stop',container],{stdio:'ignore'});
