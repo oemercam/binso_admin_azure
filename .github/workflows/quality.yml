@@ -12,7 +12,7 @@ on:
         options: [standard, full]
         default: full
   schedule:
-    - cron: '23 3 * * 0'
+    - cron: '23 1 * * *'
   release:
     types: [published]
 concurrency:
@@ -60,7 +60,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: public.ecr.aws/docker/library/postgres:16 # Docker Official Image; avoids shared Docker Hub pull quota
+        image: postgres:16 # Docker Official Image; ECR mirror exceeded its data quota
         env:
           POSTGRES_USER: binso_test
           POSTGRES_PASSWORD: binso_test
@@ -105,7 +105,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: public.ecr.aws/docker/library/postgres:16 # Docker Official Image; avoids shared Docker Hub pull quota
+        image: postgres:16 # Docker Official Image; ECR mirror exceeded its data quota
         env:
           POSTGRES_USER: binso_test
           POSTGRES_PASSWORD: binso_test
@@ -148,7 +148,7 @@ jobs:
   browser:
     services:
       postgres:
-        image: public.ecr.aws/docker/library/postgres:16
+        image: postgres:16
         env:
           POSTGRES_USER: binso_test
           POSTGRES_PASSWORD: binso_test
@@ -157,7 +157,7 @@ jobs:
         options: >-
           --health-cmd "pg_isready -U binso_test -d binso_observability_test"
           --health-interval 5s --health-timeout 5s --health-retries 10
-    needs: [plan, build]
+    needs: [plan, checks, build]
     if: needs.plan.outputs.browser == 'true'
     runs-on: ubuntu-latest
     # Full UX, real 60-second recovery polling, registration and PWA gates share this job.
