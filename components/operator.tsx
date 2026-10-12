@@ -1,7 +1,7 @@
 "use client";
 import {MonitoringPanel} from "./monitoring";
 import {useApiQuery} from "@/lib/client/use-api-query";
-import {ActionRow, FilterSheet, FormSheet, MetricTiles, MetricTile, WorkspaceSection} from "./binso-ux";
+import {ActionRow, FilterSheet, FormSheet, MetricTiles, MetricTile, WorkspaceSection,DetailTabs} from "./binso-ux";
 import {DataTable, DataTableHead, DataTableRow, RecordsView, RecordsControls, RecordRow, useRecordsController} from "./records";
 import ConfirmDialog from "./confirm-dialog";
 
@@ -155,7 +155,7 @@ export function OperatorPage({ section = "", demo = false, identity, role="platf
         <div className="operator-header-brand"><Logo/><span>Admin</span></div>
         <div className="operator-user">{demo&&<span className="app-demo-badge">Demo</span>}<Link className="icon-button operator-home-link" href="/dashboard" aria-label="Zur App"><Icon name="home" size={18}/></Link><button className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={()=>{setMobileMore(false);setAccountOpen(true)}}><Avatar/></button></div>
       </header>
-      <div className="operator-page-head"><PageHeading leading={detail?<Button href={"/operator/"+key} variant="ghost" icon="back" ariaLabel={key==="tickets"?"Zur Ticketliste":"Zur Kundenliste"}>Zurück</Button>:undefined} title={detail ? (key === "tickets" ? "Ticketdetails" : key === "kunden" ? "Kundendetails" : title) : title} description={operatorSubtitle(key, detail)} action={allowed&&!detail&&(key==="sperrungen"||key==="ankuendigungen")?<Button className="bo-create-action" ariaLabel={key==="sperrungen"?"Einschränkung erstellen":"Ankündigung erstellen"} icon="plus" onClick={()=>setCreateOpen(true)}/>:undefined}/></div>
+      <div className="operator-page-head"><PageHeading leading={detail?<Button href={"/operator/"+key} variant="ghost" className="icon-button" icon="back" ariaLabel={key==="tickets"?"Zur Ticketliste":"Zur Kundenliste"}/>:undefined} title={detail ? (key === "tickets" ? "Ticketdetails" : key === "kunden" ? "Kundendetails" : title) : title} description={operatorSubtitle(key, detail)} action={allowed&&!detail&&(key==="sperrungen"||key==="ankuendigungen")?<Button className="bo-create-action" ariaLabel={key==="sperrungen"?"Einschränkung erstellen":"Ankündigung erstellen"} icon="plus" onClick={()=>setCreateOpen(true)}/>:undefined}/></div>
       {accountOpen&&<HeaderPanel kind="account" label="Konto" onClose={()=>setAccountOpen(false)} headerSelector=".operator-app-header" backgroundSelector=".operator-sidebar,.operator-main > :not(.operator-app-header)"><div className="account-sheet"><div className="account-sheet-profile"><Avatar size="large"/><div><b>{identity?.name||"One Admin"}</b><small>{identity?.email||"Administration"}</small></div></div><div className="action-list"><ActionRow href="/dashboard" icon="home" title="Zum Kundenportal" description="Binso One öffnen" onClick={()=>setAccountOpen(false)}/><ActionRow icon="logout" title="Abmelden" disabled={logoutBusy} onClick={()=>void logout()}/></div>{logoutError&&<ErrorState>{logoutError}</ErrorState>}</div></HeaderPanel>}
 
       <nav className="operator-mobile-nav" aria-label="Operator Navigation">
@@ -207,6 +207,8 @@ function operatorSubtitle(key: string, detail: string) {
 
 function OperatorDashboard() {
   const canSupport=useOperatorPermission("support:manage"),canBilling=useOperatorPermission("subscriptions:read");
+  const [insight,setInsight]=useState("billing");
+  const activeInsight=canBilling&&(insight==="billing"||!canSupport)?"billing":"support";
   const production=useBackendMode();
   
   const resource=useApiQuery<{stats?:Record<string,unknown>;tickets?:OperatorTicket[];incidents?:Array<{id:string;service:string;title:string;status:string;started_at:string}>}>(production?"/api/operator/dashboard":null);
@@ -230,10 +232,10 @@ function OperatorDashboard() {
       ["Testphasen",canBilling?Number(stats.trials_active??0):"—","/operator/abonnemente"],
       ["Nutzer · letzte 15 Minuten",Number(stats.users_active??0),"/operator/kunden"],
     ].map(([label,value,href])=>value==="—"?<MetricTile key={String(label)} label={String(label)} value="—" hint="Keine Berechtigung"/>:<Link href={String(href)} key={String(label)}><MetricTile label={String(label)} value={String(value)}/></Link>)}</MetricTiles>
-    <div className="operator-insight-grid">
-      {canBilling&&<WorkspaceSection><SectionTitle title="Abrechnung"/><MetricTiles columns={2}><Link href="/operator/zahlungen"><MetricTile label="Zahlungen letzte 30 Tage" value={moneyChf(Number(stats.payments_30d??0))}/></Link><Link href="/operator/finanzen"><MetricTile label="Monatlicher Vertragswert" value={moneyChf(Number(stats.monthly_contract_value??0))}/></Link></MetricTiles></WorkspaceSection>}
-      {canSupport&&<WorkspaceSection><SectionTitle title="Support"/><MetricTiles columns={3}>{[["Offen",open],["In Bearbeitung",progress],["Gelöst",resolved]].map(([label,value])=><Link href="/operator/tickets" key={String(label)}><MetricTile label={String(label)} value={String(value)}/></Link>)}</MetricTiles></WorkspaceSection>}
-    </div>
+    {(canBilling||canSupport)&&<div className="operator-insight-grid"><WorkspaceSection>
+      {canBilling&&canSupport&&<DetailTabs label="Dashboard-Auswertungen"><button type="button" className={activeInsight==='billing'?'active':''} onClick={()=>setInsight('billing')}>Abrechnung</button><button type="button" className={activeInsight==='support'?'active':''} onClick={()=>setInsight('support')}>Support</button></DetailTabs>}
+      {activeInsight==='billing'?<><SectionTitle title="Abrechnung"/><MetricTiles columns={2}><Link href="/operator/zahlungen"><MetricTile label="Zahlungen letzte 30 Tage" value={moneyChf(Number(stats.payments_30d??0))}/></Link><Link href="/operator/finanzen"><MetricTile label="Monatlicher Vertragswert" value={moneyChf(Number(stats.monthly_contract_value??0))}/></Link></MetricTiles></>:<><SectionTitle title="Support"/><MetricTiles columns={3}>{[["Offen",open],["In Bearbeitung",progress],["Gelöst",resolved]].map(([label,value])=><Link href="/operator/tickets" key={String(label)}><MetricTile label={String(label)} value={String(value)}/></Link>)}</MetricTiles></>}
+    </WorkspaceSection></div>}
     <WorkspaceSection><SectionTitle title="Systemstatus" action={<Link href="/operator/monitoring">Monitoring öffnen</Link>}/><p>{incidents.length?incidents.length+" aktive Störungen erfasst":"Keine aktiven Störungen erfasst."}</p></WorkspaceSection>
     {canSupport&&<WorkspaceSection><SectionTitle title="Letzte Supportfälle" action={<Link href="/operator/tickets">Alle Tickets</Link>}/>{recent.length?<div className="compact-list">{recent.map(x=><Link href={"/operator/tickets/"+x.id} key={x.id}><b>{x.subject}</b><span>{x.tenant?.name??"Kunde"}</span><Status>{operatorStatus(x.status)}</Status></Link>)}</div>:<EmptyState compact icon="support" title="Keine offenen Supportfälle" text="Neue Anfragen erscheinen hier."/>}</WorkspaceSection>}
   </div>;

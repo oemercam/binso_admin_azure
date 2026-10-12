@@ -59,7 +59,9 @@ try{
   await page.waitForLoadState('networkidle');await page.evaluate(theme=>document.documentElement.dataset.theme=theme,theme);
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,'Admin overflow '+section+' '+width);
   assert.equal(await page.getByText(/Invalid Date|undefined/).count(),0,'Actual admin contract '+section);
-  assert.equal(await page.getByRole('alert').count(),0,'Admin page loads without API errors '+section);
+  const loadErrors=await page.locator('.operator-root').getByRole('alert').allTextContents();
+  if(loadErrors.length){await page.screenshot({path:path.join(output,'failed-admin-page.png'),fullPage:true});console.log('Admin loading errors:',section,loadErrors);}
+  assert.deepEqual(loadErrors,[],'Admin page loads without API errors '+section);
   assert.equal(await page.getByRole('heading',{name:'Keine Berechtigung für diesen Bereich',exact:true}).count(),0,'Owner page accessible '+section);
   await page.screenshot({path:path.join(output,'admin-'+theme+'-'+width+'-'+(section.replaceAll('/','-')||'dashboard')+'.png'),fullPage:true});results.push({theme,width,section,passed:true});
  }
