@@ -1,5 +1,5 @@
 import "server-only";
-import {query,withTenant} from "@/lib/server/db";
+import {withTenant} from "@/lib/server/db";
 import {isPlanId,planAllowsModule,planLimits,type PlanId} from "@/config/plan-access";
 
 function appPlan(value:string):PlanId{
@@ -9,7 +9,7 @@ function appPlan(value:string):PlanId{
 }
 
 export async function getOrganizationPlan(organizationId:string):Promise<PlanId>{
- const result=await query<{plan:string}>(`select plan from organization_subscriptions where organization_id=$1 limit 1`,[organizationId]);
+ const result=await withTenant(organizationId,'',client=>client.query<{plan:string}>(`select plan from organization_subscriptions where organization_id=$1 limit 1`,[organizationId]));
  return appPlan(result.rows[0]?.plan||"");
 }
 
@@ -31,7 +31,7 @@ export async function requireProjectCapacity(organizationId:string,userId:string
 
 export async function requireUserCapacity(organizationId:string){
  const plan=await getOrganizationPlan(organizationId);
- const count=await query<{count:number}>(`select count(*)::int as count from organization_memberships where organization_id=$1 and status='active'`,[organizationId]);
+ const count=await withTenant(organizationId,'',client=>client.query<{count:number}>(`select count(*)::int as count from organization_memberships where organization_id=$1 and status='active'`,[organizationId]));
  if((count.rows[0]?.count??0)>=planLimits[plan].users)throw new Response("Das Benutzerlimit deines aktuellen Plans ist erreicht.",{status:409});
  return plan;
 }
