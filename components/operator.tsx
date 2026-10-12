@@ -146,8 +146,8 @@ export function OperatorPage({ section = "", demo = false, identity, role="platf
   const allowed=demo||canOpenOperatorSection(role,section);
   return <OperatorAccess.Provider value={demo?"platform_owner":role}><div className="operator-root" data-operator-demo={demo?"true":"false"}>
     <aside className="operator-sidebar">
-      <Link href="/operator"><Logo dark/></Link>
-      <nav className="operator-sidebar-groups">{operatorNavGroups.map(group=><div className="operator-sidebar-group" key={group.label}><span className="operator-nav-label">{group.label}</span>{group.slugs.map(slug=>{const item=operatorNav.find(([candidate])=>candidate===slug);if(!item)return null;const [,label,icon]=item;return <Link aria-current={slug===key?"page":undefined} className={slug===key?"active":""} href={slug ? `/operator/${slug}` : "/operator"} key={slug}><Icon name={icon}/><span>{label}</span></Link>})}</div>)}</nav>
+      <Link prefetch={false} href="/operator"><Logo dark/></Link>
+      <nav className="operator-sidebar-groups">{operatorNavGroups.map(group=><div className="operator-sidebar-group" key={group.label}><span className="operator-nav-label">{group.label}</span>{group.slugs.map(slug=>{const item=operatorNav.find(([candidate])=>candidate===slug);if(!item)return null;const [,label,icon]=item;return <Link prefetch={false} aria-current={slug===key?"page":undefined} className={slug===key?"active":""} href={slug ? `/operator/${slug}` : "/operator"} key={slug}><Icon name={icon}/><span>{label}</span></Link>})}</div>)}</nav>
     </aside>
 
     <main className="operator-main">
