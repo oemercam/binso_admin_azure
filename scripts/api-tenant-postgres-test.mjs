@@ -15,6 +15,7 @@ try{
  const pgVersion=Number((await pool.query("select current_setting('server_version_num') version")).rows[0].version);assert.ok(pgVersion>=160000&&pgVersion<170000,'Gate requires PostgreSQL 16');
  assert.equal((await pool.query("select count(*)::int n from information_schema.tables where table_schema='public'")).rows[0].n,0,'Never resets an existing database');
  for(const name of (await fs.readdir('database/migrations')).filter(name=>name.endsWith('.sql')).sort())await pool.query(await fs.readFile('database/migrations/'+name,'utf8'));
+ await pool.query(await fs.readFile('database/operations/provision-runtime-role.sql','utf8'));
  const http=moduleUrl('export class ApiError extends Error{constructor(status,code,message){super(message);this.status=status;this.code=code}}');
  const demo=await import(moduleUrl((await fs.readFile('lib/server/repositories/demo-fixture.ts','utf8')).replace('import "server-only";','').replace("'../http'",JSON.stringify(http))));
  const roles=['owner','admin','finance','hr','project_manager','manager','member','reader'];
@@ -30,7 +31,7 @@ try{
    await pool.query("insert into auth_sessions(user_id,organization_id,token_hash,expires_at) values($1,$2,$3,now()+interval '1 hour')",[user,organizationId,createHash('sha256').update(token).digest('hex')]);
    cookies.set(index+':'+role,'binso_v213_test_session='+token);
   }
-  const c=await pool.connect();try{await c.query('begin');await demo.seedDatabaseDemo(c,organizationId,'http-'+index+'-owner');await c.query('commit');}catch(e){await c.query('rollback');throw e;}finally{c.release();}
+  const c=await pool.connect();try{await c.query('begin');await c.query('set local role binso_runtime');await c.query("select set_config('app.organization_id',$1,true),set_config('app.user_id',$2,true)",[organizationId,'http-'+index+'-owner']);assert.equal((await c.query('select id from organizations where id=$1',[demo.demoTemplateId])).rowCount,0,'Template profile is hidden outside its explicit seeding context');await demo.seedDatabaseDemo(c,organizationId,'http-'+index+'-owner');await c.query("select set_config('app.organization_id',$1,true)",[demo.demoTemplateId]);assert.equal((await c.query("update organizations set name=name where id=$1",[demo.demoTemplateId])).rowCount,0,'Runtime cannot modify the canonical template profile');await c.query('commit');}catch(e){await c.query('rollback');throw e;}finally{c.release();}
   // Only this empty disposable database is permitted; ordinary tenant sessions
   // must exercise production permission guards, not demo exemptions.
   await pool.query('update organizations set is_demo=false where id=$1',[organizationId]);
