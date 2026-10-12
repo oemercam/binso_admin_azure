@@ -31,3 +31,9 @@ Der vorhandene kanonische produktive Migrationsprozess führt additive Migration
 Geheimnisse verbleiben in einer privaten temporären Datei bzw. im Prozess-Environment, werden maskiert und nicht als Artefakt veröffentlicht. Eine neue Registry, ein Planupgrade, neue IAM-Rollen oder Scanneraktivierung werden nicht ausgeführt. Ein unerwartet aktivierter permanenter Sidecar stoppt diesen Deploy-Ablauf.
 
 Dieser Text dokumentiert den geplanten Ablauf. Commit-Prüfung, Main-Merge, Migration, Runtime-Promotion und Live-Smoke sind erst nach ihren tatsächlichen erfolgreichen Läufen bestätigt.
+
+## Offene CodeQL-Gespräche vor dem Merge
+
+Der kontrollierte Rescan liest das private Manifest nun über einen einzigen mit O_NOFOLLOW geöffneten Descriptor. Eigentümer, regulärer Dateityp, private Rechte und maximal 1 MiB werden an diesem Descriptor geprüft; der Pfad wird zum Lesen nicht erneut geöffnet. Ein echter Dateiaustausch zwischen Öffnen und Prüfung/Lesen muss weiterhin den ursprünglichen Inhalt liefern. Symlinks, öffentliche Rechte, Verzeichnisse und übergroße Dateien werden negativ getestet.
+
+Scanner-CI-Ergebnisse werden in einem neu erzeugten privaten Verzeichnis bzw. einem eindeutigen mkdtemp-Verzeichnis erstellt und über den bestehenden privaten atomaren Writer veröffentlicht. Ein vorab angelegtes Zielverzeichnis wird nicht übernommen. Die Korrekturen betreffen Test-/Operatorwerkzeuge und geben keine Produktionsdateien frei.

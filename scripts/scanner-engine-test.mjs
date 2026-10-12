@@ -1,5 +1,8 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
+import {writeTestOutput} from './test-output.mjs';
 import {execFileSync,spawn} from 'node:child_process';
 import {scanBytes,scannerVersion} from '../lib/server/clamav-protocol.mjs';
 import {startScannerBridge} from './scanner-bridge.mjs';
@@ -34,5 +37,9 @@ try{
  const state=JSON.parse(execFileSync('docker',['inspect',container,'--format','{{json .State}}'],{encoding:'utf8'}));assert.equal(state.OOMKilled,false);report.cases.push('restart recovery within configured memory limit');
  report.qualified=true;console.log('REAL CLAMAV QUALIFICATION PASSED',report);
 }finally{
- await close();const output=process.env.BINSO_SCANNER_OUTPUT??'/tmp/binso-scanner-qualification';await fs.mkdir(output,{recursive:true});await fs.writeFile(output+'/results.json',JSON.stringify(report,null,2)+'\n');
+ await close();
+ const configured=process.env.BINSO_SCANNER_OUTPUT;
+ const output=configured??await fs.mkdtemp(path.join(os.tmpdir(),'binso-scanner-qualification-'));
+ if(configured)await fs.mkdir(output,{mode:0o700});
+ await writeTestOutput(path.join(output,'results.json'),JSON.stringify(report,null,2)+'\n');
 }

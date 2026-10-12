@@ -23,7 +23,7 @@ mkdir -p deploy/app/public
 mkdir -p deploy/app/scripts deploy/app/lib/server
 mkdir -p deploy/app/ux-compliance
 cp ux-compliance/release-scope.v1.json deploy/app/ux-compliance/
-cp scripts/scanner-bridge.mjs scripts/start-scanner-production.mjs scripts/rescan-pending-files.mjs deploy/app/scripts/
+cp scripts/scanner-bridge.mjs scripts/start-scanner-production.mjs scripts/rescan-pending-files.mjs scripts/private-manifest.mjs deploy/app/scripts/
 cp lib/server/clamav-protocol.mjs lib/server/file-rescan.mjs deploy/app/lib/server/
 if [ -d public ]; then cp -R public/. deploy/app/public/; fi
 node --input-type=module -e 'import fs from "node:fs";import {readScope,scopeDigest} from "./scripts/compliance/release-scope.mjs";const scope=readScope();fs.writeFileSync("deploy/app/public/deployment.json",JSON.stringify({sha:process.env.GITHUB_SHA,releaseProfile:scope.id,releaseScopeSha256:scopeDigest(),productionAcceptance:false})+"\n");'

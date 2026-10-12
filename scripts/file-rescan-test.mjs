@@ -1,10 +1,27 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
+import {readPrivateManifest} from './private-manifest.mjs';
 import {createHash} from 'node:crypto';
 import {PGlite} from '@electric-sql/pglite';
 import {rescanPendingFile} from '../lib/server/file-rescan.mjs';
 import {scanBytes} from '../lib/server/clamav-protocol.mjs';
 
+const privateDirectory=await fs.mkdtemp(path.join(os.tmpdir(),'binso-private-manifest-test-'));
+try{
+ const filename=path.join(privateDirectory,'manifest.json');
+ await fs.writeFile(filename,JSON.stringify({selected:'original'}),{mode:0o600});
+ assert.deepEqual(await readPrivateManifest(filename),{selected:'original'});
+ const symlink=path.join(privateDirectory,'link.json');await fs.symlink(filename,symlink);
+ await assert.rejects(readPrivateManifest(symlink),'A final-component symlink must never be followed');
+ await fs.chmod(filename,0o644);await assert.rejects(readPrivateManifest(filename),'Nonprivate manifests are rejected');await fs.chmod(filename,0o600);
+ await assert.rejects(readPrivateManifest(privateDirectory),'A directory is not a manifest');
+ const large=path.join(privateDirectory,'large.json');await fs.writeFile(large,Buffer.alloc(1024*1024+1),{mode:0o600});await assert.rejects(readPrivateManifest(large),'Bound file reads before allocation/parse');
+ const originalOpen=fs.open;
+ fs.open=async(...args)=>{const file=await originalOpen(...args);if(args[0]===filename){await fs.rename(filename,filename+'.old');await fs.writeFile(filename,JSON.stringify({selected:'replacement'}),{mode:0o600});}return file;};
+ try{assert.deepEqual(await readPrivateManifest(filename),{selected:'original'},'Replacing the checked pathname cannot replace the opened manifest');}finally{fs.open=originalOpen;}
+}finally{await fs.rm(privateDirectory,{recursive:true,force:true});}
 const db=new PGlite();
 const organization='00000000-0000-4000-8000-000000000001',foreign='00000000-0000-4000-8000-000000000002';
 const body=Buffer.from('Synthetic isolated rescan fixture\n'),hash=createHash('sha256').update(body).digest('hex');

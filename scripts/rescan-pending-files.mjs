@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import pg from 'pg';
 import {scanBytes} from '../lib/server/clamav-protocol.mjs';
 import {rescanPendingFile} from '../lib/server/file-rescan.mjs';
+import {readPrivateManifest} from './private-manifest.mjs';
 
 // Operator-run only. Dry run creates a bounded, hash-bound manifest; apply never selects new files.
 const option=name=>{const at=process.argv.indexOf(name);return at<0?undefined:process.argv[at+1];};
@@ -25,9 +26,7 @@ try{
    await fs.writeFile(manifestPath,JSON.stringify(manifest,null,2)+'\n',{mode:0o600,flag:'wx'});
    console.log({operation:'rescan-dry-run',files:files.length,changes:0});
   }else{
-   const manifestInfo=await fs.lstat(manifestPath);
-   assert.ok(manifestInfo.isFile()&&!manifestInfo.isSymbolicLink()&&manifestInfo.uid===process.getuid()&&(manifestInfo.mode&0o077)===0,'Manifest must be an owned private regular file');
-   const manifest=JSON.parse(await fs.readFile(manifestPath,'utf8'));
+   const manifest=await readPrivateManifest(manifestPath);
    assert.equal(manifest.schemaVersion,1);assert.equal(manifest.organization,organization);
    assert.ok(Array.isArray(manifest.files)&&manifest.files.length<=500);
    assert.equal(new Set(manifest.files.map(file=>file.id)).size,manifest.files.length,'Duplicate manifest file');
