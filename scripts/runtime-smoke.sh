@@ -71,7 +71,7 @@ ROUTES=(
   /einstellungen/darstellung
   /operator
   /operator/kunden
-  /operator/support
+  /operator/tickets
   /operator/sicherheit
   /operator/audit
   /preview/dashboard
@@ -82,6 +82,11 @@ ROUTES=(
 for route in "${ROUTES[@]}"; do
   echo "Smoke: $route"
   curl -fsS "http://127.0.0.1:3000$route" > /dev/null
+done
+
+echo "Smoke: unknown operator routes"
+for route in /operator/invalid-admin-route /operator/support; do
+  test "$(curl -sS -o /dev/null -w '%{http_code}' "http://127.0.0.1:3000$route")" = "404"
 done
 
 BINSO_BASE_URL=http://127.0.0.1:3000 pnpm routes:css-check

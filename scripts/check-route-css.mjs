@@ -54,7 +54,7 @@ const routes=[
   "/einstellungen/darstellung",
   "/operator",
   "/operator/kunden",
-  "/operator/support",
+  "/operator/tickets",
   "/operator/sicherheit",
   "/operator/audit",
   "/preview/dashboard",
