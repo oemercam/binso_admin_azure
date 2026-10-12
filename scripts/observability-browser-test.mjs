@@ -9,9 +9,14 @@ const url=new URL(process.env.BINSO_OBSERVABILITY_TEST_URL??'');
 assert.ok(['localhost','127.0.0.1'].includes(url.hostname)&&url.pathname==='/binso_observability_test'&&url.username==='binso_test','Only empty isolated observability test DB allowed');
 const pool=new pg.Pool({connectionString:url.href}),output=process.env.BINSO_OBSERVABILITY_OUTPUT??'/tmp/binso-observability-browser';
 const base='http://127.0.0.1:3228';let server,browser;const errors=[],results=[];
+let lastOperatorNavigation=0;
 async function navigateOperator(page,route){
  const target=base+route;
  if(page.url()===target)return;
+ // Cached route sweeps must respect WebKit's native History API rate limit.
+ const delay=500-(Date.now()-lastOperatorNavigation);
+ if(delay>0)await new Promise(resolve=>setTimeout(resolve,delay));
+ lastOperatorNavigation=Date.now();
  const links=page.locator('.operator-root a[href='+JSON.stringify(route)+']');
  if(await links.count()){
   // Use the existing Next Link handler instead of repeatedly unloading its RSC streams.
