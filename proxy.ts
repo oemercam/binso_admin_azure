@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import {validOperatorSection} from './lib/operator-pages';
 
 const protectedPrefixes=[
   "/dashboard","/kunden","/angebote","/rechnungen","/zahlungen","/produkte",
@@ -8,6 +9,7 @@ const protectedPrefixes=[
 
 export function proxy(request:NextRequest){
   const pathname=request.nextUrl.pathname;
+  if(pathname.startsWith('/operator/')&&!['/operator/login','/operator/wallboard'].includes(pathname)&&!validOperatorSection(pathname.slice('/operator/'.length)))return new NextResponse('Not found',{status:404,headers:{'Cache-Control':'no-store','Content-Type':'text/plain; charset=utf-8'}});
   if(process.env.NODE_ENV!=="development"&&(pathname==="/dev"||pathname.startsWith("/dev/")))return new NextResponse("Not found",{status:404,headers:{"Cache-Control":"no-store","Content-Type":"text/plain; charset=utf-8"}});
   const isProtected=protectedPrefixes.some(prefix=>pathname===prefix||pathname.startsWith(prefix+"/"));
   if(!isProtected) return NextResponse.next();
@@ -23,7 +25,7 @@ export function proxy(request:NextRequest){
 
 export const config={
   matcher:[
-    "/dev/:path*","/dashboard/:path*","/kunden/:path*","/angebote/:path*","/rechnungen/:path*",
+    "/operator/:path*","/dev/:path*","/dashboard/:path*","/kunden/:path*","/angebote/:path*","/rechnungen/:path*",
     "/zahlungen/:path*","/produkte/:path*","/mitarbeiter/:path*","/spesen/:path*",
     "/zeit/:path*","/support/:path*","/einstellungen/:path*","/belege/:path*",
     "/benachrichtigungen/:path*","/willkommen/:path*","/finanzen/:path*"
