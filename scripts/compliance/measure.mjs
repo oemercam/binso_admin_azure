@@ -61,7 +61,11 @@ export async function measureCompliance(page,{output,route,theme,width,state='no
   }
   for(const el of all('.tabs,.chips')){const c=getComputedStyle(el);add('CTL-002',el.scrollWidth<=el.clientWidth+1||['auto','scroll'].includes(c.overflowX)?'passed':'failed',{clientWidth:el.clientWidth,scrollWidth:el.scrollWidth,overflowX:c.overflowX},'.tabs,.chips');}
   for(const el of all('.mobile-header'))add('HDR-001',getComputedStyle(el).backdropFilter==='none'?'passed':'failed',{backdropFilter:getComputedStyle(el).backdropFilter,background:getComputedStyle(el).backgroundColor,rect:rect(el)},'.mobile-header');
-  for(const el of all('.header-actions'))if(innerWidth>=1024){const actions=all('button,a').filter(x=>el.contains(x));add('LAY-003',actions.length<=2?'passed':'failed',{visibleActions:actions.length,rects:actions.map(item)},'.header-actions');}
+  for(const el of all('.desktop-appbar-actions'))if(innerWidth>=1024){
+   const actions=[...el.querySelectorAll('button,a')].filter(visible);
+   const unexpected=actions.filter(x=>!x.matches('button.desktop-notification-button,button.avatar-button'));
+   add('LAY-003',actions.length<=2&&!unexpected.length?'passed':'failed',{visibleActions:actions.length,unexpectedActions:unexpected.map(item),rects:actions.map(item)},'.desktop-appbar-actions');
+  }
   for(const el of dialogs.filter(el=>el===activeDialog))add('SHT-001',within(rect(el),v)?'passed':'failed',{rect:rect(el),visualViewport:v},'[role=dialog],[role=alertdialog]');
   for(const el of all('.mobile-sticky-save,.filter-sheet-actions')){const c=getComputedStyle(el);if(['sticky','fixed'].includes(c.position)||el.closest('[role=dialog]')){const actions=[...el.querySelectorAll('button,a,input[type=submit]')].filter(a=>a.getClientRects().length&&getComputedStyle(a).visibility!=='hidden'&&getComputedStyle(a).display!=='none').map(rect);add('SHT-002',actions.length?actions.every(r=>within(r,v))?'passed':'failed':'not-tested',{container:rect(el),actions,visualViewport:v,criterion:'Actual action targets, not decorative edge-to-edge footer background'},'.mobile-sticky-save,.filter-sheet-actions');}}
   for(const el of all('.bo-statistics')){
