@@ -11,9 +11,9 @@ export async function GET(){
     count(*) filter(where not o.is_demo)::int customers_total,
     count(*) filter(where not o.is_demo and s.status='trial')::int trials_active,
     count(*) filter(where not o.is_demo and s.status='active')::int subscriptions_active,
-    coalesce(sum(case when not o.is_demo and s.status='active' then s.unit_amount_chf else 0 end),0)::numeric monthly_contract_value
+    coalesce(sum(case when not o.is_demo and s.status='active' then s.unit_amount_chf / case when s.billing_interval='yearly' then 12 else 1 end else 0 end),0)::numeric monthly_contract_value
     from organizations o left join organization_subscriptions s on s.organization_id=o.id`);
-  const billing=await c.query(`select coalesce(sum(amount_chf),0)::numeric payments_30d from platform_billing_payments where paid_at>=now()-interval '30 days'`);
+  const billing=await c.query(`select coalesce(sum(p.amount),0)::numeric payments_30d from platform_billing_payments p join organizations o on o.id=p.organization_id where not o.is_demo and p.provider<>'demo' and p.currency='CHF' and p.payment_date>=current_date-29 and p.payment_date<=current_date`);
   const tickets=await c.query("select t.id,t.subject,t.status,json_build_object('name',o.name) tenant from support_cases t join organizations o on o.id=t.organization_id where not o.is_demo order by t.updated_at desc limit 6");
   const incidents=await c.query("select id,title,status,started_at,'Plattform' service from platform_incidents where status<>'resolved' order by started_at desc limit 5");
   return {stats:{...stats.rows[0],...users.rows[0],...business.rows[0],...billing.rows[0]},tickets:tickets.rows,incidents:incidents.rows};

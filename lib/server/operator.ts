@@ -9,8 +9,8 @@ export async function requireOperatorSession(){
 }
 export async function requireOperator(){
  const session=await getOperatorSession();
- if(session)return {prototype:false,role:session.role};
+ if(session)return {prototype:false,role:session.role,identity:{name:session.name,email:session.email}};
  const jar=await cookies();
- if(jar.get("binso_operator_demo")?.value==="1")return {prototype:true,role:"readonly" as const};
+ if(jar.get("binso_operator_demo")?.value==="1")return {prototype:true,role:"readonly" as const,identity:null};
  redirect("/operator/login");
 }

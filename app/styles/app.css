@@ -101,6 +101,15 @@
   box-shadow:none;
 }
 .surface{padding:20px}
+.bo-workspace-section{min-width:0;margin-block:20px;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}
+.records-inline-controls{display:grid;gap:12px;min-width:0;margin-bottom:var(--heading-content-gap)}
+.records-search-row{display:grid;grid-template-columns:minmax(0,1fr) 44px;align-items:center;gap:var(--mobile-toolbar-gap);min-width:0}
+.records-search-row>.searchbox{flex:1;min-width:0;max-width:none}
+.records-search-row>.icon-button{flex:0 0 44px;width:44px;height:44px}
+.records-inline-controls>.tabs{min-width:0;max-width:100%;overflow-x:auto;flex-wrap:nowrap;border-bottom:0;margin-bottom:0}
+.records-inline-controls>.tabs>button{flex:none;white-space:nowrap}
+.record-table-meta{display:inline;overflow-wrap:anywhere}
+.record-table-meta+.record-table-meta::before{content:" · "}
 .section-title{
   min-height:30px;
   margin-bottom:var(--heading-content-gap);
@@ -1416,8 +1425,8 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 .form-field>span{white-space:normal;overflow-wrap:anywhere;line-height:1.4}
 
 /* Blueprint components use shared rhythm; no changes to the navigation. */
-.bo-metric-tiles{background:transparent;align-items:start}
-.bo-metric-tiles .metric>small{display:block;margin-top:var(--field-label-gap);font-size:11px;color:var(--color-muted)}
+.bo-metric-tiles{--metric-columns:4;background:transparent;align-items:start;grid-template-columns:repeat(var(--metric-columns,4),minmax(0,1fr))}
+.bo-metric-tiles .metric>small{display:block;margin-top:var(--field-label-gap);font-size:11px;color:var(--color-muted);white-space:normal;overflow-wrap:anywhere;line-height:1.4}
 .bo-metric-tiles .metric strong{max-width:100%;white-space:normal;overflow-wrap:anywhere;font-size:18px;line-height:1.25}
 .bo-metric-tiles .metric{padding:var(--field-group-gap) var(--kpi-padding);min-width:0;min-height:0;background:transparent}
 .bo-metric-tiles .metric-top>span{white-space:normal;overflow:visible}
@@ -1425,6 +1434,8 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 .document-summary-row>b{min-width:0;overflow-wrap:anywhere}
 .document-summary-row>.status{justify-self:end;max-width:100%;white-space:normal;text-align:right}
 .document-summary-row>small{grid-column:1/-1;color:var(--color-muted);overflow-wrap:anywhere}
+.document-summary-row.has-value.has-inline-value>small{grid-column:1;grid-row:2;min-width:0}
+.document-summary-row.has-value.has-inline-value>.document-summary-amount{grid-column:2;grid-row:2;align-self:start}
 .document-summary-amount{grid-column:1/-1;display:flex;align-items:baseline;justify-content:space-between;gap:var(--field-label-gap);font-variant-numeric:tabular-nums;min-width:0}
 .document-summary-amount>small{color:var(--color-muted)}
 .document-summary-amount>strong{margin-left:auto;text-align:right;white-space:normal;overflow-wrap:anywhere;min-width:0}
@@ -1489,3 +1500,73 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 .records-filter-action[aria-pressed="true"]{color:var(--status-info-fg)}
 .records-pagination{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--mobile-toolbar-gap);margin-top:var(--mobile-section-gap)}
 .records-pagination>span{font-size:.875rem;color:var(--color-muted)}
+
+/* Observability extends the shared workspace, metric and status foundation. */
+.bo-monitoring{min-width:0}
+.bo-monitor-toolbar{display:flex;justify-content:space-between;align-items:flex-start;gap:var(--desktop-action-gap);flex-wrap:wrap;margin-bottom:var(--desktop-section-gap)}
+.bo-monitor-toolbar h2{font-size:var(--section-title-font);margin:0 0 8px}
+.bo-monitor-toolbar p,.bo-monitor-reading p{color:var(--color-muted);font-size:13px;overflow-wrap:anywhere}
+.bo-monitor-controls{display:flex;align-items:center;gap:var(--desktop-action-gap);flex-wrap:wrap}
+.bo-monitor-controls a,.bo-monitor-reading a{font-size:13px;text-decoration:underline}
+.bo-monitor-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:var(--desktop-section-gap)}
+.bo-monitor-reading{min-width:0;overflow-wrap:anywhere}
+.bo-monitor-reading small{display:block;color:var(--color-muted);font-size:12px;margin-top:8px}
+.bo-monitor-charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:var(--desktop-section-gap)}
+.bo-monitor-chart{min-width:0}
+.bo-monitor-chart h3{font-size:var(--section-title-font)}
+.bo-monitor-chart small{color:var(--color-muted)}
+.bo-monitor-chart svg{display:block;width:100%;max-height:220px;color:var(--color-fg)}
+.bo-monitor-chart svg text{fill:var(--color-muted);font-size:10px}
+.bo-monitor-point-list{display:flex;gap:8px;overflow:auto;padding:8px 0}
+.bo-monitor-point-list button{min-height:var(--touch);white-space:nowrap;background:var(--color-bg);color:var(--color-fg);border:1px solid var(--color-line);border-radius:var(--radius-sm);padding:8px;font:inherit;font-size:12px}
+.bo-monitor-point-list button[aria-pressed="true"]{border-color:var(--color-fg)}
+.bo-monitor-alarms{display:grid;gap:var(--desktop-action-gap)}
+.bo-monitor-alarms>div{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 0}
+.bo-monitor-alarms small{flex-basis:100%;color:var(--color-muted);overflow-wrap:anywhere}
+/* Wallboard owns its density instead of inheriting portal row heights. */
+.bo-wallboard-root{min-height:100dvh;padding:clamp(16px,2vw,48px);background:var(--color-bg);color:var(--color-fg)}
+.bo-monitoring-wallboard{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start}
+.bo-monitoring-wallboard>.bo-monitor-toolbar,.bo-monitoring-wallboard>.bo-metric-tiles,.bo-monitoring-wallboard>.bo-workspace-section:last-of-type,.bo-monitoring-wallboard>footer{grid-column:1/-1}
+.bo-monitoring-wallboard .bo-monitor-toolbar{margin-bottom:0}
+.bo-monitoring-wallboard .bo-monitor-toolbar h2{font-size:clamp(24px,2vw,48px)}
+.bo-monitoring-wallboard .metric>strong{font-size:clamp(28px,3vw,64px)}
+.bo-monitoring-wallboard .bo-metric-tiles{grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.bo-monitoring-wallboard .bo-workspace-section{margin-block:0}
+.bo-monitoring-wallboard .monitoring-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.bo-monitoring-wallboard .monitoring-list>div{min-width:0;min-height:44px;padding:8px 0;gap:12px;grid-template-columns:minmax(0,1fr) auto}
+.bo-monitoring-wallboard .bo-monitor-alarms{grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px}
+.bo-monitoring-wallboard .bo-monitor-chart svg{max-height:140px}
+.bo-monitoring-wallboard .bo-monitor-chart .empty-state{min-height:120px;padding:12px}
+.bo-monitoring-wallboard .bo-monitor-point-list{display:none}
+.bo-monitor-wallboard-footer{color:var(--color-muted);font-size:13px;overflow-wrap:anywhere}
+
+/* Monitoring overview: bounded charts and disclosure-based technical details. */
+.bo-monitoring-portal .bo-monitor-toolbar{align-items:center;gap:12px;margin-bottom:16px}
+.bo-monitoring-portal .bo-monitor-toolbar>div:first-child{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+.bo-monitoring-portal .bo-monitor-toolbar p{margin:0;font-size:12px}
+.bo-monitoring-portal .bo-monitor-controls{font-size:13px;gap:12px}
+.bo-monitoring-portal .bo-monitor-charts{grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.bo-monitor-chart-slot{min-width:0}
+.bo-monitor-chart-tabs{display:none}
+.bo-monitoring-portal .bo-monitor-chart .empty-state{min-height:156px;padding:12px}
+.bo-monitor-point-select{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--color-muted)}
+.bo-monitor-point-select select{min-width:0;max-width:100%;min-height:44px;background:var(--color-bg);color:var(--color-fg);border:0;font:inherit}
+.bo-monitoring-wallboard .bo-monitor-point-select{display:none}
+.bo-monitor-services{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 20px}
+.bo-monitor-services details,.bo-monitor-detail-metrics details{min-width:0;border-bottom:1px solid var(--color-line);padding:10px 0}
+.bo-monitor-services summary,.bo-monitor-detail-metrics summary,.bo-monitor-alarms summary{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:44px;cursor:pointer;list-style:none}
+.bo-monitor-services summary::-webkit-details-marker,.bo-monitor-detail-metrics summary::-webkit-details-marker,.bo-monitor-alarms summary::-webkit-details-marker{display:none}
+.bo-monitor-services b{font-size:13px;overflow-wrap:anywhere}
+.bo-monitor-services .status{font-size:11px;flex-shrink:0;padding:4px 8px}
+.bo-monitor-services p,.bo-monitor-details p,.bo-monitor-alarms details p{font-size:13px;color:var(--color-muted);overflow-wrap:anywhere}
+.bo-monitoring-portal .bo-monitor-alarms>details{padding:4px 0;border-bottom:1px solid var(--color-line)}
+.bo-monitor-details{border-top:1px solid var(--color-line);padding:12px 0}
+.bo-monitor-details>summary{min-height:44px;cursor:pointer;font-weight:600}
+.bo-monitor-detail-metrics summary>span{flex:1;min-width:0}
+.bo-monitor-detail-metrics summary strong{white-space:nowrap}
+.bo-monitor-detail-metrics small{display:block;color:var(--color-muted);font-size:12px}
+.bo-monitor-detail-metrics a{display:inline-block;font-size:13px;margin-top:8px}
+.bo-monitor-details code{overflow-wrap:anywhere}
+
+.bo-monitor-headline{min-width:0;margin-bottom:16px}
+.bo-monitor-alert-summary{margin:12px 0;font-size:13px;color:var(--color-fg)}

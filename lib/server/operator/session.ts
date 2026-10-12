@@ -18,7 +18,10 @@ export async function createOperatorSession(input:{userId:string;email:string;na
  const ip=(h.get("x-forwarded-for")?.split(",")[0]?.trim()||h.get("x-real-ip")||"unknown");
  const result=await query<{id:string}>(`insert into platform_auth_sessions(user_id,token_hash,expires_at,user_agent,ip_hash) values($1,$2,$3,$4,$5) returning id`,[input.userId,tokenHash(token),expiresAt,ua,ipHash(ip)]);
  const jar=await cookies();
- jar.set(env.operatorSessionCookieName,token,{httpOnly:true,secure:process.env.NODE_ENV==="production",sameSite:"strict",path:"/",expires:expiresAt});
+ // Microsoft returns through a cross-site navigation; Strict omits the new
+ // session on the redirect to /operator. Lax permits that top-level GET while
+ // keeping cross-site mutation requests excluded.
+ jar.set(env.operatorSessionCookieName,token,{httpOnly:true,secure:process.env.NODE_ENV==="production",sameSite:"lax",path:"/",expires:expiresAt});
  return result.rows[0]?.id;
 }
 export async function getOperatorSession():Promise<OperatorSession|null>{

@@ -6,12 +6,29 @@ import {matchesRecordChip} from "@/lib/list-filter";
 import Link from "next/link";
 import { Children, cloneElement, isValidElement, useEffect, useMemo, useState, useId, useRef, type ReactNode, type CSSProperties } from "react";
 import {EmptyState, Icon, Status, LoadingState, ErrorState, Button, Field, Select, Input} from "./ui";
-import { ListRow, FilterSheet } from "./binso-ux";
+import { ListRow, FilterSheet, ListSearch, DetailTabs } from "./binso-ux";
 import {Avatar} from "./avatar";
 
 /** Domain columns differ; table/row/cell semantics and ownership stay central. */
 export function DataTable({children,label,variant="records",owner}:{children:ReactNode;label:string;variant?:"records"|"operator";owner?:string}){
- return <div className={variant==="operator"?"operator-table":"desktop-record-table"} role="table" aria-label={label} data-records-owner={owner}>{children}</div>;
+ const nodes=Children.toArray(children);
+ const header=nodes.find(node=>isValidElement(node)&&node.type===DataTableHead);
+ const headings=isValidElement<{children:ReactNode}>(header)?Children.toArray(header.props.children).map(cell=>isValidElement<{children:ReactNode}>(cell)?cell.props.children:null):[];
+ const titleIndex=headings.findIndex(heading=>heading==='Kunde'||heading==='Mandant / Kunde');
+ const amountIndex=headings.findIndex(heading=>heading==='Betrag');
+ return <><div className={variant==="operator"?"operator-table desktop-record-table":"desktop-record-table"} role="table" aria-label={label} data-records-owner={owner}>{children}</div>{variant==='operator'&&<div className="records mobile-record-list" data-records-owner={owner??label}>{nodes.map((node,index)=>{
+  if(!isValidElement<{children:ReactNode;href?:string;onClick?:()=>void}>(node)||node.type!==DataTableRow)return null;
+  const cells=Children.toArray(node.props.children).map(cell=>isValidElement<{children:ReactNode}>(cell)?cell.props.children:cell);
+  const primary=titleIndex<0?0:titleIndex;
+  const primaryParts=Children.toArray(cells[primary]);
+  const firstPart=primaryParts[0];
+  const structuredTitle=primaryParts.length>1&&isValidElement<{children:ReactNode}>(firstPart)&&firstPart.type==='b';
+  const title=structuredTitle?firstPart.props.children:cells[primary];
+  const statusIndex=cells.findIndex(cell=>isValidElement(cell)&&cell.type===Status);
+  const status=cells[statusIndex];
+  const badge=isValidElement<{children:string;tone?:"success"|"warning"|"danger"|"neutral"|"info"}>(status)?status.props:null;
+  return <span className="record-wrapper" key={node.key??index}><ListRow compact valuePlacement="metadata" href={node.props.href} onClick={node.props.onClick} title={title} meta={<>{structuredTitle&&<span className="record-table-meta">{primaryParts.slice(1)}</span>}{cells.map((cell,i)=>i===primary||i===statusIndex||i===amountIndex||(isValidElement<{children:ReactNode}>(cell)&&cell.type===Status&&cell.props.children===badge?.children)?null:<span className="record-table-meta" key={i}>{headings[i]&&<span>{headings[i]}: </span>}{isValidElement<{children:ReactNode}>(cell)&&cell.type===Status?cell.props.children:cell}</span>)}</>} value={amountIndex<0?undefined:cells[amountIndex]} status={badge?.children} tone={badge?.tone}/></span>;
+ })}</div>}</>;
 }
 function tableCells(children:ReactNode,header=false){
  return Children.map(children,child=>isValidElement<{role?:string}>(child)&&child.type==='span'&&!child.props.role?cloneElement(child,{role:header?'columnheader':'cell'}):child);
@@ -78,10 +95,11 @@ export function useRecordsController({placeholder,chips=["Alle","Aktiv","Inaktiv
 }
 
 /** Search and filters use the existing sheet, fields and action footer. */
-export function RecordsControls({controller:s,placeholder,chips=["Alle","Aktiv","Inaktiv"],columns,children}:{controller:RecordsController;placeholder:string;chips?:string[];columns?:RecordsColumns;children?:ReactNode}){
+export function RecordsControls({controller:s,placeholder,chips=["Alle","Aktiv","Inaktiv"],columns,children,inline=false}:{controller:RecordsController;placeholder:string;chips?:string[];columns?:RecordsColumns;children?:ReactNode;inline?:boolean}){
  const id=useId(),searchId=id+'-search',filterId=id+'-filter';
  const choices=columns?.length?columns:[{label:"Name",index:s.firstSortIndex}];
- return <><button type="button" className="icon-button records-search-action" aria-label={placeholder} onClick={()=>s.setSearchOpen(true)}><Icon name="search" size={20}/></button><button type="button" className="icon-button records-filter-action" aria-label="Filter und Sortierung" aria-pressed={s.activeChip!==(chips[0]??"Alle")||s.sort!=="default"} onClick={s.openFilters}><Icon name="filter" size={20}/></button>{children}
+ const filterButton=<button type="button" className="icon-button records-filter-action" aria-label="Filter und Sortierung" aria-pressed={s.activeChip!==(chips[0]??"Alle")||s.sort!=="default"} onClick={s.openFilters}><Icon name="filter" size={20}/></button>;
+ return <>{inline?<div className="records-inline-controls"><div className="records-search-row"><ListSearch value={s.query} onChange={s.setQuery} placeholder={placeholder}/>{filterButton}{children}</div><DetailTabs label={placeholder.replace(/ suchen.*$/,'')}>{chips.map(chip=><button type="button" key={chip} className={s.activeChip===chip?'active':''} onClick={()=>s.setActiveChip(chip)}>{chip}</button>)}</DetailTabs></div>:<><button type="button" className="icon-button records-search-action" aria-label={placeholder} onClick={()=>s.setSearchOpen(true)}><Icon name="search" size={20}/></button>{filterButton}{children}</>}
   <FilterSheet label={placeholder.replace(/\.\.\.$/,'')} open={s.searchOpen} onClose={()=>s.setSearchOpen(false)} actions={<Button type="submit" form={searchId}>Anwenden</Button>}><form id={searchId} onSubmit={event=>{event.preventDefault();s.setSearchOpen(false)}}><Field label="Suchtext" allowReadOnlyInput><Input type="search" maxLength={200} value={s.query} onChange={event=>s.setQuery(event.target.value)} placeholder={placeholder}/></Field></form></FilterSheet>
   <FilterSheet label="Filter und Sortierung" open={s.filterOpen} onClose={()=>s.setFilterOpen(false)} actions={<><Button variant="secondary" onClick={()=>s.setDraft({activeChip:chips[0]??"Alle",sort:"default",sortIndex:s.firstSortIndex})}>Zurücksetzen</Button><Button type="submit" form={filterId}>Anwenden</Button></>}><form id={filterId} onSubmit={event=>{event.preventDefault();s.applyFilters()}}><Field label="Status / Typ" allowReadOnlyInput><Select value={s.draft.activeChip} onChange={event=>s.setDraft({...s.draft,activeChip:event.target.value})}>{chips.map(chip=><option key={chip}>{chip}</option>)}</Select></Field><Field label="Sortierung" allowReadOnlyInput><Select value={s.draft.sort==='default'?'default':`${s.draft.sortIndex}:${s.draft.sort}`} onChange={event=>{if(event.target.value==='default')s.setDraft({...s.draft,sort:'default',sortIndex:s.firstSortIndex});else{const [index,direction]=event.target.value.split(':');s.setDraft({...s.draft,sortIndex:Number(index),sort:direction as 'asc'|'desc'})}}}><option value="default">Standard</option>{choices.flatMap(column=>[<option key={`${column.index}:asc`} value={`${column.index}:asc`}>{column.label} ↑</option>,<option key={`${column.index}:desc`} value={`${column.index}:desc`}>{column.label} ↓</option>])}</Select></Field></form></FilterSheet>
  </>;
@@ -103,6 +121,7 @@ export function RecordsView({
   sortValue,
   controller,
   toolbarActions=true,
+  filterSummary=true,
   remote=false,
   pagination,
   showCount=true,
@@ -111,6 +130,7 @@ export function RecordsView({
   pagination?:{total:number;page:number;pageSize:number;onPage:(page:number)=>void};
   controller?:RecordsController;
   toolbarActions?:boolean;
+  filterSummary?:boolean;
   remote?:boolean;
   sortValue?:(item:string[],index:number)=>string|number;
   countLabel?:string;
@@ -166,11 +186,11 @@ export function RecordsView({
   const singularCountLabel=({Einträge:"Eintrag",Kunden:"Kunde",Zahlungen:"Zahlung",Rechnungen:"Rechnung",Angebote:"Angebot",Dokumente:"Dokument",Produkte:"Produkt",Mitarbeiter:"Mitarbeiter",Spesen:"Spese",Tickets:"Ticket"} as Record<string,string>)[countLabel]??countLabel;
 
   return <>
-    {(toolbarActions||showCount||hasFilters)&&<div className="records-toolbar">
+    {(toolbarActions||showCount||(filterSummary&&hasFilters))&&<div className="records-toolbar">
       {toolbarActions&&<RecordsControls controller={state} placeholder={placeholder} chips={chips} columns={columns}/>}
       {showCount&&(loading||visible.length>0||hasFilters)&&<span className="records-count" aria-live="polite">{loading?"Wird geladen…":`${pagination?.total??visible.length} ${(pagination?.total??visible.length)===1?singularCountLabel:countLabel}`}</span>}
-      {hasFilters&&<span className="records-active-filters">{[query.trim(),activeChip!==(chips[0]??"Alle")?activeChip:"",sort!=="default"?`${columns?.find(column=>column.index===sortIndex)?.label??"Name"} ${sort==='asc'?'↑':'↓'}`:""].filter(Boolean).join(" · ")}</span>}
-      {hasFilters&&<button className="toolbar-reset" type="button" onClick={reset}>Filter zurücksetzen</button>}
+      {filterSummary&&hasFilters&&<span className="records-active-filters">{[query.trim(),activeChip!==(chips[0]??"Alle")?activeChip:"",sort!=="default"?`${columns?.find(column=>column.index===sortIndex)?.label??"Name"} ${sort==='asc'?'↑':'↓'}`:""].filter(Boolean).join(" · ")}</span>}
+      {filterSummary&&hasFilters&&<button className="toolbar-reset" type="button" onClick={reset}>Filter zurücksetzen</button>}
     </div>}
 
     {loading?<LoadingState>Einträge werden geladen …</LoadingState>:error?<ErrorState>{error}</ErrorState>:visible.length ? <><DataTable owner={placeholder} label={placeholder.replace(/ suchen.*$/,"")}>{columns&&<DataTableHead className="desktop-record-head" style={{gridTemplateColumns:`repeat(${columns.length},minmax(0,1fr)) 28px`}}>{columns.map(col=><span role="columnheader" aria-sort={sortIndex===col.index&&sort!=="default"?(sort==="asc"?"ascending":"descending"):"none"} className={col.align==="right"?"align-right":""} key={col.label}>{col.label}{sortIndex===col.index&&sort!=="default"?<span aria-hidden="true">{sort==="asc"?" ↑":" ↓"}</span>:null}</span>)}<span aria-hidden="true"/></DataTableHead>}{visible.map((item,index)=>{const cells=<>{columns?.map(col=><span role="cell" key={col.label} className={`${col.align==="right"?"align-right ":""}${col.status?"table-status-cell":""}`}>{col.render?col.render(item):col.status?<Status tone={tone(item[col.index]??item.at(-1)??"")}>{item[col.index]??item.at(-1)??"—"}</Status>:(item[col.index]||"—")}</span>)}<Icon name="arrow" size={16}/></>;const href=rowHref?.(item);return href?<DataTableRow href={href} className="desktop-record-row" style={{gridTemplateColumns:`repeat(${columns?.length??1},minmax(0,1fr)) 28px`}} key={item.join("-")+index}>{cells}</DataTableRow>:<DataTableRow className="desktop-record-row" style={{gridTemplateColumns:`repeat(${columns?.length??1},minmax(0,1fr)) 28px`}} key={item.join("-")+index}>{cells}</DataTableRow>})}</DataTable><div className="records mobile-record-list" data-records-owner={placeholder}>{visible.map((item,index)=><span className="record-wrapper" key={item.join("-")+index}>{children(item)}</span>)}</div></> :
@@ -186,6 +206,8 @@ export function RecordRow({
   value,
   status,
   personIdentity,
+  compact=false,
+  valuePlacement="separate",
 }: {
   href?: string;
   icon?: string;
@@ -194,8 +216,10 @@ export function RecordRow({
   value?: string;
   status?: string;
   personIdentity?:string;
+  compact?:boolean;
+  valuePlacement?:"separate"|"metadata";
 }) {
-  return <ListRow href={href} title={personIdentity?<span className="person-record"><Avatar name={title} identity={personIdentity}/><span>{title}</span></span>:title} meta={meta} value={value} status={status} tone={status?tone(status):"neutral"}/>;
+  return <ListRow compact={compact} valuePlacement={valuePlacement} href={href} title={personIdentity?<span className="person-record"><Avatar name={title} identity={personIdentity}/><span>{title}</span></span>:title} meta={meta} value={value} status={status} tone={status?tone(status):"neutral"}/>;
 }
 
 /** Employee ledgers and the time module share the same information layout. */

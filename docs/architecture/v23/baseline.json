@@ -1,0 +1,78 @@
+{
+  "checkedAt": "2026-10-11",
+  "mainSha": "e33af0192e8c810aebf1845e5622089ec325b8e0",
+  "liveSha": "e33af0192e8c810aebf1845e5622089ec325b8e0",
+  "liveHealth": "ok",
+  "liveReady": "ready",
+  "openPRs": [
+    {
+      "number": 237,
+      "head": "54c7b8436efeb98f05aaab385e2f3c93ba01ac3b",
+      "ahead": 10,
+      "behind": 20,
+      "note": "Separate security/auth/runtime-role work; not merged into V23 without approval"
+    },
+    {
+      "number": 231,
+      "head": "3377b50be56df4b97fbf784a6825161d686b2d6e",
+      "note": "Central form UX work; source overlap reviewed"
+    },
+    {
+      "number": 222,
+      "head": "75d5aa04bebfdbc0ea81ff82373d8cdaf2fc5510",
+      "note": "Document/PDF UX work; source overlap reviewed"
+    }
+  ],
+  "mainRuns": [
+    {
+      "id": 38155460995,
+      "workflow": "Quality",
+      "conclusion": "success"
+    },
+    {
+      "id": 38155460994,
+      "workflow": "CodeQL",
+      "conclusion": "success"
+    },
+    {
+      "id": 38156421695,
+      "workflow": "Deploy Azure App Service",
+      "conclusion": "success"
+    }
+  ],
+  "azureEvidence": {
+    "inventoryJob": 114435954652,
+    "inventoryRun": 38127890961,
+    "measuredAt": "2026-10-11T09:18:35Z",
+    "newerReadinessRun": 38128629567,
+    "newerReadinessJob": 114438145259,
+    "resources": {
+      "resourceGroup": "rg-binso-admin-prod",
+      "appService": "binso-admin-prod",
+      "appServiceState": "Running",
+      "region": "switzerlandnorth",
+      "databaseServer": "binso-platform-db",
+      "databaseVersion": "18",
+      "databaseState": "Ready",
+      "backupRetentionDays": 7,
+      "highAvailability": "Disabled",
+      "blobStorageInGroup": 0,
+      "applicationInsightsInGroup": 0,
+      "metricAlertsInGroup": 0,
+      "scheduledQueryAlertsInGroup": 0,
+      "actionGroupsInGroup": 0,
+      "managedIdentity": null
+    },
+    "securityFindings": [
+      "Runtime binsoadmin can bypass RLS and has administrative privileges; latest explicit runtime-role check fails.",
+      "Latest Easy Auth/AAD registration and pinned issuer readiness check fails.",
+      "Application Insights readiness fails; prior permissive architecture job success does not imply readiness."
+    ],
+    "limitations": [
+      "Resources outside observed resource group not fully inventoried.",
+      "No direct authenticated Azure control-plane access available in this workspace.",
+      "Logs are time-stamped evidence, not live metric samples.",
+      "Runtime PostgreSQL 18 differs from required CI PostgreSQL 16."
+    ]
+  }
+}

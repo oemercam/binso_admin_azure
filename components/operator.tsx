@@ -1,7 +1,8 @@
 "use client";
+import {MonitoringPanel} from "./monitoring";
 import {useApiQuery} from "@/lib/client/use-api-query";
-import {ActionRow, FormSheet, ListSearch} from "./binso-ux";
-import {DataTable, DataTableHead, DataTableRow} from "./records";
+import {ActionRow, FilterSheet, FormSheet, MetricTiles, MetricTile, WorkspaceSection} from "./binso-ux";
+import {DataTable, DataTableHead, DataTableRow, RecordsView, RecordsControls, RecordRow, useRecordsController} from "./records";
 import ConfirmDialog from "./confirm-dialog";
 
 import Link from "next/link";
@@ -14,6 +15,7 @@ import { PageHeading } from "./binso-ux";
 import {Button, EmptyState, Icon, Logo, Metric, SectionTitle, Status, Toast, Field, Input, Select, Textarea, LoadingState, ErrorState, MessageBubble} from "./ui";
 import { apiPatch, apiPost, logoutOperatorClientSession, useBackendMode } from "@/lib/client/backend";
 import {platformFinanceInsights} from "@/lib/finance-periods";
+import {sumMoney} from "@/lib/money";
 import {businessDate} from "@/lib/financial-status";
 import { plans } from "@/lib/plans";
 
@@ -83,7 +85,7 @@ function operatorStatus(value:string){
   const map:Record<string,string>={
     new:"Neu",open:"Offen",in_progress:"In Bearbeitung",waiting_customer:"Wartet auf Kunde",
     resolved:"Gelöst",closed:"Geschlossen",active:"Aktiv",past_due:"Überfällig",suspended:"Gesperrt",
-    restricted:"Eingeschränkt",cancelled:"Gekündigt",trial:"Testphase"
+    restricted:"Eingeschränkt",cancelled:"Gekündigt",trial:"Testphase",expired:"Abgelaufen",read_only:"Eingeschränkt",inactive:"Inaktiv"
   };
   return map[value]??value;
 }
@@ -118,13 +120,15 @@ function useOperatorCustomers(){
 }
 
 
-export function OperatorPage({ section = "", demo = false }: { section?: string; demo?: boolean }) {
+export function OperatorPage({ section = "", demo = false, identity }: { section?: string; demo?: boolean;identity?:{name:string;email:string}|null }) {
   const key = section.split("/")[0] || "";
   const detail = section.split("/")[1] || "";
   const title = useMemo(() => operatorNav.find(([slug]) => slug === key)?.[1] ?? "Dashboard", [key]);
   const [mobileMore,setMobileMore]=useState(false);
   const mobileMoreDialog=useDialogFocus(mobileMore,()=>setMobileMore(false));
   const [accountOpen,setAccountOpen]=useState(false);
+  const [createOpen,setCreateOpen]=useState(false);
+  useEffect(()=>{queueMicrotask(()=>setCreateOpen(false));},[section]);
   const [logoutBusy,setLogoutBusy]=useState(false);
   const [logoutError,setLogoutError]=useState("");
   const logout=async()=>{if(logoutBusy)return;setLogoutBusy(true);setLogoutError("");try{const payload=await logoutOperatorClientSession();const path=typeof payload.microsoftLogoutUrl==="string"?payload.microsoftLogoutUrl:"/operator/login";window.location.assign(new URL(path,window.location.origin).toString());}catch{setLogoutError("Abmelden fehlgeschlagen. Bitte erneut versuchen.");setLogoutBusy(false);}};
@@ -140,8 +144,8 @@ export function OperatorPage({ section = "", demo = false }: { section?: string;
         <div className="operator-header-brand"><Logo/><span>Admin</span></div>
         <div className="operator-user">{demo&&<span className="app-demo-badge">Demo</span>}<Link className="icon-button operator-home-link" href="/dashboard" aria-label="Zur App"><Icon name="home" size={18}/></Link><button className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={()=>{setMobileMore(false);setAccountOpen(true)}}><Avatar/></button></div>
       </header>
-      <div className="operator-page-head"><PageHeading title={detail ? (key === "tickets" ? "Ticketdetails" : key === "kunden" ? "Kundendetails" : title) : title} description={operatorSubtitle(key, detail)}/></div>
-      {accountOpen&&<HeaderPanel kind="account" label="Konto" onClose={()=>setAccountOpen(false)} headerSelector=".operator-app-header" backgroundSelector=".operator-sidebar,.operator-main > :not(.operator-app-header)"><div className="account-sheet"><div className="account-sheet-profile"><Avatar size="large"/><div><b>One Admin</b><small>Administration</small></div></div><div className="action-list"><ActionRow href="/dashboard" icon="home" title="Zum Kundenportal" description="Binso One öffnen" onClick={()=>setAccountOpen(false)}/><ActionRow icon="logout" title="Abmelden" disabled={logoutBusy} onClick={()=>void logout()}/></div>{logoutError&&<ErrorState>{logoutError}</ErrorState>}</div></HeaderPanel>}
+      <div className="operator-page-head"><PageHeading title={detail ? (key === "tickets" ? "Ticketdetails" : key === "kunden" ? "Kundendetails" : title) : title} description={operatorSubtitle(key, detail)} action={!detail&&(key==="sperrungen"||key==="ankuendigungen")?<Button className="bo-create-action" ariaLabel={key==="sperrungen"?"Einschränkung erstellen":"Ankündigung erstellen"} icon="plus" onClick={()=>setCreateOpen(true)}/>:undefined}/></div>
+      {accountOpen&&<HeaderPanel kind="account" label="Konto" onClose={()=>setAccountOpen(false)} headerSelector=".operator-app-header" backgroundSelector=".operator-sidebar,.operator-main > :not(.operator-app-header)"><div className="account-sheet"><div className="account-sheet-profile"><Avatar size="large"/><div><b>{identity?.name||"One Admin"}</b><small>{identity?.email||"Administration"}</small></div></div><div className="action-list"><ActionRow href="/dashboard" icon="home" title="Zum Kundenportal" description="Binso One öffnen" onClick={()=>setAccountOpen(false)}/><ActionRow icon="logout" title="Abmelden" disabled={logoutBusy} onClick={()=>void logout()}/></div>{logoutError&&<ErrorState>{logoutError}</ErrorState>}</div></HeaderPanel>}
 
       <nav className="operator-mobile-nav" aria-label="Operator Navigation">
         {operatorNav.filter(([slug])=>["","tickets","kunden","monitoring"].includes(slug)).map(([slug,label,icon])=><Link aria-current={slug===key?"page":undefined} className={slug===key?"active":""} href={slug ? `/operator/${slug}` : "/operator"} key={slug}><Icon name={icon} size={19}/><span>{label}</span></Link>)}
@@ -161,9 +165,9 @@ export function OperatorPage({ section = "", demo = false }: { section?: string;
         key === "zahlungen" ? <PaymentsView/> :
         key === "finanzen" ? <OperatorFinanceView demo={demo}/> :
         key === "abonnemente" ? <SubscriptionsView/> :
-        key === "sperrungen" ? <RestrictionsView/> :
+        key === "sperrungen" ? <RestrictionsView open={createOpen} onClose={()=>setCreateOpen(false)}/> :
         key === "monitoring" ? <MonitoringView/> :
-        key === "ankuendigungen" ? <AnnouncementsView/> :
+        key === "ankuendigungen" ? <AnnouncementsView open={createOpen} onClose={()=>setCreateOpen(false)}/> :
         key === "sicherheit" ? <SecurityView/> :
         key === "audit" ? <AuditView/> :
         <OperatorDashboard/>}
@@ -208,18 +212,18 @@ function OperatorDashboard() {
   if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError} onRetry={refresh}/>;
 
   if(production)return <div className="operator-dashboard-cockpit">
-    <div className="operator-ticket-stats">{[
+    <MetricTiles>{[
       ["Kunden",Number(stats.customers_total??0),"/operator/kunden"],
       ["Aktive Abos",Number(stats.subscriptions_active??0),"/operator/abonnemente"],
       ["Testphasen",Number(stats.trials_active??0),"/operator/abonnemente"],
       ["Aktive Nutzer",Number(stats.users_active??0),"/operator/kunden"],
-    ].map(([label,value,href])=><Link href={String(href)} key={String(label)}><strong>{String(value)}</strong><span>{String(label)}</span></Link>)}</div>
+    ].map(([label,value,href])=><Link href={String(href)} key={String(label)}><MetricTile label={String(label)} value={String(value)}/></Link>)}</MetricTiles>
     <div className="operator-insight-grid">
-      <section className="surface"><SectionTitle title="Billing"/><div className="operator-ticket-stats"><Link href="/operator/zahlungen"><strong>{moneyChf(Number(stats.payments_30d??0))}</strong><span>Zahlungen letzte 30 Tage</span></Link><Link href="/operator/finanzen"><strong>{moneyChf(Number(stats.monthly_contract_value??0))}</strong><span>Aktiver Vertragswert</span></Link></div></section>
-      <section className="surface"><SectionTitle title="Support"/><div className="operator-ticket-stats">{[["Offen",open],["In Bearbeitung",progress],["Gelöst",resolved]].map(([label,value])=><Link href="/operator/tickets" key={String(label)}><strong>{String(value)}</strong><span>{String(label)}</span></Link>)}</div></section>
+      <WorkspaceSection><SectionTitle title="Abrechnung"/><MetricTiles columns={2}><Link href="/operator/zahlungen"><MetricTile label="Zahlungen letzte 30 Tage" value={moneyChf(Number(stats.payments_30d??0))}/></Link><Link href="/operator/finanzen"><MetricTile label="Monatlicher Vertragswert" value={moneyChf(Number(stats.monthly_contract_value??0))}/></Link></MetricTiles></WorkspaceSection>
+      <WorkspaceSection><SectionTitle title="Support"/><MetricTiles columns={3}>{[["Offen",open],["In Bearbeitung",progress],["Gelöst",resolved]].map(([label,value])=><Link href="/operator/tickets" key={String(label)}><MetricTile label={String(label)} value={String(value)}/></Link>)}</MetricTiles></WorkspaceSection>
     </div>
-    <section className="surface"><SectionTitle title="Systemstatus" action={<Link href="/operator/monitoring">Monitoring öffnen</Link>}/><p>{incidents.length?incidents.length+" aktive Störungen erfasst":"Keine aktiven Störungen erfasst."}</p></section>
-    <section className="surface"><SectionTitle title="Letzte Supportfälle" action={<Link href="/operator/tickets">Alle Tickets</Link>}/>{recent.length?<div className="compact-list">{recent.map(x=><Link href={"/operator/tickets/"+x.id} key={x.id}><b>{x.subject}</b><span>{x.tenant?.name??"Kunde"}</span><Status>{operatorStatus(x.status)}</Status></Link>)}</div>:<EmptyState icon="support" title="Keine offenen Supportfälle" text="Neue Anfragen erscheinen hier."/>}</section>
+    <WorkspaceSection><SectionTitle title="Systemstatus" action={<Link href="/operator/monitoring">Monitoring öffnen</Link>}/><p>{incidents.length?incidents.length+" aktive Störungen erfasst":"Keine aktiven Störungen erfasst."}</p></WorkspaceSection>
+    <WorkspaceSection><SectionTitle title="Letzte Supportfälle" action={<Link href="/operator/tickets">Alle Tickets</Link>}/>{recent.length?<div className="compact-list">{recent.map(x=><Link href={"/operator/tickets/"+x.id} key={x.id}><b>{x.subject}</b><span>{x.tenant?.name??"Kunde"}</span><Status>{operatorStatus(x.status)}</Status></Link>)}</div>:<EmptyState compact icon="support" title="Keine offenen Supportfälle" text="Neue Anfragen erscheinen hier."/>}</WorkspaceSection>
   </div>;
   return <div className="operator-dashboard-cockpit">
     <section className="operator-health-strip">
@@ -230,50 +234,23 @@ function OperatorDashboard() {
       {(["availability","users","api"] as const).map((key)=><button type="button" className={"operator-pulse "+(metric===key?"active":"")} key={key} onClick={()=>setMetric(key)}><div><span>{metricInfo[key][0]}</span><strong>{metricInfo[key][1]}</strong><small>{metricInfo[key][2]}</small></div><div className={"operator-stat-ring "+key} aria-hidden="true"><b>{key==="availability"?"99.99":key==="users"?"128":"182"}</b><span>{key==="availability"?"%":key==="users"?"online":"ms"}</span></div></button>)}
     </div>
     <div className="operator-insight-grid">
-      <section className="surface"><SectionTitle title="Tickets" action={<Link className="text-action" href="/operator/tickets">Alle anzeigen</Link>}/><div className="operator-ticket-stats">{[["Neu",open],["In Bearbeitung",progress],["Gelöst",resolved],["Überfällig",overdue]].map(([label,value],i)=><Link href="/operator/tickets" key={String(label)} className={"ticket-stat t"+i}><strong>{value}</strong><span>{label}</span></Link>)}</div></section>
-      <section className="surface operator-sla"><SectionTitle title="SLA Erfüllung"/><button type="button" aria-label="SLA Details" onClick={()=>setMetric("availability")} className="sla-compact"><span className="sla-ring"><b>96.3%</b></span><span className="sla-copy"><strong>Innerhalb SLA</strong><small><i/> 96.3 % erfüllt</small><small><i/> 2.5 % knapp</small><small><i/> 1.2 % überfällig</small></span></button></section>
+      <WorkspaceSection><SectionTitle title="Tickets" action={<Link className="text-action" href="/operator/tickets">Alle anzeigen</Link>}/><div className="operator-ticket-stats">{[["Neu",open],["In Bearbeitung",progress],["Gelöst",resolved],["Überfällig",overdue]].map(([label,value],i)=><Link href="/operator/tickets" key={String(label)} className={"ticket-stat t"+i}><strong>{value}</strong><span>{label}</span></Link>)}</div></WorkspaceSection>
+      <WorkspaceSection className="operator-sla"><SectionTitle title="SLA Erfüllung"/><button type="button" aria-label="SLA Details" onClick={()=>setMetric("availability")} className="sla-compact"><span className="sla-ring"><b>96.3%</b></span><span className="sla-copy"><strong>Innerhalb SLA</strong><small><i/> 96.3 % erfüllt</small><small><i/> 2.5 % knapp</small><small><i/> 1.2 % überfällig</small></span></button></WorkspaceSection>
     </div>
     <div className="operator-insight-grid">
-      <section className="surface"><SectionTitle title="Offene Anfragen nach Kategorie" action={<Link className="text-action" href="/operator/tickets">Alle anzeigen</Link>}/><div className="operator-category-bars">{[["Technische Störung",14],["Zugriff / Berechtigung",9],["Funktion / Anwendung",7],["Änderung / Anfrage",5]].map(([label,value],i)=><Link href="/operator/tickets" key={String(label)}><span>{label}</span><i><b style={{width:String(Number(value)*6)+"%"}}/></i><strong>{value}</strong></Link>)}</div></section>
-      <section className="surface"><SectionTitle title="Letzte Aktivitäten"/>{incidents.length?<div className="incident-history">{incidents.slice(0,5).map(x=><div className="incident-row" key={x.id}><span className={"incident-dot "+(x.status==="resolved"?"resolved":"maintenance")}/><div><b>{x.title}</b><small>{x.service}</small></div></div>)}</div>:<div className="compact-list">{recent.slice(0,4).map(x=><Link href={"/operator/tickets/"+x.id} key={x.id}><b>{x.subject}</b><span>{x.tenant?.name??"Kunde"}</span><Status tone={x.status==="open"?"warning":"success"}>{operatorStatus(x.status)}</Status></Link>)}</div>}</section>
+      <WorkspaceSection><SectionTitle title="Offene Anfragen nach Kategorie" action={<Link className="text-action" href="/operator/tickets">Alle anzeigen</Link>}/><div className="operator-category-bars">{[["Technische Störung",14],["Zugriff / Berechtigung",9],["Funktion / Anwendung",7],["Änderung / Anfrage",5]].map(([label,value],i)=><Link href="/operator/tickets" key={String(label)}><span>{label}</span><i><b style={{width:String(Number(value)*6)+"%"}}/></i><strong>{value}</strong></Link>)}</div></WorkspaceSection>
+      <WorkspaceSection><SectionTitle title="Letzte Aktivitäten"/>{incidents.length?<div className="incident-history">{incidents.slice(0,5).map(x=><div className="incident-row" key={x.id}><span className={"incident-dot "+(x.status==="resolved"?"resolved":"maintenance")}/><div><b>{x.title}</b><small>{x.service}</small></div></div>)}</div>:<div className="compact-list">{recent.slice(0,4).map(x=><Link href={"/operator/tickets/"+x.id} key={x.id}><b>{x.subject}</b><span>{x.tenant?.name??"Kunde"}</span><Status tone={x.status==="open"?"warning":"success"}>{operatorStatus(x.status)}</Status></Link>)}</div>}</WorkspaceSection>
     </div>
   </div>;
 }
 
 function TicketsView() {
-  const {production,items,loading,loadError,refresh}=useOperatorTickets();
-  const [query,setQuery]=useState("");
-  const [filter,setFilter]=useState("all");
-  const demoTicketVisible=tickets.filter(([nr,subject,customer,status])=>{
-    const matchQuery=!query.trim()||(`${nr} ${subject} ${customer}`).toLowerCase().includes(query.trim().toLowerCase());
-    const matchFilter=filter==="all"||status===filter;
-    return matchQuery&&matchFilter;
-  });
-
-  if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError} onRetry={refresh}/>;
-
-  if(!production) return <section className="surface operator-table-card">
-    <div className="operator-toolbar"><div className="chips"><button className={filter==="all"?"active":""} onClick={()=>setFilter("all")}>Alle {tickets.length}</button><button className={filter==="Offen"?"active":""} onClick={()=>setFilter("Offen")}>Offen</button><button className={filter==="In Bearbeitung"?"active":""} onClick={()=>setFilter("In Bearbeitung")}>In Bearbeitung</button><button className={filter==="Wartet auf Kunde"?"active":""} onClick={()=>setFilter("Wartet auf Kunde")}>Wartet auf Kunde</button></div><ListSearch value={query} onChange={setQuery} placeholder="Tickets suchen..."/></div>
-    {demoTicketVisible.length===0&&<p role="status">Keine Tickets gefunden.</p>}<DataTable variant="operator" label="Operator-Daten"><DataTableHead className="operator-table-head"><span>Priorität</span><span>Ticket</span><span>Kunde</span><span>Status</span><span>Aktualisiert</span></DataTableHead>{demoTicketVisible.map(([nr,subject,customer,status],i)=><DataTableRow href={"/operator/tickets/"+nr.replace("#","")} className="operator-table-row" key={nr}><span><i className={i<2?"priority high":"priority"}/>{i<2?"Hoch":"Mittel"}</span><span><b>{nr}</b><small>{subject}</small></span><span>{customer}</span><span><Status tone={status==="Offen"?"warning":"info"}>{status}</Status></span><span>Demo</span></DataTableRow>)}</DataTable>
-  </section>;
-
-  const visible=items.filter(item=>{
-    const text=(item.subject+" "+(item.tenant?.name??"")+" "+item.id).toLowerCase();
-    const matchesQuery=!query.trim()||text.includes(query.trim().toLowerCase());
-    const matchesFilter=filter==="all"||item.status===filter;
-    return matchesQuery&&matchesFilter;
-  });
-
-  return <section className="surface operator-table-card">
-    <div className="operator-toolbar">
-      <div className="chips"><button className={filter==="all"?"active":""} onClick={()=>setFilter("all")}>Alle {items.length}</button><button className={filter==="open"?"active":""} onClick={()=>setFilter("open")}>Offen</button><button className={filter==="in_progress"?"active":""} onClick={()=>setFilter("in_progress")}>In Bearbeitung</button><button className={filter==="waiting_customer"?"active":""} onClick={()=>setFilter("waiting_customer")}>Wartet auf Kunde</button><button className={filter==="resolved"?"active":""} onClick={()=>setFilter("resolved")}>Gelöst</button></div>
-      <ListSearch value={query} onChange={setQuery} placeholder="Tickets suchen..."/>
-    </div>
-    {visible.length?<DataTable variant="operator" label="Operator-Daten">
-      <DataTableHead className="operator-table-head"><span>Priorität</span><span>Ticket</span><span>Kunde</span><span>Status</span><span>Aktualisiert</span></DataTableHead>
-      {visible.map(item=><DataTableRow href={"/operator/tickets/"+item.id} className="operator-table-row" key={item.id}><span><i className={["high","critical"].includes(item.priority)?"priority high":"priority"}/>{item.priority==="critical"?"Kritisch":item.priority==="high"?"Hoch":item.priority==="low"?"Niedrig":"Normal"}</span><span><b>{"#"+item.id.slice(0,8)}</b><small>{item.subject}</small></span><span>{item.tenant?.name??"Kunde"}</span><span><Status tone={item.status==="resolved"||item.status==="closed"?"success":item.status==="open"?"warning":"info"}>{operatorStatus(item.status)}</Status></span><span>{new Date(item.updated_at).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"})}</span></DataTableRow>)}
-    </DataTable>:<EmptyState icon="search" title="Keine Tickets" text="Für die aktuelle Auswahl wurden keine Tickets gefunden."/>}
-  </section>;
+ const {production,items,loading,loadError,refresh}=useOperatorTickets();
+ const chips=['Alle','Offen','In Bearbeitung','Wartet auf Kunde','Gelöst'];
+ const columns=[{label:'Ticket',index:0},{label:'Kunde',index:1},{label:'Priorität',index:2},{label:'Status',index:3,status:true},{label:'Aktualisiert',index:4}];
+ const controller=useRecordsController({placeholder:'Tickets suchen...',chips,columns});
+ const rows=production?items.map(item=>[item.subject,item.tenant?.name??'Kunde',item.priority==='critical'?'Kritisch':item.priority==='high'?'Hoch':item.priority==='low'?'Niedrig':'Normal',operatorStatus(item.status),new Date(item.updated_at).toLocaleString('de-CH',{dateStyle:'short',timeStyle:'short'}),item.id]):tickets.map(([nr,subject,customer,status])=>[subject,customer,'Normal',status,'Demo',nr.replace('#','')]);
+ return <><RecordsControls inline controller={controller} placeholder="Tickets suchen..." chips={chips} columns={columns}/><RecordsView controller={controller} toolbarActions={false} filterSummary={false} showCount={false} items={rows} loading={production&&loading} error={loadError} placeholder="Tickets suchen..." countLabel="Tickets" emptyLabel={chip=>({Offen:"Keine offenen Tickets",["In Bearbeitung"]:"Keine Tickets in Bearbeitung",["Wartet auf Kunde"]:"Keine wartenden Tickets",Gelöst:"Keine gelösten Tickets"}[chip]??"Keine Tickets erfasst")} chips={chips} columns={columns} rowHref={row=>'/operator/tickets/'+row[5]} statusGroups={{Gelöst:['Gelöst','Geschlossen']}}>{row=><RecordRow compact valuePlacement="metadata" href={'/operator/tickets/'+row[5]} title={row[0]} meta={[row[1],row[2],row[4]].join(' · ')} status={row[3]}/>}</RecordsView>{loadError&&<Button variant="secondary" onClick={refresh}>Erneut versuchen</Button>}</>;
 }
 
 function TicketDetail({ticketId}:{ticketId:string}) {
@@ -321,23 +298,23 @@ function TicketDetail({ticketId}:{ticketId:string}) {
   if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError} onRetry={refresh}/>;
 
   if(!production) return <div className="operator-ticket-layout">
-    <section className="surface operator-thread">
+    <WorkspaceSection className="operator-thread">
       <div className="ticket-meta-bar"><Field label="Status"><Select defaultValue="progress"><option value="open">Offen</option><option value="progress">In Bearbeitung</option><option value="waiting">Wartet auf Kunde</option><option value="solved">Gelöst</option></Select></Field><Field label="Priorität"><Select defaultValue="high"><option value="normal">Normal</option><option value="high">Hoch</option><option value="critical">Kritisch</option></Select></Field></div>
       <MessageBubble outgoing={false} time={<>10:24</>} author={<>Thomas Meier</>}>Guten Tag. In der letzten Rechnung sind nicht alle Positionen korrekt aufgeführt. Können Sie das bitte prüfen?</MessageBubble>
       <MessageBubble outgoing={true} time={<>10:37</>} author={<>Binso Support</>}>Guten Tag Herr Meier. Vielen Dank für die Anfrage. Ich prüfe die Rechnung gerne und melde mich in Kürze bei Ihnen.</MessageBubble>
       <div className="operator-reply"><Textarea value={reply} onChange={e=>setReply(e.target.value)} placeholder="Antwort schreiben..."/><div><Button onClick={()=>void send()}>Senden</Button></div></div>
-    </section>
+    </WorkspaceSection>
     <aside className="surface customer-context"><SectionTitle title="Kunde"/><h3>Acme AG</h3><p>Demo-Kontext</p></aside>{toast&&<Toast title={toast}/>}
   </div>;
 
-  if(!ticket) return <section className="surface"><EmptyState icon="support" title="Ticket wird geladen" text="Die Ticketdaten werden abgerufen."/></section>;
+  if(!ticket) return <WorkspaceSection><EmptyState compact icon="support" title="Ticket wird geladen" text="Die Ticketdaten werden abgerufen."/></WorkspaceSection>;
 
   const tenant=ticket.tenant as Record<string,unknown>|undefined;
   const status=String(ticket.status??"open");
   const priority=String(ticket.priority??"normal");
 
   return <div className="operator-ticket-layout">
-    <section className="surface operator-thread">
+    <WorkspaceSection className="operator-thread">
       <div className="ticket-meta-bar">
         <Field label="Status"><Select value={status} onChange={e=>void update("status",e.target.value)}><option value="open">Offen</option><option value="in_progress">In Bearbeitung</option><option value="waiting_customer">Wartet auf Kunde</option><option value="resolved">Gelöst</option><option value="closed">Geschlossen</option></Select></Field>
         <Field label="Priorität"><Select value={priority} onChange={e=>void update("priority",e.target.value)}><option value="low">Niedrig</option><option value="normal">Normal</option><option value="high">Hoch</option><option value="critical">Kritisch</option></Select></Field>
@@ -345,7 +322,7 @@ function TicketDetail({ticketId}:{ticketId:string}) {
       <div className="tabs"><button className={!internal?"active":""} onClick={()=>setInternal(false)}>Konversation</button><button className={internal?"active":""} onClick={()=>setInternal(true)}>Interne Notiz</button></div>
       {messages.filter(message=>internal?message.internal===true:message.internal!==true).map(message=><MessageBubble outgoing={message.author_type!=="customer"} time={<>{new Date(String(message.created_at)).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"})}</>} author={<>{message.author_type==="customer"?"Kunde":"Binso Operator"}</>} internal={message.internal===true} key={String(message.id)}>{String(message.body??"")}</MessageBubble>)}
       <div className="operator-reply"><Textarea value={reply} onChange={e=>setReply(e.target.value)} placeholder={internal?"Interne Notiz schreiben...":"Antwort an Kunden schreiben..."}/><div><Button onClick={()=>void send()}>{internal?"Notiz speichern":"Senden"}</Button></div></div>
-    </section>
+    </WorkspaceSection>
     <aside className="surface customer-context">
       <SectionTitle title="Kunde"/>
       <h3>{String(tenant?.name??"Kunde")}</h3><p>{String(tenant?.uid??"")} {tenant?.city?"· "+String(tenant.city):""}</p>
@@ -357,32 +334,13 @@ function TicketDetail({ticketId}:{ticketId:string}) {
 }
 
 function CustomersView() {
-  const {production,items,loading,loadError,refresh}=useOperatorCustomers();
-  const [query,setQuery]=useState("");
-  const [filter,setFilter]=useState("all");
-  const demoCustomerVisible=demoCustomers.filter(({name,status})=>{
-    const matchQuery=!query.trim()||name.toLowerCase().includes(query.trim().toLowerCase());
-    const matchFilter=filter==="all"||status===filter;
-    return matchQuery&&matchFilter;
-  });
-
-  if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError} onRetry={refresh}/>;
-
-  if(!production) return <section className="surface">
-    <div className="operator-toolbar"><ListSearch value={query} onChange={setQuery} placeholder="Kunden suchen..."/><div className="chips"><button className={filter==="all"?"active":""} onClick={()=>setFilter("all")}>Alle</button><button className={filter==="Aktiv"?"active":""} onClick={()=>setFilter("Aktiv")}>Aktiv</button><button className={filter==="Eingeschränkt"?"active":""} onClick={()=>setFilter("Eingeschränkt")}>Eingeschränkt</button></div></div>
-    {demoCustomerVisible.length===0&&<p role="status">Keine Kunden gefunden.</p>}<DataTable variant="operator" label="Operator-Daten"><DataTableHead className="operator-table-head customer"><span>Kunde</span><span>Plan</span><span>MRR</span><span>Status</span><span>Letzte Aktivität</span></DataTableHead>{demoCustomerVisible.map(({id,name,plan,mrr,status})=><DataTableRow href={"/operator/kunden/"+id} className="operator-table-row customer" key={name}><span><b>{name}</b><small>Demo</small></span><span>{plan}</span><span>{mrr}</span><span><Status tone={status==="Aktiv"?"success":"warning"}>{status}</Status></span><span>Demo</span></DataTableRow>)}</DataTable>
-  </section>;
-
-  const visible=items.filter(item=>{
-    const accountStatus=item.account?.account_status??"active";
-    return (!query.trim()||(item.name+" "+(item.uid??"")+" "+(item.city??"")).toLowerCase().includes(query.trim().toLowerCase()))&&(filter==="all"||accountStatus===filter);
-  });
-  const price:Record<string,string>={start:"CHF 19",business:"CHF 49",pro:"CHF 89",trial:"CHF 0"};
-
-  return <section className="surface">
-    <div className="operator-toolbar"><ListSearch value={query} onChange={setQuery} placeholder="Kunden suchen..."/><div className="chips"><button className={filter==="all"?"active":""} onClick={()=>setFilter("all")}>Alle</button><button className={filter==="active"?"active":""} onClick={()=>setFilter("active")}>Aktiv</button><button className={filter==="restricted"?"active":""} onClick={()=>setFilter("restricted")}>Eingeschränkt</button><button className={filter==="suspended"?"active":""} onClick={()=>setFilter("suspended")}>Gesperrt</button></div></div>
-    {visible.length?<DataTable variant="operator" label="Operator-Daten"><DataTableHead className="operator-table-head customer"><span>Kunde</span><span>Plan</span><span>MRR</span><span>Status</span><span>Erstellt</span></DataTableHead>{visible.map(item=>{const status=item.account?.account_status??"active";const plan=item.account?.plan??"trial";return <DataTableRow href={"/operator/kunden/"+item.id} className="operator-table-row customer" key={item.id}><span><b>{item.name}</b><small>{item.uid??item.city??"—"}</small></span><span>{operatorPlan(plan)}</span><span>{price[plan]??"—"}</span><span><Status tone={status==="active"?"success":"warning"}>{operatorStatus(status)}</Status></span><span>{new Date(item.created_at).toLocaleDateString("de-CH")}</span></DataTableRow>})}</DataTable>:<EmptyState icon="users" title="Keine Kunden" text="Für die aktuelle Auswahl wurden keine Kunden gefunden."/>}
-  </section>;
+ const {production,items,loading,loadError,refresh}=useOperatorCustomers();
+ const chips=['Alle','Aktiv','Eingeschränkt','Gesperrt'];
+ const columns=[{label:'Kunde',index:0},{label:'Plan',index:1},{label:'Monatlicher Listenpreis',index:2,align:'right' as const},{label:'Status',index:3,status:true},{label:'Erstellt',index:4}];
+ const controller=useRecordsController({placeholder:'Kunden suchen...',chips,columns});
+ const price=Object.fromEntries(plans.map(plan=>[plan.id,moneyChf(plan.monthly)]));
+ const rows=production?items.map(item=>[item.name,operatorPlan(item.account?.plan??'trial'),price[item.account?.plan??'trial']??moneyChf(0),operatorStatus(item.account?.account_status??'active'),new Date(item.created_at).toLocaleDateString('de-CH'),item.id,[item.uid,item.city].filter(Boolean).join(' · ')]):demoCustomers.map(item=>[item.name,item.plan,item.mrr,item.status,'Demo',item.id,'Demo']);
+ return <><RecordsControls inline controller={controller} placeholder="Kunden suchen..." chips={chips} columns={columns}/><RecordsView controller={controller} toolbarActions={false} filterSummary={false} showCount={false} items={rows} loading={production&&loading} error={loadError} placeholder="Kunden suchen..." countLabel="Kunden" emptyLabel={chip=>({Aktiv:"Keine aktiven Kunden",Eingeschränkt:"Keine eingeschränkten Kunden",Gesperrt:"Keine gesperrten Kunden"}[chip]??"Keine Kunden erfasst")} statusGroups={{Aktiv:["Aktiv","Testphase"]}} chips={chips} columns={columns} rowHref={row=>'/operator/kunden/'+row[5]}>{row=><RecordRow compact valuePlacement="metadata" href={'/operator/kunden/'+row[5]} title={row[0]} meta={[row[6],row[1],row[4]].filter(Boolean).join(' · ')} status={row[3]} value={row[2]}/>}</RecordsView>{loadError&&<Button variant="secondary" onClick={refresh}>Erneut versuchen</Button>}</>;
 }
 
 function OperatorCustomerDetail({tenantId}:{tenantId:string}) {
@@ -411,35 +369,35 @@ function OperatorCustomerDetail({tenantId}:{tenantId:string}) {
   const restrictions=Array.isArray(overview.active_restrictions)?overview.active_restrictions as Array<Record<string,unknown>>:[];
   if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError} onRetry={refresh}/>;
 
-  if(!tenant) return <section className="surface"><EmptyState icon="users" title="Kunde wird geladen" text="Die Mandantendaten werden abgerufen."/></section>;
+  if(!tenant) return <WorkspaceSection><EmptyState compact icon="users" title="Kunde wird geladen" text="Die Mandantendaten werden abgerufen."/></WorkspaceSection>;
 
   const plan=String(account?.plan??"trial");
   const accountStatus=String(account?.account_status??"active");
-  const planPrice:Record<string,string>={trial:"CHF 0",...Object.fromEntries(plans.map(plan=>[plan.id,moneyChf(plan.monthly)]))};
   const userLimit=Number(account?.user_limit??0);
   const users=Number(overview.users??0);
-  const openTickets=Number(overview.open_tickets??0);
+  const openTickets=overview.open_tickets==null?null:Number(overview.open_tickets);
+  const access=overview.access as {billing?:boolean;support?:boolean;restrictions?:boolean;audit?:boolean}|undefined;
 
   return <>
     <div className="operator-customer-hero">
       <div className="operator-customer-main"><span className="record-avatar large">{String(tenant.name??"K").slice(0,1)}</span><div><h2>{String(tenant.name??"Kunde")}</h2><p>{String(tenant.uid??"Keine UID")} {tenant.city?"· "+String(tenant.city):""}</p></div></div>
       <div className="operator-customer-actions"><Status tone={accountStatus==="active"?"success":"warning"}>{operatorStatus(accountStatus)}</Status><Button variant="secondary" disabled>Support-Zugriff nicht verfügbar</Button><Button href="/operator/sperrungen" variant="danger">Einschränken</Button></div>
     </div>
-    <div className="operator-customer-metrics"><Metric label="Plan" value={operatorPlan(plan)} hint={planPrice[plan]+" / Monat"} icon="card"/><Metric label="Benutzer" value={String(users)+" / "+String(userLimit||"—")} hint={userLimit?String(Math.max(0,userLimit-users))+" Plätze frei":"Keine Grenze"} icon="users"/><Metric label="Offene Tickets" value={String(openTickets)} hint="Aktuelle Anfragen" icon="support"/><Metric label="Kundenzahlungen" value={"CHF "+Number(overview.payments_total??0).toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})} hint="Erfasste Rechnungszahlungen" icon="wallet"/></div>
+    <div className="operator-customer-metrics"><Metric label="Plan" value={operatorPlan(plan)} hint={overview.monthly_contract_value==null?"Vertragswert: "+(access?.billing?"Keine Daten":"Keine Berechtigung"):"Vertragswert: "+moneyChf(Number(overview.monthly_contract_value))+" / Monat"} icon="card"/><Metric label="Benutzer" value={String(users)+" / "+String(userLimit||"—")} hint={userLimit?String(Math.max(0,userLimit-users))+" Plätze frei":"Keine Grenze"} icon="users"/><Metric label="Offene Tickets" value={openTickets===null?"—":String(openTickets)} hint={access?.support?"Aktuelle Anfragen":"Keine Berechtigung"} icon="support"/><Metric label="Kundenzahlungen" value={overview.payments_total==null?"—":moneyChf(Number(overview.payments_total))} hint={access?.billing?"Erfasste CHF-Plattformzahlungen":"Keine Berechtigung"} icon="wallet"/></div>
     <div className="operator-customer-grid">
-      <section className="surface"><SectionTitle title="Konto"/><dl className="operator-detail-list"><div><dt>Firma</dt><dd>{String(tenant.name??"—")}</dd></div><div><dt>E-Mail</dt><dd>{String(tenant.email??"—")}</dd></div><div><dt>Telefon</dt><dd>{String(tenant.phone??"—")}</dd></div><div><dt>Erstellt</dt><dd>{new Date(String(tenant.created_at)).toLocaleDateString("de-CH")}</dd></div><div><dt>Mandant</dt><dd>{String(tenant.id)}</dd></div></dl></section>
-      <section className="surface"><SectionTitle title="Abonnement"/><div className="context-block"><small>Plan</small><b>{operatorPlan(plan)}</b><span>{planPrice[plan]??"—"} / Monat</span><Status tone={String(account?.subscription_status)==="active"?"success":"warning"}>{operatorStatus(String(account?.subscription_status??"trial"))}</Status></div><div className="context-block"><small>Kontostatus</small><b>{operatorStatus(accountStatus)}</b><span>{restrictions.length?String(restrictions.length)+" aktive Einschränkung(en)":"Keine aktive Einschränkung"}</span></div></section>
-      <section className="surface"><SectionTitle title="Support"/>{(data.tickets??[]).length?<div className="compact-list">{(data.tickets??[]).map(ticket=><Link href={"/operator/tickets/"+String(ticket.id)} key={String(ticket.id)}><b>{"#"+String(ticket.id).slice(0,8)+" · "+String(ticket.subject??"")}</b><span>{new Date(String(ticket.updated_at)).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"})}</span><Status tone={String(ticket.status)==="resolved"?"success":"warning"}>{operatorStatus(String(ticket.status))}</Status></Link>)}</div>:<EmptyState icon="support" title="Keine Tickets" text="Für diesen Kunden sind keine Tickets vorhanden."/>}</section>
-      <section className="surface"><SectionTitle title="Audit"/>{(data.audit??[]).length?<div className="audit-list">{(data.audit??[]).map(item=><span key={String(item.id)}><b>{new Date(String(item.created_at)).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"})}</b> {String(item.action)}</span>)}</div>:<p>Noch keine tenant-spezifischen Audit-Einträge.</p>}</section>
+      <WorkspaceSection><SectionTitle title="Konto"/><dl className="operator-detail-list"><div><dt>Firma</dt><dd>{String(tenant.name??"—")}</dd></div><div><dt>E-Mail</dt><dd>{String(tenant.email??"—")}</dd></div><div><dt>Telefon</dt><dd>{String(tenant.phone??"—")}</dd></div><div><dt>Erstellt</dt><dd>{new Date(String(tenant.created_at)).toLocaleDateString("de-CH")}</dd></div><div><dt>Mandant</dt><dd>{String(tenant.id)}</dd></div></dl></WorkspaceSection>
+      <WorkspaceSection><SectionTitle title="Abonnement"/><div className="context-block"><small>Plan</small><b>{operatorPlan(plan)}</b><span>{overview.monthly_contract_value==null?"Vertragswert: "+(access?.billing?"Keine Daten":"Keine Berechtigung"):moneyChf(Number(overview.monthly_contract_value))+" / Monat"}</span><Status tone={String(account?.subscription_status)==="active"?"success":"warning"}>{operatorStatus(String(account?.subscription_status??"trial"))}</Status></div><div className="context-block"><small>Kontostatus</small><b>{operatorStatus(accountStatus)}</b><span>{access?.restrictions?(restrictions.length?String(restrictions.length)+" aktive Einschränkung(en)":"Keine aktive Einschränkung"):"Einschränkungen: Keine Berechtigung"}</span></div></WorkspaceSection>
+      <WorkspaceSection><SectionTitle title="Support"/>{!access?.support?<p>Keine Berechtigung für Supportfälle.</p>:(data.tickets??[]).length?<div className="compact-list">{(data.tickets??[]).map(ticket=><Link href={"/operator/tickets/"+String(ticket.id)} key={String(ticket.id)}><b>{"#"+String(ticket.id).slice(0,8)+" · "+String(ticket.subject??"")}</b><span>{new Date(String(ticket.updated_at)).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"})}</span><Status tone={String(ticket.status)==="resolved"?"success":"warning"}>{operatorStatus(String(ticket.status))}</Status></Link>)}</div>:<EmptyState compact icon="support" title="Keine Tickets" text="Für diesen Kunden sind keine Tickets vorhanden."/>}</WorkspaceSection>
+      <WorkspaceSection><SectionTitle title="Audit"/>{!access?.audit?<p>Keine Berechtigung für Audit-Einträge.</p>:(data.audit??[]).length?<div className="audit-list">{(data.audit??[]).map(item=><span key={String(item.id)}><b>{new Date(String(item.created_at)).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"})}</b> {String(item.action)}</span>)}</div>:<p>Noch keine tenant-spezifischen Audit-Einträge.</p>}</WorkspaceSection>
     </div>
     {toast&&<Toast title={toast}/>}
   </>;
 }
 
 function PaymentInsight({label,value,kind,bars=[],ratio=0}:{label:string;value:string;kind:"trend"|"donut"|"status";bars?:number[];ratio?:number}) {
-  return <section className={"operator-payment-insight "+kind}>
+  return <section className={"operator-payment-insight payment-insight-"+kind}>
     <div><span>{label}</span><strong>{value}</strong></div>
-    {kind==="trend"?<div className="payment-mini-bars" aria-hidden="true">{bars.map((height,index)=><i key={index} style={{height:String(height)+"%"}}/>)}</div>:<div className={"payment-ring "+kind} style={{"--payment-ratio":String(Math.max(0,Math.min(100,ratio)))+"%"} as React.CSSProperties}><b>{ratio}%</b></div>}
+    {kind==="trend"?<div className="payment-mini-bars" aria-hidden="true">{bars.some(height=>height>0)?bars.map((height,index)=><i key={index} style={{height:String(height)+"%"}}/>):<span>Keine Zahlungen</span>}</div>:<div className={"payment-ring payment-ring-"+kind} style={{"--payment-ratio":String(Math.max(0,Math.min(100,ratio)))+"%"} as React.CSSProperties}><b>{ratio}%</b></div>}
   </section>;
 }
 
@@ -450,16 +408,17 @@ function OperatorFinanceView({demo=false}:{demo?:boolean}){
   const error=resource.error,refresh=resource.refresh;
   
   const [range,setRange]=useState("month");
+  const [filterOpen,setFilterOpen]=useState(false),[draftRange,setDraftRange]=useState("month");
   if(resource.loading||error)return <OperatorLoadState loading={resource.loading} error={error} onRetry={refresh}/>;
   
   const ranges:Record<string,{label:string}>={month:{label:"Dieser Monat"},last:{label:"Letzter Monat"},three:{label:"3 Monate"},year:{label:"12 Monate"},previous:{label:"Letztes Jahr"}};
   const {volume,platformRevenue,costs,result,monthly}=platformFinanceInsights(data,range,businessDate()),max=Math.max(1,...monthly.map(x=>x.value));
-  return <div>
-    {error&&<ErrorState onRetry={refresh}>{error}</ErrorState>}
-    <div className="finance-range">{Object.entries(ranges).map(([key,x])=><button type="button" className={range===key?"active":""} key={key} onClick={()=>setRange(key)}>{x.label}</button>)}</div>
+  return <div className="operator-finance">
+    <div className="section-title"><span>{ranges[range].label}</span><button type="button" className="icon-button records-filter-action" aria-label="Zeitraum filtern" onClick={()=>{setDraftRange(range);setFilterOpen(true)}}><Icon name="filter" size={20}/></button></div>
+    <FilterSheet label="Zeitraum" open={filterOpen} onClose={()=>setFilterOpen(false)} actions={<><Button variant="secondary" onClick={()=>setDraftRange("month")}>Zurücksetzen</Button><Button onClick={()=>{setRange(draftRange);setFilterOpen(false)}}>Anwenden</Button></>}><Field label="Zeitraum"><Select value={draftRange} onChange={event=>setDraftRange(event.target.value)}>{Object.entries(ranges).map(([key,x])=><option key={key} value={key}>{x.label}</option>)}</Select></Field></FilterSheet>
     <div className="operator-payment-insights"><PaymentInsight label="Kundenzahlungen" value={"CHF "+volume.toLocaleString("de-CH",{minimumFractionDigits:2})} kind="trend" bars={monthly.map(x=>max?x.value/max*100:0)}/><PaymentInsight label="Plattformumsatz" value={"CHF "+platformRevenue.toLocaleString("de-CH",{minimumFractionDigits:2})} kind="donut" ratio={platformRevenue+costs?Math.round(platformRevenue/(platformRevenue+costs)*100):0}/><PaymentInsight label="Betriebskosten" value={"CHF "+costs.toLocaleString("de-CH",{minimumFractionDigits:2})} kind="status" ratio={platformRevenue+costs?Math.round(costs/(platformRevenue+costs)*100):0}/></div>
-    <section className="finance-analysis"><SectionTitle title="Finanzentwicklung"/><div className="finance-month-bars">{monthly.map(x=><div key={x.label}><i style={{height:`${x.value>0?Math.max(8,x.value/max*100):0}%`}}/><b>{x.label}</b><small>CHF {x.value.toLocaleString("de-CH",{maximumFractionDigits:0})}</small></div>)}</div></section>
-    <div className="finance-breakdown"><section><h3>Plattformkosten</h3><div><span>Betriebskosten gesamt</span><strong>{"CHF "+costs.toLocaleString("de-CH",{minimumFractionDigits:2})}</strong></div><div><span>Plattformumsatz</span><strong>{"CHF "+platformRevenue.toLocaleString("de-CH",{minimumFractionDigits:2})}</strong></div><div><span>Ergebnis</span><strong>{"CHF "+result.toLocaleString("de-CH",{minimumFractionDigits:2})}</strong></div></section><section><h3>Datenbasis</h3><p>Kundenzahlungen, Plattformumsatz und Betriebskosten werden aus Azure PostgreSQL geladen und nach dem gewählten Zeitraum ausgewertet.</p></section></div>
+    <section className="finance-analysis"><SectionTitle title="Finanzentwicklung"/>{monthly.some(x=>x.value>0)?<div className="finance-month-bars">{monthly.map(x=><div key={x.label}><i style={{height:`${x.value>0?Math.max(8,x.value/max*100):0}%`}}/><b>{x.label}</b><small>CHF {x.value.toLocaleString("de-CH",{maximumFractionDigits:0})}</small></div>)}</div>:<EmptyState compact title="Keine Kundenzahlungen im gewählten Zeitraum" text="Erfasste Zahlungen erscheinen in der Finanzentwicklung."/>}</section>
+    <div className="finance-breakdown"><section><h3>Zusammenfassung</h3><div><span>Betriebskosten gesamt</span><strong>{"CHF "+costs.toLocaleString("de-CH",{minimumFractionDigits:2})}</strong></div><div><span>Plattformumsatz</span><strong>{"CHF "+platformRevenue.toLocaleString("de-CH",{minimumFractionDigits:2})}</strong></div><div><span>Ergebnis</span><strong>{"CHF "+result.toLocaleString("de-CH",{minimumFractionDigits:2})}</strong></div></section><section><h3>Datenbasis</h3><p>Kundenzahlungen, Plattformumsatz und Betriebskosten werden nach dem gewählten Zeitraum ausgewertet.</p></section></div>
   </div>
 }
 
@@ -476,24 +435,28 @@ function PaymentsView() {
 
   if(!production) return <>
     <div className="operator-payment-insights"><PaymentInsight label="Kundenzahlungen" value="CHF 49’820" kind="trend" bars={[38,52,44,68,61,82,74,92]}/><PaymentInsight label="Verbucht" value="184" kind="donut" ratio={96}/><PaymentInsight label="Offen / storniert" value="2" kind="status" ratio={1}/></div>
-    <section className="surface operator-table-card"><DataTable variant="operator" label="Operator-Daten"><DataTableHead className="operator-table-head payment"><span>Datum</span><span>Kunde</span><span>Betrag</span><span>Status</span><span>Zahlungsart</span></DataTableHead>{[["02.10.2026","Acme AG","CHF 1’240.00","Verbucht","Bank"],["02.10.2026","Müller GmbH","CHF 49.00","Verbucht","Bank"],["01.10.2026","Schmid Consulting","CHF 89.00","Ausstehend","Bank"]].map(r=><DataTableRow className="operator-table-row payment" key={r[1]}>{r.map((x,i)=><span key={i}>{i===3?<Status tone={x==="Verbucht"?"success":"warning"}>{x}</Status>:x}</span>)}</DataTableRow>)}</DataTable></section>
+    <WorkspaceSection className="operator-table-card"><DataTable variant="operator" label="Operator-Daten"><DataTableHead className="operator-table-head payment"><span>Datum</span><span>Kunde</span><span>Betrag</span><span>Status</span><span>Zahlungsart</span></DataTableHead>{[["02.10.2026","Acme AG","CHF 1’240.00","Verbucht","Bank"],["02.10.2026","Müller GmbH","CHF 49.00","Verbucht","Bank"],["01.10.2026","Schmid Consulting","CHF 89.00","Ausstehend","Bank"]].map(r=><DataTableRow className="operator-table-row payment" key={r[1]}>{r.map((x,i)=><span key={i}>{i===3?<Status tone={x==="Verbucht"?"success":"warning"}>{x}</Status>:x}</span>)}</DataTableRow>)}</DataTable></WorkspaceSection>
   </>;
 
   const booked=items.filter(item=>item.status==="booked");
-  const total=booked.reduce((sum,item)=>sum+Number(item.amount??0),0);
+  const chfBooked=booked.filter(item=>item.currency==="CHF");
+  const total=sumMoney(chfBooked.map(item=>item.amount));
+  const paymentMonths=platformFinanceInsights({payments:chfBooked.map(item=>({...item,payment_date:item.paid_on}))},"year",businessDate()).monthly;
+  const paymentMax=Math.max(1,...paymentMonths.map(item=>item.value));
+  const paymentBars=paymentMonths.map(item=>item.value/paymentMax*100);
   const pending=items.filter(item=>item.status==="pending").length;
   const reversed=items.filter(item=>item.status==="reversed").length;
   return <>
     <div className="operator-payment-insights">
-      <PaymentInsight label="Kundenzahlungen" value={"CHF "+total.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})} kind="trend" bars={[32,46,41,58,52,67,61,78]}/>
+      <PaymentInsight label="Angezeigte Zahlungen · CHF" value={"CHF "+total.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})} kind="trend" bars={paymentBars}/>
       <PaymentInsight label="Verbucht" value={String(booked.length)} kind="donut" ratio={items.length?Math.round(booked.length/items.length*100):0}/>
       <PaymentInsight label="Offen / storniert" value={String(pending+reversed)} kind="status" ratio={items.length?Math.round((pending+reversed)/items.length*100):0}/>
     </div>
-    <section className="surface operator-table-card">
+    <WorkspaceSection className="operator-table-card">
       <SectionTitle title="Kundenzahlungen"/>
-      <p className="technical-hint">Diese Liste zeigt Zahlungen zu Kundenrechnungen. SaaS-Abonnementzahlungen über Stripe sind noch nicht angebunden.</p>
-      {items.length?<DataTable variant="operator" label="Operator-Daten"><DataTableHead className="operator-table-head payment"><span>Datum</span><span>Mandant / Kunde</span><span>Betrag</span><span>Status</span><span>Referenz</span></DataTableHead>{items.map(item=>{const tenant=item.tenant as {name?:string}|undefined;const customer=item.customer as {name?:string}|undefined;const invoice=item.invoice as {number?:string}|undefined;const status=String(item.status??"pending");return <DataTableRow className="operator-table-row payment" key={String(item.id)}><span>{new Date(String(item.paid_on)).toLocaleDateString("de-CH")}</span><span><b>{tenant?.name??"Mandant"}</b><small>{customer?.name??"Kunde"}</small></span><span>{"CHF "+Number(item.amount??0).toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}</span><span><Status tone={status==="booked"?"success":status==="reversed"?"danger":"warning"}>{status==="booked"?"Verbucht":status==="reversed"?"Storniert":"Ausstehend"}</Status></span><span>{[invoice?.number,item.method].filter(Boolean).join(" · ")||"—"}</span></DataTableRow>})}</DataTable>:<EmptyState icon="wallet" title="Noch keine Kundenzahlungen" text="Erfasste Rechnungszahlungen erscheinen hier."/>}
-    </section>
+      <p className="technical-hint">Erfasste Plattformzahlungen. Kennzahl und Verlauf enthalten CHF; weitere Währungen bleiben in der Liste getrennt.</p>
+      {items.length?<DataTable variant="operator" label="Operator-Daten"><DataTableHead className="operator-table-head payment"><span>Datum</span><span>Mandant / Kunde</span><span>Betrag</span><span>Status</span><span>Referenz</span></DataTableHead>{items.map(item=>{const tenant=item.tenant as {name?:string}|undefined;const customer=item.customer as {name?:string}|undefined;const invoice=item.invoice as {number?:string}|undefined;const status=String(item.status??"pending");return <DataTableRow className="operator-table-row payment" key={String(item.id)}><span>{new Date(String(item.paid_on)).toLocaleDateString("de-CH")}</span><span><b>{tenant?.name??"Mandant"}</b><small>{customer?.name??"Kunde"}</small></span><span>{(item.currency?String(item.currency):"—")+" "+Number(item.amount??0).toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}</span><span><Status tone={status==="booked"?"success":status==="reversed"?"danger":"warning"}>{status==="booked"?"Verbucht":status==="reversed"?"Storniert":"Ausstehend"}</Status></span><span>{[invoice?.number,item.method].filter(Boolean).join(" · ")||"—"}</span></DataTableRow>})}</DataTable>:<EmptyState compact icon="wallet" title="Noch keine Kundenzahlungen" text="Erfasste Rechnungszahlungen erscheinen hier."/>}
+    </WorkspaceSection>
   </>;
 }
 
@@ -521,11 +484,7 @@ function SubscriptionsView() {
     window.setTimeout(()=>setToast(null),2400);
   };
 
-  if(!production){
-    return <>
-      <div className="operator-grid thirds">{[["Start","1’128","CHF 19","21’432"],["Business","1’462","CHF 49","71’638"],["Pro","251","CHF 89","22’339"]].map(([plan,count,price,mrr])=><section className="surface subscription-card" key={plan}><small>Plan</small><h2>{plan}</h2><strong>{count} Kunden</strong><p>CHF {mrr} MRR</p><span>{price} / Monat</span><Button variant="secondary">Demo</Button></section>)}</div>
-    </>;
-  }
+  if(!production)return <MetricTiles>{plans.map(plan=><MetricTile key={plan.id} label={plan.name} value={demoCustomers.filter(customer=>customer.plan===plan.name).length+" Kunden"} hint={moneyChf(plan.monthly)+" / Monat · Demo"}/>)}</MetricTiles>;
 
   const grouped=["trial","start","business","pro"].map(plan=>({plan,items:items.filter(item=>item.plan===plan)}));
   const price:Record<string,string>={trial:"CHF 0",...Object.fromEntries(plans.map(plan=>[plan.id,moneyChf(plan.monthly)]))};
@@ -533,18 +492,16 @@ function SubscriptionsView() {
   if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError} onRetry={refresh}/>;
 
   return <>
-    <div className="operator-grid thirds">
-      {grouped.map(group=><section className="surface subscription-card" key={group.plan}><small>Plan</small><h2>{operatorPlan(group.plan)}</h2><strong>{group.items.length} Kunden</strong><p>{group.items.filter(item=>item.subscription_status==="active").length} aktiv</p><span>{price[group.plan]} / Monat</span><Button variant="secondary" onClick={()=>setSelected(group.items[0]??null)}>Kundenstatus</Button></section>)}
-    </div>
-    <section className="surface operator-table-card">
-      <DataTable variant="operator" label="Operator-Daten"><DataTableHead className="operator-table-head customer"><span>Kunde</span><span>Plan</span><span>Abonnement</span><span>Konto</span><span>Aktualisiert</span></DataTableHead>{items.map(item=>{const tenant=item.tenant as {name?:string}|undefined;return <DataTableRow className="operator-table-row customer" key={String(item.tenant_id)} onClick={()=>setSelected(item)}><span><b>{tenant?.name??"Kunde"}</b><small>{String(item.tenant_id).slice(0,8)}</small></span><span>{operatorPlan(String(item.plan))}</span><span><Status tone={item.subscription_status==="active"?"success":"warning"}>{operatorStatus(String(item.subscription_status))}</Status></span><span><Status tone={item.account_status==="active"?"success":"warning"}>{operatorStatus(String(item.account_status))}</Status></span><span>{new Date(String(item.updated_at)).toLocaleDateString("de-CH")}</span></DataTableRow>})}</DataTable>
-    </section>
+    <MetricTiles>{grouped.map(group=><MetricTile key={group.plan} label={operatorPlan(group.plan)} value={group.items.length+(group.items.length===1?" Kunde":" Kunden")} hint={group.items.filter(item=>item.subscription_status==="active").length+" aktiv · Listenpreis "+price[group.plan]+" / Monat"}/>)}</MetricTiles>
+    <WorkspaceSection className="operator-table-card">
+      <DataTable variant="operator" label="Operator-Daten"><DataTableHead className="operator-table-head customer"><span>Kunde</span><span>Plan</span><span>Abonnement</span><span>Konto</span><span>Aktualisiert</span></DataTableHead>{items.map(item=>{const tenant=item.tenant as {name?:string}|undefined;return <DataTableRow className="operator-table-row customer" key={String(item.tenant_id)} onClick={()=>setSelected(item)}><span><b>{tenant?.name??"Kunde"}</b></span><span>{operatorPlan(String(item.plan))}</span><span><Status tone={item.subscription_status==="active"?"success":"warning"}>{operatorStatus(String(item.subscription_status))}</Status></span><span><Status tone={item.account_status==="active"?"success":"warning"}>{operatorStatus(String(item.account_status))}</Status></span><span>{new Date(String(item.updated_at)).toLocaleDateString("de-CH")}</span></DataTableRow>})}</DataTable>
+    </WorkspaceSection>
     {selected&&<FormSheet open={Boolean(selected)} label={String((selected?.tenant as {name?:string}|undefined)?.name??"Kunde")} description="Plan und interner Kontostatus. Stripe-Abonnements werden über Stripe verwaltet; interne Kontosperren ändern keine Stripe-Zahlungen." dirty={false} onClose={()=>setSelected(null)} actions={<><Button variant="secondary" onClick={()=>setSelected(null)}>Schliessen</Button><Button href={"/operator/kunden/"+String(selected?.tenant_id)}>Kunde öffnen</Button></>}><Field label="Plan"><Select value={String(selected.plan)} onChange={e=>void updateSelected({plan:e.target.value})}><option value="trial">Testphase</option><option value="start">Start</option><option value="business">Business</option><option value="pro">Pro</option></Select></Field><Field label="Abonnement"><Select value={String(selected.subscription_status)} onChange={e=>void updateSelected({subscriptionStatus:e.target.value})}><option value="trial">Testphase</option><option value="active">Aktiv</option><option value="past_due">Überfällig</option><option value="suspended">Pausiert</option><option value="cancelled">Gekündigt</option></Select></Field><Field label="Benutzerlimit"><Input type="number" min="1" value={String(selected.user_limit??3)} onChange={e=>setSelected(current=>current?{...current,user_limit:Number(e.target.value)}:current)} onBlur={()=>void updateSelected({userLimit:Number(selected.user_limit??3)})}/></Field></FormSheet>}
     {toast&&<Toast title={toast} tone={toast.includes("konnte")?"danger":"success"}/>}
   </>;
 }
 
-function RestrictionsView() {
+function RestrictionsView({open,onClose}:{open:boolean;onClose:()=>void}) {
   const production=useBackendMode();
   
   const {items:customers}=useOperatorCustomers();
@@ -565,10 +522,10 @@ function RestrictionsView() {
   useEffect(()=>{if(production&&!tenantId&&customers[0]) queueMicrotask(()=>setTenantId(customers[0].id));},[production,tenantId,customers]);
 
   const createRestriction=async()=>{
-    if(!production){setConfirm(null);setToast("Einschränkung im Demo-Modus simuliert.");window.setTimeout(()=>setToast(null),2200);return;}
+    if(!production){setConfirm(null);onClose();setToast("Einschränkung im Demo-Modus simuliert.");window.setTimeout(()=>setToast(null),2200);return;}
     try{
       await apiPost("/api/operator/restrictions",{tenantId,scope,reason,note:note.trim()||reason,endsAt:endsAt||null});
-      setConfirm(null);setNote("");setEndsAt("");
+      setConfirm(null);setNote("");setEndsAt("");onClose();
       await load();
       setToast("Einschränkung erstellt und im Audit protokolliert.");
     }catch(error){setToast(error instanceof Error?error.message:"Einschränkung konnte nicht erstellt werden.");}
@@ -588,9 +545,7 @@ function RestrictionsView() {
   if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError} onRetry={refresh}/>;
 
   return <>
-    <div className="operator-grid">
-      <section className="surface restriction-form">
-        <SectionTitle title="Einschränkung erstellen"/>
+    <FormSheet open={open} onClose={onClose} label="Einschränkung erstellen" actions={<Button onClick={()=>setConfirm("create")} disabled={production&&!tenantId}>Einschränkung prüfen</Button>}>
         <div className="form-grid two">
           <Field label="Kunde"><Select value={tenantId} onChange={e=>setTenantId(e.target.value)}>{production?customers.map(customer=><option value={customer.id} key={customer.id}>{customer.name}</option>):<option>Meier Handel AG</option>}</Select></Field>
           <Field label="Grund"><Select value={reason} onChange={e=>setReason(e.target.value)}><option>Zahlungsausstand</option><option>Sicherheitsvorfall</option><option>Vertragsende</option><option>Manuelle Prüfung</option></Select></Field>
@@ -598,93 +553,20 @@ function RestrictionsView() {
           <Field label="Ablaufdatum"><Input type="date" value={endsAt} onChange={e=>setEndsAt(e.target.value)}/></Field>
           <Field label="Interne Begründung" className="full"><Textarea value={note} onChange={e=>setNote(e.target.value)} placeholder="Begründung für Audit und interne Nachvollziehbarkeit"/></Field>
         </div>
-        <Button variant="danger" onClick={()=>setConfirm("create")} disabled={production&&!tenantId}>Einschränkung erstellen</Button>
-      </section>
-      <section className="surface">
+    </FormSheet>
+      <WorkspaceSection>
         <SectionTitle title="Aktive Einschränkungen"/>
-        {production?(active.length?active.map(item=>{const tenant=item.tenant as {name?:string}|undefined;return <div className="notice" key={String(item.id)}><Status tone="warning">{item.scope==="all"?"Gesperrt":"Eingeschränkt"}</Status><b>{tenant?.name??"Kunde"}</b><span>{String(item.reason??"")} · seit {new Date(String(item.starts_at)).toLocaleDateString("de-CH")}</span><Button variant="secondary" onClick={()=>setConfirm(String(item.id))}>Aufheben</Button></div>}):<EmptyState icon="lock" title="Keine aktiven Einschränkungen" text="Alle Kundenkonten sind ohne Operator-Einschränkung."/>):<div className="notice"><Status tone="warning">Demo</Status><b>Meier Handel AG</b><span>Zahlungsausstand · Beispiel</span><Button variant="secondary" onClick={()=>setConfirm("demo")}>Aufheben</Button></div>}
-      </section>
-    </div>
+        {production?(active.length?active.map(item=>{const tenant=item.tenant as {name?:string}|undefined;return <div className="notice" key={String(item.id)}><Status tone="warning">{item.scope==="all"?"Gesperrt":"Eingeschränkt"}</Status><b>{tenant?.name??"Kunde"}</b><span>{String(item.reason??"")} · seit {new Date(String(item.starts_at)).toLocaleDateString("de-CH")}</span><Button variant="secondary" onClick={()=>setConfirm(String(item.id))}>Aufheben</Button></div>}):<EmptyState compact icon="lock" title="Keine aktiven Einschränkungen" text="Alle Kundenkonten sind ohne Operator-Einschränkung."/>):<div className="notice"><Status tone="warning">Demo</Status><b>Meier Handel AG</b><span>Zahlungsausstand · Beispiel</span><Button variant="secondary" onClick={()=>setConfirm("demo")}>Aufheben</Button></div>}
+      </WorkspaceSection>
     {confirm&&<ConfirmDialog open={Boolean(confirm)} title={confirm==="create"?"Zugriff einschränken?":"Einschränkung aufheben?"} message={confirm==="create"?"Der Zugriff wird gemäss Umfang eingeschränkt. Grund, Operator und Zeitpunkt werden im Audit protokolliert.":"Der normale Zugriff wird wiederhergestellt, sofern keine weitere aktive Einschränkung besteht."} confirmLabel={confirm==="create"?"Einschränken":"Aufheben"} danger={confirm==="create"} onCancel={()=>setConfirm(null)} onConfirm={()=>confirm==="create"?void createRestriction():confirm&&void removeRestriction(confirm)}/>}
     {toast&&<Toast title={toast} tone={toast.includes("konnte")?"danger":"success"}/>}
   </>;
 }
 
 
-function MonitoringCockpit({services,api,database,errorRate,incidents}:{services:Array<{name:string;status:string;latencyMs?:number|null}>;api:number|null;database:number|null;errorRate:string;incidents:Array<Record<string,unknown>>}) {
-  const healthy=services.filter(s=>s.status==="operational").length;
-  const degraded=services.filter(s=>s.status==="degraded").length;
-  const apiBars=api==null?[]:[Math.min(100,Math.max(1,api/10))];
-  const dbBars=database==null?[]:[Math.min(100,Math.max(1,database/10))];
-  const health=services.length?Math.round(healthy/services.length*100):0;
-  const affected=services.length?Math.round(degraded/services.length*100):0;
-  return <div className="monitoring-cockpit">
-    <div className="monitoring-kpis monitoring-kpis-visual">
-      <section><div><span>Service Health</span><strong>{services.length?health+" %":"—"}</strong><small>{healthy}/{services.length} Services operational · Momentaufnahme</small></div><div className="monitoring-kpi-ring" style={{"--kpi-value":health+"%"} as React.CSSProperties}><b>{services.length?health+" %":"—"}</b></div></section>
-      <section><div><span>API Antwortzeit</span><strong>{api==null?"—":api+" ms"}</strong><small>Aktuelle Messung</small></div><div className="monitoring-kpi-bars" aria-hidden="true">{apiBars.map((h,i)=><i key={i} style={{height:h+"%"}}/>)}</div></section>
-      <section><div><span>Datenbank</span><strong>{database==null?"—":database+" ms"}</strong><small>Aktuelle Abfrage</small></div><div className="monitoring-kpi-bars database" aria-hidden="true">{dbBars.map((h,i)=><i key={i} style={{height:h+"%"}}/>)}</div></section>
-      <section><div><span>Störungen</span><strong>{incidents.length}</strong><small>{degraded} Services beeinträchtigt</small></div><div className="monitoring-kpi-ring incidents" style={{"--kpi-value":String(affected)+"%"} as React.CSSProperties}><b>{degraded}</b></div></section>
-    </div>
-    <div className="monitoring-visual-grid monitoring-technical-grid">
-      <section className="monitoring-technical-chart"><div className="monitoring-chart-title"><b>API Latenz</b><strong>{api==null?"—":api+" ms"}</strong></div><div className="monitoring-compact-bars">{apiBars.map((h,i)=><i key={i} style={{height:h+"%"}}/>)}</div><small>Aktuelle Messung · keine historischen Daten</small></section>
-      <section className="monitoring-technical-chart"><div className="monitoring-chart-title"><b>Datenbank</b><strong>{database==null?"—":database+" ms"}</strong></div><div className="monitoring-compact-bars database">{dbBars.map((h,i)=><i key={i} style={{height:h+"%"}}/>)}</div><small>Aktuelle Abfrage · keine historischen Daten</small></section>
-      <section className="monitoring-technical-chart"><div className="monitoring-chart-title"><b>Service Health</b><strong>{health}%</strong></div><div className="monitoring-compact-ring" style={{"--health":String(health)+"%"} as React.CSSProperties}><span>{healthy}/{services.length}</span></div><small>Operational verfügbare Services</small></section>
-      <section className="monitoring-technical-chart"><div className="monitoring-chart-title"><b>Aktive Störungen</b><strong>{incidents.length}</strong></div><div className="monitoring-compact-ring incidents" style={{"--health":String(affected)+"%"} as React.CSSProperties}><span>{degraded}</span></div><small>Anteil beeinträchtigter Services</small></section>
-    </div>
-    <div className="monitoring-technical-summary"><b>Technische Übersicht</b><p>Alle zentralen Plattformwerte auf einen Blick: Aktueller Service-Status, API- und Datenbank-Latenz, Service Health und aktive Störungen. INP-Stichproben: {errorRate}. Darunter bleiben Service-Status und Ereignisse für die technische Detailanalyse sichtbar.</p></div>
-  </div>;
-}
+function MonitoringView(){return <MonitoringPanel/>;}
 
-function MonitoringView() {
-  const production=useBackendMode();
-  
-  const resource=useApiQuery<{services?:Array<{name:string;status:string;detail?:string;key?:string;latencyMs?:number|null}>;incidents?:Array<Record<string,unknown>>;webVitals?:Record<string,{p75:number|null;samples:number;poor:number}>;billingEvents?:Array<Record<string,unknown>>;mailQueue?:Array<{status:string;count:number;oldest:string}>;latencyMs?:{api:number;database:number};build?:{sha?:string|null;node?:string}}>(production?"/api/operator/monitoring":null);
-  const data=resource.data??{};
-  const loading=resource.loading,loadError=resource.error,refresh=resource.refresh;
-  const [toast,setToast]=useState<string|null>(null);
-
-  
-
-  const testEmail=async()=>{
-    try{
-      await apiPost("/api/operator/integrations/email-test",{});
-      setToast("Test-E-Mail wurde an dein Operator-Konto gesendet.");
-    }catch(error){
-      setToast(error instanceof Error?error.message:"Test-E-Mail konnte nicht gesendet werden.");
-    }
-    window.setTimeout(()=>setToast(null),2600);
-  };
-
-  if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError} onRetry={refresh}/>;
-
-  if(!production) return <MonitoringCockpit services={["Web App","API","Datenbank","Dateispeicher","Zahlungsabwicklung","E-Mail Service"].map((name,i)=>({name,status:i<4?"operational":"degraded",latencyMs:[28,41,16,35,210,184][i]}))} api={182} database={41} errorRate="—" incidents={[]}/>;
-
-  const services=data.services??[];
-  const incidents=data.incidents??[];
-  const operational=services.filter(service=>service.status==="operational").length;
-  const configured=services.filter(service=>service.status==="configured").length;
-  const missing=services.filter(service=>service.status==="not_connected"||service.status==="not_implemented").length;
-  const emailReady=services.some(service=>service.key==="email"&&(service.status==="configured"||service.status==="operational"));
-  const label=(status:string)=>status==="operational"?"Operational":status==="degraded"?"Beeinträchtigt":status==="configured"?"Konfiguriert":status==="not_implemented"?"Noch nicht implementiert":"Nicht verbunden";
-  const vitals=data.webVitals??{};
-  const formatVital=(key:string,unit:string)=>vitals[key]?.p75==null?"—":String(vitals[key].p75)+unit;
-
-  return <>
-    <MonitoringCockpit services={services} api={data.latencyMs?.api??null} database={data.latencyMs?.database??null} errorRate={vitals.INP?.poor!=null?String(vitals.INP.poor)+" poor":"—"} incidents={incidents}/>
-    <div className="monitoring-panel">
-      <div className="monitoring-head"><div><span className="monitoring-dot"/><b>Service-Status</b></div><small>{operational} operational · {configured} konfiguriert · {missing} offen</small></div>
-      <div className="monitoring-list">{services.map(service=><div key={service.name}><div><i/><span><b>{service.name}</b><small>{service.detail??(service.status==="operational"?"Binso One":"Externe Integration")}</small></span></div><strong>{label(service.status)}</strong>{service.key==="email"&&emailReady?<Button variant="secondary" onClick={()=>void testEmail()}>Test</Button>:<div className="spark"/>}</div>)}</div>
-    </div>
-    {!!data.mailQueue?.length&&<section className="surface"><SectionTitle title="Ausstehender E-Mail-Versand"/><p>Unklarer oder unterbrochener Versand muss beim Anbieter geprüft werden, bevor er erneut ausgelöst wird.</p><dl className="detail-list">{data.mailQueue.map(item=><div key={item.status}><dt>{{queued:"Wartend",failed:"Fehlgeschlagen",uncertain:"Zustellung unklar",sending:"Versand unterbrochen"}[item.status]??item.status}</dt><dd>{item.count} · seit {new Date(item.oldest).toLocaleString("de-CH")}</dd></div>)}</dl></section>}
-    <section className="surface incident-history">
-      <SectionTitle title="Ereignisse"/>
-      {incidents.length?incidents.map(item=><div className="incident-row" key={String(item.id)}><span className={"incident-dot "+(String(item.status)==="resolved"?"resolved":"maintenance")}/><div><b>{String(item.title??"Ereignis")}</b><small>{String(item.service??"")} · {new Date(String(item.started_at)).toLocaleString("de-CH")}</small></div><Status tone={String(item.status)==="resolved"?"success":"warning"}>{operatorStatus(String(item.status))}</Status></div>):<EmptyState icon="chart" title="Keine Ereignisse" text="Es sind keine Plattform-Ereignisse erfasst."/>}
-    </section>
-    {toast&&<Toast title={toast} tone={toast.includes("konnte")?"danger":"success"}/>}
-  </>;
-}
-
-function AnnouncementsView() {
+function AnnouncementsView({open,onClose}:{open:boolean;onClose:()=>void}) {
   const production=useBackendMode();
   
   const resource=useApiQuery<{items:Array<Record<string,unknown>>}>(production?"/api/operator/announcements":null);
@@ -707,14 +589,14 @@ function AnnouncementsView() {
       return;
     }
     if(!production){
-      setToast("Ankündigung im Demo-Modus simuliert.");
+      onClose();setToast("Ankündigung im Demo-Modus simuliert.");
       window.setTimeout(()=>setToast(null),2200);
       return;
     }
     try{
       await apiPost<{item:Record<string,unknown>}>("/api/operator/announcements",{title,body,kind,audience,published:true});
       refresh();
-      setTitle("");setBody("");
+      setTitle("");setBody("");onClose();
       setToast("Ankündigung veröffentlicht.");
     }catch(error){
       setToast(error instanceof Error?error.message:"Ankündigung konnte nicht veröffentlicht werden.");
@@ -727,18 +609,15 @@ function AnnouncementsView() {
 
   if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError} onRetry={refresh}/>;
 
-  return <div className="operator-grid">
-    <section className="surface">
-      <SectionTitle title="Neue Ankündigung"/>
+  return <>
+    <FormSheet open={open} onClose={onClose} label="Ankündigung erstellen" actions={<Button onClick={()=>void publish()}>Veröffentlichen</Button>}>
       <div className="form-grid"><Field label="Titel" className="full"><Input value={title} onChange={e=>setTitle(e.target.value)} placeholder="Kurzer Titel"/></Field><Field label="Typ" className="full"><Select value={kind} onChange={e=>setKind(e.target.value)}><option value="information">Information</option><option value="maintenance">Wartung</option><option value="incident">Störung</option><option value="feature">Neue Funktion</option></Select></Field><Field label="Zielgruppe" className="full"><Select value={audience} onChange={e=>setAudience(e.target.value)}><option value="all">Alle Kunden</option><option value="start">Start</option><option value="business">Business</option><option value="pro">Pro</option></Select></Field><Field label="Nachricht" className="full"><Textarea value={body} onChange={e=>setBody(e.target.value)} placeholder="Nachricht..."/></Field></div>
-      <Button onClick={()=>void publish()}>Veröffentlichen</Button>
-    </section>
-    <section className="surface">
-      <SectionTitle title="Ankündigungen"/>
-      {production?(items.length?<div>{items.map(item=><div className="announcement-card" key={String(item.id)}><Status tone={item.published===true?"success":"neutral"}>{item.published===true?"Veröffentlicht":"Entwurf"}</Status><b>{String(item.title??"")}</b><p>{String(item.body??"")}</p><small>{kindLabel[String(item.kind)]??String(item.kind)} · {audienceLabel[String(item.audience)]??String(item.audience)} · {new Date(String(item.created_at)).toLocaleString("de-CH")}</small></div>)}</div>:<EmptyState icon="bell" title="Noch keine Ankündigungen" text="Veröffentlichte Hinweise erscheinen hier."/>):<div className="announcement-card"><Status tone="info">Demo</Status><b>Neue Rechnungsansicht</b><p>Beispiel-Ankündigung ohne Backend.</p><small>Demo · alle Kunden</small></div>}
-    </section>
+    </FormSheet>
+    <WorkspaceSection>
+      {production?(items.length?<div>{items.map(item=><div className="announcement-card" key={String(item.id)}><Status tone={item.published===true?"success":"neutral"}>{item.published===true?"Veröffentlicht":"Entwurf"}</Status><b>{String(item.title??"")}</b><p>{String(item.body??"")}</p><small>{kindLabel[String(item.kind)]??String(item.kind)} · {audienceLabel[String(item.audience)]??String(item.audience)} · {new Date(String(item.created_at)).toLocaleString("de-CH")}</small></div>)}</div>:<EmptyState compact icon="bell" title="Noch keine Ankündigungen" text="Veröffentlichte Hinweise erscheinen hier."/>):<div className="announcement-card"><Status tone="info">Demo</Status><b>Neue Rechnungsansicht</b><p>Beispiel-Ankündigung ohne Backend.</p><small>Demo · alle Kunden</small></div>}
+    </WorkspaceSection>
     {toast&&<Toast title={toast} tone={toast.includes("erforderlich")||toast.includes("konnte")?"danger":"success"}/>}
-  </div>;
+  </>;
 }
 
 function SecurityView() {
@@ -753,10 +632,10 @@ function SecurityView() {
   if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError} onRetry={refresh}/>;
 
   if(!production) return <>
-    <section className="surface">
+    <WorkspaceSection>
       <SectionTitle title="Interne Benutzer"/>
       <DataTable variant="operator" label="Operator-Daten"><DataTableHead className="operator-table-head security"><span>Name</span><span>Rolle</span><span>Status</span><span>Quelle</span></DataTableHead>{[["Oemer Cam","Administrator","Aktiv","Microsoft Entra"],["Maria Bianchi","Support","Aktiv","Microsoft Entra"],["Luca Schneider","Support","Aktiv","Microsoft Entra"],["Anna Pross","Finanzen","Aktiv","Microsoft Entra"]].map(r=><DataTableRow className="operator-table-row security" key={r[0]}><span><b>{r[0]}</b></span><span>{r[1]}</span><span><Status tone="success">{r[2]}</Status></span><span>{r[3]}</span></DataTableRow>)}</DataTable>
-    </section>
+    </WorkspaceSection>
   </>;
 
   const roleLabel:Record<string,string>={
@@ -767,36 +646,20 @@ function SecurityView() {
     platform_auditor:"Audit"
   };
   return <>
-    <section className="surface">
+    <WorkspaceSection>
       <SectionTitle title="Microsoft Entra Zugriffe"/>
       <p className="technical-hint">Interne Identitäten, MFA und Rollen werden in Microsoft Entra ID verwaltet. Binso One zeigt hier nur die zuletzt synchronisierte Berechtigung.</p>
-      {items.length?<DataTable variant="operator" label="Operator-Daten"><DataTableHead className="operator-table-head security"><span>Benutzer</span><span>Rolle</span><span>Status</span><span>Synchronisiert</span></DataTableHead>{items.map(item=><DataTableRow className="operator-table-row security" key={String(item.user_id)}><span><b>{String(item.display_name??item.email??"")}</b><small>{String(item.email??"")}</small></span><span>{roleLabel[String(item.role)]??String(item.role)}</span><span><Status tone={item.active===true?"success":"neutral"}>{item.active===true?"Aktiv":"Inaktiv"}</Status></span><span>{item.last_entra_sync_at?new Date(String(item.last_entra_sync_at)).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"}):"—"}</span></DataTableRow>)}</DataTable>:<EmptyState icon="lock" title="Noch keine Entra-Anmeldung" text="Sobald ein berechtigter Binso-Mitarbeiter sich über Microsoft anmeldet, erscheint die Identität hier."/>}
-    </section>
-    <section className="surface security-card"><div className="security-row"><div><b>Berechtigungen in Azure verwalten</b><p>Zuweisungen erfolgen ausschliesslich über die Binso-One-App-Rollen in Microsoft Entra ID. Lokale Operator-Passwörter und lokale Rollenzuweisungen sind für Produktion deaktiviert.</p></div><Status tone="success">Entra verwaltet</Status><Button variant="secondary" disabled>Azure / Entra</Button></div></section>
+      {items.length?<DataTable variant="operator" label="Operator-Daten"><DataTableHead className="operator-table-head security"><span>Benutzer</span><span>Rolle</span><span>Status</span><span>Synchronisiert</span></DataTableHead>{items.map(item=><DataTableRow className="operator-table-row security" key={String(item.user_id)}><span><b>{String(item.display_name??item.email??"")}</b><small>{String(item.email??"")}</small></span><span>{roleLabel[String(item.role)]??String(item.role)}</span><span><Status tone={item.active===true?"success":"neutral"}>{item.active===true?"Aktiv":"Inaktiv"}</Status></span><span>{item.last_entra_sync_at?new Date(String(item.last_entra_sync_at)).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"}):"—"}</span></DataTableRow>)}</DataTable>:<EmptyState compact icon="lock" title="Noch keine Entra-Anmeldung" text="Sobald ein berechtigter Binso-Mitarbeiter sich über Microsoft anmeldet, erscheint die Identität hier."/>}
+    </WorkspaceSection>
+    <WorkspaceSection><SectionTitle title="Berechtigungen verwalten"/><p className="technical-hint">Rollen und MFA werden in Microsoft Entra ID verwaltet. Die Liste zeigt den zuletzt synchronisierten Stand.</p></WorkspaceSection>
   </>;
 }
 
 function AuditView() {
-  const production=useBackendMode();
-  
-  const resource=useApiQuery<{items:Array<Record<string,unknown>>}>(production?"/api/operator/audit":null);
-  const items=resource.data?.items??[];
-  const loading=resource.loading,loadError=resource.error,refresh=resource.refresh;
-  const [query,setQuery]=useState("");
-  const demoAuditRows=[["10:42","ocam","Kunde aktualisiert","Acme AG (Demo)"],["09:18","lschneider","Sperrung erstellt","Demo"],["Gestern","mbianchi","Ticket Status geändert","#8419 → In Bearbeitung"]].filter(row=>!query.trim()||row.join(" ").toLowerCase().includes(query.trim().toLowerCase()));
-
-  
-
-  if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError} onRetry={refresh}/>;
-
-  if(!production) return <section className="surface">
-    <div className="operator-toolbar"><span className="operator-demo-filter">Demo · letzte 7 Tage</span><ListSearch value={query} onChange={setQuery} placeholder="Audit durchsuchen..."/></div>
-    <DataTable variant="operator" label="Operator-Daten"><DataTableHead className="operator-table-head audit"><span>Zeit</span><span>Benutzer</span><span>Aktion</span><span>Details</span></DataTableHead>{demoAuditRows.map(r=><DataTableRow className="operator-table-row audit" key={r.join("-")}>{r.map((x,i)=><span key={i}>{i===2?<b>{x}</b>:x}</span>)}</DataTableRow>)}</DataTable>
-  </section>;
-
-  const visible=items.filter(item=>!query.trim()||JSON.stringify(item).toLowerCase().includes(query.trim().toLowerCase()));
-  return <section className="surface">
-    <div className="operator-toolbar"><span className="operator-demo-filter">Operator Audit</span><ListSearch value={query} onChange={setQuery} placeholder="Audit durchsuchen..."/></div>
-    {visible.length?<DataTable variant="operator" label="Operator-Daten"><DataTableHead className="operator-table-head audit"><span>Zeit</span><span>Operator</span><span>Aktion</span><span>Ziel</span></DataTableHead>{visible.map(item=><DataTableRow className="operator-table-row audit" key={String(item.id)}><span>{new Date(String(item.created_at)).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"})}</span><span>{String(item.operator_user_id).slice(0,8)}</span><span><b>{String(item.action)}</b></span><span>{[item.target_type,item.target_id].filter(Boolean).map(String).join(" · ")||"—"}</span></DataTableRow>)}</DataTable>:<EmptyState icon="file" title="Keine Audit-Einträge" text="Operator-Aktionen werden hier nachvollziehbar protokolliert."/>}
-  </section>;
+ const production=useBackendMode();
+ const resource=useApiQuery<{items:Array<{id:string;createdAt:string|null;userName:string|null;userEmail:string|null;action:string;entityType:string|null;entityId:string|null}>}>(production?'/api/operator/audit':null);
+ const columns=[{label:'Zeit',index:0},{label:'Operator',index:1},{label:'Aktion',index:2},{label:'Ziel',index:3}];
+ const controller=useRecordsController({placeholder:'Audit durchsuchen...',chips:['Alle'],columns});
+ const rows=production?(resource.data?.items??[]).map(item=>[item.createdAt&&Number.isFinite(Date.parse(item.createdAt))?new Date(item.createdAt).toLocaleString('de-CH',{dateStyle:'short',timeStyle:'short'}):'Zeitpunkt nicht verfügbar',item.userName||item.userEmail||'System',item.action==='operator.entra_login'?'Microsoft-Anmeldung':item.action,[item.entityType,item.entityId].filter(Boolean).map(String).join(' · ')||'—']):[['10:42','ocam','Kunde aktualisiert','Acme AG (Demo)'],['09:18','lschneider','Sperrung erstellt','Demo'],['Gestern','mbianchi','Ticket Status geändert','#8419 → In Bearbeitung']];
+ return <><RecordsControls inline controller={controller} placeholder="Audit durchsuchen..." chips={['Alle']} columns={columns}/><RecordsView controller={controller} toolbarActions={false} filterSummary={false} showCount={false} items={rows} loading={production&&resource.loading} error={resource.error} placeholder="Audit durchsuchen..." countLabel="Audit-Einträge" chips={['Alle']} columns={columns}>{row=><RecordRow compact valuePlacement="metadata" title={row[2]} meta={[row[0],row[1],row[3]].join(' · ')}/>}</RecordsView>{resource.error&&<Button variant="secondary" onClick={resource.refresh}>Erneut versuchen</Button>}</>;
 }

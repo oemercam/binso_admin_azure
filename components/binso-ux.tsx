@@ -1,6 +1,6 @@
 "use client";
 
-import { Children, isValidElement, cloneElement, useState, useRef, useEffect, type ReactNode } from "react";
+import { Children, isValidElement, cloneElement, useState, useRef, useEffect, type ReactNode, type CSSProperties } from "react";
 import Link from "next/link";
 import { createPortal } from "react-dom";
 import { useDialogFocus } from "./use-dialog-focus";
@@ -50,12 +50,17 @@ export function DetailHeading({ title, status, tone = "neutral", subtitle, leadi
   </div>;
 }
 
-export function MetricTiles({ children }: { children: ReactNode }) {
-  return <div className="metrics-grid bo-metric-tiles">{children}</div>;
+export function MetricTiles({ children, columns=4 }: { children: ReactNode;columns?:2|3|4 }) {
+  return <div className="metrics-grid bo-metric-tiles" style={{"--metric-columns":columns} as CSSProperties}>{children}</div>;
 }
 
 export function MetricTile({ label, value, hint }: { label: string; value: ReactNode; hint?:string }) {
   return <Metric label={label} value={value} hint={hint}/>;
+}
+
+/** Open workspace sections share page spacing without adding nested card chrome. */
+export function WorkspaceSection({children,className=""}:{children:ReactNode;className?:string}){
+ return <section className={`bo-workspace-section ${className}`.trim()}>{children}</section>;
 }
 
 /** Route links and local detail tabs keep their behavior and share one container. */
@@ -118,8 +123,8 @@ export function ActionsMenu({label, children, busy=false}: {label:string;childre
 }
 
 /** Canonical two-line row shared by entity and financial lists. */
-export function ListRow({href,onClick,title,meta,value,valueLabel,status,tone="neutral",compact=false}:{href?:string;onClick?:()=>void;title:ReactNode;meta:ReactNode;value?:ReactNode;valueLabel?:string;status?:string;tone?:"success"|"warning"|"danger"|"neutral"|"info";compact?:boolean}){
+export function ListRow({href,onClick,title,meta,value,valueLabel,status,tone="neutral",compact=false,valuePlacement="separate"}:{href?:string;onClick?:()=>void;title:ReactNode;meta:ReactNode;value?:ReactNode;valueLabel?:string;status?:string;tone?:"success"|"warning"|"danger"|"neutral"|"info";compact?:boolean;valuePlacement?:"separate"|"metadata"}){
  const content=<><b>{title}</b>{status&&<Status tone={tone}>{status}</Status>}<small>{meta}</small>{value!=null&&<span className="document-summary-amount">{valueLabel&&<small>{valueLabel}</small>}<strong>{value}</strong></span>}</>;
- const className=`document-summary-row${value!=null?" has-value":""}${compact?" is-compact":""}`;
+ const className=`document-summary-row${value!=null?" has-value":""}${compact?" is-compact":""}${valuePlacement==="metadata"?" has-inline-value":""}`;
  return href?<Link prefetch={false} href={href} className={className}>{content}</Link>:onClick?<button type="button" onClick={onClick} className={className}>{content}</button>:<div className={className}>{content}</div>;
 }

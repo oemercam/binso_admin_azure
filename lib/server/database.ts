@@ -1,5 +1,6 @@
 import "server-only";
 import {createHash} from "node:crypto";
+import {operatorCustomerReadings} from "./repositories/operator-customer-overview";
 import {listOperatorBusiness,insertOperatorBusiness,updateOperatorBusiness} from "./repositories/operator-api";
 import {platformAudit} from "./operator/audit";
 import { canonicalApiTables, listApiBusiness, translateBusinessWrite, mutateApiBusiness } from "./repositories/business-api";
@@ -113,7 +114,7 @@ export async function operatorRpc<T>(operation:string,args:Row={}):Promise<T>{
   const filter="id=eq."+encodeURIComponent(String(args.p_tenant_id));
   const tenant=(await listOperatorBusiness(c,s,"tenants",filter))[0];
   if(!tenant)throw new ApiError(404,"not_found","Kunde wurde nicht gefunden.");
-  const users=await c.query("select count(*)::int n from organization_memberships where organization_id=$1 and status='active'",[tenant.id]);
-  return {tenant,account:tenant.account,users:users.rows[0].n} as T;
- });
+  const readings=await operatorCustomerReadings(c,s,String(tenant.id));
+  return {tenant,account:tenant.account,...readings} as T;
+ },{snapshot:true});
 }

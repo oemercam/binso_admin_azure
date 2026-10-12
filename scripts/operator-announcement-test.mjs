@@ -1,0 +1,38 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import {PGlite} from '@electric-sql/pglite';
+import {pgcrypto} from '@electric-sql/pglite/contrib/pgcrypto';
+import {moduleUrl} from './data-test-modules.mjs';
+const read=file=>fs.readFile(file,'utf8');
+const http=moduleUrl((await read('lib/server/http.ts')).replace('"next/server"',JSON.stringify(import.meta.resolve('next/server.js'))));
+const validation=moduleUrl((await read('lib/server/validation.ts')).replace('import "server-only";','').replace('"./http"',JSON.stringify(http)));
+const permissions=moduleUrl(await read('lib/permissions.ts'));
+const authorization=moduleUrl((await read('lib/server/operator/rbac.ts')).replace('import "server-only";','').replace('"@/lib/permissions"',JSON.stringify(permissions)));
+const env=moduleUrl('export const env={};export function requireDatabaseUrl(){throw Error("External database forbidden");}');
+const dbModule=moduleUrl((await read('lib/server/db.ts')).replace('import "server-only";','').replace('"pg"',JSON.stringify(import.meta.resolve('pg'))).replace('"@/lib/server/env"',JSON.stringify(env)));
+const audit=moduleUrl((await read('lib/server/operator/audit.ts')).replace('import "server-only";','').replace('"@/lib/server/db"',JSON.stringify(dbModule)));
+const session=moduleUrl('export async function requireOperatorSession(){return globalThis.announcementSession;}');
+let source=await read('app/api/operator/announcements/route.ts');
+for(const [name,url] of [['operator/session',session],['operator/rbac',authorization],['operator/audit',audit],['db',dbModule],['http',http],['validation',validation]])source=source.replace('"@/lib/server/'+name+'"',JSON.stringify(url));
+const {POST}=await import(moduleUrl(source));
+const {NextRequest}=await import('next/server.js');
+const db=new PGlite({extensions:{pgcrypto}});let failAudit=false;
+try{
+ await db.exec('create extension pgcrypto;create role schema_owner;grant usage,create on schema public to schema_owner;set role schema_owner');
+ for(const name of (await fs.readdir('database/migrations')).filter(n=>n.endsWith('.sql')).sort())await db.exec(await read('database/migrations/'+name));
+ const query=async(text,values)=>{if(failAudit&&text.includes('insert into platform_audit_events'))throw Error('Synthetic audit failure');return db.query(text,values);};
+ globalThis.__binsoPool={query,connect:async()=>({query,release(){}})};
+ const request=(origin='http://localhost',body={title:'Synthetic notice',message:'Isolated test only',kind:'info'})=>new NextRequest('http://localhost/api/operator/announcements',{method:'POST',headers:{origin,'content-type':'application/json'},body:JSON.stringify(body)});
+ for(const role of ['platform_support','platform_billing','platform_auditor']){globalThis.announcementSession={role,userId:'fixture',email:'fixture@invalid.test'};assert.equal((await POST(request())).status,403);}
+ globalThis.announcementSession={role:'platform_owner',userId:'fixture',email:'fixture@invalid.test'};
+ assert.equal((await POST(request('https://invalid.test'))).status,403);
+ assert.equal((await POST(request('http://localhost',{title:'x'}))).status,400);
+ assert.equal(Number((await db.query('select count(*) n from platform_announcements')).rows[0].n),0);
+ const response=await POST(request());assert.equal(response.status,201);const item=(await response.json()).item;
+ const row=(await db.query('select actor_user_id,actor_email,action,entity_type,entity_id,metadata from platform_audit_events where entity_id=$1',[item.id])).rows[0];
+ assert.deepEqual(row,{actor_user_id:'fixture',actor_email:'fixture@invalid.test',action:'platform.announcement.created',entity_type:'announcement',entity_id:item.id,metadata:{kind:'info'}});
+ failAudit=true;assert.equal((await POST(request())).status,500);failAudit=false;
+ assert.equal(Number((await db.query('select count(*) n from platform_announcements')).rows[0].n),1,'Audit failure rolls back announcement');
+ assert.equal(Number((await db.query('select count(*) n from platform_audit_events')).rows[0].n),1,'No orphan or duplicate audit');
+ console.log('Announcement API: actual RBAC/origin/validation, migrated persistence+audit, real transaction rollback on audit failure passed.');
+}finally{delete globalThis.__binsoPool;delete globalThis.announcementSession;await db.close();}

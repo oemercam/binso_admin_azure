@@ -1,14 +1,16 @@
-import {NextRequest,NextResponse} from "next/server";
+import {NextRequest} from "next/server";
+import {redirect} from "next/navigation";
 import {getEntraOperatorIdentity} from "@/lib/server/operator/entra";
 import {createOperatorSession} from "@/lib/server/operator/session";
-import {query,withTransaction} from "@/lib/server/db";
+import {withTransaction} from "@/lib/server/db";
 import {platformAudit} from "@/lib/server/operator/audit";
 
 export const runtime="nodejs";
 
 export async function GET(request:NextRequest){
   const identity=await getEntraOperatorIdentity();
-  if(!identity)return NextResponse.redirect(new URL("/operator/login?error=entra_access_denied",request.url));
+  // Relative redirects retain the public host behind App Service's reverse proxy.
+  if(!identity)redirect("/operator/login?error=entra_access_denied");
 
   const fallbackUserId=`entra:${identity.tenantId}:${identity.objectId}`;
   const userId=await withTransaction(async client=>{
@@ -35,5 +37,5 @@ export async function GET(request:NextRequest){
   await platformAudit({userId,userEmail:identity.email,action:"operator.entra_login",entityType:"platform_operator",entityId:userId,metadata:{role:identity.role,appRole:identity.appRole}});
 
   const next=request.nextUrl.searchParams.get("next");
-  return NextResponse.redirect(new URL(next?.startsWith("/operator")?next:"/operator",request.url));
+  redirect(next==="/operator"||next?.startsWith("/operator/")?next:"/operator");
 }

@@ -1,0 +1,6 @@
+{
+  "baseline": "e33af0192e8c810aebf1845e5622089ec325b8e0",
+  "markupEqual": true,
+  "sha256": "14c42d6fd5639d8d1febf4861559d00eacbbf94c0b7f71715a3aa11c49a3c1f0",
+  "method": "Byte-for-byte comparison of operator-mobile-nav and mobile-more rendering block; CSS/runtime contracts in navigation-foundation-test.mjs"
+}

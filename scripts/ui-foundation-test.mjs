@@ -28,6 +28,15 @@ const body=ast.statements.filter(n=>!ts.isImportDeclaration(n)).map(n=>n.getText
 const compiled=ts.transpileModule(body,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
 let write=true;const ui={};Function('require','exports','Children','cloneElement','isValidElement','useId','usePageAccess','Link',compiled)(require,ui,React.Children,React.cloneElement,React.isValidElement,React.useId,()=>({write,canOpen:()=>true}),({children,...props})=>React.createElement('a',props,children));
 const html=element=>renderToStaticMarkup(element);
+for(const expanded of [false,true]){
+ const disclosure=html(React.createElement(ui.Button,{'aria-expanded':expanded,'aria-controls':'further-readings','aria-label':'Weitere Auswertungen'},'Mehr anzeigen'));
+ assert.ok(disclosure.includes(`aria-expanded="${expanded}"`),'Shared disclosure button exposes its actual expanded state');
+ assert.ok(disclosure.includes('aria-controls="further-readings"'),'Shared button retains its controlled-region association');
+ assert.ok(disclosure.includes('aria-label="Weitere Auswertungen"'),'Native accessible name is forwarded');
+}
+const ariaLink=html(React.createElement(ui.Button,{href:'/operator/monitoring','aria-describedby':'source-description'},'Monitoring'));
+assert.ok(ariaLink.includes('aria-describedby="source-description"'),'Shared link button forwards ARIA descriptions');
+write=false;assert.ok(html(React.createElement(ui.Button,{requiresWrite:true,'aria-expanded':false},'Geschützte Aktion')).includes('disabled=""'),'ARIA forwarding preserves write protection');write=true;
 const invalid=html(React.createElement(ui.Field,{label:'E-Mail',error:'Ungültig',hint:'Geschäftlich'},React.createElement(ui.Input,{'aria-describedby':'existing',type:'email'})));
 assert.ok(invalid.includes('aria-invalid="true"'));assert.ok(invalid.includes('aria-labelledby="'));const labelId=invalid.match(/aria-labelledby="([^"]+)"/)[1];assert.ok(invalid.includes(`id="${labelId}">E-Mail</span>`),'Accessible name excludes validation/help text');const description=invalid.match(/aria-describedby="([^"]+)"/)[1].split(' ');assert.equal(description[0],'existing');for(const id of description.slice(1))assert.ok(invalid.includes(`id="${id}"`),'Hint/error belongs to its actual control');assert.ok(invalid.includes('role="alert"'));
 const valid=html(React.createElement(ui.Field,{label:'Name'},React.createElement(ui.Input)));assert.ok(!valid.includes('aria-invalid'));assert.ok(!valid.includes('role="alert"'));
