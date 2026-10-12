@@ -6,7 +6,7 @@ import {startScannerBridge} from './scanner-bridge.mjs';
 
 const socketPath='/tmp/binso-scanner/clamd.sock',container=process.env.BINSO_SCANNER_TEST_CONTAINER;
 assert.ok(container,'Explicit isolated scanner container required');
-const report={engine:null,cases:[],baseImage:process.env.BINSO_SCANNER_BASE_IMAGE??null};
+const report={qualified:false,engine:null,cases:[],baseImage:process.env.BINSO_SCANNER_BASE_IMAGE??null};
 const close=await startScannerBridge();
 try{
  for(let attempt=0;;attempt++){
@@ -32,7 +32,7 @@ try{
   catch{if(attempt>=300)throw Error('Engine did not recover after restart');await new Promise(resolve=>setTimeout(resolve,1000));}
  }
  const state=JSON.parse(execFileSync('docker',['inspect',container,'--format','{{json .State}}'],{encoding:'utf8'}));assert.equal(state.OOMKilled,false);report.cases.push('restart recovery within configured memory limit');
- console.log('REAL CLAMAV QUALIFICATION PASSED',report);
+ report.qualified=true;console.log('REAL CLAMAV QUALIFICATION PASSED',report);
 }finally{
  await close();const output=process.env.BINSO_SCANNER_OUTPUT??'/tmp/binso-scanner-qualification';await fs.mkdir(output,{recursive:true});await fs.writeFile(output+'/results.json',JSON.stringify(report,null,2)+'\n');
 }

@@ -1,4 +1,5 @@
 import {spawn} from 'node:child_process';
+import {fileURLToPath} from 'node:url';
 import {startScannerBridge} from './scanner-bridge.mjs';
 import {scannerVersion} from '../lib/server/clamav-protocol.mjs';
 
@@ -8,7 +9,7 @@ if(process.env.BINSO_SCANNER_SIDECAR==='true'){
  if(process.env.FILE_SCAN_SOCKET!=='/tmp/binso-scanner/clamd.sock')throw Error('Scanner socket configuration mismatch');
  closeBridge=await startScannerBridge();
 }
-const server=spawn(process.execPath,['server.js'],{env:{...process.env,HOSTNAME:'0.0.0.0'},stdio:'inherit'});
+const server=spawn(process.execPath,['server.js'],{cwd:fileURLToPath(new URL('../',import.meta.url)),env:{...process.env,HOSTNAME:'0.0.0.0'},stdio:'inherit'});
 let previous,stopping=false;
 const health=closeBridge?setInterval(()=>{void scannerVersion({socketPath:process.env.FILE_SCAN_SOCKET,deadline:Date.now()+1000}).then(()=>record('ready'),()=>record('unavailable'));},60000):undefined;
 function record(state){if(state!==previous){previous=state;console.log(JSON.stringify({category:'file_scan_health',state}));}}

@@ -222,6 +222,62 @@ jobs:
           node -e 'const p=JSON.parse(process.argv[1]);if(!p.access_token)process.exit(1)' "$TOKEN_RESPONSE"
           echo "Microsoft Graph client-credentials authentication passed."
 
+      - name: Inspect explicitly activated scanner configuration
+        id: scanner
+        shell: bash
+        run: |
+          set -euo pipefail
+          ENABLED="$(az webapp config appsettings list -g "$AZURE_RESOURCE_GROUP" -n "$AZURE_WEBAPP_NAME" --query "[?name=='BINSO_SCANNER_SIDECAR'].value | [0]" -o tsv)"
+          if [ "$ENABLED" != true ]; then
+            echo 'enabled=false' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          PLAN_ID="$(az webapp show -g "$AZURE_RESOURCE_GROUP" -n "$AZURE_WEBAPP_NAME" --query serverFarmId -o tsv)"
+          SKU="$(az appservice plan show --ids "$PLAN_ID" --query sku.name -o tsv)"
+          case "$SKU" in P1v3|P1v4) ;; *) echo '::error::Scanner requires an approved 8 GiB worker plan'; exit 1 ;; esac
+          REGISTRY="$(az webapp config appsettings list -g "$AZURE_RESOURCE_GROUP" -n "$AZURE_WEBAPP_NAME" --query "[?name=='BINSO_SCANNER_REGISTRY'].value | [0]" -o tsv)"
+          IDENTITY="$(az webapp config appsettings list -g "$AZURE_RESOURCE_GROUP" -n "$AZURE_WEBAPP_NAME" --query "[?name=='BINSO_SCANNER_PULL_IDENTITY_CLIENT_ID'].value | [0]" -o tsv)"
+          SOCKET="$(az webapp config appsettings list -g "$AZURE_RESOURCE_GROUP" -n "$AZURE_WEBAPP_NAME" --query "[?name=='FILE_SCAN_SOCKET'].value | [0]" -o tsv)"
+          [[ "$REGISTRY" =~ ^[a-z0-9]{5,50}$ ]]
+          [[ "$IDENTITY" =~ ^[a-fA-F0-9-]{36}$ ]]
+          test "$SOCKET" = /tmp/binso-scanner/clamd.sock
+          az webapp identity show -g "$AZURE_RESOURCE_GROUP" -n "$AZURE_WEBAPP_NAME" --query 'userAssignedIdentities.*.clientId' -o json | jq -e --arg id "$IDENTITY" 'index($id) != null' > /dev/null
+          echo 'enabled=true' >> "$GITHUB_OUTPUT"
+          echo "registry=$REGISTRY" >> "$GITHUB_OUTPUT"
+          echo "identity=$IDENTITY" >> "$GITHUB_OUTPUT"
+
+      - name: Download exact Quality-qualified scanner
+        if: steps.scanner.outputs.enabled == 'true'
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: binso-scanner-${{ env.BINSO_DEPLOY_SHA }}
+          path: scanner-image
+          github-token: ${{ github.token }}
+          run-id: ${{ steps.verified.outputs.run_id }}
+
+      - name: Publish qualified scanner and bind immutable sidecar
+        if: steps.scanner.outputs.enabled == 'true'
+        shell: bash
+        env:
+          SCANNER_REGISTRY: ${{ steps.scanner.outputs.registry }}
+          SCANNER_PULL_IDENTITY: ${{ steps.scanner.outputs.identity }}
+        run: |
+          set -euo pipefail
+          EXPECTED_ID="$(node scripts/verify-scanner-image.mjs scanner-image "$BINSO_DEPLOY_SHA")"
+          docker load --input scanner-image/image.tar.gz
+          test "$(docker image inspect binso-scanner-qualification --format '{{.Id}}')" = "$EXPECTED_ID"
+          az acr login --name "$SCANNER_REGISTRY" --output none
+          IMAGE="$SCANNER_REGISTRY.azurecr.io/binso-scanner:$BINSO_DEPLOY_SHA"
+          docker tag binso-scanner-qualification "$IMAGE"
+          docker push "$IMAGE"
+          DIGEST="$(az acr repository show --name "$SCANNER_REGISTRY" --image "binso-scanner:$BINSO_DEPLOY_SHA" --query digest -o tsv)"
+          [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
+          az deployment group create --resource-group "$AZURE_RESOURCE_GROUP" \
+            --name "scanner-${BINSO_DEPLOY_SHA:0:12}" --mode Incremental \
+            --template-file infrastructure/scanner/sidecar.bicep \
+            --parameters "appName=$AZURE_WEBAPP_NAME" "scannerImage=$SCANNER_REGISTRY.azurecr.io/binso-scanner@$DIGEST" "registryPullIdentityClientId=$SCANNER_PULL_IDENTITY" \
+            --output none
+
       - name: Inspect production startup entry point
         shell: bash
         run: |
@@ -235,7 +291,7 @@ jobs:
           package: deploy/binso-one.zip
           # Each release is isolated from files left by earlier deployments.
           target-path: /home/site/wwwroot
-          startup-command: node /home/site/wwwroot/server.js
+          startup-command: node /home/site/wwwroot/scripts/start-scanner-production.mjs
 
       - name: Wait for deployed worker
         shell: bash
