@@ -58,6 +58,8 @@ try{
  assert.deepEqual(speculativeGovernance,[],'Desktop admin navigation does not preload authenticated pages');
  await page.locator('.operator-sidebar a[href="/operator/sicherheit"]').click();await page.waitForURL(base+'/operator/sicherheit');await page.locator('.operator-page-head h1').waitFor();await page.waitForLoadState('networkidle');
  assert.equal(await page.getByRole('heading',{name:'Keine Berechtigung für diesen Bereich',exact:true}).count(),0,'Explicit authenticated sidebar navigation still works');
+ // The independent wallboard opens in its own document; keep the portal mounted.
+ const portalPage=page;page=await context.newPage();observeErrors(page);
  for(const theme of ['light','dark'])for(const width of [390,768,1920,2560,3840]){
   await page.setViewportSize({width,height:width>=1920?Math.round(width*9/16):900});await page.goto(base+'/operator/wallboard');await page.getByRole('heading',{name:'Binso One · Monitoring',exact:true}).waitFor();await page.locator('[data-metric-id="customers"]').waitFor();
   await page.evaluate(theme=>{document.documentElement.dataset.theme=theme;},theme);
@@ -69,6 +71,7 @@ try{
    if(width>=1920)assert.equal(await page.evaluate(()=>document.documentElement.scrollHeight<=innerHeight+1),true,'Wallboard fits 16:9 viewport '+width+' '+profile);await page.screenshot({path:path.join(output,theme+'-'+width+'-'+profile+'.png'),fullPage:true});results.push({theme,width,profile,passed:true});
   }
  }
+ await page.close();page=portalPage;
  await page.setViewportSize({width:390,height:900});await navigateOperator(page,'/operator/zahlungen');await page.getByText('12.34',{exact:false}).first().waitFor();
  assert.ok((await page.locator('.operator-payment-insights').innerText()).includes('CHF 12.34'),'Foreign currency excluded from CHF KPI');assert.ok((await page.locator('.operator-table-card').innerText()).includes('EUR'),'Original payment currency retained');
  await navigateOperator(page,'/operator/kunden/'+org);await page.getByText('Synthetic customer',{exact:true}).first().waitFor();assert.ok((await page.locator('.operator-customer-metrics').innerText()).includes('CHF 12.34'),'Customer metrics from actual API');assert.ok((await page.locator('.operator-customer-metrics').innerText()).includes('Limit nicht verfügbar'),'Missing entitlements never imply an unlimited account');await page.screenshot({path:path.join(output,'customer-actual-data.png'),fullPage:true});
