@@ -22,6 +22,7 @@ const audit=moduleUrl((await read('lib/server/operator/audit.ts')).replace('impo
 const session=moduleUrl('export async function requireOperatorSession(){return globalThis.operatorContractSession;}');
 const database=moduleUrl(`import {withPlatform} from ${JSON.stringify(dbModule)};import {listOperatorBusiness} from ${JSON.stringify(repo)};export async function operatorList(table,_select,filters){return withPlatform(c=>listOperatorBusiness(c,globalThis.operatorContractSession,table,filters));}`);
 async function route(file){let source=await read(file);for(const [name,url] of [['operator/session',session],['operator/rbac',authorization],['operator/audit',audit],['db',dbModule],['http',http],['repositories/operator-api',repo],['database',database]])source=source.replaceAll('"@/lib/server/'+name+'"',JSON.stringify(url)).replaceAll("'@/lib/server/"+name+"'",JSON.stringify(url));return import(moduleUrl(source));}
+const accounts=await route('app/api/operator/accounts/[id]/route.ts');
 const restrictions=await route('app/api/operator/restrictions/route.ts'),remove=await route('app/api/operator/restrictions/[id]/route.ts'),tickets=await route('app/api/operator/tickets/[id]/route.ts'),messages=await route('app/api/operator/tickets/[id]/messages/route.ts');
 const {NextRequest}=await import('next/server.js');
 const db=new PGlite({extensions:{pgcrypto}});let failAudit=false;
@@ -62,6 +63,13 @@ try{
  const conversation=await repository.listOperatorBusiness(client,globalThis.operatorContractSession,'support_messages','ticket_id=eq.'+ticket.id+'&order=created_at.asc');assert.equal(conversation[0].body,'Earlier message','Requested chronological order honored');
  await assert.rejects(()=>repository.listOperatorBusiness(client,globalThis.operatorContractSession,'support_messages','order=created_at.desc;drop'),/Sortierung/);
  const account=(await repository.updateOperatorBusiness(client,globalThis.operatorContractSession,'tenant_accounts','tenant_id=eq.'+org,{subscription_status:'past_due'}))[0];assert.equal(account.subscription_status,'past_due');assert.equal(account.tenant.name,'Contract customer','Full mutation response');
+ const accountParams={params:Promise.resolve({id:org})};
+ assert.equal((await accounts.PATCH(req('/api/operator/accounts/'+org,{userLimit:5},'PATCH'),accountParams)).status,409,'Missing entitlements cannot report a saved user limit');
+ await db.query('insert into organization_entitlements(organization_id,max_users) values($1,3)',[org]);
+ const limitResponse=await accounts.PATCH(req('/api/operator/accounts/'+org,{userLimit:5},'PATCH'),accountParams);assert.equal(limitResponse.status,200);assert.equal((await limitResponse.json()).item.user_limit,5);
+ failAudit=true;assert.equal((await accounts.PATCH(req('/api/operator/accounts/'+org,{userLimit:6},'PATCH'),accountParams)).status,500);failAudit=false;assert.equal((await db.query('select max_users from organization_entitlements where organization_id=$1',[org])).rows[0].max_users,5,'Account audit failure rolls back the limit');
+ await db.query("update organization_subscriptions set billing_subscription_id='sub_fixture' where organization_id=$1",[org]);assert.equal((await accounts.PATCH(req('/api/operator/accounts/'+org,{plan:'pro'},'PATCH'),accountParams)).status,409,'Stripe subscription cannot be overwritten locally');
+ globalThis.operatorContractSession={role:'platform_billing',userId:'fixture',email:'fixture@invalid.test'};assert.equal((await accounts.PATCH(req('/api/operator/accounts/'+org,{accountStatus:'suspended'},'PATCH'),accountParams)).status,403,'Billing role cannot bypass restriction permission through the account API');
  globalThis.operatorContractSession={role:'platform_support',userId:'fixture',email:'fixture@invalid.test'};
  assert.equal((await restrictions.POST(req('/api/operator/restrictions',body))).status,403);
  console.log('Admin contracts: page access, actual migrated ticket/account responses, chronological messages, restriction precedence, expiry validation, role denial and atomic audit rollback passed.');
