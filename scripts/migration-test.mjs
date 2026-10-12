@@ -38,8 +38,11 @@ try{
  await db.exec('reset role');
  const demoProfiles=(await db.query("select c.id,c.city,c.address,c.email,(select count(*)::int from customer_contacts cc where cc.organization_id=c.organization_id and cc.customer_id=c.id and cc.is_primary and cc.archived_at is null) primary_contacts from customers c where c.organization_id=$1 and c.external_id in ('demo-customer-acme','demo-customer-alpin','demo-customer-nova')",[demo])).rows;
  assert.equal(demoProfiles.length,3);assert.ok(demoProfiles.every(c=>c.city&&c.address&&c.email&&!c.email.endsWith('example.invalid')&&c.primary_contacts===1),'Every canonical demo customer needs a plausible profile and one main contact');
- await db.exec(`create role tenant_probe; grant usage on schema public to tenant_probe; grant select,insert,update,delete on all tables in schema public to tenant_probe;`);
- await db.exec('set role tenant_probe');
+ await db.exec(await fs.readFile('database/operations/provision-runtime-role.sql','utf8'));
+ await db.exec('set role binso_runtime');
+ await db.exec(await fs.readFile('scripts/sql/runtime-role-check.sql','utf8'));
+ await assert.rejects(()=>db.query('select * from schema_migrations'),/permission denied|does not exist/);
+ await assert.rejects(()=>db.exec('alter table invoices add column forbidden_runtime_ddl integer'),/owner/);
  assert.equal((await db.query('select count(*)::int n from invoices')).rows[0].n,0);
  await db.query("select set_config('app.organization_id',$1,false)",[demo]);
  assert.ok((await db.query('select count(*)::int n from invoices')).rows[0].n>20);
@@ -226,7 +229,7 @@ try{
  await db.query("insert into file_contents(file_id,organization_id,body) values($1,$2,convert_to('test','utf8'))",[fileId,sandbox]);
  assert.equal((await db.query("select convert_from(body,'utf8') value from file_contents where file_id=$1",[fileId])).rows[0].value,'test');
  await assert.rejects(db.query("update file_contents set body=convert_to('fail','utf8') where file_id=$1",[fileId]),e=>e.code==='23514');
- await db.exec('set role tenant_probe');await db.query("select set_config('app.organization_id',$1,false)",[demo]);
+ await db.exec('set role binso_runtime');await db.query("select set_config('app.organization_id',$1,false)",[demo]);
  assert.equal((await db.query('select * from file_contents where file_id=$1',[fileId])).rows.length,0);
  await db.exec('reset role');
  assert.equal((await db.query("select count(*)::int n from pg_constraint where contype='f' and not convalidated")).rows[0].n,0);
@@ -251,7 +254,7 @@ try{
   await db.query("insert into customers(organization_id,external_id,customer_no,name) values($1,'same-external-id','K-001',$2)",[trial.organizationId,`Customer ${i}`]);
  }
  assert.equal(new Set(trialTenants).size,50);
- await db.exec('set role tenant_probe');
+ await db.exec('set role binso_runtime');
  for(const [i,organizationId] of trialTenants.entries()){
   await db.query("select set_config('app.organization_id',$1,false)",[organizationId]);
   const visible=await db.query('select organization_id,name from customers');
@@ -267,13 +270,16 @@ try{
  console.log('50 independently provisioned trial tenants: read/write/delete isolation passed (non-superuser RLS).');
 
  // Expired unpaid trials must become read-only while paid/Stripe-linked trials stay untouched.
- const lifecycleDb=dataModule('export async function query(text,params=[]){return globalThis.__lifecycleQuery(text,params)}');
+ const lifecycleDb=dataModule('export async function query(text,params=[]){return globalThis.__lifecycleQuery(text,params)} export async function withTenant(org,user,fn){return globalThis.__lifecycleTenant(org,user,fn)}');
  globalThis.__lifecycleQuery=(text,params)=>db.query(text,params);
+ globalThis.__lifecycleTenant=(org,user,fn)=>db.transaction(async c=>{await c.query("select set_config('app.organization_id',$1,true),set_config('app.user_id',$2,true)",[org,user]);return fn(c)});
  const lifecycleSource=(await fs.readFile('lib/server/subscription-lifecycle.ts','utf8')).replace('import "server-only";','').replace('"@/lib/server/db"',JSON.stringify(lifecycleDb));
  const {expireUnpaidTrials}=await import(dataModule(lifecycleSource));
  const expiredTrial=await provisionOrganization({userId:'expired-trial-user',email:'expired-trial@example.invalid',name:'Expired Trial',companyName:'Expired Trial AG',plan:'start',mode:'trial'});
  await db.query("update organization_subscriptions set trial_until=now()-interval '1 day' where organization_id=$1",[expiredTrial.organizationId]);
- await expireUnpaidTrials();
+ await expireUnpaidTrials(demo);
+ assert.equal((await db.query('select status from organization_subscriptions where organization_id=$1',[expiredTrial.organizationId])).rows[0].status,'trial','An authenticated tenant check cannot expire another tenant');
+ await expireUnpaidTrials(expiredTrial.organizationId);
  assert.equal((await db.query('select status from organization_subscriptions where organization_id=$1',[expiredTrial.organizationId])).rows[0].status,'expired');
  assert.equal((await db.query('select status from organizations where id=$1',[expiredTrial.organizationId])).rows[0].status,'read_only');
  assert.equal((await db.query('select platform_status from platform_tenants where organization_id=$1',[expiredTrial.organizationId])).rows[0].platform_status,'read_only');
@@ -281,7 +287,7 @@ try{
  await db.query("update organization_subscriptions set trial_until=now()-interval '1 day',billing_subscription_id='sub_pending' where organization_id=$1",[linkedTrial.organizationId]);
  await expireUnpaidTrials();
  assert.equal((await db.query('select status from organization_subscriptions where organization_id=$1',[linkedTrial.organizationId])).rows[0].status,'trial');
- delete globalThis.__lifecycleQuery;
+ delete globalThis.__lifecycleQuery;delete globalThis.__lifecycleTenant;
  // Use the actual Stripe transport/signature code with an isolated HTTP fixture.
  globalThis.__billingEnv={stripeSecretKey:'sk_test_fixture',stripeWebhookSecret:'whsec_fixture',appUrl:'https://example.invalid',stripePrices:{start:{monthly:'price_start_m'},business:{yearly:'price_business_y'},pro:{}}};
  const billingEnv=dataModule('export const env=globalThis.__billingEnv');
@@ -355,7 +361,7 @@ try{
  await assert.rejects(globalThis.__provisionTest(c=>processStripeEvent(c,{...invoiceEvent,id:'evt_wrong_mode',livemode:true})),e=>e.code==='stripe_mode_mismatch');
  authoritative={...authoritative,metadata:{organization_id:demo}};
  await assert.rejects(globalThis.__provisionTest(c=>processStripeEvent(c,{...invoiceEvent,id:'evt_wrong_tenant'})),e=>e.code==='subscription_mapping_invalid');
- await db.exec('set role tenant_probe');await db.query("select set_config('app.organization_id',$1,false)",[demo]);
+ await db.exec('set role binso_runtime');await db.query("select set_config('app.organization_id',$1,false)",[demo]);
  assert.equal((await db.query('select * from billing_checkout_sessions')).rows.length,0);
  await db.exec('reset role');
  globalThis.fetch=originalFetch;delete globalThis.__billingEnv;
@@ -396,7 +402,7 @@ try{
  console.log('Timer customer-only start/reload/pause/finish, context lock and internal work passed.');
 
  // Exercise the process implementations against migrated PostgreSQL, not source strings.
- const processHttp=dataModule(`export class ApiError extends Error{constructor(status,code,message){super(message);this.status=status;this.code=code}};export const assertSameOrigin=()=>{};export const cleanText=(v)=>typeof v==='string'?v:'';export const readJson=async r=>r.body;export const json=(data,status=200)=>({data,status});export const validEmail=v=>/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(v);export const apiError=e=>({status:e instanceof Response?e.status:e.status??500,data:{error:e.code,message:e.message}});`);
+ const processHttp=dataModule(`export class ApiError extends Error{constructor(status,code,message){super(message);this.status=status;this.code=code}};export const assertSameOrigin=()=>{};export const cleanText=(v)=>typeof v==='string'?v:'';export const readJson=async r=>r.body;export const readBoundedBody=async r=>Buffer.from(await r.arrayBuffer());export const json=(data,status=200)=>({data,status});export const validEmail=v=>/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(v);export const apiError=e=>({status:e instanceof Response?e.status:e.status??500,data:{error:e.code,message:e.message}});`);
  const processRbac=dataModule((await fs.readFile('lib/server/rbac.ts','utf8')).replace('import "server-only";','').replace('"@/lib/permissions"',JSON.stringify(permissions)));
  const processSession=dataModule('export async function requireSession(){return globalThis.__processSession}');
  const processDb=dataModule('export async function withTenant(org,user,fn){return globalThis.__processTransaction(org,fn)} export async function withPlatform(fn){return globalThis.__processPlatform(fn)}');
@@ -542,7 +548,7 @@ try{
  delete globalThis.__invitationMails;delete globalThis.__invitationMailMode;
  console.log('Atomic invitation identity/membership/token/outbox, same-key replay, failed-delivery recovery, ambiguous-delivery protection, roles and database rollback passed.');
 
- for(const table of ['organization_invitations','document_deliveries']){await db.exec('set role tenant_probe');await db.query("select set_config('app.platform_operator','',false)");await db.query("select set_config('app.organization_id',$1,false)",[sandbox]);assert.equal((await db.query('select * from '+table+' where organization_id=$1',[demo])).rows.length,0);await db.exec('reset role');}
+ for(const table of ['organization_invitations','document_deliveries']){await db.exec('set role binso_runtime');await db.query("select set_config('app.platform_operator','',false)");await db.query("select set_config('app.organization_id',$1,false)",[sandbox]);assert.equal((await db.query('select * from '+table+' where organization_id=$1',[demo])).rows.length,0);await db.exec('reset role');}
  await db.query("select set_config('app.organization_id',$1,false)",[demo]);
 
  const processTime=(await db.query("insert into time_entries(organization_id,external_id,customer_id,person_name,worker_type,work_date,hours,description,billable,approved,sales_rate) values($1,'process-time',$2,'Fixture person','employee','2026-10-06',2,'Fixture time',true,true,100) returning id",[demo,documentArgs.p_customer_id])).rows[0].id;
@@ -727,10 +733,12 @@ try{
  const fileRelations=dataModule(await fs.readFile('lib/file-associations.ts','utf8'));
  const validation=dataModule((await fs.readFile('lib/server/file-validation.ts','utf8')).replace("'./http'",JSON.stringify(processHttp)));
  const limits=dataModule(await fs.readFile('config/limits.ts','utf8'));
- const fileRoute=async path=>{let source=await fs.readFile(path,'utf8');for(const [specifier,url] of Object.entries({'@/lib/server/file-relations':fileRelations,'@/lib/server/file-validation':validation,'@/config/limits':limits,'@/lib/server/http':processHttp,'@/lib/server/session':processSession,'@/lib/server/db':processDb,'@/lib/server/rbac':processRbac,'@/lib/permissions':permissions,'@/lib/server/storage':dataModule('export async function getBlobByUrl(){throw new Error("External storage must not be contacted by isolated tests")}')})){source=source.replaceAll(JSON.stringify(specifier),JSON.stringify(url)).replaceAll("'"+specifier+"'",JSON.stringify(url));}return import(dataModule(source));};
+ const fileRoute=async path=>{let source=await fs.readFile(path,'utf8');for(const [specifier,url] of Object.entries({'@/lib/server/file-scan':dataModule('export async function scanFile(){return "pending"}'),'@/lib/server/business-idempotency':idempotencyModule,'@/lib/server/file-relations':fileRelations,'@/lib/server/file-validation':validation,'@/config/limits':limits,'@/lib/server/http':processHttp,'@/lib/server/session':processSession,'@/lib/server/db':processDb,'@/lib/server/rbac':processRbac,'@/lib/permissions':permissions,'@/lib/server/storage':dataModule('export async function getBlobByUrl(){throw new Error("External storage must not be contacted by isolated tests")}')})){source=source.replaceAll(JSON.stringify(specifier),JSON.stringify(url)).replaceAll("'"+specifier+"'",JSON.stringify(url));}return import(dataModule(source));};
  const fileUpload=await fileRoute('app/api/files/route.ts'),fileDownload=await fileRoute('app/api/files/[id]/download/route.ts');
- const uploadRequest=(entityId,mime='text/plain',bytes='synthetic attachment')=>{const form=new FormData();form.set('purpose','customer_document');form.set('entityId',entityId);form.set('file',new File([bytes],'fixture.txt',{type:mime}));return {formData:async()=>form};};
+ const uploadRequest=(entityId,mime='text/plain',bytes='synthetic attachment')=>{const form=new FormData();form.set('purpose','customer_document');form.set('entityId',entityId);form.set('file',new File([bytes],'fixture.txt',{type:mime}));return new Request('https://fixture.invalid/api/files',{method:'POST',headers:{'idempotency-key':crypto.randomUUID()},body:form});};
  const uploaded=await fileUpload.POST(uploadRequest(documentArgs.p_customer_id));assert.equal(uploaded.status,201,JSON.stringify(uploaded));assert.equal(uploaded.data.item.customer_id,documentArgs.p_customer_id);
+ const pendingDownload=await fileDownload.GET({}, {params:Promise.resolve({id:uploaded.data.item.id})});assert.equal(pendingDownload.status,423);
+ await db.query("update file_objects set scan_status='clean' where id=$1",[uploaded.data.item.id]);
  const downloaded=await fileDownload.GET({}, {params:Promise.resolve({id:uploaded.data.item.id})});assert.equal(downloaded.status,200);assert.equal(await downloaded.text(),'synthetic attachment');assert.equal(downloaded.headers.get('cache-control'),'private, no-store');
  const listed=await fileUpload.GET({nextUrl:new URL('https://fixture.invalid/api/files?customerId='+documentArgs.p_customer_id)});assert.ok(listed.data.items.some(row=>row.id===uploaded.data.item.id));
  assert.equal((await fileUpload.POST(uploadRequest(documentArgs.p_customer_id,'application/pdf','not a PDF'))).status,400);

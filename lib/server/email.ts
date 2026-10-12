@@ -28,8 +28,7 @@ async function getGraphToken(){
   signal:AbortSignal.timeout(20_000),
  });
  if(!response.ok){
-  const detail=(await response.text()).slice(0,300);
-  log("error","graph_token_error",{status:response.status,detail});
+  log("error","graph_token_error",{status:response.status});
   throw new Error("Microsoft Graph Authentifizierung für E-Mail ist fehlgeschlagen.");
  }
  const payload=await response.json() as {access_token:string;expires_in?:number};
@@ -55,8 +54,7 @@ async function sendViaGraph(mail:Mail){
   signal:AbortSignal.timeout(20_000),
  });
  if(!response.ok){
-  const detail=(await response.text()).slice(0,300);
-  log("error","graph_mail_error",{status:response.status,detail,toDomain:mail.to.split("@")[1]});
+  log("error","graph_mail_error",{status:response.status});
   throw new Error("E-Mail konnte nicht über Microsoft Graph versendet werden.");
  }
  return {delivered:true,provider:"microsoft-graph" as const};
@@ -64,7 +62,7 @@ async function sendViaGraph(mail:Mail){
 
 export async function sendMail(mail:Mail){
  if(!graphConfigured()){
-  log("error","graph_mail_not_configured",{toDomain:mail.to.split("@")[1],subject:mail.subject,appMode:env.appMode});
+  log("error","graph_mail_not_configured",{appMode:env.appMode});
   if(env.appMode==="production")throw new Error("Microsoft Graph Mail ist produktiv nicht vollständig konfiguriert.");
   return {delivered:false,provider:"none" as const};
  }

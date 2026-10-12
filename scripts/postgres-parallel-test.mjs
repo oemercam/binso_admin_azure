@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
+import {createHash} from 'node:crypto';
 import pg from 'pg';
 import {moduleUrl,financialModuleUrl} from './data-test-modules.mjs';
 // Deliberately accept only this disposable localhost test database. No DATABASE_URL
@@ -11,8 +12,9 @@ assert.ok(['localhost','127.0.0.1'].includes(url.hostname)&&url.pathname==='/bin
 const pool=new pg.Pool({connectionString:address,max:16});
 try{
  assert.equal((await pool.query("select count(*)::int n from information_schema.tables where table_schema='public'")).rows[0].n,0,'Requires an empty disposable test database; never resets an existing schema');
+ await pool.query('create table schema_migrations(version text primary key,checksum text not null,applied_at timestamptz not null default now())');
  for(const name of (await fs.readdir('database/migrations')).filter(name=>name.endsWith('.sql')).sort()){
-  const c=await pool.connect();try{await c.query('begin');await c.query(await fs.readFile('database/migrations/'+name,'utf8'));await c.query('commit');}catch(error){await c.query('rollback');throw error;}finally{c.release();}
+  const c=await pool.connect();try{await c.query('begin');const sql=await fs.readFile('database/migrations/'+name,'utf8');await c.query(sql);await c.query('insert into schema_migrations(version,checksum) values($1,$2)',[name,createHash('sha256').update(sql).digest('hex')]);await c.query('commit');}catch(error){await c.query('rollback');throw error;}finally{c.release();}
  }
  globalThis.__binsoParallelPool=pool;
  const http=moduleUrl('export class ApiError extends Error{constructor(status,code,message){super(message);this.status=status;this.code=code}}');

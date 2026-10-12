@@ -2,6 +2,7 @@ import pg from "pg";
 if(!process.env.DATABASE_URL)throw new Error("DATABASE_URL is required");
 const pool=new pg.Pool({connectionString:process.env.DATABASE_URL,ssl:process.env.DATABASE_SSL==="false"?undefined:{rejectUnauthorized:process.env.DATABASE_SSL_REJECT_UNAUTHORIZED!=="false"}});
 
+const restricted=process.argv.includes('--runtime');
 const required={
  organization_invitations:["organization_id","email","role","status","expires_at"],
  document_deliveries:["organization_id","kind","document_id","recipient","status","request_key"],
@@ -54,11 +55,14 @@ const tenantTables=["organization_invitations","document_deliveries","billing_ch
 const forceTables=["billing_checkout_sessions","customers","projects","quotes","quote_lines","orders","products_services","time_entries","expenses","invoices","invoice_lines","payments","suppliers","supplier_invoices","employees","tasks","absences","contracts","accounting_entries","bank_transactions","vat_periods","payroll_runs","business_documents","operating_costs","active_time_trackers"];
 try{
  const meta=await pool.query("select current_database() db,current_user db_user,current_schema() schema,now() now");
- const migrations=await pool.query("select version from schema_migrations order by version");
+ const migrations=await pool.query(restricted?"select public.runtime_schema_versions() as version":"select version from schema_migrations order by version");
  const versions=migrations.rows.map(r=>r.version);
  if(!versions.includes("0016_self_service_signup.sql"))throw new Error("Canonical database lineage incomplete: 0016_self_service_signup.sql is not applied.");
  if(!versions.includes("0017_v150_code_schema_alignment.sql"))throw new Error("Database migration 0017_v150_code_schema_alignment.sql is not applied.");
- const cols=await pool.query(`select table_name,column_name from information_schema.columns where table_schema='public' and table_name=any($1::text[])`,[Object.keys(required)]);
+ if(!versions.includes("0047_runtime_auth_bootstrap.sql"))throw new Error("Database migration 0047_runtime_auth_bootstrap.sql is not applied.");
+ const cols=await pool.query(restricted?
+   `select c.relname as table_name,a.attname as column_name from pg_class c join pg_namespace n on n.oid=c.relnamespace join pg_attribute a on a.attrelid=c.oid where n.nspname='public' and c.relkind in ('r','p') and a.attnum>0 and not a.attisdropped and c.relname=any($1::text[])`:
+   `select table_name,column_name from information_schema.columns where table_schema='public' and table_name=any($1::text[])`,[Object.keys(required)]);
  const found=new Map();for(const row of cols.rows){if(!found.has(row.table_name))found.set(row.table_name,new Set());found.get(row.table_name).add(row.column_name)}
  const missing=[];for(const [table,names] of Object.entries(required))for(const name of names)if(!found.get(table)?.has(name))missing.push(`${table}.${name}`);
  if(missing.length)throw new Error(`Canonical database schema incomplete. Missing: ${missing.join(", ")}`);
@@ -72,5 +76,5 @@ try{
  const policyMap=new Map(policies.rows.map(r=>[r.tablename,Number(r.count)]));
  const policyMissing=tenantTables.filter(t=>(policyMap.get(t)||0)<1);
  if(policyMissing.length)throw new Error(`Tenant RLS policy missing on: ${policyMissing.join(", ")}`);
- console.log({...meta.rows[0],lineage:"canonical-0001..0017",schema:"ok",checkedTables:Object.keys(required).length,rlsTables:tenantTables.length,migrations:versions.length});
+ console.log({...meta.rows[0],lineage:"canonical-0001..0047",schema:"ok",checkedTables:Object.keys(required).length,rlsTables:tenantTables.length,migrations:versions.length});
 }finally{await pool.end()}

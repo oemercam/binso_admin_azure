@@ -63,7 +63,7 @@ try{
  // Independent expected-role contract: do not derive the expectation from the
  // same tenantCan function being tested by the actual HTTP handlers.
  const readContracts=[
-  ...['/api/auth/mfa','/api/auth/session','/api/auth/sessions','/api/dashboard','/api/files','/api/finance/overview','/api/integrations/status','/api/notifications','/api/search?q=Alpen','/api/settings/company','/api/settings/documents','/api/settings/notifications','/api/settings/profile','/api/support/tickets'].map(path=>[path,roles]),
+  ...['/api/auth/mfa','/api/auth/register','/api/auth/session','/api/auth/sessions','/api/dashboard','/api/files','/api/finance/overview','/api/integrations/status','/api/notifications','/api/search?q=Alpen','/api/settings/company','/api/settings/documents','/api/settings/notifications','/api/settings/profile','/api/support/tickets'].map(path=>[path,roles]),
   ...['/api/billing/catalog','/api/payments','/api/finance','/api/finance/overview?include=workspace','/api/settings/subscription','/api/time-entries/billing','/api/expenses/billing'].map(path=>[path,finance]),
   ...['/api/customers','/api/customers/'+customer.id,'/api/customers/'+customer.id+'/activity','/api/customers/'+customer.id+'/contacts','/api/customers/'+customer.id+'?include=workspace'].map(path=>[path,customerRoles]),
   ...['/api/documents','/api/customers/'+customer.id+'/documents'].map(path=>[path,documentRoles]),
@@ -78,6 +78,8 @@ try{
  const ticket=(await pool.query('select id from support_cases where organization_id=$1 order by id limit 1',[organizations[0]])).rows[0];
  readContracts.push(['/api/employees/'+employee.id,employeeRoles],['/api/products/'+product.id,projectRoles],['/api/payments/'+payment.id,finance],['/api/support/tickets/'+ticket.id+'/messages',roles]);
  for(const [path,allowed] of readContracts)for(const role of roles){const r=await get(path,cookies.get('0:'+role));assert.equal(r.status,allowed.includes(role)?200:403,role+' GET '+path+': '+JSON.stringify(r.data));}
+ const anonymousRegistration=await get('/api/auth/register','');assert.equal(anonymousRegistration.status,200);assert.equal(anonymousRegistration.data.state,'new');assert.equal(anonymousRegistration.data.pending,null,'Anonymous registration context contains no other tenant receipt');
+ for(const index of [0,1])for(const role of roles){const registration=await get('/api/auth/register',cookies.get(index+':'+role));assert.equal(registration.status,200);assert.equal(registration.data.state,'authenticated');assert.equal(registration.data.pending,undefined,'Authenticated handoff cannot expose a pending registration receipt');assert.ok(registration.data.next.startsWith('/'),'Role-specific onboarding stays inside the app');}
  // Own-record scope is stronger than the permission to list expense records.
  for(const role of roles)assert.equal((await get('/api/expenses/'+expense.id,cookies.get('0:'+role))).status,role==='member'?404:expenseRoles.includes(role)?200:403,role+' expense direct ID');
  for(const role of roles){

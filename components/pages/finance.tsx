@@ -15,7 +15,7 @@ import { CreateAction } from "../binso-ux";
 
 export function FinanceAnalysisPage() {
  const production=useBackendMode();
- const query=useApiQuery<{cash:CashStatisticsData}>(isProductionBackendEnabled()&&production?"/api/finance":"/api/demo/finance");
+ const query=useApiQuery<{cash:CashStatisticsData}>(isProductionBackendEnabled()&&production?"/api/finance?view=cash":"/api/demo/finance");
  return <AppShell title="Finanzanalyse" active="finanzen"><FinanceTabs/>{query.loading?<LoadingState>Finanzdaten werden geladen …</LoadingState>:query.error?<ErrorState onRetry={query.refresh}>{query.error}</ErrorState>:query.data?.cash?<CashStatistics data={query.data.cash} storageKey="finance-analysis"/>:<ErrorState>Finanzdaten sind nicht verfügbar.</ErrorState>}</AppShell>;
 }
 
@@ -41,7 +41,7 @@ export function InvoicesPage({forceDemo=false}:{forceDemo?:boolean}={}){return <
 export type FinancialSummary={invoices:Array<{currency:string;open_count:number;overdue_count:number;draft_count:number;open_amount:number;revenue:number}>;offers:{draft_count:number;actionable_count:number}|null;time:{hours:number;ready_hours:number;invoiced_hours:number}|null};
 
 export function FinancePage(){
- const query=useApiQuery<FinancialSummary&{documents:DocumentListItem[];cash:CashStatisticsData|null}>("/api/finance/overview?include=workspace");
+ const query=useApiQuery<FinancialSummary&{documents:DocumentListItem[];cash:CashStatisticsData|null}>("/api/finance/overview?include=workspace&view=cash");
  const summary=query.data,items=summary?.documents??[];
  const overdue=items.filter(item=>item.kind==='invoice'&&financialStatus(item)==='overdue');
  return <AppShell title="Finanzen" active="finanzen"><FinanceTabs/>{query.loading?<LoadingState>Finanzen werden geladen …</LoadingState>:query.error?<ErrorState onRetry={query.refresh}>{query.error}</ErrorState>:<>

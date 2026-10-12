@@ -48,6 +48,7 @@ export const env={
   azureStorageAccount:optional("AZURE_STORAGE_ACCOUNT"),
   azureStorageContainer:optional("AZURE_STORAGE_CONTAINER")||"documents",
   azureStorageSas:optional("AZURE_STORAGE_SAS"),
+  fileScanSocket:optional("FILE_SCAN_SOCKET"),
   smokeTestToken:optional("BINSO_SMOKE_TEST_TOKEN"),
   logLevel:optional("LOG_LEVEL")||"info"
 };
