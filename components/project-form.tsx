@@ -1,4 +1,5 @@
 "use client";
+import {safeAppPath} from "@/lib/navigation";
 import {useEffect,useRef,useState} from 'react';
 import {useSearchParams,useRouter} from 'next/navigation';
 import {apiPost} from '@/lib/client/backend';
@@ -18,7 +19,7 @@ export function ProjectForm(){
  const sourceOffer=params.get('sourceOffer');
  const [open,setOpen]=useState(false);
  useEffect(()=>{queueMicrotask(()=>setOpen(true))},[]);
- const returnTo=sourceOffer?'/angebote/'+encodeURIComponent(sourceOffer):params.get('returnTo')==='/dashboard'?'/dashboard':'/zeit';
+ const returnTo=sourceOffer?'/angebote/'+encodeURIComponent(sourceOffer):safeAppPath(params.get('returnTo'),'/zeit');
  const [replay,setReplay]=useState<{body:string;key:string}|null>(null);
  const close=()=>{recovery.clear();allowDraftNavigation();setOpen(false);router.replace(returnTo)};
  const directory=useApiQuery<{items:Array<{id:string;name:string}>}>('/api/customers');

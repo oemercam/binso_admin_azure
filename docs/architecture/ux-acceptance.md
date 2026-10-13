@@ -164,3 +164,8 @@ Only completed results JSON counts. Screenshots and computed DOM/CSS evidence re
 | /operator/abonnemente | components/operator.tsx#OperatorPage | OperatorPage + shared HeaderPanel | F13; F23 (restriction rows) | Only applicable proven paths F1–F27 | 4 combinations: webkit | 4 captures; e.g. light-390-_operator_abonnemente.png | Automated checks passed; visual sign-off separate |
 | /operator/sperrungen | components/operator.tsx#OperatorPage | OperatorPage + shared HeaderPanel | F13; F23 (restriction rows) | Only applicable proven paths F1–F27 | 4 combinations: webkit | 4 captures; e.g. light-390-_operator_sperrungen.png | Automated checks passed; visual sign-off separate |
 | /operator/ankuendigungen | components/operator.tsx#OperatorPage | OperatorPage + shared HeaderPanel | F13; F23 (restriction rows) | Only applicable proven paths F1–F27 | 4 combinations: webkit | 4 captures; e.g. light-390-_operator_ankuendigungen.png | Automated checks passed; visual sign-off separate |
+
+
+## Aktueller UX-Vertrag vom 13.10.2026
+
+Der ausdrücklich beauftragte gemeinsame Glas-/Dock-Standard ist in [ux-glass-standard-20261013.md](../ux-glass-standard-20261013.md) dokumentiert. Er erweitert die früheren Material-/Geometriesperren der Bottom-Navigation; ursprüngliche Ziele, Zugriffs-/Scroll-Logik und Icon-Pfade bleiben geschützt. Neue Seiten verwenden `AppHeader`, `MobileDock`, den gemeinsamen Erstellen-Katalog und die vorhandenen zentralen Sheet-/Formular-/Listenkomponenten.

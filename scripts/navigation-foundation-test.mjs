@@ -8,7 +8,7 @@ const require=createRequire(import.meta.url),postcss=require(require.resolve('po
 const hash=value=>createHash('sha256').update(JSON.stringify(value)).digest('hex');
 export function navigationFoundation(read){
  const markup=[],logic=[],icons=[],rules=[],variables=[];
- for(const file of ['components/app-shell.tsx','components/operator.tsx','components/ui.tsx']){
+ for(const file of ['components/app-shell.tsx','components/operator.tsx','components/ui.tsx','components/app-chrome.tsx']){
   const ast=ts.createSourceFile(file,read(file),99,true,4);
   function visit(node){
    if(ts.isJsxElement(node)&&node.openingElement.tagName.getText(ast)==='nav'&&/bottom-nav|operator-mobile-nav/.test(node.openingElement.attributes.getText(ast)))markup.push({file,source:ts.isBinaryExpression(node.parent)?node.parent.getText(ast):node.getText(ast)});
@@ -19,7 +19,7 @@ export function navigationFoundation(read){
   }visit(ast);
  }
  for(const file of ['app/styles/base.css','app/styles/app.css','app/styles/operator.css','app/styles/responsive.css'])postcss.parse(read(file)).walkRules(rule=>{
-  const selectors=rule.selectors.filter(s=>/\.bottom-nav\b|\.operator-mobile-nav\b/.test(s));if(!selectors.length)return;
+  const selectors=rule.selectors.filter(s=>/\.bottom-nav\b|\.operator-mobile-nav\b|\.mobile-dock\b|\.dock-create-action\b/.test(s));if(!selectors.length)return;
   let context='';for(let p=rule.parent;p&&p.type!=='root';p=p.parent)if(p.type==='atrule')context=p.name+' '+p.params+'/'+context;
   rules.push({file,selectors,context,declarations:rule.nodes.filter(n=>n.type==='decl').map(n=>[n.prop,n.value,n.important])});
  });
@@ -30,7 +30,11 @@ export function navigationFoundation(read){
  return {markup:hash(markup),logic:hash(logic),icons:hash(icons),rules:hash(rules),tokens:hash(variables),tokenNames:[...needed].sort()};
 }
 if(process.argv[1]===fileURLToPath(import.meta.url)){
- const reference=JSON.parse(fs.readFileSync('docs/assets/v21-1/navigation-reference.json','utf8'));
- assert.deepEqual(navigationFoundation(file=>fs.readFileSync(file,'utf8')),reference.snapshot,'Navigation JSX, display/access/scroll logic, icons, both navigation CSS contracts and their transitive theme/safe-area tokens must remain unchanged');
- console.log('Customer and operator bottom navigation: markup, access/display/scroll logic, icons, styles and transitive tokens unchanged against '+reference.commit+'.');
+ const original=JSON.parse(fs.readFileSync('docs/assets/v21-1/navigation-reference.json','utf8'));
+ const reference=JSON.parse(fs.readFileSync('docs/assets/20261013/navigation-reference.json','utf8'));
+ const current=navigationFoundation(file=>fs.readFileSync(file,'utf8'));
+ assert.equal(current.logic,original.snapshot.logic,'Creation/material changes must preserve destination access and scroll logic');
+ assert.equal(current.icons,original.snapshot.icons,'Existing navigation icons remain unchanged');
+ assert.deepEqual(navigationFoundation(file=>fs.readFileSync(file,'utf8')),reference.snapshot,'Navigation must match the explicitly authorized shared glass/dock contract from 2026-10-13');
+ console.log('Customer/operator dock: approved glass/creation placement; original destination access/scroll logic and icons preserved. Reference '+reference.commit+'.');
 }

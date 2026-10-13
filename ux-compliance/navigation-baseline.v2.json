@@ -1,0 +1,465 @@
+{
+  "schemaVersion": 2,
+  "provenance": "Explicit capture for the user-authorized 2026-10-13 glass/dock layout; browser fixtures, not physical PWA approval.",
+  "cases": [
+    {
+      "theme": "light",
+      "width": 320,
+      "withCreate": true,
+      "navigation": {
+        "x": 8.953125,
+        "width": 302.09375,
+        "height": 68,
+        "bottomOffset": 8,
+        "position": "static",
+        "borderRadius": "30px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/finanzen",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "light",
+      "width": 320,
+      "withCreate": false,
+      "navigation": {
+        "x": 8.953125,
+        "width": 302.09375,
+        "height": 68,
+        "bottomOffset": 8,
+        "position": "static",
+        "borderRadius": "30px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/finanzen",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "light",
+      "width": 375,
+      "withCreate": true,
+      "navigation": {
+        "x": 10.5,
+        "width": 292,
+        "height": 68,
+        "bottomOffset": 8.25,
+        "position": "static",
+        "borderRadius": "30px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/finanzen",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "light",
+      "width": 375,
+      "withCreate": false,
+      "navigation": {
+        "x": 10.5,
+        "width": 354,
+        "height": 68,
+        "bottomOffset": 8.25,
+        "position": "static",
+        "borderRadius": "30px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/finanzen",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "withCreate": true,
+      "navigation": {
+        "x": 10.90625,
+        "width": 306.1875,
+        "height": 68,
+        "bottomOffset": 8.578125,
+        "position": "static",
+        "borderRadius": "30px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/finanzen",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "withCreate": false,
+      "navigation": {
+        "x": 10.90625,
+        "width": 368.1875,
+        "height": 68,
+        "bottomOffset": 8.578125,
+        "position": "static",
+        "borderRadius": "30px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/finanzen",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "light",
+      "width": 430,
+      "withCreate": true,
+      "navigation": {
+        "x": 12.03125,
+        "width": 343.9375,
+        "height": 68,
+        "bottomOffset": 9.453125,
+        "position": "static",
+        "borderRadius": "30px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/finanzen",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "light",
+      "width": 430,
+      "withCreate": false,
+      "navigation": {
+        "x": 12.03125,
+        "width": 405.9375,
+        "height": 68,
+        "bottomOffset": 9.453125,
+        "position": "static",
+        "borderRadius": "30px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/finanzen",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "light",
+      "width": 768,
+      "withCreate": true,
+      "navigation": {
+        "x": 73,
+        "width": 560,
+        "height": 68,
+        "bottomOffset": 12,
+        "position": "static",
+        "borderRadius": "30px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/finanzen",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "light",
+      "width": 768,
+      "withCreate": false,
+      "navigation": {
+        "x": 104,
+        "width": 560,
+        "height": 68,
+        "bottomOffset": 12,
+        "position": "static",
+        "borderRadius": "30px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/finanzen",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "light",
+      "width": 1024,
+      "withCreate": true,
+      "navigation": {
+        "x": 201,
+        "width": 560,
+        "height": 68,
+        "bottomOffset": 12,
+        "position": "static",
+        "borderRadius": "30px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/finanzen",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "light",
+      "width": 1024,
+      "withCreate": false,
+      "navigation": {
+        "x": 232,
+        "width": 560,
+        "height": 68,
+        "bottomOffset": 12,
+        "position": "static",
+        "borderRadius": "30px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/finanzen",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 320,
+      "withCreate": true,
+      "navigation": {
+        "x": 8.953125,
+        "width": 302.09375,
+        "height": 68,
+        "bottomOffset": 8,
+        "position": "static",
+        "borderRadius": "30px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/finanzen",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 320,
+      "withCreate": false,
+      "navigation": {
+        "x": 8.953125,
+        "width": 302.09375,
+        "height": 68,
+        "bottomOffset": 8,
+        "position": "static",
+        "borderRadius": "30px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/finanzen",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 375,
+      "withCreate": true,
+      "navigation": {
+        "x": 10.5,
+        "width": 292,
+        "height": 68,
+        "bottomOffset": 8.25,
+        "position": "static",
+        "borderRadius": "30px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/finanzen",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 375,
+      "withCreate": false,
+      "navigation": {
+        "x": 10.5,
+        "width": 354,
+        "height": 68,
+        "bottomOffset": 8.25,
+        "position": "static",
+        "borderRadius": "30px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/finanzen",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "withCreate": true,
+      "navigation": {
+        "x": 10.90625,
+        "width": 306.1875,
+        "height": 68,
+        "bottomOffset": 8.578125,
+        "position": "static",
+        "borderRadius": "30px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/finanzen",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "withCreate": false,
+      "navigation": {
+        "x": 10.90625,
+        "width": 368.1875,
+        "height": 68,
+        "bottomOffset": 8.578125,
+        "position": "static",
+        "borderRadius": "30px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/finanzen",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 430,
+      "withCreate": true,
+      "navigation": {
+        "x": 12.03125,
+        "width": 343.9375,
+        "height": 68,
+        "bottomOffset": 9.453125,
+        "position": "static",
+        "borderRadius": "30px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/finanzen",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 430,
+      "withCreate": false,
+      "navigation": {
+        "x": 12.03125,
+        "width": 405.9375,
+        "height": 68,
+        "bottomOffset": 9.453125,
+        "position": "static",
+        "borderRadius": "30px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/finanzen",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 768,
+      "withCreate": true,
+      "navigation": {
+        "x": 73,
+        "width": 560,
+        "height": 68,
+        "bottomOffset": 12,
+        "position": "static",
+        "borderRadius": "30px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/finanzen",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 768,
+      "withCreate": false,
+      "navigation": {
+        "x": 104,
+        "width": 560,
+        "height": 68,
+        "bottomOffset": 12,
+        "position": "static",
+        "borderRadius": "30px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/finanzen",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 1024,
+      "withCreate": true,
+      "navigation": {
+        "x": 201,
+        "width": 560,
+        "height": 68,
+        "bottomOffset": 12,
+        "position": "static",
+        "borderRadius": "30px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/finanzen",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 1024,
+      "withCreate": false,
+      "navigation": {
+        "x": 232,
+        "width": 560,
+        "height": 68,
+        "bottomOffset": 12,
+        "position": "static",
+        "borderRadius": "30px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/finanzen",
+          "/zeit"
+        ]
+      }
+    }
+  ],
+  "commit": "4b8e0115a90de981b11f1d716a8145e97efa7e6f",
+  "toleranceCssPixels": 1,
+  "approval": "User-authorized glass material and separate creation dock on 2026-10-13. Explicit owner-fixture capture after behavioral validation; original v1 retained."
+}

@@ -7,7 +7,7 @@ import {useState} from "react";
 import {usePageAccess} from "@/lib/client/page-access";
 import {Avatar} from "./avatar";
 import {ActionRow,SettingsGroup} from "./binso-ux";
-import {Button, EmptyState, Icon, LoadingState, ErrorState} from "./ui";
+import {Button, Toast, EmptyState, Icon, LoadingState, ErrorState} from "./ui";
 
 export type PanelNotification={id:string;kind:string;title:string;body:string;href?:string|null;read_at?:string|null;created_at:string};
 
@@ -15,7 +15,7 @@ function PanelLink({href,icon,title,onClose}:{href:string;icon:string;title:stri
  return <ActionRow href={href} icon={icon} title={title} onClick={onClose}/>;
 }
 
-export function SearchPanel({query,onQuery,items,loading,error,onClose}:{query:string;onQuery:(query:string)=>void;items:SearchItem[];loading:boolean;error:string|null;onClose:()=>void}){
+export function SearchPanel({query,onQuery,items,loading,error,onClose,recent=[],onRemember,onClearRecent,onUndoRecent}:{onUndoRecent?:()=>void;recent?:string[];onRemember?:(query:string)=>void;onClearRecent?:()=>void;query:string;onQuery:(query:string)=>void;items:SearchItem[];loading:boolean;error:string|null;onClose:()=>void}){
  const access=usePageAccess();
  const [scope,setScope]=useState("all");
  const sources=searchSources.filter(source=>access.canOpen(source.href));
@@ -23,14 +23,16 @@ export function SearchPanel({query,onQuery,items,loading,error,onClose}:{query:s
  const visible=items.filter(item=>access.canOpen(item.href)&&(selected==="all"||item.type===selected));
  const groups=Array.from(new Set(visible.map(item=>item.type)));
  return <div className="global-search">
-  <div className="header-search-controls"><div className="searchbox" role="search"><Icon name="search"/><input aria-label="Suchen" autoFocus value={query} onChange={e=>onQuery(e.target.value)} placeholder="Suchen…"/>{query&&<button className="search-clear" type="button" aria-label="Suche löschen" onClick={()=>onQuery("")}><Icon name="close" size={15}/></button>}</div><button type="button" className="header-search-cancel" onClick={onClose}>Abbrechen</button></div>
+  <div className="header-search-controls"><div className="searchbox" role="search"><Icon name="search"/><input aria-label="Suchen" autoFocus value={query} onChange={e=>onQuery(e.target.value)} placeholder="Suchen…" onKeyDown={event=>{if(event.key==="Enter")onRemember?.(query)}}/>{query&&<button className="search-clear" type="button" aria-label="Suche löschen" onClick={()=>onQuery("")}><Icon name="close" size={15}/></button>}</div><button type="button" className="header-search-cancel" onClick={onClose}>Abbrechen</button></div>
   <div className="chips header-search-scopes" aria-label="Suchbereiche"><button type="button" className={selected==="all"?"active":""} aria-pressed={selected==="all"} onClick={()=>setScope("all")}>Alle</button>{sources.map(source=><button type="button" key={source.type} className={selected===source.type?"active":""} aria-pressed={selected===source.type} onClick={()=>setScope(source.type)}>{source.type}</button>)}</div>
   <div className="search-results">
+   {!query.trim()&&onUndoRecent&&<Toast inline tone="info" title="Suchverlauf gelöscht." actionLabel="Rückgängig" onAction={onUndoRecent}/>}
+   {!query.trim()&&recent.length>0&&<section><div className="recent-search-heading"><h3>Letzte Suchanfragen</h3><button type="button" className="text-action" onClick={onClearRecent}>Löschen</button></div><div className="action-list">{recent.map(term=><ActionRow key={term} icon="clock" title={term} onClick={()=>onQuery(term)}/>)}</div></section>}
    {!query.trim()&&<><h3>Schnellzugriff</h3><div>{[["/kunden","users","Kunden öffnen"],["/rechnungen","receipt","Rechnungen öffnen"],["/angebote","file","Angebote öffnen"]].map(([href,icon,title])=><PanelLink key={href} href={href} icon={icon} title={title} onClose={onClose}/>)}</div></>}
    {loading&&<LoadingState className="technical-hint">Suche läuft …</LoadingState>}
    {query.trim().length>=2&&!loading&&error&&<ErrorState className="technical-hint">{error}</ErrorState>}
    {query.trim().length>=2&&!loading&&!error&&visible.length===0&&<EmptyState compact title="Keine Treffer gefunden" text=""/>}
-   {groups.map(type=><section key={type}><h3>{type}</h3>{visible.filter(item=>item.type===type).map(item=><ActionRow key={item.href} href={item.href} icon={item.icon} title={item.title} description={item.meta} onClick={onClose}/>)}</section>)}
+   {groups.map(type=><section key={type}><h3>{type}</h3>{visible.filter(item=>item.type===type).map(item=><ActionRow key={item.href} href={item.href} icon={item.icon} title={item.title} description={item.meta} onClick={()=>{onRemember?.(query);onClose()}}/>)}</section>)}
   </div>
  </div>;
 }

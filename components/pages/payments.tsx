@@ -1,4 +1,5 @@
 "use client";
+import {safeAppPath} from "@/lib/navigation";
 
 import { FinancialSummaryRow, FinanceTabs } from "../document-list";
 import { openAmount, formatCurrency, businessDate } from "@/lib/financial-status";
@@ -41,7 +42,7 @@ export function PaymentForm() {
   const availableInvoices=useMemo(()=>invoiceData?.items.filter(item=>!["draft","cancelled","paid"].includes(item.status)&&openAmount(item)>0)??[],[invoiceData]);
   useEffect(()=>{if(!sourceInvoice||invoiceId)return;const item=availableInvoices.find(row=>row.number===sourceInvoice);if(item)queueMicrotask(()=>{setInvoiceId(item.id);setAmount(String(openAmount(item)));});},[sourceInvoice,availableInvoices,invoiceId]);
   const selectedInvoice=availableInvoices.find(item=>item.id===invoiceId);
-  const returnTo=sourceInvoice?"/rechnungen/"+encodeURIComponent(sourceInvoice):"/zahlungen";
+  const returnTo=sourceInvoice?"/rechnungen/"+encodeURIComponent(sourceInvoice):safeAppPath(searchParams.get("returnTo"),"/zahlungen");
 
   const save=async()=>{
     if(savePending.current)return;

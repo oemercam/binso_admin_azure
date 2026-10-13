@@ -1,4 +1,5 @@
 "use client";
+import {safeAppPath} from "@/lib/navigation";
 
 import {allowDraftNavigation} from "../use-browser-back-guard";
 import {useProcessDraft} from "../use-process-draft";
@@ -7,7 +8,7 @@ import Link from "next/link";
 import {formatDateTime} from "@/lib/display-format";
 import {supportReference} from "@/lib/support-reference";
 import {useApiQuery,useDataRevision} from "@/lib/client/use-api-query";
-import { useRouter } from "next/navigation";
+import { useRouter,useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useWorkspaceViewport } from "../use-workspace-viewport";
 import { AppShell } from "../app-shell";
@@ -36,7 +37,8 @@ export function SupportPage() {
 }
 
 export function SupportTicketForm() {
-  const router=useRouter();
+  const router=useRouter(),params=useSearchParams();
+  const returnTo=safeAppPath(params.get("returnTo"),"/support");
   const [subject,setSubject]=useState("");
   const [saved,setSaved]=useState(false);
   const [submitting,setSubmitting]=useState(false);
@@ -56,7 +58,7 @@ export function SupportTicketForm() {
    if(value.replay&&typeof value.replay.body==='string'&&value.replay.body.length<10000&&typeof value.replay.key==='string'&&value.replay.key.length>=8&&value.replay.key.length<=128)setReplay(value.replay);
    if(typeof value.createdId==='string')setCreatedId(value.createdId);
   }});
-  const close=()=>{recovery.clear();allowDraftNavigation();setOpen(false);router.push('/support')};
+  const close=()=>{recovery.clear();allowDraftNavigation();setOpen(false);router.push(returnTo)};
   const save=async()=>{
     if(submitPending.current||saved||!recovery.ready)return;
     if(subject.trim().length<3||!message.trim()){
@@ -95,7 +97,7 @@ export function SupportTicketForm() {
       setSubmitting(false);
     }
   };
-  return <AppShell title="Support" editing unsavedChanges={false} subtitle="Beschreibe kurz, wobei wir helfen können." active="support" backHref="/support" backLabel="Support">
+  return <AppShell title="Support" editing unsavedChanges={false} subtitle="Beschreibe kurz, wobei wir helfen können." active="support" backHref={returnTo} backLabel="Support">
     <FormSheet label="Neue Support-Anfrage" open={open} onClose={close} busy={submitting} dirty={dirty&&!saved}>
     <form onSubmit={event=>{event.preventDefault();void save()}}>
       <div className="form-grid">

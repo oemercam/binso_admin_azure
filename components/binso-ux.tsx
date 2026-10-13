@@ -8,6 +8,7 @@ import { Button, Icon, Metric, Status, FormActions } from "@/components/ui";
 import { usePageAccess } from "@/lib/client/page-access";
 import {useBrowserBackGuard} from "./use-browser-back-guard";
 import ConfirmDialog from "./confirm-dialog";
+import {createActions,permittedCreateActions,createReturnHref} from "@/config/create-actions";
 
 /** Action rows have one DOM shape; navigation and destructive intent are explicit. */
 export function ActionRow({title,icon,href,onClick,disabled=false,requiresWrite=false,danger=false,navigation=false,description,metadata,endAdornment,selected,role,tabIndex,onKeyDown}: {
@@ -29,7 +30,7 @@ export function SelectionRows<T extends string>({label,value,options,onChange}:{
  }}/>)}</div>;
 }
 
-/** Shared visual contract for Binso One. Existing page navigation is intentionally untouched. */
+/** Shared visual contract for Binso One. Navigation, creation and entity actions have separate shared owners. */
 export function PageHeading({ title, description, action, leading }: { title: string; description?: string; action?: ReactNode; leading?: ReactNode }) {
   return <header className="bo-page-heading">{leading}
     <div className="bo-page-heading-main"><h1>{title}</h1>{action}</div>
@@ -38,21 +39,23 @@ export function PageHeading({ title, description, action, leading }: { title: st
 }
 
 export function CreateAction({ label, href, onClick, disabled = false }: { label: string; href?: string; onClick?: () => void; disabled?: boolean }) {
-  return <Button href={href} requiresWrite className="bo-create-action" ariaLabel={label} disabled={disabled} onClick={onClick} icon="plus"/>;
+  return <Button href={href} requiresWrite className="bo-create-action page-create-action" ariaLabel={label} disabled={disabled} onClick={onClick} icon="plus"/>;
 }
 
-export function QuickCreateAction(){
+export function QuickCreateAction({placement="page",section="dashboard",returnTo="/dashboard"}:{placement?:"page"|"dock";section?:string;returnTo?:string}){
  const access=usePageAccess(),[open,setOpen]=useState(false);
- const actions=[
-  {title:"Kunde",href:"/kunden/neu",icon:"users"},
-  {title:"Angebot",href:"/angebote/neu",icon:"file"},
-  {title:"Rechnung",href:"/rechnungen/neu",icon:"receipt"},
-  {title:"Projekt",href:"/projekte/neu",icon:"box"},
-  {title:"Zeiteintrag",href:"/zeit?manual=1",icon:"clock"},
-  {title:"Ausgabe",href:"/spesen/neu",icon:"card"},
- ].filter(item=>access.canOpen(item.href.startsWith("/zeit?")?"/zeit/neu":item.href)&&access.write);
+ const actions=permittedCreateActions(section,access.canOpen);
  if(!actions.length)return null;
- return <><CreateAction label="Neu erstellen" onClick={()=>setOpen(true)}/><ActionSheet label="Neu erstellen" className="quick-create-sheet" open={open} onClose={()=>setOpen(false)}><div className="action-list">{actions.map(item=><ActionRow key={item.href} {...item} href={item.href+(item.href.includes('?')?'&':'?')+'returnTo=/dashboard'} navigation onClick={()=>setOpen(false)}/>)}</div></ActionSheet></>;
+ return <>{placement==="dock"?<button type="button" className="dock-create-action app-glass" aria-label="Neu erstellen" aria-haspopup="dialog" aria-expanded={open} onClick={()=>setOpen(true)}><Icon name="plus" size={24}/></button>:<CreateAction label="Neu erstellen" onClick={()=>setOpen(true)}/>}
+  <ActionSheet label="Neu erstellen" className="quick-create-sheet" open={open} onClose={()=>setOpen(false)}><div className="action-list">{actions.map(item=><ActionRow key={item.href} title={item.title} icon={item.icon} href={createReturnHref(item.href,returnTo)} navigation onClick={()=>setOpen(false)}/>)}</div></ActionSheet>
+ </>;
+}
+
+/** Empty lists use the same permission-aware creation catalog as the dock. */
+export function EmptyRecordAction({section}:{section:string}){
+ const access=usePageAccess(),action=createActions.find(item=>item.section===section);
+ if(!action||!access.canOpen(action.permissionPath))return null;
+ return <Button variant="secondary" href={action.href}>{action.title} erstellen</Button>;
 }
 
 export function DetailHeading({ title, status, tone = "neutral", subtitle, leading, action }: {

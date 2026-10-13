@@ -7,13 +7,13 @@ import { readTimer, changeTimer } from "@/lib/client/time-tracker";
 import Link from "next/link";
 import {loadTheme,saveTheme} from "@/lib/client/theme";
 import {AppStart} from "./app-start";
-import { hasBlockingModal, useDialogFocus } from "./use-dialog-focus";
+import { hasBlockingModal } from "./use-dialog-focus";
 import {safeAppPath} from "@/lib/navigation";
 import { usePathname, useRouter } from "next/navigation";
 import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {useBrowserBackGuard,allowDraftNavigation} from "./use-browser-back-guard";
 import ConfirmDialog from "./confirm-dialog";
-import { PageHeading, DetailHeading } from "./binso-ux";
+import { ActionRow, ActionSheet, QuickCreateAction, PageHeading, DetailHeading } from "./binso-ux";
 import {Button, EmptyState, Icon, IconButton, Logo, Status, LoadingState} from "./ui";
 import {useApiQuery,useDataRevision} from "@/lib/client/use-api-query";
 import { apiGet, apiPatch, logoutClientSession, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
@@ -22,6 +22,7 @@ import type { SearchItem } from "@/lib/search";
 import {SearchPanel,NotificationPanel,AccountPanel,type PanelNotification} from "./header-panel-content";
 import {HeaderPanel} from "./header-panel";
 import {Avatar} from "./avatar";
+import {AppHeader,MobileDock} from "./app-chrome";
 
 const desktopNav = [
   ["/dashboard","Start","home"],
@@ -151,9 +152,11 @@ function AppShellFrame({
   const [sheet, setSheet] = useState<"more" | "docs" | "search" | "notifications" | "account" | null>(null);
   useEffect(()=>{if(searchParams.get("panel")==="account")queueMicrotask(()=>setSheet("account"));},[searchParams]);
   const headerPanel=sheet==="search"||sheet==="notifications"||sheet==="account";
-  const dialogRef = useDialogFocus(sheet !== null&&!headerPanel, () => setSheet(null));
   const production=useBackendMode();
   const [query, setQuery] = useState("");
+  const [recentSearches,setRecentSearches]=useState<string[]>([]);
+  const [clearedSearches,setClearedSearches]=useState<string[]|null>(null);
+  const rememberSearch=(term:string)=>{if(term.trim().length>=2){setClearedSearches(null);setRecentSearches(previous=>[term.trim(),...previous.filter(value=>value!==term.trim())].slice(0,5));}};
   const [remoteSearch,setRemoteSearch]=useState<{query:string;items:SearchItem[];loading:boolean;error:string|null}>({query:"",items:[],loading:false,error:null});
   const [timerRunning, setTimerRunning] = useState(false);
   const [dark, setDark] = useState(false);
@@ -333,18 +336,16 @@ function AppShellFrame({
           <button className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={() => setSheet("account")}><Avatar name={profile.name} identity={profile.identity} src={profile.avatar} size="small"/></button>
         </div>}
       </div>
-      <header className={backHref ? "mobile-header mobile-header-detail" : "mobile-header"}>
-        <div className="mobile-header-leading">
-          {backHref ? <Link className="mobile-back" href={backHref} aria-label={backLabel}><Icon name="back"/></Link> : <><Link href="/dashboard" className="mobile-header-brand" aria-label="Zur Übersicht"><Logo compact/></Link><h1 className="mobile-section-title">{title}</h1></>}
-          {backHref && <h1 className="mobile-header-title"><span>{title}</span>{status!=null&&<Status tone={statusTone}>{status}</Status>}</h1>}
-        </div>
+      <AppHeader className={backHref ? "mobile-header mobile-header-detail" : "mobile-header"} detail={!!backHref} leadingClassName="mobile-header-leading" leading={<>
+        {backHref ? <Link className="mobile-back" href={backHref} aria-label={backLabel}><Icon name="back"/></Link> : <><Link href="/dashboard" className="mobile-header-brand" aria-label="Zur Übersicht"><Logo compact/></Link><h1 className="mobile-section-title">{title}</h1></>}
+        {backHref&&<h1 className="mobile-header-title"><span>{title}</span>{status!=null&&<Status tone={statusTone}>{status}</Status>}</h1>}
+      </>} actionClassName={backHref?"mobile-detail-actions":"mobile-header-actions"} actions={backHref ? (allowed&&(mobileActions||visibleActions)?mobileActions??visibleActions:undefined) : <>
+        <IconButton label="Suche" icon="search" onClick={()=>setSheet("search")}/>
+        <button className="mobile-notification-button icon-button" type="button" aria-label="Benachrichtigungen" onClick={openNotifications}><Icon name="bell"/>{unreadNotifications>0&&<i className="notification-badge">{unreadNotifications>99?"99+":unreadNotifications}</i>}</button>
+        <button className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={()=>setSheet("account")}><Avatar name={profile.name} identity={profile.identity} src={profile.avatar} size="small"/></button>
+      </>}>
         {timerRunning&&!backHref&&<Link href="/zeit" className="header-timer" aria-label={"Zeitmessung läuft "+formattedTimer}><i/><b>{formattedTimer}</b></Link>}
-        {backHref&&(mobileActions||visibleActions)&&allowed&&<div className="mobile-detail-actions">{mobileActions??visibleActions}</div>}
-        <div className="mobile-header-actions"><IconButton label="Suche" icon="search" onClick={() => setSheet("search")}/>
-          <button className="mobile-notification-button icon-button" type="button" aria-label="Benachrichtigungen" onClick={openNotifications}><Icon name="bell"/>{unreadNotifications>0&&<i className="notification-badge">{unreadNotifications>99?"99+":unreadNotifications}</i>}</button>
-          <button className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={() => setSheet("account")}><Avatar name={profile.name} identity={profile.identity} src={profile.avatar} size="small"/></button>
-        </div>
-      </header>
+      </AppHeader>
 
       <main className="page-container" data-section={active}>
         <div className={backHref ? "page-head page-head-detail" : "page-head"}>
@@ -355,56 +356,29 @@ function AppShellFrame({
 
       {timerNotice&&<div className="timer-notice" role="status">{timerNotice}</div>}
 
-      {!preview && !formActive && <nav className={`bottom-nav ${navCompact ? "is-compact" : ""}`} aria-label="Hauptnavigation">
+      {!preview && !formActive && <MobileDock compact={navCompact} action={!backHref&&allowed?<QuickCreateAction key={pathname} placement="dock" section={active} returnTo={pathname}/>:undefined}><nav className={`bottom-nav ${navCompact ? "is-compact" : ""}`} aria-label="Hauptnavigation">
         <Link href="/dashboard" className={active==="dashboard"?"active":""}><Icon name="home"/><span>Start</span></Link>
         {canOpen("/kunden")&&<Link href="/kunden" className={active==="kunden"?"active":""}><Icon name="users"/><span>Kunden</span></Link>}
         <Link href="/finanzen" className={["angebote","rechnungen","zahlungen","belege","finanzen"].includes(active)?"active":""}><Icon name="wallet"/><span>Finanzen</span></Link>
         {canOpen("/zeit")&&<Link href="/zeit" className={active==="zeit"?"active":""}><Icon name="clock"/><span>Zeit</span></Link>}
         <button type="button" className={["produkte","spesen","mitarbeiter","support","einstellungen"].includes(active)?"active":""} onClick={() => setSheet("more")}><Icon name="more"/><span>Mehr</span></button>
-      </nav>}
+      </nav></MobileDock>}
 
       {headerPanel&&<HeaderPanel key={sheet} kind={sheet} label={sheet==="search"?"Suche":sheet==="account"?"Konto":"Benachrichtigungen"} onClose={()=>setSheet(null)}>
-        {sheet==="search"&&<SearchPanel query={query} onQuery={setQuery} items={filtered} loading={searchLoading} error={searchError} onClose={()=>setSheet(null)}/>}
+        {sheet==="search"&&<SearchPanel query={query} onQuery={setQuery} items={filtered} loading={searchLoading} error={searchError} recent={recentSearches} onRemember={rememberSearch} onClearRecent={()=>{setClearedSearches(recentSearches);setRecentSearches([])}} onUndoRecent={clearedSearches?()=>{setRecentSearches(clearedSearches);setClearedSearches(null)}:undefined} onClose={()=>setSheet(null)}/>}
         {sheet==="notifications"&&<NotificationPanel items={notifications} loading={notificationsLoading} error={notificationsError} filter={notificationFilter} onFilter={setNotificationFilter} onRead={id=>void markNotificationRead(id)} onReadAll={()=>void markAllRead()} onRetry={()=>void loadNotifications()} onClose={()=>setSheet(null)}/>}
         {sheet==="account"&&<AccountPanel profile={profile} demo={demoSession} logoutBusy={logoutBusy} onLogout={()=>void logout()} onClose={()=>setSheet(null)}/>}
       </HeaderPanel>}
-      {sheet&&!headerPanel && <div className={`sheet-layer ${sheet==="more"||sheet==="docs"?"sheet-layer-navigation":""}`} role="presentation" onMouseDown={(e) => { if (e.target === e.currentTarget) setSheet(null); }}>
-        <section ref={dialogRef} tabIndex={-1} className="bottom-sheet" role="dialog" aria-modal="true" aria-label={sheet === "more" ? "Mehr" : sheet === "docs" ? "Finanzen" : "Benachrichtigungen"}>
-          <div className="sheet-handle"/>
-          <header className="sheet-header">
-            <div>
-              <h2>{sheet === "more" ? "Mehr" : sheet === "docs" ? "Finanzen" : "Benachrichtigungen"}</h2>
-              {sheet === "docs" && <p>Dokumente und Zahlungen direkt öffnen.</p>}
-            </div>
-            <IconButton label="Schliessen" icon="close" onClick={() => setSheet(null)}/>
-          </header>
-
-          {sheet === "docs" && <div className="sheet-menu">
-            <SheetLink href="/finanzen" icon="receipt" title="Finanzübersicht" text="Angebote, Rechnungen und Zahlungen zusammen" onSelect={() => setSheet(null)}/>
-            <SheetLink href="/angebote" icon="file" title="Angebote" text="Erstellen und nachverfolgen" onSelect={() => setSheet(null)}/>
-            <SheetLink href="/rechnungen" icon="receipt" title="Rechnungen" text="Erstellen, senden und verwalten" onSelect={() => setSheet(null)}/>
-            <SheetLink href="/zahlungen" icon="wallet" title="Zahlungen" text="Eingänge und offene Beträge" onSelect={() => setSheet(null)}/>
-          </div>}
-
-          {sheet === "more" && <>
-            <div className="sheet-menu">
-              <SheetLink href="/produkte" icon="box" title="Produkte" text="Produkte und Dienstleistungen" onSelect={() => setSheet(null)}/>
-              <SheetLink href="/mitarbeiter" icon="users" title="Mitarbeiter" text="Stammdaten und Arbeitsverhältnis" onSelect={() => setSheet(null)}/>
-              <SheetLink href="/spesen" icon="card" title="Spesen" text="Quittungen und Freigaben" onSelect={() => setSheet(null)}/>
-              <SheetLink href="/finanzen/analyse" icon="chart" title="Finanzanalyse" text="Einnahmen, Kosten und Auswertungen" onSelect={() => setSheet(null)}/>
-              <SheetLink href="/support" icon="support" title="Support" text="Tickets und Hilfe" onSelect={() => setSheet(null)}/>
-              <SheetLink href="/einstellungen" icon="settings" title="Einstellungen" text="Alle Einstellungen" onSelect={() => setSheet(null)}/>
-            </div>
-            <div className="sheet-secondary">
-              <button type="button" disabled={logoutBusy} onClick={()=>void logout()}><Icon name="logout"/><span>{logoutBusy?"Wird abgemeldet…":"Abmelden"}</span></button>
-            </div>
-          </>}
-
-
-
-
-        </section>
-      </div>}
+      <ActionSheet label={sheet==="docs"?"Finanzen":"Mehr"} open={!!sheet&&!headerPanel} onClose={()=>setSheet(null)}>
+        <div className="action-list">
+          {(sheet==="docs"?[
+            ["/finanzen","receipt","Finanzübersicht"],["/angebote","file","Angebote"],["/rechnungen","receipt","Rechnungen"],["/zahlungen","wallet","Zahlungen"],
+          ]:[
+            ["/angebote","file","Angebote"],["/rechnungen","receipt","Rechnungen"],["/zahlungen","wallet","Zahlungen"],["/produkte","box","Produkte"],["/mitarbeiter","users","Mitarbeiter"],["/spesen","card","Spesen"],["/finanzen/analyse","chart","Finanzanalyse"],["/support","support","Support"],["/einstellungen","settings","Einstellungen"],
+          ]).map(([href,icon,label])=><ActionRow key={href} href={href} icon={icon} title={label} navigation onClick={()=>setSheet(null)}/>)}
+        </div>
+        {sheet==="more"&&<div className="sheet-secondary"><ActionRow icon="logout" title={logoutBusy?"Wird abgemeldet…":"Abmelden"} disabled={logoutBusy} onClick={()=>void logout()}/></div>}
+      </ActionSheet>
     </div>
   </div></PageAccessContext.Provider>;
 }

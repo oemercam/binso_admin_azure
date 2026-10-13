@@ -59,9 +59,9 @@ try{
  // Authenticated governance pages load on explicit navigation, without speculative RSC requests.
  const speculativeGovernance=[];
  page.on('request',request=>{const target=new URL(request.url());if(['/operator/ankuendigungen','/operator/sicherheit','/operator/audit','/operator/monitoring'].includes(target.pathname)&&request.headers()['next-router-prefetch']==='1')speculativeGovernance.push(target.pathname);});
- await page.setViewportSize({width:1440,height:900});await page.goto(base+'/operator');await page.locator('.operator-page-head h1').waitFor();await page.waitForLoadState('networkidle');
+ await page.setViewportSize({width:1440,height:900});await page.goto(base+'/operator');await page.locator('.operator-root').getByRole('heading',{level:1}).waitFor();await page.waitForLoadState('networkidle');
  assert.deepEqual(speculativeGovernance,[],'Desktop admin navigation does not preload authenticated pages');
- await page.locator('.operator-sidebar a[href="/operator/sicherheit"]').click();await page.waitForURL(base+'/operator/sicherheit');await page.locator('.operator-page-head h1').waitFor();await page.waitForLoadState('networkidle');
+ await page.locator('.operator-sidebar a[href="/operator/sicherheit"]').click();await page.waitForURL(base+'/operator/sicherheit');await page.locator('.operator-root').getByRole('heading',{level:1}).waitFor();await page.waitForLoadState('networkidle');
  assert.equal(await page.getByRole('heading',{name:'Keine Berechtigung für diesen Bereich',exact:true}).count(),0,'Explicit authenticated sidebar navigation still works');
  // The independent wallboard opens in its own document; keep the portal mounted.
  const portalPage=page;page=await context.newPage();observeErrors(page);
@@ -83,8 +83,9 @@ try{
  // Every implemented admin page and both detail views consume real isolated APIs.
  const portalRoutes=['','tickets','tickets/'+supportCase.id,'kunden','kunden/'+org,'zahlungen','finanzen','abonnemente','sperrungen','monitoring','ankuendigungen','sicherheit','audit'];
  for(const theme of ['light','dark'])for(const width of [320,390,820,1440])for(const section of portalRoutes){
-  await page.setViewportSize({width,height:900});await navigateOperator(page,'/operator'+(section?'/'+section:''));await page.locator('.operator-page-head h1').waitFor();
+  await page.setViewportSize({width,height:900});await navigateOperator(page,'/operator'+(section?'/'+section:''));await page.locator('.operator-root').getByRole('heading',{level:1}).waitFor();
   await page.waitForLoadState('networkidle');await page.evaluate(theme=>document.documentElement.dataset.theme=theme,theme);
+  assert.equal(await page.locator('.operator-root').getByRole('heading',{level:1}).count(),1,'One visible admin title '+section+' '+width);
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,'Admin overflow '+section+' '+width);
   assert.equal(await page.getByText(/Invalid Date|undefined/).count(),0,'Actual admin contract '+section);
   const loadErrors=await page.locator('.operator-root').getByRole('alert').allTextContents();

@@ -358,7 +358,7 @@
   font-size:13px;
   line-height:1.45;
 }
-.operator-main>:not(.operator-app-header):not(.operator-page-head):not(.sheet-layer):not(.operator-mobile-nav):not(.operator-mobile-more-layer){
+.operator-main>:not(.operator-app-header):not(.operator-page-head):not(.sheet-layer):not(.mobile-dock){
   width:100%;
   max-width:1760px;
   margin-left:auto;
@@ -391,3 +391,5 @@
 
 /* A single selected insight fills the desktop workspace instead of an empty half-grid. */
 .operator-insight-grid:has(>.bo-workspace-section:only-child){grid-template-columns:minmax(0,1fr)}
+
+.operator-header-title{display:none}

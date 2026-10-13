@@ -1,0 +1,38 @@
+{
+  "commit": "4b8e0115a90de981b11f1d716a8145e97efa7e6f",
+  "approval": "User explicitly authorized shared glass navigation, separate plus, both portals and app/tablet standardization on 2026-10-13; old destination/access/scroll/icon contracts remain enforced.",
+  "snapshot": {
+    "markup": "fdb851e1029133e479bd3adad4af5cc936eb78961b6aab9d1983126468816e1f",
+    "logic": "8724e28af32d7aaf1779885ccdaed77f7f43f7c07a0d461dccdb6256aaa8e433",
+    "icons": "b01b4f68013ccaea6f5846ffb30b07bc0a079eac3adeb9bac3800cbfdbe9366e",
+    "rules": "8f5b68484964e3f92f96c808ac5ffb22c9a7d80c68375df4f8caa60ae8b7ae3f",
+    "tokens": "698f9a3b5696c2d23ab7fed7668f4bd7edc4275faa8023bc2b099fbfa6c0b531",
+    "tokenNames": [
+      "--app-accent",
+      "--app-glass-blur",
+      "--app-glass-line",
+      "--app-glass-shadow",
+      "--app-glass-solid",
+      "--app-glass-tint",
+      "--color-fg",
+      "--color-muted",
+      "--dock-action-size",
+      "--dock-gap",
+      "--mobile-nav-bottom",
+      "--mobile-nav-compact-h",
+      "--mobile-nav-compact-radius",
+      "--mobile-nav-edge",
+      "--mobile-nav-h",
+      "--mobile-nav-radius",
+      "--motion-base",
+      "--motion-ease",
+      "--motion-ease-standard",
+      "--motion-fast",
+      "--safe-bottom",
+      "--safe-left",
+      "--safe-right",
+      "--touch"
+    ]
+  },
+  "customerContract": "b1d31cc9a936ff231d7ebde3f497b3bf5ca7d1ff035d87f73ce67f411811d4b8"
+}
