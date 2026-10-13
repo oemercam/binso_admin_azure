@@ -7,9 +7,10 @@ import {IconButton} from "./ui";
 
 export type HeaderPanelKind="search"|"notifications"|"account";
 
-/** All global header interactions share this anchored modal and viewport contract. */
+/** Global interactions share full mobile views and anchored desktop panels. */
 export function HeaderPanel({kind,label,onClose,children,headerSelector,backgroundSelector=".page-container,.app-sidebar,.bottom-nav"}:{kind:HeaderPanelKind;label:string;onClose:()=>void;children:ReactNode;headerSelector?:string;backgroundSelector?:string}){
- const dialog=useDialogFocus(true,onClose,true,headerSelector);
+ const [mobile,setMobile]=useState(false);
+ const dialog=useDialogFocus(true,onClose,true,mobile?".header-panel":headerSelector);
  const trigger=useRef<HTMLElement|null>(typeof document!=="undefined"&&document.activeElement instanceof HTMLElement?document.activeElement:null);
  const [placement,setPlacement]=useState({top:64,right:16});
  useEffect(()=>{
@@ -21,6 +22,7 @@ export function HeaderPanel({kind,label,onClose,children,headerSelector,backgrou
  useEffect(()=>{
   const update=()=>{
    const mobile=window.innerWidth<=760;
+   setMobile(mobile);
    const header=document.querySelector(headerSelector??(mobile?".mobile-header":".desktop-appbar"));
    const rect=header?.getBoundingClientRect();
    const anchor=trigger.current?.getBoundingClientRect();
@@ -32,7 +34,7 @@ export function HeaderPanel({kind,label,onClose,children,headerSelector,backgrou
  },[onClose,headerSelector]);
  return createPortal(<div className="header-panel-layer" style={{"--header-panel-top":`${placement.top}px`,"--header-panel-right":`${placement.right}px`} as React.CSSProperties} onMouseDown={event=>{if(event.target===event.currentTarget)onClose()}}>
   <section ref={dialog} className={`header-panel header-panel-${kind}`} tabIndex={-1} role="dialog" aria-modal="true" aria-label={label}>
-   <header className="header-panel-heading"><h2>{label}</h2><IconButton label="Schliessen" icon="close" onClick={onClose}/></header>
+   <header className="header-panel-heading"><h2>{label}</h2><IconButton label={mobile?"Zurück":"Schliessen"} icon={mobile?"back":"close"} onClick={onClose}/></header>
    {children}
   </section>
  </div>,document.body);

@@ -148,7 +148,7 @@ function AppShellFrame({
   const logoutBusyRef=useRef(false);
   const [confirmLogout,setConfirmLogout]=useState(false);
   const [logoutError,setLogoutError]=useState<string|null>(null);
-  const [sheet, setSheet] = useState<"more" | "docs" | "search" | "notifications" | "quick" | "account" | null>(null);
+  const [sheet, setSheet] = useState<"more" | "docs" | "search" | "notifications" | "account" | null>(null);
   useEffect(()=>{if(searchParams.get("panel")==="account")queueMicrotask(()=>setSheet("account"));},[searchParams]);
   const headerPanel=sheet==="search"||sheet==="notifications"||sheet==="account";
   const dialogRef = useDialogFocus(sheet !== null&&!headerPanel, () => setSheet(null));
@@ -335,7 +335,7 @@ function AppShellFrame({
       </div>
       <header className={backHref ? "mobile-header mobile-header-detail" : "mobile-header"}>
         <div className="mobile-header-leading">
-          {backHref ? <Link className="mobile-back" href={backHref} aria-label={backLabel}><Icon name="back"/></Link> : <Link href="/dashboard"><Logo /></Link>}
+          {backHref ? <Link className="mobile-back" href={backHref} aria-label={backLabel}><Icon name="back"/></Link> : <><Link href="/dashboard" className="mobile-header-brand" aria-label="Zur Übersicht"><Logo compact/></Link><h1 className="mobile-section-title">{title}</h1></>}
           {backHref && <h1 className="mobile-header-title"><span>{title}</span>{status!=null&&<Status tone={statusTone}>{status}</Status>}</h1>}
         </div>
         {timerRunning&&!backHref&&<Link href="/zeit" className="header-timer" aria-label={"Zeitmessung läuft "+formattedTimer}><i/><b>{formattedTimer}</b></Link>}
@@ -369,13 +369,12 @@ function AppShellFrame({
         {sheet==="account"&&<AccountPanel profile={profile} demo={demoSession} logoutBusy={logoutBusy} onLogout={()=>void logout()} onClose={()=>setSheet(null)}/>}
       </HeaderPanel>}
       {sheet&&!headerPanel && <div className={`sheet-layer ${sheet==="more"||sheet==="docs"?"sheet-layer-navigation":""}`} role="presentation" onMouseDown={(e) => { if (e.target === e.currentTarget) setSheet(null); }}>
-        <section ref={dialogRef} tabIndex={-1} className="bottom-sheet" role="dialog" aria-modal="true" aria-label={sheet === "more" ? "Mehr" : sheet === "docs" ? "Finanzen" : sheet === "quick" ? "Erstellen" : "Benachrichtigungen"}>
+        <section ref={dialogRef} tabIndex={-1} className="bottom-sheet" role="dialog" aria-modal="true" aria-label={sheet === "more" ? "Mehr" : sheet === "docs" ? "Finanzen" : "Benachrichtigungen"}>
           <div className="sheet-handle"/>
           <header className="sheet-header">
             <div>
-              <h2>{sheet === "more" ? "Mehr" : sheet === "docs" ? "Finanzen" : sheet === "quick" ? "Erstellen" : "Benachrichtigungen"}</h2>
+              <h2>{sheet === "more" ? "Mehr" : sheet === "docs" ? "Finanzen" : "Benachrichtigungen"}</h2>
               {sheet === "docs" && <p>Dokumente und Zahlungen direkt öffnen.</p>}
-              {sheet === "quick" && <p>Häufige Aufgaben ohne Umweg starten.</p>}
             </div>
             <IconButton label="Schliessen" icon="close" onClick={() => setSheet(null)}/>
           </header>
@@ -401,14 +400,7 @@ function AppShellFrame({
             </div>
           </>}
 
-          {sheet === "quick" && <div className="sheet-menu quick-create-menu">
-            <SheetLink href="/kunden/neu" icon="users" title="Kunde" text="Neuen Kunden erfassen" onSelect={() => setSheet(null)}/>
-            <SheetLink href="/angebote/neu" icon="file" title="Angebot" text="Angebot mit Live-Vorschau erstellen" onSelect={() => setSheet(null)}/>
-            <SheetLink href="/rechnungen/neu" icon="receipt" title="Rechnung" text="Rechnung erstellen und prüfen" onSelect={() => setSheet(null)}/>
-            <SheetLink href="/zahlungen/neu" icon="wallet" title="Zahlung" text="Zahlung zu einer Rechnung erfassen" onSelect={() => setSheet(null)}/>
-            <SheetLink href="/spesen/neu" icon="card" title="Spese" text="Beleg und Ausgabe erfassen" onSelect={() => setSheet(null)}/>
-            <SheetLink href="/mitarbeiter/neu" icon="users" title="Mitarbeiter" text="Teammitglied hinzufügen" onSelect={() => setSheet(null)}/>
-          </div>}
+
 
 
         </section>

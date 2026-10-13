@@ -1,4 +1,7 @@
 "use client";
+import {RingChart} from "./statistics";
+import {formatDateTime} from "@/lib/display-format";
+import {supportReference} from "@/lib/support-reference";
 import {MonitoringPanel} from "./monitoring";
 import {useApiQuery} from "@/lib/client/use-api-query";
 import {ActionRow, FilterSheet, FormSheet, MetricTiles, MetricTile, WorkspaceSection,DetailTabs} from "./binso-ux";
@@ -8,7 +11,7 @@ import ConfirmDialog from "./confirm-dialog";
 import Link from "next/link";
 import {HeaderPanel} from "./header-panel";
 import {Avatar} from "./avatar";
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useDialogFocus } from "./use-dialog-focus";
 import { PageHeading } from "./binso-ux";
@@ -74,6 +77,7 @@ const tickets = [
 ];
 
 type OperatorTicket = {
+  case_number?:string;
   id:string;
   subject:string;
   priority:string;
@@ -169,7 +173,7 @@ export function OperatorPage({ section = "", demo = false, identity, role="platf
         </section>
       </div>}
 
-      {!allowed ? <EmptyState icon="lock" title="Keine Berechtigung für diesen Bereich" text="Deine Adminrolle erlaubt diesen Zugriff nicht. Wende dich für eine passende Rolle an die Entra-Administration."/> : detail && key === "tickets" ? <TicketDetail ticketId={detail}/> :
+      <div className="operator-app-content">{!allowed ? <EmptyState icon="lock" title="Keine Berechtigung für diesen Bereich" text="Deine Adminrolle erlaubt diesen Zugriff nicht. Wende dich für eine passende Rolle an die Entra-Administration."/> : detail && key === "tickets" ? <TicketDetail ticketId={detail}/> :
         detail && key === "kunden" ? <OperatorCustomerDetail tenantId={detail}/> :
         key === "tickets" ? <TicketsView/> :
         key === "kunden" ? <CustomersView/> :
@@ -181,7 +185,7 @@ export function OperatorPage({ section = "", demo = false, identity, role="platf
         key === "ankuendigungen" ? <AnnouncementsView open={createOpen} onClose={()=>setCreateOpen(false)}/> :
         key === "sicherheit" ? <SecurityView/> :
         key === "audit" ? <AuditView/> :
-        <OperatorDashboard/>}
+        <OperatorDashboard/>}</div>
     </main>
   </div></OperatorAccess.Provider>;
 }
@@ -234,7 +238,7 @@ function OperatorDashboard() {
     ].map(([label,value,href])=>value==="—"?<MetricTile key={String(label)} label={String(label)} value="—" hint="Keine Berechtigung"/>:<Link href={String(href)} key={String(label)}><MetricTile label={String(label)} value={String(value)}/></Link>)}</MetricTiles>
     {(canBilling||canSupport)&&<div className="operator-insight-grid"><WorkspaceSection>
       {canBilling&&canSupport&&<DetailTabs label="Dashboard-Auswertungen"><button type="button" className={activeInsight==='billing'?'active':''} onClick={()=>setInsight('billing')}>Abrechnung</button><button type="button" className={activeInsight==='support'?'active':''} onClick={()=>setInsight('support')}>Support</button></DetailTabs>}
-      {activeInsight==='billing'?<><SectionTitle title="Abrechnung"/><MetricTiles columns={2}><Link href="/operator/zahlungen"><MetricTile label="Zahlungen letzte 30 Tage" value={moneyChf(Number(stats.payments_30d??0))}/></Link><Link href="/operator/finanzen"><MetricTile label="Monatlicher Vertragswert" value={moneyChf(Number(stats.monthly_contract_value??0))}/></Link></MetricTiles></>:<><SectionTitle title="Support"/><MetricTiles columns={3}>{[["Offen",open],["In Bearbeitung",progress],["Gelöst",resolved]].map(([label,value])=><Link href="/operator/tickets" key={String(label)}><MetricTile label={String(label)} value={String(value)}/></Link>)}</MetricTiles></>}
+      {activeInsight==='billing'?<><SectionTitle title="Abrechnung"/><MetricTiles columns={2}><Link href="/operator/zahlungen"><MetricTile label="Zahlungen letzte 30 Tage" value={moneyChf(Number(stats.payments_30d??0))}/></Link><Link href="/operator/finanzen"><MetricTile label="Monatlicher Vertragswert" value={moneyChf(Number(stats.monthly_contract_value??0))}/></Link></MetricTiles></>:<><SectionTitle title="Support"/><RingChart label="Offen / in Bearbeitung / gelöst" format="number" parts={[{key:"open",label:"Offen",tone:"negative",value:open},{key:"progress",label:"In Bearbeitung",tone:"neutral",value:progress},{key:"resolved",label:"Gelöst",tone:"positive",value:resolved}]}/></>}
     </WorkspaceSection></div>}
     <WorkspaceSection><SectionTitle title="Systemstatus" action={<Link prefetch={false} href="/operator/monitoring">Monitoring öffnen</Link>}/><p>{incidents.length?incidents.length+" aktive Störungen erfasst":"Keine aktiven Störungen erfasst."}</p></WorkspaceSection>
     {canSupport&&<WorkspaceSection><SectionTitle title="Letzte Supportfälle" action={<Link href="/operator/tickets">Alle Tickets</Link>}/>{recent.length?<div className="compact-list">{recent.map(x=><Link href={"/operator/tickets/"+x.id} key={x.id}><b>{x.subject}</b><span>{x.tenant?.name??"Kunde"}</span><Status>{operatorStatus(x.status)}</Status></Link>)}</div>:<EmptyState compact icon="support" title="Keine offenen Supportfälle" text="Neue Anfragen erscheinen hier."/>}</WorkspaceSection>}
@@ -263,8 +267,8 @@ function TicketsView() {
  const chips=['Alle','Offen','In Bearbeitung','Wartet auf Kunde','Gelöst'];
  const columns=[{label:'Ticket',index:0},{label:'Kunde',index:1},{label:'Priorität',index:2},{label:'Status',index:3,status:true},{label:'Aktualisiert',index:4}];
  const controller=useRecordsController({placeholder:'Tickets suchen...',chips,columns});
- const rows=production?items.map(item=>[item.subject,item.tenant?.name??'Kunde',item.priority==='critical'?'Kritisch':item.priority==='high'?'Hoch':item.priority==='low'?'Niedrig':'Normal',operatorStatus(item.status),new Date(item.updated_at).toLocaleString('de-CH',{dateStyle:'short',timeStyle:'short'}),item.id]):tickets.map(([nr,subject,customer,status])=>[subject,customer,'Normal',status,'Demo',nr.replace('#','')]);
- return <><RecordsControls inline controller={controller} placeholder="Tickets suchen..." chips={chips} columns={columns}/><RecordsView controller={controller} toolbarActions={false} filterSummary={false} showCount={false} items={rows} loading={production&&loading} error={loadError} placeholder="Tickets suchen..." countLabel="Tickets" emptyLabel={chip=>({Offen:"Keine offenen Tickets",["In Bearbeitung"]:"Keine Tickets in Bearbeitung",["Wartet auf Kunde"]:"Keine wartenden Tickets",Gelöst:"Keine gelösten Tickets"}[chip]??"Keine Tickets erfasst")} chips={chips} columns={columns} rowHref={row=>'/operator/tickets/'+row[5]} statusGroups={{Gelöst:['Gelöst','Geschlossen']}}>{row=><RecordRow compact valuePlacement="metadata" href={'/operator/tickets/'+row[5]} title={row[0]} meta={[row[1],row[2],row[4]].join(' · ')} status={row[3]}/>}</RecordsView>{loadError&&<Button variant="secondary" onClick={refresh}>Erneut versuchen</Button>}</>;
+ const rows=production?items.map(item=>[item.subject,item.tenant?.name??'Kunde',item.priority==='critical'?'Kritisch':item.priority==='high'?'Hoch':item.priority==='low'?'Niedrig':'Normal',operatorStatus(item.status),formatDateTime(item.updated_at),item.id,supportReference(item.id,item.case_number)]):tickets.map(([nr,subject,customer,status])=>[subject,customer,'Normal',status,'Demo',nr.replace('#','')]);
+ return <><RecordsControls inline controller={controller} placeholder="Tickets suchen..." chips={chips} columns={columns}/><RecordsView controller={controller} toolbarActions={false} filterSummary={false} showCount={false} items={rows} loading={production&&loading} error={loadError} placeholder="Tickets suchen..." countLabel="Tickets" emptyLabel={chip=>({Offen:"Keine offenen Tickets",["In Bearbeitung"]:"Keine Tickets in Bearbeitung",["Wartet auf Kunde"]:"Keine wartenden Tickets",Gelöst:"Keine gelösten Tickets"}[chip]??"Keine Tickets erfasst")} chips={chips} columns={columns} rowHref={row=>'/operator/tickets/'+row[5]} statusGroups={{Gelöst:['Gelöst','Geschlossen']}}>{row=><RecordRow compact valuePlacement="metadata" href={'/operator/tickets/'+row[5]} title={row[0]} meta={[row[6],row[1],row[2],row[4]].filter(Boolean).join(' · ')} status={row[3]}/>}</RecordsView>{loadError&&<Button variant="secondary" onClick={refresh}>Erneut versuchen</Button>}</>;
 }
 
 function TicketDetail({ticketId}:{ticketId:string}) {
@@ -276,6 +280,7 @@ function TicketDetail({ticketId}:{ticketId:string}) {
   const [reply,setReply]=useState("");
   const [internal,setInternal]=useState(false);
   const [sending,setSending]=useState(false),[updating,setUpdating]=useState(false);
+  const sendPending=useRef(false);
   const [toast,setToast,toastTone]=useOperatorToast();
   const [ticket,setTicket]=useState<Record<string,unknown>|null>(null);
   const [messages,setMessages]=useState<Array<Record<string,unknown>>>([]);
@@ -298,19 +303,19 @@ function TicketDetail({ticketId}:{ticketId:string}) {
   };
 
   const send=async()=>{
-    const value=reply.trim();
-    if(!value||sending)return;
+    const draft=reply,value=draft.trim();
+    if(!value||sending||sendPending.current)return;
     if(!production){setReply("");setToast("Antwort wurde im Ticket ergänzt.");window.setTimeout(()=>setToast(null),2200);return;}
-    setSending(true);
+    sendPending.current=true;setSending(true);
     try{
       const payload=await apiPost<{item:Record<string,unknown>}>("/api/operator/tickets/"+encodeURIComponent(ticketId)+"/messages",{body:value,internal});
       setMessages(current=>current.some(item=>item.id===payload.item.id)?current:[...current,payload.item]);
-      setReply("");
+      setReply(current=>current===draft?"":current);
       setToast(internal?"Interne Notiz gespeichert.":"Antwort gesendet.");
     }catch(error){
       setToast(error instanceof Error?error.message:"Nachricht konnte nicht gespeichert werden.","danger");
     }
-    setSending(false);
+    sendPending.current=false;setSending(false);
     window.setTimeout(()=>setToast(null),2200);
   };
 
@@ -404,7 +409,7 @@ function OperatorCustomerDetail({tenantId}:{tenantId:string}) {
     <div className="operator-customer-grid">
       <WorkspaceSection><SectionTitle title="Konto"/><dl className="operator-detail-list"><div><dt>Firma</dt><dd>{String(tenant.name??"—")}</dd></div><div><dt>E-Mail</dt><dd>{String(tenant.email??"—")}</dd></div><div><dt>Telefon</dt><dd>{String(tenant.phone??"—")}</dd></div><div><dt>Erstellt</dt><dd>{new Date(String(tenant.created_at)).toLocaleDateString("de-CH")}</dd></div><div><dt>Mandant</dt><dd>{String(tenant.id)}</dd></div></dl></WorkspaceSection>
       <WorkspaceSection><SectionTitle title="Abonnement"/><div className="context-block"><small>Plan</small><b>{operatorPlan(plan)}</b><span>{overview.monthly_contract_value==null?"Vertragswert: "+(access?.billing?"Keine Daten":"Keine Berechtigung"):moneyChf(Number(overview.monthly_contract_value))+" / Monat"}</span><Status tone={String(account?.subscription_status)==="active"?"success":"warning"}>{operatorStatus(String(account?.subscription_status??"Nicht verfügbar"))}</Status></div><div className="context-block"><small>Kontostatus</small><b>{operatorStatus(accountStatus)}</b><span>{access?.restrictions?(restrictions.length?String(restrictions.length)+" aktive Einschränkung(en)":"Keine aktive Einschränkung"):"Einschränkungen: Keine Berechtigung"}</span></div></WorkspaceSection>
-      <WorkspaceSection><SectionTitle title="Support"/>{!access?.support?<p>Keine Berechtigung für Supportfälle.</p>:(data.tickets??[]).length?<div className="compact-list">{(data.tickets??[]).map(ticket=><Link href={"/operator/tickets/"+String(ticket.id)} key={String(ticket.id)}><b>{"#"+String(ticket.id).slice(0,8)+" · "+String(ticket.subject??"")}</b><span>{new Date(String(ticket.updated_at)).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"})}</span><Status tone={String(ticket.status)==="resolved"?"success":"warning"}>{operatorStatus(String(ticket.status))}</Status></Link>)}</div>:<EmptyState compact icon="support" title="Keine Tickets" text="Für diesen Kunden sind keine Tickets vorhanden."/>}</WorkspaceSection>
+      <WorkspaceSection><SectionTitle title="Support"/>{!access?.support?<p>Keine Berechtigung für Supportfälle.</p>:(data.tickets??[]).length?<div className="compact-list">{(data.tickets??[]).map(ticket=><Link href={"/operator/tickets/"+String(ticket.id)} key={String(ticket.id)}><b>{supportReference(String(ticket.id),typeof ticket.case_number==="string"?ticket.case_number:undefined)+" · "+String(ticket.subject??"")}</b><span>{new Date(String(ticket.updated_at)).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"})}</span><Status tone={String(ticket.status)==="resolved"?"success":"warning"}>{operatorStatus(String(ticket.status))}</Status></Link>)}</div>:<EmptyState compact icon="support" title="Keine Tickets" text="Für diesen Kunden sind keine Tickets vorhanden."/>}</WorkspaceSection>
       <WorkspaceSection><SectionTitle title="Audit"/>{!access?.audit?<p>Keine Berechtigung für Audit-Einträge.</p>:(data.audit??[]).length?<div className="audit-list">{(data.audit??[]).map(item=><span key={String(item.id)}><b>{new Date(String(item.created_at)).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"})}</b> {String(item.action)}</span>)}</div>:<p>Noch keine tenant-spezifischen Audit-Einträge.</p>}</WorkspaceSection>
     </div>
   </>;

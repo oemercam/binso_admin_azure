@@ -1,0 +1,179 @@
+{
+  "baseline": "cbd0f03b0a6923bcc1506ae30f93bb190abd7f41",
+  "sourceFingerprint": "68ff2d73208ce0b9a5d34f8ba4bc61996a887fb268dc1a66873f8d2dfc4e7d01",
+  "scope": "Local checks only. Browser/device, real Unix scanner transport and GitHub CI remain pending.",
+  "checks": {
+    "lint": "passed",
+    "typecheck": "passed",
+    "productionBuild": "passed",
+    "cssArchitecture": "passed",
+    "releaseConsistency": "passed",
+    "routeCssHttp": {
+      "status": "passed",
+      "routes": 57,
+      "stylesheets": 5
+    },
+    "navigationFrozenReference": "passed",
+    "suites": [
+      {
+        "command": "node scripts/readiness-integrity-test.mjs",
+        "status": "passed",
+        "limitation": null
+      },
+      {
+        "command": "node scripts/security-exception-test.mjs",
+        "status": "passed",
+        "limitation": null
+      },
+      {
+        "command": "node scripts/runtime-integrity-test.mjs",
+        "status": "passed",
+        "limitation": null
+      },
+      {
+        "command": "node scripts/file-scan-test.mjs",
+        "status": "passed",
+        "limitation": "Existing in-memory duplex protocol transport; real Unix socket not tested."
+      },
+      {
+        "command": "node scripts/file-rescan-test.mjs",
+        "status": "passed",
+        "limitation": null
+      },
+      {
+        "command": "node scripts/auth-integrity-test.mjs",
+        "status": "passed",
+        "limitation": null
+      },
+      {
+        "command": "node scripts/registration-test.mjs",
+        "status": "passed",
+        "limitation": null
+      },
+      {
+        "command": "node scripts/statistics-test.mjs",
+        "status": "passed",
+        "limitation": null
+      },
+      {
+        "command": "node scripts/v23-2-ux-test.mjs",
+        "status": "passed",
+        "limitation": null
+      },
+      {
+        "command": "node scripts/architecture-selfcheck.mjs",
+        "status": "passed",
+        "limitation": null
+      },
+      {
+        "command": "node scripts/permission-selfcheck.mjs",
+        "status": "passed",
+        "limitation": null
+      },
+      {
+        "command": "node scripts/theme-selfcheck.mjs",
+        "status": "passed",
+        "limitation": null
+      },
+      {
+        "command": "node scripts/client-session-test.mjs",
+        "status": "passed",
+        "limitation": null
+      },
+      {
+        "command": "node scripts/migration-test.mjs",
+        "status": "passed",
+        "limitation": null
+      },
+      {
+        "command": "node scripts/data-lifecycle-schema-test.mjs",
+        "status": "passed",
+        "limitation": null
+      },
+      {
+        "command": "node scripts/ux-regression-test.mjs",
+        "status": "passed",
+        "limitation": null
+      },
+      {
+        "command": "node scripts/pwa-preview-test.mjs",
+        "status": "passed",
+        "limitation": null
+      },
+      {
+        "command": "node scripts/pwa-lifecycle-test.mjs",
+        "status": "passed",
+        "limitation": null
+      },
+      {
+        "command": "node scripts/document-presentation-test.mjs",
+        "status": "passed",
+        "limitation": null
+      },
+      {
+        "command": "node scripts/qa-plan-test.mjs",
+        "status": "passed",
+        "limitation": null
+      },
+      {
+        "command": "node scripts/browser-shards-test.mjs",
+        "status": "passed",
+        "limitation": null
+      },
+      {
+        "command": "node scripts/navigation-contract-test.mjs",
+        "status": "passed",
+        "limitation": null
+      },
+      {
+        "command": "node scripts/ui-foundation-test.mjs",
+        "status": "passed",
+        "limitation": null
+      },
+      {
+        "command": "node scripts/navigation-foundation-test.mjs",
+        "status": "passed",
+        "limitation": null
+      },
+      {
+        "command": "node scripts/data-foundation-test.mjs",
+        "status": "passed",
+        "limitation": null
+      },
+      {
+        "command": "node scripts/foundation-integration-test.mjs",
+        "status": "passed",
+        "limitation": null
+      },
+      {
+        "command": "node scripts/process-draft-test.mjs",
+        "status": "passed",
+        "limitation": null
+      },
+      {
+        "command": "node scripts/observability-test.mjs",
+        "status": "passed",
+        "limitation": null
+      },
+      {
+        "command": "node scripts/operator-announcement-test.mjs",
+        "status": "passed",
+        "limitation": null
+      },
+      {
+        "command": "node scripts/operator-contract-test.mjs",
+        "status": "passed",
+        "limitation": null
+      }
+    ]
+  },
+  "browserLocal": {
+    "status": "blocked",
+    "reason": "No installed browser binaries; installation returned invalid archives."
+  },
+  "githubPublication": {
+    "status": "blocked",
+    "reason": "Automatic approval review requires explicit authorization to publish the feature branch."
+  },
+  "productionDeployment": "not performed"
+}

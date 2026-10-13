@@ -167,7 +167,7 @@ try{
    else if(p==='/api/operator/accounts')data={items:[operatorAccount]};
    else if(p==='/api/operator/customers')data={items:[{id:'tenant-one',name:'Prüffirma AG',created_at:'2026-10-09',account:{plan:'pro',account_status:'trial'}},{id:'tenant-two',name:'Zeta AG',created_at:'2026-10-08',account:{plan:'start',account_status:'suspended'}},{id:'tenant-three',name:'Büro AG',created_at:'2026-10-08',account:{plan:'start',account_status:'read_only'}}]};
    else if(p==='/api/operator/tickets')data={items:[{...ticket,tenant:{name:'Prüffirma AG'}}]};
-   else if(p==='/api/operator/dashboard')data={stats:{customers_total:2,subscriptions_active:1,trials_active:1,users_active:1,payments_30d:79,monthly_contract_value:79,tickets_open:1},tickets:[{...ticket,tenant:{name:'Prüffirma AG'}}],incidents:[]};
+   else if(p==='/api/operator/dashboard')data={stats:{customers_total:2,subscriptions_active:1,trials_active:1,users_active:1,payments_30d:79,monthly_contract_value:79,tickets_open:2,tickets_in_progress:3,tickets_resolved:5},tickets:[{...ticket,tenant:{name:'Prüffirma AG'}}],incidents:[]};
    else if(p==='/api/operator/monitoring')data=monitoringFixture();
    else if(p==='/api/operator/restrictions')data={items:[]};
    else if(p==='/api/operator/announcements')data={items:[]};
@@ -239,6 +239,12 @@ try{
     const geometry=await page.evaluate(()=>({overflow:[...document.querySelectorAll('body *')].filter(el=>el.getBoundingClientRect().right>innerWidth+1).slice(0,12).map(el=>({tag:el.tagName,cls:el.className,text:el.textContent?.slice(0,80),parent:el.parentElement?.className,right:el.getBoundingClientRect().right})),viewport:innerWidth,scroll:document.documentElement.scrollWidth,body:document.body.scrollWidth,sort:[...document.querySelectorAll('.toolbar .filter-button')].map(el=>el.getBoundingClientRect().width),metricDividers:[...document.querySelectorAll('.metric,.finance-flow-primary,.finance-flow-result,.finance-flow-costs,.finance-flow-costs>div')].map(el=>getComputedStyle(el).borderLeftWidth)}));
     if(geometry.scroll>width+1||geometry.body>width+1){console.log('Overflow details',JSON.stringify(await page.evaluate(()=>[...document.querySelectorAll('body *')].filter(el=>el.scrollWidth>el.clientWidth+2).slice(0,30).map(el=>({tag:el.tagName,cls:el.className,width:el.clientWidth,scroll:el.scrollWidth,overflow:getComputedStyle(el).overflowX,children:[...el.children].map(c=>({tag:c.tagName,width:c.clientWidth,scroll:c.scrollWidth,rect:c.getBoundingClientRect().width,min:getComputedStyle(c).minWidth,grid:getComputedStyle(el).gridTemplateColumns})),rect:JSON.stringify(el.getBoundingClientRect())}))),null,2));await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${width}-overflow.png`)});}
     assert.ok(geometry.scroll<=width+1&&geometry.body<=width+1,`${theme} ${width} ${route}: horizontal overflow ${JSON.stringify(geometry)}`);
+    if(!process.env.BINSO_UX_BASELINE&&width<=1100&&await page.locator('.page-container,.operator-app-content').count()){
+      const appearance=await page.locator('.page-container,.operator-app-content').first().evaluate(el=>({ink:getComputedStyle(el).color,surface:getComputedStyle(el).getPropertyValue('--app-surface').trim(),controls:[...el.querySelectorAll('.form-control,.form-textarea')].filter(node=>!['checkbox','radio','file'].includes(node.type)&&!node.closest('.searchbox,.thread-composer')).map(node=>({radius:getComputedStyle(node).borderTopLeftRadius,font:getComputedStyle(node).fontSize})),groups:[...el.querySelectorAll('.bo-settings-group-body')].map(node=>({background:getComputedStyle(node).backgroundColor,border:getComputedStyle(node).borderTopWidth}))}));
+      assert.equal(appearance.ink,theme==='light'?'rgb(34, 34, 37)':'rgb(222, 222, 226)',`${route}: app text uses the central theme`);
+      assert.ok(appearance.controls.every(control=>control.radius==='12px'),`${route}: shared app field corners ${JSON.stringify(appearance.controls)}`);
+      assert.ok(appearance.groups.every(group=>group.border==='0px'&&group.background===(theme==='light'?'rgb(243, 243, 245)':'rgb(20, 20, 20)')),`${route}: grouped app surfaces in both themes`);
+    }
     assert.ok(geometry.sort.every(size=>size<=44),`${route}: sorting control is too wide`);
     assert.ok(geometry.metricDividers.every(size=>parseFloat(size)===0),`${route}: metric dividers`);
     if(!process.env.BINSO_UX_BASELINE&&width<=760){for(const toolbar of await page.locator('.toolbar:has(.searchbox):has(.filter-button)').all()){const search=await toolbar.locator('.searchbox').boundingBox(),filter=await toolbar.locator('.filter-button').boundingBox(),tabs=await toolbar.locator('.chips').boundingBox();assert.ok(filter.x>search.x&&Math.abs(filter.y-search.y)<2&&Math.abs(filter.height-search.height)<2,'Search and filter share a row and height');assert.ok(!tabs||tabs.y>=search.y+search.height,'Status tabs occupy their own row')}}
@@ -251,7 +257,8 @@ try{
     if(!process.env.BINSO_UX_BASELINE&&['/dashboard','/finanzen','/finanzen/analyse','/kunden/customer-one'].includes(route)){
       assert.equal(await page.locator('.bo-statistics-kpis>div').count(),3,'Migrated statistics have exactly three metrics');
       assert.equal(await page.locator('.bo-statistics').count(),1,'One central statistics surface');
-      assert.equal(await page.locator('.bo-statistics').evaluate(el=>getComputedStyle(el).backgroundColor),theme==='light'?'rgb(255, 255, 255)':'rgb(23, 25, 29)','Statistics follow the approved light app background; existing dark variant remains pending review');
+      assert.equal(await page.locator('.bo-statistics').evaluate(el=>getComputedStyle(el).backgroundColor),width<=1100?(theme==='light'?'rgb(243, 243, 245)':'rgb(20, 20, 20)'):(theme==='light'?'rgb(255, 255, 255)':'rgb(0, 0, 0)'),'Statistics follow the app surface on phone/tablet and page surface on desktop');
+      const trendToggle=page.getByRole('button',{name:'Zeitverlauf anzeigen',exact:true});if(await trendToggle.count())await trendToggle.click();
       assert.ok(process.env.BINSO_UX_FIXTURE_CASE==='empty'||await page.locator('.bo-statistics-bar').evaluateAll(elements=>elements.some(el=>el.getBoundingClientRect().height>20)),'Actual fixture values produce bars');
       assert.equal(await page.locator('.revenue-insight,.dashboard-summary,.quick-section,.finance-overview-chart').count(),0,'Migrated pages have no competing KPI/chart layout');
     }
@@ -261,8 +268,8 @@ try{
       const visible=await page.evaluate(()=>{const composer=document.querySelector('.thread-composer').getBoundingClientRect();return composer.bottom<=innerHeight&&composer.top>=0&&scrollY===0});assert.ok(visible,'Chat input stays inside the viewport');
     }
     if(!process.env.BINSO_UX_BASELINE){for(const control of await page.locator('.form-field>.form-control').filter({visible:true}).all()){
-     const g=await control.evaluate(el=>{const c=getComputedStyle(el);return {height:el.getBoundingClientRect().height,radius:c.borderRadius,padding:c.paddingLeft,font:c.fontSize}});
-     assert.equal(g.height,width<=760?44:40,`${route}: canonical closed field height`);assert.equal(g.padding,'11px',`${route}: canonical field inset`);assert.equal(g.radius,'10px',`${route}: canonical field radius`);
+     const g=await control.evaluate(el=>{const c=getComputedStyle(el);return {height:el.getBoundingClientRect().height,radius:c.borderRadius,padding:c.paddingLeft,font:c.fontSize,app:!!el.closest('.page-container,.operator-app-content,.bottom-sheet,.header-panel,.confirm-dialog')}});
+     assert.equal(g.height,width<=760||(g.app&&width<=1100)?44:40,`${route}: canonical closed field height`);assert.equal(g.padding,'11px',`${route}: canonical field inset`);assert.equal(g.radius,g.app&&width<=1100?'12px':'10px',`${route}: canonical field radius`);
     }}
     for(const label of await page.locator('.detail-list dt').filter({visible:true}).all()){const confined=await label.evaluate(el=>{const r=el.getBoundingClientRect(),range=document.createRange();range.selectNodeContents(el);return [...range.getClientRects()].every(text=>text.right<=r.right+1)});assert.ok(confined,`${route}: detail labels never overlap their values`);}
     if(route.endsWith('/neu')&&await page.locator('.mobile-sticky-save').count()){assert.equal(await page.locator('.mobile-sticky-save .button-primary').filter({visible:true}).count(),1,`${route}: form footer action must be reachable`);assert.equal(await page.locator('.page-head .page-actions .button-primary,.mobile-detail-actions .button-primary').filter({visible:true}).count(),0,`${route}: duplicate header save`);}
@@ -417,6 +424,8 @@ try{
    assert.equal(await page.locator('.bo-statistics dd').first().textContent(),'CHF 120.00','Custom period survives actual same-tab navigation');
    await page.locator('.bo-statistics').getByRole('button',{name:'Eigenen Statistikzeitraum wählen',exact:true}).click();
    const emptySheet=page.getByRole('dialog',{name:'Statistikzeitraum',exact:true});await emptySheet.getByLabel('Von *',{exact:true}).fill('2020-01-01');await emptySheet.getByLabel('Bis *',{exact:true}).fill('2020-01-02');await emptySheet.getByRole('button',{name:'Anwenden',exact:true}).click();
+   await page.getByText('Keine Buchungen im gewählten Zeitraum.',{exact:true}).waitFor();
+   const emptyTrend=page.getByRole('button',{name:'Zeitverlauf anzeigen',exact:true});if(await emptyTrend.count())await emptyTrend.click();
    assert.ok((await page.locator('.bo-statistics-bar').evaluateAll(elements=>elements.map(el=>el.getBoundingClientRect().height))).every(height=>height===0),'Empty period has no fabricated columns');
    await page.getByText('Keine Buchungen im gewählten Zeitraum.',{exact:true}).waitFor();
   }
@@ -497,6 +506,23 @@ try{
   const downloaded=page.waitForEvent('download');await page.getByRole('button',{name:'Teilen oder herunterladen',exact:true}).click();
   const download=await downloaded;assert.deepEqual(await fs.readFile(await download.path()),fixturePdf,'Download is byte-identical to the preview PDF');
   await page.getByRole('button',{name:'Vorschau schliessen',exact:true}).click();
+  // A worker can download successfully without ever signalling readiness.
+  // Verify that the real viewer leaves loading and can render on retry.
+  const stalledWorker=route=>route.fulfill({contentType:'text/javascript',body:'await new Promise(()=>{});'});
+  await context.route('**/*pdf.worker*.mjs',stalledWorker);
+  await navigate(base+'/angebote/AN-TEST-1');
+  await page.clock.install();
+  await page.getByRole('button',{name:'Weitere Aktionen',exact:true}).filter({visible:true}).click();
+  await page.getByRole('dialog',{name:'Weitere Aktionen'}).getByRole('button',{name:'Vorschau',exact:true}).click();
+  await page.getByText('PDF wird angezeigt …',{exact:true}).waitFor();
+  await page.clock.fastForward(20001);
+  await page.getByText('Die PDF-Vorschau dauert zu lange. Bitte erneut versuchen.',{exact:true}).waitFor();
+  assert.equal(await page.getByText('PDF wird angezeigt …',{exact:true}).count(),0,'Stalled worker cannot leave an endless loader');
+  await context.unroute('**/*pdf.worker*.mjs',stalledWorker);
+  await page.clock.resume();
+  await page.getByRole('button',{name:'Erneut versuchen',exact:true}).click();
+  await rendered(1);
+  await page.getByRole('button',{name:'Vorschau schliessen',exact:true}).click();
   }
   if(hasInteraction('documents')){
    invoice.status='draft';await navigate(base+'/rechnungen/RE-TEST-1');await page.waitForLoadState('networkidle');assert.equal(await page.getByText('Zahlungsstand',{exact:true}).count(),0,'Draft does not demand payment');await capture(page,{animations:'disabled',path:path.join(output,`${theme}-430-draft-invoice.png`)});invoice.status='sent';
@@ -556,8 +582,17 @@ try{
   await page.getByRole('button',{name:'Erneut versuchen',exact:true}).click();await page.getByText('Keine Arbeitszeiten erfasst',{exact:true}).waitFor();
   }
   if(hasInteraction('chat')){
+  await page.setViewportSize({width:390,height:740});await navigate(base+'/support/neu');await page.waitForLoadState('networkidle');const supportForm=page.getByRole('dialog',{name:'Neue Support-Anfrage',exact:true});await supportForm.waitFor();await supportForm.getByLabel('Betreff',{exact:true}).fill('Keyboard draft');await supportForm.getByLabel('Nachricht',{exact:true}).fill('Preserved message');
+  await page.setViewportSize({width:390,height:400});await supportForm.getByLabel('Nachricht',{exact:true}).focus();await settleLayout(page);const supportFooter=await supportForm.locator('.sheet-form-footer').boundingBox();assert.ok(supportFooter.y+supportFooter.height<=400,'Native support form actions remain above the keyboard');assert.equal(await supportForm.getByLabel('Betreff',{exact:true}).inputValue(),'Keyboard draft');const focus=await supportForm.getByLabel('Nachricht',{exact:true}).evaluate(el=>({shadow:getComputedStyle(el).boxShadow,offset:getComputedStyle(el).outlineOffset}));assert.equal(focus.shadow,'none');assert.equal(focus.offset,'-2px','Single inset outline replaces competing focus rings');await supportForm.getByRole('button',{name:'Schliessen',exact:true}).click();await page.getByRole('button',{name:'Änderungen verwerfen',exact:true}).click();
   await page.setViewportSize({width:375,height:400});await page.waitForLoadState('networkidle');await navigate(base+'/support/ticket-one');await page.waitForLoadState('networkidle');
   await page.getByLabel('Nachricht',{exact:true}).focus();const composer=await page.locator('.thread-composer').boundingBox(),chatHeader=await page.locator('.mobile-header').boundingBox();assert.ok(composer.y>=chatHeader.y+chatHeader.height&&composer.y+composer.height<=400,'Short chat viewport retains header and input');
+  const sendsBeforeNewline=messagePosts;
+  await page.getByLabel('Nachricht',{exact:true}).fill('First line');await page.getByLabel('Nachricht',{exact:true}).press('Enter');await page.getByLabel('Nachricht',{exact:true}).pressSequentially('Second line');
+  assert.equal(await page.getByLabel('Nachricht',{exact:true}).inputValue(),'First line\nSecond line','Composer supports real multiline drafts');assert.equal(messagePosts,sendsBeforeNewline,'Return inserts a newline instead of sending');
+  await page.getByLabel('Nachricht',{exact:true}).fill('Viewport draft');
+  await page.evaluate(()=>{const vv=window.visualViewport;Object.defineProperty(vv,'height',{configurable:true,value:300});Object.defineProperty(vv,'offsetTop',{configurable:true,value:40});vv.dispatchEvent(new Event('resize'));});await settleLayout(page);
+  const panned=await page.locator('.thread-composer').boundingBox(),pannedHeader=await page.locator('.mobile-header').boundingBox();assert.ok(pannedHeader.y>=39&&panned.y+panned.height<=341,'Chat honors the visual viewport height and pan offset exactly once');assert.equal(await page.getByLabel('Nachricht',{exact:true}).inputValue(),'Viewport draft');
+  await page.evaluate(()=>{const vv=window.visualViewport;delete vv.height;delete vv.offsetTop;vv.dispatchEvent(new Event('resize'));});await settleLayout(page);
   await capture(page,{animations:'disabled',path:path.join(output,`${theme}-375-400-chat.png`)});await page.setViewportSize({width:430,height:900});
   failSend=true;messagePosts=0;await page.waitForLoadState("networkidle");await navigate(base+'/support/ticket-one');await page.waitForLoadState('networkidle');await page.getByLabel('Nachricht',{exact:true}).fill('Test message');await page.getByRole('button',{name:'Senden',exact:true}).dblclick();await page.getByText('Fixture message offline',{exact:true}).waitFor();assert.equal(messagePosts,1);assert.equal(await page.getByLabel('Nachricht',{exact:true}).inputValue(),'Test message');failSend=false;await page.getByRole('button',{name:'Senden',exact:true}).click();await page.getByText('Test message',{exact:true}).waitFor();assert.equal(messagePosts,2);
   }
@@ -584,6 +619,17 @@ try{
    await capture(page,{animations:'disabled',path:path.join(output,`${theme}-320-400-manual-time-final.png`)});await page.keyboard.press('Escape');groupingFixture=false;
   }
   if(hasInteraction('header')){
+   for(const width of [390,1440]){
+    await page.setViewportSize({width,height:740});await navigate(base+'/dashboard');await page.waitForLoadState('networkidle');
+    const create=page.getByRole('button',{name:'Neu erstellen',exact:true});
+    const size=await create.boundingBox(),avatar=await page.locator(width<=760?'.mobile-header .person-avatar-small':'.desktop-appbar .person-avatar-small').boundingBox();
+    assert.equal(size.width,avatar.width,'Create circle uses the actual avatar diameter');assert.equal(size.height,avatar.height);
+    await create.click();const menu=page.getByRole('dialog',{name:'Neu erstellen',exact:true});
+    assert.deepEqual(await menu.locator('.action-row>span').allTextContents(),['Kunde','Angebot','Rechnung','Projekt','Zeiteintrag','Ausgabe']);
+    assert.equal(await page.getByRole('button',{name:'Weiter',exact:true}).count(),0,'Opening global plus never starts an invoice wizard');
+    await menu.getByRole('link',{name:'Kunde',exact:true}).click();await page.waitForURL(url=>url.pathname==='/kunden/neu'&&url.searchParams.get('returnTo')==='/dashboard');
+    await page.getByRole('dialog',{name:'Kunde erstellen',exact:true}).getByRole('button',{name:'Schliessen',exact:true}).click();await page.waitForURL(base+'/dashboard');
+   }
    for(const width of [320,390,768,1440]){
     await page.setViewportSize({width,height:740});await navigate(base+'/dashboard');await page.waitForLoadState('networkidle');
     const header=page.locator(width<=760?'.mobile-header':'.desktop-appbar');
@@ -591,9 +637,9 @@ try{
     const searchTrigger=await header.getByRole('button',{name:'Suche',exact:true}).boundingBox();await page.mouse.click(searchTrigger.x+searchTrigger.width/2,searchTrigger.y+searchTrigger.height/2);
     const panel=page.getByRole('dialog',{name:'Suche',exact:true});await panel.waitFor();
     assert.equal(await page.locator('.bottom-sheet').count(),0,'Header search is not a bottom sheet');
-    assert.equal(await panel.getByRole('button',{name:'Abbrechen',exact:true}).count(),0,'Search has only the central close control');
+    assert.equal(await panel.getByRole('button',{name:'Abbrechen',exact:true}).filter({visible:true}).count(),width<=760?1:0,'Mobile search cancels beside the input; desktop uses the anchored close control');
     assert.equal(await panel.getByLabel('Suchen',{exact:true}).evaluate(el=>el===document.activeElement),true,'Search focuses its input');
-    const box=await panel.boundingBox(),bar=await header.boundingBox();assert.ok(box.y>=bar.y+bar.height-1&&box.x>=0&&box.x+box.width<=width+1,'Panel begins under the fixed header inside viewport');
+    const box=await panel.boundingBox(),bar=await header.boundingBox();assert.ok(box.x>=0&&box.x+box.width<=width+1,'Panel stays within viewport');if(width<=760){assert.ok(box.y<=1&&box.height>=739,'Mobile search owns a full view');assert.equal(await header.locator('.mobile-section-title').textContent(),'Übersicht');}else assert.ok(box.y>=bar.y+bar.height-1,'Desktop panel remains anchored under header');
     assert.equal(await page.evaluate(()=>document.body.style.overflow),'clip');
     assert.equal(await panel.getByText('Mindestens zwei Zeichen eingeben.',{exact:true}).count(),0);
     const oldRequest=page.waitForRequest(request=>new URL(request.url()).pathname==='/api/search'&&new URL(request.url()).searchParams.get('q')==='old');await panel.getByLabel('Suchen',{exact:true}).fill('old');await oldRequest;await panel.getByLabel('Suchen',{exact:true}).fill('Prüffirma');
@@ -607,8 +653,9 @@ try{
     await header.getByRole('button',{name:'Benutzerkonto',exact:true}).click();const account=page.getByRole('dialog',{name:'Konto',exact:true});await account.getByText('Test Person',{exact:true}).waitFor();await assertAccountAvatarSpacing(account);
     assert.equal(await account.locator('.person-avatar').innerText(),'TP');assert.equal(await account.getByRole('link',{name:'Abonnement',exact:true}).count(),0,'Account panel does not duplicate company billing');
     const accountRows=await account.locator('.action-row').evaluateAll(rows=>rows.map(row=>{const css=getComputedStyle(row),box=row.getBoundingClientRect(),icon=row.firstElementChild.getBoundingClientRect(),text=row.children[1].getBoundingClientRect();return {height:box.height,font:css.fontSize,weight:css.fontWeight,display:css.display,grid:css.gridTemplateColumns,iconLeft:icon.left,textLeft:text.left,iconWidth:icon.width}}));
-    assert.ok(accountRows.length>=6);for(const row of accountRows)assert.deepEqual(row,accountRows[0],'Personal, company, create-account and logout rows share the same geometry and typography');
+    assert.ok(accountRows.length>=6);for(const row of accountRows){const {height,...geometry}=row;const {height:minimum,...reference}=accountRows[0];assert.ok(height>=minimum,'Wrapped labels grow rather than clipping');assert.deepEqual(geometry,reference,'Account groups share icon/text columns and typography');}
     await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${width}-header-account.png`)});
+    if(width<=760)await account.getByRole('button',{name:'Zurück',exact:true}).click();
     await header.getByRole('button',{name:'Benachrichtigungen',exact:true}).click();const notifications=page.getByRole('dialog',{name:'Benachrichtigungen',exact:true});await notifications.getByText('Neue Rechnung',{exact:true}).waitFor();assert.equal(await account.count(),0,'Only one header panel is mounted');
     await notifications.getByRole('button',{name:'Ungelesen',exact:true}).click();assert.equal(await notifications.getByText('Produktinformation',{exact:true}).count(),0);
     await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${width}-header-notifications.png`)});await page.keyboard.press('Escape');
@@ -653,6 +700,17 @@ try{
    if(scenario.group==='customers')await page.getByRole('dialog',{name:'Kunde bearbeiten',exact:true}).getByRole('button',{name:'Schliessen',exact:true}).click();else{const sheet=page.getByRole('dialog',{name:scenario.group==='products'?'Produkt bearbeiten':'Mitarbeiter bearbeiten',exact:true});await sheet.getByRole('button',{name:'Schliessen',exact:true}).click();await sheet.waitFor({state:'hidden'});assert.equal(await page.getByRole('alertdialog').count(),0,'Pristine sheet closes without a warning');await page.locator('.mobile-back').click();}await page.waitForURL(base+scenario.back);assert.equal(await page.getByRole('alertdialog').count(),0,scenario.group+': restoring original values is pristine');
   }
   if(hasInteraction('settings')){
+   await page.setViewportSize({width:390,height:740});await navigate(base+'/einstellungen');
+   const settingsContent=page.locator('.page-container');await settingsContent.getByRole('link',{name:'Abonnement',exact:true}).waitFor();
+   await settingsContent.getByLabel('Einstellungen suchen',{exact:true}).fill('Abonnement');
+   assert.equal(await settingsContent.locator('.bo-settings-group').count(),1,'Settings search hides empty groups');
+   assert.equal(await settingsContent.locator('.bo-settings-group .action-row').count(),1,'Settings search retains only the matching authorized route');
+   const groupSurface=await settingsContent.locator('.bo-settings-group-body').evaluate(el=>({border:getComputedStyle(el).borderTopWidth,radius:getComputedStyle(el).borderTopLeftRadius,background:getComputedStyle(el).backgroundColor}));
+   assert.equal(groupSurface.border,'0px');assert.equal(groupSurface.radius,'22px');assert.notEqual(groupSurface.background,'rgba(0, 0, 0, 0)','Grouped settings have a real surface without an outline');
+   await settingsContent.getByLabel('Einstellungen suchen',{exact:true}).fill('no-such-setting');await settingsContent.getByText('Keine passenden Einstellungen',{exact:true}).waitFor();
+   await settingsContent.getByLabel('Einstellungen suchen',{exact:true}).fill('');assert.ok(await settingsContent.locator('.bo-settings-group').count()>=2,'Clearing search restores the groups');
+   await capture(page,{animations:'disabled',path:path.join(output,`${theme}-390-grouped-settings.png`)});
+
    // Actual settings UI, controlled scanner verdicts; not a live antivirus-engine test.
    const imageBytes=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jB1kAAAAASUVORK5CYII=','base64');
    const imageFile={name:'synthetic-branding.png',mimeType:'image/png',buffer:imageBytes};
@@ -672,7 +730,14 @@ try{
    scanFailure=503;await page.locator('#profile-avatar-upload').setInputFiles(imageFile);await page.getByRole('status').filter({hasText:'Synthetic scan unavailable'}).waitFor();assert.equal(await page.locator('.settings-profile img').getAttribute('src'),oldImage);
    scanFailure=0;scanVerdict='clean';await page.locator('#profile-avatar-upload').setInputFiles(imageFile);await page.getByText('Profilbild gespeichert.',{exact:true}).waitFor();assert.equal(await page.locator('.settings-profile img').getAttribute('src'),'/api/files/'+newImageId+'/download');
    await navigate(base+'/einstellungen/firma');await page.locator('.company-logo-card b').getByText('Synthetic Branding Company',{exact:true}).waitFor();
-   await page.getByRole('button',{name:'Bearbeiten',exact:true}).filter({visible:true}).first().click();await page.locator('#company-logo-upload').setInputFiles(imageFile);
+   await page.getByRole('button',{name:'Bearbeiten',exact:true}).filter({visible:true}).first().click();
+   const companySheet=page.getByRole('dialog',{name:'Firmendaten bearbeiten',exact:true});
+   assert.equal(await companySheet.locator(':scope>.filter-sheet-actions').count(),1,'Component FormActions is a direct, non-scrolling sheet footer');
+   const logoGap=await companySheet.evaluate(el=>{const upload=el.querySelector('#company-logo-upload').closest('.form-field').getBoundingClientRect(),name=el.querySelector('input[autocomplete=organization]').closest('.form-field').getBoundingClientRect(),grid=el.querySelector('.form-grid');return {actual:name.top-upload.bottom,expected:parseFloat(getComputedStyle(grid).rowGap)}});
+   assert.ok(Math.abs(logoGap.actual-logoGap.expected)<1,'Logo and company name use the same field-group gap');
+   const saveBox=await companySheet.locator(':scope>.filter-sheet-actions>.button').boundingBox(),footerWidth=await companySheet.locator(':scope>.filter-sheet-actions').evaluate(el=>{const css=getComputedStyle(el);return el.getBoundingClientRect().width-parseFloat(css.paddingLeft)-parseFloat(css.paddingRight)-parseFloat(css.borderLeftWidth)-parseFloat(css.borderRightWidth)});
+   assert.ok(Math.abs(saveBox.width-footerWidth)<1,'Single action occupies the full shared footer content width, inside page gutters');
+   await page.locator('#company-logo-upload').setInputFiles(imageFile);
    scanVerdict='pending';await page.getByRole('button',{name:'Speichern',exact:true}).click();await page.getByRole('status').filter({hasText:'Das Firmenlogo wartet auf die Sicherheitsprüfung.'}).waitFor();assert.equal(companyWrites,0,'Quarantine cannot complete company save');assert.equal(await page.locator('#company-logo-upload').count(),1,'Pending upload retains the edit form for recovery');
    scanFailure=503;await page.getByRole('button',{name:'Speichern',exact:true}).click();await page.getByRole('status').filter({hasText:'Synthetic scan unavailable'}).waitFor();assert.equal(companyWrites,0);
    scanFailure=0;scanVerdict='clean';await page.getByRole('button',{name:'Speichern',exact:true}).click();await page.getByText('Firmendaten gespeichert.',{exact:true}).waitFor();assert.equal(companyWrites,1,'Clean scan allows exactly one company save');
@@ -711,14 +776,14 @@ try{
    await page.locator('.operator-app-header').getByRole('button',{name:'Benutzerkonto',exact:true}).click();
    const panel=page.getByRole('dialog',{name:'Konto',exact:true});await panel.waitFor();await assertAccountAvatarSpacing(panel);
    const g=await page.evaluate(()=>({header:document.querySelector('.operator-app-header').getBoundingClientRect().bottom,panel:document.querySelector('.header-panel').getBoundingClientRect().top,inert:document.querySelector('.operator-page-head').inert}));
-   assert.ok(g.panel>=g.header&&g.panel-g.header<=12,'Operator account shares the anchored top panel');assert.equal(g.inert,true,'Operator background is inert');
+   assert.ok(g.panel<=1,'Mobile operator account shares the full-view panel');assert.equal(g.inert,true,'Operator background is inert');
    await panel.getByRole('button',{name:'Abmelden',exact:true}).click();await panel.getByRole('alert').waitFor();assert.ok(page.url().endsWith('/operator'),'Failed logout must not pretend the session ended');
    await capture(page,{animations:'disabled',path:path.join(output,`${theme}-operator-account.png`)});await page.keyboard.press('Escape');await panel.waitFor({state:'hidden'});
    assert.equal(await page.locator('.operator-app-header').getByRole('button',{name:'Benutzerkonto',exact:true}).evaluate(el=>el===document.activeElement),true,'Operator account restores trigger focus');
    // Client-renderer fixture only: the server still uses a local demo cookie.
    // All API requests remain intercepted; this does not claim real operator SSO coverage.
    await context.addInitScript(()=>{const selectClient=()=>document.querySelector('[data-operator-demo="true"]')?.setAttribute('data-operator-demo','false');new MutationObserver(selectClient).observe(document,{childList:true,subtree:true,attributes:true,attributeFilter:['data-operator-demo']});selectClient()});
-   await navigate(base+'/operator');await page.getByRole('heading',{name:'Abrechnung',exact:true}).waitFor();const dashboardMetrics=page.locator('.operator-insight-grid .metric');assert.equal(await dashboardMetrics.count(),2,'Secondary dashboard metrics start in one bounded billing view');await page.getByRole('tab',{name:'Support',exact:true}).click();assert.equal(await dashboardMetrics.count(),3,'Support uses the same central metrics in its own view');await page.getByRole('tab',{name:'Abrechnung',exact:true}).click();for(const metric of await dashboardMetrics.all()){const boxes=await metric.evaluate(el=>({label:el.querySelector('.metric-top').getBoundingClientRect().toJSON(),value:el.querySelector('strong').getBoundingClientRect().toJSON()}));assert.ok(boxes.value.top>=boxes.label.bottom-1,'Dashboard values and labels occupy separate lines');}
+   await navigate(base+'/operator');await page.getByRole('heading',{name:'Abrechnung',exact:true}).waitFor();const dashboardMetrics=page.locator('.operator-insight-grid .metric');assert.equal(await dashboardMetrics.count(),2,'Secondary dashboard metrics start in one bounded billing view');await page.getByRole('tab',{name:'Support',exact:true}).click();const supportRing=page.locator('.operator-insight-grid .bo-ring-chart');await supportRing.getByRole('img',{name:'Offen / in Bearbeitung / gelöst: 10',exact:true}).waitFor();assert.deepEqual(await supportRing.locator('circle title').allTextContents(),['Offen: 2 · 20 %','In Bearbeitung: 3 · 30 %','Gelöst: 5 · 50 %'],'Support segments use the actual mutually exclusive ticket counts');assert.equal(await supportRing.locator('.bo-ring-details button').count(),3,'Every support segment has an accessible detail action');await supportRing.getByRole('button',{name:'In Bearbeitung 3 · 30 %',exact:true}).click();assert.equal(await supportRing.locator('output').textContent(),'3','Support segment selection exposes its real count');await page.getByRole('tab',{name:'Abrechnung',exact:true}).click();for(const metric of await dashboardMetrics.all()){const boxes=await metric.evaluate(el=>({label:el.querySelector('.metric-top').getBoundingClientRect().toJSON(),value:el.querySelector('strong').getBoundingClientRect().toJSON()}));assert.ok(boxes.value.top>=boxes.label.bottom-1,'Dashboard values and labels occupy separate lines');}
    for(const section of await page.locator('.operator-insight-grid>.bo-workspace-section').all())assert.equal(await section.evaluate(el=>getComputedStyle(el).marginTop),'0px','Dashboard grid owns section spacing');const insightGeometry=await page.locator('.operator-insight-grid').evaluate(el=>({grid:el.getBoundingClientRect().width,section:el.firstElementChild.getBoundingClientRect().width}));assert.ok(insightGeometry.section>=insightGeometry.grid-1,'A single selected dashboard view fills its workspace');
    // The server prototype cookie selects the demo finance endpoint even when
    // the client-renderer fixture switches the other operator APIs to production.

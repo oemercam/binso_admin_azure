@@ -1,6 +1,7 @@
 "use client";
 import {useEffect,useRef,useState} from 'react';
 import {AppShell} from './app-shell';
+import {SettingsGroup} from './binso-ux';
 import {Button, Toggle, FormActions, LoadingState, ErrorState} from "./ui";
 import {apiGet,apiPatch} from '@/lib/client/backend';
 export function TimeSettingsPage(){
@@ -9,13 +10,13 @@ export function TimeSettingsPage(){
  useEffect(()=>{let active=true;Promise.all([apiGet<{tenant?:{role?:string;readOnly?:boolean};demo?:boolean}>('/api/auth/session'),apiGet<{time_approval_required:boolean}>('/api/time-entries/policy')]).then(([session,policy])=>{if(!active)return;if(typeof policy.time_approval_required!=="boolean")throw new Error("Freigabeeinstellung konnte nicht geladen werden.");setAllowed(!session.demo&&!session.tenant?.readOnly&&['owner','admin'].includes(session.tenant?.role??''));setRequired(policy.time_approval_required);setInitial(policy.time_approval_required)}).catch(e=>{if(active)setError(e instanceof Error?e.message:'Einstellung konnte nicht geladen werden.')}).finally(()=>{if(active)setLoading(false)});return()=>{active=false}},[]);
  const save=async()=>{if(busy.current||!allowed||loading)return;busy.current=true;setSaving(true);setError(null);setSaved(false);try{const result=await apiPatch<{time_approval_required:boolean}>('/api/time-entries/policy',{required});setRequired(result.time_approval_required);setInitial(result.time_approval_required);setSaved(true)}catch(e){setError(e instanceof Error?e.message:'Einstellung konnte nicht gespeichert werden.')}finally{busy.current=false;setSaving(false)}};
  return <AppShell title="Zeiterfassung" active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen" unsavedChanges={required!==initial}>
-  <section className="settings-section">
+  <SettingsGroup title="Freigaben"><div className="settings-group-fields">
    {loading?<LoadingState>Einstellung wird geladen …</LoadingState>:<div className="preference-channels"><label><b>Freigabe erforderlich</b><Toggle checked={required} disabled={!allowed||saving} label="Freigabe erforderlich" onChange={()=>{setRequired(!required);setSaved(false)}}/></label></div>}
    <p>Neue Zeiten müssen vor der Verrechnung freigegeben werden. Bestehende Freigaben bleiben erhalten.</p>
    {!loading&&!allowed&&!error&&<p>Nur Inhaber und Administratoren können diese Einstellung ändern.</p>}
    {error&&<ErrorState>{error}</ErrorState>}
    {saved&&<p role="status">Zeiterfassungseinstellung gespeichert.</p>}
-  </section>
+  </div></SettingsGroup>
   {allowed&&<FormActions ><Button requiresWrite disabled={loading||saving||required===initial} onClick={()=>void save()}>{saving?'Wird gespeichert…':'Speichern'}</Button></FormActions>}
  </AppShell>
 }

@@ -14,7 +14,7 @@ export function financialStatus(document:FinancialDocument,today=businessDate())
  return paymentStatus(document);
 }
 export const financialStatusLabels:Record<string,string>={draft:'Entwurf',sent:'Versendet',accepted:'Angenommen',declined:'Abgelehnt',expired:'Abgelaufen',open:'Offen',partial:'Teilweise bezahlt',paid:'Bezahlt',overdue:'Überfällig',cancelled:'Storniert'};
-export function formatCurrency(value:unknown,currency='CHF'){return `${currency} ${Number(value??0).toLocaleString('de-CH',{minimumFractionDigits:2,maximumFractionDigits:2})}`;}
+export function formatCurrency(value:unknown,currency='CHF'){return `${currency} ${Number(value??0).toLocaleString('de-CH',{minimumFractionDigits:2,maximumFractionDigits:2}).replaceAll('’',"'")}`;}
 export function formatDate(value:unknown){const date=String(value??'').slice(0,10);return /^\d{4}-\d{2}-\d{2}$/.test(date)?date.split('-').reverse().join('.'):'';}
 export function documentDateLabel(document:FinancialDocument,today=businessDate()){
  const state=financialStatus(document,today);

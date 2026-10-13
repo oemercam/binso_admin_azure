@@ -1,4 +1,16 @@
 :root{
+  /* App appearance: independent of the frozen navigation theme tokens. */
+  --app-canvas:#fff;
+  --app-surface:#f3f3f5;
+  --app-chrome:#f1f1f3;
+  --app-text:#222225;
+  --app-secondary:#626267;
+  --app-divider:#dedee2;
+  --app-symbol:#737379;
+  --app-accent:#006ec7;
+  --app-control-border:#d3d3d8;
+  --app-group-radius:22px;
+  --app-control-radius:12px;
   --stat-cell-min:120px;
   --insight-panel-min:240px;
   --operator-detail-panel-min:420px;
@@ -13,7 +25,6 @@
   --kpi-padding:14px;
   --action-row-height:48px;
   --section-title-font:18px;
-  --sheet-keyboard-offset:0px;
   color-scheme:light;
   --color-bg:#fff;
   --color-fg:#000;
@@ -89,6 +100,13 @@
   --mobile-sheet-row-h:56px;
   --touch:44px;
 
+  --header-avatar-size:30px;
+  --control-focus-width:2px;
+  --chart-positive:#57cc91;
+  --chart-negative:#f07881;
+  --chart-neutral:#a2a8b3;
+  --chart-ring-size:96px;
+  --chart-ring-width:10px;
   --control-h:40px;
   --control-h-mobile:44px;
   --control-font:13px;
@@ -137,6 +155,15 @@
 }
 
 html[data-theme="dark"]{
+  --app-canvas:#000;
+  --app-surface:#141414;
+  --app-chrome:#212121;
+  --app-text:#dedee2;
+  --app-secondary:#a0a0a5;
+  --app-divider:#2b2b2e;
+  --app-symbol:#929297;
+  --app-accent:#48a7ff;
+  --app-control-border:#3a3a3e;
   --control-border:#333;
   color-scheme:dark;
   --color-bg:#000;

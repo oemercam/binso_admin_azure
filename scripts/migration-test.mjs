@@ -1,3 +1,4 @@
+import {displayModuleUrl} from "./data-test-modules.mjs";
 import {randomUUID} from "node:crypto";
 import {PGlite} from '@electric-sql/pglite';
 import {pgcrypto} from '@electric-sql/pglite/contrib/pgcrypto';
@@ -110,7 +111,7 @@ try{
  assert.deepEqual(foreignCash,{payments:[],outflows:[],incomplete:false},'Cash queries do not leak a different tenant population');
  const fixtureExpense=(await db.query("select id from expenses where organization_id=$1 and currency='CHF' and status in ('approved','posted') limit 1",[demo])).rows[0];
  if(fixtureExpense){await db.query("update expenses set reimbursed_at='2026-10-25T23:30:00Z' where id=$1",[fixtureExpense.id]);const reimbursed=await cashStatisticsData(client,demo);assert.ok(reimbursed.outflows.some(row=>row.payment_date==='2026-10-26'),'Reimbursement uses Europe/Zurich calendar day, not expense date or UTC date');await db.query('update expenses set reimbursed_at=null where id=$1',[fixtureExpense.id]);}
- const workspaceSource=(await fs.readFile('lib/server/repositories/customer-workspace.ts','utf8')).replace('import "server-only";','').replace('"@/lib/permissions"',JSON.stringify(permissions)).replace('"../http"',JSON.stringify(http)).replace('"./business-api"',JSON.stringify(dataModule(businessSource))).replace('"./financial-summary"',JSON.stringify(dataModule((await fs.readFile('lib/server/repositories/financial-summary.ts','utf8')).replace('import "server-only";','').replace("'@/lib/permissions'",JSON.stringify(permissions))))).replace('"./customer-activity"',JSON.stringify(dataModule((await fs.readFile('lib/server/repositories/customer-activity.ts','utf8')).replace('import "server-only";','').replace('"@/lib/permissions"',JSON.stringify(permissions)))));
+ const workspaceSource=(await fs.readFile('lib/server/repositories/customer-workspace.ts','utf8')).replace('import "server-only";','').replace('"@/lib/permissions"',JSON.stringify(permissions)).replace('"../http"',JSON.stringify(http)).replace('"./business-api"',JSON.stringify(dataModule(businessSource))).replace('"./financial-summary"',JSON.stringify(dataModule((await fs.readFile('lib/server/repositories/financial-summary.ts','utf8')).replace('import "server-only";','').replace("'@/lib/permissions'",JSON.stringify(permissions))))).replace('"./customer-activity"',JSON.stringify(dataModule((await fs.readFile('lib/server/repositories/customer-activity.ts','utf8')).replace('import "server-only";','').replace('"@/lib/display-format"',JSON.stringify(displayModuleUrl)).replace('"@/lib/permissions"',JSON.stringify(permissions)))));
  const {customerWorkspace}=await import(dataModule(workspaceSource));
  const statisticsCustomer=(await db.query('select id from customers where organization_id=$1 and archived_at is null order by id limit 1',[demo])).rows[0].id;
  const customerStatistics=await customerWorkspace(client,session,statisticsCustomer);
@@ -686,7 +687,7 @@ try{
  const {financialSummary}=await import(dataModule(summarySource));
  const ownerSummary=await financialSummary(client,session,documentArgs.p_customer_id);assert.ok(ownerSummary.invoices.length);assert.ok(Number(ownerSummary.time.ready_hours)>=1);
  const restrictedSummary=await financialSummary(client,{...session,role:'member'},documentArgs.p_customer_id);assert.equal(restrictedSummary.invoices.length,0);assert.equal(restrictedSummary.offers,null,'A shared workspace cannot expose restricted finance data');
- const activitySource=(await fs.readFile('lib/server/repositories/customer-activity.ts','utf8')).replace('import "server-only";','').replace('"@/lib/permissions"',JSON.stringify(permissions));
+ const activitySource=(await fs.readFile('lib/server/repositories/customer-activity.ts','utf8')).replace('import "server-only";','').replace('"@/lib/display-format"',JSON.stringify(displayModuleUrl)).replace('"@/lib/permissions"',JSON.stringify(permissions));
  const activityModule=dataModule(activitySource);
  const workspaceSource=(await fs.readFile('lib/server/repositories/customer-workspace.ts','utf8')).replace('import "server-only";','').replace('"@/lib/permissions"',JSON.stringify(permissions)).replace('"../http"',JSON.stringify(http)).replace('"./business-api"',JSON.stringify(dataModule(businessSource))).replace('"./financial-summary"',JSON.stringify(dataModule(summarySource))).replace('"./customer-activity"',JSON.stringify(activityModule));
  const {customerWorkspace}=await import(dataModule(workspaceSource));

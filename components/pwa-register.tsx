@@ -1,72 +1,36 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
-const reloadKey="binso.pwa.reloaded-for-controller";
-
+/** Updates the offline shell silently. Documents stay network-first and hashed
+ * build assets are never cached by the worker, so no forced reload is needed. */
 export function PwaRegister() {
-  const [updateAvailable,setUpdateAvailable]=useState(false);
-
   useEffect(() => {
     if (!("serviceWorker" in navigator) || process.env.NODE_ENV !== "production") return;
-
     let active=true;
-    let hadController=Boolean(navigator.serviceWorker.controller);
-
-    const handleControllerChange=()=>{
-      if(!active) return;
-      if(!hadController){hadController=true;return;}
-      if(sessionStorage.getItem(reloadKey)==="1") return;
-      sessionStorage.setItem(reloadKey,"1");
-      window.location.reload();
+    let registration:ServiceWorkerRegistration|undefined;
+    let installing:ServiceWorker|null=null;
+    const activateWaiting=()=>{if(active)registration?.waiting?.postMessage({type:"SKIP_WAITING"})};
+    const stateChanged=()=>{if(installing?.state==="installed")activateWaiting()};
+    const updateFound=()=>{
+      installing?.removeEventListener("statechange",stateChanged);
+      installing=registration?.installing??null;
+      installing?.addEventListener("statechange",stateChanged);
     };
-
-    navigator.serviceWorker.addEventListener("controllerchange",handleControllerChange);
-
-    navigator.serviceWorker.register("/sw.js",{updateViaCache:"none"}).then(registration=>{
-      if(registration.waiting)setUpdateAvailable(true);
-      registration.update().catch(()=>undefined);
-
-      registration.addEventListener("updatefound",()=>{
-        const worker=registration.installing;
-        if(!worker)return;
-
-        worker.addEventListener("statechange",()=>{
-          if(!active)return;
-
-          if(worker.state==="installed"){
-            if(navigator.serviceWorker.controller){
-              setUpdateAvailable(true);
-            }else{
-              sessionStorage.removeItem(reloadKey);
-            }
-          }
-        });
-      });
+    const check=()=>{if(active&&document.visibilityState==="visible")void registration?.update().catch(()=>undefined)};
+    navigator.serviceWorker.register("/sw.js",{updateViaCache:"none"}).then(value=>{
+      if(!active)return;
+      registration=value;
+      registration.addEventListener("updatefound",updateFound);
+      updateFound();activateWaiting();check();
     }).catch(()=>undefined);
-
+    document.addEventListener("visibilitychange",check);
     return()=>{
       active=false;
-      navigator.serviceWorker.removeEventListener("controllerchange",handleControllerChange);
+      document.removeEventListener("visibilitychange",check);
+      registration?.removeEventListener("updatefound",updateFound);
+      installing?.removeEventListener("statechange",stateChanged);
     };
   }, []);
-
-  if(!updateAvailable)return null;
-
-  return <div className="pwa-update" role="status">
-    <div>
-      <b>Update verfügbar</b>
-      <span>Neue Version von Binso One ist bereit.</span>
-    </div>
-    <button
-      type="button"
-      onClick={async()=>{
-        const registration=await navigator.serviceWorker.getRegistration();
-        if(registration?.waiting){sessionStorage.removeItem(reloadKey);registration.waiting.postMessage({type:"SKIP_WAITING"});}
-        // controllerchange reloads once when the requested worker is active.
-      }}
-    >
-      Aktualisieren
-    </button>
-  </div>;
+  return null;
 }

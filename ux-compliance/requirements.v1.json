@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "baselineCommit": "b398ff7400eb1b2ea90016c25e596261d58c822b",
   "sourceCompleteness": "Available V22.1/V22.2 registers imported without acceptance. Complete original V21.1–V21.5 approvals unavailable.",
   "conflicts": [
     {
       "id": "STATISTICS-BACKGROUND",
       "earlier": "Hardcoded dark surface and old browser assertions",
-      "later": "User subsequently requested white matching app background",
-      "decision": "Latest explicit white requirement governs light theme and is centrally implemented with app tokens. Existing dark variant retained pending explicit review."
+      "later": "13.10.2026: user requests the new Outlook-style appearance across all mobile/PWA/tablet components in light and dark modes",
+      "decision": "Up to 1100 px statistics use the central --app-surface group background in both themes; wider desktop retains --color-bg. This explicitly supersedes the earlier light-only white-surface decision."
     }
   ],
   "requirements": [
@@ -614,22 +614,22 @@
     },
     {
       "id": "UX-FIN-010",
-      "description": "Statistik-Hintergrund wie heller App-Hintergrund",
+      "description": "Statistik-Hintergrund folgt dem freigegebenen App-/Desktop-Standard",
       "routes": [
         "customer-app"
       ],
       "componentTypes": [
         "Statistics"
       ],
-      "expected": "Light Theme: aufgelöster Hintergrund entspricht --color-bg; frühere dunkle Variante ist dokumentierter Konflikt",
+      "expected": "Hell/Dunkel: bis 1100 px entspricht der aufgelöste Hintergrund --app-surface; über 1100 px --color-bg. Freigabe: Nutzerauftrag vom 13.10.2026 zur neuen Darstellung für alle Mobile-/PWA-/Tablet-Komponenten.",
       "owner": "Statistics",
       "method": "browser",
       "testCase": "TC-UX-FIN-010",
       "adapter": "background",
       "priority": "P1",
-      "acceptance": "Light Theme: aufgelöster Hintergrund entspricht --color-bg; frühere dunkle Variante ist dokumentierter Konflikt",
+      "acceptance": "Hell/Dunkel: bis 1100 px entspricht der aufgelöste Hintergrund --app-surface; über 1100 px --color-bg. Freigabe: Nutzerauftrag vom 13.10.2026 zur neuen Darstellung für alle Mobile-/PWA-/Tablet-Komponenten.",
       "automation": "automatic",
-      "provenance": "Current UX compliance instruction; approved UX summary where referenced",
+      "provenance": "Explicit user approval 2026-10-13: align every app component/page/subpage with the supplied Outlook-style reference in light and dark mode, including mobile/PWA/tablet.",
       "review": null
     },
     {

@@ -43,11 +43,21 @@ function PdfPage({pdf,pageNumber,zoomed}: {pdf:PDFDocumentProxy;pageNumber:numbe
 }
 
 export function DocumentPageViewer({file,zoomed=false}: {file:Blob;zoomed?:boolean}) {
-  const [loaded,setLoaded]=useState<{file:Blob;pdf:PDFDocumentProxy}|null>(null);
-  const [error,setError]=useState<{file:Blob;message:string}|null>(null);
+  const [attempt,setAttempt]=useState(0);
+  const [loaded,setLoaded]=useState<{file:Blob;attempt:number;pdf:PDFDocumentProxy}|null>(null);
+  const [error,setError]=useState<{file:Blob;attempt:number;message:string}|null>(null);
   useEffect(()=>{
     let active=true;
     let task:ReturnType<typeof import("pdfjs-dist").getDocument>|undefined;
+    const destroy=()=>{void task?.destroy().catch(()=>{});};
+    // Module import and worker startup can remain pending without rejecting.
+    // Bound the whole attempt, including file reads, and ignore late results.
+    const timeout=window.setTimeout(()=>{
+      if(!active)return;
+      active=false;
+      setError({file,attempt,message:"Die PDF-Vorschau dauert zu lange. Bitte erneut versuchen."});
+      destroy();
+    },20000);
     // Load the self-contained ESM as a same-origin asset: PDF.js internal
     // webpack bindings collide with eval-wrapped development modules.
     const engineUrl=new URL("pdfjs-dist/build/pdf.mjs",import.meta.url).toString();
@@ -58,12 +68,12 @@ export function DocumentPageViewer({file,zoomed=false}: {file:Blob;zoomed?:boole
       if(!active)return;
       task=engine.getDocument({data,isEvalSupported:false});
       const document=await task.promise;
-      if(active)setLoaded({file,pdf:document});
-    }).catch(()=>{if(active)setError({file,message:"PDF konnte nicht angezeigt werden."})});
-    return()=>{active=false;void task?.destroy()};
-  },[file]);
-  if(error?.file===file)return <ErrorState>{error.message}</ErrorState>;
-  if(loaded?.file!==file)return <LoadingState>PDF wird angezeigt …</LoadingState>;
+      if(active){window.clearTimeout(timeout);setLoaded({file,attempt,pdf:document});}
+    }).catch(()=>{if(active){window.clearTimeout(timeout);setError({file,attempt,message:"PDF konnte nicht angezeigt werden."});}});
+    return()=>{active=false;window.clearTimeout(timeout);destroy()};
+  },[file,attempt]);
+  if(error?.file===file&&error.attempt===attempt)return <ErrorState onRetry={()=>setAttempt(value=>value+1)} retryLabel="Erneut versuchen">{error.message}</ErrorState>;
+  if(loaded?.file!==file||loaded.attempt!==attempt)return <LoadingState>PDF wird angezeigt …</LoadingState>;
   return <DocumentPages key={loaded.pdf.fingerprints[0]} pdf={loaded.pdf} zoomed={zoomed}/>;
 }
 

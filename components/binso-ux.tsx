@@ -4,7 +4,7 @@ import { Children, isValidElement, cloneElement, useState, useRef, useEffect, ty
 import Link from "next/link";
 import { createPortal } from "react-dom";
 import { useDialogFocus } from "./use-dialog-focus";
-import { Button, Icon, Metric, Status } from "@/components/ui";
+import { Button, Icon, Metric, Status, FormActions } from "@/components/ui";
 import { usePageAccess } from "@/lib/client/page-access";
 import {useBrowserBackGuard} from "./use-browser-back-guard";
 import ConfirmDialog from "./confirm-dialog";
@@ -41,6 +41,20 @@ export function CreateAction({ label, href, onClick, disabled = false }: { label
   return <Button href={href} requiresWrite className="bo-create-action" ariaLabel={label} disabled={disabled} onClick={onClick} icon="plus"/>;
 }
 
+export function QuickCreateAction(){
+ const access=usePageAccess(),[open,setOpen]=useState(false);
+ const actions=[
+  {title:"Kunde",href:"/kunden/neu",icon:"users"},
+  {title:"Angebot",href:"/angebote/neu",icon:"file"},
+  {title:"Rechnung",href:"/rechnungen/neu",icon:"receipt"},
+  {title:"Projekt",href:"/projekte/neu",icon:"box"},
+  {title:"Zeiteintrag",href:"/zeit?manual=1",icon:"clock"},
+  {title:"Ausgabe",href:"/spesen/neu",icon:"card"},
+ ].filter(item=>access.canOpen(item.href.startsWith("/zeit?")?"/zeit/neu":item.href)&&access.write);
+ if(!actions.length)return null;
+ return <><CreateAction label="Neu erstellen" onClick={()=>setOpen(true)}/><ActionSheet label="Neu erstellen" className="quick-create-sheet" open={open} onClose={()=>setOpen(false)}><div className="action-list">{actions.map(item=><ActionRow key={item.href} {...item} href={item.href+(item.href.includes('?')?'&':'?')+'returnTo=/dashboard'} navigation onClick={()=>setOpen(false)}/>)}</div></ActionSheet></>;
+}
+
 export function DetailHeading({ title, status, tone = "neutral", subtitle, leading, action }: {
   title: string; status?: ReactNode; tone?: "neutral" | "success" | "warning" | "danger" | "info"; subtitle?: string; leading?: ReactNode; action?: ReactNode;
 }) {
@@ -61,6 +75,11 @@ export function MetricTile({ label, value, hint }: { label: string; value: React
 /** Open workspace sections share page spacing without adding nested card chrome. */
 export function WorkspaceSection({children,className=""}:{children:ReactNode;className?:string}){
  return <section className={`bo-workspace-section ${className}`.trim()}>{children}</section>;
+}
+
+/** Settings groups share one label, surface and row boundary contract. */
+export function SettingsGroup({title,children}:{title:string;children:ReactNode}){
+ return <section className="bo-settings-group"><h2>{title}</h2><div className="bo-settings-group-body">{children}</div></section>;
 }
 
 /** Route links and local detail tabs keep their behavior and share one container. */
@@ -88,6 +107,17 @@ export function RowActions({ label = "Weitere Aktionen", onClick, disabled = fal
 
 function sheetValues(root:HTMLElement|null){return JSON.stringify(Array.from(root?.querySelectorAll<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>('input:not([type="hidden"]),select,textarea')??[]).map(el=>[el.name||el.id,el.type,el.type==='checkbox'||el.type==='radio'?(el as HTMLInputElement).checked:el.value]));}
 
+function sheetForm(child:ReactNode):ReactNode{
+ if(!isValidElement<{children?:ReactNode}>(child)||child.type!=="form")return child;
+ const content:ReactNode[]=[],actions:ReactNode[]=[];
+ for(const node of Children.toArray(child.props.children)){
+  if(isValidElement<{className?:string}>(node)&&(node.type===FormActions||node.props.className?.split(/\s+/).some(name=>["filter-sheet-actions","mobile-sticky-save"].includes(name))))actions.push(node);
+  else content.push(node);
+ }
+ if(!actions.length)return child;
+ return cloneElement(child,{children:<><div className="sheet-form-content">{content}</div><div className="sheet-form-footer">{actions}</div></>});
+}
+
 type SheetProps={label:string;lang?:string;ariaLabel?:string;description?:string;open:boolean;onClose:()=>void;children:ReactNode;busy?:boolean;className?:string;layerClassName?:string;actions?:ReactNode;dirty?:boolean;wizard?:boolean;onBrowserBack?:()=>void;closeLabel?:string;discardText?:{title:string;message:string;cancelLabel:string;confirmLabel:string}};
 /** One focus/viewport/header/scroll/footer contract for all sheet families. */
 function Sheet({label,lang,description,open,onClose,children,busy=false,className="",layerClassName="",ariaLabel,actions,kind,dirty,wizard=false,onBrowserBack,closeLabel="Schliessen",discardText}:SheetProps&{kind:"action"|"form"|"filter"}){
@@ -106,9 +136,9 @@ function Sheet({label,lang,description,open,onClose,children,busy=false,classNam
  if(!open||!mounted)return null;
  const body:ReactNode[]=[],footers:ReactNode[]=[];
  for(const child of Children.toArray(children)){
-  if(isValidElement<{className?:string;children?:ReactNode}>(child)&&child.props.className?.split(/\s+/).includes("filter-sheet-actions"))footers.push(child);
+  if(isValidElement<{className?:string;children?:ReactNode;sheet?:boolean}>(child)&&(child.type===FormActions||child.props.className?.split(/\s+/).includes("filter-sheet-actions")))footers.push(child.type===FormActions?cloneElement(child,{sheet:true}):child);
   else if(isValidElement<{className?:string;children?:ReactNode}>(child)&&child.props.className?.split(/\s+/).includes("sheet-body"))body.push(cloneElement(child,{className:child.props.className.replace(/\bsheet-body\b/g,"").trim()}));
-  else body.push(child);
+  else body.push(sheetForm(child));
  }
  return createPortal(<><div className={`sheet-layer ${layerClassName}`.trim()} onMouseDown={event=>{if(event.target===event.currentTarget)requestClose()}}><section ref={dialogRef} tabIndex={-1} className={`bottom-sheet ${className}`.trim()} lang={lang} data-sheet-kind={kind} data-wizard={wizard||undefined} role="dialog" aria-modal="true" aria-label={ariaLabel??label} onInvalidCapture={event=>{if(event.target instanceof Element){const details=event.target.closest("details");if(details instanceof HTMLDetailsElement)details.open=true}}} onInputCapture={()=>setChanged(sheetValues(dialogRef.current)!==baseline.current)} onChangeCapture={()=>setChanged(sheetValues(dialogRef.current)!==baseline.current)} onClickCapture={event=>{const button=event.target instanceof Element?event.target.closest('button'):null;if(button&&/^(Abbrechen|Schliessen)$/.test(button.textContent?.trim()??"")){event.preventDefault();event.stopPropagation();requestClose()}}}><div className="sheet-handle"/><header className="sheet-header"><div><h2>{label}</h2>{description&&<p>{description}</p>}</div><button type="button" className="icon-button" aria-label={closeLabel} disabled={busy} onClick={requestClose}><Icon name="close"/></button></header><div className="sheet-body" inert={kind==="form"&&busy}>{body}</div>{actions?<div className="filter-sheet-actions">{actions}</div>:footers}</section></div><ConfirmDialog open={discard} closeLabel={closeLabel} title={discardText?.title??"Änderungen verwerfen?"} message={discardText?.message??"Deine Änderungen sind noch nicht gespeichert und gehen verloren."} cancelLabel={discardText?.cancelLabel??"Weiter bearbeiten"} confirmLabel={discardText?.confirmLabel??"Änderungen verwerfen"} onCancel={()=>{setDiscard(false);setBackDiscard(false)}} onConfirm={()=>{window.dispatchEvent(new Event("binso-draft-discard"));setDiscard(false);if(backDiscard){setBackDiscard(false);leaveBack()}else onClose()}}/></>,document.body);
 }

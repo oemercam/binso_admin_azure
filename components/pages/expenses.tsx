@@ -6,7 +6,6 @@ import { businessDate } from "@/lib/financial-status";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { useDialogFocus } from "../use-dialog-focus";
 import { AppShell } from "../app-shell";
 import { RecordRow, RecordsView, RecordsControls, useRecordsController } from "../records";
 import { appendDemoRow } from "@/lib/demo-storage";
@@ -27,6 +26,7 @@ export function ExpensesPage() {
 export function ExpenseForm({ existing = false, expenseId }: { existing?: boolean; expenseId?: string }) {
   const router=useRouter();
   const searchParams=useSearchParams();
+  const returnTo=searchParams.get("returnTo")==="/dashboard"?"/dashboard":"/spesen";
   const production=useBackendMode();
   const [person,setPerson]=useState(existing?"":searchParams.get("employeeId")??"");
   const employeesQuery=useApiQuery<{items:Array<{id:string;first_name:string;last_name:string}>}>(production?"/api/expenses/options":"/api/demo/data?collection=employees");
@@ -132,7 +132,7 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
       }
       setSavedExpense(true);
       setToast(receiptFile?"Spese und Beleg gespeichert.":existing?"Spese gespeichert.":"Spese eingereicht.");
-      window.setTimeout(()=>router.push("/spesen"),700);
+      window.setTimeout(()=>router.push(returnTo),700);
     }catch(error){
       expenseMutationPending.current=false;setExpenseBusy(false);
       setToast(error instanceof Error?error.message:"Spese konnte nicht gespeichert werden.");
@@ -143,8 +143,8 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
   const recordReimbursement=async()=>{if(expenseMutationPending.current||!expenseId)return;expenseMutationPending.current=true;setExpenseBusy(true);try{const r=await apiPost<{item:{reimbursed_at:string}}>('/api/expenses/'+encodeURIComponent(expenseId)+'/reimbursement',{reference:reimbursementRef});setReimbursedAt(r.item.reimbursed_at);setReimbursementOpen(false);setToast('Erstattung erfasst.')}catch(e){setToast(e instanceof Error?e.message:'Erstattung konnte nicht erfasst werden.')}finally{expenseMutationPending.current=false;setExpenseBusy(false)}};
   const selectedEmployee=availableEmployees.find(item=>item.id===person);
   const employeeLabel=selectedEmployee?[selectedEmployee.first_name,selectedEmployee.last_name].filter(Boolean).join(" "):"Ohne Mitarbeiter";
-  if(existing&&(loadingExpense||expenseLoadError))return <AppShell title="Spese" subtitle={expenseLoadError?"Spesendaten nicht verfügbar":"Daten werden geladen."} active="spesen" backHref="/spesen" backLabel="Spesen">{loadingExpense?<div role="status"><EmptyState icon="card" title="Spese wird geladen" text="Die Spesendaten werden abgerufen."/></div>:<><div role="alert"><EmptyState icon="card" title="Spese konnte nicht geladen werden" text={expenseLoadError??"Bitte versuche es erneut."}/></div><div className="page-actions"><Button onClick={expenseQuery.refresh}>Erneut versuchen</Button><Button href="/spesen" variant="ghost">Zur Übersicht</Button></div></>}</AppShell>;
-  return <AppShell editing={!lockedExpense} unsavedChanges={editedExpense&&!savedExpense} title={existing ? merchant||description||"Spese" : "Spese erfassen"} status={existing?status:undefined} statusTone={status==="Genehmigt"||status==="Verbucht"?"success":status==="Abgelehnt"?"danger":status==="Eingereicht"?"warning":"neutral"} subtitle={existing ? employeeLabel : "Beleg fotografieren oder Datei auswählen."} active="spesen" backHref="/spesen" backLabel="Spesen">
+  if(existing&&(loadingExpense||expenseLoadError))return <AppShell title="Spese" subtitle={expenseLoadError?"Spesendaten nicht verfügbar":"Daten werden geladen."} active="spesen" backHref={returnTo} backLabel="Spesen">{loadingExpense?<div role="status"><EmptyState icon="card" title="Spese wird geladen" text="Die Spesendaten werden abgerufen."/></div>:<><div role="alert"><EmptyState icon="card" title="Spese konnte nicht geladen werden" text={expenseLoadError??"Bitte versuche es erneut."}/></div><div className="page-actions"><Button onClick={expenseQuery.refresh}>Erneut versuchen</Button><Button href="/spesen" variant="ghost">Zur Übersicht</Button></div></>}</AppShell>;
+  return <AppShell editing={!lockedExpense} unsavedChanges={editedExpense&&!savedExpense} title={existing ? merchant||description||"Spese" : "Spese erfassen"} status={existing?status:undefined} statusTone={status==="Genehmigt"||status==="Verbucht"?"success":status==="Abgelehnt"?"danger":status==="Eingereicht"?"warning":"neutral"} subtitle={existing ? employeeLabel : "Beleg fotografieren oder Datei auswählen."} active="spesen" backHref={returnTo} backLabel="Spesen">
     {(employeesQuery.error||customersQuery.error||filesQuery.error)&&<div role="alert">{employeesQuery.error||customersQuery.error||filesQuery.error}<Button variant="ghost" onClick={()=>{employeesQuery.refresh();customersQuery.refresh();filesQuery.refresh()}}>Erneut versuchen</Button></div>}
     <div className={existing?"entity-detail-workspace expense-detail-workspace":"expense-layout"} onChangeCapture={()=>setEditedExpense(true)}>
 

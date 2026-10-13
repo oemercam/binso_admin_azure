@@ -4,7 +4,7 @@ import {useApiQuery} from "@/lib/client/use-api-query";
 import {Avatar} from "../avatar";
 import {usePageAccess} from "@/lib/client/page-access";
 import {DocumentModal} from "../documents";
-import {ActionRow,ActionSheet,FormSheet,ListRow,SelectionRows} from "../binso-ux";
+import {ActionRow,ActionSheet,FormSheet,ListRow,SelectionRows,SettingsGroup} from "../binso-ux";
 
 import Link from "next/link";
 import {Monitor} from "lucide-react";
@@ -26,12 +26,15 @@ export function SettingsPage() {
 
 function SettingsNavigation(){
  const access=usePageAccess();
+ const [query,setQuery]=useState("");
  const groups=[
   {title:"Unternehmen",rows:[["/einstellungen/firma","users","Firma"],["/einstellungen/team","users","Benutzer & Rollen"],["/einstellungen/abonnement","card","Abonnement"]]},
   {title:"Geschäftsprozesse",rows:[["/einstellungen/dokumente","receipt","Rechnungen & Dokumente"],["/einstellungen/zeiterfassung","clock","Zeiterfassung"]]},
   {title:"Weitere Einstellungen",rows:[["/einstellungen/datenschutz","lock","Datenschutz & Cookies"]]},
  ];
- return <>{groups.map(group=><section className="settings-section" key={group.title}><SectionTitle title={group.title}/><div className="settings-list">{group.rows.filter(([href])=>access.canOpen(href)).map(([href,icon,title])=><ActionRow href={href} key={href} icon={icon} title={title}/>)}</div></section>)}</>;
+ const term=query.trim().toLocaleLowerCase("de-CH");
+ const visibleGroups=groups.map(group=>({...group,rows:group.rows.filter(([href,,title])=>access.canOpen(href)&&(!term||`${group.title} ${title}`.toLocaleLowerCase("de-CH").includes(term)))})).filter(group=>group.rows.length);
+ return <><label className="searchbox settings-navigation-search"><Icon name="search"/><Input type="search" aria-label="Einstellungen suchen" placeholder="Einstellungen suchen" value={query} onChange={event=>setQuery(event.target.value)}/></label>{visibleGroups.map(group=><SettingsGroup title={group.title} key={group.title}><div className="settings-list">{group.rows.map(([href,icon,title])=><ActionRow href={href} key={href} icon={icon} title={title}/>)}</div></SettingsGroup>)}{!visibleGroups.length&&<EmptyState compact title="Keine passenden Einstellungen" text="Versuche einen anderen Suchbegriff."/>}</>;
 }
 
 export function AccountSettingsPage() {
@@ -161,7 +164,7 @@ export function CompanySettingsPage() {
     {loading?<LoadingState>Einstellungen werden geladen …</LoadingState>:loadError?<ErrorState onRetry={query.refresh} retryLabel="Erneut versuchen">{loadError}</ErrorState>:<div className="settings-detail-grid">
       <section className="surface company-logo-card">{companyLogoSource(logoPreview||logoUrl)?<img src={companyLogoSource(logoPreview||logoUrl)} alt="Firmenlogo"/>:<span className="company-logo-placeholder" role="img" aria-label="Kein Firmenlogo"><Icon name="users"/></span>}<div><b>{name||"Firma"}</b><small>Firmenlogo für Angebote, Rechnungen und Dokumente</small></div></section>
       {editing?<FormSheet open={editing} label={onboarding?"Unternehmen einrichten":"Firmendaten bearbeiten"} description={onboarding?"Weitere Unternehmensdaten kannst du jetzt oder später ergänzen.":undefined} onClose={()=>setEditing(false)} busy={saving} dirty={currentValues!==baseline||pendingLogo!==null}><section className="settings-form">
-        <Field label="Firmenlogo"><Input id="company-logo-upload" type="file" accept="image/png,image/jpeg,image/webp" onChange={e=>void uploadLogo(e.target.files?.[0])}/></Field><div className="form-grid two">
+        <div className="form-grid two"><Field label="Firmenlogo" className="full"><Input id="company-logo-upload" type="file" accept="image/png,image/jpeg,image/webp" onChange={e=>void uploadLogo(e.target.files?.[0])}/></Field>
           <Field label="Firmenname *"><Input required autoComplete="organization" value={name} onChange={e=>setName(e.target.value)}/></Field>
           <Field label="UID"><Input value={uid} onChange={e=>setUid(e.target.value)}/></Field>
           <Field label="Strasse"><Input value={street} onChange={e=>setStreet(e.target.value)}/></Field>
@@ -345,7 +348,7 @@ export function NotificationSettingsPage() {
   return <AppShell title="Benachrichtigungen" subtitle="Bestimme, wie Binso One dich informiert." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
     {error&&<ErrorState>{error}</ErrorState>}
     {!ready&&!error&&<LoadingState>Einstellungen werden geladen …</LoadingState>}
-    <section className="preference-table">{rows.map(([title,text])=><div className="preference-row" key={title}><div><b>{title}</b><small>{text}</small></div><div className="preference-channels">{(["email","push"] as const).map(channel=><label key={channel}><span>{channel==="email"?"E-Mail":"Push"}</span><Toggle checked={prefs[title][channel]} disabled={!ready||saving.includes(title+channel)} onChange={()=>void toggle(title,channel)} label={`${channel==="email"?"E-Mail":"Push"} ${title}`}/></label>)}</div></div>)}</section>
+    <SettingsGroup title="Benachrichtigungen"><section className="preference-table">{rows.map(([title,text])=><div className="preference-row" key={title}><div><b>{title}</b><small>{text}</small></div><div className="preference-channels">{(["email","push"] as const).map(channel=><label key={channel}><span>{channel==="email"?"E-Mail":"Push"}</span><Toggle checked={prefs[title][channel]} disabled={!ready||saving.includes(title+channel)} onChange={()=>void toggle(title,channel)} label={`${channel==="email"?"E-Mail":"Push"} ${title}`}/></label>)}</div></div>)}</section></SettingsGroup>
   </AppShell>;
 }
 
@@ -378,7 +381,7 @@ export function AppearanceSettingsPage(){
  const choose=(next:ThemeMode)=>{setError("");void saveTheme(next).catch(()=>setError("Darstellung konnte nicht gespeichert werden."))};
  return <AppShell title="Darstellung & Sprache" subtitle="Binso One passt sich deiner Arbeitsweise an." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
   {error&&<ErrorState>{error}</ErrorState>}
-  <section className="settings-section"><SectionTitle title="Darstellung"/><SelectionRows label="Darstellung" value={theme} options={themeOptions} onChange={choose}/></section>
-  <section className="settings-section"><SectionTitle title="Sprache"/><LanguagePreference/></section>
+  <SettingsGroup title="Darstellung"><SelectionRows label="Darstellung" value={theme} options={themeOptions} onChange={choose}/></SettingsGroup>
+  <SettingsGroup title="Sprache"><div className="settings-group-fields"><LanguagePreference/></div></SettingsGroup>
  </AppShell>;
 }

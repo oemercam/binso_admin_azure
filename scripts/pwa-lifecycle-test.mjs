@@ -3,24 +3,29 @@ import fs from 'node:fs/promises';
 import vm from 'node:vm';
 import {createRequire} from 'node:module';
 import ts from 'typescript';
-const require=createRequire(import.meta.url),source=(await fs.readFile('components/pwa-register.tsx','utf8')).replace('import { useEffect, useState } from "react";','');
+const require=createRequire(import.meta.url);
+const source=(await fs.readFile('components/pwa-register.tsx','utf8')).replace('import { useEffect } from "react";','');
 const compiled=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
-const listeners={},workerListeners={};let reloads=0,updates=0,available=false,effectsEnabled=true;
-const values=new Map(),sessionStorage={getItem:key=>values.get(key)??null,setItem:(key,value)=>values.set(key,value),removeItem:key=>values.delete(key)};
-const worker={state:'installed',addEventListener:(name,fn)=>workerListeners[name]=fn,postMessage:()=>{updates++;listeners.controllerchange()}};
-const registration={waiting:null,installing:worker,update:async()=>{},addEventListener:(name,fn)=>listeners[name]=fn};
-const navigator={serviceWorker:{controller:null,register:async()=>registration,getRegistration:async()=>registration,addEventListener:(name,fn)=>listeners[name]=fn,removeEventListener:()=>{}}};
-const pwaExports={};
-Function('require','exports','useEffect','useState','navigator','window','sessionStorage','process',compiled)(require,pwaExports,fn=>{if(effectsEnabled)fn()},()=>[available,value=>available=value],navigator,{location:{reload:()=>reloads++}},sessionStorage,{env:{NODE_ENV:'production'}});
-pwaExports.PwaRegister();await Promise.resolve();await Promise.resolve();
-listeners.controllerchange();assert.equal(reloads,0,'First service-worker ownership must not reload the application');
-navigator.serviceWorker.controller={};listeners.updatefound();workerListeners.statechange();assert.equal(available,true);
-registration.waiting=worker;effectsEnabled=false;const banner=pwaExports.PwaRegister();
-await banner.props.children[1].props.onClick();assert.equal(updates,1);assert.equal(reloads,1,'Explicit update reloads on activation, not before');
-listeners.controllerchange();assert.equal(reloads,1,'Repeated controllerchange cannot double reload');
-await banner.props.children[1].props.onClick();assert.equal(reloads,2,'A later explicitly accepted update can reload once');
+function target(){const listeners=new Map();return {listeners,addEventListener:(name,fn)=>listeners.set(name,fn),removeEventListener:(name,fn)=>{if(listeners.get(name)===fn)listeners.delete(name)},fire:name=>listeners.get(name)?.()};}
+async function scenario({controlled=false,waiting=false,unmount=false}={}){
+ const serviceWorker=target(),registration=target(),worker=target(),document=target();let updates=0,activations=0,reloads=0,cleanup;
+ document.visibilityState='visible';worker.state='installing';worker.postMessage=message=>{assert.equal(message.type,'SKIP_WAITING');activations++;serviceWorker.fire('controllerchange')};
+ Object.assign(registration,{waiting:waiting?worker:null,installing:worker,update:async()=>{updates++}});
+ Object.assign(serviceWorker,{controller:controlled?{}:null,register:async()=>registration});
+ const exports={};Function('require','exports','useEffect','navigator','document','window','process',compiled)(require,exports,fn=>cleanup=fn(),{serviceWorker},document,{location:{reload:()=>reloads++}},{env:{NODE_ENV:'production'}});
+ assert.equal(exports.PwaRegister(),null,'No update UI is rendered on initial mount');
+ if(unmount)cleanup();await Promise.resolve();await Promise.resolve();
+ if(unmount){assert.equal(registration.listeners.size,0);assert.equal(activations,0);return;}
+ assert.equal(activations,waiting?1:0,'An already waiting update activates without a prompt');
+ registration.fire('updatefound');worker.state='installed';registration.waiting=worker;worker.fire('statechange');assert.equal(activations,waiting?2:1);
+ assert.equal(reloads,0,'Worker ownership changes never reload an in-progress draft');
+ document.visibilityState='hidden';document.fire('visibilitychange');assert.equal(updates,1);
+ document.visibilityState='visible';document.fire('visibilitychange');assert.equal(updates,2,'App resume checks for newer workers');
+ cleanup();assert.equal(worker.listeners.size,0);assert.equal(registration.listeners.size,0);assert.equal(document.listeners.size,0,'Every lifecycle listener is cleaned up');
+}
+await scenario();await scenario({controlled:true,waiting:true});await scenario({unmount:true});
 const swEvents={};let skip=0;
 vm.runInNewContext(await fs.readFile('public/sw.js','utf8'),{self:{addEventListener:(name,fn)=>swEvents[name]=fn,skipWaiting:()=>{skip++}},caches:{open:async()=>({addAll:async()=>{}})}});
-let installed;swEvents.install({waitUntil:promise=>installed=promise});await installed;assert.equal(skip,0,'Installing an update waits for acceptance');
+let installed;swEvents.install({waitUntil:promise=>installed=promise});await installed;assert.equal(skip,0,'Shell caching finishes before requested activation');
 swEvents.message({data:{type:'SKIP_WAITING'}});assert.equal(skip,1);
-console.log('PWA lifecycle: no initial takeover reload, accepted update activates before a single reload, repeated events deduplicate, later acceptance works.');
+console.log('Silent PWA lifecycle: first install, waiting/new updates, resume checks, no UI/reloads, late registration and listener cleanup passed.');
