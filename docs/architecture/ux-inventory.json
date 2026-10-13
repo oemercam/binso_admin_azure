@@ -14267,17 +14267,17 @@
         },
         {
           "tag": "FilterSheet",
-          "line": 50,
+          "line": 51,
           "component": "components/statistics.tsx#Statistics"
         },
         {
           "tag": "Field",
-          "line": 50,
+          "line": 51,
           "component": "components/statistics.tsx#Statistics"
         },
         {
           "tag": "Field",
-          "line": 50,
+          "line": 51,
           "component": "components/statistics.tsx#Statistics"
         },
         {
@@ -17057,17 +17057,17 @@
         },
         {
           "tag": "FilterSheet",
-          "line": 50,
+          "line": 51,
           "component": "components/statistics.tsx#Statistics"
         },
         {
           "tag": "Field",
-          "line": 50,
+          "line": 51,
           "component": "components/statistics.tsx#Statistics"
         },
         {
           "tag": "Field",
-          "line": 50,
+          "line": 51,
           "component": "components/statistics.tsx#Statistics"
         },
         {
@@ -40517,17 +40517,17 @@
         },
         {
           "tag": "FilterSheet",
-          "line": 50,
+          "line": 51,
           "component": "components/statistics.tsx#Statistics"
         },
         {
           "tag": "Field",
-          "line": 50,
+          "line": 51,
           "component": "components/statistics.tsx#Statistics"
         },
         {
           "tag": "Field",
-          "line": 50,
+          "line": 51,
           "component": "components/statistics.tsx#Statistics"
         },
         {
@@ -42152,17 +42152,17 @@
         },
         {
           "tag": "FilterSheet",
-          "line": 50,
+          "line": 51,
           "component": "components/statistics.tsx#Statistics"
         },
         {
           "tag": "Field",
-          "line": 50,
+          "line": 51,
           "component": "components/statistics.tsx#Statistics"
         },
         {
           "tag": "Field",
-          "line": 50,
+          "line": 51,
           "component": "components/statistics.tsx#Statistics"
         },
         {
@@ -46592,17 +46592,17 @@
         },
         {
           "tag": "FilterSheet",
-          "line": 50,
+          "line": 51,
           "component": "components/statistics.tsx#Statistics"
         },
         {
           "tag": "Field",
-          "line": 50,
+          "line": 51,
           "component": "components/statistics.tsx#Statistics"
         },
         {
           "tag": "Field",
-          "line": 50,
+          "line": 51,
           "component": "components/statistics.tsx#Statistics"
         },
         {
@@ -74446,17 +74446,17 @@
         },
         {
           "tag": "FilterSheet",
-          "line": 50,
+          "line": 51,
           "component": "components/statistics.tsx#Statistics"
         },
         {
           "tag": "Field",
-          "line": 50,
+          "line": 51,
           "component": "components/statistics.tsx#Statistics"
         },
         {
           "tag": "Field",
-          "line": 50,
+          "line": 51,
           "component": "components/statistics.tsx#Statistics"
         },
         {
@@ -121625,21 +121625,21 @@
       "widgets": [
         {
           "tag": "FilterSheet",
-          "line": 50
+          "line": 51
         },
         {
           "tag": "Field",
-          "line": 50
+          "line": 51
         },
         {
           "tag": "Field",
-          "line": 50
+          "line": 51
         }
       ],
       "elements": [
         {
           "tag": "section",
-          "line": 39,
+          "line": 40,
           "props": [
             "className=\"bo-statistics\"",
             "aria-labelledby={id}"
@@ -121647,31 +121647,31 @@
         },
         {
           "tag": "header",
-          "line": 40,
+          "line": 41,
           "props": [
             "className=\"bo-statistics-heading\""
           ]
         },
         {
           "tag": "div",
-          "line": 40,
+          "line": 41,
           "props": []
         },
         {
           "tag": "h2",
-          "line": 40,
+          "line": 41,
           "props": [
             "id={id}"
           ]
         },
         {
           "tag": "p",
-          "line": 40,
+          "line": 41,
           "props": []
         },
         {
           "tag": "div",
-          "line": 40,
+          "line": 41,
           "props": [
             "className=\"bo-statistics-periods\"",
             "aria-label=\"Statistikzeitraum\""
@@ -121679,7 +121679,7 @@
         },
         {
           "tag": "button",
-          "line": 40,
+          "line": 41,
           "props": [
             "type=\"button\"",
             "key={months}",
@@ -121689,7 +121689,7 @@
         },
         {
           "tag": "button",
-          "line": 40,
+          "line": 41,
           "props": [
             "type=\"button\"",
             "aria-label=\"Eigenen Statistikzeitraum wählen\"",
@@ -121699,7 +121699,7 @@
         },
         {
           "tag": "Icon",
-          "line": 40,
+          "line": 41,
           "props": [
             "name=\"calendar\"",
             "size={18}"
@@ -121707,60 +121707,60 @@
         },
         {
           "tag": "p",
-          "line": 41,
+          "line": 42,
           "props": [
             "className=\"bo-statistics-dates\""
           ]
         },
         {
           "tag": "dl",
-          "line": 42,
+          "line": 43,
           "props": [
             "className=\"bo-statistics-kpis\""
           ]
         },
         {
           "tag": "div",
-          "line": 42,
+          "line": 43,
           "props": [
             "key={metric.label}"
           ]
         },
         {
           "tag": "dt",
-          "line": 42,
+          "line": 43,
           "props": []
         },
         {
           "tag": "dd",
-          "line": 42,
+          "line": 43,
           "props": []
         },
         {
           "tag": "small",
-          "line": 42,
+          "line": 43,
           "props": []
         },
         {
           "tag": "details",
-          "line": 43,
+          "line": 44,
           "props": [
             "className=\"bo-statistics-notice\""
           ]
         },
         {
           "tag": "summary",
-          "line": 43,
+          "line": 44,
           "props": []
         },
         {
           "tag": "p",
-          "line": 43,
+          "line": 44,
           "props": []
         },
         {
           "tag": "RingChart",
-          "line": 44,
+          "line": 45,
           "props": [
             "label=\"Zahlungsvolumen\"",
             "currency={currency}",
@@ -121769,7 +121769,7 @@
         },
         {
           "tag": "button",
-          "line": 44,
+          "line": 45,
           "props": [
             "type=\"button\"",
             "className=\"text-action\"",
@@ -121780,7 +121780,7 @@
         },
         {
           "tag": "div",
-          "line": 45,
+          "line": 46,
           "props": [
             "id={id+\"-trend\"}",
             "hidden={!showTrend}"
@@ -121788,7 +121788,7 @@
         },
         {
           "tag": "div",
-          "line": 46,
+          "line": 47,
           "props": [
             "className=\"bo-statistics-plot\"",
             "aria-label={series.map(item=>item.label).join(' und ')}"
@@ -121796,7 +121796,7 @@
         },
         {
           "tag": "button",
-          "line": 46,
+          "line": 47,
           "props": [
             "type=\"button\"",
             "key={bucket.key}",
@@ -121810,14 +121810,14 @@
         },
         {
           "tag": "span",
-          "line": 46,
+          "line": 47,
           "props": [
             "className=\"bo-statistics-bars\""
           ]
         },
         {
           "tag": "i",
-          "line": 46,
+          "line": 47,
           "props": [
             "key={item.key}",
             "className={'bo-statistics-bar bo-statistics-'+item.tone}",
@@ -121826,35 +121826,35 @@
         },
         {
           "tag": "span",
-          "line": 46,
+          "line": 47,
           "props": [
             "className=\"bo-statistics-axis\""
           ]
         },
         {
           "tag": "div",
-          "line": 47,
+          "line": 48,
           "props": [
             "className=\"bo-statistics-legend\""
           ]
         },
         {
           "tag": "span",
-          "line": 47,
+          "line": 48,
           "props": [
             "key={item.key}"
           ]
         },
         {
           "tag": "i",
-          "line": 47,
+          "line": 48,
           "props": [
             "className={'bo-statistics-'+item.tone}"
           ]
         },
         {
           "tag": "p",
-          "line": 48,
+          "line": 50,
           "props": [
             "className=\"bo-statistics-detail\"",
             "role=\"status\""
@@ -121862,7 +121862,7 @@
         },
         {
           "tag": "FilterSheet",
-          "line": 50,
+          "line": 51,
           "props": [
             "label=\"Statistikzeitraum\"",
             "open={open}",
@@ -121871,19 +121871,19 @@
         },
         {
           "tag": "p",
-          "line": 50,
+          "line": 51,
           "props": []
         },
         {
           "tag": "div",
-          "line": 50,
+          "line": 51,
           "props": [
             "className=\"form-grid two\""
           ]
         },
         {
           "tag": "Field",
-          "line": 50,
+          "line": 51,
           "props": [
             "allowReadOnlyInput",
             "label=\"Von *\""
@@ -121891,7 +121891,7 @@
         },
         {
           "tag": "Input",
-          "line": 50,
+          "line": 51,
           "props": [
             "type=\"date\"",
             "required",
@@ -121903,7 +121903,7 @@
         },
         {
           "tag": "Field",
-          "line": 50,
+          "line": 51,
           "props": [
             "allowReadOnlyInput",
             "label=\"Bis *\""
@@ -121911,7 +121911,7 @@
         },
         {
           "tag": "Input",
-          "line": 50,
+          "line": 51,
           "props": [
             "type=\"date\"",
             "required",
@@ -121923,19 +121923,19 @@
         },
         {
           "tag": "ErrorState",
-          "line": 50,
+          "line": 51,
           "props": []
         },
         {
           "tag": "div",
-          "line": 50,
+          "line": 51,
           "props": [
             "className=\"filter-sheet-actions\""
           ]
         },
         {
           "tag": "Button",
-          "line": 50,
+          "line": 51,
           "props": [
             "variant=\"secondary\"",
             "onClick={()=>setOpen(false)}"
@@ -121943,7 +121943,7 @@
         },
         {
           "tag": "Button",
-          "line": 50,
+          "line": 51,
           "props": [
             "disabled={!pending}",
             "onClick={()=>{choose({...draft,months:'custom'});setOpen(false)}}"
@@ -121968,20 +121968,20 @@
           "expression": "format==='number'"
         },
         {
-          "line": 40,
+          "line": 41,
           "expression": "period.months==='custom'"
         },
         {
-          "line": 44,
+          "line": 45,
           "expression": "showTrend"
         },
         {
-          "line": 48,
+          "line": 50,
           "expression": "active"
         },
         {
-          "line": 48,
-          "expression": "events.some(event=>bounds&&event.date>=bounds.from&&event.date<=bounds.to)"
+          "line": 50,
+          "expression": "hasEntries"
         }
       ]
     },
@@ -208795,7 +208795,7 @@
       "id": 2117,
       "file": "app/styles/responsive.css",
       "line": 2216,
-      "selector": ".page-head:not(.page-head-detail) .page-actions .button",
+      "selector": ".page-head:not(.page-head-detail) .page-actions .button:not(.bo-create-action)",
       "context": "@media (max-width:760px)",
       "declarations": [
         {

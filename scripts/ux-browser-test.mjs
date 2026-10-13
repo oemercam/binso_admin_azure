@@ -418,6 +418,8 @@ try{
    assert.equal(await page.locator('.bo-statistics dd').first().textContent(),'CHF 120.00','Custom period survives actual same-tab navigation');
    await page.locator('.bo-statistics').getByRole('button',{name:'Eigenen Statistikzeitraum wählen',exact:true}).click();
    const emptySheet=page.getByRole('dialog',{name:'Statistikzeitraum',exact:true});await emptySheet.getByLabel('Von *',{exact:true}).fill('2020-01-01');await emptySheet.getByLabel('Bis *',{exact:true}).fill('2020-01-02');await emptySheet.getByRole('button',{name:'Anwenden',exact:true}).click();
+   await page.getByText('Keine Buchungen im gewählten Zeitraum.',{exact:true}).waitFor();
+   const emptyTrend=page.getByRole('button',{name:'Zeitverlauf anzeigen',exact:true});if(await emptyTrend.count())await emptyTrend.click();
    assert.ok((await page.locator('.bo-statistics-bar').evaluateAll(elements=>elements.map(el=>el.getBoundingClientRect().height))).every(height=>height===0),'Empty period has no fabricated columns');
    await page.getByText('Keine Buchungen im gewählten Zeitraum.',{exact:true}).waitFor();
   }

@@ -63,3 +63,12 @@ Real iPhone standalone PWA, iPhone browser and Android device keyboard behavior 
 ## Publication state
 
 Local commit prepared; GitHub push was rejected by automatic approval review because publishing the complete branch to the destination was not explicitly authorized. No workaround was attempted. A PR, GitHub CI and production merge/deployment are pending permission to publish this exact branch to the user-named repository.
+
+## Fresh CI findings — first published candidate
+
+Published PR #246 at `6e5c7b2ebf5d2b3268ff9245c763f20cc35ebb09` after explicit user authorization. Quality run `38364606762`: checks, real scanner engine and production build/artifact passed; CodeQL run `38364606832` passed. Both browser gates correctly blocked acceptance.
+
+- WebKit identified a real empty-state regression: `Keine Buchungen` was inside the collapsed trend container. The central Statistics owner now keeps the empty status visible independently of trend disclosure. The test still requires visible empty text and additionally expands the plot before testing zero-height bars.
+- Chromium identified a real CSS-cascade conflict: `.page-head:not(.page-head-detail) .page-actions .button` overrode the canonical create circle with 40 px height. Excluding `.bo-create-action` from that generic sizing rule restores the shared 30×30 avatar geometry without a local page patch. The existing exact rectangle comparison remains unchanged.
+
+Fresh WebKit screenshot/DOM evidence was inspected for dashboard, support conversation and keyboard-sized manual entry. No browser or deployment success is claimed for the first candidate. The follow-up candidate must complete the full current gates.
