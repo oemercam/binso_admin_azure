@@ -691,6 +691,17 @@ try{
    if(scenario.group==='customers')await page.getByRole('dialog',{name:'Kunde bearbeiten',exact:true}).getByRole('button',{name:'Schliessen',exact:true}).click();else{const sheet=page.getByRole('dialog',{name:scenario.group==='products'?'Produkt bearbeiten':'Mitarbeiter bearbeiten',exact:true});await sheet.getByRole('button',{name:'Schliessen',exact:true}).click();await sheet.waitFor({state:'hidden'});assert.equal(await page.getByRole('alertdialog').count(),0,'Pristine sheet closes without a warning');await page.locator('.mobile-back').click();}await page.waitForURL(base+scenario.back);assert.equal(await page.getByRole('alertdialog').count(),0,scenario.group+': restoring original values is pristine');
   }
   if(hasInteraction('settings')){
+   await page.setViewportSize({width:390,height:740});await navigate(base+'/einstellungen');
+   const settingsContent=page.locator('.page-container');await settingsContent.getByRole('link',{name:'Abonnement',exact:true}).waitFor();
+   await settingsContent.getByLabel('Einstellungen suchen',{exact:true}).fill('Abonnement');
+   assert.equal(await settingsContent.locator('.bo-settings-group').count(),1,'Settings search hides empty groups');
+   assert.equal(await settingsContent.locator('.bo-settings-group .action-row').count(),1,'Settings search retains only the matching authorized route');
+   const groupSurface=await settingsContent.locator('.bo-settings-group-body').evaluate(el=>({border:getComputedStyle(el).borderTopWidth,radius:getComputedStyle(el).borderTopLeftRadius,background:getComputedStyle(el).backgroundColor}));
+   assert.equal(groupSurface.border,'0px');assert.equal(groupSurface.radius,'22px');assert.notEqual(groupSurface.background,'rgba(0, 0, 0, 0)','Grouped settings have a real surface without an outline');
+   await settingsContent.getByLabel('Einstellungen suchen',{exact:true}).fill('no-such-setting');await settingsContent.getByText('Keine passenden Einstellungen',{exact:true}).waitFor();
+   await settingsContent.getByLabel('Einstellungen suchen',{exact:true}).fill('');assert.ok(await settingsContent.locator('.bo-settings-group').count()>=2,'Clearing search restores the groups');
+   await capture(page,{animations:'disabled',path:path.join(output,`${theme}-390-grouped-settings.png`)});
+
    // Actual settings UI, controlled scanner verdicts; not a live antivirus-engine test.
    const imageBytes=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jB1kAAAAASUVORK5CYII=','base64');
    const imageFile={name:'synthetic-branding.png',mimeType:'image/png',buffer:imageBytes};

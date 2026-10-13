@@ -1011,6 +1011,27 @@
 
 .sheet-layer-contextual{top:calc(var(--dialog-viewport-top) + var(--mobile-header-h) + var(--safe-top));height:calc(var(--dialog-available-height) - var(--mobile-header-h) - var(--safe-top));align-items:flex-start;padding-top:0}
 .sheet-layer-contextual>.bottom-sheet{max-height:calc(var(--dialog-available-height) - var(--mobile-header-h) - var(--safe-top));border-radius:0 0 var(--radius-lg) var(--radius-lg)}
+/* Outlook reference: grouped preferences use their own palette. */
+.bo-settings-group{--settings-surface:#f3f3f5;--settings-label:#626267;--settings-ink:#222225;--settings-rule:#dedee2;--settings-symbol:#737379;--settings-accent:#006ec7;margin-block:24px}
+html[data-theme="dark"] .bo-settings-group{--settings-surface:#141414;--settings-label:#a0a0a5;--settings-ink:#dedee2;--settings-rule:#2b2b2e;--settings-symbol:#929297;--settings-accent:#48a7ff}
+.bo-settings-group>h2{margin:0 16px 8px;color:var(--settings-label);font-size:12px;font-weight:400;line-height:1.4}
+.bo-settings-group-body{border:0;border-radius:22px;background:var(--settings-surface);color:var(--settings-ink);overflow:hidden}
+.bo-settings-group-body :is(.settings-list,.action-list){margin:0;border:0;max-width:none}
+.bo-settings-group-body .action-row{position:relative;min-height:52px;padding:12px 16px;border:0;gap:14px}
+.bo-settings-group-body .action-row:not(:last-child)::after{content:"";position:absolute;bottom:0;left:52px;right:16px;height:1px;background:var(--settings-rule)}
+.bo-settings-group-body .action-row>svg{color:var(--settings-symbol)}
+.bo-settings-group-body .action-row-description{color:var(--settings-label)}
+.bo-settings-group-body :is(.toggle,.settings-switch){background:#77777d}
+.bo-settings-group-body :is(.toggle,.settings-switch).is-on{background:var(--settings-accent)}
+.bo-settings-group-body .preference-table{border:0;max-width:none}
+.bo-settings-group-body .preference-row{padding:16px;border-bottom:1px solid var(--settings-rule)}
+.bo-settings-group-body .preference-row:last-child{border-bottom:0}
+.app-section-einstellungen .mobile-header-detail{background:#f1f1f3;border-bottom:0;border-radius:22px 22px 0 0}
+html[data-theme="dark"] .app-section-einstellungen .mobile-header-detail{background:#212121}
+.app-section-einstellungen .mobile-back{border:1px solid var(--color-line);border-radius:50%;background:var(--color-subtle)}
+.settings-navigation-search{display:flex;width:100%;max-width:none;height:44px;border-radius:999px;background:#f1f1f3;margin-bottom:24px}
+html[data-theme="dark"] .settings-navigation-search{background:#212121}
+.settings-navigation-search>input{min-width:0;max-width:100%;height:40px}
 /* Binso mobile header and sorting refinements */
 
   .mobile-header.mobile-header-detail{
