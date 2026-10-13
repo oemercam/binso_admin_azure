@@ -1,0 +1,212 @@
+{
+  "date": "2026-10-13",
+  "baseCommit": "4b8e0115a90de981b11f1d716a8145e97efa7e6f",
+  "scope": "Shared customer/admin UX; synthetic API fixtures; no production writes",
+  "qualityGates": {
+    "lint": "passed",
+    "cssArchitecture": "passed",
+    "typecheck": "passed",
+    "productionBuild": "passed",
+    "releaseCheck": "passed",
+    "integrationArchitecture": "passed",
+    "navigationFoundation": "passed",
+    "qaPlan": "passed",
+    "diffWhitespace": "passed"
+  },
+  "staticTests": [
+    {
+      "command": "node scripts/readiness-integrity-test.mjs",
+      "status": "passed"
+    },
+    {
+      "command": "node scripts/security-exception-test.mjs",
+      "status": "passed"
+    },
+    {
+      "command": "node scripts/runtime-integrity-test.mjs",
+      "status": "passed"
+    },
+    {
+      "command": "node scripts/file-scan-test.mjs",
+      "status": "blocked",
+      "reason": "Environment denies AF_UNIX sockets; unchanged tests remain required in GitHub CI."
+    },
+    {
+      "command": "node scripts/file-rescan-test.mjs",
+      "status": "blocked",
+      "reason": "Environment denies AF_UNIX sockets; unchanged tests remain required in GitHub CI."
+    },
+    {
+      "command": "node scripts/auth-integrity-test.mjs",
+      "status": "passed"
+    },
+    {
+      "command": "node scripts/registration-test.mjs",
+      "status": "passed"
+    },
+    {
+      "command": "node scripts/statistics-test.mjs",
+      "status": "passed"
+    },
+    {
+      "command": "node scripts/v23-2-ux-test.mjs",
+      "status": "passed"
+    },
+    {
+      "command": "node scripts/glass-ux-test.mjs",
+      "status": "passed"
+    },
+    {
+      "command": "node scripts/ui-build-cache-test.mjs",
+      "status": "passed"
+    },
+    {
+      "command": "node scripts/architecture-selfcheck.mjs",
+      "status": "passed"
+    },
+    {
+      "command": "node scripts/permission-selfcheck.mjs",
+      "status": "passed"
+    },
+    {
+      "command": "node scripts/theme-selfcheck.mjs",
+      "status": "passed"
+    },
+    {
+      "command": "node scripts/client-session-test.mjs",
+      "status": "passed"
+    },
+    {
+      "command": "node scripts/migration-test.mjs",
+      "status": "passed"
+    },
+    {
+      "command": "node scripts/data-lifecycle-schema-test.mjs",
+      "status": "passed"
+    },
+    {
+      "command": "node scripts/ux-regression-test.mjs",
+      "status": "passed"
+    },
+    {
+      "command": "node scripts/pwa-preview-test.mjs",
+      "status": "passed"
+    },
+    {
+      "command": "node scripts/pwa-lifecycle-test.mjs",
+      "status": "passed"
+    },
+    {
+      "command": "node scripts/document-presentation-test.mjs",
+      "status": "passed"
+    },
+    {
+      "command": "node scripts/qa-plan-test.mjs",
+      "status": "passed"
+    },
+    {
+      "command": "node scripts/browser-shards-test.mjs",
+      "status": "passed"
+    },
+    {
+      "command": "node scripts/navigation-contract-test.mjs",
+      "status": "passed"
+    },
+    {
+      "command": "node scripts/ui-foundation-test.mjs",
+      "status": "passed"
+    },
+    {
+      "command": "node scripts/navigation-foundation-test.mjs",
+      "status": "passed"
+    },
+    {
+      "command": "node scripts/data-foundation-test.mjs",
+      "status": "passed"
+    },
+    {
+      "command": "node scripts/foundation-integration-test.mjs",
+      "status": "passed"
+    },
+    {
+      "command": "node scripts/process-draft-test.mjs",
+      "status": "passed"
+    },
+    {
+      "command": "node scripts/observability-test.mjs",
+      "status": "passed"
+    },
+    {
+      "command": "node scripts/operator-announcement-test.mjs",
+      "status": "passed"
+    },
+    {
+      "command": "node scripts/operator-contract-test.mjs",
+      "status": "passed"
+    }
+  ],
+  "browserChecks": {
+    "finalMatrix": {
+      "status": "passed",
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        768,
+        1024,
+        1440
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "routeThemeViewportCases": 1134,
+      "routes": 81
+    },
+    "finalChrome": {
+      "status": "passed",
+      "routeThemeViewportCases": 6,
+      "navigationCaptures": 24,
+      "interactions": [
+        "shared material",
+        "separate create action",
+        "contextual creation",
+        "permission filtering",
+        "cancel return path",
+        "focus return",
+        "filter count/reset",
+        "recent-search clear/undo",
+        "admin dock and sheet"
+      ],
+      "approvedGeometryComparison": "All 24 navigation captures exactly match navigation-baseline.v2.json"
+    },
+    "existingInteractions": {
+      "status": "passed",
+      "theme": "light",
+      "suites": [
+        "customers",
+        "products",
+        "header",
+        "operator"
+      ]
+    },
+    "adminTicketDetail": {
+      "status": "passed",
+      "routeThemeViewportCases": 6
+    },
+    "compliance": {
+      "status": "passed",
+      "routeThemeViewportCases": 16,
+      "failed": 0,
+      "notTested": 0
+    },
+    "complianceAdversaries": "passed"
+  },
+  "limitations": [
+    "file-scan and file-rescan tests blocked locally by AF_UNIX socket restrictions; required in GitHub CI",
+    "No physical iPhone/PWA keyboard verification",
+    "No live Azure acceptance or production deployment",
+    "Chromium viewport testing; no WebKit execution"
+  ]
+}

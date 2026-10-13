@@ -4,7 +4,7 @@ import {writeTestOutput} from '../test-output.mjs';
 import {identity} from './identity.mjs';
 import {createHash} from 'node:crypto';
 const runIdentity=identity();
-const baselineFile='ux-compliance/navigation-baseline.v1.json';
+const baselineFile='ux-compliance/navigation-baseline.v2.json';
 const navigationBaseline=await fs.readFile(baselineFile,'utf8').then(JSON.parse).catch(()=>null);
 export async function measureActionClearance(page){
  return page.evaluate(async()=>{
@@ -24,7 +24,8 @@ export async function measureActionClearance(page){
   const navRect=nav.getBoundingClientRect(),main=document.querySelector('.page-container');
   const actions=main?[...main.querySelectorAll('button,a,input,select,textarea')].filter(el=>el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden'&&!el.closest('[hidden],[inert],[aria-hidden=true]')):[];
   const bottom=actions.length?Math.max(...actions.map(el=>el.getBoundingClientRect().bottom)):null;
-  const observed={lastActionBottom:bottom,navigationTop:navRect.top,scrollY,scrollEndpoint:previous,scrollEndEstablished:atEnd&&stable>=2};
+  const plus=document.querySelector('.dock-create-action');const plusTop=plus?.getClientRects().length?plus.getBoundingClientRect().top:navRect.top;
+  const observed={lastActionBottom:bottom,navigationTop:Math.min(navRect.top,plusTop),scrollY,scrollEndpoint:previous,scrollEndEstablished:atEnd&&stable>=2};
   window.scrollTo({left:old.x,top:old.y,behavior:'instant'});await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));return observed;
  });
 }
@@ -79,16 +80,16 @@ export async function measureCompliance(page,{output,route,theme,width,state='no
   }
   const selectors=['.page-container','.page-head','.section-title','.record-controls','.bo-statistics','.bo-statistics-plot','.bo-statistics-axis','.bottom-nav','.form-wizard','.bottom-sheet','.form-actions'];
   const surfaces=selectors.flatMap(selector=>all(selector).slice(0,12).map(el=>{const c=getComputedStyle(el);return {selector,...item(el),css:{padding:c.padding,margin:c.margin,gap:c.gap,background:c.backgroundColor,border:c.border,overflowX:c.overflowX,fontSize:c.fontSize,position:c.position}}}));
-  return {viewport:v,checks,surfaces,navigation:all('.bottom-nav').map(el=>({rect:rect(el),position:getComputedStyle(el).position,borderRadius:getComputedStyle(el).borderRadius,links:[...el.querySelectorAll('a')].map(a=>({href:a.getAttribute('href'),rect:rect(a)}))}))};
+  return {viewport:v,checks,surfaces,navigation:all('.bottom-nav').map(el=>({rect:rect(el),position:getComputedStyle(el).position,borderRadius:getComputedStyle(el).borderRadius,bottomOffset:innerHeight-el.getBoundingClientRect().bottom,withCreate:!!document.querySelector('.mobile-dock .dock-create-action')?.getClientRects().length,links:[...el.querySelectorAll('a')].map(a=>({href:a.getAttribute('href'),rect:rect(a)}))}))};
  });
  // Last reachable action at scroll end; measure only outside dialogs/editors. Restore scroll without firing navigation clicks.
  const clearance=await measureActionClearance(page);
  if(clearance?.lastActionBottom!==null&&clearance)measured.checks.push({id:'UX-LAY-008',status:clearance.scrollEndEstablished&&clearance.lastActionBottom<=clearance.navigationTop+1?'passed':'failed',selector:'.page-container,.bottom-nav',observed:clearance});
  const evidence={schemaVersion:1,...runIdentity,engine,route,theme,width,state,scope:'Synthetic API fixtures; desktop engine emulation; no native keyboard proof',...measured};
  if(measured.navigation.length){
-  const reference=navigationBaseline?.cases.find(c=>c.theme===theme&&c.width===width&&c.state===state);
   const observed=measured.navigation[0];
-  const same=reference&&['x','y','width','height'].every(k=>Math.abs(observed.rect[k]-reference.navigation.rect[k])<=1)&&observed.borderRadius===reference.navigation.borderRadius&&JSON.stringify(observed.links.map(l=>l.href))===JSON.stringify(reference.navigation.links.map(l=>l.href));
+  const reference=state==='normal'?navigationBaseline?.cases.find(c=>c.theme===theme&&c.width===width&&c.withCreate===observed.withCreate):null;
+  const same=reference&&['x','width','height'].every(k=>Math.abs(observed.rect[k]-reference.navigation[k])<=1)&&Math.abs(observed.bottomOffset-reference.navigation.bottomOffset)<=1&&observed.position===reference.navigation.position&&observed.borderRadius===reference.navigation.borderRadius&&JSON.stringify(observed.links.map(l=>l.href))===JSON.stringify(reference.navigation.links);
   evidence.checks.push({id:'UX-NAV-003',status:reference?(same?'passed':'failed'):'not-tested',selector:'.bottom-nav',observed:{current:observed,reference:reference?.navigation??null,baselineCommit:navigationBaseline?.commit??null,reason:reference?null:'No explicitly captured protected baseline for this viewport/theme/state'}});
  }
  const filename=path.join(output,'compliance-'+createHash('sha256').update(JSON.stringify([engine,route,theme,width,state])).digest('hex').slice(0,20)+'.json');

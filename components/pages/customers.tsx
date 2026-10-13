@@ -1,4 +1,5 @@
 "use client";
+import {safeAppPath} from "@/lib/navigation";
 import {Statistics} from "../statistics";
 import {EntityFiles} from "../entity-files";
 import {useApiQuery} from "@/lib/client/use-api-query";
@@ -44,7 +45,7 @@ export function CustomerDetail({customerId="acme"}:{customerId?:string}) {
   const workspace=useApiQuery<{item:Record<string,unknown>;contacts:Array<Record<string,unknown>>;documents:Array<Record<string,unknown>>;summary:FinancialSummary;activity:Array<{at:string;title:string;detail:string}>;statistics:Array<{currency:string;date:string;paid:unknown;billed:unknown;invoice_count:unknown}>|null}>(production?"/api/customers/"+encodeURIComponent(customerId)+"?include=workspace":null);
   const searchParams=useSearchParams();
   const requestedReturnTo=searchParams.get("returnTo");
-  const returnTo=requestedReturnTo==="/dashboard"?"/dashboard":"/kunden";
+  const returnTo=safeAppPath(requestedReturnTo,"/kunden");
   const router=useRouter();
   const panelId=useId();
   const requestedTab=searchParams.get('tab');
@@ -138,7 +139,7 @@ export function CustomerDetail({customerId="acme"}:{customerId?:string}) {
 export function CustomerForm({customerId}:{customerId?:string}={}) {
   const router=useRouter();
   const searchParams=useSearchParams();
-  const returnTo=searchParams.get("returnTo")==="/dashboard"?"/dashboard":"/kunden";
+  const returnTo=safeAppPath(searchParams.get("returnTo"),"/kunden");
   const [company,setCompany]=useState("");
   const [email,setEmail]=useState("");
   const [phone,setPhone]=useState("");

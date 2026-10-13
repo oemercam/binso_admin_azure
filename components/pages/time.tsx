@@ -1,4 +1,5 @@
 "use client";
+import {safeAppPath} from "@/lib/navigation";
 import {EntityFiles} from "../entity-files";
 
 import { timeMetadata } from "@/lib/display-format";
@@ -20,7 +21,7 @@ import { formatMinutes, swissDate } from "./shared";
 
 export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const searchParams=useSearchParams(),router=useRouter();
-  const returnTo=searchParams.get("returnTo")==="/dashboard"?"/dashboard":undefined;
+  const returnTo=searchParams.has("returnTo")?safeAppPath(searchParams.get("returnTo"),"/zeit"):undefined;
   const production=useBackendMode()&&!forceDemo;
   const timeRevision=useDataRevision(["/api/time-entries"]);
   const directoryRevision=useDataRevision(["/api/customers","/api/projects"]);

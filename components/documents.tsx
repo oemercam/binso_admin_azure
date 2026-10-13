@@ -1,4 +1,5 @@
 "use client";
+import {safeAppPath} from "@/lib/navigation";
 import {EntityFiles} from "./entity-files";
 import {customerDirectory,resolveCustomer,type CustomerDirectory} from "@/lib/customer-identity";
 import {documentTotals} from "@/lib/money";
@@ -219,7 +220,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const router=useRouter();
   const searchParams=useSearchParams();
   const plural=kind==="Angebot"?"angebote":"rechnungen";
-  const returnTo=!existing&&searchParams.get("returnTo")==="/dashboard"?"/dashboard":"/"+plural;
+  const returnTo=!existing?safeAppPath(searchParams.get("returnTo"),"/"+plural):"/"+plural;
   const production=useBackendMode();
   const [preview,setPreview]=useState(false);
   const [editing,setEditing]=useState(!existing);

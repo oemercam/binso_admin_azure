@@ -8,7 +8,7 @@ import {IconButton} from "./ui";
 export type HeaderPanelKind="search"|"notifications"|"account";
 
 /** Global interactions share full mobile views and anchored desktop panels. */
-export function HeaderPanel({kind,label,onClose,children,headerSelector,backgroundSelector=".page-container,.app-sidebar,.bottom-nav"}:{kind:HeaderPanelKind;label:string;onClose:()=>void;children:ReactNode;headerSelector?:string;backgroundSelector?:string}){
+export function HeaderPanel({kind,label,onClose,children,headerSelector,backgroundSelector=".page-container,.app-sidebar,.mobile-dock"}:{kind:HeaderPanelKind;label:string;onClose:()=>void;children:ReactNode;headerSelector?:string;backgroundSelector?:string}){
  const [mobile,setMobile]=useState(false);
  const dialog=useDialogFocus(true,onClose,true,mobile?".header-panel":headerSelector);
  const trigger=useRef<HTMLElement|null>(typeof document!=="undefined"&&document.activeElement instanceof HTMLElement?document.activeElement:null);
@@ -21,7 +21,7 @@ export function HeaderPanel({kind,label,onClose,children,headerSelector,backgrou
  },[backgroundSelector]);
  useEffect(()=>{
   const update=()=>{
-   const mobile=window.innerWidth<=760;
+   const mobile=window.innerWidth<=1100;
    setMobile(mobile);
    const header=document.querySelector(headerSelector??(mobile?".mobile-header":".desktop-appbar"));
    const rect=header?.getBoundingClientRect();

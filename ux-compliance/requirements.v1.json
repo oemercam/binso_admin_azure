@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "1.0.1",
+  "version": "1.0.2",
   "baselineCommit": "b398ff7400eb1b2ea90016c25e596261d58c822b",
   "sourceCompleteness": "Available V22.1/V22.2 registers imported without acceptance. Complete original V21.1–V21.5 approvals unavailable.",
   "conflicts": [
@@ -9,6 +9,12 @@
       "earlier": "Hardcoded dark surface and old browser assertions",
       "later": "13.10.2026: user requests the new Outlook-style appearance across all mobile/PWA/tablet components in light and dark modes",
       "decision": "Up to 1100 px statistics use the central --app-surface group background in both themes; wider desktop retains --color-bg. This explicitly supersedes the earlier light-only white-surface decision."
+    },
+    {
+      "id": "NAVIGATION-MATERIAL-CREATION",
+      "earlier": "Bottom-navigation source and geometry frozen against V21.1/V22 baseline",
+      "later": "2026-10-13: explicit user authorization for glass on navigation, separate creation plus and a shared customer/admin/tablet UX foundation",
+      "decision": "Glass material and dock placement may change. Finanzen remains a direct destination; original access/scroll logic and icon paths stay protected. New source reference: docs/assets/20261013/navigation-reference.json. Geometry must be explicitly captured, never silently refreshed."
     }
   ],
   "requirements": [
@@ -21,15 +27,15 @@
       "componentTypes": [
         "AppShell"
       ],
-      "expected": "Keine Änderung an JSX und responsiven Deklarationen",
+      "expected": "Freigegebener Glas-/Dock-Quellvertrag vom 13.10.2026; Navigationsziele bleiben erhalten",
       "owner": "AppShell",
       "method": "static",
       "testCase": "TC-UX-NAV-001",
       "adapter": "navigation-contract-test.mjs",
       "priority": "P0",
-      "acceptance": "Keine Änderung an JSX und responsiven Deklarationen",
+      "acceptance": "Freigegebener Glas-/Dock-Quellvertrag vom 13.10.2026; Navigationsziele bleiben erhalten",
       "automation": "automatic",
-      "provenance": "Current UX compliance instruction; approved UX summary where referenced",
+      "provenance": "Explicit user approval in the 2026-10-13 glass/navigation/central-standardization conversation",
       "review": null
     },
     {
@@ -41,15 +47,15 @@
       "componentTypes": [
         "AppShell"
       ],
-      "expected": "Referenzsnapshot unverändert",
+      "expected": "Freigegebener Glas-/Dock-Snapshot; ursprüngliche Zugriffs-/Scroll-Logik und Icons unverändert",
       "owner": "AppShell",
       "method": "static",
       "testCase": "TC-UX-NAV-002",
       "adapter": "navigation-foundation-test.mjs",
       "priority": "P0",
-      "acceptance": "Referenzsnapshot unverändert",
+      "acceptance": "Freigegebener Glas-/Dock-Snapshot; ursprüngliche Zugriffs-/Scroll-Logik und Icons unverändert",
       "automation": "automatic",
-      "provenance": "Current UX compliance instruction; approved UX summary where referenced",
+      "provenance": "Explicit user approval in the 2026-10-13 glass/navigation/central-standardization conversation",
       "review": null
     },
     {

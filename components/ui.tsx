@@ -161,7 +161,7 @@ export function Field({ label, children, className = "",allowReadOnlyInput=false
 }
 
 export function EmptyState({ icon = "file", title, text, action, compact=false }: { icon?: string; title: string; text: string; action?: React.ReactNode; compact?:boolean }) {
-  if(compact)return <p role="status" data-empty-state="compact">{title}</p>;
+  if(compact)return action?<div className="empty-list-state" data-empty-state="compact"><p role="status">{title}</p>{action}</div>:<p role="status" data-empty-state="compact">{title}</p>;
   return <div className="empty-state"><span className="empty-icon"><Icon name={icon} size={22}/></span><h3>{title}</h3><p>{text}</p>{action}</div>;
 }
 
@@ -173,10 +173,11 @@ export function Toggle({ checked = false, label, onChange,disabled=false }: { ch
   return <button className={`toggle ${checked ? "is-on" : ""}`} disabled={disabled} type="button" role="switch" aria-checked={checked} aria-label={label} onClick={onChange}><span/></button>;
 }
 
-export function Toast({ title, text, tone = "success" }: { title: string; text?: string; tone?: "success" | "danger" | "info" }) {
-  return <div className={`toast toast-${tone}`} role="status">
+export function Toast({ title, text, tone = "success",inline=false,actionLabel,onAction }: { title: string; text?: string; tone?: "success" | "danger" | "info";inline?:boolean;actionLabel?:string;onAction?:()=>void }) {
+  return <div className={`${inline?"inline-feedback":"toast"} toast-${tone}`} role="status">
     <span className="toast-icon"><Icon name={tone === "danger" ? "close" : tone === "info" ? "bell" : "check"} size={16}/></span>
     <div><b>{title}</b>{text && <small>{text}</small>}</div>
+    {onAction&&actionLabel&&<button type="button" className="text-action" onClick={onAction}>{actionLabel}</button>}
   </div>;
 }
 

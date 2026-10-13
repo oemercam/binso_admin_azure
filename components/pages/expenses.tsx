@@ -1,4 +1,5 @@
 "use client";
+import {safeAppPath} from "@/lib/navigation";
 import {useApiQuery} from "@/lib/client/use-api-query";
 import {ActionSheet,FormSheet} from "../binso-ux";
 
@@ -26,7 +27,7 @@ export function ExpensesPage() {
 export function ExpenseForm({ existing = false, expenseId }: { existing?: boolean; expenseId?: string }) {
   const router=useRouter();
   const searchParams=useSearchParams();
-  const returnTo=searchParams.get("returnTo")==="/dashboard"?"/dashboard":"/spesen";
+  const returnTo=safeAppPath(searchParams.get("returnTo"),"/spesen");
   const production=useBackendMode();
   const [person,setPerson]=useState(existing?"":searchParams.get("employeeId")??"");
   const employeesQuery=useApiQuery<{items:Array<{id:string;first_name:string;last_name:string}>}>(production?"/api/expenses/options":"/api/demo/data?collection=employees");

@@ -4,7 +4,7 @@ import {formatDateTime} from "@/lib/display-format";
 import {supportReference} from "@/lib/support-reference";
 import {MonitoringPanel} from "./monitoring";
 import {useApiQuery} from "@/lib/client/use-api-query";
-import {ActionRow, FilterSheet, FormSheet, MetricTiles, MetricTile, WorkspaceSection,DetailTabs} from "./binso-ux";
+import {ActionRow, ActionSheet, CreateAction, FilterSheet, FormSheet, MetricTiles, MetricTile, WorkspaceSection,DetailTabs} from "./binso-ux";
 import {DataTable, DataTableHead, DataTableRow, RecordsView, RecordsControls, RecordRow, useRecordsController} from "./records";
 import ConfirmDialog from "./confirm-dialog";
 
@@ -13,7 +13,7 @@ import {HeaderPanel} from "./header-panel";
 import {Avatar} from "./avatar";
 import { createContext, useContext, useEffect, useMemo, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { useDialogFocus } from "./use-dialog-focus";
+import {AppHeader,MobileDock} from "./app-chrome";
 import { PageHeading } from "./binso-ux";
 import {Button, EmptyState, Icon, Logo, Metric, SectionTitle, Status, Toast, Field, Input, Select, Textarea, LoadingState, ErrorState, MessageBubble} from "./ui";
 import { apiPatch, apiPost, logoutOperatorClientSession, useBackendMode } from "@/lib/client/backend";
@@ -139,7 +139,6 @@ export function OperatorPage({ section = "", demo = false, identity, role="platf
   const detail = section.split("/")[1] || "";
   const title = useMemo(() => operatorNav.find(([slug]) => slug === key)?.[1] ?? "Dashboard", [key]);
   const [mobileMore,setMobileMore]=useState(false);
-  const mobileMoreDialog=useDialogFocus(mobileMore,()=>setMobileMore(false));
   const [accountOpen,setAccountOpen]=useState(false);
   const [createOpen,setCreateOpen]=useState(false);
   useEffect(()=>{queueMicrotask(()=>setCreateOpen(false));},[section]);
@@ -148,6 +147,8 @@ export function OperatorPage({ section = "", demo = false, identity, role="platf
   const logout=async()=>{if(logoutBusy)return;setLogoutBusy(true);setLogoutError("");try{const payload=await logoutOperatorClientSession();const path=typeof payload.microsoftLogoutUrl==="string"?payload.microsoftLogoutUrl:"/operator/login";window.location.assign(new URL(path,window.location.origin).toString());}catch{setLogoutError("Abmelden fehlgeschlagen. Bitte erneut versuchen.");setLogoutBusy(false);}};
 
   const allowed=demo||canOpenOperatorSection(role,section);
+  const canCreate=allowed&&!detail&&((key==="sperrungen"&&operatorCan(demo?"platform_owner":role,"restrictions:manage"))||(key==="ankuendigungen"&&operatorCan(demo?"platform_owner":role,"announcements:manage")));
+  const detailTitle=detail?(key==="tickets"?"Ticketdetails":key==="kunden"?"Kundendetails":title):title;
   return <OperatorAccess.Provider value={demo?"platform_owner":role}><div className="operator-root" data-operator-demo={demo?"true":"false"}>
     <aside className="operator-sidebar">
       <Link prefetch={false} href="/operator"><Logo dark/></Link>
@@ -155,23 +156,21 @@ export function OperatorPage({ section = "", demo = false, identity, role="platf
     </aside>
 
     <main className="operator-main">
-      <header className="operator-app-header">
-        <div className="operator-header-brand"><Logo/><span>Admin</span></div>
-        <div className="operator-user">{demo&&<span className="app-demo-badge">Demo</span>}<Link prefetch={false} className="icon-button operator-home-link" href="/dashboard" aria-label="Zur App"><Icon name="home" size={18}/></Link><button className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={()=>{setMobileMore(false);setAccountOpen(true)}}><Avatar/></button></div>
-      </header>
-      <div className="operator-page-head"><PageHeading leading={detail?<Button href={"/operator/"+key} variant="ghost" className="icon-button" icon="back" ariaLabel={key==="tickets"?"Zur Ticketliste":"Zur Kundenliste"}/>:undefined} title={detail ? (key === "tickets" ? "Ticketdetails" : key === "kunden" ? "Kundendetails" : title) : title} description={operatorSubtitle(key, detail)} action={allowed&&!detail&&(key==="sperrungen"||key==="ankuendigungen")?<Button className="bo-create-action" ariaLabel={key==="sperrungen"?"Einschränkung erstellen":"Ankündigung erstellen"} icon="plus" onClick={()=>setCreateOpen(true)}/>:undefined}/></div>
+      <AppHeader className="operator-app-header" detail={!!detail} leadingClassName="operator-header-brand" leading={<>
+        {detail?<Link href={"/operator/"+key} className="mobile-back" aria-label="Zur Liste"><Icon name="back"/></Link>:<Link href="/operator" aria-label="Zum Admin-Dashboard"><Logo compact/></Link>}
+        <span className="operator-header-desktop-label">Admin</span><h1 className="operator-header-title">{detailTitle}</h1>
+      </>} actionClassName="operator-user" actions={<>{demo&&<span className="app-demo-badge">Demo</span>}<Link prefetch={false} className="icon-button operator-home-link" href="/dashboard" aria-label="Zur App"><Icon name="home" size={18}/></Link><button className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={()=>{setMobileMore(false);setAccountOpen(true)}}><Avatar name={identity?.name} identity={identity?.email}/></button></>}/>
+
+      <div className="operator-page-head"><PageHeading leading={detail?<Button href={"/operator/"+key} variant="ghost" className="icon-button desktop-back" icon="back" ariaLabel={key==="tickets"?"Zur Ticketliste":"Zur Kundenliste"}/>:undefined} title={detail ? (key === "tickets" ? "Ticketdetails" : key === "kunden" ? "Kundendetails" : title) : title} description={operatorSubtitle(key, detail)} action={canCreate?<CreateAction label={key==="sperrungen"?"Einschränkung erstellen":"Ankündigung erstellen"} onClick={()=>setCreateOpen(true)}/>:undefined}/></div>
       {accountOpen&&<HeaderPanel kind="account" label="Konto" onClose={()=>setAccountOpen(false)} headerSelector=".operator-app-header" backgroundSelector=".operator-sidebar,.operator-main > :not(.operator-app-header)"><div className="account-sheet"><div className="account-sheet-profile"><Avatar size="large"/><div><b>{identity?.name||"One Admin"}</b><small>{identity?.email||"Administration"}</small></div></div><div className="action-list"><ActionRow href="/dashboard" icon="home" title="Zum Kundenportal" description="Binso One öffnen" onClick={()=>setAccountOpen(false)}/><ActionRow icon="logout" title="Abmelden" disabled={logoutBusy} onClick={()=>void logout()}/></div>{logoutError&&<ErrorState>{logoutError}</ErrorState>}</div></HeaderPanel>}
 
-      <nav className="operator-mobile-nav" aria-label="Operator Navigation">
+      <MobileDock action={canCreate?<button type="button" className="dock-create-action app-glass" aria-label={key==="sperrungen"?"Einschränkung erstellen":"Ankündigung erstellen"} aria-haspopup="dialog" onClick={()=>setCreateOpen(true)}><Icon name="plus" size={24}/></button>:undefined}><nav className="operator-mobile-nav" aria-label="Operator Navigation">
         {operatorNav.filter(([slug])=>["","tickets","kunden","monitoring"].includes(slug)).map(([slug,label,icon])=><Link aria-current={slug===key?"page":undefined} className={slug===key?"active":""} href={slug ? `/operator/${slug}` : "/operator"} key={slug}><Icon name={icon} size={19}/><span>{label}</span></Link>)}
         <button type="button" className={["zahlungen","finanzen","abonnemente","sperrungen","ankuendigungen","sicherheit","audit"].includes(key)?"active":""} onClick={()=>setMobileMore(true)}><Icon name="more" size={19}/><span>Mehr</span></button>
-      </nav>
-      {mobileMore&&<div className="operator-mobile-more-layer" role="presentation" onMouseDown={event=>{if(event.target===event.currentTarget)setMobileMore(false)}}>
-        <section ref={mobileMoreDialog} tabIndex={-1} className="operator-mobile-more" role="dialog" aria-modal="true" aria-label="Weitere Admin-Bereiche">
-          <header><div><h2>Mehr</h2><p>Weitere Bereiche von One Admin.</p></div><button type="button" className="icon-button" aria-label="Schliessen" onClick={()=>setMobileMore(false)}><Icon name="close"/></button></header>
-          <nav className="operator-mobile-more-groups">{operatorNavGroups.map(group=>{const items=group.slugs.map(slug=>operatorNav.find(([candidate])=>candidate===slug)).filter((item):item is NonNullable<typeof item>=>Boolean(item&&["zahlungen","finanzen","abonnemente","sperrungen","ankuendigungen","sicherheit","audit"].includes(item[0])));if(!items.length)return null;return <div className="operator-mobile-more-group" key={group.label}><span>{group.label}</span>{items.map(([slug,label,icon])=><Link href={`/operator/${slug}`} key={slug} onClick={()=>setMobileMore(false)}><Icon name={icon}/><span>{label}</span><Icon name="arrow" size={15}/></Link>)}</div>})}</nav>
-        </section>
-      </div>}
+      </nav></MobileDock>
+      <ActionSheet label="Weitere Admin-Bereiche" open={mobileMore} onClose={()=>setMobileMore(false)}>
+        {operatorNavGroups.map(group=>{const items=group.slugs.map(slug=>operatorNav.find(([candidate])=>candidate===slug)).filter((item):item is NonNullable<typeof item>=>Boolean(item&&["zahlungen","finanzen","abonnemente","sperrungen","ankuendigungen","sicherheit","audit"].includes(item[0])&&(demo||canOpenOperatorSection(role,item[0]))));if(!items.length)return null;return <section className="navigation-sheet-group" key={group.label}><h3>{group.label}</h3><div className="action-list">{items.map(([slug,label,icon])=><ActionRow href={`/operator/${slug}`} key={slug} icon={icon} title={label} navigation onClick={()=>setMobileMore(false)}/>)}</div></section>})}
+      </ActionSheet>
 
       <div className="operator-app-content">{!allowed ? <EmptyState icon="lock" title="Keine Berechtigung für diesen Bereich" text="Deine Adminrolle erlaubt diesen Zugriff nicht. Wende dich für eine passende Rolle an die Entra-Administration."/> : detail && key === "tickets" ? <TicketDetail ticketId={detail}/> :
         detail && key === "kunden" ? <OperatorCustomerDetail tenantId={detail}/> :

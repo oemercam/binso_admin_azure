@@ -1,4 +1,5 @@
 "use client";
+import {safeAppPath} from "@/lib/navigation";
 import {useApiQuery} from "@/lib/client/use-api-query";
 import {useProcessDraft} from "../use-process-draft";
 import {useDirtySnapshot} from "../use-dirty-snapshot";
@@ -7,7 +8,7 @@ import { formatQuantity, withPriceUnit } from "@/lib/display-format";
 
 import { formatCurrency } from "@/lib/financial-status";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter,useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { AppShell } from "../app-shell";
 import { RecordRow, RecordsView, RecordsControls, useRecordsController } from "../records";
@@ -28,7 +29,8 @@ export function ProductsPage() {
 }
 
 export function ProductForm({ existing = false, productId }: { existing?: boolean; productId?: string }) {
-  const router=useRouter();
+  const router=useRouter(),params=useSearchParams();
+  const returnTo=existing?"/produkte":safeAppPath(params.get("returnTo"),"/produkte");
   const production=useBackendMode();
   const [name,setName]=useState("");
   const [type,setType]=useState("Dienstleistung");
@@ -91,7 +93,7 @@ export function ProductForm({ existing = false, productId }: { existing?: boolea
       }
       setSavedRecord(true);recovery.clear();allowDraftNavigation();
       setToast("Produkt gespeichert.");
-      window.setTimeout(()=>router.push("/produkte"),700);
+      window.setTimeout(()=>router.push(returnTo),700);
     }catch(error){
       saveRecordPending.current=false;setSavingRecord(false);
       setToast(error instanceof Error?error.message:"Produkt konnte nicht gespeichert werden.");
@@ -99,8 +101,8 @@ export function ProductForm({ existing = false, productId }: { existing?: boolea
     }
   };
 
-  if(loadingRecord||recordError)return <AppShell title="Produkt" active="produkte" backHref="/produkte">{loadingRecord?<LoadingState>Produkt wird geladen …</LoadingState>:<ErrorState onRetry={recordQuery.refresh} retryLabel="Erneut versuchen">{recordError}</ErrorState>}</AppShell>;
-  return <AppShell unsavedChanges={false} title={existing ? name||"Produkt" : "Produkt erstellen"} status={existing?status:undefined} statusTone={status==="Aktiv"?"success":"neutral"} editing={editingRecord} subtitle={existing ? type : "Für Angebote und Rechnungen wiederverwendbar."} active="produkte" backHref="/produkte" backLabel="Produkte" actions={existing?<><ActionsMenu label="Produktaktionen" busy={savingRecord}>{!editingRecord&&<ActionRow requiresWrite icon="edit" onClick={()=>setEditingRecord(true)} title="Bearbeiten" navigation/>}<ActionRow href="/angebote/neu" icon="file" title="Angebot erstellen" navigation/><ActionRow href="/rechnungen/neu" icon="receipt" title="Rechnung erstellen" navigation/></ActionsMenu></>:undefined}>
+  if(loadingRecord||recordError)return <AppShell title="Produkt" active="produkte" backHref={returnTo}>{loadingRecord?<LoadingState>Produkt wird geladen …</LoadingState>:<ErrorState onRetry={recordQuery.refresh} retryLabel="Erneut versuchen">{recordError}</ErrorState>}</AppShell>;
+  return <AppShell unsavedChanges={false} title={existing ? name||"Produkt" : "Produkt erstellen"} status={existing?status:undefined} statusTone={status==="Aktiv"?"success":"neutral"} editing={editingRecord} subtitle={existing ? type : "Für Angebote und Rechnungen wiederverwendbar."} active="produkte" backHref={returnTo} backLabel="Produkte" actions={existing?<><ActionsMenu label="Produktaktionen" busy={savingRecord}>{!editingRecord&&<ActionRow requiresWrite icon="edit" onClick={()=>setEditingRecord(true)} title="Bearbeiten" navigation/>}<ActionRow href="/angebote/neu" icon="file" title="Angebot erstellen" navigation/><ActionRow href="/rechnungen/neu" icon="receipt" title="Rechnung erstellen" navigation/></ActionsMenu></>:undefined}>
     <div className={existing?"entity-detail-workspace":"form-page"} inert={savingRecord}>
 
       <div className={existing?"entity-edit-main":"entity-edit-main form-main-new"}>
@@ -109,7 +111,7 @@ export function ProductForm({ existing = false, productId }: { existing?: boolea
           <div><dt>MwSt.</dt><dd>{formatQuantity(vatRate,"%")}</dd></div>
           {sku&&<div><dt>Artikelnummer</dt><dd>{sku}</dd></div>}
           {description&&<div><dt>Beschreibung</dt><dd>{description}</dd></div>}
-        </dl>:<FormSheet label={existing?"Produkt bearbeiten":"Produkt erstellen"} open={editingRecord} onClose={()=>{recovery.clear();allowDraftNavigation();if(existing)setEditingRecord(false);else router.push("/produkte")}} busy={savingRecord} dirty={dirty&&!savedRecord}><form onSubmit={event=>{event.preventDefault();void save()}}><div className="form-grid two">
+        </dl>:<FormSheet label={existing?"Produkt bearbeiten":"Produkt erstellen"} open={editingRecord} onClose={()=>{recovery.clear();allowDraftNavigation();if(existing)setEditingRecord(false);else router.push(returnTo)}} busy={savingRecord} dirty={dirty&&!savedRecord}><form onSubmit={event=>{event.preventDefault();void save()}}><div className="form-grid two">
           <Field label="Name"><Input required maxLength={200} value={name} onChange={e=>setName(e.target.value)} placeholder="Name"/></Field>
           <Field label="Typ"><Select value={type} onChange={e=>setType(e.target.value)}><option>Dienstleistung</option><option>Produkt</option></Select></Field>
           <Field label="Artikelnummer"><Input value={sku} onChange={e=>setSku(e.target.value)} placeholder="Optional"/></Field>
@@ -118,7 +120,7 @@ export function ProductForm({ existing = false, productId }: { existing?: boolea
           <Field label="MwSt."><Select value={vatRate} onChange={e=>setVatRate(e.target.value)}><option value="8.1">8.1 %</option><option value="2.6">2.6 %</option><option value="0">0 %</option></Select></Field>
           <Field label="Status"><Select value={status} onChange={e=>setStatus(e.target.value)}><option>Aktiv</option><option>Inaktiv</option></Select></Field>
           <Field label="Beschreibung" className="full"><Textarea value={description} onChange={e=>setDescription(e.target.value)} placeholder="Kurze Beschreibung"/></Field>
-        </div><FormActions><Button variant="secondary" onClick={()=>{recovery.clear();allowDraftNavigation();if(existing)setEditingRecord(false);else router.push("/produkte")}} disabled={savingRecord}>Abbrechen</Button><Button requiresWrite type="submit" disabled={savingRecord}>{savingRecord?"Wird gespeichert…":"Speichern"}</Button></FormActions></form></FormSheet>}
+        </div><FormActions><Button variant="secondary" onClick={()=>{recovery.clear();allowDraftNavigation();if(existing)setEditingRecord(false);else router.push(returnTo)}} disabled={savingRecord}>Abbrechen</Button><Button requiresWrite type="submit" disabled={savingRecord}>{savingRecord?"Wird gespeichert…":"Speichern"}</Button></FormActions></form></FormSheet>}
       </div>
       {existing&&<aside className="desktop-context-rail"><section className="desktop-toolbox"><Link href="/angebote/neu"><Icon name="file"/><span><b>Angebot erstellen</b></span><Icon name="arrow" size={15}/></Link><Link href="/rechnungen/neu"><Icon name="receipt"/><span><b>Rechnung erstellen</b></span><Icon name="arrow" size={15}/></Link></section></aside>}
 

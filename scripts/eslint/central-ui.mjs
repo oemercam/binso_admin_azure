@@ -8,6 +8,9 @@ const nativeOwners={
  'components/privacy-consent.tsx':{input:['PrivacyConsent']}, // consent toggle, outside tenant forms
 };
 const classOwners={
+ 'app-header':['components/app-chrome.tsx'],
+ 'app-header-actions':['components/app-chrome.tsx'],
+ 'mobile-dock':['components/app-chrome.tsx'],
  'form-wizard':['components/form-wizard.tsx'],
  'wizard-progress':['components/form-wizard.tsx'],
  'wizard-content':['components/form-wizard.tsx'],
@@ -15,8 +18,8 @@ const classOwners={
  'message':['components/ui.tsx'],
  'confirm-dialog':['components/confirm-dialog.tsx'],
  'confirm-layer':['components/confirm-dialog.tsx'],
- 'bottom-sheet':['components/binso-ux.tsx','components/app-shell.tsx'], // protected navigation sheets
- 'sheet-layer':['components/binso-ux.tsx','components/app-shell.tsx'],
+ 'bottom-sheet':['components/binso-ux.tsx'],
+ 'sheet-layer':['components/binso-ux.tsx'],
  'bo-page-heading':['components/binso-ux.tsx'],
  'bo-detail-heading':['components/binso-ux.tsx'],
  'desktop-record-table':['components/records.tsx'],
