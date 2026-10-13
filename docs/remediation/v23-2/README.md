@@ -72,3 +72,7 @@ Published PR #246 at `6e5c7b2ebf5d2b3268ff9245c763f20cc35ebb09` after explicit u
 - Chromium identified a real CSS-cascade conflict: `.page-head:not(.page-head-detail) .page-actions .button` overrode the canonical create circle with 40 px height. Excluding `.bo-create-action` from that generic sizing rule restores the shared 30×30 avatar geometry without a local page patch. The existing exact rectangle comparison remains unchanged.
 
 Fresh WebKit screenshot/DOM evidence was inspected for dashboard, support conversation and keyboard-sized manual entry. No browser or deployment success is claimed for the first candidate. The follow-up candidate must complete the full current gates.
+
+### Zweiter CI-Lauf – 38366231346
+
+Build, vollständige Checks, echte Scannerqualifizierung und CodeQL erfolgreich. Beide Browser kamen über die korrigierten Plus- und Statistikprüfungen hinaus und scheiterten an der alten Erwartung von drei Support-KPI-Kacheln. Der Supportanteilstest prüft jetzt den gemeinsamen RingChart mit expliziten Fixture-Werten 2/3/5, Gesamtzahl 10, Anteilen 20/30/50 % und auswählbarer Detailzahl. Keine Browserprüfung oder Release-Sperre wurde deaktiviert.
