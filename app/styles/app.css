@@ -704,7 +704,7 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 }
 .thread-day{margin:8px 0 20px;text-align:center;color:var(--color-muted);font-size:11px}
 .message{max-width:78%;margin-bottom:10px}
-.message>div{padding:11px 13px;border-radius:14px;font-size:13px;line-height:1.5}
+.message>div{padding:11px 13px;border-radius:14px;font-size:13px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}
 .message small{display:block;margin-top:4px;color:var(--color-muted);font-size:9px}
 .message>span{display:block;margin:0 0 4px 4px;color:var(--color-muted);font-size:10px}
 .message-user{margin-left:auto;align-self:flex-end;text-align:right}
@@ -724,10 +724,13 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
   background:var(--color-bg);
   box-shadow:none;
 }
-.thread-composer input{
+.thread-composer :is(input,textarea){
   height:42px;
+  min-height:42px;
+  max-height:144px;
+  resize:none;
   min-width:0;
-  padding:0 8px;
+  padding:8px;
   border:0;
   border-radius:0;
   outline:0;
@@ -735,8 +738,8 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
   box-shadow:none;
 }
 .thread-composer:focus-within{border-color:var(--color-fg)}
-.thread-composer input:focus,
-.thread-composer input:focus-visible{
+.thread-composer :is(input,textarea):focus,
+.thread-composer :is(input,textarea):focus-visible{
   border:0;
   outline:0;
   box-shadow:none;
