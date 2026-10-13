@@ -76,3 +76,20 @@ Fresh WebKit screenshot/DOM evidence was inspected for dashboard, support conver
 ### Zweiter CI-Lauf – 38366231346
 
 Build, vollständige Checks, echte Scannerqualifizierung und CodeQL erfolgreich. Beide Browser kamen über die korrigierten Plus- und Statistikprüfungen hinaus und scheiterten an der alten Erwartung von drei Support-KPI-Kacheln. Der Supportanteilstest prüft jetzt den gemeinsamen RingChart mit expliziten Fixture-Werten 2/3/5, Gesamtzahl 10, Anteilen 20/30/50 % und auswählbarer Detailzahl. Keine Browserprüfung oder Release-Sperre wurde deaktiviert.
+
+## Screenshot follow-up IMG_0161–0170 (13.10.2026)
+
+Live health was read again: `cbd0f03b0a6923bcc1506ae30f93bb190abd7f41`, status ok. The visible update banners are from that deployed baseline, not the unpublished V23.2 branch.
+
+Additional centrally owned corrections:
+
+- `Sheet` recognized direct HTML action rows by `className` but missed the `FormActions` component before React rendered it. Component-based actions now become direct footer siblings of the scroll body. Native form submit ownership remains unchanged.
+- The shared two-column footer left a single company-save action at half width. A single action now spans the existing grid; multi-action rows retain their layout.
+- Company logo upload sat outside the existing company-field grid, losing the shared field-group gap. It now occupies a full-width cell in that grid.
+- The plan block's bottom border and subscription grid's top border drew duplicate lines; the grid's bottom border paired with the invoices section's top border. The subscription grid no longer draws outer borders; existing neighboring blocks own the separators.
+- Team settings rendered the database plan key directly. It now reads the display name from the existing plan catalog, with explicit trial/unknown labels.
+- IMG_0170 shows the PDF viewer initialization loader, after the PDF blob has loaded. The viewer had no deadline for a pending module import/worker handshake. Its complete startup attempt is now bounded at 20 seconds, with a retry action, cleanup and suppression of late results. This is a proven missing failure path; the specific iPhone stall trigger is **not yet identified or claimed fixed**. CI/browser/device evidence is required before accepting the reported PDF failure.
+
+Validation of this follow-up: actual compiled Sheet and PDF hook lifecycle tests passed, including stalled module/worker startup, timeout, late completion and unmount. TypeScript, targeted ESLint, CSS architecture and frozen navigation contract passed. The unit/component/PGlite chain passed with the existing in-memory scanner transport; the source inventory was regenerated after its expected fingerprint mismatch, and the remaining integration/process/operator suites then passed. No real local socket/engine result is claimed. Production build passed for the final Sheet correction. New browser checks cover the company footer/gap/width and a stalled worker followed by a real canvas-rendering retry. Local WebKit was downloaded but cannot launch due to missing native libraries; Chromium downloads were truncated. Browser results are therefore pending CI. No production deployment or device acceptance is claimed.
+
+The subscription screenshot captures content behind the fixed navigation while scrolling. Reachability at the end of scrolling still needs browser/device verification; a static screenshot alone cannot prove the final section is inaccessible. No bottom-navigation declaration, markup, behavior or shared navigation token was changed.

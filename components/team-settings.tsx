@@ -1,5 +1,6 @@
 "use client";
 import {useApiQuery,useDataRevision} from "@/lib/client/use-api-query";
+import {plans} from "@/lib/plans";
 import {Avatar} from "./avatar";
 import { FormSheet } from "./binso-ux";
 import {useCallback,useEffect,useState,useRef} from "react";
@@ -37,7 +38,7 @@ export function TeamSettingsPage(){
  const revoke=async(id:string)=>{try{await apiDelete('/api/settings/team/invitations/'+encodeURIComponent(id));await load()}catch(e){setToast(e instanceof Error?e.message:'Einladung konnte nicht zurückgezogen werden.')}};
  const occupied=data.members.length+data.invitations.filter(i=>i.status==="pending"&&new Date(i.expires_at)>new Date()).length;
  return <AppShell title="Benutzer & Rollen" subtitle="Zugänge, Rollen und Einladungen verwalten." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen" actions={canManage?<Button icon="plus" onClick={()=>setInviteOpen(true)} className="page-add-button responsive-create-action" ariaLabel="Mitarbeiter einladen"><span className="create-action-label">Mitarbeiter einladen</span></Button>:undefined}>
-  {!loading&&!loadError&&<p className="settings-note">{occupied} von {data.userLimit} Plätzen belegt · Plan {data.plan}</p>}
+  {!loading&&!loadError&&<p className="settings-note">{occupied} von {data.userLimit} Plätzen belegt · Plan {plans.find(plan=>plan.id===data.plan)?.name??(data.plan==="trial"?"Testphase":"Unbekannt")}</p>}
   <div className="settings-choice-list team-list">{loading?<LoadingState>Team wird geladen …</LoadingState>:loadError?<ErrorState onRetry={()=>void load()} retryLabel="Erneut laden">{loadError}</ErrorState>:data.members.length?data.members.map(m=><button type="button" key={m.user_id} disabled={!canManage} onClick={()=>openMember(m)}><Avatar name={m.name||m.email||""} identity={m.user_id}/><div><b>{m.name||m.email||"Mitarbeiter"}</b><small>{roleLabel(m.role)}</small><small>{m.email}</small></div><Status tone="success">Aktiv</Status><Icon name="arrow" size={17}/></button>):<EmptyState icon="users" title="Keine Mitarbeitenden" text="Lade die erste Person in dein Team ein."/>}</div>
   {data.invitations.length>0&&<section className="settings-section"><h2>Offene Einladungen</h2><div className="settings-choice-list">{data.invitations.filter(i=>i.status==="pending"&&new Date(i.expires_at)>new Date()).map(i=><div className="settings-static-row" key={i.id}><div><b>{i.email}</b><small>{roleLabel(i.role)}</small></div><Status tone="warning">Ausstehend</Status>{canManage&&<Button variant="secondary" onClick={()=>void revoke(i.id)}>Zurückziehen</Button>}</div>)}</div></section>}
 

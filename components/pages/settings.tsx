@@ -161,7 +161,7 @@ export function CompanySettingsPage() {
     {loading?<LoadingState>Einstellungen werden geladen …</LoadingState>:loadError?<ErrorState onRetry={query.refresh} retryLabel="Erneut versuchen">{loadError}</ErrorState>:<div className="settings-detail-grid">
       <section className="surface company-logo-card">{companyLogoSource(logoPreview||logoUrl)?<img src={companyLogoSource(logoPreview||logoUrl)} alt="Firmenlogo"/>:<span className="company-logo-placeholder" role="img" aria-label="Kein Firmenlogo"><Icon name="users"/></span>}<div><b>{name||"Firma"}</b><small>Firmenlogo für Angebote, Rechnungen und Dokumente</small></div></section>
       {editing?<FormSheet open={editing} label={onboarding?"Unternehmen einrichten":"Firmendaten bearbeiten"} description={onboarding?"Weitere Unternehmensdaten kannst du jetzt oder später ergänzen.":undefined} onClose={()=>setEditing(false)} busy={saving} dirty={currentValues!==baseline||pendingLogo!==null}><section className="settings-form">
-        <Field label="Firmenlogo"><Input id="company-logo-upload" type="file" accept="image/png,image/jpeg,image/webp" onChange={e=>void uploadLogo(e.target.files?.[0])}/></Field><div className="form-grid two">
+        <div className="form-grid two"><Field label="Firmenlogo" className="full"><Input id="company-logo-upload" type="file" accept="image/png,image/jpeg,image/webp" onChange={e=>void uploadLogo(e.target.files?.[0])}/></Field>
           <Field label="Firmenname *"><Input required autoComplete="organization" value={name} onChange={e=>setName(e.target.value)}/></Field>
           <Field label="UID"><Input value={uid} onChange={e=>setUid(e.target.value)}/></Field>
           <Field label="Strasse"><Input value={street} onChange={e=>setStreet(e.target.value)}/></Field>

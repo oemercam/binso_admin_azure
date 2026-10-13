@@ -500,6 +500,23 @@ try{
   const downloaded=page.waitForEvent('download');await page.getByRole('button',{name:'Teilen oder herunterladen',exact:true}).click();
   const download=await downloaded;assert.deepEqual(await fs.readFile(await download.path()),fixturePdf,'Download is byte-identical to the preview PDF');
   await page.getByRole('button',{name:'Vorschau schliessen',exact:true}).click();
+  // A worker can download successfully without ever signalling readiness.
+  // Verify that the real viewer leaves loading and can render on retry.
+  const stalledWorker=route=>route.fulfill({contentType:'text/javascript',body:'await new Promise(()=>{});'});
+  await context.route('**/*pdf.worker*.mjs',stalledWorker);
+  await navigate(base+'/angebote/AN-TEST-1');
+  await page.clock.install();
+  await page.getByRole('button',{name:'Weitere Aktionen',exact:true}).filter({visible:true}).click();
+  await page.getByRole('dialog',{name:'Weitere Aktionen'}).getByRole('button',{name:'Vorschau',exact:true}).click();
+  await page.getByText('PDF wird angezeigt …',{exact:true}).waitFor();
+  await page.clock.fastForward(20001);
+  await page.getByText('Die PDF-Vorschau dauert zu lange. Bitte erneut versuchen.',{exact:true}).waitFor();
+  assert.equal(await page.getByText('PDF wird angezeigt …',{exact:true}).count(),0,'Stalled worker cannot leave an endless loader');
+  await context.unroute('**/*pdf.worker*.mjs',stalledWorker);
+  await page.clock.resume();
+  await page.getByRole('button',{name:'Erneut versuchen',exact:true}).click();
+  await rendered(1);
+  await page.getByRole('button',{name:'Vorschau schliessen',exact:true}).click();
   }
   if(hasInteraction('documents')){
    invoice.status='draft';await navigate(base+'/rechnungen/RE-TEST-1');await page.waitForLoadState('networkidle');assert.equal(await page.getByText('Zahlungsstand',{exact:true}).count(),0,'Draft does not demand payment');await capture(page,{animations:'disabled',path:path.join(output,`${theme}-430-draft-invoice.png`)});invoice.status='sent';
@@ -692,7 +709,14 @@ try{
    scanFailure=503;await page.locator('#profile-avatar-upload').setInputFiles(imageFile);await page.getByRole('status').filter({hasText:'Synthetic scan unavailable'}).waitFor();assert.equal(await page.locator('.settings-profile img').getAttribute('src'),oldImage);
    scanFailure=0;scanVerdict='clean';await page.locator('#profile-avatar-upload').setInputFiles(imageFile);await page.getByText('Profilbild gespeichert.',{exact:true}).waitFor();assert.equal(await page.locator('.settings-profile img').getAttribute('src'),'/api/files/'+newImageId+'/download');
    await navigate(base+'/einstellungen/firma');await page.locator('.company-logo-card b').getByText('Synthetic Branding Company',{exact:true}).waitFor();
-   await page.getByRole('button',{name:'Bearbeiten',exact:true}).filter({visible:true}).first().click();await page.locator('#company-logo-upload').setInputFiles(imageFile);
+   await page.getByRole('button',{name:'Bearbeiten',exact:true}).filter({visible:true}).first().click();
+   const companySheet=page.getByRole('dialog',{name:'Firmendaten bearbeiten',exact:true});
+   assert.equal(await companySheet.locator(':scope>.filter-sheet-actions').count(),1,'Component FormActions is a direct, non-scrolling sheet footer');
+   const logoGap=await companySheet.evaluate(el=>{const upload=el.querySelector('#company-logo-upload').closest('.form-field').getBoundingClientRect(),name=el.querySelector('input[autocomplete=organization]').closest('.form-field').getBoundingClientRect(),grid=el.querySelector('.form-grid');return {actual:name.top-upload.bottom,expected:parseFloat(getComputedStyle(grid).rowGap)}});
+   assert.ok(Math.abs(logoGap.actual-logoGap.expected)<1,'Logo and company name use the same field-group gap');
+   const saveBox=await companySheet.locator(':scope>.filter-sheet-actions>.button').boundingBox(),footerBox=await companySheet.locator(':scope>.filter-sheet-actions').boundingBox();
+   assert.ok(Math.abs(saveBox.width-footerBox.width)<1,'Single action occupies the full shared footer width');
+   await page.locator('#company-logo-upload').setInputFiles(imageFile);
    scanVerdict='pending';await page.getByRole('button',{name:'Speichern',exact:true}).click();await page.getByRole('status').filter({hasText:'Das Firmenlogo wartet auf die Sicherheitsprüfung.'}).waitFor();assert.equal(companyWrites,0,'Quarantine cannot complete company save');assert.equal(await page.locator('#company-logo-upload').count(),1,'Pending upload retains the edit form for recovery');
    scanFailure=503;await page.getByRole('button',{name:'Speichern',exact:true}).click();await page.getByRole('status').filter({hasText:'Synthetic scan unavailable'}).waitFor();assert.equal(companyWrites,0);
    scanFailure=0;scanVerdict='clean';await page.getByRole('button',{name:'Speichern',exact:true}).click();await page.getByText('Firmendaten gespeichert.',{exact:true}).waitFor();assert.equal(companyWrites,1,'Clean scan allows exactly one company save');

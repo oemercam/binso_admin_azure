@@ -1108,6 +1108,7 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
   background:var(--color-bg);
 }
 .filter-sheet-actions .button{width:100%;min-width:0;white-space:normal;height:auto;min-height:var(--control-h)}
+.filter-sheet-actions>.button:only-child{grid-column:1/-1}
 
 /* Onboarding */
 .onboarding-progress{max-width:760px;margin-bottom:28px;display:flex;align-items:center;gap:10px}

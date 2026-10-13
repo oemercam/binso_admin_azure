@@ -388,8 +388,7 @@
   .plan-hero>:last-child{grid-column:1/-1;justify-self:start}
   .subscription-detail-grid{
     grid-template-columns:minmax(0,1fr);
-    border-top:1px solid var(--color-line);
-    border-bottom:1px solid var(--color-line);
+    border:0;
   }
   .subscription-detail-grid>.surface{
     padding:var(--desktop-section-y) 0;
@@ -589,8 +588,7 @@
     width:100%;
     grid-template-columns:repeat(2,minmax(0,1fr));
     gap:0;
-    border-top:1px solid var(--color-line);
-    border-bottom:1px solid var(--color-line);
+    border:0;
   }
   .subscription-detail-grid>.surface{
     min-width:0;

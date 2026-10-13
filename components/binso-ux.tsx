@@ -131,7 +131,7 @@ function Sheet({label,lang,description,open,onClose,children,busy=false,classNam
  if(!open||!mounted)return null;
  const body:ReactNode[]=[],footers:ReactNode[]=[];
  for(const child of Children.toArray(children)){
-  if(isValidElement<{className?:string;children?:ReactNode}>(child)&&child.props.className?.split(/\s+/).includes("filter-sheet-actions"))footers.push(child);
+  if(isValidElement<{className?:string;children?:ReactNode;sheet?:boolean}>(child)&&(child.type===FormActions||child.props.className?.split(/\s+/).includes("filter-sheet-actions")))footers.push(child.type===FormActions?cloneElement(child,{sheet:true}):child);
   else if(isValidElement<{className?:string;children?:ReactNode}>(child)&&child.props.className?.split(/\s+/).includes("sheet-body"))body.push(cloneElement(child,{className:child.props.className.replace(/\bsheet-body\b/g,"").trim()}));
   else body.push(sheetForm(child));
  }
