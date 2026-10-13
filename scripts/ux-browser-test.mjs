@@ -628,9 +628,9 @@ try{
     const searchTrigger=await header.getByRole('button',{name:'Suche',exact:true}).boundingBox();await page.mouse.click(searchTrigger.x+searchTrigger.width/2,searchTrigger.y+searchTrigger.height/2);
     const panel=page.getByRole('dialog',{name:'Suche',exact:true});await panel.waitFor();
     assert.equal(await page.locator('.bottom-sheet').count(),0,'Header search is not a bottom sheet');
-    assert.equal(await panel.getByRole('button',{name:'Abbrechen',exact:true}).count(),0,'Search has only the central close control');
+    assert.equal(await panel.getByRole('button',{name:'Abbrechen',exact:true}).filter({visible:true}).count(),width<=760?1:0,'Mobile search cancels beside the input; desktop uses the anchored close control');
     assert.equal(await panel.getByLabel('Suchen',{exact:true}).evaluate(el=>el===document.activeElement),true,'Search focuses its input');
-    const box=await panel.boundingBox(),bar=await header.boundingBox();assert.ok(box.y>=bar.y+bar.height-1&&box.x>=0&&box.x+box.width<=width+1,'Panel begins under the fixed header inside viewport');
+    const box=await panel.boundingBox(),bar=await header.boundingBox();assert.ok(box.x>=0&&box.x+box.width<=width+1,'Panel stays within viewport');if(width<=760){assert.ok(box.y<=1&&box.height>=739,'Mobile search owns a full view');assert.equal(await header.locator('.mobile-section-title').textContent(),'Übersicht');}else assert.ok(box.y>=bar.y+bar.height-1,'Desktop panel remains anchored under header');
     assert.equal(await page.evaluate(()=>document.body.style.overflow),'clip');
     assert.equal(await panel.getByText('Mindestens zwei Zeichen eingeben.',{exact:true}).count(),0);
     const oldRequest=page.waitForRequest(request=>new URL(request.url()).pathname==='/api/search'&&new URL(request.url()).searchParams.get('q')==='old');await panel.getByLabel('Suchen',{exact:true}).fill('old');await oldRequest;await panel.getByLabel('Suchen',{exact:true}).fill('Prüffirma');
@@ -646,6 +646,7 @@ try{
     const accountRows=await account.locator('.action-row').evaluateAll(rows=>rows.map(row=>{const css=getComputedStyle(row),box=row.getBoundingClientRect(),icon=row.firstElementChild.getBoundingClientRect(),text=row.children[1].getBoundingClientRect();return {height:box.height,font:css.fontSize,weight:css.fontWeight,display:css.display,grid:css.gridTemplateColumns,iconLeft:icon.left,textLeft:text.left,iconWidth:icon.width}}));
     assert.ok(accountRows.length>=6);for(const row of accountRows)assert.deepEqual(row,accountRows[0],'Personal, company, create-account and logout rows share the same geometry and typography');
     await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${width}-header-account.png`)});
+    if(width<=760)await account.getByRole('button',{name:'Zurück',exact:true}).click();
     await header.getByRole('button',{name:'Benachrichtigungen',exact:true}).click();const notifications=page.getByRole('dialog',{name:'Benachrichtigungen',exact:true});await notifications.getByText('Neue Rechnung',{exact:true}).waitFor();assert.equal(await account.count(),0,'Only one header panel is mounted');
     await notifications.getByRole('button',{name:'Ungelesen',exact:true}).click();assert.equal(await notifications.getByText('Produktinformation',{exact:true}).count(),0);
     await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${width}-header-notifications.png`)});await page.keyboard.press('Escape');
@@ -714,8 +715,8 @@ try{
    assert.equal(await companySheet.locator(':scope>.filter-sheet-actions').count(),1,'Component FormActions is a direct, non-scrolling sheet footer');
    const logoGap=await companySheet.evaluate(el=>{const upload=el.querySelector('#company-logo-upload').closest('.form-field').getBoundingClientRect(),name=el.querySelector('input[autocomplete=organization]').closest('.form-field').getBoundingClientRect(),grid=el.querySelector('.form-grid');return {actual:name.top-upload.bottom,expected:parseFloat(getComputedStyle(grid).rowGap)}});
    assert.ok(Math.abs(logoGap.actual-logoGap.expected)<1,'Logo and company name use the same field-group gap');
-   const saveBox=await companySheet.locator(':scope>.filter-sheet-actions>.button').boundingBox(),footerBox=await companySheet.locator(':scope>.filter-sheet-actions').boundingBox();
-   assert.ok(Math.abs(saveBox.width-footerBox.width)<1,'Single action occupies the full shared footer width');
+   const saveBox=await companySheet.locator(':scope>.filter-sheet-actions>.button').boundingBox(),footerWidth=await companySheet.locator(':scope>.filter-sheet-actions').evaluate(el=>{const css=getComputedStyle(el);return el.getBoundingClientRect().width-parseFloat(css.paddingLeft)-parseFloat(css.paddingRight)-parseFloat(css.borderLeftWidth)-parseFloat(css.borderRightWidth)});
+   assert.ok(Math.abs(saveBox.width-footerWidth)<1,'Single action occupies the full shared footer content width, inside page gutters');
    await page.locator('#company-logo-upload').setInputFiles(imageFile);
    scanVerdict='pending';await page.getByRole('button',{name:'Speichern',exact:true}).click();await page.getByRole('status').filter({hasText:'Das Firmenlogo wartet auf die Sicherheitsprüfung.'}).waitFor();assert.equal(companyWrites,0,'Quarantine cannot complete company save');assert.equal(await page.locator('#company-logo-upload').count(),1,'Pending upload retains the edit form for recovery');
    scanFailure=503;await page.getByRole('button',{name:'Speichern',exact:true}).click();await page.getByRole('status').filter({hasText:'Synthetic scan unavailable'}).waitFor();assert.equal(companyWrites,0);
@@ -755,7 +756,7 @@ try{
    await page.locator('.operator-app-header').getByRole('button',{name:'Benutzerkonto',exact:true}).click();
    const panel=page.getByRole('dialog',{name:'Konto',exact:true});await panel.waitFor();await assertAccountAvatarSpacing(panel);
    const g=await page.evaluate(()=>({header:document.querySelector('.operator-app-header').getBoundingClientRect().bottom,panel:document.querySelector('.header-panel').getBoundingClientRect().top,inert:document.querySelector('.operator-page-head').inert}));
-   assert.ok(g.panel>=g.header&&g.panel-g.header<=12,'Operator account shares the anchored top panel');assert.equal(g.inert,true,'Operator background is inert');
+   assert.ok(g.panel<=1,'Mobile operator account shares the full-view panel');assert.equal(g.inert,true,'Operator background is inert');
    await panel.getByRole('button',{name:'Abmelden',exact:true}).click();await panel.getByRole('alert').waitFor();assert.ok(page.url().endsWith('/operator'),'Failed logout must not pretend the session ended');
    await capture(page,{animations:'disabled',path:path.join(output,`${theme}-operator-account.png`)});await page.keyboard.press('Escape');await panel.waitFor({state:'hidden'});
    assert.equal(await page.locator('.operator-app-header').getByRole('button',{name:'Benutzerkonto',exact:true}).evaluate(el=>el===document.activeElement),true,'Operator account restores trigger focus');

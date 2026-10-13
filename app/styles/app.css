@@ -981,6 +981,9 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 .header-panel>:not(.header-panel-heading){min-height:0;min-width:0;overflow:auto;overscroll-behavior:contain}
 .header-panel .global-search{display:flex;flex-direction:column;overflow:hidden}
 .search-clear{display:grid;place-items:center;width:32px;height:32px;flex:none;border:0;background:transparent;color:var(--color-fg)}
+.header-search-cancel{display:none}
+.header-search-scopes{display:none;flex:none;overflow-x:auto}
+.mobile-section-title{display:none}
 .header-search-controls{display:flex;align-items:center;gap:10px;flex:none;padding:0 0 12px}
 .header-search-controls .searchbox{min-width:0;flex:1;margin:0}
 .header-panel .search-results{min-height:0;overflow:auto;overscroll-behavior:contain}

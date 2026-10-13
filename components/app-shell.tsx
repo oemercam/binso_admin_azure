@@ -335,7 +335,7 @@ function AppShellFrame({
       </div>
       <header className={backHref ? "mobile-header mobile-header-detail" : "mobile-header"}>
         <div className="mobile-header-leading">
-          {backHref ? <Link className="mobile-back" href={backHref} aria-label={backLabel}><Icon name="back"/></Link> : <Link href="/dashboard"><Logo /></Link>}
+          {backHref ? <Link className="mobile-back" href={backHref} aria-label={backLabel}><Icon name="back"/></Link> : <><Link href="/dashboard" className="mobile-header-brand" aria-label="Zur Übersicht"><Logo compact/></Link><h1 className="mobile-section-title">{title}</h1></>}
           {backHref && <h1 className="mobile-header-title"><span>{title}</span>{status!=null&&<Status tone={statusTone}>{status}</Status>}</h1>}
         </div>
         {timerRunning&&!backHref&&<Link href="/zeit" className="header-timer" aria-label={"Zeitmessung läuft "+formattedTimer}><i/><b>{formattedTimer}</b></Link>}

@@ -2,7 +2,8 @@
 
 import {usePathname,useSearchParams} from "next/navigation";
 import {safeAppPath} from "@/lib/navigation";
-import type {SearchItem} from "@/lib/search";
+import {searchSources,type SearchItem} from "@/lib/search";
+import {useState} from "react";
 import {usePageAccess} from "@/lib/client/page-access";
 import {Avatar} from "./avatar";
 import {ActionRow} from "./binso-ux";
@@ -15,10 +16,15 @@ function PanelLink({href,icon,title,onClose}:{href:string;icon:string;title:stri
 }
 
 export function SearchPanel({query,onQuery,items,loading,error,onClose}:{query:string;onQuery:(query:string)=>void;items:SearchItem[];loading:boolean;error:string|null;onClose:()=>void}){
- const access=usePageAccess();const visible=items.filter(item=>access.canOpen(item.href));
+ const access=usePageAccess();
+ const [scope,setScope]=useState("all");
+ const sources=searchSources.filter(source=>access.canOpen(source.href));
+ const selected=sources.some(source=>source.type===scope)?scope:"all";
+ const visible=items.filter(item=>access.canOpen(item.href)&&(selected==="all"||item.type===selected));
  const groups=Array.from(new Set(visible.map(item=>item.type)));
  return <div className="global-search">
-  <div className="header-search-controls"><div className="searchbox" role="search"><Icon name="search"/><input aria-label="Suchen" autoFocus value={query} onChange={e=>onQuery(e.target.value)} placeholder="Suchen…"/>{query&&<button className="search-clear" type="button" aria-label="Suche löschen" onClick={()=>onQuery("")}><Icon name="close" size={15}/></button>}</div></div>
+  <div className="header-search-controls"><div className="searchbox" role="search"><Icon name="search"/><input aria-label="Suchen" autoFocus value={query} onChange={e=>onQuery(e.target.value)} placeholder="Suchen…"/>{query&&<button className="search-clear" type="button" aria-label="Suche löschen" onClick={()=>onQuery("")}><Icon name="close" size={15}/></button>}</div><button type="button" className="header-search-cancel" onClick={onClose}>Abbrechen</button></div>
+  <div className="chips header-search-scopes" aria-label="Suchbereiche"><button type="button" className={selected==="all"?"active":""} aria-pressed={selected==="all"} onClick={()=>setScope("all")}>Alle</button>{sources.map(source=><button type="button" key={source.type} className={selected===source.type?"active":""} aria-pressed={selected===source.type} onClick={()=>setScope(source.type)}>{source.type}</button>)}</div>
   <div className="search-results">
    {!query.trim()&&<><h3>Schnellzugriff</h3><div>{[["/kunden","users","Kunden öffnen"],["/rechnungen","receipt","Rechnungen öffnen"],["/angebote","file","Angebote öffnen"]].map(([href,icon,title])=><PanelLink key={href} href={href} icon={icon} title={title} onClose={onClose}/>)}</div></>}
    {loading&&<LoadingState className="technical-hint">Suche läuft …</LoadingState>}
