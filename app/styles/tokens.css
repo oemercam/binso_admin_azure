@@ -13,7 +13,6 @@
   --kpi-padding:14px;
   --action-row-height:48px;
   --section-title-font:18px;
-  --sheet-keyboard-offset:0px;
   color-scheme:light;
   --color-bg:#fff;
   --color-fg:#000;
@@ -89,6 +88,13 @@
   --mobile-sheet-row-h:56px;
   --touch:44px;
 
+  --header-avatar-size:30px;
+  --control-focus-width:2px;
+  --chart-positive:#57cc91;
+  --chart-negative:#f07881;
+  --chart-neutral:#a2a8b3;
+  --chart-ring-size:96px;
+  --chart-ring-width:10px;
   --control-h:40px;
   --control-h-mobile:44px;
   --control-font:13px;

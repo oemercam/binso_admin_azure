@@ -1,7 +1,7 @@
 "use client";
 import Link from 'next/link';
 import {AppShell} from '../app-shell';
-import {CreateAction} from '../binso-ux';
+import {QuickCreateAction} from '../binso-ux';
 import {CashStatistics} from '../cash-statistics';
 import type {CashStatisticsData} from '@/lib/cash-statistics';
 import {useApiQuery} from '@/lib/client/use-api-query';
@@ -18,7 +18,7 @@ export function DashboardPage({forceDemo=false}:{forceDemo?:boolean}={}){
  // Attention comes from all authorized overdue invoices, never just the five recent rows.
  const attention=(data?.attention??[]).filter(item=>financialStatus(item)==='overdue');
  const recent=data?.recent??data?.invoices??[];
- return <AppShell title="Übersicht" active="dashboard" actions={<CreateAction href="/rechnungen/neu?returnTo=/dashboard" label="Neue Rechnung"/>}>
+ return <AppShell title="Übersicht" active="dashboard" actions={<QuickCreateAction/>}>
   {query.loading?<LoadingState>Übersicht wird geladen …</LoadingState>:query.error?<ErrorState onRetry={query.refresh}>{query.error}</ErrorState>:<>
    {data?.canFinance&&data.cash&&<CashStatistics data={data.cash} storageKey="dashboard"/>}
    <div className="dashboard-grid"><section className="surface"><SectionTitle title="Handlungsbedarf"/>{attention.length?<div className="recent-invoices">{attention.map(item=><DocumentSummaryRow key={item.id} item={item} customerHeading compact/>)}</div>:<p role="status">Keine dringenden Vorgänge in den verfügbaren Rechnungen.</p>}</section>

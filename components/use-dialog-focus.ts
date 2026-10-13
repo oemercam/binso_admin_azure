@@ -39,7 +39,7 @@ export function useDialogFocus(open: boolean, onClose: () => void, headerPanel=f
       document.documentElement.style.setProperty("--dialog-viewport-height",`${viewport?.height??window.innerHeight}px`);
       document.documentElement.style.setProperty("--dialog-viewport-top",`${viewport?.offsetTop??0}px`);
       const focused=document.activeElement;
-      if(focused instanceof HTMLElement&&dialog.contains(focused))focused.scrollIntoView({block:"nearest"});
+      if(focused instanceof HTMLElement&&dialog.contains(focused))focused.scrollIntoView({block:"nearest",behavior:"instant"});
     };
     resize();viewport?.addEventListener("resize",resize);viewport?.addEventListener("scroll",resize);
     const controls = () => Array.from(dialog.querySelectorAll<HTMLElement>(

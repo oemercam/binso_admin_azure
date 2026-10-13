@@ -174,9 +174,9 @@ textarea{
 input:focus,
 select:focus,
 textarea:focus{
-  border-color:var(--color-fg);
-  outline:0;
-  box-shadow:0 0 0 1px var(--color-fg);
+  outline:var(--control-focus-width) solid var(--color-fg);
+  outline-offset:calc(-1 * var(--control-focus-width));
+  box-shadow:none;
 }
 
 input,

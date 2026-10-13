@@ -251,7 +251,8 @@ try{
     if(!process.env.BINSO_UX_BASELINE&&['/dashboard','/finanzen','/finanzen/analyse','/kunden/customer-one'].includes(route)){
       assert.equal(await page.locator('.bo-statistics-kpis>div').count(),3,'Migrated statistics have exactly three metrics');
       assert.equal(await page.locator('.bo-statistics').count(),1,'One central statistics surface');
-      assert.equal(await page.locator('.bo-statistics').evaluate(el=>getComputedStyle(el).backgroundColor),theme==='light'?'rgb(255, 255, 255)':'rgb(23, 25, 29)','Statistics follow the approved light app background; existing dark variant remains pending review');
+      assert.equal(await page.locator('.bo-statistics').evaluate(el=>getComputedStyle(el).backgroundColor),theme==='light'?'rgb(255, 255, 255)':'rgb(0, 0, 0)','Statistics match the approved page background in both themes');
+      const trendToggle=page.getByRole('button',{name:'Zeitverlauf anzeigen',exact:true});if(await trendToggle.count())await trendToggle.click();
       assert.ok(process.env.BINSO_UX_FIXTURE_CASE==='empty'||await page.locator('.bo-statistics-bar').evaluateAll(elements=>elements.some(el=>el.getBoundingClientRect().height>20)),'Actual fixture values produce bars');
       assert.equal(await page.locator('.revenue-insight,.dashboard-summary,.quick-section,.finance-overview-chart').count(),0,'Migrated pages have no competing KPI/chart layout');
     }
@@ -556,8 +557,14 @@ try{
   await page.getByRole('button',{name:'Erneut versuchen',exact:true}).click();await page.getByText('Keine Arbeitszeiten erfasst',{exact:true}).waitFor();
   }
   if(hasInteraction('chat')){
+  await page.setViewportSize({width:390,height:740});await navigate(base+'/support/neu');await page.waitForLoadState('networkidle');const supportForm=page.getByRole('dialog',{name:'Neue Support-Anfrage',exact:true});await supportForm.waitFor();await supportForm.getByLabel('Betreff',{exact:true}).fill('Keyboard draft');await supportForm.getByLabel('Nachricht',{exact:true}).fill('Preserved message');
+  await page.setViewportSize({width:390,height:400});await supportForm.getByLabel('Nachricht',{exact:true}).focus();await settleLayout(page);const supportFooter=await supportForm.locator('.sheet-form-footer').boundingBox();assert.ok(supportFooter.y+supportFooter.height<=400,'Native support form actions remain above the keyboard');assert.equal(await supportForm.getByLabel('Betreff',{exact:true}).inputValue(),'Keyboard draft');const focus=await supportForm.getByLabel('Nachricht',{exact:true}).evaluate(el=>({shadow:getComputedStyle(el).boxShadow,offset:getComputedStyle(el).outlineOffset}));assert.equal(focus.shadow,'none');assert.equal(focus.offset,'-2px','Single inset outline replaces competing focus rings');await supportForm.getByRole('button',{name:'Schliessen',exact:true}).click();await page.getByRole('button',{name:'Änderungen verwerfen',exact:true}).click();
   await page.setViewportSize({width:375,height:400});await page.waitForLoadState('networkidle');await navigate(base+'/support/ticket-one');await page.waitForLoadState('networkidle');
   await page.getByLabel('Nachricht',{exact:true}).focus();const composer=await page.locator('.thread-composer').boundingBox(),chatHeader=await page.locator('.mobile-header').boundingBox();assert.ok(composer.y>=chatHeader.y+chatHeader.height&&composer.y+composer.height<=400,'Short chat viewport retains header and input');
+  await page.getByLabel('Nachricht',{exact:true}).fill('Viewport draft');
+  await page.evaluate(()=>{const vv=window.visualViewport;Object.defineProperty(vv,'height',{configurable:true,value:300});Object.defineProperty(vv,'offsetTop',{configurable:true,value:40});vv.dispatchEvent(new Event('resize'));});await settleLayout(page);
+  const panned=await page.locator('.thread-composer').boundingBox(),pannedHeader=await page.locator('.mobile-header').boundingBox();assert.ok(pannedHeader.y>=39&&panned.y+panned.height<=341,'Chat honors the visual viewport height and pan offset exactly once');assert.equal(await page.getByLabel('Nachricht',{exact:true}).inputValue(),'Viewport draft');
+  await page.evaluate(()=>{const vv=window.visualViewport;delete vv.height;delete vv.offsetTop;vv.dispatchEvent(new Event('resize'));});await settleLayout(page);
   await capture(page,{animations:'disabled',path:path.join(output,`${theme}-375-400-chat.png`)});await page.setViewportSize({width:430,height:900});
   failSend=true;messagePosts=0;await page.waitForLoadState("networkidle");await navigate(base+'/support/ticket-one');await page.waitForLoadState('networkidle');await page.getByLabel('Nachricht',{exact:true}).fill('Test message');await page.getByRole('button',{name:'Senden',exact:true}).dblclick();await page.getByText('Fixture message offline',{exact:true}).waitFor();assert.equal(messagePosts,1);assert.equal(await page.getByLabel('Nachricht',{exact:true}).inputValue(),'Test message');failSend=false;await page.getByRole('button',{name:'Senden',exact:true}).click();await page.getByText('Test message',{exact:true}).waitFor();assert.equal(messagePosts,2);
   }
@@ -584,6 +591,17 @@ try{
    await capture(page,{animations:'disabled',path:path.join(output,`${theme}-320-400-manual-time-final.png`)});await page.keyboard.press('Escape');groupingFixture=false;
   }
   if(hasInteraction('header')){
+   for(const width of [390,1440]){
+    await page.setViewportSize({width,height:740});await navigate(base+'/dashboard');await page.waitForLoadState('networkidle');
+    const create=page.getByRole('button',{name:'Neu erstellen',exact:true});
+    const size=await create.boundingBox(),avatar=await page.locator(width<=760?'.mobile-header .person-avatar-small':'.desktop-appbar .person-avatar-small').boundingBox();
+    assert.equal(size.width,avatar.width,'Create circle uses the actual avatar diameter');assert.equal(size.height,avatar.height);
+    await create.click();const menu=page.getByRole('dialog',{name:'Neu erstellen',exact:true});
+    assert.deepEqual(await menu.locator('.action-row>span').allTextContents(),['Kunde','Angebot','Rechnung','Projekt','Zeiteintrag','Ausgabe']);
+    assert.equal(await page.getByRole('button',{name:'Weiter',exact:true}).count(),0,'Opening global plus never starts an invoice wizard');
+    await menu.getByRole('link',{name:'Kunde',exact:true}).click();await page.waitForURL(url=>url.pathname==='/kunden/neu'&&url.searchParams.get('returnTo')==='/dashboard');
+    await page.getByRole('dialog',{name:'Kunde erstellen',exact:true}).getByRole('button',{name:'Schliessen',exact:true}).click();await page.waitForURL(base+'/dashboard');
+   }
    for(const width of [320,390,768,1440]){
     await page.setViewportSize({width,height:740});await navigate(base+'/dashboard');await page.waitForLoadState('networkidle');
     const header=page.locator(width<=760?'.mobile-header':'.desktop-appbar');

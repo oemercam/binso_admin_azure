@@ -416,7 +416,7 @@ console.log('Project-linked idle timer context survives synchronization without 
 
 // Central presentation helpers preserve units and do not mutate source values.
 {
- const {formatQuantity,withPriceUnit,timeMetadata}=await import(moduleUrl(ts.transpileModule(await fs.readFile('lib/display-format.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2017}}).outputText));
+ const {formatQuantity,withPriceUnit,timeMetadata}=await import(moduleUrl(ts.transpileModule((await fs.readFile('lib/display-format.ts','utf8')).replace('\"./financial-status\"',JSON.stringify(financialModuleUrl)),{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2017}}).outputText));
  assert.equal(formatQuantity('100.00','%'),'100 %');assert.equal(formatQuantity('42.00','h/Woche'),'42 h/Woche');assert.equal(formatQuantity('25.5','Tage/Jahr'),'25.5 Tage/Jahr');assert.equal(formatQuantity('8.1','%'),'8.1 %');
  assert.equal(withPriceUnit('CHF 185.00','hour'),'CHF 185.00 / Std.');assert.equal(withPriceUnit('CHF 50.00','custom-unit'),'CHF 50.00 / custom-unit');assert.equal(withPriceUnit('CHF 50.00',null),'CHF 50.00');
  assert.equal(timeMetadata('Arbeitszeit','Arbeitszeit',null,'09.10.2026'),'09.10.2026');assert.equal(timeMetadata('Konzeption','Workplace','Alex','09.10.2026'),'Workplace · Alex · 09.10.2026');

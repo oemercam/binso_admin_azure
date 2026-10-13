@@ -40,7 +40,7 @@ A CSS cascade, duplicate reachable wrapper or possibly unused declaration is a c
 
 For each imported requirement, obtain the original approval, resolve scope/owner/state, bind an individual executable assertion and add evidence. A representative interaction-suite pass is partial evidence only. For visual approval record route/state/engine/theme/viewport, reviewer, approval reference and a justified per-case threshold. For native approval record physical OS/device/browser/PWA installation, keyboard show/hide, safe-area/orientation and actual footer/back-navigation recordings. Desktop emulation cannot replace this.
 
-Statistics conflict: the existing `.bo-statistics` and old browser assertion enforce `#17191d`; the later explicit white/app-background instruction governs light theme. Dark-theme treatment remains a declared variant review. The V22.4 remediation corrects the light-theme mismatch centrally using app tokens. The existing dark palette remains until its approval is resolved.
+V23.2 explicit approval: statistics surfaces use the page background in both light and dark themes. The former `#17191d` dark card is retired centrally. Rings represent explicitly labelled parts of a common total; time-series renderers and measured monitoring history remain available.
 
 ## Completing acceptance later
 

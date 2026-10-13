@@ -4,6 +4,8 @@ import {allowDraftNavigation} from "../use-browser-back-guard";
 import {useProcessDraft} from "../use-process-draft";
 import {useDirtySnapshot} from "../use-dirty-snapshot";
 import Link from "next/link";
+import {formatDateTime} from "@/lib/display-format";
+import {supportReference} from "@/lib/support-reference";
 import {useApiQuery,useDataRevision} from "@/lib/client/use-api-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -14,11 +16,6 @@ import { apiGet, apiPost, apiUpload, isProductionBackendEnabled, useBackendMode 
 import {Button, EmptyState, Field, Icon, Toast, Input, Select, Textarea, FormActions, LoadingState, ErrorState, MessageBubble} from "../ui";
 import { ActionRow, ActionsMenu, CreateAction, FormSheet } from "../binso-ux";
 
-export function supportReference(id:string,caseNumber?:string|null){
-  const raw=String(caseNumber??id);
-  if(/^(?:T-)?[0-9a-f-]{20,}$/i.test(raw))return "T-"+id.replace(/-/g,"").slice(0,8).toUpperCase();
-  return raw.startsWith("#")?raw:"#"+raw;
-}
 
 export function SupportPage() {
  const production=useBackendMode(),placeholder="Tickets suchen...";
@@ -31,7 +28,7 @@ export function SupportPage() {
  const statusMap:Record<string,string>={new:"Neu",open:"Offen",in_progress:"In Bearbeitung",waiting_customer:"Warten auf Kunde",resolved:"Gelöst",closed:"Geschlossen"};
  const selected=Object.entries(statusMap).find(([,label])=>label===controller.activeChip)?.[0];if(selected)params.set('status',selected);
  const query=useApiQuery<{items:Array<{id:string;case_number?:string;subject:string;status:string;updated_at:string}>;total?:number}>(production?"/api/support/tickets?"+params:"/api/demo/data?collection=support_tickets&"+params);
- const rows=(query.data?.items??[]).map(item=>[item.id,item.subject?.trim()||"Support-Anfrage",new Date(item.updated_at).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"}),statusMap[item.status]??item.status,supportReference(item.id,item.case_number)]);
+ const rows=(query.data?.items??[]).map(item=>[item.id,item.subject?.trim()||"Support-Anfrage",formatDateTime(item.updated_at),statusMap[item.status]??item.status,supportReference(item.id,item.case_number)]);
  const total=query.data?.total??rows.length;
  return <AppShell title="Support" subtitle={query.loading?"Wird geladen…":`${total} Tickets`} active="support" actions={<RecordsControls controller={controller} placeholder={placeholder} chips={chips} columns={columns}><CreateAction href="/support/neu" label="Neues Ticket"/></RecordsControls>}>
   <RecordsView controller={controller} toolbarActions={false} showCount={false} remote pagination={{total,page:controller.page,pageSize,onPage:controller.setPage}} countLabel="Tickets" loading={query.loading} error={query.error} items={rows} placeholder={placeholder} chips={chips} columns={columns} rowHref={row=>`/support/${row[0]}`}>{([id,subject,updated,status,reference])=><RecordRow href={`/support/${id}`} icon="support" title={subject} meta={`${reference} · ${updated}`} status={status}/>}</RecordsView>
@@ -98,7 +95,7 @@ export function SupportTicketForm() {
       setSubmitting(false);
     }
   };
-  return <AppShell title="Neue Support-Anfrage" editing unsavedChanges={false} subtitle="Beschreibe kurz, wobei wir helfen können." active="support" backHref="/support" backLabel="Support">
+  return <AppShell title="Support" editing unsavedChanges={false} subtitle="Beschreibe kurz, wobei wir helfen können." active="support" backHref="/support" backLabel="Support">
     <FormSheet label="Neue Support-Anfrage" open={open} onClose={close} busy={submitting} dirty={dirty&&!saved}>
     <form onSubmit={event=>{event.preventDefault();void save()}}>
       <div className="form-grid">

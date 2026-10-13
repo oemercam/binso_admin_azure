@@ -176,6 +176,8 @@
     animation:desktop-dialog-enter var(--motion-base) var(--motion-ease) both;
   }
   .sheet-handle{display:none}
+  .sheet-layer:has(.quick-create-sheet){align-items:flex-start;justify-content:flex-end;padding-top:110px;padding-right:var(--page-x)}
+  .quick-create-sheet{width:320px}
   .bottom-sheet>.sheet-header{top:-18px;padding-top:0}
   .bottom-sheet .sheet-menu b{font-size:14px}
   .bottom-sheet .sheet-menu small{font-size:12px}
@@ -1424,8 +1426,9 @@
   .metric{min-height:76px;padding:12px 14px}
   .metrics-grid.bo-metric-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
   .app-main:has(.support-detail-workspace){--workspace-header-height:calc(var(--mobile-header-h) + var(--safe-top))}
-  .app-main:has(.support-detail-workspace) .page-container{padding-bottom:calc(var(--mobile-nav-h) + var(--safe-bottom) + var(--mobile-nav-edge) + var(--field-group-gap))}
-  .app-main:has(.support-detail-workspace) .mobile-header{top:var(--workspace-viewport-top)}
+  .app-main:has(.support-detail-workspace) .page-container>.support-detail-workspace{margin-bottom:0}
+  .app-main:has(.support-detail-workspace) .page-container{padding-bottom:calc(var(--mobile-nav-h) + var(--safe-bottom) + var(--mobile-nav-edge) + var(--field-group-gap));animation:none}
+  .app-main:has(.support-detail-workspace) .mobile-header{top:0}
   .metrics-grid .metric:first-child{border-left:0}
   .metrics-grid .metric:nth-child(odd){border-left:0}
   .metrics-grid{border:0}
@@ -1792,7 +1795,6 @@
   .danger-zone .button{width:100%;margin-top:12px}
 
   .sheet-layer{
-    bottom:var(--sheet-keyboard-offset);
     overscroll-behavior:contain;
     touch-action:none;
   }
@@ -1867,12 +1869,6 @@
     right:max(var(--mobile-page-x),var(--safe-right));
     min-width:0;
     max-width:none;
-  }
-  .pwa-update{
-    left:max(var(--mobile-page-x),var(--safe-left));
-    right:max(var(--mobile-page-x),var(--safe-right));
-    bottom:calc(var(--mobile-nav-h) + var(--safe-bottom) + 10px);
-    min-width:0;
   }
 
   /* Operator */
@@ -2762,7 +2758,8 @@ input:not([type="checkbox"]):not([type="radio"]),
 .bo-page-heading h1,.bo-detail-heading h1{margin:0;min-width:0;flex:1;overflow-wrap:anywhere}
 .bo-page-heading p,.bo-detail-heading p{margin:0;color:var(--color-muted, #71717a);font-size:.875rem}
 .bo-detail-heading-main .status{flex-shrink:0}
-.bo-create-action.button{width:44px;height:44px;flex:0 0 44px;min-width:44px;min-height:44px;padding:0;border:0;border-radius:50%;background:var(--color-inverse-bg);color:var(--color-inverse-fg);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:opacity .15s ease}
+.bo-create-action.button{position:relative;width:var(--header-avatar-size);height:var(--header-avatar-size);aspect-ratio:1 / 1;flex:0 0 var(--header-avatar-size);min-width:var(--header-avatar-size);min-height:var(--header-avatar-size);padding:0;border:0;border-radius:50%;background:var(--color-inverse-bg);color:var(--color-inverse-fg);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:opacity .15s ease}
+.bo-create-action::before{content:"";position:absolute;inset:calc((var(--header-avatar-size) - var(--touch)) / 2);border-radius:50%}
 .bo-create-action:hover:not(:disabled){opacity:.85}
 .bo-create-action:active:not(:disabled){opacity:.7}
 .bo-create-action:disabled{opacity:.45;cursor:not-allowed}
@@ -2809,7 +2806,6 @@ input:not([type="checkbox"]):not([type="radio"]),
 .form-field,.form-field>label,.form-field>div{min-width:0;max-width:100%}
 .form-field input,.form-field select,.form-field textarea{box-sizing:border-box;min-width:0;max-width:100%}
 .form-field textarea{resize:vertical;overflow-wrap:anywhere}
-.form-field input:focus-visible,.form-field select:focus-visible,.form-field textarea:focus-visible{outline-offset:2px}
 .page-container form{min-width:0;max-width:100%}
 .page-container form button{max-width:100%}
 
