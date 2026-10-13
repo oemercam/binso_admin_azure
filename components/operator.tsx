@@ -173,7 +173,7 @@ export function OperatorPage({ section = "", demo = false, identity, role="platf
         </section>
       </div>}
 
-      {!allowed ? <EmptyState icon="lock" title="Keine Berechtigung für diesen Bereich" text="Deine Adminrolle erlaubt diesen Zugriff nicht. Wende dich für eine passende Rolle an die Entra-Administration."/> : detail && key === "tickets" ? <TicketDetail ticketId={detail}/> :
+      <div className="operator-app-content">{!allowed ? <EmptyState icon="lock" title="Keine Berechtigung für diesen Bereich" text="Deine Adminrolle erlaubt diesen Zugriff nicht. Wende dich für eine passende Rolle an die Entra-Administration."/> : detail && key === "tickets" ? <TicketDetail ticketId={detail}/> :
         detail && key === "kunden" ? <OperatorCustomerDetail tenantId={detail}/> :
         key === "tickets" ? <TicketsView/> :
         key === "kunden" ? <CustomersView/> :
@@ -185,7 +185,7 @@ export function OperatorPage({ section = "", demo = false, identity, role="platf
         key === "ankuendigungen" ? <AnnouncementsView open={createOpen} onClose={()=>setCreateOpen(false)}/> :
         key === "sicherheit" ? <SecurityView/> :
         key === "audit" ? <AuditView/> :
-        <OperatorDashboard/>}
+        <OperatorDashboard/>}</div>
     </main>
   </div></OperatorAccess.Provider>;
 }

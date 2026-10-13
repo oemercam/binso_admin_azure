@@ -95,3 +95,23 @@ const racedSend=sendHarness();const firstSend=racedSend.send();await racedSend.s
 const normalSend=sendHarness();const normalPending=normalSend.send();normalSend.resolve({item:{id:'message-two'}});await normalPending;assert.equal(normalSend.draft,'');
 const failedSend=sendHarness();const failedPending=failedSend.send();failedSend.reject(Error('Fixture unavailable'));await failedPending;assert.equal(failedSend.draft,'First draft');
 console.log('Actual operator send: same-frame lock, late-completion draft preservation, successful clear and failure retention passed.');
+
+// New app appearance keeps text readable in both modes, including secondary labels.
+{
+ const {createRequire}=await import('node:module');
+ const require=createRequire(import.meta.url),postcss=require(require.resolve('postcss',{paths:[require.resolve('next')]}));
+ const palettes={light:{},dark:{}};
+ postcss.parse(await fs.readFile('app/styles/tokens.css','utf8')).walkRules(rule=>{
+  const palette=rule.selector===':root'?palettes.light:rule.selector==='html[data-theme="dark"]'?palettes.dark:null;
+  if(palette)for(const decl of rule.nodes.filter(node=>node.type==='decl'&&node.prop.startsWith('--app-')))palette[decl.prop]=decl.value;
+ });
+ const luminance=hex=>{const rgb=(hex.length===4?hex.slice(1).split('').map(c=>c+c).join(''):hex.slice(1)).match(/../g).map(value=>parseInt(value,16)/255).map(value=>value<=.04045?value/12.92:((value+.055)/1.055)**2.4);return rgb[0]*.2126+rgb[1]*.7152+rgb[2]*.0722};
+ for(const [mode,values] of Object.entries(palettes)){
+  const palette={...palettes.light,...values};
+  for(const ink of ['--app-text','--app-secondary','--app-accent'])for(const background of ['--app-canvas','--app-surface','--app-chrome']){
+   const a=luminance(palette[ink]),b=luminance(palette[background]);
+   assert.ok((Math.max(a,b)+.05)/(Math.min(a,b)+.05)>=4.5,`${mode}: ${ink} must meet normal-text contrast on ${background}`);
+  }
+ }
+ console.log('App light/dark themes: primary text, secondary labels and accent meet 4.5:1 contrast on all three surfaces.');
+}
