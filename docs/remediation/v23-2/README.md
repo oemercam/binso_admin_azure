@@ -136,3 +136,10 @@ The single compact-view media block owns preference groups, list/table surfaces,
 Validation: full production build/TypeScript, targeted ESLint, CSS architecture, complete local test chain and navigation fingerprint passed. Local file-scan protocol tests use the documented in-memory transport; no actual antivirus/OS socket validation is claimed here. New palette checks verify at least 4.5:1 contrast for normal primary/secondary/accent text against all three app surfaces in both themes. Browser route matrix now verifies app text, grouped settings surfaces and shared control radii at phone/tablet widths while preserving desktop/public-page expectations.
 
 The inventory contains 72 page routes, 13 operator variants and 181 component owners. This is source/dependency coverage, not a completed visual acceptance of every screen. Chromium/WebKit route/interaction gates and physical iPhone/PWA/tablet acceptance are pending. CI runner queue and unavailable native browser libraries prevent fresh visual evidence in this workspace. No merge or deployment is claimed.
+
+
+### Fresh CI triage for a5d3fa6
+
+GitHub Quality run 38387337325 passed checks (full tests/lint/CSS/TypeScript/security), production build/runtime HTTP and actual scanner-engine qualification; CodeQL run 38387337314 passed. Chromium/WebKit stopped at the new generic corner assertion because it included the deliberately borderless search input and chat textarea. The assertion now targets normal form controls while retaining their exact 12 px requirement; it does not skip normal fields or waive geometric failures.
+
+The compliance artifact contained 62 measured failures, all UX-FIN-010: actual compact app statistic surface #f3f3f5 versus the old #ffffff expectation. Registry 1.0.1 records the user's explicit 13 October request as the superseding appearance approval. FIN-010 now resolves --app-surface through 1100 px and --color-bg above, and measures both themes. Baseline navigation requirements remain untouched. These changes need a fresh CI run; no passing browser acceptance is claimed from the interrupted run.
