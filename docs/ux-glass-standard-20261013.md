@@ -49,6 +49,10 @@ Neue Seiten müssen diese Komponenten nutzen. Die zentrale ESLint-Regel verbiete
 
 7. Ein warmer Build lieferte für die Firmen-Unterseite ältere CSS-Asset-Referenzen (`be416f1b10e76cb7.css`) aus; nach Entfernen der erzeugten Build-Dateien wurde der aktuelle responsive Stand (`c9ace042a01b5fd4.css`) geladen und die Tablet-Prüfung bestanden. `scripts/prepare-ui-build.mjs` verwirft deshalb beim Wechsel des zentralen CSS-Fingerprints den erzeugten Next-Stand vor der Kompilierung. Unveränderte Styles behalten ihren Cache. Der Schutz ist durch isolierte Cache-/Source-Erhaltungsszenarien geprüft.
 
+## CI-Nachprüfung des Chat-Viewports
+
+Der vollständige Lauf zu `c0dd5ac` bestand Build, Tests, Scanner, Chromium und WebKit. Die anschliessende aggregierte Compliance erkannte 16 identische Chat-Abstandsverletzungen bei 768/1024 Pixeln: Der Nachrichten-Composer endete bei 965 Pixeln, die Navigation begann bei 920 Pixeln. Die bestehenden Chat-Regeln für Header-Höhe und reservierten Navigationsraum standen noch im Smartphone-Block bis 700 Pixel. Sie gehören in den gemeinsamen App-Block bis 1100 Pixel und wurden dorthin verschoben. Die direkte Browserprüfung verlangt jetzt, dass der Composer oberhalb der Navigation endet. Gezielte Light-/Dark-Prüfungen bei sieben Breiten sowie verkleinerte/verschobene Visual-Viewport-Szenarien sind bestanden; die Navigation bleibt unverändert.
+
 ## Abnahme
 
 Die konkreten lokalen Prüfergebnisse und Einschränkungen stehen in `docs/assets/20261013/validation.json`. Synthetische API- und Browserprüfungen sind keine Live-Azure-Abnahme und kein Test einer realen iPhone-Tastatur. Die Änderung wird über einen separaten GitHub-Branch und Pull Request bereitgestellt; eine Produktionsbereitstellung ist eine separate Release-Stufe.

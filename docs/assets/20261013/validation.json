@@ -208,5 +208,27 @@
     "No physical iPhone/PWA keyboard verification",
     "No live Azure acceptance or production deployment",
     "Chromium viewport testing; no WebKit execution"
-  ]
+  ],
+  "followUpRegression": {
+    "failedCiRun": 38465894026,
+    "priorCommit": "c0dd5ac043784fae34902c1b1e9dd614d6004cd2",
+    "priorCi": "Build, static tests, scanner, Chromium and WebKit passed; aggregate compliance found 16 support-chat clearance failures at widths 768/1024",
+    "rootCause": "Chat header-height and navigation-reserve rules still scoped to <=700px; shared navigation covers <=1100px",
+    "fix": "Move existing chat viewport rules into the canonical <=1100px app block; retain navigation geometry and destinations",
+    "localChecks": [
+      "lint",
+      "typecheck",
+      "css architecture",
+      "navigation foundation",
+      "navigation contract",
+      "production build",
+      "release check"
+    ],
+    "supportChatCases": 14,
+    "chatInteractions": "passed including shortened/panned visual viewport",
+    "complianceCases": 20,
+    "clearancePassed": 16,
+    "failedMeasurements": 0,
+    "newCi": "pending"
+  }
 }

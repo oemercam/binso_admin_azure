@@ -1283,10 +1283,6 @@
   .metrics-grid.three{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;border:0}
   .metric{min-height:76px;padding:12px 14px}
   .metrics-grid.bo-metric-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .app-main:has(.support-detail-workspace){--workspace-header-height:calc(var(--mobile-header-h) + var(--safe-top))}
-  .app-main:has(.support-detail-workspace) .page-container>.support-detail-workspace{margin-bottom:0}
-  .app-main:has(.support-detail-workspace) .page-container{padding-bottom:calc(var(--mobile-nav-h) + var(--safe-bottom) + var(--mobile-nav-edge) + var(--field-group-gap));animation:none}
-  .app-main:has(.support-detail-workspace) .mobile-header{top:0}
   .metrics-grid .metric:first-child{border-left:0}
   .metrics-grid .metric:nth-child(odd){border-left:0}
   .metrics-grid{border:0}
@@ -2734,6 +2730,10 @@ input:not([type="checkbox"]):not([type="radio"]),
 .bo-settings-group-body .preference-row{padding:16px;border-bottom:1px solid var(--app-divider)}
 .bo-settings-group-body .preference-row:last-child{border-bottom:0}
 
+  .app-main:has(.support-detail-workspace){--workspace-header-height:calc(var(--mobile-header-h) + var(--safe-top))}
+  .app-main:has(.support-detail-workspace) .page-container>.support-detail-workspace{margin-bottom:0}
+  .app-main:has(.support-detail-workspace) .page-container{padding-bottom:calc(var(--mobile-nav-h) + var(--safe-bottom) + var(--mobile-nav-edge) + var(--field-group-gap));animation:none}
+  .app-main:has(.support-detail-workspace) .mobile-header{top:0}
   .thread-composer{
     min-height:104px;
     grid-template-columns:44px minmax(0,1fr) 44px;
