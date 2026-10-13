@@ -79,3 +79,19 @@ Function('require','exports','usePageAccess','useState','searchSources','Icon','
 const searched=html(React.createElement(actualSearch.SearchPanel,{query:'fixture',items:[{type:'Kunde',title:'Excluded customer',href:'/kunden/c'},{type:'Rechnung',title:'Selected invoice',href:'/rechnungen/r'},{type:'Produkt',title:'Forbidden product',href:'/produkte/p'}],loading:false,error:null,onClose:()=>{},onQuery:()=>{}}));
 assert.ok(searched.includes('Selected invoice'));assert.ok(!searched.includes('Excluded customer'));assert.ok(!searched.includes('Forbidden product'));assert.ok(!searched.includes('>Produkt</button>'));assert.ok(searched.includes('aria-pressed="true">Rechnung'));
 console.log('Actual search: selected type and module permissions filter results and scope controls together.');
+
+const operatorSource=await fs.readFile('components/operator.tsx','utf8');
+const ticketSource=declaration('operator.tsx',operatorSource,'TicketDetail');
+const ticketAst=ts.createSourceFile('ticket.tsx',ticketSource,99,true,4);let sendDeclaration;
+function findSend(node){if(ts.isVariableDeclaration(node)&&node.name.getText(ticketAst)==='send')sendDeclaration=node.getText(ticketAst);ts.forEachChild(node,findSend)}findSend(ticketAst);
+function sendHarness(){
+ let current='First draft',calls=0,resolve,reject;const messages=[];
+ const pending=new Promise((a,b)=>{resolve=a;reject=b}),exports={};
+ const setReply=value=>{current=typeof value==='function'?value(current):value};
+ Function('require','exports','reply','sending','sendPending','production','ticketId','internal','apiPost','setSending','setReply','setMessages','setToast','window',compile('const '+sendDeclaration+'; export {send};'))(require,exports,current,false,{current:false},true,'fixture',false,()=>{calls++;return pending},()=>{},setReply,fn=>messages.push(...fn(messages)),()=>{},{setTimeout(){}});
+ return {send:exports.send,resolve,reject,setDraft:value=>current=value,get draft(){return current},get calls(){return calls}};
+}
+const racedSend=sendHarness();const firstSend=racedSend.send();await racedSend.send();assert.equal(racedSend.calls,1,'Same-frame operator sends are deduplicated');racedSend.setDraft('Next draft');racedSend.resolve({item:{id:'message-one'}});await firstSend;assert.equal(racedSend.draft,'Next draft','Late send completion preserves newly typed input');
+const normalSend=sendHarness();const normalPending=normalSend.send();normalSend.resolve({item:{id:'message-two'}});await normalPending;assert.equal(normalSend.draft,'');
+const failedSend=sendHarness();const failedPending=failedSend.send();failedSend.reject(Error('Fixture unavailable'));await failedPending;assert.equal(failedSend.draft,'First draft');
+console.log('Actual operator send: same-frame lock, late-completion draft preservation, successful clear and failure retention passed.');

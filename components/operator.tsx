@@ -11,7 +11,7 @@ import ConfirmDialog from "./confirm-dialog";
 import Link from "next/link";
 import {HeaderPanel} from "./header-panel";
 import {Avatar} from "./avatar";
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useDialogFocus } from "./use-dialog-focus";
 import { PageHeading } from "./binso-ux";
@@ -280,6 +280,7 @@ function TicketDetail({ticketId}:{ticketId:string}) {
   const [reply,setReply]=useState("");
   const [internal,setInternal]=useState(false);
   const [sending,setSending]=useState(false),[updating,setUpdating]=useState(false);
+  const sendPending=useRef(false);
   const [toast,setToast,toastTone]=useOperatorToast();
   const [ticket,setTicket]=useState<Record<string,unknown>|null>(null);
   const [messages,setMessages]=useState<Array<Record<string,unknown>>>([]);
@@ -302,19 +303,19 @@ function TicketDetail({ticketId}:{ticketId:string}) {
   };
 
   const send=async()=>{
-    const value=reply.trim();
-    if(!value||sending)return;
+    const draft=reply,value=draft.trim();
+    if(!value||sending||sendPending.current)return;
     if(!production){setReply("");setToast("Antwort wurde im Ticket ergänzt.");window.setTimeout(()=>setToast(null),2200);return;}
-    setSending(true);
+    sendPending.current=true;setSending(true);
     try{
       const payload=await apiPost<{item:Record<string,unknown>}>("/api/operator/tickets/"+encodeURIComponent(ticketId)+"/messages",{body:value,internal});
       setMessages(current=>current.some(item=>item.id===payload.item.id)?current:[...current,payload.item]);
-      setReply("");
+      setReply(current=>current===draft?"":current);
       setToast(internal?"Interne Notiz gespeichert.":"Antwort gesendet.");
     }catch(error){
       setToast(error instanceof Error?error.message:"Nachricht konnte nicht gespeichert werden.","danger");
     }
-    setSending(false);
+    sendPending.current=false;setSending(false);
     window.setTimeout(()=>setToast(null),2200);
   };
 
