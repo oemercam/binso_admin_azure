@@ -1,5 +1,6 @@
 "use client";
 import {LocalizedText} from "@/lib/client/locale";
+import {contactHref} from '@/lib/contact-links';
 import {safeAppPath} from "@/lib/navigation";
 import {useApiQuery,useDataRevision} from "@/lib/client/use-api-query";
 import {useProcessDraft} from "../use-process-draft";
@@ -165,8 +166,8 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
     </DetailTabs>}
     {(!existing||employeeTab==="overview")&&<div className="form-page" inert={savingRecord}>
       {!editingRecord?<><div className="settings-profile"><Avatar name={displayName} identity={employeeId} size="large"/><span>{role}</span></div><SectionTitle title="Mitarbeiterdetails"/><dl className="detail-list">
-        <div className="detail-list-stacked"><dt><LocalizedText>{"E-Mail"}</LocalizedText></dt><dd>{email?<a href={"mailto:"+email}>{email}</a>:"Keine E-Mail hinterlegt"}</dd></div>
-        {phone&&<div><dt><LocalizedText>{"Telefon"}</LocalizedText></dt><dd><a href={"tel:"+phone}>{phone}</a></dd></div>}
+        <div className="detail-list-stacked"><dt><LocalizedText>{"E-Mail"}</LocalizedText></dt><dd>{email?<a href={contactHref("email",email)}>{email}</a>:<LocalizedText>Keine E-Mail hinterlegt</LocalizedText>}</dd></div>
+        {phone&&<div><dt><LocalizedText>{"Telefon"}</LocalizedText></dt><dd><a href={contactHref("phone",phone)}>{phone}</a></dd></div>}
         {entryDate&&<div><dt><LocalizedText>{"Eintritt"}</LocalizedText></dt><dd>{swissDate(entryDate)}</dd></div>}
         <div><dt><LocalizedText>{"Wochenstunden"}</LocalizedText></dt><dd>{formatQuantity(weeklyHours,"h/Woche")}</dd></div>
         <div><dt><LocalizedText>{"Ferientage / Jahr"}</LocalizedText></dt><dd>{formatQuantity(vacationDays,"Tage/Jahr")}</dd></div>

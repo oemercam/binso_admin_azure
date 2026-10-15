@@ -24,7 +24,9 @@ export async function changeDocumentStatus(c:PoolClient,s:SessionUser,number:str
   next=action==='accept'?'accepted':'declined';
  }else if(kind==='invoice'&&action==='cancel'&&['draft','sent','overdue'].includes(row.status)&&Number(row.paid_amount)===0)next='cancelled';
  else throw new ApiError(409,'transition_invalid','Dieser Statuswechsel ist nicht möglich.');
+ if(next==='cancelled'&&(await c.query('select id from credit_notes where organization_id=$1 and invoice_id=$2 limit 1',[s.organizationId,row.id])).rowCount)throw new ApiError(409,'credit_exists','Eine Rechnung mit Gutschriften kann nicht storniert werden.');
  await c.query(`update ${table} set status=$3,updated_at=now()${kind==='offer'&&['accept','decline'].includes(action)?',decision_at=now(),decision_by_user_id=$4,decision_note=$5':''} where organization_id=$1 and id=$2`,[s.organizationId,row.id,next,...(kind==='offer'&&['accept','decline'].includes(action)?[s.userId,note]:[])]);
+
  if(next==='cancelled'){await c.query('update time_entries set invoiced_invoice_id=null where organization_id=$1 and invoiced_invoice_id=$2',[s.organizationId,row.id]);await c.query('update expenses set invoiced_invoice_id=null where organization_id=$1 and invoiced_invoice_id=$2',[s.organizationId,row.id]);}
  await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'document.'+action,entityType:table,entityId:row.id,metadata:{previous:row.status,status:next,note}});
  return {status:next};

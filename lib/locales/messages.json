@@ -11323,5 +11323,55 @@
     "Select a data point for details.",
     "Sélectionnez un point pour afficher les détails.",
     "Seleziona un punto per i dettagli."
+  ],
+  "Gutschriften": [
+    "Credit notes",
+    "Notes de crédit",
+    "Note di credito"
+  ],
+  "Eine Rechnung mit Gutschriften kann nicht storniert werden.": [
+    "An invoice with credit notes cannot be cancelled.",
+    "Une facture avec des notes de crédit ne peut pas être annulée.",
+    "Una fattura con note di credito non può essere annullata."
+  ],
+  "Gutschrift erfassen": [
+    "Record credit note",
+    "Saisir une note de crédit",
+    "Registrare una nota di credito"
+  ],
+  "Gutschrift erfasst.": [
+    "Credit note recorded.",
+    "Note de crédit enregistrée.",
+    "Nota di credito registrata."
+  ],
+  "Gutschrift konnte nicht erfasst werden.": [
+    "The credit note could not be recorded.",
+    "La note de crédit n’a pas pu être enregistrée.",
+    "Impossibile registrare la nota di credito."
+  ],
+  "Die Gutschrift reduziert die Forderung. Eine Rückerstattung wird nicht ausgelöst.": [
+    "The credit note reduces the receivable. No refund is initiated.",
+    "La note de crédit réduit la créance. Aucun remboursement n’est déclenché.",
+    "La nota di credito riduce il credito. Non viene avviato alcun rimborso."
+  ],
+  "Bitte eine Begründung mit 3 bis 2000 Zeichen eingeben.": [
+    "Enter a reason with 3 to 2000 characters.",
+    "Veuillez saisir un motif de 3 à 2000 caractères.",
+    "Inserire una motivazione da 3 a 2000 caratteri."
+  ],
+  "Nur ausgestellte Rechnungen können gutgeschrieben werden.": [
+    "Only issued invoices can be credited.",
+    "Seules les factures émises peuvent être créditées.",
+    "Solo le fatture emesse possono essere accreditate."
+  ],
+  "Die Rechnung ist noch nicht ausgestellt.": [
+    "The invoice has not been issued yet.",
+    "La facture n’est pas encore émise.",
+    "La fattura non è ancora stata emessa."
+  ],
+  "Die Gutschrift überschreitet den verbleibenden Rechnungsbetrag.": [
+    "The credit note exceeds the remaining invoice amount.",
+    "La note de crédit dépasse le montant restant de la facture.",
+    "La nota di credito supera l’importo residuo della fattura."
   ]
 }

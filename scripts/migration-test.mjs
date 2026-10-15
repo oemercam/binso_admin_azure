@@ -864,6 +864,50 @@ try{
   assert.ok(byCustomer.length>0&&byCustomer.every(row=>row.customer_id===numbered.customer_id),'Invoice search joins the actual related customer number');
   console.log('V22 search: real 1000-record boundary, normalized invoice/customer numbers, Swiss text, punctuation safety and full-population tenant scope passed.');
  }finally{await db.exec('rollback')}
+ // Reconcile the actual list, detail status and payment write against the same
+ // credit-adjusted balance used by financial metrics, with all writes rolled back.
+ await db.exec('begin');
+ try{
+  const probe=await mutateApiBusiness(client,session,'create_document_atomic',{...documentArgs,p_number:'CREDIT-RECONCILIATION'});
+  await db.query("update invoices set status='sent',due_date=current_date-1,issue_date=current_date-2 where id=$1",[probe.id]);
+  const creditDependencies={'./document-process':dataModule(processSource),'./business-idempotency':idempotencyModule,'./rbac':processRbac,'./plan-access':dataModule('export async function requireModuleEntitlement(){}'),'./http':processHttp,'./audit':audit,'@/lib/financial-status':financialModule,'@/lib/money':moneyModule};
+  let creditSource=(await fs.readFile('lib/server/credit-notes.ts','utf8')).replace("import 'server-only';",'');
+  for(const [specifier,url] of Object.entries(creditDependencies))creditSource=creditSource.replaceAll("'"+specifier+"'",JSON.stringify(url));
+  const {createCreditNote}=await import(dataModule(creditSource));
+  const creditKey=randomUUID(),creditBody={amount:16.2,reason:'Fixture adjustment'};
+  await assert.rejects(()=>createCreditNote(client,{...session,role:'employee'},probe.number,creditBody,randomUUID()));
+  await assert.rejects(()=>createCreditNote(client,{...session,organizationStatus:'read_only'},probe.number,creditBody,randomUUID()));
+  await assert.rejects(()=>createCreditNote(client,{...session,organizationId:sandbox},probe.number,creditBody,randomUUID()),e=>e.code==='not_found');
+  await assert.rejects(()=>createCreditNote(client,session,probe.number,{amount:0.001,reason:'Invalid amount'},randomUUID()),e=>e.code==='amount_invalid');
+  await assert.rejects(()=>createCreditNote(client,session,probe.number,{amount:1,reason:'x'},randomUUID()),e=>e.code==='reason_required');
+  await assert.rejects(()=>createCreditNote(client,session,probe.number,creditBody,''),e=>e.code==='idempotency_required');
+  const credit=await createCreditNote(client,session,probe.number,creditBody,creditKey);
+  assert.match(credit.credit_no,/^GS-[0-9]{4}-[0-9]{6}$/);
+  assert.deepEqual(await createCreditNote(client,session,probe.number,creditBody,creditKey),credit,'Credit retry cannot create another credit');
+  await assert.rejects(()=>createCreditNote(client,session,probe.number,{...creditBody,amount:20},creditKey),e=>e.code==='idempotency_conflict');
+  await assert.rejects(()=>createCreditNote(client,session,probe.number,{...creditBody,amount:201},randomUUID()),e=>e.code==='credit_exceeds_invoice');
+  assert.equal((await db.query("select count(*)::int n from audit_events where organization_id=$1 and entity_id=$2 and action='invoice.credit.created'",[demo,credit.id])).rows[0].n,1);
+
+  await db.query("insert into credit_notes(organization_id,credit_no,invoice_id,customer_id,credit_date,amount,reason,external_id) values($1,'GS-FUTURE-RECONCILIATION',$2,$3,current_date+1,50,'Future credit is not current balance','future-credit-reconciliation')",[demo,probe.id,documentArgs.p_customer_id]);
+  const {openAmount,financialStatus}=await import(financialModule);
+  const before=(await listApiBusiness(client,session,'documents','id=eq.'+probe.id))[0];
+  assert.equal(Number(before.credit_amount),16.2);assert.equal(openAmount(before),200);assert.equal(financialStatus(before),'overdue');
+  const paymentArgs={p_invoice_id:probe.id,p_customer_id:documentArgs.p_customer_id,p_paid_on:new Date().toISOString().slice(0,10),p_amount:200.01,p_method:'bank',p_note:'Credit balance probe',p_idempotency_key:randomUUID()};
+  await assert.rejects(()=>mutateApiBusiness(client,session,'create_payment_idempotent',paymentArgs),e=>e.code==='payment_exceeds_balance');
+  paymentArgs.p_amount=200;
+  const payment=await mutateApiBusiness(client,session,'create_payment_idempotent',paymentArgs);
+  assert.deepEqual(JSON.parse(JSON.stringify(await mutateApiBusiness(client,session,'create_payment_idempotent',paymentArgs))),JSON.parse(JSON.stringify(payment)),'Lost payment response replays after credit-adjusted settlement');
+  const after=(await listApiBusiness(client,session,'documents','id=eq.'+probe.id))[0];
+  assert.equal(openAmount(after),0);assert.equal(after.display_status,'paid');assert.equal(financialStatus(after),'paid');
+  assert.equal((await listApiBusiness(client,session,'documents','id=eq.'+probe.id+'&display_status=eq.overdue')).length,0);
+  // Unpaid, credited invoices cannot be cancelled or release billed time.
+  const cancelProbe=await mutateApiBusiness(client,session,'create_document_atomic',{...documentArgs,p_number:'CREDIT-CANCEL-PROBE'});
+  await db.query("update invoices set status='sent' where id=$1",[cancelProbe.id]);
+  await db.query("insert into credit_notes(organization_id,credit_no,invoice_id,customer_id,credit_date,amount,reason,external_id) values($1,'GS-CANCEL-PROBE',$2,$3,current_date,10,'Fixture','cancel-credit-reconciliation')",[demo,cancelProbe.id,documentArgs.p_customer_id]);
+  await assert.rejects(()=>changeDocumentStatus(client,session,cancelProbe.number,'cancel',''),e=>e.code==='credit_exists');
+  assert.equal((await db.query('select status from invoices where id=$1',[cancelProbe.id])).rows[0].status,'sent');
+  console.log('Credit-adjusted list/detail/payment parity, future-credit exclusion, exact balance limit, payment replay and cancellation integrity passed.');
+ }finally{await db.exec('rollback')}
  delete globalThis.__processSession;delete globalThis.__processTransaction;delete globalThis.__processPlatform;
  console.log('PostgreSQL migrations, deterministic fixtures and tenant/platform RLS passed.');
 }finally{await db.close()}

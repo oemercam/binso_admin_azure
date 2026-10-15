@@ -47,3 +47,7 @@ Der begrenzte zentrale Fix für Erstellen-Aktionen ist separat in `create-placem
 ## Fortgesetzte Phasen
 
 Die Zusammenführung und Security-Korrektur stehen in `security-data-phase.md`; zentrale Statistiken und Demo-Daten in `charts-demo-phase.md`. Der verbindliche Gesamtstatus steht in `release-readiness.md`. Historische Zahlen oben sind die Erstaufnahme, keine aktuelle Vollständigkeitsbehauptung.
+
+## Aktueller konsolidierter Stand
+
+Massgeblicher Nachtrag: [consolidation-status.md](consolidation-status.md). Dieser enthält den aktuellen PR-/Main-Abgleich, alle 16 Auftragsabschnitte, verbleibende Implementierung und den neuen manuellen Deploy-/Full-QA-Ablauf. Frühere Aussagen zum automatischen Main-Deploy beschreiben die historische Baseline. Gesamtauftrag und Produktionsfreigabe bleiben offen.

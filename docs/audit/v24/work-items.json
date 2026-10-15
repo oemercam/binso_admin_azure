@@ -48,11 +48,16 @@
     "parent": "V24-00-01",
     "phase": 0,
     "requirement": "Produktivdeploy nur nach Freigabe.",
-    "status": "open",
-    "sourceEvidence": [],
-    "implementationEvidence": [],
+    "status": "partial; acceptance open",
+    "sourceEvidence": [
+      "docs/audit/v24/consolidation-status.md"
+    ],
+    "implementationEvidence": [
+      ".github/workflows/deploy-azure.yml",
+      "scripts/release-check.mjs"
+    ],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "Final CI/browser/operational acceptance remains open; no blanket completion."
   },
   {
     "id": "V24-00-01-06",
@@ -688,13 +693,17 @@
     "parent": "V24-08-01",
     "phase": 8,
     "requirement": "CHF, MWST, Brutto/Netto, Stichtag, Status, Rundung, Storno, Gutschrift, Teilzahlung, Tenant, Rechte.",
-    "status": "partial",
-    "sourceEvidence": [],
+    "status": "partial; acceptance open",
+    "sourceEvidence": [
+      "docs/audit/v24/consolidation-status.md"
+    ],
     "implementationEvidence": [
-      "docs/audit/v24/charts-demo-phase.md"
+      "lib/financial-status.ts",
+      "lib/server/repositories/business-api.ts",
+      "scripts/migration-test.mjs"
     ],
     "testEvidence": [],
-    "acceptance": "open; final CI/browser/physical and complete domain coverage required"
+    "acceptance": "Final CI/browser/operational acceptance remains open; no blanket completion."
   },
   {
     "id": "V24-08-01-10",
@@ -831,11 +840,17 @@
     "parent": "V24-10-01",
     "phase": 10,
     "requirement": "Kunde/Kontakt → Dublettenprüfung → Angebot Entwurf/Versand/Annahme/Ablehnung/Ablauf/Revision → Auftrag/Projekt → Leistungen/Zeiten/Ausgaben/Belege → abrechenbare Positionen → Rechnung Nummer/MWST/Schweizer QR/Versand → Teil-/Vollzahlung/Überzahlung/Korrektur → Fälligkeit/Mahnstufen/Mahnversand/Historie → Abschluss/Archiv/Reporting.",
-    "status": "open",
-    "sourceEvidence": [],
-    "implementationEvidence": [],
+    "status": "partial; acceptance open",
+    "sourceEvidence": [
+      "docs/audit/v24/consolidation-status.md"
+    ],
+    "implementationEvidence": [
+      "lib/server/credit-notes.ts",
+      "components/documents.tsx",
+      "scripts/migration-test.mjs"
+    ],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "Final CI/browser/operational acceptance remains open; no blanket completion."
   },
   {
     "id": "V24-10-01-02",
@@ -853,22 +868,33 @@
     "parent": "V24-10-01",
     "phase": 10,
     "requirement": "Statusmaschinen, Berechtigungen, Transaktionen, Idempotenz, Audit, Dokumente, Benachrichtigungen, Offline-/Session-/Parallelbearbeitung testen.",
-    "status": "open",
-    "sourceEvidence": [],
-    "implementationEvidence": [],
+    "status": "partial; acceptance open",
+    "sourceEvidence": [
+      "docs/audit/v24/consolidation-status.md"
+    ],
+    "implementationEvidence": [
+      "lib/server/credit-notes.ts",
+      "scripts/migration-test.mjs"
+    ],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "Final CI/browser/operational acceptance remains open; no blanket completion."
   },
   {
     "id": "V24-10-01-04",
     "parent": "V24-10-01",
     "phase": 10,
     "requirement": "Keine doppelte Rechnung, keine bezahlte Rechnung als überfällig, keine Mahnung ohne Voraussetzungen.",
-    "status": "open",
-    "sourceEvidence": [],
-    "implementationEvidence": [],
+    "status": "partial; acceptance open",
+    "sourceEvidence": [
+      "docs/audit/v24/consolidation-status.md"
+    ],
+    "implementationEvidence": [
+      "lib/server/document-process.ts",
+      "lib/server/repositories/business-api.ts",
+      "scripts/migration-test.mjs"
+    ],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "Final CI/browser/operational acceptance remains open; no blanket completion."
   },
   {
     "id": "V24-10-01-05",
@@ -1040,11 +1066,16 @@
     "parent": "V24-14-01",
     "phase": 14,
     "requirement": "Fast QA, Standard PR QA, Release QA.",
-    "status": "open",
-    "sourceEvidence": [],
-    "implementationEvidence": [],
+    "status": "partial; acceptance open",
+    "sourceEvidence": [
+      "docs/audit/v24/consolidation-status.md"
+    ],
+    "implementationEvidence": [
+      "scripts/qa.mjs",
+      ".github/workflows/quality.yml"
+    ],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "Final CI/browser/operational acceptance remains open; no blanket completion."
   },
   {
     "id": "V24-14-01-02",
@@ -1150,11 +1181,16 @@
     "parent": "V24-15-01",
     "phase": 15,
     "requirement": "Keine Produktionsfreigabe ohne ausdrückliche Zustimmung.",
-    "status": "open",
-    "sourceEvidence": [],
-    "implementationEvidence": [],
+    "status": "partial; acceptance open",
+    "sourceEvidence": [
+      "docs/audit/v24/consolidation-status.md"
+    ],
+    "implementationEvidence": [
+      ".github/workflows/deploy-azure.yml",
+      "scripts/release-check.mjs"
+    ],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "Final CI/browser/operational acceptance remains open; no blanket completion."
   },
   {
     "id": "V24-15-02-01",

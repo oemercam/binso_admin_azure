@@ -17,3 +17,25 @@ Lokale Katalog-/SSR-, CSS-, Sitzungs-, Auth-Race-, RLS-, Idempotenz- und Wartung
 ## Noch offene Konzeptfunktionen
 
 Ein eigener Projektarbeitsbereich mit Liste, Details, Versionsschutz und Statuspflege sowie rollen- und paketabhängige Berichte mit CSV-Export sind implementiert. Laufende oder pausierte Projektzeit verhindert den Abschluss; geschlossene Projekte erlauben keine neue Zeiterfassung. Datenbank-, Mandanten-, Rollen- und Exporttests bestehen; die Browserabnahme steht noch aus. Lohnabrechnung, vollständige MWST-Abrechnung und umfassende Infrastrukturverwaltung sind weiterhin nicht implementiert. Diese Bereiche dürfen nicht als vollständig abgenommen ausgewiesen werden. Schweizer Lohn-/Steuerberechnung benötigt zusätzlich definierte Berechnungsgrundlagen und fachliche Abnahmetests. Es werden keine leeren Navigationsziele als fertige Funktionen ergänzt.
+
+## Security-Review-Nachtrag
+
+Kontakt-URIs für Mitarbeitende und Kunden werden zentral mit festem mailto-/tel-Protokoll und kontextgerechter URI-Kodierung erzeugt. Kontrollzeichen und Wählkommandos werden abgewiesen; Anzeigenamen und Kontaktdaten werden weiterhin als React-Text ausgegeben. Regressionen prüfen Adress-Trennzeichen, feste Protokolle und ungültige Telefonnummern. Der Sprach-Browsertest erstellt seinen Standard-Ausgabeordner mit mkdtemp und schreibt die Ergebnisdatei exklusiv mit restriktiven Dateirechten. Die offenen CodeQL-Review-Threads müssen nach erneutem Scan geprüft werden.
+
+## Arbeitsstand und gebündelte QA – 15.10.2026
+
+Repository-Abgleich: main `7bd6722c` enthält die oben dokumentierten Änderungen.
+Die offenen Browser-/Live-Abnahmen und noch fehlenden Konzeptfunktionen bleiben offen;
+dieser Abgleich ist keine neue V24-Gesamtabnahme.
+
+Ursache wiederholter Browserstarts: `qa:fast` und `qa:integration` starteten Browser
+implizit; der CI-Plan stuft Skript-/Workflowänderungen konservativ als volle Abdeckung ein.
+Lokale schnelle/integrative Prüfungen starten Browser jetzt nur mit `--browser`.
+Zusammenhängende Arbeit bleibt im Draft-PR; dessen Browserjobs werden bis
+`ready_for_review` aufgeschoben. Statische, Sicherheits-, Datenbank- und Buildprüfungen
+laufen weiterhin. Abnahmebereite PRs, main, Nacht- und Release-Läufe behalten ihre
+bisherige Browserabdeckung. Aufgeschobene Messungen gelten nicht als bestanden.
+
+Nachweise dieser Änderung: QA-Plan-Regression einschliesslich explizitem Browser-Opt-in,
+Node-Syntaxprüfung und YAML-Strukturprüfung. Kein Browserlauf für diese reine
+Prüfsteuerungsänderung; kein produktiver Deploy.

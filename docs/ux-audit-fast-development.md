@@ -25,7 +25,7 @@ Kein `!important`, keine neue CSS-Datei und kein zweites Designsystem. AppShell 
 pnpm qa:fast                         # lokale, noch nicht commitete Änderungen
 pnpm qa:fast --base origin/main      # gesamter Branch einschließlich lokaler Änderungen
 pnpm qa:fast --files app/produkte/page.tsx
-pnpm qa:fast --url http://localhost:3000 --base origin/main
+pnpm qa:fast --browser --url http://localhost:3000 --base origin/main
 pnpm qa:plan --base origin/main      # nachvollziehbare Auswahl ohne Testausführung
 pnpm qa:standard --base origin/main
 pnpm qa:full --base origin/main
@@ -52,7 +52,7 @@ Lokales Browsertooling kann isoliert installiert werden (`playwright@1.62.1`, `a
 - Nur `.next/cache` wird wiederverwendet, niemals ein veralteter fertiger Build.
 - Je Browserjob wird nur der erforderliche Browser installiert; Chromium nutzt nur die Headless Shell. Ein grosser Browserbinary-Cache wird nicht ohne messbaren Nutzen eingeführt (Playwright empfiehlt ihn generell nicht).
 - Pflichtjob `quality` bleibt namentlich erhalten. `always()` prüft explizit Erfolg aller erforderlichen Jobs; Fehler, Abbruch und unerwartetes Überspringen blockieren. Ein nur dokumentierter Diff darf Browser gezielt überspringen, die übrigen Pflichtchecks bleiben erhalten.
-- Veraltete Läufe desselben PRs werden abgebrochen. FULL läuft sonntags, bei veröffentlichten Releases und manuell; diese Kontrollläufe deployen nicht automatisch. Azure startet nur nach erfolgreichem Quality-Push auf main.
+- Veraltete Läufe desselben PRs werden abgebrochen. FULL läuft sonntags, bei veröffentlichten Releases und manuell; diese Kontrollläufe deployen nicht automatisch. Azure startet ausschliesslich manuell mit ausdrücklicher Freigabe und vollständigem aktuellem Main-SHA. Vorher ist ein erfolgreicher manueller Quality-Lauf mit `level=full` für denselben SHA erforderlich; dessen identische Artefakte werden übernommen.
 - Build-/Browserjobs haben begrenzte Laufzeiten; Logs nennen ausgewählte Routen und Interaktionen. Ergebnisse/Screenshots/Accessibility-JSON werden als Artefakte gespeichert.
 
 Quellen: [Next CI-Caching](https://nextjs.org/docs/app/guides/ci-build-caching), [Playwright CI](https://playwright.dev/docs/ci), [GitHub Workflow-Abhängigkeiten](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax).
@@ -76,3 +76,20 @@ STANDARD lokal: 306,23 s, davon 35,37 s Build, 103,66 s Chromium (126 Fälle) un
 Abschliessend: 28 gezielte Browser-/Theme-/Viewport-Fälle mit Accessibility-Prüfung und Kontaktformular bei 375×400 bestanden; PWA-/Offline-/Theme-Test bestanden. Zwei vergleichbare Bottom-Navigation-Bildausschnitte sind pixelidentisch. Die visuelle Prüfung fand zusätzlich einen widersprüchlichen <390-px-Schnellzugriff-Breakpoint und fehlenden Textumbruch in kompakten Listen; beide Ursachen wurden korrigiert.
 
 FAST über globale Styles fand zusätzlich eine PDF.js-/Webpack-Eval-Namenskollision im Entwicklungsmodus. Der Renderer lädt dieselbe lokale, selbstständige ESM-Datei nun als Same-Origin-Asset. Gezielter Dev-Browserlauf: Rechnungsvorschau mit allen Seiten, Zoom und Dokumentaktionen bestanden. Kein CSP-Abschwächen und kein Produktionsbuild für FAST erforderlich.
+
+## Verbindlicher Ablauf ab V24
+
+Zusammenhängende Folgeprompts bleiben ein Arbeitspaket im selben Draft-PR.
+`qa:fast` und `qa:integration` führen standardmässig keine Browser aus;
+`--browser` fordert einen gezielten Lauf ausdrücklich an. Standard/full behalten
+Browserprüfungen. Draft-PRs führen weiterhin statische, DB-, Sicherheits- und
+Build-Gates aus; Browserjobs starten bei `ready_for_review` und danach bei
+relevanten PR-Aktualisierungen. Nacht- und Release-Prüfungen bleiben vollständig.
+
+Nach Abschluss des Pakets: PR auf Ready, Pflicht-Gates einschliesslich Browser
+bestehen lassen. Nach Integration ist der tatsächliche Main-SHA nochmals mit
+Quality / `level=full` zu prüfen. Erst danach und nach ausdrücklicher Freigabe
+Deploy Azure / `commit_sha` / `approve_production=true` starten. Weder ein Prompt,
+ein Merge noch eine grüne Quality löst von sich aus Produktion aus. Ein ausgelassener
+Browserlauf ist aufgeschoben, niemals bestanden. Physische PWA- und operative
+Abnahmen bleiben eigene Nachweise.

@@ -26,3 +26,7 @@ Kritische vollständige Release-Gates und fachliche Restpunkte bleiben blockiere
 Bestanden: vollständiger Lint, TypeScript, CSS-Architektur, Build, Repository-/Dokumentations-/Release-Selbstprüfung und produktiver Dependency-Advisory-Scan. Protokolle liegen unter qa/v24-*.txt. Node 24.19.0, pnpm 10.17.1 auch für Unterprozesse über einen lokalen Corepack-Shim. Keine Dependency oder Lockfile geändert.
 
 Der frühere GitHub-Stand 73cdcb85 bestand checks, echten PostgreSQL-Paralleltest, Build/HTTP-Gates, Scanner-Engine und CodeQL. Seine beiden Browserjobs scheiterten an überholten Dock-/Formular-Testannahmen; diese sind inzwischen geändert. Das ist keine Browser-Abnahme des neuen Quell-Fingerprints. Der neue CI-Lauf bleibt blockierend.
+
+## Aktueller konsolidierter Stand
+
+Massgeblicher Nachtrag: [consolidation-status.md](consolidation-status.md). Dieser enthält den aktuellen PR-/Main-Abgleich, alle 16 Auftragsabschnitte, verbleibende Implementierung und den neuen manuellen Deploy-/Full-QA-Ablauf. Frühere Aussagen zum automatischen Main-Deploy beschreiben die historische Baseline. Gesamtauftrag und Produktionsfreigabe bleiben offen.

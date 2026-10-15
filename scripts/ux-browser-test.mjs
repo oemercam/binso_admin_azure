@@ -116,6 +116,7 @@ async function actionEvidence(page,name,theme){
 const navigationCaptures=[];
 async function captureNavigation(page,theme,width,withCreate){navigationCaptures.push({theme,width,withCreate,navigation:await page.locator(".bottom-nav").evaluate(el=>{const r=el.getBoundingClientRect(),c=getComputedStyle(el);return {x:r.x,width:r.width,height:r.height,bottomOffset:innerHeight-r.bottom,position:c.position,borderRadius:c.borderRadius,links:[...el.querySelectorAll("a")].map(a=>a.getAttribute("href"))}})});}
 const results=[];const errors=[];const accessibilityFailures=[];let failMutation=false,posts=0,failLedger=false,failSend=false,messagePosts=0,uploads=0,employeeLedgerFixture=false,groupingFixture=false,releaseReceiptScan;
+let creditPosts=0,failCredit=false;const creditKeys=[];
 let policyPosts=0,policyRequired=true,policyRole=process.env.BINSO_UX_FIXTURE_CASE==='employee'?'member':['owner','admin','finance'].includes(process.env.BINSO_UX_FIXTURE_CASE)?process.env.BINSO_UX_FIXTURE_CASE:"owner",policyReadOnly=false,failPolicy=false,teamPosts=0,failTeam=false;
 let failPreferences=false,preferencePosts=0;
 let notificationWrites=0,failNotificationWrite=false,securityUnavailable=false,sessionDeletes=0;
@@ -148,6 +149,13 @@ try{
     if(req.method()==='PATCH'&&p==='/api/projects/project-one'){const body=JSON.parse(req.postData());if(body.version!==projectFixture.version)return route.fulfill({status:409,json:{message:'Project changed'}});Object.assign(projectFixture,{name:body.name,status:body.status,notes:body.notes,hours_budget:body.hoursBudget,version:projectFixture.version+1});return route.fulfill({json:{item:projectFixture}});}
     if(p==='/api/payments'&&dataPaymentMode){dataPaymentPosts++;if(incompletePaymentResponse)return route.fulfill({status:201,json:{}});if(dataPaymentFailed)return route.fulfill({status:503,json:{error:'unavailable',message:'Synthetic payment failed'}});const key=req.headers()['idempotency-key'];assert.ok(key,'Financial requests carry a replay key');if(paymentReplays.has(key))return route.fulfill({status:200,json:{item:paymentReplays.get(key)}});const body=JSON.parse(req.postData());invoice.paid_amount+=body.amount;const row={...payment,id:'foundation-payment',amount:body.amount,paid_on:'2026-10-09'};collections.payments.unshift(row);paymentReplays.set(key,row);summary.invoices[0].open_amount=invoice.total-invoice.paid_amount;if(losePaymentResponse){losePaymentResponse=false;return route.abort('failed');}return route.fulfill({status:201,json:{item:row}});}
 
+    if(p==='/api/documents/RE-TEST-1/credits'){
+     creditPosts++;const key=req.headers()['idempotency-key'];assert.ok(key,'Credit booking carries an immutable replay key');creditKeys.push(key);
+     if(failCredit)return route.fulfill({status:503,json:{message:'Synthetic credit unavailable'}});
+     const body=JSON.parse(req.postData());invoice.credit_amount=Number(invoice.credit_amount??0)+body.amount;
+     const credit={number:'GS-2026-000001',date:'2026-10-15',amount:body.amount,reason:body.reason};invoice.credits=[credit];
+     return route.fulfill({status:201,json:{item:credit}});
+    }
     if(p==='/api/documents/preview')return route.fulfill({body:fixturePdf,contentType:'application/pdf'});
     if(p==='/api/demo/session')return route.fulfill({json:{ok:true,databaseBacked:true,expiresIn:86400}});
     if(p==='/api/expenses'){posts++;await new Promise(resolve=>setTimeout(resolve,150));return route.fulfill({status:failMutation?503:200,json:failMutation?{message:'Fixture offline'}:{item:{...expense,id:'new-expense'}}});}
@@ -589,6 +597,23 @@ try{
   }
   if(hasInteraction('documents')){
    invoice.status='draft';await navigate(base+'/rechnungen/RE-TEST-1');await page.waitForLoadState('networkidle');assert.equal(await page.getByText('Zahlungsstand',{exact:true}).count(),0,'Draft does not demand payment');await capture(page,{animations:'disabled',path:path.join(output,`${theme}-430-draft-invoice.png`)});invoice.status='sent';
+   const creditBefore={amount:invoice.credit_amount,credits:invoice.credits};creditPosts=0;creditKeys.length=0;
+   await navigate(base+'/rechnungen/RE-TEST-1');await page.waitForLoadState('networkidle');
+   await page.getByRole('button',{name:'Weitere Aktionen',exact:true}).filter({visible:true}).click();
+   await page.getByRole('dialog',{name:'Weitere Aktionen'}).getByRole('button',{name:'Gutschrift erfassen',exact:true}).click();
+   const creditDialog=page.getByRole('dialog',{name:'Gutschrift erfassen'});await creditDialog.waitFor();
+   await creditDialog.getByLabel('Betrag',{exact:true}).fill('20');await creditDialog.getByLabel('Interne Begründung',{exact:true}).fill('Synthetic price correction');
+   failCredit=true;await creditDialog.getByRole('button',{name:'Gutschrift erfassen',exact:true}).click();
+   await creditDialog.getByText('Synthetic credit unavailable',{exact:true}).waitFor();
+   assert.equal(await creditDialog.getByLabel('Betrag',{exact:true}).inputValue(),'20','A failed credit retains the entered amount');
+   assert.equal(await page.getByText('Gutschrift erfasst.',{exact:true}).count(),0,'Failure cannot show a successful booking');
+   failCredit=false;await creditDialog.getByRole('button',{name:'Gutschrift erfassen',exact:true}).click();
+   await creditDialog.waitFor({state:'hidden'});await page.getByText('GS-2026-000001',{exact:true}).waitFor();
+   assert.equal(creditPosts,2);assert.equal(creditKeys[0],creditKeys[1],'Retry reuses the same credit key');
+   await capture(page,{animations:'disabled',path:path.join(output,`${theme}-430-credit-note.png`)});
+   if(creditBefore.amount===undefined)delete invoice.credit_amount;else invoice.credit_amount=creditBefore.amount;
+   if(creditBefore.credits===undefined)delete invoice.credits;else invoice.credits=creditBefore.credits;
+
   }
   if(hasInteraction('employees')){
   employeeLedgerFixture=true;

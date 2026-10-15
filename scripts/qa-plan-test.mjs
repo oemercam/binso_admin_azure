@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {planChanges,fullRoutes} from './qa-plan.mjs';
+import {planChanges,fullRoutes,shouldRunBrowser} from './qa-plan.mjs';
 assert.deepEqual(planChanges(['components/product-form.tsx'],{level:'fast'}).routes,['/produkte','/produkte/product-one','/produkte/neu']);
 assert.equal(planChanges(['components/product-form.tsx']).level,'standard');
 for(const path of ['app/styles/app.css','components/ui.tsx','components/records.tsx','components/app-chrome.tsx','components/binso-ux.tsx','components/use-dialog-focus.ts']){const p=planChanges([path]);assert(p.global);for(const r of ['/dashboard','/kunden/neu','/rechnungen/RE-TEST-1','/support/ticket-one','/operator'])assert(p.routes.includes(r),path+': '+r);}
@@ -28,3 +28,12 @@ for(const path of ['lib/server/file-scan.ts','app/api/files/route.ts','app/api/s
  const suites=planChanges([path],{level:'fast'}).suites;
  assert.ok(suites.includes('file-scan-test')&&suites.includes('auth-integrity-test'),'FAST retains scan protocol and database publication checks for '+path);
 }
+
+// Prompt-sized local checks must not launch browser processes implicitly.
+for(const level of ['fast','integration']){
+ assert.equal(shouldRunBrowser(level),false);
+ assert.equal(shouldRunBrowser(level,['--browser']),true);
+}
+for(const level of ['standard','full']) assert.equal(shouldRunBrowser(level),true);
+for(const level of ['fast','integration','standard','full'])
+ assert.equal(shouldRunBrowser(level,['--browser','--no-browser']),false);

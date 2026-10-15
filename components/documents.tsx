@@ -42,6 +42,8 @@ type DocumentDraft = {
   customerId?: string;
   status?: string;
   paidAmount?: number;
+  creditAmount?:number;
+  credits?:Array<{number:string;date:string;amount:number;reason:string}>;
   paidOn?:string;
   sourceOffer?:string;
   invoiceNumber?:string;
@@ -166,6 +168,8 @@ function remoteDraftFromItem(item:Record<string,unknown>,kind:DocumentKind):Docu
     currency:String(item.currency??"CHF"),
     status:kind==="Angebot"?financialStatus({...item,kind:"offer"}):String(item.status??"draft"),
     paidAmount:Number(item.paid_amount??0),
+    creditAmount:Number(item.credit_amount??0),
+    credits:Array.isArray(item.credits)?item.credits:[],
     paidOn:String(item.paid_on??""),
     sourceOffer:String(item.source_offer??""),
     invoiceNumber:String(item.invoice_number??""),
@@ -233,6 +237,8 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const [documentReadOnly,setDocumentReadOnly]=useState(true);
   const [sendOpen,setSendOpen]=useState(false),[recipient,setRecipient]=useState("");
   const [actionBusy,setActionBusy]=useState(false),[actionError,setActionError]=useState<string|null>(null);
+  const [creditOpen,setCreditOpen]=useState(false),[creditAmount,setCreditAmount]=useState(""),[creditReason,setCreditReason]=useState("");
+  const creditKey=useRef("");
   const [sendKey,setSendKey]=useState("");
   useEffect(()=>{apiGet<{demo?:boolean;tenant?:{role?:string;readOnly?:boolean}}>("/api/auth/session").then(s=>{setDocumentRole(s.tenant?.role??"");setDocumentReadOnly(s.tenant?.readOnly===true);setDemoDocument(s.demo===true)}).catch(()=>{});},[]);
   const [toast,setToast]=useState<string|null>(null);
@@ -264,7 +270,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
     if(existing||!sourceOffer||!sourceItem||sourceError||initializedOffer.current===sourceOffer)return;
     initializedOffer.current=sourceOffer;
     const source=remoteDraftFromItem(sourceItem,"Angebot");
-    queueMicrotask(()=>setDraft(current=>({...source,id:undefined,status:"draft",paidAmount:0,paidOn:undefined,number:current.number,date:current.date,due:"30"})));
+    queueMicrotask(()=>setDraft(current=>({...source,id:undefined,status:"draft",paidAmount:0,creditAmount:0,credits:[],paidOn:undefined,number:current.number,date:current.date,due:"30"})));
   },[existing,sourceOffer,sourceItem,sourceError,setDraft]);
 
   const sourceExpenseParam=kind==='Rechnung'?(searchParams.get('expenses')??''):'';
@@ -336,8 +342,9 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const canWrite=!documentReadOnly&&tenantCan(documentRole,kind==="Rechnung"?"invoices:write":"sales:write");
   const canEdit=canWrite&&(!existing||draft.status==="draft");
   const processAction=async(action:string)=>{if(documentActionPending.current||documentSavePending.current)return;documentActionPending.current=true;setActionBusy(true);setActionError(null);try{await apiPost("/api/documents/"+encodeURIComponent(documentKey??draft.number)+"/status",{action});const payload=await apiGet<{item:Record<string,unknown>}>("/api/documents/"+encodeURIComponent(documentKey??draft.number));setDraft(remoteDraftFromItem(payload.item,kind));setMoreOpen(false);show("Status aktualisiert.")}catch(e){setActionError(e instanceof Error?e.message:"Status konnte nicht geändert werden.")}finally{documentActionPending.current=false;setActionBusy(false)}};
+  const bookCredit=async()=>{if(documentActionPending.current||documentSavePending.current)return;documentActionPending.current=true;setActionBusy(true);setActionError(null);try{await apiPost("/api/documents/"+encodeURIComponent(documentKey??draft.number)+"/credits",{amount:Number(creditAmount),reason:creditReason},{idempotencyKey:creditKey.current});const payload=await apiGet<{item:Record<string,unknown>}>("/api/documents/"+encodeURIComponent(documentKey??draft.number));setDraft(remoteDraftFromItem(payload.item,kind));setCreditOpen(false);show("Gutschrift erfasst.")}catch(e){setActionError(e instanceof Error?e.message:"Gutschrift konnte nicht erfasst werden.")}finally{documentActionPending.current=false;setActionBusy(false)}};
   const sendDocument=async()=>{if(documentActionPending.current||documentSavePending.current)return;documentActionPending.current=true;setActionBusy(true);setActionError(null);try{await apiPost("/api/documents/"+encodeURIComponent(documentKey??draft.number)+"/send",{recipient,requestKey:sendKey});const payload=await apiGet<{item:Record<string,unknown>}>("/api/documents/"+encodeURIComponent(documentKey??draft.number));setDraft(remoteDraftFromItem(payload.item,kind));setSendOpen(false);show("Dokument als PDF versendet.")}catch(e){setActionError(e instanceof Error?e.message:"Versand konnte nicht bestätigt werden.")}finally{documentActionPending.current=false;setActionBusy(false)}};
-  const canRecordPayment=tenantCan(documentRole,"payments:write")&&kind==="Rechnung"&&!["draft","paid","cancelled"].includes(draft.status??"draft")&&Number(draft.total??0)>Number(draft.paidAmount??0);
+  const canRecordPayment=tenantCan(documentRole,"payments:write")&&kind==="Rechnung"&&!["draft","paid","cancelled"].includes(draft.status??"draft")&&openAmount({total:draft.total,paid_amount:draft.paidAmount,credit_amount:draft.creditAmount})>0;
   const presentation=documentPresentation(kind,draft,useDocumentTotals(draft).total);
   const title=existing?`${kind} ${draft.number||documentKey||""}`:`${kind} erstellen`;
   const headerActions=existing&&!editing
@@ -346,7 +353,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const desktopActions=headerActions;
 
   return <AppShell title={title} status={existing&&!editing&&!documentLoad.loading&&!documentLoad.error?presentation.statusLabel:undefined} statusTone={presentation.statusTone} subtitle={existing&&!editing?undefined:production?"Wird sicher gespeichert":"Schreibgeschützte Vorschau"} active={plural} backHref={returnTo} backLabel={returnTo==="/dashboard"?"Übersicht":kind==="Angebot"?"Angebote":"Rechnungen"} actions={desktopActions} mobileActions={existing&&!editing?headerActions:undefined} preview={preview} editing={editing} unsavedChanges={dirty}>
-    {actionError&&!moreOpen&&!sendOpen&&<ErrorState><LocalizedText>{actionError}</LocalizedText></ErrorState>}
+    {actionError&&!moreOpen&&!sendOpen&&!creditOpen&&<ErrorState><LocalizedText>{actionError}</LocalizedText></ErrorState>}
     {editing&&companyPending&&<LoadingState><LocalizedText>{"Firmendaten werden geladen …"}</LocalizedText></LoadingState>}
     {editing&&paymentIssue&&<div className="document-source-note" role="status"><span>{paymentIssue}</span><Link href="/einstellungen/dokumente"><LocalizedText>{"Einstellungen"}</LocalizedText></Link></div>}
     {sourceOffer&&!existing&&<div className="document-source-note"><span><LocalizedText>{"Erstellt aus Angebot"}</LocalizedText></span><b>{sourceOffer}</b></div>}
@@ -376,17 +383,19 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
       {canWrite&&!['draft','cancelled','declined','expired'].includes(draft.status??'')&&<ActionRow disabled={demoDocument||actionBusy} onClick={()=>{setSendKey(crypto.randomUUID());setActionError(null);setMoreOpen(false);setSendOpen(true)}} icon="mail" title={demoDocument?'Versand in der Demo deaktiviert':'Als PDF senden'} navigation/>}
       {canWrite&&draft.status==='draft'&&<ActionRow disabled={actionBusy} onClick={()=>void processAction('issue')} icon="check" title={kind==='Rechnung'?'Rechnung stellen':'Als versendet erfassen'}/>}
       {canWrite&&kind==='Angebot'&&draft.status==='sent'&&<><ActionRow disabled={actionBusy} onClick={()=>void processAction('accept')} icon="check" title="Kundenannahme erfassen"/><ActionRow disabled={actionBusy} onClick={()=>void processAction('decline')} icon="close" title="Kundenablehnung erfassen" danger/></>}
-      {canWrite&&kind==='Rechnung'&&Number(draft.paidAmount??0)===0&&['draft','sent','overdue'].includes(draft.status??'')&&<ActionRow disabled={actionBusy} onClick={()=>void processAction('cancel')} icon="close" title="Rechnung stornieren" danger/>}
+      {canWrite&&kind==='Rechnung'&&!['draft','cancelled'].includes(draft.status??'draft')&&Number(draft.total??0)>Number(draft.creditAmount??0)&&<ActionRow disabled={actionBusy} onClick={()=>{creditKey.current=crypto.randomUUID();setCreditAmount("");setCreditReason("");setActionError(null);setMoreOpen(false);setCreditOpen(true)}} icon="receipt" title="Gutschrift erfassen" navigation/>}
+      {canWrite&&kind==='Rechnung'&&Number(draft.paidAmount??0)===0&&Number(draft.creditAmount??0)===0&&['draft','sent','overdue'].includes(draft.status??'')&&<ActionRow disabled={actionBusy} onClick={()=>void processAction('cancel')} icon="close" title="Rechnung stornieren" danger/>}
       </div>{actionError&&<ErrorState><LocalizedText>{actionError}</LocalizedText></ErrorState>}</ActionSheet>
+    <FormSheet label="Gutschrift erfassen" description={draft.number} open={creditOpen} busy={actionBusy} onClose={()=>setCreditOpen(false)}><form onSubmit={event=>{event.preventDefault();void bookCredit()}}><div className="sheet-body"><Field label="Betrag"><Input type="number" inputMode="decimal" min="0.01" step="0.01" max={Math.max(0,Number(draft.total??0)-Number(draft.creditAmount??0))} value={creditAmount} onChange={event=>{setCreditAmount(event.target.value);creditKey.current=crypto.randomUUID()}} required/></Field><Field label="Interne Begründung"><Textarea value={creditReason} onChange={event=>{setCreditReason(event.target.value);creditKey.current=crypto.randomUUID()}} minLength={3} maxLength={2000} required/></Field><p><LocalizedText>{"Die Gutschrift reduziert die Forderung. Eine Rückerstattung wird nicht ausgelöst."}</LocalizedText></p>{actionError&&<ErrorState><LocalizedText>{actionError}</LocalizedText></ErrorState>}</div><FormActions><Button type="button" variant="secondary" disabled={actionBusy} onClick={()=>setCreditOpen(false)}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button type="submit" disabled={actionBusy||!creditAmount||creditReason.trim().length<3}><LocalizedText>{actionBusy?'Wird gespeichert…':'Gutschrift erfassen'}</LocalizedText></Button></FormActions></form></FormSheet>
     <FormSheet label="Dokument senden" description={kind+" als PDF · "+draft.number} open={sendOpen} busy={actionBusy} onClose={()=>setSendOpen(false)}><div className="sheet-body"><Field label="Empfänger"><Input type="email" value={recipient} onChange={e=>{setRecipient(e.target.value);setSendKey(crypto.randomUUID())}} autoComplete="email"/></Field><p><LocalizedText>{"Das ausgestellte Dokument wird als PDF versendet."}</LocalizedText></p>{actionError&&<ErrorState><LocalizedText>{actionError}</LocalizedText></ErrorState>}</div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setSendOpen(false)}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button disabled={actionBusy||!recipient} onClick={()=>void sendDocument()}><LocalizedText>{actionBusy?'Wird versendet …':'PDF senden'}</LocalizedText></Button></div></FormSheet>
-    {toast&&<Toast title={toast} tone={[`${kind} gespeichert.`,`${kind} erstellt.`,"Status aktualisiert.","Dokument als PDF versendet."].includes(toast)?"success":"danger"}/>}
+    {toast&&<Toast title={toast} tone={[`${kind} gespeichert.`,`${kind} erstellt.`,"Status aktualisiert.","Dokument als PDF versendet.","Gutschrift erfasst."].includes(toast)?"success":"danger"}/>}
   </AppShell>;
 }
 
 function documentPresentation(type:DocumentKind,draft:DocumentDraft,total:number){
   const isInvoice=type==="Rechnung";
   const dueDate=isInvoice&&draft.date&&draft.due?invoiceDueDate(draft.date,draft.due):"";
-  const displayStatus=financialStatus({kind:isInvoice?"invoice":"offer",status:draft.status,total,paid_amount:draft.paidAmount,due_date:dueDate?dueDate.split(".").reverse().join("-"):null,valid_until:isInvoice?null:draft.due});
+  const displayStatus=financialStatus({kind:isInvoice?"invoice":"offer",status:draft.status,total,paid_amount:draft.paidAmount,credit_amount:draft.creditAmount,due_date:dueDate?dueDate.split(".").reverse().join("-"):null,valid_until:isInvoice?null:draft.due});
   const statusLabel=financialStatusLabels[displayStatus]??({draft:"Entwurf",sent:type==="Angebot"?"Versendet":"Gestellt",open:"Offen",paid:"Bezahlt",partial:"Teilweise bezahlt",overdue:"Überfällig",cancelled:"Storniert",accepted:"Angenommen",declined:"Abgelehnt",expired:"Abgelaufen",rejected:"Abgelehnt"} as Record<string,string>)[draft.status??""]??draft.status;
   const statusTone: "success"|"danger"|"warning"|"neutral"=displayStatus==="paid"||displayStatus==="accepted"?"success":displayStatus==="overdue"||displayStatus==="cancelled"||displayStatus==="declined"||displayStatus==="expired"?"danger":["open","partial","sent"].includes(displayStatus)?"warning":"neutral";
   return {displayStatus,statusLabel,statusTone,dueDate};
@@ -398,7 +407,7 @@ function DocumentReadView({type,draft,directory}:{type:DocumentKind;draft:Docume
   const currency=draft.currency??"CHF";
   const isInvoice=type==="Rechnung";
   const dueDate=isInvoice&&draft.date&&draft.due?invoiceDueDate(draft.date,draft.due):"";
-  const outstanding=openAmount({total:totals.total,paid_amount:draft.paidAmount});
+  const outstanding=openAmount({total:totals.total,paid_amount:draft.paidAmount,credit_amount:draft.creditAmount});
   const {displayStatus}=documentPresentation(type,draft,totals.total);
   return <div className="document-detail-view">
     <section className="document-detail-section">
@@ -430,10 +439,12 @@ function DocumentReadView({type,draft,directory}:{type:DocumentKind;draft:Docume
         <strong><LocalizedText>{"Total "}</LocalizedText><b>{currency} {money(totals.total)}</b></strong>
       </div>
     </section>
+    {isInvoice&&Number(draft.creditAmount??0)>0&&<p><LocalizedText>{"Gutschriften"}</LocalizedText>: {currency} {money(Number(draft.creditAmount))}</p>}
     {isInvoice&&!["draft","paid","cancelled"].includes(displayStatus)&&outstanding>0&&<LocalizedElement as="section" className="document-payment-facts" aria-label="Zahlungsstand"><h2><LocalizedText>{"Zahlungsstand"}</LocalizedText></h2>
       {Number(draft.paidAmount??0)>0&&<span><LocalizedText>{"Bereits bezahlt "}</LocalizedText><b>{currency} {money(Number(draft.paidAmount??0))}</b></span>}
       <span><LocalizedText>{"Offener Betrag "}</LocalizedText><b>{currency} {money(outstanding)}</b></span>
     </LocalizedElement>}
+    {isInvoice&&Boolean(draft.credits?.length)&&<section className="document-detail-section"><h2><LocalizedText>{"Gutschriften"}</LocalizedText></h2>{draft.credits?.map(credit=><p key={credit.number}><b>{credit.number}</b> · {credit.date.split('-').reverse().join('.')} · {currency} {money(Number(credit.amount))}<br/>{credit.reason}</p>)}</section>}
     {draft.sourceOffer&&<p><LocalizedText>{"Ursprungsangebot: "}</LocalizedText><Link href={"/angebote/"+encodeURIComponent(draft.sourceOffer)}>{draft.sourceOffer}</Link></p>}{draft.invoiceNumber&&<p><LocalizedText>{"Rechnung: "}</LocalizedText><Link href={"/rechnungen/"+encodeURIComponent(draft.invoiceNumber)}>{draft.invoiceNumber}</Link></p>}
     {draft.note&&<section className="document-detail-section"><span className="eyebrow"><LocalizedText>{"NOTIZ"}</LocalizedText></span><p>{draft.note}</p></section>}
   </div>;

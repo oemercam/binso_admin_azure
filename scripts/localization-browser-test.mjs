@@ -1,10 +1,12 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
 import {spawn} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
 const engines=await import(process.env.BINSO_PLAYWRIGHT_MODULE?pathToFileURL(process.env.BINSO_PLAYWRIGHT_MODULE).href:'playwright');
-const base='http://127.0.0.1:3370',output=process.env.BINSO_LOCALIZATION_OUTPUT??'/tmp/binso-localization';
-await fs.mkdir(output,{recursive:true});
+const base='http://127.0.0.1:3370',output=process.env.BINSO_LOCALIZATION_OUTPUT??await fs.mkdtemp(path.join(os.tmpdir(),'binso-localization-'));
+await fs.mkdir(output,{recursive:true,mode:0o700});
 const server=spawn(process.execPath,process.env.BINSO_UX_SERVER_FILE?[process.env.BINSO_UX_SERVER_FILE]:['node_modules/next/dist/bin/next','start','--hostname','127.0.0.1','--port','3370'],{env:{...process.env,PORT:'3370',HOSTNAME:'127.0.0.1'},stdio:['ignore','pipe','pipe']});
 let logs='',browser;server.stdout.on('data',v=>logs+=v);server.stderr.on('data',v=>logs+=v);
 const messages=JSON.parse(await fs.readFile('lib/locales/messages.json','utf8'));
@@ -48,5 +50,5 @@ try{
   }
   assert.deepEqual(faults,[],'No uncaught browser errors');results.push({locale,width,passed:true,cancelledReloadPrefetches});await context.close();
  }
- await fs.writeFile(output+'/results.json',JSON.stringify(results,null,2));console.log('Four-language landing/customer/operator/404, persistent selection and responsive overflow checks passed.');
+ await fs.writeFile(output+'/results.json',JSON.stringify(results,null,2),{flag:'wx',mode:0o600});console.log('Four-language landing/customer/operator/404, persistent selection and responsive overflow checks passed.');
 }finally{await browser?.close();server.kill()}

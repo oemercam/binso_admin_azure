@@ -88,3 +88,29 @@ assert.ok(fullAuditGate.includes('GHSA-VFJ7-8CJW-P6XM'),'Full dependency audit m
 await import("./repository-cleanliness-check.mjs");
 
 await import('./documentation-consistency-check.mjs');
+
+// Execute the actual deployment resolver with mocked GitHub responses. Deployment
+// must require explicit approval and a full successful run for current main.
+assert.ok(!/\n  workflow_run:/.test(deployWorkflow),'Quality completion must not deploy production automatically');
+assert.ok(deployWorkflow.includes("inputs.approve_production == true")&&deployWorkflow.includes("github.ref == 'refs/heads/main'"),'Production requires explicit approval from main');
+const resolverBlock=deployWorkflow.split('      - name: Resolve successful Quality artifact for this exact main commit')[1]?.split('      - name: Download Quality-verified production artifact')[0];
+const resolverSource=resolverBlock?.split('          script: |\n')[1]?.split('\n').map(line=>line.startsWith('            ')?line.slice(12):line).join('\n');
+assert.ok(resolverSource,'Production resolver is present');
+const resolveCandidate=new (Object.getPrototypeOf(async function(){}).constructor)('process','github','context','core',resolverSource);
+const candidateSha='a'.repeat(40),otherSha='b'.repeat(40);
+const successfulRun={id:42,head_sha:candidateSha,status:'completed',conclusion:'success',display_title:'Quality • workflow_dispatch • full'};
+async function probeResolver({sha=candidateSha,main=candidateSha,runs=[successfulRun]}={}){
+ const output={};let queried=false;
+ const github={rest:{repos:{getBranch:async()=>({data:{commit:{sha:main}}})},actions:{listWorkflowRuns:async input=>{queried=true;assert.equal(input.event,'workflow_dispatch');assert.equal(input.head_sha,sha);return {data:{workflow_runs:runs}}}}}};
+ await resolveCandidate({env:{BINSO_DEPLOY_SHA:sha}},github,{repo:{owner:'fixture',repo:'fixture'}},{setOutput:(key,value)=>{output[key]=value}});
+ assert.ok(queried);return output;
+}
+assert.deepEqual(await probeResolver(),{run_id:'42'});
+for(const input of [
+ {sha:'main'}, {main:otherSha}, {runs:[]},
+ {runs:[{...successfulRun,head_sha:otherSha}]},
+ {runs:[{...successfulRun,conclusion:'failure'}]},
+ {runs:[{...successfulRun,display_title:'Quality • workflow_dispatch • standard'}]},
+ {runs:[{...successfulRun,display_title:'Quality • push • standard'}]},
+]) await assert.rejects(probeResolver(input));
+console.log('Manual production authorization, immutable current-main SHA and full final QA resolver passed.');

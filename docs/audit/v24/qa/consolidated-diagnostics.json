@@ -1,0 +1,196 @@
+{
+  "scope": "Independent diagnostic entries after functional credit changes, before final browser-fixture edits; not a replacement for required pnpm test. The packaging fingerprint identifies the final source, not a claim that every diagnostic entry was rerun on it. Relevant syntax, lint, typecheck, localization, release and integration checks were repeated.",
+  "results": [
+    {
+      "script": "scripts/deployed-assets-test.mjs",
+      "exit": 0,
+      "log": "Deployed asset identity: static HTML and dynamic localized manifests, ancestor styles, deduplication and missing-artifact rejection passed.\n"
+    },
+    {
+      "script": "scripts/localization-test.mjs",
+      "exit": 0,
+      "log": "Locale catalogues: complete EN/FR/IT tuples, preserved template tokens, server-rendered language, native attributes and unchanged user data passed.\nPassword recovery: translated mail/link locale and uniform unknown-account/delivery-failure response passed.\nShared rows/headings preserve colliding user titles while menu labels and document prefixes translate.\nLocalized metadata binds canonical alternatives and social-image URLs to the selected language.\n"
+    },
+    {
+      "script": "scripts/localization-coverage-test.mjs",
+      "exit": 0,
+      "log": "Application source copy coverage passed.\n"
+    },
+    {
+      "script": "scripts/maintenance-test.mjs",
+      "exit": 0,
+      "log": "Maintenance: authorization, duration validation, activation, expiry, deactivation and atomic audit rollback passed.\n"
+    },
+    {
+      "script": "scripts/readiness-integrity-test.mjs",
+      "exit": 0,
+      "log": "Runtime role, inherited bypass/ownership, public-schema creation denial, pinned Azure issuer and real Bash monitoring failure gates passed.\n"
+    },
+    {
+      "script": "scripts/security-exception-test.mjs",
+      "exit": 0,
+      "log": "Dependency exceptions are package/version/path/dev-root/expiry bound; changed, critical and production scope are rejected.\n"
+    },
+    {
+      "script": "scripts/runtime-integrity-test.mjs",
+      "exit": 0,
+      "log": "Bounded chunked/UTF-8/declared-size/JSON reads, sensitive-log suppression and service-worker owned-cache cleanup passed.\n"
+    },
+    {
+      "script": "scripts/rate-limit-test.mjs",
+      "exit": 0,
+      "log": "Actual rate limiter: bounded new-key capacity, no active-key eviction, expiry reuse, retry delays and atomic production database path passed.\n"
+    },
+    {
+      "script": "scripts/demo-session-test.mjs",
+      "exit": 0,
+      "log": "Actual demo route: resume, isolated reset, reserved synthetic email, rate/origin denial, provisioning failure recovery and production-cookie preservation passed. No external service is called.\n"
+    },
+    {
+      "script": "scripts/file-scan-test.mjs",
+      "exit": 1,
+      "log": "node:net:2145\n      const error = new UVExceptionWithHostPort(rval, 'listen', address, port);\n                    ^\n\nError: listen EPERM: operation not permitted /tmp/binso-scan-YkHPpn/s0.sock\n    at Server.setupListenHandle [as _listen2] (node:net:2145:21)\n    at listenInCluster (node:net:2224:12)\n    at Server.listen (node:net:2361:5)\n    at scanFile.socketPath.socketPath (file:///workspace/scratch/4766d9dd3bd6/repo/scripts/file-scan-test.mjs:52:79)\n    at new Promise (<anonymous>)\n    at peer (file:///workspace/scratch/4766d9dd3bd6/repo/scripts/file-scan-test.mjs:52:13)\n    at file:///workspace/scratch/4766d9dd3bd6/repo/scripts/file-scan-test.mjs:62:8 {\n  code: 'EPERM',\n  errno: -1,\n  syscall: 'listen',\n  address: '/tmp/binso-scan-YkHPpn/s0.sock',\n  port: -1\n}\n\nNode.js v24.19.0\n"
+    },
+    {
+      "script": "scripts/file-rescan-test.mjs",
+      "exit": 0,
+      "log": "Isolated rescan: tenant isolation, hash-bound selection, rejection, retry, scanner outage and atomic audit rollback passed.\n"
+    },
+    {
+      "script": "scripts/auth-integrity-test.mjs",
+      "exit": 0,
+      "log": "{\"probe\":\"stale-login-after-committed-password-reset\",\"status\":401,\"persistedSessionsAfterReset\":0,\"synthetic\":true}\n{\"probe\":\"stale-password-change-after-committed-reset\",\"status\":409,\"resetPasswordPreserved\":true,\"synthetic\":true}\nIsolated PGlite: auth races, upload replay, strict/default quarantine, explicit development access without verdict mutation, rejected/auth/tenant denial and branding policy passed.\nUnhandled API error { category: 'Error' }\n"
+    },
+    {
+      "script": "scripts/registration-test.mjs",
+      "exit": 0,
+      "log": "PGlite restricted runtime registration integration passed: server plan/contract checks, actual isolated tenant creation, delivery failure, pending receipt, duplicate replay, independent equal names, five locale catalogues, cross-browser link, consumed/expired link, trial start, OTP, existing login OTP/delivery failure, MFA/company handoff, explicit company completion, reader rejection, tenant preservation, generic public resend, direct bootstrap denial, helper ACL/ownership/path boundary, duplicate-account denial, temporary-table shadowing resistance, scoped identity-only lookup, pooled-context cleanup, revoked membership/organization denial and scoped trial expiration.\n"
+    },
+    {
+      "script": "scripts/statistics-test.mjs",
+      "exit": 0,
+      "log": "Central statistics: presets, inclusive dates, invalid dates, UTC/DST-independent groups, decimal precision, bounded long periods and cash mapping passed.\nActual chart and shared KPI foundation: pointer/Enter/Space, zero segments, selected status/amount, drilldown, four primary metrics, negative values and accessible disclosure passed.\nActual PostgreSQL metric queries: CHF/tenant/date/status/archive scope, credits on their own dates, partial payments, current due balance, credit liability and ring reconciliation passed. Whitelisted list drilldowns passed. Real external runtime-role testing remains separate.\nSigned time-series geometry preserves negative/zero/positive ordering and a true zero baseline, centers a sole observation and rejects invalid values.\nActual shared line chart: signed plotted coordinates, accessible negative values, keyboard/pointer selection and full-chart nearest-observation hit testing passed.\n"
+    },
+    {
+      "script": "scripts/v23-2-ux-test.mjs",
+      "exit": 0,
+      "log": "red footer.\nActual search: selected type and module permissions filter results and scope controls together.\nActual operator send: same-frame lock, late-completion draft preservation, successful clear and failure retention passed.\nApp light/dark themes: primary text, secondary labels and accent meet 4.5:1 contrast on all three surfaces.\nReact expects the `children` prop of <title> tags to be a string, number, bigint, or object with a novel `toString` method but found an object that appears to be a React element which never implements a suitable `toString` method. Browsers treat all child Nodes of <title> tags as Text content and React expects to be able to convert children of <title> tags to a single string value which is why rendering React elements is not supported. If the `children` of <title> is a React Component try moving the <title> tag into that component. If the `children` of <title> is some HTML markup change it to be Text only to be valid HTML.\nReact expects the `children` prop of <title> tags to be a string, number, bigint, or object with a novel `toString` method but found an object that appears to be a React element which never implements a suitable `toString` method. Browsers treat all child Nodes of <title> tags as Text content and React expects to be able to convert children of <title> tags to a single string value which is why rendering React elements is not supported. If the `children` of <title> is a React Component try moving the <title> tag into that component. If the `children` of <title> is some HTML markup change it to be Text only to be valid HTML.\n"
+    },
+    {
+      "script": "scripts/glass-ux-test.mjs",
+      "exit": 0,
+      "log": "Shared creation: permission paths, context ordering, no duplicate destinations, independent support access and encoded return context passed.\nActual shared dock renders only navigation and preserves compact mode; obsolete creation injection is ignored.\n"
+    },
+    {
+      "script": "scripts/ui-build-cache-test.mjs",
+      "exit": 0,
+      "log": "UI build guard: stale/unknown style identity purges derived output; unchanged styles retain cache; source files remain intact.\n"
+    },
+    {
+      "script": "scripts/architecture-selfcheck.mjs",
+      "exit": 0,
+      "log": "Architecture entry points and package scripts passed.\n"
+    },
+    {
+      "script": "scripts/permission-selfcheck.mjs",
+      "exit": 0,
+      "log": "Finance and operator permission matrix passed.\nSearch respects member record ownership.\nExpense approval/rejection rejects unauthorized roles before either mutation writes.\nRelated-record links respect the AppShell context and retain a text fallback.\n"
+    },
+    {
+      "script": "scripts/theme-selfcheck.mjs",
+      "exit": 0,
+      "log": "Theme ownership, reload resolver and stale profile response checks passed.\n"
+    },
+    {
+      "script": "scripts/client-session-test.mjs",
+      "exit": 0,
+      "log": "Demo start deduplication, offline failure, session-cache isolation and confirmed logout with retry passed.\nConfirmed operator logout clears the shared private session fence; unconfirmed logout preserves state and simultaneous clicks share one request.\nExpired database demo is unauthenticated; static cookie preview remains read-only.\nConfirmed logout remains successful when browser storage or BroadcastChannel is blocked.\nFile exports: verified CSV content/name, private request, HTTP errors, expired sessions, wrong MIME and tenant changes before/after headers passed.\n"
+    },
+    {
+      "script": "scripts/migration-test.mjs",
+      "exit": 0,
+      "log": "ken/outbox, same-key replay, failed-delivery recovery, ambiguous-delivery protection, roles and database rollback passed.\nPDF/QR generation, send idempotency/failure/demo guards, cancellation release and new/existing/revoked invitation acceptance passed with synthetic fixtures only.\nTeam schema, entitlement limits, document status/locks/conversion, expense approval/reimbursement/billing and tenant isolation passed.\nProject workspace: paged search, filter validation, optimistic versions, tenant direct-ID denial, role denial and time/invoice masking passed.\nReports: bounded periods, role masking, company isolation and private formula-safe CSV export passed.\nAll ten canonical business repository sources reject foreign direct IDs with positive source fixtures.\nV21.3 document idempotency/payload conflict, immutable server numbers, transaction/counter rollback, quote precision and cash/open-balance parity passed.\nActual file upload/list/download, content signature, cross-tenant association/download denial and role denial passed.\nFull customer/offer/project/time/invoice/partial-payment process, direct customer work, internal time, optional approval, exact completion date, overpayment and double-billing protection passed.\nV22 search: real 1000-record boundary, normalized invoice/customer numbers, Swiss text, punctuation safety and full-population tenant scope passed.\nCredit-adjusted list/detail/payment parity, future-credit exclusion, exact balance limit, payment replay and cancellation integrity passed.\nPostgreSQL migrations, deterministic fixtures and tenant/platform RLS passed.\n"
+    },
+    {
+      "script": "scripts/data-lifecycle-schema-test.mjs",
+      "exit": 0,
+      "log": "Organization data lifecycle schema and deletion safeguards passed.\n"
+    },
+    {
+      "script": "scripts/ux-regression-test.mjs",
+      "exit": 0,
+      "log": "de partial date ranges.\nTime query, today-only period, project/customer context and approval filters passed.\nDesktop, tablet, mobile and PWA share business routes; viewport logic is presentation-only.\nShared customer-finance type filters match singular rows and plural tabs; payment filters retain partial support.\nProject-linked idle timer context survives synchronization without changing active or already recorded time.\nActual record rendering: status column filtering, reset visibility, Swiss numeric/date sorting and mobile column selection passed.\nReal form handlers prevent double saves, permit failure retries, preserve return context and render error toasts.\nUnknown server failures stay errors across 12 form, document, time and billing feedback paths.\nActual document and expense handlers prevent same-frame double writes, retain successful navigation locks and allow retries after failures.\nQuantity/price units, fractional values, numeric sorting and distinct time metadata passed.\nCentral action row preserves write/route permissions and explicit navigation/destructive intent.\nActual avatar identity, neutral fallback, stable color and light/dark text contrast passed.\nCompany logo sources reject executable and unscoped URLs; authenticated file and local preview identities remain valid.\nReceived `false` for a non-boolean attribute `prefetch`.\n\nIf you want to write it to the DOM, pass a string instead: prefetch=\"false\" or prefetch={value.toString()}.\n\nIf you used to conditionally omit it with prefetch={condition && value}, pass prefetch={condition ? value : undefined} instead.\n"
+    },
+    {
+      "script": "scripts/pwa-preview-test.mjs",
+      "exit": 0,
+      "log": "Generated Swiss QR payment slip scales as a complete 210 × 105 mm viewport without altering its content.\n"
+    },
+    {
+      "script": "scripts/pwa-lifecycle-test.mjs",
+      "exit": 0,
+      "log": "Silent PWA lifecycle: first install, waiting/new updates, resume checks, no UI/reloads, late registration and listener cleanup passed.\n"
+    },
+    {
+      "script": "scripts/document-presentation-test.mjs",
+      "exit": 0,
+      "log": "Production PDF: A4 pages, company texts, items, dates, totals, remaining-balance QR, paid/cancelled/draft suppression and multipage QR passed.\nOperational document details: real paid date, no fabricated legacy date, derived open/overdue/partial/paid states, cancellation and mobile quantity/unit/unit-price/amount passed.\nOptional outstanding lists retain scoped filters; the full invoice list retains all main filters.\nQR debtor structured address, exact remaining amount, valid SCOR/invalid references and shared employee validation passed.\n"
+    },
+    {
+      "script": "scripts/qa-plan-test.mjs",
+      "exit": 0,
+      "log": "QA scope covers changed modules, shared dependencies, unknown files and forced releases without unsafe skips.\n"
+    },
+    {
+      "script": "scripts/browser-shards-test.mjs",
+      "exit": 0,
+      "log": "Browser sharding preserves full route/interaction coverage, isolated servers and blocking failure status.\n"
+    },
+    {
+      "script": "scripts/navigation-contract-test.mjs",
+      "exit": 0,
+      "log": "Approved customer navigation destinations and shared glass/dock style contract passed.\n"
+    },
+    {
+      "script": "scripts/ui-foundation-test.mjs",
+      "exit": 0,
+      "log": "UI foundation: rejecting copied controls/wrappers/states/imports; field validation association; read-only permissions; native types; cascade fallback/context; route/layout/operator/API inventory passed.\nWizard first/middle/final actions and architecture ownership passed.\nContact URIs retain fixed schemes, encode address delimiters and reject control/query/dial-command injection.\n"
+    },
+    {
+      "script": "scripts/navigation-foundation-test.mjs",
+      "exit": 0,
+      "log": "Customer/operator dock: approved glass/creation placement; original destination access/scroll logic and icons preserved. Reference 4b8e0115a90de981b11f1d716a8145e97efa7e6f.\n"
+    },
+    {
+      "script": "scripts/data-foundation-test.mjs",
+      "exit": 0,
+      "log": "V21.3: decimal/PostgreSQL precision, partial/full balances, finance/calendar parity, targeted payment invalidation, read deduplication, mutation failures, old-session fencing, cross-tab logout/reconnect, safe API errors and file signatures passed.\n"
+    },
+    {
+      "script": "scripts/foundation-integration-test.mjs",
+      "exit": 0,
+      "log": "Integration architecture: no local runtime-import cycles, retired barrel protection and complete current route matrix passed.\n"
+    },
+    {
+      "script": "scripts/process-draft-test.mjs",
+      "exit": 0,
+      "log": "Process recovery: editable input/step/replay retained; user/tenant/role isolation, expiry, corruption, quota handling and session-fence purge passed.\nDraft ownership: app visibility revalidates queries without changing the private-session fence; actual session changes purge input.\n"
+    },
+    {
+      "script": "scripts/observability-test.mjs",
+      "exit": 0,
+      "log": "Observability: migrated SQL, demo/currency isolation, role masking, genuine history, missing/stale/future data, boundaries, deduplication, recovery and database outage passed.\n"
+    },
+    {
+      "script": "scripts/operator-announcement-test.mjs",
+      "exit": 0,
+      "log": "Announcement API: actual RBAC/origin/validation, migrated persistence+audit, real transaction rollback on audit failure passed.\nUnhandled API error { category: 'Error' }\n"
+    },
+    {
+      "script": "scripts/operator-contract-test.mjs",
+      "exit": 0,
+      "log": "Admin contracts: page access, actual migrated ticket/account responses, chronological messages, restriction precedence, expiry validation, role denial and atomic audit rollback passed.\nUnhandled API error { category: 'Error' }\nUnhandled API error { category: 'Error' }\nUnhandled API error { category: 'Error' }\nUnhandled API error { category: 'Error' }\n"
+    }
+  ],
+  "sourceFingerprintAtPackaging": "0ac54caea2e5d21570ddd0168251804ac12ced99000870c460c277bcb056e51a"
+}

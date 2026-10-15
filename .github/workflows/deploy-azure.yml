@@ -1,11 +1,17 @@
 name: Deploy Azure App Service
 
 on:
-  workflow_run:
-    workflows: ["Quality"]
-    types: [completed]
-    branches: [main]
   workflow_dispatch:
+    inputs:
+      commit_sha:
+        description: 'Exact current main SHA with a successful full Quality run'
+        required: true
+        type: string
+      approve_production:
+        description: 'Explicitly approve production migrations and deployment for this SHA'
+        required: true
+        default: false
+        type: boolean
 
 concurrency:
   group: production-deploy
@@ -17,14 +23,14 @@ permissions:
   id-token: write
 
 env:
-  BINSO_DEPLOY_SHA: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
+  BINSO_DEPLOY_SHA: ${{ inputs.commit_sha }}
   AZURE_WEBAPP_NAME: binso-admin-prod
   AZURE_RESOURCE_GROUP: rg-binso-admin-prod
   PRODUCTION_URL: https://binso-admin-prod-asctesfvhnd5b6ay.switzerlandnorth-01.azurewebsites.net
 
 jobs:
   deploy:
-    if: ${{ github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_branch == 'main') }}
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.approve_production == true && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     environment: production
@@ -33,7 +39,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
+          ref: ${{ inputs.commit_sha }}
 
       - name: Resolve successful Quality artifact for this exact main commit
         id: verified
@@ -41,11 +47,12 @@ jobs:
         with:
           script: |
             const sha = process.env.BINSO_DEPLOY_SHA;
+            if (!/^[a-f0-9]{40}$/.test(sha)) throw new Error('A full immutable commit SHA is required');
             const {data: branch} = await github.rest.repos.getBranch({...context.repo, branch: 'main'});
             if (branch.commit.sha !== sha) throw new Error('Only the current main commit may be promoted');
-            const {data} = await github.rest.actions.listWorkflowRuns({...context.repo, workflow_id: 'quality.yml', branch: 'main', event: 'push', head_sha: sha, per_page: 100});
-            const verified = data.workflow_runs.find(run => run.head_sha === sha && run.status === 'completed' && run.conclusion === 'success');
-            if (!verified) throw new Error('No successful Quality push run for this exact commit; migrations and deployment are blocked');
+            const {data} = await github.rest.actions.listWorkflowRuns({...context.repo, workflow_id: 'quality.yml', branch: 'main', event: 'workflow_dispatch', head_sha: sha, per_page: 100});
+            const verified = data.workflow_runs.find(run => run.head_sha === sha && run.status === 'completed' && run.conclusion === 'success' && run.display_title === 'Quality • workflow_dispatch • full');
+            if (!verified) throw new Error('No successful full manual Quality run for this exact commit; migrations and deployment are blocked');
             core.setOutput('run_id', String(verified.id));
 
       - name: Download Quality-verified production artifact
@@ -66,7 +73,7 @@ jobs:
           rm -rf /tmp/binso-artifact
           mkdir -p /tmp/binso-artifact
           unzip -q deploy/binso-one.zip -d /tmp/binso-artifact
-          DEPLOY_SHA="${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}"
+          DEPLOY_SHA="$BINSO_DEPLOY_SHA"
           grep -q "$DEPLOY_SHA" /tmp/binso-artifact/public/deployment.json
           node --input-type=module -e 'import fs from "node:fs";import {createHash} from "node:crypto";import {validateScope,scopeDigest} from "./scripts/compliance/release-scope.mjs";const raw=fs.readFileSync("/tmp/binso-artifact/ux-compliance/release-scope.v1.json");const scope=validateScope(JSON.parse(raw));const meta=JSON.parse(fs.readFileSync("/tmp/binso-artifact/public/deployment.json"));const hash=createHash("sha256").update(raw).digest("hex");if(meta.sha!==process.env.BINSO_DEPLOY_SHA||meta.releaseProfile!==scope.id||meta.productionAcceptance!==false||meta.releaseScopeSha256!==hash||hash!==scopeDigest())throw Error("Release scope/artifact binding mismatch");'
 
@@ -342,7 +349,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          DEPLOY_SHA="${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}"
+          DEPLOY_SHA="$BINSO_DEPLOY_SHA"
           VERSION_URL="$PRODUCTION_URL/api/health"
           CONSECUTIVE=0
           # App Service may keep routing to the old worker until the new
@@ -377,7 +384,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          DEPLOY_SHA="${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}"
+          DEPLOY_SHA="$BINSO_DEPLOY_SHA"
 
           VERSION_URL="$PRODUCTION_URL/api/health"
 
