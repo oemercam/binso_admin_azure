@@ -2312,8 +2312,6 @@ input:not([type="checkbox"]):not([type="radio"]),
 
 /* Extra narrow viewport */
 @media (max-width:389px){
-  .workspace-preview-navigation{position:relative;padding-top:52px}
-  .workspace-preview-navigation>.workspace-preview-create{position:absolute;top:0;right:0}
   .bo-statistics-kpis{grid-template-columns:minmax(0,1fr)}
   .bo-statistics-kpis dd{font-size:20px}
 .metrics-grid,
