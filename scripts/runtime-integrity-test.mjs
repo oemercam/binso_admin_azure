@@ -11,6 +11,17 @@ const exact=new Request('https://fixture.invalid',{method:'POST',body:'ä'});ass
 await assert.rejects(()=>http.readBoundedBody(new Request('https://fixture.invalid',{method:'POST',headers:{'content-length':'100'},body:'x'}),12),e=>e.status===413);
 await assert.rejects(()=>http.readJson(new Request('https://fixture.invalid',{method:'POST',body:'not json'})),e=>e.status===400);
 assert.deepEqual(await http.readJson(new Request('https://fixture.invalid',{method:'POST',body:'{"ok":true}'})),{ok:true});
+const savedOrigin=process.env.NEXT_PUBLIC_APP_URL;
+try{
+ process.env.NEXT_PUBLIC_APP_URL='https://app.fixture.invalid';
+ const request=origin=>({nextUrl:new URL('https://fixture.invalid/api'),headers:new Headers({origin,'x-forwarded-host':'attacker.invalid','x-forwarded-proto':'https'})});
+ http.assertSameOrigin(request('https://app.fixture.invalid'));
+ http.assertSameOrigin(request('https://fixture.invalid'));
+ assert.throws(()=>http.assertSameOrigin(request('https://attacker.invalid')),e=>e.status===403);
+}finally{if(savedOrigin===undefined)delete process.env.NEXT_PUBLIC_APP_URL;else process.env.NEXT_PUBLIC_APP_URL=savedOrigin;}
+const limited=http.apiError(new Response('private detail',{status:429,headers:{'Retry-After':'37','Set-Cookie':'secret'}}));
+assert.equal(limited.headers.get('retry-after'),'37');assert.equal(limited.headers.get('set-cookie'),null);
+assert.equal(http.json({ok:true},200,new Headers({'X-Fixture':'preserved'})).headers.get('x-fixture'),'preserved');
 const logger=await import(moduleUrl((await fs.readFile('lib/server/logger.ts','utf8')).replace('import "server-only";','')));
 const error=console.error,captured=[];console.error=(...args)=>captured.push(args);
 try{logger.log('error','fixed_event',{detail:'synthetic-sensitive-marker',nested:{access_token:'synthetic-token',email:'fixture@fixture.invalid'},status:503});http.apiError(new Error('synthetic-sensitive-marker'));}finally{console.error=error}

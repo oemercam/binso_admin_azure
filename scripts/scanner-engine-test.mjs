@@ -14,7 +14,15 @@ const close=await startScannerBridge();
 try{
  for(let attempt=0;;attempt++){
   try{report.engine=await scannerVersion({socketPath,deadline:Date.now()+1000});break;}
-  catch{if(attempt>=300)throw Error('Patched engine with current signatures did not become ready');await new Promise(resolve=>setTimeout(resolve,1000));}
+  catch{
+   if(attempt%30===0){
+    // Engine metadata only: distinguish startup, transport and stale-signature failures.
+    let metadata;try{metadata=execFileSync('docker',['exec',container,'clamdscan','--version'],{encoding:'utf8',timeout:5000});}catch{metadata='engine not reachable yet';}
+    console.log('Scanner readiness metadata:',metadata.trim());
+   }
+   if(attempt>=300)throw Error('Patched engine with current signatures did not become ready');
+   await new Promise(resolve=>setTimeout(resolve,1000));
+  }
  }
  const environment=execFileSync('docker',['exec',container,'sh','-c',"tr '\\0' '\\n' < /proc/1/environ"],{encoding:'utf8'});
  assert.ok(!environment.includes('BINSO_CREDENTIAL_SENTINEL'),'Scanner service must not inherit application credentials');
