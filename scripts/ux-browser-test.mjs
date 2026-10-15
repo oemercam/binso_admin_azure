@@ -113,7 +113,7 @@ let failPreferences=false,preferencePosts=0;
 let notificationWrites=0,failNotificationWrite=false,securityUnavailable=false,sessionDeletes=0;
 let dataPaymentMode=false,dataPaymentFailed=false,dataPaymentPosts=0,holdDataRefresh=false,customerIdentityMode=false,losePaymentResponse=false,incompletePaymentResponse=false;const paymentReplays=new Map(),dataRefreshWaiters=[];
 let projectSourceMode=false,failProjectSource=false,projectSourceTitle='Synthetic accepted offer',processRecoveryMode=false;
-let incompleteProductResponse=false;
+let incompleteProductResponse=false;let failReportDownload=false,reportExports=0;
 let projectPosts=0,failProjectCreate=false,loseProjectResponse=false;const projectReplays=new Map();
 let customerPosts=0,failCustomerCreate=false,loseCustomerResponse=false;const customerReplays=new Map();
 let teamMemberRole='member';let supportMessages=[];
@@ -200,7 +200,7 @@ try{
    else if(p==='/api/demo/data')data=recordListFixture(url.searchParams.get('collection'),url.searchParams);
    else if(['/api/products','/api/employees','/api/expenses','/api/payments'].includes(p))data=recordListFixture(p.split('/')[2],url.searchParams);
    else if(p==='/api/reports'){
-    if(url.searchParams.get('format')==='csv')return route.fulfill({headers:{'Content-Type':'text/csv; charset=utf-8','Content-Disposition':'attachment; filename="binso-reports-fixture.csv"'},body:'"Kennzahl";"Wert";"Einheit"\r\n'});
+    if(url.searchParams.get('format')==='csv'){reportExports++;await new Promise(resolve=>setTimeout(resolve,150));if(failReportDownload)return route.fulfill({status:503,json:{message:'Synthetic report export unavailable'}});return route.fulfill({headers:{'Content-Type':'text/csv; charset=utf-8','Content-Disposition':'attachment; filename="binso-reports-fixture.csv"'},body:'"Kennzahl";"Wert";"Einheit"\r\n'});}
     data={period:{from:statisticToday.slice(0,7)+'-01',to:statisticToday},asOf:new Date().toISOString(),customers:{total:'2',added:'1'},projects:[{status:'active',count:'1'}],time:{hours:'12.5',billable_hours:'10',invoiced_hours:'5'},payments:[{currency:'CHF',amount:'200'}],expenses:[{currency:'CHF',amount:'50'}],employees:{total:'2',active:'2'}};
    }
    else if(p==='/api/projects')data={items:[projectFixture],total:1};
@@ -415,7 +415,8 @@ try{
   await projectEdit.getByRole('button',{name:'Speichern',exact:true}).dblclick();await projectEdit.waitFor({state:'hidden'});await page.locator('h2[translate="no"]').filter({hasText:/^Rechnungen$/}).waitFor();assert.equal(projectFixture.version,2,'Project completion taps create one versioned update');
   processRecoveryMode=false;
   await navigate(base+'/berichte');await page.getByRole('heading',{name:'Aktueller Bestand',exact:true}).waitFor();await page.getByRole('button',{name:'Zeitraum',exact:true}).first().click();const reportPeriod=page.getByRole('dialog',{name:'Berichtszeitraum',exact:true});await reportPeriod.getByLabel('Zeitraum',{exact:true}).selectOption('3');const reportChanged=page.waitForRequest(request=>new URL(request.url()).pathname==='/api/reports'&&new URL(request.url()).searchParams.get('months')==='3');await reportPeriod.getByRole('button',{name:'Anwenden',exact:true}).click();await reportChanged;
-  const reportDownload=page.waitForEvent('download');await page.getByRole('link',{name:'CSV exportieren',exact:true}).click();assert.equal((await reportDownload).suggestedFilename(),'binso-reports-fixture.csv','Reports use a native private file download without replacing the app');assert.equal(new URL(page.url()).pathname,'/berichte');
+  reportExports=0;failReportDownload=true;const exportButton=page.getByRole('button',{name:'CSV exportieren',exact:true});await exportButton.click();await page.getByRole('alert').getByText('Synthetic report export unavailable',{exact:true}).waitFor();assert.equal(reportExports,1);failReportDownload=false;
+  const reportDownload=page.waitForEvent('download');await exportButton.dblclick();const exported=await reportDownload;assert.equal(exported.suggestedFilename(),'binso-reports-fixture.csv');assert.ok((await fs.readFile(await exported.path(),'utf8')).startsWith('"Kennzahl";"Wert";"Einheit"'),'Reports save verified CSV content');assert.equal(reportExports,2,'Failure and one deduplicated retry are the only export requests');assert.equal(new URL(page.url()).pathname,'/berichte');
 
 
   }

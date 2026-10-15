@@ -41,8 +41,6 @@ for(const expanded of [false,true]){
 }
 const ariaLink=html(React.createElement(ui.Button,{href:'/operator/monitoring','aria-describedby':'source-description'},'Monitoring'));
 assert.ok(ariaLink.includes('aria-describedby="source-description"'),'Shared link button forwards ARIA descriptions');
-const download=html(React.createElement(ui.Button,{href:'/api/reports?format=csv',download:true},'CSV'));
-assert.ok(download.includes('download=""')&&download.includes('href="/api/reports?format=csv"'),'A report export uses a native download anchor');
 write=false;assert.ok(html(React.createElement(ui.Button,{requiresWrite:true,'aria-expanded':false},'Geschützte Aktion')).includes('disabled=""'),'ARIA forwarding preserves write protection');write=true;
 const invalid=html(React.createElement(ui.Field,{label:'E-Mail',error:'Ungültig',hint:'Geschäftlich'},React.createElement(ui.Input,{'aria-describedby':'existing',type:'email'})));
 assert.ok(invalid.includes('aria-invalid="true"'));assert.ok(invalid.includes('aria-labelledby="'));const labelId=invalid.match(/aria-labelledby="([^"]+)"/)[1];assert.ok(invalid.includes(`id="${labelId}">E-Mail</span>`),'Accessible name excludes validation/help text');const description=invalid.match(/aria-describedby="([^"]+)"/)[1].split(' ');assert.equal(description[0],'existing');for(const id of description.slice(1))assert.ok(invalid.includes(`id="${id}"`),'Hint/error belongs to its actual control');assert.ok(invalid.includes('role="alert"'));

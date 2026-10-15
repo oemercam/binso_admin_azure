@@ -142,6 +142,17 @@ export async function apiPost<T>(path:string,body:unknown,options:{idempotencyKe
 }
 
 const pendingGets=new Map<string,Promise<unknown>>();
+/** Authenticated exports must never save an HTML/JSON error as a business file. */
+export async function apiGetFile(path:string,contentType:string):Promise<{blob:Blob;fileName?:string}>{
+  const revision=dataRevision([]);
+  const response=await fetchApi(path,{method:"GET",cache:"no-store",credentials:"same-origin",redirect:"error",headers:{Accept:contentType}});
+  if(!response.ok)await parseResponse(response,"Daten konnten nicht geladen werden.");
+  if(response.headers.get("Content-Type")?.split(";")[0].trim().toLowerCase()!==contentType.toLowerCase())throw new ClientApiError("Daten konnten nicht geladen werden.","invalid_response",502);
+  const blob=await response.blob().catch(()=>{throw new ClientApiError("Daten konnten nicht geladen werden.","invalid_response",502)});
+  if(revision!==dataRevision([]))throw new ClientApiError("Die Sitzung wurde geändert. Bitte erneut versuchen.","session_changed",401);
+  const fileName=response.headers.get("Content-Disposition")?.match(/(?:^|;)\s*filename="([A-Za-z0-9._-]{1,120})"/i)?.[1];
+  return {blob,fileName};
+}
 export async function apiGet<T>(path:string):Promise<T>{
   if(path==="/api/auth/session")return readClientSession() as Promise<T>;
   const sessionRevision=dataRevision([]);

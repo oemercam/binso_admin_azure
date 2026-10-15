@@ -65,4 +65,15 @@ try{
  assert.doesNotThrow(()=>isolatedEvents.resetClientData(false),'Blocked cross-tab channels cannot break in-memory invalidation');globalThis.BroadcastChannel=undefined;
  console.log('Confirmed logout remains successful when browser storage or BroadcastChannel is blocked.');
 
+ const csvHeaders={'Content-Type':'text/csv; charset=utf-8','Content-Disposition':'attachment; filename="binso-fixture.csv"'};
+ globalThis.fetch=async(path,options)=>{assert.equal(path,'/api/reports?format=csv');assert.equal(options.cache,'no-store');assert.equal(options.credentials,'same-origin');assert.equal(options.headers.Accept,'text/csv');return new Response('"Metric";"Value"\r\n', {headers:csvHeaders})};
+ const exportFile=await backend.apiGetFile('/api/reports?format=csv','text/csv');assert.equal(exportFile.fileName,'binso-fixture.csv');assert.equal(await exportFile.blob.text(),'"Metric";"Value"\r\n');
+ globalThis.fetch=async()=>new Response(JSON.stringify({message:'Export unavailable'}),{status:503});await assert.rejects(backend.apiGetFile('/api/reports?format=csv','text/csv'),/Export unavailable/);
+ let invalidSignals=0;window.dispatchEvent=event=>{if(event.type==='binso-session-invalid')invalidSignals++};
+ globalThis.fetch=async()=>new Response(JSON.stringify({message:'Session expired'}),{status:401});await assert.rejects(backend.apiGetFile('/api/reports?format=csv','text/csv'),/Session expired/);assert.equal(invalidSignals,1);
+ globalThis.fetch=async()=>new Response('{"not":"csv"}',{headers:{'Content-Type':'application/json'}});await assert.rejects(backend.apiGetFile('/api/reports?format=csv','text/csv'),error=>error.code==='invalid_response');
+ let deliverExport;globalThis.fetch=()=>new Promise(resolve=>{deliverExport=resolve});const obsoleteExport=backend.apiGetFile('/api/reports?format=csv','text/csv');cache.invalidateClientSession();deliverExport(new Response('private old tenant CSV',{headers:csvHeaders}));await assert.rejects(obsoleteExport,error=>error.code==='session_changed');
+ let body;globalThis.fetch=async()=>new Response(new ReadableStream({start(controller){body=controller}}),{headers:csvHeaders});const lateExport=backend.apiGetFile('/api/reports?format=csv','text/csv');await Promise.resolve();cache.invalidateClientSession();body.enqueue(new TextEncoder().encode('private late CSV'));body.close();await assert.rejects(lateExport,error=>error.code==='session_changed');
+ console.log('File exports: verified CSV content/name, private request, HTTP errors, expired sessions, wrong MIME and tenant changes before/after headers passed.');
+
 }finally{globalThis.BroadcastChannel=originalBroadcastChannel;globalThis.fetch=originalFetch;delete globalThis.window;delete globalThis.document;}

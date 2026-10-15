@@ -6324,9 +6324,17 @@
       "calls": [
         {
           "callee": "useApiQuery",
-          "line": 14,
+          "line": 15,
           "arguments": [
             "'/api/reports?'+query.toString()"
+          ]
+        },
+        {
+          "callee": "apiGetFile",
+          "line": 22,
+          "arguments": [
+            "'/api/reports?'+query.toString()+'&format=csv&lang='+locale",
+            "'text/csv'"
           ]
         }
       ],
@@ -9731,13 +9739,21 @@
           ]
         },
         {
+          "callee": "fetchApi",
+          "line": 148,
+          "arguments": [
+            "path",
+            "{method:\"GET\",cache:\"no-store\",credentials:\"same-origin\",redirect:\"error\",headers:{Accept:contentType}}"
+          ]
+        },
+        {
           "callee": "(async()=>{\n    const response=await fetchApi(path,{method:\"GET\",cache:\"no-store\",signal:AbortSignal.timeout(15000)});\n    const result=await parseResponse<T>(response,\"Daten konnten nicht geladen werden.\");\n    if(sessionRevision!==dataRevision([]))throw new ClientApiError(\"Die Sitzung wurde geändert. Bitte erneut versuchen.\",\"session_changed\",401);\n    return result;\n  })",
-          "line": 150,
+          "line": 161,
           "arguments": []
         },
         {
           "callee": "fetchApi",
-          "line": 151,
+          "line": 162,
           "arguments": [
             "path",
             "{method:\"GET\",cache:\"no-store\",signal:AbortSignal.timeout(15000)}"
@@ -9745,7 +9761,7 @@
         },
         {
           "callee": "fetchApi",
-          "line": 163,
+          "line": 174,
           "arguments": [
             "path",
             "{\n    method:\"PATCH\",\n    headers:{\"Content-Type\":\"application/json\"},\n    body:JSON.stringify(body),\n  }"
@@ -9753,7 +9769,7 @@
         },
         {
           "callee": "fetchApi",
-          "line": 173,
+          "line": 184,
           "arguments": [
             "path",
             "{method:\"DELETE\"}"
@@ -9761,7 +9777,7 @@
         },
         {
           "callee": "fetchApi",
-          "line": 188,
+          "line": 199,
           "arguments": [
             "path",
             "{method:\"POST\",body:form,headers}"

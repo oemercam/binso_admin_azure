@@ -1,5 +1,6 @@
 "use client";
-import {useState} from 'react';
+import {useRef,useState} from 'react';
+import {apiGetFile} from '@/lib/client/backend';
 import {useLocale,LocalizedText} from '@/lib/client/locale';
 import {localeTags} from '@/lib/locales/config';
 import {useApiQuery} from '@/lib/client/use-api-query';
@@ -13,6 +14,19 @@ export function ReportsPage(){
  const {locale}=useLocale(),[period,setPeriod]=useState({months:'1',from:businessDate().slice(0,7)+'-01',to:businessDate()}),[draft,setDraft]=useState(period),[open,setOpen]=useState(false);
  const query=new URLSearchParams(period),resource=useApiQuery<ReportSummary>('/api/reports?'+query.toString()),data=resource.data;
  const hasAccess=!!data&&[data.customers,data.projects,data.time,data.payments,data.expenses,data.employees].some(value=>value!==null);
+ const exportPending=useRef(false),[exportBusy,setExportBusy]=useState(false),[exportError,setExportError]=useState('');
+ const exportCsv=async()=>{
+  if(exportPending.current||!data||!hasAccess)return;
+  exportPending.current=true;setExportBusy(true);setExportError('');
+  try{
+   const file=await apiGetFile('/api/reports?'+query.toString()+'&format=csv&lang='+locale,'text/csv');
+   const url=URL.createObjectURL(file.blob),anchor=document.createElement('a');
+   anchor.href=url;anchor.download=file.fileName?.endsWith('.csv')?file.fileName:`binso-reports-${data.period.from}-${data.period.to}.csv`;
+   try{anchor.hidden=true;document.body.appendChild(anchor);anchor.click()}
+   finally{anchor.remove();window.setTimeout(()=>URL.revokeObjectURL(url),1000)}
+  }catch(error){setExportError(error instanceof Error?error.message:'Daten konnten nicht geladen werden.')}
+  finally{exportPending.current=false;setExportBusy(false)}
+ };
  const date=(value:string)=>new Intl.DateTimeFormat(localeTags[locale],{dateStyle:'short',timeZone:'UTC'}).format(new Date(value+'T12:00:00Z'));
  const number=(value:string)=>Number(value).toLocaleString(localeTags[locale],{maximumFractionDigits:2});
  return <AppShell title="Berichte" active="berichte" subtitle={data?date(data.period.from)+' – '+date(data.period.to):undefined}>
@@ -24,8 +38,8 @@ export function ReportsPage(){
    {data.time&&<WorkspaceSection><h2><LocalizedText>Arbeitszeit im Zeitraum</LocalizedText></h2><MetricTiles columns={2}><MetricTile label="Arbeitszeit" value={number(data.time.hours)+' h'}/><MetricTile label="Verrechnete Zeit" value={number(data.time.invoiced_hours)+' h'}/><MetricTile label="Verrechenbare Zeit" value={number(data.time.billable_hours)+' h'}/></MetricTiles></WorkspaceSection>}
    {data.payments&&<WorkspaceSection><h2><LocalizedText>Eingegangene Zahlungen</LocalizedText></h2>{data.payments.length?<MetricTiles columns={2}>{data.payments.map(item=><MetricTile key={item.currency} label={item.currency} value={formatCurrency(item.amount,item.currency)}/>)}</MetricTiles>:<EmptyState compact title="Keine Zahlungen im Zeitraum" text=""/>}</WorkspaceSection>}
    {data.expenses&&<WorkspaceSection><h2><LocalizedText>Erstattete Spesen</LocalizedText></h2>{data.expenses.length?<MetricTiles columns={2}>{data.expenses.map(item=><MetricTile key={item.currency} label={item.currency} value={formatCurrency(item.amount,item.currency)}/>)}</MetricTiles>:<EmptyState compact title="Keine Spesenerstattungen im Zeitraum" text=""/>}</WorkspaceSection>}
-   <WorkspaceSection>{(data.payments||data.expenses)&&<p><LocalizedText>Zahlungsbeträge enthalten ausschliesslich verbuchte Zahlungseingänge und erfasste Spesenerstattungen. Andere Kosten und Löhne sind darin nicht enthalten.</LocalizedText></p>}<Button disabled={!hasAccess} download variant="secondary" href={'/api/reports?'+query.toString()+'&format=csv&lang='+locale}><LocalizedText>CSV exportieren</LocalizedText></Button></WorkspaceSection>
+   <WorkspaceSection>{(data.payments||data.expenses)&&<p><LocalizedText>Zahlungsbeträge enthalten ausschliesslich verbuchte Zahlungseingänge und erfasste Spesenerstattungen. Andere Kosten und Löhne sind darin nicht enthalten.</LocalizedText></p>}{exportError&&<ErrorState>{exportError}</ErrorState>}<Button disabled={!hasAccess||exportBusy} aria-busy={exportBusy} variant="secondary" onClick={()=>void exportCsv()}><LocalizedText>CSV exportieren</LocalizedText></Button></WorkspaceSection>
   </>}
-  <FilterSheet label="Berichtszeitraum" open={open} onClose={()=>setOpen(false)}><Field allowReadOnlyInput label="Zeitraum"><Select value={draft.months} onChange={event=>setDraft({...draft,months:event.target.value})}><option value="1"><LocalizedText>Dieser Monat</LocalizedText></option><option value="3"><LocalizedText>3 Monate</LocalizedText></option><option value="6"><LocalizedText>6 Monate</LocalizedText></option><option value="12"><LocalizedText>12 Monate</LocalizedText></option><option value="custom"><LocalizedText>Eigener Zeitraum</LocalizedText></option></Select></Field>{draft.months==='custom'&&<><Field allowReadOnlyInput label="Von"><Input type="date" value={draft.from} onChange={event=>setDraft({...draft,from:event.target.value})}/></Field><Field allowReadOnlyInput label="Bis"><Input type="date" value={draft.to} onChange={event=>setDraft({...draft,to:event.target.value})}/></Field></>}<div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setOpen(false)}><LocalizedText>Abbrechen</LocalizedText></Button><Button onClick={()=>{setPeriod(draft);setOpen(false)}}><LocalizedText>Anwenden</LocalizedText></Button></div></FilterSheet>
+  <FilterSheet label="Berichtszeitraum" open={open} onClose={()=>setOpen(false)}><Field allowReadOnlyInput label="Zeitraum"><Select value={draft.months} onChange={event=>setDraft({...draft,months:event.target.value})}><option value="1"><LocalizedText>Dieser Monat</LocalizedText></option><option value="3"><LocalizedText>3 Monate</LocalizedText></option><option value="6"><LocalizedText>6 Monate</LocalizedText></option><option value="12"><LocalizedText>12 Monate</LocalizedText></option><option value="custom"><LocalizedText>Eigener Zeitraum</LocalizedText></option></Select></Field>{draft.months==='custom'&&<><Field allowReadOnlyInput label="Von"><Input type="date" value={draft.from} onChange={event=>setDraft({...draft,from:event.target.value})}/></Field><Field allowReadOnlyInput label="Bis"><Input type="date" value={draft.to} onChange={event=>setDraft({...draft,to:event.target.value})}/></Field></>}<div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setOpen(false)}><LocalizedText>Abbrechen</LocalizedText></Button><Button onClick={()=>{setPeriod(draft);setExportError('');setOpen(false)}}><LocalizedText>Anwenden</LocalizedText></Button></div></FilterSheet>
  </AppShell>;
 }
