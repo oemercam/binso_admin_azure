@@ -16,6 +16,8 @@ import {saveDomEvidence} from './ux-dom-evidence.mjs';
 // No request reaches a production system; unhandled fixture APIs fail closed.
 const engines=await import(process.env.BINSO_PLAYWRIGHT_MODULE?pathToFileURL(process.env.BINSO_PLAYWRIGHT_MODULE).href:'playwright');
 const output=process.env.BINSO_UX_OUTPUT??'/tmp/binso-ux-browser';
+const previewState=process.env.BINSO_UX_PREVIEW_STATE;
+if(previewState&&(previewState!=='error'||process.env.BINSO_UX_MATRIX_ONLY!=='1'))throw Error('Preview state requires the isolated matrix-only error case');
 // Keep period assertions valid as the real Swiss calendar advances; never freeze
 // Date.now, which would corrupt timer/recovery interactions in the same suite.
 const statisticToday=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Zurich',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
@@ -89,6 +91,7 @@ function recordListFixture(table,params){
  return {items:rows.slice(offset,offset+limit),total:rows.length};
 }
 const summary={invoices:[{currency:'CHF',open_amount:35.13,revenue:135.13,open_count:1,overdue_count:0,draft_count:0}],offers:{draft_count:0,sent_count:0,accepted_count:0},time:{hours:2.25,invoiced_hours:0,ready_hours:0,unapproved_hours:0},expenses:{ready_amount:0}};
+if(process.env.BINSO_UX_FIXTURE_CASE==='empty')summary.invoices=[];
 const fixturePdf=process.env.BINSO_UX_PDF_FILE?await fs.readFile(process.env.BINSO_UX_PDF_FILE):await new Promise(resolve=>{const doc=new PDFDocument({size:'A4'}),chunks=[];doc.on('data',chunk=>chunks.push(chunk));doc.on('end',()=>resolve(Buffer.concat(chunks)));doc.text('Invoice fixture page one');doc.addPage().text('Payment fixture page two');doc.end()});
 const requestedInteractions=process.env.BINSO_UX_INTERACTIONS?.split(',')??['data','customers','products','employees','documents','finance','time','expenses','chat','billing','header','operator','settings','chrome'];
 const hasInteraction=name=>requestedInteractions.includes(name);
@@ -141,6 +144,7 @@ try{
   await context.addInitScript(mode=>{localStorage.setItem('binso.theme.mode',mode);localStorage.setItem('binso.privacy.preferences.v1',JSON.stringify({essential:true,performance:false,updatedAt:'2026-10-08'}))},theme);
   await context.route('**/api/**',async route=>{
    const req=route.request(),url=new URL(req.url()),p=url.pathname;
+   if(previewState==='error'&&req.method()==='GET'&&p==='/api/customers')return route.fulfill({status:503,json:{message:'Kundendaten vorübergehend nicht verfügbar.'}});
    if(req.method()!=='GET'){
     if(p==='/api/projects'){projectPosts++;const body=JSON.parse(req.postData()),key=req.headers()['idempotency-key'];assert.ok(key,'Project creation carries a stable replay key');assert.equal(body.customerId,'','The minimal internal project needs no artificial customer');assert.ok(body.name.length>=2);await new Promise(resolve=>setTimeout(resolve,150));if(failProjectCreate)return route.fulfill({status:503,json:{message:'Synthetic project creation unavailable'}});if(!projectReplays.has(key))projectReplays.set(key,{id:projectReplays.size?'project-created-'+(projectReplays.size+1):'project-created',name:body.name,customer_id:null});if(loseProjectResponse){loseProjectResponse=false;return route.abort('failed');}return route.fulfill({status:201,json:{item:projectReplays.get(key)}});}
     if(p==='/api/customers'&&req.method()==='POST'){customerPosts++;const body=JSON.parse(req.postData()),key=req.headers()['idempotency-key'];assert.ok(key,'Customer creation carries its recoverable request key');assert.ok(body.name.length>=2);assert.equal(body.city,'','Minimal creation does not invent a mandatory city');await new Promise(resolve=>setTimeout(resolve,150));if(failCustomerCreate)return route.fulfill({status:503,json:{message:'Synthetic customer creation unavailable'}});if(!customerReplays.has(key))customerReplays.set(key,{...customer,id:'customer-created-'+(customerReplays.size+1),customer_no:'K-'+String(customerReplays.size+2).padStart(6,'0'),name:body.name,city:body.city});if(loseCustomerResponse){loseCustomerResponse=false;return route.abort('failed');}return route.fulfill({status:201,json:{item:customerReplays.get(key)}});}
@@ -313,7 +317,7 @@ try{
     assert.ok(geometry.scroll<=width+1&&geometry.body<=width+1,`${theme} ${width} ${route}: horizontal overflow ${JSON.stringify(geometry)}`);
     if(!process.env.BINSO_UX_BASELINE&&width<=1100&&await page.locator('.page-container,.operator-app-content').count()){
       const appearance=await page.locator('.page-container,.operator-app-content').first().evaluate(el=>({ink:getComputedStyle(el).color,surface:getComputedStyle(el).getPropertyValue('--app-surface').trim(),controls:[...el.querySelectorAll('.form-control,.form-textarea')].filter(node=>!['checkbox','radio','file'].includes(node.type)&&!node.closest('.searchbox,.thread-composer')).map(node=>({radius:getComputedStyle(node).borderTopLeftRadius,font:getComputedStyle(node).fontSize})),groups:[...el.querySelectorAll('.bo-settings-group-body')].map(node=>({background:getComputedStyle(node).backgroundColor,border:getComputedStyle(node).borderTopWidth}))}));
-      assert.equal(appearance.ink,theme==='light'?'rgb(34, 34, 37)':'rgb(222, 222, 226)',`${route}: app text uses the central theme`);
+      assert.equal(appearance.ink,theme==='light'?(route.startsWith('/operator')?'rgb(34, 34, 37)':'rgb(33, 48, 71)'):(route.startsWith('/operator')?'rgb(222, 222, 226)':'rgb(215, 227, 243)'),`${route}: app text uses the central theme`);
       assert.ok(appearance.controls.every(control=>control.radius==='8px'),`${route}: shared app field corners ${JSON.stringify(appearance.controls)}`);
       assert.ok(appearance.groups.every(group=>group.border==='0px'&&group.background===(theme==='light'?'rgb(255, 255, 255)':'rgb(20, 20, 20)')),`${route}: grouped app surfaces in both themes`);
     }
@@ -326,8 +330,8 @@ try{
       await page.evaluate(()=>{window.scrollTo(0,0);return new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))});
     }
     if(width<=760&&await page.locator('.mobile-back').count()){const back=page.locator('.mobile-back');assert.ok(await back.isVisible(),`${route}: detail back control is visible`);const icon=await back.locator('svg').boundingBox();assert.ok(icon&&icon.width>=18&&icon.height>=18&&icon.x>=0,`${route}: back icon is not clipped`);}
-    if(!process.env.BINSO_UX_BASELINE&&['/dashboard','/finanzen','/finanzen/analyse','/kunden/customer-one'].includes(route)){
-      assert.equal(await page.locator('.bo-statistics .bo-metric-tiles>.metric').count(),route==='/kunden/customer-one'?3:4,'The common foundation shows domain-appropriate primary metrics');
+    if(!process.env.BINSO_UX_BASELINE&&['/dashboard','/finanzen','/finanzen/analyse','/kunden/customer-one?tab=finances'].includes(route)){
+      assert.equal(await page.locator('.bo-statistics .bo-metric-tiles>.metric').count(),route==='/kunden/customer-one?tab=finances'?3:4,'The common foundation shows domain-appropriate primary metrics');
       assert.equal(await page.locator('.bo-statistics').count(),1,'One central statistics surface');
       assert.equal(await page.locator('.bo-statistics').evaluate(el=>getComputedStyle(el).backgroundColor),width<=1100?(theme==='light'?'rgb(255, 255, 255)':'rgb(20, 20, 20)'):(theme==='light'?'rgb(255, 255, 255)':'rgb(0, 0, 0)'),'Statistics follow the app surface on phone/tablet and page surface on desktop');
       const trendToggle=page.getByRole('button',{name:'Zeitverlauf anzeigen',exact:true}),initiallyCollapsed=await trendToggle.count()>0;if(initiallyCollapsed)await trendToggle.click();
@@ -336,14 +340,32 @@ try{
       // Preserve the actual initial disclosure state in the reference captures.
       if(initiallyCollapsed)await page.getByRole('button',{name:'Zeitverlauf ausblenden',exact:true}).click();
     }
+    if(!process.env.BINSO_UX_BASELINE&&route==='/kunden/customer-one'){
+      const dossier=page.locator('.detail-grid[data-layout="dossier"]');
+      assert.equal(await dossier.count(),1,'Customer overview uses the shared reference dossier layout');
+      assert.equal(await dossier.locator('[data-area="summary"] .metric').count(),2,'Customer overview shows actual yearly volume and open receivables');
+      assert.equal(await page.locator('.bo-statistics').count(),0,'The period chart belongs to the document/finance tab');
+      assert.equal(await page.locator('h1').filter({visible:true}).count(),1,'Reference dossier has exactly one visible primary heading');
+      const summaryBox=await dossier.locator('[data-area="summary"]').boundingBox(),factsBox=await dossier.locator('[data-area="facts"]').boundingBox(),recordsBox=await dossier.locator('[data-area="records"]').boundingBox();
+      if(width<=1100)assert.ok(summaryBox.y<factsBox.y&&factsBox.y<recordsBox.y,'Mobile order: finances, contact facts, open invoices');
+      else assert.ok(factsBox.x>summaryBox.x&&recordsBox.y>summaryBox.y,'Desktop order: work on the left, contact facts on the right');
+      const supplementary=dossier.locator('.bo-data-disclosure');
+      if(width<=1100){
+       assert.equal(await supplementary.getAttribute('open'),null,'Supplementary mobile facts start collapsed');
+       await supplementary.locator('summary').click();await page.waitForFunction(()=>document.querySelector('.bo-data-disclosure').open);
+       await supplementary.locator('summary').press('Enter');await page.waitForFunction(()=>!document.querySelector('.bo-data-disclosure').open);
+       await supplementary.locator('summary').evaluate(el=>el.blur());
+      }else assert.notEqual(await supplementary.getAttribute('open'),null,'Desktop supplementary facts stay visible');
+
+    }
     if(!process.env.BINSO_UX_BASELINE&&route==='/mitarbeiter/employee-one'){await page.getByRole('heading',{name:'Mitarbeiterdetails',exact:true}).waitFor();await page.getByText(employee.email,{exact:true}).waitFor()}
     if(!process.env.BINSO_UX_BASELINE&&route==='/support/ticket-one'){
       const before=await page.locator('.thread-composer').boundingBox();await page.locator('.thread-messages').evaluate(el=>{el.scrollTop=0});const after=await page.locator('.thread-composer').boundingBox();assert.deepEqual(after,before,'Only messages scroll; composer stays fixed');
       const visible=await page.evaluate(()=>{const composer=document.querySelector('.thread-composer').getBoundingClientRect(),nav=document.querySelector('.bottom-nav');const limit=nav?.getClientRects().length?nav.getBoundingClientRect().top:innerHeight;return composer.bottom<=limit+1&&composer.top>=0&&scrollY===0});assert.ok(visible,'Chat input stays above navigation in every app viewport');
     }
     if(!process.env.BINSO_UX_BASELINE){for(const control of await page.locator('.form-field>.form-control').filter({visible:true}).all()){
-     const g=await control.evaluate(el=>{const c=getComputedStyle(el);return {height:el.getBoundingClientRect().height,radius:c.borderRadius,padding:c.paddingLeft,font:c.fontSize,app:!!el.closest('.page-container,.operator-app-content,.bottom-sheet,.header-panel,.confirm-dialog')}});
-     assert.equal(g.height,width<=760||(g.app&&width<=1100)?44:40,`${route}: canonical closed field height`);assert.equal(g.padding,'11px',`${route}: canonical field inset`);assert.equal(g.radius,width<=1100?'8px':'7px',`${route}: canonical field radius`);
+     const g=await control.evaluate(el=>{const c=getComputedStyle(el);return {height:el.getBoundingClientRect().height,radius:c.borderRadius,padding:c.paddingLeft,font:c.fontSize,auth:!!el.closest('.auth-workspace'),app:!!el.closest('.page-container,.operator-app-content,.bottom-sheet,.header-panel,.confirm-dialog')}});
+     assert.equal(g.height,width<=760||(g.app&&width<=1100)?44:g.auth?46:40,`${route}: canonical closed field height`);assert.equal(g.padding,'11px',`${route}: canonical field inset`);assert.equal(g.radius,g.auth?'5px':width<=1100?'8px':'7px',`${route}: canonical field radius`);
     }}
     for(const label of await page.locator('.detail-list dt').filter({visible:true}).all()){const confined=await label.evaluate(el=>{const r=el.getBoundingClientRect(),range=document.createRange();range.selectNodeContents(el);return [...range.getClientRects()].every(text=>text.right<=r.right+1)});assert.ok(confined,`${route}: detail labels never overlap their values`);}
     if(width<=1100&&await page.locator('.mobile-header-detail').count())assert.equal(await page.locator('.page-head h1,.page-head .status,.desktop-back').filter({visible:true}).count(),0,route+' '+width+': app detail header owns its title/status/back once, including tablet');
@@ -775,7 +797,7 @@ try{
    await row.getByRole('button',{name:'Alex Muster Aktionen'}).click();await actionEvidence(page,'Kontaktaktionen',theme);await page.getByRole('button',{name:'Kontakt bearbeiten'}).click();
    const primary=page.getByRole('checkbox',{name:'Als Hauptkontakt festlegen'}),box=await primary.boundingBox();assert.ok(box.width<=24&&box.height<=24,'Primary contact checkbox stays compact');assert.equal(await primary.isChecked(),true,'Existing primary contact value is retained');assert.ok((await page.getByRole('dialog').boundingBox()).x>=0,'Contact sheet stays inside the viewport');
    await capture(page,{animations:'disabled',path:path.join(output,`${theme}-320-contact-form-final.png`)});await page.keyboard.press('Escape');
-   await page.getByRole('tab',{name:'Finanzen',exact:true}).click();await capture(page,{animations:'disabled',path:path.join(output,`${theme}-320-customer-finance-final.png`)});assert.equal(await page.locator('.mobile-record-list .document-summary-row').count(),2,'Offers and invoices share the same financial row');
+   await page.getByRole('tab',{name:'Dokumente',exact:true}).click();await capture(page,{animations:'disabled',path:path.join(output,`${theme}-320-customer-finance-final.png`)});assert.equal(await page.locator('.mobile-record-list .document-summary-row').count(),2,'Offers and invoices share the same financial row');
   }
   if(hasInteraction('time')){
    groupingFixture=true;   await page.setViewportSize({width:320,height:740});await navigate(base+'/zeit');await page.waitForLoadState('networkidle');await page.getByRole('tab',{name:'Einträge',exact:true}).click();
@@ -1063,17 +1085,17 @@ try{
    if(!await tabs.list.getByText(/2[’']561\.97/).count())console.log('Pending read diagnostics:',await tabs.list.locator('body').innerText());
    assert.ok(await tabs.list.getByText(/2[’']561\.97/).count(),'A confirmed invoice stays visible while a background request is pending');
    holdDataRefresh=false;dataRefreshWaiters.splice(0).forEach(resolve=>resolve());await tabs.list.waitForLoadState('networkidle');
-   await tabs.customer.getByRole('tab',{name:'Finanzen',exact:true}).click();await tabs.activity.getByRole('tab',{name:'Aktivität',exact:true}).click();
+   await tabs.customer.getByRole('tab',{name:'Dokumente',exact:true}).click();await tabs.activity.getByRole('tab',{name:'Aktivitäten',exact:true}).click();
    for(const consumer of Object.values(tabs))await consumer.evaluate(()=>{window.v215ConsumerChanges=[]});
    await tabs.form.getByLabel('Zahlungsbetrag CHF',{exact:true}).fill('1000');
    const initialPosts=dataPaymentPosts;dataPaymentFailed=true;await tabs.form.getByRole('button',{name:'Zahlung speichern',exact:true}).click();await tabs.form.getByText('Synthetic payment failed',{exact:true}).waitFor();assert.equal(invoice.paid_amount,0);assert.equal(dataPaymentPosts,initialPosts+1);assert.equal(await tabs.detail.getByText(/1[’']561\.97/).count(),0,'Failed payment cannot create a visible fictional balance');
    dataPaymentFailed=false;incompletePaymentResponse=true;await tabs.form.getByRole('button',{name:'Zahlung speichern',exact:true}).click();await tabs.form.getByText('Die Speicherung konnte nicht bestätigt werden. Bitte den gespeicherten Stand prüfen.',{exact:true}).waitFor();assert.equal(await tabs.form.getByText('Zahlung gespeichert.',{exact:true}).count(),0,'Incomplete JSON confirmation cannot report financial success');assert.equal(invoice.paid_amount,0);incompletePaymentResponse=false;losePaymentResponse=true;await tabs.form.getByRole('button',{name:'Zahlung speichern',exact:true}).click();await tabs.form.getByText('Keine Verbindung zum Server. Bitte die Verbindung und den gespeicherten Stand prüfen.',{exact:true}).waitFor();assert.equal(invoice.paid_amount,1000,'The server committed although its response was lost');assert.equal(await tabs.form.getByText('Zahlung gespeichert.',{exact:true}).count(),0,'Lost response is never reported as success');
    await tabs.form.getByRole('button',{name:'Zahlung speichern',exact:true}).click();await tabs.form.getByText('Zahlung gespeichert.',{exact:true}).waitFor();assert.equal(dataPaymentPosts,initialPosts+4);assert.equal(invoice.paid_amount,1000,'Retry replays the original request without a second payment');assert.equal(collections.payments.filter(row=>row.id==='foundation-payment').length,1);
-   for(const [name,value] of [['detail',/1[’']561\.97/],['list',/1[’']561\.97/],['customer',/1[’']561\.97/],['finance',/1[’']561\.97/],['payments',/1[’']000\.00/],['dashboard',/1[’']561\.97/],['customerOverview',/1[’']000\.00/],['activity','Zahlung erhalten']]){
+   for(const [name,value] of [['detail',/1[’']561\.97/],['list',/1[’']561\.97/],['customer',/1[’']561\.97/],['finance',/1[’']561\.97/],['payments',/1[’']000\.00/],['dashboard',/1[’']561\.97/],['customerOverview',/1[’']561\.97/],['activity','Zahlung erhalten']]){
     await tabs[name].waitForFunction(()=>window.v215ConsumerChanges.some(message=>message.domains?.includes('payments')),undefined,{polling:100});await tabs[name].bringToFront();await tabs[name].getByText(value,{exact:typeof value==='string'}).first().waitFor();assert.equal(await tabs[name].evaluate(()=>window.v215ConsumerMarker),'same-document',name+' updates without a reload');
    }
-   for(const [name,amount] of [['dashboard',"CHF 1'561.97"],['finance',"CHF 1'561.97"],['customerOverview',"CHF 1'000.00"]]){
-    await tabs[name].bringToFront();assert.equal((await tabs[name].locator('.bo-statistics .metric>strong').nth(name==='customerOverview'?0:1).textContent())?.replaceAll('’',"'"),amount,name+' domain metric refreshes from the same confirmed ledger');
+   for(const [name,amount] of [['dashboard',"CHF 1'561.97"],['finance',"CHF 1'561.97"],['customerOverview',"CHF 1'561.97"]]){
+    await tabs[name].bringToFront();assert.equal((await tabs[name].locator(name==='customerOverview'?'.detail-grid [data-area="summary"] .metric>strong':'.bo-statistics .metric>strong').nth(1).textContent())?.replaceAll('’',"'"),amount,name+' domain metric refreshes from the same confirmed ledger');
    }
    for(const tab of Object.values(tabs))await tab.close();dataPaymentMode=false;Object.assign(invoice,priorInvoice);summary.invoices[0].open_amount=priorOpenAmount;collections.payments=collections.payments.filter(row=>row.id!=='foundation-payment');collections.customers=collections.customers.filter(row=>row.id!=='customer-two');Object.assign(customer,priorCustomer);
    console.log('Actual PaymentForm: failed mutation has no fictional balance; lost committed response retries the same key without double payment; confirmed partial payment updates eight mounted cross-tab consumers without reload.');

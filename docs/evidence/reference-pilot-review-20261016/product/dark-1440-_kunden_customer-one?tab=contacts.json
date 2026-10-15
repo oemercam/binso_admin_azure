@@ -1,0 +1,1547 @@
+{
+  "url": "http://127.0.0.1:3200/kunden/customer-one?tab=contacts",
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "documentWidth": 1440,
+  "elements": [
+    {
+      "selector": ".page-head h1",
+      "tag": "H1",
+      "classes": "",
+      "text": "Prüffirma AG",
+      "inline": null,
+      "rect": {
+        "x": 221,
+        "y": 140,
+        "width": 1193,
+        "height": 40.5
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "1193px",
+        "min-width": "0px",
+        "max-width": "none",
+        "height": "40.5px",
+        "min-height": "auto",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "1 1 0%",
+        "grid": "none / none / none / row / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-family": "Inter, system-ui, sans-serif",
+        "color": "rgb(215, 227, 243)",
+        "letter-spacing": "-0.6px",
+        "font-size": "27px",
+        "font-weight": "600",
+        "line-height": "40.5px",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 20,
+          "order": 369,
+          "selector": ".page-head h1",
+          "css": "margin: 0px; font-size: var(--page-heading-size); line-height: var(--page-heading-line-height); letter-spacing: var(--page-heading-letter-spacing); font-weight: var(--workspace-title-weight);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 31,
+          "order": 1569,
+          "selector": ".page-head h1",
+          "css": "font-size: 30px; line-height: 1.05;",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 147,
+          "order": 1685,
+          "selector": ".page-head h1",
+          "css": "font-size: var(--workspace-title-size); line-height: 1.5;",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 99,
+          "order": 1828,
+          "selector": ".page-head h1",
+          "css": "font-size: 25px; line-height: 1.5; letter-spacing: var(--mobile-title-tracking);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 23,
+          "order": 2406,
+          "selector": ".bo-detail-heading h1, .bo-page-heading h1",
+          "css": "margin: 0px; min-width: 0px; flex: 1 1 0%; overflow-wrap: anywhere;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 43,
+          "order": 2426,
+          "selector": ".page-head h1",
+          "css": "overflow-wrap: anywhere;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 16,
+          "order": 2465,
+          "selector": ".page-head[data-heading-placement=\"content\"] .bo-detail-heading-main h1",
+          "css": "font-size: 23px; line-height: 1.5;",
+          "contexts": [
+            "media (max-width: 1100px)"
+          ],
+          "active": false
+        }
+      ]
+    },
+    {
+      "selector": ".desktop-global-search",
+      "tag": "BUTTON",
+      "classes": "button button-secondary desktop-global-search",
+      "text": "Alles durchsuchen⌘ / Ctrl K",
+      "inline": null,
+      "rect": {
+        "x": 1089.828125,
+        "y": 10.5,
+        "width": 219.625,
+        "height": 34
+      },
+      "computed": {
+        "display": "flex",
+        "position": "static",
+        "width": "219.625px",
+        "min-width": "184px",
+        "max-width": "none",
+        "height": "34px",
+        "min-height": "34px",
+        "padding": "0px 16px",
+        "border-radius": "7px",
+        "border-width": "1px",
+        "margin": "0px",
+        "gap": "8px",
+        "flex": "0 0 auto",
+        "grid": "none / none / none / row / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "center",
+        "align-content": "normal",
+        "justify-content": "flex-start",
+        "text-align": "center",
+        "font-family": "Inter, system-ui, sans-serif",
+        "color": "rgb(177, 191, 206)",
+        "letter-spacing": "normal",
+        "font-size": "11px",
+        "font-weight": "400",
+        "line-height": "11px",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgb(0, 0, 0)",
+        "white-space": "nowrap"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 9,
+          "order": 10,
+          "selector": "button, input, select, textarea",
+          "css": "font: inherit; color: inherit;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 10,
+          "order": 11,
+          "selector": "button",
+          "css": "cursor: pointer;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 18,
+          "order": 19,
+          "selector": ".button",
+          "css": "min-height: var(--button-height); height: var(--button-height); padding: 0 var(--button-padding-inline); display: inline-flex; align-items: center; justify-content: center; gap: var(--button-gap); border: 1px solid transparent; border-radius: var(--button-radius); background: transparent; font-size: var(--button-font-size); font-weight: var(--button-font-weight); line-height: var(--button-line-height); white-space: nowrap; transition: background-color var(--motion-fast) var(--motion-ease),opacity var(--motion-fast) var(--motion-ease);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 23,
+          "order": 24,
+          "selector": ".button-secondary",
+          "css": "background: var(--color-bg); color: var(--color-fg); border-color: var(--color-line);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 469,
+          "order": 817,
+          "selector": ".button, .icon-button, .sheet-menu > a, .sheet-menu > button",
+          "css": "transition: transform var(--motion-fast) var(--motion-ease),background-color var(--motion-fast) ease,border-color var(--motion-fast) ease,opacity var(--motion-fast) ease;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 144,
+          "order": 1682,
+          "selector": ".desktop-appbar-actions > .desktop-global-search",
+          "css": "flex: 0 0 auto; min-width: 184px; height: 34px; min-height: 34px; justify-content: flex-start; border-radius: 7px; color: var(--color-muted); font-size: 11px;",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 105,
+          "order": 1834,
+          "selector": ".button",
+          "css": "min-height: 44px; height: 44px; padding-inline: 14px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 431,
+          "order": 2160,
+          "selector": "a, button, input, select, textarea",
+          "css": "-webkit-tap-highlight-color: transparent;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": false
+        }
+      ]
+    },
+    {
+      "selector": ".workspace-company",
+      "tag": "A",
+      "classes": "workspace-company",
+      "text": "Prüffirma AGUnternehmen",
+      "inline": null,
+      "rect": {
+        "x": 14,
+        "y": 88,
+        "width": 166,
+        "height": 55.1875
+      },
+      "computed": {
+        "display": "flex",
+        "position": "static",
+        "width": "166px",
+        "min-width": "auto",
+        "max-width": "none",
+        "height": "55.1875px",
+        "min-height": "44px",
+        "padding": "10px 8px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px 0px 20px",
+        "gap": "10px",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / row / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "center",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-family": "Inter, system-ui, sans-serif",
+        "color": "rgb(215, 227, 243)",
+        "letter-spacing": "normal",
+        "font-size": "12px",
+        "font-weight": "400",
+        "line-height": "16.8px",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 8,
+          "order": 9,
+          "selector": "a",
+          "css": "color: inherit; text-decoration: none;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 852,
+          "order": 1199,
+          "selector": ".workspace-company",
+          "css": "display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 10px 8px; margin-bottom: 20px; font-size: 12px; line-height: 1.4; color: var(--color-fg);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 431,
+          "order": 2160,
+          "selector": "a, button, input, select, textarea",
+          "css": "-webkit-tap-highlight-color: transparent;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": false
+        }
+      ]
+    },
+    {
+      "selector": ".bo-detail-meta",
+      "tag": "P",
+      "classes": "bo-detail-meta",
+      "text": "AktivBern",
+      "inline": null,
+      "rect": {
+        "x": 221,
+        "y": 186.5,
+        "width": 780,
+        "height": 24
+      },
+      "computed": {
+        "display": "flex",
+        "position": "static",
+        "width": "780px",
+        "min-width": "auto",
+        "max-width": "780px",
+        "height": "24px",
+        "min-height": "auto",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "12px",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / row / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "center",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-family": "Inter, system-ui, sans-serif",
+        "color": "rgb(177, 191, 206)",
+        "letter-spacing": "normal",
+        "font-size": "14px",
+        "font-weight": "400",
+        "line-height": "19.6px",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 21,
+          "order": 370,
+          "selector": ".page-head p",
+          "css": "margin: 7px 0px 0px; color: var(--color-muted); font-size: var(--body-font-size); line-height: var(--body-line-height);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 859,
+          "order": 1206,
+          "selector": ".bo-detail-meta",
+          "css": "display: flex; align-items: center; gap: 12px; flex-wrap: wrap;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 32,
+          "order": 1570,
+          "selector": ".page-head p",
+          "css": "max-width: 780px; margin-top: 8px;",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 148,
+          "order": 1686,
+          "selector": ".page-head p",
+          "css": "margin-top: 5px; font-size: 13px; line-height: 1.4;",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 100,
+          "order": 1829,
+          "selector": ".page-head p",
+          "css": "max-width: 34rem; margin-top: 6px; font-size: 11px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 24,
+          "order": 2407,
+          "selector": ".bo-detail-heading p, .bo-page-heading p",
+          "css": "margin: 0px; color: var(--color-muted,#71717a); font-size: 0.875rem;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".page-container",
+      "tag": "MAIN",
+      "classes": "page-container",
+      "text": "KundenK-000001Prüffirma AGAktivBernBearbeitenAngebot erstellenRechnung erstellenZeit erfassenÜbersichtKontakteDokumenteAktivitätenKontakteKontaktAMAlex MusterProjektleitungalex.muster@internationales-",
+      "inline": null,
+      "rect": {
+        "x": 195,
+        "y": 56,
+        "width": 1245,
+        "height": 579.5
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "1245px",
+        "min-width": "0px",
+        "max-width": "1760px",
+        "height": "579.5px",
+        "min-height": "0px",
+        "padding": "20px 26px 48px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / row / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-family": "Inter, system-ui, sans-serif",
+        "color": "rgb(215, 227, 243)",
+        "letter-spacing": "normal",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgb(0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 16,
+          "order": 366,
+          "selector": ".page-container",
+          "css": "background: var(--app-canvas); width: 100%; max-width: var(--content-max); margin: 0px auto; padding: 34px var(--page-x) 90px; animation: page-enter var(--motion-fast) var(--motion-ease-standard) backwards;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 29,
+          "order": 378,
+          "selector": ".page-container",
+          "css": "--page-x: 26px; --mobile-page-x: 22px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 848,
+          "order": 1195,
+          "selector": ".app-sidebar, .bottom-sheet, .confirm-dialog, .desktop-appbar, .header-panel, .operator-app-content, .operator-app-header, .operator-page-head, .page-container",
+          "css": "--app-accent: var(--app-action-accent);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 851,
+          "order": 1198,
+          "selector": ".app-sidebar, .auth-workspace, .bottom-sheet, .confirm-dialog, .desktop-appbar, .header-panel, .mobile-header, .page-container",
+          "css": "font-family: var(--workspace-font); color: var(--color-fg); --app-text: var(--workspace-ink); --app-secondary: var(--workspace-muted); --app-divider: var(--workspace-line); --color-fg: var(--workspace-ink); --color-muted: var(--workspace-muted); --color-line: var(--workspace-line); --button-font-size: 13px; --button-font-weight: 400;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 23,
+          "order": 1507,
+          "selector": ".page-container",
+          "css": "width: 100%; max-width: none; padding-left: clamp(24px, 3.2vw, 34px); padding-right: clamp(24px, 3.2vw, 34px);",
+          "contexts": [
+            "media (min-width: 761px) and (max-width: 1100px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 21,
+          "order": 1559,
+          "selector": ".page-container",
+          "css": "padding-top: 28px; padding-left: clamp(32px, 3vw, 48px); padding-right: clamp(32px, 3vw, 48px);",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 29,
+          "order": 1567,
+          "selector": ".page-container",
+          "css": "width: 100%; padding-top: 30px; padding-left: var(--page-x); padding-right: var(--page-x);",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 145,
+          "order": 1683,
+          "selector": ".page-container",
+          "css": "max-width: var(--content-max); padding: var(--desktop-page-top) var(--page-x) var(--desktop-page-bottom);",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 97,
+          "order": 1826,
+          "selector": ".page-container",
+          "css": "max-width: none; margin: 0px; padding: var(--mobile-page-top) max(var(--mobile-page-x),var(--safe-right)) calc(var(--mobile-nav-h) + var(--mobile-nav-bottom) + var(--safe-bottom) + 72px) max(var(--mobile-page-x),var(--safe-left));",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 287,
+          "order": 2016,
+          "selector": ".page-container",
+          "css": "scroll-padding-bottom: calc(var(--mobile-nav-h) + var(--mobile-nav-bottom) + var(--safe-bottom) + 28px);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 421,
+          "order": 2150,
+          "selector": ".mobile-header, .page-container",
+          "css": "padding-left: max(var(--mobile-page-x),var(--safe-left)); padding-right: max(var(--mobile-page-x),var(--safe-right));",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 434,
+          "order": 2163,
+          "selector": ".page-container",
+          "css": "min-width: 0px; padding-bottom: calc(var(--mobile-nav-h) + var(--mobile-nav-bottom) + var(--safe-bottom) + 28px);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 3,
+          "order": 2399,
+          "selector": ".app-root:not(.app-editing) .page-container",
+          "css": "padding-bottom: calc(54px + var(--safe-bottom) + 22px);",
+          "contexts": [
+            "media (max-height: 520px) and (orientation: landscape) and (max-width: 900px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 60,
+          "order": 2443,
+          "selector": ".page-container, .page-container section, .page-container > *",
+          "css": "min-width: 0px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 0,
+          "order": 2449,
+          "selector": ".mobile-header, .page-container",
+          "css": "--workspace-ink: var(--workspace-mobile-ink); --workspace-value-size: 23px; --metric-value-letter-spacing: var(--mobile-value-tracking);",
+          "contexts": [
+            "media (max-width: 1100px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 2,
+          "order": 2451,
+          "selector": ".page-container:has(> .page-head[data-heading-placement=\"content\"])",
+          "css": "--mobile-page-top: 28px; --mobile-page-head-gap: 24px;",
+          "contexts": [
+            "media (max-width: 1100px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 171,
+          "order": 2620,
+          "selector": ".page-container",
+          "css": "padding-bottom: calc(var(--mobile-nav-h) + var(--mobile-nav-bottom) + var(--safe-bottom) + 48px);",
+          "contexts": [
+            "media (max-width: 1100px)"
+          ],
+          "active": false
+        }
+      ]
+    },
+    {
+      "selector": ".bo-detail-heading",
+      "tag": "DIV",
+      "classes": "bo-detail-heading",
+      "text": "KundenK-000001Prüffirma AGAktivBernBearbeitenAngebot erstellenRechnung erstellenZeit erfassen",
+      "inline": null,
+      "rect": {
+        "x": 221,
+        "y": 76,
+        "width": 1193,
+        "height": 199.5
+      },
+      "computed": {
+        "display": "grid",
+        "position": "static",
+        "width": "1193px",
+        "min-width": "0px",
+        "max-width": "none",
+        "height": "199.5px",
+        "min-height": "auto",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "6px",
+        "flex": "1 1 0%",
+        "grid": "34px 18px 40.5px 24px 59px / 1193px / none / row / auto / auto",
+        "grid-template-columns": "1193px",
+        "grid-template-rows": "34px 18px 40.5px 24px 59px",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-family": "Inter, system-ui, sans-serif",
+        "color": "rgb(215, 227, 243)",
+        "letter-spacing": "normal",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 19,
+          "order": 368,
+          "selector": ".page-head > div",
+          "css": "min-width: 0px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 25,
+          "order": 1509,
+          "selector": ".page-head > div",
+          "css": "flex: 1 1 0%; min-width: 0px;",
+          "contexts": [
+            "media (min-width: 761px) and (max-width: 1100px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 21,
+          "order": 2404,
+          "selector": ".bo-detail-heading, .bo-page-heading",
+          "css": "display: grid; gap: 6px; min-width: 0px; flex: 1 1 0%;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 42,
+          "order": 2425,
+          "selector": ".page-head, .page-head > div",
+          "css": "min-width: 0px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 7,
+          "order": 2456,
+          "selector": ".page-head[data-heading-placement=\"content\"] .bo-detail-heading",
+          "css": "gap: 0px;",
+          "contexts": [
+            "media (max-width: 1100px)"
+          ],
+          "active": false
+        }
+      ]
+    },
+    {
+      "selector": ".tabs",
+      "tag": "DIV",
+      "classes": "tabs",
+      "text": "ÜbersichtKontakteDokumenteAktivitäten",
+      "inline": null,
+      "rect": {
+        "x": 221,
+        "y": 295.5,
+        "width": 1193,
+        "height": 55
+      },
+      "computed": {
+        "display": "flex",
+        "position": "static",
+        "width": "1193px",
+        "min-width": "0px",
+        "max-width": "none",
+        "height": "55px",
+        "min-height": "0px",
+        "padding": "0px 0px 10px",
+        "border-radius": "0px",
+        "border-width": "0px 0px 1px",
+        "margin": "0px 0px 20px",
+        "gap": "25px",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / row / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "center",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-family": "Inter, system-ui, sans-serif",
+        "color": "rgb(215, 227, 243)",
+        "letter-spacing": "normal",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "auto",
+        "overflow-x": "auto",
+        "overflow-y": "auto",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 72,
+          "order": 421,
+          "selector": ".chips, .notification-center-tabs, .tabs",
+          "css": "display: flex; align-items: center; gap: 6px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 113,
+          "order": 462,
+          "selector": ".tabs",
+          "css": "overflow-x: auto; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--color-line); scrollbar-width: none;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 856,
+          "order": 1203,
+          "selector": ".tabs[data-appearance=\"line\"]",
+          "css": "gap: 25px; padding-bottom: 0px; border-bottom: 1px solid var(--color-line); margin-block: 20px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 111,
+          "order": 1649,
+          "selector": ".desktop-detail-main > .tabs",
+          "css": "margin-top: 0px; margin-bottom: 20px; padding-bottom: 10px;",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 172,
+          "order": 1710,
+          "selector": ".tabs",
+          "css": "margin-bottom: var(--heading-content-gap); padding-bottom: 8px;",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 128,
+          "order": 1857,
+          "selector": ".chips, .tabs",
+          "css": "margin-left: calc(-1 * var(--mobile-page-x)); margin-right: 0px; padding-left: var(--mobile-page-x); padding-right: 0px; overflow-x: auto;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": false
+        }
+      ]
+    },
+    {
+      "selector": ".desktop-detail-main",
+      "tag": "DIV",
+      "classes": "desktop-detail-main",
+      "text": "ÜbersichtKontakteDokumenteAktivitätenKontakteKontaktAMAlex MusterProjektleitungalex.muster@internationales-unternehmen.example.invalid+41 31 555 10 20Hauptkontakt",
+      "inline": null,
+      "rect": {
+        "x": 221,
+        "y": 295.5,
+        "width": 1193,
+        "height": 292
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "1193px",
+        "min-width": "0px",
+        "max-width": "none",
+        "height": "292px",
+        "min-height": "auto",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / row / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-family": "Inter, system-ui, sans-serif",
+        "color": "rgb(215, 227, 243)",
+        "letter-spacing": "normal",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 110,
+          "order": 1648,
+          "selector": ".desktop-detail-main, .entity-edit-main",
+          "css": "min-width: 0px;",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".customer-tab-panel",
+      "tag": "SECTION",
+      "classes": "customer-tab-panel",
+      "text": "KontakteKontaktAMAlex MusterProjektleitungalex.muster@internationales-unternehmen.example.invalid+41 31 555 10 20Hauptkontakt",
+      "inline": null,
+      "rect": {
+        "x": 221,
+        "y": 370.5,
+        "width": 1193,
+        "height": 217
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "1193px",
+        "min-width": "0px",
+        "max-width": "none",
+        "height": "217px",
+        "min-height": "0px",
+        "padding": "24px 0px",
+        "border-radius": "0px",
+        "border-width": "1px 0px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / row / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-family": "Inter, system-ui, sans-serif",
+        "color": "rgb(215, 227, 243)",
+        "letter-spacing": "normal",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 463,
+          "order": 811,
+          "selector": ".account-sheet, .customer-tab-panel, .employee-tab-panel, .global-search, .invoice-master-detail, .notification-center-list",
+          "css": "min-width: 0px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 24,
+          "order": 1480,
+          "selector": ".customer-tab-panel, .dashboard-grid > .surface, .detail-card, .detail-grid > .surface, .documents-hub-grid > .surface, .employee-tab-panel, .settings-detail-grid > .surface",
+          "css": "padding: var(--desktop-section-y) 0; border-left: 0px; border-right: 0px; border-radius: 0px; box-shadow: none; background: transparent;",
+          "contexts": [
+            "media (min-width: 761px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 25,
+          "order": 1481,
+          "selector": ".customer-tab-panel, .dashboard-grid > .surface, .detail-card, .documents-hub-grid > .surface, .employee-tab-panel, .settings-detail-grid > .surface",
+          "css": "border-top: 1px solid var(--color-line); border-bottom: 1px solid var(--color-line);",
+          "contexts": [
+            "media (min-width: 761px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 67,
+          "order": 1605,
+          "selector": ".customer-tab-panel",
+          "css": "max-width: none;",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 140,
+          "order": 1869,
+          "selector": ".customer-tab-panel, .detail-card, .employee-tab-panel, .form-page, .form-page.narrow, .settings-detail-grid",
+          "css": "width: 100%; max-width: none;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 143,
+          "order": 1872,
+          "selector": ".customer-tab-panel, .detail-card, .employee-tab-panel, .security-card, .settings-detail-grid > .surface, .subscription-detail-grid > .surface",
+          "css": "margin: 0px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 154,
+          "order": 1883,
+          "selector": ".customer-tab-panel, .employee-tab-panel, .tabs + .detail-grid > .surface:first-child, .tabs + .surface",
+          "css": "border-top: 0px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 155,
+          "order": 1884,
+          "selector": ".customer-tab-panel, .employee-tab-panel",
+          "css": "border-bottom: 0px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 60,
+          "order": 2443,
+          "selector": ".page-container, .page-container section, .page-container > *",
+          "css": "min-width: 0px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 100,
+          "order": 2549,
+          "selector": ":is(.page-container, .operator-app-content) :is(.surface, .detail-card, .security-card, .subscription-panel, .customer-tab-panel, .employee-tab-panel, .timer-card, .invoice-form)",
+          "css": "border: 0px; border-radius: var(--app-group-radius); background: var(--app-surface); padding: 16px; box-shadow: none;",
+          "contexts": [
+            "media (max-width: 1100px)"
+          ],
+          "active": false
+        }
+      ]
+    },
+    {
+      "selector": ".contact-list>div",
+      "tag": "DIV",
+      "classes": "",
+      "text": "AMAlex MusterProjektleitungalex.muster@internationales-unternehmen.example.invalid+41 31 555 10 20Hauptkontakt",
+      "inline": null,
+      "rect": {
+        "x": 221,
+        "y": 449.5,
+        "width": 1193,
+        "height": 113
+      },
+      "computed": {
+        "display": "grid",
+        "position": "static",
+        "width": "1193px",
+        "min-width": "0px",
+        "max-width": "none",
+        "height": "113px",
+        "min-height": "56px",
+        "padding": "8px 0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "12px",
+        "flex": "0 1 auto",
+        "grid": "97px / 38px 1095px 36px / none / row / auto / auto",
+        "grid-template-columns": "38px 1095px 36px",
+        "grid-template-rows": "97px",
+        "align-items": "start",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-family": "Inter, system-ui, sans-serif",
+        "color": "rgb(215, 227, 243)",
+        "letter-spacing": "normal",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 118,
+          "order": 467,
+          "selector": ".compact-list > a:last-child, .compact-list > div:last-child, .contact-list > div:last-child, .detail-list > div:last-child, .operator-detail-list > div:last-child",
+          "css": "border-bottom: 0px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 123,
+          "order": 472,
+          "selector": ".contact-list > div",
+          "css": "min-height: 62px; padding: 10px 0px; display: grid; grid-template-columns: 38px minmax(0px, 1fr) auto; gap: 12px; align-items: start; border-bottom: 1px solid var(--color-line);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 186,
+          "order": 1724,
+          "selector": ".contact-list > div",
+          "css": "min-height: 56px; padding: 8px 0px;",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 157,
+          "order": 1886,
+          "selector": ".customer-tab-panel .compact-list > a:last-child, .customer-tab-panel .contact-list > div:last-child, .customer-tab-panel .timeline > div:last-child, .employee-tab-panel .detail-list > div:last-child, .surface > .activity-list:last-child > a:last-child, .surface > .compact-list:last-child > a:last-child",
+          "css": "border-bottom: 0px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": false
+        }
+      ]
+    },
+    {
+      "selector": ".contact-main",
+      "tag": "DIV",
+      "classes": "contact-main",
+      "text": "Alex MusterProjektleitungalex.muster@internationales-unternehmen.example.invalid+41 31 555 10 20Hauptkontakt",
+      "inline": null,
+      "rect": {
+        "x": 271,
+        "y": 457.5,
+        "width": 1095,
+        "height": 97
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "1095px",
+        "min-width": "0px",
+        "max-width": "none",
+        "height": "97px",
+        "min-height": "auto",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / row / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-family": "Inter, system-ui, sans-serif",
+        "color": "rgb(215, 227, 243)",
+        "letter-spacing": "normal",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 641,
+          "order": 988,
+          "selector": ".contact-main",
+          "css": "min-width: 0px; overflow-wrap: anywhere;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".person-avatar",
+      "tag": "SPAN",
+      "classes": "person-avatar person-avatar-small person-avatar-tone-0",
+      "text": "TP",
+      "inline": null,
+      "rect": {
+        "x": 1370.453125,
+        "y": 12.5,
+        "width": 30,
+        "height": 30
+      },
+      "computed": {
+        "display": "grid",
+        "position": "static",
+        "width": "30px",
+        "min-width": "auto",
+        "max-width": "none",
+        "height": "30px",
+        "min-height": "auto",
+        "padding": "0px",
+        "border-radius": "50%",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 0 auto",
+        "grid": "30px / 30px / none / row / auto / auto",
+        "grid-template-columns": "30px",
+        "grid-template-rows": "30px",
+        "align-items": "center",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "center",
+        "font-family": "Inter, system-ui, sans-serif",
+        "color": "rgb(255, 255, 255)",
+        "letter-spacing": "normal",
+        "font-size": "11px",
+        "font-weight": "600",
+        "line-height": "11px",
+        "overflow": "hidden",
+        "overflow-x": "hidden",
+        "overflow-y": "hidden",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgb(52, 95, 148)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 287,
+          "order": 635,
+          "selector": ".person-avatar",
+          "css": "width: 36px; height: 36px; flex: 0 0 auto; display: inline-grid; place-items: center; overflow: hidden; border-radius: 50%; font-size: 13px; font-weight: 600; color: rgb(255, 255, 255); line-height: 1;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 288,
+          "order": 636,
+          "selector": ".person-avatar-small",
+          "css": "width: var(--header-avatar-size); height: var(--header-avatar-size); font-size: 11px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 292,
+          "order": 640,
+          "selector": ".person-avatar-tone-0",
+          "css": "background: rgb(52, 95, 148);",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".person-avatar",
+      "tag": "SPAN",
+      "classes": "person-avatar person-avatar-medium person-avatar-tone-3",
+      "text": "AM",
+      "inline": null,
+      "rect": {
+        "x": 221,
+        "y": 457.5,
+        "width": 36,
+        "height": 36
+      },
+      "computed": {
+        "display": "grid",
+        "position": "static",
+        "width": "36px",
+        "min-width": "auto",
+        "max-width": "none",
+        "height": "36px",
+        "min-height": "auto",
+        "padding": "0px",
+        "border-radius": "50%",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 0 auto",
+        "grid": "36px / 36px / none / row / auto / auto",
+        "grid-template-columns": "36px",
+        "grid-template-rows": "36px",
+        "align-items": "center",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-family": "Inter, system-ui, sans-serif",
+        "color": "rgb(255, 255, 255)",
+        "letter-spacing": "normal",
+        "font-size": "13px",
+        "font-weight": "600",
+        "line-height": "13px",
+        "overflow": "hidden",
+        "overflow-x": "hidden",
+        "overflow-y": "hidden",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgb(105, 83, 142)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 287,
+          "order": 635,
+          "selector": ".person-avatar",
+          "css": "width: 36px; height: 36px; flex: 0 0 auto; display: inline-grid; place-items: center; overflow: hidden; border-radius: 50%; font-size: 13px; font-weight: 600; color: rgb(255, 255, 255); line-height: 1;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 289,
+          "order": 637,
+          "selector": ".person-avatar-medium",
+          "css": "width: 36px; height: 36px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 295,
+          "order": 643,
+          "selector": ".person-avatar-tone-3",
+          "css": "background: rgb(105, 83, 142);",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    }
+  ]
+}

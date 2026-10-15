@@ -439,7 +439,7 @@
       "context": "",
       "property": "line-height",
       "token": "--page-heading-line-height",
-      "value": "1.08"
+      "value": "1.5"
     },
     {
       "id": "UX24-STYLE-011",
@@ -448,7 +448,7 @@
       "context": "",
       "property": "letter-spacing",
       "token": "--page-heading-letter-spacing",
-      "value": "-.035em"
+      "value": "-.6px"
     },
     {
       "id": "UX24-STYLE-012",
@@ -475,7 +475,7 @@
       "context": "",
       "property": "font-size",
       "token": "--metric-label-size",
-      "value": "11px"
+      "value": "12px"
     },
     {
       "id": "UX24-STYLE-015",
@@ -511,7 +511,7 @@
       "context": "",
       "property": "letter-spacing",
       "token": "--metric-value-letter-spacing",
-      "value": "-.025em"
+      "value": "-1px"
     }
   ]
 }

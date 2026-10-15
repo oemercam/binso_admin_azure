@@ -1,4 +1,36 @@
 {
+  "Weitere Kundendaten": ["More customer details", "Autres coordonnées du client", "Altri dettagli del cliente"],
+  "Kontakte, Geschäftsvorgänge und offene Forderungen.": ["Contacts, business transactions and outstanding receivables.", "Contacts, opérations commerciales et créances ouvertes.", "Contatti, operazioni commerciali e crediti aperti."],
+  "Keine Rechnungen erfasst": [
+    "No invoices recorded",
+    "Aucune facture enregistrée",
+    "Nessuna fattura registrata"
+  ],
+  "Offene Rechnungen": [
+    "Open invoices",
+    "Factures ouvertes",
+    "Fatture aperte"
+  ],
+  "Alles durchsuchen": [
+    "Search everything",
+    "Tout rechercher",
+    "Cerca ovunque"
+  ],
+  "Firmenadresse": [
+    "Company address",
+    "Adresse de l’entreprise",
+    "Indirizzo aziendale"
+  ],
+  "Kontaktperson": [
+    "Contact person",
+    "Personne de contact",
+    "Persona di contatto"
+  ],
+  "Aktivitäten": [
+    "Activities",
+    "Activités",
+    "Attività"
+  ],
   ". Eingesetzte Unterauftragsbearbeiter sind unter": [
     ". The subprocessors used are listed under",
     ". Les sous-traitants ultérieurs utilisés figurent sous",

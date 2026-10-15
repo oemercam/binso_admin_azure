@@ -27,3 +27,39 @@ Vollständiges `pnpm test` scheitert lokal weiterhin im Scanner-Unix-Socket an E
 Der Pilot ist weiter in Arbeit. Exakte Übereinstimmung ist nicht bestätigt. Offen bleiben insbesondere Referenztypografie/-abstände der gemeinsamen Zeilen, Firmen-/Arbeitsbereichsauswahl, dauerhafte globale Desktop-Suche statt ausschliesslichem Suchsymbol, Desktop-Status-Tabs und kontextbezogener kontrollierter Aktionsoverflow. Der mobile Dossierkopf/Informationsaufbau weicht weiterhin vom Entwurf ab. Die existierenden fachlichen Kontakte-/Finanztabs bleiben erreichbar; ihre Anordnung ist noch kein vollständiges Match der Referenz-Dokumenttabs. Referenzdarstellungen mit Beispieldaten rechtfertigen keine Änderung echter Berechnungen.
 
 Dark Mode wurde technisch geprüft, ist laut Referenzpaket weiterhin nicht visuell freigegeben. Fehlende Ansichten sind als abgeleitet zu behandeln. Keine breite Übertragung dieses noch nicht vollständig abgeglichenen Piloten, kein Merge und kein Deploy dieser Phase. Vollständige Pflicht-Gates und abschliessender Referenzvergleich stehen aus.
+
+## Folgeprüfung: gerenderter Vergleich bei 1440 und 390 px
+
+Dieser Abschnitt ersetzt die offenen technischen Aussagen des vorherigen Zwischenstands; die damaligen Bilder bleiben historische Evidenz. Arbeitsbasis: `da4bf40` mit Main-Fix #257 integriert, anschliessende Änderungen und exakte Quell-/Bildhashes in `docs/evidence/reference-pilot-review-20261016/manifest.json`. Keine Referenzdatei geändert, keine Baseline freigegeben.
+
+### Nach Sichtprüfung korrigiert
+
+- Gemessene Microsoft-Typografie übernommen: Inter/system-ui, Haupttitel Desktop 27/600 und Mobile 25 bzw. Dossier 23/600; zugehörige Zeilenhöhen, Laufweiten und Haupttextfarben. Sekundärtextkontrast bewusst höher als in der kleinen Vorlage.
+- Login-Spalten, 65-px-Abstand, Formbreite, Startposition, Titel und 5-px-Controlradien korrigiert. Funktionale Texte, Login-/Codeablauf, Passwortanzeige und brauchbare Checkbox bleiben erhalten. Die fehlerhafte Checkboxbreite des HTML-Musters wird nicht repliziert.
+- Sidebar auf 195 px, aktive Linie/Surface, sichtbare echte Firmendaten als Link und reale globale Desktop-Suche umgesetzt. Der Firmenlink ist kein vorgetäuschter Mandantenwechsel.
+- Listenfilter bei den Daten, Desktop-Linientabs vor der Suche, Mobile danach. Dossierkopf mit Originalbranding und Inhaltsüberschrift statt doppelter mobiler Headerüberschrift; Status auf der Unterzeile.
+- Dossier-Finanzwerte aus vorhandenen Jahres- und Forderungsdaten nach Währung. Kontakt rechts auf Desktop, davor auf Mobile. Nur tatsächliche offene Rechnungen in der Übersicht. Zusätzliche Kundendaten bleiben erreichbar: Desktop offen, Mobile in einem ausdrücklich abgeleiteten Disclosure. Ein alter Logo-Breitenowner und die ungünstige Raster-Verteilung wurden nach Bildprüfung korrigiert.
+
+### Sichtbar und noch nicht referenzgleich
+
+| Bereich | Restabweichung / Einordnung |
+| --- | --- |
+| Kundenliste | Finanzspalten je Zeile fehlen in der bestehenden API. Kontakt/Ort/Status-Tabelle, Zeilenhöhe, Statuspill und Zeilenaufbau bleiben sichtbar anders. Dies ist eine offene Abweichung, keine freigegebene Ableitung. Keine Platzhalterfinanzen. |
+| Listentabs und Aktionen | Fachlich vorhandene Filter (Alle/Aktiv/Inaktiv), Sortierung im vorhandenen Filter sowie echtes Plus bleiben. Mockup-Filter „mit offenen Beträgen“ und separate Sortierfläche sind noch nicht vollständig umgesetzt. |
+| Navigation und Branding | Originalassets und bestehende Bottom-Navigation bleiben verbindlich erhalten; Inhalt der produktiven Sidebar unterscheidet sich von der schematischen Referenz. Keine Navigation neu erfunden. |
+| Firmenauswahl | Echte Firmendaten verlinken zur vorhandenen Firmenverwaltung; ein funktionaler Arbeitsbereichswechsel fehlt weiterhin. |
+| Kundendetail | Kontakt-Tab, Zusatzdaten-Disclosure, reale Dokumentzeilen/Statuspills und kombinierte Währungsbeträge sind zusätzliche/abweichende Komponenten. Abstände sind deshalb noch nicht vollständig identisch. Im Vergleich ausdrücklich sichtbar. |
+| Login | Footer bleibt am verfügbaren Viewportende, echte Funktionslinks und Originalbranding ändern Inhalte/Längen; mobile Felder 16 px und Touchflächen mindestens 44 px. Kein vollständiger Pixelmatch behauptet. |
+| Dark Mode und fehlende Zustände | Als abgeleitete Entwürfe gezeigt; weiterhin keine visuelle Freigabe. |
+
+### Prüffähige Vorschau und Nachweise
+
+`BINSO_ONE_UX_Vergleich.html` ist eine offline verwendbare Vergleichsdatei mit 24 Produktansichten, sechs Referenzbildern, Umschaltung 1440/390 px, Nebeneinander/Überblendung, gemessenen Haupttitelwerten und Abweichungsprotokoll. Sie ist keine interaktive Produktbereitstellung: Die Bilder stammen aus der echten Implementierung mit isolierten API-Testdaten, keine produktiven Kundenkopien und keine übernommenen Referenzbeträge. Referenzdarstellungsrahmen, Vorschau-Schalter und OS-Uhr sind entfernt; Desktop-Arbeitsbereich auf identische Browserbreite gerendert. Interne Referenzkomponenten und die gelieferten Dateien bleiben unverändert. Eine Pixel-Prozentzahl wäre wegen unterschiedlicher echter Inhalte irreführend.
+
+Aktueller Produktionsbuild bestanden. Browsermatrix: 20 Routen-/Theme-/Viewportfälle (drei Piloten plus Kontakte-/Dokumenttab, Light/Dark, 1440/390), dazu zwei Leer- und zwei HTTP-503-Fehlerfälle. Disclosure per Pointer und Enter geprüft; der Fokus wird danach für den normalen Start-Screenshot zurückgesetzt. Vier abschliessende Dossiercaptures wurden nach dieser Testkorrektur ersetzt. Alle 30 eingebetteten Bilder der Vergleichsdatei laden; Ansichtswechsel, mobile Breite und Überblendung geprüft, keine Browser-JavaScriptfehler.
+
+`corepack pnpm qa:fast --typecheck` bestanden: Lint, TypeScript, zehn zugeordnete statische/Komponenten-Suites; führt absichtlich keine weiteren Browser aus. Zusätzlich unveränderter Navigationsvertrag, Lokalisierungsabdeckung und UX-Style-Adversarialtest bestanden. Aktuelle Komponenten-/Routeninventare neu erzeugt, ohne den visuellen Status der übrigen 76 Seiten hochzustufen. Eine zunächst veraltete Inventarfingerprint-Datei sowie die alten Auth-Geometrieerwartungen im Browsertest wurden korrekt aktualisiert; keine Produktprüfung entfernt.
+
+Main-Statistikfix #257 ist integriert; die zuvor gemeldete Geschäftstagslücke ist separat behoben. Lokaler Gesamtlauf weiterhin durch Scanner-Unix-Socket-EPERM begrenzt, keine Gates abgeschaltet. Vollständige CI, WebKit, physische Geräte und sämtliche Schreibabläufe sind nicht durch diese Matrix ersetzt.
+
+Keine breite visuelle Freigabe, kein Merge und kein Deploy. Gemeinsame Komponenten wirken technisch auf weitere Bereiche; deren Ableitung ist weiterhin nicht visuell abgenommen. Weitere Übertragung erfolgt erst nach dem noch offenen Pilotvergleich.

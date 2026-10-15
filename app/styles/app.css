@@ -2,6 +2,7 @@
 
 .app-root[hidden]{display:none}
 .app-root{
+  --sidebar-w:195px;
   min-height:100dvh;
   background:var(--color-bg);
   color:var(--color-fg);
@@ -30,15 +31,16 @@
   align-items:center;
   gap:11px;
   padding:10px 12px;
-  border-radius:9px;
+  border-radius:5px;
+  border-left:3px solid transparent;
   color:var(--color-muted);
   font-size:13px;
-  font-weight:560;
+  font-weight:400;
 }
 .app-sidebar nav a svg,
 .sidebar-bottom a svg{width:20px;height:20px}
 .app-sidebar nav a.active,
-.sidebar-bottom a.active{background:var(--app-accent-soft);color:var(--app-accent)}
+.sidebar-bottom a.active{background:var(--app-accent-soft);color:var(--app-accent);border-left-color:var(--app-accent)}
 .sidebar-bottom{margin-top:auto}
 
 .app-main{min-width:0;margin-left:var(--sidebar-w)}
@@ -67,10 +69,10 @@
   gap:24px;
 }
 .page-head>div{min-width:0}
-.page-head h1{margin:0;font-size:var(--page-heading-size);line-height:var(--page-heading-line-height);letter-spacing:var(--page-heading-letter-spacing)}
+.page-head h1{margin:0;font-size:var(--page-heading-size);line-height:var(--page-heading-line-height);letter-spacing:var(--page-heading-letter-spacing);font-weight:var(--workspace-title-weight)}
 .page-head p{margin:7px 0 0;color:var(--color-muted);font-size:var(--body-font-size);line-height:var(--body-line-height)}
 .page-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px}
-.desktop-back{
+.desktop-back,.detail-back{
   min-height:24px;
   margin-bottom:10px;
   display:inline-flex;
@@ -106,6 +108,7 @@
 }
 .surface{padding:20px}
 .bo-workspace-section{min-width:0;margin-block:20px;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}
+.page-container{--page-x:26px;--mobile-page-x:22px}
 .records-inline-controls{display:grid;gap:12px;min-width:0;flex-basis:100%;margin-bottom:var(--heading-content-gap)}
 .records-search-row{display:grid;grid-template-columns:minmax(0,1fr) 44px auto;align-items:center;gap:var(--mobile-toolbar-gap);min-width:0}
 .records-search-row>.searchbox{flex:1;min-width:0;max-width:none}
@@ -123,7 +126,7 @@
   justify-content:space-between;
   gap:12px;
 }
-.section-title h2{margin:0;font-size:15px;font-weight:700;letter-spacing:-.01em}
+.section-title h2{margin:0;font-size:14px;font-weight:600;letter-spacing:0}
 .section-title>a,
 .text-action{
   border:0;
@@ -292,7 +295,7 @@ html[data-theme="dark"] .searchbox>input{height:100%;min-width:0;padding:0;borde
 .desktop-record-row:last-child{border-bottom:0}
 .desktop-record-row:hover{background:var(--color-subtle)}
 .desktop-record-row>span{min-width:0;padding:0 10px;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.desktop-record-row>span:first-child{font-weight:700}
+.desktop-record-row>span:first-child{font-weight:var(--workspace-row-weight)}
 .desktop-record-row>.align-right{text-align:right;font-variant-numeric:tabular-nums}
 .desktop-record-row>svg{justify-self:end}
 .desktop-record-row>.table-status-cell{overflow:visible}
@@ -1422,11 +1425,11 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 /* Blueprint components use shared rhythm; no changes to the navigation. */
 .bo-metric-tiles{--metric-columns:4;background:transparent;align-items:start;grid-template-columns:repeat(var(--metric-columns,4),minmax(0,1fr))}
 .bo-metric-tiles .metric>small{display:block;margin-top:var(--field-label-gap);font-size:11px;color:var(--color-muted);white-space:normal;overflow-wrap:anywhere;line-height:1.4}
-.bo-metric-tiles .metric strong{max-width:100%;white-space:normal;overflow-wrap:anywhere;font-size:18px;line-height:1.25}
-.bo-metric-tiles .metric{padding:var(--field-group-gap) var(--kpi-padding);min-width:0;min-height:0;background:transparent}
+.bo-metric-tiles .metric strong{max-width:100%;white-space:normal;overflow-wrap:anywhere;font-size:var(--workspace-value-size);font-weight:var(--workspace-value-weight);line-height:1.5}
+.bo-metric-tiles .metric{padding:15px 0 22px;min-width:0;min-height:0;background:transparent}
 .bo-metric-tiles .metric-top>span{white-space:normal;overflow:visible}
-.document-summary-row{position:relative;width:100%;min-width:0;padding-inline:0;border:0;background:transparent;color:inherit;text-align:left;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:var(--field-label-gap);padding-block:var(--kpi-padding);font-size:var(--control-label-font)}
-.document-summary-row>b{min-width:0;overflow-wrap:anywhere}
+.document-summary-row{position:relative;width:100%;min-width:0;padding-inline:0;border:0;background:transparent;color:inherit;text-align:left;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:var(--field-label-gap);padding-block:var(--kpi-padding);font-size:13px}
+.document-summary-row>b{font-weight:var(--workspace-row-weight);min-width:0;overflow-wrap:anywhere}
 .document-summary-row>.status{justify-self:end;max-width:100%;white-space:normal;text-align:right}
 .document-summary-row>small{grid-column:1/-1;color:var(--color-muted);overflow-wrap:anywhere}
 .document-summary-row.has-value.has-inline-value>small{grid-column:1;grid-row:2;min-width:0}
@@ -1648,3 +1651,30 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 .page-container :focus-visible,.operator-app-content :focus-visible,.auth-workspace :focus-visible,.app-sidebar :focus-visible,.operator-sidebar :focus-visible{outline-color:var(--app-accent)}
 
 .bo-detail-commandbar{display:none}
+
+/* Reference typography belongs to workspaces; the frozen dock keeps its inherited tokens. */
+.page-container,.desktop-appbar,.app-sidebar,.mobile-header,.auth-workspace,.bottom-sheet,.header-panel,.confirm-dialog{
+  font-family:var(--workspace-font);color:var(--color-fg);--app-text:var(--workspace-ink);--app-secondary:var(--workspace-muted);--app-divider:var(--workspace-line);--color-fg:var(--workspace-ink);--color-muted:var(--workspace-muted);--color-line:var(--workspace-line);--button-font-size:13px;--button-font-weight:400;
+}
+.workspace-company{display:flex;align-items:center;gap:10px;min-height:44px;padding:10px 8px;margin-bottom:20px;font-size:12px;line-height:1.4;color:var(--color-fg)}
+.workspace-company>span{min-width:0;overflow-wrap:anywhere}.workspace-company small{display:block;color:var(--color-muted);font-size:11px;margin-top:3px}
+.desktop-global-search kbd{font:10px var(--workspace-font);border:1px solid var(--color-line);padding:1px 4px;border-radius:3px;color:var(--color-muted)}
+.tabs[data-appearance="line"]{gap:25px;padding-bottom:0;border-bottom:1px solid var(--color-line);margin-block:20px}
+.tabs[data-appearance="line"]>:is(button,a){border-radius:0;padding-inline:0;background:transparent;color:var(--color-muted);font-size:13px;border-bottom:2px solid transparent;height:44px;min-height:44px}
+.tabs[data-appearance="line"]>:is(button,a).active{background:transparent;color:var(--app-accent);border-bottom-color:var(--app-accent)}
+.bo-detail-meta{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.detail-grid[data-layout="dossier"]{grid-template-columns:minmax(0,1fr) 220px;grid-template-areas:"summary facts" "records facts";gap:20px 30px;grid-template-rows:min-content 1fr;align-items:start;margin-top:0}
+.detail-grid[data-layout="dossier"]>[data-area="summary"]{grid-area:summary;min-width:0}
+.detail-grid[data-layout="dossier"]>[data-area="facts"]{grid-area:facts;min-width:0;border-left:1px solid var(--color-line);padding-left:23px}
+.detail-grid[data-layout="dossier"]>[data-area="records"]{grid-area:records;min-width:0}
+.contact-facts p,.contact-address{font-size:12px;line-height:1.7;margin:12px 0;overflow-wrap:anywhere}
+.records-search-row>.records-filter-action{border:1px solid var(--control-border);border-radius:var(--control-radius)}
+
+.bo-record-label{color:var(--color-muted);font-size:12px;line-height:1.5}
+.detail-list>.detail-list-stacked{grid-template-columns:minmax(0,1fr);gap:4px}
+
+.status[data-appearance="text"]{padding:0;border:0;background:transparent;font-size:12px;font-weight:400;line-height:18px}
+.status[data-appearance="text"]::before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor}
+.detail-grid[data-layout="dossier"][data-has-extra]{grid-template-areas:"summary facts" "records extra"}
+.detail-grid[data-layout="dossier"]>[data-area="extra"]{grid-area:extra;min-width:0;border-left:1px solid var(--color-line);padding-left:23px}
+.bo-data-disclosure>summary{min-height:44px;cursor:pointer;font-size:12px;color:var(--app-accent);padding-block:12px}

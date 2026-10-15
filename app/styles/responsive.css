@@ -408,6 +408,11 @@
 
 /* Wide desktop */
 @media (min-width:1101px){
+  .bo-data-disclosure[open]>summary{display:none}
+  .records-inline-controls[data-appearance="line"]>.tabs{grid-row:1;margin-top:10px;margin-bottom:0}
+  .records-inline-controls[data-appearance="line"]>.records-search-row{grid-row:2}
+  .page-head[data-heading-placement="content"] .bo-detail-commandbar .button{height:34px;min-height:34px;padding-inline:10px;border-radius:5px;font-size:12px}
+
   .auth-form-demo{display:none}
 
   /* Shared desktop shell; mobile navigation remains independently owned. */
@@ -885,7 +890,7 @@
   .desktop-appbar .desktop-header-timer{display:flex}
   .desktop-appbar .app-demo-badge{display:none}
   .desktop-appbar-actions{margin-left:auto;display:flex;align-items:center;gap:8px}
-  .desktop-appbar-actions>.desktop-global-search{flex:none}
+  .desktop-appbar-actions>.desktop-global-search{flex:none;min-width:184px;height:34px;min-height:34px;justify-content:flex-start;border-radius:7px;color:var(--color-muted);font-size:11px}
 
   .page-container{
     max-width:var(--content-max);
@@ -897,7 +902,7 @@
     padding:0;
     align-items:flex-end;
   }
-  .page-head h1{font-size:26px;line-height:1.12}
+  .page-head h1{font-size:var(--workspace-title-size);line-height:1.5}
   .page-head p{margin-top:5px;font-size:13px;line-height:1.4}
   .page-head .mobile-page-actions{display:none}
   .desktop-page-actions{
@@ -1276,10 +1281,10 @@
     padding-bottom:calc(var(--mobile-nav-h) + var(--mobile-nav-bottom) + var(--safe-bottom) + 72px);
   }
   .page-head{margin-bottom:var(--mobile-page-head-gap);gap:10px}
-  .page-head h1{font-size:21px;line-height:1.12}
+  .page-head h1{font-size:25px;line-height:1.5;letter-spacing:var(--mobile-title-tracking)}
   .page-head p{max-width:34rem;margin-top:6px;font-size:11px}
-  .page-head-detail>div>h1,
-  .page-head-detail>div>p,
+  .page-head-detail:not([data-heading-placement="content"])>div>h1,
+  .page-head-detail:not([data-heading-placement="content"])>div>p,
   .page-head-detail .page-actions{display:none}
   .desktop-back{display:none}
 
@@ -1308,7 +1313,7 @@
   .metrics-grid .metric:first-child{border-left:0}
   .metrics-grid .metric:nth-child(odd){border-left:0}
   .metrics-grid{border:0}
-  .metric-top{font-size:10px}
+  .metric-top{font-size:11px}
   .metric-top svg{width:14px;height:14px}
   .metric strong{margin-top:7px;font-size:19px}
   .dashboard-grid,
@@ -2289,7 +2294,7 @@ input:not([type="checkbox"]):not([type="radio"]),
 
 @supports (height:100svh){
   }
-  .page-head-detail{display:none}
+  .page-head-detail:not([data-heading-placement="content"]){display:none}
 
  .bo-monitor-chart-tabs{display:block;margin-bottom:12px}
  .bo-monitoring-portal .bo-monitor-charts{grid-template-columns:1fr}
@@ -2444,8 +2449,28 @@ input:not([type="checkbox"]):not([type="radio"]),
 /* Shared app appearance for phone, PWA and tablet / split views.
    Scope inherited legacy aliases to content and portals, never to navigation. */
 @media (max-width:1100px){
+  .page-container,.mobile-header{--workspace-ink:var(--workspace-mobile-ink);--workspace-value-size:23px;--metric-value-letter-spacing:var(--mobile-value-tracking)}
+  .mobile-header[data-appearance="plain"]{--mobile-header-h:65px;border-bottom:1px solid var(--color-line)}
+  .page-container:has(>.page-head[data-heading-placement="content"]){--mobile-page-top:28px;--mobile-page-head-gap:24px}
+  .page-head[data-heading-placement="content"]:not(.page-head-detail) .bo-page-heading>p{display:none}
+
+  .detail-grid[data-layout="dossier"][data-has-extra]{grid-template-areas:"summary" "facts" "records" "extra"}
+  .detail-grid[data-layout="dossier"]>[data-area="extra"]{border:0;padding:0}
+  .page-head-detail[data-heading-placement="content"]{margin-bottom:0}
+  .page-head[data-heading-placement="content"] .bo-detail-heading{gap:0}
+  .page-head[data-heading-placement="content"] .bo-record-label{display:none}
+  .page-head[data-heading-placement="content"] .bo-detail-heading-main{align-items:flex-start}
+  .section-title h2{font-weight:500}
+  .detail-grid[data-layout="dossier"]{grid-template-columns:minmax(0,1fr);grid-template-areas:"summary" "facts" "records";gap:22px}
+  .detail-grid[data-layout="dossier"]>[data-area="facts"]{border:0;padding:0}
+  .page-head[data-heading-placement="content"] .bo-detail-heading-main .mobile-page-actions{display:flex;flex:none}
+  .page-head[data-heading-placement="content"] .bo-detail-commandbar{display:none}
+  .page-head[data-heading-placement="content"] .detail-back{display:inline-flex;align-items:flex-start;gap:6px;min-height:44px;color:var(--app-accent);font-size:12px;line-height:18px;margin:0 0 -4px}
+  .page-head[data-heading-placement="content"] .bo-detail-heading-main h1{font-size:23px;line-height:1.5}
+  .records-inline-controls[data-appearance="line"]>.tabs{margin-top:0;margin-bottom:0}
+
   :root{--app-control-radius:8px}
-  .auth-workspace.auth-page{gap:24px;padding-inline:max(var(--mobile-page-x),var(--safe-left));padding-top:calc(12px + var(--safe-top));padding-bottom:calc(24px + var(--safe-bottom))}
+  .auth-workspace.auth-page{gap:40px;padding-inline:max(25px,var(--safe-left));padding-top:calc(22px + var(--safe-top));padding-bottom:calc(24px + var(--safe-bottom))}
   .auth-workspace-body{grid-template-columns:minmax(0,1fr);max-width:440px;padding-block:12px;align-items:start}
   .auth-workspace-intro{display:none}
   .auth-workspace-body>.auth-card{border:0;padding:0}
@@ -2650,8 +2675,8 @@ input:not([type="checkbox"]):not([type="radio"]),
   .mobile-header:not(.mobile-header-detail){position:sticky}
   .mobile-header-actions{padding:2px;border-radius:999px}
   .mobile-section-title{display:block;margin:0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:18px;font-weight:700}
-  .mobile-header .mobile-header-brand .logo{width:24px;height:24px}
-  .mobile-header-brand{display:grid;place-items:center;flex:none;width:28px;height:40px}
+  .mobile-header .mobile-header-brand .logo.logo-compact{width:24px;height:24px}
+  .mobile-header-brand{display:grid;place-items:center;flex:none;min-width:28px;width:auto;height:40px}
   .mobile-header:not(.mobile-header-detail) .mobile-header-leading{flex:1;gap:8px}
   .mobile-header-leading,
   .mobile-header-actions{min-width:0;display:flex;align-items:center;gap:4px}
@@ -2730,8 +2755,8 @@ input:not([type="checkbox"]):not([type="radio"]),
   /* Nested sections keep a single surface rather than cards inside cards. */
   :is(.page-container,.operator-app-content) :is(.surface,.detail-card,.customer-tab-panel,.employee-tab-panel) :is(.surface,.detail-card,.security-card){padding:0;border-radius:0;background:transparent}
   :is(.page-container,.operator-app-content) :is(.mobile-record-list,.desktop-record-table,.operator-table,.support-tablet-preview,.invoice-tablet-preview){border:0;border-radius:var(--app-group-radius);background:var(--app-surface)}
-  :is(.page-container,.operator-app-content) .mobile-record-list{padding-inline:16px}
-  .bo-metric-tiles[data-desktop-only]{display:none}
+  :is(.page-container,.operator-app-content) .mobile-record-list{padding-inline:0}
+  :is(.bo-metric-tiles,.section-title)[data-desktop-only]{display:none}
   :is(.page-container,.operator-app-content) .metric{background:var(--app-surface);border-radius:16px}
   :is(.page-container,.operator-app-content) .bo-statistics{--statistics-bg:var(--app-surface);border-radius:var(--app-group-radius)}
   :is(.page-container,.operator-app-content) :is(.detail-list dd,.operator-detail-list strong){overflow-wrap:anywhere}
@@ -2803,7 +2828,7 @@ input:not([type="checkbox"]):not([type="radio"]),
   .operator-header-desktop-label{display:none}
   .operator-header-brand>.operator-header-title{display:block;margin:0;border:0;padding:0;font-size:18px;font-weight:700;color:var(--app-text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .operator-header-brand .logo{width:24px;height:24px}
-  .operator-page-head .bo-page-heading-main>h1,.page-head-detail .bo-detail-heading-main,.desktop-back{display:none}
+  .operator-page-head .bo-page-heading-main>h1,.page-head-detail:not([data-heading-placement="content"]) .bo-detail-heading-main,.desktop-back{display:none}
   .operator-page-head{padding-block:var(--mobile-page-top);margin-bottom:var(--mobile-section-gap);border:0}
   .app-header-actions :is(.icon-button,.avatar-button){width:44px;height:44px;min-width:44px;min-height:44px}
   .app-header-leading{min-width:0}

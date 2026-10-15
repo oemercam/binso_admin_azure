@@ -66,8 +66,8 @@ export function Logo({ dark = false, compact = false }: { dark?: boolean; compac
   return <LocalizedElement as="img" className={compact ? "logo logo-compact" : "logo"} src={dark ? (compact ? "/brand/icon-white.svg" : "/brand/logo-white.svg") : (compact ? "/brand/icon-black.svg" : "/brand/logo-black.svg")} alt="Binso" />;
 }
 
-export function Status({ children, tone = "neutral" }: { children: React.ReactNode; tone?: "neutral" | "success" | "warning" | "danger" | "info" }) {
-  return <span className={`status status-${tone}`}><LocalizedText>{children}</LocalizedText></span>;
+export function Status({ children, tone = "neutral", appearance="pill" }: { children: React.ReactNode; appearance?:"pill"|"text";tone?: "neutral" | "success" | "warning" | "danger" | "info" }) {
+  return <span className={`status status-${tone}`} data-appearance={appearance}><LocalizedText>{children}</LocalizedText></span>;
 }
 
 function actionSourceText(nodes:React.ReactNode):string{return Children.toArray(nodes).map(node=>typeof node==='string'?node:isValidElement<{children?:React.ReactNode}>(node)?actionSourceText(node.props.children):'').join('');}
@@ -117,12 +117,12 @@ export function IconButton({ label, icon, onClick, className="" }: { label: stri
   return <LocalizedElement as="button" className={["icon-button",className].filter(Boolean).join(" ")} type="button" aria-label={label} onClick={onClick}><Icon name={icon}/></LocalizedElement>;
 }
 
-export function Metric({ label, value, hint, icon }: { label: string; value: React.ReactNode; hint?: string; icon?: string }) {
+export function Metric({ label, value, hint, icon }: { label: React.ReactNode; value: React.ReactNode; hint?: string; icon?: string }) {
   return <div className="metric"><div className="metric-top"><FormLabel><LocalizedText>{label}</LocalizedText></FormLabel>{icon && <Icon name={icon} size={18}/>}</div><strong>{value}</strong>{hint && <small><LocalizedText>{hint}</LocalizedText></small>}</div>;
 }
 
-export function SectionTitle({ title, action }: { title: string; action?: React.ReactNode }) {
-  return <div className="section-title"><h2><LocalizedText>{title}</LocalizedText></h2>{action}</div>;
+export function SectionTitle({ title, action, desktopOnly=false }: { title: string; action?: React.ReactNode;desktopOnly?:boolean }) {
+  return <div className="section-title" data-desktop-only={desktopOnly||undefined}><h2><LocalizedText>{title}</LocalizedText></h2>{action}</div>;
 }
 
 /** Native controls keep browser autofill and validation, with one shared field contract. */

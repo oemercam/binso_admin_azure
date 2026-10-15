@@ -5,6 +5,17 @@ import {createElement} from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 import * as icons from 'lucide-react';
 
+/** Read trusted, versioned owner references with bundled icons; no product HTML path. */
+export async function referenceDocument(name){
+ if(!['desktop-login','landingpage','mobile-app','komponenten'].includes(name))throw Error('Unknown approved reference');
+ let html=await fs.readFile('docs/audit/v24/reference/'+name+'.html','utf8');
+ html=html.replace(/<i\b([^>]*?)data-lucide="([^"]+)"([^>]*)><\/i>/g,(_match,before,name,after)=>{
+    const key=name.split('-').map(word=>word[0].toUpperCase()+word.slice(1)).join(''),Icon=icons[key]??icons.File;
+    return renderToStaticMarkup(createElement(Icon,{'aria-hidden':true})).replace('<svg ','<svg '+before+' '+after+' ');
+   });
+ return html;
+}
+
 /** Owner-supplied references are evidence, never a replacement screenshot baseline.
  * Render with bundled Lucide; isolated context denies all remote requests. */
 export async function captureReferenceViews(browser,output){
@@ -16,11 +27,7 @@ export async function captureReferenceViews(browser,output){
   for(const name of ['desktop-login','landingpage','mobile-app','komponenten']){
    // These versioned owner references intentionally retain their own interactions.
    // Remote resources are denied by the isolated context, not regex-sanitized.
-   let html=await fs.readFile('docs/audit/v24/reference/'+name+'.html','utf8');
-   html=html.replace(/<i\b([^>]*?)data-lucide="([^"]+)"([^>]*)><\/i>/g,(_match,before,name,after)=>{
-    const key=name.split('-').map(word=>word[0].toUpperCase()+word.slice(1)).join(''),Icon=icons[key]??icons.File;
-    return renderToStaticMarkup(createElement(Icon,{'aria-hidden':true})).replace('<svg ','<svg '+before+' '+after+' ');
-   });
+   const html=await referenceDocument(name);
    await page.setContent(html,{waitUntil:'load'});
    await page.evaluate(()=>document.fonts.ready);
    if(name==='desktop-login'){

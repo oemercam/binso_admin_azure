@@ -1,5 +1,18 @@
 :root{
   /* App appearance: independent of the frozen navigation theme tokens. */
+  --auth-control-border:#dfe5ed;
+  --workspace-font:Inter,system-ui,sans-serif;
+  --workspace-ink:#181b20;
+  --workspace-mobile-ink:#213047;
+  --workspace-muted:#647080;
+  --workspace-line:#edf1f6;
+  --workspace-title-size:27px;
+  --mobile-title-tracking:-.8px;
+  --mobile-value-tracking:-.8px;
+  --workspace-title-weight:600;
+  --workspace-row-weight:500;
+  --workspace-value-size:25px;
+  --workspace-value-weight:500;
   --app-canvas:#fff;
   --app-surface:#fff;
   --app-chrome:#fff;
@@ -72,15 +85,15 @@
   --button-padding-inline:16px;
   --button-icon-size:17px;
   --page-heading-size:28px;
-  --page-heading-line-height:1.08;
-  --page-heading-letter-spacing:-.035em;
+  --page-heading-line-height:1.5;
+  --page-heading-letter-spacing:-.6px;
   --body-font-size:14px;
   --body-line-height:1.45;
-  --metric-label-size:11px;
+  --metric-label-size:12px;
   --metric-label-line-height:1.2;
   --metric-value-size:20px;
   --metric-value-line-height:1.05;
-  --metric-value-letter-spacing:-.025em;
+  --metric-value-letter-spacing:-1px;
 
 
   --radius-xs:7px;
@@ -186,6 +199,11 @@
 }
 
 html[data-theme="dark"]{
+  --auth-control-border:#2a3545;
+  --workspace-ink:#d7e3f3;
+  --workspace-mobile-ink:#d7e3f3;
+  --workspace-muted:#b1bfce;
+  --workspace-line:#2a3545;
   --app-canvas:#000;
   --app-surface:#141414;
   --app-chrome:#212121;
