@@ -394,3 +394,7 @@
 .operator-insight-grid:has(>.bo-workspace-section:only-child){grid-template-columns:minmax(0,1fr)}
 
 .operator-header-title{display:none}
+
+.audit-list>span:last-child,
+.service-list>div:last-child,
+.mini-stat:last-child{border-bottom:0}

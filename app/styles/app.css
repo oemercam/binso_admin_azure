@@ -1621,3 +1621,7 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 .inline-feedback{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 0;color:var(--color-fg)}
 .inline-feedback .text-action{min-height:var(--touch)}
 .toast:has(>button){grid-template-columns:34px minmax(0,1fr) auto}
+
+.timeline>div:last-child,
+.session-list>div:last-child,
+.support-preview-message:last-child{border-bottom:0}
