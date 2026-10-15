@@ -6,7 +6,7 @@ import {validOperatorSection} from './lib/operator-pages';
 const protectedPrefixes=[
   "/dashboard","/kunden","/angebote","/rechnungen","/zahlungen","/produkte",
   "/mitarbeiter","/spesen","/zeit","/support","/einstellungen","/belege",
-  "/benachrichtigungen","/willkommen","/finanzen","/projekte"
+  "/benachrichtigungen","/willkommen","/finanzen","/projekte","/berichte"
 ];
 
 function routeProxy(request:NextRequest,headers:Headers){
@@ -43,6 +43,6 @@ export const config={
     "/operator/:path*","/dev/:path*","/dashboard/:path*","/kunden/:path*","/angebote/:path*","/rechnungen/:path*",
     "/zahlungen/:path*","/produkte/:path*","/mitarbeiter/:path*","/spesen/:path*",
     "/zeit/:path*","/support/:path*","/einstellungen/:path*","/belege/:path*",
-    "/projekte/:path*","/benachrichtigungen/:path*","/willkommen/:path*","/finanzen/:path*"
+    "/berichte/:path*","/projekte/:path*","/benachrichtigungen/:path*","/willkommen/:path*","/finanzen/:path*"
   ]
 };

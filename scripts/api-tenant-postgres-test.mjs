@@ -63,7 +63,9 @@ try{
  const expenseRoles=['owner','admin','finance','project_manager','manager','member'],employeeRoles=['owner','admin','hr'],teamRoles=['owner','admin','finance','hr'];
  // Independent expected-role contract: do not derive the expectation from the
  // same tenantCan function being tested by the actual HTTP handlers.
+ const reportRoles=["owner","admin","finance","hr","project_manager","manager","reader"];
  const readContracts=[
+  ["/api/reports",reportRoles],
   ...['/api/auth/mfa','/api/auth/register','/api/auth/session','/api/auth/sessions','/api/dashboard','/api/files','/api/finance/overview','/api/integrations/status','/api/notifications','/api/search?q=Alpen','/api/settings/company','/api/settings/documents','/api/settings/notifications','/api/settings/profile','/api/support/tickets'].map(path=>[path,roles]),
   ...['/api/billing/catalog','/api/payments','/api/finance','/api/finance/overview?include=workspace','/api/settings/subscription','/api/time-entries/billing','/api/expenses/billing'].map(path=>[path,finance]),
   ...['/api/customers','/api/customers/'+customer.id,'/api/customers/'+customer.id+'/activity','/api/customers/'+customer.id+'/contacts','/api/customers/'+customer.id+'?include=workspace'].map(path=>[path,customerRoles]),
@@ -72,12 +74,13 @@ try{
   ...['/api/expenses','/api/expenses/options','/api/time-entries','/api/time-entries/policy','/api/time-tracker'].map(path=>[path,expenseRoles]),
   ['/api/employees',employeeRoles],['/api/settings/team/invitations',teamRoles],
  ];
+ const project=(await pool.query('select id from projects where organization_id=$1 order by id limit 1',[organizations[0]])).rows[0];
  const employee=(await pool.query('select id from employees where organization_id=$1 order by id limit 1',[organizations[0]])).rows[0];
  const product=(await pool.query('select id from products_services where organization_id=$1 order by id limit 1',[organizations[0]])).rows[0];
  const payment=(await pool.query('select id from payments where organization_id=$1 order by id limit 1',[organizations[0]])).rows[0];
  const expense=(await pool.query('select id from expenses where organization_id=$1 order by id limit 1',[organizations[0]])).rows[0];
  const ticket=(await pool.query('select id from support_cases where organization_id=$1 order by id limit 1',[organizations[0]])).rows[0];
- readContracts.push(['/api/employees/'+employee.id,employeeRoles],['/api/products/'+product.id,projectRoles],['/api/payments/'+payment.id,finance],['/api/support/tickets/'+ticket.id+'/messages',roles]);
+ readContracts.push(['/api/projects/'+project.id,projectRoles],['/api/employees/'+employee.id,employeeRoles],['/api/products/'+product.id,projectRoles],['/api/payments/'+payment.id,finance],['/api/support/tickets/'+ticket.id+'/messages',roles]);
  for(const [path,allowed] of readContracts)for(const role of roles){const r=await get(path,cookies.get('0:'+role));assert.equal(r.status,allowed.includes(role)?200:403,role+' GET '+path+': '+JSON.stringify(r.data));}
  const anonymousRegistration=await get('/api/auth/register','');assert.equal(anonymousRegistration.status,200);assert.equal(anonymousRegistration.data.state,'new');assert.equal(anonymousRegistration.data.pending,null,'Anonymous registration context contains no other tenant receipt');
  for(const index of [0,1])for(const role of roles){const registration=await get('/api/auth/register',cookies.get(index+':'+role));assert.equal(registration.status,200);assert.equal(registration.data.state,'authenticated');assert.equal(registration.data.pending,undefined,'Authenticated handoff cannot expose a pending registration receipt');assert.ok(registration.data.next.startsWith('/'),'Role-specific onboarding stays inside the app');}
@@ -93,8 +96,9 @@ try{
  await pool.query("insert into file_objects(id,organization_id,object_key,original_name,content_type,size_bytes,sha256,scan_status,created_by,purpose,customer_id) values($1,$2::uuid,($2::uuid)::text||'/http-test.txt','http-test.txt','text/plain',$3,$4,'clean','http-0-owner','customer_document',$5)",[fileId,organizations[0],bytes.length,createHash('sha256').update(bytes).digest('hex'),customer.id]);
  await pool.query('insert into file_contents(file_id,organization_id,body) values($1,$2,$3)',[fileId,organizations[0],bytes]);
  for(const role of roles){const downloaded=await get('/api/files/'+fileId+'/download',cookies.get('0:'+role));assert.equal(downloaded.status,customerRoles.includes(role)?200:403,role+' customer file read');if(downloaded.status===200)assert.equal(Buffer.from(downloaded.data).toString(),bytes.toString());assert.equal((await get('/api/files/'+fileId+'/download',cookies.get('1:'+role))).status,404,role+' foreign file ID');}
+ assert.equal((await get('/api/projects/'+project.id,cookies.get('1:owner'))).status,404,'Foreign project workspace ID stays hidden');
  const inventory=JSON.parse(await fs.readFile('docs/architecture/v21-3-data-inventory.json','utf8'));
- const covered=new Set(readContracts.map(([path])=>path.split('?')[0].replace(new RegExp(customer.id+'|'+employee.id+'|'+product.id+'|'+payment.id+'|'+ticket.id,'g'),'[id]')));
+ const covered=new Set(readContracts.map(([path])=>path.split('?')[0].replace(new RegExp(customer.id+'|'+project.id+'|'+employee.id+'|'+product.id+'|'+payment.id+'|'+ticket.id,'g'),'[id]')));
  for(const path of ['/api/expenses/[id]','/api/documents/[number]','/api/documents/[number]/pdf','/api/files/[id]/download'])covered.add(path);
  const publicEntries=new Set(['/api/auth/invitation','/api/health','/api/health/ready','/api/demo/session','/api/operator/sso/callback']);
  for(const api of inventory.apis.filter(item=>item.methods.includes('GET'))){

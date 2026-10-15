@@ -33,15 +33,17 @@ const desktopNav = [
   ["/zahlungen","Zahlungen","wallet"],
   ["/produkte","Produkte","box"],
   ["/zeit","Zeiterfassung","clock"],
+  ["/projekte","Aufträge / Projekte","box"],
   ["/spesen","Spesen","card"],
   ["/finanzen","Finanzen","chart"],
+  ["/berichte","Berichte","chart"],
   ["/mitarbeiter","Mitarbeiter","users"],
 ] as const;
 
 const desktopNavGroups = [
   {label:"Verkauf",paths:["/kunden","/angebote","/rechnungen","/produkte"]},
-  {label:"Arbeit & Team",paths:["/zeit","/mitarbeiter"]},
-  {label:"Finanzen",paths:["/zahlungen","/spesen","/finanzen"]},
+  {label:"Arbeit & Team",paths:["/projekte","/zeit","/mitarbeiter"]},
+  {label:"Finanzen",paths:["/zahlungen","/spesen","/finanzen","/berichte"]},
 ];
 
 type NotificationItem=PanelNotification;
@@ -378,7 +380,7 @@ function AppShellFrame({
           {(sheet==="docs"?[
             ["/finanzen","receipt","Finanzübersicht"],["/angebote","file","Angebote"],["/rechnungen","receipt","Rechnungen"],["/zahlungen","wallet","Zahlungen"],
           ]:[
-            ["/angebote","file","Angebote"],["/rechnungen","receipt","Rechnungen"],["/zahlungen","wallet","Zahlungen"],["/produkte","box","Produkte"],["/mitarbeiter","users","Mitarbeiter"],["/spesen","card","Spesen"],["/finanzen/analyse","chart","Finanzanalyse"],["/support","support","Support"],["/einstellungen","settings","Einstellungen"],
+            ["/angebote","file","Angebote"],["/rechnungen","receipt","Rechnungen"],["/zahlungen","wallet","Zahlungen"],["/produkte","box","Produkte"],["/projekte","box","Aufträge / Projekte"],["/mitarbeiter","users","Mitarbeiter"],["/spesen","card","Spesen"],["/finanzen/analyse","chart","Finanzanalyse"],["/berichte","chart","Berichte"],["/support","support","Support"],["/einstellungen","settings","Einstellungen"],
           ]).map(([href,icon,label])=><ActionRow key={href} href={href} icon={icon} title={label} navigation onClick={()=>setSheet(null)}/>)}
         </div>
         {sheet==="more"&&<div className="sheet-secondary"><ActionRow icon="logout" title={logoutBusy?"Wird abgemeldet…":"Abmelden"} disabled={logoutBusy} onClick={()=>void logout()}/></div>}
@@ -408,7 +410,7 @@ export function AppShell(props:ShellProps){
  },[register,pathname,title,titleIsUserContent,subtitle,active,actions,mobileActions,backHref,backLabel,preview,editing,unsavedChanges,status,statusTone]);
  return register?props.children:<AppShellFrame {...props}/>;
 }
-const appSections:Record<string,string>={dashboard:"Übersicht",kunden:"Kunden",angebote:"Angebote",rechnungen:"Rechnungen",zahlungen:"Zahlungen",produkte:"Produkte",mitarbeiter:"Mitarbeiter",spesen:"Spesen",zeit:"Zeiterfassung",support:"Support",einstellungen:"Einstellungen",belege:"Belege",benachrichtigungen:"Benachrichtigungen",finanzen:"Finanzen"};
+const appSections:Record<string,string>={berichte:"Berichte",projekte:"Aufträge / Projekte",dashboard:"Übersicht",kunden:"Kunden",angebote:"Angebote",rechnungen:"Rechnungen",zahlungen:"Zahlungen",produkte:"Produkte",mitarbeiter:"Mitarbeiter",spesen:"Spesen",zeit:"Zeiterfassung",support:"Support",einstellungen:"Einstellungen",belege:"Belege",benachrichtigungen:"Benachrichtigungen",finanzen:"Finanzen"};
 export function AppShellLayout({children}:{children:React.ReactNode}){
  const pathname=usePathname(),section=pathname.split("/")[1];
  const [configuration,setConfiguration]=useState<ShellConfiguration|null>(null);

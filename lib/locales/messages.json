@@ -8095,9 +8095,9 @@
     "Impossibile creare il progetto."
   ],
   "Projekt konnte nicht gespeichert werden.": [
-    "Project could not be saved.",
+    "The project could not be saved.",
     "Le projet n’a pas pu être enregistré.",
-    "Impossibile salvare il progetto."
+    "Non è stato possibile salvare il progetto."
   ],
   "Projekt öffnen": [
     "Open project",
@@ -11098,5 +11098,200 @@
     "Automatic end",
     "Fin automatique",
     "Fine automatica"
+  ],
+  "Angebot öffnen": [
+    "Open quote",
+    "Ouvrir le devis",
+    "Apri preventivo"
+  ],
+  "Aufträge / Projekte": [
+    "Jobs / projects",
+    "Mandats / projets",
+    "Commesse / progetti"
+  ],
+  "Keine Rechnungen": [
+    "No invoices",
+    "Aucune facture",
+    "Nessuna fattura"
+  ],
+  "Keine Zeiteinträge": [
+    "No time entries",
+    "Aucune saisie de temps",
+    "Nessuna registrazione delle ore"
+  ],
+  "Letzte Zeiteinträge": [
+    "Recent time entries",
+    "Dernières saisies de temps",
+    "Ultime registrazioni delle ore"
+  ],
+  "Notizen": [
+    "Notes",
+    "Notes",
+    "Note"
+  ],
+  "Projekt bearbeiten": [
+    "Edit project",
+    "Modifier le projet",
+    "Modifica progetto"
+  ],
+  "Projektaktionen": [
+    "Project actions",
+    "Actions du projet",
+    "Azioni del progetto"
+  ],
+  "Projekte suchen...": [
+    "Search projects...",
+    "Rechercher des projets...",
+    "Cerca progetti..."
+  ],
+  "Stundenbudget": [
+    "Hours budget",
+    "Budget horaire",
+    "Budget ore"
+  ],
+  "Projekt wurde nicht gefunden.": [
+    "Project not found.",
+    "Projet introuvable.",
+    "Progetto non trovato."
+  ],
+  "Bitte die Projektangaben prüfen.": [
+    "Please check the project details.",
+    "Vérifie les informations du projet.",
+    "Controlla i dati del progetto."
+  ],
+  "Das Projekt wurde inzwischen geändert. Bitte neu laden.": [
+    "The project has changed. Please reload.",
+    "Le projet a été modifié entre-temps. Recharge la page.",
+    "Il progetto è stato modificato. Ricarica la pagina."
+  ],
+  "Ungültiger Projektfilter.": [
+    "Invalid project filter.",
+    "Filtre de projet non valide.",
+    "Filtro progetto non valido."
+  ],
+  "12 Monate": [
+    "12 months",
+    "12 mois",
+    "12 mesi"
+  ],
+  "3 Monate": [
+    "3 months",
+    "3 mois",
+    "3 mesi"
+  ],
+  "6 Monate": [
+    "6 months",
+    "6 mois",
+    "6 mesi"
+  ],
+  "Aktive Mitarbeiter": [
+    "Active employees",
+    "Collaborateurs actifs",
+    "Collaboratori attivi"
+  ],
+  "Arbeitszeit im Zeitraum": [
+    "Working time in the period",
+    "Temps de travail sur la période",
+    "Ore lavorate nel periodo"
+  ],
+  "Berichtszeitraum": [
+    "Reporting period",
+    "Période du rapport",
+    "Periodo del rapporto"
+  ],
+  "CSV exportieren": [
+    "Export CSV",
+    "Exporter en CSV",
+    "Esporta CSV"
+  ],
+  "Eigener Zeitraum": [
+    "Custom period",
+    "Période personnalisée",
+    "Periodo personalizzato"
+  ],
+  "Eingegangene Zahlungen": [
+    "Payments received",
+    "Paiements reçus",
+    "Pagamenti ricevuti"
+  ],
+  "Erstattete Spesen": [
+    "Reimbursed expenses",
+    "Frais remboursés",
+    "Spese rimborsate"
+  ],
+  "Keine Spesenerstattungen im Zeitraum": [
+    "No expense reimbursements in this period",
+    "Aucun remboursement de frais sur cette période",
+    "Nessun rimborso spese nel periodo"
+  ],
+  "Keine Zahlungen im Zeitraum": [
+    "No payments in this period",
+    "Aucun paiement sur cette période",
+    "Nessun pagamento nel periodo"
+  ],
+  "Kunden gesamt": [
+    "Total customers",
+    "Total des clients",
+    "Totale clienti"
+  ],
+  "Neue Kunden": [
+    "New customers",
+    "Nouveaux clients",
+    "Nuovi clienti"
+  ],
+  "Verrechenbare Zeit": [
+    "Billable time",
+    "Temps facturable",
+    "Ore fatturabili"
+  ],
+  "Verrechnete Zeit": [
+    "Invoiced time",
+    "Temps facturé",
+    "Ore fatturate"
+  ],
+  "Zahlungsbeträge enthalten ausschliesslich verbuchte Zahlungseingänge und erfasste Spesenerstattungen. Andere Kosten und Löhne sind darin nicht enthalten.": [
+    "Payment amounts include only recorded incoming payments and recorded expense reimbursements. Other costs and salaries are not included.",
+    "Les montants comprennent uniquement les encaissements comptabilisés et les remboursements de frais enregistrés. Les autres coûts et salaires ne sont pas inclus.",
+    "Gli importi comprendono soltanto gli incassi contabilizzati e i rimborsi spese registrati. Altri costi e salari non sono inclusi."
+  ],
+  "Bitte einen gültigen Berichtszeitraum von höchstens einem Jahr wählen.": [
+    "Please choose a valid reporting period of no more than one year.",
+    "Choisis une période de rapport valide d’un an au maximum.",
+    "Scegli un periodo di rapporto valido di al massimo un anno."
+  ],
+  "Kennzahl": [
+    "Metric",
+    "Indicateur",
+    "Indicatore"
+  ],
+  "Mitarbeiter gesamt": [
+    "Total employees",
+    "Total des collaborateurs",
+    "Totale collaboratori"
+  ],
+  "Stand": [
+    "As of",
+    "État au",
+    "Situazione al"
+  ],
+  "Keine Berichtsdaten verfügbar": [
+    "No report data available",
+    "Aucune donnée de rapport disponible",
+    "Nessun dato disponibile per il rapporto"
+  ],
+  "Für diese Rolle und diesen Plan sind keine Berichtsdaten freigegeben.": [
+    "No report data is available for this role and plan.",
+    "Aucune donnée de rapport n’est accessible pour ce rôle et cette offre.",
+    "Nessun dato del rapporto è disponibile per questo ruolo e piano."
+  ],
+  "Bitte zuerst die laufenden oder pausierten Zeitmessungen dieses Projekts abschliessen.": [
+    "Please finish this project’s running or paused timers first.",
+    "Termine d’abord les chronomètres en cours ou en pause de ce projet.",
+    "Termina prima i timer in corso o in pausa di questo progetto."
+  ],
+  "Für dieses Projekt können momentan keine Zeiten erfasst werden.": [
+    "Time cannot currently be recorded for this project.",
+    "Il n’est pas possible de saisir du temps pour ce projet actuellement.",
+    "Al momento non è possibile registrare ore per questo progetto."
   ]
 }

@@ -75,6 +75,7 @@ const dismissActionLabels=new Set(['Abbrechen','Schliessen','Cancel','Close','An
 
 export function Button({
   href,
+  download,
   children,
   variant = "primary",
   icon,
@@ -88,6 +89,7 @@ export function Button({
   ...ariaProps
 }: {
   href?: string;
+  download?:string|boolean;
   children?: React.ReactNode;
   variant?: "primary" | "secondary" | "ghost" | "danger";
   icon?: string;
@@ -104,6 +106,7 @@ export function Button({
   if(href&&!access.canOpen(href))return null;
   const cls = `button button-${variant} ${className}`.trim();
   const body = <>{icon && <Icon name={icon} size={17} />}{children != null && children !== "" && <span><LocalizedText>{children}</LocalizedText></span>}</>;
+  if(href&&!disabled&&download!==undefined&&download!==false)return <LocalizedElement as="a" {...ariaProps} className={cls} href={href} download={download} aria-label={ariaLabel??ariaProps['aria-label']}>{body}</LocalizedElement>;
   return href && !disabled ? <Link {...ariaProps} className={cls} href={href} aria-label={ariaLabel??ariaProps['aria-label']}>{body}</Link> : <LocalizedElement as="button" data-sheet-dismiss={dismissActionLabels.has(actionSourceText(children).trim())||undefined} {...ariaProps} className={cls} onClick={onClick} type={type} form={form} disabled={disabled} aria-label={ariaLabel??ariaProps['aria-label']}>{body}</LocalizedElement>;
 }
 
