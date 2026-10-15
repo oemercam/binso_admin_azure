@@ -998,7 +998,8 @@ try{
   await assert.rejects(()=>createCreditNote(client,session,probe.number,{...creditBody,amount:201},randomUUID()),e=>e.code==='credit_exceeds_invoice');
   assert.equal((await db.query("select count(*)::int n from audit_events where organization_id=$1 and entity_id=$2 and action='invoice.credit.created'",[demo,credit.id])).rows[0].n,1);
 
-  await db.query("insert into credit_notes(organization_id,credit_no,invoice_id,customer_id,credit_date,amount,reason,external_id) values($1,'GS-FUTURE-RECONCILIATION',$2,$3,current_date+1,50,'Future credit is not current balance','future-credit-reconciliation')",[demo,probe.id,documentArgs.p_customer_id]);
+  await db.query("insert into credit_notes(organization_id,credit_no,invoice_id,customer_id,credit_date,amount,reason,external_id) values($1,'GS-FUTURE-RECONCILIATION',$2,$3,(now() at time zone 'Europe/Zurich')::date+1,50,'Future credit is not current balance','future-credit-reconciliation')",[demo,probe.id,documentArgs.p_customer_id]);
+  assert.equal((await db.query("select credit_date>(now() at time zone 'Europe/Zurich')::date as future from credit_notes where organization_id=$1 and invoice_id=$2 and credit_no='GS-FUTURE-RECONCILIATION'",[demo,probe.id])).rows[0].future,true,'Future-credit fixture must lie beyond the Swiss business day');
   const {openAmount,financialStatus}=await import(financialModule);
   const before=(await listApiBusiness(client,session,'documents','id=eq.'+probe.id))[0];
   assert.equal(Number(before.credit_amount),16.2);assert.equal(openAmount(before),200);assert.equal(financialStatus(before),'overdue');

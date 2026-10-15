@@ -60,28 +60,35 @@ const {PGlite}=await import('@electric-sql/pglite');
 const financeDb=new PGlite();
 try{
  await financeDb.exec(`create table invoices(id text,organization_id text,currency text,status text,archived_at timestamptz,issue_date date,due_date date,total_amount numeric(14,2),paid_amount numeric(14,2),customer_id uuid);create table credit_notes(invoice_id text,organization_id text,credit_date date,amount numeric(14,2));create table invoice_refunds(invoice_id text,organization_id text,refund_date date,amount numeric(14,2));`);
- const today=(await financeDb.query("select (now() at time zone 'Europe/Zurich')::date::text as business_day")).rows[0].business_day;
- await financeDb.exec(`insert into invoices(id,organization_id,currency,status,archived_at,issue_date,due_date,total_amount,paid_amount) values
- ('partial','a','CHF','partial',null,current_date-10,current_date-1,100,50),
- ('paid','a','CHF','paid',null,current_date-10,current_date+10,200,200),
- ('open','a','CHF','sent',null,current_date-10,current_date+10,300,0),
- ('draft','a','CHF','draft',null,current_date,current_date+1,1000,0),
- ('cancel','a','CHF','cancelled',null,current_date,current_date+1,1000,0),
- ('archived','a','CHF','sent',now(),current_date,current_date+1,1000,0),
- ('foreign-currency','a','EUR','sent',null,current_date,current_date+1,1000,0),
- ('future','a','CHF','sent',null,current_date+10,current_date+20,1000,0),
- ('other-tenant','b','CHF','sent',null,current_date,current_date+1,99999,0);
- insert into credit_notes values('partial','a',current_date,20),('partial','a',current_date+1,30),('partial','b',current_date,500);`);
  const financeSource=(await fs.readFile('lib/server/repositories/finance.ts','utf8')).replace("import 'server-only';",'');
  const {financialMetricsData}=await import(moduleUrl(financeSource));
+ let differingSessionDays=0;
+ for(const zone of ['UTC','Pacific/Kiritimati','Etc/GMT+12']){
+  // Pin now() for the complete fixture/assertion transaction, including midnight.
+  await financeDb.exec(`begin; set local time zone '${zone}'`);
+  try{
+ const days=(await financeDb.query("select current_date::text session_day,(now() at time zone 'Europe/Zurich')::date::text business_day")).rows[0];
+ if(days.session_day!==days.business_day)differingSessionDays++;
+ const today=days.business_day;
+ await financeDb.exec(`insert into invoices(id,organization_id,currency,status,archived_at,issue_date,due_date,total_amount,paid_amount) values
+ ('partial','a','CHF','partial',null,(now() at time zone 'Europe/Zurich')::date-10,(now() at time zone 'Europe/Zurich')::date-1,100,50),
+ ('paid','a','CHF','paid',null,(now() at time zone 'Europe/Zurich')::date-10,(now() at time zone 'Europe/Zurich')::date+10,200,200),
+ ('open','a','CHF','sent',null,(now() at time zone 'Europe/Zurich')::date-10,(now() at time zone 'Europe/Zurich')::date+10,300,0),
+ ('draft','a','CHF','draft',null,(now() at time zone 'Europe/Zurich')::date,(now() at time zone 'Europe/Zurich')::date+1,1000,0),
+ ('cancel','a','CHF','cancelled',null,(now() at time zone 'Europe/Zurich')::date,(now() at time zone 'Europe/Zurich')::date+1,1000,0),
+ ('archived','a','CHF','sent',now(),(now() at time zone 'Europe/Zurich')::date,(now() at time zone 'Europe/Zurich')::date+1,1000,0),
+ ('foreign-currency','a','EUR','sent',null,(now() at time zone 'Europe/Zurich')::date,(now() at time zone 'Europe/Zurich')::date+1,1000,0),
+ ('future','a','CHF','sent',null,(now() at time zone 'Europe/Zurich')::date+10,(now() at time zone 'Europe/Zurich')::date+20,1000,0),
+ ('other-tenant','b','CHF','sent',null,(now() at time zone 'Europe/Zurich')::date,(now() at time zone 'Europe/Zurich')::date+1,99999,0);
+ insert into credit_notes values('partial','a',(now() at time zone 'Europe/Zurich')::date,20),('partial','a',(now() at time zone 'Europe/Zurich')::date+1,30),('partial','b',(now() at time zone 'Europe/Zurich')::date,500);`);
  const result=await financialMetricsData(financeDb,'a');
  assert.equal(result.snapshot.as_of,today);assert.equal(Number(result.snapshot.paid),250);assert.equal(Number(result.snapshot.open),300);assert.equal(Number(result.snapshot.overdue),30);assert.equal(Number(result.snapshot.credit_balance),0);
  assert.equal(result.revenueEvents.reduce((total,row)=>total+Number(row.amount),0),580,'Issued gross volume minus current credit notes; never payment receipts');
  assert.ok(result.revenueEvents.some(row=>Number(row.amount)===-20),'Credit date remains a real negative revenue event');
- await financeDb.exec("insert into credit_notes values('paid','a',current_date,100)");
+ await financeDb.exec("insert into credit_notes values('paid','a',(now() at time zone 'Europe/Zurich')::date,100)");
  const credited=await financialMetricsData(financeDb,'a');assert.equal(Number(credited.snapshot.paid),150);assert.equal(Number(credited.snapshot.credit_balance),100,'Credit after full payment is exposed as credit balance, not a negative receivable');
  assert.equal(Number(credited.snapshot.paid)+Number(credited.snapshot.open)+Number(credited.snapshot.overdue),480,'Ring segments form one adjusted invoice volume');
- await financeDb.exec("insert into invoice_refunds values('paid','a',current_date,60),('paid','a',current_date+1,30),('paid','b',current_date,999)");
+ await financeDb.exec("insert into invoice_refunds values('paid','a',(now() at time zone 'Europe/Zurich')::date,60),('paid','a',(now() at time zone 'Europe/Zurich')::date+1,30),('paid','b',(now() at time zone 'Europe/Zurich')::date,999)");
  const repaid=await financialMetricsData(financeDb,'a');
  assert.equal(Number(repaid.snapshot.credit_balance),40,'Only actual current-tenant repayments reduce customer credit');
  assert.equal(repaid.snapshot.receivables,credited.snapshot.receivables,'Refunds do not manufacture new receivables');
@@ -90,7 +97,10 @@ try{
  const empty=await financialMetricsData(financeDb,'empty');assert.equal(empty.revenueEvents.length,0);for(const key of ['paid','open','overdue','credit_balance'])assert.equal(Number(empty.snapshot[key]),0);
  const {listStatusOverride}=await import(moduleUrl(await fs.readFile('lib/list-filter.ts','utf8')));
  assert.equal(listStatusOverride('?status='+encodeURIComponent('Überfällig'),['Alle','Überfällig']),'Überfällig');assert.equal(listStatusOverride('?status=unknown',['Alle']),undefined);assert.equal(listStatusOverride('?status=https://foreign.invalid',['Alle']),undefined);
- console.log('Actual PostgreSQL metric queries: CHF/tenant/date/status/archive scope, credits on their own dates, partial payments, current due balance, credit liability and ring reconciliation passed. Whitelisted list drilldowns passed. Real external runtime-role testing remains separate.');
+ console.log('Actual PostgreSQL metric queries: CHF/tenant/date/status/archive scope, credits on their own dates, partial payments, current due balance, credit liability and ring reconciliation passed. Whitelisted list drilldowns passed. Real external runtime-role testing remains separate. Session timezone: '+zone);
+  }finally{await financeDb.exec('rollback')}
+ }
+ assert.ok(differingSessionDays>0,'Exercise a session whose calendar day differs from the Swiss business day');
 }finally{await financeDb.close()}
 
 const signed=lineChartCoordinates([{key:'a',label:'A',from:'',to:'',values:{amount:-10}},{key:'b',label:'B',from:'',to:'',values:{amount:0}},{key:'c',label:'C',from:'',to:'',values:{amount:10}}],['amount']);
