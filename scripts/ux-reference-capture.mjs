@@ -14,8 +14,9 @@ export async function captureReferenceViews(browser,output){
  const destination=path.join(output,'approved-reference');await fs.mkdir(destination,{recursive:true});
  try{
   for(const name of ['desktop-login','landingpage','mobile-app','komponenten']){
+   // These versioned owner references intentionally retain their own interactions.
+   // Remote resources are denied by the isolated context, not regex-sanitized.
    let html=await fs.readFile('docs/audit/v24/reference/'+name+'.html','utf8');
-   html=html.replace(/<script\b[^>]*\bsrc=[^>]*><\/script>/gi,'');
    html=html.replace(/<i\b([^>]*?)data-lucide="([^"]+)"([^>]*)><\/i>/g,(_match,before,name,after)=>{
     const key=name.split('-').map(word=>word[0].toUpperCase()+word.slice(1)).join(''),Icon=icons[key]??icons.File;
     return renderToStaticMarkup(createElement(Icon,{'aria-hidden':true})).replace('<svg ','<svg '+before+' '+after+' ');
