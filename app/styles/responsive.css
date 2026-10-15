@@ -409,6 +409,8 @@
 
 /* Wide desktop */
 @media (min-width:1101px){
+  .auth-form-demo{display:none}
+
   /* Shared desktop shell; mobile navigation remains independently owned. */
   .desktop-navigation-toggle{display:grid;flex:none}
   .app-root[data-navigation-collapsed]{--sidebar-w:var(--sidebar-collapsed-w)}
@@ -427,6 +429,9 @@
     gap:24px;
     align-items:start;
   }
+  :is(.customer-detail-workspace,.entity-detail-workspace):not(:has(>aside)){grid-template-columns:minmax(0,1fr)}
+  .bo-detail-commandbar{display:flex;min-width:0;padding-block:12px;border-bottom:1px solid var(--color-line)}
+  .bo-detail-commandbar>.page-actions{justify-content:flex-start;min-width:0}
   .customer-info-pane,
   .entity-info-pane,
   .desktop-context-rail{position:sticky;top:82px;align-self:start;min-width:0}
@@ -1218,7 +1223,7 @@
   .auth-cancel{min-height:40px;display:inline-flex;align-items:center}
   .auth-after-submit{margin-top:16px;gap:18px}
   .auth-legal{max-width:38rem}
-  .auth-card h1{font-size:28px;line-height:1.05}
+  .auth-card h1{font-size:24px;line-height:1.15}
   .auth-card>p{margin-bottom:24px;font-size:13px}
   .auth-card input{font-size:16px}
   .auth-card .button{width:100%;height:46px}

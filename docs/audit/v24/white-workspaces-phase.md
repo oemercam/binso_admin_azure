@@ -63,3 +63,15 @@ Die Pilot-Referenzbilder wurden im Chromium-Runner erfolgreich erzeugt und zur P
 ### Frühes Inventar-Gate
 
 Der Integrationsfingerprint umfasst auch `scripts/`. Nach Ergänzung der geerbten Navigations-Fokusprüfung war das gespeicherte Inventar erneut veraltet und blockierte Quality #38798735176 vor den Browserjobs. Das war ein fehlender Generatorschritt dieser Umsetzung. Die bestehende Fast-QA führt die Integrationsprüfung jetzt bei gemeinsamen oder Infrastruktur-/Skriptänderungen mit aus; sie generiert keine Freigabe und überspringt kein Gate. Inventar nach allen Änderungen neu erzeugt und anschliessend geprüft.
+
+## Visueller Pilotvergleich und Folgebatch
+
+Bilder aus Chromium #38799220066, 1440/390 px, mit den gebundenen HTML-Referenzen angesehen. Login besitzt bereits die richtige zweigeteilte Struktur und Original-Branding. Korrigiert: eindeutiger Zeilenumbruch der Einleitung, Titelgrösse, Checkbox-Abstand und gemeinsame Zeile für Remember-me/Reset; keine doppelte Desktop-Demoaktion. Auf Mobile bleibt der Demo-Zugang im Formular verfügbar.
+
+Kundendetail: die sichtbare Umrandung stammt aus der gemeinsamen Surface-Gruppe und ist dort entfernt, statt durch eine Kunden-CSS-Ausnahme übermalt zu werden. Gemeinsame Detailüberschriften erhalten eine Desktop-Aktionsleiste unter Titel/Status/Untertitel; Mobile verwendet weiterhin seine eigenen Headeraktionen. Kunden haben dort eine berechtigte direkte Bearbeiten-Aktion. Die dauerhafte Spalte mit zwei Zählern ist entfernt; gemeinsame Detailraster reservieren ohne echtes Aside keine leere Spalte. Die gleiche Statistikkomponente kann den Verlauf initial einklappen; im Kundendossier sind echte KPIs zuerst sichtbar und der Zeitverlauf bleibt über seine zugängliche Aktion erreichbar. Keine Datenberechnung geändert.
+
+Weitere Browserbefunde desselben Laufs:
+- Chromium: neuer Einklapptest klickte hinter einem korrekt sperrenden Formular-Dialog. Keine Force-Clicks eingeführt. Bei Dialogen prüft das Gate jetzt Fokusbesitz und Pointer-Sperre, ausserhalb von Dialogen weiterhin das tatsächliche Einklappen und die Inhaltsbreite.
+- WebKit: historischer Test verlangte dasselbe graue Glassmaterial für Header-Aktionsgruppe und Bottom-Navigation. Neue Vorgabe verlangt weisse Header und schützt gleichzeitig die bestehende Navigation. Das Gate prüft nun den opaken Header separat und die unveränderten expliziten Light-/Dark-Glasswerte der Navigation. Keine Navigationstokens/-referenzen geändert.
+
+Der Vergleich zeigt auch noch offene Marketing-Abweichungen: der vorhandene `ProductPreview` baut Kennzahlen und Listen mit fest eingetragenen Beispieldaten nach; der grosse inverse Produktabschnitt entspricht nicht der weissen Referenz. Das ist kein echter Produkt-Screenshot und noch nicht als erledigt gewertet.

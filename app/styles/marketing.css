@@ -404,7 +404,7 @@
 .auth-topbar .logo{flex:0 0 auto}
 .auth-cancel{color:var(--color-muted);font-size:11px;font-weight:650}
 .auth-cancel:hover{text-decoration:underline;text-underline-offset:3px}
-.auth-card h1{margin:0 0 8px;font-size:32px;letter-spacing:-.04em}
+.auth-card h1{margin:0 0 8px;font-size:var(--page-heading-size);letter-spacing:-.04em}
 .auth-plan-summary{margin:0 0 22px;padding:14px 0;display:grid;gap:4px;border-top:1px solid var(--color-line);border-bottom:1px solid var(--color-line)}
 .auth-plan-summary b{font-size:13px}
 .auth-plan-summary span{font-size:12px}
@@ -414,7 +414,7 @@
 .auth-card>.auth-status{margin:8px 0 0;color:var(--color-muted);font-size:10px;text-align:center}
 .auth-card>p{margin:0 0 28px;color:var(--color-muted);font-size:13px;line-height:1.55}
 .auth-card form{display:grid;gap:16px}
-.auth-card label:has(>input[type="checkbox"]){grid-template-columns:18px minmax(0,1fr);align-items:start;gap:10px;font-weight:400;line-height:1.5}
+.auth-card label:has(>input[type="checkbox"]){display:grid;grid-template-columns:18px minmax(0,1fr);align-items:start;gap:10px;font-weight:400;line-height:1.5}
 .auth-card input[type="checkbox"]{width:18px;height:18px;min-height:0;padding:0;margin:1px 0 0;accent-color:var(--color-fg)}
 .password-field{position:relative}
 .password-field input{padding-right:80px}
@@ -777,3 +777,7 @@ html[data-theme="dark"] .app-start-icon{filter:invert(1)}
 .auth-workspace-body>.auth-card{width:100%;max-width:none;border-left:1px solid var(--color-line);padding-left:40px}
 .auth-workspace-footer{font-size:12px;color:var(--color-muted);padding-top:20px;border-top:1px solid var(--color-line)}
 .auth-workspace-footer nav{display:flex;gap:20px;flex-wrap:wrap}
+
+.auth-options{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.auth-options .form-link a,.auth-card .auth-bottom a{color:var(--app-accent)}
+.auth-form-demo{display:grid}
