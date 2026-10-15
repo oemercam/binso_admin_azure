@@ -131,7 +131,7 @@ export default function Home() {
           <p><LocalizedText>{"Kunden nachschlagen, Zeit erfassen und Rechnungen prüfen. Direkt auf deinem Smartphone oder als installierbare Web-App."}</LocalizedText></p>
           <Button href="/demo"><LocalizedText>{"Demo starten"}</LocalizedText></Button>
         </div>
-        <figure className="landing-phone-preview"><LocalizedElement as="img" src="/product/binso-one-dashboard-mobile.jpg" alt="Binso One Dashboard auf dem Smartphone" width={390} height={844} loading="lazy"/><figcaption><LocalizedText>{"Die wichtigsten Aufgaben immer griffbereit."}</LocalizedText></figcaption></figure>
+        <figure className="landing-phone-preview"><ProductPreview compact/><figcaption><LocalizedText>{"Die wichtigsten Aufgaben immer griffbereit."}</LocalizedText></figcaption></figure>
       </section>
 
       <section className="marketing-section pricing-section" id="preise">
