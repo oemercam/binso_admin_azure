@@ -1,0 +1,971 @@
+[
+  {
+    "selector": ":root",
+    "context": "",
+    "tokens": [
+      {
+        "property": "--app-canvas",
+        "value": "#fff",
+        "important": false
+      },
+      {
+        "property": "--app-surface",
+        "value": "#f3f3f5",
+        "important": false
+      },
+      {
+        "property": "--app-chrome",
+        "value": "#f1f1f3",
+        "important": false
+      },
+      {
+        "property": "--app-glass-tint",
+        "value": "rgba(243,243,245,.78)",
+        "important": false
+      },
+      {
+        "property": "--app-glass-solid",
+        "value": "#f3f3f5",
+        "important": false
+      },
+      {
+        "property": "--app-glass-line",
+        "value": "rgba(34,34,37,.12)",
+        "important": false
+      },
+      {
+        "property": "--app-glass-shadow",
+        "value": "0 3px 16px rgba(0,0,0,.08)",
+        "important": false
+      },
+      {
+        "property": "--app-glass-blur",
+        "value": "18px",
+        "important": false
+      },
+      {
+        "property": "--dock-gap",
+        "value": "8px",
+        "important": false
+      },
+      {
+        "property": "--dock-action-size",
+        "value": "54px",
+        "important": false
+      },
+      {
+        "property": "--app-text",
+        "value": "#222225",
+        "important": false
+      },
+      {
+        "property": "--app-secondary",
+        "value": "#626267",
+        "important": false
+      },
+      {
+        "property": "--app-divider",
+        "value": "#dedee2",
+        "important": false
+      },
+      {
+        "property": "--app-symbol",
+        "value": "#737379",
+        "important": false
+      },
+      {
+        "property": "--app-accent",
+        "value": "#006ec7",
+        "important": false
+      },
+      {
+        "property": "--app-control-border",
+        "value": "#d3d3d8",
+        "important": false
+      },
+      {
+        "property": "--app-group-radius",
+        "value": "22px",
+        "important": false
+      },
+      {
+        "property": "--app-control-radius",
+        "value": "12px",
+        "important": false
+      },
+      {
+        "property": "--stat-cell-min",
+        "value": "120px",
+        "important": false
+      },
+      {
+        "property": "--insight-panel-min",
+        "value": "240px",
+        "important": false
+      },
+      {
+        "property": "--operator-detail-panel-min",
+        "value": "420px",
+        "important": false
+      },
+      {
+        "property": "--operator-stat-min",
+        "value": "72px",
+        "important": false
+      },
+      {
+        "property": "--group-row-h",
+        "value": "64px",
+        "important": false
+      },
+      {
+        "property": "--check-size",
+        "value": "18px",
+        "important": false
+      },
+      {
+        "property": "--form-column-min",
+        "value": "220px",
+        "important": false
+      },
+      {
+        "property": "--workspace-viewport-height",
+        "value": "100dvh",
+        "important": false
+      },
+      {
+        "property": "--workspace-viewport-top",
+        "value": "0px",
+        "important": false
+      },
+      {
+        "property": "--workspace-header-height",
+        "value": "58px",
+        "important": false
+      },
+      {
+        "property": "--chart-compact-height",
+        "value": "130px",
+        "important": false
+      },
+      {
+        "property": "--kpi-padding",
+        "value": "14px",
+        "important": false
+      },
+      {
+        "property": "--action-row-height",
+        "value": "48px",
+        "important": false
+      },
+      {
+        "property": "--section-title-font",
+        "value": "18px",
+        "important": false
+      },
+      {
+        "property": "--color-bg",
+        "value": "#fff",
+        "important": false
+      },
+      {
+        "property": "--color-fg",
+        "value": "#000",
+        "important": false
+      },
+      {
+        "property": "--color-muted",
+        "value": "#6c6c6c",
+        "important": false
+      },
+      {
+        "property": "--color-line",
+        "value": "#e9e9e7",
+        "important": false
+      },
+      {
+        "property": "--color-subtle",
+        "value": "#fff",
+        "important": false
+      },
+      {
+        "property": "--color-inverse-bg",
+        "value": "#000",
+        "important": false
+      },
+      {
+        "property": "--color-inverse-fg",
+        "value": "#fff",
+        "important": false
+      },
+      {
+        "property": "--color-danger",
+        "value": "#a61b1b",
+        "important": false
+      },
+      {
+        "property": "--status-success-bg",
+        "value": "#eaf7ee",
+        "important": false
+      },
+      {
+        "property": "--status-success-fg",
+        "value": "#176b35",
+        "important": false
+      },
+      {
+        "property": "--status-success-line",
+        "value": "#bfe5ca",
+        "important": false
+      },
+      {
+        "property": "--status-warning-bg",
+        "value": "#fff6df",
+        "important": false
+      },
+      {
+        "property": "--status-warning-fg",
+        "value": "#8a5a00",
+        "important": false
+      },
+      {
+        "property": "--status-warning-line",
+        "value": "#f1d38a",
+        "important": false
+      },
+      {
+        "property": "--status-danger-bg",
+        "value": "#fdecec",
+        "important": false
+      },
+      {
+        "property": "--status-danger-fg",
+        "value": "#a61b1b",
+        "important": false
+      },
+      {
+        "property": "--status-danger-line",
+        "value": "#efbcbc",
+        "important": false
+      },
+      {
+        "property": "--status-info-bg",
+        "value": "#eaf3ff",
+        "important": false
+      },
+      {
+        "property": "--status-info-fg",
+        "value": "#1d5fa7",
+        "important": false
+      },
+      {
+        "property": "--status-info-line",
+        "value": "#bfd7f4",
+        "important": false
+      },
+      {
+        "property": "--status-neutral-bg",
+        "value": "#f3f3f1",
+        "important": false
+      },
+      {
+        "property": "--status-neutral-fg",
+        "value": "#555",
+        "important": false
+      },
+      {
+        "property": "--status-neutral-line",
+        "value": "#dededb",
+        "important": false
+      },
+      {
+        "property": "--font-sans",
+        "value": "Inter,-apple-system,BlinkMacSystemFont,\"SF Pro Text\",\"Segoe UI\",sans-serif",
+        "important": false
+      },
+      {
+        "property": "--radius-xs",
+        "value": "7px",
+        "important": false
+      },
+      {
+        "property": "--radius-sm",
+        "value": "9px",
+        "important": false
+      },
+      {
+        "property": "--radius-md",
+        "value": "10px",
+        "important": false
+      },
+      {
+        "property": "--radius-lg",
+        "value": "14px",
+        "important": false
+      },
+      {
+        "property": "--radius-sheet",
+        "value": "18px",
+        "important": false
+      },
+      {
+        "property": "--shadow-float",
+        "value": "0 12px 32px rgba(0,0,0,.10)",
+        "important": false
+      },
+      {
+        "property": "--shadow-modal",
+        "value": "0 20px 70px rgba(0,0,0,.20)",
+        "important": false
+      },
+      {
+        "property": "--motion-fast",
+        "value": "140ms",
+        "important": false
+      },
+      {
+        "property": "--motion-base",
+        "value": "220ms",
+        "important": false
+      },
+      {
+        "property": "--motion-slow",
+        "value": "420ms",
+        "important": false
+      },
+      {
+        "property": "--motion-ease",
+        "value": "cubic-bezier(.22,1,.36,1)",
+        "important": false
+      },
+      {
+        "property": "--motion-ease-standard",
+        "value": "cubic-bezier(.2,0,0,1)",
+        "important": false
+      },
+      {
+        "property": "--glass-bg",
+        "value": "rgba(255,255,255,.76)",
+        "important": false
+      },
+      {
+        "property": "--glass-line",
+        "value": "rgba(10,10,10,.10)",
+        "important": false
+      },
+      {
+        "property": "--glass-blur",
+        "value": "18px",
+        "important": false
+      },
+      {
+        "property": "--sidebar-w",
+        "value": "228px",
+        "important": false
+      },
+      {
+        "property": "--content-max",
+        "value": "1760px",
+        "important": false
+      },
+      {
+        "property": "--marketing-max",
+        "value": "1240px",
+        "important": false
+      },
+      {
+        "property": "--page-x",
+        "value": "clamp(28px,2.4vw,46px)",
+        "important": false
+      },
+      {
+        "property": "--desktop-section-y",
+        "value": "24px",
+        "important": false
+      },
+      {
+        "property": "--desktop-surface-x",
+        "value": "24px",
+        "important": false
+      },
+      {
+        "property": "--desktop-section-gap",
+        "value": "20px",
+        "important": false
+      },
+      {
+        "property": "--desktop-action-h",
+        "value": "40px",
+        "important": false
+      },
+      {
+        "property": "--desktop-action-gap",
+        "value": "8px",
+        "important": false
+      },
+      {
+        "property": "--mobile-page-x",
+        "value": "clamp(16px,4.55vw,20px)",
+        "important": false
+      },
+      {
+        "property": "--mobile-header-h",
+        "value": "52px",
+        "important": false
+      },
+      {
+        "property": "--mobile-nav-h",
+        "value": "68px",
+        "important": false
+      },
+      {
+        "property": "--mobile-nav-compact-h",
+        "value": "52px",
+        "important": false
+      },
+      {
+        "property": "--mobile-nav-edge",
+        "value": "clamp(8px,2.8vw,14px)",
+        "important": false
+      },
+      {
+        "property": "--mobile-nav-bottom",
+        "value": "clamp(8px,2.2vw,12px)",
+        "important": false
+      },
+      {
+        "property": "--mobile-nav-radius",
+        "value": "30px",
+        "important": false
+      },
+      {
+        "property": "--mobile-nav-compact-radius",
+        "value": "26px",
+        "important": false
+      },
+      {
+        "property": "--mobile-page-top",
+        "value": "14px",
+        "important": false
+      },
+      {
+        "property": "--mobile-page-head-gap",
+        "value": "16px",
+        "important": false
+      },
+      {
+        "property": "--mobile-toolbar-gap",
+        "value": "10px",
+        "important": false
+      },
+      {
+        "property": "--mobile-section-gap",
+        "value": "18px",
+        "important": false
+      },
+      {
+        "property": "--mobile-search-h",
+        "value": "40px",
+        "important": false
+      },
+      {
+        "property": "--mobile-chip-h",
+        "value": "34px",
+        "important": false
+      },
+      {
+        "property": "--mobile-row-h",
+        "value": "64px",
+        "important": false
+      },
+      {
+        "property": "--mobile-sheet-row-h",
+        "value": "56px",
+        "important": false
+      },
+      {
+        "property": "--touch",
+        "value": "44px",
+        "important": false
+      },
+      {
+        "property": "--header-avatar-size",
+        "value": "30px",
+        "important": false
+      },
+      {
+        "property": "--control-focus-width",
+        "value": "2px",
+        "important": false
+      },
+      {
+        "property": "--chart-positive",
+        "value": "#57cc91",
+        "important": false
+      },
+      {
+        "property": "--chart-negative",
+        "value": "#f07881",
+        "important": false
+      },
+      {
+        "property": "--chart-neutral",
+        "value": "#a2a8b3",
+        "important": false
+      },
+      {
+        "property": "--chart-ring-size",
+        "value": "96px",
+        "important": false
+      },
+      {
+        "property": "--chart-ring-width",
+        "value": "10px",
+        "important": false
+      },
+      {
+        "property": "--control-h",
+        "value": "40px",
+        "important": false
+      },
+      {
+        "property": "--control-h-mobile",
+        "value": "44px",
+        "important": false
+      },
+      {
+        "property": "--control-font",
+        "value": "13px",
+        "important": false
+      },
+      {
+        "property": "--control-font-mobile",
+        "value": "16px",
+        "important": false
+      },
+      {
+        "property": "--control-label-font",
+        "value": "14px",
+        "important": false
+      },
+      {
+        "property": "--control-label-weight",
+        "value": "500",
+        "important": false
+      },
+      {
+        "property": "--heading-content-gap",
+        "value": "12px",
+        "important": false
+      },
+      {
+        "property": "--field-label-gap",
+        "value": "6px",
+        "important": false
+      },
+      {
+        "property": "--field-group-gap",
+        "value": "14px",
+        "important": false
+      },
+      {
+        "property": "--sheet-row-gap",
+        "value": "10px",
+        "important": false
+      },
+      {
+        "property": "--control-help-font",
+        "value": "10px",
+        "important": false
+      },
+      {
+        "property": "--control-x",
+        "value": "11px",
+        "important": false
+      },
+      {
+        "property": "--control-radius",
+        "value": "var(--radius-md)",
+        "important": false
+      },
+      {
+        "property": "--control-textarea-min",
+        "value": "110px",
+        "important": false
+      },
+      {
+        "property": "--control-disabled-opacity",
+        "value": ".45",
+        "important": false
+      },
+      {
+        "property": "--control-border",
+        "value": "#d9d9d6",
+        "important": false
+      },
+      {
+        "property": "--dialog-edge-gap",
+        "value": "16px",
+        "important": false
+      },
+      {
+        "property": "--sheet-max-width",
+        "value": "560px",
+        "important": false
+      },
+      {
+        "property": "--layer-sheet",
+        "value": "80",
+        "important": false
+      },
+      {
+        "property": "--layer-confirm",
+        "value": "190",
+        "important": false
+      },
+      {
+        "property": "--wizard-height",
+        "value": "auto",
+        "important": false
+      },
+      {
+        "property": "--process-action-h",
+        "value": "48px",
+        "important": false
+      },
+      {
+        "property": "--header-panel-top",
+        "value": "64px",
+        "important": false
+      },
+      {
+        "property": "--header-panel-right",
+        "value": "16px",
+        "important": false
+      },
+      {
+        "property": "--dialog-viewport-height",
+        "value": "100dvh",
+        "important": false
+      },
+      {
+        "property": "--dialog-available-height",
+        "value": "min(var(--dialog-viewport-height),100dvh)",
+        "important": false
+      },
+      {
+        "property": "--dialog-viewport-top",
+        "value": "0px",
+        "important": false
+      },
+      {
+        "property": "--safe-top",
+        "value": "0px",
+        "important": false
+      },
+      {
+        "property": "--safe-right",
+        "value": "env(safe-area-inset-right,0px)",
+        "important": false
+      },
+      {
+        "property": "--safe-bottom",
+        "value": "env(safe-area-inset-bottom,0px)",
+        "important": false
+      },
+      {
+        "property": "--safe-left",
+        "value": "env(safe-area-inset-left,0px)",
+        "important": false
+      },
+      {
+        "property": "--bg",
+        "value": "var(--color-bg)",
+        "important": false
+      },
+      {
+        "property": "--ink",
+        "value": "var(--color-fg)",
+        "important": false
+      },
+      {
+        "property": "--muted",
+        "value": "var(--color-muted)",
+        "important": false
+      },
+      {
+        "property": "--line",
+        "value": "var(--color-line)",
+        "important": false
+      },
+      {
+        "property": "--soft",
+        "value": "var(--color-subtle)",
+        "important": false
+      }
+    ]
+  },
+  {
+    "selector": ":root",
+    "context": "@media (display-mode:standalone)",
+    "tokens": [
+      {
+        "property": "--safe-top",
+        "value": "env(safe-area-inset-top,0px)",
+        "important": false
+      },
+      {
+        "property": "--safe-bottom",
+        "value": "env(safe-area-inset-bottom,0px)",
+        "important": false
+      }
+    ]
+  },
+  {
+    "selector": "html[data-theme=\"dark\"]",
+    "context": "",
+    "tokens": [
+      {
+        "property": "--app-canvas",
+        "value": "#000",
+        "important": false
+      },
+      {
+        "property": "--app-surface",
+        "value": "#141414",
+        "important": false
+      },
+      {
+        "property": "--app-chrome",
+        "value": "#212121",
+        "important": false
+      },
+      {
+        "property": "--app-glass-tint",
+        "value": "rgba(33,33,33,.82)",
+        "important": false
+      },
+      {
+        "property": "--app-glass-solid",
+        "value": "#212121",
+        "important": false
+      },
+      {
+        "property": "--app-glass-line",
+        "value": "rgba(255,255,255,.16)",
+        "important": false
+      },
+      {
+        "property": "--app-glass-shadow",
+        "value": "0 3px 18px rgba(0,0,0,.32)",
+        "important": false
+      },
+      {
+        "property": "--app-text",
+        "value": "#dedee2",
+        "important": false
+      },
+      {
+        "property": "--app-secondary",
+        "value": "#a0a0a5",
+        "important": false
+      },
+      {
+        "property": "--app-divider",
+        "value": "#2b2b2e",
+        "important": false
+      },
+      {
+        "property": "--app-symbol",
+        "value": "#929297",
+        "important": false
+      },
+      {
+        "property": "--app-accent",
+        "value": "#48a7ff",
+        "important": false
+      },
+      {
+        "property": "--app-control-border",
+        "value": "#3a3a3e",
+        "important": false
+      },
+      {
+        "property": "--control-border",
+        "value": "#333",
+        "important": false
+      },
+      {
+        "property": "--color-bg",
+        "value": "#000",
+        "important": false
+      },
+      {
+        "property": "--color-fg",
+        "value": "#fff",
+        "important": false
+      },
+      {
+        "property": "--color-muted",
+        "value": "#a4a4a4",
+        "important": false
+      },
+      {
+        "property": "--color-line",
+        "value": "#292929",
+        "important": false
+      },
+      {
+        "property": "--color-subtle",
+        "value": "#000",
+        "important": false
+      },
+      {
+        "property": "--color-inverse-bg",
+        "value": "#fff",
+        "important": false
+      },
+      {
+        "property": "--color-inverse-fg",
+        "value": "#000",
+        "important": false
+      },
+      {
+        "property": "--glass-bg",
+        "value": "rgba(0,0,0,.72)",
+        "important": false
+      },
+      {
+        "property": "--glass-line",
+        "value": "rgba(255,255,255,.16)",
+        "important": false
+      },
+      {
+        "property": "--status-success-bg",
+        "value": "#0d2a18",
+        "important": false
+      },
+      {
+        "property": "--status-success-fg",
+        "value": "#78d99a",
+        "important": false
+      },
+      {
+        "property": "--status-success-line",
+        "value": "#245f39",
+        "important": false
+      },
+      {
+        "property": "--status-warning-bg",
+        "value": "#302306",
+        "important": false
+      },
+      {
+        "property": "--status-warning-fg",
+        "value": "#f1c75b",
+        "important": false
+      },
+      {
+        "property": "--status-warning-line",
+        "value": "#665018",
+        "important": false
+      },
+      {
+        "property": "--status-danger-bg",
+        "value": "#321010",
+        "important": false
+      },
+      {
+        "property": "--status-danger-fg",
+        "value": "#ff8e8e",
+        "important": false
+      },
+      {
+        "property": "--status-danger-line",
+        "value": "#6f2929",
+        "important": false
+      },
+      {
+        "property": "--status-info-bg",
+        "value": "#0d2239",
+        "important": false
+      },
+      {
+        "property": "--status-info-fg",
+        "value": "#82baff",
+        "important": false
+      },
+      {
+        "property": "--status-info-line",
+        "value": "#28517d",
+        "important": false
+      },
+      {
+        "property": "--status-neutral-bg",
+        "value": "#171717",
+        "important": false
+      },
+      {
+        "property": "--status-neutral-fg",
+        "value": "#c5c5c5",
+        "important": false
+      },
+      {
+        "property": "--status-neutral-line",
+        "value": "#343434",
+        "important": false
+      },
+      {
+        "property": "--bg",
+        "value": "var(--color-bg)",
+        "important": false
+      },
+      {
+        "property": "--ink",
+        "value": "var(--color-fg)",
+        "important": false
+      },
+      {
+        "property": "--muted",
+        "value": "var(--color-muted)",
+        "important": false
+      },
+      {
+        "property": "--line",
+        "value": "var(--color-line)",
+        "important": false
+      },
+      {
+        "property": "--soft",
+        "value": "var(--color-subtle)",
+        "important": false
+      }
+    ]
+  },
+  {
+    "selector": ":root",
+    "context": "@media (prefers-reduced-motion:reduce)",
+    "tokens": [
+      {
+        "property": "--motion-fast",
+        "value": "0ms",
+        "important": false
+      },
+      {
+        "property": "--motion-base",
+        "value": "0ms",
+        "important": false
+      },
+      {
+        "property": "--motion-slow",
+        "value": "0ms",
+        "important": false
+      }
+    ]
+  },
+  {
+    "selector": "html",
+    "context": "@media (prefers-reduced-motion:reduce)",
+    "tokens": []
+  }
+]

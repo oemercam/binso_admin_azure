@@ -1613,8 +1613,6 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 .app-root,.operator-root,.bottom-sheet,.header-panel,.confirm-dialog{
   --color-bg:var(--app-canvas);--color-fg:var(--app-text);--color-muted:var(--app-secondary);--color-line:var(--app-divider);--color-subtle:var(--app-surface);--control-border:var(--app-control-border);--control-radius:var(--app-control-radius);
 }
-:is(.app-root,.operator-root,.bottom-sheet,.header-panel) :is(.form-control,.form-textarea):focus{outline:var(--control-focus-width) solid var(--app-accent);outline-offset:calc(-1 * var(--control-focus-width));box-shadow:none}
-:is(.app-root,.operator-root,.bottom-sheet,.header-panel) :is(.form-control,.form-textarea)[aria-invalid="true"]{border-color:var(--status-danger-fg);outline-color:var(--status-danger-fg)}
 
 .empty-list-state{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:12px 0;color:var(--color-muted)}
 .empty-list-state>p{margin:0}

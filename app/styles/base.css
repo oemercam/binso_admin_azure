@@ -174,9 +174,15 @@ textarea{
 input:focus,
 select:focus,
 textarea:focus{
-  outline:var(--control-focus-width) solid var(--color-fg);
+  outline:var(--control-focus-width) solid var(--app-accent);
   outline-offset:calc(-1 * var(--control-focus-width));
   box-shadow:none;
+}
+
+/* Error colour owns focus as well as the resting border on every surface. */
+:root :is(input,select,textarea)[aria-invalid="true"]{
+  border-color:var(--status-danger-fg);
+  outline-color:var(--status-danger-fg);
 }
 
 input,

@@ -1,0 +1,115 @@
+{
+  "baselineMain": "746374485f81a376a56e4d8c6141ba0d41dfbbfc",
+  "candidate": "de9bf8ed67ad854cce8e6355d73d380346ad1ab1",
+  "date": "2026-10-15",
+  "rules": [
+    {
+      "id": "UX24-TYPE",
+      "scope": "Alle Oberflächen",
+      "requirement": "Inter/system via --font-sans; Controls 13px Desktop/16px Mobile, Labels 14px/500. Fehlende allgemeine Typografiestufen bleiben offen.",
+      "owner": "app/styles/tokens.css",
+      "acceptance": "Computed font und line-height je Rolle/Gerät gegen freigegebenen Wert prüfen",
+      "status": "offen",
+      "evidence": []
+    },
+    {
+      "id": "UX24-SPACE",
+      "scope": "Alle Oberflächen",
+      "requirement": "Bestehende --page-x, --mobile-page-x, --field-group-gap, --desktop-section-gap verwenden; keine neue Skala parallel anlegen.",
+      "owner": "app/styles/tokens.css",
+      "acceptance": "Computed Padding/Gap mit zuständigem Token vergleichen",
+      "status": "offen",
+      "evidence": []
+    },
+    {
+      "id": "UX24-COLOR",
+      "scope": "Light/Dark",
+      "requirement": "Bestehende semantische color/app/status Tokens verwenden; Kontrast in beiden Themes prüfen.",
+      "owner": "app/styles/tokens.css",
+      "acceptance": "Kontrast und Zustände tatsächlich messen",
+      "status": "offen",
+      "evidence": []
+    },
+    {
+      "id": "UX24-SURFACE",
+      "scope": "Cards/Listen/Settings",
+      "requirement": "Bestehende Surface/Row Varianten; Separator nur zwischen Einträgen, nie nach letztem.",
+      "owner": "app/styles/app.css",
+      "acceptance": "Einzelner, letzter und mehrzeiliger Eintrag ohne Schlusslinie",
+      "status": "offen",
+      "evidence": []
+    },
+    {
+      "id": "UX24-CONTROL",
+      "scope": "Formulare inkl. Auth",
+      "requirement": "Field/Input/Select/Textarea verwenden; Fokus 2px innen, Akzent, Fehler rot; Disabled via Rechte erhalten.",
+      "owner": "components/ui.tsx",
+      "acceptance": "Fokus/Fehler/Disabled/Loading rendern; aria-describedby und Label prüfen",
+      "status": "offen",
+      "evidence": []
+    },
+    {
+      "id": "UX24-HEADER",
+      "scope": "Haupt-/Detail-/Desktopheader",
+      "requirement": "Bestehende Shell und Header verwenden; Detailtitel zentriert, Zurück und Aktionen nach Seitentyp.",
+      "owner": "components/app-chrome.tsx",
+      "acceptance": "Geometrie und Back/Deep Link auf Mobile/Tablet/Desktop prüfen",
+      "status": "offen",
+      "evidence": []
+    },
+    {
+      "id": "UX24-ACTIONS",
+      "scope": "Listen und Aktionen",
+      "requirement": "Lokale Suche/Filter/Plus und Tabs über bestehende Komponenten; Plus erstellt, Datensatz öffnet, Menü weitere erlaubte Aktionen.",
+      "owner": "components/binso-ux.tsx",
+      "acceptance": "Rollen und Öffnungsmodus je Aktion testen",
+      "status": "offen",
+      "evidence": []
+    },
+    {
+      "id": "UX24-OVERLAY",
+      "scope": "Sheets/Dialog/Popover",
+      "requirement": "Bestehende Action/Selection/Filter/Form Sheets; Fokus, Escape/Back, Scroll, Safe Area und Keyboard zentral.",
+      "owner": "components/binso-ux.tsx",
+      "acceptance": "Fokus zurück, Keyboard, Dirty-State, Footer ohne Überdeckung prüfen",
+      "status": "offen",
+      "evidence": []
+    },
+    {
+      "id": "UX24-CHART",
+      "scope": "KPI und Diagramme",
+      "requirement": "Maximal vier primäre KPIs; weitere per Mehr anzeigen; Ring für Anteile, Zeitreihe für Zeit; gemeinsame Drilldowns.",
+      "owner": "components/statistics.tsx",
+      "acceptance": "Touch/Tastatur und gefiltertes Ziel mit korrektem Zeitraum/Betrag prüfen",
+      "status": "offen",
+      "evidence": []
+    },
+    {
+      "id": "UX24-PWA",
+      "scope": "Mobile/PWA",
+      "requirement": "Dynamischer Viewport und Safe-Area Tokens; kein verdeckter Composer/Footer; kein sichtbares Updatebanner.",
+      "owner": "components/use-workspace-viewport.ts",
+      "acceptance": "Browseremulation und echte installierte Geräte getrennt protokollieren",
+      "status": "offen",
+      "evidence": []
+    },
+    {
+      "id": "UX24-MOTION",
+      "scope": "Motion/Glass",
+      "requirement": "Bestehende motion/glass Tokens und Reduced Motion; keine zusätzlichen Navigationseingriffe.",
+      "owner": "app/styles/tokens.css",
+      "acceptance": "Reduced Motion und Glass-Fallback in beiden Themes prüfen",
+      "status": "offen",
+      "evidence": []
+    },
+    {
+      "id": "UX24-NAV",
+      "scope": "Bottom-Navigation",
+      "requirement": "Bestehende Bottom-Navigation unverändert; diese Aufgabe autorisiert keine neue Glass/Layout/Plus-Änderung.",
+      "owner": "components/app-chrome.tsx",
+      "acceptance": "Vorhandene navigation-contract und navigation-foundation Gates ohne Referenzregeneration",
+      "status": "offen",
+      "evidence": []
+    }
+  ]
+}

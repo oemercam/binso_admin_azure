@@ -2716,7 +2716,6 @@ input:not([type="checkbox"]):not([type="radio"]),
   :is(.page-container,.operator-app-content,.bottom-sheet,.header-panel) .searchbox{background:var(--app-chrome);border-color:transparent;border-radius:999px}
   :is(.page-container,.operator-app-content,.bottom-sheet,.header-panel) .searchbox:focus-within{border-color:var(--app-accent)}
   :is(.page-container,.operator-app-content,.bottom-sheet,.header-panel) :is(.form-control,.form-textarea){background:var(--app-chrome)}
-  :is(.page-container,.operator-app-content,.bottom-sheet,.header-panel) :is(.form-control,.form-textarea):focus-visible{outline-color:var(--app-accent)}
   :is(.page-container,.operator-app-content,.bottom-sheet,.header-panel) :is(.form-control,.form-textarea)[aria-invalid="true"]{border-color:var(--status-danger-fg)}
   :is(.page-container,.operator-app-content,.bottom-sheet,.header-panel) :is(.tabs,.chips,.notification-center-tabs) :is(button,a).active{background:var(--app-chrome);color:var(--app-accent)}
   .bottom-sheet{border:0;background:var(--app-surface);border-radius:var(--app-group-radius)}
