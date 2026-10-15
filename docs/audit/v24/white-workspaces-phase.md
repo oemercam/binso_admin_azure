@@ -26,12 +26,14 @@ Entfernte Altlasten: zwei UI-Massen-Leseaktionen und ihre unbenutzten Handler/Pr
 ## Prüfungen
 
 - Frozen Install mit projektgebundenem pnpm 10.17.1 erfolgreich. Vorinstalliertes pnpm 11 verursachte einen Konfigurationskonflikt; Lockfile blieb unverändert.
-- Fast-QA einschliesslich TypeScript, UX-Vertrag, Regression, Theme/Glass, Foundation, Navigations- und CSS-Architektur sowie QA-Plan bestanden vor der letzten Desktop-Suchpositionierung.
+- Fast-QA einschliesslich TypeScript, UX-Vertrag, Regression, Theme/Glass, Foundation, Navigations- und CSS-Architektur sowie QA-Plan auch nach der letzten Desktop-Suchpositionierung bestanden.
 - Separater unveränderter Navigation-Contract bestanden: keine Referenzregeneration.
-- Erster Produktionsbuild erfolgreich; finaler Build/ESLint und weitere Prüfungen laufen.
+- Finaler Produktionsbuild, vollständiger ESLint, Statistiktests, Repository-/Dokumentations-/Releasechecks und Dependency-Audit bestanden; keine bekannten produktiven Dependency-Schwachstellen. Lokales HTTP-Gate ebenfalls bestanden: 57 Routen, fünf Stylesheets, Demo-Flow und Theme-/Storagezustände.
 - Neues Browsergate prüft weisse Flächen, Desktop-Einklappen/Rückgewinnung der Breite/Storage und geometrische Ringzentrierung. Der bestehende Flächentest wurde wegen der expliziten neuen Weiss-Vorgabe von Grau auf Weiss geändert. Keine Screenshotreferenz erneuert.
 - Lokaler vollständiger Testlauf der Ausgangsbasis scheitert unverändert im Scanner-Test an `listen EPERM`. Keine Prüfung deaktiviert.
 - Lokale Browserinstallation scheitert am Download/Entpacken des Chromium-Archivs. Kein Browser-/Gerätenachweis dieser Phase.
+
+Der Token-Snapshot und der zentrale UX-Vertrag enthalten die neue schriftliche Weiss-/Desktop-Vorgabe; ältere graue Snapshotwerte sind ersetzt. PR #256, Implementierungscommit `e480261b8088f67e5cb144982ac9b1b2939ccdf4`: GitHub Quality/CodeQL laufen. Browser werden für den Draft gemäss bestehendem Workflow zurückgestellt und nicht als bestanden gewertet.
 
 ## Verbleibender Umfang
 

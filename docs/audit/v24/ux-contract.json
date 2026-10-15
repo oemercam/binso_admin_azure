@@ -326,6 +326,28 @@
         "scripts/ux-contract-check.mjs"
       ],
       "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
+    },
+    {
+      "id": "UX24-WHITE-WORKSPACE",
+      "scope": "Light Mode: Marketing, Auth, Kunden- und Adminportal; bestehende Bottom-Navigation ausgenommen",
+      "requirement": "Weisse Grund-, Header-, Control- und Inhaltsflächen; dezente blaue Fokus-/Auswahl-/Aktionszustände. Dark Mode eigenständig. Neuer schriftlicher Auftrag white-workspaces-request.md hat Vorrang vor älteren Grau-Vorgaben.",
+      "owner": "app/styles/tokens.css",
+      "acceptance": "Computed weisse Flächen und Kontrast prüfen; Navigation-Referenz unverändert bestehen lassen.",
+      "status": "implementiert; Browserprüfung offen",
+      "evidence": [
+        "white-workspaces-phase.md"
+      ]
+    },
+    {
+      "id": "UX24-DESKTOP-COLLAPSE",
+      "scope": "Desktop ab 1101px, Kunden- und Adminportal",
+      "requirement": "Linke Navigation standardmässig offen, manuell einklappbar; gespeicherte Auswahl, ARIA-Zustand und Icon-Linknamen. Mobile-Navigation unverändert.",
+      "owner": "components/desktop-navigation.tsx",
+      "acceptance": "Einklappen/Öffnen, gewonnene Inhaltsbreite, Storage und mobile Unsichtbarkeit im Browser prüfen.",
+      "status": "implementiert; Browserprüfung offen",
+      "evidence": [
+        "white-workspaces-phase.md"
+      ]
     }
   ],
   "styleBindings": [

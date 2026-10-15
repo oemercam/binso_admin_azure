@@ -10,12 +10,12 @@
       },
       {
         "property": "--app-surface",
-        "value": "#f3f3f5",
+        "value": "#fff",
         "important": false
       },
       {
         "property": "--app-chrome",
-        "value": "#f1f1f3",
+        "value": "#fff",
         "important": false
       },
       {
@@ -76,6 +76,21 @@
       {
         "property": "--app-accent",
         "value": "#006ec7",
+        "important": false
+      },
+      {
+        "property": "--app-accent-soft",
+        "value": "#edf5fc",
+        "important": false
+      },
+      {
+        "property": "--app-accent-text",
+        "value": "#fff",
+        "important": false
+      },
+      {
+        "property": "--sidebar-collapsed-w",
+        "value": "68px",
         "important": false
       },
       {
@@ -868,6 +883,16 @@
       {
         "property": "--app-accent",
         "value": "#48a7ff",
+        "important": false
+      },
+      {
+        "property": "--app-accent-soft",
+        "value": "#102b42",
+        "important": false
+      },
+      {
+        "property": "--app-accent-text",
+        "value": "#071521",
         "important": false
       },
       {
