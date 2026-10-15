@@ -28,7 +28,7 @@ assert.ok(recoverRoute.includes('domainConfig.passwordResetMinutes'),'Password r
 assert.ok(provisioningSource.includes('input.language??"de"'),'Persisted profile language must remain schema-compatible');
 assert.ok(provisioningSource.includes('input.mode==="demo"?addHours(new Date(),domainConfig.demoSessionHours):null'),'Trial expiry must not start before first email verification');
 const appPagesSource=await readPageFile('components/app-pages.tsx','utf8');
-assert.ok(appPagesSource.includes('value==="de"?"de-CH":value'),'Language settings must present persisted de as de-CH');
+assert.ok(appPagesSource.includes('useLocale()')&&appPagesSource.includes('locales.map('),'Language settings must expose all supported locales through the shared provider');
 for(const legacyMrr of ['CHF 19','CHF 49','CHF 89'])assert.ok(!operatorSource.includes('mrr:"'+legacyMrr+'"'),'Operator demo must not hardcode retired MRR '+legacyMrr);
 assert.ok(operatorSource.includes('demoPlan("start")')&&operatorSource.includes('demoPlan("business")')&&operatorSource.includes('demoPlan("pro")'),'Operator demo MRR must derive from canonical plans');
 

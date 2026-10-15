@@ -13,7 +13,7 @@ export function useProcessDraft<T>({process,value,dirty,enabled,onRestore}:{proc
  const restored=useRef<string|null>(null),discarded=useRef(false);
  const scopeRevision=useRef<string|null>(null);
  useEffect(()=>{
-  if(!enabled)return;
+  if(!enabled){restored.current=null;discarded.current=false;return;}
   if(scopeRevision.current!==null&&scopeRevision.current!==revision){discarded.current=true;return;}
   scopeRevision.current=revision;
   let active=true;

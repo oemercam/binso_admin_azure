@@ -1,4 +1,5 @@
 "use client";
+import {LocalizedText} from "@/lib/client/locale";
 import {safeAppPath} from "@/lib/navigation";
 import {useEffect,useRef,useState} from 'react';
 import {useSearchParams,useRouter} from 'next/navigation';
@@ -51,15 +52,15 @@ export function ProjectForm(){
  };
  return <AppShell title="Zeiterfassung" active="zeit" editing unsavedChanges={false}>
   <FormSheet label="Auftrag / Projekt starten" description="Beginne mit der Bezeichnung. Ein Kunde ist nur für kundenbezogene Arbeit nötig." open={open} onClose={close} busy={saving} dirty={dirty&&!saved} wizard>
-   {loading?<LoadingState>Projektdaten werden geladen …</LoadingState>:loadError?<ErrorState onRetry={()=>{directory.refresh();source.refresh()}}>{loadError}</ErrorState>:<form onSubmit={event=>{event.preventDefault();void save()}}>
-    <FormWizard labels={["Grunddaten"]} step={0} onStep={()=>{}} busy={saving} ariaLabel="Projekt erfassen" cancelAction={<Button variant="secondary" onClick={close}>Abbrechen</Button>} action={<Button requiresWrite type="submit" disabled={saving||!recovery.ready||name.trim().length<2}>{saving?'Wird erstellt…':'Auftrag starten'}</Button>}>
-     {error&&<ErrorState>{error}</ErrorState>}
+   {loading?<LoadingState><LocalizedText>{"Projektdaten werden geladen …"}</LocalizedText></LoadingState>:loadError?<ErrorState onRetry={()=>{directory.refresh();source.refresh()}}><LocalizedText>{loadError}</LocalizedText></ErrorState>:<form onSubmit={event=>{event.preventDefault();void save()}}>
+    <FormWizard labels={["Grunddaten"]} step={0} onStep={()=>{}} busy={saving} ariaLabel="Projekt erfassen" cancelAction={<Button variant="secondary" onClick={close}><LocalizedText>{"Abbrechen"}</LocalizedText></Button>} action={<Button requiresWrite type="submit" disabled={saving||!recovery.ready||name.trim().length<2}><LocalizedText>{saving?'Wird erstellt…':'Auftrag starten'}</LocalizedText></Button>}>
+     {error&&<ErrorState><LocalizedText>{error}</LocalizedText></ErrorState>}
      <div className="form-grid">
      <Field label="Bezeichnung *"><Input required minLength={2} maxLength={200} autoComplete="off" value={name} disabled={saving} onChange={e=>setName(e.target.value)} placeholder="z. B. Cloud Migration"/></Field>
-     <Field label="Kunde"><Select disabled={!!sourceOffer||saving} value={customerId} onChange={e=>setCustomerId(e.target.value)}><option value="">Intern</option>{directory.data?.items.map(item=><option key={item.id} value={item.id}>{item.name}</option>)}</Select></Field>
+     <Field label="Kunde"><Select disabled={!!sourceOffer||saving} value={customerId} onChange={e=>setCustomerId(e.target.value)}><option value=""><LocalizedText>{"Intern"}</LocalizedText></option>{directory.data?.items.map(item=><option key={item.id} value={item.id}>{item.name}</option>)}</Select></Field>
      </div>
-     {sourceOffer&&<p>Ursprungsangebot: {sourceOffer}</p>}
-     <p>* Pflichtfeld</p>
+     {sourceOffer&&<p><LocalizedText>{"Ursprungsangebot: "}</LocalizedText>{sourceOffer}</p>}
+     <p><LocalizedText>{"* Pflichtfeld"}</LocalizedText></p>
     </FormWizard>
    </form>}
   </FormSheet>

@@ -1,4 +1,5 @@
 "use client";
+import {LocalizedText} from "@/lib/client/locale";
 import Link from 'next/link';
 import {AppShell} from '../app-shell';
 import {QuickCreateAction} from '../binso-ux';
@@ -19,10 +20,10 @@ export function DashboardPage({forceDemo=false}:{forceDemo?:boolean}={}){
  const attention=(data?.attention??[]).filter(item=>financialStatus(item)==='overdue');
  const recent=data?.recent??data?.invoices??[];
  return <AppShell title="Übersicht" active="dashboard" actions={<QuickCreateAction/>}>
-  {query.loading?<LoadingState>Übersicht wird geladen …</LoadingState>:query.error?<ErrorState onRetry={query.refresh}>{query.error}</ErrorState>:<>
+  {query.loading?<LoadingState><LocalizedText>{"Übersicht wird geladen …"}</LocalizedText></LoadingState>:query.error?<ErrorState onRetry={query.refresh}><LocalizedText>{query.error}</LocalizedText></ErrorState>:<>
    {data?.canFinance&&data.cash&&<CashStatistics data={data.cash} storageKey="dashboard"/>}
-   <div className="dashboard-grid"><section className="surface"><SectionTitle title="Handlungsbedarf"/>{attention.length?<div className="recent-invoices">{attention.map(item=><DocumentSummaryRow key={item.id} item={item} customerHeading compact/>)}</div>:<p role="status">Keine dringenden Vorgänge in den verfügbaren Rechnungen.</p>}</section>
-   <section className="surface"><SectionTitle title="Zuletzt bearbeitet" action={<Link href="/rechnungen">Rechnungen anzeigen</Link>}/>{recent.length?<div className="recent-invoices">{recent.map(item=><DocumentSummaryRow key={item.id} item={item} customerHeading compact/>)}</div>:<p role="status">Noch keine Geschäftsvorgänge vorhanden.</p>}</section></div>
+   <div className="dashboard-grid"><section className="surface"><SectionTitle title="Handlungsbedarf"/>{attention.length?<div className="recent-invoices">{attention.map(item=><DocumentSummaryRow key={item.id} item={item} customerHeading compact/>)}</div>:<p role="status"><LocalizedText>{"Keine dringenden Vorgänge in den verfügbaren Rechnungen."}</LocalizedText></p>}</section>
+   <section className="surface"><SectionTitle title="Zuletzt bearbeitet" action={<Link href="/rechnungen"><LocalizedText>{"Rechnungen anzeigen"}</LocalizedText></Link>}/>{recent.length?<div className="recent-invoices">{recent.map(item=><DocumentSummaryRow key={item.id} item={item} customerHeading compact/>)}</div>:<p role="status"><LocalizedText>{"Noch keine Geschäftsvorgänge vorhanden."}</LocalizedText></p>}</section></div>
   </>}
  </AppShell>;
 }

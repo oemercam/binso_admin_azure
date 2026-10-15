@@ -1,3 +1,4 @@
+import './localization-test-adapter.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import {PGlite} from '@electric-sql/pglite';

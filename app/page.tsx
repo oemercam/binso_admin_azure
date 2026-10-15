@@ -1,3 +1,4 @@
+import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
 import Link from "next/link";
 import { MarketingFooter, MarketingHeader, MarketingFaq, ProductPreview, ProductScreen } from "@/components/marketing";
 import { Button, Icon } from "@/components/ui";
@@ -53,7 +54,7 @@ export default function Home() {
       url:"https://www.binso.ch",
       name:"Binso One",
       publisher:{"@id":"https://www.binso.ch/#organization"},
-      inLanguage:"de-CH"
+      inLanguage:["de-CH","fr-CH","it-CH","en-CH"]
     }]
   };
   return <>
@@ -62,34 +63,34 @@ export default function Home() {
     <main>
       <section className="hero">
         <div className="hero-copy">
-          <span className="eyebrow">BINSO ONE</span>
-          <h1>Mehr Zeit für das Wesentliche.</h1>
-          <p className="hero-lead">Kunden, Angebote, Rechnungen, Zahlungen, Mitarbeiter, Spesen und Arbeitszeiten – klar organisiert in einer modernen Business-App.</p>
+          <span className="eyebrow landing-kicker"><span/><LocalizedText>{" DEIN BUSINESS. KLAR ORGANISIERT."}</LocalizedText></span>
+          <h1><LocalizedText>{"Dein Büro."}</LocalizedText><br/><LocalizedText>{"Einfach dabei."}</LocalizedText></h1>
+          <p className="hero-lead"><LocalizedText>{"Vom ersten Kundenkontakt bis zur bezahlten Rechnung. Eine übersichtliche App für dein Unternehmen – am Schreibtisch und unterwegs."}</LocalizedText></p>
           <div className="hero-actions">
-            <Button href="/registrieren">{domainConfig.trialDays} Tage kostenlos testen</Button>
-            <Button href="/demo" variant="secondary">Demo starten</Button>
+            <Button href="/registrieren">{domainConfig.trialDays}<LocalizedText>{" Tage kostenlos testen"}</LocalizedText></Button>
+            <Button href="/demo" variant="secondary"><LocalizedText>{"Demo starten"}</LocalizedText></Button>
           </div>
           <div className="trust-row">
-            <span><Icon name="lock"/> Keine Kreditkarte für die Testphase</span>
-            <span><Icon name="clock"/> Nach 14 Tagen nur mit aktivem Abo weiterbearbeiten</span>
+            <span><Icon name="lock"/><LocalizedText>{" Keine Kreditkarte für die Testphase"}</LocalizedText></span>
+            <span><Icon name="clock"/><LocalizedText>{" 14 Tage testen · danach selbst entscheiden"}</LocalizedText></span>
           </div>
         </div>
         <ProductPreview/>
       </section>
 
-      <section className="marketing-benefits" aria-label="Vorteile">
+      <LocalizedElement as="section" className="marketing-benefits" aria-label="Vorteile">
         {benefits.map(([icon,title,text])=><article key={title}>
           <span><Icon name={icon} size={18}/></span>
-          <div><b>{title}</b><p>{text}</p></div>
+          <div><b><LocalizedText>{title}</LocalizedText></b><p><LocalizedText>{text}</LocalizedText></p></div>
         </article>)}
-      </section>
+      </LocalizedElement>
 
       <section id="funktionen" className="marketing-section feature-showcase">
         <div className="feature-showcase-copy">
           <div className="section-intro">
-            <span className="eyebrow">ALLES AN EINEM ORT</span>
-            <h2>Einfach arbeiten. Ohne Umwege.</h2>
-            <p>Die wichtigsten Abläufe eines Schweizer KMU sind in einer Oberfläche verbunden.</p>
+            <span className="eyebrow"><LocalizedText>{"ALLES AN EINEM ORT"}</LocalizedText></span>
+            <h2><LocalizedText>{"Einfach arbeiten. Ohne Umwege."}</LocalizedText></h2>
+            <p><LocalizedText>{"Die wichtigsten Abläufe eines Schweizer KMU sind in einer Oberfläche verbunden."}</LocalizedText></p>
           </div>
           <div className="feature-list">
             {[
@@ -99,9 +100,9 @@ export default function Home() {
               ["Zahlungen","Eingänge und offene Beträge im Blick.","/zahlungen"],
               ["Zeiterfassung","Timer oder manuelle Erfassung.","/zeit"],
               ["Mitarbeiter","Teamdaten und Zuständigkeiten.","/mitarbeiter"],
-            ].map(([title,text,href])=><Link className="feature-list-link" href={href} key={title}><span><b>{title}</b><small>{text}</small></span><Icon name="arrow" size={15}/></Link>)}
+            ].map(([title,text,href])=><Link className="feature-list-link" href={href} key={title}><span><b><LocalizedText>{title}</LocalizedText></b><small><LocalizedText>{text}</LocalizedText></small></span><Icon name="arrow" size={15}/></Link>)}
           </div>
-          <Link className="marketing-text-link" href="/produkt">Alle Funktionen ansehen <Icon name="arrow" size={15}/></Link>
+          <Link className="marketing-text-link" href="/produkt"><LocalizedText>{"Alle Funktionen ansehen "}</LocalizedText><Icon name="arrow" size={15}/></Link>
         </div>
         <ProductScreen route="/preview/dashboard" title="Aktuelle Binso One Produktoberfläche" variant="desktop"/>
       </section>
@@ -109,14 +110,14 @@ export default function Home() {
       <section className="workflow-section">
         <div className="workflow-copy">
           <div className="section-intro">
-            <span className="eyebrow">VOM KUNDEN BIS ZUR RECHNUNG</span>
-            <h2>Ein Ablauf. Kein Systemwechsel.</h2>
-            <p>Die wichtigsten Schritte bauen direkt aufeinander auf.</p>
+            <span className="eyebrow"><LocalizedText>{"VOM KUNDEN BIS ZUR RECHNUNG"}</LocalizedText></span>
+            <h2><LocalizedText>{"Ein Ablauf. Kein Systemwechsel."}</LocalizedText></h2>
+            <p><LocalizedText>{"Die wichtigsten Schritte bauen direkt aufeinander auf."}</LocalizedText></p>
           </div>
           <div className="workflow-list">
             {workflow.map(([nr,title,text])=><article key={nr}>
               <span>{nr}</span>
-              <div><h3>{title}</h3><p>{text}</p></div>
+              <div><h3><LocalizedText>{title}</LocalizedText></h3><p><LocalizedText>{text}</LocalizedText></p></div>
             </article>)}
           </div>
         </div>
@@ -125,67 +126,61 @@ export default function Home() {
 
       <section className="product-callout">
         <div>
-          <span className="eyebrow">APP-FIRST</span>
-          <h2>Auf Mobile wie eine echte App.</h2>
-          <p>Klare Bottom Navigation, Touch-first Bedienung, sichere iOS Safe Areas und reduzierte Ansichten statt verkleinerter Desktop-Seiten.</p>
-          <Button href="/demo">Demo starten</Button>
+          <span className="eyebrow"><LocalizedText>{"DEIN BÜRO FÜR UNTERWEGS"}</LocalizedText></span>
+          <h2><LocalizedText>{"Gleicher Überblick. Überall."}</LocalizedText></h2>
+          <p><LocalizedText>{"Kunden nachschlagen, Zeit erfassen und Rechnungen prüfen. Direkt auf deinem Smartphone oder als installierbare Web-App."}</LocalizedText></p>
+          <Button href="/demo"><LocalizedText>{"Demo starten"}</LocalizedText></Button>
         </div>
-        <div className="mobile-callout-copy">
-          <div><b>Start</b><span>Übersicht und Schnellzugriffe</span></div>
-          <div><b>Kunden</b><span>Kontakte und Aktivitäten</span></div>
-          <div><b>Finanzen</b><span>Angebote, Rechnungen, Zahlungen</span></div>
-          <div><b>Zeit</b><span>Timer und Einträge</span></div>
-          <div><b>Mehr</b><span>Produkte, Spesen, Team, Einstellungen</span></div>
-        </div>
+        <figure className="landing-phone-preview"><LocalizedElement as="img" src="/product/binso-one-dashboard-mobile.jpg" alt="Binso One Dashboard auf dem Smartphone" width={390} height={844} loading="lazy"/><figcaption><LocalizedText>{"Die wichtigsten Aufgaben immer griffbereit."}</LocalizedText></figcaption></figure>
       </section>
 
       <section className="marketing-section pricing-section" id="preise">
         <div className="section-intro">
-          <span className="eyebrow">PREISE</span>
-          <h2>Einfach starten. Später erweitern.</h2>
-          <p>Alle Pläne bleiben bewusst übersichtlich. Keine versteckten Pflichtmodule.</p>
+          <span className="eyebrow"><LocalizedText>{"PREISE"}</LocalizedText></span>
+          <h2><LocalizedText>{"Einfach starten. Später erweitern."}</LocalizedText></h2>
+          <p><LocalizedText>{"Alle Pläne bleiben bewusst übersichtlich. Keine versteckten Pflichtmodule."}</LocalizedText></p>
         </div>
         <div className="pricing-grid marketing-pricing-grid">
           {subscriptionPlans.map(plan=><article className={plan.popular?"price-card featured":"price-card"} key={plan.id}>
-            {plan.popular&&<span className="popular">BELIEBT</span>}
+            {plan.popular&&<span className="popular"><LocalizedText>{"BELIEBT"}</LocalizedText></span>}
             <h3>{plan.name}</h3>
-            <p>{plan.description}</p>
-            <div className="price"><strong>CHF {plan.monthly}</strong><span>/ Monat</span></div><p><small>oder CHF {plan.yearly} / Jahr · exkl. MWST, sofern geschuldet</small></p>
-            <Button href={`/registrieren?plan=${plan.id}&billing=monthly`} variant={plan.popular?"primary":"secondary"}>{domainConfig.trialDays} Tage kostenlos testen</Button><Link className="marketing-text-link" href={`/registrieren?plan=${plan.id}&billing=yearly`}>Jährlich starten</Link>
-            <ul>{plan.features.map(feature=><li key={feature}><Icon name="check" size={14}/><span>{feature}</span></li>)}</ul>
+            <p><LocalizedText>{plan.description}</LocalizedText></p>
+            <div className="price"><strong><LocalizedText>{"CHF "}</LocalizedText>{plan.monthly}</strong><span><LocalizedText>{"/ Monat"}</LocalizedText></span></div><p><small><LocalizedText>{"oder CHF "}</LocalizedText>{plan.yearly}<LocalizedText>{" / Jahr · exkl. MWST, sofern geschuldet"}</LocalizedText></small></p>
+            <Button href={`/registrieren?plan=${plan.id}&billing=monthly`} variant={plan.popular?"primary":"secondary"}>{domainConfig.trialDays}<LocalizedText>{" Tage kostenlos testen"}</LocalizedText></Button><Link className="marketing-text-link" href={`/registrieren?plan=${plan.id}&billing=yearly`}><LocalizedText>{"Jährlich starten"}</LocalizedText></Link>
+            <ul>{plan.features.map(feature=><li key={feature}><Icon name="check" size={14}/><span><LocalizedText>{feature}</LocalizedText></span></li>)}</ul>
           </article>)}
         </div>
       </section>
 
       <section id="sicherheit" className="marketing-section security-split">
         <div>
-          <span className="eyebrow">SCHWEIZ</span>
-          <h2>Entwickelt für Schweizer KMU.</h2>
-          <p>Binso One wird von der Binso GmbH in Appenzell entwickelt. Klare Prozesse, reduzierte Oberfläche und Schweizer Schreibweise stehen im Mittelpunkt.</p>
+          <span className="eyebrow"><LocalizedText>{"SCHWEIZ"}</LocalizedText></span>
+          <h2><LocalizedText>{"Entwickelt für Schweizer KMU."}</LocalizedText></h2>
+          <p><LocalizedText>{"Binso One wird von der Binso GmbH in Appenzell entwickelt. Klare Prozesse, reduzierte Oberfläche und Schweizer Schreibweise stehen im Mittelpunkt."}</LocalizedText></p>
         </div>
         <div className="security-points">
-          <div><Icon name="lock"/><span><b>Sicher aufgebaut</b><small>Klare Rollen, getrennte Bereiche und nachvollziehbare Aktionen.</small></span></div>
-          <div><Icon name="receipt"/><span><b>Für Schweizer Abläufe</b><small>CHF, Schweizer Datumsformat und KMU-orientierte Prozesse.</small></span></div>
-          <div><Icon name="support"/><span><b>Direkter Support</b><small>Support direkt aus der Anwendung.</small></span></div>
+          <div><Icon name="lock"/><span><b><LocalizedText>{"Sicher aufgebaut"}</LocalizedText></b><small><LocalizedText>{"Klare Rollen, getrennte Bereiche und nachvollziehbare Aktionen."}</LocalizedText></small></span></div>
+          <div><Icon name="receipt"/><span><b><LocalizedText>{"Für Schweizer Abläufe"}</LocalizedText></b><small><LocalizedText>{"CHF, Schweizer Datumsformat und KMU-orientierte Prozesse."}</LocalizedText></small></span></div>
+          <div><Icon name="support"/><span><b><LocalizedText>{"Direkter Support"}</LocalizedText></b><small><LocalizedText>{"Support direkt aus der Anwendung."}</LocalizedText></small></span></div>
         </div>
       </section>
 
       <section className="marketing-section faq-section">
         <div className="section-intro">
-          <span className="eyebrow">FAQ</span>
-          <h2>Die wichtigsten Fragen.</h2>
+          <span className="eyebrow"><LocalizedText>{"FAQ"}</LocalizedText></span>
+          <h2><LocalizedText>{"Die wichtigsten Fragen."}</LocalizedText></h2>
         </div>
         <MarketingFaq>
-          <details><summary>Kann ich Binso One zuerst ausprobieren?</summary><p>Ja. Du kannst die Demo starten und die Oberfläche ohne produktive Firmendaten kennenlernen.</p></details>
-          <details><summary>Brauche ich eine Kreditkarte für den Test?</summary><p>Nein. Die 14-tägige Testphase startet ohne Kreditkarte. Erst wenn du einen Plan aktivierst, wirst du zu Stripe Checkout weitergeleitet.</p></details><details><summary>Was passiert nach den 14 Tagen?</summary><p>Ohne aktiviertes Abo bleibt dein Konto erhalten, wechselt aber in den Nur-Lesen-Modus. Du kannst danach jederzeit einen Plan aktivieren und weiterarbeiten.</p></details>
-          <details><summary>Funktioniert Binso One auf dem Smartphone?</summary><p>Ja. Mobile und PWA sind als eigene App-Oberfläche gestaltet und nicht als verkleinerte Desktop-Version.</p></details>
-          <details><summary>Kann ich mein Abo kündigen?</summary><p>Ja. Ein aktives Abonnement kann über das bereitgestellte Stripe Customer Portal auf das Ende der laufenden Abrechnungsperiode gekündigt werden. Der bezahlte Zugriff bleibt bis dahin bestehen.</p></details>
+          <details><summary><LocalizedText>{"Kann ich Binso One zuerst ausprobieren?"}</LocalizedText></summary><p><LocalizedText>{"Ja. Du kannst die Demo starten und die Oberfläche ohne produktive Firmendaten kennenlernen."}</LocalizedText></p></details>
+          <details><summary><LocalizedText>{"Brauche ich eine Kreditkarte für den Test?"}</LocalizedText></summary><p><LocalizedText>{"Nein. Die 14-tägige Testphase startet ohne Kreditkarte. Erst wenn du einen Plan aktivierst, wirst du zu Stripe Checkout weitergeleitet."}</LocalizedText></p></details><details><summary><LocalizedText>{"Was passiert nach den 14 Tagen?"}</LocalizedText></summary><p><LocalizedText>{"Ohne aktiviertes Abo bleibt dein Konto erhalten, wechselt aber in den Nur-Lesen-Modus. Du kannst danach jederzeit einen Plan aktivieren und weiterarbeiten."}</LocalizedText></p></details>
+          <details><summary><LocalizedText>{"Funktioniert Binso One auf dem Smartphone?"}</LocalizedText></summary><p><LocalizedText>{"Ja. Mobile und PWA sind als eigene App-Oberfläche gestaltet und nicht als verkleinerte Desktop-Version."}</LocalizedText></p></details>
+          <details><summary><LocalizedText>{"Kann ich mein Abo kündigen?"}</LocalizedText></summary><p><LocalizedText>{"Ja. Ein aktives Abonnement kann über das bereitgestellte Stripe Customer Portal auf das Ende der laufenden Abrechnungsperiode gekündigt werden. Der bezahlte Zugriff bleibt bis dahin bestehen."}</LocalizedText></p></details>
         </MarketingFaq>
       </section>
 
       <section className="marketing-cta">
-        <div><span className="eyebrow">BINSO ONE</span><h2>Einfach selbst ansehen.</h2><p>Starte direkt mit der Demo oder richte dein eigenes Konto ein.</p></div>
-        <div><Button href="/registrieren">{domainConfig.trialDays} Tage kostenlos testen</Button><Button href="/demo" variant="secondary">Demo starten</Button></div>
+        <div><span className="eyebrow"><LocalizedText>{"BINSO ONE"}</LocalizedText></span><h2><LocalizedText>{"Einfach selbst ansehen."}</LocalizedText></h2><p><LocalizedText>{"Starte direkt mit der Demo oder richte dein eigenes Konto ein."}</LocalizedText></p></div>
+        <div><Button href="/registrieren">{domainConfig.trialDays}<LocalizedText>{" Tage kostenlos testen"}</LocalizedText></Button><Button href="/demo" variant="secondary"><LocalizedText>{"Demo starten"}</LocalizedText></Button></div>
       </section>
     </main>
     <MarketingFooter/>

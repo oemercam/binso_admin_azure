@@ -1,5 +1,6 @@
 "use client";
 
+import {LocalizedText} from "@/lib/client/locale";
 import { FormEvent, useEffect, useState } from "react";
 import {Button, Logo, Input, Field, ErrorState} from "@/components/ui";
 
@@ -42,13 +43,13 @@ export default function Page(){
 
   return <><main className="auth-page"><section className="auth-card">
     <Logo/>
-    {!ready?<><h1>Link wird geprüft</h1><p>Einen Moment bitte.</p></>:invalid?<><h1>Link nicht gültig</h1><p>Der Link ist abgelaufen oder ungültig. Fordere einen neuen Link an.</p><Button href="/passwort-vergessen">Neuen Link anfordern</Button></>:done?<><h1>Passwort geändert</h1><p>Du kannst dich jetzt mit deinem neuen Passwort anmelden.</p><Button href="/login">Zur Anmeldung</Button></>:<>
-      <h1>Neues Passwort</h1><p>Lege ein neues Passwort für dein Binso One Konto fest.</p>
+    {!ready?<><h1><LocalizedText>{"Link wird geprüft"}</LocalizedText></h1><p><LocalizedText>{"Einen Moment bitte."}</LocalizedText></p></>:invalid?<><h1><LocalizedText>{"Link nicht gültig"}</LocalizedText></h1><p><LocalizedText>{"Der Link ist abgelaufen oder ungültig. Fordere einen neuen Link an."}</LocalizedText></p><Button href="/passwort-vergessen"><LocalizedText>{"Neuen Link anfordern"}</LocalizedText></Button></>:done?<><h1><LocalizedText>{"Passwort geändert"}</LocalizedText></h1><p><LocalizedText>{"Du kannst dich jetzt mit deinem neuen Passwort anmelden."}</LocalizedText></p><Button href="/login"><LocalizedText>{"Zur Anmeldung"}</LocalizedText></Button></>:<>
+      <h1><LocalizedText>{"Neues Passwort"}</LocalizedText></h1><p><LocalizedText>{"Lege ein neues Passwort für dein Binso One Konto fest."}</LocalizedText></p>
       <form onSubmit={submit}>
-        <Field label="Neues Passwort"><div className="password-field"><Input required minLength={12} value={password} onChange={e=>setPassword(e.target.value)} type={showPassword?"text":"password"} autoComplete="new-password"/><button type="button" onClick={()=>setShowPassword(!showPassword)}>{showPassword?"Ausblenden":"Anzeigen"}</button></div><small className="password-hint">Mindestens 12 Zeichen.</small></Field>
+        <Field label="Neues Passwort"><div className="password-field"><Input required minLength={12} value={password} onChange={e=>setPassword(e.target.value)} type={showPassword?"text":"password"} autoComplete="new-password"/><button type="button" onClick={()=>setShowPassword(!showPassword)}><LocalizedText>{showPassword?"Ausblenden":"Anzeigen"}</LocalizedText></button></div><small className="password-hint"><LocalizedText>{"Mindestens 12 Zeichen."}</LocalizedText></small></Field>
         <Field label="Passwort bestätigen"><Input required minLength={12} value={confirm} onChange={e=>setConfirm(e.target.value)} type={showPassword?"text":"password"} autoComplete="new-password"/></Field>
-        {error&&<ErrorState className="auth-error">{error}</ErrorState>}
-        <Button type="submit">{loading?"Wird gespeichert…":"Passwort speichern"}</Button>
+        {error&&<ErrorState className="auth-error"><LocalizedText>{error}</LocalizedText></ErrorState>}
+        <Button type="submit"><LocalizedText>{loading?"Wird gespeichert…":"Passwort speichern"}</LocalizedText></Button>
       </form>
     </>}
   </section></main><ConfirmDialog open={discard} busy={loading} title="Änderungen verwerfen?" message="Deine Änderungen sind noch nicht gespeichert und gehen verloren." cancelLabel="Weiter bearbeiten" confirmLabel="Änderungen verwerfen" onCancel={()=>setDiscard(false)} onConfirm={()=>{setDiscard(false);leaveBack()}}/></>;

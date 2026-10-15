@@ -226,6 +226,9 @@
 
 /* Medium desktop / split view */
 @media (min-width:761px) and (max-width:1100px){
+  .marketing-nav{gap:20px}
+  .marketing-nav nav{gap:16px}
+  .marketing-actions>.button{display:none}
 /* Medium desktop keeps the full account/notification header available. */
   .desktop-appbar{
     position:sticky;
@@ -991,6 +994,12 @@
 
 /* Mobile / PWA */
 @media (max-width:760px){
+  .hero-workspace{padding:12px;border-radius:25px;width:100%;max-width:540px;margin:auto}
+  .workspace-preview-metrics strong{font-size:22px}
+  .marketing-actions>.locale-switcher{display:none}
+  .marketing-mobile-actions>.locale-switcher{justify-content:space-between;padding:6px 2px}
+  .landing-phone-preview>img{width:210px}
+
 .app-start-icon,.app-launch-brand .logo{width:72px;height:72px}
 .settings-navigation-search{display:flex;width:100%;max-width:none;height:44px;border-radius:999px;background:var(--app-chrome);margin-bottom:24px}
 .settings-navigation-search>input{min-width:0;max-width:100%;height:40px}
@@ -1026,7 +1035,6 @@
   }
   .marketing-nav>a .logo{width:88px;height:28px}
   .marketing-nav nav{display:none}
-  .marketing-actions>a:first-child,
   .marketing-actions>.button{display:none}
   .marketing-actions{gap:4px}
   .marketing-menu-button{display:grid;place-items:center}

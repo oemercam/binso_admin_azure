@@ -1,5 +1,6 @@
 "use client";
 
+import {LocalizedText} from "@/lib/client/locale";
 import {useCallback,useEffect,useRef,useState} from "react";
 import {useRouter,useSearchParams} from "next/navigation";
 import ConfirmDialog from "./confirm-dialog";
@@ -106,42 +107,42 @@ export function SecuritySettingsPage(){
         <Field label="Neues Passwort"><Input value={newPassword} onChange={e=>setNewPassword(e.target.value)} type="password" autoComplete="new-password"/></Field>
         <Field label="Neues Passwort bestätigen"><Input value={confirmPassword} onChange={e=>setConfirmPassword(e.target.value)} type="password" autoComplete="new-password"/></Field>
       </div>
-      <Button variant="secondary" disabled={busy} onClick={()=>void changePassword()}>Passwort speichern</Button>
+      <Button variant="secondary" disabled={busy} onClick={()=>void changePassword()}><LocalizedText>{"Passwort speichern"}</LocalizedText></Button>
     </section>
     <section className="surface security-card">
       <SectionTitle title="Zwei-Faktor-Authentifizierung"/>
-      {!mfa?mfaError?<ErrorState onRetry={()=>{setMfaError("");void loadMfa()}} retryLabel="Erneut versuchen">{mfaError}</ErrorState>:<LoadingState>Sicherheitsstatus wird geladen…</LoadingState>:mfa.demo?<div className="context-block"><Status tone="info">Demo</Status><b>Keine Authenticator-Einrichtung für die Demo nötig</b><span>Produktive Konten verwenden E-Mail-Codes oder einen Authenticator. Die Demo benötigt keinen Login.</span></div>:mfa.enabled?<div className="context-block"><Status tone="success">Aktiv</Status><b>Authenticator-App ist eingerichtet</b><span>Bei der Anmeldung wird nach E-Mail und Passwort zusätzlich ein zeitbasierter Authenticator-Code verlangt.</span></div>:<>
-        <div className="context-block"><Status tone={mfa.required?"warning":"info"}>{mfa.required?"Erforderlich":"Empfohlen"}</Status><b>{mfa.required?"Authenticator für diese Rolle erforderlich":"Authenticator-App aktivieren"}</b><span>{mfa.required?"Owner, Admin und Finance müssen den stärkeren zweiten Faktor einrichten. Bis dahin bleiben geschützte Produktfunktionen gesperrt.":"Ohne Authenticator wird bei jeder Anmeldung ein zusätzlicher Code per E-Mail verlangt."}</span></div>
-        {!setup&&<Button onClick={()=>void startSetup()}>Authenticator einrichten</Button>}
+      {!mfa?mfaError?<ErrorState onRetry={()=>{setMfaError("");void loadMfa()}} retryLabel="Erneut versuchen"><LocalizedText>{mfaError}</LocalizedText></ErrorState>:<LoadingState><LocalizedText>{"Sicherheitsstatus wird geladen…"}</LocalizedText></LoadingState>:mfa.demo?<div className="context-block"><Status tone="info"><LocalizedText>{"Demo"}</LocalizedText></Status><b><LocalizedText>{"Keine Authenticator-Einrichtung für die Demo nötig"}</LocalizedText></b><span><LocalizedText>{"Produktive Konten verwenden E-Mail-Codes oder einen Authenticator. Die Demo benötigt keinen Login."}</LocalizedText></span></div>:mfa.enabled?<div className="context-block"><Status tone="success"><LocalizedText>{"Aktiv"}</LocalizedText></Status><b><LocalizedText>{"Authenticator-App ist eingerichtet"}</LocalizedText></b><span><LocalizedText>{"Bei der Anmeldung wird nach E-Mail und Passwort zusätzlich ein zeitbasierter Authenticator-Code verlangt."}</LocalizedText></span></div>:<>
+        <div className="context-block"><Status tone={mfa.required?"warning":"info"}><LocalizedText>{mfa.required?"Erforderlich":"Empfohlen"}</LocalizedText></Status><b><LocalizedText>{mfa.required?"Authenticator für diese Rolle erforderlich":"Authenticator-App aktivieren"}</LocalizedText></b><span><LocalizedText>{mfa.required?"Owner, Admin und Finance müssen den stärkeren zweiten Faktor einrichten. Bis dahin bleiben geschützte Produktfunktionen gesperrt.":"Ohne Authenticator wird bei jeder Anmeldung ein zusätzlicher Code per E-Mail verlangt."}</LocalizedText></span></div>
+        {!setup&&<Button onClick={()=>void startSetup()}><LocalizedText>{"Authenticator einrichten"}</LocalizedText></Button>}
       </>}
       {setup&&<div className="form-grid">
         <Field label="Einrichtungsschlüssel"><Input readOnly value={setup.secret}/></Field>
-        <p className="settings-note">Öffne deine Authenticator-App, füge ein neues Konto hinzu und gib den Schlüssel manuell ein. Alternativ kannst du auf einem unterstützten Gerät den folgenden Link öffnen.</p>
-        <a className="text-action" href={setup.otpAuthUri}>In Authenticator-App öffnen</a>
+        <p className="settings-note"><LocalizedText>{"Öffne deine Authenticator-App, füge ein neues Konto hinzu und gib den Schlüssel manuell ein. Alternativ kannst du auf einem unterstützten Gerät den folgenden Link öffnen."}</LocalizedText></p>
+        <a className="text-action" href={setup.otpAuthUri}><LocalizedText>{"In Authenticator-App öffnen"}</LocalizedText></a>
         <Field label="6-stelliger Authenticator-Code"><Input value={code} onChange={e=>setCode(e.target.value.replace(/\D/g,"").slice(0,6))} inputMode="numeric" autoComplete="one-time-code" placeholder="000000"/></Field>
-        <Button onClick={()=>void confirmSetup()} disabled={code.length!==6}>Authenticator bestätigen</Button>
+        <Button onClick={()=>void confirmSetup()} disabled={code.length!==6}><LocalizedText>{"Authenticator bestätigen"}</LocalizedText></Button>
       </div>}
-      {recovery.length>0&&<div className="context-block"><Status tone="warning">Einmal anzeigen</Status><b>Recovery Codes sicher speichern</b><span>Jeder Code kann nur einmal verwendet werden. Bewahre sie getrennt von deinem Passwort auf.</span><pre>{recovery.join("\n")}</pre></div>}
-      {mfa?.enabled&&next&&<Button onClick={()=>router.push(safeAppPath(next))}>Weiter zu Binso One</Button>}
+      {recovery.length>0&&<div className="context-block"><Status tone="warning"><LocalizedText>{"Einmal anzeigen"}</LocalizedText></Status><b><LocalizedText>{"Recovery Codes sicher speichern"}</LocalizedText></b><span><LocalizedText>{"Jeder Code kann nur einmal verwendet werden. Bewahre sie getrennt von deinem Passwort auf."}</LocalizedText></span><pre>{recovery.join("\n")}</pre></div>}
+      {mfa?.enabled&&next&&<Button onClick={()=>router.push(safeAppPath(next))}><LocalizedText>{"Weiter zu Binso One"}</LocalizedText></Button>}
     </section>
 
     <section className="surface security-card">
       <SectionTitle title="Anmeldeschutz"/>
-      <p>{mfa?mfa.enabled?"E-Mail + Passwort + Authenticator-Code.":"E-Mail + Passwort + einmaliger E-Mail-Code bei jeder Anmeldung.":mfaError?"Anmeldeschutzstatus nicht verfügbar.":"Anmeldeschutz wird geladen…"}</p>
+      <p><LocalizedText>{mfa?mfa.enabled?"E-Mail + Passwort + Authenticator-Code.":"E-Mail + Passwort + einmaliger E-Mail-Code bei jeder Anmeldung.":mfaError?"Anmeldeschutzstatus nicht verfügbar.":"Anmeldeschutz wird geladen…"}</LocalizedText></p>
     </section>
 
     <section className="surface security-card">
-      <SectionTitle title="Aktive Sitzungen" action={sessions.some(item=>!item.current)?<Button variant="secondary" disabled={busy} onClick={()=>setRevokeTarget("all")}>Alle anderen abmelden</Button>:undefined}/>
-      {sessionsLoading?<p>Sitzungen werden geladen…</p>:sessionsError?<ErrorState onRetry={()=>{setSessionsLoading(true);setSessionsError("");void loadSessions()}} retryLabel="Erneut versuchen">{sessionsError}</ErrorState>:sessions.length===0?<p>Keine aktive Sitzung gefunden.</p>:<div className="session-list">
+      <SectionTitle title="Aktive Sitzungen" action={sessions.some(item=>!item.current)?<Button variant="secondary" disabled={busy} onClick={()=>setRevokeTarget("all")}><LocalizedText>{"Alle anderen abmelden"}</LocalizedText></Button>:undefined}/>
+      {sessionsLoading?<p><LocalizedText>{"Sitzungen werden geladen…"}</LocalizedText></p>:sessionsError?<ErrorState onRetry={()=>{setSessionsLoading(true);setSessionsError("");void loadSessions()}} retryLabel="Erneut versuchen"><LocalizedText>{sessionsError}</LocalizedText></ErrorState>:sessions.length===0?<p><LocalizedText>{"Keine aktive Sitzung gefunden."}</LocalizedText></p>:<div className="session-list">
         {sessions.map(item=><div key={item.id}>
           <div>
             <b>{sessionLabel(item.userAgent)}</b>
-            <small>{item.current?"Dieses Gerät":"Zuletzt aktiv: "+sessionDate(item.lastSeenAt)} · Ablauf: {sessionDate(item.expiresAt)}</small>
+            <small><LocalizedText>{item.current?"Dieses Gerät":"Zuletzt aktiv: "+sessionDate(item.lastSeenAt)}</LocalizedText><LocalizedText>{" · Ablauf: "}</LocalizedText>{sessionDate(item.expiresAt)}</small>
           </div>
-          {item.current?<Status tone="success">Aktuell</Status>:<Button variant="secondary" disabled={busy} onClick={()=>setRevokeTarget(item.id)}>Abmelden</Button>}
+          {item.current?<Status tone="success"><LocalizedText>{"Aktuell"}</LocalizedText></Status>:<Button variant="secondary" disabled={busy} onClick={()=>setRevokeTarget(item.id)}><LocalizedText>{"Abmelden"}</LocalizedText></Button>}
         </div>)}
       </div>}
-      <p className="settings-note">Es werden nur serverseitig tatsächlich aktive Sitzungen angezeigt. Geräteorte werden nicht geschätzt oder erfunden.</p>
+      <p className="settings-note"><LocalizedText>{"Es werden nur serverseitig tatsächlich aktive Sitzungen angezeigt. Geräteorte werden nicht geschätzt oder erfunden."}</LocalizedText></p>
     </section>
 
     <ConfirmDialog open={revokeTarget!==null} busy={busy} title={revokeTarget==="all"?"Andere Sitzungen abmelden?":"Sitzung abmelden?"} message="Die ausgewählten Geräte müssen sich danach erneut anmelden. Dieses Gerät bleibt angemeldet." confirmLabel="Abmelden" onCancel={()=>setRevokeTarget(null)} onConfirm={()=>void (revokeTarget==="all"?revokeOtherSessions():revokeTarget?revokeSession(revokeTarget):Promise.resolve())}/>

@@ -34,7 +34,7 @@ const transaction=async fn=>{
  const client=native?await db.connect():db;
  await client.query('begin');try{const result=await fn({query:(sql,args)=>query(sql,args,client)});await client.query('commit');return result}catch(error){await client.query('rollback');throw error}finally{if(native)client.release()}
 };
-globalThis.__integrity={query,transaction,getSession:()=>({userId:'auth-integrity-fixture',sessionId:'00000000-0000-4000-8000-000000000081',email:'integrity@fixture.invalid',organizationId:'00000000-0000-4000-8000-000000000099',role:'owner',mfaEnabled:true}),createSession:async input=>{const id=await actualSession.createSession(input);created++;return id},jar:{set(){cookieSets++},get(){},delete(){}}};
+globalThis.__integrity={query,transaction,getSession:()=>({userId:'auth-integrity-fixture',sessionId:'00000000-0000-4000-8000-000000000081',email:'integrity@fixture.invalid',organizationId:'00000000-0000-4000-8000-000000000099',role:'owner',mfaEnabled:true}),createSession:async input=>{const id=await actualSession.createSession(input);created++;return id},jar:{set(...args){cookieSets++;globalThis.__integrity.cookieOptions=args[2]},get(){},delete(){}}};
 globalThis.__integrity.scanStatus='pending';globalThis.__integrity.scanCalls=0;
 const adapters={
  'server-only':uri(''),
@@ -110,6 +110,12 @@ try{
  console.log(JSON.stringify({probe:'stale-password-change-after-committed-reset',status:staleChange.status,resetPasswordPreserved:true,synthetic:true}));
  const sessionInput={userId:user,organizationId:org,email:'integrity@fixture.invalid',name:'Synthetic Auth',role:'owner'};
  const finalHash=(await query('select password_hash from app_users where id=$1',[user])).rows[0].password_hash;
+ await actualSession.createSession({...sessionInput,persistent:false,ttlHours:12});
+ assert.equal(globalThis.__integrity.cookieOptions.expires,undefined,'Default login must not create a persistent browser cookie');
+ assert.equal(globalThis.__integrity.cookieOptions.httpOnly,true);
+ await actualSession.createSession({...sessionInput,persistent:true});
+ assert.ok(globalThis.__integrity.cookieOptions.expires instanceof Date,'Remembered login has bounded cookie expiry');
+ await query('delete from auth_sessions where user_id=$1',[user]);
  await assert.rejects(actualSession.createSession({...sessionInput,expectedAuth:{passwordHash:finalHash,mfaEnabled:false,mfaSecretEnc:null}}),e=>e.status===401,'Changed MFA state rejects stale pre-enrollment credentials');
  await query("update app_users set status='suspended' where id=$1",[user]);await assert.rejects(actualSession.createSession(sessionInput),e=>e.status===401,'Even token-based callers cannot issue a session for an inactive user');await query("update app_users set status='active' where id=$1",[user]);
  const finance=await import(await load('app/api/finance/route.ts'));

@@ -410,9 +410,15 @@ try{
  globalThis.__processSession={...session,isDemo:false,organizationStatus:'active',email:'process@example.invalid'};
  globalThis.__processTransaction=async(org,fn)=>{await db.exec('begin');try{await db.query("select set_config('app.organization_id',$1,true)",[org]);const r=await fn(client);await db.exec('commit');return r}catch(e){await db.exec('rollback');throw e}};
  globalThis.__processPlatform=async(fn)=>{await db.exec('begin');try{await db.query("select set_config('app.platform_operator','true',true)");const r=await fn(client);await db.exec('commit');return r}catch(e){await db.exec('rollback');throw e}};
- const manualTimeSource=(await fs.readFile('app/api/time-entries/route.ts','utf8')).replace('"@/lib/money"',JSON.stringify(moneyModule)).replace('"@/lib/server/http"',JSON.stringify(processHttp)).replace('"@/lib/server/session"',JSON.stringify(processSession)).replace('"@/lib/server/rbac"',JSON.stringify(processRbac)).replace('"@/lib/server/db"',JSON.stringify(processDb)).replace('"@/lib/permissions"',JSON.stringify(permissions));
+ const manualTimeSource=(await fs.readFile('app/api/time-entries/route.ts','utf8')).replace('"@/lib/server/business-idempotency"',JSON.stringify(idempotencyModule)).replace('"@/lib/money"',JSON.stringify(moneyModule)).replace('"@/lib/server/http"',JSON.stringify(processHttp)).replace('"@/lib/server/session"',JSON.stringify(processSession)).replace('"@/lib/server/rbac"',JSON.stringify(processRbac)).replace('"@/lib/server/db"',JSON.stringify(processDb)).replace('"@/lib/permissions"',JSON.stringify(permissions));
  const manualTimeHandler=await import(dataModule(manualTimeSource));globalThis.__processSession={...globalThis.__processSession,name:'Fixture Person'};
- const manualCreated=await manualTimeHandler.POST({body:{customerId:documentArgs.p_customer_id,projectName:'Arbeitszeit',description:'Manual fixture',durationMinutes:60,startedAt:'2026-10-06T12:00:00'}});
+ const manualCreated=await manualTimeHandler.POST({headers:new Headers(),body:{customerId:documentArgs.p_customer_id,projectName:'Arbeitszeit',description:'Manual fixture',durationMinutes:60,startedAt:'2026-10-06T12:00:00'}});
+ const replayBody={customerId:documentArgs.p_customer_id,projectName:'Arbeitszeit',description:'Idempotent manual fixture',durationMinutes:30,startedAt:'2026-10-06T12:00:00'};
+ const replayRequest=body=>({headers:new Headers({'Idempotency-Key':'manual-time-retry-fixture'}),body});
+ const firstManualReplay=await manualTimeHandler.POST(replayRequest(replayBody));
+ assert.equal(firstManualReplay.status,201);
+ assert.equal((await manualTimeHandler.POST(replayRequest(replayBody))).data.item.id,firstManualReplay.data.item.id,'Manual retry reuses committed time entry');
+ assert.equal((await manualTimeHandler.POST(replayRequest({...replayBody,durationMinutes:45}))).status,409,'Changed manual time cannot reuse a request key');
  assert.equal(manualCreated.status,201);assert.equal(manualCreated.data.item.customer_id,documentArgs.p_customer_id);assert.equal(manualCreated.data.item.billable,true);assert.equal(manualCreated.data.item.employee_name,'Fixture Person');
  const manualReloaded=(await manualTimeHandler.GET({nextUrl:new URL('https://example.invalid/api/time-entries')})).data.items.find(i=>i.id===manualCreated.data.item.id);
  assert.ok(manualCreated.data.item.customer_name);assert.equal(manualCreated.data.item.customer_name,manualReloaded.customer_name,'Customer label must match the reloaded record immediately');assert.equal(manualReloaded.employee_name,'Fixture Person');
@@ -432,10 +438,10 @@ try{
  await contactRepository.archiveCustomerContact(globalThis.__processSession,documentArgs.p_customer_id,contactB.id);
  assert.equal((await listApiBusiness(client,session,'customer_contacts','id=eq.'+contactB.id)).length,0);
  assert.ok((await db.query('select archived_at from customer_contacts where id=$1',[contactB.id])).rows[0].archived_at,'Archiving preserves contact references');
- const manualInternal=await manualTimeHandler.POST({body:{customerId:documentArgs.p_customer_id,projectName:'Arbeitszeit',durationMinutes:45,startedAt:'2026-10-06T12:00:00',billable:false,salesRate:125}});
+ const manualInternal=await manualTimeHandler.POST({headers:new Headers(),body:{customerId:documentArgs.p_customer_id,projectName:'Arbeitszeit',durationMinutes:45,startedAt:'2026-10-06T12:00:00',billable:false,salesRate:125}});
  assert.equal(manualInternal.data.item.billable,false);assert.equal(Number(manualInternal.data.item.sales_rate),125);
- assert.equal((await manualTimeHandler.POST({body:{durationMinutes:60,billable:true}})).data.error,'billable_customer_required');
- assert.equal((await manualTimeHandler.POST({body:{durationMinutes:60,salesRate:-10}})).data.error,'rate_invalid');
+ assert.equal((await manualTimeHandler.POST({headers:new Headers(),body:{durationMinutes:60,billable:true}})).data.error,'billable_customer_required');
+ assert.equal((await manualTimeHandler.POST({headers:new Headers(),body:{durationMinutes:60,salesRate:-10}})).data.error,'rate_invalid');
 
  const contactHttpDependencies={"@/lib/server/http":processHttp,"@/lib/server/database":dataModule('export async function requireTenantFeature(){return {session:globalThis.__processSession}}'),"@/lib/server/rbac":processRbac,"@/lib/server/repositories/contacts":dataModule(contactSource)};
  let contactRouteSource=await fs.readFile('app/api/customers/[id]/contacts/[contactId]/route.ts','utf8');
@@ -646,7 +652,7 @@ try{
  assert.equal((await db.query('select count(*)::int n from projects where organization_id=$1 and name=$2',[demo,internalProjectRequest.body.name])).rows[0].n,1,'The replay never creates a second project');
  assert.equal((await projectHandler.POST({...internalProjectRequest,body:{name:'Changed payload'}})).status,409,'A replay key cannot be reused for different project data');
  assert.equal((await projectHandler.POST({body:{name:'Wrong tenant',customerId:'10000000-0000-4000-8000-000000000002',sourceOffer:processQuote.number}})).status,409);
- const timeCreated=await manualTimeHandler.POST({body:{projectId:projectCreated.data.item.id,description:'Migration and rollout',durationMinutes:750,startedAt:'2026-10-01',billable:true,salesRate:180}});
+ const timeCreated=await manualTimeHandler.POST({headers:new Headers(),body:{projectId:projectCreated.data.item.id,description:'Migration and rollout',durationMinutes:750,startedAt:'2026-10-01',billable:true,salesRate:180}});
  assert.equal(timeCreated.status,201,JSON.stringify(timeCreated));assert.equal(timeCreated.data.item.customer_id,documentArgs.p_customer_id,'Project supplies customer without redundant selection');
  const timeReview=await loadProcessRoute('app/api/time-entries/[id]/route.ts');
  const submitted=await timeReview.PATCH({body:{action:'submit'}},{params:Promise.resolve({id:timeCreated.data.item.id})});assert.equal(submitted.status,200,JSON.stringify(submitted));assert.ok(submitted.data.item.submitted_at);
@@ -656,7 +662,7 @@ try{
  const timeInvoice=await atomic('create_document_atomic',serviceArgs);assert.equal(Number(timeInvoice.total),2561.97);
  await assert.rejects(()=>atomic('create_document_atomic',{...serviceArgs,p_number:'PROCESS-TIME-DUP'}),e=>e.code==='time_entries_changed');
  assert.equal((await db.query('select count(*)::int n from invoices where organization_id=$1 and invoice_no=$2',[demo,'PROCESS-TIME-DUP'])).rows[0].n,0,'Failed double billing rolls back the whole invoice');
- const unusedTime=await manualTimeHandler.POST({body:{customerId:documentArgs.p_customer_id,description:'Direct customer work',durationMinutes:60,startedAt:'2026-10-01',billable:true,salesRate:180}});
+ const unusedTime=await manualTimeHandler.POST({headers:new Headers(),body:{customerId:documentArgs.p_customer_id,description:'Direct customer work',durationMinutes:60,startedAt:'2026-10-01',billable:true,salesRate:180}});
  await timeReview.PATCH({body:{action:'approve'}},{params:Promise.resolve({id:unusedTime.data.item.id})});
  await assert.rejects(()=>atomic('create_document_atomic',{...serviceArgs,p_number:'PROCESS-INTRA-DUP',p_items:[{description:'One',quantity:1,unit_price:180,time_entry_ids:[unusedTime.data.item.id]},{description:'Two',quantity:1,unit_price:180,time_entry_ids:[unusedTime.data.item.id]}]}),e=>e.code==='duplicate_service');
  assert.equal((await db.query('select invoiced_invoice_id from time_entries where id=$1',[unusedTime.data.item.id])).rows[0].invoiced_invoice_id,null);
@@ -675,8 +681,8 @@ try{
  const foreignNotificationId=(await db.query("insert into in_app_notifications(organization_id,user_id,kind,title,body) values($1,null,'system','Foreign synthetic notification','No personal data') returning id",[sandbox])).rows[0].id;
  assert.equal((await notificationRoute.PATCH({body:{all:true}})).status,200);assert.ok((await db.query('select read_at from in_app_notifications where id=$1',[notificationId])).rows[0].read_at);assert.equal((await db.query('select read_at from in_app_notifications where id=$1',[foreignNotificationId])).rows[0].read_at,null,'Read all cannot affect another tenant');
  const policy=await loadProcessRoute('app/api/time-entries/policy/route.ts');assert.equal((await policy.PATCH({body:{required:false}})).status,200);
- const immediate=await manualTimeHandler.POST({body:{customerId:documentArgs.p_customer_id,description:'Direct approved work',durationMinutes:60,billable:true}});assert.equal(immediate.data.item.approved,true);
- const internalProcessTime=await manualTimeHandler.POST({body:{projectName:'Weiterbildung',description:'Internal training',durationMinutes:90,billable:false}});assert.equal(internalProcessTime.status,201);assert.equal(internalProcessTime.data.item.customer_id,null);assert.equal(internalProcessTime.data.item.billable,false);
+ const immediate=await manualTimeHandler.POST({headers:new Headers(),body:{customerId:documentArgs.p_customer_id,description:'Direct approved work',durationMinutes:60,billable:true}});assert.equal(immediate.data.item.approved,true);
+ const internalProcessTime=await manualTimeHandler.POST({headers:new Headers(),body:{projectName:'Weiterbildung',description:'Internal training',durationMinutes:90,billable:false}});assert.equal(internalProcessTime.status,201);assert.equal(internalProcessTime.data.item.customer_id,null);assert.equal(internalProcessTime.data.item.billable,false);
  await policy.PATCH({body:{required:true}});
  globalThis.__processSession={...globalThis.__processSession,role:'member'};assert.equal((await policy.PATCH({body:{required:false}})).status,403);assert.equal((await projectHandler.POST({body:{name:'Forbidden'}})).status,403);
  globalThis.__processSession={...session,name:'Process Owner',email:'owner@fixture.invalid'};

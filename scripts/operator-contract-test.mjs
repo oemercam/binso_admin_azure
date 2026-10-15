@@ -26,10 +26,15 @@ const accounts=await route('app/api/operator/accounts/[id]/route.ts');
 const restrictions=await route('app/api/operator/restrictions/route.ts'),remove=await route('app/api/operator/restrictions/[id]/route.ts'),tickets=await route('app/api/operator/tickets/[id]/route.ts'),messages=await route('app/api/operator/tickets/[id]/messages/route.ts');
 const {NextRequest}=await import('next/server.js');
 const pageModule=moduleUrl((await read('lib/operator-pages.ts')).replace("'./permissions'",JSON.stringify(permissions)));
-const boundary=await import(moduleUrl((await read('proxy.ts')).replace('"next/server"',JSON.stringify(import.meta.resolve('next/server.js'))).replace("'./lib/operator-pages'",JSON.stringify(pageModule))));
+const localeConfig=moduleUrl(await read('lib/locales/config.ts'));
+const maintenanceModule=moduleUrl('export const maintenanceState=async()=>({enabled:false,endsAt:null})');
+const boundary=await import(moduleUrl((await read('proxy.ts')).replace('"./lib/locales/config"',JSON.stringify(localeConfig)).replace('"./lib/server/maintenance"',JSON.stringify(maintenanceModule)).replace('"next/server"',JSON.stringify(import.meta.resolve('next/server.js'))).replace("'./lib/operator-pages'",JSON.stringify(pageModule))));
 assert.ok(boundary.config.matcher.includes('/operator/:path*'));
-for(const path of ['/operator/unknown','/operator/login/extra','/operator/wallboard/extra','/operator/kunden/id/extra'])assert.equal(boundary.proxy(new NextRequest('http://localhost'+path)).status,404,'Invalid admin route is rejected before streaming');
-for(const path of ['/operator','/operator/login','/operator/wallboard','/operator/tickets/id','/operator/kunden/id'])assert.equal(boundary.proxy(new NextRequest('http://localhost'+path)).headers.get('x-middleware-next'),'1','Valid admin routes retain server-side authentication');
+for(const path of ['/operator/unknown','/operator/login/extra','/operator/wallboard/extra','/operator/kunden/id/extra'])assert.equal((await boundary.proxy(new NextRequest('http://localhost'+path))).status,404,'Invalid admin route is rejected before streaming');
+for(const path of ['/operator','/operator/login','/operator/wallboard','/operator/tickets/id','/operator/kunden/id'])assert.equal((await boundary.proxy(new NextRequest('http://localhost'+path))).headers.get('x-middleware-next'),'1','Valid admin routes retain server-side authentication');
+const loginRedirect=await boundary.proxy(new NextRequest('http://localhost/projekte/neu?customerId=fixture&lang=fr'));
+assert.equal(new URL(loginRedirect.headers.get('location')).searchParams.get('next'),'/projekte/neu?customerId=fixture&lang=fr','Login preserves the full local process context');
+assert.equal(loginRedirect.cookies.get('binso_locale')?.value,'fr');
 const db=new PGlite({extensions:{pgcrypto}});let failAudit=false;
 try{
  await db.exec('create extension pgcrypto;create role schema_owner;grant usage,create on schema public to schema_owner;set role schema_owner');

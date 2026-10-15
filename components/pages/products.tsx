@@ -1,4 +1,5 @@
 "use client";
+import {LocalizedText} from "@/lib/client/locale";
 import {safeAppPath} from "@/lib/navigation";
 import {useApiQuery} from "@/lib/client/use-api-query";
 import {useProcessDraft} from "../use-process-draft";
@@ -101,28 +102,28 @@ export function ProductForm({ existing = false, productId }: { existing?: boolea
     }
   };
 
-  if(loadingRecord||recordError)return <AppShell title="Produkt" active="produkte" backHref={returnTo}>{loadingRecord?<LoadingState>Produkt wird geladen …</LoadingState>:<ErrorState onRetry={recordQuery.refresh} retryLabel="Erneut versuchen">{recordError}</ErrorState>}</AppShell>;
+  if(loadingRecord||recordError)return <AppShell title="Produkt" active="produkte" backHref={returnTo}>{loadingRecord?<LoadingState><LocalizedText>{"Produkt wird geladen …"}</LocalizedText></LoadingState>:<ErrorState onRetry={recordQuery.refresh} retryLabel="Erneut versuchen"><LocalizedText>{recordError}</LocalizedText></ErrorState>}</AppShell>;
   return <AppShell unsavedChanges={false} title={existing ? name||"Produkt" : "Produkt erstellen"} status={existing?status:undefined} statusTone={status==="Aktiv"?"success":"neutral"} editing={editingRecord} subtitle={existing ? type : "Für Angebote und Rechnungen wiederverwendbar."} active="produkte" backHref={returnTo} backLabel="Produkte" actions={existing?<><ActionsMenu label="Produktaktionen" busy={savingRecord}>{!editingRecord&&<ActionRow requiresWrite icon="edit" onClick={()=>setEditingRecord(true)} title="Bearbeiten" navigation/>}<ActionRow href="/angebote/neu" icon="file" title="Angebot erstellen" navigation/><ActionRow href="/rechnungen/neu" icon="receipt" title="Rechnung erstellen" navigation/></ActionsMenu></>:undefined}>
     <div className={existing?"entity-detail-workspace":"form-page"} inert={savingRecord}>
 
       <div className={existing?"entity-edit-main":"entity-edit-main form-main-new"}>
         {!editingRecord?<dl className="detail-list">
-          <div><dt>Verkaufspreis</dt><dd>{withPriceUnit(formatCurrency(price,"CHF"),unit)}</dd></div>
-          <div><dt>MwSt.</dt><dd>{formatQuantity(vatRate,"%")}</dd></div>
-          {sku&&<div><dt>Artikelnummer</dt><dd>{sku}</dd></div>}
-          {description&&<div><dt>Beschreibung</dt><dd>{description}</dd></div>}
+          <div><dt><LocalizedText>{"Verkaufspreis"}</LocalizedText></dt><dd>{withPriceUnit(formatCurrency(price,"CHF"),unit)}</dd></div>
+          <div><dt><LocalizedText>{"MwSt."}</LocalizedText></dt><dd>{formatQuantity(vatRate,"%")}</dd></div>
+          {sku&&<div><dt><LocalizedText>{"Artikelnummer"}</LocalizedText></dt><dd>{sku}</dd></div>}
+          {description&&<div><dt><LocalizedText>{"Beschreibung"}</LocalizedText></dt><dd><LocalizedText>{description}</LocalizedText></dd></div>}
         </dl>:<FormSheet label={existing?"Produkt bearbeiten":"Produkt erstellen"} open={editingRecord} onClose={()=>{recovery.clear();allowDraftNavigation();if(existing)setEditingRecord(false);else router.push(returnTo)}} busy={savingRecord} dirty={dirty&&!savedRecord}><form onSubmit={event=>{event.preventDefault();void save()}}><div className="form-grid two">
           <Field label="Name"><Input required maxLength={200} value={name} onChange={e=>setName(e.target.value)} placeholder="Name"/></Field>
-          <Field label="Typ"><Select value={type} onChange={e=>setType(e.target.value)}><option>Dienstleistung</option><option>Produkt</option></Select></Field>
+          <Field label="Typ"><Select value={type} onChange={e=>setType(e.target.value)}><option value={"Dienstleistung"}><LocalizedText>{"Dienstleistung"}</LocalizedText></option><option value={"Produkt"}><LocalizedText>{"Produkt"}</LocalizedText></option></Select></Field>
           <Field label="Artikelnummer"><Input value={sku} onChange={e=>setSku(e.target.value)} placeholder="Optional"/></Field>
-          <Field label="Einheit"><Select value={unit} onChange={e=>setUnit(e.target.value)}><option value="hour">Stunde</option><option value="piece">Stück</option><option value="flat">Pauschal</option></Select></Field>
+          <Field label="Einheit"><Select value={unit} onChange={e=>setUnit(e.target.value)}><option value="hour"><LocalizedText>{"Stunde"}</LocalizedText></option><option value="piece"><LocalizedText>{"Stück"}</LocalizedText></option><option value="flat"><LocalizedText>{"Pauschal"}</LocalizedText></option></Select></Field>
           <Field label="Verkaufspreis (CHF)"><Input required inputMode="decimal" value={price} onChange={e=>setPrice(e.target.value)} placeholder="0.00"/></Field>
           <Field label="MwSt."><Select value={vatRate} onChange={e=>setVatRate(e.target.value)}><option value="8.1">8.1 %</option><option value="2.6">2.6 %</option><option value="0">0 %</option></Select></Field>
-          <Field label="Status"><Select value={status} onChange={e=>setStatus(e.target.value)}><option>Aktiv</option><option>Inaktiv</option></Select></Field>
+          <Field label="Status"><Select value={status} onChange={e=>setStatus(e.target.value)}><option value={"Aktiv"}><LocalizedText>{"Aktiv"}</LocalizedText></option><option value={"Inaktiv"}><LocalizedText>{"Inaktiv"}</LocalizedText></option></Select></Field>
           <Field label="Beschreibung" className="full"><Textarea value={description} onChange={e=>setDescription(e.target.value)} placeholder="Kurze Beschreibung"/></Field>
-        </div><FormActions><Button variant="secondary" onClick={()=>{recovery.clear();allowDraftNavigation();if(existing)setEditingRecord(false);else router.push(returnTo)}} disabled={savingRecord}>Abbrechen</Button><Button requiresWrite type="submit" disabled={savingRecord}>{savingRecord?"Wird gespeichert…":"Speichern"}</Button></FormActions></form></FormSheet>}
+        </div><FormActions><Button variant="secondary" onClick={()=>{recovery.clear();allowDraftNavigation();if(existing)setEditingRecord(false);else router.push(returnTo)}} disabled={savingRecord}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button requiresWrite type="submit" disabled={savingRecord}><LocalizedText>{savingRecord?"Wird gespeichert…":"Speichern"}</LocalizedText></Button></FormActions></form></FormSheet>}
       </div>
-      {existing&&<aside className="desktop-context-rail"><section className="desktop-toolbox"><Link href="/angebote/neu"><Icon name="file"/><span><b>Angebot erstellen</b></span><Icon name="arrow" size={15}/></Link><Link href="/rechnungen/neu"><Icon name="receipt"/><span><b>Rechnung erstellen</b></span><Icon name="arrow" size={15}/></Link></section></aside>}
+      {existing&&<aside className="desktop-context-rail"><section className="desktop-toolbox"><Link href="/angebote/neu"><Icon name="file"/><span><b><LocalizedText>{"Angebot erstellen"}</LocalizedText></b></span><Icon name="arrow" size={15}/></Link><Link href="/rechnungen/neu"><Icon name="receipt"/><span><b><LocalizedText>{"Rechnung erstellen"}</LocalizedText></b></span><Icon name="arrow" size={15}/></Link></section></aside>}
 
     </div>
     {toast&&<Toast title={toast} tone={toast==="Produkt gespeichert."?"success":"danger"}/>}

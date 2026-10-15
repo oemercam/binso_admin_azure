@@ -1,5 +1,6 @@
 "use client";
 
+import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
 import {useEffect,useRef,useState,type ReactNode} from "react";
 import {createPortal} from "react-dom";
 import {useDialogFocus} from "./use-dialog-focus";
@@ -33,9 +34,9 @@ export function HeaderPanel({kind,label,onClose,children,headerSelector,backgrou
   return()=>{window.removeEventListener("resize",update);window.visualViewport?.removeEventListener("resize",update);window.removeEventListener("binso-modal-open",closeForModal)};
  },[onClose,headerSelector]);
  return createPortal(<div className="header-panel-layer" style={{"--header-panel-top":`${placement.top}px`,"--header-panel-right":`${placement.right}px`} as React.CSSProperties} onMouseDown={event=>{if(event.target===event.currentTarget)onClose()}}>
-  <section ref={dialog} className={`header-panel header-panel-${kind}`} tabIndex={-1} role="dialog" aria-modal="true" aria-label={label}>
-   <header className="header-panel-heading"><h2>{label}</h2><IconButton label={mobile?"Zurück":"Schliessen"} icon={mobile?"back":"close"} onClick={onClose}/></header>
+  <LocalizedElement as="section" ref={dialog} className={`header-panel header-panel-${kind}`} tabIndex={-1} role="dialog" aria-modal="true" aria-label={label}>
+   <header className="header-panel-heading"><h2><LocalizedText>{label}</LocalizedText></h2><IconButton label={mobile?"Zurück":"Schliessen"} icon={mobile?"back":"close"} onClick={onClose}/></header>
    {children}
-  </section>
+  </LocalizedElement>
  </div>,document.body);
 }

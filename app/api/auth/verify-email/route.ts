@@ -44,7 +44,7 @@ export async function POST(request:NextRequest){
   }
   if(!completed)return json({error:"invalid_or_expired_code"},400);
   await endDemoSession();
-  await createSession({userId,organizationId:completed.organization_id,email,name:completed.name,role:completed.role});
+  await createSession({userId,organizationId:completed.organization_id,email,name:completed.name,role:completed.role,persistent:body.rememberMe===true,ttlHours:body.rememberMe===true?undefined:12});
   return json({ok:true,...await registrationHandoff(completed.organization_id,completed.role,completed.mfa_enabled)});
  }catch(error){return apiError(error);}
 }

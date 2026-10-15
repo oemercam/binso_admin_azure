@@ -1,4 +1,5 @@
 "use client";
+import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
 import {safeAppPath} from "@/lib/navigation";
 import {EntityFiles} from "./entity-files";
 import {customerDirectory,resolveCustomer,type CustomerDirectory} from "@/lib/customer-identity";
@@ -345,29 +346,29 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const desktopActions=headerActions;
 
   return <AppShell title={title} status={existing&&!editing&&!documentLoad.loading&&!documentLoad.error?presentation.statusLabel:undefined} statusTone={presentation.statusTone} subtitle={existing&&!editing?undefined:production?"Wird sicher gespeichert":"Schreibgeschützte Vorschau"} active={plural} backHref={returnTo} backLabel={returnTo==="/dashboard"?"Übersicht":kind==="Angebot"?"Angebote":"Rechnungen"} actions={desktopActions} mobileActions={existing&&!editing?headerActions:undefined} preview={preview} editing={editing} unsavedChanges={dirty}>
-    {actionError&&!moreOpen&&!sendOpen&&<ErrorState>{actionError}</ErrorState>}
-    {editing&&companyPending&&<LoadingState>Firmendaten werden geladen …</LoadingState>}
-    {editing&&paymentIssue&&<div className="document-source-note" role="status"><span>{paymentIssue}</span><Link href="/einstellungen/dokumente">Einstellungen</Link></div>}
-    {sourceOffer&&!existing&&<div className="document-source-note"><span>Erstellt aus Angebot</span><b>{sourceOffer}</b></div>}
-    {customersLoading?<LoadingState>Kunden werden geladen …</LoadingState>:customersError?<ErrorState onRetry={refreshCustomers}>{customersError}</ErrorState>:sourceQuery.loading?<LoadingState>Ursprungsangebot wird geladen …</LoadingState>:sourceError?<ErrorState onRetry={sourceQuery.refresh}>{sourceError}</ErrorState>:billingLoading?<LoadingState>Verrechenbare Positionen werden geladen …</LoadingState>:billingError?<ErrorState onRetry={()=>{timeSource.refresh();expenseSource.refresh()}}>{billingError}</ErrorState>:documentLoad.loading?<LoadingState>Dokument wird geladen …</LoadingState>:documentLoad.error?<EmptyState icon="file" title="Dokument konnte nicht geladen werden" text={documentLoad.error}/>:existing&&!editing
+    {actionError&&!moreOpen&&!sendOpen&&<ErrorState><LocalizedText>{actionError}</LocalizedText></ErrorState>}
+    {editing&&companyPending&&<LoadingState><LocalizedText>{"Firmendaten werden geladen …"}</LocalizedText></LoadingState>}
+    {editing&&paymentIssue&&<div className="document-source-note" role="status"><span>{paymentIssue}</span><Link href="/einstellungen/dokumente"><LocalizedText>{"Einstellungen"}</LocalizedText></Link></div>}
+    {sourceOffer&&!existing&&<div className="document-source-note"><span><LocalizedText>{"Erstellt aus Angebot"}</LocalizedText></span><b>{sourceOffer}</b></div>}
+    {customersLoading?<LoadingState><LocalizedText>{"Kunden werden geladen …"}</LocalizedText></LoadingState>:customersError?<ErrorState onRetry={refreshCustomers}><LocalizedText>{customersError}</LocalizedText></ErrorState>:sourceQuery.loading?<LoadingState><LocalizedText>{"Ursprungsangebot wird geladen …"}</LocalizedText></LoadingState>:sourceError?<ErrorState onRetry={sourceQuery.refresh}><LocalizedText>{sourceError}</LocalizedText></ErrorState>:billingLoading?<LoadingState><LocalizedText>{"Verrechenbare Positionen werden geladen …"}</LocalizedText></LoadingState>:billingError?<ErrorState onRetry={()=>{timeSource.refresh();expenseSource.refresh()}}><LocalizedText>{billingError}</LocalizedText></ErrorState>:documentLoad.loading?<LoadingState><LocalizedText>{"Dokument wird geladen …"}</LocalizedText></LoadingState>:documentLoad.error?<EmptyState icon="file" title="Dokument konnte nicht geladen werden" text={documentLoad.error}/>:existing&&!editing
       ? <div className="document-desktop-workspace">
           <div className="document-desktop-detail">
             <DocumentReadView type={kind} draft={draft} directory={directory}/>
             {draft.id&&<EntityFiles purpose={kind==="Rechnung"?"invoice_attachment":"offer_attachment"} entityId={draft.id}/>}
           </div>
           {(kind==="Angebot"&&draft.status==="accepted"&&(tenantCan(documentRole,"invoices:write")||tenantCan(documentRole,"projects:write"))||canRecordPayment)&&<aside className="document-desktop-rail">
-            <section className="document-toolbox" aria-label="Dokumentaktionen">
-              <span className="compact-section-label">Aktionen</span>
-              {kind==="Angebot"&&draft.status==="accepted"&&tenantCan(documentRole,"projects:write")&&<Link href={draft.projectId?"/zeit?projectId="+draft.projectId:"/projekte/neu?customerId="+encodeURIComponent(draft.customerId??"")+"&sourceOffer="+encodeURIComponent(draft.number)}><Icon name="clock"/><span><b>{draft.projectId?"Projekt öffnen":"Auftrag starten"}</b></span><Icon name="arrow" size={15}/></Link>}
+            <LocalizedElement as="section" className="document-toolbox" aria-label="Dokumentaktionen">
+              <span className="compact-section-label"><LocalizedText>{"Aktionen"}</LocalizedText></span>
+              {kind==="Angebot"&&draft.status==="accepted"&&tenantCan(documentRole,"projects:write")&&<Link href={draft.projectId?"/zeit?projectId="+draft.projectId:"/projekte/neu?customerId="+encodeURIComponent(draft.customerId??"")+"&sourceOffer="+encodeURIComponent(draft.number)}><Icon name="clock"/><span><b><LocalizedText>{draft.projectId?"Projekt öffnen":"Auftrag starten"}</LocalizedText></b></span><Icon name="arrow" size={15}/></Link>}
               {kind==="Angebot"
-                ? tenantCan(documentRole,"invoices:write")&&<Link href={draft.invoiceNumber?"/rechnungen/"+encodeURIComponent(draft.invoiceNumber):"/rechnungen/neu?sourceOffer="+encodeURIComponent(documentKey??draft.number)}><Icon name="receipt" size={17}/><span><b>{draft.invoiceNumber?"Rechnung öffnen":"Rechnung erstellen"}</b><small>Daten aus Angebot übernehmen</small></span><Icon name="arrow" size={15}/></Link>
-                : canRecordPayment&&<Link href={"/zahlungen/neu?invoice="+encodeURIComponent(documentKey??draft.number)}><Icon name="wallet" size={17}/><span><b>Zahlung erfassen</b><small>Zahlung zuordnen</small></span><Icon name="arrow" size={15}/></Link>}
-            </section>
+                ? tenantCan(documentRole,"invoices:write")&&<Link href={draft.invoiceNumber?"/rechnungen/"+encodeURIComponent(draft.invoiceNumber):"/rechnungen/neu?sourceOffer="+encodeURIComponent(documentKey??draft.number)}><Icon name="receipt" size={17}/><span><b><LocalizedText>{draft.invoiceNumber?"Rechnung öffnen":"Rechnung erstellen"}</LocalizedText></b><small><LocalizedText>{"Daten aus Angebot übernehmen"}</LocalizedText></small></span><Icon name="arrow" size={15}/></Link>
+                : canRecordPayment&&<Link href={"/zahlungen/neu?invoice="+encodeURIComponent(documentKey??draft.number)}><Icon name="wallet" size={17}/><span><b><LocalizedText>{"Zahlung erfassen"}</LocalizedText></b><small><LocalizedText>{"Zahlung zuordnen"}</LocalizedText></small></span><Icon name="arrow" size={15}/></Link>}
+            </LocalizedElement>
           </aside>}
         </div>
-      : !existing?<FormWizard cancelAction={<Button variant="secondary" href={returnTo} disabled={saving}>Abbrechen</Button>} labels={["Kunde und Dokumentdaten","Positionen","Zahlungsbedingungen","Prüfen und als Entwurf speichern"]} step={wizardStep} onStep={setWizardStep} busy={saving} action={<Button disabled={saving||companyPending||Boolean(paymentIssue)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)} onClick={()=>void save()}>{saving?"Wird gespeichert…":existing?"Speichern":kind+" erstellen"}</Button>}><DocumentEditor type={kind} draft={draft} onChange={next=>{draftBaseline.current??=editableDocumentSnapshot(draft);setDirty(editableDocumentSnapshot(next)!==draftBaseline.current);setDraft({...next,subtotal:undefined,vat:undefined,total:undefined})}} directory={directory} lockedCustomer={Boolean(sourceOffer)} step={!existing?wizardStep:undefined}/>{wizardStep===3&&<DocumentReadView type={kind} draft={draft} directory={directory}/>}{wizardStep===1&&editing&&kind==="Rechnung"&&draft.customerId&&tenantCan(documentRole,"invoices:write")&&<Button variant="secondary" href={"/zeit?invoice="+encodeURIComponent(existing?draft.number:"")+"&customerId="+encodeURIComponent(draft.customerId)}>Freigegebene Zeiten hinzufügen</Button>}</FormWizard>:<DocumentEditor type={kind} draft={draft} onChange={next=>{draftBaseline.current??=editableDocumentSnapshot(draft);setDirty(editableDocumentSnapshot(next)!==draftBaseline.current);setDraft({...next,subtotal:undefined,vat:undefined,total:undefined})}} directory={directory} lockedCustomer={Boolean(sourceOffer)} step={!existing?wizardStep:undefined}/>}
-    {editing&&existing&&kind==="Rechnung"&&draft.customerId&&tenantCan(documentRole,"invoices:write")&&<Button variant="secondary" href={"/zeit?invoice="+encodeURIComponent(draft.number)+"&customerId="+encodeURIComponent(draft.customerId)}>Freigegebene Zeiten hinzufügen</Button>}
-    {editing&&existing&&<FormActions><Button disabled={saving||companyPending||Boolean(paymentIssue)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)} onClick={()=>void save()}>{saving?"Wird gespeichert…":existing?"Speichern":kind+" erstellen"}</Button></FormActions>}
+      : !existing?<FormWizard cancelAction={<Button variant="secondary" href={returnTo} disabled={saving}><LocalizedText>{"Abbrechen"}</LocalizedText></Button>} labels={["Kunde und Dokumentdaten","Positionen","Zahlungsbedingungen","Prüfen und als Entwurf speichern"]} step={wizardStep} onStep={setWizardStep} busy={saving} action={<Button disabled={saving||companyPending||Boolean(paymentIssue)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)} onClick={()=>void save()}><LocalizedText>{saving?"Wird gespeichert…":existing?"Speichern":kind+" erstellen"}</LocalizedText></Button>}><DocumentEditor type={kind} draft={draft} onChange={next=>{draftBaseline.current??=editableDocumentSnapshot(draft);setDirty(editableDocumentSnapshot(next)!==draftBaseline.current);setDraft({...next,subtotal:undefined,vat:undefined,total:undefined})}} directory={directory} lockedCustomer={Boolean(sourceOffer)} step={!existing?wizardStep:undefined}/>{wizardStep===3&&<DocumentReadView type={kind} draft={draft} directory={directory}/>}{wizardStep===1&&editing&&kind==="Rechnung"&&draft.customerId&&tenantCan(documentRole,"invoices:write")&&<Button variant="secondary" href={"/zeit?invoice="+encodeURIComponent(existing?draft.number:"")+"&customerId="+encodeURIComponent(draft.customerId)}><LocalizedText>{"Freigegebene Zeiten hinzufügen"}</LocalizedText></Button>}</FormWizard>:<DocumentEditor type={kind} draft={draft} onChange={next=>{draftBaseline.current??=editableDocumentSnapshot(draft);setDirty(editableDocumentSnapshot(next)!==draftBaseline.current);setDraft({...next,subtotal:undefined,vat:undefined,total:undefined})}} directory={directory} lockedCustomer={Boolean(sourceOffer)} step={!existing?wizardStep:undefined}/>}
+    {editing&&existing&&kind==="Rechnung"&&draft.customerId&&tenantCan(documentRole,"invoices:write")&&<Button variant="secondary" href={"/zeit?invoice="+encodeURIComponent(draft.number)+"&customerId="+encodeURIComponent(draft.customerId)}><LocalizedText>{"Freigegebene Zeiten hinzufügen"}</LocalizedText></Button>}
+    {editing&&existing&&<FormActions><Button disabled={saving||companyPending||Boolean(paymentIssue)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)} onClick={()=>void save()}><LocalizedText>{saving?"Wird gespeichert…":existing?"Speichern":kind+" erstellen"}</LocalizedText></Button></FormActions>}
     {preview&&<DocumentModal previewDraft={{...draft,kind,sourceNumber:existing&&editing?documentKey:undefined}} pdfNumber={existing&&!editing?documentKey??draft.number:undefined} title={kind==="Angebot"?"Angebotsvorschau":"Rechnungsvorschau"} onClose={()=>setPreview(false)}/>}
     <ActionSheet label="Weitere Aktionen" open={moreOpen} busy={actionBusy} onClose={()=>setMoreOpen(false)}><div className="action-list">
       <ActionRow onClick={()=>{setMoreOpen(false);setPreview(true)}} icon="file" title="Vorschau" navigation/>
@@ -376,8 +377,8 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
       {canWrite&&draft.status==='draft'&&<ActionRow disabled={actionBusy} onClick={()=>void processAction('issue')} icon="check" title={kind==='Rechnung'?'Rechnung stellen':'Als versendet erfassen'}/>}
       {canWrite&&kind==='Angebot'&&draft.status==='sent'&&<><ActionRow disabled={actionBusy} onClick={()=>void processAction('accept')} icon="check" title="Kundenannahme erfassen"/><ActionRow disabled={actionBusy} onClick={()=>void processAction('decline')} icon="close" title="Kundenablehnung erfassen" danger/></>}
       {canWrite&&kind==='Rechnung'&&Number(draft.paidAmount??0)===0&&['draft','sent','overdue'].includes(draft.status??'')&&<ActionRow disabled={actionBusy} onClick={()=>void processAction('cancel')} icon="close" title="Rechnung stornieren" danger/>}
-      </div>{actionError&&<ErrorState>{actionError}</ErrorState>}</ActionSheet>
-    <FormSheet label="Dokument senden" description={kind+" als PDF · "+draft.number} open={sendOpen} busy={actionBusy} onClose={()=>setSendOpen(false)}><div className="sheet-body"><Field label="Empfänger"><Input type="email" value={recipient} onChange={e=>{setRecipient(e.target.value);setSendKey(crypto.randomUUID())}} autoComplete="email"/></Field><p>Das ausgestellte Dokument wird als PDF versendet.</p>{actionError&&<ErrorState>{actionError}</ErrorState>}</div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setSendOpen(false)}>Abbrechen</Button><Button disabled={actionBusy||!recipient} onClick={()=>void sendDocument()}>{actionBusy?'Wird versendet …':'PDF senden'}</Button></div></FormSheet>
+      </div>{actionError&&<ErrorState><LocalizedText>{actionError}</LocalizedText></ErrorState>}</ActionSheet>
+    <FormSheet label="Dokument senden" description={kind+" als PDF · "+draft.number} open={sendOpen} busy={actionBusy} onClose={()=>setSendOpen(false)}><div className="sheet-body"><Field label="Empfänger"><Input type="email" value={recipient} onChange={e=>{setRecipient(e.target.value);setSendKey(crypto.randomUUID())}} autoComplete="email"/></Field><p><LocalizedText>{"Das ausgestellte Dokument wird als PDF versendet."}</LocalizedText></p>{actionError&&<ErrorState><LocalizedText>{actionError}</LocalizedText></ErrorState>}</div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setSendOpen(false)}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button disabled={actionBusy||!recipient} onClick={()=>void sendDocument()}><LocalizedText>{actionBusy?'Wird versendet …':'PDF senden'}</LocalizedText></Button></div></FormSheet>
     {toast&&<Toast title={toast} tone={[`${kind} gespeichert.`,`${kind} erstellt.`,"Status aktualisiert.","Dokument als PDF versendet."].includes(toast)?"success":"danger"}/>}
   </AppShell>;
 }
@@ -401,40 +402,40 @@ function DocumentReadView({type,draft,directory}:{type:DocumentKind;draft:Docume
   const {displayStatus}=documentPresentation(type,draft,totals.total);
   return <div className="document-detail-view">
     <section className="document-detail-section">
-      <span className="eyebrow">KUNDE</span>
+      <span className="eyebrow"><LocalizedText>{"KUNDE"}</LocalizedText></span>
       <div className="document-customer-heading"><h2>{draft.customer}</h2></div>
       {[customer.address,customer.zip,customer.city].some(Boolean)&&<p>{[customer.address,[customer.zip,customer.city].filter(Boolean).join(" ")].filter(Boolean).join(" · ")}</p>}
     </section>
     <section className="document-facts">
-      <div><small>{type==="Rechnung"?"Rechnungsdatum":"Angebotsdatum"}</small><b>{isoToSwiss(draft.date)}</b></div>
+      <div><small><LocalizedText>{type==="Rechnung"?"Rechnungsdatum":"Angebotsdatum"}</LocalizedText></small><b>{isoToSwiss(draft.date)}</b></div>
       {type==="Angebot"
-        ? <div><small>Gültig bis</small><b>{draft.due&&isoToSwiss(draft.due)}</b></div>
-        : <>{displayStatus==="paid"?(draft.paidOn&&<div><small>Bezahlt am</small><b>{isoToSwiss(draft.paidOn)}</b></div>):dueDate&&<div><small>Fällig am</small><b>{dueDate}</b></div>}</>}
+        ? <div><small><LocalizedText>{"Gültig bis"}</LocalizedText></small><b><LocalizedText>{draft.due&&isoToSwiss(draft.due)}</LocalizedText></b></div>
+        : <>{displayStatus==="paid"?(draft.paidOn&&<div><small><LocalizedText>{"Bezahlt am"}</LocalizedText></small><b>{isoToSwiss(draft.paidOn)}</b></div>):dueDate&&<div><small><LocalizedText>{"Fällig am"}</LocalizedText></small><b>{dueDate}</b></div>}</>}
     </section>
-    {isInvoice&&draft.due&&<p className="document-payment-term">Zahlungsfrist: {draft.due} Tage</p>}
+    {isInvoice&&draft.due&&<p className="document-payment-term"><LocalizedText>{"Zahlungsfrist: "}</LocalizedText>{draft.due}<LocalizedText>{" Tage"}</LocalizedText></p>}
     <section className="document-detail-section document-lines-section">
-      <div className="section-title"><h2>Positionen</h2></div>
+      <div className="section-title"><h2><LocalizedText>{"Positionen"}</LocalizedText></h2></div>
       <div className="document-read-table">
-        <div className="document-read-head" aria-hidden="true"><span>Bezeichnung</span><span>Menge / Einheit</span><span>Einzelpreis</span><span>Betrag</span></div>
+        <div className="document-read-head" aria-hidden="true"><span><LocalizedText>{"Bezeichnung"}</LocalizedText></span><span><LocalizedText>{"Menge / Einheit"}</LocalizedText></span><span><LocalizedText>{"Einzelpreis"}</LocalizedText></span><span><LocalizedText>{"Betrag"}</LocalizedText></span></div>
         {draft.positions.map(item=><div className="document-read-row" key={item.id}>
-          <b>{item.description}</b>
-          <span>{item.quantity} {({hour:"Std.",piece:"Stück",flat:"Pauschal"} as Record<string,string>)[item.unit??""]??item.unit??"Stück"}<small className="document-mobile-price"> × {currency} {money(numberValue(item.price))}</small></span>
+          <b><LocalizedText>{item.description}</LocalizedText></b>
+          <span>{item.quantity} <LocalizedText>{({hour:"Std.",piece:"Stück",flat:"Pauschal"} as Record<string,string>)[item.unit??""]??item.unit??"Stück"}</LocalizedText><small className="document-mobile-price"><LocalizedText>{" × "}</LocalizedText>{currency} {money(numberValue(item.price))}</small></span>
           <span>{currency} {money(numberValue(item.price))}</span>
           <strong>{currency} {money(numberValue(item.quantity)*numberValue(item.price))}</strong>
         </div>)}
       </div>
       <div className="invoice-totals">
-        <span>Zwischentotal <b>{currency} {money(totals.subtotal)}</b></span>
-        <span>MwSt. {Number(draft.vatRate).toLocaleString("de-CH",{maximumFractionDigits:2})} % <b>{currency} {money(totals.vat)}</b></span>
-        <strong>Total <b>{currency} {money(totals.total)}</b></strong>
+        <span><LocalizedText>{"Zwischentotal "}</LocalizedText><b>{currency} {money(totals.subtotal)}</b></span>
+        <span><LocalizedText>{"MwSt. "}</LocalizedText>{Number(draft.vatRate).toLocaleString("de-CH",{maximumFractionDigits:2})} % <b>{currency} {money(totals.vat)}</b></span>
+        <strong><LocalizedText>{"Total "}</LocalizedText><b>{currency} {money(totals.total)}</b></strong>
       </div>
     </section>
-    {isInvoice&&!["draft","paid","cancelled"].includes(displayStatus)&&outstanding>0&&<section className="document-payment-facts" aria-label="Zahlungsstand"><h2>Zahlungsstand</h2>
-      {Number(draft.paidAmount??0)>0&&<span>Bereits bezahlt <b>{currency} {money(Number(draft.paidAmount??0))}</b></span>}
-      <span>Offener Betrag <b>{currency} {money(outstanding)}</b></span>
-    </section>}
-    {draft.sourceOffer&&<p>Ursprungsangebot: <Link href={"/angebote/"+encodeURIComponent(draft.sourceOffer)}>{draft.sourceOffer}</Link></p>}{draft.invoiceNumber&&<p>Rechnung: <Link href={"/rechnungen/"+encodeURIComponent(draft.invoiceNumber)}>{draft.invoiceNumber}</Link></p>}
-    {draft.note&&<section className="document-detail-section"><span className="eyebrow">NOTIZ</span><p>{draft.note}</p></section>}
+    {isInvoice&&!["draft","paid","cancelled"].includes(displayStatus)&&outstanding>0&&<LocalizedElement as="section" className="document-payment-facts" aria-label="Zahlungsstand"><h2><LocalizedText>{"Zahlungsstand"}</LocalizedText></h2>
+      {Number(draft.paidAmount??0)>0&&<span><LocalizedText>{"Bereits bezahlt "}</LocalizedText><b>{currency} {money(Number(draft.paidAmount??0))}</b></span>}
+      <span><LocalizedText>{"Offener Betrag "}</LocalizedText><b>{currency} {money(outstanding)}</b></span>
+    </LocalizedElement>}
+    {draft.sourceOffer&&<p><LocalizedText>{"Ursprungsangebot: "}</LocalizedText><Link href={"/angebote/"+encodeURIComponent(draft.sourceOffer)}>{draft.sourceOffer}</Link></p>}{draft.invoiceNumber&&<p><LocalizedText>{"Rechnung: "}</LocalizedText><Link href={"/rechnungen/"+encodeURIComponent(draft.invoiceNumber)}>{draft.invoiceNumber}</Link></p>}
+    {draft.note&&<section className="document-detail-section"><span className="eyebrow"><LocalizedText>{"NOTIZ"}</LocalizedText></span><p>{draft.note}</p></section>}
   </div>;
 }
 
@@ -463,56 +464,56 @@ function DocumentEditor({ type, draft, onChange, directory, step,lockedCustomer=
   };
 
   if(production&&names.length===0){
-    return <div className="invoice-workspace"><section className="invoice-form"><EmptyState icon="users" title="Zuerst einen Kunden erfassen" text="Für Angebote und Rechnungen muss mindestens ein Kunde vorhanden sein." action={<Button href="/kunden/neu">Kunde erfassen</Button>}/></section></div>;
+    return <div className="invoice-workspace"><section className="invoice-form"><EmptyState icon="users" title="Zuerst einen Kunden erfassen" text="Für Angebote und Rechnungen muss mindestens ein Kunde vorhanden sein." action={<Button href="/kunden/neu"><LocalizedText>{"Kunde erfassen"}</LocalizedText></Button>}/></section></div>;
   }
 
   return <div className="invoice-workspace">
     <section className={`invoice-form ${type==="Angebot"?"offer-form":""}`}>
       <div hidden={step!==undefined&&step!==0} className="form-section customer-form-section">
-        <span className="compact-section-label">Kunde</span>
+        <span className="compact-section-label"><LocalizedText>{"Kunde"}</LocalizedText></span>
         <Field label="Kunde auswählen">
           <Select disabled={lockedCustomer} value={draft.customerId??Object.entries(directory).find(([,item])=>item===resolveCustomer(draft,directory))?.[0]??''} onChange={e=>{const item=directory[e.target.value];if(item)onChange({...draft,customer:item.name??e.target.value,customerId:item.id})}}>
-            {!resolveCustomer(draft,directory)&&<option value="">Kunde auswählen</option>}
-            {names.map(key=><option key={key} value={key}>{directory[key].name??key}{directory[key].city?' · '+directory[key].city:''}</option>)}
+            {!resolveCustomer(draft,directory)&&<option value=""><LocalizedText>{"Kunde auswählen"}</LocalizedText></option>}
+            {names.map(key=><option key={key} value={key}><LocalizedText>{directory[key].name??key}</LocalizedText><LocalizedText>{directory[key].city?' · '+directory[key].city:''}</LocalizedText></option>)}
           </Select>
         </Field>
         {[customer.sector,customer.city].some(Boolean)&&<div className="document-customer-hint"><span>{[customer.sector,customer.city].filter(Boolean).join(" · ")}</span></div>}
       </div>
       <div hidden={step!==undefined&&step!==0&&step!==2} className="form-section">
-        <h2>{type}details</h2>
+        <h2>{type}<LocalizedText>{"details"}</LocalizedText></h2>
         <div className="form-grid document-meta-grid">
           {draft.id&&<Field className="document-number-field" label={type==="Rechnung" ? "Rechnungsnummer" : "Angebotsnummer"}><Input value={draft.number} readOnly aria-readonly="true"/></Field>}
           <Field label={type==="Rechnung" ? "Rechnungsdatum" : "Angebotsdatum"}><Input type="date" value={draft.date} onChange={e=>onChange({...draft,date:e.target.value})}/></Field>
           <Field label={type==="Rechnung" ? "Zahlungsfrist" : "Gültig bis"}>
-            {type==="Rechnung" ? <Select value={draft.due} onChange={e=>onChange({...draft,due:e.target.value})}>{!["10","30","45"].includes(draft.due)&&<option value={draft.due}>{draft.due} Tage</option>}<option value="10">10 Tage</option><option value="30">30 Tage</option><option value="45">45 Tage</option></Select> : <Input type="date" value={draft.due} onChange={e=>onChange({...draft,due:e.target.value})}/>}
+            {type==="Rechnung" ? <Select value={draft.due} onChange={e=>onChange({...draft,due:e.target.value})}>{!["10","30","45"].includes(draft.due)&&<option value={draft.due}>{draft.due}<LocalizedText>{" Tage"}</LocalizedText></option>}<option value="10"><LocalizedText>{"10 Tage"}</LocalizedText></option><option value="30"><LocalizedText>{"30 Tage"}</LocalizedText></option><option value="45"><LocalizedText>{"45 Tage"}</LocalizedText></option></Select> : <Input type="date" value={draft.due} onChange={e=>onChange({...draft,due:e.target.value})}/>}
           </Field>
           <Field label="MwSt."><Select value={draft.vatRate} onChange={e=>onChange({...draft,vatRate:e.target.value,positions:draft.positions.map(item=>({...item,vatRate:e.target.value}))})}><option value="8.1">8.10 %</option><option value="2.6">2.60 %</option><option value="0">0.00 %</option></Select></Field>
         </div>
       </div>
       <div hidden={step!==undefined&&step!==1} className="form-section">
-        <div className="section-title"><h2>Positionen</h2><button className="icon-action" type="button" onClick={addPosition} aria-label="Position hinzufügen"><Icon name="plus" size={18}/></button></div>
+        <div className="section-title"><h2><LocalizedText>{"Positionen"}</LocalizedText></h2><LocalizedElement as="button" className="icon-action" type="button" onClick={addPosition} aria-label="Position hinzufügen"><Icon name="plus" size={18}/></LocalizedElement></div>
         <div className="line-items document-line-items">
-          <div className="line-head"><span>Beschreibung</span><span>Menge</span><span>Einheit</span><span>Einzelpreis</span><span>Total</span><span/></div>
+          <div className="line-head"><span><LocalizedText>{"Beschreibung"}</LocalizedText></span><span><LocalizedText>{"Menge"}</LocalizedText></span><span><LocalizedText>{"Einheit"}</LocalizedText></span><span><LocalizedText>{"Einzelpreis"}</LocalizedText></span><span><LocalizedText>{"Total"}</LocalizedText></span><span/></div>
           {draft.positions.map(item=>{
             const lineTotal=numberValue(item.quantity)*numberValue(item.price);
             return <div className="document-line-item" key={item.id}>
               <button className="mobile-position-summary" type="button" onClick={()=>{setPositionDraft({...item});setMobilePositionId(item.id)}}>
-                <span><b>{item.description}</b><small>{item.quantity} {({hour:"Std.",piece:"Stück",flat:"Pauschal"} as Record<string,string>)[item.unit??""]??item.unit??"Stück"} × {draft.currency??"CHF"} {money(numberValue(item.price))}</small></span>
-                <strong>{draft.currency??"CHF"} {money(lineTotal)}</strong><Icon name="arrow" size={16}/>
+                <span><b><LocalizedText>{item.description}</LocalizedText></b><small>{item.quantity} <LocalizedText>{({hour:"Std.",piece:"Stück",flat:"Pauschal"} as Record<string,string>)[item.unit??""]??item.unit??"Stück"}</LocalizedText><LocalizedText>{" × "}</LocalizedText><LocalizedText>{draft.currency??"CHF"}</LocalizedText> {money(numberValue(item.price))}</small></span>
+                <strong><LocalizedText>{draft.currency??"CHF"}</LocalizedText> {money(lineTotal)}</strong><Icon name="arrow" size={16}/>
               </button>
-              <label className="mobile-line-field description"><span>Beschreibung</span><Input aria-label="Beschreibung" value={item.description} onChange={e=>updatePosition(item.id,{description:e.target.value})}/></label>
-              <label className="mobile-line-field"><span>Menge</span><Input aria-label="Menge" inputMode="decimal" value={item.quantity} onChange={e=>updatePosition(item.id,{quantity:e.target.value})}/></label>
-              <label className="mobile-line-field"><span>Einheit</span><Select aria-label="Einheit" value={item.unit??"Stück"} onChange={e=>updatePosition(item.id,{unit:e.target.value})}><option value="Stück">Stück</option><option value="Stunden">Stunden</option></Select></label>
-              <label className="mobile-line-field"><span>Einzelpreis</span><Input aria-label="Einzelpreis" inputMode="decimal" value={item.price} onChange={e=>updatePosition(item.id,{price:e.target.value})}/></label>
-              <div className="mobile-line-total"><span>Total</span><b>{money(lineTotal)}</b></div>
-              <button className="line-remove" type="button" aria-label="Position entfernen" disabled={draft.positions.length===1} onClick={()=>removePosition(item.id)}><Icon name="close" size={15}/></button>
+              <label className="mobile-line-field description"><span><LocalizedText>{"Beschreibung"}</LocalizedText></span><Input aria-label="Beschreibung" value={item.description} onChange={e=>updatePosition(item.id,{description:e.target.value})}/></label>
+              <label className="mobile-line-field"><span><LocalizedText>{"Menge"}</LocalizedText></span><Input aria-label="Menge" inputMode="decimal" value={item.quantity} onChange={e=>updatePosition(item.id,{quantity:e.target.value})}/></label>
+              <label className="mobile-line-field"><span><LocalizedText>{"Einheit"}</LocalizedText></span><Select aria-label="Einheit" value={item.unit??"Stück"} onChange={e=>updatePosition(item.id,{unit:e.target.value})}><option value="Stück"><LocalizedText>{"Stück"}</LocalizedText></option><option value="Stunden"><LocalizedText>{"Stunden"}</LocalizedText></option></Select></label>
+              <label className="mobile-line-field"><span><LocalizedText>{"Einzelpreis"}</LocalizedText></span><Input aria-label="Einzelpreis" inputMode="decimal" value={item.price} onChange={e=>updatePosition(item.id,{price:e.target.value})}/></label>
+              <div className="mobile-line-total"><span><LocalizedText>{"Total"}</LocalizedText></span><b>{money(lineTotal)}</b></div>
+              <LocalizedElement as="button" className="line-remove" type="button" aria-label="Position entfernen" disabled={draft.positions.length===1} onClick={()=>removePosition(item.id)}><Icon name="close" size={15}/></LocalizedElement>
             </div>;
           })}
         </div>
-        <div className="invoice-totals"><span>Zwischentotal <b>{draft.currency??"CHF"} {money(totals.subtotal)}</b></span><span>MwSt. {Number(draft.vatRate).toLocaleString("de-CH",{maximumFractionDigits:2})} % <b>{draft.currency??"CHF"} {money(totals.vat)}</b></span><strong>Total <b>{draft.currency??"CHF"} {money(totals.total)}</b></strong></div>
+        <div className="invoice-totals"><span><LocalizedText>{"Zwischentotal "}</LocalizedText><b><LocalizedText>{draft.currency??"CHF"}</LocalizedText> {money(totals.subtotal)}</b></span><span><LocalizedText>{"MwSt. "}</LocalizedText>{Number(draft.vatRate).toLocaleString("de-CH",{maximumFractionDigits:2})} % <b><LocalizedText>{draft.currency??"CHF"}</LocalizedText> {money(totals.vat)}</b></span><strong><LocalizedText>{"Total "}</LocalizedText><b><LocalizedText>{draft.currency??"CHF"}</LocalizedText> {money(totals.total)}</b></strong></div>
       </div>
-      {mobilePositionId&&(()=>{const item=positionDraft;if(!item)return null;return <FormSheet label={"Position bearbeiten"} description={item.description} open={true} onClose={closePosition} busy={false} className={"mobile-position-sheet"} layerClassName={"mobile-position-layer"} ariaLabel={"Position bearbeiten"}><div className="sheet-body mobile-position-fields"><Field label="Beschreibung"><Input value={item.description} onChange={e=>setPositionDraft({...item,description:e.target.value})}/></Field><div><Field label="Menge"><Input inputMode="decimal" value={item.quantity} onChange={e=>setPositionDraft({...item,quantity:e.target.value})}/></Field><Field label="Einheit"><Select value={item.unit??"Stück"} onChange={e=>setPositionDraft({...item,unit:e.target.value})}><option value="Stück">Stück</option><option value="Stunden">Stunden</option></Select></Field><Field label="Einzelpreis"><Input inputMode="decimal" value={item.price} onChange={e=>setPositionDraft({...item,price:e.target.value})}/></Field></div><div className="mobile-position-sheet-total"><span>Total</span><b>{draft.currency??"CHF"} {money(numberValue(item.quantity)*numberValue(item.price))}</b></div><button className="text-action mobile-position-remove" type="button" disabled={draft.positions.length===1} onClick={()=>{removePosition(item.id);closePosition()}}>Position entfernen</button></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={closePosition}>Abbrechen</Button><Button onClick={()=>{updatePosition(item.id,item);closePosition()}}>Übernehmen</Button></div></FormSheet>})()}
-      <div hidden={step!==undefined&&step!==2} className="form-section optional-row document-note-section">{!noteOpen?<button className="text-action add-note-action" type="button" onClick={()=>setNoteOpen(true)}><Icon name="plus" size={16}/> Notiz hinzufügen</button>:<><div className="section-title"><h2>Notiz</h2>{!draft.note&&<button className="text-action" type="button" onClick={()=>setNoteOpen(false)}>Schliessen</button>}</div><Field label="Text für den Kunden"><Textarea autoFocus value={draft.note} onChange={e=>onChange({...draft,note:e.target.value})} placeholder="Optional"/></Field></>}</div>
+      {mobilePositionId&&(()=>{const item=positionDraft;if(!item)return null;return <FormSheet label={"Position bearbeiten"} description={item.description} open={true} onClose={closePosition} busy={false} className={"mobile-position-sheet"} layerClassName={"mobile-position-layer"} ariaLabel={"Position bearbeiten"}><div className="sheet-body mobile-position-fields"><Field label="Beschreibung"><Input value={item.description} onChange={e=>setPositionDraft({...item,description:e.target.value})}/></Field><div><Field label="Menge"><Input inputMode="decimal" value={item.quantity} onChange={e=>setPositionDraft({...item,quantity:e.target.value})}/></Field><Field label="Einheit"><Select value={item.unit??"Stück"} onChange={e=>setPositionDraft({...item,unit:e.target.value})}><option value="Stück"><LocalizedText>{"Stück"}</LocalizedText></option><option value="Stunden"><LocalizedText>{"Stunden"}</LocalizedText></option></Select></Field><Field label="Einzelpreis"><Input inputMode="decimal" value={item.price} onChange={e=>setPositionDraft({...item,price:e.target.value})}/></Field></div><div className="mobile-position-sheet-total"><span><LocalizedText>{"Total"}</LocalizedText></span><b><LocalizedText>{draft.currency??"CHF"}</LocalizedText> {money(numberValue(item.quantity)*numberValue(item.price))}</b></div><button className="text-action mobile-position-remove" type="button" disabled={draft.positions.length===1} onClick={()=>{removePosition(item.id);closePosition()}}><LocalizedText>{"Position entfernen"}</LocalizedText></button></div><div className="filter-sheet-actions"><Button variant="secondary" onClick={closePosition}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button onClick={()=>{updatePosition(item.id,item);closePosition()}}><LocalizedText>{"Übernehmen"}</LocalizedText></Button></div></FormSheet>})()}
+      <div hidden={step!==undefined&&step!==2} className="form-section optional-row document-note-section">{!noteOpen?<button className="text-action add-note-action" type="button" onClick={()=>setNoteOpen(true)}><Icon name="plus" size={16}/><LocalizedText>{" Notiz hinzufügen"}</LocalizedText></button>:<><div className="section-title"><h2><LocalizedText>{"Notiz"}</LocalizedText></h2>{!draft.note&&<button className="text-action" type="button" onClick={()=>setNoteOpen(false)}><LocalizedText>{"Schliessen"}</LocalizedText></button>}</div><Field label="Text für den Kunden"><Textarea autoFocus value={draft.note} onChange={e=>onChange({...draft,note:e.target.value})} placeholder="Optional"/></Field></>}</div>
     </section>
   </div>;
 }
@@ -533,10 +534,10 @@ export function DocumentModal({ title, onClose, pdfNumber, previewDraft, fileUrl
     if(pdfFile.current&&navigator.canShare?.({files:[pdfFile.current]})){try{await navigator.share({title,files:[pdfFile.current]})}catch{/* share dialog closed */}return;}
     if(pdfBlob){const url=URL.createObjectURL(pdfBlob);const link=document.createElement("a");link.href=url;link.download=(pdfNumber||"Entwurf")+".pdf";link.click();window.setTimeout(()=>URL.revokeObjectURL(url),1000);}
   };
-  return <section ref={modalDialog} tabIndex={-1} className="document-modal" role="dialog" aria-modal="true" aria-label={title}>
-    <header><span className="document-modal-header-spacer" aria-hidden="true"/><strong>{title}</strong><div className="document-modal-header-actions"><button type="button" aria-label={zoomed?"Auf Bildschirm einpassen":"Vorschau vergrössern"} aria-pressed={zoomed} onClick={()=>setZoomed(value=>!value)}><Icon name="search"/></button><button type="button" disabled={!pdfBlob} aria-label="Teilen oder herunterladen" onClick={()=>void share()}><Icon name="upload"/></button><button type="button" aria-label="Vorschau schliessen" onClick={onClose}><Icon name="close"/></button></div></header>
-    <div className="document-modal-body">{pdfError?<ErrorState>{pdfError}</ErrorState>:pdfBlob?<DocumentPageViewer key={previewJson+String(pdfNumber)} file={pdfBlob} zoomed={zoomed}/>:<LoadingState>PDF wird geladen …</LoadingState>}</div>
-  </section>;
+  return <LocalizedElement as="section" ref={modalDialog} tabIndex={-1} className="document-modal" role="dialog" aria-modal="true" aria-label={title}>
+    <header><span className="document-modal-header-spacer" aria-hidden="true"/><strong><LocalizedText>{title}</LocalizedText></strong><div className="document-modal-header-actions"><LocalizedElement as="button" type="button" aria-label={zoomed?"Auf Bildschirm einpassen":"Vorschau vergrössern"} aria-pressed={zoomed} onClick={()=>setZoomed(value=>!value)}><Icon name="search"/></LocalizedElement><LocalizedElement as="button" type="button" disabled={!pdfBlob} aria-label="Teilen oder herunterladen" onClick={()=>void share()}><Icon name="upload"/></LocalizedElement><LocalizedElement as="button" type="button" aria-label="Vorschau schliessen" onClick={onClose}><Icon name="close"/></LocalizedElement></div></header>
+    <div className="document-modal-body">{pdfError?<ErrorState><LocalizedText>{pdfError}</LocalizedText></ErrorState>:pdfBlob?<DocumentPageViewer key={previewJson+String(pdfNumber)} file={pdfBlob} zoomed={zoomed}/>:<LoadingState><LocalizedText>{"PDF wird geladen …"}</LocalizedText></LoadingState>}</div>
+  </LocalizedElement>;
 }
 
 function useDocumentCompany(){

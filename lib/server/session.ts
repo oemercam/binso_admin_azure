@@ -1,4 +1,5 @@
 import "server-only";
+import {maintenanceState} from "@/lib/server/maintenance";
 import {createHash,randomBytes} from "node:crypto";
 import {cookies,headers} from "next/headers";
 import {query,withTransaction} from "@/lib/server/db";
@@ -21,7 +22,7 @@ export type SessionUser={
 const tokenHash=(token:string)=>createHash("sha256").update(token).digest("hex");
 const ipHash=(value:string)=>createHash("sha256").update(value).digest("hex");
 
-export async function createSession(input:{userId:string;organizationId:string;email:string;name:string;role:SessionUser["role"];ttlHours?:number;cookieName?:string;expectedAuth?:{passwordHash:string;mfaEnabled:boolean;mfaSecretEnc:string|null}}){
+export async function createSession(input:{userId:string;organizationId:string;email:string;name:string;role:SessionUser["role"];ttlHours?:number;persistent?:boolean;cookieName?:string;expectedAuth?:{passwordHash:string;mfaEnabled:boolean;mfaSecretEnc:string|null}}){
  const token=randomBytes(32).toString("base64url");
  const hash=tokenHash(token);
  const ttlHours=Math.max(1,Math.min(input.ttlHours??env.sessionTtlHours,env.sessionTtlHours));
@@ -42,7 +43,7 @@ export async function createSession(input:{userId:string;organizationId:string;e
   );
  });
  const jar=await cookies();
- jar.set(input.cookieName??env.sessionCookieName,token,{httpOnly:true,secure:process.env.NODE_ENV==="production",sameSite:"lax",path:"/",expires:expiresAt});
+ jar.set(input.cookieName??env.sessionCookieName,token,{httpOnly:true,secure:process.env.NODE_ENV==="production",sameSite:"lax",path:"/",...(input.persistent===false?{}:{expires:expiresAt})});
  return result.rows[0]?.id;
 }
 
@@ -88,6 +89,7 @@ export async function getSession():Promise<SessionUser|null>{
 }
 
 export async function requireSession(options:{allowMfaEnrollment?:boolean}={}){
+ if((await maintenanceState()).enabled)throw new ApiError(503,"maintenance","Binso One wird gewartet");
  const session=await getSession();
  if(!session){const {ApiError}=await import("@/lib/server/http");throw new ApiError(401,"unauthorized","Anmeldung erforderlich.");}
  const privileged=["owner","admin","finance"].includes(session.role);

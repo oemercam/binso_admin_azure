@@ -1,3 +1,4 @@
+import './localization-test-adapter.mjs';
 import os from 'node:os';
 import path from 'node:path';
 import {writeTestOutput} from './test-output.mjs';

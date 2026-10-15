@@ -1,4 +1,5 @@
 "use client";
+import {LocalizedText} from "@/lib/client/locale";
 import {useRef,useState} from 'react';
 import {fileRelations} from '@/lib/file-associations';
 import {tenantCan} from '@/lib/permissions';
@@ -22,10 +23,10 @@ export function EntityFiles({purpose,entityId}:{purpose:string;entityId:string})
   finally{busy.current=false;setUploading(false);if(input.current)input.current.value='';}
  };
  if(!production||!relation||!entityId)return null;
- return <section className="surface"><SectionTitle title="Anhänge" action={allowed?<Button requiresWrite variant="secondary" disabled={uploading} onClick={()=>input.current?.click()}>{uploading?'Wird hochgeladen…':'Datei hinzufügen'}</Button>:undefined}/>
+ return <section className="surface"><SectionTitle title="Anhänge" action={allowed?<Button requiresWrite variant="secondary" disabled={uploading} onClick={()=>input.current?.click()}><LocalizedText>{uploading?'Wird hochgeladen…':'Datei hinzufügen'}</LocalizedText></Button>:undefined}/>
   <Input ref={input} hidden type="file" accept="application/pdf,image/png,image/jpeg,image/webp,text/plain,text/csv" aria-label="Anhang auswählen" onChange={e=>void upload(e.target.files?.[0])}/>
-  {files.loading&&<LoadingState>Anhänge werden geladen …</LoadingState>}
-  {(error||files.error)&&<ErrorState onRetry={()=>{setError(null);files.refresh()}} retryLabel="Erneut laden">{error||files.error}</ErrorState>}
+  {files.loading&&<LoadingState><LocalizedText>{"Anhänge werden geladen …"}</LocalizedText></LoadingState>}
+  {(error||files.error)&&<ErrorState onRetry={()=>{setError(null);files.refresh()}} retryLabel="Erneut laden"><LocalizedText>{error||files.error}</LocalizedText></ErrorState>}
   {(files.data?.items??[]).map(file=><RecordRow key={file.id} href={'/api/files/'+encodeURIComponent(file.id)+'/download'} title={file.fileName} meta=""/>)}
   {!files.loading&&!files.error&&!files.data?.items.length&&<EmptyState compact title="Keine Anhänge vorhanden" text=""/>}
  </section>;
