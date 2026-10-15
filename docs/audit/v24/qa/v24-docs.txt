@@ -1,0 +1,5 @@
+
+> binso-one@0.11.0 docs:check /workspace/scratch/aa87b46d92b6/binso_admin_azure
+> node scripts/documentation-consistency-check.mjs
+
+Documentation and public-flow consistency passed: runtime, authentication, billing, privacy and legal content are aligned.

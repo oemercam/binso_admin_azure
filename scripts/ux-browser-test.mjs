@@ -22,7 +22,14 @@ const statisticToday=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Zurich',y
 const [statisticYear,statisticMonth]=statisticToday.split('-').map(Number);
 const previousStatisticFrom=new Date(Date.UTC(statisticYear,statisticMonth-2,1)).toISOString().slice(0,10);
 const previousStatisticTo=new Date(Date.UTC(statisticYear,statisticMonth-1,0)).toISOString().slice(0,10);
-const cashFixture=(income=200)=>process.env.BINSO_UX_FIXTURE_CASE?{...fixtureCase(process.env.BINSO_UX_FIXTURE_CASE).cash,payments:fixtureCase(process.env.BINSO_UX_FIXTURE_CASE).cash.payments.map(p=>({...p,payment_date:statisticToday})),outflows:fixtureCase(process.env.BINSO_UX_FIXTURE_CASE).cash.outflows.map(p=>({...p,payment_date:statisticToday}))}:({payments:[{payment_date:previousStatisticFrom,amount:120},{payment_date:statisticToday,amount:income}],outflows:[{payment_date:statisticToday,amount:50}],incomplete:false});
+const cashFixture=(income=200)=>{
+ const fixture=process.env.BINSO_UX_FIXTURE_CASE?fixtureCase(process.env.BINSO_UX_FIXTURE_CASE):null;
+ const cash=fixture?{...fixture.cash,payments:fixture.cash.payments.map(p=>({...p,payment_date:statisticToday})),outflows:fixture.cash.outflows.map(p=>({...p,payment_date:statisticToday}))}:{payments:[{payment_date:previousStatisticFrom,amount:120},{payment_date:statisticToday,amount:income}],outflows:[{payment_date:statisticToday,amount:50}],incomplete:false};
+ const issued=fixture?.invoices.filter(item=>!['draft','cancelled'].includes(item.status))??[];
+ const gross=issued.reduce((sum,item)=>sum+item.total,0),paid=issued.reduce((sum,item)=>sum+item.paid_amount,0);
+ const financial=fixture?{revenueEvents:gross?[{date:statisticToday,amount:gross}]:[],snapshot:{as_of:statisticToday,paid,open:gross-paid,overdue:0,credit_balance:0}}:dataPaymentMode?{revenueEvents:[{date:previousStatisticFrom,amount:120},{date:statisticToday,amount:invoice.total}],snapshot:{as_of:statisticToday,paid:income+120,open:Math.max(0,invoice.total-income),overdue:0,credit_balance:0}}:{revenueEvents:[{date:previousStatisticFrom,amount:240},{date:statisticToday,amount:400}],snapshot:{as_of:statisticToday,paid:440,open:180,overdue:20,credit_balance:0}};
+ return {...cash,financial};
+};
 
 await fs.mkdir(output,{recursive:true});
 const port=process.env.BINSO_UX_PORT??'3200';
@@ -109,6 +116,7 @@ async function actionEvidence(page,name,theme){
 const navigationCaptures=[];
 async function captureNavigation(page,theme,width,withCreate){navigationCaptures.push({theme,width,withCreate,navigation:await page.locator(".bottom-nav").evaluate(el=>{const r=el.getBoundingClientRect(),c=getComputedStyle(el);return {x:r.x,width:r.width,height:r.height,bottomOffset:innerHeight-r.bottom,position:c.position,borderRadius:c.borderRadius,links:[...el.querySelectorAll("a")].map(a=>a.getAttribute("href"))}})});}
 const results=[];const errors=[];const accessibilityFailures=[];let failMutation=false,posts=0,failLedger=false,failSend=false,messagePosts=0,uploads=0,employeeLedgerFixture=false,groupingFixture=false,releaseReceiptScan;
+let creditPosts=0,failCredit=false,adjustmentPosts=0,failAdjustment=false;const creditKeys=[],adjustmentKeys=[];
 let policyPosts=0,policyRequired=true,policyRole=process.env.BINSO_UX_FIXTURE_CASE==='employee'?'member':['owner','admin','finance'].includes(process.env.BINSO_UX_FIXTURE_CASE)?process.env.BINSO_UX_FIXTURE_CASE:"owner",policyReadOnly=false,failPolicy=false,teamPosts=0,failTeam=false;
 let failPreferences=false,preferencePosts=0;
 let notificationWrites=0,failNotificationWrite=false,securityUnavailable=false,sessionDeletes=0;
@@ -116,6 +124,7 @@ let dataPaymentMode=false,dataPaymentFailed=false,dataPaymentPosts=0,holdDataRef
 let projectSourceMode=false,failProjectSource=false,projectSourceTitle='Synthetic accepted offer',processRecoveryMode=false;
 let incompleteProductResponse=false;let failReportDownload=false,reportExports=0;
 let projectPosts=0,failProjectCreate=false,loseProjectResponse=false;const projectReplays=new Map();
+let revisionPosts=0,failRevision=false,revisedOfferFixture;const revisionKeys=[];
 let customerPosts=0,failCustomerCreate=false,loseCustomerResponse=false;const customerReplays=new Map();
 let teamMemberRole='member';let supportMessages=[];
 const operatorAccount={tenant_id:'tenant-one',tenant:{name:'Prüffirma AG'},plan:'pro',subscription_status:'active',account_status:'active',user_limit:10,updated_at:'2026-10-09'};
@@ -141,6 +150,28 @@ try{
     if(req.method()==='PATCH'&&p==='/api/projects/project-one'){const body=JSON.parse(req.postData());if(body.version!==projectFixture.version)return route.fulfill({status:409,json:{message:'Project changed'}});Object.assign(projectFixture,{name:body.name,status:body.status,notes:body.notes,hours_budget:body.hoursBudget,version:projectFixture.version+1});return route.fulfill({json:{item:projectFixture}});}
     if(p==='/api/payments'&&dataPaymentMode){dataPaymentPosts++;if(incompletePaymentResponse)return route.fulfill({status:201,json:{}});if(dataPaymentFailed)return route.fulfill({status:503,json:{error:'unavailable',message:'Synthetic payment failed'}});const key=req.headers()['idempotency-key'];assert.ok(key,'Financial requests carry a replay key');if(paymentReplays.has(key))return route.fulfill({status:200,json:{item:paymentReplays.get(key)}});const body=JSON.parse(req.postData());invoice.paid_amount+=body.amount;const row={...payment,id:'foundation-payment',amount:body.amount,paid_on:'2026-10-09'};collections.payments.unshift(row);paymentReplays.set(key,row);summary.invoices[0].open_amount=invoice.total-invoice.paid_amount;if(losePaymentResponse){losePaymentResponse=false;return route.abort('failed');}return route.fulfill({status:201,json:{item:row}});}
 
+    if(p==='/api/documents/AN-TEST-1/revision'){
+     revisionPosts++;const key=req.headers()['idempotency-key'];assert.ok(key);revisionKeys.push(key);
+     if(failRevision)return route.fulfill({status:503,json:{message:'Synthetic revision unavailable'}});
+     revisedOfferFixture={...offer,id:'offer-revision',number:'AN-REV-1',status:'draft',revises_offer:offer.number};return route.fulfill({status:201,json:{item:revisedOfferFixture}});
+    }
+    if(p==='/api/documents/RE-TEST-1/refunds'){
+     adjustmentPosts++;adjustmentKeys.push(req.headers()['idempotency-key']);assert.ok(adjustmentKeys.at(-1));
+     if(failAdjustment)return route.fulfill({status:503,json:{message:'Synthetic refund unavailable'}});
+     const body=JSON.parse(req.postData());invoice.refund_amount=Number(invoice.refund_amount??0)+body.amount;invoice.refunds=[{id:'refund-one',date:body.date,amount:body.amount,reason:body.reason}];return route.fulfill({status:201,json:{item:invoice.refunds[0]}});
+    }
+    if(p==='/api/documents/RE-TEST-1/send'&&JSON.parse(req.postData()).purpose==='reminder'){
+     adjustmentPosts++;const body=JSON.parse(req.postData());adjustmentKeys.push(body.requestKey);assert.ok(body.requestKey);
+     if(failAdjustment)return route.fulfill({status:503,json:{message:'Synthetic reminder unavailable'}});
+     invoice.reminders=[{id:'reminder-one',stage:1,status:'sent',recipient:body.recipient,amount:invoice.total-invoice.paid_amount,deadline:'2026-10-25',completed_at:'2026-10-15T12:00:00Z'}];return route.fulfill({json:{ok:true}});
+    }
+    if(p==='/api/documents/RE-TEST-1/credits'){
+     creditPosts++;const key=req.headers()['idempotency-key'];assert.ok(key,'Credit booking carries an immutable replay key');creditKeys.push(key);
+     if(failCredit)return route.fulfill({status:503,json:{message:'Synthetic credit unavailable'}});
+     const body=JSON.parse(req.postData());invoice.credit_amount=Number(invoice.credit_amount??0)+body.amount;
+     const credit={number:'GS-2026-000001',date:'2026-10-15',amount:body.amount,reason:body.reason};invoice.credits=[credit];
+     return route.fulfill({status:201,json:{item:credit}});
+    }
     if(p==='/api/documents/preview')return route.fulfill({body:fixturePdf,contentType:'application/pdf'});
     if(p==='/api/demo/session')return route.fulfill({json:{ok:true,databaseBacked:true,expiresIn:86400}});
     if(p==='/api/expenses'){posts++;await new Promise(resolve=>setTimeout(resolve,150));return route.fulfill({status:failMutation?503:200,json:failMutation?{message:'Fixture offline'}:{item:{...expense,id:'new-expense'}}});}
@@ -197,6 +228,8 @@ try{
    else if(p==='/api/finance/overview')data=url.searchParams.get('include')==='workspace'?{...summary,documents:collections.documents,cash:cashFixture(dataPaymentMode?invoice.paid_amount:200),data:{payments:[{payment_date:'2026-09-15',amount:120},{payment_date:'2026-10-05',amount:dataPaymentMode?invoice.paid_amount:200}],expenses:[{expense_date:'2026-09-15',amount:20},{expense_date:'2026-10-05',amount:50}],payroll:[],operatingCosts:[]}}:summary;
    else if(['/api/operator/finance','/api/demo/platform-finance'].includes(p))data={payments:[{payment_date:'2026-10-05',amount:200}],subscriptions:[{created_at:'2026-10-05',monthly_revenue_chf:79}],operatingCosts:[{cost_date:'2026-10-05',amount:20}]};
    else if(p==='/api/finance')data={cash:cashFixture(dataPaymentMode?invoice.paid_amount:200),payments:[{payment_date:'2026-09-15',amount:120},{payment_date:'2026-10-05',amount:dataPaymentMode?invoice.paid_amount:200}],expenses:[{expense_date:'2026-09-15',amount:20},{expense_date:'2026-10-05',amount:50}],payroll:[],operatingCosts:[]};
+   else if(p==='/api/customers/duplicates')data={items:url.searchParams.get('name')===customer.name?[customer]:[]};
+   else if(p==='/api/documents/AN-REV-1')data={item:revisedOfferFixture};
    else if(p==='/api/customers'||p==='/api/demo/data'&&url.searchParams.get('collection')==='customers')data=customerListFixture(url.searchParams);
    else if(p==='/api/demo/data')data=recordListFixture(url.searchParams.get('collection'),url.searchParams);
    else if(['/api/products','/api/employees','/api/expenses','/api/payments'].includes(p))data=recordListFixture(p.split('/')[2],url.searchParams);
@@ -266,11 +299,11 @@ try{
     }
     if(width<=760&&await page.locator('.mobile-back').count()){const back=page.locator('.mobile-back');assert.ok(await back.isVisible(),`${route}: detail back control is visible`);const icon=await back.locator('svg').boundingBox();assert.ok(icon&&icon.width>=18&&icon.height>=18&&icon.x>=0,`${route}: back icon is not clipped`);}
     if(!process.env.BINSO_UX_BASELINE&&['/dashboard','/finanzen','/finanzen/analyse','/kunden/customer-one'].includes(route)){
-      assert.equal(await page.locator('.bo-statistics-kpis>div').count(),3,'Migrated statistics have exactly three metrics');
+      assert.equal(await page.locator('.bo-statistics .bo-metric-tiles>.metric').count(),route==='/kunden/customer-one'?3:4,'The common foundation shows domain-appropriate primary metrics');
       assert.equal(await page.locator('.bo-statistics').count(),1,'One central statistics surface');
       assert.equal(await page.locator('.bo-statistics').evaluate(el=>getComputedStyle(el).backgroundColor),width<=1100?(theme==='light'?'rgb(243, 243, 245)':'rgb(20, 20, 20)'):(theme==='light'?'rgb(255, 255, 255)':'rgb(0, 0, 0)'),'Statistics follow the app surface on phone/tablet and page surface on desktop');
       const trendToggle=page.getByRole('button',{name:'Zeitverlauf anzeigen',exact:true});if(await trendToggle.count())await trendToggle.click();
-      assert.ok(process.env.BINSO_UX_FIXTURE_CASE==='empty'||await page.locator('.bo-statistics-bar').evaluateAll(elements=>elements.some(el=>el.getBoundingClientRect().height>20)),'Actual fixture values produce bars');
+      assert.ok(process.env.BINSO_UX_FIXTURE_CASE==='empty'||await page.locator('.bo-statistics-line').evaluateAll(elements=>elements.some(el=>{const ys=Array.from({length:el.points.numberOfItems},(_,i)=>el.points.getItem(i).y);return Math.max(...ys)-Math.min(...ys)>20})),'Actual fixture values produce time-series lines');
       assert.equal(await page.locator('.revenue-insight,.dashboard-summary,.quick-section,.finance-overview-chart').count(),0,'Migrated pages have no competing KPI/chart layout');
     }
     if(!process.env.BINSO_UX_BASELINE&&route==='/mitarbeiter/employee-one'){await page.getByRole('heading',{name:'Mitarbeiterdetails',exact:true}).waitFor();await page.getByText(employee.email,{exact:true}).waitFor()}
@@ -324,12 +357,13 @@ try{
     const create=page.getByRole('button',{name:'Neu erstellen',exact:true}).filter({visible:true});
     assert.equal(await create.count(),1,'One visible creation entry point on every viewport');
     if(width<=1100){
-     const geometry=await page.evaluate(()=>{const rect=selector=>document.querySelector(selector).getBoundingClientRect().toJSON(),css=selector=>getComputedStyle(document.querySelector(selector));return {nav:rect('.bottom-nav'),plus:rect('.dock-create-action'),capsule:css('.mobile-header-actions').backgroundColor,material:css('.bottom-nav').backgroundColor,header:css('.mobile-header').backgroundColor,page:css('.page-container').backgroundColor,blur:css('.mobile-header').backdropFilter,navBlur:css('.bottom-nav').backdropFilter,targets:[...document.querySelector('.bottom-nav').children].map(el=>el.getBoundingClientRect().toJSON())}});
+     const geometry=await page.evaluate(()=>{const rect=selector=>document.querySelector(selector).getBoundingClientRect().toJSON(),css=selector=>getComputedStyle(document.querySelector(selector));return {nav:rect('.bottom-nav'),plus:rect('.page-head .bo-create-action'),capsule:css('.mobile-header-actions').backgroundColor,material:css('.bottom-nav').backgroundColor,header:css('.mobile-header').backgroundColor,page:css('.page-container').backgroundColor,blur:css('.mobile-header').backdropFilter,navBlur:css('.bottom-nav').backdropFilter,targets:[...document.querySelector('.bottom-nav').children].map(el=>el.getBoundingClientRect().toJSON())}});
      assert.equal(geometry.header,geometry.page,'Header and page share one opaque canvas');assert.equal(geometry.blur,'none');assert.equal(geometry.capsule,geometry.material,'Header and navigation share one glass material');assert.ok(geometry.navBlur.includes('blur'),'Only action surfaces use the glass blur');
      assert.ok(geometry.targets.every(t=>t.width>=44&&t.height>=44),'Destinations keep minimum touch targets');
-     assert.ok(width<375?geometry.plus.bottom<=geometry.nav.top-7:geometry.plus.left>=geometry.nav.right+7,'Creation remains separate and never overlaps navigation');
+     assert.ok(geometry.plus.bottom<=geometry.nav.top,'Creation belongs to the page above navigation');
+     assert.equal(await page.locator('.mobile-dock .bo-create-action,.dock-create-action').count(),0,'Navigation has no attached creation action');
      assert.ok(geometry.plus.right<=width&&geometry.plus.bottom<=740);
-     assert.equal(await page.locator('.page-head .page-create-action').filter({visible:true}).count(),0,'Page-level duplicate plus is removed from app views');
+     assert.equal(await page.locator('.page-head .bo-create-action').filter({visible:true}).count(),1,'Exactly one page-owned creation trigger is visible');
      assert.equal(await page.locator('.bottom-nav a[href="/finanzen"]').count(),1,'Finances remains a direct destination');
      await captureNavigation(page,theme,width,true);
     }
@@ -338,13 +372,12 @@ try{
     if(width<=1100){await navigate(base+'/kunden/customer-one');await captureNavigation(page,theme,width,false);}
    }
    await page.setViewportSize({width:390,height:740});await navigate(base+'/kunden');
-   await page.locator('.mobile-dock').getByRole('button',{name:'Neu erstellen',exact:true}).click();const createMenu=page.getByRole('dialog',{name:'Neu erstellen',exact:true});assert.equal(await createMenu.locator('.action-row').first().innerText(),'Kunde','Current section creation is first');
-   await createMenu.getByRole('link',{name:'Rechnung',exact:true}).click();await page.waitForURL(url=>url.pathname==='/rechnungen/neu'&&url.searchParams.get('returnTo')==='/kunden');assert.equal(await page.locator('.mobile-dock').count(),0,'Forms do not retain the creation dock');await page.getByRole('link',{name:'Abbrechen',exact:true}).filter({visible:true}).click();await page.waitForURL(base+'/kunden');
+   const customerCreate=page.getByRole('link',{name:'Neuer Kunde',exact:true}).filter({visible:true});assert.equal(await customerCreate.count(),1,'Customer list has one context-specific creation action');await customerCreate.click();await page.waitForURL(url=>url.pathname==='/kunden/neu');assert.equal(await page.locator('.mobile-dock').count(),0,'Forms do not retain navigation');await page.getByRole('dialog',{name:'Kunde erstellen',exact:true}).getByRole('button',{name:'Abbrechen',exact:true}).click();await page.waitForURL(base+'/kunden');
    await navigate(base+'/kunden/customer-one');assert.equal(await page.locator('.dock-create-action').count(),0,'Entity detail uses its own contextual actions');
    await navigate(base+'/kunden');await page.getByRole('button',{name:'Filter und Sortierung',exact:true}).click();const filters=page.getByRole('dialog',{name:'Filter und Sortierung',exact:true});await filters.getByLabel('Status / Typ',{exact:true}).selectOption('Inaktiv');await filters.getByRole('button',{name:'Anwenden',exact:true}).click();assert.equal((await page.locator('.filter-count').innerText()).replace(/\s+/g,' '),'1 aktive Filter');await page.getByRole('button',{name:'Filter und Sortierung',exact:true}).click();await filters.getByRole('button',{name:'Zurücksetzen',exact:true}).click();await filters.getByRole('button',{name:'Anwenden',exact:true}).click();assert.equal(await page.locator('.filter-count').count(),0);
    await navigate(base+'/dashboard');await page.locator('.mobile-header').getByRole('button',{name:'Suche',exact:true}).click();const searchView=page.getByRole('dialog',{name:'Suche',exact:true});await searchView.getByLabel('Suchen',{exact:true}).fill('Prüffirma');await searchView.getByLabel('Suchen',{exact:true}).press('Enter');await searchView.getByRole('button',{name:'Suche löschen',exact:true}).click();await searchView.getByRole('heading',{name:'Letzte Suchanfragen',exact:true}).waitFor();await searchView.getByRole('button',{name:'Löschen',exact:true}).click();await searchView.getByRole('button',{name:'Rückgängig',exact:true}).click();await searchView.getByRole('heading',{name:'Letzte Suchanfragen',exact:true}).waitFor();await page.keyboard.press('Escape');
-   policyReadOnly=true;await navigate(base+'/dashboard');await page.locator('.mobile-dock').getByRole('button',{name:'Neu erstellen',exact:true}).click();const readOnlyMenu=page.getByRole('dialog',{name:'Neu erstellen',exact:true});assert.deepEqual(await readOnlyMenu.locator('.action-row>span').allTextContents(),['Support-Anfrage'],'Read-only accounts retain support but no business creation');await page.keyboard.press('Escape');policyReadOnly=false;
-   await navigate(base+'/operator/sperrungen');const adminDock=await page.locator('.mobile-dock').boundingBox();assert.ok(adminDock.x>=0&&adminDock.x+adminDock.width<=391,'Admin dock remains inside the viewport');assert.equal(await page.locator('.mobile-dock').getByRole('button',{name:'Einschränkung erstellen',exact:true}).count(),1);await page.locator('.operator-mobile-nav').getByRole('button',{name:'Mehr',exact:true}).click();const more=page.getByRole('dialog',{name:'Weitere Admin-Bereiche',exact:true});assert.equal(await more.getAttribute('data-sheet-kind'),'action','Admin navigation uses the shared sheet');await page.setViewportSize({width:390,height:400});await page.waitForFunction(()=>{const el=document.querySelector('[aria-label="Weitere Admin-Bereiche"]');const r=el?.getBoundingClientRect();return r&&r.y>=0&&r.bottom<=401});const box=await more.boundingBox();assert.ok(box.y>=0&&box.y+box.height<=401,'Admin sheet fits a short viewport');await page.keyboard.press('Escape');
+   policyReadOnly=true;await navigate(base+'/dashboard');const readOnlyCreate=page.locator('.page-head .bo-create-action').filter({visible:true});assert.equal(await readOnlyCreate.count(),1,'Read-only dashboard retains one page-owned support action');assert.equal(await readOnlyCreate.getAttribute('aria-label'),'Support-Anfrage');assert.equal(await readOnlyCreate.getAttribute('href'),'/support/neu?returnTo=%2Fdashboard');assert.equal(await page.locator('.mobile-dock .bo-create-action').count(),0,'Read-only support never returns to navigation');await readOnlyCreate.click();await page.waitForURL(url=>url.pathname==='/support/neu');await page.getByRole('dialog',{name:'Neue Support-Anfrage',exact:true}).waitFor();policyReadOnly=false;
+   await navigate(base+'/operator/sperrungen');const adminDock=await page.locator('.mobile-dock').boundingBox();assert.ok(adminDock.x>=0&&adminDock.x+adminDock.width<=391,'Admin dock remains inside the viewport');assert.equal(await page.locator('.operator-page-head').getByRole('button',{name:'Einschränkung erstellen',exact:true}).filter({visible:true}).count(),1);assert.equal(await page.locator('.mobile-dock .bo-create-action').count(),0,'Operator creation also stays on the page');await page.locator('.operator-mobile-nav').getByRole('button',{name:'Mehr',exact:true}).click();const more=page.getByRole('dialog',{name:'Weitere Admin-Bereiche',exact:true});assert.equal(await more.getAttribute('data-sheet-kind'),'action','Admin navigation uses the shared sheet');await page.setViewportSize({width:390,height:400});await page.waitForFunction(()=>{const el=document.querySelector('[aria-label="Weitere Admin-Bereiche"]');const r=el?.getBoundingClientRect();return r&&r.y>=0&&r.bottom<=401});const box=await more.boundingBox();assert.ok(box.y>=0&&box.y+box.height<=401,'Admin sheet fits a short viewport');await page.keyboard.press('Escape');
    await capture(page,{animations:'disabled',path:path.join(output,theme+'-390-shared-glass-admin.png')});
   }
   if(process.env.BINSO_UX_MATRIX_ONLY==="1"){await context.close();context=null;await browser.close();browser=null;continue;}
@@ -353,7 +386,7 @@ try{
   if(hasInteraction('customers')){
     customerPosts=0;customerReplays.clear();
     await navigate(base+'/kunden/neu');const customerSheet=()=>page.getByRole('dialog',{name:'Kunde erstellen',exact:true});await customerSheet().waitFor();await customerSheet().getByRole('button',{name:'Schliessen',exact:true}).click();await page.waitForURL(base+'/kunden');assert.equal(await page.getByRole('alertdialog').count(),0,'An unchanged customer sheet closes without warning');
-    await navigate(base+'/kunden/neu');await customerSheet().getByLabel('Kundenname *',{exact:true}).fill('Minimal Company AG');assert.equal(await customerSheet().getByText(/^K-\d+/).count(),0,'No generated customer number appears in creation');failCustomerCreate=true;await customerSheet().getByRole('button',{name:'Kunde speichern',exact:true}).click();await page.getByText('Synthetic customer creation unavailable',{exact:true}).waitFor();assert.equal(customerPosts,1);assert.equal(await customerSheet().getByLabel('Kundenname *',{exact:true}).inputValue(),'Minimal Company AG');
+    await navigate(base+'/kunden/neu');await customerSheet().getByLabel('Kundenname *',{exact:true}).fill(customer.name);await customerSheet().getByRole('heading',{name:'Mögliche Dubletten',exact:true}).waitFor();await customerSheet().getByLabel('Als separaten Kunden erfassen',{exact:true}).check();await customerSheet().getByLabel('Kundenname *',{exact:true}).fill('Minimal Company AG');await customerSheet().getByRole('heading',{name:'Mögliche Dubletten',exact:true}).waitFor({state:'hidden'});assert.equal(await customerSheet().getByText(/^K-\d+/).count(),0,'No generated customer number appears in creation');failCustomerCreate=true;await customerSheet().getByRole('button',{name:'Kunde speichern',exact:true}).click();await page.getByText('Synthetic customer creation unavailable',{exact:true}).waitFor();assert.equal(customerPosts,1);assert.equal(await customerSheet().getByLabel('Kundenname *',{exact:true}).inputValue(),'Minimal Company AG');
     await customerSheet().locator('summary').click();await customerSheet().getByLabel('E-Mail',{exact:true}).fill('invalid-email');await customerSheet().locator('summary').click();await customerSheet().getByRole('button',{name:'Kunde speichern',exact:true}).click();assert.equal(customerPosts,1,'An invalid optional email cannot submit even when its group is collapsed');assert.equal(await customerSheet().locator('details').getAttribute('open'),'','Native validation reopens the invalid optional group');await customerSheet().getByLabel('E-Mail',{exact:true}).fill('');await customerSheet().locator('summary').click();
     await page.setViewportSize({width:320,height:400});await customerSheet().locator('summary').click();await customerSheet().getByLabel('Ort',{exact:true}).focus();const customerGeometry=await customerSheet().evaluate(el=>{const header=el.querySelector('.sheet-header').getBoundingClientRect(),footer=el.querySelector('.mobile-sticky-save').getBoundingClientRect();return {headerTop:header.top,footerBottom:footer.bottom,width:el.getBoundingClientRect().width,height:window.innerHeight}});assert.ok(customerGeometry.headerTop>=0&&customerGeometry.footerBottom<=customerGeometry.height+1&&customerGeometry.width<=320,'Customer sheet header and action footer remain reachable in a short narrow viewport');await capture(page,{path:path.join(output,`${theme}-320-400-customer-sheet.png`)},customerSheet());await page.setViewportSize({width:430,height:900});
     failCustomerCreate=false;await customerSheet().getByRole('button',{name:'Kunde speichern',exact:true}).dblclick();await page.waitForURL(base+'/kunden');assert.equal(customerPosts,2,'Two completion taps send one customer retry');assert.equal(customerReplays.size,1);
@@ -362,7 +395,7 @@ try{
     await navigate(base+'/kunden');await page.waitForLoadState('networkidle');
     const listActions=page.locator('.page-actions');
     await listActions.getByRole('searchbox',{name:'Kunden suchen...',exact:true}).waitFor({state:'visible'});
-    assert.equal(await listActions.locator('.records-search-row').getByRole('searchbox',{name:'Kunden suchen...',exact:true}).count(),1,'Search is inline');assert.equal(await listActions.locator('.records-search-row').getByRole('button',{name:'Filter und Sortierung',exact:true}).count(),1,'Filter follows search');assert.equal(await page.locator('.mobile-dock').getByRole('button',{name:'Neu erstellen',exact:true}).count(),1,'Creation belongs to the dock');
+    assert.equal(await listActions.locator('.records-search-row').getByRole('searchbox',{name:'Kunden suchen...',exact:true}).count(),1,'Search is inline');assert.equal(await listActions.locator('.records-search-row').getByRole('button',{name:'Filter und Sortierung',exact:true}).count(),1,'Filter follows search');assert.equal(await listActions.getByRole('link',{name:'Neuer Kunde',exact:true}).count(),1,'Context creation is in the list toolbar');assert.equal(await page.locator('.dock-create-action').count(),0,'No navigation-attached create action');
     assert.equal(await page.locator('main select').count(),0,'Sorting remains in its sheet');assert.equal(await listActions.getByRole('tab',{name:'Alle',exact:true}).count(),1,'Status tabs sit below search');
     await page.getByPlaceholder('Kunden suchen...').fill('not-present');await page.getByText('Keine Treffer für diese Suche',{exact:true}).waitFor();
     await page.getByRole('button',{name:'Filter zurücksetzen',exact:true}).click();await page.locator('.mobile-record-list').getByText(customer.name,{exact:true}).waitFor();
@@ -458,27 +491,32 @@ try{
   if(hasInteraction('finance')){
    await navigate(base+'/finanzen');await page.waitForLoadState('networkidle');
    const statistics=page.locator('.bo-statistics');
-   await statistics.locator('dd').getByText('CHF 320.00',{exact:true}).waitFor();
-   assert.equal(await statistics.locator('.bo-statistics-kpis>div').count(),3);
-   for(const months of [1,3,6,12]){await statistics.getByRole('button',{name:months+' M',exact:true}).click();assert.equal(await statistics.getByRole('button',{name:months+' M',exact:true}).getAttribute('aria-pressed'),'true');assert.equal(await statistics.locator('dd').first().textContent(),months===1?'CHF 200.00':'CHF 320.00');}
+   await statistics.locator('.metric>strong').getByText('CHF 640.00',{exact:true}).waitFor();
+   assert.equal(await statistics.locator('.bo-metric-tiles>.metric').count(),4);
+   for(const months of [1,3,6,12]){await statistics.getByRole('button',{name:months+' M',exact:true}).click();assert.equal(await statistics.getByRole('button',{name:months+' M',exact:true}).getAttribute('aria-pressed'),'true');assert.equal(await statistics.locator('.metric>strong').first().textContent(),months===1?'CHF 400.00':'CHF 640.00');}
    await statistics.getByRole('button',{name:'Eigenen Statistikzeitraum wählen',exact:true}).click();
    const periodSheet=page.getByRole('dialog',{name:'Statistikzeitraum',exact:true});
    await periodSheet.getByLabel('Von *',{exact:true}).fill(previousStatisticFrom);await periodSheet.getByLabel('Bis *',{exact:true}).fill(previousStatisticTo);
    await capture(page,{animations:'disabled',path:path.join(output,`${theme}-430-period-sheet.png`)});
    await periodSheet.getByRole('button',{name:'Anwenden',exact:true}).click();
-   assert.equal(await statistics.locator('dd').first().textContent(),'CHF 120.00');
-   assert.equal(await statistics.locator('dd').nth(1).textContent(),'CHF 0.00');
-   assert.equal(await statistics.locator('dd').nth(2).evaluate(el=>el.firstChild.textContent),'CHF 120.00');
+   assert.equal(await statistics.locator('.metric>strong').first().textContent(),'CHF 240.00');
+   assert.equal(await statistics.locator('.metric>strong').nth(1).textContent(),'CHF 200.00','Current receivables are independent of document period');
+   assert.equal(await statistics.locator('.metric>strong').nth(2).textContent(),'CHF 0.00','Only recorded outflows in the selected period');
+   assert.equal(await statistics.locator('.metric>strong').nth(3).textContent(),'CHF 20.00','Current overdue balance is independently labelled');
    assert.ok(await page.locator('.document-summary-row').filter({hasText:'RE-TEST-1'}).filter({visible:true}).count()>0,'Chart period does not hide a directly searched invoice');
    await page.locator('a[href="/dashboard"]').filter({visible:true}).first().click();await page.waitForURL('**/dashboard');await page.waitForLoadState('networkidle');await page.locator('a[href="/finanzen"]').filter({visible:true}).first().click();await page.waitForURL('**/finanzen');await page.waitForLoadState('networkidle');
-   await page.locator('.bo-statistics dd').first().getByText('CHF 120.00',{exact:true}).waitFor();
-   assert.equal(await page.locator('.bo-statistics dd').first().textContent(),'CHF 120.00','Custom period survives actual same-tab navigation');
+   await page.locator('.bo-statistics .metric>strong').first().getByText('CHF 240.00',{exact:true}).waitFor();
+   assert.equal(await page.locator('.bo-statistics .metric>strong').first().textContent(),'CHF 240.00','Custom period survives actual same-tab navigation');
    await page.locator('.bo-statistics').getByRole('button',{name:'Eigenen Statistikzeitraum wählen',exact:true}).click();
    const emptySheet=page.getByRole('dialog',{name:'Statistikzeitraum',exact:true});await emptySheet.getByLabel('Von *',{exact:true}).fill('2020-01-01');await emptySheet.getByLabel('Bis *',{exact:true}).fill('2020-01-02');await emptySheet.getByRole('button',{name:'Anwenden',exact:true}).click();
    await page.getByText('Keine Buchungen im gewählten Zeitraum.',{exact:true}).waitFor();
    const emptyTrend=page.getByRole('button',{name:'Zeitverlauf anzeigen',exact:true});if(await emptyTrend.count())await emptyTrend.click();
-   assert.ok((await page.locator('.bo-statistics-bar').evaluateAll(elements=>elements.map(el=>el.getBoundingClientRect().height))).every(height=>height===0),'Empty period has no fabricated columns');
+   assert.ok((await page.locator('.bo-statistics-point').evaluateAll(elements=>elements.map(el=>Number(el.getAttribute('data-value'))))).every(value=>value===0),'Empty period has only real zero observations');
    await page.getByText('Keine Buchungen im gewählten Zeitraum.',{exact:true}).waitFor();
+   const overdueSegment=page.locator('.bo-ring-chart circle[role="button"]').last();await overdueSegment.focus();await overdueSegment.press('Enter');
+   await page.getByRole('link',{name:'Details anzeigen',exact:true}).click();await page.waitForURL(url=>url.pathname==='/rechnungen'&&url.searchParams.get('status')==='Überfällig');
+   await page.waitForFunction(()=>document.querySelector('.records-inline-controls [role="tab"][aria-selected="true"]')?.textContent==='Überfällig');
+   await page.getByRole('tab',{name:'Alle',exact:true}).click();assert.equal(new URL(page.url()).searchParams.has('status'),false,'A user filter change clears the consumed chart drilldown');
   }
   if(hasInteraction('time')){
   await page.waitForLoadState("networkidle");await navigate(base+'/zeit');await page.waitForLoadState('networkidle');await page.getByRole('tab',{name:'Einträge',exact:true}).click();
@@ -577,6 +615,56 @@ try{
   }
   if(hasInteraction('documents')){
    invoice.status='draft';await navigate(base+'/rechnungen/RE-TEST-1');await page.waitForLoadState('networkidle');assert.equal(await page.getByText('Zahlungsstand',{exact:true}).count(),0,'Draft does not demand payment');await capture(page,{animations:'disabled',path:path.join(output,`${theme}-430-draft-invoice.png`)});invoice.status='sent';
+   const creditBefore={amount:invoice.credit_amount,credits:invoice.credits};creditPosts=0;creditKeys.length=0;
+   await navigate(base+'/rechnungen/RE-TEST-1');await page.waitForLoadState('networkidle');
+   await page.getByRole('button',{name:'Weitere Aktionen',exact:true}).filter({visible:true}).click();
+   await page.getByRole('dialog',{name:'Weitere Aktionen'}).getByRole('button',{name:'Gutschrift erfassen',exact:true}).click();
+   const creditDialog=page.getByRole('dialog',{name:'Gutschrift erfassen'});await creditDialog.waitFor();
+   await creditDialog.getByLabel('Betrag',{exact:true}).fill('20');await creditDialog.getByLabel('Interne Begründung',{exact:true}).fill('Synthetic price correction');
+   failCredit=true;await creditDialog.getByRole('button',{name:'Gutschrift erfassen',exact:true}).click();
+   await creditDialog.getByText('Synthetic credit unavailable',{exact:true}).waitFor();
+   assert.equal(await creditDialog.getByLabel('Betrag',{exact:true}).inputValue(),'20','A failed credit retains the entered amount');
+   assert.equal(await page.getByText('Gutschrift erfasst.',{exact:true}).count(),0,'Failure cannot show a successful booking');
+   failCredit=false;await creditDialog.getByRole('button',{name:'Gutschrift erfassen',exact:true}).click();
+   await creditDialog.waitFor({state:'hidden'});await page.getByText('GS-2026-000001',{exact:true}).waitFor();
+   assert.equal(creditPosts,2);assert.equal(creditKeys[0],creditKeys[1],'Retry reuses the same credit key');
+   await capture(page,{animations:'disabled',path:path.join(output,`${theme}-430-credit-note.png`)});
+   if(creditBefore.amount===undefined)delete invoice.credit_amount;else invoice.credit_amount=creditBefore.amount;
+   if(creditBefore.credits===undefined)delete invoice.credits;else invoice.credits=creditBefore.credits;
+   revisionPosts=0;revisionKeys.length=0;failRevision=true;
+   await navigate(base+'/angebote/AN-TEST-1');await page.waitForLoadState('networkidle');
+   await page.getByRole('button',{name:'Weitere Aktionen',exact:true}).filter({visible:true}).click();
+   const revisionActions=page.getByRole('dialog',{name:'Weitere Aktionen'});
+   await revisionActions.getByRole('button',{name:'Angebot überarbeiten',exact:true}).click();await revisionActions.getByText('Synthetic revision unavailable',{exact:true}).waitFor();
+   assert.equal(new URL(page.url()).pathname,'/angebote/AN-TEST-1');failRevision=false;
+   await revisionActions.getByRole('button',{name:'Angebot überarbeiten',exact:true}).click();await page.waitForURL(base+'/angebote/AN-REV-1');await page.getByRole('link',{name:'AN-TEST-1',exact:true}).waitFor();
+   assert.equal(revisionPosts,2);assert.equal(revisionKeys[0],revisionKeys[1]);assert.equal(offer.status,'sent','Draft revision does not withdraw the issued source');
+   const ledgerBefore={paid_amount:invoice.paid_amount,credit_amount:invoice.credit_amount,refund_amount:invoice.refund_amount,refunds:invoice.refunds,reminders:invoice.reminders,due_date:invoice.due_date};
+   invoice.paid_amount=invoice.total;invoice.credit_amount=35.13;invoice.refund_amount=0;adjustmentPosts=0;adjustmentKeys.length=0;
+   await navigate(base+'/rechnungen/RE-TEST-1');await page.waitForLoadState('networkidle');
+   await page.getByRole('button',{name:'Weitere Aktionen',exact:true}).filter({visible:true}).click();
+   await page.getByRole('dialog',{name:'Weitere Aktionen'}).getByRole('button',{name:'Rückerstattung erfassen',exact:true}).click();
+   const refundDialog=page.getByRole('dialog',{name:'Rückerstattung erfassen'});await refundDialog.waitFor();
+   await refundDialog.getByLabel('Betrag',{exact:true}).fill('20');await refundDialog.getByLabel('Interne Begründung',{exact:true}).fill('Synthetic bank refund REF-123');await refundDialog.getByLabel('Rückerstattungsdatum',{exact:true}).fill('2026-10-15');
+   failAdjustment=true;await refundDialog.getByRole('button',{name:'Rückerstattung erfassen',exact:true}).click();await refundDialog.getByText('Synthetic refund unavailable',{exact:true}).waitFor();
+   assert.equal(await refundDialog.getByLabel('Betrag',{exact:true}).inputValue(),'20');
+   failAdjustment=false;await refundDialog.getByRole('button',{name:'Rückerstattung erfassen',exact:true}).click();await refundDialog.waitFor({state:'hidden'});
+   const refundEntry=page.locator('.document-detail-section').filter({has:page.getByRole('heading',{name:'Rückerstattungen',exact:true})}).locator('p').filter({hasText:'Synthetic bank refund REF-123'});
+   await refundEntry.waitFor();assert.equal(await refundEntry.count(),1,'Refund is shown once in its history');
+   const refundHistoryText=await refundEntry.innerText();assert.ok(refundHistoryText.includes('Synthetic bank refund REF-123'));assert.ok(refundHistoryText.includes('15.10.2026'));assert.match(refundHistoryText,/CHF\s+20[.,]00/,'Refund history retains the actual booked amount');
+   assert.equal(adjustmentPosts,2);assert.equal(adjustmentKeys[0],adjustmentKeys[1]);assert.equal(invoice.paid_amount,invoice.total,'Refund cannot rewrite the original receipt');
+   Object.assign(invoice,ledgerBefore);invoice.due_date='2020-01-01';adjustmentPosts=0;adjustmentKeys.length=0;
+   await navigate(base+'/rechnungen/RE-TEST-1');await page.waitForLoadState('networkidle');
+   await page.getByRole('button',{name:'Weitere Aktionen',exact:true}).filter({visible:true}).click();
+   await page.getByRole('dialog',{name:'Weitere Aktionen'}).getByRole('button',{name:'Zahlungserinnerung senden',exact:true}).click();
+   const reminderDialog=page.getByRole('dialog',{name:'Zahlungserinnerung senden'});await reminderDialog.waitFor();await reminderDialog.getByLabel('Empfänger',{exact:true}).fill('reminder@example.invalid');
+   failAdjustment=true;await reminderDialog.getByRole('button',{name:'Zahlungserinnerung senden',exact:true}).click();await reminderDialog.getByText('Synthetic reminder unavailable',{exact:true}).waitFor();
+   failAdjustment=false;await reminderDialog.getByRole('button',{name:'Zahlungserinnerung senden',exact:true}).click();await reminderDialog.waitFor({state:'hidden'});await page.getByRole('heading',{name:'Mahnhistorie',exact:true}).waitFor();
+   assert.equal(adjustmentPosts,2);assert.equal(adjustmentKeys[0],adjustmentKeys[1],'Retry retains the delivery key');
+   await capture(page,{animations:'disabled',path:path.join(output,`${theme}-430-reminder-history.png`)});
+   Object.assign(invoice,ledgerBefore);
+
+
   }
   if(hasInteraction('employees')){
   employeeLedgerFixture=true;
@@ -673,8 +761,8 @@ try{
    for(const width of [390,1440]){
     await page.setViewportSize({width,height:740});await navigate(base+'/dashboard');await page.waitForLoadState('networkidle');
     const create=page.getByRole('button',{name:'Neu erstellen',exact:true}).filter({visible:true});
-    const size=await create.boundingBox(),avatar=await page.locator(width<=760?'.mobile-header .person-avatar-small':'.desktop-appbar .person-avatar-small').boundingBox();
-    assert.equal(size.width,width<=1100?54:avatar.width,'Creation has a reachable dock target on app viewports');assert.equal(size.height,size.width);
+    const size=await create.boundingBox();
+    assert.equal(size.width,44,'Page creation has a real 44px touch target on every viewport');assert.equal(size.height,size.width);
     await create.click();const menu=page.getByRole('dialog',{name:'Neu erstellen',exact:true});
     assert.deepEqual(await menu.locator('.action-row>span').allTextContents(),['Kunde','Angebot','Rechnung','Zeit erfassen','Projekt','Zahlung','Spese','Produkt','Mitarbeiter','Support-Anfrage']);
     assert.equal(await page.getByRole('button',{name:'Weiter',exact:true}).count(),0,'Opening global plus never starts an invoice wizard');
@@ -834,7 +922,7 @@ try{
    // Client-renderer fixture only: the server still uses a local demo cookie.
    // All API requests remain intercepted; this does not claim real operator SSO coverage.
    await context.addInitScript(()=>{const selectClient=()=>document.querySelector('[data-operator-demo="true"]')?.setAttribute('data-operator-demo','false');new MutationObserver(selectClient).observe(document,{childList:true,subtree:true,attributes:true,attributeFilter:['data-operator-demo']});selectClient()});
-   await navigate(base+'/operator');await page.getByRole('heading',{name:'Abrechnung',exact:true}).waitFor();const dashboardMetrics=page.locator('.operator-insight-grid .metric');assert.equal(await dashboardMetrics.count(),2,'Secondary dashboard metrics start in one bounded billing view');await page.getByRole('tab',{name:'Support',exact:true}).click();const supportRing=page.locator('.operator-insight-grid .bo-ring-chart');await supportRing.getByRole('img',{name:'Offen / in Bearbeitung / gelöst: 10',exact:true}).waitFor();assert.deepEqual(await supportRing.locator('circle title').allTextContents(),['Offen: 2 · 20 %','In Bearbeitung: 3 · 30 %','Gelöst: 5 · 50 %'],'Support segments use the actual mutually exclusive ticket counts');assert.equal(await supportRing.locator('.bo-ring-details button').count(),3,'Every support segment has an accessible detail action');await supportRing.getByRole('button',{name:'In Bearbeitung 3 · 30 %',exact:true}).click();assert.equal(await supportRing.locator('output').textContent(),'3','Support segment selection exposes its real count');await page.getByRole('tab',{name:'Abrechnung',exact:true}).click();for(const metric of await dashboardMetrics.all()){const boxes=await metric.evaluate(el=>({label:el.querySelector('.metric-top').getBoundingClientRect().toJSON(),value:el.querySelector('strong').getBoundingClientRect().toJSON()}));assert.ok(boxes.value.top>=boxes.label.bottom-1,'Dashboard values and labels occupy separate lines');}
+   await navigate(base+'/operator');await page.getByRole('heading',{name:'Abrechnung',exact:true}).waitFor();const dashboardMetrics=page.locator('.operator-insight-grid .metric');assert.equal(await dashboardMetrics.count(),2,'Secondary dashboard metrics start in one bounded billing view');await page.getByRole('tab',{name:'Support',exact:true}).click();const supportRing=page.locator('.operator-insight-grid .bo-ring-chart');await supportRing.getByRole('group',{name:'Offen / in Bearbeitung / gelöst: 10',exact:true}).waitFor();assert.deepEqual(await supportRing.locator('circle title').allTextContents(),['Offen: 2 · 20 %','In Bearbeitung: 3 · 30 %','Gelöst: 5 · 50 %'],'Support segments use the actual mutually exclusive ticket counts');assert.equal(await supportRing.locator('.bo-ring-details button').count(),3,'Every support segment has an accessible detail action');await supportRing.getByRole('button',{name:'In Bearbeitung 3 · 30 %',exact:true}).click();assert.equal(await supportRing.locator('output').textContent(),'In Bearbeitung: 3','Support segment selection exposes its label and real count');const openSupportSegment=supportRing.getByRole('button',{name:'Offen: 2',exact:true});await openSupportSegment.focus();await openSupportSegment.press('Enter');assert.equal(await supportRing.locator('output').textContent(),'Offen: 2','Interactive chart segments support keyboard selection');await page.getByRole('tab',{name:'Abrechnung',exact:true}).click();for(const metric of await dashboardMetrics.all()){const boxes=await metric.evaluate(el=>({label:el.querySelector('.metric-top').getBoundingClientRect().toJSON(),value:el.querySelector('strong').getBoundingClientRect().toJSON()}));assert.ok(boxes.value.top>=boxes.label.bottom-1,'Dashboard values and labels occupy separate lines');}
    for(const section of await page.locator('.operator-insight-grid>.bo-workspace-section').all())assert.equal(await section.evaluate(el=>getComputedStyle(el).marginTop),'0px','Dashboard grid owns section spacing');const insightGeometry=await page.locator('.operator-insight-grid').evaluate(el=>({grid:el.getBoundingClientRect().width,section:el.firstElementChild.getBoundingClientRect().width}));assert.ok(insightGeometry.section>=insightGeometry.grid-1,'A single selected dashboard view fills its workspace');
    // The server prototype cookie selects the demo finance endpoint even when
    // the client-renderer fixture switches the other operator APIs to production.
@@ -951,11 +1039,11 @@ try{
    const initialPosts=dataPaymentPosts;dataPaymentFailed=true;await tabs.form.getByRole('button',{name:'Zahlung speichern',exact:true}).click();await tabs.form.getByText('Synthetic payment failed',{exact:true}).waitFor();assert.equal(invoice.paid_amount,0);assert.equal(dataPaymentPosts,initialPosts+1);assert.equal(await tabs.detail.getByText(/1[’']561\.97/).count(),0,'Failed payment cannot create a visible fictional balance');
    dataPaymentFailed=false;incompletePaymentResponse=true;await tabs.form.getByRole('button',{name:'Zahlung speichern',exact:true}).click();await tabs.form.getByText('Die Speicherung konnte nicht bestätigt werden. Bitte den gespeicherten Stand prüfen.',{exact:true}).waitFor();assert.equal(await tabs.form.getByText('Zahlung gespeichert.',{exact:true}).count(),0,'Incomplete JSON confirmation cannot report financial success');assert.equal(invoice.paid_amount,0);incompletePaymentResponse=false;losePaymentResponse=true;await tabs.form.getByRole('button',{name:'Zahlung speichern',exact:true}).click();await tabs.form.getByText('Keine Verbindung zum Server. Bitte die Verbindung und den gespeicherten Stand prüfen.',{exact:true}).waitFor();assert.equal(invoice.paid_amount,1000,'The server committed although its response was lost');assert.equal(await tabs.form.getByText('Zahlung gespeichert.',{exact:true}).count(),0,'Lost response is never reported as success');
    await tabs.form.getByRole('button',{name:'Zahlung speichern',exact:true}).click();await tabs.form.getByText('Zahlung gespeichert.',{exact:true}).waitFor();assert.equal(dataPaymentPosts,initialPosts+4);assert.equal(invoice.paid_amount,1000,'Retry replays the original request without a second payment');assert.equal(collections.payments.filter(row=>row.id==='foundation-payment').length,1);
-   for(const [name,value] of [['detail',/1[’']561\.97/],['list',/1[’']561\.97/],['customer',/1[’']561\.97/],['finance',/1[’']561\.97/],['payments',/1[’']000\.00/],['dashboard',/1[’']120\.00/],['customerOverview',/1[’']000\.00/],['activity','Zahlung erhalten']]){
+   for(const [name,value] of [['detail',/1[’']561\.97/],['list',/1[’']561\.97/],['customer',/1[’']561\.97/],['finance',/1[’']561\.97/],['payments',/1[’']000\.00/],['dashboard',/1[’']561\.97/],['customerOverview',/1[’']000\.00/],['activity','Zahlung erhalten']]){
     await tabs[name].waitForFunction(()=>window.v215ConsumerChanges.some(message=>message.domains?.includes('payments')),undefined,{polling:100});await tabs[name].bringToFront();await tabs[name].getByText(value,{exact:typeof value==='string'}).first().waitFor();assert.equal(await tabs[name].evaluate(()=>window.v215ConsumerMarker),'same-document',name+' updates without a reload');
    }
-   for(const [name,amount] of [['dashboard',"CHF 1'120.00"],['finance',"CHF 1'120.00"],['customerOverview',"CHF 1'000.00"]]){
-    await tabs[name].bringToFront();assert.equal((await tabs[name].locator('.bo-statistics dd').first().textContent())?.replaceAll('’',"'"),amount,name+' cash/statistic totals refresh from the same confirmed ledger');
+   for(const [name,amount] of [['dashboard',"CHF 1'561.97"],['finance',"CHF 1'561.97"],['customerOverview',"CHF 1'000.00"]]){
+    await tabs[name].bringToFront();assert.equal((await tabs[name].locator('.bo-statistics .metric>strong').nth(name==='customerOverview'?0:1).textContent())?.replaceAll('’',"'"),amount,name+' domain metric refreshes from the same confirmed ledger');
    }
    for(const tab of Object.values(tabs))await tab.close();dataPaymentMode=false;Object.assign(invoice,priorInvoice);summary.invoices[0].open_amount=priorOpenAmount;collections.payments=collections.payments.filter(row=>row.id!=='foundation-payment');collections.customers=collections.customers.filter(row=>row.id!=='customer-two');Object.assign(customer,priorCustomer);
    console.log('Actual PaymentForm: failed mutation has no fictional balance; lost committed response retries the same key without double payment; confirmed partial payment updates eight mounted cross-tab consumers without reload.');

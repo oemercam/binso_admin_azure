@@ -57,22 +57,22 @@ html[data-theme="dark"] .logo[src*="-black"],
 html[data-theme="light"] .logo[src*="-white"]{filter:invert(1)}
 
 .button{
-  min-height:42px;
-  height:42px;
-  padding:0 16px;
+  min-height:var(--button-height);
+  height:var(--button-height);
+  padding:0 var(--button-padding-inline);
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  gap:8px;
+  gap:var(--button-gap);
   border:1px solid transparent;
   border-radius:var(--radius-md);
   background:transparent;
-  font-size:14px;
-  font-weight:650;
-  line-height:1;
+  font-size:var(--button-font-size);
+  font-weight:var(--button-font-weight);
+  line-height:var(--button-line-height);
   white-space:nowrap;
 }
-.button svg{width:17px;height:17px;flex:0 0 auto}
+.button svg{width:var(--button-icon-size);height:var(--button-icon-size);flex:0 0 auto}
 .button-primary{background:var(--color-inverse-bg);color:var(--color-inverse-fg)}
 .button-secondary{background:var(--color-bg);color:var(--color-fg);border-color:var(--color-line)}
 .button-ghost{background:transparent;color:var(--color-fg)}
@@ -174,9 +174,15 @@ textarea{
 input:focus,
 select:focus,
 textarea:focus{
-  outline:var(--control-focus-width) solid var(--color-fg);
+  outline:var(--control-focus-width) solid var(--app-accent);
   outline-offset:calc(-1 * var(--control-focus-width));
   box-shadow:none;
+}
+
+/* Error colour owns focus as well as the resting border on every surface. */
+:root :is(input,select,textarea)[aria-invalid="true"]{
+  border-color:var(--status-danger-fg);
+  outline-color:var(--status-danger-fg);
 }
 
 input,

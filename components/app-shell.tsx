@@ -14,7 +14,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {useBrowserBackGuard,allowDraftNavigation} from "./use-browser-back-guard";
 import ConfirmDialog from "./confirm-dialog";
-import { ActionRow, ActionSheet, QuickCreateAction, PageHeading, DetailHeading } from "./binso-ux";
+import { ActionRow, ActionSheet, PageHeading, DetailHeading } from "./binso-ux";
 import {Button, EmptyState, Icon, IconButton, Logo, Status, LoadingState} from "./ui";
 import {useApiQuery,useDataRevision} from "@/lib/client/use-api-query";
 import { apiGet, apiPatch, logoutClientSession, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
@@ -362,7 +362,7 @@ function AppShellFrame({
 
       {timerNotice&&<div className="timer-notice" role="status">{timerNotice}</div>}
 
-      {!preview && !formActive && <MobileDock compact={navCompact} action={!backHref&&allowed?<QuickCreateAction key={pathname} placement="dock" section={active} returnTo={pathname}/>:undefined}><LocalizedElement as="nav" className={`bottom-nav ${navCompact ? "is-compact" : ""}`} aria-label="Hauptnavigation">
+      {!preview && !formActive && <MobileDock compact={navCompact}><LocalizedElement as="nav" className={`bottom-nav ${navCompact ? "is-compact" : ""}`} aria-label="Hauptnavigation">
         <Link href="/dashboard" className={active==="dashboard"?"active":""}><Icon name="home"/><span><LocalizedText>{"Start"}</LocalizedText></span></Link>
         {canOpen("/kunden")&&<Link href="/kunden" className={active==="kunden"?"active":""}><Icon name="users"/><span><LocalizedText>{"Kunden"}</LocalizedText></span></Link>}
         <Link href="/finanzen" className={["angebote","rechnungen","zahlungen","belege","finanzen"].includes(active)?"active":""}><Icon name="wallet"/><span><LocalizedText>{"Finanzen"}</LocalizedText></span></Link>

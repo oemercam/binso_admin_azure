@@ -43,6 +43,9 @@ try{
  assert.equal(new Set(sameCustomers.map(row=>row.id)).size,1);assert.equal(new Set(sameCustomers.map(row=>row.customer_no)).size,1);assert.equal(await customerCounter(),beforeCustomers+1);assert.equal((await pool.query('select count(*)::int n from customers where organization_id=$1 and name=$2',[organizationId,'Synthetic parallel minimal customer'])).rows[0].n,1);
  const distinctCustomers=await Promise.all(Array.from({length:10},(_,i)=>customerRepository.createCustomer(organizationId,session.userId,{name:'Synthetic distinct customer '+i},'parallel-customer-number-'+i)));
  assert.equal(new Set(distinctCustomers.map(row=>row.id)).size,10);assert.equal(new Set(distinctCustomers.map(row=>row.customer_no)).size,10);assert.equal(await customerCounter(),beforeCustomers+11);
+ const competingDuplicates=await Promise.allSettled(Array.from({length:4},(_,i)=>customerRepository.createCustomer(organizationId,session.userId,{name:'Parallel duplicate '+i,uid:i%2?'CHE123456789':'CHE-123.456.789 MWST'},'parallel-duplicate-'+i)));
+ assert.equal(competingDuplicates.filter(result=>result.status==='fulfilled').length,1,'Distinct request keys cannot bypass concurrent duplicate detection');
+ assert.ok(competingDuplicates.filter(result=>result.status==='rejected').every(result=>result.reason.code==='customer_duplicate'));
  // Internal projects use the same transaction-bound replay owner after a lost reply.
  globalThis.__parallelProjectSession=session;
  const projectHttp=moduleUrl('export class ApiError extends Error{constructor(status,code,message){super(message);this.status=status;this.code=code}} export const assertSameOrigin=()=>{};export const cleanText=v=>typeof v==="string"?v:"";export const readJson=async r=>r.body;export const json=(data,status=200)=>({data,status});export const apiError=e=>{throw e}');
@@ -57,6 +60,13 @@ try{
  assert.equal(new Set(ids.map(row=>row.number)).size,10);assert.equal(new Set(ids.map(row=>row.id)).size,10);
  const replayArgs={...args,p_idempotency_key:'parallel-document-replay'};
  const replays=await Promise.all(Array.from({length:6},()=>txn(c=>business.mutateApiBusiness(c,session,'create_document_atomic',replayArgs))));assert.equal(new Set(replays.map(row=>row.id)).size,1);
+ const offerRevisionModule=await compile('lib/server/offer-revisions.ts',{'./http':http,'./rbac':rbac,'./plan-access':await compile('lib/server/plan-access.ts',{'@/lib/server/db':scopedDb,'@/config/plan-access':plans}),'./business-idempotency':replay,'./audit':audit,'./repositories/business-api':businessModule,'@/lib/financial-status':financialModuleUrl,'@/config/domain':moduleUrl(await fs.readFile('config/domain.ts','utf8'))});
+ const {createOfferRevision}=await import(offerRevisionModule);
+ const sourceOffer=await txn(c=>business.mutateApiBusiness(c,session,'create_document_atomic',{p_kind:'offer',p_customer_id:customer.id,p_number:'',p_issue_date:'2026-10-09',p_valid_until:'2099-12-31',p_currency:'CHF',p_vat_rate:8.1,p_note:'Parallel offer revision fixture',p_items:[{description:'Synthetic item',quantity:1,unit_price:100,vat_rate:8.1}],p_idempotency_key:'parallel-offer-source'}));
+ await txn(c=>process.changeDocumentStatus(c,session,sourceOffer.number,'issue',''));
+ const revisions=await Promise.allSettled(Array.from({length:4},(_,i)=>txn(c=>createOfferRevision(c,session,sourceOffer.number,'parallel-revision-'+i))));
+ assert.equal(revisions.filter(result=>result.status==='fulfilled').length,1,'Concurrent distinct requests may create only one revision draft');
+ assert.ok(revisions.filter(result=>result.status==='rejected').every(result=>result.reason.code==='revision_exists'));
  const invoice=ids[0];await txn(c=>process.changeDocumentStatus(c,session,invoice.number,'issue',''));
  const payment={p_invoice_id:invoice.id,p_paid_on:'2026-10-09',p_amount:1000,p_method:'bank',p_note:'Isolated payment',p_idempotency_key:'parallel-payment-replay'};
  const payments=await Promise.all(Array.from({length:6},()=>txn(c=>business.mutateApiBusiness(c,session,'create_payment_idempotent',payment))));assert.equal(new Set(payments.map(row=>row.id)).size,1);

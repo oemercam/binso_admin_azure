@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {qaAcceptance} from './qa-acceptance.mjs';
+assert.deepEqual(qaAcceptance({event:'workflow_dispatch',level:'full'}),{release:true,deployment:false},'Production default remains strict');
+assert.deepEqual(qaAcceptance({event:'workflow_dispatch',level:'full',profile:'development'}),{release:false,deployment:true},'Explicit development choice still enforces deployment evidence');
+assert.equal(qaAcceptance({event:'release',profile:'development'}).release,true,'Published releases cannot opt out of production acceptance');
+assert.equal(qaAcceptance({event:'push',ref:'refs/heads/main'}).deployment,true);
+assert.equal(qaAcceptance({event:'pull_request',plannedLevel:'full',browser:true}).deployment,true);
+assert.throws(()=>qaAcceptance({profile:'unknown'}));
+const workflow=fs.readFileSync('.github/workflows/quality.yml','utf8');
+assert.ok(workflow.includes("import {qaAcceptance} from './scripts/qa-acceptance.mjs'"),'Workflow executes the tested policy');
+assert.ok(workflow.includes("FORCE_FULL: ${{ github.event_name == 'schedule' || github.event_name == 'release' || inputs.level == 'full' }}"),'Both profiles retain full test coverage');
+console.log('QA acceptance: full coverage preserved, strict production default, explicit development gate, profile mismatch and invalid profiles rejected.');

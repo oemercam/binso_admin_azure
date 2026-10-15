@@ -4,3 +4,11 @@ export const moduleUrl=source=>'data:text/javascript;base64,'+Buffer.from(ts.tra
 export const moneyModuleUrl=moduleUrl(await fs.readFile('lib/money.ts','utf8'));
 export const financialModuleUrl=moduleUrl((await fs.readFile('lib/financial-status.ts','utf8')).replace('"./money"',JSON.stringify(moneyModuleUrl)));
 export const displayModuleUrl=moduleUrl((await fs.readFile('lib/display-format.ts','utf8')).replace('"./financial-status"',JSON.stringify(financialModuleUrl)));
+
+let localeModule;
+export async function localeTestModuleUrl(){
+ if(localeModule)return localeModule;
+ const config=moduleUrl(await fs.readFile('lib/locales/config.ts','utf8'));
+ localeModule=moduleUrl((await fs.readFile('lib/locales/index.ts','utf8')).replace("import catalogue from './messages.json';",'const catalogue='+await fs.readFile('lib/locales/messages.json','utf8')+';').replace('import pluralCatalogue from "./plurals.json";','const pluralCatalogue='+await fs.readFile('lib/locales/plurals.json','utf8')+';').replace('import templateCatalogue from "./templates.json";','const templateCatalogue='+await fs.readFile('lib/locales/templates.json','utf8')+';').replaceAll('"./config"',JSON.stringify(config)));
+ return localeModule;
+}

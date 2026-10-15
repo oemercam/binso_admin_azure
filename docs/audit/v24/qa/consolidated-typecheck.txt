@@ -1,0 +1,4 @@
+
+> binso-one@0.11.0 typecheck /workspace/scratch/4766d9dd3bd6/repo
+> tsc --noEmit
+

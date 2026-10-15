@@ -1,0 +1,4 @@
+
+> binso-one@0.11.0 lint /workspace/scratch/4766d9dd3bd6/repo
+> eslint . --max-warnings=0
+

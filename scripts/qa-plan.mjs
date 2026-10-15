@@ -38,6 +38,7 @@ export function planChanges(files,{level='standard'}={}){
  let dependencyRoutes=[];try{const catalog=JSON.parse(fs.readFileSync('docs/architecture/ux-inventory.json','utf8'));dependencyRoutes=catalog.routes.filter(r=>modulePaths.some(p=>r.components.some(c=>c.startsWith(p+'#')))).map(r=>r.route).filter(r=>!r.startsWith('/preview')&&!r.startsWith('/operator')).map(r=>r.replace('[id]',r.startsWith('/kunden')?'customer-one':r.startsWith('/produkte')?'product-one':r.startsWith('/mitarbeiter')?'employee-one':r.startsWith('/spesen')?'expense-one':r.startsWith('/zahlungen')?'payment-one':r.startsWith('/support')?'ticket-one':r.startsWith('/rechnungen')?'RE-TEST-1':'AN-TEST-1'));}catch{}
  const routes=full?fullRoutes:broad?representative:modulePaths.length&&dependencyRoutes.length?[...new Set([...dependencyRoutes,...matched.flatMap(g=>g.routes).filter(r=>r.startsWith('/einstellungen/zeiterfassung'))])]:[...new Set(matched.flatMap(g=>g.routes))];
  const suites=new Set();
+ if(global||infrastructure)suites.add('ux-contract-check');
  if(paths.some(p=>/process-draft/.test(p)))suites.add('process-draft-test');
  if(global||matched.some(g=>g!==groups.public&&g!==groups.operator&&g!==groups.settings))suites.add('ux-regression-test');
  if(global){suites.add('theme-selfcheck');suites.add('glass-ux-test');suites.add('ui-build-cache-test');}
@@ -54,6 +55,9 @@ export function planChanges(files,{level='standard'}={}){
  if(paths.some(p=>/database|server\/repositories|app\/api/.test(p)))suites.add('migration-test');
  if(infrastructure||unknown)suites.add('qa-plan-test');
  return {level:full?'full':level,files:paths,global,reason:full?'Release/CI/auth/schema or unknown dependency: full coverage':broad?'Shared/unknown dependency: representative cross-module coverage':'Changed modules only',routes,webkitRoutes:full?webkitFullRoutes:routes,interactions:full||broad?allInteractions:[...new Set(matched.flatMap(g=>g.interactions))],suites:[...suites],widths:full?[320,375,390,430,768,1024,1440]:level==='fast'?[390]:[390,768,1440],webkitWidths:full?[320,375,390,430,768,1024]:[390,768],themes:level==='fast'?['light']:['light','dark']};
+}
+export function shouldRunBrowser(level,args=[]){
+ return !args.includes('--no-browser') && (args.includes('--browser') || !['fast','integration'].includes(level));
 }
 export function changedFiles(base){
  const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).split('\0').filter(Boolean);

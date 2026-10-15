@@ -1,0 +1,5 @@
+
+> binso-one@0.11.0 css:check /workspace/scratch/4766d9dd3bd6/repo
+> node scripts/check-css-architecture.mjs
+
+CSS architecture OK: 451 used classes covered by 6 runtime stylesheets; 17 canonical media blocks.

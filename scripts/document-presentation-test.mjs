@@ -2,7 +2,7 @@ import './localization-test-adapter.mjs';
 import os from 'node:os';
 import path from 'node:path';
 import {writeTestOutput} from './test-output.mjs';
-import {financialModuleUrl,moneyModuleUrl,moduleUrl} from "./data-test-modules.mjs";
+import {financialModuleUrl,moneyModuleUrl,moduleUrl,localeTestModuleUrl} from "./data-test-modules.mjs";
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import {createRequire} from 'node:module';
@@ -24,7 +24,7 @@ assert.ok(!/export function (InvoicePreview|OfferPreview)/.test(source),'Unused 
 
 // Execute the production renderer used by the HTTP PDF endpoints; no alternative calculation.
 const pdfFinancial=financialModuleUrl;
-const pdfModuleSource=(await fs.readFile('lib/server/document-pdf.ts','utf8')).replace('import "server-only";','').replace('"@/lib/qr-bill"',JSON.stringify('data:text/javascript;base64,'+Buffer.from(qrCompiled).toString('base64'))).replace('"@/lib/financial-status"',JSON.stringify(pdfFinancial)).replace('"pdfkit"',JSON.stringify(pathToFileURL(require.resolve('pdfkit')).href)).replace('"swissqrbill/pdf"',JSON.stringify(pathToFileURL(require.resolve('swissqrbill/pdf')).href));
+const pdfModuleSource=(await fs.readFile('lib/server/document-pdf.ts','utf8')).replace('import "server-only";','').replace('"@/lib/locales"',JSON.stringify(await localeTestModuleUrl())).replace('"@/lib/qr-bill"',JSON.stringify('data:text/javascript;base64,'+Buffer.from(qrCompiled).toString('base64'))).replace('"@/lib/financial-status"',JSON.stringify(pdfFinancial)).replace('"pdfkit"',JSON.stringify(pathToFileURL(require.resolve('pdfkit')).href)).replace('"swissqrbill/pdf"',JSON.stringify(pathToFileURL(require.resolve('swissqrbill/pdf')).href));
 const pdfModuleJs=ts.transpileModule(pdfModuleSource,{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText;
 const {documentPdf}=await import('data:text/javascript;base64,'+Buffer.from(pdfModuleJs).toString('base64'));
 const {getDocument}=await import('pdfjs-dist/legacy/build/pdf.mjs');
@@ -64,6 +64,18 @@ const invalid=await inspectPdf({...data,status:'sent',currency:'USD'});assert.eq
 const unusual=await inspectPdf({...data,items:[{...data.items[0],description:'Langer Positionstext '.repeat(400)}]});assert.ok(unusual.pages.length>2);assert.ok(unusual.pages.at(-1).includes('Empfangsschein'));
 const snap=await inspectPdf({...data,document_snapshot:{version:1,intro:'Persistierte individuelle Einleitung',closing:'Persistierter Abschluss'},issuer_snapshot:{...company.raw,legal_name:'Historische Firma AG'},customer_snapshot:{...data.customer,name:'Historischer Kunde AG'},payment_snapshot:{iban:company.raw.iban}});
 assert.ok(snap.pages[0].includes('Historische Firma AG'));assert.ok(snap.pages[0].includes('Historischer Kunde AG'));assert.ok(snap.pages[0].includes('Persistierte individuelle Einleitung'));assert.ok(!snap.pages[0].includes('Individuelle Rechnungseinleitung'));
+const creditedPdf=await inspectPdf({...data,credit_amount:16.2,status:'partial'});const creditedText=creditedPdf.pages.join(' ');
+assert.ok(creditedText.includes('Gutschriften: CHF 16.20'));assert.ok(creditedText.includes('Offener Betrag: CHF 100.00'),'QR payable amount reflects the credit-adjusted receivable');assert.ok(!creditedPdf.pages.at(-1).includes('116.20'));
+const refundedPdf=await inspectPdf({...data,paid_amount:216.2,credit_amount:100,refund_amount:100});const refundedText=refundedPdf.pages.join(' ');
+assert.ok(refundedText.includes('Rückerstattungen: CHF 100.00'));assert.ok(refundedText.includes('Ausgeglichen'));assert.ok(!refundedText.includes('Empfangsschein'));assert.ok(!refundedText.includes('Offen: CHF 0.00'));
+for(const [locale,title,paymentTitle] of [['fr','FACTURE','INFORMATIONS DE PAIEMENT'],['it','FATTURA','INFORMAZIONI DI PAGAMENTO'],['en','INVOICE','PAYMENT INFORMATION']]){
+ const localized=await inspectPdf({...data,document_snapshot:{version:1,locale,intro:'Authored contract text unchanged',closing:''}});const localizedText=localized.pages.join(' ');
+ assert.ok(localizedText.includes(title),locale+' document heading');assert.ok(localizedText.includes(paymentTitle),locale+' payment section');assert.ok(localizedText.includes('Authored contract text unchanged'));
+ assert.ok(!localizedText.includes('ZAHLUNGSINFORMATIONEN'));assert.ok(localized.pages.at(-1).includes(locale==='fr'?'Récépissé':locale==='it'?'Ricevuta':'Receipt'),'QR section uses the same language');
+}
+const frozenLanguagePdf=await inspectPdf({...data,customer:{...data.customer,language:'fr'},document_snapshot:{version:1,locale:'de',intro:'',closing:''}});
+assert.ok(frozenLanguagePdf.pages[0].includes('RECHNUNG'),'Captured document language wins over later master-data changes');
+console.log('Actual multilingual PDFs/Swiss QR: DE/FR/IT/EN labels, captured language, unchanged authored content, credit-adjusted QR and separate refund history passed.');
 const matrix={logo:withLogo,partial:generated,invalid,long:unusual,snapshot:snap};
 for(const status of ['draft','sent','partial','paid','cancelled'])matrix[status]=await inspectPdf({...data,status,paid_amount:status==='sent'?0:status==='paid'?216.2:100});
 for(const status of ['draft','sent'])matrix['offer-'+status]=await inspectPdf({...data,kind:'offer',status});

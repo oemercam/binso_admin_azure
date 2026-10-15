@@ -46,15 +46,22 @@ export async function listApiBusiness(c:PoolClient,s:SessionUser,table:string,ex
    if(!tenantCan(s.role,k==='invoice'?'invoices:read':'sales:read'))continue;
    const lines=k==='invoice'?'invoice_lines':'quote_lines';
    sources.push(`select d.id,d.customer_id,'${k}' kind,d.${no} number,d.status,${k==='offer'?'d.title':'null::text'} title,${k==='invoice'?'d.qr_reference':'null::text'} qr_reference,d.issue_date::text issue_date,${k==='invoice'?'d.due_date::text':'null::text'} due_date,${k==='offer'?'d.valid_until::text':'null::text'} valid_until,d.note,d.intro_text,d.issuer_snapshot,d.customer_snapshot,d.document_snapshot,${k==='invoice'?'d.payment_snapshot':"'{}'::jsonb"} payment_snapshot,d.currency,d.created_at,d.updated_at,${k==='invoice'?'d.paid_amount':'0::numeric'} paid_amount,
+     ${k==='invoice'?`coalesce((select sum(n.amount) from credit_notes n where n.organization_id=d.organization_id and n.invoice_id=d.id and n.credit_date<=(now() at time zone 'Europe/Zurich')::date),0)`:'0::numeric'} credit_amount,
+     ${k==='invoice'?`coalesce((select json_agg(json_build_object('number',n.credit_no,'date',n.credit_date::text,'amount',n.amount,'reason',n.reason) order by n.credit_date,n.created_at,n.id) from credit_notes n where n.organization_id=d.organization_id and n.invoice_id=d.id),'[]'::json)`:`'[]'::json`} credits,
+     ${k==='invoice'?`coalesce((select json_agg(json_build_object('id',r.id,'stage',r.reminder_stage,'status',r.status,'recipient',r.recipient,'amount',r.balance_amount,'deadline',r.payment_deadline::text,'completed_at',r.completed_at) order by r.created_at,r.id) from document_deliveries r where r.organization_id=d.organization_id and r.document_id=d.id and r.purpose='reminder'),'[]'::json)`:`'[]'::json`} reminders,
+     ${k==='invoice'?`coalesce((select sum(r.amount) from invoice_refunds r where r.organization_id=d.organization_id and r.invoice_id=d.id and r.refund_date<=(now() at time zone 'Europe/Zurich')::date),0)`:'0::numeric'} refund_amount,
+     ${k==='invoice'?`coalesce((select json_agg(json_build_object('id',r.id,'date',r.refund_date::text,'amount',r.amount,'reason',r.reason) order by r.refund_date,r.created_at,r.id) from invoice_refunds r where r.organization_id=d.organization_id and r.invoice_id=d.id),'[]'::json)`:`'[]'::json`} refunds,
      ${k==='invoice'?`(select min(x.payment_date)::text from (select p.payment_date,sum(p.amount) over(order by p.payment_date,p.created_at,p.id) accumulated,sum(p.amount) over() recorded_total from payments p where p.organization_id=d.organization_id and p.invoice_id=d.id and p.archived_at is null and p.allocation_status='matched') x where x.accumulated>=d.total_amount and x.recorded_total=d.paid_amount and d.total_amount>0 and d.paid_amount>=d.total_amount)`:'null::text'} paid_on,
      ${k==='invoice'?`(select q.quote_no from quotes q where q.id=d.source_quote_id and q.organization_id=d.organization_id)`:'null::text'} source_offer,
+     ${k==='offer'?`(select q.quote_no from quotes q where q.id=d.revises_quote_id and q.organization_id=d.organization_id)`:'null::text'} revises_offer,
+     ${k==='offer'?`coalesce((select json_agg(json_build_object('number',q.quote_no,'status',q.status) order by q.created_at,q.id) from quotes q where q.revises_quote_id=d.id and q.organization_id=d.organization_id and q.archived_at is null),'[]'::json)`:`'[]'::json`} revisions,
      ${k==='offer'?`(select i.invoice_no from invoices i where i.source_quote_id=d.id and i.organization_id=d.organization_id and i.archived_at is null and i.status<>'cancelled' limit 1)`:'null::text'} invoice_number,
      ${k==='offer'?`(select p.id from projects p where p.source_quote_id=d.id and p.organization_id=d.organization_id and p.archived_at is null limit 1)`:'null::uuid'} project_id,
      ${k==='invoice'?'d.subtotal':`coalesce((select round(sum(l.quantity*l.unit_price),2) from ${lines} l where l.${fk}=d.id and l.organization_id=d.organization_id),0)`} subtotal,
      ${k==='invoice'?'d.vat_amount':`coalesce((select round(sum(l.quantity*l.unit_price*l.vat_rate/100),2) from ${lines} l where l.${fk}=d.id and l.organization_id=d.organization_id),0)`} vat_amount,
      ${k==='invoice'?'d.total_amount':`coalesce((select round(sum(l.quantity*l.unit_price),2)+round(sum(l.quantity*l.unit_price*l.vat_rate/100),2) from ${lines} l where l.${fk}=d.id and l.organization_id=d.organization_id),0)`} total,
      coalesce((select max(l.vat_rate) from ${lines} l where l.${fk}=d.id and l.organization_id=d.organization_id),0) vat_rate,
-     json_build_object('name',c.name,'number',c.customer_no,'street',c.address,'postal_code',c.zip,'city',c.city,'country',c.country) customer,
+     json_build_object('name',c.name,'number',c.customer_no,'street',c.address,'postal_code',c.zip,'city',c.city,'country',c.country,'language',c.language) customer,
      coalesce((select json_agg(json_build_object('id',l.id,'position',l.sort_order,'description',l.description,'quantity',l.quantity,'unit_price',l.unit_price,'unit',l.unit,'vat_rate',l.vat_rate,'line_total',l.quantity*l.unit_price,'expense_ids',${k==='invoice'?`coalesce((select json_agg(x.expense_id) from invoice_line_expenses x where x.invoice_line_id=l.id),'[]'::json)`:"'[]'::json"},'time_entry_ids',${k==='invoice'?`coalesce((select json_agg(x.time_entry_id) from invoice_line_time_entries x where x.invoice_line_id=l.id),'[]'::json)`:"'[]'::json"}) order by l.sort_order) from ${lines} l where l.${fk}=d.id and l.organization_id=d.organization_id),'[]'::json) items
      from ${t} d join customers c on c.id=d.customer_id and c.organization_id=d.organization_id where d.organization_id=$1 and d.archived_at is null`);
   }
@@ -65,12 +72,12 @@ export async function listApiBusiness(c:PoolClient,s:SessionUser,table:string,ex
  // Persisted legacy statuses and document snapshots remain unchanged.
  if(table==='documents'){
   values.push(businessDate());
-  source=`select d.*,case when d.kind='offer' then case when d.status='sent' and d.valid_until<$${values.length}::text then 'expired' else d.status end when d.status in ('draft','cancelled') then d.status when d.total>0 and round(d.total*100)<=round(d.paid_amount*100) then 'paid' when d.due_date<$${values.length}::text and round(d.total*100)>round(d.paid_amount*100) then 'overdue' when round(d.paid_amount*100)>0 then 'partial' else 'open' end display_status from (${source}) d`;
+  source=`select d.*,case when d.kind='offer' then case when d.status='sent' and d.valid_until<$${values.length}::text then 'expired' else d.status end when d.status in ('draft','cancelled') then d.status when d.total>0 and round(greatest(0,d.total-d.credit_amount)*100)<=round(greatest(0,d.paid_amount-d.refund_amount)*100) then 'paid' when d.due_date<$${values.length}::text and round(greatest(0,d.total-d.credit_amount)*100)>round(greatest(0,d.paid_amount-d.refund_amount)*100) then 'overdue' when round(greatest(0,d.paid_amount-d.refund_amount)*100)>0 then 'partial' else 'open' end display_status from (${source}) d`;
  }
  const where:string[]=[];
  const display=filters.get('display_status');
  if(display){
-  if(table!=='documents'||!/^eq\.(draft|open|partial|overdue|paid|sent|accepted|declined|expired|cancelled)$/.test(display))throw new ApiError(400,'invalid_filter','Ungültiger Dokumentstatus.');
+  if(table!=='documents'||!/^eq\.(draft|open|partial|overdue|paid|sent|accepted|declined|expired|revised|cancelled)$/.test(display))throw new ApiError(400,'invalid_filter','Ungültiger Dokumentstatus.');
   const state=display.slice(3);if(state!=='open')values.push(state);
   where.push(state==='open'?"q.display_status in ('open','partial','overdue')":`q.display_status=$${values.length}`);
  }
@@ -142,12 +149,14 @@ async function executeBusinessMutation(c:PoolClient,s:SessionUser,operation:stri
   const amount=Number(args.p_amount);if(!Number.isFinite(amount)||amount<=0)throw new ApiError(400,'amount_invalid','Ungültiger Betrag.');
   const invoice=await c.query('select id,customer_id,total_amount,paid_amount,status from invoices where id::text=$1 and organization_id=$2 and archived_at is null for update',[args.p_invoice_id,s.organizationId]);
   const row=invoice.rows[0];if(!row||['draft','cancelled'].includes(row.status))throw new ApiError(400,'invoice_invalid','Bitte eine offene Rechnung auswählen.');
-  const remaining=openAmount({total:row.total_amount,paid_amount:row.paid_amount});
+  const credits=(await c.query("select coalesce(sum(amount),0) amount from credit_notes where organization_id=$1 and invoice_id=$2 and credit_date<=(now() at time zone 'Europe/Zurich')::date",[s.organizationId,row.id])).rows[0].amount;
+  const refunds=(await c.query("select coalesce(sum(amount),0) amount from invoice_refunds where organization_id=$1 and invoice_id=$2 and refund_date<=(now() at time zone 'Europe/Zurich')::date",[s.organizationId,row.id])).rows[0].amount;
+  const remaining=openAmount({total:row.total_amount,paid_amount:row.paid_amount,credit_amount:credits,refund_amount:refunds});
   if(amount!==Math.round(amount*100)/100||amount>remaining||remaining===0)throw new ApiError(409,'payment_exceeds_balance','Der Zahlungsbetrag darf den offenen Rechnungsbetrag nicht überschreiten. Bitte Zahlungsstand aktualisieren.');
   if(args.p_customer_id&&String(args.p_customer_id)!==String(row.customer_id))throw new ApiError(400,'customer_mismatch','Kunde stimmt nicht mit der Rechnung überein.');
   const payment=await c.query(`insert into payments(organization_id,external_id,invoice_id,payer_customer_id,payment_date,amount,method,reference,allocation_status,created_by_user_id)
    values($1,$2,$3,$4,$5,$6,$7,$8,'matched',$9) returning id,amount,payment_date paid_on`,[s.organizationId,randomUUID(),row.id,row.customer_id,args.p_paid_on,amount,args.p_method,args.p_note,s.userId]);
-  await c.query("update invoices set paid_amount=paid_amount+$1,status=case when paid_amount+$1>=total_amount then 'paid' else 'partial' end,updated_at=now() where id=$2 and organization_id=$3",[amount,row.id,s.organizationId]);
+  await c.query("update invoices set paid_amount=paid_amount+$1,status=case when paid_amount+$1-$5::numeric>=greatest(0,total_amount-$4::numeric) then 'paid' else 'partial' end,updated_at=now() where id=$2 and organization_id=$3",[amount,row.id,s.organizationId,credits,refunds]);
   await c.query('insert into business_idempotency_keys(organization_id,operation,idempotency_key,request_hash,response_json,created_by_user_id) values($1,$2,$3,$4,$5::jsonb,$6)',[s.organizationId,operation,key,hash,JSON.stringify(payment.rows[0]),s.userId]);
   await audit(c,{organizationId:s.organizationId,userId:s.userId,action:"payment.created",entityType:"payment",entityId:payment.rows[0].id});
   return payment.rows[0];

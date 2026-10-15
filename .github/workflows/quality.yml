@@ -1,9 +1,11 @@
 name: Quality
+run-name: "Quality • ${{ github.event_name }} • ${{ inputs.level || 'standard' }}${{ inputs.release_profile == 'development' && ' • development' || '' }}"
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review, converted_to_draft]
   workflow_dispatch:
     inputs:
       level:
@@ -11,6 +13,11 @@ on:
         type: choice
         options: [standard, full]
         default: full
+      release_profile:
+        description: Acceptance scope (full coverage is unchanged)
+        type: choice
+        options: [production, development]
+        default: production
   schedule:
     - cron: '23 1 * * *'
   release:
@@ -45,6 +52,7 @@ jobs:
         id: scope
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          DEFER_BROWSER: ${{ github.event_name == 'pull_request' && github.event.pull_request.draft }}
           FORCE_FULL: ${{ github.event_name == 'schedule' || github.event_name == 'release' || inputs.level == 'full' }}
         shell: bash
         run: |
@@ -55,6 +63,10 @@ jobs:
             node scripts/qa-plan.mjs --level "$LEVEL" --base "$BASE_SHA" | tee /tmp/qa-plan.json
           else
             node scripts/qa-plan.mjs --level full | tee /tmp/qa-plan.json
+          fi
+          if [ "$DEFER_BROWSER" = true ]; then
+            echo "browser=false" >> "$GITHUB_OUTPUT"
+            echo "Draft PR: browser validation deferred until ready_for_review; static, security and build checks remain required." >> "$GITHUB_STEP_SUMMARY"
           fi
           cat /tmp/qa-plan.json >> "$GITHUB_STEP_SUMMARY"
   checks:
@@ -346,14 +358,22 @@ jobs:
           path: evidence/ux/static
       - name: Generate individual requirement coverage and enforce measured failures
         env:
-          RELEASE_GATE: ${{ github.event_name == 'release' || inputs.level == 'full' }}
-          DEPLOYMENT_GATE: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'pull_request' && needs.plan.outputs.level == 'full') }}
+          QA_EVENT: ${{ github.event_name }}
+          QA_LEVEL: ${{ inputs.level }}
+          QA_RELEASE_PROFILE: ${{ inputs.release_profile || 'production' }}
+          QA_REF: ${{ github.ref }}
+          QA_PLANNED_LEVEL: ${{ needs.plan.outputs.level }}
+          QA_BROWSER: ${{ needs.plan.outputs.browser }}
         shell: bash
         run: |
           set -euo pipefail
-          EXTRA=()
-          if [ "$RELEASE_GATE" = true ]; then EXTRA+=(--release); fi
-          if [ "$DEPLOYMENT_GATE" = true ]; then EXTRA+=(--deployment-release); fi
+          node --input-type=module - <<'JS' > "$RUNNER_TEMP/qa-acceptance-flags"
+          import {qaAcceptance} from './scripts/qa-acceptance.mjs';
+          const decision=qaAcceptance({event:process.env.QA_EVENT,level:process.env.QA_LEVEL,profile:process.env.QA_RELEASE_PROFILE,ref:process.env.QA_REF,plannedLevel:process.env.QA_PLANNED_LEVEL,browser:process.env.QA_BROWSER==='true'});
+          if(decision.release)console.log('--release');
+          if(decision.deployment)console.log('--deployment-release');
+          JS
+          mapfile -t EXTRA < "$RUNNER_TEMP/qa-acceptance-flags"
           node scripts/compliance/visual.mjs evidence/ux ux-compliance/visual-baselines.v1.json evidence/ux/compliance-visual.json
           node scripts/compliance/report.mjs --static --gate "${EXTRA[@]}" evidence/ux --out docs/ux-compliance
       - name: Publish compliance report including failures and missing evidence
@@ -468,13 +488,13 @@ jobs:
             test "$BROWSER_RESULT" = skipped || { echo "::error::Unexpected browser result: $BROWSER_RESULT"; exit 1; }
           fi
       - name: Download fully verified production candidate
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.level == 'full'))
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: binso-candidate-${{ github.sha }}
           path: deploy
       - name: Promote verified artifact for Azure (no rebuild)
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.level == 'full'))
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: binso-one-${{ github.sha }}
@@ -483,13 +503,13 @@ jobs:
           compression-level: 0
           retention-days: 2
       - name: Download exact qualified scanner image
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.level == 'full'))
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: binso-scanner-candidate-${{ github.sha }}
           path: scanner-image
       - name: Promote qualified scanner for Azure (no rebuild)
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.level == 'full'))
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: binso-scanner-${{ github.sha }}

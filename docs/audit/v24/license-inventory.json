@@ -1,0 +1,3375 @@
+{
+  "source": "corepack pnpm licenses list --json; lockfile installed with frozen resolution",
+  "packages": [
+    {
+      "name": "@babel/code-frame",
+      "versions": [
+        "7.29.7"
+      ],
+      "license": "MIT",
+      "homepage": "https://babel.dev/docs/en/next/babel-code-frame",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@babel/compat-data",
+      "versions": [
+        "7.29.7"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/babel/babel#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@babel/core",
+      "versions": [
+        "7.29.7"
+      ],
+      "license": "MIT",
+      "homepage": "https://babel.dev/docs/en/next/babel-core",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@babel/generator",
+      "versions": [
+        "7.29.8"
+      ],
+      "license": "MIT",
+      "homepage": "https://babel.dev/docs/en/next/babel-generator",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@babel/helper-compilation-targets",
+      "versions": [
+        "7.29.7"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/babel/babel#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@babel/helper-globals",
+      "versions": [
+        "7.29.7"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/babel/babel#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@babel/helper-module-imports",
+      "versions": [
+        "7.29.7"
+      ],
+      "license": "MIT",
+      "homepage": "https://babel.dev/docs/en/next/babel-helper-module-imports",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@babel/helper-module-transforms",
+      "versions": [
+        "7.29.7"
+      ],
+      "license": "MIT",
+      "homepage": "https://babel.dev/docs/en/next/babel-helper-module-transforms",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@babel/helper-string-parser",
+      "versions": [
+        "7.29.7"
+      ],
+      "license": "MIT",
+      "homepage": "https://babel.dev/docs/en/next/babel-helper-string-parser",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@babel/helper-validator-identifier",
+      "versions": [
+        "7.29.7"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/babel/babel#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@babel/helper-validator-option",
+      "versions": [
+        "7.29.7"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/babel/babel#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@babel/helpers",
+      "versions": [
+        "7.29.7"
+      ],
+      "license": "MIT",
+      "homepage": "https://babel.dev/docs/en/next/babel-helpers",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@babel/parser",
+      "versions": [
+        "7.29.9"
+      ],
+      "license": "MIT",
+      "homepage": "https://babel.dev/docs/en/next/babel-parser",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@babel/template",
+      "versions": [
+        "7.29.7"
+      ],
+      "license": "MIT",
+      "homepage": "https://babel.dev/docs/en/next/babel-template",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@babel/traverse",
+      "versions": [
+        "7.29.8"
+      ],
+      "license": "MIT",
+      "homepage": "https://babel.dev/docs/en/next/babel-traverse",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@babel/types",
+      "versions": [
+        "7.29.8"
+      ],
+      "license": "MIT",
+      "homepage": "https://babel.dev/docs/en/next/babel-types",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@electric-sql/pglite",
+      "versions": [
+        "0.3.15"
+      ],
+      "license": "Apache-2.0",
+      "homepage": "https://pglite.dev",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@eslint-community/eslint-utils",
+      "versions": [
+        "4.9.1",
+        "4.10.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/eslint-community/eslint-utils#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@eslint-community/regexpp",
+      "versions": [
+        "4.12.2"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/eslint-community/regexpp#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@eslint/config-array",
+      "versions": [
+        "0.21.2"
+      ],
+      "license": "Apache-2.0",
+      "homepage": "https://github.com/eslint/rewrite/tree/main/packages/config-array#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@eslint/config-helpers",
+      "versions": [
+        "0.4.2"
+      ],
+      "license": "Apache-2.0",
+      "homepage": "https://github.com/eslint/rewrite/tree/main/packages/config-helpers#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@eslint/core",
+      "versions": [
+        "0.17.0"
+      ],
+      "license": "Apache-2.0",
+      "homepage": "https://github.com/eslint/rewrite/tree/main/packages/core#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@eslint/eslintrc",
+      "versions": [
+        "3.3.7"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/eslint/eslintrc#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@eslint/js",
+      "versions": [
+        "9.39.5"
+      ],
+      "license": "MIT",
+      "homepage": "https://eslint.org",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@eslint/object-schema",
+      "versions": [
+        "2.1.7"
+      ],
+      "license": "Apache-2.0",
+      "homepage": "https://github.com/eslint/rewrite/tree/main/packages/object-schema#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@eslint/plugin-kit",
+      "versions": [
+        "0.4.1"
+      ],
+      "license": "Apache-2.0",
+      "homepage": "https://github.com/eslint/rewrite/tree/main/packages/plugin-kit#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@humanfs/core",
+      "versions": [
+        "0.19.2"
+      ],
+      "license": "Apache-2.0",
+      "homepage": "https://github.com/humanwhocodes/humanfs#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@humanfs/node",
+      "versions": [
+        "0.16.8"
+      ],
+      "license": "Apache-2.0",
+      "homepage": "https://github.com/humanwhocodes/humanfs#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@humanfs/types",
+      "versions": [
+        "0.15.0"
+      ],
+      "license": "Apache-2.0",
+      "homepage": "https://github.com/humanwhocodes/humanfs#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@humanwhocodes/module-importer",
+      "versions": [
+        "1.0.1"
+      ],
+      "license": "Apache-2.0",
+      "homepage": "https://github.com/humanwhocodes/module-importer#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@humanwhocodes/retry",
+      "versions": [
+        "0.4.3"
+      ],
+      "license": "Apache-2.0",
+      "homepage": "https://github.com/humanwhocodes/retry#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@img/colour",
+      "versions": [
+        "1.1.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/lovell/colour#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@img/sharp-libvips-linux-x64",
+      "versions": [
+        "1.3.4"
+      ],
+      "license": "LGPL-3.0-or-later",
+      "homepage": "https://sharp.pixelplumbing.com",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@img/sharp-libvips-linuxmusl-x64",
+      "versions": [
+        "1.3.4"
+      ],
+      "license": "LGPL-3.0-or-later",
+      "homepage": "https://sharp.pixelplumbing.com",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@img/sharp-linux-x64",
+      "versions": [
+        "0.35.5"
+      ],
+      "license": "Apache-2.0",
+      "homepage": "https://sharp.pixelplumbing.com",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@img/sharp-linuxmusl-x64",
+      "versions": [
+        "0.35.5"
+      ],
+      "license": "Apache-2.0",
+      "homepage": "https://sharp.pixelplumbing.com",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@jridgewell/gen-mapping",
+      "versions": [
+        "0.3.13"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/jridgewell/sourcemaps/tree/main/packages/gen-mapping",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@jridgewell/remapping",
+      "versions": [
+        "2.3.5"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/jridgewell/sourcemaps/tree/main/packages/remapping",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@jridgewell/resolve-uri",
+      "versions": [
+        "3.1.2"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/jridgewell/resolve-uri#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@jridgewell/sourcemap-codec",
+      "versions": [
+        "1.6.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/jridgewell/sourcemaps/tree/main/packages/sourcemap-codec",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@jridgewell/trace-mapping",
+      "versions": [
+        "0.3.31"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/jridgewell/sourcemaps/tree/main/packages/trace-mapping",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@napi-rs/canvas",
+      "versions": [
+        "0.1.100"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/Brooooooklyn/canvas#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@napi-rs/canvas-linux-x64-gnu",
+      "versions": [
+        "0.1.100"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/Brooooooklyn/canvas#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@napi-rs/canvas-linux-x64-musl",
+      "versions": [
+        "0.1.100"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/Brooooooklyn/canvas#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@next/env",
+      "versions": [
+        "16.3.8"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/vercel/next.js#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@next/eslint-plugin-next",
+      "versions": [
+        "16.3.8"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/vercel/next.js#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@next/swc-linux-x64-gnu",
+      "versions": [
+        "16.3.8"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/vercel/next.js#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@next/swc-linux-x64-musl",
+      "versions": [
+        "16.3.8"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/vercel/next.js#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@nodelib/fs.scandir",
+      "versions": [
+        "2.1.5"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/nodelib/nodelib/tree/master#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@nodelib/fs.stat",
+      "versions": [
+        "2.0.5"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/nodelib/nodelib/tree/master#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@nodelib/fs.walk",
+      "versions": [
+        "1.2.8"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/nodelib/nodelib/tree/master#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@nolyfill/is-core-module",
+      "versions": [
+        "1.0.39"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/SukkaW/nolyfill#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@rtsao/scc",
+      "versions": [
+        "1.1.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/rtsao/scc#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@swc/helpers",
+      "versions": [
+        "0.5.23"
+      ],
+      "license": "Apache-2.0",
+      "homepage": "https://swc.rs",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@types/estree",
+      "versions": [
+        "1.0.9"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/estree",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@types/json-schema",
+      "versions": [
+        "7.0.15"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/json-schema",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@types/json5",
+      "versions": [
+        "0.0.29"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/DefinitelyTyped/DefinitelyTyped#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@types/node",
+      "versions": [
+        "22.20.4"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/node",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@types/pdfkit",
+      "versions": [
+        "0.17.3"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/pdfkit",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@types/pg",
+      "versions": [
+        "8.15.5"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/pg",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@types/react",
+      "versions": [
+        "19.3.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/react",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@types/react-dom",
+      "versions": [
+        "19.3.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/react-dom",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@typescript-eslint/eslint-plugin",
+      "versions": [
+        "8.71.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://typescript-eslint.io/packages/eslint-plugin",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@typescript-eslint/parser",
+      "versions": [
+        "8.71.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://typescript-eslint.io/packages/parser",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@typescript-eslint/project-service",
+      "versions": [
+        "8.71.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://typescript-eslint.io",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@typescript-eslint/scope-manager",
+      "versions": [
+        "8.71.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://typescript-eslint.io/packages/scope-manager",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@typescript-eslint/tsconfig-utils",
+      "versions": [
+        "8.71.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://typescript-eslint.io",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@typescript-eslint/type-utils",
+      "versions": [
+        "8.71.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://typescript-eslint.io",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@typescript-eslint/types",
+      "versions": [
+        "8.71.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://typescript-eslint.io",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@typescript-eslint/typescript-estree",
+      "versions": [
+        "8.71.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://typescript-eslint.io/packages/typescript-estree",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@typescript-eslint/utils",
+      "versions": [
+        "8.71.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://typescript-eslint.io/packages/utils",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@typescript-eslint/visitor-keys",
+      "versions": [
+        "8.71.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://typescript-eslint.io",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@unrs/resolver-binding-linux-x64-gnu",
+      "versions": [
+        "1.12.2"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/unrs/unrs-resolver",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "@unrs/resolver-binding-linux-x64-musl",
+      "versions": [
+        "1.12.2"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/unrs/unrs-resolver",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "acorn",
+      "versions": [
+        "8.18.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/acornjs/acorn",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "acorn-jsx",
+      "versions": [
+        "5.3.2"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/acornjs/acorn-jsx",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "ajv",
+      "versions": [
+        "6.15.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/ajv-validator/ajv",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "ansi-styles",
+      "versions": [
+        "4.3.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/chalk/ansi-styles#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "argparse",
+      "versions": [
+        "2.0.1"
+      ],
+      "license": "Python-2.0",
+      "homepage": "https://github.com/nodeca/argparse#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "aria-query",
+      "versions": [
+        "5.3.2"
+      ],
+      "license": "Apache-2.0",
+      "homepage": "https://github.com/A11yance/aria-query#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "array-buffer-byte-length",
+      "versions": [
+        "1.0.2"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/array-buffer-byte-length#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "array-includes",
+      "versions": [
+        "3.2.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/es-shims/array-includes#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "array.prototype.findlast",
+      "versions": [
+        "1.2.5"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/es-shims/Array.prototype.findLast#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "array.prototype.findlastindex",
+      "versions": [
+        "1.2.6"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/es-shims/Array.prototype.findLastIndex#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "array.prototype.flat",
+      "versions": [
+        "1.3.3"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/es-shims/Array.prototype.flat#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "array.prototype.flatmap",
+      "versions": [
+        "1.3.3"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/es-shims/Array.prototype.flatMap#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "array.prototype.tosorted",
+      "versions": [
+        "1.1.4"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/es-shims/Array.prototype.toSorted#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "arraybuffer.prototype.slice",
+      "versions": [
+        "1.0.4"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/es-shims/ArrayBuffer.prototype.slice#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "ast-types-flow",
+      "versions": [
+        "0.0.8"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/kyldvs/ast-types-flow#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "async-function",
+      "versions": [
+        "1.0.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/ljharb/async-function#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "available-typed-arrays",
+      "versions": [
+        "1.0.7"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/available-typed-arrays#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "axe-core",
+      "versions": [
+        "4.13.0"
+      ],
+      "license": "MPL-2.0",
+      "homepage": "https://www.deque.com/axe/",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "axobject-query",
+      "versions": [
+        "4.1.0"
+      ],
+      "license": "Apache-2.0",
+      "homepage": "https://github.com/A11yance/axobject-query#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "balanced-match",
+      "versions": [
+        "1.0.2",
+        "4.0.4"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/juliangruber/balanced-match#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "base64-js",
+      "versions": [
+        "0.0.8",
+        "1.5.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/beatgammit/base64-js",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "baseline-browser-mapping",
+      "versions": [
+        "2.11.26"
+      ],
+      "license": "Apache-2.0",
+      "homepage": "https://github.com/web-platform-dx/baseline-browser-mapping#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "brace-expansion",
+      "versions": [
+        "1.1.21",
+        "5.0.12"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/juliangruber/brace-expansion#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "braces",
+      "versions": [
+        "3.0.3"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/micromatch/braces",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "brotli",
+      "versions": [
+        "1.3.3"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/devongovett/brotli.js",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "browserify-zlib",
+      "versions": [
+        "0.2.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/devongovett/browserify-zlib",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "browserslist",
+      "versions": [
+        "4.29.2"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/browserslist/browserslist#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "call-bind",
+      "versions": [
+        "1.0.9"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/ljharb/call-bind#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "call-bind-apply-helpers",
+      "versions": [
+        "1.0.2"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/ljharb/call-bind-apply-helpers#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "call-bound",
+      "versions": [
+        "1.0.4"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/ljharb/call-bound#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "callsites",
+      "versions": [
+        "3.1.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/sindresorhus/callsites#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "caniuse-lite",
+      "versions": [
+        "1.0.30001813"
+      ],
+      "license": "CC-BY-4.0",
+      "homepage": "https://github.com/browserslist/caniuse-lite#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "chalk",
+      "versions": [
+        "4.1.2"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/chalk/chalk#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "client-only",
+      "versions": [
+        "0.0.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://reactjs.org/",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "clone",
+      "versions": [
+        "2.1.2"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/pvorb/node-clone#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "color-convert",
+      "versions": [
+        "2.0.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/Qix-/color-convert#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "color-name",
+      "versions": [
+        "1.1.4"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/colorjs/color-name",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "concat-map",
+      "versions": [
+        "0.0.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/substack/node-concat-map#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "convert-source-map",
+      "versions": [
+        "2.0.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/thlorenz/convert-source-map",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "cross-spawn",
+      "versions": [
+        "7.0.6"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/moxystudio/node-cross-spawn",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "crypto-js",
+      "versions": [
+        "4.2.0"
+      ],
+      "license": "MIT",
+      "homepage": "http://github.com/brix/crypto-js",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "csstype",
+      "versions": [
+        "3.2.3"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/frenic/csstype#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "damerau-levenshtein",
+      "versions": [
+        "1.0.8"
+      ],
+      "license": "BSD-2-Clause",
+      "homepage": "https://github.com/tad-lispy/node-damerau-levenshtein#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "data-view-buffer",
+      "versions": [
+        "1.0.2"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/data-view-buffer#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "data-view-byte-length",
+      "versions": [
+        "1.0.2"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/data-view-byte-length#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "data-view-byte-offset",
+      "versions": [
+        "1.0.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/data-view-byte-offset#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "debug",
+      "versions": [
+        "3.2.7",
+        "4.4.3"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/debug-js/debug#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "deep-is",
+      "versions": [
+        "0.1.4"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/thlorenz/deep-is#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "define-data-property",
+      "versions": [
+        "1.1.4"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/ljharb/define-data-property#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "define-properties",
+      "versions": [
+        "1.2.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/ljharb/define-properties#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "detect-libc",
+      "versions": [
+        "2.1.2"
+      ],
+      "license": "Apache-2.0",
+      "homepage": "https://github.com/lovell/detect-libc#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "dfa",
+      "versions": [
+        "1.2.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/devongovett/dfa#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "doctrine",
+      "versions": [
+        "2.1.0"
+      ],
+      "license": "Apache-2.0",
+      "homepage": "https://github.com/eslint/doctrine",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "dunder-proto",
+      "versions": [
+        "1.0.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/es-shims/dunder-proto#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "electron-to-chromium",
+      "versions": [
+        "1.5.440"
+      ],
+      "license": "ISC",
+      "homepage": "https://github.com/Kilian/electron-to-chromium#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "emoji-regex",
+      "versions": [
+        "9.2.2"
+      ],
+      "license": "MIT",
+      "homepage": "https://mths.be/emoji-regex",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "es-abstract",
+      "versions": [
+        "1.24.2"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/ljharb/es-abstract#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "es-abstract-get",
+      "versions": [
+        "1.0.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/ljharb/es-abstract-get#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "es-define-property",
+      "versions": [
+        "1.0.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/ljharb/es-define-property#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "es-errors",
+      "versions": [
+        "1.3.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/ljharb/es-errors#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "es-iterator-helpers",
+      "versions": [
+        "1.4.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/es-shims/iterator-helpers#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "es-object-atoms",
+      "versions": [
+        "1.1.2"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/ljharb/es-object-atoms#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "es-set-tostringtag",
+      "versions": [
+        "2.1.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/es-shims/es-set-tostringtag#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "es-shim-unscopables",
+      "versions": [
+        "1.1.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/ljharb/es-shim-unscopables#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "es-to-primitive",
+      "versions": [
+        "1.3.4"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/ljharb/es-to-primitive#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "escalade",
+      "versions": [
+        "3.2.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/lukeed/escalade#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "escape-string-regexp",
+      "versions": [
+        "4.0.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/sindresorhus/escape-string-regexp#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "eslint",
+      "versions": [
+        "9.39.5"
+      ],
+      "license": "MIT",
+      "homepage": "https://eslint.org",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "eslint-config-next",
+      "versions": [
+        "16.3.8"
+      ],
+      "license": "MIT",
+      "homepage": "https://nextjs.org/docs/app/api-reference/config/eslint",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "eslint-import-resolver-node",
+      "versions": [
+        "0.3.10"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/import-js/eslint-plugin-import",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "eslint-import-resolver-typescript",
+      "versions": [
+        "3.10.1"
+      ],
+      "license": "ISC",
+      "homepage": "https://github.com/import-js/eslint-import-resolver-typescript#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "eslint-module-utils",
+      "versions": [
+        "2.14.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/import-js/eslint-plugin-import#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "eslint-plugin-import",
+      "versions": [
+        "2.32.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/import-js/eslint-plugin-import",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "eslint-plugin-jsx-a11y",
+      "versions": [
+        "6.10.2"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/jsx-eslint/eslint-plugin-jsx-a11y#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "eslint-plugin-react",
+      "versions": [
+        "7.37.5"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/jsx-eslint/eslint-plugin-react",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "eslint-plugin-react-hooks",
+      "versions": [
+        "7.1.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://react.dev/",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "eslint-scope",
+      "versions": [
+        "8.4.0"
+      ],
+      "license": "BSD-2-Clause",
+      "homepage": "https://github.com/eslint/js/blob/main/packages/eslint-scope/README.md",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "eslint-visitor-keys",
+      "versions": [
+        "3.4.3",
+        "4.2.1",
+        "5.0.1"
+      ],
+      "license": "Apache-2.0",
+      "homepage": "https://github.com/eslint/js/blob/main/packages/eslint-visitor-keys/README.md",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "espree",
+      "versions": [
+        "10.4.0"
+      ],
+      "license": "BSD-2-Clause",
+      "homepage": "https://github.com/eslint/js/blob/main/packages/espree/README.md",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "esquery",
+      "versions": [
+        "1.7.0"
+      ],
+      "license": "BSD-3-Clause",
+      "homepage": "https://github.com/estools/esquery/",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "esrecurse",
+      "versions": [
+        "4.3.0"
+      ],
+      "license": "BSD-2-Clause",
+      "homepage": "https://github.com/estools/esrecurse",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "estraverse",
+      "versions": [
+        "5.3.0"
+      ],
+      "license": "BSD-2-Clause",
+      "homepage": "https://github.com/estools/estraverse",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "esutils",
+      "versions": [
+        "2.0.3"
+      ],
+      "license": "BSD-2-Clause",
+      "homepage": "https://github.com/estools/esutils",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "fast-deep-equal",
+      "versions": [
+        "3.1.3"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/epoberezkin/fast-deep-equal#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "fast-glob",
+      "versions": [
+        "3.3.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/mrmlnc/fast-glob#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "fast-json-stable-stringify",
+      "versions": [
+        "2.1.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/epoberezkin/fast-json-stable-stringify",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "fast-levenshtein",
+      "versions": [
+        "2.0.6"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/hiddentao/fast-levenshtein#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "fastq",
+      "versions": [
+        "1.20.3"
+      ],
+      "license": "ISC",
+      "homepage": "https://github.com/mcollina/fastq#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "fdir",
+      "versions": [
+        "6.5.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/thecodrr/fdir#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "file-entry-cache",
+      "versions": [
+        "8.0.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/jaredwray/file-entry-cache#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "fill-range",
+      "versions": [
+        "7.1.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/jonschlinkert/fill-range",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "find-up",
+      "versions": [
+        "5.0.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/sindresorhus/find-up#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "flat-cache",
+      "versions": [
+        "4.0.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/jaredwray/flat-cache#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "flatted",
+      "versions": [
+        "3.4.4"
+      ],
+      "license": "ISC",
+      "homepage": "https://github.com/WebReflection/flatted#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "fontkit",
+      "versions": [
+        "2.0.4"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/foliojs/fontkit#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "for-each",
+      "versions": [
+        "0.3.5"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/Raynos/for-each",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "function-bind",
+      "versions": [
+        "1.1.2"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/Raynos/function-bind",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "function.prototype.name",
+      "versions": [
+        "1.2.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/es-shims/Function.prototype.name#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "functions-have-names",
+      "versions": [
+        "1.2.3"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/functions-have-names#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "generator-function",
+      "versions": [
+        "2.0.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/TimothyGu/generator-function#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "gensync",
+      "versions": [
+        "1.0.0-beta.2"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/loganfsmyth/gensync",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "get-intrinsic",
+      "versions": [
+        "1.3.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/ljharb/get-intrinsic#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "get-proto",
+      "versions": [
+        "1.0.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/ljharb/get-proto#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "get-symbol-description",
+      "versions": [
+        "1.1.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/get-symbol-description#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "get-tsconfig",
+      "versions": [
+        "4.14.3"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/privatenumber/get-tsconfig#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "glob-parent",
+      "versions": [
+        "5.1.2",
+        "6.0.2"
+      ],
+      "license": "ISC",
+      "homepage": "https://github.com/gulpjs/glob-parent#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "globals",
+      "versions": [
+        "14.0.0",
+        "16.4.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/sindresorhus/globals#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "globalthis",
+      "versions": [
+        "1.0.4"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/ljharb/System.global#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "gopd",
+      "versions": [
+        "1.2.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/ljharb/gopd#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "has-bigints",
+      "versions": [
+        "1.1.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/ljharb/has-bigints#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "has-flag",
+      "versions": [
+        "4.0.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/sindresorhus/has-flag#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "has-property-descriptors",
+      "versions": [
+        "1.0.2"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/has-property-descriptors#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "has-proto",
+      "versions": [
+        "1.2.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/has-proto#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "has-symbols",
+      "versions": [
+        "1.1.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/ljharb/has-symbols#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "has-tostringtag",
+      "versions": [
+        "1.0.2"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/has-tostringtag#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "hasown",
+      "versions": [
+        "2.0.4"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/hasOwn#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "hermes-estree",
+      "versions": [
+        "0.25.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/facebook/hermes#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "hermes-parser",
+      "versions": [
+        "0.25.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/facebook/hermes#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "ignore",
+      "versions": [
+        "5.3.2",
+        "7.0.10"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/kaelzhang/node-ignore#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "import-fresh",
+      "versions": [
+        "3.3.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/sindresorhus/import-fresh#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "imurmurhash",
+      "versions": [
+        "0.1.4"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/jensyt/imurmurhash-js",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "internal-slot",
+      "versions": [
+        "1.1.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/ljharb/internal-slot#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "is-array-buffer",
+      "versions": [
+        "3.0.5"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/is-array-buffer#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "is-async-function",
+      "versions": [
+        "2.1.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/is-async-function#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "is-bigint",
+      "versions": [
+        "1.1.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/is-bigint#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "is-boolean-object",
+      "versions": [
+        "1.2.2"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/is-boolean-object#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "is-bun-module",
+      "versions": [
+        "2.0.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/SunsetTechuila/is-bun-module",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "is-callable",
+      "versions": [
+        "1.2.7"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/is-callable#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "is-core-module",
+      "versions": [
+        "2.17.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/is-core-module",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "is-data-view",
+      "versions": [
+        "1.0.2"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/is-data-view#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "is-date-object",
+      "versions": [
+        "1.1.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/is-date-object#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "is-document.all",
+      "versions": [
+        "1.0.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/is-document.all#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "is-extglob",
+      "versions": [
+        "2.1.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/jonschlinkert/is-extglob",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "is-finalizationregistry",
+      "versions": [
+        "1.1.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/is-finalizationregistry#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "is-generator-function",
+      "versions": [
+        "1.1.2"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/is-generator-function#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "is-glob",
+      "versions": [
+        "4.0.3"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/micromatch/is-glob",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "is-map",
+      "versions": [
+        "2.0.3"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/is-map#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "is-negative-zero",
+      "versions": [
+        "2.0.3"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/is-negative-zero",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "is-number",
+      "versions": [
+        "7.0.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/jonschlinkert/is-number",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "is-number-object",
+      "versions": [
+        "1.1.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/is-number-object#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "is-regex",
+      "versions": [
+        "1.2.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/is-regex",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "is-set",
+      "versions": [
+        "2.0.3"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/is-set#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "is-shared-array-buffer",
+      "versions": [
+        "1.0.4"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/is-shared-array-buffer#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "is-string",
+      "versions": [
+        "1.1.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/is-string#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "is-symbol",
+      "versions": [
+        "1.1.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/is-symbol#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "is-typed-array",
+      "versions": [
+        "1.1.15"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/is-typed-array#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "is-weakmap",
+      "versions": [
+        "2.0.2"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/is-weakmap#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "is-weakref",
+      "versions": [
+        "1.1.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/is-weakref#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "is-weakset",
+      "versions": [
+        "2.0.4"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/is-weakset#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "isarray",
+      "versions": [
+        "2.0.5"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/juliangruber/isarray",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "isexe",
+      "versions": [
+        "2.0.0"
+      ],
+      "license": "ISC",
+      "homepage": "https://github.com/isaacs/isexe#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "iterator.prototype",
+      "versions": [
+        "1.1.5"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/ljharb/Iterator.prototype#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "jpeg-exif",
+      "versions": [
+        "1.1.4"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/zhso/jpeg-exif",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "js-tokens",
+      "versions": [
+        "4.0.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/lydell/js-tokens#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "js-yaml",
+      "versions": [
+        "4.3.2"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/nodeca/js-yaml#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "jsesc",
+      "versions": [
+        "3.1.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://mths.be/jsesc",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "json-buffer",
+      "versions": [
+        "3.0.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/dominictarr/json-buffer",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "json-schema-traverse",
+      "versions": [
+        "0.4.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/epoberezkin/json-schema-traverse#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "json-stable-stringify-without-jsonify",
+      "versions": [
+        "1.0.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/samn/json-stable-stringify",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "json5",
+      "versions": [
+        "1.0.2",
+        "2.2.3"
+      ],
+      "license": "MIT",
+      "homepage": "http://json5.org/",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "jsx-ast-utils",
+      "versions": [
+        "3.3.5"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/jsx-eslint/jsx-ast-utils#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "keyv",
+      "versions": [
+        "4.5.4"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/jaredwray/keyv",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "language-subtag-registry",
+      "versions": [
+        "0.3.23"
+      ],
+      "license": "CC0-1.0",
+      "homepage": "https://github.com/mattcg/language-subtag-registry",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "language-tags",
+      "versions": [
+        "1.0.9"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/mattcg/language-tags",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "levn",
+      "versions": [
+        "0.4.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/gkz/levn",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "linebreak",
+      "versions": [
+        "1.1.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/devongovett/linebreaker",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "locate-path",
+      "versions": [
+        "6.0.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/sindresorhus/locate-path#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "lodash.merge",
+      "versions": [
+        "4.6.2"
+      ],
+      "license": "MIT",
+      "homepage": "https://lodash.com/",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "loose-envify",
+      "versions": [
+        "1.4.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/zertosh/loose-envify",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "lru-cache",
+      "versions": [
+        "5.1.1"
+      ],
+      "license": "ISC",
+      "homepage": "https://github.com/isaacs/node-lru-cache#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "lucide-react",
+      "versions": [
+        "0.468.0"
+      ],
+      "license": "ISC",
+      "homepage": "https://lucide.dev",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "math-intrinsics",
+      "versions": [
+        "1.1.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/es-shims/math-intrinsics#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "merge2",
+      "versions": [
+        "1.4.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/teambition/merge2",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "micromatch",
+      "versions": [
+        "4.0.8"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/micromatch/micromatch",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "minimatch",
+      "versions": [
+        "3.1.5"
+      ],
+      "license": "ISC",
+      "homepage": "https://github.com/isaacs/minimatch#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "minimatch",
+      "versions": [
+        "10.2.6"
+      ],
+      "license": "BlueOak-1.0.0",
+      "homepage": "https://github.com/isaacs/minimatch#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "minimist",
+      "versions": [
+        "1.2.8"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/minimistjs/minimist",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "ms",
+      "versions": [
+        "2.1.3"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/vercel/ms#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "nanoid",
+      "versions": [
+        "3.3.19"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/ai/nanoid#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "napi-postinstall",
+      "versions": [
+        "0.3.4"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/un-ts/napi-postinstall#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "natural-compare",
+      "versions": [
+        "1.4.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/litejs/natural-compare-lite#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "next",
+      "versions": [
+        "16.3.8"
+      ],
+      "license": "MIT",
+      "homepage": "https://nextjs.org",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "node-exports-info",
+      "versions": [
+        "1.6.2"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/node-exports-info#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "node-releases",
+      "versions": [
+        "2.0.57"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/chicoxyzzy/node-releases#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "object-assign",
+      "versions": [
+        "4.1.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/sindresorhus/object-assign#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "object-inspect",
+      "versions": [
+        "1.13.4"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/object-inspect",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "object-keys",
+      "versions": [
+        "1.1.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/ljharb/object-keys#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "object.assign",
+      "versions": [
+        "4.1.7"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/ljharb/object.assign#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "object.entries",
+      "versions": [
+        "1.1.9"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/es-shims/Object.entries#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "object.fromentries",
+      "versions": [
+        "2.0.8"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/es-shims/Object.fromEntries#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "object.groupby",
+      "versions": [
+        "1.0.3"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/es-shims/Object.groupBy#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "object.values",
+      "versions": [
+        "1.2.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/es-shims/Object.values#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "optionator",
+      "versions": [
+        "0.9.4"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/gkz/optionator",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "own-keys",
+      "versions": [
+        "1.0.2"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/ljharb/own-keys#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "p-limit",
+      "versions": [
+        "3.1.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/sindresorhus/p-limit#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "p-locate",
+      "versions": [
+        "5.0.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/sindresorhus/p-locate#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "pako",
+      "versions": [
+        "0.2.9"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/nodeca/pako",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "pako",
+      "versions": [
+        "1.0.11"
+      ],
+      "license": "(MIT AND Zlib)",
+      "homepage": "https://github.com/nodeca/pako",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "parent-module",
+      "versions": [
+        "1.0.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/sindresorhus/parent-module#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "path-exists",
+      "versions": [
+        "4.0.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/sindresorhus/path-exists#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "path-key",
+      "versions": [
+        "3.1.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/sindresorhus/path-key#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "path-parse",
+      "versions": [
+        "1.0.7"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/jbgutierrez/path-parse#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "pdfjs-dist",
+      "versions": [
+        "5.4.296"
+      ],
+      "license": "Apache-2.0",
+      "homepage": "https://mozilla.github.io/pdf.js/",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "pdfkit",
+      "versions": [
+        "0.17.2"
+      ],
+      "license": "MIT",
+      "homepage": "http://pdfkit.org/",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "pg",
+      "versions": [
+        "8.16.3"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/brianc/node-postgres",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "pg-cloudflare",
+      "versions": [
+        "1.4.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/brianc/node-postgres#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "pg-connection-string",
+      "versions": [
+        "2.14.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/brianc/node-postgres/tree/master/packages/pg-connection-string",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "pg-int8",
+      "versions": [
+        "1.0.1"
+      ],
+      "license": "ISC",
+      "homepage": "https://github.com/charmander/pg-int8#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "pg-pool",
+      "versions": [
+        "3.14.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/brianc/node-postgres/tree/master/packages/pg-pool#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "pg-protocol",
+      "versions": [
+        "1.16.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/brianc/node-postgres#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "pg-types",
+      "versions": [
+        "2.2.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/brianc/node-pg-types",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "pgpass",
+      "versions": [
+        "1.0.5"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/hoegaarden/pgpass#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "picocolors",
+      "versions": [
+        "1.1.1"
+      ],
+      "license": "ISC",
+      "homepage": "https://github.com/alexeyraspopov/picocolors#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "picomatch",
+      "versions": [
+        "2.3.2",
+        "4.0.7"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/micromatch/picomatch",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "png-js",
+      "versions": [
+        "1.1.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/devongovett/png.js#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "possible-typed-array-names",
+      "versions": [
+        "1.1.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/ljharb/possible-typed-array-names#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "postcss",
+      "versions": [
+        "8.5.23"
+      ],
+      "license": "MIT",
+      "homepage": "https://postcss.org/",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "postgres-array",
+      "versions": [
+        "2.0.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/bendrucker/postgres-array#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "postgres-bytea",
+      "versions": [
+        "1.0.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/bendrucker/postgres-bytea#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "postgres-date",
+      "versions": [
+        "1.0.7"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/bendrucker/postgres-date#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "postgres-interval",
+      "versions": [
+        "1.2.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/bendrucker/postgres-interval#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "prelude-ls",
+      "versions": [
+        "1.2.1"
+      ],
+      "license": "MIT",
+      "homepage": "http://preludels.com",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "prop-types",
+      "versions": [
+        "15.8.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://facebook.github.io/react/",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "punycode",
+      "versions": [
+        "2.3.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://mths.be/punycode",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "queue-microtask",
+      "versions": [
+        "1.2.3"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/feross/queue-microtask",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "react",
+      "versions": [
+        "19.3.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://react.dev/",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "react-dom",
+      "versions": [
+        "19.3.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://react.dev/",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "react-is",
+      "versions": [
+        "16.13.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://reactjs.org/",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "reflect.getprototypeof",
+      "versions": [
+        "1.0.10"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/es-shims/Reflect.getPrototypeOf",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "regexp.prototype.flags",
+      "versions": [
+        "1.5.4"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/es-shims/RegExp.prototype.flags#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "resolve",
+      "versions": [
+        "2.0.0-next.7"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/browserify/resolve#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "resolve-from",
+      "versions": [
+        "4.0.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/sindresorhus/resolve-from#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "resolve-pkg-maps",
+      "versions": [
+        "1.0.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/privatenumber/resolve-pkg-maps#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "restructure",
+      "versions": [
+        "3.0.2"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/devongovett/restructure",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "reusify",
+      "versions": [
+        "1.1.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/mcollina/reusify#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "run-parallel",
+      "versions": [
+        "1.2.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/feross/run-parallel",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "safe-array-concat",
+      "versions": [
+        "1.1.4"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/ljharb/safe-array-concat#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "safe-push-apply",
+      "versions": [
+        "1.0.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/ljharb/safe-push-apply#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "safe-regex-test",
+      "versions": [
+        "1.1.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/ljharb/safe-regex-test#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "scheduler",
+      "versions": [
+        "0.28.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://react.dev/",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "semver",
+      "versions": [
+        "6.3.1",
+        "7.8.5"
+      ],
+      "license": "ISC",
+      "homepage": "https://github.com/npm/node-semver#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "set-function-length",
+      "versions": [
+        "1.2.2"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/ljharb/set-function-length#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "set-function-name",
+      "versions": [
+        "2.0.2"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/ljharb/set-function-name#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "set-proto",
+      "versions": [
+        "1.0.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/ljharb/set-proto#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "sharp",
+      "versions": [
+        "0.35.5"
+      ],
+      "license": "Apache-2.0",
+      "homepage": "https://sharp.pixelplumbing.com",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "shebang-command",
+      "versions": [
+        "2.0.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/kevva/shebang-command#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "shebang-regex",
+      "versions": [
+        "3.0.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/sindresorhus/shebang-regex#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "side-channel",
+      "versions": [
+        "1.1.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/ljharb/side-channel#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "side-channel-list",
+      "versions": [
+        "1.0.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/ljharb/side-channel-list#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "side-channel-map",
+      "versions": [
+        "1.0.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/ljharb/side-channel-map#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "side-channel-weakmap",
+      "versions": [
+        "1.0.2"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/ljharb/side-channel-weakmap#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "source-map-js",
+      "versions": [
+        "1.2.2"
+      ],
+      "license": "BSD-3-Clause",
+      "homepage": "https://github.com/7rulnik/source-map-js",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "split2",
+      "versions": [
+        "4.2.0"
+      ],
+      "license": "ISC",
+      "homepage": "https://github.com/mcollina/split2#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "stable-hash",
+      "versions": [
+        "0.0.5"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/shuding/stable-hash#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "stop-iteration-iterator",
+      "versions": [
+        "1.1.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/ljharb/stop-iteration-iterator#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "string.prototype.includes",
+      "versions": [
+        "2.0.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://mths.be/includes",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "string.prototype.matchall",
+      "versions": [
+        "4.1.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/es-shims/String.prototype.matchAll#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "string.prototype.repeat",
+      "versions": [
+        "1.0.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://mths.be/repeat",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "string.prototype.trim",
+      "versions": [
+        "1.2.11"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/es-shims/String.prototype.trim#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "string.prototype.trimend",
+      "versions": [
+        "1.0.10"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/es-shims/String.prototype.trimEnd#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "string.prototype.trimstart",
+      "versions": [
+        "1.0.8"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/es-shims/String.prototype.trimStart#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "strip-bom",
+      "versions": [
+        "3.0.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/sindresorhus/strip-bom#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "strip-json-comments",
+      "versions": [
+        "3.1.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/sindresorhus/strip-json-comments#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "styled-jsx",
+      "versions": [
+        "5.1.6"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/vercel/styled-jsx#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "supports-color",
+      "versions": [
+        "7.2.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/chalk/supports-color#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "supports-preserve-symlinks-flag",
+      "versions": [
+        "1.0.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/node-supports-preserve-symlinks-flag#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "svg-engine",
+      "versions": [
+        "0.3.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/schoero/svg-engine#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "swissqrbill",
+      "versions": [
+        "4.4.2"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/schoero/swissqrbill#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "tiny-inflate",
+      "versions": [
+        "1.0.3"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/devongovett/tiny-inflate",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "tinyglobby",
+      "versions": [
+        "0.2.17"
+      ],
+      "license": "MIT",
+      "homepage": "https://superchupu.dev/tinyglobby",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "to-regex-range",
+      "versions": [
+        "5.0.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/micromatch/to-regex-range",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "ts-api-utils",
+      "versions": [
+        "2.5.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/JoshuaKGoldberg/ts-api-utils#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "tsconfig-paths",
+      "versions": [
+        "3.15.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/dividab/tsconfig-paths#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "tslib",
+      "versions": [
+        "2.8.1"
+      ],
+      "license": "0BSD",
+      "homepage": "https://www.typescriptlang.org/",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "type-check",
+      "versions": [
+        "0.4.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/gkz/type-check",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "typed-array-buffer",
+      "versions": [
+        "1.0.3"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/typed-array-buffer#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "typed-array-byte-length",
+      "versions": [
+        "1.0.3"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/typed-array-byte-length#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "typed-array-byte-offset",
+      "versions": [
+        "1.0.5"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/typed-array-byte-offset#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "typed-array-length",
+      "versions": [
+        "1.0.8"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/typed-array-length#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "typescript",
+      "versions": [
+        "5.9.3"
+      ],
+      "license": "Apache-2.0",
+      "homepage": "https://www.typescriptlang.org/",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "typescript-eslint",
+      "versions": [
+        "8.71.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://typescript-eslint.io/packages/typescript-eslint",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "unbox-primitive",
+      "versions": [
+        "1.1.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/ljharb/unbox-primitive#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "undici-types",
+      "versions": [
+        "6.21.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://undici.nodejs.org",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "unicode-properties",
+      "versions": [
+        "1.4.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/devongovett/unicode-properties",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "unicode-trie",
+      "versions": [
+        "2.0.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/devongovett/unicode-trie",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "unrs-resolver",
+      "versions": [
+        "1.12.2"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/unrs/unrs-resolver",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "update-browserslist-db",
+      "versions": [
+        "1.3.3"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/browserslist/update-db#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "uri-js",
+      "versions": [
+        "4.4.1"
+      ],
+      "license": "BSD-2-Clause",
+      "homepage": "https://github.com/garycourt/uri-js",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "which",
+      "versions": [
+        "2.0.2"
+      ],
+      "license": "ISC",
+      "homepage": "https://github.com/isaacs/node-which#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "which-boxed-primitive",
+      "versions": [
+        "1.1.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/which-boxed-primitive#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "which-builtin-type",
+      "versions": [
+        "1.2.1"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/which-builtin-type#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "which-collection",
+      "versions": [
+        "1.0.2"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/which-collection#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "which-typed-array",
+      "versions": [
+        "1.1.24"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/inspect-js/which-typed-array#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "word-wrap",
+      "versions": [
+        "1.2.5"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/jonschlinkert/word-wrap",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "xtend",
+      "versions": [
+        "4.0.2"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/Raynos/xtend",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "yallist",
+      "versions": [
+        "3.1.1"
+      ],
+      "license": "ISC",
+      "homepage": "https://github.com/isaacs/yallist#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "yocto-queue",
+      "versions": [
+        "0.1.0"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/sindresorhus/yocto-queue#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "zod",
+      "versions": [
+        "4.6.5"
+      ],
+      "license": "MIT",
+      "homepage": "https://zod.dev",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    },
+    {
+      "name": "zod-validation-error",
+      "versions": [
+        "4.0.2"
+      ],
+      "license": "MIT",
+      "homepage": "https://github.com/causaly/zod-validation-error#readme",
+      "review": "metadata only; distribution obligations and bundled notices need review"
+    }
+  ]
+}

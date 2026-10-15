@@ -1,0 +1,155 @@
+{
+  "note": "Control-Mapping ist eine nachvollziehbare technische Zuordnung, keine vollständige Normabdeckung. ISO-Volltext-Controls und genaue CIS-Benchmarks bleiben offen.",
+  "controls": [
+    {
+      "controlId": "CIS 2",
+      "reference": "CIS Controls 8.1",
+      "classification": "CIS",
+      "requirement": "Softwareinventar",
+      "evidence": "dependency-inventory.json; license-inventory.json",
+      "status": "partial",
+      "risk": "P2",
+      "nextAction": "Support, SBOM und Lizenzpflichten prüfen"
+    },
+    {
+      "controlId": "CIS 4",
+      "reference": "CIS Controls 8.1",
+      "classification": "CIS",
+      "requirement": "Sichere Konfiguration",
+      "evidence": "next.config.ts; .github/workflows/; database/operations/",
+      "status": "partial",
+      "risk": "P1",
+      "nextAction": "Azure/PostgreSQL-Benchmark und aktuelle Live-Konfiguration fehlen"
+    },
+    {
+      "controlId": "CIS 5 / 6",
+      "reference": "CIS Controls 8.1",
+      "classification": "CIS",
+      "requirement": "Konten und Zugriff",
+      "evidence": "lib/server/session.ts; lib/server/rbac.ts; lib/server/operator/",
+      "status": "partial",
+      "risk": "P1",
+      "nextAction": "Alle Rollen und Session-/MFA-Übergänge am finalen Commit nachweisen"
+    },
+    {
+      "controlId": "CIS 7",
+      "reference": "CIS Controls 8.1",
+      "classification": "CIS",
+      "requirement": "Schwachstellenmanagement",
+      "evidence": "pnpm security:scan; .github/workflows/codeql.yml",
+      "status": "partial",
+      "risk": "P1",
+      "nextAction": "Exakte CI- und Advisory-Evidenz je Release"
+    },
+    {
+      "controlId": "CIS 8",
+      "reference": "CIS Controls 8.1",
+      "classification": "CIS",
+      "requirement": "Audit-Protokollierung",
+      "evidence": "lib/server/audit.ts; lib/server/operator/audit.ts",
+      "status": "partial",
+      "risk": "P1",
+      "nextAction": "Retention, Unveränderbarkeit, Zugriffe und Alert-Zustellung prüfen"
+    },
+    {
+      "controlId": "CIS 11",
+      "reference": "CIS Controls 8.1",
+      "classification": "CIS",
+      "requirement": "Wiederherstellung",
+      "evidence": "docs/azure-postgresql-backup-restore.md",
+      "status": "open",
+      "risk": "P1",
+      "nextAction": "Isolierten Restore und RPO/RTO messen"
+    },
+    {
+      "controlId": "CIS 15 / 16",
+      "reference": "CIS Controls 8.1",
+      "classification": "CIS",
+      "requirement": "Provider und Anwendungssicherheit",
+      "evidence": "integrations-and-controls.md; runtime-integrity-test.mjs",
+      "status": "partial",
+      "risk": "P1",
+      "nextAction": "Provider-Konfiguration, Supply Chain und alle API-Übergänge"
+    },
+    {
+      "controlId": "CIS 17",
+      "reference": "CIS Controls 8.1",
+      "classification": "CIS",
+      "requirement": "Incident Response",
+      "evidence": "docs/incident-response-and-retention.md",
+      "status": "partial",
+      "risk": "P1",
+      "nextAction": "Zuständigkeiten und Übung nachweisen"
+    },
+    {
+      "controlId": "API1:2023 / API5:2023",
+      "reference": "OWASP API Top 10 2023",
+      "classification": "Nicht-CIS",
+      "requirement": "Objekt-/Funktionsberechtigungen",
+      "evidence": "scripts/api-tenant-postgres-test.mjs; lib/permissions.ts",
+      "status": "partial",
+      "risk": "P1",
+      "nextAction": "Cross-Tenant- und Rollen-Tests für finale API-Fläche"
+    },
+    {
+      "controlId": "API4:2023",
+      "reference": "OWASP API Top 10 2023",
+      "classification": "Nicht-CIS",
+      "requirement": "Ressourcenbegrenzung",
+      "evidence": "lib/server/http.ts; lib/server/rate-limit.ts; scripts/rate-limit-test.mjs",
+      "status": "implemented-test-pending-CI",
+      "risk": "P2",
+      "nextAction": "Neue-Key-Kapazität und Ablauf sind lokal getestet; finaler CI-Nachweis offen"
+    },
+    {
+      "controlId": "API7:2023",
+      "reference": "OWASP API Top 10 2023",
+      "classification": "Nicht-CIS",
+      "requirement": "SSRF",
+      "evidence": "lib/server/storage.ts; lib/image-url.ts; lib/server/document-logo.ts",
+      "status": "partial",
+      "risk": "P1",
+      "nextAction": "Redirects, Storage-Ziel und Logo-/Dateiquellen dynamisch testen"
+    },
+    {
+      "controlId": "API9:2023",
+      "reference": "OWASP API Top 10 2023",
+      "classification": "Nicht-CIS",
+      "requirement": "API-Inventar",
+      "evidence": "source-inventory.json; scripts/ux-inventory.mjs",
+      "status": "partial",
+      "risk": "P2",
+      "nextAction": "Inventar nach Zusammenführung neu erzeugen"
+    },
+    {
+      "controlId": "Art. 24",
+      "reference": "DSG SR 235.1",
+      "classification": "Nicht-CIS",
+      "requirement": "Verletzung der Datensicherheit",
+      "evidence": "docs/incident-response-and-retention.md",
+      "status": "open",
+      "risk": "P1",
+      "nextAction": "Meldeprozess und Verantwortliche fachlich freigeben"
+    },
+    {
+      "controlId": "Art. 958f",
+      "reference": "OR SR 220",
+      "classification": "Nicht-CIS",
+      "requirement": "Aufbewahrung",
+      "evidence": "scripts/organization-data-lifecycle.mjs; docs/customer-data-lifecycle.md",
+      "status": "partial",
+      "risk": "P1",
+      "nextAction": "Löschsperren und Beleg-/Backup-Aufbewahrung fachlich abnehmen"
+    },
+    {
+      "controlId": "2.1.1 / 2.4.3 / 2.4.7 / 2.5.8 / 4.1.2",
+      "reference": "WCAG 2.2",
+      "classification": "Nicht-CIS",
+      "requirement": "Tastatur, Fokus, Zielgrösse, Name/Rolle",
+      "evidence": "components/ui.tsx; components/use-dialog-focus.ts; scripts/ux-browser-test.mjs",
+      "status": "partial",
+      "risk": "P1",
+      "nextAction": "Browser, Screenreader und physische Tastatur/PWA prüfen"
+    }
+  ]
+}

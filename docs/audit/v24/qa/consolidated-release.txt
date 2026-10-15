@@ -1,0 +1,8 @@
+
+> binso-one@0.11.0 release:check /workspace/scratch/4766d9dd3bd6/repo
+> node scripts/release-check.mjs
+
+Release gates passed.
+Repository cleanliness passed: current Azure/PostgreSQL/Graph/Stripe architecture only.
+Documentation and public-flow consistency passed: runtime, authentication, billing, privacy and legal content are aligned.
+Manual production authorization, immutable current-main SHA and full final QA resolver passed.

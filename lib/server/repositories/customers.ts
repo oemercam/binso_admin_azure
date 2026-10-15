@@ -1,4 +1,5 @@
 import "server-only";
+import type {PoolClient} from "pg";
 import {randomUUID} from "node:crypto";
 import {withTenant} from "@/lib/server/db";
 import {audit} from "@/lib/server/audit";
@@ -7,10 +8,11 @@ import {idempotentBusiness} from "../business-idempotency";
 import {listApiBusiness} from "./business-api";
 import type {SessionUser} from "@/lib/server/session";
 
-export type CustomerInput={name:string;contact?:string;email?:string;phone?:string;address?:string;zipCity?:string;postalCode?:string;city?:string;sector?:string;uid?:string;language?:string;paymentDays?:number;discount?:number;status?:string;notes?:string};
+export type CustomerInput={name:string;contact?:string;email?:string;phone?:string;address?:string;zipCity?:string;postalCode?:string;city?:string;sector?:string;uid?:string;language?:string;paymentDays?:number;discount?:number;status?:string;notes?:string;allowDuplicate?:boolean};
 const columns=`id,customer_no,name,coalesce((select cc.name from customer_contacts cc where cc.organization_id=customers.organization_id and cc.customer_id=customers.id and cc.is_primary=true and cc.archived_at is null limit 1),contact_name) as contact,email,phone,address,address as street,zip as postal_code,city,sector,trim(concat_ws(' ',zip,city)) as "zipCity",uid,language,payment_days as "paymentDays",discount,status,notes,created_at as "createdAt",updated_at as "updatedAt"`;
 export function customerInput(body:Record<string,unknown>,partial=false):Partial<CustomerInput>{
  const out:Partial<CustomerInput>={};
+ if(body.allowDuplicate!==undefined){if(typeof body.allowDuplicate!=="boolean")throw new ApiError(400,"invalid_field","Ungültiges Kundenfeld: allowDuplicate");out.allowDuplicate=body.allowDuplicate;}
  for(const key of ['name','contact','email','phone','address','zipCity','postalCode','city','sector','uid','language','status','notes'] as const){
   if(body[key]===undefined)continue;
   if(typeof body[key]!=="string"||body[key].length>320)throw new ApiError(400,'invalid_field','Ungültiges Kundenfeld: '+key);
@@ -33,7 +35,19 @@ function addressParts(input:Partial<CustomerInput>,current:Record<string,unknown
 }
 const statusToDb=(value:string)=>/inaktiv|inactive/i.test(value)?'inactive':'active';
 export async function listCustomers(session:SessionUser,filters="order=name.asc"){return withTenant(session.organizationId,session.userId,client=>listApiBusiness(client,session,'customers',filters))}
+/** Exact identifiers only; candidate review never exposes another tenant. */
+export async function customerDuplicates(client:PoolClient,organizationId:string,input:Partial<CustomerInput>,excludeId=''){
+ const uid=(input.uid??'').toUpperCase().replace(/[^A-Z0-9]/g,'').replace(/(MWST|TVA|IVA)$/,''),email=(input.email??'').trim().toLowerCase(),name=(input.name??'').trim().replace(/\s+/g,' ').toLowerCase();
+ if(!uid&&!email&&name.length<2)return [];
+ return (await client.query(`select id,customer_no,name,email from customers c where organization_id=$1 and archived_at is null and id::text<>$5 and (
+  ($2<>'' and regexp_replace(regexp_replace(upper(coalesce(c.uid,'')),'[^A-Z0-9]','','g'),'(MWST|TVA|IVA)$','')=$2)
+  or ($3<>'' and lower(trim(coalesce(c.email,'')))=$3)
+  or (length($4)>=2 and regexp_replace(lower(trim(c.name)),'[[:space:]]+',' ','g')=$4)) order by customer_no,id limit 5`,[organizationId,uid,email,name,excludeId])).rows;
+}
+export async function findCustomerDuplicates(session:SessionUser,input:Partial<CustomerInput>,excludeId=''){return withTenant(session.organizationId,session.userId,c=>customerDuplicates(c,session.organizationId,input,excludeId))}
 export async function createCustomer(organizationId:string,userId:string,input:CustomerInput,requestKey=""){return withTenant(organizationId,userId,async client=>{const write=async()=>{
+ await client.query('select pg_advisory_xact_lock(hashtextextended($1,0))',[organizationId+':customer-create']);
+ if(!input.allowDuplicate&&(await customerDuplicates(client,organizationId,input)).length)throw new ApiError(409,'customer_duplicate','Mögliche Dublette gefunden. Bitte bestehende Kunden prüfen oder die separate Erfassung bestätigen.');
  const id=randomUUID(),{zip,city}=addressParts(input);
  const sequence=await client.query(`insert into business_document_counters(organization_id,kind,period,next_value) values($1,'customer','',2) on conflict(organization_id,kind,period) do update set next_value=business_document_counters.next_value+1 returning next_value-1 number`,[organizationId]);
  const customerNo='K-'+String(sequence.rows[0].number).padStart(6,'0');
