@@ -6,7 +6,8 @@ import {sumMoney} from '@/lib/money';
 const cashSeries:Series[]=[{key:'income',label:'Einnahmen',tone:'positive'},{key:'costs',label:'Ausgaben',tone:'negative'}];
 export function CashStatistics({data,storageKey}:{data:CashStatisticsData;storageKey:string}){
  const financial=data.financial,snapshot=financial?.snapshot;
- const notice=data.incomplete?'Auszahlungsdaten sind unvollständig. Betriebskosten und Löhne ohne nachgewiesenes Zahlungsdatum sind nicht enthalten. Der Saldo ist kein vollständiger Cashflow oder buchhalterischer Gewinn.':undefined;
+ const refundNotice=data.refunds?.length?'Zahlungseingänge sind nach erfassten Rückerstattungen ausgewiesen. ':'';
+ const notice=refundNotice+(data.incomplete?'Auszahlungsdaten sind unvollständig. Betriebskosten und Löhne ohne nachgewiesenes Zahlungsdatum sind nicht enthalten. Der Saldo ist kein vollständiger Cashflow oder buchhalterischer Gewinn.':'');
  // An older/incomplete response may still show its known cash ledger, but must
  // never fabricate invoice metrics or compose income and outflow into one ring.
  if(!snapshot)return <Statistics title="Finanzentwicklung" subtitle="Erfasste Zahlungseingänge und nachgewiesene Auszahlungen · CHF" storageKey={storageKey} events={cashStatisticEvents(data)} series={cashSeries} metrics={totals=>[{label:'Einnahmen',value:totals.income},{label:'Ausgaben',value:totals.costs},{label:'Ergebnis',value:sumMoney([totals.income,-totals.costs]),hint:'Saldo erfasster Zahlungen'}]} notice={notice}/>;

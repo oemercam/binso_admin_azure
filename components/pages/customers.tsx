@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import {contactHref} from "@/lib/contact-links";
 import {LocalizedText} from "@/lib/client/locale";
 import {safeAppPath} from "@/lib/navigation";
@@ -167,9 +168,14 @@ export function CustomerForm({customerId}:{customerId?:string}={}) {
   const [sheetOpen,setSheetOpen]=useState(false);
   useEffect(()=>{queueMicrotask(()=>setSheetOpen(true))},[]);
   const [replay,setReplay]=useState<{body:string;key:string}|null>(null);
-  const recovery=useProcessDraft({process:customerId?"customer:edit:"+customerId:"customer:create",value:{company,email,phone,city,sector,address,postalCode,uid,notes,customerStatus,replay},dirty,enabled:!loadingRecord&&!recordError,onRestore:value=>{
+  const [allowDuplicate,setAllowDuplicate]=useState(false);
+  const [duplicateQuery,setDuplicateQuery]=useState('');
+  useEffect(()=>{const timer=window.setTimeout(()=>setDuplicateQuery(new URLSearchParams({name:company.trim(),email:email.trim(),uid:uid.trim(),excludeId:customerId??''}).toString()),250);return()=>window.clearTimeout(timer)},[company,email,uid,customerId]);
+  const duplicateCheck=useApiQuery<{items:Array<{id:string;customer_no:string;name:string;email?:string}>}>(isProductionBackendEnabled()&&!customerId&&company.trim().length>=2&&duplicateQuery?'/api/customers/duplicates?'+duplicateQuery:null);
+  const duplicateItems=duplicateCheck.data?.items??[];
+  const recovery=useProcessDraft({process:customerId?"customer:edit:"+customerId:"customer:create",value:{company,email,phone,city,sector,address,postalCode,uid,notes,customerStatus,replay,allowDuplicate},dirty,enabled:!loadingRecord&&!recordError,onRestore:value=>{
     if(!value||[value.company,value.email,value.phone,value.city,value.sector,value.address,value.postalCode,value.uid,value.notes].some(item=>typeof item!=="string"||item.length>320)||!["active","inactive"].includes(value.customerStatus))return;
-    setCompany(value.company);setEmail(value.email);setPhone(value.phone);setCity(value.city);setSector(value.sector);setAddress(value.address);setPostalCode(value.postalCode);setUid(value.uid);setNotes(value.notes);setCustomerStatus(value.customerStatus);
+    setAllowDuplicate(value.allowDuplicate===true);    setCompany(value.company);setEmail(value.email);setPhone(value.phone);setCity(value.city);setSector(value.sector);setAddress(value.address);setPostalCode(value.postalCode);setUid(value.uid);setNotes(value.notes);setCustomerStatus(value.customerStatus);
     if(value.replay&&typeof value.replay.body==="string"&&value.replay.body.length<8192&&typeof value.replay.key==="string"&&value.replay.key.length>=8&&value.replay.key.length<=128)setReplay(value.replay);
   }});
   const close=()=>{recovery.clear();allowDraftNavigation();setSheetOpen(false);router.push(returnTo)};
@@ -183,8 +189,8 @@ export function CustomerForm({customerId}:{customerId?:string}={}) {
     setToast(null);saveRecordPending.current=true;setSavingRecord(true);
     try{
       if(isProductionBackendEnabled()){
-        const body={name:company.trim(),sector,email,phone,city,address,postalCode,uid,notes,status:customerStatus},serialized=JSON.stringify(body);
-        const attempt=replay?.body===serialized?replay:{body:serialized,key:crypto.randomUUID()};setReplay(attempt);recovery.persist({company,email,phone,city,sector,address,postalCode,uid,notes,customerStatus,replay:attempt});
+        const body={name:company.trim(),sector,email,phone,city,address,postalCode,uid,notes,status:customerStatus,...(!customerId?{allowDuplicate}:{})},serialized=JSON.stringify(body);
+        const attempt=replay?.body===serialized?replay:{body:serialized,key:crypto.randomUUID()};setReplay(attempt);recovery.persist({company,email,phone,city,sector,address,postalCode,uid,notes,customerStatus,replay:attempt,allowDuplicate});
         const result=customerId?await apiPatch<{item?:{id:string}}>("/api/customers/"+encodeURIComponent(customerId),body):await apiPost<{item?:{id:string}}>("/api/customers",body,{idempotencyKey:attempt.key});
         if(typeof result.item?.id!=="string"||!result.item.id)throw new Error("Die Speicherung konnte nicht bestätigt werden. Bitte den gespeicherten Stand prüfen.");
       }
@@ -203,17 +209,20 @@ export function CustomerForm({customerId}:{customerId?:string}={}) {
       {loadingRecord?<LoadingState><LocalizedText>{"Kunde wird geladen …"}</LocalizedText></LoadingState>:recordError?<ErrorState onRetry={recordQuery.refresh} retryLabel="Erneut versuchen"><LocalizedText>{recordError}</LocalizedText></ErrorState>:<form onSubmit={event=>{event.preventDefault();return save()}}>
         <FormWizard labels={["Grunddaten"]} step={0} onStep={()=>{}} busy={savingRecord} ariaLabel="Kunde erfassen" cancelAction={<Button variant="secondary" onClick={close}><LocalizedText>{"Abbrechen"}</LocalizedText></Button>} action={<Button requiresWrite type="submit" disabled={savingRecord||!recovery.ready||company.trim().length<2}><LocalizedText>{savingRecord?"Wird gespeichert…":customerId?"Änderungen speichern":"Kunde speichern"}</LocalizedText></Button>}>
           {toast&&toast!=="Kunde gespeichert."&&<ErrorState>{toast}</ErrorState>}
-          <Field label="Kundenname *"><Input required minLength={2} maxLength={320} autoComplete="organization" value={company} disabled={savingRecord} onChange={e=>setCompany(e.target.value)} placeholder="Firma oder Name"/></Field>
+          <Field label="Kundenname *"><Input required minLength={2} maxLength={320} autoComplete="organization" value={company} disabled={savingRecord} onChange={e=>{setCompany(e.target.value);setAllowDuplicate(false)}} placeholder="Firma oder Name"/></Field>
           <p><LocalizedText>{"* Pflichtfeld"}</LocalizedText></p>
+          {!customerId&&duplicateCheck.error&&<ErrorState onRetry={duplicateCheck.refresh}><LocalizedText>{duplicateCheck.error}</LocalizedText></ErrorState>}
+          {!customerId&&duplicateItems.length>0&&<section><h2><LocalizedText>{"Mögliche Dubletten"}</LocalizedText></h2>{duplicateItems.map(item=><p key={item.id}><Link href={'/kunden/'+encodeURIComponent(item.id)}>{item.customer_no} · {item.name}</Link></p>)}<Field label="Als separaten Kunden erfassen"><Input type="checkbox" checked={allowDuplicate} onChange={event=>setAllowDuplicate(event.target.checked)}/></Field></section>}
+
           <details className="optional-details"><summary><LocalizedText>{"Weitere Angaben"}</LocalizedText></summary><div className="form-grid two">
-            <Field label="E-Mail"><Input type="email" autoComplete="email" maxLength={320} value={email} disabled={savingRecord} onChange={e=>setEmail(e.target.value)} placeholder="name@firma.ch"/></Field>
+            <Field label="E-Mail"><Input type="email" autoComplete="email" maxLength={320} value={email} disabled={savingRecord} onChange={e=>{setEmail(e.target.value);setAllowDuplicate(false)}} placeholder="name@firma.ch"/></Field>
             <Field label="Telefon"><Input type="tel" inputMode="tel" autoComplete="tel" maxLength={320} value={phone} disabled={savingRecord} onChange={e=>setPhone(e.target.value)} placeholder="+41 00 000 00 00"/></Field>
             <Field label="Adresse"><Input autoComplete="street-address" maxLength={320} value={address} disabled={savingRecord} onChange={e=>setAddress(e.target.value)} placeholder="Strasse und Nummer"/></Field>
             <Field label="PLZ"><Input autoComplete="postal-code" maxLength={320} value={postalCode} disabled={savingRecord} onChange={e=>setPostalCode(e.target.value)} placeholder="8000"/></Field>
             <Field label="Ort"><Input autoComplete="address-level2" maxLength={320} value={city} disabled={savingRecord} onChange={e=>setCity(e.target.value)} placeholder="Zürich"/></Field>
             <Field label="Status"><Select disabled={savingRecord} value={customerStatus} onChange={e=>setCustomerStatus(e.target.value)}><option value="active"><LocalizedText>{"Aktiv"}</LocalizedText></option><option value="inactive"><LocalizedText>{"Inaktiv"}</LocalizedText></option></Select></Field>
             <Field label="Branche"><Select disabled={savingRecord} value={sector} onChange={e=>setSector(e.target.value)}><option value={"Dienstleistung"}><LocalizedText>{"Dienstleistung"}</LocalizedText></option><option value={"Bauunternehmen"}><LocalizedText>{"Bauunternehmen"}</LocalizedText></option><option value={"Immobilien"}><LocalizedText>{"Immobilien"}</LocalizedText></option><option value={"Beratung"}><LocalizedText>{"Beratung"}</LocalizedText></option><option value={"Handel"}><LocalizedText>{"Handel"}</LocalizedText></option><option value={"Elektro"}><LocalizedText>{"Elektro"}</LocalizedText></option></Select></Field>
-            <Field label="UID"><Input maxLength={320} value={uid} disabled={savingRecord} onChange={e=>setUid(e.target.value)} placeholder="CHE-000.000.000"/></Field>
+            <Field label="UID"><Input maxLength={320} value={uid} disabled={savingRecord} onChange={e=>{setUid(e.target.value);setAllowDuplicate(false)}} placeholder="CHE-000.000.000"/></Field>
             <Field label="Interne Notiz"><Input maxLength={320} value={notes} disabled={savingRecord} onChange={e=>setNotes(e.target.value)} placeholder="Optional"/></Field>
           </div></details>
         </FormWizard>

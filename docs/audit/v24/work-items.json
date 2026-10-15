@@ -723,12 +723,17 @@
     "parent": "V24-09-01",
     "phase": 9,
     "requirement": "Demo-Tenant/User und Seed/Reset prüfen.",
-    "status": "partial",
+    "status": "partial; acceptance open",
     "sourceEvidence": [],
     "implementationEvidence": [
-      "docs/audit/v24/charts-demo-phase.md"
+      "docs/audit/v24/charts-demo-phase.md",
+      "docs/audit/v24/consolidation-status.md",
+      "lib/server/repositories/demo-fixture.ts"
     ],
-    "testEvidence": [],
+    "testEvidence": [
+      "scripts/migration-test.mjs",
+      "scripts/document-presentation-test.mjs"
+    ],
     "acceptance": "open; final CI/browser/physical and complete domain coverage required"
   },
   {
@@ -736,12 +741,17 @@
     "parent": "V24-09-01",
     "phase": 9,
     "requirement": "Nur markierte Demo-Mandanten ändern, nie echte Kunden.",
-    "status": "partial",
+    "status": "partial; acceptance open",
     "sourceEvidence": [],
     "implementationEvidence": [
-      "docs/audit/v24/charts-demo-phase.md"
+      "docs/audit/v24/charts-demo-phase.md",
+      "docs/audit/v24/consolidation-status.md",
+      "lib/server/repositories/demo-fixture.ts"
     ],
-    "testEvidence": [],
+    "testEvidence": [
+      "scripts/migration-test.mjs",
+      "scripts/document-presentation-test.mjs"
+    ],
     "acceptance": "open; final CI/browser/physical and complete domain coverage required"
   },
   {
@@ -749,12 +759,18 @@
     "parent": "V24-09-01",
     "phase": 9,
     "requirement": "Deterministischer idempotenter Seed über mindestens zwölf Monate mit zusammenhängenden Kunden, Kontakten, Angeboten, Projekten, Leistungen, Zeiten, Ausgaben, Rechnungen, Zahlungen, Support und unterstützten Mahnungen/Gutschriften.",
-    "status": "partial",
+    "status": "partial; acceptance open",
     "sourceEvidence": [],
     "implementationEvidence": [
-      "docs/audit/v24/charts-demo-phase.md"
+      "docs/audit/v24/charts-demo-phase.md",
+      "docs/audit/v24/consolidation-status.md",
+      "lib/payment-reminder.ts",
+      "app/api/documents/[number]/send/route.ts"
     ],
-    "testEvidence": [],
+    "testEvidence": [
+      "scripts/migration-test.mjs",
+      "scripts/document-presentation-test.mjs"
+    ],
     "acceptance": "open; final CI/browser/physical and complete domain coverage required"
   },
   {
@@ -814,12 +830,17 @@
     "parent": "V24-09-01",
     "phase": 9,
     "requirement": "Alle Demo-Charts/KPIs aus echten PostgreSQL-Abfragen.",
-    "status": "partial",
+    "status": "partial; acceptance open",
     "sourceEvidence": [],
     "implementationEvidence": [
-      "docs/audit/v24/charts-demo-phase.md"
+      "docs/audit/v24/charts-demo-phase.md",
+      "docs/audit/v24/consolidation-status.md",
+      "lib/server/repositories/demo-fixture.ts"
     ],
-    "testEvidence": [],
+    "testEvidence": [
+      "scripts/migration-test.mjs",
+      "scripts/document-presentation-test.mjs"
+    ],
     "acceptance": "open; final CI/browser/physical and complete domain coverage required"
   },
   {
@@ -847,9 +868,17 @@
     "implementationEvidence": [
       "lib/server/credit-notes.ts",
       "components/documents.tsx",
-      "scripts/migration-test.mjs"
+      "scripts/migration-test.mjs",
+      "docs/audit/v24/consolidation-status.md",
+      "lib/payment-reminder.ts",
+      "app/api/documents/[number]/send/route.ts",
+      "lib/server/repositories/customers.ts",
+      "lib/server/offer-revisions.ts"
     ],
-    "testEvidence": [],
+    "testEvidence": [
+      "scripts/migration-test.mjs",
+      "scripts/document-presentation-test.mjs"
+    ],
     "acceptance": "Final CI/browser/operational acceptance remains open; no blanket completion."
   },
   {
@@ -891,9 +920,15 @@
     "implementationEvidence": [
       "lib/server/document-process.ts",
       "lib/server/repositories/business-api.ts",
-      "scripts/migration-test.mjs"
+      "scripts/migration-test.mjs",
+      "docs/audit/v24/consolidation-status.md",
+      "lib/payment-reminder.ts",
+      "app/api/documents/[number]/send/route.ts"
     ],
-    "testEvidence": [],
+    "testEvidence": [
+      "scripts/migration-test.mjs",
+      "scripts/document-presentation-test.mjs"
+    ],
     "acceptance": "Final CI/browser/operational acceptance remains open; no blanket completion."
   },
   {
@@ -989,10 +1024,17 @@
     "parent": "V24-12-01",
     "phase": 12,
     "requirement": "**Favicon klein nur originales Binso-Icon ohne „One“**, Original-Asset, 16/32, ico/SVG, Apple Touch, PWA 192/512/maskable, Manifest. de-CH/fr-CH/it-CH/en mit üblichen Schweizer Geschäftsbegriffen, zentralem Glossar, konsistenter Terminologie, CHF/MWST/Datum/Zahl/Plural; UI, Formulare, PDFs, E-Mails, Admin, SEO.",
-    "status": "open",
+    "status": "partial; acceptance open",
     "sourceEvidence": [],
-    "implementationEvidence": [],
-    "testEvidence": [],
+    "implementationEvidence": [
+      "docs/audit/v24/consolidation-status.md",
+      "lib/server/document-pdf.ts",
+      "database/migrations/0054_document_language_snapshot.sql"
+    ],
+    "testEvidence": [
+      "scripts/migration-test.mjs",
+      "scripts/document-presentation-test.mjs"
+    ],
     "acceptance": "open"
   },
   {

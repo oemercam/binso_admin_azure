@@ -14,12 +14,13 @@ export async function financeData(c:PoolClient,organizationId:string){
 
 /** Exact cash dates only. Legacy costs/payroll have no payment-date evidence. */
 export async function cashStatisticsData(c:PoolClient,organizationId:string){
- const [payments,outflows,coverage]=await Promise.all([
+ const [payments,outflows,coverage,refunds]=await Promise.all([
   c.query("select p.payment_date::text,sum(p.amount) amount from payments p join invoices i on i.id=p.invoice_id and i.organization_id=p.organization_id where p.organization_id=$1 and p.archived_at is null and p.allocation_status='matched' and i.currency='CHF' group by p.payment_date order by p.payment_date",[organizationId]),
   c.query("select (reimbursed_at at time zone 'Europe/Zurich')::date::text payment_date,sum(quantity*unit_price)::numeric(14,2) amount from expenses where organization_id=$1 and archived_at is null and currency='CHF' and reimbursed_at is not null and status in ('approved','posted') group by (reimbursed_at at time zone 'Europe/Zurich')::date order by payment_date",[organizationId]),
-  c.query("select exists(select 1 from operating_costs where organization_id=$1 and scope='tenant' and currency='CHF') or exists(select 1 from payroll_runs where organization_id=$1 and status in ('approved','paid')) incomplete",[organizationId])
+  c.query("select exists(select 1 from operating_costs where organization_id=$1 and scope='tenant' and currency='CHF') or exists(select 1 from payroll_runs where organization_id=$1 and status in ('approved','paid')) incomplete",[organizationId]),
+  c.query("select r.refund_date::text payment_date,sum(r.amount) amount from invoice_refunds r join invoices i on i.organization_id=r.organization_id and i.id=r.invoice_id where r.organization_id=$1 and i.currency='CHF' and r.refund_date<=(now() at time zone 'Europe/Zurich')::date group by r.refund_date order by r.refund_date",[organizationId])
  ]);
- return {payments:payments.rows,outflows:outflows.rows,incomplete:Boolean(coverage.rows[0]?.incomplete),financial:await financialMetricsData(c,organizationId)};
+ return {payments:payments.rows,outflows:outflows.rows,refunds:refunds.rows,incomplete:Boolean(coverage.rows[0]?.incomplete),financial:await financialMetricsData(c,organizationId)};
 }
 
 
@@ -36,16 +37,18 @@ export async function financialMetricsData(c:PoolClient,organizationId:string,op
   ) select date::text,sum(amount) amount from events group by date order by date`,params),
   c.query(`with issued as (${scope}), credits as (
    select n.invoice_id,sum(n.amount) amount from credit_notes n join issued i on i.id=n.invoice_id and i.organization_id=n.organization_id where n.organization_id=$1 and n.credit_date<=(now() at time zone 'Europe/Zurich')::date group by n.invoice_id
+  ), refunds as (
+   select r.invoice_id,sum(r.amount) amount from invoice_refunds r join issued i on i.id=r.invoice_id and i.organization_id=r.organization_id where r.organization_id=$1 and r.refund_date<=(now() at time zone 'Europe/Zurich')::date group by r.invoice_id
   ), adjusted as (
-   select i.*,greatest(0,i.total_amount-coalesce(n.amount,0)) gross from issued i left join credits n on n.invoice_id=i.id
+   select i.*,greatest(0,i.total_amount-coalesce(n.amount,0)) gross,greatest(0,i.paid_amount-coalesce(r.amount,0)) settled_amount from issued i left join credits n on n.invoice_id=i.id left join refunds r on r.invoice_id=i.id
   ) select (now() at time zone 'Europe/Zurich')::date::text as_of,
-   coalesce(sum(least(paid_amount,gross)),0) paid,
-   coalesce(sum(greatest(0,gross-paid_amount)) filter(where due_date>=(now() at time zone 'Europe/Zurich')::date),0) open,
-   coalesce(sum(greatest(0,gross-paid_amount)) filter(where due_date<(now() at time zone 'Europe/Zurich')::date),0) overdue,
-   coalesce(sum(greatest(0,gross-paid_amount)),0) receivables,
-   count(*) filter(where gross>paid_amount)::int open_count,
-   count(*) filter(where gross>paid_amount and due_date<(now() at time zone 'Europe/Zurich')::date)::int overdue_count,
-   coalesce(sum(greatest(0,paid_amount-gross)),0) credit_balance
+   coalesce(sum(least(settled_amount,gross)),0) paid,
+   coalesce(sum(greatest(0,gross-settled_amount)) filter(where due_date>=(now() at time zone 'Europe/Zurich')::date),0) open,
+   coalesce(sum(greatest(0,gross-settled_amount)) filter(where due_date<(now() at time zone 'Europe/Zurich')::date),0) overdue,
+   coalesce(sum(greatest(0,gross-settled_amount)),0) receivables,
+   count(*) filter(where gross>settled_amount)::int open_count,
+   count(*) filter(where gross>settled_amount and due_date<(now() at time zone 'Europe/Zurich')::date)::int overdue_count,
+   coalesce(sum(greatest(0,settled_amount-gross)),0) credit_balance
    from adjusted`,params)
  ]);
  return {revenueEvents:revenue.rows,snapshot:snapshot.rows[0]};

@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import {moduleUrl,financialModuleUrl} from './data-test-modules.mjs';
+const domain=moduleUrl(await fs.readFile('config/domain.ts','utf8'));
+const {planPaymentReminder}=await import(moduleUrl((await fs.readFile('lib/payment-reminder.ts','utf8')).replace("'@/config/domain'",JSON.stringify(domain)).replace("'./financial-status'",JSON.stringify(financialModuleUrl))));
+const invoice={kind:'invoice',status:'sent',total:100,paid_amount:20,credit_amount:10,due_date:'2026-10-01'};
+assert.deepEqual(planPaymentReminder(invoice,[],'2026-10-15'),{stage:1,amount:70,deadline:'2026-10-25'});
+for(const document of [{...invoice,kind:'offer'},{...invoice,status:'draft'},{...invoice,status:'cancelled'},{...invoice,paid_amount:90},{...invoice,credit_amount:80},{...invoice,due_date:'2026-10-15'},{...invoice,due_date:null}])assert.equal(planPaymentReminder(document,[],'2026-10-15').error,'reminder_not_due');
+const sent={stage:1,status:'sent',deadline:'2026-10-25'};
+for(const today of ['2026-10-15','2026-10-25'])assert.equal(planPaymentReminder(invoice,[sent],today).error,'reminder_too_soon');
+assert.deepEqual(planPaymentReminder(invoice,[sent],'2026-10-26'),{stage:2,amount:70,deadline:'2026-11-05'});
+assert.equal(planPaymentReminder(invoice,[{...sent,status:'failed'}],'2026-10-15').stage,1,'An unconfirmed delivery does not advance the stage');
+assert.equal(planPaymentReminder(invoice,[{...sent,stage:3}],'2026-10-26').error,'reminder_complete');
+assert.equal(planPaymentReminder(invoice,[{...sent,deadline:null}],'2026-10-26').error,'reminder_history_invalid');
+assert.equal(planPaymentReminder(invoice,[{...sent,stage:0}],'2026-10-26').error,'reminder_history_invalid');
+assert.equal(planPaymentReminder(invoice,[],'2026-03-25').deadline,undefined,'An invoice not yet due never receives a reminder');
+assert.equal(planPaymentReminder({...invoice,due_date:'2026-03-01'},[],'2026-03-25').deadline,'2026-04-04','Deadline arithmetic survives DST');
+console.log('Reminder prerequisites, credit/payment balance, sequential manual stages, inclusive stored deadlines, failed-delivery history and DST passed.');

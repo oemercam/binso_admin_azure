@@ -116,7 +116,7 @@ async function actionEvidence(page,name,theme){
 const navigationCaptures=[];
 async function captureNavigation(page,theme,width,withCreate){navigationCaptures.push({theme,width,withCreate,navigation:await page.locator(".bottom-nav").evaluate(el=>{const r=el.getBoundingClientRect(),c=getComputedStyle(el);return {x:r.x,width:r.width,height:r.height,bottomOffset:innerHeight-r.bottom,position:c.position,borderRadius:c.borderRadius,links:[...el.querySelectorAll("a")].map(a=>a.getAttribute("href"))}})});}
 const results=[];const errors=[];const accessibilityFailures=[];let failMutation=false,posts=0,failLedger=false,failSend=false,messagePosts=0,uploads=0,employeeLedgerFixture=false,groupingFixture=false,releaseReceiptScan;
-let creditPosts=0,failCredit=false;const creditKeys=[];
+let creditPosts=0,failCredit=false,adjustmentPosts=0,failAdjustment=false;const creditKeys=[],adjustmentKeys=[];
 let policyPosts=0,policyRequired=true,policyRole=process.env.BINSO_UX_FIXTURE_CASE==='employee'?'member':['owner','admin','finance'].includes(process.env.BINSO_UX_FIXTURE_CASE)?process.env.BINSO_UX_FIXTURE_CASE:"owner",policyReadOnly=false,failPolicy=false,teamPosts=0,failTeam=false;
 let failPreferences=false,preferencePosts=0;
 let notificationWrites=0,failNotificationWrite=false,securityUnavailable=false,sessionDeletes=0;
@@ -124,6 +124,7 @@ let dataPaymentMode=false,dataPaymentFailed=false,dataPaymentPosts=0,holdDataRef
 let projectSourceMode=false,failProjectSource=false,projectSourceTitle='Synthetic accepted offer',processRecoveryMode=false;
 let incompleteProductResponse=false;let failReportDownload=false,reportExports=0;
 let projectPosts=0,failProjectCreate=false,loseProjectResponse=false;const projectReplays=new Map();
+let revisionPosts=0,failRevision=false,revisedOfferFixture;const revisionKeys=[];
 let customerPosts=0,failCustomerCreate=false,loseCustomerResponse=false;const customerReplays=new Map();
 let teamMemberRole='member';let supportMessages=[];
 const operatorAccount={tenant_id:'tenant-one',tenant:{name:'Prüffirma AG'},plan:'pro',subscription_status:'active',account_status:'active',user_limit:10,updated_at:'2026-10-09'};
@@ -149,6 +150,21 @@ try{
     if(req.method()==='PATCH'&&p==='/api/projects/project-one'){const body=JSON.parse(req.postData());if(body.version!==projectFixture.version)return route.fulfill({status:409,json:{message:'Project changed'}});Object.assign(projectFixture,{name:body.name,status:body.status,notes:body.notes,hours_budget:body.hoursBudget,version:projectFixture.version+1});return route.fulfill({json:{item:projectFixture}});}
     if(p==='/api/payments'&&dataPaymentMode){dataPaymentPosts++;if(incompletePaymentResponse)return route.fulfill({status:201,json:{}});if(dataPaymentFailed)return route.fulfill({status:503,json:{error:'unavailable',message:'Synthetic payment failed'}});const key=req.headers()['idempotency-key'];assert.ok(key,'Financial requests carry a replay key');if(paymentReplays.has(key))return route.fulfill({status:200,json:{item:paymentReplays.get(key)}});const body=JSON.parse(req.postData());invoice.paid_amount+=body.amount;const row={...payment,id:'foundation-payment',amount:body.amount,paid_on:'2026-10-09'};collections.payments.unshift(row);paymentReplays.set(key,row);summary.invoices[0].open_amount=invoice.total-invoice.paid_amount;if(losePaymentResponse){losePaymentResponse=false;return route.abort('failed');}return route.fulfill({status:201,json:{item:row}});}
 
+    if(p==='/api/documents/AN-TEST-1/revision'){
+     revisionPosts++;const key=req.headers()['idempotency-key'];assert.ok(key);revisionKeys.push(key);
+     if(failRevision)return route.fulfill({status:503,json:{message:'Synthetic revision unavailable'}});
+     revisedOfferFixture={...offer,id:'offer-revision',number:'AN-REV-1',status:'draft',revises_offer:offer.number};return route.fulfill({status:201,json:{item:revisedOfferFixture}});
+    }
+    if(p==='/api/documents/RE-TEST-1/refunds'){
+     adjustmentPosts++;adjustmentKeys.push(req.headers()['idempotency-key']);assert.ok(adjustmentKeys.at(-1));
+     if(failAdjustment)return route.fulfill({status:503,json:{message:'Synthetic refund unavailable'}});
+     const body=JSON.parse(req.postData());invoice.refund_amount=Number(invoice.refund_amount??0)+body.amount;invoice.refunds=[{id:'refund-one',date:body.date,amount:body.amount,reason:body.reason}];return route.fulfill({status:201,json:{item:invoice.refunds[0]}});
+    }
+    if(p==='/api/documents/RE-TEST-1/send'&&JSON.parse(req.postData()).purpose==='reminder'){
+     adjustmentPosts++;const body=JSON.parse(req.postData());adjustmentKeys.push(body.requestKey);assert.ok(body.requestKey);
+     if(failAdjustment)return route.fulfill({status:503,json:{message:'Synthetic reminder unavailable'}});
+     invoice.reminders=[{id:'reminder-one',stage:1,status:'sent',recipient:body.recipient,amount:invoice.total-invoice.paid_amount,deadline:'2026-10-25',completed_at:'2026-10-15T12:00:00Z'}];return route.fulfill({json:{ok:true}});
+    }
     if(p==='/api/documents/RE-TEST-1/credits'){
      creditPosts++;const key=req.headers()['idempotency-key'];assert.ok(key,'Credit booking carries an immutable replay key');creditKeys.push(key);
      if(failCredit)return route.fulfill({status:503,json:{message:'Synthetic credit unavailable'}});
@@ -212,6 +228,8 @@ try{
    else if(p==='/api/finance/overview')data=url.searchParams.get('include')==='workspace'?{...summary,documents:collections.documents,cash:cashFixture(dataPaymentMode?invoice.paid_amount:200),data:{payments:[{payment_date:'2026-09-15',amount:120},{payment_date:'2026-10-05',amount:dataPaymentMode?invoice.paid_amount:200}],expenses:[{expense_date:'2026-09-15',amount:20},{expense_date:'2026-10-05',amount:50}],payroll:[],operatingCosts:[]}}:summary;
    else if(['/api/operator/finance','/api/demo/platform-finance'].includes(p))data={payments:[{payment_date:'2026-10-05',amount:200}],subscriptions:[{created_at:'2026-10-05',monthly_revenue_chf:79}],operatingCosts:[{cost_date:'2026-10-05',amount:20}]};
    else if(p==='/api/finance')data={cash:cashFixture(dataPaymentMode?invoice.paid_amount:200),payments:[{payment_date:'2026-09-15',amount:120},{payment_date:'2026-10-05',amount:dataPaymentMode?invoice.paid_amount:200}],expenses:[{expense_date:'2026-09-15',amount:20},{expense_date:'2026-10-05',amount:50}],payroll:[],operatingCosts:[]};
+   else if(p==='/api/customers/duplicates')data={items:url.searchParams.get('name')===customer.name?[customer]:[]};
+   else if(p==='/api/documents/AN-REV-1')data={item:revisedOfferFixture};
    else if(p==='/api/customers'||p==='/api/demo/data'&&url.searchParams.get('collection')==='customers')data=customerListFixture(url.searchParams);
    else if(p==='/api/demo/data')data=recordListFixture(url.searchParams.get('collection'),url.searchParams);
    else if(['/api/products','/api/employees','/api/expenses','/api/payments'].includes(p))data=recordListFixture(p.split('/')[2],url.searchParams);
@@ -368,7 +386,7 @@ try{
   if(hasInteraction('customers')){
     customerPosts=0;customerReplays.clear();
     await navigate(base+'/kunden/neu');const customerSheet=()=>page.getByRole('dialog',{name:'Kunde erstellen',exact:true});await customerSheet().waitFor();await customerSheet().getByRole('button',{name:'Schliessen',exact:true}).click();await page.waitForURL(base+'/kunden');assert.equal(await page.getByRole('alertdialog').count(),0,'An unchanged customer sheet closes without warning');
-    await navigate(base+'/kunden/neu');await customerSheet().getByLabel('Kundenname *',{exact:true}).fill('Minimal Company AG');assert.equal(await customerSheet().getByText(/^K-\d+/).count(),0,'No generated customer number appears in creation');failCustomerCreate=true;await customerSheet().getByRole('button',{name:'Kunde speichern',exact:true}).click();await page.getByText('Synthetic customer creation unavailable',{exact:true}).waitFor();assert.equal(customerPosts,1);assert.equal(await customerSheet().getByLabel('Kundenname *',{exact:true}).inputValue(),'Minimal Company AG');
+    await navigate(base+'/kunden/neu');await customerSheet().getByLabel('Kundenname *',{exact:true}).fill(customer.name);await customerSheet().getByRole('heading',{name:'Mögliche Dubletten',exact:true}).waitFor();await customerSheet().getByLabel('Als separaten Kunden erfassen',{exact:true}).check();await customerSheet().getByLabel('Kundenname *',{exact:true}).fill('Minimal Company AG');await customerSheet().getByRole('heading',{name:'Mögliche Dubletten',exact:true}).waitFor({state:'hidden'});assert.equal(await customerSheet().getByText(/^K-\d+/).count(),0,'No generated customer number appears in creation');failCustomerCreate=true;await customerSheet().getByRole('button',{name:'Kunde speichern',exact:true}).click();await page.getByText('Synthetic customer creation unavailable',{exact:true}).waitFor();assert.equal(customerPosts,1);assert.equal(await customerSheet().getByLabel('Kundenname *',{exact:true}).inputValue(),'Minimal Company AG');
     await customerSheet().locator('summary').click();await customerSheet().getByLabel('E-Mail',{exact:true}).fill('invalid-email');await customerSheet().locator('summary').click();await customerSheet().getByRole('button',{name:'Kunde speichern',exact:true}).click();assert.equal(customerPosts,1,'An invalid optional email cannot submit even when its group is collapsed');assert.equal(await customerSheet().locator('details').getAttribute('open'),'','Native validation reopens the invalid optional group');await customerSheet().getByLabel('E-Mail',{exact:true}).fill('');await customerSheet().locator('summary').click();
     await page.setViewportSize({width:320,height:400});await customerSheet().locator('summary').click();await customerSheet().getByLabel('Ort',{exact:true}).focus();const customerGeometry=await customerSheet().evaluate(el=>{const header=el.querySelector('.sheet-header').getBoundingClientRect(),footer=el.querySelector('.mobile-sticky-save').getBoundingClientRect();return {headerTop:header.top,footerBottom:footer.bottom,width:el.getBoundingClientRect().width,height:window.innerHeight}});assert.ok(customerGeometry.headerTop>=0&&customerGeometry.footerBottom<=customerGeometry.height+1&&customerGeometry.width<=320,'Customer sheet header and action footer remain reachable in a short narrow viewport');await capture(page,{path:path.join(output,`${theme}-320-400-customer-sheet.png`)},customerSheet());await page.setViewportSize({width:430,height:900});
     failCustomerCreate=false;await customerSheet().getByRole('button',{name:'Kunde speichern',exact:true}).dblclick();await page.waitForURL(base+'/kunden');assert.equal(customerPosts,2,'Two completion taps send one customer retry');assert.equal(customerReplays.size,1);
@@ -613,6 +631,36 @@ try{
    await capture(page,{animations:'disabled',path:path.join(output,`${theme}-430-credit-note.png`)});
    if(creditBefore.amount===undefined)delete invoice.credit_amount;else invoice.credit_amount=creditBefore.amount;
    if(creditBefore.credits===undefined)delete invoice.credits;else invoice.credits=creditBefore.credits;
+   revisionPosts=0;revisionKeys.length=0;failRevision=true;
+   await navigate(base+'/angebote/AN-TEST-1');await page.waitForLoadState('networkidle');
+   await page.getByRole('button',{name:'Weitere Aktionen',exact:true}).filter({visible:true}).click();
+   const revisionActions=page.getByRole('dialog',{name:'Weitere Aktionen'});
+   await revisionActions.getByRole('button',{name:'Angebot überarbeiten',exact:true}).click();await revisionActions.getByText('Synthetic revision unavailable',{exact:true}).waitFor();
+   assert.equal(new URL(page.url()).pathname,'/angebote/AN-TEST-1');failRevision=false;
+   await revisionActions.getByRole('button',{name:'Angebot überarbeiten',exact:true}).click();await page.waitForURL(base+'/angebote/AN-REV-1');await page.getByRole('link',{name:'AN-TEST-1',exact:true}).waitFor();
+   assert.equal(revisionPosts,2);assert.equal(revisionKeys[0],revisionKeys[1]);assert.equal(offer.status,'sent','Draft revision does not withdraw the issued source');
+   const ledgerBefore={paid_amount:invoice.paid_amount,credit_amount:invoice.credit_amount,refund_amount:invoice.refund_amount,refunds:invoice.refunds,reminders:invoice.reminders,due_date:invoice.due_date};
+   invoice.paid_amount=invoice.total;invoice.credit_amount=35.13;invoice.refund_amount=0;adjustmentPosts=0;adjustmentKeys.length=0;
+   await navigate(base+'/rechnungen/RE-TEST-1');await page.waitForLoadState('networkidle');
+   await page.getByRole('button',{name:'Weitere Aktionen',exact:true}).filter({visible:true}).click();
+   await page.getByRole('dialog',{name:'Weitere Aktionen'}).getByRole('button',{name:'Rückerstattung erfassen',exact:true}).click();
+   const refundDialog=page.getByRole('dialog',{name:'Rückerstattung erfassen'});await refundDialog.waitFor();
+   await refundDialog.getByLabel('Betrag',{exact:true}).fill('20');await refundDialog.getByLabel('Interne Begründung',{exact:true}).fill('Synthetic bank refund REF-123');await refundDialog.getByLabel('Rückerstattungsdatum',{exact:true}).fill('2026-10-15');
+   failAdjustment=true;await refundDialog.getByRole('button',{name:'Rückerstattung erfassen',exact:true}).click();await refundDialog.getByText('Synthetic refund unavailable',{exact:true}).waitFor();
+   assert.equal(await refundDialog.getByLabel('Betrag',{exact:true}).inputValue(),'20');
+   failAdjustment=false;await refundDialog.getByRole('button',{name:'Rückerstattung erfassen',exact:true}).click();await refundDialog.waitFor({state:'hidden'});await page.getByText('Synthetic bank refund REF-123',{exact:true}).waitFor();
+   assert.equal(adjustmentPosts,2);assert.equal(adjustmentKeys[0],adjustmentKeys[1]);assert.equal(invoice.paid_amount,invoice.total,'Refund cannot rewrite the original receipt');
+   Object.assign(invoice,ledgerBefore);invoice.due_date='2020-01-01';adjustmentPosts=0;adjustmentKeys.length=0;
+   await navigate(base+'/rechnungen/RE-TEST-1');await page.waitForLoadState('networkidle');
+   await page.getByRole('button',{name:'Weitere Aktionen',exact:true}).filter({visible:true}).click();
+   await page.getByRole('dialog',{name:'Weitere Aktionen'}).getByRole('button',{name:'Zahlungserinnerung senden',exact:true}).click();
+   const reminderDialog=page.getByRole('dialog',{name:'Zahlungserinnerung senden'});await reminderDialog.waitFor();await reminderDialog.getByLabel('Empfänger',{exact:true}).fill('reminder@example.invalid');
+   failAdjustment=true;await reminderDialog.getByRole('button',{name:'Zahlungserinnerung senden',exact:true}).click();await reminderDialog.getByText('Synthetic reminder unavailable',{exact:true}).waitFor();
+   failAdjustment=false;await reminderDialog.getByRole('button',{name:'Zahlungserinnerung senden',exact:true}).click();await reminderDialog.waitFor({state:'hidden'});await page.getByRole('heading',{name:'Mahnhistorie',exact:true}).waitFor();
+   assert.equal(adjustmentPosts,2);assert.equal(adjustmentKeys[0],adjustmentKeys[1],'Retry retains the delivery key');
+   await capture(page,{animations:'disabled',path:path.join(output,`${theme}-430-reminder-history.png`)});
+   Object.assign(invoice,ledgerBefore);
+
 
   }
   if(hasInteraction('employees')){

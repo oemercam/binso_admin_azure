@@ -113,7 +113,9 @@
     "evidence": [
       "lib/server/repositories/demo-fixture.ts",
       "scripts/migration-test.mjs",
-      "docs/audit/v24/consolidation-status.md"
+      "docs/audit/v24/consolidation-status.md",
+      "lib/payment-reminder.ts",
+      "app/api/documents/[number]/send/route.ts"
     ],
     "acceptance": "Open: implementation evidence is not complete acceptance of every clause; see consolidation-status.md for section-level gaps."
   },
@@ -126,7 +128,11 @@
       "lib/server/credit-notes.ts",
       "lib/server/document-process.ts",
       "scripts/migration-test.mjs",
-      "docs/audit/v24/consolidation-status.md"
+      "docs/audit/v24/consolidation-status.md",
+      "lib/payment-reminder.ts",
+      "app/api/documents/[number]/send/route.ts",
+      "lib/server/repositories/customers.ts",
+      "lib/server/offer-revisions.ts"
     ],
     "acceptance": "Open: implementation evidence is not complete acceptance of every clause; see consolidation-status.md for section-level gaps."
   },
@@ -149,7 +155,9 @@
     "evidence": [
       "lib/locales/messages.json",
       "app/layout.tsx",
-      "docs/audit/v24/consolidation-status.md"
+      "docs/audit/v24/consolidation-status.md",
+      "lib/server/document-pdf.ts",
+      "database/migrations/0054_document_language_snapshot.sql"
     ],
     "acceptance": "Open: implementation evidence is not complete acceptance of every clause; see consolidation-status.md for section-level gaps."
   },

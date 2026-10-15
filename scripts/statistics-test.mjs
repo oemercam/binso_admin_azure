@@ -18,7 +18,7 @@ for(const [from,to,resolution] of [['2026-10-01','2026-10-31','week'],['2026-05-
  const result=aggregateStatistics(events,{from,to},['income','costs']);assert.equal(result.resolution,resolution);assert.equal(result.totals.income,to==='2026-10-10'?0.3:90000.3);assert.ok(result.buckets.length<=24);
 }
 const long=aggregateStatistics([],{from:'1900-01-01',to:'9998-12-31'},['income']);assert.ok(long.buckets.length<=12,'Very long ranges remain bounded');assert.ok(long.buckets.every(bucket=>bucket.values.income===0),'No invented bars');
-const cashSource=(await fs.readFile('lib/cash-statistics.ts','utf8'));const {cashStatisticEvents}=await import(moduleUrl(cashSource));
+const cashSource=(await fs.readFile('lib/cash-statistics.ts','utf8')).replace("'./money'",JSON.stringify(moneyModuleUrl));const {cashStatisticEvents}=await import(moduleUrl(cashSource));
 assert.deepEqual(cashStatisticEvents({payments:[{payment_date:'2026-10-10',amount:50}],outflows:[{payment_date:'2026-10-11',amount:20}]}),[{date:'2026-10-10',values:{income:50,costs:0}},{date:'2026-10-11',values:{income:0,costs:20}}]);
 console.log('Central statistics: presets, inclusive dates, invalid dates, UTC/DST-independent groups, decimal precision, bounded long periods and cash mapping passed.');
 
@@ -59,7 +59,7 @@ console.log('Actual chart and shared KPI foundation: pointer/Enter/Space, zero s
 const {PGlite}=await import('@electric-sql/pglite');
 const financeDb=new PGlite();
 try{
- await financeDb.exec(`create table invoices(id text,organization_id text,currency text,status text,archived_at timestamptz,issue_date date,due_date date,total_amount numeric(14,2),paid_amount numeric(14,2),customer_id uuid);create table credit_notes(invoice_id text,organization_id text,credit_date date,amount numeric(14,2));`);
+ await financeDb.exec(`create table invoices(id text,organization_id text,currency text,status text,archived_at timestamptz,issue_date date,due_date date,total_amount numeric(14,2),paid_amount numeric(14,2),customer_id uuid);create table credit_notes(invoice_id text,organization_id text,credit_date date,amount numeric(14,2));create table invoice_refunds(invoice_id text,organization_id text,refund_date date,amount numeric(14,2));`);
  const today=(await financeDb.query("select (now() at time zone 'Europe/Zurich')::date::text as business_day")).rows[0].business_day;
  await financeDb.exec(`insert into invoices(id,organization_id,currency,status,archived_at,issue_date,due_date,total_amount,paid_amount) values
  ('partial','a','CHF','partial',null,current_date-10,current_date-1,100,50),
@@ -81,6 +81,12 @@ try{
  await financeDb.exec("insert into credit_notes values('paid','a',current_date,100)");
  const credited=await financialMetricsData(financeDb,'a');assert.equal(Number(credited.snapshot.paid),150);assert.equal(Number(credited.snapshot.credit_balance),100,'Credit after full payment is exposed as credit balance, not a negative receivable');
  assert.equal(Number(credited.snapshot.paid)+Number(credited.snapshot.open)+Number(credited.snapshot.overdue),480,'Ring segments form one adjusted invoice volume');
+ await financeDb.exec("insert into invoice_refunds values('paid','a',current_date,60),('paid','a',current_date+1,30),('paid','b',current_date,999)");
+ const repaid=await financialMetricsData(financeDb,'a');
+ assert.equal(Number(repaid.snapshot.credit_balance),40,'Only actual current-tenant repayments reduce customer credit');
+ assert.equal(repaid.snapshot.receivables,credited.snapshot.receivables,'Refunds do not manufacture new receivables');
+ assert.deepEqual(repaid.revenueEvents,credited.revenueEvents,'Credit note already corrected revenue; refund must not correct it again');
+ assert.deepEqual(cashStatisticEvents({refunds:[{payment_date:today,amount:60}]}),[{date:today,values:{income:-60,costs:0}}],'A refund is a negative receipt on the actual repayment date');
  const empty=await financialMetricsData(financeDb,'empty');assert.equal(empty.revenueEvents.length,0);for(const key of ['paid','open','overdue','credit_balance'])assert.equal(Number(empty.snapshot[key]),0);
  const {listStatusOverride}=await import(moduleUrl(await fs.readFile('lib/list-filter.ts','utf8')));
  assert.equal(listStatusOverride('?status='+encodeURIComponent('Überfällig'),['Alle','Überfällig']),'Überfällig');assert.equal(listStatusOverride('?status=unknown',['Alle']),undefined);assert.equal(listStatusOverride('?status=https://foreign.invalid',['Alle']),undefined);

@@ -4,7 +4,7 @@ import type {PoolClient} from 'pg';
 import {ApiError} from '../http';
 export const demoTemplateId='00000000-0000-4000-8000-000000000099';
 // Fixed canonical tables, ordered by their foreign keys. No platform or authentication records are copied.
-const tables=['customers','employees','suppliers','products_services','quotes','quote_lines','projects','orders','contracts','invoices','invoice_lines','payments','credit_notes','expenses','time_entries','tasks','absences','payroll_runs','operating_costs','customer_contacts','supplier_invoices','accounting_entries','bank_transactions','vat_periods','business_documents','entity_notes','support_cases','support_messages','in_app_notifications','customer_activities'] as const;
+const tables=['customers','employees','suppliers','products_services','quotes','quote_lines','projects','orders','contracts','invoices','invoice_lines','payments','credit_notes','invoice_refunds','expenses','time_entries','tasks','absences','payroll_runs','operating_costs','customer_contacts','supplier_invoices','accounting_entries','bank_transactions','vat_periods','business_documents','entity_notes','support_cases','support_messages','in_app_notifications','customer_activities'] as const;
 export async function seedDatabaseDemo(c:PoolClient,organizationId:string,userId:string,userEmail?:string){
  const target=await c.query('select is_demo from organizations where id=$1',[organizationId]);
  if(target.rows[0]?.is_demo!==true||organizationId===demoTemplateId)throw new ApiError(403,'demo_target_invalid','Ungültiger Demo-Mandant.');
@@ -98,6 +98,11 @@ export async function seedDemoScenarios(c:PoolClient,organizationId:string,userI
  }
  await c.query(`insert into credit_notes(id,organization_id,external_id,credit_no,invoice_id,customer_id,credit_date,amount,reason)
   values($1,$2,'v24-credit-note','V24-GS-001',$3,$4,$5,100,'Demo: Gutschrift nach Zahlung, Rückerstattung offen') on conflict(id) do nothing`,[id('credit-note'),organizationId,id('invoice-'+date(-1).slice(0,7)+'-paid'),customer.id,date(-1,20)]);
+ await c.query(`insert into invoice_refunds(id,organization_id,external_id,invoice_id,customer_id,refund_date,amount,reason,created_by_user_id)
+  values($1,$2,'v24-refund',$3,$4,$5,60,'Demo: erfasste Teilrückerstattung nach Gutschrift',$6) on conflict(id) do nothing`,[id('refund'),organizationId,id('invoice-'+date(-1).slice(0,7)+'-paid'),customer.id,date(-1,22),userId]);
+ await c.query(`insert into document_deliveries(id,organization_id,kind,document_id,recipient,status,request_key,created_by_user_id,purpose,reminder_stage,balance_amount,payment_deadline,created_at,completed_at)
+  select $1,$2,'invoice',i.id,'simulated-reminder@demo.example.invalid','sent',$3,$4,'reminder',1,i.total_amount-i.paid_amount,$5,$6::date::timestamp at time zone 'Europe/Zurich',$6::date::timestamp at time zone 'Europe/Zurich'
+  from invoices i where i.organization_id=$2 and i.id=$7 on conflict(id) do nothing`,[id('reminder'),organizationId,'v24-simulated-reminder',userId,date(-1,28),date(-1,20),id('invoice-'+date(-1).slice(0,7)+'-overdue')]);
  await c.query(`insert into customers(id,organization_id,external_id,customer_no,name,email,status)
   values($1,$2,'v24-inactive-customer','V24-K-001','Demo: inaktiver Kunde','inactive@demo.example.invalid','inactive') on conflict(id) do nothing`,[id('inactive-customer'),organizationId]);
  await c.query(`insert into support_cases(id,organization_id,case_number,created_by_user_id,category,subject,status,internal_priority,created_at,updated_at)

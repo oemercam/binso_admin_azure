@@ -1015,8 +1015,8 @@
     "Data dell’offerta"
   ],
   "Angebotsdatum:": [
-    "Quote date:",
-    "Date du devis :",
+    "Offer date:",
+    "Date de l’offre :",
     "Data dell’offerta:"
   ],
   "Angebotseinleitung": [
@@ -2205,9 +2205,9 @@
     "Verifica il codice paese nell’indirizzo del cliente."
   ],
   "Bitte den Rechnungsbetrag mit dem folgenden QR-Zahlteil bezahlen.": [
-    "Please pay the invoice amount using the QR payment section below.",
-    "Veuillez régler le montant de la facture avec la section de paiement QR ci-dessous.",
-    "Paga l’importo della fattura tramite la sezione di pagamento QR seguente."
+    "Please pay the invoice amount using the following QR payment section.",
+    "Veuillez régler la facture avec la section de paiement QR ci-dessous.",
+    "Pagare l’importo della fattura utilizzando la seguente sezione di pagamento QR."
   ],
   "Bitte den Zahlungsbeleg oder die Zahlungsreferenz angeben.": [
     "Please enter a payment receipt or payment reference.",
@@ -4395,9 +4395,9 @@
     "Bozza"
   ],
   "ENTWURF - nicht zur Zahlung / nicht versenden": [
-    "DRAFT – not for payment / do not send",
-    "BROUILLON – ne pas payer / ne pas envoyer",
-    "BOZZA – non pagare / non inviare"
+    "DRAFT - not payable / do not send",
+    "BROUILLON - non payable / ne pas envoyer",
+    "BOZZA - non pagabile / non inviare"
   ],
   "Entwurf wurde nicht gefunden.": [
     "Draft not found.",
@@ -4405,8 +4405,8 @@
     "Bozza non trovata."
   ],
   "Entwurf: Kein zahlbarer QR-Zahlteil vor der Ausstellung.": [
-    "Draft: no payable QR section before issue.",
-    "Brouillon : aucune section QR payable avant émission.",
+    "Draft: no payable QR payment section before issue.",
+    "Brouillon : aucune section QR payable avant l’émission.",
     "Bozza: nessuna sezione QR pagabile prima dell’emissione."
   ],
   "Erfasst": [
@@ -4656,8 +4656,8 @@
   ],
   "Fällig am:": [
     "Due on:",
-    "Échéance le :",
-    "Scadenza il:"
+    "Échéance :",
+    "Scadenza:"
   ],
   "Fehlende Messwerte, veraltete Daten und fehlende Berechtigungen sind niemals Healthy.": [
     "Missing measurements, stale data and missing permissions are never Healthy.",
@@ -5192,7 +5192,7 @@
   "Gültig bis:": [
     "Valid until:",
     "Valable jusqu’au :",
-    "Valido fino al:"
+    "Valida fino al:"
   ],
   "Guten Tag Herr Meier. Vielen Dank für die Anfrage. Ich prüfe die Rechnung gerne und melde mich in Kürze bei Ihnen.": [
     "Hello Mr Meier. Thank you for your enquiry. I will review the invoice and get back to you shortly.",
@@ -8311,8 +8311,8 @@
   ],
   "Rechnungsdatum:": [
     "Invoice date:",
-    "Date de facturation :",
-    "Data fattura:"
+    "Date de facture :",
+    "Data della fattura:"
   ],
   "Rechnungseinleitung": [
     "Invoice introduction",
@@ -8337,7 +8337,7 @@
   "Rechnungsreferenz:": [
     "Invoice reference:",
     "Référence de facture :",
-    "Riferimento fattura:"
+    "Riferimento della fattura:"
   ],
   "Rechnungsschlusstext": [
     "Invoice closing text",
@@ -8850,14 +8850,14 @@
     "Annullato"
   ],
   "STORNIERT - keine Zahlung erforderlich": [
-    "CANCELLED – no payment required",
-    "ANNULÉ – aucun paiement requis",
-    "ANNULLATO – nessun pagamento richiesto"
+    "CANCELLED - no payment required",
+    "ANNULÉE - aucun paiement requis",
+    "ANNULLATA - nessun pagamento richiesto"
   ],
   "Storniert - keine Zahlung erforderlich.": [
-    "Cancelled – no payment required.",
-    "Annulé – aucun paiement requis.",
-    "Annullato – nessun pagamento richiesto."
+    "Cancelled - no payment required.",
+    "Annulée - aucun paiement requis.",
+    "Annullata - nessun pagamento richiesto."
   ],
   "Strasse": [
     "Street",
@@ -9930,9 +9930,9 @@
     "Lo schermo intero non è disponibile in questo browser."
   ],
   "Vollständig bezahlt - keine weitere Zahlung erforderlich.": [
-    "Paid in full – no further payment required.",
-    "Entièrement payé – aucun paiement supplémentaire requis.",
-    "Interamente pagato – nessun ulteriore pagamento richiesto."
+    "Paid in full - no further payment required.",
+    "Entièrement payée - aucun autre paiement requis.",
+    "Interamente pagata - nessun ulteriore pagamento richiesto."
   ],
   "Volumen": [
     "Volume",
@@ -10442,7 +10442,7 @@
   "Zahlungsfrist:": [
     "Payment term:",
     "Délai de paiement :",
-    "Termine pagamento:"
+    "Termine di pagamento:"
   ],
   "ZAHLUNGSINFORMATIONEN": [
     "PAYMENT INFORMATION",
@@ -10477,7 +10477,7 @@
   "Zahlungsreferenz:": [
     "Payment reference:",
     "Référence de paiement :",
-    "Riferimento pagamento:"
+    "Riferimento del pagamento:"
   ],
   "Zahlungsstand": [
     "Payment balance",
@@ -11373,5 +11373,210 @@
     "The credit note exceeds the remaining invoice amount.",
     "La note de crédit dépasse le montant restant de la facture.",
     "La nota di credito supera l’importo residuo della fattura."
+  ],
+  "Zahlungserinnerung": [
+    "Payment reminder",
+    "Rappel de paiement",
+    "Promemoria di pagamento"
+  ],
+  "1. Mahnung": [
+    "First overdue notice",
+    "Première sommation",
+    "Primo sollecito"
+  ],
+  "2. Mahnung": [
+    "Second overdue notice",
+    "Deuxième sommation",
+    "Secondo sollecito"
+  ],
+  "Zahlungserinnerung senden": [
+    "Send payment reminder",
+    "Envoyer un rappel de paiement",
+    "Inviare un promemoria di pagamento"
+  ],
+  "Zahlungserinnerung versendet.": [
+    "Payment reminder sent.",
+    "Rappel de paiement envoyé.",
+    "Promemoria di pagamento inviato."
+  ],
+  "Mahnhistorie": [
+    "Reminder history",
+    "Historique des rappels",
+    "Cronologia dei solleciti"
+  ],
+  "Versand nicht bestätigt": [
+    "Delivery unconfirmed",
+    "Envoi non confirmé",
+    "Invio non confermato"
+  ],
+  "Versand wird geprüft": [
+    "Checking delivery",
+    "Vérification de l’envoi",
+    "Verifica dell’invio"
+  ],
+  "Der aktuelle offene Betrag wird geprüft. Der Versand erhöht die Mahnstufe; es werden keine Gebühren berechnet.": [
+    "The current outstanding amount is checked. Sending advances the reminder stage; no fees are charged.",
+    "Le montant actuellement ouvert est vérifié. L’envoi augmente le niveau de rappel ; aucuns frais ne sont facturés.",
+    "Viene verificato l’importo attualmente aperto. L’invio avanza il livello del sollecito; non vengono addebitate spese."
+  ],
+  "Ungültiger Versandzweck.": [
+    "Invalid delivery purpose.",
+    "Objet d’envoi invalide.",
+    "Scopo dell’invio non valido."
+  ],
+  "Nur überfällige offene Rechnungen können gemahnt werden.": [
+    "Only overdue outstanding invoices can receive a reminder.",
+    "Seules les factures ouvertes échues peuvent faire l’objet d’un rappel.",
+    "È possibile sollecitare solo fatture aperte scadute."
+  ],
+  "Die letzte Zahlungsfrist ist noch nicht abgelaufen.": [
+    "The last payment deadline has not expired yet.",
+    "Le dernier délai de paiement n’est pas encore expiré.",
+    "L’ultimo termine di pagamento non è ancora scaduto."
+  ],
+  "Die vorgesehenen Mahnstufen sind abgeschlossen.": [
+    "The configured reminder stages are complete.",
+    "Les niveaux de rappel prévus sont terminés.",
+    "I livelli di sollecito previsti sono completati."
+  ],
+  "Die Mahnhistorie muss vor dem Versand geprüft werden.": [
+    "The reminder history must be checked before sending.",
+    "L’historique des rappels doit être vérifié avant l’envoi.",
+    "La cronologia dei solleciti deve essere verificata prima dell’invio."
+  ],
+  "Bereits verbuchte Zahlungen und Gutschriften sind berücksichtigt.": [
+    "Payments and credit notes already recorded are included.",
+    "Les paiements et notes de crédit déjà comptabilisés sont pris en compte.",
+    "Sono considerati i pagamenti e le note di credito già registrati."
+  ],
+  "Der Zahlungsstand hat sich geändert. Bitte die Rechnung aktualisieren.": [
+    "The payment balance has changed. Please refresh the invoice.",
+    "L’état du paiement a changé. Veuillez actualiser la facture.",
+    "Il saldo dei pagamenti è cambiato. Aggiornare la fattura."
+  ],
+  "Rückerstattung erfassen": [
+    "Record refund",
+    "Saisir un remboursement",
+    "Registrare un rimborso"
+  ],
+  "Rückerstattung erfasst.": [
+    "Refund recorded.",
+    "Remboursement enregistré.",
+    "Rimborso registrato."
+  ],
+  "Rückerstattung konnte nicht erfasst werden.": [
+    "The refund could not be recorded.",
+    "Le remboursement n’a pas pu être enregistré.",
+    "Impossibile registrare il rimborso."
+  ],
+  "Rückerstattungen": [
+    "Refunds",
+    "Remboursements",
+    "Rimborsi"
+  ],
+  "Rückerstattungsdatum": [
+    "Refund date",
+    "Date du remboursement",
+    "Data del rimborso"
+  ],
+  "Nur eine bereits ausserhalb von Binso One ausgeführte Rückerstattung erfassen. Es wird keine Bankzahlung ausgelöst.": [
+    "Only record a refund already completed outside Binso One. No bank transfer is initiated.",
+    "Saisissez uniquement un remboursement déjà effectué en dehors de Binso One. Aucun virement bancaire n’est déclenché.",
+    "Registrare solo un rimborso già effettuato al di fuori di Binso One. Non viene avviato alcun bonifico bancario."
+  ],
+  "Bitte ein gültiges Rückerstattungsdatum bis heute eingeben.": [
+    "Enter a valid refund date no later than today.",
+    "Veuillez saisir une date de remboursement valide au plus tard aujourd’hui.",
+    "Inserire una data di rimborso valida non successiva a oggi."
+  ],
+  "Die Rückerstattung überschreitet das verfügbare Kundenguthaben am gewählten Datum.": [
+    "The refund exceeds the available customer credit on the selected date.",
+    "Le remboursement dépasse l’avoir client disponible à la date sélectionnée.",
+    "Il rimborso supera il credito cliente disponibile alla data selezionata."
+  ],
+  "Der Zahlungsstand muss vor der Rückerstattung geprüft werden.": [
+    "The payment ledger must be checked before recording the refund.",
+    "L’état des paiements doit être vérifié avant le remboursement.",
+    "Il registro dei pagamenti deve essere verificato prima del rimborso."
+  ],
+  "Zahlungseingänge sind nach erfassten Rückerstattungen ausgewiesen.": [
+    "Payment receipts are shown net of recorded refunds.",
+    "Les encaissements sont présentés après déduction des remboursements enregistrés.",
+    "Gli incassi sono indicati al netto dei rimborsi registrati."
+  ],
+  "Zahlungseingänge sind nach erfassten Rückerstattungen ausgewiesen. Auszahlungsdaten sind unvollständig. Betriebskosten und Löhne ohne nachgewiesenes Zahlungsdatum sind nicht enthalten. Der Saldo ist kein vollständiger Cashflow oder buchhalterischer Gewinn.": [
+    "Payment receipts are shown net of recorded refunds. Outgoing payment data is incomplete. Operating costs and salaries without a verified payment date are excluded. The balance is neither complete cash flow nor accounting profit.",
+    "Les encaissements sont présentés après déduction des remboursements enregistrés. Les données de décaissement sont incomplètes. Les charges d’exploitation et salaires sans date de paiement vérifiée sont exclus. Le solde ne représente ni un flux de trésorerie complet ni un bénéfice comptable.",
+    "Gli incassi sono indicati al netto dei rimborsi registrati. I dati dei pagamenti in uscita sono incompleti. Costi operativi e stipendi senza data di pagamento verificata sono esclusi. Il saldo non rappresenta né un flusso di cassa completo né l’utile contabile."
+  ],
+  "Mögliche Dubletten": [
+    "Possible duplicates",
+    "Doublons possibles",
+    "Possibili duplicati"
+  ],
+  "Als separaten Kunden erfassen": [
+    "Create as a separate customer",
+    "Créer en tant que client distinct",
+    "Registrare come cliente separato"
+  ],
+  "Mögliche Dublette gefunden. Bitte bestehende Kunden prüfen oder die separate Erfassung bestätigen.": [
+    "Possible duplicate found. Review existing customers or confirm creation of a separate customer.",
+    "Doublon possible trouvé. Vérifiez les clients existants ou confirmez la création d’un client distinct.",
+    "Trovato un possibile duplicato. Verificare i clienti esistenti o confermare la registrazione di un cliente separato."
+  ],
+  "Angebot überarbeiten": [
+    "Revise offer",
+    "Réviser l’offre",
+    "Rivedere l’offerta"
+  ],
+  "Angebot konnte nicht überarbeitet werden.": [
+    "The offer could not be revised.",
+    "L’offre n’a pas pu être révisée.",
+    "Impossibile rivedere l’offerta."
+  ],
+  "Vorherige Angebotsversion": [
+    "Previous offer version",
+    "Version précédente de l’offre",
+    "Versione precedente dell’offerta"
+  ],
+  "Überarbeitete Angebotsversionen": [
+    "Revised offer versions",
+    "Versions révisées de l’offre",
+    "Versioni riviste dell’offerta"
+  ],
+  "Überarbeitet": [
+    "Revised",
+    "Révisé",
+    "Rivisto"
+  ],
+  "Nur versendete, abgelaufene oder abgelehnte Angebote können überarbeitet werden.": [
+    "Only sent, expired or declined offers can be revised.",
+    "Seules les offres envoyées, expirées ou refusées peuvent être révisées.",
+    "È possibile rivedere solo offerte inviate, scadute o rifiutate."
+  ],
+  "Zu diesem Angebot besteht bereits ein überarbeiteter Entwurf.": [
+    "A revised draft already exists for this offer.",
+    "Un brouillon révisé existe déjà pour cette offre.",
+    "Esiste già una bozza rivista per questa offerta."
+  ],
+  "Die vorherige Angebotsversion wurde geändert. Bitte den Entwurf prüfen.": [
+    "The previous offer version has changed. Please review the draft.",
+    "La version précédente de l’offre a changé. Veuillez vérifier le brouillon.",
+    "La versione precedente dell’offerta è cambiata. Verificare la bozza."
+  ],
+  "QR-Zahlteil nicht verfügbar": [
+    "QR payment section unavailable",
+    "Section de paiement QR indisponible",
+    "Sezione di pagamento QR non disponibile"
+  ],
+  "Ausgeglichen - keine weitere Zahlung erforderlich.": [
+    "Settled - no further payment required.",
+    "Soldée - aucun autre paiement requis.",
+    "Saldata - nessun ulteriore pagamento richiesto."
+  ],
+  "Offen:": [
+    "Outstanding:",
+    "Ouvert :",
+    "Aperto:"
   ]
 }

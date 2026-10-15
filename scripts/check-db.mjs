@@ -5,7 +5,7 @@ const pool=new pg.Pool({connectionString:process.env.DATABASE_URL,ssl:process.en
 const restricted=process.argv.includes('--runtime');
 const required={
  organization_invitations:["organization_id","email","role","status","expires_at"],
- document_deliveries:["organization_id","kind","document_id","recipient","status","request_key"],
+ document_deliveries:["organization_id","kind","document_id","recipient","status","request_key","purpose","reminder_stage","balance_amount","payment_deadline"],
  billing_checkout_sessions:["organization_id","request_key","stripe_session_id","plan","billing_interval","expires_at"],
  file_contents:["file_id","organization_id","body"],
  operating_costs:["id","organization_id","external_id","cost_date","amount","scope","is_demo"],
@@ -21,7 +21,7 @@ const required={
  auth_tokens:["id","user_id","organization_id","email","token_hash","token_type","expires_at"],
  customers:["id","organization_id","external_id","customer_no","name","status","city","sector"],
  projects:["id","organization_id","external_id","customer_id","name","status","source_quote_id"],
- quotes:["id","organization_id","external_id","quote_no","customer_id","status"],
+ quotes:["id","organization_id","external_id","quote_no","customer_id","status","revises_quote_id"],
  quote_lines:["id","organization_id","external_id","quote_id"],
  orders:["id","organization_id","external_id","customer_id","project_id","status"],
  products_services:["id","organization_id","external_id","name","status"],
@@ -29,6 +29,8 @@ const required={
  expenses:["id","organization_id","external_id","expense_date","status","category_label"],
  invoices:["id","organization_id","external_id","invoice_no","customer_id","status","qr_reference"],
  invoice_lines:["id","organization_id","external_id","invoice_id"],
+ invoice_refunds:["id","organization_id","external_id","invoice_id","customer_id","refund_date","amount","reason","created_by_user_id"],
+ credit_notes:["id","organization_id","invoice_id","credit_no","credit_date","amount"],
  payments:["id","organization_id","external_id","amount","allocation_status"],
  suppliers:["id","organization_id","external_id","name","status"],
  supplier_invoices:["id","organization_id","external_id","supplier_id","status"],
@@ -51,8 +53,8 @@ const required={
  rate_limit_buckets:["bucket_key","count","reset_at","updated_at"],
  schema_migrations:["version","checksum","applied_at"]
 };
-const tenantTables=["organization_invitations","document_deliveries","billing_checkout_sessions","customers","projects","quotes","quote_lines","orders","products_services","time_entries","expenses","invoices","invoice_lines","payments","suppliers","supplier_invoices","employees","tasks","absences","contracts","accounting_entries","bank_transactions","vat_periods","payroll_runs","business_documents","operating_costs","active_time_trackers","support_cases","in_app_notifications","file_objects"];
-const forceTables=["billing_checkout_sessions","customers","projects","quotes","quote_lines","orders","products_services","time_entries","expenses","invoices","invoice_lines","payments","suppliers","supplier_invoices","employees","tasks","absences","contracts","accounting_entries","bank_transactions","vat_periods","payroll_runs","business_documents","operating_costs","active_time_trackers"];
+const tenantTables=["invoice_refunds","credit_notes","organization_invitations","document_deliveries","billing_checkout_sessions","customers","projects","quotes","quote_lines","orders","products_services","time_entries","expenses","invoices","invoice_lines","payments","suppliers","supplier_invoices","employees","tasks","absences","contracts","accounting_entries","bank_transactions","vat_periods","payroll_runs","business_documents","operating_costs","active_time_trackers","support_cases","in_app_notifications","file_objects"];
+const forceTables=["invoice_refunds","credit_notes","document_deliveries","billing_checkout_sessions","customers","projects","quotes","quote_lines","orders","products_services","time_entries","expenses","invoices","invoice_lines","payments","suppliers","supplier_invoices","employees","tasks","absences","contracts","accounting_entries","bank_transactions","vat_periods","payroll_runs","business_documents","operating_costs","active_time_trackers"];
 try{
  const meta=await pool.query("select current_database() db,current_user db_user,current_schema() schema,now() now");
  const migrations=await pool.query(restricted?"select public.runtime_schema_versions() as version":"select version from schema_migrations order by version");
@@ -60,6 +62,7 @@ try{
  if(!versions.includes("0016_self_service_signup.sql"))throw new Error("Canonical database lineage incomplete: 0016_self_service_signup.sql is not applied.");
  if(!versions.includes("0017_v150_code_schema_alignment.sql"))throw new Error("Database migration 0017_v150_code_schema_alignment.sql is not applied.");
  if(!versions.includes("0047_runtime_auth_bootstrap.sql"))throw new Error("Database migration 0047_runtime_auth_bootstrap.sql is not applied.");
+ if(!versions.includes('0051_document_reminders.sql')||!versions.includes('0052_invoice_refunds.sql')||!versions.includes('0053_offer_revisions.sql')||!versions.includes('0054_document_language_snapshot.sql'))throw new Error('Document reminder/refund migrations are not applied.');
  const cols=await pool.query(restricted?
    `select c.relname as table_name,a.attname as column_name from pg_class c join pg_namespace n on n.oid=c.relnamespace join pg_attribute a on a.attrelid=c.oid where n.nspname='public' and c.relkind in ('r','p') and a.attnum>0 and not a.attisdropped and c.relname=any($1::text[])`:
    `select table_name,column_name from information_schema.columns where table_schema='public' and table_name=any($1::text[])`,[Object.keys(required)]);
@@ -76,5 +79,5 @@ try{
  const policyMap=new Map(policies.rows.map(r=>[r.tablename,Number(r.count)]));
  const policyMissing=tenantTables.filter(t=>(policyMap.get(t)||0)<1);
  if(policyMissing.length)throw new Error(`Tenant RLS policy missing on: ${policyMissing.join(", ")}`);
- console.log({...meta.rows[0],lineage:"canonical-0001..0047",schema:"ok",checkedTables:Object.keys(required).length,rlsTables:tenantTables.length,migrations:versions.length});
+ console.log({...meta.rows[0],lineage:"canonical-0001..0054",schema:"ok",checkedTables:Object.keys(required).length,rlsTables:tenantTables.length,migrations:versions.length});
 }finally{await pool.end()}
