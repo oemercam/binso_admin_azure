@@ -648,7 +648,10 @@ try{
    await refundDialog.getByLabel('Betrag',{exact:true}).fill('20');await refundDialog.getByLabel('Interne Begründung',{exact:true}).fill('Synthetic bank refund REF-123');await refundDialog.getByLabel('Rückerstattungsdatum',{exact:true}).fill('2026-10-15');
    failAdjustment=true;await refundDialog.getByRole('button',{name:'Rückerstattung erfassen',exact:true}).click();await refundDialog.getByText('Synthetic refund unavailable',{exact:true}).waitFor();
    assert.equal(await refundDialog.getByLabel('Betrag',{exact:true}).inputValue(),'20');
-   failAdjustment=false;await refundDialog.getByRole('button',{name:'Rückerstattung erfassen',exact:true}).click();await refundDialog.waitFor({state:'hidden'});await page.getByText('Synthetic bank refund REF-123',{exact:true}).waitFor();
+   failAdjustment=false;await refundDialog.getByRole('button',{name:'Rückerstattung erfassen',exact:true}).click();await refundDialog.waitFor({state:'hidden'});
+   const refundEntry=page.locator('.document-detail-section').filter({has:page.getByRole('heading',{name:'Rückerstattungen',exact:true})}).locator('p').filter({hasText:'Synthetic bank refund REF-123'});
+   await refundEntry.waitFor();assert.equal(await refundEntry.count(),1,'Refund is shown once in its history');
+   const refundHistoryText=await refundEntry.innerText();assert.ok(refundHistoryText.includes('Synthetic bank refund REF-123'));assert.ok(refundHistoryText.includes('15.10.2026'));assert.match(refundHistoryText,/CHF\s+20[.,]00/,'Refund history retains the actual booked amount');
    assert.equal(adjustmentPosts,2);assert.equal(adjustmentKeys[0],adjustmentKeys[1]);assert.equal(invoice.paid_amount,invoice.total,'Refund cannot rewrite the original receipt');
    Object.assign(invoice,ledgerBefore);invoice.due_date='2020-01-01';adjustmentPosts=0;adjustmentKeys.length=0;
    await navigate(base+'/rechnungen/RE-TEST-1');await page.waitForLoadState('networkidle');

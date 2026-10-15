@@ -17,3 +17,7 @@
 - Echtes unverändertes lokales `pnpm test`: Socket weiterhin blockiert. GitHub führt weiterhin die echten Tests aus.
 - `foundation-integration-test`: nach abschliessender Regenerierung des Inventars bestanden. Der in CI gefundene veraltete Source-Fingerprint ist korrigiert, nicht als Umgebungsproblem eingeordnet.
 - Lokale Browser-/Pixelprüfung und reale Geräte weiterhin offen. Kein produktiver Deploy oder Infrastrukturwechsel.
+
+## Gebündelte GitHub-Browserprüfung
+
+Head `a2a06c6615c68df2adc22c0a9f91a2c131fcbd38`, Quality 38774822114: echte Testsuite, Build und Scanner erfolgreich. Chromium und WebKit installieren/starten erfolgreich; beide erreichen dieselbe Rückerstattungsregression und scheitern am exakten Einzeltext-Selektor. Der vorhandene `<p>` enthält Datum, Betrag und Begründung gemeinsam. Korrektur beschränkt die Suche auf den Historieneintrag unter „Rückerstattungen“ und prüft zusätzlich Datum, Betrag und Einmaligkeit. Keine Produktlogik/Produktdarstellung geändert; keine Assertion entfernt. Lint und aktualisiertes Architekturinventar bestanden. Korrigierter Browsernachweis ausstehend.
