@@ -126,22 +126,22 @@
     },
     {
       "id": "UX-LAY-003",
-      "description": "Header-Aktionen rechts; Desktop nur Glocke/Avatar",
+      "description": "Desktop: globale Suche, optional laufender Timer, Glocke und Profil rechts; fachliche Aktionen im Seitenbereich",
       "routes": [
         "customer-app"
       ],
       "componentTypes": [
         "HeaderPanel"
       ],
-      "expected": "Desktop ab 1024px keine zusätzlichen sichtbaren Header-Aktionen",
+      "expected": "Sichtbarer Desktop-Header: Suche/Glocke/Profil in definierter Reihenfolge, optional echter Timer; keine zusätzlichen fachlichen Aktionen",
       "owner": "HeaderPanel",
       "method": "browser",
       "testCase": "TC-UX-LAY-003",
       "adapter": "header-actions",
       "priority": "P1",
-      "acceptance": "Desktop ab 1024px keine zusätzlichen sichtbaren Header-Aktionen",
+      "acceptance": "Sichtbarer Desktop-Header: Suche/Glocke/Profil in definierter Reihenfolge, optional echter Timer; keine zusätzlichen fachlichen Aktionen",
       "automation": "automatic",
-      "provenance": "Current UX compliance instruction; approved UX summary where referenced",
+      "provenance": "Nutzerauftrag 15.10.2026: docs/audit/v24/white-workspaces-request.md Abschnitt 4; reference/IMPLEMENTIERUNG.md. Ersetzt die ältere Nur-Glocke/Avatar-Vorgabe; Navigation unverändert.",
       "review": null
     },
     {

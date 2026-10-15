@@ -1,3 +1,4 @@
+import {writeTestOutput} from './test-output.mjs';
 import {spawn} from 'node:child_process';
 import path from 'node:path';
 import fs from 'node:fs/promises';
@@ -9,7 +10,7 @@ export async function runShards({routes,interactions,count,env=process.env,comma
  try{await Promise.all(routeParts.map((part,index)=>new Promise((resolve,reject)=>{
   const child=spawn(command,[script],{stdio:'inherit',env:{...env,BINSO_UX_ROUTES:part.join(','),BINSO_UX_INTERACTIONS:interactionParts[index].join(','),BINSO_UX_PORT:String(Number(env.BINSO_UX_PORT??3200)+index*2),BINSO_UX_OUTPUT:path.join(output,'shard-'+index)}});children.push(child);
   child.on('error',reject);child.on('exit',(code,signal)=>code===0?resolve():reject(new Error(`Browser shard ${index+1}/${count} failed: ${signal??code}`)));
- })));await fs.mkdir(output,{recursive:true});await fs.writeFile(path.join(output,'shards.json'),JSON.stringify({count,routeParts,interactionParts,seconds:(Date.now()-started)/1000,passed:true},null,2));
+ })));await fs.mkdir(output,{recursive:true});await writeTestOutput(path.join(output,'shards.json'),JSON.stringify({count,routeParts,interactionParts,seconds:(Date.now()-started)/1000,passed:true},null,2));
  }finally{for(const child of children)if(child.exitCode===null&&!child.killed)child.kill('SIGTERM');}
 }
 if(process.argv[1]===fileURLToPath(import.meta.url)){

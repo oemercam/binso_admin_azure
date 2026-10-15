@@ -1,0 +1,112 @@
+{
+  "sourceHead": "fe9398c9789508d8c20e565b9c552a2c419b192a",
+  "testedMerge": "9b3fbadf279257a2e0a8accaeed486213be3fbc9",
+  "workflowRun": 38801108487,
+  "data": "Isolated synthetic UI fixtures; no production customer records",
+  "derivation": "Top viewport crop from full-page Chromium capture at viewport height 1000; no retouching or invented UI",
+  "status": "Captured from passing Chromium browser suite; overall run blocked by superseded header criterion",
+  "screens": {
+    "dashboard": {
+      "route": "/dashboard",
+      "desktop": {
+        "src": "/product/dashboard-desktop.png",
+        "width": 1440,
+        "height": 1000,
+        "sha256": "e85c8bc7f60fcb17330ec1ae4baeee2c18d91bffc9faaaf800068062492a0907",
+        "sourceSha256": "2aa5058967ba2980bf8664188838f680f7c0984f803d2c6b767b91eba5f0d26f"
+      },
+      "mobile": {
+        "src": "/product/dashboard-mobile.png",
+        "width": 390,
+        "height": 1000,
+        "sha256": "63ff650ec68cb3fca54df4cc31532a51ad170f2e47f0e7653fd7217ede9f6cdf",
+        "sourceSha256": "aeb3336157ddd889423252eed87104eba368009a3960b42e50cd6f0b6c9bd2a7"
+      }
+    },
+    "customers": {
+      "route": "/kunden",
+      "desktop": {
+        "src": "/product/customers-desktop.png",
+        "width": 1440,
+        "height": 1000,
+        "sha256": "eb449e9e5a58898eb1d50c75f1d925d5adffa69d1f6e031fbb9437bb0cf61a08",
+        "sourceSha256": "dfbde63281339d9adb467b9a9eda851a0bc99f63b67d2b028ef6611317a504f8"
+      },
+      "mobile": {
+        "src": "/product/customers-mobile.png",
+        "width": 390,
+        "height": 1000,
+        "sha256": "38e1239eb359b935787e3254b8e476c10d060d0a285c71fa8311d166a2330181",
+        "sourceSha256": "aeda6a8f8db7d1f377d77bb02b8e9f95f4ecc91baddafde007b628b5b09e6e68"
+      }
+    },
+    "offers": {
+      "route": "/angebote",
+      "desktop": {
+        "src": "/product/offers-desktop.png",
+        "width": 1440,
+        "height": 1000,
+        "sha256": "0414fbfd2a2d79b31230e74344d530e2748e1ecf3eaa69a9fba7350184fc9346",
+        "sourceSha256": "b9f00f929333ebf7cf25d8f89a06352a06a4cec12786ebe775c7dc4403e54cc9"
+      },
+      "mobile": {
+        "src": "/product/offers-mobile.png",
+        "width": 390,
+        "height": 1000,
+        "sha256": "e7a546bccf89bbcfdbb98c463646954d7b6fde0e88aac47b2e58feb7fc75241e",
+        "sourceSha256": "4c2ba96355803e9e81b8ff9329d81127aace49726e8237adfbc4848625a481d1"
+      }
+    },
+    "invoices": {
+      "route": "/rechnungen",
+      "desktop": {
+        "src": "/product/invoices-desktop.png",
+        "width": 1440,
+        "height": 1000,
+        "sha256": "244bca6f0ddf5d4e2cbe3d671816b01a9f79be88b5bc75c70a593696a09e99d2",
+        "sourceSha256": "f4ffa1c701ba077c922b3ba8ebddba5d7aae760e706d96baa092b5e1c33294cb"
+      },
+      "mobile": {
+        "src": "/product/invoices-mobile.png",
+        "width": 390,
+        "height": 1000,
+        "sha256": "295b5ba92b38d066d96b1456035ea631f153406112cad7d0be115bf9a54eac72",
+        "sourceSha256": "29288d9697faf386b509fae53525e3951957346600f5759d6efc0c5db73cdcd0"
+      }
+    },
+    "payments": {
+      "route": "/zahlungen",
+      "desktop": {
+        "src": "/product/payments-desktop.png",
+        "width": 1440,
+        "height": 1000,
+        "sha256": "38655c89f547ad40450f529b51d079112555e946ca9a0de79c182e18faccc430",
+        "sourceSha256": "c6bfc90eda86abb10fc0ffcbc9d2d1c8a06cfdc9b3a909deddfb32ca4055a218"
+      },
+      "mobile": {
+        "src": "/product/payments-mobile.png",
+        "width": 390,
+        "height": 1000,
+        "sha256": "8a4ce7d954b6d537e4470968d2ec2a5d1145e76f725b5e8fcf65bb1227b1625d",
+        "sourceSha256": "69c8b787abe999df6b1eac973b1f8bdf169f54127782cffca878a6f3f278adf4"
+      }
+    },
+    "time": {
+      "route": "/zeit",
+      "desktop": {
+        "src": "/product/time-desktop.png",
+        "width": 1440,
+        "height": 1000,
+        "sha256": "0cf26b83e80ebec15b98213a154d11163a86d6d200afc758f68ca227e95cdb16",
+        "sourceSha256": "a83a6839315623df15738be87a71db11a263eb81748704803cdff07626485d58"
+      },
+      "mobile": {
+        "src": "/product/time-mobile.png",
+        "width": 390,
+        "height": 1000,
+        "sha256": "52f95411e8018830760d11626be51060968db10a2c35bd745385df2fd9b9b299",
+        "sourceSha256": "244ecb059a70548cf60bc442b7e38c59356c17ddea61849923ff168e419bd3b9"
+      }
+    }
+  }
+}

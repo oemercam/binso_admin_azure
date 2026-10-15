@@ -1,10 +1,13 @@
 "use client";
 
-import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
+import {LocalizedText,LocalizedElement,useTranslation} from "@/lib/client/locale";
 import Link from "next/link";
+import Image from "next/image";
+import captures from "@/public/product/captures.json";
 import {LocaleSwitcher} from "./locale-switcher";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useId } from "react";
 import { Button, Icon, Logo } from "./ui";
+import {DetailTabs} from "./binso-ux";
 import {PrivacySettingsButton} from "./privacy-consent";
 
 export function MarketingHeader() {
@@ -97,21 +100,31 @@ export function MarketingFooter() {
   </footer>;
 }
 
-export function ProductPreview({compact=false}:{compact?:boolean}={}) {
- return <LocalizedElement as="div" className={compact?"hero-workspace landing-phone-canvas":"hero-workspace"} aria-label="Binso One mit Beispieldaten">
-  <div className="workspace-preview-bar"><span className="workspace-preview-brand"><Logo/></span><span className="workspace-preview-tools app-glass"><Icon name="search" size={17}/><Icon name="bell" size={17}/><span className="workspace-preview-avatar"><LocalizedText>{"BC"}</LocalizedText></span></span></div>
-  <div className="workspace-preview-body"><div className="workspace-preview-heading"><div><small><LocalizedText>{"DEIN ARBEITSTAG"}</LocalizedText></small><h2><LocalizedText>{"Alles im Blick."}</LocalizedText></h2></div><Button href="/demo" variant="ghost" ariaLabel="Demo starten" className="workspace-preview-create"><Icon name="plus"/></Button></div>
-   <div className="workspace-preview-metrics">{[["Monatsumsatz","CHF 24’850","+12.4 %"],["Zahlungen","CHF 18’420","Dieser Monat"],["Rechnungen","18","Diesen Monat"],["Kunden","124","Gesamt"]].map(([label,value,note])=><div key={label}><span><LocalizedText>{label}</LocalizedText></span><strong>{value}</strong><small><LocalizedText>{note}</LocalizedText></small></div>)}</div>
-   <div className="workspace-preview-section"><b><LocalizedText>{"Als Nächstes"}</LocalizedText></b><Link href="/demo"><LocalizedText>{"Alle anzeigen "}</LocalizedText><Icon name="arrow" size={13}/></Link></div>
-   <div className="workspace-preview-records">{[["RE-2026-1042","Atelier Nord AG","CHF 3’450","Offen"],["RE-2026-1041","Berg & Partner GmbH","CHF 1’280","Bezahlt"],["RE-2026-1040","Studio West","CHF 2’160","Teilbezahlt"]].map(([number,name,amount,status])=><Link href="/demo" key={number}><span className="workspace-preview-record-icon"><Icon name="receipt" size={19}/></span><span><b>{number}</b><small translate="no">{name}</small></span><span><b>{amount}</b><small className={status==='Bezahlt'?'workspace-preview-paid':''}><LocalizedText>{status}</LocalizedText></small></span></Link>)}</div>
-   <Link href="/demo" className="workspace-preview-timer"><span><Icon name="clock" size={18}/><span><b><LocalizedText>{"Zeiterfassung"}</LocalizedText></b><small><LocalizedText>{"Projekt Website"}</LocalizedText></small></span></span><strong>01:24:36</strong><Icon name="arrow" size={15}/></Link>
-  </div>
-  <div className="workspace-preview-navigation"><LocalizedElement as="nav" className="workspace-preview-dock app-glass" aria-label="Demo entdecken">{[["home","Start"],["users","Kunden"],["wallet","Finanzen"],["clock","Zeit"],["more","Mehr"]].map(([icon,label])=><Link href="/demo" key={label}><Icon name={icon} size={18}/><span><LocalizedText>{label}</LocalizedText></span></Link>)}</LocalizedElement></div><small className="workspace-preview-caption"><LocalizedText>{"Beispieldaten · Entdecke alle Funktionen in der Demo"}</LocalizedText></small>
- </LocalizedElement>;
+const productViews=[['dashboard','Übersicht'],['customers','Kunden'],['offers','Angebote'],['invoices','Rechnungen'],['payments','Zahlungen'],['time','Zeiterfassung']] as const;
+type ProductView=typeof productViews[number][0];
+
+/** Actual application captures; the provenance manifest names their fixture/commit. */
+export function ProductPreview({compact=false,screen="dashboard"}:{compact?:boolean;screen?:ProductView}={}) {
+ const translate=useTranslation(),group=captures.screens[screen],capture=compact?group.mobile:group.desktop;
+ const label=productViews.find(([key])=>key===screen)![1];
+ return <div className={compact?"product-capture product-capture-mobile":"product-capture product-capture-desktop"}>
+  <Image src={capture.src} width={capture.width} height={capture.height} sizes={compact?"(max-width: 760px) 85vw, 310px":"(max-width: 760px) 100vw, 640px"} alt={translate(label)+" · "+translate("Binso One mit Beispieldaten")} preload={!compact}/><small className="product-capture-caption"><LocalizedText>{"Produktansicht in Deutsch · Beispieldaten"}</LocalizedText></small>
+ </div>;
 }
 
-export function ProductScreen({title,variant="desktop"}:{route?:string;title:string;variant?:"desktop"|"mobile"}) {
-  return <LocalizedElement as="figure" className={`product-screen product-screen-${variant}`} aria-label={title}><ProductPreview compact={variant==='mobile'}/></LocalizedElement>;
+export function ProductScreen({title,variant="desktop",screen="dashboard"}:{title:string;variant?:"desktop"|"mobile";screen?:ProductView}) {
+ return <LocalizedElement as="figure" className={`product-screen product-screen-${variant}`} aria-label={title}><ProductPreview screen={screen} compact={variant==='mobile'}/></LocalizedElement>;
+}
+
+/** Real screenshots are selectable with the same tab/keyboard foundation as the app. */
+export function ProductGallery(){
+ const [screen,setScreen]=useState<ProductView>('customers'),[mobile,setMobile]=useState(false),id=useId();
+ return <section className="product-gallery" aria-labelledby={id+'-title'}>
+  <header><h3 id={id+'-title'}><LocalizedText>{"Produktansichten"}</LocalizedText></h3><div className="product-gallery-views"><Button variant={mobile?'secondary':'primary'} aria-pressed={!mobile} onClick={()=>setMobile(false)}><LocalizedText>{"Desktop"}</LocalizedText></Button><Button variant={mobile?'primary':'secondary'} aria-pressed={mobile} onClick={()=>setMobile(true)}><LocalizedText>{"Mobile / PWA"}</LocalizedText></Button></div></header>
+  <DetailTabs label="Produktansichten" panelId={id+'-panel'}>{productViews.map(([key,label])=><button type="button" key={key} className={screen===key?'active':''} onClick={()=>setScreen(key)}><LocalizedText>{label}</LocalizedText></button>)}</DetailTabs>
+  <div id={id+'-panel'} role="tabpanel" aria-labelledby={id+'-panel-tab-'+productViews.findIndex(([key])=>key===screen)}><ProductPreview screen={screen} compact={mobile}/></div>
+  <Button href="/demo" variant="ghost"><LocalizedText>{"In der Demo ansehen"}</LocalizedText><Icon name="arrow" size={16}/></Button>
+ </section>;
 }
 
 export function MarketingFaq({children}:{children:React.ReactNode}) {

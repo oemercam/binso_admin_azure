@@ -1,3 +1,4 @@
+import {writeTestOutput} from './test-output.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -109,5 +110,5 @@ try{
  await context.close();assert.deepEqual(errors,[]);
  console.log('Authenticated wallboard: five real operator roles, anonymous denial, three profiles, light/dark, 390–3840px, automatic refresh, outage and recovery passed.');
 }finally{
- await fs.mkdir(output,{recursive:true});await fs.writeFile(path.join(output,'results.json'),JSON.stringify({results,errors},null,2));await browser?.close();if(server&&server.exitCode===null)server.kill('SIGTERM');await pool.end();
+ await fs.mkdir(output,{recursive:true});await writeTestOutput(path.join(output,'results.json'),JSON.stringify({results,errors},null,2));await browser?.close();if(server&&server.exitCode===null)server.kill('SIGTERM');await pool.end();
 }

@@ -933,6 +933,11 @@ try{
  assert.equal((await fileUpload.POST(uploadRequest(documentArgs.p_customer_id))).status,404);
  globalThis.__processSession={...session,role:'employee'};
  assert.equal((await fileDownload.GET({}, {params:Promise.resolve({id:uploaded.data.item.id})})).status,403);
+ globalThis.__processSession={...session,role:'hr'};
+ const unfilteredFiles=await fileUpload.GET({nextUrl:new URL('https://fixture.invalid/api/files')});
+ assert.equal(unfilteredFiles.status,200,'Document readers retain permitted listing access');
+ assert.ok(!unfilteredFiles.data.items.some(row=>row.id===uploaded.data.item.id),'Omitting a customer filter cannot expose files outside the role permission');
+ assert.equal((await fileUpload.GET({nextUrl:new URL('https://fixture.invalid/api/files?customerId='+documentArgs.p_customer_id)})).status,403,'Explicit customer filter remains forbidden to HR');
  globalThis.__processSession=session;
  console.log('Actual file upload/list/download, content signature, cross-tenant association/download denial and role denial passed.');
  // The unused generic record writer was removed. Public finance routes expose no

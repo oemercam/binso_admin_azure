@@ -11578,5 +11578,110 @@
     "Outstanding:",
     "Ouvert :",
     "Aperto:"
+  ],
+  "Navigation": [
+    "Navigation",
+    "Navigation",
+    "Navigazione"
+  ],
+  "Dein Geschäft. Klar organisiert.": [
+    "Your business. Clearly organised.",
+    "Votre activité. Clairement organisée.",
+    "La tua attività. Organizzata con chiarezza."
+  ],
+  "Alles verbunden. Alles im Blick.": [
+    "Everything connected. Everything in view.",
+    "Tout est connecté. Tout est visible.",
+    "Tutto collegato. Tutto sotto controllo."
+  ],
+  "Kunden, Angebote, Rechnungen und Zeit – ein Arbeitsbereich für deinen Geschäftsalltag.": [
+    "Customers, quotes, invoices and time – one workspace for your daily business.",
+    "Clients, offres, factures et temps – un espace de travail pour votre quotidien professionnel.",
+    "Clienti, offerte, fatture e tempo – uno spazio di lavoro per la tua attività quotidiana."
+  ],
+  "Vom Kundenkontakt bis zur Zahlung": [
+    "From customer contact to payment",
+    "Du premier contact client au paiement",
+    "Dal contatto con il cliente al pagamento"
+  ],
+  "Am Schreibtisch und unterwegs": [
+    "At your desk and on the go",
+    "Au bureau et en déplacement",
+    "Alla scrivania e in viaggio"
+  ],
+  "Zahlen und nächste Schritte im Überblick": [
+    "Figures and next steps at a glance",
+    "Chiffres et prochaines étapes en un coup d’œil",
+    "Cifre e prossimi passi a colpo d’occhio"
+  ],
+  "Rechtliches": [
+    "Legal",
+    "Informations légales",
+    "Informazioni legali"
+  ],
+  "Alles verbunden.": [
+    "Everything connected.",
+    "Tout est connecté.",
+    "Tutto collegato."
+  ],
+  "Binso One Dashboard mit Beispieldaten": [
+    "Binso One dashboard with sample data",
+    "Tableau de bord Binso One avec données de démonstration",
+    "Dashboard Binso One con dati di esempio"
+  ],
+  "Dein Geschäft.": [
+    "Your business.",
+    "Votre activité.",
+    "La tua attività."
+  ],
+  "Ein klarer Überblick.": [
+    "A clear overview.",
+    "Une vue d’ensemble claire.",
+    "Una panoramica chiara."
+  ],
+  "Projekt & Zeit": [
+    "Projects & time",
+    "Projets et temps",
+    "Progetti e tempo"
+  ],
+  "Arbeit organisieren und Leistungen erfassen.": [
+    "Organise work and record services.",
+    "Organiser le travail et saisir les prestations.",
+    "Organizzare il lavoro e registrare le prestazioni."
+  ],
+  "Zahlungseingänge und offene Beträge verfolgen.": [
+    "Track incoming payments and outstanding amounts.",
+    "Suivre les paiements reçus et les montants ouverts.",
+    "Seguire i pagamenti ricevuti e gli importi aperti."
+  ],
+  "Produktansichten": [
+    "Product views",
+    "Vues du produit",
+    "Viste del prodotto"
+  ],
+  "Desktop": [
+    "Desktop",
+    "Ordinateur",
+    "Desktop"
+  ],
+  "Mobile / PWA": [
+    "Mobile / PWA",
+    "Mobile / PWA",
+    "Mobile / PWA"
+  ],
+  "In der Demo ansehen": [
+    "View in the demo",
+    "Voir dans la démonstration",
+    "Visualizza nella demo"
+  ],
+  "Binso One Rechnungsübersicht": [
+    "Binso One invoice overview",
+    "Vue des factures Binso One",
+    "Panoramica fatture Binso One"
+  ],
+  "Produktansicht in Deutsch · Beispieldaten": [
+    "Product view in German · Sample data",
+    "Vue du produit en allemand · Données de démonstration",
+    "Vista del prodotto in tedesco · Dati di esempio"
   ]
 }

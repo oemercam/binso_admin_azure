@@ -7,7 +7,7 @@ import {useApiQuery} from "@/lib/client/use-api-query";
 import { useState } from "react";
 import { AppShell } from "../app-shell";
 import { apiPatch, useBackendMode } from "@/lib/client/backend";
-import { Button, EmptyState, Icon, LoadingState, ErrorState } from "../ui";
+import { EmptyState, Icon, LoadingState, ErrorState } from "../ui";
 
 export type NotificationRecord={
   id:string;
@@ -52,15 +52,11 @@ export function NotificationsPage() {
     try{await apiPatch("/api/notifications/"+encodeURIComponent(id),{});setMutationError(null);}
     catch(err){setMutationError(err instanceof Error?err.message:"Benachrichtigung konnte nicht aktualisiert werden.");}
   };
-  const markAll=async()=>{
-    try{await apiPatch("/api/notifications",{all:true});setMutationError(null);}
-    catch(err){setMutationError(err instanceof Error?err.message:"Benachrichtigungen konnten nicht aktualisiert werden.");}
-  };
 
   if(production){
     const unreadCount=remoteItems.filter(item=>!item.read_at).length;
     const visible=view==="all"?remoteItems:remoteItems.filter(item=>!item.read_at);
-    return <AppShell title="Benachrichtigungen" subtitle="Wichtige Aktivitäten aus deinem Unternehmen." active="einstellungen" backHref="/dashboard" backLabel="Start" actions={unreadCount>0?<Button variant="secondary" onClick={()=>void markAll()}><LocalizedText>{"Alle gelesen"}</LocalizedText></Button>:undefined}>
+    return <AppShell title="Benachrichtigungen" subtitle="Wichtige Aktivitäten aus deinem Unternehmen." active="einstellungen" backHref="/dashboard" backLabel="Start">
       <div className="notification-center">
         <div className="notification-center-tabs"><button className={view==="all"?"active":""} onClick={()=>setView("all")}><LocalizedText>{"Alle"}</LocalizedText></button><button className={view==="unread"?"active":""} onClick={()=>setView("unread")}><LocalizedText>{"Ungelesen"}</LocalizedText><LocalizedText>{unreadCount>0?` (${unreadCount})`:""}</LocalizedText></button></div>
         {loading&&remoteItems.length===0&&<LoadingState><LocalizedText>{"Benachrichtigungen werden geladen …"}</LocalizedText></LoadingState>}
@@ -74,7 +70,7 @@ export function NotificationsPage() {
 
   const visible=view==="all"?items:items.filter(([id])=>!read.includes(id));
   const unreadCount=items.length-read.length;
-  return <AppShell title="Benachrichtigungen" subtitle="Wichtige Aktivitäten aus deinem Unternehmen." active="einstellungen" backHref="/dashboard" backLabel="Start" actions={<Button variant="secondary" onClick={()=>setRead(items.map(item=>item[0]))}><LocalizedText>{"Alle gelesen"}</LocalizedText></Button>}>
+  return <AppShell title="Benachrichtigungen" subtitle="Wichtige Aktivitäten aus deinem Unternehmen." active="einstellungen" backHref="/dashboard" backLabel="Start">
     <div className="notification-center">
       <div className="notification-center-tabs"><button className={view==="all"?"active":""} onClick={()=>setView("all")}><LocalizedText>{"Alle"}</LocalizedText></button><button className={view==="unread"?"active":""} onClick={()=>setView("unread")}><LocalizedText>{"Ungelesen"}</LocalizedText><LocalizedText>{unreadCount>0?` (${unreadCount})`:""}</LocalizedText></button></div>
       {visible.length?<div className="action-list">{visible.map(([id,icon,title,text,time,href])=><ActionRow href={href} key={id} icon={icon} title={title} description={text} metadata={time} endAdornment={!read.includes(id)?<LocalizedElement as="i" className="unread-dot" aria-label="Ungelesen"/>:undefined} onClick={()=>setRead(current=>current.includes(id)?current:[...current,id])}/>)}</div>:<EmptyState icon="bell" title="Alles gelesen" text="Es gibt aktuell keine ungelesenen Benachrichtigungen."/>}

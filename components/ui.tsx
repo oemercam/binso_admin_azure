@@ -113,8 +113,8 @@ export function AccessLink({href,children,fallback=null,className}:{href:string;
   return access.canOpen(href)?<Link href={href} className={className}>{children}</Link>:<>{fallback}</>;
 }
 
-export function IconButton({ label, icon, onClick }: { label: string; icon: string; onClick?: () => void }) {
-  return <LocalizedElement as="button" className="icon-button" type="button" aria-label={label} onClick={onClick}><Icon name={icon}/></LocalizedElement>;
+export function IconButton({ label, icon, onClick, className="" }: { label: string; icon: string; onClick?: () => void; className?:string }) {
+  return <LocalizedElement as="button" className={["icon-button",className].filter(Boolean).join(" ")} type="button" aria-label={label} onClick={onClick}><Icon name={icon}/></LocalizedElement>;
 }
 
 export function Metric({ label, value, hint, icon }: { label: string; value: React.ReactNode; hint?: string; icon?: string }) {

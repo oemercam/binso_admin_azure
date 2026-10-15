@@ -1,9 +1,11 @@
 "use client";
 
+import {AuthWorkspace} from "@/components/auth-workspace";
+
 import {clearDemoClientSession} from "@/lib/client/backend";
 import {LocalizedText} from "@/lib/client/locale";
 import { FormEvent, useEffect, useRef, useState } from "react";
-import {Button, Logo, Input, Field, ErrorState} from "@/components/ui";
+import {Button, Input, Field, ErrorState} from "@/components/ui";
 
 import ConfirmDialog from "@/components/confirm-dialog";
 import {useBrowserBackGuard} from "@/components/use-browser-back-guard";
@@ -43,8 +45,8 @@ export default function Page(){
     }finally{pending.current=false;setLoading(false);}
   };
 
-  return <><main className="auth-page"><section className="auth-card">
-    <Logo/>
+  return <><AuthWorkspace><section className="auth-card">
+
     {!ready?<><h1><LocalizedText>{"Link wird geprüft"}</LocalizedText></h1><p><LocalizedText>{"Einen Moment bitte."}</LocalizedText></p></>:invalid?<><h1><LocalizedText>{"Link nicht gültig"}</LocalizedText></h1><p><LocalizedText>{"Der Link ist abgelaufen oder ungültig. Fordere einen neuen Link an."}</LocalizedText></p><Button href="/passwort-vergessen"><LocalizedText>{"Neuen Link anfordern"}</LocalizedText></Button></>:done?<><h1><LocalizedText>{"Passwort geändert"}</LocalizedText></h1><p><LocalizedText>{"Du kannst dich jetzt mit deinem neuen Passwort anmelden."}</LocalizedText></p><Button href="/login"><LocalizedText>{"Zur Anmeldung"}</LocalizedText></Button></>:<>
       <h1><LocalizedText>{"Neues Passwort"}</LocalizedText></h1><p><LocalizedText>{"Lege ein neues Passwort für dein Binso One Konto fest."}</LocalizedText></p>
       <form onSubmit={submit}>
@@ -54,5 +56,5 @@ export default function Page(){
         <Button type="submit" disabled={loading}><LocalizedText>{loading?"Wird gespeichert…":"Passwort speichern"}</LocalizedText></Button>
       </form>
     </>}
-  </section></main><ConfirmDialog open={discard} busy={loading} title="Änderungen verwerfen?" message="Deine Änderungen sind noch nicht gespeichert und gehen verloren." cancelLabel="Weiter bearbeiten" confirmLabel="Änderungen verwerfen" onCancel={()=>setDiscard(false)} onConfirm={()=>{setDiscard(false);leaveBack()}}/></>;
+  </section></AuthWorkspace><ConfirmDialog open={discard} busy={loading} title="Änderungen verwerfen?" message="Deine Änderungen sind noch nicht gespeichert und gehen verloren." cancelLabel="Weiter bearbeiten" confirmLabel="Änderungen verwerfen" onCancel={()=>setDiscard(false)} onConfirm={()=>{setDiscard(false);leaveBack()}}/></>;
 }

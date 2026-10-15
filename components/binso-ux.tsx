@@ -65,8 +65,9 @@ export function DetailHeading({ title, status, tone = "neutral", subtitle, leadi
   title: string;verbatimTitle?:boolean; status?: ReactNode; tone?: "neutral" | "success" | "warning" | "danger" | "info"; subtitle?: string; leading?: ReactNode; action?: ReactNode;
 }) {
   return <div className="bo-detail-heading">{leading}
-    <div className="bo-detail-heading-main"><h1><LocalizedText verbatim={verbatimTitle}>{title}</LocalizedText></h1>{status != null && <Status tone={tone}>{status}</Status>}{action}</div>
+    <div className="bo-detail-heading-main"><h1><LocalizedText verbatim={verbatimTitle}>{title}</LocalizedText></h1>{status != null && <Status tone={tone}>{status}</Status>}</div>
     {subtitle && <p><LocalizedText verbatim={verbatimTitle}>{subtitle}</LocalizedText></p>}
+    {action&&<div className="bo-detail-commandbar">{action}</div>}
   </div>;
 }
 
