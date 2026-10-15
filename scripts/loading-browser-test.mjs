@@ -1,3 +1,4 @@
+import {writeTestOutput} from './test-output.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import {spawn} from 'node:child_process';
@@ -53,5 +54,5 @@ try{
   authMode='error';await page.reload();await page.getByText('Initialisierung fehlgeschlagen',{exact:true}).waitFor();authMode='valid';await page.getByRole('button',{name:'Erneut versuchen',exact:true}).click();await page.getByText('Keine Kunden erfasst',{exact:true}).waitFor();
   await context.close();
  }
- await fs.writeFile(output+'/measurements.json',JSON.stringify({baseline,browser:process.env.BINSO_UX_BROWSER??'webkit',syntheticAuthDelayMs:350,results,physicalPwa:false},null,2));console.log(JSON.stringify(results,null,2));
+ await writeTestOutput(output+'/measurements.json',JSON.stringify({baseline,browser:process.env.BINSO_UX_BROWSER??'webkit',syntheticAuthDelayMs:350,results,physicalPwa:false},null,2));console.log(JSON.stringify(results,null,2));
 }finally{await browser.close();server?.kill();}

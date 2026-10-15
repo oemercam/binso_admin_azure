@@ -25,7 +25,10 @@ async function scenario({controlled=false,waiting=false,unmount=false}={}){
 }
 await scenario();await scenario({controlled:true,waiting:true});await scenario({unmount:true});
 const swEvents={};let skip=0;
-vm.runInNewContext(await fs.readFile('public/sw.js','utf8'),{self:{addEventListener:(name,fn)=>swEvents[name]=fn,skipWaiting:()=>{skip++}},caches:{open:async()=>({addAll:async()=>{}})}});
+vm.runInNewContext(await fs.readFile('public/sw.js','utf8'),{self:{location:{origin:"https://fixture.invalid"},addEventListener:(name,fn)=>swEvents[name]=fn,skipWaiting:()=>{skip++}},caches:{open:async()=>({addAll:async()=>{}})}});
 let installed;swEvents.install({waitUntil:promise=>installed=promise});await installed;assert.equal(skip,0,'Shell caching finishes before requested activation');
-swEvents.message({data:{type:'SKIP_WAITING'}});assert.equal(skip,1);
+swEvents.message({origin:'https://other.invalid',source:{type:'window'},data:{type:'SKIP_WAITING'}});
+swEvents.message({origin:'https://fixture.invalid',source:{type:'worker'},data:{type:'SKIP_WAITING'}});
+swEvents.message({data:{type:'SKIP_WAITING'}});assert.equal(skip,0,'Foreign origins and non-window senders cannot activate the worker');
+swEvents.message({origin:'https://fixture.invalid',source:{type:'window'},data:{type:'SKIP_WAITING'}});assert.equal(skip,1,'The actual same-origin application can silently activate its waiting worker');
 console.log('Silent PWA lifecycle: first install, waiting/new updates, resume checks, no UI/reloads, late registration and listener cleanup passed.');
