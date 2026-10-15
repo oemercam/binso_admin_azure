@@ -1,5 +1,5 @@
 {
-  "commit": "df31d8ba7be5276c1381a63caa6f9dba85c8e341",
+  "commit": "fe9398c9789508d8c20e565b9c552a2c419b192a",
   "method": "Existing TypeScript AST dependency inventory; conditional reachability is not runtime proof",
   "pages": [
     {
@@ -6487,6 +6487,10 @@
         "components/ui.tsx#dismissActionLabels",
         "components/ui.tsx#actionSourceText",
         "components/marketing.tsx#ProductPreview",
+        "components/marketing.tsx#ProductView",
+        "components/marketing.tsx#productViews",
+        "components/marketing.tsx#ProductGallery",
+        "components/binso-ux.tsx#DetailTabs",
         "components/marketing.tsx#ProductScreen",
         "components/marketing.tsx#MarketingFaq",
         "components/marketing.tsx#MarketingFooter",
@@ -7643,6 +7647,8 @@
         "components/ui.tsx#dismissActionLabels",
         "components/ui.tsx#actionSourceText",
         "components/marketing.tsx#ProductPreview",
+        "components/marketing.tsx#ProductView",
+        "components/marketing.tsx#productViews",
         "components/marketing.tsx#MarketingFooter",
         "components/privacy-consent.tsx#PrivacySettingsButton"
       ],

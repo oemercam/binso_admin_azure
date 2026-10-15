@@ -886,6 +886,7 @@
   .desktop-appbar .desktop-header-timer{display:flex}
   .desktop-appbar .app-demo-badge{display:none}
   .desktop-appbar-actions{margin-left:auto;display:flex;align-items:center;gap:8px}
+  .desktop-appbar-actions>.desktop-global-search{flex:none}
 
   .page-container{
     max-width:var(--content-max);
@@ -1011,8 +1012,6 @@
 
 /* Mobile / PWA */
 @media (max-width:760px){
-  .hero-workspace{padding:12px;border-radius:25px;width:100%;max-width:540px;margin:auto}
-  .workspace-preview-metrics strong{font-size:22px}
   .marketing-actions>.locale-switcher{display:none}
   .marketing-mobile-actions>.locale-switcher{justify-content:space-between;padding:6px 2px}
 
@@ -2400,7 +2399,6 @@ input:not([type="checkbox"]):not([type="radio"]),
 .bo-row-actions:hover:not(:disabled){background:var(--color-subtle);border-radius:10px}
 .bo-detail-heading-main{flex-wrap:wrap}
 .bo-detail-heading-main .status{margin-left:auto}
-.bo-detail-heading-main .page-actions{margin-left:auto;position:static;flex:none}
 
 /* Shared mobile/desktop sheet content guards: prevent label and action collisions. */
 .bottom-sheet,.bottom-sheet *{box-sizing:border-box}

@@ -1,6 +1,6 @@
 import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
 import Link from "next/link";
-import { MarketingFooter, MarketingHeader, MarketingFaq, ProductPreview, ProductScreen } from "@/components/marketing";
+import { MarketingFooter, MarketingHeader, MarketingFaq, ProductPreview, ProductScreen, ProductGallery } from "@/components/marketing";
 import { Button, Icon } from "@/components/ui";
 import { domainConfig } from "@/config/domain";
 import { plans as subscriptionPlans } from "@/lib/plans";
@@ -15,8 +15,9 @@ const benefits=[
 const workflow=[
   ["01","Kunde","Kundendaten einmal sauber erfassen."],
   ["02","Angebot","Leistungen auswählen und Angebot erstellen."],
-  ["03","Zeit","Aufwand während der Arbeit direkt erfassen."],
+  ["03","Projekt & Zeit","Arbeit organisieren und Leistungen erfassen."],
   ["04","Rechnung","Aus Leistungen und Zeit eine Rechnung erstellen."],
+  ["05","Zahlung","Zahlungseingänge und offene Beträge verfolgen."],
 ] as const;
 
 export default function Home() {
@@ -64,7 +65,7 @@ export default function Home() {
       <section className="hero">
         <div className="hero-copy">
           <span className="eyebrow landing-kicker"><span/><LocalizedText>{" DEIN BUSINESS. KLAR ORGANISIERT."}</LocalizedText></span>
-          <h1><LocalizedText>{"Dein Büro."}</LocalizedText><br/><LocalizedText>{"Einfach dabei."}</LocalizedText></h1>
+          <h1><LocalizedText>{"Dein Geschäft."}</LocalizedText><br/><LocalizedText>{"Ein klarer Überblick."}</LocalizedText></h1>
           <p className="hero-lead"><LocalizedText>{"Vom ersten Kundenkontakt bis zur bezahlten Rechnung. Eine übersichtliche App für dein Unternehmen – am Schreibtisch und unterwegs."}</LocalizedText></p>
           <div className="hero-actions">
             <Button href="/registrieren">{domainConfig.trialDays}<LocalizedText>{" Tage kostenlos testen"}</LocalizedText></Button>
@@ -104,7 +105,7 @@ export default function Home() {
           </div>
           <Link className="marketing-text-link" href="/produkt"><LocalizedText>{"Alle Funktionen ansehen "}</LocalizedText><Icon name="arrow" size={15}/></Link>
         </div>
-        <ProductScreen route="/preview/dashboard" title="Aktuelle Binso One Produktoberfläche" variant="desktop"/>
+        <ProductGallery/>
       </section>
 
       <section className="workflow-section">
@@ -121,7 +122,7 @@ export default function Home() {
             </article>)}
           </div>
         </div>
-        <ProductScreen route="/preview/dashboard" title="Aktuelles Binso One Dashboard" variant="desktop"/>
+        <ProductScreen screen="invoices" title="Binso One Rechnungsübersicht" variant="desktop"/>
       </section>
 
       <section className="product-callout">

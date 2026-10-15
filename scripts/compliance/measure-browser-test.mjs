@@ -24,24 +24,28 @@ try{
  const blocked=await measureActionClearance(page);
  assert.equal(blocked.scrollEndEstablished,false,'Unreachable endpoint cannot pass as measured geometry');
  await page.setViewportSize({width:1440,height:1000});
- const notification='<button class="desktop-notification-button">Bell</button>',avatar='<button class="avatar-button">Account</button>';
- const header=actions=>`<div class="desktop-appbar"><button>Search</button><div class="desktop-appbar-actions">${actions}</div></div>`;
+ const notification='<button class="desktop-notification-button">Bell</button>',avatar='<button class="avatar-button">Account</button>',search='<button class="desktop-global-search" aria-label="Search">Search</button>';
+ const normalActions=search+notification+avatar;
+ const header=actions=>`<div class="desktop-appbar"><button class="desktop-navigation-toggle" aria-controls="customer-desktop-navigation">Navigation</button><div class="desktop-appbar-actions">${actions}</div></div>`;
  const checkHeader=async(actions,state)=>{
   await page.setContent(header(actions));
   const evidence=await measureCompliance(page,{output,route:'/dashboard',theme:'light',width:page.viewportSize().width,state,engine});
   return evidence.checks.filter(c=>c.id==='UX-LAY-003');
  };
- const normal=await checkHeader(notification+avatar,'header-normal');
+ const normal=await checkHeader(normalActions,'header-normal');
  assert.equal(normal.length,1,'The actual desktop action owner must produce evidence');
- assert.equal(normal[0].status,'passed','Left search is outside the right action group');
- assert.equal((await checkHeader(notification+avatar+'<button>Extra</button>','header-extra'))[0].status,'failed','A third action must fail');
- assert.equal((await checkHeader(notification+'<button>Wrong replacement</button>','header-replacement'))[0].status,'failed','Counting two controls cannot approve an unrelated replacement');
- assert.equal((await checkHeader(notification+avatar+'<a class="desktop-header-timer" href="/zeit">Timer</a>','header-timer'))[0].status,'failed','The registered no-extra-actions criterion has no implicit timer exemption');
- assert.equal((await checkHeader(notification+avatar+'<button hidden>Hidden</button>','header-hidden'))[0].status,'passed','Hidden controls are excluded from visible actions');
+ assert.equal(normal[0].status,'passed','Approved search, notifications and account occupy the shared right action group');
+ assert.equal((await checkHeader(normalActions+'<button>Extra</button>','header-extra'))[0].status,'failed','Additional business actions must fail');
+ assert.equal((await checkHeader(search+notification+'<button>Wrong replacement</button>','header-replacement'))[0].status,'failed','Counting controls cannot approve an unrelated replacement');
+ assert.equal((await checkHeader(search+'<a class="desktop-header-timer" href="/zeit">01:24:36</a>'+notification+avatar,'header-timer'))[0].status,'passed','The preserved running timer is an explicit status shortcut');
+ assert.equal((await checkHeader(search+'<a class="desktop-header-timer" href="/zahlungen">01:24:36</a>'+notification+avatar,'header-fake-timer'))[0].status,'failed','A timer class cannot authorize a different business destination');
+ assert.equal((await checkHeader(search+search+notification+avatar,'header-duplicate-search'))[0].status,'failed','Duplicate allowed roles remain blocking');
+ assert.equal((await checkHeader(notification+avatar,'header-missing-search'))[0].status,'failed','The approved global search is required, not just permitted');
+ assert.equal((await checkHeader(normalActions+'<button hidden>Hidden</button>','header-hidden'))[0].status,'passed','Hidden controls are excluded from visible actions');
  await page.setViewportSize({width:1024,height:1000});
- assert.equal((await checkHeader(notification+avatar,'header-breakpoint'))[0].status,'passed','The desktop criterion includes the exact 1024px breakpoint');
+ assert.equal((await checkHeader(normalActions,'header-breakpoint'))[0].status,'passed','The desktop criterion includes the exact 1024px breakpoint');
  await page.setViewportSize({width:1023,height:1000});
- assert.equal((await checkHeader(notification+avatar+'<button>Mobile</button>','header-mobile')).length,0,'The desktop criterion starts at 1024px');
+ assert.equal((await checkHeader(normalActions+'<button>Mobile</button>','header-mobile')).length,0,'The desktop criterion starts at 1024px');
  await page.close();
  console.log('Scroll-end and desktop-header adversaries passed. Engine: '+engine);
 }finally{await browser.close();await fs.rm(output,{recursive:true,force:true});}

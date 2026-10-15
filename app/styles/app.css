@@ -1449,7 +1449,7 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 .bo-statistics{--statistics-bg:var(--color-bg);--statistics-fg:var(--color-fg);--statistics-muted:var(--color-muted);--statistics-control:var(--color-muted);--statistics-selected:var(--app-accent-soft);--statistics-grid:var(--color-line);--statistics-focus:var(--color-line);min-width:0;width:100%;box-sizing:border-box;background:var(--statistics-bg);color:var(--statistics-fg);border-radius:var(--radius-lg);padding:var(--kpi-padding);margin-block:var(--field-group-gap);overflow:hidden}
 .bo-ring-chart{display:flex;align-items:center;gap:var(--field-group-gap);padding-block:var(--field-group-gap);min-width:0}
 .bo-ring-visual{position:relative;flex:none;width:var(--chart-ring-size);height:var(--chart-ring-size)}
-.bo-ring-center{position:absolute;inset:19%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-align:center;pointer-events:none;overflow-wrap:anywhere;font-size:9px;line-height:1.15}
+.bo-ring-center{position:absolute;inset:15%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-align:center;pointer-events:none;overflow-wrap:anywhere;font-size:9px;line-height:1.15}
 .bo-ring-center strong{font-size:11px;font-variant-numeric:tabular-nums}
 .bo-ring-center span{color:var(--color-muted)}
 .bo-ring-chart svg{width:var(--chart-ring-size);height:var(--chart-ring-size);flex:none;overflow:visible}
