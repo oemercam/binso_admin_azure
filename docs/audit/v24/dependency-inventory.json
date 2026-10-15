@@ -1,0 +1,32 @@
+{
+  "baseCommit": "cb1e5574880790f9d7ad7404572876edd8149689",
+  "runtime": "Node 24.19.0",
+  "packageManager": "pnpm 10.17.1 via corepack (host default is 11.25.0)",
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "dependencies": {
+    "@swc/helpers": "0.5.23",
+    "lucide-react": "0.468.0",
+    "next": "16.3.8",
+    "pdfjs-dist": "5.4.296",
+    "pdfkit": "0.17.2",
+    "pg": "8.16.3",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "sharp": "0.35.5",
+    "swissqrbill": "4.4.2"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.3.15",
+    "@types/node": "22.20.4",
+    "@types/pdfkit": "0.17.3",
+    "@types/pg": "8.15.5",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "eslint": "9.39.5",
+    "eslint-config-next": "16.3.8",
+    "typescript": "5.9.3"
+  },
+  "supportLicenseBreakingChangeReview": "open; production advisory scan recorded separately; package version is not a support/security certification"
+}

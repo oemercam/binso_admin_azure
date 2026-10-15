@@ -1,0 +1,4 @@
+
+> binso-one@0.11.0 typecheck /workspace/scratch/aa87b46d92b6/binso_admin_azure
+> tsc --noEmit
+

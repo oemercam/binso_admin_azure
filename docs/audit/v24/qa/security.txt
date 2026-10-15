@@ -1,0 +1,6 @@
+
+> binso-one@0.11.0 security:scan /workspace/scratch/aa87b46d92b6/binso_admin_azure
+> pnpm audit --prod --audit-level high
+
+[WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.overrides", "pnpm.onlyBuiltDependencies". See https://pnpm.io/settings for the new home of each setting.
+No known vulnerabilities found

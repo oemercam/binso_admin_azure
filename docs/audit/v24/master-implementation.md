@@ -1,0 +1,69 @@
+# BINSO ONE V24 – COMPLETE MASTER IMPLEMENTATION
+
+Repository: `oemercam/binso_admin_azure`. Dieser Auftrag ersetzt alle V24-Teilprompts. Gilt für Kundenportal, Adminportal, Landingpage, Desktop, Tablet, Mobile, iOS-/Android-PWA, Light/Dark und de-CH/fr-CH/it-CH/en.
+
+## 0. Regeln
+
+Aktuellen HEAD, PRs und Produktionsstand prüfen. Erst Ist-Inventar, Root Cause und Evidenz, dann zentrale Korrektur, Regression und dokumentierte Abnahme. **Keine lokalen CSS-Patches, keine parallele Foundation, keine unnötigen Libraries.** Legacy nur nach Usage- und Regressionstest entfernen. Keine produktiven Kundendaten löschen, keine unkontrollierten Migrationen, keine Sicherheitskontrollen deaktivieren, keine echten Zahlungen oder Demo-E-Mails nach extern. Produktivdeploy nur nach Freigabe. Befunde mit ID, P0–P3, Quelle, Status, Root Cause, Fix, Test dokumentieren; nicht nachgewiesen bleibt offen.
+
+## 1. Tech-Stack und Architektur
+
+Next.js, React, TypeScript, Node 24, pnpm, PostgreSQL, Azure App Service, Entra, Graph/M365, Stripe, GitHub Actions/OIDC, Storage, Push, Monitoring, PDFKit/PDF.js, Swiss QR Bill, Sharp, Lucide, Jobs, Webhooks inventarisieren. Version, Support, CVEs, Breaking Changes, Lizenzen, Lockfile, Runtime prüfen. App Router, Server/Client Components, APIs, Server Actions, Middleware, Domain-/Service-Schicht, DB/RLS, Caching, Tenant, Fehlerbehandlung, Hintergrundjobs analysieren. Hardcoding von URLs, Secrets, Tarifen, Status, Rollen, Texten, Farben, Breakpoints, Limits, Timeouts und Vorlagen zentralisieren. Modularen Monolithen bevorzugen.
+
+## 2. ISO, CIS, Security, Schweizer Recht
+
+Anwendbare aktuelle Ausgaben: ISO/IEC 27001/27002/27017/27018/27701/25010/25012/12207/27035, ISO 22301, ISO/IEC 20000-1, ISO/IEC 42001 bei KI; OWASP ASVS/Top 10/API Top 10; CIS Controls/Benchmarks; NIST CSF/SSDF/Digital Identity; WCAG 2.2 AA/WAI-ARIA; W3C, OpenSSF, OpenTelemetry, Schweizer DSG/DSV/MWST/Buchführung/Aufbewahrung. Norm, Version, Control-ID, Anwendbarkeit, Evidenz, Risiko, Massnahme je Punkt. CIS-Anforderung oder Nicht-CIS-Anforderung explizit; Deutsch erklären, technische Pfade/Werte Englisch. Keine Zertifizierung behaupten. Prüfe Auth/Verifikation/Login/Logout/Reset/Remember-me/MFA/TOTP/Sessions, Entra Operator, RBAC, RLS unter echter DB-Rolle, Tenant-Isolation, CSRF/XSS/Injection/SSRF, CSP/CORS, Rate Limits, Secrets, Upload-Scanner/Quarantäne, Verschlüsselung, Audit, Retention, Export/Löschung, Supply Chain/SBOM, Incident Response. Kritische Risiken blockieren Release.
+
+## 3. Zentrale CSS-/React-Foundation
+
+`app/binso-ui.css` und `app/styles/{tokens,base,marketing,app,operator,responsive}.css` prüfen: Kaskade, Selektoren, doppelte Overrides, Legacy, ungenutzte Regeln, Breakpoints und Architekturchecks. Zentral konsolidieren. Tokens für Inter-/Systemfont, Schriftgrössen/Gewichte/Zeilenhöhen, Titel, Labels, KPI-Ziffern, Spacing, Card-Padding, Grid, Button/Input/Touch/Icon-Grössen, Radius, Separator, Schatten, Status, Light/Dark, Glass, Motion, Safe Areas, Header/Nav. Mobile-first, kompakt und lesbar. Gemeinsame Shell, Header, Card, ListItem, DetailRow, SettingsRow, FormField/Input/Select/Textarea, Button, Tabs, BottomSheet, Dialog, Popover, Chat, KPI, Chart. Bestehende geeignete Komponenten wiederverwenden.
+
+## 4. Seiten, Header, Navigation und Scroll
+
+Zentrale ListPage, DetailPage, FormPage, DashboardPage, SettingsPage, ChatPage, DocumentViewer, Wizard, AdminDataTable, Wallboard. ListPage immer Header → lokale Suche links / Filter daneben / Plus rechts → optionale Status-Tabs → Liste. DetailPage Zurück links, geometrisch zentrierter Titel, Aktion rechts. Dashboard Schnellaktion, höchstens vier Haupt-KPIs, Ring/Trend, kompakte Listen und „Mehr anzeigen“. Hauptseitenheader originales Binso-Icon, Titel, globale Suche, Glocke, Profil; gleiche Höhe/Icons/Touchflächen. Scroll: stabiler/sticky Header ohne Sprünge, Scroll-Restoration, Back/Deep Links, Safe Areas, dynamischer Viewport, Keyboard Awareness, keine verdeckten Inhalte. **Bottom-Navigation Start/Kunden/Finanzen/Zeit/Mehr in Struktur, Reihenfolge, Design und Funktion unverändert; separat rechts angehängtes Plus entfernen.** Labels/Icons konsistent. Bei Tastatur nötigenfalls Navigation temporär ausblenden.
+
+## 5. Suche, Aktionen, Bottom Sheets und Formulare
+
+Globale Suche vs lokale Suche trennen; Debounce, Filter-Chips, Sortierung, Reset, Pagination, Berechtigungen, Zustandserhalt, leere Ergebnisse. **Plus = neu erstellen, Datensatz antippen = öffnen, `···` = weitere erlaubte Aktionen** (Vorschau/Bearbeiten/Duplizieren/Archivieren). Bei nur einer Aktion direkte Aktion. Zentrale Action Registry mit RBAC, Status, Ziel, Öffnungsmodus, Feedback. Globales Plus auf Übersicht im Header/Aktionsbereich öffnet „Neu erstellen“ mit berechtigten Kunde/Angebot/Rechnung/Projekt/Zeit/Ausgabe; kein Plus an Bottom-Navigation. Fachlisten-Plus kontextbezogen. Vier zentrale Sheets: Action, Selection, Filter, Form; Mobile Sheet, Desktop Popover/Dialog/Panel; Fokus, Scroll, Tastatur, Safe Area, Footer, Escape/Back, Datenverlustschutz. Kompakte Kunden/Projekte/Zeiten/Ausgaben/Tickets/Einladungen als Form Sheet, Angebots-/Rechnungsassistenten als Arbeitsansicht. **Kein „Kunden suchen“ im Neuer-Kunde-Formular.** Einheitliche Feld-Borders, Fokus, Fehler, Vorbelegung, Validierung, Tastaturtypen, Drafts, Doppelsubmit und Recovery.
+
+## 6. Chat, Listen, Settings und kompakte Zustände
+
+Supportchat nach WhatsApp-/ChatGPT-Bedienprinzipien: kurze Ticketnummer, Nachrichtenblasen, Zeitstempel, Anhänge, Status/Retry, Scroll-Anker, keyboard-aware Composer auf iPhone Safari/iOS-PWA. Gemeinsame Card-Listen: dezente Separatoren zwischen Einträgen, **nie nach letztem**; keine Linien zwischen eigenständigen Cards. Kompakte Zeilen und Status/Beträge. CompactEmptyState horizontal, kleines Icon, kurzer Titel, maximal eine Zusatzzeile, optionale Aktion; keine grossen Illustrationen oder Leerflächen. Zustände keine Daten/Treffer/Rechte/Offline/Fehler; kompakte Loading/Success/Error/Toast/Undo. Settings/Profil/Firma/Sicherheit/Benachrichtigungen/Abos/Benutzer-Rollen mit gemeinsamen Rows, korrekten Werten, langen E-Mails, Rechten und ohne Nav-Überlagerung.
+
+## 7. Glass und Motion
+
+Vorhandene Glass-Tokens zentral für Header-Aktionsgruppe, Bottom-Navigation und geeignete Menüs: Transparenz, Blur, Tint, Kontur, Schatten, Kontrast, Light/Dark und Fallback. Keine Glass-Überladung auf Inhaltskarten. Subtile Pressed/Hover/Focus/Loading-, Sheet-/Dialog-/Navigationsanimationen, Reduced Motion, keine Layoutsprünge. Behavior Contract pro Komponente für Öffnen/Schliessen/Fokus/Scroll/Keyboard/Fehler/Rechte.
+
+## 8. KPI, Ringe und interaktive Diagramme
+
+**Alle Zahlen-/Statistikbereiche** (Kunden, Angebote, Rechnungen, Projekte, Zeit, Ausgaben, Support, Abos, Admin, Monitoring) verwenden gleiche KPI-/Chart-Foundation, fachlich passende Visualisierung. KPI nur Label + grosse Zahl + maximal eine kurze Zusatzinfo, keine 4–5 Zeilen. Mobile 2×2, maximal vier primäre KPIs; weitere „Mehr anzeigen“. Freigegebene Kombination Finanzen: Umsatz, offene Forderungen, Ausgaben, überfällige Forderungen als KPIs; Zahlungsstatus-Ring bezahlt/offen/überfällig; Einnahmen-/Ausgaben-Zeitreihen und Details. Ring nur für Anteile/Fortschritt, Linien für Zeit, Balken für Kategorien. Gemeinsame KPI, Trend, Ring, Donut, Line, Bar, Tooltip, Drilldown, Empty/Loading/Error. Tap/Click zeigt Betrag/Zeitraum/Status; Detailaktion öffnet gefilterte Liste; Hover, Touch, Tastatur und Screenreader. Zentrale serverseitige Metrikdefinition: Umsatz ≠ Zahlungseingänge ≠ Forderungen ≠ Gewinn. CHF, MWST, Brutto/Netto, Stichtag, Status, Rundung, Storno, Gutschrift, Teilzahlung, Tenant, Rechte. Keine erfundenen Zahlen.
+
+## 9. Realistische isolierte Demo-Daten in PostgreSQL
+
+Demo-Tenant/User und Seed/Reset prüfen. Nur markierte Demo-Mandanten ändern, nie echte Kunden. Deterministischer idempotenter Seed über mindestens zwölf Monate mit zusammenhängenden Kunden, Kontakten, Angeboten, Projekten, Leistungen, Zeiten, Ausgaben, Rechnungen, Zahlungen, Support und unterstützten Mahnungen/Gutschriften. Positive **und negative** Szenarien: bezahlt, offen, überfällig, Teilzahlung, Storno, abgelehnte Angebote, Verlustprojekte, Budgetüberschreitung, hohe Ausgaben, negative Monate, rückläufiger Umsatz, inaktive Kunden, überfällige Tickets. Gültige Fremdschlüssel, Status, MWST, CHF, RLS. Keine ungültigen Status erzwingen. Keine echten E-Mails/Zahlungen/Webhooks. Alle Demo-Charts/KPIs aus echten PostgreSQL-Abfragen. Tests für Summen, negative Werte, Zeiträume, Isolation und Reset.
+
+## 10. Vollständige Geschäftsprozesse
+
+Kunde/Kontakt → Dublettenprüfung → Angebot Entwurf/Versand/Annahme/Ablehnung/Ablauf/Revision → Auftrag/Projekt → Leistungen/Zeiten/Ausgaben/Belege → abrechenbare Positionen → Rechnung Nummer/MWST/Schweizer QR/Versand → Teil-/Vollzahlung/Überzahlung/Korrektur → Fälligkeit/Mahnstufen/Mahnversand/Historie → Abschluss/Archiv/Reporting. Daten ohne erneute Eingabe übernehmen. Statusmaschinen, Berechtigungen, Transaktionen, Idempotenz, Audit, Dokumente, Benachrichtigungen, Offline-/Session-/Parallelbearbeitung testen. Keine doppelte Rechnung, keine bezahlte Rechnung als überfällig, keine Mahnung ohne Voraussetzungen. Fehlende Funktionen gegen Produktkonzept bewerten, nicht stillschweigend erfinden.
+
+## 11. Adminportal und SaaS-Lifecycle
+
+Gleiche UX-Foundation, spezialisierte Admin-Tabellen, Sidebar, Breadcrumbs, Bulk Actions, Monitoring-Wallboard, Logs, Alerts, Jobs, Integrationen, Audit, Mandanten, Benutzer/Rollen, Billing Oversight, Feature Flags, Plattformsettings, Wartungsmodus, Support. Kritische Admin-Aktionen mit Berechtigung, Begründung, Bestätigung, Audit. SaaS-Lifecycle Registrierung, Trial, Aktivierung, Einladung, Seats, Tarifwechsel, Kündigung, Reaktivierung, Export, Löschung. Wallboard Vollbild, Auto-Refresh, Stale-Data-Anzeige.
+
+## 12. SEO, Branding und Übersetzungen
+
+Landingpage: Next.js Metadata API, individuelle Titel/Beschreibungen, Canonical, Sitemap, Robots, hreflang, Schema.org Organization/SoftwareApplication/WebSite/BreadcrumbList wo passend, Google Search Console, Bing, Core Web Vitals, HTTP-Status. WhatsApp/LinkedIn/X/Teams/iMessage Open-Graph-Vorschau. Private Portale noindex und serverseitig geschützt, keine privaten Daten in Preview. **Favicon klein nur originales Binso-Icon ohne „One“**, Original-Asset, 16/32, ico/SVG, Apple Touch, PWA 192/512/maskable, Manifest. de-CH/fr-CH/it-CH/en mit üblichen Schweizer Geschäftsbegriffen, zentralem Glossar, konsistenter Terminologie, CHF/MWST/Datum/Zahl/Plural; UI, Formulare, PDFs, E-Mails, Admin, SEO. W3C i18n, CLDR, ICU, BCP47, ISO 17100 als Prozessreferenz. Missing Keys, Platzhalter und Overflow testen; sprachliche Fachprüfung ausweisen.
+
+## 13. PWA, Azure, Betrieb und Recovery
+
+PWA Installation, Standalone, Push, Service Worker, Cache-Isolation privater Daten, Offline-Fallback, Update/Cache-Invalidierung, Session-/Crash-Recovery, iOS/Android. **Kein sichtbares PWA-Update-Banner**, auch nicht im Rechnungsassistenten. Azure App Service, PostgreSQL, Storage/Managed Identity, Entra, Graph, Stripe Checkout/Billing Portal/signierte idempotente Webhooks, E-Mail, Jobs, Application Insights, Azure Monitor, Health/Readiness, Alerts, Backup/Restore, RPO/RTO, Disaster Recovery, Wartungsmodus, Incident Response, Rollback prüfen. Produktionskonfiguration nur nach Freigabe ändern.
+
+## 14. QA, Release und Nachweise
+
+Fast QA, Standard PR QA, Release QA. Unit/API/DB-RLS/Security/E2E/Browser/Responsive/Accessibility/PWA/iOS-Tastatur/Charts/Demo/SEO/i18n/Performance/Visual Regression. Echte Browser-Screenshots für Kundenportal, Adminportal, Landingpage; Mobile 320–430 px, Tablet, Desktop, Light/Dark, Rollen, leere/volle/negative Daten. Nicht nur statische Scheintests. Vorhandene Skripte verwenden: `pnpm install --frozen-lockfile`, `pnpm repository:clean`, `pnpm docs:check`, `pnpm release:check`, `pnpm test`, `pnpm lint`, `pnpm security:scan`, `pnpm css:check`, `pnpm typecheck`, `pnpm build`, relevante `pnpm qa:*`/UX-Compliance. Fehlgeschlagene Pflicht-Gates blockieren Release; Diagnosen dürfen weiterlaufen. Keine Tests deaktivieren, um grün zu werden.
+
+## 15. Lieferumfang und Abschluss
+
+Unter `docs/audit/v24/` erstellen: Requirements Ledger, Architektur-/Dependency-/Integrationsinventar, ISO/CIS/OWASP-Matrix, Security-Risiken, Hardcoding-/Legacy-Befunde, UX Design Tokens, Page/Action/Overlay/Behavior Contracts, Responsive-/PWA-Matrix, KPI-Metrikdefinitionen, Demo-Seed-/DB-Nachweise, E2E-Prozessmatrix, SEO/Favicon/Social, Terminologie-Glossar, Admin/Monitoring, QA/Visual Screenshots, Release Readiness und offene Risiken. Jede Phase mit Commit/PR, Tests und Abnahmestatus dokumentieren. Erst kritische Foundation/Security/Data-Fixes, dann UX, Charts/Demo, Prozesse, Integrationen und finaler Release. Keine Produktionsfreigabe ohne ausdrückliche Zustimmung.
+
+**Abnahmekriterium:** Alle bestehenden Seiten verwenden nachweisbar die zentrale Foundation; keine konkurrierenden Legacy-Patterns; konsistente UX auf allen Geräten und im Adminportal; echte DB-basierte positive/negative Demo-Statistiken; fachlich korrekte End-to-End-Prozesse; grüne verpflichtende Tests; dokumentierte offene Risiken.
