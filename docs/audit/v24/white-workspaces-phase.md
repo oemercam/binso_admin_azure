@@ -59,3 +59,7 @@ Vor der Referenz-Pilotänderung bestanden auf `4c39191da8c84ba83ea17b2ce995e7c76
 - Auswahlzustände von Tabs/Chips/Benachrichtigungen verwenden jetzt im bestehenden Basisowner die weiche blaue Fläche; die identische mobile Sonderdeklaration wurde entfernt. Dateiauswahl-Touchziel beträgt mindestens 44 px.
 
 Die Pilot-Referenzbilder wurden im Chromium-Runner erfolgreich erzeugt und zur Prüfung geladen. Ein vollständiger visueller Vergleich mit den tatsächlichen Pilotseiten bleibt bis zum korrigierten Browserlauf offen; der fehlgeschlagene Lauf wird nicht als bestanden ausgewiesen.
+
+### Frühes Inventar-Gate
+
+Der Integrationsfingerprint umfasst auch `scripts/`. Nach Ergänzung der geerbten Navigations-Fokusprüfung war das gespeicherte Inventar erneut veraltet und blockierte Quality #38798735176 vor den Browserjobs. Das war ein fehlender Generatorschritt dieser Umsetzung. Die bestehende Fast-QA führt die Integrationsprüfung jetzt bei gemeinsamen oder Infrastruktur-/Skriptänderungen mit aus; sie generiert keine Freigabe und überspringt kein Gate. Inventar nach allen Änderungen neu erzeugt und anschliessend geprüft.
