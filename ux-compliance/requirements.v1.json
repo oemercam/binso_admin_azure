@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "1.0.2",
+  "version": "1.1.0",
   "baselineCommit": "b398ff7400eb1b2ea90016c25e596261d58c822b",
   "sourceCompleteness": "Available V22.1/V22.2 registers imported without acceptance. Complete original V21.1–V21.5 approvals unavailable.",
   "conflicts": [
@@ -15,6 +15,12 @@
       "earlier": "Bottom-navigation source and geometry frozen against V21.1/V22 baseline",
       "later": "2026-10-13: explicit user authorization for glass on navigation, separate creation plus and a shared customer/admin/tablet UX foundation",
       "decision": "Glass material and dock placement may change. Finanzen remains a direct destination; original access/scroll logic and icon paths stay protected. New source reference: docs/assets/20261013/navigation-reference.json. Geometry must be explicitly captured, never silently refreshed."
+    },
+    {
+      "id": "PRIMARY-KPI-COUNT",
+      "earlier": "Exactly three statistics metrics",
+      "later": "V24 section 8: four primary financial KPIs; existing central foundation; additional metrics behind More",
+      "resolution": "V24 contract applied; no weakening of exact domain counts or navigation protection"
     }
   ],
   "requirements": [
@@ -440,42 +446,42 @@
     },
     {
       "id": "UX-FIN-001",
-      "description": "Drei Kennzahlen",
+      "description": "Zentrale primäre Kennzahlen",
       "routes": [
         "customer-app"
       ],
       "componentTypes": [
         "CashStatistics"
       ],
-      "expected": "Genau drei KPI-Elemente pro zentraler Statistik",
+      "expected": "Vier primäre Finanz-KPIs, drei Kunden-KPIs; gemeinsame MetricTiles, zusätzliche Werte per Mehr anzeigen",
       "owner": "CashStatistics",
       "method": "browser",
       "testCase": "TC-UX-FIN-001",
-      "adapter": "three-kpis",
+      "adapter": "primary-kpis",
       "priority": "P1",
-      "acceptance": "Genau drei KPI-Elemente pro zentraler Statistik",
+      "acceptance": "Vier primäre Finanz-KPIs, drei Kunden-KPIs; gemeinsame MetricTiles, zusätzliche Werte per Mehr anzeigen",
       "automation": "automatic",
-      "provenance": "Current UX compliance instruction; approved UX summary where referenced",
+      "provenance": "Binso One V24 section 8 supersedes the former exactly-three-KPI contract",
       "review": null
     },
     {
       "id": "UX-FIN-002",
-      "description": "Einnahmen/Ausgaben gruppiert",
+      "description": "Einnahmen/Ausgaben als Zeitreihen",
       "routes": [
         "customer-app"
       ],
       "componentTypes": [
         "CashStatistics"
       ],
-      "expected": "Hauptübersicht zeigt Einnahmen und Ausgaben; jede Gruppe zwei Balken",
+      "expected": "Zwei getrennte Datenreihen als Linien mit Datum, Nullachse, Legende und auswählbaren Werten",
       "owner": "CashStatistics",
       "method": "browser",
       "testCase": "TC-UX-FIN-002",
       "adapter": "cash-series",
       "priority": "P1",
-      "acceptance": "Hauptübersicht zeigt Einnahmen und Ausgaben; jede Gruppe zwei Balken",
+      "acceptance": "Zwei getrennte Datenreihen als Linien mit Datum, Nullachse, Legende und auswählbaren Werten",
       "automation": "automatic",
-      "provenance": "Current UX compliance instruction; approved UX summary where referenced",
+      "provenance": "V24 section 8: lines encode time; grouped bars retained only for categorical charts",
       "review": null
     },
     {

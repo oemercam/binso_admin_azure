@@ -19,5 +19,34 @@ export async function cashStatisticsData(c:PoolClient,organizationId:string){
   c.query("select (reimbursed_at at time zone 'Europe/Zurich')::date::text payment_date,sum(quantity*unit_price)::numeric(14,2) amount from expenses where organization_id=$1 and archived_at is null and currency='CHF' and reimbursed_at is not null and status in ('approved','posted') group by (reimbursed_at at time zone 'Europe/Zurich')::date order by payment_date",[organizationId]),
   c.query("select exists(select 1 from operating_costs where organization_id=$1 and scope='tenant' and currency='CHF') or exists(select 1 from payroll_runs where organization_id=$1 and status in ('approved','paid')) incomplete",[organizationId])
  ]);
- return {payments:payments.rows,outflows:outflows.rows,incomplete:Boolean(coverage.rows[0]?.incomplete)};
+ return {payments:payments.rows,outflows:outflows.rows,incomplete:Boolean(coverage.rows[0]?.incomplete),financial:await financialMetricsData(c,organizationId)};
+}
+
+
+/** One CHF metric definition: issued gross revenue by document date, cash by
+ * actual payment date, and current receivables after recorded credit notes.
+ * Call in the caller's tenant-scoped repeatable-read transaction. */
+export async function financialMetricsData(c:PoolClient,organizationId:string,options:{currency?:string;customerId?:string|null}={}){
+ const params=[organizationId,options.currency??'CHF',options.customerId??null];
+ const scope=`select i.* from invoices i where i.organization_id=$1 and i.archived_at is null and i.currency=$2 and ($3::uuid is null or i.customer_id=$3) and i.status not in ('draft','cancelled') and i.issue_date<=(now() at time zone 'Europe/Zurich')::date`;
+ const [revenue,snapshot]=await Promise.all([
+  c.query(`with issued as (${scope}), events as (
+   select issue_date date,total_amount amount from issued
+   union all select n.credit_date,-n.amount from credit_notes n join issued i on i.id=n.invoice_id and i.organization_id=n.organization_id where n.organization_id=$1 and n.credit_date<=(now() at time zone 'Europe/Zurich')::date
+  ) select date::text,sum(amount) amount from events group by date order by date`,params),
+  c.query(`with issued as (${scope}), credits as (
+   select n.invoice_id,sum(n.amount) amount from credit_notes n join issued i on i.id=n.invoice_id and i.organization_id=n.organization_id where n.organization_id=$1 and n.credit_date<=(now() at time zone 'Europe/Zurich')::date group by n.invoice_id
+  ), adjusted as (
+   select i.*,greatest(0,i.total_amount-coalesce(n.amount,0)) gross from issued i left join credits n on n.invoice_id=i.id
+  ) select (now() at time zone 'Europe/Zurich')::date::text as_of,
+   coalesce(sum(least(paid_amount,gross)),0) paid,
+   coalesce(sum(greatest(0,gross-paid_amount)) filter(where due_date>=(now() at time zone 'Europe/Zurich')::date),0) open,
+   coalesce(sum(greatest(0,gross-paid_amount)) filter(where due_date<(now() at time zone 'Europe/Zurich')::date),0) overdue,
+   coalesce(sum(greatest(0,gross-paid_amount)),0) receivables,
+   count(*) filter(where gross>paid_amount)::int open_count,
+   count(*) filter(where gross>paid_amount and due_date<(now() at time zone 'Europe/Zurich')::date)::int overdue_count,
+   coalesce(sum(greatest(0,paid_amount-gross)),0) credit_balance
+   from adjusted`,params)
+ ]);
+ return {revenueEvents:revenue.rows,snapshot:snapshot.rows[0]};
 }

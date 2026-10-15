@@ -1,0 +1,37 @@
+
+> binso-one@0.11.0 test /workspace/scratch/aa87b46d92b6/binso_admin_azure
+> node scripts/deployed-assets-test.mjs && node scripts/localization-test.mjs && node scripts/localization-coverage-test.mjs && node scripts/maintenance-test.mjs && node scripts/readiness-integrity-test.mjs && node scripts/security-exception-test.mjs && node scripts/runtime-integrity-test.mjs && node scripts/rate-limit-test.mjs && node scripts/demo-session-test.mjs && node scripts/file-scan-test.mjs && node scripts/file-rescan-test.mjs && node scripts/auth-integrity-test.mjs && node scripts/registration-test.mjs && node scripts/statistics-test.mjs && node scripts/v23-2-ux-test.mjs && node scripts/glass-ux-test.mjs && node scripts/ui-build-cache-test.mjs && node scripts/architecture-selfcheck.mjs && node scripts/permission-selfcheck.mjs && node scripts/theme-selfcheck.mjs && node scripts/client-session-test.mjs && node scripts/migration-test.mjs && node scripts/data-lifecycle-schema-test.mjs && node scripts/ux-regression-test.mjs && node scripts/pwa-preview-test.mjs && node scripts/pwa-lifecycle-test.mjs && node scripts/document-presentation-test.mjs && node scripts/qa-plan-test.mjs && node scripts/browser-shards-test.mjs && node scripts/navigation-contract-test.mjs && node scripts/ui-foundation-test.mjs && node scripts/navigation-foundation-test.mjs && node scripts/data-foundation-test.mjs && node scripts/foundation-integration-test.mjs && node scripts/process-draft-test.mjs && node scripts/observability-test.mjs && node scripts/operator-announcement-test.mjs && node scripts/operator-contract-test.mjs
+
+Deployed asset identity: static HTML and dynamic localized manifests, ancestor styles, deduplication and missing-artifact rejection passed.
+Locale catalogues: complete EN/FR/IT tuples, preserved template tokens, server-rendered language, native attributes and unchanged user data passed.
+Password recovery: translated mail/link locale and uniform unknown-account/delivery-failure response passed.
+Shared rows/headings preserve colliding user titles while menu labels and document prefixes translate.
+Localized metadata binds canonical alternatives and social-image URLs to the selected language.
+Application source copy coverage passed.
+Maintenance: authorization, duration validation, activation, expiry, deactivation and atomic audit rollback passed.
+Runtime role, inherited bypass/ownership, public-schema creation denial, pinned Azure issuer and real Bash monitoring failure gates passed.
+Dependency exceptions are package/version/path/dev-root/expiry bound; changed, critical and production scope are rejected.
+Bounded chunked/UTF-8/declared-size/JSON reads, sensitive-log suppression and service-worker owned-cache cleanup passed.
+Actual rate limiter: bounded new-key capacity, no active-key eviction, expiry reuse, retry delays and atomic production database path passed.
+Actual demo route: resume, isolated reset, reserved synthetic email, rate/origin denial, provisioning failure recovery and production-cookie preservation passed. No external service is called.
+node:net:2145
+      const error = new UVExceptionWithHostPort(rval, 'listen', address, port);
+                    ^
+
+Error: listen EPERM: operation not permitted /tmp/binso-scan-AchkvF/s0.sock
+    at Server.setupListenHandle [as _listen2] (node:net:2145:21)
+    at listenInCluster (node:net:2224:12)
+    at Server.listen (node:net:2361:5)
+    at scanFile.socketPath.socketPath (file:///workspace/scratch/aa87b46d92b6/binso_admin_azure/scripts/file-scan-test.mjs:52:79)
+    at new Promise (<anonymous>)
+    at peer (file:///workspace/scratch/aa87b46d92b6/binso_admin_azure/scripts/file-scan-test.mjs:52:13)
+    at file:///workspace/scratch/aa87b46d92b6/binso_admin_azure/scripts/file-scan-test.mjs:62:8 {
+  code: 'EPERM',
+  errno: -1,
+  syscall: 'listen',
+  address: '/tmp/binso-scan-AchkvF/s0.sock',
+  port: -1
+}
+
+Node.js v24.19.0
+ ELIFECYCLE  Test failed. See above for more details.

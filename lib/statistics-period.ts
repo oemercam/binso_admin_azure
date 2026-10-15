@@ -35,3 +35,14 @@ export function aggregateStatistics(events:readonly StatisticEvent[],bounds:Stat
  for(const bucket of buckets)for(const key of keys)bucket.values[key]=sumMoney(values.get(bucket.key)![key]);
  return {buckets,totals:Object.fromEntries(keys.map(key=>[key,sumMoney(buckets.map(bucket=>bucket.values[key]))])),resolution};
 }
+
+/** Shared signed time-series geometry. Negative values stay below the zero line. */
+export function lineChartCoordinates(buckets:readonly StatisticBucket[],keys:readonly string[]){
+ const width=600,height=160,inset=12;
+ const values=buckets.flatMap(bucket=>keys.map(key=>bucket.values[key]??0));
+ if(values.some(value=>!Number.isFinite(value)))throw new Error('Chart values must be finite');
+ const minimum=Math.min(0,...values),maximum=Math.max(1,...values);
+ const y=(value:number)=>height-inset-(value-minimum)/(maximum-minimum)*(height-2*inset);
+ const paths=keys.map(key=>({key,points:buckets.map((bucket,index)=>({key:bucket.key,label:bucket.label,value:bucket.values[key]??0,x:buckets.length===1?width/2:inset+index*(width-2*inset)/(buckets.length-1),y:y(bucket.values[key]??0)}))}));
+ return {width,height,inset,minimum,maximum,zeroY:y(0),paths};
+}

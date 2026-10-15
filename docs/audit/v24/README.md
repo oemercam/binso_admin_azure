@@ -43,3 +43,7 @@ Kein Merge auf main: `.github/workflows/deploy-azure.yml` startet nach erfolgrei
 ## Nachfolgende Implementierung
 
 Der begrenzte zentrale Fix für Erstellen-Aktionen ist separat in `create-placement-phase.md` dokumentiert. Das obige Inventar und die Baseline bleiben auf cb1e5574 bezogen. V24 ist weiterhin nicht vollständig umgesetzt oder abgenommen.
+
+## Fortgesetzte Phasen
+
+Die Zusammenführung und Security-Korrektur stehen in `security-data-phase.md`; zentrale Statistiken und Demo-Daten in `charts-demo-phase.md`. Der verbindliche Gesamtstatus steht in `release-readiness.md`. Historische Zahlen oben sind die Erstaufnahme, keine aktuelle Vollständigkeitsbehauptung.

@@ -11293,5 +11293,35 @@
     "Time cannot currently be recorded for this project.",
     "Il n’est pas possible de saisir du temps pour ce projet actuellement.",
     "Al momento non è possibile registrare ore per questo progetto."
+  ],
+  "Umsatz inkl. MWST nach Belegdatum · Zahlungsstatus zum aktuellen Stichtag · CHF": [
+    "Revenue incl. VAT by document date · payment status as of today · CHF",
+    "Chiffre d’affaires TTC par date du document · statut des paiements à ce jour · CHF",
+    "Fatturato IVA inclusa per data del documento · stato dei pagamenti attuale · CHF"
+  ],
+  "Belege inkl. MWST nach Gutschriften": [
+    "Documents incl. VAT after credit notes",
+    "Documents TTC après notes de crédit",
+    "Documenti IVA inclusa dopo note di credito"
+  ],
+  "Nachgewiesene Auszahlungen": [
+    "Recorded cash outflows",
+    "Décaissements attestés",
+    "Uscite di cassa documentate"
+  ],
+  "Guthaben nach Gutschriften": [
+    "Credit balance after credit notes",
+    "Avoir après notes de crédit",
+    "Credito dopo note di credito"
+  ],
+  "Details anzeigen": [
+    "Show details",
+    "Afficher les détails",
+    "Mostra dettagli"
+  ],
+  "Datenpunkt auswählen für Details.": [
+    "Select a data point for details.",
+    "Sélectionnez un point pour afficher les détails.",
+    "Seleziona un punto per i dettagli."
   ]
 }

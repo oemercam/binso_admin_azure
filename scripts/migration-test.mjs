@@ -66,6 +66,9 @@ try{
  const qrModule=dataModule(qrSource);
  const moneyModule=dataModule(await fs.readFile("lib/money.ts","utf8"));
  const financialModule=dataModule((await fs.readFile("lib/financial-status.ts","utf8")).replace('"./money"',JSON.stringify(moneyModule)));
+ const financeModule=dataModule((await fs.readFile('lib/server/repositories/finance.ts','utf8')).replace("import 'server-only';",''));
+ const sharedSummaryModule=dataModule((await fs.readFile('lib/server/repositories/financial-summary.ts','utf8')).replace('import "server-only";','').replace("'@/lib/permissions'",JSON.stringify(permissions)).replace('"./finance"',JSON.stringify(financeModule)).replace('"@/lib/money"',JSON.stringify(moneyModule)));
+
  const idempotencyModule=dataModule((await fs.readFile('lib/server/business-idempotency.ts','utf8')).replace("import 'server-only';",'').replace("'./http'",JSON.stringify(http)));
  const businessSource=(await fs.readFile('lib/server/repositories/business-api.ts','utf8')).replace('import "server-only";','').replace('"../business-idempotency"',JSON.stringify(idempotencyModule)).replace('"../http"',JSON.stringify(http)).replace('"../audit"',JSON.stringify(audit)).replace('"@/lib/permissions"',JSON.stringify(permissions)).replace('"@/lib/qr-bill"',JSON.stringify(qrModule)).replace('"@/lib/financial-status"',JSON.stringify(financialModule));
  const {listApiBusiness,mutateApiBusiness:rawMutation}=await import(dataModule(businessSource));
@@ -108,10 +111,11 @@ try{
  assert.equal(cashBefore.outflows.length,0,'Approved but not reimbursed expenses are not cash outflows');
  assert.ok(cashBefore.payments.length>0,'Actual matched payment dates populate income');
  const foreignCash=await cashStatisticsData(client,'00000000-0000-4000-8000-000000000001');
- assert.deepEqual(foreignCash,{payments:[],outflows:[],incomplete:false},'Cash queries do not leak a different tenant population');
+ assert.deepEqual({payments:foreignCash.payments,outflows:foreignCash.outflows,incomplete:foreignCash.incomplete},{payments:[],outflows:[],incomplete:false},'Cash queries do not leak a different tenant population');
+ assert.deepEqual(foreignCash.financial.revenueEvents,[]);for(const key of ['paid','open','overdue','receivables','credit_balance'])assert.equal(Number(foreignCash.financial.snapshot[key]),0,'Invoice metrics cannot leak another tenant');
  const fixtureExpense=(await db.query("select id from expenses where organization_id=$1 and currency='CHF' and status in ('approved','posted') limit 1",[demo])).rows[0];
  if(fixtureExpense){await db.query("update expenses set reimbursed_at='2026-10-25T23:30:00Z' where id=$1",[fixtureExpense.id]);const reimbursed=await cashStatisticsData(client,demo);assert.ok(reimbursed.outflows.some(row=>row.payment_date==='2026-10-26'),'Reimbursement uses Europe/Zurich calendar day, not expense date or UTC date');await db.query('update expenses set reimbursed_at=null where id=$1',[fixtureExpense.id]);}
- const workspaceSource=(await fs.readFile('lib/server/repositories/customer-workspace.ts','utf8')).replace('import "server-only";','').replace('"@/lib/permissions"',JSON.stringify(permissions)).replace('"../http"',JSON.stringify(http)).replace('"./business-api"',JSON.stringify(dataModule(businessSource))).replace('"./financial-summary"',JSON.stringify(dataModule((await fs.readFile('lib/server/repositories/financial-summary.ts','utf8')).replace('import "server-only";','').replace("'@/lib/permissions'",JSON.stringify(permissions))))).replace('"./customer-activity"',JSON.stringify(dataModule((await fs.readFile('lib/server/repositories/customer-activity.ts','utf8')).replace('import "server-only";','').replace('"@/lib/display-format"',JSON.stringify(displayModuleUrl)).replace('"@/lib/permissions"',JSON.stringify(permissions)))));
+ const workspaceSource=(await fs.readFile('lib/server/repositories/customer-workspace.ts','utf8')).replace('import "server-only";','').replace('"@/lib/permissions"',JSON.stringify(permissions)).replace('"../http"',JSON.stringify(http)).replace('"./business-api"',JSON.stringify(dataModule(businessSource))).replace('"./financial-summary"',JSON.stringify(sharedSummaryModule)).replace('"./customer-activity"',JSON.stringify(dataModule((await fs.readFile('lib/server/repositories/customer-activity.ts','utf8')).replace('import "server-only";','').replace('"@/lib/display-format"',JSON.stringify(displayModuleUrl)).replace('"@/lib/permissions"',JSON.stringify(permissions)))));
  const {customerWorkspace}=await import(dataModule(workspaceSource));
  const statisticsCustomer=(await db.query('select id from customers where organization_id=$1 and archived_at is null order by id limit 1',[demo])).rows[0].id;
  const customerStatistics=await customerWorkspace(client,session,statisticsCustomer);
@@ -191,12 +195,30 @@ try{
  const sandbox='00000000-0000-4000-8000-000000000098';
  await db.query("insert into organizations(id,name,slug,is_demo,status) values($1,'Synthetic sandbox','sandbox-test',true,'trial')",[sandbox]);
  await db.query("insert into app_users(id,email,display_name,status) values('sandbox-user','sandbox-user@example.invalid','Demo','active')");
+ await db.query("insert into organization_memberships(organization_id,user_id,email,role,status) values($1,'sandbox-user','sandbox-user@example.invalid','owner','active')",[sandbox]);
  await db.query("select set_config('app.organization_id',$1,false)",[sandbox]);
  await seedDatabaseDemo(client,sandbox,'sandbox-user');
  const sandboxInvoices=await db.query('select id from invoices where organization_id=$1',[sandbox]);
  assert.ok(sandboxInvoices.rows.length>20);
  await seedDatabaseDemo(client,sandbox,'sandbox-user');
  assert.equal((await db.query('select count(*)::int n from invoices where organization_id=$1',[sandbox])).rows[0].n,sandboxInvoices.rows.length);
+ const scenarioCount=(await db.query("select count(distinct date_trunc('month',issue_date))::int months,count(*)::int invoices from invoices where organization_id=$1 and external_id like 'v24-invoice-%'",[sandbox])).rows[0];
+ assert.equal(scenarioCount.months,12);assert.equal(scenarioCount.invoices,36);
+ const scenarioParity=(await db.query("select count(*)::int invalid from invoices i where i.organization_id=$1 and i.external_id like 'v24-invoice-%' and i.paid_amount<>coalesce((select sum(p.amount) from payments p where p.organization_id=i.organization_id and p.invoice_id=i.id),0)",[sandbox])).rows[0];assert.equal(scenarioParity.invalid,0,'Every paid/partial demo amount is backed by matching payments');
+ const negativeMonths=(await db.query(`with income as(select date_trunc('month',payment_date) as month_bucket,sum(amount) amount from payments where organization_id=$1 group by 1),outflow as(select date_trunc('month',reimbursed_at at time zone 'Europe/Zurich') as month_bucket,sum(quantity*unit_price) amount from expenses where organization_id=$1 and reimbursed_at is not null group by 1) select count(*)::int n from outflow o left join income i using(month_bucket) where o.amount>coalesce(i.amount,0)`,[sandbox])).rows[0];assert.ok(negativeMonths.n>=3,'Loss months remain negative even including the existing template income');
+ assert.ok((await db.query("select count(*)::int n from customers where organization_id=$1 and status='inactive'",[sandbox])).rows[0].n>0);
+ assert.equal((await db.query("select count(*)::int n from quotes where organization_id=$1 and external_id like 'v24-quote-%' and status in ('declined','expired')",[sandbox])).rows[0].n,2);
+ await db.exec('begin');
+ try{
+  await db.exec('set local role binso_runtime');await db.query("select set_config('app.organization_id',$1,true),set_config('app.user_id','sandbox-user',true),set_config('app.platform_operator','false',true)",[sandbox]);
+  await seedDatabaseDemo(client,sandbox,'sandbox-user');
+  assert.equal((await db.query("select count(*)::int n from invoices where organization_id=$1 and external_id like 'v24-invoice-%'",[sandbox])).rows[0].n,36,'Repeat seeding under the restricted runtime role preserves scenario identity');
+  assert.equal((await db.query('select count(*)::int n from invoices where organization_id<>$1',[sandbox])).rows[0].n,0,'Seed restores target tenant context and cannot expose other invoice populations');
+ }finally{await db.exec('rollback')}
+ await assert.rejects(()=>seedDatabaseDemo(client,'00000000-0000-4000-8000-000000000001','sandbox-user'),e=>e.code==='demo_target_invalid');
+ await assert.rejects(()=>seedDatabaseDemo(client,demo,'sandbox-user'),e=>e.code==='demo_target_invalid');
+ console.log('V24 demo: 12 months, exact payments, at least three negative cash months, declined/expired offers, inactive customer, idempotent restricted-role seed and non-demo/template denial passed.');
+
  await db.query("select set_config('app.organization_id',$1,false)",[sandbox]);
  const clonedSession={...session,organizationId:sandbox,userId:'sandbox-user'};
  const clonedCustomer=(await listApiBusiness(client,clonedSession,'customers',''))[0];
@@ -740,7 +762,7 @@ try{
  assert.equal((await listApiBusiness(client,session,'documents','number=eq.'+processQuote.number))[0].project_id,projectCreated.data.item.id);
  assert.equal((await listApiBusiness(client,session,'documents','id=eq.'+converted.id))[0].source_offer,processQuote.number);
 
- const summarySource=(await fs.readFile('lib/server/repositories/financial-summary.ts','utf8')).replace('import "server-only";','').replace("'@/lib/permissions'",JSON.stringify(permissions));
+ const summarySource=(await fs.readFile('lib/server/repositories/financial-summary.ts','utf8')).replace('import "server-only";','').replace("'@/lib/permissions'",JSON.stringify(permissions)).replace('"./finance"',JSON.stringify(dataModule((await fs.readFile('lib/server/repositories/finance.ts','utf8')).replace("import 'server-only';",'')))).replace('"@/lib/money"',JSON.stringify(moneyModule));
  const {financialSummary}=await import(dataModule(summarySource));
  const ownerSummary=await financialSummary(client,session,documentArgs.p_customer_id);assert.ok(ownerSummary.invoices.length);assert.ok(Number(ownerSummary.time.ready_hours)>=1);
  const restrictedSummary=await financialSummary(client,{...session,role:'member'},documentArgs.p_customer_id);assert.equal(restrictedSummary.invoices.length,0);assert.equal(restrictedSummary.offers,null,'A shared workspace cannot expose restricted finance data');

@@ -126,7 +126,11 @@
     "phase": 2,
     "requirement": "Anwendbare aktuelle Ausgaben: ISO/IEC 27001/27002/27017/27018/27701/25010/25012/12207/27035, ISO 22301, ISO/IEC 20000-1, ISO/IEC 42001 bei KI; OWASP ASVS/Top 10/API Top 10; CIS Controls/Benchmarks; NIST CSF/SSDF/Digital Identity; WCAG 2.2 AA/WAI-ARIA; W3C, OpenSSF, OpenTelemetry, Schweizer DSG/DSV/MWST/Buchführung/Aufbewahrung.",
     "status": "open",
-    "sourceEvidence": [],
+    "sourceEvidence": [
+      "docs/audit/v24/standards-register.json",
+      "docs/audit/v24/control-matrix.json",
+      "docs/audit/v24/security-data-phase.md"
+    ],
     "implementationEvidence": [],
     "testEvidence": [],
     "acceptance": "open"
@@ -137,7 +141,11 @@
     "phase": 2,
     "requirement": "Norm, Version, Control-ID, Anwendbarkeit, Evidenz, Risiko, Massnahme je Punkt.",
     "status": "open",
-    "sourceEvidence": [],
+    "sourceEvidence": [
+      "docs/audit/v24/standards-register.json",
+      "docs/audit/v24/control-matrix.json",
+      "docs/audit/v24/security-data-phase.md"
+    ],
     "implementationEvidence": [],
     "testEvidence": [],
     "acceptance": "open"
@@ -148,7 +156,11 @@
     "phase": 2,
     "requirement": "CIS-Anforderung oder Nicht-CIS-Anforderung explizit; Deutsch erklären, technische Pfade/Werte Englisch.",
     "status": "open",
-    "sourceEvidence": [],
+    "sourceEvidence": [
+      "docs/audit/v24/standards-register.json",
+      "docs/audit/v24/control-matrix.json",
+      "docs/audit/v24/security-data-phase.md"
+    ],
     "implementationEvidence": [],
     "testEvidence": [],
     "acceptance": "open"
@@ -159,7 +171,11 @@
     "phase": 2,
     "requirement": "Keine Zertifizierung behaupten.",
     "status": "open",
-    "sourceEvidence": [],
+    "sourceEvidence": [
+      "docs/audit/v24/standards-register.json",
+      "docs/audit/v24/control-matrix.json",
+      "docs/audit/v24/security-data-phase.md"
+    ],
     "implementationEvidence": [],
     "testEvidence": [],
     "acceptance": "open"
@@ -170,7 +186,11 @@
     "phase": 2,
     "requirement": "Prüfe Auth/Verifikation/Login/Logout/Reset/Remember-me/MFA/TOTP/Sessions, Entra Operator, RBAC, RLS unter echter DB-Rolle, Tenant-Isolation, CSRF/XSS/Injection/SSRF, CSP/CORS, Rate Limits, Secrets, Upload-Scanner/Quarantäne, Verschlüsselung, Audit, Retention, Export/Löschung, Supply Chain/SBOM, Incident Response.",
     "status": "open",
-    "sourceEvidence": [],
+    "sourceEvidence": [
+      "docs/audit/v24/standards-register.json",
+      "docs/audit/v24/control-matrix.json",
+      "docs/audit/v24/security-data-phase.md"
+    ],
     "implementationEvidence": [],
     "testEvidence": [],
     "acceptance": "open"
@@ -181,7 +201,11 @@
     "phase": 2,
     "requirement": "Kritische Risiken blockieren Release.",
     "status": "open",
-    "sourceEvidence": [],
+    "sourceEvidence": [
+      "docs/audit/v24/standards-register.json",
+      "docs/audit/v24/control-matrix.json",
+      "docs/audit/v24/security-data-phase.md"
+    ],
     "implementationEvidence": [],
     "testEvidence": [],
     "acceptance": "open"
@@ -195,7 +219,7 @@
     "sourceEvidence": [],
     "implementationEvidence": [],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "open; no completion inferred from a related component change"
   },
   {
     "id": "V24-03-01-02",
@@ -206,7 +230,7 @@
     "sourceEvidence": [],
     "implementationEvidence": [],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "open; no completion inferred from a related component change"
   },
   {
     "id": "V24-03-01-03",
@@ -217,7 +241,7 @@
     "sourceEvidence": [],
     "implementationEvidence": [],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "open; no completion inferred from a related component change"
   },
   {
     "id": "V24-03-01-04",
@@ -228,7 +252,7 @@
     "sourceEvidence": [],
     "implementationEvidence": [],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "open; no completion inferred from a related component change"
   },
   {
     "id": "V24-03-01-05",
@@ -239,7 +263,7 @@
     "sourceEvidence": [],
     "implementationEvidence": [],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "open; no completion inferred from a related component change"
   },
   {
     "id": "V24-03-01-06",
@@ -250,7 +274,7 @@
     "sourceEvidence": [],
     "implementationEvidence": [],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "open; no completion inferred from a related component change"
   },
   {
     "id": "V24-04-01-01",
@@ -261,7 +285,7 @@
     "sourceEvidence": [],
     "implementationEvidence": [],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "open; no completion inferred from a related component change"
   },
   {
     "id": "V24-04-01-02",
@@ -272,7 +296,7 @@
     "sourceEvidence": [],
     "implementationEvidence": [],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "open; no completion inferred from a related component change"
   },
   {
     "id": "V24-04-01-03",
@@ -283,7 +307,7 @@
     "sourceEvidence": [],
     "implementationEvidence": [],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "open; no completion inferred from a related component change"
   },
   {
     "id": "V24-04-01-04",
@@ -294,7 +318,7 @@
     "sourceEvidence": [],
     "implementationEvidence": [],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "open; no completion inferred from a related component change"
   },
   {
     "id": "V24-04-01-05",
@@ -305,7 +329,7 @@
     "sourceEvidence": [],
     "implementationEvidence": [],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "open; no completion inferred from a related component change"
   },
   {
     "id": "V24-04-01-06",
@@ -316,7 +340,7 @@
     "sourceEvidence": [],
     "implementationEvidence": [],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "open; no completion inferred from a related component change"
   },
   {
     "id": "V24-04-01-07",
@@ -327,7 +351,7 @@
     "sourceEvidence": [],
     "implementationEvidence": [],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "open; no completion inferred from a related component change"
   },
   {
     "id": "V24-04-01-08",
@@ -338,7 +362,7 @@
     "sourceEvidence": [],
     "implementationEvidence": [],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "open; no completion inferred from a related component change"
   },
   {
     "id": "V24-05-01-01",
@@ -349,7 +373,7 @@
     "sourceEvidence": [],
     "implementationEvidence": [],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "open; no completion inferred from a related component change"
   },
   {
     "id": "V24-05-01-02",
@@ -360,18 +384,20 @@
     "sourceEvidence": [],
     "implementationEvidence": [],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "open; no completion inferred from a related component change"
   },
   {
     "id": "V24-05-01-03",
     "parent": "V24-05-01",
     "phase": 5,
     "requirement": "Bei nur einer Aktion direkte Aktion.",
-    "status": "open",
+    "status": "partial",
     "sourceEvidence": [],
-    "implementationEvidence": [],
+    "implementationEvidence": [
+      "docs/audit/v24/charts-demo-phase.md"
+    ],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "open; final CI/browser/physical and complete domain coverage required"
   },
   {
     "id": "V24-05-01-04",
@@ -382,29 +408,33 @@
     "sourceEvidence": [],
     "implementationEvidence": [],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "open; no completion inferred from a related component change"
   },
   {
     "id": "V24-05-01-05",
     "parent": "V24-05-01",
     "phase": 5,
     "requirement": "Globales Plus auf Übersicht im Header/Aktionsbereich öffnet „Neu erstellen“ mit berechtigten Kunde/Angebot/Rechnung/Projekt/Zeit/Ausgabe; kein Plus an Bottom-Navigation.",
-    "status": "open",
+    "status": "partial",
     "sourceEvidence": [],
-    "implementationEvidence": [],
+    "implementationEvidence": [
+      "docs/audit/v24/charts-demo-phase.md"
+    ],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "open; final CI/browser/physical and complete domain coverage required"
   },
   {
     "id": "V24-05-01-06",
     "parent": "V24-05-01",
     "phase": 5,
     "requirement": "Fachlisten-Plus kontextbezogen.",
-    "status": "open",
+    "status": "partial",
     "sourceEvidence": [],
-    "implementationEvidence": [],
+    "implementationEvidence": [
+      "docs/audit/v24/charts-demo-phase.md"
+    ],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "open; final CI/browser/physical and complete domain coverage required"
   },
   {
     "id": "V24-05-01-07",
@@ -415,7 +445,7 @@
     "sourceEvidence": [],
     "implementationEvidence": [],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "open; no completion inferred from a related component change"
   },
   {
     "id": "V24-05-01-08",
@@ -426,7 +456,7 @@
     "sourceEvidence": [],
     "implementationEvidence": [],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "open; no completion inferred from a related component change"
   },
   {
     "id": "V24-05-01-09",
@@ -437,7 +467,7 @@
     "sourceEvidence": [],
     "implementationEvidence": [],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "open; no completion inferred from a related component change"
   },
   {
     "id": "V24-06-01-01",
@@ -554,209 +584,247 @@
     "parent": "V24-08-01",
     "phase": 8,
     "requirement": "**Alle Zahlen-/Statistikbereiche** (Kunden, Angebote, Rechnungen, Projekte, Zeit, Ausgaben, Support, Abos, Admin, Monitoring) verwenden gleiche KPI-/Chart-Foundation, fachlich passende Visualisierung.",
-    "status": "open",
+    "status": "partial",
     "sourceEvidence": [],
-    "implementationEvidence": [],
+    "implementationEvidence": [
+      "docs/audit/v24/charts-demo-phase.md"
+    ],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "open; final CI/browser/physical and complete domain coverage required"
   },
   {
     "id": "V24-08-01-02",
     "parent": "V24-08-01",
     "phase": 8,
     "requirement": "KPI nur Label + grosse Zahl + maximal eine kurze Zusatzinfo, keine 4–5 Zeilen.",
-    "status": "open",
+    "status": "partial",
     "sourceEvidence": [],
-    "implementationEvidence": [],
+    "implementationEvidence": [
+      "docs/audit/v24/charts-demo-phase.md"
+    ],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "open; final CI/browser/physical and complete domain coverage required"
   },
   {
     "id": "V24-08-01-03",
     "parent": "V24-08-01",
     "phase": 8,
     "requirement": "Mobile 2×2, maximal vier primäre KPIs; weitere „Mehr anzeigen“.",
-    "status": "open",
+    "status": "partial",
     "sourceEvidence": [],
-    "implementationEvidence": [],
+    "implementationEvidence": [
+      "docs/audit/v24/charts-demo-phase.md"
+    ],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "open; final CI/browser/physical and complete domain coverage required"
   },
   {
     "id": "V24-08-01-04",
     "parent": "V24-08-01",
     "phase": 8,
     "requirement": "Freigegebene Kombination Finanzen: Umsatz, offene Forderungen, Ausgaben, überfällige Forderungen als KPIs; Zahlungsstatus-Ring bezahlt/offen/überfällig; Einnahmen-/Ausgaben-Zeitreihen und Details.",
-    "status": "open",
+    "status": "partial",
     "sourceEvidence": [],
-    "implementationEvidence": [],
+    "implementationEvidence": [
+      "docs/audit/v24/charts-demo-phase.md"
+    ],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "open; final CI/browser/physical and complete domain coverage required"
   },
   {
     "id": "V24-08-01-05",
     "parent": "V24-08-01",
     "phase": 8,
     "requirement": "Ring nur für Anteile/Fortschritt, Linien für Zeit, Balken für Kategorien.",
-    "status": "open",
+    "status": "partial",
     "sourceEvidence": [],
-    "implementationEvidence": [],
+    "implementationEvidence": [
+      "docs/audit/v24/charts-demo-phase.md"
+    ],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "open; final CI/browser/physical and complete domain coverage required"
   },
   {
     "id": "V24-08-01-06",
     "parent": "V24-08-01",
     "phase": 8,
     "requirement": "Gemeinsame KPI, Trend, Ring, Donut, Line, Bar, Tooltip, Drilldown, Empty/Loading/Error.",
-    "status": "open",
+    "status": "partial",
     "sourceEvidence": [],
-    "implementationEvidence": [],
+    "implementationEvidence": [
+      "docs/audit/v24/charts-demo-phase.md"
+    ],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "open; final CI/browser/physical and complete domain coverage required"
   },
   {
     "id": "V24-08-01-07",
     "parent": "V24-08-01",
     "phase": 8,
     "requirement": "Tap/Click zeigt Betrag/Zeitraum/Status; Detailaktion öffnet gefilterte Liste; Hover, Touch, Tastatur und Screenreader.",
-    "status": "open",
+    "status": "partial",
     "sourceEvidence": [],
-    "implementationEvidence": [],
+    "implementationEvidence": [
+      "docs/audit/v24/charts-demo-phase.md"
+    ],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "open; final CI/browser/physical and complete domain coverage required"
   },
   {
     "id": "V24-08-01-08",
     "parent": "V24-08-01",
     "phase": 8,
     "requirement": "Zentrale serverseitige Metrikdefinition: Umsatz ≠ Zahlungseingänge ≠ Forderungen ≠ Gewinn.",
-    "status": "open",
+    "status": "partial",
     "sourceEvidence": [],
-    "implementationEvidence": [],
+    "implementationEvidence": [
+      "docs/audit/v24/charts-demo-phase.md"
+    ],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "open; final CI/browser/physical and complete domain coverage required"
   },
   {
     "id": "V24-08-01-09",
     "parent": "V24-08-01",
     "phase": 8,
     "requirement": "CHF, MWST, Brutto/Netto, Stichtag, Status, Rundung, Storno, Gutschrift, Teilzahlung, Tenant, Rechte.",
-    "status": "open",
+    "status": "partial",
     "sourceEvidence": [],
-    "implementationEvidence": [],
+    "implementationEvidence": [
+      "docs/audit/v24/charts-demo-phase.md"
+    ],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "open; final CI/browser/physical and complete domain coverage required"
   },
   {
     "id": "V24-08-01-10",
     "parent": "V24-08-01",
     "phase": 8,
     "requirement": "Keine erfundenen Zahlen.",
-    "status": "open",
+    "status": "partial",
     "sourceEvidence": [],
-    "implementationEvidence": [],
+    "implementationEvidence": [
+      "docs/audit/v24/charts-demo-phase.md"
+    ],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "open; final CI/browser/physical and complete domain coverage required"
   },
   {
     "id": "V24-09-01-01",
     "parent": "V24-09-01",
     "phase": 9,
     "requirement": "Demo-Tenant/User und Seed/Reset prüfen.",
-    "status": "open",
+    "status": "partial",
     "sourceEvidence": [],
-    "implementationEvidence": [],
+    "implementationEvidence": [
+      "docs/audit/v24/charts-demo-phase.md"
+    ],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "open; final CI/browser/physical and complete domain coverage required"
   },
   {
     "id": "V24-09-01-02",
     "parent": "V24-09-01",
     "phase": 9,
     "requirement": "Nur markierte Demo-Mandanten ändern, nie echte Kunden.",
-    "status": "open",
+    "status": "partial",
     "sourceEvidence": [],
-    "implementationEvidence": [],
+    "implementationEvidence": [
+      "docs/audit/v24/charts-demo-phase.md"
+    ],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "open; final CI/browser/physical and complete domain coverage required"
   },
   {
     "id": "V24-09-01-03",
     "parent": "V24-09-01",
     "phase": 9,
     "requirement": "Deterministischer idempotenter Seed über mindestens zwölf Monate mit zusammenhängenden Kunden, Kontakten, Angeboten, Projekten, Leistungen, Zeiten, Ausgaben, Rechnungen, Zahlungen, Support und unterstützten Mahnungen/Gutschriften.",
-    "status": "open",
+    "status": "partial",
     "sourceEvidence": [],
-    "implementationEvidence": [],
+    "implementationEvidence": [
+      "docs/audit/v24/charts-demo-phase.md"
+    ],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "open; final CI/browser/physical and complete domain coverage required"
   },
   {
     "id": "V24-09-01-04",
     "parent": "V24-09-01",
     "phase": 9,
     "requirement": "Positive **und negative** Szenarien: bezahlt, offen, überfällig, Teilzahlung, Storno, abgelehnte Angebote, Verlustprojekte, Budgetüberschreitung, hohe Ausgaben, negative Monate, rückläufiger Umsatz, inaktive Kunden, überfällige Tickets.",
-    "status": "open",
+    "status": "partial",
     "sourceEvidence": [],
-    "implementationEvidence": [],
+    "implementationEvidence": [
+      "docs/audit/v24/charts-demo-phase.md"
+    ],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "open; final CI/browser/physical and complete domain coverage required"
   },
   {
     "id": "V24-09-01-05",
     "parent": "V24-09-01",
     "phase": 9,
     "requirement": "Gültige Fremdschlüssel, Status, MWST, CHF, RLS.",
-    "status": "open",
+    "status": "partial",
     "sourceEvidence": [],
-    "implementationEvidence": [],
+    "implementationEvidence": [
+      "docs/audit/v24/charts-demo-phase.md"
+    ],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "open; final CI/browser/physical and complete domain coverage required"
   },
   {
     "id": "V24-09-01-06",
     "parent": "V24-09-01",
     "phase": 9,
     "requirement": "Keine ungültigen Status erzwingen.",
-    "status": "open",
+    "status": "partial",
     "sourceEvidence": [],
-    "implementationEvidence": [],
+    "implementationEvidence": [
+      "docs/audit/v24/charts-demo-phase.md"
+    ],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "open; final CI/browser/physical and complete domain coverage required"
   },
   {
     "id": "V24-09-01-07",
     "parent": "V24-09-01",
     "phase": 9,
     "requirement": "Keine echten E-Mails/Zahlungen/Webhooks.",
-    "status": "open",
+    "status": "partial",
     "sourceEvidence": [],
-    "implementationEvidence": [],
+    "implementationEvidence": [
+      "docs/audit/v24/charts-demo-phase.md"
+    ],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "open; final CI/browser/physical and complete domain coverage required"
   },
   {
     "id": "V24-09-01-08",
     "parent": "V24-09-01",
     "phase": 9,
     "requirement": "Alle Demo-Charts/KPIs aus echten PostgreSQL-Abfragen.",
-    "status": "open",
+    "status": "partial",
     "sourceEvidence": [],
-    "implementationEvidence": [],
+    "implementationEvidence": [
+      "docs/audit/v24/charts-demo-phase.md"
+    ],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "open; final CI/browser/physical and complete domain coverage required"
   },
   {
     "id": "V24-09-01-09",
     "parent": "V24-09-01",
     "phase": 9,
     "requirement": "Tests für Summen, negative Werte, Zeiträume, Isolation und Reset.",
-    "status": "open",
+    "status": "partial",
     "sourceEvidence": [],
-    "implementationEvidence": [],
+    "implementationEvidence": [
+      "docs/audit/v24/charts-demo-phase.md"
+    ],
     "testEvidence": [],
-    "acceptance": "open"
+    "acceptance": "open; final CI/browser/physical and complete domain coverage required"
   },
   {
     "id": "V24-10-01-01",

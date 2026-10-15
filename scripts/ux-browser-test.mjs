@@ -22,7 +22,14 @@ const statisticToday=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Zurich',y
 const [statisticYear,statisticMonth]=statisticToday.split('-').map(Number);
 const previousStatisticFrom=new Date(Date.UTC(statisticYear,statisticMonth-2,1)).toISOString().slice(0,10);
 const previousStatisticTo=new Date(Date.UTC(statisticYear,statisticMonth-1,0)).toISOString().slice(0,10);
-const cashFixture=(income=200)=>process.env.BINSO_UX_FIXTURE_CASE?{...fixtureCase(process.env.BINSO_UX_FIXTURE_CASE).cash,payments:fixtureCase(process.env.BINSO_UX_FIXTURE_CASE).cash.payments.map(p=>({...p,payment_date:statisticToday})),outflows:fixtureCase(process.env.BINSO_UX_FIXTURE_CASE).cash.outflows.map(p=>({...p,payment_date:statisticToday}))}:({payments:[{payment_date:previousStatisticFrom,amount:120},{payment_date:statisticToday,amount:income}],outflows:[{payment_date:statisticToday,amount:50}],incomplete:false});
+const cashFixture=(income=200)=>{
+ const fixture=process.env.BINSO_UX_FIXTURE_CASE?fixtureCase(process.env.BINSO_UX_FIXTURE_CASE):null;
+ const cash=fixture?{...fixture.cash,payments:fixture.cash.payments.map(p=>({...p,payment_date:statisticToday})),outflows:fixture.cash.outflows.map(p=>({...p,payment_date:statisticToday}))}:{payments:[{payment_date:previousStatisticFrom,amount:120},{payment_date:statisticToday,amount:income}],outflows:[{payment_date:statisticToday,amount:50}],incomplete:false};
+ const issued=fixture?.invoices.filter(item=>!['draft','cancelled'].includes(item.status))??[];
+ const gross=issued.reduce((sum,item)=>sum+item.total,0),paid=issued.reduce((sum,item)=>sum+item.paid_amount,0);
+ const financial=fixture?{revenueEvents:gross?[{date:statisticToday,amount:gross}]:[],snapshot:{as_of:statisticToday,paid,open:gross-paid,overdue:0,credit_balance:0}}:dataPaymentMode?{revenueEvents:[{date:previousStatisticFrom,amount:120},{date:statisticToday,amount:invoice.total}],snapshot:{as_of:statisticToday,paid:income+120,open:Math.max(0,invoice.total-income),overdue:0,credit_balance:0}}:{revenueEvents:[{date:previousStatisticFrom,amount:240},{date:statisticToday,amount:400}],snapshot:{as_of:statisticToday,paid:440,open:180,overdue:20,credit_balance:0}};
+ return {...cash,financial};
+};
 
 await fs.mkdir(output,{recursive:true});
 const port=process.env.BINSO_UX_PORT??'3200';
@@ -266,11 +273,11 @@ try{
     }
     if(width<=760&&await page.locator('.mobile-back').count()){const back=page.locator('.mobile-back');assert.ok(await back.isVisible(),`${route}: detail back control is visible`);const icon=await back.locator('svg').boundingBox();assert.ok(icon&&icon.width>=18&&icon.height>=18&&icon.x>=0,`${route}: back icon is not clipped`);}
     if(!process.env.BINSO_UX_BASELINE&&['/dashboard','/finanzen','/finanzen/analyse','/kunden/customer-one'].includes(route)){
-      assert.equal(await page.locator('.bo-statistics-kpis>div').count(),3,'Migrated statistics have exactly three metrics');
+      assert.equal(await page.locator('.bo-statistics .bo-metric-tiles>.metric').count(),route==='/kunden/customer-one'?3:4,'The common foundation shows domain-appropriate primary metrics');
       assert.equal(await page.locator('.bo-statistics').count(),1,'One central statistics surface');
       assert.equal(await page.locator('.bo-statistics').evaluate(el=>getComputedStyle(el).backgroundColor),width<=1100?(theme==='light'?'rgb(243, 243, 245)':'rgb(20, 20, 20)'):(theme==='light'?'rgb(255, 255, 255)':'rgb(0, 0, 0)'),'Statistics follow the app surface on phone/tablet and page surface on desktop');
       const trendToggle=page.getByRole('button',{name:'Zeitverlauf anzeigen',exact:true});if(await trendToggle.count())await trendToggle.click();
-      assert.ok(process.env.BINSO_UX_FIXTURE_CASE==='empty'||await page.locator('.bo-statistics-bar').evaluateAll(elements=>elements.some(el=>el.getBoundingClientRect().height>20)),'Actual fixture values produce bars');
+      assert.ok(process.env.BINSO_UX_FIXTURE_CASE==='empty'||await page.locator('.bo-statistics-line').evaluateAll(elements=>elements.some(el=>{const ys=Array.from({length:el.points.numberOfItems},(_,i)=>el.points.getItem(i).y);return Math.max(...ys)-Math.min(...ys)>20})),'Actual fixture values produce time-series lines');
       assert.equal(await page.locator('.revenue-insight,.dashboard-summary,.quick-section,.finance-overview-chart').count(),0,'Migrated pages have no competing KPI/chart layout');
     }
     if(!process.env.BINSO_UX_BASELINE&&route==='/mitarbeiter/employee-one'){await page.getByRole('heading',{name:'Mitarbeiterdetails',exact:true}).waitFor();await page.getByText(employee.email,{exact:true}).waitFor()}
@@ -339,7 +346,7 @@ try{
     if(width<=1100){await navigate(base+'/kunden/customer-one');await captureNavigation(page,theme,width,false);}
    }
    await page.setViewportSize({width:390,height:740});await navigate(base+'/kunden');
-   const customerCreate=page.getByRole('link',{name:'Neuer Kunde',exact:true}).filter({visible:true});assert.equal(await customerCreate.count(),1,'Customer list has one context-specific creation action');await customerCreate.click();await page.waitForURL(url=>url.pathname==='/kunden/neu');assert.equal(await page.locator('.mobile-dock').count(),0,'Forms do not retain navigation');await page.getByRole('link',{name:'Abbrechen',exact:true}).filter({visible:true}).click();await page.waitForURL(base+'/kunden');
+   const customerCreate=page.getByRole('link',{name:'Neuer Kunde',exact:true}).filter({visible:true});assert.equal(await customerCreate.count(),1,'Customer list has one context-specific creation action');await customerCreate.click();await page.waitForURL(url=>url.pathname==='/kunden/neu');assert.equal(await page.locator('.mobile-dock').count(),0,'Forms do not retain navigation');await page.getByRole('dialog',{name:'Kunde erstellen',exact:true}).getByRole('button',{name:'Abbrechen',exact:true}).click();await page.waitForURL(base+'/kunden');
    await navigate(base+'/kunden/customer-one');assert.equal(await page.locator('.dock-create-action').count(),0,'Entity detail uses its own contextual actions');
    await navigate(base+'/kunden');await page.getByRole('button',{name:'Filter und Sortierung',exact:true}).click();const filters=page.getByRole('dialog',{name:'Filter und Sortierung',exact:true});await filters.getByLabel('Status / Typ',{exact:true}).selectOption('Inaktiv');await filters.getByRole('button',{name:'Anwenden',exact:true}).click();assert.equal((await page.locator('.filter-count').innerText()).replace(/\s+/g,' '),'1 aktive Filter');await page.getByRole('button',{name:'Filter und Sortierung',exact:true}).click();await filters.getByRole('button',{name:'Zurücksetzen',exact:true}).click();await filters.getByRole('button',{name:'Anwenden',exact:true}).click();assert.equal(await page.locator('.filter-count').count(),0);
    await navigate(base+'/dashboard');await page.locator('.mobile-header').getByRole('button',{name:'Suche',exact:true}).click();const searchView=page.getByRole('dialog',{name:'Suche',exact:true});await searchView.getByLabel('Suchen',{exact:true}).fill('Prüffirma');await searchView.getByLabel('Suchen',{exact:true}).press('Enter');await searchView.getByRole('button',{name:'Suche löschen',exact:true}).click();await searchView.getByRole('heading',{name:'Letzte Suchanfragen',exact:true}).waitFor();await searchView.getByRole('button',{name:'Löschen',exact:true}).click();await searchView.getByRole('button',{name:'Rückgängig',exact:true}).click();await searchView.getByRole('heading',{name:'Letzte Suchanfragen',exact:true}).waitFor();await page.keyboard.press('Escape');
@@ -362,7 +369,7 @@ try{
     await navigate(base+'/kunden');await page.waitForLoadState('networkidle');
     const listActions=page.locator('.page-actions');
     await listActions.getByRole('searchbox',{name:'Kunden suchen...',exact:true}).waitFor({state:'visible'});
-    assert.equal(await listActions.locator('.records-search-row').getByRole('searchbox',{name:'Kunden suchen...',exact:true}).count(),1,'Search is inline');assert.equal(await listActions.locator('.records-search-row').getByRole('button',{name:'Filter und Sortierung',exact:true}).count(),1,'Filter follows search');assert.equal(await page.locator('.mobile-dock').getByRole('button',{name:'Neu erstellen',exact:true}).count(),1,'Creation belongs to the dock');
+    assert.equal(await listActions.locator('.records-search-row').getByRole('searchbox',{name:'Kunden suchen...',exact:true}).count(),1,'Search is inline');assert.equal(await listActions.locator('.records-search-row').getByRole('button',{name:'Filter und Sortierung',exact:true}).count(),1,'Filter follows search');assert.equal(await listActions.getByRole('link',{name:'Neuer Kunde',exact:true}).count(),1,'Context creation is in the list toolbar');assert.equal(await page.locator('.dock-create-action').count(),0,'No navigation-attached create action');
     assert.equal(await page.locator('main select').count(),0,'Sorting remains in its sheet');assert.equal(await listActions.getByRole('tab',{name:'Alle',exact:true}).count(),1,'Status tabs sit below search');
     await page.getByPlaceholder('Kunden suchen...').fill('not-present');await page.getByText('Keine Treffer für diese Suche',{exact:true}).waitFor();
     await page.getByRole('button',{name:'Filter zurücksetzen',exact:true}).click();await page.locator('.mobile-record-list').getByText(customer.name,{exact:true}).waitFor();
@@ -458,27 +465,32 @@ try{
   if(hasInteraction('finance')){
    await navigate(base+'/finanzen');await page.waitForLoadState('networkidle');
    const statistics=page.locator('.bo-statistics');
-   await statistics.locator('dd').getByText('CHF 320.00',{exact:true}).waitFor();
-   assert.equal(await statistics.locator('.bo-statistics-kpis>div').count(),3);
-   for(const months of [1,3,6,12]){await statistics.getByRole('button',{name:months+' M',exact:true}).click();assert.equal(await statistics.getByRole('button',{name:months+' M',exact:true}).getAttribute('aria-pressed'),'true');assert.equal(await statistics.locator('dd').first().textContent(),months===1?'CHF 200.00':'CHF 320.00');}
+   await statistics.locator('.metric>strong').getByText('CHF 640.00',{exact:true}).waitFor();
+   assert.equal(await statistics.locator('.bo-metric-tiles>.metric').count(),4);
+   for(const months of [1,3,6,12]){await statistics.getByRole('button',{name:months+' M',exact:true}).click();assert.equal(await statistics.getByRole('button',{name:months+' M',exact:true}).getAttribute('aria-pressed'),'true');assert.equal(await statistics.locator('.metric>strong').first().textContent(),months===1?'CHF 400.00':'CHF 640.00');}
    await statistics.getByRole('button',{name:'Eigenen Statistikzeitraum wählen',exact:true}).click();
    const periodSheet=page.getByRole('dialog',{name:'Statistikzeitraum',exact:true});
    await periodSheet.getByLabel('Von *',{exact:true}).fill(previousStatisticFrom);await periodSheet.getByLabel('Bis *',{exact:true}).fill(previousStatisticTo);
    await capture(page,{animations:'disabled',path:path.join(output,`${theme}-430-period-sheet.png`)});
    await periodSheet.getByRole('button',{name:'Anwenden',exact:true}).click();
-   assert.equal(await statistics.locator('dd').first().textContent(),'CHF 120.00');
-   assert.equal(await statistics.locator('dd').nth(1).textContent(),'CHF 0.00');
-   assert.equal(await statistics.locator('dd').nth(2).evaluate(el=>el.firstChild.textContent),'CHF 120.00');
+   assert.equal(await statistics.locator('.metric>strong').first().textContent(),'CHF 240.00');
+   assert.equal(await statistics.locator('.metric>strong').nth(1).textContent(),'CHF 200.00','Current receivables are independent of document period');
+   assert.equal(await statistics.locator('.metric>strong').nth(2).textContent(),'CHF 0.00','Only recorded outflows in the selected period');
+   assert.equal(await statistics.locator('.metric>strong').nth(3).textContent(),'CHF 20.00','Current overdue balance is independently labelled');
    assert.ok(await page.locator('.document-summary-row').filter({hasText:'RE-TEST-1'}).filter({visible:true}).count()>0,'Chart period does not hide a directly searched invoice');
    await page.locator('a[href="/dashboard"]').filter({visible:true}).first().click();await page.waitForURL('**/dashboard');await page.waitForLoadState('networkidle');await page.locator('a[href="/finanzen"]').filter({visible:true}).first().click();await page.waitForURL('**/finanzen');await page.waitForLoadState('networkidle');
-   await page.locator('.bo-statistics dd').first().getByText('CHF 120.00',{exact:true}).waitFor();
-   assert.equal(await page.locator('.bo-statistics dd').first().textContent(),'CHF 120.00','Custom period survives actual same-tab navigation');
+   await page.locator('.bo-statistics .metric>strong').first().getByText('CHF 240.00',{exact:true}).waitFor();
+   assert.equal(await page.locator('.bo-statistics .metric>strong').first().textContent(),'CHF 240.00','Custom period survives actual same-tab navigation');
    await page.locator('.bo-statistics').getByRole('button',{name:'Eigenen Statistikzeitraum wählen',exact:true}).click();
    const emptySheet=page.getByRole('dialog',{name:'Statistikzeitraum',exact:true});await emptySheet.getByLabel('Von *',{exact:true}).fill('2020-01-01');await emptySheet.getByLabel('Bis *',{exact:true}).fill('2020-01-02');await emptySheet.getByRole('button',{name:'Anwenden',exact:true}).click();
    await page.getByText('Keine Buchungen im gewählten Zeitraum.',{exact:true}).waitFor();
    const emptyTrend=page.getByRole('button',{name:'Zeitverlauf anzeigen',exact:true});if(await emptyTrend.count())await emptyTrend.click();
-   assert.ok((await page.locator('.bo-statistics-bar').evaluateAll(elements=>elements.map(el=>el.getBoundingClientRect().height))).every(height=>height===0),'Empty period has no fabricated columns');
+   assert.ok((await page.locator('.bo-statistics-point').evaluateAll(elements=>elements.map(el=>Number(el.getAttribute('data-value'))))).every(value=>value===0),'Empty period has only real zero observations');
    await page.getByText('Keine Buchungen im gewählten Zeitraum.',{exact:true}).waitFor();
+   const overdueSegment=page.locator('.bo-ring-chart circle[role="button"]').last();await overdueSegment.focus();await overdueSegment.press('Enter');
+   await page.getByRole('link',{name:'Details anzeigen',exact:true}).click();await page.waitForURL(url=>url.pathname==='/rechnungen'&&url.searchParams.get('status')==='Überfällig');
+   await page.waitForFunction(()=>document.querySelector('.records-inline-controls [role="tab"][aria-selected="true"]')?.textContent==='Überfällig');
+   await page.getByRole('tab',{name:'Alle',exact:true}).click();assert.equal(new URL(page.url()).searchParams.has('status'),false,'A user filter change clears the consumed chart drilldown');
   }
   if(hasInteraction('time')){
   await page.waitForLoadState("networkidle");await navigate(base+'/zeit');await page.waitForLoadState('networkidle');await page.getByRole('tab',{name:'Einträge',exact:true}).click();
@@ -673,8 +685,8 @@ try{
    for(const width of [390,1440]){
     await page.setViewportSize({width,height:740});await navigate(base+'/dashboard');await page.waitForLoadState('networkidle');
     const create=page.getByRole('button',{name:'Neu erstellen',exact:true}).filter({visible:true});
-    const size=await create.boundingBox(),avatar=await page.locator(width<=760?'.mobile-header .person-avatar-small':'.desktop-appbar .person-avatar-small').boundingBox();
-    assert.equal(size.width,width<=1100?54:avatar.width,'Creation has a reachable dock target on app viewports');assert.equal(size.height,size.width);
+    const size=await create.boundingBox();
+    assert.equal(size.width,44,'Page creation has a real 44px touch target on every viewport');assert.equal(size.height,size.width);
     await create.click();const menu=page.getByRole('dialog',{name:'Neu erstellen',exact:true});
     assert.deepEqual(await menu.locator('.action-row>span').allTextContents(),['Kunde','Angebot','Rechnung','Zeit erfassen','Projekt','Zahlung','Spese','Produkt','Mitarbeiter','Support-Anfrage']);
     assert.equal(await page.getByRole('button',{name:'Weiter',exact:true}).count(),0,'Opening global plus never starts an invoice wizard');
@@ -951,11 +963,11 @@ try{
    const initialPosts=dataPaymentPosts;dataPaymentFailed=true;await tabs.form.getByRole('button',{name:'Zahlung speichern',exact:true}).click();await tabs.form.getByText('Synthetic payment failed',{exact:true}).waitFor();assert.equal(invoice.paid_amount,0);assert.equal(dataPaymentPosts,initialPosts+1);assert.equal(await tabs.detail.getByText(/1[’']561\.97/).count(),0,'Failed payment cannot create a visible fictional balance');
    dataPaymentFailed=false;incompletePaymentResponse=true;await tabs.form.getByRole('button',{name:'Zahlung speichern',exact:true}).click();await tabs.form.getByText('Die Speicherung konnte nicht bestätigt werden. Bitte den gespeicherten Stand prüfen.',{exact:true}).waitFor();assert.equal(await tabs.form.getByText('Zahlung gespeichert.',{exact:true}).count(),0,'Incomplete JSON confirmation cannot report financial success');assert.equal(invoice.paid_amount,0);incompletePaymentResponse=false;losePaymentResponse=true;await tabs.form.getByRole('button',{name:'Zahlung speichern',exact:true}).click();await tabs.form.getByText('Keine Verbindung zum Server. Bitte die Verbindung und den gespeicherten Stand prüfen.',{exact:true}).waitFor();assert.equal(invoice.paid_amount,1000,'The server committed although its response was lost');assert.equal(await tabs.form.getByText('Zahlung gespeichert.',{exact:true}).count(),0,'Lost response is never reported as success');
    await tabs.form.getByRole('button',{name:'Zahlung speichern',exact:true}).click();await tabs.form.getByText('Zahlung gespeichert.',{exact:true}).waitFor();assert.equal(dataPaymentPosts,initialPosts+4);assert.equal(invoice.paid_amount,1000,'Retry replays the original request without a second payment');assert.equal(collections.payments.filter(row=>row.id==='foundation-payment').length,1);
-   for(const [name,value] of [['detail',/1[’']561\.97/],['list',/1[’']561\.97/],['customer',/1[’']561\.97/],['finance',/1[’']561\.97/],['payments',/1[’']000\.00/],['dashboard',/1[’']120\.00/],['customerOverview',/1[’']000\.00/],['activity','Zahlung erhalten']]){
+   for(const [name,value] of [['detail',/1[’']561\.97/],['list',/1[’']561\.97/],['customer',/1[’']561\.97/],['finance',/1[’']561\.97/],['payments',/1[’']000\.00/],['dashboard',/1[’']561\.97/],['customerOverview',/1[’']000\.00/],['activity','Zahlung erhalten']]){
     await tabs[name].waitForFunction(()=>window.v215ConsumerChanges.some(message=>message.domains?.includes('payments')),undefined,{polling:100});await tabs[name].bringToFront();await tabs[name].getByText(value,{exact:typeof value==='string'}).first().waitFor();assert.equal(await tabs[name].evaluate(()=>window.v215ConsumerMarker),'same-document',name+' updates without a reload');
    }
-   for(const [name,amount] of [['dashboard',"CHF 1'120.00"],['finance',"CHF 1'120.00"],['customerOverview',"CHF 1'000.00"]]){
-    await tabs[name].bringToFront();assert.equal((await tabs[name].locator('.bo-statistics dd').first().textContent())?.replaceAll('’',"'"),amount,name+' cash/statistic totals refresh from the same confirmed ledger');
+   for(const [name,amount] of [['dashboard',"CHF 1'561.97"],['finance',"CHF 1'561.97"],['customerOverview',"CHF 1'000.00"]]){
+    await tabs[name].bringToFront();assert.equal((await tabs[name].locator('.bo-statistics .metric>strong').nth(name==='customerOverview'?0:1).textContent())?.replaceAll('’',"'"),amount,name+' domain metric refreshes from the same confirmed ledger');
    }
    for(const tab of Object.values(tabs))await tab.close();dataPaymentMode=false;Object.assign(invoice,priorInvoice);summary.invoices[0].open_amount=priorOpenAmount;collections.payments=collections.payments.filter(row=>row.id!=='foundation-payment');collections.customers=collections.customers.filter(row=>row.id!=='customer-two');Object.assign(customer,priorCustomer);
    console.log('Actual PaymentForm: failed mutation has no fictional balance; lost committed response retries the same key without double payment; confirmed partial payment updates eight mounted cross-tab consumers without reload.');

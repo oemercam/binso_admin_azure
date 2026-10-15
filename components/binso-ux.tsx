@@ -39,15 +39,17 @@ export function PageHeading({ title, description, action, leading, verbatimTitle
   </header>;
 }
 
-export function CreateAction({ label, href, onClick, disabled = false }: { label: string; href?: string; onClick?: () => void; disabled?: boolean }) {
-  return <Button href={href} requiresWrite className="bo-create-action" ariaLabel={label} disabled={disabled} onClick={onClick} icon="plus"/>;
+export function CreateAction({ label, href, onClick, disabled = false, requiresWrite = true }: { label: string; href?: string; onClick?: () => void; disabled?: boolean;requiresWrite?:boolean }) {
+  return <Button href={href} requiresWrite={requiresWrite} className="bo-create-action" ariaLabel={label} disabled={disabled} onClick={onClick} icon="plus"/>;
 }
 
 export function QuickCreateAction({section="dashboard",returnTo="/dashboard"}:{section?:string;returnTo?:string}){
  const access=usePageAccess(),[open,setOpen]=useState(false);
  const actions=permittedCreateActions(section,access.canOpen);
  if(!actions.length)return null;
- return <><CreateAction label="Neu erstellen" onClick={()=>setOpen(true)}/>
+ // The catalog authorizes each target, including support in a read-only tenant.
+ if(actions.length===1)return <CreateAction requiresWrite={false} label={actions[0].title} href={createReturnHref(actions[0].href,returnTo)}/>;
+ return <><CreateAction requiresWrite={false} label="Neu erstellen" onClick={()=>setOpen(true)}/>
   <ActionSheet label="Neu erstellen" className="quick-create-sheet" open={open} onClose={()=>setOpen(false)}><div className="action-list">{actions.map(item=><ActionRow key={item.href} title={item.title} icon={item.icon} href={createReturnHref(item.href,returnTo)} navigation onClick={()=>setOpen(false)}/>)}</div></ActionSheet>
  </>;
 }

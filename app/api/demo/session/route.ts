@@ -23,12 +23,14 @@ export async function POST(request:NextRequest){
     let databaseBacked=false;
     if(env.databaseUrl){
       const current=await getSession();
-      if(!current?.isDemo){
+      const reset=request.nextUrl.searchParams.get('reset')==='1';
+      if(!current?.isDemo||reset){
         const smokeToken=request.headers.get("x-binso-smoke-test");
         const trustedSmoke=Boolean(env.smokeTestToken&&smokeToken&&smokeToken===env.smokeTestToken);
         if(!trustedSmoke)await enforceRateLimit(request,'demo-provision',10,60*60*1000);
-        const userId='demo-'+randomUUID(),email='nina.mueller.'+userId.slice(-8)+'@alpenblick-digital.ch';
+        const userId='demo-'+randomUUID(),email='nina.mueller.'+userId.slice(-8)+'@demo.example.invalid';
         const created=await provisionOrganization({userId,email,name:'Nina Müller',companyName:'Alpenblick Digital AG',plan:'business',mode:'demo'});
+        if(reset&&current?.isDemo)await destroySession('binso_demo_write');
         await createSession({userId,organizationId:created.organizationId,email,name:'Nina Müller',role:'owner',ttlHours:24,cookieName:'binso_demo_write'});
       }
       databaseBacked=true;

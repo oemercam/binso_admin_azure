@@ -2,7 +2,7 @@
 import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
 import {listStateStore} from "@/lib/client/list-state";
 import {compareRecordValues} from "@/lib/record-sort";
-import {matchesRecordChip} from "@/lib/list-filter";
+import {matchesRecordChip,listStatusOverride} from "@/lib/list-filter";
 
 import Link from "next/link";
 import { Children, cloneElement, isValidElement, useEffect, useMemo, useState, useId, useRef, type ReactNode, type CSSProperties } from "react";
@@ -84,15 +84,16 @@ export function useRecordsController({placeholder,chips=["Alle","Aktiv","Inaktiv
     document.addEventListener("click",remember,true);
     return()=>document.removeEventListener("click",remember,true);
   },[enabled,restored,placeholder,listContext]);
-  useEffect(()=>{if(!enabled)return;const storedChips:string[]=JSON.parse(chipsKey);try{const saved=JSON.parse(listStateStore.get("binso.list:"+window.location.pathname+":"+placeholder)??"null");if(saved){queueMicrotask(()=>{setQuery(typeof saved.query==="string"?saved.query:"");setActiveChip(storedChips.includes(saved.activeChip)?saved.activeChip:storedChips[0]??"Alle");setSort(["default","asc","desc"].includes(saved.sort)?saved.sort:"default");setSortIndex(Number.isInteger(saved.sortIndex)&&(!JSON.parse(columnIndexes).length||JSON.parse(columnIndexes).includes(saved.sortIndex))?saved.sortIndex:firstSortIndex);setPage(Number.isSafeInteger(saved.page)&&saved.page>=0?saved.page:0);setRestored(true);});return;}}catch{}queueMicrotask(()=>setRestored(true));},[chipsKey,placeholder,firstSortIndex,columnIndexes,enabled]);
+  useEffect(()=>{if(!enabled)return;const storedChips:string[]=JSON.parse(chipsKey);const requested=listStatusOverride(window.location.search,storedChips);try{const saved=JSON.parse(listStateStore.get("binso.list:"+window.location.pathname+":"+placeholder)??"null");if(saved){queueMicrotask(()=>{setQuery(typeof saved.query==="string"?saved.query:"");setActiveChip(requested??(storedChips.includes(saved.activeChip)?saved.activeChip:storedChips[0]??"Alle"));setSort(["default","asc","desc"].includes(saved.sort)?saved.sort:"default");setSortIndex(Number.isInteger(saved.sortIndex)&&(!JSON.parse(columnIndexes).length||JSON.parse(columnIndexes).includes(saved.sortIndex))?saved.sortIndex:firstSortIndex);setPage(requested?0:Number.isSafeInteger(saved.page)&&saved.page>=0?saved.page:0);setRestored(true);});return;}}catch{}queueMicrotask(()=>{if(requested){setActiveChip(requested);setPage(0)}setRestored(true)});},[chipsKey,placeholder,firstSortIndex,columnIndexes,enabled]);
   useEffect(()=>{if(!enabled||!restored)return;try{listStateStore.set("binso.list:"+window.location.pathname+":"+placeholder,JSON.stringify({query,activeChip,sort,sortIndex,page}));}catch{}},[restored,query,activeChip,sort,sortIndex,page,placeholder,enabled]);
 
 
   const [searchOpen,setSearchOpen]=useState(false),[filterOpen,setFilterOpen]=useState(false);
   const [draft,setDraft]=useState({activeChip:chips[0]??"Alle",sort:"default" as "default"|"asc"|"desc",sortIndex:firstSortIndex});
   const openFilters=()=>{setDraft({activeChip,sort,sortIndex});setFilterOpen(true)};
-  const applyFilters=()=>{setActiveChip(draft.activeChip);setSort(draft.sort);setSortIndex(draft.sortIndex);setPage(0);setFilterOpen(false)};
-  return {query,setQuery:(value:string)=>{setQuery(value);setPage(0)},activeChip,setActiveChip:(value:string)=>{setActiveChip(value);setPage(0)},sort,setSort:(value:"default"|"asc"|"desc")=>{setSort(value);setPage(0)},sortIndex,setSortIndex:(value:number)=>{setSortIndex(value);setPage(0)},page,setPage,restored,scrollSnapshot,listContext,firstSortIndex,statusIndex,searchOpen,setSearchOpen,filterOpen,setFilterOpen,draft,setDraft,openFilters,applyFilters};
+  const clearDrilldown=()=>{const url=new URL(window.location.href);if(url.searchParams.has('status')){url.searchParams.delete('status');window.history.replaceState(window.history.state,'',url)}};
+  const applyFilters=()=>{clearDrilldown();setActiveChip(draft.activeChip);setSort(draft.sort);setSortIndex(draft.sortIndex);setPage(0);setFilterOpen(false)};
+  return {query,setQuery:(value:string)=>{setQuery(value);setPage(0)},activeChip,setActiveChip:(value:string)=>{clearDrilldown();setActiveChip(value);setPage(0)},sort,setSort:(value:"default"|"asc"|"desc")=>{setSort(value);setPage(0)},sortIndex,setSortIndex:(value:number)=>{setSortIndex(value);setPage(0)},page,setPage,restored,scrollSnapshot,listContext,firstSortIndex,statusIndex,searchOpen,setSearchOpen,filterOpen,setFilterOpen,draft,setDraft,openFilters,applyFilters};
 }
 
 /** Search and filters use the existing sheet, fields and action footer. */

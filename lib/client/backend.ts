@@ -38,11 +38,11 @@ export function clearDemoClientSession(){
 }
 
 let demoStart:Promise<void>|null=null;
-export function startDemoClientSession({name="Demo",company="Demo Firma",focus="overview"}:{name?:string;company?:string;focus?:string}={}):Promise<void>{
+export function startDemoClientSession({name="Demo",company="Demo Firma",focus="overview",reset=false}:{name?:string;company?:string;focus?:string;reset?:boolean}={}):Promise<void>{
   if(typeof window==="undefined")return Promise.reject(new Error("Demo-Sitzung kann nur im Browser gestartet werden."));
   if(demoStart)return demoStart;
   const request=(async()=>{
-    const response=await fetchApi("/api/demo/session",{method:"POST",headers:{"Content-Type":"application/json"}});
+    const response=await fetchApi(reset?"/api/demo/session?reset=1":"/api/demo/session",{method:"POST",headers:{"Content-Type":"application/json"}});
     const payload=await parseResponse<{ok?:boolean;databaseBacked?:boolean;expiresIn?:number}>(response,"Demo-Sitzung konnte nicht gestartet werden.");
     if(payload.ok!==true)throw new Error("Demo-Sitzung konnte nicht gestartet werden.");
     clearDemoClientSession();
