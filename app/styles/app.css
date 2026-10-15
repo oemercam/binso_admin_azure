@@ -63,8 +63,8 @@
   gap:24px;
 }
 .page-head>div{min-width:0}
-.page-head h1{margin:0;font-size:28px;line-height:1.08;letter-spacing:-.035em}
-.page-head p{margin:7px 0 0;color:var(--color-muted);font-size:14px;line-height:1.45}
+.page-head h1{margin:0;font-size:var(--page-heading-size);line-height:var(--page-heading-line-height);letter-spacing:var(--page-heading-letter-spacing)}
+.page-head p{margin:7px 0 0;color:var(--color-muted);font-size:var(--body-font-size);line-height:var(--body-line-height)}
 .page-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px}
 .desktop-back{
   min-height:24px;
@@ -133,10 +133,10 @@
 .metrics-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;border:0}
 .metrics-grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
 .metric{min-width:0;min-height:74px;padding:12px 14px;border:0;border-radius:10px;background:var(--color-subtle);box-shadow:none}
-.metric-top{display:flex;align-items:center;justify-content:space-between;gap:8px;color:var(--color-muted);font-size:11px;line-height:1.2}
+.metric-top{display:flex;align-items:center;justify-content:space-between;gap:8px;color:var(--color-muted);font-size:var(--metric-label-size);line-height:var(--metric-label-line-height)}
 .metric-top>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .metric-top svg{width:15px;height:15px;flex:0 0 auto}
-.metric strong{display:block;margin:7px 0 0;font-size:20px;line-height:1.05;letter-spacing:-.025em;white-space:nowrap}
+.metric strong{display:block;margin:7px 0 0;font-size:var(--metric-value-size);line-height:var(--metric-value-line-height);letter-spacing:var(--metric-value-letter-spacing);white-space:nowrap}
 .metric small{display:none}
 .dashboard-grid,
 .detail-grid{display:grid;grid-template-columns:1.4fr .8fr;gap:14px;margin-top:14px}
@@ -1313,7 +1313,6 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 
 
 /* Form controls use their grid cell width and cannot push beyond page gutters. */
-.form-field{grid-template-columns:minmax(0,1fr)}
 .form-field>input:not([type="checkbox"]):not([type="radio"]),.form-field>select,.form-field>textarea{width:100%;min-width:0;max-width:100%}
 .detail-grid:has(>.surface:only-child){grid-template-columns:minmax(0,1fr)}
 .entity-hero>div{min-width:0}.entity-hero h2,.entity-hero p{overflow-wrap:anywhere}

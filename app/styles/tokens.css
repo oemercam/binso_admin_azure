@@ -58,6 +58,25 @@
   --status-neutral-line:#dededb;
 
   --font-sans:Inter,-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif;
+  /* Existing shared component values, now centrally owned. No visual change. */
+  --button-height:42px;
+  --button-font-size:14px;
+  --button-font-weight:650;
+  --button-line-height:1;
+  --button-gap:8px;
+  --button-padding-inline:16px;
+  --button-icon-size:17px;
+  --page-heading-size:28px;
+  --page-heading-line-height:1.08;
+  --page-heading-letter-spacing:-.035em;
+  --body-font-size:14px;
+  --body-line-height:1.45;
+  --metric-label-size:11px;
+  --metric-label-line-height:1.2;
+  --metric-value-size:20px;
+  --metric-value-line-height:1.05;
+  --metric-value-letter-spacing:-.025em;
+
 
   --radius-xs:7px;
   --radius-sm:9px;

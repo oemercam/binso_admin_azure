@@ -37,3 +37,15 @@ Nicht releasebereit als vollständige UX-Abnahme. Offen: vollständige atomare R
 Bestanden: Frozen Install pnpm 10.17.1; Produktionsbuild (141 generierte Seiten inkl. Framework/API-Routen); TypeScript; vollständiger ESLint; CSS-Architektur; Dokumentations-/Releasechecks; UI-Foundation; Navigation-Contract und -Foundation ohne Snapshot-Neugenerierung; Theme; Glass; QA-Plan; neues UX-Vertragsgate. Die 141 Build-Einträge sind keine 141 abgenommenen UX-Seiten.
 
 Blockiert/fehlgeschlagen: vollständiges `pnpm test` am File-Scanner-Socket `listen EPERM`; kein Gate entfernt. Route/CSS-HTTP-Prüfung liefert lokal `fetch failed`, auch nach Start auf explizitem Loopback-Port. Browserinstallation scheitert am ungültigen/trunkierten Downloadarchiv; Browser-Lauf nicht durchgeführt. Keine echte Geräteprüfung, keine neue Pixel-Freigabe, kein RLS-/DB-/Geschäftsprozessnachweis dieses Pakets.
+
+## Zentrale Token-Durchsetzung und Deploy-Freigabe – 15.10.2026
+
+Nutzerfreigabe um 20:24:41 Europe/Zurich: „ja dann mach doch ohne zu fragen bis deploy“. Dies autorisiert Merge, bestehende vollständige Release-QA und anschliessenden Deploy des geprüften Stands; es erklärt fehlende Nachweise nicht zu bestandenen Anforderungen. Der bestehende begrenzte Entwicklungsumfang und alle Pflicht-Gates bleiben unverändert.
+
+17 bereits verwendete Button-/Titel-/KPI-Werte sind als semantische Tokens zentralisiert; 18 atomare CSS-Bindungen werden im bestehenden UX-Vertragsgate geprüft. Werte und Responsive-Overrides bleiben erhalten. Die Navigationstoken/-quellen und Referenzen wurden nicht verändert. Gegenprüfungen verwerfen rohe Ersatzwerte, fremde Token-Aliase, lokale Fallbackwerte, fehlende und doppelte Eigentümer sowie dokumentationswidrige Tokenwerte. Dies ist technische Durchsetzung für diese konkreten Bindungen, kein allgemeiner Beweis für alle CSS-Regeln.
+
+Befund UX24-RC-002: `.form-field` setzt in app.css einmal in der zentralen Gruppendefinition und später nochmals separat `grid-template-columns:minmax(0,1fr)`. PostCSS-Inventar zeigt exakt diese zwei identischen Deklarationen ohne zwischenliegenden Grid-Owner für diesen Selektor. Die spätere identische Regel wurde entfernt. Browserregression bleibt für das neue Paket verpflichtend.
+
+Historischer Paketnachweis auf Head 7b4b3b46: Quality 38778531197 vollständig erfolgreich, inklusive Chromium/WebKit/Scanner und Schlussgate. WebKit bestand erst im gezielten Wiederholungslauf; sporadischer Kunden-Recovery-Timeout bleibt offen. Der Nachweis gilt nicht automatisch für die neuen Tokenänderungen.
+
+Der atomare Vertrag hat nun 30 Regeln; vollständige fachliche UX-/V24-/Geräteabnahme bleibt offen. Diese Offenheit darf beim Entwicklungsdeploy nicht in eine behauptete vollständige Umsetzung umbenannt werden.

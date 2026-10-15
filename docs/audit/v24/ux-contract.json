@@ -110,6 +110,386 @@
       "acceptance": "Vorhandene navigation-contract und navigation-foundation Gates ohne Referenzregeneration",
       "status": "offen",
       "evidence": []
+    },
+    {
+      "id": "UX24-STYLE-001",
+      "scope": ".button",
+      "requirement": "min-height: var(--button-height); Basiswert 42px. Bestehende responsive Varianten behalten ihre Zuständigkeit.",
+      "owner": "app/styles/base.css",
+      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 42px; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "status": "implementiert, noch nicht geprüft",
+      "evidence": [
+        "scripts/ux-contract-check.mjs"
+      ],
+      "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
+    },
+    {
+      "id": "UX24-STYLE-002",
+      "scope": ".button",
+      "requirement": "height: var(--button-height); Basiswert 42px. Bestehende responsive Varianten behalten ihre Zuständigkeit.",
+      "owner": "app/styles/base.css",
+      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 42px; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "status": "implementiert, noch nicht geprüft",
+      "evidence": [
+        "scripts/ux-contract-check.mjs"
+      ],
+      "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
+    },
+    {
+      "id": "UX24-STYLE-003",
+      "scope": ".button",
+      "requirement": "font-size: var(--button-font-size); Basiswert 14px. Bestehende responsive Varianten behalten ihre Zuständigkeit.",
+      "owner": "app/styles/base.css",
+      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 14px; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "status": "implementiert, noch nicht geprüft",
+      "evidence": [
+        "scripts/ux-contract-check.mjs"
+      ],
+      "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
+    },
+    {
+      "id": "UX24-STYLE-004",
+      "scope": ".button",
+      "requirement": "font-weight: var(--button-font-weight); Basiswert 650. Bestehende responsive Varianten behalten ihre Zuständigkeit.",
+      "owner": "app/styles/base.css",
+      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 650; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "status": "implementiert, noch nicht geprüft",
+      "evidence": [
+        "scripts/ux-contract-check.mjs"
+      ],
+      "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
+    },
+    {
+      "id": "UX24-STYLE-005",
+      "scope": ".button",
+      "requirement": "line-height: var(--button-line-height); Basiswert 1. Bestehende responsive Varianten behalten ihre Zuständigkeit.",
+      "owner": "app/styles/base.css",
+      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 1; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "status": "implementiert, noch nicht geprüft",
+      "evidence": [
+        "scripts/ux-contract-check.mjs"
+      ],
+      "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
+    },
+    {
+      "id": "UX24-STYLE-006",
+      "scope": ".button",
+      "requirement": "gap: var(--button-gap); Basiswert 8px. Bestehende responsive Varianten behalten ihre Zuständigkeit.",
+      "owner": "app/styles/base.css",
+      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 8px; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "status": "implementiert, noch nicht geprüft",
+      "evidence": [
+        "scripts/ux-contract-check.mjs"
+      ],
+      "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
+    },
+    {
+      "id": "UX24-STYLE-007",
+      "scope": ".button svg",
+      "requirement": "width: var(--button-icon-size); Basiswert 17px. Bestehende responsive Varianten behalten ihre Zuständigkeit.",
+      "owner": "app/styles/base.css",
+      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 17px; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "status": "implementiert, noch nicht geprüft",
+      "evidence": [
+        "scripts/ux-contract-check.mjs"
+      ],
+      "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
+    },
+    {
+      "id": "UX24-STYLE-008",
+      "scope": ".button svg",
+      "requirement": "height: var(--button-icon-size); Basiswert 17px. Bestehende responsive Varianten behalten ihre Zuständigkeit.",
+      "owner": "app/styles/base.css",
+      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 17px; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "status": "implementiert, noch nicht geprüft",
+      "evidence": [
+        "scripts/ux-contract-check.mjs"
+      ],
+      "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
+    },
+    {
+      "id": "UX24-STYLE-009",
+      "scope": ".page-head h1",
+      "requirement": "font-size: var(--page-heading-size); Basiswert 28px. Bestehende responsive Varianten behalten ihre Zuständigkeit.",
+      "owner": "app/styles/app.css",
+      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 28px; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "status": "implementiert, noch nicht geprüft",
+      "evidence": [
+        "scripts/ux-contract-check.mjs"
+      ],
+      "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
+    },
+    {
+      "id": "UX24-STYLE-010",
+      "scope": ".page-head h1",
+      "requirement": "line-height: var(--page-heading-line-height); Basiswert 1.08. Bestehende responsive Varianten behalten ihre Zuständigkeit.",
+      "owner": "app/styles/app.css",
+      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 1.08; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "status": "implementiert, noch nicht geprüft",
+      "evidence": [
+        "scripts/ux-contract-check.mjs"
+      ],
+      "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
+    },
+    {
+      "id": "UX24-STYLE-011",
+      "scope": ".page-head h1",
+      "requirement": "letter-spacing: var(--page-heading-letter-spacing); Basiswert -.035em. Bestehende responsive Varianten behalten ihre Zuständigkeit.",
+      "owner": "app/styles/app.css",
+      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert -.035em; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "status": "implementiert, noch nicht geprüft",
+      "evidence": [
+        "scripts/ux-contract-check.mjs"
+      ],
+      "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
+    },
+    {
+      "id": "UX24-STYLE-012",
+      "scope": ".page-head p",
+      "requirement": "font-size: var(--body-font-size); Basiswert 14px. Bestehende responsive Varianten behalten ihre Zuständigkeit.",
+      "owner": "app/styles/app.css",
+      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 14px; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "status": "implementiert, noch nicht geprüft",
+      "evidence": [
+        "scripts/ux-contract-check.mjs"
+      ],
+      "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
+    },
+    {
+      "id": "UX24-STYLE-013",
+      "scope": ".page-head p",
+      "requirement": "line-height: var(--body-line-height); Basiswert 1.45. Bestehende responsive Varianten behalten ihre Zuständigkeit.",
+      "owner": "app/styles/app.css",
+      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 1.45; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "status": "implementiert, noch nicht geprüft",
+      "evidence": [
+        "scripts/ux-contract-check.mjs"
+      ],
+      "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
+    },
+    {
+      "id": "UX24-STYLE-014",
+      "scope": ".metric-top",
+      "requirement": "font-size: var(--metric-label-size); Basiswert 11px. Bestehende responsive Varianten behalten ihre Zuständigkeit.",
+      "owner": "app/styles/app.css",
+      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 11px; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "status": "implementiert, noch nicht geprüft",
+      "evidence": [
+        "scripts/ux-contract-check.mjs"
+      ],
+      "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
+    },
+    {
+      "id": "UX24-STYLE-015",
+      "scope": ".metric-top",
+      "requirement": "line-height: var(--metric-label-line-height); Basiswert 1.2. Bestehende responsive Varianten behalten ihre Zuständigkeit.",
+      "owner": "app/styles/app.css",
+      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 1.2; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "status": "implementiert, noch nicht geprüft",
+      "evidence": [
+        "scripts/ux-contract-check.mjs"
+      ],
+      "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
+    },
+    {
+      "id": "UX24-STYLE-016",
+      "scope": ".metric strong",
+      "requirement": "font-size: var(--metric-value-size); Basiswert 20px. Bestehende responsive Varianten behalten ihre Zuständigkeit.",
+      "owner": "app/styles/app.css",
+      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 20px; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "status": "implementiert, noch nicht geprüft",
+      "evidence": [
+        "scripts/ux-contract-check.mjs"
+      ],
+      "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
+    },
+    {
+      "id": "UX24-STYLE-017",
+      "scope": ".metric strong",
+      "requirement": "line-height: var(--metric-value-line-height); Basiswert 1.05. Bestehende responsive Varianten behalten ihre Zuständigkeit.",
+      "owner": "app/styles/app.css",
+      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 1.05; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "status": "implementiert, noch nicht geprüft",
+      "evidence": [
+        "scripts/ux-contract-check.mjs"
+      ],
+      "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
+    },
+    {
+      "id": "UX24-STYLE-018",
+      "scope": ".metric strong",
+      "requirement": "letter-spacing: var(--metric-value-letter-spacing); Basiswert -.025em. Bestehende responsive Varianten behalten ihre Zuständigkeit.",
+      "owner": "app/styles/app.css",
+      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert -.025em; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "status": "implementiert, noch nicht geprüft",
+      "evidence": [
+        "scripts/ux-contract-check.mjs"
+      ],
+      "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
+    }
+  ],
+  "styleBindings": [
+    {
+      "id": "UX24-STYLE-001",
+      "file": "app/styles/base.css",
+      "selector": ".button",
+      "context": "",
+      "property": "min-height",
+      "token": "--button-height",
+      "value": "42px"
+    },
+    {
+      "id": "UX24-STYLE-002",
+      "file": "app/styles/base.css",
+      "selector": ".button",
+      "context": "",
+      "property": "height",
+      "token": "--button-height",
+      "value": "42px"
+    },
+    {
+      "id": "UX24-STYLE-003",
+      "file": "app/styles/base.css",
+      "selector": ".button",
+      "context": "",
+      "property": "font-size",
+      "token": "--button-font-size",
+      "value": "14px"
+    },
+    {
+      "id": "UX24-STYLE-004",
+      "file": "app/styles/base.css",
+      "selector": ".button",
+      "context": "",
+      "property": "font-weight",
+      "token": "--button-font-weight",
+      "value": "650"
+    },
+    {
+      "id": "UX24-STYLE-005",
+      "file": "app/styles/base.css",
+      "selector": ".button",
+      "context": "",
+      "property": "line-height",
+      "token": "--button-line-height",
+      "value": "1"
+    },
+    {
+      "id": "UX24-STYLE-006",
+      "file": "app/styles/base.css",
+      "selector": ".button",
+      "context": "",
+      "property": "gap",
+      "token": "--button-gap",
+      "value": "8px"
+    },
+    {
+      "id": "UX24-STYLE-007",
+      "file": "app/styles/base.css",
+      "selector": ".button svg",
+      "context": "",
+      "property": "width",
+      "token": "--button-icon-size",
+      "value": "17px"
+    },
+    {
+      "id": "UX24-STYLE-008",
+      "file": "app/styles/base.css",
+      "selector": ".button svg",
+      "context": "",
+      "property": "height",
+      "token": "--button-icon-size",
+      "value": "17px"
+    },
+    {
+      "id": "UX24-STYLE-009",
+      "file": "app/styles/app.css",
+      "selector": ".page-head h1",
+      "context": "",
+      "property": "font-size",
+      "token": "--page-heading-size",
+      "value": "28px"
+    },
+    {
+      "id": "UX24-STYLE-010",
+      "file": "app/styles/app.css",
+      "selector": ".page-head h1",
+      "context": "",
+      "property": "line-height",
+      "token": "--page-heading-line-height",
+      "value": "1.08"
+    },
+    {
+      "id": "UX24-STYLE-011",
+      "file": "app/styles/app.css",
+      "selector": ".page-head h1",
+      "context": "",
+      "property": "letter-spacing",
+      "token": "--page-heading-letter-spacing",
+      "value": "-.035em"
+    },
+    {
+      "id": "UX24-STYLE-012",
+      "file": "app/styles/app.css",
+      "selector": ".page-head p",
+      "context": "",
+      "property": "font-size",
+      "token": "--body-font-size",
+      "value": "14px"
+    },
+    {
+      "id": "UX24-STYLE-013",
+      "file": "app/styles/app.css",
+      "selector": ".page-head p",
+      "context": "",
+      "property": "line-height",
+      "token": "--body-line-height",
+      "value": "1.45"
+    },
+    {
+      "id": "UX24-STYLE-014",
+      "file": "app/styles/app.css",
+      "selector": ".metric-top",
+      "context": "",
+      "property": "font-size",
+      "token": "--metric-label-size",
+      "value": "11px"
+    },
+    {
+      "id": "UX24-STYLE-015",
+      "file": "app/styles/app.css",
+      "selector": ".metric-top",
+      "context": "",
+      "property": "line-height",
+      "token": "--metric-label-line-height",
+      "value": "1.2"
+    },
+    {
+      "id": "UX24-STYLE-016",
+      "file": "app/styles/app.css",
+      "selector": ".metric strong",
+      "context": "",
+      "property": "font-size",
+      "token": "--metric-value-size",
+      "value": "20px"
+    },
+    {
+      "id": "UX24-STYLE-017",
+      "file": "app/styles/app.css",
+      "selector": ".metric strong",
+      "context": "",
+      "property": "line-height",
+      "token": "--metric-value-line-height",
+      "value": "1.05"
+    },
+    {
+      "id": "UX24-STYLE-018",
+      "file": "app/styles/app.css",
+      "selector": ".metric strong",
+      "context": "",
+      "property": "letter-spacing",
+      "token": "--metric-value-letter-spacing",
+      "value": "-.025em"
     }
   ]
 }

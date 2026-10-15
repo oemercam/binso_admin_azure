@@ -284,6 +284,91 @@
         "important": false
       },
       {
+        "property": "--button-height",
+        "value": "42px",
+        "important": false
+      },
+      {
+        "property": "--button-font-size",
+        "value": "14px",
+        "important": false
+      },
+      {
+        "property": "--button-font-weight",
+        "value": "650",
+        "important": false
+      },
+      {
+        "property": "--button-line-height",
+        "value": "1",
+        "important": false
+      },
+      {
+        "property": "--button-gap",
+        "value": "8px",
+        "important": false
+      },
+      {
+        "property": "--button-padding-inline",
+        "value": "16px",
+        "important": false
+      },
+      {
+        "property": "--button-icon-size",
+        "value": "17px",
+        "important": false
+      },
+      {
+        "property": "--page-heading-size",
+        "value": "28px",
+        "important": false
+      },
+      {
+        "property": "--page-heading-line-height",
+        "value": "1.08",
+        "important": false
+      },
+      {
+        "property": "--page-heading-letter-spacing",
+        "value": "-.035em",
+        "important": false
+      },
+      {
+        "property": "--body-font-size",
+        "value": "14px",
+        "important": false
+      },
+      {
+        "property": "--body-line-height",
+        "value": "1.45",
+        "important": false
+      },
+      {
+        "property": "--metric-label-size",
+        "value": "11px",
+        "important": false
+      },
+      {
+        "property": "--metric-label-line-height",
+        "value": "1.2",
+        "important": false
+      },
+      {
+        "property": "--metric-value-size",
+        "value": "20px",
+        "important": false
+      },
+      {
+        "property": "--metric-value-line-height",
+        "value": "1.05",
+        "important": false
+      },
+      {
+        "property": "--metric-value-letter-spacing",
+        "value": "-.025em",
+        "important": false
+      },
+      {
         "property": "--radius-xs",
         "value": "7px",
         "important": false
