@@ -1,8 +1,8 @@
 :root{
   /* App appearance: independent of the frozen navigation theme tokens. */
   --app-canvas:#fff;
-  --app-surface:#f3f3f5;
-  --app-chrome:#f1f1f3;
+  --app-surface:#fff;
+  --app-chrome:#fff;
   --app-glass-tint:rgba(243,243,245,.78);
   --app-glass-solid:#f3f3f5;
   --app-glass-line:rgba(34,34,37,.12);
@@ -15,6 +15,9 @@
   --app-divider:#dedee2;
   --app-symbol:#737379;
   --app-accent:#006ec7;
+  --app-accent-soft:#edf5fc;
+  --app-accent-text:#fff;
+  --sidebar-collapsed-w:68px;
   --app-control-border:#d3d3d8;
   --app-group-radius:22px;
   --app-control-radius:12px;
@@ -193,6 +196,8 @@ html[data-theme="dark"]{
   --app-divider:#2b2b2e;
   --app-symbol:#929297;
   --app-accent:#48a7ff;
+  --app-accent-soft:#102b42;
+  --app-accent-text:#071521;
   --app-control-border:#3a3a3e;
   --control-border:#333;
   color-scheme:dark;

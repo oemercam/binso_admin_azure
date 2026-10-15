@@ -1,6 +1,6 @@
 "use client";
 
-import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
+import {LocalizedText,LocalizedElement,useTranslation} from "@/lib/client/locale";
 import {PageAccessContext,usePageAccess} from "@/lib/client/page-access";
 import {routePermission,tenantCan,permissionForModule} from "@/lib/permissions";
 import {moduleForPath,planAllowsPath,type PlanId} from "@/config/plan-access";
@@ -24,6 +24,7 @@ import {SearchPanel,NotificationPanel,AccountPanel,type PanelNotification} from 
 import {HeaderPanel} from "./header-panel";
 import {Avatar} from "./avatar";
 import {AppHeader,MobileDock} from "./app-chrome";
+import {DesktopNavigationToggle,useDesktopNavigation} from "./desktop-navigation";
 
 const desktopNav = [
   ["/dashboard","Start","home"],
@@ -81,6 +82,8 @@ function AppShellFrame({
   editing?: boolean;
   unsavedChanges?: boolean;
 }) {
+  const {navigationCollapsed,toggleNavigation}=useDesktopNavigation();
+  const translate=useTranslation();
   const pathname=usePathname();
   const [navigationQuery,setNavigationQuery]=useState("");
   useEffect(()=>{const update=()=>setNavigationQuery(window.location.search);queueMicrotask(update);window.addEventListener('popstate',update);return()=>window.removeEventListener('popstate',update);},[pathname]);
@@ -289,7 +292,6 @@ function AppShellFrame({
   const unreadNotifications=notifications.filter(item=>!item.read_at).length;
 
   const filtered=production&&query.trim().length>=2&&remoteSearch.query===query.trim()?remoteSearch.items.filter(item=>canOpen(item.href)):[];
-  async function markAllRead(){try{await apiPatch("/api/notifications",{all:true});await loadNotifications();}catch{setNotificationsError("Benachrichtigungen konnten nicht als gelesen markiert werden.");}}
 
 
   useEffect(()=>{
@@ -319,26 +321,26 @@ function AppShellFrame({
 
   return <PageAccessContext.Provider value={pageAccess}>
     {!access&&!accessError&&<AppStart/>}
-    <div hidden={!access&&!accessError} ref={shellRef} className={`app-root app-section-${active} ${timerRunning && !backHref ? "timer-active" : ""} ${preview ? "app-preview" : ""} ${formActive ? "app-editing" : ""}`}>
+    <div hidden={!access&&!accessError} ref={shellRef} data-navigation-collapsed={navigationCollapsed||undefined} className={`app-root app-section-${active} ${timerRunning && !backHref ? "timer-active" : ""} ${preview ? "app-preview" : ""} ${formActive ? "app-editing" : ""}`}>
     <ConfirmDialog open={confirmLogout} busy={logoutBusy} title="Änderungen verwerfen und abmelden?" message="Deine Änderungen sind noch nicht gespeichert." confirmLabel="Abmelden" onCancel={()=>setConfirmLogout(false)} onConfirm={()=>void logout(true)}/>
     <ConfirmDialog open={leaveHref!==null} title="Änderungen verwerfen?" message="Deine Änderungen sind noch nicht gespeichert und gehen verloren." cancelLabel="Weiter bearbeiten" confirmLabel="Änderungen verwerfen" onCancel={()=>setLeaveHref(null)} onConfirm={()=>{const href=leaveHref;setLeaveHref(null);if(href){window.dispatchEvent(new Event("binso-draft-discard"));allowDraftNavigation();if(href==="browser-back"){leaveBack();return;}const url=new URL(href);if(url.origin===window.location.origin)router.replace(url.pathname+url.search+url.hash);else window.location.assign(href);}}}/>
     {logoutError&&<div className="toast" role="alert"><Icon name="close" size={16}/><span><LocalizedText>{logoutError}</LocalizedText></span><button type="button" className="text-action" disabled={logoutBusy} onClick={()=>void logout()}><LocalizedText>{"Erneut versuchen"}</LocalizedText></button></div>}
-    <aside className="app-sidebar">
-      <Link href="/dashboard" className="sidebar-logo"><Logo /></Link>
-      <nav>
-        <Link href="/dashboard" className={active==="dashboard"?"active":""} aria-current={active==="dashboard"?"page":undefined}><Icon name="home"/><span><LocalizedText>{"Start"}</LocalizedText></span></Link>
-        {desktopNavGroups.map(group=>desktopNav.some(([href])=>group.paths.includes(href)&&canOpen(href))&&<div className="sidebar-nav-group" key={group.label}><span className="sidebar-nav-label"><LocalizedText>{group.label}</LocalizedText></span>{desktopNav.filter(([href])=>group.paths.includes(href)&&canOpen(href)).map(([href,label,icon])=><Link key={href} href={href} className={active===href.slice(1)?"active":""} aria-current={active===href.slice(1)?"page":undefined}><Icon name={icon}/><span><LocalizedText>{label}</LocalizedText></span></Link>)}</div>)}
+    <aside id="customer-desktop-navigation" className="app-sidebar">
+      <Link href="/dashboard" className="sidebar-logo"><Logo compact={navigationCollapsed}/></Link>
+      <nav aria-label={translate("Navigation")}>
+        <Link href="/dashboard" aria-label={translate("Start")} title={translate("Start")} className={active==="dashboard"?"active":""} aria-current={active==="dashboard"?"page":undefined}><Icon name="home"/><span><LocalizedText>{"Start"}</LocalizedText></span></Link>
+        {desktopNavGroups.map(group=>desktopNav.some(([href])=>group.paths.includes(href)&&canOpen(href))&&<div className="sidebar-nav-group" key={group.label}><span className="sidebar-nav-label"><LocalizedText>{group.label}</LocalizedText></span>{desktopNav.filter(([href])=>group.paths.includes(href)&&canOpen(href)).map(([href,label,icon])=><Link key={href} href={href} aria-label={translate(label)} title={translate(label)} className={active===href.slice(1)?"active":""} aria-current={active===href.slice(1)?"page":undefined}><Icon name={icon}/><span><LocalizedText>{label}</LocalizedText></span></Link>)}</div>)}
       </nav>
       <div className="sidebar-bottom">
-        <Link href="/support" className={active==="support" ? "active" : ""}><Icon name="support"/><span><LocalizedText>{"Support"}</LocalizedText></span></Link>
-        <Link href="/einstellungen" className={active==="einstellungen" ? "active" : ""}><Icon name="settings"/><span><LocalizedText>{"Einstellungen"}</LocalizedText></span></Link>
+        <Link href="/support" aria-label={translate("Support")} title={translate("Support")} className={active==="support" ? "active" : ""}><Icon name="support"/><span><LocalizedText>{"Support"}</LocalizedText></span></Link>
+        <Link href="/einstellungen" aria-label={translate("Einstellungen")} title={translate("Einstellungen")} className={active==="einstellungen" ? "active" : ""}><Icon name="settings"/><span><LocalizedText>{"Einstellungen"}</LocalizedText></span></Link>
       </div>
     </aside>
 
     <div className="app-main">
       <div className="desktop-appbar">
-        {!formActive&&<IconButton label="Suche" icon="search" onClick={()=>setSheet("search")}/>}
-        {!formActive&&<div className="desktop-appbar-actions">{timerRunning&&<Link href="/zeit" className="desktop-header-timer" aria-label={"Zeitmessung läuft "+formattedTimer}><Icon name="clock" size={16}/><span>{formattedTimer}</span></Link>}<LocalizedElement as="button" className="desktop-notification-button" type="button" aria-label="Benachrichtigungen" onClick={openNotifications}><Icon name="bell"/>{unreadNotifications>0&&<i className="notification-badge"><LocalizedText>{unreadNotifications>9?"9+":unreadNotifications}</LocalizedText></i>}</LocalizedElement>
+        <DesktopNavigationToggle collapsed={navigationCollapsed} onToggle={toggleNavigation} controls="customer-desktop-navigation"/>
+        {!formActive&&<div className="desktop-appbar-actions"><IconButton label="Suche" icon="search" onClick={()=>setSheet("search")}/>{timerRunning&&<Link href="/zeit" className="desktop-header-timer" aria-label={"Zeitmessung läuft "+formattedTimer}><Icon name="clock" size={16}/><span>{formattedTimer}</span></Link>}<LocalizedElement as="button" className="desktop-notification-button" type="button" aria-label="Benachrichtigungen" onClick={openNotifications}><Icon name="bell"/>{unreadNotifications>0&&<i className="notification-badge"><LocalizedText>{unreadNotifications>9?"9+":unreadNotifications}</LocalizedText></i>}</LocalizedElement>
           <LocalizedElement as="button" className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={() => setSheet("account")}><Avatar name={profile.name} identity={profile.identity} src={profile.avatar} size="small"/></LocalizedElement>
         </div>}
       </div>
@@ -372,7 +374,7 @@ function AppShellFrame({
 
       {headerPanel&&<HeaderPanel key={sheet} kind={sheet} label={sheet==="search"?"Suche":sheet==="account"?"Konto":"Benachrichtigungen"} onClose={()=>setSheet(null)}>
         {sheet==="search"&&<SearchPanel query={query} onQuery={setQuery} items={filtered} loading={searchLoading} error={searchError} recent={recentSearches} onRemember={rememberSearch} onClearRecent={()=>{setClearedSearches(recentSearches);setRecentSearches([])}} onUndoRecent={clearedSearches?()=>{setRecentSearches(clearedSearches);setClearedSearches(null)}:undefined} onClose={()=>setSheet(null)}/>}
-        {sheet==="notifications"&&<NotificationPanel items={notifications} loading={notificationsLoading} error={notificationsError} filter={notificationFilter} onFilter={setNotificationFilter} onRead={id=>void markNotificationRead(id)} onReadAll={()=>void markAllRead()} onRetry={()=>void loadNotifications()} onClose={()=>setSheet(null)}/>}
+        {sheet==="notifications"&&<NotificationPanel items={notifications} loading={notificationsLoading} error={notificationsError} filter={notificationFilter} onFilter={setNotificationFilter} onRead={id=>void markNotificationRead(id)} onRetry={()=>void loadNotifications()} onClose={()=>setSheet(null)}/>}
         {sheet==="account"&&<AccountPanel profile={profile} demo={demoSession} logoutBusy={logoutBusy} onLogout={()=>void logout()} onClose={()=>setSheet(null)}/>}
       </HeaderPanel>}
       <ActionSheet label={sheet==="docs"?"Finanzen":"Mehr"} open={!!sheet&&!headerPanel} onClose={()=>setSheet(null)}>

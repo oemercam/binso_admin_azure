@@ -158,6 +158,7 @@
 
 /* Shared non-mobile behavior */
 @media (min-width:761px){
+
   .desktop-record-table{display:block}
   .desktop-record-head,.desktop-record-row{display:grid}
   .mobile-record-list{display:none}
@@ -177,7 +178,7 @@
   .bottom-sheet .sheet-menu small{font-size:12px}
   .desktop-header-timer{display:flex;align-items:center;gap:6px;font-size:12px;font-variant-numeric:tabular-nums;white-space:nowrap}
   .operator-sidebar a{font-size:13px}
-  .operator-sidebar a[aria-current="page"]{font-weight:750;text-decoration:underline;text-underline-offset:6px}
+  .operator-sidebar a[aria-current="page"]{font-weight:650;background:var(--app-accent-soft);color:var(--app-accent)}
   .operator-table-head,.operator-table-row{grid-template-columns:100px minmax(0,1.5fr) minmax(0,1fr) 150px 120px}
   .operator-table-row{font-size:13px}
   .operator-table-row>span{min-width:0;overflow-wrap:anywhere}
@@ -408,6 +409,17 @@
 
 /* Wide desktop */
 @media (min-width:1101px){
+  /* Shared desktop shell; mobile navigation remains independently owned. */
+  .desktop-navigation-toggle{display:grid;flex:none}
+  .app-root[data-navigation-collapsed]{--sidebar-w:var(--sidebar-collapsed-w)}
+  :is(.app-root,.operator-root)[data-navigation-collapsed] :is(.app-sidebar,.operator-sidebar){width:var(--sidebar-collapsed-w);padding-inline:10px}
+  :is(.app-root,.operator-root)[data-navigation-collapsed] :is(.app-main,.operator-main){margin-left:var(--sidebar-collapsed-w)}
+  :is(.app-root,.operator-root)[data-navigation-collapsed] :is(.sidebar-nav-label,.operator-nav-label){display:none}
+  :is(.app-root,.operator-root)[data-navigation-collapsed] :is(.app-sidebar nav a,.sidebar-bottom a,.operator-sidebar nav a){justify-content:center;padding-inline:0;min-height:44px}
+  :is(.app-root,.operator-root)[data-navigation-collapsed] :is(.app-sidebar nav a,.sidebar-bottom a,.operator-sidebar nav a)>span{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+  :is(.app-root,.operator-root)[data-navigation-collapsed] :is(.sidebar-logo,.operator-sidebar>a){padding:4px 8px 24px;display:block}
+  :is(.app-root,.operator-root)[data-navigation-collapsed] :is(.sidebar-logo,.operator-sidebar>a) .logo{width:28px;height:36px;margin:0;object-position:center}
+
   .customer-detail-workspace,
   .entity-detail-workspace{
     display:grid;
@@ -2713,11 +2725,11 @@ input:not([type="checkbox"]):not([type="radio"]),
   :is(.page-container,.operator-app-content) .metric{background:var(--app-surface);border-radius:16px}
   :is(.page-container,.operator-app-content) .bo-statistics{--statistics-bg:var(--app-surface);border-radius:var(--app-group-radius)}
   :is(.page-container,.operator-app-content) :is(.detail-list dd,.operator-detail-list strong){overflow-wrap:anywhere}
-  :is(.page-container,.operator-app-content,.bottom-sheet,.header-panel) .searchbox{background:var(--app-chrome);border-color:transparent;border-radius:999px}
+  :is(.page-container,.operator-app-content,.bottom-sheet,.header-panel) .searchbox{background:var(--app-chrome);border-color:var(--app-control-border);border-radius:999px}
   :is(.page-container,.operator-app-content,.bottom-sheet,.header-panel) .searchbox:focus-within{border-color:var(--app-accent)}
   :is(.page-container,.operator-app-content,.bottom-sheet,.header-panel) :is(.form-control,.form-textarea){background:var(--app-chrome)}
   :is(.page-container,.operator-app-content,.bottom-sheet,.header-panel) :is(.form-control,.form-textarea)[aria-invalid="true"]{border-color:var(--status-danger-fg)}
-  :is(.page-container,.operator-app-content,.bottom-sheet,.header-panel) :is(.tabs,.chips,.notification-center-tabs) :is(button,a).active{background:var(--app-chrome);color:var(--app-accent)}
+  :is(.page-container,.operator-app-content,.bottom-sheet,.header-panel) :is(.tabs,.chips,.notification-center-tabs) :is(button,a).active{background:var(--app-accent-soft);color:var(--app-accent)}
   .bottom-sheet{border:0;background:var(--app-surface);border-radius:var(--app-group-radius)}
   .bottom-sheet .sheet-header,.bottom-sheet .filter-sheet-actions,.bottom-sheet .mobile-sticky-save{background:var(--app-surface)}
   .bottom-sheet .sheet-header .icon-button,.header-panel-heading .icon-button{border:0;border-radius:50%;background:var(--app-chrome)}

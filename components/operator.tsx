@@ -1,5 +1,5 @@
 "use client";
-import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
+import {LocalizedText,LocalizedElement,useTranslation} from "@/lib/client/locale";
 import {LocaleSwitcher} from "./locale-switcher";
 import {RingChart} from "./statistics";
 import {formatDateTime} from "@/lib/display-format";
@@ -17,6 +17,7 @@ import {Avatar} from "./avatar";
 import { createContext, useContext, useEffect, useMemo, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {AppHeader,MobileDock} from "./app-chrome";
+import {DesktopNavigationToggle,useDesktopNavigation} from "./desktop-navigation";
 import { PageHeading } from "./binso-ux";
 import {Button, EmptyState, Icon, Logo, Metric, SectionTitle, Status, Toast, Field, Input, Select, Textarea, LoadingState, ErrorState, MessageBubble} from "./ui";
 import { apiPatch, apiPost, logoutOperatorClientSession, useBackendMode } from "@/lib/client/backend";
@@ -138,6 +139,8 @@ function useOperatorCustomers(){
 
 
 export function OperatorPage({ section = "", demo = false, identity, role="platform_owner" }: { section?: string; demo?: boolean;identity?:{name:string;email:string}|null;role?:OperatorRole|"readonly" }) {
+  const {navigationCollapsed,toggleNavigation}=useDesktopNavigation();
+  const translate=useTranslation();
   const key = section.split("/")[0] || "";
   const detail = section.split("/")[1] || "";
   const title = useMemo(() => operatorNav.find(([slug]) => slug === key)?.[1] ?? "Dashboard", [key]);
@@ -152,14 +155,15 @@ export function OperatorPage({ section = "", demo = false, identity, role="platf
   const allowed=demo||canOpenOperatorSection(role,section);
   const canCreate=allowed&&!detail&&((key==="sperrungen"&&operatorCan(demo?"platform_owner":role,"restrictions:manage"))||(key==="ankuendigungen"&&operatorCan(demo?"platform_owner":role,"announcements:manage")));
   const detailTitle=detail?(key==="tickets"?"Ticketdetails":key==="kunden"?"Kundendetails":title):title;
-  return <OperatorAccess.Provider value={demo?"platform_owner":role}><div className="operator-root" data-operator-demo={demo?"true":"false"}>
-    <aside className="operator-sidebar">
-      <Link prefetch={false} href="/operator"><Logo dark/></Link>
-      <nav className="operator-sidebar-groups">{operatorNavGroups.map(group=><div className="operator-sidebar-group" key={group.label}><span className="operator-nav-label"><LocalizedText>{group.label}</LocalizedText></span>{group.slugs.map(slug=>{const item=operatorNav.find(([candidate])=>candidate===slug);if(!item)return null;const [,label,icon]=item;return <Link prefetch={false} aria-current={slug===key?"page":undefined} className={slug===key?"active":""} href={slug ? `/operator/${slug}` : "/operator"} key={slug}><Icon name={icon}/><span><LocalizedText>{label}</LocalizedText></span></Link>})}</div>)}</nav>
+  return <OperatorAccess.Provider value={demo?"platform_owner":role}><div className="operator-root" data-navigation-collapsed={navigationCollapsed||undefined} data-operator-demo={demo?"true":"false"}>
+    <aside id="operator-desktop-navigation" className="operator-sidebar">
+      <Link prefetch={false} href="/operator"><Logo dark compact={navigationCollapsed}/></Link>
+      <nav className="operator-sidebar-groups">{operatorNavGroups.map(group=><div className="operator-sidebar-group" key={group.label}><span className="operator-nav-label"><LocalizedText>{group.label}</LocalizedText></span>{group.slugs.map(slug=>{const item=operatorNav.find(([candidate])=>candidate===slug);if(!item)return null;const [,label,icon]=item;return <Link prefetch={false} aria-label={translate(label)} title={translate(label)} aria-current={slug===key?"page":undefined} className={slug===key?"active":""} href={slug ? `/operator/${slug}` : "/operator"} key={slug}><Icon name={icon}/><span><LocalizedText>{label}</LocalizedText></span></Link>})}</div>)}</nav>
     </aside>
 
     <main className="operator-main">
       <AppHeader className="operator-app-header" detail={!!detail} leadingClassName="operator-header-brand" leading={<>
+        <DesktopNavigationToggle collapsed={navigationCollapsed} onToggle={toggleNavigation} controls="operator-desktop-navigation"/>
         {detail?<Link href={"/operator/"+key} className="mobile-back" aria-label="Zur Liste"><Icon name="back"/></Link>:<Link href="/operator" aria-label="Zum Admin-Dashboard"><Logo compact/></Link>}
         <span className="operator-header-desktop-label"><LocalizedText>{"Admin"}</LocalizedText></span><h1 className="operator-header-title"><LocalizedText>{detailTitle}</LocalizedText></h1>
       </>} actionClassName="operator-user" actions={<>{demo&&<span className="app-demo-badge"><LocalizedText>{"Demo"}</LocalizedText></span>}<Link prefetch={false} className="icon-button operator-home-link" href="/dashboard" aria-label="Zur App"><Icon name="home" size={18}/></Link><LocalizedElement as="button" className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={()=>{setMobileMore(false);setAccountOpen(true)}}><Avatar name={identity?.name} identity={identity?.email}/></LocalizedElement></>}/>
