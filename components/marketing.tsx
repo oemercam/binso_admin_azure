@@ -97,8 +97,8 @@ export function MarketingFooter() {
   </footer>;
 }
 
-export function ProductPreview() {
- return <LocalizedElement as="div" className="hero-workspace" aria-label="Binso One mit Beispieldaten">
+export function ProductPreview({compact=false}:{compact?:boolean}={}) {
+ return <LocalizedElement as="div" className={compact?"hero-workspace landing-phone-canvas":"hero-workspace"} aria-label="Binso One mit Beispieldaten">
   <div className="workspace-preview-bar"><span className="workspace-preview-brand"><Logo/></span><span className="workspace-preview-tools app-glass"><Icon name="search" size={17}/><Icon name="bell" size={17}/><span className="workspace-preview-avatar"><LocalizedText>{"BC"}</LocalizedText></span></span></div>
   <div className="workspace-preview-body"><div className="workspace-preview-heading"><div><small><LocalizedText>{"DEIN ARBEITSTAG"}</LocalizedText></small><h2><LocalizedText>{"Alles im Blick."}</LocalizedText></h2></div></div>
    <div className="workspace-preview-metrics">{[["Monatsumsatz","CHF 24’850","+12.4 %"],["Zahlungen","CHF 18’420","Dieser Monat"],["Rechnungen","18","Diesen Monat"],["Kunden","124","Gesamt"]].map(([label,value,note])=><div key={label}><span><LocalizedText>{label}</LocalizedText></span><strong>{value}</strong><small><LocalizedText>{note}</LocalizedText></small></div>)}</div>
@@ -110,14 +110,8 @@ export function ProductPreview() {
  </LocalizedElement>;
 }
 
-const productScreens:Record<string,string>={
-  "/preview/dashboard":"/product/binso-one-dashboard-desktop.jpg",
-};
-
-export function ProductScreen({route="/preview/dashboard",title,variant="desktop"}:{route?:string;title:string;variant?:"desktop"|"mobile"}) {
-  return <figure className={`product-screen product-screen-${variant}`}>
-    <LocalizedElement as="img" src={productScreens[route]??productScreens["/preview/dashboard"]} alt={title} width={1363} height={936} loading="lazy" decoding="async"/>
-  </figure>;
+export function ProductScreen({title,variant="desktop"}:{route?:string;title:string;variant?:"desktop"|"mobile"}) {
+  return <LocalizedElement as="figure" className={`product-screen product-screen-${variant}`} aria-label={title}><ProductPreview compact={variant==='mobile'}/></LocalizedElement>;
 }
 
 export function MarketingFaq({children}:{children:React.ReactNode}) {

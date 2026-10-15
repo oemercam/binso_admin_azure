@@ -998,7 +998,6 @@
   .workspace-preview-metrics strong{font-size:22px}
   .marketing-actions>.locale-switcher{display:none}
   .marketing-mobile-actions>.locale-switcher{justify-content:space-between;padding:6px 2px}
-  .landing-phone-preview>img{width:210px}
 
 .app-start-icon,.app-launch-brand .logo{width:72px;height:72px}
 .settings-navigation-search{display:flex;width:100%;max-width:none;height:44px;border-radius:999px;background:var(--app-chrome);margin-bottom:24px}
