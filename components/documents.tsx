@@ -418,7 +418,7 @@ function DocumentReadView({type,draft,directory}:{type:DocumentKind;draft:Docume
       <div className="document-read-table">
         <div className="document-read-head" aria-hidden="true"><span><LocalizedText>{"Bezeichnung"}</LocalizedText></span><span><LocalizedText>{"Menge / Einheit"}</LocalizedText></span><span><LocalizedText>{"Einzelpreis"}</LocalizedText></span><span><LocalizedText>{"Betrag"}</LocalizedText></span></div>
         {draft.positions.map(item=><div className="document-read-row" key={item.id}>
-          <b><LocalizedText>{item.description}</LocalizedText></b>
+          <b><LocalizedText verbatim={true}>{item.description}</LocalizedText></b>
           <span>{item.quantity} <LocalizedText>{({hour:"Std.",piece:"Stück",flat:"Pauschal"} as Record<string,string>)[item.unit??""]??item.unit??"Stück"}</LocalizedText><small className="document-mobile-price"><LocalizedText>{" × "}</LocalizedText>{currency} {money(numberValue(item.price))}</small></span>
           <span>{currency} {money(numberValue(item.price))}</span>
           <strong>{currency} {money(numberValue(item.quantity)*numberValue(item.price))}</strong>
@@ -474,7 +474,7 @@ function DocumentEditor({ type, draft, onChange, directory, step,lockedCustomer=
         <Field label="Kunde auswählen">
           <Select disabled={lockedCustomer} value={draft.customerId??Object.entries(directory).find(([,item])=>item===resolveCustomer(draft,directory))?.[0]??''} onChange={e=>{const item=directory[e.target.value];if(item)onChange({...draft,customer:item.name??e.target.value,customerId:item.id})}}>
             {!resolveCustomer(draft,directory)&&<option value=""><LocalizedText>{"Kunde auswählen"}</LocalizedText></option>}
-            {names.map(key=><option key={key} value={key}><LocalizedText>{directory[key].name??key}</LocalizedText><LocalizedText>{directory[key].city?' · '+directory[key].city:''}</LocalizedText></option>)}
+            {names.map(key=><option key={key} value={key}><LocalizedText verbatim={true}>{directory[key].name??key}</LocalizedText><LocalizedText>{directory[key].city?' · '+directory[key].city:''}</LocalizedText></option>)}
           </Select>
         </Field>
         {[customer.sector,customer.city].some(Boolean)&&<div className="document-customer-hint"><span>{[customer.sector,customer.city].filter(Boolean).join(" · ")}</span></div>}
@@ -498,7 +498,7 @@ function DocumentEditor({ type, draft, onChange, directory, step,lockedCustomer=
             const lineTotal=numberValue(item.quantity)*numberValue(item.price);
             return <div className="document-line-item" key={item.id}>
               <button className="mobile-position-summary" type="button" onClick={()=>{setPositionDraft({...item});setMobilePositionId(item.id)}}>
-                <span><b><LocalizedText>{item.description}</LocalizedText></b><small>{item.quantity} <LocalizedText>{({hour:"Std.",piece:"Stück",flat:"Pauschal"} as Record<string,string>)[item.unit??""]??item.unit??"Stück"}</LocalizedText><LocalizedText>{" × "}</LocalizedText><LocalizedText>{draft.currency??"CHF"}</LocalizedText> {money(numberValue(item.price))}</small></span>
+                <span><b><LocalizedText verbatim={true}>{item.description}</LocalizedText></b><small>{item.quantity} <LocalizedText>{({hour:"Std.",piece:"Stück",flat:"Pauschal"} as Record<string,string>)[item.unit??""]??item.unit??"Stück"}</LocalizedText><LocalizedText>{" × "}</LocalizedText><LocalizedText>{draft.currency??"CHF"}</LocalizedText> {money(numberValue(item.price))}</small></span>
                 <strong><LocalizedText>{draft.currency??"CHF"}</LocalizedText> {money(lineTotal)}</strong><Icon name="arrow" size={16}/>
               </button>
               <label className="mobile-line-field description"><span><LocalizedText>{"Beschreibung"}</LocalizedText></span><Input aria-label="Beschreibung" value={item.description} onChange={e=>updatePosition(item.id,{description:e.target.value})}/></label>

@@ -697,7 +697,7 @@ try{
     await page.setViewportSize({width,height:740});await navigate(base+'/einstellungen/darstellung');await page.waitForLoadState('networkidle');
     const choices=page.getByRole('radiogroup',{name:'Darstellung',exact:true});assert.equal(await choices.getByRole('radio').count(),3);assert.equal(await page.locator('.appearance-card,.theme-preview').count(),0);
     const heights=await choices.getByRole('radio').evaluateAll(rows=>rows.map(row=>row.getBoundingClientRect().height));assert.ok(heights.every(height=>Math.abs(height-heights[0])<1),'Theme rows keep equal heights');
-    assert.equal(await page.getByLabel('Sprache',{exact:true}).locator('option').count(),1,'Offer only the translated language');
+    assert.deepEqual(await page.getByLabel('Sprache',{exact:true}).locator('option').evaluateAll(options=>options.map(option=>option.value)),['de','fr','it','en'],'Expose the complete translated language catalogue');
     await choices.getByRole('radio',{name:/^Hell/}).click();await page.waitForFunction(()=>document.documentElement.dataset.theme==='light');
     await choices.getByRole('radio',{name:/^Dunkel/}).click();await page.waitForFunction(()=>document.documentElement.dataset.theme==='dark');
     await choices.getByRole('radio',{name:/^Dunkel/}).press('ArrowDown');await page.waitForFunction(()=>document.documentElement.dataset.themeMode==='system');

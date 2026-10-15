@@ -29,6 +29,12 @@ try{
    // Public 404 is outside the locale-query matcher; the selected cookie remains authoritative.
    assert.equal(await page.locator('html').getAttribute('lang'),locale+'-CH');
    const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1);assert.equal(overflow,false,route+' '+locale+' '+width+' overflow');
+   if(route.startsWith('/dashboard')){
+    const navigation=page.locator(width<=1100?'.bottom-nav':'.sidebar');
+    assert.equal((await navigation.locator('a[href="/kunden"] span').first().textContent()).trim(),text('Kunden',locale));
+    await page.locator('button.avatar-button:visible').first().click();
+    const accountLanguage=page.locator('.locale-switcher select:visible').first();await accountLanguage.waitFor();assert.equal(await accountLanguage.inputValue(),locale);await page.keyboard.press('Escape');
+   }
    if(route.startsWith('/?')){assert.equal((await page.locator('.hero h1').textContent()).replace(/\s/g,''),(text('Dein Büro.',locale)+text('Einfach dabei.',locale)).replace(/\s/g,''));}if(route.startsWith('/?'))await page.screenshot({path:output+'/landing-'+locale+'-'+width+'.png',fullPage:true});
   }
   assert.deepEqual(faults,[],'No uncaught browser errors');results.push({locale,width,passed:true});await context.close();

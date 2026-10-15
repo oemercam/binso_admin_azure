@@ -26,5 +26,5 @@ export function DocumentSummaryRow({item,customerHeading=false,compact=false}:{i
 }
 
 export function FinancialSummaryRow({href,title,status,tone='neutral',meta,amount,amountLabel,compact=false}:{href:string;title:string;status:string;tone?:'neutral'|'success'|'warning'|'danger'|'info';meta:string;amount:string;amountLabel?:string;compact?:boolean}){
- return <ListRow href={href} title={title} meta={meta} status={status} tone={tone} value={amount} valueLabel={amountLabel} compact={compact}/>;
+ return <ListRow translateTitle={false} href={href} title={title} meta={meta} status={status} tone={tone} value={amount} valueLabel={amountLabel} compact={compact}/>;
 }

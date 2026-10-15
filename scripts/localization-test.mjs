@@ -57,3 +57,14 @@ console.log('Locale catalogues: complete EN/FR/IT tuples, preserved template tok
  user={id:'fixture',language:'fr'};failMail=true;assert.deepEqual(await (await recovery.POST(request())).json(),expected,'Unknown account and failed delivery retain the same public response');
  console.log('Password recovery: translated mail/link locale and uniform unknown-account/delivery-failure response passed.');
 }
+// Exercise the actual shared row and heading renderers with colliding user copy.
+{
+ const source=fs.readFileSync('components/binso-ux.tsx','utf8'),ast=ts.createSourceFile('ux.tsx',source,99,true,4);
+ const declarations=['ListRow','PageHeading','ActionRow'].map(name=>ast.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text===name).getText(ast)).join('\n');
+ const exports={};const compiled=ts.transpileModule(declarations,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,target:ts.ScriptTarget.ES2022}}).outputText;
+ Function('exports','require','LocalizedText','Link','Status','Icon','usePageAccess',compiled)(exports,require,client.LocalizedText,({children})=>children,({children})=>children,()=>null,()=>({write:true,canOpen:()=>true}));
+ const html=renderToStaticMarkup(element(client.LocaleProvider,{initialLocale:'fr'},element('main',null,element(exports.ListRow,{title:'Rechnungen',meta:'Customer-entered title',translateTitle:false}),element(exports.PageHeading,{title:'Rechnungen',verbatimTitle:true}),element(exports.ActionRow,{title:'Rechnungen',icon:'file'}))));
+ assert.equal((html.match(/Rechnungen/g)??[]).length,2,'User-authored list/heading titles stay verbatim even if they equal application copy');assert.ok(html.includes('Factures'),'Plain menu rows translate their UI labels');
+ assert.equal(locale.translateMessage('Rechnung RE-001','en'),'Invoice RE-001');
+ console.log('Shared rows/headings preserve colliding user titles while menu labels and document prefixes translate.');
+}

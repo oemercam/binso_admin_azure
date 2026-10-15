@@ -17,10 +17,10 @@ export function LocaleProvider({initialLocale,children}:{initialLocale:Locale;ch
 export function useLocale(){return useContext(LocaleContext)}
 export function useTranslation(){const {locale}=useLocale();return (value:string)=>translateMessage(value,locale)}
 /** Only application copy is passed here; records, names and user messages stay untouched. */
-export function LocalizedText({children}:{children:ReactNode}){
+export function LocalizedText({children,verbatim=false}:{children:ReactNode;verbatim?:boolean}){
  const {locale}=useLocale();
  const render=(value:ReactNode):ReactNode=>typeof value==='string'?translateMessage(value,locale):Array.isArray(value)?value.map(render):value;
- return render(children);
+ return verbatim?children:render(children);
 }
 /** Native attribute localization keeps accessible names in the selected language. */
 export function LocalizedElement<Tag extends keyof JSX.IntrinsicElements>({as,...props}:{as:Tag}&ComponentPropsWithRef<Tag>){

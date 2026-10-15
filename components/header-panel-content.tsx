@@ -34,7 +34,7 @@ export function SearchPanel({query,onQuery,items,loading,error,onClose,recent=[]
    {loading&&<LoadingState className="technical-hint"><LocalizedText>{"Suche läuft …"}</LocalizedText></LoadingState>}
    {query.trim().length>=2&&!loading&&error&&<ErrorState className="technical-hint"><LocalizedText>{error}</LocalizedText></ErrorState>}
    {query.trim().length>=2&&!loading&&!error&&visible.length===0&&<EmptyState compact title="Keine Treffer gefunden" text=""/>}
-   {groups.map(type=><section key={type}><h3>{type}</h3>{visible.filter(item=>item.type===type).map(item=><ActionRow key={item.href} href={item.href} icon={item.icon} title={item.title} description={item.meta} onClick={()=>{onRemember?.(query);onClose()}}/>)}</section>)}
+   {groups.map(type=><section key={type}><h3><LocalizedText>{type}</LocalizedText></h3>{visible.filter(item=>item.type===type).map(item=><ActionRow verbatim key={item.href} href={item.href} icon={item.icon} title={item.title} description={item.meta} onClick={()=>{onRemember?.(query);onClose()}}/>)}</section>)}
   </div>
  </div>;
 }
@@ -57,7 +57,7 @@ export function AccountPanel({profile,demo,logoutBusy,onLogout,onClose}:{profile
  const origin=safeAppPath(params.get("accountReturn"),pathname);
  const target=new URL(origin,"https://binso.invalid");target.searchParams.set("panel","account");
  const back=target.pathname+target.search;
- return <div className="account-sheet"><div className="account-sheet-profile"><Avatar name={profile.name} identity={profile.identity} src={profile.avatar} size="large"/><div><b><LocalizedText>{profile.name||"Persönliches Konto"}</LocalizedText></b><small><LocalizedText>{"Persönliches Konto"}</LocalizedText></small></div></div>
+ return <div className="account-sheet"><div className="account-sheet-profile"><Avatar name={profile.name} identity={profile.identity} src={profile.avatar} size="large"/><div><b><LocalizedText verbatim={!!profile.name}>{profile.name||"Persönliches Konto"}</LocalizedText></b><small><LocalizedText>{"Persönliches Konto"}</LocalizedText></small></div></div>
   <LocaleSwitcher/><SettingsGroup title="Persönlich"><div>{[["/einstellungen/konto","user","Mein Profil"],["/einstellungen/sicherheit","lock","Sicherheit"],["/einstellungen/benachrichtigungen","bell","Benachrichtigungen"],["/einstellungen/darstellung","moon","Darstellung & Sprache"]].map(([href,icon,title])=><PanelLink key={href} href={href+"?accountReturn="+encodeURIComponent(back)} icon={icon} title={title} onClose={onClose}/>)}</div></SettingsGroup>
   <SettingsGroup title="Unternehmen"><div className="action-list"><PanelLink href="/einstellungen" icon="settings" title="Unternehmenseinstellungen" onClose={onClose}/>{demo&&<PanelLink href="/registrieren" icon="plus" title="Eigenes Konto erstellen" onClose={onClose}/>}</div></SettingsGroup>
   <SettingsGroup title="Sitzung"><div className="action-list"><ActionRow icon="logout" title={logoutBusy?"Wird abgemeldet…":"Abmelden"} disabled={logoutBusy} onClick={onLogout}/></div></SettingsGroup>

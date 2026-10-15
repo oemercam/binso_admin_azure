@@ -221,7 +221,7 @@ export function RecordRow({
   compact?:boolean;
   valuePlacement?:"separate"|"metadata";
 }) {
-  return <ListRow compact={compact} valuePlacement={valuePlacement} href={href} title={personIdentity?<span className="person-record"><Avatar name={title} identity={personIdentity}/><span><LocalizedText>{title}</LocalizedText></span></span>:title} meta={meta} value={value} status={status} tone={status?tone(status):"neutral"}/>;
+  return <ListRow translateTitle={false} compact={compact} valuePlacement={valuePlacement} href={href} title={personIdentity?<span className="person-record"><Avatar name={title} identity={personIdentity}/><span>{title}</span></span>:title} meta={meta} value={value} status={status} tone={status?tone(status):"neutral"}/>;
 }
 
 /** Employee ledgers and the time module share the same information layout. */

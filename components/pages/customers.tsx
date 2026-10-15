@@ -117,7 +117,7 @@ export function CustomerDetail({customerId="acme"}:{customerId?:string}) {
   const sector=String(customer.sector??"");
   const city=String(customer.city??"");
   const status=String(customer.status??"active");
-  return <AppShell title={name} status={status==="inactive"?"Inaktiv":"Aktiv"} statusTone={status==="inactive"?"neutral":"success"} subtitle={[sector,city].filter(Boolean).join(" · ")} active="kunden" backHref={returnTo} backLabel="Kunden" actions={<Button variant="ghost" icon="more" ariaLabel="Kundenaktionen" onClick={()=>setCustomerActions(true)}/>} >
+  return <AppShell titleIsUserContent title={name} status={status==="inactive"?"Inaktiv":"Aktiv"} statusTone={status==="inactive"?"neutral":"success"} subtitle={[sector,city].filter(Boolean).join(" · ")} active="kunden" backHref={returnTo} backLabel="Kunden" actions={<Button variant="ghost" icon="more" ariaLabel="Kundenaktionen" onClick={()=>setCustomerActions(true)}/>} >
     <div className="customer-detail-workspace">
 
       <div className="desktop-detail-main"><DetailTabs label="Kundenbereiche" panelId={panelId}><button className={tab==="overview"?"active":""} onClick={()=>setTab("overview")}><LocalizedText>{"Übersicht"}</LocalizedText></button><button className={tab==="contacts"?"active":""} onClick={()=>setTab("contacts")}><LocalizedText>{"Kontakte"}</LocalizedText></button><button className={tab==="finances"?"active":""} onClick={()=>setTab("finances")}><LocalizedText>{"Finanzen"}</LocalizedText></button><button className={tab==="activity"?"active":""} onClick={()=>setTab("activity")}><LocalizedText>{"Aktivität"}</LocalizedText></button></DetailTabs>

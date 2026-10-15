@@ -12,14 +12,14 @@ import ConfirmDialog from "./confirm-dialog";
 import {createActions,permittedCreateActions,createReturnHref} from "@/config/create-actions";
 
 /** Action rows have one DOM shape; navigation and destructive intent are explicit. */
-export function ActionRow({title,icon,href,onClick,disabled=false,requiresWrite=false,danger=false,navigation=false,description,metadata,endAdornment,selected,role,tabIndex,onKeyDown}: {
- title:string;icon:ReactNode;href?:string;onClick?:()=>void;disabled?:boolean;requiresWrite?:boolean;danger?:boolean;navigation?:boolean;description?:string;metadata?:string;endAdornment?:ReactNode;selected?:boolean;role?:"radio";tabIndex?:number;onKeyDown?:React.KeyboardEventHandler<HTMLButtonElement>;
+export function ActionRow({title,verbatim=false,icon,href,onClick,disabled=false,requiresWrite=false,danger=false,navigation=false,description,metadata,endAdornment,selected,role,tabIndex,onKeyDown}: {
+ title:string;verbatim?:boolean;icon:ReactNode;href?:string;onClick?:()=>void;disabled?:boolean;requiresWrite?:boolean;danger?:boolean;navigation?:boolean;description?:string;metadata?:string;endAdornment?:ReactNode;selected?:boolean;role?:"radio";tabIndex?:number;onKeyDown?:React.KeyboardEventHandler<HTMLButtonElement>;
 }) {
  const access=usePageAccess();
  if(href&&!access.canOpen(href))return null;
  const blocked=disabled||(requiresWrite&&!access.write);
  const className=`action-row${danger?" action-row-danger":""}`;
- const body=<>{typeof icon==='string'?<Icon name={icon} size={18}/>:icon}<span>{description||metadata?<span><LocalizedText>{title}</LocalizedText></span>:title}{description&&<small className="action-row-description"><LocalizedText>{description}</LocalizedText></small>}{metadata&&<small className="action-row-description">{metadata}</small>}</span>{endAdornment??(selected!==undefined?<span className="action-row-selection" aria-hidden="true">{selected&&<Icon name="check" size={16}/>}</span>:!danger&&(navigation||href)&&<Icon name="arrow" size={16}/>)}</>;
+ const body=<>{typeof icon==='string'?<Icon name={icon} size={18}/>:icon}<span>{description||metadata?<span><LocalizedText verbatim={verbatim}>{title}</LocalizedText></span>:<LocalizedText verbatim={verbatim}>{title}</LocalizedText>}{description&&<small className="action-row-description"><LocalizedText verbatim={verbatim}>{description}</LocalizedText></small>}{metadata&&<small className="action-row-description">{metadata}</small>}</span>{endAdornment??(selected!==undefined?<span className="action-row-selection" aria-hidden="true">{selected&&<Icon name="check" size={16}/>}</span>:!danger&&(navigation||href)&&<Icon name="arrow" size={16}/>)}</>;
  return href&&!blocked?<Link prefetch={false} href={href} onClick={onClick} className={className}>{body}</Link>:<button type="button" className={className} disabled={blocked} onClick={onClick} role={role} aria-checked={role==="radio"?selected:undefined} tabIndex={tabIndex} onKeyDown={onKeyDown}>{body}</button>;
 }
 
@@ -32,10 +32,10 @@ export function SelectionRows<T extends string>({label,value,options,onChange}:{
 }
 
 /** Shared visual contract for Binso One. Navigation, creation and entity actions have separate shared owners. */
-export function PageHeading({ title, description, action, leading }: { title: string; description?: string; action?: ReactNode; leading?: ReactNode }) {
+export function PageHeading({ title, description, action, leading, verbatimTitle=false }: { title: string;verbatimTitle?:boolean; description?: string; action?: ReactNode; leading?: ReactNode }) {
   return <header className="bo-page-heading">{leading}
-    <div className="bo-page-heading-main"><h1><LocalizedText>{title}</LocalizedText></h1>{action}</div>
-    {description && <p><LocalizedText>{description}</LocalizedText></p>}
+    <div className="bo-page-heading-main"><h1><LocalizedText verbatim={verbatimTitle}>{title}</LocalizedText></h1>{action}</div>
+    {description && <p><LocalizedText verbatim={verbatimTitle}>{description}</LocalizedText></p>}
   </header>;
 }
 
@@ -59,12 +59,12 @@ export function EmptyRecordAction({section}:{section:string}){
  return <Button variant="secondary" href={action.href}><LocalizedText>{action.title}</LocalizedText><LocalizedText>{" erstellen"}</LocalizedText></Button>;
 }
 
-export function DetailHeading({ title, status, tone = "neutral", subtitle, leading, action }: {
-  title: string; status?: ReactNode; tone?: "neutral" | "success" | "warning" | "danger" | "info"; subtitle?: string; leading?: ReactNode; action?: ReactNode;
+export function DetailHeading({ title, status, tone = "neutral", subtitle, leading, action, verbatimTitle=false }: {
+  title: string;verbatimTitle?:boolean; status?: ReactNode; tone?: "neutral" | "success" | "warning" | "danger" | "info"; subtitle?: string; leading?: ReactNode; action?: ReactNode;
 }) {
   return <div className="bo-detail-heading">{leading}
-    <div className="bo-detail-heading-main"><h1><LocalizedText>{title}</LocalizedText></h1>{status != null && <Status tone={tone}>{status}</Status>}{action}</div>
-    {subtitle && <p><LocalizedText>{subtitle}</LocalizedText></p>}
+    <div className="bo-detail-heading-main"><h1><LocalizedText verbatim={verbatimTitle}>{title}</LocalizedText></h1>{status != null && <Status tone={tone}>{status}</Status>}{action}</div>
+    {subtitle && <p><LocalizedText verbatim={verbatimTitle}>{subtitle}</LocalizedText></p>}
   </div>;
 }
 
@@ -157,8 +157,8 @@ export function ActionsMenu({label, children, busy=false}: {label:string;childre
 }
 
 /** Canonical two-line row shared by entity and financial lists. */
-export function ListRow({href,onClick,title,meta,value,valueLabel,status,tone="neutral",compact=false,valuePlacement="separate"}:{href?:string;onClick?:()=>void;title:ReactNode;meta:ReactNode;value?:ReactNode;valueLabel?:string;status?:string;tone?:"success"|"warning"|"danger"|"neutral"|"info";compact?:boolean;valuePlacement?:"separate"|"metadata"}){
- const content=<><b><LocalizedText>{title}</LocalizedText></b>{status&&<Status tone={tone}>{status}</Status>}<small>{meta}</small>{value!=null&&<span className="document-summary-amount">{valueLabel&&<small><LocalizedText>{valueLabel}</LocalizedText></small>}<strong>{value}</strong></span>}</>;
+export function ListRow({href,onClick,title,meta,value,valueLabel,status,tone="neutral",compact=false,valuePlacement="separate",translateTitle=true}:{translateTitle?:boolean;href?:string;onClick?:()=>void;title:ReactNode;meta:ReactNode;value?:ReactNode;valueLabel?:string;status?:string;tone?:"success"|"warning"|"danger"|"neutral"|"info";compact?:boolean;valuePlacement?:"separate"|"metadata"}){
+ const content=<><b><LocalizedText verbatim={!translateTitle}>{title}</LocalizedText></b>{status&&<Status tone={tone}>{status}</Status>}<small>{meta}</small>{value!=null&&<span className="document-summary-amount">{valueLabel&&<small><LocalizedText>{valueLabel}</LocalizedText></small>}<strong>{value}</strong></span>}</>;
  const className=`document-summary-row${value!=null?" has-value":""}${compact?" is-compact":""}${valuePlacement==="metadata"?" has-inline-value":""}`;
  return href?<Link prefetch={false} href={href} className={className}>{content}</Link>:onClick?<button type="button" onClick={onClick} className={className}>{content}</button>:<div className={className}>{content}</div>;
 }
