@@ -39,3 +39,21 @@ for(const [language,label] of [['fr','Factures'],['it','Fatture'],['en','Invoice
  assert.ok(!markup.includes('placeholder="Kunden suchen..."'),'Accessible native attributes are translated');
 }
 console.log('Locale catalogues: complete EN/FR/IT tuples, preserved template tokens, server-rendered language, native attributes and unchanged user data passed.');
+// Exercise the real recovery handler with isolated token/mail delivery adapters.
+{
+ let user={id:'fixture',language:'de'},sent=null,failMail=false;
+ const recovery=compile('app/api/auth/recover/route.ts',{
+  '@/lib/locales':locale,
+  '@/lib/server/http':{apiError:()=>Response.json({error:'internal'},{status:500}),assertSameOrigin:()=>{},cleanText:value=>typeof value==='string'?value.trim():'',json:data=>Response.json(data),readJson:request=>request.json(),validEmail:value=>value.includes('@')},
+  '@/lib/server/rate-limit':{enforceRateLimit:async()=>{}},'@/lib/server/db':{query:async()=>({rows:user?[user]:[]})},
+  '@/lib/server/auth-tokens':{createAuthToken:async()=> 'synthetic-recovery-token'},
+  '@/lib/server/email':{sendMail:async mail=>{sent=mail;if(failMail)throw Error('synthetic delivery failure')},mailLayout:(title,body,cta,language)=>{assert.equal(language,user.language);return title+body+cta.url}},
+  '@/lib/server/env':{env:{appUrl:'https://fixture.invalid'}},'@/config/domain':{domainConfig:{passwordResetMinutes:30}}
+ });
+ const request=()=>new Request('https://fixture.invalid/api/auth/recover',{method:'POST',body:JSON.stringify({email:'fixture@example.invalid'})});
+ let expected;
+ for(const language of config.locales){user={id:'fixture',language};sent=null;const response=await recovery.POST(request());assert.equal(response.status,200);expected=await response.json();assert.equal(sent.subject,locale.translateMessage('Passwort für Binso One zurücksetzen',language));assert.ok(sent.html.includes('&lang='+language));}
+ user=null;sent=null;assert.deepEqual(await (await recovery.POST(request())).json(),expected);assert.equal(sent,null);
+ user={id:'fixture',language:'fr'};failMail=true;assert.deepEqual(await (await recovery.POST(request())).json(),expected,'Unknown account and failed delivery retain the same public response');
+ console.log('Password recovery: translated mail/link locale and uniform unknown-account/delivery-failure response passed.');
+}

@@ -7,7 +7,8 @@ import {invalidateClientSession,readClientSession} from "./session-cache";
 export function isProductionBackendEnabled(){
   if(typeof window==="undefined") return false;
   if(document.querySelector('[data-operator-demo="true"]'))return false;
-  return (window.localStorage.getItem("binso.demo.session")!=="1" || window.localStorage.getItem("binso.demo.database")==="1") && !window.location.pathname.startsWith("/preview/");
+  if(window.location.pathname.startsWith("/preview/"))return false;
+  try{return window.localStorage.getItem("binso.demo.session")!=="1" || window.localStorage.getItem("binso.demo.database")==="1"}catch{return true}
 }
 
 export function useBackendMode(){
@@ -20,6 +21,8 @@ export function useBackendMode(){
 
 export function clearDemoClientSession(){
   if(typeof window==="undefined") return;
+  invalidateClientSession();
+  try{
   [
     "binso.demo.session",
     "binso.demo.database",
@@ -29,9 +32,9 @@ export function clearDemoClientSession(){
     "binso.demo.startedAt",
     "binso.demo.expiresAt",
   ].forEach(key=>window.localStorage.removeItem(key));
-  invalidateClientSession();
   window.localStorage.setItem("binso.session.changed",String(Date.now()));
   for(const key of Object.keys(window.sessionStorage)){if(key.startsWith("binso.list:"))window.sessionStorage.removeItem(key);}
+  }catch{/* Browser storage can be unavailable; server revocation and the memory fence still apply. */}
 }
 
 let demoStart:Promise<void>|null=null;
@@ -44,13 +47,13 @@ export function startDemoClientSession({name="Demo",company="Demo Firma",focus="
     if(payload.ok!==true)throw new Error("Demo-Sitzung konnte nicht gestartet werden.");
     clearDemoClientSession();
     const now=Date.now();
-    window.localStorage.setItem("binso.demo.session","1");
+    try{window.localStorage.setItem("binso.demo.session","1");
     window.localStorage.setItem("binso.demo.name",name.trim()||"Demo");
     window.localStorage.setItem("binso.demo.company",company.trim()||"Demo Firma");
     window.localStorage.setItem("binso.demo.focus",focus);
     window.localStorage.setItem("binso.demo.startedAt",String(now));
     window.localStorage.setItem("binso.demo.expiresAt",String(now+(payload.expiresIn??86400)*1000));
-    if(payload.databaseBacked===true)window.localStorage.setItem("binso.demo.database","1");
+    if(payload.databaseBacked===true)window.localStorage.setItem("binso.demo.database","1");}catch{/* Authenticated demo cookies remain authoritative when optional storage is blocked. */}
   })();
   demoStart=request;
   void request.finally(()=>{if(demoStart===request)demoStart=null;}).catch(()=>{});

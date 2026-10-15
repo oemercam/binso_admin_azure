@@ -24,7 +24,7 @@ try{
   const selector=page.locator('.locale-switcher select:visible').first();await selector.selectOption(locale==='en'?'fr':'en');
   const chosen=locale==='en'?'fr':'en';await page.waitForFunction(code=>document.documentElement.lang===code+'-CH',chosen);
   await page.reload();assert.equal(await page.locator('html').getAttribute('lang'),chosen+'-CH','Choice survives reload');
-  for(const route of ['/?lang='+locale,'/dashboard?lang='+locale,'/operator?lang='+locale,'/missing-localization-route?lang='+locale]){
+  for(const route of ['/?lang='+locale,'/dashboard?lang='+locale,'/operator?lang='+locale,'/wartung?lang='+locale,'/missing-localization-route?lang='+locale]){
    await page.goto(base+route);await page.locator('h1').first().waitFor();
    // Public 404 is outside the locale-query matcher; the selected cookie remains authoritative.
    assert.equal(await page.locator('html').getAttribute('lang'),locale+'-CH');

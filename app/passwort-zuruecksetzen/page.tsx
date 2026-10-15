@@ -1,13 +1,15 @@
 "use client";
 
+import {clearDemoClientSession} from "@/lib/client/backend";
 import {LocalizedText} from "@/lib/client/locale";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import {Button, Logo, Input, Field, ErrorState} from "@/components/ui";
 
 import ConfirmDialog from "@/components/confirm-dialog";
 import {useBrowserBackGuard} from "@/components/use-browser-back-guard";
 
 export default function Page(){
+  const pending=useRef(false);
   const [ready,setReady]=useState(false);
   const [invalid,setInvalid]=useState(false);
   const [password,setPassword]=useState("");
@@ -26,19 +28,19 @@ export default function Page(){
   },[]);
 
   const submit=async(event:FormEvent)=>{
-    event.preventDefault();
+    event.preventDefault();if(pending.current)return;
     setError("");
     if(password.length<12){setError("Das Passwort muss mindestens 12 Zeichen haben.");return;}
     if(password!==confirm){setError("Die Passwörter stimmen nicht überein.");return;}
-    setLoading(true);
+    pending.current=true;setLoading(true);
     try{
-      const response=await fetch("/api/auth/password",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({password,token:new URLSearchParams(window.location.search).get("token")})});
+      const response=await fetch("/api/auth/password",{method:"PATCH",signal:AbortSignal.timeout(15000),headers:{"Content-Type":"application/json"},body:JSON.stringify({password,token:new URLSearchParams(window.location.search).get("token")})});
       const payload=await response.json().catch(()=>({}));
       if(!response.ok) throw new Error(typeof payload?.message==="string"?payload.message:"Passwort konnte nicht geändert werden.");
-      setDone(true);
+      clearDemoClientSession();const url=new URL(window.location.href);url.searchParams.delete("token");window.history.replaceState(window.history.state,"",url);setPassword("");setConfirm("");setDone(true);
     }catch(error){
       setError(error instanceof Error?error.message:"Passwort konnte nicht geändert werden.");
-    }finally{setLoading(false);}
+    }finally{pending.current=false;setLoading(false);}
   };
 
   return <><main className="auth-page"><section className="auth-card">
@@ -49,7 +51,7 @@ export default function Page(){
         <Field label="Neues Passwort"><div className="password-field"><Input required minLength={12} value={password} onChange={e=>setPassword(e.target.value)} type={showPassword?"text":"password"} autoComplete="new-password"/><button type="button" onClick={()=>setShowPassword(!showPassword)}><LocalizedText>{showPassword?"Ausblenden":"Anzeigen"}</LocalizedText></button></div><small className="password-hint"><LocalizedText>{"Mindestens 12 Zeichen."}</LocalizedText></small></Field>
         <Field label="Passwort bestätigen"><Input required minLength={12} value={confirm} onChange={e=>setConfirm(e.target.value)} type={showPassword?"text":"password"} autoComplete="new-password"/></Field>
         {error&&<ErrorState className="auth-error"><LocalizedText>{error}</LocalizedText></ErrorState>}
-        <Button type="submit"><LocalizedText>{loading?"Wird gespeichert…":"Passwort speichern"}</LocalizedText></Button>
+        <Button type="submit" disabled={loading}><LocalizedText>{loading?"Wird gespeichert…":"Passwort speichern"}</LocalizedText></Button>
       </form>
     </>}
   </section></main><ConfirmDialog open={discard} busy={loading} title="Änderungen verwerfen?" message="Deine Änderungen sind noch nicht gespeichert und gehen verloren." cancelLabel="Weiter bearbeiten" confirmLabel="Änderungen verwerfen" onCancel={()=>setDiscard(false)} onConfirm={()=>{setDiscard(false);leaveBack()}}/></>;

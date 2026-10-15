@@ -182,14 +182,14 @@ function AppShellFrame({
   useEffect(() => {
     queueMicrotask(() => {
       setDark(document.documentElement.dataset.theme === "dark");
-      const demo=window.localStorage.getItem("binso.demo.session")==="1";
+      try{const demo=window.localStorage.getItem("binso.demo.session")==="1";
       const expiresAt=Number(window.localStorage.getItem("binso.demo.expiresAt")??"0");
       const validDemo=demo&&(!expiresAt||expiresAt>Date.now());
       setDemoSession(validDemo);
       if(demo&&!validDemo){
         window.localStorage.removeItem("binso.demo.session");
         window.localStorage.removeItem("binso.demo.expiresAt");
-      }
+      }}catch{setDemoSession(false)}
     });
   }, []);
 

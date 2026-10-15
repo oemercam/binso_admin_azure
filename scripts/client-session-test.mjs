@@ -57,4 +57,12 @@ try{
  assert.equal((await exports.GET()).authenticated,false,'An expired database demo must never regain fake owner permissions through its marker cookie');
  env.databaseUrl='';assert.equal((await exports.GET()).tenant.readOnly,true,'A static preview is explicitly read-only');
  console.log('Expired database demo is unauthenticated; static cookie preview remains read-only.');
+ window.localStorage={removeItem(){throw new DOMException('blocked','SecurityError')},setItem(){throw new DOMException('blocked','SecurityError')}};
+ assert.equal(backend.isProductionBackendEnabled(),true,'Blocked browser storage defers to authenticated server APIs');
+ globalThis.fetch=async()=>new Response(JSON.stringify({ok:true}));await backend.logoutClientSession();assert.equal(cache.cachedClientSession(),null,'Blocked storage cannot prevent confirmed logout and the private-memory fence');window.localStorage=local;
+ globalThis.BroadcastChannel=class {constructor(){throw new DOMException('blocked','SecurityError')}};
+ const isolatedEvents=await import(moduleUrl((await fs.readFile('lib/client/data-events.ts','utf8')).replace("'./process-draft'",JSON.stringify(draftUrl)).replace("'./list-state'",JSON.stringify(listStateUrl))+'\n// blocked-broadcast-fixture'));
+ assert.doesNotThrow(()=>isolatedEvents.resetClientData(false),'Blocked cross-tab channels cannot break in-memory invalidation');globalThis.BroadcastChannel=undefined;
+ console.log('Confirmed logout remains successful when browser storage or BroadcastChannel is blocked.');
+
 }finally{globalThis.BroadcastChannel=originalBroadcastChannel;globalThis.fetch=originalFetch;delete globalThis.window;delete globalThis.document;}

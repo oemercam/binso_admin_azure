@@ -34,7 +34,8 @@ function connect(){
  if(listening||typeof window==='undefined')return;
  listening=true;
  if(typeof BroadcastChannel!=='undefined'){
-  channel=new BroadcastChannel('binso-data-events');
+  try{channel=new BroadcastChannel('binso-data-events')}catch{channel=null}
+  if(channel)
   channel.onmessage=event=>{if(event.data?.type==='changed'&&Array.isArray(event.data.domains))apply(event.data.domains);if(event.data?.type==='session')resetClientData(false);};
  }
  window.addEventListener('storage',event=>{if(event.key==='binso.session.changed')resetClientData(false);});
