@@ -6,7 +6,9 @@ export const jsonHeaders = {
 };
 
 export function json(data:unknown,status=200,headers?:HeadersInit){
-  return NextResponse.json(data,{status,headers:{...jsonHeaders,...(headers??{})}});
+  const merged=new Headers(jsonHeaders);
+  new Headers(headers).forEach((value,key)=>merged.set(key,value));
+  return NextResponse.json(data,{status,headers:merged});
 }
 
 /** Enforce byte limits while reading, including chunked bodies without Content-Length. */
@@ -38,19 +40,19 @@ export function assertSameOrigin(request:NextRequest){
   if(!origin) return;
 
   const allowed=new Set<string>();
-  const configured=process.env.NEXT_PUBLIC_APP_URL;
+  const configured=process.env.APP_URL||process.env.NEXT_PUBLIC_APP_URL;
   if(configured){
     try{allowed.add(new URL(configured).origin);}catch{}
   }
 
   allowed.add(request.nextUrl.origin);
 
-  const forwardedHost=request.headers.get("x-forwarded-host");
-  const host=forwardedHost||request.headers.get("host");
-  if(host){
-    const forwardedProto=request.headers.get("x-forwarded-proto");
-    const protocol=(forwardedProto?.split(",")[0]?.trim())||request.nextUrl.protocol.replace(":","");
-    allowed.add(`${protocol}://${host.split(",")[0].trim()}`);
+  // Forwarded headers are request input, never an additional CSRF trust anchor.
+  // Next may normalize loopback URLs to localhost. An unconfigured local server
+  // still needs its actual HTTP authority; configured deployments use APP_URL.
+  if(!configured){
+    const host=request.headers.get("host");
+    if(host&&!/[\s,/@\\]/.test(host))allowed.add(`${request.nextUrl.protocol}//${host}`);
   }
 
   if(!allowed.has(origin)) throw new ApiError(403,"invalid_origin","Ungültige Herkunft.");
@@ -65,7 +67,10 @@ export class ApiError extends Error {
 export function apiError(error:unknown){
   if(error instanceof Response){
     const meaning:Record<number,{error:string;message:string}>={401:{error:"not_authenticated",message:"Bitte erneut anmelden."},403:{error:"forbidden",message:"Keine Berechtigung."},404:{error:"not_found",message:"Datensatz wurde nicht gefunden."},409:{error:"conflict",message:"Der Vorgang steht im Konflikt mit dem aktuellen Stand."},429:{error:"rate_limited",message:"Zu viele Anfragen. Bitte später erneut versuchen."},503:{error:"service_unavailable",message:"Der Dienst ist momentan nicht verfügbar."}};
-    return json(meaning[error.status]??{error:"request_failed",message:"Die Anfrage konnte nicht verarbeitet werden."},error.status);
+    const headers=new Headers();
+    const retryAfter=error.headers.get("retry-after");
+    if(error.status===429&&retryAfter&&/^\d+$/.test(retryAfter))headers.set("Retry-After",retryAfter);
+    return json(meaning[error.status]??{error:"request_failed",message:"Die Anfrage konnte nicht verarbeitet werden."},error.status,headers);
   }
   if(error instanceof ApiError) return json({error:error.code,message:error.message},error.status,error.headers);
   const code=error&&typeof error==='object'&&'code' in error?String(error.code):'';

@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import {createRequire} from "node:module";
-import {redundantDeclarations} from "./css-contract.mjs";
+import {redundantDeclarations,assertRuntimeImports} from "./css-contract.mjs";
 const require=createRequire(import.meta.url),postcss=require(require.resolve("postcss",{paths:[require.resolve("next")]}));
 
 const root=process.cwd();
@@ -47,6 +47,7 @@ if(JSON.stringify(styleCssFiles)!==JSON.stringify(expectedCss)){
 }
 
 const entry=fs.readFileSync(path.join(root,"app","binso-ui.css"),"utf8");
+assertRuntimeImports(postcss.parse(entry),runtimeCss);
 for(const file of runtimeCss){
   if(!entry.includes(`./styles/${file}`))throw new Error(`Missing runtime CSS import: ${file}`);
 }
