@@ -2717,7 +2717,6 @@ input:not([type="checkbox"]):not([type="radio"]),
   .desktop-page-actions,.document-desktop-rail,.desktop-context-rail{display:none}
   .entity-edit-workspace{display:block}
   .operator-app-content{min-width:0;display:grid;gap:18px}
-  :is(.page-container,.operator-app-content){background:var(--app-canvas)}
   :is(.mobile-header,.desktop-appbar,.operator-app-header){background:var(--app-canvas);color:var(--app-text)}
   :is(.page-container,.operator-app-content) :is(.surface,.detail-card,.security-card,.subscription-panel,.customer-tab-panel,.employee-tab-panel,.timer-card,.invoice-form){
     border:0;
@@ -2737,7 +2736,6 @@ input:not([type="checkbox"]):not([type="radio"]),
   :is(.page-container,.operator-app-content,.bottom-sheet,.header-panel) .searchbox:focus-within{border-color:var(--app-accent)}
   :is(.page-container,.operator-app-content,.bottom-sheet,.header-panel) :is(.form-control,.form-textarea){background:var(--app-chrome)}
   :is(.page-container,.operator-app-content,.bottom-sheet,.header-panel) :is(.form-control,.form-textarea)[aria-invalid="true"]{border-color:var(--status-danger-fg)}
-  :is(.page-container,.operator-app-content,.bottom-sheet,.header-panel) :is(.tabs,.chips,.notification-center-tabs) :is(button,a).active{background:var(--app-accent-soft);color:var(--app-accent)}
   .bottom-sheet{border:0;background:var(--app-surface);border-radius:var(--app-group-radius)}
   .bottom-sheet .sheet-header,.bottom-sheet .filter-sheet-actions,.bottom-sheet .mobile-sticky-save{background:var(--app-surface)}
   .bottom-sheet .sheet-header .icon-button,.header-panel-heading .icon-button{border:0;border-radius:50%;background:var(--app-chrome)}

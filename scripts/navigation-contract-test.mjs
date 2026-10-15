@@ -12,3 +12,10 @@ const reference=JSON.parse(fs.readFileSync('docs/assets/20261013/navigation-refe
 const digest=createHash('sha256').update(JSON.stringify({navigation,styles})).digest('hex');
 assert.equal(digest,reference.customerContract,'Navigation must match the approved 2026-10-13 glass/dock contract');
 console.log('Approved customer navigation destinations and shared glass/dock style contract passed.');
+
+// The frozen dock also inherits the base focus outline; avoid changing it through
+// a generic rule that the navigation-only selector digest cannot observe.
+const base=postcss.parse(fs.readFileSync('app/styles/base.css','utf8'));
+const inheritedFocus=[];
+base.walkRules(rule=>{if(rule.selector===':focus-visible')rule.walkDecls('outline',decl=>inheritedFocus.push(decl.value))});
+assert.deepEqual(inheritedFocus,['2px solid currentColor'],'Preserve the base focus inherited by frozen navigation links/buttons');

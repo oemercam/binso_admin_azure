@@ -50,3 +50,12 @@ Die Ausgangswerte des Referenzpakets werden in bestehenden Tokens verwendet: Pri
 Der bestehende Browser-Controltest erwartet aufgrund der neuen expliziten Referenz 8 statt 12 px. Keine Referenzbilder oder Gate-Entscheidungen angepasst. `ux-reference-capture.mjs` rendert die unveränderten Referenzdateien in einem separaten, netzwerkgesperrten Browserkontext mit bereits gebündeltem Lucide. Ein zusätzlicher Evidenzschritt im bestehenden Chromium-Job legt diese Bilder bei den tatsächlichen Produkt-Screenshots ab; keine automatische Baselinefreigabe. Keine Vorschau-Daten/Handler ins Produkt übernommen.
 
 Vor der Referenz-Pilotänderung bestanden auf `4c39191da8c84ba83ea17b2ce995e7c768fc1010` GitHub Quality #38796209547 und CodeQL #38796209578. Der vollständige lokale Diagnoselauf bestand 41 von 42 Einzeltests; nur der Scanner-Unix-Socket scheiterte an EPERM. Dies ersetzt nicht das vollständige Pflichtgate. Neue Pilotänderungen benötigen eigene CI-/Browsernachweise.
+
+## Kaskaden- und Browserkorrekturen des Pilotpakets
+
+- Chromium #38797350820: Desktop `.page-container` hatte einen transparenten statt eigenen weissen Hintergrund. Weisser Parent allein erfüllte das explizite neue Surface-Gate nicht. Der vorhandene Container und Operator-Inhalt besitzen jetzt `--app-canvas` unabhängig vom Viewport; die redundante mobile Deklaration ist entfernt. Erwartung blieb unverändert.
+- WebKit desselben Laufs: zweite historische Control-Geometrieprüfung erwartete noch 12/10 px. Die Implementierung lieferte 8 px entsprechend der neuen Referenz. Beide Controlprüfungen erwarten nun die ausdrücklich dokumentierten 7 px Desktop bzw. 8 px bis 1100 px; Höhen/Insets/Validierungs-/Keyboardgates unverändert.
+- Vererbungsprüfung: der globale Fokus gehört auch zur eingefrorenen Navigation. `:focus-visible` bleibt deshalb bei `currentColor`; blau wird nur für die vorgesehenen gemeinsamen Button-/Iconbutton-Kontexte gesetzt. Das Navigationsgate prüft zusätzlich diesen geerbten Owner. Keine Navigationsreferenz regeneriert.
+- Auswahlzustände von Tabs/Chips/Benachrichtigungen verwenden jetzt im bestehenden Basisowner die weiche blaue Fläche; die identische mobile Sonderdeklaration wurde entfernt. Dateiauswahl-Touchziel beträgt mindestens 44 px.
+
+Die Pilot-Referenzbilder wurden im Chromium-Runner erfolgreich erzeugt und zur Prüfung geladen. Ein vollständiger visueller Vergleich mit den tatsächlichen Pilotseiten bleibt bis zum korrigierten Browserlauf offen; der fehlgeschlagene Lauf wird nicht als bestanden ausgewiesen.

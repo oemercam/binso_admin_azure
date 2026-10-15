@@ -47,6 +47,7 @@
 .bottom-nav{display:none}
 
 .page-container{
+  background:var(--app-canvas);
   width:100%;
   max-width:var(--content-max);
   margin:0 auto;
@@ -227,7 +228,7 @@ html[data-theme="dark"] .searchbox>input{height:100%;min-width:0;padding:0;borde
 .chips button.active,
 .tabs button.active,
 .tabs a.active,
-.notification-center-tabs button.active{background:var(--color-inverse-bg);color:var(--color-inverse-fg)}
+.notification-center-tabs button.active{background:var(--app-accent-soft);color:var(--app-accent)}
 .toolbar .filter-button{
   position:relative;
   border:1px solid var(--color-line);
@@ -1602,7 +1603,7 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 /* Shared chrome material; opaque fallback is the default on unsupported engines. */
 .app-header{background:var(--app-canvas);color:var(--app-text);backdrop-filter:none;-webkit-backdrop-filter:none}
 .app-header-leading{display:flex;align-items:center;min-width:0;gap:8px;flex:1}
-.app-header-actions{display:flex;align-items:center;gap:4px;flex:none;padding:2px;border-radius:999px}
+.app-header-actions{--app-glass-solid:var(--app-canvas);--app-glass-tint:var(--app-canvas);display:flex;align-items:center;gap:4px;flex:none;padding:2px;border-radius:999px}
 .app-glass{background:var(--app-glass-solid);border:1px solid var(--app-glass-line);box-shadow:var(--app-glass-shadow);color:var(--app-text)}
 .mobile-dock{display:none}
 .dock-create-action{display:grid;place-items:center;width:var(--dock-action-size);height:var(--dock-action-size);min-width:var(--touch);min-height:var(--touch);border-radius:50%;padding:0;cursor:pointer;transition:transform var(--motion-fast) var(--motion-ease)}
@@ -1642,3 +1643,5 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 
 /* App content uses the approved action blue; frozen navigation retains its token. */
 .page-container,.desktop-appbar,.app-sidebar,.operator-app-header,.operator-page-head,.operator-app-content,.bottom-sheet,.header-panel,.confirm-dialog{--app-accent:var(--app-action-accent)}
+
+.page-container :focus-visible,.operator-app-content :focus-visible,.auth-workspace :focus-visible,.app-sidebar :focus-visible,.operator-sidebar :focus-visible{outline-color:var(--app-accent)}

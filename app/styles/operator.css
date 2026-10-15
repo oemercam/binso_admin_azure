@@ -399,3 +399,5 @@
 .audit-list>span:last-child,
 .service-list>div:last-child,
 .mini-stat:last-child{border-bottom:0}
+
+.operator-app-content{background:var(--app-canvas)}
