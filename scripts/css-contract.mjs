@@ -11,3 +11,13 @@ export function redundantDeclarations(root){
   }
  });return redundant;
 }
+
+/** Import order defines cascade precedence; membership alone cannot enforce it. */
+export function assertRuntimeImports(root,files){
+ const imports=[];
+ root.walkAtRules('import',rule=>{
+  if(rule.parent!==root)throw new Error('Runtime CSS imports must be top-level');
+  imports.push(rule.params.replace(/^["']|["']$/g,''));
+ });
+ if(JSON.stringify(imports)!==JSON.stringify(files.map(file=>'./styles/'+file)))throw new Error('Runtime CSS imports must match the canonical cascade order exactly');
+}

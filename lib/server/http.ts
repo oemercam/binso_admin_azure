@@ -40,7 +40,7 @@ export function assertSameOrigin(request:NextRequest){
   if(!origin) return;
 
   const allowed=new Set<string>();
-  const configured=process.env.NEXT_PUBLIC_APP_URL;
+  const configured=process.env.APP_URL||process.env.NEXT_PUBLIC_APP_URL;
   if(configured){
     try{allowed.add(new URL(configured).origin);}catch{}
   }
@@ -48,6 +48,12 @@ export function assertSameOrigin(request:NextRequest){
   allowed.add(request.nextUrl.origin);
 
   // Forwarded headers are request input, never an additional CSRF trust anchor.
+  // Next may normalize loopback URLs to localhost. An unconfigured local server
+  // still needs its actual HTTP authority; configured deployments use APP_URL.
+  if(!configured){
+    const host=request.headers.get("host");
+    if(host&&!/[\s,/@\\]/.test(host))allowed.add(`${request.nextUrl.protocol}//${host}`);
+  }
 
   if(!allowed.has(origin)) throw new ApiError(403,"invalid_origin","Ungültige Herkunft.");
 }
