@@ -17,15 +17,18 @@ try{
   const context=await browser.newContext({viewport:{width,height:900},serviceWorkers:'block'});
   await context.addCookies([{name:'binso_demo',value:'1',url:base},{name:'binso_operator_demo',value:'1',url:base}]);
   await context.route('**/api/**',route=>{const pathname=new URL(route.request().url()).pathname;return route.fulfill({json:pathname==='/api/auth/session'?{authenticated:true,demo:true,user:{id:'fixture'},tenant:{id:'fixture',role:'owner',plan:'pro'}}:pathname==='/api/settings/profile'?{item:{display_name:'Fixture Person',language:locale}}:{items:[],tracker:null}})});
-  const page=await context.newPage();
-  const faults=[];page.on('pageerror',error=>faults.push(error.message));
-  await page.goto(base+'/?lang='+locale);await page.locator('.hero').waitFor();
+  const faults=[];
+  const trackedPage=async()=>{const next=await context.newPage();next.on('pageerror',error=>faults.push(error.message));return next};
+  let page=await trackedPage();
+  await page.goto(base+'/?lang='+locale,{waitUntil:'networkidle'});await page.locator('.hero').waitFor();
   assert.equal(await page.locator('html').getAttribute('lang'),locale+'-CH');
   const selector=page.locator('.locale-switcher select:visible').first();await selector.selectOption(locale==='en'?'fr':'en');
   const chosen=locale==='en'?'fr':'en';await page.waitForFunction(code=>document.documentElement.lang===code+'-CH',chosen);
-  await page.reload();assert.equal(await page.locator('html').getAttribute('lang'),chosen+'-CH','Choice survives reload');
+  await page.waitForLoadState('networkidle');await page.reload({waitUntil:'networkidle'});assert.equal(await page.locator('html').getAttribute('lang'),chosen+'-CH','Choice survives reload');
   for(const route of ['/?lang='+locale,'/dashboard?lang='+locale,'/operator?lang='+locale,'/wartung?lang='+locale,'/missing-localization-route?lang='+locale]){
-   await page.goto(base+route);await page.locator('h1').first().waitFor();
+   await page.waitForLoadState('networkidle');assert.deepEqual(faults,[],'No runtime failures before an isolated route reset');
+   page.removeAllListeners('pageerror');await page.close();page=await trackedPage();
+   await page.goto(base+route,{waitUntil:'networkidle'});await page.locator('h1').first().waitFor();
    // Public 404 is outside the locale-query matcher; the selected cookie remains authoritative.
    assert.equal(await page.locator('html').getAttribute('lang'),locale+'-CH');
    const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1);assert.equal(overflow,false,route+' '+locale+' '+width+' overflow');
