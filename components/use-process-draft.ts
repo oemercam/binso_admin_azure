@@ -6,7 +6,9 @@ import {useDataRevision} from '@/lib/client/use-api-query';
 
 /** One recovery owner: identity checked before reading; session fences clear it. */
 export function useProcessDraft<T>({process,value,dirty,enabled,onRestore}:{process:string;value:T;dirty:boolean;enabled:boolean;onRestore:(value:T)=>void}){
- const revision=useDataRevision(['/api/auth/session']);
+ // Query revalidation on focus/visibility is not an identity change. Only the
+ // private-session fence can revoke this draft's authenticated ownership.
+ const revision=useDataRevision([]);
  const [state,setState]=useState<{process:string;revision:string;key:string|null;ready:boolean}|null>(null);
  const latest=useRef({value,dirty,onRestore});
  useEffect(()=>{latest.current={value,dirty,onRestore}},[value,dirty,onRestore]);
@@ -14,6 +16,7 @@ export function useProcessDraft<T>({process,value,dirty,enabled,onRestore}:{proc
  const scopeRevision=useRef<string|null>(null);
  useEffect(()=>{
   if(!enabled){restored.current=null;discarded.current=false;return;}
+  if(!revision)return;
   if(scopeRevision.current!==null&&scopeRevision.current!==revision){discarded.current=true;return;}
   scopeRevision.current=revision;
   let active=true;
