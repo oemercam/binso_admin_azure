@@ -11,7 +11,14 @@ if(!process.env.BINSO_BASE_URL){
 }
 const browser=await chromium.launch({headless:true,...(process.env.BINSO_CHROMIUM_EXECUTABLE?{executablePath:process.env.BINSO_CHROMIUM_EXECUTABLE,args:['--no-sandbox','--disable-dev-shm-usage','--single-process']}: {})});
 try{
- const context=await browser.newContext({viewport:{width:375,height:812},colorScheme:'light',serviceWorkers:'allow'});
+ const context=await browser.newContext({viewport:{width:375,height:812},colorScheme:'light',serviceWorkers:'allow',
+  // Seed an existing PWA preference before navigation. Writing storage while
+  // ThemeRuntime hydrates races its initial system-theme persistence.
+  storageState:{cookies:[],origins:[{origin:new URL(base).origin,localStorage:[
+   {name:'binso.theme.mode',value:'dark'},
+   {name:'binso.privacy.preferences.v1',value:JSON.stringify({essential:true,performance:false,updatedAt:'2026-10-08'})}
+  ]}]}
+ });
  let authenticated=false,tracker=null,startedAt=0,mutations=0,entries=[];
  const savedTracker=()=>tracker?{...tracker,seconds:tracker.seconds+(tracker.state==='running'?Math.floor((Date.now()-startedAt)/1000):0)}:null;
  await context.route('**/api/**',async route=>{
@@ -32,7 +39,7 @@ try{
  });
  let page=await context.newPage();
  await page.goto(base+'/login');
- await page.evaluate(()=>{localStorage.setItem('binso.theme.mode','dark');localStorage.setItem('binso.privacy.preferences.v1',JSON.stringify({essential:true,performance:false,updatedAt:'2026-10-08'}))});
+ assert.equal(await page.locator('html').getAttribute('data-theme'),'dark','Stored theme is applied on the first navigation');
  await page.reload();await page.waitForFunction(()=>navigator.serviceWorker.controller!==null);
  assert.equal(await page.locator('html').getAttribute('data-theme'),'dark');
  await page.close();page=await context.newPage();await page.goto(base+'/login');
