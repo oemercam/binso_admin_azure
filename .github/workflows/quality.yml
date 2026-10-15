@@ -1,5 +1,5 @@
 name: Quality
-run-name: "Quality • ${{ github.event_name }} • ${{ inputs.level || 'standard' }}"
+run-name: "Quality • ${{ github.event_name }} • ${{ inputs.level || 'standard' }}${{ inputs.release_profile == 'development' && ' • development' || '' }}"
 on:
   push:
     branches: [main]
@@ -13,6 +13,11 @@ on:
         type: choice
         options: [standard, full]
         default: full
+      release_profile:
+        description: Acceptance scope (full coverage is unchanged)
+        type: choice
+        options: [production, development]
+        default: production
   schedule:
     - cron: '23 1 * * *'
   release:
@@ -353,14 +358,22 @@ jobs:
           path: evidence/ux/static
       - name: Generate individual requirement coverage and enforce measured failures
         env:
-          RELEASE_GATE: ${{ github.event_name == 'release' || inputs.level == 'full' }}
-          DEPLOYMENT_GATE: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'pull_request' && needs.plan.outputs.level == 'full' && needs.plan.outputs.browser == 'true') }}
+          QA_EVENT: ${{ github.event_name }}
+          QA_LEVEL: ${{ inputs.level }}
+          QA_RELEASE_PROFILE: ${{ inputs.release_profile || 'production' }}
+          QA_REF: ${{ github.ref }}
+          QA_PLANNED_LEVEL: ${{ needs.plan.outputs.level }}
+          QA_BROWSER: ${{ needs.plan.outputs.browser }}
         shell: bash
         run: |
           set -euo pipefail
-          EXTRA=()
-          if [ "$RELEASE_GATE" = true ]; then EXTRA+=(--release); fi
-          if [ "$DEPLOYMENT_GATE" = true ]; then EXTRA+=(--deployment-release); fi
+          node --input-type=module - <<'JS' > "$RUNNER_TEMP/qa-acceptance-flags"
+          import {qaAcceptance} from './scripts/qa-acceptance.mjs';
+          const decision=qaAcceptance({event:process.env.QA_EVENT,level:process.env.QA_LEVEL,profile:process.env.QA_RELEASE_PROFILE,ref:process.env.QA_REF,plannedLevel:process.env.QA_PLANNED_LEVEL,browser:process.env.QA_BROWSER==='true'});
+          if(decision.release)console.log('--release');
+          if(decision.deployment)console.log('--deployment-release');
+          JS
+          mapfile -t EXTRA < "$RUNNER_TEMP/qa-acceptance-flags"
           node scripts/compliance/visual.mjs evidence/ux ux-compliance/visual-baselines.v1.json evidence/ux/compliance-visual.json
           node scripts/compliance/report.mjs --static --gate "${EXTRA[@]}" evidence/ux --out docs/ux-compliance
       - name: Publish compliance report including failures and missing evidence

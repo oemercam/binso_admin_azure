@@ -99,13 +99,18 @@ assert.ok(resolverSource,'Production resolver is present');
 const resolveCandidate=new (Object.getPrototypeOf(async function(){}).constructor)('process','github','context','core',resolverSource);
 const candidateSha='a'.repeat(40),otherSha='b'.repeat(40);
 const successfulRun={id:42,head_sha:candidateSha,status:'completed',conclusion:'success',display_title:'Quality • workflow_dispatch • full'};
-async function probeResolver({sha=candidateSha,main=candidateSha,runs=[successfulRun]}={}){
+async function probeResolver({sha=candidateSha,main=candidateSha,runs=[successfulRun],profile='production'}={}){
  const output={};let queried=false;
  const github={rest:{repos:{getBranch:async()=>({data:{commit:{sha:main}}})},actions:{listWorkflowRuns:async input=>{queried=true;assert.equal(input.event,'workflow_dispatch');assert.equal(input.head_sha,sha);return {data:{workflow_runs:runs}}}}}};
- await resolveCandidate({env:{BINSO_DEPLOY_SHA:sha}},github,{repo:{owner:'fixture',repo:'fixture'}},{setOutput:(key,value)=>{output[key]=value}});
+ await resolveCandidate({env:{BINSO_DEPLOY_SHA:sha,BINSO_RELEASE_PROFILE:profile}},github,{repo:{owner:'fixture',repo:'fixture'}},{setOutput:(key,value)=>{output[key]=value}});
  assert.ok(queried);return output;
 }
 assert.deepEqual(await probeResolver(),{run_id:'42'});
+const developmentRun={...successfulRun,display_title:successfulRun.display_title+' • development'};
+assert.deepEqual(await probeResolver({profile:'development',runs:[developmentRun]}),{run_id:'42'});
+await assert.rejects(probeResolver({runs:[developmentRun]}),'Development evidence cannot satisfy production acceptance');
+await assert.rejects(probeResolver({profile:'development'}),'Production title cannot silently substitute an explicitly scoped development run');
+await assert.rejects(probeResolver({profile:'unknown'}));
 for(const input of [
  {sha:'main'}, {main:otherSha}, {runs:[]},
  {runs:[{...successfulRun,head_sha:otherSha}]},

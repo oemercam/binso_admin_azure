@@ -1,6 +1,6 @@
 # V24 – Konsolidierter Stand und verbleibende Arbeit
 
-Stand: 15.10.2026. Keine Produktionsfreigabe und keine vollständige V24-Abnahme.
+Stand: 15.10.2026. Aktualisierung: Nutzer hat am 15.10.2026 um 20:24:41 Europe/Zurich den Weg bis Deploy ausdrücklich freigegeben. Keine vollständige V24-/Produktionsabnahme; Details und Profiltrennung in ux-enforcement-phase.md. Historische Phasenangaben unten bleiben als damaliger Stand erkennbar.
 
 ## GitHub-Abgleich
 
@@ -56,8 +56,8 @@ Dies ist keine vollständige Buchführungsabnahme. Eigene Gutschriftdokumente/Ve
 
 1. Zusammenhängende Änderungen im Draft-PR entwickeln. Fast-/Integrationsprüfungen starten Browser nur mit `--browser`; statische, DB-, Security- und Build-Gates bleiben aktiv.
 2. Nach Abschluss des Pakets Ready for review setzen. Die bestehenden Browserjobs laufen für den tatsächlichen Kandidaten; Nacht-/Release-Gates bleiben erhalten.
-3. Tatsächlichen Main-Commit nach Integration manuell mit Quality `level=full` prüfen. Standardläufe können keinen vollständigen Freigabenachweis ersetzen.
-4. Nur nach ausdrücklicher Produktionsfreigabe Deploy manuell starten: vollständiger aktueller Main-SHA plus `approve_production=true`. Der Resolver verlangt den erfolgreichen manuellen Full-Lauf genau dieses SHAs. Derselbe geprüfte ZIP und Scanner werden übernommen. Kein automatisches Deployment nach Merge/Quality.
+3. Tatsächlichen Main-Commit nach Integration manuell mit Quality `level=full` prüfen. Den bestehenden begrenzten Entwicklungsumfang explizit mit `release_profile=development` wählen; Standard production bleibt strikt. Standardläufe können keinen vollständigen Freigabenachweis ersetzen.
+4. Nur nach ausdrücklicher Produktionsfreigabe Deploy manuell starten: vollständiger aktueller Main-SHA plus `approve_production=true` und exakt dasselbe release_profile wie im erfolgreichen Full-Lauf. Der Resolver verlangt den erfolgreichen manuellen Full-Lauf genau dieses SHAs. Derselbe geprüfte ZIP und Scanner werden übernommen. Kein automatisches Deployment nach Merge/Quality.
 
 ## Prüfstand dieser Fortsetzung
 

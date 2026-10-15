@@ -49,3 +49,11 @@ Befund UX24-RC-002: `.form-field` setzt in app.css einmal in der zentralen Grupp
 Historischer Paketnachweis auf Head 7b4b3b46: Quality 38778531197 vollständig erfolgreich, inklusive Chromium/WebKit/Scanner und Schlussgate. WebKit bestand erst im gezielten Wiederholungslauf; sporadischer Kunden-Recovery-Timeout bleibt offen. Der Nachweis gilt nicht automatisch für die neuen Tokenänderungen.
 
 Der atomare Vertrag hat nun 30 Regeln; vollständige fachliche UX-/V24-/Geräteabnahme bleibt offen. Diese Offenheit darf beim Entwicklungsdeploy nicht in eine behauptete vollständige Umsetzung umbenannt werden.
+
+### Vollständige Testabdeckung und expliziter Abnahmeumfang
+
+Befund UX24-RC-003: der Deploy-Resolver verlangt manuellen `level=full`, Quality setzte bei jedem solchen Lauf zwingend `--release`. Letzteres verlangt vollständige 432er-Produktionsabnahme; der bereits vorhandene gebundene Entwicklungsumfang setzt ausdrücklich `productionAcceptance:false` und lässt benannte Betriebs-/Gerätenachweise offen. Der geplante Entwicklungsdeploy war dadurch trotz bestandenem technischen Gate nicht ausführbar.
+
+Die manuelle Quality und der manuelle Deploy besitzen jetzt jeweils `release_profile`, Standard `production`. `production` und veröffentlichte Releases behalten die strikte Produktionsabnahme; nur die explizite Wahl `development` verwendet das bestehende unveränderte Entwicklungs-Deployment-Gate. **Testabdeckung bleibt full in beiden Profilen**, inklusive Browser, Scanner, DB, Security, Build, Zustandsfixtures und Schlussgate. Der Deploy verlangt denselben Profilnamen, Full-Lauf, aktuellen Main-SHA und dessen identische gebundene Artefakte. Ein Development-Lauf kann keine Production-Auswahl erfüllen. Der getestete Resolver verwirft Profilverwechslungen, falsche SHAs, fehlende/rote/Standard-/Push-Läufe und ungültige Profile. Kein Scope-Eintrag, Pflichtnachweis oder Produktionsdefault wurde entfernt.
+
+Dies liefert ausdrücklich keine vollständige Produktions-/V24-Abnahme. Vorhandene offene Pflichten verbleiben in Ledger und Issue #238; sie werden durch Deploy-Freigabe nicht erfüllt.

@@ -7,6 +7,11 @@ on:
         description: 'Exact current main SHA with a successful full Quality run'
         required: true
         type: string
+      release_profile:
+        description: 'Must match the successful full QA acceptance profile'
+        type: choice
+        options: [production, development]
+        default: production
       approve_production:
         description: 'Explicitly approve production migrations and deployment for this SHA'
         required: true
@@ -24,6 +29,7 @@ permissions:
 
 env:
   BINSO_DEPLOY_SHA: ${{ inputs.commit_sha }}
+  BINSO_RELEASE_PROFILE: ${{ inputs.release_profile || 'production' }}
   AZURE_WEBAPP_NAME: binso-admin-prod
   AZURE_RESOURCE_GROUP: rg-binso-admin-prod
   PRODUCTION_URL: https://binso-admin-prod-asctesfvhnd5b6ay.switzerlandnorth-01.azurewebsites.net
@@ -48,10 +54,13 @@ jobs:
           script: |
             const sha = process.env.BINSO_DEPLOY_SHA;
             if (!/^[a-f0-9]{40}$/.test(sha)) throw new Error('A full immutable commit SHA is required');
+            const profile = process.env.BINSO_RELEASE_PROFILE || 'production';
+            if (!['production','development'].includes(profile)) throw new Error('Unknown release acceptance profile');
+            const expectedTitle = 'Quality • workflow_dispatch • full' + (profile === 'development' ? ' • development' : '');
             const {data: branch} = await github.rest.repos.getBranch({...context.repo, branch: 'main'});
             if (branch.commit.sha !== sha) throw new Error('Only the current main commit may be promoted');
             const {data} = await github.rest.actions.listWorkflowRuns({...context.repo, workflow_id: 'quality.yml', branch: 'main', event: 'workflow_dispatch', head_sha: sha, per_page: 100});
-            const verified = data.workflow_runs.find(run => run.head_sha === sha && run.status === 'completed' && run.conclusion === 'success' && run.display_title === 'Quality • workflow_dispatch • full');
+            const verified = data.workflow_runs.find(run => run.head_sha === sha && run.status === 'completed' && run.conclusion === 'success' && run.display_title === expectedTitle);
             if (!verified) throw new Error('No successful full manual Quality run for this exact commit; migrations and deployment are blocked');
             core.setOutput('run_id', String(verified.id));
 
