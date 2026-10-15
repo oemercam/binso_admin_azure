@@ -48,7 +48,8 @@
     "ux:compliance:release": "node scripts/compliance/report.mjs --static --gate --release",
     "readiness:test": "node scripts/readiness-integrity-test.mjs",
     "db:runtime-check": "node scripts/check-runtime-db.mjs",
-    "ux:contract": "node scripts/ux-contract-check.mjs"
+    "ux:contract": "node scripts/ux-contract-check.mjs",
+    "qa:local:http": "node scripts/qa-local-http.mjs"
   },
   "dependencies": {
     "@swc/helpers": "0.5.23",
