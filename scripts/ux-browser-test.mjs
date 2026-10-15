@@ -330,9 +330,11 @@ try{
       assert.equal(await page.locator('.bo-statistics .bo-metric-tiles>.metric').count(),route==='/kunden/customer-one'?3:4,'The common foundation shows domain-appropriate primary metrics');
       assert.equal(await page.locator('.bo-statistics').count(),1,'One central statistics surface');
       assert.equal(await page.locator('.bo-statistics').evaluate(el=>getComputedStyle(el).backgroundColor),width<=1100?(theme==='light'?'rgb(255, 255, 255)':'rgb(20, 20, 20)'):(theme==='light'?'rgb(255, 255, 255)':'rgb(0, 0, 0)'),'Statistics follow the app surface on phone/tablet and page surface on desktop');
-      const trendToggle=page.getByRole('button',{name:'Zeitverlauf anzeigen',exact:true});if(await trendToggle.count())await trendToggle.click();
+      const trendToggle=page.getByRole('button',{name:'Zeitverlauf anzeigen',exact:true}),initiallyCollapsed=await trendToggle.count()>0;if(initiallyCollapsed)await trendToggle.click();
       assert.ok(process.env.BINSO_UX_FIXTURE_CASE==='empty'||await page.locator('.bo-statistics-line').evaluateAll(elements=>elements.some(el=>{const ys=Array.from({length:el.points.numberOfItems},(_,i)=>el.points.getItem(i).y);return Math.max(...ys)-Math.min(...ys)>20})),'Actual fixture values produce time-series lines');
       assert.equal(await page.locator('.revenue-insight,.dashboard-summary,.quick-section,.finance-overview-chart').count(),0,'Migrated pages have no competing KPI/chart layout');
+      // Preserve the actual initial disclosure state in the reference captures.
+      if(initiallyCollapsed)await page.getByRole('button',{name:'Zeitverlauf ausblenden',exact:true}).click();
     }
     if(!process.env.BINSO_UX_BASELINE&&route==='/mitarbeiter/employee-one'){await page.getByRole('heading',{name:'Mitarbeiterdetails',exact:true}).waitFor();await page.getByText(employee.email,{exact:true}).waitFor()}
     if(!process.env.BINSO_UX_BASELINE&&route==='/support/ticket-one'){

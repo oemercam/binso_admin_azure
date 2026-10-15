@@ -212,7 +212,6 @@
   }
   .customer-tab-panel,
   .employee-tab-panel,
-  .detail-grid>.surface,
   .settings-detail-grid>.surface,
   .detail-card{
     border-top:1px solid var(--color-line);
@@ -1260,7 +1259,7 @@
   .demo-summary-list>div{grid-template-columns:34px minmax(0,1fr)}
 
   /* Authenticated app shell */
-  .app-root:not(.app-preview) .page-head:not(.page-head-detail) h1{display:none}
+  .app-root:not(.app-preview) .page-head:not(.page-head-detail):not([data-heading-placement="content"]) h1{display:none}
   .app-demo-badge.mobile{display:none}
   .app-preview .page-container{
     padding-top:18px;
@@ -2089,7 +2088,7 @@ input:not([type="checkbox"]):not([type="radio"]),
   .mobile-position-summary>span{padding-left:0}
   .mobile-position-summary>svg{justify-self:end}
 
-.page-head:not(.page-head-detail){position:relative;min-height:64px;padding-right:56px}
+.page-head:not(.page-head-detail):not([data-heading-placement="content"]){position:relative;min-height:64px;padding-right:56px}
   .page-head:not(.page-head-detail) .page-actions{
     position:absolute;
     top:0;
@@ -2732,10 +2731,11 @@ input:not([type="checkbox"]):not([type="radio"]),
   :is(.page-container,.operator-app-content) :is(.surface,.detail-card,.customer-tab-panel,.employee-tab-panel) :is(.surface,.detail-card,.security-card){padding:0;border-radius:0;background:transparent}
   :is(.page-container,.operator-app-content) :is(.mobile-record-list,.desktop-record-table,.operator-table,.support-tablet-preview,.invoice-tablet-preview){border:0;border-radius:var(--app-group-radius);background:var(--app-surface)}
   :is(.page-container,.operator-app-content) .mobile-record-list{padding-inline:16px}
+  .bo-metric-tiles[data-desktop-only]{display:none}
   :is(.page-container,.operator-app-content) .metric{background:var(--app-surface);border-radius:16px}
   :is(.page-container,.operator-app-content) .bo-statistics{--statistics-bg:var(--app-surface);border-radius:var(--app-group-radius)}
   :is(.page-container,.operator-app-content) :is(.detail-list dd,.operator-detail-list strong){overflow-wrap:anywhere}
-  :is(.page-container,.operator-app-content,.bottom-sheet,.header-panel) .searchbox{background:var(--app-chrome);border-color:var(--app-control-border);border-radius:999px}
+  :is(.page-container,.operator-app-content,.bottom-sheet,.header-panel) .searchbox{background:var(--app-chrome);border-color:var(--app-control-border);border-radius:var(--app-control-radius)}
   :is(.page-container,.operator-app-content,.bottom-sheet,.header-panel) .searchbox:focus-within{border-color:var(--app-accent)}
   :is(.page-container,.operator-app-content,.bottom-sheet,.header-panel) :is(.form-control,.form-textarea){background:var(--app-chrome)}
   :is(.page-container,.operator-app-content,.bottom-sheet,.header-panel) :is(.form-control,.form-textarea)[aria-invalid="true"]{border-color:var(--status-danger-fg)}
@@ -2779,7 +2779,7 @@ input:not([type="checkbox"]):not([type="radio"]),
   :is(.support-detail-workspace,.operator-thread) .message>div{font-size:14px;line-height:1.6}
   :is(.support-detail-workspace,.operator-thread) .message-user>div{padding:12px 16px;border-radius:22px;background:var(--app-accent-soft);color:var(--app-text)}
   :is(.support-detail-workspace,.operator-thread) .message-support>div{background:transparent;padding-inline:0;border-radius:0}
-  .app-root:not(.app-preview) .page-head:not(.page-head-detail) h1{display:none}
+  .app-root:not(.app-preview) .page-head:not(.page-head-detail):not([data-heading-placement="content"]) h1{display:none}
   .app-sidebar,.desktop-appbar{display:none}
   .app-main{margin-left:0;width:100%}
   .mobile-header{border-bottom:0}
@@ -2788,7 +2788,8 @@ input:not([type="checkbox"]):not([type="radio"]),
   .mobile-dock>nav{flex:1;min-width:0}
   .mobile-dock-action{flex:none}
   .mobile-dock.is-compact .dock-create-action{width:var(--mobile-nav-compact-h);height:var(--mobile-nav-compact-h)}
-  .page-head:not(.page-head-detail) .page-actions{position:static;inset:auto;width:100%;box-shadow:none;display:flex}
+  .page-head:not(.page-head-detail) .page-actions{position:static;inset:auto;width:auto;flex:0 0 auto;box-shadow:none;display:flex}
+  .page-head:not(.page-head-detail):not([data-heading-placement="content"]) .page-actions{width:100%}
   .page-head:not(.page-head-detail) .bo-page-heading-main{width:100%}
   .page-head:not(.page-head-detail):has(.records-inline-controls) .bo-page-heading>p{display:none}
   .records-inline-controls{width:100%;min-width:0}

@@ -54,6 +54,7 @@ function accessFromSession(session:ClientSession|null){return session?.authentic
 function AppShellFrame({
   title,
   titleIsUserContent=false,
+  headingPlacement="header",
   subtitle,
   active,
   children,
@@ -69,6 +70,7 @@ function AppShellFrame({
 }: {
   title: string;
   titleIsUserContent?:boolean;
+  headingPlacement?:"header"|"content";
   status?: React.ReactNode;
   statusTone?: "neutral"|"success"|"warning"|"danger"|"info";
   subtitle?: string;
@@ -345,7 +347,7 @@ function AppShellFrame({
         </div>}
       </div>
       <AppHeader className={backHref ? "mobile-header mobile-header-detail" : "mobile-header"} detail={!!backHref} leadingClassName="mobile-header-leading" leading={<>
-        {backHref ? <Link className="mobile-back" href={backHref} aria-label={backLabel}><Icon name="back"/></Link> : <><Link href="/dashboard" className="mobile-header-brand" aria-label="Zur Übersicht"><Logo compact/></Link><h1 className="mobile-section-title"><LocalizedText verbatim={titleIsUserContent}>{title}</LocalizedText></h1></>}
+        {backHref ? <Link className="mobile-back" href={backHref} aria-label={backLabel}><Icon name="back"/></Link> : <><Link href="/dashboard" className="mobile-header-brand" aria-label="Zur Übersicht"><Logo compact/></Link>{headingPlacement==="header"&&<h1 className="mobile-section-title"><LocalizedText verbatim={titleIsUserContent}>{title}</LocalizedText></h1>}</>}
         {backHref&&<h1 className="mobile-header-title"><span><LocalizedText verbatim={titleIsUserContent}>{title}</LocalizedText></span>{status!=null&&<Status tone={statusTone}>{status}</Status>}</h1>}
       </>} actionClassName={backHref?"mobile-detail-actions":"mobile-header-actions"} actions={backHref ? (allowed&&(mobileActions||visibleActions)?mobileActions??visibleActions:undefined) : <>
         <IconButton label="Suche" icon="search" onClick={()=>setSheet("search")}/>
@@ -356,7 +358,7 @@ function AppShellFrame({
       </AppHeader>
 
       <main className="page-container" data-section={active}>
-        <div className={backHref ? "page-head page-head-detail" : "page-head"}>
+        <div className={backHref ? "page-head page-head-detail" : "page-head"} data-heading-placement={headingPlacement}>
           {backHref ? <DetailHeading verbatimTitle={titleIsUserContent} title={title} subtitle={subtitle} status={status} tone={statusTone} action={visibleActions&&allowed?<div className="page-actions">{visibleActions}</div>:undefined} leading={<Link className="desktop-back" href={backHref} aria-label={backLabel}><Icon name="back" size={16}/></Link>}/> : <PageHeading verbatimTitle={titleIsUserContent} title={title} description={subtitle} action={visibleActions&&allowed?<div className="page-actions">{visibleActions}</div>:undefined}/> }
         </div>
         {accessError?<div role="alert"><p><LocalizedText>{accessError}</LocalizedText></p><div className="filter-sheet-actions"><Button onClick={()=>{invalidateClientSession();setAccessError(null);setAccessRetry(value=>value+1)}}><LocalizedText>{"Erneut versuchen"}</LocalizedText></Button><Link className="button button-secondary" href="/login"><LocalizedText>{"Anmelden"}</LocalizedText></Link></div></div>:(!access||allowed)?children:<EmptyState icon="lock" title="Kein Zugriff" text="Diese Seite ist für deine Rolle oder deinen Plan nicht verfügbar."/>}
@@ -406,10 +408,10 @@ const ShellRegistration=createContext<((configuration:ShellConfiguration)=>void)
  * the mounted frame, navigation, session and timer across route transitions. */
 export function AppShell(props:ShellProps){
  const register=useContext(ShellRegistration),pathname=usePathname();
- const {title,titleIsUserContent,subtitle,active,actions,mobileActions,backHref,backLabel,preview,editing,unsavedChanges,status,statusTone}=props;
+ const {title,titleIsUserContent,headingPlacement,subtitle,active,actions,mobileActions,backHref,backLabel,preview,editing,unsavedChanges,status,statusTone}=props;
  useLayoutEffect(()=>{
-  register?.({pathname,title,titleIsUserContent,subtitle,active,actions,mobileActions,backHref,backLabel,preview,editing,unsavedChanges,status,statusTone});
- },[register,pathname,title,titleIsUserContent,subtitle,active,actions,mobileActions,backHref,backLabel,preview,editing,unsavedChanges,status,statusTone]);
+  register?.({pathname,title,titleIsUserContent,headingPlacement,subtitle,active,actions,mobileActions,backHref,backLabel,preview,editing,unsavedChanges,status,statusTone});
+ },[register,pathname,title,titleIsUserContent,headingPlacement,subtitle,active,actions,mobileActions,backHref,backLabel,preview,editing,unsavedChanges,status,statusTone]);
  return register?props.children:<AppShellFrame {...props}/>;
 }
 const appSections:Record<string,string>={berichte:"Berichte",projekte:"Aufträge / Projekte",dashboard:"Übersicht",kunden:"Kunden",angebote:"Angebote",rechnungen:"Rechnungen",zahlungen:"Zahlungen",produkte:"Produkte",mitarbeiter:"Mitarbeiter",spesen:"Spesen",zeit:"Zeiterfassung",support:"Support",einstellungen:"Einstellungen",belege:"Belege",benachrichtigungen:"Benachrichtigungen",finanzen:"Finanzen"};

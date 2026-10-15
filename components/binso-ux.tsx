@@ -71,8 +71,8 @@ export function DetailHeading({ title, status, tone = "neutral", subtitle, leadi
   </div>;
 }
 
-export function MetricTiles({ children, columns=4 }: { children: ReactNode;columns?:2|3|4 }) {
-  return <div className="metrics-grid bo-metric-tiles" style={{"--metric-columns":columns} as CSSProperties}>{children}</div>;
+export function MetricTiles({ children, columns=4, desktopOnly=false }: { children: ReactNode;columns?:2|3|4;desktopOnly?:boolean }) {
+  return <div className="metrics-grid bo-metric-tiles" data-desktop-only={desktopOnly||undefined} style={{"--metric-columns":columns} as CSSProperties}>{children}</div>;
 }
 
 export function MetricTile({ label, value, hint }: { label: string; value: ReactNode; hint?:string }) {

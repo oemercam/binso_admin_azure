@@ -29,6 +29,12 @@ export async function captureReferenceViews(browser,output){
     await page.screenshot({path:path.join(destination,'desktop-customer-detail-1440.png'),fullPage:true});
     await page.locator('#bm-back').click();
     await page.screenshot({path:path.join(destination,'desktop-customers-1440.png'),fullPage:true});
+   }else if(name==='mobile-app'){
+    await page.screenshot({path:path.join(destination,name+'-1440.png'),fullPage:true});
+    await page.locator('#ba-pages').selectOption('customers');
+    await page.screenshot({path:path.join(destination,'mobile-customers-1440.png'),fullPage:true});
+    await page.locator('[data-customer]').first().click();
+    await page.screenshot({path:path.join(destination,'mobile-customer-detail-1440.png'),fullPage:true});
    }else await page.screenshot({path:path.join(destination,name+'-1440.png'),fullPage:true});
   }
  }finally{await context.close()}

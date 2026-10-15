@@ -1,0 +1,21 @@
+{
+  "baseline": "c88a581e7bf952a0da9923a58f1e229c67c28986",
+  "sourceFingerprint": "cba699b842af7896feacea1727fcc8434938f7c214ca987d052daa203af4435d",
+  "scope": "Synthetic API fixtures; Chromium 153; 1440/390 light/dark; matrix checks, no full interaction or production acceptance",
+  "files": {
+    "dark-1440-_kunden.png": "91442165c815cf358572435f4c28be66a23681629787d497a727e48c02aff86b",
+    "dark-1440-_kunden_customer-one.png": "43580dc601a6472e1534879832f29ecad46e4caf8687c321ca5fd08a8b387d0d",
+    "dark-1440-_login.png": "66df0e12b7101492c879b03459410be8052f95efe5a2623bb1223e37bc9f6e28",
+    "dark-390-_kunden.png": "e3ca53f9b90ed290f896e6e244c11688833e2bc60913cd4f7ed8654ffb262782",
+    "dark-390-_kunden_customer-one.png": "fdceb37adf197cf5135f7f5d4f4246c97e4f5e8c9e9d13f67bf2a81a1bdeafb8",
+    "dark-390-_login.png": "6a46e46be1fba6d095ea6a2562a79a9eb279865d97e34af1b48fc9e84dc64802",
+    "light-1440-_kunden.png": "0fd4b525e2ae2392e2c811cdea08dea465641a9c63bd1564ae1fe8ec2bee932b",
+    "light-1440-_kunden_customer-one.png": "b2dbe310fd137ec4ffdf52c8494920a39fb6a16cf7501348f684227542042c87",
+    "light-1440-_login.png": "62d0036a999ab55939a9df96eb8253eb182e816d7f74ac1c11c08d92156b0ae2",
+    "light-390-_kunden.png": "4e6615ec903d0f50c7bba9c7f6fb94b9834fee8711b93aa4dc100adfce24719a",
+    "light-390-_kunden_customer-one.png": "7ce4c6eed8d17893153aaa96964d1c471de29987a8ad80e5969bef557dee35b2",
+    "light-390-_login.png": "98cd78fd8902a941022848baf9ebcbfbe528585c5e90c64d3eb317d19b5b7359",
+    "results-chromium-light,dark.json": "fa9a6ef45e4365af4076428d4a4bdebc32652a1b243846757e7b54f410bda7c1",
+    "results-light,dark.json": "fa9a6ef45e4365af4076428d4a4bdebc32652a1b243846757e7b54f410bda7c1"
+  }
+}

@@ -5829,6 +5829,21 @@
     "Aucun collaborateur",
     "Nessun collaboratore"
   ],
+  "Aktive Kunden": [
+    "Active customers",
+    "Clients actifs",
+    "Clienti attivi"
+  ],
+  "Keine offenen Vorgänge": [
+    "No open items",
+    "Aucune opération ouverte",
+    "Nessuna operazione aperta"
+  ],
+  "Offene Vorgänge": [
+    "Open items",
+    "Opérations ouvertes",
+    "Operazioni aperte"
+  ],
   "Keine offenen Rechnungen": [
     "No open invoices",
     "Aucune facture ouverte",
