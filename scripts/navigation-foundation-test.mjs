@@ -1,3 +1,4 @@
+import {withoutLocalization} from "./localized-source.mjs";
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
@@ -9,7 +10,7 @@ const hash=value=>createHash('sha256').update(JSON.stringify(value)).digest('hex
 export function navigationFoundation(read){
  const markup=[],logic=[],icons=[],rules=[],variables=[];
  for(const file of ['components/app-shell.tsx','components/operator.tsx','components/ui.tsx','components/app-chrome.tsx']){
-  const ast=ts.createSourceFile(file,read(file),99,true,4);
+  const ast=ts.createSourceFile(file,withoutLocalization(read(file)),99,true,4);
   function visit(node){
    if(ts.isJsxElement(node)&&node.openingElement.tagName.getText(ast)==='nav'&&/bottom-nav|operator-mobile-nav/.test(node.openingElement.attributes.getText(ast)))markup.push({file,source:ts.isBinaryExpression(node.parent)?node.parent.getText(ast):node.getText(ast)});
    if(ts.isVariableDeclaration(node)&&/^(formActive|canOpen|\[navCompact,|operatorNav\b|operatorNavGroups\b|\[key,\s*detail\])/.test(node.name.getText(ast)))logic.push({file,source:node.getText(ast)});

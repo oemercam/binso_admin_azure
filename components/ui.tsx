@@ -1,4 +1,5 @@
 "use client";
+import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
 import {usePageAccess} from "@/lib/client/page-access";
 import {Children,cloneElement,isValidElement,useId} from "react";
 import Link from "next/link";
@@ -58,16 +59,19 @@ export function Icon({ name, size = 20 }: { name: string; size?: number }) {
     "eye-off": <><path d="m3 3 18 18"/><path d="M10.6 6.2A10.7 10.7 0 0 1 12 6c6 0 9.5 6 9.5 6a16 16 0 0 1-2.1 2.7M6.6 6.6C4 8.3 2.5 12 2.5 12s3.5 6 9.5 6a9.8 9.8 0 0 0 3.4-.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></>,
   };
 
-  return <svg {...common}>{paths[name] ?? paths.file}</svg>;
+  return <svg {...common}><LocalizedText>{paths[name] ?? paths.file}</LocalizedText></svg>;
 }
 
 export function Logo({ dark = false, compact = false }: { dark?: boolean; compact?: boolean }) {
-  return <img className={compact ? "logo logo-compact" : "logo"} src={dark ? (compact ? "/brand/icon-white.svg" : "/brand/logo-white.svg") : (compact ? "/brand/icon-black.svg" : "/brand/logo-black.svg")} alt="Binso" />;
+  return <LocalizedElement as="img" className={compact ? "logo logo-compact" : "logo"} src={dark ? (compact ? "/brand/icon-white.svg" : "/brand/logo-white.svg") : (compact ? "/brand/icon-black.svg" : "/brand/logo-black.svg")} alt="Binso" />;
 }
 
 export function Status({ children, tone = "neutral" }: { children: React.ReactNode; tone?: "neutral" | "success" | "warning" | "danger" | "info" }) {
-  return <span className={`status status-${tone}`}>{children}</span>;
+  return <span className={`status status-${tone}`}><LocalizedText>{children}</LocalizedText></span>;
 }
+
+function actionSourceText(nodes:React.ReactNode):string{return Children.toArray(nodes).map(node=>typeof node==='string'?node:isValidElement<{children?:React.ReactNode}>(node)?actionSourceText(node.props.children):'').join('');}
+const dismissActionLabels=new Set(['Abbrechen','Schliessen','Cancel','Close','Annuler','Fermer','Annulla','Chiudi']);
 
 export function Button({
   href,
@@ -99,8 +103,8 @@ export function Button({
   disabled=disabled||requiresWrite&&!access.write;
   if(href&&!access.canOpen(href))return null;
   const cls = `button button-${variant} ${className}`.trim();
-  const body = <>{icon && <Icon name={icon} size={17} />}{children != null && children !== "" && <span>{children}</span>}</>;
-  return href && !disabled ? <Link {...ariaProps} className={cls} href={href} aria-label={ariaLabel??ariaProps['aria-label']}>{body}</Link> : <button {...ariaProps} className={cls} onClick={onClick} type={type} form={form} disabled={disabled} aria-label={ariaLabel??ariaProps['aria-label']}>{body}</button>;
+  const body = <>{icon && <Icon name={icon} size={17} />}{children != null && children !== "" && <span><LocalizedText>{children}</LocalizedText></span>}</>;
+  return href && !disabled ? <Link {...ariaProps} className={cls} href={href} aria-label={ariaLabel??ariaProps['aria-label']}>{body}</Link> : <LocalizedElement as="button" data-sheet-dismiss={dismissActionLabels.has(actionSourceText(children).trim())||undefined} {...ariaProps} className={cls} onClick={onClick} type={type} form={form} disabled={disabled} aria-label={ariaLabel??ariaProps['aria-label']}>{body}</LocalizedElement>;
 }
 
 /** Related-record navigation must consume access inside the AppShell provider. */
@@ -110,30 +114,30 @@ export function AccessLink({href,children,fallback=null,className}:{href:string;
 }
 
 export function IconButton({ label, icon, onClick }: { label: string; icon: string; onClick?: () => void }) {
-  return <button className="icon-button" type="button" aria-label={label} onClick={onClick}><Icon name={icon}/></button>;
+  return <LocalizedElement as="button" className="icon-button" type="button" aria-label={label} onClick={onClick}><Icon name={icon}/></LocalizedElement>;
 }
 
 export function Metric({ label, value, hint, icon }: { label: string; value: React.ReactNode; hint?: string; icon?: string }) {
-  return <div className="metric"><div className="metric-top"><FormLabel>{label}</FormLabel>{icon && <Icon name={icon} size={18}/>}</div><strong>{value}</strong>{hint && <small>{hint}</small>}</div>;
+  return <div className="metric"><div className="metric-top"><FormLabel><LocalizedText>{label}</LocalizedText></FormLabel>{icon && <Icon name={icon} size={18}/>}</div><strong>{value}</strong>{hint && <small><LocalizedText>{hint}</LocalizedText></small>}</div>;
 }
 
 export function SectionTitle({ title, action }: { title: string; action?: React.ReactNode }) {
-  return <div className="section-title"><h2>{title}</h2>{action}</div>;
+  return <div className="section-title"><h2><LocalizedText>{title}</LocalizedText></h2>{action}</div>;
 }
 
 /** Native controls keep browser autofill and validation, with one shared field contract. */
 export function Input(props:React.ComponentProps<"input">){
  const sized=!props.hidden&&!['checkbox','radio','file','hidden','range','color','button','submit','reset','image'].includes(props.type??'text');
- return <input {...props} className={[props.className,sized?'form-control':undefined].filter(Boolean).join(' ')||undefined}/>;
+ return <LocalizedElement as="input" {...props} className={[props.className,sized?'form-control':undefined].filter(Boolean).join(' ')||undefined}/>;
 }
-export function Select(props:React.ComponentProps<"select">){return <select {...props} className={[props.className,'form-control'].filter(Boolean).join(' ')}/>}
-export function Textarea(props:React.ComponentProps<"textarea">){return <textarea {...props} className={[props.className,'form-textarea'].filter(Boolean).join(' ')}/>}
+export function Select(props:React.ComponentProps<"select">){return <LocalizedElement as="select" {...props} className={[props.className,'form-control'].filter(Boolean).join(' ')}/>}
+export function Textarea(props:React.ComponentProps<"textarea">){return <LocalizedElement as="textarea" {...props} className={[props.className,'form-textarea'].filter(Boolean).join(' ')}/>}
 export function Checkbox(props:Omit<React.ComponentProps<"input">,"type">){return <Input {...props} type="checkbox"/>}
 export function DateInput(props:Omit<React.ComponentProps<"input">,"type">){return <Input {...props} type="date"/>}
 export function TimeInput(props:React.ComponentProps<"input">){return <Input inputMode="text" placeholder="HH:MM" {...props}/>}
 export function CurrencyInput(props:React.ComponentProps<"input">){return <Input inputMode="decimal" {...props}/>}
-export function FormLabel({children,id}:{children:React.ReactNode;id?:string}){return <span id={id}>{children}</span>}
-export function FormError({children,id}:{children?:React.ReactNode;id?:string}){return children?<span className="form-error" id={id} role="alert">{children}</span>:null}
+export function FormLabel({children,id}:{children:React.ReactNode;id?:string}){return <span id={id}><LocalizedText>{children}</LocalizedText></span>}
+export function FormError({children,id}:{children?:React.ReactNode;id?:string}){return children?<span className="form-error" id={id} role="alert"><LocalizedText>{children}</LocalizedText></span>:null}
 /** Logical field groups share spacing and headings across editors and wizard steps. */
 export function FormSection({title,children,hidden=false}:{title?:string;children:React.ReactNode;hidden?:boolean}){
  return <section className="form-section" hidden={hidden}>{title&&<SectionTitle title={title}/>} {children}</section>;
@@ -157,12 +161,12 @@ export function Field({ label, children, className = "",allowReadOnlyInput=false
   });
   const fields=decorate(children);
   const inline=Children.toArray(children).some(child=>isValidElement<Record<string,unknown>>(child)&&((child.type==='input'||child.type===Input)&&['checkbox','radio'].includes(String(child.props.type))||child.type===Checkbox));
-  return <label className={`form-field ${inline?'form-check ':''}${className}`.trim()}>{inline?fields:<FormLabel id={`${id}-label`}>{label}</FormLabel>}{inline?<FormLabel id={`${id}-label`}>{label}</FormLabel>:fields}{hint&&<small id={`${id}-hint`}>{hint}</small>}<FormError id={`${id}-error`}>{error}</FormError></label>;
+  return <label className={`form-field ${inline?'form-check ':''}${className}`.trim()}>{inline?fields:<FormLabel id={`${id}-label`}><LocalizedText>{label}</LocalizedText></FormLabel>}{inline?<FormLabel id={`${id}-label`}><LocalizedText>{label}</LocalizedText></FormLabel>:fields}{hint&&<small id={`${id}-hint`}><LocalizedText>{hint}</LocalizedText></small>}<FormError id={`${id}-error`}>{error}</FormError></label>;
 }
 
 export function EmptyState({ icon = "file", title, text, action, compact=false }: { icon?: string; title: string; text: string; action?: React.ReactNode; compact?:boolean }) {
-  if(compact)return action?<div className="empty-list-state" data-empty-state="compact"><p role="status">{title}</p>{action}</div>:<p role="status" data-empty-state="compact">{title}</p>;
-  return <div className="empty-state"><span className="empty-icon"><Icon name={icon} size={22}/></span><h3>{title}</h3><p>{text}</p>{action}</div>;
+  if(compact)return action?<div className="empty-list-state" data-empty-state="compact"><p role="status"><LocalizedText>{title}</LocalizedText></p>{action}</div>:<p role="status" data-empty-state="compact"><LocalizedText>{title}</LocalizedText></p>;
+  return <div className="empty-state"><span className="empty-icon"><Icon name={icon} size={22}/></span><h3><LocalizedText>{title}</LocalizedText></h3><p><LocalizedText>{text}</LocalizedText></p>{action}</div>;
 }
 
 export function Divider() {
@@ -170,14 +174,14 @@ export function Divider() {
 }
 
 export function Toggle({ checked = false, label, onChange,disabled=false }: { checked?: boolean; label: string; onChange?: () => void;disabled?:boolean }) {
-  return <button className={`toggle ${checked ? "is-on" : ""}`} disabled={disabled} type="button" role="switch" aria-checked={checked} aria-label={label} onClick={onChange}><span/></button>;
+  return <LocalizedElement as="button" className={`toggle ${checked ? "is-on" : ""}`} disabled={disabled} type="button" role="switch" aria-checked={checked} aria-label={label} onClick={onChange}><span/></LocalizedElement>;
 }
 
 export function Toast({ title, text, tone = "success",inline=false,actionLabel,onAction }: { title: string; text?: string; tone?: "success" | "danger" | "info";inline?:boolean;actionLabel?:string;onAction?:()=>void }) {
   return <div className={`${inline?"inline-feedback":"toast"} toast-${tone}`} role="status">
     <span className="toast-icon"><Icon name={tone === "danger" ? "close" : tone === "info" ? "bell" : "check"} size={16}/></span>
-    <div><b>{title}</b>{text && <small>{text}</small>}</div>
-    {onAction&&actionLabel&&<button type="button" className="text-action" onClick={onAction}>{actionLabel}</button>}
+    <div><b><LocalizedText>{title}</LocalizedText></b>{text && <small><LocalizedText>{text}</LocalizedText></small>}</div>
+    {onAction&&actionLabel&&<button type="button" className="text-action" onClick={onAction}><LocalizedText>{actionLabel}</LocalizedText></button>}
   </div>;
 }
 
@@ -187,15 +191,15 @@ export function Skeleton({ className = "" }: { className?: string }) {
 
 /** Content loading keeps the current shell and never starts a second splash. */
 export function LoadingState({children="Daten werden geladen …",className}:{children?:React.ReactNode;className?:string}){
-  return <p role="status" className={className}>{children}</p>;
+  return <p role="status" className={className}><LocalizedText>{children}</LocalizedText></p>;
 }
 
 /** Retry remains local to the owning data source; callers retain their error text. */
 export function ErrorState({children,onRetry,retryLabel="Erneut versuchen",className}:{children:React.ReactNode;onRetry?:()=>void;retryLabel?:string;className?:string}){
-  return onRetry?<div role="alert" className={className}><p>{children}</p><Button variant="secondary" onClick={onRetry}>{retryLabel}</Button></div>:<p role="alert" className={className}>{children}</p>;
+  return onRetry?<div role="alert" className={className}><p><LocalizedText>{children}</LocalizedText></p><Button variant="secondary" onClick={onRetry}><LocalizedText>{retryLabel}</LocalizedText></Button></div>:<p role="alert" className={className}><LocalizedText>{children}</LocalizedText></p>;
 }
 
 /** Customer and operator conversations share one bubble; direction is contextual. */
 export function MessageBubble({children,author,time,outgoing=false,internal=false}:{children:React.ReactNode;author?:React.ReactNode;time:React.ReactNode;outgoing?:boolean;internal?:boolean}){
-  return <article className={outgoing?"message message-user":"message message-support"}>{author&&<span>{author}</span>}<div>{children}</div><small>{time}{internal&&<> · <Status>Intern</Status></>}</small></article>;
+  return <article className={outgoing?"message message-user":"message message-support"}>{author&&<span>{author}</span>}<div>{children}</div><small>{time}{internal&&<> · <Status><LocalizedText>{"Intern"}</LocalizedText></Status></>}</small></article>;
 }

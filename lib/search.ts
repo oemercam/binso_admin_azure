@@ -8,6 +8,7 @@ export const searchSources = [
   {module:"zahlungen",table:"payments",type:"Zahlung",href:"/zahlungen",icon:"wallet"},
   {module:"produkte",table:"products",type:"Produkt",href:"/produkte",icon:"box"},
   {module:"personal",table:"employees",type:"Mitarbeiter",href:"/mitarbeiter",icon:"users"},
+  {module:"projekte",table:"projects",type:"Projekt",href:"/projekte",icon:"box"},
   {module:"spesen",table:"expenses",type:"Spese",href:"/spesen",icon:"card"},
 ] as const;
 

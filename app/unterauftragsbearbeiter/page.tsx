@@ -1,3 +1,4 @@
+import {LocalizedText} from "@/lib/client/locale";
 import type {Metadata} from "next";
 import {LegalPage} from "@/components/legal-page";
 import {legalConfig} from "@/config/legal";
@@ -11,8 +12,8 @@ const processors=[
 
 export default function Page(){
  return <LegalPage eyebrow="DATENSCHUTZ" title="Unterauftragsbearbeiter" intro="Wesentliche externe Dienstleister, die Binso One beim sicheren Betrieb, bei Zahlungen und beim E-Mail-Versand unterstützen.">
-  <section><h2>Aktuelle Liste</h2><div className="legal-processor-list">{processors.map(p=><article key={p.name}><h3>{p.name}</h3><dl><div><dt>Zweck</dt><dd>{p.purpose}</dd></div><div><dt>Bearbeitungsort</dt><dd>{p.location}</dd></div><div><dt>Auslandtransfer</dt><dd>{p.transfer}</dd></div></dl></article>)}</div></section>
-  <section><h2>Änderungen</h2><p>Binso kann diese Liste anpassen, wenn Dienstleister ersetzt oder zusätzliche Dienste für den Betrieb erforderlich werden. Wesentliche Änderungen werden so kommuniziert, dass Geschäftskunden ihre datenschutzrechtlichen Pflichten wahrnehmen können.</p></section>
-  <p className="legal-version">Stand: {legalConfig.versionDate}</p>
+  <section><h2><LocalizedText>{"Aktuelle Liste"}</LocalizedText></h2><div className="legal-processor-list">{processors.map(p=><article key={p.name}><h3>{p.name}</h3><dl><div><dt><LocalizedText>{"Zweck"}</LocalizedText></dt><dd>{p.purpose}</dd></div><div><dt><LocalizedText>{"Bearbeitungsort"}</LocalizedText></dt><dd>{p.location}</dd></div><div><dt><LocalizedText>{"Auslandtransfer"}</LocalizedText></dt><dd>{p.transfer}</dd></div></dl></article>)}</div></section>
+  <section><h2><LocalizedText>{"Änderungen"}</LocalizedText></h2><p><LocalizedText>{"Binso kann diese Liste anpassen, wenn Dienstleister ersetzt oder zusätzliche Dienste für den Betrieb erforderlich werden. Wesentliche Änderungen werden so kommuniziert, dass Geschäftskunden ihre datenschutzrechtlichen Pflichten wahrnehmen können."}</LocalizedText></p></section>
+  <p className="legal-version"><LocalizedText>{"Stand: "}</LocalizedText>{legalConfig.versionDate}</p>
  </LegalPage>;
 }

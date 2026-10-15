@@ -16,3 +16,15 @@ drafts.writeProcessDraft(storage,key,value);storage.setItem('unrelated-preferenc
 globalThis.window={sessionStorage:storage};drafts.clearProcessDrafts();assert.equal(storage.getItem(key),null);assert.equal(storage.getItem('unrelated-preference'),'light');delete globalThis.window;
 const events=await fs.readFile('lib/client/data-events.ts','utf8');assert.match(events,/resetClientData[^\n]*clearProcessDrafts\(\)/,'Every local and remote session fence clears drafts');
 console.log('Process recovery: editable input/step/replay retained; user/tenant/role isolation, expiry, corruption, quota handling and session-fence purge passed.');
+
+const channel=globalThis.BroadcastChannel;globalThis.BroadcastChannel=undefined;
+const callbacks=new Map();globalThis.window={sessionStorage:storage,addEventListener(){}};globalThis.document={visibilityState:'visible',addEventListener:(name,callback)=>callbacks.set(name,callback)};
+try{
+ const draftModule=moduleUrl(await fs.readFile('lib/client/process-draft.ts','utf8')),listModule=moduleUrl(await fs.readFile('lib/client/list-state.ts','utf8'));
+ const eventModule=await import(moduleUrl(events.replace("'./process-draft'",JSON.stringify(draftModule)).replace("'./list-state'",JSON.stringify(listModule))));
+ eventModule.subscribeClientData(()=>{});const identityBefore=eventModule.dataRevision(['/api/auth/session']),sessionBefore=eventModule.dataRevision([]);
+ drafts.writeProcessDraft(storage,key,value);callbacks.get('visibilitychange')();
+ assert.notEqual(eventModule.dataRevision(['/api/auth/session']),identityBefore,'Returning to the app revalidates identity queries');assert.equal(eventModule.dataRevision([]),sessionBefore,'Routine revalidation is not a session fence');assert.deepEqual(drafts.readProcessDraft(storage,key),value,'Routine revalidation retains editable input');
+ eventModule.resetClientData(false);assert.notEqual(eventModule.dataRevision([]),sessionBefore);assert.equal(storage.getItem(key),null,'An actual identity/tenant/role fence still clears private drafts');
+ console.log('Draft ownership: app visibility revalidates queries without changing the private-session fence; actual session changes purge input.');
+}finally{globalThis.BroadcastChannel=channel;delete globalThis.window;delete globalThis.document}

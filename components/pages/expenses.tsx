@@ -1,4 +1,6 @@
 "use client";
+import {useProcessDraft} from "../use-process-draft";
+import {LocalizedText} from "@/lib/client/locale";
 import {safeAppPath} from "@/lib/navigation";
 import {useApiQuery} from "@/lib/client/use-api-query";
 import {ActionSheet,FormSheet} from "../binso-ux";
@@ -54,6 +56,7 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
   const canFinanceExpense=["owner","admin","finance"].includes(role);
   const [createdExpenseId,setCreatedExpenseId]=useState(expenseId??"");
   const expenseRequestKey=useRef("");
+  const [expenseReplayKey,setExpenseReplayKey]=useState("");
   const expenseMutationPending=useRef(false);
   const receiptScanPending=useRef(false);
   const [editedExpense,setEditedExpense]=useState(false);
@@ -85,6 +88,11 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
     });return()=>{active=false};
   },[editedExpense,expenseQuery.data]);
 
+  const expenseDraft={person,date,category,amount,currency,vatRate,merchant,description,status,expenseCustomer,expenseBillable,createdExpenseId,requestKey:expenseReplayKey};
+  const expenseRecovery=useProcessDraft({process:"expense:create",value:expenseDraft,dirty:editedExpense,enabled:!existing&&!savedExpense,onRestore:value=>{
+    if(!value||[value.person,value.date,value.category,value.amount,value.currency,value.vatRate,value.merchant,value.description,value.status,value.expenseCustomer,value.createdExpenseId,value.requestKey].some(field=>typeof field!=="string"||field.length>4000)||typeof value.expenseBillable!=="boolean")return;
+    setPerson(value.person);setDate(value.date);setCategory(value.category);setAmount(value.amount);setCurrency(value.currency);setVatRate(value.vatRate);setMerchant(value.merchant);setDescription(value.description);setStatus(value.status);setExpenseCustomer(value.expenseCustomer);setExpenseBillable(value.expenseBillable);setCreatedExpenseId(value.createdExpenseId);expenseRequestKey.current=value.requestKey;setExpenseReplayKey(value.requestKey);setEditedExpense(true);
+  }});
   const scanReceipt=async(file:File|null)=>{
     if(receiptScanPending.current||expenseMutationPending.current||lockedExpense||!file)return;
     receiptScanPending.current=true;setEditedExpense(true);setReceiptFile(file);setScanState("scanning");
@@ -103,7 +111,7 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
   };
 
   const save=async()=>{
-    if(expenseMutationPending.current||receiptScanPending.current||lockedExpense||loadingExpense||expenseLoadError)return;
+    if(expenseMutationPending.current||receiptScanPending.current||lockedExpense||loadingExpense||expenseLoadError||!existing&&!expenseRecovery.ready)return;
     const value=Number(amount.replace(",","."));
     if(expenseBillable&&!expenseCustomer){setToast("Bitte einen Kunden für die Weiterverrechnung wählen.");return;}
     if(!Number.isFinite(value)||value<=0){setToast("Bitte einen gültigen Betrag erfassen.");window.setTimeout(()=>setToast(null),2200);return;}
@@ -117,9 +125,10 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
           const result=await apiPatch<{item:{id:string}}>("/api/expenses/"+encodeURIComponent(targetExpenseId),payload);
           targetExpenseId=result.item?.id??targetExpenseId;
         }else{
-          if(!expenseRequestKey.current)expenseRequestKey.current=crypto.randomUUID();
+          if(!expenseRequestKey.current){expenseRequestKey.current=crypto.randomUUID();setExpenseReplayKey(expenseRequestKey.current);}
+          expenseRecovery.persist({...expenseDraft,requestKey:expenseRequestKey.current});
           const result=await apiPost<{item:{id:string}}>("/api/expenses",payload,{idempotencyKey:expenseRequestKey.current});
-          targetExpenseId=result.item.id;setCreatedExpenseId(targetExpenseId);
+          targetExpenseId=result.item.id;setCreatedExpenseId(targetExpenseId);expenseRecovery.persist({...expenseDraft,createdExpenseId:targetExpenseId,requestKey:expenseRequestKey.current});
         }
         if(receiptFile&&targetExpenseId&&!receiptUploaded){
           const form=new FormData();
@@ -131,7 +140,7 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
       }else if(!existing){
         appendDemoRow("expenses",[merchant.trim()||description.trim()||category,person,"CHF "+value.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2}),"Eingereicht"]);
       }
-      setSavedExpense(true);
+      expenseRecovery.clear();setSavedExpense(true);
       setToast(receiptFile?"Spese und Beleg gespeichert.":existing?"Spese gespeichert.":"Spese eingereicht.");
       window.setTimeout(()=>router.push(returnTo),700);
     }catch(error){
@@ -144,32 +153,32 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
   const recordReimbursement=async()=>{if(expenseMutationPending.current||!expenseId)return;expenseMutationPending.current=true;setExpenseBusy(true);try{const r=await apiPost<{item:{reimbursed_at:string}}>('/api/expenses/'+encodeURIComponent(expenseId)+'/reimbursement',{reference:reimbursementRef});setReimbursedAt(r.item.reimbursed_at);setReimbursementOpen(false);setToast('Erstattung erfasst.')}catch(e){setToast(e instanceof Error?e.message:'Erstattung konnte nicht erfasst werden.')}finally{expenseMutationPending.current=false;setExpenseBusy(false)}};
   const selectedEmployee=availableEmployees.find(item=>item.id===person);
   const employeeLabel=selectedEmployee?[selectedEmployee.first_name,selectedEmployee.last_name].filter(Boolean).join(" "):"Ohne Mitarbeiter";
-  if(existing&&(loadingExpense||expenseLoadError))return <AppShell title="Spese" subtitle={expenseLoadError?"Spesendaten nicht verfügbar":"Daten werden geladen."} active="spesen" backHref={returnTo} backLabel="Spesen">{loadingExpense?<div role="status"><EmptyState icon="card" title="Spese wird geladen" text="Die Spesendaten werden abgerufen."/></div>:<><div role="alert"><EmptyState icon="card" title="Spese konnte nicht geladen werden" text={expenseLoadError??"Bitte versuche es erneut."}/></div><div className="page-actions"><Button onClick={expenseQuery.refresh}>Erneut versuchen</Button><Button href="/spesen" variant="ghost">Zur Übersicht</Button></div></>}</AppShell>;
-  return <AppShell editing={!lockedExpense} unsavedChanges={editedExpense&&!savedExpense} title={existing ? merchant||description||"Spese" : "Spese erfassen"} status={existing?status:undefined} statusTone={status==="Genehmigt"||status==="Verbucht"?"success":status==="Abgelehnt"?"danger":status==="Eingereicht"?"warning":"neutral"} subtitle={existing ? employeeLabel : "Beleg fotografieren oder Datei auswählen."} active="spesen" backHref={returnTo} backLabel="Spesen">
-    {(employeesQuery.error||customersQuery.error||filesQuery.error)&&<div role="alert">{employeesQuery.error||customersQuery.error||filesQuery.error}<Button variant="ghost" onClick={()=>{employeesQuery.refresh();customersQuery.refresh();filesQuery.refresh()}}>Erneut versuchen</Button></div>}
+  if(existing&&(loadingExpense||expenseLoadError))return <AppShell title="Spese" subtitle={expenseLoadError?"Spesendaten nicht verfügbar":"Daten werden geladen."} active="spesen" backHref={returnTo} backLabel="Spesen">{loadingExpense?<div role="status"><EmptyState icon="card" title="Spese wird geladen" text="Die Spesendaten werden abgerufen."/></div>:<><div role="alert"><EmptyState icon="card" title="Spese konnte nicht geladen werden" text={expenseLoadError??"Bitte versuche es erneut."}/></div><div className="page-actions"><Button onClick={expenseQuery.refresh}><LocalizedText>{"Erneut versuchen"}</LocalizedText></Button><Button href="/spesen" variant="ghost"><LocalizedText>{"Zur Übersicht"}</LocalizedText></Button></div></>}</AppShell>;
+  return <AppShell titleIsUserContent={existing&&!!(merchant||description)} editing={!lockedExpense} unsavedChanges={editedExpense&&!savedExpense} title={existing ? merchant||description||"Spese" : "Spese erfassen"} status={existing?status:undefined} statusTone={status==="Genehmigt"||status==="Verbucht"?"success":status==="Abgelehnt"?"danger":status==="Eingereicht"?"warning":"neutral"} subtitle={existing ? employeeLabel : "Beleg fotografieren oder Datei auswählen."} active="spesen" backHref={returnTo} backLabel="Spesen">
+    {(employeesQuery.error||customersQuery.error||filesQuery.error)&&<div role="alert"><LocalizedText>{employeesQuery.error||customersQuery.error||filesQuery.error}</LocalizedText><Button variant="ghost" onClick={()=>{employeesQuery.refresh();customersQuery.refresh();filesQuery.refresh()}}><LocalizedText>{"Erneut versuchen"}</LocalizedText></Button></div>}
     <div className={existing?"entity-detail-workspace expense-detail-workspace":"expense-layout"} onChangeCapture={()=>setEditedExpense(true)}>
 
-      {!lockedExpense&&<><label className={`receipt-upload ${scanState==="scanning"?"is-scanning":""}`} htmlFor="expense-receipt-upload"><span><Icon name="upload" size={25}/></span><b>{scanState==="scanning"?"Beleg wird erkannt…":receiptFile?receiptFile.name:"Beleg fotografieren"}</b><small>{scanState==="done"?`Erkannt${scanConfidence!==null?` · ${Math.round(scanConfidence*100)}% Sicherheit`:""} – Angaben prüfen`:scanState==="error"?"Erkennung nicht möglich – manuell erfassen":"Kamera oder Datei verwenden · Angaben werden automatisch vorausgefüllt"}</small></label><Input id="expense-receipt-upload" hidden disabled={expenseBusy||scanState==="scanning"} type="file" capture="environment" accept="image/png,image/jpeg,image/webp,application/pdf" onChange={e=>void scanReceipt(e.target.files?.[0]??null)}/></>}
+      {!lockedExpense&&<><label className={`receipt-upload ${scanState==="scanning"?"is-scanning":""}`} htmlFor="expense-receipt-upload"><span><Icon name="upload" size={25}/></span><b><LocalizedText verbatim={scanState!=="scanning"&&!!receiptFile}>{scanState==="scanning"?"Beleg wird erkannt…":receiptFile?receiptFile.name:"Beleg fotografieren"}</LocalizedText></b><small><LocalizedText>{scanState==="done"?`Erkannt${scanConfidence!==null?` · ${Math.round(scanConfidence*100)}% Sicherheit`:""} – Angaben prüfen`:scanState==="error"?"Erkennung nicht möglich – manuell erfassen":"Kamera oder Datei verwenden · Angaben werden automatisch vorausgefüllt"}</LocalizedText></small></label><Input id="expense-receipt-upload" hidden disabled={expenseBusy||scanState==="scanning"} type="file" capture="environment" accept="image/png,image/jpeg,image/webp,application/pdf" onChange={e=>void scanReceipt(e.target.files?.[0]??null)}/></>}
       <div className="form-page">
-        {expenseFiles.length>0&&<section><h2>Quittungen</h2><div className="compact-list">{expenseFiles.map(f=><a key={f.id} href={'/api/files/'+f.id+'/download'}><span>{f.fileName}</span><Icon name="file"/></a>)}</div></section>}
+        {expenseFiles.length>0&&<section><h2><LocalizedText>{"Quittungen"}</LocalizedText></h2><div className="compact-list">{expenseFiles.map(f=><a key={f.id} href={'/api/files/'+f.id+'/download'}><span>{f.fileName}</span><Icon name="file"/></a>)}</div></section>}
         <fieldset disabled={lockedExpense||expenseBusy||scanState==="scanning"} className="form-grid two" style={{border:0,padding:0,margin:0}}>
           <Field label="Händler / Firma"><Input value={merchant} onChange={e=>setMerchant(e.target.value)} placeholder="Wird aus dem Beleg erkannt"/></Field>
-          <Field label="Mitarbeiter"><Select value={person} onChange={e=>setPerson(e.target.value)}><option value="">Keine Zuordnung</option>{availableEmployees.map(item=><option key={item.id} value={item.id}>{item.first_name} {item.last_name}</option>)}</Select></Field>
+          <Field label="Mitarbeiter"><Select value={person} onChange={e=>setPerson(e.target.value)}><option value=""><LocalizedText>{"Keine Zuordnung"}</LocalizedText></option>{availableEmployees.map(item=><option key={item.id} value={item.id}>{item.first_name} {item.last_name}</option>)}</Select></Field>
           <Field label="Datum"><Input type="date" value={date} onChange={e=>setDate(e.target.value)}/></Field>
-          <Field label="Kategorie"><Select value={category} onChange={e=>setCategory(e.target.value)}><option>Reise</option><option>Verpflegung</option><option>Material</option><option>Sonstiges</option></Select></Field>
+          <Field label="Kategorie"><Select value={category} onChange={e=>setCategory(e.target.value)}><option value={"Reise"}><LocalizedText>{"Reise"}</LocalizedText></option><option value={"Verpflegung"}><LocalizedText>{"Verpflegung"}</LocalizedText></option><option value={"Material"}><LocalizedText>{"Material"}</LocalizedText></option><option value={"Sonstiges"}><LocalizedText>{"Sonstiges"}</LocalizedText></option></Select></Field>
           <Field label="Betrag"><Input inputMode="decimal" value={amount} onChange={e=>setAmount(e.target.value)} placeholder="0.00"/></Field>
-          <Field label="Währung"><Select value={currency} onChange={e=>setCurrency(e.target.value)}><option>CHF</option><option>EUR</option></Select></Field>
+          <Field label="Währung"><Select value={currency} onChange={e=>setCurrency(e.target.value)}><option value={"CHF"}><LocalizedText>{"CHF"}</LocalizedText></option><option value={"EUR"}><LocalizedText>{"EUR"}</LocalizedText></option></Select></Field>
           <Field label="MwSt."><Select value={vatRate} onChange={e=>setVatRate(e.target.value)}><option value="8.1">8.1%</option><option value="2.6">2.6%</option><option value="0">0%</option></Select></Field>
-          {existing&&<Field label="Status"><Select value={status} onChange={e=>setStatus(e.target.value)}><option>Entwurf</option><option>Eingereicht</option>{(canApproveExpense||status==="Genehmigt")&&<option disabled={!canApproveExpense}>Genehmigt</option>}{(canApproveExpense||status==="Abgelehnt")&&<option disabled={!canApproveExpense}>Abgelehnt</option>}</Select></Field>}
-          <Field label="Weiterverrechnen"><Select value={expenseBillable?'yes':'no'} onChange={e=>setExpenseBillable(e.target.value==='yes')}><option value="no">Nicht weiterverrechnen</option><option value="yes">An Kunden weiterverrechnen</option></Select></Field>
-          {expenseBillable&&<Field label="Kunde"><Select value={expenseCustomer} onChange={e=>setExpenseCustomer(e.target.value)}><option value="">Kunde auswählen</option>{expenseCustomers.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</Select></Field>}
+          {existing&&<Field label="Status"><Select value={status} onChange={e=>setStatus(e.target.value)}><option value={"Entwurf"}><LocalizedText>{"Entwurf"}</LocalizedText></option><option value={"Eingereicht"}><LocalizedText>{"Eingereicht"}</LocalizedText></option>{(canApproveExpense||status==="Genehmigt")&&<option value={"Genehmigt"} disabled={!canApproveExpense}><LocalizedText>{"Genehmigt"}</LocalizedText></option>}{(canApproveExpense||status==="Abgelehnt")&&<option value={"Abgelehnt"} disabled={!canApproveExpense}><LocalizedText>{"Abgelehnt"}</LocalizedText></option>}</Select></Field>}
+          <Field label="Weiterverrechnen"><Select value={expenseBillable?'yes':'no'} onChange={e=>setExpenseBillable(e.target.value==='yes')}><option value="no"><LocalizedText>{"Nicht weiterverrechnen"}</LocalizedText></option><option value="yes"><LocalizedText>{"An Kunden weiterverrechnen"}</LocalizedText></option></Select></Field>
+          {expenseBillable&&<Field label="Kunde"><Select value={expenseCustomer} onChange={e=>setExpenseCustomer(e.target.value)}><option value=""><LocalizedText>{"Kunde auswählen"}</LocalizedText></option>{expenseCustomers.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</Select></Field>}
           <Field label="Beschreibung" className="full"><Textarea value={description} onChange={e=>setDescription(e.target.value)} placeholder="Kurze Beschreibung"/></Field>
         </fieldset>
-        {!lockedExpense&&<FormActions ><Button requiresWrite disabled={expenseBusy||scanState==="scanning"} onClick={()=>void save()}>{existing ? "Speichern" : "Einreichen"}</Button></FormActions>}
+        {!lockedExpense&&<FormActions ><Button requiresWrite disabled={expenseBusy||scanState==="scanning"} onClick={()=>void save()}><LocalizedText>{existing ? "Speichern" : "Einreichen"}</LocalizedText></Button></FormActions>}
       </div>
-      {existing&&<aside className="desktop-context-rail"><section className="desktop-toolbox">{lockedExpense&&<p>Genehmigte Spesen sind gesperrt.</p>}{reimbursedAt?<p>Erstattet am {new Date(reimbursedAt).toLocaleDateString('de-CH')} · {reimbursementRef}</p>:lockedExpense&&canFinanceExpense&&<Button variant="secondary" onClick={()=>setReimbursementOpen(true)}>Erstattung erfassen</Button>}{lockedExpense&&canFinanceExpense&&expenseBillable&&expenseCustomer&&!invoicedId&&<Button href={'/rechnungen/neu?expenses='+encodeURIComponent(expenseId??'')} variant="secondary">Weiterverrechnen</Button>}{invoicedId&&<p>Bereits einer Rechnung zugeordnet.</p>}<Link href="/spesen"><Icon name="card"/><span><b>Alle Spesen</b><small>Zur Spesenübersicht</small></span><Icon name="arrow" size={15}/></Link></section></aside>}
+      {existing&&<aside className="desktop-context-rail"><section className="desktop-toolbox">{lockedExpense&&<p><LocalizedText>{"Genehmigte Spesen sind gesperrt."}</LocalizedText></p>}{reimbursedAt?<p><LocalizedText>{"Erstattet am "}</LocalizedText>{new Date(reimbursedAt).toLocaleDateString('de-CH')} · {reimbursementRef}</p>:lockedExpense&&canFinanceExpense&&<Button variant="secondary" onClick={()=>setReimbursementOpen(true)}><LocalizedText>{"Erstattung erfassen"}</LocalizedText></Button>}{lockedExpense&&canFinanceExpense&&expenseBillable&&expenseCustomer&&!invoicedId&&<Button href={'/rechnungen/neu?expenses='+encodeURIComponent(expenseId??'')} variant="secondary"><LocalizedText>{"Weiterverrechnen"}</LocalizedText></Button>}{invoicedId&&<p><LocalizedText>{"Bereits einer Rechnung zugeordnet."}</LocalizedText></p>}<Link href="/spesen"><Icon name="card"/><span><b><LocalizedText>{"Alle Spesen"}</LocalizedText></b><small><LocalizedText>{"Zur Spesenübersicht"}</LocalizedText></small></span><Icon name="arrow" size={15}/></Link></section></aside>}
     </div>
-    {reimbursementOpen&&<FormSheet label={"Erfolgte Erstattung erfassen"} description={"Die Zahlung muss bereits erfolgt sein. Es wird keine Überweisung ausgelöst."} open={true} onClose={()=>setReimbursementOpen(false)} busy={expenseBusy} className={""} layerClassName={""} ariaLabel={"Erstattung erfassen"}><Field label="Zahlungsreferenz"><Input value={reimbursementRef} onChange={e=>setReimbursementRef(e.target.value)}/></Field><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setReimbursementOpen(false)}>Abbrechen</Button><Button disabled={expenseBusy||!reimbursementRef.trim()} onClick={()=>void recordReimbursement()}>Erstattung erfassen</Button></div></FormSheet>}
+    {reimbursementOpen&&<FormSheet label={"Erfolgte Erstattung erfassen"} description={"Die Zahlung muss bereits erfolgt sein. Es wird keine Überweisung ausgelöst."} open={true} onClose={()=>setReimbursementOpen(false)} busy={expenseBusy} className={""} layerClassName={""} ariaLabel={"Erstattung erfassen"}><Field label="Zahlungsreferenz"><Input value={reimbursementRef} onChange={e=>setReimbursementRef(e.target.value)}/></Field><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setReimbursementOpen(false)}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button disabled={expenseBusy||!reimbursementRef.trim()} onClick={()=>void recordReimbursement()}><LocalizedText>{"Erstattung erfassen"}</LocalizedText></Button></div></FormSheet>}
     {toast&&<Toast title={toast} tone={["Spese und Beleg gespeichert.","Spese gespeichert.","Spese eingereicht.","Erstattung erfasst."].includes(toast)?"success":"danger"}/>}
   </AppShell>;
 }

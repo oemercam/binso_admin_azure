@@ -56,3 +56,11 @@ Der vollständige Lauf zu `c0dd5ac` bestand Build, Tests, Scanner, Chromium und 
 ## Abnahme
 
 Die konkreten lokalen Prüfergebnisse und Einschränkungen stehen in `docs/assets/20261013/validation.json`. Synthetische API- und Browserprüfungen sind keine Live-Azure-Abnahme und kein Test einer realen iPhone-Tastatur. Die Änderung wird über einen separaten GitHub-Branch und Pull Request bereitgestellt; eine Produktionsbereitstellung ist eine separate Release-Stufe.
+
+## Ergänzung vom 15.10.2026: Abschluss, Zustände und Bewegung
+
+- Trennlinien stehen ausschliesslich zwischen gleichartigen Einträgen. Der letzte sichtbare Eintrag, Menüpunkt oder Textblock erhält keine Abschlusslinie. Gruppenflächen übernehmen die Abgrenzung; auch der Gruppencontainer darf keine zusätzliche untere Linie zeichnen. Das gilt für gefilterte Listen, leere Zustände und beide Farbmodi. Formularfeldränder, Fokusindikatoren und fachliche Dokumentlinien sind davon unabhängig.
+- Farben, Abstände, Radien und Bewegungszeiten stammen aus gemeinsamen Tokens; Texte aus Sprachkatalogen. Betriebswerte, Geheimnisse und Provider-IDs werden serverseitig konfiguriert. Fachliche Regeln und Berechtigungen bleiben zentral und testbar; sie werden nicht als beliebig editierbare UI-Einstellungen angeboten.
+- Fehler-, Offline-, Nicht-gefunden- und zukünftige Wartungsansichten verwenden die gemeinsamen Flächen, Typografie und Aktionen, erklären den Zustand und bieten eine tatsächlich verfügbare nächste Aktion. Unbestätigte Aussagen über die Unversehrtheit von Daten sind unzulässig.
+- Mobile und PWA verwenden kurze, zentrale Übergänge und sichtbare Druck-/Ladezustände. Reduzierte Bewegung wird respektiert. Fokus, Scrollposition, Tastatur und Safe Areas dürfen durch Animationen nicht beeinträchtigt werden. Kein künstlicher Ladeaufschub, keine dekorativen Dauerschleifen und kein erzwungenes Pull-to-refresh bei ungespeicherten Formularen. Die freigegebene Navigation bleibt erhalten.
+- Ein Wartungsstatus im Monitoring ist kein durchgesetzter Wartungsmodus. Ein künftiger Schalter benötigt serverseitige Zugriffskontrolle, Audit, zeitliche Begrenzung, weiterhin zugänglichen Operatorzugang sowie Ausnahmen für Healthchecks und Provider-Webhooks. Eine Azure- oder Datenbankstörung muss zusätzlich ausserhalb der Anwendung behebbar bleiben.

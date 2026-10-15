@@ -1,5 +1,6 @@
 "use client";
 
+import {LocalizedText} from "@/lib/client/locale";
 import Link from "next/link";
 import {useEffect,useState} from "react";
 import {Button,SectionTitle,Status} from "@/components/ui";
@@ -53,26 +54,26 @@ export function PrivacyConsent(){
   return <div className="privacy-consent-layer" role="dialog" aria-labelledby="privacy-consent-title">
     <section className="privacy-consent-card">
       <div className="privacy-consent-copy">
-        <span className="eyebrow">DATENSCHUTZ</span>
-        <h2 id="privacy-consent-title">Datenschutz-Einstellungen</h2>
-        <p>Notwendiger Speicher ermöglicht Anmeldung und Einstellungen. Die optionale Performance-Messung verbessert Ladezeiten. Keine Werbung oder Cross-Site-Tracking.</p>
-        <Link href="/datenschutz">Datenschutzerklärung</Link>
+        <span className="eyebrow"><LocalizedText>{"DATENSCHUTZ"}</LocalizedText></span>
+        <h2 id="privacy-consent-title"><LocalizedText>{"Datenschutz-Einstellungen"}</LocalizedText></h2>
+        <p><LocalizedText>{"Notwendiger Speicher ermöglicht Anmeldung und Einstellungen. Die optionale Performance-Messung verbessert Ladezeiten. Keine Werbung oder Cross-Site-Tracking."}</LocalizedText></p>
+        <Link href="/datenschutz"><LocalizedText>{"Datenschutzerklärung"}</LocalizedText></Link>
       </div>
       <div className="privacy-consent-options">
-        <div><span><b>Technisch notwendig</b><small>Für Anmeldung, Sicherheit, Sitzungen und Einstellungen.</small></span><strong>Immer aktiv</strong></div>
-        <label><span><b>Performance</b><small>Optionale Messung von Ladezeit und Darstellungsstabilität.</small></span><input type="checkbox" checked={performance} onChange={e=>setPerformance(e.target.checked)}/></label>
+        <div><span><b><LocalizedText>{"Technisch notwendig"}</LocalizedText></b><small><LocalizedText>{"Für Anmeldung, Sicherheit, Sitzungen und Einstellungen."}</LocalizedText></small></span><strong><LocalizedText>{"Immer aktiv"}</LocalizedText></strong></div>
+        <label><span><b><LocalizedText>{"Performance"}</LocalizedText></b><small><LocalizedText>{"Optionale Messung von Ladezeit und Darstellungsstabilität."}</LocalizedText></small></span><input type="checkbox" checked={performance} onChange={e=>setPerformance(e.target.checked)}/></label>
       </div>
       <div className="privacy-consent-actions">
-        <Button variant="secondary" onClick={()=>{storePreferences(false);setPerformance(false);setOpen(false);}}>Nur notwendige</Button>
-        <Button variant="secondary" onClick={()=>{storePreferences(performance);setOpen(false);}}>Auswahl speichern</Button>
-        <Button onClick={()=>{storePreferences(true);setPerformance(true);setOpen(false);}}>Alle erlauben</Button>
+        <Button variant="secondary" onClick={()=>{storePreferences(false);setPerformance(false);setOpen(false);}}><LocalizedText>{"Nur notwendige"}</LocalizedText></Button>
+        <Button variant="secondary" onClick={()=>{storePreferences(performance);setOpen(false);}}><LocalizedText>{"Auswahl speichern"}</LocalizedText></Button>
+        <Button onClick={()=>{storePreferences(true);setPerformance(true);setOpen(false);}}><LocalizedText>{"Alle erlauben"}</LocalizedText></Button>
       </div>
     </section>
   </div>;
 }
 
 export function PrivacySettingsButton(){
-  return <button type="button" className="footer-privacy-button" onClick={()=>window.dispatchEvent(new Event("binso:open-privacy-settings"))}>Cookie-/Datenschutz-Einstellungen</button>;
+  return <button type="button" className="footer-privacy-button" onClick={()=>window.dispatchEvent(new Event("binso:open-privacy-settings"))}><LocalizedText>{"Cookie-/Datenschutz-Einstellungen"}</LocalizedText></button>;
 }
 
 
@@ -94,21 +95,21 @@ export function PrivacySettingsPage(){
   return <AppShell title="Datenschutz & Cookies" subtitle="Technisch notwendige Funktionen und optionale Performance-Messung." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
     <section className="surface security-card">
       <SectionTitle title="Technisch notwendig"/>
-      <div className="context-block"><Status tone="success">Immer aktiv</Status><b>Anmeldung, Sicherheit und Einstellungen</b><span>Diese Speichermechanismen sind für Sessions, Kontoschutz, Demo-Funktionen und Benutzereinstellungen erforderlich und können nicht deaktiviert werden.</span></div>
+      <div className="context-block"><Status tone="success"><LocalizedText>{"Immer aktiv"}</LocalizedText></Status><b><LocalizedText>{"Anmeldung, Sicherheit und Einstellungen"}</LocalizedText></b><span><LocalizedText>{"Diese Speichermechanismen sind für Sessions, Kontoschutz, Demo-Funktionen und Benutzereinstellungen erforderlich und können nicht deaktiviert werden."}</LocalizedText></span></div>
     </section>
     <section className="surface security-card">
       <SectionTitle title="Performance-Messung"/>
-      <div className="context-block"><Status tone={performance?"success":"neutral"}>{performance?"Erlaubt":"Aus"}</Status><b>Web-Vitals</b><span>Optional werden technische Kennzahlen wie Ladezeit und Darstellungsstabilität sowie eine gekürzte Route erfasst. Keine Werbung und kein Cross-Site-Tracking.</span></div>
+      <div className="context-block"><Status tone={performance?"success":"neutral"}><LocalizedText>{performance?"Erlaubt":"Aus"}</LocalizedText></Status><b><LocalizedText>{"Web-Vitals"}</LocalizedText></b><span><LocalizedText>{"Optional werden technische Kennzahlen wie Ladezeit und Darstellungsstabilität sowie eine gekürzte Route erfasst. Keine Werbung und kein Cross-Site-Tracking."}</LocalizedText></span></div>
       <div className="privacy-settings-actions">
-        <Button variant={performance?"secondary":"primary"} onClick={()=>save(false)}>Deaktivieren</Button>
-        <Button variant={performance?"primary":"secondary"} onClick={()=>save(true)}>Erlauben</Button>
+        <Button variant={performance?"secondary":"primary"} onClick={()=>save(false)}><LocalizedText>{"Deaktivieren"}</LocalizedText></Button>
+        <Button variant={performance?"primary":"secondary"} onClick={()=>save(true)}><LocalizedText>{"Erlauben"}</LocalizedText></Button>
       </div>
-      {saved&&<p className="settings-note" role="status">Datenschutz-Einstellung gespeichert.</p>}
+      {saved&&<p className="settings-note" role="status"><LocalizedText>{"Datenschutz-Einstellung gespeichert."}</LocalizedText></p>}
     </section>
     <section className="surface security-card">
       <SectionTitle title="Weitere Informationen"/>
-      <p className="settings-note">Details zur Datenbearbeitung und zu eingesetzten Dienstleistern findest du in der Datenschutzerklärung und der Unterauftragsbearbeiter-Liste.</p>
-      <div className="privacy-settings-actions"><Button href="/datenschutz" variant="secondary">Datenschutzerklärung</Button><Button href="/unterauftragsbearbeiter" variant="secondary">Unterauftragsbearbeiter</Button></div>
+      <p className="settings-note"><LocalizedText>{"Details zur Datenbearbeitung und zu eingesetzten Dienstleistern findest du in der Datenschutzerklärung und der Unterauftragsbearbeiter-Liste."}</LocalizedText></p>
+      <div className="privacy-settings-actions"><Button href="/datenschutz" variant="secondary"><LocalizedText>{"Datenschutzerklärung"}</LocalizedText></Button><Button href="/unterauftragsbearbeiter" variant="secondary"><LocalizedText>{"Unterauftragsbearbeiter"}</LocalizedText></Button></div>
     </section>
   </AppShell>;
 }

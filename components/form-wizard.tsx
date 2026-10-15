@@ -1,5 +1,6 @@
 "use client";
 
+import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
 import {useEffect,useRef,type ReactNode} from "react";
 import {Button,FormActions} from "./ui";
 
@@ -40,12 +41,12 @@ export function FormWizard({labels,step,onStep,children,action,cancelAction,busy
   if(busy||next<0||next>=labels.length)return;
   onStep(next);rootRef.current?.querySelector(".wizard-content")?.scrollTo({top:0});
  };
- return <div ref={rootRef} className="form-wizard" data-guided={guided?"true":undefined} aria-label={ariaLabel}>
-  {guided&&<div className="wizard-progress" role="status">{progressLabel?progressLabel(step+1,labels.length,labels[step]):`Schritt ${step+1} von ${labels.length} · ${labels[step]}`}</div>}
+ return <LocalizedElement as="div" ref={rootRef} className="form-wizard" data-guided={guided?"true":undefined} aria-label={ariaLabel}>
+  {guided&&<div className="wizard-progress" role="status"><LocalizedText>{progressLabel?progressLabel(step+1,labels.length,labels[step]):`Schritt ${step+1} von ${labels.length} · ${labels[step]}`}</LocalizedText></div>}
   <div className="wizard-content">{children}</div>
   <FormActions onClickCapture={event=>{
    const button=event.target instanceof Element?event.target.closest('button.button-primary'):null;
    if(button&&(!guided||step===labels.length-1)&&!valid()){event.preventDefault();event.stopPropagation();}
-  }}>{guided&&(step===0?cancelAction:<Button variant="secondary" disabled={busy} onClick={()=>go(step-1)}>{backLabel}</Button>)}{!guided||step===labels.length-1?action:<Button disabled={busy} onClick={()=>go(step+1)}>{nextLabel}</Button>}</FormActions>
- </div>;
+  }}>{guided&&(step===0?cancelAction:<Button variant="secondary" disabled={busy} onClick={()=>go(step-1)}><LocalizedText>{backLabel}</LocalizedText></Button>)}{!guided||step===labels.length-1?action:<Button disabled={busy} onClick={()=>go(step+1)}><LocalizedText>{nextLabel}</LocalizedText></Button>}</FormActions>
+ </LocalizedElement>;
 }

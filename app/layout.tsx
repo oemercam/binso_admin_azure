@@ -1,3 +1,7 @@
+import {localizeMetadata} from "@/lib/server/locale";
+import {cookies} from "next/headers";
+import {LocaleProvider} from "@/lib/client/locale";
+import {asLocale,localeCookie,localeTags} from "@/lib/locales/config";
 import type { Metadata, Viewport } from "next";
 import "./binso-ui.css";
 import {AppShellLayout} from "@/components/app-shell";
@@ -10,7 +14,7 @@ import { PrivacyConsent } from "@/components/privacy-consent";
 
 const metadataBase = new URL(siteConfig.marketingUrl);
 
-export const metadata: Metadata = {
+const baseMetadata: Metadata = {
   metadataBase,
   title: { default: siteConfig.name, template: `%s | ${siteConfig.name}` },
   description: siteConfig.description,
@@ -55,6 +59,8 @@ export const metadata: Metadata = {
     apple: [{ url: "/brand/apple-touch-icon.png", type: "image/png", sizes: "180x180" }],
   },
 };
+export async function generateMetadata():Promise<Metadata>{return localizeMetadata(baseMetadata,"/");}
+
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -63,16 +69,19 @@ export const viewport: Viewport = {
   themeColor: "#ffffff",
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const locale=asLocale((await cookies()).get(localeCookie)?.value);
   return (
-    <html lang="de-CH" suppressHydrationWarning data-scroll-behavior="smooth">
+    <html lang={localeTags[locale]} suppressHydrationWarning data-scroll-behavior="smooth">
       <head><script id="binso-theme-init" dangerouslySetInnerHTML={{__html:`(${initializeTheme.toString()})();`}} /></head>
       <body>
+        <LocaleProvider initialLocale={locale}>
         <ThemeRuntime />
         <AppShellLayout>{children}</AppShellLayout>
         <PrivacyConsent />
         <PwaRegister />
         <WebVitalsReporter />
+        </LocaleProvider>
       </body>
     </html>
   );

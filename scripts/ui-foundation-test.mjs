@@ -1,7 +1,9 @@
+import './localization-test-adapter.mjs';
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 import {createRequire} from 'node:module';
 import ts from 'typescript';
+import {moduleUrl} from './data-test-modules.mjs';
 import React from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 import {ESLint} from 'eslint';
@@ -66,3 +68,11 @@ for(const step of [0,1,2]){
  assert.equal(markup.includes('Abbrechen'),step===0);assert.equal(markup.includes('Zurück'),step>0);assert.equal(markup.includes('Weiter'),step<2);assert.equal(markup.includes('Erstellen'),step===2);
 }
 console.log('Wizard first/middle/final actions and architecture ownership passed.');
+
+const {contactHref}=await import(moduleUrl(fs.readFileSync('lib/contact-links.ts','utf8')));
+assert.equal(contactHref('email',' name+tag@example.ch '),'mailto:name%2Btag@example.ch');
+const encodedMail=contactHref('email','name?subject=<script>@example.ch');assert.equal(new URL(encodedMail).search,'');assert.ok(!encodedMail.includes('<script>'));
+assert.equal(contactHref('email','name@example.ch\r\nBcc:other@example.ch'),undefined);assert.equal(contactHref('email','javascript:alert(1)'),undefined);
+assert.equal(contactHref('phone','+41 (44) 123-45-67'),'tel:+41441234567');assert.equal(contactHref('phone','079 123 45 67'),'tel:0791234567');
+for(const value of ['javascript:alert(1)','+41?code=1','*#06#','+41\n123','++41123'])assert.equal(contactHref('phone',value),undefined);
+console.log('Contact URIs retain fixed schemes, encode address delimiters and reject control/query/dial-command injection.');

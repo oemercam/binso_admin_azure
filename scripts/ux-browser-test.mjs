@@ -54,6 +54,8 @@ const invoice={id:'invoice-one',number:'RE-TEST-1',kind:'invoice',customer_id:cu
 const offer={...invoice,id:'offer-one',kind:'offer',number:'AN-TEST-1',status:'sent',paid_amount:0};
 const payment={id:'payment-one',amount:100,currency:'CHF',paid_on:'2026-10-08',method:'bank',status:'booked',customer_id:customer.id,customer,invoice};
 const ticket={id:'ticket-one',case_number:'T-TEST-1',subject:'Testanfrage',status:'open',priority:'normal',created_at:'2026-10-08T10:00:00Z',updated_at:'2026-10-08T10:00:00Z'};
+const projectSeed={id:'project-one',name:'Cloud Migration',customer_id:customer.id,customer_name:customer.name,status:'active',hours:12.5,hours_budget:120,progress:10,notes:'Synthetic project notes',version:1,source_offer:offer.number};
+let projectFixture={...projectSeed};
 const collections={customers:[customer],products:[product],employees:[employee],expenses:[expense],payments:[payment],documents:[invoice,offer],projects:[],time_entries:[]};
 if(process.env.BINSO_UX_FIXTURE_CASE){
  if(process.env.BINSO_UX_MATRIX_ONLY!=='1')throw Error('Alternative fixtures require matrix-only mode; interaction suites own their mutation fixtures');
@@ -112,7 +114,7 @@ let failPreferences=false,preferencePosts=0;
 let notificationWrites=0,failNotificationWrite=false,securityUnavailable=false,sessionDeletes=0;
 let dataPaymentMode=false,dataPaymentFailed=false,dataPaymentPosts=0,holdDataRefresh=false,customerIdentityMode=false,losePaymentResponse=false,incompletePaymentResponse=false;const paymentReplays=new Map(),dataRefreshWaiters=[];
 let projectSourceMode=false,failProjectSource=false,projectSourceTitle='Synthetic accepted offer',processRecoveryMode=false;
-let incompleteProductResponse=false;
+let incompleteProductResponse=false;let failReportDownload=false,reportExports=0;
 let projectPosts=0,failProjectCreate=false,loseProjectResponse=false;const projectReplays=new Map();
 let customerPosts=0,failCustomerCreate=false,loseCustomerResponse=false;const customerReplays=new Map();
 let teamMemberRole='member';let supportMessages=[];
@@ -122,7 +124,7 @@ let releaseOldSearch;
 let context;
 try{
  for(const theme of (process.env.BINSO_UX_THEMES?.split(",")??["light","dark"])){
-  teamMemberRole='member';supportMessages=[];let preferenceTheme=theme;
+  projectFixture={...projectSeed};teamMemberRole='member';supportMessages=[];let preferenceTheme=theme;
   operatorAccount.plan='pro';
   browser=await browserType.launch(launchOptions);
   context=await browser.newContext({...(process.env.BINSO_UX_DEVICE?engines.devices[process.env.BINSO_UX_DEVICE]:{}),viewport:{width:1440,height:1000},colorScheme:"dark",serviceWorkers:"block"});
@@ -136,6 +138,7 @@ try{
     if(p==='/api/products'&&incompleteProductResponse)return route.fulfill({status:201,json:{ok:true}});
     if(req.method()==='PATCH'&&p==='/api/operator/accounts/tenant-one'){const body=JSON.parse(req.postData());if(body.plan)operatorAccount.plan=body.plan;if(body.userLimit)operatorAccount.user_limit=body.userLimit;if(body.subscriptionStatus)operatorAccount.subscription_status=body.subscriptionStatus;return route.fulfill({json:{item:operatorAccount}});}
     if(customerIdentityMode&&req.method()==='PATCH'&&p.startsWith('/api/customers/')){const item=collections.customers.find(item=>item.id===p.split('/')[3]);Object.assign(item,JSON.parse(req.postData()));return route.fulfill({json:{item}});}
+    if(req.method()==='PATCH'&&p==='/api/projects/project-one'){const body=JSON.parse(req.postData());if(body.version!==projectFixture.version)return route.fulfill({status:409,json:{message:'Project changed'}});Object.assign(projectFixture,{name:body.name,status:body.status,notes:body.notes,hours_budget:body.hoursBudget,version:projectFixture.version+1});return route.fulfill({json:{item:projectFixture}});}
     if(p==='/api/payments'&&dataPaymentMode){dataPaymentPosts++;if(incompletePaymentResponse)return route.fulfill({status:201,json:{}});if(dataPaymentFailed)return route.fulfill({status:503,json:{error:'unavailable',message:'Synthetic payment failed'}});const key=req.headers()['idempotency-key'];assert.ok(key,'Financial requests carry a replay key');if(paymentReplays.has(key))return route.fulfill({status:200,json:{item:paymentReplays.get(key)}});const body=JSON.parse(req.postData());invoice.paid_amount+=body.amount;const row={...payment,id:'foundation-payment',amount:body.amount,paid_on:'2026-10-09'};collections.payments.unshift(row);paymentReplays.set(key,row);summary.invoices[0].open_amount=invoice.total-invoice.paid_amount;if(losePaymentResponse){losePaymentResponse=false;return route.abort('failed');}return route.fulfill({status:201,json:{item:row}});}
 
     if(p==='/api/documents/preview')return route.fulfill({body:fixturePdf,contentType:'application/pdf'});
@@ -197,6 +200,12 @@ try{
    else if(p==='/api/customers'||p==='/api/demo/data'&&url.searchParams.get('collection')==='customers')data=customerListFixture(url.searchParams);
    else if(p==='/api/demo/data')data=recordListFixture(url.searchParams.get('collection'),url.searchParams);
    else if(['/api/products','/api/employees','/api/expenses','/api/payments'].includes(p))data=recordListFixture(p.split('/')[2],url.searchParams);
+   else if(p==='/api/reports'){
+    if(url.searchParams.get('format')==='csv'){reportExports++;await new Promise(resolve=>setTimeout(resolve,150));if(failReportDownload)return route.fulfill({status:503,json:{message:'Synthetic report export unavailable'}});return route.fulfill({headers:{'Content-Type':'text/csv; charset=utf-8','Content-Disposition':'attachment; filename="binso-reports-fixture.csv"'},body:'"Kennzahl";"Wert";"Einheit"\r\n'});}
+    data={period:{from:statisticToday.slice(0,7)+'-01',to:statisticToday},asOf:new Date().toISOString(),customers:{total:'2',added:'1'},projects:[{status:'active',count:'1'}],time:{hours:'12.5',billable_hours:'10',invoiced_hours:'5'},payments:[{currency:'CHF',amount:'200'}],expenses:[{currency:'CHF',amount:'50'}],employees:{total:'2',active:'2'}};
+   }
+   else if(p==='/api/projects')data={items:[projectFixture],total:1};
+   else if(p==='/api/projects/project-one')data={item:projectFixture,time:[{id:'project-time',work_date:'2026-10-01',hours:12.5,description:'Synthetic project work',billable:true,approved:true}],totals:{hours:12.5,invoiced_hours:0,entries:1},invoices:[{number:invoice.number,status:invoice.status,currency:'CHF',total_amount:invoice.total}]};
    else if(p==='/api/documents')data={items:collections.documents.filter(item=>!url.searchParams.has('kind')||item.kind===url.searchParams.get('kind'))};
    else if(p==='/api/dashboard'||p==='/api/demo/dashboard')data={cash:cashFixture(dataPaymentMode?invoice.paid_amount:200),canFinance:true,recent:[invoice],attention:[],invoices:[invoice],payments:[payment],stats:{customer_count:2},analyticsInvoices:[{issue_date:'2026-10-01',total:135.13,invoice_count:1}],analyticsPayments:[{paid_on:'2026-10-01',amount:dataPaymentMode?invoice.paid_amount:100}]};
    else if(p==='/api/support/tickets')data={items:[ticket]};
@@ -401,6 +410,15 @@ try{
   await page.getByLabel('Bezeichnung *',{exact:true}).fill('Unsaved project draft');projectSourceTitle='Updated server offer';
   const sourceRefresh=page.waitForRequest(request=>new URL(request.url()).pathname==='/api/documents/AN-TEST-1');await page.evaluate(()=>document.dispatchEvent(new Event('visibilitychange')));await sourceRefresh;await page.waitForLoadState('networkidle');assert.equal(await page.getByLabel('Bezeichnung *',{exact:true}).inputValue(),'Unsaved project draft','Source revalidation cannot overwrite the local project draft');
   await page.getByRole('dialog',{name:'Auftrag / Projekt starten',exact:true}).getByRole('button',{name:'Schliessen',exact:true}).click();await page.getByRole('button',{name:'Weiter bearbeiten',exact:true}).click();assert.equal(await page.getByLabel('Bezeichnung *',{exact:true}).inputValue(),'Unsaved project draft');await page.getByRole('dialog',{name:'Auftrag / Projekt starten',exact:true}).getByRole('button',{name:'Schliessen',exact:true}).click();await page.getByRole('button',{name:'Änderungen verwerfen',exact:true}).click();await page.waitForURL('**/angebote/AN-TEST-1');projectSourceMode=false;processRecoveryMode=false;
+  processRecoveryMode=true;await navigate(base+'/projekte');await page.locator('a[href="/projekte/project-one"]:visible').first().waitFor();await page.locator('a[href="/projekte/project-one"]:visible').first().click();await page.waitForURL('**/projekte/project-one');
+  await page.getByRole('button',{name:'Projektaktionen',exact:true}).first().click();await page.getByRole('button',{name:'Bearbeiten',exact:true}).click();let projectEdit=page.getByRole('dialog',{name:'Projekt bearbeiten',exact:true});await projectEdit.getByRole('button',{name:'Speichern',exact:true}).click({trial:true});await page.bringToFront();const projectSessionRefresh=page.waitForResponse(response=>new URL(response.url()).pathname==='/api/auth/session');await page.evaluate(()=>document.dispatchEvent(new Event('visibilitychange')));await projectSessionRefresh;await projectEdit.getByRole('button',{name:'Speichern',exact:true}).click({trial:true});await projectEdit.getByLabel('Bezeichnung',{exact:true}).fill('Rechnungen');
+  await page.waitForFunction(()=>Object.keys(sessionStorage).some(key=>key.includes('project:edit:project-one')&&JSON.parse(sessionStorage.getItem(key)||'null')?.value?.name==='Rechnungen'));await page.reload();await page.getByRole('button',{name:'Projektaktionen',exact:true}).first().click();await page.getByRole('button',{name:'Bearbeiten',exact:true}).click();projectEdit=page.getByRole('dialog',{name:'Projekt bearbeiten',exact:true});await page.waitForFunction(()=>document.querySelector('[role="dialog"] input')?.value==='Rechnungen');
+  await projectEdit.getByRole('button',{name:'Speichern',exact:true}).dblclick();await projectEdit.waitFor({state:'hidden'});await page.locator('h2[translate="no"]').filter({hasText:/^Rechnungen$/}).waitFor();assert.equal(projectFixture.version,2,'Project completion taps create one versioned update');
+  processRecoveryMode=false;
+  await navigate(base+'/berichte');await page.getByRole('heading',{name:'Aktueller Bestand',exact:true}).waitFor();await page.getByRole('button',{name:'Zeitraum',exact:true}).first().click();const reportPeriod=page.getByRole('dialog',{name:'Berichtszeitraum',exact:true});await reportPeriod.getByLabel('Zeitraum',{exact:true}).selectOption('3');const reportChanged=page.waitForRequest(request=>new URL(request.url()).pathname==='/api/reports'&&new URL(request.url()).searchParams.get('months')==='3');await reportPeriod.getByRole('button',{name:'Anwenden',exact:true}).click();await reportChanged;
+  reportExports=0;failReportDownload=true;const exportButton=page.getByRole('button',{name:'CSV exportieren',exact:true});await exportButton.click();await page.getByRole('alert').getByText('Synthetic report export unavailable',{exact:true}).waitFor();assert.equal(reportExports,1);failReportDownload=false;
+  const reportDownload=page.waitForEvent('download');await exportButton.dblclick();const exported=await reportDownload;assert.equal(exported.suggestedFilename(),'binso-reports-fixture.csv');assert.ok((await fs.readFile(await exported.path(),'utf8')).startsWith('"Kennzahl";"Wert";"Einheit"'),'Reports save verified CSV content');assert.equal(reportExports,2,'Failure and one deduplicated retry are the only export requests');assert.equal(new URL(page.url()).pathname,'/berichte');
+
 
   }
   if(hasInteraction('employees')){
@@ -697,7 +715,7 @@ try{
     await page.setViewportSize({width,height:740});await navigate(base+'/einstellungen/darstellung');await page.waitForLoadState('networkidle');
     const choices=page.getByRole('radiogroup',{name:'Darstellung',exact:true});assert.equal(await choices.getByRole('radio').count(),3);assert.equal(await page.locator('.appearance-card,.theme-preview').count(),0);
     const heights=await choices.getByRole('radio').evaluateAll(rows=>rows.map(row=>row.getBoundingClientRect().height));assert.ok(heights.every(height=>Math.abs(height-heights[0])<1),'Theme rows keep equal heights');
-    assert.equal(await page.getByLabel('Sprache',{exact:true}).locator('option').count(),1,'Offer only the translated language');
+    assert.deepEqual(await page.getByLabel('Sprache',{exact:true}).locator('option').evaluateAll(options=>options.map(option=>option.value)),['de','fr','it','en'],'Expose the complete translated language catalogue');
     await choices.getByRole('radio',{name:/^Hell/}).click();await page.waitForFunction(()=>document.documentElement.dataset.theme==='light');
     await choices.getByRole('radio',{name:/^Dunkel/}).click();await page.waitForFunction(()=>document.documentElement.dataset.theme==='dark');
     await choices.getByRole('radio',{name:/^Dunkel/}).press('ArrowDown');await page.waitForFunction(()=>document.documentElement.dataset.themeMode==='system');

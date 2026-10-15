@@ -1,5 +1,6 @@
 "use client";
 
+import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
 import {useEffect,useRef,useState} from "react";
 import type {PDFDocumentProxy} from "pdfjs-dist";
 import {Icon, ErrorState, LoadingState} from "./ui";
@@ -39,7 +40,7 @@ function PdfPage({pdf,pageNumber,zoomed}: {pdf:PDFDocumentProxy;pageNumber:numbe
     observer.observe(element.closest(".document-page-stage")??element);
     return()=>{active=false;cancelAnimationFrame(frame);observer.disconnect();renderTask?.cancel()};
   },[pdf,pageNumber,zoomed]);
-  return <section className="pdf-page" data-page-number={pageNumber} aria-label={`Seite ${pageNumber} von ${pdf.numPages}`}>{error?<ErrorState>{error}</ErrorState>:<canvas ref={canvas} role="img" aria-label={`PDF-Seite ${pageNumber}`}/>}</section>;
+  return <LocalizedElement as="section" className="pdf-page" data-page-number={pageNumber} aria-label={`Seite ${pageNumber} von ${pdf.numPages}`}>{error?<ErrorState><LocalizedText>{error}</LocalizedText></ErrorState>:<LocalizedElement as="canvas" ref={canvas} role="img" aria-label={`PDF-Seite ${pageNumber}`}/>}</LocalizedElement>;
 }
 
 export function DocumentPageViewer({file,zoomed=false}: {file:Blob;zoomed?:boolean}) {
@@ -72,12 +73,12 @@ export function DocumentPageViewer({file,zoomed=false}: {file:Blob;zoomed?:boole
     }).catch(()=>{if(active){window.clearTimeout(timeout);setError({file,attempt,message:"PDF konnte nicht angezeigt werden."});}});
     return()=>{active=false;window.clearTimeout(timeout);destroy()};
   },[file,attempt]);
-  if(error?.file===file&&error.attempt===attempt)return <ErrorState onRetry={()=>setAttempt(value=>value+1)} retryLabel="Erneut versuchen">{error.message}</ErrorState>;
-  if(loaded?.file!==file||loaded.attempt!==attempt)return <LoadingState>PDF wird angezeigt …</LoadingState>;
+  if(error?.file===file&&error.attempt===attempt)return <ErrorState onRetry={()=>setAttempt(value=>value+1)} retryLabel="Erneut versuchen"><LocalizedText>{error.message}</LocalizedText></ErrorState>;
+  if(loaded?.file!==file||loaded.attempt!==attempt)return <LoadingState><LocalizedText>{"PDF wird angezeigt …"}</LocalizedText></LoadingState>;
   return <DocumentPages key={loaded.pdf.fingerprints[0]} pdf={loaded.pdf} zoomed={zoomed}/>;
 }
 
 function DocumentPages({pdf,zoomed}:{pdf:PDFDocumentProxy;zoomed:boolean}){
   const [pageNumber,setPageNumber]=useState(1);
-  return <div className="document-page-viewer"><div className={`document-page-stage${zoomed?" is-zoomed":""}`}><PdfPage key={`${pageNumber}:${zoomed}`} pdf={pdf} pageNumber={pageNumber} zoomed={zoomed}/></div><nav className="document-page-navigation" aria-label="Dokumentseiten"><button type="button" className="icon-button" aria-label="Vorherige Seite" disabled={pageNumber<=1} onClick={()=>setPageNumber(value=>value-1)}><Icon name="back"/></button><span role="status" aria-live="polite">Seite {pageNumber} von {pdf.numPages}</span><button type="button" className="icon-button" aria-label="Nächste Seite" disabled={pageNumber>=pdf.numPages} onClick={()=>setPageNumber(value=>value+1)}><Icon name="arrow"/></button></nav></div>;
+  return <div className="document-page-viewer"><div className={`document-page-stage${zoomed?" is-zoomed":""}`}><PdfPage key={`${pageNumber}:${zoomed}`} pdf={pdf} pageNumber={pageNumber} zoomed={zoomed}/></div><LocalizedElement as="nav" className="document-page-navigation" aria-label="Dokumentseiten"><LocalizedElement as="button" type="button" className="icon-button" aria-label="Vorherige Seite" disabled={pageNumber<=1} onClick={()=>setPageNumber(value=>value-1)}><Icon name="back"/></LocalizedElement><span role="status" aria-live="polite"><LocalizedText>{"Seite "}</LocalizedText>{pageNumber}<LocalizedText>{" von "}</LocalizedText>{pdf.numPages}</span><LocalizedElement as="button" type="button" className="icon-button" aria-label="Nächste Seite" disabled={pageNumber>=pdf.numPages} onClick={()=>setPageNumber(value=>value+1)}><Icon name="arrow"/></LocalizedElement></LocalizedElement></div>;
 }

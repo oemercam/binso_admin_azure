@@ -33,7 +33,7 @@ const rule={
  meta:{type:'problem',schema:[],messages:{native:'Use the existing {{control}} from components/ui; native controls belong to the canonical renderer.',owned:'{{name}} belongs to its central component. Reuse it instead of creating another native wrapper.',barrel:'Import the actual domain module; app-pages is a retired compatibility import.',state:'Use the central {{component}} from components/ui for this state.'}},
  create(context){const file=path.relative(process.cwd(),context.filename).replaceAll('\\','/');return {
   ImportDeclaration(node){if(/(?:^|\/)app-pages$/.test(node.source.value))context.report({node,messageId:'barrel'});},
-  JSXOpeningElement(node){if(node.name.type!=='JSXIdentifier')return;const tag=node.name.name;
+  JSXOpeningElement(node){if(node.name.type!=='JSXIdentifier')return;let tag=node.name.name;if(tag==='LocalizedElement'){const as=node.attributes.find(a=>a.type==='JSXAttribute'&&a.name.name==='as');tag=literal(as)??tag;}
    if(['input','select','textarea'].includes(tag)&&!nativeOwners[file]?.[tag]?.includes(owner(node)))context.report({node,messageId:'native',data:{control:{input:'Input',select:'Select',textarea:'Textarea'}[tag]}});
    if(!/^[a-z]/.test(tag))return;
    const attributes=node.attributes.filter(a=>a.type==='JSXAttribute'),classes=classStrings(attributes.find(a=>a.name.name==='className')?.value);

@@ -57,4 +57,23 @@ try{
  assert.equal((await exports.GET()).authenticated,false,'An expired database demo must never regain fake owner permissions through its marker cookie');
  env.databaseUrl='';assert.equal((await exports.GET()).tenant.readOnly,true,'A static preview is explicitly read-only');
  console.log('Expired database demo is unauthenticated; static cookie preview remains read-only.');
+ window.localStorage={removeItem(){throw new DOMException('blocked','SecurityError')},setItem(){throw new DOMException('blocked','SecurityError')}};
+ assert.equal(backend.isProductionBackendEnabled(),true,'Blocked browser storage defers to authenticated server APIs');
+ globalThis.fetch=async()=>new Response(JSON.stringify({ok:true}));await backend.logoutClientSession();assert.equal(cache.cachedClientSession(),null,'Blocked storage cannot prevent confirmed logout and the private-memory fence');window.localStorage=local;
+ globalThis.BroadcastChannel=class {constructor(){throw new DOMException('blocked','SecurityError')}};
+ const isolatedEvents=await import(moduleUrl((await fs.readFile('lib/client/data-events.ts','utf8')).replace("'./process-draft'",JSON.stringify(draftUrl)).replace("'./list-state'",JSON.stringify(listStateUrl))+'\n// blocked-broadcast-fixture'));
+ assert.doesNotThrow(()=>isolatedEvents.resetClientData(false),'Blocked cross-tab channels cannot break in-memory invalidation');globalThis.BroadcastChannel=undefined;
+ console.log('Confirmed logout remains successful when browser storage or BroadcastChannel is blocked.');
+
+ const csvHeaders={'Content-Type':'text/csv; charset=utf-8','Content-Disposition':'attachment; filename="binso-fixture.csv"'};
+ globalThis.fetch=async(path,options)=>{assert.equal(path,'/api/reports?format=csv');assert.equal(options.cache,'no-store');assert.equal(options.credentials,'same-origin');assert.equal(options.headers.Accept,'text/csv');return new Response('"Metric";"Value"\r\n', {headers:csvHeaders})};
+ const exportFile=await backend.apiGetFile('/api/reports?format=csv','text/csv');assert.equal(exportFile.fileName,'binso-fixture.csv');assert.equal(await exportFile.blob.text(),'"Metric";"Value"\r\n');
+ globalThis.fetch=async()=>new Response(JSON.stringify({message:'Export unavailable'}),{status:503});await assert.rejects(backend.apiGetFile('/api/reports?format=csv','text/csv'),/Export unavailable/);
+ let invalidSignals=0;window.dispatchEvent=event=>{if(event.type==='binso-session-invalid')invalidSignals++};
+ globalThis.fetch=async()=>new Response(JSON.stringify({message:'Session expired'}),{status:401});await assert.rejects(backend.apiGetFile('/api/reports?format=csv','text/csv'),/Session expired/);assert.equal(invalidSignals,1);
+ globalThis.fetch=async()=>new Response('{"not":"csv"}',{headers:{'Content-Type':'application/json'}});await assert.rejects(backend.apiGetFile('/api/reports?format=csv','text/csv'),error=>error.code==='invalid_response');
+ let deliverExport;globalThis.fetch=()=>new Promise(resolve=>{deliverExport=resolve});const obsoleteExport=backend.apiGetFile('/api/reports?format=csv','text/csv');cache.invalidateClientSession();deliverExport(new Response('private old tenant CSV',{headers:csvHeaders}));await assert.rejects(obsoleteExport,error=>error.code==='session_changed');
+ let body;globalThis.fetch=async()=>new Response(new ReadableStream({start(controller){body=controller}}),{headers:csvHeaders});const lateExport=backend.apiGetFile('/api/reports?format=csv','text/csv');await Promise.resolve();cache.invalidateClientSession();body.enqueue(new TextEncoder().encode('private late CSV'));body.close();await assert.rejects(lateExport,error=>error.code==='session_changed');
+ console.log('File exports: verified CSV content/name, private request, HTTP errors, expired sessions, wrong MIME and tenant changes before/after headers passed.');
+
 }finally{globalThis.BroadcastChannel=originalBroadcastChannel;globalThis.fetch=originalFetch;delete globalThis.window;delete globalThis.document;}

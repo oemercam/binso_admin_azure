@@ -1,5 +1,6 @@
 "use client";
 
+import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
 import { useEffect, useState } from "react";
 import { startDemoClientSession } from "@/lib/client/backend";
 import {Logo, ErrorState} from "@/components/ui";
@@ -28,10 +29,10 @@ export default function Demo(){
   },[]);
 
   return <main className="app-launch-screen" aria-live="polite">
-    <button className="app-launch-brand" type="button" disabled={opening} onClick={()=>void openDemo()} aria-label="Binso One erneut öffnen">
+    <LocalizedElement as="button" className="app-launch-brand" type="button" disabled={opening} onClick={()=>void openDemo()} aria-label="Binso One erneut öffnen">
       <Logo compact/>
-    </button>
-    {error&&<ErrorState className="app-launch-error">{error}</ErrorState>}
-    <span className="sr-only">Binso One wird vorbereitet.</span>
+    </LocalizedElement>
+    {error&&<ErrorState className="app-launch-error"><LocalizedText>{error}</LocalizedText></ErrorState>}
+    <span className="sr-only"><LocalizedText>{"Binso One wird vorbereitet."}</LocalizedText></span>
   </main>;
 }

@@ -1,5 +1,5 @@
 import {NextRequest} from 'next/server';
-import {tenantCan} from '@/lib/permissions';
+import {listProjects} from '@/lib/server/repositories/project-workspace';
 import {randomUUID} from 'node:crypto';
 import {requireSession} from '@/lib/server/session';
 import {authorize} from '@/lib/server/rbac';
@@ -7,11 +7,7 @@ import {withTenant} from '@/lib/server/db';
 import {audit} from '@/lib/server/audit';
 import {idempotentBusiness} from '@/lib/server/business-idempotency';
 import {ApiError,apiError,assertSameOrigin,cleanText,json,readJson} from '@/lib/server/http';
-export async function GET(){try{const s=await requireSession();authorize(s,'projects:read');return json({items:await withTenant(s.organizationId,s.userId,async c=>(await c.query(`select p.id,p.name,p.customer_id,p.status,p.source_quote_id,c.name customer_name,q.quote_no source_offer,
- coalesce((select sum(t.hours) from time_entries t where t.organization_id=p.organization_id and t.project_id=p.id and t.archived_at is null),0) hours,
- coalesce((select sum(t.hours) from time_entries t where t.organization_id=p.organization_id and t.project_id=p.id and t.archived_at is null and t.invoiced_invoice_id is not null),0) invoiced_hours
-  ,${tenantCan(s.role,'invoices:read')?`coalesce((select json_agg(distinct i.invoice_no) from time_entries t join invoices i on i.id=t.invoiced_invoice_id and i.organization_id=t.organization_id where t.organization_id=p.organization_id and t.project_id=p.id and t.archived_at is null),'[]'::json)`:`'[]'::json`} invoice_numbers
- from projects p left join customers c on c.id=p.customer_id and c.organization_id=p.organization_id left join quotes q on q.id=p.source_quote_id and q.organization_id=p.organization_id where p.organization_id=$1 and p.archived_at is null order by p.name`,[s.organizationId])).rows)});}catch(e){return apiError(e)}}
+export async function GET(request:NextRequest){try{const s=await requireSession();authorize(s,'projects:read');return json(await withTenant(s.organizationId,s.userId,c=>listProjects(c,s,request.nextUrl.searchParams),{snapshot:true}));}catch(error){return apiError(error)}}
 export async function POST(request:NextRequest){try{assertSameOrigin(request);const s=await requireSession();authorize(s,'projects:write');const body=await readJson<Record<string,unknown>>(request,8192);const name=cleanText(body.name,200),customerId=cleanText(body.customerId,80),sourceOffer=cleanText(body.sourceOffer,80);if(name.length<2)throw new ApiError(400,'name_required','Bitte eine Projektbezeichnung eingeben.');
  const requestKey=request.headers?.get('idempotency-key')?.trim()??'';
  const item=await withTenant(s.organizationId,s.userId,async c=>{const write=async()=>{let quoteId=null;

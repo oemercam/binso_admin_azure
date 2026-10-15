@@ -1,7 +1,8 @@
 "use client";
 
+import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
 import Link from "next/link";
-import {FormEvent,useState} from "react";
+import {FormEvent,useRef,useState} from "react";
 import {Button, Icon, Logo, Input, Field, ErrorState} from "@/components/ui";
 import {clearDemoClientSession} from "@/lib/client/backend";
 import {safeAppPath} from "@/lib/navigation";
@@ -9,7 +10,9 @@ import {safeAppPath} from "@/lib/navigation";
 type Stage="credentials"|"email"|"totp"|"verify";
 
 export default function Login(){
+  const pending=useRef(false);
   const [show,setShow]=useState(false);
+  const [rememberMe,setRememberMe]=useState(false);
   const [email,setEmail]=useState("");
   const [password,setPassword]=useState("");
   const [code,setCode]=useState("");
@@ -26,7 +29,7 @@ export default function Login(){
   };
 
   const loginRequest=async(extra:Record<string,string>={})=>{
-    const response=await fetch("/api/auth/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email,password,...extra})});
+    const response=await fetch("/api/auth/login",{method:"POST",signal:AbortSignal.timeout(15000),headers:{"Content-Type":"application/json"},body:JSON.stringify({email,password,rememberMe,...extra})});
     const payload=await response.json().catch(()=>({}));
     if(response.status===202){
       setCode("");
@@ -41,56 +44,57 @@ export default function Login(){
   };
 
   const submitCredentials=async(event:FormEvent)=>{
-    event.preventDefault();setLoading(true);setError("");
+    event.preventDefault();if(pending.current)return;pending.current=true;setLoading(true);setError("");
     try{await loginRequest();}catch(error){setError(error instanceof Error?error.message:"Anmeldung nicht möglich.");}
-    finally{setLoading(false);}
+    finally{pending.current=false;setLoading(false);}
   };
 
   const submitCode=async(event:FormEvent)=>{
-    event.preventDefault();setLoading(true);setError("");
+    event.preventDefault();if(pending.current)return;pending.current=true;setLoading(true);setError("");
     try{
       if(stage==="verify"){
-        const response=await fetch("/api/auth/verify-email",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email,code})});
+        const response=await fetch("/api/auth/verify-email",{method:"POST",signal:AbortSignal.timeout(15000),headers:{"Content-Type":"application/json"},body:JSON.stringify({email,code,rememberMe})});
         const payload=await response.json().catch(()=>({}));
         if(!response.ok)throw new Error(typeof payload?.message==="string"?payload.message:"Code konnte nicht bestätigt werden.");
         finish(payload);return;
       }
       await loginRequest(stage==="totp"?{mfaCode:code}:{emailCode:code});
     }catch(error){setError(error instanceof Error?error.message:"Code konnte nicht bestätigt werden.");}
-    finally{setLoading(false);}
+    finally{pending.current=false;setLoading(false);}
   };
 
   const resend=async()=>{
-    setLoading(true);setError("");
+    if(pending.current)return;pending.current=true;setLoading(true);setError("");
     try{
-      if(stage==="verify")await fetch("/api/auth/resend-verification",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email})});
+      if(stage==="verify"){const response=await fetch("/api/auth/resend-verification",{method:"POST",signal:AbortSignal.timeout(15000),headers:{"Content-Type":"application/json"},body:JSON.stringify({email})});if(!response.ok)throw new Error("Code konnte nicht erneut gesendet werden.");}
       else if(stage==="email")await loginRequest();
     }catch(error){setError(error instanceof Error?error.message:"Code konnte nicht erneut gesendet werden.");}
-    finally{setLoading(false);}
+    finally{pending.current=false;setLoading(false);}
   };
 
   if(stage!=="credentials")return <main className="auth-page"><section className="auth-card">
-    <Logo/><h1>{stage==="totp"?"Authenticator-Code":stage==="verify"?"E-Mail bestätigen":"Anmeldung bestätigen"}</h1>
-    <p>{stage==="totp"?"Öffne deine Authenticator-App und gib den aktuellen Code oder einen Recovery Code ein.":`Wir haben einen 6-stelligen Code an ${email} gesendet.`}</p>
+    <Logo/><h1><LocalizedText>{stage==="totp"?"Authenticator-Code":stage==="verify"?"E-Mail bestätigen":"Anmeldung bestätigen"}</LocalizedText></h1>
+    <p><LocalizedText>{stage==="totp"?"Öffne deine Authenticator-App und gib den aktuellen Code oder einen Recovery Code ein.":`Wir haben einen 6-stelligen Code an ${email} gesendet.`}</LocalizedText></p>
     <form onSubmit={submitCode}>
       <Field label={stage==="totp"?"Authenticator- oder Recovery-Code":"6-stelliger Code"}><Input required autoFocus value={code} onChange={e=>setCode(stage==="totp"?e.target.value:e.target.value.replace(/\D/g,"").slice(0,6))} inputMode={stage==="totp"?"text":"numeric"} autoComplete="one-time-code" placeholder={stage==="totp"?"000000 oder Recovery Code":"000000"}/></Field>
-      {error&&<ErrorState className="auth-error">{error}</ErrorState>}
-      <Button type="submit" disabled={loading||!code.trim()}>{loading?"Wird geprüft…":"Anmeldung abschliessen"}</Button>
+      {error&&<ErrorState className="auth-error"><LocalizedText>{error}</LocalizedText></ErrorState>}
+      <Button type="submit" disabled={loading||!code.trim()}><LocalizedText>{loading?"Wird geprüft…":"Anmeldung abschliessen"}</LocalizedText></Button>
     </form>
-    {stage!=="totp"&&<button type="button" className="auth-inline-action" disabled={loading} onClick={()=>void resend()}>Code erneut senden</button>}
-    <button type="button" className="auth-inline-action" onClick={()=>{setStage("credentials");setCode("");setError("");}}>Zurück</button>
+    {stage!=="totp"&&<button type="button" className="auth-inline-action" disabled={loading} onClick={()=>void resend()}><LocalizedText>{"Code erneut senden"}</LocalizedText></button>}
+    <button type="button" className="auth-inline-action" onClick={()=>{setStage("credentials");setCode("");setError("");}}><LocalizedText>{"Zurück"}</LocalizedText></button>
   </section></main>;
 
   return <main className="auth-page"><section className="auth-card">
-    <Logo/><h1>Willkommen zurück</h1><p>Melde dich sicher in deinem Binso One Konto an.</p>
+    <Logo/><h1><LocalizedText>{"Willkommen zurück"}</LocalizedText></h1><p><LocalizedText>{"Melde dich sicher in deinem Binso One Konto an."}</LocalizedText></p>
     <form onSubmit={submitCredentials}>
       <Field label="E-Mail"><Input required value={email} onChange={e=>setEmail(e.target.value)} type="email" inputMode="email" autoComplete="email" placeholder="name@firma.ch"/></Field>
-      <Field label="Passwort"><div className="password-field"><Input required value={password} onChange={e=>setPassword(e.target.value)} type={show?"text":"password"} autoComplete="current-password" placeholder="••••••••"/><button className="password-visibility" type="button" onClick={()=>setShow(!show)} aria-label={show?"Passwort ausblenden":"Passwort anzeigen"} aria-pressed={show}><Icon name={show?"eye-off":"eye"} size={18}/></button></div></Field>
-      <div className="form-link"><Link href="/passwort-vergessen">Passwort vergessen?</Link></div>
-      {error&&<ErrorState className="auth-error">{error}</ErrorState>}
-      <Button type="submit" disabled={loading}>{loading?"Anmeldung läuft…":"Weiter"}</Button>
+      <Field label="Passwort"><div className="password-field"><Input required value={password} onChange={e=>setPassword(e.target.value)} type={show?"text":"password"} autoComplete="current-password" placeholder="••••••••"/><LocalizedElement as="button" className="password-visibility" type="button" onClick={()=>setShow(!show)} aria-label={show?"Passwort ausblenden":"Passwort anzeigen"} aria-pressed={show}><Icon name={show?"eye-off":"eye"} size={18}/></LocalizedElement></div></Field>
+      <label><Input type="checkbox" checked={rememberMe} onChange={event=>setRememberMe(event.target.checked)}/><LocalizedText>{"Angemeldet bleiben"}</LocalizedText></label>
+      <div className="form-link"><Link href="/passwort-vergessen"><LocalizedText>{"Passwort vergessen?"}</LocalizedText></Link></div>
+      {error&&<ErrorState className="auth-error"><LocalizedText>{error}</LocalizedText></ErrorState>}
+      <Button type="submit" disabled={loading}><LocalizedText>{loading?"Anmeldung läuft…":"Weiter"}</LocalizedText></Button>
     </form>
-    <div className="auth-divider"><span>oder</span></div><Button href="/demo" variant="secondary">Demo starten</Button>
-    <p className="auth-bottom">Noch kein Konto? <Link href="/registrieren">Konto erstellen</Link></p>
+    <div className="auth-divider"><span><LocalizedText>{"oder"}</LocalizedText></span></div><Button href="/demo" variant="secondary"><LocalizedText>{"Demo starten"}</LocalizedText></Button>
+    <p className="auth-bottom"><LocalizedText>{"Noch kein Konto? "}</LocalizedText><Link href="/registrieren"><LocalizedText>{"Konto erstellen"}</LocalizedText></Link></p>
   </section></main>;
 }
