@@ -17,14 +17,20 @@ try{
   const context=await browser.newContext({viewport:{width,height:900},serviceWorkers:'block'});
   await context.addCookies([{name:'binso_demo',value:'1',url:base},{name:'binso_operator_demo',value:'1',url:base}]);
   await context.route('**/api/**',route=>{const pathname=new URL(route.request().url()).pathname;return route.fulfill({json:pathname==='/api/auth/session'?{authenticated:true,demo:true,user:{id:'fixture'},tenant:{id:'fixture',role:'owner',plan:'pro'}}:pathname==='/api/settings/profile'?{item:{display_name:'Fixture Person',language:locale}}:{items:[],tracker:null}})});
-  const faults=[];
-  const trackedPage=async()=>{const next=await context.newPage();next.on('pageerror',error=>faults.push(error.message));return next};
+  const faults=[],cancelledReloadPrefetches=[];let reloading=false;
+  const trackedPage=async()=>{const next=await context.newPage();next.on('pageerror',error=>{
+   // WebKit reports old-document speculative RSC fetches as page errors when
+   // an explicit full reload cancels them. Keep startup/application errors and
+   // the same error outside that reload phase fatal; retain cancellation evidence.
+   if(reloading&&error.message.includes('_rsc=')&&error.message.includes('due to access control checks.'))cancelledReloadPrefetches.push(error.message);
+   else faults.push(error.message);
+  });return next};
   let page=await trackedPage();
   await page.goto(base+'/?lang='+locale,{waitUntil:'networkidle'});await page.locator('.hero').waitFor();
   assert.equal(await page.locator('html').getAttribute('lang'),locale+'-CH');
   const selector=page.locator('.locale-switcher select:visible').first();await selector.selectOption(locale==='en'?'fr':'en');
   const chosen=locale==='en'?'fr':'en';await page.waitForFunction(code=>document.documentElement.lang===code+'-CH',chosen);
-  await page.waitForLoadState('networkidle');await page.reload({waitUntil:'networkidle'});assert.equal(await page.locator('html').getAttribute('lang'),chosen+'-CH','Choice survives reload');
+  await page.waitForLoadState('networkidle');reloading=true;try{await page.reload({waitUntil:'networkidle'})}finally{reloading=false}assert.equal(await page.locator('html').getAttribute('lang'),chosen+'-CH','Choice survives reload');
   for(const route of ['/?lang='+locale,'/dashboard?lang='+locale,'/operator?lang='+locale,'/wartung?lang='+locale,'/missing-localization-route?lang='+locale]){
    await page.waitForLoadState('networkidle');assert.deepEqual(faults,[],'No runtime failures before an isolated route reset');
    page.removeAllListeners('pageerror');await page.close();page=await trackedPage();
@@ -40,7 +46,7 @@ try{
    }
    if(route.startsWith('/?')){assert.equal((await page.locator('.hero h1').textContent()).replace(/\s/g,''),(text('Dein Büro.',locale)+text('Einfach dabei.',locale)).replace(/\s/g,''));}if(route.startsWith('/?'))await page.screenshot({path:output+'/landing-'+locale+'-'+width+'.png',fullPage:true});
   }
-  assert.deepEqual(faults,[],'No uncaught browser errors');results.push({locale,width,passed:true});await context.close();
+  assert.deepEqual(faults,[],'No uncaught browser errors');results.push({locale,width,passed:true,cancelledReloadPrefetches});await context.close();
  }
  await fs.writeFile(output+'/results.json',JSON.stringify(results,null,2));console.log('Four-language landing/customer/operator/404, persistent selection and responsive overflow checks passed.');
 }finally{await browser?.close();server.kill()}
