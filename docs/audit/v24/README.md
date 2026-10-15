@@ -39,3 +39,7 @@ Node `24.19.0`, Projekt-pnpm `10.17.1` über `corepack pnpm`. Der globale pnpm i
 Die unveränderten GitHub-PR-Gates können in ihrer vorgesehenen Runner-Umgebung weitere Evidenz liefern. Fehlende reale PostgreSQL-/PWA-/Gerätenachweise bleiben auch bei grünen statischen Tests offen.
 
 Kein Merge auf main: `.github/workflows/deploy-azure.yml` startet nach erfolgreicher main-Quality automatisch produktive Migrationen/Deploy. Ein Merge wäre damit keine rein interne Integration. Produktivfreigabe bleibt ausdrücklich erforderlich.
+
+## Nachfolgende Implementierung
+
+Der begrenzte zentrale Fix für Erstellen-Aktionen ist separat in `create-placement-phase.md` dokumentiert. Das obige Inventar und die Baseline bleiben auf cb1e5574 bezogen. V24 ist weiterhin nicht vollständig umgesetzt oder abgenommen.

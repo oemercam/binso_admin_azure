@@ -11,10 +11,9 @@ export function AppHeader({leading,actions,children,detail=false,className="",ac
  </header>;
 }
 
-/** Creation is a separate action next to navigation, never a destination. */
-export function MobileDock({children,action,compact=false}:{children:ReactNode;action?:ReactNode;compact?:boolean}){
+/** Navigation owns destinations only; creation belongs to the page action area. */
+export function MobileDock({children,compact=false}:{children:ReactNode;compact?:boolean}){
  return <div className={`mobile-dock${compact?" is-compact":""}`}>
   {children}
-  {action&&<div className="mobile-dock-action">{action}</div>}
  </div>;
 }
