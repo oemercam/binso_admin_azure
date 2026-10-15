@@ -5905,7 +5905,7 @@
       "calls": [
         {
           "callee": "useDemoRows",
-          "line": 38,
+          "line": 39,
           "arguments": [
             "\"customers\"",
             "customers",
@@ -5914,28 +5914,28 @@
         },
         {
           "callee": "useApiQuery",
-          "line": 46,
+          "line": 47,
           "arguments": [
             "production?\"/api/customers/\"+encodeURIComponent(customerId)+\"?include=workspace\":null"
           ]
         },
         {
           "callee": "apiDelete",
-          "line": 87,
+          "line": 88,
           "arguments": [
             "\"/api/customers/\"+encodeURIComponent(customerId)+\"/contacts/\"+encodeURIComponent(removeContact)"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 155,
+          "line": 156,
           "arguments": [
             "customerId?\"/api/customers/\"+encodeURIComponent(customerId):null"
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 187,
+          "line": 188,
           "arguments": [
             "\"/api/customers/\"+encodeURIComponent(customerId)",
             "body"
@@ -5943,7 +5943,7 @@
         },
         {
           "callee": "apiPost",
-          "line": 187,
+          "line": 188,
           "arguments": [
             "\"/api/customers\"",
             "body",
@@ -5979,35 +5979,35 @@
       "calls": [
         {
           "callee": "useApiQuery",
-          "line": 57,
+          "line": 58,
           "arguments": [
             "existing&&employeeId?(production?\"/api/employees/\"+encodeURIComponent(employeeId):\"/api/demo/data?collection=employees&id=\"+encodeURIComponent(employeeId)):null"
           ]
         },
         {
           "callee": "apiGet<{tenant?:{role?:string;readOnly?:boolean}}>(\"/api/auth/session\").then(data=>setCanAddDocument(!data.tenant?.readOnly&&tenantCan(data.tenant?.role??\"reader\",\"employees:write\"))).catch",
-          "line": 69,
+          "line": 70,
           "arguments": [
             "()=>undefined"
           ]
         },
         {
           "callee": "apiGet<{tenant?:{role?:string;readOnly?:boolean}}>(\"/api/auth/session\").then",
-          "line": 69,
+          "line": 70,
           "arguments": [
             "data=>setCanAddDocument(!data.tenant?.readOnly&&tenantCan(data.tenant?.role??\"reader\",\"employees:write\"))"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 69,
+          "line": 70,
           "arguments": [
             "\"/api/auth/session\""
           ]
         },
         {
           "callee": "apiUpload",
-          "line": 75,
+          "line": 76,
           "arguments": [
             "\"/api/files\"",
             "form"
@@ -6015,28 +6015,28 @@
         },
         {
           "callee": "apiGet",
-          "line": 87,
+          "line": 88,
           "arguments": [
             "\"/api/time-entries?employeeId=\"+encoded"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 88,
+          "line": 89,
           "arguments": [
             "\"/api/expenses?employeeId=\"+encoded"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 89,
+          "line": 90,
           "arguments": [
             "\"/api/files?employeeId=\"+encoded"
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 135,
+          "line": 136,
           "arguments": [
             "\"/api/employees/\"+encodeURIComponent(employeeId)",
             "payload"
@@ -6044,7 +6044,7 @@
         },
         {
           "callee": "apiPost",
-          "line": 138,
+          "line": 139,
           "arguments": [
             "\"/api/employees\"",
             "payload",

@@ -17,3 +17,7 @@ Lokale Katalog-/SSR-, CSS-, Sitzungs-, Auth-Race-, RLS-, Idempotenz- und Wartung
 ## Noch offene Konzeptfunktionen
 
 Ein eigener Projektarbeitsbereich mit Liste, Details, Versionsschutz und Statuspflege sowie rollen- und paketabhängige Berichte mit CSV-Export sind implementiert. Laufende oder pausierte Projektzeit verhindert den Abschluss; geschlossene Projekte erlauben keine neue Zeiterfassung. Datenbank-, Mandanten-, Rollen- und Exporttests bestehen; die Browserabnahme steht noch aus. Lohnabrechnung, vollständige MWST-Abrechnung und umfassende Infrastrukturverwaltung sind weiterhin nicht implementiert. Diese Bereiche dürfen nicht als vollständig abgenommen ausgewiesen werden. Schweizer Lohn-/Steuerberechnung benötigt zusätzlich definierte Berechnungsgrundlagen und fachliche Abnahmetests. Es werden keine leeren Navigationsziele als fertige Funktionen ergänzt.
+
+## Security-Review-Nachtrag
+
+Kontakt-URIs für Mitarbeitende und Kunden werden zentral mit festem mailto-/tel-Protokoll und kontextgerechter URI-Kodierung erzeugt. Kontrollzeichen und Wählkommandos werden abgewiesen; Anzeigenamen und Kontaktdaten werden weiterhin als React-Text ausgegeben. Regressionen prüfen Adress-Trennzeichen, feste Protokolle und ungültige Telefonnummern. Der Sprach-Browsertest erstellt seinen Standard-Ausgabeordner mit mkdtemp und schreibt die Ergebnisdatei exklusiv mit restriktiven Dateirechten. Die offenen CodeQL-Review-Threads müssen nach erneutem Scan geprüft werden.
