@@ -1,5 +1,5 @@
 {
-  "commit": "116ad260d98123b433449f5d53f47f64b09827c5",
+  "commit": "4c39191da8c84ba83ea17b2ce995e7c768fc1010",
   "method": "Existing TypeScript AST dependency inventory; conditional reachability is not runtime proof",
   "pages": [
     {
@@ -5027,10 +5027,13 @@
       "route": "/login",
       "family": "AuthenticationPage",
       "components": [
+        "components/auth-workspace.tsx#AuthWorkspace",
         "components/ui.tsx#Logo",
+        "components/locale-switcher.tsx#LocaleSwitcher",
+        "components/ui.tsx#Select",
+        "components/ui.tsx#Icon",
         "components/ui.tsx#Field",
         "components/ui.tsx#Input",
-        "components/ui.tsx#Select",
         "components/ui.tsx#Textarea",
         "components/ui.tsx#Checkbox",
         "components/ui.tsx#DateInput",
@@ -5040,7 +5043,6 @@
         "components/ui.tsx#FormError",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
-        "components/ui.tsx#Icon",
         "components/ui.tsx#dismissActionLabels",
         "components/ui.tsx#actionSourceText"
       ],
@@ -6564,14 +6566,16 @@
       "route": "/passwort-vergessen",
       "family": "AuthenticationPage",
       "components": [
+        "components/auth-workspace.tsx#AuthWorkspace",
         "components/ui.tsx#Logo",
-        "components/ui.tsx#Button",
+        "components/locale-switcher.tsx#LocaleSwitcher",
+        "components/ui.tsx#Select",
         "components/ui.tsx#Icon",
+        "components/ui.tsx#Button",
         "components/ui.tsx#dismissActionLabels",
         "components/ui.tsx#actionSourceText",
         "components/ui.tsx#Field",
         "components/ui.tsx#Input",
-        "components/ui.tsx#Select",
         "components/ui.tsx#Textarea",
         "components/ui.tsx#Checkbox",
         "components/ui.tsx#DateInput",
@@ -6660,14 +6664,16 @@
         "components/use-browser-back-guard.ts#guards",
         "components/use-browser-back-guard.ts#boundary",
         "components/use-browser-back-guard.ts#armBoundary",
+        "components/auth-workspace.tsx#AuthWorkspace",
         "components/ui.tsx#Logo",
-        "components/ui.tsx#Button",
+        "components/locale-switcher.tsx#LocaleSwitcher",
+        "components/ui.tsx#Select",
         "components/ui.tsx#Icon",
+        "components/ui.tsx#Button",
         "components/ui.tsx#dismissActionLabels",
         "components/ui.tsx#actionSourceText",
         "components/ui.tsx#Field",
         "components/ui.tsx#Input",
-        "components/ui.tsx#Select",
         "components/ui.tsx#Textarea",
         "components/ui.tsx#Checkbox",
         "components/ui.tsx#DateInput",
@@ -6691,7 +6697,7 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 57,
+          "line": 59,
           "component": "app/passwort-zuruecksetzen/page.tsx#Page"
         },
         {

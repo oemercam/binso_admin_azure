@@ -2442,6 +2442,14 @@ input:not([type="checkbox"]):not([type="radio"]),
 /* Shared app appearance for phone, PWA and tablet / split views.
    Scope inherited legacy aliases to content and portals, never to navigation. */
 @media (max-width:1100px){
+  :root{--app-control-radius:8px}
+  .auth-workspace.auth-page{gap:24px;padding-inline:max(var(--mobile-page-x),var(--safe-left));padding-top:calc(12px + var(--safe-top));padding-bottom:calc(24px + var(--safe-bottom))}
+  .auth-workspace-body{grid-template-columns:minmax(0,1fr);max-width:440px;padding-block:12px;align-items:start}
+  .auth-workspace-intro{display:none}
+  .auth-workspace-body>.auth-card{border:0;padding:0}
+  .auth-workspace-header .logo{width:88px;height:28px}
+  .auth-workspace-footer{flex-wrap:wrap}
+
   .mobile-header-detail .document-header-icons .icon-button{
     width:40px;
     min-width:40px;

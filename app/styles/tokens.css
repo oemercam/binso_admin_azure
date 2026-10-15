@@ -15,12 +15,14 @@
   --app-divider:#dedee2;
   --app-symbol:#737379;
   --app-accent:#006ec7;
-  --app-accent-soft:#edf5fc;
+  --app-accent-soft:#edf4ff;
+  --app-action-accent:#2566bd;
+  --button-radius:7px;
   --app-accent-text:#fff;
   --sidebar-collapsed-w:68px;
   --app-control-border:#d3d3d8;
   --app-group-radius:22px;
-  --app-control-radius:12px;
+  --app-control-radius:7px;
   --stat-cell-min:120px;
   --insight-panel-min:240px;
   --operator-detail-panel-min:420px;
@@ -148,7 +150,7 @@
   --sheet-row-gap:10px;
   --control-help-font:10px;
   --control-x:11px;
-  --control-radius:var(--radius-md);
+  --control-radius:var(--app-control-radius);
   --control-textarea-min:110px;
   --control-disabled-opacity:.45;
   --control-border:#d9d9d6;
@@ -197,6 +199,7 @@ html[data-theme="dark"]{
   --app-symbol:#929297;
   --app-accent:#48a7ff;
   --app-accent-soft:#102b42;
+  --app-action-accent:#48a7ff;
   --app-accent-text:#071521;
   --app-control-border:#3a3a3e;
   --control-border:#333;

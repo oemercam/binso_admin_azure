@@ -6,7 +6,7 @@ Ausgangsstand: `116ad260d98123b433449f5d53f47f64b09827c5` (Main, PR #255). Arbei
 
 [Neuer Auftrag](white-workspaces-request.md), vom Nutzer am 15.10.2026 beigefügt. Seine konkreten Designentscheidungen haben Vorrang vor älteren widersprüchlichen Gestaltungsanforderungen. Weisse Grund-/Header-/Inhaltsflächen im Light Mode; dezente blaue Aktionen und Zustände; separate konsistente Dark-Variante; eigenständige Desktop- und mobile Bedienung. Die bestehende mobile Bottom-Navigation bleibt geschützt.
 
-Die zuletzt freigegebenen Desktop-, Mobile/PWA- und Landingpage-Designvorschauen liegen dieser Arbeitsumgebung nicht vor. Schriftliche Anforderungen können umgesetzt werden; exakte Referenzparität wird nicht behauptet. Anforderungen des gesamten V24 bleiben offen, bis sie individuell nachgewiesen sind.
+Die Referenzen wurden nach dem ersten Foundation-Paket im Gesprächskontext und anschliessend als aktuelle Datei `binso-one-ux-referenzpaket.zip` gefunden (15.10.2026, 19:35 UTC). `reference/IMPLEMENTIERUNG.md` wurde zuerst gelesen; die vier zugehörigen HTML-Ansichten liegen unverändert unter `reference/`. Microsoft-Variante ist verbindlich. Dark Mode und vollständige Adminansichten sind laut Paket noch nicht visuell freigegeben. Exakte Referenzparität wird ohne Browservergleich nicht behauptet. Anforderungen des gesamten V24 bleiben offen, bis sie individuell nachgewiesen sind.
 
 ## Ursachen und zentrale Korrekturen
 
@@ -37,6 +37,16 @@ Der Token-Snapshot und der zentrale UX-Vertrag enthalten die neue schriftliche W
 
 ## Verbleibender Umfang
 
-Gesamtauftrag nicht abgeschlossen. Offen sind genaue Referenzbindung, vollständige Prüfung jeder Route/Zustands-/Rollen-/Sprachkombination, kontrollierter Desktop-Aktionsoverflow, aktuelle Firmen-/Arbeitsbereichsauswahl, Admin-Suche/Benachrichtigungen mit realen Daten, sämtliche Layout-/Overlayvarianten und vollständige Legacy-Nutzungsbereinigung. Das Repository unterstützt derzeit DE/FR/IT/EN; TR ist im neuen Auftrag gefordert, aber noch nicht implementiert. Keine funktionslosen zusätzlichen Schaltflächen dafür eingeführt.
+Gesamtauftrag nicht abgeschlossen. Offen sind tatsächlicher visueller Referenzvergleich, vollständige Prüfung jeder Route/Zustands-/Rollen-/Sprachkombination, kontrollierter Desktop-Aktionsoverflow, aktuelle Firmen-/Arbeitsbereichsauswahl, Admin-Suche/Benachrichtigungen mit realen Daten, sämtliche Layout-/Overlayvarianten und vollständige Legacy-Nutzungsbereinigung. Das Repository unterstützt derzeit DE/FR/IT/EN; TR ist im neuen Auftrag gefordert, aber noch nicht implementiert. Keine funktionslosen zusätzlichen Schaltflächen dafür eingeführt.
 
 Issue #238 und seine Scanner-/Ingress-/Betriebs-/Geräte-/Abnahmenachweise bleiben offen. Der aktuelle bereits ausgelieferte Stand ist ein dokumentierter Entwicklungsumfang; dieser Nachtrag erklärt ihn nicht zur vollständigen Produktionsabnahme. Kein Merge/Deploy dieses Pakets ohne bestandene Pflicht-Gates und zulässigen Review.
+
+## Referenzgebundene Pilotansichten
+
+`AuthWorkspace` bildet den gemeinsamen Desktop-Rahmen für Login, Codeprüfung und Passwortanforderung/-zurücksetzung. Bestehende Formular-, Fehler-, Doppelsubmit-, Reset- und Session-Handler bleiben erhalten. Auf Mobile/Tablet wird die Marketing-Einleitung ausgeblendet, Formular und echte Navigation bleiben erreichbar. Sprache und Rechtslinks sind funktional; Original-Logo statt Textlogo. Registrierung behält vorläufig den vorhandenen Wizard/Sheet-Prozess.
+
+Die Ausgangswerte des Referenzpakets werden in bestehenden Tokens verwendet: Primäraktion `--app-action-accent:#2566bd`, weiche Fläche `#edf4ff`, Buttonradius 7 px, Feldradius Desktop 7 px/Mobile 8 px. `--app-accent` der eingefrorenen Navigation bleibt unverändert; nur Inhalts-/Overlay-/Desktop-Shell-Kontexte binden den freigegebenen Aktionsakzent ein. Native Dateiauswahl verwendet den gemeinsamen dezenten blauen `::file-selector-button`; Dateinamen, native Auswahl und Disabled-Verhalten bleiben erhalten.
+
+Der bestehende Browser-Controltest erwartet aufgrund der neuen expliziten Referenz 8 statt 12 px. Keine Referenzbilder oder Gate-Entscheidungen angepasst. `ux-reference-capture.mjs` rendert die unveränderten Referenzdateien in einem separaten, netzwerkgesperrten Browserkontext mit bereits gebündeltem Lucide. Ein zusätzlicher Evidenzschritt im bestehenden Chromium-Job legt diese Bilder bei den tatsächlichen Produkt-Screenshots ab; keine automatische Baselinefreigabe. Keine Vorschau-Daten/Handler ins Produkt übernommen.
+
+Vor der Referenz-Pilotänderung bestanden auf `4c39191da8c84ba83ea17b2ce995e7c768fc1010` GitHub Quality #38796209547 und CodeQL #38796209578. Der vollständige lokale Diagnoselauf bestand 41 von 42 Einzeltests; nur der Scanner-Unix-Socket scheiterte an EPERM. Dies ersetzt nicht das vollständige Pflichtgate. Neue Pilotänderungen benötigen eigene CI-/Browsernachweise.

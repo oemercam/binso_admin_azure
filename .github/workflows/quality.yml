@@ -218,6 +218,12 @@ jobs:
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-${{ runner.arch }}-playwright-1.62.1-${{ matrix.engine }}
+      - name: Capture owner-supplied UX reference views
+        if: matrix.engine == 'chromium'
+        env:
+          BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs
+          BINSO_REFERENCE_OUTPUT: ${{ runner.temp }}/binso-ux-${{ matrix.engine }}
+        run: node scripts/ux-reference-capture.mjs
       - name: Scroll endpoint measurement adversaries
         env:
           BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs

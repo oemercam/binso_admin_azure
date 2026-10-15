@@ -1,9 +1,11 @@
 "use client";
 
+import {AuthWorkspace} from "@/components/auth-workspace";
+
 import {LocalizedText} from "@/lib/client/locale";
 import Link from "next/link";
 import { FormEvent, useRef, useState } from "react";
-import {Button, Logo, Input, Field, ErrorState} from "@/components/ui";
+import {Button, Input, Field, ErrorState} from "@/components/ui";
 
 export default function Page() {
   const pending=useRef(false);
@@ -25,9 +27,9 @@ export default function Page() {
     }finally{pending.current=false;setLoading(false);}
   };
 
-  return <main className="auth-page">
+  return <AuthWorkspace>
     <section className="auth-card">
-      <Logo/>
+
       <h1><LocalizedText>{"Passwort zurücksetzen"}</LocalizedText></h1>
       {sent?<><p><LocalizedText>{"Die Anfrage wurde entgegengenommen. Prüfe deinen Posteingang. Wenn kein Link ankommt, versuche es später erneut."}</LocalizedText></p><Button href="/login"><LocalizedText>{"Zur Anmeldung"}</LocalizedText></Button></>:<>
         <p><LocalizedText>{"Gib deine E-Mail-Adresse ein. Wir senden dir einen Link zum Zurücksetzen."}</LocalizedText></p>
@@ -39,5 +41,5 @@ export default function Page() {
         <p className="auth-bottom"><Link href="/login"><LocalizedText>{"Zurück zur Anmeldung"}</LocalizedText></Link></p>
       </>}
     </section>
-  </main>;
+  </AuthWorkspace>;
 }

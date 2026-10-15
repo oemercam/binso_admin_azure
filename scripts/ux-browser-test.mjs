@@ -309,7 +309,7 @@ try{
     if(!process.env.BINSO_UX_BASELINE&&width<=1100&&await page.locator('.page-container,.operator-app-content').count()){
       const appearance=await page.locator('.page-container,.operator-app-content').first().evaluate(el=>({ink:getComputedStyle(el).color,surface:getComputedStyle(el).getPropertyValue('--app-surface').trim(),controls:[...el.querySelectorAll('.form-control,.form-textarea')].filter(node=>!['checkbox','radio','file'].includes(node.type)&&!node.closest('.searchbox,.thread-composer')).map(node=>({radius:getComputedStyle(node).borderTopLeftRadius,font:getComputedStyle(node).fontSize})),groups:[...el.querySelectorAll('.bo-settings-group-body')].map(node=>({background:getComputedStyle(node).backgroundColor,border:getComputedStyle(node).borderTopWidth}))}));
       assert.equal(appearance.ink,theme==='light'?'rgb(34, 34, 37)':'rgb(222, 222, 226)',`${route}: app text uses the central theme`);
-      assert.ok(appearance.controls.every(control=>control.radius==='12px'),`${route}: shared app field corners ${JSON.stringify(appearance.controls)}`);
+      assert.ok(appearance.controls.every(control=>control.radius==='8px'),`${route}: shared app field corners ${JSON.stringify(appearance.controls)}`);
       assert.ok(appearance.groups.every(group=>group.border==='0px'&&group.background===(theme==='light'?'rgb(255, 255, 255)':'rgb(20, 20, 20)')),`${route}: grouped app surfaces in both themes`);
     }
     assert.ok(geometry.sort.every(size=>size<=44),`${route}: sorting control is too wide`);

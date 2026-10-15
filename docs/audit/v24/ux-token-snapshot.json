@@ -80,7 +80,17 @@
       },
       {
         "property": "--app-accent-soft",
-        "value": "#edf5fc",
+        "value": "#edf4ff",
+        "important": false
+      },
+      {
+        "property": "--app-action-accent",
+        "value": "#2566bd",
+        "important": false
+      },
+      {
+        "property": "--button-radius",
+        "value": "7px",
         "important": false
       },
       {
@@ -105,7 +115,7 @@
       },
       {
         "property": "--app-control-radius",
-        "value": "12px",
+        "value": "7px",
         "important": false
       },
       {
@@ -685,7 +695,7 @@
       },
       {
         "property": "--control-radius",
-        "value": "var(--radius-md)",
+        "value": "var(--app-control-radius)",
         "important": false
       },
       {
@@ -888,6 +898,11 @@
       {
         "property": "--app-accent-soft",
         "value": "#102b42",
+        "important": false
+      },
+      {
+        "property": "--app-action-accent",
+        "value": "#48a7ff",
         "important": false
       },
       {

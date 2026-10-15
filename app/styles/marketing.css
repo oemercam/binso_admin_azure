@@ -761,3 +761,19 @@ html[data-theme="dark"] .app-start-icon{filter:invert(1)}
 .demo-focus-list>button:last-child,
 .demo-summary-list>div:last-child,
 .privacy-consent-options>:last-child{border-bottom:0}
+
+/* Shared auth workspace derived from desktop-login.html, Microsoft variant. */
+.auth-workspace.auth-page{--app-accent:var(--app-action-accent);display:flex;flex-direction:column;align-items:stretch;padding:24px clamp(20px,4vw,64px);gap:32px}
+.auth-workspace-header,.auth-workspace-footer{width:100%;max-width:1120px;margin-inline:auto;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.auth-workspace-body{flex:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,460px);align-items:center;gap:clamp(40px,6vw,80px);width:100%;max-width:1020px;margin-inline:auto;padding-block:32px}
+.auth-workspace-intro{min-width:0;max-width:440px}
+.auth-workspace-intro .eyebrow{color:var(--app-accent)}
+.auth-workspace-intro h2{font-size:clamp(32px,3.5vw,44px);line-height:1.12;letter-spacing:-.035em;margin:0 0 24px}
+.auth-workspace-intro p{color:var(--color-muted);line-height:1.7;font-size:14px;margin-bottom:28px}
+.auth-workspace-intro ul{display:grid;gap:18px;padding:0;margin:0 0 36px;list-style:none}
+.auth-workspace-intro li{display:flex;align-items:center;gap:12px;font-size:13px}
+.auth-workspace-intro li svg{color:var(--app-accent)}
+.auth-workspace-intro>.text-action{display:inline-flex;align-items:center;gap:8px;color:var(--app-accent);min-height:var(--touch)}
+.auth-workspace-body>.auth-card{width:100%;max-width:none;border-left:1px solid var(--color-line);padding-left:40px}
+.auth-workspace-footer{font-size:12px;color:var(--color-muted);padding-top:20px;border-top:1px solid var(--color-line)}
+.auth-workspace-footer nav{display:flex;gap:20px;flex-wrap:wrap}

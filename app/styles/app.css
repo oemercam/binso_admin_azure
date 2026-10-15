@@ -1639,3 +1639,6 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 .bo-statistics-point{cursor:pointer;stroke:var(--statistics-bg);stroke-width:1;vector-effect:non-scaling-stroke}
 .bo-statistics-point:focus-visible{outline:2px solid var(--statistics-fg);outline-offset:2px}
 .bo-statistics-axis-row{display:flex;justify-content:space-between;gap:var(--field-label-gap);margin-top:var(--field-label-gap);min-width:0}
+
+/* App content uses the approved action blue; frozen navigation retains its token. */
+.page-container,.desktop-appbar,.app-sidebar,.operator-app-header,.operator-page-head,.operator-app-content,.bottom-sheet,.header-panel,.confirm-dialog{--app-accent:var(--app-action-accent)}
