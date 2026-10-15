@@ -54,7 +54,8 @@ const invoice={id:'invoice-one',number:'RE-TEST-1',kind:'invoice',customer_id:cu
 const offer={...invoice,id:'offer-one',kind:'offer',number:'AN-TEST-1',status:'sent',paid_amount:0};
 const payment={id:'payment-one',amount:100,currency:'CHF',paid_on:'2026-10-08',method:'bank',status:'booked',customer_id:customer.id,customer,invoice};
 const ticket={id:'ticket-one',case_number:'T-TEST-1',subject:'Testanfrage',status:'open',priority:'normal',created_at:'2026-10-08T10:00:00Z',updated_at:'2026-10-08T10:00:00Z'};
-const projectFixture={id:'project-one',name:'Cloud Migration',customer_id:customer.id,customer_name:customer.name,status:'active',hours:12.5,hours_budget:120,progress:10,notes:'Synthetic project notes',version:1,source_offer:offer.number};
+const projectSeed={id:'project-one',name:'Cloud Migration',customer_id:customer.id,customer_name:customer.name,status:'active',hours:12.5,hours_budget:120,progress:10,notes:'Synthetic project notes',version:1,source_offer:offer.number};
+let projectFixture={...projectSeed};
 const collections={customers:[customer],products:[product],employees:[employee],expenses:[expense],payments:[payment],documents:[invoice,offer],projects:[],time_entries:[]};
 if(process.env.BINSO_UX_FIXTURE_CASE){
  if(process.env.BINSO_UX_MATRIX_ONLY!=='1')throw Error('Alternative fixtures require matrix-only mode; interaction suites own their mutation fixtures');
@@ -123,7 +124,7 @@ let releaseOldSearch;
 let context;
 try{
  for(const theme of (process.env.BINSO_UX_THEMES?.split(",")??["light","dark"])){
-  teamMemberRole='member';supportMessages=[];let preferenceTheme=theme;
+  projectFixture={...projectSeed};teamMemberRole='member';supportMessages=[];let preferenceTheme=theme;
   operatorAccount.plan='pro';
   browser=await browserType.launch(launchOptions);
   context=await browser.newContext({...(process.env.BINSO_UX_DEVICE?engines.devices[process.env.BINSO_UX_DEVICE]:{}),viewport:{width:1440,height:1000},colorScheme:"dark",serviceWorkers:"block"});

@@ -211,6 +211,23 @@ jobs:
           BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs
           BINSO_UX_BROWSER: ${{ matrix.engine }}
         run: node scripts/compliance/measure-browser-test.mjs
+      - name: Critical timer, draft recovery and report export regression
+        env:
+          BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs
+          BINSO_UX_BROWSER: ${{ matrix.engine }}
+          BINSO_UX_DEVICE: ${{ matrix.engine == 'webkit' && 'iPhone 13' || '' }}
+          BINSO_UX_SERVER_FILE: ${{ runner.temp }}/binso-candidate/server.js
+          BINSO_UX_ROUTES: /projekte/project-one,/berichte
+          BINSO_UX_WIDTHS: '390'
+          BINSO_UX_THEMES: light,dark
+          BINSO_UX_INTERACTIONS: time
+          BINSO_UX_SCREENSHOTS: '0'
+          BINSO_UX_DOM_EVIDENCE: '0'
+          BINSO_UX_CAPTURE_ALL: '0'
+          BINSO_UX_COMPLIANCE: '0'
+          BINSO_UX_PORT: '3350'
+          BINSO_UX_OUTPUT: ${{ runner.temp }}/binso-ux-${{ matrix.engine }}/critical
+        run: node scripts/ux-browser-test.mjs
       - name: Landing and portal localization regression
         env:
           BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs
