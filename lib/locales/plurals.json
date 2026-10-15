@@ -1,0 +1,380 @@
+{
+  "Kunden": {
+    "de": {
+      "one": "Kunde",
+      "other": "Kunden"
+    },
+    "en": {
+      "one": "customer",
+      "other": "customers"
+    },
+    "fr": {
+      "one": "client",
+      "other": "clients"
+    },
+    "it": {
+      "one": "cliente",
+      "other": "clienti"
+    }
+  },
+  "Rechnungen": {
+    "de": {
+      "one": "Rechnung",
+      "other": "Rechnungen"
+    },
+    "en": {
+      "one": "invoice",
+      "other": "invoices"
+    },
+    "fr": {
+      "one": "facture",
+      "other": "factures"
+    },
+    "it": {
+      "one": "fattura",
+      "other": "fatture"
+    }
+  },
+  "Angebote": {
+    "de": {
+      "one": "Angebot",
+      "other": "Angebote"
+    },
+    "en": {
+      "one": "quote",
+      "other": "quotes"
+    },
+    "fr": {
+      "one": "devis",
+      "other": "devis"
+    },
+    "it": {
+      "one": "preventivo",
+      "other": "preventivi"
+    }
+  },
+  "Aufträge": {
+    "de": {
+      "one": "Auftrag",
+      "other": "Aufträge"
+    },
+    "en": {
+      "one": "job",
+      "other": "jobs"
+    },
+    "fr": {
+      "one": "mandat",
+      "other": "mandats"
+    },
+    "it": {
+      "one": "commessa",
+      "other": "commesse"
+    }
+  },
+  "Produkte": {
+    "de": {
+      "one": "Produkt",
+      "other": "Produkte"
+    },
+    "en": {
+      "one": "product",
+      "other": "products"
+    },
+    "fr": {
+      "one": "produit",
+      "other": "produits"
+    },
+    "it": {
+      "one": "prodotto",
+      "other": "prodotti"
+    }
+  },
+  "Mitarbeiter": {
+    "de": {
+      "one": "Mitarbeiter",
+      "other": "Mitarbeiter"
+    },
+    "en": {
+      "one": "employee",
+      "other": "employees"
+    },
+    "fr": {
+      "one": "collaborateur",
+      "other": "collaborateurs"
+    },
+    "it": {
+      "one": "collaboratore",
+      "other": "collaboratori"
+    }
+  },
+  "Spesen": {
+    "de": {
+      "one": "Spese",
+      "other": "Spesen"
+    },
+    "en": {
+      "one": "expense",
+      "other": "expenses"
+    },
+    "fr": {
+      "one": "dépense",
+      "other": "dépenses"
+    },
+    "it": {
+      "one": "spesa",
+      "other": "spese"
+    }
+  },
+  "Einträge": {
+    "de": {
+      "one": "Eintrag",
+      "other": "Einträge"
+    },
+    "en": {
+      "one": "entry",
+      "other": "entries"
+    },
+    "fr": {
+      "one": "entrée",
+      "other": "entrées"
+    },
+    "it": {
+      "one": "voce",
+      "other": "voci"
+    }
+  },
+  "Zahlungen": {
+    "de": {
+      "one": "Zahlung",
+      "other": "Zahlungen"
+    },
+    "en": {
+      "one": "payment",
+      "other": "payments"
+    },
+    "fr": {
+      "one": "paiement",
+      "other": "paiements"
+    },
+    "it": {
+      "one": "pagamento",
+      "other": "pagamenti"
+    }
+  },
+  "Projekte": {
+    "de": {
+      "one": "Projekt",
+      "other": "Projekte"
+    },
+    "en": {
+      "one": "project",
+      "other": "projects"
+    },
+    "fr": {
+      "one": "projet",
+      "other": "projets"
+    },
+    "it": {
+      "one": "progetto",
+      "other": "progetti"
+    }
+  },
+  "Benachrichtigungen": {
+    "de": {
+      "one": "Benachrichtigung",
+      "other": "Benachrichtigungen"
+    },
+    "en": {
+      "one": "notification",
+      "other": "notifications"
+    },
+    "fr": {
+      "one": "notification",
+      "other": "notifications"
+    },
+    "it": {
+      "one": "notifica",
+      "other": "notifiche"
+    }
+  },
+  "Dateien": {
+    "de": {
+      "one": "Datei",
+      "other": "Dateien"
+    },
+    "en": {
+      "one": "file",
+      "other": "files"
+    },
+    "fr": {
+      "one": "fichier",
+      "other": "fichiers"
+    },
+    "it": {
+      "one": "file",
+      "other": "file"
+    }
+  },
+  "Dokumente": {
+    "de": {
+      "one": "Dokument",
+      "other": "Dokumente"
+    },
+    "en": {
+      "one": "document",
+      "other": "documents"
+    },
+    "fr": {
+      "one": "document",
+      "other": "documents"
+    },
+    "it": {
+      "one": "documento",
+      "other": "documenti"
+    }
+  },
+  "Kontakte": {
+    "de": {
+      "one": "Kontakt",
+      "other": "Kontakte"
+    },
+    "en": {
+      "one": "contact",
+      "other": "contacts"
+    },
+    "fr": {
+      "one": "contact",
+      "other": "contacts"
+    },
+    "it": {
+      "one": "contatto",
+      "other": "contatti"
+    }
+  },
+  "Tickets": {
+    "de": {
+      "one": "Ticket",
+      "other": "Tickets"
+    },
+    "en": {
+      "one": "ticket",
+      "other": "tickets"
+    },
+    "fr": {
+      "one": "ticket",
+      "other": "tickets"
+    },
+    "it": {
+      "one": "ticket",
+      "other": "ticket"
+    }
+  },
+  "Berichte": {
+    "de": {
+      "one": "Bericht",
+      "other": "Berichte"
+    },
+    "en": {
+      "one": "report",
+      "other": "reports"
+    },
+    "fr": {
+      "one": "rapport",
+      "other": "rapports"
+    },
+    "it": {
+      "one": "rapporto",
+      "other": "rapporti"
+    }
+  },
+  "Tage": {
+    "de": {
+      "one": "Tag",
+      "other": "Tage"
+    },
+    "en": {
+      "one": "day",
+      "other": "days"
+    },
+    "fr": {
+      "one": "jour",
+      "other": "jours"
+    },
+    "it": {
+      "one": "giorno",
+      "other": "giorni"
+    }
+  },
+  "Monate": {
+    "de": {
+      "one": "Monat",
+      "other": "Monate"
+    },
+    "en": {
+      "one": "month",
+      "other": "months"
+    },
+    "fr": {
+      "one": "mois",
+      "other": "mois"
+    },
+    "it": {
+      "one": "mese",
+      "other": "mesi"
+    }
+  },
+  "Stunden": {
+    "de": {
+      "one": "Stunde",
+      "other": "Stunden"
+    },
+    "en": {
+      "one": "hour",
+      "other": "hours"
+    },
+    "fr": {
+      "one": "heure",
+      "other": "heures"
+    },
+    "it": {
+      "one": "ora",
+      "other": "ore"
+    }
+  },
+  "Minuten": {
+    "de": {
+      "one": "Minute",
+      "other": "Minuten"
+    },
+    "en": {
+      "one": "minute",
+      "other": "minutes"
+    },
+    "fr": {
+      "one": "minute",
+      "other": "minutes"
+    },
+    "it": {
+      "one": "minuto",
+      "other": "minuti"
+    }
+  },
+  "Sekunden": {
+    "de": {
+      "one": "Sekunde",
+      "other": "Sekunden"
+    },
+    "en": {
+      "one": "second",
+      "other": "seconds"
+    },
+    "fr": {
+      "one": "seconde",
+      "other": "secondes"
+    },
+    "it": {
+      "one": "secondo",
+      "other": "secondi"
+    }
+  }
+}

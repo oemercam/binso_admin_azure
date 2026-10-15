@@ -35,6 +35,7 @@ for(const path of ['/operator','/operator/login','/operator/wallboard','/operato
 const loginRedirect=await boundary.proxy(new NextRequest('http://localhost/projekte/neu?customerId=fixture&lang=fr'));
 assert.equal(new URL(loginRedirect.headers.get('location')).searchParams.get('next'),'/projekte/neu?customerId=fixture&lang=fr','Login preserves the full local process context');
 assert.equal(loginRedirect.cookies.get('binso_locale')?.value,'fr');
+const imageLocale=await boundary.proxy(new NextRequest('http://localhost/opengraph-image?lang=fr'));assert.equal(imageLocale.cookies.get('binso_locale')?.value,'fr');assert.ok(imageLocale.headers.get('x-middleware-request-cookie').includes('binso_locale=fr'),'Shared social images receive their explicit locale without crawler cookies');
 const db=new PGlite({extensions:{pgcrypto}});let failAudit=false;
 try{
  await db.exec('create extension pgcrypto;create role schema_owner;grant usage,create on schema public to schema_owner;set role schema_owner');

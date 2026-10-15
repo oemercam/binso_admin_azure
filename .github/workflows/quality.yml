@@ -211,6 +211,13 @@ jobs:
           BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs
           BINSO_UX_BROWSER: ${{ matrix.engine }}
         run: node scripts/compliance/measure-browser-test.mjs
+      - name: Landing and portal localization regression
+        env:
+          BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs
+          BINSO_UX_BROWSER: ${{ matrix.engine }}
+          BINSO_UX_SERVER_FILE: ${{ runner.temp }}/binso-candidate/server.js
+          BINSO_LOCALIZATION_OUTPUT: ${{ runner.temp }}/binso-ux-${{ matrix.engine }}/localization
+        run: node scripts/localization-browser-test.mjs
       - name: Scoped responsive UX and process regression
         env:
           BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs
@@ -261,13 +268,6 @@ jobs:
           BINSO_OBSERVABILITY_OUTPUT: ${{ runner.temp }}/binso-ux-${{ matrix.engine }}/observability
           BINSO_UX_SERVER_FILE: ${{ runner.temp }}/binso-candidate/server.js
         run: node scripts/observability-browser-test.mjs
-      - name: Landing and portal localization regression
-        env:
-          BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs
-          BINSO_UX_BROWSER: ${{ matrix.engine }}
-          BINSO_UX_SERVER_FILE: ${{ runner.temp }}/binso-candidate/server.js
-          BINSO_LOCALIZATION_OUTPUT: ${{ runner.temp }}/binso-ux-${{ matrix.engine }}/localization
-        run: node scripts/localization-browser-test.mjs
       - name: Guided registration, languages and responsive regression
         env:
           BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs

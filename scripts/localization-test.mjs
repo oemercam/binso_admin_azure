@@ -19,13 +19,14 @@ function compile(file,deps={}){
  Function('require','exports',source)(name=>Object.hasOwn(deps,name)?deps[name]:require(name),output);return output;
 }
 const config=compile('lib/locales/config.ts');
-const locale=compile('lib/locales/index.ts',{'./config':config,'./messages.json':messages,'./templates.json':templates});
+const locale=compile('lib/locales/index.ts',{'./config':config,'./messages.json':messages,'./templates.json':templates,'./plurals.json':JSON.parse(fs.readFileSync('lib/locales/plurals.json','utf8'))});
 assert.deepEqual(config.locales,['de','fr','it','en']);
 for(const [language,label] of [['de','Rechnungen'],['fr','Factures'],['it','Fatture'],['en','Invoices']]){
  assert.equal(locale.translateMessage('Rechnungen',language),label);
  assert.equal(locale.translateMessage('Acme AG',language),'Acme AG');
  assert.equal(locale.translateMessage('  entirely user-authored <script>  ',language),'  entirely user-authored <script>  ');
 }
+assert.equal(locale.translateMessage('1 Kunden','de'),'1 Kunde');assert.equal(locale.translateMessage('1 Kunden','en'),'1 customer');assert.equal(locale.translateMessage('2 Mitarbeiter','en'),'2 employees');assert.equal(locale.translateMessage('0 Kunden','fr'),'0 client');assert.equal(locale.translateMessage('2 Projekte','it'),'2 progetti');
 assert.equal(locale.translateMessage('Seite 2 von 4','fr'),'Page 2 sur 4');
 assert.equal(locale.translateMessage('Schritt 1 von 3 · Prüfen','it'),'Passaggio 1 di 3 · Verifica');
 assert.equal(locale.translateMessage('Die Datei darf höchstens 10 MB gross sein.','en'),'The file must not exceed 10 MB.');
@@ -67,4 +68,11 @@ console.log('Locale catalogues: complete EN/FR/IT tuples, preserved template tok
  assert.equal((html.match(/Rechnungen/g)??[]).length,2,'User-authored list/heading titles stay verbatim even if they equal application copy');assert.ok(html.includes('Factures'),'Plain menu rows translate their UI labels');
  assert.equal(locale.translateMessage('Rechnung RE-001','en'),'Invoice RE-001');
  console.log('Shared rows/headings preserve colliding user titles while menu labels and document prefixes translate.');
+}
+
+{
+ const metadata=compile('lib/server/locale.ts',{'server-only':{},'next/headers':{cookies:async()=>({get:()=>({value:'fr'})})},'@/lib/locales':locale});
+ const value=await metadata.localizeMetadata({title:'Rechnungen',openGraph:{title:'Rechnungen'},twitter:{title:'Rechnungen'}},'/preise');
+ assert.equal(value.title,'Factures');assert.equal(value.openGraph.images[0].url,'/opengraph-image?lang=fr');assert.equal(value.twitter.images[0],'/opengraph-image?lang=fr');assert.equal(value.alternates.canonical,'/preise?lang=fr');
+ console.log('Localized metadata binds canonical alternatives and social-image URLs to the selected language.');
 }

@@ -39,7 +39,7 @@ export async function proxy(request:NextRequest){
 
 export const config={
   matcher:[
-    "/","/produkt","/preise","/login","/registrieren","/portal/:path*","/demo","/agb","/datenschutz","/impressum","/auftragsbearbeitung","/unterauftragsbearbeiter","/email-bestaetigen","/einladung","/passwort-vergessen","/passwort-zuruecksetzen",
+    "/","/opengraph-image","/produkt","/preise","/login","/registrieren","/portal/:path*","/demo","/agb","/datenschutz","/impressum","/auftragsbearbeitung","/unterauftragsbearbeiter","/email-bestaetigen","/einladung","/passwort-vergessen","/passwort-zuruecksetzen",
     "/operator/:path*","/dev/:path*","/dashboard/:path*","/kunden/:path*","/angebote/:path*","/rechnungen/:path*",
     "/zahlungen/:path*","/produkte/:path*","/mitarbeiter/:path*","/spesen/:path*",
     "/zeit/:path*","/support/:path*","/einstellungen/:path*","/belege/:path*",
