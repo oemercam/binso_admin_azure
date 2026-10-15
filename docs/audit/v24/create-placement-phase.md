@@ -26,3 +26,9 @@ Bestanden: unveränderte navigation-contract-test und navigation-foundation-test
 - Gleichzeitige Arbeit in PR #250 vor Integration erneut abgleichen; diese Änderung enthält dessen Code nicht.
 - F003–F009 und sämtliche übrigen V24-Anforderungen bleiben offen. Noch keine Chart-, Demo-, Prozess-, i18n-, Security-Control- oder Infrastrukturvollständigkeit behauptet.
 - Kein Merge/Deploy/Migration/Produktionszugriff. Produktivfreigabe weiterhin erforderlich.
+
+## CI-Nachtrag
+
+Quality Run 38728122353 für dd491c5e scheiterte in checks am veralteten Source-Fingerprint des bestehenden Integration-Inventars. Das war ein ausgelassener Generierungsschritt, kein Socket-Fehler. `pnpm architecture:inventory` regeneriert die bestehende Datei und Routenmatrix; der unveränderte foundation-integration-test besteht danach lokal. Kein Gate oder Snapshot-Vertrag wurde abgeschwächt.
+
+Im selben Run bestanden CodeQL, scanner-engine (echter ClamAV), Build und authentifizierte sowie anonyme API-HTTP-Prüfungen. DB-Parallelitäts- und Browserjobs waren wegen des fehlgeschlagenen checks-Jobs noch nicht erfolgreich nachgewiesen. Neuer Run bleibt abzuwarten.
