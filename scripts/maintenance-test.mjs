@@ -5,7 +5,11 @@ import {PGlite} from '@electric-sql/pglite';
 const db=new PGlite();
 try{
  await db.exec(await fs.readFile('database/migrations/0050_platform_maintenance.sql','utf8'));
- await db.exec('create role maintenance_fixture;grant usage on schema public to maintenance_fixture;grant select,update on platform_maintenance to maintenance_fixture;set role maintenance_fixture');
+ await db.exec('create role binso_runtime;grant usage on schema public to binso_runtime');
+ await assert.rejects(()=>db.exec('set role binso_runtime;select * from platform_maintenance'),/permission denied/);
+ await db.exec('reset role');
+ await db.exec(await fs.readFile('database/migrations/0051_runtime_maintenance_permissions.sql','utf8'));
+ await db.exec('set role binso_runtime');
  const load=async(file,modules)=>{
   const exports={};const source=ts.transpileModule(await fs.readFile(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText;
   Function('require','exports',source)(name=>{if(Object.hasOwn(modules,name))return modules[name];throw Error('Missing isolated dependency '+name)},exports);return exports;
@@ -29,7 +33,7 @@ try{
  assert.equal((await route.POST(request({enabled:true,minutes:15}))).status,200);assert.equal((await state.maintenanceState()).enabled,true);assert.equal(audit.at(-1).action,'platform.maintenance.enabled');
  auditFailure=true;assert.equal((await route.POST(request({enabled:false}))).status,500);assert.equal((await state.maintenanceState()).enabled,true,'Audit failure rolls back switch');auditFailure=false;
  await db.exec("update platform_maintenance set enabled=false");assert.equal((await state.maintenanceState()).enabled,true,"Tenant DB context cannot change platform maintenance");
- await db.exec("reset role;update platform_maintenance set ends_at=now()-interval '1 minute';set role maintenance_fixture");assert.equal((await state.maintenanceState()).enabled,false,'Expired maintenance cannot lock customers out');
+ await db.exec("reset role;update platform_maintenance set ends_at=now()-interval '1 minute';set role binso_runtime");assert.equal((await state.maintenanceState()).enabled,false,'Expired maintenance cannot lock customers out');
  assert.equal((await route.POST(request({enabled:false}))).status,200);assert.equal((await state.maintenanceState()).enabled,false);
  console.log('Maintenance: authorization, duration validation, activation, expiry, deactivation and atomic audit rollback passed.');
 }finally{await db.close()}
