@@ -1,0 +1,190 @@
+{
+  "reviewDate": "2026-10-15",
+  "note": "Official catalog/publication identities checked. Full-text requirements, amendments, organisational implementation and complete control coverage are separate evidence; no certification claim. NIST CSF, W3C i18n/ARIA, OpenSSF/OpenTelemetry, Azure/PostgreSQL CIS benchmark releases still require individual version registration.",
+  "standards": [
+    {
+      "name": "ISO/IEC 27001",
+      "edition": "2022",
+      "source": "https://www.iso.org/standard/27001",
+      "area": "Information security management",
+      "applicability": "organisation/process applicability; certification not claimed",
+      "controlReview": "open"
+    },
+    {
+      "name": "ISO/IEC 27002",
+      "edition": "2022",
+      "source": "https://www.iso.org/standard/75652.html",
+      "area": "Information security controls",
+      "applicability": "technical and organisational controls",
+      "controlReview": "open"
+    },
+    {
+      "name": "ISO/IEC 27017",
+      "edition": "2026",
+      "source": "https://www.iso.org/standard/27017",
+      "area": "Cloud security",
+      "applicability": "Azure service responsibilities",
+      "controlReview": "open"
+    },
+    {
+      "name": "ISO/IEC 27018",
+      "edition": "2025",
+      "source": "https://www.iso.org/standard/27018",
+      "area": "Cloud PII processing",
+      "applicability": "tenant personal data",
+      "controlReview": "open"
+    },
+    {
+      "name": "ISO/IEC 27701",
+      "edition": "2025",
+      "source": "https://www.iso.org/standard/27701",
+      "area": "Privacy management",
+      "applicability": "organisation and processor governance",
+      "controlReview": "open"
+    },
+    {
+      "name": "ISO/IEC 25010",
+      "edition": "2023",
+      "source": "https://www.iso.org/standard/78176.html",
+      "area": "Product quality",
+      "applicability": "application quality acceptance",
+      "controlReview": "open"
+    },
+    {
+      "name": "ISO/IEC 25012",
+      "edition": "2008 (confirmed 2025)",
+      "source": "https://www.iso.org/standard/35736.html",
+      "area": "Data quality",
+      "applicability": "money, status, tenant, demo data",
+      "controlReview": "open"
+    },
+    {
+      "name": "ISO/IEC/IEEE 12207",
+      "edition": "2026",
+      "source": "https://www.iso.org/standard/90219.html",
+      "area": "Software lifecycle",
+      "applicability": "versioned implementation and acceptance process",
+      "controlReview": "open"
+    },
+    {
+      "name": "ISO/IEC 27035-1",
+      "edition": "2023",
+      "source": "https://www.iso.org/committee/45306/x/catalogue/",
+      "area": "Incident management",
+      "applicability": "runbooks and operational evidence",
+      "controlReview": "open"
+    },
+    {
+      "name": "ISO 22301",
+      "edition": "2019; amendment 1:2024 listed",
+      "source": "https://www.iso.org/standard/75106.html",
+      "area": "Business continuity",
+      "applicability": "backup/restore and operational ownership",
+      "controlReview": "open"
+    },
+    {
+      "name": "ISO/IEC 20000-1",
+      "edition": "2018; amendment 1:2024 listed",
+      "source": "https://webstore.iec.ch/en/publication/63873",
+      "area": "Service management",
+      "applicability": "operational processes",
+      "controlReview": "open"
+    },
+    {
+      "name": "ISO/IEC 42001",
+      "edition": "2023",
+      "source": "https://www.iso.org/standard/42001",
+      "area": "AI management",
+      "applicability": "conditional; production AI integration not established",
+      "controlReview": "open"
+    },
+    {
+      "name": "OWASP ASVS",
+      "edition": "5.0.0",
+      "source": "https://owasp.org/projects/asvs",
+      "area": "Application verification",
+      "applicability": "web application and APIs",
+      "controlReview": "open"
+    },
+    {
+      "name": "OWASP Top 10",
+      "edition": "2025",
+      "source": "https://top10.owasp.org/2025/",
+      "area": "Application risks",
+      "applicability": "web application",
+      "controlReview": "open"
+    },
+    {
+      "name": "OWASP API Security Top 10",
+      "edition": "2023",
+      "source": "https://owasp.org/API-Security/editions/2023/en/0x11-t10/",
+      "area": "API risks",
+      "applicability": "tenant and operator APIs",
+      "controlReview": "open"
+    },
+    {
+      "name": "CIS Controls",
+      "edition": "8.1",
+      "source": "https://www.cisecurity.org/controls/v8-1",
+      "area": "Security controls",
+      "applicability": "application/operations responsibilities",
+      "controlReview": "open"
+    },
+    {
+      "name": "NIST Digital Identity",
+      "edition": "SP 800-63-4 final July 2025",
+      "source": "https://csrc.nist.gov/pubs/sp/800/63/4/final",
+      "area": "Identity assurance",
+      "applicability": "authentication and federation; no AAL claim",
+      "controlReview": "open"
+    },
+    {
+      "name": "NIST SSDF",
+      "edition": "SP 800-218 version 1.1 final; 1.2 draft tracked separately",
+      "source": "https://csrc.nist.gov/pubs/sp/800/218/final",
+      "area": "Secure development",
+      "applicability": "repository and supply chain",
+      "controlReview": "open"
+    },
+    {
+      "name": "WCAG",
+      "edition": "2.2 AA",
+      "source": "https://www.w3.org/TR/WCAG22/",
+      "area": "Accessibility",
+      "applicability": "customer/operator/public UI",
+      "controlReview": "open"
+    },
+    {
+      "name": "Swiss DSG",
+      "edition": "SR 235.1; consolidated law source",
+      "source": "https://www.fedlex.admin.ch/eli/cc/2022/491/de",
+      "area": "Data protection",
+      "applicability": "personal data; article-by-article legal assessment remains open",
+      "controlReview": "open"
+    },
+    {
+      "name": "Swiss DSV",
+      "edition": "SR 235.11; consolidated ordinance source",
+      "source": "https://www.fedlex.admin.ch/eli/cc/2022/568/de",
+      "area": "Data security ordinance",
+      "applicability": "personal data protection measures",
+      "controlReview": "open"
+    },
+    {
+      "name": "Swiss OR",
+      "edition": "SR 220, Art. 958f",
+      "source": "https://www.fedlex.admin.ch/eli/cc/27/317_321_377/de",
+      "area": "Accounting retention",
+      "applicability": "retention and immutable evidence; exceptions need legal review",
+      "controlReview": "open"
+    },
+    {
+      "name": "Swiss VAT",
+      "edition": "current ESTV rates, checked 2026-10-15",
+      "source": "https://www.estv.admin.ch/de/mwst-steuersaetze-schweiz",
+      "area": "VAT rates",
+      "applicability": "invoice tax by date and rate; 8.1/2.6/3.8 rather than one fixed rate",
+      "controlReview": "open"
+    }
+  ]
+}

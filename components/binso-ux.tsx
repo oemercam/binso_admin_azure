@@ -40,19 +40,19 @@ export function PageHeading({ title, description, action, leading, verbatimTitle
 }
 
 export function CreateAction({ label, href, onClick, disabled = false }: { label: string; href?: string; onClick?: () => void; disabled?: boolean }) {
-  return <Button href={href} requiresWrite className="bo-create-action page-create-action" ariaLabel={label} disabled={disabled} onClick={onClick} icon="plus"/>;
+  return <Button href={href} requiresWrite className="bo-create-action" ariaLabel={label} disabled={disabled} onClick={onClick} icon="plus"/>;
 }
 
-export function QuickCreateAction({placement="page",section="dashboard",returnTo="/dashboard"}:{placement?:"page"|"dock";section?:string;returnTo?:string}){
+export function QuickCreateAction({section="dashboard",returnTo="/dashboard"}:{section?:string;returnTo?:string}){
  const access=usePageAccess(),[open,setOpen]=useState(false);
  const actions=permittedCreateActions(section,access.canOpen);
  if(!actions.length)return null;
- return <>{placement==="dock"?<LocalizedElement as="button" type="button" className="dock-create-action app-glass" aria-label="Neu erstellen" aria-haspopup="dialog" aria-expanded={open} onClick={()=>setOpen(true)}><Icon name="plus" size={24}/></LocalizedElement>:<CreateAction label="Neu erstellen" onClick={()=>setOpen(true)}/>}
+ return <><CreateAction label="Neu erstellen" onClick={()=>setOpen(true)}/>
   <ActionSheet label="Neu erstellen" className="quick-create-sheet" open={open} onClose={()=>setOpen(false)}><div className="action-list">{actions.map(item=><ActionRow key={item.href} title={item.title} icon={item.icon} href={createReturnHref(item.href,returnTo)} navigation onClick={()=>setOpen(false)}/>)}</div></ActionSheet>
  </>;
 }
 
-/** Empty lists use the same permission-aware creation catalog as the dock. */
+/** Empty lists use the same permission-aware creation catalog as the page action area. */
 export function EmptyRecordAction({section}:{section:string}){
  const access=usePageAccess(),action=createActions.find(item=>item.section===section);
  if(!action||!access.canOpen(action.permissionPath))return null;

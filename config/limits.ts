@@ -1,4 +1,5 @@
 export const limitsConfig = {
+  rateLimitMemoryBuckets: 5000,
   maxFileUploadBytes: 10 * 1024 * 1024,
   maxDemoAttachmentBytes: 1_500_000,
   maxSupportRequestBytes: 1_500_000,
