@@ -23,9 +23,10 @@ on:
   release:
     types: [published]
 concurrency:
-  group: quality-${{ github.event.pull_request.number || github.ref }}-${{ github.event_name == 'workflow_dispatch' && format('manual-{0}-{1}', inputs.level, inputs.release_profile) || 'automatic' }}
-  # Newer PR/push checks supersede stale checks; explicit release runs queue safely.
-  cancel-in-progress: ${{ github.event_name == 'pull_request' || github.event_name == 'push' }}
+  group: quality-${{ github.event.pull_request.number || github.ref }}-${{ inputs.release_profile || 'production' }}
+  # PR updates supersede stale checks. Main/manual runs serialize per ref/profile,
+  # so a push cannot cancel a release qualification or run an identical one in parallel.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 permissions:
   contents: read
 env:
@@ -330,13 +331,13 @@ jobs:
           BINSO_UX_SERVER_FILE: ${{ runner.temp }}/binso-candidate/server.js
         run: node scripts/registration-browser-test.mjs
       - name: Development-only shared component reference regression
-        if: matrix.engine == 'chromium' && needs.plan.outputs.level == 'full'
+        if: matrix.lane == 'functional' && matrix.engine == 'chromium' && needs.plan.outputs.level == 'full'
         env:
           BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs
           BINSO_LAB_OUTPUT: ${{ runner.temp }}/binso-ux-${{ matrix.engine }}/lab
         run: pnpm ux:lab
       - name: FULL PWA restart and offline regression
-        if: matrix.engine == 'chromium' && needs.plan.outputs.level == 'full'
+        if: matrix.lane == 'functional' && matrix.engine == 'chromium' && needs.plan.outputs.level == 'full'
         env:
           BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs
           BINSO_UX_SERVER_FILE: ${{ runner.temp }}/binso-candidate/server.js

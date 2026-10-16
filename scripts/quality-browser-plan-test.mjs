@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import {createRequire} from 'node:module';
 import {browserLanes} from './quality-browser-plan.mjs';
 import {planChanges} from './qa-plan.mjs';
 import {partition} from './browser-shards.mjs';
@@ -26,4 +27,15 @@ assert(workflow.includes('include: ${{ fromJSON(needs.plan.outputs.browser_matri
 assert(workflow.includes('needs: [plan, checks, build, browser, ux-compliance, scanner-engine]'));
 assert(workflow.includes('ux-browser-${{ matrix.engine }}-${{ matrix.lane }}-${{ matrix.shard }}-${{ github.sha }}'));
 for(const gate of ['pnpm lint','pnpm typecheck','pnpm build','pnpm security:scan','pnpm security:scan:all','scanner-engine-test.mjs','api-tenant-postgres-test.mjs'])assert(workflow.includes(gate),gate);
+// Parse the actual workflow: a missing lane condition multiplies slow suites across
+// every responsive runner while appearing harmless in a route partition test.
+const require=createRequire(import.meta.url);
+const yaml=createRequire(require.resolve('eslint'))('js-yaml');
+const config=yaml.load(workflow);
+for(const step of config.jobs.browser.steps.filter(s=>/node scripts\/|pnpm ux:lab/.test(s.run??''))){
+ const owner=step.run==='node scripts/browser-shards.mjs'?'responsive':'functional';
+ assert(step.if?.includes(`matrix.lane == '${owner}'`),'One owning lane for '+step.name);
+}
+assert.equal(config.concurrency['cancel-in-progress'],"${{ github.event_name == 'pull_request' }}",'Main pushes cannot cancel explicit release qualification');
+assert(!config.concurrency.group.includes('github.event_name'),'Main push/manual checks share their ref/profile queue');
 console.log('Full/smoke browser lanes preserve unique route-width-theme and interaction coverage and mandatory gates.');

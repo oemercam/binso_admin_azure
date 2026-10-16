@@ -78,11 +78,13 @@ and loss/duplication of route, width, theme and interaction coverage.
 * Duplicate runtime/rate-limit/demo/navigation static commands were removed from
   the workflow's compliance step: `pnpm test` already executes them. The two unique
   compliance suites and the new orchestration contracts still run explicitly.
-* Conversion to draft no longer triggers a second full checks/build run. Newer
-  automatic runs cancel obsolete checks for the same PR/ref. Explicit manual
-  full/profile runs use separate concurrency groups and queue rather than being
-  cancelled by automatic pushes. PR branch pushes do not also trigger the main-only
-  push workflow. Different source/profile/coverage runs must not be deduplicated.
+* Conversion to draft no longer triggers a second full checks/build run. Newer PR
+  updates cancel obsolete PR checks. Main push and manual runs serialize in the
+  same ref/profile concurrency group; pushes cannot cancel release qualification
+  or execute identical qualification concurrently. GitHub retains only one pending
+  run per group. PR branch pushes do not also trigger the main-only push workflow.
+  Different acceptance profiles have separate groups; a completed standard run
+  must never substitute for full release qualification.
 
 Tradeoff: more concurrent runners and repeated setup can increase total runner
 minutes. The target is elapsed feedback time with unchanged assertions. Account
@@ -90,4 +92,49 @@ concurrency/queueing can limit the gain; measure actual runs rather than extrapo
 
 ## Optimized comparison
 
-Pending executed GitHub comparison; no projected runtime is an observed result.
+[Quality #1400](https://github.com/oemercam/binso_admin_azure/actions/runs/38966070430)
+succeeded with full planned coverage (the run title says `standard`, while the
+conservative plan selects **full** for workflow changes). PR head
+`e8434f5ded8c0b0ce11c472e5a952dc7f80ad8f5`; tested merge commit
+`bb28dffae7c9c12942e6521ca959908b2103456c`. Application source equals #1399.
+
+| GitHub displayed elapsed time | #1399 | #1400 |
+| --- | ---: | ---: |
+| Entire workflow | 25m47s | **11m22s** |
+| Chromium critical browser path (longest job) | 19m57s | **8m09s** |
+| WebKit critical browser path (longest job) | 22m23s | **8m29s** |
+| Checks | 2m13s | 2m27s |
+| Build | 2m11s | 2m00s |
+| Scanner | 1m11s | 1m21s |
+
+Measured total reduction: **14m25s / 55.9%**. This compares full browser coverage
+against full browser coverage, not a smoke run against a full release. Hosted
+runner variability and existing cache hits apply; one pair is not a percentile
+benchmark. Summing parallel browser durations would answer a different question:
+#1400 used about 54 browser runner minutes against 42m20s previously, including
+the unnecessary Lab/PWA duplicates discovered below. Shorter feedback can cost
+more runner minutes. Account concurrency limits can reduce the benefit.
+
+Responsive shard results from the actual logs:
+
+| Engine | Shard 0 | Shard 1 | Shard 2 | Total |
+| --- | ---: | ---: | ---: | ---: |
+| Chromium | 406 | 392 | 392 | **1,190** |
+| WebKit | 72 | 72 | 60 | **204** |
+
+All 14 interaction groups passed in both engines, plus the independent critical,
+localization, real PostgreSQL observability, registration and startup suites.
+The required `quality` and `ux-compliance` jobs succeeded. Compliance reported
+zero individual failed checks and 74/76 source routes with runtime evidence;
+the existing physical-device, reviewed-pixel and individual approval gaps remain
+explicit. A successful Quality run does not claim full production UX approval.
+
+Inspection of #1400 logs found Lab/PWA executing on every Chromium shard as well
+as the functional runner. The final workflow restricts both to the functional
+lane; a parsed-YAML contract now checks every browser suite's unique owning lane.
+The final revision also serializes main/manual checks per ref/profile while only
+PR updates cancel stale runs. Its confirming full run is available in
+[PR #262 checks](https://github.com/oemercam/binso_admin_azure/pull/262/checks).
+Machine-readable baseline/comparison data is in `quality-performance-runs.json`.
+No smoke-only GitHub runtime is claimed: it cannot be measured on this workflow
+PR without bypassing its deliberately mandatory full selection.

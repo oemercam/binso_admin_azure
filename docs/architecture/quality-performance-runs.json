@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-16",
+  "source": "GitHub Actions displayed elapsed durations; completed job logs for coverage",
+  "baseline": {
+    "runNumber": 1399,
+    "runId": 38950640955,
+    "url": "https://github.com/oemercam/binso_admin_azure/actions/runs/38950640955",
+    "sha": "db3f377884ee5ba1bd21beaad6fb4b8c843f1d8a",
+    "conclusion": "success",
+    "plannedCoverage": "full",
+    "totalSeconds": 1547,
+    "chromiumLongestJobSeconds": 1197,
+    "webkitLongestJobSeconds": 1343,
+    "checksSeconds": 133,
+    "buildSeconds": 131,
+    "scannerSeconds": 71
+  },
+  "comparison": {
+    "runNumber": 1400,
+    "runId": 38966070430,
+    "url": "https://github.com/oemercam/binso_admin_azure/actions/runs/38966070430",
+    "headSha": "e8434f5ded8c0b0ce11c472e5a952dc7f80ad8f5",
+    "testedMergeSha": "bb28dffae7c9c12942e6521ca959908b2103456c",
+    "conclusion": "success",
+    "plannedCoverage": "full",
+    "totalSeconds": 682,
+    "chromiumLongestJobSeconds": 489,
+    "webkitLongestJobSeconds": 509,
+    "checksSeconds": 147,
+    "buildSeconds": 120,
+    "scannerSeconds": 81,
+    "chromiumResponsiveCases": [406, 392, 392],
+    "webkitResponsiveCases": [72, 72, 60],
+    "allMandatoryJobsPassed": true,
+    "note": "Final follow-up eliminates Lab/PWA repetition on responsive shards; latest confirming full run is linked in PR 262 checks."
+  },
+  "reductionSeconds": 865,
+  "reductionPercent": 55.91,
+  "scope": "No app source/business logic changes or production deployment; existing strict production acceptance remains unchanged.",
+  "limitations": ["Single paired run, not p95", "More concurrent runners and potentially higher runner-minute cost", "No smoke-only CI timing claimed for a systemwide workflow change"]
+}
