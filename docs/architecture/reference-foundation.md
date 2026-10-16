@@ -65,6 +65,26 @@ Controller für Suche, Filter, Sortierung und Rückkehrzustand. Mobile Zeilen
 werden mit `RecordRow`, Desktopzellen mit den zentralen Spaltendefinitionen
 erstellt. Keine eigene Toolbar oder zweite Suche zeichnen.
 
+`CreateAction` ist auf dem Desktop ein beschrifteter blauer Button und auf Mobile
+ein schwarzer runder Plus-Button. `RecordsControls` zeigt auf Desktop Filter und
+Sortierung direkt neben der Suche; Mobile verwendet das gemeinsame Filter-Sheet.
+Eine Erfassungsaktion darf nicht manuell zu einem viewportunabhängigen Kreis werden.
+
+Dashboard und Finanzübersicht verwenden `CashOverview`: vier offene Kennzahlen,
+auf dem Dashboard die vier berechtigten Schnellaktionen und letzte Rechnungen,
+in der Finanzübersicht sechs Monatsbalken. Die ausführliche Statistik mit Ring,
+benutzerdefiniertem Zeitraum und Ledger-Hinweisen gehört zu `/finanzen/analyse`.
+Beide Darstellungen nutzen dieselben Finanzereignisse und Aggregationsfunktionen.
+Fehlende berechtigte Kennzahlen bleiben unbekannt; jüngste Rechnungen sind kein
+Ersatz für einen mandantenweiten Zähler. Negative Monatswerte bleiben unter der Nulllinie.
+
+Fachbereichs-CSS darf keine gemeinsamen Komponenten oder Kundenansichten über
+generische Containerselektoren neu gestalten. Insbesondere darf `operator.css`
+keine `.page-container`-Regeln enthalten. Kartenradien, graue Flächen oder pauschale
+Innenabstände dürfen nicht über einen späten Mobile-Block wieder eingeführt werden.
+Gemeinsame Sektionen, Kennzahlen, Felder, Chatnachrichten und Sheets bleiben bei
+ihrem Komponenten-Owner. Ein zentral abgelegter alter Override ist keine Migration.
+
 Eine Detailseite setzt `backHref`, Titel, Status und Aktionen an der Shell.
 `ActionsMenu` bleibt über den gemeinsamen Mobile-Fallback erreichbar; ein
 explizites `mobileActions` ersetzt ihn bei fachlich besonderen Aktionen.
@@ -75,7 +95,11 @@ die mobilen Aktionen darin zusammengeführt (`mobile={false}` am ergänzenden
 Desktop-Slot), damit kein zweiter gleichnamiger Einstieg entsteht.
 
 Erfassungen behalten ihre realen API-Handler, Validierung, Entwurfswiederherstellung
-und Sperren gegen doppelte Schreibvorgänge. `FormSheet` und `FormWizard` besitzen
+und Sperren gegen doppelte Schreibvorgänge. Das Verwerfen eines untergeordneten
+Editors darf den wiederherstellbaren Hauptentwurf nicht löschen. Kindformulare
+räumen ihre eigenen Eingaben über ihren Abschluss-Handler auf; seitenweites
+Verwerfen gehört zum allein geöffneten Hauptformular oder zur Seitennavigation.
+`FormSheet` und `FormWizard` besitzen
 Dialog, Fokus, Header und Abschlussaktionen. `Field` mit `Input`, `Select` oder
 `Textarea` besitzt Beschriftung und Fehlerzuordnung. Dateiauswahl verwendet den
 gemeinsamen Upload-Stil, nicht ein nachgebautes Eingabefeld.
@@ -103,6 +127,14 @@ prüft anschliessend Darstellung und tatsächliche Bedienung.
   Farbmarkierung, Betrag und Prozentanteil beziehen sich auf dieselben Teile.
 
 ## Prüfung und Grenzen
+
+Der aktive Farbvertrag `UX-FIN-010` folgt der ZIP-Vorgabe vom 15.10.2026:
+Statistikflächen verwenden bei jeder Breite die offene Seitenfläche `--color-bg`.
+Die frühere Outlook-Kartenfläche vom 13.10. ist damit abgelöst. Dark Mode
+verwendet dieselbe Tokenbeziehung und bleibt ausdrücklich abgeleitet.
+Die Messung prüft weiterhin exakte Farbgleichheit; Gegenproben müssen die alte
+graue Kartenfläche in beiden Themes bei 390, 1100 und 1440 px ablehnen.
+Der eingefrorene Navigationsvertrag und das Releaseprofil bleiben unverändert.
 
 `pnpm qa:fast --typecheck`, Referenz-/Navigations-/Foundation-Verträge und die
 gezielte Browsermatrix gehören zum Paket. Neue Seiten müssen im Inventar und

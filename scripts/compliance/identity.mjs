@@ -6,5 +6,5 @@ export function identity(){
  // child-process output buffer before a JavaScript-side filter ever runs.
  const files=[...new Set(execFileSync('git',['ls-files','--cached','--others','--exclude-standard','-z','--','app/','components/','lib/','public/','scripts/','ux-compliance/','package.json*','pnpm-lock.yaml*','next.config*'],{encoding:'utf8'}).split('\0'))].filter(p=>/^(app|components|lib|public|scripts|ux-compliance)\//.test(p)||/^(package.json|pnpm-lock.yaml|next.config)/.test(p)).sort();
  const hash=createHash('sha256');for(const file of files)if(fs.existsSync(file)){hash.update(file+'\0');hash.update(fs.readFileSync(file));}
- return {commit:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),sourceDigest:hash.digest('hex'),registryVersion:'1.0.0'};
+ return {commit:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),sourceDigest:hash.digest('hex'),registryVersion:JSON.parse(fs.readFileSync('ux-compliance/requirements.v1.json','utf8')).version};
 }

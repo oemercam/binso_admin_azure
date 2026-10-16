@@ -12,8 +12,10 @@ import { RecordsView, RecordsControls, useRecordsController } from "../records";
 import { appendDemoRow } from "@/lib/demo-storage";
 import {useApiQuery} from "@/lib/client/use-api-query";
 import { apiPost, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
-import { AccessLink, Button, EmptyState, ErrorState, Field, Icon, Status, Toast, Select, Input, FormActions } from "../ui";
-import { CreateAction } from "../binso-ux";
+import { AccessLink, Button, EmptyState, ErrorState, Field, Icon, Status, Toast, Select, Input } from "../ui";
+import { CreateAction,FormSheet } from "../binso-ux";
+import {useDirtySnapshot} from '../use-dirty-snapshot';
+import {allowDraftNavigation} from '../use-browser-back-guard';
 import { useRecordList, swissDate, paymentMethodLabel } from "./shared";
 
 export function PaymentsPage() {
@@ -39,10 +41,12 @@ export function PaymentForm() {
   const [idempotencyKey,setIdempotencyKey]=useState("");
   const [invoiceId,setInvoiceId]=useState("");
   const [note,setNote]=useState("");
+  const initialFields=useRef({date,method,note});
+  const {dirty,markPristine}=useDirtySnapshot([invoiceId,date,amount,method,note]);
   const production=useBackendMode();
   const {data:invoiceData,error:invoiceError,loading:invoicesLoading}=useApiQuery<{items:Array<{id:string;number:string;total:number;paid_amount:number;currency?:string;status:string;customer?:{name?:string}}> }>(production?"/api/documents?kind=invoice":"/api/demo/data?collection=documents&kind=invoice");
   const availableInvoices=useMemo(()=>invoiceData?.items.filter(item=>!["draft","cancelled","paid"].includes(item.status)&&openAmount(item)>0)??[],[invoiceData]);
-  useEffect(()=>{if(!sourceInvoice||invoiceId)return;const item=availableInvoices.find(row=>row.number===sourceInvoice);if(item)queueMicrotask(()=>{setInvoiceId(item.id);setAmount(String(openAmount(item)));});},[sourceInvoice,availableInvoices,invoiceId]);
+  useEffect(()=>{if(!sourceInvoice||invoiceId)return;const item=availableInvoices.find(row=>row.number===sourceInvoice);if(item)queueMicrotask(()=>{setInvoiceId(item.id);setAmount(current=>current||String(openAmount(item)));markPristine([item.id,initialFields.current.date,String(openAmount(item)),initialFields.current.method,initialFields.current.note]);});},[sourceInvoice,availableInvoices,invoiceId,markPristine]);
   const selectedInvoice=availableInvoices.find(item=>item.id===invoiceId);
   const returnTo=sourceInvoice?"/rechnungen/"+encodeURIComponent(sourceInvoice):safeAppPath(searchParams.get("returnTo"),"/zahlungen");
 
@@ -51,10 +55,9 @@ export function PaymentForm() {
     const value=Number(amount.replace(",","."));
     if(!selectedInvoice||!Number.isFinite(value)||value<=0||value>openAmount(selectedInvoice)){
       setToast("Bitte einen gültigen Betrag erfassen.");
-      window.setTimeout(()=>setToast(null),2200);
       return;
     }
-    savePending.current=true;setSaving(true);
+    savePending.current=true;setSaving(true);setToast(null);
     try{
       if(isProductionBackendEnabled()){
         const key=idempotencyKey||window.crypto.randomUUID();
@@ -66,15 +69,17 @@ export function PaymentForm() {
         const displayDate=date.split("-").reverse().join(".");
         appendDemoRow("payments",[id,displayDate,selectedInvoice.customer?.name??"Demo",`${selectedInvoice.number} · ${method}`,`CHF ${value.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})}`,"Verbucht"]);
       }
-      setSaved(true);setToast("Zahlung gespeichert.");
+      setSaved(true);allowDraftNavigation();setToast("Zahlung gespeichert.");
       window.setTimeout(()=>router.push(returnTo),700);
     }catch(error){
       savePending.current=false;setSaving(false);
       setToast(error instanceof Error?error.message:"Zahlung konnte nicht gespeichert werden.");
-      window.setTimeout(()=>setToast(null),2600);
     }
   };
-  return <AppShell unsavedChanges={saved?false:undefined} title="Zahlung erfassen" subtitle="Rechnungsdaten werden automatisch übernommen." active="zahlungen" backHref={returnTo} backLabel={sourceInvoice?"Rechnung":"Zahlungen"}>
+  const close=()=>{allowDraftNavigation();router.push(returnTo)};
+  return <AppShell editing unsavedChanges={false} title="Zahlungen" active="zahlungen">
+    <FormSheet label="Zahlung erfassen" description="Rechnungsdaten werden automatisch übernommen." open onClose={close} busy={saving} dirty={dirty&&!saved} actions={<><Button variant="secondary" onClick={close}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button onClick={save} disabled={saving||!selectedInvoice}><LocalizedText>{saving?"Wird gespeichert…":"Zahlung speichern"}</LocalizedText></Button></>}>
+    {toast&&toast!=="Zahlung gespeichert."&&<ErrorState>{toast}</ErrorState>}
     <div className="form-page narrow" inert={saving}>
       <Field label="Rechnung"><Select disabled={invoicesLoading} value={invoiceId} onChange={e=>{setInvoiceId(e.target.value);setIdempotencyKey("");const item=availableInvoices.find(x=>x.id===e.target.value);setAmount(item?String(openAmount(item)):"")}}><option value=""><LocalizedText>{"Rechnung auswählen"}</LocalizedText></option>{availableInvoices.map(item=><option key={item.id} value={item.id}>{item.number} · {item.customer?.name} · {formatCurrency(openAmount(item),item.currency)}</option>)}</Select></Field>
       {invoiceError&&<ErrorState><LocalizedText>{invoiceError}</LocalizedText></ErrorState>}
@@ -85,9 +90,9 @@ export function PaymentForm() {
         <Field label="Zahlungsmethode"><Select value={method} onChange={e=>{setMethod(e.target.value);setIdempotencyKey("")}}><option value={"Banküberweisung"}><LocalizedText>{"Banküberweisung"}</LocalizedText></option><option value={"Kreditkarte"}><LocalizedText>{"Kreditkarte"}</LocalizedText></option><option value={"TWINT"}><LocalizedText>{"TWINT"}</LocalizedText></option><option value={"Bar"}><LocalizedText>{"Bar"}</LocalizedText></option></Select></Field>
         <Field label="Notiz"><Input placeholder="Optional" value={note} onChange={e=>{setNote(e.target.value);setIdempotencyKey("")}}/></Field>
       </div>
-      <FormActions ><Button onClick={save} disabled={saving||!selectedInvoice}><LocalizedText>{saving?"Wird gespeichert…":"Zahlung speichern"}</LocalizedText></Button></FormActions>
     </div>
-    {toast&&<Toast title={toast} tone={toast==="Zahlung gespeichert."?"success":"danger"}/>}
+    </FormSheet>
+    {toast==="Zahlung gespeichert."&&<Toast title={toast} tone="success"/>}
   </AppShell>;
 }
 

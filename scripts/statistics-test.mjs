@@ -50,7 +50,8 @@ Function('require','exports','useId','useState','useEffect','businessDate','stat
 const render=()=>{cursor=0;return statisticsExports.Statistics({title:'Statistics',subtitle:'Synthetic',storageKey:'test',events:[],series:[],metrics:()=>Array.from({length:6},(_,i)=>({label:'Metric '+i,value:i===0?-125:i}))})};
 let statistics=render();
 const tileGroups=nodes(statistics).filter(n=>n.type===Tiles);assert.equal(React.Children.count(tileGroups[0].props.children),4,'Only four primary KPIs');assert.equal(React.Children.count(tileGroups[1].props.children),2,'Remaining KPIs use the shared renderer');
-assert.equal(React.Children.toArray(tileGroups[0].props.children)[0].props.value,'-125','Negative metrics are not clamped or hidden');
+assert.equal(React.Children.toArray(tileGroups[0].props.children)[0].props.value,-125,'Negative metrics are passed unchanged to the shared money renderer');
+assert.equal(React.Children.toArray(tileGroups[0].props.children)[0].props.currency,'CHF','The shared renderer receives the original currency');
 let disclosure=nodes(statistics).find(n=>n.type===Button&&n.props['aria-controls']===':metrics:-more-metrics');assert.equal(disclosure.props['aria-expanded'],false);
 assert.equal(nodes(statistics).find(n=>n.props?.id===':metrics:-more-metrics').props.hidden,true);
 disclosure.props.onClick();statistics=render();assert.equal(nodes(statistics).find(n=>n.props?.id===':metrics:-more-metrics').props.hidden,false,'Disclosure reveals additional metrics');

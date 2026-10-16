@@ -7,6 +7,7 @@ import {customerDirectory,resolveCustomer,type CustomerDirectory} from "@/lib/cu
 import {documentTotals} from "@/lib/money";
 import {useApiQuery,useDataRevision} from "@/lib/client/use-api-query";
 import {FormWizard} from "./form-wizard";
+import {allowDraftNavigation} from "./use-browser-back-guard";
 import {useProcessDraft} from "./use-process-draft";
 import {businessDate,financialStatus,financialStatusLabels,openAmount} from "@/lib/financial-status";
 
@@ -17,7 +18,7 @@ import { invoicePaymentIssue } from "@/lib/qr-bill";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useDialogFocus } from "./use-dialog-focus";
 import { AppShell } from "./app-shell";
-import { ActionRow, ActionSheet, FormSheet } from "./binso-ux";
+import { ActionRow, ActionSheet, FormSheet,MetricTiles,MetricTile } from "./binso-ux";
 import {DocumentPageViewer} from "./pdf-preview";
 import {Button, EmptyState, Field, Icon, IconButton, Toast, FormActions, Input, Select, Textarea, ErrorState, LoadingState} from "./ui";
 import { apiGet, apiPatch, apiPost, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
@@ -365,13 +366,17 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const sendingReminder=sendPurpose==='reminder';
   const canRecordPayment=tenantCan(documentRole,"payments:write")&&kind==="Rechnung"&&!["draft","paid","cancelled"].includes(draft.status??"draft")&&openAmount({total:draft.total,paid_amount:draft.paidAmount,credit_amount:draft.creditAmount,refund_amount:draft.refundAmount})>0;
   const presentation=documentPresentation(kind,draft,useDocumentTotals(draft).total);
-  const title=existing?`${kind} ${draft.number||documentKey||""}`:`${kind} erstellen`;
+  const title=existing?draft.number||documentKey||kind:`${kind} erstellen`;
   const headerActions=existing&&!editing
     ? <div className="document-header-icons">{canEdit&&<IconButton label="Bearbeiten" icon="edit" onClick={()=>setEditing(true)}/>}<IconButton label="Weitere Aktionen" icon="more" onClick={()=>setMoreOpen(true)}/></div>
     : <div className="document-header-icons"><IconButton label="Vorschau" icon="file" onClick={()=>setPreview(true)}/></div>;
   const desktopActions=headerActions;
 
-  return <AppShell title={title} status={existing&&!editing&&!documentLoad.loading&&!documentLoad.error?presentation.statusLabel:undefined} statusTone={presentation.statusTone} subtitle={existing&&!editing?undefined:production?"Wird sicher gespeichert":"Schreibgeschützte Vorschau"} active={plural} backHref={returnTo} backLabel={returnTo==="/dashboard"?"Übersicht":kind==="Angebot"?"Angebote":"Rechnungen"} actions={desktopActions} mobileActions={existing&&!editing?headerActions:undefined} preview={preview} editing={editing} unsavedChanges={dirty}>
+  const closeCreation=()=>{recovery.clear();allowDraftNavigation();router.push(returnTo)};
+  const feedback=toast&&<Toast title={toast} tone={[`${kind} gespeichert.`,`${kind} erstellt.`,"Status aktualisiert.","Dokument als PDF versendet.","Gutschrift erfasst.","Rückerstattung erfasst.","Zahlungserinnerung versendet."].includes(toast)?"success":"danger"}/>;
+  const documentContent=<>
+    {!existing&&feedback}
+    {!existing&&<div className="document-form-preview">{headerActions}</div>}
     {actionError&&!moreOpen&&!sendOpen&&!creditOpen&&<ErrorState><LocalizedText>{actionError}</LocalizedText></ErrorState>}
     {editing&&companyPending&&<LoadingState><LocalizedText>{"Firmendaten werden geladen …"}</LocalizedText></LoadingState>}
     {editing&&paymentIssue&&<div className="document-source-note" role="status"><span>{paymentIssue}</span><Link href="/einstellungen/dokumente"><LocalizedText>{"Einstellungen"}</LocalizedText></Link></div>}
@@ -392,9 +397,12 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
             </LocalizedElement>
           </ContextActions>}
         </div>
-      : !existing?<FormWizard cancelAction={<Button variant="secondary" href={returnTo} disabled={saving}><LocalizedText>{"Abbrechen"}</LocalizedText></Button>} labels={["Kunde und Dokumentdaten","Positionen","Zahlungsbedingungen","Prüfen und als Entwurf speichern"]} step={wizardStep} onStep={setWizardStep} busy={saving} action={<Button disabled={saving||companyPending||Boolean(paymentIssue)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)} onClick={()=>void save()}><LocalizedText>{saving?"Wird gespeichert…":existing?"Speichern":kind+" erstellen"}</LocalizedText></Button>}><DocumentEditor type={kind} draft={draft} onChange={next=>{draftBaseline.current??=editableDocumentSnapshot(draft);setDirty(editableDocumentSnapshot(next)!==draftBaseline.current);setDraft({...next,subtotal:undefined,vat:undefined,total:undefined})}} directory={directory} lockedCustomer={Boolean(sourceOffer)} step={!existing?wizardStep:undefined}/>{wizardStep===3&&<DocumentReadView type={kind} draft={draft} directory={directory}/>}{wizardStep===1&&editing&&kind==="Rechnung"&&draft.customerId&&tenantCan(documentRole,"invoices:write")&&<Button variant="secondary" href={"/zeit?invoice="+encodeURIComponent(existing?draft.number:"")+"&customerId="+encodeURIComponent(draft.customerId)}><LocalizedText>{"Freigegebene Zeiten hinzufügen"}</LocalizedText></Button>}</FormWizard>:<DocumentEditor type={kind} draft={draft} onChange={next=>{draftBaseline.current??=editableDocumentSnapshot(draft);setDirty(editableDocumentSnapshot(next)!==draftBaseline.current);setDraft({...next,subtotal:undefined,vat:undefined,total:undefined})}} directory={directory} lockedCustomer={Boolean(sourceOffer)} step={!existing?wizardStep:undefined}/>}
+      : !existing?<FormWizard cancelAction={<Button variant="secondary" onClick={closeCreation} disabled={saving}><LocalizedText>{"Abbrechen"}</LocalizedText></Button>} labels={["Kunde und Dokumentdaten","Positionen","Zahlungsbedingungen","Prüfen und als Entwurf speichern"]} step={wizardStep} onStep={setWizardStep} busy={saving} action={<Button disabled={saving||companyPending||Boolean(paymentIssue)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)} onClick={()=>void save()}><LocalizedText>{saving?"Wird gespeichert…":existing?"Speichern":kind+" erstellen"}</LocalizedText></Button>}><DocumentEditor type={kind} draft={draft} onChange={next=>{draftBaseline.current??=editableDocumentSnapshot(draft);setDirty(editableDocumentSnapshot(next)!==draftBaseline.current);setDraft({...next,subtotal:undefined,vat:undefined,total:undefined})}} directory={directory} lockedCustomer={Boolean(sourceOffer)} step={!existing?wizardStep:undefined}/>{wizardStep===3&&<DocumentReadView type={kind} draft={draft} directory={directory}/>}{wizardStep===1&&editing&&kind==="Rechnung"&&draft.customerId&&tenantCan(documentRole,"invoices:write")&&<Button variant="secondary" href={"/zeit?invoice="+encodeURIComponent(existing?draft.number:"")+"&customerId="+encodeURIComponent(draft.customerId)}><LocalizedText>{"Freigegebene Zeiten hinzufügen"}</LocalizedText></Button>}</FormWizard>:<DocumentEditor type={kind} draft={draft} onChange={next=>{draftBaseline.current??=editableDocumentSnapshot(draft);setDirty(editableDocumentSnapshot(next)!==draftBaseline.current);setDraft({...next,subtotal:undefined,vat:undefined,total:undefined})}} directory={directory} lockedCustomer={Boolean(sourceOffer)} step={!existing?wizardStep:undefined}/>}
     {editing&&existing&&kind==="Rechnung"&&draft.customerId&&tenantCan(documentRole,"invoices:write")&&<Button variant="secondary" href={"/zeit?invoice="+encodeURIComponent(draft.number)+"&customerId="+encodeURIComponent(draft.customerId)}><LocalizedText>{"Freigegebene Zeiten hinzufügen"}</LocalizedText></Button>}
     {editing&&existing&&<FormActions><Button disabled={saving||companyPending||Boolean(paymentIssue)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)} onClick={()=>void save()}><LocalizedText>{saving?"Wird gespeichert…":existing?"Speichern":kind+" erstellen"}</LocalizedText></Button></FormActions>}
+  </>;
+  return <AppShell title={title} titleIsUserContent={existing} status={existing&&!editing&&!documentLoad.loading&&!documentLoad.error?presentation.statusLabel:undefined} statusTone={presentation.statusTone} subtitle={existing&&!editing?undefined:production?"Wird sicher gespeichert":"Schreibgeschützte Vorschau"} active={plural} backHref={returnTo} backLabel={returnTo==="/dashboard"?"Übersicht":kind==="Angebot"?"Angebote":"Rechnungen"} actions={desktopActions} mobileActions={existing&&!editing?headerActions:undefined} preview={preview} editing={editing} unsavedChanges={existing&&dirty}>
+    {existing?documentContent:<FormSheet label={title} open onClose={closeCreation} busy={saving} dirty={dirty} wizard className="document-entry-sheet">{documentContent}</FormSheet>}
     {preview&&<DocumentModal previewDraft={{...draft,kind,sourceNumber:existing&&editing?documentKey:undefined}} pdfNumber={existing&&!editing?documentKey??draft.number:undefined} title={kind==="Angebot"?"Angebotsvorschau":"Rechnungsvorschau"} onClose={()=>setPreview(false)}/>}
     <ActionSheet label="Weitere Aktionen" open={moreOpen} busy={actionBusy} onClose={()=>setMoreOpen(false)}><div className="action-list">
       {canRecordPayment&&<ActionRow href={"/zahlungen/neu?invoice="+encodeURIComponent(documentKey??draft.number)} icon="wallet" title="Zahlung erfassen"/>}
@@ -413,7 +421,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
       </div>{actionError&&<ErrorState><LocalizedText>{actionError}</LocalizedText></ErrorState>}</ActionSheet>
     <FormSheet label={adjustmentIsRefund?"Rückerstattung erfassen":"Gutschrift erfassen"} description={draft.number} open={creditOpen} busy={actionBusy} onClose={()=>setCreditOpen(false)}><form onSubmit={event=>{event.preventDefault();void bookCredit()}}><div className="sheet-body"><Field label="Betrag"><Input type="number" inputMode="decimal" min="0.01" step="0.01" max={adjustmentIsRefund?refundableAmount:Math.max(0,Number(draft.total??0)-Number(draft.creditAmount??0))} value={creditAmount} onChange={event=>{setCreditAmount(event.target.value);creditKey.current=crypto.randomUUID()}} required/></Field><Field label="Interne Begründung"><Textarea value={creditReason} onChange={event=>{setCreditReason(event.target.value);creditKey.current=crypto.randomUUID()}} minLength={3} maxLength={2000} required/></Field>{adjustmentIsRefund&&<Field label="Rückerstattungsdatum"><Input type="date" max={businessDate()} value={refundDate} onChange={event=>{setRefundDate(event.target.value);creditKey.current=crypto.randomUUID()}} required/></Field>}<p><LocalizedText>{adjustmentIsRefund?"Nur eine bereits ausserhalb von Binso One ausgeführte Rückerstattung erfassen. Es wird keine Bankzahlung ausgelöst.":"Die Gutschrift reduziert die Forderung. Eine Rückerstattung wird nicht ausgelöst."}</LocalizedText></p>{actionError&&<ErrorState><LocalizedText>{actionError}</LocalizedText></ErrorState>}</div><FormActions><Button type="button" variant="secondary" disabled={actionBusy} onClick={()=>setCreditOpen(false)}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button type="submit" disabled={actionBusy||!creditAmount||creditReason.trim().length<3}><LocalizedText>{actionBusy?'Wird gespeichert…':adjustmentIsRefund?'Rückerstattung erfassen':'Gutschrift erfassen'}</LocalizedText></Button></FormActions></form></FormSheet>
     <FormSheet label={sendingReminder?"Zahlungserinnerung senden":"Dokument senden"} description={kind+" als PDF · "+draft.number} open={sendOpen} busy={actionBusy} onClose={()=>setSendOpen(false)}><div className="sheet-body"><Field label="Empfänger"><Input type="email" value={recipient} onChange={e=>{setRecipient(e.target.value);setSendKey(crypto.randomUUID())}} autoComplete="email"/></Field><p><LocalizedText>{sendingReminder?"Der aktuelle offene Betrag wird geprüft. Der Versand erhöht die Mahnstufe; es werden keine Gebühren berechnet.":"Das ausgestellte Dokument wird als PDF versendet."}</LocalizedText></p>{actionError&&<ErrorState><LocalizedText>{actionError}</LocalizedText></ErrorState>}</div><div className="filter-sheet-actions"><Button variant="secondary" onClick={()=>setSendOpen(false)}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button disabled={actionBusy||!recipient} onClick={()=>void sendDocument()}><LocalizedText>{actionBusy?'Wird versendet …':sendingReminder?'Zahlungserinnerung senden':'PDF senden'}</LocalizedText></Button></div></FormSheet>
-    {toast&&<Toast title={toast} tone={[`${kind} gespeichert.`,`${kind} erstellt.`,"Status aktualisiert.","Dokument als PDF versendet.","Gutschrift erfasst.","Rückerstattung erfasst.","Zahlungserinnerung versendet."].includes(toast)?"success":"danger"}/>}
+    {existing&&feedback}
   </AppShell>;
 }
 
@@ -436,7 +444,6 @@ function DocumentReadView({type,draft,directory}:{type:DocumentKind;draft:Docume
   const {displayStatus}=documentPresentation(type,draft,totals.total);
   return <div className="document-detail-view">
     <section className="document-detail-section">
-      <span className="eyebrow"><LocalizedText>{"KUNDE"}</LocalizedText></span>
       <div className="document-customer-heading"><h2>{draft.customer}</h2></div>
       {[customer.address,customer.zip,customer.city].some(Boolean)&&<p>{[customer.address,[customer.zip,customer.city].filter(Boolean).join(" ")].filter(Boolean).join(" · ")}</p>}
     </section>
@@ -445,8 +452,8 @@ function DocumentReadView({type,draft,directory}:{type:DocumentKind;draft:Docume
       {type==="Angebot"
         ? <div><small><LocalizedText>{"Gültig bis"}</LocalizedText></small><b><LocalizedText>{draft.due&&isoToSwiss(draft.due)}</LocalizedText></b></div>
         : <>{displayStatus==="paid"?(draft.paidOn&&<div><small><LocalizedText>{"Bezahlt am"}</LocalizedText></small><b>{isoToSwiss(draft.paidOn)}</b></div>):dueDate&&<div><small><LocalizedText>{"Fällig am"}</LocalizedText></small><b>{dueDate}</b></div>}</>}
+      {isInvoice&&draft.due&&<div className="document-payment-term"><small><LocalizedText>{"Zahlungsfrist"}</LocalizedText></small><b>{draft.due}<LocalizedText>{" Tage"}</LocalizedText></b></div>}
     </section>
-    {isInvoice&&draft.due&&<p className="document-payment-term"><LocalizedText>{"Zahlungsfrist: "}</LocalizedText>{draft.due}<LocalizedText>{" Tage"}</LocalizedText></p>}
     <section className="document-detail-section document-lines-section">
       <div className="section-title"><h2><LocalizedText>{"Positionen"}</LocalizedText></h2></div>
       <div className="document-read-table">
@@ -466,8 +473,7 @@ function DocumentReadView({type,draft,directory}:{type:DocumentKind;draft:Docume
     </section>
     {isInvoice&&Number(draft.creditAmount??0)>0&&<p><LocalizedText>{"Gutschriften"}</LocalizedText>: {currency} {money(Number(draft.creditAmount))}</p>}
     {isInvoice&&!["draft","paid","cancelled"].includes(displayStatus)&&outstanding>0&&<LocalizedElement as="section" className="document-payment-facts" aria-label="Zahlungsstand"><h2><LocalizedText>{"Zahlungsstand"}</LocalizedText></h2>
-      {Number(draft.paidAmount??0)>0&&<span><LocalizedText>{"Bereits bezahlt "}</LocalizedText><b>{currency} {money(Number(draft.paidAmount??0))}</b></span>}
-      <span><LocalizedText>{"Offener Betrag "}</LocalizedText><b>{currency} {money(outstanding)}</b></span>
+      <MetricTiles columns={2}><MetricTile label="Bereits bezahlt" value={`${currency} ${money(Number(draft.paidAmount??0))}`}/><MetricTile label="Offener Betrag" value={`${currency} ${money(outstanding)}`}/></MetricTiles>
     </LocalizedElement>}
     {isInvoice&&Boolean(draft.credits?.length)&&<section className="document-detail-section"><h2><LocalizedText>{"Gutschriften"}</LocalizedText></h2>{draft.credits?.map(credit=><p key={credit.number}><b>{credit.number}</b> · {credit.date.split('-').reverse().join('.')} · {currency} {money(Number(credit.amount))}<br/>{credit.reason}</p>)}</section>}
     {isInvoice&&Boolean(draft.reminders?.length)&&<section className="document-detail-section"><h2><LocalizedText>{"Mahnhistorie"}</LocalizedText></h2>{draft.reminders?.map(reminder=><p key={reminder.id}><b><LocalizedText>{reminder.stage===1?'Zahlungserinnerung':reminder.stage===2?'1. Mahnung':'2. Mahnung'}</LocalizedText></b> · <LocalizedText>{({sent:'Versendet',failed:'Versand nicht bestätigt'} as Record<string,string>)[reminder.status]??'Versand wird geprüft'}</LocalizedText><br/>{reminder.recipient} · {currency} {money(Number(reminder.amount))} · <LocalizedText>{"Zahlungsfrist"}</LocalizedText>: {reminder.deadline.split('-').reverse().join('.')}</p>)}</section>}

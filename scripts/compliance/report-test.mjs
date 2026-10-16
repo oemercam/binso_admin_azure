@@ -42,16 +42,17 @@ const identityModule=pathToFileURL(path.resolve('scripts/compliance/identity.mjs
 const git=(...args)=>execFileSync('git',args,{cwd:identityDir,encoding:'utf8',maxBuffer:4*1024*1024});
 const readIdentity=()=>JSON.parse(execFileSync(process.execPath,['--input-type=module','-e',`import {identity} from ${JSON.stringify(identityModule)};console.log(JSON.stringify(identity()))`],{cwd:identityDir,encoding:'utf8'}));
 try{
- git('init','-q');fs.mkdirSync(path.join(identityDir,'app'));fs.writeFileSync(path.join(identityDir,'app/page.tsx'),'source fixture');fs.writeFileSync(path.join(identityDir,'package.json'),'{}');git('add','app','package.json');
+ git('init','-q');fs.mkdirSync(path.join(identityDir,'app'));fs.writeFileSync(path.join(identityDir,'app/page.tsx'),'source fixture');fs.writeFileSync(path.join(identityDir,'package.json'),'{}');fs.mkdirSync(path.join(identityDir,'ux-compliance'));fs.writeFileSync(path.join(identityDir,'ux-compliance/requirements.v1.json'),JSON.stringify({version:'9.9.9'}));git('add','app','package.json','ux-compliance/requirements.v1.json');
  const blob=execFileSync('git',['hash-object','-w','--stdin'],{cwd:identityDir,input:'synthetic evidence',encoding:'utf8'}).trim();
  const index=Array.from({length:8000},(_,i)=>`100644 ${blob}\tevidence/${String(i).padStart(5,'0')}-${'x'.repeat(150)}.json\n`).join('');
  execFileSync('git',['update-index','--index-info'],{cwd:identityDir,input:index});
  git('-c','user.name=Isolated Fixture','-c','user.email=fixture@example.invalid','commit','-q','-m','Synthetic identity fixture');
  assert(Buffer.byteLength(git('ls-files','-z'))>1024*1024,'Exercise the original child-process buffer boundary');
- const expected=createHash('sha256');for(const file of ['app/page.tsx','package.json'])expected.update(file+'\0').update(fs.readFileSync(path.join(identityDir,file)));
- const initial=readIdentity();assert.equal(initial.sourceDigest,expected.digest('hex'),'Evidence paths do not change the source digest');
+ const expected=createHash('sha256');for(const file of ['app/page.tsx','package.json','ux-compliance/requirements.v1.json'])expected.update(file+'\0').update(fs.readFileSync(path.join(identityDir,file)));
+ const initial=readIdentity();assert.equal(initial.sourceDigest,expected.digest('hex'),'Evidence paths do not change the source digest');assert.equal(initial.registryVersion,'9.9.9');
  fs.mkdirSync(path.join(identityDir,'evidence'));fs.writeFileSync(path.join(identityDir,'evidence/untracked.json'),'new generated result');assert.equal(readIdentity().sourceDigest,initial.sourceDigest);
  fs.writeFileSync(path.join(identityDir,'app/page.tsx'),'changed source fixture');assert.notEqual(readIdentity().sourceDigest,initial.sourceDigest,'Source edits remain bound');
+ const beforeRegistry=readIdentity();fs.writeFileSync(path.join(identityDir,'ux-compliance/requirements.v1.json'),JSON.stringify({version:'9.9.10'}));const afterRegistry=readIdentity();assert.equal(afterRegistry.registryVersion,'9.9.10');assert.notEqual(afterRegistry.sourceDigest,beforeRegistry.sourceDigest,'A changed visual contract invalidates older evidence');
  fs.mkdirSync(path.join(identityDir,'components'));fs.writeFileSync(path.join(identityDir,'components/new.tsx'),'untracked source fixture');const untracked=readIdentity().sourceDigest;git('add','components/new.tsx');assert.equal(readIdentity().sourceDigest,untracked,'Untracked source is included before staging');
  console.log('Source identity handles >1 MiB of generated Git paths while retaining tracked/untracked source binding.');
 }finally{fs.rmSync(identityDir,{recursive:true,force:true});}

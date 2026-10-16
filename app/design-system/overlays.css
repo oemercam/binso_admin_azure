@@ -328,15 +328,7 @@
 .header-panel-heading{position:relative;justify-content:center;min-height:var(--mobile-header-h);padding-inline:44px}
 .header-panel{width:100%;height:100%;max-height:100%;border-radius:0;padding:var(--safe-top) max(var(--mobile-page-x),var(--safe-right)) max(16px,var(--safe-bottom)) max(var(--mobile-page-x),var(--safe-left));box-shadow:none}
 .header-panel-layer{inset:var(--dialog-viewport-top,0px) 0 auto;height:min(var(--dialog-available-height),100dvh);padding:0;justify-content:stretch;background:var(--color-bg)}
-.bottom-sheet{border:0;background:var(--app-surface);border-radius:var(--app-group-radius)}
-.bottom-sheet .sheet-header,.bottom-sheet .filter-sheet-actions,.bottom-sheet .mobile-sticky-save{background:var(--app-surface)}
 .bottom-sheet .sheet-header .icon-button,.header-panel-heading .icon-button{border:0;border-radius:50%;background:var(--app-chrome)}
-.confirm-dialog{border:0;border-radius:var(--app-group-radius);background:var(--app-surface)}
-.bo-settings-group-body :is(.settings-list,.action-list){margin:0;border:0;max-width:none}
-.bo-settings-group-body .action-row{position:relative;min-height:52px;padding:12px 16px;border:0;gap:14px}
-.bo-settings-group-body .action-row:not(:last-child)::after{content:"";position:absolute;bottom:0;left:52px;right:16px;height:1px;background:var(--app-divider)}
-.bo-settings-group-body .action-row>svg{color:var(--app-symbol)}
-.bo-settings-group-body .action-row-description{color:var(--app-secondary)}
 .bottom-sheet,.header-panel,.confirm-dialog{--control-h:44px;--control-font:16px}
 }
 .context-actions-inline,.context-action-group{

@@ -1,20 +1,22 @@
 {
   "schemaVersion": 1,
-  "version": "1.1.0",
+  "version": "1.2.0",
   "baselineCommit": "b398ff7400eb1b2ea90016c25e596261d58c822b",
-  "sourceCompleteness": "Available V22.1/V22.2 registers imported without acceptance. Complete original V21.1–V21.5 approvals unavailable.",
+  "sourceCompleteness": "The owner ZIP dated 2026-10-15 is the binding visual source. Imported historical V21/V22 entries remain traceability evidence and cannot override it; complete historical approval artifacts remain unavailable.",
   "conflicts": [
     {
       "id": "STATISTICS-BACKGROUND",
       "earlier": "Hardcoded dark surface and old browser assertions",
-      "later": "13.10.2026: user requests the new Outlook-style appearance across all mobile/PWA/tablet components in light and dark modes",
-      "decision": "Up to 1100 px statistics use the central --app-surface group background in both themes; wider desktop retains --color-bg. This explicitly supersedes the earlier light-only white-surface decision."
+      "later": "2026-10-15 original ZIP and 2026-10-16 explicit replacement of old visual rules",
+      "decision": "Statistics is an open section on --color-bg at every viewport. No mobile gray card surface. Dark uses the same derived canvas token; this is not full Dark Mode visual approval.",
+      "supersededDecision": "Up to 1100 px statistics use the central --app-surface group background in both themes; wider desktop retains --color-bg. This explicitly supersedes the earlier light-only white-surface decision."
     },
     {
       "id": "NAVIGATION-MATERIAL-CREATION",
       "earlier": "Bottom-navigation source and geometry frozen against V21.1/V22 baseline",
-      "later": "2026-10-13: explicit user authorization for glass on navigation, separate creation plus and a shared customer/admin/tablet UX foundation",
-      "decision": "Glass material and dock placement may change. Finanzen remains a direct destination; original access/scroll logic and icon paths stay protected. New source reference: docs/assets/20261013/navigation-reference.json. Geometry must be explicitly captured, never silently refreshed."
+      "later": "2026-10-15 original ZIP implementation supplement: retain the existing bottom navigation exactly",
+      "decision": "Preserve the current navigation markup, destinations, access/scroll logic, icons, material, geometry and token inheritance. The schematic ZIP dock does not replace it; the existing protected navigation reference remains unchanged.",
+      "supersededDecision": "Glass material and dock placement may change. Finanzen remains a direct destination; original access/scroll logic and icon paths stay protected. New source reference: docs/assets/20261013/navigation-reference.json. Geometry must be explicitly captured, never silently refreshed."
     },
     {
       "id": "PRIMARY-KPI-COUNT",
@@ -626,22 +628,22 @@
     },
     {
       "id": "UX-FIN-010",
-      "description": "Statistik-Hintergrund folgt dem freigegebenen App-/Desktop-Standard",
+      "description": "Offene Statistikfläche folgt der aktuellen ZIP-Seitenfläche",
       "routes": [
         "customer-app"
       ],
       "componentTypes": [
         "Statistics"
       ],
-      "expected": "Hell/Dunkel: bis 1100 px entspricht der aufgelöste Hintergrund --app-surface; über 1100 px --color-bg. Freigabe: Nutzerauftrag vom 13.10.2026 zur neuen Darstellung für alle Mobile-/PWA-/Tablet-Komponenten.",
+      "expected": "Alle Viewports: Statistics verwendet den aufgelösten Seitenhintergrund --color-bg, ohne eigene graue Kartenfläche. Light folgt dem Original-ZIP vom 15.10.2026; Dark verwendet dieselbe abgeleitete Token-Struktur und ist keine zusätzliche visuelle Freigabe.",
       "owner": "Statistics",
       "method": "browser",
       "testCase": "TC-UX-FIN-010",
       "adapter": "background",
       "priority": "P1",
-      "acceptance": "Hell/Dunkel: bis 1100 px entspricht der aufgelöste Hintergrund --app-surface; über 1100 px --color-bg. Freigabe: Nutzerauftrag vom 13.10.2026 zur neuen Darstellung für alle Mobile-/PWA-/Tablet-Komponenten.",
+      "acceptance": "Alle Viewports: Statistics verwendet den aufgelösten Seitenhintergrund --color-bg, ohne eigene graue Kartenfläche. Light folgt dem Original-ZIP vom 15.10.2026; Dark verwendet dieselbe abgeleitete Token-Struktur und ist keine zusätzliche visuelle Freigabe.",
       "automation": "automatic",
-      "provenance": "Explicit user approval 2026-10-13: align every app component/page/subpage with the supplied Outlook-style reference in light and dark mode, including mobile/PWA/tablet.",
+      "provenance": "Owner-supplied ZIP 2026-10-15 and explicit 2026-10-16 instruction to replace all old visual rules with this ZIP. Supersedes the 2026-10-13 Outlook surface rule; full Dark Mode visual approval remains separate.",
       "review": null
     },
     {

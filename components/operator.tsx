@@ -223,49 +223,30 @@ function OperatorDashboard() {
   const resource=useApiQuery<{stats?:Record<string,unknown>;tickets?:OperatorTicket[];incidents?:Array<{id:string;service:string;title:string;status:string;started_at:string}>}>(production?"/api/operator/dashboard":null);
   const data=resource.data??{};
   const loading=resource.loading,loadError=resource.error,refresh=resource.refresh;
-  const [metric,setMetric]=useState<"availability"|"users"|"api">("availability");
   
-  const stats=data.stats??{};
-  const recent=production?(data.tickets??[]):tickets.map(([,subject,customer,status],i)=>({id:String(i),subject,tenant:{name:customer},status:status==="Offen"?"open":"in_progress"} as OperatorTicket));
+  const stats:Record<string,unknown>=production?data.stats??{}:{customers_total:demoCustomers.length,subscriptions_active:demoCustomers.filter(item=>item.status==="Aktiv").length,trials_active:0,monthly_contract_value:demoCustomers.filter(item=>item.status==="Aktiv").reduce((total,item)=>total+(plans.find(plan=>plan.name===item.plan)?.monthly??0),0)};
+  const recent=production?(data.tickets??[]):tickets.map(([,subject,customer,status],i)=>({id:String(i),subject,tenant:{name:customer},status:status==="Offen"?"open":status==="Gelöst"?"resolved":"in_progress"} as OperatorTicket));
   const incidents=data.incidents??[];
-  const open=production?Number(stats.tickets_open??0):8, progress=production?Number(stats.tickets_in_progress??0):12;
-  const resolved=production?Number(stats.tickets_resolved??0):28, overdue=production?Number(stats.tickets_overdue??0):3;
-  const metricInfo={availability:["Systemverfügbarkeit","99.99 %","+0.01 %","0,6,12,18,24"],users:["Aktive Nutzer",production?String(stats.users_active??0):"128","aktuell online","0,6,12,18,24"],api:["Antwortzeit API","182 ms","−12 %","0,6,12,18,24"]} as const;
-  const current=metricInfo[metric];
+  const open=production?Number(stats.tickets_open??0):recent.filter(item=>item.status==="open").length, progress=production?Number(stats.tickets_in_progress??0):recent.filter(item=>item.status==="in_progress").length;
+  const resolved=production?Number(stats.tickets_resolved??0):recent.filter(item=>item.status==="resolved").length;
   if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError} onRetry={refresh}/>;
 
-  if(production)return <div className="operator-dashboard-cockpit">
+  return <div className="operator-dashboard-cockpit">
     <MetricTiles>{[
       ["Kunden",Number(stats.customers_total??0),"/operator/kunden"],
       ["Aktive Abos",canBilling?Number(stats.subscriptions_active??0):"—","/operator/abonnemente"],
       ["Testphasen",canBilling?Number(stats.trials_active??0):"—","/operator/abonnemente"],
-      ["Nutzer · letzte 15 Minuten",Number(stats.users_active??0),"/operator/kunden"],
-    ].map(([label,value,href])=>value==="—"?<MetricTile key={String(label)} label={String(label)} value="—" hint="Keine Berechtigung"/>:<Link href={String(href)} key={String(label)}><MetricTile label={String(label)} value={String(value)}/></Link>)}</MetricTiles>
+      ["Nutzer · letzte 15 Minuten",stats.users_active==null?"—":Number(stats.users_active),"/operator/kunden"],
+    ].map(([label,value,href])=>value==="—"?<MetricTile key={String(label)} label={String(label)} value="—" hint={production?"Keine Berechtigung":"Demo"}/>:<Link href={String(href)} key={String(label)}><MetricTile label={String(label)} value={String(value)}/></Link>)}</MetricTiles>
     {(canBilling||canSupport)&&<div className="operator-insight-grid"><WorkspaceSection>
       {canBilling&&canSupport&&<DetailTabs label="Dashboard-Auswertungen"><button type="button" className={activeInsight==='billing'?'active':''} onClick={()=>setInsight('billing')}><LocalizedText>{"Abrechnung"}</LocalizedText></button><button type="button" className={activeInsight==='support'?'active':''} onClick={()=>setInsight('support')}><LocalizedText>{"Support"}</LocalizedText></button></DetailTabs>}
-      {activeInsight==='billing'?<><SectionTitle title="Abrechnung"/><MetricTiles columns={2}><Link href="/operator/zahlungen"><MetricTile label="Zahlungen letzte 30 Tage" value={moneyChf(Number(stats.payments_30d??0))}/></Link><Link href="/operator/finanzen"><MetricTile label="Monatlicher Vertragswert" value={moneyChf(Number(stats.monthly_contract_value??0))}/></Link></MetricTiles></>:<><SectionTitle title="Support"/><RingChart label="Offen / in Bearbeitung / gelöst" format="number" parts={[{key:"open",label:"Offen",tone:"negative",value:open},{key:"progress",label:"In Bearbeitung",tone:"neutral",value:progress},{key:"resolved",label:"Gelöst",tone:"positive",value:resolved}]}/></>}
+      {activeInsight==='billing'?<><SectionTitle title="Abrechnung"/><MetricTiles columns={2}><Link href="/operator/zahlungen"><MetricTile label="Zahlungen letzte 30 Tage" value={stats.payments_30d==null?"—":moneyChf(Number(stats.payments_30d))}/></Link><Link href="/operator/finanzen"><MetricTile label="Monatlicher Vertragswert" value={moneyChf(Number(stats.monthly_contract_value??0))}/></Link></MetricTiles></>:<><SectionTitle title="Support"/><RingChart label="Offen / in Bearbeitung / gelöst" format="number" parts={[{key:"open",label:"Offen",tone:"negative",value:open},{key:"progress",label:"In Bearbeitung",tone:"neutral",value:progress},{key:"resolved",label:"Gelöst",tone:"positive",value:resolved}]}/></>}
     </WorkspaceSection></div>}
     <WorkspaceSection><SectionTitle title="Systemstatus" action={<Link prefetch={false} href="/operator/monitoring"><LocalizedText>{"Monitoring öffnen"}</LocalizedText></Link>}/><p><LocalizedText>{incidents.length?incidents.length+" aktive Störungen erfasst":"Keine aktiven Störungen erfasst."}</LocalizedText></p></WorkspaceSection>
     {canSupport&&<WorkspaceSection><SectionTitle title="Letzte Supportfälle" action={<Link href="/operator/tickets"><LocalizedText>{"Alle Tickets"}</LocalizedText></Link>}/>{recent.length?<div className="compact-list">{recent.map(x=><Link href={"/operator/tickets/"+x.id} key={x.id}><b>{x.subject}</b><span><LocalizedText verbatim={!!x.tenant?.name}>{x.tenant?.name??"Kunde"}</LocalizedText></span><Status>{operatorStatus(x.status)}</Status></Link>)}</div>:<EmptyState compact icon="support" title="Keine offenen Supportfälle" text="Neue Anfragen erscheinen hier."/>}</WorkspaceSection>}
   </div>;
-  return <div className="operator-dashboard-cockpit">
-    <section className="operator-health-strip">
-      <SectionTitle title="Systemstatus" action={<Link prefetch={false} className="text-action" href="/operator/monitoring"><LocalizedText>{"Alle anzeigen"}</LocalizedText></Link>}/>
-      <div className="operator-health-services">{["Web App","Datenbank","API","Dateispeicher","E-Mail Service"].map((name,i)=><button type="button" key={name} onClick={()=>setMetric(i===1?"availability":i===2?"api":"users")}><i className={i===4?"warn":""}/><b>{name}</b><span><LocalizedText>{i===4?"Degradiert":"Online"}</LocalizedText></span><small><LocalizedText>{i===0?"99.99 %":i===1?"12 ms":i===2?"24 ms":i===3?"34 ms":"Antwortzeit erhöht"}</LocalizedText></small></button>)}</div>
-    </section>
-    <div className="operator-pulse-grid">
-      {(["availability","users","api"] as const).map((key)=><button type="button" className={"operator-pulse "+(metric===key?"active":"")} key={key} onClick={()=>setMetric(key)}><div><span>{metricInfo[key][0]}</span><strong>{metricInfo[key][1]}</strong><small>{metricInfo[key][2]}</small></div><div className={"operator-stat-ring "+key} aria-hidden="true"><span className="operator-ring-content"><b><LocalizedText>{key==="availability"?"99.99":key==="users"?"128":"182"}</LocalizedText></b><span><LocalizedText>{key==="availability"?"%":key==="users"?"online":"ms"}</LocalizedText></span></span></div></button>)}
-    </div>
-    <div className="operator-insight-grid">
-      <WorkspaceSection><SectionTitle title="Tickets" action={<Link className="text-action" href="/operator/tickets"><LocalizedText>{"Alle anzeigen"}</LocalizedText></Link>}/><div className="operator-ticket-stats">{[["Neu",open],["In Bearbeitung",progress],["Gelöst",resolved],["Überfällig",overdue]].map(([label,value],i)=><Link href="/operator/tickets" key={String(label)} className={"ticket-stat t"+i}><strong>{value}</strong><span><LocalizedText>{label}</LocalizedText></span></Link>)}</div></WorkspaceSection>
-      <WorkspaceSection className="operator-sla"><SectionTitle title="SLA Erfüllung"/><LocalizedElement as="button" type="button" aria-label="SLA Details" onClick={()=>setMetric("availability")} className="sla-compact"><span className="sla-ring"><b>96.3%</b></span><span className="sla-copy"><strong><LocalizedText>{"Innerhalb SLA"}</LocalizedText></strong><small><i/><LocalizedText>{" 96.3 % erfüllt"}</LocalizedText></small><small><i/><LocalizedText>{" 2.5 % knapp"}</LocalizedText></small><small><i/><LocalizedText>{" 1.2 % überfällig"}</LocalizedText></small></span></LocalizedElement></WorkspaceSection>
-    </div>
-    <div className="operator-insight-grid">
-      <WorkspaceSection><SectionTitle title="Offene Anfragen nach Kategorie" action={<Link className="text-action" href="/operator/tickets"><LocalizedText>{"Alle anzeigen"}</LocalizedText></Link>}/><div className="operator-category-bars">{[["Technische Störung",14],["Zugriff / Berechtigung",9],["Funktion / Anwendung",7],["Änderung / Anfrage",5]].map(([label,value],i)=><Link href="/operator/tickets" key={String(label)}><span><LocalizedText>{label}</LocalizedText></span><i><b style={{"--bar-value":String(Number(value)*6)+"%"} as CSSProperties}/></i><strong>{value}</strong></Link>)}</div></WorkspaceSection>
-      <WorkspaceSection><SectionTitle title="Letzte Aktivitäten"/>{incidents.length?<div className="incident-history">{incidents.slice(0,5).map(x=><div className="incident-row" key={x.id}><span className={"incident-dot "+(x.status==="resolved"?"resolved":"maintenance")}/><div><b><LocalizedText verbatim={true}>{x.title}</LocalizedText></b><small>{x.service}</small></div></div>)}</div>:<div className="compact-list">{recent.slice(0,4).map(x=><Link href={"/operator/tickets/"+x.id} key={x.id}><b>{x.subject}</b><span><LocalizedText verbatim={!!x.tenant?.name}>{x.tenant?.name??"Kunde"}</LocalizedText></span><Status tone={x.status==="open"?"warning":"success"}>{operatorStatus(x.status)}</Status></Link>)}</div>}</WorkspaceSection>
-    </div>
-  </div>;
 }
+
 
 function TicketsView() {
  const {production,items,loading,loadError,refresh}=useOperatorTickets();
@@ -420,10 +401,10 @@ function OperatorCustomerDetail({tenantId}:{tenantId:string}) {
   </>;
 }
 
-function PaymentInsight({label,value,kind,bars=[],ratio=0}:{label:string;value:string;kind:"trend"|"donut"|"status";bars?:number[];ratio?:number}) {
+function PaymentInsight({label,value,kind,bars=[]}:{label:string;value:string;kind:"trend"|"number";bars?:number[]}) {
   return <section className={"operator-payment-insight payment-insight-"+kind}>
-    <div><span><LocalizedText>{label}</LocalizedText></span><strong>{value}</strong></div>
-    {kind==="trend"?<div className="payment-mini-bars" aria-hidden="true">{bars.some(height=>height>0)?bars.map((height,index)=><i key={index} style={{"--bar-value":String(height)+"%"} as CSSProperties}/>):<span><LocalizedText>{"Keine Zahlungen"}</LocalizedText></span>}</div>:<div className={"payment-ring payment-ring-"+kind} style={{"--payment-ratio":String(Math.max(0,Math.min(100,ratio)))+"%"} as React.CSSProperties}><b>{ratio}%</b></div>}
+    <MetricTile label={label} value={value}/>
+    {kind==="trend"&&<div className="payment-mini-bars" aria-hidden="true">{bars.some(height=>height>0)?bars.map((height,index)=><i key={index} style={{"--bar-value":String(height)+"%"} as CSSProperties}/>):<span><LocalizedText>{"Keine Zahlungen"}</LocalizedText></span>}</div>}
   </section>;
 }
 
@@ -442,7 +423,7 @@ function OperatorFinanceView({demo=false}:{demo?:boolean}){
   return <div className="operator-finance">
     <div className="section-title"><span><LocalizedText>{ranges[range].label}</LocalizedText></span><LocalizedElement as="button" type="button" className="icon-button records-filter-action" aria-label="Zeitraum filtern" onClick={()=>{setDraftRange(range);setFilterOpen(true)}}><Icon name="filter" size={20}/></LocalizedElement></div>
     <FilterSheet label="Zeitraum" open={filterOpen} onClose={()=>setFilterOpen(false)} actions={<><Button variant="secondary" onClick={()=>setDraftRange("month")}><LocalizedText>{"Zurücksetzen"}</LocalizedText></Button><Button onClick={()=>{setRange(draftRange);setFilterOpen(false)}}><LocalizedText>{"Anwenden"}</LocalizedText></Button></>}><Field label="Zeitraum"><Select value={draftRange} onChange={event=>setDraftRange(event.target.value)}>{Object.entries(ranges).map(([key,x])=><option key={key} value={key}><LocalizedText>{x.label}</LocalizedText></option>)}</Select></Field></FilterSheet>
-    <div className="operator-payment-insights"><PaymentInsight label="Kundenzahlungen" value={"CHF "+volume.toLocaleString("de-CH",{minimumFractionDigits:2})} kind="trend" bars={monthly.map(x=>max?x.value/max*100:0)}/><PaymentInsight label="Plattformumsatz" value={"CHF "+platformRevenue.toLocaleString("de-CH",{minimumFractionDigits:2})} kind="donut" ratio={platformRevenue+costs?Math.round(platformRevenue/(platformRevenue+costs)*100):0}/><PaymentInsight label="Betriebskosten" value={"CHF "+costs.toLocaleString("de-CH",{minimumFractionDigits:2})} kind="status" ratio={platformRevenue+costs?Math.round(costs/(platformRevenue+costs)*100):0}/></div>
+    <div className="operator-payment-insights"><PaymentInsight label="Kundenzahlungen" value={"CHF "+volume.toLocaleString("de-CH",{minimumFractionDigits:2})} kind="trend" bars={monthly.map(x=>max?x.value/max*100:0)}/><PaymentInsight label="Plattformumsatz" value={"CHF "+platformRevenue.toLocaleString("de-CH",{minimumFractionDigits:2})} kind="number"/><PaymentInsight label="Betriebskosten" value={"CHF "+costs.toLocaleString("de-CH",{minimumFractionDigits:2})} kind="number"/></div>
     <section className="finance-analysis"><SectionTitle title="Finanzentwicklung"/>{monthly.some(x=>x.value>0)?<div className="finance-month-bars">{monthly.map(x=><div key={x.label}><i style={{"--bar-value":`${x.value>0?x.value/max*100:0}%`} as CSSProperties}/><b><LocalizedText>{x.label}</LocalizedText></b><small><LocalizedText>{"CHF "}</LocalizedText>{x.value.toLocaleString("de-CH",{maximumFractionDigits:0})}</small></div>)}</div>:<EmptyState compact title="Keine Kundenzahlungen im gewählten Zeitraum" text="Erfasste Zahlungen erscheinen in der Finanzentwicklung."/>}</section>
     <div className="finance-breakdown"><section><h3><LocalizedText>{"Zusammenfassung"}</LocalizedText></h3><div><span><LocalizedText>{"Betriebskosten gesamt"}</LocalizedText></span><strong><LocalizedText>{"CHF "+costs.toLocaleString("de-CH",{minimumFractionDigits:2})}</LocalizedText></strong></div><div><span><LocalizedText>{"Plattformumsatz"}</LocalizedText></span><strong><LocalizedText>{"CHF "+platformRevenue.toLocaleString("de-CH",{minimumFractionDigits:2})}</LocalizedText></strong></div><div><span><LocalizedText>{"Ergebnis"}</LocalizedText></span><strong><LocalizedText>{"CHF "+result.toLocaleString("de-CH",{minimumFractionDigits:2})}</LocalizedText></strong></div></section><section><h3><LocalizedText>{"Datenbasis"}</LocalizedText></h3><p><LocalizedText>{"Kundenzahlungen, Plattformumsatz und Betriebskosten werden nach dem gewählten Zeitraum ausgewertet."}</LocalizedText></p></section></div>
   </div>
@@ -452,7 +433,7 @@ function PaymentsView() {
   const production=useBackendMode();
   
   const resource=useApiQuery<{items:Array<Record<string,unknown>>}>(production?"/api/operator/payments":null);
-  const items=resource.data?.items??[];
+  const items:Array<Record<string,unknown>>=production?resource.data?.items??[]:[{paid_on:"2026-10-02",tenant:{name:"Acme AG"},currency:"CHF",amount:1240,status:"booked",method:"Bank"},{paid_on:"2026-10-02",tenant:{name:"Müller GmbH"},currency:"CHF",amount:49,status:"booked",method:"Bank"},{paid_on:"2026-10-01",tenant:{name:"Schmid Consulting"},currency:"CHF",amount:89,status:"pending",method:"Bank"}];
   const chips=['Alle','Verbucht','Ausstehend','Storniert'];
   const columns=[{label:'Datum',index:0},{label:'Kunde',index:1},{label:'Betrag',index:2,align:'right' as const},{label:'Status',index:3,status:true},{label:'Referenz',index:4}];
   const controller=useRecordsController({placeholder:'Zahlungen suchen...',chips,columns});
@@ -462,11 +443,6 @@ function PaymentsView() {
   
 
   if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError} onRetry={refresh}/>;
-
-  if(!production) return <>
-    <div className="operator-payment-insights"><PaymentInsight label="Kundenzahlungen" value="CHF 49’820" kind="trend" bars={[38,52,44,68,61,82,74,92]}/><PaymentInsight label="Verbucht" value="184" kind="donut" ratio={96}/><PaymentInsight label="Offen / storniert" value="2" kind="status" ratio={1}/></div>
-    <WorkspaceSection className="operator-table-card"><DataTable variant="operator" label="Operator-Daten"><DataTableHead className="operator-table-head payment"><span><LocalizedText>{"Datum"}</LocalizedText></span><span><LocalizedText>{"Kunde"}</LocalizedText></span><span><LocalizedText>{"Betrag"}</LocalizedText></span><span><LocalizedText>{"Status"}</LocalizedText></span><span><LocalizedText>{"Zahlungsart"}</LocalizedText></span></DataTableHead>{[["02.10.2026","Acme AG","CHF 1’240.00","Verbucht","Bank"],["02.10.2026","Müller GmbH","CHF 49.00","Verbucht","Bank"],["01.10.2026","Schmid Consulting","CHF 89.00","Ausstehend","Bank"]].map(r=><DataTableRow className="operator-table-row payment" key={r[1]}>{r.map((x,i)=><span key={i}>{i===3?<Status tone={x==="Verbucht"?"success":"warning"}>{x}</Status>:x}</span>)}</DataTableRow>)}</DataTable></WorkspaceSection>
-  </>;
 
   const booked=items.filter(item=>item.status==="booked");
   const chfBooked=booked.filter(item=>item.currency==="CHF");
@@ -479,8 +455,8 @@ function PaymentsView() {
   return <>
     <div className="operator-payment-insights">
       <PaymentInsight label="Angezeigte Zahlungen · CHF" value={"CHF "+total.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2})} kind="trend" bars={paymentBars}/>
-      <PaymentInsight label="Verbucht" value={String(booked.length)} kind="donut" ratio={items.length?Math.round(booked.length/items.length*100):0}/>
-      <PaymentInsight label="Offen / storniert" value={String(pending+reversed)} kind="status" ratio={items.length?Math.round((pending+reversed)/items.length*100):0}/>
+      <PaymentInsight label="Verbucht" value={String(booked.length)} kind="number"/>
+      <PaymentInsight label="Offen / storniert" value={String(pending+reversed)} kind="number"/>
     </div>
     <WorkspaceSection className="operator-table-card">
       <SectionTitle title="Kundenzahlungen"/>

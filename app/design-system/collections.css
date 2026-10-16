@@ -16,6 +16,7 @@
 .records-inline-controls>.tabs>button{flex:none;white-space:nowrap}
 .record-table-meta{display:inline;overflow-wrap:anywhere}
 .record-table-meta+.record-table-meta::before{content:" · "}
+.records-sort-control,.records-filter-label{display:none}
 .detail-grid{display:grid;grid-template-columns:1.4fr .8fr;gap:14px;margin-top:14px}
 .searchbox{
   height:42px;
@@ -32,7 +33,7 @@
 .searchbox>input,
 .searchbox>input:focus,
 html[data-theme="dark"] .searchbox>input{height:100%;min-width:0;padding:0;border:0;border-radius:0;box-shadow:none;background:transparent;outline:0}
-.searchbox:focus-within{border-color:var(--color-fg);outline:0;box-shadow:none}
+.searchbox:focus-within{border-color:var(--app-accent);outline:var(--control-focus-width) solid var(--app-accent);outline-offset:1px;box-shadow:none}
 .searchbox>svg{flex:none}
 .toolbar .searchbox{height:var(--control-h);min-height:var(--control-h)}
 .searchbox.large{max-width:none}
@@ -103,7 +104,7 @@ html[data-theme="dark"] .searchbox>input{height:100%;min-width:0;padding:0;borde
   border-bottom:1px solid var(--color-line);
 }
 .detail-list dt{min-width:0;color:var(--color-muted);font-size:var(--type-label);overflow-wrap:anywhere;line-height:1.5}
-.detail-list dd{margin:0;font-size:var(--type-label);font-weight:550}
+.detail-list dd{margin:0;font-size:var(--type-label);font-weight:400;text-align:right}
 .detail-list>div:last-child,
 .contact-list>div:last-child{border-bottom:0}
 .contact-list>div{
@@ -150,7 +151,8 @@ html[data-theme="dark"] .searchbox>input{height:100%;min-width:0;padding:0;borde
 .detail-grid[data-layout="dossier"]>[data-area="summary"]{grid-area:summary;min-width:0}
 .detail-grid[data-layout="dossier"]>[data-area="facts"]{grid-area:facts;min-width:0;border-left:1px solid var(--color-line);padding-left:23px}
 .detail-grid[data-layout="dossier"]>[data-area="records"]{grid-area:records;min-width:0}
-.contact-facts p,.contact-address{font-size:var(--type-label);line-height:1.7;margin:12px 0;overflow-wrap:anywhere}
+.contact-facts p,.contact-address{font-size:var(--type-label);line-height:1.7;margin:0 0 8px;overflow-wrap:anywhere}
+.contact-facts p:last-child{margin-bottom:0}
 .records-search-row>.records-filter-action{border:1px solid var(--control-border);border-radius:var(--control-radius)}
 .bo-record-label{color:var(--color-muted);font-size:var(--type-label);line-height:1.5}
 .detail-list>.detail-list-stacked{grid-template-columns:minmax(0,1fr);gap:4px}
@@ -202,10 +204,16 @@ html[data-theme="dark"] .searchbox>input{height:100%;min-width:0;padding:0;borde
   }
 }
 @media (min-width:1101px){
+.records-search-row{grid-template-columns:minmax(0,1fr) auto auto auto}
+.records-sort-control{display:block;min-width:0;max-width:220px}
+.records-sort-control select{font-size:var(--type-label);color:var(--control-secondary-fg)}
+.records-search-row>.records-filter-action{display:flex;gap:6px;width:auto;min-width:44px;padding-inline:12px;color:var(--control-secondary-fg)}
+.records-search-row .records-filter-label{display:inline;font-size:var(--type-label)}
 .bo-data-disclosure[open]>summary{display:none}
 .records-inline-controls[data-appearance="line"]>.tabs{grid-row:1;margin-top:10px;margin-bottom:0}
 .records-inline-controls[data-appearance="line"]>.records-search-row{grid-row:2}
 .page-head[data-heading-placement="content"] .bo-detail-commandbar .button{height:34px;min-height:34px;padding-inline:10px;border-radius:var(--shape-control-desktop);font-size:var(--type-label)}
+.bo-detail-commandbar .button-ghost{color:var(--command-text)}
 .bo-detail-commandbar{display:flex;min-width:0;padding-block:12px;border-bottom:1px solid var(--color-line)}
 .bo-detail-commandbar>.page-actions{justify-content:flex-start;min-width:0}
 .toolbar .searchbox{max-width:520px;flex:1 1 360px}
@@ -222,7 +230,7 @@ html[data-theme="dark"] .searchbox>input{height:100%;min-width:0;padding:0;borde
 .desktop-detail-main .detail-card{max-width:none}
 .page-container> :is(.toolbar,.finance-range,.payment-summary-strip,.tabs):first-of-type{margin-top:0}
 .page-container>.detail-grid{margin-top:var(--desktop-section-gap)}
-.searchbox{height:var(--desktop-toolbar-h);max-width:440px;border-radius:var(--shape-medium)}
+.searchbox{height:var(--desktop-toolbar-h);max-width:440px;border-radius:var(--control-radius)}
 .searchbox.large{max-width:620px}
 .chips{min-width:0}
 .chips button,.tabs button,.tabs a{height:34px;min-height:34px}
@@ -317,17 +325,22 @@ html[data-theme="dark"] .searchbox>input{height:100%;min-width:0;padding:0;borde
 .desktop-record-table,.desktop-record-head,.desktop-record-row{min-width:0;max-width:100%}
 .desktop-record-row>[role="cell"]{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .desktop-record-row>.table-status-cell{overflow:visible;white-space:normal}
+.desktop-record-row>[role="cell"].align-right{white-space:normal;overflow:visible;overflow-wrap:anywhere}
 .desktop-record-head>[role="columnheader"]{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .desktop-record-head>[role="columnheader"]:focus-visible,.toolbar .chips button:focus-visible{outline:2px solid currentColor;outline-offset:2px}
 .desktop-record-row>.table-status-cell .status{max-width:100%;white-space:normal;overflow-wrap:anywhere}
 @media (max-width:1100px){
+.searchbox{border-radius:var(--shape-control-mobile)}
+.desktop-detail-main>.tabs{margin-top:0}
 .detail-grid[data-layout="dossier"][data-has-extra]{grid-template-areas:"summary" "facts" "records" "extra"}
 .detail-grid[data-layout="dossier"]>[data-area="extra"]{border:0;padding:0}
 .page-head[data-heading-placement="content"] .bo-detail-heading{gap:0}
 .page-head[data-heading-placement="content"] .bo-record-label{display:none}
 .page-head[data-heading-placement="content"] .bo-detail-heading-main{align-items:flex-start}
-.detail-grid[data-layout="dossier"]{grid-template-columns:minmax(0,1fr);grid-template-areas:"summary" "facts" "records";gap:22px}
-.detail-grid[data-layout="dossier"]>[data-area="facts"]{border:0;padding:0}
+.detail-grid[data-layout="dossier"]{grid-template-columns:minmax(0,1fr);grid-template-areas:"summary" "facts" "records";gap:26px}
+.detail-grid[data-layout="dossier"]>[data-area="facts"]{border:0;border-bottom:1px solid var(--color-line);padding:0 0 15px}
+.detail-grid[data-layout="dossier"]>[data-area="facts"]>.section-title{min-height:0;margin-bottom:2px}
+.detail-grid[data-layout="dossier"] .contact-facts p{margin:0 0 3px}
 .page-head[data-heading-placement="content"] .bo-detail-heading-main .mobile-page-actions{display:flex;flex:none}
 .page-head[data-heading-placement="content"] .bo-detail-commandbar{display:none}
 .page-head[data-heading-placement="content"] .detail-back{display:inline-flex;align-items:flex-start;gap:6px;min-height:44px;color:var(--app-accent);font-size:var(--type-label);line-height:18px;margin:0 0 -4px}

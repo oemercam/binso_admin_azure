@@ -41,7 +41,7 @@ export function PageHeading({ title, description, action, leading, verbatimTitle
 }
 
 export function CreateAction({ label, href, onClick, disabled = false, requiresWrite = true }: { label: string; href?: string; onClick?: () => void; disabled?: boolean;requiresWrite?:boolean }) {
-  return <Button href={href} requiresWrite={requiresWrite} className="bo-create-action" ariaLabel={label} disabled={disabled} onClick={onClick} icon="plus"/>;
+  return <Button href={href} requiresWrite={requiresWrite} className="bo-create-action" ariaLabel={label} disabled={disabled} onClick={onClick} icon="plus"><span className="create-action-label"><LocalizedText>{label}</LocalizedText></span></Button>;
 }
 
 /** One context-action contract: desktop command bar, mobile overflow sheet. */
@@ -60,6 +60,12 @@ export function QuickCreateAction({section="dashboard",returnTo="/dashboard"}:{s
  return <><CreateAction requiresWrite={false} label="Neu erstellen" onClick={()=>setOpen(true)}/>
   <ActionSheet label="Neu erstellen" className="quick-create-sheet" open={open} onClose={()=>setOpen(false)}><div className="action-list">{actions.map(item=><ActionRow key={item.href} title={item.title} icon={item.icon} href={createReturnHref(item.href,returnTo)} navigation onClick={()=>setOpen(false)}/>)}</div></ActionSheet>
  </>;
+}
+
+export function QuickCreateLinks({returnTo="/dashboard"}:{returnTo?:string}){
+ const access=usePageAccess();
+ const actions=permittedCreateActions('dashboard',access.canOpen).filter(action=>['kunden','angebote','rechnungen','zeit'].includes(action.section));
+ return <div className="bo-quick-create-links">{actions.map(action=><Button key={action.href} variant="secondary" requiresWrite href={createReturnHref(action.href,returnTo)} icon="plus"><LocalizedText>{action.title}</LocalizedText></Button>)}</div>;
 }
 
 /** Empty lists use the same permission-aware creation catalog as the page action area. */
@@ -95,8 +101,8 @@ export function MetricTiles({ children, columns=4, desktopOnly=false }: { childr
   return <div className="metrics-grid bo-metric-tiles" data-desktop-only={desktopOnly||undefined} style={{"--metric-columns":columns} as CSSProperties}>{children}</div>;
 }
 
-export function MetricTile({ label, value, hint }: { label: ReactNode; value: ReactNode; hint?:string }) {
-  return <Metric label={label} value={value} hint={hint}/>;
+export function MetricTile({ label, value, hint, currency, compactMoney=false }: { label: ReactNode; value: ReactNode; hint?:string; currency?:string; compactMoney?:boolean }) {
+  return <Metric label={label} value={currency&&typeof value==='number'?<span className="metric-money"><span className="metric-money-currency">{currency}</span>{" "}<span>{value.toLocaleString('de-CH',{minimumFractionDigits:compactMoney?0:2,maximumFractionDigits:2})}</span></span>:value} hint={hint}/>;
 }
 
 /** Open workspace sections share page spacing without adding nested card chrome. */
@@ -146,7 +152,8 @@ function sheetForm(child:ReactNode):ReactNode{
 }
 
 type SheetProps={label:string;lang?:string;ariaLabel?:string;description?:string;open:boolean;onClose:()=>void;children:ReactNode;busy?:boolean;className?:string;layerClassName?:string;actions?:ReactNode;dirty?:boolean;wizard?:boolean;onBrowserBack?:()=>void;closeLabel?:string;discardText?:{title:string;message:string;cancelLabel:string;confirmLabel:string}};
-/** One focus/viewport/header/scroll/footer contract for all sheet families. */
+/** One focus/viewport/header/scroll/footer contract for all sheet families.
+ * Only the sole open form may clear page-wide recovery; nested editors preserve their parent's draft. */
 function Sheet({label,lang,description,open,onClose,children,busy=false,className="",layerClassName="",ariaLabel,actions,kind,dirty,wizard=false,onBrowserBack,closeLabel="Schliessen",discardText}:SheetProps&{kind:"action"|"form"|"filter"}){
  const [mounted,setMounted]=useState(false);
  useEffect(()=>{queueMicrotask(()=>setMounted(true))},[]);
@@ -157,6 +164,8 @@ function Sheet({label,lang,description,open,onClose,children,busy=false,classNam
 
  const closeRef=useRef<()=>void>(()=>{});
  const dialogRef=useDialogFocus(open&&mounted,()=>closeRef.current());
+ // React portal events still traverse their parent tree; a nested editor owns its own dismissal and dirty state.
+ const ownsEvent=(target:EventTarget)=>target instanceof Element&&target.closest('[role="dialog"]')===dialogRef.current;
  const requestClose=()=>{if(busy)return;if(kind==="form"&&(dirty??sheetValues(dialogRef.current)!==baseline.current)){setDiscard(true);return;}onClose()};
  useEffect(()=>{closeRef.current=requestClose;});
  useEffect(()=>{if(open)baseline.current=sheetValues(dialogRef.current);let active=true;queueMicrotask(()=>{if(active)setChanged(false)});return()=>{active=false}},[open,mounted,dialogRef]);
@@ -167,7 +176,7 @@ function Sheet({label,lang,description,open,onClose,children,busy=false,classNam
   else if(isValidElement<{className?:string;children?:ReactNode}>(child)&&child.props.className?.split(/\s+/).includes("sheet-body"))body.push(cloneElement(child,{className:child.props.className.replace(/\bsheet-body\b/g,"").trim()}));
   else body.push(sheetForm(child));
  }
- return createPortal(<><div className={`sheet-layer ${layerClassName}`.trim()} onMouseDown={event=>{if(event.target===event.currentTarget)requestClose()}}><LocalizedElement as="section" ref={dialogRef} tabIndex={-1} className={`bottom-sheet ${className}`.trim()} lang={lang} data-sheet-kind={kind} data-wizard={wizard||undefined} role="dialog" aria-modal="true" aria-label={ariaLabel??label} onInvalidCapture={event=>{if(event.target instanceof Element){const details=event.target.closest("details");if(details instanceof HTMLDetailsElement)details.open=true}}} onInputCapture={()=>setChanged(sheetValues(dialogRef.current)!==baseline.current)} onChangeCapture={()=>setChanged(sheetValues(dialogRef.current)!==baseline.current)} onClickCapture={event=>{const button=event.target instanceof Element?event.target.closest('button'):null;if(button&&button.dataset.sheetDismiss==='true'){event.preventDefault();event.stopPropagation();requestClose()}}}><div className="sheet-handle"/><header className="sheet-header"><div><h2><LocalizedText>{label}</LocalizedText></h2>{description&&<p><LocalizedText>{description}</LocalizedText></p>}</div><LocalizedElement as="button" type="button" className="icon-button" aria-label={closeLabel} disabled={busy} onClick={requestClose}><Icon name="close"/></LocalizedElement></header><div className="sheet-body" inert={kind==="form"&&busy}>{body}</div>{actions?<div className="filter-sheet-actions">{actions}</div>:footers}</LocalizedElement></div><ConfirmDialog open={discard} closeLabel={closeLabel} title={discardText?.title??"Änderungen verwerfen?"} message={discardText?.message??"Deine Änderungen sind noch nicht gespeichert und gehen verloren."} cancelLabel={discardText?.cancelLabel??"Weiter bearbeiten"} confirmLabel={discardText?.confirmLabel??"Änderungen verwerfen"} onCancel={()=>{setDiscard(false);setBackDiscard(false)}} onConfirm={()=>{window.dispatchEvent(new Event("binso-draft-discard"));setDiscard(false);if(backDiscard){setBackDiscard(false);leaveBack()}else onClose()}}/></>,document.body);
+ return createPortal(<><div className={`sheet-layer ${layerClassName}`.trim()} onMouseDown={event=>{if(event.target===event.currentTarget)requestClose()}}><LocalizedElement as="section" ref={dialogRef} tabIndex={-1} className={`bottom-sheet ${className}`.trim()} lang={lang} data-sheet-kind={kind} data-wizard={wizard||undefined} role="dialog" aria-modal="true" aria-label={ariaLabel??label} onInvalidCapture={event=>{if(!ownsEvent(event.target))return;if(event.target instanceof Element){const details=event.target.closest("details");if(details instanceof HTMLDetailsElement)details.open=true}}} onInputCapture={event=>{if(ownsEvent(event.target))setChanged(sheetValues(dialogRef.current)!==baseline.current)}} onChangeCapture={event=>{if(ownsEvent(event.target))setChanged(sheetValues(dialogRef.current)!==baseline.current)}} onClickCapture={event=>{if(!ownsEvent(event.target))return;const button=event.target instanceof Element?event.target.closest('button'):null;if(button&&button.dataset.sheetDismiss==='true'){event.preventDefault();event.stopPropagation();requestClose()}}}><div className="sheet-handle"/><header className="sheet-header"><div><h2><LocalizedText>{label}</LocalizedText></h2>{description&&<p><LocalizedText>{description}</LocalizedText></p>}</div><LocalizedElement as="button" type="button" className="icon-button" aria-label={closeLabel} disabled={busy} onClick={requestClose}><Icon name="close"/></LocalizedElement></header><div className="sheet-body" inert={kind==="form"&&busy}>{body}</div>{actions?<div className="filter-sheet-actions">{actions}</div>:footers}</LocalizedElement></div><ConfirmDialog open={discard} closeLabel={closeLabel} title={discardText?.title??"Änderungen verwerfen?"} message={discardText?.message??"Deine Änderungen sind noch nicht gespeichert und gehen verloren."} cancelLabel={discardText?.cancelLabel??"Weiter bearbeiten"} confirmLabel={discardText?.confirmLabel??"Änderungen verwerfen"} onCancel={()=>{setDiscard(false);setBackDiscard(false)}} onConfirm={()=>{if(document.querySelectorAll('.bottom-sheet[data-sheet-kind="form"]').length<=1)window.dispatchEvent(new Event("binso-draft-discard"));setDiscard(false);if(backDiscard){setBackDiscard(false);leaveBack()}else onClose()}}/></>,document.body);
 }
 export function ActionSheet(props:SheetProps){return <Sheet {...props} kind="action"/>}
 export function FormSheet(props:SheetProps){return <Sheet {...props} kind="form"/>}

@@ -140,6 +140,9 @@
 }
 .surface{padding:20px}
 .bo-workspace-section{min-width:0;margin-block:20px;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}
+.bo-workspace-section>h2{margin:0 0 16px;font-size:var(--type-body);font-weight:500;line-height:1.5}
+.bo-quick-create-links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-block:28px;max-width:700px}
+.bo-quick-create-links .button{min-width:0;justify-content:flex-start;font-size:var(--type-label);padding-inline:12px}
 .page-container{--page-x:var(--workspace-page-inset);--mobile-page-x:22px}
 .section-title{
   min-height:30px;
@@ -326,9 +329,6 @@
 .page-head-detail .desktop-back{margin-bottom:12px}
 .desktop-appbar{padding-left:var(--page-x);padding-right:var(--page-x)}
 .desktop-appbar-actions{gap:10px}
-.surface{
-    border-radius:var(--shape-group);
-  }
 .section-title{
     margin-bottom:var(--heading-content-gap);
     padding-bottom:0;

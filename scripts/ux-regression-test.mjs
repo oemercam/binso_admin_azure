@@ -96,7 +96,7 @@ console.log('Apple and PWA installation icons use the Binso One artwork with One
  assert(statistics.includes('statisticPeriods.map'), 'All statistics consume central month presets');
  assert(statistics.includes('type="date" required')&&statistics.includes('Eigenen Statistikzeitraum wählen'), 'Actual date controls and calendar action exist');
  assert(statistics.includes('aggregateStatistics')&&statistics.includes('metrics(aggregated.totals)'), 'KPIs and bars share aggregation');
- for(const page of ['components/pages/dashboard.tsx','components/pages/finance.tsx'])assert((await fs.readFile(page,'utf8')).includes('CashStatistics'), page+' renders central cash statistics');
+ for(const page of ['components/pages/dashboard.tsx','components/pages/finance.tsx'])assert((await fs.readFile(page,'utf8')).includes('CashOverview'), page+' renders the compact central cash overview');
  console.log('Finance and dashboard consume one statistics owner with required custom dates and shared KPI/chart aggregation.');
 }
 
@@ -204,7 +204,7 @@ console.log('Project-linked idle timer context survives synchronization without 
   return renderToStaticMarkup(React.createElement(exports.RecordsView,{items:fixture,placeholder:'Tickets suchen',chips:['Alle','Offen'],statusGroups:{Offen:['Neu','Warten auf Kunde']},columns:[{label:'Titel',index:1},{label:'Betrag',index:2},{label:'Status',index:3,status:true}]},row=>React.createElement('b',null,row[1])));
  };
  const filtered=render('Offen');assert.ok(filtered.includes('First'));assert.ok(!filtered.includes('Second'));assert.ok(filtered.includes('Filter zurücksetzen'));
- const sorted=render('Alle','desc',2);assert.ok(sorted.indexOf('Second')<sorted.indexOf('First'));assert.ok(!sorted.includes('<select'),'Sort fields are closed with the filter sheet');const options=render('Alle','desc',2,true);assert.ok(options.includes('Betrag ↑'));assert.ok(options.includes('Betrag ↓'));assert.ok(!sorted.includes('class="chips"'),'Status tabs use the shared DetailTabs owner');
+ const sorted=render('Alle','desc',2);assert.ok(sorted.indexOf('Second')<sorted.indexOf('First'));assert.ok(sorted.includes('class="records-sort-control"'),'The reference desktop sort control remains available outside the mobile filter sheet');const options=render('Alle','desc',2,true);assert.ok(options.includes('Betrag ↑'));assert.ok(options.includes('Betrag ↓'));assert.ok(!sorted.includes('class="chips"'),'Status tabs use the shared DetailTabs owner');
  const empty=render('Bezahlt');assert.ok(empty.includes('data-empty-state="compact"'));assert.ok(!empty.includes('empty-icon'),'Empty lists remain one-line status messages');
  console.log('Actual record rendering: status column filtering, reset visibility, Swiss numeric/date sorting and mobile column selection passed.');
 }
@@ -246,6 +246,11 @@ console.log('Project-linked idle timer context survives synchronization without 
  for(const path of ['components/app-pages.tsx','components/documents.tsx']){
   const source=await readPageFile(path,'utf8');const ast=ts.createSourceFile(path,source,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
   const inspect=node=>{
+   if(ts.isJsxElement(node)&&node.openingElement.tagName.getText(ast)==='ErrorState'&&node.children.some(child=>ts.isJsxExpression(child)&&child.expression?.getText(ast)==='toast')){
+    // Form sheets keep mutation failures inside the accessible dialog instead
+    // of sending them to a background toast hidden by modal focus ownership.
+    ++checked;
+   }
    if(ts.isJsxSelfClosingElement(node)&&node.tagName.getText(ast)==='Toast'){
     const title=node.attributes.properties.find(attribute=>attribute.name?.getText(ast)==='title');
     const tone=node.attributes.properties.find(attribute=>attribute.name?.getText(ast)==='tone');

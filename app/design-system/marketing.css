@@ -64,9 +64,9 @@
   display:grid;
   grid-template-columns:repeat(4,1fr);
   gap:2px;
-  border-radius:var(--app-group-radius);
+  border-radius:0;
   overflow:hidden;
-  background:var(--app-surface);
+  background:transparent;
 }
 .marketing-benefits{
   width:100%;
@@ -236,14 +236,15 @@
 .price-card{
   position:relative;
   min-height:430px;
-  padding:28px;
+  padding:28px 0;
   display:flex;
   flex-direction:column;
-  border:1px solid var(--color-line);
-  border-radius:var(--shape-sheet);
+  border:0;
+  border-radius:0;
   background:var(--color-bg);
 }
-.price-card.featured{border-color:var(--color-fg);box-shadow:0 18px 45px var(--palette-rgba-0-0-0-07)}
+.price-card+.price-card{border-left:1px solid var(--color-line);padding-left:28px}
+.price-card.featured{box-shadow:none}
 .price-card h3{margin:0;font-size:var(--type-scale-17)}
 .price-card>p{min-height:52px;margin:10px 0 0;color:var(--color-muted);font-size:var(--type-label);line-height:1.5}
 .price{display:flex;align-items:flex-end;gap:8px;margin:26px 0}
@@ -475,7 +476,8 @@
 .legal-content .legal-version{margin-top:26px;color:var(--color-muted)}
 .legal-related{margin-top:34px;display:flex;flex-wrap:wrap;gap:12px 20px;font-size:var(--type-metadata);font-weight:650}
 .legal-processor-list{display:grid;gap:18px}
-.legal-processor-list article{padding:18px;border:1px solid var(--color-line);border-radius:var(--shape-group)}
+.legal-processor-list article{padding:18px 0;border:0;border-radius:0}
+.legal-processor-list article+article{border-top:1px solid var(--color-line)}
 .legal-processor-list dl{margin:0;display:grid;gap:10px}
 .legal-processor-list dl>div{display:grid;grid-template-columns:130px minmax(0,1fr);gap:14px}
 .legal-processor-list dt{font-size:var(--type-caption);font-weight:800;text-transform:uppercase;letter-spacing:.08em}
@@ -639,6 +641,7 @@
 .feature-list small{font-size:var(--type-scale-10-5)}
 .pricing-grid,
   .marketing-pricing-grid{grid-template-columns:1fr;gap:10px}
+.price-card+.price-card{border-left:0;border-top:1px solid var(--color-line);padding-left:0}
 .marketing-cta{
     width:100%;
     max-width:none;
@@ -853,10 +856,12 @@
   padding:55px 40px;
   text-align:center;
 }
+.reference-capabilities{width:100%;max-width:var(--marketing-max);margin-inline:auto;padding:22px 40px;border-block:1px solid var(--color-line);display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;color:var(--color-muted);font-size:var(--type-metadata)}
 .reference-closing .reference-actions{
   justify-content:center;
 }
 @media (max-width:750px){
+  .reference-capabilities{padding:22px 24px}
   .reference-hero,.reference-feature-area,.reference-split{
     grid-template-columns:minmax(0,1fr);
   }

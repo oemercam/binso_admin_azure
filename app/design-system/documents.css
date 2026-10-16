@@ -1,4 +1,6 @@
 /* BINso One / documents — one owner for base, states and responsive behavior. */
+.document-entry-sheet{--sheet-max-width:var(--document-entry-width)}
+.document-form-preview{display:flex;justify-content:flex-end;margin-bottom:8px}
 .invoice-form,
 .invoice-tablet-preview{
   border:0;
@@ -162,7 +164,7 @@
 .document-header-icons{display:flex;align-items:center;gap:8px}
 .document-desktop-detail>.tabs + .document-detail-view{border-top:0}
 .document-customer-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:8px 0 4px}
-.document-customer-heading h2{margin:0;min-width:0}
+.document-customer-heading h2{margin:0;min-width:0;font-size:var(--type-body);font-weight:400}
 .document-mobile-price{display:none}
 .document-modal-header-spacer{display:none}
 .document-modal>header>strong{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:var(--type-body)}
@@ -347,16 +349,19 @@
 .document-detail-view{gap:0}
 .document-detail-section{padding:18px 0}
 .document-detail-section:first-child{padding-top:10px}
-.document-detail-section h2{margin:8px 0 4px;font-size:var(--type-section);line-height:1.25}
+.document-detail-section h2{margin:8px 0 4px;font-size:var(--type-body);font-weight:500;line-height:1.5}
 .document-detail-section p{font-size:var(--type-label);line-height:1.45}
 .document-facts{
-    gap:12px;
+    grid-template-columns:minmax(0,1fr);
+    gap:0;
     padding:16px 0;
+    border-bottom:0;
   }
-.document-facts small{margin-bottom:5px;font-size:var(--type-caption)}
-.document-facts b{font-size:var(--type-label)}
+.document-facts>div{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:8px 0}
+.document-facts small{margin-bottom:0;font-size:var(--type-label)}
+.document-facts b{font-size:var(--type-label);font-weight:400;text-align:right}
 .document-lines-section>.section-title{margin:0 0 6px}
-.document-lines-section>.section-title h2{margin:0;font-size:var(--type-section)}
+.document-lines-section>.section-title h2{margin:0;font-size:var(--type-body)}
 .document-read-lines>div{
     min-height:64px;
     padding:12px 0;

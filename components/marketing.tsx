@@ -10,6 +10,10 @@ import { Button, Icon, Logo } from "./ui";
 import {DetailTabs} from "./binso-ux";
 import {PrivacySettingsButton} from "./privacy-consent";
 
+export function ProductCapabilities(){
+ return <div className="reference-capabilities">{['Kunden & Kontakte','Angebote & Rechnungen','Projekte & Zeit','Schweizer QR-Rechnung'].map(label=><span key={label}><LocalizedText>{label}</LocalizedText></span>)}</div>;
+}
+
 export function MarketingHeader() {
   const [open, setOpen] = useState(false);
 
