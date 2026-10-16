@@ -1,6 +1,6 @@
 import {plans as subscriptionPlans} from "@/lib/plans";
 import {LocalizedText} from "@/lib/client/locale";
-import {MarketingHeader,MarketingFooter,ProductPreview,ReferenceFeatures} from "@/components/marketing";
+import {MarketingHeader,MarketingFooter,ProductPreview,ReferenceFeatures,ProductCapabilities} from "@/components/marketing";
 import {Button} from "@/components/ui";
 
 export default function Home(){
@@ -47,6 +47,7 @@ export default function Home(){
    <div><div className="eyebrow"><LocalizedText>{"DEIN SCHWEIZER GESCHÄFTSALLTAG"}</LocalizedText></div><h1><LocalizedText>{"Dein Geschäft."}</LocalizedText><br/><LocalizedText>{"Ein klarer"}</LocalizedText><br/><LocalizedText>{"Überblick."}</LocalizedText></h1><p><LocalizedText>{"Von der ersten Anfrage bis zur bezahlten Rechnung. Organisiere Kunden, Projekte und Finanzen in einem Arbeitsbereich."}</LocalizedText></p><div className="reference-actions"><Button href="/registrieren"><LocalizedText>{"14 Tage testen"}</LocalizedText></Button><Button href="/demo" variant="secondary"><LocalizedText>{"Demo ansehen →"}</LocalizedText></Button></div><small><LocalizedText>{"Web & PWA · Am Schreibtisch und unterwegs"}</LocalizedText></small></div>
    <ProductPreview/>
   </section>
+  <ProductCapabilities/>
   <section className="reference-section" id="funktionen"><div className="eyebrow"><LocalizedText>{"EIN ZUSAMMENHÄNGENDER ARBEITSABLAUF"}</LocalizedText></div><h2><LocalizedText>{"Weniger wechseln."}</LocalizedText><br/><LocalizedText>{"Mehr erledigen."}</LocalizedText></h2><p className="reference-muted"><LocalizedText>{"Informationen bleiben dort verbunden, wo du sie brauchst."}</LocalizedText></p><ReferenceFeatures/></section>
   <section className="reference-section reference-divider" id="ablauf"><h2><LocalizedText>{"Ein Ablauf. Vom Kontakt bis zur Zahlung."}</LocalizedText></h2><div className="reference-workflow">{[
    ['01','Kunde','Kontakt erfassen und Informationen bündeln.'],['02','Angebot','Leistungen anbieten und den Entscheid verfolgen.'],['03','Projekt & Zeit','Arbeiten organisieren und Leistungen erfassen.'],['04','Rechnung','Positionen übernehmen und Rechnung erstellen.'],['05','Zahlung','Zahlungseingänge und offene Beträge verfolgen.']

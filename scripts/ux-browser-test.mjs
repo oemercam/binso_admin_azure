@@ -354,9 +354,10 @@ try{
       if(width>=1101){assert.ok(shape.label,`${route}: desktop creation keeps its visible label`);assert.equal(shape.radius,'5px','Desktop creation follows the original control shape');assert.equal(shape.background,theme==='light'?'rgb(37, 102, 189)':'rgb(72, 167, 255)');}
       else{assert.equal(shape.label,false,'Mobile creation uses the original round plus');assert.equal(shape.width,44);assert.equal(shape.height,44);assert.equal(shape.radius,'50%');}
     }
-    for(const money of await page.locator('.metric-money').filter({visible:true}).all()){
-      const direction=await money.evaluate(el=>getComputedStyle(el).flexDirection);
-      assert.equal(direction,width<=1100?'column-reverse':'row','Metric currency follows the original responsive arrangement');
+    // Snapshot values in one browser task: query hydration can replace metric nodes between awaited locator calls.
+    const moneyDirections=await page.locator('.metric-money').evaluateAll(nodes=>nodes.filter(el=>el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden').map(el=>getComputedStyle(el).flexDirection));
+    for(const direction of moneyDirections){
+      assert.equal(direction,width<=1100?'column-reverse':'row',`${route} ${width}px: metric currency follows the original responsive arrangement`);
     }
     assert.ok(geometry.sort.every(size=>size<=44),`${route}: sorting control is too wide`);
     assert.ok(geometry.metricDividers.every(size=>parseFloat(size)===0),`${route}: metric dividers`);

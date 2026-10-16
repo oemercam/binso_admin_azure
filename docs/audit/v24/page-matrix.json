@@ -6673,6 +6673,7 @@
         "components/marketing.tsx#ProductPreview",
         "components/marketing.tsx#ProductView",
         "components/marketing.tsx#productViews",
+        "components/marketing.tsx#ProductCapabilities",
         "components/marketing.tsx#ReferenceFeatures",
         "components/binso-ux.tsx#DetailTabs",
         "components/marketing.tsx#MarketingFooter",

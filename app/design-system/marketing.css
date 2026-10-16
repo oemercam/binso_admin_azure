@@ -856,10 +856,12 @@
   padding:55px 40px;
   text-align:center;
 }
+.reference-capabilities{width:100%;max-width:var(--marketing-max);margin-inline:auto;padding:22px 40px;border-block:1px solid var(--color-line);display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;color:var(--color-muted);font-size:var(--type-metadata)}
 .reference-closing .reference-actions{
   justify-content:center;
 }
 @media (max-width:750px){
+  .reference-capabilities{padding:22px 24px}
   .reference-hero,.reference-feature-area,.reference-split{
     grid-template-columns:minmax(0,1fr);
   }
