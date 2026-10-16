@@ -38,6 +38,10 @@ try{
   const evidence=await measureCompliance(page,{output,route:'/dashboard',theme:'light',width:page.viewportSize().width,state,engine});
   return evidence.checks.filter(c=>c.id==='UX-LAY-003');
  };
+ await page.setContent(header(normalActions).replace('<div class="desktop-appbar">','<div class="desktop-appbar"><a class="desktop-flow-brand" href="/dashboard">Binso One</a>'));
+ assert.equal((await measureCompliance(page,{output,route:'/dashboard',theme:'light',width:1440,state:'header-home-brand',engine})).checks.find(c=>c.id==='UX-LAY-003').status,'passed','The Flow home brand is an approved destination');
+ await page.setContent(header(normalActions).replace('<div class="desktop-appbar">','<div class="desktop-appbar"><a class="desktop-flow-brand" href="/zahlungen">Wrong destination</a>'));
+ assert.equal((await measureCompliance(page,{output,route:'/dashboard',theme:'light',width:1440,state:'header-false-brand',engine})).checks.find(c=>c.id==='UX-LAY-003').status,'failed','A brand class does not authorize business actions');
  const normal=await checkHeader(normalActions,'header-normal');
  assert.equal(normal.length,1,'The actual desktop action owner must produce evidence');
  assert.equal(normal[0].status,'passed','Approved search, notifications and account occupy the shared right action group');

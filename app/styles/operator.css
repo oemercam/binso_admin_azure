@@ -360,7 +360,7 @@
   font-size:13px;
   line-height:1.45;
 }
-.operator-main>:not(.operator-app-header):not(.operator-page-head):not(.sheet-layer):not(.mobile-dock){
+.operator-main>:where(:not(.operator-app-header):not(.operator-page-head):not(.sheet-layer):not(.mobile-dock)){
   width:100%;
   max-width:1760px;
   margin-left:auto;

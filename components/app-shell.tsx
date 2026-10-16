@@ -24,6 +24,7 @@ import {SearchPanel,NotificationPanel,AccountPanel,type PanelNotification} from 
 import {HeaderPanel} from "./header-panel";
 import {Avatar} from "./avatar";
 import {AppHeader,MobileDock} from "./app-chrome";
+import {FlowSectionLabel,FlowNavigationBackdrop} from "./flow-workspace";
 import {DesktopNavigationToggle,useDesktopNavigation} from "./desktop-navigation";
 
 const desktopNav = [
@@ -325,7 +326,7 @@ function AppShellFrame({
     <ConfirmDialog open={confirmLogout} busy={logoutBusy} title="Änderungen verwerfen und abmelden?" message="Deine Änderungen sind noch nicht gespeichert." confirmLabel="Abmelden" onCancel={()=>setConfirmLogout(false)} onConfirm={()=>void logout(true)}/>
     <ConfirmDialog open={leaveHref!==null} title="Änderungen verwerfen?" message="Deine Änderungen sind noch nicht gespeichert und gehen verloren." cancelLabel="Weiter bearbeiten" confirmLabel="Änderungen verwerfen" onCancel={()=>setLeaveHref(null)} onConfirm={()=>{const href=leaveHref;setLeaveHref(null);if(href){window.dispatchEvent(new Event("binso-draft-discard"));allowDraftNavigation();if(href==="browser-back"){leaveBack();return;}const url=new URL(href);if(url.origin===window.location.origin)router.replace(url.pathname+url.search+url.hash);else window.location.assign(href);}}}/>
     {logoutError&&<div className="toast" role="alert"><Icon name="close" size={16}/><span><LocalizedText>{logoutError}</LocalizedText></span><button type="button" className="text-action" disabled={logoutBusy} onClick={()=>void logout()}><LocalizedText>{"Erneut versuchen"}</LocalizedText></button></div>}
-    <aside id="customer-desktop-navigation" className="app-sidebar">
+    <FlowNavigationBackdrop open={!navigationCollapsed} onClose={toggleNavigation}/><aside onKeyDown={event=>{if(event.key==="Escape"){event.preventDefault();toggleNavigation()}}} onClickCapture={event=>{if(event.target instanceof Element&&event.target.closest("a"))toggleNavigation()}} id="customer-desktop-navigation" className="app-sidebar" inert={navigationCollapsed}>
       <Link href="/dashboard" className="sidebar-logo"><Logo compact={navigationCollapsed}/></Link>
       <nav aria-label={translate("Navigation")}>
         <Link href="/dashboard" aria-label={translate("Start")} title={translate("Start")} className={active==="dashboard"?"active":""} aria-current={active==="dashboard"?"page":undefined}><Icon name="home"/><span><LocalizedText>{"Start"}</LocalizedText></span></Link>
@@ -338,7 +339,7 @@ function AppShellFrame({
     </aside>
 
     <div className="app-main">
-      <div className="desktop-appbar">
+      <div className="desktop-appbar"><Link href="/dashboard" className="flow-brand desktop-flow-brand" aria-label="Zur Übersicht"><span className="flow-brand-mark" aria-hidden="true">b</span><span>binso <b>one</b></span></Link>
         <DesktopNavigationToggle collapsed={navigationCollapsed} onToggle={toggleNavigation} controls="customer-desktop-navigation"/>
         {!formActive&&<div className="desktop-appbar-actions"><IconButton className="desktop-global-search" label="Suche" icon="search" onClick={()=>setSheet("search")}/>{timerRunning&&<Link href="/zeit" className="desktop-header-timer" aria-label={"Zeitmessung läuft "+formattedTimer}><Icon name="clock" size={16}/><span>{formattedTimer}</span></Link>}<LocalizedElement as="button" className="desktop-notification-button" type="button" aria-label="Benachrichtigungen" onClick={openNotifications}><Icon name="bell"/>{unreadNotifications>0&&<i className="notification-badge"><LocalizedText>{unreadNotifications>9?"9+":unreadNotifications}</LocalizedText></i>}</LocalizedElement>
           <LocalizedElement as="button" className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={() => setSheet("account")}><Avatar name={profile.name} identity={profile.identity} src={profile.avatar} size="small"/></LocalizedElement>
@@ -346,7 +347,7 @@ function AppShellFrame({
       </div>
       <AppHeader className={backHref ? "mobile-header mobile-header-detail" : "mobile-header"} detail={!!backHref} leadingClassName="mobile-header-leading" leading={<>
         {backHref ? <Link className="mobile-back" href={backHref} aria-label={backLabel}><Icon name="back"/></Link> : <Link href="/dashboard" className="mobile-header-brand flow-brand" aria-label="Zur Übersicht"><span className="flow-brand-mark" aria-hidden="true">b</span><span>binso <b>one</b></span></Link>}
-        {backHref&&<h1 className="mobile-header-title"><span><LocalizedText verbatim={titleIsUserContent}>{title}</LocalizedText></span>{status!=null&&<Status tone={statusTone}>{status}</Status>}</h1>}
+        {backHref&&<span className="flow-brand flow-detail-brand"><span className="flow-brand-mark" aria-hidden="true">b</span><span>binso <b>one</b></span></span>}
       </>} actionClassName={backHref?"mobile-detail-actions":"mobile-header-actions"} actions={backHref ? (allowed&&(mobileActions||visibleActions)?mobileActions??visibleActions:undefined) : <>
         <IconButton label="Suche" icon="search" onClick={()=>setSheet("search")}/>
         <LocalizedElement as="button" className="mobile-notification-button icon-button" type="button" aria-label="Benachrichtigungen" onClick={openNotifications}><Icon name="bell"/>{unreadNotifications>0&&<i className="notification-badge"><LocalizedText>{unreadNotifications>99?"99+":unreadNotifications}</LocalizedText></i>}</LocalizedElement>
@@ -357,7 +358,7 @@ function AppShellFrame({
 
       <main className="page-container" data-section={active}>
         <div className={backHref ? "page-head page-head-detail" : "page-head"}>
-          {backHref ? <DetailHeading verbatimTitle={titleIsUserContent} title={title} subtitle={subtitle} status={status} tone={statusTone} action={visibleActions&&allowed?<div className="page-actions">{visibleActions}</div>:undefined} leading={<Link className="desktop-back" href={backHref} aria-label={backLabel}><Icon name="back" size={16}/></Link>}/> : <PageHeading verbatimTitle={titleIsUserContent} title={title} description={subtitle} action={visibleActions&&allowed?<div className="page-actions">{visibleActions}</div>:undefined}/> }
+          <FlowSectionLabel section={active}/>{backHref ? <DetailHeading verbatimTitle={titleIsUserContent} title={title} subtitle={subtitle} status={status} tone={statusTone} action={visibleActions&&allowed?<div className="page-actions">{visibleActions}</div>:undefined} leading={<Link className="desktop-back" href={backHref} aria-label={backLabel}><Icon name="back" size={16}/></Link>}/> : <PageHeading verbatimTitle={titleIsUserContent} title={title} description={subtitle} action={visibleActions&&allowed?<div className="page-actions">{visibleActions}</div>:undefined}/> }
         </div>
         {accessError?<div role="alert"><p><LocalizedText>{accessError}</LocalizedText></p><div className="filter-sheet-actions"><Button onClick={()=>{invalidateClientSession();setAccessError(null);setAccessRetry(value=>value+1)}}><LocalizedText>{"Erneut versuchen"}</LocalizedText></Button><Link className="button button-secondary" href="/login"><LocalizedText>{"Anmelden"}</LocalizedText></Link></div></div>:(!access||allowed)?children:<EmptyState icon="lock" title="Kein Zugriff" text="Diese Seite ist für deine Rolle oder deinen Plan nicht verfügbar."/>}
       </main>

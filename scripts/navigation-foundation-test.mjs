@@ -31,7 +31,7 @@ export function navigationFoundation(read){
  return {markup:hash(markup),logic:hash(logic),icons:hash(icons),rules:hash(rules),tokens:hash(variables),tokenNames:[...needed].sort()};
 }
 if(process.argv[1]===fileURLToPath(import.meta.url)){
- const reference=JSON.parse(fs.readFileSync('docs/assets/flow-noir-20261016/navigation-reference.json','utf8'));
+ const reference=JSON.parse(fs.readFileSync('docs/assets/flow-noir-complete-20261016/navigation-reference.json','utf8'));
  const current=navigationFoundation(file=>fs.readFileSync(file,'utf8'));
  assert.equal(current.logic,reference.preChangeSnapshot.logic,'Creation/material changes must preserve destination access and scroll logic');
  assert.equal(current.icons,reference.preChangeSnapshot.icons,'Existing navigation icons remain unchanged');

@@ -17,6 +17,7 @@ import {Avatar} from "./avatar";
 import { createContext, useContext, useEffect, useMemo, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {AppHeader,MobileDock} from "./app-chrome";
+import {FlowSectionLabel,FlowNavigationBackdrop} from "./flow-workspace";
 import {DesktopNavigationToggle,useDesktopNavigation} from "./desktop-navigation";
 import { PageHeading } from "./binso-ux";
 import {Button, EmptyState, Icon, Logo, Metric, SectionTitle, Status, Toast, Field, Input, Select, Textarea, LoadingState, ErrorState, MessageBubble} from "./ui";
@@ -155,8 +156,8 @@ export function OperatorPage({ section = "", demo = false, identity, role="platf
   const allowed=demo||canOpenOperatorSection(role,section);
   const canCreate=allowed&&!detail&&((key==="sperrungen"&&operatorCan(demo?"platform_owner":role,"restrictions:manage"))||(key==="ankuendigungen"&&operatorCan(demo?"platform_owner":role,"announcements:manage")));
   const detailTitle=detail?(key==="tickets"?"Ticketdetails":key==="kunden"?"Kundendetails":title):title;
-  return <OperatorAccess.Provider value={demo?"platform_owner":role}><div className="operator-root" data-navigation-collapsed={navigationCollapsed||undefined} data-operator-demo={demo?"true":"false"}>
-    <aside id="operator-desktop-navigation" className="operator-sidebar">
+  return <OperatorAccess.Provider value={demo?"platform_owner":role}><div className="operator-root flow-noir" data-navigation-collapsed={navigationCollapsed||undefined} data-operator-demo={demo?"true":"false"}>
+    <FlowNavigationBackdrop open={!navigationCollapsed} onClose={toggleNavigation}/><aside onKeyDown={event=>{if(event.key==="Escape"){event.preventDefault();toggleNavigation()}}} onClickCapture={event=>{if(event.target instanceof Element&&event.target.closest("a"))toggleNavigation()}} id="operator-desktop-navigation" className="operator-sidebar" inert={navigationCollapsed}>
       <Link prefetch={false} href="/operator"><Logo dark compact={navigationCollapsed}/></Link>
       <nav className="operator-sidebar-groups">{operatorNavGroups.map(group=><div className="operator-sidebar-group" key={group.label}><span className="operator-nav-label"><LocalizedText>{group.label}</LocalizedText></span>{group.slugs.map(slug=>{const item=operatorNav.find(([candidate])=>candidate===slug);if(!item)return null;const [,label,icon]=item;return <Link prefetch={false} aria-label={translate(label)} title={translate(label)} aria-current={slug===key?"page":undefined} className={slug===key?"active":""} href={slug ? `/operator/${slug}` : "/operator"} key={slug}><Icon name={icon}/><span><LocalizedText>{label}</LocalizedText></span></Link>})}</div>)}</nav>
     </aside>
@@ -164,11 +165,11 @@ export function OperatorPage({ section = "", demo = false, identity, role="platf
     <main className="operator-main">
       <AppHeader className="operator-app-header" detail={!!detail} leadingClassName="operator-header-brand" leading={<>
         <DesktopNavigationToggle collapsed={navigationCollapsed} onToggle={toggleNavigation} controls="operator-desktop-navigation"/>
-        {detail?<Link href={"/operator/"+key} className="mobile-back" aria-label="Zur Liste"><Icon name="back"/></Link>:<Link href="/operator" aria-label="Zum Admin-Dashboard"><Logo compact/></Link>}
-        <span className="operator-header-desktop-label"><LocalizedText>{"Admin"}</LocalizedText></span><h1 className="operator-header-title"><LocalizedText>{detailTitle}</LocalizedText></h1>
+        {detail?<Link href={"/operator/"+key} className="mobile-back" aria-label="Zur Liste"><Icon name="back"/></Link>:<Link className="flow-brand" href="/operator" aria-label="Zum Admin-Dashboard"><span className="flow-brand-mark" aria-hidden="true">b</span><span>binso one</span></Link>}
+        <span className="operator-header-desktop-label"><LocalizedText>{"Admin"}</LocalizedText></span><span className="operator-header-title"><LocalizedText>{detailTitle}</LocalizedText></span>
       </>} actionClassName="operator-user" actions={<>{demo&&<span className="app-demo-badge"><LocalizedText>{"Demo"}</LocalizedText></span>}<Link prefetch={false} className="icon-button operator-home-link" href="/dashboard" aria-label="Zur App"><Icon name="home" size={18}/></Link><LocalizedElement as="button" className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={()=>{setMobileMore(false);setAccountOpen(true)}}><Avatar name={identity?.name} identity={identity?.email}/></LocalizedElement></>}/>
 
-      <div className="operator-page-head"><PageHeading leading={detail?<Button href={"/operator/"+key} variant="ghost" className="icon-button desktop-back" icon="back" ariaLabel={key==="tickets"?"Zur Ticketliste":"Zur Kundenliste"}/>:undefined} title={detail ? (key === "tickets" ? "Ticketdetails" : key === "kunden" ? "Kundendetails" : title) : title} description={operatorSubtitle(key, detail)} action={canCreate?<CreateAction label={key==="sperrungen"?"Einschränkung erstellen":"Ankündigung erstellen"} onClick={()=>setCreateOpen(true)}/>:undefined}/></div>
+      <div className="operator-page-head"><FlowSectionLabel section="Administration"/><PageHeading leading={detail?<Button href={"/operator/"+key} variant="ghost" className="icon-button desktop-back" icon="back" ariaLabel={key==="tickets"?"Zur Ticketliste":"Zur Kundenliste"}/>:undefined} title={detail ? (key === "tickets" ? "Ticketdetails" : key === "kunden" ? "Kundendetails" : title) : title} description={operatorSubtitle(key, detail)} action={canCreate?<CreateAction label={key==="sperrungen"?"Einschränkung erstellen":"Ankündigung erstellen"} onClick={()=>setCreateOpen(true)}/>:undefined}/></div>
       {accountOpen&&<HeaderPanel kind="account" label="Konto" onClose={()=>setAccountOpen(false)} headerSelector=".operator-app-header" backgroundSelector=".operator-sidebar,.operator-main > :not(.operator-app-header)"><div className="account-sheet"><div className="account-sheet-profile"><Avatar size="large"/><div><b><LocalizedText verbatim={!!identity?.name}>{identity?.name||"One Admin"}</LocalizedText></b><small><LocalizedText>{identity?.email||"Administration"}</LocalizedText></small></div></div><LocaleSwitcher/><div className="action-list"><ActionRow href="/dashboard" icon="home" title="Zum Kundenportal" description="Binso One öffnen" onClick={()=>setAccountOpen(false)}/><ActionRow icon="logout" title="Abmelden" disabled={logoutBusy} onClick={()=>void logout()}/></div>{logoutError&&<ErrorState><LocalizedText>{logoutError}</LocalizedText></ErrorState>}</div></HeaderPanel>}
 
       <MobileDock><LocalizedElement as="nav" className="operator-mobile-nav" aria-label="Operator Navigation">

@@ -62,7 +62,7 @@ export default function Home() {
     <script type="application/ld+json">{JSON.stringify(structuredData)}</script>
     <MarketingHeader/>
     <main>
-      <section className="hero">
+      <section className="hero flow-marketing-hero">
         <div className="hero-copy">
           <span className="eyebrow landing-kicker"><span/><LocalizedText>{" DEIN BUSINESS. KLAR ORGANISIERT."}</LocalizedText></span>
           <h1><LocalizedText>{"Dein Geschäft."}</LocalizedText><br/><LocalizedText>{"Ein klarer Überblick."}</LocalizedText></h1>
@@ -76,7 +76,7 @@ export default function Home() {
             <span><Icon name="clock"/><LocalizedText>{" 14 Tage testen · danach selbst entscheiden"}</LocalizedText></span>
           </div>
         </div>
-        <ProductPreview/>
+        <div className="flow-product-stack"><div className="flow-product-note"><Icon name="receipt"/><h2><LocalizedText>{"Rechnungen"}</LocalizedText></h2><p><LocalizedText>{"Erstellen, prüfen und Zahlungen verfolgen."}</LocalizedText></p></div><div className="flow-product-note"><Icon name="clock"/><h2><LocalizedText>{"Zeiterfassung"}</LocalizedText></h2><p><LocalizedText>{"Zeit dort erfassen, wo sie entsteht."}</LocalizedText></p></div></div>
       </section>
 
       <LocalizedElement as="section" className="marketing-benefits" aria-label="Vorteile">

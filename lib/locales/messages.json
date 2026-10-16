@@ -11758,5 +11758,30 @@
     "Keep track of contacts and activity",
     "Gardez une vue sur les contacts et les activités",
     "Contatti e attività sotto controllo"
+  ],
+  "Navigation schliessen": [
+    "Close navigation",
+    "Fermer la navigation",
+    "Chiudi navigazione"
+  ],
+  "Zeit dort erfassen, wo sie entsteht.": [
+    "Track time where work happens.",
+    "Saisissez le temps là où le travail se fait.",
+    "Registra il tempo dove lavori."
+  ],
+  "Zugehörige Vorgänge": [
+    "Related activity",
+    "Opérations associées",
+    "Attività correlate"
+  ],
+  "überfällig": [
+    "overdue",
+    "en retard",
+    "scadute"
+  ],
+  "Bereiche": [
+    "Areas",
+    "Espaces",
+    "Aree"
   ]
 }

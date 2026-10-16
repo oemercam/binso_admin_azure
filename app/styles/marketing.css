@@ -754,3 +754,44 @@ html[data-theme="dark"] .app-start-icon{filter:invert(1)}
 .product-gallery-views{display:flex;gap:6px;flex-wrap:wrap}
 .product-gallery .tabs{max-width:100%;overflow-x:auto;flex-wrap:nowrap}
 .product-gallery .product-capture{box-shadow:none}
+
+/* Public Flow entrance: black frame, light paper and restrained accent cards. */
+.flow-marketing-hero{background:var(--flow-chrome-bg);color:var(--flow-chrome-fg);border-radius:22px;padding:52px 44px;margin-top:25px;gap:48px;overflow:hidden}
+.flow-marketing-hero .hero-copy h1{color:var(--flow-chrome-fg);font-size:clamp(38px,4.8vw,64px);line-height:1.05;letter-spacing:-2px;font-weight:600}
+.flow-marketing-hero .hero-lead{color:#e6e6df;font-size:14px;line-height:1.7}
+.flow-marketing-hero .eyebrow{color:#e6e6df;font-size:10px;letter-spacing:1.5px}
+.flow-marketing-hero .landing-kicker>span{background:var(--flow-sage)}
+.flow-marketing-hero .button-primary{background:var(--flow-chrome-fg);color:var(--flow-chrome-bg);border-color:var(--flow-chrome-fg);border-radius:10px}
+.flow-marketing-hero .button-secondary{background:transparent;color:var(--flow-chrome-fg);border:1px solid #ffffff60;border-radius:10px}
+.flow-marketing-hero .trust-row{color:#e6e6df;font-size:10px}
+.flow-product-stack{display:flex;flex-direction:column;align-items:stretch;padding:15px 8px;gap:22px;min-width:0}
+.flow-product-note{position:relative;border-radius:15px;padding:27px;background:var(--flow-sand);color:var(--flow-sand-text);transform:rotate(-4deg);margin-right:18px;box-shadow:0 12px 30px #00000015}
+.flow-product-note:nth-child(2){background:var(--flow-sage);color:var(--flow-sage-text);transform:rotate(3deg);margin:0 0 0 18px}
+.flow-product-note h2{font-size:26px;line-height:1.2;letter-spacing:-.7px;font-weight:500;margin:15px 0 10px}
+.flow-product-note p{font-size:12px;line-height:1.6;color:inherit;margin:0}
+.flow-product-note svg{width:23px;height:23px}
+
+.flow-marketing-header{background:var(--flow-chrome-bg);color:var(--flow-chrome-fg);border:0}
+.flow-marketing-header .flow-brand{color:var(--flow-chrome-fg);font-size:21px;gap:9px}
+.flow-marketing-header .marketing-nav{min-height:76px}
+.flow-marketing-header :is(nav a,.marketing-actions>a,.locale-switcher button,.marketing-menu-button){color:var(--flow-chrome-fg)}
+.flow-marketing-header .button-primary{background:var(--flow-chrome-fg);color:var(--flow-chrome-bg);border-radius:10px}
+.flow-auth{background:var(--flow-chrome-bg);color:var(--app-text);padding:24px}
+.flow-auth>.auth-card{background:var(--app-canvas);border:1px solid var(--app-divider);border-radius:20px;padding:32px;width:min(100%,480px)}
+.flow-auth.auth-workspace{padding:24px;gap:24px}
+.flow-auth .auth-workspace-header{padding-inline:12px;color:var(--flow-chrome-fg)}
+.flow-auth .auth-workspace-header .logo{filter:invert(1)}
+.flow-auth .auth-workspace-header .locale-switcher{color:var(--flow-chrome-fg)}
+.flow-auth .auth-workspace-body{background:var(--app-canvas);border-radius:20px;padding:44px;max-width:1100px;width:100%;gap:48px}
+.flow-auth .auth-workspace-intro h2{font-size:44px;line-height:1.08;letter-spacing:-1.7px;font-weight:600}
+.flow-auth .auth-workspace-intro ul{margin:26px 0;display:grid;gap:14px}
+.flow-auth .auth-workspace-intro li{display:flex;align-items:center;gap:12px;font-size:12px}
+.flow-auth .auth-workspace-intro li>svg{padding:9px;box-sizing:content-box;border-radius:10px;background:var(--flow-sand);color:var(--flow-sand-text)}
+.flow-auth .auth-workspace-intro li:nth-child(2)>svg{background:var(--flow-sage);color:var(--flow-sage-text)}
+.flow-auth .auth-workspace-body>.auth-card{border:1px solid var(--app-divider);border-radius:15px;background:var(--app-canvas);padding:28px}
+.flow-auth .auth-workspace-footer{border-color:#ffffff30;color:var(--flow-chrome-fg);padding:20px 12px}
+.flow-auth .auth-card h1{font-size:28px;letter-spacing:-.8px;line-height:1.2;margin:20px 0 12px}
+.flow-auth .auth-card p{font-size:12px;line-height:1.6;color:var(--app-secondary)}
+.flow-auth .auth-card form{display:grid;gap:20px}
+
+.flow-marketing-header .marketing-actions>.button-primary{color:var(--flow-chrome-bg)}

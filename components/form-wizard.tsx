@@ -42,7 +42,7 @@ export function FormWizard({labels,step,onStep,children,action,cancelAction,busy
   onStep(next);rootRef.current?.querySelector(".wizard-content")?.scrollTo({top:0});
  };
  return <LocalizedElement as="div" ref={rootRef} className="form-wizard" data-guided={guided?"true":undefined} aria-label={ariaLabel}>
-  {guided&&<div className="wizard-progress" role="status"><LocalizedText>{progressLabel?progressLabel(step+1,labels.length,labels[step]):`Schritt ${step+1} von ${labels.length} · ${labels[step]}`}</LocalizedText></div>}
+  {guided&&<div className="flow-wizard-steps" aria-hidden="true">{labels.map((label,index)=><span key={label} className={index===step?"is-current":index<step?"is-complete":""}><i>{index+1}</i><span><LocalizedText>{label}</LocalizedText></span></span>)}</div>}{guided&&<div className="wizard-progress" role="status"><LocalizedText>{progressLabel?progressLabel(step+1,labels.length,labels[step]):`Schritt ${step+1} von ${labels.length} · ${labels[step]}`}</LocalizedText></div>}
   <div className="wizard-content">{children}</div>
   <FormActions onClickCapture={event=>{
    const button=event.target instanceof Element?event.target.closest('button.button-primary'):null;

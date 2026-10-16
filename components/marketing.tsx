@@ -41,9 +41,9 @@ export function MarketingHeader() {
   }, [open]);
 
   return <>
-    <header className="marketing-header">
+    <header className="marketing-header flow-marketing-header">
       <div className="marketing-nav">
-        <Link href="/" onClick={() => setOpen(false)}><Logo /></Link>
+        <Link className="flow-brand" href="/" aria-label="Binso One" onClick={() => setOpen(false)}><span className="flow-brand-mark" aria-hidden="true">b</span><span>binso one</span></Link>
         <nav>
           <Link href="/produkt"><LocalizedText>{"Produkt"}</LocalizedText></Link>
           <Link href="/#funktionen"><LocalizedText>{"Funktionen"}</LocalizedText></Link>
@@ -108,7 +108,7 @@ export function ProductPreview({compact=false,screen="dashboard"}:{compact?:bool
  const translate=useTranslation(),group=captures.screens[screen],capture=compact?group.mobile:group.desktop;
  const label=productViews.find(([key])=>key===screen)![1];
  return <div className={compact?"product-capture product-capture-mobile":"product-capture product-capture-desktop"}>
-  <Image src={capture.src} width={capture.width} height={capture.height} sizes={compact?"(max-width: 760px) 85vw, 310px":"(max-width: 760px) 100vw, 640px"} alt={translate(label)+" · "+translate("Binso One mit Beispieldaten")} preload={!compact}/><small className="product-capture-caption"><LocalizedText>{"Produktansicht in Deutsch · Beispieldaten"}</LocalizedText></small>
+  <Image src={`${capture.src}?v=${capture.sha256.slice(0,12)}`} width={capture.width} height={capture.height} sizes={compact?"(max-width: 760px) 85vw, 310px":"(max-width: 760px) 100vw, 640px"} alt={translate(label)+" · "+translate("Binso One mit Beispieldaten")} preload={!compact}/><small className="product-capture-caption"><LocalizedText>{"Produktansicht in Deutsch · Beispieldaten"}</LocalizedText></small>
  </div>;
 }
 

@@ -68,7 +68,7 @@ export async function measureCompliance(page,{output,route,theme,width,state='no
    const actions=[...el.querySelectorAll('button,a')].filter(visible);
    const kind=x=>x.matches('button.desktop-global-search[aria-label]')&&x.getAttribute('aria-label').trim()?'search':x.matches('button.desktop-notification-button')?'notification':x.matches('button.avatar-button')?'account':x.matches('a.desktop-header-timer[href="/zeit"]')&&/^\d{2,}:\d{2}:\d{2}$/.test(x.textContent.trim())?'timer':'unexpected';
    const roles=actions.map(kind),unexpected=actions.filter(x=>kind(x)==='unexpected');
-   const outside=[...el.closest('.desktop-appbar').querySelectorAll('button,a')].filter(visible).filter(x=>!el.contains(x)&&!x.matches('button.desktop-navigation-toggle[aria-controls="customer-desktop-navigation"]'));
+   const outside=[...el.closest('.desktop-appbar').querySelectorAll('button,a')].filter(visible).filter(x=>!el.contains(x)&&!x.matches('button.desktop-navigation-toggle[aria-controls="customer-desktop-navigation"],a.desktop-flow-brand[href="/dashboard"]'));
    const validOrder=['search,notification,account','search,timer,notification,account'].includes(roles.join(','));
    add('LAY-003',validOrder&&!unexpected.length&&!outside.length?'passed':'failed',{visibleActions:actions.length,roles,unexpectedActions:[...unexpected,...outside].map(item),rects:actions.map(item)},'.desktop-appbar-actions');
   }

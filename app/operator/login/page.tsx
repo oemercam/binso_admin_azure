@@ -31,7 +31,7 @@ export default function OperatorLogin(){
     }
   };
 
-  return <main className="auth-page"><section className="auth-card operator-login-card">
+  return <main className="auth-page flow-noir flow-auth"><section className="auth-card operator-login-card">
     <Link href="/"><Logo/></Link>
     <span className="eyebrow"><LocalizedText>{"ONE ADMIN"}</LocalizedText></span>
     <h1><LocalizedText>{"Admin Portal"}</LocalizedText></h1>

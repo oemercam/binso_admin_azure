@@ -101,7 +101,7 @@ export function AccountSettingsPage() {
           <Field label="Funktion"><Input value={jobTitle} onChange={e=>setJobTitle(e.target.value)}/></Field>
         </div>
         <FormActions ><Button requiresWrite disabled={loading||!!loadError||saving} onClick={()=>void save()}><LocalizedText>{saving?"Wird gespeichert…":"Speichern"}</LocalizedText></Button></FormActions>
-      </section>:<section className="settings-readonly"><dl className="detail-list"><div><dt><LocalizedText>{"Name"}</LocalizedText></dt><dd>{displayName}</dd></div><div><dt><LocalizedText>{"E-Mail"}</LocalizedText></dt><dd><LocalizedText>{email||"—"}</LocalizedText></dd></div><div><dt><LocalizedText>{"Telefon"}</LocalizedText></dt><dd><LocalizedText>{phone||"—"}</LocalizedText></dd></div><div><dt><LocalizedText>{"Funktion"}</LocalizedText></dt><dd><LocalizedText>{jobTitle||"—"}</LocalizedText></dd></div></dl></section>}
+      </section>:<section className="settings-readonly"><div className="form-grid two"><Field label="Vorname"><Input readOnly value={firstName}/></Field><Field label="Nachname"><Input readOnly value={lastName}/></Field><Field label="E-Mail"><Input readOnly value={email} type="email"/></Field><Field label="Telefon"><Input readOnly value={phone} type="tel"/></Field><Field label="Funktion"><Input readOnly value={jobTitle}/></Field></div></section>}
     </div>}
     {toast&&<Toast title={toast} tone={["Persönliche Daten gespeichert.","Firmendaten gespeichert.","Profilbild gespeichert.","Firmenlogo gespeichert."].includes(toast)?"success":"danger"}/>}
   </AppShell>;

@@ -72,7 +72,7 @@ export function RegistrationSheet(){
  };
  const labels=[t('company'),t('access'),t('review')];
  const planSummary=context&&<><p>{context.plan?.name??t('noPlan')}</p>{context.plan&&<p>{t('futurePrice',{amount:context.billingCycle==='yearly'?context.plan.yearly:context.plan.monthly,interval:t(context.billingCycle)})}</p>}<p>{t('trial',{days:context.trialDays})}</p><p>{t('conditions')}</p></>;
- return <main className="auth-page" lang={locale==='de'?'de-CH':locale==='fr'?'fr-CH':locale==='it'?'it-CH':locale}>
+ return <main className="auth-page flow-noir flow-auth" lang={locale==='de'?'de-CH':locale==='fr'?'fr-CH':locale==='it'?'it-CH':locale}>
   <section className="auth-card"><Logo/><h1>{t('title')}</h1>{error&&!context?<><ErrorState>{t('failure')}</ErrorState><Button onClick={()=>setRetry(retry+1)}>{t('open')}</Button></>:<Button onClick={()=>setOpen(true)} disabled={!context}>{context?t('open'):t('loading')}</Button>}<p><Link href={'/login?lang='+locale}>{t('signIn')}</Link></p></section>
   <FormSheet lang={locale} open={open} actions={stage==='pending'?<><Button form="registration-verification" type="submit" disabled={busy||code.length!==6}>{busy?t('sending'):t('verify')}</Button><Button variant="secondary" disabled={busy} onClick={()=>void resend()}>{t('resend')}</Button></>:undefined} label={t('title')} closeLabel={t('close')} onClose={close} busy={busy} dirty={dirty} wizard className="registration-sheet" onBrowserBack={stage==='new'&&step>0?()=>setStep(step-1):undefined} discardText={{title:t('leaveTitle'),message:t('leaveHelp'),cancelLabel:t('keep'),confirmLabel:t('discard')}}>
    {context&&stage==='new'&&<form ref={form} onSubmit={submit} noValidate>

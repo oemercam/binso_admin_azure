@@ -55,7 +55,7 @@ async function load(file,actualRoot=false){
  let source=ts.transpileModule(await fs.readFile(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText;
  for(const match of [...source.matchAll(/(?:from\s*|import\s*)(['"])([^'"]+)\1/g)]){
   const name=match[2];let resolved=adapters[name];
-  if(!resolved&&(name.startsWith('@/')||name.startsWith('.'))){let dependency=name.startsWith('@/')?name.slice(2):path.join(path.dirname(file),name);if(!dependency.endsWith('.ts'))dependency+='.ts';resolved=await load(dependency);}
+  if(!resolved&&(name.startsWith('@/')||name.startsWith('.'))){let dependency=name.startsWith('@/')?name.slice(2):path.posix.normalize(path.posix.join(path.posix.dirname(file),name));if(!dependency.endsWith('.ts'))dependency+='.ts';resolved=await load(dependency);}
   if(resolved)source=source.replace(match[0],match[0].replace(match[1]+name+match[1],JSON.stringify(resolved)));
  }
  const result=uri(source);cache.set(file,result);return result;

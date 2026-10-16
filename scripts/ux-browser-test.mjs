@@ -49,7 +49,7 @@ if(!process.env.BINSO_BASE_URL){
 }
 // Compile scoped development routes before opening clients: the initial webpack
 // compilation must not issue Fast Refresh into an in-progress browser scenario.
-if(server&&process.env.BINSO_UX_SERVER_MODE==='dev')for(const route of (process.env.BINSO_UX_ROUTES?.split(',')??fullRoutes)){const warm=await fetch(base+route);await warm.text();if(!warm.ok)throw new Error('Development reference failed to compile: '+route+' ('+warm.status+')');}
+if(server&&process.env.BINSO_UX_SERVER_MODE==='dev')for(const route of (process.env.BINSO_UX_ROUTES?.split(',')??fullRoutes)){const warm=await fetch(base+route,{headers:{cookie:'binso_demo=1; binso_operator_demo=1'}});await warm.text();if(!warm.ok)throw new Error('Development reference failed to compile: '+route+' ('+warm.status+')');}
 const browserType=engines[process.env.BINSO_UX_BROWSER??"chromium"];
 const launchOptions={headless:true,...(process.env.BINSO_CHROMIUM_EXECUTABLE&&(process.env.BINSO_UX_BROWSER??'chromium')==='chromium'?{executablePath:process.env.BINSO_CHROMIUM_EXECUTABLE,args:['--no-sandbox','--disable-dev-shm-usage','--use-gl=angle','--use-angle=swiftshader']}: {})};
 let browser;
@@ -201,6 +201,7 @@ try{
    else if(p==='/api/settings/company')data={item:{name:customer.name,city:'Bern',logo_url:null,email:'firma@example.invalid'}};
 
    else if(p==='/api/operator/accounts')data={items:[operatorAccount]};
+   else if(p==='/api/operator/customers/tenant-one')data={overview:{tenant:{id:'tenant-one',name:'Prüffirma AG',email:'test@example.invalid',phone:'+41315551020',city:'Bern',uid:'CHE-173.401.068',created_at:'2026-10-09'},account:operatorAccount,users:3,open_tickets:1,monthly_contract_value:129,payments_total:258,active_restrictions:[],access:{billing:true,support:true,restrictions:true,audit:true}},tickets:[ticket],audit:[{id:'audit-one',created_at:'2026-10-09T10:00:00Z',action:'Kundenkonto erstellt'}]};
    else if(p==='/api/operator/customers')data={items:[{id:'tenant-one',name:'Prüffirma AG',created_at:'2026-10-09',account:{plan:'pro',account_status:'trial'}},{id:'tenant-two',name:'Zeta AG',created_at:'2026-10-08',account:{plan:'start',account_status:'suspended'}},{id:'tenant-three',name:'Büro AG',created_at:'2026-10-08',account:{plan:'start',account_status:'read_only'}}]};
    else if(p==='/api/operator/tickets')data={items:[{...ticket,tenant:{name:'Prüffirma AG'}}]};
    else if(p==='/api/operator/dashboard')data={stats:{customers_total:2,subscriptions_active:1,trials_active:1,users_active:1,payments_30d:79,monthly_contract_value:79,tickets_open:2,tickets_in_progress:3,tickets_resolved:5},tickets:[{...ticket,tenant:{name:'Prüffirma AG'}}],incidents:[]};
@@ -284,7 +285,7 @@ try{
     if(!process.env.BINSO_UX_BASELINE&&theme==='light'){
       const surfaces=await page.locator('.app-root,.operator-root,.page-container,.operator-app-content,.desktop-appbar,.mobile-header,.operator-app-header').evaluateAll(nodes=>nodes.filter(el=>el.getClientRects().length).map(el=>({name:el.className,background:getComputedStyle(el).backgroundColor})));
       const flow=await page.locator('.flow-noir').count();
-      assert.ok(surfaces.every(surface=>surface.background===(flow&&(/mobile-header|desktop-appbar/.test(surface.name)||width<=1100&&surface.name.includes('app-root'))?'rgb(21, 21, 21)':'rgb(255, 255, 255)')),`${route}: approved chrome and white workspace surfaces ${JSON.stringify(surfaces)}`);
+      assert.ok(surfaces.every(surface=>surface.background===(flow&&(/mobile-header|desktop-appbar|operator-app-header/.test(surface.name)||/app-root|operator-root/.test(surface.name))?'rgb(21, 21, 21)':'rgb(255, 255, 255)')),`${route}: approved chrome and white workspace surfaces ${JSON.stringify(surfaces)}`);
     }
     const navigationToggle=page.locator('.desktop-navigation-toggle').filter({visible:true});
     const modal=page.locator('[aria-modal="true"]').filter({visible:true});
@@ -293,15 +294,26 @@ try{
       assert.ok(await navigationToggle.evaluate(el=>{const box=el.getBoundingClientRect();return !el.contains(document.elementFromPoint(box.x+box.width/2,box.y+box.height/2))}),'Modal backdrop blocks desktop navigation pointer access');
     }
     if(!process.env.BINSO_UX_BASELINE&&width>=1101&&await navigationToggle.count()&&!await modal.count()){
-      const sidebar=page.locator('.app-sidebar,.operator-sidebar').filter({visible:true});
+      const sidebar=page.locator('.app-sidebar,.operator-sidebar');
+      if(await navigationToggle.getAttribute('aria-expanded')==='false')await navigationToggle.click();
+      assert.ok((await sidebar.boundingBox()).width>=500,'The launcher exposes full labelled destinations');
+      if(['/dashboard','/operator'].includes(route)){
+       await page.waitForFunction(()=>document.querySelector('.app-sidebar,.operator-sidebar')?.contains(document.activeElement));
+       if(process.env.BINSO_UX_CAPTURE_ALL==='1')await capture(page,{animations:'disabled',path:path.join(output,theme+'-'+width+'-'+route.replaceAll('/','_')+'-launcher.png')});
+       await page.keyboard.press('Escape');
+       assert.equal(await navigationToggle.getAttribute('aria-expanded'),'false','Escape dismisses the destination launcher');
+       assert.equal(await navigationToggle.evaluate(el=>el===document.activeElement),true,'Closing restores focus to the launcher control');
+       await navigationToggle.click();
+      }
       await navigationToggle.click();
       assert.equal(await navigationToggle.getAttribute('aria-expanded'),'false','Desktop navigation exposes collapsed state');
-      assert.equal(Math.round((await sidebar.boundingBox()).width),68,'Collapsed navigation preserves an accessible icon rail');
+      assert.equal(await sidebar.isVisible(),false,'Closed launcher removes destinations from pointer and keyboard access');
       const layout=await page.locator('.app-main,.operator-main').first().boundingBox();
-      assert.equal(Math.round(layout.x),68,'Workspace reclaims collapsed navigation space');
+      assert.equal(Math.round(layout.x),0,'Launcher overlays the full-width Flow workspace');
       assert.equal(await page.evaluate(()=>localStorage.getItem('binso.desktop-navigation')),'collapsed','Desktop preference survives navigation');
       await navigationToggle.click();
       assert.equal(await navigationToggle.getAttribute('aria-expanded'),'true','Desktop navigation expands again');
+      await navigationToggle.click();
     }
     if(!process.env.BINSO_UX_BASELINE&&width<=1100)assert.equal(await navigationToggle.count(),0,'Desktop collapse control stays out of the mobile shell');
     if(!process.env.BINSO_UX_BASELINE)for(const ring of await page.locator('.bo-ring-visual').filter({visible:true}).all()){
@@ -309,17 +321,17 @@ try{
       assert.ok(geometry.dx<1&&geometry.dy<1,'Ring value and label share its geometric center');
     }
 
-    const geometry=await page.evaluate(()=>({overflow:[...document.querySelectorAll('body *')].filter(el=>el.getBoundingClientRect().right>innerWidth+1).slice(0,12).map(el=>({tag:el.tagName,cls:el.className,text:el.textContent?.slice(0,80),parent:el.parentElement?.className,right:el.getBoundingClientRect().right})),viewport:innerWidth,scroll:document.documentElement.scrollWidth,body:document.body.scrollWidth,sort:[...document.querySelectorAll('.toolbar .filter-button')].map(el=>el.getBoundingClientRect().width),metricDividers:[...document.querySelectorAll('.metric,.finance-flow-primary,.finance-flow-result,.finance-flow-costs,.finance-flow-costs>div')].map(el=>getComputedStyle(el).borderLeftWidth)}));
+    const geometry=await page.evaluate(()=>({overflow:[...document.querySelectorAll('body *')].filter(el=>el.getBoundingClientRect().right>innerWidth+1).slice(0,12).map(el=>({tag:el.tagName,cls:el.className,text:el.textContent?.slice(0,80),parent:el.parentElement?.className,right:el.getBoundingClientRect().right})),viewport:innerWidth,scroll:document.documentElement.scrollWidth,body:document.body.scrollWidth,sort:[...document.querySelectorAll('.toolbar .filter-button')].map(el=>el.getBoundingClientRect().width),metricDividers:[...document.querySelectorAll('.metric,.finance-flow-primary,.finance-flow-result,.finance-flow-costs,.finance-flow-costs>div')].map(el=>{const c=getComputedStyle(el);return {metric:el.classList.contains('metric'),left:c.borderLeftWidth,top:c.borderTopWidth,right:c.borderRightWidth,bottom:c.borderBottomWidth}})}));
     if(geometry.scroll>width+1||geometry.body>width+1){console.log('Overflow details',JSON.stringify(await page.evaluate(()=>[...document.querySelectorAll('body *')].filter(el=>el.scrollWidth>el.clientWidth+2).slice(0,30).map(el=>({tag:el.tagName,cls:el.className,width:el.clientWidth,scroll:el.scrollWidth,overflow:getComputedStyle(el).overflowX,children:[...el.children].map(c=>({tag:c.tagName,width:c.clientWidth,scroll:c.scrollWidth,rect:c.getBoundingClientRect().width,min:getComputedStyle(c).minWidth,grid:getComputedStyle(el).gridTemplateColumns})),rect:JSON.stringify(el.getBoundingClientRect())}))),null,2));await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${width}-overflow.png`)});}
     assert.ok(geometry.scroll<=width+1&&geometry.body<=width+1,`${theme} ${width} ${route}: horizontal overflow ${JSON.stringify(geometry)}`);
     if(!process.env.BINSO_UX_BASELINE&&width<=1100&&await page.locator('.page-container,.operator-app-content').count()){
-      const appearance=await page.locator('.page-container,.operator-app-content').first().evaluate(el=>({ink:getComputedStyle(el).color,surface:getComputedStyle(el).getPropertyValue('--app-surface').trim(),controls:[...el.querySelectorAll('.form-control,.form-textarea')].filter(node=>!['checkbox','radio','file'].includes(node.type)&&!node.closest('.searchbox,.thread-composer')).map(node=>({radius:getComputedStyle(node).borderTopLeftRadius,font:getComputedStyle(node).fontSize})),groups:[...el.querySelectorAll('.bo-settings-group-body')].map(node=>({background:getComputedStyle(node).backgroundColor,border:getComputedStyle(node).borderTopWidth}))}));
+      const appearance=await page.locator('.page-container,.operator-app-content').first().evaluate(el=>({flow:!!el.closest('.flow-noir'),ink:getComputedStyle(el).color,surface:getComputedStyle(el).getPropertyValue('--app-surface').trim(),controls:[...el.querySelectorAll('.form-control,.form-textarea')].filter(node=>!['checkbox','radio','file'].includes(node.type)&&!node.closest('.searchbox,.thread-composer')).map(node=>({radius:getComputedStyle(node).borderTopLeftRadius,font:getComputedStyle(node).fontSize})),groups:[...el.querySelectorAll('.bo-settings-group-body')].map(node=>({background:getComputedStyle(node).backgroundColor,border:getComputedStyle(node).borderTopWidth}))}));
       assert.equal(appearance.ink,theme==='light'?'rgb(32, 32, 32)':'rgb(222, 222, 226)',`${route}: app text uses the central theme`);
       assert.ok(appearance.controls.every(control=>control.radius==='10px'),`${route}: shared app field corners ${JSON.stringify(appearance.controls)}`);
-      assert.ok(appearance.groups.every(group=>group.border==='0px'&&group.background===(theme==='light'?'rgb(255, 255, 255)':'rgb(20, 20, 20)')),`${route}: grouped app surfaces in both themes`);
+      assert.ok(appearance.groups.every(group=>group.border===(appearance.flow?'1px':'0px')&&group.background===(theme==='light'?'rgb(255, 255, 255)':appearance.flow?'rgb(0, 0, 0)':'rgb(20, 20, 20)')),`${route}: approved Flow outlined groups in both themes`);
     }
     assert.ok(geometry.sort.every(size=>size<=44),`${route}: sorting control is too wide`);
-    assert.ok(geometry.metricDividers.every(size=>parseFloat(size)===0),`${route}: metric dividers`);
+    assert.ok(geometry.metricDividers.every(border=>parseFloat(border.left)===0||border.metric&&[border.left,border.top,border.right,border.bottom].every(size=>parseFloat(size)===1)),`${route}: metric cards use a complete outline; stray left dividers remain rejected`);
     if(!process.env.BINSO_UX_BASELINE&&width<=760){for(const toolbar of await page.locator('.toolbar:has(.searchbox):has(.filter-button)').all()){const search=await toolbar.locator('.searchbox').boundingBox(),filter=await toolbar.locator('.filter-button').boundingBox(),tabs=await toolbar.locator('.chips').boundingBox();assert.ok(filter.x>search.x&&Math.abs(filter.y-search.y)<2&&Math.abs(filter.height-search.height)<2,'Search and filter share a row and height');assert.ok(!tabs||tabs.y>=search.y+search.height,'Status tabs occupy their own row')}}
     if(!process.env.BINSO_UX_BASELINE&&width<=760&&await page.locator('.app-root:not(.app-preview)').count()&&!route.startsWith('/operator')&&!route.startsWith('/support/')){
       await page.evaluate(()=>window.scrollTo(0,document.documentElement.scrollHeight));
@@ -332,6 +344,11 @@ try{
       assert.equal(await page.locator('.flow-month-summary').count(),1,'Home shows the approved compact authoritative revenue summary');
       assert.ok(await page.locator('.flow-month-summary strong').innerText(),'Revenue amount is available');
       assert.equal(await page.locator('.flow-finance-details').getAttribute('open'),null,'Detailed analytics stays collapsed on the Flow home');
+    }
+    if(!process.env.BINSO_UX_BASELINE&&!process.env.BINSO_UX_FIXTURE_CASE&&route==='/kunden/customer-one'){
+      const contact=page.locator('.flow-customer-identity');
+      await contact.getByText('Alex Muster',{exact:true}).waitFor();
+      assert.equal(await contact.getByRole('link',{name:'alex.muster@internationales-unternehmen.example.invalid',exact:true}).getAttribute('href'),'mailto:alex.muster@internationales-unternehmen.example.invalid','Primary contact name and e-mail use the same contact record');
     }
     if(!process.env.BINSO_UX_BASELINE&&['/finanzen','/finanzen/analyse','/kunden/customer-one'].includes(route)){
       assert.equal(await page.locator('.bo-statistics .bo-metric-tiles>.metric').count(),route==='/kunden/customer-one'?3:4,'The common foundation shows domain-appropriate primary metrics');
@@ -351,7 +368,7 @@ try{
      assert.equal(g.height,width<=760||(g.app&&width<=1100)?44:40,`${route}: canonical closed field height`);assert.equal(g.padding,'11px',`${route}: canonical field inset`);assert.equal(g.radius,'10px',`${route}: canonical field radius`);
     }}
     for(const label of await page.locator('.detail-list dt').filter({visible:true}).all()){const confined=await label.evaluate(el=>{const r=el.getBoundingClientRect(),range=document.createRange();range.selectNodeContents(el);return [...range.getClientRects()].every(text=>text.right<=r.right+1)});assert.ok(confined,`${route}: detail labels never overlap their values`);}
-    if(width<=1100&&await page.locator('.mobile-header-detail').count())assert.equal(await page.locator('.page-head h1,.page-head .status,.desktop-back').filter({visible:true}).count(),0,route+' '+width+': app detail header owns its title/status/back once, including tablet');
+    if(width<=1100&&await page.locator('.mobile-header-detail').count())assert.equal(await page.locator('.page-head h1').filter({visible:true}).count(),1,route+' '+width+': Flow detail owns one full page title below the brand header');
     if(route.endsWith('/neu')&&await page.locator('.mobile-sticky-save').count()){assert.equal(await page.locator('.mobile-sticky-save .button-primary').filter({visible:true}).count(),1,`${route}: form footer action must be reachable`);assert.equal(await page.locator('.page-head .page-actions .button-primary,.mobile-detail-actions .button-primary').filter({visible:true}).count(),0,`${route}: duplicate header save`);}
     if(width<=760&&await page.locator('.app-root:not(.app-preview):not(.app-editing)').count()&&!route.endsWith('/neu')&&!route.startsWith('/operator'))assert.equal(await page.locator('nav.bottom-nav').isVisible(),true,`${route}: bottom navigation hidden`);
     if(await page.locator('.app-editing').count())assert.equal(await page.locator('nav.bottom-nav').count(),0,`${route}: capture processes apply the existing visibility contract`);
@@ -360,10 +377,10 @@ try{
     if(!process.env.BINSO_UX_BASELINE&&width<=760){
      for(const row of await page.locator('.document-summary-row.has-value').filter({visible:true}).all()){
       const geometry=await row.evaluate(el=>{const box=selector=>{const node=el.querySelector(selector);return node?.getClientRects().length?node.getBoundingClientRect().toJSON():null};return {inline:el.classList.contains('has-inline-value'),title:box(':scope>b'),meta:box(':scope>small'),amount:box('.document-summary-amount')}});
-      if(geometry.amount){assert.ok(geometry.title&&geometry.meta,'A visible financial amount must have a visible title and metadata');assert.ok(geometry.meta.y>=geometry.title.y+geometry.title.height-1,'Financial metadata appears below the title');if(geometry.inline){assert.ok(Math.abs(geometry.amount.y-geometry.meta.y)<=2,'Admin amount shares the metadata line');assert.ok(geometry.meta.right<=geometry.amount.x+1,'Admin metadata and amount cannot overlap');}else{assert.ok(geometry.amount.y>=geometry.meta.y+geometry.meta.height-1,'Financial row has distinct title, metadata and amount lines');}}
+      if(geometry.amount){assert.ok(geometry.title&&geometry.meta,'A visible financial amount must have a visible title and metadata');assert.ok(geometry.meta.y>=geometry.title.y+geometry.title.height-1,'Financial metadata appears below the title');assert.ok(Math.abs(geometry.amount.y-geometry.title.y)<=2,'Flow financial amount shares the title line');assert.ok(geometry.title.x+geometry.title.width<=geometry.amount.x+1,'Flow title and amount cannot overlap');}
      }
      if(['/rechnungen/RE-TEST-1','/angebote/AN-TEST-1'].includes(route)){
-      const header=page.locator('.mobile-header');assert.equal(await header.locator('.status').count(),1,'Document status appears once in its header');
+      const header=page.locator('.mobile-header');assert.equal(await header.locator('.status').count(),0,'Brand header does not repeat the document status');assert.equal(await page.locator('.page-head .status').filter({visible:true}).count(),1,'Document status appears once beside its page title');
       assert.equal(await page.locator('.document-detail-view .status').count(),0,'Document body has no redundant status');
       const actions=await header.locator('.mobile-detail-actions').boundingBox(),box=await header.boundingBox();
       assert.ok(actions.x+actions.width>=box.width-35,'Document actions stay at the right edge');
@@ -960,6 +977,14 @@ try{
    await context.addInitScript(()=>{const selectClient=()=>document.querySelector('[data-operator-demo="true"]')?.setAttribute('data-operator-demo','false');new MutationObserver(selectClient).observe(document,{childList:true,subtree:true,attributes:true,attributeFilter:['data-operator-demo']});selectClient()});
    await navigate(base+'/operator');await page.getByRole('heading',{name:'Abrechnung',exact:true}).waitFor();const dashboardMetrics=page.locator('.operator-insight-grid .metric');assert.equal(await dashboardMetrics.count(),2,'Secondary dashboard metrics start in one bounded billing view');await page.getByRole('tab',{name:'Support',exact:true}).click();const supportRing=page.locator('.operator-insight-grid .bo-ring-chart');await supportRing.getByRole('group',{name:'Offen / in Bearbeitung / gelöst: 10',exact:true}).waitFor();assert.deepEqual(await supportRing.locator('circle title').allTextContents(),['Offen: 2 · 20 %','In Bearbeitung: 3 · 30 %','Gelöst: 5 · 50 %'],'Support segments use the actual mutually exclusive ticket counts');assert.equal(await supportRing.locator('.bo-ring-details button').count(),3,'Every support segment has an accessible detail action');await supportRing.getByRole('button',{name:'In Bearbeitung 3 · 30 %',exact:true}).click();assert.equal(await supportRing.locator('output').textContent(),'In Bearbeitung: 3','Support segment selection exposes its label and real count');const openSupportSegment=supportRing.getByRole('button',{name:'Offen: 2',exact:true});await openSupportSegment.focus();await openSupportSegment.press('Enter');assert.equal(await supportRing.locator('output').textContent(),'Offen: 2','Interactive chart segments support keyboard selection');await page.getByRole('tab',{name:'Abrechnung',exact:true}).click();for(const metric of await dashboardMetrics.all()){const boxes=await metric.evaluate(el=>({label:el.querySelector('.metric-top').getBoundingClientRect().toJSON(),value:el.querySelector('strong').getBoundingClientRect().toJSON()}));assert.ok(boxes.value.top>=boxes.label.bottom-1,'Dashboard values and labels occupy separate lines');}
    for(const section of await page.locator('.operator-insight-grid>.bo-workspace-section').all())assert.equal(await section.evaluate(el=>getComputedStyle(el).marginTop),'0px','Dashboard grid owns section spacing');const insightGeometry=await page.locator('.operator-insight-grid').evaluate(el=>({grid:el.getBoundingClientRect().width,section:el.firstElementChild.getBoundingClientRect().width}));assert.ok(insightGeometry.section>=insightGeometry.grid-1,'A single selected dashboard view fills its workspace');
+   for(const width of [390,1440]){
+    await page.setViewportSize({width,height:1000});await navigate(base+'/operator/kunden/tenant-one');
+    await page.locator('.operator-customer-hero').getByRole('heading',{name:'Prüffirma AG',exact:true}).waitFor();
+    assert.equal(await page.getByText('Kunde nicht gefunden.',{exact:true}).count(),0,'Admin customer coverage requires a positive loaded tenant');
+    await page.getByRole('heading',{name:'Abonnement',exact:true}).waitFor();
+    await capture(page,{animations:'disabled',fullPage:true,path:path.join(output,theme+'-'+width+'-operator-customer-loaded.png')});
+   }
+   await page.setViewportSize({width:390,height:740});
    // The server prototype cookie selects the demo finance endpoint even when
    // the client-renderer fixture switches the other operator APIs to production.
    await capture(page,{animations:'disabled',path:path.join(output,theme+'-operator-dashboard-production.png')});

@@ -25,7 +25,7 @@ export default function VerifyEmailPage(){
   return()=>{active=false};
  },[]);
  const t=(key:Parameters<typeof registrationText>[0])=>registrationText(key,locale);
- return <main className="auth-page" lang={locale}><section className="auth-card"><Logo/>
+ return <main className="auth-page flow-noir flow-auth" lang={locale}><section className="auth-card"><Logo/>
   {state==='loading'?<><h1>{t('verification')}</h1><p>{t('sending')}</p></>:state==='invalid'?<><h1>{t('verification')}</h1><p>{t('invalidCode')}</p><Button href={'/login?lang='+locale}>{t('signIn')}</Button></>:<><h1>{t('verified')}</h1><p>{t(state==='already'?'alreadyVerified':'verified')}</p><Button href={state==='already'?'/login?lang='+locale:next}>{t(state==='already'?'signIn':'open')}</Button></>}
  </section></main>;
 }

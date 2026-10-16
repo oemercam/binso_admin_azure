@@ -5,6 +5,7 @@ import {EntityFiles} from "./entity-files";
 import {customerDirectory,resolveCustomer,type CustomerDirectory} from "@/lib/customer-identity";
 import {documentTotals} from "@/lib/money";
 import {useApiQuery,useDataRevision} from "@/lib/client/use-api-query";
+import {FlowSummary} from "./flow-workspace";
 import {FormWizard} from "./form-wizard";
 import {useProcessDraft} from "./use-process-draft";
 import {businessDate,financialStatus,financialStatusLabels,openAmount} from "@/lib/financial-status";
@@ -430,7 +431,7 @@ function DocumentReadView({type,draft,directory}:{type:DocumentKind;draft:Docume
   const dueDate=isInvoice&&draft.date&&draft.due?invoiceDueDate(draft.date,draft.due):"";
   const outstanding=openAmount({total:totals.total,paid_amount:draft.paidAmount,credit_amount:draft.creditAmount,refund_amount:draft.refundAmount});
   const {displayStatus}=documentPresentation(type,draft,totals.total);
-  return <div className="document-detail-view">
+  return <div className="document-detail-view"><FlowSummary label={isInvoice?"Rechnungsbetrag":"Angebotsbetrag"} value={currency+" "+money(totals.total)} tone="plain"><span>{draft.customer}</span>{isInvoice&&["open","partial","overdue"].includes(displayStatus)&&<span><LocalizedText>{"Offener Betrag"}</LocalizedText>: {currency} {money(outstanding)}</span>}</FlowSummary>
     <section className="document-detail-section">
       <span className="eyebrow"><LocalizedText>{"KUNDE"}</LocalizedText></span>
       <div className="document-customer-heading"><h2>{draft.customer}</h2></div>

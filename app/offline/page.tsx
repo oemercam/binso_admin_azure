@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Logo } from "@/components/ui";
 
 export default function Page() {
-  return <main className="auth-page">
+  return <main className="auth-page flow-noir flow-auth">
     <section className="auth-card">
       <Logo/>
       <h1><LocalizedText>{"Keine Verbindung"}</LocalizedText></h1>
