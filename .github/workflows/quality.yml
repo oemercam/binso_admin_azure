@@ -5,7 +5,7 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
-    types: [opened, synchronize, reopened, ready_for_review, converted_to_draft]
+    types: [opened, synchronize, reopened, ready_for_review]
   workflow_dispatch:
     inputs:
       level:
@@ -23,8 +23,10 @@ on:
   release:
     types: [published]
 concurrency:
-  group: quality-${{ github.event_name }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: quality-${{ github.event.pull_request.number || github.ref }}-${{ inputs.release_profile || 'production' }}
+  # PR updates supersede stale checks. Main/manual runs serialize per ref/profile,
+  # so a push cannot cancel a release qualification or run an identical one in parallel.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 permissions:
   contents: read
 env:
@@ -40,6 +42,7 @@ jobs:
       webkit_widths: ${{ steps.scope.outputs.webkit_widths }}
       interactions: ${{ steps.scope.outputs.interactions }}
       browser: ${{ steps.scope.outputs.browser }}
+      browser_matrix: ${{ steps.lanes.outputs.matrix }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -69,6 +72,9 @@ jobs:
             echo "Draft PR: browser validation deferred until ready_for_review; static, security and build checks remain required." >> "$GITHUB_STEP_SUMMARY"
           fi
           cat /tmp/qa-plan.json >> "$GITHUB_STEP_SUMMARY"
+      - name: Plan independent browser lanes
+        id: lanes
+        run: node scripts/quality-browser-plan.mjs /tmp/qa-plan.json
   checks:
     runs-on: ubuntu-24.04
     services:
@@ -91,7 +97,11 @@ jobs:
       - run: pnpm release:check
       - run: pnpm test
       - name: Fast UX compliance contracts
-        run: pnpm ux:compliance:fast
+        # Runtime/rate-limit/demo/navigation contracts already ran in pnpm test.
+        run: |
+          node scripts/compliance/selftest.mjs
+          node scripts/compliance/report-test.mjs
+          node scripts/quality-browser-plan-test.mjs
       - name: Real isolated PostgreSQL parallel process gate
         env:
           BINSO_DB_PARALLEL_TEST_URL: postgres://binso_test:binso_test@127.0.0.1:5432/binso_v213_test
@@ -165,7 +175,8 @@ jobs:
   browser:
     services:
       postgres:
-        image: postgres:16
+        # Responsive fixtures intercept every API; only real authenticated suites need PostgreSQL.
+        image: ${{ matrix.lane == 'functional' && 'postgres:16' || '' }}
         env:
           POSTGRES_USER: binso_test
           POSTGRES_PASSWORD: binso_test
@@ -174,15 +185,15 @@ jobs:
         options: >-
           --health-cmd "pg_isready -U binso_test -d binso_observability_test"
           --health-interval 5s --health-timeout 5s --health-retries 10
-    needs: [plan, checks, build]
+    needs: [plan, build]
     if: needs.plan.outputs.browser == 'true'
     runs-on: ubuntu-24.04
-    # Full UX, real 60-second recovery polling, registration and PWA gates share this job.
+    # Responsive shards and functional suites use separate runners; all gate quality.
     timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
-        engine: [chromium, webkit]
+        include: ${{ fromJSON(needs.plan.outputs.browser_matrix) }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -219,17 +230,19 @@ jobs:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-${{ runner.arch }}-playwright-1.62.1-${{ matrix.engine }}
       - name: Capture owner-supplied UX reference views
-        if: matrix.engine == 'chromium'
+        if: matrix.lane == 'functional' && matrix.engine == 'chromium'
         env:
           BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs
           BINSO_REFERENCE_OUTPUT: ${{ runner.temp }}/binso-ux-${{ matrix.engine }}
         run: node scripts/ux-reference-capture.mjs
       - name: Scroll endpoint measurement adversaries
+        if: matrix.lane == 'functional'
         env:
           BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs
           BINSO_UX_BROWSER: ${{ matrix.engine }}
         run: node scripts/compliance/measure-browser-test.mjs
       - name: Critical timer, draft recovery and report export regression
+        if: matrix.lane == 'functional'
         env:
           BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs
           BINSO_UX_BROWSER: ${{ matrix.engine }}
@@ -247,6 +260,7 @@ jobs:
           BINSO_UX_OUTPUT: ${{ runner.temp }}/binso-ux-${{ matrix.engine }}/critical
         run: node scripts/ux-browser-test.mjs
       - name: Landing and portal localization regression
+        if: matrix.lane == 'functional'
         env:
           BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs
           BINSO_UX_BROWSER: ${{ matrix.engine }}
@@ -254,6 +268,7 @@ jobs:
           BINSO_LOCALIZATION_OUTPUT: ${{ runner.temp }}/binso-ux-${{ matrix.engine }}/localization
         run: node scripts/localization-browser-test.mjs
       - name: Scoped responsive UX and process regression
+        if: matrix.lane == 'responsive'
         env:
           BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs
           BINSO_AXE_MODULE: ${{ runner.temp }}/binso-browser/node_modules/axe-core/axe.min.js
@@ -263,6 +278,8 @@ jobs:
           BINSO_UX_ROUTES: ${{ matrix.engine == 'webkit' && needs.plan.outputs.webkit_routes || needs.plan.outputs.routes }}
           BINSO_UX_WIDTHS: ${{ matrix.engine == 'webkit' && needs.plan.outputs.webkit_widths || needs.plan.outputs.widths }}
           BINSO_UX_INTERACTIONS: ${{ needs.plan.outputs.interactions }}
+          BINSO_UX_CI_SHARD: ${{ matrix.shard }}
+          BINSO_UX_CI_SHARDS: ${{ matrix.shards }}
           BINSO_UX_SCREENSHOTS: ${{ needs.plan.outputs.level == 'full' && '1' || '0' }}
           BINSO_UX_DOM_EVIDENCE: ${{ needs.plan.outputs.level == 'full' && '1' || '0' }}
           BINSO_UX_CAPTURE_ALL: ${{ needs.plan.outputs.level == 'full' && '1' || '0' }}
@@ -271,7 +288,7 @@ jobs:
           BINSO_UX_SERVER_FILE: ${{ runner.temp }}/binso-candidate/server.js
         run: node scripts/browser-shards.mjs
       - name: Deterministic synthetic data and role variants
-        if: matrix.engine == 'chromium' && needs.plan.outputs.level == 'full'
+        if: matrix.lane == 'functional' && matrix.engine == 'chromium' && needs.plan.outputs.level == 'full'
         env:
           BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs
           BINSO_UX_SERVER_FILE: ${{ runner.temp }}/binso-candidate/server.js
@@ -296,6 +313,7 @@ jobs:
             INDEX=$((INDEX + 1))
           done
       - name: Authenticated observability and wallboard regression
+        if: matrix.lane == 'functional'
         env:
           BINSO_OBSERVABILITY_TEST_URL: postgres://binso_test:binso_test@127.0.0.1:5432/binso_observability_test
           BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs
@@ -304,6 +322,7 @@ jobs:
           BINSO_UX_SERVER_FILE: ${{ runner.temp }}/binso-candidate/server.js
         run: node scripts/observability-browser-test.mjs
       - name: Guided registration, languages and responsive regression
+        if: matrix.lane == 'functional'
         env:
           BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs
           BINSO_AXE_MODULE: ${{ runner.temp }}/binso-browser/node_modules/axe-core/axe.min.js
@@ -313,18 +332,19 @@ jobs:
           BINSO_UX_SERVER_FILE: ${{ runner.temp }}/binso-candidate/server.js
         run: node scripts/registration-browser-test.mjs
       - name: Development-only shared component reference regression
-        if: matrix.engine == 'chromium' && needs.plan.outputs.level == 'full'
+        if: matrix.lane == 'functional' && matrix.engine == 'chromium' && needs.plan.outputs.level == 'full'
         env:
           BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs
           BINSO_LAB_OUTPUT: ${{ runner.temp }}/binso-ux-${{ matrix.engine }}/lab
         run: pnpm ux:lab
       - name: FULL PWA restart and offline regression
-        if: matrix.engine == 'chromium' && needs.plan.outputs.level == 'full'
+        if: matrix.lane == 'functional' && matrix.engine == 'chromium' && needs.plan.outputs.level == 'full'
         env:
           BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs
           BINSO_UX_SERVER_FILE: ${{ runner.temp }}/binso-candidate/server.js
         run: node scripts/pwa-browser-test.mjs
       - name: Startup, session and persistent navigation regression
+        if: matrix.lane == 'functional'
         env:
           BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs
           BINSO_UX_BROWSER: ${{ matrix.engine }}
@@ -335,7 +355,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: ux-browser-${{ matrix.engine }}-${{ github.sha }}
+          name: ux-browser-${{ matrix.engine }}-${{ matrix.lane }}-${{ matrix.shard }}-${{ github.sha }}
           path: ${{ runner.temp }}/binso-ux-${{ matrix.engine }}
           if-no-files-found: warn
           retention-days: 7

@@ -16,6 +16,12 @@ export async function runShards({routes,interactions,count,env=process.env,comma
 if(process.argv[1]===fileURLToPath(import.meta.url)){
  const routes=(process.env.BINSO_UX_ROUTES??'').split(',').filter(Boolean),interactions=(process.env.BINSO_UX_INTERACTIONS??'').split(',').filter(Boolean);
  if(!routes.length)throw new Error('Explicit browser route scope is required');
- const count=process.env.BINSO_UX_BROWSER==='chromium'&&routes.length>=30?2:1;
- await runShards({routes,interactions,count});
+ const total=Number(process.env.BINSO_UX_CI_SHARDS??1),index=Number(process.env.BINSO_UX_CI_SHARD??0);
+ if(!Number.isInteger(total)||total<1||total>3||!Number.isInteger(index)||index<0||index>=total)throw Error('Invalid CI browser shard');
+ const selectedRoutes=partition(routes,total)[index],selectedInteractions=partition(interactions,total)[index];
+ if(!selectedRoutes.length)throw Error('Empty CI browser shard would silently expand to default routes');
+ // One browser and server per runner. Cross-runner partitioning avoids CPU contention
+ // and keeps all widths/themes and every interaction exactly once per engine.
+ const count=total>1?1:process.env.BINSO_UX_BROWSER==='chromium'&&routes.length>=30?2:1;
+ await runShards({routes:selectedRoutes,interactions:selectedInteractions,count});
 }
