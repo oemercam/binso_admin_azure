@@ -23,6 +23,12 @@ components. They are not silently classified as original-approved screens.
   as unavailable rather than inventing values.
 - Public product screenshots embedded the preceding interface. Replace the twelve
   images with actual isolated browser captures and content-addressed URLs.
+- Nested portal sheets now consume only their own input and dismissal events.
+  Cancelling a position must not dismiss its parent document draft.
+- Payment source hydration preserves already typed amounts and dirty notes. Error
+  feedback persists until another attempt; old timeout callbacks cannot erase a
+  newer failed/lost-response result. The delayed-lookup and cross-tab ledger tests
+  verify these cases without production writes.
 
 ## Rendered evidence
 

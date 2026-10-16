@@ -41,11 +41,12 @@ export function PaymentForm() {
   const [idempotencyKey,setIdempotencyKey]=useState("");
   const [invoiceId,setInvoiceId]=useState("");
   const [note,setNote]=useState("");
+  const initialFields=useRef({date,method,note});
   const {dirty,markPristine}=useDirtySnapshot([invoiceId,date,amount,method,note]);
   const production=useBackendMode();
   const {data:invoiceData,error:invoiceError,loading:invoicesLoading}=useApiQuery<{items:Array<{id:string;number:string;total:number;paid_amount:number;currency?:string;status:string;customer?:{name?:string}}> }>(production?"/api/documents?kind=invoice":"/api/demo/data?collection=documents&kind=invoice");
   const availableInvoices=useMemo(()=>invoiceData?.items.filter(item=>!["draft","cancelled","paid"].includes(item.status)&&openAmount(item)>0)??[],[invoiceData]);
-  useEffect(()=>{if(!sourceInvoice||invoiceId)return;const item=availableInvoices.find(row=>row.number===sourceInvoice);if(item)queueMicrotask(()=>{setInvoiceId(item.id);setAmount(String(openAmount(item)));markPristine([item.id,date,String(openAmount(item)),method,note]);});},[sourceInvoice,availableInvoices,invoiceId,date,method,note,markPristine]);
+  useEffect(()=>{if(!sourceInvoice||invoiceId)return;const item=availableInvoices.find(row=>row.number===sourceInvoice);if(item)queueMicrotask(()=>{setInvoiceId(item.id);setAmount(current=>current||String(openAmount(item)));markPristine([item.id,initialFields.current.date,String(openAmount(item)),initialFields.current.method,initialFields.current.note]);});},[sourceInvoice,availableInvoices,invoiceId,markPristine]);
   const selectedInvoice=availableInvoices.find(item=>item.id===invoiceId);
   const returnTo=sourceInvoice?"/rechnungen/"+encodeURIComponent(sourceInvoice):safeAppPath(searchParams.get("returnTo"),"/zahlungen");
 
@@ -54,10 +55,9 @@ export function PaymentForm() {
     const value=Number(amount.replace(",","."));
     if(!selectedInvoice||!Number.isFinite(value)||value<=0||value>openAmount(selectedInvoice)){
       setToast("Bitte einen gültigen Betrag erfassen.");
-      window.setTimeout(()=>setToast(null),2200);
       return;
     }
-    savePending.current=true;setSaving(true);
+    savePending.current=true;setSaving(true);setToast(null);
     try{
       if(isProductionBackendEnabled()){
         const key=idempotencyKey||window.crypto.randomUUID();
@@ -74,7 +74,6 @@ export function PaymentForm() {
     }catch(error){
       savePending.current=false;setSaving(false);
       setToast(error instanceof Error?error.message:"Zahlung konnte nicht gespeichert werden.");
-      window.setTimeout(()=>setToast(null),2600);
     }
   };
   const close=()=>{allowDraftNavigation();router.push(returnTo)};
