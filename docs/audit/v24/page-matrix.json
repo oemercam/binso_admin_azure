@@ -1,4 +1,5 @@
 {
+  "commit": "db3f377884ee5ba1bd21beaad6fb4b8c843f1d8a",
   "method": "Existing TypeScript AST dependency inventory; conditional reachability is not runtime proof",
   "pages": [
     {
@@ -25,28 +26,48 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
       "dimensions": {
@@ -114,16 +135,18 @@
         "components/documents.tsx#useDocumentTotals",
         "components/ui.tsx#IconButton",
         "components/ui.tsx#Icon",
+        "components/ui.tsx#Button",
+        "components/ui.tsx#dismissActionLabels",
+        "components/ui.tsx#actionSourceText",
         "components/use-browser-back-guard.ts#allowDraftNavigation",
         "components/use-browser-back-guard.ts#boundary",
         "components/ui.tsx#Toast",
         "components/ui.tsx#ErrorState",
-        "components/ui.tsx#Button",
-        "components/ui.tsx#dismissActionLabels",
-        "components/ui.tsx#actionSourceText",
         "components/ui.tsx#LoadingState",
         "components/ui.tsx#EmptyState",
         "components/documents.tsx#DocumentReadView",
+        "components/ui.tsx#Status",
+        "components/binso-ux.tsx#DetailFacts",
         "components/documents.tsx#isoToSwiss",
         "components/documents.tsx#money",
         "components/binso-ux.tsx#MetricTiles",
@@ -135,7 +158,6 @@
         "components/ui.tsx#Input",
         "components/records.tsx#RecordRow",
         "components/binso-ux.tsx#ListRow",
-        "components/ui.tsx#Status",
         "components/avatar.tsx#Avatar",
         "components/avatar.tsx#avatarIdentity",
         "components/records.tsx#tone",
@@ -215,54 +237,84 @@
       "roles": "sales:read",
       "actions": [
         {
+          "tag": "FormSheet",
+          "line": 405,
+          "component": "components/documents.tsx#DocumentPage"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 398,
+          "line": 407,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 410,
+          "line": 423,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 411,
+          "line": 424,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
-          "tag": "ConfirmDialog",
-          "line": 331,
-          "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "ConfirmDialog",
-          "line": 332,
-          "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
           "tag": "ActionSheet",
-          "line": 387,
-          "component": "components/app-shell.tsx#AppShellFrame"
+          "line": 52,
+          "component": "components/binso-ux.tsx#ContextActions"
         },
         {
           "tag": "Sheet",
-          "line": 164,
+          "line": 187,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "FormSheet",
-          "line": 551,
+          "line": 560,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Sheet",
-          "line": 165,
+          "line": 188,
           "component": "components/binso-ux.tsx#FormSheet"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 312,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 313,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
+          "tag": "ActionSheet",
+          "line": 370,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "Sheet",
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         }
       ],
       "dimensions": {
@@ -330,16 +382,18 @@
         "components/documents.tsx#useDocumentTotals",
         "components/ui.tsx#IconButton",
         "components/ui.tsx#Icon",
+        "components/ui.tsx#Button",
+        "components/ui.tsx#dismissActionLabels",
+        "components/ui.tsx#actionSourceText",
         "components/use-browser-back-guard.ts#allowDraftNavigation",
         "components/use-browser-back-guard.ts#boundary",
         "components/ui.tsx#Toast",
         "components/ui.tsx#ErrorState",
-        "components/ui.tsx#Button",
-        "components/ui.tsx#dismissActionLabels",
-        "components/ui.tsx#actionSourceText",
         "components/ui.tsx#LoadingState",
         "components/ui.tsx#EmptyState",
         "components/documents.tsx#DocumentReadView",
+        "components/ui.tsx#Status",
+        "components/binso-ux.tsx#DetailFacts",
         "components/documents.tsx#isoToSwiss",
         "components/documents.tsx#money",
         "components/binso-ux.tsx#MetricTiles",
@@ -351,7 +405,6 @@
         "components/ui.tsx#Input",
         "components/records.tsx#RecordRow",
         "components/binso-ux.tsx#ListRow",
-        "components/ui.tsx#Status",
         "components/avatar.tsx#Avatar",
         "components/avatar.tsx#avatarIdentity",
         "components/records.tsx#tone",
@@ -431,54 +484,84 @@
       "roles": "sales:read",
       "actions": [
         {
+          "tag": "FormSheet",
+          "line": 405,
+          "component": "components/documents.tsx#DocumentPage"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 398,
+          "line": 407,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 410,
+          "line": 423,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 411,
+          "line": 424,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
-          "tag": "ConfirmDialog",
-          "line": 331,
-          "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "ConfirmDialog",
-          "line": 332,
-          "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
           "tag": "ActionSheet",
-          "line": 387,
-          "component": "components/app-shell.tsx#AppShellFrame"
+          "line": 52,
+          "component": "components/binso-ux.tsx#ContextActions"
         },
         {
           "tag": "Sheet",
-          "line": 164,
+          "line": 187,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "FormSheet",
-          "line": 551,
+          "line": 560,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Sheet",
-          "line": 165,
+          "line": 188,
           "component": "components/binso-ux.tsx#FormSheet"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 312,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 313,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
+          "tag": "ActionSheet",
+          "line": 370,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "Sheet",
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         }
       ],
       "dimensions": {
@@ -626,28 +709,18 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
-        },
-        {
-          "tag": "ConfirmDialog",
-          "line": 162,
-          "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "ListSearch",
@@ -666,8 +739,18 @@
         },
         {
           "tag": "Sheet",
-          "line": 166,
+          "line": 189,
           "component": "components/binso-ux.tsx#FilterSheet"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 185,
+          "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
       "dimensions": {
@@ -732,28 +815,48 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
       "dimensions": {
@@ -897,38 +1000,18 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
-        },
-        {
-          "tag": "ConfirmDialog",
-          "line": 162,
-          "component": "components/binso-ux.tsx#Sheet"
-        },
-        {
-          "tag": "FilterSheet",
-          "line": 68,
-          "component": "components/statistics.tsx#Statistics"
-        },
-        {
-          "tag": "Sheet",
-          "line": 166,
-          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ListSearch",
@@ -944,6 +1027,21 @@
           "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "Sheet",
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 185,
+          "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
       "dimensions": {
@@ -1078,28 +1176,48 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
       "dimensions": {
@@ -1241,33 +1359,48 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 166,
-          "component": "components/binso-ux.tsx#FilterSheet"
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
       "dimensions": {
@@ -1412,43 +1545,53 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
-          "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
-        },
-        {
-          "tag": "ConfirmDialog",
-          "line": 162,
-          "component": "components/binso-ux.tsx#Sheet"
-        },
-        {
-          "tag": "ActionSheet",
-          "line": 53,
-          "component": "components/binso-ux.tsx#QuickCreateAction"
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
-          "line": 68,
-          "component": "components/statistics.tsx#Statistics"
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "Sheet",
-          "line": 166,
+          "line": 189,
           "component": "components/binso-ux.tsx#FilterSheet"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 185,
+          "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
+        },
+        {
+          "tag": "ActionSheet",
+          "line": 62,
+          "component": "components/binso-ux.tsx#QuickCreateAction"
         }
       ],
       "dimensions": {
@@ -1513,28 +1656,48 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
       "dimensions": {
@@ -1594,28 +1757,48 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
       "dimensions": {
@@ -1786,37 +1969,37 @@
         },
         {
           "tag": "Sheet",
-          "line": 166,
+          "line": 189,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 164,
+          "line": 187,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
           "tag": "Sheet",
-          "line": 165,
+          "line": 188,
           "component": "components/binso-ux.tsx#FormSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         }
       ],
@@ -1904,28 +2087,48 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
       "dimensions": {
@@ -2069,42 +2272,62 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 279,
+          "line": 280,
           "component": "components/pages/settings.tsx#SubscriptionSettingsPage"
         },
         {
           "tag": "FormSheet",
-          "line": 319,
+          "line": 320,
           "component": "components/pages/settings.tsx#SubscriptionSettingsPage"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 165,
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 188,
           "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
@@ -2238,28 +2461,48 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
       "dimensions": {
@@ -2394,28 +2637,48 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
       "dimensions": {
@@ -2553,28 +2816,48 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
       "dimensions": {
@@ -2707,28 +2990,48 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
       "dimensions": {
@@ -2861,37 +3164,57 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 169,
+          "line": 170,
           "component": "components/pages/settings.tsx#CompanySettingsPage"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 165,
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 188,
           "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
@@ -3024,28 +3347,48 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
       "dimensions": {
@@ -3178,28 +3521,48 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
       "dimensions": {
@@ -3341,28 +3704,48 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
       "dimensions": {
@@ -3495,28 +3878,48 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
       "dimensions": {
@@ -3643,6 +4046,7 @@
         "components/binso-ux.tsx#ActionSheet",
         "components/app-shell.tsx#ShellRegistration",
         "components/app-shell.tsx#ShellConfiguration",
+        "components/binso-ux.tsx#CreateAction",
         "components/team-settings.tsx#roleLabel",
         "components/binso-ux.tsx#FormSheet"
       ],
@@ -3669,32 +4073,52 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 165,
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 188,
           "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
@@ -3828,28 +4252,48 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
       "dimensions": {
@@ -3908,28 +4352,48 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
       "dimensions": {
@@ -4073,38 +4537,53 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
           "tag": "FilterSheet",
           "line": 68,
           "component": "components/statistics.tsx#Statistics"
-        },
-        {
-          "tag": "Sheet",
-          "line": 166,
-          "component": "components/binso-ux.tsx#FilterSheet"
         }
       ],
       "dimensions": {
@@ -4247,38 +4726,18 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
-        },
-        {
-          "tag": "ConfirmDialog",
-          "line": 162,
-          "component": "components/binso-ux.tsx#Sheet"
-        },
-        {
-          "tag": "FilterSheet",
-          "line": 68,
-          "component": "components/statistics.tsx#Statistics"
-        },
-        {
-          "tag": "Sheet",
-          "line": 166,
-          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ListSearch",
@@ -4294,6 +4753,21 @@
           "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "Sheet",
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 185,
+          "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
       "dimensions": {
@@ -4358,28 +4832,48 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
       "dimensions": {
@@ -4515,37 +5009,57 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 219,
+          "line": 227,
           "component": "components/pages/customers.tsx#CustomerForm"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 165,
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 188,
           "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
@@ -4710,58 +5224,38 @@
       "actions": [
         {
           "tag": "ActionSheet",
-          "line": 145,
+          "line": 153,
           "component": "components/pages/customers.tsx#CustomerDetail"
         },
         {
           "tag": "ActionSheet",
-          "line": 146,
+          "line": 154,
           "component": "components/pages/customers.tsx#CustomerDetail"
         },
         {
           "tag": "FormSheet",
-          "line": 147,
+          "line": 155,
           "component": "components/pages/customers.tsx#CustomerDetail"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 148,
+          "line": 156,
           "component": "components/pages/customers.tsx#CustomerDetail"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
-        },
-        {
-          "tag": "ConfirmDialog",
-          "line": 162,
-          "component": "components/binso-ux.tsx#Sheet"
-        },
-        {
-          "tag": "FilterSheet",
-          "line": 68,
-          "component": "components/statistics.tsx#Statistics"
-        },
-        {
-          "tag": "Sheet",
-          "line": 166,
-          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ListSearch",
@@ -4780,7 +5274,27 @@
         },
         {
           "tag": "Sheet",
-          "line": 165,
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 185,
+          "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 68,
+          "component": "components/statistics.tsx#Statistics"
+        },
+        {
+          "tag": "Sheet",
+          "line": 188,
           "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
@@ -4917,37 +5431,57 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 219,
+          "line": 227,
           "component": "components/pages/customers.tsx#CustomerForm"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 165,
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 188,
           "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
@@ -5106,28 +5640,18 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
-        },
-        {
-          "tag": "ConfirmDialog",
-          "line": 162,
-          "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "ListSearch",
@@ -5146,8 +5670,18 @@
         },
         {
           "tag": "Sheet",
-          "line": 166,
+          "line": 189,
           "component": "components/binso-ux.tsx#FilterSheet"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 185,
+          "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
       "dimensions": {
@@ -5219,28 +5753,48 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
       "dimensions": {
@@ -5387,43 +5941,68 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 175,
+          "line": 176,
           "component": "components/pages/employees.tsx#EmployeeForm"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 171,
+          "line": 194,
           "component": "components/binso-ux.tsx#ActionsMenu"
         },
         {
           "tag": "Sheet",
-          "line": 165,
+          "line": 188,
           "component": "components/binso-ux.tsx#FormSheet"
+        },
+        {
+          "tag": "ActionSheet",
+          "line": 52,
+          "component": "components/binso-ux.tsx#ContextActions"
         }
       ],
       "dimensions": {
@@ -5570,43 +6149,68 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 175,
+          "line": 176,
           "component": "components/pages/employees.tsx#EmployeeForm"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 171,
+          "line": 194,
           "component": "components/binso-ux.tsx#ActionsMenu"
         },
         {
           "tag": "Sheet",
-          "line": 165,
+          "line": 188,
           "component": "components/binso-ux.tsx#FormSheet"
+        },
+        {
+          "tag": "ActionSheet",
+          "line": 52,
+          "component": "components/binso-ux.tsx#ContextActions"
         }
       ],
       "dimensions": {
@@ -5756,28 +6360,18 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
-        },
-        {
-          "tag": "ConfirmDialog",
-          "line": 162,
-          "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "ListSearch",
@@ -5796,8 +6390,18 @@
         },
         {
           "tag": "Sheet",
-          "line": 166,
+          "line": 189,
           "component": "components/binso-ux.tsx#FilterSheet"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 185,
+          "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
       "dimensions": {
@@ -5852,28 +6456,48 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
       "dimensions": {
@@ -6046,17 +6670,17 @@
       "actions": [
         {
           "tag": "ActionSheet",
-          "line": 178,
+          "line": 177,
           "component": "components/operator.tsx#OperatorPage"
         },
         {
           "tag": "Sheet",
-          "line": 164,
+          "line": 187,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
@@ -6076,32 +6700,32 @@
         },
         {
           "tag": "Sheet",
-          "line": 166,
+          "line": 189,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "FilterSheet",
-          "line": 445,
+          "line": 425,
           "component": "components/operator.tsx#OperatorFinanceView"
         },
         {
           "tag": "FormSheet",
-          "line": 535,
+          "line": 510,
           "component": "components/operator.tsx#SubscriptionsView"
         },
         {
           "tag": "Sheet",
-          "line": 165,
+          "line": 188,
           "component": "components/binso-ux.tsx#FormSheet"
         },
         {
           "tag": "FormSheet",
-          "line": 592,
+          "line": 567,
           "component": "components/operator.tsx#RestrictionsView"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 605,
+          "line": 580,
           "component": "components/operator.tsx#RestrictionsView"
         },
         {
@@ -6121,22 +6745,22 @@
         },
         {
           "tag": "FormSheet",
-          "line": 662,
+          "line": 637,
           "component": "components/operator.tsx#AnnouncementsView"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         }
       ],
@@ -6198,28 +6822,48 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
       "dimensions": {
@@ -6392,17 +7036,17 @@
       "actions": [
         {
           "tag": "ActionSheet",
-          "line": 178,
+          "line": 177,
           "component": "components/operator.tsx#OperatorPage"
         },
         {
           "tag": "Sheet",
-          "line": 164,
+          "line": 187,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
@@ -6422,32 +7066,32 @@
         },
         {
           "tag": "Sheet",
-          "line": 166,
+          "line": 189,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "FilterSheet",
-          "line": 445,
+          "line": 425,
           "component": "components/operator.tsx#OperatorFinanceView"
         },
         {
           "tag": "FormSheet",
-          "line": 535,
+          "line": 510,
           "component": "components/operator.tsx#SubscriptionsView"
         },
         {
           "tag": "Sheet",
-          "line": 165,
+          "line": 188,
           "component": "components/binso-ux.tsx#FormSheet"
         },
         {
           "tag": "FormSheet",
-          "line": 592,
+          "line": 567,
           "component": "components/operator.tsx#RestrictionsView"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 605,
+          "line": 580,
           "component": "components/operator.tsx#RestrictionsView"
         },
         {
@@ -6467,22 +7111,22 @@
         },
         {
           "tag": "FormSheet",
-          "line": 662,
+          "line": 637,
           "component": "components/operator.tsx#AnnouncementsView"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         }
       ],
@@ -6590,32 +7234,52 @@
         },
         {
           "tag": "Sheet",
-          "line": 165,
+          "line": 188,
           "component": "components/binso-ux.tsx#FormSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
           "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
@@ -6686,28 +7350,48 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
       "dimensions": {
@@ -6779,28 +7463,48 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
       "dimensions": {
@@ -6889,28 +7593,48 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
       "dimensions": {
@@ -6964,28 +7688,48 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
       "dimensions": {
@@ -7039,28 +7783,48 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
       "dimensions": {
@@ -7114,28 +7878,48 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
       "dimensions": {
@@ -7200,28 +7984,48 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
       "dimensions": {
@@ -7365,43 +8169,53 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
-          "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
-        },
-        {
-          "tag": "ConfirmDialog",
-          "line": 162,
-          "component": "components/binso-ux.tsx#Sheet"
-        },
-        {
-          "tag": "ActionSheet",
-          "line": 53,
-          "component": "components/binso-ux.tsx#QuickCreateAction"
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
-          "line": 68,
-          "component": "components/statistics.tsx#Statistics"
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "Sheet",
-          "line": 166,
+          "line": 189,
           "component": "components/binso-ux.tsx#FilterSheet"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 185,
+          "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
+        },
+        {
+          "tag": "ActionSheet",
+          "line": 62,
+          "component": "components/binso-ux.tsx#QuickCreateAction"
         }
       ],
       "dimensions": {
@@ -7548,28 +8362,18 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
-        },
-        {
-          "tag": "ConfirmDialog",
-          "line": 162,
-          "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "ListSearch",
@@ -7588,8 +8392,18 @@
         },
         {
           "tag": "Sheet",
-          "line": 166,
+          "line": 189,
           "component": "components/binso-ux.tsx#FilterSheet"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 185,
+          "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
       "dimensions": {
@@ -7750,37 +8564,52 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 166,
-          "component": "components/binso-ux.tsx#FilterSheet"
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
           "tag": "Sheet",
-          "line": 165,
+          "line": 188,
           "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
@@ -7849,28 +8678,48 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
       "dimensions": {
@@ -8008,43 +8857,68 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 115,
+          "line": 116,
           "component": "components/pages/products.tsx#ProductForm"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 171,
+          "line": 194,
           "component": "components/binso-ux.tsx#ActionsMenu"
         },
         {
           "tag": "Sheet",
-          "line": 165,
+          "line": 188,
           "component": "components/binso-ux.tsx#FormSheet"
+        },
+        {
+          "tag": "ActionSheet",
+          "line": 52,
+          "component": "components/binso-ux.tsx#ContextActions"
         }
       ],
       "dimensions": {
@@ -8182,43 +9056,68 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 115,
+          "line": 116,
           "component": "components/pages/products.tsx#ProductForm"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 171,
+          "line": 194,
           "component": "components/binso-ux.tsx#ActionsMenu"
         },
         {
           "tag": "Sheet",
-          "line": 165,
+          "line": 188,
           "component": "components/binso-ux.tsx#FormSheet"
+        },
+        {
+          "tag": "ActionSheet",
+          "line": 52,
+          "component": "components/binso-ux.tsx#ContextActions"
         }
       ],
       "dimensions": {
@@ -8368,28 +9267,18 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
-        },
-        {
-          "tag": "ConfirmDialog",
-          "line": 162,
-          "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "ListSearch",
@@ -8408,8 +9297,18 @@
         },
         {
           "tag": "Sheet",
-          "line": 166,
+          "line": 189,
           "component": "components/binso-ux.tsx#FilterSheet"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 185,
+          "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
       "dimensions": {
@@ -8558,37 +9457,57 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 171,
+          "line": 194,
           "component": "components/binso-ux.tsx#ActionsMenu"
         },
         {
           "tag": "Sheet",
-          "line": 165,
+          "line": 188,
           "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
@@ -8730,32 +9649,52 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 165,
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 188,
           "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
@@ -8901,28 +9840,18 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
-        },
-        {
-          "tag": "ConfirmDialog",
-          "line": 162,
-          "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "ListSearch",
@@ -8941,8 +9870,18 @@
         },
         {
           "tag": "Sheet",
-          "line": 166,
+          "line": 189,
           "component": "components/binso-ux.tsx#FilterSheet"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 185,
+          "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
       "dimensions": {
@@ -9010,16 +9949,18 @@
         "components/documents.tsx#useDocumentTotals",
         "components/ui.tsx#IconButton",
         "components/ui.tsx#Icon",
+        "components/ui.tsx#Button",
+        "components/ui.tsx#dismissActionLabels",
+        "components/ui.tsx#actionSourceText",
         "components/use-browser-back-guard.ts#allowDraftNavigation",
         "components/use-browser-back-guard.ts#boundary",
         "components/ui.tsx#Toast",
         "components/ui.tsx#ErrorState",
-        "components/ui.tsx#Button",
-        "components/ui.tsx#dismissActionLabels",
-        "components/ui.tsx#actionSourceText",
         "components/ui.tsx#LoadingState",
         "components/ui.tsx#EmptyState",
         "components/documents.tsx#DocumentReadView",
+        "components/ui.tsx#Status",
+        "components/binso-ux.tsx#DetailFacts",
         "components/documents.tsx#isoToSwiss",
         "components/documents.tsx#money",
         "components/binso-ux.tsx#MetricTiles",
@@ -9031,7 +9972,6 @@
         "components/ui.tsx#Input",
         "components/records.tsx#RecordRow",
         "components/binso-ux.tsx#ListRow",
-        "components/ui.tsx#Status",
         "components/avatar.tsx#Avatar",
         "components/avatar.tsx#avatarIdentity",
         "components/records.tsx#tone",
@@ -9111,54 +10051,84 @@
       "roles": "invoices:read",
       "actions": [
         {
+          "tag": "FormSheet",
+          "line": 405,
+          "component": "components/documents.tsx#DocumentPage"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 398,
+          "line": 407,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 410,
+          "line": 423,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 411,
+          "line": 424,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
-          "tag": "ConfirmDialog",
-          "line": 331,
-          "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "ConfirmDialog",
-          "line": 332,
-          "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
           "tag": "ActionSheet",
-          "line": 387,
-          "component": "components/app-shell.tsx#AppShellFrame"
+          "line": 52,
+          "component": "components/binso-ux.tsx#ContextActions"
         },
         {
           "tag": "Sheet",
-          "line": 164,
+          "line": 187,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "FormSheet",
-          "line": 551,
+          "line": 560,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Sheet",
-          "line": 165,
+          "line": 188,
           "component": "components/binso-ux.tsx#FormSheet"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 312,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 313,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
+          "tag": "ActionSheet",
+          "line": 370,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "Sheet",
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         }
       ],
       "dimensions": {
@@ -9226,16 +10196,18 @@
         "components/documents.tsx#useDocumentTotals",
         "components/ui.tsx#IconButton",
         "components/ui.tsx#Icon",
+        "components/ui.tsx#Button",
+        "components/ui.tsx#dismissActionLabels",
+        "components/ui.tsx#actionSourceText",
         "components/use-browser-back-guard.ts#allowDraftNavigation",
         "components/use-browser-back-guard.ts#boundary",
         "components/ui.tsx#Toast",
         "components/ui.tsx#ErrorState",
-        "components/ui.tsx#Button",
-        "components/ui.tsx#dismissActionLabels",
-        "components/ui.tsx#actionSourceText",
         "components/ui.tsx#LoadingState",
         "components/ui.tsx#EmptyState",
         "components/documents.tsx#DocumentReadView",
+        "components/ui.tsx#Status",
+        "components/binso-ux.tsx#DetailFacts",
         "components/documents.tsx#isoToSwiss",
         "components/documents.tsx#money",
         "components/binso-ux.tsx#MetricTiles",
@@ -9247,7 +10219,6 @@
         "components/ui.tsx#Input",
         "components/records.tsx#RecordRow",
         "components/binso-ux.tsx#ListRow",
-        "components/ui.tsx#Status",
         "components/avatar.tsx#Avatar",
         "components/avatar.tsx#avatarIdentity",
         "components/records.tsx#tone",
@@ -9327,54 +10298,84 @@
       "roles": "invoices:read",
       "actions": [
         {
+          "tag": "FormSheet",
+          "line": 405,
+          "component": "components/documents.tsx#DocumentPage"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 398,
+          "line": 407,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 410,
+          "line": 423,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 411,
+          "line": 424,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
-          "tag": "ConfirmDialog",
-          "line": 331,
-          "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "ConfirmDialog",
-          "line": 332,
-          "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
           "tag": "ActionSheet",
-          "line": 387,
-          "component": "components/app-shell.tsx#AppShellFrame"
+          "line": 52,
+          "component": "components/binso-ux.tsx#ContextActions"
         },
         {
           "tag": "Sheet",
-          "line": 164,
+          "line": 187,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "FormSheet",
-          "line": 551,
+          "line": 560,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Sheet",
-          "line": 165,
+          "line": 188,
           "component": "components/binso-ux.tsx#FormSheet"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 312,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 313,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
+          "tag": "ActionSheet",
+          "line": 370,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "Sheet",
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         }
       ],
       "dimensions": {
@@ -9522,28 +10523,18 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
-        },
-        {
-          "tag": "ConfirmDialog",
-          "line": 162,
-          "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "ListSearch",
@@ -9562,8 +10553,18 @@
         },
         {
           "tag": "Sheet",
-          "line": 166,
+          "line": 189,
           "component": "components/binso-ux.tsx#FilterSheet"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 185,
+          "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
       "dimensions": {
@@ -9666,32 +10667,52 @@
         },
         {
           "tag": "Sheet",
-          "line": 165,
+          "line": 188,
           "component": "components/binso-ux.tsx#FormSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
           "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
@@ -9827,37 +10848,67 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 181,
+          "line": 187,
+          "component": "components/pages/expenses.tsx#ExpenseForm"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 188,
           "component": "components/pages/expenses.tsx#ExpenseForm"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 165,
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
+        },
+        {
+          "tag": "ActionSheet",
+          "line": 52,
+          "component": "components/binso-ux.tsx#ContextActions"
+        },
+        {
+          "tag": "Sheet",
+          "line": 188,
           "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
@@ -9993,37 +11044,67 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 181,
+          "line": 187,
+          "component": "components/pages/expenses.tsx#ExpenseForm"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 188,
           "component": "components/pages/expenses.tsx#ExpenseForm"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 165,
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
+        },
+        {
+          "tag": "ActionSheet",
+          "line": 52,
+          "component": "components/binso-ux.tsx#ContextActions"
+        },
+        {
+          "tag": "Sheet",
+          "line": 188,
           "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
@@ -10174,28 +11255,18 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
-        },
-        {
-          "tag": "ConfirmDialog",
-          "line": 162,
-          "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "ListSearch",
@@ -10214,8 +11285,18 @@
         },
         {
           "tag": "Sheet",
-          "line": 166,
+          "line": 189,
           "component": "components/binso-ux.tsx#FilterSheet"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 185,
+          "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
       "dimensions": {
@@ -10352,33 +11433,58 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 171,
+          "line": 194,
           "component": "components/binso-ux.tsx#ActionsMenu"
+        },
+        {
+          "tag": "ActionSheet",
+          "line": 52,
+          "component": "components/binso-ux.tsx#ContextActions"
         }
       ],
       "dimensions": {
@@ -10513,37 +11619,57 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 102,
+          "line": 103,
           "component": "components/pages/support.tsx#SupportTicketForm"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 165,
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 188,
           "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
@@ -10687,28 +11813,18 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
-        },
-        {
-          "tag": "ConfirmDialog",
-          "line": 162,
-          "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "ListSearch",
@@ -10727,8 +11843,18 @@
         },
         {
           "tag": "Sheet",
-          "line": 166,
+          "line": 189,
           "component": "components/binso-ux.tsx#FilterSheet"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 185,
+          "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
       "dimensions": {
@@ -10793,28 +11919,48 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
       "dimensions": {
@@ -10873,28 +12019,48 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
       "dimensions": {
@@ -10948,28 +12114,48 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
       "dimensions": {
@@ -11105,28 +12291,53 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
+        },
+        {
+          "tag": "ActionSheet",
+          "line": 52,
+          "component": "components/binso-ux.tsx#ContextActions"
         }
       ],
       "dimensions": {
@@ -11259,29 +12470,59 @@
       "roles": "payments:read",
       "actions": [
         {
+          "tag": "FormSheet",
+          "line": 81,
+          "component": "components/pages/payments.tsx#PaymentForm"
+        },
+        {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 188,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -11432,28 +12673,18 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
-        },
-        {
-          "tag": "ConfirmDialog",
-          "line": 162,
-          "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "ListSearch",
@@ -11472,8 +12703,18 @@
         },
         {
           "tag": "Sheet",
-          "line": 166,
+          "line": 189,
           "component": "components/binso-ux.tsx#FilterSheet"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 185,
+          "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         }
       ],
       "dimensions": {
@@ -11635,37 +12876,52 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 331,
+          "line": 312,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 332,
+          "line": 313,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 387,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ListSearch",
+          "line": 105,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 106,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
-          "line": 164,
-          "component": "components/binso-ux.tsx#ActionSheet"
+          "line": 189,
+          "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 185,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 166,
-          "component": "components/binso-ux.tsx#FilterSheet"
+          "line": 187,
+          "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
           "tag": "Sheet",
-          "line": 165,
+          "line": 188,
           "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
@@ -11771,8 +13027,5 @@
       "file": "app/not-found.tsx",
       "status": "nicht geprüft"
     }
-  ],
-  "date": "2026-10-16",
-  "referenceArchiveSha256": "6c53321824f70961464309e2ab813f0b5c20486f5e10ccb336e46c1cbd6ae57d",
-  "source": "Original ZIP; current working source described by generated integration inventory; no visual approval inferred"
+  ]
 }

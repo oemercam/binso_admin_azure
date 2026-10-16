@@ -18,9 +18,9 @@ import { invoicePaymentIssue } from "@/lib/qr-bill";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useDialogFocus } from "./use-dialog-focus";
 import { AppShell } from "./app-shell";
-import { ActionRow, ActionSheet, FormSheet,MetricTiles,MetricTile } from "./binso-ux";
+import { ActionRow, ActionSheet, FormSheet,MetricTiles,MetricTile,DetailFacts } from "./binso-ux";
 import {DocumentPageViewer} from "./pdf-preview";
-import {Button, EmptyState, Field, Icon, IconButton, Toast, FormActions, Input, Select, Textarea, ErrorState, LoadingState} from "./ui";
+import {Button, EmptyState, Field, Icon, IconButton, Toast, FormActions, Input, Select, Textarea, ErrorState, LoadingState,Status} from "./ui";
 import { apiGet, apiPatch, apiPost, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 
 type DocumentKind = "Rechnung" | "Angebot";
@@ -368,9 +368,9 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const presentation=documentPresentation(kind,draft,useDocumentTotals(draft).total);
   const title=existing?draft.number||documentKey||kind:`${kind} erstellen`;
   const headerActions=existing&&!editing
-    ? <div className="document-header-icons">{canEdit&&<IconButton label="Bearbeiten" icon="edit" onClick={()=>setEditing(true)}/>}<IconButton label="Weitere Aktionen" icon="more" onClick={()=>setMoreOpen(true)}/></div>
+    ? <div className="document-header-icons"><IconButton label="Weitere Aktionen" icon="more" onClick={()=>setMoreOpen(true)}/></div>
     : <div className="document-header-icons"><IconButton label="Vorschau" icon="file" onClick={()=>setPreview(true)}/></div>;
-  const desktopActions=headerActions;
+  const desktopActions=existing&&!editing?<>{canEdit&&<Button onClick={()=>setEditing(true)}><LocalizedText>{"Bearbeiten"}</LocalizedText></Button>}<Button variant="ghost" icon="more" onClick={()=>setMoreOpen(true)}><LocalizedText>{"Weitere Aktionen"}</LocalizedText></Button></>:headerActions;
 
   const closeCreation=()=>{recovery.clear();allowDraftNavigation();router.push(returnTo)};
   const feedback=toast&&<Toast title={toast} tone={[`${kind} gespeichert.`,`${kind} erstellt.`,"Status aktualisiert.","Dokument als PDF versendet.","Gutschrift erfasst.","Rückerstattung erfasst.","Zahlungserinnerung versendet."].includes(toast)?"success":"danger"}/>;
@@ -401,10 +401,11 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
     {editing&&existing&&kind==="Rechnung"&&draft.customerId&&tenantCan(documentRole,"invoices:write")&&<Button variant="secondary" href={"/zeit?invoice="+encodeURIComponent(draft.number)+"&customerId="+encodeURIComponent(draft.customerId)}><LocalizedText>{"Freigegebene Zeiten hinzufügen"}</LocalizedText></Button>}
     {editing&&existing&&<FormActions><Button disabled={saving||companyPending||Boolean(paymentIssue)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)} onClick={()=>void save()}><LocalizedText>{saving?"Wird gespeichert…":existing?"Speichern":kind+" erstellen"}</LocalizedText></Button></FormActions>}
   </>;
-  return <AppShell title={title} titleIsUserContent={existing} status={existing&&!editing&&!documentLoad.loading&&!documentLoad.error?presentation.statusLabel:undefined} statusTone={presentation.statusTone} subtitle={existing&&!editing?undefined:production?"Wird sicher gespeichert":"Schreibgeschützte Vorschau"} active={plural} backHref={returnTo} backLabel={returnTo==="/dashboard"?"Übersicht":kind==="Angebot"?"Angebote":"Rechnungen"} actions={desktopActions} mobileActions={existing&&!editing?headerActions:undefined} preview={preview} editing={editing} unsavedChanges={existing&&dirty}>
+  return <AppShell title={title} titleIsUserContent={existing} subtitle={existing&&!editing?undefined:production?"Wird sicher gespeichert":"Schreibgeschützte Vorschau"} active={plural} backHref={returnTo} backLabel={returnTo==="/dashboard"?"Übersicht":kind==="Angebot"?"Angebote":"Rechnungen"} actions={desktopActions} mobileActions={existing&&!editing?headerActions:undefined} preview={preview} editing={editing} unsavedChanges={existing&&dirty}>
     {existing?documentContent:<FormSheet label={title} open onClose={closeCreation} busy={saving} dirty={dirty} wizard className="document-entry-sheet">{documentContent}</FormSheet>}
     {preview&&<DocumentModal previewDraft={{...draft,kind,sourceNumber:existing&&editing?documentKey:undefined}} pdfNumber={existing&&!editing?documentKey??draft.number:undefined} title={kind==="Angebot"?"Angebotsvorschau":"Rechnungsvorschau"} onClose={()=>setPreview(false)}/>}
     <ActionSheet label="Weitere Aktionen" open={moreOpen} busy={actionBusy} onClose={()=>setMoreOpen(false)}><div className="action-list">
+      {canEdit&&<ActionRow icon="edit" title="Bearbeiten" navigation onClick={()=>{setMoreOpen(false);setEditing(true)}}/>}
       {canRecordPayment&&<ActionRow href={"/zahlungen/neu?invoice="+encodeURIComponent(documentKey??draft.number)} icon="wallet" title="Zahlung erfassen"/>}
       {kind==="Angebot"&&draft.status==="accepted"&&tenantCan(documentRole,"projects:write")&&<ActionRow href={draft.projectId?"/projekte/"+encodeURIComponent(draft.projectId):"/projekte/neu?customerId="+encodeURIComponent(draft.customerId??"")+"&sourceOffer="+encodeURIComponent(draft.number)} icon="clock" title={draft.projectId?"Projekt öffnen":"Auftrag starten"}/>}
       {kind==="Angebot"&&draft.status==="accepted"&&tenantCan(documentRole,"invoices:write")&&<ActionRow href={draft.invoiceNumber?"/rechnungen/"+encodeURIComponent(draft.invoiceNumber):"/rechnungen/neu?sourceOffer="+encodeURIComponent(documentKey??draft.number)} icon="receipt" title={draft.invoiceNumber?"Rechnung öffnen":"Rechnung erstellen"}/>}
@@ -441,19 +442,17 @@ function DocumentReadView({type,draft,directory}:{type:DocumentKind;draft:Docume
   const isInvoice=type==="Rechnung";
   const dueDate=isInvoice&&draft.date&&draft.due?invoiceDueDate(draft.date,draft.due):"";
   const outstanding=openAmount({total:totals.total,paid_amount:draft.paidAmount,credit_amount:draft.creditAmount,refund_amount:draft.refundAmount});
-  const {displayStatus}=documentPresentation(type,draft,totals.total);
+  const {displayStatus,statusLabel,statusTone}=documentPresentation(type,draft,totals.total);
   return <div className="document-detail-view">
     <section className="document-detail-section">
-      <div className="document-customer-heading"><h2>{draft.customer}</h2></div>
+      <div className="document-customer-heading"><h2>{draft.customer}</h2><Status appearance="text" tone={statusTone}>{statusLabel}</Status></div>
       {[customer.address,customer.zip,customer.city].some(Boolean)&&<p>{[customer.address,[customer.zip,customer.city].filter(Boolean).join(" ")].filter(Boolean).join(" · ")}</p>}
     </section>
-    <section className="document-facts">
-      <div><small><LocalizedText>{type==="Rechnung"?"Rechnungsdatum":"Angebotsdatum"}</LocalizedText></small><b>{isoToSwiss(draft.date)}</b></div>
-      {type==="Angebot"
-        ? <div><small><LocalizedText>{"Gültig bis"}</LocalizedText></small><b><LocalizedText>{draft.due&&isoToSwiss(draft.due)}</LocalizedText></b></div>
-        : <>{displayStatus==="paid"?(draft.paidOn&&<div><small><LocalizedText>{"Bezahlt am"}</LocalizedText></small><b>{isoToSwiss(draft.paidOn)}</b></div>):dueDate&&<div><small><LocalizedText>{"Fällig am"}</LocalizedText></small><b>{dueDate}</b></div>}</>}
-      {isInvoice&&draft.due&&<div className="document-payment-term"><small><LocalizedText>{"Zahlungsfrist"}</LocalizedText></small><b>{draft.due}<LocalizedText>{" Tage"}</LocalizedText></b></div>}
-    </section>
+    <DetailFacts items={[
+      {label:isInvoice?"Rechnungsdatum":"Angebotsdatum",value:isoToSwiss(draft.date)},
+      ...(!isInvoice?[{label:"Gültig bis",value:draft.due&&isoToSwiss(draft.due)}]:displayStatus==="paid"?(draft.paidOn?[{label:"Bezahlt am",value:isoToSwiss(draft.paidOn)}]:[]):dueDate?[{label:"Fällig am",value:dueDate}]:[]),
+      ...(isInvoice&&draft.due?[{label:"Zahlungsfrist",value:<>{draft.due}<LocalizedText>{" Tage"}</LocalizedText></>}]:[])
+    ]}/>
     <section className="document-detail-section document-lines-section">
       <div className="section-title"><h2><LocalizedText>{"Positionen"}</LocalizedText></h2></div>
       <div className="document-read-table">

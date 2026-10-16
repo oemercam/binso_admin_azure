@@ -195,7 +195,6 @@ function AppShellFrame({
   const profileQuery=useApiQuery<{item?:Record<string,unknown>|null;email?:string}>(production?"/api/settings/profile":null);
   const profileItem=profileQuery.data?.item;
   const profile={name:String(profileItem?.display_name||[profileItem?.first_name,profileItem?.last_name].filter(Boolean).join(" ")||""),identity:String(profileQuery.data?.email||""),avatar:String(profileItem?.avatar_url||"")};
-  const [navCompact,setNavCompact]=useState(false);
   const [timerNotice,setTimerNotice]=useState<string|null>(null);
 
   useEffect(() => {
@@ -223,33 +222,9 @@ function AppShellFrame({
   useEffect(() => {
     window.scrollTo({top:0,left:0,behavior:"auto"});
     touchedRef.current=false;
-    queueMicrotask(()=>{setFormDirty(false);setSheet(null);setNavCompact(false)});
+    queueMicrotask(()=>{setFormDirty(false);setSheet(null)});
   }, [pathname]);
 
-  useEffect(() => {
-    if(preview) return;
-    let lastY=window.scrollY;
-    let compact=false;
-    let ticking=false;
-    const update=()=>{
-      const currentY=Math.max(0,window.scrollY);
-      const delta=currentY-lastY;
-      if(currentY<24) compact=false;
-      else if(delta>7) compact=true;
-      else if(delta<-7) compact=false;
-      setNavCompact(value=>value===compact?value:compact);
-      lastY=currentY;
-      ticking=false;
-    };
-    const onScroll=()=>{
-      if(!ticking){
-        ticking=true;
-        window.requestAnimationFrame(update);
-      }
-    };
-    window.addEventListener("scroll",onScroll,{passive:true});
-    return()=>window.removeEventListener("scroll",onScroll);
-  },[preview]);
 
 
   useEffect(() => {
@@ -379,7 +354,7 @@ function AppShellFrame({
 
       {timerNotice&&<div className="timer-notice" role="status">{timerNotice}</div>}
 
-      {!preview && !formActive && <MobileDock compact={navCompact}><LocalizedElement as="nav" className={`bottom-nav ${navCompact ? "is-compact" : ""}`} aria-label="Hauptnavigation">
+      {!preview && !formActive && <MobileDock><LocalizedElement as="nav" className="bottom-nav" aria-label="Hauptnavigation">
         <Link href="/dashboard" className={active==="dashboard"?"active":""}><Icon name="home"/><span><LocalizedText>{"Start"}</LocalizedText></span></Link>
         {canOpen("/kunden")&&<Link href="/kunden" className={active==="kunden"?"active":""}><Icon name="users"/><span><LocalizedText>{"Kunden"}</LocalizedText></span></Link>}
         <Link href="/finanzen" className={["angebote","rechnungen","zahlungen","belege","finanzen"].includes(active)?"active":""}><Icon name="wallet"/><span><LocalizedText>{"Finanzen"}</LocalizedText></span></Link>

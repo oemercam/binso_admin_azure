@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "1.2.0",
+  "version": "1.3.0",
   "baselineCommit": "b398ff7400eb1b2ea90016c25e596261d58c822b",
   "sourceCompleteness": "The owner ZIP dated 2026-10-15 is the binding visual source. Imported historical V21/V22 entries remain traceability evidence and cannot override it; complete historical approval artifacts remain unavailable.",
   "conflicts": [
@@ -14,9 +14,9 @@
     {
       "id": "NAVIGATION-MATERIAL-CREATION",
       "earlier": "Bottom-navigation source and geometry frozen against V21.1/V22 baseline",
-      "later": "2026-10-15 original ZIP implementation supplement: retain the existing bottom navigation exactly",
-      "decision": "Preserve the current navigation markup, destinations, access/scroll logic, icons, material, geometry and token inheritance. The schematic ZIP dock does not replace it; the existing protected navigation reference remains unchanged.",
-      "supersededDecision": "Glass material and dock placement may change. Finanzen remains a direct destination; original access/scroll logic and icon paths stay protected. New source reference: docs/assets/20261013/navigation-reference.json. Geometry must be explicitly captured, never silently refreshed."
+      "later": "2026-10-16: owner requires every remaining old UX including navigation to be replaced",
+      "decision": "ZIP white edge-to-edge navigation, persistent labels, blue selection. No gray floating glass dock; desktop shell from 1024px. Preserve actual destinations and role checks. Explicit v3 semantic/geometry contract supersedes old hashes.",
+      "supersededDecision": "Preserve the current navigation markup, destinations, access/scroll logic, icons, material, geometry and token inheritance. The schematic ZIP dock does not replace it; the existing protected navigation reference remains unchanged."
     },
     {
       "id": "PRIMARY-KPI-COUNT",
@@ -35,15 +35,15 @@
       "componentTypes": [
         "AppShell"
       ],
-      "expected": "Freigegebener Glas-/Dock-Quellvertrag vom 13.10.2026; Navigationsziele bleiben erhalten",
+      "expected": "Randfüllende weisse Navigation, blaue Auswahl, sichtbare Labels; keine schwebende Glasfläche. V3-Vertrag und Gegenproben.",
       "owner": "AppShell",
       "method": "static",
       "testCase": "TC-UX-NAV-001",
       "adapter": "navigation-contract-test.mjs",
       "priority": "P0",
-      "acceptance": "Freigegebener Glas-/Dock-Quellvertrag vom 13.10.2026; Navigationsziele bleiben erhalten",
+      "acceptance": "Randfüllende weisse Navigation, blaue Auswahl, sichtbare Labels; keine schwebende Glasfläche. V3-Vertrag und Gegenproben.",
       "automation": "automatic",
-      "provenance": "Explicit user approval in the 2026-10-13 glass/navigation/central-standardization conversation",
+      "provenance": "Explicit owner replacement instruction 2026-10-16, ZIP mobile navigation; supersedes previous glass dock freeze",
       "review": null
     },
     {
@@ -55,15 +55,15 @@
       "componentTypes": [
         "AppShell"
       ],
-      "expected": "Freigegebener Glas-/Dock-Snapshot; ursprüngliche Zugriffs-/Scroll-Logik und Icons unverändert",
+      "expected": "Navigationsziele, Rollenbedingungen und Icons bleiben erhalten. Der alte Scroll-Verkleinerungsmodus entfällt ausdrücklich.",
       "owner": "AppShell",
       "method": "static",
       "testCase": "TC-UX-NAV-002",
       "adapter": "navigation-foundation-test.mjs",
       "priority": "P0",
-      "acceptance": "Freigegebener Glas-/Dock-Snapshot; ursprüngliche Zugriffs-/Scroll-Logik und Icons unverändert",
+      "acceptance": "Navigationsziele, Rollenbedingungen und Icons bleiben erhalten. Der alte Scroll-Verkleinerungsmodus entfällt ausdrücklich.",
       "automation": "automatic",
-      "provenance": "Explicit user approval in the 2026-10-13 glass/navigation/central-standardization conversation",
+      "provenance": "Explicit owner replacement instruction 2026-10-16, ZIP mobile navigation; supersedes previous glass dock freeze",
       "review": null
     },
     {
@@ -75,15 +75,15 @@
       "componentTypes": [
         "AppShell"
       ],
-      "expected": "Referenzvergleich je Theme/Breite/Zustand; keine automatische Baseline-Erneuerung",
+      "expected": "Unter 1024 px: Navigation x=0, Breite=Viewport, Höhe 76 px, Radius 0, Safe Area erreichbar. Ab 1024 px Desktop-Shell. Deklarativer V3-Vertrag, keine automatisch akzeptierte Screenshot-Baseline.",
       "owner": "AppShell",
       "method": "browser",
       "testCase": "TC-UX-NAV-003",
       "adapter": "nav-geometry",
       "priority": "P0",
-      "acceptance": "Referenzvergleich je Theme/Breite/Zustand; keine automatische Baseline-Erneuerung",
+      "acceptance": "Unter 1024 px: Navigation x=0, Breite=Viewport, Höhe 76 px, Radius 0, Safe Area erreichbar. Ab 1024 px Desktop-Shell. Deklarativer V3-Vertrag, keine automatisch akzeptierte Screenshot-Baseline.",
       "automation": "automatic",
-      "provenance": "Current UX compliance instruction; approved UX summary where referenced",
+      "provenance": "Explicit owner replacement instruction 2026-10-16, ZIP mobile navigation; supersedes previous glass dock freeze",
       "review": null
     },
     {

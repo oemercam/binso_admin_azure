@@ -4,7 +4,7 @@ import {writeTestOutput} from '../test-output.mjs';
 import {identity} from './identity.mjs';
 import {createHash} from 'node:crypto';
 const runIdentity=identity();
-const baselineFile='ux-compliance/navigation-baseline.v2.json';
+const baselineFile='ux-compliance/navigation-contract.v3.json';
 const navigationBaseline=await fs.readFile(baselineFile,'utf8').then(JSON.parse).catch(()=>null);
 export async function measureActionClearance(page){
  return page.evaluate(async()=>{
@@ -57,7 +57,7 @@ export async function measureCompliance(page,{output,route,theme,width,state='no
   if(dividers.length)add('LAY-005',doubled.length?'failed':'passed',{dividers:dividers.length,doubled},'hr,[role=separator]');
   for(const el of all('.toolbar:has(.searchbox):has(.filter-button),.record-controls')){
    const search=all('.searchbox').find(x=>el.contains(x)),filter=el.querySelector('.filter-button');const tabs=el.querySelector('.chips,.tabs');
-   if(innerWidth<=760&&search&&filter&&visible(filter)){const a=rect(search),b=rect(filter),t=tabs&&visible(tabs)?rect(tabs):null;add('CTL-001',b.x>=a.right-2&&Math.abs(a.y-b.y)<=2&&Math.abs(a.height-b.height)<=2&&(!t||t.y>=a.bottom-1)?'passed':'failed',{search:a,filter:b,tabs:t},'.toolbar,.record-controls');}
+   if(innerWidth<1024&&search&&filter&&visible(filter)){const a=rect(search),b=rect(filter),t=tabs&&visible(tabs)?rect(tabs):null;add('CTL-001',b.x>=a.right-2&&Math.abs(a.y-b.y)<=2&&Math.abs(a.height-b.height)<=2&&(!t||t.y>=a.bottom-1)?'passed':'failed',{search:a,filter:b,tabs:t},'.toolbar,.record-controls');}
    const sort=el.querySelectorAll('select[aria-label*=Sort],button[aria-label*=Sort]');add('CTL-003',[...sort].filter(visible).length<=1?'passed':'failed',{visibleSorts:[...sort].filter(visible).length},'.record-controls');
   }
   for(const el of all('.tabs,.chips')){const c=getComputedStyle(el);add('CTL-002',el.scrollWidth<=el.clientWidth+1||['auto','scroll'].includes(c.overflowX)?'passed':'failed',{clientWidth:el.clientWidth,scrollWidth:el.scrollWidth,overflowX:c.overflowX},'.tabs,.chips');}
@@ -91,9 +91,10 @@ export async function measureCompliance(page,{output,route,theme,width,state='no
  const evidence={schemaVersion:1,...runIdentity,engine,route,theme,width,state,scope:'Synthetic API fixtures; desktop engine emulation; no native keyboard proof',...measured};
  if(measured.navigation.length){
   const observed=measured.navigation[0];
-  const reference=state==='normal'?navigationBaseline?.cases.find(c=>c.theme===theme&&c.width===width&&c.withCreate===observed.withCreate):null;
-  const same=reference&&['x','width','height'].every(k=>Math.abs(observed.rect[k]-reference.navigation[k])<=1)&&Math.abs(observed.bottomOffset-reference.navigation.bottomOffset)<=1&&observed.position===reference.navigation.position&&observed.borderRadius===reference.navigation.borderRadius&&JSON.stringify(observed.links.map(l=>l.href))===JSON.stringify(reference.navigation.links);
-  evidence.checks.push({id:'UX-NAV-003',status:reference?(same?'passed':'failed'):'not-tested',selector:'.bottom-nav',observed:{current:observed,reference:reference?.navigation??null,baselineCommit:navigationBaseline?.commit??null,reason:reference?null:'No explicitly captured protected baseline for this viewport/theme/state'}});
+  Object.assign(observed,await page.locator('.bottom-nav').filter({visible:true}).first().evaluate(el=>({background:getComputedStyle(el).backgroundColor,activeColor:el.querySelector('.active')?getComputedStyle(el.querySelector('.active')).color:null})));
+  const paletteCorrect=observed.background===navigationBaseline.backgrounds[theme]&&(!observed.activeColor||observed.activeColor===navigationBaseline.activeColors[theme]);
+  const same=width<navigationBaseline.desktopMinWidth&&Math.abs(observed.rect.x)<=1&&Math.abs(observed.rect.width-width)<=1&&Math.abs(observed.rect.height-navigationBaseline.mobileHeight)<=1&&observed.borderRadius===navigationBaseline.mobileRadius&&observed.position==='static'&&observed.bottomOffset>=0&&observed.bottomOffset<=48;
+  evidence.checks.push({id:'UX-NAV-003',status:same&&paletteCorrect?'passed':'failed',selector:'.bottom-nav',observed:{current:observed,contract:navigationBaseline,reason:'Explicit ZIP replacement: edge-to-edge opaque navigation; safe-area inset remains reachable'}});
  }
  const filename=path.join(output,'compliance-'+createHash('sha256').update(JSON.stringify([engine,route,theme,width,state])).digest('hex').slice(0,20)+'.json');
  await fs.mkdir(output,{recursive:true});await writeTestOutput(filename,JSON.stringify(evidence,null,2)+'\n');return evidence;

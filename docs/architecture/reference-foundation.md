@@ -6,9 +6,20 @@ Die unveränderten Dateien in `docs/audit/v24/reference/` und die Ergänzungen i
 `IMPLEMENTIERUNG.md` sind verbindlich. Ausschliesslich die Microsoft-Variante
 verwenden. Kein Flow-, Noir-, Apple- oder anderes paralleles Design einführen.
 Bei Widersprüchen gelten die jüngsten ausdrücklichen Entscheidungen in der
-Anleitung (Dateiauswahl, Ringausrichtung, unveränderte Bottom-Navigation).
+Anleitung (Dateiauswahl, Ringausrichtung, Bottom-Navigation gemäss jüngster Nutzerentscheidung).
 
 ## Zuständigkeit
+
+Der jüngste Nutzerauftrag vom 16.10.2026 hebt die frühere Ausnahme für die
+Bottom-Navigation ausdrücklich auf. Verbindlich ist jetzt die weisse, randfüllende
+ZIP-Navigation mit blauer Auswahl und dauerhaft sichtbaren Labels. Header und
+Seitennavigation verwenden ab 1024 px das Desktopmuster; darunter gilt das
+Mobilmuster. Interaktive Erkennung gehört in `lib/client/layout.ts`, CSS-Grenzen
+werden durch den V3-Navigationsvertrag geprüft. Keine zusätzlichen Tablet-Shells.
+
+Dokumentdetails setzen ihren Status einmal beim Kunden und verwenden `DetailFacts`
+für Beschriftungs-/Wertzeilen. Bearbeiten und weitere Aktionen bleiben im gemeinsamen
+Aktionsmenü; keine separat gestalteten Symbolleisten je Dokumenttyp.
 
 | Aufgabe | Bestehender Owner |
 | --- | --- |
@@ -45,7 +56,7 @@ E-Mails und PDF-Dokumente verwenden ihre bestehenden Renderer.
    kennzeichnen. Die Kennzeichnung gehört in die Abnahme, nicht als technische
    Erklärung in die Oberfläche der Endkunden.
 7. Erst mit identischen Inhaltsbreiten, Browser, Schriftauflösung und
-   vergleichbaren Daten gegen die Referenz rendern. Schutz der Bottom-Navigation
+   vergleichbaren Daten gegen die Referenz rendern. ZIP-Navigationsvertrag
    und Tastatur-/Fokusverhalten prüfen. Keine Baselines automatisch akzeptieren.
 
 Zuerst eine vorhandene Komponente erweitern, falls die fachliche Anforderung
@@ -117,7 +128,7 @@ prüft anschliessend Darstellung und tatsächliche Bedienung.
 - Light Mode: weisse Seite, Header und Inhaltsflächen; Blau für Aktionen,
   Auswahl und Fokus. Offene Abschnitte statt wiederholter umrahmter Karten.
 - Desktop: gemeinsame Command Bar; ergänzende Aktionen ins bestehende Menü.
-  Mobile: kurze Abläufe im Sheet; schwarzes rundes Plus und bestehende Navigation.
+  Mobile: kurze Abläufe im Sheet; schwarzes rundes Plus und ZIP-Navigation.
 - Sekundärtext muss lesbar bleiben. Mobile Eingabefelder mindestens 16 px,
   aktive Touchziele mindestens 44 px. Kleine Vorschau-Schalter sind keine Vorlage
   für unzugängliche Produktbedienung.
@@ -134,7 +145,7 @@ Die frühere Outlook-Kartenfläche vom 13.10. ist damit abgelöst. Dark Mode
 verwendet dieselbe Tokenbeziehung und bleibt ausdrücklich abgeleitet.
 Die Messung prüft weiterhin exakte Farbgleichheit; Gegenproben müssen die alte
 graue Kartenfläche in beiden Themes bei 390, 1100 und 1440 px ablehnen.
-Der eingefrorene Navigationsvertrag und das Releaseprofil bleiben unverändert.
+Der frühere eingefrorene Navigationsvertrag ist durch den ausdrücklichen Auftrag vom 16.10.2026 abgelöst. Das Releaseprofil bleibt unverändert.
 
 `pnpm qa:fast --typecheck`, Referenz-/Navigations-/Foundation-Verträge und die
 gezielte Browsermatrix gehören zum Paket. Neue Seiten müssen im Inventar und

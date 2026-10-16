@@ -2,7 +2,7 @@
 :root{
   --progress-value:0%;
   --bar-value:0%;
-  /* App appearance: independent of the frozen navigation theme tokens. */
+  /* One ZIP palette for page content, header and navigation. */
   --auth-control-border:#dfe5ed;
   --workspace-font:var(--font-sans);
   --workspace-ink:#202b3b;
@@ -20,18 +20,13 @@
   --app-canvas:#fff;
   --app-surface:#fff;
   --app-chrome:#fff;
-  --app-glass-tint:rgba(243,243,245,.78);
-  --app-glass-solid:#f3f3f5;
-  --app-glass-line:rgba(34,34,37,.12);
-  --app-glass-shadow:0 3px 16px rgba(0,0,0,.08);
-  --app-glass-blur:18px;
   --dock-gap:8px;
   --dock-action-size:54px;
-  --app-text:#222225;
-  --app-secondary:#626267;
-  --app-divider:#dedee2;
-  --app-symbol:#737379;
-  --app-accent:#006ec7;
+  --app-text:var(--workspace-ink);
+  --app-secondary:var(--workspace-muted);
+  --app-divider:var(--workspace-line);
+  --app-symbol:var(--workspace-muted);
+  --app-accent:var(--app-action-accent);
   --app-accent-soft:#edf4ff;
   --app-action-accent:#2566bd;
   --button-radius:var(--shape-control-desktop);
@@ -58,9 +53,9 @@
   --section-title-font:18px;
   color-scheme:light;
   --color-bg:#fff;
-  --color-fg:#000;
-  --color-muted:#6c6c6c;
-  --color-line:#e9e9e7;
+  --color-fg:var(--workspace-ink);
+  --color-muted:var(--workspace-muted);
+  --color-line:var(--workspace-line);
   --color-subtle:#fff;
   --color-inverse-bg:#000;
   --color-inverse-fg:#fff;
@@ -136,12 +131,10 @@
 
   --mobile-page-x:clamp(16px,4.55vw,20px);
   --mobile-header-h:52px;
-  --mobile-nav-h:68px;
-  --mobile-nav-compact-h:52px;
-  --mobile-nav-edge:clamp(8px,2.8vw,14px);
-  --mobile-nav-bottom:clamp(8px,2.2vw,12px);
-  --mobile-nav-radius:30px;
-  --mobile-nav-compact-radius:26px;
+  --mobile-nav-h:76px;
+  --mobile-nav-edge:0px;
+  --mobile-nav-bottom:0px;
+  --mobile-nav-radius:0px;
   --mobile-page-top:14px;
   --mobile-page-head-gap:16px;
   --mobile-toolbar-gap:10px;
@@ -327,15 +320,11 @@ html[data-theme="dark"]{
   --app-canvas:#000;
   --app-surface:#141414;
   --app-chrome:#212121;
-  --app-glass-tint:rgba(33,33,33,.82);
-  --app-glass-solid:#212121;
-  --app-glass-line:rgba(255,255,255,.16);
-  --app-glass-shadow:0 3px 18px rgba(0,0,0,.32);
-  --app-text:#dedee2;
-  --app-secondary:#a0a0a5;
-  --app-divider:#2b2b2e;
-  --app-symbol:#929297;
-  --app-accent:#48a7ff;
+  --app-text:var(--workspace-ink);
+  --app-secondary:var(--workspace-muted);
+  --app-divider:var(--workspace-line);
+  --app-symbol:var(--workspace-muted);
+  --app-accent:var(--app-action-accent);
   --app-accent-soft:#102b42;
   --app-action-accent:#48a7ff;
   --app-accent-text:#071521;
@@ -347,9 +336,9 @@ html[data-theme="dark"]{
   --control-border:#333;
   color-scheme:dark;
   --color-bg:#000;
-  --color-fg:#fff;
-  --color-muted:#a4a4a4;
-  --color-line:#292929;
+  --color-fg:var(--workspace-ink);
+  --color-muted:var(--workspace-muted);
+  --color-line:var(--workspace-line);
   --color-subtle:#000;
   --color-inverse-bg:#fff;
   --color-inverse-fg:#000;
@@ -385,10 +374,7 @@ html[data-theme="dark"]{
 :root{--motion-fast:0ms;--motion-base:0ms;--motion-slow:0ms}
 html{scroll-behavior:auto}
 }
-@media (min-width:761px) and (max-width:1100px){
-:root{--sidebar-w:190px;--page-x:28px}
-}
-@media (min-width:1101px){
+@media (min-width:1024px){
 :root{
     --desktop-header-h:56px;
     --desktop-page-top:20px;
@@ -402,7 +388,7 @@ html{scroll-behavior:auto}
     --desktop-list-min:520px;
   }
 }
-@media (max-width:760px){
+@media (max-width:1023px){
 :root{
     --page-x:var(--mobile-page-x);
   }
@@ -410,6 +396,6 @@ html{scroll-behavior:auto}
 @media (max-height:520px) and (orientation:landscape){
 :root{--mobile-page-x:20px}
 }
-@media (max-width:1100px){
+@media (max-width:1023px){
 :root{--app-control-radius:8px}
 }

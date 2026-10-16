@@ -1,4 +1,5 @@
 "use client";
+import {desktopLayoutQuery} from '@/lib/client/layout';
 
 import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
 import { Children, isValidElement, cloneElement, useState, useRef, useEffect, useLayoutEffect, useContext, useId, type ReactNode, type CSSProperties } from "react";
@@ -90,10 +91,15 @@ export function DetailSections({summary,facts,records,extra}:{summary:ReactNode;
  return <div className="detail-grid" data-layout="dossier" data-has-extra={!!extra||undefined}><section data-area="summary">{summary}</section><section data-area="facts">{facts}</section><section data-area="records">{records}</section>{extra&&<section data-area="extra">{extra}</section>}</div>;
 }
 
+/** Shared label/value rows for document and entity details. */
+export function DetailFacts({items}:{items:ReadonlyArray<{label:string;value:ReactNode}>}){
+ return <dl className="bo-detail-facts">{items.map(item=><div key={item.label}><dt><LocalizedText>{item.label}</LocalizedText></dt><dd>{item.value}</dd></div>)}</dl>;
+}
+
 /** Supplementary facts stay accessible without crowding a mobile dossier. */
 export function DetailDisclosure({label,children}:{label:string;children:ReactNode}){
  const [open,setOpen]=useState(false),touched=useRef(false);
- useLayoutEffect(()=>{const media=window.matchMedia('(min-width:1101px)'),update=()=>{if(!touched.current)setOpen(media.matches)};update();media.addEventListener('change',update);return()=>media.removeEventListener('change',update)},[]);
+ useLayoutEffect(()=>{const media=window.matchMedia(desktopLayoutQuery),update=()=>{if(!touched.current)setOpen(media.matches)};update();media.addEventListener('change',update);return()=>media.removeEventListener('change',update)},[]);
  return <details className="bo-data-disclosure" open={open} onToggle={event=>{const next=event.currentTarget.open;if(next!==open){touched.current=true;setOpen(next)}}}><summary><LocalizedText>{label}</LocalizedText></summary><div>{children}</div></details>;
 }
 

@@ -1,4 +1,5 @@
 "use client";
+import {isDesktopLayout} from '@/lib/client/layout';
 
 import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
 import {useEffect,useRef,useState,type ReactNode} from "react";
@@ -22,7 +23,7 @@ export function HeaderPanel({kind,label,onClose,children,headerSelector,backgrou
  },[backgroundSelector]);
  useEffect(()=>{
   const update=()=>{
-   const mobile=window.innerWidth<=1100;
+   const mobile=!isDesktopLayout();
    setMobile(mobile);
    const header=document.querySelector(headerSelector??(mobile?".mobile-header":".desktop-appbar"));
    const rect=header?.getBoundingClientRect();

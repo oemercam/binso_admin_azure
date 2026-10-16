@@ -6,18 +6,18 @@
     "dashboard": {
       "route": "/dashboard",
       "desktop": {
-        "src": "/product/dashboard-desktop-e277c6942e.png",
+        "src": "/product/dashboard-desktop-82def6012f.png",
         "width": 1440,
         "height": 1000,
-        "sha256": "e277c6942ea811a71b3cbdc70bb40fe9deff84ccc1475775759f58504ba6d029",
-        "sourceSha256": "567fc669d8a1fa5c9912effcf81c2046c6ba50d7f3cb3e4f5d89c2f1a91bb745"
+        "sha256": "82def6012f6762dad76ea779b5092ffe546c7ec5ae031d8fb63a7cd45cf2b442",
+        "sourceSha256": "8383cea34b014fae140e67adec59c312577a5c7d311e8f3760c734abd4486b31"
       },
       "mobile": {
-        "src": "/product/dashboard-mobile-b79db1f4aa.png",
+        "src": "/product/dashboard-mobile-132e5e3b4b.png",
         "width": 390,
         "height": 1000,
-        "sha256": "b79db1f4aae698feb68f9e3ef06bce4ee4f204e9ef7e5eee6d62a9ff79163572",
-        "sourceSha256": "54d91edb72dd0061140f68536d9dc398a5b1efc8e841cfade81ffa91ca30daf3"
+        "sha256": "132e5e3b4b4729d66f994e3ffffafd012eb83449b6bd5938a06dab9917da4324",
+        "sourceSha256": "08b22e7fa7b0ad6ef989160b57cfffacaf08b338beaa02658dcbce7ad8fa4786"
       }
     },
     "customers": {
@@ -30,11 +30,11 @@
         "sourceSha256": "c63fd7b195324fc6e63c27bf3a518e5d5d92baa42b12c657b5e174707e093c4c"
       },
       "mobile": {
-        "src": "/product/customers-mobile-ac4663b75b.png",
+        "src": "/product/customers-mobile-81072312a0.png",
         "width": 390,
         "height": 1000,
-        "sha256": "ac4663b75b176f2d6b9bda03b6e16a08df96c069c6fed3c86e14baa77d1682f4",
-        "sourceSha256": "572336acc3ee40c7e8cb07847aaf906c52527dc880dfb860efa1526fc1dfab8c"
+        "sha256": "81072312a0124aeb4b3a559acc88b28ab55443cc21146379b02286cc3fe96a9a",
+        "sourceSha256": "a02c5cfd604e9dd1d3351587e01d2b9c01f92ae61203dea56f4dc66d2fb08d4e"
       }
     },
     "offers": {
@@ -47,11 +47,11 @@
         "sourceSha256": "df36db6123db0db6fdceaf02cbd9c9ec487ea2d2f0019dd634e498332a1d0c88"
       },
       "mobile": {
-        "src": "/product/offers-mobile-7a3f3326ab.png",
+        "src": "/product/offers-mobile-d8f7f3ebf3.png",
         "width": 390,
         "height": 1000,
-        "sha256": "7a3f3326ab2cdc423a35f43d4c21ed7034efc5ba2766396f6c83b5edf71d3921",
-        "sourceSha256": "f30f005aefe1f32fb2d20458a4d900c5d57c2e156d0bffd24659e03003f80d29"
+        "sha256": "d8f7f3ebf3efaaf5bcfee8a40e50954b42fb3bd1cd60e480e2608886a36dab4d",
+        "sourceSha256": "8aa768e4f4e6114dfc9de788dd58693e95a536bfdd1f00940035741904170b6e"
       }
     },
     "invoices": {
@@ -64,11 +64,11 @@
         "sourceSha256": "3e9be51a8f3c90a23b728234915aa2797429e0d1245f53a1362d58e0af3b8424"
       },
       "mobile": {
-        "src": "/product/invoices-mobile-9b7f190e5c.png",
+        "src": "/product/invoices-mobile-f8986804d4.png",
         "width": 390,
         "height": 1000,
-        "sha256": "9b7f190e5c032c59795fd5bc4a516f584dabb3872d8ef7f636cb0f9a6cf24985",
-        "sourceSha256": "5e14b7d91383125f9a1f62b631f9f36015f5e3aae02bdd36942d07bfc9e95b48"
+        "sha256": "f8986804d4998e09529ec62b60dc450fed5a0dc481f0b1da6d1baf49c9f371d6",
+        "sourceSha256": "a97ffee97b30031ba940b0ad1c9ee732daa59b8e82d3721c0cfa136dd809ae58"
       }
     },
     "payments": {
@@ -81,31 +81,29 @@
         "sourceSha256": "eb575200170b08916ffe20c8dff27439fba6133643fc8c38a44ca57832ba2ef5"
       },
       "mobile": {
-        "src": "/product/payments-mobile-61c311f44b.png",
+        "src": "/product/payments-mobile-933c6e5b9d.png",
         "width": 390,
         "height": 1000,
-        "sha256": "61c311f44b5c0c7df595a69f6602c84ce04777e78a0d52ee4e4eec0fe3edb587",
-        "sourceSha256": "2fd1bf665bf442535f2213ceb4ef73c96615b447ecae167dafbe554a0ba6b1d6"
+        "sha256": "933c6e5b9d1d1e889958c14e42fdef6ee26317b8b2035ee56bdaf67d2cee30e9",
+        "sourceSha256": "966a982b11043dec4ae7a68840d1d3d4df19dbbca25ed25ff8c2b14b293da07b"
       }
     },
     "time": {
       "route": "/zeit",
       "desktop": {
-        "src": "/product/time-desktop-0ca65608ab.png",
+        "src": "/product/time-desktop-09bcb802cc.png",
         "width": 1440,
         "height": 1000,
-        "sha256": "0ca65608abda069f9bcb7f2254371c072216a8829fbef31e0185908899293d99",
-        "sourceSha256": "1663120bf0477857241acfc0629d9eaac7124b420ba8602b4ee597bd19b4077f"
+        "sha256": "09bcb802ccfbff7f7232962dc3740e6ab8c692ecfdfec2f0451fc9b00309aadf",
+        "sourceSha256": "96ee0a9eda29a334a5cfc1c0f03f2f9a415a7e9f1b6dfad8defd7b481807d690"
       },
       "mobile": {
-        "src": "/product/time-mobile-5936f968fa.png",
+        "src": "/product/time-mobile-899c883fd7.png",
         "width": 390,
         "height": 1000,
-        "sha256": "5936f968fad737fa678d25ae77c10519ae8551ad7f926f977d7f0fd0e7ddc5f5",
-        "sourceSha256": "5a550aba727d19e59f40cf03b980efd7e8cfa8e713608e12e6029613a065ac69"
+        "sha256": "899c883fd76bf1c4d3b4d274a8ecbe4d3afab9a45d1db0ea670c32ba9e00fcae",
+        "sourceSha256": "f9aa595a02e071c1edc02bd3d9195b58cda7b8175e72cda57ab1f5663270a2ff"
       }
     }
-  },
-  "sourceFingerprint": "bd8b6051fe341d29fbf8a2b34ca305a9e3e325306b9ba907f189f6b70222a04a",
-  "sourceTree": "24e6fa4ec49c3527a47f9498b961e3dcd0d4dbaa"
+  }
 }

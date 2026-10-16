@@ -22,6 +22,6 @@ for(const compact of [false,true]){
  const rendered=renderToStaticMarkup(React.createElement(chrome.MobileDock,{compact,action:React.createElement('button',null,'Forbidden dock action')},navigation));
  assert.ok(rendered.includes('href="/dashboard"'),'Navigation children are preserved');
  assert.ok(!rendered.includes('Forbidden dock action'),'Shared dock cannot render an attached creation action');
- assert.equal(rendered.includes('is-compact'),compact,'Compact navigation behavior is preserved');
+ assert.equal(rendered.includes('is-compact'),false,'ZIP navigation retains visible labels and constant height while scrolling');
 }
-console.log('Actual shared dock renders only navigation and preserves compact mode; obsolete creation injection is ignored.');
+console.log('Actual shared dock renders only navigation and keeps labels and height stable; obsolete creation injection is ignored.');

@@ -1,0 +1,19 @@
+{
+  "version": 3,
+  "authorization": "Owner instruction 2026-10-16: es darf von der alten ux nichts mehr vorhanden sein. mach alles nach neue ux vorgaben",
+  "source": "docs/audit/v24/reference/mobile-app.html",
+  "supersedes": "The earlier exception retaining the 2026-10-13 glass dock",
+  "desktopMinWidth": 1024,
+  "mobileHeight": 76,
+  "mobileRadius": "0px",
+  "backgroundToken": "--color-bg",
+  "activeColorToken": "--app-accent",
+  "backgrounds": {"light":"rgb(255, 255, 255)","dark":"rgb(0, 0, 0)"},
+  "activeColors": {"light":"rgb(37, 102, 189)","dark":"rgb(72, 167, 255)"},
+  "preservedBehaviorCommit": "db3f377884ee5ba1bd21beaad6fb4b8c843f1d8a",
+  "preservedBehavior": {
+    "logic": "7c405ba4b85822168d8f4c20d2ad0a3556fd146c19cb40264abf36c47ae77b31",
+    "icons": "b01b4f68013ccaea6f5846ffb30b07bc0a079eac3adeb9bac3800cbfdbe9366e",
+    "markup": "5e0ddb1a68b36ded252b02e38b5205f08586d608247ccd17c68f60580133ed08"
+  }
+}

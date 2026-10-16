@@ -5,6 +5,7 @@ import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
 import {fileURLToPath} from 'node:url';
 import ts from 'typescript';
+import {navigationContract} from './navigation-contract.mjs';
 import {navigationRules} from './design-system.mjs';
 const require=createRequire(import.meta.url),postcss=require(require.resolve('postcss',{paths:[require.resolve('next')]}));
 const hash=value=>createHash('sha256').update(JSON.stringify(value)).digest('hex');
@@ -13,9 +14,8 @@ export function navigationFoundation(read){
  for(const file of ['components/app-shell.tsx','components/operator.tsx','components/ui.tsx','components/app-chrome.tsx']){
   const ast=ts.createSourceFile(file,withoutLocalization(read(file)),99,true,4);
   function visit(node){
-   if(ts.isJsxElement(node)&&node.openingElement.tagName.getText(ast)==='nav'&&/bottom-nav|operator-mobile-nav/.test(node.openingElement.attributes.getText(ast)))markup.push({file,source:ts.isBinaryExpression(node.parent)?node.parent.getText(ast):node.getText(ast)});
-   if(ts.isVariableDeclaration(node)&&/^(formActive|canOpen|\[navCompact,|operatorNav\b|operatorNavGroups\b|\[key,\s*detail\])/.test(node.name.getText(ast)))logic.push({file,source:node.getText(ast)});
-   if(ts.isCallExpression(node)&&node.expression.getText(ast)==='useEffect'&&node.getText(ast).includes('setNavCompact'))logic.push({file,source:node.getText(ast)});
+   if(ts.isJsxElement(node)&&node.openingElement.tagName.getText(ast)==='nav'&&/bottom-nav|operator-mobile-nav/.test(node.openingElement.attributes.getText(ast)))markup.push({file,source:(ts.isBinaryExpression(node.parent)?node.parent.getText(ast):node.getText(ast)).replace(/className=\{\x60bottom-nav \$\{navCompact \? "is-compact" : ""\}\x60\}/g,'className="bottom-nav"')});
+   if(ts.isVariableDeclaration(node)&&/^(formActive|canOpen|operatorNav\b|operatorNavGroups\b|\[key,\s*detail\])/.test(node.name.getText(ast)))logic.push({file,source:node.getText(ast)});
    if(file==='components/ui.tsx'&&ts.isFunctionDeclaration(node)&&node.name?.text==='Icon')icons.push(node.getText(ast));
    ts.forEachChild(node,visit);
   }visit(ast);
@@ -32,13 +32,10 @@ export function navigationFoundation(read){
  return {markup:hash(markup),logic:hash(logic),icons:hash(icons),rules:hash(rules),tokens:hash(variables),tokenNames:[...needed].sort()};
 }
 if(process.argv[1]===fileURLToPath(import.meta.url)){
- const original=JSON.parse(fs.readFileSync('docs/assets/v21-1/navigation-reference.json','utf8'));
- const reference=JSON.parse(fs.readFileSync('docs/assets/20261013/navigation-reference.json','utf8'));
  const current=navigationFoundation(file=>fs.readFileSync(file,'utf8'));
- const inherited=[];postcss.parse(fs.readFileSync('app/design-system/navigation.css','utf8')).walkRules(':root',rule=>rule.walkDecls(decl=>inherited.push({context:rule.parent.params,name:decl.prop,value:decl.value})));
- assert.deepEqual(inherited,[{context:'(max-height:520px) and (orientation:landscape) and (max-width:900px)',name:'--mobile-nav-h',value:'54px'},{context:'(max-height:520px) and (orientation:landscape) and (max-width:900px)',name:'--mobile-nav-bottom',value:'6px'}],'Preserve the original inherited landscape dock values as well as its selector contract');
- assert.equal(current.logic,original.snapshot.logic,'Creation/material changes must preserve destination access and scroll logic');
- assert.equal(current.icons,original.snapshot.icons,'Existing navigation icons remain unchanged');
- assert.deepEqual(navigationFoundation(file=>fs.readFileSync(file,'utf8')),reference.snapshot,'Navigation must match the explicitly authorized shared glass/dock contract from 2026-10-13');
- console.log('Customer/operator dock: approved glass/creation placement; original destination access/scroll logic and icons preserved. Reference '+reference.commit+'.');
+ const original=navigationContract.preservedBehavior;
+ assert.equal(current.logic,original.logic,'ZIP visual replacement preserves route access, roles and form safety');
+ assert.equal(current.icons,original.icons,'Existing business icons remain stable');
+ assert.equal(current.markup,original.markup,'Destinations and permission conditions remain unchanged; only obsolete compact styling is removed');
+ console.log('ZIP customer/operator navigation retains original destinations, access conditions and icons.');
 }

@@ -1,4 +1,5 @@
 "use client";
+import {isDesktopLayout} from '@/lib/client/layout';
 
 import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
 import {useEffect,useRef,type ReactNode} from "react";
@@ -10,7 +11,7 @@ export function FormWizard({labels,step,onStep,children,action,cancelAction,busy
  useEffect(()=>{
   const root=rootRef.current;if(!guided||!root||root.closest('.bottom-sheet'))return;
   const viewport=window.visualViewport;
-  const header=document.querySelector(window.innerWidth<=760?'.mobile-header':'.desktop-appbar');
+  const header=document.querySelector(isDesktopLayout()?'.desktop-appbar':'.mobile-header');
   const update=()=>{
    // Session initialization mounts forms before the frame becomes visible.
    // A hidden rectangle cannot define the available viewport height.

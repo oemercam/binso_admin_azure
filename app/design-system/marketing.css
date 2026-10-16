@@ -55,7 +55,6 @@
 }
 .product-callout p{
   margin:0;
-  color:var(--color-muted);
   font-size:var(--type-control);
   line-height:1.55;
 }

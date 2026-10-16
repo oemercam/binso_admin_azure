@@ -26,6 +26,7 @@ for(const file of designSources){const css=postcss.parse(fs.readFileSync(file,'u
 }
 assert.deepEqual(conflicts,[],'Each selector/state has one source owner');
 assert.deepEqual([...refs].filter(name=>!variables.has(name)),[],'Every dynamic or theme variable has an explicit default');
+for(const file of designSources)postcss.parse(fs.readFileSync(file,'utf8')).walkRules(rule=>assert.ok(rule.selector.trim(),file+': empty selectors cannot own component styles'));
 const ignored=new Set(['active','selected','full','large','narrow','clean','two','three','thirds','light','dark','system','mobile','support','customer','payment','security','audit','high']);
 for(const file of [...walk('app'),...walk('components')].filter(f=>/\.tsx?$/.test(f))){const s=fs.readFileSync(file,'utf8');for(const match of s.matchAll(/className=(?:\{\`([^\`]+)\`\}|"([^"]+)"|'([^']+)')/g)){const raw=(match[1]||match[2]||match[3]||'').replace(/\$\{[^}]+\}/g,' ');for(const cls of raw.split(/\s+/))if(/^[A-Za-z][\w-]*$/.test(cls)&&!cls.endsWith('-')&&!ignored.has(cls))assert.ok(classes.has(cls),file+': missing CSS owner for '+cls);}}
 assert.ok(designManifest.policy.derivedViewsRequireReview,'Derived screens need a separate review');

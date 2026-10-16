@@ -93,19 +93,19 @@
     },
     {
       "id": "UX24-MOTION",
-      "scope": "Motion/Glass",
-      "requirement": "Bestehende motion/glass Tokens und Reduced Motion; keine zusätzlichen Navigationseingriffe.",
+      "scope": "Motion",
+      "requirement": "Direktes Pressedfeedback und kurze Overlay-Übergänge gemäss ZIP; Reduced Motion. Kein Glass-Material in Header oder Navigation.",
       "owner": "app/design-system/theme.css",
-      "acceptance": "Reduced Motion und Glass-Fallback in beiden Themes prüfen",
+      "acceptance": "Reduced Motion und opake Header-/Navigationsflächen in beiden Themes prüfen.",
       "status": "offen",
       "evidence": []
     },
     {
       "id": "UX24-NAV",
       "scope": "Bottom-Navigation",
-      "requirement": "Bestehende Bottom-Navigation unverändert; diese Aufgabe autorisiert keine neue Glass/Layout/Plus-Änderung.",
+      "requirement": "Nutzerauftrag 16.10.2026 ersetzt die bisherige Ausnahme: ZIP-Navigation weiss, randfüllend, blaue Auswahl, dauerhaft sichtbare Labels. Kein Glas, keine schwebende Kapsel, keine Scroll-Verkleinerung. Ziele und Rollen bleiben geschützt.",
       "owner": "components/app-chrome.tsx",
-      "acceptance": "Vorhandene navigation-contract und navigation-foundation Gates ohne Referenzregeneration",
+      "acceptance": "Deklarativen V3-Vertrag, alte Design-Gegenproben, gerenderte Geometrie und Rechteprüfung ausführen.",
       "status": "offen",
       "evidence": []
     },
@@ -291,17 +291,17 @@
     },
     {
       "id": "UX24-WHITE-WORKSPACE",
-      "scope": "Light Mode: Marketing, Auth, Kunden- und Adminportal; bestehende Bottom-Navigation ausgenommen",
+      "scope": "Light Mode: Marketing, Auth, Kunden- und Adminportal inklusive Navigation",
       "requirement": "Weisse Grund-, Header-, Control- und Inhaltsflächen; dezente blaue Fokus-/Auswahl-/Aktionszustände. Dark Mode eigenständig. Neuer schriftlicher Auftrag white-workspaces-request.md hat Vorrang vor älteren Grau-Vorgaben.",
       "owner": "app/design-system/theme.css",
-      "acceptance": "Computed weisse Flächen und Kontrast prüfen; Navigation-Referenz unverändert bestehen lassen.",
+      "acceptance": "Weisse Flächen, blaue Auswahl, Kontrast und den aktuellen ZIP-Navigationsvertrag prüfen.",
       "status": "offen",
       "evidence": []
     },
     {
       "id": "UX24-DESKTOP-COLLAPSE",
-      "scope": "Desktop ab 1101px, Kunden- und Adminportal",
-      "requirement": "Linke Navigation standardmässig offen, manuell einklappbar; gespeicherte Auswahl, ARIA-Zustand und Icon-Linknamen. Mobile-Navigation unverändert.",
+      "scope": "Desktop ab 1024px, Kunden- und Adminportal",
+      "requirement": "Linke Navigation standardmässig offen, manuell einklappbar; gespeicherte Auswahl, ARIA-Zustand und Linknamen. Unter 1024px verwendet die Shell die ZIP-Mobilnavigation.",
       "owner": "components/desktop-navigation.tsx",
       "acceptance": "Einklappen/Öffnen, gewonnene Inhaltsbreite, Storage und mobile Unsichtbarkeit im Browser prüfen.",
       "status": "offen",

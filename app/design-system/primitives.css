@@ -232,11 +232,7 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 .announcement-card .status{width:max-content}
 .notice>span:not(.status){color:var(--color-muted);font-size:var(--type-caption);overflow-wrap:anywhere}
 .notice>.status,.notice>.button{justify-self:start}
-@media (min-width:761px) and (max-width:1100px){
-.timer-actions .button{white-space:nowrap}
-.form-grid,
-  .form-grid.two{grid-template-columns:repeat(auto-fit,minmax(min(100%,max(var(--form-column-min),calc((100% - var(--field-group-gap))/2))),1fr))}}
-@media (min-width:1101px){
+@media (min-width:1024px){
 .empty-state{min-height:240px}
 .desktop-page-actions .button{
     min-height:var(--desktop-action-h);
@@ -265,10 +261,10 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 .form-main-new{display:block}
 .expense-detail-workspace>.form-page{grid-column:1;grid-row:1}
 .form-page{max-width:960px}
-.form-page.narrow{max-width:760px}
+.form-page.narrow{max-width:1023px}
 .form-section{padding:18px 0}
 .form-grid{gap:var(--field-group-gap)}}
-@media (max-width:760px){
+@media (max-width:1023px){
 .page-actions .button-secondary{display:none}
 .page-actions .button{
     height:42px;
@@ -296,7 +292,6 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
   .form-field select,
   .form-field textarea{font-size:var(--type-subheading)}
 .mobile-sticky-save{
-    position:sticky;
     bottom:calc(var(--mobile-nav-h) + var(--safe-bottom) + 10px);
     z-index:12;
     margin-top:var(--mobile-section-gap);
@@ -365,7 +360,7 @@ input:not([type="checkbox"]):not([type="radio"]),
 @media (max-width:389px){
 .mobile-header-detail .mobile-detail-actions .icon-button{width:36px;height:40px;min-width:36px}}
 .bo-create-action.button{position:relative;margin-inline-start:auto;width:auto;height:var(--control-h);flex:none;min-width:var(--touch);min-height:var(--control-h);padding:0 var(--button-padding-inline);border:0;border-radius:var(--shape-control-desktop);background:var(--app-action-accent);color:var(--app-accent-text);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:opacity var(--motion-fast) var(--motion-ease)}
-@media(max-width:1100px){
+@media(max-width:1023px){
 .bo-create-action.button{width:var(--touch);height:var(--touch);aspect-ratio:1 / 1;flex:0 0 var(--touch);min-height:var(--touch);padding:0;border-radius:50%;background:var(--color-inverse-bg);color:var(--color-inverse-fg)}
 .bo-create-action .create-action-label{display:none}
 }
@@ -381,10 +376,7 @@ input:not([type="checkbox"]):not([type="radio"]),
 .form-field input,.form-field select,.form-field textarea{box-sizing:border-box;min-width:0;max-width:100%}
 .form-field textarea{resize:vertical;overflow-wrap:anywhere}
 .page-head .page-actions .button{white-space:nowrap}
-@media (max-width:1100px){
-.mobile-header .icon-button{
-    width:44px;height:44px;min-width:44px;min-height:44px;
-  }
+@media (max-width:1023px){
 .mobile-header .icon-button{width:40px;height:40px;min-width:40px;min-height:40px}
 .mobile-detail-actions .icon-button{width:40px;height:40px;min-width:40px}
 .app-header-actions :is(.icon-button,.avatar-button){width:44px;height:44px;min-width:44px;min-height:44px}}

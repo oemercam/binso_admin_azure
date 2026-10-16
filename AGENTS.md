@@ -26,8 +26,10 @@ permanent-toolbox instructions. Historical audit reports are evidence, not rules
   screens as derived in the review; never silently call them original-approved.
 - Preserve real APIs, authentication, roles, financial calculations and files.
   Reference data is allowed only in isolated test fixtures, never tenant data.
-- The ZIP's protected Bottom-Navigation contract remains unchanged. Its frozen
-  markup, token inheritance, focus and geometry have independent regression tests.
+- The owner instruction of 2026-10-16 replaces the earlier frozen-navigation
+  exception. Use the ZIP white edge-to-edge navigation with persistent labels and
+  blue selection; no glass or floating dock. Preserve destinations and permissions.
+  The explicit v3 contract and adversarial tests protect the replacement.
 - Compare original and actual login/list/detail at equal content widths first.
   Then cover every route family and operator variant with rendered evidence.
 - During work use qa:fast and focused tests; run the coherent browser matrix after
