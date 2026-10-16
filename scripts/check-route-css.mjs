@@ -129,7 +129,7 @@ for(const route of routes){
   // Next.js can split and deduplicate CSS into an empty auxiliary chunk. The
   // complete set linked by each route must still contain every shared UI marker.
   const combinedCss=cssHrefs.map(href=>assetCss.get(new URL(href,url).toString())??'').join('\n');
-  const requiredCssMarkers=["--font-sans",".marketing-header",".button",".hero",".app-root","@media"];
+  const requiredCssMarkers=["--font-sans",".marketing-header",".button",".reference-hero",".app-root","@media"];
   const missing=requiredCssMarkers.filter(marker=>!combinedCss.includes(marker));
   if(combinedCss.length<1000||missing.length){
     failures.push(`${route}: linked stylesheets are incomplete (${combinedCss.length} bytes; missing ${missing.join(", ")||"none"})`);

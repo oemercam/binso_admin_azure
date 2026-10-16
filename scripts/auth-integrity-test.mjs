@@ -51,6 +51,7 @@ const adapters={
 };
 const cache=new Map();
 async function load(file,actualRoot=false){
+ file=file.replaceAll("\\","/");
  if(adapters[file]&&!actualRoot)return adapters[file];if(cache.has(file))return cache.get(file);
  let source=ts.transpileModule(await fs.readFile(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText;
  for(const match of [...source.matchAll(/(?:from\s*|import\s*)(['"])([^'"]+)\1/g)]){
