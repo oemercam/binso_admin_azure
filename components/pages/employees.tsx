@@ -166,8 +166,8 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
       <button role="tab" aria-selected={employeeTab==="documents"} className={employeeTab==="documents"?"active":""} onClick={()=>setEmployeeTab("documents")}><LocalizedText>{"Dokumente"}</LocalizedText></button>
     </DetailTabs>}
     {(!existing||employeeTab==="overview")&&<div className="form-page" inert={savingRecord}>
-      {!editingRecord?<><div className="settings-profile"><Avatar name={displayName} identity={employeeId} size="large"/><span>{role}</span></div><SectionTitle title="Mitarbeiterdetails"/><dl className="detail-list">
-        <div className="detail-list-stacked"><dt><LocalizedText>{"E-Mail"}</LocalizedText></dt><dd>{email?<a href={contactHref("email",email)}>{email}</a>:<LocalizedText>Keine E-Mail hinterlegt</LocalizedText>}</dd></div>
+      {!editingRecord?<><dl className="detail-list">
+        <div><dt><LocalizedText>{"E-Mail"}</LocalizedText></dt><dd>{email?<a href={contactHref("email",email)}>{email}</a>:<LocalizedText>Keine E-Mail hinterlegt</LocalizedText>}</dd></div>
         {phone&&<div><dt><LocalizedText>{"Telefon"}</LocalizedText></dt><dd><a href={contactHref("phone",phone)}>{phone}</a></dd></div>}
         {entryDate&&<div><dt><LocalizedText>{"Eintritt"}</LocalizedText></dt><dd>{swissDate(entryDate)}</dd></div>}
         <div><dt><LocalizedText>{"Wochenstunden"}</LocalizedText></dt><dd>{formatQuantity(weeklyHours,"h/Woche")}</dd></div>

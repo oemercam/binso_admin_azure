@@ -7,7 +7,7 @@ import Link from "next/link";
 import { AppShell } from "../app-shell";
 import {useApiQuery} from "@/lib/client/use-api-query";
 import { isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
-import {CashStatistics} from "../cash-statistics";
+import {CashStatistics,CashOverview} from "../cash-statistics";
 import type {CashStatisticsData} from "@/lib/cash-statistics";
 import {financialStatus,financialStatusLabels} from "@/lib/financial-status";
 import {SectionTitle, LoadingState, ErrorState} from "../ui";
@@ -46,10 +46,10 @@ export function FinancePage(){
  const summary=query.data,items=summary?.documents??[];
  const overdue=items.filter(item=>item.kind==='invoice'&&financialStatus(item)==='overdue');
  return <AppShell title="Finanzen" active="finanzen"><FinanceTabs/>{query.loading?<LoadingState><LocalizedText>{"Finanzen werden geladen …"}</LocalizedText></LoadingState>:query.error?<ErrorState onRetry={query.refresh}><LocalizedText>{query.error}</LocalizedText></ErrorState>:<>
-  {summary?.cash&&<CashStatistics data={summary.cash} storageKey="finance"/>}
-  <section className="surface"><SectionTitle title="Offene Forderungen"/><p><LocalizedText>{"Aktueller Bestand · unabhängig vom Statistikzeitraum"}</LocalizedText></p>{summary?.invoices.length?summary.invoices.map(item=><p key={item.currency}>{formatCurrency(item.open_amount,item.currency)}</p>):<p>{formatCurrency(0)}</p>}</section>
-  <SectionTitle title="Rechnungen" action={<Link href="/rechnungen"><LocalizedText>{"Alle anzeigen"}</LocalizedText></Link>}/><DocumentList items={items.filter(item=>item.kind==='invoice')} kind="invoice"/>
-  <section className="surface"><SectionTitle title="Handlungsbedarf"/>{overdue.length?overdue.slice(0,5).map(item=><DocumentSummaryRow key={item.id} item={item} compact/>):<p role="status"><LocalizedText>{"Keine überfälligen Rechnungen."}</LocalizedText></p>}</section>
+  {summary?.cash&&<CashOverview data={summary.cash}/>}
+  {!!summary?.invoices.filter(item=>item.currency!=='CHF').length&&<section className="bo-workspace-section"><SectionTitle title="Offene Forderungen"/>{summary.invoices.filter(item=>item.currency!=='CHF').map(item=><p key={item.currency}>{formatCurrency(item.open_amount,item.currency)}</p>)}</section>}
+  <p><Link className="text-action" href="/finanzen/analyse"><LocalizedText>{"Finanzanalyse"}</LocalizedText></Link></p>
+  {overdue.length>0&&<section className="bo-workspace-section"><SectionTitle title="Handlungsbedarf"/>{overdue.slice(0,5).map(item=><DocumentSummaryRow key={item.id} item={item} compact/>)}</section>}
  </>}</AppShell>;
 }
 

@@ -65,6 +65,26 @@ Controller für Suche, Filter, Sortierung und Rückkehrzustand. Mobile Zeilen
 werden mit `RecordRow`, Desktopzellen mit den zentralen Spaltendefinitionen
 erstellt. Keine eigene Toolbar oder zweite Suche zeichnen.
 
+`CreateAction` ist auf dem Desktop ein beschrifteter blauer Button und auf Mobile
+ein schwarzer runder Plus-Button. `RecordsControls` zeigt auf Desktop Filter und
+Sortierung direkt neben der Suche; Mobile verwendet das gemeinsame Filter-Sheet.
+Eine Erfassungsaktion darf nicht manuell zu einem viewportunabhängigen Kreis werden.
+
+Dashboard und Finanzübersicht verwenden `CashOverview`: vier offene Kennzahlen,
+auf dem Dashboard die vier berechtigten Schnellaktionen und letzte Rechnungen,
+in der Finanzübersicht sechs Monatsbalken. Die ausführliche Statistik mit Ring,
+benutzerdefiniertem Zeitraum und Ledger-Hinweisen gehört zu `/finanzen/analyse`.
+Beide Darstellungen nutzen dieselben Finanzereignisse und Aggregationsfunktionen.
+Fehlende berechtigte Kennzahlen bleiben unbekannt; jüngste Rechnungen sind kein
+Ersatz für einen mandantenweiten Zähler. Negative Monatswerte bleiben unter der Nulllinie.
+
+Fachbereichs-CSS darf keine gemeinsamen Komponenten oder Kundenansichten über
+generische Containerselektoren neu gestalten. Insbesondere darf `operator.css`
+keine `.page-container`-Regeln enthalten. Kartenradien, graue Flächen oder pauschale
+Innenabstände dürfen nicht über einen späten Mobile-Block wieder eingeführt werden.
+Gemeinsame Sektionen, Kennzahlen, Felder, Chatnachrichten und Sheets bleiben bei
+ihrem Komponenten-Owner. Ein zentral abgelegter alter Override ist keine Migration.
+
 Eine Detailseite setzt `backHref`, Titel, Status und Aktionen an der Shell.
 `ActionsMenu` bleibt über den gemeinsamen Mobile-Fallback erreichbar; ein
 explizites `mobileActions` ersetzt ihn bei fachlich besonderen Aktionen.

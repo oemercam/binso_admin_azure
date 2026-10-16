@@ -18,7 +18,7 @@ for(const file of designSources){const css=postcss.parse(fs.readFileSync(file,'u
    if(!d.value.includes('url('))assert.ok(!/#[a-f\d]{3,8}\b|rgba?\(/i.test(d.value),file+': colour literals belong to the central theme');
   }
  });
- css.walkRules(rule=>{ruleCount++;if(rule.selector===':root')assert.ok(/\/(theme|navigation)\.css$/.test(file),file+': global tokens belong to theme or protected navigation');for(const m of rule.selector.matchAll(/\.([A-Za-z_][\w-]*)/g))classes.add(m[1]);
+ css.walkRules(rule=>{ruleCount++;if(file.endsWith('/operator.css'))assert.ok(!rule.selector.includes('.page-container'),'Admin styles cannot override the customer workspace; shared components must use their own owner');if(rule.selector===':root')assert.ok(/\/(theme|navigation)\.css$/.test(file),file+': global tokens belong to theme or protected navigation');for(const m of rule.selector.matchAll(/\.([A-Za-z_][\w-]*)/g))classes.add(m[1]);
   let context='';for(let p=rule.parent;p&&p.type!=='root';p=p.parent)context=p.name+' '+p.params+'/'+context;
   if(file.endsWith('/navigation.css'))return;
   for(const selector of rule.selectors){const key=context+'|'+selector.trim();if(owners.has(key)&&owners.get(key)!==file)conflicts.push(key+': '+owners.get(key)+' / '+file);owners.set(key,file);}

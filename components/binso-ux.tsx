@@ -41,7 +41,7 @@ export function PageHeading({ title, description, action, leading, verbatimTitle
 }
 
 export function CreateAction({ label, href, onClick, disabled = false, requiresWrite = true }: { label: string; href?: string; onClick?: () => void; disabled?: boolean;requiresWrite?:boolean }) {
-  return <Button href={href} requiresWrite={requiresWrite} className="bo-create-action" ariaLabel={label} disabled={disabled} onClick={onClick} icon="plus"/>;
+  return <Button href={href} requiresWrite={requiresWrite} className="bo-create-action" ariaLabel={label} disabled={disabled} onClick={onClick} icon="plus"><span className="create-action-label"><LocalizedText>{label}</LocalizedText></span></Button>;
 }
 
 /** One context-action contract: desktop command bar, mobile overflow sheet. */
@@ -60,6 +60,12 @@ export function QuickCreateAction({section="dashboard",returnTo="/dashboard"}:{s
  return <><CreateAction requiresWrite={false} label="Neu erstellen" onClick={()=>setOpen(true)}/>
   <ActionSheet label="Neu erstellen" className="quick-create-sheet" open={open} onClose={()=>setOpen(false)}><div className="action-list">{actions.map(item=><ActionRow key={item.href} title={item.title} icon={item.icon} href={createReturnHref(item.href,returnTo)} navigation onClick={()=>setOpen(false)}/>)}</div></ActionSheet>
  </>;
+}
+
+export function QuickCreateLinks({returnTo="/dashboard"}:{returnTo?:string}){
+ const access=usePageAccess();
+ const actions=permittedCreateActions('dashboard',access.canOpen).filter(action=>['kunden','angebote','rechnungen','zeit'].includes(action.section));
+ return <div className="bo-quick-create-links">{actions.map(action=><Button key={action.href} variant="secondary" requiresWrite href={createReturnHref(action.href,returnTo)} icon="plus"><LocalizedText>{action.title}</LocalizedText></Button>)}</div>;
 }
 
 /** Empty lists use the same permission-aware creation catalog as the page action area. */
@@ -95,8 +101,8 @@ export function MetricTiles({ children, columns=4, desktopOnly=false }: { childr
   return <div className="metrics-grid bo-metric-tiles" data-desktop-only={desktopOnly||undefined} style={{"--metric-columns":columns} as CSSProperties}>{children}</div>;
 }
 
-export function MetricTile({ label, value, hint }: { label: ReactNode; value: ReactNode; hint?:string }) {
-  return <Metric label={label} value={value} hint={hint}/>;
+export function MetricTile({ label, value, hint, currency, compactMoney=false }: { label: ReactNode; value: ReactNode; hint?:string; currency?:string; compactMoney?:boolean }) {
+  return <Metric label={label} value={currency&&typeof value==='number'?<span className="metric-money"><span className="metric-money-currency">{currency}</span>{" "}<span>{value.toLocaleString('de-CH',{minimumFractionDigits:compactMoney?0:2,maximumFractionDigits:2})}</span></span>:value} hint={hint}/>;
 }
 
 /** Open workspace sections share page spacing without adding nested card chrome. */

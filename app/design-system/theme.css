@@ -5,7 +5,7 @@
   /* App appearance: independent of the frozen navigation theme tokens. */
   --auth-control-border:#dfe5ed;
   --workspace-font:var(--font-sans);
-  --workspace-ink:#181b20;
+  --workspace-ink:#202b3b;
   --workspace-mobile-ink:#213047;
   --workspace-muted:#647080;
   --workspace-line:#edf1f6;
@@ -16,6 +16,7 @@
   --workspace-row-weight:500;
   --workspace-value-size:25px;
   --workspace-value-weight:500;
+  --timer-value-size:44px;
   --app-canvas:#fff;
   --app-surface:#fff;
   --app-chrome:#fff;
@@ -36,8 +37,10 @@
   --button-radius:var(--shape-control-desktop);
   --app-accent-text:#fff;
   --sidebar-collapsed-w:68px;
-  --app-control-border:#d3d3d8;
-  --app-group-radius:22px;
+  --app-control-border:#dce5ef;
+  --control-secondary-fg:#3e6594;
+  --control-ghost-fg:#2f73c4;
+  --command-text:#475469;
   --app-control-radius:7px;
   --stat-cell-min:120px;
   --insight-panel-min:240px;
@@ -99,9 +102,9 @@
   --metric-value-letter-spacing:-1px;
 
 
-  --radius-xs:7px;
-  --radius-sm:9px;
-  --radius-md:10px;
+  --radius-xs:5px;
+  --radius-sm:7px;
+  --radius-md:7px;
   --radius-lg:14px;
   --radius-sheet:18px;
 
@@ -152,6 +155,8 @@
   --header-avatar-size:30px;
   --control-focus-width:2px;
   --chart-positive:#57cc91;
+  --chart-overview:#5687c7;
+  --message-incoming-bg:#f1f5fa;
   --chart-negative:#f07881;
   --chart-neutral:#a2a8b3;
   --chart-ring-size:112px;
@@ -175,6 +180,7 @@
 
   --dialog-edge-gap:16px;
   --sheet-max-width:560px;
+  --document-entry-width:960px;
   --layer-sheet:80;
   --layer-confirm:190;
   --wizard-height:auto;
@@ -334,6 +340,10 @@ html[data-theme="dark"]{
   --app-action-accent:#48a7ff;
   --app-accent-text:#071521;
   --app-control-border:#3a3a3e;
+  --control-secondary-fg:#b4d3fa;
+  --control-ghost-fg:#8fc3ff;
+  --command-text:#c0cee0;
+  --message-incoming-bg:#172433;
   --control-border:#333;
   color-scheme:dark;
   --color-bg:#000;

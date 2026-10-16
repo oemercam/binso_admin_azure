@@ -1,4 +1,12 @@
 {
+  "Auszahlungsdaten sind unvollständig.": ["Outflow data is incomplete.", "Les données de décaissement sont incomplètes.", "I dati sulle uscite sono incompleti."],
+  "Dein Überblick.": ["Your overview.", "Votre vue d’ensemble.", "La tua panoramica."],
+  "Filter": ["Filter", "Filtrer", "Filtra"],
+  "Letzte Rechnungen": ["Recent invoices", "Dernières factures", "Ultime fatture"],
+  "Monatsentwicklung": ["Monthly trend", "Évolution mensuelle", "Andamento mensile"],
+  "Offene und überfällige Forderungen zeigen den aktuellen Bestand.": ["Outstanding and overdue receivables show the current balance.", "Les créances ouvertes et échues indiquent le solde actuel.", "I crediti aperti e scaduti mostrano il saldo attuale."],
+  "Rechnungen im Monat": ["Invoices this month", "Factures du mois", "Fatture del mese"],
+  "Sortieren": ["Sort", "Trier", "Ordina"],
   "Arbeitsbereich": [
     "Workspace",
     "Espace de travail",
