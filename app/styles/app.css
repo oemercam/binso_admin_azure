@@ -25,7 +25,8 @@
 .flow-tone-primary{background:var(--flow-chrome-bg);color:var(--flow-chrome-fg)}
 .flow-tone-sand{background:var(--flow-sand);color:var(--flow-sand-text)}
 .flow-tone-sage{background:var(--flow-sage);color:var(--flow-sage-text)}
-.flow-noir.app-section-dashboard .page-head{display:none}
+.flow-noir.app-section-dashboard:has(.flow-tone-primary) .page-head{display:none}
+.flow-noir.app-root.app-section-dashboard .page-head:not(.page-head-detail) .bo-page-heading h1{display:none}
 .flow-noir.app-section-dashboard .dashboard-grid{margin-block:25px;gap:22px}
 .flow-noir.app-section-dashboard .dashboard-grid>.surface{padding:0}
 .flow-noir.app-section-dashboard .section-title h2{font-weight:600}

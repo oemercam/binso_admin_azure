@@ -1,5 +1,25 @@
 # V24 – Konsolidierter Stand und verbleibende Arbeit
 
+## Flow Noir – freigegebener mobiler Entwurf vom 16.10.2026
+
+Ausgangsstand: `1f01c12c805d7cf1d09cda2e4f902965fb856b68`. Umsetzung und GitHub-Push wurden im Chat ausdrücklich beauftragt. Branch: `codex/flow-noir-ui`, PR #259. Diese Änderung ist keine Produktionsfreigabe.
+
+- Die freigegebene Referenz steht unverändert unter `docs/assets/flow-noir-20261016/approved-mobile-reference.html`. Sie enthält ausschliesslich simulierte Daten; die Anwendung übernimmt keine Beispielidentitäten oder Beispielkennzahlen.
+- Schwarze Kopfzeile, weisse Arbeitsfläche, Sand-/Salbei-Aktionen und Apricot-Statusfarben sind über zentrale Tokens umgesetzt. Dunkle Darstellung bleibt funktionsfähig. Mobile Navigation: Start, Kunden, Rechnungen, Mehr. Zeit und Finanzen bleiben über Mehr erreichbar.
+- Die Startseite verwendet das echte Profil, die Schweizer Geschäftszeit und die aktuelle Sprache. Rechnungsanlage erhält den bisherigen Rücksprungkontext. Aktionen konsumieren den vorhandenen Rollen-/Tarif-/Read-only-Kontext. Für Read-only-Nutzer bleibt die bisherige unabhängige Support-Aktion verfügbar.
+- Die kompakte Umsatzkarte summiert alle signierten Umsatzereignisse im Monat des autoritativen Finanz-Snapshots. Sie verwendet weder die letzten fünf Rechnungen noch Zahlungseingänge als Ersatz für Umsatz. Bestehende Finanzstatistiken bleiben aufklappbar verfügbar.
+- Bestehende Authentifizierung, Mandantentrennung, schreibende APIs, Entwurfs-/Abbruchschutz und Datenbankmigrationen wurden nicht ersetzt. Die öffentlichen Seiten und der Operator verwenden die gemeinsamen Farb-/Feldtokens; ihre fachlichen Abläufe bleiben beim bisherigen Seitenbesitzer.
+- Der Navigationsvertrag wurde für die ausdrücklich freigegebenen Ziele und Materialien aktualisiert. Zugriffs-/Scrolllogik und bestehende Icon-Implementierung sind gegenüber dem Ausgangsstand unverändert geprüft. Alte Referenzen bleiben als historische Nachweise erhalten.
+- Die QA-Berichtsausgabe nutzt nun das tatsächliche Betriebssystem-Tempverzeichnis, statt auf Windows `C:\tmp` vorauszusetzen. Der lokale Start benötigt einen Shim für den Node-basierten pnpm-Aufruf; dieser Host-Shim ist nicht Teil des Repositorys.
+
+### Nachweise und Grenzen
+
+- Produktionsbuild, TypeScript, Lint, schneller QA-Pfad, zentrale CSS-Architektur, Übersetzungsabdeckung sowie Release-/Dokumentationsprüfungen wurden lokal ausgeführt. Regressionsprüfungen für tatsächliche Aktionsrechte, Monats-/Jahresgrenzen und negative Umsatzereignisse sowie Textkontraste beider Themes stehen in `scripts/flow-noir-test.mjs` und im normalen Testskript.
+- Chromium/Edge gegen den Produktionsbuild: 72 bestandene Kombinationen aus neun Seiten, 320/390/768/1440 Pixeln und Hell/Dunkel. Enthalten sind Start, Rechnungs-/Kundenlisten und Details, Profil, Sicherheit sowie beide Anlageprozesse. Nachweis: `docs/assets/flow-noir-20261016/chromium-matrix.json`. Dies ist eine Browserprüfung mit isolierten API-Fixtures, keine Prüfung mit produktiven Kundendaten oder physischen iPhones.
+- Zugehörige Screenshots: `mobile-home-light.png`, `mobile-home-dark.png`, `mobile-invoices.png` im selben Evidenzverzeichnis. Der ergänzende Interaktionslauf prüft Suche, Konto, Benachrichtigungen und Chrome einschliesslich Read-only-Support; dessen abschliessender Stand wird hier nachgetragen.
+- **Der vollständige lokale Pflichtlauf ist nicht bestanden.** Der bestehende Monitoringtest benötigt Bash/POSIX-Ausführung; der Datei-Rescan prüft POSIX-Eigentümerrechte über `process.getuid`, das Windows nicht anbietet. Auch der Scanner-Protokolltest schlägt auf diesem Host fehl. Eine unveränderte Authentifizierungs-Fixture meldet `423` statt `200`; dies wurde nicht durch eine Änderung an Auth-/Sicherheitslogik verdeckt. Der alternative In-Memory-Transport ist kein echter ClamAV-Nachweis.
+- Die vollständigen Linux-CI-, WebKit- und Produktionsfreigaben bleiben erforderlich. Keine automatische Hochstufung früherer V24-Abnahmen, kein Merge und kein Deployment durch diese Umsetzung.
+
 Stand: 15.10.2026. Aktualisierung: Nutzer hat am 15.10.2026 um 20:24:41 Europe/Zurich den Weg bis Deploy ausdrücklich freigegeben. Keine vollständige V24-/Produktionsabnahme; Details und Profiltrennung in ux-enforcement-phase.md. Historische Phasenangaben unten bleiben als damaliger Stand erkennbar.
 
 ## GitHub-Abgleich
