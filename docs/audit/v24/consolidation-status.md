@@ -20,6 +20,16 @@ Ausgangsstand: `1f01c12c805d7cf1d09cda2e4f902965fb856b68`. Umsetzung und GitHub-
 - **Der vollständige lokale Pflichtlauf ist nicht bestanden.** Der bestehende Monitoringtest benötigt Bash/POSIX-Ausführung; der Datei-Rescan prüft POSIX-Eigentümerrechte über `process.getuid`, das Windows nicht anbietet. Auch der Scanner-Protokolltest schlägt auf diesem Host fehl. Eine unveränderte Authentifizierungs-Fixture meldet `423` statt `200`; dies wurde nicht durch eine Änderung an Auth-/Sicherheitslogik verdeckt. Der alternative In-Memory-Transport ist kein echter ClamAV-Nachweis.
 - Der erste GitHub-Linux-Lauf auf 386de8335630336949c166455a78f0054c7e80b1 bestand checks, build, scanner-engine, ux-compliance und quality; Browser wurden wegen des Draft-Status dort ausdrücklich ausgelassen. Der aktuelle Folge-Commit benötigt seine eigenen GitHub-Nachweise. Vollständige WebKit- und Produktionsfreigaben bleiben erforderlich. Keine automatische Hochstufung früherer V24-Abnahmen, kein Merge und kein Deployment durch diese Umsetzung.
 
+### Korrektur des fehlgeschlagenen Ready-Laufs #38831353373
+
+Der vollständige GitHub-Lauf auf eb5e2e3763e37dca82e0c620b8cf1d0fd1facb97 bestand Build, Checks, Scanner, Chromium und WebKit. Die nachgelagerte UX-Aggregation blockierte mit 612 alten Navigationsvergleichen und 150 Aktionsabstands-Messungen. Ursache: noch aktive Glas-Referenz v2 sowie Layoutrechtecke unsichtbarer Schaltflächen in geschlossenen details-Elementen.
+
+- Explizite Referenz v3 für den im Chat freigegebenen Flow-Noir-Dock. Sechs Breiten, beide Themes, konsistente Geometrie aus Chromium und WebKit des obigen GitHub-Laufs. v1/v2 bleiben erhalten; keine automatische Baseline-Aktualisierung.
+- Aktionsabstand verwendet gerenderte Sichtbarkeit statt allein getClientRects. Regression reproduzierte den Fehler zuerst; geschlossene und geöffnete Bereiche, echte Überlappungen und blockierte Scrollendpunkte sind geprüft. Stabiler Scrollendpunkt bleibt Pflicht, mit zehn Sekunden Zeitbudget bei paralleler Browserlast.
+- Dashboard-Prüfung wartet auf die tatsächliche Umsatzkarte statt unmittelbar deren Anzahl während des Ladens zu zählen.
+- Erneute lokale Abnahme gegen denselben Produktionsbuild: 84 Seiten-/Theme-/Breitenkombinationen bestanden; 92 einzelne aktuelle Compliance-Evidenzen, keine fehlgeschlagenen Messungen. Bericht mit --static --gate bestanden. Sieben Seiten: Dashboard, Willkommen, Demo, Preview-Dashboard, Zeit, Kunden und Rechnungen; 320/375/390/430/768/1024 px, Hell/Dunkel. Nachweis: chromium-compliance-fix.json.
+- Getesteter Arbeitsbaum auf Elterncommit eb5e2e3763e37dca82e0c620b8cf1d0fd1facb97, Source-Digest ceca54cc4e2581bb5e020f4c2068aefc56d9712fef633f174645126a588c5989. qa:fast mit TypeScript, Lint, Architektur, Vertrags- und Compliance-Selbsttests bestanden. Die neue GitHub-Abnahme bleibt bis zum Abschluss offen; keine Produktionsfreigabe.
+
 Stand: 15.10.2026. Aktualisierung: Nutzer hat am 15.10.2026 um 20:24:41 Europe/Zurich den Weg bis Deploy ausdrücklich freigegeben. Keine vollständige V24-/Produktionsabnahme; Details und Profiltrennung in ux-enforcement-phase.md. Historische Phasenangaben unten bleiben als damaliger Stand erkennbar.
 
 ## GitHub-Abgleich

@@ -1,0 +1,225 @@
+{
+  "schemaVersion": 3,
+  "provenance": "Explicit Flow Noir capture from PR #259 run 38831353373. Same geometry independently measured by Chromium and WebKit; fixture evidence, not physical PWA approval.",
+  "commit": "eb5e2e3763e37dca82e0c620b8cf1d0fd1facb97",
+  "toleranceCssPixels": 1,
+  "approval": "User approved the Flow mobile layout and requested black/white with coordinated accents on 2026-10-16. Full-width square dock: Start, Kunden, Rechnungen, Mehr; no separate create button. Previous glass references v1/v2 retained.",
+  "cases": [
+    {
+      "theme": "dark",
+      "width": 320,
+      "withCreate": false,
+      "navigation": {
+        "x": 8,
+        "width": 304,
+        "height": 70,
+        "bottomOffset": 0,
+        "position": "relative",
+        "borderRadius": "0px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/rechnungen"
+        ]
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 375,
+      "withCreate": false,
+      "navigation": {
+        "x": 8,
+        "width": 359,
+        "height": 70,
+        "bottomOffset": 0,
+        "position": "relative",
+        "borderRadius": "0px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/rechnungen"
+        ]
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "withCreate": false,
+      "navigation": {
+        "x": 8,
+        "width": 374,
+        "height": 70,
+        "bottomOffset": 0,
+        "position": "relative",
+        "borderRadius": "0px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/rechnungen"
+        ]
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 430,
+      "withCreate": false,
+      "navigation": {
+        "x": 8,
+        "width": 414,
+        "height": 70,
+        "bottomOffset": 0,
+        "position": "relative",
+        "borderRadius": "0px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/rechnungen"
+        ]
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 768,
+      "withCreate": false,
+      "navigation": {
+        "x": 8,
+        "width": 752,
+        "height": 70,
+        "bottomOffset": 0,
+        "position": "relative",
+        "borderRadius": "0px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/rechnungen"
+        ]
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 1024,
+      "withCreate": false,
+      "navigation": {
+        "x": 8,
+        "width": 1008,
+        "height": 70,
+        "bottomOffset": 0,
+        "position": "relative",
+        "borderRadius": "0px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/rechnungen"
+        ]
+      }
+    },
+    {
+      "theme": "light",
+      "width": 320,
+      "withCreate": false,
+      "navigation": {
+        "x": 8,
+        "width": 304,
+        "height": 70,
+        "bottomOffset": 0,
+        "position": "relative",
+        "borderRadius": "0px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/rechnungen"
+        ]
+      }
+    },
+    {
+      "theme": "light",
+      "width": 375,
+      "withCreate": false,
+      "navigation": {
+        "x": 8,
+        "width": 359,
+        "height": 70,
+        "bottomOffset": 0,
+        "position": "relative",
+        "borderRadius": "0px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/rechnungen"
+        ]
+      }
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "withCreate": false,
+      "navigation": {
+        "x": 8,
+        "width": 374,
+        "height": 70,
+        "bottomOffset": 0,
+        "position": "relative",
+        "borderRadius": "0px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/rechnungen"
+        ]
+      }
+    },
+    {
+      "theme": "light",
+      "width": 430,
+      "withCreate": false,
+      "navigation": {
+        "x": 8,
+        "width": 414,
+        "height": 70,
+        "bottomOffset": 0,
+        "position": "relative",
+        "borderRadius": "0px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/rechnungen"
+        ]
+      }
+    },
+    {
+      "theme": "light",
+      "width": 768,
+      "withCreate": false,
+      "navigation": {
+        "x": 8,
+        "width": 752,
+        "height": 70,
+        "bottomOffset": 0,
+        "position": "relative",
+        "borderRadius": "0px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/rechnungen"
+        ]
+      }
+    },
+    {
+      "theme": "light",
+      "width": 1024,
+      "withCreate": false,
+      "navigation": {
+        "x": 8,
+        "width": 1008,
+        "height": 70,
+        "bottomOffset": 0,
+        "position": "relative",
+        "borderRadius": "0px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/rechnungen"
+        ]
+      }
+    }
+  ]
+}

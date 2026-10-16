@@ -328,6 +328,7 @@ try{
     }
     if(width<=760&&await page.locator('.mobile-back').count()){const back=page.locator('.mobile-back');assert.ok(await back.isVisible(),`${route}: detail back control is visible`);const icon=await back.locator('svg').boundingBox();assert.ok(icon&&icon.width>=18&&icon.height>=18&&icon.x>=0,`${route}: back icon is not clipped`);}
     if(!process.env.BINSO_UX_BASELINE&&route==='/dashboard'){
+      await page.locator('.flow-month-summary').waitFor({state:'visible'});
       assert.equal(await page.locator('.flow-month-summary').count(),1,'Home shows the approved compact authoritative revenue summary');
       assert.ok(await page.locator('.flow-month-summary strong').innerText(),'Revenue amount is available');
       assert.equal(await page.locator('.flow-finance-details').getAttribute('open'),null,'Detailed analytics stays collapsed on the Flow home');

@@ -17,10 +17,16 @@ try{
  assert(settled.scrollEndEstablished,'A delayed route scroll reset must be retried');
  assert(settled.scrollY>0&&settled.lastActionBottom<settled.navigationTop,'Compare the real document endpoint');
  assert.equal(await page.evaluate(()=>scrollY),0,'Restore the original scroll');
+ await page.setContent(fixture(160).replace('</main>','<details><summary>Statistics</summary><div style="padding-top:1200px"><button>Collapsed action</button></div></details></main>'));
+ const collapsed=await measureActionClearance(page);
+ assert(collapsed.lastActionBottom<collapsed.navigationTop,'Collapsed details descendants must not count as reachable actions');
+ await page.locator('summary').click();
+ const expanded=await measureActionClearance(page);
+ assert(expanded.scrollY>collapsed.scrollY&&expanded.lastActionBottom<expanded.navigationTop,'Expanded details actions must be measured at their real endpoint');
  await page.setContent(fixture(0));
  const overlap=await measureActionClearance(page);
  assert(overlap.scrollEndEstablished&&overlap.lastActionBottom>overlap.navigationTop,'True navigation overlap stays blocking');
- await page.evaluate(()=>{window.scrollTo=()=>{};});
+ await page.evaluate(()=>{window.scrollTo(0,0);window.scrollTo=()=>{};});
  const blocked=await measureActionClearance(page);
  assert.equal(blocked.scrollEndEstablished,false,'Unreachable endpoint cannot pass as measured geometry');
  await page.setViewportSize({width:1440,height:1000});
