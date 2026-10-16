@@ -32,7 +32,7 @@ export function planChanges(files,{level='standard'}={}){
  const infrastructure=paths.some(isInfrastructure);
  const matched=Object.values(groups).filter(g=>paths.some(p=>g.match.test(p)));
  const unknown=paths.some(p=>!/^(docs\/|README|\.gitignore|AGENTS\.md)/.test(p)&&!isGlobal(p)&&!isInfrastructure(p)&&!Object.values(groups).some(g=>g.match.test(p)));
- const full=level==='full'||level==='standard'&&(infrastructure||unknown);
+ const full=level==='full'||level==='standard'&&(global||infrastructure||unknown);
  const broad=global||unknown||infrastructure;
  const modulePaths=paths.filter(p=>p.startsWith('components/pages/')&&!p.endsWith('/shared.tsx'));
  let dependencyRoutes=[];try{const catalog=JSON.parse(fs.readFileSync('docs/architecture/ux-inventory.json','utf8'));dependencyRoutes=catalog.routes.filter(r=>modulePaths.some(p=>r.components.some(c=>c.startsWith(p+'#')))).map(r=>r.route).filter(r=>!r.startsWith('/preview')&&!r.startsWith('/operator')).map(r=>r.replace('[id]',r.startsWith('/kunden')?'customer-one':r.startsWith('/produkte')?'product-one':r.startsWith('/mitarbeiter')?'employee-one':r.startsWith('/spesen')?'expense-one':r.startsWith('/zahlungen')?'payment-one':r.startsWith('/support')?'ticket-one':r.startsWith('/rechnungen')?'RE-TEST-1':'AN-TEST-1'));}catch{}
