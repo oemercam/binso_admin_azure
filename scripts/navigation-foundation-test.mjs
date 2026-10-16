@@ -31,11 +31,10 @@ export function navigationFoundation(read){
  return {markup:hash(markup),logic:hash(logic),icons:hash(icons),rules:hash(rules),tokens:hash(variables),tokenNames:[...needed].sort()};
 }
 if(process.argv[1]===fileURLToPath(import.meta.url)){
- const original=JSON.parse(fs.readFileSync('docs/assets/v21-1/navigation-reference.json','utf8'));
- const reference=JSON.parse(fs.readFileSync('docs/assets/20261013/navigation-reference.json','utf8'));
+ const reference=JSON.parse(fs.readFileSync('docs/assets/flow-noir-20261016/navigation-reference.json','utf8'));
  const current=navigationFoundation(file=>fs.readFileSync(file,'utf8'));
- assert.equal(current.logic,original.snapshot.logic,'Creation/material changes must preserve destination access and scroll logic');
- assert.equal(current.icons,original.snapshot.icons,'Existing navigation icons remain unchanged');
- assert.deepEqual(navigationFoundation(file=>fs.readFileSync(file,'utf8')),reference.snapshot,'Navigation must match the explicitly authorized shared glass/dock contract from 2026-10-13');
+ assert.equal(current.logic,reference.preChangeSnapshot.logic,'Creation/material changes must preserve destination access and scroll logic');
+ assert.equal(current.icons,reference.preChangeSnapshot.icons,'Existing navigation icons remain unchanged');
+ assert.deepEqual(navigationFoundation(file=>fs.readFileSync(file,'utf8')),reference.snapshot,'Navigation must match the explicitly authorized Flow Noir navigation contract from 2026-10-16');
  console.log('Customer/operator dock: approved glass/creation placement; original destination access/scroll logic and icons preserved. Reference '+reference.commit+'.');
 }

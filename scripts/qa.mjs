@@ -1,6 +1,8 @@
 import {writeTestOutput} from './test-output.mjs';
 import {spawn} from 'node:child_process';
 import fs from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import path from 'node:path';
 import {planChanges,changedFiles,shouldRunBrowser} from './qa-plan.mjs';
 const args=process.argv.slice(2),level=args[0]??'fast';
 const arg=name=>{const i=args.indexOf(name);return i<0?undefined:args[i+1]};
@@ -37,5 +39,6 @@ try{
   if(level!=='fast')await run('scoped WebKit browser',process.execPath,['scripts/ux-browser-test.mjs'],{...env,BINSO_UX_BROWSER:'webkit',BINSO_UX_ROUTES:plan.webkitRoutes.join(','),BINSO_UX_WIDTHS:plan.webkitWidths.join(','),BINSO_UX_DEVICE:'iPhone 13'});
  }
  const report={level,effectiveCoverage:plan.level,browserExecuted:plan.routes.length>0&&browserRequested,scope:plan,seconds:Number(((performance.now()-started)/1000).toFixed(2)),timings,passed:true};
- await fs.mkdir('/tmp/binso-qa-reports',{recursive:true});await writeTestOutput('/tmp/binso-qa-reports/'+level+'.json',JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));
+ const reportDirectory=path.join(tmpdir(),'binso-qa-reports');
+ await fs.mkdir(reportDirectory,{recursive:true});await writeTestOutput(path.join(reportDirectory,level+'.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));
 }catch(error){console.error(error.message);process.exitCode=1;}
