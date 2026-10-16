@@ -2978,7 +2978,7 @@ input:not([type="checkbox"]):not([type="radio"]),
 .flow-panel .sheet-header{padding:22px 20px 18px}
 .flow-panel .sheet-header h2{font-size:25px;letter-spacing:-.6px}
 .flow-panel .sheet-body{padding:22px 20px}
-.flow-panel .filter-sheet-actions{padding:16px 20px max(16px,var(--safe-bottom));background:var(--app-canvas)}
+.flow-panel .filter-sheet-actions{padding:16px 20px max(16px,var(--safe-bottom));background:var(--app-canvas)}.flow-noir.operator-root .operator-app-content{grid-template-columns:minmax(0,1fr)}.flow-noir .operator-customer-hero{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;padding:20px}.flow-noir .operator-customer-main{min-width:0}.flow-noir .operator-customer-main>div{min-width:0;overflow-wrap:anywhere}.flow-noir .operator-customer-actions{min-width:0;width:100%;display:flex;flex-wrap:wrap;gap:10px}.flow-noir .operator-customer-actions .button{min-width:0;max-width:100%;white-space:normal}.flow-noir .operator-customer-metrics{min-width:0;grid-template-columns:repeat(2,minmax(0,1fr))}.flow-noir .operator-customer-grid{min-width:0;grid-template-columns:minmax(0,1fr)}.flow-noir:not(.flow-auth) .form-textarea,.flow-panel .form-textarea{min-height:110px}
 }
 @supports ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
   .app-glass,.mobile-dock> :is(.bottom-nav,.operator-mobile-nav){background:var(--app-glass-tint);backdrop-filter:blur(var(--app-glass-blur));-webkit-backdrop-filter:blur(var(--app-glass-blur))}

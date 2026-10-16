@@ -1870,3 +1870,7 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 .flow-budget-progress::-webkit-progress-bar{background:var(--app-divider);border-radius:8px}
 .flow-budget-progress::-webkit-progress-value{background:var(--flow-sage-text);border-radius:8px}
 .flow-budget-progress::-moz-progress-bar{background:var(--flow-sage-text);border-radius:8px}
+
+.flow-noir .operator-app-content>*{min-width:0}
+.flow-noir .operator-detail-list>div{grid-template-columns:minmax(0,120px) minmax(0,1fr)}
+.flow-noir .operator-detail-list dd{min-width:0;overflow-wrap:anywhere}
