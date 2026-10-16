@@ -25,7 +25,6 @@ concurrency:
 permissions:
   contents: read
   actions: read
-  id-token: write
 
 env:
   BINSO_DEPLOY_SHA: ${{ inputs.commit_sha }}
@@ -40,8 +39,21 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     environment: production
+    permissions:
+      contents: read
+      actions: read
+      id-token: write
 
     steps:
+      - name: Validate dispatch identity before checking out code
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const sha = process.env.BINSO_DEPLOY_SHA;
+            if (!/^[a-f0-9]{40}$/.test(sha) || context.ref !== 'refs/heads/main' || context.sha !== sha) {
+              throw new Error('Deployment must use the immutable main SHA selected at dispatch');
+            }
+
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
@@ -60,7 +72,7 @@ jobs:
             const {data: branch} = await github.rest.repos.getBranch({...context.repo, branch: 'main'});
             if (branch.commit.sha !== sha) throw new Error('Only the current main commit may be promoted');
             const {data} = await github.rest.actions.listWorkflowRuns({...context.repo, workflow_id: 'quality.yml', branch: 'main', event: 'workflow_dispatch', head_sha: sha, per_page: 100});
-            const verified = data.workflow_runs.find(run => run.head_sha === sha && run.status === 'completed' && run.conclusion === 'success' && run.display_title === expectedTitle);
+            const verified = data.workflow_runs.find(run => run.event === 'workflow_dispatch' && run.head_branch === 'main' && run.path === '.github/workflows/quality.yml' && run.head_sha === sha && run.status === 'completed' && run.conclusion === 'success' && run.display_title === expectedTitle);
             if (!verified) throw new Error('No successful full manual Quality run for this exact commit; migrations and deployment are blocked');
             core.setOutput('run_id', String(verified.id));
 
@@ -72,10 +84,13 @@ jobs:
           github-token: ${{ github.token }}
           run-id: ${{ steps.verified.outputs.run_id }}
 
+      - uses: ./.github/actions/setup-node
+
       - name: Validate deploy artifact
         shell: bash
         run: |
           set -euo pipefail
+          node scripts/release-artifact.mjs verify deploy "$BINSO_DEPLOY_SHA"
           test -s deploy/binso-one.zip
           unzip -l deploy/binso-one.zip > /tmp/binso-zip-contents.txt
           grep -q 'server.js' /tmp/binso-zip-contents.txt
@@ -85,15 +100,6 @@ jobs:
           DEPLOY_SHA="$BINSO_DEPLOY_SHA"
           grep -q "$DEPLOY_SHA" /tmp/binso-artifact/public/deployment.json
           node --input-type=module -e 'import fs from "node:fs";import {createHash} from "node:crypto";import {validateScope,scopeDigest} from "./scripts/compliance/release-scope.mjs";const raw=fs.readFileSync("/tmp/binso-artifact/ux-compliance/release-scope.v1.json");const scope=validateScope(JSON.parse(raw));const meta=JSON.parse(fs.readFileSync("/tmp/binso-artifact/public/deployment.json"));const hash=createHash("sha256").update(raw).digest("hex");if(meta.sha!==process.env.BINSO_DEPLOY_SHA||meta.releaseProfile!==scope.id||meta.productionAcceptance!==false||meta.releaseScopeSha256!==hash||hash!==scopeDigest())throw Error("Release scope/artifact binding mismatch");'
-
-      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version: 24
-          cache: pnpm
-
-      - name: Install migration tooling
-        run: pnpm install --frozen-lockfile
 
       - name: Validate and migrate Azure PostgreSQL
         shell: bash

@@ -11,8 +11,13 @@ permissions:
   contents: read
   id-token: write
 
+concurrency:
+  group: operational-azure-architecture-audit
+  cancel-in-progress: true
+
 jobs:
   audit:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     environment: production

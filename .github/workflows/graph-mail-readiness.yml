@@ -2,6 +2,11 @@ name: Microsoft Graph Mail Readiness
 
 on:
   workflow_dispatch:
+    inputs:
+      send_self_test:
+        description: Explicitly send one production self-test email
+        type: boolean
+        default: false
   push:
     branches: [main]
     paths:
@@ -13,9 +18,15 @@ permissions:
   contents: read
   id-token: write
 
+concurrency:
+  group: operational-graph-mail-readiness
+  cancel-in-progress: false
+
 jobs:
   graph-mail:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
     environment: production
     steps:
       - uses: azure/login@a641126d1b8aa4d1fa005f4f92df94a3a4c4c906 # v3
@@ -24,16 +35,24 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Validate Microsoft Graph mail and submit self-test
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+
+      - name: Validate Microsoft Graph mail (sending requires explicit input)
         shell: bash
+        env:
+          SEND_SELF_TEST: ${{ github.event_name == 'workflow_dispatch' && inputs.send_self_test == true }}
         run: |
           set -euo pipefail
 
+          umask 077
+          SETTINGS_FILE="$(mktemp)"
+          trap 'rm -f "$SETTINGS_FILE" /tmp/graph-send-response' EXIT
+          az webapp config appsettings list -g rg-binso-admin-prod -n binso-admin-prod \
+            --query "[?starts_with(name, 'GRAPH_')].{name:name,value:value}" -o json > "$SETTINGS_FILE"
           get_setting() {
-            az webapp config appsettings list \
-              --resource-group rg-binso-admin-prod \
-              --name binso-admin-prod \
-              --query "[?name=='$1'].value | [0]" -o tsv
+            node -e 'const fs=require("fs");const rows=JSON.parse(fs.readFileSync(process.argv[1],"utf8"));process.stdout.write(String(rows.find(r=>r.name===process.argv[2])?.value??""))' "$SETTINGS_FILE" "$1"
           }
 
           GRAPH_TENANT_ID="$(get_setting GRAPH_TENANT_ID)"
@@ -64,8 +83,13 @@ jobs:
             --data-urlencode "grant_type=client_credentials" \
             "https://login.microsoftonline.com/$GRAPH_TENANT_ID/oauth2/v2.0/token")"
 
-          ACCESS_TOKEN="$(node -e 'const p=JSON.parse(process.argv[1]);if(!p.access_token)process.exit(1);process.stdout.write(p.access_token)' "$TOKEN_RESPONSE")"
+          ACCESS_TOKEN="$(printf '%s' "$TOKEN_RESPONSE" | node -e 'let s="";process.stdin.on("data",d=>s+=d);process.stdin.on("end",()=>{const p=JSON.parse(s);if(!p.access_token)process.exit(1);process.stdout.write(p.access_token)})')"
           echo "::add-mask::$ACCESS_TOKEN"
+
+          if [ "$SEND_SELF_TEST" != true ]; then
+            echo 'Microsoft Graph credentials validated. No email sent; explicit manual send_self_test=true is required.'
+            exit 0
+          fi
 
           PAYLOAD="$(node -e 'const sender=process.argv[1],sha=process.argv[2];process.stdout.write(JSON.stringify({message:{subject:"Binso One – Microsoft Graph Produktionsprüfung "+sha.slice(0,7),body:{contentType:"Text",content:"Automatischer Binso-One-Produktionscheck. Microsoft Graph hat diese Nachricht im Auftrag der Mail-Service-App angenommen."},toRecipients:[{emailAddress:{address:sender}}]},saveToSentItems:false}))' "$GRAPH_SENDER_USER_ID" "$GITHUB_SHA")"
 

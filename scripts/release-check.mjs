@@ -98,7 +98,7 @@ const resolverSource=resolverBlock?.split('          script: |\n')[1]?.split('\n
 assert.ok(resolverSource,'Production resolver is present');
 const resolveCandidate=new (Object.getPrototypeOf(async function(){}).constructor)('process','github','context','core',resolverSource);
 const candidateSha='a'.repeat(40),otherSha='b'.repeat(40);
-const successfulRun={id:42,head_sha:candidateSha,status:'completed',conclusion:'success',display_title:'Quality • workflow_dispatch • full'};
+const successfulRun={id:42,event:'workflow_dispatch',head_branch:'main',path:'.github/workflows/quality.yml',head_sha:candidateSha,status:'completed',conclusion:'success',display_title:'Quality • workflow_dispatch • full'};
 async function probeResolver({sha=candidateSha,main=candidateSha,runs=[successfulRun],profile='production'}={}){
  const output={};let queried=false;
  const github={rest:{repos:{getBranch:async()=>({data:{commit:{sha:main}}})},actions:{listWorkflowRuns:async input=>{queried=true;assert.equal(input.event,'workflow_dispatch');assert.equal(input.head_sha,sha);return {data:{workflow_runs:runs}}}}}};
@@ -113,6 +113,9 @@ await assert.rejects(probeResolver({profile:'development'}),'Production title ca
 await assert.rejects(probeResolver({profile:'unknown'}));
 for(const input of [
  {sha:'main'}, {main:otherSha}, {runs:[]},
+ {runs:[{...successfulRun,event:'push'}]},
+ {runs:[{...successfulRun,head_branch:'feature'}]},
+ {runs:[{...successfulRun,path:'.github/workflows/other.yml'}]},
  {runs:[{...successfulRun,head_sha:otherSha}]},
  {runs:[{...successfulRun,conclusion:'failure'}]},
  {runs:[{...successfulRun,display_title:'Quality • workflow_dispatch • standard'}]},

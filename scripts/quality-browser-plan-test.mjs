@@ -34,6 +34,11 @@ const yaml=createRequire(require.resolve('eslint'))('js-yaml');
 const config=yaml.load(workflow);
 assert.equal(config.jobs.browser.services.postgres.image,"${{ matrix.lane == 'functional' && 'postgres:16' || '' }}",'Only real API browser suites start PostgreSQL; responsive fixtures have no database');
 for(const step of config.jobs.browser.steps.filter(s=>/node scripts\/|pnpm ux:lab/.test(s.run??''))){
+ if(step.run.includes('node scripts/release-artifact.mjs verify')){
+  assert.equal(step.name,'Extract exact production candidate','Only shared candidate preparation may run on every lane');
+  assert(step.run.indexOf('release-artifact.mjs verify')<step.run.indexOf('unzip -q'),'Verify bytes before extracting them');
+  continue;
+ }
  const owner=step.run==='node scripts/browser-shards.mjs'?'responsive':'functional';
  assert(step.if?.includes(`matrix.lane == '${owner}'`),'One owning lane for '+step.name);
 }
