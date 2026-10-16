@@ -32,6 +32,7 @@ for(const gate of ['pnpm lint','pnpm typecheck','pnpm build','pnpm security:scan
 const require=createRequire(import.meta.url);
 const yaml=createRequire(require.resolve('eslint'))('js-yaml');
 const config=yaml.load(workflow);
+assert.equal(config.jobs.browser.services.postgres.image,"${{ matrix.lane == 'functional' && 'postgres:16' || '' }}",'Only real API browser suites start PostgreSQL; responsive fixtures have no database');
 for(const step of config.jobs.browser.steps.filter(s=>/node scripts\/|pnpm ux:lab/.test(s.run??''))){
  const owner=step.run==='node scripts/browser-shards.mjs'?'responsive':'functional';
  assert(step.if?.includes(`matrix.lane == '${owner}'`),'One owning lane for '+step.name);

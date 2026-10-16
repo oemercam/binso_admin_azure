@@ -175,7 +175,8 @@ jobs:
   browser:
     services:
       postgres:
-        image: postgres:16
+        # Responsive fixtures intercept every API; only real authenticated suites need PostgreSQL.
+        image: ${{ matrix.lane == 'functional' && 'postgres:16' || '' }}
         env:
           POSTGRES_USER: binso_test
           POSTGRES_PASSWORD: binso_test

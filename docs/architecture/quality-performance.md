@@ -133,7 +133,10 @@ Inspection of #1400 logs found Lab/PWA executing on every Chromium shard as well
 as the functional runner. The final workflow restricts both to the functional
 lane; a parsed-YAML contract now checks every browser suite's unique owning lane.
 The final revision also serializes main/manual checks per ref/profile while only
-PR updates cancel stale runs. Its confirming full run is available in
+PR updates cancel stale runs. Responsive fixture shards no longer start unused
+PostgreSQL containers; the two functional runners keep their real database gates.
+This uses GitHub's documented [conditional service image](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#jobsjob_idservicesservice_idimage)
+and is checked by the parsed-workflow contract. Its confirming full run is available in
 [PR #262 checks](https://github.com/oemercam/binso_admin_azure/pull/262/checks).
 Machine-readable baseline/comparison data is in `quality-performance-runs.json`.
 No smoke-only GitHub runtime is claimed: it cannot be measured on this workflow
