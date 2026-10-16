@@ -1,5 +1,8 @@
 import {pixelDifference} from './visual.mjs';
 import assert from 'node:assert/strict';
+import {execFileSync} from 'node:child_process';
+import {pathToFileURL} from 'node:url';
+import {createHash} from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -30,3 +33,25 @@ try{
  assert.equal((await pixelDifference(a,a)).changedPixels,0);assert.equal((await pixelDifference(a,b)).changedPixels,16);
 }finally{fs.rmSync(imageDir,{recursive:true,force:true});}
 console.log('Stale evidence rejected, failures dominate, sampled pass stays partial, absent/physical evidence cannot pass.');
+
+// Real Git index regression: thousands of generated evidence paths must not
+// overflow identity collection or alter the binding to actual source bytes.
+const identityDir=fs.mkdtempSync(path.join(os.tmpdir(),'binso-identity-test-'));
+assert(identityDir.startsWith(path.resolve(os.tmpdir())+path.sep));
+const identityModule=pathToFileURL(path.resolve('scripts/compliance/identity.mjs')).href;
+const git=(...args)=>execFileSync('git',args,{cwd:identityDir,encoding:'utf8',maxBuffer:4*1024*1024});
+const readIdentity=()=>JSON.parse(execFileSync(process.execPath,['--input-type=module','-e',`import {identity} from ${JSON.stringify(identityModule)};console.log(JSON.stringify(identity()))`],{cwd:identityDir,encoding:'utf8'}));
+try{
+ git('init','-q');fs.mkdirSync(path.join(identityDir,'app'));fs.writeFileSync(path.join(identityDir,'app/page.tsx'),'source fixture');fs.writeFileSync(path.join(identityDir,'package.json'),'{}');git('add','app','package.json');
+ const blob=execFileSync('git',['hash-object','-w','--stdin'],{cwd:identityDir,input:'synthetic evidence',encoding:'utf8'}).trim();
+ const index=Array.from({length:8000},(_,i)=>`100644 ${blob}\tevidence/${String(i).padStart(5,'0')}-${'x'.repeat(150)}.json\n`).join('');
+ execFileSync('git',['update-index','--index-info'],{cwd:identityDir,input:index});
+ git('-c','user.name=Isolated Fixture','-c','user.email=fixture@example.invalid','commit','-q','-m','Synthetic identity fixture');
+ assert(Buffer.byteLength(git('ls-files','-z'))>1024*1024,'Exercise the original child-process buffer boundary');
+ const expected=createHash('sha256');for(const file of ['app/page.tsx','package.json'])expected.update(file+'\0').update(fs.readFileSync(path.join(identityDir,file)));
+ const initial=readIdentity();assert.equal(initial.sourceDigest,expected.digest('hex'),'Evidence paths do not change the source digest');
+ fs.mkdirSync(path.join(identityDir,'evidence'));fs.writeFileSync(path.join(identityDir,'evidence/untracked.json'),'new generated result');assert.equal(readIdentity().sourceDigest,initial.sourceDigest);
+ fs.writeFileSync(path.join(identityDir,'app/page.tsx'),'changed source fixture');assert.notEqual(readIdentity().sourceDigest,initial.sourceDigest,'Source edits remain bound');
+ fs.mkdirSync(path.join(identityDir,'components'));fs.writeFileSync(path.join(identityDir,'components/new.tsx'),'untracked source fixture');const untracked=readIdentity().sourceDigest;git('add','components/new.tsx');assert.equal(readIdentity().sourceDigest,untracked,'Untracked source is included before staging');
+ console.log('Source identity handles >1 MiB of generated Git paths while retaining tracked/untracked source binding.');
+}finally{fs.rmSync(identityDir,{recursive:true,force:true});}
