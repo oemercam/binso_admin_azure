@@ -24,7 +24,8 @@ components. They are not silently classified as original-approved screens.
 - Public product screenshots embedded the preceding interface. Replace the twelve
   images with actual isolated browser captures and content-addressed URLs.
 - Nested portal sheets now consume only their own input and dismissal events.
-  Cancelling a position must not dismiss its parent document draft.
+  Cancelling a position must not dismiss its parent document draft. Discarding an
+  inner editor preserves the parent's persisted draft, including a subsequent reload.
 - Payment source hydration preserves already typed amounts and dirty notes. Error
   feedback persists until another attempt; old timeout callbacks cannot erase a
   newer failed/lost-response result. The delayed-lookup and cross-tab ledger tests

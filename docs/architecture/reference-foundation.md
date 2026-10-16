@@ -95,7 +95,11 @@ die mobilen Aktionen darin zusammengeführt (`mobile={false}` am ergänzenden
 Desktop-Slot), damit kein zweiter gleichnamiger Einstieg entsteht.
 
 Erfassungen behalten ihre realen API-Handler, Validierung, Entwurfswiederherstellung
-und Sperren gegen doppelte Schreibvorgänge. `FormSheet` und `FormWizard` besitzen
+und Sperren gegen doppelte Schreibvorgänge. Das Verwerfen eines untergeordneten
+Editors darf den wiederherstellbaren Hauptentwurf nicht löschen. Kindformulare
+räumen ihre eigenen Eingaben über ihren Abschluss-Handler auf; seitenweites
+Verwerfen gehört zum allein geöffneten Hauptformular oder zur Seitennavigation.
+`FormSheet` und `FormWizard` besitzen
 Dialog, Fokus, Header und Abschlussaktionen. `Field` mit `Input`, `Select` oder
 `Textarea` besitzt Beschriftung und Fehlerzuordnung. Dateiauswahl verwendet den
 gemeinsamen Upload-Stil, nicht ein nachgebautes Eingabefeld.

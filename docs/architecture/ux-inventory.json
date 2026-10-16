@@ -7035,17 +7035,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -9209,12 +9209,12 @@
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
@@ -9274,7 +9274,7 @@
         },
         {
           "tag": "Sheet",
-          "line": 181,
+          "line": 182,
           "component": "components/binso-ux.tsx#FormSheet"
         },
         {
@@ -9339,7 +9339,7 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
@@ -11508,12 +11508,12 @@
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
@@ -11573,7 +11573,7 @@
         },
         {
           "tag": "Sheet",
-          "line": 181,
+          "line": 182,
           "component": "components/binso-ux.tsx#FormSheet"
         },
         {
@@ -11638,7 +11638,7 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
@@ -13414,17 +13414,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -15088,17 +15088,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -16901,17 +16901,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -18544,17 +18544,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -20286,17 +20286,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -22115,17 +22115,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -23754,17 +23754,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -25313,17 +25313,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -27164,12 +27164,12 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
@@ -27184,12 +27184,12 @@
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
           "tag": "Sheet",
-          "line": 181,
+          "line": 182,
           "component": "components/binso-ux.tsx#FormSheet"
         },
         {
@@ -28844,17 +28844,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -30672,22 +30672,22 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
           "tag": "Sheet",
-          "line": 181,
+          "line": 182,
           "component": "components/binso-ux.tsx#FormSheet"
         },
         {
@@ -32308,17 +32308,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -33930,17 +33930,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -35621,17 +35621,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -37354,17 +37354,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -39104,22 +39104,22 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
           "tag": "Sheet",
-          "line": 181,
+          "line": 182,
           "component": "components/binso-ux.tsx#FormSheet"
         },
         {
@@ -40830,17 +40830,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -42447,17 +42447,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -44200,17 +44200,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -45812,17 +45812,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -47528,22 +47528,22 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
           "tag": "Sheet",
-          "line": 181,
+          "line": 182,
           "component": "components/binso-ux.tsx#FormSheet"
         },
         {
@@ -49153,17 +49153,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -50741,17 +50741,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -52536,17 +52536,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -54365,17 +54365,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -55999,17 +55999,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -57727,22 +57727,22 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
           "tag": "Sheet",
-          "line": 181,
+          "line": 182,
           "component": "components/binso-ux.tsx#FormSheet"
         },
         {
@@ -59872,17 +59872,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -59947,7 +59947,7 @@
         },
         {
           "tag": "Sheet",
-          "line": 181,
+          "line": 182,
           "component": "components/binso-ux.tsx#FormSheet"
         },
         {
@@ -61665,22 +61665,22 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
           "tag": "Sheet",
-          "line": 181,
+          "line": 182,
           "component": "components/binso-ux.tsx#FormSheet"
         },
         {
@@ -63516,17 +63516,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -65241,17 +65241,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -67169,27 +67169,27 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
           "tag": "ActionSheet",
-          "line": 187,
+          "line": 188,
           "component": "components/binso-ux.tsx#ActionsMenu"
         },
         {
           "tag": "Sheet",
-          "line": 181,
+          "line": 182,
           "component": "components/binso-ux.tsx#FormSheet"
         },
         {
@@ -69117,27 +69117,27 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
           "tag": "ActionSheet",
-          "line": 187,
+          "line": 188,
           "component": "components/binso-ux.tsx#ActionsMenu"
         },
         {
           "tag": "Sheet",
-          "line": 181,
+          "line": 182,
           "component": "components/binso-ux.tsx#FormSheet"
         },
         {
@@ -70901,17 +70901,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -72483,17 +72483,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -74881,12 +74881,12 @@
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
@@ -74966,7 +74966,7 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
@@ -75071,7 +75071,7 @@
         },
         {
           "tag": "Sheet",
-          "line": 181,
+          "line": 182,
           "component": "components/binso-ux.tsx#FormSheet"
         },
         {
@@ -76802,17 +76802,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -79183,12 +79183,12 @@
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
@@ -79268,7 +79268,7 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
@@ -79373,7 +79373,7 @@
         },
         {
           "tag": "Sheet",
-          "line": 181,
+          "line": 182,
           "component": "components/binso-ux.tsx#FormSheet"
         },
         {
@@ -81356,12 +81356,12 @@
         },
         {
           "tag": "Sheet",
-          "line": 181,
+          "line": 182,
           "component": "components/binso-ux.tsx#FormSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
@@ -81426,12 +81426,12 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -83126,17 +83126,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -84751,17 +84751,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -86427,17 +86427,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -87947,17 +87947,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -89467,17 +89467,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -90987,17 +90987,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -92690,17 +92690,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -94511,17 +94511,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -96294,17 +96294,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -98293,22 +98293,22 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
           "tag": "Sheet",
-          "line": 181,
+          "line": 182,
           "component": "components/binso-ux.tsx#FormSheet"
         },
         {
@@ -100016,17 +100016,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -101772,27 +101772,27 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
           "tag": "ActionSheet",
-          "line": 187,
+          "line": 188,
           "component": "components/binso-ux.tsx#ActionsMenu"
         },
         {
           "tag": "Sheet",
-          "line": 181,
+          "line": 182,
           "component": "components/binso-ux.tsx#FormSheet"
         },
         {
@@ -103543,27 +103543,27 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
           "tag": "ActionSheet",
-          "line": 187,
+          "line": 188,
           "component": "components/binso-ux.tsx#ActionsMenu"
         },
         {
           "tag": "Sheet",
-          "line": 181,
+          "line": 182,
           "component": "components/binso-ux.tsx#FormSheet"
         },
         {
@@ -105322,17 +105322,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -107138,27 +107138,27 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
           "tag": "ActionSheet",
-          "line": 187,
+          "line": 188,
           "component": "components/binso-ux.tsx#ActionsMenu"
         },
         {
           "tag": "Sheet",
-          "line": 181,
+          "line": 182,
           "component": "components/binso-ux.tsx#FormSheet"
         },
         {
@@ -108824,22 +108824,22 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
           "tag": "Sheet",
-          "line": 181,
+          "line": 182,
           "component": "components/binso-ux.tsx#FormSheet"
         },
         {
@@ -110566,17 +110566,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -112775,12 +112775,12 @@
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
@@ -112840,7 +112840,7 @@
         },
         {
           "tag": "Sheet",
-          "line": 181,
+          "line": 182,
           "component": "components/binso-ux.tsx#FormSheet"
         },
         {
@@ -112905,7 +112905,7 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
@@ -115074,12 +115074,12 @@
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
@@ -115139,7 +115139,7 @@
         },
         {
           "tag": "Sheet",
-          "line": 181,
+          "line": 182,
           "component": "components/binso-ux.tsx#FormSheet"
         },
         {
@@ -115204,7 +115204,7 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
@@ -116980,17 +116980,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -118641,12 +118641,12 @@
         },
         {
           "tag": "Sheet",
-          "line": 181,
+          "line": 182,
           "component": "components/binso-ux.tsx#FormSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
@@ -118711,12 +118711,12 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -120474,17 +120474,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -120494,7 +120494,7 @@
         },
         {
           "tag": "Sheet",
-          "line": 181,
+          "line": 182,
           "component": "components/binso-ux.tsx#FormSheet"
         },
         {
@@ -122252,17 +122252,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -122272,7 +122272,7 @@
         },
         {
           "tag": "Sheet",
-          "line": 181,
+          "line": 182,
           "component": "components/binso-ux.tsx#FormSheet"
         },
         {
@@ -124026,17 +124026,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -125749,22 +125749,22 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
           "tag": "ActionSheet",
-          "line": 187,
+          "line": 188,
           "component": "components/binso-ux.tsx#ActionsMenu"
         },
         {
@@ -127433,22 +127433,22 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
           "tag": "Sheet",
-          "line": 181,
+          "line": 182,
           "component": "components/binso-ux.tsx#FormSheet"
         },
         {
@@ -129170,17 +129170,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -130839,17 +130839,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -132392,17 +132392,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -133908,17 +133908,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -135599,17 +135599,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -137295,22 +137295,22 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
           "tag": "Sheet",
-          "line": 181,
+          "line": 182,
           "component": "components/binso-ux.tsx#FormSheet"
         },
         {
@@ -139071,17 +139071,17 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
@@ -141073,22 +141073,22 @@
         },
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "component": "components/binso-ux.tsx#FilterSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "component": "components/binso-ux.tsx#ActionSheet"
         },
         {
           "tag": "Sheet",
-          "line": 181,
+          "line": 182,
           "component": "components/binso-ux.tsx#FormSheet"
         },
         {
@@ -146806,20 +146806,20 @@
       "key": "components/binso-ux.tsx#FilterSheet",
       "file": "components/binso-ux.tsx",
       "name": "FilterSheet",
-      "line": 182,
+      "line": 183,
       "classes": [],
       "apis": [],
       "collections": [],
       "widgets": [
         {
           "tag": "Sheet",
-          "line": 182
+          "line": 183
         }
       ],
       "elements": [
         {
           "tag": "Sheet",
-          "line": 182,
+          "line": 183,
           "props": [
             "{...props}",
             "kind=\"filter\""
@@ -146844,7 +146844,7 @@
       "key": "components/binso-ux.tsx#Sheet",
       "file": "components/binso-ux.tsx",
       "name": "Sheet",
-      "line": 156,
+      "line": 157,
       "classes": [
         "sheet-layer",
         "bottom-sheet",
@@ -146859,13 +146859,13 @@
       "widgets": [
         {
           "tag": "ConfirmDialog",
-          "line": 178
+          "line": 179
         }
       ],
       "elements": [
         {
           "tag": "div",
-          "line": 178,
+          "line": 179,
           "props": [
             "className={`sheet-layer ${layerClassName}`.trim()}",
             "onMouseDown={event=>{if(event.target===event.currentTarget)requestClose()}}"
@@ -146873,7 +146873,7 @@
         },
         {
           "tag": "LocalizedElement",
-          "line": 178,
+          "line": 179,
           "props": [
             "as=\"section\"",
             "ref={dialogRef}",
@@ -146893,46 +146893,46 @@
         },
         {
           "tag": "div",
-          "line": 178,
+          "line": 179,
           "props": [
             "className=\"sheet-handle\""
           ]
         },
         {
           "tag": "header",
-          "line": 178,
+          "line": 179,
           "props": [
             "className=\"sheet-header\""
           ]
         },
         {
           "tag": "div",
-          "line": 178,
+          "line": 179,
           "props": []
         },
         {
           "tag": "h2",
-          "line": 178,
+          "line": 179,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 178,
+          "line": 179,
           "props": []
         },
         {
           "tag": "p",
-          "line": 178,
+          "line": 179,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 178,
+          "line": 179,
           "props": []
         },
         {
           "tag": "LocalizedElement",
-          "line": 178,
+          "line": 179,
           "props": [
             "as=\"button\"",
             "type=\"button\"",
@@ -146944,14 +146944,14 @@
         },
         {
           "tag": "Icon",
-          "line": 178,
+          "line": 179,
           "props": [
             "name=\"close\""
           ]
         },
         {
           "tag": "div",
-          "line": 178,
+          "line": 179,
           "props": [
             "className=\"sheet-body\"",
             "inert={kind===\"form\"&&busy}"
@@ -146959,14 +146959,14 @@
         },
         {
           "tag": "div",
-          "line": 178,
+          "line": 179,
           "props": [
             "className=\"filter-sheet-actions\""
           ]
         },
         {
           "tag": "ConfirmDialog",
-          "line": 178,
+          "line": 179,
           "props": [
             "open={discard}",
             "closeLabel={closeLabel}",
@@ -146975,93 +146975,97 @@
             "cancelLabel={discardText?.cancelLabel??\"Weiter bearbeiten\"}",
             "confirmLabel={discardText?.confirmLabel??\"Änderungen verwerfen\"}",
             "onCancel={()=>{setDiscard(false);setBackDiscard(false)}}",
-            "onConfirm={()=>{window.dispatchEvent(new Event(\"binso-draft-discard\"));setDiscard(false);if(backDiscard){setBackDiscard(false);leaveBack()}else onClose()}}"
+            "onConfirm={()=>{if(document.querySelectorAll('.bottom-sheet[data-sheet-kind=\"form\"]').length<=1)window.dispatchEvent(new Event(\"binso-draft-discard\"));setDiscard(false);if(backDiscard){setBackDiscard(false);leaveBack()}else onClose()}}"
           ]
         }
       ],
       "conditions": [
         {
-          "line": 161,
+          "line": 162,
           "expression": "busy"
         },
         {
-          "line": 161,
+          "line": 162,
           "expression": "onBrowserBack"
         },
         {
-          "line": 168,
+          "line": 169,
           "expression": "busy"
         },
         {
-          "line": 168,
+          "line": 169,
           "expression": "kind===\"form\"&&(dirty??sheetValues(dialogRef.current)!==baseline.current)"
         },
         {
-          "line": 170,
+          "line": 171,
           "expression": "open"
         },
         {
-          "line": 170,
+          "line": 171,
           "expression": "active"
         },
         {
-          "line": 171,
+          "line": 172,
           "expression": "!open||!mounted"
         },
         {
-          "line": 174,
+          "line": 175,
           "expression": "isValidElement<{className?:string;children?:ReactNode;sheet?:boolean}>(child)&&(child.type===FormActions||child.props.className?.split(/\\s+/).includes(\"filter-sheet-actions\"))"
         },
         {
-          "line": 174,
+          "line": 175,
           "expression": "child.type===FormActions"
         },
         {
-          "line": 175,
+          "line": 176,
           "expression": "isValidElement<{className?:string;children?:ReactNode}>(child)&&child.props.className?.split(/\\s+/).includes(\"sheet-body\")"
         },
         {
-          "line": 178,
+          "line": 179,
           "expression": "event.target===event.currentTarget"
         },
         {
-          "line": 178,
+          "line": 179,
           "expression": "!ownsEvent(event.target)"
         },
         {
-          "line": 178,
+          "line": 179,
           "expression": "event.target instanceof Element"
         },
         {
-          "line": 178,
+          "line": 179,
           "expression": "details instanceof HTMLDetailsElement"
         },
         {
-          "line": 178,
+          "line": 179,
           "expression": "ownsEvent(event.target)"
         },
         {
-          "line": 178,
+          "line": 179,
           "expression": "ownsEvent(event.target)"
         },
         {
-          "line": 178,
+          "line": 179,
           "expression": "!ownsEvent(event.target)"
         },
         {
-          "line": 178,
+          "line": 179,
           "expression": "event.target instanceof Element"
         },
         {
-          "line": 178,
+          "line": 179,
           "expression": "button&&button.dataset.sheetDismiss==='true'"
         },
         {
-          "line": 178,
+          "line": 179,
           "expression": "actions"
         },
         {
-          "line": 178,
+          "line": 179,
+          "expression": "document.querySelectorAll('.bottom-sheet[data-sheet-kind=\"form\"]').length<=1"
+        },
+        {
+          "line": 179,
           "expression": "backDiscard"
         }
       ]
@@ -150061,20 +150065,20 @@
       "key": "components/binso-ux.tsx#ActionSheet",
       "file": "components/binso-ux.tsx",
       "name": "ActionSheet",
-      "line": 180,
+      "line": 181,
       "classes": [],
       "apis": [],
       "collections": [],
       "widgets": [
         {
           "tag": "Sheet",
-          "line": 180
+          "line": 181
         }
       ],
       "elements": [
         {
           "tag": "Sheet",
-          "line": 180,
+          "line": 181,
           "props": [
             "{...props}",
             "kind=\"action\""
@@ -154068,7 +154072,7 @@
       "key": "components/binso-ux.tsx#ListRow",
       "file": "components/binso-ux.tsx",
       "name": "ListRow",
-      "line": 191,
+      "line": 192,
       "classes": [
         "document-summary-amount",
         "record-chevron"
@@ -154079,31 +154083,31 @@
       "elements": [
         {
           "tag": "b",
-          "line": 192,
+          "line": 193,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 192,
+          "line": 193,
           "props": [
             "verbatim={!translateTitle}"
           ]
         },
         {
           "tag": "Status",
-          "line": 192,
+          "line": 193,
           "props": [
             "tone={tone}"
           ]
         },
         {
           "tag": "small",
-          "line": 192,
+          "line": 193,
           "props": []
         },
         {
           "tag": "Status",
-          "line": 192,
+          "line": 193,
           "props": [
             "appearance=\"text\"",
             "tone={tone}"
@@ -154111,36 +154115,36 @@
         },
         {
           "tag": "span",
-          "line": 192,
+          "line": 193,
           "props": [
             "className=\"document-summary-amount\""
           ]
         },
         {
           "tag": "small",
-          "line": 192,
+          "line": 193,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 192,
+          "line": 193,
           "props": []
         },
         {
           "tag": "strong",
-          "line": 192,
+          "line": 193,
           "props": []
         },
         {
           "tag": "span",
-          "line": 192,
+          "line": 193,
           "props": [
             "className=\"record-chevron\""
           ]
         },
         {
           "tag": "Icon",
-          "line": 192,
+          "line": 193,
           "props": [
             "name=\"arrow\"",
             "size={12}"
@@ -154148,7 +154152,7 @@
         },
         {
           "tag": "Link",
-          "line": 194,
+          "line": 195,
           "props": [
             "prefetch={false}",
             "href={href}",
@@ -154157,7 +154161,7 @@
         },
         {
           "tag": "button",
-          "line": 194,
+          "line": 195,
           "props": [
             "type=\"button\"",
             "onClick={onClick}",
@@ -154166,7 +154170,7 @@
         },
         {
           "tag": "div",
-          "line": 194,
+          "line": 195,
           "props": [
             "className={className}"
           ]
@@ -154174,23 +154178,23 @@
       ],
       "conditions": [
         {
-          "line": 193,
+          "line": 194,
           "expression": "value!=null"
         },
         {
-          "line": 193,
+          "line": 194,
           "expression": "compact"
         },
         {
-          "line": 193,
+          "line": 194,
           "expression": "valuePlacement===\"metadata\""
         },
         {
-          "line": 194,
+          "line": 195,
           "expression": "href"
         },
         {
-          "line": 194,
+          "line": 195,
           "expression": "onClick"
         }
       ]
@@ -155577,20 +155581,20 @@
       "key": "components/binso-ux.tsx#FormSheet",
       "file": "components/binso-ux.tsx",
       "name": "FormSheet",
-      "line": 181,
+      "line": 182,
       "classes": [],
       "apis": [],
       "collections": [],
       "widgets": [
         {
           "tag": "Sheet",
-          "line": 181
+          "line": 182
         }
       ],
       "elements": [
         {
           "tag": "Sheet",
-          "line": 181,
+          "line": 182,
           "props": [
             "{...props}",
             "kind=\"form\""
@@ -174889,7 +174893,7 @@
       "key": "components/binso-ux.tsx#ActionsMenu",
       "file": "components/binso-ux.tsx",
       "name": "ActionsMenu",
-      "line": 185,
+      "line": 186,
       "classes": [
         "action-list"
       ],
@@ -174898,13 +174902,13 @@
       "widgets": [
         {
           "tag": "ActionSheet",
-          "line": 187
+          "line": 188
         }
       ],
       "elements": [
         {
           "tag": "RowActions",
-          "line": 187,
+          "line": 188,
           "props": [
             "label={label}",
             "disabled={busy}",
@@ -174913,7 +174917,7 @@
         },
         {
           "tag": "ActionSheet",
-          "line": 187,
+          "line": 188,
           "props": [
             "label={label}",
             "open={open}",
@@ -174923,7 +174927,7 @@
         },
         {
           "tag": "div",
-          "line": 187,
+          "line": 188,
           "props": [
             "className=\"action-list\"",
             "onClick={event=>{if(!busy&&event.target instanceof Element&&event.target.closest(\"button,a\"))setOpen(false)}}"
@@ -174932,7 +174936,7 @@
       ],
       "conditions": [
         {
-          "line": 187,
+          "line": 188,
           "expression": "!busy&&event.target instanceof Element&&event.target.closest(\"button,a\")"
         }
       ]
@@ -196631,7 +196635,7 @@
     {
       "file": "components/binso-ux.tsx",
       "name": "Sheet",
-      "line": 156,
+      "line": 157,
       "usedBy": [
         "/agb",
         "/angebote/[id]",
@@ -196714,7 +196718,7 @@
     {
       "file": "components/binso-ux.tsx",
       "name": "ActionSheet",
-      "line": 180,
+      "line": 181,
       "usedBy": [
         "/agb",
         "/angebote/[id]",
@@ -196797,7 +196801,7 @@
     {
       "file": "components/binso-ux.tsx",
       "name": "FormSheet",
-      "line": 181,
+      "line": 182,
       "usedBy": [
         "/angebote/[id]",
         "/angebote/neu",
@@ -196831,7 +196835,7 @@
     {
       "file": "components/binso-ux.tsx",
       "name": "FilterSheet",
-      "line": 182,
+      "line": 183,
       "usedBy": [
         "/agb",
         "/angebote/[id]",
@@ -196914,7 +196918,7 @@
     {
       "file": "components/binso-ux.tsx",
       "name": "ActionsMenu",
-      "line": 185,
+      "line": 186,
       "usedBy": [
         "/mitarbeiter/[id]",
         "/mitarbeiter/neu",
@@ -196927,7 +196931,7 @@
     {
       "file": "components/binso-ux.tsx",
       "name": "ListRow",
-      "line": 191,
+      "line": 192,
       "usedBy": [
         "/angebote/[id]",
         "/angebote/neu",
