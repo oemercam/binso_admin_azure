@@ -321,7 +321,7 @@ function AppShellFrame({
 
   return <PageAccessContext.Provider value={pageAccess}>
     {!access&&!accessError&&<AppStart/>}
-    <div hidden={!access&&!accessError} ref={shellRef} data-navigation-collapsed={navigationCollapsed||undefined} className={`app-root app-section-${active} ${timerRunning && !backHref ? "timer-active" : ""} ${preview ? "app-preview" : ""} ${formActive ? "app-editing" : ""}`}>
+    <div hidden={!access&&!accessError} ref={shellRef} data-navigation-collapsed={navigationCollapsed||undefined} className={`app-root flow-noir app-section-${active} ${timerRunning && !backHref ? "timer-active" : ""} ${preview ? "app-preview" : ""} ${formActive ? "app-editing" : ""}`}>
     <ConfirmDialog open={confirmLogout} busy={logoutBusy} title="Änderungen verwerfen und abmelden?" message="Deine Änderungen sind noch nicht gespeichert." confirmLabel="Abmelden" onCancel={()=>setConfirmLogout(false)} onConfirm={()=>void logout(true)}/>
     <ConfirmDialog open={leaveHref!==null} title="Änderungen verwerfen?" message="Deine Änderungen sind noch nicht gespeichert und gehen verloren." cancelLabel="Weiter bearbeiten" confirmLabel="Änderungen verwerfen" onCancel={()=>setLeaveHref(null)} onConfirm={()=>{const href=leaveHref;setLeaveHref(null);if(href){window.dispatchEvent(new Event("binso-draft-discard"));allowDraftNavigation();if(href==="browser-back"){leaveBack();return;}const url=new URL(href);if(url.origin===window.location.origin)router.replace(url.pathname+url.search+url.hash);else window.location.assign(href);}}}/>
     {logoutError&&<div className="toast" role="alert"><Icon name="close" size={16}/><span><LocalizedText>{logoutError}</LocalizedText></span><button type="button" className="text-action" disabled={logoutBusy} onClick={()=>void logout()}><LocalizedText>{"Erneut versuchen"}</LocalizedText></button></div>}
@@ -345,7 +345,7 @@ function AppShellFrame({
         </div>}
       </div>
       <AppHeader className={backHref ? "mobile-header mobile-header-detail" : "mobile-header"} detail={!!backHref} leadingClassName="mobile-header-leading" leading={<>
-        {backHref ? <Link className="mobile-back" href={backHref} aria-label={backLabel}><Icon name="back"/></Link> : <><Link href="/dashboard" className="mobile-header-brand" aria-label="Zur Übersicht"><Logo compact/></Link><h1 className="mobile-section-title"><LocalizedText verbatim={titleIsUserContent}>{title}</LocalizedText></h1></>}
+        {backHref ? <Link className="mobile-back" href={backHref} aria-label={backLabel}><Icon name="back"/></Link> : <Link href="/dashboard" className="mobile-header-brand flow-brand" aria-label="Zur Übersicht"><span className="flow-brand-mark" aria-hidden="true">b</span><span>binso <b>one</b></span></Link>}
         {backHref&&<h1 className="mobile-header-title"><span><LocalizedText verbatim={titleIsUserContent}>{title}</LocalizedText></span>{status!=null&&<Status tone={statusTone}>{status}</Status>}</h1>}
       </>} actionClassName={backHref?"mobile-detail-actions":"mobile-header-actions"} actions={backHref ? (allowed&&(mobileActions||visibleActions)?mobileActions??visibleActions:undefined) : <>
         <IconButton label="Suche" icon="search" onClick={()=>setSheet("search")}/>
@@ -365,10 +365,9 @@ function AppShellFrame({
       {timerNotice&&<div className="timer-notice" role="status">{timerNotice}</div>}
 
       {!preview && !formActive && <MobileDock compact={navCompact}><LocalizedElement as="nav" className={`bottom-nav ${navCompact ? "is-compact" : ""}`} aria-label="Hauptnavigation">
-        <Link href="/dashboard" className={active==="dashboard"?"active":""}><Icon name="home"/><span><LocalizedText>{"Start"}</LocalizedText></span></Link>
+        <Link href="/dashboard" className={active==="dashboard"?"active":""} aria-current={active==="dashboard"?"page":undefined}><Icon name="home"/><span><LocalizedText>{"Start"}</LocalizedText></span></Link>
         {canOpen("/kunden")&&<Link href="/kunden" className={active==="kunden"?"active":""}><Icon name="users"/><span><LocalizedText>{"Kunden"}</LocalizedText></span></Link>}
-        <Link href="/finanzen" className={["angebote","rechnungen","zahlungen","belege","finanzen"].includes(active)?"active":""}><Icon name="wallet"/><span><LocalizedText>{"Finanzen"}</LocalizedText></span></Link>
-        {canOpen("/zeit")&&<Link href="/zeit" className={active==="zeit"?"active":""}><Icon name="clock"/><span><LocalizedText>{"Zeit"}</LocalizedText></span></Link>}
+        {canOpen("/rechnungen")&&<Link href="/rechnungen" className={active==="rechnungen"?"active":""} aria-current={active==="rechnungen"?"page":undefined}><Icon name="receipt"/><span><LocalizedText>{"Rechnungen"}</LocalizedText></span></Link>}
         <button type="button" className={["produkte","spesen","mitarbeiter","support","einstellungen"].includes(active)?"active":""} onClick={() => setSheet("more")}><Icon name="more"/><span><LocalizedText>{"Mehr"}</LocalizedText></span></button>
       </LocalizedElement></MobileDock>}
 
@@ -382,7 +381,7 @@ function AppShellFrame({
           {(sheet==="docs"?[
             ["/finanzen","receipt","Finanzübersicht"],["/angebote","file","Angebote"],["/rechnungen","receipt","Rechnungen"],["/zahlungen","wallet","Zahlungen"],
           ]:[
-            ["/angebote","file","Angebote"],["/rechnungen","receipt","Rechnungen"],["/zahlungen","wallet","Zahlungen"],["/produkte","box","Produkte"],["/projekte","box","Aufträge / Projekte"],["/mitarbeiter","users","Mitarbeiter"],["/spesen","card","Spesen"],["/finanzen/analyse","chart","Finanzanalyse"],["/berichte","chart","Berichte"],["/support","support","Support"],["/einstellungen","settings","Einstellungen"],
+            ["/angebote","file","Angebote"],["/rechnungen","receipt","Rechnungen"],["/zahlungen","wallet","Zahlungen"],["/produkte","box","Produkte"],["/projekte","box","Aufträge / Projekte"],["/zeit","clock","Zeiterfassung"],["/mitarbeiter","users","Mitarbeiter"],["/spesen","card","Spesen"],["/finanzen","wallet","Finanzen"],["/finanzen/analyse","chart","Finanzanalyse"],["/berichte","chart","Berichte"],["/support","support","Support"],["/einstellungen","settings","Einstellungen"],
           ]).map(([href,icon,label])=><ActionRow key={href} href={href} icon={icon} title={label} navigation onClick={()=>setSheet(null)}/>)}
         </div>
         {sheet==="more"&&<div className="sheet-secondary"><ActionRow icon="logout" title={logoutBusy?"Wird abgemeldet…":"Abmelden"} disabled={logoutBusy} onClick={()=>void logout()}/></div>}

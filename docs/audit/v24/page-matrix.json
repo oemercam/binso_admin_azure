@@ -1,5 +1,5 @@
 {
-  "commit": "c88a581e7bf952a0da9923a58f1e229c67c28986",
+  "commit": "codex/flow-noir-ui",
   "method": "Existing TypeScript AST dependency inventory; conditional reachability is not runtime proof",
   "pages": [
     {
@@ -1349,6 +1349,13 @@
         "components/app-shell.tsx#ShellConfiguration",
         "components/binso-ux.tsx#QuickCreateAction",
         "components/binso-ux.tsx#CreateAction",
+        "components/flow-home.tsx#FlowWelcome",
+        "components/flow-home.tsx#FlowQuickActions",
+        "components/ui.tsx#SectionTitle",
+        "components/document-list.tsx#DocumentSummaryRow",
+        "components/document-list.tsx#FinancialSummaryRow",
+        "components/binso-ux.tsx#ListRow",
+        "components/flow-home.tsx#FlowMonthSummary",
         "components/cash-statistics.tsx#CashStatistics",
         "components/statistics.tsx#Statistics",
         "components/statistics.tsx#Series",
@@ -1369,11 +1376,7 @@
         "components/ui.tsx#TimeInput",
         "components/ui.tsx#CurrencyInput",
         "components/ui.tsx#FormError",
-        "components/cash-statistics.tsx#cashSeries",
-        "components/ui.tsx#SectionTitle",
-        "components/document-list.tsx#DocumentSummaryRow",
-        "components/document-list.tsx#FinancialSummaryRow",
-        "components/binso-ux.tsx#ListRow"
+        "components/cash-statistics.tsx#cashSeries"
       ],
       "layouts": [
         "app/layout.tsx",
@@ -7149,6 +7152,13 @@
         "components/app-shell.tsx#ShellConfiguration",
         "components/binso-ux.tsx#QuickCreateAction",
         "components/binso-ux.tsx#CreateAction",
+        "components/flow-home.tsx#FlowWelcome",
+        "components/flow-home.tsx#FlowQuickActions",
+        "components/ui.tsx#SectionTitle",
+        "components/document-list.tsx#DocumentSummaryRow",
+        "components/document-list.tsx#FinancialSummaryRow",
+        "components/binso-ux.tsx#ListRow",
+        "components/flow-home.tsx#FlowMonthSummary",
         "components/cash-statistics.tsx#CashStatistics",
         "components/statistics.tsx#Statistics",
         "components/statistics.tsx#Series",
@@ -7169,11 +7179,7 @@
         "components/ui.tsx#TimeInput",
         "components/ui.tsx#CurrencyInput",
         "components/ui.tsx#FormError",
-        "components/cash-statistics.tsx#cashSeries",
-        "components/ui.tsx#SectionTitle",
-        "components/document-list.tsx#DocumentSummaryRow",
-        "components/document-list.tsx#FinancialSummaryRow",
-        "components/binso-ux.tsx#ListRow"
+        "components/cash-statistics.tsx#cashSeries"
       ],
       "layouts": [
         "app/layout.tsx"

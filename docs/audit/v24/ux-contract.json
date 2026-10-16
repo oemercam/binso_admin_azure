@@ -6,7 +6,7 @@
     {
       "id": "UX24-TYPE",
       "scope": "Alle Oberflächen",
-      "requirement": "Inter/system via --font-sans; Controls 13px Desktop/16px Mobile, Labels 14px/500. Fehlende allgemeine Typografiestufen bleiben offen.",
+      "requirement": "Segoe UI/system via --font-sans; Controls 13px Desktop/16px Mobile, Labels 14px/500. Fehlende allgemeine Typografiestufen bleiben offen.",
       "owner": "app/styles/tokens.css",
       "acceptance": "Computed font und line-height je Rolle/Gerät gegen freigegebenen Wert prüfen",
       "status": "offen",

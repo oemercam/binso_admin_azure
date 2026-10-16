@@ -280,10 +280,11 @@ try{
     if(route==='/einstellungen/dokumente'){await page.getByRole('heading',{name:'Rechnungsstandard',exact:true}).waitFor();await page.getByText('Synthetischer Rechnungstext',{exact:true}).waitFor();}
     assert.equal(await page.locator('html').getAttribute('data-theme'),theme,`${route}: explicit theme must override system dark mode`);
     if(process.env.BINSO_UX_COMPLIANCE==='1')await measureCompliance(page,{output:path.join(output,'compliance'),route,theme,width,state:process.env.BINSO_UX_FIXTURE_CASE??'normal',engine:process.env.BINSO_UX_BROWSER??'chromium'});
-    // Explicit 15 October white-workspace contract; no screenshot baseline is rewritten.
+    // Approved Flow Noir chrome surrounds the unchanged white working surfaces.
     if(!process.env.BINSO_UX_BASELINE&&theme==='light'){
       const surfaces=await page.locator('.app-root,.operator-root,.page-container,.operator-app-content,.desktop-appbar,.mobile-header,.operator-app-header').evaluateAll(nodes=>nodes.filter(el=>el.getClientRects().length).map(el=>({name:el.className,background:getComputedStyle(el).backgroundColor})));
-      assert.ok(surfaces.every(surface=>surface.background==='rgb(255, 255, 255)'),`${route}: white workspace surfaces ${JSON.stringify(surfaces)}`);
+      const flow=await page.locator('.flow-noir').count();
+      assert.ok(surfaces.every(surface=>surface.background===(flow&&(/mobile-header|desktop-appbar/.test(surface.name)||width<=1100&&surface.name.includes('app-root'))?'rgb(21, 21, 21)':'rgb(255, 255, 255)')),`${route}: approved chrome and white workspace surfaces ${JSON.stringify(surfaces)}`);
     }
     const navigationToggle=page.locator('.desktop-navigation-toggle').filter({visible:true});
     const modal=page.locator('[aria-modal="true"]').filter({visible:true});
@@ -303,7 +304,7 @@ try{
       assert.equal(await navigationToggle.getAttribute('aria-expanded'),'true','Desktop navigation expands again');
     }
     if(!process.env.BINSO_UX_BASELINE&&width<=1100)assert.equal(await navigationToggle.count(),0,'Desktop collapse control stays out of the mobile shell');
-    if(!process.env.BINSO_UX_BASELINE)for(const ring of await page.locator('.bo-ring-visual').all()){
+    if(!process.env.BINSO_UX_BASELINE)for(const ring of await page.locator('.bo-ring-visual').filter({visible:true}).all()){
       const geometry=await ring.evaluate(el=>{const box=el.getBoundingClientRect(),center=el.querySelector('.bo-ring-center').getBoundingClientRect();return {dx:Math.abs(box.x+box.width/2-center.x-center.width/2),dy:Math.abs(box.y+box.height/2-center.y-center.height/2)}});
       assert.ok(geometry.dx<1&&geometry.dy<1,'Ring value and label share its geometric center');
     }
@@ -313,8 +314,8 @@ try{
     assert.ok(geometry.scroll<=width+1&&geometry.body<=width+1,`${theme} ${width} ${route}: horizontal overflow ${JSON.stringify(geometry)}`);
     if(!process.env.BINSO_UX_BASELINE&&width<=1100&&await page.locator('.page-container,.operator-app-content').count()){
       const appearance=await page.locator('.page-container,.operator-app-content').first().evaluate(el=>({ink:getComputedStyle(el).color,surface:getComputedStyle(el).getPropertyValue('--app-surface').trim(),controls:[...el.querySelectorAll('.form-control,.form-textarea')].filter(node=>!['checkbox','radio','file'].includes(node.type)&&!node.closest('.searchbox,.thread-composer')).map(node=>({radius:getComputedStyle(node).borderTopLeftRadius,font:getComputedStyle(node).fontSize})),groups:[...el.querySelectorAll('.bo-settings-group-body')].map(node=>({background:getComputedStyle(node).backgroundColor,border:getComputedStyle(node).borderTopWidth}))}));
-      assert.equal(appearance.ink,theme==='light'?'rgb(34, 34, 37)':'rgb(222, 222, 226)',`${route}: app text uses the central theme`);
-      assert.ok(appearance.controls.every(control=>control.radius==='8px'),`${route}: shared app field corners ${JSON.stringify(appearance.controls)}`);
+      assert.equal(appearance.ink,theme==='light'?'rgb(32, 32, 32)':'rgb(222, 222, 226)',`${route}: app text uses the central theme`);
+      assert.ok(appearance.controls.every(control=>control.radius==='10px'),`${route}: shared app field corners ${JSON.stringify(appearance.controls)}`);
       assert.ok(appearance.groups.every(group=>group.border==='0px'&&group.background===(theme==='light'?'rgb(255, 255, 255)':'rgb(20, 20, 20)')),`${route}: grouped app surfaces in both themes`);
     }
     assert.ok(geometry.sort.every(size=>size<=44),`${route}: sorting control is too wide`);
@@ -326,7 +327,13 @@ try{
       await page.evaluate(()=>{window.scrollTo(0,0);return new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))});
     }
     if(width<=760&&await page.locator('.mobile-back').count()){const back=page.locator('.mobile-back');assert.ok(await back.isVisible(),`${route}: detail back control is visible`);const icon=await back.locator('svg').boundingBox();assert.ok(icon&&icon.width>=18&&icon.height>=18&&icon.x>=0,`${route}: back icon is not clipped`);}
-    if(!process.env.BINSO_UX_BASELINE&&['/dashboard','/finanzen','/finanzen/analyse','/kunden/customer-one'].includes(route)){
+    if(!process.env.BINSO_UX_BASELINE&&route==='/dashboard'){
+      await page.locator('.flow-month-summary').waitFor({state:'visible'});
+      assert.equal(await page.locator('.flow-month-summary').count(),1,'Home shows the approved compact authoritative revenue summary');
+      assert.ok(await page.locator('.flow-month-summary strong').innerText(),'Revenue amount is available');
+      assert.equal(await page.locator('.flow-finance-details').getAttribute('open'),null,'Detailed analytics stays collapsed on the Flow home');
+    }
+    if(!process.env.BINSO_UX_BASELINE&&['/finanzen','/finanzen/analyse','/kunden/customer-one'].includes(route)){
       assert.equal(await page.locator('.bo-statistics .bo-metric-tiles>.metric').count(),route==='/kunden/customer-one'?3:4,'The common foundation shows domain-appropriate primary metrics');
       assert.equal(await page.locator('.bo-statistics').count(),1,'One central statistics surface');
       assert.equal(await page.locator('.bo-statistics').evaluate(el=>getComputedStyle(el).backgroundColor),width<=1100?(theme==='light'?'rgb(255, 255, 255)':'rgb(20, 20, 20)'):(theme==='light'?'rgb(255, 255, 255)':'rgb(0, 0, 0)'),'Statistics follow the app surface on phone/tablet and page surface on desktop');
@@ -341,7 +348,7 @@ try{
     }
     if(!process.env.BINSO_UX_BASELINE){for(const control of await page.locator('.form-field>.form-control').filter({visible:true}).all()){
      const g=await control.evaluate(el=>{const c=getComputedStyle(el);return {height:el.getBoundingClientRect().height,radius:c.borderRadius,padding:c.paddingLeft,font:c.fontSize,app:!!el.closest('.page-container,.operator-app-content,.bottom-sheet,.header-panel,.confirm-dialog')}});
-     assert.equal(g.height,width<=760||(g.app&&width<=1100)?44:40,`${route}: canonical closed field height`);assert.equal(g.padding,'11px',`${route}: canonical field inset`);assert.equal(g.radius,width<=1100?'8px':'7px',`${route}: canonical field radius`);
+     assert.equal(g.height,width<=760||(g.app&&width<=1100)?44:40,`${route}: canonical closed field height`);assert.equal(g.padding,'11px',`${route}: canonical field inset`);assert.equal(g.radius,'10px',`${route}: canonical field radius`);
     }}
     for(const label of await page.locator('.detail-list dt').filter({visible:true}).all()){const confined=await label.evaluate(el=>{const r=el.getBoundingClientRect(),range=document.createRange();range.selectNodeContents(el);return [...range.getClientRects()].every(text=>text.right<=r.right+1)});assert.ok(confined,`${route}: detail labels never overlap their values`);}
     if(width<=1100&&await page.locator('.mobile-header-detail').count())assert.equal(await page.locator('.page-head h1,.page-head .status,.desktop-back').filter({visible:true}).count(),0,route+' '+width+': app detail header owns its title/status/back once, including tablet');
@@ -371,7 +378,11 @@ try{
     }
   assert.deepEqual(errors,[],'Browser runtime errors');
     results.push({theme,width,route,passed:true});
-    if(process.env.BINSO_UX_CAPTURE_ALL==='1'||[1440,430].includes(width)&&['/dashboard','/rechnungen','/support/ticket-one','/produkte','/produkte/product-one','/spesen/expense-one','/support','/finanzen','/zeit','/finanzen/analyse','/mitarbeiter/neu','/mitarbeiter/employee-one','/projekte/neu'].includes(route))await capture(page,{animations:"disabled",path:path.join(output,`${theme}-${width}-${route.replaceAll('/','_')}.png`),fullPage:true});
+    if(process.env.BINSO_UX_CAPTURE_ALL==='1'||[1440,430].includes(width)&&['/dashboard','/rechnungen','/support/ticket-one','/produkte','/produkte/product-one','/spesen/expense-one','/support','/finanzen','/zeit','/finanzen/analyse','/mitarbeiter/neu','/mitarbeiter/employee-one','/projekte/neu'].includes(route)){
+     await page.evaluate(()=>{window.scrollTo(0,0);return new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))});
+     await capture(page,{animations:"disabled",path:path.join(output,`${theme}-${width}-${route.replaceAll('/','_')}.png`),fullPage:true});
+     if(route==='/dashboard')await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${width}-dashboard-viewport.png`)});
+    }
     if(process.env.BINSO_UX_CAPTURE_ALL==='1'&&width<=760&&await page.locator('nav.bottom-nav').isVisible()){const hide=await page.addStyleTag({content:'.page-container{visibility:hidden}'});await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${width}-${route.replaceAll('/','_')}-nav.png`)},page.locator('nav.bottom-nav'));await hide.evaluate(el=>{el.remove();return new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));});}
     await page.waitForLoadState("networkidle");
     assert.deepEqual(errors,[],"Browser runtime errors after rendering");
@@ -382,21 +393,21 @@ try{
    for(const width of [320,375,390,430,768,1024,1440]){
     await page.setViewportSize({width,height:740});await navigate(base+'/dashboard');
     if(width===390)await capture(page,{animations:'disabled',path:path.join(output,theme+'-390-shared-glass-dashboard.png')});
-    const create=page.getByRole('button',{name:'Neu erstellen',exact:true}).filter({visible:true});
-    assert.equal(await create.count(),1,'One visible creation entry point on every viewport');
+    const create=page.locator('.flow-quick-actions a[href^="/rechnungen/neu"]');
+    assert.equal(await create.count(),1,'One invoice creation entry point on the Flow home');
+    assert.equal(await page.locator('.flow-quick-actions a').count(),3,'Authorized users see the three approved Flow actions');
     if(width<=1100){
-     const geometry=await page.evaluate(()=>{const rect=selector=>document.querySelector(selector).getBoundingClientRect().toJSON(),css=selector=>getComputedStyle(document.querySelector(selector));return {nav:rect('.bottom-nav'),plus:rect('.page-head .bo-create-action'),capsule:css('.mobile-header-actions').backgroundColor,material:css('.bottom-nav').backgroundColor,header:css('.mobile-header').backgroundColor,page:css('.page-container').backgroundColor,blur:css('.mobile-header').backdropFilter,navBlur:css('.bottom-nav').backdropFilter,targets:[...document.querySelector('.bottom-nav').children].map(el=>el.getBoundingClientRect().toJSON())}});
-     assert.equal(geometry.header,geometry.page,'Header and page share one opaque canvas');assert.equal(geometry.blur,'none');assert.equal(geometry.capsule,geometry.page,'Approved white/opaque header actions share the page canvas');assert.equal(geometry.material,theme==='light'?'rgba(243, 243, 245, 0.78)':'rgba(33, 33, 33, 0.82)','Frozen navigation retains its approved glass material');assert.ok(geometry.navBlur.includes('blur'),'Only action surfaces use the glass blur');
+     const geometry=await page.evaluate(()=>{const rect=selector=>document.querySelector(selector).getBoundingClientRect().toJSON(),css=selector=>getComputedStyle(document.querySelector(selector));return {nav:rect('.bottom-nav'),plus:rect('.flow-tone-primary'),capsule:css('.mobile-header-actions').backgroundColor,material:css('.bottom-nav').backgroundColor,header:css('.mobile-header').backgroundColor,page:css('.page-container').backgroundColor,blur:css('.mobile-header').backdropFilter,navBlur:css('.bottom-nav').backdropFilter,targets:[...document.querySelector('.bottom-nav').children].map(el=>el.getBoundingClientRect().toJSON())}});
+     assert.equal(geometry.header,theme==='light'?'rgb(21, 21, 21)':'rgb(8, 8, 8)','Flow uses the approved black header');assert.equal(geometry.blur,'none');assert.equal(geometry.capsule,'rgba(0, 0, 0, 0)','Header actions remain transparent on black');assert.equal(geometry.material,geometry.page,'Navigation shares the opaque workspace canvas');assert.equal(geometry.navBlur,'none','Flow navigation uses an opaque surface');
      assert.ok(geometry.targets.every(t=>t.width>=44&&t.height>=44),'Destinations keep minimum touch targets');
      assert.ok(geometry.plus.bottom<=geometry.nav.top,'Creation belongs to the page above navigation');
      assert.equal(await page.locator('.mobile-dock .bo-create-action,.dock-create-action').count(),0,'Navigation has no attached creation action');
      assert.ok(geometry.plus.right<=width&&geometry.plus.bottom<=740);
-     assert.equal(await page.locator('.page-head .bo-create-action').filter({visible:true}).count(),1,'Exactly one page-owned creation trigger is visible');
-     assert.equal(await page.locator('.bottom-nav a[href="/finanzen"]').count(),1,'Finances remains a direct destination');
+     assert.equal(await page.locator('.page-head .bo-create-action').filter({visible:true}).count(),0,'The Flow home replaces the generic creation trigger with direct actions');
+     assert.equal(await page.locator('.bottom-nav a[href="/rechnungen"]').count(),1,'Invoices are a direct destination');
      await captureNavigation(page,theme,width,true);
     }
-    await create.click();const menu=page.getByRole('dialog',{name:'Neu erstellen',exact:true});assert.equal(await menu.locator('h2').count(),1,'One sheet heading');
-    await page.keyboard.press('Escape');assert.equal(await create.evaluate(el=>el===document.activeElement),true,'Closing creation restores the actual trigger');
+    await create.click();await page.waitForURL(url=>url.pathname==='/rechnungen/neu'&&url.searchParams.get('returnTo')==='/dashboard');assert.ok(await page.locator('.app-editing').count(),'Direct creation opens the existing guarded invoice process');
     if(width<=1100){await navigate(base+'/kunden/customer-one');await captureNavigation(page,theme,width,false);}
    }
    await page.setViewportSize({width:390,height:740});await navigate(base+'/kunden');
@@ -532,7 +543,7 @@ try{
    assert.equal(await statistics.locator('.metric>strong').nth(2).textContent(),'CHF 0.00','Only recorded outflows in the selected period');
    assert.equal(await statistics.locator('.metric>strong').nth(3).textContent(),'CHF 20.00','Current overdue balance is independently labelled');
    assert.ok(await page.locator('.document-summary-row').filter({hasText:'RE-TEST-1'}).filter({visible:true}).count()>0,'Chart period does not hide a directly searched invoice');
-   await page.locator('a[href="/dashboard"]').filter({visible:true}).first().click();await page.waitForURL('**/dashboard');await page.waitForLoadState('networkidle');await page.locator('a[href="/finanzen"]').filter({visible:true}).first().click();await page.waitForURL('**/finanzen');await page.waitForLoadState('networkidle');
+   await page.locator('a[href="/dashboard"]').filter({visible:true}).first().click();await page.waitForURL('**/dashboard');await page.waitForLoadState('networkidle');if(!await page.locator('a[href="/finanzen"]').filter({visible:true}).count())await page.locator('.bottom-nav').getByRole('button',{name:'Mehr',exact:true}).click();await page.locator('a[href="/finanzen"]').filter({visible:true}).first().click();await page.waitForURL('**/finanzen');await page.waitForLoadState('networkidle');
    await page.locator('.bo-statistics .metric>strong').first().getByText('CHF 240.00',{exact:true}).waitFor();
    assert.equal(await page.locator('.bo-statistics .metric>strong').first().textContent(),'CHF 240.00','Custom period survives actual same-tab navigation');
    await page.locator('.bo-statistics').getByRole('button',{name:'Eigenen Statistikzeitraum wählen',exact:true}).click();
@@ -788,14 +799,11 @@ try{
   if(hasInteraction('header')){
    for(const width of [390,1440]){
     await page.setViewportSize({width,height:740});await navigate(base+'/dashboard');await page.waitForLoadState('networkidle');
-    const create=page.getByRole('button',{name:'Neu erstellen',exact:true}).filter({visible:true});
+    const create=page.locator('.flow-quick-actions a[href="/kunden"]');
     const size=await create.boundingBox();
-    assert.equal(size.width,44,'Page creation has a real 44px touch target on every viewport');assert.equal(size.height,size.width);
-    await create.click();const menu=page.getByRole('dialog',{name:'Neu erstellen',exact:true});
-    assert.deepEqual(await menu.locator('.action-row>span').allTextContents(),['Kunde','Angebot','Rechnung','Zeit erfassen','Projekt','Zahlung','Spese','Produkt','Mitarbeiter','Support-Anfrage']);
-    assert.equal(await page.getByRole('button',{name:'Weiter',exact:true}).count(),0,'Opening global plus never starts an invoice wizard');
-    await menu.getByRole('link',{name:'Kunde',exact:true}).click();await page.waitForURL(url=>url.pathname==='/kunden/neu'&&url.searchParams.get('returnTo')==='/dashboard');
-    await page.getByRole('dialog',{name:'Kunde erstellen',exact:true}).getByRole('button',{name:'Schliessen',exact:true}).click();await page.waitForURL(base+'/dashboard');
+    assert.ok(size.width>=44&&size.height>=44,'Flow customer access keeps a real touch target on every viewport');
+    assert.equal(await page.locator('.flow-quick-actions a').count(),3,'The three approved actions replace the generic plus menu');
+    await create.click();await page.waitForURL(base+'/kunden');
    }
    for(const width of [320,390,768,1440]){
     await page.setViewportSize({width,height:740});await navigate(base+'/dashboard');await page.waitForLoadState('networkidle');
@@ -806,7 +814,7 @@ try{
     assert.equal(await page.locator('.bottom-sheet').count(),0,'Header search is not a bottom sheet');
     assert.equal(await panel.getByRole('button',{name:'Abbrechen',exact:true}).filter({visible:true}).count(),width<=1100?1:0,'Mobile search cancels beside the input; desktop uses the anchored close control');
     assert.equal(await panel.getByLabel('Suchen',{exact:true}).evaluate(el=>el===document.activeElement),true,'Search focuses its input');
-    const box=await panel.boundingBox(),bar=await header.boundingBox();assert.ok(box.x>=0&&box.x+box.width<=width+1,'Panel stays within viewport');if(width<=1100){assert.ok(box.y<=1&&box.height>=739,'Mobile search owns a full view');assert.equal(await header.locator('.mobile-section-title').textContent(),'Übersicht');}else assert.ok(box.y>=bar.y+bar.height-1,'Desktop panel remains anchored under header');
+    const box=await panel.boundingBox(),bar=await header.boundingBox();assert.ok(box.x>=0&&box.x+box.width<=width+1,'Panel stays within viewport');if(width<=1100){assert.ok(box.y<=1&&box.height>=739,'Mobile search owns a full view');assert.match(await header.locator('.flow-brand').innerText(),/binso one/);}else assert.ok(box.y>=bar.y+bar.height-1,'Desktop panel remains anchored under header');
     assert.equal(await page.evaluate(()=>document.body.style.overflow),'clip');
     assert.equal(await panel.getByText('Mindestens zwei Zeichen eingeben.',{exact:true}).count(),0);
     const oldRequest=page.waitForRequest(request=>new URL(request.url()).pathname==='/api/search'&&new URL(request.url()).searchParams.get('q')==='old');await panel.getByLabel('Suchen',{exact:true}).fill('old');await oldRequest;await panel.getByLabel('Suchen',{exact:true}).fill('Prüffirma');

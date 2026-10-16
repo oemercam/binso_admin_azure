@@ -1,0 +1,18 @@
+{
+  "browser": "chromium",
+  "device": "responsive viewport",
+  "scope": "Synthetic API UI fixtures; no production writes",
+  "interactions": [
+    "header",
+    "chrome"
+  ],
+  "results": [
+    {
+      "theme": "light",
+      "width": 390,
+      "route": "/dashboard",
+      "passed": true
+    }
+  ],
+  "errors": []
+}

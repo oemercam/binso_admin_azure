@@ -10511,8 +10511,8 @@
   ],
   "Zeit erfassen": [
     "Track time",
-    "Saisir du temps",
-    "Registra ore"
+    "Saisir le temps",
+    "Registra il tempo"
   ],
   "Zeit freigegeben.": [
     "Time approved.",
@@ -11683,5 +11683,80 @@
     "Product view in German · Sample data",
     "Vue du produit en allemand · Données de démonstration",
     "Vista del prodotto in tedesco · Dati di esempio"
+  ],
+  "Ihr nächster Schritt": [
+    "Your next step",
+    "Votre prochaine étape",
+    "Il prossimo passo"
+  ],
+  "Ihr Arbeitsbereich": [
+    "Your workspace",
+    "Votre espace de travail",
+    "Il tuo spazio di lavoro"
+  ],
+  "Was möchten Sie heute bewegen?": [
+    "What would you like to accomplish today?",
+    "Que souhaitez-vous accomplir aujourd’hui ?",
+    "Cosa desideri realizzare oggi?"
+  ],
+  "Guten Morgen": [
+    "Good morning",
+    "Bonjour",
+    "Buongiorno"
+  ],
+  "Guten Tag": [
+    "Good afternoon",
+    "Bonjour",
+    "Buongiorno"
+  ],
+  "Guten Abend": [
+    "Good evening",
+    "Bonsoir",
+    "Buonasera"
+  ],
+  "Willkommen": [
+    "Welcome",
+    "Bienvenue",
+    "Benvenuto"
+  ],
+  "Schnellaktionen": [
+    "Quick actions",
+    "Actions rapides",
+    "Azioni rapide"
+  ],
+  "Leistung abrechnen": [
+    "Invoice your work",
+    "Facturer une prestation",
+    "Fattura una prestazione"
+  ],
+  "Direkt einem Projekt zuordnen": [
+    "Assign directly to a project",
+    "Affecter directement à un projet",
+    "Assegna direttamente a un progetto"
+  ],
+  "Kunde anlegen": [
+    "Add customer",
+    "Ajouter un client",
+    "Aggiungi cliente"
+  ],
+  "Eine neue Beziehung beginnen": [
+    "Start a new relationship",
+    "Commencer une nouvelle relation",
+    "Inizia una nuova relazione"
+  ],
+  "Finanzentwicklung anzeigen": [
+    "Show financial development",
+    "Afficher l’évolution financière",
+    "Mostra l’andamento finanziario"
+  ],
+  "Fakturierter Umsatz": [
+    "Invoiced revenue",
+    "Chiffre d’affaires facturé",
+    "Fatturato emesso"
+  ],
+  "Kontakte und Vorgänge im Blick": [
+    "Keep track of contacts and activity",
+    "Gardez une vue sur les contacts et les activités",
+    "Contatti e attività sotto controllo"
   ]
 }

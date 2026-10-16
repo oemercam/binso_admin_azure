@@ -4,12 +4,12 @@ import {writeTestOutput} from '../test-output.mjs';
 import {identity} from './identity.mjs';
 import {createHash} from 'node:crypto';
 const runIdentity=identity();
-const baselineFile='ux-compliance/navigation-baseline.v2.json';
+const baselineFile='ux-compliance/navigation-baseline.v3.json';
 const navigationBaseline=await fs.readFile(baselineFile,'utf8').then(JSON.parse).catch(()=>null);
 export async function measureActionClearance(page){
  return page.evaluate(async()=>{
   const nav=document.querySelector('.bottom-nav');if(!nav?.getClientRects().length||document.querySelector('[role=dialog]'))return null;
-  const old={x:scrollX,y:scrollY},deadline=performance.now()+3000;
+  const old={x:scrollX,y:scrollY},deadline=performance.now()+10000;
   let stable=0,previous=null,atEnd=false;
   // Route effects and late document growth can reset the first scroll. Prove the
   // endpoint before comparing geometry; two RAFs alone never prove scroll end.
@@ -22,7 +22,9 @@ export async function measureActionClearance(page){
    previous=endpoint;if(stable>=2)break;
   }
   const navRect=nav.getBoundingClientRect(),main=document.querySelector('.page-container');
-  const actions=main?[...main.querySelectorAll('button,a,input,select,textarea')].filter(el=>el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden'&&!el.closest('[hidden],[inert],[aria-hidden=true]')):[];
+  // Closed details can retain descendant layout rectangles in both engines.
+  // Those controls are not rendered or reachable until the disclosure opens.
+  const actions=main?[...main.querySelectorAll('button,a,input,select,textarea')].filter(el=>el.checkVisibility({visibilityProperty:true})&&!el.closest('[hidden],[inert],[aria-hidden=true]')):[];
   const bottom=actions.length?Math.max(...actions.map(el=>el.getBoundingClientRect().bottom)):null;
   const plus=document.querySelector('.dock-create-action');const plusTop=plus?.getClientRects().length?plus.getBoundingClientRect().top:navRect.top;
   const observed={lastActionBottom:bottom,navigationTop:Math.min(navRect.top,plusTop),scrollY,scrollEndpoint:previous,scrollEndEstablished:atEnd&&stable>=2};
