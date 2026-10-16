@@ -30,10 +30,19 @@ function owner(node){for(let p=node.parent;p;p=p.parent){if(p.type==='FunctionDe
 function classStrings(node){if(!node)return [];if(node.type==='Literal'&&typeof node.value==='string')return [node.value];if(node.type==='JSXExpressionContainer')return classStrings(node.expression);if(node.type==='TemplateLiteral')return [...node.quasis.map(q=>q.value.cooked??q.value.raw),...node.expressions.flatMap(classStrings)];if(node.type==='ConditionalExpression')return [...classStrings(node.consequent),...classStrings(node.alternate)];if(node.type==='LogicalExpression')return [...classStrings(node.left),...classStrings(node.right)];return [];}
 function literal(attribute){const value=attribute?.value;if(value?.type==='Literal')return value.value;if(value?.type==='JSXExpressionContainer'&&value.expression.type==='Literal')return value.expression.value;return undefined;}
 const rule={
- meta:{type:'problem',schema:[],messages:{native:'Use the existing {{control}} from components/ui; native controls belong to the canonical renderer.',owned:'{{name}} belongs to its central component. Reuse it instead of creating another native wrapper.',barrel:'Import the actual domain module; app-pages is a retired compatibility import.',state:'Use the central {{component}} from components/ui for this state.'}},
+ meta:{type:'problem',schema:[],messages:{native:'Use the existing {{control}} from components/ui; native controls belong to the canonical renderer.',owned:'{{name}} belongs to its central component. Reuse it instead of creating another native wrapper.',barrel:'Import the actual domain module; app-pages is a retired compatibility import.',state:'Use the central {{component}} from components/ui for this state.',style:'Visual styling belongs to the central CSS owner. Inline styles may only supply measured CSS custom properties.',stylesheet:'Runtime CSS belongs to app/binso-ui.css and its design-system manifest; do not create a page-local stylesheet.'}},
  create(context){const file=path.relative(process.cwd(),context.filename).replaceAll('\\','/');return {
-  ImportDeclaration(node){if(/(?:^|\/)app-pages$/.test(node.source.value))context.report({node,messageId:'barrel'});},
-  JSXOpeningElement(node){if(node.name.type!=='JSXIdentifier')return;let tag=node.name.name;if(tag==='LocalizedElement'){const as=node.attributes.find(a=>a.type==='JSXAttribute'&&a.name.name==='as');tag=literal(as)??tag;}
+  ImportDeclaration(node){if(/(?:^|\/)app-pages$/.test(node.source.value))context.report({node,messageId:'barrel'});if(/\.(css|scss|sass)$/.test(node.source.value)&&!(['app/layout.tsx','app/global-error.tsx'].includes(file)&&node.source.value==='./binso-ui.css'))context.report({node,messageId:'stylesheet'});},
+  JSXOpeningElement(node){if(node.name.type!=='JSXIdentifier')return;let tag=node.name.name;
+   if(tag==='style')context.report({node,messageId:'stylesheet'});
+   const inline=node.attributes.find(a=>a.type==='JSXAttribute'&&a.name.name==='style');
+   if(inline&&file!=='app/opengraph-image.tsx'){
+    let value=inline.value?.expression;while(value?.type==='TSAsExpression'||value?.type==='TSSatisfiesExpression')value=value.expression;
+    const variables=value?.type==='ObjectExpression'&&value.properties.every(p=>p.type==='Property'&&String(p.key.value??p.key.name??'').startsWith('--'));
+    const tableTracks=file==='components/records.tsx'&&value?.type==='CallExpression'&&value.callee.name==='recordGrid';
+    if(!variables&&!tableTracks)context.report({node:inline,messageId:'style'});
+   }
+   if(tag==='LocalizedElement'){const as=node.attributes.find(a=>a.type==='JSXAttribute'&&a.name.name==='as');tag=literal(as)??tag;}
    if(['input','select','textarea'].includes(tag)&&!nativeOwners[file]?.[tag]?.includes(owner(node)))context.report({node,messageId:'native',data:{control:{input:'Input',select:'Select',textarea:'Textarea'}[tag]}});
    if(!/^[a-z]/.test(tag))return;
    const attributes=node.attributes.filter(a=>a.type==='JSXAttribute'),classes=classStrings(attributes.find(a=>a.name.name==='className')?.value);

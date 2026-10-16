@@ -4,12 +4,12 @@ import {writeTestOutput} from '../test-output.mjs';
 import {identity} from './identity.mjs';
 import {createHash} from 'node:crypto';
 const runIdentity=identity();
-const baselineFile='ux-compliance/navigation-baseline.v3.json';
+const baselineFile='ux-compliance/navigation-baseline.v2.json';
 const navigationBaseline=await fs.readFile(baselineFile,'utf8').then(JSON.parse).catch(()=>null);
 export async function measureActionClearance(page){
  return page.evaluate(async()=>{
   const nav=document.querySelector('.bottom-nav');if(!nav?.getClientRects().length||document.querySelector('[role=dialog]'))return null;
-  const old={x:scrollX,y:scrollY},deadline=performance.now()+10000;
+  const old={x:scrollX,y:scrollY},deadline=performance.now()+3000;
   let stable=0,previous=null,atEnd=false;
   // Route effects and late document growth can reset the first scroll. Prove the
   // endpoint before comparing geometry; two RAFs alone never prove scroll end.
@@ -22,9 +22,7 @@ export async function measureActionClearance(page){
    previous=endpoint;if(stable>=2)break;
   }
   const navRect=nav.getBoundingClientRect(),main=document.querySelector('.page-container');
-  // Closed details can retain descendant layout rectangles in both engines.
-  // Those controls are not rendered or reachable until the disclosure opens.
-  const actions=main?[...main.querySelectorAll('button,a,input,select,textarea')].filter(el=>el.checkVisibility({visibilityProperty:true})&&!el.closest('[hidden],[inert],[aria-hidden=true]')):[];
+  const actions=main?[...main.querySelectorAll('button,a,input,select,textarea')].filter(el=>el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden'&&!el.closest('[hidden],[inert],[aria-hidden=true]')):[];
   const bottom=actions.length?Math.max(...actions.map(el=>el.getBoundingClientRect().bottom)):null;
   const plus=document.querySelector('.dock-create-action');const plusTop=plus?.getClientRects().length?plus.getBoundingClientRect().top:navRect.top;
   const observed={lastActionBottom:bottom,navigationTop:Math.min(navRect.top,plusTop),scrollY,scrollEndpoint:previous,scrollEndEstablished:atEnd&&stable>=2};
@@ -68,7 +66,7 @@ export async function measureCompliance(page,{output,route,theme,width,state='no
    const actions=[...el.querySelectorAll('button,a')].filter(visible);
    const kind=x=>x.matches('button.desktop-global-search[aria-label]')&&x.getAttribute('aria-label').trim()?'search':x.matches('button.desktop-notification-button')?'notification':x.matches('button.avatar-button')?'account':x.matches('a.desktop-header-timer[href="/zeit"]')&&/^\d{2,}:\d{2}:\d{2}$/.test(x.textContent.trim())?'timer':'unexpected';
    const roles=actions.map(kind),unexpected=actions.filter(x=>kind(x)==='unexpected');
-   const outside=[...el.closest('.desktop-appbar').querySelectorAll('button,a')].filter(visible).filter(x=>!el.contains(x)&&!x.matches('button.desktop-navigation-toggle[aria-controls="customer-desktop-navigation"]'));
+   const outside=[...el.closest('.desktop-appbar').querySelectorAll('button,a')].filter(visible).filter(x=>!el.contains(x)&&!x.matches('button.desktop-navigation-toggle[aria-controls="customer-desktop-navigation"],.workspace-location>a[href="/dashboard"]'));
    const validOrder=['search,notification,account','search,timer,notification,account'].includes(roles.join(','));
    add('LAY-003',validOrder&&!unexpected.length&&!outside.length?'passed':'failed',{visibleActions:actions.length,roles,unexpectedActions:[...unexpected,...outside].map(item),rects:actions.map(item)},'.desktop-appbar-actions');
   }

@@ -10,7 +10,7 @@ export async function GET(request:NextRequest){
  try{
   const s=await requireSession();authorize(s,"customers:read");
   const filters=new URLSearchParams({order:"name.asc"});
-  for(const key of ["q","limit","order","offset"]){const value=request.nextUrl.searchParams.get(key);if(value)filters.set(key,value)}
+  for(const key of ["q","limit","order","offset","include","outstanding"]){const value=request.nextUrl.searchParams.get(key);if(value)filters.set(key,value)}
   const status=request.nextUrl.searchParams.get("status");if(status)filters.set("status","eq."+status);
   const items=await listCustomers(s,filters.toString());
   let total=Number(items[0]?.total_count??0);

@@ -1,4 +1,49 @@
 {
+  "Arbeitsbereich": [
+    "Workspace",
+    "Espace de travail",
+    "Area di lavoro"
+  ],
+  "Weitere Kundendaten": [
+    "More customer details",
+    "Autres coordonnées du client",
+    "Altri dettagli del cliente"
+  ],
+  "Kontakte, Geschäftsvorgänge und offene Forderungen.": [
+    "Contacts, business transactions and outstanding receivables.",
+    "Contacts, opérations commerciales et créances ouvertes.",
+    "Contatti, operazioni commerciali e crediti aperti."
+  ],
+  "Keine Rechnungen erfasst": [
+    "No invoices recorded",
+    "Aucune facture enregistrée",
+    "Nessuna fattura registrata"
+  ],
+  "Offene Rechnungen": [
+    "Open invoices",
+    "Factures ouvertes",
+    "Fatture aperte"
+  ],
+  "Alles durchsuchen": [
+    "Search everything",
+    "Tout rechercher",
+    "Cerca ovunque"
+  ],
+  "Firmenadresse": [
+    "Company address",
+    "Adresse de l’entreprise",
+    "Indirizzo aziendale"
+  ],
+  "Kontaktperson": [
+    "Contact person",
+    "Personne de contact",
+    "Persona di contatto"
+  ],
+  "Aktivitäten": [
+    "Activities",
+    "Activités",
+    "Attività"
+  ],
   ". Eingesetzte Unterauftragsbearbeiter sind unter": [
     ". The subprocessors used are listed under",
     ". Les sous-traitants ultérieurs utilisés figurent sous",
@@ -5829,6 +5874,21 @@
     "Aucun collaborateur",
     "Nessun collaboratore"
   ],
+  "Aktive Kunden": [
+    "Active customers",
+    "Clients actifs",
+    "Clienti attivi"
+  ],
+  "Keine offenen Vorgänge": [
+    "No open items",
+    "Aucune opération ouverte",
+    "Nessuna operazione aperta"
+  ],
+  "Offene Vorgänge": [
+    "Open items",
+    "Opérations ouvertes",
+    "Operazioni aperte"
+  ],
   "Keine offenen Rechnungen": [
     "No open invoices",
     "Aucune facture ouverte",
@@ -10511,8 +10571,8 @@
   ],
   "Zeit erfassen": [
     "Track time",
-    "Saisir le temps",
-    "Registra il tempo"
+    "Saisir du temps",
+    "Registra ore"
   ],
   "Zeit freigegeben.": [
     "Time approved.",
@@ -11684,79 +11744,244 @@
     "Vue du produit en allemand · Données de démonstration",
     "Vista del prodotto in tedesco · Dati di esempio"
   ],
-  "Ihr nächster Schritt": [
-    "Your next step",
-    "Votre prochaine étape",
-    "Il prossimo passo"
+  "14 Tage testen": [
+    "Try for 14 days",
+    "Essayer pendant 14 jours",
+    "Prova per 14 giorni"
   ],
-  "Ihr Arbeitsbereich": [
-    "Your workspace",
-    "Votre espace de travail",
-    "Il tuo spazio di lavoro"
+  "Benutzerrollen und gemeinsame Firmen-Arbeitsbereiche": [
+    "User roles and shared company workspaces",
+    "Rôles utilisateurs et espaces de travail partagés",
+    "Ruoli utente e spazi di lavoro aziendali condivisi"
   ],
-  "Was möchten Sie heute bewegen?": [
-    "What would you like to accomplish today?",
-    "Que souhaitez-vous accomplir aujourd’hui ?",
-    "Cosa desideri realizzare oggi?"
+  "Bring Klarheit in deinen Geschäftsalltag.": [
+    "Bring clarity to your business day.",
+    "Simplifie ton quotidien professionnel.",
+    "Fai chiarezza nella tua giornata lavorativa."
   ],
-  "Guten Morgen": [
-    "Good morning",
-    "Bonjour",
-    "Buongiorno"
+  "CHF, MWST und QR-Rechnungen": [
+    "CHF, VAT and QR invoices",
+    "CHF, TVA et factures QR",
+    "CHF, IVA e fatture QR"
   ],
-  "Guten Tag": [
-    "Good afternoon",
-    "Bonjour",
-    "Buongiorno"
+  "DEIN SCHWEIZER GESCHÄFTSALLTAG": [
+    "YOUR SWISS BUSINESS DAY",
+    "TON QUOTIDIEN PROFESSIONNEL SUISSE",
+    "LA TUA GIORNATA LAVORATIVA SVIZZERA"
   ],
-  "Guten Abend": [
-    "Good evening",
-    "Bonsoir",
-    "Buonasera"
+  "Demo ansehen →": [
+    "View demo →",
+    "Voir la démo →",
+    "Guarda la demo →"
   ],
-  "Willkommen": [
-    "Welcome",
-    "Bienvenue",
-    "Benvenuto"
+  "Der passende Umfang": [
+    "The right scope",
+    "Les fonctions adaptées",
+    "Le funzionalità adatte"
   ],
-  "Schnellaktionen": [
-    "Quick actions",
-    "Actions rapides",
-    "Azioni rapide"
+  "Desktop-Arbeitsbereich": [
+    "Desktop workspace",
+    "Espace de travail sur ordinateur",
+    "Spazio di lavoro desktop"
   ],
-  "Leistung abrechnen": [
-    "Invoice your work",
-    "Facturer une prestation",
-    "Fattura una prestazione"
+  "Du kannst BINSO ONE im Browser nutzen. Die PWA ermöglicht den Zugriff vom Homescreen.": [
+    "Use BINSO ONE in your browser. The PWA provides access from your home screen.",
+    "Utilise BINSO ONE dans ton navigateur. La PWA permet un accès depuis ton écran d’accueil.",
+    "Usa BINSO ONE nel browser. La PWA permette l’accesso dalla schermata iniziale."
   ],
-  "Direkt einem Projekt zuordnen": [
-    "Assign directly to a project",
-    "Affecter directement à un projet",
-    "Assegna direttamente a un progetto"
+  "EIN ZUSAMMENHÄNGENDER ARBEITSABLAUF": [
+    "ONE CONNECTED WORKFLOW",
+    "UN PROCESSUS DE TRAVAIL CONNECTÉ",
+    "UN FLUSSO DI LAVORO CONNESSO"
   ],
-  "Kunde anlegen": [
-    "Add customer",
-    "Ajouter un client",
-    "Aggiungi cliente"
+  "Ein Ablauf. Vom Kontakt bis zur Zahlung.": [
+    "One workflow. From contact to payment.",
+    "Un processus. Du contact au paiement.",
+    "Un flusso. Dal contatto al pagamento."
   ],
-  "Eine neue Beziehung beginnen": [
-    "Start a new relationship",
-    "Commencer une nouvelle relation",
-    "Inizia una nuova relazione"
+  "Ein klarer": [
+    "One clear",
+    "Une vue",
+    "Una chiara"
   ],
-  "Finanzentwicklung anzeigen": [
-    "Show financial development",
-    "Afficher l’évolution financière",
-    "Mostra l’andamento finanziario"
+  "Eine grosszügige Desktop-Arbeitsfläche und eine eigene mobile Bedienung für Smartphone und PWA.": [
+    "A spacious desktop workspace and dedicated mobile controls for smartphones and PWA.",
+    "Un espace de travail généreux sur ordinateur et une interface mobile dédiée pour smartphone et PWA.",
+    "Uno spazio desktop ampio e comandi mobili dedicati per smartphone e PWA."
   ],
-  "Fakturierter Umsatz": [
-    "Invoiced revenue",
-    "Chiffre d’affaires facturé",
-    "Fatturato emesso"
+  "Häufige Fragen": [
+    "Frequently asked questions",
+    "Questions fréquentes",
+    "Domande frequenti"
   ],
-  "Kontakte und Vorgänge im Blick": [
-    "Keep track of contacts and activity",
-    "Gardez une vue sur les contacts et les activités",
-    "Contatti e attività sotto controllo"
+  "Im Büro die Übersicht.": [
+    "An overview at the office.",
+    "Une vue d’ensemble au bureau.",
+    "Una visione d’insieme in ufficio."
+  ],
+  "Informationen bleiben dort verbunden, wo du sie brauchst.": [
+    "Information stays connected where you need it.",
+    "Les informations restent liées là où tu en as besoin.",
+    "Le informazioni restano collegate dove ti servono."
+  ],
+  "Kann mein Team mitarbeiten?": [
+    "Can my team work together?",
+    "Mon équipe peut-elle collaborer ?",
+    "Il mio team può collaborare?"
+  ],
+  "Klare Navigation, übersichtliche Daten und kontextbezogene Aktionen.": [
+    "Clear navigation, organised data and contextual actions.",
+    "Navigation claire, données lisibles et actions contextuelles.",
+    "Navigazione chiara, dati ordinati e azioni contestuali."
+  ],
+  "Kompakte Ansichten für Kundendaten, Zeiterfassung und schnelle Aufgaben unterwegs.": [
+    "Compact views for customer data, time tracking and quick tasks on the go.",
+    "Vues compactes pour les clients, le suivi du temps et les tâches rapides en déplacement.",
+    "Viste compatte per clienti, rilevamento del tempo e attività rapide in mobilità."
+  ],
+  "Mehr erledigen.": [
+    "Get more done.",
+    "Accomplis davantage.",
+    "Fai di più."
+  ],
+  "Mobile & PWA": [
+    "Mobile & PWA",
+    "Mobile et PWA",
+    "Mobile e PWA"
+  ],
+  "Monatlich oder jährlich. Lerne BINSO ONE im 14-tägigen Test kennen.": [
+    "Monthly or yearly. Discover BINSO ONE with a 14-day trial.",
+    "Au mois ou à l’année. Découvre BINSO ONE pendant 14 jours.",
+    "Mensile o annuale. Scopri BINSO ONE con una prova di 14 giorni."
+  ],
+  "Muss ich eine App installieren?": [
+    "Do I need to install an app?",
+    "Dois-je installer une application ?",
+    "Devo installare un’app?"
+  ],
+  "PASSEND ZU DEINEM ARBEITSTAG": [
+    "MADE FOR YOUR WORKDAY",
+    "ADAPTÉ À TA JOURNÉE DE TRAVAIL",
+    "ADATTO ALLA TUA GIORNATA LAVORATIVA"
+  ],
+  "Schweizer Geschäftsalltag": [
+    "Swiss business day",
+    "Quotidien professionnel suisse",
+    "Quotidianità lavorativa svizzera"
+  ],
+  "Tarife vergleichen →": [
+    "Compare plans →",
+    "Comparer les tarifs →",
+    "Confronta i piani →"
+  ],
+  "Unterwegs direkt handeln.": [
+    "Take action on the go.",
+    "Agis directement en déplacement.",
+    "Agisci direttamente in mobilità."
+  ],
+  "Von der ersten Anfrage bis zur bezahlten Rechnung. Organisiere Kunden, Projekte und Finanzen in einem Arbeitsbereich.": [
+    "From the first enquiry to the paid invoice. Organise customers, projects and finances in one workspace.",
+    "De la première demande à la facture payée. Organise clients, projets et finances dans un seul espace.",
+    "Dalla prima richiesta alla fattura pagata. Organizza clienti, progetti e finanze in un solo spazio."
+  ],
+  "Web & PWA · Am Schreibtisch und unterwegs": [
+    "Web & PWA · At your desk and on the go",
+    "Web et PWA · Au bureau et en déplacement",
+    "Web e PWA · Alla scrivania e in mobilità"
+  ],
+  "Weniger wechseln.": [
+    "Switch less.",
+    "Change moins d’outil.",
+    "Cambia meno strumenti."
+  ],
+  "für dein Unternehmen.": [
+    "for your business.",
+    "pour ton entreprise.",
+    "per la tua azienda."
+  ],
+  "Überblick.": [
+    "overview.",
+    "d’ensemble.",
+    "visione d’insieme."
+  ],
+  "Mit offenen Beträgen": [
+    "With outstanding balances",
+    "Avec montants ouverts",
+    "Con importi aperti"
+  ],
+  "Kunden & Verkauf": [
+    "Customers & sales",
+    "Clients et ventes",
+    "Clienti e vendite"
+  ],
+  "Zeit & Team": [
+    "Time & team",
+    "Temps et équipe",
+    "Tempo e team"
+  ],
+  "Jede Kundenbeziehung im Zusammenhang.": [
+    "Every customer relationship in context.",
+    "Chaque relation client dans son contexte.",
+    "Ogni relazione con il cliente nel suo contesto."
+  ],
+  "Kontaktdaten, Angebote, Rechnungen und Projekte an einem Ort. Öffne das Kundendossier und arbeite direkt weiter.": [
+    "Contacts, quotes, invoices and projects in one place. Open the customer dossier and continue working.",
+    "Coordonnées, offres, factures et projets au même endroit. Ouvre le dossier client et poursuis ton travail.",
+    "Contatti, offerte, fatture e progetti in un unico posto. Apri il dossier cliente e continua a lavorare."
+  ],
+  "Kontakt → Angebot → Auftrag": [
+    "Contact → Quote → Order",
+    "Contact → Offre → Mandat",
+    "Contatto → Offerta → Ordine"
+  ],
+  "Wissen, was offen ist.": [
+    "Know what is outstanding.",
+    "Savoir ce qui reste ouvert.",
+    "Sapere cosa è ancora aperto."
+  ],
+  "Behalte Rechnungen, Zahlungseingänge und offene Forderungen im Blick und öffne die passenden Vorgänge direkt.": [
+    "Track invoices, payments and receivables and open the relevant records directly.",
+    "Suis les factures, paiements et créances et ouvre directement les dossiers concernés.",
+    "Tieni sotto controllo fatture, pagamenti e crediti e apri direttamente le operazioni."
+  ],
+  "Rechnung → Zahlung → Überblick": [
+    "Invoice → Payment → Overview",
+    "Facture → Paiement → Vue d’ensemble",
+    "Fattura → Pagamento → Panoramica"
+  ],
+  "Leistungen erfassen. Gemeinsam weiterkommen.": [
+    "Record work. Move forward together.",
+    "Saisir les prestations. Avancer ensemble.",
+    "Registra le prestazioni. Avanza insieme al team."
+  ],
+  "Ordne Arbeitszeit und Leistungen dem passenden Kunden oder Projekt zu und übernimm sie in die Abrechnung.": [
+    "Assign time and services to the right customer or project and transfer them to billing.",
+    "Attribue le temps et les prestations au bon client ou projet et intègre-les à la facturation.",
+    "Assegna tempo e prestazioni al cliente o progetto corretto e trasferiscili alla fatturazione."
+  ],
+  "Projekt → Zeit → Abrechnung": [
+    "Project → Time → Billing",
+    "Projet → Temps → Facturation",
+    "Progetto → Tempo → Fatturazione"
+  ],
+  "Kontakt erfassen und Informationen bündeln.": [
+    "Record contacts and connect information.",
+    "Saisir les contacts et regrouper les informations.",
+    "Registra contatti e raggruppa le informazioni."
+  ],
+  "Leistungen anbieten und den Entscheid verfolgen.": [
+    "Offer services and follow the decision.",
+    "Proposer des prestations et suivre la décision.",
+    "Offri prestazioni e segui la decisione."
+  ],
+  "Arbeiten organisieren und Leistungen erfassen.": [
+    "Organise work and record services.",
+    "Organiser le travail et saisir les prestations.",
+    "Organizza il lavoro e registra le prestazioni."
+  ],
+  "Positionen übernehmen und Rechnung erstellen.": [
+    "Transfer items and create an invoice.",
+    "Reprendre les postes et créer une facture.",
+    "Trasferisci le voci e crea una fattura."
   ]
 }

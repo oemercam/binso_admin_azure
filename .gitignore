@@ -2,6 +2,7 @@ node_modules
 .next
 out
 deploy/
+/evidence/
 .env
 .env.*
 !.env.example

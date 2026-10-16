@@ -35,6 +35,21 @@ const searchColumns:Record<string,string[]>={
  time_entries:['q.project_name','q.description'],
  support_tickets:['q.case_number','q.subject'],
 };
+
+/** Read projection only: same issued/credit/refund definitions as financialMetricsData.
+ * Correlated by tenant and customer; filtering/counting happen before pagination. */
+export function customerFinancialProjection(){return `select
+ coalesce(json_agg(json_build_object('currency',currency,'revenue',revenue,'open_amount',open_amount) order by currency),'[]'::json) financials,
+ coalesce(bool_or(open_amount>0),false) has_open from (
+  select i.currency,
+   sum(case when date_trunc('year',i.issue_date)=date_trunc('year',(now() at time zone 'Europe/Zurich')::date) then i.total_amount else 0 end-coalesce(n.year_credit,0)) revenue,
+   sum(greatest(0,greatest(0,i.total_amount-coalesce(n.credit,0))-greatest(0,i.paid_amount-coalesce(r.refund,0)))) open_amount
+  from invoices i
+  left join lateral (select sum(amount) credit,sum(amount) filter(where date_trunc('year',credit_date)=date_trunc('year',(now() at time zone 'Europe/Zurich')::date)) year_credit from credit_notes where organization_id=$1 and invoice_id=i.id and credit_date<=(now() at time zone 'Europe/Zurich')::date) n on true
+  left join lateral (select sum(amount) refund from invoice_refunds where organization_id=$1 and invoice_id=i.id and refund_date<=(now() at time zone 'Europe/Zurich')::date) r on true
+  where i.organization_id=$1 and i.customer_id=c.id and i.archived_at is null and i.status not in ('draft','cancelled') and i.issue_date<=(now() at time zone 'Europe/Zurich')::date
+  group by i.currency
+ ) totals`;}
 export async function listApiBusiness(c:PoolClient,s:SessionUser,table:string,extra:string):Promise<Row[]>{
  const filters=new URLSearchParams(extra);const values:unknown[]=[s.organizationId];
  let source=sqlSources[table];
@@ -68,6 +83,8 @@ export async function listApiBusiness(c:PoolClient,s:SessionUser,table:string,ex
   if(!sources.length)throw new ApiError(403,'forbidden','Keine Berechtigung.');source=sources.join(' union all ');
  }
  if(!source)throw new ApiError(400,'invalid_table','Ungültige Datenquelle.');
+ const customerFinancials=table==='customers'&&filters.get('include')==='financials'&&tenantCan(s.role,'invoices:read');
+ if(customerFinancials)source=`select c.*,f.financials,f.has_open from (${source}) c left join lateral (${customerFinancialProjection()}) f on true`;
  // Derive the same financial display state before filtering/pagination.
  // Persisted legacy statuses and document snapshots remain unchanged.
  if(table==='documents'){
@@ -75,6 +92,10 @@ export async function listApiBusiness(c:PoolClient,s:SessionUser,table:string,ex
   source=`select d.*,case when d.kind='offer' then case when d.status='sent' and d.valid_until<$${values.length}::text then 'expired' else d.status end when d.status in ('draft','cancelled') then d.status when d.total>0 and round(greatest(0,d.total-d.credit_amount)*100)<=round(greatest(0,d.paid_amount-d.refund_amount)*100) then 'paid' when d.due_date<$${values.length}::text and round(greatest(0,d.total-d.credit_amount)*100)>round(greatest(0,d.paid_amount-d.refund_amount)*100) then 'overdue' when round(greatest(0,d.paid_amount-d.refund_amount)*100)>0 then 'partial' else 'open' end display_status from (${source}) d`;
  }
  const where:string[]=[];
+ if(filters.has('outstanding')){
+  if(!customerFinancials||filters.get('outstanding')!=='1')throw new ApiError(400,'invalid_filter','Ungültiger Kundenfilter.');
+  where.push('q.has_open=true');
+ }
  const display=filters.get('display_status');
  if(display){
   if(table!=='documents'||!/^eq\.(draft|open|partial|overdue|paid|sent|accepted|declined|expired|revised|cancelled)$/.test(display))throw new ApiError(400,'invalid_filter','Ungültiger Dokumentstatus.');

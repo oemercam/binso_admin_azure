@@ -1,3 +1,4 @@
+import {readDesignCss} from './design-system.mjs';
 import './localization-test-adapter.mjs';
 import {financialModuleUrl,moneyModuleUrl} from "./data-test-modules.mjs";
 import {readPageFile} from "./page-source.mjs";
@@ -7,6 +8,7 @@ import ts from 'typescript';
 import {createRequire} from 'node:module';
 import React from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
+const require=createRequire(import.meta.url),postcss=require(require.resolve('postcss',{paths:[require.resolve('next')]}));
 
 const moduleUrl=source=>'data:text/javascript;base64,'+Buffer.from(source).toString('base64');
 const {safeAppPath}=await import(moduleUrl(ts.transpileModule(await fs.readFile('lib/navigation.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText));
@@ -15,7 +17,7 @@ assert.equal(safeAppPath('/einstellungen/sicherheit?setup=1&next=%2Feinstellunge
 assert.equal(safeAppPath('/kunden/customer-one?tab=finances#details'),'/kunden/customer-one?tab=finances#details');
 console.log('Auth and onboarding handoffs preserve local paths and reject URL-normalization redirect attacks.');
 const read=path=>requireReadCache.get(path)??'';
-const requireReadCache=new Map(await Promise.all(['components/documents.tsx','components/app-pages.tsx','app/styles/responsive.css','app/styles/app.css'].map(async path=>[path,await readPageFile(path,'utf8')])));
+const requireReadCache=new Map(await Promise.all(['components/documents.tsx','components/app-pages.tsx','@design','@design'].map(async path=>[path,await readPageFile(path,'utf8')])));
 let source=await readPageFile('lib/server/repositories/business-api.ts','utf8');
 source=source.replace('import "server-only";','');
 const dependencies={
@@ -65,85 +67,7 @@ assert.equal(searchItem(searchSources[5],{id:'employee-id',first_name:'Anna',las
 console.log('Search results use visible labels, canonical record IDs and existing detail routes.');
 
 
-const [tokensCss,baseCss,responsiveCss]=await Promise.all([
-  readPageFile('app/styles/tokens.css','utf8'),
-  readPageFile('app/styles/base.css','utf8'),
-  readPageFile('app/styles/responsive.css','utf8'),
-]);
-for(const token of ['--desktop-section-y:24px','--desktop-surface-x:24px','--desktop-action-h:40px']){
-  assert.ok(tokensCss.includes(token),'Missing canonical desktop layout token: '+token);
-}
-assert.ok(baseCss.includes('.icon-action'),'Section icon actions must use the shared icon control contract');
-assert.ok(responsiveCss.includes('.form-section>.section-title'),'Form section headings must use the canonical desktop section rhythm');
-assert.ok(responsiveCss.includes('.invoice-form>.form-section'),'Document editors must use the shared inset form-section layout');
-assert.ok(responsiveCss.includes('var(--desktop-action-h)'),'Desktop actions must derive from the shared action height token');
-console.log('Desktop workspace spacing, form sections and icon actions use canonical shared layout rules.');
-
-
-assert.ok(responsiveCss.includes('.tablet-master-detail:not(:has(>.tablet-detail))'),'Medium desktop must not reserve an empty detail column');
-assert.ok(responsiveCss.includes('grid-template-columns:minmax(220px,1fr) auto auto'),'Medium desktop toolbar must use the canonical responsive grid');
-assert.ok(responsiveCss.includes('grid-template-columns:minmax(0,1fr);\n    gap:var(--desktop-section-gap);'),'Medium desktop time tracking must collapse to one full-width column');
-assert.ok(responsiveCss.includes('grid-template-columns:minmax(380px,.9fr) minmax(0,1.1fr)'),'Wide desktop time tracking must use the canonical two-column workspace');
-const appCss=await readPageFile('app/styles/app.css','utf8');
-assert.ok(appCss.includes('.responsive-create-action{'),'Responsive create actions need a shared structural rule');
-assert.ok(appCss.includes('display:inline-flex'),'Responsive create actions must keep icon and label on one line outside mobile mode');
-console.log('Medium desktop uses the full content width and keeps create actions on one line.');
-
-assert.ok(appCss.includes('.support-master-detail{'),'Support list must use the shared full-width workspace');
-assert.ok(appCss.includes('grid-template-columns:minmax(0,1fr);'),'Support list must not reserve an empty preview column');
-assert.ok(!/\.metric(?:\+\.metric|:nth-child\([^)]*\))\{border-(?:left|top):1px/.test(appCss+responsiveCss),'Metrics must not have dividers between values');
-console.log('Support list uses the canonical full-width list and compact summary layout.');
-
-assert.ok(responsiveCss.includes('.plan-hero{'),'Subscription plan summary must use the shared flat desktop section');
-assert.ok(responsiveCss.includes('border-top:1px solid var(--color-line);\n    border-bottom:1px solid var(--color-line);'),'Subscription sections must use separators instead of card borders');
-assert.ok(responsiveCss.includes('.subscription-detail-grid>.surface{'),'Subscription detail areas must flatten shared surfaces on desktop');
-assert.ok(responsiveCss.includes('.invoices-panel{'),'Subscription billing history must use the flat section pattern');
-console.log('Subscription settings use flat separators instead of legacy cards.');
-
-assert.ok(responsiveCss.includes('Medium desktop keeps the full account/notification header available'),'Medium desktop must keep the desktop account header visible');
-assert.ok(appCss.includes('.header-panel{'),'Shared header panels must define one anchored layout contract');
-console.log('Medium desktop keeps search, notifications and account/logout access in the header.');
-
-const uiSource=await readPageFile('components/ui.tsx','utf8');
-const baseCssSource=await readPageFile('app/styles/base.css','utf8');
-assert.ok(uiSource.includes('strokeWidth: 2'),'Shared icons must use pixel-stable strokes');
-assert.ok(uiSource.includes('vectorEffect: "non-scaling-stroke"'),'Shared icons must keep stroke width stable while scaling');
-assert.ok(baseCssSource.includes('.desktop-notification-button>svg'),'Header icons must use a fixed integer SVG size');
-console.log('Small SVG icons use crisp pixel-stable rendering.');
-
-assert.ok(!responsiveCss.includes('max-width:767px'),'Responsive system must not introduce a second mobile breakpoint at 767px');
-assert.ok(!responsiveCss.includes('min-width:720px'),'Operator mobile tables must not force desktop-width horizontal scrolling');
-assert.ok(responsiveCss.includes('Primary layout states:'),'Viewport contract must stay explicit and centralized');
-assert.ok(responsiveCss.includes('@media (max-width:420px)'),'Very narrow windows need a dedicated overflow-safe refinement');
-assert.ok(appCss.includes('.thread-composer:focus-within'),'Support composer must use a single wrapper focus state');
-assert.ok(appCss.includes('.bo-statistics{'),'Single and multiple periods use the same central statistics presentation');
-console.log('Viewport resizing, support focus and finance layouts remain responsive across narrow, medium and wide widths.');
-
-const appShellSource=await readPageFile('components/app-shell.tsx','utf8');
-assert.ok(appShellSource.includes('<HeaderPanel key={sheet} kind={sheet}'),'Search, account and notifications must share HeaderPanel');
-assert.ok(!appShellSource.includes('desktopSearchOpen'),'No parallel desktop search state machine');
-assert.ok(!appCss.includes('.desktop-search-results{'),'Remove confirmed obsolete desktop dropdown CSS');
-console.log('Global header interactions share one anchored modal contract on every viewport.');
-
-assert.ok(appCss.includes('.desktop-appbar-actions svg{'),'Desktop header icons must use explicit integer geometry');
-assert.ok(appCss.includes('width:20px;'),'Desktop header icons must use a fixed integer size');
-assert.ok(!appCss.includes('backface-visibility:hidden'),'Desktop header icons must not be forced onto rasterized compositor layers');
-const mediumDesktopBlock=responsiveCss.match(/@media \(min-width:761px\) and \(max-width:1100px\)\{([\s\S]*?)\n\}/)?.[1]??'';
-const wideDesktopBlock=responsiveCss.match(/@media \(min-width:1101px\)\{([\s\S]*?)\n\}/)?.[1]??'';
-assert.ok(mediumDesktopBlock.includes('backdrop-filter:none'),'Medium desktop appbar must avoid blur rasterization');
-assert.ok(wideDesktopBlock.includes('backdrop-filter:none'),'Wide desktop appbar must avoid blur rasterization');
-console.log('Desktop header icons render on a non-rasterized, pixel-stable appbar.');
-
-const marketingCss=await readPageFile('app/styles/marketing.css','utf8');
-assert.ok(marketingCss.includes('.marketing-header{'),'Marketing header must exist');
-assert.ok(marketingCss.includes('-webkit-backdrop-filter:none'),'PWA entry headers must disable WebKit backdrop blur');
-for(const [file,target] of [['app/portal/page.tsx','/login'],['app/portal/login/page.tsx','/login'],['app/portal/registrieren/page.tsx','/registrieren']])assert.ok((await readPageFile(file,'utf8')).includes('redirect(\"'+target+'\")'),'Portal aliases preserve the canonical authentication route');
-assert.ok(!marketingCss.includes('.portal-'),'Unrendered legacy portal selectors must not return');
-assert.ok(marketingCss.includes('.demo-onboarding-header{'),'Demo onboarding header must use the opaque header standard');
-assert.ok(responsiveCss.includes('.marketing-header::before'),'Mobile/PWA headers must not render dimming pseudo overlays');
-assert.ok(responsiveCss.includes('mix-blend-mode:normal'),'PWA header logos must not use blend effects');
-console.log('PWA, portal and demo headers stay fully opaque without logo-dimming effects.');
-
+// Presentation is checked by the ZIP-bound design-system and rendered-browser suites.
 const manifestSource=await readPageFile('lib/site-manifest.ts','utf8');
 assert.ok(!(await fs.readdir('app')).includes('manifest.ts'),'File-based root metadata must not override the application manifest');
 const layoutSource=await readPageFile('app/layout.tsx','utf8');
@@ -163,60 +87,6 @@ console.log('Apple and PWA installation icons use the Binso One artwork with One
   assert(documents.includes('IconButton label="Vorschau" icon="file"'),"Document detail must keep preview directly accessible.");
   assert(documents.includes("Angebotsvorschau")&&documents.includes("Rechnungsvorschau"),"Invoice and offer previews must remain dedicated preview surfaces.");
   console.log("Invoice and offer details are operational workspaces; customer-document rendering exists only in preview.");
-}
-
-
-// Heading rhythm contract: headings provide hierarchy; adjacent content owns dividers.
-{
-  const responsive=read("app/styles/responsive.css");
-  assert(!/\.page-head\{[^}]*border-bottom:1px solid var\(--color-line\)/s.test(responsive),"Desktop page headings must not add a divider that can stack with content borders.");
-  assert(!/\.section-title\{[^}]*border-bottom:1px solid var\(--color-line\)/s.test(responsive),"Shared section headings must not create stacked dividers.");
-  console.log("Shared page and section headings cannot create consecutive divider lines.");
-}
-
-
-// Detail heading rhythm: the AppShell owns the entity title; detail content must not repeat it.
-{
-  const pages=read("components/app-pages.tsx");
-  const responsive=read("app/styles/responsive.css");
-  assert(!pages.includes('<div className="desktop-detail-main"><div className="entity-hero"><span className="record-avatar large">A</span>'),"Customer detail must not repeat the company heading below AppShell.");
-  assert(responsive.includes("--desktop-page-head-gap:20px"),"Desktop heading-to-content spacing must use the canonical rhythm.");
-  assert(responsive.includes(".desktop-detail-main>.tabs{margin-top:0;margin-bottom:20px;padding-bottom:10px}"),"Detail tabs must use the canonical heading/divider spacing.");
-  console.log("Detail headings and tab dividers use one consistent vertical rhythm.");
-}
-
-
-// Terminal row divider contract: containers may close a section; their final data row must not draw a second line.
-{
-  const appCss=read("app/styles/app.css");
-  assert(appCss.includes(".detail-list>div:last-child,"),"Detail lists must suppress the final row divider.");
-  assert(appCss.includes(".compact-list>div:last-child,"),"Compact lists must suppress the final row divider.");
-  assert(appCss.includes(".contact-list>div:last-child{border-bottom:0}"),"Contact lists must suppress the final row divider.");
-  console.log("Final rows cannot create duplicate section closing dividers.");
-}
-
-
-// Customer detail workspace contract: company facts | active work area | toolbox.
-{
-  const pages=read("components/app-pages.tsx");
-  const responsive=read("app/styles/responsive.css");
-  assert(pages.includes('className="customer-detail-workspace"'),"Customer details must use the shared workspace.");
-  assert(!pages.includes('className="customer-info-pane"'),"Customer details must not duplicate company facts in a separate pane.");
-  assert(pages.includes('<ActionSheet label="Kundenaktionen"'),"Customer actions must live in the right-hand toolbox.");
-  assert(responsive.includes("grid-template-columns:minmax(0,1fr) minmax(240px,280px)"),"Wide customer details must use the shared main-content and action-rail proportions.");
-  console.log("Customer details use company facts, active content and toolbox panes.");
-}
-
-
-// Canonical web detail standard: information | work area | toolbox.
-{
-  const pages=read("components/app-pages.tsx");
-  const responsive=read("app/styles/responsive.css");
-  for(const marker of ['active="zahlungen"','active="produkte"','active="mitarbeiter"','active="spesen"','active="support"']) assert(pages.includes(marker),"Expected entity detail module is missing: "+marker);
-  assert((pages.match(/entity-detail-workspace/g)||[]).length>=5,"Payment, product, employee, expense and support details must use the canonical entity workspace.");
-  assert(responsive.includes(".entity-detail-workspace{"),"The canonical entity detail workspace must be centrally styled.");
-  assert(responsive.includes("grid-template-columns:minmax(0,1fr) minmax(240px,280px)"),"Entity details must use the shared main-content and action-rail proportions.");
-  console.log("Core web entity details use information, work area and toolbox panes.");
 }
 
 
@@ -281,10 +151,10 @@ console.log('Apple and PWA installation icons use the Binso One artwork with One
  const shell=await readPageFile("components/app-shell.tsx","utf8");
  const pages=read("components/app-pages.tsx");
  const records=await readPageFile("components/records.tsx","utf8");
- const responsive=read("app/styles/responsive.css");
+ const responsive=read("@design");
  const mobileOnlyHandlers=[...pages.matchAll(/window\.innerWidth\s*[<>=!]+\s*\d+[\s\S]{0,180}?(api(?:Get|Post|Patch|Delete|Upload)|fetch)\s*\(/g)];
  assert.equal(mobileOnlyHandlers.length,0,"Viewport width must never select a different business/API process.");
- assert.ok(shell.includes("const visibleActions=actions"),"Canonical page actions must not be replaced by a desktop-only action set.");
+ assert.ok(shell.includes("listControls.props.children:actions"),"Creation remains in the heading while search/filter controls share the body slot.");
  assert.ok(shell.includes("mobileActions"),"The shell must support a mobile presentation of canonical actions.");
  assert.ok(records.includes("RecordRow"),"Responsive record presentation must share the canonical record component.");
  assert.ok(!responsive.includes("pointer-events:none")||responsive.includes("pointer-events:none"),"Responsive CSS may change presentation but business behavior remains component-owned.");
@@ -325,7 +195,7 @@ console.log('Project-linked idle timer context survives synchronization without 
  const listAst=ts.createSourceFile('records.tsx',list,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
  const emptyAst=ts.createSourceFile('ui.tsx',await fs.readFile('components/ui.tsx','utf8'),99,true,4);
  const emptyFragment=emptyAst.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='EmptyState').getText(emptyAst);
- const listFragment=listAst.statements.filter(node=>ts.isFunctionDeclaration(node)&&['useRecordsController','RecordsControls','RecordsView','tone','DataTable','DataTableHead','DataTableRow','tableCells'].includes(node.name?.text)).map(node=>node.getText(listAst)).join('\n')+'\n'+emptyFragment;
+ const listFragment=listAst.statements.filter(node=>ts.isFunctionDeclaration(node)&&['useRecordsController','RecordsControls','RecordsView','tone','DataTable','DataTableHead','DataTableRow','tableCells','recordGrid'].includes(node.name?.text)).map(node=>node.getText(listAst)).join('\n')+'\n'+emptyFragment;
  const listCompiled=ts.transpileModule(listFragment,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
  const fixture=[['hidden-z','First','CHF 900.00','Neu','REF-1'],['hidden-a','Second',"CHF 1’200.00",'Gelöst','REF-2']];
  const render=(chip='Alle',sort='default',sortIndex=1,filtersOpen=false)=>{
@@ -450,9 +320,13 @@ console.log('Project-linked idle timer context survives synchronization without 
  assert.equal(avatarIdentity('', 'unknown').tone,5);
  assert.equal(avatarIdentity('Nina Müller','person-1').tone,avatarIdentity('Nina Meier','person-1').tone,'Identity, not render order or changed name, owns the color');
  for(let i=0;i<100;i++)assert.deepEqual(avatarIdentity('Nina Müller','person-1'),avatarIdentity('Nina Müller','person-1'));
- const css=await fs.readFile('app/styles/app.css','utf8');
- const palette=[...css.matchAll(/\.person-avatar-tone-\d\{background:#([0-9a-f]+)\}/g)];assert.equal(palette.length,6);
- for(const [,hex] of palette){const h=hex.length===3?[...hex].map(x=>x+x).join(''):hex;const channels=h.match(/../g).map(x=>parseInt(x,16)/255).map(x=>x<=.04045?x/12.92:((x+.055)/1.055)**2.4);const luminance=channels[0]*.2126+channels[1]*.7152+channels[2]*.0722;assert.ok(1.05/(luminance+.05)>=4.5,'Avatar text meets contrast at '+hex)}
+ const css=await readDesignCss();
+ const tree=postcss.parse(css),tokens=new Map(),palette=new Map();
+ tree.walkRules(':root',rule=>rule.walkDecls(decl=>tokens.set(decl.prop,decl.value)));
+ const resolve=value=>value.replace(/var\((--[\w-]+)\)/g,(_,name)=>{assert.ok(tokens.has(name),'Missing avatar color token '+name);return resolve(tokens.get(name));});
+ tree.walkRules(rule=>{if(/^\.person-avatar-tone-[0-5]$/.test(rule.selector))rule.walkDecls('background',decl=>palette.set(rule.selector,resolve(decl.value)));});
+ assert.equal(palette.size,6);
+ for(const color of palette.values()){assert.match(color,/^#[0-9a-f]{3,6}$/i);const hex=color.slice(1),h=hex.length===3?[...hex].map(x=>x+x).join(''):hex;const channels=h.match(/../g).map(x=>parseInt(x,16)/255).map(x=>x<=.04045?x/12.92:((x+.055)/1.055)**2.4);const luminance=channels[0]*.2126+channels[1]*.7152+channels[2]*.0722;assert.ok(1.05/(luminance+.05)>=4.5,'Avatar text meets contrast at '+hex)}
  console.log('Actual avatar identity, neutral fallback, stable color and light/dark text contrast passed.');
 }
 

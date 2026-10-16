@@ -4,6 +4,71 @@
     "context": "",
     "tokens": [
       {
+        "property": "--auth-control-border",
+        "value": "#dfe5ed",
+        "important": false
+      },
+      {
+        "property": "--workspace-font",
+        "value": "Inter,system-ui,sans-serif",
+        "important": false
+      },
+      {
+        "property": "--workspace-ink",
+        "value": "#181b20",
+        "important": false
+      },
+      {
+        "property": "--workspace-mobile-ink",
+        "value": "#213047",
+        "important": false
+      },
+      {
+        "property": "--workspace-muted",
+        "value": "#647080",
+        "important": false
+      },
+      {
+        "property": "--workspace-line",
+        "value": "#edf1f6",
+        "important": false
+      },
+      {
+        "property": "--workspace-title-size",
+        "value": "27px",
+        "important": false
+      },
+      {
+        "property": "--mobile-title-tracking",
+        "value": "-.8px",
+        "important": false
+      },
+      {
+        "property": "--mobile-value-tracking",
+        "value": "-.8px",
+        "important": false
+      },
+      {
+        "property": "--workspace-title-weight",
+        "value": "600",
+        "important": false
+      },
+      {
+        "property": "--workspace-row-weight",
+        "value": "500",
+        "important": false
+      },
+      {
+        "property": "--workspace-value-size",
+        "value": "25px",
+        "important": false
+      },
+      {
+        "property": "--workspace-value-weight",
+        "value": "500",
+        "important": false
+      },
+      {
         "property": "--app-canvas",
         "value": "#fff",
         "important": false
@@ -350,12 +415,12 @@
       },
       {
         "property": "--page-heading-line-height",
-        "value": "1.08",
+        "value": "1.5",
         "important": false
       },
       {
         "property": "--page-heading-letter-spacing",
-        "value": "-.035em",
+        "value": "-.6px",
         "important": false
       },
       {
@@ -370,7 +435,7 @@
       },
       {
         "property": "--metric-label-size",
-        "value": "11px",
+        "value": "12px",
         "important": false
       },
       {
@@ -390,7 +455,7 @@
       },
       {
         "property": "--metric-value-letter-spacing",
-        "value": "-.025em",
+        "value": "-1px",
         "important": false
       },
       {
@@ -835,6 +900,31 @@
     "selector": "html[data-theme=\"dark\"]",
     "context": "",
     "tokens": [
+      {
+        "property": "--auth-control-border",
+        "value": "#2a3545",
+        "important": false
+      },
+      {
+        "property": "--workspace-ink",
+        "value": "#d7e3f3",
+        "important": false
+      },
+      {
+        "property": "--workspace-mobile-ink",
+        "value": "#d7e3f3",
+        "important": false
+      },
+      {
+        "property": "--workspace-muted",
+        "value": "#b1bfce",
+        "important": false
+      },
+      {
+        "property": "--workspace-line",
+        "value": "#2a3545",
+        "important": false
+      },
       {
         "property": "--app-canvas",
         "value": "#000",

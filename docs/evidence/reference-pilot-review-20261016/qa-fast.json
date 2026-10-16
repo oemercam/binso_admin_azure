@@ -1,0 +1,164 @@
+{
+  "level": "fast",
+  "effectiveCoverage": "fast",
+  "browserExecuted": false,
+  "scope": {
+    "level": "fast",
+    "files": [
+      "app/styles/app.css",
+      "app/styles/marketing.css",
+      "app/styles/responsive.css",
+      "app/styles/tokens.css",
+      "components/binso-ux.tsx",
+      "components/pages/customers.tsx",
+      "components/ui.tsx",
+      "docs/architecture/v21-5-integration-inventory.json",
+      "docs/architecture/v21-5-routes.md",
+      "docs/audit/v24/page-matrix.json",
+      "docs/audit/v24/ux-contract.json",
+      "docs/audit/v24/ux-token-snapshot.json",
+      "lib/locales/messages.json",
+      "scripts/ux-browser-test.mjs",
+      "scripts/ux-dom-evidence.mjs",
+      "scripts/ux-review-gallery.py"
+    ],
+    "global": true,
+    "reason": "Shared/unknown dependency: representative cross-module coverage",
+    "routes": [
+      "/dashboard",
+      "/finanzen",
+      "/kunden",
+      "/kunden/customer-one",
+      "/kunden/neu",
+      "/produkte",
+      "/produkte/product-one",
+      "/produkte/neu",
+      "/rechnungen",
+      "/rechnungen/RE-TEST-1",
+      "/rechnungen/neu",
+      "/mitarbeiter/employee-one",
+      "/mitarbeiter/neu",
+      "/zeit",
+      "/projekte/neu",
+      "/spesen/neu",
+      "/support/ticket-one",
+      "/einstellungen",
+      "/operator",
+      "/operator/kunden",
+      "/login"
+    ],
+    "webkitRoutes": [
+      "/dashboard",
+      "/finanzen",
+      "/kunden",
+      "/kunden/customer-one",
+      "/kunden/neu",
+      "/produkte",
+      "/produkte/product-one",
+      "/produkte/neu",
+      "/rechnungen",
+      "/rechnungen/RE-TEST-1",
+      "/rechnungen/neu",
+      "/mitarbeiter/employee-one",
+      "/mitarbeiter/neu",
+      "/zeit",
+      "/projekte/neu",
+      "/spesen/neu",
+      "/support/ticket-one",
+      "/einstellungen",
+      "/operator",
+      "/operator/kunden",
+      "/login"
+    ],
+    "interactions": [
+      "data",
+      "customers",
+      "products",
+      "employees",
+      "documents",
+      "finance",
+      "time",
+      "expenses",
+      "chat",
+      "billing",
+      "header",
+      "operator",
+      "settings",
+      "chrome"
+    ],
+    "suites": [
+      "ux-contract-check",
+      "foundation-integration-test",
+      "ux-regression-test",
+      "theme-selfcheck",
+      "glass-ux-test",
+      "ui-build-cache-test",
+      "ui-foundation-test",
+      "navigation-foundation-test",
+      "check-css-architecture",
+      "qa-plan-test"
+    ],
+    "widths": [
+      390
+    ],
+    "webkitWidths": [
+      390,
+      768
+    ],
+    "themes": [
+      "light"
+    ]
+  },
+  "seconds": 14.62,
+  "timings": [
+    {
+      "label": "changed-file lint",
+      "seconds": 1.52
+    },
+    {
+      "label": "incremental typecheck",
+      "seconds": 2.15
+    },
+    {
+      "label": "ux-contract-check",
+      "seconds": 1.9
+    },
+    {
+      "label": "foundation-integration-test",
+      "seconds": 2.11
+    },
+    {
+      "label": "ux-regression-test",
+      "seconds": 1.1
+    },
+    {
+      "label": "theme-selfcheck",
+      "seconds": 0.33
+    },
+    {
+      "label": "glass-ux-test",
+      "seconds": 0.4
+    },
+    {
+      "label": "ui-build-cache-test",
+      "seconds": 0.24
+    },
+    {
+      "label": "ui-foundation-test",
+      "seconds": 3.04
+    },
+    {
+      "label": "navigation-foundation-test",
+      "seconds": 0.57
+    },
+    {
+      "label": "check-css-architecture",
+      "seconds": 0.17
+    },
+    {
+      "label": "qa-plan-test",
+      "seconds": 1.09
+    }
+  ],
+  "passed": true
+}

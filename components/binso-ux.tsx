@@ -1,7 +1,8 @@
 "use client";
 
 import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
-import { Children, isValidElement, cloneElement, useState, useRef, useEffect, type ReactNode, type CSSProperties } from "react";
+import { Children, isValidElement, cloneElement, useState, useRef, useEffect, useLayoutEffect, useContext, useId, type ReactNode, type CSSProperties } from "react";
+import {WorkspaceActionContext} from '@/lib/client/workspace-actions';
 import Link from "next/link";
 import { createPortal } from "react-dom";
 import { useDialogFocus } from "./use-dialog-focus";
@@ -43,6 +44,13 @@ export function CreateAction({ label, href, onClick, disabled = false, requiresW
   return <Button href={href} requiresWrite={requiresWrite} className="bo-create-action" ariaLabel={label} disabled={disabled} onClick={onClick} icon="plus"/>;
 }
 
+/** One context-action contract: desktop command bar, mobile overflow sheet. */
+export function ContextActions({label="Weitere Aktionen",children,mobile=true}:{label?:string;children:ReactNode;mobile?:boolean}){
+ const register=useContext(WorkspaceActionContext),id=useId(),[open,setOpen]=useState(false);
+ useLayoutEffect(()=>{register?.(id,children);return()=>register?.(id,null)},[register,id,children]);
+ return <>{mobile&&<div className="context-actions-mobile"><Button variant="ghost" icon="more" ariaLabel={label} onClick={()=>setOpen(true)}><LocalizedText>{label}</LocalizedText></Button></div>}{!register&&<div className="context-actions-inline">{children}</div>}{mobile&&<ActionSheet label={label} open={open} onClose={()=>setOpen(false)}><div className="context-actions-menu" onClick={event=>{if(event.target instanceof Element&&event.target.closest('a,button'))setOpen(false)}}>{children}</div></ActionSheet>}</>;
+}
+
 export function QuickCreateAction({section="dashboard",returnTo="/dashboard"}:{section?:string;returnTo?:string}){
  const access=usePageAccess(),[open,setOpen]=useState(false);
  const actions=permittedCreateActions(section,access.canOpen);
@@ -61,21 +69,33 @@ export function EmptyRecordAction({section}:{section:string}){
  return <Button variant="secondary" href={action.href}><LocalizedText>{action.title}</LocalizedText><LocalizedText>{" erstellen"}</LocalizedText></Button>;
 }
 
-export function DetailHeading({ title, status, tone = "neutral", subtitle, leading, action, verbatimTitle=false }: {
-  title: string;verbatimTitle?:boolean; status?: ReactNode; tone?: "neutral" | "success" | "warning" | "danger" | "info"; subtitle?: string; leading?: ReactNode; action?: ReactNode;
+export function DetailHeading({ title, status, tone = "neutral", subtitle, leading, action, mobileAction, recordLabel, statusPlacement="title", verbatimTitle=false }: {
+  title: string;verbatimTitle?:boolean; status?: ReactNode; tone?: "neutral" | "success" | "warning" | "danger" | "info"; subtitle?: string; leading?: ReactNode; action?: ReactNode;mobileAction?:ReactNode;recordLabel?:string;statusPlacement?:"title"|"subtitle";
 }) {
-  return <div className="bo-detail-heading">{leading}
-    <div className="bo-detail-heading-main"><h1><LocalizedText verbatim={verbatimTitle}>{title}</LocalizedText></h1>{status != null && <Status tone={tone}>{status}</Status>}</div>
-    {subtitle && <p><LocalizedText verbatim={verbatimTitle}>{subtitle}</LocalizedText></p>}
+  return <div className="bo-detail-heading">{leading}{recordLabel&&<small className="bo-record-label">{recordLabel}</small>}
+    <div className="bo-detail-heading-main"><h1><LocalizedText verbatim={verbatimTitle}>{title}</LocalizedText></h1>{statusPlacement==="title"&&status != null && <Status tone={tone}>{status}</Status>}{mobileAction&&<div className="mobile-page-actions">{mobileAction}</div>}</div>
+    {(subtitle||statusPlacement==="subtitle"&&status!=null)&&<p className="bo-detail-meta">{statusPlacement==="subtitle"&&status!=null&&<Status appearance="text" tone={tone}>{status}</Status>}{subtitle&&<LocalizedText verbatim={verbatimTitle}>{subtitle}</LocalizedText>}</p>}
     {action&&<div className="bo-detail-commandbar">{action}</div>}
   </div>;
 }
 
-export function MetricTiles({ children, columns=4 }: { children: ReactNode;columns?:2|3|4 }) {
-  return <div className="metrics-grid bo-metric-tiles" style={{"--metric-columns":columns} as CSSProperties}>{children}</div>;
+/** Responsive dossier slots keep contact facts before records on a phone. */
+export function DetailSections({summary,facts,records,extra}:{summary:ReactNode;facts:ReactNode;records:ReactNode;extra?:ReactNode}){
+ return <div className="detail-grid" data-layout="dossier" data-has-extra={!!extra||undefined}><section data-area="summary">{summary}</section><section data-area="facts">{facts}</section><section data-area="records">{records}</section>{extra&&<section data-area="extra">{extra}</section>}</div>;
 }
 
-export function MetricTile({ label, value, hint }: { label: string; value: ReactNode; hint?:string }) {
+/** Supplementary facts stay accessible without crowding a mobile dossier. */
+export function DetailDisclosure({label,children}:{label:string;children:ReactNode}){
+ const [open,setOpen]=useState(false),touched=useRef(false);
+ useLayoutEffect(()=>{const media=window.matchMedia('(min-width:1101px)'),update=()=>{if(!touched.current)setOpen(media.matches)};update();media.addEventListener('change',update);return()=>media.removeEventListener('change',update)},[]);
+ return <details className="bo-data-disclosure" open={open} onToggle={event=>{const next=event.currentTarget.open;if(next!==open){touched.current=true;setOpen(next)}}}><summary><LocalizedText>{label}</LocalizedText></summary><div>{children}</div></details>;
+}
+
+export function MetricTiles({ children, columns=4, desktopOnly=false }: { children: ReactNode;columns?:2|3|4;desktopOnly?:boolean }) {
+  return <div className="metrics-grid bo-metric-tiles" data-desktop-only={desktopOnly||undefined} style={{"--metric-columns":columns} as CSSProperties}>{children}</div>;
+}
+
+export function MetricTile({ label, value, hint }: { label: ReactNode; value: ReactNode; hint?:string }) {
   return <Metric label={label} value={value} hint={hint}/>;
 }
 
@@ -90,12 +110,12 @@ export function SettingsGroup({title,children}:{title:string;children:ReactNode}
 }
 
 /** Route links and local detail tabs keep their behavior and share one container. */
-export function DetailTabs({children,label,role,panelId}:{children:ReactNode;label:string;role?:"navigation"|"tablist";panelId?:string}){
+export function DetailTabs({children,label,role,panelId,appearance="line"}:{children:ReactNode;label:string;role?:"navigation"|"tablist";panelId?:string;appearance?:"pill"|"line"}){
  const root=useRef<HTMLDivElement>(null);
  const nodes=Children.toArray(children);
  const localTabs=role==='tablist'||(!role&&nodes.length>0&&nodes.every(child=>isValidElement(child)&&child.type==='button'));
  useEffect(()=>{const active=root.current?.querySelector<HTMLElement>('[aria-selected="true"],.active');if(!active)return;const container=root.current!;const left=active.offsetLeft-container.offsetLeft,right=left+active.offsetWidth;if(left<container.scrollLeft)container.scrollLeft=left;else if(right>container.scrollLeft+container.clientWidth)container.scrollLeft=right-container.clientWidth;},[children]);
- return <LocalizedElement as="div" ref={root} className="tabs" role={localTabs?'tablist':role??'navigation'} aria-label={label}>{nodes.map((child,index)=>{
+ return <LocalizedElement as="div" ref={root} className="tabs" data-appearance={appearance} role={localTabs?'tablist':role??'navigation'} aria-label={label}>{nodes.map((child,index)=>{
   if(!localTabs||!isValidElement<{className?:string;onKeyDown?:React.KeyboardEventHandler<HTMLButtonElement>}>(child))return child;
   const selected=child.props.className?.split(/\s+/).includes('active')??false;
   return cloneElement(child,{'role':'tab','aria-selected':selected,tabIndex:selected?0:-1,...(panelId?{id:panelId+'-tab-'+index,'aria-controls':panelId}:{}),onKeyDown:(event:React.KeyboardEvent<HTMLButtonElement>)=>{child.props.onKeyDown?.(event);if(event.defaultPrevented)return;const next=event.key==='Home'?0:event.key==='End'?nodes.length-1:event.key==='ArrowRight'?(index+1)%nodes.length:event.key==='ArrowLeft'?(index+nodes.length-1)%nodes.length:null;if(next===null)return;event.preventDefault();const button=event.currentTarget.parentElement?.children[next] as HTMLButtonElement|undefined;button?.focus();button?.click();}} as Partial<typeof child.props>);
@@ -161,7 +181,7 @@ export function ActionsMenu({label, children, busy=false}: {label:string;childre
 
 /** Canonical two-line row shared by entity and financial lists. */
 export function ListRow({href,onClick,title,meta,value,valueLabel,status,tone="neutral",compact=false,valuePlacement="separate",translateTitle=true}:{translateTitle?:boolean;href?:string;onClick?:()=>void;title:ReactNode;meta:ReactNode;value?:ReactNode;valueLabel?:string;status?:string;tone?:"success"|"warning"|"danger"|"neutral"|"info";compact?:boolean;valuePlacement?:"separate"|"metadata"}){
- const content=<><b><LocalizedText verbatim={!translateTitle}>{title}</LocalizedText></b>{status&&<Status tone={tone}>{status}</Status>}<small>{meta}</small>{value!=null&&<span className="document-summary-amount">{valueLabel&&<small><LocalizedText>{valueLabel}</LocalizedText></small>}<strong>{value}</strong></span>}</>;
+ const content=<><b><LocalizedText verbatim={!translateTitle}>{title}</LocalizedText></b>{status&&!compact&&<Status tone={tone}>{status}</Status>}<small>{meta}{status&&compact&&<Status appearance="text" tone={tone}>{status}</Status>}</small>{value!=null&&<span className="document-summary-amount">{valueLabel&&<small><LocalizedText>{valueLabel}</LocalizedText></small>}<strong>{value}</strong></span>}{(href||onClick)&&!status&&value==null&&<span className="record-chevron"><Icon name="arrow" size={12}/></span>}</>;
  const className=`document-summary-row${value!=null?" has-value":""}${compact?" is-compact":""}${valuePlacement==="metadata"?" has-inline-value":""}`;
  return href?<Link prefetch={false} href={href} className={className}>{content}</Link>:onClick?<button type="button" onClick={onClick} className={className}>{content}</button>:<div className={className}>{content}</div>;
 }

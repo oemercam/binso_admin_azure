@@ -8,17 +8,29 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 <!-- END:nextjs-agent-rules -->
 
-# Batched validation
+# BINso One — binding product and UI rules
 
-- Treat follow-up prompts for the same feature as one work package. Continue from
-  the existing branch and documented evidence; a prompt alone does not invalidate tests.
-- During implementation use `pnpm qa:fast` (optionally `--typecheck`) and focused
-  non-browser tests. `qa:fast` and `qa:integration` start browsers only with `--browser`.
-- Keep incomplete work in a draft PR. Quality still runs static, security, database
-  and build gates; browser jobs run when the PR becomes ready for review.
-- Once a coherent package is complete, run the scoped browser gate for affected
-  behavior. Repeat only after relevant changes, failures or unresolved concerns.
-- Standard/full QA, ready PRs, main, nightly and release coverage remain enforced.
-  Never present deferred browser checks as passed or as release acceptance.
-- Record tested commit/scope, results and remaining checks in the existing work report.
-  Do not deploy production or change production infrastructure without authorization.
+The user's original ZIP in docs/audit/v24/reference/ is the binding visual source.
+Read IMPLEMENTIERUNG.md and docs/architecture/reference-foundation.md before UI work.
+The original Microsoft variant wins over historical Flow, Noir, Apple, grey or
+permanent-toolbox instructions. Historical audit reports are evidence, not rules.
+
+- app/design-system/manifest.json declares the ordered CSS owners. There is no
+  fixed stylesheet count. Base, states and responsive rules share a component owner.
+- Reuse the design-system components for headings, controls, lists, sheets,
+  feedback and charts. Extend the common owner for reusable requirements.
+- No route-local CSS, JSX style blocks or literal inline presentation. Dynamic
+  measurements may pass CSS custom properties into the owning component.
+- New pages must follow a documented page pattern and include loading, empty,
+  error, read-only, keyboard and narrow-screen states. Mark missing reference
+  screens as derived in the review; never silently call them original-approved.
+- Preserve real APIs, authentication, roles, financial calculations and files.
+  Reference data is allowed only in isolated test fixtures, never tenant data.
+- The ZIP's protected Bottom-Navigation contract remains unchanged. Its frozen
+  markup, token inheritance, focus and geometry have independent regression tests.
+- Compare original and actual login/list/detail at equal content widths first.
+  Then cover every route family and operator variant with rendered evidence.
+- During work use qa:fast and focused tests; run the coherent browser matrix after
+  relevant changes. A green build or static inventory is not visual acceptance.
+- Keep incomplete work in a draft PR. Never disable failed gates, silently accept
+  new screenshot baselines, or deploy production without explicit authorization.

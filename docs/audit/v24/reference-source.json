@@ -1,0 +1,45 @@
+{
+  "archiveSha256": "6c53321824f70961464309e2ab813f0b5c20486f5e10ccb336e46c1cbd6ae57d",
+  "files": [
+    {
+      "file": "IMPLEMENTIERUNG.md",
+      "sha256": "9a3fc7752e887736d27c71b291a8109afe1a5b8e8f4467fbdc05d87a511b5b28"
+    },
+    {
+      "file": "desktop-login.html",
+      "sha256": "6e1b4c2f16c34657d12602111aab4ca0a92f3d7d981676e42bedfe6512f9f3c9"
+    },
+    {
+      "file": "index.html",
+      "sha256": "48d4c2422ac67d3559c2283ea341039a834f2948f2476bad992a96a3d77fe472"
+    },
+    {
+      "file": "komponenten.html",
+      "sha256": "ab1ca4b21a92faeeda481dcfdbf5e6d71676e00f89c5453875fabab70109e734"
+    },
+    {
+      "file": "landingpage.html",
+      "sha256": "8c57b64744b49e582b3b6956618cb6588547d002775e8e6d76bdca6f1ea080c8"
+    },
+    {
+      "file": "mobile-app.html",
+      "sha256": "ccdab3cd24721d1ed96274707278c99f771914eef3d6de936dbde54d4aef5193"
+    },
+    {
+      "file": "sources/desktop-login.html",
+      "sha256": "ccc4969cc9659c670840f032639402cebe49ff1cf4784a1e7cdc06af88d40e19"
+    },
+    {
+      "file": "sources/komponenten.html",
+      "sha256": "e526e7a956a727dbbcdbc821388ffca0836d3cd06cf9483807eb5c7acdcac55b"
+    },
+    {
+      "file": "sources/landingpage.html",
+      "sha256": "9c1c6685e3128cd58e13777e448ecccd47e17287ac31cb211969686cfae438fe"
+    },
+    {
+      "file": "sources/mobile-app.html",
+      "sha256": "b95e84dbfb3498c2d38b052f3715326a9775e7a0e4b2a392b38e6a2afc3eaef5"
+    }
+  ]
+}

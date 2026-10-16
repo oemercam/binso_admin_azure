@@ -1,0 +1,576 @@
+{
+  "files": 281,
+  "routes": 76,
+  "styles": [
+    {
+      "file": "app/design-system/analytics.css",
+      "bytes": 10357,
+      "declarations": 345,
+      "competing": 0,
+      "examples": []
+    },
+    {
+      "file": "app/design-system/auth.css",
+      "bytes": 7264,
+      "declarations": 253,
+      "competing": 0,
+      "examples": []
+    },
+    {
+      "file": "app/design-system/collections.css",
+      "bytes": 17839,
+      "declarations": 548,
+      "competing": 3,
+      "examples": [
+        [
+          "|.desktop-record-head>[role=\"columnheader\"]|min-width",
+          [
+            "0",
+            "0"
+          ]
+        ],
+        [
+          "|.desktop-record-row>.table-status-cell|overflow",
+          [
+            "visible",
+            "visible"
+          ]
+        ],
+        [
+          "media (min-width:1101px)/|.detail-grid|gap",
+          [
+            "22px",
+            "var(--desktop-workspace-gap)"
+          ]
+        ]
+      ]
+    },
+    {
+      "file": "app/design-system/documents.css",
+      "bytes": 20404,
+      "declarations": 556,
+      "competing": 1,
+      "examples": [
+        [
+          "media (max-width:760px)/|.document-line-items>.document-line-item|display",
+          [
+            "grid",
+            "block"
+          ]
+        ]
+      ]
+    },
+    {
+      "file": "app/design-system/foundation.css",
+      "bytes": 4104,
+      "declarations": 141,
+      "competing": 0,
+      "examples": []
+    },
+    {
+      "file": "app/design-system/layout.css",
+      "bytes": 26937,
+      "declarations": 764,
+      "competing": 41,
+      "examples": [
+        [
+          "|.desktop-notification-button,\n.mobile-notification-button|border-radius",
+          [
+            "var(--radius-md)",
+            "0"
+          ]
+        ],
+        [
+          "|.desktop-notification-button,\n.mobile-notification-button|background",
+          [
+            "transparent",
+            "transparent"
+          ]
+        ],
+        [
+          "|.desktop-notification-button,\n.mobile-notification-button|color",
+          [
+            "inherit",
+            "var(--color-fg)"
+          ]
+        ],
+        [
+          "|.page-head>div|min-width",
+          [
+            "0",
+            "0"
+          ]
+        ],
+        [
+          "media (min-width:1101px)/|.desktop-appbar|position",
+          [
+            "sticky",
+            "sticky"
+          ]
+        ],
+        [
+          "media (min-width:1101px)/|.desktop-appbar|top",
+          [
+            "0",
+            "0"
+          ]
+        ],
+        [
+          "media (min-width:1101px)/|.desktop-appbar|z-index",
+          [
+            "18",
+            "18"
+          ]
+        ],
+        [
+          "media (min-width:1101px)/|.desktop-appbar|height",
+          [
+            "64px",
+            "var(--desktop-header-h)"
+          ]
+        ],
+        [
+          "media (min-width:1101px)/|.desktop-appbar|padding",
+          [
+            "0 clamp(32px,3vw,48px)",
+            "0 var(--page-x)"
+          ]
+        ],
+        [
+          "media (min-width:1101px)/|.desktop-appbar|display",
+          [
+            "flex",
+            "flex"
+          ]
+        ],
+        [
+          "media (min-width:1101px)/|.desktop-appbar|align-items",
+          [
+            "center",
+            "center"
+          ]
+        ],
+        [
+          "media (min-width:1101px)/|.desktop-appbar|justify-content",
+          [
+            "space-between",
+            "space-between"
+          ]
+        ]
+      ]
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "bytes": 30321,
+      "declarations": 987,
+      "competing": 3,
+      "examples": [
+        [
+          "|.product-callout p|color",
+          [
+            "var(--color-muted)",
+            "var(--app-secondary)"
+          ]
+        ],
+        [
+          "media (max-width:760px)/|.hero-product-preview|display",
+          [
+            "grid",
+            "block"
+          ]
+        ],
+        [
+          "media (max-width:760px)/|.hero-product-mobile|height",
+          [
+            "420px",
+            "min(68dvh,560px)"
+          ]
+        ]
+      ]
+    },
+    {
+      "file": "app/design-system/navigation.css",
+      "bytes": 5359,
+      "declarations": 111,
+      "competing": 2,
+      "examples": [
+        [
+          "media (max-width:1100px)/|.mobile-dock> :is(.bottom-nav,.operator-mobile-nav)|bottom",
+          [
+            "auto",
+            "auto"
+          ]
+        ],
+        [
+          "media (max-width:1100px)/|.mobile-dock> :is(.bottom-nav,.operator-mobile-nav)|background",
+          [
+            "var(--app-glass-solid)",
+            "var(--app-glass-solid)"
+          ]
+        ]
+      ]
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "bytes": 42807,
+      "declarations": 1216,
+      "competing": 8,
+      "examples": [
+        [
+          "|.operator-detail-list>div|padding",
+          [
+            "12px 0",
+            "11px 0"
+          ]
+        ],
+        [
+          "|.operator-detail-list>div|display",
+          [
+            "grid",
+            "grid"
+          ]
+        ],
+        [
+          "|.operator-detail-list>div|grid-template-columns",
+          [
+            "120px minmax(0,1fr)",
+            "130px 1fr"
+          ]
+        ],
+        [
+          "|.operator-detail-list>div|gap",
+          [
+            "12px",
+            "12px"
+          ]
+        ],
+        [
+          "|.operator-detail-list>div|border-bottom",
+          [
+            "1px solid var(--color-line)",
+            "1px solid var(--color-line)"
+          ]
+        ],
+        [
+          "|.operator-sidebar a.active|background",
+          [
+            "var(--app-accent-soft)",
+            "var(--color-subtle)"
+          ]
+        ],
+        [
+          "|.operator-app-header|padding",
+          [
+            "0 clamp(32px,3vw,48px)",
+            "0 var(--page-x)"
+          ]
+        ],
+        [
+          "|.operator-header-brand>.logo|display",
+          [
+            "none",
+            "block"
+          ]
+        ]
+      ]
+    },
+    {
+      "file": "app/design-system/overlays.css",
+      "bytes": 17864,
+      "declarations": 529,
+      "competing": 3,
+      "examples": [
+        [
+          "|.bottom-sheet,.header-panel,.confirm-dialog|--color-fg",
+          [
+            "var(--app-text)",
+            "var(--workspace-ink)"
+          ]
+        ],
+        [
+          "|.bottom-sheet,.header-panel,.confirm-dialog|--color-muted",
+          [
+            "var(--app-secondary)",
+            "var(--workspace-muted)"
+          ]
+        ],
+        [
+          "|.bottom-sheet,.header-panel,.confirm-dialog|--color-line",
+          [
+            "var(--app-divider)",
+            "var(--workspace-line)"
+          ]
+        ]
+      ]
+    },
+    {
+      "file": "app/design-system/primitives.css",
+      "bytes": 18855,
+      "declarations": 531,
+      "competing": 5,
+      "examples": [
+        [
+          "media (max-width:760px)/|.mobile-sticky-save|position",
+          [
+            "sticky",
+            "static"
+          ]
+        ],
+        [
+          "media (max-width:1100px)/|.mobile-header .icon-button|width",
+          [
+            "44px",
+            "40px"
+          ]
+        ],
+        [
+          "media (max-width:1100px)/|.mobile-header .icon-button|height",
+          [
+            "44px",
+            "40px"
+          ]
+        ],
+        [
+          "media (max-width:1100px)/|.mobile-header .icon-button|min-width",
+          [
+            "44px",
+            "40px"
+          ]
+        ],
+        [
+          "media (max-width:1100px)/|.mobile-header .icon-button|min-height",
+          [
+            "44px",
+            "40px"
+          ]
+        ]
+      ]
+    },
+    {
+      "file": "app/design-system/settings.css",
+      "bytes": 14797,
+      "declarations": 430,
+      "competing": 0,
+      "examples": []
+    },
+    {
+      "file": "app/design-system/theme.css",
+      "bytes": 10571,
+      "declarations": 349,
+      "competing": 0,
+      "examples": []
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "bytes": 51354,
+      "declarations": 1654,
+      "competing": 7,
+      "examples": [
+        [
+          "media (min-width:1101px)/|.tablet-detail|max-height",
+          [
+            "calc(100dvh - 104px)",
+            "calc(100dvh - var(--desktop-header-h) - (var(--desktop-page-top) * 2))"
+          ]
+        ],
+        [
+          "media (min-width:1101px)/|.dashboard-grid|gap",
+          [
+            "18px",
+            "var(--desktop-workspace-gap)"
+          ]
+        ],
+        [
+          "media (min-width:1101px)/|.dashboard-grid|margin-top",
+          [
+            "20px",
+            "var(--desktop-section-gap)"
+          ]
+        ],
+        [
+          "media (max-width:760px)/|.mobile-document-bar|padding",
+          [
+            "8px 0",
+            "10px 0"
+          ]
+        ],
+        [
+          "media (max-width:760px)/|.onboarding-footer|display",
+          [
+            "block",
+            "grid"
+          ]
+        ],
+        [
+          "media (max-width:1100px)/|.mobile-back|width",
+          [
+            "44px",
+            "40px"
+          ]
+        ],
+        [
+          "media (max-width:1100px)/|.mobile-back|height",
+          [
+            "44px",
+            "40px"
+          ]
+        ]
+      ]
+    }
+  ],
+  "inline": [
+    {
+      "file": "app/opengraph-image.tsx",
+      "styles": [
+        "width:\"100%\",height:\"100%\",display:\"flex\",flexDirection:\"column\",justifyContent:\"space-between\",background:\"#fff\",color:\"#000\",padding:\"72px\",fontFamily:\"Arial, sans-serif\"",
+        "display:\"flex\",fontSize:28,fontWeight:700,letterSpacing:\"0.08em\"",
+        "display:\"flex\",flexDirection:\"column\",gap:20,maxWidth:900",
+        "display:\"flex\",fontSize:72,fontWeight:700,lineHeight:1.05",
+        "display:\"flex\",fontSize:30,lineHeight:1.3",
+        "display:\"flex\",fontSize:24"
+      ]
+    }
+  ],
+  "colors": {
+    "rgba(0,0,0,.06)": 1,
+    "#dfe5ed": 1,
+    "#181b20": 1,
+    "#213047": 1,
+    "#647080": 1,
+    "#edf1f6": 1,
+    "#fff": 10,
+    "rgba(243,243,245,.78)": 1,
+    "#f3f3f5": 1,
+    "rgba(34,34,37,.12)": 1,
+    "rgba(0,0,0,.08)": 2,
+    "#222225": 1,
+    "#626267": 1,
+    "#dedee2": 2,
+    "#737379": 1,
+    "#006ec7": 1,
+    "#edf4ff": 1,
+    "#2566bd": 1,
+    "#d3d3d8": 1,
+    "#000": 7,
+    "#6c6c6c": 1,
+    "#e9e9e7": 1,
+    "#a61b1b": 3,
+    "#eaf7ee": 1,
+    "#176b35": 1,
+    "#bfe5ca": 1,
+    "#fff6df": 1,
+    "#8a5a00": 1,
+    "#f1d38a": 1,
+    "#fdecec": 1,
+    "#efbcbc": 1,
+    "#eaf3ff": 1,
+    "#1d5fa7": 1,
+    "#bfd7f4": 1,
+    "#f3f3f1": 1,
+    "#555": 2,
+    "#dededb": 1,
+    "rgba(0,0,0,.10)": 2,
+    "rgba(0,0,0,.20)": 1,
+    "rgba(255,255,255,.76)": 1,
+    "rgba(10,10,10,.10)": 1,
+    "#57cc91": 1,
+    "#f07881": 1,
+    "#a2a8b3": 1,
+    "#d9d9d6": 1,
+    "#edf5ff": 1,
+    "#2e68af": 1,
+    "#e1edff": 1,
+    "#d5e6fc": 1,
+    "#d7d7d4": 1,
+    "rgba(0,0,0,.2)": 1,
+    "#345f94": 1,
+    "#25686c": 1,
+    "#426b46": 1,
+    "#69538e": 1,
+    "#805f25": 1,
+    "#71717a": 1,
+    "rgba(0,0,0,.24)": 1,
+    "rgba(0,0,0,.36)": 1,
+    "#cfcfcb": 1,
+    "#bbb": 1,
+    "#8b8b8b": 1,
+    "#16a34a": 1,
+    "#dc2626": 1,
+    "#2563eb": 1,
+    "#94a3b8": 1,
+    "#ddd": 1,
+    "#77777d": 1,
+    "#111": 1,
+    "rgba(0,0,0,.15)": 1,
+    "rgba(0,0,0,.07)": 1,
+    "rgba(0,0,0,.18)": 1,
+    "#35c778": 1,
+    "#d9a514": 1,
+    "#c43b32": 1,
+    "#e4e4e1": 1,
+    "#12b76a": 1,
+    "#f79009": 1,
+    "#aaa": 1,
+    "#d7f6e6": 1,
+    "#dcecff": 1,
+    "#eadcff": 1,
+    "#e5484d": 1,
+    "#f04438": 1,
+    "#5897f7": 1,
+    "#ccefdc": 1,
+    "#d8e8ff": 1,
+    "#16b364": 1,
+    "#ececea": 1,
+    "#3b82f6": 1,
+    "#8b5cf6": 1,
+    "#60a5fa": 1,
+    "#22c55e": 1,
+    "#2a3545": 2,
+    "#d7e3f3": 2,
+    "#b1bfce": 1,
+    "#141414": 1,
+    "#212121": 2,
+    "rgba(33,33,33,.82)": 1,
+    "rgba(255,255,255,.16)": 2,
+    "rgba(0,0,0,.32)": 1,
+    "#a0a0a5": 1,
+    "#2b2b2e": 1,
+    "#929297": 1,
+    "#48a7ff": 2,
+    "#102b42": 1,
+    "#071521": 1,
+    "#3a3a3e": 1,
+    "#333": 1,
+    "#a4a4a4": 1,
+    "#292929": 1,
+    "rgba(0,0,0,.72)": 1,
+    "#0d2a18": 1,
+    "#78d99a": 1,
+    "#245f39": 1,
+    "#302306": 1,
+    "#f1c75b": 1,
+    "#665018": 1,
+    "#321010": 1,
+    "#ff8e8e": 1,
+    "#6f2929": 1,
+    "#0d2239": 1,
+    "#82baff": 1,
+    "#28517d": 1,
+    "#171717": 1,
+    "#c5c5c5": 1,
+    "#343434": 1,
+    "#142d48": 1,
+    "#a5cbff": 1,
+    "#1b3b60": 1,
+    "#234a76": 1
+  },
+  "radii": {
+    "0": 47,
+    "5px 5px 1px 1px": 2,
+    "50%": 41,
+    "3px 3px 0 0": 2,
+    "14px": 1,
+    "4px 4px 0 0": 1,
+    "4px 4px 1px 1px": 1
+  }
+}

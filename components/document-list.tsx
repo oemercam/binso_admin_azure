@@ -22,7 +22,7 @@ export function DocumentSummaryRow({item,customerHeading=false,compact=false}:{i
  const label=financialStatusLabels[state]??item.status??'';
  const tone=state==='paid'||state==='accepted'?'success':state==='overdue'||state==='cancelled'?'danger':open?'warning':'neutral';
  const amount=formatCurrency(open?openAmount(item):item.total,item.currency);
- return <FinancialSummaryRow title={customerHeading?item.customer?.name||'Kunde':item.number??''} status={label} tone={tone} meta={[customerHeading?item.number:item.customer?.name,formatDate(item.issue_date)].filter(Boolean).join(' · ')} amount={amount} amountLabel={open?'Offen':compact&&state!=='draft'?undefined:'Total'} compact={compact} href={(item.kind==='offer'?'/angebote/':'/rechnungen/')+encodeURIComponent(item.number??'')}/>;
+ return <FinancialSummaryRow title={customerHeading?item.customer?.name||'Kunde':item.number??''} status={label} tone={tone} meta={compact?[documentDateLabel(item),label].filter(Boolean).join(' · '):[customerHeading?item.number:item.customer?.name,formatDate(item.issue_date)].filter(Boolean).join(' · ')} amount={amount} amountLabel={open?'Offen':compact&&state!=='draft'?undefined:'Total'} compact={compact} href={(item.kind==='offer'?'/angebote/':'/rechnungen/')+encodeURIComponent(item.number??'')}/>;
 }
 
 export function FinancialSummaryRow({href,title,status,tone='neutral',meta,amount,amountLabel,compact=false}:{href:string;title:string;status:string;tone?:'neutral'|'success'|'warning'|'danger'|'info';meta:string;amount:string;amountLabel?:string;compact?:boolean}){

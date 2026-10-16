@@ -103,7 +103,7 @@ console.log('Actual operator send: same-frame lock, late-completion draft preser
  const {createRequire}=await import('node:module');
  const require=createRequire(import.meta.url),postcss=require(require.resolve('postcss',{paths:[require.resolve('next')]}));
  const palettes={light:{},dark:{}};
- postcss.parse(await fs.readFile('app/styles/tokens.css','utf8')).walkRules(rule=>{
+ postcss.parse(await fs.readFile('app/design-system/theme.css','utf8')).walkRules(rule=>{
   const palette=rule.selector===':root'?palettes.light:rule.selector==='html[data-theme="dark"]'?palettes.dark:null;
   if(palette)for(const decl of rule.nodes.filter(node=>node.type==='decl'&&node.prop.startsWith('--app-')))palette[decl.prop]=decl.value;
  });

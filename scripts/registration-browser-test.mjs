@@ -41,7 +41,7 @@ try{
   await context.route('**/api/auth/register*',async route=>{if(route.request().method()!=='POST'){if(created)return route.fulfill({json:{state:'pending',context:fixtureContext,pending:{company:'Synthetic Company GmbH',email:syntheticEmail,locale}}});return route.continue();}posts++;await new Promise(resolve=>setTimeout(resolve,100));const body=JSON.parse(route.request().postData());assert.equal(body.locale,locale);assert.equal(body.acceptedDpa,true);assert.ok(body.termsVersion&&body.dpaVersion&&body.privacyVersion);if(!fail)created=true;return route.fulfill({status:fail?503:201,json:fail?{error:'service_unavailable'}:{ok:true,emailSent:false}})});
   await context.route('**/api/auth/resend-verification',route=>{resends++;return route.fulfill({json:{ok:true,deliveryUnconfirmed:true}})});
   if(locale==='de'){
-   await page.goto(base+'/');await page.locator('.hero-actions a[href="/registrieren"]').click();await page.getByRole('dialog',{name:t('title')}).waitFor();
+   await page.goto(base+'/');await page.locator('.reference-hero .reference-actions a[href="/registrieren"]').click();await page.getByRole('dialog',{name:t('title')}).waitFor();
    await page.goto(base+'/preise');await page.locator('.pricing-grid a[href="/registrieren?plan=business&billing=yearly"]').click();await page.waitForURL('**/registrieren?plan=business&billing=yearly');await page.getByRole('dialog',{name:t('title')}).waitFor();
   }
   await page.goto(base+'/registrieren?lang='+locale);const sheet=page.getByRole('dialog',{name:t('title')});await sheet.waitFor();

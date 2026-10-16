@@ -1,0 +1,2873 @@
+{
+  "url": "http://127.0.0.1:3200/kunden/customer-one",
+  "viewport": {
+    "width": 390,
+    "height": 1000
+  },
+  "documentWidth": 390,
+  "elements": [
+    {
+      "selector": ".metric strong",
+      "tag": "STRONG",
+      "classes": "",
+      "text": "CHF 135.13",
+      "inline": null,
+      "rect": {
+        "x": 22,
+        "y": 321.1875,
+        "width": 168,
+        "height": 34.5
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "168px",
+        "min-width": "0px",
+        "max-width": "100%",
+        "height": "34.5px",
+        "min-height": "0px",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "7px 0px 0px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / row / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-family": "Inter, system-ui, sans-serif",
+        "color": "rgb(215, 227, 243)",
+        "letter-spacing": "-0.8px",
+        "font-size": "23px",
+        "font-weight": "500",
+        "line-height": "34.5px",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 47,
+          "order": 396,
+          "selector": ".metric strong",
+          "css": "display: block; margin: 7px 0px 0px; font-size: var(--metric-value-size); line-height: var(--metric-value-line-height); letter-spacing: var(--metric-value-letter-spacing); white-space: nowrap;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 661,
+          "order": 1008,
+          "selector": ".bo-metric-tiles .metric strong",
+          "css": "max-width: 100%; white-space: normal; overflow-wrap: anywhere; font-size: var(--workspace-value-size); font-weight: var(--workspace-value-weight); line-height: 1.5;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 50,
+          "order": 1588,
+          "selector": ".metric strong",
+          "css": "font-size: 21px;",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 180,
+          "order": 1718,
+          "selector": ".metric strong",
+          "css": "margin: 7px 0px 0px; font-size: 20px;",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 113,
+          "order": 1842,
+          "selector": ".metric strong",
+          "css": "margin-top: 7px; font-size: 19px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".metric strong",
+      "tag": "STRONG",
+      "classes": "",
+      "text": "CHF 35.13",
+      "inline": null,
+      "rect": {
+        "x": 200,
+        "y": 321.1875,
+        "width": 168,
+        "height": 34.5
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "168px",
+        "min-width": "0px",
+        "max-width": "100%",
+        "height": "34.5px",
+        "min-height": "0px",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "7px 0px 0px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / row / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-family": "Inter, system-ui, sans-serif",
+        "color": "rgb(215, 227, 243)",
+        "letter-spacing": "-0.8px",
+        "font-size": "23px",
+        "font-weight": "500",
+        "line-height": "34.5px",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 47,
+          "order": 396,
+          "selector": ".metric strong",
+          "css": "display: block; margin: 7px 0px 0px; font-size: var(--metric-value-size); line-height: var(--metric-value-line-height); letter-spacing: var(--metric-value-letter-spacing); white-space: nowrap;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 661,
+          "order": 1008,
+          "selector": ".bo-metric-tiles .metric strong",
+          "css": "max-width: 100%; white-space: normal; overflow-wrap: anywhere; font-size: var(--workspace-value-size); font-weight: var(--workspace-value-weight); line-height: 1.5;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 50,
+          "order": 1588,
+          "selector": ".metric strong",
+          "css": "font-size: 21px;",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 180,
+          "order": 1718,
+          "selector": ".metric strong",
+          "css": "margin: 7px 0px 0px; font-size: 20px;",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 113,
+          "order": 1842,
+          "selector": ".metric strong",
+          "css": "margin-top: 7px; font-size: 19px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".page-head h1",
+      "tag": "H1",
+      "classes": "",
+      "text": "Prüffirma AG",
+      "inline": null,
+      "rect": {
+        "x": 22,
+        "y": 133,
+        "width": 287,
+        "height": 34.5
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "287px",
+        "min-width": "0px",
+        "max-width": "none",
+        "height": "34.5px",
+        "min-height": "auto",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "1 1 0%",
+        "grid": "none / none / none / row / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-family": "Inter, system-ui, sans-serif",
+        "color": "rgb(215, 227, 243)",
+        "letter-spacing": "-0.8px",
+        "font-size": "23px",
+        "font-weight": "600",
+        "line-height": "34.5px",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 20,
+          "order": 369,
+          "selector": ".page-head h1",
+          "css": "margin: 0px; font-size: var(--page-heading-size); line-height: var(--page-heading-line-height); letter-spacing: var(--page-heading-letter-spacing); font-weight: var(--workspace-title-weight);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 31,
+          "order": 1569,
+          "selector": ".page-head h1",
+          "css": "font-size: 30px; line-height: 1.05;",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 147,
+          "order": 1685,
+          "selector": ".page-head h1",
+          "css": "font-size: var(--workspace-title-size); line-height: 1.5;",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 99,
+          "order": 1828,
+          "selector": ".page-head h1",
+          "css": "font-size: 25px; line-height: 1.5; letter-spacing: var(--mobile-title-tracking);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 23,
+          "order": 2406,
+          "selector": ".bo-detail-heading h1, .bo-page-heading h1",
+          "css": "margin: 0px; min-width: 0px; flex: 1 1 0%; overflow-wrap: anywhere;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 43,
+          "order": 2426,
+          "selector": ".page-head h1",
+          "css": "overflow-wrap: anywhere;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 16,
+          "order": 2465,
+          "selector": ".page-head[data-heading-placement=\"content\"] .bo-detail-heading-main h1",
+          "css": "font-size: 23px; line-height: 1.5;",
+          "contexts": [
+            "media (max-width: 1100px)"
+          ],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".bo-detail-meta",
+      "tag": "P",
+      "classes": "bo-detail-meta",
+      "text": "AktivBern",
+      "inline": null,
+      "rect": {
+        "x": 22,
+        "y": 177,
+        "width": 346,
+        "height": 24
+      },
+      "computed": {
+        "display": "flex",
+        "position": "static",
+        "width": "346px",
+        "min-width": "auto",
+        "max-width": "544px",
+        "height": "24px",
+        "min-height": "auto",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "12px",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / row / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "center",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-family": "Inter, system-ui, sans-serif",
+        "color": "rgb(177, 191, 206)",
+        "letter-spacing": "normal",
+        "font-size": "14px",
+        "font-weight": "400",
+        "line-height": "20.3px",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 21,
+          "order": 370,
+          "selector": ".page-head p",
+          "css": "margin: 7px 0px 0px; color: var(--color-muted); font-size: var(--body-font-size); line-height: var(--body-line-height);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 859,
+          "order": 1206,
+          "selector": ".bo-detail-meta",
+          "css": "display: flex; align-items: center; gap: 12px; flex-wrap: wrap;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 32,
+          "order": 1570,
+          "selector": ".page-head p",
+          "css": "max-width: 780px; margin-top: 8px;",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 148,
+          "order": 1686,
+          "selector": ".page-head p",
+          "css": "margin-top: 5px; font-size: 13px; line-height: 1.4;",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 100,
+          "order": 1829,
+          "selector": ".page-head p",
+          "css": "max-width: 34rem; margin-top: 6px; font-size: 11px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 24,
+          "order": 2407,
+          "selector": ".bo-detail-heading p, .bo-page-heading p",
+          "css": "margin: 0px; color: var(--color-muted,#71717a); font-size: 0.875rem;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".detail-grid[data-layout=\"dossier\"]",
+      "tag": "DIV",
+      "classes": "detail-grid",
+      "text": "FinanzübersichtUmsatz 2026CHF 135.13Offene ForderungenCHF 35.13KontaktpersonAlex Musteralex.muster@internationales-unternehmen.example.invalidOffene RechnungenAlle anzeigenRE-TEST-1Teilweise bezahltPr",
+      "inline": null,
+      "rect": {
+        "x": 22,
+        "y": 286,
+        "width": 346,
+        "height": 477.859375
+      },
+      "computed": {
+        "display": "grid",
+        "position": "static",
+        "width": "346px",
+        "min-width": "0px",
+        "max-width": "none",
+        "height": "477.859px",
+        "min-height": "0px",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "22px",
+        "flex": "0 1 auto",
+        "grid": "91.6875px 127.172px 149px 44px / 346px / \"summary\" \"facts\" \"records\" \"extra\" / row / auto / auto",
+        "grid-template-columns": "346px",
+        "grid-template-rows": "91.6875px 127.172px 149px 44px",
+        "align-items": "start",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-family": "Inter, system-ui, sans-serif",
+        "color": "rgb(215, 227, 243)",
+        "letter-spacing": "normal",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 49,
+          "order": 398,
+          "selector": ".dashboard-grid, .detail-grid",
+          "css": "display: grid; grid-template-columns: 1.4fr 0.8fr; gap: 14px; margin-top: 14px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 860,
+          "order": 1207,
+          "selector": ".detail-grid[data-layout=\"dossier\"]",
+          "css": "grid-template: \"summary facts\" min-content \"records facts\" 1fr / minmax(0px, 1fr) 220px; gap: 20px 30px; align-items: start; margin-top: 0px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 870,
+          "order": 1217,
+          "selector": ".detail-grid[data-layout=\"dossier\"][data-has-extra]",
+          "css": "grid-template-areas: \"summary facts\" \"records extra\";",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 12,
+          "order": 1496,
+          "selector": ".dashboard-grid, .detail-grid",
+          "css": "grid-template-columns: 1fr;",
+          "contexts": [
+            "media (min-width: 761px) and (max-width: 1100px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 65,
+          "order": 1603,
+          "selector": ".detail-grid",
+          "css": "grid-template-columns: minmax(0px, 1fr) minmax(320px, 0.42fr); gap: 22px;",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 181,
+          "order": 1719,
+          "selector": ".dashboard-grid, .detail-grid",
+          "css": "gap: var(--desktop-workspace-gap);",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 182,
+          "order": 1720,
+          "selector": ".dashboard-grid, .detail-grid, .quick-section",
+          "css": "margin-top: var(--desktop-section-gap);",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 114,
+          "order": 1843,
+          "selector": ".dashboard-grid, .detail-grid",
+          "css": "grid-template-columns: 1fr; gap: var(--mobile-section-gap); margin-top: var(--mobile-section-gap);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 4,
+          "order": 2453,
+          "selector": ".detail-grid[data-layout=\"dossier\"][data-has-extra]",
+          "css": "grid-template-areas: \"summary\" \"facts\" \"records\" \"extra\";",
+          "contexts": [
+            "media (max-width: 1100px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 11,
+          "order": 2460,
+          "selector": ".detail-grid[data-layout=\"dossier\"]",
+          "css": "grid-template-columns: minmax(0px, 1fr); grid-template-areas: \"summary\" \"facts\" \"records\"; gap: 22px;",
+          "contexts": [
+            "media (max-width: 1100px)"
+          ],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".document-summary-row>b",
+      "tag": "B",
+      "classes": "",
+      "text": "RE-TEST-1",
+      "inline": null,
+      "rect": {
+        "x": 22,
+        "y": 624.359375,
+        "width": 225.359375,
+        "height": 15
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "225.359px",
+        "min-width": "0px",
+        "max-width": "none",
+        "height": "15px",
+        "min-height": "auto",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / row / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "left",
+        "font-family": "Inter, system-ui, sans-serif",
+        "color": "rgb(215, 227, 243)",
+        "letter-spacing": "normal",
+        "font-size": "13px",
+        "font-weight": "500",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 665,
+          "order": 1012,
+          "selector": ".document-summary-row > b",
+          "css": "font-weight: var(--workspace-row-weight); min-width: 0px; overflow-wrap: anywhere;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".detail-list>div",
+      "tag": "DIV",
+      "classes": "detail-list-stacked",
+      "text": "KundennummerK-000001",
+      "inline": null,
+      "rect": {
+        "x": 22,
+        "y": 903.03125,
+        "width": 346,
+        "height": 67
+      },
+      "computed": {
+        "display": "grid",
+        "position": "static",
+        "width": "346px",
+        "min-width": "0px",
+        "max-width": "none",
+        "height": "67px",
+        "min-height": "44px",
+        "padding": "12px 0px",
+        "border-radius": "0px",
+        "border-width": "0px 0px 1px",
+        "margin": "0px",
+        "gap": "6px",
+        "flex": "0 1 auto",
+        "grid": "18px 18px / 346px / none / row / auto / auto",
+        "grid-template-columns": "346px",
+        "grid-template-rows": "18px 18px",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-family": "Inter, system-ui, sans-serif",
+        "color": "rgb(215, 227, 243)",
+        "letter-spacing": "normal",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 115,
+          "order": 464,
+          "selector": ".detail-list > div, .operator-detail-list > div",
+          "css": "min-height: 44px; padding: 12px 0px; display: grid; grid-template-columns: 120px minmax(0px, 1fr); gap: 12px; border-bottom: 1px solid var(--color-line);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 867,
+          "order": 1214,
+          "selector": ".detail-list > .detail-list-stacked",
+          "css": "grid-template-columns: minmax(0px, 1fr); gap: 4px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 184,
+          "order": 1722,
+          "selector": ".detail-list > div, .operator-detail-list > div",
+          "css": "min-height: 42px; padding: 10px 0px;",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 138,
+          "order": 1867,
+          "selector": ".detail-list > div",
+          "css": "grid-template-columns: minmax(94px, 31%) 1fr; padding: 12px 0px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 139,
+          "order": 1868,
+          "selector": ".detail-list > .detail-list-stacked",
+          "css": "grid-template-columns: minmax(0px, 1fr); gap: var(--field-label-gap);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 616,
+          "order": 2345,
+          "selector": ".detail-list > div",
+          "css": "grid-template-columns: minmax(0px, 0.4fr) minmax(0px, 1fr); gap: 12px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".detail-list>div",
+      "tag": "DIV",
+      "classes": "detail-list-stacked",
+      "text": "E-Mailtest@example.invalid",
+      "inline": null,
+      "rect": {
+        "x": 22,
+        "y": 970.03125,
+        "width": 346,
+        "height": 66
+      },
+      "computed": {
+        "display": "grid",
+        "position": "static",
+        "width": "346px",
+        "min-width": "0px",
+        "max-width": "none",
+        "height": "66px",
+        "min-height": "44px",
+        "padding": "12px 0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "6px",
+        "flex": "0 1 auto",
+        "grid": "18px 18px / 346px / none / row / auto / auto",
+        "grid-template-columns": "346px",
+        "grid-template-rows": "18px 18px",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-family": "Inter, system-ui, sans-serif",
+        "color": "rgb(215, 227, 243)",
+        "letter-spacing": "normal",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 115,
+          "order": 464,
+          "selector": ".detail-list > div, .operator-detail-list > div",
+          "css": "min-height: 44px; padding: 12px 0px; display: grid; grid-template-columns: 120px minmax(0px, 1fr); gap: 12px; border-bottom: 1px solid var(--color-line);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 118,
+          "order": 467,
+          "selector": ".compact-list > a:last-child, .compact-list > div:last-child, .contact-list > div:last-child, .detail-list > div:last-child, .operator-detail-list > div:last-child",
+          "css": "border-bottom: 0px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 867,
+          "order": 1214,
+          "selector": ".detail-list > .detail-list-stacked",
+          "css": "grid-template-columns: minmax(0px, 1fr); gap: 4px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 184,
+          "order": 1722,
+          "selector": ".detail-list > div, .operator-detail-list > div",
+          "css": "min-height: 42px; padding: 10px 0px;",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 138,
+          "order": 1867,
+          "selector": ".detail-list > div",
+          "css": "grid-template-columns: minmax(94px, 31%) 1fr; padding: 12px 0px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 139,
+          "order": 1868,
+          "selector": ".detail-list > .detail-list-stacked",
+          "css": "grid-template-columns: minmax(0px, 1fr); gap: var(--field-label-gap);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 153,
+          "order": 1882,
+          "selector": ".detail-list > div:last-child",
+          "css": "border-bottom: 0px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 616,
+          "order": 2345,
+          "selector": ".detail-list > div",
+          "css": "grid-template-columns: minmax(0px, 0.4fr) minmax(0px, 1fr); gap: 12px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".detail-list dt",
+      "tag": "DT",
+      "classes": "",
+      "text": "Kundennummer",
+      "inline": null,
+      "rect": {
+        "x": 22,
+        "y": 915.03125,
+        "width": 346,
+        "height": 18
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "346px",
+        "min-width": "0px",
+        "max-width": "none",
+        "height": "18px",
+        "min-height": "auto",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / row / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-family": "Inter, system-ui, sans-serif",
+        "color": "rgb(177, 191, 206)",
+        "letter-spacing": "normal",
+        "font-size": "12px",
+        "font-weight": "400",
+        "line-height": "18px",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 116,
+          "order": 465,
+          "selector": ".detail-list dt",
+          "css": "min-width: 0px; color: var(--color-muted); font-size: 12px; overflow-wrap: anywhere; line-height: 1.5;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".detail-list dt",
+      "tag": "DT",
+      "classes": "",
+      "text": "E-Mail",
+      "inline": null,
+      "rect": {
+        "x": 22,
+        "y": 982.03125,
+        "width": 346,
+        "height": 18
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "346px",
+        "min-width": "0px",
+        "max-width": "none",
+        "height": "18px",
+        "min-height": "auto",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / row / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-family": "Inter, system-ui, sans-serif",
+        "color": "rgb(177, 191, 206)",
+        "letter-spacing": "normal",
+        "font-size": "12px",
+        "font-weight": "400",
+        "line-height": "18px",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 116,
+          "order": 465,
+          "selector": ".detail-list dt",
+          "css": "min-width: 0px; color: var(--color-muted); font-size: 12px; overflow-wrap: anywhere; line-height: 1.5;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".detail-list dd",
+      "tag": "DD",
+      "classes": "",
+      "text": "K-000001",
+      "inline": null,
+      "rect": {
+        "x": 22,
+        "y": 939.03125,
+        "width": 346,
+        "height": 18
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "346px",
+        "min-width": "0px",
+        "max-width": "none",
+        "height": "18px",
+        "min-height": "auto",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / row / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-family": "Inter, system-ui, sans-serif",
+        "color": "rgb(215, 227, 243)",
+        "letter-spacing": "normal",
+        "font-size": "12px",
+        "font-weight": "550",
+        "line-height": "18px",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 117,
+          "order": 466,
+          "selector": ".detail-list dd",
+          "css": "margin: 0px; font-size: 12px; font-weight: 550;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 674,
+          "order": 1021,
+          "selector": ".detail-list dd",
+          "css": "min-width: 0px; overflow-wrap: anywhere;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 617,
+          "order": 2346,
+          "selector": ".detail-list dd",
+          "css": "min-width: 0px; overflow-wrap: anywhere; line-height: 1.5;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 107,
+          "order": 2556,
+          "selector": ":is(.page-container, .operator-app-content) :is(.detail-list dd, .operator-detail-list strong)",
+          "css": "overflow-wrap: anywhere;",
+          "contexts": [
+            "media (max-width: 1100px)"
+          ],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".detail-list dd",
+      "tag": "DD",
+      "classes": "",
+      "text": "test@example.invalid",
+      "inline": null,
+      "rect": {
+        "x": 22,
+        "y": 1006.03125,
+        "width": 346,
+        "height": 18
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "346px",
+        "min-width": "0px",
+        "max-width": "none",
+        "height": "18px",
+        "min-height": "auto",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / row / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-family": "Inter, system-ui, sans-serif",
+        "color": "rgb(215, 227, 243)",
+        "letter-spacing": "normal",
+        "font-size": "12px",
+        "font-weight": "550",
+        "line-height": "18px",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 117,
+          "order": 466,
+          "selector": ".detail-list dd",
+          "css": "margin: 0px; font-size: 12px; font-weight: 550;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 674,
+          "order": 1021,
+          "selector": ".detail-list dd",
+          "css": "min-width: 0px; overflow-wrap: anywhere;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 617,
+          "order": 2346,
+          "selector": ".detail-list dd",
+          "css": "min-width: 0px; overflow-wrap: anywhere; line-height: 1.5;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 107,
+          "order": 2556,
+          "selector": ":is(.page-container, .operator-app-content) :is(.detail-list dd, .operator-detail-list strong)",
+          "css": "overflow-wrap: anywhere;",
+          "contexts": [
+            "media (max-width: 1100px)"
+          ],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".page-container",
+      "tag": "MAIN",
+      "classes": "page-container",
+      "text": "KundenK-000001Prüffirma AGAktivBernBearbeitenAngebot erstellenRechnung erstellenZeit erfassenÜbersichtKontakteDokumenteAktivitätenFinanzübersichtUmsatz 2026CHF 135.13Offene ForderungenCHF 35.13Kontakt",
+      "inline": null,
+      "rect": {
+        "x": 0,
+        "y": 65,
+        "width": 390,
+        "height": 847.4375
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "390px",
+        "min-width": "0px",
+        "max-width": "none",
+        "height": "847.438px",
+        "min-height": "0px",
+        "padding": "28px 22px 124.58px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / row / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-family": "Inter, system-ui, sans-serif",
+        "color": "rgb(215, 227, 243)",
+        "letter-spacing": "normal",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgb(0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 16,
+          "order": 366,
+          "selector": ".page-container",
+          "css": "background: var(--app-canvas); width: 100%; max-width: var(--content-max); margin: 0px auto; padding: 34px var(--page-x) 90px; animation: page-enter var(--motion-fast) var(--motion-ease-standard) backwards;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 29,
+          "order": 378,
+          "selector": ".page-container",
+          "css": "--page-x: 26px; --mobile-page-x: 22px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 848,
+          "order": 1195,
+          "selector": ".app-sidebar, .bottom-sheet, .confirm-dialog, .desktop-appbar, .header-panel, .operator-app-content, .operator-app-header, .operator-page-head, .page-container",
+          "css": "--app-accent: var(--app-action-accent);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 851,
+          "order": 1198,
+          "selector": ".app-sidebar, .auth-workspace, .bottom-sheet, .confirm-dialog, .desktop-appbar, .header-panel, .mobile-header, .page-container",
+          "css": "font-family: var(--workspace-font); color: var(--color-fg); --app-text: var(--workspace-ink); --app-secondary: var(--workspace-muted); --app-divider: var(--workspace-line); --color-fg: var(--workspace-ink); --color-muted: var(--workspace-muted); --color-line: var(--workspace-line); --button-font-size: 13px; --button-font-weight: 400;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 23,
+          "order": 1507,
+          "selector": ".page-container",
+          "css": "width: 100%; max-width: none; padding-left: clamp(24px, 3.2vw, 34px); padding-right: clamp(24px, 3.2vw, 34px);",
+          "contexts": [
+            "media (min-width: 761px) and (max-width: 1100px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 21,
+          "order": 1559,
+          "selector": ".page-container",
+          "css": "padding-top: 28px; padding-left: clamp(32px, 3vw, 48px); padding-right: clamp(32px, 3vw, 48px);",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 29,
+          "order": 1567,
+          "selector": ".page-container",
+          "css": "width: 100%; padding-top: 30px; padding-left: var(--page-x); padding-right: var(--page-x);",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 145,
+          "order": 1683,
+          "selector": ".page-container",
+          "css": "max-width: var(--content-max); padding: var(--desktop-page-top) var(--page-x) var(--desktop-page-bottom);",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 97,
+          "order": 1826,
+          "selector": ".page-container",
+          "css": "max-width: none; margin: 0px; padding: var(--mobile-page-top) max(var(--mobile-page-x),var(--safe-right)) calc(var(--mobile-nav-h) + var(--mobile-nav-bottom) + var(--safe-bottom) + 72px) max(var(--mobile-page-x),var(--safe-left));",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 287,
+          "order": 2016,
+          "selector": ".page-container",
+          "css": "scroll-padding-bottom: calc(var(--mobile-nav-h) + var(--mobile-nav-bottom) + var(--safe-bottom) + 28px);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 421,
+          "order": 2150,
+          "selector": ".mobile-header, .page-container",
+          "css": "padding-left: max(var(--mobile-page-x),var(--safe-left)); padding-right: max(var(--mobile-page-x),var(--safe-right));",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 434,
+          "order": 2163,
+          "selector": ".page-container",
+          "css": "min-width: 0px; padding-bottom: calc(var(--mobile-nav-h) + var(--mobile-nav-bottom) + var(--safe-bottom) + 28px);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 3,
+          "order": 2399,
+          "selector": ".app-root:not(.app-editing) .page-container",
+          "css": "padding-bottom: calc(54px + var(--safe-bottom) + 22px);",
+          "contexts": [
+            "media (max-height: 520px) and (orientation: landscape) and (max-width: 900px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 60,
+          "order": 2443,
+          "selector": ".page-container, .page-container section, .page-container > *",
+          "css": "min-width: 0px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 0,
+          "order": 2449,
+          "selector": ".mobile-header, .page-container",
+          "css": "--workspace-ink: var(--workspace-mobile-ink); --workspace-value-size: 23px; --metric-value-letter-spacing: var(--mobile-value-tracking);",
+          "contexts": [
+            "media (max-width: 1100px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 2,
+          "order": 2451,
+          "selector": ".page-container:has(> .page-head[data-heading-placement=\"content\"])",
+          "css": "--mobile-page-top: 28px; --mobile-page-head-gap: 24px;",
+          "contexts": [
+            "media (max-width: 1100px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 171,
+          "order": 2620,
+          "selector": ".page-container",
+          "css": "padding-bottom: calc(var(--mobile-nav-h) + var(--mobile-nav-bottom) + var(--safe-bottom) + 48px);",
+          "contexts": [
+            "media (max-width: 1100px)"
+          ],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".mobile-header",
+      "tag": "HEADER",
+      "classes": "app-header mobile-header",
+      "text": "1TP",
+      "inline": null,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 65
+      },
+      "computed": {
+        "display": "flex",
+        "position": "sticky",
+        "width": "390px",
+        "min-width": "0px",
+        "max-width": "100%",
+        "height": "65px",
+        "min-height": "65px",
+        "padding": "0px 17.745px",
+        "border-radius": "0px",
+        "border-width": "0px 0px 1px",
+        "margin": "0px",
+        "gap": "10px",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / row / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "center",
+        "align-content": "normal",
+        "justify-content": "space-between",
+        "text-align": "start",
+        "font-family": "Inter, system-ui, sans-serif",
+        "color": "rgb(215, 227, 243)",
+        "letter-spacing": "normal",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "20",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgb(0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 15,
+          "order": 365,
+          "selector": ".bottom-nav, .desktop-appbar, .mobile-header",
+          "css": "display: none;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 652,
+          "order": 999,
+          "selector": ".mobile-header, .mobile-header *",
+          "css": "filter: none; mix-blend-mode: normal;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 818,
+          "order": 1165,
+          "selector": ".app-header",
+          "css": "background: var(--app-canvas); color: var(--app-text); backdrop-filter: none;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 851,
+          "order": 1198,
+          "selector": ".app-sidebar, .auth-workspace, .bottom-sheet, .confirm-dialog, .desktop-appbar, .header-panel, .mobile-header, .page-container",
+          "css": "font-family: var(--workspace-font); color: var(--color-fg); --app-text: var(--workspace-ink); --app-secondary: var(--workspace-muted); --app-divider: var(--workspace-line); --color-fg: var(--workspace-ink); --color-muted: var(--workspace-muted); --color-line: var(--workspace-line); --button-font-size: 13px; --button-font-weight: 400;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 421,
+          "order": 2150,
+          "selector": ".mobile-header, .page-container",
+          "css": "padding-left: max(var(--mobile-page-x),var(--safe-left)); padding-right: max(var(--mobile-page-x),var(--safe-right));",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 0,
+          "order": 2449,
+          "selector": ".mobile-header, .page-container",
+          "css": "--workspace-ink: var(--workspace-mobile-ink); --workspace-value-size: 23px; --metric-value-letter-spacing: var(--mobile-value-tracking);",
+          "contexts": [
+            "media (max-width: 1100px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 1,
+          "order": 2450,
+          "selector": ".mobile-header[data-appearance=\"plain\"]",
+          "css": "--mobile-header-h: 65px; border-bottom: 1px solid var(--color-line);",
+          "contexts": [
+            "media (max-width: 1100px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 42,
+          "order": 2491,
+          "selector": ".mobile-header",
+          "css": "width: 100%; max-width: 100%; isolation: isolate; backdrop-filter: none; opacity: 1;",
+          "contexts": [
+            "media (max-width: 1100px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 70,
+          "order": 2519,
+          "selector": ".mobile-header:not(.mobile-header-detail)",
+          "css": "position: sticky;",
+          "contexts": [
+            "media (max-width: 1100px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 77,
+          "order": 2526,
+          "selector": ".mobile-header",
+          "css": "position: sticky; top: 0px; z-index: 20; height: calc(var(--mobile-header-h) + var(--safe-top)); min-height: calc(var(--mobile-header-h) + var(--safe-top)); padding-top: var(--safe-top); padding-left: max(var(--mobile-page-x),var(--safe-left)); padding-right: max(var(--mobile-page-x),var(--safe-right)); display: flex; align-items: center; justify-content: space-between; gap: 10px; border-bottom: 1px solid var(--color-line); background: var(--color-bg);",
+          "contexts": [
+            "media (max-width: 1100px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 99,
+          "order": 2548,
+          "selector": ":is(.mobile-header, .desktop-appbar, .operator-app-header)",
+          "css": "background: var(--app-canvas); color: var(--app-text);",
+          "contexts": [
+            "media (max-width: 1100px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 145,
+          "order": 2594,
+          "selector": ".mobile-header",
+          "css": "border-bottom: 0px;",
+          "contexts": [
+            "media (max-width: 1100px)"
+          ],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".bo-detail-heading",
+      "tag": "DIV",
+      "classes": "bo-detail-heading",
+      "text": "KundenK-000001Prüffirma AGAktivBernBearbeitenAngebot erstellenRechnung erstellenZeit erfassen",
+      "inline": null,
+      "rect": {
+        "x": 22,
+        "y": 93,
+        "width": 346,
+        "height": 108
+      },
+      "computed": {
+        "display": "grid",
+        "position": "static",
+        "width": "346px",
+        "min-width": "0px",
+        "max-width": "none",
+        "height": "108px",
+        "min-height": "auto",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "0px",
+        "flex": "1 1 0%",
+        "grid": "40px 44px 24px / 346px / none / row / auto / auto",
+        "grid-template-columns": "346px",
+        "grid-template-rows": "40px 44px 24px",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-family": "Inter, system-ui, sans-serif",
+        "color": "rgb(215, 227, 243)",
+        "letter-spacing": "normal",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 19,
+          "order": 368,
+          "selector": ".page-head > div",
+          "css": "min-width: 0px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 25,
+          "order": 1509,
+          "selector": ".page-head > div",
+          "css": "flex: 1 1 0%; min-width: 0px;",
+          "contexts": [
+            "media (min-width: 761px) and (max-width: 1100px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 21,
+          "order": 2404,
+          "selector": ".bo-detail-heading, .bo-page-heading",
+          "css": "display: grid; gap: 6px; min-width: 0px; flex: 1 1 0%;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 42,
+          "order": 2425,
+          "selector": ".page-head, .page-head > div",
+          "css": "min-width: 0px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 7,
+          "order": 2456,
+          "selector": ".page-head[data-heading-placement=\"content\"] .bo-detail-heading",
+          "css": "gap: 0px;",
+          "contexts": [
+            "media (max-width: 1100px)"
+          ],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".tabs",
+      "tag": "DIV",
+      "classes": "tabs",
+      "text": "ÜbersichtKontakteDokumenteAktivitäten",
+      "inline": null,
+      "rect": {
+        "x": 0,
+        "y": 221,
+        "width": 368,
+        "height": 45
+      },
+      "computed": {
+        "display": "flex",
+        "position": "static",
+        "width": "368px",
+        "min-width": "0px",
+        "max-width": "none",
+        "height": "45px",
+        "min-height": "0px",
+        "padding": "0px 0px 0px 22px",
+        "border-radius": "0px",
+        "border-width": "0px 0px 1px",
+        "margin": "20px 0px 20px -22px",
+        "gap": "25px",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / row / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "center",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-family": "Inter, system-ui, sans-serif",
+        "color": "rgb(215, 227, 243)",
+        "letter-spacing": "normal",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "auto",
+        "overflow-x": "auto",
+        "overflow-y": "auto",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 72,
+          "order": 421,
+          "selector": ".chips, .notification-center-tabs, .tabs",
+          "css": "display: flex; align-items: center; gap: 6px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 113,
+          "order": 462,
+          "selector": ".tabs",
+          "css": "overflow-x: auto; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--color-line); scrollbar-width: none;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 856,
+          "order": 1203,
+          "selector": ".tabs[data-appearance=\"line\"]",
+          "css": "gap: 25px; padding-bottom: 0px; border-bottom: 1px solid var(--color-line); margin-block: 20px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 111,
+          "order": 1649,
+          "selector": ".desktop-detail-main > .tabs",
+          "css": "margin-top: 0px; margin-bottom: 20px; padding-bottom: 10px;",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 172,
+          "order": 1710,
+          "selector": ".tabs",
+          "css": "margin-bottom: var(--heading-content-gap); padding-bottom: 8px;",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 128,
+          "order": 1857,
+          "selector": ".chips, .tabs",
+          "css": "margin-left: calc(-1 * var(--mobile-page-x)); margin-right: 0px; padding-left: var(--mobile-page-x); padding-right: 0px; overflow-x: auto;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".desktop-detail-main",
+      "tag": "DIV",
+      "classes": "desktop-detail-main",
+      "text": "ÜbersichtKontakteDokumenteAktivitätenFinanzübersichtUmsatz 2026CHF 135.13Offene ForderungenCHF 35.13KontaktpersonAlex Musteralex.muster@internationales-unternehmen.example.invalidOffene RechnungenAlle",
+      "inline": null,
+      "rect": {
+        "x": 22,
+        "y": 221,
+        "width": 346,
+        "height": 542.859375
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "346px",
+        "min-width": "0px",
+        "max-width": "none",
+        "height": "542.859px",
+        "min-height": "0px",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / row / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-family": "Inter, system-ui, sans-serif",
+        "color": "rgb(215, 227, 243)",
+        "letter-spacing": "normal",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 110,
+          "order": 1648,
+          "selector": ".desktop-detail-main, .entity-edit-main",
+          "css": "min-width: 0px;",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": false
+        }
+      ]
+    },
+    {
+      "selector": ".bo-metric-tiles",
+      "tag": "DIV",
+      "classes": "metrics-grid bo-metric-tiles",
+      "text": "Umsatz 2026CHF 135.13Offene ForderungenCHF 35.13",
+      "inline": "--metric-columns: 2;",
+      "rect": {
+        "x": 22,
+        "y": 286,
+        "width": 346,
+        "height": 91.6875
+      },
+      "computed": {
+        "display": "grid",
+        "position": "static",
+        "width": "346px",
+        "min-width": "0px",
+        "max-width": "none",
+        "height": "91.6875px",
+        "min-height": "0px",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "10px",
+        "flex": "0 1 auto",
+        "grid": "91.6875px / 168px 168px / none / row / auto / auto",
+        "grid-template-columns": "168px 168px",
+        "grid-template-rows": "91.6875px",
+        "align-items": "start",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-family": "Inter, system-ui, sans-serif",
+        "color": "rgb(215, 227, 243)",
+        "letter-spacing": "normal",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 41,
+          "order": 390,
+          "selector": ".metrics-grid",
+          "css": "display: grid; grid-template-columns: repeat(4, minmax(0px, 1fr)); gap: 10px; border: 0px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 659,
+          "order": 1006,
+          "selector": ".bo-metric-tiles",
+          "css": "--metric-columns: 4; background: transparent; align-items: start; grid-template-columns: repeat(var(--metric-columns,4),minmax(0,1fr));",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 11,
+          "order": 1495,
+          "selector": ".metrics-grid",
+          "css": "grid-template-columns: repeat(2, minmax(0px, 1fr));",
+          "contexts": [
+            "media (min-width: 761px) and (max-width: 1100px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 178,
+          "order": 1716,
+          "selector": ".metrics-grid",
+          "css": "gap: 10px; border: 0px;",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 106,
+          "order": 1835,
+          "selector": ".metrics-grid, .metrics-grid.three",
+          "css": "grid-template-columns: repeat(2, minmax(0px, 1fr)); gap: 10px; border: 0px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 108,
+          "order": 1837,
+          "selector": ".metrics-grid.bo-metric-tiles",
+          "css": "grid-template-columns: repeat(2, minmax(0px, 1fr));",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 110,
+          "order": 1839,
+          "selector": ".metrics-grid",
+          "css": "border: 0px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 2,
+          "order": 2389,
+          "selector": ".metrics-grid, .metrics-grid.three, .support-summary",
+          "css": "grid-template-columns: 1fr;",
+          "contexts": [
+            "media (max-width: 389px)"
+          ],
+          "active": false
+        }
+      ]
+    },
+    {
+      "selector": ".metric",
+      "tag": "DIV",
+      "classes": "metric",
+      "text": "Umsatz 2026CHF 135.13",
+      "inline": null,
+      "rect": {
+        "x": 22,
+        "y": 286,
+        "width": 168,
+        "height": 91.6875
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "168px",
+        "min-width": "0px",
+        "max-width": "none",
+        "height": "91.6875px",
+        "min-height": "0px",
+        "padding": "15px 0px 22px",
+        "border-radius": "16px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / row / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-family": "Inter, system-ui, sans-serif",
+        "color": "rgb(215, 227, 243)",
+        "letter-spacing": "normal",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgb(20, 20, 20)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 43,
+          "order": 392,
+          "selector": ".metric",
+          "css": "min-width: 0px; min-height: 74px; padding: 12px 14px; border: 0px; border-radius: 10px; background: var(--color-subtle); box-shadow: none;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 662,
+          "order": 1009,
+          "selector": ".bo-metric-tiles .metric",
+          "css": "padding: 15px 0px 22px; min-width: 0px; min-height: 0px; background: transparent;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 49,
+          "order": 1587,
+          "selector": ".metric",
+          "css": "min-height: 76px; padding: 13px 16px;",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 179,
+          "order": 1717,
+          "selector": ".metric",
+          "css": "min-height: 74px; padding: 12px 14px; border: 0px;",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 107,
+          "order": 1836,
+          "selector": ".metric",
+          "css": "min-height: 76px; padding: 12px 14px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 109,
+          "order": 1838,
+          "selector": ".metrics-grid .metric:first-child, .metrics-grid .metric:nth-child(2n+1)",
+          "css": "border-left: 0px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 105,
+          "order": 2554,
+          "selector": ":is(.page-container, .operator-app-content) .metric",
+          "css": "background: var(--app-surface); border-radius: 16px;",
+          "contexts": [
+            "media (max-width: 1100px)"
+          ],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".metric",
+      "tag": "DIV",
+      "classes": "metric",
+      "text": "Offene ForderungenCHF 35.13",
+      "inline": null,
+      "rect": {
+        "x": 200,
+        "y": 286,
+        "width": 168,
+        "height": 91.6875
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "168px",
+        "min-width": "0px",
+        "max-width": "none",
+        "height": "91.6875px",
+        "min-height": "0px",
+        "padding": "15px 0px 22px",
+        "border-radius": "16px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / row / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-family": "Inter, system-ui, sans-serif",
+        "color": "rgb(215, 227, 243)",
+        "letter-spacing": "normal",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgb(20, 20, 20)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 43,
+          "order": 392,
+          "selector": ".metric",
+          "css": "min-width: 0px; min-height: 74px; padding: 12px 14px; border: 0px; border-radius: 10px; background: var(--color-subtle); box-shadow: none;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 662,
+          "order": 1009,
+          "selector": ".bo-metric-tiles .metric",
+          "css": "padding: 15px 0px 22px; min-width: 0px; min-height: 0px; background: transparent;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 49,
+          "order": 1587,
+          "selector": ".metric",
+          "css": "min-height: 76px; padding: 13px 16px;",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 179,
+          "order": 1717,
+          "selector": ".metric",
+          "css": "min-height: 74px; padding: 12px 14px; border: 0px;",
+          "contexts": [
+            "media (min-width: 1101px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 107,
+          "order": 1836,
+          "selector": ".metric",
+          "css": "min-height: 76px; padding: 12px 14px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 105,
+          "order": 2554,
+          "selector": ":is(.page-container, .operator-app-content) .metric",
+          "css": "background: var(--app-surface); border-radius: 16px;",
+          "contexts": [
+            "media (max-width: 1100px)"
+          ],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".document-summary-row",
+      "tag": "A",
+      "classes": "document-summary-row has-value is-compact",
+      "text": "RE-TEST-1Teilweise bezahltPrüffirma AG · 08.10.2026OffenCHF 35.13",
+      "inline": null,
+      "rect": {
+        "x": 22,
+        "y": 605.859375,
+        "width": 346,
+        "height": 92
+      },
+      "computed": {
+        "display": "grid",
+        "position": "relative",
+        "width": "346px",
+        "min-width": "0px",
+        "max-width": "none",
+        "height": "92px",
+        "min-height": "0px",
+        "padding": "14px 0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "6px",
+        "flex": "0 1 auto",
+        "grid": "24px 13px 15px / 225.359px 114.641px / none / row / auto / auto",
+        "grid-template-columns": "225.359px 114.641px",
+        "grid-template-rows": "24px 13px 15px",
+        "align-items": "center",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "left",
+        "font-family": "Inter, system-ui, sans-serif",
+        "color": "rgb(215, 227, 243)",
+        "letter-spacing": "normal",
+        "font-size": "13px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 8,
+          "order": 9,
+          "selector": "a",
+          "css": "color: inherit; text-decoration: none;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 664,
+          "order": 1011,
+          "selector": ".document-summary-row",
+          "css": "position: relative; width: 100%; min-width: 0px; padding-inline: 0px; border: 0px; background: transparent; color: inherit; text-align: left; display: grid; grid-template-columns: minmax(0px, 1fr) auto; align-items: center; gap: var(--field-label-gap); padding-block: var(--kpi-padding); font-size: 13px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 431,
+          "order": 2160,
+          "selector": "a, button, input, select, textarea",
+          "css": "-webkit-tap-highlight-color: transparent;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".document-summary-amount",
+      "tag": "SPAN",
+      "classes": "document-summary-amount",
+      "text": "OffenCHF 35.13",
+      "inline": null,
+      "rect": {
+        "x": 22,
+        "y": 668.859375,
+        "width": 346,
+        "height": 15
+      },
+      "computed": {
+        "display": "flex",
+        "position": "static",
+        "width": "346px",
+        "min-width": "0px",
+        "max-width": "none",
+        "height": "15px",
+        "min-height": "auto",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "6px",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / row / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "baseline",
+        "align-content": "normal",
+        "justify-content": "space-between",
+        "text-align": "left",
+        "font-family": "Inter, system-ui, sans-serif",
+        "color": "rgb(215, 227, 243)",
+        "letter-spacing": "normal",
+        "font-size": "13px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 670,
+          "order": 1017,
+          "selector": ".document-summary-amount",
+          "css": "grid-column: 1 / -1; display: flex; align-items: baseline; justify-content: space-between; gap: var(--field-label-gap); font-feature-settings: \"tnum\"; font-variant-numeric: tabular-nums; min-width: 0px;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".bottom-nav",
+      "tag": "NAV",
+      "classes": "bottom-nav ",
+      "text": "StartKundenFinanzenZeitMehr",
+      "inline": null,
+      "rect": {
+        "x": 10.90625,
+        "y": 923.421875,
+        "width": 368.1875,
+        "height": 68
+      },
+      "computed": {
+        "display": "grid",
+        "position": "static",
+        "width": "368.188px",
+        "min-width": "0px",
+        "max-width": "560px",
+        "height": "68px",
+        "min-height": "68px",
+        "padding": "6px",
+        "border-radius": "30px",
+        "border-width": "1px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "1 1 0%",
+        "grid": "54px / 70.8281px 70.8438px 70.8281px 70.8438px 70.8438px / none / row / auto / auto",
+        "grid-template-columns": "70.8281px 70.8438px 70.8281px 70.8438px 70.8438px",
+        "grid-template-rows": "54px",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-family": "Inter, -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", sans-serif",
+        "color": "rgb(222, 222, 226)",
+        "letter-spacing": "normal",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "matrix(1, 0, 0, 1, 0, 0)",
+        "opacity": "1",
+        "backdrop-filter": "blur(18px)",
+        "background-color": "rgba(33, 33, 33, 0.82)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 15,
+          "order": 365,
+          "selector": ".bottom-nav, .desktop-appbar, .mobile-header",
+          "css": "display: none;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 1,
+          "order": 2397,
+          "selector": ".mobile-dock > :is(.bottom-nav, .operator-mobile-nav)",
+          "css": "height: 54px; min-height: 54px;",
+          "contexts": [
+            "media (max-height: 520px) and (orientation: landscape) and (max-width: 900px)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 38,
+          "order": 2487,
+          "selector": ".mobile-dock > :is(.bottom-nav, .operator-mobile-nav)",
+          "css": "max-width: 560px; margin-inline: auto; backdrop-filter: none;",
+          "contexts": [
+            "media (max-width: 1100px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 52,
+          "order": 2501,
+          "selector": ".mobile-dock > :is(.bottom-nav, .operator-mobile-nav)",
+          "css": "position: static; left: auto; right: auto; bottom: auto; z-index: auto; height: var(--mobile-nav-h); min-height: var(--mobile-nav-h); padding: 6px; display: grid; grid-template-columns: repeat(5, minmax(0px, 1fr)); border: 1px solid var(--app-glass-line); border-radius: var(--mobile-nav-radius); background: var(--app-glass-solid); box-shadow: var(--app-glass-shadow); transform: translateZ(0px); transition: height var(--motion-base) var(--motion-ease),border-radius var(--motion-base) var(--motion-ease),background-color var(--motion-base) var(--motion-ease),box-shadow var(--motion-base) var(--motion-ease);",
+          "contexts": [
+            "media (max-width: 1100px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 147,
+          "order": 2596,
+          "selector": ".mobile-dock > :is(nav, .mobile-dock-action)",
+          "css": "pointer-events: auto;",
+          "contexts": [
+            "media (max-width: 1100px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 148,
+          "order": 2597,
+          "selector": ".mobile-dock > nav",
+          "css": "flex: 1 1 0%; min-width: 0px;",
+          "contexts": [
+            "media (max-width: 1100px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 0,
+          "order": 2621,
+          "selector": ".app-glass, .mobile-dock > :is(.bottom-nav, .operator-mobile-nav)",
+          "css": "background: var(--app-glass-tint); backdrop-filter: blur(var(--app-glass-blur));",
+          "contexts": [
+            "supports (((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))) or (-webkit-backdrop-filter:blur(1px)))"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 0,
+          "order": 2625,
+          "selector": ".app-glass, .mobile-dock > :is(.bottom-nav, .operator-mobile-nav)",
+          "css": "background: var(--app-glass-solid); backdrop-filter: none;",
+          "contexts": [
+            "media (prefers-reduced-transparency: reduce)"
+          ],
+          "active": false
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 0,
+          "order": 2626,
+          "selector": ".app-glass, .mobile-dock > :is(.bottom-nav, .operator-mobile-nav)",
+          "css": "background: canvas; color: initial; border: 1px solid buttontext; backdrop-filter: none;",
+          "contexts": [
+            "media (forced-colors: active)"
+          ],
+          "active": false
+        }
+      ]
+    },
+    {
+      "selector": ".person-avatar",
+      "tag": "SPAN",
+      "classes": "person-avatar person-avatar-small person-avatar-tone-0",
+      "text": "TP",
+      "inline": null,
+      "rect": {
+        "x": 333.265625,
+        "y": 17,
+        "width": 30,
+        "height": 30
+      },
+      "computed": {
+        "display": "grid",
+        "position": "static",
+        "width": "30px",
+        "min-width": "auto",
+        "max-width": "none",
+        "height": "30px",
+        "min-height": "auto",
+        "padding": "0px",
+        "border-radius": "50%",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 0 auto",
+        "grid": "30px / 30px / none / row / auto / auto",
+        "grid-template-columns": "30px",
+        "grid-template-rows": "30px",
+        "align-items": "center",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "center",
+        "font-family": "Inter, system-ui, sans-serif",
+        "color": "rgb(255, 255, 255)",
+        "letter-spacing": "normal",
+        "font-size": "11px",
+        "font-weight": "600",
+        "line-height": "11px",
+        "overflow": "hidden",
+        "overflow-x": "hidden",
+        "overflow-y": "hidden",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgb(52, 95, 148)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 287,
+          "order": 635,
+          "selector": ".person-avatar",
+          "css": "width: 36px; height: 36px; flex: 0 0 auto; display: inline-grid; place-items: center; overflow: hidden; border-radius: 50%; font-size: 13px; font-weight: 600; color: rgb(255, 255, 255); line-height: 1;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 288,
+          "order": 636,
+          "selector": ".person-avatar-small",
+          "css": "width: var(--header-avatar-size); height: var(--header-avatar-size); font-size: 11px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 292,
+          "order": 640,
+          "selector": ".person-avatar-tone-0",
+          "css": "background: rgb(52, 95, 148);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 652,
+          "order": 999,
+          "selector": ".mobile-header, .mobile-header *",
+          "css": "filter: none; mix-blend-mode: normal;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    }
+  ]
+}

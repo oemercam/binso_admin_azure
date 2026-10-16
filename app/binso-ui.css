@@ -1,9 +1,15 @@
-/* Binso One CSS architecture.
-   One source of truth. Imports intentionally stay unlayered so Safari/iOS and
-   the Next.js production CSS pipeline apply the same cascade as local builds. */
-@import "./styles/tokens.css";
-@import "./styles/base.css";
-@import "./styles/marketing.css";
-@import "./styles/app.css";
-@import "./styles/operator.css";
-@import "./styles/responsive.css";
+/* BINso One: ordered, reference-bound design system. */
+@import "./design-system/theme.css";
+@import "./design-system/foundation.css";
+@import "./design-system/primitives.css";
+@import "./design-system/layout.css";
+@import "./design-system/collections.css";
+@import "./design-system/overlays.css";
+@import "./design-system/analytics.css";
+@import "./design-system/documents.css";
+@import "./design-system/workflows.css";
+@import "./design-system/settings.css";
+@import "./design-system/auth.css";
+@import "./design-system/marketing.css";
+@import "./design-system/operator.css";
+@import "./design-system/navigation.css";

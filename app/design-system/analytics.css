@@ -1,0 +1,116 @@
+/* BINso One / analytics — one owner for base, states and responsive behavior. */
+.metrics-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;border:0}
+.metrics-grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.metric{min-width:0;min-height:74px;padding:12px 14px;border:0;border-radius:var(--shape-group-small);background:var(--color-subtle);box-shadow:none}
+.metric-top{display:flex;align-items:center;justify-content:space-between;gap:8px;color:var(--color-muted);font-size:var(--metric-label-size);line-height:var(--metric-label-line-height)}
+.metric-top>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.metric-top svg{width:15px;height:15px;flex:0 0 auto}
+.metric strong{display:block;margin:7px 0 0;font-size:var(--metric-value-size);line-height:var(--metric-value-line-height);letter-spacing:var(--metric-value-letter-spacing);white-space:nowrap}
+.metric small{display:none}
+.support-summary .metric{
+  min-height:96px;
+  padding:16px 20px;
+}
+.chart-legend{display:flex;gap:18px;margin-top:14px;font-size:var(--type-metadata);color:var(--color-muted)}
+.chart-legend span{display:flex;align-items:center;gap:6px}
+.chart-legend i{width:18px;height:3px;border-radius:var(--shape-scale-999)}
+.finance-month-bars{height:190px;display:flex;align-items:flex-end;gap:10px;margin-top:20px}
+.finance-month-bars>button{height:100%;flex:1;min-width:0;padding:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px;border:0;background:transparent;color:inherit;cursor:pointer}
+.finance-month-bars>button.active i,.finance-month-bars>button:hover i{background:var(--color-fg)}
+.finance-month-bars>button:focus-visible{outline:2px solid var(--color-fg);outline-offset:3px;border-radius:var(--shape-small)}
+.finance-month-bars i{width:100%;max-width:42px;min-height:5px;border-radius:5px 5px 1px 1px;background:var(--chart-positive)}
+.finance-month-bars b{font-size:var(--type-caption)}
+.finance-month-bars small{font-size:var(--type-caption-small);color:var(--color-muted);white-space:nowrap}
+.bo-metric-tiles{--metric-columns:4;background:transparent;align-items:start;grid-template-columns:repeat(var(--metric-columns,4),minmax(0,1fr))}
+.bo-metric-tiles .metric>small{display:block;margin-top:var(--field-label-gap);font-size:var(--type-metadata);color:var(--color-muted);white-space:normal;overflow-wrap:anywhere;line-height:1.4}
+.bo-metric-tiles .metric strong{max-width:100%;white-space:normal;overflow-wrap:anywhere;font-size:var(--workspace-value-size);font-weight:var(--workspace-value-weight);line-height:1.5}
+.bo-metric-tiles .metric{padding:0 0 22px;min-width:0;min-height:0;background:transparent}
+.bo-metric-tiles .metric-top>span{white-space:normal;overflow:visible}
+.bo-statistics{--statistics-bg:var(--color-bg);--statistics-fg:var(--color-fg);--statistics-muted:var(--color-muted);--statistics-control:var(--color-muted);--statistics-selected:var(--app-accent-soft);--statistics-grid:var(--color-line);--statistics-focus:var(--color-line);min-width:0;width:100%;box-sizing:border-box;background:var(--statistics-bg);color:var(--statistics-fg);border-radius:var(--radius-lg);padding:var(--kpi-padding);margin-block:var(--field-group-gap);overflow:hidden}
+.bo-ring-chart{display:flex;align-items:center;gap:var(--field-group-gap);padding-block:var(--field-group-gap);min-width:0}
+.bo-ring-visual{position:relative;flex:none;width:var(--chart-ring-size);height:var(--chart-ring-size)}
+.bo-ring-center{position:absolute;inset:15%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-align:center;pointer-events:none;overflow-wrap:anywhere;font-size:var(--type-metadata);line-height:1.15}
+.bo-ring-center strong{font-size:var(--type-label);font-variant-numeric:tabular-nums}
+.bo-ring-center span{color:var(--color-muted)}
+.bo-ring-chart svg{width:var(--chart-ring-size);height:var(--chart-ring-size);flex:none;overflow:visible}
+.bo-ring-chart circle{stroke-width:var(--chart-ring-width);transition:stroke-dasharray var(--motion-base) var(--motion-ease)}
+.bo-ring-details{display:grid;gap:var(--field-label-gap);min-width:0;flex:1;font-size:var(--type-label)}
+.bo-ring-details button{display:grid;grid-template-columns:8px minmax(0,1fr) auto;align-items:center;gap:var(--field-label-gap);min-height:var(--touch);padding:0;border:0;background:transparent;color:inherit;text-align:left}
+.bo-ring-details i{width:8px;height:8px;border-radius:50%}
+.bo-ring-details output{color:var(--color-muted);font-variant-numeric:tabular-nums}
+.bo-statistics-notice summary{cursor:pointer;min-height:var(--touch);display:flex;align-items:center}
+.bo-statistics-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--field-group-gap);flex-wrap:wrap}
+.bo-statistics-heading h2{margin:0;font-size:var(--section-title-font);line-height:1.3;overflow-wrap:anywhere}
+.bo-statistics-heading p,
+.bo-statistics-dates,
+.bo-statistics-notice{color:var(--statistics-muted);font-size:var(--type-label);line-height:1.5;margin-block:var(--field-label-gap)}
+.bo-statistics-periods{display:flex;align-items:center;gap:2px;flex-wrap:wrap}
+.bo-statistics-periods button{display:grid;place-items:center;min-width:var(--touch);min-height:var(--touch);background:transparent;border:0;border-radius:var(--radius-xs);color:var(--statistics-control);font:inherit;font-size:var(--type-label);padding:4px}
+.bo-statistics-periods button[aria-pressed=true]{background:var(--statistics-selected);color:var(--statistics-fg)}
+.bo-statistics button:focus-visible{outline:2px solid var(--statistics-fg);outline-offset:-2px}
+.bo-statistics-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--field-group-gap);margin-block:var(--field-group-gap)}
+.bo-statistics-kpis>div{min-width:0}
+.bo-statistics-kpis dt,
+.bo-statistics-kpis small{display:block;font-weight:400;color:var(--statistics-muted);font-size:var(--type-label);line-height:1.4}
+.bo-statistics-kpis dd{font-size:clamp(14px,2.4vw,28px);font-weight:600;font-variant-numeric:tabular-nums;margin:var(--field-label-gap) 0;overflow-wrap:anywhere}
+.bo-statistics-plot{height:var(--chart-compact-height);min-width:0;display:block;background:repeating-linear-gradient(to top,transparent 0,transparent 39px,var(--statistics-grid) 40px);margin-top:var(--field-group-gap)}
+.bo-statistics-group{transition:background-color 160ms ease;min-width:var(--touch);flex:1;display:grid;grid-template-rows:minmax(0,1fr) auto;gap:var(--field-label-gap);border:0;background:transparent;color:var(--statistics-control);padding:0;font:inherit}
+.bo-statistics-group[aria-pressed=true]{background:var(--statistics-focus)}
+.bo-statistics-bars{display:flex;align-items:flex-end;justify-content:center;gap:2px;height:100%;min-width:0}
+.bo-statistics-bar{width:35%;max-width:38px;border-radius:3px 3px 0 0}
+.bo-statistics-positive{background:var(--chart-positive)}
+.bo-statistics-negative{background:var(--chart-negative)}
+.bo-statistics-neutral{background:var(--chart-neutral)}
+.bo-statistics-axis{font-size:var(--type-caption);line-height:1.4;overflow-wrap:anywhere}
+.bo-statistics-legend{display:flex;gap:var(--field-group-gap);flex-wrap:wrap;margin-top:var(--field-group-gap);font-size:var(--type-label);color:var(--statistics-control)}
+.bo-statistics-legend>span{display:flex;gap:var(--field-label-gap);align-items:center}
+.bo-statistics-legend i{width:8px;height:8px;border-radius:var(--shape-mark)}
+.bo-statistics-detail{min-height:2.8em;font-size:var(--type-label);line-height:1.4;color:var(--statistics-control);margin-bottom:0}
+.bo-ring-chart circle[role="button"]{cursor:pointer}
+.bo-ring-chart circle[role="button"]:focus-visible{outline:2px solid var(--color-fg);outline-offset:2px}
+.bo-statistics-plot svg{width:100%;height:100%;display:block;overflow:visible}
+.bo-statistics-line{fill:none;stroke-width:2;vector-effect:non-scaling-stroke}
+.bo-statistics-zero{stroke:var(--statistics-grid);stroke-width:1;vector-effect:non-scaling-stroke}
+.bo-statistics-point{cursor:pointer;stroke:var(--statistics-bg);stroke-width:1;vector-effect:non-scaling-stroke}
+.bo-statistics-point:focus-visible{outline:2px solid var(--statistics-fg);outline-offset:2px}
+.bo-statistics-axis-row{display:flex;justify-content:space-between;gap:var(--field-label-gap);margin-top:var(--field-label-gap);min-width:0}
+.bo-ring-details strong{display:grid;justify-items:end;gap:2px;font-weight:500;font-variant-numeric:tabular-nums}
+.bo-ring-details strong small{font-size:var(--type-metadata);color:var(--color-muted);font-weight:400}
+.operator-finance .finance-month-bars>div{height:100%;flex:1;min-width:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px}
+.operator-finance .finance-month-bars{min-height:0}
+.operator-finance .finance-month-bars i{flex-shrink:0;min-height:0}
+.finance-month-bars i{
+  height:var(--bar-value,0%);
+}
+@media (min-width:761px) and (max-width:1100px){
+.metrics-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (min-width:1101px){
+.finance-month-bars{width:100%;min-height:250px}
+.metrics-grid{gap:10px;border:0}
+.metric{min-height:74px;padding:12px 14px;border:0}
+.metric strong{margin:7px 0 0;font-size:var(--type-subtitle)}}
+@media (min-width:1500px){
+.finance-month-bars{min-height:290px}}
+@media (max-width:760px){
+.metrics-grid,
+  .metrics-grid.three{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;border:0}
+.metric{min-height:76px;padding:12px 14px}
+.metrics-grid.bo-metric-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+.metrics-grid .metric:first-child{border-left:0}
+.metrics-grid .metric:nth-child(odd){border-left:0}
+.metrics-grid{border:0}
+.metric-top{font-size:var(--type-metadata)}
+.metric-top svg{width:14px;height:14px}
+.metric strong{margin-top:7px;font-size:var(--type-scale-19)}
+.chart-legend{margin-top:6px;gap:12px;font-size:var(--type-caption)}
+.finance-month-bars{height:150px;gap:5px}
+.finance-month-bars small{display:none}}
+@media (max-width:389px){
+.bo-statistics-kpis{grid-template-columns:minmax(0,1fr)}
+.bo-statistics-kpis dd{font-size:var(--type-subtitle)}
+.metrics-grid,
+  .metrics-grid.three{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){
+.bo-statistics-group{transition:none}}
+@media (max-width:1100px){
+:is(.bo-metric-tiles,.section-title)[data-desktop-only]{display:none}}

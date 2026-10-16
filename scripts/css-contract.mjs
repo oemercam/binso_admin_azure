@@ -19,5 +19,5 @@ export function assertRuntimeImports(root,files){
   if(rule.parent!==root)throw new Error('Runtime CSS imports must be top-level');
   imports.push(rule.params.replace(/^["']|["']$/g,''));
  });
- if(JSON.stringify(imports)!==JSON.stringify(files.map(file=>'./styles/'+file)))throw new Error('Runtime CSS imports must match the canonical cascade order exactly');
+ if(JSON.stringify(imports)!==JSON.stringify(files.map(file=>'./design-system/'+file)))throw new Error('Runtime CSS imports must match the canonical cascade order exactly');
 }

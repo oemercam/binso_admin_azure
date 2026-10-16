@@ -1,0 +1,2640 @@
+{
+  "source": "binso-one-original-referenz.zip",
+  "zipSha256": "6c53321824f70961464309e2ab813f0b5c20486f5e10ccb336e46c1cbd6ae57d",
+  "originalFiles": [
+    {
+      "file": "desktop-login.html",
+      "sha256": "6e1b4c2f16c34657d12602111aab4ca0a92f3d7d981676e42bedfe6512f9f3c9"
+    },
+    {
+      "file": "IMPLEMENTIERUNG.md",
+      "sha256": "9a3fc7752e887736d27c71b291a8109afe1a5b8e8f4467fbdc05d87a511b5b28"
+    },
+    {
+      "file": "index.html",
+      "sha256": "48d4c2422ac67d3559c2283ea341039a834f2948f2476bad992a96a3d77fe472"
+    },
+    {
+      "file": "komponenten.html",
+      "sha256": "ab1ca4b21a92faeeda481dcfdbf5e6d71676e00f89c5453875fabab70109e734"
+    },
+    {
+      "file": "landingpage.html",
+      "sha256": "8c57b64744b49e582b3b6956618cb6588547d002775e8e6d76bdca6f1ea080c8"
+    },
+    {
+      "file": "mobile-app.html",
+      "sha256": "ccdab3cd24721d1ed96274707278c99f771914eef3d6de936dbde54d4aef5193"
+    }
+  ],
+  "pilots": [
+    {
+      "label": "Login · 1440 px",
+      "width": 1440,
+      "reference": "ux-vergleich/reference-login-1440.png",
+      "product": "ux-vergleich/light-1440-_login.png",
+      "referenceSha256": "36afe1b93af1c46e4bf3b387e19d1ae7e87453fff3cc7f5ce69f1e25615159bd",
+      "productSha256": "e472b14d63dd94a8b0e7135d3a4e397b8e6184369e1789dd2664c8c7f1f84ce4"
+    },
+    {
+      "label": "Login · 390 px",
+      "width": 390,
+      "reference": "ux-vergleich/reference-login-390.png",
+      "product": "ux-vergleich/light-390-_login.png",
+      "referenceSha256": "7f4dc57402aaa7e524605c68f60d93b279c2a9330c341eeb938c712169d4708c",
+      "productSha256": "bdf95657435ec5859d9e0a3023b3efd09033cb7086aba7a0f80f65835b372fa2"
+    },
+    {
+      "label": "Kundenliste · 1440 px",
+      "width": 1440,
+      "reference": "ux-vergleich/reference-customers-1440.png",
+      "product": "ux-vergleich/light-1440-_kunden.png",
+      "referenceSha256": "375007865df5cbd8ac99d69d6c3a1b50e76aa942c52783cbe04a74f59a189077",
+      "productSha256": "d350da0d125323224f00a6d19bd180605bb14346e1d600d2ea5aa10c6ee74072"
+    },
+    {
+      "label": "Kundenliste · 390 px",
+      "width": 390,
+      "reference": "ux-vergleich/reference-customers-390.png",
+      "product": "ux-vergleich/light-390-_kunden.png",
+      "referenceSha256": "413c39cc3350ef208baf0a18a45c1b63042edcfb0e231430f5631dc4a6b26b3e",
+      "productSha256": "65573490e9dfbb9f55ce25c018ee5cb7996e6ab24e309989c189cbf1bb3f0cac"
+    },
+    {
+      "label": "Kundendetail · 1440 px",
+      "width": 1440,
+      "reference": "ux-vergleich/reference-detail-1440.png",
+      "product": "ux-vergleich/light-1440-_kunden_customer-one.png",
+      "referenceSha256": "3301fc538e632feaffeb9dc1ea9ea4bd36d3a3f3b3e7422b3b2ae1306ab2ec56",
+      "productSha256": "4a41c58da7b945d926609ccb7f9b43d91504ad7e20c5fadd995af9a7cd60819f"
+    },
+    {
+      "label": "Kundendetail · 390 px",
+      "width": 390,
+      "reference": "ux-vergleich/reference-detail-390.png",
+      "product": "ux-vergleich/light-390-_kunden_customer-one.png",
+      "referenceSha256": "96ed34b54cf1c5cc202ba55e7373477eab75f50d461982a8e640d16d662d3bd4",
+      "productSha256": "dfea89c5504b65dbfba7d87ce2188b3786bebc4aa67d8410250c4e0e95cfe7fd"
+    }
+  ],
+  "derived": [
+    {
+      "route": "/agb",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_agb.png",
+      "sha256": "b44b6d0871b3b88a04f5824355e0cc92474a0e15be47344514b2017ad98498b7",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/angebote",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_angebote.png",
+      "sha256": "8634ce9f0be9ed3e30861a4082cbf2e5fadcfff1ad2254e74d09e6b5971b8741",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/angebote/neu",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_angebote_neu.png",
+      "sha256": "528a69e2532833cc593ae81988550161544f6c0de67da2462816c90c7f4e1ceb",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/auftragsbearbeitung",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_auftragsbearbeitung.png",
+      "sha256": "8fd5be4095349670c7965634ec19f0215530ba6f2a282e8b7ca43d6052135e2a",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/belege",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_belege.png",
+      "sha256": "684d43d199f87f41d3ba9a19d5677d011cdc379b236ac5e1a4ac941178eba5e7",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/benachrichtigungen",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_benachrichtigungen.png",
+      "sha256": "939d9d9fd8b020c5a0bc6d4998d6c73684a1fc15091fd4d851764b5ccfc5022b",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/berichte",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_berichte.png",
+      "sha256": "9f8d728258b485d20d5478805958ec29bc87108d22189266bad9ca8180ed8b4f",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/datenschutz",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_datenschutz.png",
+      "sha256": "c1c984c3b492cc198b56b9f5ff9cb1c555bba345983efd9b53d8e6a226866195",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/demo",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_demo.png",
+      "sha256": "7322038f18e6461497953d97dbda92000bfb653cf9131fbb87ce0cecd1a93955",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/einladung",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_einladung.png",
+      "sha256": "11ffc76063c47617230ae5d269a6e6ba6965829d4e9f4d79c172979b5778723a",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/einstellungen",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_einstellungen.png",
+      "sha256": "9830b2ff517cd63c7a992e4a2f299e8f9e5a80079c1ed73c3c27aa2a114f9af1",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/einstellungen/abonnement",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_einstellungen_abonnement.png",
+      "sha256": "f6848a52745b72f3bc0b7b489d7adb9eb658bf660ddd95025e75cc3564652d49",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/einstellungen/benachrichtigungen",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_einstellungen_benachrichtigungen.png",
+      "sha256": "4262dff08cbcf9891da172193d968b632863787574666cec3eab089102423c7f",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/einstellungen/darstellung",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_einstellungen_darstellung.png",
+      "sha256": "94933e3509e84751addbd5740986b2281b84a22481e36c081175f41c91f6774a",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/einstellungen/datenschutz",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_einstellungen_datenschutz.png",
+      "sha256": "1ee303c848190a4374be946fbf9f7b6920e50d6f05f6c77eb37e1e93ab6bc149",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/einstellungen/dokumente",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_einstellungen_dokumente.png",
+      "sha256": "7697aa0e0c9523d5211dae469f2293eadd9320d0d496e4037235b3afb3eb6110",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/einstellungen/firma",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_einstellungen_firma.png",
+      "sha256": "5d3aef88da6604d1f8a67eeab085d00cb9df8f61959679c376ab4ee5f123f68f",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/einstellungen/konto",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_einstellungen_konto.png",
+      "sha256": "bcdffe78615b8896ad33640c42565cf0c56c6695bc7522127b8d06c2c87fc012",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/einstellungen/sicherheit",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_einstellungen_sicherheit.png",
+      "sha256": "055f4af208864a62c3b330931becce99e93eda7fe5be26fc844b76bb123c6216",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/einstellungen/sprache",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_einstellungen_sprache.png",
+      "sha256": "bab3d99bc04900cd52bbe8469304d2a953c948afea8022cbea5e32baf59525ff",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/einstellungen/team",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_einstellungen_team.png",
+      "sha256": "cbdf5075cf719c034477feeb918c8dff149d257e86e0518228b301ac38d2944f",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/einstellungen/zeiterfassung",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_einstellungen_zeiterfassung.png",
+      "sha256": "20b2614754936e78e6cd0a1d74948c7cbdffac5f82aa926157eba76ca73972b2",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/email-bestaetigen",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_email-bestaetigen.png",
+      "sha256": "cd176121054c34b13aa5c1f1b106eff58f53fe4ea1c48ab5fb8b13191d81b0e0",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/finanzen",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_finanzen.png",
+      "sha256": "d36ffe0f531a511a46336f2ec9df67fd4407f0c2abded9d454e755a81ea3f3c7",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/finanzen/analyse",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_finanzen_analyse.png",
+      "sha256": "8e2a51b656e954c56730afc0419f3ee14ba3b0ad7f0374ce7b6b3d034103af2f",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/impressum",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_impressum.png",
+      "sha256": "44562f2c29e64b900d5a2725403ee6e8007c8e44cc0ef53b22226c09c495d191",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/kunden/customer-one/bearbeiten",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_kunden_customer-one_bearbeiten.png",
+      "sha256": "9e283dfac9ce27036515730636985909020de0ee5c2a202b36bb7f737f542021",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/kunden/neu",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_kunden_neu.png",
+      "sha256": "f4141f0873dea150bf62b74b8dc9c290b2fcd961baac45b263f37bf7c6e61b81",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/mitarbeiter",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_mitarbeiter.png",
+      "sha256": "560f2df62eaea72efc1b5b11f4c221baac78cbdd94e4323c518cb9321fc364c2",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/mitarbeiter/neu",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_mitarbeiter_neu.png",
+      "sha256": "32da8af7c5dc54a8b4bbe3fb73f6ede7fc0c35224582c72a6a9641c9f36390f3",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/offline",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_offline.png",
+      "sha256": "dbba9d19345ca741e5b7855b4bd1841e4406a698f5a1e0d45691298d06930260",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/operator/login",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_operator_login.png",
+      "sha256": "aea1bbeb2d597149e5149831e80de77a5e6702b2c13e543de01eb9e9e4004ee3",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/passwort-vergessen",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_passwort-vergessen.png",
+      "sha256": "4a5cb878d467af3c670a98d8cf8fa2eea53c5dcac0768545df49b77998826ec0",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/passwort-zuruecksetzen",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_passwort-zuruecksetzen.png",
+      "sha256": "183defbb2bd21d2024e2f0d4dd5a690cea271ce9fe0142382ddb0bcb1c379f6a",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/portal",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_portal.png",
+      "sha256": "e472b14d63dd94a8b0e7135d3a4e397b8e6184369e1789dd2664c8c7f1f84ce4",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/portal/login",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_portal_login.png",
+      "sha256": "e472b14d63dd94a8b0e7135d3a4e397b8e6184369e1789dd2664c8c7f1f84ce4",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/portal/registrieren",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_portal_registrieren.png",
+      "sha256": "022c4859c5c14a20bc117ba59d74dcea8d17028b4f713c7ed4bcf8fff576bb81",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/preise",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_preise.png",
+      "sha256": "01cc1419cfe2e13d88cdd3637d755b89abd0e0f5e6603372f751297c06ec6449",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/preview/dashboard",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_preview_dashboard.png",
+      "sha256": "de89a4c08f623de5595ca8f10ff776c463dd54d796145a274ddc40af1592754e",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/preview/rechnungen",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_preview_rechnungen.png",
+      "sha256": "b9676e5901288df32f7aa027e825258b2a6064899261385c25b50ca96ff38921",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/preview/zeit",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_preview_zeit.png",
+      "sha256": "1eaab59f1eccfde168f1e70ee28cb259dbf6f1a806d2ce79ce75ad247927ec09",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/produkt",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_produkt.png",
+      "sha256": "c2ef047fbdfb7a97aead6693bf775eb1c2949382c0e28ab99b69b1b437c71107",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/produkte",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_produkte.png",
+      "sha256": "14713f34e920ff127689452ec17381ac323161700ad543489b17bc002c15473a",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/produkte/neu",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_produkte_neu.png",
+      "sha256": "f85709eba714a384b0d16c9ca7245b384c7ced89ed5ee21872db1728a51aceeb",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/projekte",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_projekte.png",
+      "sha256": "7d0e7ea72d5d32a90488125939872b949aeeb35dff350fe7281820afff7c3256",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/projekte/neu",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_projekte_neu.png",
+      "sha256": "00cf3ddc08227e0523cad2fb2dcab0dde200ba87cbe250f22ba0bca879ea8ada",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/rechnungen",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_rechnungen.png",
+      "sha256": "32797a6dfb3b32de0261a28ecccf359aca7babbb66c7e4983cb12e11f48bf053",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/rechnungen/neu",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_rechnungen_neu.png",
+      "sha256": "0ed018b07cc6d7395d157d8da1273f0946aa1a6b9cc049a2947030783c298f49",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/registrieren",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_registrieren.png",
+      "sha256": "022c4859c5c14a20bc117ba59d74dcea8d17028b4f713c7ed4bcf8fff576bb81",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/spesen",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_spesen.png",
+      "sha256": "f359acf9ea7b52b833c77ee3f260f4e9f94cee92a6b756849a8deddee203da2d",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/spesen/neu",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_spesen_neu.png",
+      "sha256": "71f0d72b12d86597c896ec6df50fdc0d9481a6e1e4a812134c1ad15a76f681a6",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/support",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_support.png",
+      "sha256": "bfc55bb69ca0aa093ac9887a34884e11bab2c003aeb07996ce4e94090c094cf0",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/support/neu",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_support_neu.png",
+      "sha256": "0db2bcb6059a10047783f95b4762a312c6d3307846bf12e7d30bea1135f385d8",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/support/ticket-one",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_support_ticket-one.png",
+      "sha256": "4749008c653d066769ce04f5885fa511111c97dec1ba72541aa2b624d079001c",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/unterauftragsbearbeiter",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_unterauftragsbearbeiter.png",
+      "sha256": "1d3a38c875ee4a0e67ed3561f938f461f3d7da622ac23c060fb373b706ed3039",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/wartung",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_wartung.png",
+      "sha256": "649f4515bb4eac0f1ee2ffb7448ea69046e03c1284096e5ff309a3631de89df1",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/willkommen",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_willkommen.png",
+      "sha256": "7322038f18e6461497953d97dbda92000bfb653cf9131fbb87ce0cecd1a93955",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/zahlungen",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_zahlungen.png",
+      "sha256": "c7b59b27a3c51556c3a1d04370f83ce5e42b9cef84af834373f12b8d206b1234",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/zahlungen/neu",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_zahlungen_neu.png",
+      "sha256": "057c2b71ddc4bf7d8a8e510b06561ba394d45f8dac1d2768d29c8cb8df2a952f",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/zeit",
+      "width": 1440,
+      "image": "ux-vergleich/light-1440-_zeit.png",
+      "sha256": "6278977c63168f0fa388040e573b534ffeaa2fc0dd1e9f442ed1be5a538e87ad",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/agb",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_agb.png",
+      "sha256": "47c5e152e72dd33e612bfde539f6ecb903d83238d911abbe23a9cfa0e16cfbf9",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/angebote",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_angebote.png",
+      "sha256": "da9a1909cffb467981721a8d490b755985149682b3fdc659a08328e376c3f277",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/angebote/neu",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_angebote_neu.png",
+      "sha256": "814cd744e0cfb4134e04ddb804d18e4ef1519d21f119911370c4fbb97f74cf68",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/auftragsbearbeitung",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_auftragsbearbeitung.png",
+      "sha256": "e306f0a8e98c6f0b62c93e11cf5bfc1e3c57f5e511661fcb68d72fd0bec127d5",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/belege",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_belege.png",
+      "sha256": "81ec8bf9542652ed94f38ea97cef71cebe726da50646f9d2902acbead23c0497",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/benachrichtigungen",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_benachrichtigungen.png",
+      "sha256": "bf4a2826e35ae0ae63651fe13bb10243b8f1ad9947ae33999b5206fdd4e7b721",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/berichte",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_berichte.png",
+      "sha256": "82f46c9b401923548e1c5383cb61377d58dfbb32c2684387e013dd06c59179e1",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/datenschutz",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_datenschutz.png",
+      "sha256": "b32e152411e8c5e27a67f51afc4c8efa68062179f953360cebe406724de0792d",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/demo",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_demo.png",
+      "sha256": "0599c9706c391a2d617262993a729f6443213a06c394ac4edc4e4f2a0c3276f2",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/einladung",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_einladung.png",
+      "sha256": "2716adb24de7ec90de3afd90228f39b39eb63147437618bb65920af9e86684a9",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/einstellungen",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_einstellungen.png",
+      "sha256": "08d56ca122080d42ba6f589ba4aebeeca937cdeef8cd5248955d8f26a91f0fd5",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/einstellungen/abonnement",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_einstellungen_abonnement.png",
+      "sha256": "c602bee49c67e28123eb7944f69652a5c60b7fb60212c1d650a73105b3c445f1",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/einstellungen/benachrichtigungen",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_einstellungen_benachrichtigungen.png",
+      "sha256": "24f52b0979216dbc793d14a8ef4f60f9d6e7255d445061345c3ba58475d08637",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/einstellungen/darstellung",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_einstellungen_darstellung.png",
+      "sha256": "12b78777d702d086618c0c170fd9a0f440bbc14de74468504836830585d7a80f",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/einstellungen/datenschutz",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_einstellungen_datenschutz.png",
+      "sha256": "2a71fbf4773a5b8f0f7afabee5b3c419bcf87ad1b40f3ab80aec26cbb3466272",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/einstellungen/dokumente",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_einstellungen_dokumente.png",
+      "sha256": "cbf0f93fec66b7b422dc68eace0b2461b86fce915429c270115419cbe146cf25",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/einstellungen/firma",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_einstellungen_firma.png",
+      "sha256": "612c8daf1bc47cba02b212778572cabf1d5975344bc1a71f6e9e1c31e2a17b8f",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/einstellungen/konto",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_einstellungen_konto.png",
+      "sha256": "57e57a395b0d0973635b4e1a4835464e56bb884a5ee45db3c155a4b7c45922d1",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/einstellungen/sicherheit",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_einstellungen_sicherheit.png",
+      "sha256": "03749e263c5f2e88f2c686c44a29308e93a5ff5c1e25e4aaf21b1d70aca35aff",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/einstellungen/sprache",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_einstellungen_sprache.png",
+      "sha256": "d9fa9596c844a1701d9557a205ef89e43038769acdb176efb85fe0622440250e",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/einstellungen/team",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_einstellungen_team.png",
+      "sha256": "8308f62bfa4c167018205578ee173ac16776363047d747fe7e53a71d3118432b",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/einstellungen/zeiterfassung",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_einstellungen_zeiterfassung.png",
+      "sha256": "fd89089db36dd9ab37cad52b8f203d0d5d0f233a4333cf6605be901cb8c09379",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/email-bestaetigen",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_email-bestaetigen.png",
+      "sha256": "b1e838153939ee41ee50eea1c39c06c9fa34277fc5d93aef38d9974bab3ade5a",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/finanzen",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_finanzen.png",
+      "sha256": "9f6d2598df3793f43395771af72fa6f11217baf6a6acae27049a8151450f91fb",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/finanzen/analyse",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_finanzen_analyse.png",
+      "sha256": "07d34b92df84b3f5f45b4db5d52619f7a3f548933983a5557fef005ec6fffbd4",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/impressum",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_impressum.png",
+      "sha256": "5d1192ea1ec4d86bde0322f3e1fb92186ca8082035c0859812c235780cce87c3",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/kunden/customer-one/bearbeiten",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_kunden_customer-one_bearbeiten.png",
+      "sha256": "99ac156662b05e6c955c0c6dd3cb3a7832833f3e50bed1c8e3e47e4519b79d3d",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/kunden/neu",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_kunden_neu.png",
+      "sha256": "6d1724046e5944bd88043aa9e2234af606bee25bc499f51b6f4da668d21bb668",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/mitarbeiter",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_mitarbeiter.png",
+      "sha256": "d5d537cdaeccbc82eaf20e2363044890ac960a7dccc3ee8ecdf5d2a225509fa0",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/mitarbeiter/neu",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_mitarbeiter_neu.png",
+      "sha256": "d44f7c5edb386c12ebc9b8e709f0a493d679cc810b75a915d4c604f7fc5cc0c0",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/offline",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_offline.png",
+      "sha256": "483f8b94de0c7b7463a225bb585213557d5797b3545b002a7708d0fe73363dea",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/operator/login",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_operator_login.png",
+      "sha256": "c85d522e0b03da43b0c20b0b601e46642ae7d664fcabe132e44ddf6d30299928",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/passwort-vergessen",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_passwort-vergessen.png",
+      "sha256": "174d1b3457e515f5386a67362948945bd6173378737cecd8c99703a09dcff590",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/passwort-zuruecksetzen",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_passwort-zuruecksetzen.png",
+      "sha256": "042ee8c17260ef9fb55a93500ecb0d8bc31e753927910bd9bb8c19d3ba57bf5a",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/portal",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_portal.png",
+      "sha256": "bdf95657435ec5859d9e0a3023b3efd09033cb7086aba7a0f80f65835b372fa2",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/portal/login",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_portal_login.png",
+      "sha256": "bdf95657435ec5859d9e0a3023b3efd09033cb7086aba7a0f80f65835b372fa2",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/portal/registrieren",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_portal_registrieren.png",
+      "sha256": "f5d3c6e6d685f7798bdec6c5fd6385248f0d19ea91a68f55e87021295153b5ad",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/preise",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_preise.png",
+      "sha256": "b4f0680bc9427ac91c7d6aa861963be506c3d87203afcd193af4f328545b6b2e",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/preview/dashboard",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_preview_dashboard.png",
+      "sha256": "b08f174fa7fcdb2f68336c5700935ad7791049f7aa638230b15332bfa39f1ba7",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/preview/rechnungen",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_preview_rechnungen.png",
+      "sha256": "b1256fbc209f3f2c6756a05e60ab05b7e2e5337af04956e2a438f7da15adfcb9",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/preview/zeit",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_preview_zeit.png",
+      "sha256": "6d950f98dbaaf7cdc81041406a27863280939afd875cb27977762f492209fa68",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/produkt",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_produkt.png",
+      "sha256": "499150d4a41f928b47a898e6a10616553406bf61778a6551f49b4a8fb0c4b16f",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/produkte",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_produkte.png",
+      "sha256": "90843969d142badd555006dce55b16b84422fde161c77c8a622415c180462b85",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/produkte/neu",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_produkte_neu.png",
+      "sha256": "be354c9c3f914b424ac616839067237616ae2108ee1c695c9d74dca8e7cdec3d",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/projekte",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_projekte.png",
+      "sha256": "f2c5396d1efcaca409f89e3061a4af0fb0c8d1e98312e2b360cd2d2d854ad8a9",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/projekte/neu",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_projekte_neu.png",
+      "sha256": "48342ab0e99e8801e1d7d2431dcdec92078da8c29f1491ff37959fb4e28af28b",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/rechnungen",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_rechnungen.png",
+      "sha256": "b8b3e62d1ba62af6e4a0a74e02a82b0798aad2cf91a92d34df040ba60b01ad2c",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/rechnungen/neu",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_rechnungen_neu.png",
+      "sha256": "81bdf1d77401bb6724ddcfa9d0a8b9fd9ffa66733e5c0a0d8b97718d014bfc10",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/registrieren",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_registrieren.png",
+      "sha256": "f5d3c6e6d685f7798bdec6c5fd6385248f0d19ea91a68f55e87021295153b5ad",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/spesen",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_spesen.png",
+      "sha256": "54292d37814ff021dd02e30f508f916fba138909b281c70d8da1ce7ccc6d2b74",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/spesen/neu",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_spesen_neu.png",
+      "sha256": "e82c75174df65ed366f925c6fc763066d875a4416a35336530c8f38c17d275b8",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/support",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_support.png",
+      "sha256": "f5b9bcea01b9b6a880e8d137e155c721c985503554c3775d9520b83410445244",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/support/neu",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_support_neu.png",
+      "sha256": "56333bd4a425f93af38eaf4a7caf34cf1df8e01636e32a2bd33ce97c877497cb",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/support/ticket-one",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_support_ticket-one.png",
+      "sha256": "58db2c02df1d9670e2c082fbdaf532b3e4f468ea92dcfa9d47919843fd91aab1",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/unterauftragsbearbeiter",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_unterauftragsbearbeiter.png",
+      "sha256": "f4c7381938f76ea5c20582ce15be62a2041c3b35660dbf7d38c23312ba910e08",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/wartung",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_wartung.png",
+      "sha256": "039260e8669f4c4bbdc735cd5db952f3535dbf45908609c4c3af708dddbf8fcf",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/willkommen",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_willkommen.png",
+      "sha256": "810e9eb2c5713c4c064b4a5fdef235b6f18c22506ea93feb56c6ee80801c657d",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/zahlungen",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_zahlungen.png",
+      "sha256": "35fc65f5a4c9ca39e33aa1a0b4d12f145f6eec548ec338b97ca6894d4da0def4",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/zahlungen/neu",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_zahlungen_neu.png",
+      "sha256": "e8cd78bed23c591bd995b130fbd60fadfa54954e807b02967039eff10eb416d6",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/zeit",
+      "width": 390,
+      "image": "ux-vergleich/light-390-_zeit.png",
+      "sha256": "864cdd090a436b596642063fef642b0030840651187218c7499a5859fd1cec20",
+      "classification": "Abgeleitet: aus freigegebenen Komponenten; keine eigenständige Originalvorlage im ZIP bestätigt."
+    },
+    {
+      "route": "/operator",
+      "width": 1440,
+      "image": "ux-vergleich/api-light-1440-_operator.png",
+      "sha256": "5734f66dee4d9d50672e31f59afefe2c6b6aa3f4619a1733a3cbb522e0b76bff",
+      "classification": "Abgeleitete Adminansicht mit isolierter API-Fixture. Kein Nachweis für reales Operator-SSO."
+    },
+    {
+      "route": "/operator/abonnemente",
+      "width": 1440,
+      "image": "ux-vergleich/api-light-1440-_operator_abonnemente.png",
+      "sha256": "d91e3e8ef3562b10dfe91fe49c6f66e638f8f83646251ab46aa52d47ab070b65",
+      "classification": "Abgeleitete Adminansicht mit isolierter API-Fixture. Kein Nachweis für reales Operator-SSO."
+    },
+    {
+      "route": "/operator/ankuendigungen",
+      "width": 1440,
+      "image": "ux-vergleich/api-light-1440-_operator_ankuendigungen.png",
+      "sha256": "027f3f414565a97f4ac397b25f05ae147b838f715989e2170521e98abe8df183",
+      "classification": "Abgeleitete Adminansicht mit isolierter API-Fixture. Kein Nachweis für reales Operator-SSO."
+    },
+    {
+      "route": "/operator/audit",
+      "width": 1440,
+      "image": "ux-vergleich/api-light-1440-_operator_audit.png",
+      "sha256": "20560332d0dbeba25a8c9bc54fe4834cb53a631fcd7943331499737e4638bfc3",
+      "classification": "Abgeleitete Adminansicht mit isolierter API-Fixture. Kein Nachweis für reales Operator-SSO."
+    },
+    {
+      "route": "/operator/finanzen",
+      "width": 1440,
+      "image": "ux-vergleich/api-light-1440-_operator_finanzen.png",
+      "sha256": "62416c834b9f3f216bd25cbfed83b0d82422e3bb7ace6ccc42807ebea4dc4d31",
+      "classification": "Abgeleitete Adminansicht mit isolierter API-Fixture. Kein Nachweis für reales Operator-SSO."
+    },
+    {
+      "route": "/operator/kunden",
+      "width": 1440,
+      "image": "ux-vergleich/api-light-1440-_operator_kunden.png",
+      "sha256": "de01343069ca409bd099c1eadbb8902c2d09b11f40622b0bde3917db650f29f3",
+      "classification": "Abgeleitete Adminansicht mit isolierter API-Fixture. Kein Nachweis für reales Operator-SSO."
+    },
+    {
+      "route": "/operator/monitoring",
+      "width": 1440,
+      "image": "ux-vergleich/api-light-1440-_operator_monitoring.png",
+      "sha256": "c5460cf253c3e0ad42dc386b94ef6e0df64b468b2683ba46dd549bed1b75c14d",
+      "classification": "Abgeleitete Adminansicht mit isolierter API-Fixture. Kein Nachweis für reales Operator-SSO."
+    },
+    {
+      "route": "/operator/sicherheit",
+      "width": 1440,
+      "image": "ux-vergleich/api-light-1440-_operator_sicherheit.png",
+      "sha256": "c41e46115b84f58710c61981893dbf385d8a873ac8bffccb94f3b8898ba54bbc",
+      "classification": "Abgeleitete Adminansicht mit isolierter API-Fixture. Kein Nachweis für reales Operator-SSO."
+    },
+    {
+      "route": "/operator/sperrungen",
+      "width": 1440,
+      "image": "ux-vergleich/api-light-1440-_operator_sperrungen.png",
+      "sha256": "07e90971a0bb39b8afaef17157cc5584ee091bc5f453ee83ab88c2e1fd5c2565",
+      "classification": "Abgeleitete Adminansicht mit isolierter API-Fixture. Kein Nachweis für reales Operator-SSO."
+    },
+    {
+      "route": "/operator/tickets",
+      "width": 1440,
+      "image": "ux-vergleich/api-light-1440-_operator_tickets.png",
+      "sha256": "e602e055ac0c4770819550ef5d6fbceee938dad82deb836bb2b247c4895219d8",
+      "classification": "Abgeleitete Adminansicht mit isolierter API-Fixture. Kein Nachweis für reales Operator-SSO."
+    },
+    {
+      "route": "/operator/zahlungen",
+      "width": 1440,
+      "image": "ux-vergleich/api-light-1440-_operator_zahlungen.png",
+      "sha256": "61055c9ce0ce20440e80fb3417a24fcbef7defbee85ceb39fc8994909a0bc416",
+      "classification": "Abgeleitete Adminansicht mit isolierter API-Fixture. Kein Nachweis für reales Operator-SSO."
+    },
+    {
+      "route": "/operator",
+      "width": 390,
+      "image": "ux-vergleich/api-light-390-_operator.png",
+      "sha256": "cc465cc13347239b482c36dc76216f70c996f01249c0e5158afa1773bdfffe03",
+      "classification": "Abgeleitete Adminansicht mit isolierter API-Fixture. Kein Nachweis für reales Operator-SSO."
+    },
+    {
+      "route": "/operator/abonnemente",
+      "width": 390,
+      "image": "ux-vergleich/api-light-390-_operator_abonnemente.png",
+      "sha256": "1bd22e77a4c3899a60c16aed6c608c733f89fca76405639a8f3f0d303c1b322b",
+      "classification": "Abgeleitete Adminansicht mit isolierter API-Fixture. Kein Nachweis für reales Operator-SSO."
+    },
+    {
+      "route": "/operator/ankuendigungen",
+      "width": 390,
+      "image": "ux-vergleich/api-light-390-_operator_ankuendigungen.png",
+      "sha256": "3b5bc78739e325ada52e3284bca2e854f65223d57fcce67410a3dede3aafc8a8",
+      "classification": "Abgeleitete Adminansicht mit isolierter API-Fixture. Kein Nachweis für reales Operator-SSO."
+    },
+    {
+      "route": "/operator/audit",
+      "width": 390,
+      "image": "ux-vergleich/api-light-390-_operator_audit.png",
+      "sha256": "fe998fe5bec896fe0bc89cfb610b351ba7a3d5e71279f9b1579a11078abb6e91",
+      "classification": "Abgeleitete Adminansicht mit isolierter API-Fixture. Kein Nachweis für reales Operator-SSO."
+    },
+    {
+      "route": "/operator/finanzen",
+      "width": 390,
+      "image": "ux-vergleich/api-light-390-_operator_finanzen.png",
+      "sha256": "63f8afe2078c5bb586182177ced6109db999f31d155fec13333bfa26076675d6",
+      "classification": "Abgeleitete Adminansicht mit isolierter API-Fixture. Kein Nachweis für reales Operator-SSO."
+    },
+    {
+      "route": "/operator/kunden",
+      "width": 390,
+      "image": "ux-vergleich/api-light-390-_operator_kunden.png",
+      "sha256": "865cfca0a5d20ff7e883f864194823ab7a8ee5432e2922a21c67ffe857dc2927",
+      "classification": "Abgeleitete Adminansicht mit isolierter API-Fixture. Kein Nachweis für reales Operator-SSO."
+    },
+    {
+      "route": "/operator/monitoring",
+      "width": 390,
+      "image": "ux-vergleich/api-light-390-_operator_monitoring.png",
+      "sha256": "c2b8c0a9ab18ba4663fa1b2a2824797b7cf035a141c1ada9d60234908ef97eac",
+      "classification": "Abgeleitete Adminansicht mit isolierter API-Fixture. Kein Nachweis für reales Operator-SSO."
+    },
+    {
+      "route": "/operator/sicherheit",
+      "width": 390,
+      "image": "ux-vergleich/api-light-390-_operator_sicherheit.png",
+      "sha256": "dbb2e7eac576d8b126c834a38012448ff98e27d7bb7830719b318096b236a041",
+      "classification": "Abgeleitete Adminansicht mit isolierter API-Fixture. Kein Nachweis für reales Operator-SSO."
+    },
+    {
+      "route": "/operator/sperrungen",
+      "width": 390,
+      "image": "ux-vergleich/api-light-390-_operator_sperrungen.png",
+      "sha256": "8fd2e81ec0a823c0f47aa6519a8ba3153db51313a6463499e5e1602660e7e20b",
+      "classification": "Abgeleitete Adminansicht mit isolierter API-Fixture. Kein Nachweis für reales Operator-SSO."
+    },
+    {
+      "route": "/operator/tickets",
+      "width": 390,
+      "image": "ux-vergleich/api-light-390-_operator_tickets.png",
+      "sha256": "b08f32bba5373915b37c25117cb86543883f002937feaf96fb0029725344754e",
+      "classification": "Abgeleitete Adminansicht mit isolierter API-Fixture. Kein Nachweis für reales Operator-SSO."
+    },
+    {
+      "route": "/operator/zahlungen",
+      "width": 390,
+      "image": "ux-vergleich/api-light-390-_operator_zahlungen.png",
+      "sha256": "92dfacb83228f4d56db1cb5178bc31add129807e83d0c43d4f97d00604546c70",
+      "classification": "Abgeleitete Adminansicht mit isolierter API-Fixture. Kein Nachweis für reales Operator-SSO."
+    },
+    {
+      "route": "/",
+      "width": 1440,
+      "image": "ux-vergleich/final-light-1440-_.png",
+      "sha256": "20ad6c5327ef7609622a9f466a6a066fca05c77d83883ac1ca99385be45b11a4",
+      "classification": "Aktuelle Produktansicht mit isolierten Vergleichsdaten; aus den gemeinsamen Komponenten abgeleitet."
+    },
+    {
+      "route": "/angebote/AN-TEST-1",
+      "width": 1440,
+      "image": "ux-vergleich/final-light-1440-_angebote_AN-TEST-1.png",
+      "sha256": "2ce6137585134adb5394b7c6628622af92e0a7c750514b031ccfaeab9093720f",
+      "classification": "Aktuelle Produktansicht mit isolierten Vergleichsdaten; aus den gemeinsamen Komponenten abgeleitet."
+    },
+    {
+      "route": "/dashboard",
+      "width": 1440,
+      "image": "ux-vergleich/final-light-1440-_dashboard.png",
+      "sha256": "d24912972383c614452cfde602c624ac49e504cfbb33ab7514f0c5b46589ecf9",
+      "classification": "Aktuelle Produktansicht mit isolierten Vergleichsdaten; aus den gemeinsamen Komponenten abgeleitet."
+    },
+    {
+      "route": "/kunden",
+      "width": 1440,
+      "image": "ux-vergleich/final-light-1440-_kunden.png",
+      "sha256": "d350da0d125323224f00a6d19bd180605bb14346e1d600d2ea5aa10c6ee74072",
+      "classification": "Aktuelle Produktansicht mit isolierten Vergleichsdaten; aus den gemeinsamen Komponenten abgeleitet."
+    },
+    {
+      "route": "/kunden/customer-one",
+      "width": 1440,
+      "image": "ux-vergleich/final-light-1440-_kunden_customer-one.png",
+      "sha256": "4a41c58da7b945d926609ccb7f9b43d91504ad7e20c5fadd995af9a7cd60819f",
+      "classification": "Aktuelle Produktansicht mit isolierten Vergleichsdaten; aus den gemeinsamen Komponenten abgeleitet."
+    },
+    {
+      "route": "/login",
+      "width": 1440,
+      "image": "ux-vergleich/final-light-1440-_login.png",
+      "sha256": "e472b14d63dd94a8b0e7135d3a4e397b8e6184369e1789dd2664c8c7f1f84ce4",
+      "classification": "Aktuelle Produktansicht mit isolierten Vergleichsdaten; aus den gemeinsamen Komponenten abgeleitet."
+    },
+    {
+      "route": "/mitarbeiter/employee-one",
+      "width": 1440,
+      "image": "ux-vergleich/final-light-1440-_mitarbeiter_employee-one.png",
+      "sha256": "fc751d05dd8a568ef94232f18e49c6f5d98524844c1fa17d0db84697a6b85adf",
+      "classification": "Aktuelle Produktansicht mit isolierten Vergleichsdaten; aus den gemeinsamen Komponenten abgeleitet."
+    },
+    {
+      "route": "/produkte/product-one",
+      "width": 1440,
+      "image": "ux-vergleich/final-light-1440-_produkte_product-one.png",
+      "sha256": "64d666b0c9cdf8ddcbf7c3472c321a3387eed6455acc5621c45fe306da060ebc",
+      "classification": "Aktuelle Produktansicht mit isolierten Vergleichsdaten; aus den gemeinsamen Komponenten abgeleitet."
+    },
+    {
+      "route": "/projekte/project-one",
+      "width": 1440,
+      "image": "ux-vergleich/final-light-1440-_projekte_project-one.png",
+      "sha256": "d836ed4969732ecd528e1161049c20585b84b72c369ef83ecc0b05342fee4ae4",
+      "classification": "Aktuelle Produktansicht mit isolierten Vergleichsdaten; aus den gemeinsamen Komponenten abgeleitet."
+    },
+    {
+      "route": "/rechnungen/RE-TEST-1",
+      "width": 1440,
+      "image": "ux-vergleich/final-light-1440-_rechnungen_RE-TEST-1.png",
+      "sha256": "2f0866bf1349b17baa5ec7dacfe63d649193795ed4f32c27e9fb8abcd35b834b",
+      "classification": "Aktuelle Produktansicht mit isolierten Vergleichsdaten; aus den gemeinsamen Komponenten abgeleitet."
+    },
+    {
+      "route": "/spesen/expense-one",
+      "width": 1440,
+      "image": "ux-vergleich/final-light-1440-_spesen_expense-one.png",
+      "sha256": "88ffecd962cd003fd8c18eebc38e7a949d8c1a5bc1b514e73db629009d69ea41",
+      "classification": "Aktuelle Produktansicht mit isolierten Vergleichsdaten; aus den gemeinsamen Komponenten abgeleitet."
+    },
+    {
+      "route": "/zahlungen/payment-one",
+      "width": 1440,
+      "image": "ux-vergleich/final-light-1440-_zahlungen_payment-one.png",
+      "sha256": "3f8910dfc1f3f65ed99dd49ea855a333dd4c223b2f6a6990d56300f6ad8f3384",
+      "classification": "Aktuelle Produktansicht mit isolierten Vergleichsdaten; aus den gemeinsamen Komponenten abgeleitet."
+    },
+    {
+      "route": "/",
+      "width": 390,
+      "image": "ux-vergleich/final-light-390-_.png",
+      "sha256": "7460085fc1536b7b2ad8f9cbd0959130968984c876525203b2d85c8354160dc2",
+      "classification": "Aktuelle Produktansicht mit isolierten Vergleichsdaten; aus den gemeinsamen Komponenten abgeleitet."
+    },
+    {
+      "route": "/angebote/AN-TEST-1",
+      "width": 390,
+      "image": "ux-vergleich/final-light-390-_angebote_AN-TEST-1.png",
+      "sha256": "26966df0fc25f7ae26e772f79214796dbeaa8c3b4cc22e1b1207065165ac8919",
+      "classification": "Aktuelle Produktansicht mit isolierten Vergleichsdaten; aus den gemeinsamen Komponenten abgeleitet."
+    },
+    {
+      "route": "/dashboard",
+      "width": 390,
+      "image": "ux-vergleich/final-light-390-_dashboard.png",
+      "sha256": "ff1161bf36e03ef9349d135117e173d4720e220245a5c0273b0d84c4e78b3284",
+      "classification": "Aktuelle Produktansicht mit isolierten Vergleichsdaten; aus den gemeinsamen Komponenten abgeleitet."
+    },
+    {
+      "route": "/kunden",
+      "width": 390,
+      "image": "ux-vergleich/final-light-390-_kunden.png",
+      "sha256": "65573490e9dfbb9f55ce25c018ee5cb7996e6ab24e309989c189cbf1bb3f0cac",
+      "classification": "Aktuelle Produktansicht mit isolierten Vergleichsdaten; aus den gemeinsamen Komponenten abgeleitet."
+    },
+    {
+      "route": "/kunden/customer-one",
+      "width": 390,
+      "image": "ux-vergleich/final-light-390-_kunden_customer-one.png",
+      "sha256": "dfea89c5504b65dbfba7d87ce2188b3786bebc4aa67d8410250c4e0e95cfe7fd",
+      "classification": "Aktuelle Produktansicht mit isolierten Vergleichsdaten; aus den gemeinsamen Komponenten abgeleitet."
+    },
+    {
+      "route": "/login",
+      "width": 390,
+      "image": "ux-vergleich/final-light-390-_login.png",
+      "sha256": "bdf95657435ec5859d9e0a3023b3efd09033cb7086aba7a0f80f65835b372fa2",
+      "classification": "Aktuelle Produktansicht mit isolierten Vergleichsdaten; aus den gemeinsamen Komponenten abgeleitet."
+    },
+    {
+      "route": "/mitarbeiter/employee-one",
+      "width": 390,
+      "image": "ux-vergleich/final-light-390-_mitarbeiter_employee-one.png",
+      "sha256": "bdd10f02cb0e7493ae498e9de2bef2bba7df9a2517c7e36ce1afaca820fe0729",
+      "classification": "Aktuelle Produktansicht mit isolierten Vergleichsdaten; aus den gemeinsamen Komponenten abgeleitet."
+    },
+    {
+      "route": "/produkte/product-one",
+      "width": 390,
+      "image": "ux-vergleich/final-light-390-_produkte_product-one.png",
+      "sha256": "1a3ddaa4ce049b22ca76584cafd4dc6858ec9a347be16bc6fc2be6727a1e7ce9",
+      "classification": "Aktuelle Produktansicht mit isolierten Vergleichsdaten; aus den gemeinsamen Komponenten abgeleitet."
+    },
+    {
+      "route": "/projekte/project-one",
+      "width": 390,
+      "image": "ux-vergleich/final-light-390-_projekte_project-one.png",
+      "sha256": "cf31f02a132d0e45dc61efc724a075b8b7feeb116972c4d1cc83faae0eef6c35",
+      "classification": "Aktuelle Produktansicht mit isolierten Vergleichsdaten; aus den gemeinsamen Komponenten abgeleitet."
+    },
+    {
+      "route": "/rechnungen/RE-TEST-1",
+      "width": 390,
+      "image": "ux-vergleich/final-light-390-_rechnungen_RE-TEST-1.png",
+      "sha256": "a7b4e178d9601c5c9a3c9d80c8709fa4ccb1a0344d6c2a2bee25f4459b689166",
+      "classification": "Aktuelle Produktansicht mit isolierten Vergleichsdaten; aus den gemeinsamen Komponenten abgeleitet."
+    },
+    {
+      "route": "/spesen/expense-one",
+      "width": 390,
+      "image": "ux-vergleich/final-light-390-_spesen_expense-one.png",
+      "sha256": "c97b86f7b1897f19707c90e2105e47ccadc303ae69db9fed2f7906bf7cfffce4",
+      "classification": "Aktuelle Produktansicht mit isolierten Vergleichsdaten; aus den gemeinsamen Komponenten abgeleitet."
+    },
+    {
+      "route": "/zahlungen/payment-one",
+      "width": 390,
+      "image": "ux-vergleich/final-light-390-_zahlungen_payment-one.png",
+      "sha256": "bf73eb6ec5f1327bf99ff5dba249217ebfa752ff0bc1d9b4b88942d4f088f119",
+      "classification": "Aktuelle Produktansicht mit isolierten Vergleichsdaten; aus den gemeinsamen Komponenten abgeleitet."
+    },
+    {
+      "route": "/ · Dark Mode",
+      "width": 1440,
+      "image": "ux-vergleich/dark-1440-_.png",
+      "sha256": "a9188efd56a0ebc1634ae8eda1b1449e1bc73af9701a2b6da081e7f0f9c2cb01",
+      "classification": "Abgeleiteter Dark Mode, keine Dark-Originalvorlage freigegeben."
+    },
+    {
+      "route": "/angebote/AN-TEST-1 · Dark Mode",
+      "width": 1440,
+      "image": "ux-vergleich/dark-1440-_angebote_AN-TEST-1.png",
+      "sha256": "3c722a0f2c515e44451ec8cae10b43888c87b6c74c9f9282b5aaa2690b305d4c",
+      "classification": "Abgeleiteter Dark Mode, keine Dark-Originalvorlage freigegeben."
+    },
+    {
+      "route": "/dashboard · Dark Mode",
+      "width": 1440,
+      "image": "ux-vergleich/dark-1440-_dashboard.png",
+      "sha256": "07223984eb0b73d57c0c030d6a81a78b6440876fab6969d17095aed70719bfc6",
+      "classification": "Abgeleiteter Dark Mode, keine Dark-Originalvorlage freigegeben."
+    },
+    {
+      "route": "/kunden · Dark Mode",
+      "width": 1440,
+      "image": "ux-vergleich/dark-1440-_kunden.png",
+      "sha256": "04c948fc38564bdc892b9d8dcbdc8f51034eeb4e486d1e9eebb2ce400632adbf",
+      "classification": "Abgeleiteter Dark Mode, keine Dark-Originalvorlage freigegeben."
+    },
+    {
+      "route": "/kunden/customer-one · Dark Mode",
+      "width": 1440,
+      "image": "ux-vergleich/dark-1440-_kunden_customer-one.png",
+      "sha256": "60f881cdff86f1db43a6192d607b648d584a07ccf80a2efceaa65ccd7b50dbee",
+      "classification": "Abgeleiteter Dark Mode, keine Dark-Originalvorlage freigegeben."
+    },
+    {
+      "route": "/login · Dark Mode",
+      "width": 1440,
+      "image": "ux-vergleich/dark-1440-_login.png",
+      "sha256": "35d2d1909dd4f380c7deadf40f002c822e15fda3c6dc5e3584e1b2535064a4e9",
+      "classification": "Abgeleiteter Dark Mode, keine Dark-Originalvorlage freigegeben."
+    },
+    {
+      "route": "/mitarbeiter/employee-one · Dark Mode",
+      "width": 1440,
+      "image": "ux-vergleich/dark-1440-_mitarbeiter_employee-one.png",
+      "sha256": "2a40b1a14c7e9a7d93ecdca23a2dcafcf93c7361b95b03238ef6f014c77d8bc7",
+      "classification": "Abgeleiteter Dark Mode, keine Dark-Originalvorlage freigegeben."
+    },
+    {
+      "route": "/produkte/product-one · Dark Mode",
+      "width": 1440,
+      "image": "ux-vergleich/dark-1440-_produkte_product-one.png",
+      "sha256": "a4987ad20a30f8842812f646c9a68c234659071433af0d4ca1480e5b99ba4a4e",
+      "classification": "Abgeleiteter Dark Mode, keine Dark-Originalvorlage freigegeben."
+    },
+    {
+      "route": "/projekte/project-one · Dark Mode",
+      "width": 1440,
+      "image": "ux-vergleich/dark-1440-_projekte_project-one.png",
+      "sha256": "239b57d68b57af24a58f23fde7962e0b38189f4f6f9a1501072564481fe79071",
+      "classification": "Abgeleiteter Dark Mode, keine Dark-Originalvorlage freigegeben."
+    },
+    {
+      "route": "/rechnungen/RE-TEST-1 · Dark Mode",
+      "width": 1440,
+      "image": "ux-vergleich/dark-1440-_rechnungen_RE-TEST-1.png",
+      "sha256": "d782289679ffc4fcc670da1eee3a7c1a57b882a260359edcbcfa282a9a38b7f2",
+      "classification": "Abgeleiteter Dark Mode, keine Dark-Originalvorlage freigegeben."
+    },
+    {
+      "route": "/spesen/expense-one · Dark Mode",
+      "width": 1440,
+      "image": "ux-vergleich/dark-1440-_spesen_expense-one.png",
+      "sha256": "373b2fc6fa6fa66f9ce2b936c5ce5f44e21a85363b29d3617f88bd24efc41065",
+      "classification": "Abgeleiteter Dark Mode, keine Dark-Originalvorlage freigegeben."
+    },
+    {
+      "route": "/zahlungen/payment-one · Dark Mode",
+      "width": 1440,
+      "image": "ux-vergleich/dark-1440-_zahlungen_payment-one.png",
+      "sha256": "35264ef8ff4d9c7c08af2ba5faf0f9bd3f13834afab5c106788d750f1d76c80d",
+      "classification": "Abgeleiteter Dark Mode, keine Dark-Originalvorlage freigegeben."
+    },
+    {
+      "route": "/ · Dark Mode",
+      "width": 390,
+      "image": "ux-vergleich/dark-390-_.png",
+      "sha256": "8199e99a9515ec5cab5c14122e21d2588d00c011e0e73bfda2e130b3475e851b",
+      "classification": "Abgeleiteter Dark Mode, keine Dark-Originalvorlage freigegeben."
+    },
+    {
+      "route": "/angebote/AN-TEST-1 · Dark Mode",
+      "width": 390,
+      "image": "ux-vergleich/dark-390-_angebote_AN-TEST-1.png",
+      "sha256": "ef5f95e5fce218471515bc59ec17b093e6704bcd79f9cb493b448af444b06c9e",
+      "classification": "Abgeleiteter Dark Mode, keine Dark-Originalvorlage freigegeben."
+    },
+    {
+      "route": "/dashboard · Dark Mode",
+      "width": 390,
+      "image": "ux-vergleich/dark-390-_dashboard.png",
+      "sha256": "d2c8847498cf19ae35669764b1dae8b70d4593dc903451a79bece031e1e67d1a",
+      "classification": "Abgeleiteter Dark Mode, keine Dark-Originalvorlage freigegeben."
+    },
+    {
+      "route": "/kunden · Dark Mode",
+      "width": 390,
+      "image": "ux-vergleich/dark-390-_kunden.png",
+      "sha256": "02377c86f51d28ba52d9f70c6ea45ad847c15fb89522adc6926e271486c50037",
+      "classification": "Abgeleiteter Dark Mode, keine Dark-Originalvorlage freigegeben."
+    },
+    {
+      "route": "/kunden/customer-one · Dark Mode",
+      "width": 390,
+      "image": "ux-vergleich/dark-390-_kunden_customer-one.png",
+      "sha256": "f79ecfbe443a17540049c661575b739391b6c942a1f7ea3dffdbfebb540883e7",
+      "classification": "Abgeleiteter Dark Mode, keine Dark-Originalvorlage freigegeben."
+    },
+    {
+      "route": "/login · Dark Mode",
+      "width": 390,
+      "image": "ux-vergleich/dark-390-_login.png",
+      "sha256": "0b638d9763c040e371310c30badc8eb132ac6d333a9bf1d1fe4ce91e5244c162",
+      "classification": "Abgeleiteter Dark Mode, keine Dark-Originalvorlage freigegeben."
+    },
+    {
+      "route": "/mitarbeiter/employee-one · Dark Mode",
+      "width": 390,
+      "image": "ux-vergleich/dark-390-_mitarbeiter_employee-one.png",
+      "sha256": "2b43d18851c7394e3d7d1feeba249e172296909e35b5c81b1b442f09bfad71c1",
+      "classification": "Abgeleiteter Dark Mode, keine Dark-Originalvorlage freigegeben."
+    },
+    {
+      "route": "/produkte/product-one · Dark Mode",
+      "width": 390,
+      "image": "ux-vergleich/dark-390-_produkte_product-one.png",
+      "sha256": "4326853567601d41e7f3e6aea7ca138c55afc08e4efd88b0f1f7a27d3e69375c",
+      "classification": "Abgeleiteter Dark Mode, keine Dark-Originalvorlage freigegeben."
+    },
+    {
+      "route": "/projekte/project-one · Dark Mode",
+      "width": 390,
+      "image": "ux-vergleich/dark-390-_projekte_project-one.png",
+      "sha256": "84abb4163af0298fcae20452b13d3855b7758c1ea3eb9d24a5b8561bb14ddca8",
+      "classification": "Abgeleiteter Dark Mode, keine Dark-Originalvorlage freigegeben."
+    },
+    {
+      "route": "/rechnungen/RE-TEST-1 · Dark Mode",
+      "width": 390,
+      "image": "ux-vergleich/dark-390-_rechnungen_RE-TEST-1.png",
+      "sha256": "d24cba6d895d46c633d3582a3328fec2d1cad521b2c10cf0bfebd06dc3fa876b",
+      "classification": "Abgeleiteter Dark Mode, keine Dark-Originalvorlage freigegeben."
+    },
+    {
+      "route": "/spesen/expense-one · Dark Mode",
+      "width": 390,
+      "image": "ux-vergleich/dark-390-_spesen_expense-one.png",
+      "sha256": "dbf9e9da138b69a10d0d13d2363aafcb6f0997f89aaf6a30b206562d6bb4d305",
+      "classification": "Abgeleiteter Dark Mode, keine Dark-Originalvorlage freigegeben."
+    },
+    {
+      "route": "/zahlungen/payment-one · Dark Mode",
+      "width": 390,
+      "image": "ux-vergleich/dark-390-_zahlungen_payment-one.png",
+      "sha256": "616e544030869a424707b9e2986f45f77d37cf561880b8bab4b2aac0c211aceb",
+      "classification": "Abgeleiteter Dark Mode, keine Dark-Originalvorlage freigegeben."
+    },
+    {
+      "route": "Zustand · light-320-400-customer-sheet",
+      "width": 320,
+      "image": "ux-vergleich/zip-customers-light-320-400-customer-sheet.png",
+      "sha256": "504628cdaf584aada892b5e1fef62e04541b9d81d243492c2a253060d7b58203",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-320-contact-form-final",
+      "width": 320,
+      "image": "ux-vergleich/zip-customers-light-320-contact-form-final.png",
+      "sha256": "24ed7c4188c3a3ff06f743487f4c20aa46fd6879c6c01b6ad7d150da91b41022",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-320-contacts-final",
+      "width": 320,
+      "image": "ux-vergleich/zip-customers-light-320-contacts-final.png",
+      "sha256": "e7801d258bccd7de36158e331c51dd18f183590030c0bb6dc44ae521d31819b4",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-320-customer-finance-final",
+      "width": 320,
+      "image": "ux-vergleich/zip-customers-light-320-customer-finance-final.png",
+      "sha256": "7a09f674502c63885fde3d01392aca807e03a4fc996245b73b969b4c9428a2b1",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-375-400-contact",
+      "width": 375,
+      "image": "ux-vergleich/zip-customers-light-375-400-contact.png",
+      "sha256": "efa3589b440b5c5322d47e6b5f7b18fb2dd9075e559a9fb82ad3b5b910f57d2b",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-430-customer-list-standard",
+      "width": 430,
+      "image": "ux-vergleich/zip-customers-light-430-customer-list-standard.png",
+      "sha256": "a005b896259790f2f70d004120b09758c2fead18f8a8e1ef03153fc2c04f6abb",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-Kontaktaktionen-actions",
+      "width": 320,
+      "image": "ux-vergleich/zip-customers-light-Kontaktaktionen-actions.png",
+      "sha256": "86771665aa176e40971d05b165b30320f98091b7ee3b192441c35cfb0a634250",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-Kundenaktionen-actions",
+      "width": 430,
+      "image": "ux-vergleich/zip-customers-light-Kundenaktionen-actions.png",
+      "sha256": "3f73b180d1c191691ea2a1b803c8d4ea8f1d0a79e592b9badfd083bb8dd2ebbc",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-320-position-discard",
+      "width": 320,
+      "image": "ux-vergleich/zip-documents-light-320-position-discard.png",
+      "sha256": "1731d18f4af7ae6c29ddc3f93bde9573bcb11719940d328ebb42494aa4d878e8",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-430-credit-note",
+      "width": 430,
+      "image": "ux-vergleich/zip-documents-light-430-credit-note.png",
+      "sha256": "6f882d2aef02a13ae4bb19bf05544c4a0e63ddbfb8196124566bd2596cee28db",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-430-draft-invoice",
+      "width": 430,
+      "image": "ux-vergleich/zip-documents-light-430-draft-invoice.png",
+      "sha256": "1262fb48bf12e253a6be43c1f8e49c15981b8e25e9d68a04c531ee7493c996b4",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-430-pdf-page-2",
+      "width": 430,
+      "image": "ux-vergleich/zip-documents-light-430-pdf-page-2.png",
+      "sha256": "773f2da174f3b7cfb0cdac0f4ca04c2d7745609b61b881a434f703da992a7cb6",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-430-pdf-preview",
+      "width": 430,
+      "image": "ux-vergleich/zip-documents-light-430-pdf-preview.png",
+      "sha256": "6f7034129c22a841133385c6822fba140b2b115f7774366d7c788bf21ed9e9c5",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-430-position-discard",
+      "width": 430,
+      "image": "ux-vergleich/zip-documents-light-430-position-discard.png",
+      "sha256": "17e3851e548fcbd1e29dd3ae2ab008d9ba0ff288e24b21a07bacc1a9f4dd804a",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-430-reminder-history",
+      "width": 430,
+      "image": "ux-vergleich/zip-documents-light-430-reminder-history.png",
+      "sha256": "df64a0f6a07df6c3e8253a42c593fbacde529acb044b5c4150ad3dde351e7bff",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-Weitere Aktionen-actions",
+      "width": 430,
+      "image": "ux-vergleich/zip-documents-light-Weitere Aktionen-actions.png",
+      "sha256": "8ad38db10cda1890e4bb5faafc769d272d6948c126163c5fee65d4ea5a659165",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-1440-appearance-rows",
+      "width": 1440,
+      "image": "ux-vergleich/zip-modules-light-1440-appearance-rows.png",
+      "sha256": "3bb13a03fab1250ff96534ef7c876b043f9299f2614ae41d74e72e451a942a17",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-1440-header-account",
+      "width": 1440,
+      "image": "ux-vergleich/zip-modules-light-1440-header-account.png",
+      "sha256": "72c0ff3eb5023e0a5be847534ee2fb4d7ce376fb0c4c9819d9a21bcf60f78ef2",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-1440-header-notifications",
+      "width": 1440,
+      "image": "ux-vergleich/zip-modules-light-1440-header-notifications.png",
+      "sha256": "17be0f6ffdb57854099ce9f933a6591462dea0b056d2078cc85db489f0bbf966",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-1440-header-search",
+      "width": 1440,
+      "image": "ux-vergleich/zip-modules-light-1440-header-search.png",
+      "sha256": "43cb5e9ae6a9947f845b0074ef8eddbea5cabfab60f59aeccf509f62c45b086f",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-1440-operator-monitoring-performance",
+      "width": 1440,
+      "image": "ux-vergleich/zip-modules-light-1440-operator-monitoring-performance.png",
+      "sha256": "147b683a8d35b9a64372e1a7f820a2445b10042a87da3e82b69586f364d58803",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-1440-operator-monitoring-shared",
+      "width": 1440,
+      "image": "ux-vergleich/zip-modules-light-1440-operator-monitoring-shared.png",
+      "sha256": "934f404548bc474a48c99c2b23691f2aabbbe404a9a560ff1c789d6b3d51cc6d",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-320-400-manual-time-final",
+      "width": 320,
+      "image": "ux-vergleich/zip-modules-light-320-400-manual-time-final.png",
+      "sha256": "68e3c974d8c558c829291c59f3cd3b82a6a5e190397ef323b1cd8b377e0023cc",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-320-appearance-rows",
+      "width": 320,
+      "image": "ux-vergleich/zip-modules-light-320-appearance-rows.png",
+      "sha256": "bbaf90f62ef03d9a111d6abafb7a492911d8da3d52f0c7a04555bbc6a1a28cf2",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-320-document-settings",
+      "width": 320,
+      "image": "ux-vergleich/zip-modules-light-320-document-settings.png",
+      "sha256": "46b43b89f4b3da92b431bbb683f26fea3e6f6e4dd9555c6bbc24a664273951f0",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-320-header-account",
+      "width": 320,
+      "image": "ux-vergleich/zip-modules-light-320-header-account.png",
+      "sha256": "a3099712c0c53377598e8e36254dc092489f78b77d63d21505b3c30f76a0d3f2",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-320-header-notifications",
+      "width": 320,
+      "image": "ux-vergleich/zip-modules-light-320-header-notifications.png",
+      "sha256": "213d1effe397d917e67da5eba85ae7622276226e0cf9538270777fb4c693c90e",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-320-header-search",
+      "width": 320,
+      "image": "ux-vergleich/zip-modules-light-320-header-search.png",
+      "sha256": "23d3e0f8fd19528600e8201b4fe0fdb409e392b990bba6a535a055fb4639df1b",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-320-notification-preferences",
+      "width": 320,
+      "image": "ux-vergleich/zip-modules-light-320-notification-preferences.png",
+      "sha256": "34fa702bef4b388648dc328f536f2a46bfb39bbe16c4430d993749ebbce790cb",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-320-operator-monitoring-performance",
+      "width": 320,
+      "image": "ux-vergleich/zip-modules-light-320-operator-monitoring-performance.png",
+      "sha256": "b5ff6a3a4b651b8177360ca751cc323ed3e461938c7bacb8d98d84e60d3419f1",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-320-operator-monitoring-shared",
+      "width": 320,
+      "image": "ux-vergleich/zip-modules-light-320-operator-monitoring-shared.png",
+      "sha256": "31492975946a059d3b50b6e44d0c78391b200acc39c1057736e56f37bb358497",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-320-operator-restrictions",
+      "width": 320,
+      "image": "ux-vergleich/zip-modules-light-320-operator-restrictions.png",
+      "sha256": "b5d975b4543b0277ed50df7aae46140a27dcd4588299704b1430801f9bdd032b",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-320-security-settings",
+      "width": 320,
+      "image": "ux-vergleich/zip-modules-light-320-security-settings.png",
+      "sha256": "6a279947997972e8bd516023b55f0cfe73fc1ff3f5bea4538da302eb7c3acb3c",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-320-subscription-settings",
+      "width": 320,
+      "image": "ux-vergleich/zip-modules-light-320-subscription-settings.png",
+      "sha256": "25211f137ad2eadad0425f7e5b56581176c6d5a2b7fee0dc78cb70cd3a8dd1bb",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-320-time-groups-final",
+      "width": 320,
+      "image": "ux-vergleich/zip-modules-light-320-time-groups-final.png",
+      "sha256": "7c7596768dba8179a0a3c93eeff6b26768fb0e8123c8bb2bd8156d0b9b3abe5b",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-375-400-chat",
+      "width": 375,
+      "image": "ux-vergleich/zip-modules-light-375-400-chat.png",
+      "sha256": "d5e45721d0cb8fb3847ff22f9bd71606ac9c8e5a51fb28d2fcd0f3a9cd63f348",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-375-400-manual-time",
+      "width": 375,
+      "image": "ux-vergleich/zip-modules-light-375-400-manual-time.png",
+      "sha256": "7e97de5e774fcf8458242863c31682e5767afc2c7cfa17283a4fad332926dccb",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-375-568-manual-time",
+      "width": 375,
+      "image": "ux-vergleich/zip-modules-light-375-568-manual-time.png",
+      "sha256": "6108579d6049e2cd92c67618ff120464a8db3a4a3841536350de79abd962a8f2",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-390-appearance-rows",
+      "width": 390,
+      "image": "ux-vergleich/zip-modules-light-390-appearance-rows.png",
+      "sha256": "a4a2a01e7e127c76a34f17be743fdd4ad060da369f0f78c6ed8f9ad3211449d0",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-390-billing-09",
+      "width": 390,
+      "image": "ux-vergleich/zip-modules-light-390-billing-09.png",
+      "sha256": "5ed6e7aa4b5ad568052d20b3b80625e0860359426be00ba3e2fc9ac453c50cef",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-390-billing-10",
+      "width": 390,
+      "image": "ux-vergleich/zip-modules-light-390-billing-10.png",
+      "sha256": "f0655dfde0e5bf1a9a10a92d061dd16799d3ffeab4dfae16d8e62c1ca61b7fd5",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-390-grouped-settings",
+      "width": 390,
+      "image": "ux-vergleich/zip-modules-light-390-grouped-settings.png",
+      "sha256": "b2aac344248a89685b932ac572f26e1e23948011663c5d84e3f827fbade04364",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-390-header-account",
+      "width": 390,
+      "image": "ux-vergleich/zip-modules-light-390-header-account.png",
+      "sha256": "2ebcccc2b6acc2ca3a5ff554a1ebb625dd0f22e6f870f3fc81499fd5e427ba21",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-390-header-notifications",
+      "width": 390,
+      "image": "ux-vergleich/zip-modules-light-390-header-notifications.png",
+      "sha256": "8d1a50c7fda96016d4a435c6b8f0b09e94aa93f062a64bd847fd2b62d5ba4d25",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-390-header-search",
+      "width": 390,
+      "image": "ux-vergleich/zip-modules-light-390-header-search.png",
+      "sha256": "c28f0494e9f3a4254a083cdadd081fd4c0f12a216b2b4b2573d09d5816eb1bfa",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-390-notification-preferences",
+      "width": 390,
+      "image": "ux-vergleich/zip-modules-light-390-notification-preferences.png",
+      "sha256": "dcc5e494bf2e9fc27d5c90966e636a7d51f6298ba3b6152dd0562a3fe52ce751",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-390-shared-glass-admin",
+      "width": 390,
+      "image": "ux-vergleich/zip-modules-light-390-shared-glass-admin.png",
+      "sha256": "f31fb1121fffc9af2185a26bc6154a00595348c2e3f339b0ea632be93ffc8b2e",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-390-shared-glass-dashboard",
+      "width": 390,
+      "image": "ux-vergleich/zip-modules-light-390-shared-glass-dashboard.png",
+      "sha256": "d62f289183b1ffd57abc55ee5829966d8dbb94b01162a4f1dcf3b7b93c08cba9",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-430-400-employee-wizard",
+      "width": 430,
+      "image": "ux-vergleich/zip-modules-light-430-400-employee-wizard.png",
+      "sha256": "f5ded9f59691f0cf259e64f8139f10ef221c4b05b2711e1f2e8ebdbaff2ff3b4",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-430-action-sheet",
+      "width": 430,
+      "image": "ux-vergleich/zip-modules-light-430-action-sheet.png",
+      "sha256": "422d4954885c202090acd8ee7922567242e6bc18c5e8232adaac585de8f3b06a",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-430-employee-documents",
+      "width": 430,
+      "image": "ux-vergleich/zip-modules-light-430-employee-documents.png",
+      "sha256": "f019f6f9b079ce0b2821939984302c6919a53cf3e0912737ffbc06f4a3561b9e",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-430-employee-expenses",
+      "width": 430,
+      "image": "ux-vergleich/zip-modules-light-430-employee-expenses.png",
+      "sha256": "1cbead8dd6aa9cb8dd7e970deae16b75a68a46600bdee7f3dd84d22258176b5c",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-430-employee-time",
+      "width": 430,
+      "image": "ux-vergleich/zip-modules-light-430-employee-time.png",
+      "sha256": "e7cb41a8eadd7212884395758081f987af04c97ed2ea9d0473c50045e4d414fb",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-430-operator-monitoring-performance",
+      "width": 430,
+      "image": "ux-vergleich/zip-modules-light-430-operator-monitoring-performance.png",
+      "sha256": "2f5781806edaf0d87ab525e89461a5a29e24a1ef4ddfdadc0f1477d9b775326e",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-430-operator-monitoring-shared",
+      "width": 430,
+      "image": "ux-vergleich/zip-modules-light-430-operator-monitoring-shared.png",
+      "sha256": "40c37178a2d4a4c661513173b01463649a49cd1c07a30370ef2762f70794d61a",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-430-period-sheet",
+      "width": 430,
+      "image": "ux-vergleich/zip-modules-light-430-period-sheet.png",
+      "sha256": "7ebc3aec77c4bd3f8849b96b857b34d7f65a92ce13cf0d61aca8efa6161fafb0",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-430-time-entries",
+      "width": 430,
+      "image": "ux-vergleich/zip-modules-light-430-time-entries.png",
+      "sha256": "d58b4696d0ef115c53c53463a5edd2a91e86aef6f032ba31ce9e37994c7470bf",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-430-time-settings",
+      "width": 430,
+      "image": "ux-vergleich/zip-modules-light-430-time-settings.png",
+      "sha256": "aaac9dcab7795a21acd6b3884ea9460e8e1c66c88f0b3fb4e8c4d77df3d35524",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-768-appearance-rows",
+      "width": 768,
+      "image": "ux-vergleich/zip-modules-light-768-appearance-rows.png",
+      "sha256": "a9e00df798b36c6927c32122b48dbf11d652091b9473ff7f63ea469956fc68b1",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-768-header-account",
+      "width": 768,
+      "image": "ux-vergleich/zip-modules-light-768-header-account.png",
+      "sha256": "9b005fe8d62312c86c47cac1580c44121a7b8015b24fbc374eaa3bf99a8ce013",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-768-header-notifications",
+      "width": 768,
+      "image": "ux-vergleich/zip-modules-light-768-header-notifications.png",
+      "sha256": "a69697c3137d8850832f593b1080dadff560dbf4d75cdab74b5f7d0307f6728e",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-768-header-search",
+      "width": 768,
+      "image": "ux-vergleich/zip-modules-light-768-header-search.png",
+      "sha256": "3b6d93d2b54a02a3126989b78ecd63fc63bf6fb78ff04b49b9c9062d9f4cc4a8",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-820-operator-monitoring-performance",
+      "width": 820,
+      "image": "ux-vergleich/zip-modules-light-820-operator-monitoring-performance.png",
+      "sha256": "fb4e87436825b4b842865bdd8b84feb8032d4fc8e6deb2329a510d327460db0c",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-820-operator-monitoring-shared",
+      "width": 820,
+      "image": "ux-vergleich/zip-modules-light-820-operator-monitoring-shared.png",
+      "sha256": "31de1987fa17a9928e3692168f47bd3d918cf8dd29bfb9c9ddbcd7b159215e4e",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-Mitarbeiteraktionen-actions",
+      "width": 430,
+      "image": "ux-vergleich/zip-modules-light-Mitarbeiteraktionen-actions.png",
+      "sha256": "0b7e9b89dba20025401c28f630409a8ad0fad197e6d8dcbbb54588854caf1542",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-operator-account",
+      "width": 320,
+      "image": "ux-vergleich/zip-modules-light-operator-account.png",
+      "sha256": "76f54f873c0aa236c152a6846b5875971189eac6fc39c9f54797eeddd3244ebf",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-operator-announcement-sheet",
+      "width": 390,
+      "image": "ux-vergleich/zip-modules-light-operator-announcement-sheet.png",
+      "sha256": "02d526a1c29ee09f3c520263b746aa9dc013c99da03ba8ccbabf120814ab5ae1",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-operator-audit-contract",
+      "width": 390,
+      "image": "ux-vergleich/zip-modules-light-operator-audit-contract.png",
+      "sha256": "361442654a092412a9dd5ead484a51c70e9249ab72517fd9716caf4e22f0041d",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-operator-customers-shared",
+      "width": 390,
+      "image": "ux-vergleich/zip-modules-light-operator-customers-shared.png",
+      "sha256": "3400aea8c8fad98fd3cdabcef25cabc5499120f386cea36a64061f62da93f79a",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-operator-dashboard-production",
+      "width": 320,
+      "image": "ux-vergleich/zip-modules-light-operator-dashboard-production.png",
+      "sha256": "b004a07f46e64addd5431cb29c1b3421b7308bf1b1cb9a03b2dd0d77dd1203a4",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-operator-finance-empty",
+      "width": 320,
+      "image": "ux-vergleich/zip-modules-light-operator-finance-empty.png",
+      "sha256": "10ac02513137fc0e661ef097a2d1b84ce4504ad8ba2cc52b125181e6758df5a9",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-operator-internal-message",
+      "width": 390,
+      "image": "ux-vergleich/zip-modules-light-operator-internal-message.png",
+      "sha256": "5cebc31fb3b4bfb4e95f127f28becfb168a884409f18553844bdb564aec854b7",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-operator-payments-empty",
+      "width": 320,
+      "image": "ux-vergleich/zip-modules-light-operator-payments-empty.png",
+      "sha256": "989e78db09e4a127ab1cf44b215e4e1d221a5ef44446ccfbc860a6498d0dd810",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-operator-restriction-confirm",
+      "width": 390,
+      "image": "ux-vergleich/zip-modules-light-operator-restriction-confirm.png",
+      "sha256": "9547ce8fc6ecf0786196b7f3054ff87453fedc8e3f3748b8c0e4ea8b0ae3a987",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-operator-subscription-sheet",
+      "width": 390,
+      "image": "ux-vergleich/zip-modules-light-operator-subscription-sheet.png",
+      "sha256": "157d5acba0f4686dd56d3c4ea72c44c1c7ce65193aeec680c9192d06d0cd56e2",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-operator-subscription-summary",
+      "width": 390,
+      "image": "ux-vergleich/zip-modules-light-operator-subscription-summary.png",
+      "sha256": "5410855e720dfe2606fb84a32445ed0e4c40ba9bd1aaca5fedaabbd260c62b2e",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    },
+    {
+      "route": "Zustand · light-Produktaktionen-actions",
+      "width": 430,
+      "image": "ux-vergleich/zip-modules-light-Produktaktionen-actions.png",
+      "sha256": "1139933558fa757eff821dc11b208f6e19e646bdb9f77ab00e2f04d57c6f27e5",
+      "classification": "Abgeleiteter Zustand aus dem erfolgreichen isolierten Bedienablauf; keine eigenständige ZIP-Freigabe."
+    }
+  ],
+  "tests": [
+    {
+      "test": "scripts/deployed-assets-test.mjs",
+      "passed": true,
+      "error": null
+    },
+    {
+      "test": "scripts/localization-test.mjs",
+      "passed": true,
+      "error": null
+    },
+    {
+      "test": "scripts/localization-coverage-test.mjs",
+      "passed": true,
+      "error": null
+    },
+    {
+      "test": "scripts/maintenance-test.mjs",
+      "passed": true,
+      "error": null
+    },
+    {
+      "test": "scripts/readiness-integrity-test.mjs",
+      "passed": false,
+      "error": "Bash monitoring probe returned null status instead of 0 on Windows."
+    },
+    {
+      "test": "scripts/security-exception-test.mjs",
+      "passed": true,
+      "error": null
+    },
+    {
+      "test": "scripts/runtime-integrity-test.mjs",
+      "passed": true,
+      "error": null
+    },
+    {
+      "test": "scripts/rate-limit-test.mjs",
+      "passed": true,
+      "error": null
+    },
+    {
+      "test": "scripts/demo-session-test.mjs",
+      "passed": true,
+      "error": null
+    },
+    {
+      "test": "scripts/file-scan-test.mjs",
+      "passed": false,
+      "error": "Windows rejected the Unix-socket protocol peer with EACCES."
+    },
+    {
+      "test": "scripts/file-rescan-test.mjs",
+      "passed": false,
+      "error": "POSIX process.getuid is unavailable on Windows."
+    },
+    {
+      "test": "scripts/auth-integrity-test.mjs",
+      "passed": false,
+      "error": "Development file-access exception expected HTTP 200 but received 423; unresolved. No security gate disabled."
+    },
+    {
+      "test": "scripts/registration-test.mjs",
+      "passed": true,
+      "error": null
+    },
+    {
+      "test": "scripts/statistics-test.mjs",
+      "passed": true,
+      "error": null
+    },
+    {
+      "test": "scripts/customer-financial-projection-test.mjs",
+      "passed": true,
+      "error": null
+    },
+    {
+      "test": "scripts/payment-reminder-test.mjs",
+      "passed": true,
+      "error": null
+    },
+    {
+      "test": "scripts/v23-2-ux-test.mjs",
+      "passed": true,
+      "error": null
+    },
+    {
+      "test": "scripts/glass-ux-test.mjs",
+      "passed": true,
+      "error": null
+    },
+    {
+      "test": "scripts/ui-build-cache-test.mjs",
+      "passed": true,
+      "error": null
+    },
+    {
+      "test": "scripts/architecture-selfcheck.mjs",
+      "passed": true,
+      "error": null
+    },
+    {
+      "test": "scripts/permission-selfcheck.mjs",
+      "passed": true,
+      "error": null
+    },
+    {
+      "test": "scripts/theme-selfcheck.mjs",
+      "passed": true,
+      "error": null
+    },
+    {
+      "test": "scripts/client-session-test.mjs",
+      "passed": true,
+      "error": null
+    },
+    {
+      "test": "scripts/migration-test.mjs",
+      "passed": true,
+      "error": null
+    },
+    {
+      "test": "scripts/data-lifecycle-schema-test.mjs",
+      "passed": true,
+      "error": null
+    },
+    {
+      "test": "scripts/ux-regression-test.mjs",
+      "passed": true,
+      "error": null
+    },
+    {
+      "test": "scripts/pwa-preview-test.mjs",
+      "passed": true,
+      "error": null
+    },
+    {
+      "test": "scripts/pwa-lifecycle-test.mjs",
+      "passed": true,
+      "error": null
+    },
+    {
+      "test": "scripts/document-presentation-test.mjs",
+      "passed": true,
+      "error": null
+    },
+    {
+      "test": "scripts/qa-acceptance-test.mjs",
+      "passed": true,
+      "error": null
+    },
+    {
+      "test": "scripts/qa-plan-test.mjs",
+      "passed": true,
+      "error": null
+    },
+    {
+      "test": "scripts/browser-shards-test.mjs",
+      "passed": true,
+      "error": null
+    },
+    {
+      "test": "scripts/navigation-contract-test.mjs",
+      "passed": true,
+      "error": null
+    },
+    {
+      "test": "scripts/ui-foundation-test.mjs",
+      "passed": true,
+      "error": null
+    },
+    {
+      "test": "scripts/navigation-foundation-test.mjs",
+      "passed": true,
+      "error": null
+    },
+    {
+      "test": "scripts/data-foundation-test.mjs",
+      "passed": true,
+      "error": null
+    },
+    {
+      "test": "scripts/foundation-integration-test.mjs",
+      "passed": true,
+      "error": null
+    },
+    {
+      "test": "scripts/process-draft-test.mjs",
+      "passed": true,
+      "error": null
+    },
+    {
+      "test": "scripts/observability-test.mjs",
+      "passed": true,
+      "error": null
+    },
+    {
+      "test": "scripts/operator-announcement-test.mjs",
+      "passed": true,
+      "error": null
+    },
+    {
+      "test": "scripts/operator-contract-test.mjs",
+      "passed": true,
+      "error": null
+    },
+    {
+      "test": "scripts/ux-style-contract-test.mjs",
+      "passed": true,
+      "error": null
+    },
+    {
+      "test": "scripts/ux-contract-check.mjs",
+      "passed": true,
+      "error": null
+    }
+  ],
+  "notes": [
+    "Referenz und Produkt wurden im selben Edge/Chromium mit 1440 bzw. 390 × 1000 CSS-Pixeln aufgenommen. Inter/system-ui, keine extern geladene Ersatzschrift.",
+    "Die originalen HTML-Dateien sind unverändert. Für die Vergleichsaufnahme wurden nur die äussere Vorschauumrahmung und der Bildschirmumschalter ausgeblendet.",
+    "Das Produkt verwendet isolierte synthetische API-Daten. Namen und Kontakte sind vergleichbar. Summen, Reihenfolge, echte Zustände und dynamisches Jahr stammen aus der laufenden Fachlogik.",
+    "Bewusste Vorgaben: echte bestehende Markenassets, unveränderte Bottom-Navigation, mindestens 44-px-Touchziele und 16-px-Mobilformulare.",
+    "Kein automatischer Pixelgleichheitsnachweis, keine Produktionsfreigabe. Fehlende Adminseiten und zusätzliche Zustände sind abgeleitet."
+  ],
+  "browserChecks": [
+    {
+      "name": "Gesamte Routenmatrix",
+      "kind": "matrix",
+      "cases": 170,
+      "passed": true,
+      "interactions": []
+    },
+    {
+      "name": "Admin mit API-Fixture",
+      "kind": "matrix",
+      "cases": 22,
+      "passed": true,
+      "interactions": []
+    },
+    {
+      "name": "Aktueller Light/Dark-Abgleich",
+      "kind": "matrix",
+      "cases": 48,
+      "passed": true,
+      "interactions": []
+    },
+    {
+      "name": "Kundenabläufe",
+      "kind": "interactions",
+      "cases": 1,
+      "passed": true,
+      "interactions": [
+        "customers"
+      ]
+    },
+    {
+      "name": "Dokumentabläufe",
+      "kind": "interactions",
+      "cases": 1,
+      "passed": true,
+      "interactions": [
+        "documents"
+      ]
+    },
+    {
+      "name": "Weitere Bedienabläufe",
+      "kind": "interactions",
+      "cases": 1,
+      "passed": true,
+      "interactions": [
+        "products",
+        "employees",
+        "finance",
+        "time",
+        "expenses",
+        "chat",
+        "billing",
+        "header",
+        "operator",
+        "settings",
+        "data",
+        "chrome"
+      ]
+    }
+  ],
+  "runtimeSourceSha256": "48ec3944d5f591c42dc2047a53ee91b64482d53412aef5f39214fcf4a883deb3",
+  "buildId": "_NI6mwk3J6cU8kJYblGLi",
+  "runtimeFiles": {
+    "app/agb/page.tsx": "75a3b6eaca3f2c37fde3f148986c05a9468d23008f263299163b4a8abd1e6402",
+    "app/angebote/[id]/page.tsx": "a1f5153788f47ff54077a7ce0aa08142d2cf7ab13d8e94abf16a8ac34b7d363c",
+    "app/angebote/layout.tsx": "6185cd4bdbef31f664260ac0737df4e9ef8c873a8c5def3b016ac70e4b559f42",
+    "app/angebote/neu/page.tsx": "bd8eef0bebb7d250161bbe789a22377245447516432b806f5c80b5f757c0df74",
+    "app/angebote/page.tsx": "4d7c980cc3b84b60d78e6ae327be0b37ea5bf614ce4c19d68e97d68388ff19b0",
+    "app/api/auth/invitation/route.ts": "a9165bbc5626ce257a2403c393bbcfe831a9efe8a78f11400d0f4af09d4d59d3",
+    "app/api/auth/login/route.ts": "2ef2476b8f08d00fbb3acffd7aba477bbb1af746a7c48022a5867f2c70f8e06a",
+    "app/api/auth/logout/route.ts": "1b51d50b3ad6ec7e6626cb256eb1c9fdf7c263d1db742adba8302744d23e7e02",
+    "app/api/auth/mfa/confirm/route.ts": "4ce23acc4c84b957545ac316c3c49941180b0d05f722596a5aa9c333bf656e5d",
+    "app/api/auth/mfa/route.ts": "cfdc6bd785273360206c49c331a64fb6ef264d03b5d8b832c7566481c9b27f9b",
+    "app/api/auth/mfa/setup/route.ts": "bc79b7b4d780a57d4cc5ab6b3c3b056e2f003856e985ccc68fbe3840a0eb1d46",
+    "app/api/auth/password/route.ts": "1065c845c8ed36847de9c57709cf16609a512bf7ac0e61aaf1edefda5c2610b9",
+    "app/api/auth/recover/route.ts": "ceea47f52bdb382dd3262a957d7ece7956bbd258793e40e757ad05dd3448f333",
+    "app/api/auth/register/route.ts": "f27d6ac937263ce8a3ba4c6f95118775c4aa2421a5961f72b6d2a5d06383eee1",
+    "app/api/auth/resend-verification/route.ts": "684ac5e417ab4cdef15a497a90c3e3f87b242e22db838a88a7e34381d9dce9bc",
+    "app/api/auth/session/route.ts": "a8185a0aed65daed453fb7b11dd88a98085bff15bd7332a0afde1ed8c6871619",
+    "app/api/auth/sessions/[id]/route.ts": "6ab663bf1d0956fa06331004a6bef9cac3843f0a779495607d346f412184efda",
+    "app/api/auth/sessions/route.ts": "405c1dcaab618dd8e32c8e0090581d77d7916da8d19a3bed3fb43ed835fd1a07",
+    "app/api/auth/verify-email/route.ts": "1ba91fbc32dd265633c4fee57ea0f629b23d9c06935e36914fda349e62981757",
+    "app/api/billing/catalog/route.ts": "7b2962efd95c83772c534c0ac9996cf5447f4777aea6d7a53a5c796a67c55b16",
+    "app/api/billing/checkout/route.ts": "632a488559f616a083fe71e8dd5e8ee99340060bc1b90f4fa5a27317328cba79",
+    "app/api/billing/portal/route.ts": "e9b15ca566fac321090081ae243b476d6d4c28f9864f8cb2b498a7c389c651c3",
+    "app/api/billing/webhook/route.ts": "8812bd213a1b0bba4775fff7514df3ea2eb62285831579b90ba226efe14e2dbf",
+    "app/api/customers/[id]/activity/route.ts": "94e845f7714a38932676182ec99e5a7126310ff6d655d3d81f3d31b6adfa0f3e",
+    "app/api/customers/[id]/contacts/[contactId]/route.ts": "957dca854df44fac1f226c9a8c9323b6b1acba2a492bf9d911ed6ca74a2658ab",
+    "app/api/customers/[id]/contacts/route.ts": "f4b1e9d74577b46ba3e465f9ef6fc9979e99bd117faf7d2bd25fd8a17e1231c1",
+    "app/api/customers/[id]/documents/route.ts": "0396c4f594bbc3cb8408e4a4e6ed80a8796b02612fc43c226bcbe0fc017d5b8a",
+    "app/api/customers/[id]/route.ts": "99a543317aa6e96353949473074fa473676a4f2b7d69a4cd3262d0f3d7cf3490",
+    "app/api/customers/duplicates/route.ts": "b8b753d40d7e397753fff1dfee75164dd51208a98e822abca1126a5525184319",
+    "app/api/customers/route.ts": "9ad6e84035001d96fca4233074590b4cda6607aebaff30e8c4655740304eae82",
+    "app/api/dashboard/route.ts": "0ef20f3797d04f78d58f51901838fdb303b6f28d6a368062b9a00d84229a85f1",
+    "app/api/demo/dashboard/route.ts": "2e334b1258d4560106c210aa5d972d956b53bd1d6602fe726bd19a73c35760eb",
+    "app/api/demo/data/route.ts": "c83d6ba3bdc580752199738ac54a38c2d532ee70bc9847403f063a601e1986e2",
+    "app/api/demo/finance/route.ts": "d624b687ba7c98c089125e75150a8825788f303b0386e5b873eb513a2429cb47",
+    "app/api/demo/platform-finance/route.ts": "a1723b6ca297fdbdd64bb96b3de26673ad77738f8322c2d23e2e61af679d7f2a",
+    "app/api/demo/session/route.ts": "b74c4a2123a53af3370bba0d37903450db2c97bd8f3fba8f77ccead0ed6d35ac",
+    "app/api/documents/[number]/credits/route.ts": "a600c20592fada95fd240761aa8ecda743ef6bc27651017296587a8e378abae8",
+    "app/api/documents/[number]/pdf/route.ts": "05286ece2e98d62d96b7d3cbd2aaaefcf1105b158a36de3c83d5f1390f909381",
+    "app/api/documents/[number]/refunds/route.ts": "5cf4b140edb1d6ad74738e3dc3c9458d287949bcbccebf237cf5c39236738b44",
+    "app/api/documents/[number]/revision/route.ts": "9c22cb9459ca8dfeeece38691fea59045dfadabd06023936ac287e81e867ed12",
+    "app/api/documents/[number]/route.ts": "3f6b6ffe7caaa7e92d8b33a050925bb96515fcde92fb8fb7943c86cd183bcea6",
+    "app/api/documents/[number]/send/route.ts": "1389f35e6e386241579a345173189de322204634f2ba6d21cf5d22358df094ae",
+    "app/api/documents/[number]/status/route.ts": "5a156152dcfe9406adef19d6549d24c022edc757369ffb8f1bcb4e7a949de58e",
+    "app/api/documents/preview/route.ts": "01e07019a7a2189aff567365490141d211166d385480857ecf6c157ab6649077",
+    "app/api/documents/route.ts": "1b842ba1acbc8681cadfc24d37fed3ecf482187b205fe4f2d97ab99f979db40b",
+    "app/api/employees/[id]/route.ts": "263a10609869de8a4501f0b60aed2c964a3eeb2c419a9c3d3b8afa4632deccd9",
+    "app/api/employees/route.ts": "f37dcf51a9dda9b10700013be0de3fde70bb90965635ea9e265651a0b1dec590",
+    "app/api/expenses/[id]/reimbursement/route.ts": "b1e1bb4736326c066c076eafe6773071950f2ffd401e15a61cf18936a58e77aa",
+    "app/api/expenses/[id]/route.ts": "481aba45a8f6492b82d3414b2dfb850f153ce13420e1816096dbc9664efff5a1",
+    "app/api/expenses/billing/route.ts": "f0b523abc7059c2ce15bec4d28f77e995719d7acaa51aa412cf8a62a8a7996f2",
+    "app/api/expenses/options/route.ts": "f0311d3e244b3b7c600f64b4633d8c71b3ea739be08c78c0ca5fdf1239a0bd8f",
+    "app/api/expenses/route.ts": "2776bab5c21c233cbd69311b9f982263eb974a3430987581b6f6ee42d233fddd",
+    "app/api/expenses/scan-receipt/route.ts": "181faee2d7bb8f5e1a321e3d325d923caa8337732627117af30e04e1812e3047",
+    "app/api/files/[id]/download/route.ts": "a59e0466a947352a152686911333cf531683bb10b631242d086679b0f7cfb90b",
+    "app/api/files/route.ts": "164636b64627149356bcd46dfbf2cf860ae9d47056313645df493ffd9af11a93",
+    "app/api/finance/overview/route.ts": "a9c97b7f520800ee37716d11c10e3b033724afd40b5396e130602ecbd7a0fc94",
+    "app/api/finance/route.ts": "7ffb738c5a45a9fc8fa0e8d01245310f8f0d727575900c0e25ac9599e72c3b1f",
+    "app/api/health/ready/route.ts": "a8acaa27f88a35cfdf21a53ab8d1f6191bcf831a65123af405ab17e407214bd9",
+    "app/api/health/route.ts": "d41cd882229bf245a2d635c9719877483c0b8fd65ed0027c0a3a6ac2f76d4841",
+    "app/api/integrations/status/route.ts": "a3d5abf8b11632659a92ab73b8e185441604015fa344180c01a4d1d7c254df76",
+    "app/api/notifications/[id]/route.ts": "adb3f0b420e831a214972aaa144d016b616ff5d10808777452f8e0079bacfcff",
+    "app/api/notifications/route.ts": "dd12a24f1322a5dc3decd8534e4d2fffd59dc0dfd7d52a59317ea03973e1f254",
+    "app/api/operator/accounts/[id]/route.ts": "be5da6f67d681aa5f471f2d744771ae6c65946a6e564fb7b6e3ef9cc4e18d463",
+    "app/api/operator/accounts/route.ts": "7b82dc79bfad497161d9ab443a620be8ec22a6a4bea9352524fba07ae21c5b6c",
+    "app/api/operator/announcements/route.ts": "cda12c6c085543568c5ef0812fca37a86b4729eb1aabb6616dd637fd75d265e3",
+    "app/api/operator/audit/route.ts": "7c6726819055f8c1b771d35ff6a0e5944a09f4c38c934c09513ba2832d06da18",
+    "app/api/operator/customers/[id]/route.ts": "f528b248cc4bdf2fab2ccdacc2955f80da97354b38037b8cd73a1ac25178185a",
+    "app/api/operator/customers/route.ts": "cb6869b5da2ea9b78f82b4fb4cfcbad4f4e990546ad535b064fb2fd1b4b46595",
+    "app/api/operator/dashboard/route.ts": "c85dc6d946fde49ea884544f240186df608a8bdd6038da941c1ddf39af70f626",
+    "app/api/operator/demo-session/route.ts": "519dbff198a924aa1244842bde521ec72c3ab2d6fc9773417edd7ce49dcd769a",
+    "app/api/operator/finance/route.ts": "bad585e0502c76646cfc566589e48386266af5d2617307f14937f6f421e78567",
+    "app/api/operator/integrations/email-test/route.ts": "0f4451e2a57bd121197fa7c83fd56950c5b1102f22ad1c43e4f831f54f4a67ad",
+    "app/api/operator/logout/route.ts": "27a1274b88e8bb876f1eb4114648bb8ec288dff7d786730b302ac0a4d0795efc",
+    "app/api/operator/maintenance/route.ts": "6728eef07004fe9e5af99e7fd1df7dfce42fa7afdc86b8eed9df35af5186c1bf",
+    "app/api/operator/monitoring/route.ts": "2503981ccf2ba3785e9bc7a5ce48756c5677d69a05f6f065d28107603eb1804a",
+    "app/api/operator/payments/route.ts": "8d24271ff731ce7b15aedb30d7b968d20b97c96b74f4ae084fc7329f8ed06050",
+    "app/api/operator/restrictions/[id]/route.ts": "05dea3e750ce4182010af0a713cea41a4663e7726ee8f99e1466d548a4f22a04",
+    "app/api/operator/restrictions/route.ts": "a405e43946275b05372b8321f86340a340936022387ecb3b5a8bbcda71e031d8",
+    "app/api/operator/sso/callback/route.ts": "6c02ca6d5645042a727e60730ecc44552fb9dacce02da25685bd8415827a4e83",
+    "app/api/operator/tickets/[id]/messages/route.ts": "14a5bf0f5ab80968c9e9a744e5ccf6acc0a49738734cebbce03f5df6ba937e43",
+    "app/api/operator/tickets/[id]/route.ts": "3f39a984247f23c82e0180b44427f2da10f04d042818ef26a9a88bad6e1647b5",
+    "app/api/operator/tickets/route.ts": "d4aa0bff333b5812b3e832dc9b50b7c7572ac774a367c7cb1ce8dbc9962a7085",
+    "app/api/operator/users/route.ts": "49f9462131ca3e72a0b167b93feafa143a30698343fdc1a03b4d2a2716a0be47",
+    "app/api/payments/[id]/route.ts": "a2197670dd284be98cc6a08331b735b63b3ba412ae26902e5cd23d7f017cd7e3",
+    "app/api/payments/route.ts": "b01bf8c1827fe74fbe33fba94c4669e8e3846f710a1cd4214b605f9356f3e034",
+    "app/api/products/[id]/route.ts": "a77df0b3a3f8a48a76ecb8db64902a8ede87f96fdcd77a694dcc9b2b0f206059",
+    "app/api/products/route.ts": "fd1b9c73b068c082ecf4772a2ab9112a7ef4b8985fd61eb6115b51ac6e886a7a",
+    "app/api/projects/[id]/route.ts": "0f0f7fb424e0458a3512f496b8900d0d19c89c384b8241e91a473ef676b538d9",
+    "app/api/projects/route.ts": "d1ae3ac5886ac7e5689f8ab48c7efd93e9c2fd0348f21ac1bb1b9a98b42d28dc",
+    "app/api/reports/route.ts": "3b28ec1339bbacca93e0b0fa7637b2641b6493e1c6f964d216c822849a763451",
+    "app/api/search/route.ts": "65ea043a97dc4cc491302b6114ea51e38cd4af1ab6cf77d13148888841a71a12",
+    "app/api/settings/company/route.ts": "4220c9faff9b367c56c1c95d46b74f9cae5b2f81fe3a2c31d6d4e49c2cfa1c68",
+    "app/api/settings/documents/route.ts": "1c525018bb2bb58aa8dabd1d219bf2cfa5a59462ece01c83e47b6d196218fbf5",
+    "app/api/settings/notifications/route.ts": "120ff849440bc0e30a6b3d3a9577b74ac9e9e5812bb10836a0bdb02700972b8f",
+    "app/api/settings/profile/route.ts": "a68f5e12d4ca911395b335d7eb0bbe0caf2c4c5b7770d228c63a4e7d40f34254",
+    "app/api/settings/subscription/route.ts": "6b25bd016f9a32598f31262cdea4268958ac686991d86d56180f04697187e4f0",
+    "app/api/settings/team/invitations/[id]/route.ts": "0edaf2f8295e6eaba8cd2dd499a4119b1a1bb3cd8a6ce04a6ac26d4c5c813886",
+    "app/api/settings/team/invitations/route.ts": "96cc814def756583632654e32d60faec1dd5e4f330a0518ffec93a88075eeb47",
+    "app/api/settings/team/members/[userId]/route.ts": "9d6568e698d55a2b6fc7173e5d8ebf3ba8ecd9b162d17ce78234b466f290fdf8",
+    "app/api/support/tickets/[id]/messages/route.ts": "ba7e7744280ee5fa1738060a0a50e5e4d1aa17ef4f7003feec162b41af94b892",
+    "app/api/support/tickets/route.ts": "ca897744d67cae1b72d5b6a09cd5bc44b7b9eff66e6a9d9981daa37fc7f43c59",
+    "app/api/telemetry/web-vitals/route.ts": "a3606c59e1466a9763b07930de3f52a3d320cd47241414e44455ba84e4e551f0",
+    "app/api/time-entries/[id]/route.ts": "400d22d0e4ae6eb2fe8ffa3377a04ca2f42b9547801cfef5f70ea7aad40f7c8b",
+    "app/api/time-entries/billing/route.ts": "61f1daf469f00e31424ff3c28d8287170d5125a0c191ce6861202cb99b959b2a",
+    "app/api/time-entries/policy/route.ts": "986bf9f74f4ddf08d010a633f3cf24e0bf94299303ce899b12332488e949eed0",
+    "app/api/time-entries/route.ts": "ceef7de7ac4fee81297daa100972161af6d719c2aa2ccb744d5aae1b10fc8311",
+    "app/api/time-tracker/route.ts": "6783fc40ee908c7b9dc9103314ac7a811b98f50c61ac5dfbb481bf9ddb0de9b9",
+    "app/auftragsbearbeitung/page.tsx": "3d5531a8daae88d6687f5251d6841b35013d4e815f03bf52fee8e5e9aa1fac31",
+    "app/belege/layout.tsx": "6185cd4bdbef31f664260ac0737df4e9ef8c873a8c5def3b016ac70e4b559f42",
+    "app/belege/page.tsx": "2f122b0c81a13b9a5f5f6a844e9c77b5d878500f2f3695a7e84dcf36280a4d67",
+    "app/benachrichtigungen/layout.tsx": "6185cd4bdbef31f664260ac0737df4e9ef8c873a8c5def3b016ac70e4b559f42",
+    "app/benachrichtigungen/page.tsx": "e213b4d4bed643aa5acd8515fb928123487b7ce7959285e364123c759eedad0d",
+    "app/berichte/layout.tsx": "dca039df221100b40ee67c80e37ddb96a44f7d631b4c36984d44f00ea643de4b",
+    "app/berichte/page.tsx": "088f8dd1f0e468ef5d86787710e85212bfc7b89b1528073ced016eec277c2afc",
+    "app/binso-ui.css": "1850d89922466dfaf08e83428d5082cdd0360825a606590bdc170acddd673f2f",
+    "app/dashboard/layout.tsx": "6185cd4bdbef31f664260ac0737df4e9ef8c873a8c5def3b016ac70e4b559f42",
+    "app/dashboard/page.tsx": "e9326137dffdccb9e5fad46e9ea75de7e36cdcd108b78d7775b97356db05b67e",
+    "app/datenschutz/page.tsx": "abd451902f0162a98689f6e455b8dc7984b4cc996f439d4f9fc4cb42ab9061fb",
+    "app/demo/page.tsx": "421e56fc0b187752fa068376fd5b2185a8a00bb3fcb30806a0447f8bff939403",
+    "app/design-system/analytics.css": "99d432e0ef1a99866cb3b8664a973dcc7f538edd9a15f42d4624f7a24f2c9ac3",
+    "app/design-system/auth.css": "ebcf967b23bb715806aa099d87ca6bef6f1957be7c348a0a620bdd549f0e9171",
+    "app/design-system/collections.css": "637d749c60f2377e3e5087c1c15ec589d1d1337f7c67df1cbb830326c400c3b9",
+    "app/design-system/documents.css": "c42d5fa394a8da479c7b2242372b8bfee9aa1393ee36cc38b5b8b1000b045211",
+    "app/design-system/foundation.css": "2bcc1f60c4bb7fe3ddcde8a8f2c7a698bb9b397556f18254f44082132db552de",
+    "app/design-system/layout.css": "d3a402ab009e01ef92fcc830a05c28b1b97d91fbcc27bd8d7f21c6ae04375142",
+    "app/design-system/manifest.json": "bef70eb93fe0c11c01779caa00f9baecd68dde220613c2ca7d031be018f82606",
+    "app/design-system/marketing.css": "b36700bb979f9b615c3f0c2797c1063891b4e6fe4519645d09601ea5f1e8a4ec",
+    "app/design-system/navigation.css": "819e432a712a16474e6502e509521402ccf6bfe0995781761ab1a03f692dd918",
+    "app/design-system/operator.css": "519f91ce1b3657a6f4338e5eb36fe16d4fa574aca3de97a9f5250fff12631ce0",
+    "app/design-system/overlays.css": "dc0644d1c4164b00182956e2372c16023e764ee89e7cffc4c18ca0021d479adb",
+    "app/design-system/primitives.css": "e1aa0fcbd2cf06cdb019b9cd64edea90e8d8a37c0a01fa1bb28be5b58a154fdd",
+    "app/design-system/settings.css": "8e45d5c8809fefb98255f1ed8a3c4af327794b6b70fd3c18dc5286b89ab9cb6b",
+    "app/design-system/theme.css": "5d5fd999cb792ae76e5e244e98786161c6ea94bbc7373483cca49e40772a9eab",
+    "app/design-system/workflows.css": "c82790b7637a89e96eaef93ab5cd6f68648ea0d61bcec99475c68f8bc06395c1",
+    "app/dev/ux-lab/page.tsx": "3081d0965d6d3278823cb5fcdbebef83c5778f30aa6f59a75fa6efa2b3daf50b",
+    "app/einladung/page.tsx": "8b8a63b8a9e9835232441222708dcd82a71303704195d76d8f389cc6acc40384",
+    "app/einstellungen/abonnement/page.tsx": "51da1a0d954244afd5c4a00f4f432c8c06b4f8d90f58dc4d8515e34341b204b3",
+    "app/einstellungen/benachrichtigungen/page.tsx": "f6cf3b88e41b29b965ba61184e740696bb12b2a3b9bc6f6efa430f522b6e1f06",
+    "app/einstellungen/darstellung/page.tsx": "97a857cbc00de800feee29be98fb47c69501d5002f004b99a0b664a013602c89",
+    "app/einstellungen/datenschutz/page.tsx": "1318af06a67ae1b60e84553b9d6e909d077bd4ce2d243202f73c03a6751ad2ce",
+    "app/einstellungen/dokumente/page.tsx": "a8cd85a28a20e2acba2c4880d787b9d310bedb0960dc7dff044081e059954b47",
+    "app/einstellungen/firma/page.tsx": "20c7fd4723a870701560d88463ce5b24d15419476b5bc45922d09cda49900528",
+    "app/einstellungen/konto/page.tsx": "377e7db56a11c5076150e6df9b2b58fbc89ed5cfc78e0f0cec2d04b189e1fa97",
+    "app/einstellungen/layout.tsx": "6185cd4bdbef31f664260ac0737df4e9ef8c873a8c5def3b016ac70e4b559f42",
+    "app/einstellungen/page.tsx": "a7b61ae4bfda2bdca858ba2fe22964d0ebced129a18a2e0cea83eebdadfe9e60",
+    "app/einstellungen/sicherheit/page.tsx": "dd5d6cfed84f785dc3ff65ecb9cc6c3202bac14f37d18acb602f7242c4f05da4",
+    "app/einstellungen/sprache/page.tsx": "0f942b4bb150d9f02d1adc7f67ff8f55a2b4bdea1489bd236766e35456746ba3",
+    "app/einstellungen/team/page.tsx": "72c56b97fee53e587098c010499e52088c3d7517c3979dae090cda121f9bb6ef",
+    "app/einstellungen/zeiterfassung/page.tsx": "d726f3b055461f1dc4e2d8084674d76a0169e55674d9ba92d84a4fc4bd09a576",
+    "app/email-bestaetigen/page.tsx": "a81a5eea6a9d834e23f4180e619ff966ad7891fcfc0ffb84e2c4886f67182250",
+    "app/error.tsx": "d8410629257cd82e861a05cd7b5e05ba2981daa62722cd7fac589db38a85beaf",
+    "app/finanzen/analyse/page.tsx": "de99a4d455d0fe847a2de5cafb008c152fad7132d5728dea4a3e13f3aeb092ea",
+    "app/finanzen/layout.tsx": "6185cd4bdbef31f664260ac0737df4e9ef8c873a8c5def3b016ac70e4b559f42",
+    "app/finanzen/page.tsx": "84fd49f56af309df93c41081e3c382c55e527aef1af18d46d04cc68b1f744b07",
+    "app/global-error.tsx": "42b4ee8bbde5fe5e94bb78340c3b9a9f76944a1f7023d103a441306411b842b7",
+    "app/impressum/page.tsx": "b76b689c7ef76ae8d5bda513c60fecbba967f43ef475afa7f2b279b4356848d7",
+    "app/kunden/[id]/bearbeiten/page.tsx": "effaf389239d140d8a39a9bb452586dc5aa439eb3c41e872e9428983cdb6ba00",
+    "app/kunden/[id]/page.tsx": "2bd2c97999a163064301e6dd56e80dc13c4c0fa92e2704a4678fbd57fcedc93b",
+    "app/kunden/layout.tsx": "6185cd4bdbef31f664260ac0737df4e9ef8c873a8c5def3b016ac70e4b559f42",
+    "app/kunden/neu/page.tsx": "a58b2ca049ef08bc57f6b0ebb9c89171e3b73dd84eeeabb6f28543ff863c4ae6",
+    "app/kunden/page.tsx": "54f36a85f88e0d620a0cb8467741975ef69a87e3d67b8d0910cbbbf717137375",
+    "app/layout.tsx": "746009ab2c1f01dab00fda1535a04a2733674dec36f39ddf6025f2d2e02f4d64",
+    "app/loading.tsx": "5c0d5dab503ec1158b8daefc5438243ef8c2a799a4b622f4f8b6a44668fa20ae",
+    "app/login/page.tsx": "09f6a53f325eef367d5eec7115e8810ff13a9ec37fbd6398a0590329fff45900",
+    "app/manifest.webmanifest/route.ts": "53d9542e52c53fd8c5e1ba09998ca9052e78ce15e6516e8b9f0bd6d7dfe9057b",
+    "app/mitarbeiter/[id]/page.tsx": "c47476374ca0de883759e99e8a43864a735717e5a1260e69aba0a2d56d1a5429",
+    "app/mitarbeiter/layout.tsx": "6185cd4bdbef31f664260ac0737df4e9ef8c873a8c5def3b016ac70e4b559f42",
+    "app/mitarbeiter/neu/page.tsx": "b629b703c9fc80e8a4a7c55efb72f6da8ecb1f52b08c0b7df77dabe36f04e68f",
+    "app/mitarbeiter/page.tsx": "0e177c9f791af8940dcb30669e6e2ddf6164cf69340b651f5e02de256dfa235b",
+    "app/not-found.tsx": "41976950245b01617c5464a2ceeb7a27bd0c4fdc12a90a9c975e69cadac03434",
+    "app/offline/page.tsx": "2fae9abf388162bde0133aaa1c23b3d16e922eb7ac94edc16e331a5a4ac500e5",
+    "app/opengraph-image.tsx": "3e0f029319094adde36e774ab3ce4c32c4d40574ca03b80d4b71b39bee5f19e5",
+    "app/operator/[...section]/page.tsx": "5636bfe172a0d6c05460f2bf303e4622b2efa48a8600f297476296ce6c2b9cc8",
+    "app/operator/layout.tsx": "0d97392653e43b4c57a075b0a0a49744a1fd9e43361765275ab7ff07d33d5538",
+    "app/operator/login/page.tsx": "24ea82f4081892c609af3fac0f537e22fd225341ee740dc0a0d79b46359fd40c",
+    "app/operator/page.tsx": "08944cf2e3885224925fcce44f56ec8653f9cdec787f7d838aed21c701d80083",
+    "app/operator/wallboard/page.tsx": "db89a29e018121f31172060f4d7d802274470a7a4a77976dbca7cdcfa1a27d93",
+    "app/page.tsx": "986eb32dcea661bbaac129696fcbc50a6b83a84f5c2c39bd07eecde082a29dc6",
+    "app/passwort-vergessen/page.tsx": "4eb8bc35b6790d4aaacc8c89e44d055b4b76fe771c47beea93916591c5661d2f",
+    "app/passwort-zuruecksetzen/page.tsx": "d0686187c10d09e52b3a809bbceaaf41c9ec641a5287fe0d00c04b1bd2adf9a9",
+    "app/portal/layout.tsx": "4360971b8714f5e8bb387fd69dd8fbc82564caa0d522b2608595be36b55aa151",
+    "app/portal/login/page.tsx": "bdd48b32efc0a921f29cb1c091f6d32fe1d84c0bcbb92478e2e0b4c7b7602b41",
+    "app/portal/page.tsx": "bdd48b32efc0a921f29cb1c091f6d32fe1d84c0bcbb92478e2e0b4c7b7602b41",
+    "app/portal/registrieren/page.tsx": "f27491112718d2bb109bfe908f38cc06ae9531441799b3f109995df51e024934",
+    "app/preise/layout.tsx": "a233b7c77936271e0620b07d513da1985480950ef230f60a31cfe09b3cebb422",
+    "app/preise/page.tsx": "ca86f7efad21ad6bdd55d277eb8493be55eeb9564210fd2ae576f58087246dc9",
+    "app/preview/dashboard/page.tsx": "d3175d0e54f7474dd4b49ddff53a7947176dd79a83393cd1a7717c95b1328d09",
+    "app/preview/rechnungen/page.tsx": "225571a23774833b05dc66a99d77ee093508d4bdecd49be6d8591e8de940de27",
+    "app/preview/zeit/page.tsx": "121db5b6559dd155d3da701eb410451a468a71a9b50dcbb7bb9bc8e24c46dad1",
+    "app/produkt/layout.tsx": "8ac4d13325fb7cf6f25e7691715762740cc1d223b1ee2d8dd471752fd719c8a8",
+    "app/produkt/page.tsx": "4dc1b945cf2ea14b31765754942a15a3cb87b1cbd59c2b53c83f7d78c5d29966",
+    "app/produkte/[id]/page.tsx": "442ee854ae57e42d397627eb974e9f56f804c0c3ecf1943e5d04f06566834e1c",
+    "app/produkte/layout.tsx": "6185cd4bdbef31f664260ac0737df4e9ef8c873a8c5def3b016ac70e4b559f42",
+    "app/produkte/neu/page.tsx": "c472de210348c0fdbb0fdb30a320ca3da003ebd96acfcfbecf4a822bc2edf6b8",
+    "app/produkte/page.tsx": "693734860798394a21e2acae9db94c8bd32d27e8e53e90ea0e102b647cd55b74",
+    "app/projekte/[id]/page.tsx": "14c08e771d04890da6bdfb362394dbdc8d3cc3830b981d62101f2e6f5e1bd93e",
+    "app/projekte/layout.tsx": "6185cd4bdbef31f664260ac0737df4e9ef8c873a8c5def3b016ac70e4b559f42",
+    "app/projekte/neu/page.tsx": "57ba689562b1543266acfbc2f618e35625fc0a3ac2c94eef60770877d35313e9",
+    "app/projekte/page.tsx": "d7f95c854757a72c3586515df3f68f1b97a0ec0955faa8322c32ec908c18004d",
+    "app/rechnungen/[id]/page.tsx": "121949a87df012a794415a745c41952832cbdebed368b9e4f514a54499252839",
+    "app/rechnungen/layout.tsx": "6185cd4bdbef31f664260ac0737df4e9ef8c873a8c5def3b016ac70e4b559f42",
+    "app/rechnungen/neu/page.tsx": "aad8738ad81be287985b4dd0d01a3a9675278ffcf11e2ca18fbe76152a84f27b",
+    "app/rechnungen/page.tsx": "8b3ebe1bf3868c7ebcb16b7a82472194705ef1f178b2eba8d10c31bd202eb01b",
+    "app/registrieren/page.tsx": "97f58fe8159a02f9f53ac5c451f6e2ad36bee3a16fc65dfb085b24b6102b6d09",
+    "app/robots.ts": "a32ff4e579fd3b9022b82ab0e0c4bfdc4505544565bbbb35d8b24170890b61ac",
+    "app/sitemap.ts": "f9730bf817ddb34918432512595428ee1bc1432589e7a12e0fa93cfc01d455ff",
+    "app/spesen/[id]/page.tsx": "69815602174d9a5216857f696cf7409e823860da670c21b1018f9586f8857dc6",
+    "app/spesen/layout.tsx": "6185cd4bdbef31f664260ac0737df4e9ef8c873a8c5def3b016ac70e4b559f42",
+    "app/spesen/neu/page.tsx": "18cd606902b0125b0d6ce26b10516596a762175555a1e5ff469bfa34c50311a6",
+    "app/spesen/page.tsx": "108e9f2a41cf4cde0cbd89f6b046c3858926444b6754ce0bcd8c66d53a5c8f59",
+    "app/support/[id]/page.tsx": "87cdb4e2ea4409c08a131b19f407f8d6aa2b23c210116df40f5ea24200e2bf45",
+    "app/support/layout.tsx": "6185cd4bdbef31f664260ac0737df4e9ef8c873a8c5def3b016ac70e4b559f42",
+    "app/support/neu/page.tsx": "0330363df419b9724138877fe9f0225616cf1dbf007dd3c637a8777e8acbb263",
+    "app/support/page.tsx": "8a09af50c1a1073b8e135a1c6da038be7a7b3bbee6df57d2aabba9dcf7937b39",
+    "app/unterauftragsbearbeiter/page.tsx": "026f6e49229b49a10196bd51213aaf9f669156e2c69d03c09164d9f5d7cf6647",
+    "app/wartung/page.tsx": "21081ef5f903adf0e4199501778e1b3fa167a8afbfcdaab776549d0bde3eea1d",
+    "app/willkommen/layout.tsx": "6185cd4bdbef31f664260ac0737df4e9ef8c873a8c5def3b016ac70e4b559f42",
+    "app/willkommen/page.tsx": "c9b026df5b7aea1ea482d654b1b7c46120021de87d5258f7e73c2536a45fe938",
+    "app/zahlungen/[id]/page.tsx": "9403b39ac63f091c3631c1dc67fc8ec43dc36716d4e2b33ec98ea2945ea78c1d",
+    "app/zahlungen/layout.tsx": "6185cd4bdbef31f664260ac0737df4e9ef8c873a8c5def3b016ac70e4b559f42",
+    "app/zahlungen/neu/page.tsx": "cc1bf6d4ed3a00a148fe7c4e34939e5d0cd95844a64c7794d42b75d63a06b3f4",
+    "app/zahlungen/page.tsx": "52933cfdb3e984bf29d9990c63a9989caeb545f6259c6897ec8c84372d817741",
+    "app/zeit/layout.tsx": "6185cd4bdbef31f664260ac0737df4e9ef8c873a8c5def3b016ac70e4b559f42",
+    "app/zeit/page.tsx": "b6d94508427fe0231787f47ae40b827a5de8a7c0ebc83a4455cdf1311fdc749d",
+    "components/app-chrome.tsx": "d08011d799613a6816153f1ce66489171e83970b843401acc64f052b13b17fec",
+    "components/app-shell.tsx": "e9fa6711bc21ef18153da0c6c23f743780b11c5542151144d76921d7f337c237",
+    "components/app-start.tsx": "8d6a5d7da1201dbe8988b178e10c2d6488f7cf5ede213b5e5930532cad1b70a2",
+    "components/auth-workspace.tsx": "88537c65aca230e5fd75ca05149c0c8b1b5dd810be6cd705aa09e87d5c2df434",
+    "components/avatar.tsx": "771a6d60909a96dac1b64e050fbb99e738b7a3374123f5603baf0c5d01b7bced",
+    "components/binso-ux.tsx": "80dced433ab76f2d6d5a2f27460dee66aab537beba17d96ae812e07f336fad0f",
+    "components/cash-statistics.tsx": "c1759b99e4f010e68bc0b3ebfaf4d2af9a547c6d4676b61d5f381608409ff0f4",
+    "components/confirm-dialog.tsx": "d098ad0c752b527a57cca3f5b147c0b906a54b9baea8e01ff3f2446c8024ce44",
+    "components/customer-app-layout.tsx": "badd7b780b784368c4313a148f5e15f2d3936323fbb59e131623bc40f3815618",
+    "components/desktop-navigation.tsx": "57ecf06147412df32f3591a4d99f2978a4511c7d585c333fc341536962461626",
+    "components/document-list.tsx": "127d3c0c5cda968453d5b230d342bb1d82fbfc4694d892c023a7c4e686a00621",
+    "components/document-settings.tsx": "0e468fe4fa2f9910291916f5525b278cff5b04766ed3d83e5d2a7bc81621a4dd",
+    "components/documents.tsx": "93384a7a4bd024d0706a652dc55a16e8317a540ccaaa3a13035fd1e3f1058cdc",
+    "components/entity-files.tsx": "126a1f208aece70fdea9b25e44d5701b5d82a71430bb3f8c148cf5decdfb3bec",
+    "components/form-wizard.tsx": "a73d51e40c443fdd0643d716df7114630aac96c81a20b01e9a3cc7919e8da91e",
+    "components/header-panel-content.tsx": "9fb8d77c7a8a4ee03d94defcd1f20eeb4610d4c316b51ac1e4aeddfad671b197",
+    "components/header-panel.tsx": "07c212f7c04fc224b66ef9d51042981ce69e8b9a3f3f573a24d844bb086b7751",
+    "components/legal-page.tsx": "c54128722572306abeac5792b9ed0c4811eecd4d35746c9cd7e853caf8bd607e",
+    "components/locale-switcher.tsx": "ffc99ccf17fb23f42ea5ea0bab1fd7418f66f20bf1f34e9acc8cda0e24c0835b",
+    "components/maintenance-control.tsx": "ee65d52566f6eb9a9d6ce532c67f80e4d70b0e5dad49668c1c927f6b64fef0df",
+    "components/marketing.tsx": "faddf9e8dd330836dc8db4d6e2cdc75d3f47a2875d66d3714a42a7f006d4a514",
+    "components/monitoring-chart.tsx": "1a90f8c2cf71cb94e519ec6897c17fa5d5aba172c3fbd8fa563be812deb49c55",
+    "components/monitoring.tsx": "1b90758157fdc76dbc73e86993330fbb45d61c748ce84dbcadb5c98619e4c7c5",
+    "components/operator.tsx": "a94403c584c64d43b7429a22434d2d99ff408c225cfe66981378142016d5bff1",
+    "components/pages/customers.tsx": "a6150e0fe14ab2c9708b59529682b137575095b885e3b7bc38293b7788739db6",
+    "components/pages/dashboard.tsx": "379310f5571d7e4d42dd0969a01b90fc7198c076f39e9be3ccba04b331434fd8",
+    "components/pages/employees.tsx": "58f3f82597e6c52fde4a8145ebfbb036362f8b4872a1447f2510ebf32cb66ed5",
+    "components/pages/expenses.tsx": "b8261f454d1a1797020d4f775abb9bd7f58ac3af5651cdadec4634426f8b4417",
+    "components/pages/finance.tsx": "b5a71f08816229dfda4d3f5165d15e0404c5bebaef1ad9026cf79dd875066b8d",
+    "components/pages/notifications.tsx": "af26dbfdc8a8b65c7452e0dcda249b76d69e3fac604cdfb7c2c83941488e29ca",
+    "components/pages/payments.tsx": "d13727f6b892202d20f567c25d976d21d92c876b4a8be1b7e2916b5af4d236ff",
+    "components/pages/products.tsx": "7e3cd8c605a707498eaa9b84198a4c5dabeb0afa45b063b368b7337a4e9ac0ec",
+    "components/pages/projects.tsx": "241d847a9151fcad2e9c09fb6bc2e8d357331a5d3d400d79de39ed8ec91af36f",
+    "components/pages/reports.tsx": "022b9d2f80ba1e6513106ffd769be1f0354bec8620be8dc739c7107ced2606c3",
+    "components/pages/settings.tsx": "2cdbee4de9abdbce88c6dc1863b6b09b70d741e4afa33fe4f1c643581bb23486",
+    "components/pages/shared.tsx": "eca2ea02632b7a149d02466808880ba6a739c13f609800a3b6e2ec59ca944133",
+    "components/pages/support.tsx": "7bb982ec94849490d1500f458c4ed4cfa45bf8924898c01cfa7926cb6b523c33",
+    "components/pages/time.tsx": "649fbca10d7391f71a757957c7e903c752979b233ae6c861764772aa73cf5f8f",
+    "components/pdf-preview.tsx": "65d116be5dab67012c18cb3193fd1dee8aef85da20577b1a76c55aa64c88b7cf",
+    "components/privacy-consent.tsx": "4225fa0aa0114820d8c11f336ffba7ea1ccfff9627d9d9991f0f8e1b40d4021d",
+    "components/project-form.tsx": "27c00f182fb9dce050dfba614eff0a3315315c1c21d01fa1c4f4a20727361665",
+    "components/pwa-register.tsx": "389fb9d6c6ffb705deda6f21af2cbca69c06d16a579db3e29a6c9c769a924b9e",
+    "components/records.tsx": "a3073189051fd14caf0da9eb835f56d46e664603181f1fd850194a94fa488898",
+    "components/registration/registration-sheet.tsx": "ed5233c3d279d2d0e57e6c2214f206b36b93a1b63aeb122a728e96211f83d76c",
+    "components/security-settings-page.tsx": "5414152b5ad893fd5358eae7a53feb4f7258685fdf21adb324af30881261e7b4",
+    "components/session-data-boundary.tsx": "310ef854b2030d92c2ed12ea05e373238d0dd98349ba860e102650ca915ac36c",
+    "components/statistics.tsx": "d79883f8ddd362438c184b9b2c6293fa39687d4b4996b17a2f597bb6c8cb24f0",
+    "components/team-settings.tsx": "0603cf1d7b3651b6bb1119cec2c676e6e901d443b92e97737d7076c65251bdf8",
+    "components/theme-runtime.tsx": "2653f04e0eaceefe95c7aca218e65c15b6290ddfdacad5eadc4bf920fdb2c120",
+    "components/time-settings.tsx": "67c7987924c8d81e5266fef4125d944cfa1f5bf3fb602eeee0bf5498aebf3870",
+    "components/ui.tsx": "9debf162d3f7a6b04b1634fef1fd1127a09a8203644bfdf2ac0779acbc5bddf2",
+    "components/use-browser-back-guard.ts": "1d23786019e823d3712e7124e81ede8d59e15307662948705f7ae83d0825c4d6",
+    "components/use-dialog-focus.ts": "a96939d3ab728c01b2d123cc91bec651a56fd23dd091864cd657da5b2eb80f84",
+    "components/use-dirty-snapshot.ts": "95b12e199785feaf96c2d32e6421e7ba6c05f5988e5375b69137c138bfe495a8",
+    "components/use-process-draft.ts": "9885460c92f2eb77ea1cc9f9137479fbdf487ee935179c5b198bfe5c1259e87b",
+    "components/use-workspace-viewport.ts": "46dcf7d9c0063930aeb4c7d674e91e99feb7b705b668425cc22f7a3916b4f0ef",
+    "components/ux-lab.tsx": "ac4ecdf34cca935e3d78eb4ea4bfcef16620df001f4c34b124cd767e8ef0f289",
+    "components/web-vitals-reporter.tsx": "b395592aa1831cae1e2b8623c1f6267ceb7ec13a3b4c1490e421dd7d41e604d8",
+    "lib/cash-statistics.ts": "3e7c502030d50b6d60dfdf97ea8c65efd179333b8fc594c95e72699b8d842edd",
+    "lib/client/backend.ts": "d72e4a1fb6c0ac4aa69ab10b79346be800db4f140e0874f8dc969ddde87a3377",
+    "lib/client/data-events.ts": "30ef38c50cb8d29e2251f9c25a8832de697ca9cfd1e8dec0850e5f621058c1b3",
+    "lib/client/list-state.ts": "13c8c80db6c2acaee29ac8ba30668b0bb20614cad48e28d6cb81986dfbdb9650",
+    "lib/client/locale.tsx": "7ca17a956122828c19ce078d180d43e12696081d794c6b409185e02df6cfb174",
+    "lib/client/page-access.tsx": "d20e2ac8bef4913f8ca632e4c4d92e5134b764bd5f50372f52e209a79ce1c245",
+    "lib/client/process-draft.ts": "2c6fc4a62ae5263de3187b7dcb29a1fc4c54d5725a50592034c82a52dcd366b1",
+    "lib/client/session-cache.ts": "3b74546527ab782abc277df4e1594e726be8a410a0fc7c75c5b68a7b2db8c301",
+    "lib/client/theme.ts": "7b0a9ddb914d72617726464a8b50981830359d9ecf544f0810246e9c101ce76d",
+    "lib/client/time-tracker.ts": "66875e60477bc4541821cdfc20358590f1dec401d74ef4b636af6b1741ec7b3a",
+    "lib/client/use-api-query.ts": "88b985f1c64dd52b158b80c49e6695941f631d0d1dea4a73a1c3c0f329fff2a5",
+    "lib/client/workspace-actions.ts": "c116bb27ac7bac4e6ee721065829297f928f1a5902675a2cd1a413d0b15296c4",
+    "lib/config.ts": "0dc9357d1958ce18c96a52a3b2977f1d7018531ab3c252582ba46b800b06b6c1",
+    "lib/contact-links.ts": "8892b01970d1313edafd9f43284fecf8cf2c676343850281d1df93a59bc63724",
+    "lib/customer-identity.ts": "75154dbf804e8ccfdf65524f8d8afad3e96e4100c507228ac96d3fbd2b46147f",
+    "lib/demo-data.ts": "2c4db9fe8241125cbbc4ecc47b671f8f3ff73f8799827baa09230f8cd781fc59",
+    "lib/demo-storage.ts": "69ede104f5b6305d166eb5dd9adca38ae62b472fe0bf80c9f9ae729901434f71",
+    "lib/display-format.ts": "21d17f8c1bb7f0bbc1429d0a08bd21c68bac8c5ca2c42e747378ac95cd3b7921",
+    "lib/employee-validation.ts": "cde72ec1e9528eb946701456a9b3f0d1d891ce4e9ff09913330723982839617b",
+    "lib/file-associations.ts": "d719e7a26f9709eba65d45d09dad95f1a041fb13302b4f133151c4d12e581887",
+    "lib/finance-periods.ts": "b957816e35408840d61dadb201e4874cc7ff12f03d4c1be4270292fd42da12f6",
+    "lib/financial-status.ts": "6d0bcb7b0e3cf23539dbc2ec1e354db2ad98f9630fe1a4e3a51263c5af348c70",
+    "lib/i18n.ts": "3b98ae0db77179bbb7c1397c7c2377df8e182ef071f063335b1d894c8822dc16",
+    "lib/image-url.ts": "ce5576239d14910d93cc997b0c1fca3c6bcd87c2131e1c5324e4004ab7690618",
+    "lib/list-filter.ts": "66c09b9c83a8cbf109180f75a2f1fdc28b3f12c24be3762f7358ac72fe3946f5",
+    "lib/locales/config.ts": "2cf2f8be13c6ef20f5ae18918dca6e8ff42f9ebfd0bec7d57fdb4aa1e0b46a7e",
+    "lib/locales/index.ts": "df358e86ff91ca5947e45620a8300313361eff960380fe3e78768b36365313f2",
+    "lib/locales/messages.json": "5541a0454e3bb025a872a87200a686b9863a5bfbc6339b05eae2a80151370e11",
+    "lib/locales/neutral.json": "f3a3a20de84113a6181facaccf20aedc6f7107a6e547983e48ac88bf90aae33a",
+    "lib/locales/plurals.json": "7653cf19e96e2daec69e70d870b35703cb81dff4963ca1f685a88131caf48dd6",
+    "lib/locales/templates.json": "c4045ef81020662296f87612c1bfbd98f0c91af88855a07e2e49781891bff46c",
+    "lib/modules.ts": "a30561f1b540a6a9e32ce28222419de8588781ee9a9d7d22e5508137a4fc46e4",
+    "lib/money.ts": "f9865dae2ce132fd7f7503d4386f726690d33520514ac7e519a975ec05d8ae18",
+    "lib/navigation.ts": "d747f503e7e0c92e7eaaa0d10bf0da1f24e1af9e44dd5b022eee2a3273533554",
+    "lib/observability/model.ts": "9bb489ba7638c474827339cfa6570c25b25e8f7215747df26ce898c20897bca9",
+    "lib/operator-pages.ts": "d9def02ac6c39aa664a09abe85ab1696c4a22bb76613c8da300df3c529ca0f68",
+    "lib/payment-reminder.ts": "83924744ef13262b3c2ac81902e15d535bd9cade1cf9129071fdca00dfe9b43f",
+    "lib/permissions.ts": "34a2aa2a421e1d58fda46350887646140603c356b23d1919da50b53acde07ccc",
+    "lib/plans.ts": "21e064172e07fdaceb22beea458f790400939881498b833232c50cdf10a58413",
+    "lib/projects.ts": "6bd019d00244a6e6bc365290a1040cbcc60072a60a63c93d4b883570cc8ac7df",
+    "lib/qr-bill.ts": "4516d2700e5b5e157ca9744b186e53d0637a6bd4f27ce580ec8b2371243ff4e6",
+    "lib/record-sort.ts": "f48e16f984aaaedaf9334fe63349cd4ebb06d818e5ac85e6d3bf52b4ac36c898",
+    "lib/report-export.ts": "377ec95fb735782f9397731e2a9633d0d77a441d0e6380f764e9b089b734b745",
+    "lib/search.ts": "e916546953d32beaaef2cd1f46e7a45cfddd71f796a3c5fae9f0a9eaf7c68097",
+    "lib/server/audit.ts": "a5a2fde697ac9190ebb632827681ba5226680a7d73ea9334af24b40635988fb1",
+    "lib/server/auth-tokens.ts": "3e7553638139ff7d52c499ceec993450637a3b2652e4904c851f7ce7dd7c172a",
+    "lib/server/auth.ts": "d01a36397dc894592a048c022d658c5bdd7c211dc73cd4f148bdf62c5de930e3",
+    "lib/server/business-idempotency.ts": "93a0b662ab9122daa06f0d9a18bfd4848fc6ac78923c9065fc8ee05420e7ff5b",
+    "lib/server/clamav-protocol.d.mts": "ee337ad6c1adf26046741f7273c785375ef381f913018d51ac4667bd5ad019b1",
+    "lib/server/clamav-protocol.mjs": "734dad202479ca6ff1fa35476b8b3fc068d35381f6abcaed435009da4aaf2efc",
+    "lib/server/credit-notes.ts": "8c6f0300ffc3b95a5575a31e578ff72fc89ec749050c65ea4872744abacabc84",
+    "lib/server/crypto.ts": "9a22eaefd42a48f77d2cc9059eda40e1b848b4ea83c8505403311594b4d084d2",
+    "lib/server/database.ts": "49498c6e148e8e7f5e92cccae28baeca0cb45e684b30bb63287782ef34e334f0",
+    "lib/server/db.ts": "5bad0a705a23b040e0f64f21ef6868aa4827d87225faee6f1f8240a1cfaf4363",
+    "lib/server/demo.ts": "4b74d74178331b29657c5486ac4d4093b70f0066a8e68c25a3d74c6545877483",
+    "lib/server/document-logo.ts": "d629f4e5e56130d353e4a3f2c419eeb5b2d595e9a4b940fb8d06c94e02980112",
+    "lib/server/document-pdf.ts": "31415997e7bb9862cb4026246c4cb004d0d63b8c97a880a0e1f42528f0019f46",
+    "lib/server/document-process.ts": "13ef6cf9d72a1e4a774ba53baf4912aeec98c9f8a5ee3a94d641cae0a52ff951",
+    "lib/server/email-otp.ts": "4f1b7462c6c875e66b007468c4a4eb78e44147a5b80e3a97cd14fa9547cbe2e7",
+    "lib/server/email.ts": "16105aea802da2b398d2ed6560665f14476d64e58633026f77fcde54db1bb8b1",
+    "lib/server/env.ts": "f92072e15d9f65ccad21520b535f3ad6ecba61b5ddcad921075381ab730fa919",
+    "lib/server/file-access.ts": "0abb455eb7de7d917baef18ffafadfc73b0b7f056bb642c9c8595b0ce754d15d",
+    "lib/server/file-relations.ts": "37393748cff0f662885a4812cda1b20041bf37f1e64490b2a6fb5b2d3d5b5a4b",
+    "lib/server/file-rescan.mjs": "264757dd8b9a3531ef2c3b7e45cf6804c85155ac90fae18e454477a42ffb07de",
+    "lib/server/file-scan.ts": "2d568811c76c50efb06afa99e007d862e863c24b52d8412b1716632c90c7731e",
+    "lib/server/file-validation.ts": "1624852c944423ed9a845d7c03a00b69a5bf8d005f57434cf34db5234e2a23d8",
+    "lib/server/http.ts": "f4492f69d0ea4d913b94dd760bfa8fc88dbbb50cd6708d3924d7741d566d9ad4",
+    "lib/server/integrations.ts": "927fe9714d618c0feb0df63ec1d117daf92fa0f20dfbb5aabaa9352a6a9a204b",
+    "lib/server/invitations.ts": "c6637a05df3c8e959d88eef5450c0ed4c913dd32f8d4b596305bc1303a59da33",
+    "lib/server/locale.ts": "338101fa972e86fc387f5eae1254483ab714fa4f0d350a635c5595f8b636e4d9",
+    "lib/server/logger.ts": "6ec6cb30712fb17dfeea67d5dfd9458dbbdb6d138c7d721e3169487a36ed0848",
+    "lib/server/mail-i18n.ts": "7eccf6acaf0613112cdcfe3f26c3f60609987dfbf42cc321420bc69695687ac7",
+    "lib/server/maintenance.ts": "bcbbacbb50d80e57b27d377179f41d48bbec447c4c7955dbb997aa87aca98fcc",
+    "lib/server/observability.ts": "a9af8ac852d7c6ca7d625fccfa76077b66b68b37ec948c55c027fb02ce0eb1bb",
+    "lib/server/offer-revisions.ts": "9375f6cd3a72c3a2dbd22b92b327dc43ac7cdf81d16c2aff10c6dc40bf594d41",
+    "lib/server/operator/audit.ts": "a5dfda92acdbf6f6e0ded7f41c5303b59485215c256b46d20fbf25c2adf4b7a1",
+    "lib/server/operator/entra.ts": "2b9319eecc61a59dea5a889233fc2f3624bf02016c69d58fb71ce067fa505d87",
+    "lib/server/operator/rbac.ts": "e7681b42ff377a6ca9fa22ad4912a8b9ad3d33f870cfaec72b7bd638f469d845",
+    "lib/server/operator/session.ts": "8dd7c47f78f3022fe5d815a5b91d744a3d76387a2f9e400724165256d966ebf5",
+    "lib/server/operator.ts": "c46d69e4f00ff80557aca254b5f23db8f68eb9b30807ff230adc4ab42b22a8a9",
+    "lib/server/password.ts": "aacf0f7734b21c60028092565405953e7717b6095f9382eb4d2789797716ab9e",
+    "lib/server/plan-access.ts": "3e885a0928fc117f02f352d9aeeec9e5860ad412bb07b9e2b76ba4c2f9dc7716",
+    "lib/server/provisioning.ts": "a669801578d61a6f855b68a13e6a2caab7c48f7261d06d8171ccf0c7e29206c3",
+    "lib/server/rate-limit.ts": "e517763674467a8508de405f99bacbbb26ec1dabd664412aeefd8165db893dad",
+    "lib/server/rbac.ts": "972389fc63ad96d5a12e686775f00e7fe93c09069fe1bf93c0e9a9a58f498b5a",
+    "lib/server/registration.ts": "7b8740def58ceae54cb3046b390a68b24367543a805ec3cc5a8d238db65a1c7c",
+    "lib/server/repositories/business-api.ts": "0876d100e6938ca43244fb1b0ddd8bec8d567829014b55abb3c5c4a15cd08857",
+    "lib/server/repositories/contacts.ts": "2fbfb0d48f7df0dd05273f9631c629cb88ac546030d1e313f221b73d32abc2e5",
+    "lib/server/repositories/customer-activity.ts": "b9c151605749a3abc5037b7434e7b5bcccd3d49edbfc8709e96e5489e3f02477",
+    "lib/server/repositories/customer-workspace.ts": "3b68bff4775e43f49f699725474e0a4dc129a3f6140a64bb6da1443822c49074",
+    "lib/server/repositories/customers.ts": "1db6e22b810f8905407bf16aac44012d843f03d5e1bcb5ebd0506602ee3b452c",
+    "lib/server/repositories/dashboard.ts": "cb5439d38b23b6ad9173ead3d1bd210b86ee4c9e433f85d5f012340dcaf07243",
+    "lib/server/repositories/demo-fixture.ts": "78ae87a38f9fc01dbf7b144059bd9938b9407a8f1d0bc8148c752f947825e4db",
+    "lib/server/repositories/finance.ts": "0ea848e1d8f8016e479cb9c66b67994f274b4304dabfd739c8e761263b8e4f2b",
+    "lib/server/repositories/financial-summary.ts": "fce4404e489f0e1d896ce93e161cb53c65a811bdf0fce6335b738fbdfcfe66af",
+    "lib/server/repositories/observability.ts": "fc060798110b1bc5970e4bb30ef566d2d01042ed0483b61501c4916a44550a59",
+    "lib/server/repositories/operator-api.ts": "b7f87804c70648d4bf291c0dc03b4ad2cc0cdbf926c9e42c2a47191bcb0acaba",
+    "lib/server/repositories/operator-customer-overview.ts": "e23bdd7f2ab779002041f0de234bbb0685ac77ae130b8c80456e645808bb0351",
+    "lib/server/repositories/project-workspace.ts": "ec492ca3b823d3cbc701931aca3333c36aa796048fc060f09556d642df96c687",
+    "lib/server/repositories/reports.ts": "55358f1e227dbac3f361d1f2dfdc90d353050af3d8b9f4006a84057a43f00e82",
+    "lib/server/repositories/stripe-billing.ts": "a9780bef2d96cf4ea51068673f85a2d46b96962d16e56069dacbbc2d6a7d18f7",
+    "lib/server/session.ts": "ab4c40d9de23326b9c19b8383cd93c33bb65c46bd34f155278b684e5a17a1bea",
+    "lib/server/storage.ts": "5aaa652fa9853b5ccc363dd67eb7dcc2fec2cad924ae67c5e8da55872e2548fd",
+    "lib/server/stripe.ts": "47975c0e93870be81dfcdf667e952f35bfd8fe615f7f7fbb862f45dbc363a6fe",
+    "lib/server/subscription-lifecycle.ts": "e539acb7ebf57ef24af233c9e40b0faf91b58123dbfc0f1caf52af8c9e16e2af",
+    "lib/server/totp.ts": "504f1fe12b4b28a598d28d5f281f2c82957daa621a433ac7b40786f4d8eed1d3",
+    "lib/server/validation.ts": "60cd386a79bb9da35a313472187c755e44254e257222b7eaa08c20568e647efc",
+    "lib/site-manifest.ts": "f4a14d964587b0700eb1eac59ada7d739f8081ce986e6a38db8c6f3550e3ae8d",
+    "lib/statistics-period.ts": "e8633ff02a0cc8326aa2df2e5b690180a8bda86d4cb9fd2c5932ed8275abc43a",
+    "lib/subscription-plans.ts": "16c4df07c29527cf168fda58bc80d165972af8d7892615ba2bd95b2fe5f39b5d",
+    "lib/support-reference.ts": "5cd011e5a9ef46436601b6056e6664a833a9a72fac09524e75ecbbef6ceb578d",
+    "lib/theme.ts": "669d28b94170abf69587f567f634b975239297ef4ecd5364f67e4dabf0f640ca",
+    "lib/time-entry-filter.ts": "34b7b86b06659e82f1bde45463c53dfaa371aebc34719b854282f83f9aa17570",
+    "config/create-actions.ts": "23c6ef7dfec45a957465aae6bd4d7aba2bef7ee8e007907a102c849eb46cfba9",
+    "config/domain.ts": "a9c07b4966725bf1f298bbc634529a4ae7792624aa6a2ce4aca24783691a25ee",
+    "config/legal.ts": "96a0d9246aa8b984984489b97e43b71657573676788e56cf25a9642bd32fa00b",
+    "config/limits.ts": "fb89f5622bd87f9b4386cee205361f049eff209e942ae1aa0e664a0719ae10b3",
+    "config/plan-access.ts": "0ffbcabe298b9ee6075f1cc36a5423ec4c5b44ed0c27631335a711d71ba95a14"
+  }
+}

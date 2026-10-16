@@ -1,0 +1,846 @@
+{
+  "url": "http://127.0.0.1:3200/login",
+  "viewport": {
+    "width": 390,
+    "height": 1000
+  },
+  "documentWidth": 390,
+  "elements": [
+    {
+      "selector": ".auth-card h1",
+      "tag": "H1",
+      "classes": "",
+      "text": "Willkommen zurück",
+      "inline": null,
+      "rect": {
+        "x": 25,
+        "y": 112,
+        "width": 340,
+        "height": 27.59375
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "340px",
+        "min-width": "auto",
+        "max-width": "none",
+        "height": "27.5938px",
+        "min-height": "auto",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px 0px 9px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / row / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-family": "Inter, system-ui, sans-serif",
+        "color": "rgb(215, 227, 243)",
+        "letter-spacing": "-0.7px",
+        "font-size": "24px",
+        "font-weight": "600",
+        "line-height": "27.6px",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 179,
+          "order": 180,
+          "selector": ".auth-card h1",
+          "css": "margin: 0px 0px 9px; font-size: 27px; line-height: 1.5; font-weight: 600; letter-spacing: -0.7px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 81,
+          "order": 1810,
+          "selector": ".auth-card h1",
+          "css": "font-size: 24px; line-height: 1.15;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".auth-options",
+      "tag": "DIV",
+      "classes": "auth-options",
+      "text": "Angemeldet bleibenPasswort vergessen?",
+      "inline": null,
+      "rect": {
+        "x": 25,
+        "y": 358.328125,
+        "width": 340,
+        "height": 19
+      },
+      "computed": {
+        "display": "flex",
+        "position": "static",
+        "width": "340px",
+        "min-width": "auto",
+        "max-width": "none",
+        "height": "19px",
+        "min-height": "auto",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "12px",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / row / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "center",
+        "align-content": "normal",
+        "justify-content": "space-between",
+        "text-align": "start",
+        "font-family": "Inter, system-ui, sans-serif",
+        "color": "rgb(215, 227, 243)",
+        "letter-spacing": "normal",
+        "font-size": "12px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 337,
+          "order": 335,
+          "selector": ".auth-options",
+          "css": "display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 12px;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".auth-bottom",
+      "tag": "P",
+      "classes": "auth-bottom",
+      "text": "Noch kein Konto? Konto erstellen",
+      "inline": null,
+      "rect": {
+        "x": 25,
+        "y": 561.328125,
+        "width": 340,
+        "height": 18.59375
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "340px",
+        "min-width": "auto",
+        "max-width": "none",
+        "height": "18.5938px",
+        "min-height": "auto",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "25px 0px 24px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / row / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "left",
+        "font-family": "Inter, system-ui, sans-serif",
+        "color": "rgb(177, 191, 206)",
+        "letter-spacing": "normal",
+        "font-size": "12px",
+        "font-weight": "400",
+        "line-height": "18.6px",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 187,
+          "order": 188,
+          "selector": ".auth-card > p",
+          "css": "margin: 0px 0px 28px; color: var(--color-muted); font-size: 13px; line-height: 1.55;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 203,
+          "order": 204,
+          "selector": ".auth-bottom",
+          "css": "margin: 0px; text-align: center; font-size: 11px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 351,
+          "order": 349,
+          "selector": ".auth-workspace .auth-card .auth-bottom",
+          "css": "margin-top: 25px; font-size: 12px; text-align: left;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 82,
+          "order": 1811,
+          "selector": ".auth-card > p",
+          "css": "margin-bottom: 24px; font-size: 13px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".form-field",
+      "tag": "LABEL",
+      "classes": "form-field",
+      "text": "E-Mail",
+      "inline": null,
+      "rect": {
+        "x": 25,
+        "y": 192.734375,
+        "width": 340,
+        "height": 66.796875
+      },
+      "computed": {
+        "display": "grid",
+        "position": "static",
+        "width": "340px",
+        "min-width": "0px",
+        "max-width": "100%",
+        "height": "66.7969px",
+        "min-height": "auto",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "6px",
+        "flex": "0 1 auto",
+        "grid": "16.7969px 44px / 340px / none / row / auto / auto",
+        "grid-template-columns": "340px",
+        "grid-template-rows": "16.7969px 44px",
+        "align-items": "normal",
+        "align-content": "start",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-family": "Inter, system-ui, sans-serif",
+        "color": "rgb(215, 227, 243)",
+        "letter-spacing": "normal",
+        "font-size": "12px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 152,
+          "order": 501,
+          "selector": ".form-field, .form-grid > label",
+          "css": "display: grid; grid-template-columns: minmax(0px, 1fr); align-content: start; gap: var(--field-label-gap); min-width: 0px; font-size: var(--control-label-font); font-weight: var(--control-label-weight);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 578,
+          "order": 925,
+          "selector": ".form-field, .form-field > input, .form-field > select, .form-field > textarea, .form-grid",
+          "css": "min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 55,
+          "order": 2438,
+          "selector": ".form-field, .form-field > div, .form-field > label",
+          "css": "min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".form-field",
+      "tag": "LABEL",
+      "classes": "form-field",
+      "text": "Passwort",
+      "inline": null,
+      "rect": {
+        "x": 25,
+        "y": 275.53125,
+        "width": 340,
+        "height": 66.796875
+      },
+      "computed": {
+        "display": "grid",
+        "position": "static",
+        "width": "340px",
+        "min-width": "0px",
+        "max-width": "100%",
+        "height": "66.7969px",
+        "min-height": "auto",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "6px",
+        "flex": "0 1 auto",
+        "grid": "16.7969px 44px / 340px / none / row / auto / auto",
+        "grid-template-columns": "340px",
+        "grid-template-rows": "16.7969px 44px",
+        "align-items": "normal",
+        "align-content": "start",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-family": "Inter, system-ui, sans-serif",
+        "color": "rgb(215, 227, 243)",
+        "letter-spacing": "normal",
+        "font-size": "12px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 152,
+          "order": 501,
+          "selector": ".form-field, .form-grid > label",
+          "css": "display: grid; grid-template-columns: minmax(0px, 1fr); align-content: start; gap: var(--field-label-gap); min-width: 0px; font-size: var(--control-label-font); font-weight: var(--control-label-weight);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 578,
+          "order": 925,
+          "selector": ".form-field, .form-field > input, .form-field > select, .form-field > textarea, .form-grid",
+          "css": "min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 55,
+          "order": 2438,
+          "selector": ".form-field, .form-field > div, .form-field > label",
+          "css": "min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".form-field>span",
+      "tag": "SPAN",
+      "classes": "",
+      "text": "E-Mail",
+      "inline": null,
+      "rect": {
+        "x": 25,
+        "y": 192.734375,
+        "width": 340,
+        "height": 16.796875
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "340px",
+        "min-width": "auto",
+        "max-width": "none",
+        "height": "16.7969px",
+        "min-height": "auto",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / row / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-family": "Inter, system-ui, sans-serif",
+        "color": "rgb(215, 227, 243)",
+        "letter-spacing": "normal",
+        "font-size": "12px",
+        "font-weight": "400",
+        "line-height": "16.8px",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 149,
+          "order": 498,
+          "selector": ".form-field > span, .form-grid > label > span",
+          "css": "font-size: var(--control-label-font);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 658,
+          "order": 1005,
+          "selector": ".form-field > span",
+          "css": "white-space: normal; overflow-wrap: anywhere; line-height: 1.4;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 504,
+          "order": 2233,
+          "selector": ".form-field > span, .form-grid > label > span",
+          "css": "font-size: var(--control-label-font);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 615,
+          "order": 2344,
+          "selector": ".form-field > span",
+          "css": "font-size: var(--control-label-font); line-height: 1.4;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".form-field>span",
+      "tag": "SPAN",
+      "classes": "",
+      "text": "Passwort",
+      "inline": null,
+      "rect": {
+        "x": 25,
+        "y": 275.53125,
+        "width": 340,
+        "height": 16.796875
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "340px",
+        "min-width": "auto",
+        "max-width": "none",
+        "height": "16.7969px",
+        "min-height": "auto",
+        "padding": "0px",
+        "border-radius": "0px",
+        "border-width": "0px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / row / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-family": "Inter, system-ui, sans-serif",
+        "color": "rgb(215, 227, 243)",
+        "letter-spacing": "normal",
+        "font-size": "12px",
+        "font-weight": "400",
+        "line-height": "16.8px",
+        "overflow": "visible",
+        "overflow-x": "visible",
+        "overflow-y": "visible",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 149,
+          "order": 498,
+          "selector": ".form-field > span, .form-grid > label > span",
+          "css": "font-size: var(--control-label-font);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 658,
+          "order": 1005,
+          "selector": ".form-field > span",
+          "css": "white-space: normal; overflow-wrap: anywhere; line-height: 1.4;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 504,
+          "order": 2233,
+          "selector": ".form-field > span, .form-grid > label > span",
+          "css": "font-size: var(--control-label-font);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 615,
+          "order": 2344,
+          "selector": ".form-field > span",
+          "css": "font-size: var(--control-label-font); line-height: 1.4;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        }
+      ]
+    },
+    {
+      "selector": ".form-field>input",
+      "tag": "INPUT",
+      "classes": "form-control",
+      "text": "",
+      "inline": "",
+      "rect": {
+        "x": 25,
+        "y": 215.53125,
+        "width": 340,
+        "height": 44
+      },
+      "computed": {
+        "display": "block",
+        "position": "static",
+        "width": "340px",
+        "min-width": "0px",
+        "max-width": "100%",
+        "height": "44px",
+        "min-height": "44px",
+        "padding": "0px 11px",
+        "border-radius": "5px",
+        "border-width": "1px",
+        "margin": "0px",
+        "gap": "normal",
+        "flex": "0 1 auto",
+        "grid": "none / none / none / row / auto / auto",
+        "grid-template-columns": "none",
+        "grid-template-rows": "none",
+        "align-items": "normal",
+        "align-content": "normal",
+        "justify-content": "normal",
+        "text-align": "start",
+        "font-family": "Inter, system-ui, sans-serif",
+        "color": "rgb(215, 227, 243)",
+        "letter-spacing": "normal",
+        "font-size": "16px",
+        "font-weight": "400",
+        "line-height": "normal",
+        "overflow": "clip",
+        "overflow-x": "clip",
+        "overflow-y": "clip",
+        "z-index": "auto",
+        "transform": "none",
+        "opacity": "1",
+        "backdrop-filter": "none",
+        "background-color": "rgb(0, 0, 0)",
+        "white-space": "normal"
+      },
+      "matchedRules": [
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 4,
+          "order": 5,
+          "selector": "*, ::after, ::before",
+          "css": "box-sizing: border-box;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 9,
+          "order": 10,
+          "selector": "button, input, select, textarea",
+          "css": "font: inherit; color: inherit;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 39,
+          "order": 40,
+          "selector": "input, select, textarea",
+          "css": "width: 100%; border: 1px solid var(--control-border); border-radius: var(--radius-md); background: var(--color-bg); color: var(--color-fg); outline: 0px;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 42,
+          "order": 43,
+          "selector": "input, select",
+          "css": "height: var(--control-h); padding: 0 var(--control-x);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/bf480ac45e37d4ae.css",
+          "index": 46,
+          "order": 47,
+          "selector": "html[data-theme=\"dark\"] input, html[data-theme=\"dark\"] select, html[data-theme=\"dark\"] textarea",
+          "css": "border-color: var(--control-border); background: var(--color-bg); color: var(--color-fg);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 147,
+          "order": 496,
+          "selector": "input:not([type=\"checkbox\"]):not([type=\"radio\"]), select, textarea",
+          "css": "font-style: inherit; font-variant: inherit; font-stretch: inherit; line-height: inherit; font-family: inherit; font-optical-sizing: inherit; font-size-adjust: inherit; font-kerning: inherit; font-feature-settings: inherit; font-variation-settings: inherit; font-language-override: inherit; font-size: var(--control-font); font-weight: 400;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 148,
+          "order": 497,
+          "selector": ".form-control, .form-field input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-field select, .form-grid > label input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-grid > label select",
+          "css": "height: var(--control-h); min-height: var(--control-h); padding-inline: var(--control-x); border-radius: var(--control-radius);",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 578,
+          "order": 925,
+          "selector": ".form-field, .form-field > input, .form-field > select, .form-field > textarea, .form-grid",
+          "css": "min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/e1f689d7e70782dd.css",
+          "index": 582,
+          "order": 929,
+          "selector": ".form-field > input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-field > select, .form-field > textarea",
+          "css": "width: 100%; min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 83,
+          "order": 1812,
+          "selector": ".auth-card input",
+          "css": "font-size: 16px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 164,
+          "order": 1893,
+          "selector": ".form-field input, .form-field select, .form-field textarea, .form-grid input, .form-grid select, .form-grid textarea",
+          "css": "font-size: 16px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 430,
+          "order": 2159,
+          "selector": "input, select, textarea",
+          "css": "font-size: 16px;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 431,
+          "order": 2160,
+          "selector": "a, button, input, select, textarea",
+          "css": "-webkit-tap-highlight-color: transparent;",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 502,
+          "order": 2231,
+          "selector": "input:not([type=\"checkbox\"]):not([type=\"radio\"]), select, textarea",
+          "css": "font-size: var(--control-font-mobile);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 503,
+          "order": 2232,
+          "selector": ".form-control, .form-field input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-field select, .form-grid > label input:not([type=\"checkbox\"]):not([type=\"radio\"]), .form-grid > label select",
+          "css": "height: var(--control-h-mobile); min-height: var(--control-h-mobile);",
+          "contexts": [
+            "media (max-width: 760px)"
+          ],
+          "active": true
+        },
+        {
+          "source": "http://127.0.0.1:3200/_next/static/css/5aaa2f7dee91756d.css",
+          "index": 56,
+          "order": 2439,
+          "selector": ".form-field input, .form-field select, .form-field textarea",
+          "css": "box-sizing: border-box; min-width: 0px; max-width: 100%;",
+          "contexts": [],
+          "active": true
+        }
+      ]
+    }
+  ]
+}

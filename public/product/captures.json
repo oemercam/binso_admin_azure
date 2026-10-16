@@ -1,112 +1,111 @@
 {
-  "sourceHead": "fe9398c9789508d8c20e565b9c552a2c419b192a",
-  "testedMerge": "9b3fbadf279257a2e0a8accaeed486213be3fbc9",
-  "workflowRun": 38801108487,
+  "sourceHead": "working-tree-reference-foundation-20261016",
   "data": "Isolated synthetic UI fixtures; no production customer records",
   "derivation": "Top viewport crop from full-page Chromium capture at viewport height 1000; no retouching or invented UI",
-  "status": "Captured from passing Chromium browser suite; overall run blocked by superseded header criterion",
+  "status": "Real Chromium/Edge captures from the ZIP-based production build; browser matrix remains separate from visual approval",
   "screens": {
     "dashboard": {
       "route": "/dashboard",
       "desktop": {
-        "src": "/product/dashboard-desktop.png",
+        "src": "/product/dashboard-desktop-0e103b2742.png",
         "width": 1440,
         "height": 1000,
-        "sha256": "e85c8bc7f60fcb17330ec1ae4baeee2c18d91bffc9faaaf800068062492a0907",
-        "sourceSha256": "2aa5058967ba2980bf8664188838f680f7c0984f803d2c6b767b91eba5f0d26f"
+        "sha256": "0e103b2742812bc058effffddfa749f9522be2878206e4ec4264f8bcdb2884e8",
+        "sourceSha256": "a67cc68717ceba91ac0d96e19e892977eaaae7f9808fd7291dbaa890dd0dd7f4"
       },
       "mobile": {
-        "src": "/product/dashboard-mobile.png",
+        "src": "/product/dashboard-mobile-2468d7cd57.png",
         "width": 390,
         "height": 1000,
-        "sha256": "63ff650ec68cb3fca54df4cc31532a51ad170f2e47f0e7653fd7217ede9f6cdf",
-        "sourceSha256": "aeb3336157ddd889423252eed87104eba368009a3960b42e50cd6f0b6c9bd2a7"
+        "sha256": "2468d7cd5795f8864f47cb1f7bb3a1e4cfe48e6bde53632f0c62f9eb722f2d0c",
+        "sourceSha256": "810e9eb2c5713c4c064b4a5fdef235b6f18c22506ea93feb56c6ee80801c657d"
       }
     },
     "customers": {
       "route": "/kunden",
       "desktop": {
-        "src": "/product/customers-desktop.png",
+        "src": "/product/customers-desktop-7e23366942.png",
         "width": 1440,
         "height": 1000,
-        "sha256": "eb449e9e5a58898eb1d50c75f1d925d5adffa69d1f6e031fbb9437bb0cf61a08",
-        "sourceSha256": "dfbde63281339d9adb467b9a9eda851a0bc99f63b67d2b028ef6611317a504f8"
+        "sha256": "7e23366942b717abd8d71ebc1ff178ac16ca532a40ccda57e0086162f4d9af58",
+        "sourceSha256": "44e9af8b50719daabe19c8d10281c4d862bf0a298680b20d9aee959af6506ae4"
       },
       "mobile": {
-        "src": "/product/customers-mobile.png",
+        "src": "/product/customers-mobile-5c2b8ec03a.png",
         "width": 390,
         "height": 1000,
-        "sha256": "38e1239eb359b935787e3254b8e476c10d060d0a285c71fa8311d166a2330181",
-        "sourceSha256": "aeda6a8f8db7d1f377d77bb02b8e9f95f4ecc91baddafde007b628b5b09e6e68"
+        "sha256": "5c2b8ec03a95986012b6c618ca4c5af305494f941c7a5306bd3b52cfb361635f",
+        "sourceSha256": "42c3e35513438ee8388670db785b5bf43b833b9d77ddf58fa99941d2a4f4ecc4"
       }
     },
     "offers": {
       "route": "/angebote",
       "desktop": {
-        "src": "/product/offers-desktop.png",
+        "src": "/product/offers-desktop-5e37432a02.png",
         "width": 1440,
         "height": 1000,
-        "sha256": "0414fbfd2a2d79b31230e74344d530e2748e1ecf3eaa69a9fba7350184fc9346",
-        "sourceSha256": "b9f00f929333ebf7cf25d8f89a06352a06a4cec12786ebe775c7dc4403e54cc9"
+        "sha256": "5e37432a023b00fd45e20d67210f29741400624fd71998e133bb77bd29c8739e",
+        "sourceSha256": "8634ce9f0be9ed3e30861a4082cbf2e5fadcfff1ad2254e74d09e6b5971b8741"
       },
       "mobile": {
-        "src": "/product/offers-mobile.png",
+        "src": "/product/offers-mobile-80dde5e61c.png",
         "width": 390,
         "height": 1000,
-        "sha256": "e7a546bccf89bbcfdbb98c463646954d7b6fde0e88aac47b2e58feb7fc75241e",
-        "sourceSha256": "4c2ba96355803e9e81b8ff9329d81127aace49726e8237adfbc4848625a481d1"
+        "sha256": "80dde5e61cddcd76c90cdff266a8954c5c9816a09088898b4d4379f3fd763358",
+        "sourceSha256": "da9a1909cffb467981721a8d490b755985149682b3fdc659a08328e376c3f277"
       }
     },
     "invoices": {
       "route": "/rechnungen",
       "desktop": {
-        "src": "/product/invoices-desktop.png",
+        "src": "/product/invoices-desktop-caa1920c4b.png",
         "width": 1440,
         "height": 1000,
-        "sha256": "244bca6f0ddf5d4e2cbe3d671816b01a9f79be88b5bc75c70a593696a09e99d2",
-        "sourceSha256": "f4ffa1c701ba077c922b3ba8ebddba5d7aae760e706d96baa092b5e1c33294cb"
+        "sha256": "caa1920c4bd346206ebd7152944a99022bf61fe2706b855123360e4381acad59",
+        "sourceSha256": "32797a6dfb3b32de0261a28ecccf359aca7babbb66c7e4983cb12e11f48bf053"
       },
       "mobile": {
-        "src": "/product/invoices-mobile.png",
+        "src": "/product/invoices-mobile-5e8cf6b948.png",
         "width": 390,
         "height": 1000,
-        "sha256": "295b5ba92b38d066d96b1456035ea631f153406112cad7d0be115bf9a54eac72",
-        "sourceSha256": "29288d9697faf386b509fae53525e3951957346600f5759d6efc0c5db73cdcd0"
+        "sha256": "5e8cf6b948b691a375f50a30c82a79da26e1c33a8950a9ab3178c31f5514877b",
+        "sourceSha256": "b8b3e62d1ba62af6e4a0a74e02a82b0798aad2cf91a92d34df040ba60b01ad2c"
       }
     },
     "payments": {
       "route": "/zahlungen",
       "desktop": {
-        "src": "/product/payments-desktop.png",
+        "src": "/product/payments-desktop-5c7157001b.png",
         "width": 1440,
         "height": 1000,
-        "sha256": "38655c89f547ad40450f529b51d079112555e946ca9a0de79c182e18faccc430",
-        "sourceSha256": "c6bfc90eda86abb10fc0ffcbc9d2d1c8a06cfdc9b3a909deddfb32ca4055a218"
+        "sha256": "5c7157001ba9279746442ed857eed67e23f5af370755501ba2e1bc39a9225187",
+        "sourceSha256": "c7b59b27a3c51556c3a1d04370f83ce5e42b9cef84af834373f12b8d206b1234"
       },
       "mobile": {
-        "src": "/product/payments-mobile.png",
+        "src": "/product/payments-mobile-844c48fc0d.png",
         "width": 390,
         "height": 1000,
-        "sha256": "8a4ce7d954b6d537e4470968d2ec2a5d1145e76f725b5e8fcf65bb1227b1625d",
-        "sourceSha256": "69c8b787abe999df6b1eac973b1f8bdf169f54127782cffca878a6f3f278adf4"
+        "sha256": "844c48fc0dc83f9a8b253815f4198aeafb454490883b97bfe7d4f7d0c4611e8f",
+        "sourceSha256": "35fc65f5a4c9ca39e33aa1a0b4d12f145f6eec548ec338b97ca6894d4da0def4"
       }
     },
     "time": {
       "route": "/zeit",
       "desktop": {
-        "src": "/product/time-desktop.png",
+        "src": "/product/time-desktop-af6c01c25a.png",
         "width": 1440,
         "height": 1000,
-        "sha256": "0cf26b83e80ebec15b98213a154d11163a86d6d200afc758f68ca227e95cdb16",
-        "sourceSha256": "a83a6839315623df15738be87a71db11a263eb81748704803cdff07626485d58"
+        "sha256": "af6c01c25a69a4b8cacafa7fee141d7127ef4aee1b7137c27ec59f46faf2c1b0",
+        "sourceSha256": "6278977c63168f0fa388040e573b534ffeaa2fc0dd1e9f442ed1be5a538e87ad"
       },
       "mobile": {
-        "src": "/product/time-mobile.png",
+        "src": "/product/time-mobile-6e24d5a19d.png",
         "width": 390,
         "height": 1000,
-        "sha256": "52f95411e8018830760d11626be51060968db10a2c35bd745385df2fd9b9b299",
-        "sourceSha256": "244ecb059a70548cf60bc442b7e38c59356c17ddea61849923ff168e419bd3b9"
+        "sha256": "6e24d5a19d83ddc508b2f6b69bf8595f769291df8b798e77f7948aa707b296bd",
+        "sourceSha256": "864cdd090a436b596642063fef642b0030840651187218c7499a5859fd1cec20"
       }
     }
-  }
+  },
+  "sourceFingerprint": "8ba99f9946294628d9b2d1706a30c5963428c18e5c1b2d3fe53bc79caf66787a"
 }

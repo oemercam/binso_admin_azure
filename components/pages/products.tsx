@@ -1,4 +1,5 @@
 "use client";
+import {ContextActions} from "../binso-ux";
 import {LocalizedText} from "@/lib/client/locale";
 import {safeAppPath} from "@/lib/navigation";
 import {useApiQuery} from "@/lib/client/use-api-query";
@@ -123,7 +124,7 @@ export function ProductForm({ existing = false, productId }: { existing?: boolea
           <Field label="Beschreibung" className="full"><Textarea value={description} onChange={e=>setDescription(e.target.value)} placeholder="Kurze Beschreibung"/></Field>
         </div><FormActions><Button variant="secondary" onClick={()=>{recovery.clear();allowDraftNavigation();if(existing)setEditingRecord(false);else router.push(returnTo)}} disabled={savingRecord}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button requiresWrite type="submit" disabled={savingRecord}><LocalizedText>{savingRecord?"Wird gespeichert…":"Speichern"}</LocalizedText></Button></FormActions></form></FormSheet>}
       </div>
-      {existing&&<aside className="desktop-context-rail"><section className="desktop-toolbox"><Link href="/angebote/neu"><Icon name="file"/><span><b><LocalizedText>{"Angebot erstellen"}</LocalizedText></b></span><Icon name="arrow" size={15}/></Link><Link href="/rechnungen/neu"><Icon name="receipt"/><span><b><LocalizedText>{"Rechnung erstellen"}</LocalizedText></b></span><Icon name="arrow" size={15}/></Link></section></aside>}
+      {existing&&<ContextActions><section className="context-action-group"><Link href="/angebote/neu"><Icon name="file"/><span><b><LocalizedText>{"Angebot erstellen"}</LocalizedText></b></span><Icon name="arrow" size={15}/></Link><Link href="/rechnungen/neu"><Icon name="receipt"/><span><b><LocalizedText>{"Rechnung erstellen"}</LocalizedText></b></span><Icon name="arrow" size={15}/></Link></section></ContextActions>}
 
     </div>
     {toast&&<Toast title={toast} tone={toast==="Produkt gespeichert."?"success":"danger"}/>}

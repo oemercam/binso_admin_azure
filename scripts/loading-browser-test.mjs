@@ -17,8 +17,9 @@ try{
    if(p==='/api/auth/session'){authCalls++;await new Promise(r=>setTimeout(r,delay));return route.fulfill({status:authMode==='error'?503:200,json:authMode==='error'?{message:'Initialisierung fehlgeschlagen'}:authMode==='expired'?{authenticated:false}:{authenticated:true,demo:false,tenant:{id:'fixture',role:'owner',plan:'pro'}}});}
    if(p==='/api/customers'&&showCustomer)return route.fulfill({json:{items:[{id:'fixture',name:'Prüffirma AG',status:'active',city:'Bern'}]}});
    if(p==='/api/finance/overview')return route.fulfill({json:{invoices:[],offers:[],time:{hours:0,invoiced_hours:0}}});
+   if(p==='/api/settings/company')return route.fulfill({json:{item:{name:'Synthetic Startup Company'}}});
    if(p==='/api/settings/profile')return route.fulfill({json:{item:{display_name:'Prüfung',theme,language:'de'}}});
-   if(p==='/api/customers/fixture')return route.fulfill({json:{item:{id:'fixture',name:'Prüffirma AG',status:'active',street:'Teststrasse 1',postal_code:'3000',city:'Bern'}}});
+   if(p==='/api/customers/fixture')return route.fulfill({json:{item:{id:'fixture',name:'Prüffirma AG',status:'active',street:'Teststrasse 1',postal_code:'3000',city:'Bern'},contacts:[],documents:[],statistics:[],activity:[],summary:{invoices:[],offers:[],time:{hours:0,invoiced_hours:0}}}});
    await new Promise(r=>setTimeout(r,150));return route.fulfill({json:{items:[],tracker:null}});
   });
   await context.addInitScript(mode=>{localStorage.setItem('binso.theme.mode',mode);localStorage.setItem('binso.privacy.preferences.v1',JSON.stringify({essential:true,performance:false,updatedAt:'2026-10-09'}));window.loadingFrames=[];const capture=()=>{const visible=selector=>{const el=document.querySelector(selector);return !!el&&el.getBoundingClientRect().height>0&&getComputedStyle(el).visibility!=='hidden'&&getComputedStyle(el).display!=='none';};window.loadingFrames.push({at:performance.now(),phase:['.app-launch-screen','.app-session-loading','.app-launch','.app-root'].filter(visible),content:document.querySelector('.page-container')?.innerText??'',iconWidth:document.querySelector('.app-start-icon')?parseFloat(getComputedStyle(document.querySelector('.app-start-icon')).width):null,iconAnimation:document.querySelector('.app-start-icon')?getComputedStyle(document.querySelector('.app-start-icon')).animationName:null});requestAnimationFrame(capture)};requestAnimationFrame(capture)},theme);
@@ -33,6 +34,7 @@ try{
    await page.screenshot({path:output+'/'+theme+'-'+label+'.png'});
   }
   await measure('cold',()=>page.goto(base+'/kunden'));
+  assert.equal(await page.locator('.records-inline-controls').count(),1,'The allowed customer controls are actually mounted before the expiry check');
   if(!baseline)assert.equal(await page.locator('link[rel="manifest"]').getAttribute('href'),'/manifest-app.webmanifest','Actual customer routes use the app manifest');
   if(!baseline){const startup=results.at(-1).startup;assert.equal(startup?.iconWidth,72);assert.equal(startup?.iconAnimation,theme==='dark'?'none':'binso-start');}
   await measure('refresh',()=>page.reload());
@@ -45,12 +47,12 @@ try{
   if(!baseline)assert(await page.evaluate(()=>window.navBefore===document.querySelector('.bottom-nav')),'Back navigation retains navigation');
   // Use an actual rendered record link to exercise detail/overview transitions.
   showCustomer=true;await page.reload();await page.locator('a[href="/kunden/fixture"]:visible').first().waitFor();await page.evaluate(()=>{window.navBefore=document.querySelector('.bottom-nav')});
-  await page.locator('a[href="/kunden/fixture"]:visible').first().click();await page.waitForURL('**/kunden/fixture');await page.getByRole('heading',{name:/Prüffirma AG/}).first().waitFor();await page.locator('.mobile-back').evaluate(el=>el.click());await page.waitForURL('**/kunden');
+  await page.locator('a[href="/kunden/fixture"]:visible').first().click();await page.waitForURL('**/kunden/fixture');await page.getByRole('heading',{name:/Prüffirma AG/}).first().waitFor();await page.locator('.detail-back').evaluate(el=>el.click());await page.waitForURL('**/kunden');
   if(!baseline)assert(await page.evaluate(()=>window.navBefore===document.querySelector('.bottom-nav')),'Detail/overview retains navigation');showCustomer=false;
   // PWA-like close/reopen of the same browser context, not physical installation.
   await page.close();page=await context.newPage();await measure('reopen',()=>page.goto(base+'/kunden'));
   delay=1200;await measure('slow-refresh',()=>page.reload());delay=350;
-  authMode='expired';await page.reload();await page.getByText('Deine Sitzung ist beendet. Bitte melde dich erneut an.',{exact:true}).waitFor();assert.equal(await page.locator('.customer-records-layout').count(),0,'Expired session hides business content');
+  authMode='expired';await page.reload();await page.getByText('Deine Sitzung ist beendet. Bitte melde dich erneut an.',{exact:true}).waitFor();assert.equal(await page.locator('.records-inline-controls').count(),0,'Expired session hides business content');
   authMode='error';await page.reload();await page.getByText('Initialisierung fehlgeschlagen',{exact:true}).waitFor();authMode='valid';await page.getByRole('button',{name:'Erneut versuchen',exact:true}).click();await page.getByText('Keine Kunden erfasst',{exact:true}).waitFor();
   await context.close();
  }

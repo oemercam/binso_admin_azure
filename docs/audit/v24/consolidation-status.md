@@ -1,35 +1,5 @@
 # V24 – Konsolidierter Stand und verbleibende Arbeit
 
-## Flow Noir – freigegebener mobiler Entwurf vom 16.10.2026
-
-Ausgangsstand: `1f01c12c805d7cf1d09cda2e4f902965fb856b68`. Umsetzung und GitHub-Push wurden im Chat ausdrücklich beauftragt. Branch: `codex/flow-noir-ui`, PR #259. Diese Änderung ist keine Produktionsfreigabe.
-
-- Die freigegebene Referenz steht unverändert unter `docs/assets/flow-noir-20261016/approved-mobile-reference.html`. Sie enthält ausschliesslich simulierte Daten; die Anwendung übernimmt keine Beispielidentitäten oder Beispielkennzahlen.
-- Schwarze Kopfzeile, weisse Arbeitsfläche, Sand-/Salbei-Aktionen und Apricot-Statusfarben sind über zentrale Tokens umgesetzt. Dunkle Darstellung bleibt funktionsfähig. Mobile Navigation: Start, Kunden, Rechnungen, Mehr. Zeit und Finanzen bleiben über Mehr erreichbar.
-- Die Startseite verwendet das echte Profil, die Schweizer Geschäftszeit und die aktuelle Sprache. Rechnungsanlage erhält den bisherigen Rücksprungkontext. Aktionen konsumieren den vorhandenen Rollen-/Tarif-/Read-only-Kontext. Für Read-only-Nutzer bleibt die bisherige unabhängige Support-Aktion verfügbar.
-- Die kompakte Umsatzkarte summiert alle signierten Umsatzereignisse im Monat des autoritativen Finanz-Snapshots. Sie verwendet weder die letzten fünf Rechnungen noch Zahlungseingänge als Ersatz für Umsatz. Bestehende Finanzstatistiken bleiben aufklappbar verfügbar.
-- Bestehende Authentifizierung, Mandantentrennung, schreibende APIs, Entwurfs-/Abbruchschutz und Datenbankmigrationen wurden nicht ersetzt. Die öffentlichen Seiten und der Operator verwenden die gemeinsamen Farb-/Feldtokens; ihre fachlichen Abläufe bleiben beim bisherigen Seitenbesitzer.
-- Der Navigationsvertrag wurde für die ausdrücklich freigegebenen Ziele und Materialien aktualisiert. Zugriffs-/Scrolllogik und bestehende Icon-Implementierung sind gegenüber dem Ausgangsstand unverändert geprüft. Alte Referenzen bleiben als historische Nachweise erhalten.
-- Die QA-Berichtsausgabe nutzt nun das tatsächliche Betriebssystem-Tempverzeichnis, statt auf Windows `C:\tmp` vorauszusetzen. Der lokale Start benötigt einen Shim für den Node-basierten pnpm-Aufruf; dieser Host-Shim ist nicht Teil des Repositorys.
-
-### Nachweise und Grenzen
-
-- Produktionsbuild, TypeScript, Lint, schneller QA-Pfad, zentrale CSS-Architektur, Übersetzungsabdeckung sowie Release-/Dokumentationsprüfungen wurden lokal ausgeführt. Regressionsprüfungen für tatsächliche Aktionsrechte, Monats-/Jahresgrenzen und negative Umsatzereignisse sowie Textkontraste beider Themes stehen in `scripts/flow-noir-test.mjs` und im normalen Testskript.
-- Chromium/Edge gegen den Produktionsbuild: 72 bestandene Kombinationen aus neun Seiten, 320/390/768/1440 Pixeln und Hell/Dunkel. Enthalten sind Start, Rechnungs-/Kundenlisten und Details, Profil, Sicherheit sowie beide Anlageprozesse. Nachweis: `docs/assets/flow-noir-20261016/chromium-matrix.json`. Dies ist eine Browserprüfung mit isolierten API-Fixtures, keine Prüfung mit produktiven Kundendaten oder physischen iPhones.
-- Zugehörige Screenshots: `mobile-home-light.png`, `mobile-home-dark.png`, `mobile-invoices.png` im selben Evidenzverzeichnis. Der ergänzende Chromium-Interaktionslauf ist bestanden: Suche inklusive veralteter Antworten, Konto/Avatar, Benachrichtigungen, Hell/Dunkel/System, Formulare/Abbruchschutz, direkter Anlagen-Rücksprung, Navigation und Read-only-Support. Nachweis: chromium-interactions.json; zusätzliche Screenshots: mobile-search.png und mobile-account.png. Der Interaktionslauf prüfte den Code mit dem Read-only-Support-Fix aus 24eda1125f7e91c885962fd1f1a3332e9acbde6f.
-- **Der vollständige lokale Pflichtlauf ist nicht bestanden.** Der bestehende Monitoringtest benötigt Bash/POSIX-Ausführung; der Datei-Rescan prüft POSIX-Eigentümerrechte über `process.getuid`, das Windows nicht anbietet. Auch der Scanner-Protokolltest schlägt auf diesem Host fehl. Eine unveränderte Authentifizierungs-Fixture meldet `423` statt `200`; dies wurde nicht durch eine Änderung an Auth-/Sicherheitslogik verdeckt. Der alternative In-Memory-Transport ist kein echter ClamAV-Nachweis.
-- Der erste GitHub-Linux-Lauf auf 386de8335630336949c166455a78f0054c7e80b1 bestand checks, build, scanner-engine, ux-compliance und quality; Browser wurden wegen des Draft-Status dort ausdrücklich ausgelassen. Der aktuelle Folge-Commit benötigt seine eigenen GitHub-Nachweise. Vollständige WebKit- und Produktionsfreigaben bleiben erforderlich. Keine automatische Hochstufung früherer V24-Abnahmen, kein Merge und kein Deployment durch diese Umsetzung.
-
-### Korrektur des fehlgeschlagenen Ready-Laufs #38831353373
-
-Der vollständige GitHub-Lauf auf eb5e2e3763e37dca82e0c620b8cf1d0fd1facb97 bestand Build, Checks, Scanner, Chromium und WebKit. Die nachgelagerte UX-Aggregation blockierte mit 612 alten Navigationsvergleichen und 150 Aktionsabstands-Messungen. Ursache: noch aktive Glas-Referenz v2 sowie Layoutrechtecke unsichtbarer Schaltflächen in geschlossenen details-Elementen.
-
-- Explizite Referenz v3 für den im Chat freigegebenen Flow-Noir-Dock. Sechs Breiten, beide Themes, konsistente Geometrie aus Chromium und WebKit des obigen GitHub-Laufs. v1/v2 bleiben erhalten; keine automatische Baseline-Aktualisierung.
-- Aktionsabstand verwendet gerenderte Sichtbarkeit statt allein getClientRects. Regression reproduzierte den Fehler zuerst; geschlossene und geöffnete Bereiche, echte Überlappungen und blockierte Scrollendpunkte sind geprüft. Stabiler Scrollendpunkt bleibt Pflicht, mit zehn Sekunden Zeitbudget bei paralleler Browserlast.
-- Dashboard-Prüfung wartet auf die tatsächliche Umsatzkarte statt unmittelbar deren Anzahl während des Ladens zu zählen.
-- Erneute lokale Abnahme gegen denselben Produktionsbuild: 84 Seiten-/Theme-/Breitenkombinationen bestanden; 92 einzelne aktuelle Compliance-Evidenzen, keine fehlgeschlagenen Messungen. Bericht mit --static --gate bestanden. Sieben Seiten: Dashboard, Willkommen, Demo, Preview-Dashboard, Zeit, Kunden und Rechnungen; 320/375/390/430/768/1024 px, Hell/Dunkel. Nachweis: chromium-compliance-fix.json.
-- Getesteter Arbeitsbaum auf Elterncommit eb5e2e3763e37dca82e0c620b8cf1d0fd1facb97, Source-Digest ceca54cc4e2581bb5e020f4c2068aefc56d9712fef633f174645126a588c5989. qa:fast mit TypeScript, Lint, Architektur, Vertrags- und Compliance-Selbsttests bestanden. Die neue GitHub-Abnahme bleibt bis zum Abschluss offen; keine Produktionsfreigabe.
-
 Stand: 15.10.2026. Aktualisierung: Nutzer hat am 15.10.2026 um 20:24:41 Europe/Zurich den Weg bis Deploy ausdrücklich freigegeben. Keine vollständige V24-/Produktionsabnahme; Details und Profiltrennung in ux-enforcement-phase.md. Historische Phasenangaben unten bleiben als damaliger Stand erkennbar.
 
 ## GitHub-Abgleich

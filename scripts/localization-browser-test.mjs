@@ -18,7 +18,7 @@ try{
  for(const width of [390,768,1440])for(const locale of ['de','fr','it','en']){
   const context=await browser.newContext({viewport:{width,height:900},serviceWorkers:'block'});
   await context.addCookies([{name:'binso_demo',value:'1',url:base},{name:'binso_operator_demo',value:'1',url:base}]);
-  await context.route('**/api/**',route=>{const pathname=new URL(route.request().url()).pathname;return route.fulfill({json:pathname==='/api/auth/session'?{authenticated:true,demo:true,user:{id:'fixture'},tenant:{id:'fixture',role:'owner',plan:'pro'}}:pathname==='/api/settings/profile'?{item:{display_name:'Fixture Person',language:locale}}:{items:[],tracker:null}})});
+  await context.route('**/api/**',route=>{const pathname=new URL(route.request().url()).pathname;return route.fulfill({json:pathname==='/api/auth/session'?{authenticated:true,demo:true,user:{id:'fixture'},tenant:{id:'fixture',role:'owner',plan:'pro'}}:pathname==='/api/settings/profile'?{item:{display_name:'Fixture Person',language:locale}}:pathname==='/api/settings/company'?{item:{name:'Synthetic Localization Company'}}:{items:[],tracker:null}})});
   const faults=[],cancelledReloadPrefetches=[];let reloading=false;
   const trackedPage=async()=>{const next=await context.newPage();next.on('pageerror',error=>{
    // WebKit reports old-document speculative RSC fetches as page errors when
@@ -28,7 +28,7 @@ try{
    else faults.push(error.message);
   });return next};
   let page=await trackedPage();
-  await page.goto(base+'/?lang='+locale,{waitUntil:'networkidle'});await page.locator('.hero').waitFor();
+  await page.goto(base+'/?lang='+locale,{waitUntil:'networkidle'});await page.locator('.reference-hero').waitFor();
   assert.equal(await page.locator('html').getAttribute('lang'),locale+'-CH');
   const selector=page.locator('.locale-switcher select:visible').first();await selector.selectOption(locale==='en'?'fr':'en');
   const chosen=locale==='en'?'fr':'en';await page.waitForFunction(code=>document.documentElement.lang===code+'-CH',chosen);
@@ -46,15 +46,12 @@ try{
     await page.locator('button.avatar-button:visible').first().click();
     const accountLanguage=page.locator('.locale-switcher select:visible').first();await accountLanguage.waitFor();assert.equal(await accountLanguage.inputValue(),locale);await page.keyboard.press('Escape');
    }
-   if(route.startsWith('/?')){assert.equal((await page.locator('.hero h1').textContent()).replace(/\s/g,''),(text('Dein Geschäft.',locale)+text('Ein klarer Überblick.',locale)).replace(/\s/g,''));}if(route.startsWith('/?')){
-    const gallery=page.locator('.product-gallery');
-    await gallery.getByRole('tab',{name:text('Rechnungen',locale),exact:true}).click();
-    await gallery.getByRole('button',{name:text('Mobile / PWA',locale),exact:true}).click();
-    await gallery.locator('img').waitFor();
-    await page.waitForFunction(()=>{const image=document.querySelector('.product-gallery img');return image?.complete&&image.naturalWidth>0&&image.getAttribute('src').includes('invoices-mobile.png')});
-    await gallery.getByRole('button',{name:text('Desktop',locale),exact:true}).click();
-    await gallery.getByRole('tab',{name:text('Kunden',locale),exact:true}).click();
-    await page.waitForFunction(()=>{const image=document.querySelector('.product-gallery img');return image?.complete&&image.naturalWidth>0&&image.getAttribute('src').includes('customers-desktop.png')});
+   if(route.startsWith('/?')){assert.equal((await page.locator('.reference-hero h1').textContent()).replace(/\s/g,''),(text('Dein Geschäft.',locale)+text('Ein klarer',locale)+text('Überblick.',locale)).replace(/\s/g,''));}if(route.startsWith('/?')){
+    const features=page.locator('#funktionen');
+    await features.getByRole('tab',{name:text('Finanzen',locale),exact:true}).click();
+    await page.waitForFunction(()=>{const image=document.querySelector('#reference-feature-panel img');return image?.complete&&image.naturalWidth>0&&image.getAttribute('src').includes('invoices-desktop-')});
+    await features.getByRole('tab',{name:text('Kunden & Verkauf',locale),exact:true}).click();
+    await page.waitForFunction(()=>{const image=document.querySelector('#reference-feature-panel img');return image?.complete&&image.naturalWidth>0&&image.getAttribute('src').includes('customers-desktop-')});
     await page.screenshot({path:output+'/landing-'+locale+'-'+width+'.png',fullPage:true});
    }
   }
