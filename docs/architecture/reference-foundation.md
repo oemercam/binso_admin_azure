@@ -128,6 +128,14 @@ prüft anschliessend Darstellung und tatsächliche Bedienung.
 
 ## Prüfung und Grenzen
 
+Der aktive Farbvertrag `UX-FIN-010` folgt der ZIP-Vorgabe vom 15.10.2026:
+Statistikflächen verwenden bei jeder Breite die offene Seitenfläche `--color-bg`.
+Die frühere Outlook-Kartenfläche vom 13.10. ist damit abgelöst. Dark Mode
+verwendet dieselbe Tokenbeziehung und bleibt ausdrücklich abgeleitet.
+Die Messung prüft weiterhin exakte Farbgleichheit; Gegenproben müssen die alte
+graue Kartenfläche in beiden Themes bei 390, 1100 und 1440 px ablehnen.
+Der eingefrorene Navigationsvertrag und das Releaseprofil bleiben unverändert.
+
 `pnpm qa:fast --typecheck`, Referenz-/Navigations-/Foundation-Verträge und die
 gezielte Browsermatrix gehören zum Paket. Neue Seiten müssen im Inventar und
 in der Seitentypmatrix enthalten sein. Statische Zuordnung oder ein grüner Build

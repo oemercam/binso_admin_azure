@@ -48,6 +48,16 @@ try{
  assert.equal((await checkHeader(normalActions,'header-breakpoint'))[0].status,'passed','The desktop criterion includes the exact 1024px breakpoint');
  await page.setViewportSize({width:1023,height:1000});
  assert.equal((await checkHeader(normalActions+'<button>Mobile</button>','header-mobile')).length,0,'The desktop criterion starts at 1024px');
+ for(const width of [390,1100,1440])for(const theme of ['light','dark']){
+  await page.setViewportSize({width,height:1000});
+  const background=theme==='light'?'#fff':'#000',oldSurface=theme==='light'?'#f5f6f8':'#141414';
+  for(const surface of ['--color-bg','--app-surface']){
+   await page.setContent(`<style>:root{--color-bg:${background};--app-surface:${oldSurface}}body{background:var(--color-bg)}.bo-statistics{height:120px;background:var(${surface})}</style><section class="bo-statistics"></section>`);
+   const evidence=await measureCompliance(page,{output,route:'/finanzen/analyse',theme,width,state:'palette-'+surface,engine});
+   const palette=evidence.checks.filter(check=>check.id==='UX-FIN-010');assert.equal(palette.length,1);
+   assert.equal(palette[0].status,surface==='--color-bg'?'passed':'failed','The ZIP canvas passes and the superseded gray surface stays blocking at every viewport');
+  }
+ }
  await page.close();
- console.log('Scroll-end and desktop-header adversaries passed. Engine: '+engine);
+ console.log('Scroll-end, desktop-header and ZIP canvas/old-gray-surface adversaries passed. Engine: '+engine);
 }finally{await browser.close();await fs.rm(output,{recursive:true,force:true});}

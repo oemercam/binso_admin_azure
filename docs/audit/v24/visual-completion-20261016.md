@@ -58,6 +58,15 @@ before reloading, rather than ignoring WebKit page errors.
 
 ## Future work rule
 
+The active UX-FIN-010 measurement now follows the newer 15 October ZIP canvas
+contract at every width, superseding the 13 October Outlook card requirement.
+Twelve adversarial palette cases retain exact equality checks: the shared canvas
+passes and the obsolete gray card fails in both themes at 390, 1100 and 1440 px.
+The two actual finance routes also passed all twelve viewport/theme combinations.
+Registry identity reports the active version and binds its complete source; fixture
+tests verify that changing the registry changes the digest. Navigation protection
+and the development release scope are unchanged. Dark mode remains derived.
+
 Use the page patterns in `docs/architecture/reference-foundation.md`. Extend the
 owning shared component and stylesheet when a pattern needs another state. Do not
 restore route overrides or duplicate operator/demo variants. Keep the independent
