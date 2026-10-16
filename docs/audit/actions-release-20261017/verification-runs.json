@@ -1,0 +1,1150 @@
+{
+  "id": 38976312383,
+  "number": 1405,
+  "url": "https://github.com/oemercam/binso_admin_azure/actions/runs/38976312383",
+  "event": "workflow_dispatch",
+  "headSha": "35ef6a3691786910d842af5f09ceec22216e4bba",
+  "branch": "audit/actions-release-architecture",
+  "status": "completed",
+  "conclusion": "success",
+  "createdAt": "2026-10-16T22:31:59Z",
+  "completedAt": "2026-10-16T22:43:16Z",
+  "elapsedSeconds": 677,
+  "runnerSeconds": 3354,
+  "jobs": [
+    {
+      "id": 117226503573,
+      "name": "build",
+      "conclusion": "success",
+      "seconds": 110,
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success",
+          "seconds": 1
+        },
+        {
+          "name": "Initialize containers",
+          "conclusion": "success",
+          "seconds": 19
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "conclusion": "success",
+          "seconds": 3
+        },
+        {
+          "name": "Run ./.github/actions/setup-node",
+          "conclusion": "success",
+          "seconds": 10
+        },
+        {
+          "name": "Restore Next compiler cache (never a completed build)",
+          "conclusion": "success",
+          "seconds": 2
+        },
+        {
+          "name": "Run pnpm build",
+          "conclusion": "success",
+          "seconds": 29
+        },
+        {
+          "name": "Authenticated tenant, role and session HTTP gate",
+          "conclusion": "success",
+          "seconds": 5
+        },
+        {
+          "name": "Anonymous API authorization surface",
+          "conclusion": "success",
+          "seconds": 1
+        },
+        {
+          "name": "Runtime smoke test",
+          "conclusion": "success",
+          "seconds": 3
+        },
+        {
+          "name": "Package production candidate",
+          "conclusion": "success",
+          "seconds": 18
+        },
+        {
+          "name": "Smoke test exact production artifact",
+          "conclusion": "success",
+          "seconds": 5
+        },
+        {
+          "name": "Bind tested ZIP bytes to the source SHA",
+          "conclusion": "success",
+          "seconds": 0
+        },
+        {
+          "name": "Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9",
+          "conclusion": "success",
+          "seconds": 3
+        },
+        {
+          "name": "Post Restore Next compiler cache (never a completed build)",
+          "conclusion": "success",
+          "seconds": 3
+        },
+        {
+          "name": "Post Run ./.github/actions/setup-node",
+          "conclusion": "success",
+          "seconds": 0
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "conclusion": "success",
+          "seconds": 0
+        },
+        {
+          "name": "Stop containers",
+          "conclusion": "success",
+          "seconds": 5
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success",
+          "seconds": 0
+        }
+      ]
+    },
+    {
+      "id": 117226503711,
+      "name": "plan",
+      "conclusion": "success",
+      "seconds": 10,
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success",
+          "seconds": 1
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "conclusion": "success",
+          "seconds": 5
+        },
+        {
+          "name": "Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+          "conclusion": "success",
+          "seconds": 1
+        },
+        {
+          "name": "Select conservative QA scope",
+          "conclusion": "success",
+          "seconds": 0
+        },
+        {
+          "name": "Plan independent browser lanes",
+          "conclusion": "success",
+          "seconds": 0
+        },
+        {
+          "name": "Post Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+          "conclusion": "success",
+          "seconds": 0
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "conclusion": "success",
+          "seconds": 0
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success",
+          "seconds": 1
+        }
+      ]
+    },
+    {
+      "id": 117226503787,
+      "name": "scanner-engine",
+      "conclusion": "success",
+      "seconds": 71,
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success",
+          "seconds": 1
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "conclusion": "success",
+          "seconds": 4
+        },
+        {
+          "name": "Run ./.github/actions/setup-node",
+          "conclusion": "success",
+          "seconds": 11
+        },
+        {
+          "name": "Validate sidecar ARM template without provisioning",
+          "conclusion": "success",
+          "seconds": 11
+        },
+        {
+          "name": "Resolve official patched ClamAV and build private-loopback runtime",
+          "conclusion": "success",
+          "seconds": 6
+        },
+        {
+          "name": "Real engine, current signatures, limits, outage and recovery",
+          "conclusion": "success",
+          "seconds": 24
+        },
+        {
+          "name": "Export the exact qualified scanner image",
+          "conclusion": "success",
+          "seconds": 6
+        },
+        {
+          "name": "Upload qualified scanner candidate",
+          "conclusion": "success",
+          "seconds": 2
+        },
+        {
+          "name": "Record scanner runtime and memory evidence",
+          "conclusion": "success",
+          "seconds": 1
+        },
+        {
+          "name": "Upload scanner qualification evidence",
+          "conclusion": "success",
+          "seconds": 1
+        },
+        {
+          "name": "Stop isolated scanner",
+          "conclusion": "success",
+          "seconds": 1
+        },
+        {
+          "name": "Post Run ./.github/actions/setup-node",
+          "conclusion": "success",
+          "seconds": 0
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "conclusion": "success",
+          "seconds": 0
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success",
+          "seconds": 1
+        }
+      ]
+    },
+    {
+      "id": 117226503872,
+      "name": "checks",
+      "conclusion": "success",
+      "seconds": 97,
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success",
+          "seconds": 1
+        },
+        {
+          "name": "Initialize containers",
+          "conclusion": "success",
+          "seconds": 20
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "conclusion": "success",
+          "seconds": 3
+        },
+        {
+          "name": "Run ./.github/actions/setup-node",
+          "conclusion": "success",
+          "seconds": 9
+        },
+        {
+          "name": "Run pnpm release:check",
+          "conclusion": "success",
+          "seconds": 1
+        },
+        {
+          "name": "Run pnpm test",
+          "conclusion": "success",
+          "seconds": 35
+        },
+        {
+          "name": "Fast UX compliance contracts",
+          "conclusion": "success",
+          "seconds": 1
+        },
+        {
+          "name": "Real isolated PostgreSQL parallel process gate",
+          "conclusion": "success",
+          "seconds": 3
+        },
+        {
+          "name": "Run pnpm lint",
+          "conclusion": "success",
+          "seconds": 13
+        },
+        {
+          "name": "Run pnpm css:check",
+          "conclusion": "success",
+          "seconds": 0
+        },
+        {
+          "name": "Run pnpm typecheck",
+          "conclusion": "success",
+          "seconds": 5
+        },
+        {
+          "name": "Record successful scoped architecture lint evidence",
+          "conclusion": "success",
+          "seconds": 0
+        },
+        {
+          "name": "Upload architecture lint evidence",
+          "conclusion": "success",
+          "seconds": 1
+        },
+        {
+          "name": "Run pnpm security:scan",
+          "conclusion": "success",
+          "seconds": 1
+        },
+        {
+          "name": "Full dependency audit including development tooling",
+          "conclusion": "success",
+          "seconds": 1
+        },
+        {
+          "name": "Post Run ./.github/actions/setup-node",
+          "conclusion": "success",
+          "seconds": 0
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "conclusion": "success",
+          "seconds": 0
+        },
+        {
+          "name": "Stop containers",
+          "conclusion": "success",
+          "seconds": 0
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success",
+          "seconds": 0
+        }
+      ]
+    },
+    {
+      "id": 117227108183,
+      "name": "browser (chromium, functional, 0, 1)",
+      "conclusion": "success",
+      "seconds": 452,
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success",
+          "seconds": 1
+        },
+        {
+          "name": "Initialize containers",
+          "conclusion": "success",
+          "seconds": 14
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "conclusion": "success",
+          "seconds": 2
+        },
+        {
+          "name": "Run ./.github/actions/setup-node",
+          "conclusion": "success",
+          "seconds": 7
+        },
+        {
+          "name": "Run actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333",
+          "conclusion": "success",
+          "seconds": 3
+        },
+        {
+          "name": "Extract exact production candidate",
+          "conclusion": "success",
+          "seconds": 4
+        },
+        {
+          "name": "Restore pinned browser binaries",
+          "conclusion": "success",
+          "seconds": 1
+        },
+        {
+          "name": "Install one browser engine",
+          "conclusion": "success",
+          "seconds": 21
+        },
+        {
+          "name": "Capture owner-supplied UX reference views",
+          "conclusion": "success",
+          "seconds": 2
+        },
+        {
+          "name": "Scroll endpoint measurement adversaries",
+          "conclusion": "success",
+          "seconds": 5
+        },
+        {
+          "name": "Critical timer, draft recovery and report export regression",
+          "conclusion": "success",
+          "seconds": 40
+        },
+        {
+          "name": "Landing and portal localization regression",
+          "conclusion": "success",
+          "seconds": 69
+        },
+        {
+          "name": "Deterministic synthetic data and role variants",
+          "conclusion": "success",
+          "seconds": 19
+        },
+        {
+          "name": "Authenticated observability and wallboard regression",
+          "conclusion": "success",
+          "seconds": 181
+        },
+        {
+          "name": "Guided registration, languages and responsive regression",
+          "conclusion": "success",
+          "seconds": 31
+        },
+        {
+          "name": "Development-only shared component reference regression",
+          "conclusion": "success",
+          "seconds": 23
+        },
+        {
+          "name": "FULL PWA restart and offline regression",
+          "conclusion": "success",
+          "seconds": 4
+        },
+        {
+          "name": "Startup, session and persistent navigation regression",
+          "conclusion": "success",
+          "seconds": 20
+        },
+        {
+          "name": "Upload browser evidence",
+          "conclusion": "success",
+          "seconds": 1
+        },
+        {
+          "name": "Post Run ./.github/actions/setup-node",
+          "conclusion": "success",
+          "seconds": 0
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "conclusion": "success",
+          "seconds": 0
+        },
+        {
+          "name": "Stop containers",
+          "conclusion": "success",
+          "seconds": 1
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success",
+          "seconds": 0
+        }
+      ]
+    },
+    {
+      "id": 117227108212,
+      "name": "browser (webkit, functional, 0, 1)",
+      "conclusion": "success",
+      "seconds": 510,
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success",
+          "seconds": 2
+        },
+        {
+          "name": "Initialize containers",
+          "conclusion": "success",
+          "seconds": 20
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "conclusion": "success",
+          "seconds": 4
+        },
+        {
+          "name": "Run ./.github/actions/setup-node",
+          "conclusion": "success",
+          "seconds": 13
+        },
+        {
+          "name": "Run actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333",
+          "conclusion": "success",
+          "seconds": 5
+        },
+        {
+          "name": "Extract exact production candidate",
+          "conclusion": "success",
+          "seconds": 5
+        },
+        {
+          "name": "Restore pinned browser binaries",
+          "conclusion": "success",
+          "seconds": 2
+        },
+        {
+          "name": "Install one browser engine",
+          "conclusion": "success",
+          "seconds": 33
+        },
+        {
+          "name": "Scroll endpoint measurement adversaries",
+          "conclusion": "success",
+          "seconds": 8
+        },
+        {
+          "name": "Critical timer, draft recovery and report export regression",
+          "conclusion": "success",
+          "seconds": 62
+        },
+        {
+          "name": "Landing and portal localization regression",
+          "conclusion": "success",
+          "seconds": 111
+        },
+        {
+          "name": "Authenticated observability and wallboard regression",
+          "conclusion": "success",
+          "seconds": 186
+        },
+        {
+          "name": "Guided registration, languages and responsive regression",
+          "conclusion": "success",
+          "seconds": 31
+        },
+        {
+          "name": "Startup, session and persistent navigation regression",
+          "conclusion": "success",
+          "seconds": 21
+        },
+        {
+          "name": "Upload browser evidence",
+          "conclusion": "success",
+          "seconds": 2
+        },
+        {
+          "name": "Post Run ./.github/actions/setup-node",
+          "conclusion": "success",
+          "seconds": 1
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "conclusion": "success",
+          "seconds": 0
+        },
+        {
+          "name": "Stop containers",
+          "conclusion": "success",
+          "seconds": 0
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success",
+          "seconds": 0
+        }
+      ]
+    },
+    {
+      "id": 117227108226,
+      "name": "browser (webkit, responsive, 1, 3)",
+      "conclusion": "success",
+      "seconds": 414,
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success",
+          "seconds": 1
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "conclusion": "success",
+          "seconds": 4
+        },
+        {
+          "name": "Run ./.github/actions/setup-node",
+          "conclusion": "success",
+          "seconds": 10
+        },
+        {
+          "name": "Run actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333",
+          "conclusion": "success",
+          "seconds": 2
+        },
+        {
+          "name": "Extract exact production candidate",
+          "conclusion": "success",
+          "seconds": 6
+        },
+        {
+          "name": "Restore pinned browser binaries",
+          "conclusion": "success",
+          "seconds": 1
+        },
+        {
+          "name": "Install one browser engine",
+          "conclusion": "success",
+          "seconds": 33
+        },
+        {
+          "name": "Scoped responsive UX and process regression",
+          "conclusion": "success",
+          "seconds": 353
+        },
+        {
+          "name": "Upload browser evidence",
+          "conclusion": "success",
+          "seconds": 2
+        },
+        {
+          "name": "Post Run ./.github/actions/setup-node",
+          "conclusion": "success",
+          "seconds": 0
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "conclusion": "success",
+          "seconds": 0
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success",
+          "seconds": 0
+        }
+      ]
+    },
+    {
+      "id": 117227108230,
+      "name": "browser (chromium, responsive, 0, 3)",
+      "conclusion": "success",
+      "seconds": 334,
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success",
+          "seconds": 1
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "conclusion": "success",
+          "seconds": 4
+        },
+        {
+          "name": "Run ./.github/actions/setup-node",
+          "conclusion": "success",
+          "seconds": 16
+        },
+        {
+          "name": "Run actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333",
+          "conclusion": "success",
+          "seconds": 3
+        },
+        {
+          "name": "Extract exact production candidate",
+          "conclusion": "success",
+          "seconds": 5
+        },
+        {
+          "name": "Restore pinned browser binaries",
+          "conclusion": "success",
+          "seconds": 1
+        },
+        {
+          "name": "Install one browser engine",
+          "conclusion": "success",
+          "seconds": 16
+        },
+        {
+          "name": "Scoped responsive UX and process regression",
+          "conclusion": "success",
+          "seconds": 282
+        },
+        {
+          "name": "Upload browser evidence",
+          "conclusion": "success",
+          "seconds": 3
+        },
+        {
+          "name": "Post Run ./.github/actions/setup-node",
+          "conclusion": "success",
+          "seconds": 0
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "conclusion": "success",
+          "seconds": 1
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success",
+          "seconds": 0
+        }
+      ]
+    },
+    {
+      "id": 117227108315,
+      "name": "browser (webkit, responsive, 0, 3)",
+      "conclusion": "success",
+      "seconds": 325,
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success",
+          "seconds": 1
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "conclusion": "success",
+          "seconds": 4
+        },
+        {
+          "name": "Run ./.github/actions/setup-node",
+          "conclusion": "success",
+          "seconds": 11
+        },
+        {
+          "name": "Run actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333",
+          "conclusion": "success",
+          "seconds": 2
+        },
+        {
+          "name": "Extract exact production candidate",
+          "conclusion": "success",
+          "seconds": 6
+        },
+        {
+          "name": "Restore pinned browser binaries",
+          "conclusion": "success",
+          "seconds": 1
+        },
+        {
+          "name": "Install one browser engine",
+          "conclusion": "success",
+          "seconds": 32
+        },
+        {
+          "name": "Scoped responsive UX and process regression",
+          "conclusion": "success",
+          "seconds": 263
+        },
+        {
+          "name": "Upload browser evidence",
+          "conclusion": "success",
+          "seconds": 2
+        },
+        {
+          "name": "Post Run ./.github/actions/setup-node",
+          "conclusion": "success",
+          "seconds": 0
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "conclusion": "success",
+          "seconds": 1
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success",
+          "seconds": 0
+        }
+      ]
+    },
+    {
+      "id": 117227108335,
+      "name": "browser (chromium, responsive, 2, 3)",
+      "conclusion": "success",
+      "seconds": 311,
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success",
+          "seconds": 1
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "conclusion": "success",
+          "seconds": 4
+        },
+        {
+          "name": "Run ./.github/actions/setup-node",
+          "conclusion": "success",
+          "seconds": 12
+        },
+        {
+          "name": "Run actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333",
+          "conclusion": "success",
+          "seconds": 11
+        },
+        {
+          "name": "Extract exact production candidate",
+          "conclusion": "success",
+          "seconds": 5
+        },
+        {
+          "name": "Restore pinned browser binaries",
+          "conclusion": "success",
+          "seconds": 4
+        },
+        {
+          "name": "Install one browser engine",
+          "conclusion": "success",
+          "seconds": 13
+        },
+        {
+          "name": "Scoped responsive UX and process regression",
+          "conclusion": "success",
+          "seconds": 250
+        },
+        {
+          "name": "Upload browser evidence",
+          "conclusion": "success",
+          "seconds": 7
+        },
+        {
+          "name": "Post Run ./.github/actions/setup-node",
+          "conclusion": "success",
+          "seconds": 0
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "conclusion": "success",
+          "seconds": 0
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success",
+          "seconds": 0
+        }
+      ]
+    },
+    {
+      "id": 117227108341,
+      "name": "browser (webkit, responsive, 2, 3)",
+      "conclusion": "success",
+      "seconds": 262,
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success",
+          "seconds": 2
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "conclusion": "success",
+          "seconds": 3
+        },
+        {
+          "name": "Run ./.github/actions/setup-node",
+          "conclusion": "success",
+          "seconds": 12
+        },
+        {
+          "name": "Run actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333",
+          "conclusion": "success",
+          "seconds": 9
+        },
+        {
+          "name": "Extract exact production candidate",
+          "conclusion": "success",
+          "seconds": 5
+        },
+        {
+          "name": "Restore pinned browser binaries",
+          "conclusion": "success",
+          "seconds": 4
+        },
+        {
+          "name": "Install one browser engine",
+          "conclusion": "success",
+          "seconds": 37
+        },
+        {
+          "name": "Scoped responsive UX and process regression",
+          "conclusion": "success",
+          "seconds": 182
+        },
+        {
+          "name": "Upload browser evidence",
+          "conclusion": "success",
+          "seconds": 4
+        },
+        {
+          "name": "Post Run ./.github/actions/setup-node",
+          "conclusion": "success",
+          "seconds": 0
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "conclusion": "success",
+          "seconds": 0
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success",
+          "seconds": 0
+        }
+      ]
+    },
+    {
+      "id": 117227108343,
+      "name": "browser (chromium, responsive, 1, 3)",
+      "conclusion": "success",
+      "seconds": 411,
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success",
+          "seconds": 2
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "conclusion": "success",
+          "seconds": 3
+        },
+        {
+          "name": "Run ./.github/actions/setup-node",
+          "conclusion": "success",
+          "seconds": 13
+        },
+        {
+          "name": "Run actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333",
+          "conclusion": "success",
+          "seconds": 4
+        },
+        {
+          "name": "Extract exact production candidate",
+          "conclusion": "success",
+          "seconds": 5
+        },
+        {
+          "name": "Restore pinned browser binaries",
+          "conclusion": "success",
+          "seconds": 3
+        },
+        {
+          "name": "Install one browser engine",
+          "conclusion": "success",
+          "seconds": 13
+        },
+        {
+          "name": "Scoped responsive UX and process regression",
+          "conclusion": "success",
+          "seconds": 361
+        },
+        {
+          "name": "Upload browser evidence",
+          "conclusion": "success",
+          "seconds": 3
+        },
+        {
+          "name": "Post Run ./.github/actions/setup-node",
+          "conclusion": "success",
+          "seconds": 1
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "conclusion": "success",
+          "seconds": 0
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success",
+          "seconds": 0
+        }
+      ]
+    },
+    {
+      "id": 117229814986,
+      "name": "ux-compliance",
+      "conclusion": "success",
+      "seconds": 33,
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success",
+          "seconds": 1
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "conclusion": "success",
+          "seconds": 4
+        },
+        {
+          "name": "Run ./.github/actions/setup-node",
+          "conclusion": "success",
+          "seconds": 11
+        },
+        {
+          "name": "Collect current browser measurements",
+          "conclusion": "success",
+          "seconds": 4
+        },
+        {
+          "name": "Collect successful architecture lint evidence",
+          "conclusion": "success",
+          "seconds": 1
+        },
+        {
+          "name": "Generate individual requirement coverage and enforce measured failures",
+          "conclusion": "success",
+          "seconds": 6
+        },
+        {
+          "name": "Publish compliance report including failures and missing evidence",
+          "conclusion": "success",
+          "seconds": 2
+        },
+        {
+          "name": "Add coverage summary",
+          "conclusion": "success",
+          "seconds": 0
+        },
+        {
+          "name": "Post Run ./.github/actions/setup-node",
+          "conclusion": "success",
+          "seconds": 0
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "conclusion": "success",
+          "seconds": 0
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success",
+          "seconds": 0
+        }
+      ]
+    },
+    {
+      "id": 117229994565,
+      "name": "quality",
+      "conclusion": "success",
+      "seconds": 14,
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success",
+          "seconds": 2
+        },
+        {
+          "name": "Enforce every mandatory result",
+          "conclusion": "success",
+          "seconds": 0
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "conclusion": "success",
+          "seconds": 4
+        },
+        {
+          "name": "Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+          "conclusion": "success",
+          "seconds": 0
+        },
+        {
+          "name": "Download fully verified production candidate",
+          "conclusion": "success",
+          "seconds": 5
+        },
+        {
+          "name": "Verify tested ZIP before promotion",
+          "conclusion": "success",
+          "seconds": 1
+        },
+        {
+          "name": "Post Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+          "conclusion": "success",
+          "seconds": 0
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "conclusion": "success",
+          "seconds": 0
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success",
+          "seconds": 0
+        }
+      ]
+    }
+  ],
+  "responsiveEvidence": [
+    {
+      "job": "browser (webkit, responsive, 1, 3)",
+      "combinations": 72,
+      "log": "UX browser checks passed: 72 route/theme/viewport combinations ; interactions: customers,documents,expenses,header,chrome. Artifacts: /home/runner/work/_temp/binso-ux-webkit/shard-0"
+    },
+    {
+      "job": "browser (chromium, responsive, 0, 3)",
+      "combinations": 406,
+      "log": "UX browser checks passed: 406 route/theme/viewport combinations ; interactions: data,employees,time,billing,settings. Artifacts: /home/runner/work/_temp/binso-ux-chromium/shard-0"
+    },
+    {
+      "job": "browser (webkit, responsive, 0, 3)",
+      "combinations": 72,
+      "log": "UX browser checks passed: 72 route/theme/viewport combinations ; interactions: data,employees,time,billing,settings. Artifacts: /home/runner/work/_temp/binso-ux-webkit/shard-0"
+    },
+    {
+      "job": "browser (chromium, responsive, 2, 3)",
+      "combinations": 392,
+      "log": "UX browser checks passed: 392 route/theme/viewport combinations ; interactions: products,finance,chat,operator. Artifacts: /home/runner/work/_temp/binso-ux-chromium/shard-0"
+    },
+    {
+      "job": "browser (webkit, responsive, 2, 3)",
+      "combinations": 60,
+      "log": "UX browser checks passed: 60 route/theme/viewport combinations ; interactions: products,finance,chat,operator. Artifacts: /home/runner/work/_temp/binso-ux-webkit/shard-0"
+    },
+    {
+      "job": "browser (chromium, responsive, 1, 3)",
+      "combinations": 392,
+      "log": "UX browser checks passed: 392 route/theme/viewport combinations ; interactions: customers,documents,expenses,header,chrome. Artifacts: /home/runner/work/_temp/binso-ux-chromium/shard-0"
+    }
+  ],
+  "baselineRun1403": {
+    "id": 38969839838,
+    "elapsedSeconds": 682,
+    "runnerSeconds": 3052,
+    "note": "Different SHA and runner allocation; descriptive comparison, not a controlled benchmark."
+  },
+  "draftRun1404": {
+    "id": 38975770430,
+    "elapsedSeconds": 179,
+    "runnerSeconds": 388,
+    "conclusion": "success",
+    "browser": "deferred per existing draft policy"
+  },
+  "codeql": {
+    "id": 38975770319,
+    "conclusion": "success",
+    "analyzeSeconds": 86
+  },
+  "scope": {
+    "level": "full",
+    "profile": "development",
+    "chromiumResponsive": 1190,
+    "webkitResponsive": 204,
+    "sourceUnchangedAfterRun": "Subsequent audit result commit changes documentation/evidence only; executable code remains exactly this headSha."
+  }
+}
