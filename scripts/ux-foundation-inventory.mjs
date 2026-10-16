@@ -1,0 +1,11 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import {createRequire} from 'node:module';
+const require=createRequire(import.meta.url),postcss=require(require.resolve('postcss',{paths:[require.resolve('next')]}));
+const walk=dir=>fs.readdirSync(dir,{withFileTypes:true}).flatMap(e=>e.isDirectory()?walk(path.join(dir,e.name)):[path.join(dir,e.name)]);
+const files=walk('app').concat(walk('components')).filter(f=>/\.(tsx?|css)$/.test(f)).map(f=>f.replaceAll('\\','/'));
+const styles=files.filter(f=>f.endsWith('.css')&&f!=='app/binso-ui.css');
+const results={files:files.length,routes:files.filter(f=>f.startsWith('app/')&&path.basename(f)==='page.tsx').length,styles:[],inline:[],colors:{},radii:{}};
+for(const file of styles){const tree=postcss.parse(fs.readFileSync(file,'utf8'));let declarations=0;const owners=new Map();tree.walkRules(rule=>{let ctx='';for(let p=rule.parent;p&&p.type!=='root';p=p.parent)ctx=p.name+' '+p.params+'/'+ctx;for(const d of rule.nodes.filter(n=>n.type==='decl')){declarations++;const k=ctx+'|'+rule.selector+'|'+d.prop;if(!owners.has(k))owners.set(k,[]);owners.get(k).push(d.value);}});tree.walkDecls(d=>{for(const c of d.value.matchAll(/#[a-f\d]{3,8}\b|rgba?\([^)]*\)/gi))results.colors[c[0]]=(results.colors[c[0]]||0)+1;if(d.prop==='border-radius'&&!d.value.includes('var('))results.radii[d.value]=(results.radii[d.value]||0)+1;});results.styles.push({file,bytes:fs.statSync(file).size,declarations,competing:[...owners].filter(([,v])=>v.length>1).length,examples:[...owners].filter(([,v])=>v.length>1).slice(0,12)});}
+for(const file of files.filter(f=>f.endsWith('.tsx'))){const text=fs.readFileSync(file,'utf8');const matches=[...text.matchAll(/style=\{\{([^}]+)\}\}/g)].map(m=>m[1]);if(matches.length)results.inline.push({file,styles:matches});}
+const output=process.env.BINSO_FOUNDATION_REPORT??'docs/audit/v24/foundation-inventory.json';fs.mkdirSync(path.dirname(output),{recursive:true});fs.writeFileSync(output,JSON.stringify(results,null,2)+'\n');console.log(JSON.stringify({...results,styles:results.styles.map(({examples,...s})=>s),colors:Object.entries(results.colors).sort((a,b)=>b[1]-a[1]).slice(0,18),radii:Object.entries(results.radii).sort((a,b)=>b[1]-a[1]).slice(0,12),inline:results.inline},null,2));

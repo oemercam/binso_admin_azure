@@ -89,7 +89,7 @@ export function Button({
 }: {
   href?: string;
   children?: React.ReactNode;
-  variant?: "primary" | "secondary" | "ghost" | "danger";
+  variant?: "primary" | "secondary" | "ghost" | "danger" | "upload";
   icon?: string;
   onClick?: () => void;
   type?: "button" | "submit";
@@ -202,4 +202,11 @@ export function ErrorState({children,onRetry,retryLabel="Erneut versuchen",class
 /** Customer and operator conversations share one bubble; direction is contextual. */
 export function MessageBubble({children,author,time,outgoing=false,internal=false}:{children:React.ReactNode;author?:React.ReactNode;time:React.ReactNode;outgoing?:boolean;internal?:boolean}){
   return <article className={outgoing?"message message-user":"message message-support"}>{author&&<span>{author}</span>}<div>{children}</div><small>{time}{internal&&<> · <Status><LocalizedText>{"Intern"}</LocalizedText></Status></>}</small></article>;
+}
+
+/** Geometry stays in base.css; only the measured progress value is dynamic. */
+export function ProgressBar({value,max=100,label}:{value:number;max?:number;label:string}){
+ const limit=Number.isFinite(max)&&max>0?max:100;
+ const current=Number.isFinite(value)?Math.max(0,Math.min(value,limit)):0;
+ return <div className="progress-track" role="progressbar" aria-label={label} aria-valuemin={0} aria-valuemax={limit} aria-valuenow={current} style={{"--progress-value":(current/limit*100)+'%'} as React.CSSProperties}><span/></div>;
 }

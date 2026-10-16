@@ -1,3 +1,5 @@
+> Historischer Stand des früheren Piloten. Aktuelle Umsetzung und Prüfungen: [Reference Foundation Review](reference-foundation-review.md). Keine aktuelle UI-Regel.
+
 # Referenzgebundener Pilot – 16.10.2026
 
 Ausgangspunkt: Main `c88a581e7bf952a0da9923a58f1e229c67c28986`, sauberer Arbeitsbaum; eigener Branch `ux/reference-pilot-alignment`.

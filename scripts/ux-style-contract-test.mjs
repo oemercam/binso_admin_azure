@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {styleBindingErrors} from './ux-style-contract.mjs';
-const binding={id:'fixture',file:'app/styles/base.css',selector:'.button',context:'',property:'font-size',token:'--button-font-size',value:'14px'};
-const root={file:'app/styles/tokens.css',selector:':root',context:'',declarations:[{property:'--button-font-size',value:'14px'}]};
+const binding={id:'fixture',file:'app/design-system/primitives.css',selector:'.button',context:'',property:'font-size',token:'--button-font-size',value:'14px'};
+const root={file:'app/design-system/theme.css',selector:':root',context:'',declarations:[{property:'--button-font-size',value:'14px'}]};
 const control={file:binding.file,selector:binding.selector,context:'',declarations:[{property:'font-size',value:'var(--button-font-size)'}]};
 assert.deepEqual(styleBindingErrors([root,control],[binding]),[]);
 for(const value of ['14px','var(--other-token)','var(--button-font-size, 18px)'])assert.ok(styleBindingErrors([root,{...control,declarations:[{property:'font-size',value}]}],[binding]).length,'Copied literal / arbitrary alias / local fallback is rejected');

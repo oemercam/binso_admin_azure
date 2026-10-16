@@ -32,7 +32,7 @@ export default function Product(){
         <span className="eyebrow"><LocalizedText>{"PRODUKT"}</LocalizedText></span>
         <h1><LocalizedText>{"Eine Plattform. Klare Prozesse."}</LocalizedText></h1>
         <p><LocalizedText>{"Binso One verbindet die wichtigsten Abläufe deines Unternehmens – vom ersten Kundenkontakt bis zur Zahlung."}</LocalizedText></p>
-        <div className="hero-actions"><Button href="/registrieren">{domainConfig.trialDays}<LocalizedText>{" Tage kostenlos testen"}</LocalizedText></Button><Button href="/demo" variant="secondary"><LocalizedText>{"Demo starten"}</LocalizedText></Button></div>
+        <div className="reference-actions"><Button href="/registrieren">{domainConfig.trialDays}<LocalizedText>{" Tage kostenlos testen"}</LocalizedText></Button><Button href="/demo" variant="secondary"><LocalizedText>{"Demo starten"}</LocalizedText></Button></div>
       </div>
       <ProductPreview/>
     </section>

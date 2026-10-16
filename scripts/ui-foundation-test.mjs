@@ -1,3 +1,4 @@
+import './reference-foundation-test.mjs';
 import './localization-test-adapter.mjs';
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
@@ -25,10 +26,10 @@ assert.equal((await messages('export function AnotherInput(){return <input/>;}',
 assert.equal(redundantDeclarations(postcss.parse('.field{height:40px}.field{height:40px}')).length,1);
 assert.equal(redundantDeclarations(postcss.parse('.field{height:40px}@media(max-width:760px){.field{height:44px}}')).length,0,'Responsive variants are different contexts');
 assert.equal(redundantDeclarations(postcss.parse('.field{height:100vh;height:100dvh}')).length,0,'Progressive fallbacks remain valid');
-const cssImports='@import "./styles/tokens.css";@import "./styles/base.css";';
-assert.doesNotThrow(()=>assertRuntimeImports(postcss.parse(cssImports),['tokens.css','base.css']));
-assert.throws(()=>assertRuntimeImports(postcss.parse(cssImports),['base.css','tokens.css']),/cascade order/);
-assert.throws(()=>assertRuntimeImports(postcss.parse(cssImports+cssImports),['tokens.css','base.css']),/cascade order/);
+const cssImports='@import "./design-system/theme.css";@import "./design-system/primitives.css";';
+assert.doesNotThrow(()=>assertRuntimeImports(postcss.parse(cssImports),['theme.css','primitives.css']));
+assert.throws(()=>assertRuntimeImports(postcss.parse(cssImports),['primitives.css','theme.css']),/cascade order/);
+assert.throws(()=>assertRuntimeImports(postcss.parse(cssImports+cssImports),['theme.css','primitives.css']),/cascade order/);
 const source=fs.readFileSync('components/ui.tsx','utf8'),ast=ts.createSourceFile('ui.tsx',source,99,true,4);
 const body=ast.statements.filter(n=>!ts.isImportDeclaration(n)).map(n=>n.getText(ast)).join('\n');
 const compiled=ts.transpileModule(body,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;

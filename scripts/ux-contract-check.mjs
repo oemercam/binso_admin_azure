@@ -25,6 +25,6 @@ assert.ok(Array.isArray(contract.styleBindings)&&contract.styleBindings.length>=
 assert.equal(new Set(contract.styleBindings.map(b=>[b.file,b.context,b.selector,b.property].join('|'))).size,contract.styleBindings.length,'Style bindings must be unique');
 for(const binding of contract.styleBindings)assert.ok(contract.rules.some(rule=>rule.id===binding.id),'Every style binding needs an acceptance rule');
 assert.deepEqual(styleBindingErrors(catalog.cssRules,contract.styleBindings),[],'Central style bindings must match documented tokens');
-const base=catalog.cssRules.filter(r=>r.file==='app/styles/base.css');
+const base=catalog.cssRules.filter(r=>r.file==='app/design-system/foundation.css');
 assert.ok(base.some(r=>r.selector.includes('[aria-invalid="true"]')&&r.declarations.some(d=>d.property==='outline-color'&&d.value==='var(--status-danger-fg)')));
 console.log(`UX contract: ${contract.rules.length} owners, ${matrix.pages.length} source pages; control focus ownership passed. Static coverage is not visual acceptance.`);

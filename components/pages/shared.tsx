@@ -27,7 +27,7 @@ export function swissDate(value:unknown){
 
 export function mapRemoteRows(collection:DemoCollection,items:Record<string,unknown>[]):string[][]{
   if(collection==="customers") return items.map(item=>[
-    String(item.name??""),String(item.contact??item.contact_name??""),String(item.city??""),String(item.id??""),item.status==="inactive"?"Inaktiv":"Aktiv",String(item.customer_no??"")
+    String(item.name??""),String(item.contact??item.contact_name??""),String(item.city??""),String(item.id??""),item.status==="inactive"?"Inaktiv":"Aktiv",String(item.customer_no??""),customerAmounts(item.financials,'revenue'),customerAmounts(item.financials,'open_amount')
   ]);
   if(collection==="products") return items.map(item=>[
     String(item.name??""),item.kind==="product"?"Produkt":"Dienstleistung",withPriceUnit(moneyChf(item.unit_price),item.unit),String(item.id??""),item.status==="inactive"?"Inaktiv":"Aktiv"
@@ -48,6 +48,12 @@ export function mapRemoteRows(collection:DemoCollection,items:Record<string,unkn
     return [String(item.id??""),swissDate(item.paid_on),String(customer?.name??"Kunde"),[invoice?.number,paymentMethodLabel(item.method)].filter(Boolean).join(" · "),formatCurrency(item.amount,String(item.currency??invoice?.currency??"CHF")),statusMap[String(item.status)]??String(item.status??"")];
   });
   return [];
+}
+
+/** No financial permission/response is an em dash, never an invented zero. */
+function customerAmounts(value:unknown,key:'revenue'|'open_amount'){
+ if(!Array.isArray(value)||!value.length)return '—';
+ return value.filter(item=>item&&typeof item.currency==='string'&&Number.isFinite(Number(item[key]))).map(item=>formatCurrency(item[key],item.currency)).join(' · ')||'—';
 }
 
 export function useDemoRows(collection:DemoCollection, defaults:string[][],filters="") {

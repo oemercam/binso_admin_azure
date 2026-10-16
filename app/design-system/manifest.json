@@ -1,0 +1,69 @@
+{
+  "version": 1,
+  "reference": "docs/audit/v24/reference/IMPLEMENTIERUNG.md",
+  "sources": [
+    {
+      "id": "theme",
+      "path": "app/design-system/theme.css"
+    },
+    {
+      "id": "foundation",
+      "path": "app/design-system/foundation.css"
+    },
+    {
+      "id": "primitives",
+      "path": "app/design-system/primitives.css"
+    },
+    {
+      "id": "layout",
+      "path": "app/design-system/layout.css"
+    },
+    {
+      "id": "collections",
+      "path": "app/design-system/collections.css"
+    },
+    {
+      "id": "overlays",
+      "path": "app/design-system/overlays.css"
+    },
+    {
+      "id": "analytics",
+      "path": "app/design-system/analytics.css"
+    },
+    {
+      "id": "documents",
+      "path": "app/design-system/documents.css"
+    },
+    {
+      "id": "workflows",
+      "path": "app/design-system/workflows.css"
+    },
+    {
+      "id": "settings",
+      "path": "app/design-system/settings.css"
+    },
+    {
+      "id": "auth",
+      "path": "app/design-system/auth.css"
+    },
+    {
+      "id": "marketing",
+      "path": "app/design-system/marketing.css"
+    },
+    {
+      "id": "operator",
+      "path": "app/design-system/operator.css"
+    },
+    {
+      "id": "navigation",
+      "path": "app/design-system/navigation.css"
+    }
+  ],
+  "policy": {
+    "entry": "app/binso-ui.css",
+    "localStyles": false,
+    "inlinePresentation": false,
+    "dynamicCssVariables": true,
+    "derivedViewsRequireReview": true
+  }
+}

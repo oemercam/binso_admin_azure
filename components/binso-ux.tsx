@@ -1,7 +1,8 @@
 "use client";
 
 import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
-import { Children, isValidElement, cloneElement, useState, useRef, useEffect, useLayoutEffect, type ReactNode, type CSSProperties } from "react";
+import { Children, isValidElement, cloneElement, useState, useRef, useEffect, useLayoutEffect, useContext, useId, type ReactNode, type CSSProperties } from "react";
+import {WorkspaceActionContext} from '@/lib/client/workspace-actions';
 import Link from "next/link";
 import { createPortal } from "react-dom";
 import { useDialogFocus } from "./use-dialog-focus";
@@ -41,6 +42,13 @@ export function PageHeading({ title, description, action, leading, verbatimTitle
 
 export function CreateAction({ label, href, onClick, disabled = false, requiresWrite = true }: { label: string; href?: string; onClick?: () => void; disabled?: boolean;requiresWrite?:boolean }) {
   return <Button href={href} requiresWrite={requiresWrite} className="bo-create-action" ariaLabel={label} disabled={disabled} onClick={onClick} icon="plus"/>;
+}
+
+/** One context-action contract: desktop command bar, mobile overflow sheet. */
+export function ContextActions({label="Weitere Aktionen",children,mobile=true}:{label?:string;children:ReactNode;mobile?:boolean}){
+ const register=useContext(WorkspaceActionContext),id=useId(),[open,setOpen]=useState(false);
+ useLayoutEffect(()=>{register?.(id,children);return()=>register?.(id,null)},[register,id,children]);
+ return <>{mobile&&<div className="context-actions-mobile"><Button variant="ghost" icon="more" ariaLabel={label} onClick={()=>setOpen(true)}><LocalizedText>{label}</LocalizedText></Button></div>}{!register&&<div className="context-actions-inline">{children}</div>}{mobile&&<ActionSheet label={label} open={open} onClose={()=>setOpen(false)}><div className="context-actions-menu" onClick={event=>{if(event.target instanceof Element&&event.target.closest('a,button'))setOpen(false)}}>{children}</div></ActionSheet>}</>;
 }
 
 export function QuickCreateAction({section="dashboard",returnTo="/dashboard"}:{section?:string;returnTo?:string}){
@@ -102,7 +110,7 @@ export function SettingsGroup({title,children}:{title:string;children:ReactNode}
 }
 
 /** Route links and local detail tabs keep their behavior and share one container. */
-export function DetailTabs({children,label,role,panelId,appearance="pill"}:{children:ReactNode;label:string;role?:"navigation"|"tablist";panelId?:string;appearance?:"pill"|"line"}){
+export function DetailTabs({children,label,role,panelId,appearance="line"}:{children:ReactNode;label:string;role?:"navigation"|"tablist";panelId?:string;appearance?:"pill"|"line"}){
  const root=useRef<HTMLDivElement>(null);
  const nodes=Children.toArray(children);
  const localTabs=role==='tablist'||(!role&&nodes.length>0&&nodes.every(child=>isValidElement(child)&&child.type==='button'));
@@ -173,7 +181,7 @@ export function ActionsMenu({label, children, busy=false}: {label:string;childre
 
 /** Canonical two-line row shared by entity and financial lists. */
 export function ListRow({href,onClick,title,meta,value,valueLabel,status,tone="neutral",compact=false,valuePlacement="separate",translateTitle=true}:{translateTitle?:boolean;href?:string;onClick?:()=>void;title:ReactNode;meta:ReactNode;value?:ReactNode;valueLabel?:string;status?:string;tone?:"success"|"warning"|"danger"|"neutral"|"info";compact?:boolean;valuePlacement?:"separate"|"metadata"}){
- const content=<><b><LocalizedText verbatim={!translateTitle}>{title}</LocalizedText></b>{status&&<Status tone={tone}>{status}</Status>}<small>{meta}</small>{value!=null&&<span className="document-summary-amount">{valueLabel&&<small><LocalizedText>{valueLabel}</LocalizedText></small>}<strong>{value}</strong></span>}</>;
+ const content=<><b><LocalizedText verbatim={!translateTitle}>{title}</LocalizedText></b>{status&&!compact&&<Status tone={tone}>{status}</Status>}<small>{meta}{status&&compact&&<Status appearance="text" tone={tone}>{status}</Status>}</small>{value!=null&&<span className="document-summary-amount">{valueLabel&&<small><LocalizedText>{valueLabel}</LocalizedText></small>}<strong>{value}</strong></span>}{(href||onClick)&&!status&&value==null&&<span className="record-chevron"><Icon name="arrow" size={12}/></span>}</>;
  const className=`document-summary-row${value!=null?" has-value":""}${compact?" is-compact":""}${valuePlacement==="metadata"?" has-inline-value":""}`;
  return href?<Link prefetch={false} href={href} className={className}>{content}</Link>:onClick?<button type="button" onClick={onClick} className={className}>{content}</button>:<div className={className}>{content}</div>;
 }

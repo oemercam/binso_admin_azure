@@ -25,7 +25,7 @@ const allInteractions=['data','customers','products','employees','documents','fi
 export function planChanges(files,{level='standard'}={}){
  if(!['fast','integration','standard','full'].includes(level))throw new Error('Unknown QA level: '+level);
  const paths=[...new Set(files)].sort();
- const isGlobal=p=>/^(app\/styles\/|app\/(binso-ui\.css|layout\.tsx)|components\/(pages\/shared|app-pages|app-shell|app-chrome|header-panel(?:-content)?|avatar|form-wizard|ui|binso-ux|records|use-dialog-focus|use-browser-back-guard|use-dirty-snapshot)|lib\/client\/|lib\/permissions|lib\/routes|next\.config)/.test(p);
+ const isGlobal=p=>/^(app\/design-system\/|app\/(binso-ui\.css|layout\.tsx)|components\/(pages\/shared|app-pages|app-shell|app-chrome|header-panel(?:-content)?|avatar|form-wizard|ui|binso-ux|records|use-dialog-focus|use-browser-back-guard|use-dirty-snapshot)|lib\/client\/|lib\/permissions|lib\/routes|next\.config)/.test(p);
  const global=paths.some(isGlobal);
  // Unknown dependencies, auth, schema and CI changes fail open to broader TEST COVERAGE, never to success.
  const isInfrastructure=p=>/^(\.github\/|package\.json|pnpm-|database\/|lib\/server\/auth|app\/api\/auth|scripts\/)/.test(p);
@@ -38,13 +38,14 @@ export function planChanges(files,{level='standard'}={}){
  let dependencyRoutes=[];try{const catalog=JSON.parse(fs.readFileSync('docs/architecture/ux-inventory.json','utf8'));dependencyRoutes=catalog.routes.filter(r=>modulePaths.some(p=>r.components.some(c=>c.startsWith(p+'#')))).map(r=>r.route).filter(r=>!r.startsWith('/preview')&&!r.startsWith('/operator')).map(r=>r.replace('[id]',r.startsWith('/kunden')?'customer-one':r.startsWith('/produkte')?'product-one':r.startsWith('/mitarbeiter')?'employee-one':r.startsWith('/spesen')?'expense-one':r.startsWith('/zahlungen')?'payment-one':r.startsWith('/support')?'ticket-one':r.startsWith('/rechnungen')?'RE-TEST-1':'AN-TEST-1'));}catch{}
  const routes=full?fullRoutes:broad?representative:modulePaths.length&&dependencyRoutes.length?[...new Set([...dependencyRoutes,...matched.flatMap(g=>g.routes).filter(r=>r.startsWith('/einstellungen/zeiterfassung'))])]:[...new Set(matched.flatMap(g=>g.routes))];
  const suites=new Set();
+ if(global||paths.some(p=>/customer|kunden|business-api|financial/.test(p)))suites.add('customer-financial-projection-test');
  if(global||infrastructure){suites.add('ux-contract-check');suites.add('foundation-integration-test');}
  if(paths.some(p=>/process-draft/.test(p)))suites.add('process-draft-test');
  if(global||matched.some(g=>g!==groups.public&&g!==groups.operator&&g!==groups.settings))suites.add('ux-regression-test');
  if(global){suites.add('theme-selfcheck');suites.add('glass-ux-test');suites.add('ui-build-cache-test');}
  if(paths.some(p=>/^(components\/(ui|binso-ux|form-wizard|ux-lab)|scripts\/(eslint\/central-ui|ui-foundation-test))/.test(p)))suites.add('ui-foundation-test');
  if(paths.some(p=>/^lib\/(client\/|money\.|financial-status\.|finance-periods\.)|^scripts\/data-foundation-test/.test(p)))suites.add('data-foundation-test');
- if(paths.some(p=>/^components\/(app-shell|operator|ui)\.|^app\/styles\/|^scripts\/navigation-foundation-test/.test(p)))suites.add('navigation-foundation-test');
+ if(paths.some(p=>/^components\/(app-shell|operator|ui)\.|^app\/design-system\/|^scripts\/navigation-foundation-test/.test(p)))suites.add('navigation-foundation-test');
  if(paths.some(p=>/css|styles/.test(p)))suites.add('check-css-architecture');
  if(paths.some(p=>/document|invoice|qr|pdf/.test(p))){suites.add('document-presentation-test');suites.add('pwa-preview-test');}
  if(paths.some(p=>/session|auth/.test(p))){suites.add('client-session-test');suites.add('auth-integrity-test');}

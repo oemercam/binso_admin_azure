@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import {contactHref} from "@/lib/contact-links";
+import {usePageAccess} from "@/lib/client/page-access";
 import {LocalizedText} from "@/lib/client/locale";
 import {safeAppPath} from "@/lib/navigation";
 import {Statistics} from "../statistics";
@@ -18,7 +19,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState, useId } from "react";
 import ConfirmDialog from "../confirm-dialog";
 import { AppShell } from "../app-shell";
-import { RecordRow, RecordsView, RecordsControls, useRecordsController } from "../records";
+import { RecordRow, RecordIdentity, RecordsView, RecordsControls, useRecordsController } from "../records";
 import { customers } from "@/lib/demo-data";
 import { appendDemoRow } from "@/lib/demo-storage";
 import { apiPatch, apiPost, apiDelete, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
@@ -31,22 +32,29 @@ export function formatSwissPhone(value:unknown){const raw=String(value??"").trim
 
 export function formatSwissUid(value:unknown){const raw=String(value??"").trim().toUpperCase();const digits=raw.replace(/\D/g,"");if(digits.length===9)return `CHE-${digits.slice(0,3)}.${digits.slice(3,6)}.${digits.slice(6,9)}`;return raw;}
 
-const customerColumns=[{label:"Kunde",index:0},{label:"Kontakt",index:1},{label:"Ort",index:2},{label:"Status",index:4,status:true}];
-const customerSortColumns=customerColumns.filter(column=>column.index!==1);
+const customerChips=["Alle","Aktiv","Mit offenen Beträgen","Inaktiv"];
+const customerVisibleChips=customerChips.slice(0,3);
+const customerColumns=[{label:"Kunde / Kontakt",index:0,render:(row:string[])=><RecordIdentity name={row[0]} meta={[row[1],row[2]].filter(value=>value&&value!=="—").join(" · ")} identity={row[3]||row[0]}/>},{label:"Status",index:4,status:true},{label:"Umsatz "+businessDate().slice(0,4),index:6,align:"right" as const},{label:"Offen",index:7,align:"right" as const}];
+const customerSortColumns=[{label:"Name",index:0},{label:"Ort",index:2},{label:"Status",index:4}];
 export function CustomersPage() {
   const production=useBackendMode();
+  const financialsAllowed=usePageAccess().canOpen("/rechnungen");
+  const chips=financialsAllowed?customerChips:customerChips.filter(chip=>chip!=="Mit offenen Beträgen");
+  const visibleChips=financialsAllowed?customerVisibleChips:customerVisibleChips.filter(chip=>chip!=="Mit offenen Beträgen");
+  const columns=financialsAllowed?customerColumns:customerColumns.filter(column=>column.index<6);
   // Whole-tenant counts remain independent of list search, status and pagination.
   const allCustomers=useApiQuery<{total:number}>(production?"/api/customers?limit=1":null);
   const activeCustomers=useApiQuery<{total:number}>(production?"/api/customers?limit=1&status=active":null);
-  const balances=useApiQuery<FinancialSummary>(production?"/api/finance/overview":null);
-  const controller=useRecordsController({placeholder:"Kunden suchen...",columns:customerSortColumns});
-  const query=new URLSearchParams({limit:"50",offset:String(controller.page*50),order:({0:"name",2:"city",4:"status"} as Record<number,string>)[controller.sortIndex]?(controller.sort==='default'?'name.asc':({0:"name",2:"city",4:"status"} as Record<number,string>)[controller.sortIndex]+'.'+controller.sort):'name.asc'});
+  const balances=useApiQuery<FinancialSummary>(production&&financialsAllowed?"/api/finance/overview":null);
+  const controller=useRecordsController({placeholder:"Kunden suchen...",columns:customerSortColumns,chips});
+  const query=new URLSearchParams({...(financialsAllowed?{include:"financials"}:{}),limit:"50",offset:String(controller.page*50),order:({0:"name",2:"city",4:"status"} as Record<number,string>)[controller.sortIndex]?(controller.sort==='default'?'name.asc':({0:"name",2:"city",4:"status"} as Record<number,string>)[controller.sortIndex]+'.'+controller.sort):'name.asc'});
   if(controller.query.trim())query.set('q',controller.query.trim());
+  if(controller.activeChip==='Mit offenen Beträgen')query.set('outstanding','1');
   if(controller.activeChip==='Aktiv'||controller.activeChip==='Inaktiv')query.set('status',controller.activeChip==='Aktiv'?'active':'inactive');
   const {rows:customerRows,total,loading,error}=useDemoRows("customers",customers,query.toString());
   return <AppShell headingPlacement="content" title="Kunden" subtitle="Kontakte, Geschäftsvorgänge und offene Forderungen." active="kunden" actions={<CreateAction href="/kunden/neu" label="Neuer Kunde"/>}>
     {production&&<MetricTiles desktopOnly columns={balances.data?.invoices.length?3:2}><MetricTile label="Kunden gesamt" value={allCustomers.data?.total??"—"}/><MetricTile label="Aktive Kunden" value={activeCustomers.data?.total??"—"}/>{!!balances.data?.invoices.length&&<MetricTile label="Offene Forderungen" value={balances.data.invoices.map(row=>formatCurrency(row.open_amount,row.currency)).join(" · ")}/>}</MetricTiles>}
-    <RecordsControls appearance="line" controller={controller} placeholder="Kunden suchen..." columns={customerSortColumns}/><RecordsView controller={controller} toolbarActions={false} showCount={false} remote pagination={{total,page:controller.page,pageSize:50,onPage:controller.setPage}} loading={loading} error={error} items={customerRows} countLabel="Kunden" placeholder="Kunden suchen..." columns={customerColumns} rowHref={row=>`/kunden/${row[4]?row[3]:"acme"}`}>{(row)=>{const [name,contact,city,idOrStatus,statusMaybe]=row;const id=statusMaybe?idOrStatus:"acme";const status=statusMaybe??idOrStatus;return <RecordRow href={"/kunden/"+id} title={name} meta={[contact,city].filter(value=>value&&value!=="—").join(" · ")} status={status}/>}}</RecordsView>
+    <RecordsControls appearance="line" chips={visibleChips} filterChips={chips} controller={controller} placeholder="Kunden suchen..." columns={customerSortColumns}/><RecordsView chips={chips} controller={controller} toolbarActions={false} showCount={false} remote pagination={{total,page:controller.page,pageSize:50,onPage:controller.setPage}} loading={loading} error={error} items={customerRows} countLabel="Kunden" placeholder="Kunden suchen..." columns={columns} rowHref={row=>`/kunden/${row[4]?row[3]:"acme"}`}>{(row)=>{const [name,contact,city,idOrStatus,statusMaybe]=row;const id=statusMaybe?idOrStatus:"acme";return <RecordRow href={"/kunden/"+id} title={name} meta={[contact,city].filter(value=>value&&value!=="—").join(" · ")} />}}</RecordsView>
   </AppShell>;
 }
 
