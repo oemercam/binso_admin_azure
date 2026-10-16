@@ -48,6 +48,13 @@ Build (webpack), type checking, changed-file lint, shared foundation/navigation,
 CSS ownership, localization and actual document/PDF presentation checks passed.
 Browser interactions are recorded separately from the static inventory.
 
+The shared browser harness waits for the actual startup surface and domain data,
+then measures each overview in one DOM snapshot. Action counts follow the explicit
+owner/admin, finance and employee fixtures. Frame settling handles background tabs
+centrally and has a bounded fallback; screenshot and geometry assertions remain
+separate. Customer recovery waits for the unrelated duplicate lookup to finish
+before reloading, rather than ignoring WebKit page errors.
+
 ## Future work rule
 
 Use the page patterns in `docs/architecture/reference-foundation.md`. Extend the
