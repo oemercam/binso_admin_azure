@@ -533,11 +533,6 @@
 }
 .footer-privacy-button:hover{text-decoration:underline}
 .privacy-settings-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
-.app-launch-screen{min-height:100dvh;display:grid;place-items:center;padding:32px;background:var(--color-bg);color:var(--color-fg)}
-.app-launch-brand{position:relative;width:92px;height:92px;padding:0;display:grid;place-items:center;border:0;background:transparent;color:inherit}
-.app-start-icon,.app-launch-brand .logo{width:80px;height:80px;object-fit:contain;animation:binso-start 1.5s ease-in-out infinite}
-html[data-theme="dark"] .app-start-icon{filter:invert(1)}
-.app-launch-error{position:absolute;top:calc(50% + 72px);max-width:320px;margin:0;color:var(--color-danger);font-size:var(--type-metadata);text-align:center}
 .locale-switcher{display:flex;align-items:center;gap:10px;color:var(--app-secondary);font-size:var(--type-label);min-width:0}
 .locale-switcher select{min-height:38px;height:38px;width:auto;max-width:170px;border-radius:var(--app-control-radius);background:var(--app-surface)}
 .locale-switcher.is-compact>span{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}

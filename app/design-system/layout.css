@@ -710,3 +710,17 @@
 @media (max-width:374px){
 .app-main{padding-bottom:calc(var(--mobile-nav-h) + var(--dock-action-size) + var(--dock-gap) + var(--safe-bottom))}
 }
+
+/* App startup has one owner, including responsive and motion states. */
+@keyframes binso-start{0%,100%{opacity:.7;transform:scale(.98)}50%{opacity:1;transform:scale(1)}}
+.app-launch-screen{min-height:100dvh;display:grid;place-items:center;padding:32px;background:var(--color-bg);color:var(--color-fg)}
+.app-launch-brand{position:relative;width:92px;height:92px;padding:0;display:grid;place-items:center;border:0;background:transparent;color:inherit}
+.app-start-icon,.app-launch-brand .logo{width:80px;height:80px;object-fit:contain;animation:binso-start 1.5s ease-in-out infinite}
+html[data-theme="dark"] .app-start-icon{filter:invert(1)}
+.app-launch-error{position:absolute;top:calc(50% + 72px);max-width:320px;margin:0;color:var(--color-danger);font-size:var(--type-metadata);text-align:center}
+@media (max-width:760px){
+.app-start-icon,.app-launch-brand .logo{width:72px;height:72px}
+}
+@media (prefers-reduced-motion:reduce){
+.app-start-icon,.app-launch-brand .logo{animation:none}
+}

@@ -7,7 +7,6 @@
   from{opacity:0;transform:translateY(-8px)}
   to{opacity:1;transform:translateY(0)}
 }
-@keyframes binso-start{0%,100%{opacity:.7;transform:scale(.98)}50%{opacity:1;transform:scale(1)}}
 .desktop-navigation-toggle{display:none}
 @keyframes page-enter{
   from{opacity:.01;transform:translateY(3px)}
@@ -826,7 +825,6 @@
 .expense-detail-workspace{grid-template-columns:minmax(0,1fr) 360px}
 }
 @media (max-width:760px){
-.app-start-icon,.app-launch-brand .logo{width:72px;height:72px}
 html,body{width:100%;max-width:100%;min-width:0;overflow-x:clip}
 .subpage,
   .product-callout{
@@ -1102,7 +1100,6 @@ a{-webkit-tap-highlight-color:transparent}
 .documents-summary{grid-template-columns:1fr}
 }
 @media (prefers-reduced-motion:reduce){
-.app-start-icon,.app-launch-brand .logo{animation:none}
 .workflow-copy,.product-callout{animation:none}
 }
 .mobile-detail-actions{flex-shrink:0}

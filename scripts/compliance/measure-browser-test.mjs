@@ -26,12 +26,14 @@ try{
  await page.setViewportSize({width:1440,height:1000});
  const notification='<button class="desktop-notification-button">Bell</button>',avatar='<button class="avatar-button">Account</button>',search='<button class="desktop-global-search" aria-label="Search">Search</button>';
  const normalActions=search+notification+avatar;
- const header=actions=>`<div class="desktop-appbar"><button class="desktop-navigation-toggle" aria-controls="customer-desktop-navigation">Navigation</button><div class="desktop-appbar-actions">${actions}</div></div>`;
- const checkHeader=async(actions,state)=>{
-  await page.setContent(header(actions));
+ const header=(actions,location='')=>`<div class="desktop-appbar">${location}<button class="desktop-navigation-toggle" aria-controls="customer-desktop-navigation">Navigation</button><div class="desktop-appbar-actions">${actions}</div></div>`;
+ const checkHeader=async(actions,state,location)=>{
+  await page.setContent(header(actions,location));
   const evidence=await measureCompliance(page,{output,route:'/dashboard',theme:'light',width:page.viewportSize().width,state,engine});
   return evidence.checks.filter(c=>c.id==='UX-LAY-003');
  };
+ assert.equal((await checkHeader(normalActions,'header-breadcrumb','<div class="workspace-location"><a href="/dashboard">Workspace</a><span>/ Customers</span></div>'))[0].status,'passed','The ZIP workspace breadcrumb is navigation, not a business action');
+ assert.equal((await checkHeader(normalActions,'header-fake-breadcrumb','<div class="workspace-location"><a href="/zahlungen">Pay</a></div>'))[0].status,'failed','The breadcrumb owner cannot authorize arbitrary business destinations');
  const normal=await checkHeader(normalActions,'header-normal');
  assert.equal(normal.length,1,'The actual desktop action owner must produce evidence');
  assert.equal(normal[0].status,'passed','Approved search, notifications and account occupy the shared right action group');
