@@ -1,0 +1,66 @@
+name: Readiness OIDC verification
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/workflows/readiness-oidc-verification.yml
+      - .github/model-a/readiness-resources.json
+      - scripts/azure-readiness-check*.mjs
+      - scripts/readiness-oidc-probe*.mjs
+permissions:
+  contents: read
+concurrency:
+  group: readiness-oidc-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  contracts:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: 24
+      - run: node scripts/azure-readiness-check-test.mjs
+      - run: node scripts/readiness-oidc-probe-test.mjs
+  readiness:
+    needs: contracts
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && github.repository == 'oemercam/binso_admin_azure'
+    environment: readiness
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      READINESS_CLIENT_ID: ${{ vars.READINESS_AZURE_CLIENT_ID }}
+      READINESS_TENANT_ID: ${{ vars.READINESS_AZURE_TENANT_ID }}
+      READINESS_SUBSCRIPTION_ID: ${{ vars.READINESS_AZURE_SUBSCRIPTION_ID }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: 24
+      - name: Validate dedicated identity and exact main SHA before login
+        run: node scripts/readiness-oidc-probe.mjs --validate
+      - name: Authenticate only the readiness identity through OIDC
+        id: login
+        uses: azure/login@a641126d1b8aa4d1fa005f4f92df94a3a4c4c906
+        with:
+          client-id: ${{ vars.READINESS_AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.READINESS_AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.READINESS_AZURE_SUBSCRIPTION_ID }}
+          audience: api://AzureADTokenExchange
+      - name: Read five exact resources and enforce monitoring and backup readiness
+        run: node scripts/readiness-oidc-probe.mjs --probe
+      - name: Record login outcome without tokens
+        if: always()
+        env:
+          LOGIN_OUTCOME: ${{ steps.login.outcome }}
+        run: |
+          printf 'Readiness OIDC login: %s; source SHA: %s\n' "$LOGIN_OUTCOME" "$GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"

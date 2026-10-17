@@ -1,0 +1,7 @@
+{
+  "app": "/subscriptions/57c41f8a-69de-4655-bea5-fad30de6921a/resourceGroups/rg-binso-admin-prod/providers/Microsoft.Web/sites/binso-admin-prod",
+  "postgres": "/subscriptions/57c41f8a-69de-4655-bea5-fad30de6921a/resourceGroups/rg-binso-admin-prod/providers/Microsoft.DBforPostgreSQL/flexibleServers/binso-platform-db",
+  "insights": "/subscriptions/41e77b08-a365-41cd-a681-b07dc0326bc6/resourceGroups/rg-binso-admin-prod/providers/Microsoft.Insights/components/binso-admin-prod",
+  "alert": "/subscriptions/41e77b08-a365-41cd-a681-b07dc0326bc6/resourceGroups/rg-binso-admin-prod/providers/Microsoft.Insights/metricAlerts/binso-admin-prod-http5xx",
+  "actionGroup": "/subscriptions/41e77b08-a365-41cd-a681-b07dc0326bc6/resourceGroups/rg-binso-admin-prod/providers/Microsoft.Insights/actionGroups/Application Insights Smart Detection"
+}
