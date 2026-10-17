@@ -1,5 +1,10 @@
 # UX-Code-Audit und schnelle Entwicklung
 
+> Historischer Audit mit damaligen Messwerten und Workflow-Beschreibungen.
+> Aktuelle Codex-Arbeitsregeln: [AGENTS.md](../AGENTS.md); Orientierung und
+> QA-Einstieg: [README.md](../README.md). Historische Routenanzahlen, offene PRs
+> und Laufzeiten sind keine Aussage über den heutigen Stand.
+
 Basis: main `330929cdbd300f2e651c790869e3cd0f71dfa151` (PRs 215–218 integriert). Offener PR 214 stellt CodeQL wieder her; keine UX-Änderungen darin. Produktionsdaten werden durch Browser-Fixtures nicht berührt.
 
 ## Befunde und Änderungen
@@ -33,7 +38,7 @@ pnpm qa:full --base origin/main
 
 `--files` ist eine explizite Entwickler-Auswahl; vor Merge wählt CI aus dem vollständigen Git-Diff. Gelöschte Dateien werden nicht an ESLint übergeben, aber bleiben in der Abhängigkeitsanalyse. Nicht zugeordnete Änderungen erweitern die Prüfung automatisch. Änderungen am grossen `app-pages.tsx` betreffen potenziell mehrere Module und benötigen deshalb repräsentative Tests.
 
-FAST führt Lint nur für vorhandene betroffene Dateien mit Cache, inkrementellen Typecheck und relevante Tests aus. Browser: betroffene Seiten bei 375/1440 px im Light Mode, nur zugehörige Interaktionen; keine regulären Screenshots. Fehlerscreenshots bleiben erhalten. Ohne `--url` startet ein eigener Webpack-Entwicklungsserver auf Port 3300; kein Produktionsbuild und kein Deployment. Ein bereits belegter Testport wird nicht stillschweigend als aktueller Server verwendet.
+Aktueller FAST-Einstieg: Lint für vorhandene betroffene Dateien mit Cache und relevante Tests; Typecheck nur mit `--typecheck`. Browser laufen nur mit `--browser`, dann nach dem aktuellen Plan in `scripts/qa-plan.mjs` (derzeit 390 px, Light Mode). `scripts/qa.mjs` setzt für diese gezielten Browserläufe Screenshot-Ausgabe. Ohne `--url` wird ein eigener Entwicklungsserver auf Port 3300 verwendet. Ein bereits belegter Testport wird nicht stillschweigend als aktueller Server verwendet. Frühere Messungen unten gelten für ihren damaligen Umfang.
 
 STANDARD behält vollständigen Lint, Typecheck, Unit-/Integrations-/RLS-Tests, beide Dependency-Sicherheitsprüfungen, CSS-Prüfung, Produktionsbuild und Runtime-Smoke bei. Browser: relevante Module in Chromium und WebKit, Mobile/Tablet/Desktop sowie beide Themes. Globale Layoutänderungen erweitern die repräsentative Auswahl. CI-, Schema-, Auth- und unbekannte Abhängigkeitsänderungen erzwingen die vollständige Matrix.
 
@@ -77,17 +82,22 @@ Abschliessend: 28 gezielte Browser-/Theme-/Viewport-Fälle mit Accessibility-Pr�
 
 FAST über globale Styles fand zusätzlich eine PDF.js-/Webpack-Eval-Namenskollision im Entwicklungsmodus. Der Renderer lädt dieselbe lokale, selbstständige ESM-Datei nun als Same-Origin-Asset. Gezielter Dev-Browserlauf: Rechnungsvorschau mit allen Seiten, Zoom und Dokumentaktionen bestanden. Kein CSP-Abschwächen und kein Produktionsbuild für FAST erforderlich.
 
-## Verbindlicher Ablauf ab V24
+## V24-Integration und Release: bestehende Gates
 
-Zusammenhängende Folgeprompts bleiben ein Arbeitspaket im selben Draft-PR.
+Zusammenhängende Folgeprompts zum selben Ziel bleiben ein Arbeitspaket im
+bestehenden Draft-PR, soweit dessen Bearbeitung beauftragt ist. Für neue grössere
+Ziele einen neuen Chat mit kurzer Übergabe empfehlen; keine automatische PR- oder
+Chat-Erstellung. Die aktuellen Arbeitsregeln stehen zentral in `AGENTS.md`.
 `qa:fast` und `qa:integration` führen standardmässig keine Browser aus;
 `--browser` fordert einen gezielten Lauf ausdrücklich an. Standard/full behalten
 Browserprüfungen. Draft-PRs führen weiterhin statische, DB-, Sicherheits- und
 Build-Gates aus; Browserjobs starten bei `ready_for_review` und danach bei
 relevanten PR-Aktualisierungen. Nacht- und Release-Prüfungen bleiben vollständig.
 
-Nach Abschluss des Pakets: PR auf Ready, Pflicht-Gates einschliesslich Browser
-bestehen lassen. Nach Integration ist der tatsächliche Main-SHA nochmals mit
+Bei beauftragter Integration nach Abschluss des Pakets: PR auf Ready setzen,
+sofern diese PR-Aktion autorisiert ist; Pflicht-Gates einschliesslich Browser
+bestehen lassen. Ohne ausdrücklichen Warteauftrag laufende CI melden und den
+Auftrag beenden. Nach Integration ist der tatsächliche Main-SHA nochmals mit
 Quality / `level=full` zu prüfen. Erst danach und nach ausdrücklicher Freigabe
 Deploy Azure / `commit_sha` / `approve_production=true` starten. Weder ein Prompt,
 ein Merge noch eine grüne Quality löst von sich aus Produktion aus. Ein ausgelassener

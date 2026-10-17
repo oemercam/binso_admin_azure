@@ -1,0 +1,12 @@
+# Search scope only: no Git exclusions or file removal.
+# For targeted audits: rg --no-ignore 'pattern' docs/evidence/<specific-directory>
+/docs/assets/
+/docs/evidence/
+/docs/architecture/*inventory*.json
+/docs/architecture/ux-state-register-*.json
+/docs/architecture/**/function-inventory.json
+/docs/architecture/**/schema-inventory.json
+/docs/architecture/**/data-inventory.json
+/docs/**/source-inventory.json
+/docs/**/source-inventory.json.gz
+/docs/audit/v24/page-matrix.json

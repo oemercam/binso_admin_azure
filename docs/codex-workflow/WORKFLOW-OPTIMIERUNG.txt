@@ -1,0 +1,63 @@
+BINSO ONE - Workflow- und Kontextoptimierung
+Stand: 17.10.2026, Europe/Zurich. Innerhalb des 10-Minuten-Budgets abgeschlossen.
+
+Geaenderte Dateien
+- AGENTS.md im Workspace: Verweis auf die einzige verbindliche Workflow-Quelle
+  repo/AGENTS.md und die Projektorientierung; Runtime-Regeln unveraendert.
+- repo/AGENTS.md: begrenzte Auftraege, Diff zuerst, bedarfsbezogenes Lesen,
+  gebuendelte Operationen, kein wiederholter Gesamtscan, Statusmeldungen,
+  Zeitbudget/Abschluss, gezielte Tests, Integrations-/Release-Gates, externe
+  Schreibaktionen und CI-Warten im vereinbarten Umfang.
+- repo/README.md: kurze Orientierung mit Quellen und QA-Befehlen; globale
+  Corepack-Aktivierung durch Hinweis auf die bestehende Prozess-Runtime ersetzt.
+- repo/docs/ux-audit-fast-development.md: historische Aussagen gekennzeichnet,
+  veraltete FAST-Aussagen korrigiert, V24-Integration mit heutigem Auftragsscope
+  und dem zentralen Regelwerk abgeglichen. Historische Nachweise bleiben erhalten.
+- repo/.rgignore: Evidence/Assets und bestimmte generierte Inventare werden aus
+  normalen rg-Suchen ausgenommen; gezielte Audits mit explizitem Pfad und
+  --no-ignore bleiben moeglich. Keine .gitignore-Aenderung, keine Dateiloeschung.
+
+Bereinigte Widersprueche
+- qa:fast fuehrt Typecheck nur mit --typecheck aus, Browser nur mit --browser.
+- Keine komplette Browsermatrix nach jeder Einzelkorrektur. Vollstaendige
+  Browserabnahme bei systemweiten UX-Aenderungen und Releases bleibt Pflicht.
+- Laufende externe CI ist ohne ausdruecklichen Warteauftrag kein Grund fuer
+  Polling oder eine Verlaengerung des Entwicklungsauftrags.
+- PR-Lifecycle, neue Chats und produktive Eingriffe werden nicht automatisch
+  aus einem abgeschlossenen Entwicklungsschritt abgeleitet.
+- Verbindliche IMPLEMENTIERUNG.md ist mit ihrem vorhandenen Pfad referenziert.
+
+Verifikation
+- Git 2.55.0.windows.5, Node v24.20.0, pnpm 10.17.1 nach . ../runtime.ps1.
+- pnpm package-manager-strict-version=true; manage-package-manager-versions=false.
+- runtime.ps1, package.json, pnpm-workspace.yaml und pnpm-lock.yaml unveraendert.
+- Globale Codex-Konfiguration und alle vorhandenen .github/workflows-Dateien
+  laut SHA-256-Abgleich unveraendert.
+- git diff --check erfolgreich; neun neu hinzugefuegte lokale Markdown-Links
+  auf existierende Ziele geprueft; generierter Next.js-AGENTS-Block unveraendert.
+- Standard-rg-Dateiliste enthaelt ux-inventory.json nicht; gezielte Auflistung
+  mit --no-ignore funktioniert.
+- Alle Branch-Referenzen unveraendert; HEAD bleibt c1da9ebb auf
+  security/remediate-release-risks. Kein Commit, PR oder Remote-Schreibzugriff.
+- Bestehende Pflicht-Gates wurden nicht veraendert oder ausgefuehrt.
+
+Auswirkungen auf bestehende Auftraege
+Die Regeln gelten fuer weitere Bearbeitung im Projekt; ausdrueckliche bestehende
+Auftraege und Freigaben bleiben massgeblich. Bereits laufende Chats uebernehmen
+geaenderte Anweisungen moeglicherweise erst beim erneuten Einlesen. Bereits
+laufende CI wurde nicht angehalten oder veraendert. Aufgeschobene Pruefungen
+bleiben offen und duerfen nicht als bestanden gewertet werden.
+Die neue .rgignore reduziert Standardsuchergebnisse: fuer Evidence-/Inventar-
+Audits die Ausnahmen bewusst und eng begrenzt umgehen.
+
+Offene Punkte und Grenzen
+Keine neue Laufzeitmessreihe fuer zukuenftige Auftraege; tatsaechlicher Zeitgewinn
+ist noch nicht quantifiziert. Die Regeln sind Arbeitsanweisungen, keine neue
+technische CI-Erzwingung. Runtime-Aktivierung bleibt je Tool-Shell erforderlich.
+Die Workspace-Runtime und uebergeordnete AGENTS.md sind lokal ausserhalb des
+Git-Checkouts; bei einem anderen Checkout muss deren Verfuegbarkeit geprueft werden.
+Draft-PR #263 wurde nicht angesprochen oder veraendert. Keine App-Tests, Builds,
+Browserlaeufe, Installationen, GitHub-/Azure-Aktionen oder Deployments ausgefuehrt.
+Die vier Repository-Dateiaenderungen bleiben absichtlich uncommitted/unstaged.
+
+Ausgangsnachweis: workflow-baseline.json (Hashes, Branch-Refs, Git-Status).
