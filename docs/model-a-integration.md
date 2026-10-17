@@ -66,6 +66,11 @@ contract, not protection against a malicious repository administrator.
   `oemercam` as the required approver and verified the saved setting in GitHub.
   Self-review prevention remains off so the sole owner can approve their own
   dispatch. This is explicit owner deployment approval, never four-eyes review.
+  Impact: the existing architecture/mail/monitoring/backup/Stripe readiness jobs
+  and retention maintenance also use this environment, so they now wait for owner
+  approval too. Separating non-writing readiness from production credentials needs
+  a dedicated least-privilege design; no secrets were copied or rights widened.
+  Until then, the target of deployment-only regular approval is not fully reached.
 - Deploy remains manual, exact-current-main SHA bound, with explicit production
   flag, successful exact-SHA full manual qualification and central ZIP verification
   before migration/deployment. Standard/main-green QA cannot replace full production
