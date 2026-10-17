@@ -16,7 +16,7 @@ import {assertCustomerDossier,verifyCustomerStates} from './customer-ux-browser.
 import {assertNavigationToggle,verifyNavigationPersistence} from './navigation-ux-browser.mjs';
 import {verifyPreviewControls} from './document-controls-browser.mjs';
 import {verifyTimeWorkspace} from './time-workspace-browser.mjs';
-import {assertMobileHeaderTargets,verifyHeaderTargetRegression} from './shared-control-browser.mjs';
+import {assertMobileHeaderTargets,verifyHeaderTargetRegression,waitForFiniteAnimations} from './shared-control-browser.mjs';
 
 // Synthetic UI fixtures: real business/RLS integration is covered by migration-test.mjs.
 // No request reaches a production system; unhandled fixture APIs fail closed.
@@ -436,7 +436,7 @@ try{
       const before=await page.locator('.thread-composer').boundingBox();await page.locator('.thread-messages').evaluate(el=>{el.scrollTop=0});const after=await page.locator('.thread-composer').boundingBox();assert.deepEqual(after,before,'Only messages scroll; composer stays fixed');
       const visible=await page.evaluate(()=>{const composer=document.querySelector('.thread-composer').getBoundingClientRect(),nav=document.querySelector('.bottom-nav');const limit=nav?.getClientRects().length?nav.getBoundingClientRect().top:innerHeight;return composer.bottom<=limit+1&&composer.top>=0&&scrollY===0});assert.ok(visible,'Chat input stays above navigation in every app viewport');
     }
-    if(!process.env.BINSO_UX_BASELINE){for(const control of await page.locator('.form-field>.form-control').filter({visible:true}).all()){
+    if(!process.env.BINSO_UX_BASELINE){await waitForFiniteAnimations(page);for(const control of await page.locator('.form-field>.form-control').filter({visible:true}).all()){
      const g=await control.evaluate(el=>{const c=getComputedStyle(el);return {height:el.getBoundingClientRect().height,radius:c.borderRadius,padding:c.paddingLeft,font:c.fontSize,auth:!!el.closest('.auth-workspace'),app:!!el.closest('.page-container,.operator-app-content,.bottom-sheet,.header-panel,.confirm-dialog')}});
      assert.equal(g.height,width<=760||(g.app&&width<=1100)?44:g.auth?46:40,`${route}: canonical closed field height`);assert.equal(g.padding,'11px',`${route}: canonical field inset`);assert.equal(g.radius,g.auth?'5px':width<=1100?'8px':'7px',`${route}: canonical field radius`);
     }}

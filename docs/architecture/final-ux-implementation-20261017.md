@@ -111,6 +111,19 @@ Fehlerzustände sind **abgeleitet** und keine separate visuelle Inhaberfreigabe.
 Synthetische UI-Fixtures sind keine produktiven Daten. Physische PWA-/Geräteabnahme
 und tatsächliches produktives SSO werden nicht durch Browseremulation behauptet.
 
+## Korrigierte Messrace bei animierten Formularen
+
+Der breite Chromium-Lauf fand bei einem 44-px-Feld einen DOMRect-Wert von
+43.999969482421875 px. Eine isolierte Reproduktion der vorhandenen Translation
+liefert bei unveränderter CSS-Höhe 44 px ebenfalls gerundete Zwischenwerte
+(zum Beispiel 43.999996185302734); nach Animationsende beträgt die Höhe exakt 44.
+Die Geometrieprüfung wartet deshalb jetzt auf abgeschlossene endliche Animationen.
+Keine Animation wird abgeschaltet, keine Rundung/Toleranz akzeptiert und die
+bestehende exakte Höhenassertion bleibt erhalten. Eine pausierte endliche
+Animation muss den neuen Negativtest blockieren; abgeschlossene endliche Motion
+besteht. Endlose Fortschrittsanimationen laufen unverändert weiter und blockieren
+nicht die Layoutabnahme. Der bestehende negative 18-px-Touchzieltest bleibt aktiv.
+
 ## Prüfstand während der Gesamtarbeit
 
 Lint, Typecheck, Build und gezielte Architektur-/UX-Verträge erfolgreich.
