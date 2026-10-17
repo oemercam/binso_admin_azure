@@ -21,5 +21,6 @@ export function useDesktopNavigation(){
 }
 
 export function DesktopNavigationToggle({collapsed,onToggle,controls}:{collapsed:boolean;onToggle:()=>void;controls:string}){
- return <LocalizedElement as="button" type="button" className="icon-button desktop-navigation-toggle" aria-label="Navigation" title="Navigation" aria-expanded={!collapsed} aria-controls={controls} onClick={onToggle}><Icon name="menu"/></LocalizedElement>;
+ const label=collapsed?"Navigation öffnen":"Navigation einklappen";
+ return <LocalizedElement as="button" type="button" className="icon-button desktop-navigation-toggle" aria-label={label} title={label} aria-expanded={!collapsed} aria-controls={controls} onClick={onToggle}><Icon name="menu"/></LocalizedElement>;
 }

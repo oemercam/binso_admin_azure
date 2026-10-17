@@ -345,8 +345,8 @@ function AppShellFrame({
         {desktopNavGroups.map(group=>desktopNav.some(([href])=>group.paths.includes(href)&&canOpen(href))&&<div className="sidebar-nav-group" key={group.label}><span className="sidebar-nav-label"><LocalizedText>{group.label}</LocalizedText></span>{desktopNav.filter(([href])=>group.paths.includes(href)&&canOpen(href)).map(([href,label,icon])=><Link key={href} href={href} aria-label={translate(label)} title={translate(label)} className={active===href.slice(1)?"active":""} aria-current={active===href.slice(1)?"page":undefined}><Icon name={icon}/><span><LocalizedText>{label}</LocalizedText></span></Link>)}</div>)}
       </nav>
       <div className="sidebar-bottom">
-        <Link href="/support" aria-label={translate("Support")} title={translate("Support")} className={active==="support" ? "active" : ""}><Icon name="support"/><span><LocalizedText>{"Support"}</LocalizedText></span></Link>
-        <Link href="/einstellungen" aria-label={translate("Einstellungen")} title={translate("Einstellungen")} className={active==="einstellungen" ? "active" : ""}><Icon name="settings"/><span><LocalizedText>{"Einstellungen"}</LocalizedText></span></Link>
+        <Link href="/support" aria-label={translate("Support")} title={translate("Support")} className={active==="support" ? "active" : ""} aria-current={active==="support"?"page":undefined}><Icon name="support"/><span><LocalizedText>{"Support"}</LocalizedText></span></Link>
+        <Link href="/einstellungen" aria-label={translate("Einstellungen")} title={translate("Einstellungen")} className={active==="einstellungen" ? "active" : ""} aria-current={active==="einstellungen"?"page":undefined}><Icon name="settings"/><span><LocalizedText>{"Einstellungen"}</LocalizedText></span></Link>
       </div>
     </aside>
 

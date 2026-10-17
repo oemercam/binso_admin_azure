@@ -143938,7 +143938,8 @@
             "href=\"/support\"",
             "aria-label={translate(\"Support\")}",
             "title={translate(\"Support\")}",
-            "className={active===\"support\" ? \"active\" : \"\"}"
+            "className={active===\"support\" ? \"active\" : \"\"}",
+            "aria-current={active===\"support\"?\"page\":undefined}"
           ]
         },
         {
@@ -143965,7 +143966,8 @@
             "href=\"/einstellungen\"",
             "aria-label={translate(\"Einstellungen\")}",
             "title={translate(\"Einstellungen\")}",
-            "className={active===\"einstellungen\" ? \"active\" : \"\"}"
+            "className={active===\"einstellungen\" ? \"active\" : \"\"}",
+            "aria-current={active===\"einstellungen\"?\"page\":undefined}"
           ]
         },
         {
@@ -145000,6 +145002,14 @@
         {
           "line": 348,
           "expression": "active===\"support\""
+        },
+        {
+          "line": 348,
+          "expression": "active===\"support\""
+        },
+        {
+          "line": 349,
+          "expression": "active===\"einstellungen\""
         },
         {
           "line": 349,
@@ -148378,13 +148388,13 @@
       "elements": [
         {
           "tag": "LocalizedElement",
-          "line": 24,
+          "line": 25,
           "props": [
             "as=\"button\"",
             "type=\"button\"",
             "className=\"icon-button desktop-navigation-toggle\"",
-            "aria-label=\"Navigation\"",
-            "title=\"Navigation\"",
+            "aria-label={label}",
+            "title={label}",
             "aria-expanded={!collapsed}",
             "aria-controls={controls}",
             "onClick={onToggle}"
@@ -148392,13 +148402,18 @@
         },
         {
           "tag": "Icon",
-          "line": 24,
+          "line": 25,
           "props": [
             "name=\"menu\""
           ]
         }
       ],
-      "conditions": []
+      "conditions": [
+        {
+          "line": 24,
+          "expression": "collapsed"
+        }
+      ]
     },
     {
       "key": "components/avatar.tsx#Avatar",

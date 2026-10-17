@@ -12043,5 +12043,15 @@
     "Swiss QR invoice",
     "Facture QR suisse",
     "Fattura QR svizzera"
+  ],
+  "Navigation öffnen": [
+    "Expand navigation",
+    "Développer la navigation",
+    "Espandi navigazione"
+  ],
+  "Navigation einklappen": [
+    "Collapse navigation",
+    "Réduire la navigation",
+    "Comprimi navigazione"
   ]
 }
