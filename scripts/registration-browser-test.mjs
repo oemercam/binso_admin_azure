@@ -1,4 +1,5 @@
 import {writeTestOutput} from './test-output.mjs';
+import {assertChoiceGeometry} from './form-choice-browser.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -28,6 +29,7 @@ try{
   await sheet.getByRole('textbox',{name:'Firmenname *',exact:true}).fill('Synthetic Company with a deliberately long business name GmbH');
   await sheet.getByRole('button',{name:'Weiter',exact:true}).click();await sheet.getByRole('textbox',{name:'Geschäftliche E-Mail-Adresse *',exact:true}).fill('synthetic-long-email@company.example.invalid');
   await sheet.locator('input[name="password"]').fill('a sufficiently long test password');await sheet.getByRole('button',{name:'Weiter',exact:true}).click();
+  await assertChoiceGeometry(sheet.locator(".form-check"));
   const geometry=await sheet.evaluate(el=>{const footer=el.querySelector('.mobile-sticky-save').getBoundingClientRect(),box=el.getBoundingClientRect();return {overflow:document.documentElement.scrollWidth>innerWidth+1,footerBottom:footer.bottom,footerTop:footer.top,height:innerHeight,boxBottom:box.bottom,inputs:Array.from(el.querySelectorAll('input')).map(input=>({name:input.name,type:input.type,value:input.type==='password'?'[omitted]':input.value}))}});
   assert.equal(geometry.overflow,false);assert.ok(geometry.footerBottom<=geometry.height+1&&geometry.footerTop>=0,'The wizard footer stays reachable in short viewports');
   if(width===320||width===390||width===1440){await page.screenshot({path:path.join(output,`${theme}-${width}-registration.png`),animations:'disabled'});await writeTestOutput(path.join(output,`${theme}-${width}-geometry.json`),JSON.stringify(geometry,null,2));}
@@ -50,6 +52,7 @@ try{
   await sheet.locator('input[name="email"]').fill('invalid-email');await sheet.getByRole('button',{name:t('next'),exact:true}).click();assert.equal(await sheet.locator('input[name="email"]').evaluate(input=>input.validity.typeMismatch),true);await sheet.locator('input[name="email"]').fill(syntheticEmail);assert.equal(await sheet.locator('input[name="email"]').getAttribute('autocomplete'),'email');await sheet.locator('input[name="password"]').fill('short');await sheet.getByRole('button',{name:t('next'),exact:true}).click();assert.equal(await sheet.locator('input[name="password"]').evaluate(input=>input.validity.tooShort),true);
   await sheet.locator('input[name="password"]').fill('a sufficiently long test password');await sheet.getByRole('button',{name:t('next'),exact:true}).click();
   await page.evaluate(()=>history.back());await sheet.locator('input[name="password"]').waitFor({state:'visible'});assert.equal(await sheet.locator('input[name="email"]').inputValue(),syntheticEmail);await sheet.getByRole('button',{name:t('next'),exact:true}).click();
+  await assertChoiceGeometry(sheet.locator(".form-check"));
   assert.equal(await sheet.getByRole('button',{name:t('create'),exact:true}).isDisabled(),true);
   const [legal]=await Promise.all([page.waitForEvent('popup'),sheet.getByRole('link',{name:t('terms'),exact:true}).click()]);await legal.waitForLoadState();assert.ok(legal.url().endsWith('/agb'));await legal.close();await page.bringToFront();assert.equal(await sheet.locator('input[name="company"]').inputValue(),'Synthetic Company GmbH');
   await sheet.getByRole('checkbox').check();const [failedCreation]=await Promise.all([page.waitForResponse(response=>new URL(response.url()).pathname==='/api/auth/register'&&response.request().method()==='POST'),sheet.getByRole('button',{name:t('create'),exact:true}).click()]);await failedCreation.finished();assert.equal(failedCreation.status(),503);await sheet.getByText(t('failure'),{exact:true}).waitFor();assert.equal(posts,1);assert.equal(await sheet.locator('input[name="password"]').inputValue(),'a sufficiently long test password','An interrupted attempt preserves its in-memory password');

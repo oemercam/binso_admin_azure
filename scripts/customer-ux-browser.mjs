@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import {verifyChoiceField} from './form-choice-browser.mjs';
 
 /** Shared dossier geometry; content and server financial values are not replaced. */
 export async function assertCustomerDossier(page){
@@ -41,6 +42,7 @@ export async function verifyCustomerStates(page,{base,capture=async()=>{}}){
   await page.locator('.contact-main').waitFor();assert.equal(await page.getByRole('tab',{name:'Kontakte',exact:true}).getAttribute('aria-selected'),'true');
   const contact=page.locator('button.contact-main');await contact.focus();await contact.press('Enter');
   const dialog=page.getByRole('dialog',{name:'Kontakt bearbeiten',exact:true});await dialog.waitFor();await capture('contact');
+  await verifyChoiceField(page,dialog.locator('.form-check'),{capture:width=>capture('choice-'+width)});
   await page.keyboard.press('Escape');await dialog.waitFor({state:'hidden'});
   assert.equal(await contact.evaluate(el=>el===document.activeElement),true,'Contact dialog restores keyboard focus');
   await page.getByRole('tab',{name:'Dokumente',exact:true}).click();
