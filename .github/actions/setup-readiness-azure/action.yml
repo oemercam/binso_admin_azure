@@ -1,0 +1,32 @@
+name: Separate Azure readiness identity
+description: Validate an explicitly configured readiness identity before OIDC login; never use deployment secrets
+inputs:
+  client-id:
+    required: true
+    description: Dedicated verified Reader application ID
+  tenant-id:
+    required: true
+    description: Tenant containing the readiness application
+  subscription-id:
+    required: true
+    description: Subscription containing the inspected resources
+runs:
+  using: composite
+  steps:
+    - name: Validate readiness configuration before requesting Azure access
+      shell: bash
+      env:
+        READINESS_CLIENT_ID: ${{ inputs.client-id }}
+        READINESS_TENANT_ID: ${{ inputs.tenant-id }}
+        READINESS_SUBSCRIPTION_ID: ${{ inputs.subscription-id }}
+      run: |
+        node --input-type=module <<'JS'
+        import {validateReadinessConfiguration} from './.github/model-a/readiness-policy.mjs';
+        validateReadinessConfiguration(process.env);
+        JS
+    - name: Login using only the dedicated readiness identity
+      uses: azure/login@a641126d1b8aa4d1fa005f4f92df94a3a4c4c906
+      with:
+        client-id: ${{ inputs.client-id }}
+        tenant-id: ${{ inputs.tenant-id }}
+        subscription-id: ${{ inputs.subscription-id }}

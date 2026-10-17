@@ -21,13 +21,18 @@ jobs:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 10
-    environment: production
+    # Configuration-only backup inspection, never restore/provision/migrate.
+    # Activation requires a separately verified Reader identity and main-only readiness.
+    environment: readiness
     steps:
-      - uses: azure/login@a641126d1b8aa4d1fa005f4f92df94a3a4c4c906 # v3
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          persist-credentials: false
+      - uses: ./.github/actions/setup-readiness-azure
+        with:
+          client-id: ${{ vars.READINESS_AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.READINESS_AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.READINESS_AZURE_SUBSCRIPTION_ID }}
 
       - name: Verify Azure PostgreSQL backup configuration
         shell: bash

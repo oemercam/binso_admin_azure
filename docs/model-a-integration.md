@@ -95,3 +95,55 @@ not report the process as accepted until that live test actually succeeds.
 Open: live routine test, and an
 independent automated review integration if broader UI/test automatic eligibility
 is desired. No production operation is part of this rollout.
+
+## Phase 2: safe readiness preparation (2026-10-17)
+
+The reviewed initial PR #267 head was
+`f257e44a7fe7ba10a6a78de434a3b40de8b3c570`. Its `quality` and `analyze` checks
+passed, but it remained draft and browser validation was skipped. These results
+are not full critical-change acceptance and cannot be reused for later heads.
+The policy classifies the actual governance/CI diff as critical and refuses its
+routine integration. No approving review, auto-merge or bypass was performed.
+
+| Operation | Prepared boundary | Activation status |
+| --- | --- | --- |
+| Monitoring inventory and backup configuration inspection | Separate `readiness` environment and dedicated `vars.READINESS_AZURE_CLIENT_ID`, `READINESS_AZURE_TENANT_ID`, `READINESS_AZURE_SUBSCRIPTION_ID`; no Production secrets or fallback | Blocked until a verified Reader identity, matching OIDC federation and main-only environment rule exist |
+| Architecture audit including settings/credentials and database inspection | Existing protected Production job | Cannot become unapproved Reader inventory as-is; split secret-reading/database checks only after dedicated least-privilege access is available |
+| Graph and Stripe credential/configuration validation | Existing protected Production jobs; explicit send gate retained | No deployment identity or production API key copied to an unapproved scope |
+| Retention checks and actual cleanup | Existing protected Production job; preview is read-only, scheduled/apply cleanup can write | Separate read-only database identity is unknown; normal preview separation remains blocked. Existing approval and schedule semantics retained |
+| Deployment/migration/configuration changes | Existing Production owner approval, exact SHA, qualification and artifact verification | Unchanged; no production operation in this assignment |
+
+Monitoring/backup workflow edits are **preparation in a draft PR**, not an activated
+readiness service. Their existing GitHub permissions (`contents: read`, existing
+`id-token: write` for OIDC) are unchanged. OIDC token permission does not prove
+Azure Reader access. `azure/login` uses only the separate variables, and the
+central configuration guard fails before login if these are absent or invalid.
+Valid IDs are not RBAC proof; neither the test nor this guard claims otherwise.
+
+Before integration/activation, verify actual direct/inherited/group/custom-role
+and resource/data-plane access of the readiness principal, its exact OIDC subject
+for `readiness`, and a GitHub environment permitting protected main only, with no
+Production secrets. Do not create an unrestricted environment by merging first.
+Do not reuse the deployment identity, copy database/Graph/Stripe secrets or widen
+Actions permissions to work around missing setup. New Azure federation/roles or
+database principals are outside the current no-infrastructure-change assignment.
+
+The owner confirmed that separate identities are not known and requested safe
+preparation. Azure CLI is not installed in this local execution environment;
+effective Azure RBAC, federated trust and read-only database grants remain
+unverified. Repository owner permission is admin, but main checks remain enforced
+for everyone; this is not a bypass entitlement. Existing Actions settings and
+Production environment protection are unchanged in phase two.
+
+Harmless integration: `.github/model-a/readiness-policy-test.mjs` parses the actual
+workflow/composite YAML and runs its Bash/Node guard before a fake Azure login.
+Positive and negative cases cover correct configuration, missing/invalid IDs,
+wrong branch/repository and forbidden deployment fallback. It also checks the
+actual YAML permissions and that secret-reading/mutating jobs stay on Production.
+No Azure token, cloud API, production data, email or migration is exercised.
+This is not a live Azure acceptance or a successfully merged routine test PR.
+
+Required next evidence: independent critical-rollout assessment, actual Reader/
+OIDC/environment/DB capability verification, current-head non-draft mandatory CI,
+then a harmless routine PR test with exact-head integration and main verification.
+Until these exist, keep PR #267 draft and do not merge through the routine path.
