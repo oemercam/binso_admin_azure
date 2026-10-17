@@ -218,7 +218,8 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 .form-field>input[type="date"],.form-field>input[type="time"]{display:block;width:100%;min-width:0;max-width:100%}
 .form-field>input:not([type="checkbox"]):not([type="radio"]),.form-field>select,.form-field>textarea{width:100%;min-width:0;max-width:100%}
 .time-filter-toolbar>.icon-button{flex:none}
-.form-field.form-check{display:flex;flex-wrap:wrap;align-items:center;gap:var(--field-label-gap);min-height:var(--control-h)}
+.form-field.form-check{display:flex;flex-wrap:wrap;align-items:center;gap:var(--field-label-gap);min-height:var(--touch)}
+.form-check>span[id$="-label"]{flex:1;min-width:0}
 .form-check>.form-error,.form-check>small{flex-basis:100%}
 .form-check>input{width:var(--check-size);height:var(--check-size);min-height:var(--check-size);flex:0 0 var(--check-size);margin:0;accent-color:var(--color-fg)}
 .time-filter-toolbar .form-field{min-width:140px;width:160px}
