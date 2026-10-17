@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import captures from "@/public/product/captures.json";
 import {LocaleSwitcher} from "./locale-switcher";
-import { useEffect, useRef, useState, useId } from "react";
+import { useEffect, useState } from "react";
 import { Button, Icon, Logo } from "./ui";
 import {DetailTabs} from "./binso-ux";
 import {PrivacySettingsButton} from "./privacy-consent";
@@ -123,35 +123,4 @@ export function ProductPreview({compact=false,screen="dashboard"}:{compact?:bool
  return <div className={compact?"product-capture product-capture-mobile":"product-capture product-capture-desktop"}>
   <Image src={capture.src} width={capture.width} height={capture.height} sizes={compact?"(max-width: 760px) 85vw, 310px":"(max-width: 760px) 100vw, 640px"} alt={translate(label)+" · "+translate("Binso One mit Beispieldaten")} preload={!compact}/><small className="product-capture-caption"><LocalizedText>{"Produktansicht in Deutsch · Beispieldaten"}</LocalizedText></small>
  </div>;
-}
-
-export function ProductScreen({title,variant="desktop",screen="dashboard"}:{title:string;variant?:"desktop"|"mobile";screen?:ProductView}) {
- return <LocalizedElement as="figure" className={`product-screen product-screen-${variant}`} aria-label={title}><ProductPreview screen={screen} compact={variant==='mobile'}/></LocalizedElement>;
-}
-
-/** Real screenshots are selectable with the same tab/keyboard foundation as the app. */
-export function ProductGallery(){
- const [screen,setScreen]=useState<ProductView>('customers'),[mobile,setMobile]=useState(false),id=useId();
- return <section className="product-gallery" aria-labelledby={id+'-title'}>
-  <header><h3 id={id+'-title'}><LocalizedText>{"Produktansichten"}</LocalizedText></h3><div className="product-gallery-views"><Button variant={mobile?'secondary':'primary'} aria-pressed={!mobile} onClick={()=>setMobile(false)}><LocalizedText>{"Desktop"}</LocalizedText></Button><Button variant={mobile?'primary':'secondary'} aria-pressed={mobile} onClick={()=>setMobile(true)}><LocalizedText>{"Mobile / PWA"}</LocalizedText></Button></div></header>
-  <DetailTabs label="Produktansichten" panelId={id+'-panel'}>{productViews.map(([key,label])=><button type="button" key={key} className={screen===key?'active':''} onClick={()=>setScreen(key)}><LocalizedText>{label}</LocalizedText></button>)}</DetailTabs>
-  <div id={id+'-panel'} role="tabpanel" aria-labelledby={id+'-panel-tab-'+productViews.findIndex(([key])=>key===screen)}><ProductPreview screen={screen} compact={mobile}/></div>
-  <Button href="/demo" variant="ghost"><LocalizedText>{"In der Demo ansehen"}</LocalizedText><Icon name="arrow" size={16}/></Button>
- </section>;
-}
-
-export function MarketingFaq({children}:{children:React.ReactNode}) {
-  const ref=useRef<HTMLDivElement>(null);
-  useEffect(()=>{
-    const root=ref.current;
-    if(!root)return;
-    const closeOthers=(event:Event)=>{
-      const opened=event.target;
-      if(!(opened instanceof HTMLDetailsElement)||!opened.open)return;
-      for(const detail of root.querySelectorAll("details")){if(detail!==opened)detail.open=false;}
-    };
-    root.addEventListener("toggle",closeOthers,true);
-    return()=>root.removeEventListener("toggle",closeOthers,true);
-  },[]);
-  return <div className="faq-list" ref={ref}>{children}</div>;
 }
