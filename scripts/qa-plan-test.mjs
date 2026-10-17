@@ -1,10 +1,19 @@
 import assert from 'node:assert/strict';
-import {planChanges,fullRoutes,shouldRunBrowser} from './qa-plan.mjs';
+import {planChanges,fullRoutes,shouldRunBrowser,isDocumentationOnlyChange} from './qa-plan.mjs';
 assert.deepEqual(planChanges(['components/product-form.tsx'],{level:'fast'}).routes,['/produkte','/produkte/product-one','/produkte/neu']);
 assert.equal(planChanges(['components/product-form.tsx']).level,'standard');
 for(const path of ['app/design-system/collections.css','components/ui.tsx','components/records.tsx','components/app-chrome.tsx','components/binso-ux.tsx','components/use-dialog-focus.ts']){const p=planChanges([path]);assert(p.global);for(const r of ['/dashboard','/kunden/neu','/rechnungen/RE-TEST-1','/support/ticket-one','/operator'])assert(p.routes.includes(r),path+': '+r);}
 for(const path of ['.github/workflows/quality.yml','database/migrations/new.sql','app/api/auth/session/route.ts','components/unmapped.tsx'])assert.deepEqual(planChanges([path]).routes,fullRoutes,path);
 assert.deepEqual(planChanges(['docs/readme.md']).routes,[]);
+for(const files of [['README.md','AGENTS.md'],['docs/architecture/v21-5-routes.md'],['docs/product-auth-guide.md','docs/notes.txt']]){
+ assert.equal(isDocumentationOnlyChange(files),true);
+ assert.deepEqual(planChanges(files).routes,[],'Prose filenames do not imply runtime dependencies');
+ assert.deepEqual(planChanges(files,{level:'full'}).routes,fullRoutes,'Explicit full coverage survives a prose-only diff');
+}
+for(const files of [[],['docs/readme.md','components/ui.tsx'],['docs/product.js'],['docs/product-config.json'],['docs/architecture/reference-foundation.md'],['docs/audit/v24/reference/IMPLEMENTIERUNG.md'],['README.runtime.js'],['docs/../components/ui.tsx'],['docs\\readme.md'],['docs/a\nb.md']]){
+ assert.equal(isDocumentationOnlyChange(files),false,JSON.stringify(files));
+ assert.deepEqual(planChanges(files).routes,fullRoutes,'Unsafe or unknown diff retains full coverage: '+JSON.stringify(files));
+}
 assert.deepEqual(planChanges(['components/documents.tsx']).interactions,['documents']);
 assert.equal(planChanges([],{level:'full'}).routes.length,fullRoutes.length);
 assert(planChanges([],{level:'full'}).webkitWidths.includes(1024),'The release candidate must actually measure the desktop header in WebKit');

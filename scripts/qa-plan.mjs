@@ -22,16 +22,25 @@ const groups={
 };
 const representative=['/dashboard','/finanzen','/kunden','/kunden/customer-one','/kunden/neu','/produkte','/produkte/product-one','/produkte/neu','/rechnungen','/rechnungen/RE-TEST-1','/rechnungen/neu','/mitarbeiter/employee-one','/mitarbeiter/neu','/zeit','/projekte/neu','/spesen/neu','/support/ticket-one','/einstellungen','/operator','/operator/kunden','/login'];
 const allInteractions=['data','customers','products','employees','documents','finance','time','expenses','chat','billing','header','operator','settings','chrome'];
+// Only prose with canonical repository paths can omit rendered evidence. Binding
+// UX references, executable/configuration evidence and unknown/empty diffs cannot.
+export function isDocumentationOnlyChange(files){
+ return Array.isArray(files)&&files.length>0&&files.every(p=>typeof p==='string'&&
+  !/[\\\r\n]/.test(p)&&!p.split('/').some(part=>!part||part==='.'||part==='..')&&
+  !/^(docs\/audit\/v24\/reference\/|docs\/architecture\/reference-foundation\.md$)/.test(p)&&
+  /^(README\.md|AGENTS\.md|docs\/.+\.(md|txt))$/.test(p));
+}
 export function planChanges(files,{level='standard'}={}){
  if(!['fast','integration','standard','full'].includes(level))throw new Error('Unknown QA level: '+level);
  const paths=[...new Set(files)].sort();
+ const documentationOnly=isDocumentationOnlyChange(paths);
  const isGlobal=p=>/^(app\/design-system\/|app\/(binso-ui\.css|layout\.tsx)|components\/(pages\/shared|app-pages|app-shell|app-chrome|header-panel(?:-content)?|avatar|form-wizard|ui|binso-ux|records|use-dialog-focus|use-browser-back-guard|use-dirty-snapshot)|lib\/client\/|lib\/permissions|lib\/routes|next\.config)/.test(p);
  const global=paths.some(isGlobal);
  // Unknown dependencies, auth, schema and CI changes fail open to broader TEST COVERAGE, never to success.
  const isInfrastructure=p=>/^(\.github\/|package\.json|pnpm-|database\/|lib\/server\/auth|app\/api\/auth|scripts\/)/.test(p);
  const infrastructure=paths.some(isInfrastructure);
- const matched=Object.values(groups).filter(g=>paths.some(p=>g.match.test(p)));
- const unknown=paths.some(p=>!/^(docs\/|README|\.gitignore|AGENTS\.md)/.test(p)&&!isGlobal(p)&&!isInfrastructure(p)&&!Object.values(groups).some(g=>g.match.test(p)));
+ const matched=documentationOnly?[]:Object.values(groups).filter(g=>paths.some(p=>g.match.test(p)));
+ const unknown=!paths.length||paths.some(p=>!isDocumentationOnlyChange([p])&&(/^(docs\/|README|AGENTS\.md)/.test(p)||!isGlobal(p)&&!isInfrastructure(p)&&!Object.values(groups).some(g=>g.match.test(p))));
  const full=level==='full'||level==='standard'&&(global||infrastructure||unknown);
  const broad=global||unknown||infrastructure;
  const modulePaths=paths.filter(p=>p.startsWith('components/pages/')&&!p.endsWith('/shared.tsx'));
@@ -69,5 +78,5 @@ if(process.argv[1]===fileURLToPath(import.meta.url)){
  const arg=name=>{const i=process.argv.indexOf(name);return i<0?undefined:process.argv[i+1]};
  const plan=planChanges(arg('--files')?.split(',')??changedFiles(arg('--base')),{level:arg('--level')??'standard'});
  console.log(JSON.stringify(plan,null,2));
- if(process.env.GITHUB_OUTPUT){const entries={level:plan.level,routes:plan.routes.join(','),webkit_routes:plan.webkitRoutes.join(','),widths:plan.widths.join(','),webkit_widths:plan.webkitWidths.join(','),interactions:plan.interactions.join(','),browser:plan.routes.length?'true':'false'};fs.appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(entries).map(([k,v])=>`${k}=${v}\n`).join(''));}
+ if(process.env.GITHUB_OUTPUT){const entries={level:plan.level,changed_files:JSON.stringify(plan.files),routes:plan.routes.join(','),webkit_routes:plan.webkitRoutes.join(','),widths:plan.widths.join(','),webkit_widths:plan.webkitWidths.join(','),interactions:plan.interactions.join(','),browser:plan.routes.length?'true':'false'};fs.appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(entries).map(([k,v])=>`${k}=${v}\n`).join(''));}
 }
