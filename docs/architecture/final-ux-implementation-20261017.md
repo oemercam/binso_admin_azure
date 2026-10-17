@@ -41,9 +41,12 @@ konkrete neue Navigationsreferenz bleiben ihre geprüften Verträge erhalten.
   Selektorspezifität und verbleibende Reihenfolge bleiben erhalten. Keine
   unterschiedlichen Werte oder progressiven Fallbacks pauschal zusammengelegt.
   [Deklarationsnachweis](final-ux-css-deduplication-20261017.json).
-- Zwei nicht mehr referenzierte generierte Rechnungsbeispiele aus `public/demo`
-  entfernt. Der bestehende PDF-Test kann Beispiele weiterhin explizit in einen
-  angegebenen Evidence-Ordner schreiben. Reale PDFs werden unverändert erzeugt.
+- Die beiden Demo-Rechnungs-PDFs in `public/demo` bleiben erhalten. Der erste
+  Bereinigungslauf hatte ihre dynamisch zusammengesetzte Verwendung in der
+  Abonnement-Demo übersehen; die CI-Vorschauprüfung deckte diesen Fehler auf.
+  Beide Originaldateien wurden exakt aus Main wiederhergestellt. Eine neue
+  Regression leitet Pfade und Rechnungsnummern aus der tatsächlichen UI ab und
+  prüft vorhandene einseitige PDF-Dateien sowie fehlende/falsche Assets.
 - Originalbranding, PWA-/Kompatibilitätsicons, Fontlizenz, PDF-Fonts und verwendete
   Produktcaptures bleiben erhalten. Datierten Audits/Referenzen wird keine neue
   Anweisungspriorität gegeben; historische Evidence wird nicht gelöscht.
@@ -216,3 +219,16 @@ Gesamtabnahme des neuen Heads. Fehlende Referenzzustände (insbesondere Dark und
 zusätzliche Operator-/Fehlerzustände) bleiben abgeleitet; physische Geräte,
 produktives SSO und Infrastruktur-Nachweise werden nicht behauptet.
 Kein automatischer Merge und kein Produktivdeployment.
+
+
+## CI-Korrektur: dynamisch referenzierte Demo-PDFs
+
+Im ersten gemeinsamen CI-Lauf scheiterten Chromium und WebKit beim Warten auf
+den PDF-Canvas der Demo-Abrechnung. Ursache waren die zuvor fälschlich als
+unbenutzt entfernten zwei PDF-Dateien. Die Anwendung bildet deren Pfade aus
+dem Rechnungsdatum; die Originalbytes sind wiederhergestellt. Der bestehende
+Dokumenttest überprüft jetzt die tatsächlichen JSX-Daten und den tatsächlichen
+URL-Ausdruck, PDF-Seitenzahl/Rechnungsidentität sowie negative fehlende und
+nicht-PDF-Antworten. Der gezielte lokale PDF-Test ist erfolgreich. Keine
+Browserassertion oder Wartezeit geändert. Andere laufende Actions werden nicht
+abgebrochen; die Korrektur wird im selben PR nach deren Abschluss geprüft.
