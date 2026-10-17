@@ -37,6 +37,7 @@ jobs:
     runs-on: ubuntu-24.04
     outputs:
       level: ${{ steps.scope.outputs.level }}
+      changed_files: ${{ steps.scope.outputs.changed_files }}
       routes: ${{ steps.scope.outputs.routes }}
       webkit_routes: ${{ steps.scope.outputs.webkit_routes }}
       widths: ${{ steps.scope.outputs.widths }}
@@ -399,12 +400,13 @@ jobs:
           QA_REF: ${{ github.ref }}
           QA_PLANNED_LEVEL: ${{ needs.plan.outputs.level }}
           QA_BROWSER: ${{ needs.plan.outputs.browser }}
+          QA_CHANGED_FILES: ${{ needs.plan.outputs.changed_files }}
         shell: bash
         run: |
           set -euo pipefail
           node --input-type=module - <<'JS' > "$RUNNER_TEMP/qa-acceptance-flags"
           import {qaAcceptance} from './scripts/qa-acceptance.mjs';
-          const decision=qaAcceptance({event:process.env.QA_EVENT,level:process.env.QA_LEVEL,profile:process.env.QA_RELEASE_PROFILE,ref:process.env.QA_REF,plannedLevel:process.env.QA_PLANNED_LEVEL,browser:process.env.QA_BROWSER==='true'});
+          const decision=qaAcceptance({event:process.env.QA_EVENT,level:process.env.QA_LEVEL,profile:process.env.QA_RELEASE_PROFILE,ref:process.env.QA_REF,plannedLevel:process.env.QA_PLANNED_LEVEL,browser:process.env.QA_BROWSER==='true',files:JSON.parse(process.env.QA_CHANGED_FILES||'[]')});
           if(decision.release)console.log('--release');
           if(decision.deployment)console.log('--deployment-release');
           JS
