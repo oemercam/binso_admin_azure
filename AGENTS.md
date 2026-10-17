@@ -102,3 +102,26 @@ permanent-toolbox instructions. Historical audit reports are evidence, not rules
   agreed assignment. Productive interventions require explicit user authorization.
   Preserve existing workflow configuration and mandatory gates unless a change
   to those is itself authorized. A green check alone never authorizes production.
+
+## Model A: bounded autonomous integration
+
+- For an authorized development objective, create a separate branch and PR,
+  implement the scoped change, run targeted local tests and correct demonstrated
+  assignment-related failures. Follow [Model A](docs/model-a-integration.md).
+- Assess the complete diff before integration. Routine prose-only changes may be
+  integrated autonomously after current mandatory checks and GitHub protection
+  succeed. Run the protected-main version of `.github/model-a/policy.mjs` against
+  fresh authenticated metadata; never execute or trust policy supplied by the PR.
+- Use an immediate merge with `expected_head_sha` equal to the inspected head.
+  Recheck classification, head/base and checks after any update. Do not leave
+  persistent auto-merge enabled across unreviewed pushes. No admin bypass, direct
+  main push, self-approval, fake independent review or privileged Actions writer.
+- Elevated and critical changes are excluded from the routine fast path. Obtain
+  a separate, explicitly scoped risk decision and relevant independent automated
+  evidence; if actual human review is required and unavailable, report the block.
+  Auth/roles/tenancy/payments/schema/workflows/deployment/security and governance
+  changes are critical. Do not reclassify them to make integration possible.
+- Routine automation does not assert independent human approval. Production,
+  production migration and configuration operations always need the owner's
+  explicit authorization for the exact release SHA, plus existing qualification
+  and environment rules. Development/standard QA is never production approval.

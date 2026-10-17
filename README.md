@@ -15,6 +15,7 @@ Prüfergebnisse. Nur die für den konkreten Auftrag relevanten Quellen lesen.
 | Laufzeit, Sicherheit und Daten | Architektur-/Sicherheitsübersicht unten; `app/`, `lib/server/`, `database/migrations/` gezielt nach betroffener Funktion |
 | Aktuelle Projektregeln | [AGENTS.md](AGENTS.md), `package.json`, `pnpm-workspace.yaml`; Windows-Runtime: Workspace-`../runtime.ps1` und `../AGENTS.md` |
 | QA-Auswahl und Ausführung | `scripts/qa-plan.mjs`, `scripts/qa.mjs`, `package.json`; Pflicht-Gates: `.github/workflows/quality.yml` |
+| Autonome Entwicklung und Integration | [Modell A: Grenzen, Risikoklassen und Abnahme](docs/model-a-integration.md) |
 | Historische Nachweise | `docs/audit/`, `docs/assets/`, `docs/evidence/`, datierte Inventare unter `docs/architecture/`; [V24-Bericht](docs/audit/v24/README.md) und [älterer QA-Audit](docs/ux-audit-fast-development.md) nur bei Bedarf |
 
 Kurze QA-Auswahl (aus dem Repository, nach Runtime-Aktivierung):

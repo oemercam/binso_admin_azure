@@ -105,6 +105,8 @@ jobs:
           node scripts/compliance/report-test.mjs
           node scripts/quality-browser-plan-test.mjs
           node scripts/workflow-safety-test.mjs
+          node .github/model-a/policy-test.mjs
+          node .github/model-a/readiness-policy-test.mjs
           node scripts/release-artifact-test.mjs
       - name: Real isolated PostgreSQL parallel process gate
         env:
