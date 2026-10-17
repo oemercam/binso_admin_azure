@@ -1,0 +1,337 @@
+{
+  "observedAt": "2026-10-17",
+  "mainSha": "381abbd9a49570a8880468c6e680735b12e8b6b9",
+  "method": "Read-only GitHub run/job API. Latest matching runs from recent all/push/manual collections, not a complete history census. Seconds are completed_at minus started_at, not billed minutes.",
+  "runs": [
+    {
+      "file": "azure-architecture-audit.yml",
+      "name": "Azure Architecture Audit",
+      "id": 38848157248,
+      "event": "workflow_dispatch",
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-10-16T03:58:05Z",
+      "head_branch": "main",
+      "path": ".github/workflows/azure-architecture-audit.yml",
+      "jobs": [
+        {
+          "id": 116803248273,
+          "name": "audit",
+          "conclusion": "failure",
+          "startedAt": "2026-10-16T03:58:08Z",
+          "completedAt": "2026-10-16T03:59:36Z",
+          "seconds": 88,
+          "failedSteps": [
+            "Verify production monitoring gate"
+          ]
+        }
+      ],
+      "runnerSeconds": 88
+    },
+    {
+      "file": "deploy-azure.yml",
+      "name": "Deploy Azure App Service",
+      "id": 38954045789,
+      "event": "workflow_dispatch",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-10-16T19:19:18Z",
+      "head_branch": "main",
+      "path": ".github/workflows/deploy-azure.yml",
+      "jobs": [
+        {
+          "id": 117152313324,
+          "name": "deploy",
+          "conclusion": "success",
+          "startedAt": "2026-10-16T19:19:22Z",
+          "completedAt": "2026-10-16T19:25:59Z",
+          "seconds": 397,
+          "failedSteps": []
+        }
+      ],
+      "runnerSeconds": 397
+    },
+    {
+      "file": "codeql.yml",
+      "name": "CodeQL",
+      "id": 38969839773,
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-10-16T21:30:28Z",
+      "head_branch": "main",
+      "path": ".github/workflows/codeql.yml",
+      "jobs": [
+        {
+          "id": 117205228619,
+          "name": "analyze",
+          "conclusion": "success",
+          "startedAt": "2026-10-16T21:30:30Z",
+          "completedAt": "2026-10-16T21:32:16Z",
+          "seconds": 106,
+          "failedSteps": []
+        }
+      ],
+      "runnerSeconds": 106
+    },
+    {
+      "file": "graph-mail-readiness.yml",
+      "name": "Microsoft Graph Mail Readiness",
+      "id": 38301303976,
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-10-12T19:59:45Z",
+      "head_branch": "main",
+      "path": ".github/workflows/graph-mail-readiness.yml",
+      "jobs": [
+        {
+          "id": 114984624067,
+          "name": "graph-mail",
+          "conclusion": "success",
+          "startedAt": "2026-10-12T19:59:48Z",
+          "completedAt": "2026-10-12T20:00:14Z",
+          "seconds": 26,
+          "failedSteps": []
+        }
+      ],
+      "runnerSeconds": 26
+    },
+    {
+      "file": "retention-maintenance.yml",
+      "name": "Retention Maintenance",
+      "id": 38866306921,
+      "event": "schedule",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-10-16T07:17:46Z",
+      "head_branch": "main",
+      "path": ".github/workflows/retention-maintenance.yml",
+      "jobs": [
+        {
+          "id": 116859831792,
+          "name": "cleanup",
+          "conclusion": "success",
+          "startedAt": "2026-10-16T07:17:50Z",
+          "completedAt": "2026-10-16T07:18:15Z",
+          "seconds": 25,
+          "failedSteps": []
+        }
+      ],
+      "runnerSeconds": 25
+    },
+    {
+      "file": "postgresql-backup-readiness.yml",
+      "name": "PostgreSQL Backup Readiness",
+      "id": 38301303887,
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-10-12T19:59:45Z",
+      "head_branch": "main",
+      "path": ".github/workflows/postgresql-backup-readiness.yml",
+      "jobs": [
+        {
+          "id": 114984623786,
+          "name": "backup",
+          "conclusion": "success",
+          "startedAt": "2026-10-12T19:59:48Z",
+          "completedAt": "2026-10-12T20:00:12Z",
+          "seconds": 24,
+          "failedSteps": []
+        }
+      ],
+      "runnerSeconds": 24
+    },
+    {
+      "file": "quality.yml",
+      "name": "Quality • push • standard",
+      "id": 38969839838,
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-10-16T21:30:28Z",
+      "head_branch": "main",
+      "path": ".github/workflows/quality.yml",
+      "jobs": [
+        {
+          "id": 117205229533,
+          "name": "plan",
+          "conclusion": "success",
+          "startedAt": "2026-10-16T21:30:30Z",
+          "completedAt": "2026-10-16T21:30:40Z",
+          "seconds": 10,
+          "failedSteps": []
+        },
+        {
+          "id": 117205229795,
+          "name": "build",
+          "conclusion": "success",
+          "startedAt": "2026-10-16T21:30:31Z",
+          "completedAt": "2026-10-16T21:32:45Z",
+          "seconds": 134,
+          "failedSteps": []
+        },
+        {
+          "id": 117205229936,
+          "name": "scanner-engine",
+          "conclusion": "success",
+          "startedAt": "2026-10-16T21:30:30Z",
+          "completedAt": "2026-10-16T21:31:38Z",
+          "seconds": 68,
+          "failedSteps": []
+        },
+        {
+          "id": 117205229997,
+          "name": "checks",
+          "conclusion": "success",
+          "startedAt": "2026-10-16T21:30:31Z",
+          "completedAt": "2026-10-16T21:32:40Z",
+          "seconds": 129,
+          "failedSteps": []
+        },
+        {
+          "id": 117206069758,
+          "name": "browser (chromium, responsive, 0, 3)",
+          "conclusion": "success",
+          "startedAt": "2026-10-16T21:32:47Z",
+          "completedAt": "2026-10-16T21:37:10Z",
+          "seconds": 263,
+          "failedSteps": []
+        },
+        {
+          "id": 117206069794,
+          "name": "browser (chromium, responsive, 1, 3)",
+          "conclusion": "success",
+          "startedAt": "2026-10-16T21:32:47Z",
+          "completedAt": "2026-10-16T21:38:12Z",
+          "seconds": 325,
+          "failedSteps": []
+        },
+        {
+          "id": 117206069822,
+          "name": "browser (chromium, responsive, 2, 3)",
+          "conclusion": "success",
+          "startedAt": "2026-10-16T21:32:47Z",
+          "completedAt": "2026-10-16T21:37:08Z",
+          "seconds": 261,
+          "failedSteps": []
+        },
+        {
+          "id": 117206069843,
+          "name": "browser (webkit, responsive, 2, 3)",
+          "conclusion": "success",
+          "startedAt": "2026-10-16T21:32:47Z",
+          "completedAt": "2026-10-16T21:36:07Z",
+          "seconds": 200,
+          "failedSteps": []
+        },
+        {
+          "id": 117206069872,
+          "name": "browser (webkit, functional, 0, 1)",
+          "conclusion": "success",
+          "startedAt": "2026-10-16T21:32:48Z",
+          "completedAt": "2026-10-16T21:40:49Z",
+          "seconds": 481,
+          "failedSteps": []
+        },
+        {
+          "id": 117206069913,
+          "name": "browser (chromium, functional, 0, 1)",
+          "conclusion": "success",
+          "startedAt": "2026-10-16T21:32:48Z",
+          "completedAt": "2026-10-16T21:40:42Z",
+          "seconds": 474,
+          "failedSteps": []
+        },
+        {
+          "id": 117206069950,
+          "name": "browser (webkit, responsive, 0, 3)",
+          "conclusion": "success",
+          "startedAt": "2026-10-16T21:32:48Z",
+          "completedAt": "2026-10-16T21:38:07Z",
+          "seconds": 319,
+          "failedSteps": []
+        },
+        {
+          "id": 117206069954,
+          "name": "browser (webkit, responsive, 1, 3)",
+          "conclusion": "success",
+          "startedAt": "2026-10-16T21:32:48Z",
+          "completedAt": "2026-10-16T21:38:19Z",
+          "seconds": 331,
+          "failedSteps": []
+        },
+        {
+          "id": 117209013643,
+          "name": "ux-compliance",
+          "conclusion": "success",
+          "startedAt": "2026-10-16T21:40:51Z",
+          "completedAt": "2026-10-16T21:41:25Z",
+          "seconds": 34,
+          "failedSteps": []
+        },
+        {
+          "id": 117209233020,
+          "name": "quality",
+          "conclusion": "success",
+          "startedAt": "2026-10-16T21:41:27Z",
+          "completedAt": "2026-10-16T21:41:50Z",
+          "seconds": 23,
+          "failedSteps": []
+        }
+      ],
+      "runnerSeconds": 3052
+    },
+    {
+      "file": "production-monitoring-readiness.yml",
+      "name": "Production Monitoring Readiness",
+      "id": 38694941598,
+      "event": "push",
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-10-15T06:51:19Z",
+      "head_branch": "main",
+      "path": ".github/workflows/production-monitoring-readiness.yml",
+      "jobs": [
+        {
+          "id": 116289206617,
+          "name": "monitoring",
+          "conclusion": "failure",
+          "startedAt": "2026-10-15T06:51:22Z",
+          "completedAt": "2026-10-15T06:51:56Z",
+          "seconds": 34,
+          "failedSteps": [
+            "Verify production monitoring resources"
+          ]
+        }
+      ],
+      "runnerSeconds": 34
+    },
+    {
+      "file": "stripe-configuration-audit.yml",
+      "name": "Stripe Billing Configuration",
+      "id": 38694941772,
+      "event": "push",
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-10-15T06:51:19Z",
+      "head_branch": "main",
+      "path": ".github/workflows/stripe-configuration-audit.yml",
+      "jobs": [
+        {
+          "id": 116289207613,
+          "name": "audit",
+          "conclusion": "failure",
+          "startedAt": "2026-10-15T06:51:22Z",
+          "completedAt": "2026-10-15T06:51:35Z",
+          "seconds": 13,
+          "failedSteps": [
+            "Audit current Stripe production configuration without payments"
+          ]
+        }
+      ],
+      "runnerSeconds": 13
+    }
+  ]
+}

@@ -1,0 +1,1862 @@
+{
+  "schemaVersion": 1,
+  "scope": "Static source inventory; script references are lexical and do not prove runtime reachability.",
+  "workflows": [
+    {
+      "file": ".github/workflows/azure-architecture-audit.yml",
+      "name": "Azure Architecture Audit",
+      "triggers": {
+        "push": {
+          "branches": [
+            "main"
+          ],
+          "paths": [
+            ".github/workflows/azure-architecture-audit.yml"
+          ]
+        },
+        "workflow_dispatch": null
+      },
+      "permissions": {
+        "contents": "read",
+        "id-token": "write"
+      },
+      "concurrency": {
+        "group": "operational-azure-architecture-audit",
+        "cancel-in-progress": true
+      },
+      "secrets": [
+        "AZURE_CLIENT_ID",
+        "AZURE_SUBSCRIPTION_ID",
+        "AZURE_TENANT_ID"
+      ],
+      "jobs": [
+        {
+          "name": "audit",
+          "if": "github.ref == 'refs/heads/main'",
+          "environment": "production",
+          "timeoutMinutes": 10,
+          "runner": "ubuntu-24.04",
+          "services": [],
+          "steps": [
+            {
+              "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+              "scripts": []
+            },
+            {
+              "uses": "azure/login@a641126d1b8aa4d1fa005f4f92df94a3a4c4c906",
+              "scripts": []
+            },
+            {
+              "name": "Audit Azure architecture without secrets",
+              "scripts": [
+                "scripts/azure-auth-check.mjs"
+              ]
+            },
+            {
+              "name": "Verify production monitoring gate",
+              "if": "${{ always() }}",
+              "scripts": [
+                "scripts/production-monitoring-check.sh"
+              ]
+            },
+            {
+              "name": "Verify restricted runtime database role",
+              "if": "${{ always() }}",
+              "scripts": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": ".github/workflows/codeql.yml",
+      "name": "CodeQL",
+      "triggers": {
+        "push": {
+          "branches": [
+            "main"
+          ]
+        },
+        "pull_request": {
+          "branches": [
+            "main"
+          ]
+        },
+        "schedule": [
+          {
+            "cron": "17 4 * * 1"
+          }
+        ],
+        "workflow_dispatch": null
+      },
+      "permissions": {
+        "contents": "read"
+      },
+      "concurrency": {
+        "group": "codeql-${{ github.workflow }}-${{ github.ref }}",
+        "cancel-in-progress": true
+      },
+      "secrets": [],
+      "jobs": [
+        {
+          "name": "analyze",
+          "permissions": {
+            "actions": "read",
+            "contents": "read",
+            "security-events": "write"
+          },
+          "timeoutMinutes": 45,
+          "runner": "ubuntu-24.04",
+          "services": [],
+          "steps": [
+            {
+              "name": "Checkout",
+              "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+              "scripts": []
+            },
+            {
+              "name": "Initialize CodeQL",
+              "uses": "github/codeql-action/init@24c54180a607b1449ed407dd24f251e4e9147c8d",
+              "scripts": []
+            },
+            {
+              "name": "Analyze",
+              "uses": "github/codeql-action/analyze@24c54180a607b1449ed407dd24f251e4e9147c8d",
+              "scripts": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": ".github/workflows/deploy-azure.yml",
+      "name": "Deploy Azure App Service",
+      "triggers": {
+        "workflow_dispatch": {
+          "inputs": {
+            "commit_sha": {
+              "description": "Exact current main SHA with a successful full Quality run",
+              "required": true,
+              "type": "string"
+            },
+            "release_profile": {
+              "description": "Must match the successful full QA acceptance profile",
+              "type": "choice",
+              "options": [
+                "production",
+                "development"
+              ],
+              "default": "production"
+            },
+            "approve_production": {
+              "description": "Explicitly approve production migrations and deployment for this SHA",
+              "required": true,
+              "default": false,
+              "type": "boolean"
+            }
+          }
+        }
+      },
+      "permissions": {
+        "contents": "read",
+        "actions": "read"
+      },
+      "concurrency": {
+        "group": "production-deploy",
+        "cancel-in-progress": false
+      },
+      "secrets": [
+        "AZURE_CLIENT_ID",
+        "AZURE_SUBSCRIPTION_ID",
+        "AZURE_TENANT_ID",
+        "DATABASE_URL"
+      ],
+      "jobs": [
+        {
+          "name": "deploy",
+          "if": "${{ github.event_name == 'workflow_dispatch' && inputs.approve_production == true && github.ref == 'refs/heads/main' }}",
+          "environment": "production",
+          "permissions": {
+            "contents": "read",
+            "actions": "read",
+            "id-token": "write"
+          },
+          "timeoutMinutes": 45,
+          "runner": "ubuntu-24.04",
+          "services": [],
+          "steps": [
+            {
+              "name": "Validate dispatch identity before checking out code",
+              "uses": "actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3",
+              "scripts": []
+            },
+            {
+              "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+              "scripts": []
+            },
+            {
+              "name": "Resolve successful Quality artifact for this exact main commit",
+              "uses": "actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3",
+              "scripts": []
+            },
+            {
+              "name": "Download Quality-verified production artifact",
+              "uses": "actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333",
+              "scripts": []
+            },
+            {
+              "uses": "./.github/actions/setup-node",
+              "scripts": []
+            },
+            {
+              "name": "Validate deploy artifact",
+              "scripts": [
+                "scripts/compliance/release-scope.mjs",
+                "scripts/release-artifact.mjs"
+              ]
+            },
+            {
+              "name": "Validate and migrate Azure PostgreSQL",
+              "scripts": []
+            },
+            {
+              "name": "Azure login (OIDC)",
+              "uses": "azure/login@a641126d1b8aa4d1fa005f4f92df94a3a4c4c906",
+              "scripts": []
+            },
+            {
+              "name": "Verify actual HTTPS and EasyAuth configuration without changing it",
+              "scripts": [
+                "scripts/azure-auth-check.mjs"
+              ]
+            },
+            {
+              "name": "Ensure production security and mail settings",
+              "scripts": []
+            },
+            {
+              "name": "Inspect explicitly activated scanner configuration",
+              "scripts": []
+            },
+            {
+              "name": "Download exact Quality-qualified scanner",
+              "uses": "actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333",
+              "if": "steps.scanner.outputs.enabled == 'true'",
+              "scripts": []
+            },
+            {
+              "name": "Publish qualified scanner and bind immutable sidecar",
+              "if": "steps.scanner.outputs.enabled == 'true'",
+              "scripts": [
+                "scripts/verify-scanner-image.mjs"
+              ]
+            },
+            {
+              "name": "Validate runtime role and prepare authorized development settings",
+              "scripts": [
+                "scripts/check-runtime-db.mjs",
+                "scripts/compliance/release-scope.mjs"
+              ]
+            },
+            {
+              "name": "Inspect production startup entry point",
+              "scripts": []
+            },
+            {
+              "name": "Deploy to Azure App Service",
+              "uses": "azure/webapps-deploy@02a81bead70021f5284939794bcec79c271ab383",
+              "scripts": []
+            },
+            {
+              "name": "Promote verified runtime settings after deploying the new auth helpers",
+              "scripts": []
+            },
+            {
+              "name": "Wait for deployed worker",
+              "scripts": []
+            },
+            {
+              "name": "Verify current production build and routes",
+              "scripts": [
+                "scripts/check-deployed-assets.mjs",
+                "scripts/compliance/release-scope.mjs"
+              ]
+            },
+            {
+              "name": "Capture Azure diagnostics on deployment failure",
+              "if": "failure()",
+              "scripts": []
+            },
+            {
+              "name": "Remove temporary runtime credentials",
+              "if": "always()",
+              "scripts": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": ".github/workflows/graph-mail-readiness.yml",
+      "name": "Microsoft Graph Mail Readiness",
+      "triggers": {
+        "workflow_dispatch": {
+          "inputs": {
+            "send_self_test": {
+              "description": "Explicitly send one production self-test email",
+              "type": "boolean",
+              "default": false
+            }
+          }
+        },
+        "push": {
+          "branches": [
+            "main"
+          ],
+          "paths": [
+            ".github/workflows/graph-mail-readiness.yml",
+            "lib/server/email.ts",
+            "lib/server/env.ts"
+          ]
+        }
+      },
+      "permissions": {
+        "contents": "read",
+        "id-token": "write"
+      },
+      "concurrency": {
+        "group": "operational-graph-mail-readiness",
+        "cancel-in-progress": false
+      },
+      "secrets": [
+        "AZURE_CLIENT_ID",
+        "AZURE_SUBSCRIPTION_ID",
+        "AZURE_TENANT_ID"
+      ],
+      "jobs": [
+        {
+          "name": "graph-mail",
+          "if": "github.ref == 'refs/heads/main'",
+          "environment": "production",
+          "timeoutMinutes": 10,
+          "runner": "ubuntu-24.04",
+          "services": [],
+          "steps": [
+            {
+              "uses": "azure/login@a641126d1b8aa4d1fa005f4f92df94a3a4c4c906",
+              "scripts": []
+            },
+            {
+              "uses": "actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+              "scripts": []
+            },
+            {
+              "name": "Validate Microsoft Graph mail (sending requires explicit input)",
+              "scripts": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": ".github/workflows/postgresql-backup-readiness.yml",
+      "name": "PostgreSQL Backup Readiness",
+      "triggers": {
+        "workflow_dispatch": null,
+        "push": {
+          "branches": [
+            "main"
+          ],
+          "paths": [
+            ".github/workflows/postgresql-backup-readiness.yml",
+            "docs/azure-postgresql-backup-restore.md"
+          ]
+        }
+      },
+      "permissions": {
+        "contents": "read",
+        "id-token": "write"
+      },
+      "concurrency": {
+        "group": "operational-postgresql-backup-readiness",
+        "cancel-in-progress": true
+      },
+      "secrets": [
+        "AZURE_CLIENT_ID",
+        "AZURE_SUBSCRIPTION_ID",
+        "AZURE_TENANT_ID"
+      ],
+      "jobs": [
+        {
+          "name": "backup",
+          "if": "github.ref == 'refs/heads/main'",
+          "environment": "production",
+          "timeoutMinutes": 10,
+          "runner": "ubuntu-24.04",
+          "services": [],
+          "steps": [
+            {
+              "uses": "azure/login@a641126d1b8aa4d1fa005f4f92df94a3a4c4c906",
+              "scripts": []
+            },
+            {
+              "name": "Verify Azure PostgreSQL backup configuration",
+              "scripts": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": ".github/workflows/production-monitoring-readiness.yml",
+      "name": "Production Monitoring Readiness",
+      "triggers": {
+        "workflow_dispatch": null,
+        "push": {
+          "branches": [
+            "main"
+          ],
+          "paths": [
+            ".github/workflows/production-monitoring-readiness.yml"
+          ]
+        }
+      },
+      "permissions": {
+        "contents": "read",
+        "id-token": "write"
+      },
+      "concurrency": {
+        "group": "operational-production-monitoring-readiness",
+        "cancel-in-progress": true
+      },
+      "secrets": [
+        "AZURE_CLIENT_ID",
+        "AZURE_SUBSCRIPTION_ID",
+        "AZURE_TENANT_ID"
+      ],
+      "jobs": [
+        {
+          "name": "monitoring",
+          "if": "github.ref == 'refs/heads/main'",
+          "environment": "production",
+          "timeoutMinutes": 10,
+          "runner": "ubuntu-24.04",
+          "services": [],
+          "steps": [
+            {
+              "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+              "scripts": []
+            },
+            {
+              "uses": "azure/login@a641126d1b8aa4d1fa005f4f92df94a3a4c4c906",
+              "scripts": []
+            },
+            {
+              "name": "Verify production monitoring resources",
+              "scripts": [
+                "scripts/production-monitoring-check.sh"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": ".github/workflows/quality.yml",
+      "name": "Quality",
+      "triggers": {
+        "push": {
+          "branches": [
+            "main"
+          ]
+        },
+        "pull_request": {
+          "branches": [
+            "main"
+          ],
+          "types": [
+            "opened",
+            "synchronize",
+            "reopened",
+            "ready_for_review"
+          ]
+        },
+        "workflow_dispatch": {
+          "inputs": {
+            "level": {
+              "description": "QA coverage",
+              "type": "choice",
+              "options": [
+                "standard",
+                "full"
+              ],
+              "default": "full"
+            },
+            "release_profile": {
+              "description": "Acceptance scope (full coverage is unchanged)",
+              "type": "choice",
+              "options": [
+                "production",
+                "development"
+              ],
+              "default": "production"
+            }
+          }
+        },
+        "schedule": [
+          {
+            "cron": "23 1 * * *"
+          }
+        ],
+        "release": {
+          "types": [
+            "published"
+          ]
+        }
+      },
+      "permissions": {
+        "contents": "read"
+      },
+      "concurrency": {
+        "group": "quality-${{ github.event.pull_request.number || github.ref }}-${{ inputs.release_profile || 'production' }}",
+        "cancel-in-progress": "${{ github.event_name == 'pull_request' }}"
+      },
+      "secrets": [],
+      "jobs": [
+        {
+          "name": "plan",
+          "timeoutMinutes": 5,
+          "runner": "ubuntu-24.04",
+          "services": [],
+          "steps": [
+            {
+              "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+              "scripts": []
+            },
+            {
+              "uses": "actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+              "scripts": []
+            },
+            {
+              "name": "Select conservative QA scope",
+              "scripts": [
+                "scripts/qa-plan.mjs"
+              ]
+            },
+            {
+              "name": "Plan independent browser lanes",
+              "scripts": [
+                "scripts/quality-browser-plan.mjs"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "checks",
+          "timeoutMinutes": 15,
+          "runner": "ubuntu-24.04",
+          "services": [
+            "postgres"
+          ],
+          "steps": [
+            {
+              "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+              "scripts": []
+            },
+            {
+              "uses": "./.github/actions/setup-node",
+              "scripts": []
+            },
+            {
+              "scripts": []
+            },
+            {
+              "scripts": []
+            },
+            {
+              "name": "Fast UX compliance contracts",
+              "scripts": [
+                "scripts/compliance/report-test.mjs",
+                "scripts/compliance/selftest.mjs",
+                "scripts/quality-browser-plan-test.mjs",
+                "scripts/release-artifact-test.mjs",
+                "scripts/workflow-safety-test.mjs"
+              ]
+            },
+            {
+              "name": "Real isolated PostgreSQL parallel process gate",
+              "scripts": [
+                "scripts/auth-integrity-test.mjs",
+                "scripts/postgres-parallel-test.mjs",
+                "scripts/registration-test.mjs"
+              ]
+            },
+            {
+              "scripts": []
+            },
+            {
+              "scripts": []
+            },
+            {
+              "scripts": []
+            },
+            {
+              "name": "Record successful scoped architecture lint evidence",
+              "scripts": [
+                "scripts/compliance/identity.mjs"
+              ]
+            },
+            {
+              "name": "Upload architecture lint evidence",
+              "uses": "actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9",
+              "scripts": []
+            },
+            {
+              "scripts": []
+            },
+            {
+              "name": "Full dependency audit including development tooling",
+              "scripts": []
+            }
+          ]
+        },
+        {
+          "name": "build",
+          "timeoutMinutes": 15,
+          "runner": "ubuntu-24.04",
+          "services": [
+            "postgres"
+          ],
+          "steps": [
+            {
+              "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+              "scripts": []
+            },
+            {
+              "uses": "./.github/actions/setup-node",
+              "scripts": []
+            },
+            {
+              "name": "Restore Next compiler cache (never a completed build)",
+              "uses": "actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9",
+              "scripts": []
+            },
+            {
+              "scripts": []
+            },
+            {
+              "name": "Authenticated tenant, role and session HTTP gate",
+              "scripts": [
+                "scripts/api-tenant-postgres-test.mjs"
+              ]
+            },
+            {
+              "name": "Anonymous API authorization surface",
+              "scripts": [
+                "scripts/api-auth-surface-test.mjs"
+              ]
+            },
+            {
+              "name": "Runtime smoke test",
+              "scripts": [
+                "scripts/runtime-smoke.sh"
+              ]
+            },
+            {
+              "name": "Package production candidate",
+              "scripts": [
+                "scripts/package-production.sh"
+              ]
+            },
+            {
+              "name": "Smoke test exact production artifact",
+              "scripts": [
+                "scripts/smoke-production-artifact.sh"
+              ]
+            },
+            {
+              "name": "Bind tested ZIP bytes to the source SHA",
+              "scripts": [
+                "scripts/release-artifact.mjs"
+              ]
+            },
+            {
+              "uses": "actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9",
+              "scripts": []
+            }
+          ]
+        },
+        {
+          "name": "browser",
+          "needs": [
+            "plan",
+            "build"
+          ],
+          "if": "needs.plan.outputs.browser == 'true'",
+          "timeoutMinutes": 30,
+          "runner": "ubuntu-24.04",
+          "matrix": {
+            "include": "${{ fromJSON(needs.plan.outputs.browser_matrix) }}"
+          },
+          "services": [
+            "postgres"
+          ],
+          "steps": [
+            {
+              "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+              "scripts": []
+            },
+            {
+              "uses": "./.github/actions/setup-node",
+              "scripts": []
+            },
+            {
+              "uses": "actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333",
+              "scripts": []
+            },
+            {
+              "name": "Extract exact production candidate",
+              "scripts": [
+                "scripts/release-artifact.mjs"
+              ]
+            },
+            {
+              "name": "Restore pinned browser binaries",
+              "uses": "actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9",
+              "scripts": []
+            },
+            {
+              "name": "Install one browser engine",
+              "scripts": []
+            },
+            {
+              "name": "Save installed browser binaries",
+              "uses": "actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9",
+              "if": "steps.browser-cache.outputs.cache-hit != 'true'",
+              "scripts": []
+            },
+            {
+              "name": "Capture owner-supplied UX reference views",
+              "if": "matrix.lane == 'functional' && matrix.engine == 'chromium'",
+              "scripts": [
+                "scripts/ux-reference-capture.mjs"
+              ]
+            },
+            {
+              "name": "Scroll endpoint measurement adversaries",
+              "if": "matrix.lane == 'functional'",
+              "scripts": [
+                "scripts/compliance/measure-browser-test.mjs"
+              ]
+            },
+            {
+              "name": "Critical timer, draft recovery and report export regression",
+              "if": "matrix.lane == 'functional'",
+              "scripts": [
+                "scripts/ux-browser-test.mjs"
+              ]
+            },
+            {
+              "name": "Landing and portal localization regression",
+              "if": "matrix.lane == 'functional'",
+              "scripts": [
+                "scripts/localization-browser-test.mjs"
+              ]
+            },
+            {
+              "name": "Scoped responsive UX and process regression",
+              "if": "matrix.lane == 'responsive'",
+              "scripts": [
+                "scripts/browser-shards.mjs"
+              ]
+            },
+            {
+              "name": "Deterministic synthetic data and role variants",
+              "if": "matrix.lane == 'functional' && matrix.engine == 'chromium' && needs.plan.outputs.level == 'full'",
+              "scripts": [
+                "scripts/ux-browser-test.mjs"
+              ]
+            },
+            {
+              "name": "Authenticated observability and wallboard regression",
+              "if": "matrix.lane == 'functional'",
+              "scripts": [
+                "scripts/observability-browser-test.mjs"
+              ]
+            },
+            {
+              "name": "Guided registration, languages and responsive regression",
+              "if": "matrix.lane == 'functional'",
+              "scripts": [
+                "scripts/registration-browser-test.mjs"
+              ]
+            },
+            {
+              "name": "Development-only shared component reference regression",
+              "if": "matrix.lane == 'functional' && matrix.engine == 'chromium' && needs.plan.outputs.level == 'full'",
+              "scripts": []
+            },
+            {
+              "name": "FULL PWA restart and offline regression",
+              "if": "matrix.lane == 'functional' && matrix.engine == 'chromium' && needs.plan.outputs.level == 'full'",
+              "scripts": [
+                "scripts/pwa-browser-test.mjs"
+              ]
+            },
+            {
+              "name": "Startup, session and persistent navigation regression",
+              "if": "matrix.lane == 'functional'",
+              "scripts": [
+                "scripts/loading-browser-test.mjs"
+              ]
+            },
+            {
+              "name": "Upload browser evidence",
+              "uses": "actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9",
+              "if": "always()",
+              "scripts": []
+            }
+          ]
+        },
+        {
+          "name": "ux-compliance",
+          "needs": [
+            "plan",
+            "checks",
+            "browser"
+          ],
+          "if": "always()",
+          "timeoutMinutes": 15,
+          "runner": "ubuntu-24.04",
+          "services": [],
+          "steps": [
+            {
+              "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+              "scripts": []
+            },
+            {
+              "uses": "./.github/actions/setup-node",
+              "scripts": []
+            },
+            {
+              "name": "Collect current browser measurements",
+              "uses": "actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333",
+              "if": "needs.plan.outputs.browser == 'true'",
+              "scripts": []
+            },
+            {
+              "name": "Collect successful architecture lint evidence",
+              "uses": "actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333",
+              "if": "always()",
+              "scripts": []
+            },
+            {
+              "name": "Generate individual requirement coverage and enforce measured failures",
+              "scripts": [
+                "scripts/compliance/report.mjs",
+                "scripts/compliance/visual.mjs",
+                "scripts/qa-acceptance.mjs"
+              ]
+            },
+            {
+              "name": "Publish compliance report including failures and missing evidence",
+              "uses": "actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9",
+              "if": "always()",
+              "scripts": []
+            },
+            {
+              "name": "Add coverage summary",
+              "if": "always()",
+              "scripts": []
+            }
+          ]
+        },
+        {
+          "name": "scanner-engine",
+          "timeoutMinutes": 20,
+          "runner": "ubuntu-24.04",
+          "services": [],
+          "steps": [
+            {
+              "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+              "scripts": []
+            },
+            {
+              "uses": "./.github/actions/setup-node",
+              "scripts": []
+            },
+            {
+              "name": "Validate sidecar ARM template without provisioning",
+              "scripts": []
+            },
+            {
+              "name": "Resolve official patched ClamAV and build private-loopback runtime",
+              "scripts": []
+            },
+            {
+              "name": "Real engine, current signatures, limits, outage and recovery",
+              "scripts": [
+                "scripts/scanner-engine-test.mjs"
+              ]
+            },
+            {
+              "name": "Export the exact qualified scanner image",
+              "scripts": [
+                "scripts/verify-scanner-image.mjs"
+              ]
+            },
+            {
+              "name": "Upload qualified scanner candidate",
+              "uses": "actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9",
+              "scripts": []
+            },
+            {
+              "name": "Record scanner runtime and memory evidence",
+              "if": "always()",
+              "scripts": []
+            },
+            {
+              "name": "Upload scanner qualification evidence",
+              "uses": "actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9",
+              "if": "always()",
+              "scripts": []
+            },
+            {
+              "name": "Stop isolated scanner",
+              "if": "always()",
+              "scripts": []
+            }
+          ]
+        },
+        {
+          "name": "quality",
+          "needs": [
+            "plan",
+            "checks",
+            "build",
+            "browser",
+            "ux-compliance",
+            "scanner-engine"
+          ],
+          "if": "always()",
+          "timeoutMinutes": 10,
+          "runner": "ubuntu-24.04",
+          "services": [],
+          "steps": [
+            {
+              "name": "Enforce every mandatory result",
+              "scripts": []
+            },
+            {
+              "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+              "scripts": []
+            },
+            {
+              "uses": "actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+              "scripts": []
+            },
+            {
+              "name": "Download fully verified production candidate",
+              "uses": "actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333",
+              "scripts": []
+            },
+            {
+              "name": "Verify tested ZIP before promotion",
+              "scripts": [
+                "scripts/release-artifact.mjs"
+              ]
+            },
+            {
+              "name": "Promote verified artifact for Azure (no rebuild)",
+              "uses": "actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9",
+              "if": "github.ref == 'refs/heads/main' && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.level == 'full'))",
+              "scripts": []
+            },
+            {
+              "name": "Download exact qualified scanner image",
+              "uses": "actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333",
+              "if": "github.ref == 'refs/heads/main' && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.level == 'full'))",
+              "scripts": []
+            },
+            {
+              "name": "Promote qualified scanner for Azure (no rebuild)",
+              "uses": "actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9",
+              "if": "github.ref == 'refs/heads/main' && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.level == 'full'))",
+              "scripts": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": ".github/workflows/retention-maintenance.yml",
+      "name": "Retention Maintenance",
+      "triggers": {
+        "schedule": [
+          {
+            "cron": "17 2 * * *"
+          }
+        ],
+        "workflow_dispatch": {
+          "inputs": {
+            "apply_cleanup": {
+              "description": "Apply production cleanup (default is read-only preview)",
+              "type": "boolean",
+              "default": false
+            }
+          }
+        },
+        "push": {
+          "branches": [
+            "main"
+          ],
+          "paths": [
+            ".github/workflows/retention-maintenance.yml",
+            "scripts/retention-cleanup.mjs"
+          ]
+        }
+      },
+      "permissions": {
+        "contents": "read"
+      },
+      "concurrency": {
+        "group": "operational-retention-maintenance",
+        "cancel-in-progress": false
+      },
+      "secrets": [
+        "DATABASE_URL"
+      ],
+      "jobs": [
+        {
+          "name": "cleanup",
+          "if": "github.ref == 'refs/heads/main'",
+          "environment": "production",
+          "timeoutMinutes": 10,
+          "runner": "ubuntu-24.04",
+          "services": [],
+          "steps": [
+            {
+              "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+              "scripts": []
+            },
+            {
+              "uses": "./.github/actions/setup-node",
+              "scripts": []
+            },
+            {
+              "name": "Remove expired authentication artifacts",
+              "scripts": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": ".github/workflows/stripe-configuration-audit.yml",
+      "name": "Stripe Billing Configuration",
+      "triggers": {
+        "push": {
+          "branches": [
+            "main"
+          ],
+          "paths": [
+            ".github/workflows/stripe-configuration-audit.yml",
+            "scripts/stripe-configuration-audit.mjs",
+            "lib/server/stripe.ts",
+            "lib/server/env.ts"
+          ]
+        },
+        "workflow_dispatch": null
+      },
+      "permissions": {
+        "contents": "read",
+        "id-token": "write"
+      },
+      "concurrency": {
+        "group": "operational-stripe-configuration-audit",
+        "cancel-in-progress": true
+      },
+      "secrets": [
+        "AZURE_CLIENT_ID",
+        "AZURE_SUBSCRIPTION_ID",
+        "AZURE_TENANT_ID"
+      ],
+      "jobs": [
+        {
+          "name": "audit",
+          "if": "github.ref == 'refs/heads/main'",
+          "environment": "production",
+          "timeoutMinutes": 15,
+          "runner": "ubuntu-24.04",
+          "services": [],
+          "steps": [
+            {
+              "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+              "scripts": []
+            },
+            {
+              "uses": "actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+              "scripts": []
+            },
+            {
+              "uses": "azure/login@a641126d1b8aa4d1fa005f4f92df94a3a4c4c906",
+              "scripts": []
+            },
+            {
+              "name": "Audit current Stripe production configuration without payments",
+              "scripts": [
+                "scripts/stripe-configuration-audit.mjs"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "composite": {
+    "file": ".github/actions/setup-node/action.yml",
+    "definition": {
+      "name": "Locked Node and pnpm dependencies",
+      "description": "Shared Node 24 and lockfile-aware pnpm store cache",
+      "runs": {
+        "using": "composite",
+        "steps": [
+          {
+            "uses": "pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413"
+          },
+          {
+            "uses": "actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+            "with": {
+              "node-version": 24,
+              "cache": "pnpm",
+              "cache-dependency-path": "pnpm-lock.yaml"
+            }
+          },
+          {
+            "shell": "bash",
+            "run": "pnpm install --frozen-lockfile"
+          }
+        ]
+      }
+    }
+  },
+  "packageScripts": {
+    "dev": "next dev",
+    "build": "node scripts/prepare-ui-build.mjs && next build --webpack",
+    "start": "next start",
+    "lint": "eslint . --max-warnings=0",
+    "typecheck": "tsc --noEmit",
+    "check": "pnpm test && pnpm lint && pnpm typecheck && pnpm build",
+    "security:scan": "pnpm audit --prod --audit-level high",
+    "db:migrate": "node scripts/migrate.mjs",
+    "db:check": "node scripts/check-db.mjs",
+    "operator:bootstrap": "node scripts/bootstrap-operator.mjs",
+    "permissions:test": "node scripts/permission-selfcheck.mjs",
+    "test": "node scripts/deployed-assets-test.mjs && node scripts/localization-test.mjs && node scripts/localization-coverage-test.mjs && node scripts/maintenance-test.mjs && node scripts/readiness-integrity-test.mjs && node scripts/security-exception-test.mjs && node scripts/runtime-integrity-test.mjs && node scripts/rate-limit-test.mjs && node scripts/demo-session-test.mjs && node scripts/file-scan-test.mjs && node scripts/file-rescan-test.mjs && node scripts/auth-integrity-test.mjs && node scripts/registration-test.mjs && node scripts/statistics-test.mjs && node scripts/customer-financial-projection-test.mjs && node scripts/payment-reminder-test.mjs && node scripts/v23-2-ux-test.mjs && node scripts/glass-ux-test.mjs && node scripts/ui-build-cache-test.mjs && node scripts/architecture-selfcheck.mjs && node scripts/permission-selfcheck.mjs && node scripts/theme-selfcheck.mjs && node scripts/client-session-test.mjs && node scripts/migration-test.mjs && node scripts/data-lifecycle-schema-test.mjs && node scripts/ux-regression-test.mjs && node scripts/pwa-preview-test.mjs && node scripts/pwa-lifecycle-test.mjs && node scripts/document-presentation-test.mjs && node scripts/qa-acceptance-test.mjs && node scripts/qa-plan-test.mjs && node scripts/browser-shards-test.mjs && node scripts/navigation-contract-test.mjs && node scripts/ui-foundation-test.mjs && node scripts/navigation-foundation-test.mjs && node scripts/data-foundation-test.mjs && node scripts/foundation-integration-test.mjs && node scripts/process-draft-test.mjs && node scripts/observability-test.mjs && node scripts/operator-announcement-test.mjs && node scripts/operator-contract-test.mjs && node scripts/ux-style-contract-test.mjs && node scripts/ux-contract-check.mjs",
+    "tenant:test": "node scripts/migration-test.mjs",
+    "release:check": "node scripts/release-check.mjs",
+    "ci": "pnpm release:check && pnpm test && pnpm lint && pnpm typecheck && pnpm build",
+    "architecture:check": "node scripts/architecture-selfcheck.mjs",
+    "architecture:hardcoding": "node scripts/architecture-selfcheck.mjs",
+    "css:check": "node scripts/check-css-architecture.mjs",
+    "routes:css-check": "node scripts/check-route-css.mjs",
+    "retention:cleanup": "node scripts/retention-cleanup.mjs",
+    "data:export": "node scripts/organization-data-lifecycle.mjs export",
+    "data:delete": "node scripts/organization-data-lifecycle.mjs delete",
+    "security:scan:all": "node scripts/full-security-audit.mjs",
+    "repository:clean": "node scripts/repository-cleanliness-check.mjs",
+    "docs:check": "node scripts/documentation-consistency-check.mjs",
+    "qa:fast": "node scripts/qa.mjs fast",
+    "qa:standard": "node scripts/qa.mjs standard",
+    "qa:full": "node scripts/qa.mjs full",
+    "qa:plan": "node scripts/qa-plan.mjs",
+    "qa:plan:test": "node scripts/qa-plan-test.mjs",
+    "ux:inventory": "node scripts/ux-inventory.mjs",
+    "ux:lab": "node scripts/ux-lab-test.mjs",
+    "qa:integration": "node scripts/qa.mjs integration",
+    "qa:release": "node scripts/qa.mjs full",
+    "test:loading": "node scripts/loading-browser-test.mjs",
+    "ui:check": "node scripts/ui-foundation-test.mjs && node scripts/navigation-foundation-test.mjs",
+    "data:inventory": "node scripts/data-inventory.mjs",
+    "data:test": "node scripts/data-foundation-test.mjs",
+    "architecture:inventory": "node scripts/foundation-integration-report.mjs",
+    "ux:compliance:fast": "node scripts/runtime-integrity-test.mjs && node scripts/rate-limit-test.mjs && node scripts/demo-session-test.mjs && node scripts/compliance/selftest.mjs && node scripts/compliance/report-test.mjs && node scripts/navigation-contract-test.mjs && node scripts/navigation-foundation-test.mjs",
+    "ux:compliance:report": "node scripts/compliance/report.mjs --static",
+    "ux:compliance:pr": "node scripts/compliance/report.mjs --static --gate",
+    "ux:compliance:release": "node scripts/compliance/report.mjs --static --gate --release",
+    "readiness:test": "node scripts/readiness-integrity-test.mjs",
+    "db:runtime-check": "node scripts/check-runtime-db.mjs",
+    "ux:contract": "node scripts/ux-style-contract-test.mjs && node scripts/ux-contract-check.mjs",
+    "qa:local:http": "node scripts/qa-local-http.mjs"
+  },
+  "scripts": [
+    {
+      "file": "lib/server/clamav-protocol.mjs",
+      "references": []
+    },
+    {
+      "file": "lib/server/file-rescan.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/api-auth-surface-test.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/api-tenant-postgres-test.mjs",
+      "references": [
+        "scripts/data-test-modules.mjs"
+      ]
+    },
+    {
+      "file": "scripts/architecture-selfcheck.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/auth-integrity-test.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/azure-auth-check.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/bootstrap-operator.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/browser-shards-test.mjs",
+      "references": [
+        "scripts/browser-shards.mjs",
+        "scripts/qa-plan.mjs"
+      ]
+    },
+    {
+      "file": "scripts/browser-shards.mjs",
+      "references": [
+        "scripts/test-output.mjs",
+        "scripts/ux-browser-test.mjs"
+      ]
+    },
+    {
+      "file": "scripts/check-css-architecture.mjs",
+      "references": [
+        "scripts/design-system.mjs"
+      ]
+    },
+    {
+      "file": "scripts/check-db.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/check-deployed-assets.mjs",
+      "references": [
+        "scripts/deployed-asset-manifest.mjs"
+      ]
+    },
+    {
+      "file": "scripts/check-route-css.mjs",
+      "references": [
+        "scripts/check-theme.mjs"
+      ]
+    },
+    {
+      "file": "scripts/check-runtime-db.mjs",
+      "references": [
+        "scripts/check-db.mjs"
+      ]
+    },
+    {
+      "file": "scripts/check-theme.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/client-session-test.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/compliance/fixtures.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/compliance/identity.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/compliance/measure-browser-test.mjs",
+      "references": [
+        "scripts/compliance/measure.mjs"
+      ]
+    },
+    {
+      "file": "scripts/compliance/measure.mjs",
+      "references": [
+        "scripts/compliance/identity.mjs",
+        "scripts/test-output.mjs"
+      ]
+    },
+    {
+      "file": "scripts/compliance/release-scope.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/compliance/report-test.mjs",
+      "references": [
+        "scripts/compliance/identity.mjs",
+        "scripts/compliance/release-scope.mjs",
+        "scripts/compliance/report.mjs",
+        "scripts/compliance/visual.mjs"
+      ]
+    },
+    {
+      "file": "scripts/compliance/report.mjs",
+      "references": [
+        "scripts/compliance/identity.mjs",
+        "scripts/compliance/release-scope.mjs",
+        "scripts/ux-inventory.mjs"
+      ]
+    },
+    {
+      "file": "scripts/compliance/selftest.mjs",
+      "references": [
+        "scripts/compliance/fixtures.mjs",
+        "scripts/compliance/identity.mjs"
+      ]
+    },
+    {
+      "file": "scripts/compliance/visual.mjs",
+      "references": [
+        "scripts/compliance/identity.mjs"
+      ]
+    },
+    {
+      "file": "scripts/css-contract.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/customer-financial-projection-test.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/data-foundation-test.mjs",
+      "references": [
+        "scripts/data-test-modules.mjs",
+        "scripts/localization-test-adapter.mjs"
+      ]
+    },
+    {
+      "file": "scripts/data-inventory.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/data-lifecycle-schema-test.mjs",
+      "references": [
+        "scripts/organization-data-lifecycle.mjs"
+      ]
+    },
+    {
+      "file": "scripts/data-test-modules.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/demo-session-test.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/deployed-asset-manifest.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/deployed-assets-test.mjs",
+      "references": [
+        "scripts/deployed-asset-manifest.mjs"
+      ]
+    },
+    {
+      "file": "scripts/design-system.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/document-presentation-test.mjs",
+      "references": [
+        "scripts/data-test-modules.mjs",
+        "scripts/localization-test-adapter.mjs",
+        "scripts/test-output.mjs"
+      ]
+    },
+    {
+      "file": "scripts/documentation-consistency-check.mjs",
+      "references": [
+        "scripts/page-source.mjs"
+      ]
+    },
+    {
+      "file": "scripts/eslint/central-ui.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/file-rescan-test.mjs",
+      "references": [
+        "lib/server/clamav-protocol.mjs",
+        "lib/server/file-rescan.mjs",
+        "scripts/private-manifest.mjs"
+      ]
+    },
+    {
+      "file": "scripts/file-scan-test.mjs",
+      "references": [
+        "scripts/data-test-modules.mjs"
+      ]
+    },
+    {
+      "file": "scripts/foundation-integration-report.mjs",
+      "references": [
+        "scripts/foundation-integration-report.mjs",
+        "scripts/ux-inventory.mjs"
+      ]
+    },
+    {
+      "file": "scripts/foundation-integration-test.mjs",
+      "references": [
+        "scripts/foundation-integration-report.mjs",
+        "scripts/ux-inventory.mjs"
+      ]
+    },
+    {
+      "file": "scripts/full-security-audit.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/glass-ux-test.mjs",
+      "references": [
+        "scripts/data-test-modules.mjs"
+      ]
+    },
+    {
+      "file": "scripts/loading-browser-test.mjs",
+      "references": [
+        "scripts/test-output.mjs"
+      ]
+    },
+    {
+      "file": "scripts/localization-browser-test.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/localization-coverage-test.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/localization-test-adapter.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/localization-test.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/localized-source.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/maintenance-test.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/migrate.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/migration-test.mjs",
+      "references": [
+        "scripts/data-test-modules.mjs"
+      ]
+    },
+    {
+      "file": "scripts/navigation-contract-test.mjs",
+      "references": [
+        "scripts/design-system.mjs",
+        "scripts/localized-source.mjs"
+      ]
+    },
+    {
+      "file": "scripts/navigation-foundation-test.mjs",
+      "references": [
+        "scripts/design-system.mjs",
+        "scripts/localized-source.mjs"
+      ]
+    },
+    {
+      "file": "scripts/observability-browser-test.mjs",
+      "references": [
+        "scripts/test-output.mjs"
+      ]
+    },
+    {
+      "file": "scripts/observability-fixture.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/observability-test.mjs",
+      "references": [
+        "scripts/data-test-modules.mjs"
+      ]
+    },
+    {
+      "file": "scripts/operator-announcement-test.mjs",
+      "references": [
+        "scripts/data-test-modules.mjs"
+      ]
+    },
+    {
+      "file": "scripts/operator-contract-test.mjs",
+      "references": [
+        "scripts/data-test-modules.mjs"
+      ]
+    },
+    {
+      "file": "scripts/organization-data-lifecycle.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/package-production.sh",
+      "references": [
+        "scripts/compliance/release-scope.mjs",
+        "scripts/private-manifest.mjs",
+        "scripts/rescan-pending-files.mjs",
+        "scripts/scanner-bridge.mjs",
+        "scripts/start-scanner-production.mjs"
+      ]
+    },
+    {
+      "file": "scripts/page-source.mjs",
+      "references": [
+        "scripts/design-system.mjs"
+      ]
+    },
+    {
+      "file": "scripts/payment-reminder-test.mjs",
+      "references": [
+        "scripts/data-test-modules.mjs"
+      ]
+    },
+    {
+      "file": "scripts/permission-selfcheck.mjs",
+      "references": [
+        "scripts/data-test-modules.mjs"
+      ]
+    },
+    {
+      "file": "scripts/postgres-parallel-test.mjs",
+      "references": [
+        "scripts/data-test-modules.mjs"
+      ]
+    },
+    {
+      "file": "scripts/prepare-ui-build.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/private-manifest.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/process-draft-test.mjs",
+      "references": [
+        "scripts/data-test-modules.mjs"
+      ]
+    },
+    {
+      "file": "scripts/production-monitoring-check.sh",
+      "references": []
+    },
+    {
+      "file": "scripts/pwa-browser-test.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/pwa-lifecycle-test.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/pwa-preview-test.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/qa-acceptance-test.mjs",
+      "references": [
+        "scripts/qa-acceptance.mjs"
+      ]
+    },
+    {
+      "file": "scripts/qa-acceptance.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/qa-local-http.mjs",
+      "references": [
+        "scripts/check-route-css.mjs"
+      ]
+    },
+    {
+      "file": "scripts/qa-plan-test.mjs",
+      "references": [
+        "scripts/eslint/central-ui.mjs",
+        "scripts/qa-plan.mjs",
+        "scripts/qa.mjs"
+      ]
+    },
+    {
+      "file": "scripts/qa-plan.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/qa.mjs",
+      "references": [
+        "scripts/loading-browser-test.mjs",
+        "scripts/pwa-browser-test.mjs",
+        "scripts/qa-plan.mjs",
+        "scripts/test-output.mjs",
+        "scripts/ux-browser-test.mjs"
+      ]
+    },
+    {
+      "file": "scripts/quality-browser-plan-test.mjs",
+      "references": [
+        "scripts/browser-shards.mjs",
+        "scripts/qa-plan.mjs",
+        "scripts/quality-browser-plan.mjs",
+        "scripts/release-artifact.mjs"
+      ]
+    },
+    {
+      "file": "scripts/quality-browser-plan.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/rate-limit-test.mjs",
+      "references": [
+        "scripts/data-test-modules.mjs"
+      ]
+    },
+    {
+      "file": "scripts/readiness-integrity-test.mjs",
+      "references": [
+        "scripts/azure-auth-check.mjs",
+        "scripts/production-monitoring-check.sh"
+      ]
+    },
+    {
+      "file": "scripts/reference-foundation-test.mjs",
+      "references": [
+        "scripts/eslint/central-ui.mjs"
+      ]
+    },
+    {
+      "file": "scripts/registration-browser-test.mjs",
+      "references": [
+        "scripts/test-output.mjs"
+      ]
+    },
+    {
+      "file": "scripts/registration-test.mjs",
+      "references": [
+        "scripts/check-runtime-db.mjs"
+      ]
+    },
+    {
+      "file": "scripts/release-artifact-test.mjs",
+      "references": [
+        "scripts/release-artifact.mjs"
+      ]
+    },
+    {
+      "file": "scripts/release-artifact.mjs",
+      "references": [
+        "scripts/test-output.mjs"
+      ]
+    },
+    {
+      "file": "scripts/release-check.mjs",
+      "references": [
+        "scripts/data-lifecycle-schema-test.mjs",
+        "scripts/documentation-consistency-check.mjs",
+        "scripts/full-security-audit.mjs",
+        "scripts/organization-data-lifecycle.mjs",
+        "scripts/page-source.mjs",
+        "scripts/repository-cleanliness-check.mjs"
+      ]
+    },
+    {
+      "file": "scripts/repository-cleanliness-check.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/rescan-pending-files.mjs",
+      "references": [
+        "lib/server/clamav-protocol.mjs",
+        "lib/server/file-rescan.mjs",
+        "scripts/private-manifest.mjs"
+      ]
+    },
+    {
+      "file": "scripts/retention-cleanup.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/runtime-integrity-test.mjs",
+      "references": [
+        "scripts/data-test-modules.mjs"
+      ]
+    },
+    {
+      "file": "scripts/runtime-smoke.sh",
+      "references": []
+    },
+    {
+      "file": "scripts/scanner-bridge.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/scanner-engine-test.mjs",
+      "references": [
+        "lib/server/clamav-protocol.mjs",
+        "scripts/auth-integrity-test.mjs",
+        "scripts/file-rescan-test.mjs",
+        "scripts/scanner-bridge.mjs",
+        "scripts/test-output.mjs"
+      ]
+    },
+    {
+      "file": "scripts/security-exception-test.mjs",
+      "references": [
+        "scripts/full-security-audit.mjs"
+      ]
+    },
+    {
+      "file": "scripts/smoke-production-artifact.sh",
+      "references": [
+        "scripts/check-deployed-assets.mjs",
+        "scripts/compliance/release-scope.mjs",
+        "scripts/start-scanner-production.mjs"
+      ]
+    },
+    {
+      "file": "scripts/start-scanner-production.mjs",
+      "references": [
+        "lib/server/clamav-protocol.mjs",
+        "scripts/scanner-bridge.mjs"
+      ]
+    },
+    {
+      "file": "scripts/statistics-test.mjs",
+      "references": [
+        "scripts/data-test-modules.mjs"
+      ]
+    },
+    {
+      "file": "scripts/stripe-configuration-audit.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/test-output.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/theme-selfcheck.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/ui-build-cache-test.mjs",
+      "references": [
+        "scripts/prepare-ui-build.mjs"
+      ]
+    },
+    {
+      "file": "scripts/ui-foundation-test.mjs",
+      "references": [
+        "scripts/css-contract.mjs",
+        "scripts/data-test-modules.mjs",
+        "scripts/localization-test-adapter.mjs",
+        "scripts/reference-foundation-test.mjs",
+        "scripts/ux-inventory.mjs"
+      ]
+    },
+    {
+      "file": "scripts/ux-browser-test.mjs",
+      "references": [
+        "scripts/compliance/fixtures.mjs",
+        "scripts/compliance/identity.mjs",
+        "scripts/compliance/measure.mjs",
+        "scripts/observability-fixture.mjs",
+        "scripts/qa-plan.mjs",
+        "scripts/test-output.mjs",
+        "scripts/ux-browser-test.mjs",
+        "scripts/ux-dom-evidence.mjs"
+      ]
+    },
+    {
+      "file": "scripts/ux-contract-check.mjs",
+      "references": [
+        "scripts/ux-inventory.mjs",
+        "scripts/ux-style-contract.mjs"
+      ]
+    },
+    {
+      "file": "scripts/ux-dom-evidence.mjs",
+      "references": [
+        "scripts/test-output.mjs"
+      ]
+    },
+    {
+      "file": "scripts/ux-inventory.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/ux-lab-test.mjs",
+      "references": [
+        "scripts/ux-browser-test.mjs"
+      ]
+    },
+    {
+      "file": "scripts/ux-reference-capture.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/ux-regression-test.mjs",
+      "references": [
+        "scripts/data-test-modules.mjs",
+        "scripts/design-system.mjs",
+        "scripts/localization-test-adapter.mjs",
+        "scripts/page-source.mjs"
+      ]
+    },
+    {
+      "file": "scripts/ux-style-contract-test.mjs",
+      "references": [
+        "scripts/ux-style-contract.mjs"
+      ]
+    },
+    {
+      "file": "scripts/ux-style-contract.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/v23-2-ux-test.mjs",
+      "references": [
+        "scripts/data-test-modules.mjs",
+        "scripts/localization-test-adapter.mjs"
+      ]
+    },
+    {
+      "file": "scripts/verify-scanner-image.mjs",
+      "references": []
+    },
+    {
+      "file": "scripts/workflow-safety-test.mjs",
+      "references": [
+        "scripts/workflow-safety-test.mjs"
+      ]
+    }
+  ]
+}

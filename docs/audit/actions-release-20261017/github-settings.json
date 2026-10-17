@@ -1,0 +1,69 @@
+{
+  "observedAt": "2026-10-17",
+  "basisMain": "381abbd9a49570a8880468c6e680735b12e8b6b9",
+  "method": "Read-only authenticated GitHub Settings UI plus branches/main and rulesets API; no Save action or settings mutation.",
+  "branchProtection": {
+    "url": "https://github.com/oemercam/binso_admin_azure/settings/branch_protection_rules/84678257",
+    "requiredPullRequest": true,
+    "requiredApprovingReviews": false,
+    "requireUpToDate": true,
+    "requiredChecks": [
+      "quality",
+      "analyze"
+    ],
+    "checksApp": "GitHub Actions",
+    "requireConversationResolution": true,
+    "enforceAdmins": true,
+    "allowForcePush": false,
+    "allowDeletion": false,
+    "requireSignedCommits": false,
+    "requireLinearHistory": false,
+    "protectionApi": "403 integration administration access unavailable; UI used"
+  },
+  "rulesets": [],
+  "environment": {
+    "name": "Production",
+    "url": "https://github.com/oemercam/binso_admin_azure/settings/environments/22377225208/edit",
+    "requiredReviewers": false,
+    "waitTimer": false,
+    "allowAdministratorBypass": true,
+    "deploymentBranches": "No restriction",
+    "secretNames": [
+      "AZURE_CLIENT_ID",
+      "AZURE_SUBSCRIPTION_ID",
+      "AZURE_TENANT_ID",
+      "BINSO_ONE_INTERNAL_JOB_SECRET",
+      "DATABASE_URL"
+    ],
+    "variableNames": [
+      "BINSO_ONE_BASE_URL"
+    ]
+  },
+  "actions": {
+    "defaultTokenPermissions": "contents/packages read",
+    "allowActionsCreateApprovePullRequests": false,
+    "allowedActions": "all",
+    "requireFullShaPinsGlobally": false,
+    "forkApproval": "first-time contributors",
+    "logArtifactDefaultDays": 90,
+    "cacheDefaultDays": 7,
+    "cacheSizeGiB": 10
+  },
+  "oidc": {
+    "defaultTemplate": true,
+    "immutableSubject": true,
+    "observedSubject": "repo:oemercam@202777456/binso_admin_azure@1379293391:environment:production",
+    "issuer": "https://token.actions.githubusercontent.com",
+    "audience": "api://AzureADTokenExchange",
+    "azureFederationAndRbacLiveVerified": false
+  },
+  "repositorySecretNames": [
+    "AZURE_CLIENT_ID",
+    "AZURE_SUBSCRIPTION_ID",
+    "AZURE_TENANT_ID",
+    "AZUREAPPSERVICE_CLIENTID_26AFEFB731284F009ED9276FD775F286",
+    "AZUREAPPSERVICE_SUBSCRIPTIONID_062EB98486644201BBC1D99AE3FDD2FC",
+    "AZUREAPPSERVICE_TENANTID_2CCE2EB4F39347B98167444DC3298211"
+  ],
+  "valuesRead": false
+}
