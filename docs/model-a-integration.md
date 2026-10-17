@@ -20,6 +20,10 @@ introduced. Existing Quality parallelism and CodeQL remain unchanged.
 The highest risk wins. Renames, incomplete diffs, unknown paths, missing evidence
 and ambiguous classification block automation. Labels and PR text cannot downgrade
 risk. AI self-review and green CI do not constitute independent human approval.
+The orchestrator must inspect the actual diff for secrets, scope and semantics.
+Security/UX/governance requirements changed inside an innocently named prose file
+are still critical. A same-head `diffAssessment` with no secrets/blockers is
+mandatory input; it is not an independent review or an approving GitHub review.
 
 ## Routine execution
 

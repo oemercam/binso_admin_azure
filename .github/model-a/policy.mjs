@@ -20,6 +20,10 @@ export function integrationDecision(snapshot){
  const classification=classifyChanges(s.files,{additions:pr.additions,deletions:pr.deletions});
  const reasons=[];
  if(!classification.automatic)reasons.push(classification.reason);
+ // Filename classification cannot detect a security requirement hidden in prose.
+ // This is a scoped content assessment, not an approving or independent review.
+ const assessment=s.diffAssessment;
+ if(assessment?.headSha!==pr.headSha||assessment?.risk!=='routine'||assessment?.secretsFound!==false||!Array.isArray(assessment?.blockers)||assessment.blockers.length)reasons.push('Missing, stale or adverse scoped diff assessment');
  if(s.repository!=='oemercam/binso_admin_azure'||pr.headRepository!==s.repository||pr.baseRef!=='main')reasons.push('Unexpected repository or fork/base');
  if(!sha(pr.headSha)||s.inspectedHeadSha!==pr.headSha||!sha(branch.sha)||pr.baseSha!==branch.sha)reasons.push('Stale or incomplete commit binding');
  if(pr.state!=='open'||pr.draft!==false||pr.mergeableState!=='clean')reasons.push('PR is not ready under GitHub rules');
@@ -31,7 +35,8 @@ export function integrationDecision(snapshot){
   if(!check||check.headSha!==pr.headSha||check.status!=='completed'||check.conclusion!=='success')reasons.push('Missing, stale or unsuccessful check: '+name);
  }
  if(s.unresolvedThreads!==0||!Array.isArray(s.reviews)||s.reviews.some(r=>['CHANGES_REQUESTED','PENDING'].includes(r.state)))reasons.push('Review evidence missing or unresolved');
- return {risk:classification.risk,ready:reasons.length===0,expectedHeadSha:pr.headSha??null,reasons};
+ const risk=classification.risk==='critical'||assessment?.risk==='critical'?'critical':classification.risk==='elevated'||assessment?.risk==='elevated'?'elevated':classification.risk;
+ return {risk,ready:reasons.length===0,expectedHeadSha:pr.headSha??null,reasons};
 }
 if(process.argv[1]===fileURLToPath(import.meta.url)){
  const result=integrationDecision(JSON.parse(fs.readFileSync(process.argv[2],'utf8')));
