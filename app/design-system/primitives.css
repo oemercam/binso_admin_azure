@@ -34,10 +34,10 @@ button{cursor:pointer}
 .button-danger{background:var(--color-danger);color:var(--palette-fff)}
 .button:focus-visible,.icon-button:focus-visible{outline-color:var(--app-accent)}
 .icon-button{
-  width:40px;
-  height:40px;
-  min-width:40px;
-  min-height:40px;
+  width:var(--desktop-action-h);
+  height:var(--desktop-action-h);
+  min-width:var(--desktop-action-h);
+  min-height:var(--desktop-action-h);
   display:grid;
   place-items:center;
   padding:0;
@@ -113,22 +113,6 @@ textarea{min-height:var(--control-textarea-min);padding:var(--control-x);resize:
   border-radius:var(--shape-group);
   background:var(--color-bg);
 }
-.skeleton-logo{width:106px;height:32px;margin-bottom:28px}
-.skeleton-nav{height:40px;margin-bottom:4px}
-.skeleton-title{width:190px;height:28px;margin-bottom:8px}
-.skeleton-subtitle{width:290px;height:12px;margin-bottom:24px}
-.skeleton-metric{height:116px}
-.skeleton-panel{height:260px;margin-top:14px}
-.skeleton-logo,
-.skeleton-nav,
-.skeleton-title,
-.skeleton-subtitle,
-.skeleton-metric,
-.skeleton-panel{
-  display:block;
-  border-radius:var(--shape-control-mobile);
-  background:var(--color-line);
-}
 input[type="file"]{max-width:100%;min-width:0;color:var(--color-muted);font-size:var(--control-font)}
 input[type="file"]::file-selector-button{min-height:var(--touch);margin-inline-end:12px;padding:8px 14px;border:0;border-radius:var(--shape-control-desktop);background:var(--upload-bg);color:var(--upload-fg);font:inherit;cursor:pointer;transition:background-color var(--motion-fast) var(--motion-ease)}
 input[type="file"]::file-selector-button:hover{background:var(--upload-hover)}
@@ -142,7 +126,6 @@ input[type="file"]:disabled::file-selector-button{opacity:var(--control-disabled
 .form-link{text-align:right;font-size:var(--type-label)}
 .form-link a{font-weight:700}
 .quick-grid .button{width:100%;min-width:0;white-space:normal;text-align:left;justify-content:flex-start}
-.tablet-detail-head .status,
 .entity-hero .status{margin-left:auto}
 .form-page{width:100%;max-width:900px;border-top:1px solid var(--color-line)}
 .form-page.narrow{max-width:700px}
@@ -238,10 +221,6 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
   .form-grid.two{grid-template-columns:repeat(auto-fit,minmax(min(100%,max(var(--form-column-min),calc((100% - var(--field-group-gap))/2))),1fr))}}
 @media (min-width:1101px){
 .empty-state{min-height:240px}
-.desktop-page-actions .button{
-    min-height:var(--desktop-action-h);
-    height:var(--desktop-action-h);
-  }
 .section-title>.icon-button{
     width:var(--desktop-action-h);
     min-width:var(--desktop-action-h);
@@ -304,30 +283,16 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
   }
 .mobile-sticky-save{display:block;position:static}
 .mobile-sticky-save .button{width:100%;min-height:48px;height:48px}
-.mobile-document-bar .button{width:100%}
 .timer-active .mobile-sticky-save{bottom:calc(var(--mobile-nav-h) + var(--safe-bottom) + 66px)}
-.offer-document-actions .button:last-child{grid-column:auto}
 .offer-form .form-section{padding:16px 0}
 .offer-form .form-section+ .form-section{border-top:1px solid var(--color-line)}
 .offer-form .form-section>h2{margin:0 0 var(--heading-content-gap)}
 .offer-form .form-grid{gap:var(--field-group-gap)}
-.mobile-document-bar .button{min-height:48px;height:48px;border-radius:var(--shape-group);font-size:var(--type-label)}
 .mobile-position-fields>.button{width:100%}
 .time-filter-toolbar .form-field{width:100%;min-width:0}
 .time-filter-toolbar .form-field input{width:100%;min-width:0}
 .timer-actions .button{min-height:44px;height:44px}
 .danger-zone .button{width:100%;margin-top:12px}
-.onboarding-footer .button{margin-top:12px}
-.onboarding-footer .button{
-    width:100%;
-    min-height:48px;
-    height:48px;
-    margin:0;
-    border:1px solid var(--color-fg);
-    background:var(--color-fg);
-    color:var(--color-bg);
-    font-weight:700;
-  }
 input,select,textarea{font-size:var(--type-subheading)}
 button,input,select,textarea{-webkit-tap-highlight-color:transparent}
 .page-head:not(.page-head-detail) .page-actions .button:not(.bo-create-action){
@@ -338,10 +303,6 @@ button,input,select,textarea{-webkit-tap-highlight-color:transparent}
 .form-grid,
   .form-grid.two{grid-template-columns:1fr}
 .form-grid .full,.form-field.full{grid-column:1}
-.skeleton-title{width:min(52vw,190px);height:24px}
-.skeleton-subtitle{width:min(78vw,290px)}
-.skeleton-metric{height:104px}
-.skeleton-panel{height:220px;margin-top:18px}
 .mobile-position-fields>.button{min-height:44px}
 input:not([type="checkbox"]):not([type="radio"]),
   select,
@@ -361,8 +322,6 @@ input:not([type="checkbox"]):not([type="radio"]),
 .form-field>span{font-size:var(--control-label-font);line-height:1.4}}
 @media (max-width:640px){
 .time-filter-toolbar .form-field{flex:1;min-width:0;width:auto}}
-@media (max-width:389px){
-.mobile-header-detail .mobile-detail-actions .icon-button{width:36px;height:40px;min-width:36px}}
 .bo-create-action.button{position:relative;margin-inline-start:auto;width:auto;height:var(--control-h);flex:none;min-width:var(--touch);min-height:var(--control-h);padding:0 var(--button-padding-inline);border:0;border-radius:var(--shape-control-desktop);background:var(--app-action-accent);color:var(--app-accent-text);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:opacity var(--motion-fast) var(--motion-ease)}
 @media(max-width:1100px){
 .bo-create-action.button{width:var(--touch);height:var(--touch);aspect-ratio:1 / 1;flex:0 0 var(--touch);min-height:var(--touch);padding:0;border-radius:50%;background:var(--color-inverse-bg);color:var(--color-inverse-fg)}
@@ -382,8 +341,6 @@ input:not([type="checkbox"]):not([type="radio"]),
 .page-head .page-actions .button{white-space:nowrap}
 @media (max-width:1100px){
 .mobile-header .icon-button{
-    width:44px;height:44px;min-width:44px;min-height:44px;
+    width:var(--touch);height:var(--touch);min-width:var(--touch);min-height:var(--touch);
   }
-.mobile-header .icon-button{width:40px;height:40px;min-width:40px;min-height:40px}
-.mobile-detail-actions .icon-button{width:40px;height:40px;min-width:40px}
-.app-header-actions :is(.icon-button,.avatar-button){width:44px;height:44px;min-width:44px;min-height:44px}}
+.app-header-actions :is(.icon-button,.avatar-button){width:var(--touch);height:var(--touch);min-width:var(--touch);min-height:var(--touch)}}

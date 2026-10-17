@@ -15,6 +15,8 @@ const classOwners={
  'wizard-progress':['components/form-wizard.tsx'],
  'wizard-content':['components/form-wizard.tsx'],
  'form-field':['components/ui.tsx'],
+ 'filter-sheet-actions':['components/ui.tsx'],
+ 'mobile-sticky-save':['components/ui.tsx'],
  'message':['components/ui.tsx'],
  'confirm-dialog':['components/confirm-dialog.tsx'],
  'confirm-layer':['components/confirm-dialog.tsx'],

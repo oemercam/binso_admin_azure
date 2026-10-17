@@ -1,0 +1,42 @@
+[
+  {
+    "file": "components/app-shell.tsx",
+    "footerCount": 1
+  },
+  {
+    "file": "components/binso-ux.tsx",
+    "footerCount": 1
+  },
+  {
+    "file": "components/documents.tsx",
+    "footerCount": 2
+  },
+  {
+    "file": "components/pages/customers.tsx",
+    "footerCount": 1
+  },
+  {
+    "file": "components/pages/expenses.tsx",
+    "footerCount": 1
+  },
+  {
+    "file": "components/pages/projects.tsx",
+    "footerCount": 1
+  },
+  {
+    "file": "components/pages/reports.tsx",
+    "footerCount": 1
+  },
+  {
+    "file": "components/pages/settings.tsx",
+    "footerCount": 2
+  },
+  {
+    "file": "components/statistics.tsx",
+    "footerCount": 1
+  },
+  {
+    "file": "components/team-settings.tsx",
+    "footerCount": 2
+  }
+]
