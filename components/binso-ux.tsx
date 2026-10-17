@@ -87,7 +87,7 @@ export function DetailHeading({ title, status, tone = "neutral", subtitle, leadi
 
 /** Responsive dossier slots keep contact facts before records on a phone. */
 export function DetailSections({summary,facts,records,extra}:{summary:ReactNode;facts:ReactNode;records:ReactNode;extra?:ReactNode}){
- return <div className="detail-grid" data-layout="dossier" data-has-extra={!!extra||undefined}><section data-area="summary">{summary}</section><section data-area="facts">{facts}</section><section data-area="records">{records}</section>{extra&&<section data-area="extra">{extra}</section>}</div>;
+ return <div className="detail-grid" data-layout="dossier" data-has-extra={!!extra||undefined}><section data-area="summary">{summary}</section><aside data-area="context"><section data-area="facts">{facts}</section>{extra&&<section data-area="extra">{extra}</section>}</aside><section data-area="records">{records}</section></div>;
 }
 
 /** Supplementary facts stay accessible without crowding a mobile dossier. */

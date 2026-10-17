@@ -12,6 +12,7 @@ import {monitoringFixture} from './observability-fixture.mjs';
 import {fullRoutes} from './qa-plan.mjs';
 import {saveDomEvidence} from './ux-dom-evidence.mjs';
 import {verifyMobileLoginGeometry} from './auth-ux-browser.mjs';
+import {assertCustomerDossier,verifyCustomerStates} from './customer-ux-browser.mjs';
 
 // Synthetic UI fixtures: real business/RLS integration is covered by migration-test.mjs.
 // No request reaches a production system; unhandled fixture APIs fail closed.
@@ -406,6 +407,7 @@ try{
       if(initiallyCollapsed)await page.getByRole('button',{name:'Zeitverlauf ausblenden',exact:true}).click();
     }
     if(!process.env.BINSO_UX_BASELINE&&route==='/kunden/customer-one'){
+      await assertCustomerDossier(page);
       const dossier=page.locator('.detail-grid[data-layout="dossier"]');
       assert.equal(await dossier.count(),1,'Customer overview uses the shared reference dossier layout');
       assert.equal(await dossier.locator('[data-area="summary"] .metric').count(),2,'Customer overview shows actual yearly volume and open receivables');
@@ -511,6 +513,8 @@ try{
   await page.setViewportSize({width:430,height:900});
   if(process.env.BINSO_UX_DEBUG)page.on('response',async response=>{if(response.url().includes('/api/auth/session'))console.log('Session fixture response',response.status(),await response.text())});
   if(hasInteraction('customers')){
+    await verifyCustomerStates(page,{base,capture:state=>capture(page,{animations:'disabled',path:path.join(output,theme+'-customer-'+state+'.png'),fullPage:true})});
+
     customerPosts=0;customerReplays.clear();
     await navigate(base+'/kunden/neu');const customerSheet=()=>page.getByRole('dialog',{name:'Kunde erstellen',exact:true});await customerSheet().waitFor();await customerSheet().getByRole('button',{name:'Schliessen',exact:true}).click();await page.waitForURL(base+'/kunden');assert.equal(await page.getByRole('alertdialog').count(),0,'An unchanged customer sheet closes without warning');
     await navigate(base+'/kunden/neu');await customerSheet().getByLabel('Kundenname *',{exact:true}).fill(customer.name);await customerSheet().getByRole('heading',{name:'Mögliche Dubletten',exact:true}).waitFor();await customerSheet().getByLabel('Als separaten Kunden erfassen',{exact:true}).check();await customerSheet().getByLabel('Kundenname *',{exact:true}).fill('Minimal Company AG');await customerSheet().getByRole('heading',{name:'Mögliche Dubletten',exact:true}).waitFor({state:'hidden'});assert.equal(await customerSheet().getByText(/^K-\d+/).count(),0,'No generated customer number appears in creation');failCustomerCreate=true;await customerSheet().getByRole('button',{name:'Kunde speichern',exact:true}).click();await page.getByText('Synthetic customer creation unavailable',{exact:true}).waitFor();assert.equal(customerPosts,1);assert.equal(await customerSheet().getByLabel('Kundenname *',{exact:true}).inputValue(),'Minimal Company AG');
