@@ -125,8 +125,3 @@ export const modules: ModuleConfig[] = [
     columns:["Vertrag","Partner","Laufzeit","Wert","Status"],
   }
 ];
-
-
-export function getModule(key: ModuleKey) {
-  return modules.find((module) => module.key === key)!;
-}

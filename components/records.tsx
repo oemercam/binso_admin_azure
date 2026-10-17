@@ -225,6 +225,11 @@ export function RecordRow({
   return <ListRow translateTitle={false} compact={compact} valuePlacement={valuePlacement} href={href} title={personIdentity?<span className="person-record"><Avatar name={title} identity={personIdentity}/><span>{title}</span></span>:title} meta={meta} value={value} status={status} tone={status?tone(status):"neutral"}/>;
 }
 
+/** Group disclosure owns structure only; callers retain domain totals, filters and permissions. */
+export function TimeEntryGroup({title,subtitle,value,children}:{title:string;subtitle:string;value:string;children:ReactNode}){
+ return <details className="time-group"><summary className="time-group-head"><div><b><LocalizedText>{title}</LocalizedText></b><small><LocalizedText>{subtitle}</LocalizedText></small></div><strong>{value}</strong><Icon name="down" size={16}/></summary><div className="time-record-list">{children}</div></details>;
+}
+
 /** Employee ledgers and the time module share the same information layout. */
 export function TimeEntryRow({title,meta,value,status,selection,action}:{title:string;meta:string;value:string;status?:string;selection?:React.ReactNode;action?:React.ReactNode}){
  return <div><RecordRow title={title} meta={meta} value={value} status={status}/>{(selection||action)&&<div className="record-controls">{selection&&<label>{selection}<span><LocalizedText>{"Für Rechnung auswählen"}</LocalizedText></span></label>}{action}</div>}</div>;

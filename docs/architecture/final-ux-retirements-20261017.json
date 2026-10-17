@@ -1,0 +1,1557 @@
+{
+  "exports": [
+    {
+      "file": "components/ui.tsx",
+      "name": "Divider"
+    },
+    {
+      "file": "components/ui.tsx",
+      "name": "Skeleton"
+    },
+    {
+      "file": "lib/demo-data.ts",
+      "name": "invoices"
+    },
+    {
+      "file": "lib/demo-data.ts",
+      "name": "offers"
+    },
+    {
+      "file": "lib/demo-data.ts",
+      "name": "products"
+    },
+    {
+      "file": "lib/demo-data.ts",
+      "name": "employees"
+    },
+    {
+      "file": "lib/demo-data.ts",
+      "name": "expenses"
+    },
+    {
+      "file": "lib/demo-data.ts",
+      "name": "payments"
+    },
+    {
+      "file": "lib/demo-data.ts",
+      "name": "supportTickets"
+    },
+    {
+      "file": "lib/modules.ts",
+      "name": "getModule"
+    }
+  ],
+  "selectors": [
+    {
+      "file": "app/design-system/primitives.css",
+      "selector": ".skeleton-logo",
+      "line": 116
+    },
+    {
+      "file": "app/design-system/primitives.css",
+      "selector": ".skeleton-nav",
+      "line": 117
+    },
+    {
+      "file": "app/design-system/primitives.css",
+      "selector": ".skeleton-title",
+      "line": 118
+    },
+    {
+      "file": "app/design-system/primitives.css",
+      "selector": ".skeleton-subtitle",
+      "line": 119
+    },
+    {
+      "file": "app/design-system/primitives.css",
+      "selector": ".skeleton-metric",
+      "line": 120
+    },
+    {
+      "file": "app/design-system/primitives.css",
+      "selector": ".skeleton-panel",
+      "line": 121
+    },
+    {
+      "file": "app/design-system/primitives.css",
+      "selector": ".skeleton-logo",
+      "line": 122
+    },
+    {
+      "file": "app/design-system/primitives.css",
+      "selector": ".skeleton-nav",
+      "line": 122
+    },
+    {
+      "file": "app/design-system/primitives.css",
+      "selector": ".skeleton-title",
+      "line": 122
+    },
+    {
+      "file": "app/design-system/primitives.css",
+      "selector": ".skeleton-subtitle",
+      "line": 122
+    },
+    {
+      "file": "app/design-system/primitives.css",
+      "selector": ".skeleton-metric",
+      "line": 122
+    },
+    {
+      "file": "app/design-system/primitives.css",
+      "selector": ".skeleton-panel",
+      "line": 122
+    },
+    {
+      "file": "app/design-system/primitives.css",
+      "selector": ".tablet-detail-head .status",
+      "line": 145
+    },
+    {
+      "file": "app/design-system/primitives.css",
+      "selector": ".desktop-page-actions .button",
+      "line": 241
+    },
+    {
+      "file": "app/design-system/primitives.css",
+      "selector": ".mobile-document-bar .button",
+      "line": 307
+    },
+    {
+      "file": "app/design-system/primitives.css",
+      "selector": ".offer-document-actions .button:last-child",
+      "line": 309
+    },
+    {
+      "file": "app/design-system/primitives.css",
+      "selector": ".mobile-document-bar .button",
+      "line": 314
+    },
+    {
+      "file": "app/design-system/primitives.css",
+      "selector": ".onboarding-footer .button",
+      "line": 320
+    },
+    {
+      "file": "app/design-system/primitives.css",
+      "selector": ".onboarding-footer .button",
+      "line": 321
+    },
+    {
+      "file": "app/design-system/primitives.css",
+      "selector": ".skeleton-title",
+      "line": 341
+    },
+    {
+      "file": "app/design-system/primitives.css",
+      "selector": ".skeleton-subtitle",
+      "line": 342
+    },
+    {
+      "file": "app/design-system/primitives.css",
+      "selector": ".skeleton-metric",
+      "line": 343
+    },
+    {
+      "file": "app/design-system/primitives.css",
+      "selector": ".skeleton-panel",
+      "line": 344
+    },
+    {
+      "file": "app/design-system/layout.css",
+      "selector": ".section-product-shot",
+      "line": 53
+    },
+    {
+      "file": "app/design-system/layout.css",
+      "selector": ".section-product-shot iframe",
+      "line": 59
+    },
+    {
+      "file": "app/design-system/layout.css",
+      "selector": ".section-product-shot",
+      "line": 65
+    },
+    {
+      "file": "app/design-system/layout.css",
+      "selector": ".section-product-shot",
+      "line": 66
+    },
+    {
+      "file": "app/design-system/layout.css",
+      "selector": ".section-product-shot",
+      "line": 69
+    },
+    {
+      "file": "app/design-system/layout.css",
+      "selector": ".documents-hub-grid>.surface",
+      "line": 225
+    },
+    {
+      "file": "app/design-system/layout.css",
+      "selector": ".documents-hub-grid>.surface",
+      "line": 234
+    },
+    {
+      "file": "app/design-system/layout.css",
+      "selector": ".documents-hub-grid>.surface",
+      "line": 347
+    },
+    {
+      "file": "app/design-system/layout.css",
+      "selector": ".page-container>.desktop-page-actions+.toolbar",
+      "line": 390
+    },
+    {
+      "file": "app/design-system/layout.css",
+      "selector": ".section-product-shot:hover",
+      "line": 516
+    },
+    {
+      "file": "app/design-system/layout.css",
+      "selector": ".section-product-shot",
+      "line": 519
+    },
+    {
+      "file": "app/design-system/documents.css",
+      "selector": ".invoice-tablet-preview",
+      "line": 4
+    },
+    {
+      "file": "app/design-system/documents.css",
+      "selector": ".invoice-tablet-preview",
+      "line": 124
+    },
+    {
+      "file": "app/design-system/documents.css",
+      "selector": ".qr-page-spacer",
+      "line": 129
+    },
+    {
+      "file": "app/design-system/documents.css",
+      "selector": ".invoice-master-detail",
+      "line": 130
+    },
+    {
+      "file": "app/design-system/documents.css",
+      "selector": ".invoice-master-detail>div",
+      "line": 194
+    },
+    {
+      "file": "app/design-system/documents.css",
+      "selector": ".document-workspace-page",
+      "line": 220
+    },
+    {
+      "file": "app/design-system/documents.css",
+      "selector": ".invoice-tablet-preview",
+      "line": 251
+    },
+    {
+      "file": "app/design-system/documents.css",
+      "selector": ".invoice-tablet-preview",
+      "line": 318
+    },
+    {
+      "file": "app/design-system/documents.css",
+      "selector": ".invoice-form .document-meta-grid-create .document-number-field",
+      "line": 346
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".support-tablet-preview",
+      "line": 35
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".big-chart",
+      "line": 50
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".big-chart>div",
+      "line": 51
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".big-chart i",
+      "line": 52
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".big-chart span",
+      "line": 53
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".tablet-master-detail",
+      "line": 117
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".tablet-detail",
+      "line": 118
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".tablet-detail-head",
+      "line": 119
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".tablet-detail-head",
+      "line": 126
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".tablet-detail-head h2",
+      "line": 127
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".tablet-detail-head p",
+      "line": 129
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".tablet-actions",
+      "line": 131
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".tablet-document-actions",
+      "line": 131
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".select-card",
+      "line": 184
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".select-card b",
+      "line": 193
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".select-card small",
+      "line": 193
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".select-card small",
+      "line": 194
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".mobile-document-bar",
+      "line": 199
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".global-timer-main",
+      "line": 257
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".global-timer-main i",
+      "line": 258
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".global-timer-main small",
+      "line": 259
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".global-timer-main span",
+      "line": 260
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".support-master-detail",
+      "line": 291
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".support-preview-message",
+      "line": 298
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".support-preview-message small",
+      "line": 299
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".support-preview-message p",
+      "line": 300
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".two-factor-setup",
+      "line": 419
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".two-factor-code",
+      "line": 420
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".documents-hub-grid",
+      "line": 421
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".onboarding-progress",
+      "line": 485
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".onboarding-progress>div",
+      "line": 486
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".onboarding-progress>div.active",
+      "line": 487
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".onboarding-progress span",
+      "line": 488
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".onboarding-progress>i",
+      "line": 489
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".onboarding-progress b",
+      "line": 490
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".onboarding-intro",
+      "line": 491
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".onboarding-intro h2",
+      "line": 492
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".onboarding-intro p",
+      "line": 493
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".welcome-grid",
+      "line": 494
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".welcome-grid>a",
+      "line": 495
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".welcome-grid>a>span",
+      "line": 504
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".welcome-grid b",
+      "line": 505
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".welcome-grid small",
+      "line": 506
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".onboarding-footer",
+      "line": 507
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".onboarding-footer p",
+      "line": 508
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".notification-center-list",
+      "line": 513
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".notification-center-list",
+      "line": 520
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".documents-summary",
+      "line": 525
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".documents-summary>div",
+      "line": 526
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".documents-summary svg",
+      "line": 527
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".documents-summary span",
+      "line": 528
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".documents-summary small",
+      "line": 528
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".documents-summary b",
+      "line": 529
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".payment-summary-strip",
+      "line": 531
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".payment-summary-strip>div",
+      "line": 532
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".payment-summary-strip>div:last-child",
+      "line": 533
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".payment-summary-strip span",
+      "line": 534
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".payment-summary-strip b",
+      "line": 534
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".payment-summary-strip small",
+      "line": 534
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".payment-summary-strip span",
+      "line": 535
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".payment-summary-strip small",
+      "line": 535
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".payment-summary-strip span",
+      "line": 536
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".payment-summary-strip b",
+      "line": 537
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".payment-summary-strip small",
+      "line": 538
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".trend-positive",
+      "line": 539
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".trend-negative",
+      "line": 539
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".trend-positive",
+      "line": 540
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".trend-negative",
+      "line": 541
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".trend-positive span",
+      "line": 542
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".trend-negative span",
+      "line": 542
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".legend-current",
+      "line": 543
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".legend-previous",
+      "line": 544
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".payment-setup-notice",
+      "line": 555
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".payment-setup-notice p",
+      "line": 556
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".customer-records-layout",
+      "line": 559
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".support-preview-message:last-child",
+      "line": 596
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".documents-hub-grid",
+      "line": 619
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".tablet-master-detail",
+      "line": 629
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".tablet-detail",
+      "line": 630
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".support-master-detail",
+      "line": 636
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".customer-records-layout",
+      "line": 636
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".entity-info-pane",
+      "line": 681
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".tablet-detail",
+      "line": 684
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".desktop-page-actions",
+      "line": 686
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".desktop-page-actions:empty",
+      "line": 689
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".support-master-detail",
+      "line": 724
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".documents-hub-grid",
+      "line": 740
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".desktop-page-actions",
+      "line": 761
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".tablet-master-detail",
+      "line": 776
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".tablet-detail",
+      "line": 786
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".tablet-detail-head",
+      "line": 795
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".tablet-actions",
+      "line": 796
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".tablet-document-actions",
+      "line": 796
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".tablet-master-detail",
+      "line": 879
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".tablet-detail",
+      "line": 880
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".mobile-document-bar",
+      "line": 895
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".mobile-document-bar",
+      "line": 903
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".timer-active .mobile-document-bar",
+      "line": 904
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".documents-summary",
+      "line": 905
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".documents-summary>div",
+      "line": 906
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".documents-summary>div:last-child",
+      "line": 907
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".documents-summary svg",
+      "line": 908
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".documents-summary span",
+      "line": 909
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".documents-summary small",
+      "line": 909
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".documents-summary b",
+      "line": 910
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".offer-document-actions",
+      "line": 912
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".mobile-document-bar",
+      "line": 921
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".support-master-detail",
+      "line": 955
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".support-tablet-preview",
+      "line": 956
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".documents-hub-grid",
+      "line": 959
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".onboarding-progress",
+      "line": 971
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".onboarding-progress b",
+      "line": 972
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".onboarding-progress>i",
+      "line": 973
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".onboarding-footer",
+      "line": 974
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".sla-compact",
+      "line": 975
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".sla-ring",
+      "line": 976
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".sla-ring:before",
+      "line": 977
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".sla-ring b",
+      "line": 978
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".incident-history>div:last-child",
+      "line": 982
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".onboarding-footer",
+      "line": 984
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".onboarding-footer p",
+      "line": 990
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".payment-summary-strip",
+      "line": 1040
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".payment-summary-strip>div",
+      "line": 1041
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".payment-summary-strip span",
+      "line": 1042
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".payment-summary-strip b",
+      "line": 1043
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".payment-summary-strip small",
+      "line": 1044
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".trend-positive",
+      "line": 1055
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".trend-negative",
+      "line": 1055
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".single-action.mobile-document-bar",
+      "line": 1068
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".documents-summary",
+      "line": 1072
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".desktop-page-actions",
+      "line": 1091
+    },
+    {
+      "file": "app/design-system/settings.css",
+      "selector": ".security-setting-row",
+      "line": 168
+    },
+    {
+      "file": "app/design-system/settings.css",
+      "selector": ".security-setting-row b",
+      "line": 169
+    },
+    {
+      "file": "app/design-system/settings.css",
+      "selector": ".security-setting-row p",
+      "line": 170
+    },
+    {
+      "file": "app/design-system/auth.css",
+      "selector": ".auth-plan-summary",
+      "line": 20
+    },
+    {
+      "file": "app/design-system/auth.css",
+      "selector": ".auth-plan-summary b",
+      "line": 21
+    },
+    {
+      "file": "app/design-system/auth.css",
+      "selector": ".auth-plan-summary span",
+      "line": 22
+    },
+    {
+      "file": "app/design-system/auth.css",
+      "selector": ".auth-plan-summary small",
+      "line": 23
+    },
+    {
+      "file": "app/design-system/auth.css",
+      "selector": ".auth-after-submit",
+      "line": 32
+    },
+    {
+      "file": "app/design-system/auth.css",
+      "selector": ".auth-after-submit",
+      "line": 90
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".feature-showcase-copy",
+      "line": 110
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".feature-list>.feature-list-link",
+      "line": 120
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".feature-list>.feature-list-link>span",
+      "line": 131
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".feature-list>.feature-list-link",
+      "line": 133
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".feature-list>.feature-list-link:focus-visible",
+      "line": 138
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".feature-list>.feature-list-link:hover b",
+      "line": 142
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".mobile-callout-copy",
+      "line": 219
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".mobile-callout-copy>div",
+      "line": 220
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".mobile-callout-copy b",
+      "line": 227
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".mobile-callout-copy span",
+      "line": 228
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".marketing-pricing-grid",
+      "line": 229
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".faq-list",
+      "line": 272
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".faq-list details",
+      "line": 273
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".faq-list summary",
+      "line": 274
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".faq-list p",
+      "line": 275
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".demo-onboarding-shell",
+      "line": 329
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".demo-onboarding-header",
+      "line": 330
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".demo-onboarding-header .logo",
+      "line": 346
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".demo-onboarding-header .logo",
+      "line": 347
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".demo-focus-list",
+      "line": 363
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".demo-focus-list button",
+      "line": 364
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".demo-focus-icon",
+      "line": 376
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".demo-focus-list b",
+      "line": 377
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".demo-focus-list small",
+      "line": 378
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".demo-step-actions",
+      "line": 379
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".demo-summary-list",
+      "line": 380
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".demo-summary-list>div",
+      "line": 381
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".demo-summary-list>div>span",
+      "line": 391
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".demo-summary-list b",
+      "line": 392
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".demo-summary-list small",
+      "line": 393
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".faq-section",
+      "line": 395
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".feature-showcase-copy",
+      "line": 429
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".faq-section",
+      "line": 429
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".landing-phone-preview",
+      "line": 539
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".landing-phone-preview>figcaption",
+      "line": 540
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".faq-list>details:last-child",
+      "line": 541
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".demo-focus-list>button:last-child",
+      "line": 541
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".demo-summary-list>div:last-child",
+      "line": 541
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".feature-showcase-copy",
+      "line": 628
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".marketing-pricing-grid",
+      "line": 632
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".demo-onboarding-header",
+      "line": 656
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".demo-onboarding-header .logo",
+      "line": 668
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".demo-summary-list>div",
+      "line": 685
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".demo-step-actions",
+      "line": 687
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".demo-step-actions .button",
+      "line": 694
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".demo-onboarding-header::before",
+      "line": 710
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".demo-onboarding-header::after",
+      "line": 710
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".demo-onboarding-header .logo",
+      "line": 714
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".feature-showcase-copy",
+      "line": 729
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "selector": ".faq-section",
+      "line": 729
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".bo-monitor-detail-metrics details",
+      "line": 60
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".bo-monitor-detail-metrics summary",
+      "line": 61
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".bo-monitor-detail-metrics summary::-webkit-details-marker",
+      "line": 62
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".bo-monitor-detail-metrics summary>span",
+      "line": 69
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".bo-monitor-detail-metrics summary strong",
+      "line": 70
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".bo-monitor-detail-metrics small",
+      "line": 71
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".bo-monitor-detail-metrics a",
+      "line": 72
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".operator-demo-banner",
+      "line": 139
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".operator-monitor-metrics",
+      "line": 194
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".incident-row",
+      "line": 285
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".incident-row:last-child",
+      "line": 293
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".incident-row b",
+      "line": 294
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".incident-row small",
+      "line": 294
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".incident-row b",
+      "line": 295
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".incident-row small",
+      "line": 296
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".operator-back-app",
+      "line": 297
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".operator-chart-grid",
+      "line": 299
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".operator-spark-1 i",
+      "line": 306
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".operator-spark-2 i",
+      "line": 307
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".sla-bar",
+      "line": 309
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".sla-bar i:nth-child(1)",
+      "line": 310
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".sla-bar i:nth-child(2)",
+      "line": 311
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".sla-bar i:nth-child(3)",
+      "line": 312
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".operator-mini-trend",
+      "line": 318
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".operator-mini-trend i",
+      "line": 319
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".operator-mini-trend i:nth-child(2)",
+      "line": 320
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".operator-mini-trend i:nth-child(3)",
+      "line": 321
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".operator-mini-trend i:nth-child(4)",
+      "line": 322
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".operator-mini-trend i:nth-child(5)",
+      "line": 323
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".operator-mini-trend i:nth-child(6)",
+      "line": 324
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".operator-mini-trend.trend-1 i",
+      "line": 325
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".operator-mini-trend.trend-2 i",
+      "line": 326
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".monitoring-technical-grid",
+      "line": 344
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".monitoring-technical-chart",
+      "line": 345
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".monitoring-chart-title",
+      "line": 346
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".monitoring-chart-title b",
+      "line": 347
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".monitoring-chart-title strong",
+      "line": 348
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".monitoring-technical-chart>small",
+      "line": 349
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".monitoring-compact-bars",
+      "line": 350
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".monitoring-compact-bars i",
+      "line": 351
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".monitoring-compact-bars.database i",
+      "line": 352
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".monitoring-compact-ring",
+      "line": 353
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".monitoring-compact-ring:after",
+      "line": 354
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".monitoring-compact-ring span",
+      "line": 355
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".monitoring-chart-title b",
+      "line": 436
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".operator-monitor-metrics",
+      "line": 461
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".operator-monitor-metrics",
+      "line": 482
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".operator-demo-banner",
+      "line": 486
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".operator-chart-grid",
+      "line": 499
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".operator-mini-trend",
+      "line": 500
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".monitoring-technical-grid",
+      "line": 521
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".monitoring-technical-chart",
+      "line": 527
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".monitoring-chart-title",
+      "line": 528
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".monitoring-chart-title b",
+      "line": 529
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".monitoring-chart-title strong",
+      "line": 530
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".monitoring-compact-bars",
+      "line": 531
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".monitoring-compact-ring",
+      "line": 532
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".monitoring-technical-chart>small",
+      "line": 533
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".bo-monitor-detail-metrics summary",
+      "line": 594
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "selector": ".bo-monitor-detail-metrics summary>span",
+      "line": 595
+    }
+  ],
+  "retainedLogicalCandidates": [
+    {
+      "file": "app/design-system/collections.css",
+      "line": 233,
+      "selector": ".page-container> :is(.toolbar,.finance-range,.payment-summary-strip,.tabs):first-of-type",
+      "absent": [
+        "payment-summary-strip"
+      ]
+    },
+    {
+      "file": "app/design-system/documents.css",
+      "line": 191,
+      "selector": ".invoice-master-detail:not(:has(>.invoice-tablet-preview))",
+      "absent": [
+        "invoice-master-detail",
+        "invoice-tablet-preview"
+      ]
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "line": 632,
+      "selector": ".tablet-master-detail:not(:has(>.tablet-detail))",
+      "absent": [
+        "tablet-master-detail",
+        "tablet-detail"
+      ]
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "line": 632,
+      "selector": ".tablet-master-detail:not(:has(>aside.tablet-detail))",
+      "absent": [
+        "tablet-master-detail",
+        "tablet-detail"
+      ]
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "line": 783,
+      "selector": ".tablet-master-detail:has(>.tablet-detail)",
+      "absent": [
+        "tablet-master-detail",
+        "tablet-detail"
+      ]
+    }
+  ]
+}

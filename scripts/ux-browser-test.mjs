@@ -15,6 +15,8 @@ import {verifyMobileLoginGeometry} from './auth-ux-browser.mjs';
 import {assertCustomerDossier,verifyCustomerStates} from './customer-ux-browser.mjs';
 import {assertNavigationToggle,verifyNavigationPersistence} from './navigation-ux-browser.mjs';
 import {verifyPreviewControls} from './document-controls-browser.mjs';
+import {verifyTimeWorkspace} from './time-workspace-browser.mjs';
+import {assertMobileHeaderTargets,verifyHeaderTargetRegression} from './shared-control-browser.mjs';
 
 // Synthetic UI fixtures: real business/RLS integration is covered by migration-test.mjs.
 // No request reaches a production system; unhandled fixture APIs fail closed.
@@ -362,6 +364,7 @@ try{
     const geometry=await page.evaluate(()=>({overflow:[...document.querySelectorAll('body *')].filter(el=>el.getBoundingClientRect().right>innerWidth+1).slice(0,12).map(el=>({tag:el.tagName,cls:el.className,text:el.textContent?.slice(0,80),parent:el.parentElement?.className,right:el.getBoundingClientRect().right})),viewport:innerWidth,scroll:document.documentElement.scrollWidth,body:document.body.scrollWidth,sort:[...document.querySelectorAll('.toolbar .filter-button')].map(el=>el.getBoundingClientRect().width),metricDividers:[...document.querySelectorAll('.metric,.finance-flow-primary,.finance-flow-result,.finance-flow-costs,.finance-flow-costs>div')].map(el=>getComputedStyle(el).borderLeftWidth)}));
     if(geometry.scroll>width+1||geometry.body>width+1){console.log('Overflow details',JSON.stringify(await page.evaluate(()=>[...document.querySelectorAll('body *')].filter(el=>el.scrollWidth>el.clientWidth+2).slice(0,30).map(el=>({tag:el.tagName,cls:el.className,width:el.clientWidth,scroll:el.scrollWidth,overflow:getComputedStyle(el).overflowX,children:[...el.children].map(c=>({tag:c.tagName,width:c.clientWidth,scroll:c.scrollWidth,rect:c.getBoundingClientRect().width,min:getComputedStyle(c).minWidth,grid:getComputedStyle(el).gridTemplateColumns})),rect:JSON.stringify(el.getBoundingClientRect())}))),null,2));await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${width}-overflow.png`)});}
     assert.ok(geometry.scroll<=width+1&&geometry.body<=width+1,`${theme} ${width} ${route}: horizontal overflow ${JSON.stringify(geometry)}`);
+    if(!process.env.BINSO_UX_BASELINE&&width<=1100)await assertMobileHeaderTargets(page);
     if(!process.env.BINSO_UX_BASELINE&&width<=1100&&await page.locator('.page-container,.operator-app-content').count()){
       const appearance=await page.locator('.page-container,.operator-app-content').first().evaluate(el=>({ink:getComputedStyle(el).color,surface:getComputedStyle(el).getPropertyValue('--app-surface').trim(),controls:[...el.querySelectorAll('.form-control,.form-textarea')].filter(node=>!['checkbox','radio','file'].includes(node.type)&&!node.closest('.searchbox,.thread-composer')).map(node=>({radius:getComputedStyle(node).borderTopLeftRadius,font:getComputedStyle(node).fontSize})),groups:[...el.querySelectorAll('.bo-settings-group-body')].map(node=>({background:getComputedStyle(node).backgroundColor,border:getComputedStyle(node).borderTopWidth}))}));
       assert.equal(appearance.ink,theme==='light'?(route.startsWith('/operator')?'rgb(32, 43, 59)':'rgb(33, 48, 71)'):(route.startsWith('/operator')?'rgb(215, 227, 243)':'rgb(215, 227, 243)'),`${route}: app text uses the central theme`);
@@ -674,6 +677,7 @@ try{
   await capture(page,{animations:'disabled',path:path.join(output,`${theme}-430-time-entries.png`),fullPage:true});
   const searchRect=await page.locator('.time-filter-toolbar .searchbox').boundingBox(),filterRect=await page.getByRole('button',{name:'Zeitfilter'}).boundingBox();
   assert.ok(filterRect.x>searchRect.x&&Math.abs(filterRect.y-searchRect.y)<5,'Mobile filter follows search on the same row');
+  await verifyTimeWorkspace(page,{capture:width=>capture(page,{animations:'disabled',path:path.join(output,`${theme}-${width}-time-workspace-central.png`),fullPage:true})});
   }
   if(hasInteraction('time')){
    await page.getByRole('button',{name:'Zeitfilter',exact:true}).click();let filter=page.getByRole('dialog',{name:'Zeitfilter',exact:true});await filter.getByLabel('Von',{exact:true}).fill('2099-01-01');await page.keyboard.press('Escape');assert.equal(await page.locator('.time-group').count(),1,'Cancelling a filter preserves the applied range');
@@ -910,6 +914,7 @@ try{
    await capture(page,{animations:'disabled',path:path.join(output,`${theme}-320-400-manual-time-final.png`)});await page.keyboard.press('Escape');groupingFixture=false;
   }
   if(hasInteraction('header')){
+   await page.setViewportSize({width:390,height:740});await navigate(base+'/dashboard');await page.waitForLoadState('networkidle');await verifyHeaderTargetRegression(page);
    for(const width of [390,1440]){
     await page.setViewportSize({width,height:740});await navigate(base+'/dashboard');await page.waitForLoadState('networkidle');
     const create=page.getByRole('button',{name:'Neu erstellen',exact:true}).filter({visible:true});

@@ -19,10 +19,11 @@ const {scanFile}=await import(moduleUrl(source));
 assert.equal(await scanFile(Buffer.from('synthetic')), 'pending');
 await assert.rejects(scanFile(Buffer.alloc(10*1024*1024+1)),e=>e.status===413);
 await assert.rejects(scanFile(Buffer.from('synthetic'),{socketPath:'relative.sock'}),e=>e.status===503);
+await assert.rejects(scanFile(Buffer.from('synthetic'),{socketPath:'C:\\synthetic\\scanner.sock'}),e=>e.status===503,'A Windows path must not be accepted as a production Unix socket');
 const directory=await fs.mkdtemp(path.join(os.tmpdir(),'binso-scan-'));
 let cases=0;
 async function peer({reply,fragment=false,drop=false,stall=false,early=false,bytes=Buffer.from('synthetic'),timeoutMs=1000,expected='clean',versionReply,expectBytes=true}){
- const socketPath=path.join(directory,`s${cases++}.sock`),sockets=new Set();let received,versions=0;
+ const id=cases++,socketPath=memory?`/synthetic-protocol/s${id}.sock`:path.join(directory,`s${id}.sock`),sockets=new Set();let received,versions=0;
  const handleSocket=socket=>{
   sockets.add(socket);socket.on('close',()=>sockets.delete(socket));socket.on('error',()=>{});
   if(early){socket.end('stream: OK\0');return;}

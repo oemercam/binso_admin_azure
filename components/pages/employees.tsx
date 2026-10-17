@@ -21,7 +21,6 @@ import { useRouter,useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { AppShell } from "../app-shell";
 import { RecordRow, RecordsView, RecordsControls, useRecordsController, TimeEntryRow } from "../records";
-import { employees, expenses } from "@/lib/demo-data";
 import { appendDemoRow } from "@/lib/demo-storage";
 import { apiGet, apiPatch, apiPost, apiUpload, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 import {Button, EmptyState, Field, Icon, SectionTitle, Toast, Input, Select, LoadingState, ErrorState, FormSection} from "../ui";
