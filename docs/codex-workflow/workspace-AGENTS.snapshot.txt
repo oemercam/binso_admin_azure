@@ -1,0 +1,23 @@
+# BINSO ONE local Windows tool resolution
+
+For shell commands using Git, Node.js, or pnpm in this workspace, activate the
+project runtime in the SAME tool invocation before running those commands:
+
+- Workspace directory: `. ./runtime.ps1`
+- Repository directory (`repo`): `. ../runtime.ps1`
+- From deeper directories, dot-source the absolute workspace `runtime.ps1` path.
+
+Each exec tool invocation starts a new shell; activation in a previous invocation
+does not persist. Use the bootstrap again for every relevant invocation.
+
+The bootstrap selects installed Git 2.55, Node.js 24.20.0, and pnpm 10.17.1,
+validates `repo/package.json`'s packageManager, and enables strict pnpm version
+checking without automatic package-manager installation. Keep inherited Git
+sandbox safe.directory settings. Do not fall back to bundled tools if validation
+fails; report the missing or mismatched installation.
+
+This bootstrap only changes the current process and its child processes. Use a
+fresh shell or dot-source the bootstrap with `-Restore` to undo activation.
+The instructions in `repo/AGENTS.md` continue to apply inside the repository.
+That file is the canonical development, QA, context, and external-system workflow;
+use the project orientation in `repo/README.md` to find relevant source material.

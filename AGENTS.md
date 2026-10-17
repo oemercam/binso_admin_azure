@@ -11,7 +11,8 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 # BINso One — binding product and UI rules
 
 The user's original ZIP in docs/audit/v24/reference/ is the binding visual source.
-Read IMPLEMENTIERUNG.md and docs/architecture/reference-foundation.md before UI work.
+Read docs/audit/v24/reference/IMPLEMENTIERUNG.md and
+docs/architecture/reference-foundation.md before UI work.
 The original Microsoft variant wins over historical Flow, Noir, Apple, grey or
 permanent-toolbox instructions. Historical audit reports are evidence, not rules.
 
@@ -28,9 +29,76 @@ permanent-toolbox instructions. Historical audit reports are evidence, not rules
   Reference data is allowed only in isolated test fixtures, never tenant data.
 - The ZIP's protected Bottom-Navigation contract remains unchanged. Its frozen
   markup, token inheritance, focus and geometry have independent regression tests.
-- Compare original and actual login/list/detail at equal content widths first.
-  Then cover every route family and operator variant with rendered evidence.
-- During work use qa:fast and focused tests; run the coherent browser matrix after
-  relevant changes. A green build or static inventory is not visual acceptance.
+- For visual acceptance, compare original and actual login/list/detail at equal
+  content widths first. Cover affected route families and operator variants with
+  rendered evidence; system-wide UX changes and releases require full coverage.
+  A green build or static inventory is not visual acceptance.
 - Keep incomplete work in a draft PR. Never disable failed gates, silently accept
   new screenshot baselines, or deploy production without explicit authorization.
+
+# Codex workflow and context (canonical project instructions)
+
+- Work toward one clearly bounded objective per assignment. State the outcome,
+  affected area and validation scope briefly; do not add cleanup, audits, PRs,
+  monitoring or deployment beyond the agreed scope. Respect explicit time limits;
+  at the limit, document completed work, remaining checks and blockers, then stop.
+- First activate the project-local runtime described in the workspace AGENTS.md
+  (`. ../runtime.ps1` from this checkout; Git 2.55, Node 24.20.0, pnpm 10.17.1).
+  Repeat activation in each new shell invocation; do not install replacement tools
+  or change global settings. If this checkout lacks that workspace bootstrap,
+  report the limitation rather than inventing a path or silently using other tools.
+- Inspect `git status`, unstaged/staged diffs and the affected files first. When a
+  committed branch change is relevant, inspect the diff against the agreed base;
+  do not fetch or scan the whole repository just to establish routine context.
+  Preserve unrelated changes and existing branches; never reset them to get clean.
+- Use README.md's project orientation to select sources. Historical audits are
+  dated evidence, not current instructions or current CI/release status. Read large
+  inventories, screenshots and audit archives only for a specific question.
+- Do not repeat whole-repository analysis or reread unchanged files already known
+  in the assignment. Reopen only relevant ranges after changes or when evidence
+  is missing. Use targeted `rg` searches and bounded output. `.rgignore` excludes
+  generated evidence from normal searches; explicitly scope `rg --no-ignore` to
+  the needed evidence/inventory path for an audit. It is not a security boundary.
+- Batch related reads and independent read-only tool calls where useful. Keep
+  edits, dependent operations and approvals sequential. Do not repeat successful
+  checks without new changes, a failure or a concrete unresolved concern.
+- During longer work, give a brief update at least every 60 seconds with findings,
+  uncertainty and next step. Finish with changed files, checks and open points.
+- For a new substantial development objective, recommend a new chat with a short
+  handoff: objective, branch/commit, changed files, decisions, checks and blockers.
+  Do not automatically create chats or discard context for the current objective.
+
+## Development checks versus integration and release
+
+- During development, run focused tests for affected behavior. Use `qa:fast` only
+  when its planned suites are relevant; `pnpm qa:plan --files <paths>` previews
+  scope without running suites. Use actual affected paths, not a narrower selection
+  that hides dependencies. Paths in `--files` are comma-separated.
+- Run `pnpm typecheck` for relevant TypeScript/type-contract changes, or use
+  `pnpm qa:fast --typecheck --files <paths>` to include it. Plain `qa:fast` does not
+  typecheck automatically. `qa:fast` and `qa:integration` have no browser by default;
+  `--browser` explicitly requests one. `qa:integration` includes a production build.
+- Use targeted browser checks when a visual/interactive change needs them. Do not
+  run the complete browser matrix after each individual edit. At integration,
+  preserve every existing required Quality, Security and acceptance gate. Full
+  browser validation remains mandatory for system-wide UX changes and releases;
+  a deferred or unexecuted check is never a pass or final visual acceptance.
+- Failures must be investigated and reported. Never suppress failures, weaken
+  gates, accept new baselines silently, or claim completion with required checks
+  missing. If the assignment excludes a required expensive check, report the
+  validation gap and leave final acceptance pending rather than expanding scope.
+- `qa:standard`, `qa:full`, `check` and `ci` are broad verification commands, not
+  the default feedback loop for small edits. Documentation-only changes normally
+  need consistency/link/diff checks, not app builds or browser regressions.
+
+## GitHub, CI and external systems
+
+- Bundle GitHub status reads for the same commit/run. Do not use tight polling or
+  repeatedly download unchanged logs. Without an explicit monitoring/wait request,
+  report the current run/link and pending checks, then finish without waiting for CI.
+  When waiting is requested, use bounded waits/backoff, respect the time budget and
+  notify only on meaningful progress, failure or required action.
+- GitHub/Azure writes, PR lifecycle changes and CI reruns must stay within the
+  agreed assignment. Productive interventions require explicit user authorization.
+  Preserve existing workflow configuration and mandatory gates unless a change
+  to those is itself authorized. A green check alone never authorizes production.

@@ -2,6 +2,40 @@
 
 Binso One ist die app-first Business-Plattform der Binso GmbH für Schweizer KMU.
 
+## Projektorientierung für Entwicklungsaufträge
+
+Verbindlicher Arbeitsablauf: [AGENTS.md](AGENTS.md). Diese Orientierung ist ein
+Wegweiser; historische Berichte ersetzen weder aktuelle Regeln noch aktuelle
+Prüfergebnisse. Nur die für den konkreten Auftrag relevanten Quellen lesen.
+
+| Gesucht | Einstieg |
+| --- | --- |
+| Freigegebene UX und Rangfolge | [Originalreferenzen](docs/audit/v24/reference/IMPLEMENTIERUNG.md), [Vorschau](docs/audit/v24/reference/index.html) |
+| UI-Architektur und Komponenten-Owner | [Reference Foundation](docs/architecture/reference-foundation.md), `app/design-system/manifest.json` |
+| Laufzeit, Sicherheit und Daten | Architektur-/Sicherheitsübersicht unten; `app/`, `lib/server/`, `database/migrations/` gezielt nach betroffener Funktion |
+| Aktuelle Projektregeln | [AGENTS.md](AGENTS.md), `package.json`, `pnpm-workspace.yaml`; Windows-Runtime: Workspace-`../runtime.ps1` und `../AGENTS.md` |
+| QA-Auswahl und Ausführung | `scripts/qa-plan.mjs`, `scripts/qa.mjs`, `package.json`; Pflicht-Gates: `.github/workflows/quality.yml` |
+| Historische Nachweise | `docs/audit/`, `docs/assets/`, `docs/evidence/`, datierte Inventare unter `docs/architecture/`; [V24-Bericht](docs/audit/v24/README.md) und [älterer QA-Audit](docs/ux-audit-fast-development.md) nur bei Bedarf |
+
+Kurze QA-Auswahl (aus dem Repository, nach Runtime-Aktivierung):
+
+```powershell
+pnpm qa:plan --files components/records.tsx  # nur Auswahl anzeigen
+pnpm qa:fast --files components/records.tsx  # passende lokale Tests/Lint
+pnpm typecheck                             # relevante TypeScript-Änderungen
+# Gezielt, wenn die Änderung Browsernachweise braucht:
+pnpm qa:fast --browser --files components/records.tsx
+# Breite Integration/Release-Abnahme, nicht nach jeder Einzeländerung:
+pnpm qa:standard --base origin/main
+pnpm qa:full --base origin/main
+```
+
+Die Dateipfade sind Beispiele und durch den vollständigen betroffenen Umfang zu
+ersetzen. `origin/main` nur als bereits vorhandene, vereinbarte Basis verwenden.
+Genaue Test-/Browserpflichten stehen in AGENTS.md. `.rgignore` nimmt grosse
+generierte Bestände aus Standardsuchen; für gezielte Audits beispielsweise
+`rg --no-ignore 'Suchbegriff' docs/architecture/ux-inventory.json` verwenden.
+
 ## Produktionsarchitektur
 
 - Next.js 16 App Router
@@ -220,11 +254,24 @@ STRIPE_WEBHOOK_SECRET=
 
 Keine Secrets mit `NEXT_PUBLIC_` veröffentlichen.
 
-QA:
+Windows-Runtime im bestehenden BINSO-ONE-Workspace (je neuer Tool-Shell):
 
 ```powershell
-corepack enable
-corepack prepare pnpm@10.17.1 --activate
+. ../runtime.ps1
+git --version
+node --version
+pnpm --version
+```
+
+Erwartet: Git 2.55, Node 24.20.0 und pnpm 10.17.1. Die Aktivierung ist
+prozesslokal und prüft `packageManager`; keine globale Corepack-Aktivierung.
+In anderen Checkouts die vorhandene Umgebung gegen `package.json` prüfen und
+fehlende Voraussetzungen melden. Installation nur im vereinbarten Auftragsumfang.
+
+Breite QA-/Einrichtungsbefehle nach Bedarf; keine automatisch auszuführende
+Checkliste für jeden Entwicklungsauftrag:
+
+```powershell
 pnpm install --frozen-lockfile
 pnpm repository:clean
 pnpm docs:check
