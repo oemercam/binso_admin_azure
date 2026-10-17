@@ -19,7 +19,6 @@
   padding:0;
   border:0;
   border-radius:var(--radius-md);
-  background:transparent;
   color:inherit;
 }
 .desktop-notification-button,
@@ -49,25 +48,6 @@
   color:var(--color-muted);
   font-size:var(--type-control);
   line-height:1.55;
-}
-.section-product-shot{
-  min-width:0;
-  overflow:hidden;
-  border:1px solid var(--color-line);
-  background:var(--color-bg);
-}
-.section-product-shot iframe{
-  display:block;
-  border:0;
-  background:var(--color-bg);
-  pointer-events:none;
-}
-.section-product-shot{border-radius:var(--shape-group)}
-.section-product-shot{
-  animation:marketing-enter var(--motion-slow) var(--motion-ease) both;
-}
-.section-product-shot{
-  transition:transform var(--motion-slow) var(--motion-ease),box-shadow var(--motion-slow) var(--motion-ease);
 }
 .app-root[hidden]{display:none}
 .app-root{
@@ -128,7 +108,6 @@
   justify-content:space-between;
   gap:24px;
 }
-.page-head>div{min-width:0}
 .page-head h1{margin:0;font-size:var(--page-heading-size);line-height:var(--page-heading-line-height);letter-spacing:var(--page-heading-letter-spacing);font-weight:var(--workspace-title-weight)}
 .page-head p{margin:7px 0 0;color:var(--color-muted);font-size:var(--body-font-size);line-height:var(--body-line-height)}
 .page-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px}
@@ -222,8 +201,7 @@
 .workspace-location>a,.workspace-location>span[aria-hidden]{color:var(--color-muted);flex:none}
 .workspace-location>span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 @media (min-width:761px){
-.dashboard-grid>.surface,
-  .documents-hub-grid>.surface{
+.dashboard-grid>.surface{
     padding:var(--desktop-section-y) 0;
     border-left:0;
     border-right:0;
@@ -231,8 +209,7 @@
     box-shadow:none;
     background:transparent;
   }
-.dashboard-grid>.surface,
-  .documents-hub-grid>.surface{
+.dashboard-grid>.surface{
     border-top:1px solid var(--color-line);
     border-bottom:1px solid var(--color-line);
   }
@@ -344,7 +321,6 @@
     background:var(--color-bg);
   }
 .invoices-panel>.section-title{margin-bottom:var(--heading-content-gap)}
-.documents-hub-grid>.surface{min-width:0}
 .employee-tab-panel>.section-title{min-height:44px;margin-bottom:0;padding:0}
 .desktop-detail-main>.surface,
   .entity-edit-main>.surface{max-width:none}
@@ -387,8 +363,7 @@
   .page-container>.dashboard-grid,
   .page-container>.finance-analysis,
   .page-container>.finance-breakdown{margin-top:var(--desktop-section-gap)}
-.page-container>.toolbar,
-  .page-container>.desktop-page-actions+.toolbar{margin-top:0}
+.page-container>.toolbar{margin-top:0}
 .surface{padding:18px}
 .section-title{min-height:28px}
 .section-title h2{font-size:var(--type-body)}
@@ -513,10 +488,8 @@
 .app-root:not(.app-editing) .page-container{padding-bottom:calc(54px + var(--safe-bottom) + 22px)}
 }
 @media (hover:hover) and (pointer:fine){
-.section-product-shot:hover{transform:translateY(-4px)}
 }
 @media (prefers-reduced-motion:reduce){
-.section-product-shot{animation:none}
 }
 .bo-page-heading{display:grid;gap:6px;min-width:0;flex:1}
 .bo-page-heading-main{display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:0}
@@ -580,7 +553,7 @@
 .mobile-header-detail .mobile-back{margin-left:-10px}
 .mobile-header .mobile-notification-button,
   .mobile-header .avatar-button{
-    width:44px;height:44px;min-width:44px;min-height:44px;
+    width:var(--touch);height:var(--touch);min-width:var(--touch);min-height:var(--touch);
   }
 .mobile-header-detail .mobile-header-actions{display:none}
 .mobile-header-detail:has(.mobile-detail-actions) .mobile-header-title{
@@ -613,8 +586,6 @@
     min-height:100dvh;
   }
 .app-preview .mobile-header{display:none}
-.mobile-header .mobile-notification-button,
-  .mobile-header .avatar-button{width:40px;height:40px;min-width:40px;min-height:40px}
 .mobile-header-detail:has(.mobile-detail-actions) .mobile-header-title{padding-right:4px;text-align:left}
 .mobile-header-detail:has(.mobile-detail-actions) .mobile-header-leading{width:auto;flex:1}
 .mobile-header-detail .mobile-header-actions{display:none}

@@ -1,0 +1,146 @@
+[
+  {
+    "file": "app/design-system/layout.css",
+    "context": "",
+    "selector": ".desktop-notification-button,\n.mobile-notification-button",
+    "property": "background",
+    "value": "transparent",
+    "earlier": 22,
+    "later": 27
+  },
+  {
+    "file": "app/design-system/layout.css",
+    "context": "",
+    "selector": ".page-head>div",
+    "property": "min-width",
+    "value": "0",
+    "earlier": 112,
+    "later": 501
+  },
+  {
+    "file": "app/design-system/collections.css",
+    "context": "",
+    "selector": ".desktop-record-row>.table-status-cell",
+    "property": "overflow",
+    "value": "visible",
+    "earlier": 95,
+    "later": 329
+  },
+  {
+    "file": "app/design-system/collections.css",
+    "context": "",
+    "selector": ".desktop-record-head>[role=\"columnheader\"]",
+    "property": "min-width",
+    "value": "0",
+    "earlier": 84,
+    "later": 331
+  },
+  {
+    "file": "app/design-system/operator.css",
+    "context": "",
+    "selector": ".operator-root",
+    "property": "--page-x",
+    "value": "var(--workspace-page-inset)",
+    "earlier": 90,
+    "later": 101
+  },
+  {
+    "file": "app/design-system/operator.css",
+    "context": "",
+    "selector": ".operator-detail-list>div",
+    "property": "display",
+    "value": "grid",
+    "earlier": 7,
+    "later": 185
+  },
+  {
+    "file": "app/design-system/operator.css",
+    "context": "",
+    "selector": ".operator-detail-list>div",
+    "property": "gap",
+    "value": "12px",
+    "earlier": 9,
+    "later": 185
+  },
+  {
+    "file": "app/design-system/operator.css",
+    "context": "",
+    "selector": ".operator-detail-list>div",
+    "property": "border-bottom",
+    "value": "1px solid var(--color-line)",
+    "earlier": 10,
+    "later": 185
+  },
+  {
+    "file": "app/design-system/operator.css",
+    "context": "",
+    "selector": ".operator-payment-insight",
+    "property": "border",
+    "value": "0",
+    "earlier": 293,
+    "later": 301
+  },
+  {
+    "file": "app/design-system/operator.css",
+    "context": "",
+    "selector": ".operator-payment-insight",
+    "property": "border-radius",
+    "value": "0",
+    "earlier": 294,
+    "later": 301
+  },
+  {
+    "file": "app/design-system/operator.css",
+    "context": "",
+    "selector": ".operator-payment-insight",
+    "property": "background",
+    "value": "transparent",
+    "earlier": 295,
+    "later": 301
+  },
+  {
+    "file": "app/design-system/operator.css",
+    "context": "",
+    "selector": ".operator-payment-insight",
+    "property": "box-shadow",
+    "value": "none",
+    "earlier": 296,
+    "later": 301
+  },
+  {
+    "file": "app/design-system/operator.css",
+    "context": "media (max-width:760px)/",
+    "selector": ".operator-payment-insight",
+    "property": "border",
+    "value": "0",
+    "earlier": 455,
+    "later": 460
+  },
+  {
+    "file": "app/design-system/operator.css",
+    "context": "media (max-width:760px)/",
+    "selector": ".operator-payment-insight",
+    "property": "border-radius",
+    "value": "0",
+    "earlier": 456,
+    "later": 460
+  },
+  {
+    "file": "app/design-system/operator.css",
+    "context": "media (max-width:760px)/",
+    "selector": ".operator-payment-insight",
+    "property": "background",
+    "value": "transparent",
+    "earlier": 457,
+    "later": 460
+  },
+  {
+    "file": "app/design-system/operator.css",
+    "context": "media (max-width:760px)/",
+    "selector": ".operator-payment-insight",
+    "property": "box-shadow",
+    "value": "none",
+    "earlier": 458,
+    "later": 460
+  }
+]

@@ -16,6 +16,9 @@ async function messages(code,filePath='app/future-module/page.tsx'){
  const [result]=await eslint.lintText(code,{filePath});return result.messages.filter(m=>m.ruleId==='binso-ui/central-components');
 }
 for(const tag of ['input','select','textarea'])assert.equal((await messages(`export default function Page(){return <${tag}/>;}`)).length,1,'Future routes cannot implement '+tag+' again');
+assert.equal((await messages('export const View=()=> <div className="filter-sheet-actions"/>;')).length,1,'Sheet footer ownership cannot drift back into routes');
+assert.equal((await messages('export const View=()=> <div className="mobile-sticky-save"/>;')).length,1,'Page footer ownership cannot drift back into routes');
+assert.equal((await messages('import {FormActions} from "@/components/ui";export const View=()=> <FormActions sheet/>;')).length,0,'Shared footer composition remains supported');
 for(const expression of ['"form-wizard"','"wizard-progress"','"wizard-content"','"form-field"','{`bottom-sheet ${true?"active":""}`}','{true?"operator-table":""}','"confirm-dialog"'])assert.equal((await messages(`export default function Page(){return <div className=${expression}/>;}`)).length,1,'Copied canonical wrappers must fail lint');
 assert.equal((await messages('import {DashboardPage} from "@/components/app-pages";export default DashboardPage;')).length,1);
 assert.equal((await messages('export default function Page(){return <p role="alert">Fehler</p>;}')).length,1);
@@ -42,6 +45,11 @@ for(const expanded of [false,true]){
  assert.ok(disclosure.includes('aria-label="Weitere Auswertungen"'),'Native accessible name is forwarded');
 }
 const ariaLink=html(React.createElement(ui.Button,{href:'/operator/monitoring','aria-describedby':'source-description'},'Monitoring'));
+for(const expanded of [false,true]){
+ const icon=html(React.createElement(ui.IconButton,{label:'Zeitfilter',icon:'filter','aria-expanded':expanded,'aria-haspopup':'dialog'}));
+ assert.ok(icon.includes(`aria-expanded="${expanded}"`),'Icon controls expose both actual disclosure states');
+ assert.ok(icon.includes('aria-haspopup="dialog"')&&icon.includes('aria-label="Zeitfilter"'),'Icon filter retains its accessible name and popup type');
+}
 assert.ok(ariaLink.includes('aria-describedby="source-description"'),'Shared link button forwards ARIA descriptions');
 write=false;assert.ok(html(React.createElement(ui.Button,{requiresWrite:true,'aria-expanded':false},'Geschützte Aktion')).includes('disabled=""'),'ARIA forwarding preserves write protection');write=true;
 const invalid=html(React.createElement(ui.Field,{label:'E-Mail',error:'Ungültig',hint:'Geschäftlich'},React.createElement(ui.Input,{'aria-describedby':'existing',type:'email'})));

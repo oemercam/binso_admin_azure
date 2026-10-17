@@ -113,8 +113,8 @@ export function AccessLink({href,children,fallback=null,className}:{href:string;
   return access.canOpen(href)?<Link href={href} className={className}>{children}</Link>:<>{fallback}</>;
 }
 
-export function IconButton({ label, icon, onClick, className="" }: { label: string; icon: string; onClick?: () => void; className?:string }) {
-  return <LocalizedElement as="button" className={["icon-button",className].filter(Boolean).join(" ")} type="button" aria-label={label} onClick={onClick}><Icon name={icon}/></LocalizedElement>;
+export function IconButton({ label, icon, onClick, className="", ...ariaProps }: { label: string; icon: string; onClick?: () => void; className?:string }&React.AriaAttributes) {
+  return <LocalizedElement as="button" {...ariaProps} className={["icon-button",className].filter(Boolean).join(" ")} type="button" aria-label={label} onClick={onClick}><Icon name={icon}/></LocalizedElement>;
 }
 
 export function Metric({ label, value, hint, icon }: { label: React.ReactNode; value: React.ReactNode; hint?: string; icon?: string }) {
@@ -169,10 +169,6 @@ export function EmptyState({ icon = "file", title, text, action, compact=false }
   return <div className="empty-state"><span className="empty-icon"><Icon name={icon} size={22}/></span><h3><LocalizedText>{title}</LocalizedText></h3><p><LocalizedText>{text}</LocalizedText></p>{action}</div>;
 }
 
-export function Divider() {
-  return <div className="divider" aria-hidden="true" />;
-}
-
 export function Toggle({ checked = false, label, onChange,disabled=false }: { checked?: boolean; label: string; onChange?: () => void;disabled?:boolean }) {
   return <LocalizedElement as="button" className={`toggle ${checked ? "is-on" : ""}`} disabled={disabled} type="button" role="switch" aria-checked={checked} aria-label={label} onClick={onChange}><span/></LocalizedElement>;
 }
@@ -183,10 +179,6 @@ export function Toast({ title, text, tone = "success",inline=false,actionLabel,o
     <div><b><LocalizedText>{title}</LocalizedText></b>{text && <small><LocalizedText>{text}</LocalizedText></small>}</div>
     {onAction&&actionLabel&&<button type="button" className="text-action" onClick={onAction}><LocalizedText>{actionLabel}</LocalizedText></button>}
   </div>;
-}
-
-export function Skeleton({ className = "" }: { className?: string }) {
-  return <span className={`skeleton ${className}`.trim()} aria-hidden="true"/>;
 }
 
 /** Content loading keeps the current shell and never starts a second splash. */

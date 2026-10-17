@@ -17,7 +17,7 @@ import {RecordsControls} from './records';
 import {useBrowserBackGuard,allowDraftNavigation} from "./use-browser-back-guard";
 import ConfirmDialog from "./confirm-dialog";
 import { ActionRow, ActionSheet, PageHeading, DetailHeading } from "./binso-ux";
-import {Button, EmptyState, Icon, IconButton, Logo, Status, LoadingState} from "./ui";
+import {Button, EmptyState, Icon, IconButton, Logo, Status, LoadingState, FormActions} from "./ui";
 import {useApiQuery,useDataRevision} from "@/lib/client/use-api-query";
 import { apiGet, apiPatch, logoutClientSession, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 import {invalidateClientSession,type ClientSession} from "@/lib/client/session-cache";
@@ -374,7 +374,7 @@ function AppShellFrame({
           {backHref ? <DetailHeading verbatimTitle={titleIsUserContent} title={title} subtitle={subtitle} status={status} tone={statusTone} recordLabel={recordLabel} statusPlacement={headingPlacement==="content"?"subtitle":"title"} mobileAction={headingPlacement==="content"&&allowed?(mobileActions??visibleActions):undefined} action={(visibleActions||contextActions)&&allowed?<div className="page-actions">{visibleActions}{contextActions&&<div className="context-actions-inline">{contextActions.content}</div>}</div>:undefined} leading={<Link className={headingPlacement==="content"?"detail-back":"desktop-back"} href={backHref} aria-label={backLabel}><Icon name="back" size={16}/><LocalizedText>{backLabel}</LocalizedText></Link>}/> : <PageHeading verbatimTitle={titleIsUserContent} title={title} description={subtitle} action={(visibleActions||contextActions)&&allowed?<div className="page-actions">{visibleActions}{contextActions&&<div className="context-actions-inline">{contextActions.content}</div>}</div>:undefined}/> }
         </div>
         {allowed&&bodyControls}
-        {accessError?<div role="alert"><p><LocalizedText>{accessError}</LocalizedText></p><div className="filter-sheet-actions"><Button onClick={()=>{invalidateClientSession();setAccessError(null);setAccessRetry(value=>value+1)}}><LocalizedText>{"Erneut versuchen"}</LocalizedText></Button><Link className="button button-secondary" href="/login"><LocalizedText>{"Anmelden"}</LocalizedText></Link></div></div>:(!access||allowed)?children:<EmptyState icon="lock" title="Kein Zugriff" text="Diese Seite ist für deine Rolle oder deinen Plan nicht verfügbar."/>}
+        {accessError?<div role="alert"><p><LocalizedText>{accessError}</LocalizedText></p><FormActions sheet><Button onClick={()=>{invalidateClientSession();setAccessError(null);setAccessRetry(value=>value+1)}}><LocalizedText>{"Erneut versuchen"}</LocalizedText></Button><Link className="button button-secondary" href="/login"><LocalizedText>{"Anmelden"}</LocalizedText></Link></FormActions></div>:(!access||allowed)?children:<EmptyState icon="lock" title="Kein Zugriff" text="Diese Seite ist für deine Rolle oder deinen Plan nicht verfügbar."/>}
       </main>
 
       {timerNotice&&<div className="timer-notice" role="status">{timerNotice}</div>}

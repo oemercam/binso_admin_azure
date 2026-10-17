@@ -165,9 +165,6 @@
 .settings-section>h2{margin:0 0 var(--heading-content-gap);font-size:var(--type-control)}
 .settings-detail-grid>.surface+.settings-readonly,.settings-detail-grid>.surface+.settings-form{border-top:0}
 .settings-profile,.company-logo-card{align-items:center}
-.security-setting-row{min-height:64px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:center}
-.security-setting-row b{display:block;font-size:var(--type-control)}
-.security-setting-row p{margin:4px 0 0;color:var(--color-muted);font-size:var(--type-metadata)}
 .settings-switch{position:relative;width:44px;height:26px;flex:0 0 auto;padding:0;border:0;border-radius:var(--shape-scale-999);background:var(--color-line);cursor:pointer;transition:background .18s ease}
 .settings-switch>span{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:var(--color-bg);box-shadow:0 1px 4px var(--palette-rgba-0-0-0-2);transition:transform .18s ease}
 .settings-switch.is-on{background:var(--app-action-accent)}
