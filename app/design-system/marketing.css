@@ -457,10 +457,6 @@
 .marketing-mobile-menu{
   animation:marketing-menu-enter var(--motion-base) var(--motion-ease) both;
 }
-.product-screen{margin:0;min-width:0;overflow:hidden;border:1px solid var(--color-line);background:var(--color-bg);box-shadow:0 18px 46px var(--palette-rgba-0-0-0-08)}
-.product-screen-desktop{width:100%;height:auto;border:0;border-radius:0;box-shadow:none}
-.product-screen-desktop img{display:block;width:100%;height:auto;object-fit:contain}
-.product-screen-mobile{width:min(100%,310px);height:auto;margin-inline:auto;border:0;border-radius:0}
 .legal-page{width:100%;max-width:980px;margin:auto;padding:72px 28px 84px;overflow-wrap:anywhere}
 .legal-hero{max-width:760px;margin-bottom:44px}
 .legal-hero h1{margin:0 0 14px;font-size:var(--type-scale-46);line-height:1;letter-spacing:-.045em}
@@ -554,12 +550,6 @@
 .product-capture-mobile{width:min(100%,310px);margin-inline:auto}
 .product-capture-caption{display:block;margin:0;padding:10px;font-size:var(--type-metadata);color:var(--app-secondary);text-align:center}
 .marketing-actions>a{min-height:var(--touch);display:inline-flex;align-items:center;padding-inline:8px}
-.product-gallery{min-width:0}
-.product-gallery>header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:14px}
-.product-gallery h3{margin:0;font-size:var(--type-section)}
-.product-gallery-views{display:flex;gap:6px;flex-wrap:wrap}
-.product-gallery .tabs{max-width:100%;overflow-x:auto;flex-wrap:nowrap}
-.product-gallery .product-capture{box-shadow:none}
 @media (min-width:761px) and (max-width:1100px){
 .marketing-nav{gap:20px}
 .marketing-nav nav{gap:16px}

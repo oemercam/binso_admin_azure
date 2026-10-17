@@ -1,7 +1,7 @@
 "use client";
 
 import {LocalizedText,LocalizedElement,useTranslation} from "@/lib/client/locale";
-import {PageAccessContext,usePageAccess} from "@/lib/client/page-access";
+import {PageAccessContext} from "@/lib/client/page-access";
 import {routePermission,tenantCan,permissionForModule} from "@/lib/permissions";
 import {moduleForPath,planAllowsPath,type PlanId} from "@/config/plan-access";
 import { readTimer, changeTimer } from "@/lib/client/time-tracker";
@@ -405,13 +405,6 @@ function AppShellFrame({
     </div>
   </div></PageAccessContext.Provider></WorkspaceActionContext.Provider>;
 }
-
-export function SheetLink({ href, icon, title, text, onSelect }: { href: string; icon: string; title: string; text?: string; onSelect: () => void }) {
-  const access=usePageAccess();
-  if(!access.canOpen(href))return null;
-  return <Link href={href} onClick={onSelect}><span className="sheet-menu-icon"><Icon name={icon}/></span><div><b><LocalizedText>{title}</LocalizedText></b>{text&&<small><LocalizedText>{text}</LocalizedText></small>}</div><Icon name="arrow" size={17}/></Link>;
-}
-
 
 type ShellProps=Parameters<typeof AppShellFrame>[0];
 type ShellConfiguration=Omit<ShellProps,"children"> & {pathname:string};

@@ -1,13 +1,4 @@
 /* BINso One / overlays — one owner for base, states and responsive behavior. */
-.sheet-menu-icon{
-  width:34px;
-  height:34px;
-  display:grid;
-  place-items:center;
-  border:1px solid var(--color-line);
-  border-radius:var(--shape-medium);
-  background:var(--color-bg);
-}
 .bottom-sheet[data-wizard]{height:calc(var(--dialog-available-height) - var(--dialog-edge-gap))}
 .bottom-sheet[data-wizard] .sheet-body{display:flex;flex-direction:column}
 .bottom-sheet[data-wizard] .sheet-body:has(.form-wizard){overflow:hidden}
@@ -227,11 +218,6 @@
     padding:8px 0;
     grid-template-columns:32px minmax(0,1fr) 16px;
     gap:10px;
-  }
-.sheet-menu-icon{
-    width:32px;
-    height:32px;
-    border-radius:var(--shape-control-mobile);
   }
 .sheet-menu b{font-size:var(--type-scale-11-5)}
 .sheet-menu small{font-size:var(--type-caption)}
