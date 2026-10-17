@@ -13,6 +13,7 @@ import {fullRoutes} from './qa-plan.mjs';
 import {saveDomEvidence} from './ux-dom-evidence.mjs';
 import {verifyMobileLoginGeometry} from './auth-ux-browser.mjs';
 import {assertCustomerDossier,verifyCustomerStates} from './customer-ux-browser.mjs';
+import {assertNavigationToggle,verifyNavigationPersistence} from './navigation-ux-browser.mjs';
 
 // Synthetic UI fixtures: real business/RLS integration is covered by migration-test.mjs.
 // No request reaches a production system; unhandled fixture APIs fail closed.
@@ -340,6 +341,7 @@ try{
       assert.ok(await navigationToggle.evaluate(el=>{const box=el.getBoundingClientRect();return !el.contains(document.elementFromPoint(box.x+box.width/2,box.y+box.height/2))}),'Modal backdrop blocks desktop navigation pointer access');
     }
     if(!process.env.BINSO_UX_BASELINE&&width>=1101&&await navigationToggle.count()&&!await modal.count()){
+      await assertNavigationToggle(navigationToggle,false);
       const sidebar=page.locator('.app-sidebar,.operator-sidebar').filter({visible:true});
       await navigationToggle.click();
       assert.equal(await navigationToggle.getAttribute('aria-expanded'),'false','Desktop navigation exposes collapsed state');
@@ -479,6 +481,7 @@ try{
    }
   }));
   if(hasInteraction('chrome')&&process.env.BINSO_UX_MATRIX_ONLY!=='1'){
+    await verifyNavigationPersistence(page,{base,capture:state=>capture(page,{animations:'disabled',path:path.join(output,theme+'-navigation-'+state+'.png'),fullPage:true})});
    for(const width of [320,375,390,430,768,1024,1440]){
     await page.setViewportSize({width,height:740});await navigate(base+'/dashboard');
     if(width===390)await capture(page,{animations:'disabled',path:path.join(output,theme+'-390-shared-glass-dashboard.png')});
