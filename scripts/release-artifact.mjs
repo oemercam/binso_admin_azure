@@ -7,9 +7,14 @@ import {writeTestOutput} from './test-output.mjs';
 
 function sourceSha(sha){if(!/^[a-f0-9]{40}$/.test(sha??''))throw Error('Immutable source SHA required');return sha;}
 async function fileHandle(file,read){
- if((await fs.lstat(file)).isSymbolicLink())throw Error('Artifact symlinks are forbidden');
  const handle=await fs.open(file,constants.O_RDONLY|(constants.O_NOFOLLOW??0));
- try{const stat=await handle.stat();if(!stat.isFile()||stat.size<1)throw Error('Expected a nonempty regular artifact file');return await read(handle,stat);}finally{await handle.close();}
+ try{
+  const stat=await handle.stat(),entry=await fs.lstat(file);
+  if(entry.isSymbolicLink()||entry.dev!==stat.dev||entry.ino!==stat.ino)throw Error('Artifact path changed or refers to a symlink');
+  if(!stat.isFile()||stat.size<1)throw Error('Expected a nonempty regular artifact file');
+  // Validate and read the same opened object; never reopen a checked pathname.
+  return await read(handle,stat);
+ }finally{await handle.close();}
 }
 async function digest(file){return fileHandle(file,async(handle,stat)=>{
  const hash=createHash('sha256');for await(const chunk of handle.createReadStream({autoClose:false}))hash.update(chunk);

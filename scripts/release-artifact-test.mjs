@@ -10,6 +10,21 @@ try{
  await assert.rejects(verifyArtifact(root,sha));
  const recorded=await createArtifactManifest(root,sha);
  assert.deepEqual(await verifyArtifact(root,sha),recorded);
+ // Replace the path after opening: verification must reject the identity change,
+ // even when the replacement contains the same bytes as the trusted archive.
+ const originalOpen=fs.open;let replaced=false;
+ fs.open=async(file,...args)=>{
+  const handle=await originalOpen(file,...args);
+  if(file===zip&&!replaced){
+   replaced=true;
+   await fs.rename(zip,zip+'.opened');
+   await fs.writeFile(zip,'PK\x03\x04test fixture');
+  }
+  return handle;
+ };
+ try{await assert.rejects(verifyArtifact(root,sha),/Artifact path changed/);assert(replaced);}
+ finally{fs.open=originalOpen;}
+ await fs.unlink(zip);await fs.rename(zip+'.opened',zip);
  await assert.rejects(verifyArtifact(root,'b'.repeat(40)),/source binding/);
  await assert.rejects(createArtifactManifest(root,'main'),/Immutable/);
  await fs.writeFile(zip,'PK\x03\x04evil fixture');
@@ -20,7 +35,7 @@ try{
  await assert.rejects(verifyArtifact(root,sha),/Invalid/);
  await fs.writeFile(manifest,JSON.stringify({...recorded,schemaVersion:2}));
  await assert.rejects(verifyArtifact(root,sha),/Invalid/);
- console.log('Artifact integrity: exact tested bytes/source, corruption, missing evidence and invalid manifests enforced.');
+ console.log('Artifact integrity: opened-file identity, exact tested bytes/source, corruption, missing evidence and invalid manifests enforced.');
 }finally{
  const resolved=await fs.realpath(root),temporary=await fs.realpath(os.tmpdir());
  assert(resolved.startsWith(temporary+path.sep)&&path.basename(resolved).startsWith('binso-release-artifact-'));
