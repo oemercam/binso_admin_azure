@@ -147,7 +147,6 @@ input[type="file"]:disabled::file-selector-button{opacity:var(--control-disabled
 .form-page{width:100%;max-width:900px;border-top:1px solid var(--color-line)}
 .form-page.narrow{max-width:700px}
 .form-section{padding:20px 0;border-bottom:1px solid var(--color-line);background:transparent}
-.form-section.clean{padding:20px 0}
 .form-section:first-child{padding-top:0}
 .form-section h2{margin:0 0 var(--heading-content-gap);font-size:var(--type-body-large)}
 .form-section .section-title h2{margin:0}
@@ -285,8 +284,7 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
   .form-page.narrow{width:100%;max-width:none}
 .customer-tab-panel .section-title .button,
   .employee-tab-panel .section-title .button{min-height:40px;height:40px;padding-inline:11px;font-size:var(--type-metadata)}
-.form-section,
-  .form-section.clean{padding:18px 0}
+.form-section{padding:18px 0}
 .form-section:first-child{padding-top:0}
 .form-grid,
   .form-grid.two{gap:var(--field-group-gap)}
