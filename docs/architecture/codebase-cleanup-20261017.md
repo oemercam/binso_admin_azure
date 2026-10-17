@@ -110,10 +110,15 @@ vorhandenen, neu erzeugten Inventaren statt in einer zweiten parallelen Liste:
 Verbindlich bleibt ausschliesslich das jüngste freigegebene
 [Microsoft-Referenzpaket vom 15.10.2026](../audit/v24/reference/IMPLEMENTIERUNG.md)
 mit der [bestehenden Foundation](reference-foundation.md): weisse Flächen,
-zentrale Command Bar, mobile Sheets, geschützte Bottom-Navigation, echter
+zentrale Command Bar, mobile Sheets, jeweils aktuell freigegebene Navigation, echter
 Datei-Button und zentrierter Ring. Historische Flow-/Noir-/Apple-/Toolbox-Vorgaben
 haben keinen Vorrang. Aktuelle Source-Owner sind bereits zugeordnet; Paket 1
 ändert keinen Token und ersetzt keine Foundation.
+
+Nachtrag vom 17.10.: Die ausdrückliche neue Rangfolge hebt einen pauschalen
+Schutz der alten Bottom-Navigation auf. Alte Freeze-Sätze sind keine dauerhafte
+Produktvorgabe. Die vorhandenen technischen Tests bleiben bis zum nachgewiesenen
+kontrollierten Ersatz aktiv; siehe [aktuelle UX-Freigabe](ux-current-approval.md).
 
 Statischer Abgleich: Die aktuellen Theme-/Layout-Owner enthalten bereits
 Inter/system-ui, den blauen Akzent `#2566bd`, 195 px Workspace-Navigation,

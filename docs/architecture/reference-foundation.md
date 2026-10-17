@@ -5,8 +5,13 @@
 Die unveränderten Dateien in `docs/audit/v24/reference/` und die Ergänzungen in
 `IMPLEMENTIERUNG.md` sind verbindlich. Ausschliesslich die Microsoft-Variante
 verwenden. Kein Flow-, Noir-, Apple- oder anderes paralleles Design einführen.
-Bei Widersprüchen gelten die jüngsten ausdrücklichen Entscheidungen in der
-Anleitung (Dateiauswahl, Ringausrichtung, unveränderte Bottom-Navigation).
+Bei Widersprüchen gelten die jüngsten ausdrücklichen UX-Entscheidungen des
+Auftraggebers. Am 17.10.2026 wurde das Paket vom 15.10. bestätigt und ausdrücklich
+klargestellt: Die alte Bottom-Navigation ist nicht pauschal geschützt. Die
+historische Freeze-Vorgabe ist daher keine dauerhafte Produktregel. Konkrete
+Navigationsänderungen benötigen weiterhin einen belegten Referenzabgleich und
+kontrollierte neue Regressionen; keine vorhandenen Tests pauschal abschwächen.
+Aktueller Abgleich und offene Verträge: [UX-Rangfolge](ux-current-approval.md).
 
 ## Zuständigkeit
 
@@ -45,8 +50,9 @@ E-Mails und PDF-Dokumente verwenden ihre bestehenden Renderer.
    kennzeichnen. Die Kennzeichnung gehört in die Abnahme, nicht als technische
    Erklärung in die Oberfläche der Endkunden.
 7. Erst mit identischen Inhaltsbreiten, Browser, Schriftauflösung und
-   vergleichbaren Daten gegen die Referenz rendern. Schutz der Bottom-Navigation
-   und Tastatur-/Fokusverhalten prüfen. Keine Baselines automatisch akzeptieren.
+   vergleichbaren Daten gegen die Referenz rendern. Aktuellen Navigationsvertrag
+   und Tastatur-/Fokusverhalten prüfen; neuere explizite Freigaben haben Vorrang.
+   Keine Baselines automatisch akzeptieren.
 
 Zuerst eine vorhandene Komponente erweitern, falls die fachliche Anforderung
 wiederverwendbar ist. Neue Tokens nach ihrer Rolle benennen. Seiten dürfen keine
