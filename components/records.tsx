@@ -226,8 +226,8 @@ export function RecordRow({
 }
 
 /** Group disclosure owns structure only; callers retain domain totals, filters and permissions. */
-export function TimeEntryGroup({title,subtitle,value,children}:{title:string;subtitle:string;value:string;children:ReactNode}){
- return <details className="time-group"><summary className="time-group-head"><div><b><LocalizedText>{title}</LocalizedText></b><small><LocalizedText>{subtitle}</LocalizedText></small></div><strong>{value}</strong><Icon name="down" size={16}/></summary><div className="time-record-list">{children}</div></details>;
+export function TimeEntryGroup({title,subtitle,value,children,titleVerbatim=false,subtitleVerbatim=false}:{title:string;subtitle:string;value:string;children:ReactNode;titleVerbatim?:boolean;subtitleVerbatim?:boolean}){
+ return <details className="time-group"><summary className="time-group-head"><div><b><LocalizedText verbatim={titleVerbatim}>{title}</LocalizedText></b><small><LocalizedText verbatim={subtitleVerbatim}>{subtitle}</LocalizedText></small></div><strong>{value}</strong><Icon name="down" size={16}/></summary><div className="time-record-list">{children}</div></details>;
 }
 
 /** Employee ledgers and the time module share the same information layout. */

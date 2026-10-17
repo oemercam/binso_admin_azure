@@ -63,6 +63,12 @@ Gruppenschlüssel, Minutenaggregation, Status, Rollenentscheidungen, Auswahllogi
 API-Aufrufe, Replay-/Doppelklickschutz und Recovery bleiben in der Fachlogik.
 Unerreichbare Wochen-Demozweige samt sechs alten Styles entfallen.
 
+Der französische SSR-Negativnachweis zeigte ausserdem, dass Zeitgruppen echte
+Kunden-/Projektnamen wie „Rechnungen“ übersetzten. Der zentrale Gruppenrenderer
+unterscheidet jetzt explizit Verbatim-Namen von UI-Fallbacks. Der echte Aufrufer
+setzt die Kennzeichnung nur bei vorhandenen Datennamen. Der neue Test war vorher
+rot und ist danach grün; Fallback-Beschriftungen werden weiterhin übersetzt.
+
 Auch die übrigen 13 identischen Sheet-Footer in zehn Dateien verwenden jetzt
 `FormActions`: Shell, Sheet-Renderer, Dokumente, Kunden, Spesen, Projekte,
 Berichte, Einstellungen, Statistik und Teamverwaltung. Mit den drei Zeit-Footern

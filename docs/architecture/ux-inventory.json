@@ -184624,6 +184624,8 @@
           "line": 165,
           "props": [
             "key={group}",
+            "titleVerbatim={!!items[0].customer_name}",
+            "subtitleVerbatim={!!items[0].project_name}",
             "title={items[0].customer_name||(items[0].billable?\"Ohne Kundenzuordnung\":\"Intern\")}",
             "subtitle={items[0].project_name||\"Ohne Auftrag\"}",
             "value={formatMinutes(items.reduce((sum,item)=>sum+Number(item.duration_minutes??0),0))}"
@@ -186250,7 +186252,9 @@
         {
           "tag": "LocalizedText",
           "line": 230,
-          "props": []
+          "props": [
+            "verbatim={titleVerbatim}"
+          ]
         },
         {
           "tag": "small",
@@ -186260,7 +186264,9 @@
         {
           "tag": "LocalizedText",
           "line": 230,
-          "props": []
+          "props": [
+            "verbatim={subtitleVerbatim}"
+          ]
         },
         {
           "tag": "strong",

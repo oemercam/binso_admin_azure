@@ -68,6 +68,12 @@ console.log('Locale catalogues: complete EN/FR/IT tuples, preserved template tok
  assert.equal((html.match(/Rechnungen/g)??[]).length,2,'User-authored list/heading titles stay verbatim even if they equal application copy');assert.ok(html.includes('Factures'),'Plain menu rows translate their UI labels');
  assert.equal(locale.translateMessage('Rechnung RE-001','en'),'Invoice RE-001');
  console.log('Shared rows/headings preserve colliding user titles while menu labels and document prefixes translate.');
+ const recordsSource=fs.readFileSync('components/records.tsx','utf8'),recordsAst=ts.createSourceFile('records.tsx',recordsSource,99,true,4);
+ const groupSource=recordsAst.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='TimeEntryGroup').getText(recordsAst),groupExports={};
+ Function('exports','require','LocalizedText','Icon',ts.transpileModule(groupSource,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText)(groupExports,require,client.LocalizedText,()=>null);
+ const groupHtml=props=>renderToStaticMarkup(element(client.LocaleProvider,{initialLocale:'fr'},element(groupExports.TimeEntryGroup,{title:'Rechnungen',subtitle:'Rechnungen',value:'2:15',...props})));
+ assert.equal((groupHtml({titleVerbatim:true,subtitleVerbatim:true}).match(/Rechnungen/g)??[]).length,2,'Customer and project names remain verbatim even when they equal UI copy');
+ assert.equal((groupHtml({}).match(/Factures/g)??[]).length,2,'Group UI fallback labels continue to translate');
 }
 
 {
