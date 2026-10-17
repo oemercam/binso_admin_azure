@@ -11,6 +11,7 @@ import {pathToFileURL} from 'node:url';
 import {monitoringFixture} from './observability-fixture.mjs';
 import {fullRoutes} from './qa-plan.mjs';
 import {saveDomEvidence} from './ux-dom-evidence.mjs';
+import {verifyMobileLoginGeometry} from './auth-ux-browser.mjs';
 
 // Synthetic UI fixtures: real business/RLS integration is covered by migration-test.mjs.
 // No request reaches a production system; unhandled fixture APIs fail closed.
@@ -322,6 +323,9 @@ try{
     if(route==='/einstellungen/abonnement')await page.locator('.plan-hero').getByText('Aktiv',{exact:true}).waitFor();
     if(route==='/einstellungen/dokumente'){await page.getByRole('heading',{name:'Rechnungsstandard',exact:true}).waitFor();await page.getByText('Synthetischer Rechnungstext',{exact:true}).waitFor();}
     assert.equal(await page.locator('html').getAttribute('data-theme'),theme,`${route}: explicit theme must override system dark mode`);
+    if(!process.env.BINSO_UX_BASELINE&&route==='/login'&&width<=760){
+      await verifyMobileLoginGeometry(page,{captureCode:process.env.BINSO_UX_CAPTURE_ALL==='1'?()=>capture(page,{animations:'disabled',path:path.join(output,`${theme}-${width}-auth-email-code.png`),fullPage:true}):undefined});
+    }
     if(process.env.BINSO_UX_COMPLIANCE==='1')await measureCompliance(page,{output:path.join(output,'compliance'),route,theme,width,state:process.env.BINSO_UX_FIXTURE_CASE??'normal',engine:process.env.BINSO_UX_BROWSER??'chromium'});
     // Explicit 15 October white-workspace contract; no screenshot baseline is rewritten.
     if(!process.env.BINSO_UX_BASELINE&&theme==='light'){

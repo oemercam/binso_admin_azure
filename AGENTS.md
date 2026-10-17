@@ -27,8 +27,11 @@ permanent-toolbox instructions. Historical audit reports are evidence, not rules
   screens as derived in the review; never silently call them original-approved.
 - Preserve real APIs, authentication, roles, financial calculations and files.
   Reference data is allowed only in isolated test fixtures, never tenant data.
-- The ZIP's protected Bottom-Navigation contract remains unchanged. Its frozen
-  markup, token inheritance, focus and geometry have independent regression tests.
+- The latest explicitly approved Microsoft UX decision takes precedence, including
+  navigation. The historical bottom-navigation baseline is not a permanent design
+  freeze. Keep its regression tests until a concrete approved replacement and its
+  rendered, keyboard, focus, safe-area and geometry evidence justify a controlled
+  contract update. See docs/architecture/ux-current-approval.md; no blanket bypass.
 - For visual acceptance, compare original and actual login/list/detail at equal
   content widths first. Cover affected route families and operator variants with
   rendered evidence; system-wide UX changes and releases require full coverage.

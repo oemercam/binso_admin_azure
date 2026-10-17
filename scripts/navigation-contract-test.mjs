@@ -10,6 +10,9 @@ const source=withoutLocalization(fs.readFileSync('components/app-shell.tsx','utf
 function visit(node){if(ts.isJsxElement(node)&&node.openingElement.tagName.getText(ast)==='nav'&&node.openingElement.attributes.getText(ast).includes('bottom-nav'))navigation=node.getText(ast);ts.forEachChild(node,visit)}visit(ast);assert(navigation);
 const styles=[];for(const {file,rule} of navigationRules()){for(const selector of rule.selectors.filter(s=>s.includes('.bottom-nav'))){let context='';for(let p=rule.parent;p?.type!=='root';p=p?.parent){if(!p)break;if(p.type==='atrule')context=p.name+' '+p.params+' / '+context}styles.push({file,selector,context,declarations:rule.nodes.filter(n=>n.type==='decl').map(n=>[n.prop,n.value,n.important])})}}
 const reference=JSON.parse(fs.readFileSync('docs/assets/20261013/navigation-reference.json','utf8'));
+// Historical regression baseline, not a permanent UX veto (owner clarification
+// 2026-10-17). Keep this assertion until a concrete approved navigation replacement
+// has rendered/keyboard/focus/safe-area evidence and a controlled contract update.
 const digest=createHash('sha256').update(JSON.stringify({navigation,styles})).digest('hex');
 assert.equal(digest,reference.customerContract,'Navigation must match the approved 2026-10-13 glass/dock contract');
 console.log('Approved customer navigation destinations and shared glass/dock style contract passed.');

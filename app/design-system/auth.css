@@ -21,7 +21,7 @@
 .auth-plan-summary b{font-size:var(--type-control)}
 .auth-plan-summary span{font-size:var(--type-label)}
 .auth-plan-summary small{color:var(--color-muted);font-size:var(--type-caption);line-height:1.45}
-.auth-inline-action{min-height:40px;margin-top:10px;border:0;background:transparent;color:var(--color-muted);font:inherit;font-size:var(--type-metadata);font-weight:650;text-align:center;cursor:pointer}
+.auth-inline-action{min-height:var(--touch);margin-top:10px;border:0;background:transparent;color:var(--color-muted);font:inherit;font-size:var(--type-metadata);font-weight:650;text-align:center;cursor:pointer}
 .auth-inline-action:hover{text-decoration:underline;text-underline-offset:3px}
 .auth-card>.auth-status{margin:8px 0 0;color:var(--color-muted);font-size:var(--type-caption);text-align:center}
 .auth-card>p{margin:0 0 28px;color:var(--color-muted);font-size:var(--type-control);line-height:1.55}
@@ -56,6 +56,7 @@
 .auth-workspace-footer{font-size:var(--type-label);color:var(--color-muted);padding-top:20px;border-top:1px solid var(--color-line)}
 .auth-workspace-footer nav{display:flex;gap:20px;flex-wrap:wrap}
 .auth-options{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:var(--type-label)}
+.auth-card .auth-options label:has(>input[type="checkbox"]){min-height:var(--touch);align-items:center}
 .auth-options .form-link a,.auth-card .auth-bottom a{color:var(--app-accent)}
 .auth-form-demo{display:grid}
 .auth-workspace .auth-card .auth-bottom{margin-top:25px;font-size:var(--type-label);text-align:left}
@@ -85,10 +86,10 @@
 .auth-card>.logo{width:88px;height:28px;margin-bottom:28px}
 .auth-topbar{margin-bottom:28px}
 .auth-topbar .logo{width:88px;height:28px}
-.auth-cancel{min-height:40px;display:inline-flex;align-items:center}
+.auth-cancel{min-height:var(--touch);display:inline-flex;align-items:center}
 .auth-after-submit{margin-top:16px;gap:18px}
 .auth-legal{max-width:38rem}
-.auth-card h1{font-size:var(--type-scale-24);line-height:1.15}
+.auth-card h1{font-size:var(--type-mobile-heading);line-height:1.15}
 .auth-card>p{margin-bottom:24px;font-size:var(--type-control)}
 .auth-card input{font-size:var(--type-subheading)}
 .auth-card .button{width:100%;height:46px}
