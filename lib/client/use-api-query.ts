@@ -10,7 +10,7 @@ export function useDataRevision(paths:readonly string[]){
 }
 export function useApiQuery<T>(path:string|null){
  const revision=useDataRevision(path?[path]:[]);
- const [state,setState]=useState<{path:string|null;revision:string;session:string;data:T|undefined;error:string|null;loading:boolean}>({path:null,revision:'',session:'',data:undefined,error:null,loading:Boolean(path)});
+ const [state,setState]=useState<{path:string|null;revision:string;session:string;attempt:number;data:T|undefined;error:string|null;loading:boolean}>({path:null,revision:'',session:'',attempt:-1,data:undefined,error:null,loading:Boolean(path)});
  const [retry,setRetry]=useState(0);
  useEffect(()=>{
   if(!path)return;
@@ -21,10 +21,10 @@ export function useApiQuery<T>(path:string|null){
   if(!path)return;
   let active=true;
   const session=dataRevision([]);
-  apiGet<T>(path).then(data=>{if(active)setState({path,revision,session,data,error:null,loading:false});}).catch(error=>{if(active)setState(previous=>({path,revision,session,data:previous.path===path&&previous.session===session?previous.data:undefined,error:error instanceof Error?error.message:'Daten konnten nicht geladen werden.',loading:false}));});
+  apiGet<T>(path).then(data=>{if(active)setState({path,revision,session,attempt:retry,data,error:null,loading:false});}).catch(error=>{if(active)setState(previous=>({path,revision,session,attempt:retry,data:previous.path===path&&previous.session===session?previous.data:undefined,error:error instanceof Error?error.message:'Daten konnten nicht geladen werden.',loading:false}));});
   return()=>{active=false;};
  },[path,revision,retry]);
- const current=state.path===path&&state.revision===revision;
+ const current=state.path===path&&state.revision===revision&&state.attempt===retry;
  const sameSession=state.path===path&&state.session===dataRevision([]);
  const data=sameSession?state.data:undefined;
  return {data,error:current?state.error:null,loading:Boolean(path)&&data===undefined&&(!current||state.loading),refreshing:Boolean(path)&&!current&&data!==undefined,refresh:()=>setRetry(value=>value+1)};

@@ -1,5 +1,6 @@
 import './localization-test-adapter.mjs';
 import assert from 'node:assert/strict';
+import ts from 'typescript';
 import fs from 'node:fs/promises';
 import {PGlite} from '@electric-sql/pglite';
 import {moduleUrl,moneyModuleUrl,financialModuleUrl} from './data-test-modules.mjs';
@@ -106,3 +107,32 @@ validation.validateFileContent(Buffer.from('%PDF-1.7 fixture'),'application/pdf'
 assert.throws(()=>validation.validateFileContent(Buffer.from('<script>bad</script>'),'application/pdf'),e=>e.code==='file_content_invalid');
 assert.throws(()=>validation.validateFileContent(Buffer.from('%PDF-1.7'),'image/png'));
 console.log('V21.3: decimal/PostgreSQL precision, partial/full balances, finance/calendar parity, targeted payment invalidation, read deduplication, mutation failures, old-session fencing, cross-tab logout/reconnect, safe API errors and file signatures passed.');
+
+
+// Execute the actual query hook with controlled effects and deferred transport.
+// A refresh retains only same-session data and never accepts an obsolete reply.
+{
+ const states=[],effects=[],requests=[];let cursor=0,scheduled=[],tick,domain=0,session=0;
+ const visibility={visibilityState:'visible'},network={onLine:true};
+ const useState=initial=>{const index=cursor++;if(!(index in states))states[index]=typeof initial==='function'?initial():initial;return [states[index],value=>{states[index]=typeof value==='function'?value(states[index]):value}];};
+ const useEffect=(effect,deps)=>{const index=cursor++,previous=effects[index];if(!previous||deps.some((dep,n)=>!Object.is(dep,previous.deps[n]))){scheduled.push(()=>{previous?.cleanup?.();effects[index]={deps,cleanup:effect()}});}};
+ const exports={},hookSource=(await fs.readFile('lib/client/use-api-query.ts','utf8')).split(String.fromCharCode(10)).filter(line=>!line.startsWith('import ')).join(String.fromCharCode(10));
+ Function('exports','useState','useEffect','useSyncExternalStore','apiGet','dataRevision','subscribeClientData','window','document','navigator',ts.transpileModule(hookSource,{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText)(exports,useState,useEffect,(_subscribe,snapshot)=>{cursor++;return snapshot()},path=>new Promise((resolve,reject)=>requests.push({path,resolve,reject})),paths=>paths.length?String(domain):String(session),()=>()=>{},{setInterval:callback=>{tick=callback;return 1},clearInterval(){}},visibility,network);
+ const render=(path='/api/customers')=>{cursor=0;scheduled=[];const result=exports.useApiQuery(path);for(const effect of scheduled)effect();return result;};
+ const flush=async()=>{await Promise.resolve();await Promise.resolve()};
+ try{
+  let result=render();assert.equal(result.loading,true);assert.equal(requests.length,1);
+  requests[0].resolve({name:'first'});await flush();result=render();assert.equal(result.data.name,'first');assert.equal(result.loading,false);
+  result.refresh();result=render();assert.equal(result.refreshing,true,'Manual refresh exposes its pending attempt');assert.equal(result.data.name,'first','Same-session data remains during refresh');assert.equal(result.loading,false);
+  requests[1].reject(new Error('offline'));await flush();result=render();assert.equal(result.error,'offline');assert.equal(result.refreshing,false);assert.equal(result.data.name,'first');
+  result.refresh();result=render();assert.equal(result.error,null,'An explicit retry clears the old error while pending');assert.equal(result.refreshing,true);
+  result.refresh();result=render();requests[2].resolve({name:'obsolete'});await flush();assert.equal(render().data.name,'first','A superseded request cannot replace visible data');
+  requests[3].resolve({name:'confirmed'});await flush();result=render();assert.equal(result.data.name,'confirmed');assert.equal(result.refreshing,false);
+  tick();result=render();assert.equal(result.refreshing,true,'Periodic visible online revalidation exposes its pending attempt');
+  visibility.visibilityState='hidden';const beforeHidden=requests.length;tick();render();assert.equal(requests.length,beforeHidden,'Hidden tabs do not poll');visibility.visibilityState='visible';network.onLine=false;tick();render();assert.equal(requests.length,beforeHidden,'Offline tabs do not poll');network.onLine=true;
+  session++;domain++;result=render();assert.equal(result.data,undefined,'Previous-session data is never shown');assert.equal(result.loading,true);
+  requests[4].resolve({name:'old-session'});await flush();assert.equal(render().data,undefined,'Late old-session refresh is ignored');requests[5].resolve({name:'new-session'});await flush();assert.equal(render().data.name,'new-session');
+  result=render('/api/projects');assert.equal(result.data,undefined,'Different paths cannot inherit customer data');assert.equal(result.loading,true);result=render(null);assert.equal(result.loading,false);assert.equal(result.data,undefined);
+ }finally{for(const effect of effects)effect?.cleanup?.();}
+ console.log('Query hook: manual/periodic refresh, error retry, superseded replies, tenant fence, route changes and hidden/offline polling passed.');
+}

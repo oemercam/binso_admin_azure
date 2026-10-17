@@ -185,3 +185,34 @@ bleiben im Workspace ausserhalb des Repositories erhalten, insbesondere unter
 `ux-final-acceptance-27cfiXXA_0Psjvj5HMYIQ` und
 `ux-final-sharded-chromium-27cfiXXA_0Psjvj5HMYIQ`.
 Kein Push, neuer PR, Merge, Deployment oder Verwerfen von Änderungen.
+
+## Fortsetzung: CI-first auf demselben Gesamtbranch
+
+Auf ausdrücklichen Folgeauftrag wird derselbe gesicherte Branch fortgesetzt;
+keine neue Gesamtanalyse und keine umfangreichen lokalen Browserläufe.
+`origin/main` wurde erneut abgeglichen: keine fehlenden Main-Commits, alle fünf
+bisherigen lokalen Arbeitscommits bleiben erhalten. Die offenen PRs #267 und
+#271 sind unverändert und werden nicht integriert. Der fachliche Gesamtumfang
+bleibt erhalten; CI-first ändert ausschliesslich den Ausführungsort der breiten QA.
+
+| Bereich | Übernommener beziehungsweise ergänzter Stand |
+| --- | --- |
+| Microsoft-UX / Standardisierung | Bestehende zentrale Foundation und jüngst integrierte Bereiche übernommen; zentrale Footer, Zeitgruppen, Suche/Filter und Headerziele wie oben implementiert. |
+| Legacy / Codebereinigung | Nachgewiesene Exporte, Demo-Daten, Assets, verwaiste Selektoren und redundante Deklarationen entfernt; Nachweisdateien bleiben verbindlich. |
+| Startanimation | Vorhandener AppStart mit originalem `/brand/icon-black.svg`, readinessgesteuertem Ende und Reduced-Motion-Regel bleibt erhalten; kein künstlicher Starttimer. |
+| Light / Dark / System | Bestehender gemeinsamer Resolver vor erstem Paint, Systemwechsel-/Storage-Synchronisierung und Theme-Persistenz bleiben erhalten. |
+| Navigation / Laden | Persistente Shell, bestehende Session-Deduplizierung, gezielte Dateninvalidierung und Session-Fences übernommen; keine neue Navigation oder zweite Foundation. |
+| Refresh-Zustand | Nachgewiesenen Fehler in useApiQuery korrigiert: manueller/periodischer Retry zählt jetzt als neuer Ladeversuch, ohne dieselben Session-Daten vorzeitig zu verwerfen. |
+
+Die neue Regression führt den tatsächlichen Query-Hook mit kontrollierten
+Effekten und verzögerten Antworten aus. Vor der Korrektur scheiterte sie an
+`Manual refresh exposes its pending attempt`. Sie prüft zusätzlich Fehler/Retry,
+überholte Antworten, Sichtbarkeit/Offline, Mandantenwechsel und Pfadwechsel.
+Keine API-, Berechtigungs-, Session-Laufzeit- oder fachlichen Schreibänderungen.
+
+Die vollständige Browser-/Linux-/Quality-/CodeQL-Abnahme wird im einzigen
+Integrations-PR ausgeführt. Historische lokale Teilresultate sind keine grüne
+Gesamtabnahme des neuen Heads. Fehlende Referenzzustände (insbesondere Dark und
+zusätzliche Operator-/Fehlerzustände) bleiben abgeleitet; physische Geräte,
+produktives SSO und Infrastruktur-Nachweise werden nicht behauptet.
+Kein automatischer Merge und kein Produktivdeployment.
