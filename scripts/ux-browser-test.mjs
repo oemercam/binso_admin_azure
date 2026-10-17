@@ -14,6 +14,7 @@ import {saveDomEvidence} from './ux-dom-evidence.mjs';
 import {verifyMobileLoginGeometry} from './auth-ux-browser.mjs';
 import {assertCustomerDossier,verifyCustomerStates} from './customer-ux-browser.mjs';
 import {assertNavigationToggle,verifyNavigationPersistence} from './navigation-ux-browser.mjs';
+import {verifyPreviewControls} from './document-controls-browser.mjs';
 
 // Synthetic UI fixtures: real business/RLS integration is covered by migration-test.mjs.
 // No request reaches a production system; unhandled fixture APIs fail closed.
@@ -726,10 +727,11 @@ try{
   const previous=page.getByRole('button',{name:'Vorherige Seite',exact:true}),next=page.getByRole('button',{name:'Nächste Seite',exact:true});
   const rendered=async number=>{await page.locator(`.pdf-page canvas[data-rendered-page="${number}"]`).waitFor();assert.equal(await page.locator('.pdf-page').count(),1,'Exactly one PDF page is mounted');await page.getByRole('status').filter({hasText:`Seite ${number} von ${expectedPdfPages}`}).waitFor();};
   await rendered(1);assert.equal(await previous.isDisabled(),true);
+  await verifyPreviewControls(page,{capture:width=>capture(page,{animations:'disabled',path:path.join(output,theme+'-pdf-controls-'+width+'.png')})});
   const fit=await page.locator('.pdf-page canvas').boundingBox(),stage=await page.locator('.document-page-stage').boundingBox();
   assert.ok(Math.abs(fit.width/fit.height-210/297)<.01&&fit.width<=stage.width&&fit.height<=stage.height,'Whole A4 page fits both dimensions');
   await capture(page,{animations:"disabled",path:path.join(output,`${theme}-430-pdf-preview.png`),fullPage:true});
-  for(let number=2;number<=expectedPdfPages;number++){await next.click();await rendered(number);await capture(page,{animations:'disabled',path:path.join(output,`${theme}-430-pdf-page-${number}.png`)});}
+  for(let number=2;number<=expectedPdfPages;number++){await next.focus();await next.press('Enter');await rendered(number);await capture(page,{animations:'disabled',path:path.join(output,`${theme}-430-pdf-page-${number}.png`)});}
   assert.equal(await next.isDisabled(),true);
   for(let number=expectedPdfPages-1;number>=1;number--){await previous.click();await rendered(number);}
   await page.getByRole('button',{name:'Vorschau vergrössern',exact:true}).click();
