@@ -12,6 +12,7 @@ import {monitoringFixture} from './observability-fixture.mjs';
 import {fullRoutes} from './qa-plan.mjs';
 import {saveDomEvidence} from './ux-dom-evidence.mjs';
 import {verifyMobileLoginGeometry} from './auth-ux-browser.mjs';
+import {assertCustomerDossier,verifyCustomerStates} from './customer-ux-browser.mjs';
 
 // Synthetic UI fixtures: real business/RLS integration is covered by migration-test.mjs.
 // No request reaches a production system; unhandled fixture APIs fail closed.
@@ -318,7 +319,7 @@ try{
     const page=await context.newPage();page.on("pageerror",error=>errors.push(page.url()+": "+error.message));
     await page.setViewportSize({width,height:1000});
     console.log(`Route ${route}`);const response=await page.goto(base+route);if(route==='/operator/wallboard'){await page.waitForURL('**/operator/login');assert.ok(page.url().endsWith('/operator/login'),'Demo cookie must not grant wallboard access');results.push({theme,width,route,passed:true,scope:'authenticated wallboard denial; positive matrix in observability-browser-test.mjs'});await page.close();continue;}if(route==='/dev/ux-lab'&&process.env.BINSO_UX_SERVER_MODE!=='dev'){assert.equal(response.status(),404,'UX-Lab is never published');results.push({theme,width,route,passed:true,scope:'production 404 guard'});await page.close();continue;}await page.waitForLoadState('networkidle');await page.waitForFunction(()=>!document.querySelector('.app-launch-screen,.app-session-loading,.app-launch'));
-    try{await page.locator(route.startsWith('/preview/')?'h1,h2':'h1').filter({visible:true}).first().waitFor({state:'visible'});}catch(error){console.log('Route render failure',route,width,errors,(await page.locator('body').innerText()).slice(0,5000));await capture(page,{path:path.join(output,`${theme}-${width}-${route.replaceAll('/','_')}-render-error.png`)});throw error;}
+    try{await page.locator(route.startsWith('/preview/')?'h1,h2':'h1').filter({visible:true}).first().waitFor({state:'visible'});}catch(error){console.log('Route render failure',route,width,errors,(await page.locator('body').innerText()).slice(0,5000));await capture(page,{path:path.join(output,`${theme}-${width}-${route.replace(/[^a-zA-Z0-9_.-]/g,'_')}-render-error.png`)});throw error;}
     assert.ok(!(await page.locator('body').innerText()).includes('UI fixture unavailable'),`${route}: a missing fixture cannot pass as content acceptance`);
     if(route==='/einstellungen/abonnement')await page.locator('.plan-hero').getByText('Aktiv',{exact:true}).waitFor();
     if(route==='/einstellungen/dokumente'){await page.getByRole('heading',{name:'Rechnungsstandard',exact:true}).waitFor();await page.getByText('Synthetischer Rechnungstext',{exact:true}).waitFor();}
@@ -406,6 +407,7 @@ try{
       if(initiallyCollapsed)await page.getByRole('button',{name:'Zeitverlauf ausblenden',exact:true}).click();
     }
     if(!process.env.BINSO_UX_BASELINE&&route==='/kunden/customer-one'){
+      await assertCustomerDossier(page);
       const dossier=page.locator('.detail-grid[data-layout="dossier"]');
       assert.equal(await dossier.count(),1,'Customer overview uses the shared reference dossier layout');
       assert.equal(await dossier.locator('[data-area="summary"] .metric').count(),2,'Customer overview shows actual yearly volume and open receivables');
@@ -454,7 +456,7 @@ try{
     if(process.env.BINSO_UX_A11Y==='1'&&[375,1440].includes(width)){
       await page.addScriptTag({path:process.env.BINSO_AXE_MODULE});
       const violations=await page.evaluate(async()=>{const {violations}=await window.axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21aa']}});return violations.map(({id,impact,description,nodes})=>({id,impact,description,targets:nodes.map(n=>n.target)}))});
-      await writeTestOutput(path.join(output,`${theme}-${width}-${route.replaceAll('/','_')}-a11y.json`),JSON.stringify(violations,null,2));
+      await writeTestOutput(path.join(output,`${theme}-${width}-${route.replace(/[^a-zA-Z0-9_.-]/g,'_')}-a11y.json`),JSON.stringify(violations,null,2));
       const blocking=violations.filter(v=>['serious','critical'].includes(v.impact));
       if(blocking.length){accessibilityFailures.push({route,theme,width,violations:blocking});console.log('A11Y',route,JSON.stringify(blocking));}
     }
@@ -469,8 +471,8 @@ try{
         return [{className:el.className,text:el.textContent?.slice(0,100),radius:css.borderRadius,background:css.backgroundColor,border:css.borderWidth,shadow:css.boxShadow,rect:{x:box.x,y:box.y,width:box.width,height:box.height}}];
       })};
     })});
-    if(process.env.BINSO_UX_CAPTURE_ALL==='1'||[1440,430].includes(width)&&['/dashboard','/rechnungen','/support/ticket-one','/produkte','/produkte/product-one','/spesen/expense-one','/support','/finanzen','/zeit','/finanzen/analyse','/mitarbeiter/neu','/mitarbeiter/employee-one','/projekte/neu'].includes(route))await capture(page,{animations:"disabled",path:path.join(output,`${theme}-${width}-${route.replaceAll('/','_')}.png`),fullPage:true});
-    if(process.env.BINSO_UX_CAPTURE_ALL==='1'&&width<=760&&await page.locator('nav.bottom-nav').isVisible()){const hide=await page.addStyleTag({content:'.page-container{visibility:hidden}'});await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${width}-${route.replaceAll('/','_')}-nav.png`)},page.locator('nav.bottom-nav'));await hide.evaluate(el=>{el.remove();return new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));});}
+    if(process.env.BINSO_UX_CAPTURE_ALL==='1'||[1440,430].includes(width)&&['/dashboard','/rechnungen','/support/ticket-one','/produkte','/produkte/product-one','/spesen/expense-one','/support','/finanzen','/zeit','/finanzen/analyse','/mitarbeiter/neu','/mitarbeiter/employee-one','/projekte/neu'].includes(route))await capture(page,{animations:"disabled",path:path.join(output,`${theme}-${width}-${route.replace(/[^a-zA-Z0-9_.-]/g,'_')}.png`),fullPage:true});
+    if(process.env.BINSO_UX_CAPTURE_ALL==='1'&&width<=760&&await page.locator('nav.bottom-nav').isVisible()){const hide=await page.addStyleTag({content:'.page-container{visibility:hidden}'});await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${width}-${route.replace(/[^a-zA-Z0-9_.-]/g,'_')}-nav.png`)},page.locator('nav.bottom-nav'));await hide.evaluate(el=>{el.remove();return new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));});}
     await page.waitForLoadState("networkidle");
     assert.deepEqual(errors,[],"Browser runtime errors after rendering");
     page.removeAllListeners("pageerror");await page.close();
@@ -511,6 +513,8 @@ try{
   await page.setViewportSize({width:430,height:900});
   if(process.env.BINSO_UX_DEBUG)page.on('response',async response=>{if(response.url().includes('/api/auth/session'))console.log('Session fixture response',response.status(),await response.text())});
   if(hasInteraction('customers')){
+    await verifyCustomerStates(page,{base,capture:state=>capture(page,{animations:'disabled',path:path.join(output,theme+'-customer-'+state+'.png'),fullPage:true})});
+
     customerPosts=0;customerReplays.clear();
     await navigate(base+'/kunden/neu');const customerSheet=()=>page.getByRole('dialog',{name:'Kunde erstellen',exact:true});await customerSheet().waitFor();await customerSheet().getByRole('button',{name:'Schliessen',exact:true}).click();await page.waitForURL(base+'/kunden');assert.equal(await page.getByRole('alertdialog').count(),0,'An unchanged customer sheet closes without warning');
     await navigate(base+'/kunden/neu');await customerSheet().getByLabel('Kundenname *',{exact:true}).fill(customer.name);await customerSheet().getByRole('heading',{name:'Mögliche Dubletten',exact:true}).waitFor();await customerSheet().getByLabel('Als separaten Kunden erfassen',{exact:true}).check();await customerSheet().getByLabel('Kundenname *',{exact:true}).fill('Minimal Company AG');await customerSheet().getByRole('heading',{name:'Mögliche Dubletten',exact:true}).waitFor({state:'hidden'});assert.equal(await customerSheet().getByText(/^K-\d+/).count(),0,'No generated customer number appears in creation');failCustomerCreate=true;await customerSheet().getByRole('button',{name:'Kunde speichern',exact:true}).click();await page.getByText('Synthetic customer creation unavailable',{exact:true}).waitFor();assert.equal(customerPosts,1);assert.equal(await customerSheet().getByLabel('Kundenname *',{exact:true}).inputValue(),'Minimal Company AG');

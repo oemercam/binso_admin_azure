@@ -1,0 +1,61 @@
+import assert from 'node:assert/strict';
+
+/** Shared dossier geometry; content and server financial values are not replaced. */
+export async function assertCustomerDossier(page){
+ const dossier=page.locator('.detail-grid[data-layout="dossier"]');
+ const context=dossier.locator(':scope > [data-area="context"]');
+ assert.equal(await context.count(),1,'Contact and address share one dossier context owner');
+ const facts=await context.locator('[data-area="facts"]').boundingBox();
+ const extra=await context.locator('[data-area="extra"]').boundingBox();
+ const records=await dossier.locator('[data-area="records"]').boundingBox();
+ if(page.viewportSize().width>1100){
+  assert.ok(Math.abs(facts.x-extra.x)<1,'Desktop context has one aligned contact/address column');
+  assert.ok(extra.y>=facts.y+facts.height&&extra.y-facts.y-facts.height<=25,'Address follows contact without waiting for the left financial rows');
+ }else assert.ok(extra.y>=records.y+records.height,'Mobile supplementary facts follow open invoices');
+ assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Customer dossier has no horizontal overflow');
+}
+
+/** Exercise real components using only isolated responses from the existing fixture. */
+export async function verifyCustomerStates(page,{base,capture=async()=>{}}){
+ const url=base+'/kunden/customer-one';
+ const endpoint='**/api/customers/customer-one?include=workspace';
+ let mode='loading',release;
+ const gate=new Promise(resolve=>{release=resolve});
+ // Page routes override the context fixture; fallback delegates to it explicitly.
+ const handler=async route=>{
+  if(mode==='loading')await gate;
+  if(mode==='error')return route.fulfill({status:503,json:{message:'Synthetic dossier unavailable'}});
+  if(mode==='empty')return route.fulfill({json:{item:{id:'customer-one',name:'Synthetic empty customer',status:'active'},contacts:[],documents:[],summary:{invoices:[],payments:[],credits:[]},statistics:[],activity:[]}});
+  return route.fallback();
+ };
+ await page.route(endpoint,handler);
+ try{
+  await page.goto(url);
+  await page.getByRole('status').getByText('Die Kundendaten werden abgerufen.',{exact:true}).waitFor();
+  await capture('loading');mode='error';release();
+  await page.getByRole('alert').getByText('Synthetic dossier unavailable',{exact:true}).waitFor();await capture('error');
+  mode='normal';await page.getByRole('button',{name:'Erneut versuchen',exact:true}).click();
+  await page.locator('.detail-grid[data-layout="dossier"]').waitFor();
+  await assertCustomerDossier(page);
+  await page.getByRole('tab',{name:'Übersicht',exact:true}).focus();await page.keyboard.press('ArrowRight');
+  await page.locator('.contact-main').waitFor();assert.equal(await page.getByRole('tab',{name:'Kontakte',exact:true}).getAttribute('aria-selected'),'true');
+  const contact=page.locator('button.contact-main');await contact.focus();await contact.press('Enter');
+  const dialog=page.getByRole('dialog',{name:'Kontakt bearbeiten',exact:true});await dialog.waitFor();await capture('contact');
+  await page.keyboard.press('Escape');await dialog.waitFor({state:'hidden'});
+  assert.equal(await contact.evaluate(el=>el===document.activeElement),true,'Contact dialog restores keyboard focus');
+  await page.getByRole('tab',{name:'Dokumente',exact:true}).click();
+  await page.locator('.bo-statistics').waitFor();assert.equal(await page.locator('.bo-statistics .metric').count(),3,'Document tab retains actual financial metrics');await capture('documents');
+  const session='**/api/auth/session';
+  const readOnly=route=>route.fulfill({json:{authenticated:true,tenant:{id:'fixture-tenant',role:'owner',plan:'pro',readOnly:true}}});
+  await page.route(session,readOnly);
+  try{
+   await page.goto(url+'?tab=contacts');await page.locator('button.contact-main').waitFor();
+   assert.equal(await page.locator('button.contact-main').isDisabled(),true,'Read-only contact identity cannot open an edit form');
+   assert.equal(await page.getByRole('button',{name:'Kontakt',exact:true}).isDisabled(),true,'Read-only cannot create contacts');
+   assert.equal(await page.getByRole('dialog').count(),0);await capture('read-only');
+  }finally{await page.unroute(session,readOnly)}
+  mode='empty';await page.goto(url);await page.getByText('Keine Kontakte erfasst',{exact:true}).waitFor();
+  await page.getByText('Keine Rechnungen erfasst',{exact:true}).waitFor();await capture('empty');
+  await page.getByRole('tab',{name:'Aktivitäten',exact:true}).click();await page.getByText('Keine Geschäftsaktivität vorhanden',{exact:true}).waitFor();
+ }finally{release();await page.unroute(endpoint,handler)}
+}
