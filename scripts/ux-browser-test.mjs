@@ -319,7 +319,7 @@ try{
     const page=await context.newPage();page.on("pageerror",error=>errors.push(page.url()+": "+error.message));
     await page.setViewportSize({width,height:1000});
     console.log(`Route ${route}`);const response=await page.goto(base+route);if(route==='/operator/wallboard'){await page.waitForURL('**/operator/login');assert.ok(page.url().endsWith('/operator/login'),'Demo cookie must not grant wallboard access');results.push({theme,width,route,passed:true,scope:'authenticated wallboard denial; positive matrix in observability-browser-test.mjs'});await page.close();continue;}if(route==='/dev/ux-lab'&&process.env.BINSO_UX_SERVER_MODE!=='dev'){assert.equal(response.status(),404,'UX-Lab is never published');results.push({theme,width,route,passed:true,scope:'production 404 guard'});await page.close();continue;}await page.waitForLoadState('networkidle');await page.waitForFunction(()=>!document.querySelector('.app-launch-screen,.app-session-loading,.app-launch'));
-    try{await page.locator(route.startsWith('/preview/')?'h1,h2':'h1').filter({visible:true}).first().waitFor({state:'visible'});}catch(error){console.log('Route render failure',route,width,errors,(await page.locator('body').innerText()).slice(0,5000));await capture(page,{path:path.join(output,`${theme}-${width}-${route.replaceAll('/','_')}-render-error.png`)});throw error;}
+    try{await page.locator(route.startsWith('/preview/')?'h1,h2':'h1').filter({visible:true}).first().waitFor({state:'visible'});}catch(error){console.log('Route render failure',route,width,errors,(await page.locator('body').innerText()).slice(0,5000));await capture(page,{path:path.join(output,`${theme}-${width}-${route.replace(/[^a-zA-Z0-9_.-]/g,'_')}-render-error.png`)});throw error;}
     assert.ok(!(await page.locator('body').innerText()).includes('UI fixture unavailable'),`${route}: a missing fixture cannot pass as content acceptance`);
     if(route==='/einstellungen/abonnement')await page.locator('.plan-hero').getByText('Aktiv',{exact:true}).waitFor();
     if(route==='/einstellungen/dokumente'){await page.getByRole('heading',{name:'Rechnungsstandard',exact:true}).waitFor();await page.getByText('Synthetischer Rechnungstext',{exact:true}).waitFor();}
@@ -456,7 +456,7 @@ try{
     if(process.env.BINSO_UX_A11Y==='1'&&[375,1440].includes(width)){
       await page.addScriptTag({path:process.env.BINSO_AXE_MODULE});
       const violations=await page.evaluate(async()=>{const {violations}=await window.axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21aa']}});return violations.map(({id,impact,description,nodes})=>({id,impact,description,targets:nodes.map(n=>n.target)}))});
-      await writeTestOutput(path.join(output,`${theme}-${width}-${route.replaceAll('/','_')}-a11y.json`),JSON.stringify(violations,null,2));
+      await writeTestOutput(path.join(output,`${theme}-${width}-${route.replace(/[^a-zA-Z0-9_.-]/g,'_')}-a11y.json`),JSON.stringify(violations,null,2));
       const blocking=violations.filter(v=>['serious','critical'].includes(v.impact));
       if(blocking.length){accessibilityFailures.push({route,theme,width,violations:blocking});console.log('A11Y',route,JSON.stringify(blocking));}
     }
@@ -471,8 +471,8 @@ try{
         return [{className:el.className,text:el.textContent?.slice(0,100),radius:css.borderRadius,background:css.backgroundColor,border:css.borderWidth,shadow:css.boxShadow,rect:{x:box.x,y:box.y,width:box.width,height:box.height}}];
       })};
     })});
-    if(process.env.BINSO_UX_CAPTURE_ALL==='1'||[1440,430].includes(width)&&['/dashboard','/rechnungen','/support/ticket-one','/produkte','/produkte/product-one','/spesen/expense-one','/support','/finanzen','/zeit','/finanzen/analyse','/mitarbeiter/neu','/mitarbeiter/employee-one','/projekte/neu'].includes(route))await capture(page,{animations:"disabled",path:path.join(output,`${theme}-${width}-${route.replaceAll('/','_')}.png`),fullPage:true});
-    if(process.env.BINSO_UX_CAPTURE_ALL==='1'&&width<=760&&await page.locator('nav.bottom-nav').isVisible()){const hide=await page.addStyleTag({content:'.page-container{visibility:hidden}'});await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${width}-${route.replaceAll('/','_')}-nav.png`)},page.locator('nav.bottom-nav'));await hide.evaluate(el=>{el.remove();return new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));});}
+    if(process.env.BINSO_UX_CAPTURE_ALL==='1'||[1440,430].includes(width)&&['/dashboard','/rechnungen','/support/ticket-one','/produkte','/produkte/product-one','/spesen/expense-one','/support','/finanzen','/zeit','/finanzen/analyse','/mitarbeiter/neu','/mitarbeiter/employee-one','/projekte/neu'].includes(route))await capture(page,{animations:"disabled",path:path.join(output,`${theme}-${width}-${route.replace(/[^a-zA-Z0-9_.-]/g,'_')}.png`),fullPage:true});
+    if(process.env.BINSO_UX_CAPTURE_ALL==='1'&&width<=760&&await page.locator('nav.bottom-nav').isVisible()){const hide=await page.addStyleTag({content:'.page-container{visibility:hidden}'});await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${width}-${route.replace(/[^a-zA-Z0-9_.-]/g,'_')}-nav.png`)},page.locator('nav.bottom-nav'));await hide.evaluate(el=>{el.remove();return new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));});}
     await page.waitForLoadState("networkidle");
     assert.deepEqual(errors,[],"Browser runtime errors after rendering");
     page.removeAllListeners("pageerror");await page.close();
