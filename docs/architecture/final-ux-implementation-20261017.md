@@ -149,3 +149,39 @@ mit 14 Ansichten endete im Navigationstimeout; kein Anwendungsfehler daraus
 abgeleitet und keine Assertion verlängert oder ausgeschaltet. Endgültige
 Ergebnisse, verbleibende Fehler und der einmalige Integrations-PR werden nach
 Abschluss hier ergänzt. Noch keine vollständige Abnahme behauptet.
+
+## Kontrollierter Stopp auf Benutzerauftrag
+
+Der Gesamtauftrag wird vor vollständiger Abnahme beendet. Entwicklungsbranch:
+`ux/final-microsoft-implementation`. Sämtliche bisherigen Codeänderungen sind
+bereits im lokalen Commit `7ad8e9dcc8f892c2d8d1ded7557ad4a42bb4bd1b` und seinen
+vorherigen drei Arbeitscommits gesichert; der Arbeitsbaum war vor diesem
+Dokumentationsnachtrag sauber. Dieser Nachtrag wird separat lokal committed.
+
+Implementiert: nachgewiesene Export-/Demo-/Asset- und CSS-Bereinigung,
+16 zentrale FormActions-Footer, zentrale Zeitgruppen/Suche/Filter,
+44-px-Headerziele, unveränderte Kundennamen bei Übersetzung sowie die
+Animations-Stabilisierung der weiterhin exakten Browser-Geometrieprüfung.
+Geschäftslogik, Sicherheitskontrollen und offene PRs #267/#271 bleiben erhalten.
+
+Verifiziert: Lint, Typecheck und lokaler Build; 42 von 43 lokalen Skriptprüfungen
+bestanden. Die unveränderte POSIX-Dateirechteprüfung benötigt Linux und ist kein
+lokaler Pass. Betroffene Foundation-/UX-Verträge und die neue positive/negative
+Header-/Animationsregression bestanden. Frischer Build:
+`27cfiXXA_0Psjvj5HMYIQ`. Im abschliessenden Chromium-Lauf waren beim letzten
+bestätigten Zwischenstand alle 170 Fälle bei 320 px (85 Routen, beide Themes)
+bestanden. Weitere teilweise ausgeführte Fälle zählen nicht als Gesamtabnahme.
+
+Offen: restliche Chromium-Matrix und Interaktionen, vollständige WebKit-Matrix,
+abschliessender Referenzvergleich sowie die im seriellen Abschlusslauf noch
+vorgesehenen PWA-/Lade-/Registrierungs-/Sprach-/Komponenten-Lab-Prüfungen.
+Frühere einzelne Teilprüfungen ersetzen diesen offenen Gesamtabschluss nicht.
+Linux-Pflichtprüfungen, abschliessende visuelle Bewertung und der einzige
+Integrations-PR sind noch ausstehend. Keine vollständige UX-Abnahme behauptet.
+
+Die eigenen umfangreichen lokalen Testprozesse werden nach dieser Sicherung
+kontrolliert beendet. Vorhandene Logs, Screenshots, Hilfsskripte und Teilresultate
+bleiben im Workspace ausserhalb des Repositories erhalten, insbesondere unter
+`ux-final-acceptance-27cfiXXA_0Psjvj5HMYIQ` und
+`ux-final-sharded-chromium-27cfiXXA_0Psjvj5HMYIQ`.
+Kein Push, neuer PR, Merge, Deployment oder Verwerfen von Änderungen.
