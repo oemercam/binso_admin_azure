@@ -184,9 +184,6 @@
 .document-summary-row.is-compact>.document-summary-amount{grid-column:2;grid-row:1;align-self:baseline}
 .document-summary-row.is-compact .document-summary-amount>strong{font-size:var(--type-control);font-weight:400}
 @media (min-width:761px) and (max-width:1100px){
-.invoice-master-detail:not(:has(>.invoice-tablet-preview)){
-    grid-template-columns:minmax(0,1fr);
-  }
 .document-line-items{min-width:0}
 }
 @media (min-width:1101px){

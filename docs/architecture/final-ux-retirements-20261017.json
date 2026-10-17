@@ -1506,52 +1506,40 @@
       "file": "app/design-system/operator.css",
       "selector": ".bo-monitor-detail-metrics summary>span",
       "line": 595
-    }
-  ],
-  "retainedLogicalCandidates": [
+    },
     {
-      "file": "app/design-system/collections.css",
-      "line": 233,
-      "selector": ".page-container> :is(.toolbar,.finance-range,.payment-summary-strip,.tabs):first-of-type",
-      "absent": [
-        "payment-summary-strip"
-      ]
+      "file": "app/design-system/workflows.css",
+      "selector": ".tablet-master-detail:not(:has(>.tablet-detail))",
+      "line": 535,
+      "reason": "Absent positive ancestor; logical descendant condition cannot make it match"
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".tablet-master-detail:not(:has(>aside.tablet-detail))",
+      "line": 535,
+      "reason": "Absent positive ancestor; logical descendant condition cannot make it match"
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "selector": ".tablet-master-detail:has(>.tablet-detail)",
+      "line": 661,
+      "reason": "Absent positive ancestor; logical descendant condition cannot make it match"
     },
     {
       "file": "app/design-system/documents.css",
-      "line": 191,
       "selector": ".invoice-master-detail:not(:has(>.invoice-tablet-preview))",
-      "absent": [
-        "invoice-master-detail",
-        "invoice-tablet-preview"
-      ]
-    },
+      "line": 187,
+      "sourceCheckpoint": "f4e41442",
+      "reason": "Absent positive ancestor; removed before the later grouped-selector assertion stopped the local transformation. Current diff and original AST verified."
+    }
+  ],
+  "retainedLogicalCandidates": [],
+  "logicalRewrites": [
     {
-      "file": "app/design-system/workflows.css",
-      "line": 632,
-      "selector": ".tablet-master-detail:not(:has(>.tablet-detail))",
-      "absent": [
-        "tablet-master-detail",
-        "tablet-detail"
-      ]
-    },
-    {
-      "file": "app/design-system/workflows.css",
-      "line": 632,
-      "selector": ".tablet-master-detail:not(:has(>aside.tablet-detail))",
-      "absent": [
-        "tablet-master-detail",
-        "tablet-detail"
-      ]
-    },
-    {
-      "file": "app/design-system/workflows.css",
-      "line": 783,
-      "selector": ".tablet-master-detail:has(>.tablet-detail)",
-      "absent": [
-        "tablet-master-detail",
-        "tablet-detail"
-      ]
+      "file": "app/design-system/collections.css",
+      "before": ".page-container> :is(.toolbar,.finance-range,.payment-summary-strip,.tabs):first-of-type",
+      "after": ".page-container> :is(.toolbar,.finance-range,.tabs):first-of-type",
+      "reason": "Remove only absent :is alternative; every alternative has identical single-class specificity, so active matching and specificity remain equal"
     }
   ]
 }

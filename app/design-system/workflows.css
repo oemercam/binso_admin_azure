@@ -532,10 +532,6 @@
 .dashboard-grid{grid-template-columns:1fr}
 .quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 .expense-layout{grid-template-columns:220px minmax(0,1fr)}
-.tablet-master-detail:not(:has(>.tablet-detail)),
-  .tablet-master-detail:not(:has(>aside.tablet-detail)){
-    grid-template-columns:minmax(0,1fr);
-  }
 .toolbar{width:100%;min-width:0}
 .toolbar{
     display:grid;
@@ -657,9 +653,6 @@
     margin-bottom:10px;
     gap:8px;
     flex-wrap:nowrap;
-  }
-.tablet-master-detail:has(>.tablet-detail){
-    grid-template-columns:minmax(var(--desktop-list-min),1.05fr) minmax(var(--desktop-detail-min),.95fr);
   }
 .entity-hero{margin-bottom:14px}
 .dashboard-grid{gap:var(--desktop-workspace-gap);margin-top:var(--desktop-section-gap)}

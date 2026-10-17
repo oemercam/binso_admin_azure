@@ -29,11 +29,14 @@ konkrete neue Navigationsreferenz bleiben ihre geprüften Verträge erhalten.
   dynamisch getestetes `responsiveQrSvg` bleiben ausdrücklich erhalten.
 - Sieben unbenutzte Demo-Tabellenexporte und zwei nicht verwendete Imports
   entfernt. Der tatsächlich benötigte Kundendemo-Fallback bleibt erhalten.
-- 293 verwaiste Selektorvorkommen an acht bestehenden CSS-Ownern entfernt.
+- 297 verwaiste Selektorvorkommen an acht bestehenden CSS-Ownern entfernt.
   Aktive TS/TSX/JS/MJS-Quellen einschliesslich Tests und dynamischer Präfixe
-  wurden geprüft. Logische Pseudoselektoren wurden nicht blind mitgelöscht.
-  Der maschinenlesbare Nachweis listet jede Entfernung und die konservativ
-  beibehaltenen Kandidaten: [Selektoren/Exporte](final-ux-retirements-20261017.json).
+  wurden geprüft. Vier verbleibende logische Selektoren haben ebenfalls einen
+  nachweislich nicht erzeugten positiven Vorfahren und entfallen. In einer `:is`-Liste
+  entfällt nur die tote Alternative; alle Alternativen besitzen dieselbe
+  Einzelklassenspezifität, die aktive Kaskade bleibt daher gleich. Der Nachweis
+  listet jede Entfernung und diese begründete Umschreibung:
+  [Selektoren/Exporte](final-ux-retirements-20261017.json).
 - 16 identische, später nochmals gesetzte Deklarationen entfernt; Media-Kontexte,
   Selektorspezifität und verbleibende Reihenfolge bleiben erhalten. Keine
   unterschiedlichen Werte oder progressiven Fallbacks pauschal zusammengelegt.
