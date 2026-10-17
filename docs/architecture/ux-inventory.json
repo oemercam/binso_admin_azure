@@ -197980,24 +197980,6 @@
       ]
     },
     {
-      "file": "components/marketing.tsx",
-      "name": "ProductScreen",
-      "line": 128,
-      "usedBy": []
-    },
-    {
-      "file": "components/marketing.tsx",
-      "name": "ProductGallery",
-      "line": 133,
-      "usedBy": []
-    },
-    {
-      "file": "components/marketing.tsx",
-      "name": "MarketingFaq",
-      "line": 143,
-      "usedBy": []
-    },
-    {
       "file": "components/monitoring-chart.tsx",
       "name": "MonitoringChart",
       "line": 7,
