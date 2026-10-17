@@ -158,3 +158,42 @@ GitHub-Pflichtprüfungen durchlaufen; kein automatischer Merge oder Deploy.
 Keine Gates, Assertions oder Screenshotbaselines verändert; generierte Fingerprints nur über
 `node scripts/ux-inventory.mjs` und
 `node scripts/foundation-integration-report.mjs` aktualisiert.
+
+## Paket 2: verwaiste UI-Erzeuger und Selektoren
+
+PR #269 ist mit Commit `87c99b04d9ae7a522f6dc2de704ab46d26045a59`
+regulär integriert. Sämtliche 14 Quality-Jobs einschliesslich Scanner,
+Chromium-/WebKit-Shards, UX-Compliance und Quality sowie CodeQL erfolgreich;
+keine offenen Review-Threads oder Änderungen am geprüften Head.
+
+Entfernt: der unreferenzierte `SheetLink`-Export und sein alleiniger
+`usePageAccess`-Import in der Shell sowie genau 16 verwaiste Regeln:
+zehn `.product-screen*`-/`.product-gallery*`-Regeln in `marketing.css`,
+vier `.product-screen*`-Regeln in `workflows.css` und zwei
+`.sheet-menu-icon`-Regeln in `overlays.css`. Der tatsächliche mobile
+Menüpfad verwendet bereits die zentrale, berechtigungsprüfende `ActionRow`.
+Keine Berechtigungsprüfung eines erreichbaren Aufrufers entfernt.
+
+Nachweis vor Entfernung: Symbol-/Importprüfung, Suche aller aktiven TS/TSX/JS-
+Quellen einschliesslich dynamischer Testaufrufe und Kontrolle des Route-/Render-
+Inventars. Ein AST-Vergleich bestätigt: alle beibehaltenen CSS-Selektoren,
+Media-Kontexte, Deklarationen und ihre Kaskadenreihenfolge bleiben exakt gleich.
+Die 16 entfernten Regeln besitzen keinen verbleibenden Klassen-Erzeuger.
+Die tatsächlich verwendeten FAQ-, Capture-, ActionRow- und Navigationsregeln
+bleiben erhalten. Keine neue lokale CSS-Ausnahme eingeführt.
+
+Die grossen Inventardiffs entstehen durch neu nummerierte CSS-Regel-IDs,
+Quellzeilen und deren Routenverknüpfungen nach dem vorgesehenen Generatorlauf;
+sie sind keine breitflächige UI-Änderung. Aktuell 2.624 statt 2.640 CSS-Regeln
+und 198 statt 199 Komponentendeklarationen, weiterhin 76 Seiten und 103 API-Routen.
+
+Bereichsprüfungen bestanden: Navigationsvertrag, CSS-Architektur,
+UX-Style-Adversarialtest, UI-Foundation, UX-Regressionen, UX-Vertrag,
+Lokalisierungsabdeckung und aktueller Dependency-Fingerprint.
+Vorher: acht gezielte öffentliche Browserfälle (Light/Dark, 390/1440 px),
+keine vollständige Browsermatrix. Vollständiges Lint, Typecheck und
+Produktionsbuild bestanden. Nachher zusätzlich 20 gezielte Browserfälle:
+Start-/Produktseite sowie Login, Kundenliste und Dossier, jeweils Light/Dark
+bei 390/1440 px. Screenshots und DOM-Nachweise liegen im lokalen
+Auftragsartefakt `cleanup-orphan-ui-after`; Originalreferenzen separat in
+`ux-next-reference`. Keine neue visuelle Gesamtfreigabe oder Screenshotbaseline.
