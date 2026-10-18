@@ -226,7 +226,9 @@ export function CustomerForm({customerId}:{customerId?:string}={}) {
       setToast("Kunde gespeichert.");
       setSavedRecord(true);
       recovery.clear();allowDraftNavigation();
-      router.push("/kunden/"+encodeURIComponent(savedCustomerId!));
+      const destination="/kunden/"+encodeURIComponent(savedCustomerId!);
+      if(customerId)window.setTimeout(()=>router.push(destination),700);
+      else router.push(destination);
     }catch(error){
       saveRecordPending.current=false;setSavingRecord(false);
       setToast(error instanceof Error?error.message:"Kunde konnte nicht gespeichert werden.");
