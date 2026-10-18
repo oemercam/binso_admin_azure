@@ -180,7 +180,8 @@ try{
   projectFixture={...projectSeed};teamMemberRole='member';supportMessages=[];let preferenceTheme=theme;
   operatorAccount.plan='pro';
   browser=await browserType.launch(launchOptions);
-  context=await browser.newContext({...(process.env.BINSO_UX_DEVICE?engines.devices[process.env.BINSO_UX_DEVICE]:{}),viewport:{width:1440,height:1000},colorScheme:"dark",serviceWorkers:"block"});
+  const createFixtureContext=async()=>{
+  const context=await browser.newContext({...(process.env.BINSO_UX_DEVICE?engines.devices[process.env.BINSO_UX_DEVICE]:{}),viewport:{width:1440,height:1000},colorScheme:"dark",serviceWorkers:"block"});
   await context.addCookies([{name:'binso_demo',value:'1',url:base},{name:'binso_operator_demo',value:'1',url:base}]);
   if(process.env.BINSO_UX_OPERATOR_PRODUCTION==='1'){if(process.env.BINSO_UX_MATRIX_ONLY!=='1')throw Error('Production operator fixture requires isolated matrix');await context.addInitScript(()=>{const selectClient=()=>document.querySelector('[data-operator-demo="true"]')?.setAttribute('data-operator-demo','false');new MutationObserver(selectClient).observe(document,{childList:true,subtree:true,attributes:true,attributeFilter:['data-operator-demo']});selectClient()});}
   await context.addInitScript(mode=>{localStorage.setItem('binso.theme.mode',mode);localStorage.setItem('binso.privacy.preferences.v1',JSON.stringify({essential:true,performance:false,updatedAt:'2026-10-08'}))},theme);
@@ -309,6 +310,9 @@ try{
    if(!data)console.log('Missing isolated API fixture: '+p);
    return route.fulfill({status:data?200:503,json:data??{message:'UI fixture unavailable'}});
   });
+  return context;
+  };
+  context=await createFixtureContext();
   const trackedPage=async()=>{const next=await context.newPage();next.on('pageerror',error=>{if(process.env.BINSO_UX_DEBUG)console.log('PAGE ERROR',error.stack);errors.push(next.url()+': '+error.message)});if(process.env.BINSO_UX_DEBUG)next.on('requestfailed',req=>console.log('FAILED REQUEST',req.url(),req.failure()));return next};
   let page=await trackedPage();
   // Hard fixture resets use a new document; real Link navigation stays on the same page.
@@ -316,6 +320,10 @@ try{
   const navigate=async(...args)=>{await page.waitForLoadState('networkidle');assert.deepEqual(errors,[],'Runtime errors before scenario reset');const viewport=page.viewportSize();page.removeAllListeners("pageerror");await page.close();page=await trackedPage();await page.setViewportSize(viewport);const response=await page.goto(...args);await page.waitForLoadState('networkidle');return response};
   const routes=fullRoutes;
   await Promise.all((process.env.BINSO_UX_WIDTHS?.split(",").map(Number)??[1440,1024,820,430,375]).map(async width=>{
+   // Independent viewport cases must not race through the shared navigation preference.
+   // Each context retains real same-origin storage events and the exact persistence assertions.
+   const context=await createFixtureContext();
+   try{
    console.log(`Checking ${theme} ${width}px`);
    for(const route of (process.env.BINSO_UX_ROUTES?.split(",")??routes)){
     // Independent route cases must not abort the preceding page’s delayed RSC prefetch.
@@ -483,6 +491,7 @@ try{
     assert.deepEqual(errors,[],"Browser runtime errors after rendering");
     page.removeAllListeners("pageerror");await page.close();
    }
+   }finally{await context.close();}
   }));
   if(hasInteraction('chrome')&&process.env.BINSO_UX_MATRIX_ONLY!=='1'){
     await verifyNavigationPersistence(page,{base,capture:state=>capture(page,{animations:'disabled',path:path.join(output,theme+'-navigation-'+state+'.png'),fullPage:true})});
@@ -630,10 +639,10 @@ try{
    await navigate(base+'/finanzen');await page.waitForLoadState('networkidle');
    const overview=page.locator('.bo-cash-overview');
    assert.equal(await overview.locator('.metric').count(),4,'Finance opens the compact original overview');
-   assert.equal(await overview.locator('.metric>strong').first().textContent(),'CHF 400');
+   assert.equal(await overview.locator('.metric>strong').first().textContent(),'CHF 400.00');
    await overview.getByRole('combobox',{name:'Statistikzeitraum',exact:true}).selectOption('6');
-   assert.equal(await overview.locator('.metric>strong').first().textContent(),'CHF 640');
-   assert.equal(await overview.locator('.metric>strong').nth(1).textContent(),'CHF 200','Snapshot balances stay independent of the selected period');
+   assert.equal(await overview.locator('.metric>strong').first().textContent(),'CHF 640.00');
+   assert.equal(await overview.locator('.metric>strong').nth(1).textContent(),'CHF 200.00','Snapshot balances stay independent of the selected period');
    assert.equal(await overview.getByRole('button').count(),6,'Monthly development uses six actual month buckets');
    await overview.getByRole('button').last().click();assert.match(await overview.locator('output').textContent(),/CHF 400/);
    await page.getByRole('link',{name:'Finanzanalyse',exact:true}).click();await page.waitForLoadState('networkidle');
@@ -1215,7 +1224,7 @@ try{
    for(const [name,value] of [['detail',/1[’']561\.97/],['list',/1[’']561\.97/],['customer',/1[’']561\.97/],['finance',/1[’']561\.97/],['payments',/1[’']000\.00/],['dashboard',/1[’']561\.97/],['customerOverview',/1[’']561\.97/],['activity','Zahlung erhalten']]){
     await tabs[name].waitForFunction(()=>window.v215ConsumerChanges.some(message=>message.domains?.includes('payments')),undefined,{polling:100});await tabs[name].bringToFront();await tabs[name].getByText(value,{exact:typeof value==='string'}).first().waitFor();assert.equal(await tabs[name].evaluate(()=>window.v215ConsumerMarker),'same-document',name+' updates without a reload');
    }
-   for(const [name,amount] of [['dashboard',"CHF 1'000"],['finance',"CHF 1'561.97"],['customerOverview',"CHF 1'561.97"]]){
+   for(const [name,amount] of [['dashboard',"CHF 1'000.00"],['finance',"CHF 1'561.97"],['customerOverview',"CHF 1'561.97"]]){
     await tabs[name].bringToFront();assert.equal((await tabs[name].locator(name==='customerOverview'?'.detail-grid [data-area="summary"] .metric>strong':'.bo-cash-overview .metric>strong').nth(1).textContent())?.replaceAll('’',"'"),amount,name+' domain metric refreshes from the same confirmed ledger');
    }
    for(const tab of Object.values(tabs))await tab.close();dataPaymentMode=false;Object.assign(invoice,priorInvoice);summary.invoices[0].open_amount=priorOpenAmount;collections.payments=collections.payments.filter(row=>row.id!=='foundation-payment');collections.customers=collections.customers.filter(row=>row.id!=='customer-two');Object.assign(customer,priorCustomer);
