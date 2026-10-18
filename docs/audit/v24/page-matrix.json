@@ -1,5 +1,5 @@
 {
-  "commit": "b9a27716d5dcae89945951fe0070e0ba8eb8925d",
+  "commit": "1a055d997f39f32a5f7e18b37d3f35331814ec72",
   "method": "Existing TypeScript AST dependency inventory; conditional reachability is not runtime proof",
   "pages": [
     {
@@ -1935,6 +1935,7 @@
         "components/header-panel-content.tsx#AccountPanel",
         "components/locale-switcher.tsx#LocaleSwitcher",
         "components/binso-ux.tsx#SettingsGroup",
+        "components/settings-navigation.tsx#settingsGroups",
         "components/header-panel-content.tsx#NotificationPanel",
         "components/header-panel-content.tsx#PanelNotification",
         "components/binso-ux.tsx#ActionSheet",
@@ -3745,17 +3746,17 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 108,
+          "line": 109,
           "component": "components/security-settings-page.tsx#SecuritySettingsPage"
         },
         {
           "tag": "FormSheet",
-          "line": 116,
+          "line": 117,
           "component": "components/security-settings-page.tsx#SecuritySettingsPage"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 151,
+          "line": 152,
           "component": "components/security-settings-page.tsx#SecuritySettingsPage"
         },
         {

@@ -643,10 +643,10 @@ try{
    await navigate(base+'/finanzen');await page.waitForLoadState('networkidle');
    const overview=page.locator('.bo-cash-overview');
    assert.equal(await overview.locator('.metric').count(),4,'Finance opens the compact original overview');
-   assert.equal(await overview.locator('.metric>strong').first().textContent(),'CHF 400');
+   assert.equal(await overview.locator('.metric>strong').first().textContent(),'CHF 400.00');
    await overview.getByRole('combobox',{name:'Statistikzeitraum',exact:true}).selectOption('6');
-   assert.equal(await overview.locator('.metric>strong').first().textContent(),'CHF 640');
-   assert.equal(await overview.locator('.metric>strong').nth(1).textContent(),'CHF 200','Snapshot balances stay independent of the selected period');
+   assert.equal(await overview.locator('.metric>strong').first().textContent(),'CHF 640.00');
+   assert.equal(await overview.locator('.metric>strong').nth(1).textContent(),'CHF 200.00','Snapshot balances stay independent of the selected period');
    assert.equal(await overview.getByRole('button').count(),6,'Monthly development uses six actual month buckets');
    await overview.getByRole('button').last().click();assert.match(await overview.locator('output').textContent(),/CHF 400/);
    await page.getByRole('link',{name:'Finanzanalyse',exact:true}).click();await page.waitForLoadState('networkidle');

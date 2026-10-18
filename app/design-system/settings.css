@@ -112,7 +112,7 @@
 .plan-price{display:flex;align-items:baseline;gap:5px}
 .plan-price strong{font-size:var(--type-section)}
 .plan-price span{color:var(--color-muted);font-size:var(--type-metadata)}
-.subscription-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.subscription-detail-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:14px}
 .usage-row{margin-top:17px;display:flex;justify-content:space-between;gap:12px;font-size:var(--type-metadata)}
 .payment-method{min-height:64px;margin-top:18px;display:flex;align-items:center;gap:12px}
 .payment-method>div{flex:1}
@@ -189,8 +189,8 @@
 .settings-context-navigation .searchbox{margin-bottom:20px}
 @media (min-width:761px){
 .settings-overview nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:40px}
-.settings-workspace{display:grid;grid-template-columns:220px minmax(0,1fr);gap:32px;align-items:start}
-.settings-page-content{min-width:0}
+.settings-workspace{display:grid;grid-template-columns:220px minmax(0,1fr);gap:32px;align-items:start;container-type:inline-size}
+.settings-page-content{min-width:0;container-type:inline-size}
 }
 @media (max-width:760px){
 .settings-context-navigation{display:none}
@@ -251,7 +251,7 @@
   }
 .subscription-detail-grid{
     width:100%;
-    grid-template-columns:repeat(2,minmax(0,1fr));
+    grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));
     gap:0;
     border:0;
   }
@@ -362,3 +362,22 @@
 /* Reference profile identity; original editable data stays in the shared form. */
 .settings-profile{display:flex;flex-direction:column;align-items:center;text-align:center;padding-block:24px;border:0}
 .settings-profile>div{min-width:0;max-width:100%;overflow-wrap:anywhere}
+
+/* Settings content adapts to its own width; the primary shell stays at 760/761. */
+/* This is only the in-page settings explorer. The primary app sidebar and dock
+   retain their 760/761px boundary and all desktop navigation assertions. */
+@container (max-width:700px){
+.settings-context-navigation{display:none}
+.settings-mobile-navigation{display:block;grid-column:1/-1;border-bottom:1px solid var(--color-line)}
+.settings-mobile-navigation>summary{display:flex;align-items:center;gap:12px;min-height:var(--touch);padding-block:10px;color:var(--app-action-accent);cursor:pointer}
+.settings-mobile-navigation[open]>summary{margin-bottom:12px}
+.settings-page-content{grid-column:1/-1}
+}
+@container (max-width:540px){
+.plan-hero{grid-template-columns:minmax(0,1fr);gap:16px}
+.plan-hero>:last-child{grid-column:auto;justify-self:start}
+.subscription-detail-grid{grid-template-columns:minmax(0,1fr)}
+.subscription-detail-grid>.surface{padding-inline:0}
+.subscription-detail-grid>.surface+.surface{border-left:0;border-top:1px solid var(--color-line)}
+.section-title h2,.context-block{min-width:0;overflow-wrap:anywhere}
+}

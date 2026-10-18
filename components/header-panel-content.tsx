@@ -9,6 +9,7 @@ import {useState} from "react";
 import {usePageAccess} from "@/lib/client/page-access";
 import {Avatar} from "./avatar";
 import {ActionRow,SettingsGroup} from "./binso-ux";
+import {settingsGroups} from "./settings-navigation";
 import {Button, Toast, EmptyState, Icon, LoadingState, ErrorState} from "./ui";
 
 export type PanelNotification={id:string;kind:string;title:string;body:string;href?:string|null;read_at?:string|null;created_at:string};
@@ -58,7 +59,7 @@ export function AccountPanel({profile,demo,logoutBusy,onLogout,onClose}:{profile
  const target=new URL(origin,"https://binso.invalid");target.searchParams.set("panel","account");
  const back=target.pathname+target.search;
  return <div className="account-sheet"><div className="account-sheet-profile"><Avatar name={profile.name} identity={profile.identity} src={profile.avatar} size="large"/><div><b><LocalizedText verbatim={!!profile.name}>{profile.name||"Persönliches Konto"}</LocalizedText></b><small><LocalizedText verbatim={!!profile.identity}>{profile.identity||"Persönliches Konto"}</LocalizedText></small></div></div>
-  <LocaleSwitcher/><SettingsGroup title="Persönlich"><div>{[["/einstellungen/konto","user","Mein Profil"],["/einstellungen/sicherheit","lock","Sicherheit"],["/einstellungen/benachrichtigungen","bell","Benachrichtigungen"],["/einstellungen/darstellung","moon","Darstellung & Sprache"]].map(([href,icon,title])=><PanelLink key={href} href={href+"?accountReturn="+encodeURIComponent(back)} icon={icon} title={title} onClose={onClose}/>)}</div></SettingsGroup>
+  <LocaleSwitcher/><SettingsGroup title="Persönlich"><div>{settingsGroups[0].rows.filter(([href])=>href!=="/einstellungen/sprache").map(([href,icon,title])=><PanelLink key={href} href={href+"?accountReturn="+encodeURIComponent(back)} icon={icon} title={href==="/einstellungen/konto"?"Mein Profil":title} onClose={onClose}/>)}</div></SettingsGroup>
   <SettingsGroup title="Unternehmen"><div className="action-list"><PanelLink href="/einstellungen" icon="settings" title="Unternehmenseinstellungen" onClose={onClose}/>{demo&&<PanelLink href="/registrieren" icon="plus" title="Eigenes Konto erstellen" onClose={onClose}/>}</div></SettingsGroup>
   <SettingsGroup title="Sitzung"><div className="action-list"><ActionRow icon="logout" title={logoutBusy?"Wird abgemeldet…":"Abmelden"} disabled={logoutBusy} onClick={onLogout}/></div></SettingsGroup>
  </div>;

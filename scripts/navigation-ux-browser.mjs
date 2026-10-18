@@ -44,7 +44,9 @@ export async function verifyNavigationPersistence(page,{base,capture=async()=>{}
    const sidebar=await page.locator('.app-sidebar').boundingBox();
    const content=await page.locator('.page-container').boundingBox();
    assert.ok(sidebar&&sidebar.width>68&&content.x>=sidebar.x+sidebar.width,'Desktop content reserves its actual sidebar width');
-   const settings=page.locator('.settings-context-navigation');
+   const railVisible=await page.locator('.settings-context-navigation').isVisible();
+   const settings=page.locator(railVisible?'.settings-context-navigation':'.settings-mobile-navigation');
+   if(!railVisible)await settings.locator('summary').click();
    await settings.getByRole('link',{name:'Darstellung & Sprache',exact:true}).click();
    await page.waitForURL(base+'/einstellungen/darstellung');
    assert.equal(await settings.getByRole('link',{name:'Darstellung & Sprache',exact:true}).getAttribute('aria-current'),'page','Settings siblings announce the current page');
@@ -65,5 +67,10 @@ export async function verifyNavigationPersistence(page,{base,capture=async()=>{}
   assert.equal(await password.getByLabel('Aktuelles Passwort',{exact:true}).getAttribute('autocomplete'),'current-password');
   await password.getByRole('button',{name:'Schliessen',exact:true}).click();await password.waitFor({state:'hidden'});
   await capture('settings-mobile-sibling-navigation');
+  const returnPath='/dashboard?panel=account';
+  await page.goto(base+'/einstellungen/konto?accountReturn='+encodeURIComponent(returnPath));await page.waitForLoadState('networkidle');
+  await menu.locator('summary').click();await menu.getByRole('link',{name:'Darstellung & Sprache',exact:true}).click();
+  await page.waitForURL(base+'/einstellungen/darstellung?accountReturn='+encodeURIComponent(returnPath));
+  assert.equal(await page.locator('.detail-back').getAttribute('href'),returnPath,'Switching settings sections preserves the original safe account return path');
  }finally{await page.setViewportSize(viewport)}
 }
