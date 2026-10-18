@@ -1,5 +1,25 @@
 # Aktuelle UX-Rangfolge und überprüfbare Pakete
 
+## Ausdrückliche mobile Entscheidung vom 18.10.2026
+
+Der Auftraggeber hat „Flache weisse Microsoft-Navigation“ gewählt. Damit ist die
+offene Materialentscheidung aus PR #279 entschieden: deckende weisse Fläche im
+Light Mode, gerade Kanten, keine Glasunschärfe oder Schatten, blaue Aktivmarkierung.
+Dark Mode folgt abgeleitet dem bestehenden dunklen Canvas. Ziele, Rechte,
+Touchziele, Abmessungen, Position, Safe Areas und Bewegungsabläufe bleiben erhalten.
+Der schwarze seitenbezogene Erstellen-Button bleibt unverändert.
+
+Die alten Referenzen vom 13./15.10. bleiben unveränderte historische Quellen.
+Der explizite Generator `scripts/navigation-reference.mjs` vergleicht vor jeder
+Erzeugung die vollständigen Nicht-Material-Invarianten mit Commit `015cc284` und
+schreibt ausschliesslich neue Verträge unter `docs/assets/20261018/` und
+`ux-compliance/navigation-baseline.v3.json`. Die erwarteten Bounds stammen aus v2;
+nur der ausdrücklich genehmigte Radius wird 0px. Gerenderte Fälle müssen diese
+Erwartungen unabhängig bestätigen. Kein Test generiert oder akzeptiert Baselines.
+Material-, Tastatur-, Fokus-, Geometrie- und Gegenprüfungen bleiben verpflichtend.
+
+Die nachfolgenden Freeze-Einordnungen beschreiben den Stand vor dieser Entscheidung.
+
 Bestätigt durch den Auftraggeber am 17.10.2026: Das Microsoft-Referenzpaket
 unter `docs/audit/v24/reference/` vom 15.10.2026 bleibt die visuelle Grundlage;
 die heutige ausdrückliche Rangfolge hat Vorrang. Es gibt keine neue Foundation.

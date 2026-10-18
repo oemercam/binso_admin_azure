@@ -13,7 +13,7 @@ import {fullRoutes} from './qa-plan.mjs';
 import {saveDomEvidence} from './ux-dom-evidence.mjs';
 import {verifyMobileLoginGeometry} from './auth-ux-browser.mjs';
 import {assertCustomerDossier,verifyCustomerStates} from './customer-ux-browser.mjs';
-import {assertNavigationToggle,verifyNavigationPersistence} from './navigation-ux-browser.mjs';
+import {assertNavigationToggle,verifyNavigationPersistence,assertFlatMobileNavigation,verifyFlatNavigationAdversaries} from './navigation-ux-browser.mjs';
 import {verifyPreviewControls} from './document-controls-browser.mjs';
 import {verifyTimeWorkspace} from './time-workspace-browser.mjs';
 import {assertMobileHeaderTargets,verifyHeaderTargetRegression,waitForFiniteAnimations} from './shared-control-browser.mjs';
@@ -378,6 +378,7 @@ try{
     const geometry=await page.evaluate(()=>({overflow:[...document.querySelectorAll('body *')].filter(el=>el.getBoundingClientRect().right>innerWidth+1).slice(0,12).map(el=>({tag:el.tagName,cls:el.className,text:el.textContent?.slice(0,80),parent:el.parentElement?.className,right:el.getBoundingClientRect().right})),viewport:innerWidth,scroll:document.documentElement.scrollWidth,body:document.body.scrollWidth,sort:[...document.querySelectorAll('.toolbar .filter-button')].map(el=>el.getBoundingClientRect().width),metricDividers:[...document.querySelectorAll('.metric,.finance-flow-primary,.finance-flow-result,.finance-flow-costs,.finance-flow-costs>div')].map(el=>getComputedStyle(el).borderLeftWidth)}));
     if(geometry.scroll>width+1||geometry.body>width+1){console.log('Overflow details',JSON.stringify(await page.evaluate(()=>[...document.querySelectorAll('body *')].filter(el=>el.scrollWidth>el.clientWidth+2).slice(0,30).map(el=>({tag:el.tagName,cls:el.className,width:el.clientWidth,scroll:el.scrollWidth,overflow:getComputedStyle(el).overflowX,children:[...el.children].map(c=>({tag:c.tagName,width:c.clientWidth,scroll:c.scrollWidth,rect:c.getBoundingClientRect().width,min:getComputedStyle(c).minWidth,grid:getComputedStyle(el).gridTemplateColumns})),rect:JSON.stringify(el.getBoundingClientRect())}))),null,2));await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${width}-overflow.png`)});}
     assert.ok(geometry.scroll<=width+1&&geometry.body<=width+1,`${theme} ${width} ${route}: horizontal overflow ${JSON.stringify(geometry)}`);
+    if(!process.env.BINSO_UX_BASELINE&&width<=760){await assertFlatMobileNavigation(page);if(route==='/dashboard'&&width===390&&!process.env.BINSO_UX_FIXTURE_CASE)await verifyFlatNavigationAdversaries(page);}
     if(!process.env.BINSO_UX_BASELINE){
      const listFrames=await page.locator('.records,.desktop-record-table').filter({visible:true}).evaluateAll(nodes=>nodes.map(el=>({top:getComputedStyle(el).borderTopWidth,bottom:getComputedStyle(el).borderBottomWidth})));
      assert.ok(listFrames.every(frame=>frame.top==='0px'&&frame.bottom==='0px'),`${route}: list containers have no duplicate leading or terminal separator`);
@@ -522,7 +523,7 @@ try{
     assert.equal(await create.count(),1,'One visible creation entry point on every viewport');
     if(width<=760){
      const geometry=await page.evaluate(()=>{const rect=selector=>document.querySelector(selector).getBoundingClientRect().toJSON(),css=selector=>getComputedStyle(document.querySelector(selector));return {nav:rect('.bottom-nav'),plus:rect('.page-head .bo-create-action'),capsule:css('.mobile-header-actions').backgroundColor,material:css('.bottom-nav').backgroundColor,header:css('.mobile-header').backgroundColor,page:css('.page-container').backgroundColor,blur:css('.mobile-header').backdropFilter,navBlur:css('.bottom-nav').backdropFilter,targets:[...document.querySelector('.bottom-nav').children].map(el=>el.getBoundingClientRect().toJSON())}});
-     assert.equal(geometry.header,geometry.page,'Header and page share one opaque canvas');assert.equal(geometry.blur,'none');assert.ok([geometry.page,'rgba(0, 0, 0, 0)'].includes(geometry.capsule),'Header actions use the shared canvas or a transparent surface');assert.equal(geometry.material,theme==='light'?'rgba(243, 243, 245, 0.78)':'rgba(33, 33, 33, 0.82)','Frozen navigation retains its approved glass material');assert.ok(geometry.navBlur.includes('blur'),'Only action surfaces use the glass blur');
+     assert.equal(geometry.header,geometry.page,'Header and page share one opaque canvas');assert.equal(geometry.blur,'none');assert.ok([geometry.page,'rgba(0, 0, 0, 0)'].includes(geometry.capsule),'Header actions use the shared canvas or a transparent surface');assert.equal(geometry.material,theme==='light'?'rgb(255, 255, 255)':'rgb(0, 0, 0)','Flat navigation shares the opaque theme canvas');assert.equal(geometry.navBlur,'none','Flat navigation never restores the old glass blur');await assertFlatMobileNavigation(page);
      assert.ok(geometry.targets.every(t=>t.width>=44&&t.height>=44),'Destinations keep minimum touch targets');
      assert.ok(geometry.plus.bottom<=geometry.nav.top,'Creation belongs to the page above navigation');
      assert.equal(await page.locator('.mobile-dock .bo-create-action,.dock-create-action').count(),0,'Navigation has no attached creation action');
@@ -1260,7 +1261,7 @@ try{
  }
  await writeTestOutput(path.join(output,`results-${process.env.BINSO_UX_THEMES??'light-dark'}.json`),JSON.stringify({browser:process.env.BINSO_UX_BROWSER??'chromium',device:process.env.BINSO_UX_DEVICE??'responsive viewport',scope:'Synthetic API UI fixtures; no production writes',interactions:requestedInteractions,results,errors},null,2));
  await fs.copyFile(path.join(output,`results-${process.env.BINSO_UX_THEMES??'light-dark'}.json`),path.join(output,`results-${process.env.BINSO_UX_BROWSER??'chromium'}-${process.env.BINSO_UX_THEMES??'light-dark'}.json`));
- if(navigationCaptures.length)await writeTestOutput(path.join(output,'navigation-capture.json'),JSON.stringify({schemaVersion:2,provenance:'Explicit capture for the user-authorized 2026-10-13 glass/dock layout; browser fixtures, not physical PWA approval.',cases:navigationCaptures},null,2)+'\n');
+ if(navigationCaptures.length)await writeTestOutput(path.join(output,'navigation-capture.json'),JSON.stringify({schemaVersion:3,provenance:'Explicit 2026-10-18 flat Microsoft material capture; preserved bounds/rights/safe areas/motion; browser fixtures, not physical PWA approval.',cases:navigationCaptures},null,2)+'\n');
  if(process.env.BINSO_UX_VISUAL_AUDIT==='1')await writeTestOutput(path.join(output,'visual-audit.json'),JSON.stringify({scope:'Rendered candidates for human review, not automatic ZIP acceptance',views:visualAudit},null,2));
  console.log(`UX browser checks passed: ${results.length} route/theme/viewport combinations ; interactions: ${process.env.BINSO_UX_MATRIX_ONLY==="1"?"matrix only":requestedInteractions.join(",")}. Artifacts: ${output}`);
 }finally{await context?.close();await browser?.close();server?.kill();}

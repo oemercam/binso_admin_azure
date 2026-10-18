@@ -263000,7 +263000,7 @@
         },
         {
           "property": "background",
-          "value": "var(--app-glass-solid)",
+          "value": "var(--color-bg)",
           "important": false
         },
         {
@@ -263115,7 +263115,7 @@
       "declarations": [
         {
           "property": "color",
-          "value": "var(--color-fg)",
+          "value": "var(--app-action-accent)",
           "important": false
         },
         {
@@ -263193,7 +263193,7 @@
         },
         {
           "property": "border-radius",
-          "value": "14px",
+          "value": "var(--shape-control-mobile)",
           "important": false
         },
         {
@@ -263242,12 +263242,12 @@
         },
         {
           "property": "border-radius",
-          "value": "var(--mobile-nav-compact-radius)",
+          "value": "0",
           "important": false
         },
         {
           "property": "box-shadow",
-          "value": "0 3px 12px rgba(0,0,0,.06)",
+          "value": "none",
           "important": false
         }
       ]
@@ -263311,22 +263311,27 @@
         },
         {
           "property": "border",
-          "value": "1px solid var(--app-glass-line)",
+          "value": "1px solid transparent",
+          "important": false
+        },
+        {
+          "property": "border-top-color",
+          "value": "var(--color-line)",
           "important": false
         },
         {
           "property": "border-radius",
-          "value": "var(--mobile-nav-radius)",
+          "value": "0",
           "important": false
         },
         {
           "property": "background",
-          "value": "var(--app-glass-solid)",
+          "value": "var(--color-bg)",
           "important": false
         },
         {
           "property": "box-shadow",
-          "value": "var(--app-glass-shadow)",
+          "value": "none",
           "important": false
         },
         {
@@ -263344,7 +263349,7 @@
     {
       "id": 2402,
       "file": "app/design-system/navigation.css",
-      "line": 81,
+      "line": 82,
       "selector": ".mobile-dock",
       "context": "@media (max-width:760px)",
       "declarations": [
@@ -263398,7 +263403,7 @@
     {
       "id": 2403,
       "file": "app/design-system/navigation.css",
-      "line": 82,
+      "line": 83,
       "selector": ".mobile-dock> :is(nav,.mobile-dock-action)",
       "context": "@media (max-width:760px)",
       "declarations": [
@@ -263412,7 +263417,7 @@
     {
       "id": 2404,
       "file": "app/design-system/navigation.css",
-      "line": 83,
+      "line": 84,
       "selector": ".mobile-dock>nav",
       "context": "@media (max-width:760px)",
       "declarations": [
@@ -263431,7 +263436,7 @@
     {
       "id": 2405,
       "file": "app/design-system/navigation.css",
-      "line": 84,
+      "line": 85,
       "selector": ".mobile-dock-action",
       "context": "@media (max-width:760px)",
       "declarations": [
@@ -263445,7 +263450,7 @@
     {
       "id": 2406,
       "file": "app/design-system/navigation.css",
-      "line": 85,
+      "line": 86,
       "selector": ".mobile-dock.is-compact .dock-create-action",
       "context": "@media (max-width:760px)",
       "declarations": [
@@ -263464,7 +263469,7 @@
     {
       "id": 2407,
       "file": "app/design-system/navigation.css",
-      "line": 86,
+      "line": 87,
       "selector": ".app-preview .mobile-dock",
       "context": "@media (max-width:760px)",
       "declarations": [
@@ -263478,8 +263483,8 @@
     {
       "id": 2408,
       "file": "app/design-system/navigation.css",
-      "line": 88,
-      "selector": ".app-glass,.mobile-dock> :is(.bottom-nav,.operator-mobile-nav)",
+      "line": 89,
+      "selector": ".app-glass",
       "context": "@supports ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px)))",
       "declarations": [
         {
@@ -263502,7 +263507,7 @@
     {
       "id": 2409,
       "file": "app/design-system/navigation.css",
-      "line": 90,
+      "line": 91,
       "selector": ".mobile-dock-action",
       "context": "@media (max-width:374px)",
       "declarations": [
@@ -263526,7 +263531,7 @@
     {
       "id": 2410,
       "file": "app/design-system/navigation.css",
-      "line": 91,
+      "line": 92,
       "selector": ".mobile-dock.is-compact .mobile-dock-action",
       "context": "@media (max-width:374px)",
       "declarations": [
@@ -263540,8 +263545,8 @@
     {
       "id": 2411,
       "file": "app/design-system/navigation.css",
-      "line": 93,
-      "selector": ".app-glass,.mobile-dock> :is(.bottom-nav,.operator-mobile-nav)",
+      "line": 94,
+      "selector": ".app-glass",
       "context": "@media (prefers-reduced-transparency:reduce)",
       "declarations": [
         {
@@ -263564,7 +263569,7 @@
     {
       "id": 2412,
       "file": "app/design-system/navigation.css",
-      "line": 95,
+      "line": 96,
       "selector": ".app-glass,.mobile-dock> :is(.bottom-nav,.operator-mobile-nav)",
       "context": "@media (forced-colors:active)",
       "declarations": [
@@ -263598,7 +263603,7 @@
     {
       "id": 2413,
       "file": "app/design-system/navigation.css",
-      "line": 98,
+      "line": 99,
       "selector": ":root",
       "context": "@media (max-height:520px) and (orientation:landscape) and (max-width:900px)",
       "declarations": [
@@ -269668,14 +269673,14 @@
             "rule": 2392,
             "file": "app/design-system/navigation.css",
             "line": 23,
-            "value": "var(--app-glass-solid)",
+            "value": "var(--color-bg)",
             "important": false
           },
           {
             "rule": 2401,
             "file": "app/design-system/navigation.css",
             "line": 63,
-            "value": "var(--app-glass-solid)",
+            "value": "var(--color-bg)",
             "important": false
           }
         ],
@@ -269708,14 +269713,14 @@
             "rule": 2392,
             "file": "app/design-system/navigation.css",
             "line": 23,
-            "value": "var(--app-glass-solid)",
+            "value": "var(--color-bg)",
             "important": false
           },
           {
             "rule": 2401,
             "file": "app/design-system/navigation.css",
             "line": 63,
-            "value": "var(--app-glass-solid)",
+            "value": "var(--color-bg)",
             "important": false
           }
         ],
@@ -269856,14 +269861,14 @@
             "rule": 2397,
             "file": "app/design-system/navigation.css",
             "line": 35,
-            "value": "var(--color-fg)",
+            "value": "var(--app-action-accent)",
             "important": false
           },
           {
             "rule": 2397,
             "file": "app/design-system/navigation.css",
             "line": 35,
-            "value": "var(--color-fg)",
+            "value": "var(--app-action-accent)",
             "important": false
           },
           {
@@ -270097,21 +270102,21 @@
             "rule": 2399,
             "file": "app/design-system/navigation.css",
             "line": 39,
-            "value": "14px",
+            "value": "var(--shape-control-mobile)",
             "important": false
           },
           {
             "rule": 2399,
             "file": "app/design-system/navigation.css",
             "line": 39,
-            "value": "14px",
+            "value": "var(--shape-control-mobile)",
             "important": false
           },
           {
             "rule": 2400,
             "file": "app/design-system/navigation.css",
             "line": 57,
-            "value": "var(--mobile-nav-compact-radius)",
+            "value": "0",
             "important": false
           }
         ],

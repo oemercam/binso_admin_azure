@@ -1,5 +1,25 @@
 # Complete Microsoft UX — acceptance ledger
 
+## Resolved mobile material decision
+
+The owner explicitly selected flat white Microsoft mobile navigation. The shared
+navigation owner now uses opaque theme canvas, straight edges, no shadow/blur,
+and blue active destinations for customer and operator. Historical markup,
+destinations, permissions, icon paths, exact bounds, touch targets, safe-area and
+motion tokens remain checked against the pre-change commit. Source and expected
+geometry contracts are generated into new 20261018/v3 files; old references stay
+unchanged. Browser checks reject injected gray/round/blur material, verify native
+Tab order and retain the existing navigation/scroll/focus/permission checks.
+Earlier paragraphs describing an unresolved dock choice are historical. Final
+visual acceptance remains distinct from technical CI and from this material choice.
+
+Focused material validation: customer/operator at 390px in Light/Dark passed (four
+cases), with no failed compliance measurements. Injected gray, rounded, blurred
+and shadowed variants are rejected after their real CSS transitions settle;
+native Tab order is retained. Source material contracts and exact historical
+non-material invariants, CSS ownership, integration inventory and compliance
+adversaries passed. Full new-head integration checks remain required in GitHub.
+
 Base: 7cf4cdda75e736f7e119ab4721b54a22e22d2c80. This supersedes any claim that PR #278 completed the full UX. No merge or deployment is authorized.
 
 ## Binding decisions

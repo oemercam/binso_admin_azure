@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 
-/** Microsoft desktop begins above 760px. Project only this documented context
- * change onto the historical digest; destinations, permissions, declarations,
- * motion and inherited dock tokens are still compared exactly. */
+/** Project only the documented desktop boundary when comparing historical
+ * non-material invariants. The explicitly replaced mobile material has its own
+ * current contract; geometry, motion and access must still match history. */
 export function historicalNavigationRead(read){
  return file=>{
   const source=read(file);

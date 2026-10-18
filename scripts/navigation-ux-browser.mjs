@@ -1,4 +1,35 @@
 import assert from 'node:assert/strict';
+import {waitForFiniteAnimations} from './shared-control-browser.mjs';
+
+export async function assertFlatMobileNavigation(page){
+ const material=await page.locator('.bottom-nav,.operator-mobile-nav').evaluateAll(nodes=>nodes.filter(el=>el.checkVisibility()).map(el=>{const c=getComputedStyle(el),r=el.getBoundingClientRect();return {background:c.backgroundColor,radius:c.borderRadius,shadow:c.boxShadow,blur:c.backdropFilter,webkitBlur:c.webkitBackdropFilter,theme:document.documentElement.dataset.theme,active:[...el.querySelectorAll('.active')].map(a=>getComputedStyle(a).color),targets:[...el.children].map(a=>({width:a.getBoundingClientRect().width,height:a.getBoundingClientRect().height})),left:r.left,right:r.right,viewport:innerWidth}}));
+ for(const nav of material){
+  assert.equal(nav.background,nav.theme==='dark'?'rgb(0, 0, 0)':'rgb(255, 255, 255)','Flat navigation uses the opaque theme canvas');
+  assert.equal(nav.radius,'0px','Flat navigation has straight edges');
+  assert.equal(nav.shadow,'none','Flat navigation has no glass shadow');
+  assert.equal(nav.blur,'none','Flat navigation has no backdrop blur');
+  assert.ok(!nav.webkitBlur||nav.webkitBlur==='none','Flat navigation has no WebKit backdrop blur');
+  assert.ok(nav.active.every(color=>color===(nav.theme==='dark'?'rgb(72, 167, 255)':'rgb(37, 102, 189)')),'Active navigation uses the Microsoft blue accent');
+  assert.ok(nav.targets.every(t=>t.width>=44&&t.height>=44),'Existing navigation touch targets remain at least 44px');
+  assert.ok(nav.left>=0&&nav.right<=nav.viewport+1,'Navigation stays inside its safe viewport');
+ }
+}
+
+export async function verifyFlatNavigationAdversaries(page){
+ const nav=page.locator('.bottom-nav').filter({visible:true});const original=await nav.getAttribute('style');
+ try{
+  for(const [property,value] of [['background-color','rgb(243, 243, 245)'],['border-radius','30px'],['backdrop-filter','blur(18px)'],['box-shadow','0 3px 12px rgba(0,0,0,.2)']]){
+   await nav.evaluate((el,[p,v])=>el.style.setProperty(p,v),[property,value]);
+   await waitForFiniteAnimations(page);
+   await assert.rejects(()=>assertFlatMobileNavigation(page),/Flat navigation/,'Old glass/round/blur styling must fail at runtime');
+   await nav.evaluate((el,style)=>style===null?el.removeAttribute('style'):el.setAttribute('style',style),original);
+   await waitForFiniteAnimations(page);
+  }
+  const targets=nav.locator(':scope > a, :scope > button');await targets.first().focus();await targets.first().press('Tab');
+  assert.equal(await targets.nth(1).evaluate(el=>el===document.activeElement),true,'Native keyboard navigation retains destination order');
+  await targets.nth(1).evaluate(el=>el.blur());await assertFlatMobileNavigation(page);
+ }finally{await nav.evaluate((el,style)=>style===null?el.removeAttribute('style'):el.setAttribute('style',style),original);}
+}
 
 export async function assertNavigationToggle(toggle,collapsed){
  assert.equal(await toggle.getAttribute('aria-expanded'),String(!collapsed),'Navigation exposes its current expanded state');

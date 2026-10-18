@@ -13,6 +13,11 @@ Navigationsänderungen benötigen weiterhin einen belegten Referenzabgleich und
 kontrollierte neue Regressionen; keine vorhandenen Tests pauschal abschwächen.
 Aktueller Abgleich und offene Verträge: [UX-Rangfolge](ux-current-approval.md).
 
+Am 18.10.2026 ausdrücklich gewählt: flache weisse mobile Microsoft-Navigation
+ohne Glas/Schatten/Kapsel, mit blauer Aktivmarkierung. Ziele, Rechte, Bounds,
+Safe Areas und Motion bleiben exakt geschützt; Dark folgt dem dunklen Canvas.
+Die ältere mobile Glass-Freeze-Vorgabe ist damit für das Material ersetzt.
+
 ## Zuständigkeit
 
 | Aufgabe | Bestehender Owner |
