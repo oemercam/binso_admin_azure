@@ -13,15 +13,15 @@ import ConfirmDialog from "./confirm-dialog";
 import {createActions,permittedCreateActions,createReturnHref} from "@/config/create-actions";
 
 /** Action rows have one DOM shape; navigation and destructive intent are explicit. */
-export function ActionRow({title,verbatim=false,icon,href,onClick,disabled=false,requiresWrite=false,danger=false,navigation=false,description,metadata,endAdornment,selected,role,tabIndex,onKeyDown}: {
- title:string;verbatim?:boolean;icon:ReactNode;href?:string;onClick?:()=>void;disabled?:boolean;requiresWrite?:boolean;danger?:boolean;navigation?:boolean;description?:string;metadata?:string;endAdornment?:ReactNode;selected?:boolean;role?:"radio";tabIndex?:number;onKeyDown?:React.KeyboardEventHandler<HTMLButtonElement>;
+export function ActionRow({title,verbatim=false,icon,href,onClick,disabled=false,requiresWrite=false,danger=false,navigation=false,current=false,description,metadata,endAdornment,selected,role,tabIndex,onKeyDown}: {
+ title:string;verbatim?:boolean;icon:ReactNode;href?:string;onClick?:()=>void;disabled?:boolean;requiresWrite?:boolean;danger?:boolean;navigation?:boolean;current?:boolean;description?:string;metadata?:string;endAdornment?:ReactNode;selected?:boolean;role?:"radio";tabIndex?:number;onKeyDown?:React.KeyboardEventHandler<HTMLButtonElement>;
 }) {
  const access=usePageAccess();
  if(href&&!access.canOpen(href))return null;
  const blocked=disabled||(requiresWrite&&!access.write);
  const className=`action-row${danger?" action-row-danger":""}`;
  const body=<>{typeof icon==='string'?<Icon name={icon} size={18}/>:icon}<span>{description||metadata?<span><LocalizedText verbatim={verbatim}>{title}</LocalizedText></span>:<LocalizedText verbatim={verbatim}>{title}</LocalizedText>}{description&&<small className="action-row-description"><LocalizedText verbatim={verbatim}>{description}</LocalizedText></small>}{metadata&&<small className="action-row-description">{metadata}</small>}</span>{endAdornment??(selected!==undefined?<span className="action-row-selection" aria-hidden="true">{selected&&<Icon name="check" size={16}/>}</span>:!danger&&(navigation||href)&&<Icon name="arrow" size={16}/>)}</>;
- return href&&!blocked?<Link prefetch={false} href={href} onClick={onClick} className={className}>{body}</Link>:<button type="button" className={className} disabled={blocked} onClick={onClick} role={role} aria-checked={role==="radio"?selected:undefined} tabIndex={tabIndex} onKeyDown={onKeyDown}>{body}</button>;
+ return href&&!blocked?<Link prefetch={false} href={href} onClick={onClick} className={className} aria-current={current?"page":undefined}>{body}</Link>:<button type="button" className={className} disabled={blocked} onClick={onClick} role={role} aria-checked={role==="radio"?selected:undefined} tabIndex={tabIndex} onKeyDown={onKeyDown}>{body}</button>;
 }
 
 /** Compact single selection extends the action-row contract, including keyboard navigation. */
@@ -93,7 +93,7 @@ export function DetailSections({summary,facts,records,extra}:{summary:ReactNode;
 /** Supplementary facts stay accessible without crowding a mobile dossier. */
 export function DetailDisclosure({label,children}:{label:string;children:ReactNode}){
  const [open,setOpen]=useState(false),touched=useRef(false);
- useLayoutEffect(()=>{const media=window.matchMedia('(min-width:1101px)'),update=()=>{if(!touched.current)setOpen(media.matches)};update();media.addEventListener('change',update);return()=>media.removeEventListener('change',update)},[]);
+ useLayoutEffect(()=>{const media=window.matchMedia('(min-width:761px)'),update=()=>{if(!touched.current)setOpen(media.matches)};update();media.addEventListener('change',update);return()=>media.removeEventListener('change',update)},[]);
  return <details className="bo-data-disclosure" open={open} onToggle={event=>{const next=event.currentTarget.open;if(next!==open){touched.current=true;setOpen(next)}}}><summary><LocalizedText>{label}</LocalizedText></summary><div>{children}</div></details>;
 }
 
@@ -101,8 +101,8 @@ export function MetricTiles({ children, columns=4, desktopOnly=false }: { childr
   return <div className="metrics-grid bo-metric-tiles" data-desktop-only={desktopOnly||undefined} style={{"--metric-columns":columns} as CSSProperties}>{children}</div>;
 }
 
-export function MetricTile({ label, value, hint, currency, compactMoney=false }: { label: ReactNode; value: ReactNode; hint?:string; currency?:string; compactMoney?:boolean }) {
-  return <Metric label={label} value={currency&&typeof value==='number'?<span className="metric-money"><span className="metric-money-currency">{currency}</span>{" "}<span>{value.toLocaleString('de-CH',{minimumFractionDigits:compactMoney?0:2,maximumFractionDigits:2})}</span></span>:value} hint={hint}/>;
+export function MetricTile({ label, value, hint, currency }: { label: ReactNode; value: ReactNode; hint?:string; currency?:string; compactMoney?:boolean }) {
+  return <Metric label={label} value={currency&&typeof value==='number'?<span className="metric-money"><span className="metric-money-currency">{currency}</span>{" "}<span>{value.toLocaleString('de-CH',{minimumFractionDigits:2,maximumFractionDigits:2})}</span></span>:value} hint={hint}/>;
 }
 
 /** Open workspace sections share page spacing without adding nested card chrome. */

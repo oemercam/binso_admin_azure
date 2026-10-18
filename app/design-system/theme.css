@@ -201,15 +201,15 @@
   --line:var(--color-line);
   --soft:var(--color-subtle);
   --type-subheading:16px;
-  --type-label:12px;
-  --type-caption:10px;
-  --type-metadata:11px;
+  --type-label:13px;
+  --type-caption:11px;
+  --type-metadata:12px;
   --shape-group:12px;
   --type-large-heading:28px;
   --shape-control-mobile:8px;
   --type-body:14px;
   --shape-feature-large:28px;
-  --type-control:13px;
+  --type-control:14px;
   --shape-sheet:18px;
   --type-desktop-heading:27px;
   --type-display-small:30px;
@@ -388,7 +388,7 @@ html{scroll-behavior:auto}
 @media (min-width:761px) and (max-width:1100px){
 :root{--sidebar-w:190px;--page-x:28px}
 }
-@media (min-width:1101px){
+@media (min-width:761px){
 :root{
     --desktop-header-h:56px;
     --desktop-page-top:20px;
@@ -410,6 +410,6 @@ html{scroll-behavior:auto}
 @media (max-height:520px) and (orientation:landscape){
 :root{--mobile-page-x:20px}
 }
-@media (max-width:1100px){
+@media (max-width:760px){
 :root{--app-control-radius:8px}
 }

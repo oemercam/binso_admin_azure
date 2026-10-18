@@ -120,7 +120,7 @@
 .surface{padding:20px}
 .bo-workspace-section{min-width:0;margin-block:20px;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}
 .bo-workspace-section>h2{margin:0 0 16px;font-size:var(--type-body);font-weight:500;line-height:1.5}
-.bo-quick-create-links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-block:28px;max-width:700px}
+.bo-quick-create-links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-block:28px;max-width:none}
 .bo-quick-create-links .button{min-width:0;justify-content:flex-start;font-size:var(--type-label);padding-inline:12px}
 .page-container{--page-x:var(--workspace-page-inset);--mobile-page-x:22px}
 .section-title{
@@ -274,7 +274,7 @@
 .page-actions .responsive-create-action svg{flex:0 0 auto}
 .page-actions .responsive-create-action>span{display:inline;white-space:nowrap}
 }
-@media (min-width:1101px){
+@media (min-width:761px){
 .app-root[data-navigation-collapsed]{--sidebar-w:var(--sidebar-collapsed-w)}
 .desktop-appbar{
     position:sticky;
@@ -507,7 +507,7 @@
 .page-container form button{max-width:100%}
 .page-container,.page-container>*,.page-container section{min-width:0}
 .page-head .page-actions{display:flex;align-items:center;gap:8px}
-@media (max-width:1100px){
+@media (max-width:760px){
 .page-container,.mobile-header{--workspace-ink:var(--workspace-mobile-ink);--workspace-value-size:23px;--metric-value-letter-spacing:var(--mobile-value-tracking)}
 .mobile-header[data-appearance="plain"]{--mobile-header-h:65px;border-bottom:1px solid var(--color-line)}
 .page-container:has(>.page-head[data-heading-placement="content"]){--mobile-page-top:28px;--mobile-page-head-gap:24px}

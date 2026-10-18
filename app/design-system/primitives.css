@@ -219,7 +219,7 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 .timer-actions .button{white-space:nowrap}
 .form-grid,
   .form-grid.two{grid-template-columns:repeat(auto-fit,minmax(min(100%,max(var(--form-column-min),calc((100% - var(--field-group-gap))/2))),1fr))}}
-@media (min-width:1101px){
+@media (min-width:761px){
 .empty-state{min-height:240px}
 .section-title>.icon-button{
     width:var(--desktop-action-h);
@@ -323,7 +323,7 @@ input:not([type="checkbox"]):not([type="radio"]),
 @media (max-width:640px){
 .time-filter-toolbar .form-field{flex:1;min-width:0;width:auto}}
 .bo-create-action.button{position:relative;margin-inline-start:auto;width:auto;height:var(--control-h);flex:none;min-width:var(--touch);min-height:var(--control-h);padding:0 var(--button-padding-inline);border:0;border-radius:var(--shape-control-desktop);background:var(--app-action-accent);color:var(--app-accent-text);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:opacity var(--motion-fast) var(--motion-ease)}
-@media(max-width:1100px){
+@media(max-width:760px){
 .bo-create-action.button{width:var(--touch);height:var(--touch);aspect-ratio:1 / 1;flex:0 0 var(--touch);min-height:var(--touch);padding:0;border-radius:50%;background:var(--color-inverse-bg);color:var(--color-inverse-fg)}
 .bo-create-action .create-action-label{display:none}
 }
@@ -339,7 +339,7 @@ input:not([type="checkbox"]):not([type="radio"]),
 .form-field input,.form-field select,.form-field textarea{box-sizing:border-box;min-width:0;max-width:100%}
 .form-field textarea{resize:vertical;overflow-wrap:anywhere}
 .page-head .page-actions .button{white-space:nowrap}
-@media (max-width:1100px){
+@media (max-width:760px){
 .mobile-header .icon-button{
     width:var(--touch);height:var(--touch);min-width:var(--touch);min-height:var(--touch);
   }

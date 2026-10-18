@@ -565,7 +565,7 @@
     padding-right:0;
   }
 }
-@media (min-width:1101px){
+@media (min-width:761px){
 .desktop-navigation-toggle{display:grid;flex:none}
 .customer-detail-workspace,
   .entity-detail-workspace{
@@ -891,7 +891,7 @@ a{-webkit-tap-highlight-color:transparent}
 }
 .mobile-detail-actions{flex-shrink:0}
 .toolbar .filter-button select:focus-visible{outline:2px solid currentColor;outline-offset:2px}
-@media (max-width:1100px){
+@media (max-width:760px){
 .mobile-back{
     width:44px;height:44px;min-width:44px;min-height:44px;
   }

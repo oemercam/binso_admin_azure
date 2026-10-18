@@ -1,5 +1,6 @@
 "use client";
 import {ProgressBar} from "../ui";
+import {SettingsNavigation} from "../settings-navigation";
 import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
 import {useLocale} from "@/lib/client/locale";
 import {asLocale,localeNames,locales} from "@/lib/locales";
@@ -26,19 +27,6 @@ export function SettingsPage() {
   return <AppShell title="Einstellungen" active="einstellungen" backHref="/dashboard">
     <SettingsNavigation/>
   </AppShell>;
-}
-
-function SettingsNavigation(){
- const access=usePageAccess();
- const [query,setQuery]=useState("");
- const groups=[
-  {title:"Unternehmen",rows:[["/einstellungen/firma","users","Firma"],["/einstellungen/team","users","Benutzer & Rollen"],["/einstellungen/abonnement","card","Abonnement"]]},
-  {title:"Geschäftsprozesse",rows:[["/einstellungen/dokumente","receipt","Rechnungen & Dokumente"],["/einstellungen/zeiterfassung","clock","Zeiterfassung"]]},
-  {title:"Weitere Einstellungen",rows:[["/einstellungen/datenschutz","lock","Datenschutz & Cookies"]]},
- ];
- const term=query.trim().toLocaleLowerCase("de-CH");
- const visibleGroups=groups.map(group=>({...group,rows:group.rows.filter(([href,,title])=>access.canOpen(href)&&(!term||`${group.title} ${title}`.toLocaleLowerCase("de-CH").includes(term)))})).filter(group=>group.rows.length);
- return <><label className="searchbox settings-navigation-search"><Icon name="search"/><Input type="search" aria-label="Einstellungen suchen" placeholder="Einstellungen suchen" value={query} onChange={event=>setQuery(event.target.value)}/></label>{visibleGroups.map(group=><SettingsGroup title={group.title} key={group.title}><div className="settings-list">{group.rows.map(([href,icon,title])=><ActionRow href={href} key={href} icon={icon} title={title}/>)}</div></SettingsGroup>)}{!visibleGroups.length&&<EmptyState compact title="Keine passenden Einstellungen" text="Versuche einen anderen Suchbegriff."/>}</>;
 }
 
 export function AccountSettingsPage() {

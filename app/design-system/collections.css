@@ -204,7 +204,7 @@ html[data-theme="dark"] .searchbox>input{height:100%;min-width:0;padding:0;borde
     justify-self:start;
   }
 }
-@media (min-width:1101px){
+@media (min-width:761px){
 .records-search-row{grid-template-columns:minmax(0,1fr) auto auto auto}
 .records-sort-control{display:block;min-width:0;max-width:220px}
 .records-sort-control select{font-size:var(--type-label);color:var(--control-secondary-fg)}
@@ -330,7 +330,7 @@ html[data-theme="dark"] .searchbox>input{height:100%;min-width:0;padding:0;borde
 .desktop-record-head>[role="columnheader"]{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .desktop-record-head>[role="columnheader"]:focus-visible,.toolbar .chips button:focus-visible{outline:2px solid currentColor;outline-offset:2px}
 .desktop-record-row>.table-status-cell .status{max-width:100%;white-space:normal;overflow-wrap:anywhere}
-@media (max-width:1100px){
+@media (max-width:760px){
 .searchbox{border-radius:var(--shape-control-mobile)}
 .desktop-detail-main>.tabs{margin-top:0}
 .detail-grid[data-layout="dossier"][data-has-extra]{grid-template-areas:"summary" "facts" "records" "extra"}
@@ -355,6 +355,6 @@ html[data-theme="dark"] .searchbox>input{height:100%;min-width:0;padding:0;borde
 .page-head-detail:not([data-heading-placement="content"]) .bo-detail-heading-main{display:none}
 }
 
-@media(max-width:1100px){
+@media(max-width:760px){
 .tabs[data-appearance="line"]>:is(button,a){font-size:var(--type-metadata)}
 }

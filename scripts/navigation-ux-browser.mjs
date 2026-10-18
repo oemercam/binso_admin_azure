@@ -25,5 +25,31 @@ export async function verifyNavigationPersistence(page,{base,capture=async()=>{}
   await page.goto(base+'/support');await page.waitForLoadState('networkidle');
   assert.equal(await page.locator('.sidebar-bottom a[aria-current="page"]').getAttribute('href'),'/support','Support announces the current destination');
   await capture('customer-expanded');
+  // The original Microsoft reference specifies a left desktop navigation, also
+  // on compact desktop/tablet widths. A 1440px-only test missed the old dock.
+  for(const width of [768,1024,1440]){
+   await page.setViewportSize({width,height:1000});
+   await page.goto(base+'/einstellungen/konto');await page.waitForLoadState('networkidle');
+   await assertNavigationToggle(toggle,false);
+   assert.equal(await page.locator('.mobile-dock').isVisible(),false,'Desktop never falls back to the floating phone dock');
+   const sidebar=await page.locator('.app-sidebar').boundingBox();
+   const content=await page.locator('.page-container').boundingBox();
+   assert.ok(sidebar&&sidebar.width>68&&content.x>=sidebar.x+sidebar.width,'Desktop content reserves its actual sidebar width');
+   const settings=page.locator('.settings-context-navigation');
+   await settings.getByRole('link',{name:'Darstellung & Sprache',exact:true}).click();
+   await page.waitForURL(base+'/einstellungen/darstellung');
+   assert.equal(await settings.getByRole('link',{name:'Darstellung & Sprache',exact:true}).getAttribute('aria-current'),'page','Settings siblings announce the current page');
+   assert.ok(await page.getByRole('radiogroup',{name:'Darstellung',exact:true}).isVisible(),'Existing appearance control remains reachable');
+   await capture('settings-desktop-'+width);
+  }
+  await page.setViewportSize({width:390,height:840});
+  await page.goto(base+'/einstellungen/konto');await page.waitForLoadState('networkidle');
+  assert.equal(await page.locator('.settings-context-navigation').isVisible(),false,'Desktop settings rail stays out of the phone flow');
+  const menu=page.locator('.settings-mobile-navigation');
+  assert.equal(await menu.getAttribute('open'),null,'Phone settings menu starts compact');
+  await menu.locator('summary').focus();await menu.locator('summary').press('Enter');
+  await menu.getByRole('link',{name:'Sicherheit',exact:true}).click();await page.waitForURL(base+'/einstellungen/sicherheit');
+  assert.equal(await menu.getAttribute('open'),null,'Changing page closes the phone menu without covering the form');
+  await capture('settings-mobile-sibling-navigation');
  }finally{await page.setViewportSize(viewport)}
 }
