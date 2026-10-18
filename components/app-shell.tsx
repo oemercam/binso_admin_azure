@@ -25,6 +25,7 @@ import type { SearchItem } from "@/lib/search";
 import {SearchPanel,NotificationPanel,AccountPanel,type PanelNotification} from "./header-panel-content";
 import {HeaderPanel} from "./header-panel";
 import {Avatar} from "./avatar";
+import {SettingsWorkspace} from "./settings-navigation";
 import {AppHeader,MobileDock} from "./app-chrome";
 import {DesktopNavigationToggle,useDesktopNavigation} from "./desktop-navigation";
 
@@ -358,7 +359,7 @@ function AppShellFrame({
           <LocalizedElement as="button" className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={() => setSheet("account")}><Avatar name={profile.name} identity={profile.identity} src={profile.avatar} size="small"/></LocalizedElement>
         </div>}
       </div>
-      <AppHeader className={headerOwnsDetail ? "mobile-header mobile-header-detail" : "mobile-header"} detail={headerOwnsDetail} plainActions={headingPlacement==="content"} leadingClassName="mobile-header-leading" leading={<>
+      <AppHeader className={headerOwnsDetail ? "mobile-header mobile-header-detail" : "mobile-header"} detail={headerOwnsDetail} contentHeader={headingPlacement==="content"} leadingClassName="mobile-header-leading" leading={<>
         {headerOwnsDetail ? <Link className="mobile-back" href={backHref!} aria-label={backLabel}><Icon name="back"/></Link> : <><Link href="/dashboard" className="mobile-header-brand" aria-label="Zur Übersicht"><Logo compact={headingPlacement!=="content"}/></Link>{headingPlacement==="header"&&<h1 className="mobile-section-title"><LocalizedText verbatim={titleIsUserContent}>{title}</LocalizedText></h1>}</>}
         {headerOwnsDetail&&<h1 className="mobile-header-title"><span><LocalizedText verbatim={titleIsUserContent}>{title}</LocalizedText></span>{status!=null&&<Status tone={statusTone}>{status}</Status>}</h1>}
       </>} actionClassName={headerOwnsDetail?"mobile-detail-actions":"mobile-header-actions"} actions={headerOwnsDetail ? (allowed&&(mobileActions||visibleActions)?mobileActions??visibleActions:undefined) : <>
@@ -373,8 +374,10 @@ function AppShellFrame({
         <div className={backHref ? "page-head page-head-detail" : "page-head"} data-heading-placement={headingPlacement}>
           {backHref ? <DetailHeading verbatimTitle={titleIsUserContent} title={title} subtitle={subtitle} status={status} tone={statusTone} recordLabel={recordLabel} statusPlacement={headingPlacement==="content"?"subtitle":"title"} mobileAction={headingPlacement==="content"&&allowed?(mobileActions??visibleActions):undefined} action={(visibleActions||contextActions)&&allowed?<div className="page-actions">{visibleActions}{contextActions&&<div className="context-actions-inline">{contextActions.content}</div>}</div>:undefined} leading={<Link className={headingPlacement==="content"?"detail-back":"desktop-back"} href={backHref} aria-label={backLabel}><Icon name="back" size={16}/><LocalizedText>{backLabel}</LocalizedText></Link>}/> : <PageHeading verbatimTitle={titleIsUserContent} title={title} description={subtitle} action={(visibleActions||contextActions)&&allowed?<div className="page-actions">{visibleActions}{contextActions&&<div className="context-actions-inline">{contextActions.content}</div>}</div>:undefined}/> }
         </div>
+        <SettingsWorkspace>
         {allowed&&bodyControls}
         {accessError?<div role="alert"><p><LocalizedText>{accessError}</LocalizedText></p><FormActions sheet><Button onClick={()=>{invalidateClientSession();setAccessError(null);setAccessRetry(value=>value+1)}}><LocalizedText>{"Erneut versuchen"}</LocalizedText></Button><Link className="button button-secondary" href="/login"><LocalizedText>{"Anmelden"}</LocalizedText></Link></FormActions></div>:(!access||allowed)?children:<EmptyState icon="lock" title="Kein Zugriff" text="Diese Seite ist für deine Rolle oder deinen Plan nicht verfügbar."/>}
+        </SettingsWorkspace>
       </main>
 
       {timerNotice&&<div className="timer-notice" role="status">{timerNotice}</div>}
@@ -431,5 +434,5 @@ export function AppShellLayout({children}:{children:React.ReactNode}){
 /** Root suspense sits inside the persistent frame on an app route. */
 export function RouteLoading(){
  const inShell=useContext(ShellRegistration);
- return inShell?<LoadingState aria-live="polite"><LocalizedText>{"Inhalt wird geladen …"}</LocalizedText></LoadingState>:<AppStart/>;
+ return inShell?<LoadingState/>:<AppStart/>;
 }

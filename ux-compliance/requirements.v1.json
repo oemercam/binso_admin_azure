@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "1.2.0",
+  "version": "1.3.0",
   "baselineCommit": "b398ff7400eb1b2ea90016c25e596261d58c822b",
   "sourceCompleteness": "The owner ZIP dated 2026-10-15 is the binding visual source. Imported historical V21/V22 entries remain traceability evidence and cannot override it; complete historical approval artifacts remain unavailable.",
   "conflicts": [
@@ -14,9 +14,10 @@
     {
       "id": "NAVIGATION-MATERIAL-CREATION",
       "earlier": "Bottom-navigation source and geometry frozen against V21.1/V22 baseline",
-      "later": "2026-10-15 original ZIP implementation supplement: retain the existing bottom navigation exactly",
-      "decision": "Preserve the current navigation markup, destinations, access/scroll logic, icons, material, geometry and token inheritance. The schematic ZIP dock does not replace it; the existing protected navigation reference remains unchanged.",
-      "supersededDecision": "Glass material and dock placement may change. Finanzen remains a direct destination; original access/scroll logic and icon paths stay protected. New source reference: docs/assets/20261013/navigation-reference.json. Geometry must be explicitly captured, never silently refreshed."
+      "later": "2026-10-18 explicit owner answer: Flache weisse Microsoft-Navigation",
+      "decision": "Flat opaque Microsoft mobile navigation; blue active state, no glass/shadow/capsule. Preserve destinations, permissions, icons, bounds, safe areas, touch targets and motion; derived dark canvas. New explicit 20261018 source contract and v3 expected geometry; no automatic baseline acceptance.",
+      "supersededDecision": "Glass material and dock placement may change. Finanzen remains a direct destination; original access/scroll logic and icon paths stay protected. New source reference: docs/assets/20261013/navigation-reference.json. Geometry must be explicitly captured, never silently refreshed.",
+      "previousDecision": "Preserve the current navigation markup, destinations, access/scroll logic, icons, material, geometry and token inheritance. The schematic ZIP dock does not replace it; the existing protected navigation reference remains unchanged."
     },
     {
       "id": "PRIMARY-KPI-COUNT",
@@ -35,15 +36,15 @@
       "componentTypes": [
         "AppShell"
       ],
-      "expected": "Freigegebener Glas-/Dock-Quellvertrag vom 13.10.2026; Navigationsziele bleiben erhalten",
+      "expected": "Explizit freigegebener flacher Microsoft-Quellvertrag vom 18.10.2026; Navigationsziele unverändert",
       "owner": "AppShell",
       "method": "static",
       "testCase": "TC-UX-NAV-001",
       "adapter": "navigation-contract-test.mjs",
       "priority": "P0",
-      "acceptance": "Freigegebener Glas-/Dock-Quellvertrag vom 13.10.2026; Navigationsziele bleiben erhalten",
+      "acceptance": "Explizit freigegebener flacher Microsoft-Quellvertrag vom 18.10.2026; Navigationsziele unverändert",
       "automation": "automatic",
-      "provenance": "Explicit user approval in the 2026-10-13 glass/navigation/central-standardization conversation",
+      "provenance": "Explicit owner choice of flat white Microsoft navigation on 2026-10-18; historical non-material invariants retained",
       "review": null
     },
     {
@@ -55,15 +56,15 @@
       "componentTypes": [
         "AppShell"
       ],
-      "expected": "Freigegebener Glas-/Dock-Snapshot; ursprüngliche Zugriffs-/Scroll-Logik und Icons unverändert",
+      "expected": "Ursprüngliche Zugriffs-/Scroll-Logik, Icons, Bounds, Safe Areas und Motion exakt erhalten; nur freigegebenes Material ersetzt",
       "owner": "AppShell",
       "method": "static",
       "testCase": "TC-UX-NAV-002",
       "adapter": "navigation-foundation-test.mjs",
       "priority": "P0",
-      "acceptance": "Freigegebener Glas-/Dock-Snapshot; ursprüngliche Zugriffs-/Scroll-Logik und Icons unverändert",
+      "acceptance": "Ursprüngliche Zugriffs-/Scroll-Logik, Icons, Bounds, Safe Areas und Motion exakt erhalten; nur freigegebenes Material ersetzt",
       "automation": "automatic",
-      "provenance": "Explicit user approval in the 2026-10-13 glass/navigation/central-standardization conversation",
+      "provenance": "Explicit owner choice of flat white Microsoft navigation on 2026-10-18; historical non-material invariants retained",
       "review": null
     },
     {

@@ -9,7 +9,7 @@ export async function assertCustomerDossier(page){
  const facts=await context.locator('[data-area="facts"]').boundingBox();
  const extra=await context.locator('[data-area="extra"]').boundingBox();
  const records=await dossier.locator('[data-area="records"]').boundingBox();
- if(page.viewportSize().width>1100){
+ if(page.viewportSize().width>760){
   assert.ok(Math.abs(facts.x-extra.x)<1,'Desktop context has one aligned contact/address column');
   assert.ok(extra.y>=facts.y+facts.height&&extra.y-facts.y-facts.height<=25,'Address follows contact without waiting for the left financial rows');
  }else assert.ok(extra.y>=records.y+records.height,'Mobile supplementary facts follow open invoices');
@@ -32,7 +32,9 @@ export async function verifyCustomerStates(page,{base,capture=async()=>{}}){
  await page.route(endpoint,handler);
  try{
   await page.goto(url);
-  await page.getByRole('status').getByText('Die Kundendaten werden abgerufen.',{exact:true}).waitFor();
+  await page.locator('.loading-state').waitFor();
+  assert.equal(await page.locator('.loading-state .sr-only').textContent(),'Die Kundendaten werden abgerufen.','Loading remains announced to assistive technology');
+  assert.equal(await page.locator('.loading-state .sr-only').evaluate(el=>getComputedStyle(el).position),'absolute','Loading copy is visually hidden, not removed from accessibility');
   await capture('loading');mode='error';release();
   await page.getByRole('alert').getByText('Synthetic dossier unavailable',{exact:true}).waitFor();await capture('error');
   mode='normal';await page.getByRole('button',{name:'Erneut versuchen',exact:true}).click();

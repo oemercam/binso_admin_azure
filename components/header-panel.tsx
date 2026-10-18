@@ -22,7 +22,7 @@ export function HeaderPanel({kind,label,onClose,children,headerSelector,backgrou
  },[backgroundSelector]);
  useEffect(()=>{
   const update=()=>{
-   const mobile=window.innerWidth<=1100;
+   const mobile=window.innerWidth<=760;
    setMobile(mobile);
    const header=document.querySelector(headerSelector??(mobile?".mobile-header":".desktop-appbar"));
    const rect=header?.getBoundingClientRect();

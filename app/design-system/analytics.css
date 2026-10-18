@@ -97,7 +97,7 @@
 }
 @media (min-width:761px) and (max-width:1100px){
 .metrics-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (min-width:1101px){
+@media (min-width:761px){
 .finance-month-bars{width:100%;min-height:250px}
 .metrics-grid{gap:10px;border:0}
 }
@@ -122,7 +122,7 @@
   .metrics-grid.three{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){
 .bo-statistics-group{transition:none}}
-@media (max-width:1100px){
+@media (max-width:760px){
 .metric-money{display:flex;flex-direction:column-reverse;align-items:flex-start;gap:3px}
 .metric-money-currency{color:var(--color-muted);font-size:var(--type-metadata);font-weight:400;letter-spacing:0;line-height:1.5}
 :is(.bo-metric-tiles,.section-title)[data-desktop-only]{display:none}}

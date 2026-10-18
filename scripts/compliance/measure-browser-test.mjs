@@ -20,6 +20,18 @@ try{
  await page.setContent(fixture(0));
  const overlap=await measureActionClearance(page);
  assert(overlap.scrollEndEstablished&&overlap.lastActionBottom>overlap.navigationTop,'True navigation overlap stays blocking');
+ // Native closed details can retain descendant layout rectangles without painting
+ // their links. Both closed and genuinely open/overlapping states must be measured.
+ const disclosureFixture=(padding,open)=>fixture(padding).replace('<button>Action</button>',`<button>Action</button><details ${open?'open':''}><summary>Sections</summary><nav>${Array.from({length:12},()=>'<section><a href="#" style="display:flex;min-height:52px">Destination</a></section>').join('')}</nav></details>`);
+ await page.setContent(disclosureFixture(160,false));
+ const closedDisclosure=await measureActionClearance(page);
+ assert(closedDisclosure.scrollEndEstablished&&closedDisclosure.lastActionBottom<closedDisclosure.navigationTop,'Unpainted links in closed native details cannot fabricate an overlap');
+ await page.setContent(disclosureFixture(160,true));
+ const openDisclosure=await measureActionClearance(page);
+ assert(openDisclosure.scrollEndEstablished&&openDisclosure.lastActionBottom<openDisclosure.navigationTop,'Open native details with adequate clearance pass');
+ await page.setContent(disclosureFixture(0,true));
+ const obstructedDisclosure=await measureActionClearance(page);
+ assert(obstructedDisclosure.scrollEndEstablished&&obstructedDisclosure.lastActionBottom>obstructedDisclosure.navigationTop,'Real overlap in an open native menu remains blocking');
  await page.evaluate(()=>{window.scrollTo=()=>{};});
  const blocked=await measureActionClearance(page);
  assert.equal(blocked.scrollEndEstablished,false,'Unreachable endpoint cannot pass as measured geometry');

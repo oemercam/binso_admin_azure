@@ -1,0 +1,50 @@
+{
+  "base": "775af2eb300cc026ddd777f010203117cd54c269",
+  "approval": "Owner explicitly requested complete Microsoft material/legacy cleanup: no glass, no unused attached-create styles or reserved action space. Existing live navigation bounds, rights, icons, motion and safe areas remain protected. Archived references are unchanged.",
+  "snapshot": {
+    "markup": "fdb851e1029133e479bd3adad4af5cc936eb78961b6aab9d1983126468816e1f",
+    "logic": "8724e28af32d7aaf1779885ccdaed77f7f43f7c07a0d461dccdb6256aaa8e433",
+    "icons": "b01b4f68013ccaea6f5846ffb30b07bc0a079eac3adeb9bac3800cbfdbe9366e",
+    "rules": "f9afda4eaa6b6846eeb5b2143547ac67342b738519d8fa5ef0f9ac26c341d151",
+    "tokens": "cb6202eb06922f8c4dcdc95ea6a86c175182538f141f55bb19640498609cd2f0",
+    "tokenNames": [
+      "--app-action-accent",
+      "--color-bg",
+      "--color-line",
+      "--color-muted",
+      "--mobile-nav-bottom",
+      "--mobile-nav-compact-h",
+      "--mobile-nav-edge",
+      "--mobile-nav-h",
+      "--motion-base",
+      "--motion-ease",
+      "--motion-ease-standard",
+      "--motion-fast",
+      "--safe-bottom",
+      "--safe-left",
+      "--safe-right",
+      "--shape-control-mobile"
+    ]
+  },
+  "invariants": {
+    "markup": "fdb851e1029133e479bd3adad4af5cc936eb78961b6aab9d1983126468816e1f",
+    "logic": "8724e28af32d7aaf1779885ccdaed77f7f43f7c07a0d461dccdb6256aaa8e433",
+    "icons": "b01b4f68013ccaea6f5846ffb30b07bc0a079eac3adeb9bac3800cbfdbe9366e",
+    "rules": "fec46d6256455fe8a15fc05a629b491fb0b48df955d4cfb4cc200c51c02417ec",
+    "tokens": "71b7e2f8dc99e9ca96e832668a9fb70fcb69c661ca3f9feb191810c0140c6f1e",
+    "tokenNames": [
+      "--mobile-nav-bottom",
+      "--mobile-nav-compact-h",
+      "--mobile-nav-edge",
+      "--mobile-nav-h",
+      "--motion-base",
+      "--motion-ease",
+      "--motion-ease-standard",
+      "--motion-fast",
+      "--safe-bottom",
+      "--safe-left",
+      "--safe-right"
+    ]
+  },
+  "customerContract": "a742de81a9bc5b0b20865f1f46dd3cff6a4a5562e295cb570b58a3bf28e8df16"
+}

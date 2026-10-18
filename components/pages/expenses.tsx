@@ -14,7 +14,7 @@ import { AppShell } from "../app-shell";
 import { RecordRow, RecordsView, RecordsControls, useRecordsController } from "../records";
 import { appendDemoRow } from "@/lib/demo-storage";
 import { apiGet, apiPatch, apiPost, apiUpload, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
-import { Button, EmptyState, ErrorState, Field, Icon, Toast, Input, Select, Textarea, FormActions } from "../ui";
+import { Button, EmptyState, ErrorState, LoadingState, Field, Icon, Toast, Input, Select, Textarea, FormActions } from "../ui";
 import { CreateAction } from "../binso-ux";
 import {allowDraftNavigation} from '../use-browser-back-guard';
 import { useRecordList } from "./shared";
@@ -23,7 +23,7 @@ export function ExpensesPage() {
   const columns:NonNullable<Parameters<typeof useRecordsController>[0]["columns"]>=[{label:"Spese",index:0},{label:"Mitarbeiter",index:1},{label:"Betrag",index:2,align:"right"},{label:"Status",index:4,status:true}];
   const chips=["Alle","Entwurf","Eingereicht","Genehmigt","Verbucht","Abgelehnt"];
   const {rows:expenseRows,total,controller,pagination,loading,error}=useRecordList("expenses",{placeholder:"Spesen suchen...",chips,columns,sortFields:{0:"merchant",1:"employee_name",2:"amount",4:"status"},defaultOrder:"expense_date.desc",filterValues:{Entwurf:{field:"status",value:"draft"},Eingereicht:{field:"status",value:"submitted"},Genehmigt:{field:"status",value:"approved"},Verbucht:{field:"status",value:"posted"},Abgelehnt:{field:"status",value:"rejected"}}});
-  return <AppShell title="Spesen" subtitle={loading?"Wird geladen…":`${total} Spesen`} active="spesen" actions={<RecordsControls controller={controller} placeholder="Spesen suchen..." chips={chips} columns={columns}><CreateAction href="/spesen/neu" label="Spese erfassen"/></RecordsControls>}>
+  return <AppShell title="Spesen" subtitle={loading?undefined:`${total} Spesen`} active="spesen" actions={<RecordsControls controller={controller} placeholder="Spesen suchen..." chips={chips} columns={columns}><CreateAction href="/spesen/neu" label="Spese erfassen"/></RecordsControls>}>
     <RecordsView controller={controller} toolbarActions={false} showCount={false} remote pagination={pagination} countLabel="Spesen" loading={loading} error={error} items={expenseRows} placeholder="Spesen suchen..." chips={chips} columns={columns} rowHref={row=>`/spesen/${row[4]?row[3]:"1"}`}>{(row)=>{const [title,person,amount,idOrStatus,statusMaybe]=row;const id=statusMaybe?idOrStatus:"1";const status=statusMaybe??idOrStatus;return <RecordRow href={"/spesen/"+id} icon="card" title={title} meta={person} value={amount} status={status}/>}}</RecordsView>
   </AppShell>;
 }
@@ -155,7 +155,7 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
   const recordReimbursement=async()=>{if(expenseMutationPending.current||!expenseId)return;expenseMutationPending.current=true;setExpenseBusy(true);try{const r=await apiPost<{item:{reimbursed_at:string}}>('/api/expenses/'+encodeURIComponent(expenseId)+'/reimbursement',{reference:reimbursementRef});setReimbursedAt(r.item.reimbursed_at);setReimbursementOpen(false);setToast('Erstattung erfasst.')}catch(e){setToast(e instanceof Error?e.message:'Erstattung konnte nicht erfasst werden.')}finally{expenseMutationPending.current=false;setExpenseBusy(false)}};
   const selectedEmployee=availableEmployees.find(item=>item.id===person);
   const employeeLabel=selectedEmployee?[selectedEmployee.first_name,selectedEmployee.last_name].filter(Boolean).join(" "):"Ohne Mitarbeiter";
-  if(existing&&(loadingExpense||expenseLoadError))return <AppShell title="Spese" subtitle={expenseLoadError?"Spesendaten nicht verfügbar":"Daten werden geladen."} active="spesen" backHref={returnTo} backLabel="Spesen">{loadingExpense?<div role="status"><EmptyState icon="card" title="Spese wird geladen" text="Die Spesendaten werden abgerufen."/></div>:<><div role="alert"><EmptyState icon="card" title="Spese konnte nicht geladen werden" text={expenseLoadError??"Bitte versuche es erneut."}/></div><div className="page-actions"><Button onClick={expenseQuery.refresh}><LocalizedText>{"Erneut versuchen"}</LocalizedText></Button><Button href="/spesen" variant="ghost"><LocalizedText>{"Zur Übersicht"}</LocalizedText></Button></div></>}</AppShell>;
+  if(existing&&(loadingExpense||expenseLoadError))return <AppShell title="Spese" subtitle={expenseLoadError?"Spesendaten nicht verfügbar":undefined} active="spesen" backHref={returnTo} backLabel="Spesen">{loadingExpense?<LoadingState/>:<><div role="alert"><EmptyState icon="card" title="Spese konnte nicht geladen werden" text={expenseLoadError??"Bitte versuche es erneut."}/></div><div className="page-actions"><Button onClick={expenseQuery.refresh}><LocalizedText>{"Erneut versuchen"}</LocalizedText></Button><Button href="/spesen" variant="ghost"><LocalizedText>{"Zur Übersicht"}</LocalizedText></Button></div></>}</AppShell>;
   const close=()=>{expenseRecovery.clear();allowDraftNavigation();router.push(returnTo)};
   const workspace=<>
     {!existing&&toast&&(savedExpense?<Toast title={toast} tone="success"/>:<ErrorState>{toast}</ErrorState>)}

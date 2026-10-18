@@ -13,10 +13,10 @@ import {fullRoutes} from './qa-plan.mjs';
 import {saveDomEvidence} from './ux-dom-evidence.mjs';
 import {verifyMobileLoginGeometry} from './auth-ux-browser.mjs';
 import {assertCustomerDossier,verifyCustomerStates} from './customer-ux-browser.mjs';
-import {assertNavigationToggle,verifyNavigationPersistence} from './navigation-ux-browser.mjs';
+import {assertNavigationToggle,verifyNavigationPersistence,assertFlatMobileNavigation,verifyFlatNavigationAdversaries} from './navigation-ux-browser.mjs';
 import {verifyPreviewControls} from './document-controls-browser.mjs';
 import {verifyTimeWorkspace} from './time-workspace-browser.mjs';
-import {assertMobileHeaderTargets,verifyHeaderTargetRegression,waitForFiniteAnimations} from './shared-control-browser.mjs';
+import {assertMobileHeaderTargets,assertChatTargets,assertOpaqueChrome,verifyHeaderTargetRegression,waitForFiniteAnimations} from './shared-control-browser.mjs';
 
 // Synthetic UI fixtures: real business/RLS integration is covered by migration-test.mjs.
 // No request reaches a production system; unhandled fixture APIs fail closed.
@@ -124,6 +124,15 @@ const fixturePdf=process.env.BINSO_UX_PDF_FILE?await fs.readFile(process.env.BIN
 const requestedInteractions=process.env.BINSO_UX_INTERACTIONS?.split(',')??['data','customers','products','employees','documents','finance','time','expenses','chat','billing','header','operator','settings','chrome'];
 const hasInteraction=name=>requestedInteractions.includes(name);
 let captureQueue=Promise.resolve();
+// Matrix tabs intentionally share a browser context. Preference mutations must
+// serialize, otherwise their genuine cross-tab storage synchronization races.
+let navigationPreferenceQueue=Promise.resolve();
+async function withNavigationPreferenceLock(run){
+ const previous=navigationPreferenceQueue;let unlock;
+ navigationPreferenceQueue=new Promise(resolve=>{unlock=resolve});
+ await previous;
+ try{return await run()}finally{unlock()}
+}
 // Parallel route tabs can background the capture tab. Hidden documents suspend
 // animation frames; their layout is already measurable and screenshot() flushes it.
 async function settleFrames(page){
@@ -141,8 +150,9 @@ async function capture(page,options,target=page){
  captureQueue=pending.catch(()=>{});return pending;
 }
 async function assertAccountAvatarSpacing(panel){
- const geometry=await panel.locator('.account-sheet-profile').evaluate(el=>{const avatar=el.firstElementChild.getBoundingClientRect(),name=el.lastElementChild.getBoundingClientRect();return {avatarRight:avatar.right,nameLeft:name.left,gap:parseFloat(getComputedStyle(el).columnGap)}});
- assert.ok(geometry.nameLeft>=geometry.avatarRight+geometry.gap-1,'Account identity preserves its declared gap after the actual avatar: '+JSON.stringify(geometry));
+ const geometry=await panel.locator('.account-sheet-profile').evaluate(el=>{const avatar=el.firstElementChild.getBoundingClientRect(),name=el.lastElementChild.getBoundingClientRect(),style=getComputedStyle(el);return {direction:style.flexDirection,avatarRight:avatar.right,avatarBottom:avatar.bottom,nameLeft:name.left,nameTop:name.top,centerDelta:Math.abs(avatar.x+avatar.width/2-name.x-name.width/2),gap:parseFloat(style.columnGap)}});
+ if(geometry.direction==='column'){assert.ok(geometry.nameTop>=geometry.avatarBottom+geometry.gap-1,'Mobile profile preserves the vertical avatar gap');assert.ok(geometry.centerDelta<1,'Mobile profile identity is geometrically centred as in the approved reference');}
+ else assert.ok(geometry.nameLeft>=geometry.avatarRight+geometry.gap-1,'Account identity preserves its declared gap after the actual avatar: '+JSON.stringify(geometry));
 }
 async function actionEvidence(page,name,theme){
  const dialog=page.getByRole('dialog',{name,exact:true});
@@ -163,7 +173,7 @@ const results=[];const errors=[];const accessibilityFailures=[];let failMutation
 let creditPosts=0,failCredit=false,adjustmentPosts=0,failAdjustment=false;const creditKeys=[],adjustmentKeys=[];
 let policyPosts=0,policyRequired=true,policyRole=process.env.BINSO_UX_FIXTURE_CASE==='employee'?'member':['owner','admin','finance'].includes(process.env.BINSO_UX_FIXTURE_CASE)?process.env.BINSO_UX_FIXTURE_CASE:"owner",policyReadOnly=false,failPolicy=false,teamPosts=0,failTeam=false;
 let failPreferences=false,preferencePosts=0;
-let notificationWrites=0,failNotificationWrite=false,securityUnavailable=false,sessionDeletes=0;
+let notificationWrites=0,failNotificationWrite=false,securityUnavailable=false,securityRetryGate=null,sessionDeletes=0;
 let dataPaymentMode=false,dataPaymentFailed=false,dataPaymentPosts=0,holdDataRefresh=false,customerIdentityMode=false,losePaymentResponse=false,incompletePaymentResponse=false;const paymentReplays=new Map(),dataRefreshWaiters=[];
 let projectSourceMode=false,failProjectSource=false,projectSourceTitle='Synthetic accepted offer',processRecoveryMode=false;
 let incompleteProductResponse=false;let failReportDownload=false,reportExports=0;
@@ -173,7 +183,7 @@ let customerPosts=0,failCustomerCreate=false,loseCustomerResponse=false;const cu
 let teamMemberRole='member';let supportMessages=[];
 const operatorAccount={tenant_id:'tenant-one',tenant:{name:'Prüffirma AG'},plan:'pro',subscription_status:'active',account_status:'active',user_limit:10,updated_at:'2026-10-09'};
 const settleLayout=async page=>{await page.evaluate(async()=>{await document.fonts.ready;await Promise.all(document.getAnimations().filter(a=>Number.isFinite(a.effect?.getComputedTiming().endTime)).map(a=>a.finished.catch(()=>{})))});await settleFrames(page)};
-let releaseOldSearch;
+let releaseOldSearch,oldSearchArrived;
 let context;
 try{
  for(const theme of (process.env.BINSO_UX_THEMES?.split(",")??["light","dark"])){
@@ -234,6 +244,7 @@ try{
     return route.fulfill({json:{ok:true,item:product,items:[],tracker:null}});
    }
    if(dataPaymentMode&&holdDataRefresh&&p==='/api/documents')await new Promise(resolve=>dataRefreshWaiters.push(resolve));
+   if(securityRetryGate&&["/api/auth/mfa","/api/auth/sessions"].includes(p)&&req.method()==="GET")await securityRetryGate;
    if(securityUnavailable&&["/api/auth/mfa","/api/auth/sessions"].includes(p))return route.fulfill({status:503,json:{message:p.endsWith("mfa")?"Fixture security status unavailable":"Fixture sessions unavailable"}});
    if(projectSourceMode&&p==='/api/documents/AN-TEST-1')return route.fulfill({status:failProjectSource?503:200,json:failProjectSource?{message:'Synthetic source unavailable'}:{item:{...offer,status:'accepted',title:projectSourceTitle}}});
    let data;
@@ -264,7 +275,7 @@ try{
 
 
    else if(p==='/api/settings/notifications')data={items:[{kind:'Rechnungen',email:true,push:false}]};
-   else if(p==='/api/search'){const term=url.searchParams.get('q');if(term==='old')await new Promise(resolve=>{releaseOldSearch=resolve});data={items:term==='none'?[]:[{type:'Kunde',title:term==='old'?'Veraltetes Ergebnis':'Prüffirma AG',meta:'Bern',href:'/kunden/customer-one',icon:'users'},{type:'Rechnung',title:'RE-TEST-1',meta:'Prüffirma AG',href:'/rechnungen/RE-TEST-1',icon:'receipt'}]};}
+   else if(p==='/api/search'){const term=url.searchParams.get('q');if(term==='old')await new Promise(resolve=>{releaseOldSearch=resolve;oldSearchArrived?.()});data={items:term==='none'?[]:[{type:'Kunde',title:term==='old'?'Veraltetes Ergebnis':'Prüffirma AG',meta:'Bern',href:'/kunden/customer-one',icon:'users'},{type:'Rechnung',title:'RE-TEST-1',meta:'Prüffirma AG',href:'/rechnungen/RE-TEST-1',icon:'receipt'}]};}
    else if(p==='/api/settings/documents')data={item:{vat_rate:8.1,payment_terms_days:30,iban:'CH9300762011623852957',qr_iban:'',invoice_intro_text:'Synthetischer Rechnungstext',invoice_footer_text:'Synthetischer Schlusstext',quote_intro_text:'Synthetischer Angebotstext',quote_footer_text:'Synthetischer Schlusstext'}};
    else if(p==='/api/settings/subscription')data={item:{plan:'pro',subscription_status:'active',account_status:'active',unit_amount_chf:79,user_limit:10,storage_limit_bytes:21474836480,current_period_ends_at:'2026-11-09'}};
    else if(p==='/api/integrations/status')data={items:[{key:'billing',configured:false}]};
@@ -339,11 +350,13 @@ try{
     }
     const navigationToggle=page.locator('.desktop-navigation-toggle').filter({visible:true});
     const modal=page.locator('[aria-modal="true"]').filter({visible:true});
-    if(!process.env.BINSO_UX_BASELINE&&width>=1101&&await navigationToggle.count()&&await modal.count()){
+    if(!process.env.BINSO_UX_BASELINE&&width>=761&&await navigationToggle.count()&&await modal.count()){
       assert.ok(await modal.last().evaluate(el=>el.contains(document.activeElement)),'Open modal owns keyboard focus');
       assert.ok(await navigationToggle.evaluate(el=>{const box=el.getBoundingClientRect();return !el.contains(document.elementFromPoint(box.x+box.width/2,box.y+box.height/2))}),'Modal backdrop blocks desktop navigation pointer access');
     }
-    if(!process.env.BINSO_UX_BASELINE&&width>=1101&&await navigationToggle.count()&&!await modal.count()){
+    if(!process.env.BINSO_UX_BASELINE&&width>=761&&await navigationToggle.count()&&!await modal.count()){
+     await withNavigationPreferenceLock(async()=>{
+      await page.waitForFunction(()=>document.querySelector('.desktop-navigation-toggle')?.getAttribute('aria-expanded')==='true');
       await assertNavigationToggle(navigationToggle,false);
       const sidebar=page.locator('.app-sidebar,.operator-sidebar').filter({visible:true});
       await navigationToggle.click();
@@ -354,8 +367,9 @@ try{
       assert.equal(await page.evaluate(()=>localStorage.getItem('binso.desktop-navigation')),'collapsed','Desktop preference survives navigation');
       await navigationToggle.click();
       assert.equal(await navigationToggle.getAttribute('aria-expanded'),'true','Desktop navigation expands again');
+     });
     }
-    if(!process.env.BINSO_UX_BASELINE&&width<=1100)assert.equal(await navigationToggle.count(),0,'Desktop collapse control stays out of the mobile shell');
+    if(!process.env.BINSO_UX_BASELINE&&width<=760)assert.equal(await navigationToggle.count(),0,'Desktop collapse control stays out of the mobile shell');
     if(!process.env.BINSO_UX_BASELINE)for(const ring of await page.locator('.bo-ring-visual').all()){
       const geometry=await ring.evaluate(el=>{const box=el.getBoundingClientRect(),center=el.querySelector('.bo-ring-center').getBoundingClientRect();return {dx:Math.abs(box.x+box.width/2-center.x-center.width/2),dy:Math.abs(box.y+box.height/2-center.y-center.height/2)}});
       assert.ok(geometry.dx<1&&geometry.dy<1,'Ring value and label share its geometric center');
@@ -364,8 +378,17 @@ try{
     const geometry=await page.evaluate(()=>({overflow:[...document.querySelectorAll('body *')].filter(el=>el.getBoundingClientRect().right>innerWidth+1).slice(0,12).map(el=>({tag:el.tagName,cls:el.className,text:el.textContent?.slice(0,80),parent:el.parentElement?.className,right:el.getBoundingClientRect().right})),viewport:innerWidth,scroll:document.documentElement.scrollWidth,body:document.body.scrollWidth,sort:[...document.querySelectorAll('.toolbar .filter-button')].map(el=>el.getBoundingClientRect().width),metricDividers:[...document.querySelectorAll('.metric,.finance-flow-primary,.finance-flow-result,.finance-flow-costs,.finance-flow-costs>div')].map(el=>getComputedStyle(el).borderLeftWidth)}));
     if(geometry.scroll>width+1||geometry.body>width+1){console.log('Overflow details',JSON.stringify(await page.evaluate(()=>[...document.querySelectorAll('body *')].filter(el=>el.scrollWidth>el.clientWidth+2).slice(0,30).map(el=>({tag:el.tagName,cls:el.className,width:el.clientWidth,scroll:el.scrollWidth,overflow:getComputedStyle(el).overflowX,children:[...el.children].map(c=>({tag:c.tagName,width:c.clientWidth,scroll:c.scrollWidth,rect:c.getBoundingClientRect().width,min:getComputedStyle(c).minWidth,grid:getComputedStyle(el).gridTemplateColumns})),rect:JSON.stringify(el.getBoundingClientRect())}))),null,2));await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${width}-overflow.png`)});}
     assert.ok(geometry.scroll<=width+1&&geometry.body<=width+1,`${theme} ${width} ${route}: horizontal overflow ${JSON.stringify(geometry)}`);
-    if(!process.env.BINSO_UX_BASELINE&&width<=1100)await assertMobileHeaderTargets(page);
-    if(!process.env.BINSO_UX_BASELINE&&width<=1100&&await page.locator('.page-container,.operator-app-content').count()){
+    if(!process.env.BINSO_UX_BASELINE&&width<=760){await assertFlatMobileNavigation(page);if(route==='/dashboard'&&width===390&&!process.env.BINSO_UX_FIXTURE_CASE)await verifyFlatNavigationAdversaries(page);}
+    if(!process.env.BINSO_UX_BASELINE){
+     const listFrames=await page.locator('.records,.desktop-record-table').filter({visible:true}).evaluateAll(nodes=>nodes.map(el=>({top:getComputedStyle(el).borderTopWidth,bottom:getComputedStyle(el).borderBottomWidth})));
+     assert.ok(listFrames.every(frame=>frame.top==='0px'&&frame.bottom==='0px'),`${route}: list containers have no duplicate leading or terminal separator`);
+     for(const table of await page.locator('.desktop-record-table').filter({visible:true}).all()){
+      const header=table.locator('.desktop-record-head,.operator-table-head');if(await header.count())assert.equal(await header.evaluate(el=>getComputedStyle(el).borderBottomWidth),'1px','The actual table heading retains its row separator');
+      const rows=table.locator('.desktop-record-row,.operator-table-row');const count=await rows.count();if(count){assert.equal(await rows.last().evaluate(el=>getComputedStyle(el).borderBottomWidth),'0px','The final table entry has no terminal line');if(count>1)assert.equal(await rows.first().evaluate(el=>getComputedStyle(el).borderBottomWidth),'1px','Separators between actual table entries remain');}
+     }
+    }
+    if(!process.env.BINSO_UX_BASELINE){await assertOpaqueChrome(page);if(width<=760)await assertMobileHeaderTargets(page);}
+    if(!process.env.BINSO_UX_BASELINE&&width<=760&&await page.locator('.page-container,.operator-app-content').count()){
       const appearance=await page.locator('.page-container,.operator-app-content').first().evaluate(el=>({ink:getComputedStyle(el).color,surface:getComputedStyle(el).getPropertyValue('--app-surface').trim(),controls:[...el.querySelectorAll('.form-control,.form-textarea')].filter(node=>!['checkbox','radio','file'].includes(node.type)&&!node.closest('.searchbox,.thread-composer')).map(node=>({radius:getComputedStyle(node).borderTopLeftRadius,font:getComputedStyle(node).fontSize})),groups:[...el.querySelectorAll('.bo-settings-group-body')].map(node=>({background:getComputedStyle(node).backgroundColor,border:getComputedStyle(node).borderTopWidth}))}));
       assert.equal(appearance.ink,theme==='light'?(route.startsWith('/operator')?'rgb(32, 43, 59)':'rgb(33, 48, 71)'):(route.startsWith('/operator')?'rgb(215, 227, 243)':'rgb(215, 227, 243)'),`${route}: app text uses the central theme`);
       assert.ok(appearance.controls.every(control=>control.radius==='8px'),`${route}: shared app field corners ${JSON.stringify(appearance.controls)}`);
@@ -373,13 +396,13 @@ try{
     }
     for(const create of await page.locator('.bo-create-action').filter({visible:true}).all()){
       const shape=await create.evaluate(el=>{const c=getComputedStyle(el),r=el.getBoundingClientRect(),label=el.querySelector('.create-action-label');return {width:r.width,height:r.height,radius:c.borderRadius,background:c.backgroundColor,label:!!label?.getClientRects().length}});
-      if(width>=1101){assert.ok(shape.label,`${route}: desktop creation keeps its visible label`);assert.equal(shape.radius,'5px','Desktop creation follows the original control shape');assert.equal(shape.background,theme==='light'?'rgb(37, 102, 189)':'rgb(72, 167, 255)');}
+      if(width>=761){assert.ok(shape.label,`${route}: desktop creation keeps its visible label`);assert.equal(shape.radius,'5px','Desktop creation follows the original control shape');assert.equal(shape.background,theme==='light'?'rgb(37, 102, 189)':'rgb(72, 167, 255)');}
       else{assert.equal(shape.label,false,'Mobile creation uses the original round plus');assert.equal(shape.width,44);assert.equal(shape.height,44);assert.equal(shape.radius,'50%');}
     }
     // Snapshot values in one browser task: query hydration can replace metric nodes between awaited locator calls.
     const moneyDirections=await page.locator('.metric-money').evaluateAll(nodes=>nodes.filter(el=>el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden').map(el=>getComputedStyle(el).flexDirection));
     for(const direction of moneyDirections){
-      assert.equal(direction,width<=1100?'column-reverse':'row',`${route} ${width}px: metric currency follows the original responsive arrangement`);
+      assert.equal(direction,width<=760?'column-reverse':'row',`${route} ${width}px: metric currency follows the original responsive arrangement`);
     }
     assert.ok(geometry.sort.every(size=>size<=44),`${route}: sorting control is too wide`);
     assert.ok(geometry.metricDividers.every(size=>parseFloat(size)===0),`${route}: metric dividers`);
@@ -405,7 +428,7 @@ try{
     if(!process.env.BINSO_UX_BASELINE&&['/finanzen/analyse','/kunden/customer-one?tab=finances'].includes(route)){
       assert.equal(await page.locator('.bo-statistics .bo-metric-tiles>.metric').count(),route==='/kunden/customer-one?tab=finances'?3:4,'The common foundation shows domain-appropriate primary metrics');
       assert.equal(await page.locator('.bo-statistics').count(),1,'One central statistics surface');
-      assert.equal(await page.locator('.bo-statistics').evaluate(el=>getComputedStyle(el).backgroundColor),width<=1100?(theme==='light'?'rgb(255, 255, 255)':'rgb(0, 0, 0)'):(theme==='light'?'rgb(255, 255, 255)':'rgb(0, 0, 0)'),'Statistics follow the app surface on phone/tablet and page surface on desktop');
+      assert.equal(await page.locator('.bo-statistics').evaluate(el=>getComputedStyle(el).backgroundColor),width<=760?(theme==='light'?'rgb(255, 255, 255)':'rgb(0, 0, 0)'):(theme==='light'?'rgb(255, 255, 255)':'rgb(0, 0, 0)'),'Statistics follow the app surface on phone/tablet and page surface on desktop');
       const trendToggle=page.getByRole('button',{name:'Zeitverlauf anzeigen',exact:true}),initiallyCollapsed=await trendToggle.count()>0;if(initiallyCollapsed)await trendToggle.click();
       assert.ok(process.env.BINSO_UX_FIXTURE_CASE==='empty'||await page.locator('.bo-statistics-line').evaluateAll(elements=>elements.some(el=>{const ys=Array.from({length:el.points.numberOfItems},(_,i)=>el.points.getItem(i).y);return Math.max(...ys)-Math.min(...ys)>20})),'Actual fixture values produce time-series lines');
       assert.equal(await page.locator('.revenue-insight,.dashboard-summary,.quick-section,.finance-overview-chart').count(),0,'Migrated pages have no competing KPI/chart layout');
@@ -420,10 +443,13 @@ try{
       assert.equal(await page.locator('.bo-statistics').count(),0,'The period chart belongs to the document/finance tab');
       assert.equal(await page.locator('h1').filter({visible:true}).count(),1,'Reference dossier has exactly one visible primary heading');
       const summaryBox=await dossier.locator('[data-area="summary"]').boundingBox(),factsBox=await dossier.locator('[data-area="facts"]').boundingBox(),recordsBox=await dossier.locator('[data-area="records"]').boundingBox();
-      if(width<=1100)assert.ok(summaryBox.y<factsBox.y&&factsBox.y<recordsBox.y,'Mobile order: finances, contact facts, open invoices');
-      else assert.ok(factsBox.x>summaryBox.x&&recordsBox.y>summaryBox.y,'Desktop order: work on the left, contact facts on the right');
+      if(width<=760)assert.ok(summaryBox.y<factsBox.y&&factsBox.y<recordsBox.y,'Mobile order: finances, contact facts, open invoices');
+      else if(await page.locator('.customer-detail-workspace').evaluate(el=>el.clientWidth)<=720){
+       assert.ok(summaryBox.y+summaryBox.height<=factsBox.y&&factsBox.y+factsBox.height<=recordsBox.y,'Compact desktop order: finances, contact facts, open invoices');
+       assert.ok(Math.abs(summaryBox.x-recordsBox.x)<=1&&Math.abs(summaryBox.width-recordsBox.width)<=1,'Compact desktop sections share the available content width');
+      }else assert.ok(factsBox.x>summaryBox.x&&recordsBox.y>summaryBox.y,'Desktop order: work on the left, contact facts on the right');
       const supplementary=dossier.locator('.bo-data-disclosure');
-      if(width<=1100){
+      if(width<=760){
        assert.equal(await supplementary.getAttribute('open'),null,'Supplementary mobile facts start collapsed');
        await supplementary.locator('summary').click();await page.waitForFunction(()=>document.querySelector('.bo-data-disclosure').open);
        await supplementary.locator('summary').press('Enter');await page.waitForFunction(()=>!document.querySelector('.bo-data-disclosure').open);
@@ -433,15 +459,19 @@ try{
     }
     if(!process.env.BINSO_UX_BASELINE&&route==='/mitarbeiter/employee-one'){await page.locator('.detail-list').getByText(employee.email,{exact:true}).waitFor();assert.equal(await page.locator('.entity-detail-workspace .settings-profile').count(),0,'The original employee dossier does not repeat its identity in a profile card')}
     if(!process.env.BINSO_UX_BASELINE&&route==='/support/ticket-one'){
-      const before=await page.locator('.thread-composer').boundingBox();await page.locator('.thread-messages').evaluate(el=>{el.scrollTop=0});const after=await page.locator('.thread-composer').boundingBox();assert.deepEqual(after,before,'Only messages scroll; composer stays fixed');
+      await assertChatTargets(page);
+      await withNavigationPreferenceLock(async()=>{
+       if(width>=761){await page.waitForFunction(()=>document.querySelector('.desktop-navigation-toggle')?.getAttribute('aria-expanded')==='true');await waitForFiniteAnimations(page);}
+       const before=await page.locator('.thread-composer').boundingBox();await page.locator('.thread-messages').evaluate(el=>{el.scrollTop=0});const after=await page.locator('.thread-composer').boundingBox();assert.deepEqual(after,before,'Only messages scroll; composer stays fixed');
+      });
       const visible=await page.evaluate(()=>{const composer=document.querySelector('.thread-composer').getBoundingClientRect(),nav=document.querySelector('.bottom-nav');const limit=nav?.getClientRects().length?nav.getBoundingClientRect().top:innerHeight;return composer.bottom<=limit+1&&composer.top>=0&&scrollY===0});assert.ok(visible,'Chat input stays above navigation in every app viewport');
     }
     if(!process.env.BINSO_UX_BASELINE){await waitForFiniteAnimations(page);for(const control of await page.locator('.form-field>.form-control').filter({visible:true}).all()){
      const g=await control.evaluate(el=>{const c=getComputedStyle(el);return {height:el.getBoundingClientRect().height,radius:c.borderRadius,padding:c.paddingLeft,font:c.fontSize,auth:!!el.closest('.auth-workspace'),app:!!el.closest('.page-container,.operator-app-content,.bottom-sheet,.header-panel,.confirm-dialog')}});
-     assert.equal(g.height,width<=760||(g.app&&width<=1100)?44:g.auth?46:40,`${route}: canonical closed field height`);assert.equal(g.padding,'11px',`${route}: canonical field inset`);assert.equal(g.radius,g.auth?'5px':width<=1100?'8px':'7px',`${route}: canonical field radius`);
+     assert.equal(g.height,width<=760||(g.app&&width<=760)?44:g.auth?46:40,`${route}: canonical closed field height`);assert.equal(g.padding,'11px',`${route}: canonical field inset`);assert.equal(g.radius,g.auth?'5px':width<=760?'8px':'7px',`${route}: canonical field radius`);
     }}
     for(const label of await page.locator('.detail-list dt').filter({visible:true}).all()){const confined=await label.evaluate(el=>{const r=el.getBoundingClientRect(),range=document.createRange();range.selectNodeContents(el);return [...range.getClientRects()].every(text=>text.right<=r.right+1)});assert.ok(confined,`${route}: detail labels never overlap their values`);}
-    if(width<=1100&&await page.locator('.mobile-header-detail').count())assert.equal(await page.locator('.page-head h1,.page-head .status,.desktop-back').filter({visible:true}).count(),0,route+' '+width+': app detail header owns its title/status/back once, including tablet');
+    if(width<=760&&await page.locator('.mobile-header-detail').count())assert.equal(await page.locator('.page-head h1,.page-head .status,.desktop-back').filter({visible:true}).count(),0,route+' '+width+': app detail header owns its title/status/back once, including tablet');
     if(route.endsWith('/neu')&&await page.locator('.mobile-sticky-save').count()){assert.equal(await page.locator('.mobile-sticky-save .button-primary').filter({visible:true}).count(),1,`${route}: form footer action must be reachable`);assert.equal(await page.locator('.page-head .page-actions .button-primary,.mobile-detail-actions .button-primary').filter({visible:true}).count(),0,`${route}: duplicate header save`);}
     if(width<=760&&await page.locator('.app-root:not(.app-preview):not(.app-editing)').count()&&!route.endsWith('/neu')&&!route.startsWith('/operator'))assert.equal(await page.locator('nav.bottom-nav').isVisible(),true,`${route}: bottom navigation hidden`);
     if(await page.locator('.app-editing').count())assert.equal(await page.locator('nav.bottom-nav').count(),0,`${route}: capture processes apply the existing visibility contract`);
@@ -492,9 +522,9 @@ try{
     const create=page.getByRole('button',{name:'Neu erstellen',exact:true}).filter({visible:true});
     await create.waitFor({state:'visible'});
     assert.equal(await create.count(),1,'One visible creation entry point on every viewport');
-    if(width<=1100){
+    if(width<=760){
      const geometry=await page.evaluate(()=>{const rect=selector=>document.querySelector(selector).getBoundingClientRect().toJSON(),css=selector=>getComputedStyle(document.querySelector(selector));return {nav:rect('.bottom-nav'),plus:rect('.page-head .bo-create-action'),capsule:css('.mobile-header-actions').backgroundColor,material:css('.bottom-nav').backgroundColor,header:css('.mobile-header').backgroundColor,page:css('.page-container').backgroundColor,blur:css('.mobile-header').backdropFilter,navBlur:css('.bottom-nav').backdropFilter,targets:[...document.querySelector('.bottom-nav').children].map(el=>el.getBoundingClientRect().toJSON())}});
-     assert.equal(geometry.header,geometry.page,'Header and page share one opaque canvas');assert.equal(geometry.blur,'none');assert.ok([geometry.page,'rgba(0, 0, 0, 0)'].includes(geometry.capsule),'Header actions use the shared canvas or a transparent surface');assert.equal(geometry.material,theme==='light'?'rgba(243, 243, 245, 0.78)':'rgba(33, 33, 33, 0.82)','Frozen navigation retains its approved glass material');assert.ok(geometry.navBlur.includes('blur'),'Only action surfaces use the glass blur');
+     assert.equal(geometry.header,geometry.page,'Header and page share one opaque canvas');assert.equal(geometry.blur,'none');assert.ok([geometry.page,'rgba(0, 0, 0, 0)'].includes(geometry.capsule),'Header actions use the shared canvas or a transparent surface');assert.equal(geometry.material,theme==='light'?'rgb(255, 255, 255)':'rgb(0, 0, 0)','Flat navigation shares the opaque theme canvas');assert.equal(geometry.navBlur,'none','Flat navigation never restores the old glass blur');await assertFlatMobileNavigation(page);
      assert.ok(geometry.targets.every(t=>t.width>=44&&t.height>=44),'Destinations keep minimum touch targets');
      assert.ok(geometry.plus.bottom<=geometry.nav.top,'Creation belongs to the page above navigation');
      assert.equal(await page.locator('.mobile-dock .bo-create-action,.dock-create-action').count(),0,'Navigation has no attached creation action');
@@ -505,7 +535,7 @@ try{
     }
     await create.click();const menu=page.getByRole('dialog',{name:'Neu erstellen',exact:true});assert.equal(await menu.locator('h2').count(),1,'One sheet heading');
     await page.keyboard.press('Escape');assert.equal(await create.evaluate(el=>el===document.activeElement),true,'Closing creation restores the actual trigger');
-    if(width<=1100){await navigate(base+'/kunden/customer-one');await captureNavigation(page,theme,width,false);}
+    if(width<=760){await navigate(base+'/kunden/customer-one');await captureNavigation(page,theme,width,false);}
    }
    await page.setViewportSize({width:390,height:740});await navigate(base+'/kunden');
    const customerCreate=page.getByRole('link',{name:'Neuer Kunde',exact:true}).filter({visible:true});assert.equal(await customerCreate.count(),1,'Customer list has one context-specific creation action');await customerCreate.click();await page.waitForURL(url=>url.pathname==='/kunden/neu');assert.equal(await page.locator('.mobile-dock').count(),0,'Forms do not retain navigation');await page.getByRole('dialog',{name:'Kunde erstellen',exact:true}).getByRole('button',{name:'Abbrechen',exact:true}).click();await page.waitForURL(base+'/kunden');
@@ -630,10 +660,10 @@ try{
    await navigate(base+'/finanzen');await page.waitForLoadState('networkidle');
    const overview=page.locator('.bo-cash-overview');
    assert.equal(await overview.locator('.metric').count(),4,'Finance opens the compact original overview');
-   assert.equal(await overview.locator('.metric>strong').first().textContent(),'CHF 400');
+   assert.equal(await overview.locator('.metric>strong').first().textContent(),'CHF 400.00');
    await overview.getByRole('combobox',{name:'Statistikzeitraum',exact:true}).selectOption('6');
-   assert.equal(await overview.locator('.metric>strong').first().textContent(),'CHF 640');
-   assert.equal(await overview.locator('.metric>strong').nth(1).textContent(),'CHF 200','Snapshot balances stay independent of the selected period');
+   assert.equal(await overview.locator('.metric>strong').first().textContent(),'CHF 640.00');
+   assert.equal(await overview.locator('.metric>strong').nth(1).textContent(),'CHF 200.00','Snapshot balances stay independent of the selected period');
    assert.equal(await overview.getByRole('button').count(),6,'Monthly development uses six actual month buckets');
    await overview.getByRole('button').last().click();assert.match(await overview.locator('output').textContent(),/CHF 400/);
    await page.getByRole('link',{name:'Finanzanalyse',exact:true}).click();await page.waitForLoadState('networkidle');
@@ -880,6 +910,13 @@ try{
   await page.setViewportSize({width:390,height:740});await navigate(base+'/support/neu');await page.waitForLoadState('networkidle');const supportForm=page.getByRole('dialog',{name:'Neue Support-Anfrage',exact:true});await supportForm.waitFor();await supportForm.getByLabel('Betreff',{exact:true}).fill('Keyboard draft');await supportForm.getByLabel('Nachricht',{exact:true}).fill('Preserved message');
   await page.setViewportSize({width:390,height:400});await supportForm.getByLabel('Nachricht',{exact:true}).focus();await settleLayout(page);const supportFooter=await supportForm.locator('.sheet-form-footer').boundingBox();assert.ok(supportFooter.y+supportFooter.height<=400,'Native support form actions remain above the keyboard');assert.equal(await supportForm.getByLabel('Betreff',{exact:true}).inputValue(),'Keyboard draft');const focus=await supportForm.getByLabel('Nachricht',{exact:true}).evaluate(el=>({shadow:getComputedStyle(el).boxShadow,offset:getComputedStyle(el).outlineOffset}));assert.equal(focus.shadow,'none');assert.equal(focus.offset,'-2px','Single inset outline replaces competing focus rings');await supportForm.getByRole('button',{name:'Schliessen',exact:true}).click();await page.getByRole('button',{name:'Änderungen verwerfen',exact:true}).click();
   await page.setViewportSize({width:375,height:400});await page.waitForLoadState('networkidle');await navigate(base+'/support/ticket-one');await page.waitForLoadState('networkidle');
+  await assertChatTargets(page);
+  const sendTarget=page.locator('.thread-composer>button:last-child'),sendStyle=await sendTarget.getAttribute('style');
+  try{
+   await sendTarget.evaluate(el=>{el.style.setProperty('width','40px','important');el.style.setProperty('min-width','0','important')});
+   await assert.rejects(()=>assertChatTargets(page),/44px touch targets/,'The historical undersized chat control must be rejected');
+  }finally{await sendTarget.evaluate((el,style)=>style===null?el.removeAttribute('style'):el.setAttribute('style',style),sendStyle);}
+  await assertChatTargets(page);
   await page.getByLabel('Nachricht',{exact:true}).focus();const composer=await page.locator('.thread-composer').boundingBox(),chatHeader=await page.locator('.mobile-header').boundingBox();assert.ok(composer.y>=chatHeader.y+chatHeader.height&&composer.y+composer.height<=400,'Short chat viewport retains header and input');
   const sendsBeforeNewline=messagePosts;
   await page.getByLabel('Nachricht',{exact:true}).fill('First line');await page.getByLabel('Nachricht',{exact:true}).press('Enter');await page.getByLabel('Nachricht',{exact:true}).pressSequentially('Second line');
@@ -919,7 +956,7 @@ try{
     await page.setViewportSize({width,height:740});await navigate(base+'/dashboard');await page.waitForLoadState('networkidle');
     const create=page.getByRole('button',{name:'Neu erstellen',exact:true}).filter({visible:true});
     const size=await create.boundingBox();
-    if(width<=1100){assert.equal(size.width,44,'Mobile creation has a real 44px touch target');assert.equal(size.height,size.width);}else{assert.ok(size.width>size.height,'Desktop creation exposes its visible text label');assert.equal(size.height,40);}
+    if(width<=760){assert.equal(size.width,44,'Mobile creation has a real 44px touch target');assert.equal(size.height,size.width);}else{assert.ok(size.width>size.height,'Desktop creation exposes its visible text label');assert.equal(size.height,40);}
     await create.click();const menu=page.getByRole('dialog',{name:'Neu erstellen',exact:true});
     assert.deepEqual(await menu.locator('.action-row>span').allTextContents(),['Kunde','Angebot','Rechnung','Zeit erfassen','Projekt','Zahlung','Spese','Produkt','Mitarbeiter','Support-Anfrage']);
     assert.equal(await page.getByRole('button',{name:'Weiter',exact:true}).count(),0,'Opening global plus never starts an invoice wizard');
@@ -928,18 +965,27 @@ try{
    }
    for(const width of [320,390,768,1440]){
     await page.setViewportSize({width,height:740});await navigate(base+'/dashboard');await page.waitForLoadState('networkidle');
-    const header=page.locator(width<=1100?'.mobile-header':'.desktop-appbar');
+    const header=page.locator(width<=760?'.mobile-header':'.desktop-appbar');
     await page.evaluate(()=>window.scrollTo(0,180));const scroll=await page.evaluate(()=>scrollY);
     const searchTrigger=await header.getByRole('button',{name:'Suche',exact:true}).boundingBox();await page.mouse.click(searchTrigger.x+searchTrigger.width/2,searchTrigger.y+searchTrigger.height/2);
     const panel=page.getByRole('dialog',{name:'Suche',exact:true});await panel.waitFor();
     assert.equal(await page.locator('.bottom-sheet').count(),0,'Header search is not a bottom sheet');
-    assert.equal(await panel.getByRole('button',{name:'Abbrechen',exact:true}).filter({visible:true}).count(),width<=1100?1:0,'Mobile search cancels beside the input; desktop uses the anchored close control');
+    assert.equal(await panel.getByRole('button',{name:'Abbrechen',exact:true}).filter({visible:true}).count(),width<=760?1:0,'Mobile search cancels beside the input; desktop uses the anchored close control');
     assert.equal(await panel.getByLabel('Suchen',{exact:true}).evaluate(el=>el===document.activeElement),true,'Search focuses its input');
-    const box=await panel.boundingBox(),bar=await header.boundingBox();assert.ok(box.x>=0&&box.x+box.width<=width+1,'Panel stays within viewport');if(width<=1100){assert.ok(box.y<=1&&box.height>=739,'Mobile search owns a full view');assert.equal(await page.locator('.page-head h1').filter({visible:true}).textContent(),'Dein Überblick.');}else assert.ok(box.y>=bar.y+bar.height-1,'Desktop panel remains anchored under header');
+    const box=await panel.boundingBox(),bar=await header.boundingBox();assert.ok(box.x>=0&&box.x+box.width<=width+1,'Panel stays within viewport');if(width<=760){assert.ok(box.y<=1&&box.height>=739,'Mobile search owns a full view');assert.equal(await page.locator('.page-head h1').filter({visible:true}).textContent(),'Dein Überblick.');}else assert.ok(box.y>=bar.y+bar.height-1,'Desktop panel remains anchored under header');
     assert.equal(await page.evaluate(()=>document.body.style.overflow),'clip');
     assert.equal(await panel.getByText('Mindestens zwei Zeichen eingeben.',{exact:true}).count(),0);
-    const oldRequest=page.waitForRequest(request=>new URL(request.url()).pathname==='/api/search'&&new URL(request.url()).searchParams.get('q')==='old');await panel.getByLabel('Suchen',{exact:true}).fill('old');await oldRequest;await panel.getByLabel('Suchen',{exact:true}).fill('Prüffirma');
-    await panel.getByText('Prüffirma AG',{exact:true}).first().waitFor();releaseOldSearch();releaseOldSearch=null;await page.waitForLoadState('networkidle');assert.equal(await panel.getByText('Veraltetes Ergebnis',{exact:true}).count(),0,'Stale responses never replace current search');
+    // Request observation precedes route-handler entry in WebKit. Synchronize both
+    // ends of the held fixture; networkidle alone is not response completion.
+    const heldSearch=new Promise(resolve=>{oldSearchArrived=resolve});
+    const oldRequest=page.waitForRequest(request=>new URL(request.url()).pathname==='/api/search'&&new URL(request.url()).searchParams.get('q')==='old');
+    await panel.getByLabel('Suchen',{exact:true}).fill('old');const staleRequest=await oldRequest;await heldSearch;oldSearchArrived=null;
+    await panel.getByLabel('Suchen',{exact:true}).fill('Prüffirma');
+    await panel.getByText('Prüffirma AG',{exact:true}).first().waitFor();
+    const staleResponse=page.waitForResponse(response=>response.request()===staleRequest);
+    releaseOldSearch();releaseOldSearch=null;
+    const completedStale=await staleResponse;assert.equal(completedStale.status(),200,'The delayed old response is actually delivered');assert.equal(await completedStale.finished(),null,'The old response finishes before navigation/fixture cleanup');
+    await page.waitForLoadState('networkidle');assert.equal(await panel.getByText('Veraltetes Ergebnis',{exact:true}).count(),0,'Stale responses never replace current search');
     await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${width}-header-search.png`)});
     await page.setViewportSize({width,height:400});
     const keyboardGeometry=await panel.evaluate(el=>{const root=document.documentElement,previous=root.style.getPropertyValue('--dialog-viewport-height');root.style.setProperty('--dialog-viewport-height','740px');const box=el.getBoundingClientRect();root.style.setProperty('--dialog-viewport-height',previous);return {top:box.top,bottom:box.bottom,height:innerHeight}});
@@ -951,14 +997,14 @@ try{
     const accountRows=await account.locator('.action-row').evaluateAll(rows=>rows.map(row=>{const css=getComputedStyle(row),box=row.getBoundingClientRect(),icon=row.firstElementChild.getBoundingClientRect(),text=row.children[1].getBoundingClientRect();return {height:box.height,font:css.fontSize,weight:css.fontWeight,display:css.display,grid:css.gridTemplateColumns,iconLeft:icon.left,textLeft:text.left,iconWidth:icon.width}}));
     assert.ok(accountRows.length>=6);for(const row of accountRows){const {height,...geometry}=row;const {height:minimum,...reference}=accountRows[0];assert.ok(height>=minimum,'Wrapped labels grow rather than clipping');assert.deepEqual(geometry,reference,'Account groups share icon/text columns and typography');}
     await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${width}-header-account.png`)});
-    if(width<=1100)await account.getByRole('button',{name:'Zurück',exact:true}).click();
+    if(width<=760)await account.getByRole('button',{name:'Zurück',exact:true}).click();
     await header.getByRole('button',{name:'Benachrichtigungen',exact:true}).click();const notifications=page.getByRole('dialog',{name:'Benachrichtigungen',exact:true});await notifications.getByText('Neue Rechnung',{exact:true}).waitFor();assert.equal(await account.count(),0,'Only one header panel is mounted');
     await notifications.getByRole('button',{name:'Ungelesen',exact:true}).click();assert.equal(await notifications.getByText('Produktinformation',{exact:true}).count(),0);
     await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${width}-header-notifications.png`)});await page.keyboard.press('Escape');
    }
    for(const width of [320,390,768,1440]){
     await page.setViewportSize({width,height:740});await navigate(base+'/einstellungen/darstellung');await page.waitForLoadState('networkidle');
-    const choices=page.getByRole('radiogroup',{name:'Darstellung',exact:true});assert.equal(await choices.getByRole('radio').count(),3);assert.equal(await page.locator('.appearance-card,.theme-preview').count(),0);
+    const choices=page.getByRole('radiogroup',{name:'Darstellung',exact:true});await choices.waitFor({state:'visible'});assert.equal(await choices.getByRole('radio').count(),3);assert.equal(await page.locator('.appearance-card,.theme-preview').count(),0);
     const heights=await choices.getByRole('radio').evaluateAll(rows=>rows.map(row=>row.getBoundingClientRect().height));assert.ok(heights.every(height=>Math.abs(height-heights[0])<1),'Theme rows keep equal heights');
     assert.deepEqual(await page.getByLabel('Sprache',{exact:true}).locator('option').evaluateAll(options=>options.map(option=>option.value)),['de','fr','it','en'],'Expose the complete translated language catalogue');
     await choices.getByRole('radio',{name:/^Hell/}).click();await page.waitForFunction(()=>document.documentElement.dataset.theme==='light');
@@ -1063,7 +1109,7 @@ try{
    await navigate(base+'/einstellungen/sicherheit');await page.getByText('Safari · iPhone',{exact:true}).waitFor();await page.getByText('Chrome · Windows',{exact:true}).waitFor();
    await capture(page,{animations:'disabled',path:path.join(output,`${theme}-320-security-settings.png`)});
    sessionDeletes=0;await page.getByRole('button',{name:'Abmelden',exact:true}).click();const revoke=page.getByRole('alertdialog');await revoke.waitFor();assert.equal(sessionDeletes,0,'Opening session confirmation does not revoke');await revoke.getByRole('button',{name:'Abbrechen',exact:true}).click();assert.equal(sessionDeletes,0);await page.getByRole('button',{name:'Abmelden',exact:true}).click();await revoke.getByRole('button',{name:'Abmelden',exact:true}).click();await revoke.waitFor({state:'hidden'});assert.equal(sessionDeletes,1);await page.getByText('Dieses Gerät',{exact:false}).waitFor();
-   securityUnavailable=true;await navigate(base+'/einstellungen/sicherheit');await page.getByRole('alert').filter({hasText:'Fixture security status unavailable'}).waitFor();await page.getByRole('alert').filter({hasText:'Fixture sessions unavailable'}).waitFor();assert.equal(await page.getByText('Keine aktive Sitzung gefunden.',{exact:true}).count(),0,'Failed session load is not an empty session list');assert.equal(await page.getByText('Sicherheitsstatus wird geladen…',{exact:true}).count(),0,'Failed security load is not perpetual loading');securityUnavailable=false;await page.getByLabel('Neues Passwort',{exact:true}).fill('Draft retained through retry');await page.getByRole('alert').filter({hasText:'Fixture security status unavailable'}).getByRole('button',{name:'Erneut versuchen',exact:true}).click();await page.getByRole('alert').filter({hasText:'Fixture sessions unavailable'}).getByRole('button',{name:'Erneut versuchen',exact:true}).click();await page.getByText('Safari · iPhone',{exact:true}).waitFor();assert.equal(await page.getByLabel('Neues Passwort',{exact:true}).inputValue(),'Draft retained through retry','Retry preserves unsaved security inputs');
+   securityUnavailable=true;await navigate(base+'/einstellungen/sicherheit');await page.getByRole('alert').filter({hasText:'Fixture security status unavailable'}).waitFor();await page.getByRole('alert').filter({hasText:'Fixture sessions unavailable'}).waitFor();assert.equal(await page.getByText('Keine aktive Sitzung gefunden.',{exact:true}).count(),0,'Failed session load is not an empty session list');assert.equal(await page.getByText('Sicherheitsstatus wird geladen…',{exact:true}).count(),0,'Failed security load is not perpetual loading');securityUnavailable=false;let releaseSecurityRetry;securityRetryGate=new Promise(resolve=>{releaseSecurityRetry=resolve});await page.getByRole('alert').filter({hasText:'Fixture security status unavailable'}).getByRole('button',{name:'Erneut versuchen',exact:true}).click();await page.getByRole('alert').filter({hasText:'Fixture sessions unavailable'}).getByRole('button',{name:'Erneut versuchen',exact:true}).click();await page.getByRole('button',{name:'Passwort ändern',exact:true}).click();const retryPassword=page.getByRole('dialog',{name:'Passwort ändern',exact:true});await retryPassword.getByLabel('Neues Passwort',{exact:true}).fill('Draft retained through retry');const mfaRetried=page.waitForResponse(response=>new URL(response.url()).pathname==='/api/auth/mfa'&&response.status()===200),sessionsRetried=page.waitForResponse(response=>new URL(response.url()).pathname==='/api/auth/sessions'&&response.status()===200);releaseSecurityRetry();securityRetryGate=null;await Promise.all([mfaRetried,sessionsRetried]);await page.getByText('Safari · iPhone',{exact:true}).waitFor();assert.equal(await retryPassword.getByLabel('Neues Passwort',{exact:true}).inputValue(),'Draft retained through retry','Retry preserves unsaved security inputs');await retryPassword.getByLabel('Neues Passwort',{exact:true}).fill('');await retryPassword.getByRole('button',{name:'Schliessen',exact:true}).click();await retryPassword.waitFor({state:'hidden'});
    await navigate(base+'/einstellungen/abonnement');await page.getByText('Nutzung',{exact:true}).waitFor();await capture(page,{animations:'disabled',path:path.join(output,`${theme}-320-subscription-settings.png`)});
   }
   if(hasInteraction('operator')){
@@ -1215,7 +1261,7 @@ try{
    for(const [name,value] of [['detail',/1[’']561\.97/],['list',/1[’']561\.97/],['customer',/1[’']561\.97/],['finance',/1[’']561\.97/],['payments',/1[’']000\.00/],['dashboard',/1[’']561\.97/],['customerOverview',/1[’']561\.97/],['activity','Zahlung erhalten']]){
     await tabs[name].waitForFunction(()=>window.v215ConsumerChanges.some(message=>message.domains?.includes('payments')),undefined,{polling:100});await tabs[name].bringToFront();await tabs[name].getByText(value,{exact:typeof value==='string'}).first().waitFor();assert.equal(await tabs[name].evaluate(()=>window.v215ConsumerMarker),'same-document',name+' updates without a reload');
    }
-   for(const [name,amount] of [['dashboard',"CHF 1'000"],['finance',"CHF 1'561.97"],['customerOverview',"CHF 1'561.97"]]){
+   for(const [name,amount] of [['dashboard',"CHF 1'000.00"],['finance',"CHF 1'561.97"],['customerOverview',"CHF 1'561.97"]]){
     await tabs[name].bringToFront();assert.equal((await tabs[name].locator(name==='customerOverview'?'.detail-grid [data-area="summary"] .metric>strong':'.bo-cash-overview .metric>strong').nth(1).textContent())?.replaceAll('’',"'"),amount,name+' domain metric refreshes from the same confirmed ledger');
    }
    for(const tab of Object.values(tabs))await tab.close();dataPaymentMode=false;Object.assign(invoice,priorInvoice);summary.invoices[0].open_amount=priorOpenAmount;collections.payments=collections.payments.filter(row=>row.id!=='foundation-payment');collections.customers=collections.customers.filter(row=>row.id!=='customer-two');Object.assign(customer,priorCustomer);
@@ -1232,7 +1278,7 @@ try{
  }
  await writeTestOutput(path.join(output,`results-${process.env.BINSO_UX_THEMES??'light-dark'}.json`),JSON.stringify({browser:process.env.BINSO_UX_BROWSER??'chromium',device:process.env.BINSO_UX_DEVICE??'responsive viewport',scope:'Synthetic API UI fixtures; no production writes',interactions:requestedInteractions,results,errors},null,2));
  await fs.copyFile(path.join(output,`results-${process.env.BINSO_UX_THEMES??'light-dark'}.json`),path.join(output,`results-${process.env.BINSO_UX_BROWSER??'chromium'}-${process.env.BINSO_UX_THEMES??'light-dark'}.json`));
- if(navigationCaptures.length)await writeTestOutput(path.join(output,'navigation-capture.json'),JSON.stringify({schemaVersion:2,provenance:'Explicit capture for the user-authorized 2026-10-13 glass/dock layout; browser fixtures, not physical PWA approval.',cases:navigationCaptures},null,2)+'\n');
+ if(navigationCaptures.length)await writeTestOutput(path.join(output,'navigation-capture.json'),JSON.stringify({schemaVersion:3,provenance:'Explicit 2026-10-18 flat Microsoft material capture; preserved bounds/rights/safe areas/motion; browser fixtures, not physical PWA approval.',cases:navigationCaptures},null,2)+'\n');
  if(process.env.BINSO_UX_VISUAL_AUDIT==='1')await writeTestOutput(path.join(output,'visual-audit.json'),JSON.stringify({scope:'Rendered candidates for human review, not automatic ZIP acceptance',views:visualAudit},null,2));
  console.log(`UX browser checks passed: ${results.length} route/theme/viewport combinations ; interactions: ${process.env.BINSO_UX_MATRIX_ONLY==="1"?"matrix only":requestedInteractions.join(",")}. Artifacts: ${output}`);
-}finally{await context?.close();await browser?.close();server?.kill();}
+}catch(error){console.error('UX regression failed before fixture cleanup:',error.stack??error);throw error;}finally{await context?.close();await browser?.close();server?.kill();}

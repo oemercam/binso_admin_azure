@@ -5,6 +5,7 @@ import {useCallback,useEffect,useRef,useState} from "react";
 import {useRouter,useSearchParams} from "next/navigation";
 import ConfirmDialog from "./confirm-dialog";
 import {AppShell} from "./app-shell";
+import {ActionRow,FormSheet,SettingsGroup} from "./binso-ux";
 import {Button, Field, SectionTitle, Status, Toast, Input, ErrorState, LoadingState} from "./ui";
 import {apiDelete,apiGet,apiPatch,apiPost} from "@/lib/client/backend";
 import {safeAppPath} from "@/lib/navigation";
@@ -28,6 +29,7 @@ export function SecuritySettingsPage(){
   const router=useRouter();
   const search=useSearchParams();
   const next=search.get("next");
+  const [panel,setPanel]=useState<"password"|"mfa"|null>(null);
   const [mfa,setMfa]=useState<MfaState|null>(null);
   const [mfaError,setMfaError]=useState("");
   const [sessionsError,setSessionsError]=useState("");
@@ -54,6 +56,8 @@ export function SecuritySettingsPage(){
       .finally(()=>setSessionsLoading(false));
   },[]);
   useEffect(()=>{void loadMfa();void loadSessions()},[loadMfa,loadSessions]);
+
+  useEffect(()=>{if(next&&mfa?.required&&!mfa.enabled&&!mfa.demo)queueMicrotask(()=>setPanel("mfa"))},[next,mfa]);
 
   const startSetup=async()=>{setToastTone("danger");
     try{
@@ -100,17 +104,17 @@ export function SecuritySettingsPage(){
   };
 
   return <AppShell title="Sicherheit" subtitle="Mehrstufiger Schutz für dein Binso One Konto." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen" unsavedChanges={!!(currentPassword||newPassword||confirmPassword||code||setup||recovery.length)}>
-    <section className="surface security-card">
-      <SectionTitle title="Passwort ändern"/>
+    {mfaError&&panel!=="mfa"&&<ErrorState onRetry={()=>{setMfaError("");void loadMfa()}} retryLabel="Erneut versuchen"><LocalizedText>{mfaError}</LocalizedText></ErrorState>}
+    <SettingsGroup title="Anmeldeschutz"><div className="action-list"><ActionRow icon="lock" title="Passwort ändern" onClick={()=>setPanel("password")}/><ActionRow icon="lock" title="Zwei-Faktor-Authentifizierung" description={!mfa?(mfaError?"Anmeldeschutzstatus nicht verfügbar.":undefined):mfa.demo?"Demo":mfa.enabled?"Aktiv":mfa.required?"Erforderlich":"Empfohlen"} endAdornment={!mfa&&!mfaError?<LoadingState/>:undefined} onClick={()=>setPanel("mfa")}/></div></SettingsGroup>
+    <FormSheet open={panel==="password"} label="Passwort ändern" onClose={()=>setPanel(null)} busy={busy} dirty={!!(currentPassword||newPassword||confirmPassword)}><section className="settings-form">
       <div className="form-grid">
         <Field label="Aktuelles Passwort"><Input value={currentPassword} onChange={e=>setCurrentPassword(e.target.value)} type="password" autoComplete="current-password"/></Field>
         <Field label="Neues Passwort"><Input value={newPassword} onChange={e=>setNewPassword(e.target.value)} type="password" autoComplete="new-password"/></Field>
         <Field label="Neues Passwort bestätigen"><Input value={confirmPassword} onChange={e=>setConfirmPassword(e.target.value)} type="password" autoComplete="new-password"/></Field>
       </div>
       <Button variant="secondary" disabled={busy} onClick={()=>void changePassword()}><LocalizedText>{"Passwort speichern"}</LocalizedText></Button>
-    </section>
-    <section className="surface security-card">
-      <SectionTitle title="Zwei-Faktor-Authentifizierung"/>
+    </section></FormSheet>
+    <FormSheet open={panel==="mfa"} label="Zwei-Faktor-Authentifizierung" onClose={()=>setPanel(null)} dirty={!!(setup||code||recovery.length)}><section className="settings-form">
       {!mfa?mfaError?<ErrorState onRetry={()=>{setMfaError("");void loadMfa()}} retryLabel="Erneut versuchen"><LocalizedText>{mfaError}</LocalizedText></ErrorState>:<LoadingState><LocalizedText>{"Sicherheitsstatus wird geladen…"}</LocalizedText></LoadingState>:mfa.demo?<div className="context-block"><Status tone="info"><LocalizedText>{"Demo"}</LocalizedText></Status><b><LocalizedText>{"Keine Authenticator-Einrichtung für die Demo nötig"}</LocalizedText></b><span><LocalizedText>{"Produktive Konten verwenden E-Mail-Codes oder einen Authenticator. Die Demo benötigt keinen Login."}</LocalizedText></span></div>:mfa.enabled?<div className="context-block"><Status tone="success"><LocalizedText>{"Aktiv"}</LocalizedText></Status><b><LocalizedText>{"Authenticator-App ist eingerichtet"}</LocalizedText></b><span><LocalizedText>{"Bei der Anmeldung wird nach E-Mail und Passwort zusätzlich ein zeitbasierter Authenticator-Code verlangt."}</LocalizedText></span></div>:<>
         <div className="context-block"><Status tone={mfa.required?"warning":"info"}><LocalizedText>{mfa.required?"Erforderlich":"Empfohlen"}</LocalizedText></Status><b><LocalizedText>{mfa.required?"Authenticator für diese Rolle erforderlich":"Authenticator-App aktivieren"}</LocalizedText></b><span><LocalizedText>{mfa.required?"Owner, Admin und Finance müssen den stärkeren zweiten Faktor einrichten. Bis dahin bleiben geschützte Produktfunktionen gesperrt.":"Ohne Authenticator wird bei jeder Anmeldung ein zusätzlicher Code per E-Mail verlangt."}</LocalizedText></span></div>
         {!setup&&<Button onClick={()=>void startSetup()}><LocalizedText>{"Authenticator einrichten"}</LocalizedText></Button>}
@@ -124,16 +128,16 @@ export function SecuritySettingsPage(){
       </div>}
       {recovery.length>0&&<div className="context-block"><Status tone="warning"><LocalizedText>{"Einmal anzeigen"}</LocalizedText></Status><b><LocalizedText>{"Recovery Codes sicher speichern"}</LocalizedText></b><span><LocalizedText>{"Jeder Code kann nur einmal verwendet werden. Bewahre sie getrennt von deinem Passwort auf."}</LocalizedText></span><pre>{recovery.join("\n")}</pre></div>}
       {mfa?.enabled&&next&&<Button onClick={()=>router.push(safeAppPath(next))}><LocalizedText>{"Weiter zu Binso One"}</LocalizedText></Button>}
-    </section>
+    </section></FormSheet>
 
     <section className="surface security-card">
       <SectionTitle title="Anmeldeschutz"/>
-      <p><LocalizedText>{mfa?mfa.enabled?"E-Mail + Passwort + Authenticator-Code.":"E-Mail + Passwort + einmaliger E-Mail-Code bei jeder Anmeldung.":mfaError?"Anmeldeschutzstatus nicht verfügbar.":"Anmeldeschutz wird geladen…"}</LocalizedText></p>
+      {mfa||mfaError?<p><LocalizedText>{mfa?mfa.enabled?"E-Mail + Passwort + Authenticator-Code.":"E-Mail + Passwort + einmaliger E-Mail-Code bei jeder Anmeldung.":"Anmeldeschutzstatus nicht verfügbar."}</LocalizedText></p>:<LoadingState/>}
     </section>
 
     <section className="surface security-card">
       <SectionTitle title="Aktive Sitzungen" action={sessions.some(item=>!item.current)?<Button variant="secondary" disabled={busy} onClick={()=>setRevokeTarget("all")}><LocalizedText>{"Alle anderen abmelden"}</LocalizedText></Button>:undefined}/>
-      {sessionsLoading?<p><LocalizedText>{"Sitzungen werden geladen…"}</LocalizedText></p>:sessionsError?<ErrorState onRetry={()=>{setSessionsLoading(true);setSessionsError("");void loadSessions()}} retryLabel="Erneut versuchen"><LocalizedText>{sessionsError}</LocalizedText></ErrorState>:sessions.length===0?<p><LocalizedText>{"Keine aktive Sitzung gefunden."}</LocalizedText></p>:<div className="session-list">
+      {sessionsLoading?<LoadingState/>:sessionsError?<ErrorState onRetry={()=>{setSessionsLoading(true);setSessionsError("");void loadSessions()}} retryLabel="Erneut versuchen"><LocalizedText>{sessionsError}</LocalizedText></ErrorState>:sessions.length===0?<p><LocalizedText>{"Keine aktive Sitzung gefunden."}</LocalizedText></p>:<div className="session-list">
         {sessions.map(item=><div key={item.id}>
           <div>
             <b>{sessionLabel(item.userAgent)}</b>

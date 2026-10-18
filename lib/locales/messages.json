@@ -12053,5 +12053,15 @@
     "Collapse navigation",
     "Réduire la navigation",
     "Comprimi navigazione"
+  ],
+  "Zuletzt bearbeitete Rechnungen": [
+    "Recently updated invoices",
+    "Factures récemment modifiées",
+    "Fatture modificate di recente"
+  ],
+  "Auszahlungsdaten sind unvollständig. Kosten ohne nachgewiesenes Zahlungsdatum sind nicht enthalten. Details findest du in der Finanzanalyse.": [
+    "Outflow data is incomplete. Costs without a documented payment date are not included. See financial analysis for details.",
+    "Les données de décaissement sont incomplètes. Les coûts sans date de paiement attestée ne sont pas inclus. Consultez l’analyse financière pour les détails.",
+    "I dati sulle uscite sono incompleti. I costi senza una data di pagamento documentata non sono inclusi. Consulta l’analisi finanziaria per i dettagli."
   ]
 }

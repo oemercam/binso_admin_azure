@@ -191,7 +191,7 @@ export function RecordsView({
   return <>
     {(toolbarActions||showCount||(filterSummary&&hasFilters))&&<div className="records-toolbar">
       {toolbarActions&&<RecordsControls controller={state} placeholder={placeholder} chips={chips} columns={columns}/>}
-      {showCount&&(loading||visible.length>0||hasFilters)&&<span className="records-count" aria-live="polite"><LocalizedText>{loading?"Wird geladen…":`${pagination?.total??visible.length} ${(pagination?.total??visible.length)===1?singularCountLabel:countLabel}`}</LocalizedText></span>}
+      {showCount&&!loading&&(visible.length>0||hasFilters)&&<span className="records-count" aria-live="polite"><LocalizedText>{`${pagination?.total??visible.length} ${(pagination?.total??visible.length)===1?singularCountLabel:countLabel}`}</LocalizedText></span>}
       {filterSummary&&hasFilters&&<span className="records-active-filters">{[query.trim(),activeChip!==(chips[0]??"Alle")?activeChip:"",sort!=="default"?`${columns?.find(column=>column.index===sortIndex)?.label??"Name"} ${sort==='asc'?'↑':'↓'}`:""].filter(Boolean).join(" · ")}</span>}
       {filterSummary&&hasFilters&&<button className="toolbar-reset" type="button" onClick={reset}><LocalizedText>{"Filter zurücksetzen"}</LocalizedText></button>}
     </div>}

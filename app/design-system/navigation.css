@@ -1,10 +1,7 @@
-/* Approved navigation contract. Its markup, declarations and inherited tokens are independently tested. */
+/* Approved flat Microsoft navigation (2026-10-18). Material and preserved geometry/motion are independently tested. */
 /* Navigation contract source: app/styles/app.css */
 .bottom-nav{display:none}
 .mobile-dock{display:none}
-.dock-create-action{display:grid;place-items:center;width:var(--dock-action-size);height:var(--dock-action-size);min-width:var(--touch);min-height:var(--touch);border-radius:50%;padding:0;cursor:pointer;transition:transform var(--motion-fast) var(--motion-ease)}
-.dock-create-action:active{transform:scale(.94)}
-.dock-create-action:focus-visible{outline:2px solid var(--app-accent);outline-offset:3px}
 /* Navigation contract source: app/styles/operator.css */
 .operator-mobile-nav{display:none}
 .operator-main>:not(.operator-app-header):not(.operator-page-head):not(.sheet-layer):not(.mobile-dock){
@@ -17,14 +14,14 @@
 @media (max-height:520px) and (orientation:landscape) and (max-width:900px){
 .mobile-dock> :is(.bottom-nav,.operator-mobile-nav){height:54px;min-height:54px}
 :is(.bottom-nav,.operator-mobile-nav) span{display:none}}
-@media (max-width:1100px){
+@media (max-width:760px){
 :is(.bottom-nav,.operator-mobile-nav).is-compact{padding-block:4px}
 :is(.bottom-nav,.operator-mobile-nav)>a,:is(.bottom-nav,.operator-mobile-nav)>button{overflow:hidden}
 .mobile-dock> :is(.bottom-nav,.operator-mobile-nav){
     bottom:auto;
     max-width:560px;
     margin-inline:auto;
-    background:var(--app-glass-solid);
+    background:var(--color-bg);
     -webkit-backdrop-filter:none;
     backdrop-filter:none;
   }
@@ -33,7 +30,7 @@
 :is(.bottom-nav,.operator-mobile-nav) span{max-height:12px;opacity:1;overflow:hidden;transition:max-height var(--motion-base) var(--motion-ease),opacity var(--motion-fast) ease,transform var(--motion-base) var(--motion-ease)}
 :is(.bottom-nav,.operator-mobile-nav) svg{width:20px;height:20px;transition:transform var(--motion-base) var(--motion-ease)}
 :is(.bottom-nav,.operator-mobile-nav)>a.active,
-  :is(.bottom-nav,.operator-mobile-nav)>button.active{color:var(--color-fg);font-weight:700}
+  :is(.bottom-nav,.operator-mobile-nav)>button.active{color:var(--app-action-accent);font-weight:700}
 :is(.bottom-nav,.operator-mobile-nav)>a:active,
   :is(.bottom-nav,.operator-mobile-nav)>button:active{transform:scale(.94)}
 :is(.bottom-nav,.operator-mobile-nav)>a,
@@ -47,7 +44,7 @@
     justify-content:center;
     gap:3px;
     border:0;
-    border-radius:14px;
+    border-radius:var(--shape-control-mobile);
     background:transparent;
     color:var(--color-muted);
     font-size:9px;
@@ -57,8 +54,8 @@
 :is(.bottom-nav,.operator-mobile-nav).is-compact{
     height:var(--mobile-nav-compact-h);
     min-height:var(--mobile-nav-compact-h);
-    border-radius:var(--mobile-nav-compact-radius);
-    box-shadow:0 3px 12px rgba(0,0,0,.06);
+    border-radius:0;
+    box-shadow:none;
   }
 .mobile-dock> :is(.bottom-nav,.operator-mobile-nav){
     position:static;
@@ -71,28 +68,20 @@
     padding:6px;
     display:grid;
     grid-template-columns:repeat(5,minmax(0,1fr));
-    border:1px solid var(--app-glass-line);
-    border-radius:var(--mobile-nav-radius);
-    background:var(--app-glass-solid);
-    box-shadow:var(--app-glass-shadow);
+    border:1px solid transparent;
+    border-top-color:var(--color-line);
+    border-radius:0;
+    background:var(--color-bg);
+    box-shadow:none;
     transform:translateZ(0);
     transition:height var(--motion-base) var(--motion-ease),border-radius var(--motion-base) var(--motion-ease),background-color var(--motion-base) var(--motion-ease),box-shadow var(--motion-base) var(--motion-ease);
   }
-.mobile-dock{position:fixed;left:max(var(--mobile-nav-edge),var(--safe-left));right:max(var(--mobile-nav-edge),var(--safe-right));bottom:max(var(--mobile-nav-bottom),var(--safe-bottom));z-index:35;display:flex;align-items:end;gap:var(--dock-gap);pointer-events:none}
-.mobile-dock> :is(nav,.mobile-dock-action){pointer-events:auto}
+.mobile-dock{position:fixed;left:max(var(--mobile-nav-edge),var(--safe-left));right:max(var(--mobile-nav-edge),var(--safe-right));bottom:max(var(--mobile-nav-bottom),var(--safe-bottom));z-index:35;display:flex;align-items:end;pointer-events:none}
+.mobile-dock>nav{pointer-events:auto}
 .mobile-dock>nav{flex:1;min-width:0}
-.mobile-dock-action{flex:none}
-.mobile-dock.is-compact .dock-create-action{width:var(--mobile-nav-compact-h);height:var(--mobile-nav-compact-h)}
 .app-preview .mobile-dock{display:none}}
-@supports ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
-.app-glass,.mobile-dock> :is(.bottom-nav,.operator-mobile-nav){background:var(--app-glass-tint);backdrop-filter:blur(var(--app-glass-blur));-webkit-backdrop-filter:blur(var(--app-glass-blur))}}
-@media (max-width:374px){
-.mobile-dock-action{position:absolute;right:0;bottom:calc(var(--mobile-nav-h) + var(--dock-gap))}
-.mobile-dock.is-compact .mobile-dock-action{bottom:calc(var(--mobile-nav-compact-h) + var(--dock-gap))}}
-@media (prefers-reduced-transparency:reduce){
-.app-glass,.mobile-dock> :is(.bottom-nav,.operator-mobile-nav){background:var(--app-glass-solid);backdrop-filter:none;-webkit-backdrop-filter:none}}
 @media (forced-colors:active){
-.app-glass,.mobile-dock> :is(.bottom-nav,.operator-mobile-nav){background:Canvas;color:CanvasText;border:1px solid ButtonText;backdrop-filter:none;-webkit-backdrop-filter:none}}
+.mobile-dock> :is(.bottom-nav,.operator-mobile-nav){background:Canvas;color:CanvasText;border:1px solid ButtonText;backdrop-filter:none;-webkit-backdrop-filter:none}}
 /* Protected inherited landscape navigation values; relocated without changing their context or values. */
 @media (max-height:520px) and (orientation:landscape) and (max-width:900px){
 :root{--mobile-nav-h:54px;--mobile-nav-bottom:6px}

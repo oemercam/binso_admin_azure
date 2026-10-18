@@ -127,7 +127,7 @@ export function CustomerDetail({customerId="acme"}:{customerId?:string}) {
   };
 
       if(loadError)return <AppShell title="Kunde" subtitle="Kundendaten nicht verfügbar" active="kunden" backHref={returnTo} backLabel="Kunden"><ErrorState onRetry={workspace.refresh}>{loadError}</ErrorState><div className="page-actions"><Button href={returnTo} variant="ghost"><LocalizedText>{"Zur Übersicht"}</LocalizedText></Button></div></AppShell>;
-  if(!customer) return <AppShell title="Kunde" subtitle="Daten werden geladen." active="kunden" backHref={returnTo} backLabel="Kunden"><LoadingState>Die Kundendaten werden abgerufen.</LoadingState></AppShell>;
+  if(!customer) return <AppShell title="Kunde" active="kunden" backHref={returnTo} backLabel="Kunden"><LoadingState>Die Kundendaten werden abgerufen.</LoadingState></AppShell>;
 
   const availableCurrencies=[...new Set([...(workspace.data?.statistics??[]).map(row=>row.currency),...(customerSummary?.invoices??[]).map(row=>row.currency)])];
   const displayCurrency=availableCurrencies.includes(statisticCurrency)?statisticCurrency:availableCurrencies[0]??'CHF';

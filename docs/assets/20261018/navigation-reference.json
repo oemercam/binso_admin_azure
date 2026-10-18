@@ -1,0 +1,58 @@
+{
+  "base": "015cc28455657f16292c10e7fd05d2f1ced0e98c",
+  "approval": "Owner explicitly chose flat white Microsoft mobile navigation on 2026-10-18. Same destinations, rights, safe areas and motion; derived dark canvas. Historical source and geometry remain archived.",
+  "snapshot": {
+    "markup": "fdb851e1029133e479bd3adad4af5cc936eb78961b6aab9d1983126468816e1f",
+    "logic": "8724e28af32d7aaf1779885ccdaed77f7f43f7c07a0d461dccdb6256aaa8e433",
+    "icons": "b01b4f68013ccaea6f5846ffb30b07bc0a079eac3adeb9bac3800cbfdbe9366e",
+    "rules": "e31f6af8a60aca3692b95e2f84345b18523c4ea4b69313b220a0c34e653d57b4",
+    "tokens": "bf1e5ce0402e038747f08824eb753ec53c19a6f11e4f4542e6230442346cf6ae",
+    "tokenNames": [
+      "--app-accent",
+      "--app-action-accent",
+      "--color-bg",
+      "--color-line",
+      "--color-muted",
+      "--dock-action-size",
+      "--dock-gap",
+      "--mobile-nav-bottom",
+      "--mobile-nav-compact-h",
+      "--mobile-nav-edge",
+      "--mobile-nav-h",
+      "--motion-base",
+      "--motion-ease",
+      "--motion-ease-standard",
+      "--motion-fast",
+      "--safe-bottom",
+      "--safe-left",
+      "--safe-right",
+      "--shape-control-mobile",
+      "--touch"
+    ]
+  },
+  "invariants": {
+    "markup": "fdb851e1029133e479bd3adad4af5cc936eb78961b6aab9d1983126468816e1f",
+    "logic": "8724e28af32d7aaf1779885ccdaed77f7f43f7c07a0d461dccdb6256aaa8e433",
+    "icons": "b01b4f68013ccaea6f5846ffb30b07bc0a079eac3adeb9bac3800cbfdbe9366e",
+    "rules": "49daceb0efeae3ece2f2075cf275e3a5993da7785cff460b440ef01a43aaae4f",
+    "tokens": "60cbc64a223d10c682b5fa740100e915c4a5eaec1fe529f451cc866a2c157c08",
+    "tokenNames": [
+      "--app-accent",
+      "--dock-action-size",
+      "--dock-gap",
+      "--mobile-nav-bottom",
+      "--mobile-nav-compact-h",
+      "--mobile-nav-edge",
+      "--mobile-nav-h",
+      "--motion-base",
+      "--motion-ease",
+      "--motion-ease-standard",
+      "--motion-fast",
+      "--safe-bottom",
+      "--safe-left",
+      "--safe-right",
+      "--touch"
+    ]
+  },
+  "customerContract": "a742de81a9bc5b0b20865f1f46dd3cff6a4a5562e295cb570b58a3bf28e8df16"
+}

@@ -26,7 +26,7 @@ export function DashboardPage({forceDemo=false}:{forceDemo?:boolean}={}){
    {data?.canFinance&&data.cash&&<CashOverview data={data.cash} dashboard invoiceCount={countsAllowed?invoiceCount:undefined} customerCount={countsAllowed?data.stats?.customer_count:undefined}/>}
    <QuickCreateLinks/>
    {attention.length>0&&<section className="bo-workspace-section"><SectionTitle title="Handlungsbedarf"/><div className="recent-invoices">{attention.map(item=><DocumentSummaryRow key={item.id} item={item} customerHeading compact/>)}</div></section>}
-   <section className="bo-workspace-section"><SectionTitle title="Letzte Rechnungen" action={<Link href="/rechnungen"><LocalizedText>{"Alle anzeigen"}</LocalizedText></Link>}/>{recent.length?<div className="recent-invoices">{recent.map(item=><DocumentSummaryRow key={item.id} item={item} customerHeading compact/>)}</div>:<p role="status"><LocalizedText>{"Noch keine Geschäftsvorgänge vorhanden."}</LocalizedText></p>}</section>
+   <section className="bo-workspace-section"><SectionTitle title="Zuletzt bearbeitete Rechnungen" action={<Link href="/rechnungen"><LocalizedText>{"Alle anzeigen"}</LocalizedText></Link>}/>{recent.length?<div className="recent-invoices">{recent.map(item=><DocumentSummaryRow key={item.id} item={item} customerHeading compact/>)}</div>:<p role="status"><LocalizedText>{"Noch keine Geschäftsvorgänge vorhanden."}</LocalizedText></p>}</section>
   </>}
  </AppShell>;
 }

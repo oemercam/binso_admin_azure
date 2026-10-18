@@ -33,7 +33,7 @@ export function SupportPage() {
  const query=useApiQuery<{items:Array<{id:string;case_number?:string;subject:string;status:string;updated_at:string}>;total?:number}>(production?"/api/support/tickets?"+params:"/api/demo/data?collection=support_tickets&"+params);
  const rows=(query.data?.items??[]).map(item=>[item.id,item.subject?.trim()||"Support-Anfrage",formatDateTime(item.updated_at),statusMap[item.status]??item.status,supportReference(item.id,item.case_number)]);
  const total=query.data?.total??rows.length;
- return <AppShell title="Support" subtitle={query.loading?"Wird geladen…":`${total} Tickets`} active="support" actions={<RecordsControls controller={controller} placeholder={placeholder} chips={chips} columns={columns}><CreateAction href="/support/neu" label="Neues Ticket"/></RecordsControls>}>
+ return <AppShell title="Support" subtitle={query.loading?undefined:`${total} Tickets`} active="support" actions={<RecordsControls controller={controller} placeholder={placeholder} chips={chips} columns={columns}><CreateAction href="/support/neu" label="Neues Ticket"/></RecordsControls>}>
   <RecordsView controller={controller} toolbarActions={false} showCount={false} remote pagination={{total,page:controller.page,pageSize,onPage:controller.setPage}} countLabel="Tickets" loading={query.loading} error={query.error} items={rows} placeholder={placeholder} chips={chips} columns={columns} rowHref={row=>`/support/${row[0]}`}>{([id,subject,updated,status,reference])=><RecordRow href={`/support/${id}`} icon="support" title={subject} meta={`${reference} · ${updated}`} status={status}/>}</RecordsView>
  </AppShell>;
 }

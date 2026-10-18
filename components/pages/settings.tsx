@@ -1,5 +1,6 @@
 "use client";
 import {ProgressBar} from "../ui";
+import {SettingsNavigation} from "../settings-navigation";
 import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
 import {useLocale} from "@/lib/client/locale";
 import {asLocale,localeNames,locales} from "@/lib/locales";
@@ -26,19 +27,6 @@ export function SettingsPage() {
   return <AppShell title="Einstellungen" active="einstellungen" backHref="/dashboard">
     <SettingsNavigation/>
   </AppShell>;
-}
-
-function SettingsNavigation(){
- const access=usePageAccess();
- const [query,setQuery]=useState("");
- const groups=[
-  {title:"Unternehmen",rows:[["/einstellungen/firma","users","Firma"],["/einstellungen/team","users","Benutzer & Rollen"],["/einstellungen/abonnement","card","Abonnement"]]},
-  {title:"Geschäftsprozesse",rows:[["/einstellungen/dokumente","receipt","Rechnungen & Dokumente"],["/einstellungen/zeiterfassung","clock","Zeiterfassung"]]},
-  {title:"Weitere Einstellungen",rows:[["/einstellungen/datenschutz","lock","Datenschutz & Cookies"]]},
- ];
- const term=query.trim().toLocaleLowerCase("de-CH");
- const visibleGroups=groups.map(group=>({...group,rows:group.rows.filter(([href,,title])=>access.canOpen(href)&&(!term||`${group.title} ${title}`.toLocaleLowerCase("de-CH").includes(term)))})).filter(group=>group.rows.length);
- return <><label className="searchbox settings-navigation-search"><Icon name="search"/><Input type="search" aria-label="Einstellungen suchen" placeholder="Einstellungen suchen" value={query} onChange={event=>setQuery(event.target.value)}/></label>{visibleGroups.map(group=><SettingsGroup title={group.title} key={group.title}><div className="settings-list">{group.rows.map(([href,icon,title])=><ActionRow href={href} key={href} icon={icon} title={title}/>)}</div></SettingsGroup>)}{!visibleGroups.length&&<EmptyState compact title="Keine passenden Einstellungen" text="Versuche einen anderen Suchbegriff."/>}</>;
 }
 
 export function AccountSettingsPage() {
@@ -91,7 +79,7 @@ export function AccountSettingsPage() {
   return <AppShell title="Persönliche Daten" subtitle="Dein Konto und deine Profildaten." active="einstellungen" editing={editing} unsavedChanges={editing&&currentValues!==baseline} backHref="/einstellungen" backLabel="Einstellungen" mobileActions={!editing?<Button requiresWrite disabled={loading||!!loadError} variant="secondary" className="icon-button" ariaLabel="Bearbeiten" icon="edit" onClick={beginEdit}/>:undefined} actions={!editing?<Button requiresWrite disabled={loading||!!loadError} variant="secondary" icon="edit" onClick={beginEdit}><LocalizedText>{"Bearbeiten"}</LocalizedText></Button>:undefined}>
     {loading?<LoadingState><LocalizedText>{"Einstellungen werden geladen …"}</LocalizedText></LoadingState>:loadError?<ErrorState onRetry={query.refresh} retryLabel="Erneut versuchen"><LocalizedText>{loadError}</LocalizedText></ErrorState>:<div className="settings-detail-grid">
       <section className="surface settings-profile">
-        <Avatar name={displayName==="Benutzer"?"":displayName} identity={email} src={avatarUrl} size="large"/><div><h2>{displayName}</h2><p><LocalizedText>{jobTitle||"Benutzer"}</LocalizedText></p></div>{editing&&<><label className="button button-secondary" htmlFor="profile-avatar-upload"><LocalizedText>{"Bild ändern"}</LocalizedText></label><Input id="profile-avatar-upload" hidden type="file" accept="image/png,image/jpeg,image/webp" onChange={e=>void uploadAvatar(e.target.files?.[0])}/></>}
+        <Avatar name={displayName==="Benutzer"?"":displayName} identity={email} src={avatarUrl} size="large"/><div><h2>{displayName}</h2><p><LocalizedText verbatim>{email}</LocalizedText></p><p><LocalizedText verbatim={!!jobTitle}>{jobTitle||"Benutzer"}</LocalizedText></p></div>{editing&&<><label className="button button-secondary" htmlFor="profile-avatar-upload"><LocalizedText>{"Bild ändern"}</LocalizedText></label><Input id="profile-avatar-upload" hidden type="file" accept="image/png,image/jpeg,image/webp" onChange={e=>void uploadAvatar(e.target.files?.[0])}/></>}
       </section>
       {editing?<section className="settings-form">
         <div className="form-grid two">
@@ -283,7 +271,7 @@ export function SubscriptionSettingsPage() {
     </AppShell>;
   }
 
-  if(!subscription) return <AppShell title="Abonnement" subtitle="Daten werden geladen." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen"><EmptyState icon="card" title={billingError?"Abonnement nicht verfügbar":"Abonnement wird geladen"} text={billingError||"Die Kontodaten werden abgerufen."}/></AppShell>;
+  if(!subscription) return <AppShell title="Abonnement" active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">{billingError?<div role="alert"><EmptyState icon="card" title="Abonnement nicht verfügbar" text={billingError}/></div>:<LoadingState/>}</AppShell>;
 
   const planKey=String(subscription.plan??"trial");
   const planLabel:Record<string,string>={trial:"Testphase",start:"Start",business:"Business",pro:"Pro"};
@@ -369,9 +357,9 @@ export function LanguageSettingsPage(){
 }
 
 const themeOptions=[
+ {value:"system",title:"System",description:"Geräteeinstellung übernehmen",icon:<Monitor size={18} aria-hidden="true"/>},
  {value:"light",title:"Hell",description:"Helle Oberfläche",icon:"sun"},
  {value:"dark",title:"Dunkel",description:"Dunkle Oberfläche",icon:"moon"},
- {value:"system",title:"System",description:"Geräteeinstellung übernehmen",icon:<Monitor size={18} aria-hidden="true"/>},
 ] as const;
 export function AppearanceSettingsPage(){
  const [theme,setTheme]=useState<ThemeMode>("system"),[error,setError]=useState("");

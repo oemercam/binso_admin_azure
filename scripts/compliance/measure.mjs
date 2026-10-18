@@ -4,7 +4,7 @@ import {writeTestOutput} from '../test-output.mjs';
 import {identity} from './identity.mjs';
 import {createHash} from 'node:crypto';
 const runIdentity=identity();
-const baselineFile='ux-compliance/navigation-baseline.v2.json';
+const baselineFile='ux-compliance/navigation-baseline.v3.json';
 const navigationBaseline=await fs.readFile(baselineFile,'utf8').then(JSON.parse).catch(()=>null);
 export async function measureActionClearance(page){
  return page.evaluate(async()=>{
@@ -22,7 +22,7 @@ export async function measureActionClearance(page){
    previous=endpoint;if(stable>=2)break;
   }
   const navRect=nav.getBoundingClientRect(),main=document.querySelector('.page-container');
-  const actions=main?[...main.querySelectorAll('button,a,input,select,textarea')].filter(el=>el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden'&&!el.closest('[hidden],[inert],[aria-hidden=true]')):[];
+  const actions=main?[...main.querySelectorAll('button,a,input,select,textarea')].filter(el=>el.checkVisibility()&&el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden'&&!el.closest('[hidden],[inert],[aria-hidden=true]')):[];
   const bottom=actions.length?Math.max(...actions.map(el=>el.getBoundingClientRect().bottom)):null;
   const plus=document.querySelector('.dock-create-action');const plusTop=plus?.getClientRects().length?plus.getBoundingClientRect().top:navRect.top;
   const observed={lastActionBottom:bottom,navigationTop:Math.min(navRect.top,plusTop),scrollY,scrollEndpoint:previous,scrollEndEstablished:atEnd&&stable>=2};
@@ -35,7 +35,7 @@ export async function measureCompliance(page,{output,route,theme,width,state='no
  const measured=await page.evaluate(()=>{
   const visible=el=>{
    const r=el.getBoundingClientRect(),c=getComputedStyle(el);
-   if(!el.getClientRects().length||c.visibility==='hidden'||c.display==='none'||el.closest('[hidden],[inert],[aria-hidden=true]')||r.width<=0||r.height<=0||r.right<=v.x||r.bottom<=v.y||r.x>=v.x+v.width||r.y>=v.y+v.height)return false;
+   if(!el.checkVisibility()||!el.getClientRects().length||c.visibility==='hidden'||c.display==='none'||el.closest('[hidden],[inert],[aria-hidden=true]')||r.width<=0||r.height<=0||r.right<=v.x||r.bottom<=v.y||r.x>=v.x+v.width||r.y>=v.y+v.height)return false;
    for(let p=el.parentElement;p;p=p.parentElement){const pc=getComputedStyle(p);if(/hidden|clip|auto|scroll/.test(pc.overflowY)){const b=p.getBoundingClientRect();if(r.bottom<=b.top||r.top>=b.bottom)return false;}}
    return true;
   };

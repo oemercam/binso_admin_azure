@@ -20,6 +20,13 @@ permanent-toolbox instructions. Historical audit reports are evidence, not rules
   fixed stylesheet count. Base, states and responsive rules share a component owner.
 - Reuse the design-system components for headings, controls, lists, sheets,
   feedback and charts. Extend the common owner for reusable requirements.
+- Current Microsoft material is opaque: no glass classes, glass tokens, backdrop
+  blur or capsule/shadow containers around header actions. Historical appearance
+  snapshots are archives, never authority to restore the retired material.
+- Internal navigation keeps the shell and uses the common quiet LoadingState.
+  Never render transient loading sentences in subtitles, counters or empty-state
+  cards. Keep accessible status announcements, real errors and retry actions.
+  AppStart with the original BINSO icon is for initial session bootstrap only.
 - No route-local CSS, JSX style blocks or literal inline presentation. Dynamic
   measurements may pass CSS custom properties into the owning component.
 - New pages must follow a documented page pattern and include loading, empty,

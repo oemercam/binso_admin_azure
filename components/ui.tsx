@@ -181,9 +181,9 @@ export function Toast({ title, text, tone = "success",inline=false,actionLabel,o
   </div>;
 }
 
-/** Content loading keeps the current shell and never starts a second splash. */
+/** Quiet content progress; the accessible status never flashes as page copy. */
 export function LoadingState({children="Daten werden geladen …",className}:{children?:React.ReactNode;className?:string}){
-  return <p role="status" className={className}><LocalizedText>{children}</LocalizedText></p>;
+  return <span role="status" aria-live="polite" className={`loading-state ${className??""}`.trim()}><span className="loading-state-indicator" aria-hidden="true"/><span className="sr-only"><LocalizedText>{children}</LocalizedText></span></span>;
 }
 
 /** Retry remains local to the owning data source; callers retain their error text. */
