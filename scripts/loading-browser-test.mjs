@@ -48,7 +48,7 @@ try{
   // Use an actual rendered record link to exercise detail/overview transitions.
   showCustomer=true;await page.reload();await page.locator('a[href="/kunden/fixture"]:visible').first().waitFor();await page.evaluate(()=>{window.navBefore=document.querySelector('.bottom-nav')});
   await page.locator('a[href="/kunden/fixture"]:visible').first().click();await page.waitForURL('**/kunden/fixture');await page.getByRole('heading',{name:/Prüffirma AG/}).first().waitFor();
-  const detailBack=page.locator('.app-header').getByRole('link',{name:'Kunden',exact:true}).filter({visible:true});assert.equal(await detailBack.count(),1,'The contextual header exposes one visible return action');await detailBack.click();await page.waitForURL('**/kunden');
+  const detailBack=page.locator('.mobile-header-detail,.page-head-detail').getByRole('link',{name:'Kunden',exact:true}).filter({visible:true});assert.equal(await detailBack.count(),1,'The contextual mobile or desktop heading exposes one visible return action');assert.equal(await detailBack.getAttribute('href'),'/kunden','The return action targets the customer overview');await detailBack.click();await page.waitForURL('**/kunden');
   if(!baseline)assert(await page.evaluate(()=>window.navBefore===document.querySelector('.bottom-nav')),'Detail/overview retains navigation');showCustomer=false;
   // PWA-like close/reopen of the same browser context, not physical installation.
   await page.close();page=await context.newPage();await measure('reopen',()=>page.goto(base+'/kunden'));
