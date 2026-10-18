@@ -1,4 +1,6 @@
 /* BINso One / documents — one owner for base, states and responsive behavior. */
+:is(a,button).document-summary-row{transition:background-color var(--motion-fast) var(--motion-ease)}
+:is(a,button).document-summary-row:active{background:var(--color-subtle)}
 .document-review{max-width:840px;margin-inline:auto}
 .document-review-positions>div{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding-block:12px;border-bottom:1px solid var(--color-line)}
 .document-review-positions>div:last-child{border-bottom:0}

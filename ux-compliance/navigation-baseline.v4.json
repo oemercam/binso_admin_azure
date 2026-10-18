@@ -1,7 +1,7 @@
 {
   "schemaVersion": 4,
   "commit": "1a2813d01a9024bd367acff9b3fe61e599e6ed54",
-  "approval": "Owner requested the complete app UX package after the 76-route diagnosis: stable visible navigation labels, viewport-wide opaque safe-area background, contextual headers and equal visible avatar/create circles. Former compact/floating geometry is superseded. Access, destinations and icons remain exact. Derived expectations require independent browser validation; no physical PWA acceptance.",
+  "approval": "Owner requested the complete app UX package after the 76-route diagnosis: stable visible navigation labels, viewport-wide opaque safe-area background, contextual headers and the later approved labeled creation button in the content command bar, never the global header. Former compact/floating geometry is superseded. Access, destinations and icons remain exact. Derived expectations require independent browser validation; no physical PWA acceptance.",
   "provenance": "Derived explicit design specification, not captured current-output approval. Safe-area and scroll probes are additionally required.",
   "toleranceCssPixels": 1,
   "cases": [

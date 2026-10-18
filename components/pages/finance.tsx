@@ -3,7 +3,6 @@
 import {LocalizedText} from "@/lib/client/locale";
 import { DocumentList, DocumentSummaryRow, FinanceTabs, type DocumentListItem } from "../document-list";
 import { formatCurrency } from "@/lib/financial-status";
-import Link from "next/link";
 import { AppShell } from "../app-shell";
 import {useApiQuery} from "@/lib/client/use-api-query";
 import { isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
@@ -48,7 +47,6 @@ export function FinancePage(){
  return <AppShell title="Finanzen" active="finanzen"><FinanceTabs/>{query.loading?<LoadingState><LocalizedText>{"Finanzen werden geladen …"}</LocalizedText></LoadingState>:query.error?<ErrorState onRetry={query.refresh}><LocalizedText>{query.error}</LocalizedText></ErrorState>:<>
   {summary?.cash&&<CashOverview data={summary.cash}/>}
   {!!summary?.invoices.filter(item=>item.currency!=='CHF').length&&<section className="bo-workspace-section"><SectionTitle title="Offene Forderungen"/>{summary.invoices.filter(item=>item.currency!=='CHF').map(item=><p key={item.currency}>{formatCurrency(item.open_amount,item.currency)}</p>)}</section>}
-  <p><Link className="text-action" href="/finanzen/analyse"><LocalizedText>{"Finanzanalyse"}</LocalizedText></Link></p>
   {overdue.length>0&&<section className="bo-workspace-section"><SectionTitle title="Handlungsbedarf"/>{overdue.slice(0,5).map(item=><DocumentSummaryRow key={item.id} item={item} compact/>)}</section>}
  </>}</AppShell>;
 }

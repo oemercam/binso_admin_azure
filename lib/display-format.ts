@@ -26,6 +26,12 @@ export function messageDay(value:string){
  const date=new Date(value);if(!Number.isFinite(date.getTime()))return "";
  return new Intl.DateTimeFormat("de-CH",{day:"2-digit",month:"2-digit",year:"numeric",timeZone:"Europe/Zurich"}).format(date);
 }
+/** Keep the server's event order within each Swiss business day. */
+export function activityDays<T extends {at:string}>(items:readonly T[]){
+ const groups=new Map<string,T[]>();
+ for(const item of [...items].sort((a,b)=>Date.parse(b.at)-Date.parse(a.at))){const day=messageDay(item.at);groups.set(day,[...(groups.get(day)??[]),item]);}
+ return [...groups].map(([day,events])=>({day,events}));
+}
 /** Presentation of legacy activity text; persisted values are never rewritten. */
 export function formatActivityDetail(title:string,detail:string){
  if(title==="Arbeitszeit erfasst")return detail.replace(/^([0-9]+(?:\.[0-9]+)?) h/,(_,hours)=>formatHours(hours));

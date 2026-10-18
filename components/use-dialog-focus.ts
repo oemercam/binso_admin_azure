@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import {lockPageScroll} from './page-scroll-lock';
 
 /** Keep modal keyboard navigation inside the dialog and restore its trigger. */
 const modalStack:HTMLElement[]=[];
 /** Header shortcuts never stack a second panel over an active non-header modal. */
 export function hasBlockingModal(){return modalStack.some(dialog=>dialog.isConnected&&!dialog.matches(".header-panel"));}
-let savedOverflow="",savedRootOverflow="",savedScrollX=0,savedScrollY=0;
 
 export function useDialogFocus(open: boolean, onClose: () => void, headerPanel=false, headerSelector=".mobile-header,.desktop-appbar") {
   const dialogRef = useRef<HTMLElement>(null);
@@ -26,14 +26,12 @@ export function useDialogFocus(open: boolean, onClose: () => void, headerPanel=f
   useEffect(() => {
     if (!open || !dialogRef.current) return;
     const dialog = dialogRef.current;
-    if(!modalStack.length){savedOverflow=document.body.style.overflow;savedRootOverflow=document.documentElement.style.overflow;savedScrollX=window.scrollX;savedScrollY=window.scrollY;}
+    const unlockScroll=lockPageScroll(()=>dialog);
     modalStack.push(dialog);
     if(!headerPanel)window.dispatchEvent(new Event("binso-modal-open"));
     const active = document.activeElement;
     const trigger = active instanceof HTMLElement && !dialog.contains(active) ? active : triggerRef.current;
     // clip prevents a new body scroll container from breaking sticky app headers.
-    document.body.style.overflow = "clip";
-    document.documentElement.style.overflow = "hidden";
     const viewport=window.visualViewport;
     const resize=()=>{
       document.documentElement.style.setProperty("--dialog-viewport-height",`${viewport?.height??window.innerHeight}px`);
@@ -74,11 +72,9 @@ export function useDialogFocus(open: boolean, onClose: () => void, headerPanel=f
       if(modalStack.length&&trigger?.isConnected&&modalStack.at(-1)?.contains(trigger))trigger.focus({preventScroll:true});
       if(!modalStack.length){
         document.documentElement.style.removeProperty("--dialog-viewport-height");document.documentElement.style.removeProperty("--dialog-viewport-top");
-        document.body.style.overflow = savedOverflow;
-        document.documentElement.style.overflow = savedRootOverflow;
         if (trigger?.isConnected) trigger.focus({preventScroll:true});
-        window.scrollTo(savedScrollX,savedScrollY);
       }
+      unlockScroll();
     };
   }, [open,headerPanel,headerSelector]);
   return dialogRef;

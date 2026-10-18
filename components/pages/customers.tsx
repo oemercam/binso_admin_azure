@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import {activityDays} from "@/lib/display-format";
 import {contactHref} from "@/lib/contact-links";
 import {usePageAccess} from "@/lib/client/page-access";
 import {LocalizedText} from "@/lib/client/locale";
@@ -24,7 +25,7 @@ import { customers } from "@/lib/demo-data";
 import { appendDemoRow } from "@/lib/demo-storage";
 import { apiPatch, apiPost, apiDelete, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 import {Button, EmptyState, Field, SectionTitle, Status, Toast, Input, Select, LoadingState, ErrorState, FormActions} from "../ui";
-import { ActionRow, ActionSheet, FormSheet, CreateAction, DetailTabs, DetailSections, DetailDisclosure, MetricTiles, MetricTile } from "../binso-ux";
+import { ActionRow, ActionSheet, FormSheet, CreateAction, DetailTabs, DetailSections, DetailDisclosure, MetricTiles, MetricTile, ListSearch } from "../binso-ux";
 import { useDemoRows, swissDate } from "./shared";
 import { FinancialSummary } from "./finance";
 
@@ -82,6 +83,8 @@ export function CustomerDetail({customerId="acme"}:{customerId?:string}) {
   const customer=workspace.data?.item;
   const [contacts,setContacts]=useState<Array<Record<string,unknown>>>([]);
   const customerActivity=workspace.data?.activity??[];
+  const [activityQuery,setActivityQuery]=useState('');
+  const visibleActivity=customerActivity.filter(item=>(item.title+' '+item.detail).toLocaleLowerCase().includes(activityQuery.trim().toLocaleLowerCase()));
   const customerSummary=workspace.data?.summary;
   const [customerActions,setCustomerActions]=useState(false);
   const [contactMenu,setContactMenu]=useState<Record<string,unknown>|null>(null);
@@ -149,10 +152,10 @@ export function CustomerDetail({customerId="acme"}:{customerId?:string}) {
     {tab==="finances"&&workspace.data?.statistics&&<>{new Set(workspace.data.statistics.map(row=>row.currency)).size>1&&<Field allowReadOnlyInput label="Statistikwährung"><Select value={displayCurrency} onChange={event=>setStatisticCurrency(event.target.value)}>{availableCurrencies.map(currency=><option value={currency} key={currency}>{currency}</option>)}</Select></Field>}<Statistics defaultTrendVisible={false} title="Kundenentwicklung" subtitle="Zahlungen und fakturiertes Volumen · ohne Entwürfe und Stornos" currency={displayCurrency} storageKey={'customer:'+customerId} events={workspace.data.statistics.filter(row=>row.currency===displayCurrency).map(row=>({date:row.date,values:{paid:row.paid,billed:row.billed,invoice_count:row.invoice_count}}))} series={[{key:'paid',label:'Erhaltene Zahlungen',tone:'positive'},{key:'billed',label:'Fakturiert',tone:'neutral'}]} metricKeys={['invoice_count']} metrics={totals=>[{label:'Erhaltene Zahlungen',value:totals.paid},{label:'Fakturiertes Volumen',value:totals.billed},{label:'Rechnungen',value:totals.invoice_count,format:'number'}]}/></>}
     {tab==="finances"&&<EntityFiles purpose="customer_document" entityId={customerId}/>}
     {tab==="finances"&&<section className="customer-tab-panel"><SectionTitle title="Finanzen"/><DocumentList items={customerDocuments as DocumentListItem[]} error={customerDocumentsError} context="customer"/></section>}
-    {tab==="activity"&&<section className="customer-tab-panel"><SectionTitle title="Aktivität"/>{customerActivity.length?<div className="timeline">{customerActivity.map((item,index)=><div key={item.at+index}><i/><div><b><LocalizedText>{item.title}</LocalizedText></b><small>{swissDate(item.at)} · {item.detail}</small></div></div>)}</div>:<p><LocalizedText>{"Keine Geschäftsaktivität vorhanden"}</LocalizedText></p>}</section>}</div></div>
+    {tab==="activity"&&<section className="customer-tab-panel"><SectionTitle title="Aktivitäten"/><ListSearch value={activityQuery} onChange={setActivityQuery} placeholder="Aktivitäten suchen..."/>{visibleActivity.length?<div className="activity-groups">{activityDays(visibleActivity).map(({day,events})=><section className="activity-day" key={day}><h3>{day||"—"}</h3><div className="timeline">{events.map((item,index)=><div key={item.at+index}><i/><div><b><LocalizedText>{item.title}</LocalizedText></b><small>{Number.isFinite(Date.parse(item.at))?new Intl.DateTimeFormat("de-CH",{hour:"2-digit",minute:"2-digit",timeZone:"Europe/Zurich"}).format(new Date(item.at)):"—"} · {item.detail}</small></div></div>)}</div></section>)}</div>:<p><LocalizedText>{"Keine Geschäftsaktivität vorhanden"}</LocalizedText></p>}</section>}</div></div>
     </div>
     <ActionSheet label="Kundenaktionen" description={name} open={customerActions} onClose={()=>setCustomerActions(false)}><div className="action-list"><ActionRow href={'/kunden/'+encodeURIComponent(customerId)+'/bearbeiten'} icon="edit" title="Kunde bearbeiten" onClick={()=>setCustomerActions(false)}/><ActionRow requiresWrite navigation icon="plus" title="Kontakt hinzufügen" onClick={()=>{setCustomerActions(false);openContact()}}/><ActionRow href={'/angebote/neu?customerId='+encodeURIComponent(customerId)} icon="file" title="Angebot erstellen" onClick={()=>setCustomerActions(false)}/><ActionRow href={'/rechnungen/neu?customerId='+encodeURIComponent(customerId)} icon="receipt" title="Rechnung erstellen" onClick={()=>setCustomerActions(false)}/><ActionRow href={'/zeit?customerId='+encodeURIComponent(customerId)} icon="clock" title="Zeit erfassen" onClick={()=>setCustomerActions(false)}/><ActionRow href={'/projekte/neu?customerId='+encodeURIComponent(customerId)} icon="box" title="Auftrag / Projekt starten" onClick={()=>setCustomerActions(false)}/></div></ActionSheet>
-    {contactMenu&&<ActionSheet label="Kontaktaktionen" open={!!contactMenu} onClose={()=>setContactMenu(null)}><div className="action-list"><ActionRow requiresWrite navigation icon="edit" title="Kontakt bearbeiten" onClick={()=>{openContact(contactMenu);setContactMenu(null)}}/>{contactHref('email',String(contactMenu.email??''))&&<ActionRow icon="mail" title="E-Mail senden" href={contactHref('email',String(contactMenu.email))} onClick={()=>setContactMenu(null)}/>}{contactHref('phone',String(contactMenu.phone??''))&&<ActionRow icon="phone" title="Anrufen" href={contactHref('phone',String(contactMenu.phone))} onClick={()=>setContactMenu(null)}/>}<ActionRow requiresWrite danger icon="trash" title="Kontakt entfernen" onClick={()=>{setRemoveContact(String(contactMenu.id));setContactMenu(null)}}/></div></ActionSheet>}
+    {contactMenu&&<ActionSheet label="Kontaktaktionen" open={!!contactMenu} onClose={()=>setContactMenu(null)}><div className="action-list"><ActionRow requiresWrite navigation icon="edit" title="Kontakt bearbeiten" onClick={()=>{openContact(contactMenu);setContactMenu(null)}}/>{contactHref('email',String(contactMenu.email??''))&&<ActionRow icon="mail" title="E-Mail senden" href={contactHref('email',String(contactMenu.email))} onClick={()=>setContactMenu(null)}/>}{contactHref('phone',String(contactMenu.phone??''))&&<ActionRow icon="phone" title="Anrufen" href={contactHref('phone',String(contactMenu.phone))} onClick={()=>setContactMenu(null)}/>}<ActionRow requiresWrite danger icon="trash" title="Kontakt entfernen" disabled={contacts.length<=1} onClick={()=>{setRemoveContact(String(contactMenu.id));setContactMenu(null)}}/></div></ActionSheet>}
     <FormSheet label={contactId?"Kontakt bearbeiten":"Kontakt hinzufügen"} description={"Kontakt wird direkt "+name+" zugeordnet."} className="contact-sheet" open={contactOpen} onClose={()=>setContactOpen(false)} busy={contactSaving}><div className="form-grid two"><Field label="Vorname"><Input value={firstName} onChange={e=>setFirstName(e.target.value)}/></Field><Field label="Nachname"><Input value={lastName} onChange={e=>setLastName(e.target.value)}/></Field><Field label="E-Mail"><Input value={contactEmail} onChange={e=>setContactEmail(e.target.value)} type="email"/></Field><Field label="Telefon"><Input value={contactPhone} onChange={e=>setContactPhone(e.target.value)} type="tel"/></Field><Field label="Funktion" className="full"><Input value={contactRole} onChange={e=>setContactRole(e.target.value)} placeholder="z. B. Buchhaltung"/></Field><Field label="Als Hauptkontakt festlegen" className="full"><Input type="checkbox" checked={contactPrimary} onChange={e=>setContactPrimary(e.target.checked)}/></Field></div><FormActions sheet><Button variant="secondary" onClick={()=>setContactOpen(false)}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button requiresWrite disabled={contactSaving} onClick={()=>void saveContact()}><LocalizedText>{contactSaving?"Wird gespeichert…":"Speichern"}</LocalizedText></Button></FormActions></FormSheet>
     {removeContact&&<ConfirmDialog open danger busy={contactSaving} title="Kontakt entfernen?" message="Der Kontakt wird aus der Kundenliste entfernt. Bestehende Dokumente bleiben erhalten." confirmLabel={contactSaving?"Wird entfernt…":"Entfernen"} onCancel={()=>{if(!contactBusy.current)setRemoveContact(null)}} onConfirm={()=>void remove()}/>}
     {contactToast&&<Toast title={contactToast} tone={contactToast==="Kontakt gespeichert."||contactToast==="Kontakt entfernt."?"success":"danger"}/>}
@@ -164,6 +167,8 @@ export function CustomerForm({customerId}:{customerId?:string}={}) {
   const searchParams=useSearchParams();
   const returnTo=safeAppPath(searchParams.get("returnTo"),"/kunden");
   const [company,setCompany]=useState("");
+  const [contactName,setContactName]=useState("");
+  const [contactLastName,setContactLastName]=useState("");
   const [email,setEmail]=useState("");
   const [phone,setPhone]=useState("");
   const [city,setCity]=useState("");
@@ -183,7 +188,7 @@ export function CustomerForm({customerId}:{customerId?:string}={}) {
   const recordError=recordQuery.error;
   const [savingRecord,setSavingRecord]=useState(false);
   const saveRecordPending=useRef(false);
-  const {dirty,markPristine}=useDirtySnapshot([company,email,phone,city,sector,address,postalCode,uid,notes,customerStatus]);
+  const {dirty,markPristine}=useDirtySnapshot([company,email,phone,city,sector,address,postalCode,uid,notes,customerStatus,...(!customerId?[contactName,contactLastName]:[])]);
   const [savedRecord,setSavedRecord]=useState(false);
   const [sheetOpen,setSheetOpen]=useState(false);
   useEffect(()=>{queueMicrotask(()=>setSheetOpen(true))},[]);
@@ -193,15 +198,16 @@ export function CustomerForm({customerId}:{customerId?:string}={}) {
   useEffect(()=>{const timer=window.setTimeout(()=>setDuplicateQuery(new URLSearchParams({name:company.trim(),email:email.trim(),uid:uid.trim(),excludeId:customerId??''}).toString()),250);return()=>window.clearTimeout(timer)},[company,email,uid,customerId]);
   const duplicateCheck=useApiQuery<{items:Array<{id:string;customer_no:string;name:string;email?:string}>}>(isProductionBackendEnabled()&&!customerId&&company.trim().length>=2&&duplicateQuery?'/api/customers/duplicates?'+duplicateQuery:null);
   const duplicateItems=duplicateCheck.data?.items??[];
-  const recovery=useProcessDraft({process:customerId?"customer:edit:"+customerId:"customer:create",value:{company,email,phone,city,sector,address,postalCode,uid,notes,customerStatus,replay,allowDuplicate},dirty,enabled:!loadingRecord&&!recordError,onRestore:value=>{
+  const recovery=useProcessDraft({process:customerId?"customer:edit:"+customerId:"customer:create",value:{company,contactName,contactLastName,email,phone,city,sector,address,postalCode,uid,notes,customerStatus,replay,allowDuplicate},dirty,enabled:!loadingRecord&&!recordError,onRestore:value=>{
     if(!value||[value.company,value.email,value.phone,value.city,value.sector,value.address,value.postalCode,value.uid,value.notes].some(item=>typeof item!=="string"||item.length>320)||!["active","inactive"].includes(value.customerStatus))return;
-    setAllowDuplicate(value.allowDuplicate===true);    setCompany(value.company);setEmail(value.email);setPhone(value.phone);setCity(value.city);setSector(value.sector);setAddress(value.address);setPostalCode(value.postalCode);setUid(value.uid);setNotes(value.notes);setCustomerStatus(value.customerStatus);
+    setContactLastName(typeof value.contactLastName==="string"&&value.contactLastName.length<=120?value.contactLastName:"");setContactName(typeof value.contactName==="string"&&value.contactName.length<=320?value.contactName:"");setAllowDuplicate(value.allowDuplicate===true);    setCompany(value.company);setEmail(value.email);setPhone(value.phone);setCity(value.city);setSector(value.sector);setAddress(value.address);setPostalCode(value.postalCode);setUid(value.uid);setNotes(value.notes);setCustomerStatus(value.customerStatus);
     if(value.replay&&typeof value.replay.body==="string"&&value.replay.body.length<8192&&typeof value.replay.key==="string"&&value.replay.key.length>=8&&value.replay.key.length<=128)setReplay(value.replay);
   }});
   const close=()=>{recovery.clear();allowDraftNavigation();setSheetOpen(false);router.push(returnTo)};
   useEffect(()=>{if(!customerId||!recordQuery.data||hydratedCustomer.current===customerId)return;hydratedCustomer.current=customerId;const {item}=recordQuery.data;queueMicrotask(()=>{setCompany(String(item.name??''));setEmail(String(item.email??''));setPhone(String(item.phone??''));setCity(String(item.city??''));setSector(String(item.sector??''));setAddress(String(item.street??''));setPostalCode(String(item.postal_code??''));setUid(String(item.uid??''));setNotes(String(item.notes??''));setCustomerStatus(String(item.status??'active'));setHydratedRecordId(customerId);markPristine([String(item.name??''),String(item.email??''),String(item.phone??''),String(item.city??''),String(item.sector??''),String(item.street??''),String(item.postal_code??''),String(item.uid??''),String(item.notes??''),String(item.status??'active')]);});},[customerId,recordQuery.data,markPristine]);
   const save=async()=>{
     if(saveRecordPending.current||!recovery.ready||loadingRecord||recordError)return;
+    if(!customerId&&(!contactName.trim()||!contactLastName.trim())){setToast("Bitte Vorname und Nachname der Kontaktperson eingeben.");return;}
     if(company.trim().length<2){
       setToast("Bitte einen Kundennamen mit mindestens zwei Zeichen eingeben.");
       return;
@@ -209,8 +215,8 @@ export function CustomerForm({customerId}:{customerId?:string}={}) {
     setToast(null);saveRecordPending.current=true;setSavingRecord(true);
     try{
       if(isProductionBackendEnabled()){
-        const body={name:company.trim(),sector,email,phone,city,address,postalCode,uid,notes,status:customerStatus,...(!customerId?{allowDuplicate}:{})},serialized=JSON.stringify(body);
-        const attempt=replay?.body===serialized?replay:{body:serialized,key:crypto.randomUUID()};setReplay(attempt);recovery.persist({company,email,phone,city,sector,address,postalCode,uid,notes,customerStatus,replay:attempt,allowDuplicate});
+        const body={name:company.trim(),sector,email,phone,city,address,postalCode,uid,notes,status:customerStatus,...(!customerId?{allowDuplicate,contactFirstName:contactName.trim(),contactLastName:contactLastName.trim()}:{})},serialized=JSON.stringify(body);
+        const attempt=replay?.body===serialized?replay:{body:serialized,key:crypto.randomUUID()};setReplay(attempt);recovery.persist({company,contactName,contactLastName,email,phone,city,sector,address,postalCode,uid,notes,customerStatus,replay:attempt,allowDuplicate});
         const result=customerId?await apiPatch<{item?:{id:string}}>("/api/customers/"+encodeURIComponent(customerId),body):await apiPost<{item?:{id:string}}>("/api/customers",body,{idempotencyKey:attempt.key});
         if(typeof result.item?.id!=="string"||!result.item.id)throw new Error("Die Speicherung konnte nicht bestätigt werden. Bitte den gespeicherten Stand prüfen.");
       }
@@ -227,9 +233,10 @@ export function CustomerForm({customerId}:{customerId?:string}={}) {
   return <AppShell editing unsavedChanges={false} title={customerId?"Kunde bearbeiten":"Kunde erstellen"} active="kunden" backHref={returnTo} backLabel="Kunden">
     <FormSheet workspace open={sheetOpen} onClose={close} label={customerId?"Kunde bearbeiten":"Kunde erstellen"} description="Beginne mit dem Namen. Weitere Angaben kannst du später ergänzen." busy={savingRecord} dirty={dirty&&!savedRecord} wizard>
       {loadingRecord?<LoadingState><LocalizedText>{"Kunde wird geladen …"}</LocalizedText></LoadingState>:recordError?<ErrorState onRetry={recordQuery.refresh} retryLabel="Erneut versuchen"><LocalizedText>{recordError}</LocalizedText></ErrorState>:<form onSubmit={event=>{event.preventDefault();return save()}}>
-        <FormWizard labels={["Grunddaten"]} step={0} onStep={()=>{}} busy={savingRecord} ariaLabel="Kunde erfassen" cancelAction={<Button variant="secondary" onClick={close}><LocalizedText>{"Abbrechen"}</LocalizedText></Button>} action={<Button requiresWrite type="submit" disabled={savingRecord||!recovery.ready||company.trim().length<2}><LocalizedText>{savingRecord?"Wird gespeichert…":customerId?"Änderungen speichern":"Kunde speichern"}</LocalizedText></Button>}>
+        <FormWizard labels={["Grunddaten"]} step={0} onStep={()=>{}} busy={savingRecord} ariaLabel="Kunde erfassen" cancelAction={<Button variant="secondary" onClick={close}><LocalizedText>{"Abbrechen"}</LocalizedText></Button>} action={<Button requiresWrite type="submit" disabled={savingRecord||!recovery.ready||(company.trim().length<2||!customerId&&(!contactName.trim()||!contactLastName.trim()))}><LocalizedText>{savingRecord?"Wird gespeichert…":customerId?"Änderungen speichern":"Kunde speichern"}</LocalizedText></Button>}>
           {toast&&toast!=="Kunde gespeichert."&&<ErrorState>{toast}</ErrorState>}
           <Field label="Kundenname *"><Input required minLength={2} maxLength={320} autoComplete="organization" value={company} disabled={savingRecord} onChange={e=>{setCompany(e.target.value);setAllowDuplicate(false)}} placeholder="Firma oder Name"/></Field>
+          {!customerId&&<div className="form-grid two"><Field label="Kontaktperson · Vorname *"><Input required maxLength={120} autoComplete="given-name" value={contactName} disabled={savingRecord} onChange={e=>setContactName(e.target.value)}/></Field><Field label="Kontaktperson · Nachname *"><Input required maxLength={120} autoComplete="family-name" value={contactLastName} disabled={savingRecord} onChange={e=>setContactLastName(e.target.value)}/></Field></div>}
           <p><LocalizedText>{"* Pflichtfeld"}</LocalizedText></p>
           {!customerId&&duplicateCheck.error&&<ErrorState onRetry={duplicateCheck.refresh}><LocalizedText>{duplicateCheck.error}</LocalizedText></ErrorState>}
           {!customerId&&duplicateItems.length>0&&<section><h2><LocalizedText>{"Mögliche Dubletten"}</LocalizedText></h2>{duplicateItems.map(item=><p key={item.id}><Link href={'/kunden/'+encodeURIComponent(item.id)}>{item.customer_no} · {item.name}</Link></p>)}<Field label="Als separaten Kunden erfassen"><Input type="checkbox" checked={allowDuplicate} onChange={event=>setAllowDuplicate(event.target.checked)}/></Field></section>}

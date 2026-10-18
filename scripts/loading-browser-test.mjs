@@ -43,7 +43,9 @@ try{
   const navigation=await page.evaluate(t=>({ms:performance.now()-t,shellPreserved:window.shellBefore===document.querySelector('.app-root'),navigationPreserved:window.navBefore===document.querySelector('.bottom-nav'),phases:[...new Set(window.loadingFrames.map(f=>f.phase.join(',')))]}),start);
   results.push({theme,viewport,label:'navigation',...navigation,authRequests:authCalls-beforeNav,requests:Object.fromEntries(Object.entries(calls).map(([p,n])=>[p,n-(navCalls[p]||0)]).filter(([,n])=>n))});
   if(!baseline){assert(navigation.shellPreserved&&navigation.navigationPreserved,'Navigation DOM persists');assert(!navigation.phases.some(p=>p.includes('.app-launch-screen')),'No internal splash');assert.equal(authCalls-beforeNav,0,'Warm route uses bounded in-memory session');assert.ok(!(await page.evaluate(()=>window.loadingFrames)).some(frame=>frame.visibleLoadingCopy),'Page changes never flash visible loading copy');}
+  const beforeBackRequests=calls['/api/customers']??0;
   await page.goBack();await page.getByText('Keine Kunden erfasst',{exact:true}).waitFor();
+  if(!baseline){await page.waitForLoadState('networkidle');assert.equal(calls['/api/customers']??0,beforeBackRequests,'A fresh same-session return reuses customer data without another GET');}
   if(!baseline)assert(await page.evaluate(()=>window.navBefore===document.querySelector('.bottom-nav')),'Back navigation retains navigation');
   // Use an actual rendered record link to exercise detail/overview transitions.
   showCustomer=true;await page.reload();await page.locator('a[href="/kunden/fixture"]:visible').first().waitFor();await page.evaluate(()=>{window.navBefore=document.querySelector('.bottom-nav')});

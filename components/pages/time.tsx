@@ -1,4 +1,5 @@
 "use client";
+import {dataRevision} from '@/lib/client/data-events';
 import {projectAllowsTime} from "@/lib/projects";
 import {useProcessDraft} from "../use-process-draft";
 import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
@@ -15,24 +16,23 @@ import { useEffect, useRef, useState } from "react";
 import { filterTimeEntries } from "@/lib/time-entry-filter";
 import { readTimer, changeTimer, withIdleTimerContext, type TimerState } from "@/lib/client/time-tracker";
 import { AppShell } from "../app-shell";
-import {useDataRevision} from "@/lib/client/use-api-query";
+import {useApiQuery,useDataRevision} from "@/lib/client/use-api-query";
 import { apiGet, apiPatch, apiPost, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 import {Button, EmptyState, Field, Icon, SectionTitle, Status, Toast, Input, Select, LoadingState, ErrorState, IconButton, FormActions} from "../ui";
 import { DetailTabs, ActionSheet, FormSheet, FilterSheet, ListSearch } from "../binso-ux";
 import { formatMinutes, swissDate } from "./shared";
 
+type TimeEntry={id:string;project_id?:string|null;project_name?:string|null;customer_id?:string|null;customer_name?:string|null;employee_name?:string|null;description?:string|null;started_at?:string|null;ended_at?:string|null;duration_minutes?:number|null;billable?:boolean;approved?:boolean;submitted_at?:string|null;invoiced_invoice_id?:string|null;created_at?:string|null};
+
 export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const searchParams=useSearchParams(),router=useRouter();
   const returnTo=searchParams.has("returnTo")?safeAppPath(searchParams.get("returnTo"),"/zeit"):undefined;
   const production=useBackendMode()&&!forceDemo;
-  const timeRevision=useDataRevision(["/api/time-entries"]);
   const directoryRevision=useDataRevision(["/api/customers","/api/projects"]);
   const timerRevision=useDataRevision(["/api/time-tracker"]);
   const timerBase=useRef({seconds:0,at:0});
   const employeeFilter=searchParams.get("employeeId");
   const projectFilter=searchParams.get("projectId");
-  const [entriesError,setEntriesError]=useState<string|null>(null);
-  const [entriesLoading,setEntriesLoading]=useState(!forceDemo);
   const [entryFilter,setEntryFilter]=useState(searchParams.has("invoice")?"Freigegeben":"Alle");
   const [entryQuery,setEntryQuery]=useState("");
   const [timeFilterOpen,setTimeFilterOpen]=useState(false);
@@ -66,7 +66,14 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const [availableCustomers,setAvailableCustomers]=useState<Array<{id:string;name:string}>>([]);
   const [toast,setToast]=useState<string|null>(null);
   useEffect(()=>{if(forceDemo)return;Promise.all([apiGet<{items:typeof availableProjects}>(isProductionBackendEnabled()?"/api/projects":"/api/demo/data?collection=projects"),apiGet<{items:typeof availableCustomers}>(isProductionBackendEnabled()?"/api/customers":"/api/demo/data?collection=customers")]).then(async([projects,customers])=>{setAvailableProjects(projects.items.filter(item=>projectAllowsTime(item.status??'active')));setAvailableCustomers(customers.items);const selected=projects.items.find(item=>item.id===searchParams.get("projectId"));if(selected){timerContext.current={project:selected.name,projectId:selected.id,customerId:selected.customer_id??null};setManualCustomer(selected.customer_id??"");const state=withIdleTimerContext(await readTimer(),timerContext.current);setTimerProject(state.project);setTimerProjectId(state.projectId??null);setTimerCustomer(state.customerId??"");setRunning(state.running);timerBase.current={seconds:state.seconds,at:Date.now()};setSeconds(state.seconds)}}).catch(()=>setToast("Kunden und Projekte konnten nicht geladen werden."));},[forceDemo,searchParams,directoryRevision]);
-  const [remoteEntries,setRemoteEntries]=useState<Array<{id:string;project_id?:string|null;project_name?:string|null;customer_id?:string|null;customer_name?:string|null;employee_name?:string|null;description?:string|null;started_at?:string|null;ended_at?:string|null;duration_minutes?:number|null;billable?:boolean;approved?:boolean;submitted_at?:string|null;invoiced_invoice_id?:string|null;created_at?:string|null}>>([]);
+  const entriesPath=isProductionBackendEnabled()?"/api/time-entries"+(employeeFilter?"?employeeId="+encodeURIComponent(employeeFilter):""):"/api/demo/data?collection=time_entries";
+  const entriesResource=useApiQuery<{items:TimeEntry[]}>(entriesPath);
+  const [entryOverride,setEntryOverride]=useState<{key:string;items:TimeEntry[]}|null>(null);
+  const entryKey=entriesPath+':'+dataRevision([entriesPath]);
+  const remoteEntries=entryOverride?.key===entryKey?entryOverride.items:entriesResource.data?.items??[];
+  const entriesLoading=entriesResource.loading,entriesError=entriesResource.error;
+  const setRemoteEntries=(next:TimeEntry[]|((items:TimeEntry[])=>TimeEntry[]))=>setEntryOverride(current=>{const key=entriesPath+':'+dataRevision([entriesPath]),items=current?.key===key?current.items:entriesResource.data?.items??[];return {key,items:typeof next==='function'?next(items):next};});
+  useEffect(()=>{let active=true;queueMicrotask(()=>{if(active)setEntryOverride(null)});return()=>{active=false};},[entriesResource.data]);
   const [selectedTimeIds,setSelectedTimeIds]=useState<string[]>([]);
   const [billingOpen,setBillingOpen]=useState(false),[billingTarget,setBillingTarget]=useState(searchParams.get("invoice")??"");
   const [billingDrafts,setBillingDrafts]=useState<Array<{number:string;customer_id:string;status:string}>>([]),[billingError,setBillingError]=useState<string|null>(null);
@@ -83,13 +90,7 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
     return()=>{active=false;window.clearInterval(syncTimer);window.removeEventListener("focus",sync);window.removeEventListener("binso-timer-change",sync);};
   },[timerRevision]);
 
-  useEffect(()=>{
-    let active=true;
-    apiGet<{items:Array<{id:string;project_name?:string|null;description?:string|null;started_at?:string|null;ended_at?:string|null;duration_minutes?:number|null;created_at?:string|null}>}>(isProductionBackendEnabled()?"/api/time-entries"+(employeeFilter?"?employeeId="+encodeURIComponent(employeeFilter):""):"/api/demo/data?collection=time_entries")
-      .then(payload=>{if(active){setRemoteEntries(payload.items);setEntriesError(null)}})
-      .catch(error=>{if(active)setEntriesError(error instanceof Error?error.message:"Zeiteinträge konnten nicht geladen werden.")}).finally(()=>{if(active)setEntriesLoading(false)});
-    return()=>{active=false};
-  },[production,forceDemo,employeeFilter,timeRevision]);
+
 
   useEffect(()=>{if(!running)return;const id=window.setInterval(()=>setSeconds(timerBase.current.seconds+Math.floor((Date.now()-timerBase.current.at)/1000)),1000);return()=>window.clearInterval(id);},[running]);
 

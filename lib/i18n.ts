@@ -20,6 +20,7 @@ export const registrationMessages={
  company:['Dein Unternehmen','Your company','Votre entreprise','La tua azienda','Şirketiniz'],
  companyHelp:['Beginne mit dem Namen deines Unternehmens.','Start with your company name.','Commencez par le nom de votre entreprise.','Inizia con il nome della tua azienda.','Şirketinizin adıyla başlayın.'],
  companyName:['Firmenname','Company name','Nom de l’entreprise','Nome dell’azienda','Şirket adı'],
+ contactName:['Kontaktperson','Contact person','Personne de contact','Persona di contatto','İlgili kişi'],
  companyExample:['Meine Firma GmbH','My company Ltd','Mon entreprise Sàrl','La mia azienda Sagl','Şirketimin adı'],
  access:['Dein Zugang','Your access','Votre accès','Il tuo accesso','Hesabınız'],
  accessHelp:['Mit diesen Angaben meldest du dich später bei Binso One an.','Use these details to sign in to Binso One.','Ces informations vous permettront de vous connecter à Binso One.','Usa questi dati per accedere a Binso One.','Binso One’a bu bilgilerle giriş yapacaksınız.'],

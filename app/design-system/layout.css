@@ -612,13 +612,25 @@ html[data-theme="dark"] .app-start-icon{filter:invert(1)}
 .sidebar-logo .logo.logo-compact{width:28px;height:28px}
 @media (max-width:760px){
  .mobile-section-title{display:block;margin:0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:var(--type-body);font-weight:600}
- .app-root[data-header-create] .page-head .bo-create-action{display:none}
- .app-root[data-header-create] .page-head{min-height:0;margin-bottom:0}
  .app-root:not(.app-section-dashboard) .page-head:not(.page-head-detail) .bo-page-heading-main>h1{display:none}
  .page-head-detail[data-heading-placement="content"] .bo-detail-heading-main{display:none}
  .page-head-detail[data-heading-placement="content"] .bo-detail-meta{margin-top:0}
  .page-head-detail[data-heading-placement="content"] .bo-detail-meta .status{display:none}
- .mobile-header-actions .bo-create-action{margin:0}
+}
+
+/* A task belongs with its content controls, never inside global navigation chrome. */
+.workspace-command-bar{display:flex;align-items:flex-start;gap:12px;margin-block:0 var(--heading-content-gap)}
+.workspace-command-bar>.records-inline-controls{flex:1;min-width:0;margin:0}
+.workspace-command-bar>.bo-create-action{flex:none;min-height:var(--touch);align-self:flex-start}
+@media(max-width:760px){
+ .app-root:not(.app-preview):not(.app-section-dashboard) .page-head:not(.page-head-detail):not(:has(.page-actions)){display:none}
+ .app-root:not(.app-preview):not(.app-section-dashboard) .page-head:not(.page-head-detail):has(.page-actions:empty){display:none}
+ .workspace-command-bar{flex-wrap:wrap}
+ .workspace-command-bar>.records-inline-controls{flex-basis:0}
+ .workspace-command-bar>.bo-create-action{width:auto;min-width:44px;padding:0 12px;border-radius:var(--control-radius);background:var(--app-action-accent);color:var(--app-accent-text)}
+ .timer-active{--workspace-header-height:calc(var(--touch) + var(--touch) + 10px + var(--safe-top))}
+ .mobile-header:has(>.header-timer){display:grid;height:auto;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:44px auto;column-gap:8px}
+ .mobile-header:has(>.header-timer)>.header-timer{grid-column:1/-1;justify-self:center;margin-block:2px 8px}
 }
 
 .app-version-notice{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-block:12px;border-bottom:1px solid var(--color-line);font-size:var(--type-label);background:var(--color-bg)}

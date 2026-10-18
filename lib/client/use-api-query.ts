@@ -2,6 +2,10 @@
 import {useEffect,useState,useSyncExternalStore} from 'react';
 import {apiGet} from './backend';
 import {dataRevision,subscribeClientData} from './data-events';
+import {clearQuerySnapshots,readQuerySnapshot,writeQuerySnapshot} from './query-snapshot';
+
+let snapshotSession=dataRevision([]);
+subscribeClientData(()=>{const session=dataRevision([]);if(session!==snapshotSession){clearQuerySnapshots();snapshotSession=session;}});
 
 /** Revalidate mounted consumers only; an obsolete response cannot overwrite newer state. */
 export function useDataRevision(paths:readonly string[]){
@@ -21,11 +25,13 @@ export function useApiQuery<T>(path:string|null){
   if(!path)return;
   let active=true;
   const session=dataRevision([]);
-  apiGet<T>(path).then(data=>{if(active)setState({path,revision,session,attempt:retry,data,error:null,loading:false});}).catch(error=>{if(active)setState(previous=>({path,revision,session,attempt:retry,data:previous.path===path&&previous.session===session?previous.data:undefined,error:error instanceof Error?error.message:'Daten konnten nicht geladen werden.',loading:false}));});
+  const snapshot=retry===0?readQuerySnapshot<T>(path,revision,session):undefined;
+  if(snapshot!==undefined){queueMicrotask(()=>{if(active)setState({path,revision,session,attempt:retry,data:snapshot,error:null,loading:false})});return()=>{active=false;};}
+  apiGet<T>(path).then(data=>{if(active){writeQuerySnapshot(path,revision,session,data);setState({path,revision,session,attempt:retry,data,error:null,loading:false});}}).catch(error=>{if(active)setState(previous=>({path,revision,session,attempt:retry,data:previous.path===path&&previous.session===session?previous.data:undefined,error:error instanceof Error?error.message:'Daten konnten nicht geladen werden.',loading:false}));});
   return()=>{active=false;};
  },[path,revision,retry]);
  const current=state.path===path&&state.revision===revision&&state.attempt===retry;
  const sameSession=state.path===path&&state.session===dataRevision([]);
- const data=sameSession?state.data:undefined;
+ const data=(sameSession?state.data:undefined)??(path?readQuerySnapshot<T>(path,revision,dataRevision([])):undefined);
  return {data,error:current?state.error:null,loading:Boolean(path)&&data===undefined&&(!current||state.loading),refreshing:Boolean(path)&&!current&&data!==undefined,refresh:()=>setRetry(value=>value+1)};
 }
