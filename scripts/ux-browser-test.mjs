@@ -124,6 +124,15 @@ const fixturePdf=process.env.BINSO_UX_PDF_FILE?await fs.readFile(process.env.BIN
 const requestedInteractions=process.env.BINSO_UX_INTERACTIONS?.split(',')??['data','customers','products','employees','documents','finance','time','expenses','chat','billing','header','operator','settings','chrome'];
 const hasInteraction=name=>requestedInteractions.includes(name);
 let captureQueue=Promise.resolve();
+// Matrix tabs intentionally share a browser context. Preference mutations must
+// serialize, otherwise their genuine cross-tab storage synchronization races.
+let navigationPreferenceQueue=Promise.resolve();
+async function withNavigationPreferenceLock(run){
+ const previous=navigationPreferenceQueue;let unlock;
+ navigationPreferenceQueue=new Promise(resolve=>{unlock=resolve});
+ await previous;
+ try{return await run()}finally{unlock()}
+}
 // Parallel route tabs can background the capture tab. Hidden documents suspend
 // animation frames; their layout is already measurable and screenshot() flushes it.
 async function settleFrames(page){
@@ -141,8 +150,9 @@ async function capture(page,options,target=page){
  captureQueue=pending.catch(()=>{});return pending;
 }
 async function assertAccountAvatarSpacing(panel){
- const geometry=await panel.locator('.account-sheet-profile').evaluate(el=>{const avatar=el.firstElementChild.getBoundingClientRect(),name=el.lastElementChild.getBoundingClientRect();return {avatarRight:avatar.right,nameLeft:name.left,gap:parseFloat(getComputedStyle(el).columnGap)}});
- assert.ok(geometry.nameLeft>=geometry.avatarRight+geometry.gap-1,'Account identity preserves its declared gap after the actual avatar: '+JSON.stringify(geometry));
+ const geometry=await panel.locator('.account-sheet-profile').evaluate(el=>{const avatar=el.firstElementChild.getBoundingClientRect(),name=el.lastElementChild.getBoundingClientRect(),style=getComputedStyle(el);return {direction:style.flexDirection,avatarRight:avatar.right,avatarBottom:avatar.bottom,nameLeft:name.left,nameTop:name.top,centerDelta:Math.abs(avatar.x+avatar.width/2-name.x-name.width/2),gap:parseFloat(style.columnGap)}});
+ if(geometry.direction==='column'){assert.ok(geometry.nameTop>=geometry.avatarBottom+geometry.gap-1,'Mobile profile preserves the vertical avatar gap');assert.ok(geometry.centerDelta<1,'Mobile profile identity is geometrically centred as in the approved reference');}
+ else assert.ok(geometry.nameLeft>=geometry.avatarRight+geometry.gap-1,'Account identity preserves its declared gap after the actual avatar: '+JSON.stringify(geometry));
 }
 async function actionEvidence(page,name,theme){
  const dialog=page.getByRole('dialog',{name,exact:true});
@@ -344,6 +354,8 @@ try{
       assert.ok(await navigationToggle.evaluate(el=>{const box=el.getBoundingClientRect();return !el.contains(document.elementFromPoint(box.x+box.width/2,box.y+box.height/2))}),'Modal backdrop blocks desktop navigation pointer access');
     }
     if(!process.env.BINSO_UX_BASELINE&&width>=761&&await navigationToggle.count()&&!await modal.count()){
+     await withNavigationPreferenceLock(async()=>{
+      await page.waitForFunction(()=>document.querySelector('.desktop-navigation-toggle')?.getAttribute('aria-expanded')==='true');
       await assertNavigationToggle(navigationToggle,false);
       const sidebar=page.locator('.app-sidebar,.operator-sidebar').filter({visible:true});
       await navigationToggle.click();
@@ -354,6 +366,7 @@ try{
       assert.equal(await page.evaluate(()=>localStorage.getItem('binso.desktop-navigation')),'collapsed','Desktop preference survives navigation');
       await navigationToggle.click();
       assert.equal(await navigationToggle.getAttribute('aria-expanded'),'true','Desktop navigation expands again');
+     });
     }
     if(!process.env.BINSO_UX_BASELINE&&width<=760)assert.equal(await navigationToggle.count(),0,'Desktop collapse control stays out of the mobile shell');
     if(!process.env.BINSO_UX_BASELINE)for(const ring of await page.locator('.bo-ring-visual').all()){

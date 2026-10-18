@@ -41,7 +41,7 @@ try{
    assert.equal(await page.locator('html').getAttribute('lang'),locale+'-CH');
    const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1);assert.equal(overflow,false,route+' '+locale+' '+width+' overflow');
    if(route.startsWith('/dashboard')){
-    const navigation=page.locator(width<=1100?'.bottom-nav':'.app-sidebar');
+    const navigation=page.locator(width<=760?'.bottom-nav':'.app-sidebar');
     assert.equal((await navigation.locator('a[href="/kunden"] span').first().textContent()).trim(),text('Kunden',locale));
     await page.locator('button.avatar-button:visible').first().click();
     const accountLanguage=page.locator('.locale-switcher select:visible').first();await accountLanguage.waitFor();assert.equal(await accountLanguage.inputValue(),locale);await page.keyboard.press('Escape');

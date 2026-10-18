@@ -31,6 +31,15 @@ export async function verifyNavigationPersistence(page,{base,capture=async()=>{}
    await page.setViewportSize({width,height:1000});
    await page.goto(base+'/einstellungen/konto');await page.waitForLoadState('networkidle');
    await assertNavigationToggle(toggle,false);
+   await toggle.focus();await toggle.press('Space');
+   await assertNavigationToggle(toggle,true);
+   const collapsedSidebar=await page.locator('.app-sidebar').boundingBox();
+   assert.equal(Math.round(collapsedSidebar.width),68,'Collapsed navigation preserves an accessible icon rail');
+   assert.equal(Math.round((await page.locator('.app-main').boundingBox()).x),68,'Workspace reclaims collapsed navigation space');
+   assert.equal(await page.evaluate(()=>localStorage.getItem('binso.desktop-navigation')),'collapsed','Desktop preference survives navigation');
+   assert.equal(await toggle.evaluate(el=>el===document.activeElement),true,'Collapsing preserves keyboard focus');
+   await capture('settings-collapsed-'+width);
+   await toggle.press('Enter');await assertNavigationToggle(toggle,false);
    assert.equal(await page.locator('.mobile-dock').isVisible(),false,'Desktop never falls back to the floating phone dock');
    const sidebar=await page.locator('.app-sidebar').boundingBox();
    const content=await page.locator('.page-container').boundingBox();
@@ -50,6 +59,11 @@ export async function verifyNavigationPersistence(page,{base,capture=async()=>{}
   await menu.locator('summary').focus();await menu.locator('summary').press('Enter');
   await menu.getByRole('link',{name:'Sicherheit',exact:true}).click();await page.waitForURL(base+'/einstellungen/sicherheit');
   assert.equal(await menu.getAttribute('open'),null,'Changing page closes the phone menu without covering the form');
+  await page.getByRole('button',{name:'Passwort ändern',exact:true}).click();
+  const password=page.getByRole('dialog',{name:'Passwort ändern',exact:true});
+  assert.equal(await password.locator('input[type="password"]').count(),3,'Existing current/new/confirm password fields stay in the real shared form');
+  assert.equal(await password.getByLabel('Aktuelles Passwort',{exact:true}).getAttribute('autocomplete'),'current-password');
+  await password.getByRole('button',{name:'Schliessen',exact:true}).click();await password.waitFor({state:'hidden'});
   await capture('settings-mobile-sibling-navigation');
  }finally{await page.setViewportSize(viewport)}
 }

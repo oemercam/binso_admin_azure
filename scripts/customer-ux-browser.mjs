@@ -9,7 +9,7 @@ export async function assertCustomerDossier(page){
  const facts=await context.locator('[data-area="facts"]').boundingBox();
  const extra=await context.locator('[data-area="extra"]').boundingBox();
  const records=await dossier.locator('[data-area="records"]').boundingBox();
- if(page.viewportSize().width>1100){
+ if(page.viewportSize().width>760){
   assert.ok(Math.abs(facts.x-extra.x)<1,'Desktop context has one aligned contact/address column');
   assert.ok(extra.y>=facts.y+facts.height&&extra.y-facts.y-facts.height<=25,'Address follows contact without waiting for the left financial rows');
  }else assert.ok(extra.y>=records.y+records.height,'Mobile supplementary facts follow open invoices');
