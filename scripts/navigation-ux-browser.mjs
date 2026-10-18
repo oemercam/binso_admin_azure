@@ -49,7 +49,8 @@ export async function verifyNavigationPersistence(page,{base,capture=async()=>{}
    if(!railVisible)await settings.locator('summary').click();
    await settings.getByRole('link',{name:'Darstellung & Sprache',exact:true}).click();
    await page.waitForURL(base+'/einstellungen/darstellung');
-   assert.equal(await settings.getByRole('link',{name:'Darstellung & Sprache',exact:true}).getAttribute('aria-current'),'page','Settings siblings announce the current page');
+   assert.equal(await settings.locator('a[aria-current="page"]').getAttribute('href'),'/einstellungen/darstellung','Settings siblings announce the current page');
+   if(!railVisible){assert.equal(await settings.getAttribute('open'),null,'Compact explorer closes after navigation');assert.equal((await settings.locator('summary').textContent()).trim(),'Darstellung & Sprache','Closed explorer still exposes its current visible section');}
    assert.ok(await page.getByRole('radiogroup',{name:'Darstellung',exact:true}).isVisible(),'Existing appearance control remains reachable');
    await capture('settings-desktop-'+width);
   }

@@ -572,6 +572,7 @@
 .desktop-navigation-toggle{display:grid;flex:none}
 .customer-detail-workspace,
   .entity-detail-workspace{
+    container-type:inline-size;
     display:grid;
     grid-template-columns:minmax(0,1fr);
     gap:24px;
