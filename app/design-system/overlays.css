@@ -1,4 +1,19 @@
 /* BINso One / overlays — one owner for base, states and responsive behavior. */
+.form-workspace{min-width:0;max-width:1120px;margin-inline:auto;outline:none}
+.form-workspace-description{margin:0 0 var(--heading-content-gap);color:var(--color-muted);font-size:var(--type-label)}
+.form-workspace>.sheet-body{overflow:visible;padding:0}
+.form-workspace .sheet-form-content{overflow:visible;padding-top:0}
+.form-workspace .sheet-form-footer,.form-workspace>.filter-sheet-actions{position:sticky;bottom:0;z-index:12;display:flex;justify-content:flex-end;gap:var(--desktop-action-gap);padding-block:12px max(12px,var(--safe-bottom));margin-top:var(--heading-content-gap);border-top:1px solid var(--color-line);background:var(--color-bg)}
+.form-workspace>.filter-sheet-actions>.button{width:auto;min-width:120px}
+.form-workspace .form-wizard>.mobile-sticky-save{border-top:1px solid var(--color-line);padding-bottom:max(12px,var(--safe-bottom))}
+.form-workspace .form-wizard>.mobile-sticky-save>.button{flex:none;width:auto;min-width:120px}
+.form-workspace .form-wizard>.mobile-sticky-save{justify-content:flex-end}
+@media (max-width:760px){
+ .app-editing{--navigation-content-inset:20px}
+ .form-workspace .form-wizard>.mobile-sticky-save>.button,.form-workspace>.filter-sheet-actions>.button{flex:1;width:0;min-width:0}
+ .form-workspace .sheet-form-footer .mobile-sticky-save{display:flex}
+ .form-workspace .sheet-form-footer .mobile-sticky-save>.button{flex:1;width:0;min-width:0}
+}
 .bottom-sheet[data-wizard]{height:calc(var(--dialog-available-height) - var(--dialog-edge-gap))}
 .bottom-sheet[data-wizard] .sheet-body{display:flex;flex-direction:column}
 .bottom-sheet[data-wizard] .sheet-body:has(.form-wizard){overflow:hidden}
@@ -349,3 +364,5 @@
     min-height:var(--touch);
   }
 }
+
+.form-workspace>.workspace-toolbar{min-height:44px;gap:12px;margin-bottom:var(--heading-content-gap);border-bottom:1px solid var(--color-line)}

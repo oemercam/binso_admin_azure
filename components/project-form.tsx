@@ -50,8 +50,8 @@ export function ProjectForm(){
   catch(e){setError(e instanceof Error?e.message:'Projekt konnte nicht erstellt werden.');}
   finally{busy.current=false;setSaving(false)}
  };
- return <AppShell title="Zeiterfassung" active="zeit" editing unsavedChanges={false}>
-  <FormSheet label="Auftrag / Projekt starten" description="Beginne mit der Bezeichnung. Ein Kunde ist nur für kundenbezogene Arbeit nötig." open={open} onClose={close} busy={saving} dirty={dirty&&!saved} wizard>
+ return <AppShell title="Auftrag / Projekt starten" active={returnTo==="/projekte"?"projekte":"zeit"} backHref={returnTo} editing unsavedChanges={false}>
+  <FormSheet workspace label="Auftrag / Projekt starten" description="Beginne mit der Bezeichnung. Ein Kunde ist nur für kundenbezogene Arbeit nötig." open={open} onClose={close} busy={saving} dirty={dirty&&!saved} wizard>
    {loading?<LoadingState><LocalizedText>{"Projektdaten werden geladen …"}</LocalizedText></LoadingState>:loadError?<ErrorState onRetry={()=>{directory.refresh();source.refresh()}}><LocalizedText>{loadError}</LocalizedText></ErrorState>:<form onSubmit={event=>{event.preventDefault();void save()}}>
     <FormWizard labels={["Grunddaten"]} step={0} onStep={()=>{}} busy={saving} ariaLabel="Projekt erfassen" cancelAction={<Button variant="secondary" onClick={close}><LocalizedText>{"Abbrechen"}</LocalizedText></Button>} action={<Button requiresWrite type="submit" disabled={saving||!recovery.ready||name.trim().length<2}><LocalizedText>{saving?'Wird erstellt…':'Auftrag starten'}</LocalizedText></Button>}>
      {error&&<ErrorState><LocalizedText>{error}</LocalizedText></ErrorState>}

@@ -113,7 +113,7 @@ export function ProductForm({ existing = false, productId }: { existing?: boolea
           <div><dt><LocalizedText>{"MwSt."}</LocalizedText></dt><dd>{formatQuantity(vatRate,"%")}</dd></div>
           {sku&&<div><dt><LocalizedText>{"Artikelnummer"}</LocalizedText></dt><dd>{sku}</dd></div>}
           {description&&<div><dt><LocalizedText>{"Beschreibung"}</LocalizedText></dt><dd><LocalizedText>{description}</LocalizedText></dd></div>}
-        </dl>:<FormSheet label={existing?"Produkt bearbeiten":"Produkt erstellen"} open={editingRecord} onClose={()=>{recovery.clear();allowDraftNavigation();if(existing)setEditingRecord(false);else router.push(returnTo)}} busy={savingRecord} dirty={dirty&&!savedRecord}><form onSubmit={event=>{event.preventDefault();void save()}}><div className="form-grid two">
+        </dl>:<FormSheet workspace label={existing?"Produkt bearbeiten":"Produkt erstellen"} open={editingRecord} onClose={()=>{recovery.clear();allowDraftNavigation();if(existing)setEditingRecord(false);else router.push(returnTo)}} busy={savingRecord} dirty={dirty&&!savedRecord}><form onSubmit={event=>{event.preventDefault();void save()}}><div className="form-grid two">
           <Field label="Name"><Input required maxLength={200} value={name} onChange={e=>setName(e.target.value)} placeholder="Name"/></Field>
           <Field label="Typ"><Select value={type} onChange={e=>setType(e.target.value)}><option value={"Dienstleistung"}><LocalizedText>{"Dienstleistung"}</LocalizedText></option><option value={"Produkt"}><LocalizedText>{"Produkt"}</LocalizedText></option></Select></Field>
           <Field label="Artikelnummer"><Input value={sku} onChange={e=>setSku(e.target.value)} placeholder="Optional"/></Field>

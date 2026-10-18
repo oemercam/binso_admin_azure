@@ -1,3 +1,4 @@
+.mobile-section-title{display:none}
 /* BINso One / layout — one owner for base, states and responsive behavior. */
 .mobile-header{display:none}
 .desktop-notification-button>svg,
@@ -65,7 +66,7 @@
   border-right:1px solid var(--color-line);
   background:var(--color-bg);
 }
-.sidebar-logo{display:block;padding:4px 10px 24px}
+.sidebar-logo{padding:4px 10px 24px}
 .app-sidebar nav{min-height:0;overflow-y:auto;overflow-x:hidden}
 .app-sidebar nav a:hover,.sidebar-bottom a:hover{background:var(--app-accent-soft);color:var(--app-accent)}
 .sidebar-logo .logo{width:106px;height:36px}
@@ -357,12 +358,7 @@
 .page-head-detail:not([data-heading-placement="content"])>div>h1,
   .page-head-detail:not([data-heading-placement="content"])>div>p,
   .page-head-detail .page-actions{display:none}
-.page-actions{
-    position:fixed;
-    right:max(var(--mobile-page-x),var(--safe-right));
-    bottom:calc(var(--mobile-nav-h) + var(--safe-bottom) + 12px);
-    z-index:11;
-  }
+.page-actions{position:static}
 .surface{padding:18px 0;border-left:0;border-right:0;border-radius:0}
 .customer-tab-panel>.section-title,
   .employee-tab-panel>.section-title{margin-bottom:12px}
@@ -533,7 +529,7 @@
 .mobile-header:not(.mobile-header-detail){position:sticky}
 .mobile-header-actions{padding:2px;border-radius:var(--shape-scale-999)}
 .mobile-header .mobile-header-brand .logo.logo-compact{width:24px;height:24px}
-.mobile-header-brand{display:grid;place-items:center;flex:none;min-width:28px;width:auto;height:40px}
+.mobile-header-brand{display:flex;align-items:center;gap:6px;flex:none;min-width:44px;width:auto;min-height:44px;font-size:var(--type-subheading);font-weight:600}
 .mobile-header:not(.mobile-header-detail) .mobile-header-leading{flex:1;gap:8px}
 .mobile-header-leading,
   .mobile-header-actions{min-width:0;display:flex;align-items:center;gap:4px}
@@ -608,3 +604,19 @@ html[data-theme="dark"] .app-start-icon{filter:invert(1)}
 @media (prefers-reduced-motion:reduce){
 .app-start-icon,.app-launch-brand .logo{animation:none}
 }
+
+/* App task headers: one visible title and one creation entry on narrow screens. */
+.sidebar-logo{display:flex;align-items:center;gap:8px;font-size:var(--type-subheading);font-weight:600}
+.sidebar-logo .logo.logo-compact{width:28px;height:28px}
+@media (max-width:760px){
+ .mobile-section-title{display:block;margin:0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:var(--type-body);font-weight:600}
+ .app-root[data-header-create] .page-head .bo-create-action{display:none}
+ .app-root[data-header-create] .page-head{min-height:0;margin-bottom:0}
+ .app-root:not(.app-section-dashboard) .page-head:not(.page-head-detail) .bo-page-heading-main>h1{display:none}
+ .page-head-detail[data-heading-placement="content"] .bo-detail-heading-main{display:none}
+ .page-head-detail[data-heading-placement="content"] .bo-detail-meta{margin-top:0}
+ .page-head-detail[data-heading-placement="content"] .bo-detail-meta .status{display:none}
+ .mobile-header-actions .bo-create-action{margin:0}
+}
+
+.app-version-notice{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-block:12px;border-bottom:1px solid var(--color-line);font-size:var(--type-label);background:var(--color-bg)}

@@ -29,6 +29,10 @@ permanent-toolbox instructions. Historical audit reports are evidence, not rules
   AppStart with the original BINSO icon is for initial session bootstrap only.
 - No route-local CSS, JSX style blocks or literal inline presentation. Dynamic
   measurements may pass CSS custom properties into the owning component.
+- Route-bound creation/editing uses the existing FormSheet workspace mode; short
+  contextual tasks retain modal sheets. Stable labeled navigation, contextual
+  headers and equal visible avatar/create circles follow ux-current-approval.md.
+  Archived compact/floating geometry is not an active requirement.
 - New pages must follow a documented page pattern and include loading, empty,
   error, read-only, keyboard and narrow-screen states. Mark missing reference
   screens as derived in the review; never silently call them original-approved.

@@ -1,0 +1,479 @@
+{
+  "date": "2026-10-16",
+  "rules": [
+    {
+      "id": "UX24-TYPE",
+      "scope": "Alle Oberflächen",
+      "requirement": "Verbindliche Microsoft-Referenz: Inter/system-ui, Desktoptitel 27px/600, mobile Titel 25px bzw. Detail 23px, Controls 13px Desktop/16px Mobile. Gemeinsame Typografierollen verwenden.",
+      "owner": "app/design-system/theme.css",
+      "acceptance": "Computed font und line-height je Rolle/Gerät gegen freigegebenen Wert prüfen",
+      "status": "offen",
+      "evidence": []
+    },
+    {
+      "id": "UX24-SPACE",
+      "scope": "Alle Oberflächen",
+      "requirement": "Abstände aus den gerenderten Originalreferenzen in gemeinsamen Layout- und Komponententokens abbilden. Keine seitenweisen Korrekturketten.",
+      "owner": "app/design-system/theme.css",
+      "acceptance": "Computed Padding/Gap mit zuständigem Token vergleichen",
+      "status": "offen",
+      "evidence": []
+    },
+    {
+      "id": "UX24-COLOR",
+      "scope": "Light/Dark",
+      "requirement": "Weisse Grund-, Header- und Inhaltsflächen, Referenzblau für Aktion/Auswahl/Fokus, semantische Statusfarben. Dark Mode ist eine ausdrücklich abgeleitete Ansicht.",
+      "owner": "app/design-system/theme.css",
+      "acceptance": "Kontrast und Zustände tatsächlich messen",
+      "status": "offen",
+      "evidence": []
+    },
+    {
+      "id": "UX24-SURFACE",
+      "scope": "Cards/Listen/Settings",
+      "requirement": "Offene Abschnitte und Listen gemäss ZIP. Trennlinien nur zwischen Einträgen. Keine frei erfundenen Kartenraster.",
+      "owner": "app/design-system/layout.css",
+      "acceptance": "Einzelner, letzter und mehrzeiliger Eintrag ohne Schlusslinie",
+      "status": "offen",
+      "evidence": []
+    },
+    {
+      "id": "UX24-CONTROL",
+      "scope": "Formulare inkl. Auth",
+      "requirement": "Field/Input/Select/Textarea verwenden; Fokus 2px innen, Akzent, Fehler rot; Disabled via Rechte erhalten.",
+      "owner": "components/ui.tsx",
+      "acceptance": "Fokus/Fehler/Disabled/Loading rendern; aria-describedby und Label prüfen",
+      "status": "offen",
+      "evidence": []
+    },
+    {
+      "id": "UX24-HEADER",
+      "scope": "Haupt-/Detail-/Desktopheader",
+      "requirement": "Ein Seiten-/Detailtitel und gemeinsame Header-Slots. Desktop mit Arbeitsbereich und globalen Aktionen; Mobile gemäss Originalvorlage.",
+      "owner": "components/app-chrome.tsx",
+      "acceptance": "Geometrie und Back/Deep Link auf Mobile/Tablet/Desktop prüfen",
+      "status": "offen",
+      "evidence": []
+    },
+    {
+      "id": "UX24-ACTIONS",
+      "scope": "Listen und Aktionen",
+      "requirement": "Lokale Suche/Filter/Plus und Tabs über bestehende Komponenten; Plus erstellt, Datensatz öffnet, Menü weitere erlaubte Aktionen.",
+      "owner": "components/binso-ux.tsx",
+      "acceptance": "Rollen und Öffnungsmodus je Aktion testen",
+      "status": "offen",
+      "evidence": []
+    },
+    {
+      "id": "UX24-OVERLAY",
+      "scope": "Sheets/Dialog/Popover",
+      "requirement": "Gemeinsame Formular-/Aktions-/Filtersheets auf Mobile; Desktop verwendet die Referenz-Commandbar und passende Dialoge. Fokus, Escape/Back, Tastatur und Safe Areas zentral.",
+      "owner": "components/binso-ux.tsx",
+      "acceptance": "Fokus zurück, Keyboard, Dirty-State, Footer ohne Überdeckung prüfen",
+      "status": "offen",
+      "evidence": []
+    },
+    {
+      "id": "UX24-CHART",
+      "scope": "KPI und Diagramme",
+      "requirement": "Ringbetrag und Label gemeinsam geometrisch zentriert; Legende vertikal mittig mit konsistenten Farbmarkierungen, echten Beträgen und Anteilen. Zeitreihen bleiben zeitbasiert.",
+      "owner": "components/statistics.tsx",
+      "acceptance": "Touch/Tastatur und gefiltertes Ziel mit korrektem Zeitraum/Betrag prüfen",
+      "status": "offen",
+      "evidence": []
+    },
+    {
+      "id": "UX24-PWA",
+      "scope": "Mobile/PWA",
+      "requirement": "Dynamischer Viewport und Safe-Area Tokens; kein verdeckter Composer/Footer; kein sichtbares Updatebanner.",
+      "owner": "components/use-workspace-viewport.ts",
+      "acceptance": "Browseremulation und echte installierte Geräte getrennt protokollieren",
+      "status": "offen",
+      "evidence": []
+    },
+    {
+      "id": "UX24-MOTION",
+      "scope": "Motion/Glass",
+      "requirement": "Bestehende motion/glass Tokens und Reduced Motion; keine zusätzlichen Navigationseingriffe.",
+      "owner": "app/design-system/theme.css",
+      "acceptance": "Reduced Motion und Glass-Fallback in beiden Themes prüfen",
+      "status": "offen",
+      "evidence": []
+    },
+    {
+      "id": "UX24-NAV",
+      "scope": "Bottom-Navigation",
+      "requirement": "Bestehende Bottom-Navigation unverändert; diese Aufgabe autorisiert keine neue Glass/Layout/Plus-Änderung.",
+      "owner": "components/app-chrome.tsx",
+      "acceptance": "Vorhandene navigation-contract und navigation-foundation Gates ohne Referenzregeneration",
+      "status": "offen",
+      "evidence": []
+    },
+    {
+      "id": "UX24-STYLE-001",
+      "scope": ".button",
+      "requirement": "min-height: var(--button-height); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
+      "owner": "app/design-system/primitives.css",
+      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 42px; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "status": "offen",
+      "evidence": [],
+      "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
+    },
+    {
+      "id": "UX24-STYLE-002",
+      "scope": ".button",
+      "requirement": "height: var(--button-height); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
+      "owner": "app/design-system/primitives.css",
+      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 42px; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "status": "offen",
+      "evidence": [],
+      "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
+    },
+    {
+      "id": "UX24-STYLE-003",
+      "scope": ".button",
+      "requirement": "font-size: var(--button-font-size); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
+      "owner": "app/design-system/primitives.css",
+      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 14px; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "status": "offen",
+      "evidence": [],
+      "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
+    },
+    {
+      "id": "UX24-STYLE-004",
+      "scope": ".button",
+      "requirement": "font-weight: var(--button-font-weight); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
+      "owner": "app/design-system/primitives.css",
+      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 650; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "status": "offen",
+      "evidence": [],
+      "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
+    },
+    {
+      "id": "UX24-STYLE-005",
+      "scope": ".button",
+      "requirement": "line-height: var(--button-line-height); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
+      "owner": "app/design-system/primitives.css",
+      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 1; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "status": "offen",
+      "evidence": [],
+      "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
+    },
+    {
+      "id": "UX24-STYLE-006",
+      "scope": ".button",
+      "requirement": "gap: var(--button-gap); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
+      "owner": "app/design-system/primitives.css",
+      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 8px; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "status": "offen",
+      "evidence": [],
+      "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
+    },
+    {
+      "id": "UX24-STYLE-007",
+      "scope": ".button svg",
+      "requirement": "width: var(--button-icon-size); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
+      "owner": "app/design-system/primitives.css",
+      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 17px; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "status": "offen",
+      "evidence": [],
+      "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
+    },
+    {
+      "id": "UX24-STYLE-008",
+      "scope": ".button svg",
+      "requirement": "height: var(--button-icon-size); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
+      "owner": "app/design-system/primitives.css",
+      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 17px; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "status": "offen",
+      "evidence": [],
+      "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
+    },
+    {
+      "id": "UX24-STYLE-009",
+      "scope": ".page-head h1",
+      "requirement": "font-size: var(--page-heading-size); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
+      "owner": "app/design-system/layout.css",
+      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 28px; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "status": "offen",
+      "evidence": [],
+      "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
+    },
+    {
+      "id": "UX24-STYLE-010",
+      "scope": ".page-head h1",
+      "requirement": "line-height: var(--page-heading-line-height); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
+      "owner": "app/design-system/layout.css",
+      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 1.08; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "status": "offen",
+      "evidence": [],
+      "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
+    },
+    {
+      "id": "UX24-STYLE-011",
+      "scope": ".page-head h1",
+      "requirement": "letter-spacing: var(--page-heading-letter-spacing); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
+      "owner": "app/design-system/layout.css",
+      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert -.035em; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "status": "offen",
+      "evidence": [],
+      "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
+    },
+    {
+      "id": "UX24-STYLE-012",
+      "scope": ".page-head p",
+      "requirement": "font-size: var(--body-font-size); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
+      "owner": "app/design-system/layout.css",
+      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 14px; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "status": "offen",
+      "evidence": [],
+      "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
+    },
+    {
+      "id": "UX24-STYLE-013",
+      "scope": ".page-head p",
+      "requirement": "line-height: var(--body-line-height); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
+      "owner": "app/design-system/layout.css",
+      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 1.45; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "status": "offen",
+      "evidence": [],
+      "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
+    },
+    {
+      "id": "UX24-STYLE-014",
+      "scope": ".metric-top",
+      "requirement": "font-size: var(--metric-label-size); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
+      "owner": "app/design-system/layout.css",
+      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 11px; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "status": "offen",
+      "evidence": [],
+      "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
+    },
+    {
+      "id": "UX24-STYLE-015",
+      "scope": ".metric-top",
+      "requirement": "line-height: var(--metric-label-line-height); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
+      "owner": "app/design-system/layout.css",
+      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 1.2; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "status": "offen",
+      "evidence": [],
+      "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
+    },
+    {
+      "id": "UX24-STYLE-016",
+      "scope": ".metric strong",
+      "requirement": "font-size: var(--metric-value-size); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
+      "owner": "app/design-system/layout.css",
+      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 20px; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "status": "offen",
+      "evidence": [],
+      "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
+    },
+    {
+      "id": "UX24-STYLE-017",
+      "scope": ".metric strong",
+      "requirement": "line-height: var(--metric-value-line-height); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
+      "owner": "app/design-system/layout.css",
+      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 1.05; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "status": "offen",
+      "evidence": [],
+      "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
+    },
+    {
+      "id": "UX24-STYLE-018",
+      "scope": ".metric strong",
+      "requirement": "letter-spacing: var(--metric-value-letter-spacing); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
+      "owner": "app/design-system/layout.css",
+      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert -.025em; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "status": "offen",
+      "evidence": [],
+      "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
+    },
+    {
+      "id": "UX24-WHITE-WORKSPACE",
+      "scope": "Light Mode: Marketing, Auth, Kunden- und Adminportal; bestehende Bottom-Navigation ausgenommen",
+      "requirement": "Weisse Grund-, Header-, Control- und Inhaltsflächen; dezente blaue Fokus-/Auswahl-/Aktionszustände. Dark Mode eigenständig. Neuer schriftlicher Auftrag white-workspaces-request.md hat Vorrang vor älteren Grau-Vorgaben.",
+      "owner": "app/design-system/theme.css",
+      "acceptance": "Computed weisse Flächen und Kontrast prüfen; Navigation-Referenz unverändert bestehen lassen.",
+      "status": "offen",
+      "evidence": []
+    },
+    {
+      "id": "UX24-DESKTOP-COLLAPSE",
+      "scope": "Desktop ab 1101px, Kunden- und Adminportal",
+      "requirement": "Linke Navigation standardmässig offen, manuell einklappbar; gespeicherte Auswahl, ARIA-Zustand und Icon-Linknamen. Mobile-Navigation unverändert.",
+      "owner": "components/desktop-navigation.tsx",
+      "acceptance": "Einklappen/Öffnen, gewonnene Inhaltsbreite, Storage und mobile Unsichtbarkeit im Browser prüfen.",
+      "status": "offen",
+      "evidence": []
+    }
+  ],
+  "styleBindings": [
+    {
+      "id": "UX24-STYLE-001",
+      "file": "app/design-system/primitives.css",
+      "selector": ".button",
+      "context": "",
+      "property": "min-height",
+      "token": "--button-height",
+      "value": "42px"
+    },
+    {
+      "id": "UX24-STYLE-002",
+      "file": "app/design-system/primitives.css",
+      "selector": ".button",
+      "context": "",
+      "property": "height",
+      "token": "--button-height",
+      "value": "42px"
+    },
+    {
+      "id": "UX24-STYLE-003",
+      "file": "app/design-system/primitives.css",
+      "selector": ".button",
+      "context": "",
+      "property": "font-size",
+      "token": "--button-font-size",
+      "value": "var(--type-control)"
+    },
+    {
+      "id": "UX24-STYLE-004",
+      "file": "app/design-system/primitives.css",
+      "selector": ".button",
+      "context": "",
+      "property": "font-weight",
+      "token": "--button-font-weight",
+      "value": "400"
+    },
+    {
+      "id": "UX24-STYLE-005",
+      "file": "app/design-system/primitives.css",
+      "selector": ".button",
+      "context": "",
+      "property": "line-height",
+      "token": "--button-line-height",
+      "value": "1"
+    },
+    {
+      "id": "UX24-STYLE-006",
+      "file": "app/design-system/primitives.css",
+      "selector": ".button",
+      "context": "",
+      "property": "gap",
+      "token": "--button-gap",
+      "value": "8px"
+    },
+    {
+      "id": "UX24-STYLE-007",
+      "file": "app/design-system/primitives.css",
+      "selector": ".button svg",
+      "context": "",
+      "property": "width",
+      "token": "--button-icon-size",
+      "value": "17px"
+    },
+    {
+      "id": "UX24-STYLE-008",
+      "file": "app/design-system/primitives.css",
+      "selector": ".button svg",
+      "context": "",
+      "property": "height",
+      "token": "--button-icon-size",
+      "value": "17px"
+    },
+    {
+      "id": "UX24-STYLE-009",
+      "file": "app/design-system/layout.css",
+      "selector": ".page-head h1",
+      "context": "",
+      "property": "font-size",
+      "token": "--page-heading-size",
+      "value": "var(--type-desktop-heading)"
+    },
+    {
+      "id": "UX24-STYLE-010",
+      "file": "app/design-system/layout.css",
+      "selector": ".page-head h1",
+      "context": "",
+      "property": "line-height",
+      "token": "--page-heading-line-height",
+      "value": "1.5"
+    },
+    {
+      "id": "UX24-STYLE-011",
+      "file": "app/design-system/layout.css",
+      "selector": ".page-head h1",
+      "context": "",
+      "property": "letter-spacing",
+      "token": "--page-heading-letter-spacing",
+      "value": "-.6px"
+    },
+    {
+      "id": "UX24-STYLE-012",
+      "file": "app/design-system/layout.css",
+      "selector": ".page-head p",
+      "context": "",
+      "property": "font-size",
+      "token": "--body-font-size",
+      "value": "14px"
+    },
+    {
+      "id": "UX24-STYLE-013",
+      "file": "app/design-system/layout.css",
+      "selector": ".page-head p",
+      "context": "",
+      "property": "line-height",
+      "token": "--body-line-height",
+      "value": "1.45"
+    },
+    {
+      "id": "UX24-STYLE-014",
+      "file": "app/design-system/analytics.css",
+      "selector": ".metric-top",
+      "context": "",
+      "property": "font-size",
+      "token": "--metric-label-size",
+      "value": "var(--type-label)"
+    },
+    {
+      "id": "UX24-STYLE-015",
+      "file": "app/design-system/analytics.css",
+      "selector": ".metric-top",
+      "context": "",
+      "property": "line-height",
+      "token": "--metric-label-line-height",
+      "value": "1.2"
+    },
+    {
+      "id": "UX24-STYLE-016",
+      "file": "app/design-system/analytics.css",
+      "selector": ".metric strong",
+      "context": "",
+      "property": "font-size",
+      "token": "--metric-value-size",
+      "value": "var(--workspace-value-size)"
+    },
+    {
+      "id": "UX24-STYLE-017",
+      "file": "app/design-system/analytics.css",
+      "selector": ".metric strong",
+      "context": "",
+      "property": "line-height",
+      "token": "--metric-value-line-height",
+      "value": "1.5"
+    },
+    {
+      "id": "UX24-STYLE-018",
+      "file": "app/design-system/analytics.css",
+      "selector": ".metric strong",
+      "context": "",
+      "property": "letter-spacing",
+      "token": "--metric-value-letter-spacing",
+      "value": "-1px"
+    }
+  ],
+  "reference": "docs/audit/v24/reference/IMPLEMENTIERUNG.md",
+  "architecture": "app/design-system/manifest.json",
+  "referenceArchiveSha256": "6c53321824f70961464309e2ab813f0b5c20486f5e10ccb336e46c1cbd6ae57d",
+  "source": "Original ZIP; current working source described by generated integration inventory; no visual approval inferred"
+}

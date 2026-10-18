@@ -12063,5 +12063,20 @@
     "Outflow data is incomplete. Costs without a documented payment date are not included. See financial analysis for details.",
     "Les données de décaissement sont incomplètes. Les coûts sans date de paiement attestée ne sont pas inclus. Consultez l’analyse financière pour les détails.",
     "I dati sulle uscite sono incompleti. I costi senza una data di pagamento documentata non sono inclusi. Consulta l’analisi finanziaria per i dettagli."
+  ],
+  "Als Entwurf speichern": [
+    "Save as draft",
+    "Enregistrer comme brouillon",
+    "Salva come bozza"
+  ],
+  "Neue Version verfügbar": [
+    "New version available",
+    "Nouvelle version disponible",
+    "Nuova versione disponibile"
+  ],
+  "Dokumentdaten": [
+    "Document details",
+    "Données du document",
+    "Dati del documento"
   ]
 }

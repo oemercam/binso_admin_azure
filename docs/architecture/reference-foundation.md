@@ -14,8 +14,9 @@ kontrollierte neue Regressionen; keine vorhandenen Tests pauschal abschwächen.
 Aktueller Abgleich und offene Verträge: [UX-Rangfolge](ux-current-approval.md).
 
 Am 18.10.2026 ausdrücklich gewählt: flache weisse mobile Microsoft-Navigation
-ohne Glas/Schatten/Kapsel, mit blauer Aktivmarkierung. Ziele, Rechte, Bounds,
-Safe Areas und Motion bleiben exakt geschützt; Dark folgt dem dunklen Canvas.
+ohne Glas/Schatten/Kapsel, mit blauer Aktivmarkierung. Diese frühere Materialentscheidung wurde anschliessend durch den aktuellen
+App-Standard erweitert: stabile Labels und volle Safe-Area-Fläche statt Dock.
+Ziele, Rechte und Icons bleiben geschützt; Dark folgt dem dunklen Canvas.
 Die ältere mobile Glass-Freeze-Vorgabe ist damit für das Material ersetzt.
 
 Die anschliessende ausdrückliche Gesamtbereinigung gilt für alle aktiven
@@ -87,7 +88,8 @@ werden mit `RecordRow`, Desktopzellen mit den zentralen Spaltendefinitionen
 erstellt. Keine eigene Toolbar oder zweite Suche zeichnen.
 
 `CreateAction` ist auf dem Desktop ein beschrifteter blauer Button und auf Mobile
-ein schwarzer runder Plus-Button. `RecordsControls` zeigt auf Desktop Filter und
+ein 30px sichtbarer schwarzer Plus-Kreis in mindestens 44px Touchfläche am
+gemeinsamen Listenheader. `RecordsControls` zeigt auf Desktop Filter und
 Sortierung direkt neben der Suche; Mobile verwendet das gemeinsame Filter-Sheet.
 Eine Erfassungsaktion darf nicht manuell zu einem viewportunabhängigen Kreis werden.
 
@@ -120,8 +122,8 @@ und Sperren gegen doppelte Schreibvorgänge. Das Verwerfen eines untergeordneten
 Editors darf den wiederherstellbaren Hauptentwurf nicht löschen. Kindformulare
 räumen ihre eigenen Eingaben über ihren Abschluss-Handler auf; seitenweites
 Verwerfen gehört zum allein geöffneten Hauptformular oder zur Seitennavigation.
-`FormSheet` und `FormWizard` besitzen
-Dialog, Fokus, Header und Abschlussaktionen. `Field` mit `Input`, `Select` oder
+`FormSheet` (workspace für routegebundene Aufgaben, modal für kurze Kontextaufgaben)
+und `FormWizard` besitzen Fokus, Header und Abschlussaktionen. `Field` mit `Input`, `Select` oder
 `Textarea` besitzt Beschriftung und Fehlerzuordnung. Dateiauswahl verwendet den
 gemeinsamen Upload-Stil, nicht ein nachgebautes Eingabefeld.
 
@@ -138,7 +140,8 @@ prüft anschliessend Darstellung und tatsächliche Bedienung.
 - Light Mode: weisse Seite, Header und Inhaltsflächen; Blau für Aktionen,
   Auswahl und Fokus. Offene Abschnitte statt wiederholter umrahmter Karten.
 - Desktop: gemeinsame Command Bar; ergänzende Aktionen ins bestehende Menü.
-  Mobile: kurze Abläufe im Sheet; schwarzes rundes Plus und bestehende Navigation.
+  Mobile: kurze Abläufe im Sheet, lange routegebundene Erfassungen im gemeinsamen
+  Workspace-Modus; stabile beschriftete Navigation nach aktueller UX-Rangfolge.
 - Sekundärtext muss lesbar bleiben. Mobile Eingabefelder mindestens 16 px,
   aktive Touchziele mindestens 44 px. Kleine Vorschau-Schalter sind keine Vorlage
   für unzugängliche Produktbedienung.
@@ -157,8 +160,8 @@ Die Messung prüft weiterhin exakte Farbgleichheit; Gegenproben müssen die alte
 graue Kartenfläche in beiden Themes bei 390, 1100 und 1440 px ablehnen.
 Der aktuelle Navigationsvertrag folgt `ux-current-approval.md`; historische
 Freeze-Regeln haben keinen Vorrang vor ausdrücklich freigegebenen Korrekturen.
-Das Releaseprofil bleibt unverändert. Die gerenderten Bounds, Rechte, Fokus,
-Safe Areas und Bewegungsabläufe bleiben weiterhin geschützt.
+Das Releaseprofil bleibt unverändert. Die neuen expliziten Bounds müssen unabhängig gerendert geprüft werden; Rechte,
+Fokus, Safe Areas, Reduced Motion und Entwurfsschutz bleiben verpflichtend.
 
 `pnpm qa:fast --typecheck`, Referenz-/Navigations-/Foundation-Verträge und die
 gezielte Browsermatrix gehören zum Paket. Neue Seiten müssen im Inventar und

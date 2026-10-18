@@ -1,6 +1,11 @@
 /* BINso One / documents — one owner for base, states and responsive behavior. */
-.document-entry-sheet{--sheet-max-width:var(--document-entry-width)}
-.document-form-preview{display:flex;justify-content:flex-end;margin-bottom:8px}
+.document-review{max-width:840px;margin-inline:auto}
+.document-review-positions>div{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding-block:12px;border-bottom:1px solid var(--color-line)}
+.document-review-positions>div:last-child{border-bottom:0}
+.document-review-positions>div>span{min-width:0;overflow-wrap:anywhere}
+.document-review-positions small{display:block;margin-top:4px;color:var(--color-muted);font-size:var(--type-metadata)}
+.document-review-positions>div>strong{white-space:nowrap}
+.form-workspace.document-entry-workspace{max-width:var(--document-entry-width)}
 .invoice-form{
   border:0;
   border-radius:0;

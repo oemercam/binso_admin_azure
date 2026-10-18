@@ -21,6 +21,8 @@ const classOwners={
  'confirm-dialog':['components/confirm-dialog.tsx'],
  'confirm-layer':['components/confirm-dialog.tsx'],
  'bottom-sheet':['components/binso-ux.tsx'],
+ 'form-workspace':['components/binso-ux.tsx'],
+ 'workspace-toolbar':['components/binso-ux.tsx'],
  'sheet-layer':['components/binso-ux.tsx'],
  'bo-page-heading':['components/binso-ux.tsx'],
  'bo-detail-heading':['components/binso-ux.tsx'],

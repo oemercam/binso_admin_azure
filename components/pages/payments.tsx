@@ -77,8 +77,8 @@ export function PaymentForm() {
     }
   };
   const close=()=>{allowDraftNavigation();router.push(returnTo)};
-  return <AppShell editing unsavedChanges={false} title="Zahlungen" active="zahlungen">
-    <FormSheet label="Zahlung erfassen" description="Rechnungsdaten werden automatisch übernommen." open onClose={close} busy={saving} dirty={dirty&&!saved} actions={<><Button variant="secondary" onClick={close}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button onClick={save} disabled={saving||!selectedInvoice}><LocalizedText>{saving?"Wird gespeichert…":"Zahlung speichern"}</LocalizedText></Button></>}>
+  return <AppShell editing unsavedChanges={false} title="Zahlung erfassen" active="zahlungen" backHref={returnTo} backLabel="Zahlungen">
+    <FormSheet workspace label="Zahlung erfassen" description="Rechnungsdaten werden automatisch übernommen." open onClose={close} busy={saving} dirty={dirty&&!saved} actions={<><Button variant="secondary" onClick={close}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button onClick={save} disabled={saving||!selectedInvoice}><LocalizedText>{saving?"Wird gespeichert…":"Zahlung speichern"}</LocalizedText></Button></>}>
     {toast&&toast!=="Zahlung gespeichert."&&<ErrorState>{toast}</ErrorState>}
     <div className="form-page narrow" inert={saving}>
       <Field label="Rechnung"><Select disabled={invoicesLoading} value={invoiceId} onChange={e=>{setInvoiceId(e.target.value);setIdempotencyKey("");const item=availableInvoices.find(x=>x.id===e.target.value);setAmount(item?String(openAmount(item)):"")}}><option value=""><LocalizedText>{"Rechnung auswählen"}</LocalizedText></option>{availableInvoices.map(item=><option key={item.id} value={item.id}>{item.number} · {item.customer?.name} · {formatCurrency(openAmount(item),item.currency)}</option>)}</Select></Field>

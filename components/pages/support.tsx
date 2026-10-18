@@ -7,11 +7,11 @@ import {allowDraftNavigation} from "../use-browser-back-guard";
 import {useProcessDraft} from "../use-process-draft";
 import {useDirtySnapshot} from "../use-dirty-snapshot";
 import Link from "next/link";
-import {formatDateTime} from "@/lib/display-format";
+import {formatDateTime,messageDay} from "@/lib/display-format";
 import {supportReference} from "@/lib/support-reference";
 import {useApiQuery,useDataRevision} from "@/lib/client/use-api-query";
 import { useRouter,useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { useWorkspaceViewport } from "../use-workspace-viewport";
 import { AppShell } from "../app-shell";
 import { RecordRow, RecordsView, RecordsControls, useRecordsController } from "../records";
@@ -99,8 +99,8 @@ export function SupportTicketForm() {
       setSubmitting(false);
     }
   };
-  return <AppShell title="Support" editing unsavedChanges={false} subtitle="Beschreibe kurz, wobei wir helfen können." active="support" backHref={returnTo} backLabel="Support">
-    <FormSheet label="Neue Support-Anfrage" open={open} onClose={close} busy={submitting} dirty={dirty&&!saved}>
+  return <AppShell title="Neue Support-Anfrage" editing unsavedChanges={false} subtitle="Beschreibe kurz, wobei wir helfen können." active="support" backHref={returnTo} backLabel="Support">
+    <FormSheet workspace label="Neue Support-Anfrage" open={open} onClose={close} busy={submitting} dirty={dirty&&!saved}>
     <form onSubmit={event=>{event.preventDefault();void save()}}>
       <div className="form-grid">
         <Field label="Betreff" className="full"><Input required minLength={3} maxLength={160} disabled={submitting||!!createdId} autoFocus value={subject} onChange={e=>setSubject(e.target.value)} placeholder="Worum geht es?"/></Field>
@@ -216,8 +216,8 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
     <div className="entity-detail-workspace support-detail-workspace">
 
       <div className="desktop-detail-main"><div className="support-thread"><LocalizedElement as="div" className="thread-messages" tabIndex={0} role="log" ref={messagesRef} aria-label="Nachrichtenverlauf">
-      {ticketLoading?<LoadingState><LocalizedText>{"Ticket wird geladen …"}</LocalizedText></LoadingState>:ticketError?<ErrorState onRetry={()=>setTicketRetry(value=>value+1)} retryLabel="Erneut versuchen"><LocalizedText>{ticketError}</LocalizedText></ErrorState>:<div className="thread-day"><LocalizedText>{"Heute"}</LocalizedText></div>}
-      {production ? remote.map(message=><MessageBubble outgoing={message.author_type==="customer"} time={<>{new Date(message.created_at).toLocaleTimeString("de-CH",{hour:"2-digit",minute:"2-digit"})}</>} author={message.author_type!=="customer"?"Binso Support":undefined} key={message.id}>{message.body}</MessageBubble>) : <>
+      {ticketLoading?<LoadingState><LocalizedText>{"Ticket wird geladen …"}</LocalizedText></LoadingState>:ticketError?<ErrorState onRetry={()=>setTicketRetry(value=>value+1)} retryLabel="Erneut versuchen"><LocalizedText>{ticketError}</LocalizedText></ErrorState>:!production&&<div className="thread-day"><LocalizedText>{"Heute"}</LocalizedText></div>}
+      {production ? remote.map((message,index)=><Fragment key={message.id}>{messageDay(message.created_at)!==messageDay(remote[index-1]?.created_at??"")&&<div className="thread-day">{messageDay(message.created_at)}</div>}<MessageBubble outgoing={message.author_type==="customer"} time={<>{new Date(message.created_at).toLocaleTimeString("de-CH",{hour:"2-digit",minute:"2-digit",timeZone:"Europe/Zurich"})}</>} author={message.author_type!=="customer"?"Binso Support":undefined}>{message.body}</MessageBubble></Fragment>) : <>
         <MessageBubble outgoing={true} time={<>10:24</>}><LocalizedText>{"Ich habe eine Frage zu einer Rechnung. Können Sie mir bitte weiterhelfen?"}</LocalizedText></MessageBubble>
         <MessageBubble outgoing={false} time={<>10:37</>} author={<><LocalizedText>{"Binso Support"}</LocalizedText></>}><LocalizedText>{"Hallo Thomas. Gerne helfe ich dir weiter. Um welche Rechnung geht es genau?"}</LocalizedText></MessageBubble>
         <MessageBubble outgoing={true} time={<>10:41</>}><LocalizedText>{"Es geht um die Rechnung RE-2026-019 von Acme AG."}</LocalizedText></MessageBubble>

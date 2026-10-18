@@ -8,6 +8,7 @@ import { readTimer, changeTimer } from "@/lib/client/time-tracker";
 import Link from "next/link";
 import {loadTheme,saveTheme} from "@/lib/client/theme";
 import {AppStart} from "./app-start";
+import {AppVersionNotice} from "./app-version-notice";
 import { hasBlockingModal } from "./use-dialog-focus";
 import {safeAppPath} from "@/lib/navigation";
 import { usePathname, useRouter } from "next/navigation";
@@ -16,7 +17,7 @@ import {WorkspaceActionContext} from '@/lib/client/workspace-actions';
 import {RecordsControls} from './records';
 import {useBrowserBackGuard,allowDraftNavigation} from "./use-browser-back-guard";
 import ConfirmDialog from "./confirm-dialog";
-import { ActionRow, ActionSheet, PageHeading, DetailHeading } from "./binso-ux";
+import { ActionRow, ActionSheet, PageHeading, DetailHeading, CreateAction } from "./binso-ux";
 import {Button, EmptyState, Icon, IconButton, Logo, Status, LoadingState, FormActions} from "./ui";
 import {useApiQuery,useDataRevision} from "@/lib/client/use-api-query";
 import { apiGet, apiPatch, logoutClientSession, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
@@ -130,8 +131,9 @@ function AppShellFrame({
   const pageAccess=useMemo(()=>({write:canWrite,canOpen}),[canWrite,canOpen]);
   const listControls=isValidElement<{children?:React.ReactNode}>(actions)&&actions.type===RecordsControls?actions:null;
   const visibleActions=listControls?listControls.props.children:actions;
+  const headerCreate=!backHref&&isValidElement(visibleActions)&&visibleActions.type===CreateAction;
   const bodyControls=listControls?cloneElement(listControls,{children:undefined}):undefined;
-  const headerOwnsDetail=!!backHref&&headingPlacement==="header";
+  const headerOwnsDetail=!!backHref;
   const allowed=canOpen(pathname);
   const [formDirty,setFormDirty]=useState(false);
   const shellRef=useRef<HTMLDivElement>(null);
@@ -196,7 +198,6 @@ function AppShellFrame({
   const profileQuery=useApiQuery<{item?:Record<string,unknown>|null;email?:string}>(production?"/api/settings/profile":null);
   const profileItem=profileQuery.data?.item;
   const profile={name:String(profileItem?.display_name||[profileItem?.first_name,profileItem?.last_name].filter(Boolean).join(" ")||""),identity:String(profileQuery.data?.email||""),avatar:String(profileItem?.avatar_url||"")};
-  const [navCompact,setNavCompact]=useState(false);
   const [timerNotice,setTimerNotice]=useState<string|null>(null);
 
   useEffect(() => {
@@ -224,33 +225,9 @@ function AppShellFrame({
   useEffect(() => {
     window.scrollTo({top:0,left:0,behavior:"auto"});
     touchedRef.current=false;
-    queueMicrotask(()=>{setFormDirty(false);setSheet(null);setNavCompact(false)});
+    queueMicrotask(()=>{setFormDirty(false);setSheet(null)});
   }, [pathname]);
 
-  useEffect(() => {
-    if(preview) return;
-    let lastY=window.scrollY;
-    let compact=false;
-    let ticking=false;
-    const update=()=>{
-      const currentY=Math.max(0,window.scrollY);
-      const delta=currentY-lastY;
-      if(currentY<24) compact=false;
-      else if(delta>7) compact=true;
-      else if(delta<-7) compact=false;
-      setNavCompact(value=>value===compact?value:compact);
-      lastY=currentY;
-      ticking=false;
-    };
-    const onScroll=()=>{
-      if(!ticking){
-        ticking=true;
-        window.requestAnimationFrame(update);
-      }
-    };
-    window.addEventListener("scroll",onScroll,{passive:true});
-    return()=>window.removeEventListener("scroll",onScroll);
-  },[preview]);
 
 
   useEffect(() => {
@@ -334,12 +311,12 @@ function AppShellFrame({
 
   return <WorkspaceActionContext.Provider value={registerContextActions}><PageAccessContext.Provider value={pageAccess}>
     {!access&&!accessError&&<AppStart/>}
-    <div hidden={!access&&!accessError} ref={shellRef} data-navigation-collapsed={navigationCollapsed||undefined} className={`app-root app-section-${active} ${timerRunning && !backHref ? "timer-active" : ""} ${preview ? "app-preview" : ""} ${formActive ? "app-editing" : ""}`}>
+    <div hidden={!access&&!accessError} ref={shellRef} data-unsaved={dirty||undefined} data-header-create={headerCreate||undefined} data-navigation-collapsed={navigationCollapsed||undefined} className={`app-root app-section-${active} ${timerRunning && !backHref ? "timer-active" : ""} ${preview ? "app-preview" : ""} ${formActive ? "app-editing" : ""}`}>
     <ConfirmDialog open={confirmLogout} busy={logoutBusy} title="Änderungen verwerfen und abmelden?" message="Deine Änderungen sind noch nicht gespeichert." confirmLabel="Abmelden" onCancel={()=>setConfirmLogout(false)} onConfirm={()=>void logout(true)}/>
     <ConfirmDialog open={leaveHref!==null} title="Änderungen verwerfen?" message="Deine Änderungen sind noch nicht gespeichert und gehen verloren." cancelLabel="Weiter bearbeiten" confirmLabel="Änderungen verwerfen" onCancel={()=>setLeaveHref(null)} onConfirm={()=>{const href=leaveHref;setLeaveHref(null);if(href){window.dispatchEvent(new Event("binso-draft-discard"));allowDraftNavigation();if(href==="browser-back"){leaveBack();return;}const url=new URL(href);if(url.origin===window.location.origin)router.replace(url.pathname+url.search+url.hash);else window.location.assign(href);}}}/>
     {logoutError&&<div className="toast" role="alert"><Icon name="close" size={16}/><span><LocalizedText>{logoutError}</LocalizedText></span><button type="button" className="text-action" disabled={logoutBusy} onClick={()=>void logout()}><LocalizedText>{"Erneut versuchen"}</LocalizedText></button></div>}
     <aside id="customer-desktop-navigation" className="app-sidebar">
-      <Link href="/dashboard" className="sidebar-logo"><Logo compact={navigationCollapsed}/></Link>
+      <Link href="/dashboard" className="sidebar-logo" aria-label={translate("Zur Übersicht")}>{pathname==="/dashboard"?<><Logo compact/><span hidden={navigationCollapsed}>One</span></>:<><Icon name="home"/><span hidden={navigationCollapsed}><LocalizedText>{"Start"}</LocalizedText></span></>}</Link>
       {companyQuery.data?.item.name&&canOpen("/einstellungen/firma")&&<Link href="/einstellungen/firma" className="workspace-company" title={companyQuery.data.item.name}><Icon name="home" size={20}/>{!navigationCollapsed&&<span>{companyQuery.data.item.name}<small><LocalizedText>{"Unternehmen"}</LocalizedText></small></span>}</Link>}
       <nav aria-label={translate("Navigation")}>
         <Link href="/dashboard" aria-label={translate("Start")} title={translate("Start")} className={active==="dashboard"?"active":""} aria-current={active==="dashboard"?"page":undefined}><Icon name="home"/><span><LocalizedText>{"Start"}</LocalizedText></span></Link>
@@ -360,9 +337,10 @@ function AppShellFrame({
         </div>}
       </div>
       <AppHeader className={headerOwnsDetail ? "mobile-header mobile-header-detail" : "mobile-header"} detail={headerOwnsDetail} contentHeader={headingPlacement==="content"} leadingClassName="mobile-header-leading" leading={<>
-        {headerOwnsDetail ? <Link className="mobile-back" href={backHref!} aria-label={backLabel}><Icon name="back"/></Link> : <><Link href="/dashboard" className="mobile-header-brand" aria-label="Zur Übersicht"><Logo compact={headingPlacement!=="content"}/></Link>{headingPlacement==="header"&&<h1 className="mobile-section-title"><LocalizedText verbatim={titleIsUserContent}>{title}</LocalizedText></h1>}</>}
+        {headerOwnsDetail ? <Link className="mobile-back" href={backHref!} aria-label={backLabel}><Icon name="back"/></Link> : pathname==="/dashboard" ? <Link href="/dashboard" className="mobile-header-brand" aria-label="Zur Übersicht"><Logo compact/><span>One</span></Link> : <h1 className="mobile-section-title"><LocalizedText verbatim={titleIsUserContent}>{title}</LocalizedText></h1>}
         {headerOwnsDetail&&<h1 className="mobile-header-title"><span><LocalizedText verbatim={titleIsUserContent}>{title}</LocalizedText></span>{status!=null&&<Status tone={statusTone}>{status}</Status>}</h1>}
       </>} actionClassName={headerOwnsDetail?"mobile-detail-actions":"mobile-header-actions"} actions={headerOwnsDetail ? (allowed&&(mobileActions||visibleActions)?mobileActions??visibleActions:undefined) : <>
+        {headerCreate&&allowed&&visibleActions}
         <IconButton label="Suche" icon="search" onClick={()=>setSheet("search")}/>
         <LocalizedElement as="button" className="mobile-notification-button icon-button" type="button" aria-label="Benachrichtigungen" onClick={openNotifications}><Icon name="bell"/>{unreadNotifications>0&&<i className="notification-badge"><LocalizedText>{unreadNotifications>99?"99+":unreadNotifications}</LocalizedText></i>}</LocalizedElement>
         <LocalizedElement as="button" className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={()=>setSheet("account")}><Avatar name={profile.name} identity={profile.identity} src={profile.avatar} size="small"/></LocalizedElement>
@@ -371,8 +349,9 @@ function AppShellFrame({
       </AppHeader>
 
       <main className="page-container" data-section={active}>
+        <AppVersionNotice/>
         <div className={backHref ? "page-head page-head-detail" : "page-head"} data-heading-placement={headingPlacement}>
-          {backHref ? <DetailHeading verbatimTitle={titleIsUserContent} title={title} subtitle={subtitle} status={status} tone={statusTone} recordLabel={recordLabel} statusPlacement={headingPlacement==="content"?"subtitle":"title"} mobileAction={headingPlacement==="content"&&allowed?(mobileActions??visibleActions):undefined} action={(visibleActions||contextActions)&&allowed?<div className="page-actions">{visibleActions}{contextActions&&<div className="context-actions-inline">{contextActions.content}</div>}</div>:undefined} leading={<Link className={headingPlacement==="content"?"detail-back":"desktop-back"} href={backHref} aria-label={backLabel}><Icon name="back" size={16}/><LocalizedText>{backLabel}</LocalizedText></Link>}/> : <PageHeading verbatimTitle={titleIsUserContent} title={title} description={subtitle} action={(visibleActions||contextActions)&&allowed?<div className="page-actions">{visibleActions}{contextActions&&<div className="context-actions-inline">{contextActions.content}</div>}</div>:undefined}/> }
+          {backHref ? <DetailHeading verbatimTitle={titleIsUserContent} title={title} subtitle={subtitle} status={status} tone={statusTone} recordLabel={recordLabel} statusPlacement={headingPlacement==="content"?"subtitle":"title"} mobileAction={undefined} action={(visibleActions||contextActions)&&allowed?<div className="page-actions">{visibleActions}{contextActions&&<div className="context-actions-inline">{contextActions.content}</div>}</div>:undefined} leading={<Link className="desktop-back" href={backHref} aria-label={backLabel}><Icon name="back" size={16}/><LocalizedText>{backLabel}</LocalizedText></Link>}/> : <PageHeading verbatimTitle={titleIsUserContent} title={title} description={subtitle} action={(visibleActions||contextActions)&&allowed?<div className="page-actions">{visibleActions}{contextActions&&<div className="context-actions-inline">{contextActions.content}</div>}</div>:undefined}/> }
         </div>
         <SettingsWorkspace>
         {allowed&&bodyControls}
@@ -382,7 +361,7 @@ function AppShellFrame({
 
       {timerNotice&&<div className="timer-notice" role="status">{timerNotice}</div>}
 
-      {!preview && !formActive && <MobileDock compact={navCompact}><LocalizedElement as="nav" className={`bottom-nav ${navCompact ? "is-compact" : ""}`} aria-label="Hauptnavigation">
+      {!preview && !formActive && <MobileDock><LocalizedElement as="nav" className="bottom-nav" aria-label="Hauptnavigation">
         <Link href="/dashboard" className={active==="dashboard"?"active":""}><Icon name="home"/><span><LocalizedText>{"Start"}</LocalizedText></span></Link>
         {canOpen("/kunden")&&<Link href="/kunden" className={active==="kunden"?"active":""}><Icon name="users"/><span><LocalizedText>{"Kunden"}</LocalizedText></span></Link>}
         <Link href="/finanzen" className={["angebote","rechnungen","zahlungen","belege","finanzen"].includes(active)?"active":""}><Icon name="wallet"/><span><LocalizedText>{"Finanzen"}</LocalizedText></span></Link>

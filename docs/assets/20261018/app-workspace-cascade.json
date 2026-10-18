@@ -1,0 +1,15 @@
+{
+  "method": "Existing safe same-context/selector/property pruning; fallbacks, specificity and media contexts retained",
+  "removed": [
+    {
+      "file": "app/design-system/layout.css",
+      "selector": ".sidebar-logo",
+      "condition": "",
+      "property": "display",
+      "old": "block",
+      "current": "flex",
+      "line": 69,
+      "winner": 609
+    }
+  ]
+}

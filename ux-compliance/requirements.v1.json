@@ -36,15 +36,15 @@
       "componentTypes": [
         "AppShell"
       ],
-      "expected": "Explizit freigegebener flacher Microsoft-Quellvertrag vom 18.10.2026; Navigationsziele unverändert",
+      "expected": "Freigegebene stabile Microsoft-App-Navigation mit unveränderten Zielen, Rechten und Icons",
       "owner": "AppShell",
       "method": "static",
       "testCase": "TC-UX-NAV-001",
       "adapter": "navigation-contract-test.mjs",
       "priority": "P0",
-      "acceptance": "Explizit freigegebener flacher Microsoft-Quellvertrag vom 18.10.2026; Navigationsziele unverändert",
+      "acceptance": "Freigegebene stabile Microsoft-App-Navigation mit unveränderten Zielen, Rechten und Icons",
       "automation": "automatic",
-      "provenance": "Explicit owner choice of flat white Microsoft navigation on 2026-10-18; historical non-material invariants retained",
+      "provenance": "Explicit owner approval of complete app UX implementation after 76-route diagnosis on 2026-10-18; derived v4 geometry requires independent runtime checks",
       "review": null
     },
     {
@@ -56,15 +56,15 @@
       "componentTypes": [
         "AppShell"
       ],
-      "expected": "Ursprüngliche Zugriffs-/Scroll-Logik, Icons, Bounds, Safe Areas und Motion exakt erhalten; nur freigegebenes Material ersetzt",
+      "expected": "Stabile sichtbare Labels, volle deckende Safe-Area-Fläche, mindestens 44px Touchziele; keine Scroll-Kompaktierung oder Glass-Fallbacks",
       "owner": "AppShell",
       "method": "static",
       "testCase": "TC-UX-NAV-002",
       "adapter": "navigation-foundation-test.mjs",
       "priority": "P0",
-      "acceptance": "Ursprüngliche Zugriffs-/Scroll-Logik, Icons, Bounds, Safe Areas und Motion exakt erhalten; nur freigegebenes Material ersetzt",
+      "acceptance": "Stabile sichtbare Labels, volle deckende Safe-Area-Fläche, mindestens 44px Touchziele; keine Scroll-Kompaktierung oder Glass-Fallbacks",
       "automation": "automatic",
-      "provenance": "Explicit owner choice of flat white Microsoft navigation on 2026-10-18; historical non-material invariants retained",
+      "provenance": "Explicit owner approval of complete app UX implementation after 76-route diagnosis on 2026-10-18; derived v4 geometry requires independent runtime checks",
       "review": null
     },
     {

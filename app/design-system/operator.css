@@ -454,3 +454,5 @@
 .operator-header-desktop-label{display:none}
 .operator-header-brand .logo{width:88px;height:28px}
 .operator-page-head{padding-block:var(--mobile-page-top);margin-bottom:var(--mobile-section-gap);border:0}}
+
+.operator-section-label{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:var(--type-subheading);font-weight:600}

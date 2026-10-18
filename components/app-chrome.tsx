@@ -12,8 +12,8 @@ export function AppHeader({leading,actions,children,detail=false,className="",ac
 }
 
 /** Navigation owns destinations only; creation belongs to the page action area. */
-export function MobileDock({children,compact=false}:{children:ReactNode;compact?:boolean}){
- return <div className={`mobile-dock${compact?" is-compact":""}`}>
+export function MobileDock({children}:{children:ReactNode}){
+ return <div className="mobile-dock">
   {children}
  </div>;
 }

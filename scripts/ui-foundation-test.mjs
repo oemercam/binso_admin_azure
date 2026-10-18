@@ -20,7 +20,7 @@ for(const tag of ['input','select','textarea'])assert.equal((await messages(`exp
 assert.equal((await messages('export const View=()=> <div className="filter-sheet-actions"/>;')).length,1,'Sheet footer ownership cannot drift back into routes');
 assert.equal((await messages('export const View=()=> <div className="mobile-sticky-save"/>;')).length,1,'Page footer ownership cannot drift back into routes');
 assert.equal((await messages('import {FormActions} from "@/components/ui";export const View=()=> <FormActions sheet/>;')).length,0,'Shared footer composition remains supported');
-for(const expression of ['"form-wizard"','"wizard-progress"','"wizard-content"','"form-field"','{`bottom-sheet ${true?"active":""}`}','{true?"operator-table":""}','"confirm-dialog"'])assert.equal((await messages(`export default function Page(){return <div className=${expression}/>;}`)).length,1,'Copied canonical wrappers must fail lint');
+for(const expression of ['"form-workspace"','"workspace-toolbar"','"form-wizard"','"wizard-progress"','"wizard-content"','"form-field"','{`bottom-sheet ${true?"active":""}`}','{true?"operator-table":""}','"confirm-dialog"'])assert.equal((await messages(`export default function Page(){return <div className=${expression}/>;}`)).length,1,'Copied canonical wrappers must fail lint');
 assert.equal((await messages('import {DashboardPage} from "@/components/app-pages";export default DashboardPage;')).length,1);
 assert.equal((await messages('export default function Page(){return <p role="alert">Fehler</p>;}')).length,1);
 assert.equal((await messages('export default function Page(){return <p role="status">Daten werden geladen …</p>;}')).length,1);

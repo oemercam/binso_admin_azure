@@ -23,9 +23,9 @@ for(const compact of [false,true]){
  const rendered=renderToStaticMarkup(React.createElement(chrome.MobileDock,{compact,action:React.createElement('button',null,'Forbidden dock action')},navigation));
  assert.ok(rendered.includes('href="/dashboard"'),'Navigation children are preserved');
  assert.ok(!rendered.includes('Forbidden dock action'),'Shared dock cannot render an attached creation action');
- assert.equal(rendered.includes('is-compact'),compact,'Compact navigation behavior is preserved');
+ assert.equal(rendered.includes('is-compact'),false,'Retired compact input cannot hide navigation labels');
 }
-console.log('Actual shared dock renders only navigation and preserves compact mode; obsolete creation injection is ignored.');
+console.log('Actual shared dock renders only navigation and rejects retired compact mode; obsolete creation injection is ignored.');
 
 for(const contentHeader of [false,true])for(const detail of [false,true]){
  const rendered=renderToStaticMarkup(React.createElement(chrome.AppHeader,{contentHeader,detail,leading:'Binso',actions:React.createElement('button',null,'Suchen')}));
