@@ -139,7 +139,6 @@
 .operator-grid{display:grid;grid-template-columns:1.2fr .8fr}
 .operator-grid.thirds{grid-template-columns:repeat(3,1fr)}
 .operator-table-card{margin-top:18px}
-.operator-table{border-top:1px solid var(--color-line)}
 .operator-table-head,
 .operator-table-row{
   min-height:58px;
@@ -153,6 +152,7 @@
   font-size:var(--type-metadata);
 }
 .operator-table-head{color:var(--color-muted);font-size:var(--type-caption)}
+.operator-table-row:last-child{border-bottom:0}
 .operator-table-row b,.operator-table-row small{display:block}
 .operator-table-row small{margin-top:3px;color:var(--color-muted);font-size:var(--type-caption)}
 .operator-table-head.customer,
@@ -436,7 +436,6 @@
 .monitoring-list .spark{display:none}
 .operator-main{padding-bottom:calc(var(--mobile-nav-h) + var(--safe-bottom) + 38px)}
 .operator-table-card .operator-table{border-top:0}
-.operator-table-row:last-child{border-bottom:0}
 .operator-detail-list>div:last-child,.monitoring-list>div:last-child{border-bottom:0}
 .operator-payment-insights{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
 .operator-payment-insight{min-height:104px;display:grid;align-content:space-between;gap:8px;padding:12px 0}

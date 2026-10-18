@@ -382,8 +382,8 @@ try{
      const listFrames=await page.locator('.records,.desktop-record-table').filter({visible:true}).evaluateAll(nodes=>nodes.map(el=>({top:getComputedStyle(el).borderTopWidth,bottom:getComputedStyle(el).borderBottomWidth})));
      assert.ok(listFrames.every(frame=>frame.top==='0px'&&frame.bottom==='0px'),`${route}: list containers have no duplicate leading or terminal separator`);
      for(const table of await page.locator('.desktop-record-table').filter({visible:true}).all()){
-      const header=table.locator('.desktop-record-head');if(await header.count())assert.equal(await header.evaluate(el=>getComputedStyle(el).borderBottomWidth),'1px','The actual table heading retains its row separator');
-      const rows=table.locator('.desktop-record-row');const count=await rows.count();if(count){assert.equal(await rows.last().evaluate(el=>getComputedStyle(el).borderBottomWidth),'0px','The final table entry has no terminal line');if(count>1)assert.equal(await rows.first().evaluate(el=>getComputedStyle(el).borderBottomWidth),'1px','Separators between actual table entries remain');}
+      const header=table.locator('.desktop-record-head,.operator-table-head');if(await header.count())assert.equal(await header.evaluate(el=>getComputedStyle(el).borderBottomWidth),'1px','The actual table heading retains its row separator');
+      const rows=table.locator('.desktop-record-row,.operator-table-row');const count=await rows.count();if(count){assert.equal(await rows.last().evaluate(el=>getComputedStyle(el).borderBottomWidth),'0px','The final table entry has no terminal line');if(count>1)assert.equal(await rows.first().evaluate(el=>getComputedStyle(el).borderBottomWidth),'1px','Separators between actual table entries remain');}
      }
     }
     if(!process.env.BINSO_UX_BASELINE&&width<=760)await assertMobileHeaderTargets(page);
@@ -458,7 +458,10 @@ try{
     }
     if(!process.env.BINSO_UX_BASELINE&&route==='/mitarbeiter/employee-one'){await page.locator('.detail-list').getByText(employee.email,{exact:true}).waitFor();assert.equal(await page.locator('.entity-detail-workspace .settings-profile').count(),0,'The original employee dossier does not repeat its identity in a profile card')}
     if(!process.env.BINSO_UX_BASELINE&&route==='/support/ticket-one'){
-      const before=await page.locator('.thread-composer').boundingBox();await page.locator('.thread-messages').evaluate(el=>{el.scrollTop=0});const after=await page.locator('.thread-composer').boundingBox();assert.deepEqual(after,before,'Only messages scroll; composer stays fixed');
+      await withNavigationPreferenceLock(async()=>{
+       if(width>=761){await page.waitForFunction(()=>document.querySelector('.desktop-navigation-toggle')?.getAttribute('aria-expanded')==='true');await waitForFiniteAnimations(page);}
+       const before=await page.locator('.thread-composer').boundingBox();await page.locator('.thread-messages').evaluate(el=>{el.scrollTop=0});const after=await page.locator('.thread-composer').boundingBox();assert.deepEqual(after,before,'Only messages scroll; composer stays fixed');
+      });
       const visible=await page.evaluate(()=>{const composer=document.querySelector('.thread-composer').getBoundingClientRect(),nav=document.querySelector('.bottom-nav');const limit=nav?.getClientRects().length?nav.getBoundingClientRect().top:innerHeight;return composer.bottom<=limit+1&&composer.top>=0&&scrollY===0});assert.ok(visible,'Chat input stays above navigation in every app viewport');
     }
     if(!process.env.BINSO_UX_BASELINE){await waitForFiniteAnimations(page);for(const control of await page.locator('.form-field>.form-control').filter({visible:true}).all()){
