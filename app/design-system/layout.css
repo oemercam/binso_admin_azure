@@ -626,6 +626,7 @@ html[data-theme="dark"] .app-start-icon{filter:invert(1)}
 .page-orientation{margin:0 0 var(--heading-content-gap);max-width:65ch;color:var(--color-muted);font-size:var(--type-control);line-height:1.5}
 .workspace-command-bar>.records-inline-controls{flex:1;min-width:0;margin:0}
 .workspace-command-bar>.bo-create-action{flex:none;min-height:var(--touch);align-self:flex-start}
+.app-section-dashboard .page-actions>.bo-create-action{min-height:var(--touch)}
 @media(max-width:760px){
  .app-root:not(.app-preview):not(.app-section-dashboard) .page-head:not(.page-head-detail):not(:has(.page-actions)){display:none}
  .app-root:not(.app-preview):not(.app-section-dashboard) .page-head:not(.page-head-detail):has(.page-actions:empty){display:none}
