@@ -436,6 +436,11 @@ try{
       if(initiallyCollapsed)await page.getByRole('button',{name:'Zeitverlauf ausblenden',exact:true}).click();
     }
     if(!process.env.BINSO_UX_BASELINE&&route==='/kunden/customer-one'){
+     // Parallel viewport pages share the real navigation preference. Keep the
+     // multi-read dossier geometry inside the same lock as sidebar mutations.
+     await withNavigationPreferenceLock(async()=>{
+      if(width>=761)await page.waitForFunction(()=>document.querySelector('.desktop-navigation-toggle')?.getAttribute('aria-expanded')==='true');
+      await waitForFiniteAnimations(page);
       await assertCustomerDossier(page);
       const dossier=page.locator('.detail-grid[data-layout="dossier"]');
       assert.equal(await dossier.count(),1,'Customer overview uses the shared reference dossier layout');
@@ -455,6 +460,7 @@ try{
        await supplementary.locator('summary').press('Enter');await page.waitForFunction(()=>!document.querySelector('.bo-data-disclosure').open);
        await supplementary.locator('summary').evaluate(el=>el.blur());
       }else assert.notEqual(await supplementary.getAttribute('open'),null,'Desktop supplementary facts stay visible');
+     });
 
     }
     if(!process.env.BINSO_UX_BASELINE&&route==='/mitarbeiter/employee-one'){await page.locator('.detail-list').getByText(employee.email,{exact:true}).waitFor();assert.equal(await page.locator('.entity-detail-workspace .settings-profile').count(),0,'The original employee dossier does not repeat its identity in a profile card')}
