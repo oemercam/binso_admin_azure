@@ -27,6 +27,7 @@ try{
   const page=await context.newPage();await page.goto(base+'/registrieren?plan=business&billing=yearly');
   const sheet=page.getByRole('dialog',{name:'Binso One einrichten'});await sheet.waitFor();
   await sheet.getByRole('textbox',{name:'Firmenname *',exact:true}).fill('Synthetic Company with a deliberately long business name GmbH');
+  await sheet.getByRole('button',{name:'Weiter',exact:true}).click();assert.equal(await sheet.locator('input[name="contactName"]').evaluate(input=>input.validity.valueMissing),true,'Company alone cannot pass the contact step');await sheet.locator('input[name="contactName"]').fill('Synthetic Contact');
   await sheet.getByRole('button',{name:'Weiter',exact:true}).click();await sheet.getByRole('textbox',{name:'Geschäftliche E-Mail-Adresse *',exact:true}).fill('synthetic-long-email@company.example.invalid');
   await sheet.locator('input[name="password"]').fill('a sufficiently long test password');await sheet.getByRole('button',{name:'Weiter',exact:true}).click();
   await assertChoiceGeometry(sheet.locator(".form-check"));
