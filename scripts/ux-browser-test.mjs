@@ -1015,7 +1015,7 @@ try{
     await page.setViewportSize({width,height:740});await navigate(base+'/einstellungen/darstellung');await page.waitForLoadState('networkidle');
     const choices=page.getByRole('radiogroup',{name:'Darstellung',exact:true});await choices.waitFor({state:'visible'});assert.equal(await choices.getByRole('radio').count(),3);assert.equal(await page.locator('.appearance-card,.theme-preview').count(),0);
     const heights=await choices.getByRole('radio').evaluateAll(rows=>rows.map(row=>row.getBoundingClientRect().height));assert.ok(heights.every(height=>Math.abs(height-heights[0])<1),'Theme rows keep equal heights');
-    assert.deepEqual(await page.getByLabel('Sprache',{exact:true}).locator('option').evaluateAll(options=>options.map(option=>option.value)),['de','fr','it','en'],'Expose the complete translated language catalogue');
+    assert.equal(await page.getByLabel('Sprache',{exact:true}).count(),0,'Appearance owns theme only; language has its dedicated settings route');
     await choices.getByRole('radio',{name:/^Hell/}).click();await page.waitForFunction(()=>document.documentElement.dataset.theme==='light');
     await choices.getByRole('radio',{name:/^Dunkel/}).click();await page.waitForFunction(()=>document.documentElement.dataset.theme==='dark');
     await choices.getByRole('radio',{name:/^Dunkel/}).press('ArrowDown');await page.waitForFunction(()=>document.documentElement.dataset.themeMode==='system');
@@ -1024,6 +1024,8 @@ try{
     await page.waitForLoadState('networkidle');await page.reload();await choices.waitFor();await page.waitForLoadState('networkidle');assert.equal(await choices.getByRole('radio',{name:/^System/}).getAttribute('aria-checked'),'true','System selection survives reload');
     await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${width}-appearance-rows.png`)});
     await choices.getByRole('radio',{name:theme==='light'?/^Hell/:/^Dunkel/}).click();await page.waitForLoadState('networkidle');
+    await navigate(base+'/einstellungen/sprache');await page.waitForLoadState('networkidle');
+    assert.deepEqual(await page.getByLabel('Sprache',{exact:true}).locator('option').evaluateAll(options=>options.map(option=>option.value)),['de','fr','it','en'],'Dedicated language route exposes the complete translated language catalogue');
    }
    await page.setViewportSize({width:390,height:740});await navigate(base+'/einstellungen/konto');await page.waitForLoadState('networkidle');
    await page.getByRole('button',{name:'Bearbeiten',exact:true}).filter({visible:true}).click();

@@ -41,9 +41,9 @@ generierten Inventare enthalten keine daraus abgeleitete visuelle Freigabe.
 Gezielte lokale Nachweise: Typecheck, Lint, UI-/CSS-/Navigationsverträge,
 unveränderte Zugriffs-/Ziel-/Icon-Invarianten, tatsächliches Workspace-/Dialog-
 Rendering, Update-/Dirty-State-Logik, Prozess-Recovery, Doppel-Speicherschutz,
-Rollen und unveränderte PDF-/QR-Funktionen. Acht isolierte Renderfälle bei
+Rollen und unveränderte PDF-/QR-Funktionen. Zehn isolierte Renderfälle bei
 320/390/760px in Light/Dark prüfen echte zentrale Button-/Navigationsstrukturen
-und sämtliche CSS-Owner, mit Scroll-, 34px-Safe-Area-, Detailheader-/Titel- und negativen Layoutproben.
+und sämtliche CSS-Owner, mit Scroll-, 34px-Safe-Area-, Detailheader-/Titel-, schmalen Formularaktionen und negativen Layoutproben.
 
 Der erste CI-Lauf hat den sauberen Produktionsbuild und CodeQL bestanden. Er
 hat ausserdem einen veralteten Router-Mock sowie alte 40px-Dokumentheader-
@@ -51,6 +51,14 @@ Overrides und einen Status innerhalb der H1 gefunden. Diese Ursachen sind
 korrigiert: zentrale Touchmasse, eigenständige Status-Semantik und aktualisierte
 Testumgebung ohne abgeschwächte Assertions. Der vollständige aktuelle Lauf bleibt
 bis zu seinem tatsächlichen Abschluss offen.
+
+Der zweite CI-Stand besteht Quality, CodeQL und Produktionsbuild. Die zusätzliche
+Browsermatrix deckt einen echten 320px-Überlauf der Support-Aktionszeile und
+einen alten Test auf, der die Sprachauswahl auf der Darstellungsseite erwartet.
+Die zentrale Workspace-Aktionszeile erhält volle verfügbare Breite und
+mehrzeilig lesbare Beschriftungen; ein positiver und negativer Rendernachweis
+sichert dies ab. Der vollständige Sprachkatalog wird auf der eigenen Sprachseite
+weiterhin geprüft. Der Abschluss der aktualisierten Browsermatrix bleibt offen.
 
 Ein zusätzlicher lokaler Next-Dev-Versuch für drei Routen bei zwei Breiten wurde
 beim Warm-up mit HTTP 500 und `Unexpected end of JSON input` gestoppt. Er ist

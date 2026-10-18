@@ -11,8 +11,9 @@
 @media (max-width:760px){
  .app-editing{--navigation-content-inset:20px}
  .form-workspace .form-wizard>.mobile-sticky-save>.button,.form-workspace>.filter-sheet-actions>.button{flex:1;width:0;min-width:0}
- .form-workspace .sheet-form-footer .mobile-sticky-save{display:flex}
+ .form-workspace .sheet-form-footer .mobile-sticky-save{display:flex;width:100%;min-width:0}
  .form-workspace .sheet-form-footer .mobile-sticky-save>.button{flex:1;width:0;min-width:0}
+ .form-workspace :is(.sheet-form-footer,.filter-sheet-actions,.form-wizard>.mobile-sticky-save) .button{white-space:normal;height:auto;min-height:48px}
 }
 .bottom-sheet[data-wizard]{height:calc(var(--dialog-available-height) - var(--dialog-edge-gap))}
 .bottom-sheet[data-wizard] .sheet-body{display:flex;flex-direction:column}
