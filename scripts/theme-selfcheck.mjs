@@ -1,6 +1,10 @@
 import fs from 'node:fs/promises';
 import assert from 'node:assert/strict';
 import ts from 'typescript';
+import {createRequire} from 'node:module';
+import {runInNewContext} from 'node:vm';
+import React from 'react';
+import {renderToStaticMarkup} from 'react-dom/server';
 const moduleUrl=source=>'data:text/javascript;base64,'+Buffer.from(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText).toString('base64');
 const themeUrl=moduleUrl(await fs.readFile('lib/theme.ts','utf8'));
 globalThis.__themeWrite=async()=>{};
@@ -80,4 +84,23 @@ runtimeDocument.documentElement.dataset.themeMode='light';osDark=true;runtimeWin
 assert.equal(runtimeDocument.documentElement.dataset.theme,'light','Resume never replaces an explicit light preference');
 cleanup();assert.equal(runtimeWindow.listeners.size,0);assert.equal(runtimeDocument.listeners.size,0);assert.equal(media.listeners.size,0,'All theme lifecycle listeners are removed');
 for(const key of ['__themeWrite','__themeRead','localStorage','document','window','CustomEvent'])delete globalThis[key];
+// A root-layout failure replaces the document: test the actual fallback render,
+// rather than assuming that the normal layout's head survives it.
+const errorSource=await fs.readFile('app/global-error.tsx','utf8');
+const errorAst=ts.createSourceFile('global-error.tsx',errorSource,99,true,4);
+const errorBody=errorAst.statements.filter(n=>!ts.isImportDeclaration(n)).map(n=>n.getText(errorAst)).join('\n');
+const errorCompiled=ts.transpileModule(errorBody,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
+const errorExports={},childrenOnly=({children})=>React.createElement(React.Fragment,null,children);
+Function('require','exports','useSyncExternalStore','asLocale','localeCookie','localeTags','Button','Logo','LocaleProvider','LocalizedText','initializeTheme','ThemeRuntime',errorCompiled)(createRequire(import.meta.url),errorExports,React.useSyncExternalStore,mode=>mode,'binso.locale',{'de':'de-CH'},({children})=>React.createElement('button',null,children),()=>React.createElement('span',null,'Binso'),childrenOnly,childrenOnly,initializeTheme,()=>null);
+const errorHtml=renderToStaticMarkup(React.createElement(errorExports.default,{reset(){},error:Error('Synthetic root failure')}));
+const errorInit=errorHtml.match(/<script\b[^>]*id="binso-theme-init"[^>]*>([\s\S]*?)<\/script>/);
+assert.ok(errorInit,'The independent root error document initializes the shared theme before paint');
+assert.ok(errorHtml.indexOf(errorInit[0])<errorHtml.indexOf('<body'),'Fallback theme script belongs to its own head');
+assert.match(errorHtml,/<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"\/>/,'Fallback preserves device scaling and safe-area viewport');
+assert.ok(!/maximum-scale|user-scalable=no/.test(errorHtml),'Error recovery must not disable user zoom');
+for(const sample of [{mode:'dark',dark:false,expected:'dark'},{mode:'light',dark:true,expected:'light'},{mode:'system',dark:true,expected:'dark'},{mode:null,dark:true,blocked:true,expected:'dark'}]){
+ const dataset={},meta={content:'#ffffff',removeAttribute(){}};
+ runInNewContext(errorInit[1],{document:{documentElement:{dataset},querySelectorAll:()=>[meta]},window:{matchMedia:()=>({matches:sample.dark})},localStorage:{getItem:()=>{if(sample.blocked)throw Error('Storage blocked');return sample.mode},setItem:()=>{if(sample.blocked)throw Error('Storage blocked')}}});
+ assert.equal(dataset.theme,sample.expected);assert.equal(meta.content,sample.expected==='dark'?'#000000':'#ffffff');
+}
 console.log('Theme ownership, reload resolver and stale profile response checks passed.');

@@ -49,6 +49,13 @@ universal hardware compatibility is claimed.
   passed with both attachment/send targets at least 44px. A negative control in
   the existing functional suite shrinks the send target to its old 40px size and
   requires rejection; full new-head CI execution remains pending.
+- Independent root error document: unlike ordinary route errors, global-error
+  replaces the failed root layout. Its actual SSR render lacked the shared
+  pre-paint theme initializer and an explicit device/safe-area viewport. It now
+  reuses initializeTheme and ThemeRuntime and supplies its own viewport/theme
+  metadata. Recovery callbacks, locale and shared controls remain unchanged.
+  The actual fallback-render regression failed before the fix, then passed for
+  explicit Light/Dark, system Dark and blocked storage; user zoom remains enabled.
 
 Existing a1169b32 CI captures were downloaded from run 39115792157, with the
 published SHA256 artifact digests verified. Overview sheets were inspected for
