@@ -21,7 +21,7 @@ export function DashboardPage({forceDemo=false}:{forceDemo?:boolean}={}){
  const recent=data?.recent??data?.invoices??[];
  const invoiceCount=data?.analyticsInvoices?.filter(row=>row.issue_date.slice(0,7)===businessDate().slice(0,7)).reduce((total,row)=>total+Number(row.invoice_count),0);
  const countsAllowed=data?.canInvoices!==false&&data?.canPayments!==false;
- return <AppShell title="Dein Überblick." active="dashboard" actions={<QuickCreateAction/>}>
+ return <AppShell headingPlacement="content" title="Dein Überblick." active="dashboard" actions={<QuickCreateAction/>}>
   {query.loading?<LoadingState><LocalizedText>{"Übersicht wird geladen …"}</LocalizedText></LoadingState>:query.error?<ErrorState onRetry={query.refresh}><LocalizedText>{query.error}</LocalizedText></ErrorState>:<>
    {data?.canFinance&&data.cash&&<CashOverview data={data.cash} dashboard invoiceCount={countsAllowed?invoiceCount:undefined} customerCount={countsAllowed?data.stats?.customer_count:undefined}/>}
    <QuickCreateLinks/>

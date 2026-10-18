@@ -722,7 +722,7 @@ a{-webkit-tap-highlight-color:transparent}
 .header-search-cancel{display:block;flex:none;padding:0;border:0;background:transparent;color:var(--color-fg);font:inherit;font-size:var(--type-body)}
 .header-search-controls{padding-block:8px 12px}
 .thread-composer{
-    min-height:104px;
+    min-height:60px;
     grid-template-columns:var(--touch) minmax(0,1fr) var(--touch);
     gap:4px;
     padding:8px;
@@ -730,9 +730,9 @@ a{-webkit-tap-highlight-color:transparent}
     background:var(--app-chrome);
     border-color:var(--app-control-border);
   }
-.thread-composer textarea{grid-column:1/-1;grid-row:1;width:100%;font-size:var(--type-subheading);line-height:1.5;background:transparent;color:var(--color-fg);overflow-y:auto}
-.thread-composer>label{grid-column:1;grid-row:2;align-self:end}
-.thread-composer>button:last-child{grid-column:3;grid-row:2;border-radius:50%;background:var(--app-action-accent);color:var(--palette-fff)}
+.thread-composer textarea{grid-column:2;grid-row:1;width:100%;font-size:var(--type-control);line-height:1.5;background:transparent;color:var(--color-fg);overflow-y:auto}
+.thread-composer>label{grid-column:1;grid-row:1;align-self:end}
+.thread-composer>button:last-child{grid-column:3;grid-row:1;align-self:end;border-radius:50%;background:var(--app-action-accent);color:var(--palette-fff)}
 .thread-composer>button:last-child:disabled{opacity:.45}
 .thread-composer>button:last-child>svg{transform:rotate(-90deg)}
 .desktop-back{display:none}

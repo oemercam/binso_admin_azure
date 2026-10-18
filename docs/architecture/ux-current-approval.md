@@ -17,7 +17,9 @@ Dark Mode und Operator-Varianten sind abgeleitet, keine behauptete Originalfreig
   Zustände. Desktop-Header behält globale Suche, Benachrichtigungen und Konto.
 - Die neuere ausdrückliche Sammelfreigabe ersetzt die frühere Plus-Kreis-Regel:
   Erstellen sitzt neben Suche/Filter in der gemeinsamen Inhalts-Command-Bar,
-  niemals im globalen Header oder in der Navigation. Beschrifteter blauer Button,
+  niemals im globalen Header oder in der Navigation. Auf der Übersicht steht der
+  Neu-Button gemäss der neuesten Entscheidung rechts in derselben Inhaltszeile
+  wie «Dein Überblick.». Beschrifteter blauer Button,
   auf Mobile kurze sichtbare Beschriftung „Neu“, vollständiger zugänglicher Name,
   mindestens 44px Touchfläche. Keine konkurrierende zweite Erstellen-Aktion.
 - Auswahlfelder nutzen den gemeinsamen App-Popup-Owner mit Tastaturbedienung,
@@ -69,3 +71,16 @@ anschliessend gemeinsame GitHub-Quality-/CodeQL-Prüfung
 und Browsermatrix. Physische iOS-/Android-PWA-, native Tastatur- und Assistive-
 Technology-Nachweise bleiben getrennt offen, bis sie tatsächlich ausgeführt sind.
 Kein automatischer Merge und kein Deployment aus dieser Implementierungsfreigabe.
+
+## Einheitlicher Inhaltseinstieg
+
+Mobile Seiten beginnen nach dem gemeinsamen Header mit dem normalen Seitenabstand.
+Keine zusätzliche Leerfläche für bereits im Header sichtbare Titel. Tabs, Suche,
+Filter und fachliche Aktionen folgen unmittelbar; die Übersicht behält Titel und
+Neu-Aktion in einer Zeile. Leere Detailköpfe entfallen, echte Datensatzmetadaten
+bleiben erhalten. Die anschliessend freigegebene Orientierung ergänzt auf Hauptseiten und
+Einstellungsbereichen jeweils einen kurzen Zweck-Satz aus lib/page-orientation.ts.
+Keine doppelten Beschreibungen; Detailseiten behalten Datensatzmetadaten, Chat
+und Bearbeitungsformulare bleiben kompakt. Kurze Hilfen erklären zusätzlich
+unklare oder noch nicht begonnene Aufgaben. Lade-, Leer-,
+Fehler- und Read-only-Zustände behalten ihre jeweilige Bedeutung.

@@ -54,3 +54,8 @@ try{
  first();first();assert.equal(restored,1);assert.equal(document.body.style.overflow,'visible');assert.equal(document.documentElement.style.overflow,'auto');assert.equal(wheel(document),false);
 }finally{Object.assign(globalThis,previous);}
 console.log('Navigation cache TTL/domain/session/bounds, required contact validation, legacy edit safety, Swiss activity groups and nested background scroll locks passed.');
+
+const {pageOrientation}=await import(moduleUrl(await fs.readFile('lib/page-orientation.ts','utf8')));
+for(const route of ['/dashboard','/kunden','/zeit','/finanzen','/finanzen/analyse','/einstellungen','/einstellungen/konto']){assert.equal(typeof pageOrientation(route),'string');assert.equal(pageOrientation(route,true),undefined,'Editing keeps its usable space');}
+for(const route of ['/kunden/neu','/kunden/id','/kunden/id/bearbeiten','/support/id','/rechnungen/neu','/login','constructor'])assert.equal(pageOrientation(route),undefined,'No generic caption on records, chats, forms or unknown routes');
+console.log('Exact page orientation routes and compact edit/detail/chat exclusions passed.');
