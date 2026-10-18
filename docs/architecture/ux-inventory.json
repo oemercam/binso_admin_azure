@@ -175217,6 +175217,8 @@
           "tag": "Link",
           "line": 174,
           "props": [
+            "aria-label={label}",
+            "title={label}",
             "aria-current={slug===key?\"page\":undefined}",
             "className={slug===key?\"active\":\"\"}",
             "href={slug ? `/operator/${slug}` : \"/operator\"}",
@@ -175233,6 +175235,16 @@
         },
         {
           "tag": "span",
+          "line": 174,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 174,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
           "line": 174,
           "props": []
         },
@@ -175499,6 +175511,14 @@
         {
           "line": 174,
           "expression": "slug"
+        },
+        {
+          "line": 174,
+          "expression": "slug===\"\""
+        },
+        {
+          "line": 174,
+          "expression": "slug===\"monitoring\""
         },
         {
           "line": 175,

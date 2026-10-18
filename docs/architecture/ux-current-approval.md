@@ -12,6 +12,9 @@ Der aktive Quellvertrag ist jetzt
 Generator verwendet den zuletzt ausgelieferten Microsoft-Stand `51024b18` und
 erlaubt nur die aktuelle Lesbarkeitskorrektur: 12px Navigationsbeschriftung,
 passende Zeilenhöhe/Labelhöhe sowie nachweislich überlagerte Deklarationen.
+Operator-Dock-Labels verwenden die kurzen sichtbaren Namen „Start“/„Status“;
+die vollständigen Namen „Dashboard“/„Monitoring“ bleiben zugänglich. Links,
+Rechte, Icons, Bounds, Safe Areas und Scrollverhalten ändern sich nicht.
 Der frühere Quellvertrag bleibt unverändert als Verlauf erhalten.
 Unbekannte oder mit realer Navigation kombinierte Selektoren blockieren die
 Migration. Der aktuelle 760/761-Breakpoint wird direkt geprüft; es gibt keine

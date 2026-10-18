@@ -44,3 +44,10 @@ export function readableNavigationSource(source){
  assert.equal(labels,1,'Exactly the old navigation label rule is migrated');assert.equal(spans,1,'Exactly its label clipping ceiling is migrated');
  pruneSuperseded(root);return root.toString();
 }
+
+/** Only shorten visible dock copy; retain destination and complete accessible name. */
+export function readableOperatorNavigationSource(source){
+ const before="<Link aria-current={slug===key?\"page\":undefined} className={slug===key?\"active\":\"\"} href={slug ? `/operator/${slug}` : \"/operator\"} key={slug}><Icon name={icon} size={19}/><span><LocalizedText>{label}</LocalizedText></span></Link>",after="<Link aria-label={label} title={label} aria-current={slug===key?\"page\":undefined} className={slug===key?\"active\":\"\"} href={slug ? `/operator/${slug}` : \"/operator\"} key={slug}><Icon name={icon} size={19}/><span>{slug===\"\"?<LocalizedText>{\"Start\"}</LocalizedText>:slug===\"monitoring\"?<LocalizedText>{\"Status\"}</LocalizedText>:<LocalizedText>{label}</LocalizedText>}</span></Link>";
+ assert.equal(source.split(before).length,2,"Exactly one original operator mobile mapping is migrated");
+ return source.replace(before,after);
+}

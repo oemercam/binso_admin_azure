@@ -1,8 +1,8 @@
 {
   "base": "51024b189f7746cbf7fe50c9107a978cdb6b5c2f",
-  "approval": "Owner requested a complete visible-interface readability/cascade cleanup after deployment: 12px navigation labels with adequate line space and removal of dominated rules. Live nav bounds, rights, icons, motion and safe areas remain protected. Historical references remain unchanged.",
+  "approval": "Owner requested a complete visible-interface readability/cascade cleanup after deployment: 12px navigation labels with adequate line space, compact operator labels Start/Status with full accessible names, and removal of dominated rules. Live nav bounds, rights, icons, motion and safe areas remain protected. Historical references remain unchanged.",
   "snapshot": {
-    "markup": "fdb851e1029133e479bd3adad4af5cc936eb78961b6aab9d1983126468816e1f",
+    "markup": "7371b549948aa3db071e835be51286f1f72f249130e327fedd155f3199044e23",
     "logic": "8724e28af32d7aaf1779885ccdaed77f7f43f7c07a0d461dccdb6256aaa8e433",
     "icons": "b01b4f68013ccaea6f5846ffb30b07bc0a079eac3adeb9bac3800cbfdbe9366e",
     "rules": "4e8083c5337790388703444297234e44c319115d9430ca1bfb9723f4811df532",
@@ -28,7 +28,7 @@
     ]
   },
   "invariants": {
-    "markup": "fdb851e1029133e479bd3adad4af5cc936eb78961b6aab9d1983126468816e1f",
+    "markup": "7371b549948aa3db071e835be51286f1f72f249130e327fedd155f3199044e23",
     "logic": "8724e28af32d7aaf1779885ccdaed77f7f43f7c07a0d461dccdb6256aaa8e433",
     "icons": "b01b4f68013ccaea6f5846ffb30b07bc0a079eac3adeb9bac3800cbfdbe9366e",
     "rules": "25afaf19d44937eecfa0a851e19836bad42e57a4d81b74f5679ce4e6138a2228",
