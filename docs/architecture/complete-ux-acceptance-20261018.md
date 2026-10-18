@@ -36,6 +36,21 @@ generators and the source-fingerprint integration test passed. Full final-head
 GitHub integration remains separate; these checks do not assert physical device
 or complete owner visual approval.
 
+## Follow-up integration finding
+
+Full 5637b1fa CI passed build/checks/CodeQL and seven of eight browser lanes.
+One WebKit responsive lane failed with a held fixture response being completed
+while its route was already handled. The header regression now waits for actual
+entry into the old-search fixture and the complete delayed HTTP response before
+navigation, retaining the stale-result rejection. A focused local WebKit run
+passed all four search widths and then exposed an unsynchronized appearance
+assertion: networkidle preceded the hydrated radio group. The test now waits for
+the actual visible group and still requires exactly three real choices. Original
+errors are logged before teardown so fixture cleanup cannot hide their cause.
+No application/API behavior, timeouts, assertions or gates are relaxed. The local
+Windows WebKit mobile keyboard probe did not pass; Linux CI had passed that same
+probe. No physical-device approval is inferred. Final-head CI must be rerun.
+
 ## Whole-product review requested after the navigation package
 
 The owner requested coverage of every page, subpage, shared component, graphic,

@@ -183,7 +183,7 @@ let customerPosts=0,failCustomerCreate=false,loseCustomerResponse=false;const cu
 let teamMemberRole='member';let supportMessages=[];
 const operatorAccount={tenant_id:'tenant-one',tenant:{name:'Prüffirma AG'},plan:'pro',subscription_status:'active',account_status:'active',user_limit:10,updated_at:'2026-10-09'};
 const settleLayout=async page=>{await page.evaluate(async()=>{await document.fonts.ready;await Promise.all(document.getAnimations().filter(a=>Number.isFinite(a.effect?.getComputedTiming().endTime)).map(a=>a.finished.catch(()=>{})))});await settleFrames(page)};
-let releaseOldSearch;
+let releaseOldSearch,oldSearchArrived;
 let context;
 try{
  for(const theme of (process.env.BINSO_UX_THEMES?.split(",")??["light","dark"])){
@@ -275,7 +275,7 @@ try{
 
 
    else if(p==='/api/settings/notifications')data={items:[{kind:'Rechnungen',email:true,push:false}]};
-   else if(p==='/api/search'){const term=url.searchParams.get('q');if(term==='old')await new Promise(resolve=>{releaseOldSearch=resolve});data={items:term==='none'?[]:[{type:'Kunde',title:term==='old'?'Veraltetes Ergebnis':'Prüffirma AG',meta:'Bern',href:'/kunden/customer-one',icon:'users'},{type:'Rechnung',title:'RE-TEST-1',meta:'Prüffirma AG',href:'/rechnungen/RE-TEST-1',icon:'receipt'}]};}
+   else if(p==='/api/search'){const term=url.searchParams.get('q');if(term==='old')await new Promise(resolve=>{releaseOldSearch=resolve;oldSearchArrived?.()});data={items:term==='none'?[]:[{type:'Kunde',title:term==='old'?'Veraltetes Ergebnis':'Prüffirma AG',meta:'Bern',href:'/kunden/customer-one',icon:'users'},{type:'Rechnung',title:'RE-TEST-1',meta:'Prüffirma AG',href:'/rechnungen/RE-TEST-1',icon:'receipt'}]};}
    else if(p==='/api/settings/documents')data={item:{vat_rate:8.1,payment_terms_days:30,iban:'CH9300762011623852957',qr_iban:'',invoice_intro_text:'Synthetischer Rechnungstext',invoice_footer_text:'Synthetischer Schlusstext',quote_intro_text:'Synthetischer Angebotstext',quote_footer_text:'Synthetischer Schlusstext'}};
    else if(p==='/api/settings/subscription')data={item:{plan:'pro',subscription_status:'active',account_status:'active',unit_amount_chf:79,user_limit:10,storage_limit_bytes:21474836480,current_period_ends_at:'2026-11-09'}};
    else if(p==='/api/integrations/status')data={items:[{key:'billing',configured:false}]};
@@ -975,8 +975,17 @@ try{
     const box=await panel.boundingBox(),bar=await header.boundingBox();assert.ok(box.x>=0&&box.x+box.width<=width+1,'Panel stays within viewport');if(width<=760){assert.ok(box.y<=1&&box.height>=739,'Mobile search owns a full view');assert.equal(await page.locator('.page-head h1').filter({visible:true}).textContent(),'Dein Überblick.');}else assert.ok(box.y>=bar.y+bar.height-1,'Desktop panel remains anchored under header');
     assert.equal(await page.evaluate(()=>document.body.style.overflow),'clip');
     assert.equal(await panel.getByText('Mindestens zwei Zeichen eingeben.',{exact:true}).count(),0);
-    const oldRequest=page.waitForRequest(request=>new URL(request.url()).pathname==='/api/search'&&new URL(request.url()).searchParams.get('q')==='old');await panel.getByLabel('Suchen',{exact:true}).fill('old');await oldRequest;await panel.getByLabel('Suchen',{exact:true}).fill('Prüffirma');
-    await panel.getByText('Prüffirma AG',{exact:true}).first().waitFor();releaseOldSearch();releaseOldSearch=null;await page.waitForLoadState('networkidle');assert.equal(await panel.getByText('Veraltetes Ergebnis',{exact:true}).count(),0,'Stale responses never replace current search');
+    // Request observation precedes route-handler entry in WebKit. Synchronize both
+    // ends of the held fixture; networkidle alone is not response completion.
+    const heldSearch=new Promise(resolve=>{oldSearchArrived=resolve});
+    const oldRequest=page.waitForRequest(request=>new URL(request.url()).pathname==='/api/search'&&new URL(request.url()).searchParams.get('q')==='old');
+    await panel.getByLabel('Suchen',{exact:true}).fill('old');const staleRequest=await oldRequest;await heldSearch;oldSearchArrived=null;
+    await panel.getByLabel('Suchen',{exact:true}).fill('Prüffirma');
+    await panel.getByText('Prüffirma AG',{exact:true}).first().waitFor();
+    const staleResponse=page.waitForResponse(response=>response.request()===staleRequest);
+    releaseOldSearch();releaseOldSearch=null;
+    const completedStale=await staleResponse;assert.equal(completedStale.status(),200,'The delayed old response is actually delivered');assert.equal(await completedStale.finished(),null,'The old response finishes before navigation/fixture cleanup');
+    await page.waitForLoadState('networkidle');assert.equal(await panel.getByText('Veraltetes Ergebnis',{exact:true}).count(),0,'Stale responses never replace current search');
     await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${width}-header-search.png`)});
     await page.setViewportSize({width,height:400});
     const keyboardGeometry=await panel.evaluate(el=>{const root=document.documentElement,previous=root.style.getPropertyValue('--dialog-viewport-height');root.style.setProperty('--dialog-viewport-height','740px');const box=el.getBoundingClientRect();root.style.setProperty('--dialog-viewport-height',previous);return {top:box.top,bottom:box.bottom,height:innerHeight}});
@@ -995,7 +1004,7 @@ try{
    }
    for(const width of [320,390,768,1440]){
     await page.setViewportSize({width,height:740});await navigate(base+'/einstellungen/darstellung');await page.waitForLoadState('networkidle');
-    const choices=page.getByRole('radiogroup',{name:'Darstellung',exact:true});assert.equal(await choices.getByRole('radio').count(),3);assert.equal(await page.locator('.appearance-card,.theme-preview').count(),0);
+    const choices=page.getByRole('radiogroup',{name:'Darstellung',exact:true});await choices.waitFor({state:'visible'});assert.equal(await choices.getByRole('radio').count(),3);assert.equal(await page.locator('.appearance-card,.theme-preview').count(),0);
     const heights=await choices.getByRole('radio').evaluateAll(rows=>rows.map(row=>row.getBoundingClientRect().height));assert.ok(heights.every(height=>Math.abs(height-heights[0])<1),'Theme rows keep equal heights');
     assert.deepEqual(await page.getByLabel('Sprache',{exact:true}).locator('option').evaluateAll(options=>options.map(option=>option.value)),['de','fr','it','en'],'Expose the complete translated language catalogue');
     await choices.getByRole('radio',{name:/^Hell/}).click();await page.waitForFunction(()=>document.documentElement.dataset.theme==='light');
@@ -1272,4 +1281,4 @@ try{
  if(navigationCaptures.length)await writeTestOutput(path.join(output,'navigation-capture.json'),JSON.stringify({schemaVersion:3,provenance:'Explicit 2026-10-18 flat Microsoft material capture; preserved bounds/rights/safe areas/motion; browser fixtures, not physical PWA approval.',cases:navigationCaptures},null,2)+'\n');
  if(process.env.BINSO_UX_VISUAL_AUDIT==='1')await writeTestOutput(path.join(output,'visual-audit.json'),JSON.stringify({scope:'Rendered candidates for human review, not automatic ZIP acceptance',views:visualAudit},null,2));
  console.log(`UX browser checks passed: ${results.length} route/theme/viewport combinations ; interactions: ${process.env.BINSO_UX_MATRIX_ONLY==="1"?"matrix only":requestedInteractions.join(",")}. Artifacts: ${output}`);
-}finally{await context?.close();await browser?.close();server?.kill();}
+}catch(error){console.error('UX regression failed before fixture cleanup:',error.stack??error);throw error;}finally{await context?.close();await browser?.close();server?.kill();}
