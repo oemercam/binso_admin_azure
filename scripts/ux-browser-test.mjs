@@ -676,7 +676,7 @@ try{
    assert.equal(await overview.locator('.metric>strong').nth(1).textContent(),'CHF 200.00','Snapshot balances stay independent of the selected period');
    assert.equal(await overview.getByRole('button').count(),6,'Monthly development uses six actual month buckets');
    await overview.getByRole('button').last().click();assert.match(await overview.locator('output').textContent(),/CHF 400/);
-   await page.getByRole('link',{name:'Finanzanalyse',exact:true}).click();await page.waitForLoadState('networkidle');
+   await page.getByRole('navigation',{name:'Finanzen',exact:true}).getByRole('link',{name:'Analyse',exact:true}).click();await page.waitForLoadState('networkidle');
    const statistics=page.locator('.bo-statistics');
    await statistics.locator('.metric>strong').getByText('CHF 640.00',{exact:true}).waitFor();
    assert.equal(await statistics.locator('.bo-metric-tiles>.metric').count(),4);
@@ -693,7 +693,7 @@ try{
    await page.getByRole('navigation',{name:'Finanzen',exact:true}).getByRole('link',{name:'Rechnungen',exact:true}).click();await page.waitForURL('**/rechnungen');await page.waitForLoadState('networkidle');
    await page.locator('.document-summary-row').filter({hasText:'RE-TEST-1'}).filter({visible:true}).first().waitFor();assert.ok(await page.locator('.document-summary-row').filter({hasText:'RE-TEST-1'}).filter({visible:true}).count()>0,'Analysis period does not filter the actual invoice list');
    await page.locator('a[href="/dashboard"]').filter({visible:true}).first().click();await page.waitForURL('**/dashboard');await page.waitForLoadState('networkidle');await page.locator('a[href="/finanzen"]').filter({visible:true}).first().click();await page.waitForURL('**/finanzen');await page.waitForLoadState('networkidle');
-   await page.getByRole('link',{name:'Finanzanalyse',exact:true}).click();await page.waitForLoadState('networkidle');
+   await page.getByRole('navigation',{name:'Finanzen',exact:true}).getByRole('link',{name:'Analyse',exact:true}).click();await page.waitForLoadState('networkidle');
    try{await page.locator('.bo-statistics .metric>strong').first().filter({hasText:/^CHF 240\.00$/}).waitFor();}catch(error){console.log('Period restore diagnostics',await page.locator('.bo-statistics .metric>strong').allTextContents(),await page.evaluate(()=>({...sessionStorage})),page.url());throw error;}
    assert.equal(await page.locator('.bo-statistics .metric>strong').first().textContent(),'CHF 240.00','Custom period survives actual same-tab navigation');
    await page.locator('.bo-statistics').getByRole('button',{name:'Eigenen Statistikzeitraum wählen',exact:true}).click();
@@ -966,7 +966,7 @@ try{
     await page.setViewportSize({width,height:740});await navigate(base+'/dashboard');await page.waitForLoadState('networkidle');
     const create=page.getByRole('button',{name:'Neu erstellen',exact:true}).filter({visible:true});
     const size=await create.boundingBox();
-    if(width<=760){assert.equal(size.width,44,'Mobile creation has a real 44px touch target');assert.equal(size.height,size.width);}else{assert.ok(size.width>size.height,'Desktop creation exposes its visible text label');assert.equal(size.height,await page.evaluate(()=>matchMedia('(pointer:coarse)').matches)?44:40,'Desktop creation retains the exact pointer-appropriate action height');}
+    assert.ok(size.width>=44&&size.height>=44,'Content creation keeps at least 44px touch targets');assert.equal(await create.evaluate(el=>!!el.closest('.workspace-command-bar')),true,'Creation belongs to the content command bar');if(width>760)assert.ok(size.width>size.height,'Desktop creation exposes its visible text label');
     await create.click();const menu=page.getByRole('dialog',{name:'Neu erstellen',exact:true});
     assert.deepEqual(await menu.locator('.action-row>span').allTextContents(),['Kunde','Angebot','Rechnung','Zeit erfassen','Projekt','Zahlung','Spese','Produkt','Mitarbeiter','Support-Anfrage']);
     assert.equal(await page.getByRole('button',{name:'Weiter',exact:true}).count(),0,'Opening global plus never starts an invoice wizard');
