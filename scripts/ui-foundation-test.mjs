@@ -2,6 +2,7 @@ import './reference-foundation-test.mjs';
 import './localization-test-adapter.mjs';
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
+import './presentation-consistency-test.mjs';
 import {createRequire} from 'node:module';
 import ts from 'typescript';
 import {moduleUrl} from './data-test-modules.mjs';

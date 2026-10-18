@@ -4,57 +4,12 @@
   font-size:var(--type-metadata);
   line-height:1.45;
 }
-.security-split{
-  display:grid;
-  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
-  gap:56px;
-  align-items:start;
-}
-.security-points{
-  display:grid;
-  margin:20px 0 0;
-  border-top:1px solid var(--color-line);
-}
-.security-points>div{
-  min-height:64px;
-  padding:10px 0;
-  display:grid;
-  grid-template-columns:36px minmax(0,1fr);
-  gap:12px;
-  align-items:center;
-  border-bottom:1px solid var(--color-line);
-}
-.security-points>div>svg{width:20px;height:20px;justify-self:center}
-.security-points>div>span{min-width:0}
-.security-points b{font-size:var(--type-label)}
-.security-points small{
-  display:block;
-  margin-top:3px;
-  color:var(--color-muted);
-  font-size:var(--type-caption);
-  line-height:1.45;
-}
-.security-points p{margin:3px 0 0;color:var(--color-muted);font-size:var(--type-caption);line-height:1.45}
-.plan-name{display:block;margin-bottom:7px;font-size:var(--type-caption);font-weight:800;letter-spacing:.08em}
-.security-split{
-  animation:marketing-enter var(--motion-slow) var(--motion-ease) both;
-}
-.security-points>:last-child{border-bottom:0}
-.security-card,
-.subscription-panel{
+.plan-name{display:block;margin-bottom:7px;font-size:var(--type-metadata);font-weight:800;letter-spacing:.08em}
+.security-card{
   border:0;
   border-radius:0;
   background:var(--color-bg);
   box-shadow:none;
-}
-.settings-icon{
-  width:34px;
-  height:34px;
-  display:grid;
-  place-items:center;
-  border:1px solid var(--color-line);
-  border-radius:var(--shape-medium);
-  background:var(--color-bg);
 }
 .settings-form{padding:20px 0;border-bottom:1px solid var(--color-line);background:transparent}
 .settings-form:first-child{padding-top:0}
@@ -67,7 +22,6 @@
   min-height:86px;
   padding:14px 0;
   display:flex;
-  align-items:center;
   gap:14px;
   border-top:1px solid var(--color-line);
   border-bottom:1px solid var(--color-line);
@@ -81,19 +35,6 @@
 .company-logo-card img{width:90px;height:44px;object-fit:contain;object-position:left center}
 .company-logo-card b,.company-logo-card small{display:block}
 .company-logo-card small{margin-top:4px}
-.subscription-panel{
-  max-width:820px;
-  margin-top:28px;
-  padding:20px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:20px;
-}
-.subscription-panel small,
-.subscription-panel p{color:var(--color-muted);font-size:var(--type-metadata)}
-.subscription-panel h2{margin:4px 0;font-size:var(--type-subtitle)}
-.subscription-panel p{margin:0}
 .plan-hero{
   min-height:0;
   margin-bottom:16px;
@@ -117,7 +58,7 @@
 .payment-method{min-height:64px;margin-top:18px;display:flex;align-items:center;gap:12px}
 .payment-method>div{flex:1}
 .payment-method b,.payment-method small{display:block}
-.payment-method small{margin-top:3px;color:var(--color-muted);font-size:var(--type-caption)}
+.payment-method small{margin-top:3px;color:var(--color-muted);font-size:var(--type-metadata)}
 .preference-table{max-width:820px;border-top:1px solid var(--color-line)}
 .preference-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(180px,240px);align-items:center;gap:16px;padding:16px 0;border-bottom:1px solid var(--color-line)}
 .preference-row:last-child{border-bottom:0}
@@ -125,7 +66,7 @@
 .preference-channels>label{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:var(--type-label)}
 .preference-row b,.preference-row small{display:block}
 .preference-row b{font-size:var(--type-control)}
-.preference-row small{margin-top:3px;color:var(--color-muted);font-size:var(--type-caption)}
+.preference-row small{margin-top:3px;color:var(--color-muted);font-size:var(--type-metadata)}
 .plan-choice-list{max-width:680px;display:grid;border-top:1px solid var(--color-line)}
 .plan-choice-list button{
   min-height:66px;
@@ -142,16 +83,12 @@
 }
 .plan-choice-list button>div{min-width:0;overflow-wrap:anywhere}
 .plan-choice-list button>svg{justify-self:end;flex:none}
-.plan-choice-list button>span{width:36px;height:36px;display:grid;place-items:center;border-radius:var(--shape-medium);background:var(--color-subtle);font-size:var(--type-caption);font-weight:800}
+.plan-choice-list button>span{width:36px;height:36px;display:grid;place-items:center;border-radius:var(--shape-medium);background:var(--color-subtle);font-size:var(--type-metadata);font-weight:800}
 .plan-choice-list b,.plan-choice-list small{display:block}
 .plan-choice-list b{font-size:var(--type-control)}
-.plan-choice-list small{margin-top:3px;color:var(--color-muted);font-size:var(--type-caption);line-height:1.4}
+.plan-choice-list small{margin-top:3px;color:var(--color-muted);font-size:var(--type-metadata);line-height:1.4}
 .plan-choice-list button.selected>span{background:var(--color-inverse-bg);color:var(--color-inverse-fg)}
 .security-card{max-width:820px;margin-bottom:12px;padding:18px}
-.security-row{display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:center}
-.security-row b{font-size:var(--type-control)}
-.security-row p{margin:4px 0 0;color:var(--color-muted);font-size:var(--type-metadata)}
-.security-sheet,
 .subscription-sheet{width:min(100%,560px)}
 .settings-choice-list{border:0}
 .settings-choice-list>button,.settings-static-row{width:100%;min-height:64px;display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:12px;align-items:center;padding:10px 0;border:0;border-bottom:1px solid var(--color-line);background:transparent;color:inherit;text-align:left}
@@ -164,11 +101,6 @@
 .settings-section>h2{margin:0 0 var(--heading-content-gap);font-size:var(--type-control)}
 .settings-detail-grid>.surface+.settings-readonly,.settings-detail-grid>.surface+.settings-form{border-top:0}
 .company-logo-card{align-items:center}
-.settings-switch{position:relative;width:44px;height:26px;flex:0 0 auto;padding:0;border:0;border-radius:var(--shape-scale-999);background:var(--color-line);cursor:pointer;transition:background .18s ease}
-.settings-switch>span{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:var(--color-bg);box-shadow:0 1px 4px var(--palette-rgba-0-0-0-2);transition:transform .18s ease}
-.settings-switch.is-on{background:var(--app-action-accent)}
-.settings-switch.is-on>span{transform:translateX(18px)}
-.settings-switch:disabled{opacity:.45;cursor:not-allowed}
 .bo-settings-group{margin-block:24px;min-width:0}
 .bo-settings-group>h2{margin:0 0 10px;font-size:var(--type-control);font-weight:600}
 .bo-settings-group-body{min-width:0}
@@ -272,10 +204,6 @@
 @media (max-width:760px){
 .settings-navigation-search{display:flex;width:100%;max-width:none;height:44px;border-radius:var(--control-radius);background:var(--color-bg);margin-bottom:24px}
 .settings-navigation-search>input{min-width:0;max-width:100%;height:40px}
-.security-points{width:100%;margin-top:0}
-.security-points>div{grid-template-columns:36px minmax(0,1fr);gap:12px}
-.security-points>div>span{min-width:0}
-.security-split{grid-template-columns:1fr;gap:28px}
 .settings-detail-grid{width:100%;max-width:none}
 .settings-list{border-top:0}
 .settings-detail-grid>.settings-form:first-child,
@@ -293,17 +221,11 @@
 .settings-form{border-bottom:0}
 .settings-form+.settings-form{border-top:1px solid var(--color-line)}
 .settings-form .form-grid{gap:var(--field-group-gap)}
-.settings-form .button{min-height:46px}
-.security-row{align-items:start}
-.security-row>.button{width:100%;margin-top:10px}
 .settings-form{padding:18px 0}
 .settings-form:first-child{padding-top:0}
 .settings-list,
-  .subscription-panel,
-  .preference-table,
-  .security-card{max-width:none}
-.subscription-panel{display:block}
-.subscription-panel .button{width:100%;margin-top:14px}
+.preference-table,
+.security-card{max-width:none}
 .company-logo-card{display:grid}
 .plan-hero{grid-template-columns:1fr;gap:12px;padding:16px 0}
 .plan-hero .button{width:100%}
@@ -317,16 +239,13 @@
 .payment-method>.button{width:100%;margin-top:4px}
 .settings-detail-grid{gap:0}
 .settings-detail-grid>.surface{border-bottom:0}
-.settings-detail-grid>.settings-readonly,.settings-detail-grid>.settings-form{border-top:1px solid var(--color-line)}
 .company-logo-card{padding-bottom:18px}
 .team-list{margin-top:2px}
 .settings-choice-list>button{min-height:66px}
-.settings-choice-list .status{font-size:var(--type-caption-small)}
 .security-card{
     min-width:0;
   }
 .company-logo-card{
-    grid-template-columns:58px minmax(0,1fr);
     gap:16px;
     padding:16px 0 18px;
     border-top:0;
@@ -340,9 +259,6 @@
 .settings-choice-list :is(b,small){overflow:hidden;text-overflow:ellipsis}
 .settings-form{padding-block:var(--mobile-section-gap)}
 }
-@media (prefers-reduced-motion:reduce){
-.security-split{animation:none}
-}
 @media (max-width:760px){
 .bo-settings-group{margin-block:24px}
 .bo-settings-group>h2{margin:0 0 8px;color:var(--color-muted);font-size:var(--type-label);font-weight:400;line-height:1.4}
@@ -352,8 +268,6 @@
 .bo-settings-group-body .action-row:not(:last-child)::after{content:"";position:absolute;bottom:0;left:38px;right:0;height:1px;background:var(--color-line)}
 .bo-settings-group-body .action-row>svg{color:var(--color-muted)}
 .bo-settings-group-body .action-row-description{color:var(--color-muted)}
-.bo-settings-group-body :is(.toggle,.settings-switch){background:var(--palette-77777d)}
-.bo-settings-group-body :is(.toggle,.settings-switch).is-on{background:var(--app-accent)}
 .bo-settings-group-body .preference-table{border:0;max-width:none}
 .bo-settings-group-body .preference-row{padding:16px 0;border-bottom:1px solid var(--color-line)}
 .bo-settings-group-body .preference-row:last-child{border-bottom:0}

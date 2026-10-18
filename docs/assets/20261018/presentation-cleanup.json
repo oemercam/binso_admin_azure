@@ -1,0 +1,338 @@
+{
+  "base": "51024b189f7746cbf7fe50c9107a978cdb6b5c2f",
+  "method": "Runtime-source census plus conservative literal/dynamic-prefix class reachability, custom-property dependency closure and exact-selector/condition cascade proof. Source reachability is not visual acceptance.",
+  "coverage": {
+    "runtimeFiles": 410,
+    "jsxFiles": 129,
+    "routes": 76,
+    "operatorVariants": 12,
+    "nativeControlOccurrences": 60,
+    "sharedStatusOccurrences": 41,
+    "cssOwners": 14
+  },
+  "css": [
+    {
+      "file": "app/design-system/theme.css",
+      "removedSelectors": 0,
+      "dominatedDeclarations": 0,
+      "beforeDeclarations": 370,
+      "afterDeclarations": 303
+    },
+    {
+      "file": "app/design-system/foundation.css",
+      "removedSelectors": 4,
+      "dominatedDeclarations": 0,
+      "beforeDeclarations": 141,
+      "afterDeclarations": 129
+    },
+    {
+      "file": "app/design-system/primitives.css",
+      "removedSelectors": 1,
+      "dominatedDeclarations": 3,
+      "beforeDeclarations": 501,
+      "afterDeclarations": 524
+    },
+    {
+      "file": "app/design-system/layout.css",
+      "removedSelectors": 6,
+      "dominatedDeclarations": 45,
+      "beforeDeclarations": 781,
+      "afterDeclarations": 719
+    },
+    {
+      "file": "app/design-system/collections.css",
+      "removedSelectors": 0,
+      "dominatedDeclarations": 1,
+      "beforeDeclarations": 593,
+      "afterDeclarations": 587
+    },
+    {
+      "file": "app/design-system/overlays.css",
+      "removedSelectors": 33,
+      "dominatedDeclarations": 3,
+      "beforeDeclarations": 554,
+      "afterDeclarations": 485
+    },
+    {
+      "file": "app/design-system/analytics.css",
+      "removedSelectors": 4,
+      "dominatedDeclarations": 0,
+      "beforeDeclarations": 407,
+      "afterDeclarations": 393
+    },
+    {
+      "file": "app/design-system/documents.css",
+      "removedSelectors": 14,
+      "dominatedDeclarations": 3,
+      "beforeDeclarations": 537,
+      "afterDeclarations": 502
+    },
+    {
+      "file": "app/design-system/workflows.css",
+      "removedSelectors": 74,
+      "dominatedDeclarations": 3,
+      "beforeDeclarations": 1244,
+      "afterDeclarations": 1035
+    },
+    {
+      "file": "app/design-system/settings.css",
+      "removedSelectors": 36,
+      "dominatedDeclarations": 3,
+      "beforeDeclarations": 516,
+      "afterDeclarations": 415
+    },
+    {
+      "file": "app/design-system/auth.css",
+      "removedSelectors": 13,
+      "dominatedDeclarations": 1,
+      "beforeDeclarations": 241,
+      "afterDeclarations": 211
+    },
+    {
+      "file": "app/design-system/marketing.css",
+      "removedSelectors": 61,
+      "dominatedDeclarations": 0,
+      "beforeDeclarations": 794,
+      "afterDeclarations": 691
+    },
+    {
+      "file": "app/design-system/operator.css",
+      "removedSelectors": 45,
+      "dominatedDeclarations": 9,
+      "beforeDeclarations": 787,
+      "afterDeclarations": 675
+    },
+    {
+      "file": "app/design-system/navigation.css",
+      "removedSelectors": 0,
+      "dominatedDeclarations": 2,
+      "beforeDeclarations": 87,
+      "afterDeclarations": 85
+    }
+  ],
+  "retiredClasses": [
+    "loading-shell",
+    "loading-sidebar",
+    "loading-main",
+    "loading-metrics",
+    "entity-hero",
+    "dashboard-grid",
+    "page-head-actions",
+    "finance-range",
+    "sheet-menu",
+    "chart-legend",
+    "document-actions",
+    "document-summary-list",
+    "desktop-detail-workspace",
+    "entity-edit-workspace",
+    "document-read-lines",
+    "activity-icon",
+    "filter-button",
+    "global-timer",
+    "support-summary",
+    "full-button",
+    "period-trigger",
+    "period-options",
+    "customer-info-pane",
+    "product-callout",
+    "workflow-section",
+    "workflow-copy",
+    "desktop-shot",
+    "mobile-shot",
+    "single-action",
+    "ticket-stat",
+    "mini-stat",
+    "security-split",
+    "security-points",
+    "subscription-panel",
+    "settings-icon",
+    "security-row",
+    "security-sheet",
+    "settings-switch",
+    "auth-topbar",
+    "auth-cancel",
+    "auth-status",
+    "auth-legal",
+    "marketing-section",
+    "marketing-benefits",
+    "feature-grid",
+    "feature-icon",
+    "feature-showcase",
+    "feature-list",
+    "pricing-section",
+    "marketing-mobile-secondary",
+    "bo-monitor-metrics",
+    "bo-monitor-point-list",
+    "bo-monitor-details",
+    "operator-grid",
+    "thirds",
+    "monitoring-head",
+    "monitoring-dot",
+    "spark",
+    "service-list",
+    "internal-note",
+    "operator-spark",
+    "monitoring-cockpit",
+    "monitoring-secondary"
+  ],
+  "retiredTokens": [
+    "--app-symbol",
+    "--stat-cell-min",
+    "--insight-panel-min",
+    "--operator-stat-min",
+    "--glass-bg",
+    "--glass-line",
+    "--glass-blur",
+    "--mobile-nav-radius",
+    "--mobile-nav-compact-radius",
+    "--bg",
+    "--ink",
+    "--muted",
+    "--line",
+    "--soft",
+    "--type-caption",
+    "--shape-feature-large",
+    "--shape-sheet",
+    "--type-caption-small",
+    "--shape-group-large",
+    "--palette-d7d7d4",
+    "--type-scale-11-5",
+    "--type-scale-19",
+    "--palette-cfcfcb",
+    "--palette-bbb",
+    "--type-scale-8",
+    "--palette-8b8b8b",
+    "--type-scale-24",
+    "--palette-dc2626",
+    "--palette-2563eb",
+    "--palette-94a3b8",
+    "--palette-ddd",
+    "--palette-000",
+    "--type-scale-32",
+    "--palette-rgba-0-0-0-10",
+    "--palette-77777d",
+    "--palette-111",
+    "--palette-rgba-0-0-0-15",
+    "--palette-rgba-0-0-0-07",
+    "--type-scale-12-5",
+    "--type-scale-10-5",
+    "--type-scale-26",
+    "--palette-e4e4e1",
+    "--palette-12b76a",
+    "--palette-f79009",
+    "--palette-aaa",
+    "--palette-d7f6e6",
+    "--palette-dcecff",
+    "--palette-eadcff",
+    "--palette-e5484d",
+    "--type-scale-31",
+    "--palette-f04438",
+    "--palette-5897f7",
+    "--type-scale-21",
+    "--palette-ccefdc",
+    "--palette-d8e8ff",
+    "--palette-16b364",
+    "--palette-ececea",
+    "--palette-3b82f6",
+    "--palette-8b5cf6",
+    "--palette-60a5fa",
+    "--palette-22c55e",
+    "--desktop-row-h",
+    "--desktop-detail-min",
+    "--desktop-list-min"
+  ],
+  "remainingOrphanClassCandidates": [],
+  "remainingDominatedDeclarations": 0,
+  "focusedRenderedControls": [
+    {
+      "theme": "light",
+      "width": 320,
+      "statuses": 10,
+      "minContrast": 5.503580741634638,
+      "toggleTarget": 44,
+      "coarseInput": {
+        "font": 16,
+        "height": 44
+      },
+      "negativeControls": "passed",
+      "reducedMotion": "passed",
+      "forcedColors": "passed"
+    },
+    {
+      "theme": "light",
+      "width": 768,
+      "statuses": 10,
+      "minContrast": 5.503580741634638,
+      "toggleTarget": 44,
+      "coarseInput": {
+        "font": 16,
+        "height": 44
+      },
+      "negativeControls": "passed",
+      "reducedMotion": "passed",
+      "forcedColors": "passed"
+    },
+    {
+      "theme": "light",
+      "width": 1440,
+      "statuses": 10,
+      "minContrast": 5.503580741634638,
+      "toggleTarget": 44,
+      "coarseInput": {
+        "font": 16,
+        "height": 44
+      },
+      "negativeControls": "passed",
+      "reducedMotion": "passed",
+      "forcedColors": "passed"
+    },
+    {
+      "theme": "dark",
+      "width": 320,
+      "statuses": 10,
+      "minContrast": 7.814360293614725,
+      "toggleTarget": 44,
+      "coarseInput": {
+        "font": 16,
+        "height": 44
+      },
+      "negativeControls": "passed",
+      "reducedMotion": "passed",
+      "forcedColors": "passed"
+    },
+    {
+      "theme": "dark",
+      "width": 768,
+      "statuses": 10,
+      "minContrast": 7.814360293614725,
+      "toggleTarget": 44,
+      "coarseInput": {
+        "font": 16,
+        "height": 44
+      },
+      "negativeControls": "passed",
+      "reducedMotion": "passed",
+      "forcedColors": "passed"
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "statuses": 10,
+      "minContrast": 7.814360293614725,
+      "toggleTarget": 44,
+      "coarseInput": {
+        "font": 16,
+        "height": 44
+      },
+      "negativeControls": "passed",
+      "reducedMotion": "passed",
+      "forcedColors": "passed"
+    }
+  ],
+  "limitations": [
+    "Component fixture runs are not complete route/visual acceptance.",
+    "CI Chromium/WebKit are not real-device Safari/Firefox/Samsung/installed-PWA proof.",
+    "Dark mode and missing reference states remain explicitly derived.",
+    "No new deployment or merge authorized."
+  ]
+}

@@ -8,9 +8,11 @@ Blur, graue Glass-Tokens und Schattenkapseln sind vollständig aus den aktiven
 CSS-Ownern und Headern entfernt. Es gibt keinen Glass-Fallback mehr.
 
 Der aktive Quellvertrag ist jetzt
-`docs/assets/20261018/microsoft-navigation-reference.json`. Der explizite
-Generator verwendet den bereits freigegebenen Microsoft-Stand `775af2eb` und
-entfernt im Vergleich ausschliesslich die benannten toten Dock-Aktionsregeln.
+`docs/assets/20261018/readable-navigation-reference.json`. Der explizite
+Generator verwendet den zuletzt ausgelieferten Microsoft-Stand `51024b18` und
+erlaubt nur die aktuelle Lesbarkeitskorrektur: 12px Navigationsbeschriftung,
+passende Zeilenhöhe/Labelhöhe sowie nachweislich überlagerte Deklarationen.
+Der frühere Quellvertrag bleibt unverändert als Verlauf erhalten.
 Unbekannte oder mit realer Navigation kombinierte Selektoren blockieren die
 Migration. Der aktuelle 760/761-Breakpoint wird direkt geprüft; es gibt keine
 Rückprojektion auf einen alten Tablet-Breakpoint mehr. Gerenderte Bounds bleiben
@@ -18,6 +20,14 @@ im bestehenden v3-Laufzeitvertrag unverändert. Archive werden nicht überschrie
 Mobile Kunden-/Operatorseiten teilen eine Inhaltsreserve aus echter
 Navigationshöhe, tatsächlichem Bottom-/Safe-Area-Inset und 20px Inhaltsabstand.
 Die Reserve für einen nicht mehr vorhandenen Dock-Erstellen-Button entfällt.
+
+Der aktuelle Gesamtauftrag vereinheitlicht sämtliche aktiven CSS-Owner, Status,
+Metadaten und Bedienflächen. Metadaten sind mindestens 12px, Statusmarker haben
+einen eigenen Abstand, lange Status können umbrechen. Schalter behalten die
+kompakte sichtbare Spur, besitzen aber eine 44px Bedienfläche. Coarse-Pointer
+verwenden mindestens 44px Bedienhöhe und 16px Eingabeschrift. Fachliche Status,
+Rechte, Daten und Navigation werden dabei nicht geändert. Der Umfang und die
+Nachweisgrenzen stehen in `docs/architecture/presentation-cleanup.md`.
 
 Inhaltsabrufe verwenden nur den zentralen visuellen LoadingState, ohne sichtbare
 Ladesätze in Seitenuntertiteln, Ergebniszählern oder EmptyState-Karten.

@@ -1,8 +1,7 @@
 /** Redundant copies differ from deliberate ordered values/progressive fallbacks. */
 export function redundantDeclarations(root){
  const redundant=[],last=new Map();root.walkRules(rule=>{
-  // Navigation chrome is immutable in this work package, including old cascade.
-  if(/nav|sidebar|app-root|app-main|mobile-header|desktop-appbar/.test(rule.selector))return;
+  // All current component owners participate, including navigation and headers.
   let context='';for(let p=rule.parent;p&&p.type!=='root';p=p.parent){if(p.type==='atrule'){if(p.name.endsWith('keyframes'))return;context=p.name+' '+p.params+'/'+context;}}
   for(const decl of rule.nodes.filter(n=>n.type==='decl')){
    const key=context+'|'+rule.selector+'|'+decl.prop,previous=last.get(key);

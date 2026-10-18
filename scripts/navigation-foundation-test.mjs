@@ -37,7 +37,7 @@ export function navigationFoundation(read,{geometryOnly=false}={}){
 if(process.argv[1]===fileURLToPath(import.meta.url)){
  const original=JSON.parse(fs.readFileSync('docs/assets/v21-1/navigation-reference.json','utf8'));
  const prior=JSON.parse(fs.readFileSync('docs/assets/20261013/navigation-reference.json','utf8'));
- const reference=JSON.parse(fs.readFileSync('docs/assets/20261018/microsoft-navigation-reference.json','utf8'));
+ const reference=JSON.parse(fs.readFileSync('docs/assets/20261018/readable-navigation-reference.json','utf8'));
  const read=file=>fs.readFileSync(file,'utf8');
  const current=navigationFoundation(read);
  const inherited=[];postcss.parse(fs.readFileSync('app/design-system/navigation.css','utf8')).walkRules(':root',rule=>rule.walkDecls(decl=>inherited.push({context:rule.parent.params,name:decl.prop,value:decl.value})));

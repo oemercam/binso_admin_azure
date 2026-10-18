@@ -63,6 +63,32 @@ export async function assertChatTargets(page){
  }
 }
 
+/** Cross-route rendered checks; no fixture text or tenant data is exported. */
+export async function assertPresentationControls(page){
+ const measured=await page.locator('.status,.toggle').evaluateAll(nodes=>nodes.filter(el=>el.checkVisibility()).map(el=>{
+  const css=getComputedStyle(el),box=el.getBoundingClientRect();
+  return {toggle:el.matches('.toggle'),font:parseFloat(css.fontSize),gap:parseFloat(css.columnGap),width:box.width,height:box.height,overflow:el.scrollWidth>el.clientWidth+1};
+ }));
+ for(const control of measured){
+  if(control.toggle)assert.ok(control.width>=44&&control.height>=44,'Shared switches retain a 44px target');
+  else {assert.ok(control.font>=12,'Status labels remain at least 12px');assert.ok(control.gap>=6,'Status marker and label remain separated');assert.equal(control.overflow,false,'Status labels must wrap instead of overflowing');}
+ }
+}
+
+export async function verifyPresentationControlRegression(page){
+ for(const [selector,properties,expected] of [
+  ['.status',[['font-size','9px']],/Status labels remain/],
+  ['.status',[['gap','0px']],/Status marker and label/],
+  ['.toggle',[['height','24px'],['min-height','24px']],/44px target/],
+ ]){
+  const target=page.locator(selector).filter({visible:true}).first();if(!await target.count())continue;
+  const original=await target.getAttribute('style');
+  try{await target.evaluate((el,properties)=>{for(const [p,v] of properties)el.style.setProperty(p,v,'important');},properties);await assert.rejects(()=>assertPresentationControls(page),expected);}
+  finally{await target.evaluate((el,style)=>style===null?el.removeAttribute('style'):el.setAttribute('style',style),original);}
+ }
+ await assertPresentationControls(page);
+}
+
 export async function verifyHeaderTargetRegression(page){
  await verifyAnimationStabilityRegression(page);
  const targets=await assertMobileHeaderTargets(page);

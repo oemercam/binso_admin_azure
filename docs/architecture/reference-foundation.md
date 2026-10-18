@@ -155,7 +155,10 @@ Die frühere Outlook-Kartenfläche vom 13.10. ist damit abgelöst. Dark Mode
 verwendet dieselbe Tokenbeziehung und bleibt ausdrücklich abgeleitet.
 Die Messung prüft weiterhin exakte Farbgleichheit; Gegenproben müssen die alte
 graue Kartenfläche in beiden Themes bei 390, 1100 und 1440 px ablehnen.
-Der eingefrorene Navigationsvertrag und das Releaseprofil bleiben unverändert.
+Der aktuelle Navigationsvertrag folgt `ux-current-approval.md`; historische
+Freeze-Regeln haben keinen Vorrang vor ausdrücklich freigegebenen Korrekturen.
+Das Releaseprofil bleibt unverändert. Die gerenderten Bounds, Rechte, Fokus,
+Safe Areas und Bewegungsabläufe bleiben weiterhin geschützt.
 
 `pnpm qa:fast --typecheck`, Referenz-/Navigations-/Foundation-Verträge und die
 gezielte Browsermatrix gehören zum Paket. Neue Seiten müssen im Inventar und

@@ -1,0 +1,52 @@
+{
+  "base": "51024b189f7746cbf7fe50c9107a978cdb6b5c2f",
+  "approval": "Owner requested a complete visible-interface readability/cascade cleanup after deployment: 12px navigation labels with adequate line space and removal of dominated rules. Live nav bounds, rights, icons, motion and safe areas remain protected. Historical references remain unchanged.",
+  "snapshot": {
+    "markup": "fdb851e1029133e479bd3adad4af5cc936eb78961b6aab9d1983126468816e1f",
+    "logic": "8724e28af32d7aaf1779885ccdaed77f7f43f7c07a0d461dccdb6256aaa8e433",
+    "icons": "b01b4f68013ccaea6f5846ffb30b07bc0a079eac3adeb9bac3800cbfdbe9366e",
+    "rules": "7aadf49178a09b3d45ba1a0de65c14a14e7e212bd39b420ce735b965d29a12ca",
+    "tokens": "b32c3810060e470a7bc0b6ed999cab3f3066f0cc4bfe00af2304e2907e9e1539",
+    "tokenNames": [
+      "--app-action-accent",
+      "--color-bg",
+      "--color-line",
+      "--color-muted",
+      "--mobile-nav-bottom",
+      "--mobile-nav-compact-h",
+      "--mobile-nav-edge",
+      "--mobile-nav-h",
+      "--motion-base",
+      "--motion-ease",
+      "--motion-ease-standard",
+      "--motion-fast",
+      "--safe-bottom",
+      "--safe-left",
+      "--safe-right",
+      "--shape-control-mobile",
+      "--type-metadata"
+    ]
+  },
+  "invariants": {
+    "markup": "fdb851e1029133e479bd3adad4af5cc936eb78961b6aab9d1983126468816e1f",
+    "logic": "8724e28af32d7aaf1779885ccdaed77f7f43f7c07a0d461dccdb6256aaa8e433",
+    "icons": "b01b4f68013ccaea6f5846ffb30b07bc0a079eac3adeb9bac3800cbfdbe9366e",
+    "rules": "5fc79bdea0d55982b5e8f10005f3c2eb2fde39b223cc7ad7688531fbd2f621d2",
+    "tokens": "67375a0e6045f4056f584743ba4e907900dfbb0883be6fbb1e064541b87ba8aa",
+    "tokenNames": [
+      "--mobile-nav-bottom",
+      "--mobile-nav-compact-h",
+      "--mobile-nav-edge",
+      "--mobile-nav-h",
+      "--motion-base",
+      "--motion-ease",
+      "--motion-ease-standard",
+      "--motion-fast",
+      "--safe-bottom",
+      "--safe-left",
+      "--safe-right",
+      "--type-metadata"
+    ]
+  },
+  "customerContract": "6887c5ac2ede1c02b33de07a0d2109e4fb45766a3839a663bdd5e6880a12e719"
+}

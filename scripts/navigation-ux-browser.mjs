@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {waitForFiniteAnimations} from './shared-control-browser.mjs';
 
 export async function assertFlatMobileNavigation(page){
- const material=await page.locator('.bottom-nav,.operator-mobile-nav').evaluateAll(nodes=>nodes.filter(el=>el.checkVisibility()).map(el=>{const c=getComputedStyle(el),r=el.getBoundingClientRect();return {background:c.backgroundColor,radius:c.borderRadius,shadow:c.boxShadow,blur:c.backdropFilter,webkitBlur:c.webkitBackdropFilter,theme:document.documentElement.dataset.theme,active:[...el.querySelectorAll('.active')].map(a=>getComputedStyle(a).color),targets:[...el.children].map(a=>({width:a.getBoundingClientRect().width,height:a.getBoundingClientRect().height})),left:r.left,right:r.right,viewport:innerWidth}}));
+ const material=await page.locator('.bottom-nav,.operator-mobile-nav').evaluateAll(nodes=>nodes.filter(el=>el.checkVisibility()).map(el=>{const c=getComputedStyle(el),r=el.getBoundingClientRect();return {background:c.backgroundColor,radius:c.borderRadius,shadow:c.boxShadow,blur:c.backdropFilter,webkitBlur:c.webkitBackdropFilter,theme:document.documentElement.dataset.theme,active:[...el.querySelectorAll('.active')].map(a=>getComputedStyle(a).color),labels:[...el.querySelectorAll(":scope > a > span,:scope > button > span")].filter(a=>a.checkVisibility()&&a.getBoundingClientRect().height>0&&getComputedStyle(a).opacity!=="0").map(a=>({font:parseFloat(getComputedStyle(a.parentElement).fontSize),height:a.clientHeight,scroll:a.scrollHeight})),targets:[...el.children].map(a=>({width:a.getBoundingClientRect().width,height:a.getBoundingClientRect().height})),left:r.left,right:r.right,viewport:innerWidth}}));
  for(const nav of material){
   assert.equal(nav.background,nav.theme==='dark'?'rgb(0, 0, 0)':'rgb(255, 255, 255)','Flat navigation uses the opaque theme canvas');
   assert.equal(nav.radius,'0px','Flat navigation has straight edges');
@@ -11,6 +11,7 @@ export async function assertFlatMobileNavigation(page){
   assert.ok(!nav.webkitBlur||nav.webkitBlur==='none','Flat navigation has no WebKit backdrop blur');
   assert.ok(nav.active.every(color=>color===(nav.theme==='dark'?'rgb(72, 167, 255)':'rgb(37, 102, 189)')),'Active navigation uses the Microsoft blue accent');
   assert.ok(nav.targets.every(t=>t.width>=44&&t.height>=44),'Existing navigation touch targets remain at least 44px');
+  assert.ok(nav.labels.every(label=>label.font>=12&&label.scroll<=label.height+1),'Flat navigation labels remain readable without clipping');
   assert.ok(nav.left>=0&&nav.right<=nav.viewport+1,'Navigation stays inside its safe viewport');
  }
 }
@@ -25,7 +26,11 @@ export async function verifyFlatNavigationAdversaries(page){
    await nav.evaluate((el,style)=>style===null?el.removeAttribute('style'):el.setAttribute('style',style),original);
    await waitForFiniteAnimations(page);
   }
-  const targets=nav.locator(':scope > a, :scope > button');await targets.first().focus();await targets.first().press('Tab');
+  const targets=nav.locator(':scope > a, :scope > button');
+  const labelTarget=targets.first(),labelStyle=await labelTarget.getAttribute('style');
+  try{await labelTarget.evaluate(el=>el.style.setProperty('font-size','9px','important'));await assert.rejects(()=>assertFlatMobileNavigation(page),/labels remain readable/,'Tiny navigation labels must fail at runtime');}
+  finally{await labelTarget.evaluate((el,style)=>style===null?el.removeAttribute('style'):el.setAttribute('style',style),labelStyle);}
+  await targets.first().focus();await targets.first().press('Tab');
   assert.equal(await targets.nth(1).evaluate(el=>el===document.activeElement),true,'Native keyboard navigation retains destination order');
   await targets.nth(1).evaluate(el=>el.blur());await assertFlatMobileNavigation(page);
  }finally{await nav.evaluate((el,style)=>style===null?el.removeAttribute('style'):el.setAttribute('style',style),original);}
