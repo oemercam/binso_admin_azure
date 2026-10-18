@@ -398,9 +398,9 @@ try{
       assert.ok(appearance.groups.every(group=>group.border==='0px'&&group.background===(theme==='light'?'rgb(255, 255, 255)':'rgb(0, 0, 0)')),`${route}: grouped app surfaces in both themes`);
     }
     for(const create of await page.locator('.bo-create-action').filter({visible:true}).all()){
-      const shape=await create.evaluate(el=>{const c=getComputedStyle(el),r=el.getBoundingClientRect(),label=el.querySelector('.create-action-label');return {width:r.width,height:r.height,radius:c.borderRadius,background:c.backgroundColor,label:!!label?.getClientRects().length}});
+      const shape=await create.evaluate(el=>{const c=getComputedStyle(el),r=el.getBoundingClientRect(),label=el.querySelector('.create-action-label'),short=el.querySelector('.create-action-short');return {width:r.width,height:r.height,radius:c.borderRadius,background:c.backgroundColor,label:!!label?.getClientRects().length,short:short?.checkVisibility()?short.textContent.trim():null,name:el.getAttribute('aria-label'),clipped:el.scrollWidth>el.clientWidth+1,inHeader:!!el.closest('.app-header,.bottom-nav')}});
       if(width>=761){assert.ok(shape.label,`${route}: desktop creation keeps its visible label`);assert.equal(shape.radius,'5px','Desktop creation follows the original control shape');assert.equal(shape.background,theme==='light'?'rgb(37, 102, 189)':'rgb(72, 167, 255)');}
-      else{assert.equal(shape.label,false,'Mobile creation uses the original round plus');assert.equal(shape.width,44);assert.equal(shape.height,44);assert.equal(shape.radius,'50%');}
+      else{assert.equal(shape.label,false,'Mobile creation uses its short label instead of duplicating the full label');assert.equal(shape.short,'Neu','Mobile creation retains its visible short label');assert.ok(shape.name&&shape.name!=='Neu','Creation retains the complete accessible task name');assert.ok(shape.width>=44&&shape.height>=44,'Labeled creation retains at least a 44px touch target');assert.equal(shape.radius,'8px','Mobile creation follows the shared app control shape');assert.equal(shape.background,theme==='light'?'rgb(37, 102, 189)':'rgb(72, 167, 255)');assert.equal(shape.clipped,false,'Creation text must not be clipped');assert.equal(shape.inHeader,false,'Creation belongs to content, not the global header or navigation');}
     }
     // Snapshot values in one browser task: query hydration can replace metric nodes between awaited locator calls.
     const moneyDirections=await page.locator('.metric-money').evaluateAll(nodes=>nodes.filter(el=>el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden').map(el=>getComputedStyle(el).flexDirection));
@@ -676,7 +676,7 @@ try{
    assert.equal(await overview.locator('.metric>strong').nth(1).textContent(),'CHF 200.00','Snapshot balances stay independent of the selected period');
    assert.equal(await overview.getByRole('button').count(),6,'Monthly development uses six actual month buckets');
    await overview.getByRole('button').last().click();assert.match(await overview.locator('output').textContent(),/CHF 400/);
-   await page.getByRole('link',{name:'Finanzanalyse',exact:true}).click();await page.waitForLoadState('networkidle');
+   const analysis=page.getByRole('navigation',{name:'Finanzen',exact:true}).getByRole('link',{name:'Analyse',exact:true});assert.equal(await analysis.getAttribute('href'),'/finanzen/analyse','The finance tab retains its actual analysis destination');await analysis.click();await page.waitForURL('**/finanzen/analyse');await page.waitForLoadState('networkidle');
    const statistics=page.locator('.bo-statistics');
    await statistics.locator('.metric>strong').getByText('CHF 640.00',{exact:true}).waitFor();
    assert.equal(await statistics.locator('.bo-metric-tiles>.metric').count(),4);
