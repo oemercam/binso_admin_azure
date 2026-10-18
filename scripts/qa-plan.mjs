@@ -56,6 +56,7 @@ export function planChanges(files,{level='standard'}={}){
  if(paths.some(p=>/^lib\/(client\/|money\.|financial-status\.|finance-periods\.)|^scripts\/data-foundation-test/.test(p)))suites.add('data-foundation-test');
  if(paths.some(p=>/^components\/(app-shell|operator|ui)\.|^app\/design-system\/|^scripts\/navigation-foundation-test/.test(p)))suites.add('navigation-foundation-test');
  if(paths.some(p=>/css|styles/.test(p)))suites.add('check-css-architecture');
+ if(global||paths.some(p=>/presentation-(cascade|consistency)|css-contract/.test(p)))suites.add('presentation-consistency-test');
  if(paths.some(p=>/document|invoice|qr|pdf/.test(p))){suites.add('document-presentation-test');suites.add('pwa-preview-test');}
  if(paths.some(p=>/session|auth/.test(p))){suites.add('client-session-test');suites.add('auth-integrity-test');}
  if(paths.some(p=>/file-scan|app\/api\/files\/|app\/api\/settings\/company/.test(p))){suites.add('file-scan-test');suites.add('auth-integrity-test');}

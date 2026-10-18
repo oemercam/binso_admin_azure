@@ -213,20 +213,20 @@ html[data-theme="dark"] .searchbox>input{height:100%;min-width:0;padding:0;borde
 .bo-data-disclosure[open]>summary{display:none}
 .records-inline-controls[data-appearance="line"]>.tabs{grid-row:1;margin-top:10px;margin-bottom:0}
 .records-inline-controls[data-appearance="line"]>.records-search-row{grid-row:2}
-.page-head[data-heading-placement="content"] .bo-detail-commandbar .button{height:34px;min-height:34px;padding-inline:10px;border-radius:var(--shape-control-desktop);font-size:var(--type-label)}
+.page-head[data-heading-placement="content"] .bo-detail-commandbar .button{padding-inline:10px}
 .bo-detail-commandbar .button-ghost{color:var(--command-text)}
 .bo-detail-commandbar{display:flex;min-width:0;padding-block:12px;border-bottom:1px solid var(--color-line)}
 .bo-detail-commandbar>.page-actions{justify-content:flex-start;min-width:0;flex:1 1 auto;max-width:100%}
 .toolbar .searchbox{max-width:520px;flex:1 1 360px}
 .toolbar .chips{flex:0 1 auto;min-width:0}
-.detail-grid{grid-template-columns:minmax(0,1fr) minmax(320px,.42fr);gap:22px}
+.detail-grid{grid-template-columns:minmax(0,1fr) minmax(320px,.42fr)}
 .detail-grid>.surface:only-child{grid-column:1/-1}
 .detail-grid:has(> :only-child){
     grid-template-columns:minmax(0,1fr);
   }
 .desktop-detail-main>.tabs{margin-top:0;margin-bottom:20px;padding-bottom:10px}
 .desktop-detail-main .detail-card{max-width:none}
-.page-container> :is(.toolbar,.finance-range,.tabs):first-of-type{margin-top:0}
+.page-container> :is(.toolbar,.tabs):first-of-type{margin-top:0}
 .page-container>.detail-grid{margin-top:var(--desktop-section-gap)}
 .searchbox{height:var(--desktop-toolbar-h);max-width:440px;border-radius:var(--control-radius)}
 .searchbox.large{max-width:620px}
@@ -325,7 +325,6 @@ html[data-theme="dark"] .searchbox>input{height:100%;min-width:0;padding:0;borde
 .desktop-record-row>[role="cell"].align-right{white-space:normal;overflow:visible;overflow-wrap:anywhere}
 .desktop-record-head>[role="columnheader"]{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .desktop-record-head>[role="columnheader"]:focus-visible,.toolbar .chips button:focus-visible{outline:2px solid currentColor;outline-offset:2px}
-.desktop-record-row>.table-status-cell .status{max-width:100%;white-space:normal;overflow-wrap:anywhere}
 @media (max-width:760px){
 .searchbox{border-radius:var(--shape-control-mobile)}
 .desktop-detail-main>.tabs{margin-top:0}
@@ -360,4 +359,8 @@ html[data-theme="dark"] .searchbox>input{height:100%;min-width:0;padding:0;borde
 .detail-grid{grid-template-columns:minmax(0,1fr)}
 .detail-grid[data-layout="dossier"]{grid-template-columns:minmax(0,1fr);grid-template-areas:"summary" "context" "records";grid-template-rows:auto}
 .detail-grid[data-layout="dossier"]>[data-area="context"]{border-left:0;padding-left:0;border-top:1px solid var(--color-line);padding-top:var(--desktop-section-gap)}
+}
+
+@media (pointer:coarse){
+.chips button,.tabs button,.tabs a{min-height:var(--touch);height:auto}
 }

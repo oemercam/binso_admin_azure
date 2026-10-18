@@ -1,0 +1,52 @@
+{
+  "base": "51024b189f7746cbf7fe50c9107a978cdb6b5c2f",
+  "approval": "Owner requested a complete visible-interface readability/cascade cleanup after deployment: 12px navigation labels with adequate line space, intrinsic columns with 44px targets, compact operator labels Start/Status with full accessible names, and removal of dominated rules. Live nav bounds, rights, icons, motion and safe areas remain protected. Historical references remain unchanged.",
+  "snapshot": {
+    "markup": "a9375850564e553c53db7da5731f4628ce1241ed5fa619f52deed3f9822e21f3",
+    "logic": "8724e28af32d7aaf1779885ccdaed77f7f43f7c07a0d461dccdb6256aaa8e433",
+    "icons": "b01b4f68013ccaea6f5846ffb30b07bc0a079eac3adeb9bac3800cbfdbe9366e",
+    "rules": "4fdb68dc5ea964034e30bb19c0fa715b80b23886c62abeea312b3b5694d502bb",
+    "tokens": "b32c3810060e470a7bc0b6ed999cab3f3066f0cc4bfe00af2304e2907e9e1539",
+    "tokenNames": [
+      "--app-action-accent",
+      "--color-bg",
+      "--color-line",
+      "--color-muted",
+      "--mobile-nav-bottom",
+      "--mobile-nav-compact-h",
+      "--mobile-nav-edge",
+      "--mobile-nav-h",
+      "--motion-base",
+      "--motion-ease",
+      "--motion-ease-standard",
+      "--motion-fast",
+      "--safe-bottom",
+      "--safe-left",
+      "--safe-right",
+      "--shape-control-mobile",
+      "--type-metadata"
+    ]
+  },
+  "invariants": {
+    "markup": "a9375850564e553c53db7da5731f4628ce1241ed5fa619f52deed3f9822e21f3",
+    "logic": "8724e28af32d7aaf1779885ccdaed77f7f43f7c07a0d461dccdb6256aaa8e433",
+    "icons": "b01b4f68013ccaea6f5846ffb30b07bc0a079eac3adeb9bac3800cbfdbe9366e",
+    "rules": "c7c6f2aad42962fbe8a46a2f84ba942da9cbecd43464190bf41cfc86effdf566",
+    "tokens": "67375a0e6045f4056f584743ba4e907900dfbb0883be6fbb1e064541b87ba8aa",
+    "tokenNames": [
+      "--mobile-nav-bottom",
+      "--mobile-nav-compact-h",
+      "--mobile-nav-edge",
+      "--mobile-nav-h",
+      "--motion-base",
+      "--motion-ease",
+      "--motion-ease-standard",
+      "--motion-fast",
+      "--safe-bottom",
+      "--safe-left",
+      "--safe-right",
+      "--type-metadata"
+    ]
+  },
+  "customerContract": "5346c8243cd97f9d84aeb7fe76d54549639e2c43c76474dcdea8b8c3f496b5eb"
+}

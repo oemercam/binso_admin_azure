@@ -36,15 +36,14 @@ export function navigationFoundation(read,{geometryOnly=false}={}){
 }
 if(process.argv[1]===fileURLToPath(import.meta.url)){
  const original=JSON.parse(fs.readFileSync('docs/assets/v21-1/navigation-reference.json','utf8'));
- const prior=JSON.parse(fs.readFileSync('docs/assets/20261013/navigation-reference.json','utf8'));
- const reference=JSON.parse(fs.readFileSync('docs/assets/20261018/microsoft-navigation-reference.json','utf8'));
+ const reference=JSON.parse(fs.readFileSync('docs/assets/20261018/readable-navigation-reference.json','utf8'));
  const read=file=>fs.readFileSync(file,'utf8');
  const current=navigationFoundation(read);
  const inherited=[];postcss.parse(fs.readFileSync('app/design-system/navigation.css','utf8')).walkRules(':root',rule=>rule.walkDecls(decl=>inherited.push({context:rule.parent.params,name:decl.prop,value:decl.value})));
  assert.deepEqual(inherited,[{context:'(max-height:520px) and (orientation:landscape) and (max-width:900px)',name:'--mobile-nav-h',value:'54px'},{context:'(max-height:520px) and (orientation:landscape) and (max-width:900px)',name:'--mobile-nav-bottom',value:'6px'}],'Preserve the original inherited landscape dock values as well as its selector contract');
  assert.equal(current.logic,original.snapshot.logic,'Creation/material changes must preserve destination access and scroll logic');
  assert.equal(current.icons,original.snapshot.icons,'Existing navigation icons remain unchanged');
- assert.equal(current.markup,prior.snapshot.markup,'Mobile navigation markup and destinations remain unchanged');
+ assert.equal(current.markup,reference.snapshot.markup,'Current navigation markup preserves destinations and the approved compact labels/accessibility names');
  assert.deepEqual(navigationFoundation(currentNavigationRead(read),{geometryOnly:true}),reference.invariants,'Current navigation geometry, motion, safe areas and non-material tokens remain exact');
  assert.deepEqual(current,reference.snapshot,'Navigation matches the explicitly approved flat Microsoft material');
  for(const [from,to] of [['background:var(--color-bg)','background:#f3f3f5'],['border-radius:0','border-radius:30px'],['backdrop-filter:none','backdrop-filter:blur(18px)'],['box-shadow:none','box-shadow:0 3px 12px rgba(0,0,0,.2)']]){

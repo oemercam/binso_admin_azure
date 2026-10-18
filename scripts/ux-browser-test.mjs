@@ -16,7 +16,7 @@ import {assertCustomerDossier,verifyCustomerStates} from './customer-ux-browser.
 import {assertNavigationToggle,verifyNavigationPersistence,assertFlatMobileNavigation,verifyFlatNavigationAdversaries} from './navigation-ux-browser.mjs';
 import {verifyPreviewControls} from './document-controls-browser.mjs';
 import {verifyTimeWorkspace} from './time-workspace-browser.mjs';
-import {assertMobileHeaderTargets,assertChatTargets,assertOpaqueChrome,verifyHeaderTargetRegression,waitForFiniteAnimations} from './shared-control-browser.mjs';
+import {assertMobileHeaderTargets,assertChatTargets,assertOpaqueChrome,verifyHeaderTargetRegression,waitForFiniteAnimations,assertPresentationControls,verifyPresentationControlRegression} from './shared-control-browser.mjs';
 
 // Synthetic UI fixtures: real business/RLS integration is covered by migration-test.mjs.
 // No request reaches a production system; unhandled fixture APIs fail closed.
@@ -387,7 +387,7 @@ try{
       const rows=table.locator('.desktop-record-row,.operator-table-row');const count=await rows.count();if(count){assert.equal(await rows.last().evaluate(el=>getComputedStyle(el).borderBottomWidth),'0px','The final table entry has no terminal line');if(count>1)assert.equal(await rows.first().evaluate(el=>getComputedStyle(el).borderBottomWidth),'1px','Separators between actual table entries remain');}
      }
     }
-    if(!process.env.BINSO_UX_BASELINE){await assertOpaqueChrome(page);if(width<=760)await assertMobileHeaderTargets(page);}
+    if(!process.env.BINSO_UX_BASELINE){await assertOpaqueChrome(page);await assertPresentationControls(page);if(width===390&&['/dashboard','/einstellungen/darstellung'].includes(route))await verifyPresentationControlRegression(page);if(width<=760)await assertMobileHeaderTargets(page);}
     if(!process.env.BINSO_UX_BASELINE&&width<=760&&await page.locator('.page-container,.operator-app-content').count()){
       const appearance=await page.locator('.page-container,.operator-app-content').first().evaluate(el=>({ink:getComputedStyle(el).color,surface:getComputedStyle(el).getPropertyValue('--app-surface').trim(),controls:[...el.querySelectorAll('.form-control,.form-textarea')].filter(node=>!['checkbox','radio','file'].includes(node.type)&&!node.closest('.searchbox,.thread-composer')).map(node=>({radius:getComputedStyle(node).borderTopLeftRadius,font:getComputedStyle(node).fontSize})),groups:[...el.querySelectorAll('.bo-settings-group-body')].map(node=>({background:getComputedStyle(node).backgroundColor,border:getComputedStyle(node).borderTopWidth}))}));
       assert.equal(appearance.ink,theme==='light'?(route.startsWith('/operator')?'rgb(32, 43, 59)':'rgb(33, 48, 71)'):(route.startsWith('/operator')?'rgb(215, 227, 243)':'rgb(215, 227, 243)'),`${route}: app text uses the central theme`);
@@ -436,6 +436,11 @@ try{
       if(initiallyCollapsed)await page.getByRole('button',{name:'Zeitverlauf ausblenden',exact:true}).click();
     }
     if(!process.env.BINSO_UX_BASELINE&&route==='/kunden/customer-one'){
+     // Parallel viewport pages share the real navigation preference. Keep the
+     // multi-read dossier geometry inside the same lock as sidebar mutations.
+     await withNavigationPreferenceLock(async()=>{
+      if(width>=761)await page.waitForFunction(()=>document.querySelector('.desktop-navigation-toggle')?.getAttribute('aria-expanded')==='true');
+      await waitForFiniteAnimations(page);
       await assertCustomerDossier(page);
       const dossier=page.locator('.detail-grid[data-layout="dossier"]');
       assert.equal(await dossier.count(),1,'Customer overview uses the shared reference dossier layout');
@@ -455,6 +460,7 @@ try{
        await supplementary.locator('summary').press('Enter');await page.waitForFunction(()=>!document.querySelector('.bo-data-disclosure').open);
        await supplementary.locator('summary').evaluate(el=>el.blur());
       }else assert.notEqual(await supplementary.getAttribute('open'),null,'Desktop supplementary facts stay visible');
+     });
 
     }
     if(!process.env.BINSO_UX_BASELINE&&route==='/mitarbeiter/employee-one'){await page.locator('.detail-list').getByText(employee.email,{exact:true}).waitFor();assert.equal(await page.locator('.entity-detail-workspace .settings-profile').count(),0,'The original employee dossier does not repeat its identity in a profile card')}
@@ -467,8 +473,8 @@ try{
       const visible=await page.evaluate(()=>{const composer=document.querySelector('.thread-composer').getBoundingClientRect(),nav=document.querySelector('.bottom-nav');const limit=nav?.getClientRects().length?nav.getBoundingClientRect().top:innerHeight;return composer.bottom<=limit+1&&composer.top>=0&&scrollY===0});assert.ok(visible,'Chat input stays above navigation in every app viewport');
     }
     if(!process.env.BINSO_UX_BASELINE){await waitForFiniteAnimations(page);for(const control of await page.locator('.form-field>.form-control').filter({visible:true}).all()){
-     const g=await control.evaluate(el=>{const c=getComputedStyle(el);return {height:el.getBoundingClientRect().height,radius:c.borderRadius,padding:c.paddingLeft,font:c.fontSize,auth:!!el.closest('.auth-workspace'),app:!!el.closest('.page-container,.operator-app-content,.bottom-sheet,.header-panel,.confirm-dialog')}});
-     assert.equal(g.height,width<=760||(g.app&&width<=760)?44:g.auth?46:40,`${route}: canonical closed field height`);assert.equal(g.padding,'11px',`${route}: canonical field inset`);assert.equal(g.radius,g.auth?'5px':width<=760?'8px':'7px',`${route}: canonical field radius`);
+     const g=await control.evaluate(el=>{const c=getComputedStyle(el);return {height:el.getBoundingClientRect().height,radius:c.borderRadius,padding:c.paddingLeft,font:c.fontSize,coarse:matchMedia('(pointer:coarse)').matches,auth:!!el.closest('.auth-workspace'),app:!!el.closest('.page-container,.operator-app-content,.bottom-sheet,.header-panel,.confirm-dialog')}});
+     assert.equal(g.height,width<=760?44:g.auth?46:g.coarse?44:40,`${route}: canonical closed field height`);assert.equal(g.padding,'11px',`${route}: canonical field inset`);assert.equal(g.radius,g.auth?'5px':width<=760?'8px':'7px',`${route}: canonical field radius`);
     }}
     for(const label of await page.locator('.detail-list dt').filter({visible:true}).all()){const confined=await label.evaluate(el=>{const r=el.getBoundingClientRect(),range=document.createRange();range.selectNodeContents(el);return [...range.getClientRects()].every(text=>text.right<=r.right+1)});assert.ok(confined,`${route}: detail labels never overlap their values`);}
     if(width<=760&&await page.locator('.mobile-header-detail').count())assert.equal(await page.locator('.page-head h1,.page-head .status,.desktop-back').filter({visible:true}).count(),0,route+' '+width+': app detail header owns its title/status/back once, including tablet');
@@ -956,7 +962,7 @@ try{
     await page.setViewportSize({width,height:740});await navigate(base+'/dashboard');await page.waitForLoadState('networkidle');
     const create=page.getByRole('button',{name:'Neu erstellen',exact:true}).filter({visible:true});
     const size=await create.boundingBox();
-    if(width<=760){assert.equal(size.width,44,'Mobile creation has a real 44px touch target');assert.equal(size.height,size.width);}else{assert.ok(size.width>size.height,'Desktop creation exposes its visible text label');assert.equal(size.height,40);}
+    if(width<=760){assert.equal(size.width,44,'Mobile creation has a real 44px touch target');assert.equal(size.height,size.width);}else{assert.ok(size.width>size.height,'Desktop creation exposes its visible text label');assert.equal(size.height,await page.evaluate(()=>matchMedia('(pointer:coarse)').matches)?44:40,'Desktop creation retains the exact pointer-appropriate action height');}
     await create.click();const menu=page.getByRole('dialog',{name:'Neu erstellen',exact:true});
     assert.deepEqual(await menu.locator('.action-row>span').allTextContents(),['Kunde','Angebot','Rechnung','Zeit erfassen','Projekt','Zahlung','Spese','Produkt','Mitarbeiter','Support-Anfrage']);
     assert.equal(await page.getByRole('button',{name:'Weiter',exact:true}).count(),0,'Opening global plus never starts an invoice wizard');
