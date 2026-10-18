@@ -21,6 +21,11 @@ export function formatDateTime(value:unknown){
  const date=new Date(String(value??""));if(!Number.isFinite(date.getTime()))return "";
  return new Intl.DateTimeFormat("de-CH",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit",timeZone:"Europe/Zurich"}).format(date);
 }
+/** Chat day boundaries use the same Swiss business timezone as other timestamps. */
+export function messageDay(value:string){
+ const date=new Date(value);if(!Number.isFinite(date.getTime()))return "";
+ return new Intl.DateTimeFormat("de-CH",{day:"2-digit",month:"2-digit",year:"numeric",timeZone:"Europe/Zurich"}).format(date);
+}
 /** Presentation of legacy activity text; persisted values are never rewritten. */
 export function formatActivityDetail(title:string,detail:string){
  if(title==="Arbeitszeit erfasst")return detail.replace(/^([0-9]+(?:\.[0-9]+)?) h/,(_,hours)=>formatHours(hours));

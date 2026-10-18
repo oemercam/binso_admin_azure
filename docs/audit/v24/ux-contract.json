@@ -49,11 +49,12 @@
     {
       "id": "UX24-HEADER",
       "scope": "Haupt-/Detail-/Desktopheader",
-      "requirement": "Ein Seiten-/Detailtitel und gemeinsame Header-Slots. Desktop mit Arbeitsbereich und globalen Aktionen; Mobile gemäss Originalvorlage.",
+      "requirement": "Ein gemeinsamer Kontexttitel: Übersicht mit originalem BINSO-Icon + One; Hauptbereiche mit Bereichstitel, Unterseiten mit Zurück-Pfeil. Desktop behält globale Suche, Glocke und Konto.",
       "owner": "components/app-chrome.tsx",
-      "acceptance": "Geometrie und Back/Deep Link auf Mobile/Tablet/Desktop prüfen",
+      "acceptance": "Back/Deep Link, sichtbare Titel, Aktionsgrössen und Rollen auf Mobile/Tablet/Desktop prüfen.",
       "status": "offen",
-      "evidence": []
+      "evidence": [],
+      "provenance": "Explicit complete app UX instruction following 76-route diagnosis on 2026-10-18; see docs/architecture/ux-current-approval.md"
     },
     {
       "id": "UX24-ACTIONS",
@@ -67,11 +68,12 @@
     {
       "id": "UX24-OVERLAY",
       "scope": "Sheets/Dialog/Popover",
-      "requirement": "Gemeinsame Formular-/Aktions-/Filtersheets auf Mobile; Desktop verwendet die Referenz-Commandbar und passende Dialoge. Fokus, Escape/Back, Tastatur und Safe Areas zentral.",
+      "requirement": "Lange routegebundene Erfassungen verwenden den bestehenden FormSheet-Workspace-Modus. Kurze Kontext-, Positions-, Filter- und Aktionsaufgaben bleiben modale Dialoge. Fokus, Escape/Back, Tastatur, Dirty-State und Safe Areas bleiben zentral.",
       "owner": "components/binso-ux.tsx",
-      "acceptance": "Fokus zurück, Keyboard, Dirty-State, Footer ohne Überdeckung prüfen",
+      "acceptance": "Workspace ohne Scrim/Fokusfalle; Kinddialog mit Fokusführung; geschützte Navigation, Recovery und erreichbare Footer prüfen.",
       "status": "offen",
-      "evidence": []
+      "evidence": [],
+      "provenance": "Explicit complete app UX instruction following 76-route diagnosis on 2026-10-18; see docs/architecture/ux-current-approval.md"
     },
     {
       "id": "UX24-CHART",
@@ -94,20 +96,22 @@
     {
       "id": "UX24-MOTION",
       "scope": "Motion/Glass",
-      "requirement": "Bestehende motion/glass Tokens und Reduced Motion; keine zusätzlichen Navigationseingriffe.",
+      "requirement": "Zentrale Motion-Tokens und Reduced Motion; kein Glass-/Blur-Fallback. Navigationslabels werden beim Scrollen niemals ausgeblendet.",
       "owner": "app/design-system/theme.css",
-      "acceptance": "Reduced Motion und Glass-Fallback in beiden Themes prüfen",
+      "acceptance": "Reduced Motion, stabile Labels und deckende Flächen in beiden Themes prüfen.",
       "status": "offen",
-      "evidence": []
+      "evidence": [],
+      "provenance": "Explicit complete app UX instruction following 76-route diagnosis on 2026-10-18; see docs/architecture/ux-current-approval.md"
     },
     {
       "id": "UX24-NAV",
       "scope": "Bottom-Navigation",
-      "requirement": "Bestehende Bottom-Navigation unverändert; diese Aufgabe autorisiert keine neue Glass/Layout/Plus-Änderung.",
+      "requirement": "Stabile Microsoft-App-Navigation bis zu allen Bildschirmrändern einschliesslich Safe Area. Ziele, Rechte und Icons bleiben unverändert; die alte Floating-/Kompakt-Geometrie ist ausdrücklich ersetzt. Plus im Listenheader: sichtbarer Kreis wie Avatar, Touchziel mindestens 44px.",
       "owner": "components/app-chrome.tsx",
-      "acceptance": "Vorhandene navigation-contract und navigation-foundation Gates ohne Referenzregeneration",
+      "acceptance": "Aktuelle navigation-contract/navigation-foundation Gates, abgeleitete v4-Geometrie und unabhängige Scroll-/Safe-Area-/Plus-Gegenproben; Tests erzeugen keine Referenz.",
       "status": "offen",
-      "evidence": []
+      "evidence": [],
+      "provenance": "Explicit complete app UX instruction following 76-route diagnosis on 2026-10-18; see docs/architecture/ux-current-approval.md"
     },
     {
       "id": "UX24-STYLE-001",
@@ -292,20 +296,22 @@
     {
       "id": "UX24-WHITE-WORKSPACE",
       "scope": "Light Mode: Marketing, Auth, Kunden- und Adminportal; bestehende Bottom-Navigation ausgenommen",
-      "requirement": "Weisse Grund-, Header-, Control- und Inhaltsflächen; dezente blaue Fokus-/Auswahl-/Aktionszustände. Dark Mode eigenständig. Neuer schriftlicher Auftrag white-workspaces-request.md hat Vorrang vor älteren Grau-Vorgaben.",
+      "requirement": "Weisse deckende Grund-, Header-, Control- und Inhaltsflächen; dezente blaue Fokus-/Auswahl-/Aktionszustände. Dark Mode ist abgeleitet. Aktuelle ux-current-approval.md hat Vorrang vor älteren Grau-/Dock-Vorgaben.",
       "owner": "app/design-system/theme.css",
-      "acceptance": "Computed weisse Flächen und Kontrast prüfen; Navigation-Referenz unverändert bestehen lassen.",
+      "acceptance": "Computed Flächen, Kontrast und die aktuelle stabile Navigation prüfen.",
       "status": "offen",
-      "evidence": []
+      "evidence": [],
+      "provenance": "Explicit complete app UX instruction following 76-route diagnosis on 2026-10-18; see docs/architecture/ux-current-approval.md"
     },
     {
       "id": "UX24-DESKTOP-COLLAPSE",
       "scope": "Desktop ab 1101px, Kunden- und Adminportal",
-      "requirement": "Linke Navigation standardmässig offen, manuell einklappbar; gespeicherte Auswahl, ARIA-Zustand und Icon-Linknamen. Mobile-Navigation unverändert.",
+      "requirement": "Linke Navigation auf Desktop/Tablet ab 761px standardmässig offen und einklappbar; gespeicherte Auswahl, ARIA-Zustand und Icon-Linknamen. Mobile verwendet die aktuelle stabile Navigation.",
       "owner": "components/desktop-navigation.tsx",
-      "acceptance": "Einklappen/Öffnen, gewonnene Inhaltsbreite, Storage und mobile Unsichtbarkeit im Browser prüfen.",
+      "acceptance": "Einklappen/Öffnen, Inhaltsbreite, Storage und mobile Unsichtbarkeit des Desktop-Schalters prüfen.",
       "status": "offen",
-      "evidence": []
+      "evidence": [],
+      "provenance": "Explicit complete app UX instruction following 76-route diagnosis on 2026-10-18; see docs/architecture/ux-current-approval.md"
     }
   ],
   "styleBindings": [

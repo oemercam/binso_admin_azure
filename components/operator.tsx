@@ -1,4 +1,5 @@
 "use client";
+import {AppVersionNotice} from "./app-version-notice";
 import {LocalizedText,LocalizedElement,useTranslation} from "@/lib/client/locale";
 import {LocaleSwitcher} from "./locale-switcher";
 import {RingChart} from "./statistics";
@@ -161,9 +162,10 @@ export function OperatorPage({ section = "", demo = false, identity, role="platf
     </aside>
 
     <main className="operator-main">
+      <AppVersionNotice/>
       <AppHeader contentHeader className="operator-app-header" detail={!!detail} leadingClassName="operator-header-brand" leading={<>
         <DesktopNavigationToggle collapsed={navigationCollapsed} onToggle={toggleNavigation} controls="operator-desktop-navigation"/>
-        {detail?<Link href={"/operator/"+key} className="mobile-back" aria-label="Zur Liste"><Icon name="back"/></Link>:<Link href="/operator" aria-label="Zum Admin-Dashboard"><Logo/></Link>}
+        {detail?<Link href={"/operator/"+key} className="mobile-back" aria-label="Zur Liste"><Icon name="back"/></Link>:key===""?<Link href="/operator" className="mobile-header-brand" aria-label="Zum Admin-Dashboard"><Logo compact/><span>One</span></Link>:<span className="operator-section-label"><LocalizedText>{title}</LocalizedText></span>}
         <span className="operator-header-desktop-label"><LocalizedText>{"Admin"}</LocalizedText></span>
       </>} actionClassName="operator-user" actions={<>{demo&&<span className="app-demo-badge"><LocalizedText>{"Demo"}</LocalizedText></span>}<Link prefetch={false} className="icon-button operator-home-link" href="/dashboard" aria-label="Zur App"><Icon name="home" size={18}/></Link><LocalizedElement as="button" className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={()=>{setMobileMore(false);setAccountOpen(true)}}><Avatar name={identity?.name} identity={identity?.email}/></LocalizedElement></>}/>
 

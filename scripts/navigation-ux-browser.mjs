@@ -12,6 +12,7 @@ export async function assertFlatMobileNavigation(page){
   assert.ok(!nav.webkitBlur||nav.webkitBlur==='none','Flat navigation has no WebKit backdrop blur');
   assert.ok(nav.active.every(color=>color===(nav.theme==='dark'?'rgb(72, 167, 255)':'rgb(37, 102, 189)')),'Active navigation uses the Microsoft blue accent');
   assert.ok(nav.targets.every(t=>t.width>=44&&t.height>=44),'Existing navigation touch targets remain at least 44px');
+  assert.equal(nav.labels.length,nav.targets.length,'Every navigation target keeps a visible label');
   assert.ok(nav.labels.every(label=>label.name.includes(label.text)),"Navigation accessible names include their visible localized label");
   assert.ok(nav.labels.every(label=>label.font>=12&&label.scroll<=label.height+1&&label.width<=label.targetWidth+1&&label.scrollWidth<=label.clientWidth+1),'Flat navigation labels remain readable without clipping: '+JSON.stringify(nav.labels));
   assert.ok(nav.left>=0&&nav.right<=nav.viewport+1,'Navigation stays inside its safe viewport');
@@ -88,10 +89,10 @@ export async function verifyNavigationPersistence(page,{base,capture=async()=>{}
    const railVisible=await page.locator('.settings-context-navigation').isVisible();
    const settings=page.locator(railVisible?'.settings-context-navigation':'.settings-mobile-navigation');
    if(!railVisible)await settings.locator('summary').click();
-   await settings.getByRole('link',{name:'Darstellung & Sprache',exact:true}).click();
+   await settings.getByRole('link',{name:'Darstellung',exact:true}).click();
    await page.waitForURL(base+'/einstellungen/darstellung');
    assert.equal(await settings.locator('a[aria-current="page"]').getAttribute('href'),'/einstellungen/darstellung','Settings siblings announce the current page');
-   if(!railVisible){assert.equal(await settings.getAttribute('open'),null,'Compact explorer closes after navigation');assert.equal((await settings.locator('summary').textContent()).trim(),'Darstellung & Sprache','Closed explorer still exposes its current visible section');}
+   if(!railVisible){assert.equal(await settings.getAttribute('open'),null,'Compact explorer closes after navigation');assert.equal((await settings.locator('summary').textContent()).trim(),'Darstellung','Closed explorer still exposes its current visible section');}
    assert.ok(await page.getByRole('radiogroup',{name:'Darstellung',exact:true}).isVisible(),'Existing appearance control remains reachable');
    await capture('settings-desktop-'+width);
   }
@@ -111,8 +112,8 @@ export async function verifyNavigationPersistence(page,{base,capture=async()=>{}
   await capture('settings-mobile-sibling-navigation');
   const returnPath='/dashboard?panel=account';
   await page.goto(base+'/einstellungen/konto?accountReturn='+encodeURIComponent(returnPath));await page.waitForLoadState('networkidle');
-  await menu.locator('summary').click();await menu.getByRole('link',{name:'Darstellung & Sprache',exact:true}).click();
+  await menu.locator('summary').click();await menu.getByRole('link',{name:'Darstellung',exact:true}).click();
   await page.waitForURL(base+'/einstellungen/darstellung?accountReturn='+encodeURIComponent(returnPath));
-  assert.equal(await page.locator('.detail-back').getAttribute('href'),returnPath,'Switching settings sections preserves the original safe account return path');
+  assert.equal(await page.locator('.mobile-back').getAttribute('href'),returnPath,'Switching settings sections preserves the original safe account return path');
  }finally{await page.setViewportSize(viewport)}
 }

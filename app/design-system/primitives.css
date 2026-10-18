@@ -316,13 +316,14 @@ input:not([type="checkbox"]):not([type="radio"]),
 .time-filter-toolbar .form-field{flex:1;min-width:0;width:auto}}
 .bo-create-action.button{position:relative;margin-inline-start:auto;width:auto;height:var(--control-h);flex:none;min-width:var(--touch);min-height:var(--control-h);padding:0 var(--button-padding-inline);border:0;border-radius:var(--shape-control-desktop);background:var(--app-action-accent);color:var(--app-accent-text);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:opacity var(--motion-fast) var(--motion-ease)}
 @media(max-width:760px){
-.bo-create-action.button{width:var(--touch);height:var(--touch);aspect-ratio:1 / 1;flex:0 0 var(--touch);min-height:var(--touch);padding:0;border-radius:50%;background:var(--color-inverse-bg);color:var(--color-inverse-fg)}
-.bo-create-action .create-action-label{display:none}
+.bo-create-action.button{isolation:isolate;width:var(--touch);height:var(--touch);aspect-ratio:1 / 1;flex:0 0 var(--touch);min-height:var(--touch);padding:0;gap:0;border-radius:50%;background:transparent;color:var(--color-inverse-fg)}
+.bo-create-action.button::before{content:"";position:absolute;z-index:-1;width:var(--header-avatar-size);height:var(--header-avatar-size);border-radius:50%;background:var(--color-inverse-bg)}
+.bo-create-action.button>span{display:none}
 }
 .bo-create-action:hover:not(:disabled){opacity:.85}
 .bo-create-action:active:not(:disabled){opacity:.7}
 .bo-create-action:disabled{opacity:.45;cursor:not-allowed}
-.bo-create-action:focus-visible,.bo-row-actions:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+.bo-create-action:focus-visible,.bo-row-actions:focus-visible{outline:2px solid var(--app-action-accent);outline-offset:3px}
 .bo-row-actions{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border:0;background:transparent;color:inherit;cursor:pointer;margin-left:auto}
 .bo-row-actions:disabled{opacity:.4;cursor:not-allowed}
 .bo-row-actions:hover:not(:disabled){background:var(--color-subtle);border-radius:var(--shape-group-small)}
@@ -337,7 +338,6 @@ input:not([type="checkbox"]):not([type="radio"]),
  .toggle.is-on::before{background:Highlight}
  .toggle.is-on span{background:HighlightText}
 }
-.mobile-header-title>.status{flex:none}
 .form-field,.form-field>label,.form-field>div{min-width:0;max-width:100%}
 .form-field input,.form-field select,.form-field textarea{box-sizing:border-box;min-width:0;max-width:100%}
 .form-field textarea{resize:vertical;overflow-wrap:anywhere}

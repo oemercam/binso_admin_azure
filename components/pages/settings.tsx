@@ -369,9 +369,9 @@ export function AppearanceSettingsPage(){
   return()=>window.removeEventListener("binso-theme",sync);
  },[]);
  const choose=(next:ThemeMode)=>{setError("");void saveTheme(next).catch(()=>setError("Darstellung konnte nicht gespeichert werden."))};
- return <AppShell title="Darstellung & Sprache" subtitle="Binso One passt sich deiner Arbeitsweise an." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
+ return <AppShell title="Darstellung" subtitle="Binso One passt sich deiner Arbeitsweise an." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
   {error&&<ErrorState><LocalizedText>{error}</LocalizedText></ErrorState>}
   <SettingsGroup title="Darstellung"><SelectionRows label="Darstellung" value={theme} options={themeOptions} onChange={choose}/></SettingsGroup>
-  <SettingsGroup title="Sprache"><div className="settings-group-fields"><LanguagePreference/></div></SettingsGroup>
+
  </AppShell>;
 }

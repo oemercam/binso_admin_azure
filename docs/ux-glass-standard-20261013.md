@@ -1,3 +1,5 @@
+> Historischer Nachweis. Darstellungsregeln zu Glass, Floating Dock und Scroll-Kompaktmodus sind durch [den aktuellen Microsoft-App-Standard](architecture/ux-current-approval.md) ersetzt. Frühere Prüfergebnisse sind keine aktuelle Abnahme.
+
 # Binso One – zentraler UX-Standard vom 13.10.2026
 
 ## Freigabe und Geltungsbereich

@@ -1,4 +1,3 @@
-import {currentNavigationRead} from './navigation-breakpoint-contract.mjs';
 import {withoutLocalization} from "./localized-source.mjs";
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
@@ -34,21 +33,29 @@ export function navigationFoundation(read,{geometryOnly=false}={}){
  tokenRoot.walkDecls(decl=>{if(!needed.has(decl.prop))return;const contexts=[];for(let p=decl.parent;p&&p.type!=='root';p=p.parent)contexts.unshift(p.type==='rule'?p.selector:'@'+p.name+' '+p.params);variables.push({name:decl.prop,value:decl.value,contexts});});
  return {markup:hash(markup),logic:hash(logic),icons:hash(icons),rules:hash(rules),tokens:hash(variables),tokenNames:[...needed].sort()};
 }
-if(process.argv[1]===fileURLToPath(import.meta.url)){
- const original=JSON.parse(fs.readFileSync('docs/assets/v21-1/navigation-reference.json','utf8'));
- const reference=JSON.parse(fs.readFileSync('docs/assets/20261018/readable-navigation-reference.json','utf8'));
- const read=file=>fs.readFileSync(file,'utf8');
- const current=navigationFoundation(read);
- const inherited=[];postcss.parse(fs.readFileSync('app/design-system/navigation.css','utf8')).walkRules(':root',rule=>rule.walkDecls(decl=>inherited.push({context:rule.parent.params,name:decl.prop,value:decl.value})));
- assert.deepEqual(inherited,[{context:'(max-height:520px) and (orientation:landscape) and (max-width:900px)',name:'--mobile-nav-h',value:'54px'},{context:'(max-height:520px) and (orientation:landscape) and (max-width:900px)',name:'--mobile-nav-bottom',value:'6px'}],'Preserve the original inherited landscape dock values as well as its selector contract');
- assert.equal(current.logic,original.snapshot.logic,'Creation/material changes must preserve destination access and scroll logic');
- assert.equal(current.icons,original.snapshot.icons,'Existing navigation icons remain unchanged');
- assert.equal(current.markup,reference.snapshot.markup,'Current navigation markup preserves destinations and the approved compact labels/accessibility names');
- assert.deepEqual(navigationFoundation(currentNavigationRead(read),{geometryOnly:true}),reference.invariants,'Current navigation geometry, motion, safe areas and non-material tokens remain exact');
- assert.deepEqual(current,reference.snapshot,'Navigation matches the explicitly approved flat Microsoft material');
- for(const [from,to] of [['background:var(--color-bg)','background:#f3f3f5'],['border-radius:0','border-radius:30px'],['backdrop-filter:none','backdrop-filter:blur(18px)'],['box-shadow:none','box-shadow:0 3px 12px rgba(0,0,0,.2)']]){
-  assert.ok(read('app/design-system/navigation.css').includes(from),'Negative control edits an actual declaration');
-  assert.notDeepEqual(navigationFoundation(file=>file==='app/design-system/navigation.css'?read(file).replace(from,to):read(file)),reference.snapshot,'Old glass/round/blur material must fail the new contract');
+/** Approval-independent invariants: no route, permission, icon or domain change. */
+export function navigationAccess(read){
+ const permissions=[],destinations=[];
+ for(const file of ['components/app-shell.tsx','components/operator.tsx']){
+  const ast=ts.createSourceFile(file,withoutLocalization(read(file)),99,true,4);
+  function visit(node){
+   if(ts.isVariableDeclaration(node)&&/^(formActive|canOpen|operatorNav|operatorNavGroups|settingsWrite|personalSettings|canWrite)$/.test(node.name.getText(ast)))permissions.push({file,source:node.getText(ast)});
+   if(ts.isJsxElement(node)&&node.openingElement.tagName.getText(ast)==='nav'&&/bottom-nav|operator-mobile-nav/.test(node.openingElement.attributes.getText(ast)))destinations.push({file,source:node.children.map(child=>child.getText(ast)).join('')});
+   ts.forEachChild(node,visit);
+  }visit(ast);
  }
- console.log('Flat Microsoft navigation: exact material, unchanged markup/access/icons/geometry/motion/safe areas and rejecting old glass controls passed.');
+ return {permissions:hash(permissions),destinations:hash(destinations)};
+}
+if(process.argv[1]===fileURLToPath(import.meta.url)){
+ const reference=JSON.parse(fs.readFileSync('docs/assets/20261018/stable-navigation-reference.json','utf8'));
+ const read=file=>fs.readFileSync(file,'utf8'),current=navigationFoundation(read);
+ assert.deepEqual(navigationAccess(read),reference.access,'Original destinations, access checks and domain permissions remain exact');
+ assert.equal(current.icons,reference.baseIcons,'Existing navigation icons remain unchanged');
+ assert.deepEqual(current,reference.snapshot,'Stable app navigation matches its explicitly generated approved source contract');
+ assert.doesNotMatch(read('components/app-shell.tsx'),/navCompact|setNavCompact/,'Scroll never hides app navigation labels');
+ for(const [from,to] of [['background:var(--color-bg)','background:#f3f3f5'],['border-radius:0','border-radius:30px'],['backdrop-filter:none','backdrop-filter:blur(18px)'],['box-shadow:none','box-shadow:0 3px 12px rgba(0,0,0,.2)'],['opacity:1','opacity:0']]){
+  assert.ok(read('app/design-system/navigation.css').includes(from),'Negative control edits an actual declaration');
+  assert.notDeepEqual(navigationFoundation(file=>file==='app/design-system/navigation.css'?read(file).replace(from,to):read(file)),reference.snapshot,'Old glass, floating geometry and disappearing labels must fail');
+ }
+ console.log('Stable Microsoft navigation: unchanged destinations/rights/icons; source contract and old-material/hidden-label counterexamples passed.');
 }

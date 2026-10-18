@@ -14,8 +14,8 @@ export async function assertOpaqueChrome(page){
    const root=nav.closest('.operator-root,.app-root'),content=root?.querySelector('.operator-main,.page-container');
    if(!content)return null;
    const style=getComputedStyle(content),dock=nav.closest('.mobile-dock'),dockStyle=getComputedStyle(dock);
-   const navHeight=parseFloat(getComputedStyle(nav).getPropertyValue('--mobile-nav-h'));
-   return {padding:parseFloat(style.paddingBottom),expected:navHeight+parseFloat(dockStyle.bottom)+20,outer:root.matches('.app-root')?parseFloat(getComputedStyle(root.querySelector('.app-main')).paddingBottom):0};
+   const dockHeight=dock.getBoundingClientRect().height;
+   return {padding:parseFloat(style.paddingBottom),expected:dockHeight+parseFloat(dockStyle.bottom)+20,outer:root.matches('.app-root')?parseFloat(getComputedStyle(root.querySelector('.app-main')).paddingBottom):0};
   });
   if(clearance){assert.ok(Math.abs(clearance.padding-clearance.expected)<1,'One shared mobile content inset clears navigation and safe area');assert.equal(clearance.outer,0,'No second bottom inset on the outer customer workspace');}
  }
@@ -46,10 +46,11 @@ async function verifyAnimationStabilityRegression(page){
 }
 
 export async function assertMobileHeaderTargets(page){
- const targets=page.locator('.mobile-header .icon-button,.mobile-header .mobile-notification-button,.mobile-header .avatar-button').filter({visible:true});
+ await waitForFiniteAnimations(page);
+ const targets=page.locator('.mobile-header .icon-button,.mobile-header .mobile-notification-button,.mobile-header .avatar-button,.mobile-header .mobile-back').filter({visible:true});
  for(const target of await targets.all()){
   const box=await target.boundingBox();
-  assert.ok(box.width>=44&&box.height>=44,'Mobile header actions retain at least 44px touch targets');
+  assert.ok(box.width>=44&&box.height>=44,'Mobile header actions retain at least 44px touch targets: '+JSON.stringify({label:await target.getAttribute('aria-label'),width:box.width,height:box.height}));
  }
  return targets;
 }

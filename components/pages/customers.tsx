@@ -224,8 +224,8 @@ export function CustomerForm({customerId}:{customerId?:string}={}) {
       setToast(error instanceof Error?error.message:"Kunde konnte nicht gespeichert werden.");
     }
   };
-  return <AppShell editing unsavedChanges={false} title="Kunden" active="kunden">
-    <FormSheet open={sheetOpen} onClose={close} label={customerId?"Kunde bearbeiten":"Kunde erstellen"} description="Beginne mit dem Namen. Weitere Angaben kannst du später ergänzen." busy={savingRecord} dirty={dirty&&!savedRecord} wizard>
+  return <AppShell editing unsavedChanges={false} title={customerId?"Kunde bearbeiten":"Kunde erstellen"} active="kunden" backHref={returnTo} backLabel="Kunden">
+    <FormSheet workspace open={sheetOpen} onClose={close} label={customerId?"Kunde bearbeiten":"Kunde erstellen"} description="Beginne mit dem Namen. Weitere Angaben kannst du später ergänzen." busy={savingRecord} dirty={dirty&&!savedRecord} wizard>
       {loadingRecord?<LoadingState><LocalizedText>{"Kunde wird geladen …"}</LocalizedText></LoadingState>:recordError?<ErrorState onRetry={recordQuery.refresh} retryLabel="Erneut versuchen"><LocalizedText>{recordError}</LocalizedText></ErrorState>:<form onSubmit={event=>{event.preventDefault();return save()}}>
         <FormWizard labels={["Grunddaten"]} step={0} onStep={()=>{}} busy={savingRecord} ariaLabel="Kunde erfassen" cancelAction={<Button variant="secondary" onClick={close}><LocalizedText>{"Abbrechen"}</LocalizedText></Button>} action={<Button requiresWrite type="submit" disabled={savingRecord||!recovery.ready||company.trim().length<2}><LocalizedText>{savingRecord?"Wird gespeichert…":customerId?"Änderungen speichern":"Kunde speichern"}</LocalizedText></Button>}>
           {toast&&toast!=="Kunde gespeichert."&&<ErrorState>{toast}</ErrorState>}
