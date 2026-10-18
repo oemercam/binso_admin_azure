@@ -175217,8 +175217,8 @@
           "tag": "Link",
           "line": 174,
           "props": [
-            "aria-label={label}",
-            "title={label}",
+            "aria-label={translate(slug===\"\"?\"Start\":slug===\"monitoring\"?\"Status\":label)+(slug===\"\"||slug===\"monitoring\"?\" · \"+translate(label):\"\")}",
+            "title={translate(label)}",
             "aria-current={slug===key?\"page\":undefined}",
             "className={slug===key?\"active\":\"\"}",
             "href={slug ? `/operator/${slug}` : \"/operator\"}",
@@ -175499,6 +175499,18 @@
         {
           "line": 170,
           "expression": "key===\"sperrungen\""
+        },
+        {
+          "line": 174,
+          "expression": "slug===\"\""
+        },
+        {
+          "line": 174,
+          "expression": "slug===\"monitoring\""
+        },
+        {
+          "line": 174,
+          "expression": "slug===\"\"||slug===\"monitoring\""
         },
         {
           "line": 174,
@@ -253470,7 +253482,12 @@
         },
         {
           "property": "grid-template-columns",
-          "value": "repeat(5,minmax(0,1fr))",
+          "value": "repeat(5,minmax(44px,max-content))",
+          "important": false
+        },
+        {
+          "property": "justify-content",
+          "value": "space-between",
           "important": false
         },
         {
@@ -253513,7 +253530,7 @@
     {
       "id": 2148,
       "file": "app/design-system/navigation.css",
-      "line": 77,
+      "line": 78,
       "selector": ".mobile-dock",
       "context": "@media (max-width:760px)",
       "declarations": [
@@ -253562,7 +253579,7 @@
     {
       "id": 2149,
       "file": "app/design-system/navigation.css",
-      "line": 78,
+      "line": 79,
       "selector": ".mobile-dock>nav",
       "context": "@media (max-width:760px)",
       "declarations": [
@@ -253576,7 +253593,7 @@
     {
       "id": 2150,
       "file": "app/design-system/navigation.css",
-      "line": 79,
+      "line": 80,
       "selector": ".mobile-dock>nav",
       "context": "@media (max-width:760px)",
       "declarations": [
@@ -253595,7 +253612,7 @@
     {
       "id": 2151,
       "file": "app/design-system/navigation.css",
-      "line": 80,
+      "line": 81,
       "selector": ".app-preview .mobile-dock",
       "context": "@media (max-width:760px)",
       "declarations": [
@@ -253609,7 +253626,7 @@
     {
       "id": 2152,
       "file": "app/design-system/navigation.css",
-      "line": 82,
+      "line": 83,
       "selector": ".mobile-dock> :is(.bottom-nav,.operator-mobile-nav)",
       "context": "@media (forced-colors:active)",
       "declarations": [
@@ -253643,7 +253660,7 @@
     {
       "id": 2153,
       "file": "app/design-system/navigation.css",
-      "line": 85,
+      "line": 86,
       "selector": ":root",
       "context": "@media (max-height:520px) and (orientation:landscape) and (max-width:900px)",
       "declarations": [

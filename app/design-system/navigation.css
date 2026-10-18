@@ -65,7 +65,8 @@
     min-height:var(--mobile-nav-h);
     padding:6px;
     display:grid;
-    grid-template-columns:repeat(5,minmax(0,1fr));
+    grid-template-columns:repeat(5,minmax(44px,max-content));
+    justify-content:space-between;
     border:1px solid transparent;
     border-top-color:var(--color-line);
     border-radius:0;

@@ -26,6 +26,8 @@ sind darauf abgestimmt. Der neue Quellvertrag entsteht ausschliesslich über den
 bestehenden Generator. Im Operator-Dock passen „Start“/„Status“ statt
 „Dashboard“/„Monitoring“ auch bei 320px; vollständige zugängliche Namen bleiben.
 Die gerenderte Prüfung erkennt horizontales wie vertikales Abschneiden.
+Intrinsische Navigationsspalten mit mindestens 44px berücksichtigen auch andere
+Browser-Schriftmetriken; die Aussenmasse des Docks bleiben geschützt.
 Historische Referenzen und gerenderte v3-Bounds bleiben
 unverändert. Header, Listen, Dokumente, Einstellungen, Marketing und Operator
 verwenden die bestehenden Schriftrollen statt winziger Sonderstufen.

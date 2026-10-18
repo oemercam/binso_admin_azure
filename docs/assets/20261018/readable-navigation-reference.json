@@ -1,11 +1,11 @@
 {
   "base": "51024b189f7746cbf7fe50c9107a978cdb6b5c2f",
-  "approval": "Owner requested a complete visible-interface readability/cascade cleanup after deployment: 12px navigation labels with adequate line space, compact operator labels Start/Status with full accessible names, and removal of dominated rules. Live nav bounds, rights, icons, motion and safe areas remain protected. Historical references remain unchanged.",
+  "approval": "Owner requested a complete visible-interface readability/cascade cleanup after deployment: 12px navigation labels with adequate line space, intrinsic columns with 44px targets, compact operator labels Start/Status with full accessible names, and removal of dominated rules. Live nav bounds, rights, icons, motion and safe areas remain protected. Historical references remain unchanged.",
   "snapshot": {
-    "markup": "7371b549948aa3db071e835be51286f1f72f249130e327fedd155f3199044e23",
+    "markup": "a9375850564e553c53db7da5731f4628ce1241ed5fa619f52deed3f9822e21f3",
     "logic": "8724e28af32d7aaf1779885ccdaed77f7f43f7c07a0d461dccdb6256aaa8e433",
     "icons": "b01b4f68013ccaea6f5846ffb30b07bc0a079eac3adeb9bac3800cbfdbe9366e",
-    "rules": "4e8083c5337790388703444297234e44c319115d9430ca1bfb9723f4811df532",
+    "rules": "4fdb68dc5ea964034e30bb19c0fa715b80b23886c62abeea312b3b5694d502bb",
     "tokens": "b32c3810060e470a7bc0b6ed999cab3f3066f0cc4bfe00af2304e2907e9e1539",
     "tokenNames": [
       "--app-action-accent",
@@ -28,10 +28,10 @@
     ]
   },
   "invariants": {
-    "markup": "7371b549948aa3db071e835be51286f1f72f249130e327fedd155f3199044e23",
+    "markup": "a9375850564e553c53db7da5731f4628ce1241ed5fa619f52deed3f9822e21f3",
     "logic": "8724e28af32d7aaf1779885ccdaed77f7f43f7c07a0d461dccdb6256aaa8e433",
     "icons": "b01b4f68013ccaea6f5846ffb30b07bc0a079eac3adeb9bac3800cbfdbe9366e",
-    "rules": "25afaf19d44937eecfa0a851e19836bad42e57a4d81b74f5679ce4e6138a2228",
+    "rules": "c7c6f2aad42962fbe8a46a2f84ba942da9cbecd43464190bf41cfc86effdf566",
     "tokens": "67375a0e6045f4056f584743ba4e907900dfbb0883be6fbb1e064541b87ba8aa",
     "tokenNames": [
       "--mobile-nav-bottom",
@@ -48,5 +48,5 @@
       "--type-metadata"
     ]
   },
-  "customerContract": "75717ddd712a17ed5dbd2c615ea671c8404f7ceee8b7e57aa3bcf43cd350849c"
+  "customerContract": "5346c8243cd97f9d84aeb7fe76d54549639e2c43c76474dcdea8b8c3f496b5eb"
 }

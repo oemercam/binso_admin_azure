@@ -12,6 +12,8 @@ Der aktive Quellvertrag ist jetzt
 Generator verwendet den zuletzt ausgelieferten Microsoft-Stand `51024b18` und
 erlaubt nur die aktuelle Lesbarkeitskorrektur: 12px Navigationsbeschriftung,
 passende Zeilenhöhe/Labelhöhe sowie nachweislich überlagerte Deklarationen.
+Das gemeinsame Raster richtet sich nach der Textbreite mit mindestens 44px je
+Ziel; starre Fünftelspalten dürfen lange Labels bei 320px nicht abschneiden.
 Operator-Dock-Labels verwenden die kurzen sichtbaren Namen „Start“/„Status“;
 die vollständigen Namen „Dashboard“/„Monitoring“ bleiben zugänglich. Links,
 Rechte, Icons, Bounds, Safe Areas und Scrollverhalten ändern sich nicht.
