@@ -214,17 +214,19 @@ export function CustomerForm({customerId}:{customerId?:string}={}) {
     }
     setToast(null);saveRecordPending.current=true;setSavingRecord(true);
     try{
+      let savedCustomerId=customerId;
       if(isProductionBackendEnabled()){
         const body={name:company.trim(),sector,email,phone,city,address,postalCode,uid,notes,status:customerStatus,...(!customerId?{allowDuplicate,contactFirstName:contactName.trim(),contactLastName:contactLastName.trim()}:{})},serialized=JSON.stringify(body);
         const attempt=replay?.body===serialized?replay:{body:serialized,key:crypto.randomUUID()};setReplay(attempt);recovery.persist({company,contactName,contactLastName,email,phone,city,sector,address,postalCode,uid,notes,customerStatus,replay:attempt,allowDuplicate});
         const result=customerId?await apiPatch<{item?:{id:string}}>("/api/customers/"+encodeURIComponent(customerId),body):await apiPost<{item?:{id:string}}>("/api/customers",body,{idempotencyKey:attempt.key});
         if(typeof result.item?.id!=="string"||!result.item.id)throw new Error("Die Speicherung konnte nicht bestätigt werden. Bitte den gespeicherten Stand prüfen.");
+        savedCustomerId=result.item.id;
       }
       else appendDemoRow("customers",[company.trim(),sector,city.trim(),"Aktiv"]);
       setToast("Kunde gespeichert.");
       setSavedRecord(true);
       recovery.clear();allowDraftNavigation();
-      window.setTimeout(()=>router.push(customerId?"/kunden/"+encodeURIComponent(customerId):returnTo),700);
+      router.push("/kunden/"+encodeURIComponent(savedCustomerId!));
     }catch(error){
       saveRecordPending.current=false;setSavingRecord(false);
       setToast(error instanceof Error?error.message:"Kunde konnte nicht gespeichert werden.");

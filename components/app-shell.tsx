@@ -10,6 +10,7 @@ import {loadTheme,saveTheme} from "@/lib/client/theme";
 import {AppStart} from "./app-start";
 import {AppVersionNotice} from "./app-version-notice";
 import { hasBlockingModal } from "./use-dialog-focus";
+import {pageOrientation} from "@/lib/page-orientation";
 import {safeAppPath} from "@/lib/navigation";
 import { usePathname, useRouter } from "next/navigation";
 import { Children, isValidElement, cloneElement, createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
@@ -136,7 +137,10 @@ function AppShellFrame({
   const inlineControls=childNodes.find(child=>isValidElement(child)&&child.type===RecordsControls);
   const bodyControls=listControls?cloneElement(listControls,{children:undefined}):inlineControls;
   const pageChildren=inlineControls?childNodes.filter(child=>child!==inlineControls):children;
-  const headingActions=contentCreate?undefined:visibleActions;
+  const orientation=preview?undefined:pageOrientation(pathname,editing);
+  const headingSubtitle=orientation&&!(subtitle&&/^\d+\s/.test(subtitle))?undefined:subtitle;
+  const headingCreate=contentCreate&&pathname==="/dashboard";
+  const headingActions=contentCreate&&!headingCreate?undefined:visibleActions;
   const headerOwnsDetail=!!backHref;
   const allowed=canOpen(pathname);
   const [formDirty,setFormDirty]=useState(false);
@@ -354,10 +358,11 @@ function AppShellFrame({
       <main className="page-container" data-section={active}>
         <AppVersionNotice/>
         <div className={backHref ? "page-head page-head-detail" : "page-head"} data-heading-placement={headingPlacement}>
-          {backHref ? <DetailHeading verbatimTitle={titleIsUserContent} title={title} subtitle={subtitle} status={status} tone={statusTone} recordLabel={recordLabel} statusPlacement={headingPlacement==="content"?"subtitle":"title"} mobileAction={undefined} action={(headingActions||contextActions)&&allowed?<div className="page-actions">{headingActions}{contextActions&&<div className="context-actions-inline">{contextActions.content}</div>}</div>:undefined} leading={<Link className="desktop-back" href={backHref} aria-label={backLabel}><Icon name="back" size={16}/><LocalizedText>{backLabel}</LocalizedText></Link>}/> : <PageHeading verbatimTitle={titleIsUserContent} title={title} description={subtitle} action={(headingActions||contextActions)&&allowed?<div className="page-actions">{headingActions}{contextActions&&<div className="context-actions-inline">{contextActions.content}</div>}</div>:undefined}/> }
+          {backHref ? <DetailHeading verbatimTitle={titleIsUserContent} title={title} subtitle={headingSubtitle} status={status} tone={statusTone} recordLabel={recordLabel} statusPlacement={headingPlacement==="content"?"subtitle":"title"} mobileAction={undefined} action={(headingActions||contextActions)&&allowed?<div className="page-actions">{headingActions}{contextActions&&<div className="context-actions-inline">{contextActions.content}</div>}</div>:undefined} leading={<Link className="desktop-back" href={backHref} aria-label={backLabel}><Icon name="back" size={16}/><LocalizedText>{backLabel}</LocalizedText></Link>}/> : <PageHeading verbatimTitle={titleIsUserContent} title={title} description={headingSubtitle} action={(headingActions||contextActions)&&allowed?<div className="page-actions">{headingActions}{contextActions&&<div className="context-actions-inline">{contextActions.content}</div>}</div>:undefined}/> }
         </div>
+        {allowed&&orientation&&<p className="page-orientation"><LocalizedText>{orientation}</LocalizedText></p>}
         <SettingsWorkspace>
-        {allowed&&(bodyControls||contentCreate)&&<div className="workspace-command-bar">{bodyControls}{contentCreate&&visibleActions}</div>}
+        {allowed&&(bodyControls||contentCreate&&!headingCreate)&&<div className="workspace-command-bar">{bodyControls}{contentCreate&&!headingCreate&&visibleActions}</div>}
         {accessError?<div role="alert"><p><LocalizedText>{accessError}</LocalizedText></p><FormActions sheet><Button onClick={()=>{invalidateClientSession();setAccessError(null);setAccessRetry(value=>value+1)}}><LocalizedText>{"Erneut versuchen"}</LocalizedText></Button><Link className="button button-secondary" href="/login"><LocalizedText>{"Anmelden"}</LocalizedText></Link></FormActions></div>:(!access||allowed)?pageChildren:<EmptyState icon="lock" title="Kein Zugriff" text="Diese Seite ist für deine Rolle oder deinen Plan nicht verfügbar."/>}
         </SettingsWorkspace>
       </main>

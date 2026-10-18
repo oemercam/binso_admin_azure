@@ -12113,5 +12113,150 @@
     "The contact name is too long.",
     "Le nom du contact est trop long.",
     "Il nome del contatto è troppo lungo."
+  ],
+  "Deine Geschäftszahlen und nächsten Aufgaben im Blick.": [
+    "Your business figures and next tasks at a glance.",
+    "Vos chiffres et prochaines tâches en un coup d’œil.",
+    "Dati aziendali e prossime attività a colpo d’occhio."
+  ],
+  "Kunden und Kontaktpersonen verwalten.": [
+    "Manage customers and contact people.",
+    "Gérer les clients et leurs interlocuteurs.",
+    "Gestire clienti e persone di contatto."
+  ],
+  "Angebote erstellen und ihren Status verfolgen.": [
+    "Create quotes and track their status.",
+    "Créer des offres et suivre leur statut.",
+    "Creare offerte e seguirne lo stato."
+  ],
+  "Rechnungen erstellen und offene Beträge verfolgen.": [
+    "Create invoices and track outstanding amounts.",
+    "Créer des factures et suivre les montants ouverts.",
+    "Creare fatture e seguire gli importi aperti."
+  ],
+  "Zahlungseingänge erfassen und Rechnungen zuordnen.": [
+    "Record incoming payments and match invoices.",
+    "Saisir les encaissements et les affecter aux factures.",
+    "Registrare gli incassi e associarli alle fatture."
+  ],
+  "Produkte, Leistungen und Preise verwalten.": [
+    "Manage products, services and prices.",
+    "Gérer les produits, prestations et prix.",
+    "Gestire prodotti, servizi e prezzi."
+  ],
+  "Arbeitszeiten erfassen und Einträge verwalten.": [
+    "Track working time and manage entries.",
+    "Saisir le temps de travail et gérer les entrées.",
+    "Registrare le ore di lavoro e gestire le registrazioni."
+  ],
+  "Aufträge, Projekte und erfasste Zeiten verwalten.": [
+    "Manage jobs, projects and tracked time.",
+    "Gérer les mandats, projets et temps saisis.",
+    "Gestire incarichi, progetti e ore registrate."
+  ],
+  "Ausgaben und Belege erfassen und verwalten.": [
+    "Record and manage expenses and receipts.",
+    "Saisir et gérer les frais et justificatifs.",
+    "Registrare e gestire spese e giustificativi."
+  ],
+  "Belege erfassen und verwalten.": [
+    "Record and manage receipts.",
+    "Saisir et gérer les justificatifs.",
+    "Registrare e gestire i giustificativi."
+  ],
+  "Umsatz, offene Forderungen und Zahlungen im Blick.": [
+    "Revenue, receivables and payments at a glance.",
+    "Chiffre d’affaires, créances et paiements en un coup d’œil.",
+    "Ricavi, crediti aperti e pagamenti a colpo d’occhio."
+  ],
+  "Finanzentwicklung nach Zeitraum auswerten.": [
+    "Analyse financial trends by period.",
+    "Analyser l’évolution financière par période.",
+    "Analizzare l’andamento finanziario per periodo."
+  ],
+  "Geschäftszahlen auswerten und Berichte erstellen.": [
+    "Analyse business figures and create reports.",
+    "Analyser les chiffres et créer des rapports.",
+    "Analizzare i dati aziendali e creare rapporti."
+  ],
+  "Mitarbeiter und ihre Geschäftsdaten verwalten.": [
+    "Manage employees and their business details.",
+    "Gérer les collaborateurs et leurs données professionnelles.",
+    "Gestire collaboratori e dati professionali."
+  ],
+  "Support-Anfragen erstellen und Antworten verfolgen.": [
+    "Create support requests and follow replies.",
+    "Créer des demandes d’assistance et suivre les réponses.",
+    "Creare richieste di assistenza e seguire le risposte."
+  ],
+  "Aktuelle Hinweise und wichtige Ereignisse im Blick.": [
+    "Keep track of notices and important events.",
+    "Suivre les notifications et événements importants.",
+    "Seguire notifiche ed eventi importanti."
+  ],
+  "Konto, Unternehmen und Anwendung einrichten.": [
+    "Set up your account, company and application.",
+    "Configurer le compte, l’entreprise et l’application.",
+    "Configurare account, azienda e applicazione."
+  ],
+  "Dein Konto und deine Profildaten verwalten.": [
+    "Manage your account and profile details.",
+    "Gérer votre compte et votre profil.",
+    "Gestire account e dati del profilo."
+  ],
+  "Unternehmensdaten für Dokumente und Kommunikation pflegen.": [
+    "Maintain company details for documents and communications.",
+    "Tenir à jour les coordonnées de l’entreprise pour les documents et communications.",
+    "Aggiornare i dati aziendali per documenti e comunicazioni."
+  ],
+  "Teamzugänge und Rollen verwalten.": [
+    "Manage team access and roles.",
+    "Gérer les accès et rôles de l’équipe.",
+    "Gestire accessi e ruoli del team."
+  ],
+  "Anmeldung und Kontosicherheit verwalten.": [
+    "Manage sign-in and account security.",
+    "Gérer la connexion et la sécurité du compte.",
+    "Gestire accesso e sicurezza dell’account."
+  ],
+  "Plan, Nutzung und Abrechnung verwalten.": [
+    "Manage your plan, usage and billing.",
+    "Gérer le plan, l’utilisation et la facturation.",
+    "Gestire piano, utilizzo e fatturazione."
+  ],
+  "Vorgaben für Rechnungen und Dokumente festlegen.": [
+    "Set defaults for invoices and documents.",
+    "Définir les paramètres des factures et documents.",
+    "Definire le impostazioni per fatture e documenti."
+  ],
+  "Vorgaben für die Zeiterfassung festlegen.": [
+    "Set time-tracking defaults.",
+    "Définir les paramètres de saisie du temps.",
+    "Definire le impostazioni della registrazione ore."
+  ],
+  "Festlegen, wie du informiert wirst.": [
+    "Choose how you receive notifications.",
+    "Choisir comment recevoir les notifications.",
+    "Scegliere come ricevere le notifiche."
+  ],
+  "Sprache der Benutzeroberfläche wählen.": [
+    "Choose the interface language.",
+    "Choisir la langue de l’interface.",
+    "Scegliere la lingua dell’interfaccia."
+  ],
+  "Light-, Dark- oder Systemdarstellung wählen.": [
+    "Choose light, dark or system appearance.",
+    "Choisir le thème clair, sombre ou système.",
+    "Scegliere il tema chiaro, scuro o di sistema."
+  ],
+  "Datenschutzeinstellungen und Cookies verwalten.": [
+    "Manage privacy settings and cookies.",
+    "Gérer les paramètres de confidentialité et les cookies.",
+    "Gestire privacy e cookie."
+  ],
+  "Kunde oder interne Arbeit wählen, bei Bedarf ein Projekt zuordnen und Zeit starten.": [
+    "Choose a customer or internal work, optionally assign a project, then start tracking.",
+    "Choisir un client ou un travail interne, associer un projet si nécessaire et démarrer le suivi.",
+    "Scegliere un cliente o lavoro interno, assegnare un progetto se necessario e avviare il timer."
   ]
 }

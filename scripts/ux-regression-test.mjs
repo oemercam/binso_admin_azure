@@ -223,18 +223,19 @@ console.log('Project-linked idle timer context survives synchronization without 
  try{
   Function('require','exports','useState','useRef','useEffect','useRouter','useSearchParams','useBackendMode','isProductionBackendEnabled','apiGet','apiPost','apiPatch','appendDemoRow','AppShell','Button','Field','Toast','Icon','Status','Link','SectionTitle','EmptyState','businessDate','Input','Select','Textarea','FormActions','FormWizard','Avatar','useDirtySnapshot','sumMoney','useDataRevision','useApiQuery','FormSheet','allowDraftNavigation','useProcessDraft','ErrorState','FormSection','safeAppPath',compiled)(createRequire(import.meta.url),exports,initial=>{const index=hook++;return [Object.hasOwn(values,index)?values[index]:typeof initial==='function'?initial():initial,()=>{}]},initial=>({current:initial}),()=>{},()=>({push:path=>navigations.push(path)}),()=>({get:() =>'/dashboard'}),()=>true,()=>true,()=>{},write,write,()=>{throw Error('preview');},()=>null,()=>null,()=>null,Toast,()=>null,()=>null,()=>null,()=>null,()=>null,()=> '2026-10-07','input','select','textarea',({children})=>children,()=>null,()=>null,()=>{hook++;return {dirty:false,markPristine:()=>{}}},(await import(moneyModuleUrl)).sumMoney,()=> '',()=>({loading:false,error:null,data:undefined,refresh:()=>{}}),()=>null,()=>{},()=>({ready:true,persist:()=>{},clear:()=>{}}),FormError,({children})=>children,(value,fallback)=>typeof value==='string'&&value.startsWith('/')&&!value.startsWith('//')?value:fallback);
   for(const [name,seeds,toastIndex] of [['CustomerForm',{0:'Audit GmbH',1:'Synthetic',2:'Contact'},12],['ProductForm',{0:'Beratung',4:'125.00'},8],['EmployeeForm',{0:'Test',1:'Person',2:'test@example.invalid',4:'ICT'},13]]){
-   values=seeds;hook=0;calls=0;scheduled.length=0;
+   values=seeds;hook=0;calls=0;scheduled.length=0;navigations.length=0;
    const getSave=view=>{if(view?.props?.onSubmit)return ()=>view.props.onSubmit({preventDefault(){}});if(view?.props?.onClick&&/speichern/i.test(renderToStaticMarkup(React.createElement(React.Fragment,null,view.props.children))))return view.props.onClick;for(const child of [view?.props?.action,view?.props?.actions,...React.Children.toArray(view?.props?.children)]){const found=child&&getSave(child);if(found)return found;}return null;};
    const view=exports[name]({});const save=getSave(view);assert.ok(save,name+' has one reachable save action');
    const first=save(),second=save();await second;assert.equal(calls,1,name+' must reject duplicate submissions immediately');resolveSave({ok:true,item:{id:"fixture-saved"}});await first;await save();assert.equal(calls,1,name+' remains locked until successful navigation');
    scheduled.forEach(fn=>fn());
+   if(name==='CustomerForm')assert.deepEqual(navigations,['/kunden/fixture-saved'],'New customer opens its saved dossier, including creation from quick access');
    values={...seeds,[toastIndex]:'Server nicht erreichbar.'};hook=0;
    const errorView=exports[name]({});if(name==='CustomerForm'){const findError=view=>view?.type===FormError?view:React.Children.toArray(view?.props?.children).map(findError).find(Boolean);assert.equal(findError(errorView)?.props.children,'Server nicht erreichbar.','Customer errors remain inside the shared sheet');assert.equal(errorView.props.children.filter(child=>child?.type===Toast).length,0,'No customer error is rendered as a success toast');}else assert.equal(errorView.props.children.find(child=>child?.type===Toast).props.tone,'danger',name+' must not render an error as success');
    values=seeds;hook=0;calls=0;
    const retry=getSave(exports[name]({}));
    const failed=retry();rejectSave(new Error('offline'));await failed;const again=retry();assert.equal(calls,2,name+' can retry a failed mutation');resolveSave({ok:true,item:{id:"fixture-saved"}});await again;
   }
-  assert.ok(navigations.includes('/dashboard'),'Customer created from quick access returns to the dashboard');
+
   values={};hook=0;
   console.log('Real form handlers prevent double saves, permit failure retries, preserve return context and render error toasts.');
  }finally{if(originalWindow===undefined)delete globalThis.window;else globalThis.window=originalWindow;}
