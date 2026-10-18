@@ -956,7 +956,7 @@ try{
     await page.setViewportSize({width,height:740});await navigate(base+'/dashboard');await page.waitForLoadState('networkidle');
     const create=page.getByRole('button',{name:'Neu erstellen',exact:true}).filter({visible:true});
     const size=await create.boundingBox();
-    if(width<=760){assert.equal(size.width,44,'Mobile creation has a real 44px touch target');assert.equal(size.height,size.width);}else{assert.ok(size.width>size.height,'Desktop creation exposes its visible text label');assert.equal(size.height,40);}
+    if(width<=760){assert.equal(size.width,44,'Mobile creation has a real 44px touch target');assert.equal(size.height,size.width);}else{assert.ok(size.width>size.height,'Desktop creation exposes its visible text label');assert.equal(size.height,await page.evaluate(()=>matchMedia('(pointer:coarse)').matches)?44:40,'Desktop creation retains the exact pointer-appropriate action height');}
     await create.click();const menu=page.getByRole('dialog',{name:'Neu erstellen',exact:true});
     assert.deepEqual(await menu.locator('.action-row>span').allTextContents(),['Kunde','Angebot','Rechnung','Zeit erfassen','Projekt','Zahlung','Spese','Produkt','Mitarbeiter','Support-Anfrage']);
     assert.equal(await page.getByRole('button',{name:'Weiter',exact:true}).count(),0,'Opening global plus never starts an invoice wizard');
