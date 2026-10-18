@@ -284,7 +284,7 @@
   min-height:54px;
   padding:5px;
   display:grid;
-  grid-template-columns:42px minmax(0,1fr) 42px;
+  grid-template-columns:var(--touch) minmax(0,1fr) var(--touch);
   align-items:center;
   border:1px solid var(--color-line);
   border-radius:var(--shape-panel);
@@ -310,7 +310,8 @@
   outline:0;
   box-shadow:none;
 }
-.thread-composer button{width:40px;height:40px;display:grid;place-items:center;border:0;border-radius:var(--shape-medium);background:transparent}
+.thread-composer button{width:var(--touch);height:var(--touch);display:grid;place-items:center;border:0;border-radius:var(--shape-medium);background:transparent}
+.thread-composer>.icon-button{width:var(--touch);height:var(--touch);min-height:var(--touch)}
 .thread-composer button:last-child{background:var(--color-inverse-bg);color:var(--color-inverse-fg)}
 .attachment-button{
   min-height:48px;
@@ -910,7 +911,7 @@ a{-webkit-tap-highlight-color:transparent}
 .entity-edit-workspace{display:block}
 .thread-composer{
     min-height:104px;
-    grid-template-columns:44px minmax(0,1fr) 44px;
+    grid-template-columns:var(--touch) minmax(0,1fr) var(--touch);
     gap:4px;
     padding:8px;
     border-radius:var(--shape-feature);
@@ -919,7 +920,7 @@ a{-webkit-tap-highlight-color:transparent}
   }
 .thread-composer textarea{grid-column:1/-1;grid-row:1;width:100%;font-size:var(--type-subheading);line-height:1.5;background:transparent;color:var(--color-fg);overflow-y:auto}
 .thread-composer>label{grid-column:1;grid-row:2;align-self:end}
-.thread-composer>button:last-child{grid-column:3;grid-row:2;width:40px;height:40px;border-radius:50%;background:var(--app-action-accent);color:var(--palette-fff)}
+.thread-composer>button:last-child{grid-column:3;grid-row:2;border-radius:50%;background:var(--app-action-accent);color:var(--palette-fff)}
 .thread-composer>button:last-child:disabled{opacity:.45}
 .thread-composer>button:last-child>svg{transform:rotate(-90deg)}
 .desktop-back{display:none}

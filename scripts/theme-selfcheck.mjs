@@ -50,5 +50,34 @@ window.matchMedia=()=>({matches:true});initializeTheme();assert.equal(document.d
 window.matchMedia=()=>({matches:false});initializeTheme('system');
 let reads=0;globalThis.__themeRead=()=>{reads++;return new Promise(resolve=>{resolveRead=resolve})};
 const readOne=loadTheme(),readTwo=loadTheme();await new Promise(resolve=>setImmediate(resolve));assert.equal(reads,1,'Concurrent profile readers share one request');resolveRead({item:{theme:'system'}});await Promise.all([readOne,readTwo]);
+// Suspended PWAs/BFCache documents can miss the OS media change event. Resume
+// must resolve the current preference, while explicit choices remain explicit.
+const runtimeSource=(await fs.readFile('components/theme-runtime.tsx','utf8'))
+ .replace("import {useEffect} from 'react';",'')
+ .replace("import {applyTheme} from '@/lib/client/theme';",'');
+const runtimeCompiled=ts.transpileModule(runtimeSource,{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText;
+const eventTarget=()=>{const listeners=new Map();return {listeners,addEventListener:(name,fn)=>listeners.set(name,fn),removeEventListener:(name,fn)=>{if(listeners.get(name)===fn)listeners.delete(name)},fire:name=>listeners.get(name)?.()};};
+const runtimeWindow=eventTarget(),runtimeDocument=eventTarget(),media=eventTarget();
+let cleanup,osDark=false;
+Object.assign(runtimeDocument,{head:{},visibilityState:'visible',documentElement:{dataset:{themeMode:'system',theme:'light'}},querySelectorAll:()=>[]});
+runtimeWindow.matchMedia=()=>({...media,matches:osDark});
+class Observer{observe(){}disconnect(){}}
+const runtimeExports={};
+Function('exports','useEffect','applyTheme','window','document','MutationObserver',runtimeCompiled)(runtimeExports,fn=>cleanup=fn(),mode=>{
+ runtimeDocument.documentElement.dataset.themeMode=mode;
+ runtimeDocument.documentElement.dataset.theme=mode==='system'?(osDark?'dark':'light'):mode;
+},runtimeWindow,runtimeDocument,Observer);
+runtimeExports.ThemeRuntime();
+osDark=true;runtimeWindow.fire('pageshow');
+assert.equal(runtimeDocument.documentElement.dataset.theme,'dark','Restored PWA resolves an OS change missed while suspended');
+osDark=false;runtimeDocument.visibilityState='hidden';runtimeDocument.fire('visibilitychange');
+assert.equal(runtimeDocument.documentElement.dataset.theme,'dark','Hidden documents do not reapply their theme');
+runtimeDocument.visibilityState='visible';runtimeDocument.fire('visibilitychange');
+assert.equal(runtimeDocument.documentElement.dataset.theme,'light','Foreground PWA resolves the current system theme');
+runtimeDocument.documentElement.dataset.themeMode='dark';osDark=false;runtimeWindow.fire('pageshow');
+assert.equal(runtimeDocument.documentElement.dataset.theme,'dark','Resume never replaces an explicit dark preference');
+runtimeDocument.documentElement.dataset.themeMode='light';osDark=true;runtimeWindow.fire('pageshow');
+assert.equal(runtimeDocument.documentElement.dataset.theme,'light','Resume never replaces an explicit light preference');
+cleanup();assert.equal(runtimeWindow.listeners.size,0);assert.equal(runtimeDocument.listeners.size,0);assert.equal(media.listeners.size,0,'All theme lifecycle listeners are removed');
 for(const key of ['__themeWrite','__themeRead','localStorage','document','window','CustomEvent'])delete globalThis[key];
 console.log('Theme ownership, reload resolver and stale profile response checks passed.');

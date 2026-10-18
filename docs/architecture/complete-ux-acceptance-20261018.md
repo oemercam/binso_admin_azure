@@ -1,5 +1,71 @@
 # Complete Microsoft UX — acceptance ledger
 
+## Whole-product review requested after the navigation package
+
+The owner requested coverage of every page, subpage, shared component, graphic,
+authentication flow, startup, navigation, chat and mobile/desktop PWA behavior.
+Continue on `ux/complete-microsoft-experience`, in the existing PR #279. This is
+an extension of the same implementation, not another foundation. Deployment is
+deferred while this review is incomplete; previous green CI belongs to a1169b32
+and must not be attributed to subsequent changes.
+
+| Area | Existing central owners / checks | Remaining acceptance evidence |
+| --- | --- | --- |
+| All 76 source routes and operator variants | Existing route ledger below, page matrix, UX/integration inventories and `ux-contract-check` | Per-family original-versus-rendered comparison; development lab and redirect cannot be claimed as directly measured runtime pages |
+| Margins, font sizes, rhythm, icons and header | theme/layout/primitives owners, UI/style/navigation contracts, responsive matrix | Current-head Light/Dark captures; text enlargement, zoom and narrow landscape on target devices |
+| Navigation, dialogs, tabs and page transitions | Persistent AppShell, shared controls, focus/draft/back guards, navigation and functional browser tests | Real installed app back/resume, physical keyboard and assistive technology |
+| Login, MFA, registration and recovery | auth-workspace/auth CSS, auth and registration browser suites | Real production SSO and device password-manager behavior; fixture login is not production identity evidence |
+| Startup and data loading | AppStart with original icon, RouteLoading, query/session owners, loading browser test | Device cold/warm start timings, interrupted network and resume on actual hardware |
+| System/Light/Dark | initializeTheme/ThemeRuntime and theme selfcheck | Resume now re-resolves current OS theme; screenshots alone do not prove physical PWA behavior |
+| Chat and keyboard | Existing support/operator composition, workflows CSS, useWorkspaceViewport, chat/browser and PWA lifecycle tests | OS keyboard/dictation/IME, installed iOS/iPadOS app and external keyboard |
+| Charts and financial documents | Statistics/document owners and financial/document regression suites | Reference comparison plus screen-reader reading order; preserve real amounts and currencies |
+| Offline/install/update and Apple insets | Existing manifests, PwaRegister/service worker, viewport-fit and safe-area tokens, PWA browser/lifecycle tests | Actual installation/update/offline recovery on supported iOS/Android; no cached business data or draft-destroying reload |
+| Legacy removal and central ownership | Existing architecture/CSS/import-graph contracts and generators | Remove only demonstrated unused implementations; historical references and required fallbacks remain evidence, not active design rules |
+
+Declared browser targets in package.json include Chromium/Edge, Firefox,
+Safari/iOS and Samsung Internet. Existing automated full integration uses
+Chromium and WebKit. This does not establish Firefox, real Safari, Samsung
+Internet, every browser version or every hardware combination. Those remain
+explicit acceptance gaps, not green by inference. No Apple certification or
+universal hardware compatibility is claimed.
+
+### Reproduced lifecycle and chat defects
+
+- Theme: a suspended/restored document could retain the old system theme when
+  the OS changed without delivering a media event. The existing ThemeRuntime
+  now re-resolves on visible resume/pageshow and preserves explicit choices.
+  The regression failed before the change; system/explicit/hidden/cleanup
+  cases pass after it. No profile write or forced reload was introduced.
+- Chat: viewport dimensions could remain stale after document restoration or
+  window resize without a visualViewport event. The existing viewport hook now
+  refreshes on resize and visible resume, keeps the visual viewport authoritative
+  for keyboard offsets, and removes every listener/scroll override on cleanup.
+  Both visualViewport and innerHeight-only regressions are covered.
+- Chat send control: the rendered 390px case failed the new 44px touch-target
+  assertion. The existing workflows owner now uses the central --touch token
+  for grid tracks and button bounds instead of 40/42px values. Existing send,
+  upload, draft, scrolling and permission behavior is unchanged. Current-head
+  browser results: four isolated customer chat cases (390/1440px, Light/Dark)
+  passed with both attachment/send targets at least 44px. A negative control in
+  the existing functional suite shrinks the send target to its old 40px size and
+  requires rejection; full new-head CI execution remains pending.
+
+Existing a1169b32 CI captures were downloaded from run 39115792157, with the
+published SHA256 artifact digests verified. Overview sheets were inspected for
+82 route/variant filenames at each of 390 and 1440px, including all settings,
+auth, forms, finance, lists/details, operator, public/legal and chat families.
+These are fixture screenshots of the previous head; overview inspection is not
+a detailed equal-width pixel comparison or owner approval. The current fixes do
+not replace that evidence with a fabricated production acceptance. The existing
+loading browser suite now covers desktop 1440px as well as mobile 390px, both
+themes, preserving all cold/refresh/slow/reopen/session and navigation assertions.
+
+Standards used to assess implementation, without replacing the approved visual
+reference: [Microsoft PWA best practices](https://learn.microsoft.com/en-gb/microsoft-edge/progressive-web-apps/how-to/best-practices),
+[WebKit safe-area guidance](https://webkit.org/blog/7929/designing-websites-for-iphone-x/)
+and [WCAG 2.2](https://www.w3.org/TR/WCAG22/). The product's 44px touch contract
+is retained; it must not be confused with a claim of a complete WCAG audit.
+
 ## Resolved mobile material decision
 
 The owner explicitly selected flat white Microsoft mobile navigation. The shared

@@ -16,7 +16,7 @@ import {assertCustomerDossier,verifyCustomerStates} from './customer-ux-browser.
 import {assertNavigationToggle,verifyNavigationPersistence,assertFlatMobileNavigation,verifyFlatNavigationAdversaries} from './navigation-ux-browser.mjs';
 import {verifyPreviewControls} from './document-controls-browser.mjs';
 import {verifyTimeWorkspace} from './time-workspace-browser.mjs';
-import {assertMobileHeaderTargets,verifyHeaderTargetRegression,waitForFiniteAnimations} from './shared-control-browser.mjs';
+import {assertMobileHeaderTargets,assertChatTargets,verifyHeaderTargetRegression,waitForFiniteAnimations} from './shared-control-browser.mjs';
 
 // Synthetic UI fixtures: real business/RLS integration is covered by migration-test.mjs.
 // No request reaches a production system; unhandled fixture APIs fail closed.
@@ -459,6 +459,7 @@ try{
     }
     if(!process.env.BINSO_UX_BASELINE&&route==='/mitarbeiter/employee-one'){await page.locator('.detail-list').getByText(employee.email,{exact:true}).waitFor();assert.equal(await page.locator('.entity-detail-workspace .settings-profile').count(),0,'The original employee dossier does not repeat its identity in a profile card')}
     if(!process.env.BINSO_UX_BASELINE&&route==='/support/ticket-one'){
+      await assertChatTargets(page);
       await withNavigationPreferenceLock(async()=>{
        if(width>=761){await page.waitForFunction(()=>document.querySelector('.desktop-navigation-toggle')?.getAttribute('aria-expanded')==='true');await waitForFiniteAnimations(page);}
        const before=await page.locator('.thread-composer').boundingBox();await page.locator('.thread-messages').evaluate(el=>{el.scrollTop=0});const after=await page.locator('.thread-composer').boundingBox();assert.deepEqual(after,before,'Only messages scroll; composer stays fixed');
@@ -909,6 +910,13 @@ try{
   await page.setViewportSize({width:390,height:740});await navigate(base+'/support/neu');await page.waitForLoadState('networkidle');const supportForm=page.getByRole('dialog',{name:'Neue Support-Anfrage',exact:true});await supportForm.waitFor();await supportForm.getByLabel('Betreff',{exact:true}).fill('Keyboard draft');await supportForm.getByLabel('Nachricht',{exact:true}).fill('Preserved message');
   await page.setViewportSize({width:390,height:400});await supportForm.getByLabel('Nachricht',{exact:true}).focus();await settleLayout(page);const supportFooter=await supportForm.locator('.sheet-form-footer').boundingBox();assert.ok(supportFooter.y+supportFooter.height<=400,'Native support form actions remain above the keyboard');assert.equal(await supportForm.getByLabel('Betreff',{exact:true}).inputValue(),'Keyboard draft');const focus=await supportForm.getByLabel('Nachricht',{exact:true}).evaluate(el=>({shadow:getComputedStyle(el).boxShadow,offset:getComputedStyle(el).outlineOffset}));assert.equal(focus.shadow,'none');assert.equal(focus.offset,'-2px','Single inset outline replaces competing focus rings');await supportForm.getByRole('button',{name:'Schliessen',exact:true}).click();await page.getByRole('button',{name:'Änderungen verwerfen',exact:true}).click();
   await page.setViewportSize({width:375,height:400});await page.waitForLoadState('networkidle');await navigate(base+'/support/ticket-one');await page.waitForLoadState('networkidle');
+  await assertChatTargets(page);
+  const sendTarget=page.locator('.thread-composer>button:last-child'),sendStyle=await sendTarget.getAttribute('style');
+  try{
+   await sendTarget.evaluate(el=>{el.style.setProperty('width','40px','important');el.style.setProperty('min-width','0','important')});
+   await assert.rejects(()=>assertChatTargets(page),/44px touch targets/,'The historical undersized chat control must be rejected');
+  }finally{await sendTarget.evaluate((el,style)=>style===null?el.removeAttribute('style'):el.setAttribute('style',style),sendStyle);}
+  await assertChatTargets(page);
   await page.getByLabel('Nachricht',{exact:true}).focus();const composer=await page.locator('.thread-composer').boundingBox(),chatHeader=await page.locator('.mobile-header').boundingBox();assert.ok(composer.y>=chatHeader.y+chatHeader.height&&composer.y+composer.height<=400,'Short chat viewport retains header and input');
   const sendsBeforeNewline=messagePosts;
   await page.getByLabel('Nachricht',{exact:true}).fill('First line');await page.getByLabel('Nachricht',{exact:true}).press('Enter');await page.getByLabel('Nachricht',{exact:true}).pressSequentially('Second line');

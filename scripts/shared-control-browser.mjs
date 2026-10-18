@@ -33,6 +33,15 @@ export async function assertMobileHeaderTargets(page){
  return targets;
 }
 
+export async function assertChatTargets(page){
+ const targets=page.locator('.thread-composer>label,.thread-composer>button').filter({visible:true});
+ assert.ok(await targets.count()>=2,'Chat exposes attachment and send controls');
+ for(const target of await targets.all()){
+  const box=await target.boundingBox();
+  assert.ok(box.width>=44&&box.height>=44,`Chat actions retain at least 44px touch targets (${await target.getAttribute('aria-label')}: ${box.width}×${box.height})`);
+ }
+}
+
 export async function verifyHeaderTargetRegression(page){
  await verifyAnimationStabilityRegression(page);
  const targets=await assertMobileHeaderTargets(page);

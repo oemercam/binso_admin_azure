@@ -31,4 +31,28 @@ swEvents.message({origin:'https://other.invalid',source:{type:'window'},data:{ty
 swEvents.message({origin:'https://fixture.invalid',source:{type:'worker'},data:{type:'SKIP_WAITING'}});
 swEvents.message({data:{type:'SKIP_WAITING'}});assert.equal(skip,0,'Foreign origins and non-window senders cannot activate the worker');
 swEvents.message({origin:'https://fixture.invalid',source:{type:'window'},data:{type:'SKIP_WAITING'}});assert.equal(skip,1,'The actual same-origin application can silently activate its waiting worker');
-console.log('Silent PWA lifecycle: first install, waiting/new updates, resume checks, no UI/reloads, late registration and listener cleanup passed.');
+const viewportSource=(await fs.readFile('components/use-workspace-viewport.ts','utf8')).replace('import {useEffect} from "react";','');
+const viewportCompiled=ts.transpileModule(viewportSource,{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText;
+for(const hasVisualViewport of [true,false]){
+ const browser=target(),visual=target(),doc=target(),properties=new Map();let dispose;
+ const rootStyle={overflow:'auto',setProperty:(key,value)=>properties.set(key,value),removeProperty:key=>properties.delete(key)};
+ Object.assign(browser,{innerHeight:844,visualViewport:hasVisualViewport?Object.assign(visual,{height:700,offsetTop:0}):undefined});
+ Object.assign(doc,{visibilityState:'visible',documentElement:{style:rootStyle},body:{style:{overflow:'scroll'}}});
+ const hook={};
+ // Use an actual global binding for the existing innerHeight browser fallback.
+ const sandbox={exports:hook,useEffect:fn=>dispose=fn(),window:browser,document:doc};
+ Object.defineProperty(sandbox,'innerHeight',{get:()=>browser.innerHeight});
+ vm.runInNewContext(viewportCompiled,sandbox);hook.useWorkspaceViewport();
+ assert.equal(properties.get('--workspace-viewport-height'),hasVisualViewport?'700px':'844px');
+ browser.innerHeight=600;visual.height=450;visual.offsetTop=12;
+ browser.fire('resize');
+ assert.equal(properties.get('--workspace-viewport-height'),hasVisualViewport?'450px':'600px','Chat resizes with both visual and window-only viewport APIs');
+ if(hasVisualViewport){visual.height=300;visual.offsetTop=25;visual.fire('resize');assert.equal(properties.get('--workspace-viewport-top'),'25px');assert.equal(properties.get('--workspace-viewport-height'),'300px','Keyboard viewport remains authoritative');}
+ browser.innerHeight=900;visual.height=800;visual.offsetTop=0;browser.fire('pageshow');
+ assert.equal(properties.get('--workspace-viewport-height'),hasVisualViewport?'800px':'900px','Restored chat refreshes stale viewport dimensions');
+ browser.innerHeight=950;visual.height=850;doc.visibilityState='hidden';doc.fire('visibilitychange');
+ assert.equal(properties.get('--workspace-viewport-height'),hasVisualViewport?'800px':'900px','Hidden chat does not recalculate');
+ doc.visibilityState='visible';doc.fire('visibilitychange');assert.equal(properties.get('--workspace-viewport-height'),hasVisualViewport?'850px':'950px');
+ dispose();assert.equal(rootStyle.overflow,'auto');assert.equal(doc.body.style.overflow,'scroll');assert.equal(properties.size,0);assert.equal(browser.listeners.size,0);assert.equal(doc.listeners.size,0);assert.equal(visual.listeners.size,0,'Chat releases all viewport lifecycle listeners');
+}
+console.log('PWA lifecycle: silent updates, no draft reload, safe activation, theme-independent chat viewport resume/fallback and cleanup passed.');

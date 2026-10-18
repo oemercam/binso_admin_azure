@@ -14,6 +14,12 @@ export function ThemeRuntime(){
   metadataObserver.observe(document.head,{childList:true,subtree:true,attributes:true,attributeFilter:['content']});
   const media=window.matchMedia('(prefers-color-scheme: dark)');
   const systemChanged=()=>{if(document.documentElement.dataset.themeMode==='system')applyTheme('system');};
+  const resume=()=>{
+   if(document.visibilityState!=='visible')return;
+   const selected=document.documentElement.dataset.themeMode;
+   applyTheme(selected==='light'||selected==='dark'?selected:'system');
+   syncMeta();
+  };
   const storedChanged=(event:StorageEvent)=>{
    if(event.key!=='binso.theme.mode'&&event.key!==null)return;
    const mode=event.newValue;
@@ -23,7 +29,9 @@ export function ThemeRuntime(){
   applyTheme(mode==='light'||mode==='dark'?mode:'system');
   media.addEventListener('change',systemChanged);
   window.addEventListener('storage',storedChanged);
-  return()=>{metadataObserver.disconnect();media.removeEventListener('change',systemChanged);window.removeEventListener('storage',storedChanged);};
+  window.addEventListener('pageshow',resume);
+  document.addEventListener('visibilitychange',resume);
+  return()=>{metadataObserver.disconnect();media.removeEventListener('change',systemChanged);window.removeEventListener('storage',storedChanged);window.removeEventListener('pageshow',resume);document.removeEventListener('visibilitychange',resume);};
  },[]);
  return null;
 }

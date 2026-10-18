@@ -10,8 +10,8 @@ const base=process.env.BINSO_BASE_URL??'http://127.0.0.1:3360';let server,logs='
 if(!process.env.BINSO_BASE_URL){server=spawn(process.execPath,process.env.BINSO_UX_SERVER_FILE?[process.env.BINSO_UX_SERVER_FILE]:['node_modules/next/dist/bin/next','start','--hostname','127.0.0.1','--port','3360'],{env:{...process.env,PORT:'3360',HOSTNAME:'127.0.0.1'},stdio:['ignore','pipe','pipe']});server.stdout.on('data',v=>logs+=v);server.stderr.on('data',v=>logs+=v);for(let i=0;;i++){try{if((await fetch(base+'/api/health')).ok)break;}catch{}if(i===100||server.exitCode!==null)throw Error(logs);await new Promise(r=>setTimeout(r,100));}}
 const browser=await engines[process.env.BINSO_UX_BROWSER??'webkit'].launch({headless:true});const results=[];
 try{
- for(const theme of ['light','dark']){
-  const context=await browser.newContext({viewport:{width:390,height:844},colorScheme:theme,reducedMotion:theme==='dark'?'reduce':'no-preference',serviceWorkers:'block'});
+ for(const viewport of [{width:390,height:844},{width:1440,height:1000}])for(const theme of ['light','dark']){
+  const context=await browser.newContext({viewport,colorScheme:theme,reducedMotion:theme==='dark'?'reduce':'no-preference',serviceWorkers:'block'});
   await context.addCookies([{name:'binso_demo',value:'1',url:base}]);let authCalls=0,delay=350,authMode='valid',showCustomer=false;const calls={};
   await context.route('**/api/**',async route=>{const p=new URL(route.request().url()).pathname;calls[p]=(calls[p]||0)+1;
    if(p==='/api/auth/session'){authCalls++;await new Promise(r=>setTimeout(r,delay));return route.fulfill({status:authMode==='error'?503:200,json:authMode==='error'?{message:'Initialisierung fehlgeschlagen'}:authMode==='expired'?{authenticated:false}:{authenticated:true,demo:false,tenant:{id:'fixture',role:'owner',plan:'pro'}}});}
@@ -29,19 +29,19 @@ try{
    const frames=await page.evaluate(()=>window.loadingFrames),readyFrame=frames.find(f=>f.content.includes(ready)&&!f.phase.includes('.app-launch-screen')&&!f.phase.includes('.app-launch'));
    const phases=[...new Set(frames.map(f=>f.phase.join(',')))];const durations={};
    for(let i=0;i<frames.length-1;i++)for(const phase of frames[i].phase)if(phase!=='.app-root')durations[phase]=(durations[phase]||0)+frames[i+1].at-frames[i].at;
-   const row={theme,label,firstMeaningfulMs:readyFrame?.at,contentReadyMs:frames.find(f=>f.content.includes(ready))?.at,authRequests:authCalls-before,requests:Object.fromEntries(Object.entries(calls).map(([p,n])=>[p,n-(requestsBefore[p]||0)]).filter(([,n])=>n)),phases,loaderDurationMs:durations,startup:frames.find(f=>f.iconWidth)};results.push(row);
+   const row={theme,viewport,label,firstMeaningfulMs:readyFrame?.at,contentReadyMs:frames.find(f=>f.content.includes(ready))?.at,authRequests:authCalls-before,requests:Object.fromEntries(Object.entries(calls).map(([p,n])=>[p,n-(requestsBefore[p]||0)]).filter(([,n])=>n)),phases,loaderDurationMs:durations,startup:frames.find(f=>f.iconWidth)};results.push(row);
    if(!baseline){assert(!phases.some(p=>p.includes('.app-session-loading')||p.split(',').includes('.app-launch')),'No retired/sequential start loader');assert.equal(row.authRequests,1,'One fresh auth check per page startup');}
-   await page.screenshot({path:output+'/'+theme+'-'+label+'.png'});
+   await page.screenshot({path:output+'/'+theme+'-'+viewport.width+'-'+label+'.png'});
   }
   await measure('cold',()=>page.goto(base+'/kunden'));
   assert.equal(await page.locator('.records-inline-controls').count(),1,'The allowed customer controls are actually mounted before the expiry check');
   if(!baseline)assert.equal(await page.locator('link[rel="manifest"]').getAttribute('href'),'/manifest-app.webmanifest','Actual customer routes use the app manifest');
-  if(!baseline){const startup=results.at(-1).startup;assert.equal(startup?.iconWidth,72);assert.equal(startup?.iconAnimation,theme==='dark'?'none':'binso-start');}
+  if(!baseline){const startup=results.at(-1).startup;assert.equal(startup?.iconWidth,viewport.width<=760?72:80);assert.equal(startup?.iconAnimation,theme==='dark'?'none':'binso-start');}
   await measure('refresh',()=>page.reload());
   await page.evaluate(()=>{window.shellBefore=document.querySelector('.app-root');window.navBefore=document.querySelector('.bottom-nav');window.loadingFrames=[];});const beforeNav=authCalls,navCalls={...calls};
   const start=await page.evaluate(()=>performance.now());await page.locator('.app-sidebar a[href="/produkte"]').evaluate(el=>el.click());await page.getByText('Keine Produkte erfasst',{exact:true}).waitFor();
   const navigation=await page.evaluate(t=>({ms:performance.now()-t,shellPreserved:window.shellBefore===document.querySelector('.app-root'),navigationPreserved:window.navBefore===document.querySelector('.bottom-nav'),phases:[...new Set(window.loadingFrames.map(f=>f.phase.join(',')))]}),start);
-  results.push({theme,label:'navigation',...navigation,authRequests:authCalls-beforeNav,requests:Object.fromEntries(Object.entries(calls).map(([p,n])=>[p,n-(navCalls[p]||0)]).filter(([,n])=>n))});
+  results.push({theme,viewport,label:'navigation',...navigation,authRequests:authCalls-beforeNav,requests:Object.fromEntries(Object.entries(calls).map(([p,n])=>[p,n-(navCalls[p]||0)]).filter(([,n])=>n))});
   if(!baseline){assert(navigation.shellPreserved&&navigation.navigationPreserved,'Navigation DOM persists');assert(!navigation.phases.some(p=>p.includes('.app-launch-screen')),'No internal splash');assert.equal(authCalls-beforeNav,0,'Warm route uses bounded in-memory session');}
   await page.goBack();await page.getByText('Keine Kunden erfasst',{exact:true}).waitFor();
   if(!baseline)assert(await page.evaluate(()=>window.navBefore===document.querySelector('.bottom-nav')),'Back navigation retains navigation');
