@@ -398,9 +398,9 @@ try{
       assert.ok(appearance.groups.every(group=>group.border==='0px'&&group.background===(theme==='light'?'rgb(255, 255, 255)':'rgb(0, 0, 0)')),`${route}: grouped app surfaces in both themes`);
     }
     for(const create of await page.locator('.bo-create-action').filter({visible:true}).all()){
-      const shape=await create.evaluate(el=>{const c=getComputedStyle(el),r=el.getBoundingClientRect(),label=el.querySelector('.create-action-label');return {width:r.width,height:r.height,radius:c.borderRadius,background:c.backgroundColor,label:!!label?.getClientRects().length}});
+      const shape=await create.evaluate(el=>{const c=getComputedStyle(el),r=el.getBoundingClientRect(),label=el.querySelector('.create-action-label'),short=el.querySelector('.create-action-short');return {width:r.width,height:r.height,radius:c.borderRadius,background:c.backgroundColor,label:!!label?.getClientRects().length,short:!!short?.checkVisibility()&&short.getBoundingClientRect().width>0&&short.getBoundingClientRect().right<=r.right}});
       if(width>=761){assert.ok(shape.label,`${route}: desktop creation keeps its visible label`);assert.equal(shape.radius,'5px','Desktop creation follows the original control shape');assert.equal(shape.background,theme==='light'?'rgb(37, 102, 189)':'rgb(72, 167, 255)');}
-      else{assert.equal(shape.label,false,'Mobile creation uses the original round plus');assert.equal(shape.width,44);assert.equal(shape.height,44);assert.equal(shape.radius,'50%');}
+      else{assert.equal(shape.label,false,'Mobile uses the approved short label');assert.equal(shape.short,true,'Mobile creation has a readable short label inside its control');assert.ok(shape.width>=44&&shape.height>=44,'Labeled creation keeps a complete touch target');assert.notEqual(shape.radius,'50%','Retired circular creation cannot return');}
     }
     // Snapshot values in one browser task: query hydration can replace metric nodes between awaited locator calls.
     const moneyDirections=await page.locator('.metric-money').evaluateAll(nodes=>nodes.filter(el=>el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden').map(el=>getComputedStyle(el).flexDirection));
