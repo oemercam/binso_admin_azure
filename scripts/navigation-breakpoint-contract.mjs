@@ -37,7 +37,7 @@ export function readableNavigationSource(source){
  root.walkRules(rule=>{
   if(rule.selectors.includes(':is(.bottom-nav,.operator-mobile-nav)>a')&&rule.selectors.includes(':is(.bottom-nav,.operator-mobile-nav)>button')){
    rule.walkDecls('font-size',d=>{assert.equal(d.value,'9px');d.value='var(--type-metadata)';labels++});
-   rule.walkDecls('line-height',d=>{assert.equal(d.value,'1.05');d.value='1.2'});
+   rule.walkDecls('line-height',d=>{assert.equal(d.value,'1.05');d.value='1.5'});
   }
   if(rule.selector===':is(.bottom-nav,.operator-mobile-nav) span')rule.walkDecls('max-height',d=>{assert.equal(d.value,'12px');d.value='18px';spans++});
  });

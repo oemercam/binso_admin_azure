@@ -253357,7 +253357,7 @@
         },
         {
           "property": "line-height",
-          "value": "1.2",
+          "value": "1.5",
           "important": false
         },
         {
@@ -257791,14 +257791,14 @@
             "rule": 2145,
             "file": "app/design-system/navigation.css",
             "line": 34,
-            "value": "1.2",
+            "value": "1.5",
             "important": false
           },
           {
             "rule": 2145,
             "file": "app/design-system/navigation.css",
             "line": 34,
-            "value": "1.2",
+            "value": "1.5",
             "important": false
           }
         ],

@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {waitForFiniteAnimations} from './shared-control-browser.mjs';
 
 export async function assertFlatMobileNavigation(page){
+ await waitForFiniteAnimations(page);
  const material=await page.locator('.bottom-nav,.operator-mobile-nav').evaluateAll(nodes=>nodes.filter(el=>el.checkVisibility()).map(el=>{const c=getComputedStyle(el),r=el.getBoundingClientRect();return {background:c.backgroundColor,radius:c.borderRadius,shadow:c.boxShadow,blur:c.backdropFilter,webkitBlur:c.webkitBackdropFilter,theme:document.documentElement.dataset.theme,active:[...el.querySelectorAll('.active')].map(a=>getComputedStyle(a).color),labels:[...el.querySelectorAll(":scope > a > span,:scope > button > span")].filter(a=>a.checkVisibility()&&a.getBoundingClientRect().height>0&&getComputedStyle(a).opacity!=="0").map(a=>({font:parseFloat(getComputedStyle(a.parentElement).fontSize),height:a.clientHeight,scroll:a.scrollHeight})),targets:[...el.children].map(a=>({width:a.getBoundingClientRect().width,height:a.getBoundingClientRect().height})),left:r.left,right:r.right,viewport:innerWidth}}));
  for(const nav of material){
   assert.equal(nav.background,nav.theme==='dark'?'rgb(0, 0, 0)':'rgb(255, 255, 255)','Flat navigation uses the opaque theme canvas');
@@ -11,7 +12,7 @@ export async function assertFlatMobileNavigation(page){
   assert.ok(!nav.webkitBlur||nav.webkitBlur==='none','Flat navigation has no WebKit backdrop blur');
   assert.ok(nav.active.every(color=>color===(nav.theme==='dark'?'rgb(72, 167, 255)':'rgb(37, 102, 189)')),'Active navigation uses the Microsoft blue accent');
   assert.ok(nav.targets.every(t=>t.width>=44&&t.height>=44),'Existing navigation touch targets remain at least 44px');
-  assert.ok(nav.labels.every(label=>label.font>=12&&label.scroll<=label.height+1),'Flat navigation labels remain readable without clipping');
+  assert.ok(nav.labels.every(label=>label.font>=12&&label.scroll<=label.height+1),'Flat navigation labels remain readable without clipping: '+JSON.stringify(nav.labels));
   assert.ok(nav.left>=0&&nav.right<=nav.viewport+1,'Navigation stays inside its safe viewport');
  }
 }
