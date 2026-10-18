@@ -117,7 +117,8 @@ console.log('V21.3: decimal/PostgreSQL precision, partial/full balances, finance
  const useState=initial=>{const index=cursor++;if(!(index in states))states[index]=typeof initial==='function'?initial():initial;return [states[index],value=>{states[index]=typeof value==='function'?value(states[index]):value}];};
  const useEffect=(effect,deps)=>{const index=cursor++,previous=effects[index];if(!previous||deps.some((dep,n)=>!Object.is(dep,previous.deps[n]))){scheduled.push(()=>{previous?.cleanup?.();effects[index]={deps,cleanup:effect()}});}};
  const exports={},hookSource=(await fs.readFile('lib/client/use-api-query.ts','utf8')).split(String.fromCharCode(10)).filter(line=>!line.startsWith('import ')).join(String.fromCharCode(10));
- Function('exports','useState','useEffect','useSyncExternalStore','apiGet','dataRevision','subscribeClientData','window','document','navigator',ts.transpileModule(hookSource,{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText)(exports,useState,useEffect,(_subscribe,snapshot)=>{cursor++;return snapshot()},path=>new Promise((resolve,reject)=>requests.push({path,resolve,reject})),paths=>paths.length?String(domain):String(session),()=>()=>{},{setInterval:callback=>{tick=callback;return 1},clearInterval(){}},visibility,network);
+ const snapshots=await import(moduleUrl(await fs.readFile('lib/client/query-snapshot.ts','utf8')));snapshots.clearQuerySnapshots();
+ Function('exports','useState','useEffect','useSyncExternalStore','apiGet','dataRevision','subscribeClientData','window','document','navigator','readQuerySnapshot','writeQuerySnapshot','clearQuerySnapshots',ts.transpileModule(hookSource,{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText)(exports,useState,useEffect,(_subscribe,snapshot)=>{cursor++;return snapshot()},path=>new Promise((resolve,reject)=>requests.push({path,resolve,reject})),paths=>paths.length?String(domain):String(session),()=>()=>{},{setInterval:callback=>{tick=callback;return 1},clearInterval(){}},visibility,network,snapshots.readQuerySnapshot,snapshots.writeQuerySnapshot,snapshots.clearQuerySnapshots);
  const render=(path='/api/customers')=>{cursor=0;scheduled=[];const result=exports.useApiQuery(path);for(const effect of scheduled)effect();return result;};
  const flush=async()=>{await Promise.resolve();await Promise.resolve()};
  try{
@@ -133,6 +134,10 @@ console.log('V21.3: decimal/PostgreSQL precision, partial/full balances, finance
   session++;domain++;result=render();assert.equal(result.data,undefined,'Previous-session data is never shown');assert.equal(result.loading,true);
   requests[4].resolve({name:'old-session'});await flush();assert.equal(render().data,undefined,'Late old-session refresh is ignored');requests[5].resolve({name:'new-session'});await flush();assert.equal(render().data.name,'new-session');
   result=render('/api/projects');assert.equal(result.data,undefined,'Different paths cannot inherit customer data');assert.equal(result.loading,true);result=render(null);assert.equal(result.loading,false);assert.equal(result.data,undefined);
+  for(const effect of effects)effect?.cleanup?.();states.length=0;effects.length=0;
+  const beforeReturn=requests.length;result=render();assert.equal(result.data.name,'new-session','A fresh mount immediately reuses only a current-session snapshot');assert.equal(result.loading,false);await flush();assert.equal(requests.length,beforeReturn,'Warm return navigation avoids a duplicate GET');
+  domain++;render();assert.equal(requests.length,beforeReturn+1,'Domain mutation still requires a new request');
+  session++;domain++;result=render();assert.equal(result.data,undefined,'A remounted warm cache cannot cross a session boundary');assert.equal(requests.length,beforeReturn+2);
  }finally{for(const effect of effects)effect?.cleanup?.();}
  console.log('Query hook: manual/periodic refresh, error retry, superseded replies, tenant fence, route changes and hidden/offline polling passed.');
 }

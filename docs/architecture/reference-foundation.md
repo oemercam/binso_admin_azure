@@ -81,15 +81,16 @@ Zuordnung im Routeninventar. Eine zusätzliche Foundation ist keine Erweiterung.
 ### Wiederverwendbare Seitenmuster
 
 Eine neue Liste übergibt `RecordsControls` mit dem `CreateAction` an den
-`actions`-Slot der `AppShell`. Die Shell platziert Erfassen beim Titel und
-Suche/Filter im gemeinsamen Listenbereich. `RecordsView` verwendet denselben
+`actions`-Slot der `AppShell`. Die Shell platziert Erfassen zusammen mit
+Suche/Filter in der Inhalts-Command-Bar, niemals im globalen Header. `RecordsView` verwendet denselben
 Controller für Suche, Filter, Sortierung und Rückkehrzustand. Mobile Zeilen
 werden mit `RecordRow`, Desktopzellen mit den zentralen Spaltendefinitionen
 erstellt. Keine eigene Toolbar oder zweite Suche zeichnen.
 
-`CreateAction` ist auf dem Desktop ein beschrifteter blauer Button und auf Mobile
-ein 30px sichtbarer schwarzer Plus-Kreis in mindestens 44px Touchfläche am
-gemeinsamen Listenheader. `RecordsControls` zeigt auf Desktop Filter und
+`CreateAction` ist ein beschrifteter blauer Button, auf Mobile mit sichtbarem
+Kurzlabel „Neu“, vollständigem zugänglichem Namen und mindestens 44px Touchfläche.
+Die neuere Sammelfreigabe ersetzt den früheren schwarzen Plus-Kreis.
+`RecordsControls` zeigt auf Desktop Filter und
 Sortierung direkt neben der Suche; Mobile verwendet das gemeinsame Filter-Sheet.
 Eine Erfassungsaktion darf nicht manuell zu einem viewportunabhängigen Kreis werden.
 

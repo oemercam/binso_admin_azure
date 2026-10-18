@@ -12,12 +12,12 @@ import {AppVersionNotice} from "./app-version-notice";
 import { hasBlockingModal } from "./use-dialog-focus";
 import {safeAppPath} from "@/lib/navigation";
 import { usePathname, useRouter } from "next/navigation";
-import { isValidElement, cloneElement, createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { Children, isValidElement, cloneElement, createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {WorkspaceActionContext} from '@/lib/client/workspace-actions';
 import {RecordsControls} from './records';
 import {useBrowserBackGuard,allowDraftNavigation} from "./use-browser-back-guard";
 import ConfirmDialog from "./confirm-dialog";
-import { ActionRow, ActionSheet, PageHeading, DetailHeading, CreateAction } from "./binso-ux";
+import { ActionRow, ActionSheet, PageHeading, DetailHeading, CreateAction, QuickCreateAction } from "./binso-ux";
 import {Button, EmptyState, Icon, IconButton, Logo, Status, LoadingState, FormActions} from "./ui";
 import {useApiQuery,useDataRevision} from "@/lib/client/use-api-query";
 import { apiGet, apiPatch, logoutClientSession, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
@@ -131,8 +131,12 @@ function AppShellFrame({
   const pageAccess=useMemo(()=>({write:canWrite,canOpen}),[canWrite,canOpen]);
   const listControls=isValidElement<{children?:React.ReactNode}>(actions)&&actions.type===RecordsControls?actions:null;
   const visibleActions=listControls?listControls.props.children:actions;
-  const headerCreate=!backHref&&isValidElement(visibleActions)&&visibleActions.type===CreateAction;
-  const bodyControls=listControls?cloneElement(listControls,{children:undefined}):undefined;
+  const contentCreate=isValidElement<{icon?:string}>(visibleActions)&&(visibleActions.type===CreateAction||visibleActions.type===QuickCreateAction||visibleActions.type===Button&&visibleActions.props.icon==="plus");
+  const childNodes=Children.toArray(children);
+  const inlineControls=childNodes.find(child=>isValidElement(child)&&child.type===RecordsControls);
+  const bodyControls=listControls?cloneElement(listControls,{children:undefined}):inlineControls;
+  const pageChildren=inlineControls?childNodes.filter(child=>child!==inlineControls):children;
+  const headingActions=contentCreate?undefined:visibleActions;
   const headerOwnsDetail=!!backHref;
   const allowed=canOpen(pathname);
   const [formDirty,setFormDirty]=useState(false);
@@ -311,7 +315,7 @@ function AppShellFrame({
 
   return <WorkspaceActionContext.Provider value={registerContextActions}><PageAccessContext.Provider value={pageAccess}>
     {!access&&!accessError&&<AppStart/>}
-    <div hidden={!access&&!accessError} ref={shellRef} data-unsaved={dirty||undefined} data-header-create={headerCreate||undefined} data-navigation-collapsed={navigationCollapsed||undefined} className={`app-root app-section-${active} ${timerRunning && !backHref ? "timer-active" : ""} ${preview ? "app-preview" : ""} ${formActive ? "app-editing" : ""}`}>
+    <div hidden={!access&&!accessError} ref={shellRef} data-unsaved={dirty||undefined} data-navigation-collapsed={navigationCollapsed||undefined} className={`app-root app-section-${active} ${timerRunning && !backHref ? "timer-active" : ""} ${preview ? "app-preview" : ""} ${formActive ? "app-editing" : ""}`}>
     <ConfirmDialog open={confirmLogout} busy={logoutBusy} title="Änderungen verwerfen und abmelden?" message="Deine Änderungen sind noch nicht gespeichert." confirmLabel="Abmelden" onCancel={()=>setConfirmLogout(false)} onConfirm={()=>void logout(true)}/>
     <ConfirmDialog open={leaveHref!==null} title="Änderungen verwerfen?" message="Deine Änderungen sind noch nicht gespeichert und gehen verloren." cancelLabel="Weiter bearbeiten" confirmLabel="Änderungen verwerfen" onCancel={()=>setLeaveHref(null)} onConfirm={()=>{const href=leaveHref;setLeaveHref(null);if(href){window.dispatchEvent(new Event("binso-draft-discard"));allowDraftNavigation();if(href==="browser-back"){leaveBack();return;}const url=new URL(href);if(url.origin===window.location.origin)router.replace(url.pathname+url.search+url.hash);else window.location.assign(href);}}}/>
     {logoutError&&<div className="toast" role="alert"><Icon name="close" size={16}/><span><LocalizedText>{logoutError}</LocalizedText></span><button type="button" className="text-action" disabled={logoutBusy} onClick={()=>void logout()}><LocalizedText>{"Erneut versuchen"}</LocalizedText></button></div>}
@@ -332,15 +336,14 @@ function AppShellFrame({
       <div className="desktop-appbar">
         <DesktopNavigationToggle collapsed={navigationCollapsed} onToggle={toggleNavigation} controls="customer-desktop-navigation"/>
         <div className="workspace-location"><Link href="/dashboard"><LocalizedText>{"Arbeitsbereich"}</LocalizedText></Link><span aria-hidden="true">/</span><span><LocalizedText verbatim={titleIsUserContent}>{title}</LocalizedText></span></div>
-        {!formActive&&<div className="desktop-appbar-actions"><Button className="desktop-global-search" variant="secondary" ariaLabel="Suche" icon="search" onClick={()=>setSheet("search")}><LocalizedText>{"Alles durchsuchen"}</LocalizedText><kbd>⌘ / Ctrl K</kbd></Button>{timerRunning&&<Link href="/zeit" className="desktop-header-timer" aria-label={"Zeitmessung läuft "+formattedTimer}><Icon name="clock" size={16}/><span>{formattedTimer}</span></Link>}<LocalizedElement as="button" className="desktop-notification-button" type="button" aria-label="Benachrichtigungen" onClick={openNotifications}><Icon name="bell"/>{unreadNotifications>0&&<i className="notification-badge"><LocalizedText>{unreadNotifications>9?"9+":unreadNotifications}</LocalizedText></i>}</LocalizedElement>
+        {!formActive&&<div className="desktop-appbar-actions"><Button className="desktop-global-search" variant="secondary" ariaLabel="Suche" icon="search" onClick={()=>setSheet("search")}><LocalizedText>{"Alles durchsuchen"}</LocalizedText><kbd>⌘ / Ctrl K</kbd></Button>{timerRunning&&<Link href="/zeit" className="desktop-header-timer" aria-label={"Zeitmessung läuft "+formattedTimer}><i aria-hidden="true"/><span>{formattedTimer}</span></Link>}<LocalizedElement as="button" className="desktop-notification-button" type="button" aria-label="Benachrichtigungen" onClick={openNotifications}><Icon name="bell"/>{unreadNotifications>0&&<i className="notification-badge"><LocalizedText>{unreadNotifications>9?"9+":unreadNotifications}</LocalizedText></i>}</LocalizedElement>
           <LocalizedElement as="button" className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={() => setSheet("account")}><Avatar name={profile.name} identity={profile.identity} src={profile.avatar} size="small"/></LocalizedElement>
         </div>}
       </div>
       <AppHeader className={headerOwnsDetail ? "mobile-header mobile-header-detail" : "mobile-header"} detail={headerOwnsDetail} contentHeader={headingPlacement==="content"} leadingClassName="mobile-header-leading" leading={<>
         {headerOwnsDetail ? <Link className="mobile-back" href={backHref!} aria-label={backLabel}><Icon name="back"/></Link> : pathname==="/dashboard" ? <Link href="/dashboard" className="mobile-header-brand" aria-label="Zur Übersicht"><Logo compact/><span>One</span></Link> : <h1 className="mobile-section-title"><LocalizedText verbatim={titleIsUserContent}>{title}</LocalizedText></h1>}
         {headerOwnsDetail&&<div className="mobile-header-context"><h1 className="mobile-header-title"><span><LocalizedText verbatim={titleIsUserContent}>{title}</LocalizedText></span></h1>{status!=null&&<Status tone={statusTone}>{status}</Status>}</div>}
-      </>} actionClassName={headerOwnsDetail?"mobile-detail-actions":"mobile-header-actions"} actions={headerOwnsDetail ? (allowed&&(mobileActions||visibleActions)?mobileActions??visibleActions:undefined) : <>
-        {headerCreate&&allowed&&visibleActions}
+      </>} actionClassName={headerOwnsDetail?"mobile-detail-actions":"mobile-header-actions"} actions={headerOwnsDetail ? (allowed&&(mobileActions||headingActions)?mobileActions??headingActions:undefined) : <>
         <IconButton label="Suche" icon="search" onClick={()=>setSheet("search")}/>
         <LocalizedElement as="button" className="mobile-notification-button icon-button" type="button" aria-label="Benachrichtigungen" onClick={openNotifications}><Icon name="bell"/>{unreadNotifications>0&&<i className="notification-badge"><LocalizedText>{unreadNotifications>99?"99+":unreadNotifications}</LocalizedText></i>}</LocalizedElement>
         <LocalizedElement as="button" className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={()=>setSheet("account")}><Avatar name={profile.name} identity={profile.identity} src={profile.avatar} size="small"/></LocalizedElement>
@@ -351,11 +354,11 @@ function AppShellFrame({
       <main className="page-container" data-section={active}>
         <AppVersionNotice/>
         <div className={backHref ? "page-head page-head-detail" : "page-head"} data-heading-placement={headingPlacement}>
-          {backHref ? <DetailHeading verbatimTitle={titleIsUserContent} title={title} subtitle={subtitle} status={status} tone={statusTone} recordLabel={recordLabel} statusPlacement={headingPlacement==="content"?"subtitle":"title"} mobileAction={undefined} action={(visibleActions||contextActions)&&allowed?<div className="page-actions">{visibleActions}{contextActions&&<div className="context-actions-inline">{contextActions.content}</div>}</div>:undefined} leading={<Link className="desktop-back" href={backHref} aria-label={backLabel}><Icon name="back" size={16}/><LocalizedText>{backLabel}</LocalizedText></Link>}/> : <PageHeading verbatimTitle={titleIsUserContent} title={title} description={subtitle} action={(visibleActions||contextActions)&&allowed?<div className="page-actions">{visibleActions}{contextActions&&<div className="context-actions-inline">{contextActions.content}</div>}</div>:undefined}/> }
+          {backHref ? <DetailHeading verbatimTitle={titleIsUserContent} title={title} subtitle={subtitle} status={status} tone={statusTone} recordLabel={recordLabel} statusPlacement={headingPlacement==="content"?"subtitle":"title"} mobileAction={undefined} action={(headingActions||contextActions)&&allowed?<div className="page-actions">{headingActions}{contextActions&&<div className="context-actions-inline">{contextActions.content}</div>}</div>:undefined} leading={<Link className="desktop-back" href={backHref} aria-label={backLabel}><Icon name="back" size={16}/><LocalizedText>{backLabel}</LocalizedText></Link>}/> : <PageHeading verbatimTitle={titleIsUserContent} title={title} description={subtitle} action={(headingActions||contextActions)&&allowed?<div className="page-actions">{headingActions}{contextActions&&<div className="context-actions-inline">{contextActions.content}</div>}</div>:undefined}/> }
         </div>
         <SettingsWorkspace>
-        {allowed&&bodyControls}
-        {accessError?<div role="alert"><p><LocalizedText>{accessError}</LocalizedText></p><FormActions sheet><Button onClick={()=>{invalidateClientSession();setAccessError(null);setAccessRetry(value=>value+1)}}><LocalizedText>{"Erneut versuchen"}</LocalizedText></Button><Link className="button button-secondary" href="/login"><LocalizedText>{"Anmelden"}</LocalizedText></Link></FormActions></div>:(!access||allowed)?children:<EmptyState icon="lock" title="Kein Zugriff" text="Diese Seite ist für deine Rolle oder deinen Plan nicht verfügbar."/>}
+        {allowed&&(bodyControls||contentCreate)&&<div className="workspace-command-bar">{bodyControls}{contentCreate&&visibleActions}</div>}
+        {accessError?<div role="alert"><p><LocalizedText>{accessError}</LocalizedText></p><FormActions sheet><Button onClick={()=>{invalidateClientSession();setAccessError(null);setAccessRetry(value=>value+1)}}><LocalizedText>{"Erneut versuchen"}</LocalizedText></Button><Link className="button button-secondary" href="/login"><LocalizedText>{"Anmelden"}</LocalizedText></Link></FormActions></div>:(!access||allowed)?pageChildren:<EmptyState icon="lock" title="Kein Zugriff" text="Diese Seite ist für deine Rolle oder deinen Plan nicht verfügbar."/>}
         </SettingsWorkspace>
       </main>
 

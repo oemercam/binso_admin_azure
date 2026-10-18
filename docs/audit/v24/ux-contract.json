@@ -40,9 +40,9 @@
     {
       "id": "UX24-CONTROL",
       "scope": "Formulare inkl. Auth",
-      "requirement": "Field/Input/Select/Textarea verwenden; Fokus 2px innen, Akzent, Fehler rot; Disabled via Rechte erhalten.",
+      "requirement": "Field/Input/Select/Textarea verwenden; gemeinsame App-Auswahl mit echter Formularvalidierung, Tastatur, Disabled-Zuständen und verschachtelter Hintergrund-Scrollsperre. Fokus, Fehler und Rechte bleiben erhalten.",
       "owner": "components/ui.tsx",
-      "acceptance": "Fokus/Fehler/Disabled/Loading rendern; aria-describedby und Label prüfen",
+      "acceptance": "Pointer-, Tastatur-, Escape-, Disabled- und Formular-Change-Regressionen; Label, Fokus und verschachtelte Scrollsperren prüfen.",
       "status": "offen",
       "evidence": []
     },
@@ -96,7 +96,7 @@
     {
       "id": "UX24-MOTION",
       "scope": "Motion/Glass",
-      "requirement": "Zentrale Motion-Tokens und Reduced Motion; kein Glass-/Blur-Fallback. Navigationslabels werden beim Scrollen niemals ausgeblendet.",
+      "requirement": "Zentrale Motion-Tokens und Reduced Motion; kein Glass-/Blur-Fallback. Navigationslabels werden beim Scrollen niemals ausgeblendet. Aktive Zeit zentriert, ruhiger blauer Statuspunkt; bei Reduced Motion statisch.",
       "owner": "app/design-system/theme.css",
       "acceptance": "Reduced Motion, stabile Labels und deckende Flächen in beiden Themes prüfen.",
       "status": "offen",
@@ -106,7 +106,7 @@
     {
       "id": "UX24-NAV",
       "scope": "Bottom-Navigation",
-      "requirement": "Stabile Microsoft-App-Navigation bis zu allen Bildschirmrändern einschliesslich Safe Area. Ziele, Rechte und Icons bleiben unverändert; die alte Floating-/Kompakt-Geometrie ist ausdrücklich ersetzt. Plus im Listenheader: sichtbarer Kreis wie Avatar, Touchziel mindestens 44px.",
+      "requirement": "Stabile Microsoft-App-Navigation bis zu allen Bildschirmrändern einschliesslich Safe Area. Ziele, Rechte und Icons bleiben unverändert. Erstellen als beschrifteter Button in der Inhalts-Command-Bar neben Suche/Filter, niemals im globalen Header oder in der Navigation; Touchziel mindestens 44px.",
       "owner": "components/app-chrome.tsx",
       "acceptance": "Aktuelle navigation-contract/navigation-foundation Gates, abgeleitete v4-Geometrie und unabhängige Scroll-/Safe-Area-/Plus-Gegenproben; Tests erzeugen keine Referenz.",
       "status": "offen",
@@ -295,7 +295,7 @@
     },
     {
       "id": "UX24-WHITE-WORKSPACE",
-      "scope": "Light Mode: Marketing, Auth, Kunden- und Adminportal; bestehende Bottom-Navigation ausgenommen",
+      "scope": "Light Mode: Marketing, Auth, Kunden- und Adminportal einschliesslich deckender Navigation",
       "requirement": "Weisse deckende Grund-, Header-, Control- und Inhaltsflächen; dezente blaue Fokus-/Auswahl-/Aktionszustände. Dark Mode ist abgeleitet. Aktuelle ux-current-approval.md hat Vorrang vor älteren Grau-/Dock-Vorgaben.",
       "owner": "app/design-system/theme.css",
       "acceptance": "Computed Flächen, Kontrast und die aktuelle stabile Navigation prüfen.",

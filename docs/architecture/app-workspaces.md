@@ -3,6 +3,11 @@
 Grundlage ist die ausdrückliche Gesamtfreigabe nach der 76-Routen-Diagnose.
 Aktive Rangfolge: [ux-current-approval.md](ux-current-approval.md).
 
+Historischer Paketbericht: Die damalige Plus-Kreis-/Listenheader-Darstellung
+ist durch die spätere Sammelfreigabe ersetzt. Aktuelle Umsetzung und Prüfgrenzen:
+[task-focused-app-controls.md](task-focused-app-controls.md). Die folgenden
+damaligen Nachweise sind keine aktive Vorgabe für die Erstellen-Platzierung.
+
 ## Zusammenhängende Umsetzung
 
 | Bereich | Gemeinsamer Owner | Ergebnis |

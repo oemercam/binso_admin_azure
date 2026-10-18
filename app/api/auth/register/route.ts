@@ -27,6 +27,7 @@ export async function POST(request:NextRequest){
   await enforceRateLimit(request,"register",5,15*60_000);
   const body=asObject(await readJson(request,32_000));
   const company=stringField(body,"company",{max:180,min:2});
+  const contactName=stringField(body,"name",{max:180,min:2});
   const email=emailField(body);
   const password=stringField(body,"password",{max:256,min:12});
   const context=registrationContext(body.plan??null,body.billingCycle??null);
@@ -38,7 +39,7 @@ export async function POST(request:NextRequest){
   const exists=await query("select 1 from app_users where lower(email)=lower($1) limit 1",[email]);
   if(exists.rowCount)throw new ApiError(409,"registration_unavailable","Bitte die Anmeldung oder Passwort-Wiederherstellung verwenden, um sicher fortzufahren.");
   const userId=randomUUID();
-  const provisioned=await provisionOrganization({userId,email,name:company,companyName:company,plan:context.plan?.id??"start",billingCycle:context.billingCycle,mode:"trial",passwordHash:await hashPassword(password),language:locale,termsVersion:context.termsVersion,privacyVersion:context.privacyVersion,dpaVersion:context.dpaVersion});
+  const provisioned=await provisionOrganization({userId,email,name:contactName,companyName:company,plan:context.plan?.id??"start",billingCycle:context.billingCycle,mode:"trial",passwordHash:await hashPassword(password),language:locale,termsVersion:context.termsVersion,privacyVersion:context.privacyVersion,dpaVersion:context.dpaVersion});
   const emailSent=await sendRegistrationVerification({email,userId,organizationId:provisioned.organizationId,locale,remember:true});
   await endDemoSession();
   return json({ok:true,onboardingComplete:false,requiresEmailVerification:true,emailSent,verificationMethod:"link_and_code"},201);

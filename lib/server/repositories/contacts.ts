@@ -27,8 +27,13 @@ export async function saveCustomerContact(s:SessionUser,customerId:string,contac
 export async function archiveCustomerContact(s:SessionUser,customerId:string,contactId:string){
  return withTenant(s.organizationId,s.userId,async c=>{
   await c.query("select id from customers where organization_id=$1 and id::text=$2 and archived_at is null for update",[s.organizationId,customerId]);
+  const contacts=await c.query("select id,is_primary from customer_contacts where organization_id=$1 and customer_id::text=$2 and archived_at is null order by created_at,id for update",[s.organizationId,customerId]);
+  const target=contacts.rows.find(contact=>String(contact.id)===contactId);
+  if(!target)throw new ApiError(404,"not_found","Kontakt wurde nicht gefunden.");
+  if(contacts.rows.length<=1)throw new ApiError(409,"contact_required","Der letzte Kontakt kann nicht entfernt werden. Bitte zuerst eine weitere Kontaktperson erfassen.");
   const result=await c.query("update customer_contacts set archived_at=now(),is_primary=false,updated_at=now() where organization_id=$1 and customer_id::text=$2 and id::text=$3 and archived_at is null returning id",[s.organizationId,customerId,contactId]);
   if(!result.rowCount)throw new ApiError(404,"not_found","Kontakt wurde nicht gefunden.");
+  if(target.is_primary){const next=contacts.rows.find(contact=>String(contact.id)!==contactId)!;await c.query("update customer_contacts set is_primary=true,updated_at=now() where organization_id=$1 and id=$2",[s.organizationId,next.id]);}
   await audit(c,{organizationId:s.organizationId,userId:s.userId,action:"contact.archived",entityType:"customer_contact",entityId:contactId});
   return result.rows[0];
  });

@@ -39,11 +39,11 @@ try{
  const customerRepository=await import(await compile('lib/server/repositories/customers.ts',{'@/lib/server/db':scopedDb,'@/lib/server/audit':audit,'@/lib/server/http':http,'../business-idempotency':replay,'./business-api':businessModule}));
  const customerCounter=async()=>Number((await pool.query("select next_value from business_document_counters where organization_id=$1 and kind='customer' and period=''",[organizationId])).rows[0]?.next_value??1);
  const beforeCustomers=await customerCounter();
- const sameCustomers=await Promise.all(Array.from({length:6},()=>customerRepository.createCustomer(organizationId,session.userId,{name:'Synthetic parallel minimal customer'},'parallel-customer-replay')));
+ const sameCustomers=await Promise.all(Array.from({length:6},()=>customerRepository.createCustomer(organizationId,session.userId,{contactFirstName:"Synthetic",contactLastName:"Contact",name:'Synthetic parallel minimal customer'},'parallel-customer-replay')));
  assert.equal(new Set(sameCustomers.map(row=>row.id)).size,1);assert.equal(new Set(sameCustomers.map(row=>row.customer_no)).size,1);assert.equal(await customerCounter(),beforeCustomers+1);assert.equal((await pool.query('select count(*)::int n from customers where organization_id=$1 and name=$2',[organizationId,'Synthetic parallel minimal customer'])).rows[0].n,1);
- const distinctCustomers=await Promise.all(Array.from({length:10},(_,i)=>customerRepository.createCustomer(organizationId,session.userId,{name:'Synthetic distinct customer '+i},'parallel-customer-number-'+i)));
+ const distinctCustomers=await Promise.all(Array.from({length:10},(_,i)=>customerRepository.createCustomer(organizationId,session.userId,{contactFirstName:"Synthetic",contactLastName:"Contact",name:'Synthetic distinct customer '+i},'parallel-customer-number-'+i)));
  assert.equal(new Set(distinctCustomers.map(row=>row.id)).size,10);assert.equal(new Set(distinctCustomers.map(row=>row.customer_no)).size,10);assert.equal(await customerCounter(),beforeCustomers+11);
- const competingDuplicates=await Promise.allSettled(Array.from({length:4},(_,i)=>customerRepository.createCustomer(organizationId,session.userId,{name:'Parallel duplicate '+i,uid:i%2?'CHE123456789':'CHE-123.456.789 MWST'},'parallel-duplicate-'+i)));
+ const competingDuplicates=await Promise.allSettled(Array.from({length:4},(_,i)=>customerRepository.createCustomer(organizationId,session.userId,{contactFirstName:"Synthetic",contactLastName:"Contact",name:'Parallel duplicate '+i,uid:i%2?'CHE123456789':'CHE-123.456.789 MWST'},'parallel-duplicate-'+i)));
  assert.equal(competingDuplicates.filter(result=>result.status==='fulfilled').length,1,'Distinct request keys cannot bypass concurrent duplicate detection');
  assert.ok(competingDuplicates.filter(result=>result.status==='rejected').every(result=>result.reason.code==='customer_duplicate'));
  // Internal projects use the same transaction-bound replay owner after a lost reply.

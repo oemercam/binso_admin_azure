@@ -117,7 +117,7 @@ try{
  const projectWriters=['owner','admin','project_manager','manager'];
  const paymentInvoice=(await pool.query("select id,customer_id from invoices where organization_id=$1 and archived_at is null and status in('sent','partial','overdue') and total_amount-paid_amount>3 limit 1",[organizations[0]])).rows[0];assert.ok(paymentInvoice,'Open synthetic invoice for three legal financial role writes');
  const writeContracts=[
-  ['/api/customers','customers',customerWriters,role=>({name:'Write contract '+role,email:role+'@write.invalid'})],
+  ['/api/customers','customers',customerWriters,role=>({name:'Write contract '+role,contactFirstName:'Synthetic',contactLastName:'Contact',email:role+'@write.invalid'})],
   ['/api/employees','employees',['owner','admin','hr'],role=>({firstName:'Write',lastName:role,jobTitle:'Synthetic ICT',workloadPercent:80,email:role+'@employee-write.invalid',weeklyHours:42,vacationDays:25})],
   ['/api/products','products_services',['owner','admin'],role=>({name:'Synthetic product '+role,kind:'service',unit:'hour',unitPrice:125,vatRate:8.1})],
   ['/api/projects','projects',projectWriters,role=>({name:'Synthetic project '+role,customerId:customer.id})],
@@ -129,6 +129,7 @@ try{
   ['/api/documents','quotes',projectWriters,()=>({kind:'offer',customerId:customer.id,issueDate:'2026-10-09',currency:'CHF',items:[{description:'Synthetic offer line',quantity:1,unitPrice:100,vatRate:8.1}]})],
  ];
  let writeCases=0;const createdInvoices=new Map();
+ const missingContact=await write('POST','/api/customers',{name:'Invalid missing contact'},'owner');assert.equal(missingContact.status,400);assert.equal(missingContact.data.error,'contact_required','HTTP validation rejects a missing contact without weakening role contracts');
  for(const [path,table,allowed,payload] of writeContracts)for(const role of roles){
   const count=async org=>(await pool.query('select count(*)::int n from '+table+' where organization_id=$1',[org])).rows[0].n;
   const before=await count(organizations[0]),otherBefore=await count(organizations[1]);

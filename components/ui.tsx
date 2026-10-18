@@ -3,6 +3,7 @@ import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
 import {usePageAccess} from "@/lib/client/page-access";
 import {Children,cloneElement,isValidElement,useId} from "react";
 import Link from "next/link";
+import {SelectControl} from './select-control';
 
 export function Icon({ name, size = 20 }: { name: string; size?: number }) {
   const common = {
@@ -130,7 +131,7 @@ export function Input(props:React.ComponentProps<"input">){
  const sized=!props.hidden&&!['checkbox','radio','file','hidden','range','color','button','submit','reset','image'].includes(props.type??'text');
  return <LocalizedElement as="input" {...props} className={[props.className,sized?'form-control':undefined].filter(Boolean).join(' ')||undefined}/>;
 }
-export function Select(props:React.ComponentProps<"select">){return <LocalizedElement as="select" {...props} className={[props.className,'form-control'].filter(Boolean).join(' ')}/>}
+export function Select(props:React.ComponentProps<"select">){return <SelectControl {...props}/>}
 export function Textarea(props:React.ComponentProps<"textarea">){return <LocalizedElement as="textarea" {...props} className={[props.className,'form-textarea'].filter(Boolean).join(' ')}/>}
 export function Checkbox(props:Omit<React.ComponentProps<"input">,"type">){return <Input {...props} type="checkbox"/>}
 export function DateInput(props:Omit<React.ComponentProps<"input">,"type">){return <Input {...props} type="date"/>}

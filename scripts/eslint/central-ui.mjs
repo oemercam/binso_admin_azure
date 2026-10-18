@@ -1,13 +1,16 @@
 import path from 'node:path';
 // Deliberate native controls live only inside their canonical renderer.
 const nativeOwners={
- 'components/ui.tsx':{input:['Input'],select:['Select'],textarea:['Textarea']},
+ 'components/ui.tsx':{input:['Input'],textarea:['Textarea']},
+ 'components/select-control.tsx':{select:['SelectControl']},
  'components/binso-ux.tsx':{input:['ListSearch']},
  'components/header-panel-content.tsx':{input:['SearchPanel']},
- 'components/records.tsx':{select:['RecordsView']}, // collapsed native sort picker
  'components/privacy-consent.tsx':{input:['PrivacyConsent']}, // consent toggle, outside tenant forms
 };
 const classOwners={
+ 'app-select-popup':['components/select-control.tsx'],
+ 'app-select-option':['components/select-control.tsx'],
+ 'workspace-command-bar':['components/app-shell.tsx'],
  'app-header':['components/app-chrome.tsx'],
  'app-header-actions':['components/app-chrome.tsx'],
  'mobile-dock':['components/app-chrome.tsx'],

@@ -747,3 +747,12 @@ a{-webkit-tap-highlight-color:transparent}
 @container (max-width:703px){
 .time-overview-section{padding-left:0;border-left:0;border-top:1px solid var(--color-line);padding-top:var(--desktop-section-gap)}
 }
+
+/* Running time is a calm status action, not a competing header title. */
+.header-timer,.desktop-header-timer{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:6px 10px;border:0;border-radius:var(--control-radius);background:var(--color-subtle);color:var(--app-action-accent);font-variant-numeric:tabular-nums;white-space:nowrap;line-height:1}
+.header-timer i,.desktop-header-timer i{display:block;flex:none;width:8px;height:8px;border-radius:50%;background:currentColor;animation:timer-status-pulse 2.4s ease-in-out infinite}
+@keyframes timer-status-pulse{0%,100%{opacity:.65;transform:scale(.85)}50%{opacity:1;transform:scale(1.15)}}
+@media(prefers-reduced-motion:reduce){.header-timer i,.desktop-header-timer i{animation:none}}
+.activity-groups{display:grid;gap:var(--field-group-gap)}
+.activity-day{padding-block:var(--field-group-gap)}
+.activity-day>h3{margin:0 0 12px;font-size:var(--type-label);font-weight:600;color:var(--color-muted)}

@@ -15,9 +15,20 @@ Dark Mode und Operator-Varianten sind abgeleitet, keine behauptete Originalfreig
   Bereichstitel. Unterseiten besitzen Zurück und Kontexttitel. Kein wiederholtes
   Produktlogo in jedem App-Header; Login/Start/öffentliche Website bleiben eigene
   Zustände. Desktop-Header behält globale Suche, Benachrichtigungen und Konto.
-- Erstellen sitzt auf Mobile im gemeinsamen Listenheader. Sichtbarer Kreis wie
-  Avatar (30px), Touchfläche mindestens 44px, zentriertes Plus ohne leeren Label-
-  Wrapper. Desktop bleibt beschriftet. Keine konkurrierende zweite Erstellen-Aktion.
+- Die neuere ausdrückliche Sammelfreigabe ersetzt die frühere Plus-Kreis-Regel:
+  Erstellen sitzt neben Suche/Filter in der gemeinsamen Inhalts-Command-Bar,
+  niemals im globalen Header oder in der Navigation. Beschrifteter blauer Button,
+  auf Mobile kurze sichtbare Beschriftung „Neu“, vollständiger zugänglicher Name,
+  mindestens 44px Touchfläche. Keine konkurrierende zweite Erstellen-Aktion.
+- Auswahlfelder nutzen den gemeinsamen App-Popup-Owner mit Tastaturbedienung,
+  Disabled-Zuständen und echter Formularvalidierung. Suche, Dialoge und Auswahl
+  sperren den Hintergrund; verschachtelte Dialoge behalten ihre Scroll-Sperre.
+- Aktive Zeit ist im mobilen Header zentriert, mit ruhigem blauem Statuspunkt.
+  Reduced Motion deaktiviert das Pulsieren. Keine alarmartige Daueranimation.
+- Kundenneuanlage benötigt Vor- und Nachname einer Kontaktperson; Speicherung
+  von Kunde und erstem Kontakt erfolgt atomar. Bestehende Kunden ohne strukturierte
+  Kontakte bleiben bearbeitbar, ohne Namen zu erfinden. Registrierung verlangt
+  einen eigenen Kontaktnamen zusätzlich zur Firma.
 - Lange routegebundene Erfassungen verwenden den bestehenden FormSheet-Owner im
   workspace-Modus: keine Scrim-Fläche, kein modaler Fokusfang, ein Kontexttitel,
   erreichbare Abschlussaktionen. Kurze Kindeditoren/Filter/Aktionen bleiben echte
@@ -52,7 +63,9 @@ erwartungen werden mit positiven und negativen Regressionen ersetzt.
 ## Abnahmegrenze
 
 Quellabdeckung aller 76 Routen ist keine vollständige Funktions-/Sichtabnahme.
-Gezielte lokale Prüfungen, anschliessend gemeinsame GitHub-Quality-/CodeQL-Prüfung
+Die frühere Plus-Kreis-Entscheidung bleibt im historischen App-Workspace-Bericht
+nachvollziehbar, ist aber keine aktive Vorgabe mehr. Gezielte lokale Prüfungen,
+anschliessend gemeinsame GitHub-Quality-/CodeQL-Prüfung
 und Browsermatrix. Physische iOS-/Android-PWA-, native Tastatur- und Assistive-
 Technology-Nachweise bleiben getrennt offen, bis sie tatsächlich ausgeführt sind.
 Kein automatischer Merge und kein Deployment aus dieser Implementierungsfreigabe.

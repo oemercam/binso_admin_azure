@@ -42,7 +42,7 @@ export function PageHeading({ title, description, action, leading, verbatimTitle
 }
 
 export function CreateAction({ label, href, onClick, disabled = false, requiresWrite = true }: { label: string; href?: string; onClick?: () => void; disabled?: boolean;requiresWrite?:boolean }) {
-  return <Button href={href} requiresWrite={requiresWrite} className="bo-create-action" ariaLabel={label} disabled={disabled} onClick={onClick} icon="plus"><span className="create-action-label"><LocalizedText>{label}</LocalizedText></span></Button>;
+  return <Button href={href} requiresWrite={requiresWrite} className="bo-create-action" ariaLabel={label} disabled={disabled} onClick={onClick} icon="plus"><span className="create-action-label"><LocalizedText>{label}</LocalizedText></span><span className="create-action-short" aria-hidden="true"><LocalizedText>{"Neu"}</LocalizedText></span></Button>;
 }
 
 /** One context-action contract: desktop command bar, mobile overflow sheet. */

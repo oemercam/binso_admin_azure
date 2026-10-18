@@ -1,6 +1,6 @@
 {
   "base": "1a2813d01a9024bd367acff9b3fe61e599e6ed54",
-  "approval": "Owner requested the complete app UX package after the 76-route diagnosis: stable visible navigation labels, viewport-wide opaque safe-area background, contextual headers and equal visible avatar/create circles. Former compact/floating geometry is superseded. Access, destinations and icons remain exact. Derived expectations require independent browser validation; no physical PWA acceptance.",
+  "approval": "Owner requested the complete app UX package after the 76-route diagnosis: stable visible navigation labels, viewport-wide opaque safe-area background, contextual headers and the later approved labeled creation button in the content command bar, never the global header. Former compact/floating geometry is superseded. Access, destinations and icons remain exact. Derived expectations require independent browser validation; no physical PWA acceptance.",
   "access": {
     "permissions": "92d41f0536d7662734657ba4d898eba7e6e97e16fb4c8025eb36faf54e19152b",
     "destinations": "fe597be560572c6f6cff35505be600ab191cdf0c96bf21d81bf90661aef04ac8"

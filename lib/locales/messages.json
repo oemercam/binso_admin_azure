@@ -12078,5 +12078,40 @@
     "Document details",
     "Données du document",
     "Dati del documento"
+  ],
+  "Kontaktperson · Vorname *": [
+    "Contact person · First name *",
+    "Personne de contact · Prénom *",
+    "Persona di contatto · Nome *"
+  ],
+  "Kontaktperson · Nachname *": [
+    "Contact person · Last name *",
+    "Personne de contact · Nom *",
+    "Persona di contatto · Cognome *"
+  ],
+  "Aktivitäten suchen...": [
+    "Search activity...",
+    "Rechercher des activités...",
+    "Cerca attività..."
+  ],
+  "Analyse": [
+    "Analysis",
+    "Analyse",
+    "Analisi"
+  ],
+  "Bitte Vorname und Nachname der Kontaktperson eingeben.": [
+    "Enter the contact person’s first and last name.",
+    "Saisissez le prénom et le nom de la personne de contact.",
+    "Inserisci nome e cognome della persona di contatto."
+  ],
+  "Der letzte Kontakt kann nicht entfernt werden. Bitte zuerst eine weitere Kontaktperson erfassen.": [
+    "The last contact cannot be removed. Add another contact person first.",
+    "Le dernier contact ne peut pas être supprimé. Ajoutez d’abord une autre personne de contact.",
+    "Non è possibile rimuovere l’ultimo contatto. Aggiungi prima un’altra persona di contatto."
+  ],
+  "Kontaktname ist zu lang.": [
+    "The contact name is too long.",
+    "Le nom du contact est trop long.",
+    "Il nome del contatto è troppo lungo."
   ]
 }
