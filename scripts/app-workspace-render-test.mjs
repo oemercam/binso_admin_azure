@@ -7,6 +7,7 @@ import React from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 import {withoutLocalization} from './localized-source.mjs';
 import {assertStableAppNavigation,verifyStableAppNavigation} from './app-workspace-browser.mjs';
+import {assertMobileHeaderTargets,verifyHeaderTargetRegression} from './shared-control-browser.mjs';
 const require=createRequire(import.meta.url),read=file=>fs.readFile(file,'utf8');
 const compile=source=>ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
 const ast=ts.createSourceFile('ui.tsx',withoutLocalization(await read('components/ui.tsx')),99,true,4);
@@ -18,6 +19,8 @@ function visit(node){if(ts.isJsxElement(node)&&node.openingElement.tagName.getTe
 const fixture={};Function('require','exports','Link','Icon','canOpen','active','setSheet',compile('export function Nav(){return '+nav+'}'))(require,fixture,({children,...props})=>React.createElement('a',props,children),ui.Icon,()=>true,'kunden',()=>{});
 const manifest=JSON.parse(await read('app/design-system/manifest.json')),css=(await Promise.all(manifest.sources.map(({path})=>read(path)))).join('\n');
 const markup=renderToStaticMarkup(React.createElement('div',{className:'app-root app-section-kunden'},React.createElement('div',{className:'app-main'},React.createElement('header',{className:'mobile-header app-header'},React.createElement('div',{className:'mobile-header-leading'},React.createElement('h1',{className:'mobile-section-title'},'Kunden')),React.createElement('div',{className:'mobile-header-actions app-header-actions'},React.createElement(ux.CreateAction,{href:'/kunden/neu',label:'Neuer Kunde'}),React.createElement(ui.IconButton,{label:'Suche',icon:'search'}),React.createElement(ui.IconButton,{label:'Benachrichtigungen',icon:'bell'}),React.createElement('button',{className:'avatar avatar-button','aria-label':'Benutzerkonto'},React.createElement('span',{className:'person-avatar person-avatar-small'},'AB')))),React.createElement('main',{className:'page-container'},React.createElement('p',null,'Synthetic shared-component fixture'),React.createElement('div',{className:'fixture-spacer'}),React.createElement('button',null,'Last action')),React.createElement('div',{className:'mobile-dock'},React.createElement(fixture.Nav)))));
+const chrome={};Function('require','exports',compile(await read('components/app-chrome.tsx')))(require,chrome);
+const detailMarkup=renderToStaticMarkup(React.createElement('div',{className:'app-root'},React.createElement(chrome.AppHeader,{className:'mobile-header mobile-header-detail',detail:true,contentHeader:true,leadingClassName:'mobile-header-leading',actionClassName:'mobile-detail-actions',leading:React.createElement(React.Fragment,null,React.createElement('a',{href:'/rechnungen',className:'mobile-back','aria-label':'Zurück'},React.createElement(ui.Icon,{name:'back'})),React.createElement('div',{className:'mobile-header-context'},React.createElement('h1',{className:'mobile-header-title'},'RE-2026-123456'),React.createElement(ui.Status,null,'Entwurf'))),actions:React.createElement('div',{className:'document-header-icons'},React.createElement(ui.IconButton,{label:'Bearbeiten',icon:'edit'}),React.createElement(ui.IconButton,{label:'Weitere Aktionen',icon:'more'}))})));
 const engines=await import(process.env.BINSO_PLAYWRIGHT_MODULE?pathToFileURL(process.env.BINSO_PLAYWRIGHT_MODULE).href:'playwright');
 const browser=await engines.chromium.launch({headless:true,...(process.env.BINSO_CHROMIUM_EXECUTABLE?{executablePath:process.env.BINSO_CHROMIUM_EXECUTABLE}:{})});
 try{
@@ -26,5 +29,10 @@ try{
   await page.setViewportSize({width,height:740});await page.setContent('<!doctype html><html data-theme="'+theme+'"><style>'+css+'\n.fixture-spacer{height:1400px}</style><body>'+markup+'</body></html>');
   await assertStableAppNavigation(page);await verifyStableAppNavigation(page);cases++;
  }
- console.log('Real CreateAction/Button, source navigation and all 14 CSS owners: '+cases+' narrow/theme render cases with scroll, 34px safe area and hidden-label adversary passed.');
+ for(const width of [320,390]){
+  await page.setViewportSize({width,height:740});await page.setContent('<!doctype html><html data-theme="light"><style>'+css+'</style><body>'+detailMarkup+'</body></html>');
+  await assertMobileHeaderTargets(page);await page.getByRole('heading',{name:'RE-2026-123456',exact:true}).waitFor();
+  await verifyHeaderTargetRegression(page);cases++;
+ }
+ console.log('Real CreateAction/Button/AppHeader, source navigation and all 14 CSS owners: '+cases+' render cases with scroll, safe area, distinct title/status and negative target/layout controls passed.');
 }finally{await browser.close()}

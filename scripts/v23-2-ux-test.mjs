@@ -39,7 +39,7 @@ const sole=quick.QuickCreateAction({});assert.equal(sole.props.requiresWrite,fal
 const quickHtml=html(quick.QuickCreateAction({}));assert.ok(quickHtml.includes('/zeit?manual=1&amp;returnTo=/dashboard'));assert.ok(!quickHtml.includes('/rechnungen/neu'),'Unpermitted actions are absent');
 const statistics=await fs.readFile('components/statistics.tsx','utf8'),ring={};
 const {formatCurrency}=await import(financialModuleUrl),{sumMoney}=await import(moneyModuleUrl);
-Function('require','exports','useState','formatCurrency','sumMoney',compile(declaration('statistics.tsx',statistics,'RingChart')))(require,ring,()=>[null,()=>{}],formatCurrency,sumMoney);
+Function('require','exports','useState','formatCurrency','sumMoney','useTranslation',compile(declaration('statistics.tsx',statistics,'RingChart')))(require,ring,()=>[null,()=>{}],formatCurrency,sumMoney,()=>value=>value);
 const parts=[{key:'a',label:'Einnahmen',tone:'positive',value:0.1},{key:'b',label:'Ausgaben',tone:'negative',value:0.2}];
 const ringHtml=html(React.createElement(ring.RingChart,{label:'Zahlungsvolumen',parts}));assert.ok(ringHtml.includes('CHF 0.30'));assert.ok(ringHtml.includes('33.3 %'));assert.ok(ringHtml.includes('66.7 %'));
 for(const invalid of [parts.map(part=>({...part,value:0})),[{...parts[0],value:-10}],[{...parts[0],value:NaN}]])assert.ok(!html(React.createElement(ring.RingChart,{label:'Volumen',parts:invalid})).includes('<svg'),'Zero, negative and missing data cannot fabricate a ring');
@@ -71,7 +71,7 @@ console.log('Actual PDF viewer: bounded module/worker startup, late-result suppr
 const uiSource=await fs.readFile('components/ui.tsx','utf8'),actualUi={};
 Function('require','exports',compile(declaration('ui.tsx',uiSource,'FormActions')))(require,actualUi);
 const sheetOwner={};let sheetState=0;
-Function('require','exports','useState','useEffect','useRef','useBrowserBackGuard','useDialogFocus','Children','isValidElement','cloneElement','FormActions','sheetForm','sheetValues','createPortal','ConfirmDialog','Icon','document',compile(declaration('ux.tsx',ux,'Sheet')+'\nexport {Sheet};'))(require,sheetOwner,()=>[sheetState++===0,()=>{}],()=>{},value=>({current:value}),()=>()=>{},()=>({current:null}),React.Children,React.isValidElement,React.cloneElement,actualUi.FormActions,helpers.sheetForm,()=>'',element=>element,stub,stub,{body:{}});
+Function('require','exports','useState','useEffect','useRef','useBrowserBackGuard','useDialogFocus','Children','isValidElement','cloneElement','FormActions','sheetForm','sheetValues','createPortal','ConfirmDialog','Icon','document','useRouter',compile(declaration('ux.tsx',ux,'Sheet')+'\nexport {Sheet};'))(require,sheetOwner,()=>[sheetState++===1,()=>{}],()=>{},value=>({current:value}),()=>()=>{},()=>({current:null}),React.Children,React.isValidElement,React.cloneElement,actualUi.FormActions,helpers.sheetForm,()=>'',element=>element,stub,stub,{body:{}},()=>({push(){}}));
 const actionHtml=html(React.createElement(sheetOwner.Sheet,{open:true,label:'Company',kind:'form',onClose:()=>{}},React.createElement('p',null,'Company fields'),React.createElement(actualUi.FormActions,null,React.createElement('button',null,'Save'))));
 assert.match(actionHtml,/<div class="sheet-body"><p>Company fields<\/p><\/div><div class="filter-sheet-actions">/,'Actual Sheet moves FormActions outside its scrolling body and normalizes the footer contract');
 console.log('Actual Sheet: component-based FormActions has a separate shared footer.');

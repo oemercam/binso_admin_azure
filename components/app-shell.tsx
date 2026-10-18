@@ -338,7 +338,7 @@ function AppShellFrame({
       </div>
       <AppHeader className={headerOwnsDetail ? "mobile-header mobile-header-detail" : "mobile-header"} detail={headerOwnsDetail} contentHeader={headingPlacement==="content"} leadingClassName="mobile-header-leading" leading={<>
         {headerOwnsDetail ? <Link className="mobile-back" href={backHref!} aria-label={backLabel}><Icon name="back"/></Link> : pathname==="/dashboard" ? <Link href="/dashboard" className="mobile-header-brand" aria-label="Zur Übersicht"><Logo compact/><span>One</span></Link> : <h1 className="mobile-section-title"><LocalizedText verbatim={titleIsUserContent}>{title}</LocalizedText></h1>}
-        {headerOwnsDetail&&<h1 className="mobile-header-title"><span><LocalizedText verbatim={titleIsUserContent}>{title}</LocalizedText></span>{status!=null&&<Status tone={statusTone}>{status}</Status>}</h1>}
+        {headerOwnsDetail&&<div className="mobile-header-context"><h1 className="mobile-header-title"><span><LocalizedText verbatim={titleIsUserContent}>{title}</LocalizedText></span></h1>{status!=null&&<Status tone={statusTone}>{status}</Status>}</div>}
       </>} actionClassName={headerOwnsDetail?"mobile-detail-actions":"mobile-header-actions"} actions={headerOwnsDetail ? (allowed&&(mobileActions||visibleActions)?mobileActions??visibleActions:undefined) : <>
         {headerCreate&&allowed&&visibleActions}
         <IconButton label="Suche" icon="search" onClick={()=>setSheet("search")}/>

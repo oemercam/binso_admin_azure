@@ -375,30 +375,5 @@
 @media (max-width:389px){
 .document-line-items>.document-line-item{grid-template-columns:minmax(0,1fr) 84px}
 }
-@media (max-width:760px){
-.mobile-header-detail .document-header-icons .icon-button{
-    width:40px;
-    min-width:40px;
-    height:40px;
-    min-height:40px;
-    padding:0;
-  }
-.mobile-header-detail .document-header-icons{
-    width:auto;
-    display:flex;
-    gap:2px;
-    justify-content:end;
-  }
-.mobile-header-detail:has(.document-header-icons) .mobile-header-title{
-    padding:0 6px;
-    text-align:left;
-    font-size:var(--type-control);
-    line-height:1.2;
-  }
-.mobile-header-detail:has(.document-header-icons){
-    grid-template-columns:44px minmax(0,1fr) auto;
-  }
-.mobile-detail-actions .document-header-icons{display:flex;gap:2px}
-}
 
 .record-chevron{grid-column:2;grid-row:1/3;align-self:center;color:var(--color-muted);display:flex;align-items:center}

@@ -1,5 +1,5 @@
 "use client";
-import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
+import {LocalizedText,LocalizedElement,useTranslation} from "@/lib/client/locale";
 import {useEffect,useId,useState} from 'react';
 import {FilterSheet,MetricTiles,MetricTile} from './binso-ux';
 import {Button,Field,Icon,Input,ErrorState, FormActions} from './ui';
@@ -12,6 +12,7 @@ export type RingPart={key:string;label:string;tone:Series['tone'];value:number;h
 export type Metric={label:string;value:number;format?:'number'|'money';hint?:string};
 /** Segments are parts of one explicitly named total, never independent KPIs. */
 export function RingChart({label,parts,currency='CHF',format='money'}:{label:string;parts:readonly RingPart[];currency?:string;format?:'money'|'number'}){
+ const translate=useTranslation();
  const [selected,setSelected]=useState<string|null>(null);
  const valid=parts.every(part=>Number.isFinite(part.value)&&part.value>=0);
  const total=valid?sumMoney(parts.map(part=>part.value)):0;
@@ -19,7 +20,7 @@ export function RingChart({label,parts,currency='CHF',format='money'}:{label:str
  if(!valid||total<=0)return <p role="status"><LocalizedText>{"Keine positiven Anteile für "}</LocalizedText><LocalizedText>{label}</LocalizedText>.</p>;
  return <div className="bo-ring-chart"><div className="bo-ring-visual"><svg viewBox="0 0 120 120" role="group" aria-label={label+': '+value(total)}><circle cx="60" cy="60" r="48" fill="none" stroke="var(--color-line)" strokeWidth="10"/>{parts.map((part,index)=>{
   const percent=part.value/total*100,start=sumMoney(parts.slice(0,index).map(part=>part.value))/total*100;
-  return <circle key={part.key} role={part.value>0?'button':undefined} tabIndex={part.value>0?0:undefined} aria-label={part.label+': '+value(part.value)} aria-pressed={selected===part.key} onClick={()=>setSelected(part.key)} onKeyDown={event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();setSelected(part.key)}}} cx="60" cy="60" r="48" pathLength="100" fill="none" stroke={'var(--chart-'+part.tone+')'} strokeWidth="10" strokeDasharray={`${percent} ${100-percent}`} strokeDashoffset={-start} transform="rotate(-90 60 60)"><title><LocalizedText>{part.label+': '+value(part.value)+' · '+percent.toLocaleString('de-CH',{maximumFractionDigits:1})+' %'}</LocalizedText></title></circle>;
+  return <circle key={part.key} role={part.value>0?'button':undefined} tabIndex={part.value>0?0:undefined} aria-label={translate(part.label)+': '+value(part.value)} aria-pressed={selected===part.key} onClick={()=>setSelected(part.key)} onKeyDown={event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();setSelected(part.key)}}} cx="60" cy="60" r="48" pathLength="100" fill="none" stroke={'var(--chart-'+part.tone+')'} strokeWidth="10" strokeDasharray={`${percent} ${100-percent}`} strokeDashoffset={-start} transform="rotate(-90 60 60)"><title>{translate(part.label)+': '+value(part.value)+' · '+percent.toLocaleString('de-CH',{maximumFractionDigits:1})+' %'}</title></circle>;
  })}</svg><div className="bo-ring-center" aria-hidden="true"><strong>{value(total)}</strong><span><LocalizedText>{label}</LocalizedText></span></div></div><div className="bo-ring-details">{parts.map(part=><button type="button" key={part.key} aria-pressed={selected===part.key} onClick={()=>setSelected(part.key)} onFocus={()=>setSelected(part.key)}><i className={'bo-statistics-'+part.tone}/><span><LocalizedText>{part.label}</LocalizedText></span><strong><span>{value(part.value)}</span><small>{(part.value/total*100).toLocaleString('de-CH',{maximumFractionDigits:1})} %</small></strong></button>)}<output aria-live="polite"><LocalizedText>{selected&&parts.some(part=>part.key===selected)?parts.find(part=>part.key===selected)!.label+': '+value(parts.find(part=>part.key===selected)!.value):value(total)}</LocalizedText></output>{parts.find(part=>part.key===selected)?.href&&<Button variant="ghost" href={parts.find(part=>part.key===selected)!.href}><LocalizedText>{'Details anzeigen'}</LocalizedText></Button>}</div></div>;
 }
 

@@ -162,7 +162,7 @@ function Sheet({label,lang,description,open,onClose,children,busy=false,classNam
  useEffect(()=>{queueMicrotask(()=>setMounted(true))},[]);
  const [discard,setDiscard]=useState(false),[backDiscard,setBackDiscard]=useState(false),[changed,setChanged]=useState(false);
  const isDirty=dirty??changed;
- const leaveBack=useBrowserBackGuard(open&&kind==="form"&&(isDirty||!!onBrowserBack),()=>{if(busy)return;if(onBrowserBack){onBrowserBack();return;}setBackDiscard(true);setDiscard(true)},isDirty);
+ const leaveBack=useBrowserBackGuard(open&&kind==="form"&&(isDirty||busy||!!onBrowserBack),()=>{if(busy)return;if(onBrowserBack){onBrowserBack();return;}setBackDiscard(true);setDiscard(true)},isDirty||busy);
  const baseline=useRef("");
 
  const closeRef=useRef<()=>void>(()=>{});
@@ -174,7 +174,7 @@ function Sheet({label,lang,description,open,onClose,children,busy=false,classNam
   dialogRef.current?.focus({preventScroll:true});
  },[workspace,open,mounted,dialogRef]);
  useEffect(()=>{
-  if(!workspace||!open||!isDirty)return;
+  if(!workspace||!open||(!isDirty&&!busy))return;
   const navigate=(event:MouseEvent)=>{
    if(event.defaultPrevented||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
    const link=event.target instanceof Element?event.target.closest<HTMLAnchorElement>('a[href]'):null;

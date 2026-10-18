@@ -46,10 +46,11 @@ async function verifyAnimationStabilityRegression(page){
 }
 
 export async function assertMobileHeaderTargets(page){
- const targets=page.locator('.mobile-header .icon-button,.mobile-header .mobile-notification-button,.mobile-header .avatar-button').filter({visible:true});
+ await waitForFiniteAnimations(page);
+ const targets=page.locator('.mobile-header .icon-button,.mobile-header .mobile-notification-button,.mobile-header .avatar-button,.mobile-header .mobile-back').filter({visible:true});
  for(const target of await targets.all()){
   const box=await target.boundingBox();
-  assert.ok(box.width>=44&&box.height>=44,'Mobile header actions retain at least 44px touch targets');
+  assert.ok(box.width>=44&&box.height>=44,'Mobile header actions retain at least 44px touch targets: '+JSON.stringify({label:await target.getAttribute('aria-label'),width:box.width,height:box.height}));
  }
  return targets;
 }

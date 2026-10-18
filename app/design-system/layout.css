@@ -568,6 +568,8 @@
 .mobile-header-detail .mobile-back{grid-column:1;justify-self:start}
 .mobile-header-detail .mobile-header-leading{display:contents}
 .mobile-header.mobile-header-detail{
+    display:grid;
+    height:auto;
     grid-template-columns:44px minmax(0,1fr) auto;
     background:var(--color-bg);
     backdrop-filter:none;
@@ -620,3 +622,8 @@ html[data-theme="dark"] .app-start-icon{filter:invert(1)}
 }
 
 .app-version-notice{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-block:12px;border-bottom:1px solid var(--color-line);font-size:var(--type-label);background:var(--color-bg)}
+
+@media (max-width:760px){
+ .mobile-header-context{grid-column:2;display:flex;align-items:center;gap:8px;min-width:0}
+ .mobile-header-context>.status{flex:0 1 auto;max-width:45%}
+}
