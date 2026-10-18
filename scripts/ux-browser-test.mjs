@@ -1232,7 +1232,7 @@ try{
    for(const [name,value] of [['detail',/1[’']561\.97/],['list',/1[’']561\.97/],['customer',/1[’']561\.97/],['finance',/1[’']561\.97/],['payments',/1[’']000\.00/],['dashboard',/1[’']561\.97/],['customerOverview',/1[’']561\.97/],['activity','Zahlung erhalten']]){
     await tabs[name].waitForFunction(()=>window.v215ConsumerChanges.some(message=>message.domains?.includes('payments')),undefined,{polling:100});await tabs[name].bringToFront();await tabs[name].getByText(value,{exact:typeof value==='string'}).first().waitFor();assert.equal(await tabs[name].evaluate(()=>window.v215ConsumerMarker),'same-document',name+' updates without a reload');
    }
-   for(const [name,amount] of [['dashboard',"CHF 1'000"],['finance',"CHF 1'561.97"],['customerOverview',"CHF 1'561.97"]]){
+   for(const [name,amount] of [['dashboard',"CHF 1'000.00"],['finance',"CHF 1'561.97"],['customerOverview',"CHF 1'561.97"]]){
     await tabs[name].bringToFront();assert.equal((await tabs[name].locator(name==='customerOverview'?'.detail-grid [data-area="summary"] .metric>strong':'.bo-cash-overview .metric>strong').nth(1).textContent())?.replaceAll('’',"'"),amount,name+' domain metric refreshes from the same confirmed ledger');
    }
    for(const tab of Object.values(tabs))await tab.close();dataPaymentMode=false;Object.assign(invoice,priorInvoice);summary.invoices[0].open_amount=priorOpenAmount;collections.payments=collections.payments.filter(row=>row.id!=='foundation-payment');collections.customers=collections.customers.filter(row=>row.id!=='customer-two');Object.assign(customer,priorCustomer);

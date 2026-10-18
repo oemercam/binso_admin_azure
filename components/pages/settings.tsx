@@ -357,9 +357,9 @@ export function LanguageSettingsPage(){
 }
 
 const themeOptions=[
+ {value:"system",title:"System",description:"Geräteeinstellung übernehmen",icon:<Monitor size={18} aria-hidden="true"/>},
  {value:"light",title:"Hell",description:"Helle Oberfläche",icon:"sun"},
  {value:"dark",title:"Dunkel",description:"Dunkle Oberfläche",icon:"moon"},
- {value:"system",title:"System",description:"Geräteeinstellung übernehmen",icon:<Monitor size={18} aria-hidden="true"/>},
 ] as const;
 export function AppearanceSettingsPage(){
  const [theme,setTheme]=useState<ThemeMode>("system"),[error,setError]=useState("");
