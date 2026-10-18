@@ -18,6 +18,16 @@ ohne Glas/Schatten/Kapsel, mit blauer Aktivmarkierung. Ziele, Rechte, Bounds,
 Safe Areas und Motion bleiben exakt geschützt; Dark folgt dem dunklen Canvas.
 Die ältere mobile Glass-Freeze-Vorgabe ist damit für das Material ersetzt.
 
+Die anschliessende ausdrückliche Gesamtbereinigung gilt für alle aktiven
+Header, Menüs und Seitenzustände: keine Glass-Klassen/-Tokens, keine
+Backdrop-Unschärfe und keine Schattenkapsel um Header-Aktionen. Normale
+Dialog-Abdunklung und fachlich nötige Buttonformen bleiben davon getrennt.
+`LoadingState` besitzt den dezenten Fortschrittsindikator ohne sichtbare
+Ladesätze. Seine Beschreibung bleibt ausschliesslich für Screenreader vorhanden.
+Seitenuntertitel und Ergebniszähler zeigen während des Abrufs keine Ersatztexte.
+Ein Startbildschirm gehört nur zum initialen Sessionaufbau, nie zum internen
+Seitenwechsel oder Zurück. Fehler und Wiederholungsaktionen bleiben sichtbar.
+
 ## Zuständigkeit
 
 | Aufgabe | Bestehender Owner |

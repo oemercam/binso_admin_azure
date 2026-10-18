@@ -334,6 +334,11 @@ input:not([type="checkbox"]):not([type="radio"]),
 .bo-row-actions{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border:0;background:transparent;color:inherit;cursor:pointer;margin-left:auto}
 .bo-row-actions:disabled{opacity:.4;cursor:not-allowed}
 .bo-row-actions:hover:not(:disabled){background:var(--color-subtle);border-radius:var(--shape-group-small)}
+.loading-state{min-height:var(--touch);display:flex;align-items:center;padding-block:var(--field-group-gap)}
+.loading-state-indicator{display:block;width:var(--touch);height:4px;border-radius:var(--shape-control-desktop);background:var(--app-action-accent);animation:content-progress var(--content-progress-duration) ease-in-out infinite}
+@keyframes content-progress{0%,100%{opacity:.35;transform:scaleX(.5)}50%{opacity:1;transform:scaleX(1)}}
+@media(prefers-reduced-motion:reduce){.loading-state-indicator{animation:none}}
+@media(forced-colors:active){.loading-state-indicator{background:CanvasText}}
 .mobile-header-title>.status{flex:none;font-size:var(--type-caption-small)}
 .form-field,.form-field>label,.form-field>div{min-width:0;max-width:100%}
 .form-field input,.form-field select,.form-field textarea{box-sizing:border-box;min-width:0;max-width:100%}

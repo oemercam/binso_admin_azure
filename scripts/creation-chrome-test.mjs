@@ -1,3 +1,4 @@
+// Current Microsoft chrome and creation permissions; no legacy glass material.
 import fs from 'node:fs/promises';
 import assert from 'node:assert/strict';
 import ts from 'typescript';
@@ -25,3 +26,9 @@ for(const compact of [false,true]){
  assert.equal(rendered.includes('is-compact'),compact,'Compact navigation behavior is preserved');
 }
 console.log('Actual shared dock renders only navigation and preserves compact mode; obsolete creation injection is ignored.');
+
+for(const contentHeader of [false,true])for(const detail of [false,true]){
+ const rendered=renderToStaticMarkup(React.createElement(chrome.AppHeader,{contentHeader,detail,leading:'Binso',actions:React.createElement('button',null,'Suchen')}));
+ assert.ok(rendered.includes('app-header-actions'));assert.ok(rendered.includes('Suchen'));
+ assert.ok(!/app-glass|backdrop|translucent/.test(rendered),'All actual shared header variants exclude the retired material');
+}

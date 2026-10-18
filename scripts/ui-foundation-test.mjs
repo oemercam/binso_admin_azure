@@ -85,3 +85,8 @@ assert.equal(contactHref('email','name@example.ch\r\nBcc:other@example.ch'),unde
 assert.equal(contactHref('phone','+41 (44) 123-45-67'),'tel:+41441234567');assert.equal(contactHref('phone','079 123 45 67'),'tel:0791234567');
 for(const value of ['javascript:alert(1)','+41?code=1','*#06#','+41\n123','++41123'])assert.equal(contactHref('phone',value),undefined);
 console.log('Contact URIs retain fixed schemes, encode address delimiters and reject control/query/dial-command injection.');
+
+const progress=html(React.createElement(ui.LoadingState,null,'Kundendaten werden abgerufen.'));
+assert.match(progress,/role="status"/);assert.match(progress,/aria-live="polite"/);
+assert.match(progress,/<span class="loading-state-indicator" aria-hidden="true"><\/span>/);
+assert.match(progress,/<span class="sr-only">Kundendaten werden abgerufen\.<\/span>/,'The actual shared loader keeps its accessible label without visible loading copy');

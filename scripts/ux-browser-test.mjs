@@ -16,7 +16,7 @@ import {assertCustomerDossier,verifyCustomerStates} from './customer-ux-browser.
 import {assertNavigationToggle,verifyNavigationPersistence,assertFlatMobileNavigation,verifyFlatNavigationAdversaries} from './navigation-ux-browser.mjs';
 import {verifyPreviewControls} from './document-controls-browser.mjs';
 import {verifyTimeWorkspace} from './time-workspace-browser.mjs';
-import {assertMobileHeaderTargets,assertChatTargets,verifyHeaderTargetRegression,waitForFiniteAnimations} from './shared-control-browser.mjs';
+import {assertMobileHeaderTargets,assertChatTargets,assertOpaqueChrome,verifyHeaderTargetRegression,waitForFiniteAnimations} from './shared-control-browser.mjs';
 
 // Synthetic UI fixtures: real business/RLS integration is covered by migration-test.mjs.
 // No request reaches a production system; unhandled fixture APIs fail closed.
@@ -387,7 +387,7 @@ try{
       const rows=table.locator('.desktop-record-row,.operator-table-row');const count=await rows.count();if(count){assert.equal(await rows.last().evaluate(el=>getComputedStyle(el).borderBottomWidth),'0px','The final table entry has no terminal line');if(count>1)assert.equal(await rows.first().evaluate(el=>getComputedStyle(el).borderBottomWidth),'1px','Separators between actual table entries remain');}
      }
     }
-    if(!process.env.BINSO_UX_BASELINE&&width<=760)await assertMobileHeaderTargets(page);
+    if(!process.env.BINSO_UX_BASELINE){await assertOpaqueChrome(page);if(width<=760)await assertMobileHeaderTargets(page);}
     if(!process.env.BINSO_UX_BASELINE&&width<=760&&await page.locator('.page-container,.operator-app-content').count()){
       const appearance=await page.locator('.page-container,.operator-app-content').first().evaluate(el=>({ink:getComputedStyle(el).color,surface:getComputedStyle(el).getPropertyValue('--app-surface').trim(),controls:[...el.querySelectorAll('.form-control,.form-textarea')].filter(node=>!['checkbox','radio','file'].includes(node.type)&&!node.closest('.searchbox,.thread-composer')).map(node=>({radius:getComputedStyle(node).borderTopLeftRadius,font:getComputedStyle(node).fontSize})),groups:[...el.querySelectorAll('.bo-settings-group-body')].map(node=>({background:getComputedStyle(node).backgroundColor,border:getComputedStyle(node).borderTopWidth}))}));
       assert.equal(appearance.ink,theme==='light'?(route.startsWith('/operator')?'rgb(32, 43, 59)':'rgb(33, 48, 71)'):(route.startsWith('/operator')?'rgb(215, 227, 243)':'rgb(215, 227, 243)'),`${route}: app text uses the central theme`);

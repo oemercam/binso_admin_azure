@@ -1,5 +1,39 @@
 # Aktuelle UX-Rangfolge und überprüfbare Pakete
 
+## Geltender Gesamtstandard nach ausdrücklicher Fortsetzungsfreigabe
+
+Alle aktiven Oberflächen verwenden die bestehende Microsoft-Foundation und das
+Referenzpaket vom 15.10. mit den neueren ausdrücklichen Entscheidungen. Glass,
+Blur, graue Glass-Tokens und Schattenkapseln sind vollständig aus den aktiven
+CSS-Ownern und Headern entfernt. Es gibt keinen Glass-Fallback mehr.
+
+Der aktive Quellvertrag ist jetzt
+`docs/assets/20261018/microsoft-navigation-reference.json`. Der explizite
+Generator verwendet den bereits freigegebenen Microsoft-Stand `775af2eb` und
+entfernt im Vergleich ausschliesslich die benannten toten Dock-Aktionsregeln.
+Unbekannte oder mit realer Navigation kombinierte Selektoren blockieren die
+Migration. Der aktuelle 760/761-Breakpoint wird direkt geprüft; es gibt keine
+Rückprojektion auf einen alten Tablet-Breakpoint mehr. Gerenderte Bounds bleiben
+im bestehenden v3-Laufzeitvertrag unverändert. Archive werden nicht überschrieben.
+Mobile Kunden-/Operatorseiten teilen eine Inhaltsreserve aus echter
+Navigationshöhe, tatsächlichem Bottom-/Safe-Area-Inset und 20px Inhaltsabstand.
+Die Reserve für einen nicht mehr vorhandenen Dock-Erstellen-Button entfällt.
+
+Inhaltsabrufe verwenden nur den zentralen visuellen LoadingState, ohne sichtbare
+Ladesätze in Seitenuntertiteln, Ergebniszählern oder EmptyState-Karten.
+Screenreader-Status, Reduced Motion, Fehler und Retry bleiben erhalten.
+Die echte initiale Anmeldung verwendet weiterhin genau einen zentralen AppStart
+mit Original-BINSO-Icon; interne Navigation und Zurück starten keinen Splash.
+
+Aktive Materialprüfungen verlangen diesen Standard. `creation-chrome-test.mjs`
+ersetzt die irreführende alte Glass-Testbezeichnung und schützt Erfassungsrechte,
+Rückkehrpfade, aktuelle Header und Navigation. Ältere funktionale Regressionen
+bleiben erforderlich, sofern sie echte Berechtigungen, Geldwerte, Entwürfe oder
+Bedienbarkeit schützen. Kein alter Look darf daraus abgeleitet werden.
+
+Die folgenden datierten Abschnitte dokumentieren ausschliesslich den Verlauf.
+Sie schaffen keine zusätzlichen aktiven oder widersprechenden Produktregeln.
+
 ## Ausdrückliche mobile Entscheidung vom 18.10.2026
 
 Der Auftraggeber hat „Flache weisse Microsoft-Navigation“ gewählt. Damit ist die

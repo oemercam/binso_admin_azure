@@ -32,7 +32,7 @@ export function FinancialDocumentsPage({kind,forceDemo=false}:{kind:"offer"|"inv
  const state=Object.entries(financialStatusLabels).find(([,label])=>label===controller.activeChip)?.[0];if(state)params.set('display_status',state);
  const {data,loading,error}=useApiQuery<{items:DocumentListItem[];total?:number}>(production?`/api/documents?${params}`:`/api/demo/data?collection=documents&${params}`);
  const items=data?.items??[],total=data?.total??items.length;
- return <AppShell title={title} subtitle={loading?'Wird geladen…':`${total} ${title}`} active={route} actions={<RecordsControls controller={controller} placeholder={placeholder} chips={chips} columns={columns}><CreateAction href={`/${route}/neu`} label={invoice?"Neue Rechnung":"Neues Angebot"}/></RecordsControls>}><FinanceTabs/><DocumentList items={items} kind={kind} loading={loading} error={error} controller={controller} remote toolbarActions={false} showCount={false} pagination={{total,page:controller.page,pageSize,onPage:controller.setPage}}/></AppShell>;
+ return <AppShell title={title} subtitle={loading?undefined:`${total} ${title}`} active={route} actions={<RecordsControls controller={controller} placeholder={placeholder} chips={chips} columns={columns}><CreateAction href={`/${route}/neu`} label={invoice?"Neue Rechnung":"Neues Angebot"}/></RecordsControls>}><FinanceTabs/><DocumentList items={items} kind={kind} loading={loading} error={error} controller={controller} remote toolbarActions={false} showCount={false} pagination={{total,page:controller.page,pageSize,onPage:controller.setPage}}/></AppShell>;
 }
 
 export function OffersPage({forceDemo=false}:{forceDemo?:boolean}={}){return <FinancialDocumentsPage kind="offer" forceDemo={forceDemo}/>;}

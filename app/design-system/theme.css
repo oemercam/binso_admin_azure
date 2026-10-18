@@ -1,6 +1,7 @@
 /* BINso One / theme — one owner for base, states and responsive behavior. */
 :root{
   --progress-value:0%;
+  --content-progress-duration:1.2s;
   --bar-value:0%;
   /* App appearance: independent of the frozen navigation theme tokens. */
   --auth-control-border:#dfe5ed;
@@ -20,13 +21,8 @@
   --app-canvas:#fff;
   --app-surface:#fff;
   --app-chrome:#fff;
-  --app-glass-tint:rgba(243,243,245,.78);
-  --app-glass-solid:#f3f3f5;
-  --app-glass-line:rgba(34,34,37,.12);
-  --app-glass-shadow:0 3px 16px rgba(0,0,0,.08);
-  --app-glass-blur:18px;
-  --dock-gap:8px;
-  --dock-action-size:54px;
+  --navigation-content-gap:20px;
+  --navigation-content-inset:calc(var(--mobile-nav-h) + max(var(--mobile-nav-bottom),var(--safe-bottom)) + var(--navigation-content-gap));
   --app-text:#222225;
   --app-secondary:#626267;
   --app-divider:#dedee2;
@@ -327,10 +323,6 @@ html[data-theme="dark"]{
   --app-canvas:#000;
   --app-surface:#141414;
   --app-chrome:#212121;
-  --app-glass-tint:rgba(33,33,33,.82);
-  --app-glass-solid:#212121;
-  --app-glass-line:rgba(255,255,255,.16);
-  --app-glass-shadow:0 3px 18px rgba(0,0,0,.32);
   --app-text:#dedee2;
   --app-secondary:#a0a0a5;
   --app-divider:#2b2b2e;

@@ -509,11 +509,9 @@
 .operator-detail-list strong{overflow-wrap:anywhere}
 .operator-root{--control-h:44px;--control-font:16px}
 .operator-sidebar{display:none}
-.operator-main{margin-left:0;padding:0 max(var(--mobile-page-x),var(--safe-right)) calc(var(--mobile-nav-h) + var(--safe-bottom) + 48px) max(var(--mobile-page-x),var(--safe-left))}
+.operator-main{margin-left:0;padding:0 max(var(--mobile-page-x),var(--safe-right)) var(--navigation-content-inset) max(var(--mobile-page-x),var(--safe-left))}
 .operator-app-header{height:calc(var(--mobile-header-h) + var(--safe-top));min-height:calc(var(--mobile-header-h) + var(--safe-top));padding-top:var(--safe-top);padding-inline:var(--mobile-page-x);margin-inline:calc(-1 * var(--mobile-page-x));border-bottom:0;gap:10px}
 .operator-header-brand{gap:8px}
 .operator-header-desktop-label{display:none}
 .operator-header-brand .logo{width:88px;height:28px}
 .operator-page-head{padding-block:var(--mobile-page-top);margin-bottom:var(--mobile-section-gap);border:0}}
-@media (max-width:374px){
-.operator-main{padding-bottom:calc(var(--mobile-nav-h) + var(--dock-action-size) + var(--dock-gap) + var(--safe-bottom))}}

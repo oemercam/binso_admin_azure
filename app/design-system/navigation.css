@@ -2,9 +2,6 @@
 /* Navigation contract source: app/styles/app.css */
 .bottom-nav{display:none}
 .mobile-dock{display:none}
-.dock-create-action{display:grid;place-items:center;width:var(--dock-action-size);height:var(--dock-action-size);min-width:var(--touch);min-height:var(--touch);border-radius:50%;padding:0;cursor:pointer;transition:transform var(--motion-fast) var(--motion-ease)}
-.dock-create-action:active{transform:scale(.94)}
-.dock-create-action:focus-visible{outline:2px solid var(--app-accent);outline-offset:3px}
 /* Navigation contract source: app/styles/operator.css */
 .operator-mobile-nav{display:none}
 .operator-main>:not(.operator-app-header):not(.operator-page-head):not(.sheet-layer):not(.mobile-dock){
@@ -79,21 +76,12 @@
     transform:translateZ(0);
     transition:height var(--motion-base) var(--motion-ease),border-radius var(--motion-base) var(--motion-ease),background-color var(--motion-base) var(--motion-ease),box-shadow var(--motion-base) var(--motion-ease);
   }
-.mobile-dock{position:fixed;left:max(var(--mobile-nav-edge),var(--safe-left));right:max(var(--mobile-nav-edge),var(--safe-right));bottom:max(var(--mobile-nav-bottom),var(--safe-bottom));z-index:35;display:flex;align-items:end;gap:var(--dock-gap);pointer-events:none}
-.mobile-dock> :is(nav,.mobile-dock-action){pointer-events:auto}
+.mobile-dock{position:fixed;left:max(var(--mobile-nav-edge),var(--safe-left));right:max(var(--mobile-nav-edge),var(--safe-right));bottom:max(var(--mobile-nav-bottom),var(--safe-bottom));z-index:35;display:flex;align-items:end;pointer-events:none}
+.mobile-dock>nav{pointer-events:auto}
 .mobile-dock>nav{flex:1;min-width:0}
-.mobile-dock-action{flex:none}
-.mobile-dock.is-compact .dock-create-action{width:var(--mobile-nav-compact-h);height:var(--mobile-nav-compact-h)}
 .app-preview .mobile-dock{display:none}}
-@supports ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
-.app-glass{background:var(--app-glass-tint);backdrop-filter:blur(var(--app-glass-blur));-webkit-backdrop-filter:blur(var(--app-glass-blur))}}
-@media (max-width:374px){
-.mobile-dock-action{position:absolute;right:0;bottom:calc(var(--mobile-nav-h) + var(--dock-gap))}
-.mobile-dock.is-compact .mobile-dock-action{bottom:calc(var(--mobile-nav-compact-h) + var(--dock-gap))}}
-@media (prefers-reduced-transparency:reduce){
-.app-glass{background:var(--app-glass-solid);backdrop-filter:none;-webkit-backdrop-filter:none}}
 @media (forced-colors:active){
-.app-glass,.mobile-dock> :is(.bottom-nav,.operator-mobile-nav){background:Canvas;color:CanvasText;border:1px solid ButtonText;backdrop-filter:none;-webkit-backdrop-filter:none}}
+.mobile-dock> :is(.bottom-nav,.operator-mobile-nav){background:Canvas;color:CanvasText;border:1px solid ButtonText;backdrop-filter:none;-webkit-backdrop-filter:none}}
 /* Protected inherited landscape navigation values; relocated without changing their context or values. */
 @media (max-height:520px) and (orientation:landscape) and (max-width:900px){
 :root{--mobile-nav-h:54px;--mobile-nav-bottom:6px}

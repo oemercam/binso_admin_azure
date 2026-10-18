@@ -185,7 +185,7 @@
 .app-main:has(.support-detail-workspace) .page-container{height:calc(var(--workspace-viewport-height) - var(--workspace-header-height));display:flex;flex-direction:column;overflow:hidden;padding-bottom:var(--desktop-section-gap)}
 .app-header{background:var(--app-canvas);color:var(--app-text);backdrop-filter:none;-webkit-backdrop-filter:none}
 .app-header-leading{display:flex;align-items:center;min-width:0;gap:8px;flex:1}
-.app-header-actions{--app-glass-solid:var(--app-canvas);--app-glass-tint:var(--app-canvas);display:flex;align-items:center;gap:4px;flex:none;padding:2px;border-radius:var(--shape-scale-999)}
+.app-header-actions{display:flex;align-items:center;gap:4px;flex:none;padding:2px}
 .app-root{
   --color-bg:var(--app-canvas);--color-fg:var(--app-text);--color-muted:var(--app-secondary);--color-line:var(--app-divider);--color-subtle:var(--app-surface);--control-border:var(--app-control-border);--control-radius:var(--app-control-radius);
 }
@@ -417,8 +417,7 @@
 .page-add-button{grid-template-columns:1fr;grid-template-rows:1fr}
 .page-add-button svg{place-self:center}
 .page-head-actions .responsive-create-action{width:40px;min-width:40px;height:40px;padding:0;border-radius:50%}
-.page-container{scroll-padding-bottom:calc(var(--mobile-nav-h) + var(--mobile-nav-bottom) + var(--safe-bottom) + 28px)}
-.page-container> :last-child{margin-bottom:24px}
+.page-container{scroll-padding-bottom:var(--navigation-content-inset)}
 .surface>.context-block:first-of-type,.surface>.notice:first-of-type{border-top:0}
 .mobile-notification-button{position:relative}
 .mobile-header,
@@ -436,7 +435,7 @@
   }
 .page-container{
     min-width:0;
-    padding-bottom:calc(var(--mobile-nav-h) + var(--mobile-nav-bottom) + var(--safe-bottom) + 28px);
+    padding-bottom:var(--navigation-content-inset);
   }
 .page-head:not(.page-head-detail){
     min-height:44px;
@@ -477,15 +476,11 @@
     border-radius:50%;
   }
 .page-head:not(.page-head-detail) .page-actions .page-add-button svg{margin:0;place-self:center}
-.app-editing .app-main{padding-bottom:calc(24px + var(--safe-bottom))}
 .page-head-detail:not([data-heading-placement="content"]){display:none}
 }
 @media (max-width:389px){
 .mobile-header-detail>.header-timer{min-width:74px;padding-inline:6px;font-size:var(--type-caption-small)}
 .mobile-header-title{font-size:var(--type-control)}
-}
-@media (max-height:520px) and (orientation:landscape) and (max-width:900px){
-.app-root:not(.app-editing) .page-container{padding-bottom:calc(54px + var(--safe-bottom) + 22px)}
 }
 @media (hover:hover) and (pointer:fine){
 }
@@ -630,9 +625,6 @@
     border-bottom:1px solid var(--color-line);
     background:var(--color-bg);
   }
-.app-main{
-    padding-bottom:calc(var(--mobile-nav-h) + var(--safe-bottom));
-  }
 .app-sidebar,
   .desktop-appbar{display:none}
 .mobile-header-detail .mobile-back,
@@ -664,7 +656,7 @@
   }
 .app-main:has(.support-detail-workspace){--workspace-header-height:calc(var(--mobile-header-h) + var(--safe-top))}
 .app-main:has(.support-detail-workspace) .page-container>.support-detail-workspace{margin-bottom:0}
-.app-main:has(.support-detail-workspace) .page-container{padding-bottom:calc(var(--mobile-nav-h) + var(--safe-bottom) + var(--mobile-nav-edge) + var(--field-group-gap));animation:none}
+.app-main:has(.support-detail-workspace) .page-container{padding-bottom:var(--navigation-content-inset);animation:none}
 .app-main:has(.support-detail-workspace) .mobile-header{top:0}
 .app-root:not(.app-preview) .page-head:not(.page-head-detail):not([data-heading-placement="content"]) h1{display:none}
 .app-sidebar,.desktop-appbar{display:none}
@@ -676,10 +668,6 @@
 .app-root{--control-h:44px;--control-font:16px}
 .app-header-leading{min-width:0}
 .mobile-header-detail .mobile-header-title{max-width:none;width:auto;flex:1;font-size:var(--type-subheading)}
-.page-container{padding-bottom:calc(var(--mobile-nav-h) + var(--mobile-nav-bottom) + var(--safe-bottom) + 48px)}
-}
-@media (max-width:374px){
-.app-main{padding-bottom:calc(var(--mobile-nav-h) + var(--dock-action-size) + var(--dock-gap) + var(--safe-bottom))}
 }
 
 /* App startup has one owner, including responsive and motion states. */

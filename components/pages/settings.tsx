@@ -271,7 +271,7 @@ export function SubscriptionSettingsPage() {
     </AppShell>;
   }
 
-  if(!subscription) return <AppShell title="Abonnement" subtitle="Daten werden geladen." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen"><EmptyState icon="card" title={billingError?"Abonnement nicht verfügbar":"Abonnement wird geladen"} text={billingError||"Die Kontodaten werden abgerufen."}/></AppShell>;
+  if(!subscription) return <AppShell title="Abonnement" active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">{billingError?<div role="alert"><EmptyState icon="card" title="Abonnement nicht verfügbar" text={billingError}/></div>:<LoadingState/>}</AppShell>;
 
   const planKey=String(subscription.plan??"trial");
   const planLabel:Record<string,string>={trial:"Testphase",start:"Start",business:"Business",pro:"Pro"};

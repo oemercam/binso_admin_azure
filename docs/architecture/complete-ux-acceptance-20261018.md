@@ -1,5 +1,41 @@
 # Complete Microsoft UX — acceptance ledger
 
+## Explicit final material/loading cleanup
+
+Continued on the existing branch/PR after the owner's instruction to implement
+the remaining Microsoft UX work. Shared AppHeader no longer has a glass variant;
+all active glass classes, blur fallbacks, header shadow capsules and glass tokens are removed.
+Current CSS tests reject any reintroduction. The old Glass test name is replaced
+by creation-chrome-test while retaining permission/return/dock-injection checks.
+
+LoadingState now owns one quiet visual progress indicator, with screenreader-only
+status and static Reduced Motion/forced-colors support. All former detail-loading
+EmptyState cards, transient list/detail subtitles, result counters and security
+loading paragraphs use this contract. Real errors/retries are retained. Cold
+bootstrap keeps the original branded AppStart; internal route/back navigation
+must preserve the shell and never replay it. Frame-by-frame loading regression
+rejects visible loading sentences in addition to the existing session/request
+and DOM-persistence checks.
+
+Unused attached-create Dock CSS and its extra bottom-space reservation are
+removed. Customer/operator content now shares navigation-content-inset based on
+actual navigation height, bottom/safe-area inset and a 20px gap. A deliberately
+invoked generator creates microsoft-navigation-reference.json from the existing
+775af2eb Microsoft head after only the explicitly listed dead-rule migration.
+Unknown/live combined selectors cause failure. The active breakpoint stays
+760/761px directly; old historical source projections are retired. Existing v3
+rendered navigation bounds, destination permissions, focus, icons and motion are
+unchanged. Historical source/reference files remain archived evidence only.
+
+Six focused customer-dossier/security/chat cases at 390/1024px passed after the
+final unused-Dock/inset refinement, including actual computed content clearance,
+opaque header/navigation material and no duplicate outer bottom padding. Local
+TypeScript, targeted ESLint, localization/source contracts, CSS ownership, UI and
+navigation guards passed. Inventories were regenerated with their designated
+generators and the source-fingerprint integration test passed. Full final-head
+GitHub integration remains separate; these checks do not assert physical device
+or complete owner visual approval.
+
 ## Whole-product review requested after the navigation package
 
 The owner requested coverage of every page, subpage, shared component, graphic,

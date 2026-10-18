@@ -359,7 +359,7 @@ function AppShellFrame({
           <LocalizedElement as="button" className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={() => setSheet("account")}><Avatar name={profile.name} identity={profile.identity} src={profile.avatar} size="small"/></LocalizedElement>
         </div>}
       </div>
-      <AppHeader className={headerOwnsDetail ? "mobile-header mobile-header-detail" : "mobile-header"} detail={headerOwnsDetail} plainActions={headingPlacement==="content"} leadingClassName="mobile-header-leading" leading={<>
+      <AppHeader className={headerOwnsDetail ? "mobile-header mobile-header-detail" : "mobile-header"} detail={headerOwnsDetail} contentHeader={headingPlacement==="content"} leadingClassName="mobile-header-leading" leading={<>
         {headerOwnsDetail ? <Link className="mobile-back" href={backHref!} aria-label={backLabel}><Icon name="back"/></Link> : <><Link href="/dashboard" className="mobile-header-brand" aria-label="Zur Übersicht"><Logo compact={headingPlacement!=="content"}/></Link>{headingPlacement==="header"&&<h1 className="mobile-section-title"><LocalizedText verbatim={titleIsUserContent}>{title}</LocalizedText></h1>}</>}
         {headerOwnsDetail&&<h1 className="mobile-header-title"><span><LocalizedText verbatim={titleIsUserContent}>{title}</LocalizedText></span>{status!=null&&<Status tone={statusTone}>{status}</Status>}</h1>}
       </>} actionClassName={headerOwnsDetail?"mobile-detail-actions":"mobile-header-actions"} actions={headerOwnsDetail ? (allowed&&(mobileActions||visibleActions)?mobileActions??visibleActions:undefined) : <>
@@ -434,5 +434,5 @@ export function AppShellLayout({children}:{children:React.ReactNode}){
 /** Root suspense sits inside the persistent frame on an app route. */
 export function RouteLoading(){
  const inShell=useContext(ShellRegistration);
- return inShell?<LoadingState aria-live="polite"><LocalizedText>{"Inhalt wird geladen …"}</LocalizedText></LoadingState>:<AppStart/>;
+ return inShell?<LoadingState/>:<AppStart/>;
 }

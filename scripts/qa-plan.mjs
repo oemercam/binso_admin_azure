@@ -51,7 +51,7 @@ export function planChanges(files,{level='standard'}={}){
  if(global||infrastructure){suites.add('ux-contract-check');suites.add('foundation-integration-test');}
  if(paths.some(p=>/process-draft/.test(p)))suites.add('process-draft-test');
  if(global||matched.some(g=>g!==groups.public&&g!==groups.operator&&g!==groups.settings))suites.add('ux-regression-test');
- if(global){suites.add('theme-selfcheck');suites.add('glass-ux-test');suites.add('ui-build-cache-test');}
+ if(global){suites.add('theme-selfcheck');suites.add('creation-chrome-test');suites.add('ui-build-cache-test');}
  if(paths.some(p=>/^(components\/(ui|binso-ux|form-wizard|ux-lab)|scripts\/(eslint\/central-ui|ui-foundation-test))/.test(p)))suites.add('ui-foundation-test');
  if(paths.some(p=>/^lib\/(client\/|money\.|financial-status\.|finance-periods\.)|^scripts\/data-foundation-test/.test(p)))suites.add('data-foundation-test');
  if(paths.some(p=>/^components\/(app-shell|operator|ui)\.|^app\/design-system\/|^scripts\/navigation-foundation-test/.test(p)))suites.add('navigation-foundation-test');

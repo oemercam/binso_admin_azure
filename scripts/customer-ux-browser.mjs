@@ -32,7 +32,9 @@ export async function verifyCustomerStates(page,{base,capture=async()=>{}}){
  await page.route(endpoint,handler);
  try{
   await page.goto(url);
-  await page.getByRole('status').getByText('Die Kundendaten werden abgerufen.',{exact:true}).waitFor();
+  await page.locator('.loading-state').waitFor();
+  assert.equal(await page.locator('.loading-state .sr-only').textContent(),'Die Kundendaten werden abgerufen.','Loading remains announced to assistive technology');
+  assert.equal(await page.locator('.loading-state .sr-only').evaluate(el=>getComputedStyle(el).position),'absolute','Loading copy is visually hidden, not removed from accessibility');
   await capture('loading');mode='error';release();
   await page.getByRole('alert').getByText('Synthetic dossier unavailable',{exact:true}).waitFor();await capture('error');
   mode='normal';await page.getByRole('button',{name:'Erneut versuchen',exact:true}).click();

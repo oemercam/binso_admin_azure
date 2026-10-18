@@ -12,7 +12,7 @@ import { RecordsView, RecordsControls, useRecordsController } from "../records";
 import { appendDemoRow } from "@/lib/demo-storage";
 import {useApiQuery} from "@/lib/client/use-api-query";
 import { apiPost, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
-import { AccessLink, Button, EmptyState, ErrorState, Field, Icon, Status, Toast, Select, Input } from "../ui";
+import { AccessLink, Button, EmptyState, ErrorState, LoadingState, Field, Icon, Status, Toast, Select, Input } from "../ui";
 import { CreateAction,FormSheet } from "../binso-ux";
 import {useDirtySnapshot} from '../use-dirty-snapshot';
 import {allowDraftNavigation} from '../use-browser-back-guard';
@@ -22,7 +22,7 @@ export function PaymentsPage() {
   const columns:NonNullable<Parameters<typeof useRecordsController>[0]["columns"]>=[{label:"Datum",index:1},{label:"Kunde",index:2},{label:"Referenz / Art",index:3},{label:"Betrag",index:4,align:"right"},{label:"Status",index:5,status:true}];
   const chips=["Alle","Verbucht","Ausstehend"];
   const {rows:paymentRows,total,controller,pagination,loading,error}=useRecordList("payments",{placeholder:"Zahlungen suchen...",chips,columns,sortFields:{1:"paid_on",2:"customer_name",3:"invoice_number",4:"amount",5:"status"},defaultOrder:"paid_on.desc",filterValues:{Verbucht:{field:"status",value:"booked"},Ausstehend:{field:"status",value:"pending"}}});
-  return <AppShell title="Zahlungen" subtitle={loading?"Wird geladen…":`${total} Zahlungen`} active="zahlungen" actions={<RecordsControls controller={controller} placeholder="Zahlungen suchen..." chips={chips} columns={columns}><CreateAction href="/zahlungen/neu" label="Zahlung erfassen"/></RecordsControls>}>
+  return <AppShell title="Zahlungen" subtitle={loading?undefined:`${total} Zahlungen`} active="zahlungen" actions={<RecordsControls controller={controller} placeholder="Zahlungen suchen..." chips={chips} columns={columns}><CreateAction href="/zahlungen/neu" label="Zahlung erfassen"/></RecordsControls>}>
     <FinanceTabs/><RecordsView controller={controller} toolbarActions={false} showCount={false} remote pagination={pagination} countLabel="Zahlungen" loading={loading} error={error} items={paymentRows} placeholder="Zahlungen suchen..." chips={chips} columns={columns} rowHref={row=>`/zahlungen/${row[0]}`}>{([id,date,name,meta,amount,status])=><FinancialSummaryRow href={`/zahlungen/${id}`} title={`${name} · ${date}`} meta={meta} amount={amount} status={status} tone={status==="Verbucht"?"success":"neutral"}/>}</RecordsView>
   </AppShell>;
 }
@@ -110,7 +110,7 @@ export function PaymentDetail({paymentId="1"}:{paymentId?:string}) {
     </div>
   </AppShell>;
 
-  if(!payment) return <AppShell title="Zahlung" subtitle={paymentError?"Zahlung nicht verfügbar":"Daten werden geladen."} active="zahlungen" backHref="/zahlungen" backLabel="Zahlungen"><div role={paymentError?"alert":"status"}><EmptyState icon="wallet" title={paymentError?"Zahlung konnte nicht geladen werden":"Zahlung wird geladen"} text={paymentError??"Die Zahlungsdaten werden abgerufen."}/></div>{paymentError&&<AccessLink className="button" href="/zahlungen"><LocalizedText>{"Zur Zahlungsübersicht"}</LocalizedText></AccessLink>}</AppShell>;
+  if(!payment) return <AppShell title="Zahlung" subtitle={paymentError?"Zahlung nicht verfügbar":undefined} active="zahlungen" backHref="/zahlungen" backLabel="Zahlungen">{paymentError?<div role="alert"><EmptyState icon="wallet" title="Zahlung konnte nicht geladen werden" text={paymentError}/></div>:<LoadingState/>}{paymentError&&<AccessLink className="button" href="/zahlungen"><LocalizedText>{"Zur Zahlungsübersicht"}</LocalizedText></AccessLink>}</AppShell>;
 
   const customer=payment.customer as {name?:string}|null|undefined;
   const invoice=payment.invoice as {number?:string;total?:number}|null|undefined;

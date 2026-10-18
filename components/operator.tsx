@@ -161,7 +161,7 @@ export function OperatorPage({ section = "", demo = false, identity, role="platf
     </aside>
 
     <main className="operator-main">
-      <AppHeader plainActions className="operator-app-header" detail={!!detail} leadingClassName="operator-header-brand" leading={<>
+      <AppHeader contentHeader className="operator-app-header" detail={!!detail} leadingClassName="operator-header-brand" leading={<>
         <DesktopNavigationToggle collapsed={navigationCollapsed} onToggle={toggleNavigation} controls="operator-desktop-navigation"/>
         {detail?<Link href={"/operator/"+key} className="mobile-back" aria-label="Zur Liste"><Icon name="back"/></Link>:<Link href="/operator" aria-label="Zum Admin-Dashboard"><Logo/></Link>}
         <span className="operator-header-desktop-label"><LocalizedText>{"Admin"}</LocalizedText></span>
@@ -317,7 +317,7 @@ function TicketDetail({ticketId}:{ticketId:string}) {
     <aside className="surface customer-context"><SectionTitle title="Kunde"/><h3><LocalizedText>{"Acme AG"}</LocalizedText></h3><p><LocalizedText>{"Demo-Kontext"}</LocalizedText></p></aside>{toast&&<Toast title={toast} tone={toastTone}/>}
   </div>;
 
-  if(!ticket) return <WorkspaceSection><EmptyState compact icon="support" title="Ticket wird geladen" text="Die Ticketdaten werden abgerufen."/></WorkspaceSection>;
+  if(!ticket) return <WorkspaceSection><LoadingState/></WorkspaceSection>;
 
   const tenant=ticket.tenant as Record<string,unknown>|undefined;
   const status=String(ticket.status??"open");
@@ -377,7 +377,7 @@ function OperatorCustomerDetail({tenantId}:{tenantId:string}) {
   const restrictions=Array.isArray(overview.active_restrictions)?overview.active_restrictions as Array<Record<string,unknown>>:[];
   if(production&&(loading||loadError))return <OperatorLoadState loading={loading} error={loadError} onRetry={refresh}/>;
 
-  if(!tenant) return <WorkspaceSection><EmptyState compact icon="users" title="Kunde wird geladen" text="Die Mandantendaten werden abgerufen."/></WorkspaceSection>;
+  if(!tenant) return <WorkspaceSection><LoadingState/></WorkspaceSection>;
 
   const plan=String(account?.plan??"");
   const accountStatus=String(account?.account_status??"active");
