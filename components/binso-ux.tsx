@@ -1,7 +1,7 @@
 "use client";
 
 import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
-import { Children, isValidElement, cloneElement, useState, useRef, useEffect, useLayoutEffect, useContext, useId, type ReactNode, type CSSProperties } from "react";
+import { Children, Fragment, isValidElement, cloneElement, useState, useRef, useEffect, useLayoutEffect, useContext, useId, type ReactNode, type CSSProperties } from "react";
 import {WorkspaceActionContext} from '@/lib/client/workspace-actions';
 import Link from "next/link";
 import {useRouter} from "next/navigation";
@@ -141,10 +141,15 @@ export function RowActions({ label = "Weitere Aktionen", onClick, disabled = fal
 
 function sheetValues(root:HTMLElement|null){return JSON.stringify(Array.from(root?.querySelectorAll<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>('input:not([type="hidden"]),select,textarea')??[]).map(el=>[el.name||el.id,el.type,el.type==='checkbox'||el.type==='radio'?(el as HTMLInputElement).checked:el.value]));}
 
+/** Fragments do not create a scroll/ownership boundary for a footer. */
+function sheetChildren(nodes:ReactNode):ReactNode[]{
+ return Children.toArray(Children.map(nodes,child=>isValidElement<{children?:ReactNode}>(child)&&child.type===Fragment?sheetChildren(child.props.children):child));
+}
+
 function sheetForm(child:ReactNode):ReactNode{
  if(!isValidElement<{children?:ReactNode;className?:string}>(child)||!["form","section","div"].includes(child.type as string))return child;
  const content:ReactNode[]=[],actions:ReactNode[]=[];
- for(const node of Children.toArray(child.props.children)){
+ for(const node of sheetChildren(child.props.children)){
   if(isValidElement<{className?:string}>(node)&&(node.type===FormActions||node.props.className?.split(/\s+/).some(name=>["filter-sheet-actions","mobile-sticky-save"].includes(name))))actions.push(node);
   else content.push(sheetForm(node));
  }
@@ -190,7 +195,7 @@ function Sheet({label,lang,description,open,onClose,children,busy=false,classNam
  useEffect(()=>{if(open)baseline.current=sheetValues(dialogRef.current);let active=true;queueMicrotask(()=>{if(active)setChanged(false)});return()=>{active=false}},[open,mounted,dialogRef]);
  if(!open||!mounted)return null;
  const body:ReactNode[]=[],footers:ReactNode[]=[];
- for(const child of Children.toArray(children)){
+ for(const child of sheetChildren(children)){
   if(isValidElement<{className?:string;children?:ReactNode;sheet?:boolean}>(child)&&(child.type===FormActions||child.props.className?.split(/\s+/).includes("filter-sheet-actions")))footers.push(child.type===FormActions?cloneElement(child,{sheet:true}):child);
   else if(isValidElement<{className?:string;children?:ReactNode}>(child)&&child.props.className?.split(/\s+/).includes("sheet-body"))body.push(cloneElement(child,{className:child.props.className.replace(/\bsheet-body\b/g,"").trim()}));
   else body.push(sheetForm(child));
