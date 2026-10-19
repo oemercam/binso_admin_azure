@@ -124,8 +124,8 @@ function recordListFixture(table,params){
  const offset=Number(params.get('offset')??0),limit=Number(params.get('limit')??1000);
  return {items:rows.slice(offset,offset+limit),total:rows.length};
 }
-const summary={invoices:[{currency:'CHF',open_amount:35.13,revenue:135.13,open_count:1,overdue_count:0,draft_count:0}],offers:{draft_count:0,sent_count:0,accepted_count:0},time:{hours:2.25,invoiced_hours:0,ready_hours:0,unapproved_hours:0},expenses:{ready_amount:0}};
-if(process.env.BINSO_UX_FIXTURE_CASE==='empty')summary.invoices=[];
+const summary={invoices:[{currency:'CHF',open_amount:35.13,revenue:135.13,open_count:1,overdue_count:0,draft_count:0}],offers:{draft_count:0,actionable_count:1},time:{hours:2.25,invoiced_hours:0,ready_hours:0,unapproved_hours:0},expenses:{ready_amount:0}};
+if(process.env.BINSO_UX_FIXTURE_CASE==='empty'){summary.invoices=[];summary.offers.actionable_count=0;}
 const fixturePdf=process.env.BINSO_UX_PDF_FILE?await fs.readFile(process.env.BINSO_UX_PDF_FILE):await new Promise(resolve=>{const doc=new PDFDocument({size:'A4'}),chunks=[];doc.on('data',chunk=>chunks.push(chunk));doc.on('end',()=>resolve(Buffer.concat(chunks)));doc.text('Invoice fixture page one');doc.addPage().text('Payment fixture page two');doc.end()});
 const requestedInteractions=process.env.BINSO_UX_INTERACTIONS?.split(',')??['data','customers','products','employees','documents','finance','time','expenses','chat','billing','header','operator','settings','chrome'];
 const hasInteraction=name=>requestedInteractions.includes(name);
@@ -430,6 +430,7 @@ try{
     if(!process.env.BINSO_UX_BASELINE&&['/dashboard','/finanzen'].includes(route)){
       const ready=await page.waitForFunction(({dashboard})=>{const metrics=document.querySelectorAll('.bo-cash-overview .bo-metric-tiles>.metric').length,actions=[...document.querySelectorAll('.app-section-dashboard .page-actions .bo-create-action')].filter(el=>el.checkVisibility()).length,legacyActions=document.querySelectorAll('.bo-quick-create-links>a').length,bars=document.querySelectorAll('.bo-overview-bars>button').length;return metrics===4&&(dashboard?actions===1:bars===6)?{metrics,actions,legacyActions,bars,analysis:document.querySelectorAll('.bo-ring-chart,.bo-statistics').length}:null},{dashboard:route==='/dashboard'});
       const overview=await ready.jsonValue();await ready.dispose();
+      assert.equal(await page.getByText('undefined',{exact:true}).count(),0,'Finance/overview never renders missing fixture values as text');
       assert.equal(overview.metrics,4,'The original overview has four domain metrics');
       assert.equal(overview.analysis,0,'Detailed analysis is kept out of the compact original overview');
       if(route==='/dashboard'){assert.equal(overview.actions,1,'Dashboard has one page-owned creation trigger');assert.equal(overview.legacyActions,0,'Dashboard has no competing legacy quick links');}
@@ -990,6 +991,7 @@ try{
   }
   if(hasInteraction('time')){
    groupingFixture=true;   await page.setViewportSize({width:320,height:740});await navigate(base+'/zeit');await page.waitForLoadState('networkidle');await page.getByRole('tab',{name:'Einträge',exact:true}).click();
+   await page.waitForFunction(()=>document.querySelectorAll('.time-group').length===4);
    assert.equal(await page.locator('.time-group').count(),4,'Internal time and distinct customer/project identities remain four groups');assert.equal(await page.locator('.timer-card .section-title strong').innerText(),'40:45 h','Group total counts each entry once');
    const group=page.locator('.time-group-head').first();assert.equal(await group.evaluate(el=>getComputedStyle(el).textAlign),'left','Time group does not inherit timer centering');
    const customerBox=await group.locator('b').boundingBox(),duration=await group.locator('strong').boundingBox(),chevron=await group.locator('svg').boundingBox();assert.ok(customerBox.x<duration.x&&duration.x<chevron.x,'Group duration and chevron are right aligned');assert.ok((await group.boundingBox()).height<=76,'Collapsed group is compact');

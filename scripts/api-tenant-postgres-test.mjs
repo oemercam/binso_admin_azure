@@ -93,6 +93,7 @@ try{
   const response=await get('/api/finance/overview?include=workspace'+suffix,cookies.get('0:'+role));
   assert.equal(response.status,documentRoles.includes(role)?200:403,role+' scoped finance workspace');
   if(!documentRoles.includes(role))continue;
+  assert.ok(Number.isInteger(response.data.offers?.actionable_count)&&response.data.offers.actionable_count>=0,role+' receives the actual finite offer-count contract');
   if(finance.includes(role)){
    assert.ok(response.data.cash&&typeof response.data.cash==='object',role+' has the authorized cash workspace');
    if(!suffix.includes('view=cash'))assert.ok(Object.keys(response.data.data).length,role+' has authorized accounting data');

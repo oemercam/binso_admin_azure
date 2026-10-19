@@ -227,3 +227,43 @@ Für die Duplikatsuche werden alle acht Rollen sowie ein positiver eigener und
 ein negativer fremder Tenant geprüft; der Endpunkt wird nicht von der
 Vollständigkeitsprüfung ausgenommen. Beide Folgekorrekturen benötigen ihren
 eigenen aktuellen CI-Nachweis. Die Browsermatrix ist weiterhin nicht bestanden.
+
+### Bestätigte CI-Korrektur und Beginn der Browserabnahme
+
+- `050f1d12`: [Quality #1564](https://github.com/oemercam/binso_admin_azure/actions/runs/39341672031)
+  und [CodeQL](https://github.com/oemercam/binso_admin_azure/actions/runs/39341671990)
+  erfolgreich. Die ursprünglichen B01/B02 sowie die HTTP-Vollständigkeit sind
+  damit tatsächlich geprüft. Der Draft-Lauf stellt Browser absichtlich zurück.
+- Der manuelle [Full/development-Lauf #1565](https://github.com/oemercam/binso_admin_azure/actions/runs/39342172012)
+  prüft denselben Head ohne Änderung des Draft-Status. Deployment ist ein
+  getrennter, ausdrücklich freizugebender Workflow und wurde nicht ausgelöst.
+  Erfolgreich: 392 Chromium- sowie 72 und 60 WebKit-Route/Theme/Viewport-Fälle
+  in drei responsiven Teilmengen. Das sind Teilnachweise, keine Summe eindeutiger
+  Seiten und keine physische Installation. Gesamtlauf fehlgeschlagen.
+- Nachgewiesene Browser-Testdrift: Dashboard erwartete entfernte doppelte
+  Schnelllinks. Es prüft jetzt genau einen gemeinsamen Erstellungs-Trigger,
+  Abwesenheit der Altlinks sowie unabhängig erwartete Menüziele für Owner,
+  Finance und Member; Read-only-Support bleibt separat geprüft. Gestaltung und
+  Verhalten der bestehenden Navigation/Plus-Aktion werden nicht geändert.
+- Die serverseitige Zeitsuche und der Wechsel Timer/Einträge sind asynchron.
+  Die Gruppierungsprüfung wartet nun auf die exakte erwartete Gruppenanzahl,
+  bevor sie weiterhin Anzahl, Summe, Bedienung und Geometrie prüft. Keine festen
+  Sleeps, niedrigeren Erwartungen oder ausgelassenen Fälle. Der [Folgelauf #1567](https://github.com/oemercam/binso_admin_azure/actions/runs/39343221820)
+  hat die Such-Rücksetzung bereits überwunden und den weiteren Tabwechsel-Gegenfall
+  aufgedeckt. Dieser ist in der lokalen gezielten Time-Regressionsprüfung behoben.
+- Sichtstichproben aus Artefakt `ux-browser-chromium-responsive-2-050f1d12…`
+  (ID 12229747152): Kundendossier, Finanzen, Operator-Tickets bei 390px/Light.
+  Ergebnisdatei: 392 Fälle, null Runtimefehler. Die Finanzaufnahme zeigt dennoch
+  `undefined`: der synthetische Fixture hatte veraltete Offer-Felder statt
+  `actionable_count`. Fixture auf tatsächlichen API-Vertrag gebracht, sichtbare
+  `undefined`-Werte werden zusätzlich abgewiesen, echter HTTP-Vertrag prüft einen
+  nicht negativen ganzzahligen Offer-Zähler. Keine Produktivursache behauptet.
+- Lokal erfolgreich: exakt ein Zeiterfassungs-Browserfall mit Time-Interaktionen
+  sowie zwei isolierte Dashboard-/Finanzfälle (390px/Light, Chromium/Edge).
+  Vorhandener Build, synthetische API-Antworten, kein neuer Build oder produktiver
+  Zugriff. Ein früherer unergiebiger lokaler PWA-Versuch wurde kontrolliert
+  beendet und bleibt ohne Erfolgsnachweis.
+
+Aktuelle Nachfolgeläufe und SHA stehen im PR #296. Fehlerhafte Vorläufe bleiben
+verlinkt. Routen, fehlende Originalzustände und Geräte bleiben offen, bis die
+jeweiligen Fälle tatsächlich bestanden sind; keine pauschale App-Freigabe.
