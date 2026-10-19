@@ -163919,7 +163919,7 @@
       "elements": [
         {
           "tag": "LocalizedElement",
-          "line": 47,
+          "line": 55,
           "props": [
             "as=\"div\"",
             "ref={rootRef}",
@@ -163930,7 +163930,7 @@
         },
         {
           "tag": "div",
-          "line": 48,
+          "line": 56,
           "props": [
             "className=\"wizard-progress\"",
             "role=\"status\""
@@ -163938,26 +163938,26 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 48,
+          "line": 56,
           "props": []
         },
         {
           "tag": "div",
-          "line": 49,
+          "line": 57,
           "props": [
             "className=\"wizard-content\""
           ]
         },
         {
           "tag": "FormActions",
-          "line": 50,
+          "line": 58,
           "props": [
             "onClickCapture={event=>{\n   const button=event.target instanceof Element?event.target.closest('button.button-primary'):null;\n   // Prevent a step transition from acquiring native submit semantics in the same click.\n   if(button&&guided&&step<labels.length-1)event.preventDefault();\n   if(button&&(!guided||step===labels.length-1)&&!valid()){event.preventDefault();event.stopPropagation();}\n  }}"
           ]
         },
         {
           "tag": "Button",
-          "line": 55,
+          "line": 63,
           "props": [
             "variant=\"secondary\"",
             "disabled={busy}",
@@ -163966,19 +163966,19 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 55,
+          "line": 63,
           "props": []
         },
         {
           "tag": "Fragment",
-          "line": 55,
+          "line": 63,
           "props": [
             "key=\"wizard-submit\""
           ]
         },
         {
           "tag": "Button",
-          "line": 55,
+          "line": 63,
           "props": [
             "key=\"wizard-next\"",
             "disabled={busy}",
@@ -163987,89 +163987,93 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 55,
+          "line": 63,
           "props": []
         }
       ],
       "conditions": [
         {
-          "line": 11,
-          "expression": "!guided||!root||root.closest('.bottom-sheet')"
-        },
-        {
           "line": 13,
-          "expression": "window.innerWidth<=760"
+          "expression": "!guided||!changed"
         },
         {
           "line": 17,
-          "expression": "!root.getClientRects().length"
-        },
-        {
-          "line": 20,
-          "expression": "container"
-        },
-        {
-          "line": 27,
-          "expression": "focused instanceof HTMLElement&&root.contains(focused)&&focused.matches('input,select,textarea')"
-        },
-        {
-          "line": 30,
-          "expression": "root.parentElement"
-        },
-        {
-          "line": 30,
-          "expression": "header"
-        },
-        {
-          "line": 38,
-          "expression": "invalid"
-        },
-        {
-          "line": 42,
-          "expression": "next>step&&!valid()"
-        },
-        {
-          "line": 43,
-          "expression": "busy||next<0||next>=labels.length"
-        },
-        {
-          "line": 45,
           "expression": "content"
         },
         {
+          "line": 20,
+          "expression": "!guided||!root||root.closest('.bottom-sheet')"
+        },
+        {
+          "line": 22,
+          "expression": "window.innerWidth<=760"
+        },
+        {
+          "line": 26,
+          "expression": "!root.getClientRects().length"
+        },
+        {
+          "line": 29,
+          "expression": "container"
+        },
+        {
+          "line": 36,
+          "expression": "focused instanceof HTMLElement&&root.contains(focused)&&focused.matches('input,select,textarea')"
+        },
+        {
+          "line": 39,
+          "expression": "root.parentElement"
+        },
+        {
+          "line": 39,
+          "expression": "header"
+        },
+        {
           "line": 47,
-          "expression": "guided"
-        },
-        {
-          "line": 48,
-          "expression": "progressLabel"
-        },
-        {
-          "line": 49,
-          "expression": "guided&&isValidElement<{title?:string}>(child)&&child.type===FormSection&&child.props.title===labels[step]"
+          "expression": "invalid"
         },
         {
           "line": 51,
+          "expression": "next>step&&!valid()"
+        },
+        {
+          "line": 52,
+          "expression": "busy||next<0||next>=labels.length"
+        },
+        {
+          "line": 55,
+          "expression": "guided"
+        },
+        {
+          "line": 56,
+          "expression": "progressLabel"
+        },
+        {
+          "line": 57,
+          "expression": "guided&&isValidElement<{title?:string}>(child)&&child.type===FormSection&&child.props.title===labels[step]"
+        },
+        {
+          "line": 59,
           "expression": "event.target instanceof Element"
         },
         {
-          "line": 53,
+          "line": 61,
           "expression": "button&&guided&&step<labels.length-1"
         },
         {
-          "line": 54,
+          "line": 62,
           "expression": "button&&(!guided||step===labels.length-1)&&!valid()"
         },
         {
-          "line": 55,
+          "line": 63,
           "expression": "!guided"
         },
         {
-          "line": 55,
+          "line": 63,
           "expression": "step===0"
         },
         {
-          "line": 55,
+          "line": 63,
           "expression": "!guided||step===labels.length-1"
         }
       ]
