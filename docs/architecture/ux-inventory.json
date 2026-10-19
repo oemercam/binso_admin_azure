@@ -163886,7 +163886,7 @@
       "elements": [
         {
           "tag": "LocalizedElement",
-          "line": 45,
+          "line": 47,
           "props": [
             "as=\"div\"",
             "ref={rootRef}",
@@ -163897,7 +163897,7 @@
         },
         {
           "tag": "div",
-          "line": 46,
+          "line": 48,
           "props": [
             "className=\"wizard-progress\"",
             "role=\"status\""
@@ -163905,26 +163905,26 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 46,
+          "line": 48,
           "props": []
         },
         {
           "tag": "div",
-          "line": 47,
+          "line": 49,
           "props": [
             "className=\"wizard-content\""
           ]
         },
         {
           "tag": "FormActions",
-          "line": 48,
+          "line": 50,
           "props": [
             "onClickCapture={event=>{\n   const button=event.target instanceof Element?event.target.closest('button.button-primary'):null;\n   // Prevent a step transition from acquiring native submit semantics in the same click.\n   if(button&&guided&&step<labels.length-1)event.preventDefault();\n   if(button&&(!guided||step===labels.length-1)&&!valid()){event.preventDefault();event.stopPropagation();}\n  }}"
           ]
         },
         {
           "tag": "Button",
-          "line": 53,
+          "line": 55,
           "props": [
             "variant=\"secondary\"",
             "disabled={busy}",
@@ -163933,19 +163933,19 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 53,
+          "line": 55,
           "props": []
         },
         {
           "tag": "Fragment",
-          "line": 53,
+          "line": 55,
           "props": [
             "key=\"wizard-submit\""
           ]
         },
         {
           "tag": "Button",
-          "line": 53,
+          "line": 55,
           "props": [
             "key=\"wizard-next\"",
             "disabled={busy}",
@@ -163954,7 +163954,7 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 53,
+          "line": 55,
           "props": []
         }
       ],
@@ -163988,55 +163988,55 @@
           "expression": "header"
         },
         {
-          "line": 36,
+          "line": 38,
           "expression": "invalid"
         },
         {
-          "line": 40,
+          "line": 42,
           "expression": "next>step&&!valid()"
         },
         {
-          "line": 41,
+          "line": 43,
           "expression": "busy||next<0||next>=labels.length"
         },
         {
-          "line": 43,
+          "line": 45,
           "expression": "content"
         },
         {
-          "line": 45,
+          "line": 47,
           "expression": "guided"
         },
         {
-          "line": 46,
+          "line": 48,
           "expression": "progressLabel"
         },
         {
-          "line": 47,
+          "line": 49,
           "expression": "guided&&isValidElement<{title?:string}>(child)&&child.type===FormSection&&child.props.title===labels[step]"
         },
         {
-          "line": 49,
+          "line": 51,
           "expression": "event.target instanceof Element"
         },
         {
-          "line": 51,
+          "line": 53,
           "expression": "button&&guided&&step<labels.length-1"
         },
         {
-          "line": 52,
+          "line": 54,
           "expression": "button&&(!guided||step===labels.length-1)&&!valid()"
         },
         {
-          "line": 53,
+          "line": 55,
           "expression": "!guided"
         },
         {
-          "line": 53,
+          "line": 55,
           "expression": "step===0"
         },
         {
-          "line": 53,
+          "line": 55,
           "expression": "!guided||step===labels.length-1"
         }
       ]

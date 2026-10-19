@@ -131,3 +131,14 @@ write=true;
 for(const file of [{type:'text/plain',size:10},{type:'image/png',size:0},{type:'image/png',size:10*1024*1024+1}]){selectFile(file);assert.equal(fileSelection,null);assert.ok(fileError,'Rejected file provides a field error');}
 const validLogo={type:'image/png',size:32,name:'synthetic.png'};selectFile(validLogo);assert.equal(fileSelection,validLogo);assert.equal(fileError,'');
 write=false;fileSelection=null;selectFile(validLogo);assert.equal(fileSelection,null,'Read-only upload callbacks fail closed');write=true;
+
+// Invalid wizard fields keep native validity and inline errors, without a native popover.
+let wizardValid=false,wizardFocused=false,wizardScrolled=false,wizardNext=0;
+const invalidWizardControl={disabled:false,getClientRects:()=>[{}],matches:()=>false,checkValidity:()=>wizardValid,reportValidity(){throw Error('Native validation popover must not replace inline errors')},focus(){wizardFocused=true},scrollIntoView(){wizardScrolled=true}};
+const validationWizard={};
+Function('require','exports','useEffect','useRef','Children','cloneElement','isValidElement','Fragment','Button','FormActions','FormSection','requestAnimationFrame',wizardCompiled)(require,validationWizard,()=>{},()=>({current:{querySelectorAll:()=>[invalidWizardControl],querySelector:()=>null}}),React.Children,React.cloneElement,React.isValidElement,React.Fragment,ui.Button,ui.FormActions,ui.FormSection,()=>0);
+const wizardElements=element=>!element||typeof element!=='object'?[]:[element,...React.Children.toArray(element.props?.children).flatMap(wizardElements)];
+const validationView=validationWizard.FormWizard({labels:['First','Second'],step:0,onStep:()=>{wizardNext++},action:null,cancelAction:null,children:null});
+const nextAction=wizardElements(validationView).find(element=>element.type===ui.Button&&element.props.onClick);
+nextAction.props.onClick();assert.equal(wizardNext,0,'Invalid input cannot advance the wizard');assert.ok(wizardFocused&&wizardScrolled,'Inline validation focuses and reveals its failing control');
+wizardValid=true;nextAction.props.onClick();assert.equal(wizardNext,1,'A valid current step remains usable');

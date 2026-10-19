@@ -33,7 +33,9 @@ export function FormWizard({labels,step,onStep,children,action,cancelAction,busy
  },[guided]);
  const valid=()=>{
   const invalid=Array.from(rootRef.current?.querySelectorAll<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>('input,select,textarea')??[]).find(el=>(el.getClientRects().length||el.matches("select[data-app-select]")&&el.closest(".app-select-control")?.getClientRects().length)&&!el.disabled&&!el.checkValidity());
-  if(invalid){invalid.reportValidity();return false;}
+  // checkValidity already dispatches Field's inline error. Keep focus on that
+  // control without adding a native validation popover over the sheet footer.
+  if(invalid){invalid.focus({preventScroll:true});invalid.scrollIntoView({block:'nearest'});return false;}
   return true;
  };
  const go=(next:number)=>{
