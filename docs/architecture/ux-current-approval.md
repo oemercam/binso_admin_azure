@@ -1,5 +1,12 @@
 # Aktueller Microsoft-App-Standard
 
+V25-Freigabe vom 19.10.2026: [vollständige Anforderungen](v25-requirements.md).
+Navigation und bestehender blauer Plus-Button bleiben unverändert. Die aktuellen
+FormSheet-Workspaces sind modal mit Scrim und Fokusführung. Sekundäre Dokument-
+und Dateiaktionen gehören in die vorhandenen Menüs; kurze Leerzustände ohne
+Dekoration/Zusatzaktion, vollständiger Umbruch bei Zoom. Diese Entscheidungen
+ersetzen widersprechende ältere Workspace-/Aktions-/Leerzustandsregeln.
+
 Die ausdrückliche Gesamtfreigabe nach der Diagnose vom 18.10.2026 ersetzt ältere
 Material-, Kompakt-, Dock-Geometrie- und Dokumenteditor-Vorgaben. Das unveränderte
 Microsoft-Referenzpaket vom 15.10. bleibt die visuelle Grundlage. Fehlende Screens,

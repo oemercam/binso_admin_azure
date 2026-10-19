@@ -65,7 +65,7 @@ const runtimeWindow=eventTarget(),runtimeDocument=eventTarget(),media=eventTarge
 let cleanup,osDark=false;
 Object.assign(runtimeDocument,{head:{},visibilityState:'visible',documentElement:{dataset:{themeMode:'system',theme:'light'}},querySelectorAll:()=>[]});
 runtimeWindow.matchMedia=()=>({...media,matches:osDark});
-class Observer{observe(){}disconnect(){}}
+const observers=[];class Observer{constructor(callback){observers.push(callback)}observe(){}disconnect(){}}
 const runtimeExports={};
 Function('exports','useEffect','applyTheme','window','document','MutationObserver',runtimeCompiled)(runtimeExports,fn=>cleanup=fn(),mode=>{
  runtimeDocument.documentElement.dataset.themeMode=mode;
@@ -82,6 +82,10 @@ runtimeDocument.documentElement.dataset.themeMode='dark';osDark=false;runtimeWin
 assert.equal(runtimeDocument.documentElement.dataset.theme,'dark','Resume never replaces an explicit dark preference');
 runtimeDocument.documentElement.dataset.themeMode='light';osDark=true;runtimeWindow.fire('pageshow');
 assert.equal(runtimeDocument.documentElement.dataset.theme,'light','Resume never replaces an explicit light preference');
+const statusMeta={content:'#ffffff'};runtimeDocument.querySelectorAll=()=>[statusMeta];
+runtimeDocument.documentElement.dataset.modalOverlay='true';observers.forEach(fn=>fn());assert.equal(statusMeta.content,'#c2c2c2','A sheet dims supported browser chrome with the same 24% scrim');
+runtimeDocument.documentElement.dataset.theme='dark';observers.forEach(fn=>fn());assert.equal(statusMeta.content,'#000000');
+delete runtimeDocument.documentElement.dataset.modalOverlay;runtimeDocument.documentElement.dataset.theme='light';observers.forEach(fn=>fn());assert.equal(statusMeta.content,'#ffffff','Closing the last sheet restores the light status bar');
 cleanup();assert.equal(runtimeWindow.listeners.size,0);assert.equal(runtimeDocument.listeners.size,0);assert.equal(media.listeners.size,0,'All theme lifecycle listeners are removed');
 for(const key of ['__themeWrite','__themeRead','localStorage','document','window','CustomEvent'])delete globalThis[key];
 // A root-layout failure replaces the document: test the actual fallback render,

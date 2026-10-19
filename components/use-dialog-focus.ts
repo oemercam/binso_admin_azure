@@ -36,6 +36,7 @@ export function useDialogFocus(open: boolean, onClose: () => void, headerPanel=f
     const unlockScroll=lockPageScroll(()=>dialog);
     const unlockBackground=headerPanel?()=>{}:lockDialogBackground(dialog);
     modalStack.push(dialog);
+    if(!headerPanel)document.documentElement.dataset.modalOverlay="true";
     if(!headerPanel)window.dispatchEvent(new Event("binso-modal-open"));
     const active = document.activeElement;
     const trigger = active instanceof HTMLElement && !dialog.contains(active) ? active : triggerRef.current;
@@ -75,6 +76,7 @@ export function useDialogFocus(open: boolean, onClose: () => void, headerPanel=f
     return () => {
       const index=modalStack.indexOf(dialog);if(index>=0)modalStack.splice(index,1);
       unlockBackground();
+      if(!modalStack.some(item=>!item.matches(".header-panel")))delete document.documentElement.dataset.modalOverlay;
       viewport?.removeEventListener("resize",resize);viewport?.removeEventListener("scroll",resize);
       document.removeEventListener("keydown", onKey);
       document.removeEventListener("focusin", onFocus);

@@ -130,3 +130,5 @@ const lineNodes=nodes(actualLine),points=lineNodes.filter(n=>n.props?.as==='circ
 points[1].props.onKeyDown({key:'Enter',preventDefault(){}});assert.equal(chosen,'b');let stopped=false;points[0].props.onClick({stopPropagation(){stopped=true}});assert.equal(stopped,true);assert.equal(chosen,'a');
 lineNodes.find(n=>n.type==='svg').props.onClick({clientX:598,currentTarget:{getBoundingClientRect:()=>({left:10,width:600})}});assert.equal(chosen,'c','A tap anywhere in a chart column chooses its nearest real observation');
 console.log('Actual shared line chart: signed plotted coordinates, accessible negative values, keyboard/pointer selection and full-chart nearest-observation hit testing passed.');
+
+assert.deepEqual(lineNodes.filter(node=>node.type==='span'&&node.props?.['data-value']!==undefined).map(node=>node.props['data-value']),[10,0,-10],'Shared value scale shows the actual signed maximum, midpoint and minimum');

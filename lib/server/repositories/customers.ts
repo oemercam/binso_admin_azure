@@ -8,10 +8,12 @@ import {idempotentBusiness} from "../business-idempotency";
 import {listApiBusiness} from "./business-api";
 import type {SessionUser} from "@/lib/server/session";
 
-export type CustomerInput={name:string;contact?:string;contactFirstName?:string;contactLastName?:string;email?:string;phone?:string;address?:string;street?:string;buildingNumber?:string;zipCity?:string;postalCode?:string;city?:string;sector?:string;uid?:string;language?:string;paymentDays?:number;discount?:number;status?:string;notes?:string;allowDuplicate?:boolean};
-const columns=`id,customer_no,name,coalesce((select cc.name from customer_contacts cc where cc.organization_id=customers.organization_id and cc.customer_id=customers.id and cc.is_primary=true and cc.archived_at is null limit 1),contact_name) as contact,email,phone,address,coalesce(street,address) as street,building_number,zip as postal_code,city,sector,trim(concat_ws(' ',zip,city)) as "zipCity",uid,language,payment_days as "paymentDays",discount,status,notes,created_at as "createdAt",updated_at as "updatedAt"`;
+export type CustomerInput={name:string;customerType?:"company"|"person";contact?:string;contactFirstName?:string;contactLastName?:string;email?:string;phone?:string;address?:string;street?:string;buildingNumber?:string;zipCity?:string;postalCode?:string;city?:string;sector?:string;uid?:string;language?:string;paymentDays?:number;discount?:number;status?:string;notes?:string;allowDuplicate?:boolean};
+const columns=`id,customer_no,customer_type as "customerType",name,coalesce((select cc.name from customer_contacts cc where cc.organization_id=customers.organization_id and cc.customer_id=customers.id and cc.is_primary=true and cc.archived_at is null limit 1),contact_name) as contact,email,phone,address,coalesce(street,address) as street,building_number,zip as postal_code,city,sector,trim(concat_ws(' ',zip,city)) as "zipCity",uid,language,payment_days as "paymentDays",discount,status,notes,created_at as "createdAt",updated_at as "updatedAt"`;
 export function customerInput(body:Record<string,unknown>,partial=false):Partial<CustomerInput>{
  const out:Partial<CustomerInput>={};
+ if(body.customerType!==undefined){if(typeof body.customerType!=='string'||!['company','person'].includes(body.customerType))throw new ApiError(400,'invalid_customer_type','Bitte einen gültigen Kundentyp wählen.');out.customerType=body.customerType as CustomerInput['customerType'];}
+ if(!partial)out.customerType??='company';
  if(body.allowDuplicate!==undefined){if(typeof body.allowDuplicate!=="boolean")throw new ApiError(400,"invalid_field","Ungültiges Kundenfeld: allowDuplicate");out.allowDuplicate=body.allowDuplicate;}
  for(const key of ['name','contact','contactFirstName','contactLastName','email','phone','address','street','buildingNumber','zipCity','postalCode','city','sector','uid','language','status','notes'] as const){
   if(body[key]===undefined)continue;
@@ -19,7 +21,7 @@ export function customerInput(body:Record<string,unknown>,partial=false):Partial
   out[key]=body[key].trim();
  }
  if((!partial||out.name!==undefined)&&(!out.name||out.name.length<2))throw new ApiError(400,'name_required','Bitte einen Kundennamen eingeben.');
- if(!partial){if(!out.contactFirstName||!out.contactLastName)throw new ApiError(400,'contact_required','Bitte Vorname und Nachname der Kontaktperson eingeben.');out.contact=out.contactFirstName+' '+out.contactLastName;}
+ if(!partial){if(!out.contactFirstName||!out.contactLastName)throw new ApiError(400,'contact_required','Bitte Vorname und Nachname der Kontaktperson eingeben.');out.contact=out.contactFirstName+' '+out.contactLastName;if(out.customerType==='person')out.name=out.contact;}
  if([out.contactFirstName,out.contactLastName].some(value=>value&&value.length>120))throw new ApiError(400,'invalid_field','Kontaktname ist zu lang.');
  if(partial&&out.contact!==undefined&&!out.contact)throw new ApiError(400,'contact_required','Bitte eine Kontaktperson eingeben.');
  if(out.buildingNumber&&out.buildingNumber.length>40)throw new ApiError(400,'invalid_field','Hausnummer ist zu lang.');
@@ -57,6 +59,7 @@ export async function createCustomer(organizationId:string,userId:string,input:C
  const sequence=await client.query(`insert into business_document_counters(organization_id,kind,period,next_value) values($1,'customer','',2) on conflict(organization_id,kind,period) do update set next_value=business_document_counters.next_value+1 returning next_value-1 number`,[organizationId]);
  const customerNo='K-'+String(sequence.rows[0].number).padStart(6,'0');
  await client.query(`insert into customers(id,organization_id,external_id,customer_no,name,legal_name,contact_name,email,phone,address,zip,city,sector,country,uid,language,payment_days,discount,status,created_by_user_id,notes) values($1,$2,$1::uuid::text,$3,$4,$4,$5,$6,$7,$8,$9,$10,$11,'Schweiz',$12,$13,$14,$15,$16,$17,$18) returning ${columns}`,[id,organizationId,customerNo,input.name,input.contact||null,input.email||null,input.phone||null,input.address||null,zip,city,input.sector||null,input.uid||null,input.language||'de',paymentDays,input.discount??0,statusToDb(input.status??'active'),userId,input.notes||null]);
+ await client.query('update customers set customer_type=$3 where organization_id=$1 and id=$2',[organizationId,id,input.customerType??'company']);
  await client.query('update customers set street=$3,building_number=$4,address=coalesce(nullif(concat_ws(\' \',nullif($3,\'\'),nullif($4,\'\')),\'\'),address) where organization_id=$1 and id=$2',[organizationId,id,input.street??null,input.buildingNumber??null]);
  await client.query(`insert into customer_contacts(organization_id,customer_id,first_name,last_name,name,email,phone,is_primary,external_id) values($1,$2::uuid,$3,$4,$5,$6,$7,true,$8)`,[organizationId,id,input.contactFirstName,input.contactLastName,input.contact,input.email||null,input.phone||null,randomUUID()]);
  await audit(client,{organizationId,userId,action:'customer.created',entityType:'customer',entityId:id});return (await client.query(`select ${columns} from customers where organization_id=$1 and id=$2`,[organizationId,id])).rows[0];
@@ -64,6 +67,7 @@ export async function createCustomer(organizationId:string,userId:string,input:C
 })}
 export async function updateCustomer(organizationId:string,userId:string,id:string,input:Partial<CustomerInput>){return withTenant(organizationId,userId,async client=>{
  const current=(await client.query('select * from customers where id=$1 and organization_id=$2 and archived_at is null for update',[id,organizationId])).rows[0];if(!current)return null;
+ if(input.customerType!==undefined&&input.customerType!==current.customer_type)throw new ApiError(400,'customer_type_immutable','Der Kundentyp kann hier nicht geändert werden.');
  const {zip,city}=addressParts(input,current);
  await client.query(`update customers set name=$1,legal_name=$1,contact_name=$2,email=$3,phone=$4,address=$5,zip=$6,city=$7,sector=$8,uid=$9,language=$10,payment_days=$11,discount=$12,status=$13,notes=$16,updated_at=now() where id=$14 and organization_id=$15 returning ${columns}`,[input.name??current.name,input.contact??current.contact_name,input.email??current.email,input.phone??current.phone,input.address??current.address,zip,city,input.sector??current.sector,input.uid??current.uid,input.language??current.language,input.paymentDays??current.payment_days,input.discount??current.discount,input.status?statusToDb(input.status):current.status,id,organizationId,input.notes??current.notes]);
  if(input.street!==undefined||input.buildingNumber!==undefined)await client.query("update customers set street=$3,building_number=$4,address=concat_ws(' ',nullif($3,''),nullif($4,'')) where organization_id=$1 and id=$2",[organizationId,id,input.street??current.street??current.address,input.buildingNumber??current.building_number??null]);

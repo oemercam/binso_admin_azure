@@ -110,7 +110,7 @@ export function PaymentDetail({paymentId="1"}:{paymentId?:string}) {
     </div>
   </AppShell>;
 
-  if(!payment) return <AppShell title="Zahlung" subtitle={paymentError?"Zahlung nicht verfügbar":undefined} active="zahlungen" backHref="/zahlungen" backLabel="Zahlungen">{paymentError?<div role="alert"><EmptyState icon="wallet" title="Zahlung konnte nicht geladen werden" text={paymentError}/></div>:<LoadingState/>}{paymentError&&<AccessLink className="button" href="/zahlungen"><LocalizedText>{"Zur Zahlungsübersicht"}</LocalizedText></AccessLink>}</AppShell>;
+  if(!payment) return <AppShell title="Zahlung" subtitle={paymentError?"Zahlung nicht verfügbar":undefined} active="zahlungen" backHref="/zahlungen" backLabel="Zahlungen">{paymentError?<div role="alert"><EmptyState  title="Zahlung konnte nicht geladen werden" description={paymentError}/></div>:<LoadingState/>}{paymentError&&<AccessLink className="button" href="/zahlungen"><LocalizedText>{"Zur Zahlungsübersicht"}</LocalizedText></AccessLink>}</AppShell>;
 
   const customer=payment.customer as {name?:string}|null|undefined;
   const invoice=payment.invoice as {number?:string;total?:number}|null|undefined;

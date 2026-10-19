@@ -1,5 +1,5 @@
 {
-  "date": "2026-10-16",
+  "date": "2026-10-19",
   "rules": [
     {
       "id": "UX24-TYPE",
@@ -40,7 +40,7 @@
     {
       "id": "UX24-CONTROL",
       "scope": "Formulare inkl. Auth",
-      "requirement": "Field/Input/Select/Textarea verwenden; gemeinsame App-Auswahl mit echter Formularvalidierung, Tastatur, Disabled-Zuständen und verschachtelter Hintergrund-Scrollsperre. Fokus, Fehler und Rechte bleiben erhalten.",
+      "requirement": "Field/Input/Select/Textarea verwenden; gemeinsame App-Auswahl mit echter Formularvalidierung, Tastatur, Disabled-Zuständen und verschachtelter Hintergrund-Scrollsperre. Fokus, Fehler und Rechte bleiben erhalten. Geeignete Mustertexte sind ausschliesslich Hinweise, keine gespeicherten Defaults; Label bleibt sichtbar. Native und serverseitige Validierung beibehalten, Fehler feldbezogen ausgeben, Sicherheitsfelder ohne erfundene Beispiele.",
       "owner": "components/ui.tsx",
       "acceptance": "Pointer-, Tastatur-, Escape-, Disabled- und Formular-Change-Regressionen; Label, Fokus und verschachtelte Scrollsperren prüfen.",
       "status": "offen",
@@ -59,7 +59,7 @@
     {
       "id": "UX24-ACTIONS",
       "scope": "Listen und Aktionen",
-      "requirement": "Lokale Suche/Filter/Plus und Tabs über bestehende Komponenten; Plus erstellt, Datensatz öffnet, Menü weitere erlaubte Aktionen.",
+      "requirement": "Bestehende Navigation und blauen Floating-Plus-Button unverändert erhalten. Erstellung über den bestehenden CreateAction-Owner; Datensatz öffnet direkt. Sekundäre Objektaktionen einschliesslich PDF, Bearbeiten, Kopieren und Anhänge im vorhandenen Kontextmenü bündeln; keine zusätzlichen Abschnitts-Plus- oder PDF-Buttons. Notwendige primäre Formular-, Navigations-, Such-/Filter- und Timeraktionen bleiben direkt erreichbar.",
       "owner": "components/binso-ux.tsx",
       "acceptance": "Rollen und Öffnungsmodus je Aktion testen",
       "status": "offen",
@@ -70,7 +70,7 @@
       "scope": "Sheets/Dialog/Popover",
       "requirement": "Lange routegebundene Erfassungen verwenden den bestehenden FormSheet-Workspace-Modus. Kurze Kontext-, Positions-, Filter- und Aktionsaufgaben bleiben modale Dialoge. Fokus, Escape/Back, Tastatur, Dirty-State und Safe Areas bleiben zentral. Erfassungen behalten ein blaues Schliessen-X und Abbrechen, keinen zusätzlichen Header-Zurück-Pfeil. Rückfrage nur bei geänderten Werten; Filter-Scrim umfasst die obere Safe Area.",
       "owner": "components/binso-ux.tsx",
-      "acceptance": "Workspace ohne Scrim/Fokusfalle; Kinddialog mit Fokusführung; geschützte Navigation, Recovery und erreichbare Footer prüfen.",
+      "acceptance": "Auch der lange FormSheet-Workspace bleibt modal: Scrim, Fokusfalle, verschachtelte Hintergrundsperre, Escape/Back, Recovery und erreichbare Footer prüfen. Obere Browser-/PWA-Statusleiste soweit technisch unterstützt abdunkeln; echte iPhone-Abnahme separat.",
       "status": "offen",
       "evidence": [],
       "provenance": "Explicit collected owner decisions on 2026-10-19; docs/architecture/ux-app-standardization.md. Visual/runtime acceptance remains open."
@@ -313,6 +313,24 @@
       "status": "offen",
       "evidence": [],
       "provenance": "Explicit complete app UX instruction following 76-route diagnosis on 2026-10-18; see docs/architecture/ux-current-approval.md"
+    },
+    {
+      "id": "UX25-EMPTY",
+      "scope": "Alle Leerzustände",
+      "requirement": "Kurze gemeinsame Textmeldung, bevorzugt eine und höchstens zwei Textzeilen als redaktionelles Ziel; keine dekorativen Karten, Illustrationen oder zusätzlichen Aktionen. Zoom darf vollständig umbrechen; Sicherheits- und Fehlerdetails bleiben erhalten.",
+      "owner": "components/ui.tsx#EmptyState",
+      "acceptance": "Tatsächliches Rendering ohne Zusatzbutton/Illustration; volle Fehlerdetails, enge Viewports und grosse Schrift ohne Clipping prüfen.",
+      "status": "offen",
+      "evidence": []
+    },
+    {
+      "id": "UX25-CUSTOMER",
+      "scope": "Kundenerfassung",
+      "requirement": "Neue Kunden in zwei Schritten; Firma mit Firmenname und Pflichtkontakt Vor-/Nachname, Privatperson mit eigenem Vor-/Nachnamen. Nur optionale Details überspringbar. Bestehende Kunden direkt bearbeiten; Draft, Rollen, Dublettenprüfung und Idempotenz erhalten.",
+      "owner": "components/pages/customers.tsx#CustomerForm",
+      "acceptance": "Positiv/Negativ: Pflichtfelder, Typ, Schrittwechsel ohne POST/Datenverlust, Retry/Replay inklusive alter Entwürfe, unveränderte Bestandsdaten sowie serverseitige Tenant-/Rollenprüfung.",
+      "status": "offen",
+      "evidence": []
     }
   ],
   "styleBindings": [

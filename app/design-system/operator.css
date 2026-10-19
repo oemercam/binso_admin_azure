@@ -33,7 +33,7 @@
 .bo-monitoring-wallboard .monitoring-list>div{min-width:0;min-height:44px;padding:8px 0;gap:12px;grid-template-columns:minmax(0,1fr) auto}
 .bo-monitoring-wallboard .bo-monitor-alarms{grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px}
 .bo-monitoring-wallboard .bo-monitor-chart svg{max-height:140px}
-.bo-monitoring-wallboard .bo-monitor-chart .empty-state{min-height:120px;padding:12px}
+
 .bo-monitor-wallboard-footer{color:var(--color-muted);font-size:var(--type-control);overflow-wrap:anywhere}
 .bo-monitoring-portal .bo-monitor-toolbar{align-items:center;gap:12px;margin-bottom:16px}
 .bo-monitoring-portal .bo-monitor-toolbar>div:first-child{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
@@ -42,7 +42,7 @@
 .bo-monitoring-portal .bo-monitor-charts{grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
 .bo-monitor-chart-slot{min-width:0}
 .bo-monitor-chart-tabs{display:none}
-.bo-monitoring-portal .bo-monitor-chart .empty-state{min-height:156px;padding:12px}
+
 .bo-monitor-point-select{display:flex;align-items:center;gap:8px;font-size:var(--type-label);color:var(--color-muted)}
 .bo-monitor-point-select select{min-width:0;max-width:100%;min-height:44px;background:var(--color-bg);color:var(--color-fg);border:0;font:inherit}
 .bo-monitoring-wallboard .bo-monitor-point-select{display:none}

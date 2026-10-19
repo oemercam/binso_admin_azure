@@ -1,7 +1,8 @@
 "use client";
 import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
 import {usePageAccess} from "@/lib/client/page-access";
-import {Children,cloneElement,isValidElement,useId} from "react";
+import {fieldInputHint} from "@/lib/form-input-hints";
+import {Children,cloneElement,isValidElement,useId,useState} from "react";
 import Link from "next/link";
 import {SelectControl} from './select-control';
 
@@ -150,25 +151,31 @@ export function FormActions({children,sheet=false,onClickCapture}:{children:Reac
 export function Field({ label, children, className = "",allowReadOnlyInput=false,error,hint }: { label: React.ReactNode; children: React.ReactNode; className?: string;allowReadOnlyInput?:boolean;error?:string;hint?:string }) {
   const access=usePageAccess();
   const id=useId();
+  const [validationError,setValidationError]=useState<string>();
+  const message=error??validationError;
   const decorate=(nodes:React.ReactNode):React.ReactNode=>Children.map(nodes,child=>{
     const control=isValidElement<Record<string,unknown>>(child)&&((typeof child.type==='string'&&['input','select','textarea'].includes(child.type))||[Input,Select,Textarea,Checkbox,DateInput,TimeInput,CurrencyInput].includes(child.type as typeof Input));
     if(!control)return isValidElement<{children?:React.ReactNode}>(child)&&typeof child.type==='string'&&child.props.children?cloneElement(child,{children:decorate(child.props.children)}):child;
-    const descriptions=[child.props['aria-describedby'],hint?`${id}-hint`:undefined,error?`${id}-error`:undefined].filter(Boolean).join(' ');
+    const descriptions=[child.props['aria-describedby'],hint?`${id}-hint`:undefined,message?`${id}-error`:undefined].filter(Boolean).join(' ');
     return cloneElement(child,{
       ...(!access.write&&!allowReadOnlyInput?{disabled:true}:{}),
       ...(!child.props['aria-label']&&!child.props['aria-labelledby']?{'aria-labelledby':`${id}-label`}:{}),
-      ...(error?{'aria-invalid':true}:{}),
+      ...(message?{'aria-invalid':true}:{}),
+      ...(!child.props.placeholder&&[Input,Textarea].includes(child.type as typeof Input)?{placeholder:fieldInputHint(label,String(child.props.type??'text'))}:{}),
+      onInvalid:(event:React.InvalidEvent<HTMLInputElement>)=>{setValidationError(event.currentTarget.validationMessage);(child.props.onInvalid as React.FormEventHandler<HTMLInputElement>|undefined)?.(event);},
+      onChange:(event:React.ChangeEvent<HTMLInputElement>)=>{setValidationError(undefined);(child.props.onChange as React.ChangeEventHandler<HTMLInputElement>|undefined)?.(event);},
+      onInput:(event:React.FormEvent<HTMLInputElement>)=>{setValidationError(undefined);(child.props.onInput as React.FormEventHandler<HTMLInputElement>|undefined)?.(event);},
       ...(descriptions?{'aria-describedby':descriptions}:{}),
     });
   });
   const fields=decorate(children);
   const inline=Children.toArray(children).some(child=>isValidElement<Record<string,unknown>>(child)&&((child.type==='input'||child.type===Input)&&['checkbox','radio'].includes(String(child.props.type))||child.type===Checkbox));
-  return <label className={`form-field ${inline?'form-check ':''}${className}`.trim()}>{inline?fields:<FormLabel id={`${id}-label`}><LocalizedText>{label}</LocalizedText></FormLabel>}{inline?<FormLabel id={`${id}-label`}><LocalizedText>{label}</LocalizedText></FormLabel>:fields}{hint&&<small id={`${id}-hint`}><LocalizedText>{hint}</LocalizedText></small>}<FormError id={`${id}-error`}>{error}</FormError></label>;
+  return <label className={`form-field ${inline?'form-check ':''}${className}`.trim()}>{inline?fields:<FormLabel id={`${id}-label`}><LocalizedText>{label}</LocalizedText></FormLabel>}{inline?<FormLabel id={`${id}-label`}><LocalizedText>{label}</LocalizedText></FormLabel>:fields}{hint&&<small id={`${id}-hint`}><LocalizedText>{hint}</LocalizedText></small>}<FormError id={`${id}-error`}>{message}</FormError></label>;
 }
 
-export function EmptyState({ icon = "file", title, text, action, compact=false }: { icon?: string; title: string; text: string; action?: React.ReactNode; compact?:boolean }) {
-  if(compact)return action?<div className="empty-list-state" data-empty-state="compact"><p role="status"><LocalizedText>{title}</LocalizedText></p>{action}</div>:<p role="status" data-empty-state="compact"><LocalizedText>{title}</LocalizedText></p>;
-  return <div className="empty-state"><span className="empty-icon"><Icon name={icon} size={22}/></span><h3><LocalizedText>{title}</LocalizedText></h3><p><LocalizedText>{text}</LocalizedText></p>{action}</div>;
+/** Short content, never clipped: large system fonts may wrap beyond two visual lines. */
+export function EmptyState({title,description}:{title:string;description?:string}) {
+  return <div className="empty-state" data-empty-state="compact" role="status"><p><LocalizedText>{title}</LocalizedText></p>{description&&<p><LocalizedText>{description}</LocalizedText></p>}</div>;
 }
 
 export function Toggle({ checked = false, label, onChange,disabled=false }: { checked?: boolean; label: string; onChange?: () => void;disabled?:boolean }) {

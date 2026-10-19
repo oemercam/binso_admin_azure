@@ -1,8 +1,8 @@
 "use client";
 
 import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
-import {useEffect,useRef,type ReactNode} from "react";
-import {Button,FormActions} from "./ui";
+import {Children,cloneElement,isValidElement,Fragment,useEffect,useRef,type ReactNode} from "react";
+import {Button,FormActions,FormSection} from "./ui";
 
 /** Keeps every step mounted: a step change never changes drafts or navigation. */
 export function FormWizard({labels,step,onStep,children,action,cancelAction,busy=false,guided=true,backLabel="Zurück",nextLabel="Weiter",progressLabel,ariaLabel="Geführte Erfassung"}:{labels:string[];step:number;onStep:(step:number)=>void;children:ReactNode;action:ReactNode;cancelAction:ReactNode;busy?:boolean;guided?:boolean;backLabel?:string;nextLabel?:string;progressLabel?:(step:number,total:number,label:string)=>string;ariaLabel?:string}){
@@ -40,13 +40,16 @@ export function FormWizard({labels,step,onStep,children,action,cancelAction,busy
   if(next>step&&!valid())return;
   if(busy||next<0||next>=labels.length)return;
   onStep(next);rootRef.current?.querySelector(".wizard-content")?.scrollTo({top:0});
+  requestAnimationFrame(()=>{const content=rootRef.current?.querySelector<HTMLElement>(".wizard-content");if(content){content.tabIndex=-1;content.focus({preventScroll:true});}});
  };
  return <LocalizedElement as="div" ref={rootRef} className="form-wizard" data-guided={guided?"true":undefined} aria-label={ariaLabel}>
   {guided&&<div className="wizard-progress" role="status"><LocalizedText>{progressLabel?progressLabel(step+1,labels.length,labels[step]):`Schritt ${step+1} von ${labels.length} · ${labels[step]}`}</LocalizedText></div>}
-  <div className="wizard-content">{children}</div>
+  <div className="wizard-content">{Children.map(children,child=>guided&&isValidElement<{title?:string}>(child)&&child.type===FormSection&&child.props.title===labels[step]?cloneElement(child,{title:undefined}):child)}</div>
   <FormActions onClickCapture={event=>{
    const button=event.target instanceof Element?event.target.closest('button.button-primary'):null;
+   // Prevent a step transition from acquiring native submit semantics in the same click.
+   if(button&&guided&&step<labels.length-1)event.preventDefault();
    if(button&&(!guided||step===labels.length-1)&&!valid()){event.preventDefault();event.stopPropagation();}
-  }}>{!guided?cancelAction:(step===0?cancelAction:<Button variant="secondary" disabled={busy} onClick={()=>go(step-1)}><LocalizedText>{backLabel}</LocalizedText></Button>)}{!guided||step===labels.length-1?action:<Button disabled={busy} onClick={()=>go(step+1)}><LocalizedText>{nextLabel}</LocalizedText></Button>}</FormActions>
+  }}>{!guided?cancelAction:(step===0?cancelAction:<Button variant="secondary" disabled={busy} onClick={()=>go(step-1)}><LocalizedText>{backLabel}</LocalizedText></Button>)}{!guided||step===labels.length-1?<Fragment key="wizard-submit">{action}</Fragment>:<Button key="wizard-next" disabled={busy} onClick={()=>go(step+1)}><LocalizedText>{nextLabel}</LocalizedText></Button>}</FormActions>
  </LocalizedElement>;
 }

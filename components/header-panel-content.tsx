@@ -34,7 +34,7 @@ export function SearchPanel({query,onQuery,items,loading,error,onClose,recent=[]
    {!query.trim()&&<><h3><LocalizedText>{"Schnellzugriff"}</LocalizedText></h3><div>{[["/kunden","users","Kunden öffnen"],["/rechnungen","receipt","Rechnungen öffnen"],["/angebote","file","Angebote öffnen"]].map(([href,icon,title])=><PanelLink key={href} href={href} icon={icon} title={title} onClose={onClose}/>)}</div></>}
    {loading&&<LoadingState className="technical-hint"><LocalizedText>{"Suche läuft …"}</LocalizedText></LoadingState>}
    {query.trim().length>=2&&!loading&&error&&<ErrorState className="technical-hint"><LocalizedText>{error}</LocalizedText></ErrorState>}
-   {query.trim().length>=2&&!loading&&!error&&visible.length===0&&<EmptyState compact title="Keine Treffer gefunden" text=""/>}
+   {query.trim().length>=2&&!loading&&!error&&visible.length===0&&<EmptyState  title="Keine Treffer gefunden" />}
    {groups.map(type=><section key={type}><h3><LocalizedText>{type}</LocalizedText></h3>{visible.filter(item=>item.type===type).map(item=><ActionRow verbatim key={item.href} href={item.href} icon={item.icon} title={item.title} description={item.meta} onClick={()=>{onRemember?.(query);onClose()}}/>)}</section>)}
   </div>
  </div>;
@@ -46,7 +46,7 @@ export function NotificationPanel({items,loading,error,filter,onFilter,onRead,on
   <div className="header-notification-filters"><button type="button" aria-pressed={filter==="all"} onClick={()=>onFilter("all")}><LocalizedText>{"Alle"}</LocalizedText></button><button type="button" aria-pressed={filter==="unread"} onClick={()=>onFilter("unread")}><LocalizedText>{"Ungelesen"}</LocalizedText></button></div>
   {loading&&<LoadingState><LocalizedText>{"Wird geladen …"}</LocalizedText></LoadingState>}
   {error&&<ErrorState onRetry={onRetry} retryLabel="Erneut laden"><LocalizedText>{error}</LocalizedText></ErrorState>}
-  {!loading&&!error&&!visible.length&&<EmptyState compact title={filter==="unread"?"Keine ungelesenen Benachrichtigungen":"Keine Benachrichtigungen"} text=""/>}
+  {!loading&&!error&&!visible.length&&<EmptyState  title={filter==="unread"?"Keine ungelesenen Benachrichtigungen":"Keine Benachrichtigungen"} />}
   {!error&&visible.map(item=><ActionRow href={item.href||"/benachrichtigungen"} key={item.id} icon={item.kind==="support"?"support":item.kind==="payment"?"wallet":"bell"} title={item.title} description={item.body} metadata={new Date(item.created_at).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"})} endAdornment={!item.read_at?<LocalizedElement as="i" className="unread-dot" aria-label="Ungelesen"/>:undefined} onClick={()=>{onRead(item.id);onClose()}}/>)}
   <ActionRow href="/benachrichtigungen" title="Alle Benachrichtigungen" icon="bell" onClick={onClose}/>
 

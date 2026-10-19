@@ -113,3 +113,16 @@ console.log('Company/customer draft defaults, explicit zeroes, invalid values an
 
 assert.equal(defaults.documentDefaults({},undefined,'Angebot','2026-10-19').due,'2026-11-18','Offer validity uses the existing central policy');
 assert.equal(defaults.documentDefaults({},undefined,'Angebot','2026-02-30').due,'','Invalid dates are never normalized into fabricated validity');
+
+assert.equal(exports.customerInput({name:'Supplied organization',customerType:'person',contactFirstName:'Ada',contactLastName:'Example'}).name,'Ada Example','Private customers use their own identity, not a hidden company name');
+for(const customerType of ['unknown',[],['person'],{},false])assert.throws(()=>exports.customerInput({name:'Test AG',customerType,contactFirstName:'Ada',contactLastName:'Example'}),error=>error.code==='invalid_customer_type');
+assert.equal(exports.customerInput({name:'Legacy API',contactFirstName:'Ada',contactLastName:'Example'}).customerType,'company','Existing API callers retain company creation semantics');
+
+const {sameCustomerCreation}=await import(moduleUrl(await fs.readFile('lib/customer-replay.ts','utf8')));
+const oldCustomerBody=JSON.stringify({name:'Test AG',allowDuplicate:true,contactFirstName:'Ada',contactLastName:'Example'});
+assert.equal(sameCustomerCreation(oldCustomerBody,JSON.stringify({name:'Test AG',customerType:'company',allowDuplicate:true,contactFirstName:'Ada',contactLastName:'Example'})),true,'A recovered pre-V25 request keeps its old key; the server can reject conflicts instead of creating another customer');
+for(const next of [{name:'Changed',customerType:'company'},{name:'Test AG',customerType:'person'},null,[]])assert.equal(sameCustomerCreation(oldCustomerBody,JSON.stringify(next)),false);
+assert.equal(sameCustomerCreation('invalid',oldCustomerBody),false);
+assert.equal(sameCustomerCreation(oldCustomerBody,oldCustomerBody),true);
+
+assert.equal(sameCustomerCreation(oldCustomerBody,JSON.stringify({customerType:"company",contactLastName:"Example",contactFirstName:"Ada",allowDuplicate:true,name:"Test AG"})),true,"Object field order cannot manufacture a new request key");

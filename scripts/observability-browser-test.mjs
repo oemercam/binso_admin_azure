@@ -64,7 +64,7 @@ try{
  await page.setViewportSize({width:1440,height:900});await page.goto(base+'/operator');await page.locator('.operator-root').getByRole('heading',{level:1}).waitFor();await page.waitForLoadState('networkidle');
  assert.deepEqual(speculativeGovernance,[],'Desktop admin navigation does not preload authenticated pages');
  await page.locator('.operator-sidebar a[href="/operator/sicherheit"]').click();await page.waitForURL(base+'/operator/sicherheit');await page.locator('.operator-root').getByRole('heading',{level:1}).waitFor();await page.waitForLoadState('networkidle');
- assert.equal(await page.getByRole('heading',{name:'Keine Berechtigung für diesen Bereich',exact:true}).count(),0,'Explicit authenticated sidebar navigation still works');
+ assert.equal(await page.getByRole('status').filter({hasText:'Keine Berechtigung für diesen Bereich'}).count(),0,'Explicit authenticated sidebar navigation still works');
  // The independent wallboard opens in its own document; keep the portal mounted.
  const portalPage=page;page=await context.newPage();observeErrors(page);
  for(const theme of ['light','dark'])for(const width of [390,768,1920,2560,3840]){
@@ -93,7 +93,7 @@ try{
   const loadErrors=await page.locator('.operator-root').getByRole('alert').allTextContents();
   if(loadErrors.length){await page.screenshot({path:path.join(output,'failed-admin-page.png'),fullPage:true});console.log('Admin loading errors:',section,loadErrors);}
   assert.deepEqual(loadErrors,[],'Admin page loads without API errors '+section);
-  assert.equal(await page.getByRole('heading',{name:'Keine Berechtigung für diesen Bereich',exact:true}).count(),0,'Owner page accessible '+section);
+  assert.equal(await page.getByRole('status').filter({hasText:'Keine Berechtigung für diesen Bereich'}).count(),0,'Owner page accessible '+section);
   await page.screenshot({path:path.join(output,'admin-'+theme+'-'+width+'-'+(section.replaceAll('/','-')||'dashboard')+'.png'),fullPage:true});results.push({theme,width,section,passed:true});
  }
  await page.setViewportSize({width:390,height:900});await navigateOperator(page,'/operator/tickets/'+supportCase.id);await page.getByText('Original customer message',{exact:true}).waitFor();
@@ -109,7 +109,7 @@ try{
  await page.getByPlaceholder('Antwort an Kunden schreiben...').fill('Real isolated operator reply');await page.getByRole('button',{name:'Senden',exact:true}).click();await page.getByText('Real isolated operator reply',{exact:true}).waitFor();
  assert.equal((await pool.query('select status from support_cases where id=$1',[supportCase.id])).rows[0].status,'waiting_for_customer','Actual ticket status persisted');
  const failedReply=route=>route.fulfill({status:503,json:{message:'Synthetic provider unavailable'}});await page.route('**/api/operator/tickets/'+supportCase.id+'/messages',failedReply);await page.getByPlaceholder('Antwort an Kunden schreiben...').fill('Retained reply draft');await page.getByRole('button',{name:'Senden',exact:true}).click();await page.locator('.toast-danger').getByText('Synthetic provider unavailable',{exact:true}).waitFor();assert.equal(await appControlValue(page.getByPlaceholder('Antwort an Kunden schreiben...')),'Retained reply draft','Failed operator write retains the draft');await page.unroute('**/api/operator/tickets/'+supportCase.id+'/messages',failedReply);
- const restrictedContext=await browser.newContext({serviceWorkers:'block'});await restrictedContext.addCookies([{name:'binso_observability_session',value:tokens.get('platform_support'),url:base}]);const restrictedPage=await restrictedContext.newPage();let deniedCalls=0;restrictedPage.on('request',request=>{if(request.url()===base+'/api/operator/finance')deniedCalls++});await restrictedPage.goto(base+'/operator/finanzen');await restrictedPage.getByRole('heading',{name:'Keine Berechtigung für diesen Bereich',exact:true}).waitFor();assert.equal(deniedCalls,0,'Denied page does not mount a failing privileged API');await restrictedContext.close();
+ const restrictedContext=await browser.newContext({serviceWorkers:'block'});await restrictedContext.addCookies([{name:'binso_observability_session',value:tokens.get('platform_support'),url:base}]);const restrictedPage=await restrictedContext.newPage();let deniedCalls=0;restrictedPage.on('request',request=>{if(request.url()===base+'/api/operator/finance')deniedCalls++});await restrictedPage.goto(base+'/operator/finanzen');await restrictedPage.getByRole('status').filter({hasText:'Keine Berechtigung für diesen Bereich'}).waitFor();assert.equal(deniedCalls,0,'Denied page does not mount a failing privileged API');await restrictedContext.close();
  const notFound=await page.goto(base+'/operator/invalid-admin-route');assert.equal(notFound.status(),404,'Unknown route cannot masquerade as dashboard');
  await page.close();page=await context.newPage();observeErrors(page);await page.bringToFront();await page.goto(base+'/operator/wallboard');await page.locator('[data-metric-id="customers"]').waitFor();
  await page.setViewportSize({width:1920,height:1080});await selectAppOption(page.getByLabel('Wallboard-Profil'), 'combined');

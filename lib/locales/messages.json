@@ -10360,9 +10360,9 @@
     "Profilo XING in arrivo"
   ],
   "z. B. Buchhaltung": [
-    "e.g. accounting",
-    "p. ex. comptabilité",
-    "ad es. contabilità"
+    "e.g. Accounting",
+    "p. ex. Comptabilité",
+    "ad es. Contabilità"
   ],
   "z. B. Cloud Migration": [
     "e.g. cloud migration",
@@ -12698,5 +12698,75 @@
     "Selection required",
     "Sélection requise",
     "Selezione obbligatoria"
+  ],
+  "Kundentyp": [
+    "Customer type",
+    "Type de client",
+    "Tipo di cliente"
+  ],
+  "Privatperson": [
+    "Private individual",
+    "Particulier",
+    "Persona privata"
+  ],
+  "Muster AG": [
+    "Muster AG",
+    "Muster AG",
+    "Muster AG"
+  ],
+  "Bahnhofstrasse": [
+    "Bahnhofstrasse",
+    "Bahnhofstrasse",
+    "Bahnhofstrasse"
+  ],
+  "max.muster@beispiel.ch": [
+    "max.muster@beispiel.ch",
+    "max.muster@beispiel.ch",
+    "max.muster@beispiel.ch"
+  ],
+  "Nummer kopiert.": [
+    "Number copied.",
+    "Numéro copié.",
+    "Numero copiato."
+  ],
+  "Nummer konnte nicht kopiert werden.": [
+    "The number could not be copied.",
+    "Le numéro n’a pas pu être copié.",
+    "Impossibile copiare il numero."
+  ],
+  "z. B. IT-Beratung und Support": [
+    "e.g. IT consulting and support",
+    "p. ex. conseil et assistance informatiques",
+    "ad es. consulenza e assistenza informatica"
+  ],
+  "z. B. IT-Beratung": [
+    "e.g. IT consulting",
+    "p. ex. conseil informatique",
+    "ad es. consulenza informatica"
+  ],
+  "Grund angeben": [
+    "Enter a reason",
+    "Indiquer le motif",
+    "Indicare il motivo"
+  ],
+  "CHE-123.456.789": [
+    "CHE-123.456.789",
+    "CHE-123.456.789",
+    "CHE-123.456.789"
+  ],
+  "CH…": [
+    "CH…",
+    "CH…",
+    "CH…"
+  ],
+  "z. B. Bürostuhl": [
+    "e.g. Office chair",
+    "p. ex. chaise de bureau",
+    "ad es. sedia da ufficio"
+  ],
+  "RF… oder QR-Referenz": [
+    "RF… or QR reference",
+    "RF… ou référence QR",
+    "RF… o riferimento QR"
   ]
 }

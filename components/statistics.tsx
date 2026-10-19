@@ -29,13 +29,13 @@ export function LineChart({buckets,series,selected,onSelect,value}:{buckets:read
  const chart=lineChartCoordinates(buckets,series.map(item=>item.key));
  if(!buckets.length||!series.length)return null;
  const labels=[...new Set([0,Math.floor((buckets.length-1)/3),Math.floor((buckets.length-1)*2/3),buckets.length-1])];
- return <><LocalizedElement as="div" className="bo-statistics-plot" role="group" aria-label={series.map(item=>item.label).join(' und ')}><svg viewBox={`0 0 ${chart.width} ${chart.height}`} role="group" preserveAspectRatio="none" onClick={event=>{
+ return <><div className="bo-statistics-frame"><div className="bo-statistics-scale" aria-hidden="true">{[chart.maximum,(chart.maximum+chart.minimum)/2,chart.minimum].map((tick,index)=><span key={index} data-value={tick}>{value(tick)}</span>)}</div><LocalizedElement as="div" className="bo-statistics-plot" role="group" aria-label={series.map(item=>item.label).join(' und ')}><svg viewBox={`0 0 ${chart.width} ${chart.height}`} role="group" preserveAspectRatio="none" onClick={event=>{
   const rect=event.currentTarget.getBoundingClientRect(),x=(event.clientX-rect.left)/rect.width*chart.width;
   const closest=chart.paths[0].points.reduce((a,b)=>Math.abs(a.x-x)<=Math.abs(b.x-x)?a:b);onSelect(closest.key);
  }}>
   <line className="bo-statistics-zero" x1={chart.inset} x2={chart.width-chart.inset} y1={chart.zeroY} y2={chart.zeroY}/>
   {chart.paths.map((path,index)=><g key={path.key}><polyline className="bo-statistics-line" data-series-key={path.key} points={path.points.map(point=>`${point.x},${point.y}`).join(' ')} stroke={'var(--chart-'+series[index].tone+')'}/>{path.points.map(point=><LocalizedElement as="circle" key={point.key} className="bo-statistics-point" role="button" tabIndex={0} aria-label={point.label+': '+series[index].label+' '+value(point.value)} aria-pressed={selected===point.key} data-value={point.value} cx={point.x} cy={point.y} r={selected===point.key?6:4} fill={'var(--chart-'+series[index].tone+')'} onClick={event=>{event.stopPropagation();onSelect(point.key)}} onFocus={()=>onSelect(point.key)} onMouseEnter={()=>onSelect(point.key)} onKeyDown={event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();onSelect(point.key)}}}/>)}</g>)}
- </svg></LocalizedElement><div className="bo-statistics-axis-row" aria-hidden="true">{labels.map(index=><span className="bo-statistics-axis" key={buckets[index].key}><LocalizedText>{buckets[index].label}</LocalizedText></span>)}</div></>;
+ </svg></LocalizedElement></div><div className="bo-statistics-axis-row" aria-hidden="true">{labels.map(index=><span className="bo-statistics-axis" key={buckets[index].key}><LocalizedText>{buckets[index].label}</LocalizedText></span>)}</div></>;
 }
 
 /** One period control, signed line chart and shared KPI renderer. */

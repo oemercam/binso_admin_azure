@@ -20,11 +20,6 @@
 .document-detail-section{
   min-width:0;
 }
-.document-detail-section h2{
-  margin:8px 0 4px;
-  font-size:var(--type-scale-22);
-  line-height:1.2;
-}
 .document-detail-section p{
   margin:4px 0 0;
   color:var(--color-muted);
@@ -159,7 +154,6 @@
 .document-page-navigation button{width:var(--touch);height:var(--touch);min-width:var(--touch);min-height:var(--touch)}
 .document-page-navigation button:disabled{opacity:.35;cursor:default}
 .document-payment-facts{display:grid;gap:var(--field-label-gap);padding-block:var(--field-group-gap);font-size:var(--control-label-font)}
-.document-payment-facts h2{margin:0 0 var(--field-label-gap);font-size:var(--section-title-font)}
 .document-payment-facts>span{display:flex;justify-content:space-between;gap:var(--field-label-gap)}
 .document-payment-facts b{white-space:nowrap;font-variant-numeric:tabular-nums}
 .document-desktop-detail>.tabs{margin-top:0}
@@ -241,7 +235,6 @@
     padding:18px 0;
     border-bottom:1px solid var(--color-line);
   }
-.document-lines-section>.section-title{margin-bottom:var(--heading-content-gap)}
 .document-lines-section .invoice-totals{margin-top:18px}
 .page-head-detail + :is(.document-desktop-workspace,.desktop-detail-single){margin-top:0}
 }
@@ -323,7 +316,6 @@
 .document-detail-view{gap:0}
 .document-detail-section{padding:18px 0}
 .document-detail-section:first-child{padding-top:10px}
-.document-detail-section h2{margin:8px 0 4px;font-size:var(--type-body);font-weight:500;line-height:1.5}
 .document-detail-section p{font-size:var(--type-label);line-height:1.45}
 .document-facts{
     grid-template-columns:minmax(0,1fr);
@@ -334,8 +326,6 @@
 .document-facts>div{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:8px 0}
 .document-facts small{margin-bottom:0;font-size:var(--type-label)}
 .document-facts b{font-size:var(--type-label);font-weight:400;text-align:right}
-.document-lines-section>.section-title{margin:0 0 6px}
-.document-lines-section>.section-title h2{margin:0;font-size:var(--type-body)}
 .document-lines-section .invoice-totals{
     margin-top:10px;
     padding-top:8px;
@@ -378,14 +368,13 @@
 
 .record-chevron{grid-column:2;grid-row:1/3;align-self:center;color:var(--color-muted);display:flex;align-items:center}
 
-.document-reference-row{display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:0}
+.document-reference-row{min-width:0}
 .document-reference-row strong{min-width:0;overflow-wrap:anywhere;font-size:var(--type-body)}
 
 .document-summary-row.has-value{grid-template-columns:minmax(0,1fr) auto}
 .document-summary-row.has-value>.document-summary-amount{grid-column:2;grid-row:1;align-self:baseline}
 .document-summary-row.has-value>.status{grid-column:2;grid-row:2;align-self:center}
 
-.document-customer-heading{display:flex;align-items:center;justify-content:space-between;gap:var(--field-group-gap);flex-wrap:wrap}
-.document-customer-heading>h2{order:-1;min-width:0;overflow-wrap:anywhere}
+.document-customer-heading>h2{overflow-wrap:anywhere}
 
 .bottom-sheet.document-entry-workspace{max-width:var(--document-entry-width)}

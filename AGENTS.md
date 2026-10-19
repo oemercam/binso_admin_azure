@@ -54,6 +54,16 @@ permanent-toolbox instructions. Historical audit reports are evidence, not rules
 - Keep incomplete work in a draft PR. Never disable failed gates, silently accept
   new screenshot baselines, or deploy production without explicit authorization.
 
+## Current V25 approval (19 October 2026)
+
+V25 is authorized for implementation: see docs/architecture/v25-requirements.md.
+The existing navigation and blue floating plus remain unchanged in appearance,
+position and behavior. This latest explicit freeze overrides older permissions
+to redesign them. Reuse the current foundation; no glass/blur. Empty states use
+short copy without clipping at zoom; security explanations and necessary primary
+actions remain reachable. Business-rule changes need separate regression evidence.
+Production deployment still requires separate explicit authorization.
+
 # Codex workflow and context (canonical project instructions)
 
 - Work toward one clearly bounded objective per assignment. State the outcome,

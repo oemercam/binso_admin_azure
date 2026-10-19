@@ -120,6 +120,7 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
   useWorkspaceViewport();
   const messagesRef=useRef<HTMLDivElement>(null);
   const composerRef=useRef<HTMLTextAreaElement>(null);
+  const attachmentRef=useRef<HTMLInputElement>(null);
   const production=useBackendMode();
   const [draft,setDraft]=useState("");
   useEffect(()=>{
@@ -224,8 +225,8 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
         <MessageBubble outgoing={false} time={<>10:42</>} author={<><LocalizedText>{"Binso Support"}</LocalizedText></>}><LocalizedText>{"Super, ich schaue das gerne für dich nach."}</LocalizedText></MessageBubble>
         {sent.map((text,i)=><MessageBubble outgoing={true} time={<><LocalizedText>{"jetzt"}</LocalizedText></>} key={text+"-"+i}><LocalizedText verbatim={true}>{text}</LocalizedText></MessageBubble>)}
       </>}
-      {production&&!ticketLoading&&!ticketError&&remote.length===0&&<EmptyState icon="support" title="Noch keine Nachrichten" text="Schreibe die erste Nachricht in diesem Ticket."/>}
-      </LocalizedElement><div className="thread-composer"><LocalizedElement as="label" className="icon-button" htmlFor={"support-thread-file-"+ticketId} aria-label={uploading?"Datei wird hochgeladen":"Datei anhängen"}><Icon name="plus"/></LocalizedElement><Input id={"support-thread-file-"+ticketId} hidden type="file" disabled={uploading||ticketLoading||!!ticketError} accept="image/png,image/jpeg,image/webp,application/pdf,text/plain" onChange={e=>void uploadSupportFile(e.target.files?.[0])}/><Textarea ref={composerRef} rows={1} autoComplete="off" autoCorrect="off" spellCheck={false} enterKeyHint="enter" aria-label="Nachricht" disabled={ticketLoading||!!ticketError} value={draft} onChange={e=>setDraft(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)&&!e.nativeEvent.isComposing){e.preventDefault();void send();}}} placeholder="Nachricht schreiben..."/><LocalizedElement as="button" type="button" onClick={()=>void send()} disabled={sending||ticketLoading||!!ticketError||!draft.trim()} aria-label={sending?"Nachricht wird gesendet":"Senden"}><Icon name="arrow"/></LocalizedElement></div>
+      {production&&!ticketLoading&&!ticketError&&remote.length===0&&<EmptyState  title="Noch keine Nachrichten" />}
+      </LocalizedElement><div className="thread-composer"><ActionsMenu label="Chataktionen" busy={uploading||ticketLoading||!!ticketError}><ActionRow icon="upload" title="Datei anhängen" onClick={()=>attachmentRef.current?.click()}/></ActionsMenu><Input ref={attachmentRef} id={"support-thread-file-"+ticketId} hidden type="file" disabled={uploading||ticketLoading||!!ticketError} accept="image/png,image/jpeg,image/webp,application/pdf,text/plain" onChange={e=>void uploadSupportFile(e.target.files?.[0])}/><Textarea ref={composerRef} rows={1} autoComplete="off" autoCorrect="off" spellCheck={false} enterKeyHint="enter" aria-label="Nachricht" disabled={ticketLoading||!!ticketError} value={draft} onChange={e=>setDraft(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)&&!e.nativeEvent.isComposing){e.preventDefault();void send();}}} placeholder="Nachricht schreiben..."/><LocalizedElement as="button" type="button" onClick={()=>void send()} disabled={sending||ticketLoading||!!ticketError||!draft.trim()} aria-label={sending?"Nachricht wird gesendet":"Senden"}><Icon name="arrow"/></LocalizedElement></div>
     </div></div>
 
     </div>
