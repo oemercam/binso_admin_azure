@@ -9530,7 +9530,7 @@
         },
         {
           "tag": "ActionSheet",
-          "line": 207,
+          "line": 211,
           "component": "components/binso-ux.tsx#ActionsMenu"
         },
         {
@@ -11973,7 +11973,7 @@
         },
         {
           "tag": "ActionSheet",
-          "line": 207,
+          "line": 211,
           "component": "components/binso-ux.tsx#ActionsMenu"
         },
         {
@@ -21277,7 +21277,7 @@
         },
         {
           "tag": "ActionSheet",
-          "line": 207,
+          "line": 211,
           "component": "components/binso-ux.tsx#ActionsMenu"
         },
         {
@@ -50171,7 +50171,7 @@
         },
         {
           "tag": "ActionSheet",
-          "line": 207,
+          "line": 211,
           "component": "components/binso-ux.tsx#ActionsMenu"
         },
         {
@@ -63430,7 +63430,7 @@
         },
         {
           "tag": "ActionSheet",
-          "line": 207,
+          "line": 211,
           "component": "components/binso-ux.tsx#ActionsMenu"
         },
         {
@@ -71139,7 +71139,7 @@
         },
         {
           "tag": "ActionSheet",
-          "line": 207,
+          "line": 211,
           "component": "components/binso-ux.tsx#ActionsMenu"
         },
         {
@@ -73250,7 +73250,7 @@
         },
         {
           "tag": "ActionSheet",
-          "line": 207,
+          "line": 211,
           "component": "components/binso-ux.tsx#ActionsMenu"
         },
         {
@@ -103842,7 +103842,7 @@
         },
         {
           "tag": "ActionSheet",
-          "line": 207,
+          "line": 211,
           "component": "components/binso-ux.tsx#ActionsMenu"
         },
         {
@@ -107565,7 +107565,7 @@
         },
         {
           "tag": "ActionSheet",
-          "line": 207,
+          "line": 211,
           "component": "components/binso-ux.tsx#ActionsMenu"
         },
         {
@@ -109415,7 +109415,7 @@
         },
         {
           "tag": "ActionSheet",
-          "line": 207,
+          "line": 211,
           "component": "components/binso-ux.tsx#ActionsMenu"
         },
         {
@@ -113164,7 +113164,7 @@
         },
         {
           "tag": "ActionSheet",
-          "line": 207,
+          "line": 211,
           "component": "components/binso-ux.tsx#ActionsMenu"
         },
         {
@@ -119137,7 +119137,7 @@
         },
         {
           "tag": "ActionSheet",
-          "line": 207,
+          "line": 211,
           "component": "components/binso-ux.tsx#ActionsMenu"
         },
         {
@@ -121580,7 +121580,7 @@
         },
         {
           "tag": "ActionSheet",
-          "line": 207,
+          "line": 211,
           "component": "components/binso-ux.tsx#ActionsMenu"
         },
         {
@@ -132844,7 +132844,7 @@
         },
         {
           "tag": "ActionSheet",
-          "line": 207,
+          "line": 211,
           "component": "components/binso-ux.tsx#ActionsMenu"
         },
         {
@@ -148998,7 +148998,7 @@
         },
         {
           "tag": "ActionSheet",
-          "line": 207,
+          "line": 211,
           "component": "components/binso-ux.tsx#ActionsMenu"
         },
         {
@@ -163373,13 +163373,13 @@
       "widgets": [
         {
           "tag": "ActionSheet",
-          "line": 207
+          "line": 211
         }
       ],
       "elements": [
         {
           "tag": "RowActions",
-          "line": 207,
+          "line": 211,
           "props": [
             "label={label}",
             "disabled={busy}",
@@ -163388,26 +163388,30 @@
         },
         {
           "tag": "ActionSheet",
-          "line": 207,
+          "line": 211,
           "props": [
             "label={label}",
             "open={open}",
             "busy={busy}",
-            "onClose={()=>setOpen(false)}"
+            "onClose={()=>{setCloseRequested(false);setOpen(false)}}"
           ]
         },
         {
           "tag": "div",
-          "line": 207,
+          "line": 211,
           "props": [
             "className=\"action-list\"",
-            "onClick={event=>{if(!busy&&event.target instanceof Element&&event.target.closest(\"button,a\"))setOpen(false)}}"
+            "onClick={event=>{if(!busy&&event.target instanceof Element&&event.target.closest(\"button,a\"))setCloseRequested(true)}}"
           ]
         }
       ],
       "conditions": [
         {
-          "line": 207,
+          "line": 210,
+          "expression": "!closeRequested||busy"
+        },
+        {
+          "line": 211,
           "expression": "!busy&&event.target instanceof Element&&event.target.closest(\"button,a\")"
         }
       ]
@@ -163452,7 +163456,7 @@
       "key": "components/binso-ux.tsx#ListRow",
       "file": "components/binso-ux.tsx",
       "name": "ListRow",
-      "line": 211,
+      "line": 215,
       "classes": [
         "document-summary-amount",
         "record-chevron"
@@ -163463,24 +163467,24 @@
       "elements": [
         {
           "tag": "b",
-          "line": 212,
+          "line": 216,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 212,
+          "line": 216,
           "props": [
             "verbatim={!translateTitle}"
           ]
         },
         {
           "tag": "small",
-          "line": 212,
+          "line": 216,
           "props": []
         },
         {
           "tag": "Status",
-          "line": 212,
+          "line": 216,
           "props": [
             "appearance=\"pill\"",
             "tone={tone}"
@@ -163488,36 +163492,36 @@
         },
         {
           "tag": "span",
-          "line": 212,
+          "line": 216,
           "props": [
             "className=\"document-summary-amount\""
           ]
         },
         {
           "tag": "small",
-          "line": 212,
+          "line": 216,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 212,
+          "line": 216,
           "props": []
         },
         {
           "tag": "strong",
-          "line": 212,
+          "line": 216,
           "props": []
         },
         {
           "tag": "span",
-          "line": 212,
+          "line": 216,
           "props": [
             "className=\"record-chevron\""
           ]
         },
         {
           "tag": "Icon",
-          "line": 212,
+          "line": 216,
           "props": [
             "name=\"arrow\"",
             "size={12}"
@@ -163525,7 +163529,7 @@
         },
         {
           "tag": "Link",
-          "line": 214,
+          "line": 218,
           "props": [
             "href={href}",
             "className={className}"
@@ -163533,7 +163537,7 @@
         },
         {
           "tag": "button",
-          "line": 214,
+          "line": 218,
           "props": [
             "type=\"button\"",
             "onClick={onClick}",
@@ -163542,7 +163546,7 @@
         },
         {
           "tag": "div",
-          "line": 214,
+          "line": 218,
           "props": [
             "className={className}"
           ]
@@ -163550,19 +163554,19 @@
       ],
       "conditions": [
         {
-          "line": 213,
+          "line": 217,
           "expression": "value!=null"
         },
         {
-          "line": 213,
+          "line": 217,
           "expression": "compact"
         },
         {
-          "line": 214,
+          "line": 218,
           "expression": "href"
         },
         {
-          "line": 214,
+          "line": 218,
           "expression": "onClick"
         }
       ]
@@ -207704,7 +207708,7 @@
     {
       "file": "components/binso-ux.tsx",
       "name": "ListRow",
-      "line": 211,
+      "line": 215,
       "usedBy": [
         "/angebote/[id]",
         "/angebote/neu",
