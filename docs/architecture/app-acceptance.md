@@ -176,3 +176,29 @@ Test-/Anwendungsänderungen wurden im Rahmen dieser Matrix ausgeführt.
 Erst danach lautet das Ergebnis: «Kunden-App und One Admin am geprüften Build
 für die dokumentierten Geräte, Rollen und Abläufe abgenommen». Keine pauschale
 Garantie für jede Hardware. Produktionsmerge/-deployment bleiben separat freizugeben.
+
+## Bearbeitung B01/B02 vom 20.10.2026
+
+Die oben aufgeführten fehlgeschlagenen Runs bleiben historische Nachweise des
+Basis-SHA. Ihre Fehler werden nicht durch eine Dokumentationsänderung als bestanden markiert.
+
+- B01: Der isolierte Testharness von `ux-regression-test.mjs` führte die tatsächliche
+  EmployeeForm ohne ihren neuen `tenantCan`-Import aus. Er erhält nun die tatsächliche
+  Berechtigungsfunktion. Der extrahierte DocumentPage-Save-Handler erhält auch seinen
+  hinzugekommenen `sourceLoading`-Zustand. Positive Speicher-/Replay-/Retryfälle bleiben
+  erhalten; neue Gegenfälle prüfen, dass Source-/Kunden-Ladefehler und ausstehende
+  Antworten keine Dokumente speichern. Der vollständige UX-Regressionsskript ist lokal
+  erfolgreich, ebenso ESLint für beide geänderten Testskripte.
+- B02: Der unabhängige authentifizierte HTTP-Vertrag trennt jetzt explizit den
+  berechtigten Teil-Arbeitsplatz von Accounting. Owner/Admin/Finance behalten Cash;
+  Auftragsleitung/Manager/Reader erhalten keine Accounting-Daten oder Cash-Snapshots.
+  Auftragsleitung/Manager erhalten weiterhin keine Rechnungs-/Überfälligkeitsdaten.
+  HR und Member werden vom Arbeitsplatz abgewiesen. Normal-, Cash- und Kundenkontext
+  sowie ein fremder Tenant sind getrennte Gegenfälle. Der echte PostgreSQL-/HTTP-Lauf
+  ist nach der Korrektur noch durch CI nachzuweisen; keine lokale Produktivdatenbank.
+- Keine Änderung an Produktionsrollen, API-Verhalten, UX oder Pflicht-Gates. Der
+  Source-Fingerprint wird ausschliesslich mit dem vorhandenen Generator aktualisiert.
+
+Fortsetzung: bestehender PR #296, keine parallele Integration. Der aktuelle CI-Run
+und sein SHA werden im Abschluss beziehungsweise im PR angegeben. Routen-, Geräte-
+und End-to-End-Seitenstatus bleiben bis zur tatsächlichen Durchführung offen.
