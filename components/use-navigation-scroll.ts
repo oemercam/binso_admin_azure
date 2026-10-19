@@ -24,10 +24,13 @@ export function useNavigationScroll(pathname:string){
   const raw=listStateStore.get('binso.navigation:'+key);if(raw===undefined)return;
   const target=Number(raw);if(!Number.isFinite(target)||target<0)return;
   restoring.current=true;let frame=0,stopped=false;
-  const stop=()=>{stopped=true;restoring.current=false;cancelAnimationFrame(frame);observer.disconnect();window.removeEventListener('wheel',stop);window.removeEventListener('touchstart',stop);window.removeEventListener('keydown',stop)};
-  const restore=()=>{cancelAnimationFrame(frame);frame=requestAnimationFrame(()=>{if(stopped)return;window.scrollTo({top:target,left:0,behavior:'instant'});if(Math.abs(window.scrollY-target)<=1)stop()})};
+  const stop=()=>{stopped=true;restoring.current=false;cancelAnimationFrame(frame);observer.disconnect();window.removeEventListener('scroll',onScroll);window.removeEventListener('pointerdown',stop);window.removeEventListener('wheel',stop);window.removeEventListener('touchstart',stop);window.removeEventListener('keydown',stop)};
+  const restore=()=>{cancelAnimationFrame(frame);frame=requestAnimationFrame(()=>{if(stopped)return;window.scrollTo({top:target,left:0,behavior:'instant'})})};
+  // Next/browser focus restoration may run after the first successful frame.
+  // Keep the target through deferred layout/scroll events until actual user input.
+  const onScroll=()=>{if(Math.abs(window.scrollY-target)>1)restore()};
   const observer=new ResizeObserver(restore);observer.observe(document.body);
-  window.addEventListener('wheel',stop,{passive:true});window.addEventListener('touchstart',stop,{passive:true});window.addEventListener('keydown',stop);
+  window.addEventListener('scroll',onScroll,{passive:true});window.addEventListener('pointerdown',stop,{passive:true});window.addEventListener('wheel',stop,{passive:true});window.addEventListener('touchstart',stop,{passive:true});window.addEventListener('keydown',stop);
   restore();const timeout=window.setTimeout(stop,5000);
   return()=>{window.clearTimeout(timeout);stop()};
  },[pathname]);

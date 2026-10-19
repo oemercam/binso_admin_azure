@@ -1061,7 +1061,10 @@ try{
   if(hasInteraction('settings')){
    await page.setViewportSize({width:390,height:740});await navigate(base+'/einstellungen');
    const settingsContent=page.locator('.page-container');await settingsContent.getByRole('link',{name:'Abonnement',exact:true}).waitFor();
-   const timeSetting=page.locator('.settings-overview a[href="/einstellungen/zeiterfassung"]');await timeSetting.scrollIntoViewIfNeeded();const returnScroll=await page.evaluate(()=>scrollY);await timeSetting.click();await page.waitForURL(base+'/einstellungen/zeiterfassung');await page.locator('.mobile-back').click();await page.waitForURL(base+'/einstellungen');await assertReturnPosition(page,returnScroll);await timeSetting.click();await page.waitForURL(base+'/einstellungen/zeiterfassung');await page.goBack();await page.waitForURL(base+'/einstellungen');await assertReturnPosition(page,returnScroll);
+   const timeSetting=page.locator('.settings-overview a[href="/einstellungen/zeiterfassung"]');
+   const leaveSettings=async()=>{await waitForFiniteAnimations(page);await timeSetting.scrollIntoViewIfNeeded();await settleFrames(page);await timeSetting.evaluate(el=>el.addEventListener('click',()=>{window.settingsDepartureY=scrollY},{capture:true,once:true}));await timeSetting.click();const position=await page.evaluate(()=>window.settingsDepartureY);assert.ok(Number.isFinite(position),'Capture the actual departure position after browser actionability scrolling');await page.waitForURL(base+'/einstellungen/zeiterfassung');return position;};
+   const headerReturn=await leaveSettings();await page.locator('.mobile-back').click();await page.waitForURL(base+'/einstellungen');await assertReturnPosition(page,headerReturn);
+   const nativeReturn=await leaveSettings();await page.goBack();await page.waitForURL(base+'/einstellungen');await assertReturnPosition(page,nativeReturn);
    assert.equal(await page.locator('.settings-mobile-navigation').count(),0,'No redundant mobile hamburger/context strip');
    await settingsContent.getByLabel('Einstellungen suchen',{exact:true}).fill('Abonnement');
    assert.equal(await settingsContent.locator('.bo-settings-group').count(),1,'Settings search hides empty groups');

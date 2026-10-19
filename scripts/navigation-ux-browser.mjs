@@ -93,7 +93,7 @@ export async function verifyNavigationPersistence(page,{base,capture=async()=>{}
    }else{
     await page.locator('.mobile-back,.desktop-back').filter({visible:true}).click();await page.waitForURL(base+'/einstellungen');await page.locator('.settings-overview').getByRole('link',{name:'Darstellung',exact:true}).click();await page.waitForURL(base+'/einstellungen/darstellung');
    }
-   assert.ok(await page.getByRole('radiogroup',{name:'Darstellung',exact:true}).isVisible(),'Existing appearance control remains reachable');
+   await page.getByRole('radiogroup',{name:'Darstellung',exact:true}).waitFor({state:'visible'});assert.ok(await page.getByRole('radiogroup',{name:'Darstellung',exact:true}).isVisible(),'Existing appearance control remains reachable');
    await capture('settings-desktop-'+width);
   }
   await page.setViewportSize({width:390,height:840});
