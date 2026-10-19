@@ -179842,7 +179842,8 @@
       "line": 166,
       "classes": [
         "form-grid",
-        "two"
+        "two",
+        "full"
       ],
       "apis": [
         "/api/customers/",
@@ -179945,7 +179946,6 @@
             "open={sheetOpen}",
             "onClose={close}",
             "label={customerId?\"Kunde bearbeiten\":\"Kunde erstellen\"}",
-            "description={customerId?undefined:\"Grunddaten erfassen, anschliessend ergänzende Angaben prüfen.\"}",
             "busy={savingRecord}",
             "dirty={dirty&&!savedRecord}",
             "wizard"
@@ -180035,6 +180035,13 @@
           ]
         },
         {
+          "tag": "div",
+          "line": 249,
+          "props": [
+            "className=\"form-grid two\""
+          ]
+        },
+        {
           "tag": "Field",
           "line": 250,
           "props": [
@@ -180089,7 +180096,7 @@
           "tag": "div",
           "line": 252,
           "props": [
-            "className=\"form-grid two\""
+            "className=\"form-grid two full\""
           ]
         },
         {
@@ -180133,7 +180140,9 @@
         {
           "tag": "p",
           "line": 253,
-          "props": []
+          "props": [
+            "className=\"full\""
+          ]
         },
         {
           "tag": "LocalizedText",
@@ -180144,6 +180153,7 @@
           "tag": "ErrorState",
           "line": 254,
           "props": [
+            "className=\"full\"",
             "onRetry={duplicateCheck.refresh}"
           ]
         },
@@ -180155,7 +180165,9 @@
         {
           "tag": "section",
           "line": 255,
-          "props": []
+          "props": [
+            "className=\"full\""
+          ]
         },
         {
           "tag": "h2",
@@ -180643,10 +180655,6 @@
         },
         {
           "line": 244,
-          "expression": "customerId"
-        },
-        {
-          "line": 245,
           "expression": "customerId"
         },
         {

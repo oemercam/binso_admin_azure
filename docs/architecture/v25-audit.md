@@ -127,3 +127,5 @@ Die nachfolgende Matrix belegt Quellgraph, API-Zuständigkeit und Rollenreferenz
 - Aktive Verträge konsolidiert: veraltete Workspace-Abnahme ohne Scrim/Fokusfalle ersetzt; aktueller FormSheet ist modal. V25-Aktionshierarchie, Eingabehilfen, Leerzustände und Kunden-Wizard im bestehenden UX-Vertrag präzisiert. Historische Originalreferenzen bleiben als Quellen erhalten, ohne die neueren Entscheidungen zu überschreiben.
 
 - Browserabhängiges Platzhaltergrau durch den bestehenden semantischen Muted-Token mit voller Opazität vereinheitlicht. Keine neue Farbpalette; Light/Dark behalten ihre vorhandenen kontrastreichen Tokens.
+
+- Visuelle Abnahme Kundenerfassung: die direkten Grunddatenfelder hatten kein gemeinsames Raster und damit keinen einheitlichen Feldgruppenabstand. Die bestehende form-grid-Komposition wird nun auch in Schritt 1 verwendet; keine neue CSS-Regel.
