@@ -46,7 +46,7 @@ try{
     const navigation=page.locator(width<=760?'.bottom-nav':'.app-sidebar');
     assert.equal((await navigation.locator('a[href="/kunden"] span').first().textContent()).trim(),text('Kunden',locale));
     await page.locator('button.avatar-button:visible').first().click();
-    const accountLanguage=page.locator('.locale-switcher select:visible').first();await accountLanguage.waitFor();assert.equal(await appControlValue(accountLanguage),locale);await page.keyboard.press('Escape');
+    const accountLanguage=page.locator('.locale-switcher .app-select-trigger:visible').first();await accountLanguage.waitFor();assert.equal(await appControlValue(accountLanguage),locale);await page.keyboard.press('Escape');
    }
    if(route.startsWith('/?')){assert.equal((await page.locator('.reference-hero h1').textContent()).replace(/\s/g,''),(text('Dein Geschäft.',locale)+text('Ein klarer',locale)+text('Überblick.',locale)).replace(/\s/g,''));}if(route.startsWith('/?')){
     const features=page.locator('#funktionen');
