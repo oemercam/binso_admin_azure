@@ -58,7 +58,7 @@ try{
  const ownDocument=await get('/api/documents/'+invoice.invoice_no,cookies.get('0:owner'));
  const otherDocument=await get('/api/documents/'+invoice.invoice_no,cookies.get('1:owner'));
  if(otherDocument.status===200)assert.notEqual(otherDocument.data.item.id,ownDocument.data.item.id);
- const customer=(await pool.query('select id from customers where organization_id=$1 order by id limit 1',[organizations[0]])).rows[0];
+ const customer=(await pool.query('select id,name from customers where organization_id=$1 order by id limit 1',[organizations[0]])).rows[0];
  assert.equal((await get('/api/customers/'+customer.id+'?include=workspace',cookies.get('1:owner'))).status,404);
  const finance=['owner','admin','finance'],customerRoles=['owner','admin','finance','project_manager','manager','member','reader'];
  const projectRoles=['owner','admin','project_manager','manager','member','reader'],documentRoles=['owner','admin','finance','project_manager','manager','reader'];
@@ -73,6 +73,7 @@ try{
   ...['/api/billing/catalog','/api/payments','/api/finance','/api/settings/subscription','/api/time-entries/billing','/api/expenses/billing'].map(path=>[path,finance]),
   ['/api/finance/overview?include=workspace',documentRoles],
   ...['/api/customers','/api/customers/'+customer.id,'/api/customers/'+customer.id+'/activity','/api/customers/'+customer.id+'/contacts','/api/customers/'+customer.id+'?include=workspace'].map(path=>[path,customerRoles]),
+  ['/api/customers/duplicates?name='+encodeURIComponent(customer.name),customerRoles],
   ...['/api/documents','/api/customers/'+customer.id+'/documents'].map(path=>[path,documentRoles]),
   ...['/api/products','/api/projects'].map(path=>[path,projectRoles]),
   ...['/api/expenses','/api/expenses/options','/api/time-entries','/api/time-entries/policy','/api/time-tracker'].map(path=>[path,expenseRoles]),
@@ -107,6 +108,10 @@ try{
  }
  const scopedForeign=await get('/api/finance/overview?include=workspace&customerId='+customer.id,cookies.get('1:owner'));
  assert.equal(scopedForeign.status,200);assert.equal(scopedForeign.data.invoices.length,0);assert.equal(scopedForeign.data.documents.length,0);assert.equal(Number(scopedForeign.data.offers.actionable_count),0,'A foreign customer cannot expose another tenant through workspace scope');
+ const duplicatePath='/api/customers/duplicates?name='+encodeURIComponent(customer.name);
+ const ownDuplicates=await get(duplicatePath,cookies.get('0:owner')),foreignDuplicates=await get(duplicatePath,cookies.get('1:owner'));
+ assert.equal(ownDuplicates.status,200);assert.ok(ownDuplicates.data.items.some(item=>item.id===customer.id),'Duplicate lookup has a positive own-tenant fixture');
+ assert.equal(foreignDuplicates.status,200);assert.ok(foreignDuplicates.data.items.every(item=>item.id!==customer.id),'Duplicate lookup cannot disclose the other tenant customer');
  const anonymousRegistration=await get('/api/auth/register','');assert.equal(anonymousRegistration.status,200);assert.equal(anonymousRegistration.data.state,'new');assert.equal(anonymousRegistration.data.pending,null,'Anonymous registration context contains no other tenant receipt');
  for(const index of [0,1])for(const role of roles){const registration=await get('/api/auth/register',cookies.get(index+':'+role));assert.equal(registration.status,200);assert.equal(registration.data.state,'authenticated');assert.equal(registration.data.pending,undefined,'Authenticated handoff cannot expose a pending registration receipt');assert.ok(registration.data.next.startsWith('/'),'Role-specific onboarding stays inside the app');}
  // Own-record scope is stronger than the permission to list expense records.

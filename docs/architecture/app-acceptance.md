@@ -215,3 +215,15 @@ eigenes Layout. Das ist keine reale Installations-/Scope-Abnahme von B03.
 Fortsetzung: bestehender PR #296, keine parallele Integration. Der aktuelle CI-Run
 und sein SHA werden im Abschluss beziehungsweise im PR angegeben. Routen-, Geräte-
 und End-to-End-Seitenstatus bleiben bis zur tatsächlichen Durchführung offen.
+
+### CI-Fortschritt für cf3cbd75
+
+[Run 39341250160](https://github.com/oemercam/binso_admin_azure/actions/runs/39341250160)
+hat den UX-Regressionsfehler und die Finanzrollen-/Maskierungsfälle überwunden.
+CodeQL ist erfolgreich. Quality bleibt fehlgeschlagen: am danach ausgeführten
+UX-Vertrag (veraltete generierte Seitenzuordnung) und an der expliziten
+GET-Vollständigkeitsprüfung (noch fehlender Vertrag für `/api/customers/duplicates`).
+Für die Duplikatsuche werden alle acht Rollen sowie ein positiver eigener und
+ein negativer fremder Tenant geprüft; der Endpunkt wird nicht von der
+Vollständigkeitsprüfung ausgenommen. Beide Folgekorrekturen benötigen ihren
+eigenen aktuellen CI-Nachweis. Die Browsermatrix ist weiterhin nicht bestanden.
