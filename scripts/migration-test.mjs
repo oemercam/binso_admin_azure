@@ -241,6 +241,16 @@ try{
  const customerRepository=await import(dataModule(customerSource));
  const input={contactFirstName:"Synthetic",contactLastName:"Contact",name:'Persistence Test AG',email:'test@example.invalid',phone:'+41 00 000 00 00',city:'Zürich',postalCode:'8000',sector:'Beratung',address:'Testweg 1',uid:'TEST',language:'de',paymentDays:45,discount:5,notes:'Persistente interne Kundennotiz'};
  const created=await customerRepository.createCustomer(sandbox,'sandbox-user',input);
+ const oldTerms=(await db.query('select payment_terms_days from organizations where id=$1',[sandbox])).rows[0].payment_terms_days;
+ await db.query('update organizations set payment_terms_days=60 where id=$1',[sandbox]);
+ const inheritedCustomer=await customerRepository.createCustomer(sandbox,'sandbox-user',{name:'Company terms fixture',contactFirstName:'Synthetic',contactLastName:'Contact'});
+ assert.equal(inheritedCustomer.paymentDays,60,'New customers inherit company terms without another mandatory question');
+ await db.query('update organizations set payment_terms_days=365 where id=$1',[sandbox]);
+ await assert.rejects(()=>customerRepository.createCustomer(sandbox,'sandbox-user',{name:'Unsupported inherited terms fixture',contactFirstName:'Synthetic',contactLastName:'Contact'}),error=>error.status===400,'An inherited company value outside the existing customer range is rejected before a database constraint fails');
+ const zeroTerms=await customerRepository.createCustomer(sandbox,'sandbox-user',{name:'Immediate terms fixture',contactFirstName:'Synthetic',contactLastName:'Contact',paymentDays:0});
+ assert.equal(zeroTerms.paymentDays,0,'An explicit customer value overrides company terms');
+ assert.equal((await db.query('select payment_days from customers where organization_id=$1 and id=$2',[sandbox,created.id])).rows[0].payment_days,45,'Existing customer conditions remain unchanged');
+ await db.query('update organizations set payment_terms_days=$2 where id=$1',[sandbox,oldTerms]);
  const initialContacts=(await db.query('select first_name,last_name,is_primary from customer_contacts where organization_id=$1 and customer_id=$2 and archived_at is null',[sandbox,created.id])).rows;
  assert.deepEqual(initialContacts,[{first_name:'Synthetic',last_name:'Contact',is_primary:true}],'Customer creation atomically creates the structured primary contact');
  const duplicateByName=await customerRepository.customerDuplicates(client,sandbox,{name:'  PERSISTENCE   TEST AG  '});assert.ok(duplicateByName.some(row=>row.id===created.id));

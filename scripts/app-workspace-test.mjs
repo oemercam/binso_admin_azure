@@ -9,16 +9,18 @@ import {navigationAccess} from './navigation-foundation-test.mjs';
 const require=createRequire(import.meta.url),read=file=>fs.readFileSync(file,'utf8');
 const compile=source=>ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
 const ast=ts.createSourceFile('workspace.tsx',withoutLocalization(read('components/binso-ux.tsx')),99,true,4);
-const source=ast.statements.filter(n=>!ts.isImportDeclaration(n)).map(n=>n.getText(ast)).join('\n');
+const source="const Fragment=require('react').Fragment;\n"+ast.statements.filter(n=>!ts.isImportDeclaration(n)).map(n=>n.getText(ast)).join('\n');
 const exports={},root={current:null};let state=0,guard;
 const control=({children,...props})=>React.createElement('button',props,children);
 Function('require','exports','Children','isValidElement','cloneElement','useState','useRef','useEffect','useRouter','useDialogFocus','useBrowserBackGuard','ConfirmDialog','FormActions','Button','Icon','createPortal','document',compile(source))(
  require,exports,React.Children,React.isValidElement,React.cloneElement,
  initial=>[state++===1?true:initial,()=>{}],()=>root,()=>{},()=>({push(){}}),()=>root,(active,blocked,unload)=>{guard={active,unload};return()=>{}},()=>null,
  ({children})=>React.createElement('footer',null,children),control,()=>React.createElement('svg'),children=>children,{body:{}});
-function render(workspace,dirty=true,busy=false){state=0;return renderToStaticMarkup(React.createElement(exports.FormSheet,{label:'Task',open:true,workspace,onClose(){},description:'Details',dirty,busy},React.createElement('input',{defaultValue:'Unsaved'})));}
+function render(workspace,dirty=true,busy=false,children=React.createElement('input',{defaultValue:'Unsaved'})){state=0;return renderToStaticMarkup(React.createElement(exports.FormSheet,{label:'Task',open:true,workspace,onClose(){},description:'Details',dirty,busy},children));}
 const inline=render(true),modal=render(false);
-assert.match(inline,/role="region"/);assert.doesNotMatch(inline,/aria-modal|sheet-layer|<h2/,'Route workspace has no modal semantics, scrim or repeated heading');
+const fragmented=render(true,true,false,React.createElement(React.Fragment,null,React.createElement('input'),React.createElement('div',{className:'filter-sheet-actions'},'Save')));
+assert.match(fragmented,/<div class="sheet-body"[^>]*><input[^>]*><\/div><div class="filter-sheet-actions">Save<\/div>/,'Fragmented document editors retain an outer action footer');
+assert.match(inline,/role="dialog"/);assert.match(inline,/aria-modal="true"/);assert.match(inline,/form-sheet-expanded/);assert.match(inline,/sheet-layer/,"Expanded route editors share the actual modal owner");
 assert.match(inline,/value="Unsaved"/);assert.match(inline,/aria-label="Schliessen"/,'Workspace keeps an explicit guarded exit');
 assert.match(modal,/role="dialog"/);assert.match(modal,/aria-modal="true"/);assert.match(modal,/sheet-layer/,'Short contextual forms retain actual modal behavior');
 render(true,false,true);assert.deepEqual(guard,{active:true,unload:true},'A pending pristine save protects browser back/unload too');

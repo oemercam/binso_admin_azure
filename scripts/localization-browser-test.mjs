@@ -1,3 +1,4 @@
+import {selectAppOption,appControlValue} from './app-select-browser.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import os from 'node:os';
@@ -30,7 +31,8 @@ try{
   let page=await trackedPage();
   await page.goto(base+'/?lang='+locale,{waitUntil:'networkidle'});await page.locator('.reference-hero').waitFor();
   assert.equal(await page.locator('html').getAttribute('lang'),locale+'-CH');
-  const selector=page.locator('.locale-switcher select:visible').first();await selector.selectOption(locale==='en'?'fr':'en');
+  const consent=page.locator('.privacy-consent-layer');if(await consent.isVisible()){await consent.getByRole('button',{name:text('Nur notwendige',locale),exact:true}).click();await consent.waitFor({state:'hidden'});}
+  const selector=page.locator('.locale-switcher .app-select-trigger:visible').first();await selectAppOption(selector, locale==='en'?'fr':'en');
   const chosen=locale==='en'?'fr':'en';await page.waitForFunction(code=>document.documentElement.lang===code+'-CH',chosen);
   await page.waitForLoadState('networkidle');reloading=true;try{await page.reload({waitUntil:'networkidle'})}finally{reloading=false}assert.equal(await page.locator('html').getAttribute('lang'),chosen+'-CH','Choice survives reload');
   for(const route of ['/?lang='+locale,'/dashboard?lang='+locale,'/operator?lang='+locale,'/wartung?lang='+locale,'/missing-localization-route?lang='+locale]){
@@ -44,7 +46,7 @@ try{
     const navigation=page.locator(width<=760?'.bottom-nav':'.app-sidebar');
     assert.equal((await navigation.locator('a[href="/kunden"] span').first().textContent()).trim(),text('Kunden',locale));
     await page.locator('button.avatar-button:visible').first().click();
-    const accountLanguage=page.locator('.locale-switcher select:visible').first();await accountLanguage.waitFor();assert.equal(await accountLanguage.inputValue(),locale);await page.keyboard.press('Escape');
+    const accountLanguage=page.locator('.locale-switcher .app-select-trigger:visible').first();await accountLanguage.waitFor();assert.equal(await appControlValue(accountLanguage),locale);await page.keyboard.press('Escape');
    }
    if(route.startsWith('/?')){assert.equal((await page.locator('.reference-hero h1').textContent()).replace(/\s/g,''),(text('Dein Geschäft.',locale)+text('Ein klarer',locale)+text('Überblick.',locale)).replace(/\s/g,''));}if(route.startsWith('/?')){
     const features=page.locator('#funktionen');

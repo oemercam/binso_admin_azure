@@ -1,7 +1,7 @@
 "use client";
 
 import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
-import { Children, isValidElement, cloneElement, useState, useRef, useEffect, useLayoutEffect, useContext, useId, type ReactNode, type CSSProperties } from "react";
+import { Children, Fragment, isValidElement, cloneElement, useState, useRef, useEffect, useLayoutEffect, useContext, useId, type ReactNode, type CSSProperties } from "react";
 import {WorkspaceActionContext} from '@/lib/client/workspace-actions';
 import Link from "next/link";
 import {useRouter} from "next/navigation";
@@ -81,7 +81,7 @@ export function DetailHeading({ title, status, tone = "neutral", subtitle, leadi
 }) {
   return <div className="bo-detail-heading">{leading}{recordLabel&&<small className="bo-record-label">{recordLabel}</small>}
     <div className="bo-detail-heading-main"><h1><LocalizedText verbatim={verbatimTitle}>{title}</LocalizedText></h1>{statusPlacement==="title"&&status != null && <Status tone={tone}>{status}</Status>}{mobileAction&&<div className="mobile-page-actions">{mobileAction}</div>}</div>
-    {(subtitle||statusPlacement==="subtitle"&&status!=null)&&<p className="bo-detail-meta">{statusPlacement==="subtitle"&&status!=null&&<Status appearance="pill" tone={tone}>{status}</Status>}{subtitle&&<LocalizedText verbatim={verbatimTitle}>{subtitle}</LocalizedText>}</p>}
+    {(subtitle||statusPlacement==="subtitle"&&status!=null)&&<p className="bo-detail-meta">{subtitle&&<LocalizedText verbatim={verbatimTitle}>{subtitle}</LocalizedText>}{statusPlacement==="subtitle"&&status!=null&&<Status appearance="pill" tone={tone}>{status}</Status>}</p>}
     {action&&<div className="bo-detail-commandbar">{action}</div>}
   </div>;
 }
@@ -141,21 +141,26 @@ export function RowActions({ label = "Weitere Aktionen", onClick, disabled = fal
 
 function sheetValues(root:HTMLElement|null){return JSON.stringify(Array.from(root?.querySelectorAll<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>('input:not([type="hidden"]),select,textarea')??[]).map(el=>[el.name||el.id,el.type,el.type==='checkbox'||el.type==='radio'?(el as HTMLInputElement).checked:el.value]));}
 
+/** Fragments do not create a scroll/ownership boundary for a footer. */
+function sheetChildren(nodes:ReactNode):ReactNode[]{
+ return Children.toArray(Children.map(nodes,child=>isValidElement<{children?:ReactNode}>(child)&&child.type===Fragment?sheetChildren(child.props.children):child));
+}
+
 function sheetForm(child:ReactNode):ReactNode{
- if(!isValidElement<{children?:ReactNode}>(child)||child.type!=="form")return child;
+ if(!isValidElement<{children?:ReactNode;className?:string}>(child)||!["form","section","div"].includes(child.type as string))return child;
  const content:ReactNode[]=[],actions:ReactNode[]=[];
- for(const node of Children.toArray(child.props.children)){
+ for(const node of sheetChildren(child.props.children)){
   if(isValidElement<{className?:string}>(node)&&(node.type===FormActions||node.props.className?.split(/\s+/).some(name=>["filter-sheet-actions","mobile-sticky-save"].includes(name))))actions.push(node);
-  else content.push(node);
+  else content.push(sheetForm(node));
  }
- if(!actions.length)return child;
- return cloneElement(child,{children:<><div className="sheet-form-content">{content}</div><div className="sheet-form-footer">{actions}</div></>});
+ if(!actions.length)return cloneElement(child,{children:content});
+ return cloneElement(child,{className:[child.props.className,"sheet-form-layout"].filter(Boolean).join(" "),children:<><div className="sheet-form-content">{content}</div><div className="sheet-form-footer">{actions}</div></>});
 }
 
 type SheetProps={label:string;lang?:string;ariaLabel?:string;description?:string;open:boolean;onClose:()=>void;children:ReactNode;busy?:boolean;className?:string;layerClassName?:string;actions?:ReactNode;dirty?:boolean;wizard?:boolean;workspace?:boolean;onBrowserBack?:()=>void;closeLabel?:string;discardText?:{title:string;message:string;cancelLabel:string;confirmLabel:string}};
 /** One focus/viewport/header/scroll/footer contract for all sheet families.
  * Only the sole open form may clear page-wide recovery; nested editors preserve their parent's draft. */
-function Sheet({label,lang,description,open,onClose,children,busy=false,className="",layerClassName="",ariaLabel,actions,kind,dirty,wizard=false,workspace=false,onBrowserBack,closeLabel="Schliessen",discardText}:SheetProps&{kind:"action"|"form"|"filter"}){
+function Sheet({label,lang,description,open,onClose,children,busy=false,className="",layerClassName="",ariaLabel,actions,kind,dirty,wizard=false,onBrowserBack,closeLabel="Schliessen",discardText}:SheetProps&{kind:"action"|"form"|"filter"}){
  const router=useRouter();
  const [destination,setDestination]=useState<string|null>(null);
  const [mounted,setMounted]=useState(false);
@@ -166,19 +171,16 @@ function Sheet({label,lang,description,open,onClose,children,busy=false,classNam
  const baseline=useRef("");
 
  const closeRef=useRef<()=>void>(()=>{});
- const dialogRef=useDialogFocus(open&&mounted&&!workspace,()=>closeRef.current());
+ const dialogRef=useDialogFocus(open&&mounted,()=>closeRef.current());
  // React portal events still traverse their parent tree; a nested editor owns its own dismissal and dirty state.
- const ownsEvent=(target:EventTarget)=>target instanceof Element&&target.closest('[role="dialog"],.form-workspace')===dialogRef.current;
+ const ownsEvent=(target:EventTarget)=>target instanceof Element&&target.closest('[role="dialog"]')===dialogRef.current;
+
  useEffect(()=>{
-  if(!workspace||!open||!mounted)return;
-  dialogRef.current?.focus({preventScroll:true});
- },[workspace,open,mounted,dialogRef]);
- useEffect(()=>{
-  if(!workspace||!open||(!isDirty&&!busy))return;
+  if(!open||(!isDirty&&!busy))return;
   const navigate=(event:MouseEvent)=>{
    if(event.defaultPrevented||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
    const link=event.target instanceof Element?event.target.closest<HTMLAnchorElement>('a[href]'):null;
-   if(!link||link.target==='_blank'||link.hasAttribute('download')||link.closest('[role="dialog"]'))return;
+   if(!link||link.target==='_blank'||link.hasAttribute('download')||link.closest('[role="dialog"]')!==dialogRef.current)return;
    const url=new URL(link.href,window.location.href);
    if(url.protocol!=="http:"&&url.protocol!=="https:")return;
    if(url.href===window.location.href||url.pathname===window.location.pathname&&url.search===window.location.search&&url.hash)return;
@@ -187,23 +189,23 @@ function Sheet({label,lang,description,open,onClose,children,busy=false,classNam
   };
   document.addEventListener('click',navigate,true);
   return()=>document.removeEventListener('click',navigate,true);
- },[workspace,open,isDirty,busy]);
+ },[open,isDirty,busy,dialogRef]);
  const requestClose=()=>{if(busy)return;if(kind==="form"&&(dirty??sheetValues(dialogRef.current)!==baseline.current)){setDiscard(true);return;}onClose()};
  useEffect(()=>{closeRef.current=requestClose;});
  useEffect(()=>{if(open)baseline.current=sheetValues(dialogRef.current);let active=true;queueMicrotask(()=>{if(active)setChanged(false)});return()=>{active=false}},[open,mounted,dialogRef]);
  if(!open||!mounted)return null;
  const body:ReactNode[]=[],footers:ReactNode[]=[];
- for(const child of Children.toArray(children)){
+ for(const child of sheetChildren(children)){
   if(isValidElement<{className?:string;children?:ReactNode;sheet?:boolean}>(child)&&(child.type===FormActions||child.props.className?.split(/\s+/).includes("filter-sheet-actions")))footers.push(child.type===FormActions?cloneElement(child,{sheet:true}):child);
   else if(isValidElement<{className?:string;children?:ReactNode}>(child)&&child.props.className?.split(/\s+/).includes("sheet-body"))body.push(cloneElement(child,{className:child.props.className.replace(/\bsheet-body\b/g,"").trim()}));
   else body.push(sheetForm(child));
  }
- const content=<LocalizedElement as="section" ref={dialogRef} tabIndex={-1} className={`${workspace?"form-workspace":"bottom-sheet"} ${className}`.trim()} lang={lang} data-sheet-kind={kind} data-unsaved={isDirty||busy||undefined} data-wizard={wizard||undefined} role={workspace?"region":"dialog"} aria-modal={workspace?undefined:true} aria-label={ariaLabel??label} onKeyDown={event=>{if(workspace&&event.key==="Escape"&&!event.defaultPrevented&&ownsEvent(event.target)){event.preventDefault();event.stopPropagation();requestClose()}}} onInvalidCapture={event=>{if(!ownsEvent(event.target))return;if(event.target instanceof Element){const details=event.target.closest("details");if(details instanceof HTMLDetailsElement)details.open=true}}} onInputCapture={event=>{if(ownsEvent(event.target))setChanged(sheetValues(dialogRef.current)!==baseline.current)}} onChangeCapture={event=>{if(ownsEvent(event.target))setChanged(sheetValues(dialogRef.current)!==baseline.current)}} onClickCapture={event=>{if(!ownsEvent(event.target))return;const button=event.target instanceof Element?event.target.closest('button'):null;if(button&&button.dataset.sheetDismiss==='true'){event.preventDefault();event.stopPropagation();requestClose()}}}>{workspace?<header className="sheet-header workspace-toolbar"><div>{description&&<p className="form-workspace-description"><LocalizedText>{description}</LocalizedText></p>}</div><LocalizedElement as="button" type="button" className="icon-button" aria-label={closeLabel} disabled={busy} onClick={requestClose}><Icon name="close"/></LocalizedElement></header>:<><div className="sheet-handle"/><header className="sheet-header"><div><h2><LocalizedText>{label}</LocalizedText></h2>{description&&<p><LocalizedText>{description}</LocalizedText></p>}</div><LocalizedElement as="button" type="button" className="icon-button" aria-label={closeLabel} disabled={busy} onClick={requestClose}><Icon name="close"/></LocalizedElement></header></>}<div className="sheet-body" inert={kind==="form"&&busy}>{body}</div>{actions?<FormActions sheet>{actions}</FormActions>:footers}</LocalizedElement>;
+ const content=<LocalizedElement as="section" ref={dialogRef} tabIndex={-1} className={`bottom-sheet ${className}`.trim()} lang={lang} data-sheet-kind={kind} data-unsaved={isDirty||busy||undefined} data-wizard={wizard||undefined} role="dialog" aria-modal={true} aria-label={ariaLabel??label} onInvalidCapture={event=>{if(!ownsEvent(event.target))return;if(event.target instanceof Element){const details=event.target.closest("details");if(details instanceof HTMLDetailsElement)details.open=true}}} onInputCapture={event=>{if(ownsEvent(event.target))setChanged(sheetValues(dialogRef.current)!==baseline.current)}} onChangeCapture={event=>{if(ownsEvent(event.target))setChanged(sheetValues(dialogRef.current)!==baseline.current)}} onClickCapture={event=>{if(!ownsEvent(event.target))return;const button=event.target instanceof Element?event.target.closest('button'):null;if(button&&button.dataset.sheetDismiss==='true'){event.preventDefault();event.stopPropagation();requestClose()}}}><><div className="sheet-handle"/><header className="sheet-header"><div><h2><LocalizedText>{label}</LocalizedText></h2>{description&&<p><LocalizedText>{description}</LocalizedText></p>}</div><LocalizedElement as="button" type="button" className="icon-button" aria-label={closeLabel} disabled={busy} onClick={requestClose}><Icon name="close"/></LocalizedElement></header></><div className="sheet-body" inert={kind==="form"&&busy}>{body}</div>{actions?<FormActions sheet>{actions}</FormActions>:footers}</LocalizedElement>;
  const confirmation=<ConfirmDialog open={discard} closeLabel={closeLabel} title={discardText?.title??"Änderungen verwerfen?"} message={discardText?.message??"Deine Änderungen sind noch nicht gespeichert und gehen verloren."} cancelLabel={discardText?.cancelLabel??"Weiter bearbeiten"} confirmLabel={discardText?.confirmLabel??"Änderungen verwerfen"} onCancel={()=>{setDiscard(false);setBackDiscard(false);setDestination(null)}} onConfirm={()=>{if(document.querySelectorAll('[data-sheet-kind="form"]').length<=1)window.dispatchEvent(new Event("binso-draft-discard"));setDiscard(false);if(destination){const url=new URL(destination);setDestination(null);allowDraftNavigation();if(url.origin===window.location.origin)router.push(url.pathname+url.search+url.hash);else window.location.assign(url.href)}else if(backDiscard){setBackDiscard(false);leaveBack()}else onClose()}}/>;
- return workspace?<>{content}{confirmation}</>:createPortal(<><div className={`sheet-layer ${layerClassName}`.trim()} onMouseDown={event=>{if(event.target===event.currentTarget)requestClose()}}>{content}</div>{confirmation}</>,document.body);
+ return createPortal(<><div className={`sheet-layer ${layerClassName}`.trim()} onMouseDown={event=>{if(event.target===event.currentTarget)requestClose()}}>{content}</div>{confirmation}</>,document.body);
 }
 export function ActionSheet(props:SheetProps){return <Sheet {...props} kind="action"/>}
-export function FormSheet(props:SheetProps){return <Sheet {...props} kind="form"/>}
+export function FormSheet({workspace,...props}:SheetProps){return <Sheet {...props} className={[props.className,workspace?"form-sheet-expanded":undefined].filter(Boolean).join(" ")} kind="form"/>}
 export function FilterSheet(props:SheetProps){return <Sheet {...props} kind="filter"/>}
 
 /** The same compact action sheet is used for entity editors on every viewport. */
@@ -213,8 +215,8 @@ export function ActionsMenu({label, children, busy=false}: {label:string;childre
 }
 
 /** Canonical two-line row shared by entity and financial lists. */
-export function ListRow({href,onClick,title,meta,value,valueLabel,status,tone="neutral",compact=false,valuePlacement="separate",translateTitle=true}:{translateTitle?:boolean;href?:string;onClick?:()=>void;title:ReactNode;meta:ReactNode;value?:ReactNode;valueLabel?:string;status?:string;tone?:"success"|"warning"|"danger"|"neutral"|"info";compact?:boolean;valuePlacement?:"separate"|"metadata"}){
- const content=<><b><LocalizedText verbatim={!translateTitle}>{title}</LocalizedText></b>{status&&!compact&&<Status tone={tone}>{status}</Status>}<small>{meta}{status&&compact&&<Status appearance="pill" tone={tone}>{status}</Status>}</small>{value!=null&&<span className="document-summary-amount">{valueLabel&&<small><LocalizedText>{valueLabel}</LocalizedText></small>}<strong>{value}</strong></span>}{(href||onClick)&&!status&&value==null&&<span className="record-chevron"><Icon name="arrow" size={12}/></span>}</>;
- const className=`document-summary-row${value!=null?" has-value":""}${compact?" is-compact":""}${valuePlacement==="metadata"?" has-inline-value":""}`;
- return href?<Link prefetch={false} href={href} className={className}>{content}</Link>:onClick?<button type="button" onClick={onClick} className={className}>{content}</button>:<div className={className}>{content}</div>;
+export function ListRow({href,onClick,title,meta,value,valueLabel,status,tone="neutral",compact=false,translateTitle=true}:{translateTitle?:boolean;href?:string;onClick?:()=>void;title:ReactNode;meta:ReactNode;value?:ReactNode;valueLabel?:string;status?:string;tone?:"success"|"warning"|"danger"|"neutral"|"info";compact?:boolean;valuePlacement?:"separate"|"metadata"}){
+ const content=<><b><LocalizedText verbatim={!translateTitle}>{title}</LocalizedText></b><small>{meta}</small>{status&&<Status appearance="pill" tone={tone}>{status}</Status>}{value!=null&&<span className="document-summary-amount">{valueLabel&&<small><LocalizedText>{valueLabel}</LocalizedText></small>}<strong>{value}</strong></span>}{(href||onClick)&&!status&&value==null&&<span className="record-chevron"><Icon name="arrow" size={12}/></span>}</>;
+ const className=`document-summary-row${value!=null?" has-value":""}${compact?" is-compact":""}`;
+ return href?<Link href={href} className={className}>{content}</Link>:onClick?<button type="button" onClick={onClick} className={className}>{content}</button>:<div className={className}>{content}</div>;
 }

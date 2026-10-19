@@ -12673,5 +12673,30 @@
     "Reset sorting",
     "Réinitialiser le tri",
     "Reimposta ordinamento"
+  ],
+  "Dateien": [
+    "Files",
+    "Fichiers",
+    "File"
+  ],
+  "Dokument erstellen": [
+    "Create document",
+    "Créer un document",
+    "Crea documento"
+  ],
+  "Dokumente suchen...": [
+    "Search documents...",
+    "Rechercher des documents...",
+    "Cerca documenti..."
+  ],
+  "Rechnungsbestand": [
+    "Invoice balance",
+    "État des factures",
+    "Situazione fatture"
+  ],
+  "Auswahl erforderlich": [
+    "Selection required",
+    "Sélection requise",
+    "Selezione obbligatoria"
   ]
 }

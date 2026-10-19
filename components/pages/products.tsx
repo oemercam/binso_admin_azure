@@ -1,5 +1,5 @@
 "use client";
-import {ContextActions} from "../binso-ux";
+import {domainConfig} from "@/config/domain";
 import {LocalizedText} from "@/lib/client/locale";
 import {safeAppPath} from "@/lib/navigation";
 import {useApiQuery} from "@/lib/client/use-api-query";
@@ -9,20 +9,19 @@ import {useDirtySnapshot} from "../use-dirty-snapshot";
 import { formatQuantity, withPriceUnit } from "@/lib/display-format";
 
 import { formatCurrency } from "@/lib/financial-status";
-import Link from "next/link";
 import { useRouter,useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { AppShell } from "../app-shell";
 import { RecordRow, RecordsView, RecordsControls, useRecordsController } from "../records";
 import { appendDemoRow } from "@/lib/demo-storage";
 import { apiPatch, apiPost, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
-import {Button, Field, Icon, Toast, Input, Select, Textarea, FormActions, LoadingState, ErrorState} from "../ui";
+import {Button, Field, Toast, Input, Select, Textarea, FormActions, LoadingState, ErrorState} from "../ui";
 import {allowDraftNavigation} from "../use-browser-back-guard";
 import { ActionRow, ActionsMenu, CreateAction, FormSheet } from "../binso-ux";
 import { useRecordList } from "./shared";
 
 export function ProductsPage() {
-  const columns:NonNullable<Parameters<typeof useRecordsController>[0]["columns"]>=[{label:"Produkt / Leistung",index:0},{label:"Typ",index:1},{label:"Preis",index:2,align:"right"},{label:"Status",index:4,status:true}];
+  const columns:NonNullable<Parameters<typeof useRecordsController>[0]["columns"]>=[{label:"Bezeichnung",index:0},{label:"Typ",index:1},{label:"Preis",index:2,align:"right"},{label:"Status",index:4,status:true}];
   const chips=["Alle","Dienstleistungen","Produkte","Aktiv","Inaktiv"];
   const {rows:productRows,total,controller,pagination,loading,error}=useRecordList("products",{placeholder:"Produkte suchen...",chips,columns,sortFields:{0:"name",1:"kind",2:"unit_price",4:"status"},defaultOrder:"name.asc",filterValues:{Dienstleistungen:{field:"kind",value:"service"},Produkte:{field:"kind",value:"product"},Aktiv:{field:"status",value:"active"},Inaktiv:{field:"status",value:"inactive"}}});
   return <AppShell title="Produkte" subtitle={loading?undefined:`${total} Produkte`} active="produkte" actions={<RecordsControls controller={controller} placeholder="Produkte suchen..." chips={chips} columns={columns}><CreateAction href="/produkte/neu" label="Neues Produkt"/></RecordsControls>}>
@@ -49,6 +48,8 @@ export function ProductForm({ existing = false, productId }: { existing?: boolea
   const [savingRecord,setSavingRecord]=useState(false);
   const saveRecordPending=useRef(false);
   const {dirty,markPristine}=useDirtySnapshot([name,type,sku,unit,price,vatRate,description,status]);
+  const defaultsQuery=useApiQuery<{item:Record<string,unknown>}>(production&&!existing?"/api/settings/company":null);
+  useEffect(()=>{if(existing||dirty||!defaultsQuery.data)return;const vat=String(defaultsQuery.data.item.vat_rate??8.1);queueMicrotask(()=>{setVatRate(vat);markPristine([name,type,sku,unit,price,vat,description,status]);});},[existing,dirty,defaultsQuery.data,markPristine,name,type,sku,unit,price,description,status]);
   const [savedRecord,setSavedRecord]=useState(false);
   const [editingRecord,setEditingRecord]=useState(!existing);
 
@@ -104,7 +105,7 @@ export function ProductForm({ existing = false, productId }: { existing?: boolea
   };
 
   if(loadingRecord||recordError)return <AppShell title="Produkt" active="produkte" backHref={returnTo}>{loadingRecord?<LoadingState><LocalizedText>{"Produkt wird geladen …"}</LocalizedText></LoadingState>:<ErrorState onRetry={recordQuery.refresh} retryLabel="Erneut versuchen"><LocalizedText>{recordError}</LocalizedText></ErrorState>}</AppShell>;
-  return <AppShell titleIsUserContent={existing&&!!name} unsavedChanges={false} title={existing ? name||"Produkt" : "Produkt erstellen"} status={existing?status:undefined} statusTone={status==="Aktiv"?"success":"neutral"} editing={editingRecord} subtitle={existing ? type : "Für Angebote und Rechnungen wiederverwendbar."} active="produkte" backHref={returnTo} backLabel="Produkte" actions={existing?<><ActionsMenu label="Produktaktionen" busy={savingRecord}>{!editingRecord&&<ActionRow requiresWrite icon="edit" onClick={()=>setEditingRecord(true)} title="Bearbeiten" navigation/>}<ActionRow href="/angebote/neu" icon="file" title="Angebot erstellen" navigation/><ActionRow href="/rechnungen/neu" icon="receipt" title="Rechnung erstellen" navigation/></ActionsMenu></>:undefined}>
+  return <AppShell titleIsUserContent={existing&&!!name} unsavedChanges={false} title={existing ? name||"Produkt" : "Produkt erstellen"} status={existing?status:undefined} statusTone={status==="Aktiv"?"success":"neutral"} editing={editingRecord} subtitle={existing ? type : "Für Angebote und Rechnungen wiederverwendbar."} active="produkte" backHref={returnTo} backLabel="Produkte" actions={existing?<><ActionsMenu label="Produktaktionen" busy={savingRecord}>{!editingRecord&&<ActionRow requiresWrite icon="edit" onClick={()=>setEditingRecord(true)} title="Bearbeiten" navigation/>}<ActionRow href={"/angebote/neu?productId="+encodeURIComponent(productId??"")} icon="file" title="Angebot erstellen" navigation/><ActionRow href={"/rechnungen/neu?productId="+encodeURIComponent(productId??"")} icon="receipt" title="Rechnung erstellen" navigation/></ActionsMenu></>:undefined}>
     <div className={existing?"entity-detail-workspace":"form-page"} inert={savingRecord}>
 
       <div className={existing?"entity-edit-main":"entity-edit-main form-main-new"}>
@@ -113,18 +114,14 @@ export function ProductForm({ existing = false, productId }: { existing?: boolea
           <div><dt><LocalizedText>{"MwSt."}</LocalizedText></dt><dd>{formatQuantity(vatRate,"%")}</dd></div>
           {sku&&<div><dt><LocalizedText>{"Artikelnummer"}</LocalizedText></dt><dd>{sku}</dd></div>}
           {description&&<div><dt><LocalizedText>{"Beschreibung"}</LocalizedText></dt><dd><LocalizedText>{description}</LocalizedText></dd></div>}
-        </dl>:<FormSheet workspace label={existing?"Produkt bearbeiten":"Produkt erstellen"} open={editingRecord} onClose={()=>{recovery.clear();allowDraftNavigation();if(existing)setEditingRecord(false);else router.push(returnTo)}} busy={savingRecord} dirty={dirty&&!savedRecord}><form onSubmit={event=>{event.preventDefault();void save()}}><div className="form-grid two">
-          <Field label="Name"><Input required maxLength={200} value={name} onChange={e=>setName(e.target.value)} placeholder="Name"/></Field>
-          <Field label="Typ"><Select value={type} onChange={e=>setType(e.target.value)}><option value={"Dienstleistung"}><LocalizedText>{"Dienstleistung"}</LocalizedText></option><option value={"Produkt"}><LocalizedText>{"Produkt"}</LocalizedText></option></Select></Field>
-          <Field label="Artikelnummer"><Input value={sku} onChange={e=>setSku(e.target.value)} placeholder="Optional"/></Field>
-          <Field label="Einheit"><Select value={unit} onChange={e=>setUnit(e.target.value)}><option value="hour"><LocalizedText>{"Stunde"}</LocalizedText></option><option value="piece"><LocalizedText>{"Stück"}</LocalizedText></option><option value="flat"><LocalizedText>{"Pauschal"}</LocalizedText></option></Select></Field>
-          <Field label="Verkaufspreis (CHF)"><Input required inputMode="decimal" value={price} onChange={e=>setPrice(e.target.value)} placeholder="0.00"/></Field>
-          <Field label="MwSt."><Select value={vatRate} onChange={e=>setVatRate(e.target.value)}><option value="8.1">8.1 %</option><option value="2.6">2.6 %</option><option value="0">0 %</option></Select></Field>
-          <Field label="Status"><Select value={status} onChange={e=>setStatus(e.target.value)}><option value={"Aktiv"}><LocalizedText>{"Aktiv"}</LocalizedText></option><option value={"Inaktiv"}><LocalizedText>{"Inaktiv"}</LocalizedText></option></Select></Field>
-          <Field label="Beschreibung" className="full"><Textarea value={description} onChange={e=>setDescription(e.target.value)} placeholder="Kurze Beschreibung"/></Field>
-        </div><FormActions><Button variant="secondary" onClick={()=>{recovery.clear();allowDraftNavigation();if(existing)setEditingRecord(false);else router.push(returnTo)}} disabled={savingRecord}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button requiresWrite type="submit" disabled={savingRecord}><LocalizedText>{savingRecord?"Wird gespeichert…":"Speichern"}</LocalizedText></Button></FormActions></form></FormSheet>}
+        </dl>:<FormSheet workspace label={existing?"Produkt bearbeiten":"Produkt erstellen"} open={editingRecord} onClose={()=>{recovery.clear();allowDraftNavigation();if(existing)setEditingRecord(false);else router.push(returnTo)}} busy={savingRecord} dirty={dirty&&!savedRecord}><form onSubmit={event=>{event.preventDefault();void save()}}><div className="form-grid two"><Field label="Name"><Input required maxLength={200} value={name} onChange={e=>setName(e.target.value)} placeholder="Name"/></Field>
+<Field label="Typ"><Select value={type} onChange={e=>setType(e.target.value)}><option value={"Dienstleistung"}><LocalizedText>{"Dienstleistung"}</LocalizedText></option><option value={"Produkt"}><LocalizedText>{"Produkt"}</LocalizedText></option></Select></Field>
+<Field label="Einheit"><Select value={unit} onChange={e=>setUnit(e.target.value)}><option value="hour"><LocalizedText>{"Stunde"}</LocalizedText></option><option value="piece"><LocalizedText>{"Stück"}</LocalizedText></option><option value="flat"><LocalizedText>{"Pauschal"}</LocalizedText></option></Select></Field>
+<Field label="Verkaufspreis (CHF)"><Input required inputMode="decimal" value={price} onChange={e=>setPrice(e.target.value)} placeholder="0.00"/></Field><details className="optional-details full"><summary><LocalizedText>{"Weitere Angaben"}</LocalizedText></summary><div className="form-grid two"><Field label="Artikelnummer"><Input value={sku} onChange={e=>setSku(e.target.value)} placeholder="Optional"/></Field>
+<Field label="MwSt."><Select value={vatRate} onChange={e=>setVatRate(e.target.value)}>{domainConfig.vatRates.map(rate=><option key={rate} value={rate}>{rate.toLocaleString("de-CH")} %</option>)}</Select></Field>
+<Field label="Beschreibung" className="full"><Textarea value={description} onChange={e=>setDescription(e.target.value)} placeholder="Kurze Beschreibung"/></Field>{existing&&<Field label="Status"><Select value={status} onChange={e=>setStatus(e.target.value)}><option value={"Aktiv"}><LocalizedText>{"Aktiv"}</LocalizedText></option><option value={"Inaktiv"}><LocalizedText>{"Inaktiv"}</LocalizedText></option></Select></Field>}</div></details></div><FormActions><Button variant="secondary" onClick={()=>{recovery.clear();allowDraftNavigation();if(existing)setEditingRecord(false);else router.push(returnTo)}} disabled={savingRecord}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button requiresWrite type="submit" disabled={savingRecord}><LocalizedText>{savingRecord?"Wird gespeichert…":"Speichern"}</LocalizedText></Button></FormActions></form></FormSheet>}
       </div>
-      {existing&&<ContextActions><section className="context-action-group"><Link href="/angebote/neu"><Icon name="file"/><span><b><LocalizedText>{"Angebot erstellen"}</LocalizedText></b></span><Icon name="arrow" size={15}/></Link><Link href="/rechnungen/neu"><Icon name="receipt"/><span><b><LocalizedText>{"Rechnung erstellen"}</LocalizedText></b></span><Icon name="arrow" size={15}/></Link></section></ContextActions>}
+
 
     </div>
     {toast&&<Toast title={toast} tone={toast==="Produkt gespeichert."?"success":"danger"}/>}

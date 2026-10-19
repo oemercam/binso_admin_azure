@@ -28,7 +28,7 @@ export function DataTable({children,label,variant="records",owner}:{children:Rea
   const statusIndex=cells.findIndex(cell=>isValidElement(cell)&&cell.type===Status);
   const status=cells[statusIndex];
   const badge=isValidElement<{children:string;tone?:"success"|"warning"|"danger"|"neutral"|"info"}>(status)?status.props:null;
-  return <span className="record-wrapper" key={node.key??index}><ListRow compact valuePlacement="metadata" href={node.props.href} onClick={node.props.onClick} title={title} meta={<>{structuredTitle&&<span className="record-table-meta">{primaryParts.slice(1)}</span>}{cells.map((cell,i)=>i===primary||i===statusIndex||i===amountIndex||(isValidElement<{children:ReactNode}>(cell)&&cell.type===Status&&cell.props.children===badge?.children)?null:<span className="record-table-meta" key={i}>{headings[i]&&<span>{headings[i]}: </span>}<LocalizedText>{isValidElement<{children:ReactNode}>(cell)&&cell.type===Status?cell.props.children:cell}</LocalizedText></span>)}</>} value={amountIndex<0?undefined:cells[amountIndex]} status={badge?.children} tone={badge?.tone}/></span>;
+  return <span className="record-wrapper" key={node.key??index}><ListRow compact href={node.props.href} onClick={node.props.onClick} title={title} meta={<>{structuredTitle&&<span className="record-table-meta">{primaryParts.slice(1)}</span>}{cells.map((cell,i)=>i===primary||i===statusIndex||i===amountIndex||(isValidElement<{children:ReactNode}>(cell)&&cell.type===Status&&cell.props.children===badge?.children)?null:<span className="record-table-meta" key={i}>{headings[i]&&<span>{headings[i]}: </span>}<LocalizedText>{isValidElement<{children:ReactNode}>(cell)&&cell.type===Status?cell.props.children:cell}</LocalizedText></span>)}</>} value={amountIndex<0?undefined:cells[amountIndex]} status={badge?.children} tone={badge?.tone}/></span>;
  })}</div>}</>;
 }
 function tableCells(children:ReactNode,header=false){
@@ -200,7 +200,6 @@ export function RecordRow({
   status,
   personIdentity,
   compact=false,
-  valuePlacement="separate",
 }: {
   href?: string;
   icon?: string;
@@ -210,9 +209,9 @@ export function RecordRow({
   status?: string;
   personIdentity?:string;
   compact?:boolean;
-  valuePlacement?:"separate"|"metadata";
+
 }) {
-  return <ListRow translateTitle={false} compact={compact} valuePlacement={valuePlacement} href={href} title={personIdentity?<span className="person-record"><Avatar name={title} identity={personIdentity}/><span>{title}</span></span>:title} meta={meta} value={value} status={status} tone={status?tone(status):"neutral"}/>;
+  return <ListRow translateTitle={false} compact={compact} href={href} title={personIdentity?<span className="person-record"><Avatar name={title} identity={personIdentity}/><span>{title}</span></span>:title} meta={meta} value={value} status={status} tone={status?tone(status):"neutral"}/>;
 }
 
 /** Group disclosure owns structure only; callers retain domain totals, filters and permissions. */

@@ -88,3 +88,32 @@ auszuweisen. Datenbankmigrationen werden ausschliesslich lokal/isoliert geprüft
 - Bestehende Quality-, CodeQL-, Browser-, Auth-, Dokument- und Finanzprüfungen
   bleiben verpflichtend. Die Checkboxen werden erst nach überprüfter Abnahme
   abgeschlossen, nicht durch die Erzeugung statischer Inventare.
+
+## Folgekorrektur nach Release #287
+
+Die gemeinsame Quelle bleibt ux-current-approval.md. Aktueller Arbeitsbranch:
+ux/task-focused-consistency. Kein Merge, Deployment oder produktive Migration.
+
+| Ansichten | Gemeinsamer Aufbau und konkret korrigierte Ursache | Nachweis |
+| --- | --- | --- |
+| Alle internen Seiten/Zurück | Kein sichtbarer Ladebalken; 30s frische und bis 5min zurückkehrende In-Memory-Snapshots nur bei identischer Sitzung/Revision; alte Werte werden im Hintergrund aktualisiert | task-focused-ux-test; loading-browser-test in CI |
+| Hauptheader | Kein doppelter Header-Timer und keine vergrösserte Timer-Headerzeile; vorhandener Wiederöffnungs-Hinweis bleibt | Header-Adversaries; responsive CI |
+| Listen/Übersicht | Name/Betrag oben, Metadaten und rechter Status darunter; ohne Betrag zentrierter rechter Status; kein Badge in Fälligkeitstext | echte Zeilengeometrie 320/390/1024 Light/Dark |
+| Details/Kundendossier/Tabs | Gleichrangige Abschnittstypografie; Nummer neben Feldbezeichnung; Dokumente mit Suche/Filter/einer kontextgebundenen Erstellung | Control-Renderer; Kunden-Browserfälle in CI |
+| Erfassen/Bearbeiten/Einstellungen | Derselbe modale Sheet-Owner, lange Aufgaben erweitert; Footer aus Scrollinhalt getrennt; hinterliegende Oberfläche inert, verschachtelt gezählt | workspace/modal, Dirty-/Replay-/Berechtigungstests; CI-Formularfälle |
+| Auswahl/Filter | Sichtbarer Button und App-Listbox; nativer Wert nur für Formularsemantik, kein iOS-Picker als Trigger | echte Auswahl, Keyboard, Disabled, verschachtelte Sperren |
+| Rechnung/Angebot/Vorschau | Betrag/Status zuerst, Positionen und Fälligkeit, explizite PDF-Vorschau; Zusatzhistorie auf Bedarf; keine zweite Aktionsspalte | echte PDF/QR- und operative Darstellungsregressionen |
+| Produkte/Leistungen | Keine doppelte Weitere-Aktionen-Sektion; Bearbeiten im Sheet; Produktwerte in neuer Dokumentposition vorbelegen; neuer Datensatz aktiv | Formular-/Replay-Tests; CI |
+| Vorgaben | Vorhandene Firmen-MwSt./Zahlungsfrist/Texte und Kundenfrist verwenden; gemeinsame Steuersatzliste; keine Bestands-Snapshots überschreiben | positive/negative Defaults; tatsächliche isolierte Repository-/PDF-Tests |
+| Finanzen/Analyse | Drei Analyse-Kernwerte, separater Zeitverlauf; echter reconciliierter Rechnungsbestand als Ring mit Drilldown, kein Kontostand behauptet | tatsächliche PostgreSQL-Zahlungs-/Gutschrift-/Zeitzonen-/Chart-Tests |
+| Chat/PWA | Ein Composer, reduzierte Eingabehilfen; Tastatur-Viewport ohne zusätzliche Safe-Area-Lücke; keine Navigation im Chat | Composer-Renderer und CI; physisches iPhone bleibt separat |
+| Auth/öffentliche Seiten/Operator | Vorhandene eigene Muster und Rollen erhalten; gemeinsame Auswahl und Dialogregeln greifen; keine neue Foundation | vorhandene vollständige Quality-/Security-/Browser-Gates |
+
+Die generierte page-matrix.json ordnet weiterhin sämtliche 76 Seiten und zwölf
+Operatorvarianten zu; eingebettete Tabs, Sheets und Vorschauen gehören zu ihren
+Seiten-Ownern. Ein statischer Eintrag ist keine visuelle Abnahme. Unbekannt bleiben
+physische iPhone-/PWA-Systemleisten und die tatsächliche Produktionslatenz nach
+diesem noch nicht veröffentlichten Paket. Kein Versprechen verzögerungsfreier
+Netzantworten; Rechte, Session-Zäune, Fehler und notwendige Validierung bleiben.
+
+Bereits geöffnete Inhalte derselben Sitzung bleiben bei einer Hintergrundaktualisierung sichtbar; ungültig gewordene Cache-Snapshots werden bei neuer Navigation nicht wiederverwendet. Sitzungswechsel und bestätigte 401/403/404-Antworten verwerfen die betroffenen Daten weiterhin.

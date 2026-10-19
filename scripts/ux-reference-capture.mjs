@@ -1,3 +1,4 @@
+import {selectAppOption,appControlValue} from './app-select-browser.mjs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import {fileURLToPath,pathToFileURL} from 'node:url';
@@ -38,7 +39,7 @@ export async function captureReferenceViews(browser,output){
     await page.screenshot({path:path.join(destination,'desktop-customers-1440.png'),fullPage:true});
    }else if(name==='mobile-app'){
     await page.screenshot({path:path.join(destination,name+'-1440.png'),fullPage:true});
-    await page.locator('#ba-pages').selectOption('customers');
+    await selectAppOption(page.locator('#ba-pages'), 'customers');
     await page.screenshot({path:path.join(destination,'mobile-customers-1440.png'),fullPage:true});
     await page.locator('[data-customer]').first().click();
     await page.screenshot({path:path.join(destination,'mobile-customer-detail-1440.png'),fullPage:true});

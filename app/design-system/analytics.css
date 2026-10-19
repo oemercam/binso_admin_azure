@@ -124,4 +124,4 @@
 :is(.bo-metric-tiles,.section-title)[data-desktop-only]{display:none}}
 
 .financial-snapshot{margin-block:24px;border-top:1px solid var(--color-line);padding-block:16px}
-.financial-snapshot>summary{font-weight:600;min-height:var(--touch);cursor:pointer}
+.financial-snapshot>summary{font-size:var(--section-title-font);font-weight:600;color:var(--color-fg);min-height:var(--touch);cursor:pointer}

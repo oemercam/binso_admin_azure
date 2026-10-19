@@ -123,7 +123,7 @@
 .timer-card{text-align:left}
 .time-overview-section{padding-left:32px;border-left:1px solid var(--color-line)}
 .timer-project{width:100%;max-width:none;margin:0;display:grid;gap:18px;text-align:left}
-.timer-project button{
+.timer-project .form-field>button{
   width:100%;
   min-height:44px;
   padding:0 12px;
@@ -360,10 +360,6 @@
   border-top:1px solid var(--color-line);
   background:var(--color-bg);
 }
-.desktop-header-timer svg{
-  width:18px;
-  height:18px;
-}
 .account-sheet,
 .global-search,
 .customer-tab-panel,
@@ -424,7 +420,6 @@
 @media (min-width:761px){
 .mobile-record-list{display:none}
 .quick-create-sheet{width:320px}
-.desktop-header-timer{display:flex;align-items:center;gap:6px;font-size:var(--type-label);font-variant-numeric:tabular-nums;white-space:nowrap}
 .customer-tab-panel,
   .employee-tab-panel{
     padding:var(--desktop-section-y) 0;
@@ -441,7 +436,6 @@
   }
 }
 @media (min-width:761px) and (max-width:1100px){
-.desktop-header-timer{font-size:var(--type-metadata)}
 .product-modules{grid-template-columns:repeat(2,1fr)}
 .quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 .expense-layout{grid-template-columns:220px minmax(0,1fr)}
@@ -708,8 +702,6 @@ a{-webkit-tap-highlight-color:transparent}
 @media (max-width:760px){
 .mobile-back{min-width:44px;min-height:44px;
   }
-.header-timer i{width:6px;height:6px;border-radius:50%;background:var(--status-success-fg)}
-.header-timer{min-height:var(--touch);padding:0 8px;display:flex;align-items:center;gap:5px;border:1px solid var(--color-line);border-radius:var(--shape-scale-999);font-size:var(--type-metadata);font-variant-numeric:tabular-nums}
 .mobile-detail-actions{display:flex;align-items:center;gap:2px;margin-left:auto}
 .mobile-back{width:40px;height:40px;display:grid;place-items:center;margin-left:-8px}
 .header-search-scopes{display:flex;margin-bottom:12px}
@@ -743,10 +735,6 @@ a{-webkit-tap-highlight-color:transparent}
 }
 
 /* Running time is a calm status action, not a competing header title. */
-.header-timer,.desktop-header-timer{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:6px 10px;border:0;border-radius:var(--control-radius);background:var(--color-subtle);color:var(--app-action-accent);font-variant-numeric:tabular-nums;white-space:nowrap;line-height:1}
-.header-timer i,.desktop-header-timer i{display:block;flex:none;width:8px;height:8px;border-radius:50%;background:currentColor;animation:timer-status-pulse 2.4s ease-in-out infinite}
-@keyframes timer-status-pulse{0%,100%{opacity:.65;transform:scale(.85)}50%{opacity:1;transform:scale(1.15)}}
-@media(prefers-reduced-motion:reduce){.header-timer i,.desktop-header-timer i{animation:none}}
 .activity-groups{display:grid;gap:var(--field-group-gap)}
 .activity-day{padding-block:var(--field-group-gap)}
 .activity-day>h3{margin:0 0 12px;font-size:var(--type-label);font-weight:600;color:var(--color-muted)}
