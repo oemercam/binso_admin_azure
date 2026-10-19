@@ -12663,5 +12663,15 @@
     "Approve",
     "Approuver",
     "Approva"
+  ],
+  "Status zurücksetzen": [
+    "Reset status",
+    "Réinitialiser le statut",
+    "Reimposta stato"
+  ],
+  "Sortierung zurücksetzen": [
+    "Reset sorting",
+    "Réinitialiser le tri",
+    "Reimposta ordinamento"
   ]
 }

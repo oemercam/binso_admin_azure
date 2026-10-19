@@ -366,5 +366,6 @@ html[data-theme="dark"] .searchbox>input{height:100%;min-width:0;padding:0;borde
 
 .filter-chip{display:inline-flex;align-items:center;gap:8px;min-height:var(--touch);padding:6px 12px;border:1px solid var(--color-line);border-radius:var(--control-radius);background:var(--color-bg);color:var(--color-fg);font-size:var(--type-label)}
 .filter-chip svg{flex:none}
+.records-active-filters:has(>.filter-chip){display:flex;flex-wrap:wrap;gap:8px}
 
 .searchbox>.search-clear{flex:none;width:var(--touch);height:var(--touch);min-width:var(--touch);padding:0}

@@ -102,7 +102,8 @@ export function RecordsControls({controller:s,placeholder,chips=["Alle","Aktiv",
  const choices=columns?.length?columns:[{label:"Name",index:s.firstSortIndex}];
  const activeFilterCount=Number(s.activeChip!==(chips[0]??"Alle"))+Number(s.sort!=="default");
  const filterButton=<LocalizedElement as="button" type="button" className="icon-button records-filter-action" aria-label="Filter und Sortierung" aria-describedby={activeFilterCount?`${id}-filter-count`:undefined} aria-pressed={s.activeChip!==(chips[0]??"Alle")||s.sort!=="default"} onClick={s.openFilters}><Icon name="filter" size={20}/><span className="records-filter-label"><LocalizedText>{"Filter"}</LocalizedText></span>{activeFilterCount>0&&<span id={`${id}-filter-count`} className="filter-count">{activeFilterCount}<span className="visually-hidden"><LocalizedText>{" aktive Filter"}</LocalizedText></span></span>}</LocalizedElement>;
- return <>{inline?<div className="records-inline-controls" data-appearance={appearance}><div className="records-search-row"><ListSearch value={s.query} onChange={s.setQuery} placeholder={placeholder}/>{filterButton}<label className="records-sort-control"><span className="visually-hidden"><LocalizedText>{"Sortierung"}</LocalizedText></span><Select aria-label="Sortierung" value={s.sort==="default"?"default":`${s.sortIndex}:${s.sort}`} onChange={event=>{const [index,direction]=event.target.value.split(":");s.setSortIndex(index==="default"?s.firstSortIndex:Number(index));s.setSort(index==="default"?"default":direction as "asc"|"desc")}}><option value="default"><LocalizedText>{"Sortieren"}</LocalizedText></option>{choices.flatMap(column=>[<option key={`${column.index}:asc`} value={`${column.index}:asc`}><LocalizedText>{column.label}</LocalizedText> ↑</option>,<option key={`${column.index}:desc`} value={`${column.index}:desc`}><LocalizedText>{column.label}</LocalizedText> ↓</option>])}</Select></label>{children}</div>{s.activeChip!==(chips[0]??"Alle")&&<div className="records-active-filters"><button type="button" className="filter-chip" onClick={()=>s.setActiveChip(chips[0]??"Alle")}><LocalizedText>{s.activeChip}</LocalizedText><Icon name="close" size={14}/></button></div>}</div>:<><LocalizedElement as="button" type="button" className="icon-button records-search-action" aria-label={placeholder} onClick={()=>s.setSearchOpen(true)}><Icon name="search" size={20}/></LocalizedElement>{filterButton}{children}</>}
+ const activeFilters=activeFilterCount>0&&<div className="records-active-filters">{s.activeChip!==(chips[0]??"Alle")&&<LocalizedElement as="button" type="button" className="filter-chip" aria-label="Status zurücksetzen" aria-describedby={id+'-active-status'} onClick={()=>s.setActiveChip(chips[0]??"Alle")}><span id={id+'-active-status'}><LocalizedText>{s.activeChip}</LocalizedText></span><Icon name="close" size={14}/></LocalizedElement>}{s.sort!=="default"&&<LocalizedElement as="button" type="button" className="filter-chip" aria-label="Sortierung zurücksetzen" aria-describedby={id+'-active-sort'} onClick={()=>s.setSort("default")}><span id={id+'-active-sort'}><LocalizedText>{choices.find(column=>column.index===s.sortIndex)?.label??"Name"}</LocalizedText>{s.sort==='asc'?' ↑':' ↓'}</span><Icon name="close" size={14}/></LocalizedElement>}</div>;
+ return <>{inline?<div className="records-inline-controls" data-appearance={appearance}><div className="records-search-row"><ListSearch value={s.query} onChange={s.setQuery} placeholder={placeholder}/>{filterButton}<label className="records-sort-control"><span className="visually-hidden"><LocalizedText>{"Sortierung"}</LocalizedText></span><Select aria-label="Sortierung" value={s.sort==="default"?"default":`${s.sortIndex}:${s.sort}`} onChange={event=>{const [index,direction]=event.target.value.split(":");s.setSortIndex(index==="default"?s.firstSortIndex:Number(index));s.setSort(index==="default"?"default":direction as "asc"|"desc")}}><option value="default"><LocalizedText>{"Sortieren"}</LocalizedText></option>{choices.flatMap(column=>[<option key={`${column.index}:asc`} value={`${column.index}:asc`}><LocalizedText>{column.label}</LocalizedText> ↑</option>,<option key={`${column.index}:desc`} value={`${column.index}:desc`}><LocalizedText>{column.label}</LocalizedText> ↓</option>])}</Select></label>{children}</div>{activeFilters}</div>:<><LocalizedElement as="button" type="button" className="icon-button records-search-action" aria-label={placeholder} onClick={()=>s.setSearchOpen(true)}><Icon name="search" size={20}/></LocalizedElement>{filterButton}{children}{activeFilters}</>}
   <FilterSheet label={placeholder.replace(/\.\.\.$/,'')} open={s.searchOpen} onClose={()=>s.setSearchOpen(false)} actions={<Button type="submit" form={searchId}><LocalizedText>{"Anwenden"}</LocalizedText></Button>}><form id={searchId} onSubmit={event=>{event.preventDefault();s.setSearchOpen(false)}}><Field label="Suchtext" allowReadOnlyInput><Input type="search" maxLength={200} value={s.query} onChange={event=>s.setQuery(event.target.value)} placeholder={placeholder}/></Field></form></FilterSheet>
   <FilterSheet label="Filter und Sortierung" open={s.filterOpen} onClose={()=>s.setFilterOpen(false)} actions={<><Button variant="secondary" onClick={()=>s.setDraft({activeChip:chips[0]??"Alle",sort:"default",sortIndex:s.firstSortIndex})}><LocalizedText>{"Zurücksetzen"}</LocalizedText></Button><Button type="submit" form={filterId}><LocalizedText>{"Anwenden"}</LocalizedText></Button></>}><form id={filterId} onSubmit={event=>{event.preventDefault();s.applyFilters()}}><Field label="Status" allowReadOnlyInput><Select value={s.draft.activeChip} onChange={event=>s.setDraft({...s.draft,activeChip:event.target.value})}>{filterChips.map(chip=><option value={chip} key={chip}><LocalizedText>{chip}</LocalizedText></option>)}</Select></Field><Field label="Sortierung" allowReadOnlyInput><Select value={s.draft.sort==='default'?'default':`${s.draft.sortIndex}:${s.draft.sort}`} onChange={event=>{if(event.target.value==='default')s.setDraft({...s.draft,sort:'default',sortIndex:s.firstSortIndex});else{const [index,direction]=event.target.value.split(':');s.setDraft({...s.draft,sortIndex:Number(index),sort:direction as 'asc'|'desc'})}}}><option value="default"><LocalizedText>{"Standard"}</LocalizedText></option>{choices.flatMap(column=>[<option key={`${column.index}:asc`} value={`${column.index}:asc`}><LocalizedText>{column.label}</LocalizedText> ↑</option>,<option key={`${column.index}:desc`} value={`${column.index}:desc`}><LocalizedText>{column.label}</LocalizedText> ↓</option>])}</Select></Field></form></FilterSheet>
  </>;
@@ -124,7 +125,6 @@ export function RecordsView({
   sortValue,
   controller,
   toolbarActions=true,
-  filterSummary=toolbarActions,
   remote=false,
   pagination,
   showCount=true,
@@ -133,7 +133,6 @@ export function RecordsView({
   pagination?:{total:number;page:number;pageSize:number;onPage:(page:number)=>void};
   controller?:RecordsController;
   toolbarActions?:boolean;
-  filterSummary?:boolean;
   remote?:boolean;
   sortValue?:(item:string[],index:number)=>string|number;
   countLabel?:string;
@@ -151,7 +150,7 @@ export function RecordsView({
 }) {
   const localController=useRecordsController({placeholder,chips,columns,enabled:!controller});
   const state=controller??localController;
-  const {query,setQuery,activeChip,setActiveChip,sort,setSort,sortIndex,setSortIndex,firstSortIndex,statusIndex}=state;
+  const {query,activeChip,sort,sortIndex,statusIndex}=state;
 
   useEffect(()=>{
     const snapshot=state.scrollSnapshot.current;
@@ -178,22 +177,13 @@ export function RecordsView({
     });
   },[activeChip,items,query,sort,sortIndex,statusGroups,typeIndex,statusIndex,sortValue,remote]);
 
-  const reset=()=>{
-    setQuery("");
-    setActiveChip(chips[0] ?? "Alle");
-    setSort("default");
-    setSortIndex(firstSortIndex);
-  };
-
   const hasFilters=query.trim().length>0 || activeChip!==(chips[0]??"Alle") || sort!=="default";
   const singularCountLabel=({Einträge:"Eintrag",Kunden:"Kunde",Zahlungen:"Zahlung",Rechnungen:"Rechnung",Angebote:"Angebot",Dokumente:"Dokument",Produkte:"Produkt",Mitarbeiter:"Mitarbeiter",Spesen:"Spese",Tickets:"Ticket"} as Record<string,string>)[countLabel]??countLabel;
 
   return <>
-    {(toolbarActions||showCount||(filterSummary&&hasFilters))&&<div className="records-toolbar">
+    {(toolbarActions||showCount)&&<div className="records-toolbar">
       {toolbarActions&&<RecordsControls controller={state} placeholder={placeholder} chips={chips} columns={columns}/>}
       {showCount&&!loading&&(visible.length>0||hasFilters)&&<span className="records-count" aria-live="polite"><LocalizedText>{`${pagination?.total??visible.length} ${(pagination?.total??visible.length)===1?singularCountLabel:countLabel}`}</LocalizedText></span>}
-      {filterSummary&&hasFilters&&<span className="records-active-filters">{[query.trim(),activeChip!==(chips[0]??"Alle")?activeChip:"",sort!=="default"?`${columns?.find(column=>column.index===sortIndex)?.label??"Name"} ${sort==='asc'?'↑':'↓'}`:""].filter(Boolean).join(" · ")}</span>}
-      {filterSummary&&hasFilters&&<button className="toolbar-reset" type="button" onClick={reset}><LocalizedText>{"Filter zurücksetzen"}</LocalizedText></button>}
     </div>}
 
     {loading?<LoadingState><LocalizedText>{"Einträge werden geladen …"}</LocalizedText></LoadingState>:error?<ErrorState><LocalizedText>{error}</LocalizedText></ErrorState>:visible.length ? <><DataTable owner={placeholder} label={placeholder.replace(/ suchen.*$/,"")}>{columns&&<DataTableHead className="desktop-record-head" columns={columns.length}>{columns.map(col=><span role="columnheader" aria-sort={sortIndex===col.index&&sort!=="default"?(sort==="asc"?"ascending":"descending"):"none"} className={col.align==="right"?"align-right":""} key={col.label}><LocalizedText>{col.label}</LocalizedText>{sortIndex===col.index&&sort!=="default"?<span aria-hidden="true"><LocalizedText>{sort==="asc"?" ↑":" ↓"}</LocalizedText></span>:null}</span>)}<span aria-hidden="true"/></DataTableHead>}{visible.map((item,index)=>{const cells=<>{columns?.map(col=><span role="cell" key={col.label} className={`${col.align==="right"?"align-right ":""}${col.status?"table-status-cell":""}`}>{col.render?col.render(item):col.status?<Status appearance="pill" tone={tone(item[col.index]??item.at(-1)??"")}><LocalizedText>{item[col.index]??item.at(-1)??"—"}</LocalizedText></Status>:(item[col.index]||"—")}</span>)}<Icon name="arrow" size={16}/></>;const href=rowHref?.(item);return href?<DataTableRow href={href} className="desktop-record-row" columns={columns?.length??1} key={item.join("-")+index}>{cells}</DataTableRow>:<DataTableRow className="desktop-record-row" columns={columns?.length??1} key={item.join("-")+index}>{cells}</DataTableRow>})}</DataTable><div className="records mobile-record-list" data-records-owner={placeholder}>{visible.map((item,index)=><span className="record-wrapper" key={item.join("-")+index}>{children(item)}</span>)}</div></> :
