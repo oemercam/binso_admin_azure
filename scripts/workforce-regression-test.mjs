@@ -49,6 +49,7 @@ try{
  await assert.rejects(()=>run(member,()=>query('update time_entries set approved=true where id=$1',[daily])),error=>error.code==='42501');
  await run(reviewer,()=>query('update time_entries set approved=true where id=$1',[daily]));
  const expense=(await run(member,()=>query("insert into expenses(organization_id,external_id,employee_id,customer_id,expense_date,description,merchant,category,quantity,unit_price,currency,status,created_by_user_id) values($1,'workforce-expense',$2,$3,current_date,'Synthetic meal','Synthetic merchant','expense',1,42,'CHF','submitted',$4) returning id",[org,employee,customers[0],member]))).rows[0].id;
+ await assert.rejects(()=>run(member,()=>query('update expenses set customer_id=$2 where id=$1',[expense,customers[1]])),error=>error.code==='42501','Draft edits cannot move an expense to an unassigned customer');
  await assert.rejects(()=>run(member,()=>query("update expenses set status='approved' where id=$1",[expense])),error=>error.code==='42501');
  await run(reviewer,()=>query("update expenses set status='approved' where id=$1",[expense]));
  await assert.rejects(()=>run(owner,()=>query('update expenses set unit_price=99 where id=$1',[expense])),error=>error.code==='42501','Approved expense amounts remain immutable');

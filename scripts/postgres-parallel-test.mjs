@@ -79,7 +79,8 @@ try{
  // Two synthetic devices execute the real timer route over independent clients.
  globalThis.__parallelTimerSession={...session,email:'timer@fixture.invalid'};
  const timerHttp=moduleUrl('export class ApiError extends Error{constructor(status,code,message){super(message);this.status=status;this.code=code}} export const assertSameOrigin=()=>{};export const cleanText=v=>typeof v==="string"?v:"";export const readJson=async r=>r.body;export const json=data=>data;export const apiError=e=>{throw e}');
- const timer=await import(await compile('app/api/time-tracker/route.ts',{'@/lib/projects':moduleUrl(await fs.readFile('lib/projects.ts','utf8')),'@/lib/server/session':moduleUrl('export async function requireSession(){return globalThis.__parallelTimerSession}'),'@/lib/server/rbac':rbac,'@/lib/server/db':scopedDb,'@/lib/server/http':timerHttp}));
+ const workforce=await compile('lib/server/workforce-access.ts',{'./http':timerHttp,'./rbac':rbac});
+ const timer=await import(await compile('app/api/time-tracker/route.ts',{'@/lib/financial-status':financialModuleUrl,'@/lib/server/workforce-access':workforce,'@/lib/projects':moduleUrl(await fs.readFile('lib/projects.ts','utf8')),'@/lib/server/session':moduleUrl('export async function requireSession(){return globalThis.__parallelTimerSession}'),'@/lib/server/rbac':rbac,'@/lib/server/db':scopedDb,'@/lib/server/http':timerHttp}));
  const baseline=(await pool.query('select count(*)::int n from time_entries where organization_id=$1 and created_by_user_id=$2',[organizationId,session.userId])).rows[0].n;
  await Promise.all([0,1].map(()=>timer.POST({body:{action:'start',project:'Interne Planung',customerId:null,projectId:null}})));
  assert.equal((await pool.query('select count(*)::int n from active_time_trackers where organization_id=$1 and user_id=$2',[organizationId,session.userId])).rows[0].n,1,'Concurrent devices share exactly one timer');

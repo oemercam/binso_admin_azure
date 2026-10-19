@@ -152,7 +152,7 @@ create function protect_expense_workforce() returns trigger language plpgsql
 set search_path=pg_catalog,public as $$
 begin
  if app_workforce_role() not in ('owner','admin','finance','project_manager','manager','member','demo_template') and not exists(select 1 from pg_roles where rolname=current_user and (rolsuper or rolbypassrls)) then raise exception 'Active expense membership required' using errcode='42501'; end if;
- if tg_op='INSERT' and app_workforce_role() in ('member','project_manager','manager') then
+ if app_workforce_role() in ('member','project_manager','manager') and (tg_op='INSERT' or (tg_op='UPDATE' and row(new.customer_id,new.employee_id,new.expense_date) is distinct from row(old.customer_id,old.employee_id,old.expense_date))) then
   if new.created_by_user_id is distinct from current_setting('app.user_id',true)
    or not exists(select 1 from employees e where e.organization_id=new.organization_id and e.id=new.employee_id and e.user_id=new.created_by_user_id and e.active and e.archived_at is null)
    or (new.customer_id is not null and not app_workforce_access(new.customer_id,null,new.expense_date))
