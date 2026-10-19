@@ -1,5 +1,5 @@
 {
-  "commit": "8e3db112ad61472700980c713bab1f8d70961272",
+  "commit": "11eff375f6ebfd86ef660236004503edd1dd964f",
   "method": "Existing TypeScript AST dependency inventory; conditional reachability is not runtime proof",
   "pages": [
     {
@@ -2198,6 +2198,7 @@
         "components/records.tsx#DataTableRow",
         "components/records.tsx#tone",
         "components/records.tsx#RecordRow",
+        "components/file-upload.tsx#FileUpload",
         "components/pdf-preview.tsx#DocumentPageViewer",
         "components/pdf-preview.tsx#DocumentPages",
         "components/pdf-preview.tsx#PdfPage",
@@ -2224,27 +2225,27 @@
       "actions": [
         {
           "tag": "ActionSheet",
-          "line": 38,
-          "component": "components/ux-lab.tsx#UxLab"
-        },
-        {
-          "tag": "FormSheet",
           "line": 39,
           "component": "components/ux-lab.tsx#UxLab"
         },
         {
-          "tag": "FilterSheet",
+          "tag": "FormSheet",
           "line": 40,
           "component": "components/ux-lab.tsx#UxLab"
         },
         {
-          "tag": "FormSheet",
+          "tag": "FilterSheet",
           "line": 41,
           "component": "components/ux-lab.tsx#UxLab"
         },
         {
-          "tag": "ConfirmDialog",
+          "tag": "FormSheet",
           "line": 42,
+          "component": "components/ux-lab.tsx#UxLab"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 43,
           "component": "components/ux-lab.tsx#UxLab"
         },
         {
@@ -2608,12 +2609,12 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 273,
+          "line": 277,
           "component": "components/pages/settings.tsx#SubscriptionSettingsPage"
         },
         {
           "tag": "FormSheet",
-          "line": 313,
+          "line": 317,
           "component": "components/pages/settings.tsx#SubscriptionSettingsPage"
         },
         {
@@ -3636,7 +3637,7 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 163,
+          "line": 167,
           "component": "components/pages/settings.tsx#CompanySettingsPage"
         },
         {
@@ -3835,7 +3836,8 @@
         "components/locale-switcher.tsx#LocaleSwitcher",
         "components/app-shell.tsx#ShellRegistration",
         "components/app-shell.tsx#ShellConfiguration",
-        "components/binso-ux.tsx#FormSheet"
+        "components/binso-ux.tsx#FormSheet",
+        "components/file-upload.tsx#FileUpload"
       ],
       "layouts": [
         "app/layout.tsx",
@@ -3845,7 +3847,7 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 85,
+          "line": 88,
           "component": "components/pages/settings.tsx#AccountSettingsPage"
         },
         {
@@ -4670,13 +4672,13 @@
         "components/app-shell.tsx#ShellRegistration",
         "components/app-shell.tsx#ShellConfiguration",
         "components/team-settings.tsx#roleLabel",
+        "components/ui.tsx#SectionTitle",
+        "components/binso-ux.tsx#ActionsMenu",
+        "components/binso-ux.tsx#RowActions",
         "components/binso-ux.tsx#FormSheet",
         "components/workforce-assignments.tsx#WorkforceAssignments",
         "components/workforce-assignments.tsx#Payload",
-        "components/workforce-assignments.tsx#Assignment",
-        "components/ui.tsx#SectionTitle",
-        "components/binso-ux.tsx#ActionsMenu",
-        "components/binso-ux.tsx#RowActions"
+        "components/workforce-assignments.tsx#Assignment"
       ],
       "layouts": [
         "app/layout.tsx",
@@ -4755,6 +4757,11 @@
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
         },
         {
+          "tag": "ActionSheet",
+          "line": 211,
+          "component": "components/binso-ux.tsx#ActionsMenu"
+        },
+        {
           "tag": "Sheet",
           "line": 201,
           "component": "components/binso-ux.tsx#FormSheet"
@@ -4768,11 +4775,6 @@
           "tag": "ConfirmDialog",
           "line": 30,
           "component": "components/workforce-assignments.tsx#WorkforceAssignments"
-        },
-        {
-          "tag": "ActionSheet",
-          "line": 211,
-          "component": "components/binso-ux.tsx#ActionsMenu"
         }
       ],
       "dimensions": {
@@ -10845,6 +10847,11 @@
         "components/binso-ux.tsx#MetricTile",
         "components/ui.tsx#Metric",
         "components/pages/shared.tsx#formatMinutes",
+        "components/ui.tsx#SectionTitle",
+        "components/records.tsx#TimeEntryRow",
+        "components/records.tsx#RecordRow",
+        "components/binso-ux.tsx#ListRow",
+        "components/records.tsx#tone",
         "components/pages/shared.tsx#swissDate",
         "components/binso-ux.tsx#FormSheet"
       ],
@@ -10856,7 +10863,7 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 49,
+          "line": 50,
           "component": "components/pages/projects.tsx#ProjectDetail"
         },
         {
@@ -12455,6 +12462,7 @@
         "components/locale-switcher.tsx#LocaleSwitcher",
         "components/app-shell.tsx#ShellRegistration",
         "components/app-shell.tsx#ShellConfiguration",
+        "components/ui.tsx#SectionTitle",
         "components/binso-ux.tsx#FormSheet"
       ],
       "layouts": [
@@ -12465,17 +12473,17 @@
       "actions": [
         {
           "tag": "ActionSheet",
-          "line": 185,
+          "line": 188,
           "component": "components/pages/expenses.tsx#ExpenseForm"
         },
         {
           "tag": "FormSheet",
-          "line": 189,
+          "line": 192,
           "component": "components/pages/expenses.tsx#ExpenseForm"
         },
         {
           "tag": "FormSheet",
-          "line": 190,
+          "line": 193,
           "component": "components/pages/expenses.tsx#ExpenseForm"
         },
         {
@@ -12675,6 +12683,7 @@
         "components/locale-switcher.tsx#LocaleSwitcher",
         "components/app-shell.tsx#ShellRegistration",
         "components/app-shell.tsx#ShellConfiguration",
+        "components/ui.tsx#SectionTitle",
         "components/binso-ux.tsx#FormSheet"
       ],
       "layouts": [
@@ -12685,17 +12694,17 @@
       "actions": [
         {
           "tag": "ActionSheet",
-          "line": 185,
+          "line": 188,
           "component": "components/pages/expenses.tsx#ExpenseForm"
         },
         {
           "tag": "FormSheet",
-          "line": 189,
+          "line": 192,
           "component": "components/pages/expenses.tsx#ExpenseForm"
         },
         {
           "tag": "FormSheet",
-          "line": 190,
+          "line": 193,
           "component": "components/pages/expenses.tsx#ExpenseForm"
         },
         {
@@ -13317,7 +13326,8 @@
         "components/locale-switcher.tsx#LocaleSwitcher",
         "components/app-shell.tsx#ShellRegistration",
         "components/app-shell.tsx#ShellConfiguration",
-        "components/binso-ux.tsx#FormSheet"
+        "components/binso-ux.tsx#FormSheet",
+        "components/file-upload.tsx#FileUpload"
       ],
       "layouts": [
         "app/layout.tsx",
@@ -13327,7 +13337,7 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 103,
+          "line": 106,
           "component": "components/pages/support.tsx#SupportTicketForm"
         },
         {

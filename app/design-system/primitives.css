@@ -355,4 +355,4 @@ input:not([type="checkbox"]):not([type="radio"]),
 .app-select-trigger{font-size:var(--control-font-mobile)}
 }
 
-.section-title-actions{display:flex;align-items:center;justify-content:flex-end;gap:var(--field-label-gap);flex:none;min-width:0}
+.section-title-actions{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:var(--field-label-gap);margin-inline-start:auto;max-width:100%;min-width:0}

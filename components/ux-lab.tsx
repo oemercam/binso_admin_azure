@@ -1,4 +1,5 @@
 "use client";
+import {FileUpload} from './file-upload';
 
 import {LocalizedText} from "@/lib/client/locale";
 import {useState} from "react";
@@ -17,7 +18,7 @@ import {Button,EmptyState,Field,Input,Select,Textarea,Toggle,Status,IconButton,C
 export function UxLab(){
  const [panel,setPanel]=useState<HeaderPanelKind|null>(null),[sheet,setSheet]=useState<"action"|"form"|"filter"|"wizard"|null>(null);
  const [query,setQuery]=useState(""),[value,setValue]=useState(""),[checked,setChecked]=useState(false),[step,setStep]=useState(0);
- const [file,setFile]=useState<Blob|null>(null),[filter,setFilter]=useState<"all"|"unread">("all");
+ const [file,setFile]=useState<File|null>(null),[filter,setFilter]=useState<"all"|"unread">("all");
  const [confirm,setConfirm]=useState(false),[showToast,setShowToast]=useState(false);
  const close=()=>setPanel(null),closeSheet=()=>setSheet(null);
  const fields=<><Field label="Name"><Input value={value} onChange={e=>setValue(e.target.value)}/></Field><Field label="Auswahl"><Select><option value={"Beispiel"}><LocalizedText>{"Beispiel"}</LocalizedText></option></Select></Field><Field label="Beschreibung"><Textarea/></Field></>;
@@ -33,7 +34,7 @@ export function UxLab(){
   <section><h2><LocalizedText>{"Nachrichten"}</LocalizedText></h2><MessageBubble author="Kunde" time="10:24"><LocalizedText>{"Synthetische Kundenanfrage"}</LocalizedText></MessageBubble><MessageBubble outgoing author="Support" time="10:37"><LocalizedText>{"Synthetische Antwort"}</LocalizedText></MessageBubble><MessageBubble outgoing internal author="Operator" time="10:40"><LocalizedText>{"Synthetische interne Notiz"}</LocalizedText></MessageBubble></section>
   <section><h2><LocalizedText>{"Sheets"}</LocalizedText></h2><div className="quick-grid">{(["action","form","filter","wizard"] as const).map(kind=><Button key={kind} variant="secondary" onClick={()=>{setPanel(null);setSheet(kind)}}>{kind}</Button>)}</div></section>
   <section><h2><LocalizedText>{"Responsive Tabelle und Liste"}</LocalizedText></h2><RecordsView placeholder="Referenzeinträge suchen" chips={["Alle","Offen","Bezahlt"]} items={[["Leistung A","Referenz A","CHF 185.00","Offen"],["Leistung B","Referenz B","CHF 95.00","Bezahlt"]]} columns={[{label:"Leistung",index:0},{label:"Referenz",index:1},{label:"Betrag",index:2,align:"right"},{label:"Status",index:3,status:true}]}>{item=><RecordRow title={item[0]} meta={item[1]} value={item[2]} status={item[3]}/>}</RecordsView></section>
-  <section><h2><LocalizedText>{"DocumentPageViewer"}</LocalizedText></h2><Input type="file" accept="application/pdf" onChange={e=>setFile(e.target.files?.[0]??null)}/>{file?<div className="ux-lab-viewer"><DocumentPageViewer file={file}/></div>:<EmptyState  title="Lokales Test-PDF auswählen" />}</section>
+  <section><h2><LocalizedText>{"DocumentPageViewer"}</LocalizedText></h2><FileUpload label="Test-PDF" file={file} accept={["application/pdf"]} onSelect={setFile} onRemove={()=>setFile(null)}/>{file?<div className="ux-lab-viewer"><DocumentPageViewer file={file}/></div>:<EmptyState  title="Lokales Test-PDF auswählen" />}</section>
   {panel&&<HeaderPanel key={panel} kind={panel} label={panel==="search"?"Suche":panel==="notifications"?"Benachrichtigungen":"Konto"} onClose={close}>{panel==="search"?<SearchPanel query={query} onQuery={setQuery} items={[]} loading={false} error={null} onClose={close}/>:panel==="account"?<AccountPanel profile={{name:"Nina Müller",identity:"lab-person",avatar:""}} demo={false} logoutBusy={false} onLogout={close} onClose={close}/>:<NotificationPanel items={[]} loading={false} error={null} filter={filter} onFilter={setFilter} onRead={()=>{}} onRetry={()=>{}} onClose={close}/>}</HeaderPanel>}
   <ActionSheet open={sheet==="action"} label="ActionSheet" onClose={closeSheet}><ActionRow title="Bearbeiten" icon="edit" onClick={closeSheet} navigation/><ActionRow title="Löschen" icon="close" onClick={closeSheet} danger/></ActionSheet>
   <FormSheet open={sheet==="form"} label="FormSheet" onClose={closeSheet} actions={<><Button variant="secondary" onClick={closeSheet}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button onClick={closeSheet}><LocalizedText>{"Speichern"}</LocalizedText></Button></>}>{fields}</FormSheet>

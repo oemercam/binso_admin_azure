@@ -12803,5 +12803,25 @@
     "The file must be between 1 byte and 10 MB.",
     "Le fichier doit avoir une taille comprise entre 1 octet et 10 Mo.",
     "Il file deve avere dimensioni comprese tra 1 byte e 10 MB."
+  ],
+  "Anhang": [
+    "Attachment",
+    "Pièce jointe",
+    "Allegato"
+  ],
+  "Einladungsaktionen": [
+    "Invitation actions",
+    "Actions de l’invitation",
+    "Azioni dell’invito"
+  ],
+  "Profilbild": [
+    "Profile picture",
+    "Photo de profil",
+    "Immagine del profilo"
+  ],
+  "Test-PDF": [
+    "Test PDF",
+    "PDF de test",
+    "PDF di prova"
   ]
 }

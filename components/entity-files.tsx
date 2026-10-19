@@ -1,5 +1,6 @@
 "use client";
-import {limitsConfig,megabytes} from "@/config/limits";
+import {limitsConfig} from "@/config/limits";
+import {fileSelectionError} from '@/lib/file-selection';
 import {LocalizedText} from "@/lib/client/locale";
 import {useRef,useState} from 'react';
 import {fileRelations} from '@/lib/file-associations';
@@ -24,8 +25,7 @@ export function EntityFiles({purpose,entityId,readOnly=false,title="Dateien",emp
  const showPdf=async(file:Attachment)=>{const request=++sequence.current;setSelected(null);setPreview(true);setPdf(null);setPreviewError('');try{const result=await apiGetFile('/api/files/'+encodeURIComponent(file.id)+'/download','application/pdf');if(request===sequence.current)setPdf(result.blob)}catch(e){if(request===sequence.current)setPreviewError(e instanceof Error?e.message:'Datei konnte nicht angezeigt werden.')}};
  const upload=async(file:File|undefined)=>{
   if(!file||!allowed||busy.current)return;
-  if(file.size>limitsConfig.maxFileUploadBytes){setError(`Die Datei darf höchstens ${megabytes(limitsConfig.maxFileUploadBytes)} MB gross sein.`);return;}
-  if(!["application/pdf","image/png","image/jpeg","image/webp","text/plain","text/csv"].includes(file.type)){setError("Bitte PDF, Bild, Text oder CSV auswählen.");return;}
+  const issue=fileSelectionError(file,["application/pdf","image/png","image/jpeg","image/webp","text/plain","text/csv"],limitsConfig.maxFileUploadBytes);if(issue){setError(issue);return;}
   busy.current=true;setUploading(true);setError(null);
   try{const form=new FormData();form.append('file',file);form.append('purpose',purpose);form.append('entityId',entityId);await apiUpload('/api/files',form);}
   catch(e){setError(e instanceof Error?e.message:'Datei konnte nicht hochgeladen werden.');}
@@ -33,7 +33,7 @@ export function EntityFiles({purpose,entityId,readOnly=false,title="Dateien",emp
  };
  if(!production||!relation||!entityId)return null;
  return <section className={["surface",className].filter(Boolean).join(" ")}><SectionTitle title={title} action={allowed?<ActionsMenu label="Dateiaktionen" busy={uploading}><ActionRow requiresWrite icon="upload" title="Datei hinzufügen" onClick={()=>input.current?.click()}/></ActionsMenu>:undefined}/>
-  <Input ref={input} hidden type="file" accept="application/pdf,image/png,image/jpeg,image/webp,text/plain,text/csv" aria-label="Anhang auswählen" onChange={e=>void upload(e.target.files?.[0])}/>
+  <Input ref={input} hidden type="file" accept="application/pdf,image/png,image/jpeg,image/webp,text/plain,text/csv" aria-label="Anhang auswählen" onChange={e=>{const file=e.target.files?.[0];e.target.value="";void upload(file)}}/>
   {files.loading&&<LoadingState><LocalizedText>{"Anhänge werden geladen …"}</LocalizedText></LoadingState>}
   {(error||files.error)&&<ErrorState onRetry={()=>{setError(null);files.refresh()}} retryLabel="Erneut laden"><LocalizedText>{error||files.error}</LocalizedText></ErrorState>}
   {!!files.data?.items.length&&<ListSearch value={search} onChange={setSearch} placeholder="Dateien suchen..."/>}

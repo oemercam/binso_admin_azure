@@ -9,7 +9,7 @@ import {useApiQuery} from '@/lib/client/use-api-query';
 import {isProductionBackendEnabled,useBackendMode} from '@/lib/client/backend';
 import {financialStatus,businessDate} from '@/lib/financial-status';
 import {DocumentSummaryRow,type DocumentListItem} from '../document-list';
-import {SectionTitle,LoadingState,ErrorState} from '../ui';
+import {SectionTitle,LoadingState,ErrorState,EmptyState} from '../ui';
 
 type DashboardData={work?:{hours:number|null;pending:number|null;expenses:number|null}|null;cash?:CashStatisticsData|null;canFinance?:boolean;canInvoices?:boolean;canPayments?:boolean;stats?:{customer_count:number};analyticsInvoices?:Array<{issue_date:string;invoice_count:number}>;invoices?:DocumentListItem[];attention?:DocumentListItem[];recent?:DocumentListItem[]};
 export function DashboardPage({forceDemo=false}:{forceDemo?:boolean}={}){
@@ -27,7 +27,7 @@ export function DashboardPage({forceDemo=false}:{forceDemo?:boolean}={}){
    {data?.work&&<section className="bo-workspace-section"><SectionTitle title="Meine Arbeit"/>{data.work.hours!==null&&<ListRow href="/zeit" title="Erfasste Stunden" meta="Dieser Monat" value={Number(data.work.hours).toLocaleString('de-CH',{maximumFractionDigits:2})+' h'}/>}{data.work.pending!==null&&<ListRow href="/zeit?tab=entries" title="Offene Zeiten" meta="Eigene Einträge" value={String(data.work.pending)}/>}{data.work.expenses!==null&&<ListRow href="/spesen" title="Eingereichte Spesen" meta="Eigene Einträge" value={String(data.work.expenses)}/>}</section>}
    <QuickCreateLinks/>
    {attention.length>0&&<section className="bo-workspace-section"><SectionTitle title="Handlungsbedarf"/><div className="recent-invoices">{attention.map(item=><DocumentSummaryRow key={item.id} item={item} customerHeading compact/>)}</div></section>}
-   {data?.canInvoices!==false&&<section className="bo-workspace-section"><SectionTitle title="Zuletzt bearbeitete Rechnungen" action={<Link href="/rechnungen"><LocalizedText>{"Alle anzeigen"}</LocalizedText></Link>}/>{recent.length?<div className="recent-invoices">{recent.map(item=><DocumentSummaryRow key={item.id} item={item} customerHeading compact/>)}</div>:<p role="status"><LocalizedText>{"Noch keine Geschäftsvorgänge vorhanden."}</LocalizedText></p>}</section>}
+   {data?.canInvoices!==false&&<section className="bo-workspace-section"><SectionTitle title="Zuletzt bearbeitete Rechnungen" action={<Link href="/rechnungen"><LocalizedText>{"Alle anzeigen"}</LocalizedText></Link>}/>{recent.length?<div className="recent-invoices">{recent.map(item=><DocumentSummaryRow key={item.id} item={item} customerHeading compact/>)}</div>:<EmptyState title="Noch keine Geschäftsvorgänge vorhanden."/>}</section>}
   </>}
  </AppShell>;
 }

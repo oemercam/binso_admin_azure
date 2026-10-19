@@ -46,7 +46,7 @@ Zoom darf Text umbrechen. Sicherheits-/Fehlerdetails bleiben vollständig.
 | Shell, Rechte, Datenzugang, Navigation | `components/app-shell.tsx`, `components/operator.tsx` |
 | Seiten-/Detailtitel, Tabs, Abschnitte, Sheets | `components/binso-ux.tsx`, `app/design-system/layout.css` |
 | Listen, Tabellen, Filter, Sortierung, Identität | `components/records.tsx` |
-| Diagramme und zentrierte Ringdarstellung | `components/statistics.tsx` |
+| Diagramme und eindeutig zugeordnete Ringsumme (V25.1) | `components/statistics.tsx` |
 | Öffentlicher Bereich und Auth | `components/marketing.tsx`, `components/auth-workspace.tsx`, `app/design-system/marketing.css` |
 | Fachlich nötige Admin-Anordnung | `app/design-system/operator.css` |
 | Responsive Anordnung, Touch und Reduced Motion | `app/design-system/manifest.json` |
@@ -135,8 +135,11 @@ räumen ihre eigenen Eingaben über ihren Abschluss-Handler auf; seitenweites
 Verwerfen gehört zum allein geöffneten Hauptformular oder zur Seitennavigation.
 `FormSheet` (ein modaler Owner, erweitert für lange Aufgaben)
 und `FormWizard` besitzen Fokus, Header und Abschlussaktionen. `Field` mit `Input`, `Select` oder
-`Textarea` besitzt Beschriftung und Fehlerzuordnung. Dateiauswahl verwendet den
-gemeinsamen Upload-Stil, nicht ein nachgebautes Eingabefeld.
+`Textarea` besitzt Beschriftung und Fehlerzuordnung. Dateiauswahl in Formularen
+verwendet `FileUpload`; kontextgebundene Anhangsaktionen behalten ihr Menü und
+ihren unsichtbaren nativen Dateipicker. Beide verwenden `fileSelectionError`
+für Typ-/Grössenfeedback. Kamera/OCR bleibt ein fachlicher Belegablauf.
+Servervalidierung, Scan und Berechtigungsprüfung werden dadurch nicht ersetzt.
 
 Neue fachliche Daten bestimmen Werte und Verfügbarkeit. Ohne Rechnungsleserecht
 zeigt die Kundenliste weder Finanzspalten noch den Offen-Filter. Währungen
@@ -158,8 +161,9 @@ prüft anschliessend Darstellung und tatsächliche Bedienung.
   für unzugängliche Produktbedienung.
 - Zeilentrenner nur zwischen Einträgen; Finanzwerte echt und nach Währung
   getrennt. Keine Platzhalterwerte für eine optische Übereinstimmung erfinden.
-- Der Ring zentriert Betrag und Label gemeinsam; Legende vertikal mittig,
-  Farbmarkierung, Betrag und Prozentanteil beziehen sich auf dieselben Teile.
+- Gemäss V25.1 stehen vollständiger Betrag und Label beim Ring ausserhalb der
+  Zeichenfläche. Legende, Farbmarkierung, Betrag und Prozentanteil beziehen sich
+  auf dieselben Teile. Die frühere Zentrierung im Ring ist abgelöst.
 
 ## Prüfung und Grenzen
 

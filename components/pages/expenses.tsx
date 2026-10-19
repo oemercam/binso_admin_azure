@@ -1,5 +1,7 @@
 "use client";
 
+import {fileSelectionError} from '@/lib/file-selection';
+import {limitsConfig} from '@/config/limits';
 import {useProcessDraft} from "../use-process-draft";
 import {LocalizedText} from "@/lib/client/locale";
 import {safeAppPath} from "@/lib/navigation";
@@ -14,7 +16,7 @@ import { AppShell } from "../app-shell";
 import { RecordRow, RecordsView, RecordsControls, useRecordsController } from "../records";
 import { appendDemoRow } from "@/lib/demo-storage";
 import { apiGet, apiPatch, apiPost, apiUpload, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
-import { Button, EmptyState, ErrorState, LoadingState, Field, Icon, Toast, Input, Select, Textarea, FormActions } from "../ui";
+import { Button, EmptyState, ErrorState, LoadingState, Field, SectionTitle, Icon, Toast, Input, Select, Textarea, FormActions } from "../ui";
 import { CreateAction } from "../binso-ux";
 import {allowDraftNavigation} from '../use-browser-back-guard';
 import { useRecordList } from "./shared";
@@ -98,6 +100,7 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
   }});
   const scanReceipt=async(file:File|null)=>{
     if(receiptScanPending.current||expenseMutationPending.current||lockedExpense||!file)return;
+    const issue=fileSelectionError(file,["image/png","image/jpeg","image/webp","application/pdf"],limitsConfig.maxFileUploadBytes);if(issue){setToast(issue);return;}
     receiptScanPending.current=true;setEditedExpense(true);setReceiptFile(file);setScanState("scanning");
     try{
       if(production){
@@ -164,9 +167,9 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
     {(employeesQuery.error||customersQuery.error||filesQuery.error)&&<div role="alert"><LocalizedText>{employeesQuery.error||customersQuery.error||filesQuery.error}</LocalizedText><Button variant="ghost" onClick={()=>{employeesQuery.refresh();customersQuery.refresh();filesQuery.refresh()}}><LocalizedText>{"Erneut versuchen"}</LocalizedText></Button></div>}
     <div className={existing?"entity-detail-workspace expense-detail-workspace":"expense-layout"} onChangeCapture={()=>setEditedExpense(true)}>
 
-      {(!existing||editingExpense)&&!lockedExpense&&<><Button requiresWrite variant="upload" icon="upload" className={`receipt-upload ${scanState==="scanning"?"is-scanning":""}`} disabled={expenseBusy||scanState==="scanning"} onClick={()=>document.getElementById("expense-receipt-upload")?.click()}><b><LocalizedText verbatim={scanState!=="scanning"&&!!receiptFile}>{scanState==="scanning"?"Beleg wird erkannt…":receiptFile?receiptFile.name:"Beleg fotografieren"}</LocalizedText></b><small><LocalizedText>{scanState==="done"?`Erkannt${scanConfidence!==null?` · ${Math.round(scanConfidence*100)}% Sicherheit`:""} – Angaben prüfen`:scanState==="error"?"Erkennung nicht möglich – manuell erfassen":"Kamera oder Datei verwenden · Angaben werden automatisch vorausgefüllt"}</LocalizedText></small></Button><Input id="expense-receipt-upload" hidden disabled={expenseBusy||scanState==="scanning"} type="file" capture="environment" accept="image/png,image/jpeg,image/webp,application/pdf" onChange={e=>void scanReceipt(e.target.files?.[0]??null)}/></>}
+      {(!existing||editingExpense)&&!lockedExpense&&<><Button requiresWrite variant="upload" icon="upload" className={`receipt-upload ${scanState==="scanning"?"is-scanning":""}`} disabled={expenseBusy||scanState==="scanning"} onClick={()=>document.getElementById("expense-receipt-upload")?.click()}><b><LocalizedText verbatim={scanState!=="scanning"&&!!receiptFile}>{scanState==="scanning"?"Beleg wird erkannt…":receiptFile?receiptFile.name:"Beleg fotografieren"}</LocalizedText></b><small><LocalizedText>{scanState==="done"?`Erkannt${scanConfidence!==null?` · ${Math.round(scanConfidence*100)}% Sicherheit`:""} – Angaben prüfen`:scanState==="error"?"Erkennung nicht möglich – manuell erfassen":"Kamera oder Datei verwenden · Angaben werden automatisch vorausgefüllt"}</LocalizedText></small></Button><Input id="expense-receipt-upload" hidden disabled={expenseBusy||scanState==="scanning"} type="file" capture="environment" accept="image/png,image/jpeg,image/webp,application/pdf" onChange={e=>{const file=e.target.files?.[0]??null;e.target.value="";void scanReceipt(file)}}/></>}
       <div className="form-page">
-        {expenseFiles.length>0&&<section><h2><LocalizedText>{"Quittungen"}</LocalizedText></h2><div className="compact-list">{expenseFiles.map(f=><a key={f.id} href={'/api/files/'+f.id+'/download'}><span>{f.fileName}</span><Icon name="file"/></a>)}</div></section>}
+        {expenseFiles.length>0&&<section><SectionTitle title="Quittungen"/><div className="compact-list">{expenseFiles.map(f=><a key={f.id} href={'/api/files/'+f.id+'/download'}><span>{f.fileName}</span><Icon name="file"/></a>)}</div></section>}
         {existing&&!editingExpense?<section className="expense-summary"><h2>{merchant}</h2><strong className="expense-summary-amount">{new Intl.NumberFormat('de-CH',{style:'currency',currency}).format(Number(amount))}</strong><p>{date.split('-').reverse().join('.')} · {category}</p>{description&&description!==merchant&&<p>{description}</p>}<details><summary><LocalizedText>{"Details"}</LocalizedText></summary><p>{employeeLabel}</p>{expenseCustomer&&<Link href={'/kunden/'+encodeURIComponent(expenseCustomer)}>{expenseCustomers.find(item=>item.id===expenseCustomer)?.name??'Kunde'}</Link>}{reimbursedAt&&<p><LocalizedText>{"Erstattet am "}</LocalizedText>{new Date(reimbursedAt).toLocaleDateString('de-CH')}</p>}</details></section>:<><fieldset disabled={lockedExpense||expenseBusy||scanState==="scanning"} className="form-grid two form-fieldset">
           <Field label="Händler"><Input value={merchant} onChange={e=>setMerchant(e.target.value)} placeholder="Wird aus dem Beleg erkannt"/></Field>
           <Field label="Mitarbeiter"><Select value={person} onChange={e=>setPerson(e.target.value)}><option value=""><LocalizedText>{"Keine Zuordnung"}</LocalizedText></option>{availableEmployees.map(item=><option key={item.id} value={item.id}>{item.first_name} {item.last_name}</option>)}</Select></Field>

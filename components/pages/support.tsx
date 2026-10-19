@@ -4,6 +4,9 @@ import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
 import {safeAppPath} from "@/lib/navigation";
 
 import {allowDraftNavigation} from "../use-browser-back-guard";
+import {FileUpload} from '../file-upload';
+import {fileSelectionError} from '@/lib/file-selection';
+import {limitsConfig} from '@/config/limits';
 import {useProcessDraft} from "../use-process-draft";
 import {useDirtySnapshot} from "../use-dirty-snapshot";
 import Link from "next/link";
@@ -107,7 +110,7 @@ export function SupportTicketForm() {
         <Field label="Kategorie" className="full"><Select disabled={submitting||!!createdId} value={category} onChange={e=>setCategory(e.target.value)}><option value={"Allgemeine Frage"}><LocalizedText>{"Allgemeine Frage"}</LocalizedText></option><option value={"Rechnung"}><LocalizedText>{"Rechnung"}</LocalizedText></option><option value={"Zeiterfassung"}><LocalizedText>{"Zeiterfassung"}</LocalizedText></option><option value={"Technisches Problem"}><LocalizedText>{"Technisches Problem"}</LocalizedText></option></Select></Field>
         <Field label="Nachricht" className="full"><Textarea required maxLength={5000} disabled={submitting||!!createdId} value={message} onChange={e=>setMessage(e.target.value)} placeholder="Beschreibe dein Anliegen kurz..."/></Field>
       </div>
-      <label className="attachment-button" htmlFor="support-file-upload"><Icon name="upload"/><span><LocalizedText verbatim={!!attachment}>{attachment?attachment.name:"Screenshot oder Datei hinzufügen"}</LocalizedText></span></label><Input id="support-file-upload" hidden type="file" accept="image/png,image/jpeg,image/webp,application/pdf,text/plain" onChange={e=>setAttachment(e.target.files?.[0]??null)}/>
+      <FileUpload id="support-file-upload" label="Anhang" file={attachment} accept={["image/png","image/jpeg","image/webp","application/pdf","text/plain"]} busy={submitting} onSelect={setAttachment} onRemove={()=>setAttachment(null)}/>
       <p className="technical-hint"><LocalizedText>{"Browser, App-Version und Zeitpunkt werden automatisch mitgesendet."}</LocalizedText></p>
       {createdId&&<p aria-live="polite"><LocalizedText>{"Das Ticket ist gespeichert. Ein fehlgeschlagener Anhang kann erneut hochgeladen werden."}</LocalizedText></p>}
       <FormActions><Button variant="secondary" onClick={close} disabled={submitting}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button type="submit" disabled={submitting||saved||!recovery.ready}><LocalizedText>{submitting?"Wird erstellt…":createdId?"Anhang speichern":"Ticket erstellen"}</LocalizedText></Button></FormActions>
@@ -150,6 +153,7 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
 
   const uploadSupportFile=async(file:File|undefined)=>{
     if(!file||uploadPending.current||ticketLoading||ticketError)return;
+    const issue=fileSelectionError(file,["image/png","image/jpeg","image/webp","application/pdf","text/plain"],limitsConfig.maxFileUploadBytes);if(issue){setToast(issue);return;}
     if(!isProductionBackendEnabled()){
       setToast("Datei im Demo-Modus nicht dauerhaft gespeichert.");
       window.setTimeout(()=>setToast(null),2200);
@@ -226,7 +230,7 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
         {sent.map((text,i)=><MessageBubble outgoing={true} time={<><LocalizedText>{"jetzt"}</LocalizedText></>} key={text+"-"+i}><LocalizedText verbatim={true}>{text}</LocalizedText></MessageBubble>)}
       </>}
       {production&&!ticketLoading&&!ticketError&&remote.length===0&&<EmptyState  title="Noch keine Nachrichten" />}
-      </LocalizedElement><div className="thread-composer"><ActionsMenu label="Chataktionen" busy={uploading||ticketLoading||!!ticketError}><ActionRow icon="upload" title="Datei anhängen" onClick={()=>attachmentRef.current?.click()}/></ActionsMenu><Input ref={attachmentRef} id={"support-thread-file-"+ticketId} hidden type="file" disabled={uploading||ticketLoading||!!ticketError} accept="image/png,image/jpeg,image/webp,application/pdf,text/plain" onChange={e=>void uploadSupportFile(e.target.files?.[0])}/><Textarea ref={composerRef} rows={1} autoComplete="off" autoCorrect="off" spellCheck={false} enterKeyHint="enter" aria-label="Nachricht" disabled={ticketLoading||!!ticketError} value={draft} onChange={e=>setDraft(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)&&!e.nativeEvent.isComposing){e.preventDefault();void send();}}} placeholder="Nachricht schreiben..."/><LocalizedElement as="button" type="button" onClick={()=>void send()} disabled={sending||ticketLoading||!!ticketError||!draft.trim()} aria-label={sending?"Nachricht wird gesendet":"Senden"}><Icon name="arrow"/></LocalizedElement></div>
+      </LocalizedElement><div className="thread-composer"><ActionsMenu label="Chataktionen" busy={uploading||ticketLoading||!!ticketError}><ActionRow icon="upload" title="Datei anhängen" onClick={()=>attachmentRef.current?.click()}/></ActionsMenu><Input ref={attachmentRef} id={"support-thread-file-"+ticketId} hidden type="file" disabled={uploading||ticketLoading||!!ticketError} accept="image/png,image/jpeg,image/webp,application/pdf,text/plain" onChange={e=>{const file=e.target.files?.[0];e.target.value="";void uploadSupportFile(file)}}/><Textarea ref={composerRef} rows={1} autoComplete="off" autoCorrect="off" spellCheck={false} enterKeyHint="enter" aria-label="Nachricht" disabled={ticketLoading||!!ticketError} value={draft} onChange={e=>setDraft(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)&&!e.nativeEvent.isComposing){e.preventDefault();void send();}}} placeholder="Nachricht schreiben..."/><LocalizedElement as="button" type="button" onClick={()=>void send()} disabled={sending||ticketLoading||!!ticketError||!draft.trim()} aria-label={sending?"Nachricht wird gesendet":"Senden"}><Icon name="arrow"/></LocalizedElement></div>
     </div></div>
 
     </div>

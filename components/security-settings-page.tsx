@@ -6,7 +6,7 @@ import {useRouter,useSearchParams} from "next/navigation";
 import ConfirmDialog from "./confirm-dialog";
 import {AppShell} from "./app-shell";
 import {ActionRow,FormSheet,SettingsGroup} from "./binso-ux";
-import {Button, Field, SectionTitle, Status, Toast, Input, ErrorState, LoadingState} from "./ui";
+import {Button, EmptyState, Field, SectionTitle, Status, Toast, Input, ErrorState, LoadingState} from "./ui";
 import {apiDelete,apiGet,apiPatch,apiPost} from "@/lib/client/backend";
 import {safeAppPath} from "@/lib/navigation";
 
@@ -137,7 +137,7 @@ export function SecuritySettingsPage(){
 
     <section className="surface security-card">
       <SectionTitle title="Aktive Sitzungen" action={sessions.some(item=>!item.current)?<Button variant="secondary" disabled={busy} onClick={()=>setRevokeTarget("all")}><LocalizedText>{"Alle anderen abmelden"}</LocalizedText></Button>:undefined}/>
-      {sessionsLoading?<LoadingState/>:sessionsError?<ErrorState onRetry={()=>{setSessionsLoading(true);setSessionsError("");void loadSessions()}} retryLabel="Erneut versuchen"><LocalizedText>{sessionsError}</LocalizedText></ErrorState>:sessions.length===0?<p><LocalizedText>{"Keine aktive Sitzung gefunden."}</LocalizedText></p>:<div className="session-list">
+      {sessionsLoading?<LoadingState/>:sessionsError?<ErrorState onRetry={()=>{setSessionsLoading(true);setSessionsError("");void loadSessions()}} retryLabel="Erneut versuchen"><LocalizedText>{sessionsError}</LocalizedText></ErrorState>:sessions.length===0?<EmptyState title="Keine aktive Sitzung gefunden."/>:<div className="session-list">
         {sessions.map(item=><div key={item.id}>
           <div>
             <b>{sessionLabel(item.userAgent)}</b>
