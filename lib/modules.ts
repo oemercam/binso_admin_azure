@@ -27,22 +27,22 @@ export const modules: ModuleConfig[] = [
   {
     key: "auftraege", label: "Aufträge", href: "/auftraege",
     description: "Aufträge, Leistungen, Budgets und Fortschritt steuern.", primaryAction: "Auftrag erfassen",
-    columns: ["Auftrag", "Kunde", "Projekt", "Volumen", "Status"],
+    columns: ["Auftrag", "Kunde", "Auftrag", "Volumen", "Status"],
   },
   {
-    key: "projekte", label: "Projekte", href: "/projekte",
-    description: "Projektfortschritt, Budget, Aufgaben und Leistungen im Blick behalten.", primaryAction: "Projekt erstellen",
-    columns: ["Projekt", "Kunde", "Fortschritt", "Budget", "Status"],
+    key: "projekte", label: "Aufträge", href: "/projekte",
+    description: "Auftragfortschritt, Budget, Aufgaben und Leistungen im Blick behalten.", primaryAction: "Auftrag erstellen",
+    columns: ["Auftrag", "Kunde", "Fortschritt", "Budget", "Status"],
   },
   {
     key: "zeiterfassung", label: "Zeiterfassung", href: "/zeiterfassung",
-    description: "Arbeitszeiten, Projektzeiten und interne Zeiten erfassen und zuordnen.", primaryAction: "Zeit erfassen",
-    columns: ["Datum", "Projekt", "Leistung", "Dauer", "Status"],
+    description: "Arbeitszeiten, Auftragzeiten und interne Zeiten erfassen und zuordnen.", primaryAction: "Zeit erfassen",
+    columns: ["Datum", "Auftrag", "Leistung", "Dauer", "Status"],
   },
   {
     key: "spesen", label: "Spesen", href: "/spesen",
     description: "Spesen und Quittungen mobil erfassen, prüfen und weiterverrechnen.", primaryAction: "Spese erfassen",
-    columns: ["Datum", "Beschreibung", "Projekt", "Betrag", "Status"],
+    columns: ["Datum", "Beschreibung", "Auftrag", "Betrag", "Status"],
   },
   {
     key: "rechnungen", label: "Rechnungen", href: "/rechnungen",
@@ -71,7 +71,7 @@ export const modules: ModuleConfig[] = [
   },
   {
     key: "berichte", label: "Berichte", href: "/berichte",
-    description: "Finanzen, Projekte, Auslastung und operative Kennzahlen auswerten.", primaryAction: "Bericht erstellen",
+    description: "Finanzen, Aufträge, Auslastung und operative Kennzahlen auswerten.", primaryAction: "Bericht erstellen",
     columns: ["Bericht", "Zeitraum", "Bereich", "Aktualisiert", "Status"],
   },
   {
@@ -106,7 +106,7 @@ export const modules: ModuleConfig[] = [
   },
   {
     key:"aufgaben", label:"Aufgaben", href:"/aufgaben",
-    description:"Offene Arbeiten über Kunden, Projekte und interne Themen zentral priorisieren.", primaryAction:"Aufgabe erstellen",
+    description:"Offene Arbeiten über Kunden, Aufträge und interne Themen zentral priorisieren.", primaryAction:"Aufgabe erstellen",
     columns:["Aufgabe","Bezug","Fällig","Verantwortlich","Status"],
   },
   {

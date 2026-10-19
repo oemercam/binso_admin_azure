@@ -87,17 +87,17 @@ Controller für Suche, Filter, Sortierung und Rückkehrzustand. Mobile Zeilen
 werden mit `RecordRow`, Desktopzellen mit den zentralen Spaltendefinitionen
 erstellt. Keine eigene Toolbar oder zweite Suche zeichnen.
 
-`CreateAction` ist ein beschrifteter blauer Button, auf Mobile mit sichtbarem
-Kurzlabel „Neu“, vollständigem zugänglichem Namen und mindestens 44px Touchfläche.
-Die neuere Sammelfreigabe ersetzt den früheren schwarzen Plus-Kreis.
+`CreateAction` ist auf Desktop ein beschrifteter blauer Button. Mobile verwendet
+gemäss Freigabe vom 19.10. einen zentral positionierten blauen Plus-Kreis mit
+vollständigem zugänglichem Namen und mindestens 44px Touchfläche.
 `RecordsControls` zeigt auf Desktop Filter und
 Sortierung direkt neben der Suche; Mobile verwendet das gemeinsame Filter-Sheet.
-Eine Erfassungsaktion darf nicht manuell zu einem viewportunabhängigen Kreis werden.
+Die mobile Position gehört ausschliesslich dem Layout-Owner; keine lokalen FABs.
 
 Dashboard und Finanzübersicht verwenden `CashOverview`: vier offene Kennzahlen,
 auf dem Dashboard die vier berechtigten Schnellaktionen und letzte Rechnungen,
-in der Finanzübersicht sechs Monatsbalken. Die ausführliche Statistik mit Ring,
-benutzerdefiniertem Zeitraum und Ledger-Hinweisen gehört zu `/finanzen/analyse`.
+in der Finanzübersicht sechs Monatsbalken. Die ausführliche Statistik mit einem Zeitdiagramm,
+benutzerdefiniertem Zeitraum, aufklappbaren Forderungen und Ledger-Hinweisen gehört zu `/finanzen/analyse`.
 Beide Darstellungen nutzen dieselben Finanzereignisse und Aggregationsfunktionen.
 Fehlende berechtigte Kennzahlen bleiben unbekannt; jüngste Rechnungen sind kein
 Ersatz für einen mandantenweiten Zähler. Negative Monatswerte bleiben unter der Nulllinie.

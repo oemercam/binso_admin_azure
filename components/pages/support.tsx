@@ -1,5 +1,5 @@
 "use client";
-import {ContextActions} from "../binso-ux";
+
 import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
 import {safeAppPath} from "@/lib/navigation";
 
@@ -16,7 +16,7 @@ import { useWorkspaceViewport } from "../use-workspace-viewport";
 import { AppShell } from "../app-shell";
 import { RecordRow, RecordsView, RecordsControls, useRecordsController } from "../records";
 import { apiGet, apiPost, apiUpload, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
-import {Button, EmptyState, Field, Icon, Toast, Input, Select, Textarea, FormActions, LoadingState, ErrorState, MessageBubble} from "../ui";
+import {Button, EmptyState, Field, Icon, Toast, Input, Select, Textarea, FormActions, LoadingState, ErrorState, MessageBubble, Status} from "../ui";
 import { ActionRow, ActionsMenu, CreateAction, FormSheet } from "../binso-ux";
 
 
@@ -212,10 +212,10 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
     setSending(false);
   };
 
-  return <AppShell headingPlacement="header" title="Support-Chat" actions={<ActionsMenu label="Chataktionen"><ActionRow href="/support" icon="support" title="Alle Tickets" navigation/><ActionRow href="/support/neu" icon="plus" title="Neues Ticket" navigation/></ActionsMenu>} status={ticket?ticketStatusLabel[ticketStatus]??ticketStatus:undefined} statusTone={ticketStatus==="resolved"||ticketStatus==="closed"?"success":"info"} subtitle={ticketReference} active="support" backHref="/support" backLabel="Support">
+  return <AppShell headingPlacement="header" title="Support" active="support" backHref="/support" backLabel="Support">
     <div className="entity-detail-workspace support-detail-workspace">
 
-      <div className="desktop-detail-main"><div className="support-thread"><LocalizedElement as="div" className="thread-messages" tabIndex={0} role="log" ref={messagesRef} aria-label="Nachrichtenverlauf">
+      <div className="desktop-detail-main"><div className="support-thread"><div className="thread-context"><span title={ticketReference}>{ticketSubject}</span>{ticket&&<Status tone={ticketStatus==="resolved"||ticketStatus==="closed"?"success":"info"}>{ticketStatusLabel[ticketStatus]??ticketStatus}</Status>}</div><LocalizedElement as="div" className="thread-messages" tabIndex={0} role="log" ref={messagesRef} aria-label="Nachrichtenverlauf">
       {ticketLoading?<LoadingState><LocalizedText>{"Ticket wird geladen …"}</LocalizedText></LoadingState>:ticketError?<ErrorState onRetry={()=>setTicketRetry(value=>value+1)} retryLabel="Erneut versuchen"><LocalizedText>{ticketError}</LocalizedText></ErrorState>:!production&&<div className="thread-day"><LocalizedText>{"Heute"}</LocalizedText></div>}
       {production ? remote.map((message,index)=><Fragment key={message.id}>{messageDay(message.created_at)!==messageDay(remote[index-1]?.created_at??"")&&<div className="thread-day">{messageDay(message.created_at)}</div>}<MessageBubble outgoing={message.author_type==="customer"} time={<>{new Date(message.created_at).toLocaleTimeString("de-CH",{hour:"2-digit",minute:"2-digit",timeZone:"Europe/Zurich"})}</>} author={message.author_type!=="customer"?"Binso Support":undefined}>{message.body}</MessageBubble></Fragment>) : <>
         <MessageBubble outgoing={true} time={<>10:24</>}><LocalizedText>{"Ich habe eine Frage zu einer Rechnung. Können Sie mir bitte weiterhelfen?"}</LocalizedText></MessageBubble>
@@ -227,7 +227,7 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
       {production&&!ticketLoading&&!ticketError&&remote.length===0&&<EmptyState icon="support" title="Noch keine Nachrichten" text="Schreibe die erste Nachricht in diesem Ticket."/>}
       </LocalizedElement><div className="thread-composer"><LocalizedElement as="label" className="icon-button" htmlFor={"support-thread-file-"+ticketId} aria-label={uploading?"Datei wird hochgeladen":"Datei anhängen"}><Icon name="plus"/></LocalizedElement><Input id={"support-thread-file-"+ticketId} hidden type="file" disabled={uploading||ticketLoading||!!ticketError} accept="image/png,image/jpeg,image/webp,application/pdf,text/plain" onChange={e=>void uploadSupportFile(e.target.files?.[0])}/><Textarea ref={composerRef} rows={1} aria-label="Nachricht" disabled={ticketLoading||!!ticketError} value={draft} onChange={e=>setDraft(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)&&!e.nativeEvent.isComposing){e.preventDefault();void send();}}} placeholder="Nachricht schreiben..."/><LocalizedElement as="button" type="button" onClick={()=>void send()} disabled={sending||ticketLoading||!!ticketError||!draft.trim()} aria-label={sending?"Nachricht wird gesendet":"Senden"}><Icon name="arrow"/></LocalizedElement></div>
     </div></div>
-      <ContextActions mobile={false}><section className="context-summary"><span className="compact-section-label"><LocalizedText>{"Ticket"}</LocalizedText></span><strong>{ticketReference}</strong><small>{ticketSubject}</small><div className="context-summary-facts"><span><LocalizedText>{"Status "}</LocalizedText><b><LocalizedText>{ticketStatusLabel[ticketStatus]??ticketStatus}</LocalizedText></b></span><span><LocalizedText>{"Nachrichten "}</LocalizedText><b><LocalizedText>{production?remote.length:4+sent.length}</LocalizedText></b></span></div></section><section className="context-action-group"><Link href="/support"><Icon name="support"/><span><b><LocalizedText>{"Alle Tickets"}</LocalizedText></b><small><LocalizedText>{"Zur Supportübersicht"}</LocalizedText></small></span><Icon name="arrow" size={15}/></Link><Link href="/support/neu"><Icon name="plus"/><span><b><LocalizedText>{"Neues Ticket"}</LocalizedText></b><small><LocalizedText>{"Weitere Anfrage erstellen"}</LocalizedText></small></span><Icon name="arrow" size={15}/></Link></section></ContextActions>
+
     </div>
     {toast&&<Toast title={toast} tone={toast==="Datei angehängt."?"success":toast==="Datei im Demo-Modus nicht dauerhaft gespeichert."?"info":"danger"}/>}
   </AppShell>;

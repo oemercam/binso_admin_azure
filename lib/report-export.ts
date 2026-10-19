@@ -8,7 +8,7 @@ export function reportCsv(rows:readonly (readonly unknown[])[]){
 export function reportRows(data:ReportSummary):string[][]{
  const rows:string[][]=[['Kennzahl','Wert','Einheit'],['Stand',data.asOf,''],['Zeitraum',data.period.from+' – '+data.period.to,'']];
  if(data.customers)rows.push(['Kunden gesamt',data.customers.total,''],['Neue Kunden',data.customers.added,'']);
- if(data.projects)for(const item of data.projects)rows.push(['Projekte · '+(projectStatusLabels[item.status]??item.status),item.count,'']);
+ if(data.projects)for(const item of data.projects)rows.push(['Aufträge · '+(projectStatusLabels[item.status]??item.status),item.count,'']);
  if(data.time)rows.push(['Arbeitszeit',data.time.hours,'h'],['Verrechenbare Zeit',data.time.billable_hours,'h'],['Verrechnete Zeit',data.time.invoiced_hours,'h']);
  if(data.payments)for(const item of data.payments)rows.push(['Eingegangene Zahlungen',item.amount,item.currency]);
  if(data.expenses)for(const item of data.expenses)rows.push(['Erstattete Spesen',item.amount,item.currency]);

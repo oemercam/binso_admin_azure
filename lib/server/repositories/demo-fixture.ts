@@ -32,6 +32,7 @@ export async function seedDatabaseDemo(c:PoolClient,organizationId:string,userId
     else if(typeof value==='string'&&ids.has(value))row[key]=ids.get(value);
    }
    if(table==='support_cases')row.case_number=String(original.case_number)+'-'+organizationId;
+   if(table==='employees')row.user_id=original===(source.get(table)??[])[0]?userId:null;
    if(table==='employees')row.email=original===(source.get(table)??[])[0]&&userEmail?userEmail:String(original.name??'mitarbeiter').toLowerCase().replace(/[^a-z]+/g,'.')+'.'+organizationId.slice(0,8)+'@demo.example.invalid';
    records.push(row);
   }

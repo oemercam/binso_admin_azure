@@ -206,8 +206,6 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 .form-field>span{white-space:normal;overflow-wrap:anywhere;line-height:1.4}
 .empty-list-state{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:12px 0;color:var(--color-muted)}
 .empty-list-state>p{margin:0}
-.status[data-appearance="text"]{padding:0;border:0;background:transparent;font-size:var(--type-label);font-weight:400;line-height:18px}
-.status[data-appearance="text"]::before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor;flex:0 0 5px}
 .context-block .status{width:max-content}
 .announcement-card .status{width:max-content}
 .notice>span:not(.status){color:var(--color-muted);font-size:var(--type-metadata);overflow-wrap:anywhere}

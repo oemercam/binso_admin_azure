@@ -15,6 +15,7 @@ export function dataDomains(path:string):DataDomain[]{
 }
 export function affectedDomains(path:string):DataDomain[]{
  const [domain]=dataDomains(path);
+ if(path.startsWith('/api/workforce-assignments'))return ['identity','customers','projects','time','files','employees','settings'];
  if(domain==='identity')return ['identity','session'];
  if(path.startsWith('/api/settings/team/'))return ['settings','session','identity'];
  if(path.startsWith('/api/settings/notifications'))return ['settings','notifications'];

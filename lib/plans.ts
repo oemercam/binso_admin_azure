@@ -23,7 +23,7 @@ export const plans: PricingPlan[] = [
       "Kunden und Kontakte",
       "Offerten und Rechnungen",
       "Zeiterfassung und Spesen",
-      "Projekte",
+      "Aufträge",
       "Basisberichte",
       "1 Firma · bis 3 Benutzer"
     ]

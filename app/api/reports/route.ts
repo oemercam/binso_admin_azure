@@ -19,7 +19,7 @@ export async function GET(request:NextRequest){try{
  const result=await withTenant(s.organizationId,s.userId,c=>reportSummary(c,s,period,plan),{snapshot:true});
  if(query.get('format')==='csv'){
   const locale=asLocale(query.get('lang')??request.cookies.get(localeCookie)?.value);
-  const rows=reportRows(result).map((row,index)=>index===0?row.map(value=>translateMessage(value,locale)):[row[0].startsWith('Projekte · ')?translateMessage('Projekte',locale)+' · '+translateMessage(row[0].slice('Projekte · '.length),locale):translateMessage(row[0],locale),...row.slice(1)]);
+  const rows=reportRows(result).map((row,index)=>index===0?row.map(value=>translateMessage(value,locale)):[row[0].startsWith('Aufträge · ')?translateMessage('Aufträge',locale)+' · '+translateMessage(row[0].slice('Aufträge · '.length),locale):translateMessage(row[0],locale),...row.slice(1)]);
   return new Response(reportCsv(rows),{headers:{...jsonHeaders,'Content-Type':'text/csv; charset=utf-8','Content-Disposition':`attachment; filename="binso-reports-${period.from}-${period.to}.csv"`}});
  }
  return json(result);

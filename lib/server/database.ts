@@ -58,9 +58,10 @@ export async function tenantInsert<T extends Row>(table:string,data:T,requestKey
  }
  if(table==='expenses'){
   if(ownRecordOnly(s.role,'spesen')){
-   const employee=(await c.query("select id from employees where organization_id=$1 and lower(email)=lower($2) and archived_at is null",[s.organizationId,s.email])).rows[0];
+   const employee=(await c.query("select id from employees where organization_id=$1 and user_id=$2 and archived_at is null",[s.organizationId,s.userId])).rows[0];
    if(fields.employee_id&&fields.employee_id!==employee?.id)throw new ApiError(403,"employee_mismatch","Du kannst nur eigene Spesen einreichen.");
-   fields.employee_id=employee?.id??null;
+   if(!employee)throw new ApiError(403,'employee_assignment_required','Bitte zuerst den Mitarbeiterzugang zuordnen lassen.');
+   fields.employee_id=employee.id;
   }
   if(['approved','rejected'].includes(String(fields.status))){if(!['owner','admin','project_manager','manager'].includes(s.role))throw new ApiError(403,'approval_forbidden','Keine Berechtigung zur Freigabe.');throw new ApiError(409,'submission_required','Die Spese muss zuerst eingereicht und anschließend geprüft werden.');}
  }
@@ -80,12 +81,12 @@ export async function tenantUpdate<T extends Row>(table:string,id:string,data:T)
   const current=(await c.query("select * from expenses where organization_id=$1 and id::text=$2 and archived_at is null for update",[s.organizationId,id])).rows[0];
   if(!current||(own&&current.created_by_user_id!==s.userId))return [];
   if(['approved','posted'].includes(current.status)||current.invoiced_invoice_id||current.reimbursed_at)throw new ApiError(409,"expense_locked","Genehmigte, erstattete oder verrechnete Spesen können nicht geändert werden.");
-  if(own){const employee=(await c.query("select id from employees where organization_id=$1 and lower(email)=lower($2) and archived_at is null",[s.organizationId,s.email])).rows[0];if(data.employee_id&&data.employee_id!==employee?.id)throw new ApiError(403,"employee_mismatch","Du kannst nur eigene Spesen einreichen.");}
+  if(own){const employee=(await c.query("select id from employees where organization_id=$1 and user_id=$2 and archived_at is null",[s.organizationId,s.userId])).rows[0];if(data.employee_id&&data.employee_id!==employee?.id)throw new ApiError(403,"employee_mismatch","Du kannst nur eigene Spesen einreichen.");}
   const next=String(data.status??current.status);
   if(['approved','rejected'].includes(next)){
    if(!['owner','admin','project_manager','manager'].includes(s.role))throw new ApiError(403,"approval_forbidden","Keine Berechtigung zur Freigabe.");
    if(current.status!=='submitted')throw new ApiError(409,"submission_required","Die Spese muss zuerst eingereicht werden.");
-   if(current.created_by_user_id===s.userId&&!['owner','admin'].includes(s.role))throw new ApiError(403,"self_approval_forbidden","Eigene Spesen müssen durch eine andere berechtigte Person geprüft werden.");
+   if(current.created_by_user_id===s.userId)throw new ApiError(403,"self_approval_forbidden","Eigene Spesen müssen durch eine andere berechtigte Person geprüft werden.");
    await c.query("update expenses set reviewed_at=now(),reviewed_by_user_id=$3 where organization_id=$1 and id=$2",[s.organizationId,current.id,s.userId]);
   }
   await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'expense.updated',entityType:'expenses',entityId:current.id,metadata:{previous:current.status,status:next}});

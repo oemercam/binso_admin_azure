@@ -11,7 +11,7 @@ import {DetailTabs} from "./binso-ux";
 import {PrivacySettingsButton} from "./privacy-consent";
 
 export function ProductCapabilities(){
- return <div className="reference-capabilities">{['Kunden & Kontakte','Angebote & Rechnungen','Projekte & Zeit','Schweizer QR-Rechnung'].map(label=><span key={label}><LocalizedText>{label}</LocalizedText></span>)}</div>;
+ return <div className="reference-capabilities">{['Kunden & Kontakte','Angebote & Rechnungen','Aufträge & Zeit','Schweizer QR-Rechnung'].map(label=><span key={label}><LocalizedText>{label}</LocalizedText></span>)}</div>;
 }
 
 export function MarketingHeader() {
@@ -111,7 +111,7 @@ type ProductView=typeof productViews[number][0];
 export function ReferenceFeatures(){
  const [view,setView]=useState<ProductView>('customers');
  const options=[['customers','Kunden & Verkauf'],['invoices','Finanzen'],['time','Zeit & Team']] as const;
- const copy={customers:['Jede Kundenbeziehung im Zusammenhang.','Kontaktdaten, Angebote, Rechnungen und Projekte an einem Ort. Öffne das Kundendossier und arbeite direkt weiter.','Kontakt → Angebot → Auftrag'],invoices:['Wissen, was offen ist.','Behalte Rechnungen, Zahlungseingänge und offene Forderungen im Blick und öffne die passenden Vorgänge direkt.','Rechnung → Zahlung → Überblick'],time:['Leistungen erfassen. Gemeinsam weiterkommen.','Ordne Arbeitszeit und Leistungen dem passenden Kunden oder Projekt zu und übernimm sie in die Abrechnung.','Projekt → Zeit → Abrechnung']} as const;
+ const copy={customers:['Jede Kundenbeziehung im Zusammenhang.','Kontaktdaten, Angebote, Rechnungen und Aufträge an einem Ort. Öffne das Kundendossier und arbeite direkt weiter.','Kontakt → Angebot → Auftrag'],invoices:['Wissen, was offen ist.','Behalte Rechnungen, Zahlungseingänge und offene Forderungen im Blick und öffne die passenden Vorgänge direkt.','Rechnung → Zahlung → Überblick'],time:['Leistungen erfassen. Gemeinsam weiterkommen.','Ordne Arbeitszeit und Leistungen dem passenden Kunden oder Auftrag zu und übernimm sie in die Abrechnung.','Auftrag → Zeit → Abrechnung']} as const;
  const content=copy[view as keyof typeof copy]??copy.customers;
  return <><DetailTabs label="Funktionen" role="tablist" panelId="reference-feature-panel">{options.map(([key,label])=><button key={key} type="button" className={view===key?'active':''} onClick={()=>setView(key)}><LocalizedText>{label}</LocalizedText></button>)}</DetailTabs><div className="reference-feature-area" id="reference-feature-panel" role="tabpanel" aria-labelledby={'reference-feature-panel-tab-'+options.findIndex(([key])=>key===view)}><div><h3><LocalizedText>{content[0]}</LocalizedText></h3><p className="reference-muted"><LocalizedText>{content[1]}</LocalizedText></p><span className="reference-check"><LocalizedText>{content[2]}</LocalizedText></span></div><ProductPreview screen={view}/></div></>;
 }

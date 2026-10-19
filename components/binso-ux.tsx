@@ -81,7 +81,7 @@ export function DetailHeading({ title, status, tone = "neutral", subtitle, leadi
 }) {
   return <div className="bo-detail-heading">{leading}{recordLabel&&<small className="bo-record-label">{recordLabel}</small>}
     <div className="bo-detail-heading-main"><h1><LocalizedText verbatim={verbatimTitle}>{title}</LocalizedText></h1>{statusPlacement==="title"&&status != null && <Status tone={tone}>{status}</Status>}{mobileAction&&<div className="mobile-page-actions">{mobileAction}</div>}</div>
-    {(subtitle||statusPlacement==="subtitle"&&status!=null)&&<p className="bo-detail-meta">{statusPlacement==="subtitle"&&status!=null&&<Status appearance="text" tone={tone}>{status}</Status>}{subtitle&&<LocalizedText verbatim={verbatimTitle}>{subtitle}</LocalizedText>}</p>}
+    {(subtitle||statusPlacement==="subtitle"&&status!=null)&&<p className="bo-detail-meta">{statusPlacement==="subtitle"&&status!=null&&<Status appearance="pill" tone={tone}>{status}</Status>}{subtitle&&<LocalizedText verbatim={verbatimTitle}>{subtitle}</LocalizedText>}</p>}
     {action&&<div className="bo-detail-commandbar">{action}</div>}
   </div>;
 }
@@ -132,7 +132,7 @@ export function DetailTabs({children,label,role,panelId,appearance="line"}:{chil
 export function ListSearch({ value, onChange, placeholder = "Suchen ...", ariaLabel = placeholder }: {
   value: string; onChange: (value: string) => void; placeholder?: string; ariaLabel?:string;
 }) {
-  return <label className="searchbox"><Icon name="search" size={19}/><LocalizedElement as="input" type="search" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} aria-label={ariaLabel}/></label>;
+  return <label className="searchbox"><Icon name="search" size={19}/><LocalizedElement as="input" type="search" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} aria-label={ariaLabel}/>{value&&<Button variant="ghost" icon="close" ariaLabel="Suche leeren" className="search-clear" onClick={()=>onChange("")}/>}</label>;
 }
 
 export function RowActions({ label = "Weitere Aktionen", onClick, disabled = false }: { label?: string; onClick: () => void; disabled?: boolean }) {
@@ -214,7 +214,7 @@ export function ActionsMenu({label, children, busy=false}: {label:string;childre
 
 /** Canonical two-line row shared by entity and financial lists. */
 export function ListRow({href,onClick,title,meta,value,valueLabel,status,tone="neutral",compact=false,valuePlacement="separate",translateTitle=true}:{translateTitle?:boolean;href?:string;onClick?:()=>void;title:ReactNode;meta:ReactNode;value?:ReactNode;valueLabel?:string;status?:string;tone?:"success"|"warning"|"danger"|"neutral"|"info";compact?:boolean;valuePlacement?:"separate"|"metadata"}){
- const content=<><b><LocalizedText verbatim={!translateTitle}>{title}</LocalizedText></b>{status&&!compact&&<Status tone={tone}>{status}</Status>}<small>{meta}{status&&compact&&<Status appearance="text" tone={tone}>{status}</Status>}</small>{value!=null&&<span className="document-summary-amount">{valueLabel&&<small><LocalizedText>{valueLabel}</LocalizedText></small>}<strong>{value}</strong></span>}{(href||onClick)&&!status&&value==null&&<span className="record-chevron"><Icon name="arrow" size={12}/></span>}</>;
+ const content=<><b><LocalizedText verbatim={!translateTitle}>{title}</LocalizedText></b>{status&&!compact&&<Status tone={tone}>{status}</Status>}<small>{meta}{status&&compact&&<Status appearance="pill" tone={tone}>{status}</Status>}</small>{value!=null&&<span className="document-summary-amount">{valueLabel&&<small><LocalizedText>{valueLabel}</LocalizedText></small>}<strong>{value}</strong></span>}{(href||onClick)&&!status&&value==null&&<span className="record-chevron"><Icon name="arrow" size={12}/></span>}</>;
  const className=`document-summary-row${value!=null?" has-value":""}${compact?" is-compact":""}${valuePlacement==="metadata"?" has-inline-value":""}`;
  return href?<Link prefetch={false} href={href} className={className}>{content}</Link>:onClick?<button type="button" onClick={onClick} className={className}>{content}</button>:<div className={className}>{content}</div>;
 }

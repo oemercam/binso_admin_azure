@@ -1,4 +1,5 @@
 import {idempotentBusiness} from "@/lib/server/business-idempotency";
+import {assertTimeAssignment} from "@/lib/server/workforce-access";
 import {fileRelations} from "@/lib/server/file-relations";
 import {validateFileContent} from "@/lib/server/file-validation";
 import {scanFileWithEvidence} from "@/lib/server/file-scan";
@@ -15,7 +16,7 @@ export const runtime="nodejs";
 const allowed=new Set(["application/pdf","image/png","image/jpeg","image/webp","text/plain","text/csv"]);
 
 const relations=fileRelations;
-const fileFields=`id,purpose,expense_id,support_case_id,employee_id,customer_id,invoice_id,quote_id,project_id,original_name as "fileName",content_type as "mimeType",size_bytes as "sizeBytes",scan_status as "scanStatus",created_at as "createdAt"`;
+const fileFields=`id,purpose,expense_id,support_case_id,employee_id,customer_id,invoice_id,quote_id,project_id,time_entry_id,original_name as "fileName",content_type as "mimeType",size_bytes as "sizeBytes",scan_status as "scanStatus",created_at as "createdAt"`;
 export async function GET(request:NextRequest){try{
  const s=await requireSession();authorize(s,'documents:read');
  const filters=new URLSearchParams(request.nextUrl.search);const where=['organization_id=$1'];const values:unknown[]=[s.organizationId];
@@ -50,6 +51,12 @@ export async function POST(request:NextRequest){
   validateFileContent(buffer,file.type);
   const sha256=createHash('sha256').update(buffer).digest('hex');
   const item=await withTenant(s.organizationId,s.userId,async c=>idempotentBusiness(c,{organizationId:s.organizationId,userId:s.userId,operation:"file-upload",key:replayKey,body:{sha256,fileName:file.name,mimeType:file.type,size:file.size,purpose,entityId}},async()=>{
+   if(purpose==='time_report'){
+    const entry=(await c.query('select created_by_user_id,approved,submitted_at,report_month,customer_id,project_id,work_date::text as work_date from time_entries where organization_id=$1 and id=$2 for update',[s.organizationId,entityId])).rows[0];
+    if(!entry||entry.created_by_user_id!==s.userId&&!['owner','admin'].includes(s.role))throw new ApiError(404,'time_entry_not_found','Zeiteintrag wurde nicht gefunden.');
+    if(!entry.report_month||entry.approved||entry.submitted_at)throw new ApiError(409,'report_locked','Nachweise können nur vor dem Einreichen eines Monatsrapports ergänzt werden.');
+    await assertTimeAssignment(c,s,entry.customer_id,entry.project_id,String(entry.work_date).slice(0,10));
+   }
    if(purpose==='expense_receipt'){
     const expense=(await c.query("select status,created_by_user_id from expenses where organization_id=$1 and id=$2 for update",[s.organizationId,entityId])).rows[0];
     if(!expense||s.role==='member'&&expense.created_by_user_id!==s.userId)throw new ApiError(404,'not_found','Spese wurde nicht gefunden.');
@@ -57,8 +64,8 @@ export async function POST(request:NextRequest){
    }
    const scan=await scanFileWithEvidence(buffer),scanStatus=scan.status;
    if(scanStatus==='rejected')throw new ApiError(422,'file_scan_rejected','Die Datei wurde von der Sicherheitsprüfung abgelehnt.');
-   const result=await c.query(`insert into file_objects(id,organization_id,object_key,original_name,content_type,size_bytes,sha256,scan_status,created_by,blob_url,purpose,expense_id,support_case_id,employee_id,customer_id,invoice_id,quote_id,project_id)
-    values($1,$2,$3,$4,$5,$6,$7,$18,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17) returning ${fileFields}`,[id,s.organizationId,objectKey,file.name.slice(0,240),file.type,file.size,sha256,s.userId,null,purpose,relation?.column==='expense_id'?entityId:null,relation?.column==='support_case_id'?entityId:null,relation?.column==='employee_id'?entityId:null,relation?.column==='customer_id'?entityId:null,relation?.column==='invoice_id'?entityId:null,relation?.column==='quote_id'?entityId:null,relation?.column==='project_id'?entityId:null,scanStatus]);
+   const result=await c.query(`insert into file_objects(id,organization_id,object_key,original_name,content_type,size_bytes,sha256,scan_status,created_by,blob_url,purpose,expense_id,support_case_id,employee_id,customer_id,invoice_id,quote_id,project_id,time_entry_id)
+    values($1,$2,$3,$4,$5,$6,$7,$18,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$19) returning ${fileFields}`,[id,s.organizationId,objectKey,file.name.slice(0,240),file.type,file.size,sha256,s.userId,null,purpose,relation?.column==='expense_id'?entityId:null,relation?.column==='support_case_id'?entityId:null,relation?.column==='employee_id'?entityId:null,relation?.column==='customer_id'?entityId:null,relation?.column==='invoice_id'?entityId:null,relation?.column==='quote_id'?entityId:null,relation?.column==='project_id'?entityId:null,scanStatus,relation?.column==='time_entry_id'?entityId:null]);
    await c.query('insert into file_contents(file_id,organization_id,body) values($1,$2,$3)',[id,s.organizationId,buffer]);
    if(scan.evidence)await c.query('update file_objects set scan_evidence=$1::jsonb where id=$2 and organization_id=$3',[JSON.stringify(scan.evidence),id,s.organizationId]);
    if(canAccessFile(scanStatus)&&purpose==='profile_avatar')await c.query('update app_users set avatar_url=$1,updated_at=now() where id=$2',['/api/files/'+id+'/download',s.userId]);

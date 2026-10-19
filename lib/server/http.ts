@@ -74,11 +74,15 @@ export function apiError(error:unknown){
   }
   if(error instanceof ApiError) return json({error:error.code,message:error.message},error.status,error.headers);
   const code=error&&typeof error==='object'&&'code' in error?String(error.code):'';
+  if(code==='23514'&&error&&typeof error==='object'&&'constraint' in error&&error.constraint==='monthly_time_no_overlap')return json({error:'time_overlap',message:'Für diesen Mitarbeiter und Kunden bestehen bereits Zeiten im gewählten Monat. Einzelzeiten und Monatsrapport dürfen sich nicht überschneiden.'},409);
   const databaseErrors:Record<string,{status:number;code:string;message:string}>={
+    '42501':{status:403,code:'forbidden',message:'Für diesen Vorgang fehlt eine gültige Berechtigung oder Zuordnung.'},
     '23505':{status:409,code:'duplicate_record',message:'Dieser Datensatz besteht bereits.'},
     '23503':{status:409,code:'relation_conflict',message:'Die Verknüpfung ist nicht mehr verfügbar. Bitte die Daten aktualisieren.'},
     '23514':{status:400,code:'validation_failed',message:'Die Angaben sind fachlich ungültig.'},
     '22P02':{status:400,code:'invalid_value',message:'Eine Angabe ist ungültig.'},
+    '22007':{status:400,code:'date_invalid',message:'Bitte ein gültiges Datum eingeben.'},
+    '22008':{status:400,code:'date_invalid',message:'Bitte ein gültiges Datum eingeben.'},
     '22003':{status:400,code:'amount_out_of_range',message:'Ein Betrag überschreitet den zulässigen Bereich.'},
     '40001':{status:409,code:'concurrent_change',message:'Die Daten wurden gleichzeitig geändert. Bitte den aktuellen Stand prüfen und erneut versuchen.'},
     '40P01':{status:409,code:'concurrent_change',message:'Die Daten wurden gleichzeitig geändert. Bitte den aktuellen Stand prüfen und erneut versuchen.'},

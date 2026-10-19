@@ -131,7 +131,7 @@
   justify-content:space-between;
   gap:12px;
 }
-.section-title h2{margin:0;font-size:var(--type-body);font-weight:600;letter-spacing:0}
+.section-title h2{margin:0;font-size:var(--section-title-font);font-weight:600;letter-spacing:0}
 .section-title>a{
   border:0;
   background:transparent;
@@ -335,7 +335,7 @@
 .page-container>.toolbar{margin-top:0}
 .surface{padding:18px}
 .section-title{min-height:28px}
-.section-title h2{font-size:var(--type-body)}
+.section-title h2{font-size:var(--section-title-font)}
 }
 @media (max-width:760px){
 .section-intro{margin-bottom:24px}
@@ -451,18 +451,16 @@
 .mobile-header[data-appearance="plain"]{border-bottom:1px solid var(--color-line)}
 .page-head[data-heading-placement="content"]:not(.page-head-detail) .bo-page-heading>p{display:none}
 .page-head-detail[data-heading-placement="content"]{margin-bottom:0}
-.section-title h2{font-weight:500}
+.section-title h2{font-weight:600}
 .mobile-header-detail:not(:has(.mobile-detail-actions))::after{content:"";grid-column:3;width:44px;height:44px}
 .mobile-header-detail .mobile-header-title{
     grid-column:2;
     min-width:0;
-    text-align:center;
     padding-inline:6px;
     filter:none;
     opacity:1;
     text-shadow:none;
     padding-right:8px;
-    font-weight:700;
     padding:0 8px;
     overflow:visible;
     white-space:normal;
@@ -569,7 +567,6 @@
 .mobile-header.mobile-header-detail{
     display:grid;
     height:auto;
-    grid-template-columns:44px minmax(0,1fr) auto;
     background:var(--color-bg);
     backdrop-filter:none;
     -webkit-backdrop-filter:none;
@@ -593,18 +590,11 @@
 }
 
 /* App startup has one owner, including responsive and motion states. */
-@keyframes binso-start{0%,100%{opacity:.7;transform:scale(.98)}50%{opacity:1;transform:scale(1)}}
 .app-launch-screen{min-height:100dvh;display:grid;place-items:center;padding:32px;background:var(--color-bg);color:var(--color-fg)}
 .app-launch-brand{position:relative;width:92px;height:92px;padding:0;display:grid;place-items:center;border:0;background:transparent;color:inherit}
-.app-start-icon,.app-launch-brand .logo{width:80px;height:80px;object-fit:contain;animation:binso-start 1.5s ease-in-out infinite}
+.app-start-icon,.app-launch-brand .logo{width:80px;height:80px;object-fit:contain}
 html[data-theme="dark"] .app-start-icon{filter:invert(1)}
 .app-launch-error{position:absolute;top:calc(50% + 72px);max-width:320px;margin:0;color:var(--color-danger);font-size:var(--type-metadata);text-align:center}
-@media (max-width:760px){
-.app-start-icon,.app-launch-brand .logo{width:72px;height:72px}
-}
-@media (prefers-reduced-motion:reduce){
-.app-start-icon,.app-launch-brand .logo{animation:none}
-}
 
 /* App task headers: one visible title and one creation entry on narrow screens. */
 .sidebar-logo{display:flex;align-items:center;gap:8px;font-size:var(--type-subheading);font-weight:600}
@@ -617,7 +607,6 @@ html[data-theme="dark"] .app-start-icon{filter:invert(1)}
  .app-root:not(.app-section-dashboard) .page-head:not(.page-head-detail) .bo-page-heading-main>h1{display:none}
  .page-head-detail[data-heading-placement="content"] .bo-detail-heading-main{display:none}
  .page-head-detail[data-heading-placement="content"] .bo-detail-meta{margin-top:0}
- .page-head-detail[data-heading-placement="content"] .bo-detail-meta .status{display:none}
  .page-head-detail[data-heading-placement="content"]:not(:has(.bo-detail-meta,.bo-record-label)){display:none}
 }
 
@@ -643,8 +632,28 @@ html[data-theme="dark"] .app-start-icon{filter:invert(1)}
 }
 
 .app-version-notice{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-block:12px;border-bottom:1px solid var(--color-line);font-size:var(--type-label);background:var(--color-bg)}
+.assignment-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-block:16px;border-bottom:1px solid var(--color-line)}
+.assignment-row:last-child{border-bottom:0}
+.assignment-row p{margin:4px 0}
+.assignment-row small{color:var(--color-muted)}
+@media(max-width:760px){
+ :is(.app-root:not(.app-editing):not(.app-chat),.operator-root) .bo-create-action{position:fixed;right:max(var(--mobile-page-x),var(--safe-right));bottom:calc(var(--mobile-nav-h) + var(--safe-bottom) + 16px);z-index:36;width:44px;height:44px;min-width:44px;min-height:44px;padding:0;border-radius:50%;background:var(--app-action-accent);color:var(--app-accent-text)}
+ :is(.app-root,.operator-root) .bo-create-action>span{display:none}
+ .workspace-command-bar:not(:has(.records-inline-controls)){margin:0}
+ body:has(.sheet-layer,.confirm-layer,.header-panel-layer) :is(.app-root,.operator-root) .bo-create-action,
+ :is(.app-root,.operator-root):has(input:focus,textarea:focus) .bo-create-action{display:none}
+ .app-root:has(.bo-create-action) .page-container{padding-bottom:calc(var(--navigation-content-inset) + 60px)}
+ .mobile-header.mobile-header-detail{grid-template-columns:minmax(44px,1fr) minmax(0,auto) minmax(44px,1fr)}
+ .mobile-header-detail .mobile-header-context{justify-content:center;text-align:center;max-width:58vw}
+ .mobile-header-detail .mobile-header-title{font-weight:600;text-align:center;white-space:nowrap}
+ .mobile-header-detail .mobile-header-title>span:first-child{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .app-chat{--navigation-content-inset:var(--safe-bottom)}
+ .app-chat .page-container{padding-top:0}
+ .app-chat .page-head{display:none}
+ .app-chat .thread-composer textarea{font-size:16px}
+}
 
 @media (max-width:760px){
  .mobile-header-context{grid-column:2;display:flex;align-items:center;gap:8px;min-width:0}
- .mobile-header-context>.status{flex:0 1 auto;max-width:45%}
+
 }

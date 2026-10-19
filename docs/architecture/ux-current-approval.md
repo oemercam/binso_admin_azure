@@ -15,13 +15,11 @@ Dark Mode und Operator-Varianten sind abgeleitet, keine behauptete Originalfreig
   Bereichstitel. Unterseiten besitzen Zurück und Kontexttitel. Kein wiederholtes
   Produktlogo in jedem App-Header; Login/Start/öffentliche Website bleiben eigene
   Zustände. Desktop-Header behält globale Suche, Benachrichtigungen und Konto.
-- Die neuere ausdrückliche Sammelfreigabe ersetzt die frühere Plus-Kreis-Regel:
-  Erstellen sitzt neben Suche/Filter in der gemeinsamen Inhalts-Command-Bar,
-  niemals im globalen Header oder in der Navigation. Auf der Übersicht steht der
-  Neu-Button gemäss der neuesten Entscheidung rechts in derselben Inhaltszeile
-  wie «Dein Überblick.». Beschrifteter blauer Button,
-  auf Mobile kurze sichtbare Beschriftung „Neu“, vollständiger zugänglicher Name,
-  mindestens 44px Touchfläche. Keine konkurrierende zweite Erstellen-Aktion.
+- Die Sammelfreigabe vom 19.10.2026 ersetzt die bisherige mobile Neu-Zeile:
+  Auf Mobile wird die bestehende CreateAction als blauer Plus-Kreis unten rechts
+  oberhalb Navigation/Safe Area dargestellt, mindestens 44px, mit vollständigem
+  zugänglichem Namen. Bei Erfassung, Dialog, Tastatur und Chat ist er verborgen.
+  Desktop behält den beschrifteten Button neben Suche/Filter. Keine zweite Aktion.
 - Auswahlfelder nutzen den gemeinsamen App-Popup-Owner mit Tastaturbedienung,
   Disabled-Zuständen und echter Formularvalidierung. Suche, Dialoge und Auswahl
   sperren den Hintergrund; verschachtelte Dialoge behalten ihre Scroll-Sperre.
@@ -65,8 +63,8 @@ erwartungen werden mit positiven und negativen Regressionen ersetzt.
 ## Abnahmegrenze
 
 Quellabdeckung aller 76 Routen ist keine vollständige Funktions-/Sichtabnahme.
-Die frühere Plus-Kreis-Entscheidung bleibt im historischen App-Workspace-Bericht
-nachvollziehbar, ist aber keine aktive Vorgabe mehr. Gezielte lokale Prüfungen,
+Der aktuelle blaue mobile Plus-Kreis folgt der Entscheidung vom 19.10.; der alte
+schwarze Kreis und die zwischenzeitliche mobile Neu-Zeile sind historische Nachweise. Gezielte lokale Prüfungen,
 anschliessend gemeinsame GitHub-Quality-/CodeQL-Prüfung
 und Browsermatrix. Physische iOS-/Android-PWA-, native Tastatur- und Assistive-
 Technology-Nachweise bleiben getrennt offen, bis sie tatsächlich ausgeführt sind.
@@ -76,8 +74,7 @@ Kein automatischer Merge und kein Deployment aus dieser Implementierungsfreigabe
 
 Mobile Seiten beginnen nach dem gemeinsamen Header mit dem normalen Seitenabstand.
 Keine zusätzliche Leerfläche für bereits im Header sichtbare Titel. Tabs, Suche,
-Filter und fachliche Aktionen folgen unmittelbar; die Übersicht behält Titel und
-Neu-Aktion in einer Zeile. Leere Detailköpfe entfallen, echte Datensatzmetadaten
+Filter und fachliche Aktionen folgen unmittelbar; die Übersicht behält Titel in der Inhaltszeile. Leere Detailköpfe entfallen, echte Datensatzmetadaten
 bleiben erhalten. Die anschliessend freigegebene Orientierung ergänzt auf Hauptseiten und
 Einstellungsbereichen jeweils einen kurzen Zweck-Satz aus lib/page-orientation.ts.
 Keine doppelten Beschreibungen; Detailseiten behalten Datensatzmetadaten, Chat

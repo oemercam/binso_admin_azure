@@ -12258,5 +12258,360 @@
     "Choose a customer or internal work, optionally assign a project, then start tracking.",
     "Choisir un client ou un travail interne, associer un projet si nécessaire et démarrer le suivi.",
     "Scegliere un cliente o lavoro interno, assegnare un progetto se necessario e avviare il timer."
+  ],
+  "Deine Zeitmessung läuft noch": [
+    "Your timer is still running",
+    "Votre chronomètre est toujours en cours",
+    "Il timer è ancora attivo"
+  ],
+  "Du kannst weiterarbeiten oder die Zeitmessung öffnen, um sie zu pausieren oder zu beenden.": [
+    "You can keep working or open time tracking to pause or finish it.",
+    "Vous pouvez continuer à travailler ou ouvrir le suivi du temps pour le mettre en pause ou le terminer.",
+    "Puoi continuare a lavorare o aprire il timer per metterlo in pausa o terminarlo."
+  ],
+  "Weiterlaufen lassen": [
+    "Keep running",
+    "Laisser tourner",
+    "Lascia attivo"
+  ],
+  "Zur Zeitmessung": [
+    "Open time tracking",
+    "Ouvrir le suivi du temps",
+    "Apri il timer"
+  ],
+  "Auftrag wählen": [
+    "Choose order",
+    "Choisir un mandat",
+    "Scegli incarico"
+  ],
+  "Beginn": [
+    "Start",
+    "Début",
+    "Inizio"
+  ],
+  "Ende": [
+    "End",
+    "Fin",
+    "Fine"
+  ],
+  "Bestand am": [
+    "Balance as of",
+    "Solde au",
+    "Saldo al"
+  ],
+  "Dateiaktionen": [
+    "File actions",
+    "Actions du fichier",
+    "Azioni file"
+  ],
+  "Dateien suchen...": [
+    "Search files...",
+    "Rechercher des fichiers...",
+    "Cerca file..."
+  ],
+  "Dein Konto ist zusätzlich mit einer Authenticator-App geschützt.": [
+    "Your account is additionally protected by an authenticator app.",
+    "Votre compte est également protégé par une application d’authentification.",
+    "Il tuo account è protetto anche da un’app di autenticazione."
+  ],
+  "Details": [
+    "Details",
+    "Détails",
+    "Dettagli"
+  ],
+  "Die Zeit wird direkt dem gewählten Auftrag zugeordnet.": [
+    "Time is assigned directly to the selected order.",
+    "Le temps est attribué directement au mandat choisi.",
+    "Il tempo viene assegnato direttamente all’incarico selezionato."
+  ],
+  "Ein persönlicher E-Mail-Code schützt jede neue Anmeldung.": [
+    "A personal email code protects each new sign-in.",
+    "Un code personnel envoyé par e-mail protège chaque nouvelle connexion.",
+    "Un codice personale via e-mail protegge ogni nuovo accesso."
+  ],
+  "Eintrag direkt dem Kunden oder Auftrag zuordnen.": [
+    "Assign the entry directly to the customer or order.",
+    "Attribuez la saisie directement au client ou au mandat.",
+    "Assegna la voce direttamente al cliente o all’incarico."
+  ],
+  "Entwurf speichern": [
+    "Save draft",
+    "Enregistrer le brouillon",
+    "Salva bozza"
+  ],
+  "Forderungen": [
+    "Receivables",
+    "Créances",
+    "Crediti"
+  ],
+  "Gesamtstunden des Monats erfassen und den unterschriebenen Stundenrapport als Nachweis hochladen. Bereits erfasste Einzelzeiten dürfen nicht nochmals enthalten sein.": [
+    "Enter the total hours for the month and upload the signed timesheet as evidence. Do not include individual time entries already recorded.",
+    "Saisissez les heures totales du mois et téléversez le relevé signé comme justificatif. N’incluez pas les heures déjà saisies individuellement.",
+    "Inserisci le ore totali del mese e carica il rapporto firmato come prova. Non includere le ore già registrate singolarmente."
+  ],
+  "Guthaben": [
+    "Credit balance",
+    "Avoir",
+    "Avere"
+  ],
+  "Hausnummer": [
+    "House number",
+    "Numéro",
+    "Numero civico"
+  ],
+  "Herunterladen": [
+    "Download",
+    "Télécharger",
+    "Scarica"
+  ],
+  "Händler": [
+    "Merchant",
+    "Commerçant",
+    "Esercente"
+  ],
+  "Keine Zuordnungen": [
+    "No assignments",
+    "Aucune attribution",
+    "Nessuna assegnazione"
+  ],
+  "Keine passenden Dateien": [
+    "No matching files",
+    "Aucun fichier correspondant",
+    "Nessun file corrispondente"
+  ],
+  "Kunde oder interne Arbeit wählen, bei Bedarf einen Auftrag zuordnen und Zeit starten.": [
+    "Choose a customer or internal work, assign an order if needed, and start tracking.",
+    "Choisissez un client ou un travail interne, attribuez un mandat si nécessaire et démarrez le suivi.",
+    "Scegli un cliente o un’attività interna, assegna un incarico se necessario e avvia il timer."
+  ],
+  "Kunden und Aufträge gezielt freigeben.": [
+    "Grant access to specific customers and orders.",
+    "Autoriser l’accès aux clients et mandats concernés.",
+    "Autorizza l’accesso a clienti e incarichi specifici."
+  ],
+  "Mitarbeitende sehen nur freigegebene Kunden und Aufträge. Eine Kundenzuordnung ohne Auftrag erlaubt die direkte Zeiterfassung.": [
+    "Employees see only assigned customers and orders. A customer assignment without an order allows direct time tracking.",
+    "Les employés voient uniquement les clients et mandats attribués. Une attribution client sans mandat permet la saisie directe du temps.",
+    "I dipendenti vedono solo clienti e incarichi assegnati. L’assegnazione a un cliente senza incarico consente la registrazione diretta delle ore."
+  ],
+  "Monatsrapport": [
+    "Monthly timesheet",
+    "Rapport mensuel",
+    "Rapporto mensile"
+  ],
+  "Rapport": [
+    "Timesheet",
+    "Rapport",
+    "Rapporto"
+  ],
+  "Spesenaktionen": [
+    "Expense actions",
+    "Actions des frais",
+    "Azioni spese"
+  ],
+  "Zahlungssaldo": [
+    "Payment balance",
+    "Solde des paiements",
+    "Saldo dei pagamenti"
+  ],
+  "Zugang": [
+    "User account",
+    "Compte utilisateur",
+    "Account utente"
+  ],
+  "Zugriff entziehen": [
+    "Revoke access",
+    "Retirer l’accès",
+    "Revoca accesso"
+  ],
+  "Zugriff entziehen?": [
+    "Revoke access?",
+    "Retirer l’accès ?",
+    "Revocare l’accesso?"
+  ],
+  "Zuordnungen": [
+    "Assignments",
+    "Attributions",
+    "Assegnazioni"
+  ],
+  "Zuordnungsaktionen": [
+    "Assignment actions",
+    "Actions d’attribution",
+    "Azioni assegnazioni"
+  ],
+  "Begründung": [
+    "Reason",
+    "Motif",
+    "Motivo"
+  ],
+  "Eingereichte Spesen": [
+    "Submitted expenses",
+    "Frais soumis",
+    "Spese presentate"
+  ],
+  "Erfasste Stunden": [
+    "Recorded hours",
+    "Heures saisies",
+    "Ore registrate"
+  ],
+  "Meine Arbeit": [
+    "My work",
+    "Mon travail",
+    "Il mio lavoro"
+  ],
+  "Offene Zeiten": [
+    "Pending time entries",
+    "Heures en attente",
+    "Ore in sospeso"
+  ],
+  "Rechnungen und Angebote": [
+    "Invoices and offers",
+    "Factures et offres",
+    "Fatture e offerte"
+  ],
+  "Zurückweisen": [
+    "Return for correction",
+    "Renvoyer pour correction",
+    "Rinvia per correzione"
+  ],
+  "Aufträge & Zeit": [
+    "Orders & time",
+    "Mandats et temps",
+    "Incarichi e tempo"
+  ],
+  "Kontaktdaten, Angebote, Rechnungen und Aufträge an einem Ort. Öffne das Kundendossier und arbeite direkt weiter.": [
+    "Contacts, quotes, invoices and orders in one place. Open the customer dossier and continue working.",
+    "Coordonnées, offres, factures et mandats au même endroit. Ouvre le dossier client et poursuis ton travail.",
+    "Contatti, offerte, fatture e incarichi in un unico posto. Apri il dossier cliente e continua a lavorare."
+  ],
+  "Ordne Arbeitszeit und Leistungen dem passenden Kunden oder Auftrag zu und übernimm sie in die Abrechnung.": [
+    "Assign time and services to the right customer or order and transfer them to billing.",
+    "Attribue le temps et les prestations au bon client ou mandat et intègre-les à la facturation.",
+    "Assegna tempo e prestazioni al cliente o incarico corretto e trasferiscili alla fatturazione."
+  ],
+  "Auftrag → Zeit → Abrechnung": [
+    "Order → Time → Billing",
+    "Mandat → Temps → Facturation",
+    "Incarico → Tempo → Fatturazione"
+  ],
+  "Auftragsleitung": [
+    "Order management",
+    "Direction de mandat",
+    "Direzione incarico"
+  ],
+  "Auftrag öffnen": [
+    "Open order",
+    "Ouvrir le mandat",
+    "Apri incarico"
+  ],
+  "Die Auftraganlage konnte nicht bestätigt werden. Bitte den gespeicherten Stand prüfen.": [
+    "Order creation could not be confirmed. Please check the saved state.",
+    "La création du mandat n’a pas pu être confirmée. Vérifiez l’état enregistré.",
+    "Impossibile confermare la creazione del incarico. Verifica lo stato salvato."
+  ],
+  "Auftrag konnte nicht erstellt werden.": [
+    "Order could not be created.",
+    "Le mandat n’a pas pu être créé.",
+    "Impossibile creare il incarico."
+  ],
+  "Auftragdaten werden geladen …": [
+    "Loading order details…",
+    "Chargement des données du mandat…",
+    "Caricamento dei dati del incarico…"
+  ],
+  "Kunden und Aufträge konnten nicht geladen werden.": [
+    "Customers and orders could not be loaded.",
+    "Les clients et mandats n’ont pas pu être chargés.",
+    "Impossibile caricare clienti e incarichi."
+  ],
+  "Auftrag konnte nicht gespeichert werden.": [
+    "The order could not be saved.",
+    "Le mandat n’a pas pu être enregistré.",
+    "Non è stato possibile salvare il incarico."
+  ],
+  "Aufträge suchen...": [
+    "Search orders...",
+    "Rechercher des mandats...",
+    "Cerca incarichi..."
+  ],
+  "Auftrag erstellen": [
+    "Create order",
+    "Créer un mandat",
+    "Crea incarico"
+  ],
+  "Auftragaktionen": [
+    "Order actions",
+    "Actions du mandat",
+    "Azioni del incarico"
+  ],
+  "Auftrag bearbeiten": [
+    "Edit order",
+    "Modifier le mandat",
+    "Modifica incarico"
+  ],
+  "Aufträge und erfasste Zeiten verwalten.": [
+    "Manage jobs, orders and tracked time.",
+    "Gérer les mandats, mandats et temps saisis.",
+    "Gestire incarichi, incarichi e ore registrate."
+  ],
+  "Auftragfortschritt, Budget, Aufgaben und Leistungen im Blick behalten.": [
+    "Keep track of order progress, budgets, tasks and services.",
+    "Suivez l’avancement, le budget, les tâches et prestations des mandats.",
+    "Tieni sotto controllo avanzamento, budget, attività e prestazioni dei incarichi."
+  ],
+  "Arbeitszeiten, Auftragzeiten und interne Zeiten erfassen und zuordnen.": [
+    "Record and assign working time, order time and internal time.",
+    "Saisissez et affectez le temps de travail, de mandat et les heures internes.",
+    "Registra e assegna ore di lavoro, di incarico e interne."
+  ],
+  "Finanzen, Aufträge, Auslastung und operative Kennzahlen auswerten.": [
+    "Analyse finances, orders, workload and operational metrics.",
+    "Analysez les finances, mandats, taux d’occupation et indicateurs opérationnels.",
+    "Analizza finanze, incarichi, carico di lavoro e indicatori operativi."
+  ],
+  "Offene Arbeiten über Kunden, Aufträge und interne Themen zentral priorisieren.": [
+    "Prioritise open work across customers, orders and internal topics in one place.",
+    "Priorisez au même endroit les travaux ouverts pour les clients, mandats et sujets internes.",
+    "Dai priorità in un unico posto ai lavori aperti per clienti, incarichi e temi interni."
+  ],
+  "Der Auftraglimit deines aktuellen Plans ist erreicht.": [
+    "You have reached the order limit of your current plan.",
+    "La limite de mandats de votre offre actuelle est atteinte.",
+    "Hai raggiunto il limite incarichi del piano attuale."
+  ],
+  "Auftrag wurde nicht gefunden.": [
+    "Order not found.",
+    "Mandat introuvable.",
+    "Incarico non trovato."
+  ],
+  "Bitte die Auftragangaben prüfen.": [
+    "Please check the order details.",
+    "Vérifie les informations du mandat.",
+    "Controlla i dati del incarico."
+  ],
+  "Der Auftrag wurde inzwischen geändert. Bitte neu laden.": [
+    "The order has changed. Please reload.",
+    "Le mandat a été modifié entre-temps. Recharge la page.",
+    "Il incarico è stato modificato. Ricarica la pagina."
+  ],
+  "Bitte zuerst die laufenden oder pausierten Zeitmessungen diesen Auftrags abschliessen.": [
+    "Please finish this order’s running or paused timers first.",
+    "Termine d’abord les chronomètres en cours ou en pause de ce mandat.",
+    "Termina prima i timer in corso o in pausa di questo incarico."
+  ],
+  "Ungültiger Auftragfilter.": [
+    "Invalid order filter.",
+    "Filtre de mandat non valide.",
+    "Filtro incarico non valido."
+  ],
+  "Persönliche Daten bearbeiten": [
+    "Edit personal details",
+    "Modifier les données personnelles",
+    "Modifica dati personali"
+  ],
+  "Datenhinweise": [
+    "Data notes",
+    "Notes sur les données",
+    "Note sui dati"
   ]
 }

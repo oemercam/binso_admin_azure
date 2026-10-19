@@ -4,7 +4,7 @@ export const createActions=[
  {section:"angebote",title:"Angebot",href:"/angebote/neu",icon:"file",permissionPath:"/angebote/neu"},
  {section:"rechnungen",title:"Rechnung",href:"/rechnungen/neu",icon:"receipt",permissionPath:"/rechnungen/neu"},
  {section:"zeit",title:"Zeit erfassen",href:"/zeit?manual=1",icon:"clock",permissionPath:"/zeit/neu"},
- {section:"projekte",title:"Projekt",href:"/projekte/neu",icon:"box",permissionPath:"/projekte/neu"},
+ {section:"projekte",title:"Auftrag",href:"/projekte/neu",icon:"box",permissionPath:"/projekte/neu"},
  {section:"zahlungen",title:"Zahlung",href:"/zahlungen/neu",icon:"wallet",permissionPath:"/zahlungen/neu"},
  {section:"spesen",title:"Spese",href:"/spesen/neu",icon:"card",permissionPath:"/spesen/neu"},
  {section:"produkte",title:"Produkt",href:"/produkte/neu",icon:"box",permissionPath:"/produkte/neu"},

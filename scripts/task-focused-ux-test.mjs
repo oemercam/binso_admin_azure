@@ -59,3 +59,29 @@ const {pageOrientation}=await import(moduleUrl(await fs.readFile('lib/page-orien
 for(const route of ['/dashboard','/kunden','/zeit','/finanzen','/finanzen/analyse','/einstellungen','/einstellungen/konto']){assert.equal(typeof pageOrientation(route),'string');assert.equal(pageOrientation(route,true),undefined,'Editing keeps its usable space');}
 for(const route of ['/kunden/neu','/kunden/id','/kunden/id/bearbeiten','/support/id','/rechnungen/neu','/login','constructor'])assert.equal(pageOrientation(route),undefined,'No generic caption on records, chats, forms or unknown routes');
 console.log('Exact page orientation routes and compact edit/detail/chat exclusions passed.');
+
+// Execute the production lifecycle observer with deferred authoritative reads.
+{
+ const previous={document:globalThis.document,window:globalThis.window};
+ const document=new EventTarget(),window=new EventTarget();document.visibilityState='visible';Object.assign(globalThis,{document,window});
+ const settle=()=>new Promise(resolve=>setImmediate(resolve));let requests=0,pending=[],notices=[];
+ try{
+  const {watchTimerResume}=await import(moduleUrl(await readFunction('components/timer-resume-notice.tsx',['watchTimerResume'])));
+  const stop=watchTimerResume(()=>{requests++;return new Promise((resolve,reject)=>pending.push({resolve,reject}))},running=>notices.push(running));
+  assert.equal(requests,1);assert.deepEqual(notices,[],'No guessed running state before the server replies');
+  window.dispatchEvent(new Event('pageshow'));assert.equal(requests,1,'Initial pageshow does not duplicate the read');
+  pending.shift().resolve({running:true});await settle();assert.deepEqual(notices,[true]);
+  window.dispatchEvent(new Event('pageshow'));assert.equal(requests,1,'Dismissal lasts for the current foreground visit');
+  document.visibilityState='hidden';document.dispatchEvent(new Event('visibilitychange'));assert.equal(notices.at(-1),false);
+  document.visibilityState='visible';document.dispatchEvent(new Event('visibilitychange'));window.dispatchEvent(new Event('pageshow'));assert.equal(requests,2);
+  pending.shift().resolve({running:false});await settle();assert.equal(notices.at(-1),false,'Paused/stopped timers never produce a reminder');
+  document.visibilityState='hidden';document.dispatchEvent(new Event('visibilitychange'));document.visibilityState='visible';document.dispatchEvent(new Event('visibilitychange'));
+  pending.shift().reject(new Error('offline'));await settle();assert.equal(notices.at(-1),false,'Network failures never invent running time');
+  document.visibilityState='hidden';document.dispatchEvent(new Event('visibilitychange'));document.visibilityState='visible';document.dispatchEvent(new Event('visibilitychange'));
+  document.visibilityState='hidden';document.dispatchEvent(new Event('visibilitychange'));document.visibilityState='visible';document.dispatchEvent(new Event('visibilitychange'));
+  const count=notices.length;pending.shift().resolve({running:true});await settle();assert.equal(notices.length,count,'A reply from a previous visit is ignored');assert.equal(requests,5,'A pending old reply is followed by one fresh read');
+  window.dispatchEvent(new Event('binso-timer-change'));pending.shift().resolve({running:true});await settle();assert.equal(notices.at(-1),false,'Timer changes invalidate an in-flight reminder');
+  stop();document.visibilityState='hidden';document.dispatchEvent(new Event('visibilitychange'));document.visibilityState='visible';document.dispatchEvent(new Event('visibilitychange'));window.dispatchEvent(new Event('pageshow'));assert.equal(requests,5,'Unmount removes every lifecycle listener');
+ }finally{Object.assign(globalThis,previous);}
+ console.log('Timer resume: authoritative state, one check per visit, paused/offline negatives, stale replies, timer changes and listener cleanup passed.');
+}
