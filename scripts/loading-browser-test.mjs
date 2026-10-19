@@ -36,7 +36,7 @@ try{
   await measure('cold',()=>page.goto(base+'/kunden'));
   assert.equal(await page.locator('.records-inline-controls').count(),1,'The allowed customer controls are actually mounted before the expiry check');
   if(!baseline)assert.equal(await page.locator('link[rel="manifest"]').getAttribute('href'),'/manifest-app.webmanifest','Actual customer routes use the app manifest');
-  if(!baseline){const startup=results.at(-1).startup;assert.equal(startup?.iconWidth,viewport.width<=760?72:80);assert.equal(startup?.iconAnimation,theme==='dark'?'none':'binso-start');}
+  if(!baseline){const startup=results.at(-1).startup;assert.equal(startup?.iconWidth,80,'The approved original icon keeps one size on every viewport');assert.equal(startup?.iconAnimation,'none','Startup never pulses or scales');assert.ok((await page.evaluate(()=>window.loadingFrames)).filter(frame=>frame.iconWidth).every(frame=>frame.iconWidth===80&&frame.iconAnimation==='none'),'Every sampled startup frame retains the same icon geometry');}
   await measure('refresh',()=>page.reload());
   await page.evaluate(()=>{window.shellBefore=document.querySelector('.app-root');window.navBefore=document.querySelector('.bottom-nav');window.loadingFrames=[];});const beforeNav=authCalls,navCalls={...calls};
   const start=await page.evaluate(()=>performance.now());await page.locator('.app-sidebar a[href="/produkte"]').evaluate(el=>el.click());await page.getByText('Keine Produkte erfasst',{exact:true}).waitFor();
