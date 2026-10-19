@@ -102,3 +102,5 @@ for(const type of ['password','checkbox','radio','file','date','time','hidden'])
 assert.equal(fieldInputHint('Passwort','text'),undefined);
 
 const singleStepHeading=html(React.createElement(wizard.FormWizard,{labels:['Grunddaten'],step:0,onStep:()=>{},action:null,cancelAction:null},React.createElement(ui.FormSection,{title:'Grunddaten'},'Inhalt')));assert.equal((singleStepHeading.match(/Grunddaten/g)||[]).length,1,'Wizard step names are not repeated by their own form section');
+
+assert.equal(fieldInputHint("Beschreibung"),"z. B. IT-Beratung und Support");assert.equal(fieldInputHint("Einrichtungsschlüssel"),undefined,"Security setup secrets never receive synthetic examples");assert.equal(fieldInputHint("Zahlungsreferenz"),"RF… oder QR-Referenz");

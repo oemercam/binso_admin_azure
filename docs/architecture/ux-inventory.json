@@ -59278,6 +59278,7 @@
         "lib/client/process-draft.ts#removeProcessDraft",
         "components/use-browser-back-guard.ts#allowDraftNavigation",
         "components/use-browser-back-guard.ts#boundary",
+        "lib/customer-replay.ts#sameCustomerCreation",
         "lib/client/backend.ts#apiPatch",
         "lib/client/backend.ts#mutationResult",
         "lib/client/data-events.ts#publishMutation",
@@ -59738,6 +59739,7 @@
         "lib/client/process-draft.ts#removeProcessDraft",
         "components/use-browser-back-guard.ts#allowDraftNavigation",
         "components/use-browser-back-guard.ts#boundary",
+        "lib/customer-replay.ts#sameCustomerCreation",
         "lib/client/backend.ts#apiPatch",
         "lib/client/backend.ts#mutationResult",
         "lib/client/data-events.ts#publishMutation",
@@ -60753,17 +60755,12 @@
       "widgets": [
         {
           "tag": "FormSheet",
-          "line": 244,
-          "component": "components/pages/customers.tsx#CustomerForm"
-        },
-        {
-          "tag": "form",
           "line": 245,
           "component": "components/pages/customers.tsx#CustomerForm"
         },
         {
-          "tag": "Field",
-          "line": 249,
+          "tag": "form",
+          "line": 246,
           "component": "components/pages/customers.tsx#CustomerForm"
         },
         {
@@ -60778,17 +60775,17 @@
         },
         {
           "tag": "Field",
-          "line": 251,
+          "line": 252,
           "component": "components/pages/customers.tsx#CustomerForm"
         },
         {
           "tag": "Field",
-          "line": 254,
+          "line": 252,
           "component": "components/pages/customers.tsx#CustomerForm"
         },
         {
           "tag": "Field",
-          "line": 257,
+          "line": 255,
           "component": "components/pages/customers.tsx#CustomerForm"
         },
         {
@@ -60808,7 +60805,7 @@
         },
         {
           "tag": "Field",
-          "line": 260,
+          "line": 261,
           "component": "components/pages/customers.tsx#CustomerForm"
         },
         {
@@ -60839,6 +60836,11 @@
         {
           "tag": "Field",
           "line": 266,
+          "component": "components/pages/customers.tsx#CustomerForm"
+        },
+        {
+          "tag": "Field",
+          "line": 267,
           "component": "components/pages/customers.tsx#CustomerForm"
         },
         {
@@ -63067,27 +63069,22 @@
       "widgets": [
         {
           "tag": "DetailTabs",
-          "line": 145,
+          "line": 146,
           "component": "components/pages/customers.tsx#CustomerDetail"
         },
         {
           "tag": "Field",
-          "line": 147,
+          "line": 148,
           "component": "components/pages/customers.tsx#CustomerDetail"
         },
         {
           "tag": "Field",
-          "line": 152,
+          "line": 153,
           "component": "components/pages/customers.tsx#CustomerDetail"
         },
         {
           "tag": "ListSearch",
-          "line": 155,
-          "component": "components/pages/customers.tsx#CustomerDetail"
-        },
-        {
-          "tag": "ActionSheet",
-          "line": 157,
+          "line": 156,
           "component": "components/pages/customers.tsx#CustomerDetail"
         },
         {
@@ -63096,43 +63093,48 @@
           "component": "components/pages/customers.tsx#CustomerDetail"
         },
         {
+          "tag": "ActionSheet",
+          "line": 159,
+          "component": "components/pages/customers.tsx#CustomerDetail"
+        },
+        {
           "tag": "FormSheet",
-          "line": 159,
+          "line": 160,
           "component": "components/pages/customers.tsx#CustomerDetail"
         },
         {
           "tag": "Field",
-          "line": 159,
+          "line": 160,
           "component": "components/pages/customers.tsx#CustomerDetail"
         },
         {
           "tag": "Field",
-          "line": 159,
+          "line": 160,
           "component": "components/pages/customers.tsx#CustomerDetail"
         },
         {
           "tag": "Field",
-          "line": 159,
+          "line": 160,
           "component": "components/pages/customers.tsx#CustomerDetail"
         },
         {
           "tag": "Field",
-          "line": 159,
+          "line": 160,
           "component": "components/pages/customers.tsx#CustomerDetail"
         },
         {
           "tag": "Field",
-          "line": 159,
+          "line": 160,
           "component": "components/pages/customers.tsx#CustomerDetail"
         },
         {
           "tag": "Field",
-          "line": 159,
+          "line": 160,
           "component": "components/pages/customers.tsx#CustomerDetail"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 160,
+          "line": 161,
           "component": "components/pages/customers.tsx#CustomerDetail"
         },
         {
@@ -63237,17 +63239,17 @@
         },
         {
           "tag": "RecordsControls",
-          "line": 282,
+          "line": 283,
           "component": "components/pages/customers.tsx#CustomerDocuments"
         },
         {
           "tag": "DocumentList",
-          "line": 282,
+          "line": 283,
           "component": "components/pages/customers.tsx#CustomerDocuments"
         },
         {
           "tag": "ActionSheet",
-          "line": 282,
+          "line": 283,
           "component": "components/pages/customers.tsx#CustomerDocuments"
         },
         {
@@ -63573,6 +63575,7 @@
         "lib/client/process-draft.ts#removeProcessDraft",
         "components/use-browser-back-guard.ts#allowDraftNavigation",
         "components/use-browser-back-guard.ts#boundary",
+        "lib/customer-replay.ts#sameCustomerCreation",
         "lib/client/backend.ts#apiPatch",
         "lib/client/backend.ts#mutationResult",
         "lib/client/data-events.ts#publishMutation",
@@ -64033,6 +64036,7 @@
         "lib/client/process-draft.ts#removeProcessDraft",
         "components/use-browser-back-guard.ts#allowDraftNavigation",
         "components/use-browser-back-guard.ts#boundary",
+        "lib/customer-replay.ts#sameCustomerCreation",
         "lib/client/backend.ts#apiPatch",
         "lib/client/backend.ts#mutationResult",
         "lib/client/data-events.ts#publishMutation",
@@ -65048,17 +65052,12 @@
       "widgets": [
         {
           "tag": "FormSheet",
-          "line": 244,
-          "component": "components/pages/customers.tsx#CustomerForm"
-        },
-        {
-          "tag": "form",
           "line": 245,
           "component": "components/pages/customers.tsx#CustomerForm"
         },
         {
-          "tag": "Field",
-          "line": 249,
+          "tag": "form",
+          "line": 246,
           "component": "components/pages/customers.tsx#CustomerForm"
         },
         {
@@ -65073,17 +65072,17 @@
         },
         {
           "tag": "Field",
-          "line": 251,
+          "line": 252,
           "component": "components/pages/customers.tsx#CustomerForm"
         },
         {
           "tag": "Field",
-          "line": 254,
+          "line": 252,
           "component": "components/pages/customers.tsx#CustomerForm"
         },
         {
           "tag": "Field",
-          "line": 257,
+          "line": 255,
           "component": "components/pages/customers.tsx#CustomerForm"
         },
         {
@@ -65103,7 +65102,7 @@
         },
         {
           "tag": "Field",
-          "line": 260,
+          "line": 261,
           "component": "components/pages/customers.tsx#CustomerForm"
         },
         {
@@ -65134,6 +65133,11 @@
         {
           "tag": "Field",
           "line": 266,
+          "component": "components/pages/customers.tsx#CustomerForm"
+        },
+        {
+          "tag": "Field",
+          "line": 267,
           "component": "components/pages/customers.tsx#CustomerForm"
         },
         {
@@ -67046,12 +67050,12 @@
       "widgets": [
         {
           "tag": "RecordsControls",
-          "line": 58,
+          "line": 59,
           "component": "components/pages/customers.tsx#CustomersPage"
         },
         {
           "tag": "RecordsView",
-          "line": 58,
+          "line": 59,
           "component": "components/pages/customers.tsx#CustomersPage"
         },
         {
@@ -156104,7 +156108,7 @@
       "key": "lib/form-input-hints.ts#fieldInputHint",
       "file": "lib/form-input-hints.ts",
       "name": "fieldInputHint",
-      "line": 9,
+      "line": 14,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -156112,7 +156116,7 @@
       "elements": [],
       "conditions": [
         {
-          "line": 10,
+          "line": 15,
           "expression": "typeof label!==\"string\"||![\"text\",\"email\",\"tel\",\"number\",\"search\"].includes(type)"
         }
       ]
@@ -179835,7 +179839,7 @@
       "key": "components/pages/customers.tsx#CustomerForm",
       "file": "components/pages/customers.tsx",
       "name": "CustomerForm",
-      "line": 165,
+      "line": 166,
       "classes": [
         "form-grid",
         "two"
@@ -179849,15 +179853,11 @@
       "widgets": [
         {
           "tag": "FormSheet",
-          "line": 244
-        },
-        {
-          "tag": "form",
           "line": 245
         },
         {
-          "tag": "Field",
-          "line": 249
+          "tag": "form",
+          "line": 246
         },
         {
           "tag": "Field",
@@ -179869,15 +179869,15 @@
         },
         {
           "tag": "Field",
-          "line": 251
+          "line": 252
         },
         {
           "tag": "Field",
-          "line": 254
+          "line": 252
         },
         {
           "tag": "Field",
-          "line": 257
+          "line": 255
         },
         {
           "tag": "Field",
@@ -179893,7 +179893,7 @@
         },
         {
           "tag": "Field",
-          "line": 260
+          "line": 261
         },
         {
           "tag": "Field",
@@ -179918,12 +179918,16 @@
         {
           "tag": "Field",
           "line": 266
+        },
+        {
+          "tag": "Field",
+          "line": 267
         }
       ],
       "elements": [
         {
           "tag": "AppShell",
-          "line": 243,
+          "line": 244,
           "props": [
             "editing",
             "unsavedChanges={false}",
@@ -179935,7 +179939,7 @@
         },
         {
           "tag": "FormSheet",
-          "line": 244,
+          "line": 245,
           "props": [
             "workspace",
             "open={sheetOpen}",
@@ -179949,17 +179953,17 @@
         },
         {
           "tag": "LoadingState",
-          "line": 245,
+          "line": 246,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 245,
+          "line": 246,
           "props": []
         },
         {
           "tag": "ErrorState",
-          "line": 245,
+          "line": 246,
           "props": [
             "onRetry={recordQuery.refresh}",
             "retryLabel=\"Erneut versuchen\""
@@ -179967,19 +179971,19 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 245,
+          "line": 246,
           "props": []
         },
         {
           "tag": "form",
-          "line": 245,
+          "line": 246,
           "props": [
             "onSubmit={event=>{event.preventDefault();if(!customerId&&step===0){setStep(1);return;}return save()}}"
           ]
         },
         {
           "tag": "FormWizard",
-          "line": 246,
+          "line": 247,
           "props": [
             "labels={[\"Grunddaten\",\"Details\"]}",
             "step={step}",
@@ -179993,7 +179997,7 @@
         },
         {
           "tag": "Button",
-          "line": 246,
+          "line": 247,
           "props": [
             "variant=\"secondary\"",
             "onClick={close}"
@@ -180001,12 +180005,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 246,
+          "line": 247,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 246,
+          "line": 247,
           "props": [
             "requiresWrite",
             "type=\"submit\"",
@@ -180015,31 +180019,31 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 246,
-          "props": []
-        },
-        {
-          "tag": "ErrorState",
           "line": 247,
           "props": []
         },
         {
-          "tag": "FormSection",
+          "tag": "ErrorState",
           "line": 248,
+          "props": []
+        },
+        {
+          "tag": "FormSection",
+          "line": 249,
           "props": [
             "hidden={!customerId&&step!==0}"
           ]
         },
         {
           "tag": "Field",
-          "line": 249,
+          "line": 250,
           "props": [
             "label=\"Kundentyp\""
           ]
         },
         {
           "tag": "Select",
-          "line": 249,
+          "line": 250,
           "props": [
             "value={customerType}",
             "disabled={savingRecord}",
@@ -180048,28 +180052,28 @@
         },
         {
           "tag": "option",
-          "line": 249,
+          "line": 250,
           "props": [
             "value=\"company\""
           ]
         },
         {
           "tag": "option",
-          "line": 249,
+          "line": 250,
           "props": [
             "value=\"person\""
           ]
         },
         {
           "tag": "Field",
-          "line": 250,
+          "line": 251,
           "props": [
             "label=\"Kundenname *\""
           ]
         },
         {
           "tag": "Input",
-          "line": 250,
+          "line": 251,
           "props": [
             "required",
             "minLength={2}",
@@ -180083,21 +180087,21 @@
         },
         {
           "tag": "div",
-          "line": 251,
+          "line": 252,
           "props": [
             "className=\"form-grid two\""
           ]
         },
         {
           "tag": "Field",
-          "line": 251,
+          "line": 252,
           "props": [
             "label={customerType===\"person\"?\"Vorname *\":\"Kontaktperson · Vorname *\"}"
           ]
         },
         {
           "tag": "Input",
-          "line": 251,
+          "line": 252,
           "props": [
             "required",
             "maxLength={120}",
@@ -180109,14 +180113,14 @@
         },
         {
           "tag": "Field",
-          "line": 251,
+          "line": 252,
           "props": [
             "label={customerType===\"person\"?\"Nachname *\":\"Kontaktperson · Nachname *\"}"
           ]
         },
         {
           "tag": "Input",
-          "line": 251,
+          "line": 252,
           "props": [
             "required",
             "maxLength={120}",
@@ -180128,65 +180132,65 @@
         },
         {
           "tag": "p",
-          "line": 252,
+          "line": 253,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 252,
+          "line": 253,
           "props": []
         },
         {
           "tag": "ErrorState",
-          "line": 253,
+          "line": 254,
           "props": [
             "onRetry={duplicateCheck.refresh}"
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 253,
+          "line": 254,
           "props": []
         },
         {
           "tag": "section",
-          "line": 254,
+          "line": 255,
           "props": []
         },
         {
           "tag": "h2",
-          "line": 254,
+          "line": 255,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 254,
+          "line": 255,
           "props": []
         },
         {
           "tag": "p",
-          "line": 254,
+          "line": 255,
           "props": [
             "key={item.id}"
           ]
         },
         {
           "tag": "Link",
-          "line": 254,
+          "line": 255,
           "props": [
             "href={'/kunden/'+encodeURIComponent(item.id)}"
           ]
         },
         {
           "tag": "Field",
-          "line": 254,
+          "line": 255,
           "props": [
             "label=\"Als separaten Kunden erfassen\""
           ]
         },
         {
           "tag": "Input",
-          "line": 254,
+          "line": 255,
           "props": [
             "type=\"checkbox\"",
             "checked={allowDuplicate}",
@@ -180195,7 +180199,7 @@
         },
         {
           "tag": "FormSection",
-          "line": 257,
+          "line": 258,
           "props": [
             "title={customerId?\"Details\":undefined}",
             "hidden={!customerId&&step!==1}"
@@ -180203,14 +180207,14 @@
         },
         {
           "tag": "div",
-          "line": 257,
+          "line": 258,
           "props": [
             "className=\"form-grid two\""
           ]
         },
         {
           "tag": "Field",
-          "line": 257,
+          "line": 258,
           "props": [
             "label=\"Zahlungsfrist\"",
             "hint=\"Leer bei Neuanlage: Firmenstandard\""
@@ -180218,7 +180222,7 @@
         },
         {
           "tag": "Input",
-          "line": 257,
+          "line": 258,
           "props": [
             "required={!!customerId}",
             "type=\"number\"",
@@ -180231,14 +180235,14 @@
         },
         {
           "tag": "Field",
-          "line": 258,
+          "line": 259,
           "props": [
             "label=\"E-Mail\""
           ]
         },
         {
           "tag": "Input",
-          "line": 258,
+          "line": 259,
           "props": [
             "type=\"email\"",
             "autoComplete=\"email\"",
@@ -180251,14 +180255,14 @@
         },
         {
           "tag": "Field",
-          "line": 259,
+          "line": 260,
           "props": [
             "label=\"Telefon\""
           ]
         },
         {
           "tag": "Input",
-          "line": 259,
+          "line": 260,
           "props": [
             "type=\"tel\"",
             "inputMode=\"tel\"",
@@ -180272,14 +180276,14 @@
         },
         {
           "tag": "Field",
-          "line": 260,
+          "line": 261,
           "props": [
             "label=\"Strasse\""
           ]
         },
         {
           "tag": "Input",
-          "line": 260,
+          "line": 261,
           "props": [
             "autoComplete=\"address-line1\"",
             "maxLength={320}",
@@ -180291,14 +180295,14 @@
         },
         {
           "tag": "Field",
-          "line": 260,
+          "line": 261,
           "props": [
             "label=\"Hausnummer\""
           ]
         },
         {
           "tag": "Input",
-          "line": 260,
+          "line": 261,
           "props": [
             "placeholder=\"12\"",
             "autoComplete=\"address-line2\"",
@@ -180310,14 +180314,14 @@
         },
         {
           "tag": "Field",
-          "line": 261,
+          "line": 262,
           "props": [
             "label=\"PLZ\""
           ]
         },
         {
           "tag": "Input",
-          "line": 261,
+          "line": 262,
           "props": [
             "inputMode=\"numeric\"",
             "autoComplete=\"postal-code\"",
@@ -180330,14 +180334,14 @@
         },
         {
           "tag": "Field",
-          "line": 262,
+          "line": 263,
           "props": [
             "label=\"Ort\""
           ]
         },
         {
           "tag": "Input",
-          "line": 262,
+          "line": 263,
           "props": [
             "autoComplete=\"address-level2\"",
             "maxLength={320}",
@@ -180349,14 +180353,14 @@
         },
         {
           "tag": "Field",
-          "line": 263,
+          "line": 264,
           "props": [
             "label=\"Status\""
           ]
         },
         {
           "tag": "Select",
-          "line": 263,
+          "line": 264,
           "props": [
             "disabled={savingRecord}",
             "value={customerStatus}",
@@ -180365,38 +180369,38 @@
         },
         {
           "tag": "option",
-          "line": 263,
+          "line": 264,
           "props": [
             "value=\"active\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 263,
+          "line": 264,
           "props": []
         },
         {
           "tag": "option",
-          "line": 263,
+          "line": 264,
           "props": [
             "value=\"inactive\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 263,
+          "line": 264,
           "props": []
         },
         {
           "tag": "Field",
-          "line": 264,
+          "line": 265,
           "props": [
             "label=\"Branche\""
           ]
         },
         {
           "tag": "Select",
-          "line": 264,
+          "line": 265,
           "props": [
             "disabled={savingRecord}",
             "value={sector}",
@@ -180405,86 +180409,86 @@
         },
         {
           "tag": "option",
-          "line": 264,
+          "line": 265,
           "props": [
             "value={\"Dienstleistung\"}"
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 264,
+          "line": 265,
           "props": []
         },
         {
           "tag": "option",
-          "line": 264,
+          "line": 265,
           "props": [
             "value={\"Bauunternehmen\"}"
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 264,
+          "line": 265,
           "props": []
         },
         {
           "tag": "option",
-          "line": 264,
+          "line": 265,
           "props": [
             "value={\"Immobilien\"}"
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 264,
+          "line": 265,
           "props": []
         },
         {
           "tag": "option",
-          "line": 264,
+          "line": 265,
           "props": [
             "value={\"Beratung\"}"
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 264,
+          "line": 265,
           "props": []
         },
         {
           "tag": "option",
-          "line": 264,
+          "line": 265,
           "props": [
             "value={\"Handel\"}"
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 264,
+          "line": 265,
           "props": []
         },
         {
           "tag": "option",
-          "line": 264,
+          "line": 265,
           "props": [
             "value={\"Elektro\"}"
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 264,
+          "line": 265,
           "props": []
         },
         {
           "tag": "Field",
-          "line": 265,
+          "line": 266,
           "props": [
             "label=\"UID\""
           ]
         },
         {
           "tag": "Input",
-          "line": 265,
+          "line": 266,
           "props": [
             "maxLength={320}",
             "value={uid}",
@@ -180495,14 +180499,14 @@
         },
         {
           "tag": "Field",
-          "line": 266,
+          "line": 267,
           "props": [
             "label=\"Interne Notiz\""
           ]
         },
         {
           "tag": "Input",
-          "line": 266,
+          "line": 267,
           "props": [
             "maxLength={320}",
             "value={notes}",
@@ -180513,7 +180517,7 @@
         },
         {
           "tag": "Toast",
-          "line": 271,
+          "line": 272,
           "props": [
             "title={toast}",
             "tone=\"success\""
@@ -180522,163 +180526,163 @@
       ],
       "conditions": [
         {
-          "line": 174,
+          "line": 175,
           "expression": "customerType===\"person\"&&!customerId"
         },
         {
-          "line": 187,
+          "line": 188,
           "expression": "customerId"
         },
         {
-          "line": 196,
+          "line": 197,
           "expression": "!customerId"
         },
         {
-          "line": 204,
+          "line": 205,
           "expression": "isProductionBackendEnabled()&&!customerId&&customerName.trim().length>=2&&duplicateQuery"
         },
         {
-          "line": 206,
+          "line": 207,
           "expression": "customerId"
         },
         {
-          "line": 207,
+          "line": 208,
           "expression": "!value||[value.company,value.email,value.phone,value.city,value.sector,value.address,value.postalCode,value.uid,value.notes].some(item=>typeof item!==\"string\"||item.length>320)||![\"active\",\"inactive\"].includes(value.customerStatus)"
         },
         {
-          "line": 208,
+          "line": 209,
           "expression": "value.customerType===\"person\""
         },
         {
-          "line": 208,
+          "line": 209,
           "expression": "typeof value.paymentDays===\"string\""
         },
         {
-          "line": 208,
+          "line": 209,
           "expression": "typeof value.contactLastName===\"string\"&&value.contactLastName.length<=120"
         },
         {
-          "line": 208,
+          "line": 209,
           "expression": "typeof value.contactName===\"string\"&&value.contactName.length<=320"
         },
         {
-          "line": 208,
+          "line": 209,
           "expression": "typeof value.buildingNumber===\"string\""
         },
         {
-          "line": 209,
+          "line": 210,
           "expression": "value.replay&&typeof value.replay.body===\"string\"&&value.replay.body.length<8192&&typeof value.replay.key===\"string\"&&value.replay.key.length>=8&&value.replay.key.length<=128"
         },
         {
-          "line": 212,
+          "line": 213,
           "expression": "!customerId||!recordQuery.data||hydratedCustomer.current===customerId"
         },
         {
-          "line": 212,
+          "line": 213,
           "expression": "item.paymentDays!=null"
         },
         {
-          "line": 212,
+          "line": 213,
           "expression": "item.paymentDays!=null"
-        },
-        {
-          "line": 214,
-          "expression": "!customerId&&step!==1"
         },
         {
           "line": 215,
-          "expression": "saveRecordPending.current||!recovery.ready||loadingRecord||recordError"
+          "expression": "!customerId&&step!==1"
         },
         {
           "line": 216,
-          "expression": "!customerId&&(!contactName.trim()||!contactLastName.trim())"
+          "expression": "saveRecordPending.current||!recovery.ready||loadingRecord||recordError"
         },
         {
           "line": 217,
+          "expression": "!customerId&&(!contactName.trim()||!contactLastName.trim())"
+        },
+        {
+          "line": 218,
           "expression": "customerName.trim().length<2"
         },
         {
-          "line": 224,
+          "line": 225,
           "expression": "isProductionBackendEnabled()"
         },
         {
-          "line": 225,
-          "expression": "!customerId"
-        },
-        {
-          "line": 225,
-          "expression": "customerId"
-        },
-        {
-          "line": 225,
-          "expression": "paymentDays!==null&&paymentDays!==\"\""
-        },
-        {
-          "line": 225,
+          "line": 226,
           "expression": "!customerId"
         },
         {
           "line": 226,
-          "expression": "replay?.body===serialized"
+          "expression": "customerId"
+        },
+        {
+          "line": 226,
+          "expression": "paymentDays!==null&&paymentDays!==\"\""
+        },
+        {
+          "line": 226,
+          "expression": "!customerId"
         },
         {
           "line": 227,
-          "expression": "customerId"
+          "expression": "replay&&sameCustomerCreation(replay.body,serialized)"
         },
         {
           "line": 228,
+          "expression": "customerId"
+        },
+        {
+          "line": 229,
           "expression": "typeof result.item?.id!==\"string\"||!result.item.id"
         },
         {
-          "line": 236,
+          "line": 237,
           "expression": "customerId"
         },
         {
-          "line": 240,
+          "line": 241,
           "expression": "error instanceof Error"
         },
         {
-          "line": 243,
-          "expression": "customerId"
-        },
-        {
-          "line": 244,
-          "expression": "customerId"
-        },
-        {
           "line": 244,
           "expression": "customerId"
         },
         {
           "line": 245,
+          "expression": "customerId"
+        },
+        {
+          "line": 245,
+          "expression": "customerId"
+        },
+        {
+          "line": 246,
           "expression": "loadingRecord"
         },
         {
-          "line": 245,
+          "line": 246,
           "expression": "recordError"
         },
         {
-          "line": 245,
+          "line": 246,
           "expression": "!customerId&&step===0"
         },
         {
-          "line": 246,
+          "line": 247,
           "expression": "savingRecord"
         },
         {
-          "line": 246,
+          "line": 247,
           "expression": "customerId"
         },
         {
-          "line": 251,
+          "line": 252,
           "expression": "customerType===\"person\""
         },
         {
-          "line": 251,
+          "line": 252,
           "expression": "customerType===\"person\""
         },
         {
-          "line": 257,
+          "line": 258,
           "expression": "customerId"
         }
       ]
@@ -180694,6 +180698,31 @@
       "widgets": [],
       "elements": [],
       "conditions": []
+    },
+    {
+      "key": "lib/customer-replay.ts#sameCustomerCreation",
+      "file": "lib/customer-replay.ts",
+      "name": "sameCustomerCreation",
+      "line": 4,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": [
+        {
+          "line": 5,
+          "expression": "previous===current"
+        },
+        {
+          "line": 8,
+          "expression": "!before||Array.isArray(before)||typeof before!==\"object\"||!after||Array.isArray(after)||typeof after!==\"object\""
+        },
+        {
+          "line": 9,
+          "expression": "Object.hasOwn(before,\"customerType\")||after.customerType!==\"company\""
+        }
+      ]
     },
     {
       "key": "lib/demo-storage.ts#appendDemoRow",
@@ -180744,7 +180773,7 @@
       "key": "components/pages/customers.tsx#CustomerDetail",
       "file": "components/pages/customers.tsx",
       "name": "CustomerDetail",
-      "line": 62,
+      "line": 63,
       "classes": [
         "page-actions",
         "customer-detail-workspace",
@@ -180780,65 +180809,65 @@
       "widgets": [
         {
           "tag": "DetailTabs",
-          "line": 145
+          "line": 146
         },
         {
           "tag": "Field",
-          "line": 147
+          "line": 148
         },
         {
           "tag": "Field",
-          "line": 152
+          "line": 153
         },
         {
           "tag": "ListSearch",
-          "line": 155
-        },
-        {
-          "tag": "ActionSheet",
-          "line": 157
+          "line": 156
         },
         {
           "tag": "ActionSheet",
           "line": 158
         },
         {
+          "tag": "ActionSheet",
+          "line": 159
+        },
+        {
           "tag": "FormSheet",
-          "line": 159
+          "line": 160
         },
         {
           "tag": "Field",
-          "line": 159
+          "line": 160
         },
         {
           "tag": "Field",
-          "line": 159
+          "line": 160
         },
         {
           "tag": "Field",
-          "line": 159
+          "line": 160
         },
         {
           "tag": "Field",
-          "line": 159
+          "line": 160
         },
         {
           "tag": "Field",
-          "line": 159
+          "line": 160
         },
         {
           "tag": "Field",
-          "line": 159
+          "line": 160
         },
         {
           "tag": "ConfirmDialog",
-          "line": 160
+          "line": 161
         }
       ],
       "elements": [
         {
           "tag": "AppShell",
-          "line": 132,
+          "line": 133,
           "props": [
             "title=\"Kunde\"",
             "subtitle=\"Kundendaten nicht verfügbar\"",
@@ -180849,21 +180878,21 @@
         },
         {
           "tag": "ErrorState",
-          "line": 132,
+          "line": 133,
           "props": [
             "onRetry={workspace.refresh}"
           ]
         },
         {
           "tag": "div",
-          "line": 132,
+          "line": 133,
           "props": [
             "className=\"page-actions\""
           ]
         },
         {
           "tag": "Button",
-          "line": 132,
+          "line": 133,
           "props": [
             "href={returnTo}",
             "variant=\"ghost\""
@@ -180871,12 +180900,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 132,
+          "line": 133,
           "props": []
         },
         {
           "tag": "AppShell",
-          "line": 133,
+          "line": 134,
           "props": [
             "title=\"Kunde\"",
             "active=\"kunden\"",
@@ -180886,12 +180915,12 @@
         },
         {
           "tag": "LoadingState",
-          "line": 133,
+          "line": 134,
           "props": []
         },
         {
           "tag": "AppShell",
-          "line": 142,
+          "line": 143,
           "props": [
             "headingPlacement=\"content\"",
             "recordLabel={String(customer.customer_no??\"\")}",
@@ -180909,7 +180938,7 @@
         },
         {
           "tag": "Button",
-          "line": 142,
+          "line": 143,
           "props": [
             "variant=\"ghost\"",
             "icon=\"more\"",
@@ -180919,7 +180948,7 @@
         },
         {
           "tag": "Button",
-          "line": 142,
+          "line": 143,
           "props": [
             "variant=\"ghost\"",
             "icon=\"more\"",
@@ -180929,21 +180958,21 @@
         },
         {
           "tag": "div",
-          "line": 143,
+          "line": 144,
           "props": [
             "className=\"customer-detail-workspace\""
           ]
         },
         {
           "tag": "div",
-          "line": 145,
+          "line": 146,
           "props": [
             "className=\"desktop-detail-main\""
           ]
         },
         {
           "tag": "DetailTabs",
-          "line": 145,
+          "line": 146,
           "props": [
             "appearance=\"line\"",
             "label=\"Kundenbereiche\"",
@@ -180952,7 +180981,7 @@
         },
         {
           "tag": "button",
-          "line": 145,
+          "line": 146,
           "props": [
             "className={tab===\"overview\"?\"active\":\"\"}",
             "onClick={()=>setTab(\"overview\")}"
@@ -180960,12 +180989,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 145,
+          "line": 146,
           "props": []
         },
         {
           "tag": "button",
-          "line": 145,
+          "line": 146,
           "props": [
             "className={tab===\"contacts\"?\"active\":\"\"}",
             "onClick={()=>setTab(\"contacts\")}"
@@ -180973,12 +181002,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 145,
+          "line": 146,
           "props": []
         },
         {
           "tag": "button",
-          "line": 145,
+          "line": 146,
           "props": [
             "className={tab===\"finances\"?\"active\":\"\"}",
             "onClick={()=>setTab(\"finances\")}"
@@ -180986,12 +181015,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 145,
+          "line": 146,
           "props": []
         },
         {
           "tag": "button",
-          "line": 145,
+          "line": 146,
           "props": [
             "className={tab===\"activity\"?\"active\":\"\"}",
             "onClick={()=>setTab(\"activity\")}"
@@ -180999,12 +181028,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 145,
+          "line": 146,
           "props": []
         },
         {
           "tag": "div",
-          "line": 146,
+          "line": 147,
           "props": [
             "id={panelId}",
             "role=\"tabpanel\"",
@@ -181013,7 +181042,7 @@
         },
         {
           "tag": "DetailSections",
-          "line": 147,
+          "line": 148,
           "props": [
             "summary={<><SectionTitle title=\"Finanzübersicht\" desktopOnly/>{availableCurrencies.length>1&&<Field label=\"Statistikwährung\" allowReadOnlyInput><Select value={displayCurrency} onChange={event=>setStatisticCurrency(event.target.value)}>{availableCurrencies.map(currency=><option key={currency} value={currency}>{currency}</option>)}</Select></Field>}{customerSummary?.invoices.filter(row=>row.currency===displayCurrency).map(row=><MetricTiles columns={2} key={row.currency}><MetricTile label={<><LocalizedText>{\"Umsatz\"}</LocalizedText> {businessDate().slice(0,4)}</>} value={row.revenue} currency={row.currency} compactMoney/><MetricTile label=\"Offen\" value={row.open_amount} currency={row.currency} compactMoney/></MetricTiles>)}{!customerSummary?.invoices.length&&<p><LocalizedText>{\"Keine Rechnungen erfasst\"}</LocalizedText></p>}</>}",
             "facts={<><SectionTitle title=\"Kontaktperson\"/>{primaryContact?<div className=\"contact-facts\"><p>{[primaryContact.first_name,primaryContact.last_name].filter(Boolean).join(\" \")}</p>{Boolean(primaryContact.email)&&<p><a href={contactHref('email',String(primaryContact.email))}>{String(primaryContact.email)}</a></p>}</div>:<p><LocalizedText>{\"Keine Kontakte erfasst\"}</LocalizedText></p>}</>}",
@@ -181023,7 +181052,7 @@
         },
         {
           "tag": "SectionTitle",
-          "line": 147,
+          "line": 148,
           "props": [
             "title=\"Finanzübersicht\"",
             "desktopOnly"
@@ -181031,7 +181060,7 @@
         },
         {
           "tag": "Field",
-          "line": 147,
+          "line": 148,
           "props": [
             "label=\"Statistikwährung\"",
             "allowReadOnlyInput"
@@ -181039,7 +181068,7 @@
         },
         {
           "tag": "Select",
-          "line": 147,
+          "line": 148,
           "props": [
             "value={displayCurrency}",
             "onChange={event=>setStatisticCurrency(event.target.value)}"
@@ -181047,7 +181076,7 @@
         },
         {
           "tag": "option",
-          "line": 147,
+          "line": 148,
           "props": [
             "key={currency}",
             "value={currency}"
@@ -181055,7 +181084,7 @@
         },
         {
           "tag": "MetricTiles",
-          "line": 147,
+          "line": 148,
           "props": [
             "columns={2}",
             "key={row.currency}"
@@ -181063,7 +181092,7 @@
         },
         {
           "tag": "MetricTile",
-          "line": 147,
+          "line": 148,
           "props": [
             "label={<><LocalizedText>{\"Umsatz\"}</LocalizedText> {businessDate().slice(0,4)}</>}",
             "value={row.revenue}",
@@ -181073,12 +181102,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 147,
+          "line": 148,
           "props": []
         },
         {
           "tag": "MetricTile",
-          "line": 147,
+          "line": 148,
           "props": [
             "label=\"Offen\"",
             "value={row.open_amount}",
@@ -181088,105 +181117,105 @@
         },
         {
           "tag": "p",
-          "line": 147,
+          "line": 148,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 147,
+          "line": 148,
           "props": []
         },
         {
           "tag": "SectionTitle",
-          "line": 148,
+          "line": 149,
           "props": [
             "title=\"Kontaktperson\""
           ]
         },
         {
           "tag": "div",
-          "line": 148,
+          "line": 149,
           "props": [
             "className=\"contact-facts\""
           ]
         },
         {
           "tag": "p",
-          "line": 148,
+          "line": 149,
           "props": []
         },
         {
           "tag": "p",
-          "line": 148,
+          "line": 149,
           "props": []
         },
         {
           "tag": "a",
-          "line": 148,
+          "line": 149,
           "props": [
             "href={contactHref('email',String(primaryContact.email))}"
           ]
         },
         {
           "tag": "p",
-          "line": 148,
+          "line": 149,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 148,
+          "line": 149,
           "props": []
         },
         {
           "tag": "DetailDisclosure",
-          "line": 149,
+          "line": 150,
           "props": [
             "label=\"Weitere Kundendaten\""
           ]
         },
         {
           "tag": "p",
-          "line": 149,
+          "line": 150,
           "props": [
             "className=\"contact-address\""
           ]
         },
         {
           "tag": "a",
-          "line": 149,
+          "line": 150,
           "props": [
             "href={contactHref('phone',String(primaryContact!.phone))}"
           ]
         },
         {
           "tag": "SectionTitle",
-          "line": 149,
+          "line": 150,
           "props": [
             "title=\"Firmenadresse\""
           ]
         },
         {
           "tag": "p",
-          "line": 149,
+          "line": 150,
           "props": [
             "className=\"contact-address\""
           ]
         },
         {
           "tag": "br",
-          "line": 149,
+          "line": 150,
           "props": []
         },
         {
           "tag": "dl",
-          "line": 149,
+          "line": 150,
           "props": [
             "className=\"detail-list\""
           ]
         },
         {
           "tag": "div",
-          "line": 149,
+          "line": 150,
           "props": [
             "className=\"detail-list-stacked\"",
             "key={String(label)}"
@@ -181194,17 +181223,17 @@
         },
         {
           "tag": "dt",
-          "line": 149,
+          "line": 150,
           "props": []
         },
         {
           "tag": "dd",
-          "line": 149,
+          "line": 150,
           "props": []
         },
         {
           "tag": "SectionTitle",
-          "line": 150,
+          "line": 151,
           "props": [
             "title=\"Offene Rechnungen\"",
             "action={<Button variant=\"ghost\" onClick={()=>setTab(\"finances\")}><LocalizedText>{\"Alle anzeigen\"}</LocalizedText></Button>}"
@@ -181212,7 +181241,7 @@
         },
         {
           "tag": "Button",
-          "line": 150,
+          "line": 151,
           "props": [
             "variant=\"ghost\"",
             "onClick={()=>setTab(\"finances\")}"
@@ -181220,19 +181249,19 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 150,
+          "line": 151,
           "props": []
         },
         {
           "tag": "div",
-          "line": 150,
+          "line": 151,
           "props": [
             "className=\"records\""
           ]
         },
         {
           "tag": "DocumentSummaryRow",
-          "line": 150,
+          "line": 151,
           "props": [
             "compact",
             "key={String(item.id??index)}",
@@ -181241,24 +181270,24 @@
         },
         {
           "tag": "p",
-          "line": 150,
+          "line": 151,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 150,
+          "line": 151,
           "props": []
         },
         {
           "tag": "section",
-          "line": 151,
+          "line": 152,
           "props": [
             "className=\"customer-tab-panel\""
           ]
         },
         {
           "tag": "SectionTitle",
-          "line": 151,
+          "line": 152,
           "props": [
             "title=\"Kontakte\"",
             "action={<CreateAction label=\"Kontakt hinzufügen\" onClick={()=>openContact()}/>}"
@@ -181266,7 +181295,7 @@
         },
         {
           "tag": "CreateAction",
-          "line": 151,
+          "line": 152,
           "props": [
             "label=\"Kontakt hinzufügen\"",
             "onClick={()=>openContact()}"
@@ -181274,21 +181303,21 @@
         },
         {
           "tag": "div",
-          "line": 151,
+          "line": 152,
           "props": [
             "className=\"contact-list\""
           ]
         },
         {
           "tag": "div",
-          "line": 151,
+          "line": 152,
           "props": [
             "key={String(contact.id)}"
           ]
         },
         {
           "tag": "Avatar",
-          "line": 151,
+          "line": 152,
           "props": [
             "name={fullName}",
             "identity={String(contact.id)}"
@@ -181296,7 +181325,7 @@
         },
         {
           "tag": "button",
-          "line": 151,
+          "line": 152,
           "props": [
             "type=\"button\"",
             "className=\"contact-main\"",
@@ -181305,26 +181334,26 @@
         },
         {
           "tag": "b",
-          "line": 151,
+          "line": 152,
           "props": []
         },
         {
           "tag": "small",
-          "line": 151,
+          "line": 152,
           "props": [
             "key={index}"
           ]
         },
         {
           "tag": "div",
-          "line": 151,
+          "line": 152,
           "props": [
             "className=\"contact-actions\""
           ]
         },
         {
           "tag": "Button",
-          "line": 151,
+          "line": 152,
           "props": [
             "variant=\"ghost\"",
             "icon=\"more\"",
@@ -181334,34 +181363,34 @@
         },
         {
           "tag": "p",
-          "line": 151,
+          "line": 152,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 151,
+          "line": 152,
           "props": []
         },
         {
           "tag": "details",
-          "line": 152,
+          "line": 153,
           "props": [
             "className=\"financial-snapshot\""
           ]
         },
         {
           "tag": "summary",
-          "line": 152,
+          "line": 153,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 152,
+          "line": 153,
           "props": []
         },
         {
           "tag": "Field",
-          "line": 152,
+          "line": 153,
           "props": [
             "allowReadOnlyInput",
             "label=\"Statistikwährung\""
@@ -181369,7 +181398,7 @@
         },
         {
           "tag": "Select",
-          "line": 152,
+          "line": 153,
           "props": [
             "value={displayCurrency}",
             "onChange={event=>setStatisticCurrency(event.target.value)}"
@@ -181377,7 +181406,7 @@
         },
         {
           "tag": "option",
-          "line": 152,
+          "line": 153,
           "props": [
             "value={currency}",
             "key={currency}"
@@ -181385,7 +181414,7 @@
         },
         {
           "tag": "Statistics",
-          "line": 152,
+          "line": 153,
           "props": [
             "defaultTrendVisible={false}",
             "title=\"Kundenentwicklung\"",
@@ -181400,7 +181429,7 @@
         },
         {
           "tag": "CustomerDocuments",
-          "line": 154,
+          "line": 155,
           "props": [
             "customerId={customerId}",
             "items={customerDocuments as DocumentListItem[]}",
@@ -181409,21 +181438,21 @@
         },
         {
           "tag": "section",
-          "line": 155,
+          "line": 156,
           "props": [
             "className=\"customer-tab-panel\""
           ]
         },
         {
           "tag": "SectionTitle",
-          "line": 155,
+          "line": 156,
           "props": [
             "title=\"Aktivitäten\""
           ]
         },
         {
           "tag": "ListSearch",
-          "line": 155,
+          "line": 156,
           "props": [
             "value={activityQuery}",
             "onChange={setActivityQuery}",
@@ -181432,14 +181461,14 @@
         },
         {
           "tag": "div",
-          "line": 155,
+          "line": 156,
           "props": [
             "className=\"activity-groups\""
           ]
         },
         {
           "tag": "section",
-          "line": 155,
+          "line": 156,
           "props": [
             "className=\"activity-day\"",
             "key={day}"
@@ -181447,61 +181476,61 @@
         },
         {
           "tag": "h3",
-          "line": 155,
+          "line": 156,
           "props": []
         },
         {
           "tag": "div",
-          "line": 155,
+          "line": 156,
           "props": [
             "className=\"timeline\""
           ]
         },
         {
           "tag": "div",
-          "line": 155,
+          "line": 156,
           "props": [
             "key={item.at+index}"
           ]
         },
         {
           "tag": "i",
-          "line": 155,
+          "line": 156,
           "props": []
         },
         {
           "tag": "div",
-          "line": 155,
+          "line": 156,
           "props": []
         },
         {
           "tag": "b",
-          "line": 155,
+          "line": 156,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 155,
+          "line": 156,
           "props": []
         },
         {
           "tag": "small",
-          "line": 155,
+          "line": 156,
           "props": []
         },
         {
           "tag": "p",
-          "line": 155,
+          "line": 156,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 155,
+          "line": 156,
           "props": []
         },
         {
           "tag": "ActionSheet",
-          "line": 157,
+          "line": 158,
           "props": [
             "label=\"Kundenaktionen\"",
             "description={name}",
@@ -181511,14 +181540,14 @@
         },
         {
           "tag": "div",
-          "line": 157,
+          "line": 158,
           "props": [
             "className=\"action-list\""
           ]
         },
         {
           "tag": "ActionRow",
-          "line": 157,
+          "line": 158,
           "props": [
             "href={'/kunden/'+encodeURIComponent(customerId)+'/bearbeiten'}",
             "icon=\"edit\"",
@@ -181528,7 +181557,7 @@
         },
         {
           "tag": "ActionRow",
-          "line": 157,
+          "line": 158,
           "props": [
             "requiresWrite",
             "navigation",
@@ -181539,7 +181568,7 @@
         },
         {
           "tag": "ActionRow",
-          "line": 157,
+          "line": 158,
           "props": [
             "href={'/angebote/neu?customerId='+encodeURIComponent(customerId)}",
             "icon=\"file\"",
@@ -181549,7 +181578,7 @@
         },
         {
           "tag": "ActionRow",
-          "line": 157,
+          "line": 158,
           "props": [
             "href={'/rechnungen/neu?customerId='+encodeURIComponent(customerId)}",
             "icon=\"receipt\"",
@@ -181559,7 +181588,7 @@
         },
         {
           "tag": "ActionRow",
-          "line": 157,
+          "line": 158,
           "props": [
             "href={'/zeit?customerId='+encodeURIComponent(customerId)}",
             "icon=\"clock\"",
@@ -181569,7 +181598,7 @@
         },
         {
           "tag": "ActionRow",
-          "line": 157,
+          "line": 158,
           "props": [
             "href={'/projekte/neu?customerId='+encodeURIComponent(customerId)}",
             "icon=\"box\"",
@@ -181579,7 +181608,7 @@
         },
         {
           "tag": "ActionSheet",
-          "line": 158,
+          "line": 159,
           "props": [
             "label=\"Kontaktaktionen\"",
             "description={[contactMenu.first_name,contactMenu.last_name,contactMenu.job_title].filter(Boolean).join(\" · \")}",
@@ -181589,26 +181618,26 @@
         },
         {
           "tag": "Status",
-          "line": 158,
+          "line": 159,
           "props": [
             "tone=\"success\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 158,
+          "line": 159,
           "props": []
         },
         {
           "tag": "div",
-          "line": 158,
+          "line": 159,
           "props": [
             "className=\"action-list\""
           ]
         },
         {
           "tag": "ActionRow",
-          "line": 158,
+          "line": 159,
           "props": [
             "requiresWrite",
             "navigation",
@@ -181619,7 +181648,7 @@
         },
         {
           "tag": "ActionRow",
-          "line": 158,
+          "line": 159,
           "props": [
             "icon=\"mail\"",
             "title=\"E-Mail senden\"",
@@ -181629,7 +181658,7 @@
         },
         {
           "tag": "ActionRow",
-          "line": 158,
+          "line": 159,
           "props": [
             "icon=\"phone\"",
             "title=\"Anrufen\"",
@@ -181639,7 +181668,7 @@
         },
         {
           "tag": "ActionRow",
-          "line": 158,
+          "line": 159,
           "props": [
             "requiresWrite",
             "danger",
@@ -181651,7 +181680,7 @@
         },
         {
           "tag": "FormSheet",
-          "line": 159,
+          "line": 160,
           "props": [
             "label={contactId?\"Kontakt bearbeiten\":\"Kontakt hinzufügen\"}",
             "description={\"Kontakt wird direkt \"+name+\" zugeordnet.\"}",
@@ -181663,21 +181692,21 @@
         },
         {
           "tag": "div",
-          "line": 159,
+          "line": 160,
           "props": [
             "className=\"form-grid two\""
           ]
         },
         {
           "tag": "Field",
-          "line": 159,
+          "line": 160,
           "props": [
             "label=\"Vorname\""
           ]
         },
         {
           "tag": "Input",
-          "line": 159,
+          "line": 160,
           "props": [
             "value={firstName}",
             "onChange={e=>setFirstName(e.target.value)}"
@@ -181685,14 +181714,14 @@
         },
         {
           "tag": "Field",
-          "line": 159,
+          "line": 160,
           "props": [
             "label=\"Nachname\""
           ]
         },
         {
           "tag": "Input",
-          "line": 159,
+          "line": 160,
           "props": [
             "value={lastName}",
             "onChange={e=>setLastName(e.target.value)}"
@@ -181700,14 +181729,14 @@
         },
         {
           "tag": "Field",
-          "line": 159,
+          "line": 160,
           "props": [
             "label=\"E-Mail\""
           ]
         },
         {
           "tag": "Input",
-          "line": 159,
+          "line": 160,
           "props": [
             "value={contactEmail}",
             "onChange={e=>setContactEmail(e.target.value)}",
@@ -181716,14 +181745,14 @@
         },
         {
           "tag": "Field",
-          "line": 159,
+          "line": 160,
           "props": [
             "label=\"Telefon\""
           ]
         },
         {
           "tag": "Input",
-          "line": 159,
+          "line": 160,
           "props": [
             "value={contactPhone}",
             "onChange={e=>setContactPhone(e.target.value)}",
@@ -181732,7 +181761,7 @@
         },
         {
           "tag": "Field",
-          "line": 159,
+          "line": 160,
           "props": [
             "label=\"Funktion\"",
             "className=\"full\""
@@ -181740,7 +181769,7 @@
         },
         {
           "tag": "Input",
-          "line": 159,
+          "line": 160,
           "props": [
             "value={contactRole}",
             "onChange={e=>setContactRole(e.target.value)}",
@@ -181749,7 +181778,7 @@
         },
         {
           "tag": "Field",
-          "line": 159,
+          "line": 160,
           "props": [
             "label=\"Als Hauptkontakt festlegen\"",
             "className=\"full\""
@@ -181757,7 +181786,7 @@
         },
         {
           "tag": "Input",
-          "line": 159,
+          "line": 160,
           "props": [
             "type=\"checkbox\"",
             "checked={contactPrimary}",
@@ -181766,14 +181795,14 @@
         },
         {
           "tag": "FormActions",
-          "line": 159,
+          "line": 160,
           "props": [
             "sheet"
           ]
         },
         {
           "tag": "Button",
-          "line": 159,
+          "line": 160,
           "props": [
             "variant=\"secondary\"",
             "onClick={()=>setContactOpen(false)}"
@@ -181781,12 +181810,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 159,
+          "line": 160,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 159,
+          "line": 160,
           "props": [
             "requiresWrite",
             "disabled={contactSaving}",
@@ -181795,12 +181824,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 159,
+          "line": 160,
           "props": []
         },
         {
           "tag": "ConfirmDialog",
-          "line": 160,
+          "line": 161,
           "props": [
             "open",
             "danger",
@@ -181814,7 +181843,7 @@
         },
         {
           "tag": "Toast",
-          "line": 161,
+          "line": 162,
           "props": [
             "title={contactToast}",
             "tone={contactToast===\"Kontakt gespeichert.\"||contactToast===\"Kontakt entfernt.\"?\"success\":\"danger\"}"
@@ -181823,135 +181852,135 @@
       ],
       "conditions": [
         {
-          "line": 65,
+          "line": 66,
           "expression": "production"
         },
         {
-          "line": 72,
+          "line": 73,
           "expression": "['overview','contacts','finances','activity'].includes(requestedTab??'')"
         },
         {
-          "line": 99,
+          "line": 100,
           "expression": "workspace.data"
         },
         {
-          "line": 102,
+          "line": 103,
           "expression": "contact"
         },
         {
-          "line": 107,
+          "line": 108,
           "expression": "!removeContact||contactBusy.current"
         },
         {
-          "line": 110,
+          "line": 111,
           "expression": "e instanceof Error"
         },
         {
-          "line": 112,
+          "line": 113,
           "expression": "!production"
         },
         {
-          "line": 113,
+          "line": 114,
           "expression": "contactBusy.current"
         },
         {
-          "line": 114,
+          "line": 115,
           "expression": "!firstName.trim()||!lastName.trim()"
         },
         {
-          "line": 115,
+          "line": 116,
           "expression": "contactEmail.trim()&&!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(contactEmail.trim())"
         },
         {
-          "line": 118,
+          "line": 119,
           "expression": "contactId"
         },
         {
-          "line": 118,
+          "line": 119,
           "expression": "contactId"
         },
         {
-          "line": 121,
+          "line": 122,
           "expression": "contactPrimary"
         },
         {
-          "line": 126,
+          "line": 127,
           "expression": "error instanceof Error"
         },
         {
-          "line": 132,
+          "line": 133,
           "expression": "loadError"
         },
         {
-          "line": 133,
+          "line": 134,
           "expression": "!customer"
         },
         {
-          "line": 136,
+          "line": 137,
           "expression": "availableCurrencies.includes(statisticCurrency)"
         },
         {
-          "line": 142,
+          "line": 143,
           "expression": "status===\"inactive\""
         },
         {
-          "line": 142,
+          "line": 143,
           "expression": "status===\"inactive\""
         },
         {
-          "line": 145,
+          "line": 146,
           "expression": "tab===\"overview\""
         },
         {
-          "line": 145,
+          "line": 146,
           "expression": "tab===\"contacts\""
         },
         {
-          "line": 145,
+          "line": 146,
           "expression": "tab===\"finances\""
         },
         {
-          "line": 145,
+          "line": 146,
           "expression": "tab===\"activity\""
         },
         {
-          "line": 148,
+          "line": 149,
           "expression": "primaryContact"
         },
         {
-          "line": 150,
+          "line": 151,
           "expression": "customerDocuments.some(item=>item.kind==='invoice'&&['open','partial','overdue'].includes(financialStatus(item as DocumentListItem)))"
         },
         {
-          "line": 151,
+          "line": 152,
           "expression": "contacts.length"
         },
         {
-          "line": 155,
+          "line": 156,
           "expression": "visibleActivity.length"
         },
         {
-          "line": 155,
+          "line": 156,
           "expression": "Number.isFinite(Date.parse(item.at))"
         },
         {
-          "line": 159,
+          "line": 160,
           "expression": "contactId"
         },
         {
-          "line": 159,
-          "expression": "contactSaving"
-        },
-        {
           "line": 160,
           "expression": "contactSaving"
-        },
-        {
-          "line": 160,
-          "expression": "!contactBusy.current"
         },
         {
           "line": 161,
+          "expression": "contactSaving"
+        },
+        {
+          "line": 161,
+          "expression": "!contactBusy.current"
+        },
+        {
+          "line": 162,
           "expression": "contactToast===\"Kontakt gespeichert.\"||contactToast===\"Kontakt entfernt.\""
         }
       ]
@@ -182052,7 +182081,7 @@
       "key": "components/pages/customers.tsx#formatSwissPhone",
       "file": "components/pages/customers.tsx",
       "name": "formatSwissPhone",
-      "line": 32,
+      "line": 33,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -182060,11 +182089,11 @@
       "elements": [],
       "conditions": [
         {
-          "line": 32,
+          "line": 33,
           "expression": "digits.startsWith(\"41\")&&digits.length===11"
         },
         {
-          "line": 32,
+          "line": 33,
           "expression": "digits.startsWith(\"0\")&&digits.length===10"
         }
       ]
@@ -182073,7 +182102,7 @@
       "key": "components/pages/customers.tsx#formatSwissUid",
       "file": "components/pages/customers.tsx",
       "name": "formatSwissUid",
-      "line": 34,
+      "line": 35,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -182081,7 +182110,7 @@
       "elements": [],
       "conditions": [
         {
-          "line": 34,
+          "line": 35,
           "expression": "digits.length===9"
         }
       ]
@@ -182090,7 +182119,7 @@
       "key": "components/pages/customers.tsx#CustomerDocuments",
       "file": "components/pages/customers.tsx",
       "name": "CustomerDocuments",
-      "line": 276,
+      "line": 277,
       "classes": [
         "customer-tab-panel",
         "action-list"
@@ -182100,35 +182129,35 @@
       "widgets": [
         {
           "tag": "RecordsControls",
-          "line": 282
+          "line": 283
         },
         {
           "tag": "DocumentList",
-          "line": 282
+          "line": 283
         },
         {
           "tag": "ActionSheet",
-          "line": 282
+          "line": 283
         }
       ],
       "elements": [
         {
           "tag": "section",
-          "line": 282,
+          "line": 283,
           "props": [
             "className=\"customer-tab-panel\""
           ]
         },
         {
           "tag": "SectionTitle",
-          "line": 282,
+          "line": 283,
           "props": [
             "title=\"Dokumente\""
           ]
         },
         {
           "tag": "RecordsControls",
-          "line": 282,
+          "line": 283,
           "props": [
             "controller={controller}",
             "columns={columns}",
@@ -182138,7 +182167,7 @@
         },
         {
           "tag": "CreateAction",
-          "line": 282,
+          "line": 283,
           "props": [
             "label=\"Dokument erstellen\"",
             "onClick={()=>setCreateOpen(true)}"
@@ -182146,7 +182175,7 @@
         },
         {
           "tag": "DocumentList",
-          "line": 282,
+          "line": 283,
           "props": [
             "items={items}",
             "error={error}",
@@ -182157,7 +182186,7 @@
         },
         {
           "tag": "EntityFiles",
-          "line": 282,
+          "line": 283,
           "props": [
             "purpose=\"customer_document\"",
             "entityId={customerId}"
@@ -182165,7 +182194,7 @@
         },
         {
           "tag": "ActionSheet",
-          "line": 282,
+          "line": 283,
           "props": [
             "label=\"Dokument erstellen\"",
             "open={createOpen}",
@@ -182174,14 +182203,14 @@
         },
         {
           "tag": "div",
-          "line": 282,
+          "line": 283,
           "props": [
             "className=\"action-list\""
           ]
         },
         {
           "tag": "ActionRow",
-          "line": 282,
+          "line": 283,
           "props": [
             "href={\"/angebote/neu\"+customerQuery}",
             "icon=\"file\"",
@@ -182190,7 +182219,7 @@
         },
         {
           "tag": "ActionRow",
-          "line": 282,
+          "line": 283,
           "props": [
             "href={\"/rechnungen/neu\"+customerQuery}",
             "icon=\"receipt\"",
@@ -182269,7 +182298,7 @@
       "key": "components/pages/customers.tsx#CustomersPage",
       "file": "components/pages/customers.tsx",
       "name": "CustomersPage",
-      "line": 40,
+      "line": 41,
       "classes": [],
       "apis": [
         "/api/customers?limit=1",
@@ -182282,17 +182311,17 @@
       "widgets": [
         {
           "tag": "RecordsControls",
-          "line": 58
+          "line": 59
         },
         {
           "tag": "RecordsView",
-          "line": 58
+          "line": 59
         }
       ],
       "elements": [
         {
           "tag": "AppShell",
-          "line": 56,
+          "line": 57,
           "props": [
             "headingPlacement=\"content\"",
             "title=\"Kunden\"",
@@ -182303,7 +182332,7 @@
         },
         {
           "tag": "CreateAction",
-          "line": 56,
+          "line": 57,
           "props": [
             "href=\"/kunden/neu\"",
             "label=\"Neuer Kunde\""
@@ -182311,7 +182340,7 @@
         },
         {
           "tag": "MetricTiles",
-          "line": 57,
+          "line": 58,
           "props": [
             "desktopOnly",
             "columns={balances.data?.invoices.length?3:2}"
@@ -182319,7 +182348,7 @@
         },
         {
           "tag": "MetricTile",
-          "line": 57,
+          "line": 58,
           "props": [
             "label=\"Kunden gesamt\"",
             "value={allCustomers.data?.total??\"—\"}"
@@ -182327,7 +182356,7 @@
         },
         {
           "tag": "MetricTile",
-          "line": 57,
+          "line": 58,
           "props": [
             "label=\"Aktive Kunden\"",
             "value={activeCustomers.data?.total??\"—\"}"
@@ -182335,7 +182364,7 @@
         },
         {
           "tag": "MetricTile",
-          "line": 57,
+          "line": 58,
           "props": [
             "label=\"Offene Forderungen\"",
             "value={balances.data.invoices.map(row=>formatCurrency(row.open_amount,row.currency)).join(\" · \")}"
@@ -182343,7 +182372,7 @@
         },
         {
           "tag": "RecordsControls",
-          "line": 58,
+          "line": 59,
           "props": [
             "appearance=\"line\"",
             "chips={visibleChips}",
@@ -182355,7 +182384,7 @@
         },
         {
           "tag": "RecordsView",
-          "line": 58,
+          "line": 59,
           "props": [
             "chips={chips}",
             "controller={controller}",
@@ -182374,7 +182403,7 @@
         },
         {
           "tag": "RecordRow",
-          "line": 58,
+          "line": 59,
           "props": [
             "href={\"/kunden/\"+id}",
             "title={name}",
@@ -182384,10 +182413,6 @@
       ],
       "conditions": [
         {
-          "line": 43,
-          "expression": "financialsAllowed"
-        },
-        {
           "line": 44,
           "expression": "financialsAllowed"
         },
@@ -182396,8 +182421,8 @@
           "expression": "financialsAllowed"
         },
         {
-          "line": 47,
-          "expression": "production"
+          "line": 46,
+          "expression": "financialsAllowed"
         },
         {
           "line": 48,
@@ -182405,46 +182430,50 @@
         },
         {
           "line": 49,
+          "expression": "production"
+        },
+        {
+          "line": 50,
           "expression": "production&&financialsAllowed"
         },
         {
-          "line": 51,
+          "line": 52,
           "expression": "financialsAllowed"
         },
         {
-          "line": 51,
+          "line": 52,
           "expression": "({0:\"name\",2:\"city\",4:\"status\"} as Record<number,string>)[controller.sortIndex]"
         },
         {
-          "line": 51,
+          "line": 52,
           "expression": "controller.sort==='default'"
         },
         {
-          "line": 52,
+          "line": 53,
           "expression": "controller.query.trim()"
         },
         {
-          "line": 53,
+          "line": 54,
           "expression": "controller.activeChip==='Mit offenen Beträgen'"
         },
         {
-          "line": 54,
+          "line": 55,
           "expression": "controller.activeChip==='Aktiv'||controller.activeChip==='Inaktiv'"
         },
         {
-          "line": 54,
+          "line": 55,
           "expression": "controller.activeChip==='Aktiv'"
         },
         {
-          "line": 57,
+          "line": 58,
           "expression": "balances.data?.invoices.length"
         },
         {
-          "line": 58,
+          "line": 59,
           "expression": "row[4]"
         },
         {
-          "line": 58,
+          "line": 59,
           "expression": "statusMaybe"
         }
       ]
@@ -182453,7 +182482,7 @@
       "key": "components/pages/customers.tsx#customerChips",
       "file": "components/pages/customers.tsx",
       "name": "customerChips",
-      "line": 36,
+      "line": 37,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -182465,7 +182494,7 @@
       "key": "components/pages/customers.tsx#customerVisibleChips",
       "file": "components/pages/customers.tsx",
       "name": "customerVisibleChips",
-      "line": 37,
+      "line": 38,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -182477,7 +182506,7 @@
       "key": "components/pages/customers.tsx#customerColumns",
       "file": "components/pages/customers.tsx",
       "name": "customerColumns",
-      "line": 38,
+      "line": 39,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -182485,7 +182514,7 @@
       "elements": [
         {
           "tag": "RecordIdentity",
-          "line": 38,
+          "line": 39,
           "props": [
             "name={row[0]}",
             "meta={[row[1],row[2]].filter(value=>value&&value!==\"—\").join(\" · \")}",
@@ -182572,7 +182601,7 @@
       "key": "components/pages/customers.tsx#customerSortColumns",
       "file": "components/pages/customers.tsx",
       "name": "customerSortColumns",
-      "line": 39,
+      "line": 40,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -198677,7 +198706,7 @@
             "maxLength={200}",
             "value={name}",
             "onChange={e=>setName(e.target.value)}",
-            "placeholder=\"Name\""
+            "placeholder={type===\"Produkt\"?\"z. B. Bürostuhl\":\"z. B. IT-Beratung\"}"
           ]
         },
         {
@@ -199097,6 +199126,10 @@
         {
           "line": 117,
           "expression": "existing"
+        },
+        {
+          "line": 117,
+          "expression": "type===\"Produkt\""
         },
         {
           "line": 122,
@@ -208598,7 +208631,7 @@
     {
       "file": "components/pages/customers.tsx",
       "name": "customerColumns",
-      "line": 38,
+      "line": 39,
       "usedBy": [
         "/kunden"
       ]
@@ -208606,7 +208639,7 @@
     {
       "file": "components/pages/customers.tsx",
       "name": "CustomersPage",
-      "line": 40,
+      "line": 41,
       "usedBy": [
         "/kunden"
       ]
@@ -208614,7 +208647,7 @@
     {
       "file": "components/pages/customers.tsx",
       "name": "CustomerDetail",
-      "line": 62,
+      "line": 63,
       "usedBy": [
         "/kunden/[id]"
       ]
@@ -208622,7 +208655,7 @@
     {
       "file": "components/pages/customers.tsx",
       "name": "CustomerForm",
-      "line": 165,
+      "line": 166,
       "usedBy": [
         "/kunden/[id]/bearbeiten",
         "/kunden/neu"
@@ -208631,7 +208664,7 @@
     {
       "file": "components/pages/customers.tsx",
       "name": "CustomerDocuments",
-      "line": 276,
+      "line": 277,
       "usedBy": [
         "/kunden/[id]"
       ]

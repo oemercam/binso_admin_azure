@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import {sameCustomerCreation} from "@/lib/customer-replay";
 import {activityDays} from "@/lib/display-format";
 import {contactHref} from "@/lib/contact-links";
 import {usePageAccess} from "@/lib/client/page-access";
@@ -223,7 +224,7 @@ export function CustomerForm({customerId}:{customerId?:string}={}) {
       let savedCustomerId=customerId;
       if(isProductionBackendEnabled()){
         const body={name:customerName.trim(),...(!customerId?{customerType}:{}),sector,email,phone,city,address:[address,buildingNumber].filter(Boolean).join(" "),street:address,buildingNumber,postalCode,uid,notes,status:customerId?customerStatus:"active",...(paymentDays!==null&&paymentDays!==""?{paymentDays:Number(paymentDays)}:{}),...(!customerId?{allowDuplicate,contactFirstName:contactName.trim(),contactLastName:contactLastName.trim()}:{})},serialized=JSON.stringify(body);
-        const attempt=replay?.body===serialized?replay:{body:serialized,key:crypto.randomUUID()};setReplay(attempt);recovery.persist({customerType,company,contactName,contactLastName,email,phone,city,sector,address,postalCode,uid,notes,customerStatus,buildingNumber,paymentDays,replay:attempt,allowDuplicate});
+        const attempt=replay&&sameCustomerCreation(replay.body,serialized)?{body:serialized,key:replay.key}:{body:serialized,key:crypto.randomUUID()};setReplay(attempt);recovery.persist({customerType,company,contactName,contactLastName,email,phone,city,sector,address,postalCode,uid,notes,customerStatus,buildingNumber,paymentDays,replay:attempt,allowDuplicate});
         const result=customerId?await apiPatch<{item?:{id:string}}>("/api/customers/"+encodeURIComponent(customerId),body):await apiPost<{item?:{id:string}}>("/api/customers",body,{idempotencyKey:attempt.key});
         if(typeof result.item?.id!=="string"||!result.item.id)throw new Error("Die Speicherung konnte nicht bestätigt werden. Bitte den gespeicherten Stand prüfen.");
         savedCustomerId=result.item.id;
