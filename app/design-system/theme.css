@@ -22,8 +22,8 @@
   --app-surface:#fff;
   --app-chrome:#fff;
   --navigation-content-gap:20px;
-  --navigation-action-clearance:0px;
-  --navigation-content-inset:calc(var(--mobile-nav-h) + var(--safe-bottom) + 1px + var(--navigation-content-gap) + var(--navigation-action-clearance));
+  --navigation-base-inset:calc(var(--mobile-nav-h) + var(--safe-bottom) + 1px + var(--navigation-content-gap));
+  --navigation-content-inset:var(--navigation-base-inset);
   --app-text:#222225;
   --app-secondary:#626267;
   --app-divider:#dedee2;

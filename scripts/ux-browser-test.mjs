@@ -498,7 +498,7 @@ try{
      if(['/rechnungen/RE-TEST-1','/angebote/AN-TEST-1'].includes(route)){
       const heading=page.locator('.page-head[data-heading-placement="content"],.mobile-header-detail').filter({visible:true});assert.equal(await heading.locator('.status').filter({visible:true}).count(),1,'Document status appears once in the visible detail heading');
       assert.equal(await page.locator('.document-detail-view .status').count(),0,'Document body has no redundant status');
-      const actions=await heading.locator('.mobile-detail-actions,.mobile-page-actions').filter({visible:true}).first().boundingBox(),box=await heading.boundingBox();
+      const header=page.locator('.mobile-header-detail');const actions=await header.locator('.mobile-detail-actions,.mobile-page-actions').filter({visible:true}).first().boundingBox(),box=await header.boundingBox();
       assert.ok(actions&&actions.x+actions.width>=box.x+box.width-35,'Document actions stay at the right edge');
      }
     }

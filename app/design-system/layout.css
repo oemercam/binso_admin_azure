@@ -640,7 +640,7 @@ html[data-theme="dark"] .app-start-icon{filter:invert(1)}
  .workspace-command-bar:not(:has(.records-inline-controls)){margin:0}
  body:has(.sheet-layer,.confirm-layer,.header-panel-layer) :is(.app-root,.operator-root) .bo-create-action,
  :is(.app-root,.operator-root):has(input:focus,textarea:focus) .bo-create-action{display:none}
- :is(.app-root,.operator-root):has(.bo-create-action){--navigation-action-clearance:60px}
+ :is(.app-root,.operator-root):has(.bo-create-action){--navigation-content-inset:calc(var(--navigation-base-inset) + 60px)}
  .mobile-header.mobile-header-detail{grid-template-columns:minmax(44px,1fr) minmax(0,auto) minmax(44px,1fr)}
  .mobile-header-detail .mobile-header-context{justify-content:center;text-align:center;max-width:58vw}
  .mobile-header-detail .mobile-header-title{font-weight:600;text-align:center;white-space:nowrap}
