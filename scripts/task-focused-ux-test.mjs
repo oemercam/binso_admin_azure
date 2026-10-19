@@ -85,3 +85,31 @@ console.log('Exact page orientation routes and compact edit/detail/chat exclusio
  }finally{Object.assign(globalThis,previous);}
  console.log('Timer resume: authoritative state, one check per visit, paused/offline negatives, stale replies, timer changes and listener cleanup passed.');
 }
+
+const defaults=await import(moduleUrl((await fs.readFile('lib/document-defaults.ts','utf8')).replace('@/config/domain',moduleUrl(await fs.readFile('config/domain.ts','utf8')))));
+assert.deepEqual(defaults.documentDefaults({payment_terms_days:45,vat_rate:0,invoice_intro_text:'Company'},undefined,'Rechnung'),{due:'45',vatRate:'0',note:'Company'});
+assert.equal(defaults.documentDefaults({payment_terms_days:45},{paymentDays:10},'Rechnung').due,'10','Customer terms take precedence over company terms');
+assert.equal(defaults.documentDefaults({payment_terms_days:45},{paymentDays:0},'Rechnung').due,'0','Immediate payment is not replaced with a truthy fallback');
+assert.deepEqual(defaults.documentDefaults({payment_terms_days:-1,vat_rate:NaN},undefined,'Rechnung'),{due:'30',vatRate:'8.1',note:''});
+assert.equal(defaults.documentDefaults({invoice_intro_text:'Invoice',quote_intro_text:'Offer'},undefined,'Angebot').note,'Offer');
+cache.writeQuerySnapshot('/api/customers','r1','tenant-a',{items:['return']},100);
+assert.equal(cache.readQuerySnapshot('/api/customers','r1','tenant-a',30100),undefined);
+assert.deepEqual(cache.readQuerySnapshot('/api/customers','r1','tenant-a',30100,300000),{items:['return']},'A same-revision return can show its memory snapshot while refreshing');
+assert.equal(cache.readQuerySnapshot('/api/customers','r2','tenant-a',30101,300000),undefined,'Extended return reuse cannot cross a mutation revision');
+cache.writeQuerySnapshot('/api/customers','r1','tenant-a',{items:['return']},100);
+assert.equal(cache.readQuerySnapshot('/api/customers','r1','tenant-a',300100,300000),undefined,'Extended navigation memory is bounded in time');
+console.log('Company/customer draft defaults, explicit zeroes, invalid values and session/revision-fenced stale navigation passed.');
+
+{
+ class Element{constructor(name,children=[]){this.name=name;this.children=children;this.inert=false;}contains(target){return this===target||this.children.some(child=>child.contains(target));}}
+ const app=new Element('app'),dialogA=new Element('a'),layerA=new Element('layer-a',[dialogA]),dialogB=new Element('b'),layerB=new Element('layer-b',[dialogB]);
+ const doc={body:{children:[app,layerA]}};
+ const body=ts.transpileModule(await readFunction('components/use-dialog-focus.ts',['lockDialogBackground']),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText;
+ const lock=Function('backgroundLocks','document','HTMLElement',body+';return lockDialogBackground;')(new Map(),doc,Element);
+ const releaseA=lock(dialogA);assert.equal(app.inert,true);assert.equal(layerA.inert,false);doc.body.children.push(layerB);const releaseB=lock(dialogB);assert.equal(layerA.inert,true);releaseA();assert.equal(app.inert,true,'Closing a parent cannot expose the page under its child');releaseB();assert.equal(app.inert,false);assert.equal(layerA.inert,false);
+ app.inert=true;const release=lock(dialogA);release();assert.equal(app.inert,true,'Pre-existing inert state is retained');
+ console.log('Modal background ownership: nested dialogs, out-of-order close and pre-existing inert state passed.');
+}
+
+assert.equal(defaults.documentDefaults({},undefined,'Angebot','2026-10-19').due,'2026-11-18','Offer validity uses the existing central policy');
+assert.equal(defaults.documentDefaults({},undefined,'Angebot','2026-02-30').due,'','Invalid dates are never normalized into fabricated validity');

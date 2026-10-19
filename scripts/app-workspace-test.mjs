@@ -18,7 +18,7 @@ Function('require','exports','Children','isValidElement','cloneElement','useStat
  ({children})=>React.createElement('footer',null,children),control,()=>React.createElement('svg'),children=>children,{body:{}});
 function render(workspace,dirty=true,busy=false){state=0;return renderToStaticMarkup(React.createElement(exports.FormSheet,{label:'Task',open:true,workspace,onClose(){},description:'Details',dirty,busy},React.createElement('input',{defaultValue:'Unsaved'})));}
 const inline=render(true),modal=render(false);
-assert.match(inline,/role="region"/);assert.doesNotMatch(inline,/aria-modal|sheet-layer|<h2/,'Route workspace has no modal semantics, scrim or repeated heading');
+assert.match(inline,/role="dialog"/);assert.match(inline,/aria-modal="true"/);assert.match(inline,/form-sheet-expanded/);assert.match(inline,/sheet-layer/,"Expanded route editors share the actual modal owner");
 assert.match(inline,/value="Unsaved"/);assert.match(inline,/aria-label="Schliessen"/,'Workspace keeps an explicit guarded exit');
 assert.match(modal,/role="dialog"/);assert.match(modal,/aria-modal="true"/);assert.match(modal,/sheet-layer/,'Short contextual forms retain actual modal behavior');
 render(true,false,true);assert.deepEqual(guard,{active:true,unload:true},'A pending pristine save protects browser back/unload too');

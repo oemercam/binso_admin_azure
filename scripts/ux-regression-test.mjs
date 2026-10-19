@@ -81,7 +81,7 @@ console.log('Apple and PWA installation icons use the Binso One artwork with One
 // Document detail contract: operational workspace; customer-facing rendering belongs to preview only.
 {
   const documents=read("components/documents.tsx");
-  assert(documents.includes("<DocumentReadView type={kind} draft={draft} directory={directory}/>"),"Document detail must expose the operational read view.");
+  assert(documents.includes("<DocumentReadView type={kind} draft={draft} directory={directory} onPreview={()=>setPreview(true)}/>"),"Document detail must expose the operational read view.");
   assert(!documents.includes('detailTab===\\\"document\\\"'),"Invoice and offer detail pages must not embed a second document-shaped preview.");
   assert(!documents.includes("document-inline-preview"),"The final customer document belongs exclusively to the preview action.");
   assert(documents.includes('IconButton label="Vorschau" icon="file"'),"Document detail must keep preview directly accessible.");
@@ -214,7 +214,7 @@ console.log('Project-linked idle timer context survives synchronization without 
  const pages=await readPageFile('components/app-pages.tsx','utf8');
  const ast=ts.createSourceFile('pages.tsx',pages,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
  const nodes=ast.statements.filter(node=>ts.isFunctionDeclaration(node)&&['CustomerForm','ProductForm','EmployeeForm','moneyChf'].includes(node.name?.text));
- const compiled=ts.transpileModule((await readPageFile('lib/employee-validation.ts','utf8')).replace('export function','function')+'\n'+nodes.map(node=>node.getText(ast)).join('\n'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
+ const compiled=ts.transpileModule((await readPageFile('config/domain.ts','utf8')).replace('export const','const')+'\n'+(await readPageFile('lib/employee-validation.ts','utf8')).replace('export function','function')+'\n'+nodes.map(node=>node.getText(ast)).join('\n'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
  let values={},hook=0,calls=0,resolveSave,rejectSave;const scheduled=[];const navigations=[];
  const exports={};const Toast=()=>null,FormError=()=>null;
  const write=()=>{++calls;return new Promise((resolve,reject)=>{resolveSave=resolve;rejectSave=reject});};

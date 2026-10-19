@@ -29,8 +29,9 @@ permanent-toolbox instructions. Historical audit reports are evidence, not rules
   AppStart with the original BINSO icon is for initial session bootstrap only.
 - No route-local CSS, JSX style blocks or literal inline presentation. Dynamic
   measurements may pass CSS custom properties into the owning component.
-- Route-bound creation/editing uses the existing FormSheet workspace mode; short
-  contextual tasks retain modal sheets. Stable labeled navigation, contextual
+- All creation/editing uses the existing FormSheet modal owner: bottom sheet on
+  mobile, centered dialog on desktop; expanded editors retain a scrollable body
+  and bottom actions. Stable labeled navigation, contextual
   headers follow ux-current-approval.md. Creation belongs to the common content
   command bar beside search/filter on desktop, never the global header or navigation.
   The approved 19 October mobile CreateAction is one blue floating plus above the

@@ -1,3 +1,4 @@
+import {selectAppOption,appControlValue} from './app-select-browser.mjs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import {pathToFileURL} from 'node:url';
@@ -23,7 +24,7 @@ try{
    // Portal controls were framing only; use the original button before removing it.
    await page.setContent(await referenceDocument('desktop-login'),{waitUntil:'load'});await page.locator('[data-portal="app"]').click();await page.evaluate(()=>{document.body.style.padding='0';const root=document.querySelector('#bm');root.style.border='0';root.style.borderRadius='0';root.style.maxWidth='none';root.parentElement.style.maxWidth='none';document.querySelectorAll('#bm .portalchoices,#bm .preview-switch,#bm .designchoices').forEach(el=>el.remove());});await capture('reference-detail');await page.locator('#bm-back').click();await capture('reference-customers');
   }else{
-   await page.setContent(await referenceDocument('mobile-app'),{waitUntil:'load'});await page.locator('#ba-pages').selectOption('customers');
+   await page.setContent(await referenceDocument('mobile-app'),{waitUntil:'load'});await selectAppOption(page.locator('#ba-pages'), 'customers');
    await page.evaluate(()=>{document.body.style.padding='0';const root=document.querySelector('#ba');root.style.padding='0';document.querySelectorAll('#ba .pageselect,#ba .statusbar').forEach(el=>el.remove());const phone=document.querySelector('#ba .phone');Object.assign(phone.style,{maxWidth:'none',width:'100%',border:'0',borderRadius:'0',boxShadow:'none',minHeight:'1000px',display:'flex',flexDirection:'column'});document.querySelector('#ba main').style.flex='1';});
    await capture('reference-customers');await page.locator('[data-customer]').first().click();await capture('reference-detail');
   }

@@ -89,5 +89,5 @@ console.log('Contact URIs retain fixed schemes, encode address delimiters and re
 
 const progress=html(React.createElement(ui.LoadingState,null,'Kundendaten werden abgerufen.'));
 assert.match(progress,/role="status"/);assert.match(progress,/aria-live="polite"/);
-assert.match(progress,/<span class="loading-state-indicator" aria-hidden="true"><\/span>/);
+assert.doesNotMatch(progress,/loading-state-indicator|progressbar/,"Navigation never fabricates visible progress");
 assert.match(progress,/<span class="sr-only">Kundendaten werden abgerufen\.<\/span>/,'The actual shared loader keeps its accessible label without visible loading copy');

@@ -1,5 +1,6 @@
 "use client";
-import {ContextActions} from "./binso-ux";
+import {domainConfig} from "@/config/domain";
+import {documentDefaults} from "@/lib/document-defaults";
 import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
 import {safeAppPath} from "@/lib/navigation";
 import {EntityFiles} from "./entity-files";
@@ -18,9 +19,9 @@ import { invoicePaymentIssue } from "@/lib/qr-bill";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useDialogFocus } from "./use-dialog-focus";
 import { AppShell } from "./app-shell";
-import { ActionRow, ActionSheet, FormSheet,MetricTiles,MetricTile } from "./binso-ux";
+import { ActionRow, ActionSheet, FormSheet,DetailDisclosure,MetricTiles,MetricTile } from "./binso-ux";
 import {DocumentPageViewer} from "./pdf-preview";
-import {Button, EmptyState, Field, Icon, IconButton, Toast, FormActions, Input, Select, Textarea, ErrorState, LoadingState, SectionTitle} from "./ui";
+import {Button, EmptyState, Field, Icon, IconButton, Toast, FormActions, Input, Select, Textarea, ErrorState, LoadingState, SectionTitle, Status} from "./ui";
 import { apiGet, apiPatch, apiPost, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 
 type DocumentKind = "Rechnung" | "Angebot";
@@ -68,8 +69,8 @@ type DocumentDraft = {
 };
 
 
-function useCustomerDirectory() {
-  const {data,loading,error,refresh}=useApiQuery<{items:Array<{id:string;name:string;sector?:string;street?:string;postal_code?:string;city?:string}>}>(isProductionBackendEnabled()?"/api/customers":"/api/demo/data?collection=customers");
+function useCustomerDirectory(enabled=true) {
+  const {data,loading,error,refresh}=useApiQuery<{items:Array<{id:string;name:string;sector?:string;street?:string;postal_code?:string;city?:string}>}>(enabled?(isProductionBackendEnabled()?"/api/customers":"/api/demo/data?collection=customers"):null);
   const directory=useMemo(()=>{return customerDirectory(data?.items??[]);},[data]);
   return {directory,loading,error,refresh};
 }
@@ -266,12 +267,17 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const draftBaseline=useRef<string|null>(null);
   const [draft,setDraft]=useDocumentDraft(createInitialDraft(kind,""));
   const refundableAmount=Math.max(0,Number(draft.paidAmount??0)-Math.max(0,Number(draft.total??0)-Number(draft.creditAmount??0))-Number(draft.refundAmount??0));
-  const {directory,loading:customersLoading,error:customersError,refresh:refreshCustomers}=useCustomerDirectory();
+  const {directory,loading:customersLoading,error:customersError,refresh:refreshCustomers}=useCustomerDirectory(editing);
   const company=useDocumentCompany();
-  const companyPending=kind==="Rechnung"&&company.loading;
+  useEffect(()=>{if(existing||dirty||company.loading||searchParams.get("sourceOffer"))return;setDraft(current=>({...current,...documentDefaults(company.raw,resolveCustomer(current,directory),kind,current.date||businessDate())}));},[existing,dirty,company.loading,company.raw,draft.customerId,directory,kind,setDraft,searchParams]);
+  const companyPending=editing&&company.loading;
   const paymentIssue=kind==="Rechnung"&&!company.loading?(company.error||invoicePaymentIssue(company.raw)):null;
   const documentLoad=useExistingDocument(kind,existing?documentKey:undefined,setDraft,editing);
   useEffect(()=>{if(existing)return;queueMicrotask(()=>setDraft(current=>({...current,date:current.date||new Date().toLocaleDateString("en-CA"),customer:current.customer})))},[existing,directory,setDraft]);
+  const selectedProductId=!existing?searchParams.get("productId"):null;
+  const productQuery=useApiQuery<{item?:Record<string,unknown>}>(selectedProductId?"/api/products/"+encodeURIComponent(selectedProductId):null);
+  const initializedProduct=useRef<string|null>(null);
+  useEffect(()=>{const product=productQuery.data?.item;if(!selectedProductId||!product||initializedProduct.current===selectedProductId||dirty)return;initializedProduct.current=selectedProductId;setDraft(current=>({...current,positions:[{id:"product-"+selectedProductId,description:String(product.name??""),quantity:"1",unit:String(product.unit??"piece"),price:String(product.unit_price??0),vatRate:String(product.vat_rate??current.vatRate)}]}));},[selectedProductId,productQuery.data,dirty,setDraft]);
   const selectedCustomerId=!existing?searchParams.get("customerId"):null;
   const initializedCustomer=useRef<string|null>(null);
   useEffect(()=>{if(!selectedCustomerId||initializedCustomer.current===selectedCustomerId)return;const customer=Object.entries(directory).find(([,item])=>item.id===selectedCustomerId);if(customer){initializedCustomer.current=selectedCustomerId;setDraft(current=>({...current,customer:customer[1].name??customer[0],customerId:selectedCustomerId}));}},[selectedCustomerId,directory,setDraft]);
@@ -325,7 +331,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
     if(existing||!isProductionBackendEnabled()) return;
     const selected=resolveCustomer({customer:draft.customer,customerId:draft.customerId},directory),first=Object.values(directory)[0];
     if(selected&&((selected.name??draft.customer)!==draft.customer||selected.id!==draft.customerId))queueMicrotask(()=>setDraft(current=>({...current,customer:selected.name??current.customer,customerId:selected.id})));
-    else if(!draft.customer&&!draft.customerId&&first)queueMicrotask(()=>setDraft(current=>current.customer||current.customerId?current:{...current,customer:first.name??'',customerId:first.id}));
+    else if(!draft.customer&&!draft.customerId&&first&&Object.keys(directory).length===1)queueMicrotask(()=>setDraft(current=>current.customer||current.customerId?current:{...current,customer:first.name??'',customerId:first.id}));
   },[existing,directory,draft.customer,draft.customerId,setDraft]);
 
   const show=(message:string)=>{setToast(message);window.setTimeout(()=>setToast(null),2300);};
@@ -378,30 +384,23 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const documentContent=<>
     {!existing&&feedback}
     {actionError&&!moreOpen&&!sendOpen&&!creditOpen&&<ErrorState><LocalizedText>{actionError}</LocalizedText></ErrorState>}
+    {editing&&productQuery.error&&<ErrorState onRetry={productQuery.refresh}>{productQuery.error}</ErrorState>}
     {editing&&companyPending&&<LoadingState><LocalizedText>{"Firmendaten werden geladen …"}</LocalizedText></LoadingState>}
     {editing&&paymentIssue&&<div className="document-source-note" role="status"><span>{paymentIssue}</span><Link href="/einstellungen/dokumente"><LocalizedText>{"Einstellungen"}</LocalizedText></Link></div>}
     {sourceOffer&&!existing&&<div className="document-source-note"><span><LocalizedText>{"Erstellt aus Angebot"}</LocalizedText></span><b>{sourceOffer}</b></div>}
     {customersLoading?<LoadingState><LocalizedText>{"Kunden werden geladen …"}</LocalizedText></LoadingState>:customersError?<ErrorState onRetry={refreshCustomers}><LocalizedText>{customersError}</LocalizedText></ErrorState>:sourceQuery.loading?<LoadingState><LocalizedText>{"Ursprungsangebot wird geladen …"}</LocalizedText></LoadingState>:sourceError?<ErrorState onRetry={sourceQuery.refresh}><LocalizedText>{sourceError}</LocalizedText></ErrorState>:billingLoading?<LoadingState><LocalizedText>{"Verrechenbare Positionen werden geladen …"}</LocalizedText></LoadingState>:billingError?<ErrorState onRetry={()=>{timeSource.refresh();expenseSource.refresh()}}><LocalizedText>{billingError}</LocalizedText></ErrorState>:documentLoad.loading?<LoadingState><LocalizedText>{"Dokument wird geladen …"}</LocalizedText></LoadingState>:documentLoad.error?<EmptyState icon="file" title="Dokument konnte nicht geladen werden" text={documentLoad.error}/>:existing&&!editing
       ? <div className="document-desktop-workspace">
           <div className="document-desktop-detail">
-            <DocumentReadView type={kind} draft={draft} directory={directory}/>
+            <DocumentReadView type={kind} draft={draft} directory={directory} onPreview={()=>setPreview(true)}/>
             {draft.id&&<EntityFiles purpose={kind==="Rechnung"?"invoice_attachment":"offer_attachment"} entityId={draft.id}/>}
           </div>
-          {(kind==="Angebot"&&draft.status==="accepted"&&(tenantCan(documentRole,"invoices:write")||tenantCan(documentRole,"projects:write"))||canRecordPayment)&&<ContextActions mobile={false}>
-            <LocalizedElement as="section" className="context-action-group" aria-label="Dokumentaktionen">
-              <span className="compact-section-label"><LocalizedText>{"Aktionen"}</LocalizedText></span>
-              {kind==="Angebot"&&draft.status==="accepted"&&tenantCan(documentRole,"projects:write")&&<Link href={draft.projectId?"/projekte/"+encodeURIComponent(draft.projectId):"/projekte/neu?customerId="+encodeURIComponent(draft.customerId??"")+"&sourceOffer="+encodeURIComponent(draft.number)}><Icon name="clock"/><span><b><LocalizedText>{draft.projectId?"Auftrag öffnen":"Auftrag starten"}</LocalizedText></b></span><Icon name="arrow" size={15}/></Link>}
-              {kind==="Angebot"
-                ? tenantCan(documentRole,"invoices:write")&&<Link href={draft.invoiceNumber?"/rechnungen/"+encodeURIComponent(draft.invoiceNumber):"/rechnungen/neu?sourceOffer="+encodeURIComponent(documentKey??draft.number)}><Icon name="receipt" size={17}/><span><b><LocalizedText>{draft.invoiceNumber?"Rechnung öffnen":"Rechnung erstellen"}</LocalizedText></b><small><LocalizedText>{"Daten aus Angebot übernehmen"}</LocalizedText></small></span><Icon name="arrow" size={15}/></Link>
-                : canRecordPayment&&<Link href={"/zahlungen/neu?invoice="+encodeURIComponent(documentKey??draft.number)}><Icon name="wallet" size={17}/><span><b><LocalizedText>{"Zahlung erfassen"}</LocalizedText></b><small><LocalizedText>{"Zahlung zuordnen"}</LocalizedText></small></span><Icon name="arrow" size={15}/></Link>}
-            </LocalizedElement>
-          </ContextActions>}
+
         </div>
-      : !existing?<FormWizard cancelAction={<Button variant="secondary" onClick={closeCreation} disabled={saving}><LocalizedText>{"Abbrechen"}</LocalizedText></Button>} labels={["Kunde und Dokumentdaten","Positionen",kind==="Angebot"?"Gültig bis":"Zahlungsbedingungen","Prüfen und als Entwurf speichern"]} step={wizardStep} onStep={setWizardStep} busy={saving} action={<Button disabled={saving||companyPending||Boolean(paymentIssue)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)} onClick={()=>void save()}><LocalizedText>{saving?"Wird gespeichert…":existing?"Speichern":"Als Entwurf speichern"}</LocalizedText></Button>}><DocumentEditor type={kind} draft={draft} onChange={next=>{draftBaseline.current??=editableDocumentSnapshot(draft);setDirty(editableDocumentSnapshot(next)!==draftBaseline.current);setDraft({...next,subtotal:undefined,vat:undefined,total:undefined})}} directory={directory} lockedCustomer={Boolean(sourceOffer)} step={!existing?wizardStep:undefined}/>{wizardStep===3&&<DocumentReview type={kind} draft={draft} onStep={setWizardStep}/>}{wizardStep===1&&editing&&kind==="Rechnung"&&draft.customerId&&tenantCan(documentRole,"invoices:write")&&<Button variant="secondary" href={"/zeit?invoice="+encodeURIComponent(existing?draft.number:"")+"&customerId="+encodeURIComponent(draft.customerId)}><LocalizedText>{"Freigegebene Zeiten hinzufügen"}</LocalizedText></Button>}</FormWizard>:<DocumentEditor type={kind} draft={draft} onChange={next=>{draftBaseline.current??=editableDocumentSnapshot(draft);setDirty(editableDocumentSnapshot(next)!==draftBaseline.current);setDraft({...next,subtotal:undefined,vat:undefined,total:undefined})}} directory={directory} lockedCustomer={Boolean(sourceOffer)} step={!existing?wizardStep:undefined}/>}
+      : !existing?<FormWizard cancelAction={<Button variant="secondary" onClick={closeCreation} disabled={saving}><LocalizedText>{"Abbrechen"}</LocalizedText></Button>} labels={["Kunde und Dokumentdaten","Positionen",kind==="Angebot"?"Gültig bis":"Zahlungsbedingungen","Prüfen und als Entwurf speichern"]} step={wizardStep} onStep={setWizardStep} busy={saving} action={<Button disabled={saving||productQuery.loading||Boolean(productQuery.error)||companyPending||Boolean(paymentIssue)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)} onClick={()=>void save()}><LocalizedText>{saving?"Wird gespeichert…":existing?"Speichern":"Als Entwurf speichern"}</LocalizedText></Button>}><DocumentEditor type={kind} draft={draft} onChange={next=>{draftBaseline.current??=editableDocumentSnapshot(draft);setDirty(editableDocumentSnapshot(next)!==draftBaseline.current);setDraft({...next,subtotal:undefined,vat:undefined,total:undefined})}} directory={directory} lockedCustomer={Boolean(sourceOffer)} step={!existing?wizardStep:undefined}/>{wizardStep===3&&<DocumentReview type={kind} draft={draft} onStep={setWizardStep}/>}{wizardStep===1&&editing&&kind==="Rechnung"&&draft.customerId&&tenantCan(documentRole,"invoices:write")&&<Button variant="secondary" href={"/zeit?invoice="+encodeURIComponent(existing?draft.number:"")+"&customerId="+encodeURIComponent(draft.customerId)}><LocalizedText>{"Freigegebene Zeiten hinzufügen"}</LocalizedText></Button>}</FormWizard>:<DocumentEditor type={kind} draft={draft} onChange={next=>{draftBaseline.current??=editableDocumentSnapshot(draft);setDirty(editableDocumentSnapshot(next)!==draftBaseline.current);setDraft({...next,subtotal:undefined,vat:undefined,total:undefined})}} directory={directory} lockedCustomer={Boolean(sourceOffer)} step={!existing?wizardStep:undefined}/>}
     {editing&&existing&&kind==="Rechnung"&&draft.customerId&&tenantCan(documentRole,"invoices:write")&&<Button variant="secondary" href={"/zeit?invoice="+encodeURIComponent(draft.number)+"&customerId="+encodeURIComponent(draft.customerId)}><LocalizedText>{"Freigegebene Zeiten hinzufügen"}</LocalizedText></Button>}
     {editing&&existing&&<FormActions><Button variant="secondary" onClick={closeEdit}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button disabled={saving||companyPending||Boolean(paymentIssue)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)} onClick={()=>void save()}><LocalizedText>{saving?"Wird gespeichert…":existing?"Speichern":kind+" erstellen"}</LocalizedText></Button></FormActions>}
   </>;
-  return <AppShell title={existing?editing?kind+" bearbeiten":kind:title} titleIsUserContent={false} status={existing&&!editing&&!documentLoad.loading&&!documentLoad.error?presentation.statusLabel:undefined} statusTone={presentation.statusTone} subtitle={undefined} active={plural} backHref={returnTo} backLabel={returnTo==="/dashboard"?"Übersicht":kind==="Angebot"?"Angebote":"Rechnungen"} actions={desktopActions} mobileActions={existing&&!editing?headerActions:undefined} preview={preview} editing={editing} unsavedChanges={false}>
+  return <AppShell title={existing?editing?kind+" bearbeiten":kind:title} titleIsUserContent={false} status={undefined} statusTone={presentation.statusTone} subtitle={undefined} active={plural} backHref={returnTo} backLabel={returnTo==="/dashboard"?"Übersicht":kind==="Angebot"?"Angebote":"Rechnungen"} actions={desktopActions} mobileActions={existing&&!editing?headerActions:undefined} preview={preview} editing={editing} unsavedChanges={false}>
     {existing?(editing?<FormSheet workspace label={kind+" bearbeiten"} open onClose={closeEdit} busy={saving} dirty={dirty}>{documentContent}</FormSheet>:documentContent):<FormSheet workspace label={title} open onClose={closeCreation} busy={saving} dirty={dirty} wizard className="document-entry-workspace">{documentContent}</FormSheet>}
     {preview&&<DocumentModal previewDraft={{...draft,kind,sourceNumber:existing&&editing?documentKey:undefined}} pdfNumber={existing&&!editing?documentKey??draft.number:undefined} title={kind==="Angebot"?"Angebotsvorschau":"Rechnungsvorschau"} onClose={()=>setPreview(false)}/>}
     <ActionSheet label="Weitere Aktionen" open={moreOpen} busy={actionBusy} onClose={()=>setMoreOpen(false)}><div className="action-list">
@@ -445,19 +444,20 @@ function documentPresentation(type:DocumentKind,draft:DocumentDraft,total:number
   return {displayStatus,statusLabel,statusTone,dueDate};
 }
 
-function DocumentReadView({type,draft,directory}:{type:DocumentKind;draft:DocumentDraft;directory:CustomerDirectory}){
+function DocumentReadView({type,draft,directory,onPreview}:{type:DocumentKind;draft:DocumentDraft;directory:CustomerDirectory;onPreview?:()=>void}){
   const totals=useDocumentTotals(draft);
   const [copied,setCopied]=useState(false);
   const currency=draft.currency??"CHF";
   const isInvoice=type==="Rechnung";
   const dueDate=isInvoice&&draft.date&&draft.due?invoiceDueDate(draft.date,draft.due):"";
   const outstanding=openAmount({total:totals.total,paid_amount:draft.paidAmount,credit_amount:draft.creditAmount,refund_amount:draft.refundAmount});
-  const {displayStatus}=documentPresentation(type,draft,totals.total);
+  const {displayStatus,statusLabel,statusTone}=documentPresentation(type,draft,totals.total);
   return <div className="document-detail-view">
     <section className="document-detail-section">
       <div className="document-reference-row"><strong>{draft.number}</strong><Button variant="ghost" icon="copy" ariaLabel={copied?"Kopiert":"Nummer kopieren"} onClick={()=>{void navigator.clipboard.writeText(draft.number).then(()=>setCopied(true)).catch(()=>setCopied(false))}}/></div>
-      <div className="document-customer-heading"><h2>{draft.customerId?<Link href={"/kunden/"+encodeURIComponent(draft.customerId)}>{draft.customer}</Link>:draft.customer}</h2></div>
+      <div className="document-customer-heading">{onPreview&&<Button variant="secondary" icon="file" onClick={onPreview}>PDF</Button>}<h2>{draft.customerId?<Link href={"/kunden/"+encodeURIComponent(draft.customerId)}>{draft.customer}</Link>:draft.customer}</h2></div>
     </section>
+    <section className="document-detail-section"><MetricTiles columns={2}><MetricTile label={isInvoice&&!["draft","paid","cancelled"].includes(displayStatus)?"Offener Betrag":"Total"} value={isInvoice&&!["draft","paid","cancelled"].includes(displayStatus)?outstanding:totals.total} currency={currency}/><MetricTile label="Status" value={<Status appearance="pill" tone={statusTone}>{statusLabel}</Status>}/></MetricTiles></section>
     <section className="document-facts">
       <div><small><LocalizedText>{type==="Rechnung"?"Rechnungsdatum":"Angebotsdatum"}</LocalizedText></small><b>{isoToSwiss(draft.date)}</b></div>
       {type==="Angebot"
@@ -468,7 +468,7 @@ function DocumentReadView({type,draft,directory}:{type:DocumentKind;draft:Docume
     <section className="document-detail-section document-lines-section">
       <div className="section-title"><h2><LocalizedText>{"Positionen"}</LocalizedText></h2></div>
       <div className="document-read-table">
-        <div className="document-read-head" aria-hidden="true"><span><LocalizedText>{"Bezeichnung"}</LocalizedText></span><span><LocalizedText>{"Menge / Einheit"}</LocalizedText></span><span><LocalizedText>{"Einzelpreis"}</LocalizedText></span><span><LocalizedText>{"Betrag"}</LocalizedText></span></div>
+        <div className="document-read-head" aria-hidden="true"><span><LocalizedText>{"Bezeichnung"}</LocalizedText></span><span><LocalizedText>{"Menge"}</LocalizedText></span><span><LocalizedText>{"Einzelpreis"}</LocalizedText></span><span><LocalizedText>{"Betrag"}</LocalizedText></span></div>
         {draft.positions.map(item=><div className="document-read-row" key={item.id}>
           <b><LocalizedText verbatim={true}>{item.description}</LocalizedText></b>
           <span>{item.quantity} <LocalizedText>{({hour:"Std.",piece:"Stück",flat:"Pauschal"} as Record<string,string>)[item.unit??""]??item.unit??"Stück"}</LocalizedText><small className="document-mobile-price"><LocalizedText>{" × "}</LocalizedText>{currency} {money(numberValue(item.price))}</small></span>
@@ -486,6 +486,7 @@ function DocumentReadView({type,draft,directory}:{type:DocumentKind;draft:Docume
     {isInvoice&&!["draft","paid","cancelled"].includes(displayStatus)&&outstanding>0&&<LocalizedElement as="section" className="document-payment-facts" aria-label="Zahlungsstand"><h2><LocalizedText>{"Zahlungsstand"}</LocalizedText></h2>
       <MetricTiles columns={2}><MetricTile label="Bereits bezahlt" value={`${currency} ${money(Number(draft.paidAmount??0))}`}/><MetricTile label="Offener Betrag" value={`${currency} ${money(outstanding)}`}/></MetricTiles>
     </LocalizedElement>}
+    {(Boolean(draft.credits?.length||draft.reminders?.length||draft.refunds?.length||draft.revisesOffer||draft.revisions?.length||draft.sourceOffer||draft.invoiceNumber||draft.note))&&<DetailDisclosure label="Weitere Angaben">
     {isInvoice&&Boolean(draft.credits?.length)&&<section className="document-detail-section"><h2><LocalizedText>{"Gutschriften"}</LocalizedText></h2>{draft.credits?.map(credit=><p key={credit.number}><b>{credit.number}</b> · {credit.date.split('-').reverse().join('.')} · {currency} {money(Number(credit.amount))}<br/>{credit.reason}</p>)}</section>}
     {isInvoice&&Boolean(draft.reminders?.length)&&<section className="document-detail-section"><h2><LocalizedText>{"Mahnhistorie"}</LocalizedText></h2>{draft.reminders?.map(reminder=><p key={reminder.id}><b><LocalizedText>{reminder.stage===1?'Zahlungserinnerung':reminder.stage===2?'1. Mahnung':'2. Mahnung'}</LocalizedText></b> · <LocalizedText>{({sent:'Versendet',failed:'Versand nicht bestätigt'} as Record<string,string>)[reminder.status]??'Versand wird geprüft'}</LocalizedText><br/>{reminder.recipient} · {currency} {money(Number(reminder.amount))} · <LocalizedText>{"Zahlungsfrist"}</LocalizedText>: {reminder.deadline.split('-').reverse().join('.')}</p>)}</section>}
     {isInvoice&&Boolean(draft.refunds?.length)&&<section className="document-detail-section"><h2><LocalizedText>{"Rückerstattungen"}</LocalizedText></h2>{draft.refunds?.map(refund=><p key={refund.id}>{refund.date.split('-').reverse().join('.')} · {currency} {money(Number(refund.amount))}<br/>{refund.reason}</p>)}</section>}
@@ -493,6 +494,7 @@ function DocumentReadView({type,draft,directory}:{type:DocumentKind;draft:Docume
     {Boolean(draft.revisions?.length)&&<section className="document-detail-section"><h2><LocalizedText>{"Überarbeitete Angebotsversionen"}</LocalizedText></h2>{draft.revisions?.map(revision=><p key={revision.number}><Link href={'/angebote/'+encodeURIComponent(revision.number)}>{revision.number}</Link> · <LocalizedText>{financialStatusLabels[revision.status]??revision.status}</LocalizedText></p>)}</section>}
     {draft.sourceOffer&&<p><LocalizedText>{"Ursprungsangebot: "}</LocalizedText><Link href={"/angebote/"+encodeURIComponent(draft.sourceOffer)}>{draft.sourceOffer}</Link></p>}{draft.invoiceNumber&&<p><LocalizedText>{"Rechnung: "}</LocalizedText><Link href={"/rechnungen/"+encodeURIComponent(draft.invoiceNumber)}>{draft.invoiceNumber}</Link></p>}
     {draft.note&&<section className="document-detail-section"><span className="eyebrow"><LocalizedText>{"NOTIZ"}</LocalizedText></span><p>{draft.note}</p></section>}
+    </DetailDisclosure>}
   </div>;
 }
 
@@ -529,7 +531,7 @@ function DocumentEditor({ type, draft, onChange, directory, step,lockedCustomer=
       <div hidden={step!==undefined&&step!==0} className="form-section customer-form-section">
         <span className="compact-section-label"><LocalizedText>{"Kunde"}</LocalizedText></span>
         <Field label="Kunde auswählen">
-          <Select disabled={lockedCustomer} value={draft.customerId??Object.entries(directory).find(([,item])=>item===resolveCustomer(draft,directory))?.[0]??''} onChange={e=>{const item=directory[e.target.value];if(item)onChange({...draft,customer:item.name??e.target.value,customerId:item.id})}}>
+          <Select disabled={lockedCustomer} value={draft.customerId??Object.entries(directory).find(([,item])=>item===resolveCustomer(draft,directory))?.[0]??''} onChange={e=>{const item=directory[e.target.value];if(item)onChange({...draft,customer:item.name??e.target.value,customerId:item.id,...(type==="Rechnung"&&item.paymentDays!=null?{due:String(item.paymentDays)}:{})})}}>
             {!resolveCustomer(draft,directory)&&<option value=""><LocalizedText>{"Kunde auswählen"}</LocalizedText></option>}
             {names.map(key=><option key={key} value={key}><LocalizedText verbatim={true}>{directory[key].name??key}</LocalizedText><LocalizedText>{directory[key].city?' · '+directory[key].city:''}</LocalizedText></option>)}
           </Select>
@@ -544,7 +546,7 @@ function DocumentEditor({ type, draft, onChange, directory, step,lockedCustomer=
           <div hidden={step===0}><Field label={type==="Rechnung" ? "Zahlungsfrist" : "Gültig bis"}>
             {type==="Rechnung" ? <Select value={draft.due} onChange={e=>onChange({...draft,due:e.target.value})}>{!["10","30","45"].includes(draft.due)&&<option value={draft.due}>{draft.due}<LocalizedText>{" Tage"}</LocalizedText></option>}<option value="10"><LocalizedText>{"10 Tage"}</LocalizedText></option><option value="30"><LocalizedText>{"30 Tage"}</LocalizedText></option><option value="45"><LocalizedText>{"45 Tage"}</LocalizedText></option></Select> : <Input type="date" value={draft.due} onChange={e=>onChange({...draft,due:e.target.value})}/>}
           </Field></div>
-          <div hidden={step===0}><Field label="MwSt."><Select value={draft.vatRate} onChange={e=>onChange({...draft,vatRate:e.target.value,positions:draft.positions.map(item=>({...item,vatRate:e.target.value}))})}><option value="8.1">8.10 %</option><option value="2.6">2.60 %</option><option value="0">0.00 %</option></Select></Field></div>
+          <div hidden={step===0}><Field label="MwSt."><Select value={draft.vatRate} onChange={e=>onChange({...draft,vatRate:e.target.value,positions:draft.positions.map(item=>({...item,vatRate:e.target.value}))})}>{domainConfig.vatRates.map(rate=><option key={rate} value={rate}>{rate.toLocaleString("de-CH")} %</option>)}</Select></Field></div>
         </div>
       </div>
       <div hidden={step!==undefined&&step!==1} className="form-section">
@@ -597,18 +599,11 @@ export function DocumentModal({ title, onClose, pdfNumber, previewDraft, fileUrl
   </LocalizedElement>;
 }
 
+const EMPTY_COMPANY:Record<string,unknown>={};
 function useDocumentCompany(){
- const [company,setCompany]=useState<Record<string,unknown>>({});
- const [loading,setLoading]=useState(true);
- const [error,setError]=useState<string|null>(null);
- useEffect(()=>{
-   let active=true;
-   if(!isProductionBackendEnabled()){queueMicrotask(()=>{if(active)setLoading(false)});return()=>{active=false;};}
-   apiGet<{item:Record<string,unknown>}>('/api/settings/company')
-     .then(data=>{if(active){setCompany(data.item);setError(null);}})
-     .catch(reason=>{if(active)setError(reason instanceof Error?reason.message:"Firmendaten konnten nicht geladen werden.");})
-     .finally(()=>{if(active)setLoading(false);});
-   return()=>{active=false;};
- },[]);
+ const production=useBackendMode();
+ const query=useApiQuery<{item:Record<string,unknown>}>(production?'/api/settings/company':null);
+ const company=query.data?.item??EMPTY_COMPANY;
+ const loading=query.loading,error=query.error;
  return {loading,error,raw:company,name:String(company.legal_name||company.name||''),street:[company.street,company.building_number].filter(Boolean).join(' '),city:[company.postal_code,company.city].filter(Boolean).join(' '),iban:String(company.iban||company.qr_iban||''),logo:String(company.logo_url||''),footer:[company.legal_name||company.name,company.vat_number||company.uid,company.email,company.phone,company.website].filter(Boolean).join(' · ')};
 }

@@ -5,6 +5,13 @@ import {lockPageScroll} from './page-scroll-lock';
 
 /** Keep modal keyboard navigation inside the dialog and restore its trigger. */
 const modalStack:HTMLElement[]=[];
+const backgroundLocks=new Map<HTMLElement,{count:number;previous:boolean}>();
+/** Nested modals share background ownership; closing one cannot expose another's page. */
+function lockDialogBackground(dialog:HTMLElement){
+ const targets=Array.from(document.body.children).filter((element):element is HTMLElement=>element instanceof HTMLElement&&!element.contains(dialog));
+ for(const element of targets){const lock=backgroundLocks.get(element)??{count:0,previous:element.inert};lock.count++;backgroundLocks.set(element,lock);element.inert=true;}
+ return()=>{for(const element of targets){const lock=backgroundLocks.get(element);if(!lock)continue;if(--lock.count===0){element.inert=lock.previous;backgroundLocks.delete(element);}}};
+}
 /** Header shortcuts never stack a second panel over an active non-header modal. */
 export function hasBlockingModal(){return modalStack.some(dialog=>dialog.isConnected&&!dialog.matches(".header-panel"));}
 
@@ -27,6 +34,7 @@ export function useDialogFocus(open: boolean, onClose: () => void, headerPanel=f
     if (!open || !dialogRef.current) return;
     const dialog = dialogRef.current;
     const unlockScroll=lockPageScroll(()=>dialog);
+    const unlockBackground=headerPanel?()=>{}:lockDialogBackground(dialog);
     modalStack.push(dialog);
     if(!headerPanel)window.dispatchEvent(new Event("binso-modal-open"));
     const active = document.activeElement;
@@ -42,7 +50,7 @@ export function useDialogFocus(open: boolean, onClose: () => void, headerPanel=f
     resize();viewport?.addEventListener("resize",resize);viewport?.addEventListener("scroll",resize);
     const controls = () => Array.from(dialog.querySelectorAll<HTMLElement>(
       'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])',
-    )).filter(element => element.getClientRects().length > 0 && !element.closest('[hidden],[inert]'));
+    )).filter(element => element.getClientRects().length > 0 && !element.closest('[hidden],[inert],[aria-hidden="true"]'));
     if(!dialog.contains(document.activeElement)) (controls()[0] ?? dialog).focus({preventScroll:true});
     const onKey = (event: KeyboardEvent) => {
       if(modalStack.at(-1)!==dialog)return;
@@ -66,6 +74,7 @@ export function useDialogFocus(open: boolean, onClose: () => void, headerPanel=f
     document.addEventListener("focusin", onFocus);
     return () => {
       const index=modalStack.indexOf(dialog);if(index>=0)modalStack.splice(index,1);
+      unlockBackground();
       viewport?.removeEventListener("resize",resize);viewport?.removeEventListener("scroll",resize);
       document.removeEventListener("keydown", onKey);
       document.removeEventListener("focusin", onFocus);

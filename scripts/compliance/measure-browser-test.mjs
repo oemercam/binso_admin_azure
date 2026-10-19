@@ -51,7 +51,7 @@ try{
  assert.equal(normal[0].status,'passed','Approved search, notifications and account occupy the shared right action group');
  assert.equal((await checkHeader(normalActions+'<button>Extra</button>','header-extra'))[0].status,'failed','Additional business actions must fail');
  assert.equal((await checkHeader(search+notification+'<button>Wrong replacement</button>','header-replacement'))[0].status,'failed','Counting controls cannot approve an unrelated replacement');
- assert.equal((await checkHeader(search+'<a class="desktop-header-timer" href="/zeit">01:24:36</a>'+notification+avatar,'header-timer'))[0].status,'passed','The preserved running timer is an explicit status shortcut');
+ assert.equal((await checkHeader(search+'<a class="desktop-header-timer" href="/zeit">01:24:36</a>'+notification+avatar,'header-timer'))[0].status,'failed','Retired header timers cannot return beside the existing reminder');
  assert.equal((await checkHeader(search+'<a class="desktop-header-timer" href="/zahlungen">01:24:36</a>'+notification+avatar,'header-fake-timer'))[0].status,'failed','A timer class cannot authorize a different business destination');
  assert.equal((await checkHeader(search+search+notification+avatar,'header-duplicate-search'))[0].status,'failed','Duplicate allowed roles remain blocking');
  assert.equal((await checkHeader(notification+avatar,'header-missing-search'))[0].status,'failed','The approved global search is required, not just permitted');

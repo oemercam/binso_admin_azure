@@ -27,11 +27,12 @@ export function useApiQuery<T>(path:string|null){
   const session=dataRevision([]);
   const snapshot=retry===0?readQuerySnapshot<T>(path,revision,session):undefined;
   if(snapshot!==undefined){queueMicrotask(()=>{if(active)setState({path,revision,session,attempt:retry,data:snapshot,error:null,loading:false})});return()=>{active=false;};}
-  apiGet<T>(path).then(data=>{if(active){writeQuerySnapshot(path,revision,session,data);setState({path,revision,session,attempt:retry,data,error:null,loading:false});}}).catch(error=>{if(active)setState(previous=>({path,revision,session,attempt:retry,data:previous.path===path&&previous.session===session?previous.data:undefined,error:error instanceof Error?error.message:'Daten konnten nicht geladen werden.',loading:false}));});
+  queueMicrotask(()=>{if(active)setState(previous=>({path,revision,session,attempt:retry,data:previous.path===path&&previous.session===session&&previous.revision===revision?previous.data:undefined,error:null,loading:true}));});
+  apiGet<T>(path).then(data=>{if(active){writeQuerySnapshot(path,revision,session,data);setState({path,revision,session,attempt:retry,data,error:null,loading:false});}}).catch(error=>{const denied=typeof error==='object'&&error!==null&&'status' in error&&[401,403,404].includes(Number(error.status));if(denied)clearQuerySnapshots();if(active)setState(previous=>({path,revision,session,attempt:retry,data:!denied&&previous.path===path&&previous.session===session&&previous.revision===revision?previous.data:undefined,error:error instanceof Error?error.message:'Daten konnten nicht geladen werden.',loading:false}));});
   return()=>{active=false;};
  },[path,revision,retry]);
  const current=state.path===path&&state.revision===revision&&state.attempt===retry;
- const sameSession=state.path===path&&state.session===dataRevision([]);
- const data=(sameSession?state.data:undefined)??(path?readQuerySnapshot<T>(path,revision,dataRevision([])):undefined);
- return {data,error:current?state.error:null,loading:Boolean(path)&&data===undefined&&(!current||state.loading),refreshing:Boolean(path)&&!current&&data!==undefined,refresh:()=>setRetry(value=>value+1)};
+ const sameSession=state.path===path&&state.session===dataRevision([])&&state.revision===revision;
+ const data=(sameSession?state.data:undefined)??(path?readQuerySnapshot<T>(path,revision,dataRevision([]),undefined,300000):undefined);
+ return {data,error:current?state.error:null,loading:Boolean(path)&&data===undefined&&(!current||state.loading),refreshing:Boolean(path)&&(!current||state.loading)&&data!==undefined,refresh:()=>setRetry(value=>value+1)};
 }

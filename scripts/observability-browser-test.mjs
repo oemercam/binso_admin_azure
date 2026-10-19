@@ -1,3 +1,4 @@
+import {selectAppOption,appControlValue} from './app-select-browser.mjs';
 import {writeTestOutput} from './test-output.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
@@ -72,7 +73,7 @@ try{
   assert.equal(await page.locator('.operator-mobile-nav').count(),0,'Independent wallboard does not alter or embed navigation');
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,'Wallboard overflow '+width);
   for(const profile of ['technical','business','combined']){
-   await page.getByLabel('Wallboard-Profil').selectOption(profile);
+   await selectAppOption(page.getByLabel('Wallboard-Profil'), profile);
    if(profile==='business'){assert.equal(await page.locator('[data-metric-id="payments"]').count(),1);assert.equal(await page.locator('.bo-monitor-chart').count(),0);}else assert.equal(await page.locator('.bo-monitor-chart').count(),3);
    if(width>=1920)assert.equal(await page.evaluate(()=>document.documentElement.scrollHeight<=innerHeight+1),true,'Wallboard fits 16:9 viewport '+width+' '+profile);await page.screenshot({path:path.join(output,theme+'-'+width+'-'+profile+'.png'),fullPage:true});results.push({theme,width,profile,passed:true});
   }
@@ -96,14 +97,14 @@ try{
   await page.screenshot({path:path.join(output,'admin-'+theme+'-'+width+'-'+(section.replaceAll('/','-')||'dashboard')+'.png'),fullPage:true});results.push({theme,width,section,passed:true});
  }
  await page.setViewportSize({width:390,height:900});await navigateOperator(page,'/operator/tickets/'+supportCase.id);await page.getByText('Original customer message',{exact:true}).waitFor();
- await page.getByLabel('Status',{exact:true}).selectOption('waiting_customer');await page.getByLabel('Status',{exact:true}).locator('option[value="waiting_customer"]:checked').waitFor({state:'attached'});
+ await selectAppOption(page.getByLabel('Status',{exact:true}), 'waiting_customer');assert.equal(await appControlValue(page.getByLabel('Status',{exact:true})),'waiting_customer');
  await page.getByPlaceholder('Antwort an Kunden schreiben...').fill('Real isolated operator reply');await page.getByRole('button',{name:'Senden',exact:true}).click();await page.getByText('Real isolated operator reply',{exact:true}).waitFor();
  assert.equal((await pool.query('select status from support_cases where id=$1',[supportCase.id])).rows[0].status,'waiting_for_customer','Actual ticket status persisted');
- const failedReply=route=>route.fulfill({status:503,json:{message:'Synthetic provider unavailable'}});await page.route('**/api/operator/tickets/'+supportCase.id+'/messages',failedReply);await page.getByPlaceholder('Antwort an Kunden schreiben...').fill('Retained reply draft');await page.getByRole('button',{name:'Senden',exact:true}).click();await page.locator('.toast-danger').getByText('Synthetic provider unavailable',{exact:true}).waitFor();assert.equal(await page.getByPlaceholder('Antwort an Kunden schreiben...').inputValue(),'Retained reply draft','Failed operator write retains the draft');await page.unroute('**/api/operator/tickets/'+supportCase.id+'/messages',failedReply);
+ const failedReply=route=>route.fulfill({status:503,json:{message:'Synthetic provider unavailable'}});await page.route('**/api/operator/tickets/'+supportCase.id+'/messages',failedReply);await page.getByPlaceholder('Antwort an Kunden schreiben...').fill('Retained reply draft');await page.getByRole('button',{name:'Senden',exact:true}).click();await page.locator('.toast-danger').getByText('Synthetic provider unavailable',{exact:true}).waitFor();assert.equal(await appControlValue(page.getByPlaceholder('Antwort an Kunden schreiben...')),'Retained reply draft','Failed operator write retains the draft');await page.unroute('**/api/operator/tickets/'+supportCase.id+'/messages',failedReply);
  const restrictedContext=await browser.newContext({serviceWorkers:'block'});await restrictedContext.addCookies([{name:'binso_observability_session',value:tokens.get('platform_support'),url:base}]);const restrictedPage=await restrictedContext.newPage();let deniedCalls=0;restrictedPage.on('request',request=>{if(request.url()===base+'/api/operator/finance')deniedCalls++});await restrictedPage.goto(base+'/operator/finanzen');await restrictedPage.getByRole('heading',{name:'Keine Berechtigung für diesen Bereich',exact:true}).waitFor();assert.equal(deniedCalls,0,'Denied page does not mount a failing privileged API');await restrictedContext.close();
  const notFound=await page.goto(base+'/operator/invalid-admin-route');assert.equal(notFound.status(),404,'Unknown route cannot masquerade as dashboard');
  await page.close();page=await context.newPage();observeErrors(page);await page.bringToFront();await page.goto(base+'/operator/wallboard');await page.locator('[data-metric-id="customers"]').waitFor();
- await page.setViewportSize({width:1920,height:1080});await page.getByLabel('Wallboard-Profil').selectOption('combined');
+ await page.setViewportSize({width:1920,height:1080});await selectAppOption(page.getByLabel('Wallboard-Profil'), 'combined');
  let attempts=0;await page.route('**/api/operator/monitoring',route=>{attempts++;return route.fulfill({status:503,json:{message:'Synthetic API outage'}});});assert.equal(await page.evaluate(()=>document.visibilityState),'visible','Polling requires a visible wallboard');await page.waitForResponse(response=>response.url()===base+'/api/operator/monitoring'&&response.status()===503,{timeout:75000});await page.getByText(/Verbindung unterbrochen/).waitFor();assert.ok(attempts>0,'Auto refresh actually attempted');assert.equal(await page.locator('[data-metric-id="payments"]').getAttribute('data-health'),'unknown');
  await page.unroute('**/api/operator/monitoring');await page.waitForResponse(response=>response.url()===base+'/api/operator/monitoring'&&response.status()===200,{timeout:75000});await page.getByText(/Automatische Aktualisierung/).waitFor();assert.equal(await page.locator('[data-metric-id="payments"]').getAttribute('data-health'),'healthy','Recovery consumes fresh server data');
  const previousTheme=await page.evaluate(()=>document.documentElement.dataset.theme);await page.getByRole('button',{name:'Hell / Dunkel'}).click();assert.notEqual(await page.evaluate(()=>document.documentElement.dataset.theme),previousTheme,'Theme button changes the actual theme');

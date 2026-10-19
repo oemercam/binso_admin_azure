@@ -23,16 +23,17 @@ Dark Mode und Operator-Varianten sind abgeleitet, keine behauptete Originalfreig
 - Auswahlfelder nutzen den gemeinsamen App-Popup-Owner mit Tastaturbedienung,
   Disabled-Zuständen und echter Formularvalidierung. Suche, Dialoge und Auswahl
   sperren den Hintergrund; verschachtelte Dialoge behalten ihre Scroll-Sperre.
-- Aktive Zeit ist im mobilen Header zentriert, mit ruhigem blauem Statuspunkt.
-  Reduced Motion deaktiviert das Pulsieren. Keine alarmartige Daueranimation.
+- Der Header zeigt keine laufende Zeitmessung. Der vorhandene Wiederöffnungs-
+  Hinweis bleibt der Einstieg zur aktiven Messung. Kein zweiter Timer und keine
+  zusätzliche Headerzeile.
 - Kundenneuanlage benötigt Vor- und Nachname einer Kontaktperson; Speicherung
   von Kunde und erstem Kontakt erfolgt atomar. Bestehende Kunden ohne strukturierte
   Kontakte bleiben bearbeitbar, ohne Namen zu erfinden. Registrierung verlangt
   einen eigenen Kontaktnamen zusätzlich zur Firma.
-- Lange routegebundene Erfassungen verwenden den bestehenden FormSheet-Owner im
-  workspace-Modus: keine Scrim-Fläche, kein modaler Fokusfang, ein Kontexttitel,
-  erreichbare Abschlussaktionen. Kurze Kindeditoren/Filter/Aktionen bleiben echte
-  Dialoge mit Fokusführung. Back, Abbrechen, Browser-Schliessen, Entwurfs-Recovery,
+- Alle Erfassungen/Bearbeitungen verwenden den bestehenden modalen FormSheet-
+  Owner: Mobile von unten, Desktop zentriert. Lange Formulare erweitern denselben
+  Dialog; Inhalt scrollt, Aktionen bleiben am unteren Rand. X und Abbrechen teilen
+  die Rückfrage nur bei ungespeicherten Eingaben. Browser-Zurück, Entwurfs-Recovery,
   Validierung, Replay-Schutz und Rollen bleiben verbindlich.
 - Rechnung/Angebot: Kunde und Datum, Positionen, Bedingungen, App-Zusammenfassung.
   PDF ist eine separate Vorschau. Keine doppelte Feldbearbeitung in mehreren
@@ -81,3 +82,19 @@ Keine doppelten Beschreibungen; Detailseiten behalten Datensatzmetadaten, Chat
 und Bearbeitungsformulare bleiben kompakt. Kurze Hilfen erklären zusätzlich
 unklare oder noch nicht begonnene Aufgaben. Lade-, Leer-,
 Fehler- und Read-only-Zustände behalten ihre jeweilige Bedeutung.
+
+## Ergänzende Sammelfreigabe nach Release #287
+
+- Pro Menüpunkt stehen die jeweilige Aufgabe und wenige wichtige Informationen
+  im Vordergrund. Details/Tabs verwenden denselben Such-, Filter-, Zeilen- und
+  Aktionsvertrag wie eigenständige Listen. Kundenkontext bleibt erhalten.
+- Status rechts und vertikal zentriert; Nummern und Werte nicht durch bewusst
+  gestapelte Metadaten auseinanderreissen. Gleichrangige Abschnitte gleich setzen.
+- Kundenvorgaben vor Firmenstandard für neue Dokumente, bewusste Eingaben und
+  gespeicherte Snapshots unverändert erhalten. Keine Bestandsänderung durch Defaults.
+- Finanzverläufe und Rechnungsbestandsanteile trennen; Ring nur für echte Teile
+  desselben Totals, keine Vermischung von Ein-/Auszahlungen oder Währungen.
+- Interne Navigation ohne Balken; kurzlebige Speichersnapshots nur innerhalb
+  derselben Sitzung und Datenrevision, mit Hintergrundaktualisierung.
+- Chat besitzt genau einen einzeiligen, begrenzt wachsenden Composer. Keine
+  zweite App-Leiste bei Tastatur; iOS-Systemleisten separat auf realem Gerät prüfen.

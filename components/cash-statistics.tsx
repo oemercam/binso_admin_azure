@@ -1,6 +1,5 @@
 "use client";
-import Link from "next/link";
-import {Statistics,type Series} from './statistics';
+import {Statistics,RingChart,type Series} from './statistics';
 import {cashStatisticEvents,financialStatisticEvents,type CashStatisticsData} from '@/lib/cash-statistics';
 import {sumMoney} from '@/lib/money';
 import {useEffect,useState,type CSSProperties} from 'react';
@@ -48,5 +47,5 @@ export function CashStatistics({data,storageKey}:{data:CashStatisticsData;storag
   {label:'Einnahmen',value:totals.income,hint:'Erfasste Zahlungen nach Rückerstattungen'},
   {label:'Ausgaben',value:totals.costs,hint:'Nachgewiesene Auszahlungen'},
   {label:'Zahlungssaldo',value:sumMoney([totals.income,-totals.costs]),hint:'Kein Bankkontostand'}
- ]} notice={notice}/><details className="financial-snapshot"><summary><LocalizedText>{'Forderungen'}</LocalizedText></summary><p><LocalizedText>{'Bestand am '}</LocalizedText>{snapshot.as_of.split('-').reverse().join('.')}</p><MetricTiles><MetricTile label="Bezahlt" value={Number(snapshot.paid)} currency="CHF"/><MetricTile label="Offen" value={Number(snapshot.open)} currency="CHF"/><Link href={"/rechnungen?status="+encodeURIComponent("Überfällig")}><MetricTile label="Überfällig" value={Number(snapshot.overdue)} currency="CHF"/></Link>{Number(snapshot.credit_balance)>0&&<MetricTile label="Guthaben" value={Number(snapshot.credit_balance)} currency="CHF"/>}</MetricTiles></details></>;
+ ]} notice={notice}/><details className="financial-snapshot"><summary><LocalizedText>{'Forderungen'}</LocalizedText></summary><p><LocalizedText>{'Bestand am '}</LocalizedText>{snapshot.as_of.split('-').reverse().join('.')}</p><RingChart label="Rechnungsbestand" parts={[{key:'paid',label:'Bezahlt',tone:'positive',value:Number(snapshot.paid),href:'/rechnungen?status='+encodeURIComponent('Bezahlt')},{key:'open',label:'Offen',tone:'neutral',value:Number(snapshot.open),href:'/rechnungen?status='+encodeURIComponent('Offen')},{key:'overdue',label:'Überfällig',tone:'negative',value:Number(snapshot.overdue),href:'/rechnungen?status='+encodeURIComponent('Überfällig')}]}/>{Number(snapshot.credit_balance)>0&&<p><LocalizedText>{'Guthaben'}</LocalizedText>: {formatCurrency(Number(snapshot.credit_balance))}</p>}</details></>;
 }

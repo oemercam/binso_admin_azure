@@ -183,9 +183,9 @@ export function Toast({ title, text, tone = "success",inline=false,actionLabel,o
   </div>;
 }
 
-/** Quiet content progress; the accessible status never flashes as page copy. */
+/** Quiet navigation has no decorative progress bar. Status remains available to assistive technology. */
 export function LoadingState({children="Daten werden geladen …",className}:{children?:React.ReactNode;className?:string}){
-  return <span role="status" aria-live="polite" className={`loading-state ${className??""}`.trim()}><span className="loading-state-indicator" aria-hidden="true"/><span className="sr-only"><LocalizedText>{children}</LocalizedText></span></span>;
+  return <span role="status" aria-live="polite" className={`loading-state ${className??""}`.trim()}><span className="sr-only"><LocalizedText>{children}</LocalizedText></span></span>;
 }
 
 /** Retry remains local to the owning data source; callers retain their error text. */
