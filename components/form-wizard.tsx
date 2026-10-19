@@ -32,7 +32,7 @@ export function FormWizard({labels,step,onStep,children,action,cancelAction,busy
   return()=>{root.removeEventListener('focusin',schedule);observer.disconnect();cancelAnimationFrame(frame);window.removeEventListener('resize',schedule);viewport?.removeEventListener('resize',schedule);viewport?.removeEventListener('scroll',schedule);root.style.removeProperty('--wizard-height')};
  },[guided]);
  const valid=()=>{
-  const invalid=Array.from(rootRef.current?.querySelectorAll<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>('input,select,textarea')??[]).find(el=>el.getClientRects().length&&!el.disabled&&!el.checkValidity());
+  const invalid=Array.from(rootRef.current?.querySelectorAll<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>('input,select,textarea')??[]).find(el=>(el.getClientRects().length||el.matches("select[data-app-select]")&&el.closest(".app-select-control")?.getClientRects().length)&&!el.disabled&&!el.checkValidity());
   if(invalid){invalid.reportValidity();return false;}
   return true;
  };

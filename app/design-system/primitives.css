@@ -359,6 +359,6 @@ input:not([type="checkbox"]):not([type="radio"]),
 @media(forced-colors:active){.app-select-popup{border-color:ButtonText}.app-select-option[aria-selected="true"]{outline:2px solid Highlight}}
 
 .app-select-control{position:relative;display:block;min-width:0;width:100%}
-.app-select-native{position:absolute;inset:0;opacity:0;pointer-events:none;width:100%;height:100%}
+.app-select-native{display:none}
 .app-select-trigger{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;text-align:left;white-space:normal}
 .app-select-trigger>span{flex:none;color:var(--color-muted)}

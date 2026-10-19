@@ -35,19 +35,20 @@ const viewportSource=(await fs.readFile('components/use-workspace-viewport.ts','
 const viewportCompiled=ts.transpileModule(viewportSource,{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText;
 for(const hasVisualViewport of [true,false]){
  const browser=target(),visual=target(),doc=target(),properties=new Map();let dispose;
+ const attributes=new Set();
  const rootStyle={overflow:'auto',setProperty:(key,value)=>properties.set(key,value),removeProperty:key=>properties.delete(key)};
  Object.assign(browser,{innerHeight:844,visualViewport:hasVisualViewport?Object.assign(visual,{height:700,offsetTop:0}):undefined});
- Object.assign(doc,{visibilityState:'visible',documentElement:{style:rootStyle},body:{style:{overflow:'scroll'}}});
+ Object.assign(doc,{visibilityState:'visible',activeElement:{matches:()=>false},documentElement:{style:rootStyle,clientHeight:844,toggleAttribute:(name,on)=>on?attributes.add(name):attributes.delete(name),removeAttribute:name=>attributes.delete(name)},body:{style:{overflow:'scroll'}}});
  const hook={};
  // Use an actual global binding for the existing innerHeight browser fallback.
- const sandbox={exports:hook,useEffect:fn=>dispose=fn(),window:browser,document:doc};
+ const sandbox={exports:hook,useEffect:fn=>dispose=fn(),window:browser,document:doc,requestAnimationFrame:fn=>{fn();return 1;},cancelAnimationFrame:()=>{}};
  Object.defineProperty(sandbox,'innerHeight',{get:()=>browser.innerHeight});
  vm.runInNewContext(viewportCompiled,sandbox);hook.useWorkspaceViewport();
  assert.equal(properties.get('--workspace-viewport-height'),hasVisualViewport?'700px':'844px');
  browser.innerHeight=600;visual.height=450;visual.offsetTop=12;
  browser.fire('resize');
  assert.equal(properties.get('--workspace-viewport-height'),hasVisualViewport?'450px':'600px','Chat resizes with both visual and window-only viewport APIs');
- if(hasVisualViewport){visual.height=300;visual.offsetTop=25;visual.fire('resize');assert.equal(properties.get('--workspace-viewport-top'),'25px');assert.equal(properties.get('--workspace-viewport-height'),'300px','Keyboard viewport remains authoritative');}
+ if(hasVisualViewport){doc.activeElement={matches:()=>true};visual.height=300;visual.offsetTop=25;visual.fire('resize');assert.equal(properties.get('--workspace-viewport-top'),'25px');assert.equal(properties.get('--workspace-viewport-height'),'300px','Keyboard viewport remains authoritative');assert.equal(attributes.has('data-workspace-keyboard'),true,'Focused keyboard viewport removes duplicate safe-area padding');}
  browser.innerHeight=900;visual.height=800;visual.offsetTop=0;browser.fire('pageshow');
  assert.equal(properties.get('--workspace-viewport-height'),hasVisualViewport?'800px':'900px','Restored chat refreshes stale viewport dimensions');
  browser.innerHeight=950;visual.height=850;doc.visibilityState='hidden';doc.fire('visibilitychange');

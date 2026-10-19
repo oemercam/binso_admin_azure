@@ -1,7 +1,8 @@
 /** Exercise the visible app popup, never the operating-system select picker. */
 export async function selectAppOption(locator,choice){
- const native=await locator.evaluate(el=>el.tagName)==='SELECT'?locator:locator.locator('..').locator('select');
- if(await native.getAttribute('data-app-select')!=='true')return native.selectOption(choice);
+ const candidate=await locator.evaluate(el=>el.tagName)==='SELECT'?locator:locator.locator('..').locator('select');
+ if(await candidate.getAttribute('data-app-select')!=='true')return candidate.selectOption(choice);
+ const native=locator.page().locator('select[id='+JSON.stringify(await candidate.getAttribute('id'))+']');
  const requested=typeof choice==='object'?choice:{value:String(choice)};
  const index=await native.evaluate((el,requested)=>Array.from(el.options).findIndex((option,index)=>requested.index!=null?index===requested.index:requested.label!=null?option.label===requested.label:option.value===String(requested.value)),requested);
  if(index<0)throw new Error('Requested app option does not exist: '+JSON.stringify(choice));
