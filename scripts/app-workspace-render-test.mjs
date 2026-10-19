@@ -23,13 +23,13 @@ const markup=renderToStaticMarkup(React.createElement('div',{className:'app-root
 const chrome={};Function('require','exports',compile(await read('components/app-chrome.tsx')))(require,chrome);
 const detailMarkup=renderToStaticMarkup(React.createElement('div',{className:'app-root'},React.createElement(chrome.AppHeader,{className:'mobile-header mobile-header-detail',detail:true,contentHeader:true,leadingClassName:'mobile-header-leading',actionClassName:'mobile-detail-actions',leading:React.createElement(React.Fragment,null,React.createElement('a',{href:'/rechnungen',className:'mobile-back','aria-label':'Zurück'},React.createElement(ui.Icon,{name:'back'})),React.createElement('div',{className:'mobile-header-context'},React.createElement('h1',{className:'mobile-header-title'},'RE-2026-123456'),React.createElement(ui.Status,null,'Entwurf'))),actions:React.createElement('div',{className:'document-header-icons'},React.createElement(ui.IconButton,{label:'Bearbeiten',icon:'edit'}),React.createElement(ui.IconButton,{label:'Weitere Aktionen',icon:'more'}))})));
 const engines=await import(process.env.BINSO_PLAYWRIGHT_MODULE?pathToFileURL(process.env.BINSO_PLAYWRIGHT_MODULE).href:'playwright');
-const footerMarkup=renderToStaticMarkup(React.createElement('main',{className:'page-container'},React.createElement('section',{className:'form-workspace'},React.createElement('form',null,React.createElement('div',{className:'sheet-form-footer'},React.createElement(ui.FormActions,null,React.createElement(ui.Button,{variant:'secondary'},'Abbrechen'),React.createElement(ui.Button,{type:'submit'},'Ticket erstellen')))))));
+const footerMarkup=renderToStaticMarkup(React.createElement('div',{className:'sheet-layer'},React.createElement('section',{className:'bottom-sheet form-sheet-expanded',role:'dialog','aria-label':'Task'},React.createElement('header',{className:'sheet-header'},React.createElement('h2',null,'Task')),React.createElement('div',{className:'sheet-body'},React.createElement('form',{className:'sheet-form-layout'},React.createElement('div',{className:'sheet-form-content'},'Synthetic form body'),React.createElement('div',{className:'sheet-form-footer'},React.createElement(ui.FormActions,null,React.createElement(ui.Button,{variant:'secondary'},'Abbrechen'),React.createElement(ui.Button,{type:'submit'},'Ticket erstellen'))))))));
 const browser=await engines.chromium.launch({headless:true,...(process.env.BINSO_CHROMIUM_EXECUTABLE?{executablePath:process.env.BINSO_CHROMIUM_EXECUTABLE}:{})});
 try{
  const page=await browser.newPage();let cases=0;
  for(const width of [320,390,760])for(const theme of ['light','dark']){
   await page.setViewportSize({width,height:740});await page.setContent('<!doctype html><html data-theme="'+theme+'"><style>'+css+'\n.fixture-spacer{height:1400px}</style><body>'+markup+'</body></html>');
-  await assertStableAppNavigation(page);await verifyStableAppNavigation(page);cases++;
+  await page.evaluate(async()=>{await document.fonts.ready;await Promise.all(document.getAnimations().filter(animation=>animation.effect?.target?.classList.contains("page-container")).map(animation=>animation.finished));});await assertStableAppNavigation(page);await verifyStableAppNavigation(page);cases++;
  }
  for(const width of [320,390]){
   await page.setViewportSize({width,height:740});await page.setContent('<!doctype html><html data-theme="light"><style>'+css+'</style><body>'+detailMarkup+'</body></html>');
@@ -38,9 +38,10 @@ try{
  }
  for(const width of [320,390]){
   await page.setViewportSize({width,height:740});await page.setContent('<!doctype html><html data-theme="light"><style>'+css+'</style><body>'+footerMarkup+'</body></html>');
+  await page.evaluate(async()=>{await document.fonts.ready;await Promise.all(document.getAnimations().filter(animation=>animation.effect?.getTiming().iterations!==Infinity).map(animation=>animation.finished));});
   const fits=()=>page.locator('.sheet-form-footer').evaluate(footer=>Array.from(footer.querySelectorAll('.button')).every(button=>{const box=button.getBoundingClientRect();return box.left>=0&&box.right<=innerWidth&&box.height>=44&&button.scrollWidth<=button.clientWidth+1}));
-  assert.ok(await fits(),'Workspace actions fit narrow screens without clipped labels');
-  const old=await page.addStyleTag({content:'.form-workspace .sheet-form-footer .mobile-sticky-save{width:auto;min-width:auto}.form-workspace .sheet-form-footer .button{white-space:nowrap}'});
+  assert.ok(await fits(),'Sheet actions fit narrow screens without clipped labels');const footer=await page.locator('.sheet-form-footer').boundingBox(),sheet=await page.getByRole('dialog').boundingBox();assert.ok(Math.abs(footer.y+footer.height-sheet.y-sheet.height)<=2,'Footer belongs to the bottom sheet edge, not the last field');
+  const old=await page.addStyleTag({content:'.bottom-sheet .sheet-form-footer .mobile-sticky-save{width:auto;min-width:auto}.bottom-sheet .sheet-form-footer .button{white-space:nowrap;min-width:220px}'});
   assert.equal(await fits(),false,'Negative control catches the retired overflowing footer');await old.evaluate(el=>el.remove());cases++;
  }
  console.log('Real CreateAction/Button/AppHeader/FormActions, source navigation and all 14 CSS owners: '+cases+' render cases with scroll, safe area, distinct title/status and negative target/layout controls passed.');

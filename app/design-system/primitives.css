@@ -362,3 +362,6 @@ input:not([type="checkbox"]):not([type="radio"]),
 .app-select-native{display:none}
 .app-select-trigger{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;text-align:left;white-space:normal}
 .app-select-trigger>span{flex:none;color:var(--color-muted)}
+
+.app-select-trigger[aria-invalid="true"]{border-color:var(--status-danger-fg)}
+.app-select-control>.form-error{display:block;margin-top:var(--field-label-gap);font-size:var(--control-help-font);color:var(--status-danger-fg)}

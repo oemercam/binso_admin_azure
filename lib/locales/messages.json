@@ -12693,5 +12693,10 @@
     "Invoice balance",
     "État des factures",
     "Situazione fatture"
+  ],
+  "Auswahl erforderlich": [
+    "Selection required",
+    "Sélection requise",
+    "Selezione obbligatoria"
   ]
 }

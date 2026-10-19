@@ -210,8 +210,8 @@ export function ActionsMenu({label, children, busy=false}: {label:string;childre
 }
 
 /** Canonical two-line row shared by entity and financial lists. */
-export function ListRow({href,onClick,title,meta,value,valueLabel,status,tone="neutral",compact=false,valuePlacement="separate",translateTitle=true}:{translateTitle?:boolean;href?:string;onClick?:()=>void;title:ReactNode;meta:ReactNode;value?:ReactNode;valueLabel?:string;status?:string;tone?:"success"|"warning"|"danger"|"neutral"|"info";compact?:boolean;valuePlacement?:"separate"|"metadata"}){
+export function ListRow({href,onClick,title,meta,value,valueLabel,status,tone="neutral",compact=false,translateTitle=true}:{translateTitle?:boolean;href?:string;onClick?:()=>void;title:ReactNode;meta:ReactNode;value?:ReactNode;valueLabel?:string;status?:string;tone?:"success"|"warning"|"danger"|"neutral"|"info";compact?:boolean;valuePlacement?:"separate"|"metadata"}){
  const content=<><b><LocalizedText verbatim={!translateTitle}>{title}</LocalizedText></b><small>{meta}</small>{status&&<Status appearance="pill" tone={tone}>{status}</Status>}{value!=null&&<span className="document-summary-amount">{valueLabel&&<small><LocalizedText>{valueLabel}</LocalizedText></small>}<strong>{value}</strong></span>}{(href||onClick)&&!status&&value==null&&<span className="record-chevron"><Icon name="arrow" size={12}/></span>}</>;
- const className=`document-summary-row${value!=null?" has-value":""}${compact?" is-compact":""}${valuePlacement==="metadata"?" has-inline-value":""}`;
+ const className=`document-summary-row${value!=null?" has-value":""}${compact?" is-compact":""}`;
  return href?<Link href={href} className={className}>{content}</Link>:onClick?<button type="button" onClick={onClick} className={className}>{content}</button>:<div className={className}>{content}</div>;
 }
