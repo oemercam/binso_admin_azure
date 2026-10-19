@@ -132,7 +132,7 @@ export function SecuritySettingsPage(){
 
     <section className="surface security-card">
       <SectionTitle title="Anmeldeschutz"/>
-      {mfa||mfaError?<p><LocalizedText>{mfa?mfa.enabled?"E-Mail + Passwort + Authenticator-Code.":"E-Mail + Passwort + einmaliger E-Mail-Code bei jeder Anmeldung.":"Anmeldeschutzstatus nicht verfügbar."}</LocalizedText></p>:<LoadingState/>}
+      {mfa||mfaError?<p><LocalizedText>{mfa?mfa.enabled?"Dein Konto ist zusätzlich mit einer Authenticator-App geschützt.":"Ein persönlicher E-Mail-Code schützt jede neue Anmeldung.":"Anmeldeschutzstatus nicht verfügbar."}</LocalizedText></p>:<LoadingState/>}
     </section>
 
     <section className="surface security-card">

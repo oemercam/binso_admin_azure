@@ -87,23 +87,21 @@ export async function verifyNavigationPersistence(page,{base,capture=async()=>{}
    const content=await page.locator('.page-container').boundingBox();
    assert.ok(sidebar&&sidebar.width>68&&content.x>=sidebar.x+sidebar.width,'Desktop content reserves its actual sidebar width');
    const railVisible=await page.locator('.settings-context-navigation').isVisible();
-   const settings=page.locator(railVisible?'.settings-context-navigation':'.settings-mobile-navigation');
-   if(!railVisible)await settings.locator('summary').click();
-   await settings.getByRole('link',{name:'Darstellung',exact:true}).click();
-   await page.waitForURL(base+'/einstellungen/darstellung');
-   assert.equal(await settings.locator('a[aria-current="page"]').getAttribute('href'),'/einstellungen/darstellung','Settings siblings announce the current page');
-   if(!railVisible){assert.equal(await settings.getAttribute('open'),null,'Compact explorer closes after navigation');assert.equal((await settings.locator('summary').textContent()).trim(),'Darstellung','Closed explorer still exposes its current visible section');}
-   assert.ok(await page.getByRole('radiogroup',{name:'Darstellung',exact:true}).isVisible(),'Existing appearance control remains reachable');
+   assert.equal(await page.locator('.settings-mobile-navigation').count(),0,'No retired hamburger or duplicate current-section strip');
+   if(railVisible){
+    const settings=page.locator('.settings-context-navigation');await settings.getByRole('link',{name:'Darstellung',exact:true}).click();await page.waitForURL(base+'/einstellungen/darstellung');assert.equal(await settings.locator('a[aria-current="page"]').getAttribute('href'),'/einstellungen/darstellung','Visible settings siblings announce the current page');
+   }else{
+    await page.locator('.mobile-back,.desktop-back').filter({visible:true}).click();await page.waitForURL(base+'/einstellungen');await page.locator('.settings-overview').getByRole('link',{name:'Darstellung',exact:true}).click();await page.waitForURL(base+'/einstellungen/darstellung');
+   }
+   await page.getByRole('radiogroup',{name:'Darstellung',exact:true}).waitFor({state:'visible'});assert.ok(await page.getByRole('radiogroup',{name:'Darstellung',exact:true}).isVisible(),'Existing appearance control remains reachable');
    await capture('settings-desktop-'+width);
   }
   await page.setViewportSize({width:390,height:840});
   await page.goto(base+'/einstellungen/konto');await page.waitForLoadState('networkidle');
   assert.equal(await page.locator('.settings-context-navigation').isVisible(),false,'Desktop settings rail stays out of the phone flow');
-  const menu=page.locator('.settings-mobile-navigation');
-  assert.equal(await menu.getAttribute('open'),null,'Phone settings menu starts compact');
-  await menu.locator('summary').focus();await menu.locator('summary').press('Enter');
-  await menu.getByRole('link',{name:'Sicherheit',exact:true}).click();await page.waitForURL(base+'/einstellungen/sicherheit');
-  assert.equal(await menu.getAttribute('open'),null,'Changing page closes the phone menu without covering the form');
+  assert.equal(await page.locator('.settings-mobile-navigation').count(),0,'Phone settings use the overview without an extra hamburger');
+  await page.locator('.mobile-back').click();await page.waitForURL(base+'/einstellungen');
+  const security=page.locator('.settings-overview').getByRole('link',{name:'Sicherheit',exact:true});await security.focus();await security.press('Enter');await page.waitForURL(base+'/einstellungen/sicherheit');
   await page.getByRole('button',{name:'Passwort ändern',exact:true}).click();
   const password=page.getByRole('dialog',{name:'Passwort ändern',exact:true});
   assert.equal(await password.locator('input[type="password"]').count(),3,'Existing current/new/confirm password fields stay in the real shared form');
@@ -112,8 +110,6 @@ export async function verifyNavigationPersistence(page,{base,capture=async()=>{}
   await capture('settings-mobile-sibling-navigation');
   const returnPath='/dashboard?panel=account';
   await page.goto(base+'/einstellungen/konto?accountReturn='+encodeURIComponent(returnPath));await page.waitForLoadState('networkidle');
-  await menu.locator('summary').click();await menu.getByRole('link',{name:'Darstellung',exact:true}).click();
-  await page.waitForURL(base+'/einstellungen/darstellung?accountReturn='+encodeURIComponent(returnPath));
-  assert.equal(await page.locator('.mobile-back').getAttribute('href'),returnPath,'Switching settings sections preserves the original safe account return path');
+  assert.equal(await page.locator('.mobile-back').getAttribute('href'),returnPath,'Account preserves its original safe return path without a duplicate mobile menu');await page.locator('.mobile-back').click();await page.waitForURL(base+returnPath);
  }finally{await page.setViewportSize(viewport)}
 }

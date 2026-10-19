@@ -196,7 +196,7 @@ try{
  await db.query("insert into organizations(id,name,slug,is_demo,status) values($1,'Synthetic sandbox','sandbox-test',true,'trial')",[sandbox]);
  await db.query("insert into app_users(id,email,display_name,status) values('sandbox-user','sandbox-user@example.invalid','Demo','active')");
  await db.query("insert into organization_memberships(organization_id,user_id,email,role,status) values($1,'sandbox-user','sandbox-user@example.invalid','owner','active')",[sandbox]);
- await db.query("select set_config('app.organization_id',$1,false)",[sandbox]);
+ await db.query("select set_config('app.organization_id',$1,false),set_config('app.user_id','sandbox-user',false)",[sandbox]);
  await seedDatabaseDemo(client,sandbox,'sandbox-user');
  const sandboxInvoices=await db.query('select id from invoices where organization_id=$1',[sandbox]);
  assert.ok(sandboxInvoices.rows.length>20);
@@ -236,7 +236,7 @@ try{
  const loadedExpense=(await listApiBusiness(client,clonedSession,'expenses','id=eq.'+persistedExpense.rows[0].id))[0];
  assert.equal(loadedExpense.category,'Reise');assert.equal(loadedExpense.status,'submitted');assert.equal(Number(loadedExpense.amount),123.45);
  const tenantWrapper=dataModule('export async function withTenant(org,user,fn){return globalThis.__customerPersistenceTest(org,user,fn)}');
- globalThis.__customerPersistenceTest=async(org,user,fn)=>{await db.query("select set_config('app.organization_id',$1,false)",[org]);return fn(client)};
+ globalThis.__customerPersistenceTest=async(org,user,fn)=>{await db.query("select set_config('app.organization_id',$1,false),set_config('app.user_id',$2,false)",[org,user]);return fn(client)};
  const customerSource=(await fs.readFile('lib/server/repositories/customers.ts','utf8')).replace('import "server-only";','').replace('"@/lib/server/db"',JSON.stringify(tenantWrapper)).replace('"@/lib/server/audit"',JSON.stringify(audit)).replace('"@/lib/server/http"',JSON.stringify(http)).replace('"./business-api"',JSON.stringify(dataModule(businessSource))).replace('"../business-idempotency"',JSON.stringify(idempotencyModule));
  const customerRepository=await import(dataModule(customerSource));
  const input={contactFirstName:"Synthetic",contactLastName:"Contact",name:'Persistence Test AG',email:'test@example.invalid',phone:'+41 00 000 00 00',city:'Zürich',postalCode:'8000',sector:'Beratung',address:'Testweg 1',uid:'TEST',language:'de',paymentDays:45,discount:5,notes:'Persistente interne Kundennotiz'};
@@ -294,7 +294,7 @@ try{
  assert.equal(new Set(trialTenants).size,50);
  await db.exec('set role binso_runtime');
  for(const [i,organizationId] of trialTenants.entries()){
-  await db.query("select set_config('app.organization_id',$1,false)",[organizationId]);
+  await db.query("select set_config('app.organization_id',$1,false),set_config('app.user_id',$2,false)",[organizationId,`trial-probe-${i}`]);
   const visible=await db.query('select organization_id,name from customers');
   assert.equal(visible.rows.length,1);assert.equal(visible.rows[0].organization_id,organizationId);assert.equal(visible.rows[0].name,`Customer ${i}`);
   const foreignTenant=trialTenants[(i+1)%trialTenants.length];
@@ -412,8 +412,10 @@ try{
  globalThis.__timerSession=timerSession;
  globalThis.__timerTenant=async(org,user,task)=>{await db.exec('begin');try{await db.query("select set_config('app.organization_id',$1,true),set_config('app.user_id',$2,true)",[org,user]);const result=await task(client);await db.exec('commit');return result;}catch(e){await db.exec('rollback');throw e;}};
  const timerHttp=dataModule(`export class ApiError extends Error {constructor(status,code,message){super(message);this.status=status;this.code=code}} export const apiError=e=>({error:e.code,status:e.status});export const json=x=>x;export const assertSameOrigin=()=>{};export const cleanText=(x)=>typeof x==='string'?x.trim():'';export const readJson=async x=>x.body;`);
+ const workforceSource=(await fs.readFile('lib/server/workforce-access.ts','utf8')).replace("import 'server-only';",'').replace("'./http'",JSON.stringify(timerHttp)).replace("'./rbac'",JSON.stringify(dataModule('export const authorize=()=>{};')));
+ const workforceModule=dataModule(workforceSource);
  let timerSource=await fs.readFile('app/api/time-tracker/route.ts','utf8');
- const timerDependencies={"@/lib/projects":dataModule(await fs.readFile("lib/projects.ts","utf8")),"@/lib/server/session":dataModule('export const requireSession=async()=>globalThis.__timerSession;'),"@/lib/server/rbac":dataModule('export const authorize=()=>{};'),"@/lib/server/db":dataModule('export const withTenant=(...args)=>globalThis.__timerTenant(...args);'),"@/lib/server/http":timerHttp};
+ const timerDependencies={"@/lib/financial-status":financialModule,"@/lib/server/workforce-access":workforceModule,"@/lib/projects":dataModule(await fs.readFile("lib/projects.ts","utf8")),"@/lib/server/session":dataModule('export const requireSession=async()=>globalThis.__timerSession;'),"@/lib/server/rbac":dataModule('export const authorize=()=>{};'),"@/lib/server/db":dataModule('export const withTenant=(...args)=>globalThis.__timerTenant(...args);'),"@/lib/server/http":timerHttp};
  for(const [key,url] of Object.entries(timerDependencies))timerSource=timerSource.replaceAll(JSON.stringify(key),JSON.stringify(url));
  const timer=await import(dataModule(timerSource));
  await db.query("select set_config('app.organization_id',$1,false)",[timerSession.organizationId]);
@@ -447,7 +449,7 @@ try{
  globalThis.__processSession={...session,isDemo:false,organizationStatus:'active',email:'process@example.invalid'};
  globalThis.__processTransaction=async(org,fn)=>{await db.exec('begin');try{await db.query("select set_config('app.organization_id',$1,true)",[org]);const r=await fn(client);await db.exec('commit');return r}catch(e){await db.exec('rollback');throw e}};
  globalThis.__processPlatform=async(fn)=>{await db.exec('begin');try{await db.query("select set_config('app.platform_operator','true',true)");const r=await fn(client);await db.exec('commit');return r}catch(e){await db.exec('rollback');throw e}};
- const manualTimeSource=(await fs.readFile('app/api/time-entries/route.ts','utf8')).replace('"@/lib/projects"',JSON.stringify(dataModule(await fs.readFile('lib/projects.ts','utf8')))).replace('"@/lib/server/business-idempotency"',JSON.stringify(idempotencyModule)).replace('"@/lib/money"',JSON.stringify(moneyModule)).replace('"@/lib/server/http"',JSON.stringify(processHttp)).replace('"@/lib/server/session"',JSON.stringify(processSession)).replace('"@/lib/server/rbac"',JSON.stringify(processRbac)).replace('"@/lib/server/db"',JSON.stringify(processDb)).replace('"@/lib/permissions"',JSON.stringify(permissions));
+ const manualTimeSource=(await fs.readFile('app/api/time-entries/route.ts','utf8')).replace('"@/lib/server/workforce-access"',JSON.stringify(workforceModule)).replace('"@/lib/projects"',JSON.stringify(dataModule(await fs.readFile('lib/projects.ts','utf8')))).replace('"@/lib/server/business-idempotency"',JSON.stringify(idempotencyModule)).replace('"@/lib/money"',JSON.stringify(moneyModule)).replace('"@/lib/server/http"',JSON.stringify(processHttp)).replace('"@/lib/server/session"',JSON.stringify(processSession)).replace('"@/lib/server/rbac"',JSON.stringify(processRbac)).replace('"@/lib/server/db"',JSON.stringify(processDb)).replace('"@/lib/permissions"',JSON.stringify(permissions));
  const manualTimeHandler=await import(dataModule(manualTimeSource));globalThis.__processSession={...globalThis.__processSession,name:'Fixture Person'};
  const manualCreated=await manualTimeHandler.POST({headers:new Headers(),body:{customerId:documentArgs.p_customer_id,projectName:'Arbeitszeit',description:'Manual fixture',durationMinutes:60,startedAt:'2026-10-06T12:00:00'}});
  const replayBody={customerId:documentArgs.p_customer_id,projectName:'Arbeitszeit',description:'Idempotent manual fixture',durationMinutes:30,startedAt:'2026-10-06T12:00:00'};
@@ -581,7 +583,10 @@ try{
  globalThis.__processSession={...session,role:'project_manager'};
  await assert.rejects(()=>databaseProcess.tenantUpdate('expenses',expenseId,{...expenseBody,status:'approved'}),e=>e.code==='self_approval_forbidden');
  globalThis.__processSession=session;
+ await assert.rejects(()=>databaseProcess.tenantUpdate('expenses',expenseId,{...expenseBody,status:'approved'}),e=>e.code==='self_approval_forbidden');
+ globalThis.__processSession={...session,userId:'independent-expense-reviewer'};
  await databaseProcess.tenantUpdate('expenses',expenseId,{...expenseBody,status:'approved'});
+ globalThis.__processSession=session;
  await assert.rejects(()=>databaseProcess.tenantUpdate('expenses',expenseId,{...expenseBody,amount:99,status:'submitted'}),e=>e.code==='expense_locked');
  const expenseInvoice=await mutateApiBusiness(client,session,'create_document_atomic',{...documentArgs,p_number:'FLOW-EXPENSE',p_items:[{description:'Fixture meal',quantity:1,unit_price:42,expense_ids:[expenseId]}]});
  assert.equal((await db.query('select invoiced_invoice_id from expenses where id=$1',[expenseId])).rows[0].invoiced_invoice_id,expenseInvoice.id);
@@ -774,7 +779,7 @@ try{
  const reportExportModule=dataModule((await fs.readFile('lib/report-export.ts','utf8')).replace("'./projects'",JSON.stringify(dataModule(await fs.readFile('lib/projects.ts','utf8')))));
  const reportPeriodModule=dataModule((await fs.readFile('lib/statistics-period.ts','utf8')).replace("'./money'",JSON.stringify(moneyModule)));
  const reportLocaleModule=dataModule("export const asLocale=v=>['de','fr','it','en'].includes(v)?v:'de';export const localeCookie='binso_locale';export const translateMessage=(v,locale)=>locale==='fr'?'FR:'+v:v;");
- const loadProcessRoute=async path=>{let source=await fs.readFile(path,'utf8');for(const [specifier,url] of Object.entries({'@/lib/projects':dataModule(await fs.readFile('lib/projects.ts','utf8')),'@/lib/server/plan-access':dataModule("export const getOrganizationPlan=async()=>globalThis.__processReportPlan??'pro'"),'@/lib/server/repositories/reports':reportRepoModule,'@/lib/report-export':reportExportModule,'@/lib/financial-status':financialModule,'@/lib/statistics-period':reportPeriodModule,'@/lib/locales':reportLocaleModule,'@/lib/server/repositories/project-workspace':projectWorkspaceModule,'@/lib/money':moneyModule,'@/lib/server/http':processHttp,'@/lib/server/session':processSession,'@/lib/server/db':processDb,'@/lib/server/rbac':processRbac,'@/lib/server/audit':audit,'@/lib/server/business-idempotency':idempotencyModule,'@/lib/permissions':permissions,'@/lib/server/validation':dataModule(await fs.readFile('lib/server/validation.ts','utf8').then(source=>source.replace('import "server-only";','').replace('"./http"',JSON.stringify(processHttp))))})){source=source.replaceAll(JSON.stringify(specifier),JSON.stringify(url)).replaceAll("'"+specifier+"'",JSON.stringify(url));}return import(dataModule(source));};
+ const loadProcessRoute=async path=>{let source=await fs.readFile(path,'utf8');for(const [specifier,url] of Object.entries({'@/lib/projects':dataModule(await fs.readFile('lib/projects.ts','utf8')),'@/lib/server/plan-access':dataModule("export const getOrganizationPlan=async()=>globalThis.__processReportPlan??'pro'"),'@/lib/server/repositories/reports':reportRepoModule,'@/lib/report-export':reportExportModule,'@/lib/financial-status':financialModule,'@/lib/statistics-period':reportPeriodModule,'@/lib/locales':reportLocaleModule,'@/lib/server/file-access':dataModule((await fs.readFile('lib/server/file-access.ts','utf8')).replace('import "server-only";','').replace('"./env"',JSON.stringify(dataModule('export const env={}')))),'@/lib/server/workforce-access':workforceModule,'@/lib/server/repositories/project-workspace':projectWorkspaceModule,'@/lib/money':moneyModule,'@/lib/server/http':processHttp,'@/lib/server/session':processSession,'@/lib/server/db':processDb,'@/lib/server/rbac':processRbac,'@/lib/server/audit':audit,'@/lib/server/business-idempotency':idempotencyModule,'@/lib/permissions':permissions,'@/lib/server/validation':dataModule(await fs.readFile('lib/server/validation.ts','utf8').then(source=>source.replace('import "server-only";','').replace('"./http"',JSON.stringify(processHttp))))})){source=source.replaceAll(JSON.stringify(specifier),JSON.stringify(url)).replaceAll("'"+specifier+"'",JSON.stringify(url));}return import(dataModule(source));};
  const projectHandler=await loadProcessRoute('app/api/projects/route.ts');
  globalThis.__processSession={...session,name:'Process Owner',email:'owner@fixture.invalid'};
  const projectCreated=await projectHandler.POST({body:{name:'Cloud Migration',customerId:documentArgs.p_customer_id,sourceOffer:processQuote.number}});
@@ -823,7 +828,11 @@ try{
  assert.equal((await projectDetailHandler.PATCH({body:{...updateBody,version:closedProject.data.item.version}},projectParams)).status,200,'Authorized users can reopen a project without losing recorded work');
  const timeReview=await loadProcessRoute('app/api/time-entries/[id]/route.ts');
  const submitted=await timeReview.PATCH({body:{action:'submit'}},{params:Promise.resolve({id:timeCreated.data.item.id})});assert.equal(submitted.status,200,JSON.stringify(submitted));assert.ok(submitted.data.item.submitted_at);
+ assert.equal((await timeReview.PATCH({body:{action:'approve'}},{params:Promise.resolve({id:timeCreated.data.item.id})})).status,403,'Self approval is forbidden');
+ const timeAuthor=globalThis.__processSession;
+ globalThis.__processSession={...timeAuthor,userId:'independent-time-reviewer'};
  assert.equal((await timeReview.PATCH({body:{action:'approve'}},{params:Promise.resolve({id:timeCreated.data.item.id})})).status,200);
+ globalThis.__processSession=timeAuthor;
  const serviceArgs={...documentArgs,p_number:'PROCESS-TIME-INVOICE',p_items:[{description:'IT-Support September',quantity:12.5,unit:'Std.',unit_price:180,vat_rate:8.1,time_entry_ids:[timeCreated.data.item.id]},{description:'A long description for the rollout of adapters and workplace connectivity',quantity:2,unit:'Stück',unit_price:60,vat_rate:8.1}]};
  const atomic=(operation,args)=>globalThis.__processTransaction(demo,c=>mutateApiBusiness(c,session,operation,args));
  const timeInvoice=await atomic('create_document_atomic',serviceArgs);assert.equal(Number(timeInvoice.total),2561.97);
@@ -844,7 +853,7 @@ try{
  globalThis.__processSession={...savedProjectSession,organizationId:sandbox};const foreignReport=await reportHandler.GET(reportRequest());assert.equal(foreignReport.status,200);assert.notEqual(foreignReport.data.customers.total,ownerReport.data.customers.total,'Reports are scoped to the current company');globalThis.__processSession=savedProjectSession;
  console.log('Reports: bounded periods, role masking, company isolation and private formula-safe CSV export passed.');
  const unusedTime=await manualTimeHandler.POST({headers:new Headers(),body:{customerId:documentArgs.p_customer_id,description:'Direct customer work',durationMinutes:60,startedAt:'2026-10-01',billable:true,salesRate:180}});
- await timeReview.PATCH({body:{action:'approve'}},{params:Promise.resolve({id:unusedTime.data.item.id})});
+ globalThis.__processSession={...savedProjectSession,userId:'independent-time-reviewer'};assert.equal((await timeReview.PATCH({body:{action:'approve'}},{params:Promise.resolve({id:unusedTime.data.item.id})})).status,200);globalThis.__processSession=savedProjectSession;
  await assert.rejects(()=>atomic('create_document_atomic',{...serviceArgs,p_number:'PROCESS-INTRA-DUP',p_items:[{description:'One',quantity:1,unit_price:180,time_entry_ids:[unusedTime.data.item.id]},{description:'Two',quantity:1,unit_price:180,time_entry_ids:[unusedTime.data.item.id]}]}),e=>e.code==='duplicate_service');
  assert.equal((await db.query('select invoiced_invoice_id from time_entries where id=$1',[unusedTime.data.item.id])).rows[0].invoiced_invoice_id,null);
  await changeDocumentStatus(client,session,timeInvoice.number,'issue','');
@@ -856,7 +865,7 @@ try{
  const finalArgs={...paymentBase,p_paid_on:'2026-10-06',p_amount:1061.97,p_idempotency_key:'process-payment-3'};const finalPayment=await atomic('create_payment_idempotent',finalArgs);assert.equal((await atomic('create_payment_idempotent',finalArgs)).id,finalPayment.id);
  reloaded=(await listApiBusiness(client,session,'documents','id=eq.'+timeInvoice.id))[0];assert.equal(reloaded.payment_status,'paid');assert.equal(reloaded.paid_on,'2026-10-06','Completion date comes from chronologically accumulated actual payments');
  await assert.rejects(()=>atomic('create_payment_idempotent',{...finalArgs,p_idempotency_key:'process-paid-duplicate',p_amount:1}),e=>e.code==='payment_exceeds_balance');
- assert.equal((await timeReview.PATCH({body:{action:'approve'}},{params:Promise.resolve({id:timeCreated.data.item.id})})).status,404,'Invoiced time is locked');
+ assert.equal((await timeReview.PATCH({body:{action:'approve'}},{params:Promise.resolve({id:timeCreated.data.item.id})})).status,403,'Self-approval stays forbidden for invoiced time');
  const notificationRoute=await loadProcessRoute('app/api/notifications/route.ts');
  const notificationId=(await db.query("insert into in_app_notifications(organization_id,user_id,kind,title,body) values($1,$2,'system','Synthetic notification','No personal data') returning id",[demo,session.userId])).rows[0].id;
  const foreignNotificationId=(await db.query("insert into in_app_notifications(organization_id,user_id,kind,title,body) values($1,null,'system','Foreign synthetic notification','No personal data') returning id",[sandbox])).rows[0].id;
@@ -890,7 +899,7 @@ try{
  let compiledActivity=activityRouteSource;for(const [specifier,url] of Object.entries({'@/lib/server/http':processHttp,'@/lib/server/session':processSession,'@/lib/server/db':processDb,'@/lib/server/rbac':processRbac})){compiledActivity=compiledActivity.replaceAll("'"+specifier+"'",JSON.stringify(url));}
  const activity=await import(dataModule(compiledActivity));
 
- const customerEvents=await activity.GET({}, {params:Promise.resolve({id:documentArgs.p_customer_id})});assert.equal(customerEvents.status,200,JSON.stringify(customerEvents));for(const title of ['Rechnung erstellt','Angebot angenommen','Zahlung erhalten','Projekt erstellt','Arbeitszeit erfasst'])assert.ok(customerEvents.data.items.some(item=>item.title===title),title);
+ const customerEvents=await activity.GET({}, {params:Promise.resolve({id:documentArgs.p_customer_id})});assert.equal(customerEvents.status,200,JSON.stringify(customerEvents));for(const title of ['Rechnung erstellt','Angebot angenommen','Zahlung erhalten','Auftrag erstellt','Arbeitszeit erfasst'])assert.ok(customerEvents.data.items.some(item=>item.title===title),title);
  // Document retry replay, payload conflict and central counter behavior.
  const retryArgs={...documentArgs,p_idempotency_key:'document-repeat-fixture'};
  const createdOnce=await atomic('create_document_atomic',retryArgs);
@@ -922,9 +931,9 @@ try{
  const validation=dataModule((await fs.readFile('lib/server/file-validation.ts','utf8')).replace("'./http'",JSON.stringify(processHttp)));
  const limits=dataModule(await fs.readFile('config/limits.ts','utf8'));
  const fileAccess=dataModule((await fs.readFile('lib/server/file-access.ts','utf8')).replace('import "server-only";','').replace('"./env"',JSON.stringify(dataModule('export const env={}'))));
- const fileRoute=async path=>{let source=await fs.readFile(path,'utf8');for(const [specifier,url] of Object.entries({'@/lib/server/file-access':fileAccess,'@/lib/server/file-scan':dataModule('export async function scanFileWithEvidence(){return {status:"pending",evidence:null}}'),'@/lib/server/business-idempotency':idempotencyModule,'@/lib/server/file-relations':fileRelations,'@/lib/server/file-validation':validation,'@/config/limits':limits,'@/lib/server/http':processHttp,'@/lib/server/session':processSession,'@/lib/server/db':processDb,'@/lib/server/rbac':processRbac,'@/lib/permissions':permissions,'@/lib/server/storage':dataModule('export async function getBlobByUrl(){throw new Error("External storage must not be contacted by isolated tests")}')})){source=source.replaceAll(JSON.stringify(specifier),JSON.stringify(url)).replaceAll("'"+specifier+"'",JSON.stringify(url));}return import(dataModule(source));};
+ const fileRoute=async path=>{let source=await fs.readFile(path,'utf8');for(const [specifier,url] of Object.entries({'@/lib/server/workforce-access':workforceModule,'@/lib/server/file-access':fileAccess,'@/lib/server/file-scan':dataModule('export async function scanFileWithEvidence(){return {status:"pending",evidence:null}}'),'@/lib/server/business-idempotency':idempotencyModule,'@/lib/server/file-relations':fileRelations,'@/lib/server/file-validation':validation,'@/config/limits':limits,'@/lib/server/http':processHttp,'@/lib/server/session':processSession,'@/lib/server/db':processDb,'@/lib/server/rbac':processRbac,'@/lib/permissions':permissions,'@/lib/server/storage':dataModule('export async function getBlobByUrl(){throw new Error("External storage must not be contacted by isolated tests")}')})){source=source.replaceAll(JSON.stringify(specifier),JSON.stringify(url)).replaceAll("'"+specifier+"'",JSON.stringify(url));}return import(dataModule(source));};
  const fileUpload=await fileRoute('app/api/files/route.ts'),fileDownload=await fileRoute('app/api/files/[id]/download/route.ts');
- const uploadRequest=(entityId,mime='text/plain',bytes='synthetic attachment')=>{const form=new FormData();form.set('purpose','customer_document');form.set('entityId',entityId);form.set('file',new File([bytes],'fixture.txt',{type:mime}));return new Request('https://fixture.invalid/api/files',{method:'POST',headers:{'idempotency-key':crypto.randomUUID()},body:form});};
+ const uploadRequest=(entityId,mime='text/plain',bytes='synthetic attachment',purpose='customer_document')=>{const form=new FormData();form.set('purpose',purpose);form.set('entityId',entityId);form.set('file',new File([bytes],'fixture.txt',{type:mime}));return new Request('https://fixture.invalid/api/files',{method:'POST',headers:{'idempotency-key':crypto.randomUUID()},body:form});};
  const uploaded=await fileUpload.POST(uploadRequest(documentArgs.p_customer_id));assert.equal(uploaded.status,201,JSON.stringify(uploaded));assert.equal(uploaded.data.item.customer_id,documentArgs.p_customer_id);
  const pendingDownload=await fileDownload.GET({}, {params:Promise.resolve({id:uploaded.data.item.id})});assert.equal(pendingDownload.status,423);
  await db.query("update file_objects set scan_status='clean' where id=$1",[uploaded.data.item.id]);
@@ -943,6 +952,26 @@ try{
  assert.equal((await fileUpload.GET({nextUrl:new URL('https://fixture.invalid/api/files?customerId='+documentArgs.p_customer_id)})).status,403,'Explicit customer filter remains forbidden to HR');
  globalThis.__processSession=session;
  console.log('Actual file upload/list/download, content signature, cross-tenant association/download denial and role denial passed.');
+ globalThis.__processSession={...globalThis.__processSession,name:'Synthetic report author'};
+ const monthly=await manualTimeHandler.POST({headers:new Headers(),body:{reportMonth:'2001-02',customerId:documentArgs.p_customer_id,description:'Synthetic signed monthly report',durationMinutes:198*60,billable:true}});assert.equal(monthly.status,201,JSON.stringify(monthly));assert.equal(monthly.data.item.approved,false);
+ const monthlyParams={params:Promise.resolve({id:monthly.data.item.id})};
+ assert.equal((await timeReview.PATCH({body:{action:'submit'}},monthlyParams)).status,409,'A report without evidence cannot be submitted');
+ const reportUpload=await fileUpload.POST(uploadRequest(monthly.data.item.id,'text/plain','Synthetic signed timesheet, 198 hours','time_report'));assert.equal(reportUpload.status,201,JSON.stringify(reportUpload));assert.equal(reportUpload.data.item.time_entry_id,monthly.data.item.id);
+ assert.equal((await timeReview.PATCH({body:{action:'submit'}},monthlyParams)).status,409,'Pending evidence cannot bypass the strict scan policy');
+ await db.query("update file_objects set scan_status='clean' where id=$1",[reportUpload.data.item.id]);
+ assert.equal((await timeReview.PATCH({body:{action:'submit'}},monthlyParams)).status,200);
+ assert.equal((await fileUpload.POST(uploadRequest(monthly.data.item.id,'text/plain','Extra evidence','time_report'))).status,409,'Submitted report evidence is locked');
+ assert.equal((await timeReview.PATCH({body:{action:'approve'}},monthlyParams)).status,403,'A monthly report cannot be self-approved');
+ const monthlyAuthor=globalThis.__processSession;globalThis.__processSession={...monthlyAuthor,userId:'independent-time-reviewer'};
+ assert.equal((await timeReview.PATCH({body:{action:'reject'}},monthlyParams)).status,400,'A return requires a reason');
+ assert.equal((await timeReview.PATCH({body:{action:'reject',note:'Please correct the total'}},monthlyParams)).status,200);
+ globalThis.__processSession=monthlyAuthor;
+ assert.equal((await timeReview.PATCH({body:{action:'correct',durationMinutes:197*60,description:'Synthetic corrected report'}},monthlyParams)).status,200);
+ assert.equal((await timeReview.PATCH({body:{action:'submit'}},monthlyParams)).status,200);
+ globalThis.__processSession={...monthlyAuthor,userId:'independent-time-reviewer'};assert.equal((await timeReview.PATCH({body:{action:'approve'}},monthlyParams)).status,200);globalThis.__processSession=monthlyAuthor;
+ assert.equal((await timeReview.PATCH({body:{action:'correct',durationMinutes:196*60,description:'Forbidden edit'}},monthlyParams)).status,403,'Approved monthly content stays immutable');
+ console.log('Monthly report: 198-hour draft, actual associated file upload, scan/evidence gates, no self-review, reasoned return, correction, resubmission and independent approval passed.');
+
  // The unused generic record writer was removed. Public finance routes expose no
  // alternate PATCH/DELETE ledger writer that can bypass canonical transitions.
  for(const file of ['app/api/payments/[id]/route.ts','app/api/payments/route.ts']){const source=await fs.readFile(file,'utf8');assert.ok(!/export async function (PATCH|DELETE)/.test(source));}

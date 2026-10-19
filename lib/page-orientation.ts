@@ -7,7 +7,7 @@ const descriptions:Readonly<Record<string,string>>={
  "/zahlungen":"Zahlungseingänge erfassen und Rechnungen zuordnen.",
  "/produkte":"Produkte, Leistungen und Preise verwalten.",
  "/zeit":"Arbeitszeiten erfassen und Einträge verwalten.",
- "/projekte":"Aufträge, Projekte und erfasste Zeiten verwalten.",
+ "/projekte":"Aufträge und erfasste Zeiten verwalten.",
  "/spesen":"Ausgaben und Belege erfassen und verwalten.",
  "/belege":"Belege erfassen und verwalten.",
  "/finanzen":"Umsatz, offene Forderungen und Zahlungen im Blick.",

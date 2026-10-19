@@ -368,11 +368,12 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const presentation=documentPresentation(kind,draft,useDocumentTotals(draft).total);
   const title=existing?draft.number||documentKey||kind:`${kind} erstellen`;
   const headerActions=existing&&!editing
-    ? <div className="document-header-icons">{canEdit&&<IconButton label="Bearbeiten" icon="edit" onClick={()=>setEditing(true)}/>}<IconButton label="Weitere Aktionen" icon="more" onClick={()=>setMoreOpen(true)}/></div>
+    ? <div className="document-header-icons">{canEdit&&<IconButton label="Bearbeiten" icon="edit" onClick={()=>{draftBaseline.current=editableDocumentSnapshot(draft);setEditing(true)}}/>}<IconButton label="Weitere Aktionen" icon="more" onClick={()=>setMoreOpen(true)}/></div>
     : <div className="document-header-icons"><IconButton label="Vorschau" icon="file" onClick={()=>setPreview(true)}/></div>;
   const desktopActions=headerActions;
 
   const closeCreation=()=>{recovery.clear();allowDraftNavigation();router.push(returnTo)};
+  const closeEdit=()=>{if(draftBaseline.current)setDraft(JSON.parse(draftBaseline.current) as DocumentDraft);draftBaseline.current=null;recovery.clear();setDirty(false);setEditing(false)};
   const feedback=toast&&<Toast title={toast} tone={[`${kind} gespeichert.`,`${kind} erstellt.`,"Status aktualisiert.","Dokument als PDF versendet.","Gutschrift erfasst.","Rückerstattung erfasst.","Zahlungserinnerung versendet."].includes(toast)?"success":"danger"}/>;
   const documentContent=<>
     {!existing&&feedback}
@@ -389,7 +390,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
           {(kind==="Angebot"&&draft.status==="accepted"&&(tenantCan(documentRole,"invoices:write")||tenantCan(documentRole,"projects:write"))||canRecordPayment)&&<ContextActions mobile={false}>
             <LocalizedElement as="section" className="context-action-group" aria-label="Dokumentaktionen">
               <span className="compact-section-label"><LocalizedText>{"Aktionen"}</LocalizedText></span>
-              {kind==="Angebot"&&draft.status==="accepted"&&tenantCan(documentRole,"projects:write")&&<Link href={draft.projectId?"/projekte/"+encodeURIComponent(draft.projectId):"/projekte/neu?customerId="+encodeURIComponent(draft.customerId??"")+"&sourceOffer="+encodeURIComponent(draft.number)}><Icon name="clock"/><span><b><LocalizedText>{draft.projectId?"Projekt öffnen":"Auftrag starten"}</LocalizedText></b></span><Icon name="arrow" size={15}/></Link>}
+              {kind==="Angebot"&&draft.status==="accepted"&&tenantCan(documentRole,"projects:write")&&<Link href={draft.projectId?"/projekte/"+encodeURIComponent(draft.projectId):"/projekte/neu?customerId="+encodeURIComponent(draft.customerId??"")+"&sourceOffer="+encodeURIComponent(draft.number)}><Icon name="clock"/><span><b><LocalizedText>{draft.projectId?"Auftrag öffnen":"Auftrag starten"}</LocalizedText></b></span><Icon name="arrow" size={15}/></Link>}
               {kind==="Angebot"
                 ? tenantCan(documentRole,"invoices:write")&&<Link href={draft.invoiceNumber?"/rechnungen/"+encodeURIComponent(draft.invoiceNumber):"/rechnungen/neu?sourceOffer="+encodeURIComponent(documentKey??draft.number)}><Icon name="receipt" size={17}/><span><b><LocalizedText>{draft.invoiceNumber?"Rechnung öffnen":"Rechnung erstellen"}</LocalizedText></b><small><LocalizedText>{"Daten aus Angebot übernehmen"}</LocalizedText></small></span><Icon name="arrow" size={15}/></Link>
                 : canRecordPayment&&<Link href={"/zahlungen/neu?invoice="+encodeURIComponent(documentKey??draft.number)}><Icon name="wallet" size={17}/><span><b><LocalizedText>{"Zahlung erfassen"}</LocalizedText></b><small><LocalizedText>{"Zahlung zuordnen"}</LocalizedText></small></span><Icon name="arrow" size={15}/></Link>}
@@ -398,14 +399,14 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
         </div>
       : !existing?<FormWizard cancelAction={<Button variant="secondary" onClick={closeCreation} disabled={saving}><LocalizedText>{"Abbrechen"}</LocalizedText></Button>} labels={["Kunde und Dokumentdaten","Positionen",kind==="Angebot"?"Gültig bis":"Zahlungsbedingungen","Prüfen und als Entwurf speichern"]} step={wizardStep} onStep={setWizardStep} busy={saving} action={<Button disabled={saving||companyPending||Boolean(paymentIssue)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)} onClick={()=>void save()}><LocalizedText>{saving?"Wird gespeichert…":existing?"Speichern":"Als Entwurf speichern"}</LocalizedText></Button>}><DocumentEditor type={kind} draft={draft} onChange={next=>{draftBaseline.current??=editableDocumentSnapshot(draft);setDirty(editableDocumentSnapshot(next)!==draftBaseline.current);setDraft({...next,subtotal:undefined,vat:undefined,total:undefined})}} directory={directory} lockedCustomer={Boolean(sourceOffer)} step={!existing?wizardStep:undefined}/>{wizardStep===3&&<DocumentReview type={kind} draft={draft} onStep={setWizardStep}/>}{wizardStep===1&&editing&&kind==="Rechnung"&&draft.customerId&&tenantCan(documentRole,"invoices:write")&&<Button variant="secondary" href={"/zeit?invoice="+encodeURIComponent(existing?draft.number:"")+"&customerId="+encodeURIComponent(draft.customerId)}><LocalizedText>{"Freigegebene Zeiten hinzufügen"}</LocalizedText></Button>}</FormWizard>:<DocumentEditor type={kind} draft={draft} onChange={next=>{draftBaseline.current??=editableDocumentSnapshot(draft);setDirty(editableDocumentSnapshot(next)!==draftBaseline.current);setDraft({...next,subtotal:undefined,vat:undefined,total:undefined})}} directory={directory} lockedCustomer={Boolean(sourceOffer)} step={!existing?wizardStep:undefined}/>}
     {editing&&existing&&kind==="Rechnung"&&draft.customerId&&tenantCan(documentRole,"invoices:write")&&<Button variant="secondary" href={"/zeit?invoice="+encodeURIComponent(draft.number)+"&customerId="+encodeURIComponent(draft.customerId)}><LocalizedText>{"Freigegebene Zeiten hinzufügen"}</LocalizedText></Button>}
-    {editing&&existing&&<FormActions><Button disabled={saving||companyPending||Boolean(paymentIssue)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)} onClick={()=>void save()}><LocalizedText>{saving?"Wird gespeichert…":existing?"Speichern":kind+" erstellen"}</LocalizedText></Button></FormActions>}
+    {editing&&existing&&<FormActions><Button variant="secondary" onClick={closeEdit}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button disabled={saving||companyPending||Boolean(paymentIssue)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)} onClick={()=>void save()}><LocalizedText>{saving?"Wird gespeichert…":existing?"Speichern":kind+" erstellen"}</LocalizedText></Button></FormActions>}
   </>;
-  return <AppShell title={title} titleIsUserContent={existing} status={existing&&!editing&&!documentLoad.loading&&!documentLoad.error?presentation.statusLabel:undefined} statusTone={presentation.statusTone} subtitle={undefined} active={plural} backHref={returnTo} backLabel={returnTo==="/dashboard"?"Übersicht":kind==="Angebot"?"Angebote":"Rechnungen"} actions={desktopActions} mobileActions={existing&&!editing?headerActions:undefined} preview={preview} editing={editing} unsavedChanges={existing&&dirty}>
-    {existing?documentContent:<FormSheet workspace label={title} open onClose={closeCreation} busy={saving} dirty={dirty} wizard className="document-entry-workspace">{documentContent}</FormSheet>}
+  return <AppShell title={existing?editing?kind+" bearbeiten":kind:title} titleIsUserContent={false} status={existing&&!editing&&!documentLoad.loading&&!documentLoad.error?presentation.statusLabel:undefined} statusTone={presentation.statusTone} subtitle={undefined} active={plural} backHref={returnTo} backLabel={returnTo==="/dashboard"?"Übersicht":kind==="Angebot"?"Angebote":"Rechnungen"} actions={desktopActions} mobileActions={existing&&!editing?headerActions:undefined} preview={preview} editing={editing} unsavedChanges={false}>
+    {existing?(editing?<FormSheet workspace label={kind+" bearbeiten"} open onClose={closeEdit} busy={saving} dirty={dirty}>{documentContent}</FormSheet>:documentContent):<FormSheet workspace label={title} open onClose={closeCreation} busy={saving} dirty={dirty} wizard className="document-entry-workspace">{documentContent}</FormSheet>}
     {preview&&<DocumentModal previewDraft={{...draft,kind,sourceNumber:existing&&editing?documentKey:undefined}} pdfNumber={existing&&!editing?documentKey??draft.number:undefined} title={kind==="Angebot"?"Angebotsvorschau":"Rechnungsvorschau"} onClose={()=>setPreview(false)}/>}
     <ActionSheet label="Weitere Aktionen" open={moreOpen} busy={actionBusy} onClose={()=>setMoreOpen(false)}><div className="action-list">
       {canRecordPayment&&<ActionRow href={"/zahlungen/neu?invoice="+encodeURIComponent(documentKey??draft.number)} icon="wallet" title="Zahlung erfassen"/>}
-      {kind==="Angebot"&&draft.status==="accepted"&&tenantCan(documentRole,"projects:write")&&<ActionRow href={draft.projectId?"/projekte/"+encodeURIComponent(draft.projectId):"/projekte/neu?customerId="+encodeURIComponent(draft.customerId??"")+"&sourceOffer="+encodeURIComponent(draft.number)} icon="clock" title={draft.projectId?"Projekt öffnen":"Auftrag starten"}/>}
+      {kind==="Angebot"&&draft.status==="accepted"&&tenantCan(documentRole,"projects:write")&&<ActionRow href={draft.projectId?"/projekte/"+encodeURIComponent(draft.projectId):"/projekte/neu?customerId="+encodeURIComponent(draft.customerId??"")+"&sourceOffer="+encodeURIComponent(draft.number)} icon="clock" title={draft.projectId?"Auftrag öffnen":"Auftrag starten"}/>}
       {kind==="Angebot"&&draft.status==="accepted"&&tenantCan(documentRole,"invoices:write")&&<ActionRow href={draft.invoiceNumber?"/rechnungen/"+encodeURIComponent(draft.invoiceNumber):"/rechnungen/neu?sourceOffer="+encodeURIComponent(documentKey??draft.number)} icon="receipt" title={draft.invoiceNumber?"Rechnung öffnen":"Rechnung erstellen"}/>}
       <ActionRow onClick={()=>{setMoreOpen(false);setPreview(true)}} icon="file" title="Vorschau" navigation/>
       <ActionRow href={"/api/documents/"+encodeURIComponent(documentKey??draft.number)+"/pdf"} icon="file" title="PDF herunterladen"/>
@@ -446,7 +447,7 @@ function documentPresentation(type:DocumentKind,draft:DocumentDraft,total:number
 
 function DocumentReadView({type,draft,directory}:{type:DocumentKind;draft:DocumentDraft;directory:CustomerDirectory}){
   const totals=useDocumentTotals(draft);
-  const customer=resolveCustomer(draft,directory)??{sector:"",city:"",address:"",zip:""};
+  const [copied,setCopied]=useState(false);
   const currency=draft.currency??"CHF";
   const isInvoice=type==="Rechnung";
   const dueDate=isInvoice&&draft.date&&draft.due?invoiceDueDate(draft.date,draft.due):"";
@@ -454,8 +455,8 @@ function DocumentReadView({type,draft,directory}:{type:DocumentKind;draft:Docume
   const {displayStatus}=documentPresentation(type,draft,totals.total);
   return <div className="document-detail-view">
     <section className="document-detail-section">
-      <div className="document-customer-heading"><h2>{draft.customer}</h2></div>
-      {[customer.address,customer.zip,customer.city].some(Boolean)&&<p>{[customer.address,[customer.zip,customer.city].filter(Boolean).join(" ")].filter(Boolean).join(" · ")}</p>}
+      <div className="document-reference-row"><strong>{draft.number}</strong><Button variant="ghost" icon="copy" ariaLabel={copied?"Kopiert":"Nummer kopieren"} onClick={()=>{void navigator.clipboard.writeText(draft.number).then(()=>setCopied(true)).catch(()=>setCopied(false))}}/></div>
+      <div className="document-customer-heading"><h2>{draft.customerId?<Link href={"/kunden/"+encodeURIComponent(draft.customerId)}>{draft.customer}</Link>:draft.customer}</h2></div>
     </section>
     <section className="document-facts">
       <div><small><LocalizedText>{type==="Rechnung"?"Rechnungsdatum":"Angebotsdatum"}</LocalizedText></small><b>{isoToSwiss(draft.date)}</b></div>

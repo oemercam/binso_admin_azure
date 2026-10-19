@@ -25,7 +25,7 @@ export async function requireProjectCapacity(organizationId:string,userId:string
   const result=await client.query<{count:number}>(`select count(*)::int as count from projects where organization_id=$1 and archived_at is null`,[organizationId]);
   return Number(result.rows[0]?.count??0);
  });
- if(projectCount>=planLimits[plan].projects)throw new Response("Das Projektlimit deines aktuellen Plans ist erreicht.",{status:409});
+ if(projectCount>=planLimits[plan].projects)throw new Response("Der Auftraglimit deines aktuellen Plans ist erreicht.",{status:409});
  return plan;
 }
 

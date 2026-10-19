@@ -32,8 +32,10 @@ permanent-toolbox instructions. Historical audit reports are evidence, not rules
 - Route-bound creation/editing uses the existing FormSheet workspace mode; short
   contextual tasks retain modal sheets. Stable labeled navigation, contextual
   headers follow ux-current-approval.md. Creation belongs to the common content
-  command bar beside search/filter, never the global header or navigation.
-  Archived compact/floating geometry is not an active requirement.
+  command bar beside search/filter on desktop, never the global header or navigation.
+  The approved 19 October mobile CreateAction is one blue floating plus above the
+  navigation/safe area, hidden in forms, dialogs, keyboard input and chat.
+  See docs/architecture/ux-app-standardization.md for the current acceptance scope.
 - New pages must follow a documented page pattern and include loading, empty,
   error, read-only, keyboard and narrow-screen states. Mark missing reference
   screens as derived in the review; never silently call them original-approved.

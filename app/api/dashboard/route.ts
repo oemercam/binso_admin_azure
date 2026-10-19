@@ -22,7 +22,13 @@ export async function GET(){
    const attention=(await Promise.all(overdueIds.map(row=>listApiBusiness(c,session,'documents','kind=eq.invoice&id=eq.'+encodeURIComponent(String(row.id)))))).flat();
    const recent=canInvoices?await listApiBusiness(c,session,'documents','kind=eq.invoice&order=updated_at.desc&limit=5'):[];
    const cash=canFinance?await cashStatisticsData(c,session.organizationId):null;
-   return {attention,recent,cash,canFinance,stats:{customer_count:analytics.customerCount},invoices,payments,canInvoices,canPayments,...analytics};
+   const canTime=tenantCan(session.role,'time:read'),canExpenses=tenantCan(session.role,'expenses:read');
+   const work=!canFinance&&(canTime||canExpenses)?{
+    hours:canTime?Number((await c.query("select coalesce(sum(hours),0) hours from time_entries where organization_id=$1 and created_by_user_id=$2 and archived_at is null and work_date>=date_trunc('month',now() at time zone 'Europe/Zurich')::date and work_date<(date_trunc('month',now() at time zone 'Europe/Zurich')+interval '1 month')::date",[session.organizationId,session.userId])).rows[0].hours):null,
+    pending:canTime?Number((await c.query('select count(*) pending from time_entries where organization_id=$1 and created_by_user_id=$2 and archived_at is null and billable and not approved',[session.organizationId,session.userId])).rows[0].pending):null,
+    expenses:canExpenses?Number((await c.query("select count(*) pending from expenses where organization_id=$1 and created_by_user_id=$2 and archived_at is null and status='submitted'",[session.organizationId,session.userId])).rows[0].pending):null,
+   }:null;
+   return {attention,recent,cash,work,canFinance,stats:{customer_count:analytics.customerCount},invoices,payments,canInvoices,canPayments,...analytics};
   },{snapshot:true}));
  }catch(error){return apiError(error);}
 }

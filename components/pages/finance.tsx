@@ -23,7 +23,7 @@ export function FinancialDocumentsPage({kind,forceDemo=false}:{kind:"offer"|"inv
  const production=useBackendMode()&&!forceDemo;
  const invoice=kind==="invoice",title=invoice?"Rechnungen":"Angebote",route=invoice?"rechnungen":"angebote",placeholder=title+" suchen...";
  const chips=invoice?["Alle","Entwurf","Offen","Überfällig","Bezahlt","Storniert"]:["Alle","Entwurf","Versendet","Angenommen","Abgelehnt","Abgelaufen","Überarbeitet"];
- const columns:NonNullable<Parameters<typeof useRecordsController>[0]['columns']>=[{label:'Nummer',index:0},{label:'Kunde',index:1},{label:'Datum / Fälligkeit',index:2},{label:'Betrag',index:3,align:'right'},{label:'Status',index:5,status:true}];
+ const columns:NonNullable<Parameters<typeof useRecordsController>[0]['columns']>=[{label:'Nummer',index:0},{label:'Kunde',index:1},{label:'Datum',index:2},{label:'Betrag',index:3,align:'right'},{label:'Status',index:5,status:true}];
  const controller=useRecordsController({placeholder,chips,columns}),pageSize=50;
  const sortFields:Record<number,string>={0:'number',1:'customer_name',2:invoice?'due_date':'issue_date',3:'total',5:'display_status'};
  const params=new URLSearchParams({kind,limit:String(pageSize),offset:String(controller.page*pageSize),order:controller.sort==='default'?'created_at.desc':sortFields[controller.sortIndex]+'.'+controller.sort});

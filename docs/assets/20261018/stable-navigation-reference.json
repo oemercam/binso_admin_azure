@@ -1,15 +1,15 @@
 {
   "base": "1a2813d01a9024bd367acff9b3fe61e599e6ed54",
-  "approval": "Owner requested the complete app UX package after the 76-route diagnosis: stable visible navigation labels, viewport-wide opaque safe-area background, contextual headers and the later approved labeled creation button in the content command bar, never the global header. Former compact/floating geometry is superseded. Access, destinations and icons remain exact. Derived expectations require independent browser validation; no physical PWA acceptance.",
+  "approval": "Owner requested the complete app UX package after the 76-route diagnosis: stable visible navigation labels, viewport-wide opaque safe-area background, contextual headers and the later approved labeled creation button in the content command bar, never the global header. Former compact/floating geometry is superseded. 19 October: chat hides navigation; creation is additionally restricted by the server-matched role matrix. Existing destinations and icons remain exact. Derived expectations require independent browser validation; no physical PWA acceptance.",
   "access": {
-    "permissions": "92d41f0536d7662734657ba4d898eba7e6e97e16fb4c8025eb36faf54e19152b",
+    "permissions": "7a1713be22d77d4b1f8cf2035eac9f0a05fcdc138a13ef59d629274c8133ff3c",
     "destinations": "fe597be560572c6f6cff35505be600ab191cdf0c96bf21d81bf90661aef04ac8"
   },
-  "baseIcons": "b01b4f68013ccaea6f5846ffb30b07bc0a079eac3adeb9bac3800cbfdbe9366e",
+  "baseIcons": "99168691ba5c419cc713b48ef443a89821fc72f9997fce59676c2ddd5c9c62c5",
   "snapshot": {
     "markup": "d6874da5e98082dee2049d0618e9d0157c724a4080a2109b86198b9a97f3bebb",
-    "logic": "7c405ba4b85822168d8f4c20d2ad0a3556fd146c19cb40264abf36c47ae77b31",
-    "icons": "b01b4f68013ccaea6f5846ffb30b07bc0a079eac3adeb9bac3800cbfdbe9366e",
+    "logic": "14154822231d367414432e306ee5c580a4b9e492baf40cf74938063032ed06bf",
+    "icons": "99168691ba5c419cc713b48ef443a89821fc72f9997fce59676c2ddd5c9c62c5",
     "rules": "9d49c1941946b6c44c33cddfe4e34adfcdda158018bebef4fa3a742424db4398",
     "tokens": "ce83c096a14e03f4789f91809f499e2eb9db61e70869ee9d2aa22a2e2219ed01",
     "tokenNames": [

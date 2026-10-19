@@ -2,7 +2,7 @@
 import {LocalizedText} from "@/lib/client/locale";
 import Link from 'next/link';
 import {AppShell} from '../app-shell';
-import {QuickCreateAction,QuickCreateLinks} from '../binso-ux';
+import {QuickCreateAction,QuickCreateLinks,ListRow} from '../binso-ux';
 import {CashOverview} from '../cash-statistics';
 import type {CashStatisticsData} from '@/lib/cash-statistics';
 import {useApiQuery} from '@/lib/client/use-api-query';
@@ -11,7 +11,7 @@ import {financialStatus,businessDate} from '@/lib/financial-status';
 import {DocumentSummaryRow,type DocumentListItem} from '../document-list';
 import {SectionTitle,LoadingState,ErrorState} from '../ui';
 
-type DashboardData={cash?:CashStatisticsData|null;canFinance?:boolean;canInvoices?:boolean;canPayments?:boolean;stats?:{customer_count:number};analyticsInvoices?:Array<{issue_date:string;invoice_count:number}>;invoices?:DocumentListItem[];attention?:DocumentListItem[];recent?:DocumentListItem[]};
+type DashboardData={work?:{hours:number|null;pending:number|null;expenses:number|null}|null;cash?:CashStatisticsData|null;canFinance?:boolean;canInvoices?:boolean;canPayments?:boolean;stats?:{customer_count:number};analyticsInvoices?:Array<{issue_date:string;invoice_count:number}>;invoices?:DocumentListItem[];attention?:DocumentListItem[];recent?:DocumentListItem[]};
 export function DashboardPage({forceDemo=false}:{forceDemo?:boolean}={}){
  const production=useBackendMode()&&!forceDemo;
  const query=useApiQuery<DashboardData>(isProductionBackendEnabled()&&production?'/api/dashboard':'/api/demo/dashboard');
@@ -24,9 +24,10 @@ export function DashboardPage({forceDemo=false}:{forceDemo?:boolean}={}){
  return <AppShell headingPlacement="content" title="Dein Überblick." active="dashboard" actions={<QuickCreateAction/>}>
   {query.loading?<LoadingState><LocalizedText>{"Übersicht wird geladen …"}</LocalizedText></LoadingState>:query.error?<ErrorState onRetry={query.refresh}><LocalizedText>{query.error}</LocalizedText></ErrorState>:<>
    {data?.canFinance&&data.cash&&<CashOverview data={data.cash} dashboard invoiceCount={countsAllowed?invoiceCount:undefined} customerCount={countsAllowed?data.stats?.customer_count:undefined}/>}
+   {data?.work&&<section className="bo-workspace-section"><SectionTitle title="Meine Arbeit"/>{data.work.hours!==null&&<ListRow href="/zeit" title="Erfasste Stunden" meta="Dieser Monat" value={Number(data.work.hours).toLocaleString('de-CH',{maximumFractionDigits:2})+' h'}/>}{data.work.pending!==null&&<ListRow href="/zeit?tab=entries" title="Offene Zeiten" meta="Eigene Einträge" value={String(data.work.pending)}/>}{data.work.expenses!==null&&<ListRow href="/spesen" title="Eingereichte Spesen" meta="Eigene Einträge" value={String(data.work.expenses)}/>}</section>}
    <QuickCreateLinks/>
    {attention.length>0&&<section className="bo-workspace-section"><SectionTitle title="Handlungsbedarf"/><div className="recent-invoices">{attention.map(item=><DocumentSummaryRow key={item.id} item={item} customerHeading compact/>)}</div></section>}
-   <section className="bo-workspace-section"><SectionTitle title="Zuletzt bearbeitete Rechnungen" action={<Link href="/rechnungen"><LocalizedText>{"Alle anzeigen"}</LocalizedText></Link>}/>{recent.length?<div className="recent-invoices">{recent.map(item=><DocumentSummaryRow key={item.id} item={item} customerHeading compact/>)}</div>:<p role="status"><LocalizedText>{"Noch keine Geschäftsvorgänge vorhanden."}</LocalizedText></p>}</section>
+   {data?.canInvoices!==false&&<section className="bo-workspace-section"><SectionTitle title="Zuletzt bearbeitete Rechnungen" action={<Link href="/rechnungen"><LocalizedText>{"Alle anzeigen"}</LocalizedText></Link>}/>{recent.length?<div className="recent-invoices">{recent.map(item=><DocumentSummaryRow key={item.id} item={item} customerHeading compact/>)}</div>:<p role="status"><LocalizedText>{"Noch keine Geschäftsvorgänge vorhanden."}</LocalizedText></p>}</section>}
   </>}
  </AppShell>;
 }

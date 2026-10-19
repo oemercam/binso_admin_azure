@@ -8,7 +8,7 @@ async function assertFilterTrigger(trigger,expanded){
 /** Exercise actual shared controls without saving entries or changing timer state. */
 export async function verifyTimeWorkspace(page,{capture}){
  const search=page.getByRole('searchbox',{name:'Zeiteinträge suchen',exact:true});
- const trigger=page.locator('.time-filter-toolbar button');
+ const trigger=page.getByRole('button',{name:'Zeitfilter',exact:true});
  await assertFilterTrigger(trigger,false);
  const original=await search.inputValue(),groups=await page.locator('.time-group').count();
  await search.fill('not-present-time-workspace');

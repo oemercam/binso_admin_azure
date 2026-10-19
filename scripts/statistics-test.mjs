@@ -18,7 +18,7 @@ for(const [from,to,resolution] of [['2026-10-01','2026-10-31','week'],['2026-05-
  const result=aggregateStatistics(events,{from,to},['income','costs']);assert.equal(result.resolution,resolution);assert.equal(result.totals.income,to==='2026-10-10'?0.3:90000.3);assert.ok(result.buckets.length<=24);
 }
 const long=aggregateStatistics([],{from:'1900-01-01',to:'9998-12-31'},['income']);assert.ok(long.buckets.length<=12,'Very long ranges remain bounded');assert.ok(long.buckets.every(bucket=>bucket.values.income===0),'No invented bars');
-const cashSource=(await fs.readFile('lib/cash-statistics.ts','utf8')).replace("'./money'",JSON.stringify(moneyModuleUrl));const {cashStatisticEvents}=await import(moduleUrl(cashSource));
+const cashSource=(await fs.readFile('lib/cash-statistics.ts','utf8')).replace("'./money'",JSON.stringify(moneyModuleUrl));const {cashStatisticEvents,financialStatisticEvents}=await import(moduleUrl(cashSource));
 assert.deepEqual(cashStatisticEvents({payments:[{payment_date:'2026-10-10',amount:50}],outflows:[{payment_date:'2026-10-11',amount:20}]}),[{date:'2026-10-10',values:{income:50,costs:0}},{date:'2026-10-11',values:{income:0,costs:20}}]);
 console.log('Central statistics: presets, inclusive dates, invalid dates, UTC/DST-independent groups, decimal precision, bounded long periods and cash mapping passed.');
 
@@ -60,6 +60,14 @@ let disclosure=nodes(statistics).find(n=>n.type===Button&&n.props['aria-controls
 assert.equal(nodes(statistics).find(n=>n.props?.id===':metrics:-more-metrics').props.hidden,true);
 disclosure.props.onClick();statistics=render();assert.equal(nodes(statistics).find(n=>n.props?.id===':metrics:-more-metrics').props.hidden,false,'Disclosure reveals additional metrics');
 console.log('Actual chart and shared KPI foundation: pointer/Enter/Space, zero segments, selected status/amount, drilldown, four primary metrics, negative values and accessible disclosure passed.');
+
+// Render the actual fallback overview: preserve geometry without fabricating invoice volume.
+const overviewExports={};
+Function('require','exports','useState','useEffect','businessDate','financialStatisticEvents','statisticBounds','aggregateStatistics','MetricTiles','MetricTile','LocalizedText','Select','SectionTitle','sumMoney','formatCurrency',compileComponent(declaration('cash-statistics.tsx',await fs.readFile('components/cash-statistics.tsx','utf8'),'CashOverview')))(require,overviewExports,initial=>[typeof initial==='function'?initial():initial,()=>{}],()=>{},()=>'2026-10-15',financialStatisticEvents,statisticBounds,aggregateStatistics,Tiles,Tile,textComponent,'select',()=>null,(await import(moneyModuleUrl)).sumMoney,String);
+const fallback=overviewExports.CashOverview({dashboard:true,data:{payments:[{payment_date:'2026-10-10',amount:50}],outflows:[{payment_date:'2026-10-11',amount:20}]}});
+const fallbackMetrics=nodes(fallback).filter(node=>node.type===Tile).map(node=>node.props);
+assert.deepEqual(fallbackMetrics.map(metric=>metric.label),['Monatsumsatz','Zahlungseingänge','Ausgaben','Zahlungssaldo']);
+assert.deepEqual(fallbackMetrics.map(metric=>metric.value),['—',50,20,30],'Missing invoice volume remains unknown; known cash is counted once');
 
 const {PGlite}=await import('@electric-sql/pglite');
 const financeDb=new PGlite();

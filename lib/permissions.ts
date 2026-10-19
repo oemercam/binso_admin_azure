@@ -71,6 +71,16 @@ export function routePermission(pathname:string):TenantPermission|undefined{
  const aliases:Record<string,string>={angebote:"offerten",zeit:"zeiterfassung",mitarbeiter:"personal",belege:"dokumente"};
  return permissionForModule(aliases[segment]??segment,"read");
 }
+/** Creating an unassigned customer/order is an administrative boundary.
+ * Existing role permissions still control every other creation route. */
+export function tenantCanCreateAt(role:string,path:string){
+ const area=path.split('/')[1],key=({angebote:'offerten',zeit:'zeiterfassung',mitarbeiter:'personal'} as Record<string,string>)[area]??area;
+ const permission=permissionForModule(key,'write');
+ if(!permission||!tenantCan(role,permission))return false;
+ if(area==='projekte')return ['owner','admin'].includes(role);
+ if(area==='kunden')return ['owner','admin','finance'].includes(role);
+ return true;
+}
 export function ownRecordOnly(role:string,moduleKey:string){
  return normalizeTenantRole(role)==="member"&&["zeiterfassung","spesen","aufgaben"].includes(moduleKey);
 }

@@ -76,12 +76,12 @@ export function AccountSettingsPage() {
   };
 
   const displayName=[firstName,lastName].filter(Boolean).join(" ")||profileName||"Benutzer";
-  return <AppShell title="Persönliche Daten" subtitle="Dein Konto und deine Profildaten." active="einstellungen" editing={editing} unsavedChanges={editing&&currentValues!==baseline} backHref="/einstellungen" backLabel="Einstellungen" mobileActions={!editing?<Button requiresWrite disabled={loading||!!loadError} variant="secondary" className="icon-button" ariaLabel="Bearbeiten" icon="edit" onClick={beginEdit}/>:undefined} actions={!editing?<Button requiresWrite disabled={loading||!!loadError} variant="secondary" icon="edit" onClick={beginEdit}><LocalizedText>{"Bearbeiten"}</LocalizedText></Button>:undefined}>
+  return <AppShell title="Persönliche Daten" subtitle="Dein Konto und deine Profildaten." active="einstellungen" editing={editing} unsavedChanges={false} backHref="/einstellungen" backLabel="Einstellungen" mobileActions={!editing?<Button requiresWrite disabled={loading||!!loadError} variant="secondary" className="icon-button" ariaLabel="Bearbeiten" icon="edit" onClick={beginEdit}/>:undefined} actions={!editing?<Button requiresWrite disabled={loading||!!loadError} variant="secondary" icon="edit" onClick={beginEdit}><LocalizedText>{"Bearbeiten"}</LocalizedText></Button>:undefined}>
     {loading?<LoadingState><LocalizedText>{"Einstellungen werden geladen …"}</LocalizedText></LoadingState>:loadError?<ErrorState onRetry={query.refresh} retryLabel="Erneut versuchen"><LocalizedText>{loadError}</LocalizedText></ErrorState>:<div className="settings-detail-grid">
       <section className="surface settings-profile">
         <Avatar name={displayName==="Benutzer"?"":displayName} identity={email} src={avatarUrl} size="large"/><div><h2>{displayName}</h2><p><LocalizedText verbatim>{email}</LocalizedText></p><p><LocalizedText verbatim={!!jobTitle}>{jobTitle||"Benutzer"}</LocalizedText></p></div>{editing&&<><label className="button button-secondary" htmlFor="profile-avatar-upload"><LocalizedText>{"Bild ändern"}</LocalizedText></label><Input id="profile-avatar-upload" hidden type="file" accept="image/png,image/jpeg,image/webp" onChange={e=>void uploadAvatar(e.target.files?.[0])}/></>}
       </section>
-      {editing?<section className="settings-form">
+      {editing?<FormSheet workspace label="Persönliche Daten bearbeiten" open onClose={()=>setEditing(false)} busy={saving} dirty={currentValues!==baseline}><section className="settings-form">
         <div className="form-grid two">
           <Field label="Vorname"><Input value={firstName} onChange={e=>setFirstName(e.target.value)}/></Field>
           <Field label="Nachname"><Input value={lastName} onChange={e=>setLastName(e.target.value)}/></Field>
@@ -89,8 +89,8 @@ export function AccountSettingsPage() {
           <Field label="Telefon"><Input type="tel" value={phone} onChange={e=>setPhone(e.target.value)}/></Field>
           <Field label="Funktion"><Input value={jobTitle} onChange={e=>setJobTitle(e.target.value)}/></Field>
         </div>
-        <FormActions ><Button requiresWrite disabled={loading||!!loadError||saving} onClick={()=>void save()}><LocalizedText>{saving?"Wird gespeichert…":"Speichern"}</LocalizedText></Button></FormActions>
-      </section>:<section className="settings-readonly"><dl className="detail-list"><div><dt><LocalizedText>{"Name"}</LocalizedText></dt><dd>{displayName}</dd></div><div><dt><LocalizedText>{"E-Mail"}</LocalizedText></dt><dd><LocalizedText>{email||"—"}</LocalizedText></dd></div><div><dt><LocalizedText>{"Telefon"}</LocalizedText></dt><dd><LocalizedText>{phone||"—"}</LocalizedText></dd></div><div><dt><LocalizedText>{"Funktion"}</LocalizedText></dt><dd><LocalizedText>{jobTitle||"—"}</LocalizedText></dd></div></dl></section>}
+        <FormActions sheet><Button variant="secondary" onClick={()=>setEditing(false)}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button requiresWrite disabled={loading||!!loadError||saving} onClick={()=>void save()}><LocalizedText>{saving?"Wird gespeichert…":"Speichern"}</LocalizedText></Button></FormActions>
+      </section></FormSheet>:<section className="settings-readonly"><dl className="detail-list"><div><dt><LocalizedText>{"Name"}</LocalizedText></dt><dd>{displayName}</dd></div><div><dt><LocalizedText>{"E-Mail"}</LocalizedText></dt><dd><LocalizedText>{email||"—"}</LocalizedText></dd></div><div><dt><LocalizedText>{"Telefon"}</LocalizedText></dt><dd><LocalizedText>{phone||"—"}</LocalizedText></dd></div><div><dt><LocalizedText>{"Funktion"}</LocalizedText></dt><dd><LocalizedText>{jobTitle||"—"}</LocalizedText></dd></div></dl></section>}
     </div>}
     {toast&&<Toast title={toast} tone={["Persönliche Daten gespeichert.","Firmendaten gespeichert.","Profilbild gespeichert.","Firmenlogo gespeichert."].includes(toast)?"success":"danger"}/>}
   </AppShell>;
@@ -105,6 +105,7 @@ export function CompanySettingsPage() {
   const [uid,setUid]=useState("");
   const [logoUrl,setLogoUrl]=useState("");
   const [street,setStreet]=useState("");
+  const [buildingNumber,setBuildingNumber]=useState("");
   const [postalCode,setPostalCode]=useState("");
   const [city,setCity]=useState("");
   const [email,setEmail]=useState("");
@@ -116,7 +117,7 @@ export function CompanySettingsPage() {
   const [saving,setSaving]=useState(false);
   const saveBusy=useRef(false);
   const [baseline,setBaseline]=useState("");
-  const currentValues=JSON.stringify([name,uid,street,postalCode,city,email,phone]);
+  const currentValues=JSON.stringify([name,uid,street,buildingNumber,postalCode,city,email,phone]);
   const beginEdit=()=>{setBaseline(currentValues);setEditing(true)};
 
   const [pendingLogo,setPendingLogo]=useState<File|null>(null);
@@ -128,9 +129,9 @@ export function CompanySettingsPage() {
     if(editing||!query.data)return;
     const item=query.data.item;let active=true;
     queueMicrotask(()=>{if(!active)return;
-      setName(String(item.name??""));setUid(String(item.uid??""));setLogoUrl(String(item.logo_url??""));setStreet(String(item.street??""));
+      setName(String(item.name??""));setUid(String(item.uid??""));setLogoUrl(String(item.logo_url??""));setStreet(String(item.street??""));setBuildingNumber(String(item.building_number??""));
       setPostalCode(String(item.postal_code??""));setCity(String(item.city??""));setEmail(String(item.email??""));setPhone(String(item.phone??""));
-      if(onboarding&&!onboardingOpened.current){onboardingOpened.current=true;setBaseline(JSON.stringify([String(item.name??""),String(item.uid??""),String(item.street??""),String(item.postal_code??""),String(item.city??""),String(item.email??""),String(item.phone??"")]));setEditing(true);}
+      if(onboarding&&!onboardingOpened.current){onboardingOpened.current=true;setBaseline(JSON.stringify([String(item.name??""),String(item.uid??""),String(item.street??""),String(item.building_number??""),String(item.postal_code??""),String(item.city??""),String(item.email??""),String(item.phone??"")]));setEditing(true);}
     });
     return()=>{active=false};
   },[editing,query.data,onboarding]);
@@ -141,7 +142,7 @@ export function CompanySettingsPage() {
       if(!isProductionBackendEnabled())throw new Error("Die Vorschau ist schreibgeschützt. Bitte eine Datenbank-Demo starten.");
       if(!name.trim()){throw new Error("Firmenname ist erforderlich.")}
       if(pendingLogo){const form=new FormData();form.append("file",pendingLogo);form.append("purpose","company_logo");const result=await apiUpload<{item:{id:string;scanStatus:string;available?:boolean}}>("/api/files",form);if(result.item.available!==true&&result.item.scanStatus!=="clean")throw new Error("Das Firmenlogo wartet auf die Sicherheitsprüfung. Das bisherige Logo bleibt erhalten.");setLogoUrl("/api/files/"+result.item.id+"/download");setPendingLogo(null);setLogoPreview("");}
-      await apiPatch("/api/settings/company",{name,uid,street,postalCode,city,email,phone,completeOnboarding:onboarding});
+      await apiPatch("/api/settings/company",{name,uid,street,buildingNumber,postalCode,city,email,phone,completeOnboarding:onboarding});
       if(onboarding){router.replace("/dashboard");return;}
       setToast(message);
       setEditing(false);
@@ -159,14 +160,14 @@ export function CompanySettingsPage() {
         <div className="form-grid two"><Field label="Firmenlogo" className="full"><Input id="company-logo-upload" type="file" accept="image/png,image/jpeg,image/webp" onChange={e=>void uploadLogo(e.target.files?.[0])}/></Field>
           <Field label="Firmenname *"><Input required autoComplete="organization" value={name} onChange={e=>setName(e.target.value)}/></Field>
           <Field label="UID"><Input value={uid} onChange={e=>setUid(e.target.value)}/></Field>
-          <Field label="Strasse"><Input value={street} onChange={e=>setStreet(e.target.value)}/></Field>
+          <Field label="Strasse"><Input value={street} onChange={e=>setStreet(e.target.value)}/></Field><Field label="Hausnummer"><Input maxLength={30} value={buildingNumber} onChange={e=>setBuildingNumber(e.target.value)}/></Field>
           <Field label="PLZ"><Input value={postalCode} onChange={e=>setPostalCode(e.target.value)}/></Field>
           <Field label="Ort"><Input value={city} onChange={e=>setCity(e.target.value)}/></Field>
           <Field label="E-Mail"><Input type="email" value={email} onChange={e=>setEmail(e.target.value)}/></Field>
           <Field label="Telefon"><Input type="tel" value={phone} onChange={e=>setPhone(e.target.value)}/></Field>
         </div>
         </section><FormActions sheet><Button requiresWrite disabled={loading||!!loadError||saving} onClick={()=>void save()}><LocalizedText>{saving?"Wird gespeichert…":onboarding?"Einrichtung abschliessen":"Speichern"}</LocalizedText></Button></FormActions>
-      </FormSheet>:<section className="settings-readonly"><dl className="detail-list"><div><dt><LocalizedText>{"Firmenname"}</LocalizedText></dt><dd><LocalizedText verbatim={true}>{name||"—"}</LocalizedText></dd></div><div><dt><LocalizedText>{"UID"}</LocalizedText></dt><dd><LocalizedText>{uid||"—"}</LocalizedText></dd></div><div><dt><LocalizedText>{"Adresse"}</LocalizedText></dt><dd><LocalizedText>{street||"—"}</LocalizedText><br/><LocalizedText>{[postalCode,city].filter(Boolean).join(" ")||"—"}</LocalizedText></dd></div><div><dt><LocalizedText>{"E-Mail"}</LocalizedText></dt><dd><LocalizedText>{email||"—"}</LocalizedText></dd></div><div><dt><LocalizedText>{"Telefon"}</LocalizedText></dt><dd><LocalizedText>{phone||"—"}</LocalizedText></dd></div></dl></section>}
+      </FormSheet>:<section className="settings-readonly"><dl className="detail-list"><div><dt><LocalizedText>{"Firmenname"}</LocalizedText></dt><dd><LocalizedText verbatim={true}>{name||"—"}</LocalizedText></dd></div><div><dt><LocalizedText>{"UID"}</LocalizedText></dt><dd><LocalizedText>{uid||"—"}</LocalizedText></dd></div><div><dt><LocalizedText>{"Adresse"}</LocalizedText></dt><dd><LocalizedText>{[street,buildingNumber].filter(Boolean).join(" ")||"—"}</LocalizedText><br/><LocalizedText>{[postalCode,city].filter(Boolean).join(" ")||"—"}</LocalizedText></dd></div><div><dt><LocalizedText>{"E-Mail"}</LocalizedText></dt><dd><LocalizedText>{email||"—"}</LocalizedText></dd></div><div><dt><LocalizedText>{"Telefon"}</LocalizedText></dt><dd><LocalizedText>{phone||"—"}</LocalizedText></dd></div></dl></section>}
     </div>}
     {toast&&<Toast title={toast} tone={["Persönliche Daten gespeichert.","Firmendaten gespeichert.","Profilbild gespeichert.","Firmenlogo gespeichert."].includes(toast)?"success":"danger"}/>}
   </AppShell>;

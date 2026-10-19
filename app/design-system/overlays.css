@@ -39,7 +39,6 @@
   display:flex;
   align-items:flex-end;
   justify-content:center;
-  background:var(--palette-rgba-0-0-0-24);
 }
 .bottom-sheet{
   width:min(100%,var(--sheet-max-width));
@@ -138,7 +137,12 @@
 .bottom-sheet .choice-list,.bottom-sheet .plan-choice-list{border-top:0}
 .bottom-sheet :is(.choice-list,.plan-choice-list)>button{width:100%;height:auto;min-height:var(--mobile-sheet-row-h)}
 .bottom-sheet :is(.choice-list,.plan-choice-list)>button:last-child{border-bottom:0}
-.sheet-layer{top:var(--dialog-viewport-top);bottom:auto;height:var(--dialog-available-height)}
+.sheet-layer{top:var(--dialog-viewport-top);bottom:auto;height:var(--dialog-available-height);isolation:isolate;background:transparent}
+.sheet-layer::before{content:"";position:fixed;inset:0;z-index:-1;background:var(--palette-rgba-0-0-0-24);pointer-events:none}
+.sheet-header .icon-button{color:var(--app-action-accent);min-width:44px;min-height:44px}
+.sheet-header .icon-button>svg{width:22px;height:22px;min-width:22px;min-height:22px}
+.bottom-sheet:not([data-wizard]) .sheet-body>form{display:grid;gap:var(--field-group-gap)}
+.bottom-sheet .form-field{margin:0;gap:var(--field-label-gap)}
 .bottom-sheet,.header-panel,.confirm-dialog{
   --color-bg:var(--app-canvas);--color-subtle:var(--app-surface);--control-border:var(--app-control-border);--control-radius:var(--app-control-radius);
 }

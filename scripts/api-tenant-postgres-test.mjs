@@ -36,6 +36,8 @@ try{
   // must exercise production permission guards, not demo exemptions.
   await pool.query('update organizations set is_demo=false where id=$1',[organizationId]);
  }
+ // Explicit staff identities for valid own-time/expense write cases; no email inference.
+ for(const role of ['project_manager','manager','member'])await pool.query("insert into employees(organization_id,external_id,name,email,role,employment_type,user_id) values($1,$2,$2,$3,'employee','hourly',$4)",[organizations[0],'http-linked-'+role,'linked-'+role+'@fixture.invalid','http-0-'+role]);
  const base='http://127.0.0.1:3218';
  try{await fetch(base+'/api/health');throw new Error('Refusing an occupied HTTP test port');}catch(e){if(e.message==='Refusing an occupied HTTP test port')throw e;}
  const serverEnv={...process.env,APP_URL:base,DATABASE_URL:address,DATABASE_SSL:'false',SESSION_COOKIE_NAME:'binso_v213_test_session'};
@@ -66,6 +68,7 @@ try{
  const reportRoles=["owner","admin","finance","hr","project_manager","manager","reader"];
  const readContracts=[
   ["/api/reports",reportRoles],
+  ['/api/workforce-assignments',['owner','admin']],
   ...['/api/auth/mfa','/api/auth/register','/api/auth/session','/api/auth/sessions','/api/dashboard','/api/files','/api/finance/overview','/api/integrations/status','/api/notifications','/api/search?q=Alpen','/api/settings/company','/api/settings/documents','/api/settings/notifications','/api/settings/profile','/api/support/tickets'].map(path=>[path,roles]),
   ...['/api/billing/catalog','/api/payments','/api/finance','/api/finance/overview?include=workspace','/api/settings/subscription','/api/time-entries/billing','/api/expenses/billing'].map(path=>[path,finance]),
   ...['/api/customers','/api/customers/'+customer.id,'/api/customers/'+customer.id+'/activity','/api/customers/'+customer.id+'/contacts','/api/customers/'+customer.id+'?include=workspace'].map(path=>[path,customerRoles]),
@@ -113,20 +116,23 @@ try{
  };
  // Valid independent synthetic payloads exercise successful persistence, not just
  // validation errors. Rejected roles must not change either tenant's row count.
- const customerWriters=['owner','admin','finance','project_manager','manager'];
- const projectWriters=['owner','admin','project_manager','manager'];
+ const customerWriters=['owner','admin','finance'];
+ const projectWriters=['owner','admin'];
+ const timeWriters=['owner','admin','project_manager','manager','member'];
+ const expenseWriters=['owner','admin','finance','project_manager','manager','member'];
+ const offerWriters=['owner','admin','project_manager','manager'];
  const paymentInvoice=(await pool.query("select id,customer_id from invoices where organization_id=$1 and archived_at is null and status in('sent','partial','overdue') and total_amount-paid_amount>3 limit 1",[organizations[0]])).rows[0];assert.ok(paymentInvoice,'Open synthetic invoice for three legal financial role writes');
  const writeContracts=[
   ['/api/customers','customers',customerWriters,role=>({name:'Write contract '+role,contactFirstName:'Synthetic',contactLastName:'Contact',email:role+'@write.invalid'})],
   ['/api/employees','employees',['owner','admin','hr'],role=>({firstName:'Write',lastName:role,jobTitle:'Synthetic ICT',workloadPercent:80,email:role+'@employee-write.invalid',weeklyHours:42,vacationDays:25})],
   ['/api/products','products_services',['owner','admin'],role=>({name:'Synthetic product '+role,kind:'service',unit:'hour',unitPrice:125,vatRate:8.1})],
   ['/api/projects','projects',projectWriters,role=>({name:'Synthetic project '+role,customerId:customer.id})],
-  ['/api/time-entries','time_entries',[...projectWriters,'member'],role=>({projectId:null,projectName:'Internal '+role,durationMinutes:60,startedAt:'2026-10-09',billable:false})],
-  ['/api/expenses','expenses',[...customerWriters,'member'],role=>({merchant:'Synthetic expense '+role,expenseDate:'2026-10-09',amount:10,currency:'CHF',vatRate:8.1,status:'draft'})],
+  ['/api/time-entries','time_entries',timeWriters,role=>({projectId:null,projectName:'Internal '+role,durationMinutes:60,startedAt:'2026-10-09',billable:false})],
+  ['/api/expenses','expenses',expenseWriters,role=>({merchant:'Synthetic expense '+role,expenseDate:'2026-10-09',amount:10,currency:'CHF',vatRate:8.1,status:'draft'})],
   ['/api/support/tickets','support_cases',roles,role=>({subject:'Synthetic support '+role,message:'Isolated role contract message'})],
   ['/api/payments','payments',finance,()=>({invoiceId:paymentInvoice.id,customerId:paymentInvoice.customer_id,paidOn:'2026-10-09',amount:1,method:'bank'})],
   ['/api/documents','invoices',finance,()=>({kind:'invoice',customerId:customer.id,issueDate:'2026-10-09',dueDate:'2026-11-09',currency:'CHF',items:[{description:'Synthetic invoice line',quantity:1,unitPrice:100,vatRate:8.1}]})],
-  ['/api/documents','quotes',projectWriters,()=>({kind:'offer',customerId:customer.id,issueDate:'2026-10-09',currency:'CHF',items:[{description:'Synthetic offer line',quantity:1,unitPrice:100,vatRate:8.1}]})],
+  ['/api/documents','quotes',offerWriters,()=>({kind:'offer',customerId:customer.id,issueDate:'2026-10-09',currency:'CHF',items:[{description:'Synthetic offer line',quantity:1,unitPrice:100,vatRate:8.1}]})],
  ];
  let writeCases=0;const createdInvoices=new Map();
  const missingContact=await write('POST','/api/customers',{name:'Invalid missing contact'},'owner');assert.equal(missingContact.status,400);assert.equal(missingContact.data.error,'contact_required','HTTP validation rejects a missing contact without weakening role contracts');
@@ -171,7 +177,7 @@ try{
   const original=(await pool.query('select name from customers where organization_id=$1 and id=$2',[organizations[1],(await pool.query('select id from customers where organization_id=$1 limit 1',[organizations[1]])).rows[0].id])).rows[0].name;
   const foreignCustomer=(await pool.query('select id from customers where organization_id=$1 limit 1',[organizations[1]])).rows[0].id;
   const result=await write('PATCH','/api/customers/'+foreignCustomer,{name:'Forbidden overwrite'},role);
-  assert.equal(result.status,customerWriters.includes(role)?404:403,role+' foreign customer write');
+  assert.equal(result.status,['owner','admin','finance','project_manager','manager'].includes(role)?404:403,role+' foreign customer write');
   assert.equal((await pool.query('select name from customers where id=$1',[foreignCustomer])).rows[0].name,original,'Cross-tenant write cannot mutate the object');
   const removed=await write('DELETE','/api/customers/'+foreignCustomer,{},role);
   assert.equal(removed.status,['owner','admin'].includes(role)?404:403,role+' foreign customer delete');

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 
 /** Real route integration, reused by the existing browser suite; no fixture baselines. */
 export async function verifyAppSelection(page,dialog){
- const select=dialog.getByLabel('Status / Typ',{exact:true});
+ const select=dialog.getByLabel('Status',{exact:true});
  const before=await select.inputValue();
  await select.click();
  const list=page.getByRole('listbox');await list.waitFor();

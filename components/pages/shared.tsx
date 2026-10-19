@@ -39,7 +39,7 @@ export function mapRemoteRows(collection:DemoCollection,items:Record<string,unkn
     const employee=item.employee as {first_name?:string;last_name?:string}|null|undefined;
     const person=employee?[employee.first_name,employee.last_name].filter(Boolean).join(" "):"Nicht zugewiesen";
     const statusMap:Record<string,string>={draft:"Entwurf",submitted:"Eingereicht",approved:"Genehmigt",posted:"Verbucht",rejected:"Abgelehnt"};
-    return [String(item.merchant??""),person,moneyChf(item.amount),String(item.id??""),statusMap[String(item.status)]??String(item.status??"")];
+    return [String(item.merchant??""),person,formatCurrency(Number(item.amount),String(item.currency??"CHF")),String(item.id??""),statusMap[String(item.status)]??String(item.status??""),swissDate(item.expense_date)];
   });
   if(collection==="payments") return items.map(item=>{
     const customer=item.customer as {name?:string}|null|undefined;

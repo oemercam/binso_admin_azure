@@ -68,21 +68,22 @@
     {
       "id": "UX24-OVERLAY",
       "scope": "Sheets/Dialog/Popover",
-      "requirement": "Lange routegebundene Erfassungen verwenden den bestehenden FormSheet-Workspace-Modus. Kurze Kontext-, Positions-, Filter- und Aktionsaufgaben bleiben modale Dialoge. Fokus, Escape/Back, Tastatur, Dirty-State und Safe Areas bleiben zentral.",
+      "requirement": "Lange routegebundene Erfassungen verwenden den bestehenden FormSheet-Workspace-Modus. Kurze Kontext-, Positions-, Filter- und Aktionsaufgaben bleiben modale Dialoge. Fokus, Escape/Back, Tastatur, Dirty-State und Safe Areas bleiben zentral. Erfassungen behalten ein blaues Schliessen-X und Abbrechen, keinen zusätzlichen Header-Zurück-Pfeil. Rückfrage nur bei geänderten Werten; Filter-Scrim umfasst die obere Safe Area.",
       "owner": "components/binso-ux.tsx",
       "acceptance": "Workspace ohne Scrim/Fokusfalle; Kinddialog mit Fokusführung; geschützte Navigation, Recovery und erreichbare Footer prüfen.",
       "status": "offen",
       "evidence": [],
-      "provenance": "Explicit complete app UX instruction following 76-route diagnosis on 2026-10-18; see docs/architecture/ux-current-approval.md"
+      "provenance": "Explicit collected owner decisions on 2026-10-19; docs/architecture/ux-app-standardization.md. Visual/runtime acceptance remains open."
     },
     {
       "id": "UX24-CHART",
       "scope": "KPI und Diagramme",
-      "requirement": "Ringbetrag und Label gemeinsam geometrisch zentriert; Legende vertikal mittig mit konsistenten Farbmarkierungen, echten Beträgen und Anteilen. Zeitreihen bleiben zeitbasiert.",
+      "requirement": "Finanzanalyse mit Zeitraum, drei Zahlungskennzahlen und einem echten Zeitdiagramm; Forderungen separat bei Bedarf. Kein erfundener Kontostand. Verwendete Ringe behalten geometrisch zentrierte Werte/Labels und echte Anteile.",
       "owner": "components/statistics.tsx",
       "acceptance": "Touch/Tastatur und gefiltertes Ziel mit korrektem Zeitraum/Betrag prüfen",
       "status": "offen",
-      "evidence": []
+      "evidence": [],
+      "provenance": "Explicit collected owner decisions on 2026-10-19; docs/architecture/ux-app-standardization.md. Visual/runtime acceptance remains open."
     },
     {
       "id": "UX24-PWA",
@@ -96,22 +97,22 @@
     {
       "id": "UX24-MOTION",
       "scope": "Motion/Glass",
-      "requirement": "Zentrale Motion-Tokens und Reduced Motion; kein Glass-/Blur-Fallback. Navigationslabels werden beim Scrollen niemals ausgeblendet. Aktive Zeit zentriert, ruhiger blauer Statuspunkt; bei Reduced Motion statisch.",
+      "requirement": "Zentrale Motion-Tokens und Reduced Motion; kein Glass-/Blur-Fallback. Navigationslabels werden beim Scrollen niemals ausgeblendet. Aktive Zeit zentriert, ruhiger blauer Statuspunkt; bei Reduced Motion statisch. Der aktive Timer verwendet einen ruhigen grünen Ring, Pause Amber, ohne fingierten Fortschritt. Initiales BINSO-Icon mit stabilen Abmessungen ohne wiederholte Zoom-/Pulsanimation.",
       "owner": "app/design-system/theme.css",
       "acceptance": "Reduced Motion, stabile Labels und deckende Flächen in beiden Themes prüfen.",
       "status": "offen",
       "evidence": [],
-      "provenance": "Explicit complete app UX instruction following 76-route diagnosis on 2026-10-18; see docs/architecture/ux-current-approval.md"
+      "provenance": "Explicit collected owner decisions on 2026-10-19; docs/architecture/ux-app-standardization.md. Visual/runtime acceptance remains open."
     },
     {
       "id": "UX24-NAV",
       "scope": "Bottom-Navigation",
-      "requirement": "Stabile Microsoft-App-Navigation bis zu allen Bildschirmrändern einschliesslich Safe Area. Ziele, Rechte und Icons bleiben unverändert. Erstellen als beschrifteter Button in der Inhalts-Command-Bar neben Suche/Filter, niemals im globalen Header oder in der Navigation; Touchziel mindestens 44px.",
+      "requirement": "Stabile Microsoft-App-Navigation mit unveränderten Zielen, Rechten und Icons bis einschliesslich Safe Area. Desktop: beschriftete zentrale CreateAction. Mobile: ein blauer Plus-Kreis unten rechts oberhalb Navigation, 44px, nie im Header; bei Erfassung, Dialog, Tastatur oder Chat verborgen. Im Chat entfällt die untere Navigation.",
       "owner": "components/app-chrome.tsx",
-      "acceptance": "Aktuelle navigation-contract/navigation-foundation Gates, abgeleitete v4-Geometrie und unabhängige Scroll-/Safe-Area-/Plus-Gegenproben; Tests erzeugen keine Referenz.",
+      "acceptance": "Navigation-/Browser-Gates, geometrische Zentrierung und unabhängige Safe-Area-/Scroll-/Plus-Gegenproben; keine automatisch erzeugte Referenz.",
       "status": "offen",
       "evidence": [],
-      "provenance": "Explicit complete app UX instruction following 76-route diagnosis on 2026-10-18; see docs/architecture/ux-current-approval.md"
+      "provenance": "Explicit collected owner decisions on 2026-10-19; docs/architecture/ux-app-standardization.md. Visual/runtime acceptance remains open."
     },
     {
       "id": "UX24-STYLE-001",

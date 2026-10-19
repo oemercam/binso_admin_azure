@@ -183,7 +183,8 @@
 .document-summary-amount>strong{margin-left:auto;text-align:right;white-space:normal;overflow-wrap:anywhere;min-width:0}
 .document-payment-term{margin-top:var(--field-label-gap);font-size:var(--control-label-font);color:var(--color-muted)}
 .record-wrapper:not(:last-child) .document-summary-row::after,
-.records>.document-summary-row:not(:last-child)::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--color-line)}
+.records>.document-summary-row:not(:last-child)::after,
+.recent-invoices>.document-summary-row:not(:last-child)::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--color-line)}
 .document-summary-row.is-compact{min-height:var(--mobile-row-h);grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto;gap:4px 12px;padding-block:15px}
 .document-summary-row.is-compact>b{grid-column:1;grid-row:1}
 .document-summary-row.is-compact .document-summary-amount>small{display:none}
@@ -379,3 +380,6 @@
 }
 
 .record-chevron{grid-column:2;grid-row:1/3;align-self:center;color:var(--color-muted);display:flex;align-items:center}
+
+.document-reference-row{display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:0}
+.document-reference-row strong{min-width:0;overflow-wrap:anywhere;font-size:var(--type-body)}

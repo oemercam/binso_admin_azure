@@ -43,18 +43,19 @@ export async function verifyCustomerStates(page,{base,capture=async()=>{}}){
   await page.getByRole('tab',{name:'Übersicht',exact:true}).focus();await page.keyboard.press('ArrowRight');
   await page.locator('.contact-main').waitFor();assert.equal(await page.getByRole('tab',{name:'Kontakte',exact:true}).getAttribute('aria-selected'),'true');
   const contact=page.locator('button.contact-main');await contact.focus();await contact.press('Enter');
+  const actions=page.getByRole('dialog',{name:'Kontaktaktionen',exact:true});await actions.waitFor();await actions.getByRole('button',{name:'Kontakt bearbeiten',exact:true}).click();
   const dialog=page.getByRole('dialog',{name:'Kontakt bearbeiten',exact:true});await dialog.waitFor();await capture('contact');
   await verifyChoiceField(page,dialog.locator('.form-check'),{capture:width=>capture('choice-'+width)});
   await page.keyboard.press('Escape');await dialog.waitFor({state:'hidden'});
   assert.equal(await contact.evaluate(el=>el===document.activeElement),true,'Contact dialog restores keyboard focus');
   await page.getByRole('tab',{name:'Dokumente',exact:true}).click();
-  await page.locator('.bo-statistics').waitFor();assert.equal(await page.locator('.bo-statistics .metric').count(),3,'Document tab retains actual financial metrics');await capture('documents');
+  await page.locator('.customer-tab-panel').getByRole('heading',{name:'Rechnungen und Angebote',exact:true}).waitFor();assert.equal(await page.locator('.bo-statistics').count(),0,'Documents retain files and records without a second finance analysis');assert.equal(await page.locator('.customer-tab-panel .mobile-record-list .document-summary-row').count(),2,'Actual invoice and offer remain available');await capture('documents');
   const session='**/api/auth/session';
   const readOnly=route=>route.fulfill({json:{authenticated:true,tenant:{id:'fixture-tenant',role:'owner',plan:'pro',readOnly:true}}});
   await page.route(session,readOnly);
   try{
    await page.goto(url+'?tab=contacts');await page.locator('button.contact-main').waitFor();
-   assert.equal(await page.locator('button.contact-main').isDisabled(),true,'Read-only contact identity cannot open an edit form');
+   assert.equal(await page.locator('button.contact-main').isDisabled(),false,'Read-only contacts retain communication actions');await page.locator('button.contact-main').click();const readActions=page.getByRole('dialog',{name:'Kontaktaktionen',exact:true});await readActions.waitFor();assert.equal(await readActions.getByRole('button',{name:'Kontakt bearbeiten',exact:true}).isDisabled(),true,'Read-only cannot enter the editor');assert.equal(await readActions.getByRole('button',{name:'Kontakt entfernen',exact:true}).isDisabled(),true,'Read-only cannot remove a contact');await page.keyboard.press('Escape');await readActions.waitFor({state:'hidden'});
    assert.equal(await page.getByRole('button',{name:'Kontakt',exact:true}).isDisabled(),true,'Read-only cannot create contacts');
    assert.equal(await page.getByRole('dialog').count(),0);await capture('read-only');
   }finally{await page.unroute(session,readOnly)}
