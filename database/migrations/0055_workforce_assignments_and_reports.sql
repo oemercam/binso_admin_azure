@@ -48,6 +48,8 @@ $$;
 create policy customer_workforce_scope on customers as restrictive for select using(app_workforce_access(id,null));
 create policy contact_workforce_scope on customer_contacts as restrictive for select using(app_workforce_access(customer_id,null));
 create policy project_workforce_scope on projects as restrictive for select using(app_workforce_access(customer_id,id));
+create policy customer_workforce_create on customers as restrictive for insert with check(app_workforce_role() in ('owner','admin','finance','demo_template'));
+create policy project_workforce_create on projects as restrictive for insert with check(app_workforce_role() in ('owner','admin','demo_template'));
 create policy quote_workforce_scope on quotes as restrictive for select using(app_workforce_access(customer_id,null));
 create policy invoice_workforce_scope on invoices as restrictive for select using(app_workforce_access(customer_id,null));
 create policy quote_line_workforce_scope on quote_lines as restrictive for select using(exists(select 1 from quotes q where q.id=quote_id and q.organization_id=quote_lines.organization_id));
@@ -68,7 +70,7 @@ begin
 end $$;
 create trigger workforce_time_write before insert or update of customer_id,project_id,employee_id,hours,work_date on time_entries for each row execute function enforce_workforce_time();
 create policy time_workforce_read on time_entries as restrictive for select using(app_workforce_role() in ('owner','admin','finance','hr','reader','demo_template') or created_by_user_id=current_setting('app.user_id',true) or (app_workforce_role() in ('project_manager','manager') and app_workforce_access(customer_id,project_id,work_date,true)));
-create policy expense_workforce_read on expenses as restrictive for select using(app_workforce_role() in ('owner','admin','finance','hr','reader','demo_template') or created_by_user_id=current_setting('app.user_id',true));
+create policy expense_workforce_read on expenses as restrictive for select using(app_workforce_role() in ('owner','admin','finance','hr','reader','demo_template') or created_by_user_id=current_setting('app.user_id',true) or (app_workforce_role() in ('project_manager','manager') and app_workforce_access(customer_id,null,expense_date)));
 
 alter table time_entries add column report_month date;
 alter table time_entries add column review_note text;
@@ -83,7 +85,7 @@ begin
  if new.archived_at is not null then return new; end if;
  perform pg_advisory_xact_lock(hashtextextended(new.organization_id::text||':'||coalesce(new.employee_id::text,new.created_by_user_id)||':'||coalesce(new.customer_id::text,''),0));
  if exists(select 1 from time_entries t where t.organization_id=new.organization_id and t.id<>new.id and t.archived_at is null
-  and coalesce(t.employee_id::text,t.created_by_user_id)=coalesce(new.employee_id::text,new.created_by_user_id)
+  and (t.employee_id=new.employee_id or ((t.employee_id is null or new.employee_id is null) and t.created_by_user_id=new.created_by_user_id))
   and t.customer_id is not distinct from new.customer_id
   and ((new.report_month is not null and coalesce(t.report_month,t.work_date)>=new.report_month and coalesce(t.report_month,t.work_date)<(new.report_month+interval '1 month'))
    or (t.report_month is not null and coalesce(new.report_month,new.work_date)>=t.report_month and coalesce(new.report_month,new.work_date)<(t.report_month+interval '1 month'))))
@@ -96,7 +98,7 @@ create policy file_workforce_scope on file_objects as restrictive for select usi
  app_workforce_role() in ('owner','admin','finance','hr','reader','demo_template') or
  (purpose='profile_avatar' and created_by=current_setting('app.user_id',true)) or purpose='company_logo' or
  (purpose='support_attachment' and exists(select 1 from support_cases s where s.id=support_case_id and s.organization_id=file_objects.organization_id and s.created_by_user_id=current_setting('app.user_id',true))) or
- (purpose='expense_receipt' and exists(select 1 from expenses e where e.id=expense_id and e.organization_id=file_objects.organization_id and e.created_by_user_id=current_setting('app.user_id',true))) or
+ (purpose='expense_receipt' and exists(select 1 from expenses e where e.id=expense_id and e.organization_id=file_objects.organization_id and (e.created_by_user_id=current_setting('app.user_id',true) or (app_workforce_role() in ('project_manager','manager') and app_workforce_access(e.customer_id,null,e.expense_date))))) or
  (purpose='time_report' and exists(select 1 from time_entries t where t.id=time_entry_id and t.organization_id=file_objects.organization_id and (t.created_by_user_id=current_setting('app.user_id',true) or (app_workforce_role() in ('project_manager','manager') and app_workforce_access(t.customer_id,t.project_id,t.work_date,true))))) or
  (purpose='customer_document' and app_workforce_access(customer_id,null)) or
  (purpose='offer_attachment' and exists(select 1 from quotes q where q.id=quote_id and q.organization_id=file_objects.organization_id and app_workforce_access(q.customer_id,null))) or
@@ -132,6 +134,7 @@ create trigger workforce_assignment_identity before insert or update on workforc
 create function protect_time_review() returns trigger language plpgsql
 set search_path=pg_catalog,public as $$
 begin
+ if new.created_by_user_id is distinct from old.created_by_user_id then raise exception 'Time author is immutable' using errcode='42501'; end if;
  if app_workforce_role() not in ('owner','admin','finance','project_manager','manager','member','demo_template') and not exists(select 1 from pg_roles where rolname=current_user and (rolsuper or rolbypassrls)) then raise exception 'Active time membership required' using errcode='42501'; end if;
  if new.approved and not old.approved then
   if new.created_by_user_id=current_setting('app.user_id',true) or app_workforce_role() not in ('owner','admin','project_manager','manager','demo_template')
@@ -156,17 +159,29 @@ begin
   then raise exception 'Expense assignment required' using errcode='42501'; end if;
  end if;
  if tg_op='UPDATE' then
+  if new.created_by_user_id is distinct from old.created_by_user_id then raise exception 'Expense author is immutable' using errcode='42501'; end if;
   if new.status in ('approved','rejected') and new.status is distinct from old.status then
    if new.created_by_user_id=current_setting('app.user_id',true) or app_workforce_role() not in ('owner','admin','project_manager','manager','demo_template')
     or (app_workforce_role() in ('project_manager','manager') and not app_workforce_access(new.customer_id,null,new.expense_date))
    then raise exception 'Independent expense review required' using errcode='42501'; end if;
   end if;
-  if (old.status in ('approved','posted') or old.invoiced_invoice_id is not null or old.reimbursed_at is not null
+  if (old.status in ('approved','posted') or (new.status in ('approved','rejected') and new.status is distinct from old.status) or old.invoiced_invoice_id is not null or old.reimbursed_at is not null
     or (app_workforce_role() in ('member','project_manager','manager') and old.created_by_user_id is distinct from current_setting('app.user_id',true)))
-   and row(new.customer_id,new.employee_id,new.quantity,new.unit_price,new.currency,new.expense_date,new.description,new.created_by_user_id)
-    is distinct from row(old.customer_id,old.employee_id,old.quantity,old.unit_price,old.currency,old.expense_date,old.description,old.created_by_user_id)
+   and row(new.customer_id,new.employee_id,new.quantity,new.unit_price,new.currency,new.expense_date,new.description,new.created_by_user_id,new.merchant,new.category,new.category_label,new.vat_rate,new.billable)
+    is distinct from row(old.customer_id,old.employee_id,old.quantity,old.unit_price,old.currency,old.expense_date,old.description,old.created_by_user_id,old.merchant,old.category,old.category_label,old.vat_rate,old.billable)
    then raise exception 'Expense content is immutable' using errcode='42501'; end if;
  end if;
  return new;
 end $$;
 create trigger expense_workforce_guard before insert or update on expenses for each row execute function protect_expense_workforce();
+
+create function protect_employee_identity() returns trigger language plpgsql
+set search_path=pg_catalog,public as $$
+begin
+ if tg_op='INSERT' and new.user_id is null then return new; end if;
+ if tg_op='UPDATE' and new.user_id is not distinct from old.user_id then return new; end if;
+ if app_workforce_role() not in ('owner','admin','demo_template') and not exists(select 1 from pg_roles where rolname=current_user and (rolsuper or rolbypassrls))
+ then raise exception 'Administrative employee identity binding required' using errcode='42501'; end if;
+ return new;
+end $$;
+create trigger employee_identity_guard before insert or update of user_id on employees for each row execute function protect_employee_identity();

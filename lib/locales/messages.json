@@ -12514,11 +12514,6 @@
     "Le mandat n’a pas pu être créé.",
     "Impossibile creare il incarico."
   ],
-  "Auftragdaten werden geladen …": [
-    "Loading order details…",
-    "Chargement des données du mandat…",
-    "Caricamento dei dati del incarico…"
-  ],
   "Kunden und Aufträge konnten nicht geladen werden.": [
     "Customers and orders could not be loaded.",
     "Les clients et mandats n’ont pas pu être chargés.",
@@ -12538,11 +12533,6 @@
     "Create order",
     "Créer un mandat",
     "Crea incarico"
-  ],
-  "Auftragaktionen": [
-    "Order actions",
-    "Actions du mandat",
-    "Azioni del incarico"
   ],
   "Auftrag bearbeiten": [
     "Edit order",
@@ -12613,5 +12603,65 @@
     "Data notes",
     "Notes sur les données",
     "Note sui dati"
+  ],
+  "Auftragsdaten werden geladen …": [
+    "Loading order details…",
+    "Chargement des données du mandat…",
+    "Caricamento dei dati del incarico…"
+  ],
+  "Auftragsaktionen": [
+    "Order actions",
+    "Actions du mandat",
+    "Azioni del incarico"
+  ],
+  "Nummer kopieren": [
+    "Copy number",
+    "Copier le numéro",
+    "Copia numero"
+  ],
+  "Kopiert": [
+    "Copied",
+    "Copié",
+    "Copiato"
+  ],
+  "Zuordnung hinzufügen": [
+    "Add assignment",
+    "Ajouter une attribution",
+    "Aggiungi assegnazione"
+  ],
+  "Suche leeren": [
+    "Clear search",
+    "Effacer la recherche",
+    "Cancella ricerca"
+  ],
+  "Erfasste Zahlungen, kein Kontostand": [
+    "Recorded payments, not a bank balance",
+    "Paiements saisis, pas un solde bancaire",
+    "Pagamenti registrati, non saldo bancario"
+  ],
+  "Erfasste Zahlungen nach Rückerstattungen": [
+    "Recorded payments after refunds",
+    "Paiements saisis après remboursements",
+    "Pagamenti registrati al netto dei rimborsi"
+  ],
+  "Kein Bankkontostand": [
+    "Not a bank balance",
+    "Pas un solde bancaire",
+    "Non è un saldo bancario"
+  ],
+  "Pro Jahr": [
+    "Per year",
+    "Par an",
+    "All’anno"
+  ],
+  "Ablehnen": [
+    "Reject",
+    "Refuser",
+    "Rifiuta"
+  ],
+  "Genehmigen": [
+    "Approve",
+    "Approuver",
+    "Approva"
   ]
 }

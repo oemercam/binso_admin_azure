@@ -1,3 +1,4 @@
+import {tenantCanCreateAt} from '@/lib/permissions';
 import {NextRequest} from 'next/server';
 import {listProjects} from '@/lib/server/repositories/project-workspace';
 import {randomUUID} from 'node:crypto';
@@ -8,7 +9,7 @@ import {audit} from '@/lib/server/audit';
 import {idempotentBusiness} from '@/lib/server/business-idempotency';
 import {ApiError,apiError,assertSameOrigin,cleanText,json,readJson} from '@/lib/server/http';
 export async function GET(request:NextRequest){try{const s=await requireSession();authorize(s,'projects:read');return json(await withTenant(s.organizationId,s.userId,c=>listProjects(c,s,request.nextUrl.searchParams),{snapshot:true}));}catch(error){return apiError(error)}}
-export async function POST(request:NextRequest){try{assertSameOrigin(request);const s=await requireSession();authorize(s,'projects:write');const body=await readJson<Record<string,unknown>>(request,8192);const name=cleanText(body.name,200),customerId=cleanText(body.customerId,80),sourceOffer=cleanText(body.sourceOffer,80);if(name.length<2)throw new ApiError(400,'name_required','Bitte eine Auftragsbezeichnung eingeben.');
+export async function POST(request:NextRequest){try{assertSameOrigin(request);const s=await requireSession();authorize(s,'projects:write');if(!tenantCanCreateAt(s.role,'/projekte/neu'))throw new ApiError(403,'creation_forbidden','Neue Aufträge werden durch Inhaber oder Administratoren freigegeben.');const body=await readJson<Record<string,unknown>>(request,8192);const name=cleanText(body.name,200),customerId=cleanText(body.customerId,80),sourceOffer=cleanText(body.sourceOffer,80);if(name.length<2)throw new ApiError(400,'name_required','Bitte eine Auftragsbezeichnung eingeben.');
  const requestKey=request.headers?.get('idempotency-key')?.trim()??'';
  const item=await withTenant(s.organizationId,s.userId,async c=>{const write=async()=>{let quoteId=null;
  if(sourceOffer){const q=(await c.query("select id,customer_id from quotes where organization_id=$1 and quote_no=$2 and status='accepted' and archived_at is null for update",[s.organizationId,sourceOffer])).rows[0];if(!q||q.customer_id!==customerId)throw new ApiError(409,'offer_invalid','Bitte ein angenommenes Angebot dieses Kunden auswählen.');quoteId=q.id;const previous=(await c.query('select id,name,customer_id,status from projects where organization_id=$1 and source_quote_id=$2 and archived_at is null',[s.organizationId,quoteId])).rows[0];if(previous)return previous;}

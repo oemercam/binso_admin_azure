@@ -52,7 +52,7 @@ export function ProjectForm(){
  };
  return <AppShell title="Auftrag starten" active={returnTo==="/projekte"?"projekte":"zeit"} backHref={returnTo} editing unsavedChanges={false}>
   <FormSheet workspace label="Auftrag starten" description="Beginne mit der Bezeichnung. Ein Kunde ist nur für kundenbezogene Arbeit nötig." open={open} onClose={close} busy={saving} dirty={dirty&&!saved} wizard>
-   {loading?<LoadingState><LocalizedText>{"Auftragdaten werden geladen …"}</LocalizedText></LoadingState>:loadError?<ErrorState onRetry={()=>{directory.refresh();source.refresh()}}><LocalizedText>{loadError}</LocalizedText></ErrorState>:<form onSubmit={event=>{event.preventDefault();void save()}}>
+   {loading?<LoadingState><LocalizedText>{"Auftragsdaten werden geladen …"}</LocalizedText></LoadingState>:loadError?<ErrorState onRetry={()=>{directory.refresh();source.refresh()}}><LocalizedText>{loadError}</LocalizedText></ErrorState>:<form onSubmit={event=>{event.preventDefault();void save()}}>
     <FormWizard labels={["Grunddaten"]} step={0} onStep={()=>{}} busy={saving} ariaLabel="Auftrag erfassen" cancelAction={<Button variant="secondary" onClick={close}><LocalizedText>{"Abbrechen"}</LocalizedText></Button>} action={<Button requiresWrite type="submit" disabled={saving||!recovery.ready||name.trim().length<2}><LocalizedText>{saving?'Wird erstellt…':'Auftrag starten'}</LocalizedText></Button>}>
      {error&&<ErrorState><LocalizedText>{error}</LocalizedText></ErrorState>}
      <div className="form-grid">

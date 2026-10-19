@@ -5,7 +5,10 @@ import ts from 'typescript';
 const source=await fs.readFile('lib/permissions.ts','utf8');
 const js=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText;
 const permissionsUrl='data:text/javascript;base64,'+Buffer.from(js).toString('base64');
-const {tenantCan,operatorCan,routePermission}=await import(permissionsUrl);
+const {tenantCan,operatorCan,routePermission,tenantCanCreateAt}=await import(permissionsUrl);
+for(const role of ['owner','admin']){assert.equal(tenantCanCreateAt(role,'/kunden/neu'),true);assert.equal(tenantCanCreateAt(role,'/projekte/neu'),true)}
+for(const role of ['project_manager','manager','member','reader','unknown']){assert.equal(tenantCanCreateAt(role,'/kunden/neu'),false);assert.equal(tenantCanCreateAt(role,'/projekte/neu'),false)}
+assert.equal(tenantCanCreateAt('finance','/kunden/neu'),true);assert.equal(tenantCanCreateAt('member','/spesen/neu'),true);
 for(const role of ['owner','admin','finance'])assert.equal(tenantCan(role,'accounting:read'),true);
 for(const role of ['member','reader','hr','project_manager'])assert.equal(tenantCan(role,'accounting:read'),false);
 assert.equal(routePermission('/finanzen'),'documents:read');

@@ -57,7 +57,7 @@ export async function tenantInsert<T extends Row>(table:string,data:T,requestKey
   if(previous){if(previous.request_hash!==requestHash)throw new ApiError(409,'idempotency_conflict','Die Anfragekennung wurde für andere Angaben verwendet.');return previous.response_json;}
  }
  if(table==='expenses'){
-  if(ownRecordOnly(s.role,'spesen')){
+  if(ownRecordOnly(s.role,'spesen')||['project_manager','manager'].includes(s.role)){
    const employee=(await c.query("select id from employees where organization_id=$1 and user_id=$2 and archived_at is null",[s.organizationId,s.userId])).rows[0];
    if(fields.employee_id&&fields.employee_id!==employee?.id)throw new ApiError(403,"employee_mismatch","Du kannst nur eigene Spesen einreichen.");
    if(!employee)throw new ApiError(403,'employee_assignment_required','Bitte zuerst den Mitarbeiterzugang zuordnen lassen.');

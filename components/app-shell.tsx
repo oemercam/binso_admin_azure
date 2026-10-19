@@ -2,7 +2,7 @@
 
 import {LocalizedText,LocalizedElement,useTranslation} from "@/lib/client/locale";
 import {PageAccessContext} from "@/lib/client/page-access";
-import {routePermission,tenantCan,permissionForModule} from "@/lib/permissions";
+import {routePermission,tenantCan,tenantCanCreateAt,permissionForModule} from "@/lib/permissions";
 import {moduleForPath,planAllowsPath,type PlanId} from "@/config/plan-access";
 import { readTimer, changeTimer } from "@/lib/client/time-tracker";
 import Link from "next/link";
@@ -128,7 +128,7 @@ function AppShellFrame({
     return()=>{active=false;window.removeEventListener('focus',refresh);document.removeEventListener('visibilitychange',visibility);window.removeEventListener('binso-session-invalid',refresh);window.removeEventListener('storage',storage);window.removeEventListener('pageshow',resume)};
   },[pathname,accessRetry,identityRevision]);
 
-  const canOpen=useCallback((href:string)=>{if(!access)return false;const path=href.split('?')[0];const permission=routePermission(path);const accessModule=moduleForPath(path);return (!permission||tenantCan(access.role,permission))&&planAllowsPath(access.plan,path)&&(!path.endsWith('/neu')||(!access.readOnly||path.startsWith('/support/'))&&(!accessModule||tenantCan(access.role,permissionForModule(accessModule,'write')??'organization:write')));},[access]);
+  const canOpen=useCallback((href:string)=>{if(!access)return false;const path=href.split('?')[0];const permission=routePermission(path);const accessModule=moduleForPath(path);return (!permission||tenantCan(access.role,permission))&&planAllowsPath(access.plan,path)&&(!path.endsWith('/neu')||tenantCanCreateAt(access.role,path)&&(!access.readOnly||path.startsWith('/support/'))&&(!accessModule||tenantCan(access.role,permissionForModule(accessModule,'write')??'organization:write')));},[access]);
   const accessModule=moduleForPath(pathname);
   const settingsWrite=pathname==='/einstellungen/team'?'users:manage':pathname==='/einstellungen/abonnement'?'billing:write':['/einstellungen/firma','/einstellungen/dokumente','/einstellungen/zeiterfassung'].includes(pathname)?'organization:write':'organization:read';
   const personalSettings=pathname.startsWith('/einstellungen')&&!['/einstellungen/firma','/einstellungen/dokumente','/einstellungen/team','/einstellungen/abonnement','/einstellungen/zeiterfassung'].includes(pathname);

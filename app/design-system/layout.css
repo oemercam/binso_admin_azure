@@ -463,7 +463,6 @@
     padding-right:8px;
     padding:0 8px;
     overflow:visible;
-    white-space:normal;
     line-height:1.2;
     overflow-wrap:anywhere;
     flex-wrap:wrap;
@@ -502,7 +501,6 @@
     min-height:100dvh;
   }
 .app-preview .mobile-header{display:none}
-.mobile-header-detail:has(.mobile-detail-actions) .mobile-header-title{padding-right:4px;text-align:left}
 .mobile-header-detail:has(.mobile-detail-actions) .mobile-header-leading{width:auto;flex:1}
 .mobile-header-detail .mobile-header-actions{display:none}
 .mobile-header-detail .mobile-header-leading{width:100%;min-width:0;gap:0}

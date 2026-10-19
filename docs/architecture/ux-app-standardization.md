@@ -46,3 +46,44 @@ Migration sind durch diesen Implementierungsauftrag freigegeben.
 
 Die physische iPhone-/PWA-Abnahme ist getrennt von emulierter Browserabnahme
 auszuweisen. Datenbankmigrationen werden ausschliesslich lokal/isoliert geprüft.
+
+## Rollen und kontrollierte Einführung
+
+- Inhaber und Administratoren verbinden einen aktiven Mitarbeiter ausdrücklich
+  mit einem aktiven Benutzerzugang und geben Kunden beziehungsweise Aufträge
+  mit Gültigkeitszeitraum frei. Keine Zuordnung aufgrund ähnlicher E-Mail-Adressen.
+- Neue Aufträge werden durch Inhaber/Administratoren angelegt; neue Kunden
+  zusätzlich durch Finanzen. Auftragsleitung bearbeitet die bereits freigegebenen
+  Bereiche. UI, POST-Endpunkte und Datenbank halten diese Erstellgrenze ein.
+- Mitarbeitende erfassen eigene Zeiten und Spesen. Auftragsleitung sieht und
+  prüft nur zugeordnete Bereiche. Inhaber/Admin prüfen andere Mitarbeitende;
+  eigene Einreichungen können auch durch diese Rollen nicht selbst geprüft werden.
+- Monatsrapporte benötigen immer einen hochgeladenen, zugänglichen Nachweis und
+  eine unabhängige Freigabe. Die bestehende Organisationsregel für automatische
+  Einzelzeitfreigaben bleibt erhalten und ist keine behauptete Personenprüfung.
+- Migration 0055 erfindet keine Bestandszuordnungen. Vor der Freigabe für
+  Mitarbeitende müssen Verantwortliche die Benutzerbindung und Zuordnungen
+  kontrollieren. Alte Einträge werden nicht gelöscht oder automatisch neu verteilt.
+- Ein Rechteentzug blockiert neue Erfassungen, Einreichungen und Nachweis-Uploads.
+  Eine bereits laufende Messung kann weiterhin pausiert werden; Abschluss oder
+  Fortsetzung benötigt wieder eine gültige Zuordnung. Gespeicherte eigene
+  Historie bleibt lesbar. Keine automatische Umbuchung oder Verwerfung.
+- Die Freigabe einer produktiven Migration oder eines Deployments gehört nicht
+  zu diesem Auftrag. Erst isolierte Datenbanktests, CI und ein geprüfter Rollout
+  mit den tatsächlichen Zuordnungen; keine Umgehung fehlender Voraussetzungen.
+
+## Vorhandene gezielte Nachweise
+
+- `scripts/workforce-regression-test.mjs`: echte eingeschränkte PostgreSQL-Rolle,
+  Mandanten-/Direkt-ID-Grenzen, Dateien, Rechteentzug, Monatsüberlappung,
+  unabhängige Prüfung und unveränderliche Historie.
+- `scripts/migration-test.mjs`: alle Migrationen und bestehende Geschäftsprozesse,
+  einschliesslich tatsächlichem Monatsrapport-Upload, Scannerstatus, Rückweisung,
+  Korrektur und erneuter Einreichung; ausschliesslich synthetische Daten.
+- `scripts/navigation-return-test.mjs`: gemeinsamer Hook für Header- und
+  Browser-Zurück, getrennte Rückkehrpositionen und Vorwärtsnavigation.
+- `scripts/task-controls-render-test.mjs`: gezielte echte Control-Geometrie in
+  Light/Dark; ersetzt keine Routenmatrix oder physische iPhone-Abnahme.
+- Bestehende Quality-, CodeQL-, Browser-, Auth-, Dokument- und Finanzprüfungen
+  bleiben verpflichtend. Die Checkboxen werden erst nach überprüfter Abnahme
+  abgeschlossen, nicht durch die Erzeugung statischer Inventare.
