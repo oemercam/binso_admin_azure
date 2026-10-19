@@ -378,12 +378,22 @@ try{
      });
     }
     if(!process.env.BINSO_UX_BASELINE&&width<=760)assert.equal(await navigationToggle.count(),0,'Desktop collapse control stays out of the mobile shell');
-    if(!process.env.BINSO_UX_BASELINE)for(const ring of await page.locator('.bo-ring-visual').filter({visible:true}).all()){
-      const geometry=await ring.evaluate(el=>{const box=el.getBoundingClientRect(),total=el.parentElement.querySelector('.bo-ring-total').getBoundingClientRect(),details=el.parentElement.querySelector('.bo-ring-details');return {separate:total.top>=box.bottom-1||total.left>=box.right-1,totalVisible:total.width>0&&total.height>0,overflow:details.scrollWidth>details.clientWidth+1,center:el.querySelector('.bo-ring-center')!==null}});
-      assert.ok(geometry.separate&&geometry.totalVisible&&!geometry.overflow&&!geometry.center,'Ring totals remain readable outside the constrained center on every viewport');
+    if(!process.env.BINSO_UX_BASELINE){
+      const assertReadableRing=async ring=>{
+        const geometry=await ring.evaluate(el=>{const box=el.getBoundingClientRect(),total=el.parentElement.querySelector('.bo-ring-total').getBoundingClientRect(),details=el.parentElement.querySelector('.bo-ring-details');return {separate:total.top>=box.bottom-1||total.left>=box.right-1,totalVisible:total.width>0&&total.height>0,overflow:details.scrollWidth>details.clientWidth+1,center:el.querySelector('.bo-ring-center')!==null}});
+        assert.ok(geometry.separate&&geometry.totalVisible&&!geometry.overflow&&!geometry.center,'Ring totals remain readable outside the constrained center on every viewport, including expanded disclosures');
+      };
+      for(const ring of await page.locator('.bo-ring-visual').filter({visible:true}).all())await assertReadableRing(ring);
+      const disclosure=page.locator('details.financial-snapshot').filter({has:page.locator('.bo-ring-visual')});
+      if(await disclosure.count()){
+        const opened=await disclosure.evaluate(el=>el.open);
+        if(!opened)await disclosure.locator(':scope > summary').click();
+        const ring=disclosure.locator('.bo-ring-visual');
+        await ring.waitFor({state:'visible'});
+        await assertReadableRing(ring);
+        if(!opened)await disclosure.locator(':scope > summary').click();
+      }
     }
-
-    if(!process.env.BINSO_UX_BASELINE){const disclosure=page.locator('details.financial-snapshot').filter({has:page.locator('.bo-ring-visual')});if(await disclosure.count()){const opened=await disclosure.evaluate(el=>el.open);if(!opened)await disclosure.locator(':scope > summary').click();const ring=disclosure.locator('.bo-ring-visual');await ring.waitFor({state:'visible'});const centered=await ring.evaluate(el=>{const b=el.getBoundingClientRect(),c=el.querySelector('.bo-ring-center').getBoundingClientRect();return Math.abs(b.x+b.width/2-c.x-c.width/2)<1&&Math.abs(b.y+b.height/2-c.y-c.height/2)<1});assert.ok(centered,'An explicitly expanded receivables ring centers its real amount and label');if(!opened)await disclosure.locator(':scope > summary').click();}}
     const geometry=await page.evaluate(()=>({overflow:[...document.querySelectorAll('body *')].filter(el=>el.getBoundingClientRect().right>innerWidth+1).slice(0,12).map(el=>({tag:el.tagName,cls:el.className,text:el.textContent?.slice(0,80),parent:el.parentElement?.className,right:el.getBoundingClientRect().right})),viewport:innerWidth,scroll:document.documentElement.scrollWidth,body:document.body.scrollWidth,sort:[...document.querySelectorAll('.toolbar .filter-button')].map(el=>el.getBoundingClientRect().width),metricDividers:[...document.querySelectorAll('.metric,.finance-flow-primary,.finance-flow-result,.finance-flow-costs,.finance-flow-costs>div')].map(el=>getComputedStyle(el).borderLeftWidth)}));
     if(geometry.scroll>width+1||geometry.body>width+1){console.log('Overflow details',JSON.stringify(await page.evaluate(()=>[...document.querySelectorAll('body *')].filter(el=>el.scrollWidth>el.clientWidth+2).slice(0,30).map(el=>({tag:el.tagName,cls:el.className,width:el.clientWidth,scroll:el.scrollWidth,overflow:getComputedStyle(el).overflowX,children:[...el.children].map(c=>({tag:c.tagName,width:c.clientWidth,scroll:c.scrollWidth,rect:c.getBoundingClientRect().width,min:getComputedStyle(c).minWidth,grid:getComputedStyle(el).gridTemplateColumns})),rect:JSON.stringify(el.getBoundingClientRect())}))),null,2));await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${width}-overflow.png`)});}
     assert.ok(geometry.scroll<=width+1&&geometry.body<=width+1,`${theme} ${width} ${route}: horizontal overflow ${JSON.stringify(geometry)}`);
