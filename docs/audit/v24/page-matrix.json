@@ -1,5 +1,5 @@
 {
-  "commit": "93f8dd492fe2c6ed1f2536457c845f37955cab0a",
+  "commit": "aceb6aa746cc8233936df77efa4c25508a2a2bd4",
   "method": "Existing TypeScript AST dependency inventory; conditional reachability is not runtime proof",
   "pages": [
     {
@@ -170,11 +170,11 @@
         "components/ui.tsx#FormLabel",
         "components/ui.tsx#Status",
         "components/documents.tsx#isoToSwiss",
+        "components/ui.tsx#SectionTitle",
         "components/documents.tsx#money",
         "components/binso-ux.tsx#DetailDisclosure",
         "components/entity-files.tsx#EntityFiles",
         "components/entity-files.tsx#Attachment",
-        "components/ui.tsx#SectionTitle",
         "components/binso-ux.tsx#ActionsMenu",
         "components/binso-ux.tsx#RowActions",
         "components/binso-ux.tsx#ActionSheet",
@@ -209,6 +209,7 @@
         "components/pdf-preview.tsx#DocumentPages",
         "components/pdf-preview.tsx#PdfPage",
         "components/form-wizard.tsx#FormWizard",
+        "components/ui.tsx#FormSection",
         "components/documents.tsx#DocumentEditor",
         "components/ui.tsx#Field",
         "components/ui.tsx#Select",
@@ -288,12 +289,12 @@
         },
         {
           "tag": "FormSheet",
-          "line": 421,
+          "line": 423,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 422,
+          "line": 424,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
@@ -333,7 +334,7 @@
         },
         {
           "tag": "FormSheet",
-          "line": 574,
+          "line": 575,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
@@ -464,11 +465,11 @@
         "components/ui.tsx#FormLabel",
         "components/ui.tsx#Status",
         "components/documents.tsx#isoToSwiss",
+        "components/ui.tsx#SectionTitle",
         "components/documents.tsx#money",
         "components/binso-ux.tsx#DetailDisclosure",
         "components/entity-files.tsx#EntityFiles",
         "components/entity-files.tsx#Attachment",
-        "components/ui.tsx#SectionTitle",
         "components/binso-ux.tsx#ActionsMenu",
         "components/binso-ux.tsx#RowActions",
         "components/binso-ux.tsx#ActionSheet",
@@ -503,6 +504,7 @@
         "components/pdf-preview.tsx#DocumentPages",
         "components/pdf-preview.tsx#PdfPage",
         "components/form-wizard.tsx#FormWizard",
+        "components/ui.tsx#FormSection",
         "components/documents.tsx#DocumentEditor",
         "components/ui.tsx#Field",
         "components/ui.tsx#Select",
@@ -582,12 +584,12 @@
         },
         {
           "tag": "FormSheet",
-          "line": 421,
+          "line": 423,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 422,
+          "line": 424,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
@@ -627,7 +629,7 @@
         },
         {
           "tag": "FormSheet",
-          "line": 574,
+          "line": 575,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
@@ -2204,7 +2206,9 @@
         "components/header-panel-content.tsx#PanelNotification",
         "components/binso-ux.tsx#ActionSheet",
         "components/binso-ux.tsx#FormSheet",
-        "components/form-wizard.tsx#FormWizard"
+        "components/form-wizard.tsx#FormWizard",
+        "components/ui.tsx#FormSection",
+        "components/ui.tsx#SectionTitle"
       ],
       "layouts": [
         "app/layout.tsx"
@@ -11051,7 +11055,9 @@
         "components/app-shell.tsx#ShellRegistration",
         "components/app-shell.tsx#ShellConfiguration",
         "components/binso-ux.tsx#FormSheet",
-        "components/form-wizard.tsx#FormWizard"
+        "components/form-wizard.tsx#FormWizard",
+        "components/ui.tsx#FormSection",
+        "components/ui.tsx#SectionTitle"
       ],
       "layouts": [
         "app/layout.tsx",
@@ -11416,11 +11422,11 @@
         "components/ui.tsx#FormLabel",
         "components/ui.tsx#Status",
         "components/documents.tsx#isoToSwiss",
+        "components/ui.tsx#SectionTitle",
         "components/documents.tsx#money",
         "components/binso-ux.tsx#DetailDisclosure",
         "components/entity-files.tsx#EntityFiles",
         "components/entity-files.tsx#Attachment",
-        "components/ui.tsx#SectionTitle",
         "components/binso-ux.tsx#ActionsMenu",
         "components/binso-ux.tsx#RowActions",
         "components/binso-ux.tsx#ActionSheet",
@@ -11455,6 +11461,7 @@
         "components/pdf-preview.tsx#DocumentPages",
         "components/pdf-preview.tsx#PdfPage",
         "components/form-wizard.tsx#FormWizard",
+        "components/ui.tsx#FormSection",
         "components/documents.tsx#DocumentEditor",
         "components/ui.tsx#Field",
         "components/ui.tsx#Select",
@@ -11534,12 +11541,12 @@
         },
         {
           "tag": "FormSheet",
-          "line": 421,
+          "line": 423,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 422,
+          "line": 424,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
@@ -11579,7 +11586,7 @@
         },
         {
           "tag": "FormSheet",
-          "line": 574,
+          "line": 575,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
@@ -11710,11 +11717,11 @@
         "components/ui.tsx#FormLabel",
         "components/ui.tsx#Status",
         "components/documents.tsx#isoToSwiss",
+        "components/ui.tsx#SectionTitle",
         "components/documents.tsx#money",
         "components/binso-ux.tsx#DetailDisclosure",
         "components/entity-files.tsx#EntityFiles",
         "components/entity-files.tsx#Attachment",
-        "components/ui.tsx#SectionTitle",
         "components/binso-ux.tsx#ActionsMenu",
         "components/binso-ux.tsx#RowActions",
         "components/binso-ux.tsx#ActionSheet",
@@ -11749,6 +11756,7 @@
         "components/pdf-preview.tsx#DocumentPages",
         "components/pdf-preview.tsx#PdfPage",
         "components/form-wizard.tsx#FormWizard",
+        "components/ui.tsx#FormSection",
         "components/documents.tsx#DocumentEditor",
         "components/ui.tsx#Field",
         "components/ui.tsx#Select",
@@ -11828,12 +11836,12 @@
         },
         {
           "tag": "FormSheet",
-          "line": 421,
+          "line": 423,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 422,
+          "line": 424,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
@@ -11873,7 +11881,7 @@
         },
         {
           "tag": "FormSheet",
-          "line": 574,
+          "line": 575,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
@@ -12213,6 +12221,8 @@
         "components/binso-ux.tsx#sheetForm",
         "components/confirm-dialog.tsx#ConfirmDialog",
         "components/form-wizard.tsx#FormWizard",
+        "components/ui.tsx#FormSection",
+        "components/ui.tsx#SectionTitle",
         "components/ui.tsx#Field",
         "components/ui.tsx#Input",
         "components/ui.tsx#Select",

@@ -18,7 +18,7 @@ Verbindlicher Umfang: [V25-Anforderungen](v25-requirements.md).
 
 ## Abdeckungsgrenzen
 
-Das codebasierte Inventar umfasst 76 Routen, 206 UI-Komponenten und 2215 CSS-Regeln. Die 282 wiederholten Selektorkontexte sind Kandidaten, keine nachgewiesenen Fehler; responsive Kaskaden werden nicht blind gelöscht. Es sind keine !important-Deklarationen vorhanden.
+Das codebasierte Inventar umfasst 76 Routen, 206 UI-Komponenten und 2208 CSS-Regeln. Die 281 wiederholten Selektorkontexte sind Kandidaten, keine nachgewiesenen Fehler; responsive Kaskaden werden nicht blind gelöscht. Es sind keine !important-Deklarationen vorhanden.
 
 Die nachfolgende Matrix belegt Quellgraph, API-Zuständigkeit und Rollenreferenz, keine visuelle Vollabnahme. Nicht neu gestaltete Seiten verwenden die vorhandene Foundation. Fehlende Referenzzustände, Dark und Operator bleiben abgeleitet. Echte iPhone-/PWA-Statusleiste, Tastatur und physische Geräte sind separat zu bestätigen. Keine Erfolgsmeldung allein aus grünem Build.
 
@@ -118,3 +118,5 @@ Die nachfolgende Matrix belegt Quellgraph, API-Zuständigkeit und Rollenreferenz
 
 - Der Schrittwechsel konnte wegen Wiederverwendung desselben Button-DOM-Knotens nach der React-Aktualisierung native Submit-Semantik erhalten. Der Wizard trennt Next/Submit-Identitäten und unterbindet native Submit-Defaults beim Weiter-Klick. Regression: Weiter verursacht null POSTs; Speichern/Retry bleiben idempotent.
 - Upload- und Berechtigungstests enthielten alte direkte Button-/Heading-Selektoren. Sie prüfen jetzt sichtbares Aktionsmenü, echten Dateiauswahldialog und synthetische Upload-API sowie Statusmeldung und unveränderte API-Zugriffsverbote. Kein Gate und keine Assertion entfernt.
+
+- Visuelle Stichprobe der CI-Bilder: separater PDF-Button und Dokument-Kopier-/Editieraktionen waren trotz bestehendem Menü noch sichtbar. Diese Doppelungen sind entfernt; das bestehende Menü erhält dieselben berechtigten Funktionen. Dokument-CSS überschrieb Abschnittstitel mit zwei widersprüchlichen h2-Regeln; die Override-Regeln sind entfernt, SectionTitle besitzt Positionen/Zahlungsstand/Dateien. Wizard-Schrittnamen werden nicht zusätzlich als identische FormSection-Überschrift wiederholt.

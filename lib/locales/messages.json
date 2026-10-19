@@ -12728,5 +12728,15 @@
     "max.muster@beispiel.ch",
     "max.muster@beispiel.ch",
     "max.muster@beispiel.ch"
+  ],
+  "Nummer kopiert.": [
+    "Number copied.",
+    "Numéro copié.",
+    "Numero copiato."
+  ],
+  "Nummer konnte nicht kopiert werden.": [
+    "The number could not be copied.",
+    "Le numéro n’a pas pu être copié.",
+    "Impossibile copiare il numero."
   ]
 }

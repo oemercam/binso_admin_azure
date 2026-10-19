@@ -776,7 +776,9 @@ try{
   await discard.getByRole('button',{name:'Weiter bearbeiten',exact:true}).click();assert.equal(await appControlValue(position.getByLabel('Beschreibung',{exact:true})),'Ungespeicherte Position');
   await position.getByRole('button',{name:'Abbrechen',exact:true}).click();await discard.getByRole('button',{name:'Änderungen verwerfen',exact:true}).click();await position.waitFor({state:'hidden'});
   await page.waitForLoadState("networkidle");await navigate(base+'/rechnungen/RE-TEST-1');await page.waitForLoadState('networkidle');
+  assert.equal(await page.locator('.document-detail-view button').count(),0,'Document content has no duplicate PDF/copy/edit buttons');
   await page.getByRole('button',{name:'Weitere Aktionen',exact:true}).filter({visible:true}).click();
+  await page.getByRole('dialog',{name:'Weitere Aktionen'}).getByRole('button',{name:'Nummer kopieren',exact:true}).waitFor();
   await actionEvidence(page,'Weitere Aktionen',theme);await page.getByRole('dialog',{name:'Weitere Aktionen'}).getByRole('button',{name:'Vorschau',exact:true}).click();
   const expectedPdfPages=Number(process.env.BINSO_UX_PDF_PAGES||2);
   const previous=page.getByRole('button',{name:'Vorherige Seite',exact:true}),next=page.getByRole('button',{name:'Nächste Seite',exact:true});
