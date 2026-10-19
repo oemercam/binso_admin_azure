@@ -142,3 +142,6 @@ const validationView=validationWizard.FormWizard({labels:['First','Second'],step
 const nextAction=wizardElements(validationView).find(element=>element.type===ui.Button&&element.props.onClick);
 nextAction.props.onClick();assert.equal(wizardNext,0,'Invalid input cannot advance the wizard');assert.ok(wizardFocused&&wizardScrolled,'Inline validation focuses and reveals its failing control');
 wizardValid=true;nextAction.props.onClick();assert.equal(wizardNext,1,'A valid current step remains usable');
+
+const groupedHeading=html(React.createElement(ui.SectionTitle,{title:'Berichtszeitraum',action:React.createElement(React.Fragment,null,React.createElement(ui.Button,null,'Filter'),React.createElement(ui.Button,null,'Aktionen'))}));
+assert.match(groupedHeading,/<div class="section-title-actions"><button[\s\S]+<\/button><button/,'Fragmented heading actions share one aligned group');

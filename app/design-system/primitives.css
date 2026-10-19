@@ -199,7 +199,7 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
   .form-grid.two{grid-template-columns:repeat(auto-fit,minmax(min(100%,max(var(--form-column-min),calc((100% - var(--field-group-gap))/2))),1fr))}}
 @media (min-width:761px){
 
-.section-title>.icon-button{
+.section-title-actions>.icon-button{
     width:var(--desktop-action-h);
     min-width:var(--desktop-action-h);
     height:var(--desktop-action-h);
@@ -354,3 +354,5 @@ input:not([type="checkbox"]):not([type="radio"]),
 @media (max-width:760px){
 .app-select-trigger{font-size:var(--control-font-mobile)}
 }
+
+.section-title-actions{display:flex;align-items:center;justify-content:flex-end;gap:var(--field-label-gap);flex:none;min-width:0}
