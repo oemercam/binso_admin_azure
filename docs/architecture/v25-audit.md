@@ -18,7 +18,7 @@ Verbindlicher Umfang: [V25-Anforderungen](v25-requirements.md).
 
 ## Abdeckungsgrenzen
 
-Das codebasierte Inventar umfasst 76 Routen, 206 UI-Komponenten und 2208 CSS-Regeln. Die 281 wiederholten Selektorkontexte sind Kandidaten, keine nachgewiesenen Fehler; responsive Kaskaden werden nicht blind gelöscht. Es sind keine !important-Deklarationen vorhanden.
+Das codebasierte Inventar umfasst 76 Routen, 206 UI-Komponenten und 2209 CSS-Regeln. Die 281 wiederholten Selektorkontexte sind Kandidaten, keine nachgewiesenen Fehler; responsive Kaskaden werden nicht blind gelöscht. Es sind keine !important-Deklarationen vorhanden.
 
 Die nachfolgende Matrix belegt Quellgraph, API-Zuständigkeit und Rollenreferenz, keine visuelle Vollabnahme. Nicht neu gestaltete Seiten verwenden die vorhandene Foundation. Fehlende Referenzzustände, Dark und Operator bleiben abgeleitet. Echte iPhone-/PWA-Statusleiste, Tastatur und physische Geräte sind separat zu bestätigen. Keine Erfolgsmeldung allein aus grünem Build.
 
@@ -125,3 +125,5 @@ Die nachfolgende Matrix belegt Quellgraph, API-Zuständigkeit und Rollenreferenz
 - Wiederhergestellte Vor-V25-Kundenerfassungen behalten ihren alten Request-Schlüssel, wenn lediglich der Firmenstandard ergänzt wurde. Ein gespeicherter alter Auftrag kann dadurch sicher als Replay/Konflikt behandelt werden, statt mit einem neuen Schlüssel versehentlich einen weiteren Kunden zu erstellen. Echte Eingabe-/Typänderungen bleiben neue Requests.
 
 - Aktive Verträge konsolidiert: veraltete Workspace-Abnahme ohne Scrim/Fokusfalle ersetzt; aktueller FormSheet ist modal. V25-Aktionshierarchie, Eingabehilfen, Leerzustände und Kunden-Wizard im bestehenden UX-Vertrag präzisiert. Historische Originalreferenzen bleiben als Quellen erhalten, ohne die neueren Entscheidungen zu überschreiben.
+
+- Browserabhängiges Platzhaltergrau durch den bestehenden semantischen Muted-Token mit voller Opazität vereinheitlicht. Keine neue Farbpalette; Light/Dark behalten ihre vorhandenen kontrastreichen Tokens.

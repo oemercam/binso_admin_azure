@@ -98,6 +98,7 @@ select{height:var(--control-h);padding:0 var(--control-x)}
 input[type="date"],input[type="time"]{text-align:left;appearance:none;-webkit-appearance:none}
 input::-webkit-date-and-time-value{text-align:left}
 textarea{min-height:var(--control-textarea-min);padding:var(--control-x);resize:vertical}
+input::placeholder,textarea::placeholder{color:var(--color-muted);opacity:1}
 .empty-state{padding:var(--field-group-gap) 0;color:var(--color-muted);text-align:start;overflow-wrap:anywhere}
 .empty-state p{margin:0;font-size:var(--type-metadata);line-height:1.5}
 .empty-state p+p{margin-top:var(--field-label-gap)}
