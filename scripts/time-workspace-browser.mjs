@@ -11,10 +11,12 @@ export async function verifyTimeWorkspace(page,{capture}){
  const trigger=page.getByRole('button',{name:'Zeitfilter',exact:true});
  await assertFilterTrigger(trigger,false);
  const original=await search.inputValue(),groups=await page.locator('.time-group').count();
+ assert.ok(groups>0,'Search regression starts with actual populated groups');
  await search.fill('not-present-time-workspace');
  assert.equal(await page.locator('.time-group').count(),0,'Shared search filters actual time entries');
  await page.getByText('Keine Zeiteinträge für diese Auswahl',{exact:true}).waitFor();
  await search.fill(original);
+ await page.waitForFunction(expected=>document.querySelectorAll('.time-group').length===expected,groups);
  assert.equal(await page.locator('.time-group').count(),groups,'Clearing search restores groups');
  const group=page.locator('.time-group').first(),summary=group.locator('summary');
  await summary.focus();
