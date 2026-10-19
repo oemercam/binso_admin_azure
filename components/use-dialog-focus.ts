@@ -5,6 +5,13 @@ import {lockPageScroll} from './page-scroll-lock';
 
 /** Keep modal keyboard navigation inside the dialog and restore its trigger. */
 const modalStack:HTMLElement[]=[];
+const dialogPortals=new Map<HTMLElement,HTMLElement>();
+/** Only a control inside an existing modal can register its own focus surface. */
+export function registerDialogPortal(trigger:HTMLElement|null,portal:HTMLElement|null){
+ const owner=trigger?[...modalStack].reverse().find(dialog=>dialog.contains(trigger)):undefined;
+ if(!owner||!portal)return()=>{};
+ dialogPortals.set(portal,owner);return()=>{dialogPortals.delete(portal)};
+}
 const backgroundLocks=new Map<HTMLElement,{count:number;previous:boolean}>();
 /** Nested modals share background ownership; closing one cannot expose another's page. */
 function lockDialogBackground(dialog:HTMLElement){
@@ -49,9 +56,10 @@ export function useDialogFocus(open: boolean, onClose: () => void, headerPanel=f
       if(focused instanceof HTMLElement&&dialog.contains(focused))focused.scrollIntoView({block:"nearest",behavior:"instant"});
     };
     resize();viewport?.addEventListener("resize",resize);viewport?.addEventListener("scroll",resize);
-    const controls = () => Array.from(dialog.querySelectorAll<HTMLElement>(
+    const roots=()=>[dialog,...[...dialogPortals].filter(([,owner])=>owner===dialog).map(([portal])=>portal)];
+    const controls = () => roots().flatMap(root=>Array.from(root.querySelectorAll<HTMLElement>(
       'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])',
-    )).filter(element => element.getClientRects().length > 0 && !element.closest('[hidden],[inert],[aria-hidden="true"]'));
+    ))).filter(element => element.getClientRects().length > 0 && !element.closest('[hidden],[inert],[aria-hidden="true"]'));
     if(!dialog.contains(document.activeElement)) (controls()[0] ?? dialog).focus({preventScroll:true});
     const onKey = (event: KeyboardEvent) => {
       if(modalStack.at(-1)!==dialog)return;
@@ -69,7 +77,7 @@ export function useDialogFocus(open: boolean, onClose: () => void, headerPanel=f
     const onFocus = (event: FocusEvent) => {
       if(modalStack.at(-1)!==dialog)return;
       if(headerPanel&&event.target instanceof Element&&event.target.closest(headerSelector))return;
-      if (event.target instanceof Node && !dialog.contains(event.target)) (controls()[0] ?? dialog).focus({preventScroll:true});
+      if (event.target instanceof Node && !roots().some(root=>root.contains(event.target as Node))) (controls()[0] ?? dialog).focus({preventScroll:true});
     };
     document.addEventListener("keydown", onKey);
     document.addEventListener("focusin", onFocus);

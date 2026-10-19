@@ -55,7 +55,8 @@ try{
 }finally{Object.assign(globalThis,previous);}
 console.log('Navigation cache TTL/domain/session/bounds, required contact validation, legacy edit safety, Swiss activity groups and nested background scroll locks passed.');
 
-const {pageOrientation}=await import(moduleUrl(await fs.readFile('lib/page-orientation.ts','utf8')));
+const orientationPermissions=moduleUrl(await fs.readFile('lib/permissions.ts','utf8')),orientationPlans=moduleUrl(await fs.readFile('config/plan-access.ts','utf8'));
+const {pageOrientation}=await import(moduleUrl((await fs.readFile('lib/page-orientation.ts','utf8')).replace("'./permissions'",JSON.stringify(orientationPermissions)).replace("'@/config/plan-access'",JSON.stringify(orientationPlans))));
 for(const route of ['/dashboard','/kunden','/zeit','/finanzen','/finanzen/analyse','/einstellungen','/einstellungen/konto']){assert.equal(typeof pageOrientation(route),'string');assert.equal(pageOrientation(route,true),undefined,'Editing keeps its usable space');}
 for(const route of ['/kunden/neu','/kunden/id','/kunden/id/bearbeiten','/support/id','/rechnungen/neu','/login','constructor'])assert.equal(pageOrientation(route),undefined,'No generic caption on records, chats, forms or unknown routes');
 console.log('Exact page orientation routes and compact edit/detail/chat exclusions passed.');
@@ -126,3 +127,39 @@ assert.equal(sameCustomerCreation('invalid',oldCustomerBody),false);
 assert.equal(sameCustomerCreation(oldCustomerBody,oldCustomerBody),true);
 
 assert.equal(sameCustomerCreation(oldCustomerBody,JSON.stringify({customerType:"company",contactLastName:"Example",contactFirstName:"Ada",allowDuplicate:true,name:"Test AG"})),true,"Object field order cannot manufacture a new request key");
+
+// Shared remote selection encodes scope/search and never increases the API limit.
+const directory=await import(moduleUrl(await fs.readFile('lib/directory-query.ts','utf8')));
+const directoryPath=new URL(directory.directoryQuery('/api/customers',{query:'Kunde & Co',page:21,id:'chosen'}),'https://fixture.invalid');
+assert.equal(directoryPath.searchParams.get('limit'),'50');assert.equal(directoryPath.searchParams.get('offset'),'1050');assert.equal(directoryPath.searchParams.get('q'),'Kunde & Co');assert.equal(directoryPath.searchParams.get('id'),'eq.chosen');
+assert.equal(new URL(directory.directoryQuery('/api/projects',{customerId:'tenant-customer'}),'https://fixture.invalid').searchParams.get('customerId'),'tenant-customer');
+console.log('Remote selection: encoded search, stable paging beyond 1000 and exact selected/context IDs passed.');
+
+const acceptedOffer={id:'offer-id',number:'AN-1',date:'2026-01-01',status:'accepted',positions:[{description:'Agreed work',price:125}],note:'Negotiated text',customerId:'customer'};
+for(const days of [0,10,45]){
+ const converted=defaults.invoiceDraftFromOffer(acceptedOffer,{number:'',date:'2026-10-20'},{payment_terms_days:45},{paymentDays:days});
+ assert.equal(converted.due,String(days));assert.deepEqual(converted.positions,acceptedOffer.positions);assert.equal(converted.note,'Negotiated text');assert.equal(converted.id,undefined);assert.equal(converted.status,'draft');assert.equal(converted.number,'');assert.equal(converted.date,'2026-10-20');
+}
+assert.equal(defaults.invoiceDraftFromOffer(acceptedOffer,{number:'',date:'2026-10-20'},{payment_terms_days:45},undefined).due,'45');
+assert.equal(acceptedOffer.status,'accepted','Conversion never mutates the issued offer');
+console.log('Offer conversion: central zero/customer/company terms, negotiated content, new identity and immutable source passed.');
+
+assert.match(pageOrientation('/dashboard',false,'member'),/Deine Arbeitszeit/);
+assert.match(pageOrientation('/dashboard',false,'project_manager'),/Freigaben/);
+assert.match(pageOrientation('/kunden',false,'reader'),/finden/);
+assert.match(pageOrientation('/einstellungen/abonnement',false,'admin'),/ansehen/);
+assert.match(pageOrientation('/einstellungen/abonnement',false,'owner'),/verwalten/);
+assert.equal(pageOrientation('/kunden/one',false,'reader'),undefined,'Record details keep their own context');
+
+const listQueries=await import(moduleUrl(await fs.readFile('lib/business-list-query.ts','utf8')));
+const publicQuery=listQueries.businessListQuery('documents',new URLSearchParams({customer_id:'eq.customer-a',id:'eq.invoice-a',display_status:'open',untrusted:'ignore'}));
+assert.equal(publicQuery.get('customer_id'),'eq.customer-a');assert.equal(publicQuery.get('id'),'eq.invoice-a');assert.equal(publicQuery.get('display_status'),'eq.open');assert.equal(publicQuery.has('untrusted'),false);
+assert.equal(listQueries.businessListQuery('expenses',new URLSearchParams({employee_id:'attacker',review:'1'}),'created_at.desc',{employee_id:'route-owned'}).get('employee_id'),'eq.route-owned','Route-owned scope overrides query input');
+assert.equal(listQueries.businessListQuery('customers',new URLSearchParams({id:'eq.saved-customer'})).get('id'),'eq.saved-customer','A selected ID survives a reload beyond the loaded page');
+
+const timeFilters=await import(moduleUrl(await fs.readFile('lib/time-entry-filter.ts','utf8')));
+const timePage=timeFilters.timeEntryQuery({query:'Ada & Co',from:'2026-01-01',to:'2026-10-20',status:'Zur Prüfung',customerId:'customer',projectId:'order'},{page:22,employeeId:'employee',review:true});
+assert.equal(timePage.get('offset'),'1100');assert.equal(timePage.get('limit'),'50');assert.equal(timePage.get('status'),'submitted');assert.equal(timePage.get('q'),'Ada & Co');assert.equal(timePage.get('customerId'),'customer');assert.equal(timePage.get('projectId'),'order');assert.equal(timePage.get('employeeId'),'employee');assert.equal(timePage.get('review'),'1');assert.equal(timePage.get('own'),null);
+const ownTime=timeFilters.timeEntryQuery({query:'',from:'2026-10-20',to:'2026-10-20',status:'Alle'},{own:true,internal:true,projectLabel:'Weiterbildung'});
+assert.equal(ownTime.get('own'),'1');assert.equal(ownTime.get('internal'),'1');assert.equal(ownTime.get('projectLabel'),'Weiterbildung');assert.equal(ownTime.get('review'),null);
+console.log('Time history query: bounded pages, full context, encoded search and separate own/review modes passed.');

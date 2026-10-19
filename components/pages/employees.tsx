@@ -1,10 +1,11 @@
 "use client";
+import {tenantCan} from "@/lib/permissions";
 import {EntityFiles} from "../entity-files";
 import {ContextActions} from "../binso-ux";
 import {LocalizedText} from "@/lib/client/locale";
 import {contactHref} from '@/lib/contact-links';
 import {safeAppPath} from "@/lib/navigation";
-import {useApiQuery,useDataRevision} from "@/lib/client/use-api-query";
+import {useApiQuery} from "@/lib/client/use-api-query";
 import {useProcessDraft} from "../use-process-draft";
 import {useDirtySnapshot} from "../use-dirty-snapshot";
 import {FormWizard} from "../form-wizard";
@@ -21,7 +22,7 @@ import { useEffect, useRef, useState } from "react";
 import { AppShell } from "../app-shell";
 import { RecordRow, RecordsView, RecordsControls, useRecordsController, TimeEntryRow } from "../records";
 import { appendDemoRow } from "@/lib/demo-storage";
-import { apiGet, apiPatch, apiPost, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
+import { apiPatch, apiPost, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 import {Button, EmptyState, Field, Icon, SectionTitle, Toast, Input, Select, LoadingState, ErrorState, FormSection} from "../ui";
 import {allowDraftNavigation} from "../use-browser-back-guard";
 import { ActionRow, ActionsMenu, CreateAction, FormSheet } from "../binso-ux";
@@ -63,28 +64,15 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
   const [savedRecord,setSavedRecord]=useState(false);
   const [editingRecord,setEditingRecord]=useState(!existing);
 
-  const ledgerRevision=useDataRevision(["/api/employees","/api/time-entries","/api/expenses","/api/files"]);
-  const [ledgerLoading,setLedgerLoading]=useState(existing);
-  const [ledgerErrors,setLedgerErrors]=useState<Partial<Record<"times"|"expenses",string>>>({});
-  const [ledgerRetry,setLedgerRetry]=useState(0);
-  const [ledger,setLedger]=useState<{times:Array<{id:string;started_at:string;duration_minutes:number;project_name:string;description?:string;approved?:boolean;billable?:boolean;invoiced_invoice_id?:string|null}>;expenses:Array<{id:string;merchant:string;amount:number;currency?:string;expense_date:string;status?:string}>}>({times:[],expenses:[]});
-  useEffect(()=>{
-    if(!existing||!employeeId)return;
-    let active=true;
-    const encoded=encodeURIComponent(employeeId);
-    queueMicrotask(()=>{if(active)setLedgerLoading(true)});
-    Promise.allSettled([
-      apiGet<{items:Array<{id:string;started_at:string;duration_minutes:number;project_name:string}>}>("/api/time-entries?employeeId="+encoded),
-      apiGet<{items:Array<{id:string;merchant:string;amount:number;currency?:string;expense_date:string}>}>("/api/expenses?employeeId="+encoded),
-    ]).then(([times,expenses])=>{
-      if(!active)return;
-      setLedger({times:times.status==="fulfilled"?times.value.items:[],expenses:expenses.status==="fulfilled"?expenses.value.items:[]});
-      const errors:Partial<Record<"times"|"expenses",string>>={};
-      for(const [key,result] of [["times",times],["expenses",expenses]] as const){if(result.status==="rejected")errors[key]=result.reason instanceof Error?result.reason.message:"Daten konnten nicht geladen werden.";}
-      setLedgerErrors(errors);setLedgerLoading(false);
-    });
-    return()=>{active=false};
-  },[production,existing,employeeId,ledgerRetry,ledgerRevision]);
+  const actor=useApiQuery<{tenant?:{role?:string}}>('/api/auth/session');
+  const tenantRole=actor.data?.tenant?.role??'';
+  const mayReadTime=tenantCan(tenantRole,'time:read'),mayReadExpenses=tenantCan(tenantRole,'expenses:read');
+  const activeEmployeeTab=employeeTab==='time'&&!mayReadTime||employeeTab==='expenses'&&!mayReadExpenses?'overview':employeeTab;
+  const times=useApiQuery<{items:Array<{id:string;started_at:string;duration_minutes:number;project_name:string;description?:string;approved?:boolean;billable?:boolean;invoiced_invoice_id?:string|null}>;total?:number}>(production&&existing&&employeeId&&activeEmployeeTab==='time'&&mayReadTime?'/api/time-entries?limit=50&employeeId='+encodeURIComponent(employeeId):null);
+  const expenses=useApiQuery<{items:Array<{id:string;merchant:string;amount:number;currency?:string;expense_date:string;status?:string}>;total?:number}>(production&&existing&&employeeId&&activeEmployeeTab==='expenses'&&mayReadExpenses?'/api/expenses?limit=50&employeeId='+encodeURIComponent(employeeId):null);
+  const ledger={times:times.data?.items??[],expenses:expenses.data?.items??[]};
+  const ledgerLoading=activeEmployeeTab==='time'?times.loading:activeEmployeeTab==='expenses'?expenses.loading:false;
+  const ledgerErrors={times:times.error,expenses:expenses.error};
   useEffect(()=>{
     if(!recordQuery.data||editingRecord)return;
       const item=recordQuery.data.item??recordQuery.data.items?.[0];
@@ -142,17 +130,17 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
 
   const displayName=[firstName,lastName].filter(Boolean).join(" ")||"Mitarbeiter";
   if(loadingRecord||recordError)return <AppShell title="Mitarbeiter" subtitle={recordError?"Mitarbeiterdaten nicht verfügbar":undefined} active="mitarbeiter" backHref={returnTo} backLabel="Mitarbeiter">{loadingRecord?<LoadingState/>:<><div role="alert"><EmptyState  title="Mitarbeiter konnte nicht geladen werden" description={recordError??"Bitte versuche es erneut."}/></div><div className="page-actions"><Button onClick={recordQuery.refresh}><LocalizedText>{"Erneut versuchen"}</LocalizedText></Button><Button href="/mitarbeiter" variant="ghost"><LocalizedText>{"Zur Übersicht"}</LocalizedText></Button></div></>}</AppShell>;
-  return <AppShell titleIsUserContent={existing&&!!displayName} unsavedChanges={false} title={existing ? displayName : "Mitarbeiter hinzufügen"} status={existing?status:undefined} statusTone={status==="Aktiv"?"success":"neutral"} editing={editingRecord} subtitle={existing ? role+" · "+formatQuantity(load,"%") : "Nur die wichtigsten Stammdaten erfassen."} active="mitarbeiter" backHref={returnTo} backLabel="Mitarbeiter" actions={existing?<><ActionsMenu label="Mitarbeiteraktionen" busy={savingRecord}>{!editingRecord&&<ActionRow requiresWrite icon="edit" onClick={()=>{setEditingRecord(true);setEmployeeTab("overview")}} title="Bearbeiten" navigation/>}<ActionRow href={"/zeit?employeeId="+encodeURIComponent(employeeId??"")} icon="clock" title="Zeiterfassung öffnen" navigation/><ActionRow href={"/spesen/neu?employeeId="+encodeURIComponent(employeeId??"")} icon="card" title="Spese erfassen" navigation/></ActionsMenu></>:undefined}>
+  return <AppShell titleIsUserContent={existing&&!!displayName} unsavedChanges={false} title={existing ? displayName : "Mitarbeiter hinzufügen"} status={existing?status:undefined} statusTone={status==="Aktiv"?"success":"neutral"} editing={editingRecord} subtitle={existing ? role+" · "+formatQuantity(load,"%") : "Nur die wichtigsten Stammdaten erfassen."} active="mitarbeiter" backHref={returnTo} backLabel="Mitarbeiter" actions={existing?<><ActionsMenu label="Mitarbeiteraktionen" busy={savingRecord}>{!editingRecord&&<ActionRow requiresWrite icon="edit" onClick={()=>{setEditingRecord(true);setEmployeeTab("overview")}} title="Bearbeiten" navigation/>}<ActionRow href={"/zeit?employeeId="+encodeURIComponent(employeeId??"")+"&returnTo="+encodeURIComponent("/mitarbeiter/"+(employeeId??""))} icon="clock" title="Zeiterfassung öffnen" navigation/><ActionRow href={"/spesen/neu?employeeId="+encodeURIComponent(employeeId??"")+"&returnTo="+encodeURIComponent("/mitarbeiter/"+(employeeId??""))} icon="card" title="Spese erfassen" navigation/></ActionsMenu></>:undefined}>
     <div className={existing?"entity-detail-workspace":"desktop-detail-single"}>
 
       <div className="desktop-detail-main">
     {existing && <DetailTabs role="tablist" label="Mitarbeiterbereiche">
-      <button role="tab" aria-selected={employeeTab==="overview"} className={employeeTab==="overview"?"active":""} onClick={()=>setEmployeeTab("overview")}><LocalizedText>{"Übersicht"}</LocalizedText></button>
-      <button role="tab" aria-selected={employeeTab==="time"} className={employeeTab==="time"?"active":""} onClick={()=>setEmployeeTab("time")}><LocalizedText>{"Arbeitszeit"}</LocalizedText></button>
-      <button role="tab" aria-selected={employeeTab==="expenses"} className={employeeTab==="expenses"?"active":""} onClick={()=>setEmployeeTab("expenses")}><LocalizedText>{"Spesen"}</LocalizedText></button>
-      <button role="tab" aria-selected={employeeTab==="documents"} className={employeeTab==="documents"?"active":""} onClick={()=>setEmployeeTab("documents")}><LocalizedText>{"Dokumente"}</LocalizedText></button>
+      <button role="tab" aria-selected={activeEmployeeTab==="overview"} className={activeEmployeeTab==="overview"?"active":""} onClick={()=>setEmployeeTab("overview")}><LocalizedText>{"Übersicht"}</LocalizedText></button>
+      {mayReadTime&&<button role="tab" aria-selected={activeEmployeeTab==="time"} className={activeEmployeeTab==="time"?"active":""} onClick={()=>setEmployeeTab("time")}><LocalizedText>{"Arbeitszeit"}</LocalizedText></button>}
+      {mayReadExpenses&&<button role="tab" aria-selected={activeEmployeeTab==="expenses"} className={activeEmployeeTab==="expenses"?"active":""} onClick={()=>setEmployeeTab("expenses")}><LocalizedText>{"Spesen"}</LocalizedText></button>}
+      <button role="tab" aria-selected={activeEmployeeTab==="documents"} className={activeEmployeeTab==="documents"?"active":""} onClick={()=>setEmployeeTab("documents")}><LocalizedText>{"Dokumente"}</LocalizedText></button>
     </DetailTabs>}
-    {(!existing||employeeTab==="overview")&&<div className="form-page" inert={savingRecord}>
+    {(!existing||activeEmployeeTab==="overview")&&<div className="form-page" inert={savingRecord}>
       {!editingRecord?<><dl className="detail-list">
         <div><dt><LocalizedText>{"E-Mail"}</LocalizedText></dt><dd>{email?<a href={contactHref("email",email)}>{email}</a>:<LocalizedText>Keine E-Mail hinterlegt</LocalizedText>}</dd></div>
         {phone&&<div><dt><LocalizedText>{"Telefon"}</LocalizedText></dt><dd><a href={contactHref("phone",phone)}>{phone}</a></dd></div>}
@@ -175,11 +163,11 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
         <Field label="Status"><Select value={status} onChange={e=>setStatus(e.target.value)}><option value={"Aktiv"}><LocalizedText>{"Aktiv"}</LocalizedText></option><option value={"Inaktiv"}><LocalizedText>{"Inaktiv"}</LocalizedText></option></Select></Field>
       </div></FormSection></FormWizard></FormSheet>}
     </div>}
-    {existing&&employeeTab==="time"&&<section className="surface employee-tab-panel"><SectionTitle title="Arbeitszeit" action={<Button href={"/zeit?employeeId="+encodeURIComponent(employeeId??"")} variant="secondary"><LocalizedText>{"Zeiterfassung öffnen"}</LocalizedText></Button>}/>{ledgerLoading?<LoadingState><LocalizedText>{"Arbeitszeiten werden geladen …"}</LocalizedText></LoadingState>:ledgerErrors.times?<ErrorState onRetry={()=>setLedgerRetry(value=>value+1)} retryLabel="Erneut versuchen">{ledgerErrors.times}</ErrorState>:null}<div>{ledger.times.map(item=><TimeEntryRow key={item.id} title={item.description||item.project_name||"Zeiteintrag"} meta={timeMetadata(item.description||item.project_name,item.project_name,undefined,swissDate(item.started_at))} value={formatMinutes(Number(item.duration_minutes))+" h"} status={item.invoiced_invoice_id?"Verrechnet":item.approved?"Freigegeben":item.billable===false?"Intern":"Erfasst"}/>)}</div>{!ledgerLoading&&!ledgerErrors.times&&!ledger.times.length&&<EmptyState  title="Keine Arbeitszeiten erfasst" />}</section>}
-    {existing&&employeeTab==="expenses"&&<section className="surface employee-tab-panel"><SectionTitle title="Spesen" action={<Button href={"/spesen/neu?employeeId="+encodeURIComponent(employeeId??"")} variant="secondary"><LocalizedText>{"Spese erfassen"}</LocalizedText></Button>}/>{ledgerLoading?<LoadingState><LocalizedText>{"Spesen werden geladen …"}</LocalizedText></LoadingState>:ledgerErrors.expenses?<ErrorState onRetry={()=>setLedgerRetry(value=>value+1)} retryLabel="Erneut versuchen">{ledgerErrors.expenses}</ErrorState>:null}<div>{ledger.expenses.map(item=><RecordRow key={item.id} href={"/spesen/"+item.id} title={item.merchant} meta={swissDate(item.expense_date)} value={formatCurrency(item.amount,item.currency??"CHF")} status={({submitted:"Eingereicht",approved:"Genehmigt",posted:"Verbucht",draft:"Entwurf",rejected:"Abgelehnt"} as Record<string,string>)[item.status??""]??item.status}/>)}</div>{!ledgerLoading&&!ledgerErrors.expenses&&!ledger.expenses.length&&<EmptyState  title="Keine Spesen erfasst" />}</section>}
-    {existing&&employeeTab==="documents"&&<EntityFiles purpose="employee_document" entityId={employeeId??""} title="Dokumente" emptyTitle="Keine Dokumente erfasst" className="employee-tab-panel"/>}
+    {existing&&mayReadTime&&activeEmployeeTab==="time"&&<section className="surface employee-tab-panel"><SectionTitle title="Letzte Arbeitszeiten" action={<Button href={"/zeit?employeeId="+encodeURIComponent(employeeId??"")+"&returnTo="+encodeURIComponent("/mitarbeiter/"+(employeeId??""))} variant="secondary"><LocalizedText>{"Zeiterfassung öffnen"}</LocalizedText></Button>}/>{ledgerLoading?<LoadingState><LocalizedText>{"Arbeitszeiten werden geladen …"}</LocalizedText></LoadingState>:ledgerErrors.times?<ErrorState onRetry={times.refresh} retryLabel="Erneut versuchen">{ledgerErrors.times}</ErrorState>:null}<div>{ledger.times.map(item=><TimeEntryRow key={item.id} title={item.description||item.project_name||"Zeiteintrag"} meta={timeMetadata(item.description||item.project_name,item.project_name,undefined,swissDate(item.started_at))} value={formatMinutes(Number(item.duration_minutes))+" h"} status={item.invoiced_invoice_id?"Verrechnet":item.approved?"Freigegeben":item.billable===false?"Intern":"Erfasst"}/>)}</div>{!ledgerLoading&&!ledgerErrors.times&&!ledger.times.length&&<EmptyState  title="Keine Arbeitszeiten erfasst" />}</section>}
+    {existing&&mayReadExpenses&&activeEmployeeTab==="expenses"&&<section className="surface employee-tab-panel"><SectionTitle title="Letzte Spesen" action={<Button href={"/spesen/neu?employeeId="+encodeURIComponent(employeeId??"")+"&returnTo="+encodeURIComponent("/mitarbeiter/"+(employeeId??""))} variant="secondary"><LocalizedText>{"Spese erfassen"}</LocalizedText></Button>}/>{ledgerLoading?<LoadingState><LocalizedText>{"Spesen werden geladen …"}</LocalizedText></LoadingState>:ledgerErrors.expenses?<ErrorState onRetry={expenses.refresh} retryLabel="Erneut versuchen">{ledgerErrors.expenses}</ErrorState>:null}<div>{ledger.expenses.map(item=><RecordRow key={item.id} href={"/spesen/"+item.id} title={item.merchant} meta={swissDate(item.expense_date)} value={formatCurrency(item.amount,item.currency??"CHF")} status={({submitted:"Eingereicht",approved:"Genehmigt",posted:"Verbucht",draft:"Entwurf",rejected:"Abgelehnt"} as Record<string,string>)[item.status??""]??item.status}/>)}</div>{!ledgerLoading&&!ledgerErrors.expenses&&Number(expenses.data?.total??0)>ledger.expenses.length&&<Button href={"/spesen?employeeId="+encodeURIComponent(employeeId??"")+"&returnTo="+encodeURIComponent("/mitarbeiter/"+(employeeId??""))} variant="secondary"><LocalizedText>{"Alle anzeigen"}</LocalizedText></Button>}{!ledgerLoading&&!ledgerErrors.expenses&&!ledger.expenses.length&&<EmptyState  title="Keine Spesen erfasst" />}</section>}
+    {existing&&activeEmployeeTab==="documents"&&<EntityFiles purpose="employee_document" entityId={employeeId??""} title="Dokumente" emptyTitle="Keine Dokumente erfasst" className="employee-tab-panel"/>}
       </div>
-      {existing&&<ContextActions><section className="context-action-group">{employeeTab!=="time"&&<Link href={"/zeit?employeeId="+encodeURIComponent(employeeId??"")}><Icon name="clock"/><span><b><LocalizedText>{"Zeiterfassung"}</LocalizedText></b><small><LocalizedText>{"Arbeitszeiten öffnen"}</LocalizedText></small></span><Icon name="arrow" size={15}/></Link>}{employeeTab!=="expenses"&&<Link href={"/spesen/neu?employeeId="+encodeURIComponent(employeeId??"")}><Icon name="card"/><span><b><LocalizedText>{"Spese erfassen"}</LocalizedText></b><small><LocalizedText>{"Neue Ausgabe hinzufügen"}</LocalizedText></small></span><Icon name="arrow" size={15}/></Link>}</section></ContextActions>}
+      {existing&&<ContextActions><section className="context-action-group">{mayReadTime&&activeEmployeeTab!=="time"&&<Link href={"/zeit?employeeId="+encodeURIComponent(employeeId??"")+"&returnTo="+encodeURIComponent("/mitarbeiter/"+(employeeId??""))}><Icon name="clock"/><span><b><LocalizedText>{"Zeiterfassung"}</LocalizedText></b><small><LocalizedText>{"Arbeitszeiten öffnen"}</LocalizedText></small></span><Icon name="arrow" size={15}/></Link>}{mayReadExpenses&&activeEmployeeTab!=="expenses"&&<Link href={"/spesen/neu?employeeId="+encodeURIComponent(employeeId??"")+"&returnTo="+encodeURIComponent("/mitarbeiter/"+(employeeId??""))}><Icon name="card"/><span><b><LocalizedText>{"Spese erfassen"}</LocalizedText></b><small><LocalizedText>{"Neue Ausgabe hinzufügen"}</LocalizedText></small></span><Icon name="arrow" size={15}/></Link>}</section></ContextActions>}
     </div>
     {toast&&<Toast title={toast} tone={toast==="Mitarbeiter gespeichert."||toast==="Dokument hinzugefügt."?"success":"danger"}/>}
   </AppShell>;

@@ -26,8 +26,9 @@ try{
  const businessModule=await compile('lib/server/repositories/business-api.ts',{'../business-idempotency':replay,'@/lib/financial-status':financialModuleUrl,'../http':http,'../audit':audit,'@/lib/permissions':permissions,'@/lib/qr-bill':qr});const business=await import(businessModule);
  const plans=moduleUrl(await fs.readFile('config/plan-access.ts','utf8'));
  const scopedDb=moduleUrl('export async function query(sql,args){return globalThis.__binsoParallelPool.query(sql,args)} export async function withTenant(org,user,fn){const c=await globalThis.__binsoParallelPool.connect();try{await c.query("begin");await c.query("select set_config(\'app.organization_id\',$1,true)",[org]);const value=await fn(c);await c.query("commit");return value}catch(e){await c.query("rollback");throw e}finally{c.release()}}');
+ const planService=await compile('lib/server/plan-access.ts',{'@/lib/server/db':scopedDb,'@/config/plan-access':plans,'./http':http});
  const rbac=await compile('lib/server/rbac.ts',{'@/lib/permissions':permissions});
- const process=await import(await compile('lib/server/document-process.ts',{'@/lib/qr-bill':qr,'@/lib/financial-status':financialModuleUrl,'@/lib/server/plan-access':await compile('lib/server/plan-access.ts',{'@/lib/server/db':scopedDb,'@/config/plan-access':plans}),'./http':http,'./rbac':rbac,'./audit':audit}));
+ const process=await import(await compile('lib/server/document-process.ts',{'@/lib/qr-bill':qr,'@/lib/financial-status':financialModuleUrl,'@/lib/server/plan-access':planService,'./http':http,'./rbac':rbac,'./audit':audit}));
  const organizationId='00000000-0000-4000-8000-000000000099';
  await pool.query("insert into organization_subscriptions(organization_id,plan,status) values($1,'professional','active') on conflict(organization_id) do update set plan='professional',status='active'",[organizationId]);
  const session={organizationId,userId:'v213-parallel-fixture',name:'Concurrency fixture',role:'owner'};
@@ -50,9 +51,19 @@ try{
  globalThis.__parallelProjectSession=session;
  const projectHttp=moduleUrl('export class ApiError extends Error{constructor(status,code,message){super(message);this.status=status;this.code=code}} export const assertSameOrigin=()=>{};export const cleanText=v=>typeof v==="string"?v:"";export const readJson=async r=>r.body;export const json=(data,status=200)=>({data,status});export const apiError=e=>{throw e}');
  const projectWorkspace=await compile('lib/server/repositories/project-workspace.ts',{'@/lib/permissions':permissions,'@/lib/server/http':projectHttp,'@/lib/server/rbac':rbac,'@/lib/server/audit':audit,'@/lib/projects':moduleUrl(await fs.readFile('lib/projects.ts','utf8'))});
- const projects=await import(await compile('app/api/projects/route.ts',{'@/lib/server/repositories/project-workspace':projectWorkspace,'@/lib/server/session':moduleUrl('export async function requireSession(){return globalThis.__parallelProjectSession}'),'@/lib/server/rbac':rbac,'@/lib/server/db':scopedDb,'@/lib/server/http':projectHttp,'@/lib/server/audit':audit,'@/lib/server/business-idempotency':replay,'@/lib/permissions':permissions}));
+ const projects=await import(await compile('app/api/projects/route.ts',{'@/lib/server/plan-access':planService,'@/lib/server/repositories/project-workspace':projectWorkspace,'@/lib/server/session':moduleUrl('export async function requireSession(){return globalThis.__parallelProjectSession}'),'@/lib/server/rbac':rbac,'@/lib/server/db':scopedDb,'@/lib/server/http':projectHttp,'@/lib/server/audit':audit,'@/lib/server/business-idempotency':replay,'@/lib/permissions':permissions}));
  const projectRequest={headers:new Headers({'idempotency-key':'parallel-internal-project-replay'}),body:{name:'Synthetic concurrent internal project'}};
  const projectReplays=await Promise.all(Array.from({length:6},()=>projects.POST(projectRequest)));assert.ok(projectReplays.every(result=>result.status===201));assert.equal(new Set(projectReplays.map(result=>result.data.item.id)).size,1);assert.equal((await pool.query('select count(*)::int n from projects where organization_id=$1 and name=$2',[organizationId,projectRequest.body.name])).rows[0].n,1);delete globalThis.__parallelProjectSession;
+
+ globalThis.__parallelProjectSession=session;
+ await pool.query("update organization_subscriptions set plan='starter' where organization_id=$1",[organizationId]);
+ await pool.query("insert into projects(organization_id,external_id,name,status) select $1,'capacity-parallel-'||n,'Synthetic capacity '||n,'active' from generate_series(1,greatest(0,99-(select count(*)::int from projects where organization_id=$1 and archived_at is null))) n",[organizationId]);
+ const atCapacity=await Promise.allSettled([0,1].map(index=>projects.POST({body:{name:'Last plan slot '+index}})));
+ assert.equal(atCapacity.filter(result=>result.status==='fulfilled').length,1,'Only one independent transaction can take the final plan slot');
+ assert.equal(atCapacity.filter(result=>result.status==='rejected'&&result.reason.code==='project_limit').length,1);
+ assert.equal(Number((await pool.query('select count(*) n from projects where organization_id=$1 and archived_at is null',[organizationId])).rows[0].n),100);
+ assert.equal((await projects.POST(projectRequest)).data.item.id,projectReplays[0].data.item.id,'Replay remains available at capacity');
+ await pool.query("update organization_subscriptions set plan='professional' where organization_id=$1",[organizationId]);delete globalThis.__parallelProjectSession;
  console.log('Real PostgreSQL: six concurrent customer/project retries return one record; ten distinct customer creations allocate unique numbers with exact counter increments.');
  const args={p_kind:'invoice',p_customer_id:customer.id,p_issue_date:'2026-10-09',p_due_date:'2026-11-09',p_currency:'CHF',p_vat_rate:0,p_items:[{description:'Synthetic concurrency work',quantity:1,unit_price:2561.97,vat_rate:0}],p_note:'Isolated test'};
  // Ten transactions use distinct physical clients and contend on the same counter.
@@ -60,7 +71,7 @@ try{
  assert.equal(new Set(ids.map(row=>row.number)).size,10);assert.equal(new Set(ids.map(row=>row.id)).size,10);
  const replayArgs={...args,p_idempotency_key:'parallel-document-replay'};
  const replays=await Promise.all(Array.from({length:6},()=>txn(c=>business.mutateApiBusiness(c,session,'create_document_atomic',replayArgs))));assert.equal(new Set(replays.map(row=>row.id)).size,1);
- const offerRevisionModule=await compile('lib/server/offer-revisions.ts',{'./http':http,'./rbac':rbac,'./plan-access':await compile('lib/server/plan-access.ts',{'@/lib/server/db':scopedDb,'@/config/plan-access':plans}),'./business-idempotency':replay,'./audit':audit,'./repositories/business-api':businessModule,'@/lib/financial-status':financialModuleUrl,'@/config/domain':moduleUrl(await fs.readFile('config/domain.ts','utf8'))});
+ const offerRevisionModule=await compile('lib/server/offer-revisions.ts',{'./http':http,'./rbac':rbac,'./plan-access':planService,'./business-idempotency':replay,'./audit':audit,'./repositories/business-api':businessModule,'@/lib/financial-status':financialModuleUrl,'@/config/domain':moduleUrl(await fs.readFile('config/domain.ts','utf8'))});
  const {createOfferRevision}=await import(offerRevisionModule);
  const sourceOffer=await txn(c=>business.mutateApiBusiness(c,session,'create_document_atomic',{p_kind:'offer',p_customer_id:customer.id,p_number:'',p_issue_date:'2026-10-09',p_valid_until:'2099-12-31',p_currency:'CHF',p_vat_rate:8.1,p_note:'Parallel offer revision fixture',p_items:[{description:'Synthetic item',quantity:1,unit_price:100,vat_rate:8.1}],p_idempotency_key:'parallel-offer-source'}));
  await txn(c=>process.changeDocumentStatus(c,session,sourceOffer.number,'issue',''));

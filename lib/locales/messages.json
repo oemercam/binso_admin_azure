@@ -12823,5 +12823,245 @@
     "Test PDF",
     "PDF de test",
     "PDF di prova"
+  ],
+  "Aktive Vorgänge": [
+    "Active items",
+    "Dossiers actifs",
+    "Pratiche attive"
+  ],
+  "Entscheidungen": [
+    "Decisions",
+    "Décisions",
+    "Decisioni"
+  ],
+  "Entwürfe": [
+    "Drafts",
+    "Brouillons",
+    "Bozze"
+  ],
+  "Keine Aufträge erfasst": [
+    "No orders recorded",
+    "Aucun mandat enregistré",
+    "Nessun incarico registrato"
+  ],
+  "Keine Zahlungen erfasst": [
+    "No payments recorded",
+    "Aucun paiement enregistré",
+    "Nessun pagamento registrato"
+  ],
+  "Keine Finanzinformationen für diesen Zugriff verfügbar": [
+    "No financial information available for this access",
+    "Aucune information financière disponible avec cet accès",
+    "Nessuna informazione finanziaria disponibile con questo accesso"
+  ],
+  "Laufende Aufträge": [
+    "Ongoing orders",
+    "Mandats en cours",
+    "Incarichi in corso"
+  ],
+  "Spesen zur Freigabe": [
+    "Expenses awaiting approval",
+    "Frais à approuver",
+    "Spese da approvare"
+  ],
+  "Zeiten zur Freigabe": [
+    "Time entries awaiting approval",
+    "Temps à approuver",
+    "Ore da approvare"
+  ],
+  "Stammdaten": [
+    "Master data",
+    "Données de base",
+    "Dati principali"
+  ],
+  "Zur Abrechnung bereit": [
+    "Ready for invoicing",
+    "Prêt à facturer",
+    "Pronto per la fatturazione"
+  ],
+  "Überfällige Forderungen": [
+    "Overdue receivables",
+    "Créances échues",
+    "Crediti scaduti"
+  ],
+  "Ausgaben und Saldo enthalten nur nachgewiesene Zahlungen. Weitere Kosten sind noch nicht berücksichtigt.": [
+    "Expenses and balance include only evidenced payments. Other costs are not yet included.",
+    "Les dépenses et le solde incluent uniquement les paiements justifiés. Les autres coûts ne sont pas encore inclus.",
+    "Le spese e il saldo includono solo pagamenti documentati. Gli altri costi non sono ancora inclusi."
+  ],
+  "Aktueller Bestand einschliesslich überfälliger Beträge": [
+    "Current balance including overdue amounts",
+    "Solde actuel comprenant les montants échus",
+    "Saldo attuale inclusi gli importi scaduti"
+  ],
+  "Eingereichte Einträge anderer Mitarbeiter": [
+    "Submitted entries from other employees",
+    "Saisies soumises par les autres collaborateurs",
+    "Registrazioni inviate da altri collaboratori"
+  ],
+  "Eingereichte Belege anderer Mitarbeiter": [
+    "Submitted receipts from other employees",
+    "Justificatifs soumis par les autres collaborateurs",
+    "Giustificativi inviati da altri collaboratori"
+  ],
+  "Sichtbarer Kundenbestand": [
+    "Visible customer base",
+    "Clientèle visible",
+    "Clienti visibili"
+  ],
+  "Aktive, berechtigte Aufträge": [
+    "Active orders within your access",
+    "Mandats actifs accessibles",
+    "Incarichi attivi accessibili"
+  ],
+  "Noch nicht versendet": [
+    "Not yet sent",
+    "Pas encore envoyé",
+    "Non ancora inviato"
+  ],
+  "Angebote mit nächstem Schritt": [
+    "Offers with a next step",
+    "Offres avec une prochaine étape",
+    "Offerte con un passo successivo"
+  ],
+  "Freigegeben und noch nicht verrechnet": [
+    "Approved and not yet invoiced",
+    "Approuvé et pas encore facturé",
+    "Approvato e non ancora fatturato"
+  ],
+  "Push-Zustellung ist noch nicht verfügbar.": [
+    "Push delivery is not yet available.",
+    "La réception de notifications push n’est pas encore disponible.",
+    "La ricezione delle notifiche push non è ancora disponibile."
+  ],
+  "Berechtigte Kunden und Kontaktpersonen finden.": [
+    "Find customers and contacts within your access.",
+    "Trouver les clients et contacts accessibles.",
+    "Trovare clienti e contatti accessibili."
+  ],
+  "Angebote und ihren Bearbeitungsstand ansehen.": [
+    "View offers and their processing status.",
+    "Consulter les offres et leur état de traitement.",
+    "Visualizzare offerte e stato di elaborazione."
+  ],
+  "Rechnungen, Fälligkeiten und offene Beträge ansehen.": [
+    "View invoices, due dates and outstanding amounts.",
+    "Consulter les factures, échéances et montants ouverts.",
+    "Visualizzare fatture, scadenze e importi aperti."
+  ],
+  "Erfasste Zahlungseingänge und ihre Zuordnung ansehen.": [
+    "View recorded incoming payments and their allocation.",
+    "Consulter les encaissements enregistrés et leur attribution.",
+    "Visualizzare gli incassi registrati e la loro assegnazione."
+  ],
+  "Produkte, Leistungen und Preise ansehen.": [
+    "View products, services and prices.",
+    "Consulter les produits, prestations et prix.",
+    "Visualizzare prodotti, servizi e prezzi."
+  ],
+  "Berechtigte Aufträge und ihren Fortschritt ansehen.": [
+    "View orders within your access and their progress.",
+    "Consulter les mandats accessibles et leur avancement.",
+    "Visualizzare gli incarichi accessibili e il loro avanzamento."
+  ],
+  "Berechtigte Mitarbeiterinformationen ansehen.": [
+    "View employee information within your access.",
+    "Consulter les informations accessibles sur les collaborateurs.",
+    "Visualizzare le informazioni accessibili sui collaboratori."
+  ],
+  "Berechtigte Ausgaben, Belege und ihren Status ansehen.": [
+    "View expenses, receipts and their status within your access.",
+    "Consulter les dépenses, justificatifs et statuts accessibles.",
+    "Visualizzare spese, giustificativi e stati accessibili."
+  ],
+  "Teamzugänge und Rollen ansehen.": [
+    "View team access and roles.",
+    "Consulter les accès et rôles de l’équipe.",
+    "Visualizzare accessi e ruoli del team."
+  ],
+  "Plan, Nutzung und Abrechnung ansehen.": [
+    "View plan, usage and billing.",
+    "Consulter le forfait, l’utilisation et la facturation.",
+    "Visualizzare piano, utilizzo e fatturazione."
+  ],
+  "Unternehmensdaten für Dokumente und Kommunikation ansehen.": [
+    "View company information for documents and communication.",
+    "Consulter les données de l’entreprise pour les documents et la communication.",
+    "Visualizzare i dati aziendali per documenti e comunicazione."
+  ],
+  "Zentrale Vorgaben für Rechnungen und Dokumente ansehen.": [
+    "View central defaults for invoices and documents.",
+    "Consulter les paramètres centraux des factures et documents.",
+    "Visualizzare le impostazioni centrali per fatture e documenti."
+  ],
+  "Vorgaben für die Zeiterfassung ansehen.": [
+    "View time tracking settings.",
+    "Consulter les paramètres de saisie du temps.",
+    "Visualizzare le impostazioni della registrazione del tempo."
+  ],
+  "Deine Arbeitszeit, Einträge und nächsten Aufgaben im Blick.": [
+    "Your working time, entries and next tasks at a glance.",
+    "Votre temps de travail, vos saisies et vos prochaines tâches en un coup d’œil.",
+    "Il tuo tempo di lavoro, le registrazioni e le prossime attività a colpo d’occhio."
+  ],
+  "Mitarbeiter und persönliche Aufgaben im Blick.": [
+    "Employees and personal tasks at a glance.",
+    "Les collaborateurs et vos tâches personnelles en un coup d’œil.",
+    "Collaboratori e attività personali a colpo d’occhio."
+  ],
+  "Deine Aufträge, Arbeitszeiten und offenen Freigaben im Blick.": [
+    "Your orders, working hours and pending approvals at a glance.",
+    "Vos mandats, temps de travail et approbations en attente en un coup d’œil.",
+    "I tuoi incarichi, le ore e le approvazioni in sospeso a colpo d’occhio."
+  ],
+  "Berechtigte Geschäftsvorgänge und ihren Status im Blick.": [
+    "Business items within your access and their status at a glance.",
+    "Les dossiers accessibles et leur statut en un coup d’œil.",
+    "Le pratiche accessibili e il loro stato a colpo d’occhio."
+  ],
+  "Deine Arbeitszeit erfassen, Rapporte einreichen und Rückmeldungen verfolgen.": [
+    "Track your time, submit reports and follow feedback.",
+    "Saisir votre temps, soumettre des rapports et suivre les retours.",
+    "Registrare il tuo tempo, inviare rapporti e seguire i riscontri."
+  ],
+  "Eigene Belege einreichen und ihren Bearbeitungsstand verfolgen.": [
+    "Submit your receipts and follow their processing status.",
+    "Soumettre vos justificatifs et suivre leur traitement.",
+    "Inviare i tuoi giustificativi e seguirne lo stato."
+  ],
+  "Wieder öffnen": [
+    "Reopen",
+    "Rouvrir",
+    "Riaprire"
+  ],
+  "Inklusive MwSt. nach Gutschriften": [
+    "Including VAT, after credit notes",
+    "TVA comprise, après notes de crédit",
+    "IVA inclusa, dopo le note di credito"
+  ],
+  "Ticket konnte nicht geöffnet werden.": [
+    "The ticket could not be reopened.",
+    "Le ticket n’a pas pu être rouvert.",
+    "Impossibile riaprire il ticket."
+  ],
+  "Suchen...": [
+    "Search...",
+    "Rechercher...",
+    "Cerca..."
+  ],
+  "Nach Gutschriften und Rückerstattungen": [
+    "After credit notes and refunds",
+    "Après notes de crédit et remboursements",
+    "Dopo note di credito e rimborsi"
+  ],
+  "Letzte Arbeitszeiten": [
+    "Recent time entries",
+    "Derniers temps de travail",
+    "Ultime registrazioni del tempo"
+  ],
+  "Letzte Spesen": [
+    "Recent expenses",
+    "Derniers frais",
+    "Ultime spese"
   ]
 }

@@ -1,11 +1,10 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import ts from 'typescript';
-const root=process.cwd();
-async function walk(dir){const entries=await fs.readdir(dir,{withFileTypes:true});return (await Promise.all(entries.map(entry=>entry.isDirectory()?walk(path.join(dir,entry.name)):path.join(dir,entry.name)))).flat();}
+async function walk(dir){const entries=await fs.readdir(dir,{withFileTypes:true});return (await Promise.all(entries.map(entry=>entry.isDirectory()?walk(path.posix.join(dir,entry.name)):path.posix.join(dir,entry.name)))).flat();}
 const paths=(await Promise.all(['app','components','lib','database/migrations'].map(walk))).flat().filter(p=>/\.(tsx?|sql)$/.test(p)).sort();
 const sources=new Map(await Promise.all(paths.map(async p=>[p,await fs.readFile(p,'utf8')])));
-const resolve=(file,specifier)=>{const base=specifier.startsWith('@/')?specifier.slice(2):specifier.startsWith('.')?path.normalize(path.join(path.dirname(file),specifier)):null;return base&&[base,base+'.ts',base+'.tsx',base+'/index.ts',base+'/index.tsx'].find(candidate=>sources.has(candidate));};
+const resolve=(file,specifier)=>{const base=specifier.startsWith('@/')?specifier.slice(2):specifier.startsWith('.')?path.posix.normalize(path.posix.join(path.posix.dirname(file),specifier)):null;return base&&[base,base+'.ts',base+'.tsx',base+'/index.ts',base+'/index.tsx'].find(candidate=>sources.has(candidate));};
 const files=new Map();
 for(const [file,source] of sources){
  if(file.endsWith('.sql'))continue;

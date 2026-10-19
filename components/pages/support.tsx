@@ -18,7 +18,7 @@ import { Fragment, useEffect, useRef, useState } from "react";
 import { useWorkspaceViewport } from "../use-workspace-viewport";
 import { AppShell } from "../app-shell";
 import { RecordRow, RecordsView, RecordsControls, useRecordsController } from "../records";
-import { apiGet, apiPost, apiUpload, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
+import { apiGet, apiPost, apiPatch, apiUpload, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 import {Button, EmptyState, Field, Icon, Toast, Input, Select, Textarea, FormActions, LoadingState, ErrorState, MessageBubble, Status} from "../ui";
 import { ActionRow, ActionsMenu, CreateAction, FormSheet } from "../binso-ux";
 
@@ -137,7 +137,7 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
   const [ticketRetry,setTicketRetry]=useState(0);
   const revision=useDataRevision(["/api/support/tickets"]);
   const [sending,setSending]=useState(false);
-  const sendPending=useRef(false);
+  const sendPending=useRef(false),replyReplay=useRef<{body:string;key:string}|null>(null);
   const uploadPending=useRef(false);
   const [uploading,setUploading]=useState(false);
   const [sent,setSent]=useState<string[]>([]);
@@ -148,11 +148,13 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
   const ticketReference=supportReference(ticket?.id??ticketId,ticket?.case_number);
   const ticketSubject=ticket?.subject?.trim()||(!production?"Frage zu einer Rechnung":"Support-Anfrage");
   const ticketStatus=String(ticket?.status??"open");
+  const closed=["resolved","closed"].includes(ticketStatus);
+  const reopen=async()=>{if(sendPending.current||!closed)return;sendPending.current=true;setSending(true);try{await apiPatch("/api/support/tickets/"+encodeURIComponent(ticketId),{action:"reopen"});setTicket(current=>current?{...current,status:"open"}:current)}catch(error){setToast(error instanceof Error?error.message:"Ticket konnte nicht geöffnet werden.")}finally{sendPending.current=false;setSending(false)}};
   const ticketStatusLabel:Record<string,string>={new:"Neu",open:"Offen",in_progress:"In Bearbeitung",waiting:"Wartet",waiting_customer:"Warten auf Kunde",resolved:"Gelöst",closed:"Geschlossen"};
   const ticketPriorityLabel:Record<string,string>={low:"Niedrig",normal:"Normal",medium:"Mittel",high:"Hoch",urgent:"Dringend"};
 
   const uploadSupportFile=async(file:File|undefined)=>{
-    if(!file||uploadPending.current||ticketLoading||ticketError)return;
+    if(!file||uploadPending.current||ticketLoading||ticketError||closed)return;
     const issue=fileSelectionError(file,["image/png","image/jpeg","image/webp","application/pdf","text/plain"],limitsConfig.maxFileUploadBytes);if(issue){setToast(issue);return;}
     if(!isProductionBackendEnabled()){
       setToast("Datei im Demo-Modus nicht dauerhaft gespeichert.");
@@ -195,13 +197,15 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
 
   const send=async()=>{
     const value=draft.trim();
-    if(!value||sendPending.current||ticketLoading||ticketError)return;
+    if(!value||sendPending.current||ticketLoading||ticketError||closed)return;
+    if(replyReplay.current?.body!==value)replyReplay.current={body:value,key:crypto.randomUUID()};
     sendPending.current=true;
     setSending(true);
     setDraft("");
     if(isProductionBackendEnabled()){
       try{
-        const payload=await apiPost<{item:{id:string;author_type:string;body:string;created_at:string}}>("/api/support/tickets/"+encodeURIComponent(ticketId)+"/messages",{body:value});
+        const payload=await apiPost<{item:{id:string;author_type:string;body:string;created_at:string}}>("/api/support/tickets/"+encodeURIComponent(ticketId)+"/messages",{body:value},{idempotencyKey:replyReplay.current.key});
+        replyReplay.current=null;
         setRemote(current=>current.some(item=>item.id===payload.item.id)?current:[...current,payload.item]);
       }catch(error){
         setDraft(current=>current.trim()?`${value}\n${current}`:value);
@@ -220,7 +224,7 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
   return <AppShell headingPlacement="header" title="Support" active="support" backHref="/support" backLabel="Support">
     <div className="entity-detail-workspace support-detail-workspace">
 
-      <div className="desktop-detail-main"><div className="support-thread"><div className="thread-context"><span title={ticketReference}>{ticketSubject}</span>{ticket&&<Status tone={ticketStatus==="resolved"||ticketStatus==="closed"?"success":"info"}>{ticketStatusLabel[ticketStatus]??ticketStatus}</Status>}</div><LocalizedElement as="div" className="thread-messages" tabIndex={0} role="log" ref={messagesRef} aria-label="Nachrichtenverlauf">
+      <div className="desktop-detail-main"><div className="support-thread"><div className="thread-context"><span title={ticketReference}>{ticketSubject}</span>{ticket&&<Status tone={ticketStatus==="resolved"||ticketStatus==="closed"?"success":"info"}>{ticketStatusLabel[ticketStatus]??ticketStatus}</Status>}{closed&&<Button variant="secondary" disabled={sending} onClick={()=>void reopen()}><LocalizedText>{"Wieder öffnen"}</LocalizedText></Button>}</div><LocalizedElement as="div" className="thread-messages" tabIndex={0} role="log" ref={messagesRef} aria-label="Nachrichtenverlauf">
       {ticketLoading?<LoadingState><LocalizedText>{"Ticket wird geladen …"}</LocalizedText></LoadingState>:ticketError?<ErrorState onRetry={()=>setTicketRetry(value=>value+1)} retryLabel="Erneut versuchen"><LocalizedText>{ticketError}</LocalizedText></ErrorState>:!production&&<div className="thread-day"><LocalizedText>{"Heute"}</LocalizedText></div>}
       {production ? remote.map((message,index)=><Fragment key={message.id}>{messageDay(message.created_at)!==messageDay(remote[index-1]?.created_at??"")&&<div className="thread-day">{messageDay(message.created_at)}</div>}<MessageBubble outgoing={message.author_type==="customer"} time={<>{new Date(message.created_at).toLocaleTimeString("de-CH",{hour:"2-digit",minute:"2-digit",timeZone:"Europe/Zurich"})}</>} author={message.author_type!=="customer"?"Binso Support":undefined}>{message.body}</MessageBubble></Fragment>) : <>
         <MessageBubble outgoing={true} time={<>10:24</>}><LocalizedText>{"Ich habe eine Frage zu einer Rechnung. Können Sie mir bitte weiterhelfen?"}</LocalizedText></MessageBubble>
@@ -230,7 +234,7 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
         {sent.map((text,i)=><MessageBubble outgoing={true} time={<><LocalizedText>{"jetzt"}</LocalizedText></>} key={text+"-"+i}><LocalizedText verbatim={true}>{text}</LocalizedText></MessageBubble>)}
       </>}
       {production&&!ticketLoading&&!ticketError&&remote.length===0&&<EmptyState  title="Noch keine Nachrichten" />}
-      </LocalizedElement><div className="thread-composer"><ActionsMenu label="Chataktionen" busy={uploading||ticketLoading||!!ticketError}><ActionRow icon="upload" title="Datei anhängen" onClick={()=>attachmentRef.current?.click()}/></ActionsMenu><Input ref={attachmentRef} id={"support-thread-file-"+ticketId} hidden type="file" disabled={uploading||ticketLoading||!!ticketError} accept="image/png,image/jpeg,image/webp,application/pdf,text/plain" onChange={e=>{const file=e.target.files?.[0];e.target.value="";void uploadSupportFile(file)}}/><Textarea ref={composerRef} rows={1} autoComplete="off" autoCorrect="off" spellCheck={false} enterKeyHint="enter" aria-label="Nachricht" disabled={ticketLoading||!!ticketError} value={draft} onChange={e=>setDraft(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)&&!e.nativeEvent.isComposing){e.preventDefault();void send();}}} placeholder="Nachricht schreiben..."/><LocalizedElement as="button" type="button" onClick={()=>void send()} disabled={sending||ticketLoading||!!ticketError||!draft.trim()} aria-label={sending?"Nachricht wird gesendet":"Senden"}><Icon name="arrow"/></LocalizedElement></div>
+      </LocalizedElement><div className="thread-composer"><ActionsMenu label="Chataktionen" busy={uploading||ticketLoading||!!ticketError}><ActionRow icon="upload" title="Datei anhängen" onClick={()=>attachmentRef.current?.click()}/></ActionsMenu><Input ref={attachmentRef} id={"support-thread-file-"+ticketId} hidden type="file" disabled={closed||uploading||ticketLoading||!!ticketError} accept="image/png,image/jpeg,image/webp,application/pdf,text/plain" onChange={e=>{const file=e.target.files?.[0];e.target.value="";void uploadSupportFile(file)}}/><Textarea ref={composerRef} rows={1} autoComplete="off" autoCorrect="off" spellCheck={false} enterKeyHint="enter" aria-label="Nachricht" disabled={closed||ticketLoading||!!ticketError} value={draft} onChange={e=>setDraft(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)&&!e.nativeEvent.isComposing){e.preventDefault();void send();}}} placeholder="Nachricht schreiben..."/><LocalizedElement as="button" type="button" onClick={()=>void send()} disabled={closed||sending||ticketLoading||!!ticketError||!draft.trim()} aria-label={sending?"Nachricht wird gesendet":"Senden"}><Icon name="arrow"/></LocalizedElement></div>
     </div></div>
 
     </div>

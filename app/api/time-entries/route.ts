@@ -6,29 +6,21 @@ import { randomUUID } from "node:crypto";
 import { ApiError, apiError, assertSameOrigin, cleanText, json, readJson } from "@/lib/server/http";
 import { requireSession } from "@/lib/server/session";
 import { authorize } from "@/lib/server/rbac";
-import { ownRecordOnly } from "@/lib/permissions";
+import {timeWorkspace} from "@/lib/server/repositories/time-workspace";
 import { withTenant } from "@/lib/server/db";
 
 export async function GET(request:NextRequest){
   try{
     const s=await requireSession();authorize(s,"time:read");
-    const items=await withTenant(s.organizationId,s.userId,async c=>(await c.query(`select t.id,coalesce(p.name,t.project_label,t.description) project_name,t.description,t.employee_id,t.customer_id,t.project_id,
-      t.work_date started_at,round(t.hours*60) duration_minutes,t.hours,t.billable,t.approved,t.submitted_at,t.invoiced_invoice_id,t.sales_rate,t.report_month,t.review_note,t.created_by_user_id,t.created_at,
-      c.name customer_name,coalesce(nullif(concat_ws(' ',e.first_name,e.last_name),''),t.person_name) employee_name
-      from time_entries t left join projects p on p.id=t.project_id and p.organization_id=t.organization_id
-      left join customers c on c.id=t.customer_id and c.organization_id=t.organization_id
-      left join employees e on e.id=t.employee_id and e.organization_id=t.organization_id
-      where t.organization_id=$1 and t.archived_at is null and ($3::boolean=false or t.created_by_user_id=$2) and ($4::text is null or t.employee_id::text=$4)
-      order by t.work_date desc,t.created_at desc limit 1000`,[s.organizationId,s.userId,ownRecordOnly(s.role,"zeiterfassung"),request.nextUrl.searchParams.get("employeeId")])).rows);
-    return json({items});
+    return json(await withTenant(s.organizationId,s.userId,c=>timeWorkspace(c,s,request.nextUrl.searchParams),{snapshot:true}));
   }catch(e){return apiError(e)}
 }
 export async function POST(request:NextRequest){
   try{
     assertSameOrigin(request);const s=await requireSession();authorize(s,"time:write");
     const body=await readJson<{durationMinutes?:unknown;projectName?:unknown;projectId?:unknown;customerId?:unknown;description?:unknown;startedAt?:unknown;billable?:unknown;salesRate?:unknown;reportMonth?:unknown}>(request,16384);
-    const reportMonth=cleanText(body.reportMonth,7);
-    if(reportMonth&&(!/^\d{4}-(0[1-9]|1[0-2])$/.test(reportMonth)||Number(reportMonth.slice(0,4))<2000))throw new ApiError(400,"month_invalid","Ungültiger Monat.");
+    const reportMonth=typeof body.reportMonth==='string'?body.reportMonth.trim():'';
+    if(body.reportMonth!==undefined&&(!/^\d{4}-(0[1-9]|1[0-2])$/.test(reportMonth)||Number(reportMonth.slice(0,4))<2000))throw new ApiError(400,"month_invalid","Ungültiger Monat.");
     const duration=Number(body.durationMinutes);
     if(!Number.isFinite(duration)||duration<=0||duration>(reportMonth?44640:1440))throw new ApiError(400,"duration_invalid","Ungültige Dauer.");
     const salesRate=body.salesRate===undefined?0:Number(body.salesRate);

@@ -1,4 +1,5 @@
 "use client";
+import {DirectorySelect} from "../directory-select";
 import {ContextActions} from "../binso-ux";
 import {LocalizedText} from "@/lib/client/locale";
 import {safeAppPath} from "@/lib/navigation";
@@ -19,9 +20,10 @@ import {allowDraftNavigation} from '../use-browser-back-guard';
 import { useRecordList, swissDate, paymentMethodLabel } from "./shared";
 
 export function PaymentsPage() {
-  const columns:NonNullable<Parameters<typeof useRecordsController>[0]["columns"]>=[{label:"Datum",index:1},{label:"Kunde",index:2},{label:"Referenz / Art",index:3},{label:"Betrag",index:4,align:"right"},{label:"Status",index:5,status:true}];
+  const customerId=useSearchParams().get("customerId");
+  const columns:NonNullable<Parameters<typeof useRecordsController>[0]["columns"]>=[{label:"Datum",index:1},{label:"Kunde",index:2},{label:"Referenz",index:3},{label:"Betrag",index:4,align:"right"},{label:"Status",index:5,status:true}];
   const chips=["Alle","Verbucht","Ausstehend"];
-  const {rows:paymentRows,total,controller,pagination,loading,error}=useRecordList("payments",{placeholder:"Zahlungen suchen...",chips,columns,sortFields:{1:"paid_on",2:"customer_name",3:"invoice_number",4:"amount",5:"status"},defaultOrder:"paid_on.desc",filterValues:{Verbucht:{field:"status",value:"booked"},Ausstehend:{field:"status",value:"pending"}}});
+  const {rows:paymentRows,total,controller,pagination,loading,error}=useRecordList("payments",{placeholder:"Zahlungen suchen...",chips,columns,sortFields:{1:"paid_on",2:"customer_name",3:"invoice_number",4:"amount",5:"status"},defaultOrder:"paid_on.desc",scope:{customerId},filterValues:{Verbucht:{field:"status",value:"booked"},Ausstehend:{field:"status",value:"pending"}}});
   return <AppShell title="Zahlungen" subtitle={loading?undefined:`${total} Zahlungen`} active="zahlungen" actions={<RecordsControls controller={controller} placeholder="Zahlungen suchen..." chips={chips} columns={columns}><CreateAction href="/zahlungen/neu" label="Zahlung erfassen"/></RecordsControls>}>
     <FinanceTabs/><RecordsView controller={controller} toolbarActions={false} showCount={false} remote pagination={pagination} countLabel="Zahlungen" loading={loading} error={error} items={paymentRows} placeholder="Zahlungen suchen..." chips={chips} columns={columns} rowHref={row=>`/zahlungen/${row[0]}`}>{([id,date,name,meta,amount,status])=><FinancialSummaryRow href={`/zahlungen/${id}`} title={`${name} · ${date}`} meta={meta} amount={amount} status={status} tone={status==="Verbucht"?"success":"neutral"}/>}</RecordsView>
   </AppShell>;
@@ -44,8 +46,9 @@ export function PaymentForm() {
   const initialFields=useRef({date,method,note});
   const {dirty,markPristine}=useDirtySnapshot([invoiceId,date,amount,method,note]);
   const production=useBackendMode();
-  const {data:invoiceData,error:invoiceError,loading:invoicesLoading}=useApiQuery<{items:Array<{id:string;number:string;total:number;paid_amount:number;currency?:string;status:string;customer?:{name?:string}}> }>(production?"/api/documents?kind=invoice":"/api/demo/data?collection=documents&kind=invoice");
-  const availableInvoices=useMemo(()=>invoiceData?.items.filter(item=>!["draft","cancelled","paid"].includes(item.status)&&openAmount(item)>0)??[],[invoiceData]);
+  const [chosenInvoice,setChosenInvoice]=useState<{id:string;number:string;total:number;paid_amount:number;credit_amount:number;refund_amount:number;currency:string;status:string;customer?:{name:string}}|null>(null);
+  const {data:invoiceData,error:invoiceError,loading:invoicesLoading}=useApiQuery<{items:Array<{id:string;number:string;total:number;paid_amount:number;currency?:string;status:string;customer?:{name?:string}}> }>(production?"/api/documents?kind=invoice&limit=50"+(sourceInvoice?"&number=eq."+encodeURIComponent(sourceInvoice):"&display_status=eq.open"):"/api/demo/data?collection=documents&kind=invoice");
+  const availableInvoices=useMemo(()=>[...(invoiceData?.items??[]),...(chosenInvoice&&!invoiceData?.items.some(item=>item.id===chosenInvoice.id)?[chosenInvoice]:[])].filter(item=>!["draft","cancelled","paid"].includes(item.status)&&openAmount(item)>0) ,[invoiceData,chosenInvoice]);
   useEffect(()=>{if(!sourceInvoice||invoiceId)return;const item=availableInvoices.find(row=>row.number===sourceInvoice);if(item)queueMicrotask(()=>{setInvoiceId(item.id);setAmount(current=>current||String(openAmount(item)));markPristine([item.id,initialFields.current.date,String(openAmount(item)),initialFields.current.method,initialFields.current.note]);});},[sourceInvoice,availableInvoices,invoiceId,markPristine]);
   const selectedInvoice=availableInvoices.find(item=>item.id===invoiceId);
   const returnTo=sourceInvoice?"/rechnungen/"+encodeURIComponent(sourceInvoice):safeAppPath(searchParams.get("returnTo"),"/zahlungen");
@@ -81,7 +84,7 @@ export function PaymentForm() {
     <FormSheet workspace label="Zahlung erfassen" description="Rechnungsdaten werden automatisch übernommen." open onClose={close} busy={saving} dirty={dirty&&!saved} actions={<><Button variant="secondary" onClick={close}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button onClick={save} disabled={saving||!selectedInvoice}><LocalizedText>{saving?"Wird gespeichert…":"Zahlung speichern"}</LocalizedText></Button></>}>
     {toast&&toast!=="Zahlung gespeichert."&&<ErrorState>{toast}</ErrorState>}
     <div className="form-page narrow" inert={saving}>
-      <Field label="Rechnung"><Select disabled={invoicesLoading} value={invoiceId} onChange={e=>{setInvoiceId(e.target.value);setIdempotencyKey("");const item=availableInvoices.find(x=>x.id===e.target.value);setAmount(item?String(openAmount(item)):"")}}><option value=""><LocalizedText>{"Rechnung auswählen"}</LocalizedText></option>{availableInvoices.map(item=><option key={item.id} value={item.id}>{item.number} · {item.customer?.name} · {formatCurrency(openAmount(item),item.currency)}</option>)}</Select></Field>
+      <Field label="Rechnung"><DirectorySelect label="Rechnung" required endpoint={production?"/api/documents?kind=invoice&display_status=eq.open":"/api/demo/data?collection=documents&kind=invoice"} value={invoiceId} selectable={item=>!['draft','cancelled','paid'].includes(String(item.status))&&openAmount(item)>0} formatOption={item=>String(item.number)+' · '+String((item.customer as {name?:string})?.name??'')+' · '+formatCurrency(openAmount(item),String(item.currency??'CHF'))} onChange={(value,item)=>{setInvoiceId(value);setIdempotencyKey('');setAmount(item?String(openAmount(item)):'');setChosenInvoice(item?{id:value,number:String(item.number),total:Number(item.total),paid_amount:Number(item.paid_amount),credit_amount:Number(item.credit_amount??0),refund_amount:Number(item.refund_amount??0),currency:String(item.currency??'CHF'),status:String(item.status),customer:item.customer as {name:string}|undefined}:null)}}/></Field>
       {invoiceError&&<ErrorState><LocalizedText>{invoiceError}</LocalizedText></ErrorState>}
       {selectedInvoice&&<p><LocalizedText>{"Offener Betrag: "}</LocalizedText>{formatCurrency(openAmount(selectedInvoice),selectedInvoice.currency)}</p>}
       <div className="form-grid two">
@@ -98,10 +101,11 @@ export function PaymentForm() {
 
 export function PaymentDetail({paymentId="1"}:{paymentId?:string}) {
   const production=useBackendMode();
+  const returnTo=safeAppPath(useSearchParams().get("returnTo"),"/zahlungen");
   const {data,error:paymentError}=useApiQuery<{item:Record<string,unknown>}>(production?"/api/payments/"+encodeURIComponent(paymentId):null);
   const payment=data?.item;
 
-  if(!production) return <AppShell title="Zahlung" subtitle="RE-2026-019 · Acme AG" active="zahlungen" backHref="/zahlungen" backLabel="Zahlungen">
+  if(!production) return <AppShell title="Zahlung" subtitle="RE-2026-019 · Acme AG" active="zahlungen" backHref={returnTo} backLabel={returnTo.startsWith("/kunden/")?"Kunde":"Zahlungen"}>
     <div className="entity-detail-workspace">
 
       <div className="desktop-detail-main"><div className="payment-detail-summary"><h2><LocalizedText>{"CHF 4’346.40"}</LocalizedText></h2><Status tone="success"><LocalizedText>{"Verbucht"}</LocalizedText></Status></div>
@@ -110,13 +114,13 @@ export function PaymentDetail({paymentId="1"}:{paymentId?:string}) {
     </div>
   </AppShell>;
 
-  if(!payment) return <AppShell title="Zahlung" subtitle={paymentError?"Zahlung nicht verfügbar":undefined} active="zahlungen" backHref="/zahlungen" backLabel="Zahlungen">{paymentError?<div role="alert"><EmptyState  title="Zahlung konnte nicht geladen werden" description={paymentError}/></div>:<LoadingState/>}{paymentError&&<AccessLink className="button" href="/zahlungen"><LocalizedText>{"Zur Zahlungsübersicht"}</LocalizedText></AccessLink>}</AppShell>;
+  if(!payment) return <AppShell title="Zahlung" subtitle={paymentError?"Zahlung nicht verfügbar":undefined} active="zahlungen" backHref={returnTo} backLabel={returnTo.startsWith("/kunden/")?"Kunde":"Zahlungen"}>{paymentError?<div role="alert"><EmptyState  title="Zahlung konnte nicht geladen werden" description={paymentError}/></div>:<LoadingState/>}{paymentError&&<AccessLink className="button" href="/zahlungen"><LocalizedText>{"Zur Zahlungsübersicht"}</LocalizedText></AccessLink>}</AppShell>;
 
   const customer=payment.customer as {name?:string}|null|undefined;
   const invoice=payment.invoice as {number?:string;total?:number}|null|undefined;
   const status=String(payment.status??"booked");
   const statusLabel:Record<string,string>={pending:"Ausstehend",booked:"Verbucht",reversed:"Storniert"};
-  return <AppShell title="Zahlung" subtitle={[invoice?.number,customer?.name].filter(Boolean).join(" · ")} active="zahlungen" backHref="/zahlungen" backLabel="Zahlungen">
+  return <AppShell title="Zahlung" subtitle={[invoice?.number,customer?.name].filter(Boolean).join(" · ")} active="zahlungen" backHref={returnTo} backLabel={returnTo.startsWith("/kunden/")?"Kunde":"Zahlungen"}>
     <div className="entity-detail-workspace">
 
       <div className="desktop-detail-main"><div className="payment-detail-summary"><h2>{formatCurrency(Number(payment.amount??0),String(payment.currency??"CHF"))}</h2><Status tone={status==="booked"?"success":status==="reversed"?"danger":"warning"}><LocalizedText>{statusLabel[status]??status}</LocalizedText></Status></div>

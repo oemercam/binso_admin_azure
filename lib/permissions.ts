@@ -2,6 +2,7 @@ export type TenantRole="owner"|"admin"|"finance"|"hr"|"project_manager"|"manager
 export type LocalUserRole="Inhaber"|"Admin"|"Finanzen"|"Personal"|"Projektleitung"|"Mitarbeiter"|"Lesen";
 
 export type TenantPermission=
+ |"finance-overview:read"
  |"organization:read"|"organization:write"|"users:read"|"users:manage"|"billing:read"|"billing:write"|"audit:read"
  |"customers:read"|"customers:write"|"customers:delete"
  |"sales:read"|"sales:write"|"invoices:read"|"invoices:write"|"payments:read"|"payments:write"
@@ -41,8 +42,14 @@ export function normalizeTenantRole(role:string):TenantRole{
  return (["owner","admin","finance","hr","project_manager","member","reader"] as string[]).includes(role)?role as TenantRole:"reader";
 }
 const universalTenantPermissions=new Set<TenantPermission>(["support:read","support:write","feedback:write"]);
-export function tenantCan(role:string,permission:TenantPermission){return Object.hasOwn(tenantGrants,role)&&(universalTenantPermissions.has(permission)||tenantGrants[normalizeTenantRole(role)].has(permission))}
-export function tenantPermissions(role:string){return Object.hasOwn(tenantGrants,role)?Array.from(new Set([...tenantGrants[normalizeTenantRole(role)],...universalTenantPermissions])):[]}
+export function tenantCan(role:string,permission:TenantPermission){
+ if(!Object.hasOwn(tenantGrants,role))return false;
+ const grants=tenantGrants[normalizeTenantRole(role)];
+ // Derived read capability, not an additional grant to documents-only roles.
+ if(permission==='finance-overview:read')return grants.has('documents:read')&&(['accounting:read','invoices:read','sales:read'] as TenantPermission[]).some(item=>grants.has(item));
+ return universalTenantPermissions.has(permission)||grants.has(permission);
+}
+export function tenantPermissions(role:string){return Object.hasOwn(tenantGrants,role)?Array.from(new Set([...tenantGrants[normalizeTenantRole(role)],...universalTenantPermissions,...(tenantCan(role,'finance-overview:read')?['finance-overview:read' as const]:[])])):[]}
 
 export function localRoleToTenant(role:LocalUserRole|string):TenantRole{
  const map:Record<string,TenantRole>={Inhaber:"owner",Admin:"admin",Finanzen:"finance",Personal:"hr",Projektleitung:"project_manager",Mitarbeiter:"member",Lesen:"reader"};
@@ -64,7 +71,9 @@ export const modulePermissionMap:Record<string,{read:TenantPermission;write:Tena
 
 export function permissionForModule(moduleKey:string,action:"read"|"write"){return modulePermissionMap[moduleKey]?.[action]}
 export function routePermission(pathname:string):TenantPermission|undefined{
- if(pathname==="/finanzen"||pathname==="/belege")return "documents:read";
+ if(pathname==="/finanzen"||pathname==="/belege")return "finance-overview:read";
+ if(pathname==="/einstellungen/team")return "users:read";
+ if(pathname==="/einstellungen/abonnement")return "billing:read";
  if(pathname.startsWith("/einstellungen"))return "organization:read";
  const segment=pathname.split("/").filter(Boolean)[0]||"dashboard";
  if(segment==="dashboard")return "organization:read";

@@ -141,3 +141,32 @@ console.log('V21.3: decimal/PostgreSQL precision, partial/full balances, finance
  }finally{for(const effect of effects)effect?.cleanup?.();}
  console.log('Query hook: manual/periodic refresh, error retry, superseded replies, tenant fence, route changes and hidden/offline polling passed.');
 }
+
+// Work changes must refresh the role-specific overview immediately, not on a timer.
+const eventsText=await fs.readFile('lib/client/data-events.ts','utf8');
+const eventAst=ts.createSourceFile('events.ts',eventsText,99,true);
+const domainFunctions=eventAst.statements.filter(node=>ts.isFunctionDeclaration(node)&&['dataDomains','affectedDomains'].includes(node.name?.text)).map(node=>node.getText(eventAst)).join('\n');
+const {affectedDomains}=await import(moduleUrl(domainFunctions));
+for(const path of ['/api/time-entries/a','/api/time-tracker','/api/expenses/a','/api/projects/a','/api/employees/a','/api/workforce-assignments'])assert.ok(affectedDomains(path).includes('dashboard'),path+' must invalidate the overview');
+assert.ok(!affectedDomains('/api/support/tickets').includes('dashboard'),'Unrelated chat mutations do not refetch all dashboard data');
+console.log('Role overview invalidation: work/review/context changes refresh the overview without unrelated chat reloads.');
+
+// Run the real generator in a disposable source tree on this host (including Windows).
+{
+ const {tmpdir}=await import('node:os'),path=await import('node:path'),{execFileSync}=await import('node:child_process');
+ const root=await fs.mkdtemp(path.join(tmpdir(),'binso-data-inventory-'));
+ try{
+  for(const directory of ['app/api/probe','components','lib','database/migrations'])await fs.mkdir(path.join(root,directory),{recursive:true});
+  await fs.writeFile(path.join(root,'lib/probe.ts'),'export const read=()=>1;');
+  await fs.writeFile(path.join(root,'app/api/probe/route.ts'),"import {read} from '../../../lib/probe'; export function GET(){return read()}");
+  await fs.writeFile(path.join(root,'components/probe.tsx'),"import {read} from '@/lib/probe'; export function Probe(){return apiGet('/api/probe')+read()}");
+  await fs.writeFile(path.join(root,'app/page.tsx'),"import {Probe} from '../components/probe'; export default Probe;");
+  await fs.writeFile(path.join(root,'database/migrations/0001.sql'),'create table probe(id uuid);');
+  execFileSync(process.execPath,[path.resolve('scripts/data-inventory.mjs')],{cwd:root,stdio:'pipe'});
+  const report=JSON.parse(await fs.readFile(path.join(root,'docs/architecture/v21-3-data-inventory.json'),'utf8'));
+  assert.equal(report.counts.apis,1);assert.equal(report.counts.consumers,1);assert.equal(report.counts.tables,1);
+  assert.deepEqual(report.apis[0].dependencies,['lib/probe.ts']);assert.deepEqual(report.consumers[0].pages,['app/page.tsx']);
+  assert.ok(report.apis.every(item=>!item.file.includes('\\')));
+ }finally{await fs.rm(root,{recursive:true,force:true})}
+ console.log('Real data inventory: platform-neutral API paths, relative/alias imports and page consumers passed.');
+}

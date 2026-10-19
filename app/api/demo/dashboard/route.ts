@@ -10,7 +10,7 @@ export async function GET(){
    const payments=await listApiBusiness(c,s,'payments','status=eq.booked');
    const analytics=await dashboardAnalytics(c,s.organizationId);
    const cash=await cashStatisticsData(c,s.organizationId);
-   const attention=(await Promise.all((await dashboardAttention(c,s.organizationId)).map(row=>listApiBusiness(c,s,'documents','kind=eq.invoice&id=eq.'+encodeURIComponent(String(row.id)))))).flat();
+   const attention=await dashboardAttention(c,s);
    return {attention,recent:await listApiBusiness(c,s,'documents','kind=eq.invoice&order=updated_at.desc&limit=5'),cash,canFinance:true,stats:{customer_count:analytics.customerCount},invoices:invoices.slice(0,5),payments:payments.slice(0,5),...analytics,demo:true};
   }));
  }catch(e){return apiError(e)}

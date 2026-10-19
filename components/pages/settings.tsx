@@ -1,4 +1,5 @@
 "use client";
+import {notificationChannels} from "@/config/notification-channels";
 import {ProgressBar} from "../ui";
 import {SettingsNavigation} from "../settings-navigation";
 import {FileUpload} from "../file-upload";
@@ -349,7 +350,7 @@ export function NotificationSettingsPage() {
   return <AppShell title="Benachrichtigungen" subtitle="Bestimme, wie Binso One dich informiert." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
     {error&&<ErrorState><LocalizedText>{error}</LocalizedText></ErrorState>}
     {!ready&&!error&&<LoadingState><LocalizedText>{"Einstellungen werden geladen …"}</LocalizedText></LoadingState>}
-    <SettingsGroup title="Zustellung"><section className="preference-table">{rows.map(([title,text])=><div className="preference-row" key={title}><div><b><LocalizedText>{title}</LocalizedText></b><small><LocalizedText>{text}</LocalizedText></small></div><div className="preference-channels">{(["email","push"] as const).map(channel=><label key={channel}><span><LocalizedText>{channel==="email"?"E-Mail":"Push"}</LocalizedText></span><Toggle checked={prefs[title][channel]} disabled={!ready||saving.includes(title+channel)} onChange={()=>void toggle(title,channel)} label={`${channel==="email"?"E-Mail":"Push"} ${title}`}/></label>)}</div></div>)}</section></SettingsGroup>
+    <SettingsGroup title="Zustellung"><section className="preference-table">{rows.map(([title,text])=><div className="preference-row" key={title}><div><b><LocalizedText>{title}</LocalizedText></b><small><LocalizedText>{text}</LocalizedText></small></div><div className="preference-channels">{(["email","push"] as const).filter(channel=>notificationChannels[channel]).map(channel=><label key={channel}><span><LocalizedText>{channel==="email"?"E-Mail":"Push"}</LocalizedText></span><Toggle checked={prefs[title][channel]} disabled={!ready||saving.includes(title+channel)} onChange={()=>void toggle(title,channel)} label={`${channel==="email"?"E-Mail":"Push"} ${title}`}/></label>)}</div></div>)}</section></SettingsGroup>
   </AppShell>;
 }
 

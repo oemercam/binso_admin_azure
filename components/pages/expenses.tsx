@@ -1,5 +1,6 @@
 "use client";
 
+import {DirectorySelect} from "../directory-select";
 import {fileSelectionError} from '@/lib/file-selection';
 import {limitsConfig} from '@/config/limits';
 import {useProcessDraft} from "../use-process-draft";
@@ -22,9 +23,10 @@ import {allowDraftNavigation} from '../use-browser-back-guard';
 import { useRecordList } from "./shared";
 
 export function ExpensesPage() {
+  const scopeParams=useSearchParams(),review=scopeParams.get("review")==="1",employeeId=scopeParams.get("employeeId");
   const columns:NonNullable<Parameters<typeof useRecordsController>[0]["columns"]>=[{label:"Spese",index:0},{label:"Mitarbeiter",index:1},{label:"Datum",index:5},{label:"Betrag",index:2,align:"right"},{label:"Status",index:4,status:true}];
   const chips=["Alle","Entwurf","Eingereicht","Genehmigt","Verbucht","Abgelehnt"];
-  const {rows:expenseRows,total,controller,pagination,loading,error}=useRecordList("expenses",{placeholder:"Spesen suchen...",chips,columns,sortFields:{0:"merchant",1:"employee_name",2:"amount",4:"status",5:"expense_date"},defaultOrder:"expense_date.desc",filterValues:{Entwurf:{field:"status",value:"draft"},Eingereicht:{field:"status",value:"submitted"},Genehmigt:{field:"status",value:"approved"},Verbucht:{field:"status",value:"posted"},Abgelehnt:{field:"status",value:"rejected"}}});
+  const {rows:expenseRows,total,controller,pagination,loading,error}=useRecordList("expenses",{placeholder:"Spesen suchen...",chips,columns,sortFields:{0:"merchant",1:"employee_name",2:"amount",4:"status",5:"expense_date"},defaultOrder:"expense_date.desc",scope:{review,employeeId},filterValues:{Entwurf:{field:"status",value:"draft"},Eingereicht:{field:"status",value:"submitted"},Genehmigt:{field:"status",value:"approved"},Verbucht:{field:"status",value:"posted"},Abgelehnt:{field:"status",value:"rejected"}}});
   return <AppShell title="Spesen" subtitle={loading?undefined:`${total} Spesen`} active="spesen" actions={<RecordsControls controller={controller} placeholder="Spesen suchen..." chips={chips} columns={columns}><CreateAction href="/spesen/neu" label="Spese erfassen"/></RecordsControls>}>
     <RecordsView controller={controller} toolbarActions={false} showCount={false} remote pagination={pagination} countLabel="Spesen" loading={loading} error={error} items={expenseRows} placeholder="Spesen suchen..." chips={chips} columns={columns} rowHref={row=>`/spesen/${row[4]?row[3]:"1"}`}>{(row)=>{const [title,person,amount,idOrStatus,statusMaybe,date]=row;const id=statusMaybe?idOrStatus:"1";const status=statusMaybe??idOrStatus;return <RecordRow href={"/spesen/"+id} icon="card" title={title} meta={[date,person].filter(Boolean).join(" · ")} value={amount} status={status}/>}}</RecordsView>
   </AppShell>;
@@ -180,7 +182,7 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
           <Field label="MwSt."><Select value={vatRate} onChange={e=>setVatRate(e.target.value)}><option value="8.1">8.1%</option><option value="2.6">2.6%</option><option value="0">0%</option></Select></Field>
           {existing&&<Field label="Status"><Select value={status} onChange={e=>setStatus(e.target.value)}><option value={"Entwurf"}><LocalizedText>{"Entwurf"}</LocalizedText></option><option value={"Eingereicht"}><LocalizedText>{"Eingereicht"}</LocalizedText></option>{(canApproveExpense||status==="Genehmigt")&&<option value={"Genehmigt"} disabled={!canApproveExpense}><LocalizedText>{"Genehmigt"}</LocalizedText></option>}{(canApproveExpense||status==="Abgelehnt")&&<option value={"Abgelehnt"} disabled={!canApproveExpense}><LocalizedText>{"Abgelehnt"}</LocalizedText></option>}</Select></Field>}
           <Field label="Weiterverrechnen"><Select value={expenseBillable?'yes':'no'} onChange={e=>setExpenseBillable(e.target.value==='yes')}><option value="no"><LocalizedText>{"Nicht weiterverrechnen"}</LocalizedText></option><option value="yes"><LocalizedText>{"An Kunden weiterverrechnen"}</LocalizedText></option></Select></Field>
-          {expenseBillable&&<Field label="Kunde"><Select value={expenseCustomer} onChange={e=>setExpenseCustomer(e.target.value)}><option value=""><LocalizedText>{"Kunde auswählen"}</LocalizedText></option>{expenseCustomers.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</Select></Field>}
+          {expenseBillable&&<Field label="Kunde"><DirectorySelect label="Kunde" required endpoint="/api/customers" value={expenseCustomer} onChange={setExpenseCustomer}/></Field>}
           <Field label="Beschreibung" className="full"><Textarea value={description} onChange={e=>setDescription(e.target.value)} placeholder="Kurze Beschreibung"/></Field>
         </fieldset>
         </>}

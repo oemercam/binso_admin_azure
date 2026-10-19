@@ -63,12 +63,6 @@ export function QuickCreateAction({section="dashboard",returnTo="/dashboard"}:{s
  </>;
 }
 
-export function QuickCreateLinks({returnTo="/dashboard"}:{returnTo?:string}){
- const access=usePageAccess();
- const actions=permittedCreateActions('dashboard',access.canOpen).filter(action=>['kunden','angebote','rechnungen','zeit'].includes(action.section));
- return <div className="bo-quick-create-links">{actions.map(action=><Button key={action.href} variant="secondary" requiresWrite href={createReturnHref(action.href,returnTo)} icon="plus"><LocalizedText>{action.title}</LocalizedText></Button>)}</div>;
-}
-
 export function DetailHeading({ title, status, tone = "neutral", subtitle, leading, action, mobileAction, recordLabel, statusPlacement="title", verbatimTitle=false }: {
   title: string;verbatimTitle?:boolean; status?: ReactNode; tone?: "neutral" | "success" | "warning" | "danger" | "info"; subtitle?: string; leading?: ReactNode; action?: ReactNode;mobileAction?:ReactNode;recordLabel?:string;statusPlacement?:"title"|"subtitle";
 }) {

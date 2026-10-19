@@ -14,15 +14,22 @@ export async function customerWorkspace(c:PoolClient,s:SessionUser,id:string){
  const filter='customer_id=eq.'+encodeURIComponent(String(item.id));
  const contacts=await listApiBusiness(c,s,'customer_contacts',filter+'&order=is_primary.desc,created_at.asc');
  const documents=tenantCan(s.role,'invoices:read')||tenantCan(s.role,'sales:read')?await listApiBusiness(c,s,'documents',filter):[];
- const summary=await financialSummary(c,s,String(item.id));
+ const openInvoices=tenantCan(s.role,'invoices:read')?await listApiBusiness(c,s,'documents',filter+'&kind=invoice&display_status=eq.open&order=due_date.asc&limit=4'):[];
+ const summary=await financialSummary(c,s,String(item.id),true);
  const activity=await customerActivity(c,s,String(item.id));
+ const projects=tenantCan(s.role,'projects:read')?await listApiBusiness(c,s,'projects',filter+'&limit=5&order=created_at.desc'):null;
+ const payments=tenantCan(s.role,'payments:read')?await listApiBusiness(c,s,'payments',filter+'&limit=5&order=paid_on.desc'):null;
  const statistics=tenantCan(s.role,'invoices:read')&&tenantCan(s.role,'payments:read')?(await c.query(`
-  select currency,issue_date::text date,sum(total_amount) billed,count(*)::int invoice_count,0::numeric paid
-  from invoices where organization_id=$1 and customer_id=$2 and archived_at is null and status not in ('draft','cancelled') group by currency,issue_date
+  select currency,issue_date::text date,0::numeric billed,count(*)::int invoice_count,0::numeric paid
+  from invoices where organization_id=$1 and customer_id=$2 and archived_at is null and status not in ('draft','cancelled') and issue_date<=(now() at time zone 'Europe/Zurich')::date group by currency,issue_date
   union all
   select i.currency,p.payment_date::text date,0::numeric billed,0::int invoice_count,sum(p.amount) paid
   from payments p join invoices i on i.id=p.invoice_id and i.organization_id=p.organization_id
-  where p.organization_id=$1 and i.customer_id=$2 and p.archived_at is null and p.allocation_status='matched' group by i.currency,p.payment_date
- `,[s.organizationId,String(item.id)])).rows:null;
- return {item,contacts,documents,summary,activity,statistics};
+  where p.organization_id=$1 and i.customer_id=$2 and p.archived_at is null and p.allocation_status='matched' and p.payment_date<=(now() at time zone 'Europe/Zurich')::date group by i.currency,p.payment_date
+  union all
+  select i.currency,r.refund_date::text date,0::numeric billed,0::int invoice_count,-sum(r.amount) paid
+  from invoice_refunds r join invoices i on i.id=r.invoice_id and i.organization_id=r.organization_id
+  where r.organization_id=$1 and i.customer_id=$2 and r.refund_date<=(now() at time zone 'Europe/Zurich')::date group by i.currency,r.refund_date
+ `,[s.organizationId,String(item.id)])).rows.concat(summary.invoices.flatMap(row=>(row.revenue_events??[]).map((event:{date:string;amount:unknown})=>({currency:row.currency,date:event.date,billed:event.amount,invoice_count:0,paid:0})))):null;
+ return {item,contacts,documents,openInvoices,summary,activity,statistics,projects,payments,capabilities:{invoices:tenantCan(s.role,'invoices:read'),offers:tenantCan(s.role,'sales:read')}};
 }
