@@ -500,8 +500,8 @@ try{
 
      }
      if(['/rechnungen/RE-TEST-1','/angebote/AN-TEST-1'].includes(route)){
-      const heading=page.locator('.page-head[data-heading-placement="content"],.mobile-header-detail').filter({visible:true});assert.equal(await heading.locator('.status').filter({visible:true}).count(),1,'Document status appears once in the visible detail heading');
-      assert.equal(await page.locator('.document-detail-view .status').count(),0,'Document body has no redundant status');
+      const heading=page.locator('.page-head[data-heading-placement="content"],.mobile-header-detail').filter({visible:true});assert.equal(await heading.locator('.status').filter({visible:true}).count(),0,'Short document header does not duplicate the financial status');
+      const documentStatus=page.locator('.document-detail-view .bo-metric-tiles .status').filter({visible:true});assert.equal(await documentStatus.count(),1,'Document status appears once beside the primary financial values');assert.equal(await page.locator('.document-detail-view .status').count(),1,'Document body has no redundant status');
       const header=page.locator('.mobile-header-detail');const actions=await header.locator('.mobile-detail-actions,.mobile-page-actions').filter({visible:true}).first().boundingBox(),box=await header.boundingBox();
       assert.ok(actions&&actions.x+actions.width>=box.x+box.width-35,'Document actions stay at the right edge');
      }
