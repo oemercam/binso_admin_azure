@@ -2,7 +2,6 @@
 @media (max-width:760px){
  .app-editing{--navigation-content-inset:20px}
 }
-.bottom-sheet[data-wizard]{height:calc(var(--dialog-available-height) - var(--dialog-edge-gap))}
 .bottom-sheet[data-wizard] .sheet-body{display:flex;flex-direction:column}
 .bottom-sheet[data-wizard] .sheet-body:has(.form-wizard){overflow:hidden}
 .bottom-sheet[data-wizard] .sheet-body>form:has(.form-wizard){display:flex;flex-direction:column;flex:1;min-height:0;min-width:0}
@@ -130,6 +129,7 @@
 .sheet-header .icon-button>svg{width:22px;height:22px;min-width:22px;min-height:22px}
 .bottom-sheet:not([data-wizard]) .sheet-body>form:not(.sheet-form-layout){display:grid;gap:var(--field-group-gap)}
 .bottom-sheet .form-field{margin:0;gap:var(--field-label-gap)}
+.sheet-body>.form-field+.form-field,.sheet-body>.form-field+.form-grid,.sheet-body>.form-grid+.form-field{margin-top:var(--field-group-gap)}
 .bottom-sheet,.header-panel,.confirm-dialog{
   --color-bg:var(--app-canvas);--color-subtle:var(--app-surface);--control-border:var(--app-control-border);--control-radius:var(--app-control-radius);
 }
@@ -359,7 +359,7 @@
 }
 
 /* Expanded editors use the same modal owner, with a footer at the actual sheet edge. */
-.bottom-sheet.form-sheet-expanded{width:min(100%,960px);height:calc(var(--dialog-available-height) - var(--dialog-edge-gap));padding-bottom:0}
+.bottom-sheet.form-sheet-expanded{width:min(100%,960px);padding-bottom:0}
 .bottom-sheet.form-sheet-expanded>.sheet-body{flex:1;min-height:0}
 .bottom-sheet.form-sheet-expanded .sheet-form-footer{margin-top:auto;padding-block:12px max(12px,var(--safe-bottom))}
 .bottom-sheet.form-sheet-expanded .sheet-body>form{flex:1;min-height:0}

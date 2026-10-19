@@ -339,6 +339,11 @@ input:not([type="checkbox"]):not([type="radio"]),
 @media(forced-colors:active){.app-select-popup{border-color:ButtonText}.app-select-option[aria-selected="true"]{outline:2px solid Highlight}}
 
 .app-select-control{position:relative;display:block;min-width:0;width:100%}
+.file-upload-control{display:flex;align-items:center;gap:var(--field-group-gap);min-width:0}
+.file-upload-control>img{width:64px;height:64px;object-fit:contain;flex:none}
+.file-upload-details{display:grid;gap:var(--field-label-gap);min-width:0;overflow-wrap:anywhere}
+.file-upload-actions{display:flex;align-items:center;flex-wrap:wrap;gap:var(--field-label-gap)}
+.file-upload-details>[role="status"]{font-size:var(--control-help-font);color:var(--color-muted)}
 .app-select-native{display:none}
 .app-select-trigger{appearance:none;border:1px solid var(--control-border);background:var(--color-bg);color:var(--color-fg);font:inherit;font-size:var(--control-font);font-weight:400;border-radius:var(--control-radius);display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;text-align:left;white-space:normal}
 .app-select-trigger>span{flex:none;color:var(--color-muted)}

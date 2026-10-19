@@ -379,8 +379,8 @@ try{
     }
     if(!process.env.BINSO_UX_BASELINE&&width<=760)assert.equal(await navigationToggle.count(),0,'Desktop collapse control stays out of the mobile shell');
     if(!process.env.BINSO_UX_BASELINE)for(const ring of await page.locator('.bo-ring-visual').filter({visible:true}).all()){
-      const geometry=await ring.evaluate(el=>{const box=el.getBoundingClientRect(),center=el.querySelector('.bo-ring-center').getBoundingClientRect();return {dx:Math.abs(box.x+box.width/2-center.x-center.width/2),dy:Math.abs(box.y+box.height/2-center.y-center.height/2)}});
-      assert.ok(geometry.dx<1&&geometry.dy<1,'Ring value and label share its geometric center');
+      const geometry=await ring.evaluate(el=>{const box=el.getBoundingClientRect(),total=el.parentElement.querySelector('.bo-ring-total').getBoundingClientRect(),details=el.parentElement.querySelector('.bo-ring-details');return {separate:total.top>=box.bottom-1||total.left>=box.right-1,totalVisible:total.width>0&&total.height>0,overflow:details.scrollWidth>details.clientWidth+1,center:el.querySelector('.bo-ring-center')!==null}});
+      assert.ok(geometry.separate&&geometry.totalVisible&&!geometry.overflow&&!geometry.center,'Ring totals remain readable outside the constrained center on every viewport');
     }
 
     if(!process.env.BINSO_UX_BASELINE){const disclosure=page.locator('details.financial-snapshot').filter({has:page.locator('.bo-ring-visual')});if(await disclosure.count()){const opened=await disclosure.evaluate(el=>el.open);if(!opened)await disclosure.locator(':scope > summary').click();const ring=disclosure.locator('.bo-ring-visual');await ring.waitFor({state:'visible'});const centered=await ring.evaluate(el=>{const b=el.getBoundingClientRect(),c=el.querySelector('.bo-ring-center').getBoundingClientRect();return Math.abs(b.x+b.width/2-c.x-c.width/2)<1&&Math.abs(b.y+b.height/2-c.y-c.height/2)<1});assert.ok(centered,'An explicitly expanded receivables ring centers its real amount and label');if(!opened)await disclosure.locator(':scope > summary').click();}}
@@ -639,8 +639,8 @@ try{
   await projectEdit.getByRole('button',{name:'Speichern',exact:true}).dblclick();await projectEdit.waitFor({state:'hidden'});await page.getByRole('heading',{name:'Rechnungen',level:1,exact:true}).waitFor();assert.equal(projectFixture.version,2,'Project completion taps create one versioned update');
   processRecoveryMode=false;
   await navigate(base+'/berichte');await page.getByRole('heading',{name:'Aktueller Bestand',exact:true}).waitFor();await page.getByRole('button',{name:'Zeitraum',exact:true}).first().click();const reportPeriod=page.getByRole('dialog',{name:'Berichtszeitraum',exact:true});await selectAppOption(reportPeriod.getByLabel('Zeitraum',{exact:true}), '3');const reportChanged=page.waitForRequest(request=>new URL(request.url()).pathname==='/api/reports'&&new URL(request.url()).searchParams.get('months')==='3');await reportPeriod.getByRole('button',{name:'Anwenden',exact:true}).click();await reportChanged;
-  reportExports=0;failReportDownload=true;const exportButton=page.getByRole('button',{name:'CSV exportieren',exact:true});await exportButton.click();await page.getByRole('alert').getByText('Synthetic report export unavailable',{exact:true}).waitFor();assert.equal(reportExports,1);failReportDownload=false;
-  const reportDownload=page.waitForEvent('download');await exportButton.dblclick();const exported=await reportDownload;assert.equal(exported.suggestedFilename(),'binso-reports-fixture.csv');assert.ok((await fs.readFile(await exported.path(),'utf8')).startsWith('"Kennzahl";"Wert";"Einheit"'),'Reports save verified CSV content');assert.equal(reportExports,2,'Failure and one deduplicated retry are the only export requests');assert.equal(new URL(page.url()).pathname,'/berichte');
+  reportExports=0;failReportDownload=true;await page.getByRole('button',{name:'Berichtsaktionen',exact:true}).click();const exportButton=page.getByRole('button',{name:'CSV exportieren',exact:true});await exportButton.click();await page.getByRole('alert').getByText('Synthetic report export unavailable',{exact:true}).waitFor();assert.equal(reportExports,1);failReportDownload=false;
+  await page.getByRole('button',{name:'Berichtsaktionen',exact:true}).click();const reportDownload=page.waitForEvent('download');await exportButton.dblclick();const exported=await reportDownload;assert.equal(exported.suggestedFilename(),'binso-reports-fixture.csv');assert.ok((await fs.readFile(await exported.path(),'utf8')).startsWith('"Kennzahl";"Wert";"Einheit"'),'Reports save verified CSV content');assert.equal(reportExports,2,'Failure and one deduplicated retry are the only export requests');assert.equal(new URL(page.url()).pathname,'/berichte');
 
 
   }
@@ -665,7 +665,7 @@ try{
   }
   if(hasInteraction('time')){
   for(const height of [568,400]){
-    await page.setViewportSize({width:375,height});await page.waitForLoadState("networkidle");await navigate(base+'/zeit');await page.waitForLoadState('networkidle');
+    await page.setViewportSize({width:375,height});await page.waitForLoadState("networkidle");await navigate(base+'/zeit');await page.waitForLoadState('networkidle');const timerOrder=await page.locator('.timer-card').evaluate(el=>{const controls=el.querySelector('.timer-actions'),context=el.querySelector('.timer-project');return !!controls&&!!context&&!!(controls.compareDocumentPosition(context)&Node.DOCUMENT_POSITION_FOLLOWING)});assert.equal(timerOrder,true,'Timer controls precede customer and order assignment');
     assert.equal(await page.getByRole('button',{name:'Zeitfilter',exact:true}).count(),0,'Timer hides entry-only filters');
     await page.getByRole('button',{name:'Manuell erfassen',exact:true}).filter({visible:true}).click();
     const manual=page.getByRole('dialog',{name:'Zeit manuell erfassen'});await manual.waitFor();await manual.evaluate(async el=>{await Promise.all(el.getAnimations({subtree:true}).map(animation=>animation.finished.catch(()=>{})))});
@@ -1089,11 +1089,11 @@ try{
    const imageBytes=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jB1kAAAAASUVORK5CYII=','base64');
    const imageFile={name:'synthetic-branding.png',mimeType:'image/png',buffer:imageBytes};
    const oldImage='/api/files/00000000-0000-4000-8000-000000000091/download',newImageId='00000000-0000-4000-8000-000000000092';
-   let scanVerdict='pending',scanFailure=0,companyWrites=0;
+   let scanVerdict='pending',scanFailure=0,companyWrites=0,companyPatch=null,companyLogo=oldImage;
    const scanUpload=route=>route.fulfill(scanFailure?{status:scanFailure,json:{message:'Synthetic scan unavailable'}}:{status:201,json:{item:{id:newImageId,scanStatus:scanVerdict}}});
-   const logoResource=route=>route.fulfill({json:{item:{name:'Synthetic Branding Company',logo_url:oldImage}}});
+   const logoResource=route=>route.fulfill({json:{item:{name:'Synthetic Branding Company',logo_url:companyLogo}}});
    const avatarResource=route=>route.fulfill({json:{item:{display_name:'Synthetic Branding User',first_name:'Synthetic',last_name:'Branding User',avatar_url:oldImage,theme,language:'de'},email:'branding@fixture.invalid'}});
-   const logoSettings=route=>{if(route.request().method()==='GET')return logoResource(route);companyWrites++;return route.fulfill({json:{item:{name:'Synthetic Branding Company'}}});};
+   const logoSettings=route=>{if(route.request().method()==='GET')return logoResource(route);companyWrites++;companyPatch=route.request().postDataJSON();if(companyPatch.logoUrl!==undefined)companyLogo=companyPatch.logoUrl;return route.fulfill({json:{item:{name:'Synthetic Branding Company',logo_url:companyLogo}}});};
    const imageDownload=route=>route.fulfill({contentType:'image/png',body:imageBytes});
    await context.route('**/api/files',scanUpload);await context.route('**/api/files/*/download',imageDownload);
    await context.route('**/api/settings/company',logoSettings);await context.route('**/api/settings/profile',avatarResource);
@@ -1111,10 +1111,15 @@ try{
    assert.ok(Math.abs(logoGap.actual-logoGap.expected)<1,'Logo and company name use the same field-group gap');
    const saveBox=await companySheet.locator(':scope>.filter-sheet-actions>.button').boundingBox(),footerWidth=await companySheet.locator(':scope>.filter-sheet-actions').evaluate(el=>{const css=getComputedStyle(el);return el.getBoundingClientRect().width-parseFloat(css.paddingLeft)-parseFloat(css.paddingRight)-parseFloat(css.borderLeftWidth)-parseFloat(css.borderRightWidth)});
    assert.ok(Math.abs(saveBox.width-footerWidth)<1,'Single action occupies the full shared footer content width, inside page gutters');
+   assert.equal(await companySheet.locator('#company-logo-upload').isVisible(),false,'Native file picker stays hidden behind the central upload control');
+   await companySheet.locator('#company-logo-upload').setInputFiles({name:'blocked.txt',mimeType:'text/plain',buffer:Buffer.from('Synthetic invalid image')});await companySheet.getByRole('alert').getByText('Bitte einen unterstützten Dateityp auswählen.',{exact:true}).waitFor();assert.equal(companyWrites,0,'Invalid logo cannot change company data');
    await page.locator('#company-logo-upload').setInputFiles(imageFile);
    scanVerdict='pending';await page.getByRole('button',{name:'Speichern',exact:true}).click();await page.getByRole('status').filter({hasText:'Das Firmenlogo wartet auf die Sicherheitsprüfung.'}).waitFor();assert.equal(companyWrites,0,'Quarantine cannot complete company save');assert.equal(await page.locator('#company-logo-upload').count(),1,'Pending upload retains the edit form for recovery');
    scanFailure=503;await page.getByRole('button',{name:'Speichern',exact:true}).click();await page.getByRole('status').filter({hasText:'Synthetic scan unavailable'}).waitFor();assert.equal(companyWrites,0);
    scanFailure=0;scanVerdict='clean';await page.getByRole('button',{name:'Speichern',exact:true}).click();await page.getByText('Firmendaten gespeichert.',{exact:true}).waitFor();assert.equal(companyWrites,1,'Clean scan allows exactly one company save');
+   await page.getByRole('button',{name:'Bearbeiten',exact:true}).filter({visible:true}).first().click();await companySheet.getByRole('button',{name:'Entfernen',exact:true}).click();assert.equal(companyWrites,1,'Removing the preview remains a draft until explicit Save');
+   await companySheet.getByRole('button',{name:'Schliessen',exact:true}).click();await page.getByRole('dialog',{name:'Änderungen verwerfen?',exact:true}).getByRole('button',{name:'Änderungen verwerfen',exact:true}).click();assert.equal(companyWrites,1,'Discarding logo removal never writes company settings');
+   await page.getByRole('button',{name:'Bearbeiten',exact:true}).filter({visible:true}).first().click();await companySheet.getByRole('button',{name:'Entfernen',exact:true}).click();const removalSaved=page.waitForResponse(response=>new URL(response.url()).pathname==='/api/settings/company'&&response.request().method()==='PATCH');await companySheet.getByRole('button',{name:'Speichern',exact:true}).click();assert.equal((await removalSaved).status(),200);await companySheet.waitFor({state:'hidden'});assert.equal(companyPatch.logoUrl,'','Explicit removal clears only the existing authorized logo reference');assert.equal(companyWrites,2);
    await context.unroute('**/api/files',scanUpload);await context.unroute('**/api/files/*/download',imageDownload);await context.unroute('**/api/settings/company',logoSettings);await context.unroute('**/api/settings/profile',avatarResource);
    let failDocumentSettings=true;
    const settingsFailure=async route=>{if(failDocumentSettings&&route.request().method()==='GET')return route.fulfill({status:503,json:{message:'Synthetic document settings unavailable'}});return route.fallback()};

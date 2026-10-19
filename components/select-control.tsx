@@ -3,6 +3,7 @@ import {Children,Fragment,cloneElement,isValidElement,useEffect,useId,useLayoutE
 import {createPortal} from 'react-dom';
 import {LocalizedElement} from '@/lib/client/locale';
 import {lockPageScroll} from './page-scroll-lock';
+import {selectGeometry} from '@/lib/select-geometry';
 
 /** Retain real form/autofill/validation semantics; pointer and keyboard use the app listbox. */
 export function SelectControl(props:React.ComponentProps<'select'>){
@@ -20,12 +21,12 @@ export function SelectControl(props:React.ComponentProps<'select'>){
  const choose=(index:number)=>{const option=control.current?.options[index];if(!enabled(index)||!control.current||!option||!available(option)||option.value!==options[index].value)return;control.current.selectedIndex=index;control.current.dispatchEvent(new Event('change',{bubbles:true}));setCaption(option.text);setInvalid(false);close();trigger.current?.focus({preventScroll:true});};
  useLayoutEffect(()=>{
   if(!open)return;
-  const place=()=>{const rect=trigger.current?.getBoundingClientRect();if(!rect)return;const viewport=window.visualViewport,top=viewport?.offsetTop??0,bottom=top+(viewport?.height??innerHeight),below=bottom-rect.bottom-12,above=rect.top-top-12,height=Math.min(320,Math.max(below,above));setPosition({left:Math.max(12,Math.min(rect.left,innerWidth-rect.width-12)),top:below>=Math.min(240,above)?rect.bottom+4:Math.max(top+12,rect.top-height-4),width:Math.min(rect.width,innerWidth-24),height});};
+  const place=()=>{const rect=trigger.current?.getBoundingClientRect();if(!rect)return;const viewport=window.visualViewport;setPosition(selectGeometry(rect,{left:viewport?.offsetLeft??0,top:viewport?.offsetTop??0,width:viewport?.width??innerWidth,height:viewport?.height??innerHeight},popup.current?popup.current.scrollHeight+popup.current.offsetHeight-popup.current.clientHeight:320));};
   place();const unlock=lockPageScroll(()=>popup.current);
   const outside=(event:PointerEvent)=>{if(event.target instanceof Node&&!trigger.current?.contains(event.target)&&!popup.current?.contains(event.target))close();};
-  document.addEventListener('pointerdown',outside,true);window.addEventListener('resize',place);window.visualViewport?.addEventListener('resize',place);window.visualViewport?.addEventListener('scroll',place);
-  return()=>{unlock();document.removeEventListener('pointerdown',outside,true);window.removeEventListener('resize',place);window.visualViewport?.removeEventListener('resize',place);window.visualViewport?.removeEventListener('scroll',place);};
- },[open]);
+  document.addEventListener('pointerdown',outside,true);window.addEventListener('resize',place);window.addEventListener('scroll',place,true);window.visualViewport?.addEventListener('resize',place);window.visualViewport?.addEventListener('scroll',place);
+  return()=>{unlock();document.removeEventListener('pointerdown',outside,true);window.removeEventListener('resize',place);window.removeEventListener('scroll',place,true);window.visualViewport?.removeEventListener('resize',place);window.visualViewport?.removeEventListener('scroll',place);};
+ },[open,position.width]);
  useEffect(()=>{if(open)popup.current?.querySelector('[data-active="true"]')?.scrollIntoView({block:'nearest'});},[open,active]);
  const typeahead=useRef({text:'',at:0});
  const optionChildren=(nodes:React.ReactNode):React.ReactNode=>Children.map(nodes,child=>isValidElement<{children?:React.ReactNode;'aria-hidden'?:boolean}>(child)?child.type==='option'?cloneElement(child,{'aria-hidden':open||undefined}):child.type==='optgroup'||child.type===Fragment?cloneElement(child,{children:optionChildren(child.props.children)}):child:child);

@@ -104,3 +104,30 @@ assert.equal(fieldInputHint('Passwort','text'),undefined);
 const singleStepHeading=html(React.createElement(wizard.FormWizard,{labels:['Grunddaten'],step:0,onStep:()=>{},action:null,cancelAction:null},React.createElement(ui.FormSection,{title:'Grunddaten'},'Inhalt')));assert.equal((singleStepHeading.match(/Grunddaten/g)||[]).length,1,'Wizard step names are not repeated by their own form section');
 
 assert.equal(fieldInputHint("Beschreibung"),"z. B. IT-Beratung und Support");assert.equal(fieldInputHint("Einrichtungsschlüssel"),undefined,"Security setup secrets never receive synthetic examples");assert.equal(fieldInputHint("Zahlungsreferenz"),"RF… oder QR-Referenz");
+
+// The real shared popup calculation must use content height and visible keyboard bounds.
+const {selectGeometry}=await import(moduleUrl(fs.readFileSync('lib/select-geometry.ts','utf8')));
+for(const viewport of [{left:0,top:0,width:390,height:844},{left:0,top:140,width:320,height:280},{left:20,top:100,width:260,height:200}]){
+ for(const anchor of [{left:20,top:110,bottom:154,width:280},{left:10,top:700,bottom:744,width:354}])for(const content of [52,144,1200]){
+  const popup=selectGeometry(anchor,viewport,content);
+  assert.ok(popup.left>=viewport.left+12&&popup.left+popup.width<=viewport.left+viewport.width-12+1);
+  assert.ok(popup.top>=viewport.top+12&&popup.top+popup.height<=viewport.top+viewport.height-12+1,'Keyboard-visible viewport contains the complete popup');
+  assert.ok(popup.height<=320&&popup.height<=content,'Short option sets never reserve a full-height blank menu');
+ }
+}
+const adjacent=selectGeometry({left:20,top:650,bottom:694,width:300},{left:0,top:0,width:390,height:844},52);
+assert.equal(adjacent.top,698,'Short menus remain adjacent below the trigger when they fit');
+const upward=selectGeometry({left:20,top:740,bottom:784,width:300},{left:0,top:0,width:390,height:844},120);
+assert.equal(upward.top+upward.height,736,'Upward menus end beside the trigger, not a presumed 320px above it');
+
+// Exercise actual upload callbacks: invalid input and read-only roles cannot mutate form state.
+const fileSource=fs.readFileSync('components/file-upload.tsx','utf8'),fileAst=ts.createSourceFile('file-upload.tsx',fileSource,99,true,4);
+const fileBody=fileAst.statements.filter(n=>!ts.isImportDeclaration(n)).map(n=>n.getText(fileAst)).join('\n'),fileExports={};
+let fileError='',fileSelection=null;
+Function('require','exports','useRef','useState','usePageAccess','LocalizedText','LocalizedElement','limitsConfig','megabytes','Button','Field','Input',ts.transpileModule(fileBody,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText)(require,fileExports,()=>({current:null}),()=>[fileError,value=>{fileError=value}],()=>({write}),({children})=>children,({children})=>children,{maxFileUploadBytes:10*1024*1024},value=>value/1024/1024,ui.Button,ui.Field,ui.Input);
+const uploadProps={label:'Firmenlogo',file:null,accept:['image/png'],onSelect:file=>{fileSelection=file}};
+const selectFile=file=>{const view=fileExports.FileUpload(uploadProps),control=React.Children.toArray(view.props.children)[0];control.props.onChange({target:{files:[file],value:'selected'}})};
+write=true;
+for(const file of [{type:'text/plain',size:10},{type:'image/png',size:0},{type:'image/png',size:10*1024*1024+1}]){selectFile(file);assert.equal(fileSelection,null);assert.ok(fileError,'Rejected file provides a field error');}
+const validLogo={type:'image/png',size:32,name:'synthetic.png'};selectFile(validLogo);assert.equal(fileSelection,validLogo);assert.equal(fileError,'');
+write=false;fileSelection=null;selectFile(validLogo);assert.equal(fileSelection,null,'Read-only upload callbacks fail closed');write=true;
