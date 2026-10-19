@@ -1,4 +1,5 @@
 import {selectAppOption,appControlValue} from './app-select-browser.mjs';
+async function openDocumentHistory(page){const details=page.locator('.document-detail-view details');await details.waitFor({state:'attached'});if(!await details.getAttribute('open'))await details.locator('summary').click();}
 async function assertReturnPosition(page,target){try{await page.waitForFunction(y=>Math.abs(scrollY-y)<=1,target);}catch(error){console.log('Return position mismatch',await page.evaluate(expected=>({expected,actual:scrollY,height:document.documentElement.scrollHeight,viewport:innerHeight,path:location.pathname}),target));throw error;}}
 async function chooseRecordFilter(page,value){await page.getByRole('button',{name:'Filter und Sortierung',exact:true}).click();const sheet=page.getByRole('dialog',{name:'Filter und Sortierung',exact:true});await selectAppOption(sheet.getByLabel('Status',{exact:true}), value);await sheet.getByRole('button',{name:'Anwenden',exact:true}).click();await sheet.waitFor({state:'hidden'});}
 import {verifyStableAppNavigation} from './app-workspace-browser.mjs';
@@ -831,7 +832,7 @@ try{
    assert.equal(await appControlValue(creditDialog.getByLabel('Betrag',{exact:true})),'20','A failed credit retains the entered amount');
    assert.equal(await page.getByText('Gutschrift erfasst.',{exact:true}).count(),0,'Failure cannot show a successful booking');
    failCredit=false;await creditDialog.getByRole('button',{name:'Gutschrift erfassen',exact:true}).click();
-   await creditDialog.waitFor({state:'hidden'});await page.getByText('GS-2026-000001',{exact:true}).waitFor();
+   await creditDialog.waitFor({state:'hidden'});await openDocumentHistory(page);await page.getByText('GS-2026-000001',{exact:true}).waitFor();
    assert.equal(creditPosts,2);assert.equal(creditKeys[0],creditKeys[1],'Retry reuses the same credit key');
    await capture(page,{animations:'disabled',path:path.join(output,`${theme}-430-credit-note.png`)});
    if(creditBefore.amount===undefined)delete invoice.credit_amount;else invoice.credit_amount=creditBefore.amount;
@@ -842,7 +843,7 @@ try{
    const revisionActions=page.getByRole('dialog',{name:'Weitere Aktionen'});
    await revisionActions.getByRole('button',{name:'Angebot überarbeiten',exact:true}).click();await revisionActions.getByText('Synthetic revision unavailable',{exact:true}).waitFor();
    assert.equal(new URL(page.url()).pathname,'/angebote/AN-TEST-1');failRevision=false;
-   await revisionActions.getByRole('button',{name:'Angebot überarbeiten',exact:true}).click();await page.waitForURL(base+'/angebote/AN-REV-1');await page.getByRole('link',{name:'AN-TEST-1',exact:true}).waitFor();
+   await revisionActions.getByRole('button',{name:'Angebot überarbeiten',exact:true}).click();await page.waitForURL(base+'/angebote/AN-REV-1');await openDocumentHistory(page);await page.getByRole('link',{name:'AN-TEST-1',exact:true}).waitFor();
    assert.equal(revisionPosts,2);assert.equal(revisionKeys[0],revisionKeys[1]);assert.equal(offer.status,'sent','Draft revision does not withdraw the issued source');
    const ledgerBefore={paid_amount:invoice.paid_amount,credit_amount:invoice.credit_amount,refund_amount:invoice.refund_amount,refunds:invoice.refunds,reminders:invoice.reminders,due_date:invoice.due_date};
    invoice.paid_amount=invoice.total;invoice.credit_amount=35.13;invoice.refund_amount=0;adjustmentPosts=0;adjustmentKeys.length=0;
@@ -853,7 +854,7 @@ try{
    await refundDialog.getByLabel('Betrag',{exact:true}).fill('20');await refundDialog.getByLabel('Interne Begründung',{exact:true}).fill('Synthetic bank refund REF-123');await refundDialog.getByLabel('Rückerstattungsdatum',{exact:true}).fill('2026-10-15');
    failAdjustment=true;await refundDialog.getByRole('button',{name:'Rückerstattung erfassen',exact:true}).click();await refundDialog.getByText('Synthetic refund unavailable',{exact:true}).waitFor();
    assert.equal(await appControlValue(refundDialog.getByLabel('Betrag',{exact:true})),'20');
-   failAdjustment=false;await refundDialog.getByRole('button',{name:'Rückerstattung erfassen',exact:true}).click();await refundDialog.waitFor({state:'hidden'});
+   failAdjustment=false;await refundDialog.getByRole('button',{name:'Rückerstattung erfassen',exact:true}).click();await refundDialog.waitFor({state:'hidden'});await openDocumentHistory(page);
    const refundEntry=page.locator('.document-detail-section').filter({has:page.getByRole('heading',{name:'Rückerstattungen',exact:true})}).locator('p').filter({hasText:'Synthetic bank refund REF-123'});
    await refundEntry.waitFor();assert.equal(await refundEntry.count(),1,'Refund is shown once in its history');
    const refundHistoryText=await refundEntry.innerText();assert.ok(refundHistoryText.includes('Synthetic bank refund REF-123'));assert.ok(refundHistoryText.includes('15.10.2026'));assert.match(refundHistoryText,/CHF\s+20[.,]00/,'Refund history retains the actual booked amount');
@@ -864,7 +865,7 @@ try{
    await page.getByRole('dialog',{name:'Weitere Aktionen'}).getByRole('button',{name:'Zahlungserinnerung senden',exact:true}).click();
    const reminderDialog=page.getByRole('dialog',{name:'Zahlungserinnerung senden'});await reminderDialog.waitFor();await reminderDialog.getByLabel('Empfänger',{exact:true}).fill('reminder@example.invalid');
    failAdjustment=true;await reminderDialog.getByRole('button',{name:'Zahlungserinnerung senden',exact:true}).click();await reminderDialog.getByText('Synthetic reminder unavailable',{exact:true}).waitFor();
-   failAdjustment=false;await reminderDialog.getByRole('button',{name:'Zahlungserinnerung senden',exact:true}).click();await reminderDialog.waitFor({state:'hidden'});await page.getByRole('heading',{name:'Mahnhistorie',exact:true}).waitFor();
+   failAdjustment=false;await reminderDialog.getByRole('button',{name:'Zahlungserinnerung senden',exact:true}).click();await reminderDialog.waitFor({state:'hidden'});await openDocumentHistory(page);await page.getByRole('heading',{name:'Mahnhistorie',exact:true}).waitFor();
    assert.equal(adjustmentPosts,2);assert.equal(adjustmentKeys[0],adjustmentKeys[1],'Retry retains the delivery key');
    await capture(page,{animations:'disabled',path:path.join(output,`${theme}-430-reminder-history.png`)});
    Object.assign(invoice,ledgerBefore);

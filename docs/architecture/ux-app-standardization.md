@@ -115,3 +115,5 @@ Seiten-Ownern. Ein statischer Eintrag ist keine visuelle Abnahme. Unbekannt blei
 physische iPhone-/PWA-Systemleisten und die tatsächliche Produktionslatenz nach
 diesem noch nicht veröffentlichten Paket. Kein Versprechen verzögerungsfreier
 Netzantworten; Rechte, Session-Zäune, Fehler und notwendige Validierung bleiben.
+
+Bereits geöffnete Inhalte derselben Sitzung bleiben bei einer Hintergrundaktualisierung sichtbar; ungültig gewordene Cache-Snapshots werden bei neuer Navigation nicht wiederverwendet. Sitzungswechsel und bestätigte 401/403/404-Antworten verwerfen die betroffenen Daten weiterhin.

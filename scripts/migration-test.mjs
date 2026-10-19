@@ -245,6 +245,8 @@ try{
  await db.query('update organizations set payment_terms_days=60 where id=$1',[sandbox]);
  const inheritedCustomer=await customerRepository.createCustomer(sandbox,'sandbox-user',{name:'Company terms fixture',contactFirstName:'Synthetic',contactLastName:'Contact'});
  assert.equal(inheritedCustomer.paymentDays,60,'New customers inherit company terms without another mandatory question');
+ await db.query('update organizations set payment_terms_days=365 where id=$1',[sandbox]);
+ await assert.rejects(()=>customerRepository.createCustomer(sandbox,'sandbox-user',{name:'Unsupported inherited terms fixture',contactFirstName:'Synthetic',contactLastName:'Contact'}),error=>error.status===400,'An inherited company value outside the existing customer range is rejected before a database constraint fails');
  const zeroTerms=await customerRepository.createCustomer(sandbox,'sandbox-user',{name:'Immediate terms fixture',contactFirstName:'Synthetic',contactLastName:'Contact',paymentDays:0});
  assert.equal(zeroTerms.paymentDays,0,'An explicit customer value overrides company terms');
  assert.equal((await db.query('select payment_days from customers where organization_id=$1 and id=$2',[sandbox,created.id])).rows[0].payment_days,45,'Existing customer conditions remain unchanged');

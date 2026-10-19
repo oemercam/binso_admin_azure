@@ -128,7 +128,7 @@
 .sheet-layer::before{content:"";position:fixed;inset:0;z-index:-1;background:var(--palette-rgba-0-0-0-24);pointer-events:none}
 .sheet-header .icon-button{color:var(--app-action-accent);min-width:44px;min-height:44px}
 .sheet-header .icon-button>svg{width:22px;height:22px;min-width:22px;min-height:22px}
-.bottom-sheet:not([data-wizard]) .sheet-body>form{display:grid;gap:var(--field-group-gap)}
+.bottom-sheet:not([data-wizard]) .sheet-body>form:not(.sheet-form-layout){display:grid;gap:var(--field-group-gap)}
 .bottom-sheet .form-field{margin:0;gap:var(--field-label-gap)}
 .bottom-sheet,.header-panel,.confirm-dialog{
   --color-bg:var(--app-canvas);--color-subtle:var(--app-surface);--control-border:var(--app-control-border);--control-radius:var(--app-control-radius);

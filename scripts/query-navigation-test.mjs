@@ -39,9 +39,12 @@ try{
  assert.equal((await settle("/api/customers")).refreshing,true);
  const refresh=requests.at(-1);assert.equal(refresh.path,'/api/customers');
  revision++;const invalidated=render('/api/customers');
- assert.equal(invalidated.data,undefined,'Mutation revisions cannot reuse mounted or navigation data');
+ assert.deepEqual(invalidated.data,{name:'Known customer'},'Mounted same-session content survives a pending background revision');
  refresh.resolve({name:'Obsolete result'});await settle('/api/customers');
- assert.equal(render('/api/customers').data,undefined,'An obsolete response cannot refill the new revision');
+ assert.deepEqual(render('/api/customers').data,{name:'Known customer'},'An obsolete response cannot replace confirmed content');
+ assert.equal(render('/api/customers').refreshing,true,'The mounted view revalidates its mutation revision');
+ render('/api/products');await settle('/api/products');
+ assert.equal(render('/api/customers').data,undefined,'Navigation cannot reuse a cache snapshot from an invalidated revision');
  requests.at(-1).reject({status:403,message:'Access removed'});
  const denied=await settle('/api/customers');assert.equal(denied.data,undefined);assert.ok(denied.error);
  session='b';assert.equal(render('/api/customers').data,undefined,'A session transition cannot reuse another tenant response');
