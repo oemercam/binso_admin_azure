@@ -73,7 +73,7 @@ const wizardSource=fs.readFileSync('components/form-wizard.tsx','utf8');
 const wizardAst=ts.createSourceFile('form-wizard.tsx',wizardSource,99,true,4);
 const wizardBody=wizardAst.statements.filter(n=>!ts.isImportDeclaration(n)).map(n=>n.getText(wizardAst)).join('\n');
 const wizardCompiled=ts.transpileModule(wizardBody,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
-const wizard={};Function('require','exports','useEffect','useRef','Button','FormActions',wizardCompiled)(require,wizard,React.useEffect,React.useRef,ui.Button,ui.FormActions);
+const wizard={};Function('require','exports','useEffect','useRef','Fragment','Button','FormActions',wizardCompiled)(require,wizard,React.useEffect,React.useRef,React.Fragment,ui.Button,ui.FormActions);
 for(const step of [0,1,2]){
  const markup=html(React.createElement(wizard.FormWizard,{labels:['Kunde','Positionen','Prüfen'],step,onStep:()=>{},cancelAction:React.createElement(ui.Button,{href:'/rechnungen'},'Abbrechen'),action:React.createElement(ui.Button,null,'Erstellen')},'Entwurf'));
  assert.equal(markup.includes('Abbrechen'),step===0);assert.equal(markup.includes('Zurück'),step>0);assert.equal(markup.includes('Weiter'),step<2);assert.equal(markup.includes('Erstellen'),step===2);

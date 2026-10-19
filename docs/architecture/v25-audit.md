@@ -18,7 +18,7 @@ Verbindlicher Umfang: [V25-Anforderungen](v25-requirements.md).
 
 ## Abdeckungsgrenzen
 
-Das codebasierte Inventar umfasst 76 Routen, 206 UI-Komponenten und 2216 CSS-Regeln. Die 282 wiederholten Selektorkontexte sind Kandidaten, keine nachgewiesenen Fehler; responsive Kaskaden werden nicht blind gelöscht. Es sind keine !important-Deklarationen vorhanden.
+Das codebasierte Inventar umfasst 76 Routen, 206 UI-Komponenten und 2215 CSS-Regeln. Die 282 wiederholten Selektorkontexte sind Kandidaten, keine nachgewiesenen Fehler; responsive Kaskaden werden nicht blind gelöscht. Es sind keine !important-Deklarationen vorhanden.
 
 Die nachfolgende Matrix belegt Quellgraph, API-Zuständigkeit und Rollenreferenz, keine visuelle Vollabnahme. Nicht neu gestaltete Seiten verwenden die vorhandene Foundation. Fehlende Referenzzustände, Dark und Operator bleiben abgeleitet. Echte iPhone-/PWA-Statusleiste, Tastatur und physische Geräte sind separat zu bestätigen. Keine Erfolgsmeldung allein aus grünem Build.
 
@@ -113,3 +113,8 @@ Die nachfolgende Matrix belegt Quellgraph, API-Zuständigkeit und Rollenreferenz
 - Isolierte PGlite-Migrationen und Geschäftsprozess-/RLS-Tests erfolgreich, einschliesslich persistiertem Privatkundentyp und Replay-Schutz. Keine produktive Datenbank angesprochen.
 - pnpm test lokal nicht vollständig erfolgreich: readiness-integrity-test.mjs:41 erwartet einen Bash-Exitcode, erhält unter Windows null. Linux-CI bleibt verbindlich; kein Test wird übersprungen oder abgeschwächt.
 - Vollständige Browsermatrix, GitHub Quality/CodeQL und visuelle Abnahme stehen bei Erstellung dieses Berichts noch aus.
+
+## Browserbefunde und gezielte Korrekturen
+
+- Der Schrittwechsel konnte wegen Wiederverwendung desselben Button-DOM-Knotens nach der React-Aktualisierung native Submit-Semantik erhalten. Der Wizard trennt Next/Submit-Identitäten und unterbindet native Submit-Defaults beim Weiter-Klick. Regression: Weiter verursacht null POSTs; Speichern/Retry bleiben idempotent.
+- Upload- und Berechtigungstests enthielten alte direkte Button-/Heading-Selektoren. Sie prüfen jetzt sichtbares Aktionsmenü, echten Dateiauswahldialog und synthetische Upload-API sowie Statusmeldung und unveränderte API-Zugriffsverbote. Kein Gate und keine Assertion entfernt.

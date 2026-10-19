@@ -1,7 +1,7 @@
 "use client";
 
 import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
-import {useEffect,useRef,type ReactNode} from "react";
+import {Fragment,useEffect,useRef,type ReactNode} from "react";
 import {Button,FormActions} from "./ui";
 
 /** Keeps every step mounted: a step change never changes drafts or navigation. */
@@ -47,7 +47,9 @@ export function FormWizard({labels,step,onStep,children,action,cancelAction,busy
   <div className="wizard-content">{children}</div>
   <FormActions onClickCapture={event=>{
    const button=event.target instanceof Element?event.target.closest('button.button-primary'):null;
+   // Prevent a step transition from acquiring native submit semantics in the same click.
+   if(button&&guided&&step<labels.length-1)event.preventDefault();
    if(button&&(!guided||step===labels.length-1)&&!valid()){event.preventDefault();event.stopPropagation();}
-  }}>{!guided?cancelAction:(step===0?cancelAction:<Button variant="secondary" disabled={busy} onClick={()=>go(step-1)}><LocalizedText>{backLabel}</LocalizedText></Button>)}{!guided||step===labels.length-1?action:<Button disabled={busy} onClick={()=>go(step+1)}><LocalizedText>{nextLabel}</LocalizedText></Button>}</FormActions>
+  }}>{!guided?cancelAction:(step===0?cancelAction:<Button variant="secondary" disabled={busy} onClick={()=>go(step-1)}><LocalizedText>{backLabel}</LocalizedText></Button>)}{!guided||step===labels.length-1?<Fragment key="wizard-submit">{action}</Fragment>:<Button key="wizard-next" disabled={busy} onClick={()=>go(step+1)}><LocalizedText>{nextLabel}</LocalizedText></Button>}</FormActions>
  </LocalizedElement>;
 }
