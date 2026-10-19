@@ -198,6 +198,19 @@ Basis-SHA. Ihre Fehler werden nicht durch eine Dokumentationsänderung als besta
   ist nach der Korrektur noch durch CI nachzuweisen; keine lokale Produktivdatenbank.
 - Keine Änderung an Produktionsrollen, API-Verhalten, UX oder Pflicht-Gates. Der
   Source-Fingerprint wird ausschliesslich mit dem vorhandenen Generator aktualisiert.
+- Zusätzlicher Vertragsabgleich: `ux-contract-check.mjs` hat einen veralteten
+  Komponentengraphen in `docs/audit/v24/page-matrix.json` nachgewiesen. Vor der
+  Regeneration wurde geprüft, dass alle bisherigen Seiten ausdrücklich ungeprüft
+  waren und keine vorhandene Abnahme-Evidence überschrieben wird. Der vorhandene
+  `ux-contract-inventory.mjs` erzeugt die aktuelle Zuordnung; anschliessend sind
+  alle 76 Seiten und 34 bestehenden Owner-/Style-Regeln erfolgreich geprüft.
+  Keine Regel, Assertion oder Screenshot-Baseline wurde abgeschwächt.
+
+Zusätzliche lokale Teilnachweise: Operator-Verträge und Ankündigungs-API mit
+Audit-Rollback, PWA-Lebenszyklus, Rücknavigation, Entwurfs-/Sessiontrennung,
+QA-Auswahl und UI-Foundation sind erfolgreich. Die Manifest-Metadaten sind
+vorhanden: Kundenrouten verwenden `customer-app-layout.tsx`, One Admin sein
+eigenes Layout. Das ist keine reale Installations-/Scope-Abnahme von B03.
 
 Fortsetzung: bestehender PR #296, keine parallele Integration. Der aktuelle CI-Run
 und sein SHA werden im Abschluss beziehungsweise im PR angegeben. Routen-, Geräte-
