@@ -1,3 +1,4 @@
+async function assertReturnPosition(page,target){try{await page.waitForFunction(y=>Math.abs(scrollY-y)<=1,target);}catch(error){console.log('Return position mismatch',await page.evaluate(expected=>({expected,actual:scrollY,height:document.documentElement.scrollHeight,viewport:innerHeight,path:location.pathname}),target));throw error;}}
 async function chooseRecordFilter(page,value){await page.getByRole('button',{name:'Filter und Sortierung',exact:true}).click();const sheet=page.getByRole('dialog',{name:'Filter und Sortierung',exact:true});await sheet.getByLabel('Status',{exact:true}).selectOption(value);await sheet.getByRole('button',{name:'Anwenden',exact:true}).click();await sheet.waitFor({state:'hidden'});}
 import {verifyStableAppNavigation} from './app-workspace-browser.mjs';
 import {verifyAppSelection} from './task-controls-browser.mjs';
@@ -300,6 +301,7 @@ try{
     if(url.searchParams.get('format')==='csv'){reportExports++;await new Promise(resolve=>setTimeout(resolve,150));if(failReportDownload)return route.fulfill({status:503,json:{message:'Synthetic report export unavailable'}});return route.fulfill({headers:{'Content-Type':'text/csv; charset=utf-8','Content-Disposition':'attachment; filename="binso-reports-fixture.csv"'},body:'"Kennzahl";"Wert";"Einheit"\r\n'});}
     data={period:{from:statisticToday.slice(0,7)+'-01',to:statisticToday},asOf:new Date().toISOString(),customers:{total:'2',added:'1'},projects:[{status:'active',count:'1'}],time:{hours:'12.5',billable_hours:'10',invoiced_hours:'5'},payments:[{currency:'CHF',amount:'200'}],expenses:[{currency:'CHF',amount:'50'}],employees:{total:'2',active:'2'}};
    }
+   else if(p==='/api/workforce-assignments')data={items:[{id:'assignment-one',employee_name:employee.name,customer_name:customer.name,project_name:projectFixture.name,starts_on:'2026-01-01',ends_on:null,revoked_at:null}],employees:[{id:employee.id,name:employee.name,user_id:'member-one'}],members:[{user_id:'member-one',email:'team@example.invalid',role:'member'}]};
    else if(p==='/api/projects')data={items:[projectFixture],total:1};
    else if(p==='/api/projects/project-one')data={item:projectFixture,time:[{id:'project-time',work_date:'2026-10-01',hours:12.5,description:'Synthetic project work',billable:true,approved:true}],totals:{hours:12.5,invoiced_hours:0,entries:1},invoices:[{number:invoice.number,status:invoice.status,currency:'CHF',total_amount:invoice.total}]};
    else if(p==='/api/documents')data={items:collections.documents.filter(item=>!url.searchParams.has('kind')||item.kind===url.searchParams.get('kind'))};
@@ -450,7 +452,7 @@ try{
       const dossier=page.locator('.detail-grid[data-layout="dossier"]');
       assert.equal(await dossier.count(),1,'Customer overview uses the shared reference dossier layout');
       assert.equal(await dossier.locator('[data-area="summary"] .metric').count(),2,'Customer overview shows actual yearly volume and open receivables');
-      assert.equal(await page.locator('.bo-statistics').count(),0,'The period chart belongs to the document/finance tab');
+      const insight=page.locator('.financial-snapshot');assert.equal(await insight.count(),1,'Customer development is available as a supplementary overview disclosure');assert.equal(await page.locator('.bo-statistics').filter({visible:true}).count(),0,'Detailed development starts collapsed');await insight.locator('summary').click();assert.equal(await insight.locator('.bo-statistics').filter({visible:true}).count(),1,'Customer development is available on demand');await insight.locator('summary').click();
       assert.equal(await page.locator('h1').filter({visible:true}).count(),1,'Reference dossier has exactly one visible primary heading');
       const summaryBox=await dossier.locator('[data-area="summary"]').boundingBox(),factsBox=await dossier.locator('[data-area="facts"]').boundingBox(),recordsBox=await dossier.locator('[data-area="records"]').boundingBox();
       if(width<=760)assert.ok(summaryBox.y<factsBox.y&&factsBox.y<recordsBox.y,'Mobile order: finances, contact facts, open invoices');
@@ -1059,7 +1061,7 @@ try{
   if(hasInteraction('settings')){
    await page.setViewportSize({width:390,height:740});await navigate(base+'/einstellungen');
    const settingsContent=page.locator('.page-container');await settingsContent.getByRole('link',{name:'Abonnement',exact:true}).waitFor();
-   const timeSetting=page.locator('.settings-overview a[href="/einstellungen/zeiterfassung"]');await timeSetting.scrollIntoViewIfNeeded();const returnScroll=await page.evaluate(()=>scrollY);await timeSetting.click();await page.waitForURL(base+'/einstellungen/zeiterfassung');await page.locator('.mobile-back').click();await page.waitForURL(base+'/einstellungen');await page.waitForFunction(y=>Math.abs(scrollY-y)<=1,returnScroll);await timeSetting.click();await page.waitForURL(base+'/einstellungen/zeiterfassung');await page.goBack();await page.waitForURL(base+'/einstellungen');await page.waitForFunction(y=>Math.abs(scrollY-y)<=1,returnScroll);
+   const timeSetting=page.locator('.settings-overview a[href="/einstellungen/zeiterfassung"]');await timeSetting.scrollIntoViewIfNeeded();const returnScroll=await page.evaluate(()=>scrollY);await timeSetting.click();await page.waitForURL(base+'/einstellungen/zeiterfassung');await page.locator('.mobile-back').click();await page.waitForURL(base+'/einstellungen');await assertReturnPosition(page,returnScroll);await timeSetting.click();await page.waitForURL(base+'/einstellungen/zeiterfassung');await page.goBack();await page.waitForURL(base+'/einstellungen');await assertReturnPosition(page,returnScroll);
    assert.equal(await page.locator('.settings-mobile-navigation').count(),0,'No redundant mobile hamburger/context strip');
    await settingsContent.getByLabel('Einstellungen suchen',{exact:true}).fill('Abonnement');
    assert.equal(await settingsContent.locator('.bo-settings-group').count(),1,'Settings search hides empty groups');
