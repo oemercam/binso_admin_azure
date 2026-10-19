@@ -66,7 +66,7 @@ if(server&&process.env.BINSO_UX_SERVER_MODE==='dev')for(const route of (process.
 const browserType=engines[process.env.BINSO_UX_BROWSER??"chromium"];
 const launchOptions={headless:true,...(process.env.BINSO_CHROMIUM_EXECUTABLE&&(process.env.BINSO_UX_BROWSER??'chromium')==='chromium'?{executablePath:process.env.BINSO_CHROMIUM_EXECUTABLE,args:['--no-sandbox','--disable-dev-shm-usage','--use-gl=angle','--use-angle=swiftshader']}: {})};
 let browser;
-const customer={id:'customer-one',customer_no:'K-000001',name:'Prüffirma AG',city:'Bern',status:'active',contact_name:'Test Person',email:'test@example.invalid',street:'Teststrasse 1',postal_code:'3000'};
+const customer={paymentDays:30,id:'customer-one',customer_no:'K-000001',name:'Prüffirma AG',city:'Bern',status:'active',contact_name:'Test Person',email:'test@example.invalid',street:'Teststrasse 1',postal_code:'3000'};
 const product={id:'product-one',name:'Beratung',kind:'service',unit:'hour',unit_price:125,vat_rate:8.1,status:'active'};
 const employee={id:'employee-one',first_name:'Test',last_name:'Person',email:'mitarbeiterin.mit.langem.namen@internationales-unternehmen.example.invalid',start_date:'2025-01-01',job_title:'ICT',workload_percent:80,weekly_hours:42,status:'active'};
 const expense={id:'expense-one',merchant:'SBB',amount:89,currency:'CHF',expense_date:'2026-10-08',status:'submitted',employee_id:employee.id,employee};
@@ -482,7 +482,7 @@ try{
       });
       const visible=await page.evaluate(()=>{const composer=document.querySelector('.thread-composer').getBoundingClientRect(),nav=document.querySelector('.bottom-nav');const limit=nav?.getClientRects().length?nav.getBoundingClientRect().top:innerHeight;return composer.bottom<=limit+1&&composer.top>=0&&scrollY===0});assert.ok(visible,'Chat input stays above navigation in every app viewport');
     }
-    if(!process.env.BINSO_UX_BASELINE){await waitForFiniteAnimations(page);for(const control of await page.locator('.form-field>.form-control').filter({visible:true}).all()){
+    if(!process.env.BINSO_UX_BASELINE){await waitForFiniteAnimations(page);for(const control of await page.locator('.form-field>.form-control,.form-field .app-select-trigger').filter({visible:true}).all()){
      const g=await control.evaluate(el=>{const c=getComputedStyle(el);return {height:el.getBoundingClientRect().height,radius:c.borderRadius,padding:c.paddingLeft,font:c.fontSize,coarse:matchMedia('(pointer:coarse)').matches,auth:!!el.closest('.auth-workspace'),app:!!el.closest('.page-container,.operator-app-content,.bottom-sheet,.header-panel,.confirm-dialog')}});
      assert.equal(g.height,width<=760?44:g.auth?46:g.coarse?44:40,`${route}: canonical closed field height`);assert.equal(g.padding,'11px',`${route}: canonical field inset`);assert.equal(g.radius,g.auth?'5px':width<=760?'8px':'7px',`${route}: canonical field radius`);
     }}
@@ -712,7 +712,7 @@ try{
    const emptyTrend=page.getByRole('button',{name:'Zeitverlauf anzeigen',exact:true});if(await emptyTrend.count())await emptyTrend.click();
    assert.ok((await page.locator('.bo-statistics-point').evaluateAll(elements=>elements.map(el=>Number(el.getAttribute('data-value'))))).every(value=>value===0),'Empty period has only real zero observations');
    await page.getByText('Keine Buchungen im gewählten Zeitraum.',{exact:true}).waitFor();
-   const snapshot=page.locator('.financial-snapshot');if(!await snapshot.getAttribute('open'))await snapshot.locator('summary').click();const overdueSegment=snapshot.getByRole('button').filter({hasText:'Überfällig'});await overdueSegment.focus();await overdueSegment.press('Enter');const overdueLink=snapshot.getByRole('link',{name:'Details anzeigen',exact:true});await overdueLink.focus();await overdueLink.press('Enter');await page.waitForURL(url=>url.pathname==='/rechnungen'&&url.searchParams.get('status')==='Überfällig');
+   const snapshot=page.locator('.financial-snapshot');if(!await snapshot.getAttribute('open'))await snapshot.locator('summary').click();const overdueSegment=snapshot.locator('.bo-ring-details').getByRole('button').filter({hasText:'Überfällig'});await overdueSegment.focus();await overdueSegment.press('Enter');const overdueLink=snapshot.getByRole('link',{name:'Details anzeigen',exact:true});await overdueLink.focus();await overdueLink.press('Enter');await page.waitForURL(url=>url.pathname==='/rechnungen'&&url.searchParams.get('status')==='Überfällig');
    await page.locator('.records-active-filters .filter-chip').filter({hasText:'Überfällig'}).waitFor();
    await chooseRecordFilter(page,'Alle');assert.equal(new URL(page.url()).searchParams.has('status'),false,'A user filter change clears the consumed chart drilldown');
   }

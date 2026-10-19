@@ -360,7 +360,7 @@ input:not([type="checkbox"]):not([type="radio"]),
 
 .app-select-control{position:relative;display:block;min-width:0;width:100%}
 .app-select-native{display:none}
-.app-select-trigger{font:inherit;font-size:var(--control-font);font-weight:400;border-radius:var(--app-control-radius);display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;text-align:left;white-space:normal}
+.app-select-trigger{font:inherit;font-size:var(--control-font);font-weight:400;border-radius:var(--control-radius);display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;text-align:left;white-space:normal}
 .app-select-trigger>span{flex:none;color:var(--color-muted)}
 
 .app-select-trigger[aria-invalid="true"]{border-color:var(--status-danger-fg)}
