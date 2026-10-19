@@ -73,7 +73,7 @@ const wizardSource=fs.readFileSync('components/form-wizard.tsx','utf8');
 const wizardAst=ts.createSourceFile('form-wizard.tsx',wizardSource,99,true,4);
 const wizardBody=wizardAst.statements.filter(n=>!ts.isImportDeclaration(n)).map(n=>n.getText(wizardAst)).join('\n');
 const wizardCompiled=ts.transpileModule(wizardBody,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
-const wizard={};Function('require','exports','useEffect','useRef','Children','cloneElement','isValidElement','Fragment','Button','FormActions','FormSection',wizardCompiled)(require,wizard,React.useEffect,React.useRef,React.Children,React.cloneElement,React.isValidElement,React.Fragment,ui.Button,ui.FormActions,ui.FormSection);
+const wizard={};Function('require','exports','useEffect','useLayoutEffect','useRef','Children','cloneElement','isValidElement','Fragment','Button','FormActions','FormSection',wizardCompiled)(require,wizard,React.useEffect,React.useLayoutEffect,React.useRef,React.Children,React.cloneElement,React.isValidElement,React.Fragment,ui.Button,ui.FormActions,ui.FormSection);
 for(const step of [0,1,2]){
  const markup=html(React.createElement(wizard.FormWizard,{labels:['Kunde','Positionen','Prüfen'],step,onStep:()=>{},cancelAction:React.createElement(ui.Button,{href:'/rechnungen'},'Abbrechen'),action:React.createElement(ui.Button,null,'Erstellen')},'Entwurf'));
  assert.equal(markup.includes('Abbrechen'),step===0);assert.equal(markup.includes('Zurück'),step>0);assert.equal(markup.includes('Weiter'),step<2);assert.equal(markup.includes('Erstellen'),step===2);
@@ -104,3 +104,51 @@ assert.equal(fieldInputHint('Passwort','text'),undefined);
 const singleStepHeading=html(React.createElement(wizard.FormWizard,{labels:['Grunddaten'],step:0,onStep:()=>{},action:null,cancelAction:null},React.createElement(ui.FormSection,{title:'Grunddaten'},'Inhalt')));assert.equal((singleStepHeading.match(/Grunddaten/g)||[]).length,1,'Wizard step names are not repeated by their own form section');
 
 assert.equal(fieldInputHint("Beschreibung"),"z. B. IT-Beratung und Support");assert.equal(fieldInputHint("Einrichtungsschlüssel"),undefined,"Security setup secrets never receive synthetic examples");assert.equal(fieldInputHint("Zahlungsreferenz"),"RF… oder QR-Referenz");
+
+// The real shared popup calculation must use content height and visible keyboard bounds.
+const {selectGeometry}=await import(moduleUrl(fs.readFileSync('lib/select-geometry.ts','utf8')));
+for(const viewport of [{left:0,top:0,width:390,height:844},{left:0,top:140,width:320,height:280},{left:20,top:100,width:260,height:200}]){
+ for(const anchor of [{left:20,top:110,bottom:154,width:280},{left:10,top:700,bottom:744,width:354}])for(const content of [52,144,1200]){
+  const popup=selectGeometry(anchor,viewport,content);
+  assert.ok(popup.left>=viewport.left+12&&popup.left+popup.width<=viewport.left+viewport.width-12+1);
+  assert.ok(popup.top>=viewport.top+12&&popup.top+popup.height<=viewport.top+viewport.height-12+1,'Keyboard-visible viewport contains the complete popup');
+  assert.ok(popup.height<=320&&popup.height<=content,'Short option sets never reserve a full-height blank menu');
+ }
+}
+const adjacent=selectGeometry({left:20,top:650,bottom:694,width:300},{left:0,top:0,width:390,height:844},52);
+assert.equal(adjacent.top,698,'Short menus remain adjacent below the trigger when they fit');
+const upward=selectGeometry({left:20,top:740,bottom:784,width:300},{left:0,top:0,width:390,height:844},120);
+assert.equal(upward.top+upward.height,736,'Upward menus end beside the trigger, not a presumed 320px above it');
+
+// Exercise actual upload callbacks: invalid input and read-only roles cannot mutate form state.
+const fileSource=fs.readFileSync('components/file-upload.tsx','utf8'),fileAst=ts.createSourceFile('file-upload.tsx',fileSource,99,true,4);
+const fileBody=fileAst.statements.filter(n=>!ts.isImportDeclaration(n)).map(n=>n.getText(fileAst)).join('\n'),fileExports={};
+let fileError='',fileSelection=null;
+Function('require','exports','useRef','useState','usePageAccess','LocalizedText','LocalizedElement','limitsConfig','megabytes','Button','Field','Input',ts.transpileModule(fileBody,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText)(require,fileExports,()=>({current:null}),()=>[fileError,value=>{fileError=value}],()=>({write}),({children})=>children,({children})=>children,{maxFileUploadBytes:10*1024*1024},value=>value/1024/1024,ui.Button,ui.Field,ui.Input);
+const uploadProps={label:'Firmenlogo',file:null,accept:['image/png'],onSelect:file=>{fileSelection=file}};
+const selectFile=file=>{const view=fileExports.FileUpload(uploadProps),control=React.Children.toArray(view.props.children)[0];control.props.onChange({target:{files:[file],value:'selected'}})};
+write=true;
+for(const file of [{type:'text/plain',size:10},{type:'image/png',size:0},{type:'image/png',size:10*1024*1024+1}]){selectFile(file);assert.equal(fileSelection,null);assert.ok(fileError,'Rejected file provides a field error');}
+const validLogo={type:'image/png',size:32,name:'synthetic.png'};selectFile(validLogo);assert.equal(fileSelection,validLogo);assert.equal(fileError,'');
+write=false;fileSelection=null;selectFile(validLogo);assert.equal(fileSelection,null,'Read-only upload callbacks fail closed');write=true;
+
+// Invalid wizard fields keep native validity and inline errors, without a native popover.
+let wizardValid=false,wizardFocused=false,wizardScrolled=false,wizardNext=0;
+const invalidWizardControl={disabled:false,getClientRects:()=>[{}],matches:()=>false,checkValidity:()=>wizardValid,reportValidity(){throw Error('Native validation popover must not replace inline errors')},focus(){wizardFocused=true},scrollIntoView(){wizardScrolled=true}};
+const validationWizard={};
+Function('require','exports','useEffect','useLayoutEffect','useRef','Children','cloneElement','isValidElement','Fragment','Button','FormActions','FormSection','requestAnimationFrame',wizardCompiled)(require,validationWizard,()=>{},()=>{},initial=>({current:initial===null?{querySelectorAll:()=>[invalidWizardControl],querySelector:()=>null}:initial}),React.Children,React.cloneElement,React.isValidElement,React.Fragment,ui.Button,ui.FormActions,ui.FormSection,()=>0);
+const wizardElements=element=>!element||typeof element!=='object'?[]:[element,...React.Children.toArray(element.props?.children).flatMap(wizardElements)];
+const validationView=validationWizard.FormWizard({labels:['First','Second'],step:0,onStep:()=>{wizardNext++},action:null,cancelAction:null,children:null});
+const nextAction=wizardElements(validationView).find(element=>element.type===ui.Button&&element.props.onClick);
+nextAction.props.onClick();assert.equal(wizardNext,0,'Invalid input cannot advance the wizard');assert.ok(wizardFocused&&wizardScrolled,'Inline validation focuses and reveals its failing control');
+wizardValid=true;nextAction.props.onClick();assert.equal(wizardNext,1,'A valid current step remains usable');
+
+const groupedHeading=html(React.createElement(ui.SectionTitle,{title:'Berichtszeitraum',action:React.createElement(React.Fragment,null,React.createElement(ui.Button,null,'Filter'),React.createElement(ui.Button,null,'Aktionen'))}));
+assert.match(groupedHeading,/<div class="section-title-actions"><button[\s\S]+<\/button><button/,'Fragmented heading actions share one aligned group');
+// Actual step commit focus must not queue a later focus that steals text entry.
+const focusWizard={},focusRefs=[];let focusCursor=0,focusEffects=[],commitFocus=0,lateFocus=0;
+const focusContent={tabIndex:-1,focus(){commitFocus++},scrollTo(){}};
+Function('require','exports','useEffect','useLayoutEffect','useRef','Children','cloneElement','isValidElement','Fragment','Button','FormActions','FormSection','requestAnimationFrame',wizardCompiled)(require,focusWizard,()=>{},effect=>focusEffects.push(effect),initial=>{const at=focusCursor++;if(!focusRefs[at])focusRefs[at]={current:initial===null?{querySelectorAll:()=>[],querySelector:()=>focusContent}:initial};return focusRefs[at]},React.Children,React.cloneElement,React.isValidElement,React.Fragment,ui.Button,ui.FormActions,ui.FormSection,()=>{lateFocus++;return 0});
+const focusRender=step=>{focusCursor=0;focusEffects=[];const view=focusWizard.FormWizard({labels:['Company','Access','Review'],step,onStep(){},action:null,cancelAction:null,children:null});focusEffects.forEach(effect=>effect());return view};
+const initialFocusView=focusRender(0);wizardElements(initialFocusView).find(element=>element.type===ui.Button&&element.props.onClick).props.onClick();assert.equal(lateFocus,0,'Going forward must never schedule delayed focus over subsequent text insertion');
+focusRender(1);assert.equal(commitFocus,1,'The new step receives focus in its layout commit');focusRender(1);assert.equal(commitFocus,1,'An input-state rerender must not steal focus again');

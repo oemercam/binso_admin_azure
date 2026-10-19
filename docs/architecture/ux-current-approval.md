@@ -1,5 +1,12 @@
 # Aktueller Microsoft-App-Standard
 
+V25.1 ist zur Codekorrektur freigegeben: [Anforderungen](v25-1-requirements.md),
+[Abnahmematrix](v25-1-acceptance.md). Navigation und blauer Plus-Button bleiben
+unverändert. Vollständige Ringbeträge dürfen zugunsten der Lesbarkeit ausserhalb
+des Rings stehen. Kurze Sheets dimensionieren sich am Inhalt; lange Inhalte
+behalten den begrenzten Scrollbereich und erreichbaren Footer. Keine separate
+Merge- oder Deployment-Freigabe aus diesem Auftrag.
+
 V25-Freigabe vom 19.10.2026: [vollständige Anforderungen](v25-requirements.md).
 Navigation und bestehender blauer Plus-Button bleiben unverändert. Die aktuellen
 FormSheet-Workspaces sind modal mit Scrim und Fokusführung. Sekundäre Dokument-

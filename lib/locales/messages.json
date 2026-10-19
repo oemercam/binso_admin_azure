@@ -12768,5 +12768,40 @@
     "RF… or QR reference",
     "RF… ou référence QR",
     "RF… o riferimento QR"
+  ],
+  "Datei auswählen": [
+    "Choose file",
+    "Choisir un fichier",
+    "Scegli file"
+  ],
+  "Datei ersetzen": [
+    "Replace file",
+    "Remplacer le fichier",
+    "Sostituisci file"
+  ],
+  "Datei wird geprüft und gespeichert.": [
+    "File is being checked and saved.",
+    "Le fichier est en cours de vérification et d’enregistrement.",
+    "Il file viene controllato e salvato."
+  ],
+  "Bitte einen unterstützten Dateityp auswählen.": [
+    "Please choose a supported file type.",
+    "Veuillez choisir un type de fichier pris en charge.",
+    "Scegli un tipo di file supportato."
+  ],
+  "Berichtsaktionen": [
+    "Report actions",
+    "Actions du rapport",
+    "Azioni del rapporto"
+  ],
+  "Zustellung": [
+    "Delivery",
+    "Distribution",
+    "Consegna"
+  ],
+  "Die Datei muss zwischen 1 Byte und 10 MB gross sein.": [
+    "The file must be between 1 byte and 10 MB.",
+    "Le fichier doit avoir une taille comprise entre 1 octet et 10 Mo.",
+    "Il file deve avere dimensioni comprese tra 1 byte e 10 MB."
   ]
 }

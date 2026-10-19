@@ -1,8 +1,9 @@
 import assert from 'node:assert/strict';
 
 export async function assertChoiceGeometry(label){
+ await label.waitFor({state:'visible'});
  const geometry=await label.evaluate(el=>{const box=el.getBoundingClientRect(),input=el.querySelector('input').getBoundingClientRect(),text=el.querySelector('span[id$="-label"]').getBoundingClientRect();return {height:box.height,inputRight:input.right,inputTop:input.top,inputBottom:input.bottom,textLeft:text.left,textTop:text.top,textBottom:text.bottom,textRight:text.right,right:box.right}});
- assert.ok(geometry.height>=44,'Choice label is a minimum 44px touch target');
+ assert.ok(geometry.height>=44,'Choice label is a minimum 44px touch target; measured '+geometry.height+'px');
  assert.ok(geometry.textLeft>=geometry.inputRight,'Wrapped choice text stays beside its control');
  assert.ok(geometry.inputTop<geometry.textBottom&&geometry.inputBottom>geometry.textTop,'Checkbox and multiline text share one row');
  assert.ok(geometry.textRight<=geometry.right+1,'Choice text remains inside its field');

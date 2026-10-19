@@ -57,6 +57,8 @@ permanent-toolbox instructions. Historical audit reports are evidence, not rules
 ## Current V25 approval (19 October 2026)
 
 V25 is authorized for implementation: see docs/architecture/v25-requirements.md.
+V25.1 corrections are authorized too: see docs/architecture/v25-1-requirements.md
+and its acceptance matrix. Existing navigation and floating-plus freezes remain.
 The existing navigation and blue floating plus remain unchanged in appearance,
 position and behavior. This latest explicit freeze overrides older permissions
 to redesign them. Reuse the current foundation; no glass/blur. Empty states use

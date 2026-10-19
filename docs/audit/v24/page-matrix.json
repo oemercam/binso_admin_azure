@@ -1,5 +1,5 @@
 {
-  "commit": "0b9d6bfc80adcf0a34b54647d24b363eacb36659",
+  "commit": "8e3db112ad61472700980c713bab1f8d70961272",
   "method": "Existing TypeScript AST dependency inventory; conditional reachability is not runtime proof",
   "pages": [
     {
@@ -314,7 +314,7 @@
         },
         {
           "tag": "ActionSheet",
-          "line": 207,
+          "line": 211,
           "component": "components/binso-ux.tsx#ActionsMenu"
         },
         {
@@ -609,7 +609,7 @@
         },
         {
           "tag": "ActionSheet",
-          "line": 207,
+          "line": 211,
           "component": "components/binso-ux.tsx#ActionsMenu"
         },
         {
@@ -1565,6 +1565,8 @@
         "components/app-shell.tsx#ShellConfiguration",
         "components/binso-ux.tsx#WorkspaceSection",
         "components/ui.tsx#SectionTitle",
+        "components/binso-ux.tsx#ActionsMenu",
+        "components/binso-ux.tsx#RowActions",
         "components/binso-ux.tsx#MetricTiles",
         "components/binso-ux.tsx#MetricTile",
         "components/ui.tsx#Metric"
@@ -1634,6 +1636,11 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "ActionSheet",
+          "line": 211,
+          "component": "components/binso-ux.tsx#ActionsMenu"
         }
       ],
       "dimensions": {
@@ -2601,12 +2608,12 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 269,
+          "line": 273,
           "component": "components/pages/settings.tsx#SubscriptionSettingsPage"
         },
         {
           "tag": "FormSheet",
-          "line": 309,
+          "line": 313,
           "component": "components/pages/settings.tsx#SubscriptionSettingsPage"
         },
         {
@@ -3618,7 +3625,8 @@
         "components/locale-switcher.tsx#LocaleSwitcher",
         "components/app-shell.tsx#ShellRegistration",
         "components/app-shell.tsx#ShellConfiguration",
-        "components/binso-ux.tsx#FormSheet"
+        "components/binso-ux.tsx#FormSheet",
+        "components/file-upload.tsx#FileUpload"
       ],
       "layouts": [
         "app/layout.tsx",
@@ -3628,7 +3636,7 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 159,
+          "line": 163,
           "component": "components/pages/settings.tsx#CompanySettingsPage"
         },
         {
@@ -3837,7 +3845,7 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 84,
+          "line": 85,
           "component": "components/pages/settings.tsx#AccountSettingsPage"
         },
         {
@@ -4763,7 +4771,7 @@
         },
         {
           "tag": "ActionSheet",
-          "line": 207,
+          "line": 211,
           "component": "components/binso-ux.tsx#ActionsMenu"
         }
       ],
@@ -6126,7 +6134,7 @@
         },
         {
           "tag": "ActionSheet",
-          "line": 207,
+          "line": 211,
           "component": "components/binso-ux.tsx#ActionsMenu"
         },
         {
@@ -6927,7 +6935,7 @@
         },
         {
           "tag": "ActionSheet",
-          "line": 207,
+          "line": 211,
           "component": "components/binso-ux.tsx#ActionsMenu"
         },
         {
@@ -7181,7 +7189,7 @@
         },
         {
           "tag": "ActionSheet",
-          "line": 207,
+          "line": 211,
           "component": "components/binso-ux.tsx#ActionsMenu"
         },
         {
@@ -9861,7 +9869,7 @@
         },
         {
           "tag": "ActionSheet",
-          "line": 207,
+          "line": 211,
           "component": "components/binso-ux.tsx#ActionsMenu"
         },
         {
@@ -10251,7 +10259,7 @@
         },
         {
           "tag": "ActionSheet",
-          "line": 207,
+          "line": 211,
           "component": "components/binso-ux.tsx#ActionsMenu"
         },
         {
@@ -10469,7 +10477,7 @@
         },
         {
           "tag": "ActionSheet",
-          "line": 207,
+          "line": 211,
           "component": "components/binso-ux.tsx#ActionsMenu"
         },
         {
@@ -10908,7 +10916,7 @@
         },
         {
           "tag": "ActionSheet",
-          "line": 207,
+          "line": 211,
           "component": "components/binso-ux.tsx#ActionsMenu"
         },
         {
@@ -11566,7 +11574,7 @@
         },
         {
           "tag": "ActionSheet",
-          "line": 207,
+          "line": 211,
           "component": "components/binso-ux.tsx#ActionsMenu"
         },
         {
@@ -11861,7 +11869,7 @@
         },
         {
           "tag": "ActionSheet",
-          "line": 207,
+          "line": 211,
           "component": "components/binso-ux.tsx#ActionsMenu"
         },
         {
@@ -13168,7 +13176,7 @@
         },
         {
           "tag": "ActionSheet",
-          "line": 207,
+          "line": 211,
           "component": "components/binso-ux.tsx#ActionsMenu"
         }
       ],
@@ -14782,7 +14790,7 @@
         },
         {
           "tag": "ActionSheet",
-          "line": 207,
+          "line": 211,
           "component": "components/binso-ux.tsx#ActionsMenu"
         },
         {

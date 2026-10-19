@@ -204,7 +204,11 @@ export function FilterSheet(props:SheetProps){return <Sheet {...props} kind="fil
 /** The same compact action sheet is used for entity editors on every viewport. */
 export function ActionsMenu({label, children, busy=false}: {label:string;children:ReactNode;busy?:boolean}) {
   const [open,setOpen]=useState(false);
-  return <><RowActions label={label} disabled={busy} onClick={()=>setOpen(true)}/><ActionSheet label={label} open={open} busy={busy} onClose={()=>setOpen(false)}><div className="action-list" onClick={event=>{if(!busy&&event.target instanceof Element&&event.target.closest("button,a"))setOpen(false)}}>{children}</div></ActionSheet></>;
+  const [closeRequested,setCloseRequested]=useState(false);
+  // An async action must retain the overlay while busy: a second tap must not
+  // reach the underlying page after the first tap started a download or upload.
+  useEffect(()=>{if(!closeRequested||busy)return;const frame=requestAnimationFrame(()=>{setOpen(false);setCloseRequested(false)});return()=>cancelAnimationFrame(frame)},[closeRequested,busy]);
+  return <><RowActions label={label} disabled={busy} onClick={()=>setOpen(true)}/><ActionSheet label={label} open={open} busy={busy} onClose={()=>{setCloseRequested(false);setOpen(false)}}><div className="action-list" onClick={event=>{if(!busy&&event.target instanceof Element&&event.target.closest("button,a"))setCloseRequested(true)}}>{children}</div></ActionSheet></>;
 }
 
 /** Canonical two-line row shared by entity and financial lists. */

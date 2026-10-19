@@ -1,3 +1,5 @@
+> Ergänzung 19.10.2026: [V25.1-Korrekturauftrag](v25-1-requirements.md) mit präzisierten Abnahme-, Aktions-, Finanz- und Evidenzregeln ist aufgenommen. Seine Codeumsetzung ist anschliessend ausdrücklich freigegeben; separate Merge-/Deployment-Freigaben bleiben erforderlich. Weiterhin gültige Fachanforderungen bleiben erhalten.
+
 > Aktueller Status, 19.10.2026: Die Implementierung wurde ausdrücklich freigegeben. Die im übernommenen Anforderungstext enthaltene Sammel-Stoppregel ist damit aufgehoben. Navigation und Plus-Button bleiben unverändert. Ein Produktivdeployment benötigt weiterhin eine separate Freigabe.
 
 # BINSO ONE – V25 FINAL MASTER IMPLEMENTATION

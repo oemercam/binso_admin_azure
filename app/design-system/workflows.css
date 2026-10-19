@@ -138,7 +138,7 @@
 .timer-actions{display:flex;justify-content:flex-start;gap:8px}
 .timer-actions>.button{flex:1}
 .time-overview-section>.section-title{display:grid;justify-content:start;gap:14px}
-.time-overview-section>.section-title>strong{font-size:var(--workspace-value-size);font-weight:500}
+.time-overview-section>.section-title>.section-title-actions>strong{font-size:var(--workspace-value-size);font-weight:500}
 .time-manual-action{padding-inline:0;margin-top:18px;max-width:100%;white-space:normal;height:auto;min-height:var(--touch)}
 .timer-notice{
   position:fixed;

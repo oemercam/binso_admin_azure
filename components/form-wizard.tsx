@@ -1,12 +1,21 @@
 "use client";
 
 import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
-import {Children,cloneElement,isValidElement,Fragment,useEffect,useRef,type ReactNode} from "react";
+import {Children,cloneElement,isValidElement,Fragment,useEffect,useLayoutEffect,useRef,type ReactNode} from "react";
 import {Button,FormActions,FormSection} from "./ui";
 
 /** Keeps every step mounted: a step change never changes drafts or navigation. */
 export function FormWizard({labels,step,onStep,children,action,cancelAction,busy=false,guided=true,backLabel="Zurück",nextLabel="Weiter",progressLabel,ariaLabel="Geführte Erfassung"}:{labels:string[];step:number;onStep:(step:number)=>void;children:ReactNode;action:ReactNode;cancelAction:ReactNode;busy?:boolean;guided?:boolean;backLabel?:string;nextLabel?:string;progressLabel?:(step:number,total:number,label:string)=>string;ariaLabel?:string}){
  const rootRef=useRef<HTMLDivElement>(null);
+ const previousStep=useRef(step);
+ useLayoutEffect(()=>{
+  const changed=previousStep.current!==step;previousStep.current=step;
+  if(!guided||!changed)return;
+  const content=rootRef.current?.querySelector<HTMLElement>('.wizard-content');
+  // Complete focus before the new step can accept input. A delayed frame can
+  // steal focus between an email/autofill focus and its actual text insertion.
+  if(content){content.tabIndex=-1;content.focus({preventScroll:true});content.scrollTo({top:0});}
+ },[step,guided]);
  useEffect(()=>{
   const root=rootRef.current;if(!guided||!root||root.closest('.bottom-sheet'))return;
   const viewport=window.visualViewport;
@@ -33,14 +42,15 @@ export function FormWizard({labels,step,onStep,children,action,cancelAction,busy
  },[guided]);
  const valid=()=>{
   const invalid=Array.from(rootRef.current?.querySelectorAll<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>('input,select,textarea')??[]).find(el=>(el.getClientRects().length||el.matches("select[data-app-select]")&&el.closest(".app-select-control")?.getClientRects().length)&&!el.disabled&&!el.checkValidity());
-  if(invalid){invalid.reportValidity();return false;}
+  // checkValidity already dispatches Field's inline error. Keep focus on that
+  // control without adding a native validation popover over the sheet footer.
+  if(invalid){invalid.focus({preventScroll:true});invalid.scrollIntoView({block:'nearest'});return false;}
   return true;
  };
  const go=(next:number)=>{
   if(next>step&&!valid())return;
   if(busy||next<0||next>=labels.length)return;
-  onStep(next);rootRef.current?.querySelector(".wizard-content")?.scrollTo({top:0});
-  requestAnimationFrame(()=>{const content=rootRef.current?.querySelector<HTMLElement>(".wizard-content");if(content){content.tabIndex=-1;content.focus({preventScroll:true});}});
+  onStep(next);
  };
  return <LocalizedElement as="div" ref={rootRef} className="form-wizard" data-guided={guided?"true":undefined} aria-label={ariaLabel}>
   {guided&&<div className="wizard-progress" role="status"><LocalizedText>{progressLabel?progressLabel(step+1,labels.length,labels[step]):`Schritt ${step+1} von ${labels.length} · ${labels[step]}`}</LocalizedText></div>}

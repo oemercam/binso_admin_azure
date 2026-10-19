@@ -125,7 +125,7 @@ export function Metric({ label, value, hint, icon }: { label: React.ReactNode; v
 }
 
 export function SectionTitle({ title, action, desktopOnly=false }: { title: string; action?: React.ReactNode;desktopOnly?:boolean }) {
-  return <div className="section-title" data-desktop-only={desktopOnly||undefined}><h2><LocalizedText>{title}</LocalizedText></h2>{action}</div>;
+  return <div className="section-title" data-desktop-only={desktopOnly||undefined}><h2><LocalizedText>{title}</LocalizedText></h2>{action&&<div className="section-title-actions">{action}</div>}</div>;
 }
 
 /** Native controls keep browser autofill and validation, with one shared field contract. */

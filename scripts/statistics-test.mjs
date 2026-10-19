@@ -132,3 +132,9 @@ lineNodes.find(n=>n.type==='svg').props.onClick({clientX:598,currentTarget:{getB
 console.log('Actual shared line chart: signed plotted coordinates, accessible negative values, keyboard/pointer selection and full-chart nearest-observation hit testing passed.');
 
 assert.deepEqual(lineNodes.filter(node=>node.type==='span'&&node.props?.['data-value']!==undefined).map(node=>node.props['data-value']),[10,0,-10],'Shared value scale shows the actual signed maximum, midpoint and minimum');
+
+// Long amounts must never be placed into a fixed-size donut hole.
+const largeRing=ringExports.RingChart({label:'Outstanding invoice balance with a translated label',parts:[{key:'open',label:'Open',tone:'neutral',value:999999999999.95}]});
+assert.equal(nodes(largeRing).some(n=>n.props?.className==='bo-ring-center'),false);
+assert.ok(nodes(largeRing).some(n=>n.props?.className==='bo-ring-total'&&JSON.stringify(n.props.children).includes('999999999999.95')),'Complete amount stays in the unconstrained associated total');
+assert.equal(nodes(ringExports.RingChart({label:'Invalid',parts:[{key:'bad',label:'Bad',tone:'negative',value:-10}]})).some(n=>n.type==='svg'),false,'Invalid compositions never render a misleading financial ring');

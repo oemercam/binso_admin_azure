@@ -53,3 +53,13 @@ console.log('Actual workspace/modal rendering, guarded-exit presence, unchanged-
  dispose();assert.equal(events.size,0,'Resume listeners are released');
  console.log('Actual version notice: foreground coalescing, no automatic reload, dirty-state protection and explicit clean-state update passed.');
 }
+
+// Actual ActionsMenu state: keep the modal between a busy action's first and second tap.
+const menuAst=ts.createSourceFile('binso-ux.tsx',read('components/binso-ux.tsx'),99,true,4),menuFunction=menuAst.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='ActionsMenu').getText(menuAst);
+const menuExports={},menuStates=[];let menuCursor=0,menuEffects=[],menuFrames=[];
+class MenuTarget{closest(){return this}}
+Function('require','exports','useState','useEffect','RowActions','ActionSheet','requestAnimationFrame','cancelAnimationFrame','Element',compile(menuFunction))(require,menuExports,initial=>{const at=menuCursor++;if(!(at in menuStates))menuStates[at]=initial;return [menuStates[at],value=>{menuStates[at]=value}]},effect=>menuEffects.push(effect),control,control,callback=>{menuFrames.push(callback);return menuFrames.length},()=>{},MenuTarget);
+const menuRender=busy=>{menuCursor=0;menuEffects=[];return React.Children.toArray(menuExports.ActionsMenu({label:'Actions',children:'Export',busy}).props.children)};
+let menu=menuRender(false);menu[0].props.onClick();menu=menuRender(false);menu[1].props.children.props.onClick({target:new MenuTarget()});
+menu=menuRender(true);menuEffects.forEach(effect=>effect());assert.equal(menu[1].props.open,true);assert.equal(menuFrames.length,0,'An in-flight action never removes the overlay and exposes the page to a second tap');
+menu=menuRender(false);menuEffects.forEach(effect=>effect());menuFrames.forEach(frame=>frame());menuFrames=[];menu=menuRender(false);assert.equal(menu[1].props.open,false,'The action menu closes after the operation has completed');
