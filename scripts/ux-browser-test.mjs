@@ -470,6 +470,7 @@ try{
     }
     if(!process.env.BINSO_UX_BASELINE&&route==='/mitarbeiter/employee-one'){await page.locator('.detail-list').getByText(employee.email,{exact:true}).waitFor();assert.equal(await page.locator('.entity-detail-workspace .settings-profile').count(),0,'The original employee dossier does not repeat its identity in a profile card')}
     if(!process.env.BINSO_UX_BASELINE&&route==='/support/ticket-one'){
+      assert.equal(await page.locator('nav.bottom-nav').count(),0,'Chat dedicates the viewport to messages without navigation');
       await assertChatTargets(page);
       await withNavigationPreferenceLock(async()=>{
        if(width>=761){await page.waitForFunction(()=>document.querySelector('.desktop-navigation-toggle')?.getAttribute('aria-expanded')==='true');await waitForFiniteAnimations(page);}
@@ -482,9 +483,10 @@ try{
      assert.equal(g.height,width<=760?44:g.auth?46:g.coarse?44:40,`${route}: canonical closed field height`);assert.equal(g.padding,'11px',`${route}: canonical field inset`);assert.equal(g.radius,g.auth?'5px':width<=760?'8px':'7px',`${route}: canonical field radius`);
     }}
     for(const label of await page.locator('.detail-list dt').filter({visible:true}).all()){const confined=await label.evaluate(el=>{const r=el.getBoundingClientRect(),range=document.createRange();range.selectNodeContents(el);return [...range.getClientRects()].every(text=>text.right<=r.right+1)});assert.ok(confined,`${route}: detail labels never overlap their values`);}
-    if(width<=760&&await page.locator('.mobile-header-detail').count())assert.equal(await page.locator('.page-head h1,.page-head .status,.desktop-back').filter({visible:true}).count(),0,route+' '+width+': app detail header owns its title/status/back once, including tablet');
+    if(width<=760&&await page.locator('.mobile-header-detail').count()){assert.equal(await page.locator('.mobile-header-title .status').count(),0,'Status never displaces the centered header title');assert.ok(await page.locator('.page-head .status').filter({visible:true}).count()<=1,'One content status badge, without duplicate header status');}
+    if(width<=760&&await page.locator('.mobile-header-detail').count())assert.equal(await page.locator('.page-head h1,.desktop-back').filter({visible:true}).count(),0,route+' '+width+': app detail header owns its title/back once, including tablet');
     if(route.endsWith('/neu')&&await page.locator('.mobile-sticky-save').count()){assert.equal(await page.locator('.mobile-sticky-save .button-primary').filter({visible:true}).count(),1,`${route}: form footer action must be reachable`);assert.equal(await page.locator('.page-head .page-actions .button-primary,.mobile-detail-actions .button-primary').filter({visible:true}).count(),0,`${route}: duplicate header save`);}
-    if(width<=760&&await page.locator('.app-root:not(.app-preview):not(.app-editing)').count()&&!route.endsWith('/neu')&&!route.startsWith('/operator'))assert.equal(await page.locator('nav.bottom-nav').isVisible(),true,`${route}: bottom navigation hidden`);
+    if(width<=760&&await page.locator('.app-root:not(.app-preview):not(.app-editing):not(.app-chat)').count()&&!route.endsWith('/neu')&&!route.startsWith('/operator'))assert.equal(await page.locator('nav.bottom-nav').isVisible(),true,`${route}: bottom navigation hidden`);
     if(await page.locator('.app-editing').count())assert.equal(await page.locator('nav.bottom-nav').count(),0,`${route}: capture processes apply the existing visibility contract`);
     if(route==='/operator'&&width>=768){for(const title of await page.locator('.operator-insight-grid .compact-list>a>b').all()){const box=await title.boundingBox();assert.ok(box.width>=80,'Admin activity titles have readable width alongside customer and status');}}
     if(route.startsWith('/operator')){const operatorHeader=page.locator('.operator-app-header');if(await operatorHeader.count()){assert.equal(await operatorHeader.evaluate(el=>getComputedStyle(el).backdropFilter),'none','Operator header has no blur');assert.equal(await page.locator('h1').filter({visible:true}).count(),1,'Admin has one visible primary title on app and desktop viewports');}}
