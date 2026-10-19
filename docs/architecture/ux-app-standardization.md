@@ -31,7 +31,8 @@ Migration sind durch diesen Implementierungsauftrag freigegeben.
   Dateianhang per beschriftetem zugänglichem Plus; Korrektur/Storno im Aktionsmenü.
 - [ ] Übersicht rollenabhängig: eigene Arbeit, Handlungsbedarf, wenige echte
   Finanzkennzahlen; Rechnung/Zahlung/Ausgabe/Saldo nicht mit Kontostand verwechseln.
-- [ ] Analyse: Zeitraum, klare Kernwerte, ein Diagramm, Details/Drilldown bei Bedarf.
+- [ ] Analyse: Zeitraum, exakt drei Kernwerte (Einnahmen, Ausgaben, Zahlungssaldo),
+  ein Diagramm, Forderungen/Drilldown bei Bedarf; CashOverview behält vier Kennzahlen.
 - [ ] Timer: digitale Zeit, grüner ruhiger Ring aktiv, Amber pausiert, Blau Start;
   kein vorgetäuschter Fortschritt; Reduced Motion, Pause/Beenden eindeutig.
 - [ ] Wiederöffnungs-Hinweis für tatsächlich laufenden Timer, keine automatische

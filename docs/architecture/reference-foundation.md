@@ -97,7 +97,9 @@ Die mobile Position gehört ausschliesslich dem Layout-Owner; keine lokalen FABs
 Dashboard und Finanzübersicht verwenden `CashOverview`: vier offene Kennzahlen,
 auf dem Dashboard die vier berechtigten Schnellaktionen und letzte Rechnungen,
 in der Finanzübersicht sechs Monatsbalken. Die ausführliche Statistik mit einem Zeitdiagramm,
-benutzerdefiniertem Zeitraum, aufklappbaren Forderungen und Ledger-Hinweisen gehört zu `/finanzen/analyse`.
+benutzerdefiniertem Zeitraum und exakt drei Kernwerten (Einnahmen, Ausgaben, Zahlungssaldo),
+aufklappbaren Forderungen und Ledger-Hinweisen gehört zu `/finanzen/analyse`.
+Die frühere Vier-KPI-Regel gilt dort nicht; CashOverview behält exakt vier Kennzahlen.
 Beide Darstellungen nutzen dieselben Finanzereignisse und Aggregationsfunktionen.
 Fehlende berechtigte Kennzahlen bleiben unbekannt; jüngste Rechnungen sind kein
 Ersatz für einen mandantenweiten Zähler. Negative Monatswerte bleiben unter der Nulllinie.

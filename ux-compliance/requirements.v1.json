@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "1.3.0",
+  "version": "1.4.0",
   "baselineCommit": "b398ff7400eb1b2ea90016c25e596261d58c822b",
   "sourceCompleteness": "The owner ZIP dated 2026-10-15 is the binding visual source. Imported historical V21/V22 entries remain traceability evidence and cannot override it; complete historical approval artifacts remain unavailable.",
   "conflicts": [
@@ -21,9 +21,10 @@
     },
     {
       "id": "PRIMARY-KPI-COUNT",
-      "earlier": "Exactly three statistics metrics",
-      "later": "V24 section 8: four primary financial KPIs; existing central foundation; additional metrics behind More",
-      "resolution": "V24 contract applied; no weakening of exact domain counts or navigation protection"
+      "earlier": "V24 section 8: four primary financial KPIs; existing central foundation; additional metrics behind More",
+      "later": "19 October collected owner UX: focused cash analysis, income, recorded outflows and payment balance; receivables separately on demand",
+      "resolution": "Exactly three primary cash-analysis metrics on /finanzen/analyse; exactly four compact CashOverview metrics; three supplementary customer-development metrics. Keep strict per-view counts, financial semantics, shared MetricTiles and measured negative controls.",
+      "supersededResolution": "V24 contract applied; no weakening of exact domain counts or navigation protection"
     }
   ],
   "requirements": [
@@ -456,15 +457,15 @@
       "componentTypes": [
         "CashStatistics"
       ],
-      "expected": "Vier primäre Finanz-KPIs, drei Kunden-KPIs; gemeinsame MetricTiles, zusätzliche Werte per Mehr anzeigen",
+      "expected": "Drei Cash-Kernwerte in der Finanzanalyse (Einnahmen, Ausgaben, Zahlungssaldo), vier Kennzahlen in CashOverview, drei in der Kundenentwicklung; gemeinsame MetricTiles, Forderungen separat auf Abruf",
       "owner": "CashStatistics",
       "method": "browser",
       "testCase": "TC-UX-FIN-001",
       "adapter": "primary-kpis",
       "priority": "P1",
-      "acceptance": "Vier primäre Finanz-KPIs, drei Kunden-KPIs; gemeinsame MetricTiles, zusätzliche Werte per Mehr anzeigen",
+      "acceptance": "Drei Cash-Kernwerte in der Finanzanalyse (Einnahmen, Ausgaben, Zahlungssaldo), vier Kennzahlen in CashOverview, drei in der Kundenentwicklung; gemeinsame MetricTiles, Forderungen separat auf Abruf",
       "automation": "automatic",
-      "provenance": "Binso One V24 section 8 supersedes the former exactly-three-KPI contract",
+      "provenance": "Collected owner UX approved for implementation on 19 October 2026; docs/architecture/ux-app-standardization.md and reference-foundation.md supersede the older V24 four-analysis-metric rule; production acceptance remains open",
       "review": null
     },
     {

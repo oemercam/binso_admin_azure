@@ -60,6 +60,13 @@ try{
  assert.equal((await checkHeader(normalActions,'header-breakpoint'))[0].status,'passed','The desktop criterion includes the exact 1024px breakpoint');
  await page.setViewportSize({width:1023,height:1000});
  assert.equal((await checkHeader(normalActions+'<button>Mobile</button>','header-mobile')).length,0,'The desktop criterion starts at 1024px');
+ // Counts are view-specific; the latest cash analysis never permits the retired fourth KPI.
+ await page.route('https://metric-fixture.invalid/**',route=>route.fulfill({contentType:'text/html',body:'<!doctype html><html><body></body></html>'}));
+ const kpis=async(route,owner,count)=>{await page.goto('https://metric-fixture.invalid'+route);await page.setContent('<section class="'+owner+'"><div class="bo-metric-tiles">'+Array.from({length:count},(_,i)=>'<div class="metric">Metric '+i+'</div>').join('')+'</div></section>');const evidence=await measureCompliance(page,{output,route,theme:'light',width:page.viewportSize().width,state:'kpis-'+count,engine});const checks=evidence.checks.filter(check=>check.id==='UX-FIN-001');assert.equal(checks.length,1,'The actual KPI owner must emit evidence');return checks[0].status;};
+ assert.equal(await kpis('/finanzen/analyse','bo-statistics',3),'passed');
+ for(const count of [2,4])assert.equal(await kpis('/finanzen/analyse','bo-statistics',count),'failed','Missing or retired extra analysis KPIs stay blocking');
+ for(const route of ['/dashboard','/finanzen']){assert.equal(await kpis(route,'bo-cash-overview',4),'passed');for(const count of [3,5])assert.equal(await kpis(route,'bo-cash-overview',count),'failed','The compact overview retains its exact four metrics');}
+ assert.equal(await kpis('/kunden/customer-one','bo-statistics',3),'passed');assert.equal(await kpis('/kunden/customer-one','bo-statistics',4),'failed');
  for(const width of [390,1100,1440])for(const theme of ['light','dark']){
   await page.setViewportSize({width,height:1000});
   const background=theme==='light'?'#fff':'#000',oldSurface=theme==='light'?'#f5f6f8':'#141414';
@@ -71,5 +78,5 @@ try{
   }
  }
  await page.close();
- console.log('Scroll-end, desktop-header and ZIP canvas/old-gray-surface adversaries passed. Engine: '+engine);
+ console.log('Scroll-end, desktop-header, exact per-view KPI and ZIP canvas/old-gray-surface adversaries passed. Engine: '+engine);
 }finally{await browser.close();await fs.rm(output,{recursive:true,force:true});}
