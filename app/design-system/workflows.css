@@ -767,4 +767,4 @@ a{-webkit-tap-highlight-color:transparent}
 .thread-context>span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .expense-summary{display:grid;gap:12px}
 .expense-summary h2,.expense-summary p{margin:0}
-.expense-summary-amount{font-size:var(--type-heading);font-variant-numeric:tabular-nums}
+.expense-summary-amount{font-size:var(--type-large-heading);font-variant-numeric:tabular-nums}

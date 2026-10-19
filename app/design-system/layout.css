@@ -648,7 +648,7 @@ html[data-theme="dark"] .app-start-icon{filter:invert(1)}
  .app-chat{--navigation-content-inset:var(--safe-bottom)}
  .app-chat .page-container{padding-top:0}
  .app-chat .page-head{display:none}
- .app-chat .thread-composer textarea{font-size:16px}
+ .app-chat .thread-composer textarea{font-size:var(--type-subheading)}
 }
 
 @media (max-width:760px){

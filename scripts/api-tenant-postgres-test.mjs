@@ -177,7 +177,7 @@ try{
   const original=(await pool.query('select name from customers where organization_id=$1 and id=$2',[organizations[1],(await pool.query('select id from customers where organization_id=$1 limit 1',[organizations[1]])).rows[0].id])).rows[0].name;
   const foreignCustomer=(await pool.query('select id from customers where organization_id=$1 limit 1',[organizations[1]])).rows[0].id;
   const result=await write('PATCH','/api/customers/'+foreignCustomer,{name:'Forbidden overwrite'},role);
-  assert.equal(result.status,customerWriters.includes(role)?404:403,role+' foreign customer write');
+  assert.equal(result.status,['owner','admin','finance','project_manager','manager'].includes(role)?404:403,role+' foreign customer write');
   assert.equal((await pool.query('select name from customers where id=$1',[foreignCustomer])).rows[0].name,original,'Cross-tenant write cannot mutate the object');
   const removed=await write('DELETE','/api/customers/'+foreignCustomer,{},role);
   assert.equal(removed.status,['owner','admin'].includes(role)?404:403,role+' foreign customer delete');
