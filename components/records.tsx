@@ -209,7 +209,7 @@ export function RecordRow({
   status?: string;
   personIdentity?:string;
   compact?:boolean;
-  
+
 }) {
   return <ListRow translateTitle={false} compact={compact} href={href} title={personIdentity?<span className="person-record"><Avatar name={title} identity={personIdentity}/><span>{title}</span></span>:title} meta={meta} value={value} status={status} tone={status?tone(status):"neutral"}/>;
 }
