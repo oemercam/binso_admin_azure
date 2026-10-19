@@ -20,6 +20,7 @@ konkrete Befunde; es ersetzt die Matrix nicht durch eine zweite Foundation.
 | Einladungsdarstellung | Überschrift trotz ausschliesslich abgelaufener Einladungen; direkte Einzelaktion und verschobene Grid-Spalten | Nur ausstehende gültige Einladungen anzeigen, gemeinsamer Titel, Mail-Icon und kontextgebundenes Menü; bestehendes Zurückziehen bleibt gleich | Fehler/Retry/Doppelklick und leere Sektion als Browsergegenfälle; Rollen- und API-Regeln unverändert |
 | Tote Sondergestaltung | Supportformular besitzt eigenen attachment-button-Stil | Nach Migration unbenutzten Selektor entfernen | Quellprüfung und vollständige CSS-Kaskadenprüfungen |
 | Widersprechende aktive Anleitung | reference-foundation verlangt noch Betrag/Label im Ring | Aktive Anleitung auf die bereits freigegebene V25.1-Aussenposition aktualisieren | Originalreferenzdateien unverändert; Rangfolge bleibt erhalten |
+| Isolierter Detailstatus | WebKit-Screenshot der Auftragsdetails zeigt ein allein rechts stehendes Badge: Der mobile Titel liegt bereits im Header, ein Untertitel fehlt | Gemeinsamer DetailHeading benennt diesen Status-only-Metadatensatz als Statuszeile. Vorhandene Untertitel und Desktop-Titelplatzierung bleiben erhalten | Tatsächlicher Renderer: Status-only/mit Untertitel/ohne Status/Titelplatzierung; zusätzlicher Browsernachweis |
 
 Profilbildauswahl bleibt wie bisher eine ausdrückliche unmittelbare Dateiaktion
 über die vorhandene API. Sie wird nicht als rückgängig machbarer Profilentwurf

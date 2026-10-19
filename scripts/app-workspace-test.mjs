@@ -34,6 +34,19 @@ assert.equal(display.messageDay('2026-01-17T22:30:00Z'),'17.01.2026','Winter off
 assert.equal(display.messageDay('invalid'),'','Bad metadata never invents Today');
 console.log('Actual workspace/modal rendering, guarded-exit presence, unchanged-access adversaries and Swiss chat-day boundaries passed.');
 
+// The mobile header already owns the title: status-only metadata still needs context.
+{
+ const headingAst=ts.createSourceFile('binso-ux.tsx',read('components/binso-ux.tsx'),99,true,4),heading={};
+ const actualHeading=headingAst.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='DetailHeading').getText(headingAst);
+ Function('require','exports','LocalizedText','Status',compile(actualHeading))(require,heading,({children})=>children,({children})=>React.createElement('span',{className:'status'},children));
+ const markup=props=>renderToStaticMarkup(React.createElement(heading.DetailHeading,{title:'Synthetic order',...props}));
+ assert.match(markup({status:'Aktiv',statusPlacement:'subtitle'}),/<p class="bo-detail-meta"><span>Status<\/span><span class="status">Aktiv<\/span><\/p>/,'A status-only detail has a labeled information row, never an isolated badge');
+ const described=markup({status:'Aktiv',statusPlacement:'subtitle',subtitle:'Synthetic customer'});
+ assert.ok(described.includes('Synthetic customer')&&!described.includes('<span>Status</span>'),'Existing meaningful subtitles are not duplicated');
+ assert.ok(!markup({}).includes('bo-detail-meta'),'A missing status never creates a new empty row');
+ assert.ok(!markup({status:'Aktiv',statusPlacement:'title'}).includes('bo-detail-meta'),'Desktop title placement remains unchanged');
+}
+
 // Execute the actual update-notice effect/handler with isolated browser services.
 {
  const updateAst=ts.createSourceFile('update.tsx',withoutLocalization(read('components/app-version-notice.tsx')),99,true,4);

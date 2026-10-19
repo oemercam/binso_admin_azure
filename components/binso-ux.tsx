@@ -74,7 +74,7 @@ export function DetailHeading({ title, status, tone = "neutral", subtitle, leadi
 }) {
   return <div className="bo-detail-heading">{leading}{recordLabel&&<small className="bo-record-label">{recordLabel}</small>}
     <div className="bo-detail-heading-main"><h1><LocalizedText verbatim={verbatimTitle}>{title}</LocalizedText></h1>{statusPlacement==="title"&&status != null && <Status tone={tone}>{status}</Status>}{mobileAction&&<div className="mobile-page-actions">{mobileAction}</div>}</div>
-    {(subtitle||statusPlacement==="subtitle"&&status!=null)&&<p className="bo-detail-meta">{subtitle&&<LocalizedText verbatim={verbatimTitle}>{subtitle}</LocalizedText>}{statusPlacement==="subtitle"&&status!=null&&<Status appearance="pill" tone={tone}>{status}</Status>}</p>}
+    {(subtitle||statusPlacement==="subtitle"&&status!=null)&&<p className="bo-detail-meta">{subtitle&&<LocalizedText verbatim={verbatimTitle}>{subtitle}</LocalizedText>}{!subtitle&&statusPlacement==="subtitle"&&status!=null&&<span><LocalizedText>{"Status"}</LocalizedText></span>}{statusPlacement==="subtitle"&&status!=null&&<Status appearance="pill" tone={tone}>{status}</Status>}</p>}
     {action&&<div className="bo-detail-commandbar">{action}</div>}
   </div>;
 }

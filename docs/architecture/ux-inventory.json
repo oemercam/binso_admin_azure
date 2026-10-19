@@ -158139,6 +158139,16 @@
           ]
         },
         {
+          "tag": "span",
+          "line": 77,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 77,
+          "props": []
+        },
+        {
           "tag": "Status",
           "line": 77,
           "props": [
