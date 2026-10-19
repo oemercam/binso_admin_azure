@@ -69,13 +69,6 @@ export function QuickCreateLinks({returnTo="/dashboard"}:{returnTo?:string}){
  return <div className="bo-quick-create-links">{actions.map(action=><Button key={action.href} variant="secondary" requiresWrite href={createReturnHref(action.href,returnTo)} icon="plus"><LocalizedText>{action.title}</LocalizedText></Button>)}</div>;
 }
 
-/** Empty lists use the same permission-aware creation catalog as the page action area. */
-export function EmptyRecordAction({section}:{section:string}){
- const access=usePageAccess(),action=createActions.find(item=>item.section===section);
- if(!action||!access.canOpen(action.permissionPath))return null;
- return <Button variant="secondary" href={action.href}><LocalizedText>{action.title}</LocalizedText><LocalizedText>{" erstellen"}</LocalizedText></Button>;
-}
-
 export function DetailHeading({ title, status, tone = "neutral", subtitle, leading, action, mobileAction, recordLabel, statusPlacement="title", verbatimTitle=false }: {
   title: string;verbatimTitle?:boolean; status?: ReactNode; tone?: "neutral" | "success" | "warning" | "danger" | "info"; subtitle?: string; leading?: ReactNode; action?: ReactNode;mobileAction?:ReactNode;recordLabel?:string;statusPlacement?:"title"|"subtitle";
 }) {

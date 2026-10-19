@@ -40,6 +40,7 @@ export function FormWizard({labels,step,onStep,children,action,cancelAction,busy
   if(next>step&&!valid())return;
   if(busy||next<0||next>=labels.length)return;
   onStep(next);rootRef.current?.querySelector(".wizard-content")?.scrollTo({top:0});
+  requestAnimationFrame(()=>{const content=rootRef.current?.querySelector<HTMLElement>(".wizard-content");if(content){content.tabIndex=-1;content.focus({preventScroll:true});}});
  };
  return <LocalizedElement as="div" ref={rootRef} className="form-wizard" data-guided={guided?"true":undefined} aria-label={ariaLabel}>
   {guided&&<div className="wizard-progress" role="status"><LocalizedText>{progressLabel?progressLabel(step+1,labels.length,labels[step]):`Schritt ${step+1} von ${labels.length} · ${labels[step]}`}</LocalizedText></div>}

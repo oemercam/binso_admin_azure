@@ -21,7 +21,9 @@ try{
    const snapshotMigration=file==='0045_document_snapshots.sql';
    const snapshotBefore=snapshotMigration?(await db.query("select to_jsonb(i)-'issuer_snapshot'-'customer_snapshot'-'payment_snapshot'-'document_snapshot' data from invoices i order by id")).rows:null;
    const before=presentation?(await db.query('select id,organization_id,customer_id,subtotal,vat_amount,total_amount,paid_amount from invoices order by id')).rows:null;
+   const customerTypeBefore=file==='0056_customer_type.sql'?(await db.query('select to_jsonb(c) data from customers c order by id')).rows:null;
    await db.exec(await fs.readFile('database/migrations/'+file,'utf8'));
+   if(customerTypeBefore){assert.deepEqual((await db.query("select to_jsonb(c)-'customer_type' data from customers c order by id")).rows,customerTypeBefore,'Customer classification migration must preserve every existing customer value');assert.ok((await db.query('select customer_type from customers')).rows.every(row=>row.customer_type===null),'Existing customers must not receive an invented classification');}
    if(snapshotMigration){
     assert.deepEqual((await db.query("select to_jsonb(i)-'issuer_snapshot'-'customer_snapshot'-'payment_snapshot'-'document_snapshot' data from invoices i order by id")).rows,snapshotBefore,'Snapshot migration must preserve every other persisted invoice field');
     assert.equal((await db.query("select count(*)::int n from invoices where not document_snapshot ? 'version'")).rows[0].n,0,'Legacy invoices are frozen with explicit provenance');
@@ -262,6 +264,12 @@ try{
  assert.throws(()=>customerRepository.customerInput({contactFirstName:"Synthetic",contactLastName:"Contact",name:'Invalid override',allowDuplicate:'true'}),e=>e.code==='invalid_field');
  const intentionalInput={...input,allowDuplicate:true};const intentionalDuplicate=await customerRepository.createCustomer(sandbox,'sandbox-user',intentionalInput,'duplicate-create-confirmed');
  assert.notEqual(intentionalDuplicate.id,created.id);assert.equal((await customerRepository.createCustomer(sandbox,'sandbox-user',intentionalInput,'duplicate-create-confirmed')).id,intentionalDuplicate.id,'Intentional duplicate retains replay protection');
+ const privateInput={name:'Not a company',customerType:'person',contactFirstName:'Private',contactLastName:'Fixture'};
+ const privateCustomer=await customerRepository.createCustomer(sandbox,'sandbox-user',privateInput,'v25-private-customer');
+ assert.equal(privateCustomer.customerType,'person');assert.equal(privateCustomer.name,'Private Fixture');
+ assert.equal((await customerRepository.createCustomer(sandbox,'sandbox-user',privateInput,'v25-private-customer')).id,privateCustomer.id,'Private creation is idempotent');
+ assert.equal((await db.query('select customer_type from customers where organization_id=$1 and id=$2',[sandbox,privateCustomer.id])).rows[0].customer_type,'person','Classification is persisted, not just a transient UI option');
+ await assert.rejects(()=>customerRepository.updateCustomer(sandbox,'sandbox-user',privateCustomer.id,{customerType:'company'}),error=>error.code==='customer_type_immutable');
  console.log('Customer duplicate review: normalized UID/email/name, literal matching, tenant scope, explicit override and idempotent confirmed creation passed.');
  assert.match(created.customer_no,/^K-\d{6,}$/,'Only the successful server creation returns the assigned business number');
  const minimalInput=customerRepository.customerInput({contactFirstName:"Synthetic",contactLastName:"Contact",name:'Minimal private or business customer'});const minimalCreated=await customerRepository.createCustomer(sandbox,'sandbox-user',minimalInput,'minimal-customer-fixture-key');const minimalReplay=await customerRepository.createCustomer(sandbox,'sandbox-user',minimalInput,'minimal-customer-fixture-key');assert.equal(minimalReplay.id,minimalCreated.id);assert.equal(minimalReplay.customer_no,minimalCreated.customer_no,'A retried create does not allocate another business number');assert.ok(!minimalCreated.city,'A first valid customer needs no artificial mandatory city');assert.equal((await db.query('select count(*)::int n from customers where organization_id=$1 and name=$2',[sandbox,minimalInput.name])).rows[0].n,1);await assert.rejects(()=>customerRepository.createCustomer(sandbox,'sandbox-user',{contactFirstName:"Synthetic",contactLastName:"Contact",name:'Different customer'},'minimal-customer-fixture-key'),e=>e.status===409);

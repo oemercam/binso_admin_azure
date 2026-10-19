@@ -37,7 +37,8 @@ assert.throws(()=>assertRuntimeImports(postcss.parse(cssImports+cssImports),['th
 const source=fs.readFileSync('components/ui.tsx','utf8'),ast=ts.createSourceFile('ui.tsx',source,99,true,4);
 const body=ast.statements.filter(n=>!ts.isImportDeclaration(n)).map(n=>n.getText(ast)).join('\n');
 const compiled=ts.transpileModule(body,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
-let write=true;const ui={};Function('require','exports','Children','cloneElement','isValidElement','useId','usePageAccess','Link',compiled)(require,ui,React.Children,React.cloneElement,React.isValidElement,React.useId,()=>({write,canOpen:()=>true}),({children,...props})=>React.createElement('a',props,children));
+const {fieldInputHint}=await import(moduleUrl(fs.readFileSync('lib/form-input-hints.ts','utf8')));
+let write=true;const ui={};Function('require','exports','Children','cloneElement','isValidElement','useId','useState','fieldInputHint','usePageAccess','Link',compiled)(require,ui,React.Children,React.cloneElement,React.isValidElement,React.useId,React.useState,fieldInputHint,()=>({write,canOpen:()=>true}),({children,...props})=>React.createElement('a',props,children));
 const html=element=>renderToStaticMarkup(element);
 for(const expanded of [false,true]){
  const disclosure=html(React.createElement(ui.Button,{'aria-expanded':expanded,'aria-controls':'further-readings','aria-label':'Weitere Auswertungen'},'Mehr anzeigen'));
@@ -91,3 +92,11 @@ const progress=html(React.createElement(ui.LoadingState,null,'Kundendaten werden
 assert.match(progress,/role="status"/);assert.match(progress,/aria-live="polite"/);
 assert.doesNotMatch(progress,/loading-state-indicator|progressbar/,"Navigation never fabricates visible progress");
 assert.match(progress,/<span class="sr-only">Kundendaten werden abgerufen\.<\/span>/,'The actual shared loader keeps its accessible label without visible loading copy');
+
+const empty=html(React.createElement(ui.EmptyState,{title:'Keine Dateien vorhanden.'}));
+assert.ok(empty.includes('role="status"')&&!empty.includes('<button')&&!empty.includes('<svg')&&!empty.includes('<h3'),'Empty lists do not add illustrations or duplicate actions');
+assert.ok(html(React.createElement(ui.EmptyState,{title:'Kein Zugriff',description:'Eine Freigabe ist erforderlich.'})).includes('Eine Freigabe ist erforderlich.'),'Security explanations remain available');
+const example=html(React.createElement(ui.Field,{label:'Telefon'},React.createElement(ui.Input,{type:'tel',value:'',readOnly:true})));
+assert.ok(example.includes('placeholder="+41 31 555 12 34"')&&example.includes('value=""'),'Examples do not initialize saved values');
+for(const type of ['password','checkbox','radio','file','date','time','hidden'])assert.equal(fieldInputHint('Telefon',type),undefined);
+assert.equal(fieldInputHint('Passwort','text'),undefined);

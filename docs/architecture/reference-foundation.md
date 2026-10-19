@@ -29,6 +29,14 @@ Seitenuntertitel und Ergebniszähler zeigen während des Abrufs keine Ersatztext
 Ein Startbildschirm gehört nur zum initialen Sessionaufbau, nie zum internen
 Seitenwechsel oder Zurück. Fehler und Wiederholungsaktionen bleiben sichtbar.
 
+## Aktuelle V25-Freigabe
+
+[Die vollständige V25-Spezifikation](v25-requirements.md) hat bei Widersprüchen
+Vorrang. Navigation und bestehender blauer Plus-Button bleiben jetzt ausdrücklich
+unverändert. Die historischen Absätze oben berechtigen nicht zu ihrer Umgestaltung.
+Leere Zustände sind kurze Textmeldungen ohne dekorative Karten oder Zusatzaktionen;
+Zoom darf Text umbrechen. Sicherheits-/Fehlerdetails bleiben vollständig.
+
 ## Zuständigkeit
 
 | Aufgabe | Bestehender Owner |

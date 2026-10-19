@@ -349,7 +349,7 @@ function AppShellFrame({
         {allowed&&orientation&&<p className="page-orientation"><LocalizedText>{orientation}</LocalizedText></p>}
         <SettingsWorkspace>
         {allowed&&(bodyControls||contentCreate&&!headingCreate)&&<div className="workspace-command-bar">{bodyControls}{contentCreate&&!headingCreate&&visibleActions}</div>}
-        {accessError?<div role="alert"><p><LocalizedText>{accessError}</LocalizedText></p><FormActions sheet><Button onClick={()=>{invalidateClientSession();setAccessError(null);setAccessRetry(value=>value+1)}}><LocalizedText>{"Erneut versuchen"}</LocalizedText></Button><Link className="button button-secondary" href="/login"><LocalizedText>{"Anmelden"}</LocalizedText></Link></FormActions></div>:!access?null:allowed?pageChildren:<EmptyState icon="lock" title="Kein Zugriff" text="Diese Seite ist für deine Rolle oder deinen Plan nicht verfügbar."/>}
+        {accessError?<div role="alert"><p><LocalizedText>{accessError}</LocalizedText></p><FormActions sheet><Button onClick={()=>{invalidateClientSession();setAccessError(null);setAccessRetry(value=>value+1)}}><LocalizedText>{"Erneut versuchen"}</LocalizedText></Button><Link className="button button-secondary" href="/login"><LocalizedText>{"Anmelden"}</LocalizedText></Link></FormActions></div>:!access?null:allowed?pageChildren:<EmptyState  title="Kein Zugriff" description="Diese Seite ist für deine Rolle oder deinen Plan nicht verfügbar."/>}
         </SettingsWorkspace>
       </main>
 

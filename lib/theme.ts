@@ -14,7 +14,7 @@ export function initializeTheme(selected?:ThemeMode){
  root.dataset.themeMode=mode;
  root.dataset.theme=resolved;
  for(const meta of document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]')){
-  meta.content=resolved==='dark'?'#000000':'#ffffff';
+  meta.content=resolved==='dark'?'#000000':root.dataset.modalOverlay==='true'?'#c2c2c2':'#ffffff';
   meta.removeAttribute('media');
  }
  try{localStorage.setItem('binso.theme.mode',mode);localStorage.setItem('binso.theme',resolved);}catch{/* Theme rendering must not depend on writable storage. */}

@@ -113,3 +113,7 @@ console.log('Company/customer draft defaults, explicit zeroes, invalid values an
 
 assert.equal(defaults.documentDefaults({},undefined,'Angebot','2026-10-19').due,'2026-11-18','Offer validity uses the existing central policy');
 assert.equal(defaults.documentDefaults({},undefined,'Angebot','2026-02-30').due,'','Invalid dates are never normalized into fabricated validity');
+
+assert.equal(exports.customerInput({name:'Supplied organization',customerType:'person',contactFirstName:'Ada',contactLastName:'Example'}).name,'Ada Example','Private customers use their own identity, not a hidden company name');
+for(const customerType of ['unknown',[],['person'],{},false])assert.throws(()=>exports.customerInput({name:'Test AG',customerType,contactFirstName:'Ada',contactLastName:'Example'}),error=>error.code==='invalid_customer_type');
+assert.equal(exports.customerInput({name:'Legacy API',contactFirstName:'Ada',contactLastName:'Example'}).customerType,'company','Existing API callers retain company creation semantics');

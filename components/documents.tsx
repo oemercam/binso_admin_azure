@@ -388,7 +388,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
     {editing&&companyPending&&<LoadingState><LocalizedText>{"Firmendaten werden geladen …"}</LocalizedText></LoadingState>}
     {editing&&paymentIssue&&<div className="document-source-note" role="status"><span>{paymentIssue}</span><Link href="/einstellungen/dokumente"><LocalizedText>{"Einstellungen"}</LocalizedText></Link></div>}
     {sourceOffer&&!existing&&<div className="document-source-note"><span><LocalizedText>{"Erstellt aus Angebot"}</LocalizedText></span><b>{sourceOffer}</b></div>}
-    {customersLoading?<LoadingState><LocalizedText>{"Kunden werden geladen …"}</LocalizedText></LoadingState>:customersError?<ErrorState onRetry={refreshCustomers}><LocalizedText>{customersError}</LocalizedText></ErrorState>:sourceQuery.loading?<LoadingState><LocalizedText>{"Ursprungsangebot wird geladen …"}</LocalizedText></LoadingState>:sourceError?<ErrorState onRetry={sourceQuery.refresh}><LocalizedText>{sourceError}</LocalizedText></ErrorState>:billingLoading?<LoadingState><LocalizedText>{"Verrechenbare Positionen werden geladen …"}</LocalizedText></LoadingState>:billingError?<ErrorState onRetry={()=>{timeSource.refresh();expenseSource.refresh()}}><LocalizedText>{billingError}</LocalizedText></ErrorState>:documentLoad.loading?<LoadingState><LocalizedText>{"Dokument wird geladen …"}</LocalizedText></LoadingState>:documentLoad.error?<EmptyState icon="file" title="Dokument konnte nicht geladen werden" text={documentLoad.error}/>:existing&&!editing
+    {customersLoading?<LoadingState><LocalizedText>{"Kunden werden geladen …"}</LocalizedText></LoadingState>:customersError?<ErrorState onRetry={refreshCustomers}><LocalizedText>{customersError}</LocalizedText></ErrorState>:sourceQuery.loading?<LoadingState><LocalizedText>{"Ursprungsangebot wird geladen …"}</LocalizedText></LoadingState>:sourceError?<ErrorState onRetry={sourceQuery.refresh}><LocalizedText>{sourceError}</LocalizedText></ErrorState>:billingLoading?<LoadingState><LocalizedText>{"Verrechenbare Positionen werden geladen …"}</LocalizedText></LoadingState>:billingError?<ErrorState onRetry={()=>{timeSource.refresh();expenseSource.refresh()}}><LocalizedText>{billingError}</LocalizedText></ErrorState>:documentLoad.loading?<LoadingState><LocalizedText>{"Dokument wird geladen …"}</LocalizedText></LoadingState>:documentLoad.error?<EmptyState  title="Dokument konnte nicht geladen werden" description={documentLoad.error}/>:existing&&!editing
       ? <div className="document-desktop-workspace">
           <div className="document-desktop-detail">
             <DocumentReadView type={kind} draft={draft} directory={directory} onPreview={()=>setPreview(true)}/>
@@ -523,7 +523,7 @@ function DocumentEditor({ type, draft, onChange, directory, step,lockedCustomer=
   };
 
   if(production&&names.length===0){
-    return <div className="invoice-workspace"><section className="invoice-form"><EmptyState icon="users" title="Zuerst einen Kunden erfassen" text="Für Angebote und Rechnungen muss mindestens ein Kunde vorhanden sein." action={<Button href="/kunden/neu"><LocalizedText>{"Kunde erfassen"}</LocalizedText></Button>}/></section></div>;
+    return <div className="invoice-workspace"><section className="invoice-form"><EmptyState  title="Zuerst einen Kunden erfassen"  /><FormActions><Button href="/kunden/neu"><LocalizedText>{"Kunde erfassen"}</LocalizedText></Button></FormActions></section></div>;
   }
 
   return <div className="invoice-workspace">

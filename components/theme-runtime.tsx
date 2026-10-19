@@ -5,12 +5,14 @@ export function ThemeRuntime(){
  useEffect(()=>{
   // Next may replace metadata after navigation. Keep the status bar in sync.
   const syncMeta=()=>{
-   const color=document.documentElement.dataset.theme==='dark'?'#000000':'#ffffff';
+   const root=document.documentElement;
+   const color=root.dataset.theme==='dark'?'#000000':root.dataset.modalOverlay==='true'?'#c2c2c2':'#ffffff';
    for(const meta of document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]')){
     if(meta.content!==color)meta.content=color;
    }
   };
   const metadataObserver=new MutationObserver(syncMeta);
+  metadataObserver.observe(document.documentElement,{attributes:true,attributeFilter:['data-theme','data-modal-overlay']});
   metadataObserver.observe(document.head,{childList:true,subtree:true,attributes:true,attributeFilter:['content']});
   const media=window.matchMedia('(prefers-color-scheme: dark)');
   const systemChanged=()=>{if(document.documentElement.dataset.themeMode==='system')applyTheme('system');};
