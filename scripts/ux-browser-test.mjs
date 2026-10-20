@@ -274,7 +274,7 @@ try{
    else if(p==='/api/operator/tickets')data={items:[{...ticket,tenant:{name:'Prüffirma AG'}}]};
    else if(p==='/api/operator/dashboard')data={stats:{customers_total:2,subscriptions_active:1,trials_active:1,users_active:1,payments_30d:79,monthly_contract_value:79,tickets_open:2,tickets_in_progress:3,tickets_resolved:5},tickets:[{...ticket,tenant:{name:'Prüffirma AG'}}],incidents:[]};
    else if(p==='/api/operator/monitoring')data=monitoringFixture();
-   else if(p==='/api/operator/restrictions')data={items:[]};
+   else if(p==='/api/operator/restrictions')data={items:[{id:'restriction-one',tenant_id:'tenant-one',tenant:{name:'Prüffirma AG'},active:true,scope:'write',reason:'Manuelle Prüfung',starts_at:'2026-01-01T00:00:00.000Z',ends_at:null}]};
    else if(p==='/api/operator/announcements')data={items:[]};
    else if(p==='/api/operator/audit')data={items:[{id:'audit-one',createdAt:'2026-10-11T12:03:00Z',userName:'Fixture Operator',userEmail:'operator@example.invalid',action:'operator.entra_login',entityType:'platform_operator',entityId:'operator-one'},{id:'audit-two',createdAt:null,userName:null,userEmail:null,action:'system.check',entityType:null,entityId:null}]};
    else if(p==='/api/operator/tickets/ticket-one')data={item:{id:'ticket-one',tenant:{name:'Prüffirma AG'},status:'open',priority:'normal'},messages:[{id:'public',body:'Öffentliche Nachricht',author_type:'customer',created_at:'2026-10-09',internal:false},{id:'private',body:'Vertrauliche interne Notiz',author_type:'operator',created_at:'2026-10-09',internal:true}]};
