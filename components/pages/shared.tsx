@@ -65,12 +65,15 @@ export function useDemoRows(collection:DemoCollection, defaults:string[][],filte
 }
 
 /** Module configuration changes domain fields, never the committed list state owner. */
-export function useRecordList(collection:DemoCollection,options:Parameters<typeof useRecordsController>[0]&{sortFields:Record<number,string>;defaultOrder?:string;filterValues:Record<string,{field:'status'|'kind';value:string}>}){
+export function useRecordList(collection:DemoCollection,options:Parameters<typeof useRecordsController>[0]&{sortFields:Record<number,string>;defaultOrder?:string;scope?:{customerId?:string|null;employeeId?:string|null;review?:boolean};filterValues:Record<string,{field:'status'|'kind';value:string}>}){
  const controller=useRecordsController(options),pageSize=50;
  const {sortFields,defaultOrder='created_at.desc',filterValues}=options;
  const field=sortFields[controller.sortIndex];
  const filters=new URLSearchParams({limit:String(pageSize),offset:String(controller.page*pageSize),order:controller.sort==='default'||!field?defaultOrder:field+'.'+controller.sort});
  if(controller.query.trim())filters.set('q',controller.query.trim());
+ if(options.scope?.customerId)filters.set('customer_id','eq.'+options.scope.customerId);
+ if(options.scope?.review)filters.set('review','1');
+ if(options.scope?.employeeId)filters.set('employee_id','eq.'+options.scope.employeeId);
  const selected=filterValues[controller.activeChip];if(selected)filters.set(selected.field,selected.value);
  const data=useDemoRows(collection,[],filters.toString());
  return {...data,controller,pagination:{total:data.total,page:controller.page,pageSize,onPage:controller.setPage}};

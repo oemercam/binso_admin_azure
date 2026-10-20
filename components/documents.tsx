@@ -1,9 +1,10 @@
 "use client";
 import {domainConfig} from "@/config/domain";
-import {documentDefaults} from "@/lib/document-defaults";
+import {documentDefaults,invoiceDraftFromOffer} from "@/lib/document-defaults";
 import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
 import {safeAppPath} from "@/lib/navigation";
 import {EntityFiles} from "./entity-files";
+import {DirectorySelect} from "./directory-select";
 import {customerDirectory,resolveCustomer,type CustomerDirectory} from "@/lib/customer-identity";
 import {documentTotals} from "@/lib/money";
 import {useApiQuery,useDataRevision} from "@/lib/client/use-api-query";
@@ -69,10 +70,11 @@ type DocumentDraft = {
 };
 
 
-function useCustomerDirectory(enabled=true) {
-  const {data,loading,error,refresh}=useApiQuery<{items:Array<{id:string;name:string;sector?:string;street?:string;postal_code?:string;city?:string}>}>(enabled?(isProductionBackendEnabled()?"/api/customers":"/api/demo/data?collection=customers"):null);
-  const directory=useMemo(()=>{return customerDirectory(data?.items??[]);},[data]);
-  return {directory,loading,error,refresh};
+function useCustomerDirectory(enabled=true,selectedId?:string) {
+  const {data,loading,error,refresh}=useApiQuery<{items:Array<{id:string;name:string;sector?:string;street?:string;postal_code?:string;city?:string}>}>(enabled?(isProductionBackendEnabled()?"/api/customers?limit=50":"/api/demo/data?collection=customers&limit=50"):null);
+  const selected=useApiQuery<{item?:Parameters<typeof customerDirectory>[0][number]}>(enabled&&selectedId&&isProductionBackendEnabled()?"/api/customers/"+encodeURIComponent(selectedId):null);
+  const directory=useMemo(()=>{const items=data?.items??[],item=selected.data?.item;return customerDirectory(item&&!items.some(row=>row.id===item.id)?[...items,item]:items);},[data,selected.data]);
+  return {directory,loading:loading||selected.loading,error:error??selected.error,refresh:()=>{refresh();selected.refresh()}};
 }
 
 function createInitialDraft(kind:DocumentKind, number:string):DocumentDraft {
@@ -267,7 +269,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const draftBaseline=useRef<string|null>(null);
   const [draft,setDraft]=useDocumentDraft(createInitialDraft(kind,""));
   const refundableAmount=Math.max(0,Number(draft.paidAmount??0)-Math.max(0,Number(draft.total??0)-Number(draft.creditAmount??0))-Number(draft.refundAmount??0));
-  const {directory,loading:customersLoading,error:customersError,refresh:refreshCustomers}=useCustomerDirectory(editing);
+  const {directory,loading:customersLoading,error:customersError,refresh:refreshCustomers}=useCustomerDirectory(editing,draft.customerId??searchParams.get("customerId")??undefined);
   const company=useDocumentCompany();
   useEffect(()=>{if(existing||dirty||company.loading||searchParams.get("sourceOffer"))return;setDraft(current=>({...current,...documentDefaults(company.raw,resolveCustomer(current,directory),kind,current.date||businessDate())}));},[existing,dirty,company.loading,company.raw,draft.customerId,directory,kind,setDraft,searchParams]);
   const companyPending=editing&&company.loading;
@@ -286,18 +288,20 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
 
   const sourceQuery=useApiQuery<{item?:Record<string,unknown>;items?:Array<Record<string,unknown>>}>(!existing&&sourceOffer?(production?"/api/documents/"+encodeURIComponent(sourceOffer):"/api/demo/data?collection=documents&number="+encodeURIComponent(sourceOffer)):null);
   const sourceItem=sourceQuery.data?.item??sourceQuery.data?.items?.[0];
-  const sourceInvalid=!existing&&sourceOffer&&!sourceQuery.loading&&!sourceQuery.error&&(!sourceItem||sourceItem.kind!=="offer"||sourceItem.status!=="accepted"||Boolean(sourceItem.invoice_number));
-  const sourceError=sourceQuery.error||(sourceInvalid?"Das Ursprungsangebot muss angenommen und noch nicht verrechnet sein.":null);
+  const sourceCustomer=useApiQuery<{item?:Parameters<typeof customerDirectory>[0][number]}>(sourceItem?.customer_id&&sourceOffer?"/api/customers/"+encodeURIComponent(String(sourceItem.customer_id)):null);
+  const sourceLoading=sourceQuery.loading||sourceCustomer.loading;
+  const sourceInvalid=!existing&&sourceOffer&&!sourceLoading&&!sourceQuery.error&&(!sourceItem||sourceItem.kind!=="offer"||sourceItem.status!=="accepted"||Boolean(sourceItem.invoice_number));
+  const sourceError=sourceQuery.error||sourceCustomer.error||(sourceInvalid?"Das Ursprungsangebot muss angenommen und noch nicht verrechnet sein.":null);
   const initializedOffer=useRef<string|null>(null);
   useEffect(()=>{
-    if(existing||!sourceOffer||!sourceItem||sourceError||initializedOffer.current===sourceOffer)return;
+    if(existing||!sourceOffer||!sourceItem||sourceError||company.loading||customersLoading||sourceCustomer.loading||sourceCustomer.error||initializedOffer.current===sourceOffer)return;
     initializedOffer.current=sourceOffer;
     const source=remoteDraftFromItem(sourceItem,"Angebot");
-    queueMicrotask(()=>setDraft(current=>({...source,id:undefined,status:"draft",paidAmount:0,creditAmount:0,refundAmount:0,refunds:[],revisesOffer:undefined,revisions:[],credits:[],reminders:[],paidOn:undefined,number:current.number,date:current.date,due:"30"})));
-  },[existing,sourceOffer,sourceItem,sourceError,setDraft]);
+    queueMicrotask(()=>setDraft(current=>invoiceDraftFromOffer(source,current,company.raw,sourceCustomer.data?.item??resolveCustomer(source,directory))));
+  },[existing,sourceOffer,sourceItem,sourceError,company.loading,company.raw,customersLoading,sourceCustomer.loading,sourceCustomer.error,sourceCustomer.data,directory,setDraft]);
 
   const sourceExpenseParam=kind==='Rechnung'?(searchParams.get('expenses')??''):'';
-  const recovery=useProcessDraft({process:kind+":"+searchParams.toString(),value:{draft,step:wizardStep,replay:draftReplay},dirty,enabled:!existing&&!customersLoading&&!customersError&&!sourceQuery.loading&&!sourceError&&!sourceTimeEntriesParam&&!sourceExpenseParam,onRestore:stored=>{
+  const recovery=useProcessDraft({process:kind+":"+searchParams.toString(),value:{draft,step:wizardStep,replay:draftReplay},dirty,enabled:!existing&&!customersLoading&&!customersError&&!sourceLoading&&!sourceError&&!sourceTimeEntriesParam&&!sourceExpenseParam,onRestore:stored=>{
     if(!stored?.draft||!Array.isArray(stored.draft.positions)||!stored.draft.positions.length||stored.draft.id||stored.draft.number||['customer','number','date','due','vatRate','note'].some(key=>typeof (stored.draft as unknown as Record<string,unknown>)[key]!=='string')||stored.draft.positions.some(item=>!item||['id','description','quantity','price'].some(key=>typeof (item as unknown as Record<string,unknown>)[key]!=='string'))||stored.replay&&(typeof stored.replay.body!=='string'||typeof stored.replay.key!=='string'))return;
     draftBaseline.current=editableDocumentSnapshot(draft);setDraft(stored.draft);setWizardStep(Math.max(0,Math.min(3,Number(stored.step)||0)));createRequest.current=stored.replay??null;setDraftReplay(stored.replay??null);setDirty(true);
   }});
@@ -336,7 +340,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
 
   const show=(message:string)=>{setToast(message);window.setTimeout(()=>setToast(null),2300);};
   const save=async()=>{
-    if(documentSavePending.current||companyPending||documentLoad.loading||documentLoad.error||customersLoading||customersError||sourceQuery.loading||sourceError||billingLoading||billingError||!recovery.ready)return;
+    if(documentSavePending.current||companyPending||documentLoad.loading||documentLoad.error||customersLoading||customersError||sourceLoading||sourceError||billingLoading||billingError||!recovery.ready)return;
     if(isProductionBackendEnabled()&&!resolveCustomer(draft,directory)){show("Bitte zuerst einen Kunden erfassen.");return;}
     if(paymentIssue){show(paymentIssue);return;}
     documentSavePending.current=true;setSaving(true);
@@ -388,7 +392,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
     {editing&&companyPending&&<LoadingState><LocalizedText>{"Firmendaten werden geladen …"}</LocalizedText></LoadingState>}
     {editing&&paymentIssue&&<div className="document-source-note" role="status"><span>{paymentIssue}</span><Link href="/einstellungen/dokumente"><LocalizedText>{"Einstellungen"}</LocalizedText></Link></div>}
     {sourceOffer&&!existing&&<div className="document-source-note"><span><LocalizedText>{"Erstellt aus Angebot"}</LocalizedText></span><b>{sourceOffer}</b></div>}
-    {customersLoading?<LoadingState><LocalizedText>{"Kunden werden geladen …"}</LocalizedText></LoadingState>:customersError?<ErrorState onRetry={refreshCustomers}><LocalizedText>{customersError}</LocalizedText></ErrorState>:sourceQuery.loading?<LoadingState><LocalizedText>{"Ursprungsangebot wird geladen …"}</LocalizedText></LoadingState>:sourceError?<ErrorState onRetry={sourceQuery.refresh}><LocalizedText>{sourceError}</LocalizedText></ErrorState>:billingLoading?<LoadingState><LocalizedText>{"Verrechenbare Positionen werden geladen …"}</LocalizedText></LoadingState>:billingError?<ErrorState onRetry={()=>{timeSource.refresh();expenseSource.refresh()}}><LocalizedText>{billingError}</LocalizedText></ErrorState>:documentLoad.loading?<LoadingState><LocalizedText>{"Dokument wird geladen …"}</LocalizedText></LoadingState>:documentLoad.error?<EmptyState  title="Dokument konnte nicht geladen werden" description={documentLoad.error}/>:existing&&!editing
+    {customersLoading?<LoadingState><LocalizedText>{"Kunden werden geladen …"}</LocalizedText></LoadingState>:customersError?<ErrorState onRetry={refreshCustomers}><LocalizedText>{customersError}</LocalizedText></ErrorState>:sourceLoading?<LoadingState><LocalizedText>{"Ursprungsangebot wird geladen …"}</LocalizedText></LoadingState>:sourceError?<ErrorState onRetry={()=>{sourceQuery.refresh();sourceCustomer.refresh()}}><LocalizedText>{sourceError}</LocalizedText></ErrorState>:billingLoading?<LoadingState><LocalizedText>{"Verrechenbare Positionen werden geladen …"}</LocalizedText></LoadingState>:billingError?<ErrorState onRetry={()=>{timeSource.refresh();expenseSource.refresh()}}><LocalizedText>{billingError}</LocalizedText></ErrorState>:documentLoad.loading?<LoadingState><LocalizedText>{"Dokument wird geladen …"}</LocalizedText></LoadingState>:documentLoad.error?<EmptyState  title="Dokument konnte nicht geladen werden" description={documentLoad.error}/>:existing&&!editing
       ? <div className="document-desktop-workspace">
           <div className="document-desktop-detail">
             <DocumentReadView type={kind} draft={draft} directory={directory}/>
@@ -485,7 +489,7 @@ function DocumentReadView({type,draft,directory}:{type:DocumentKind;draft:Docume
     </section>
     {isInvoice&&Number(draft.creditAmount??0)>0&&<p><LocalizedText>{"Gutschriften"}</LocalizedText>: {currency} {money(Number(draft.creditAmount))}</p>}
     {isInvoice&&!["draft","paid","cancelled"].includes(displayStatus)&&outstanding>0&&<LocalizedElement as="section" className="document-payment-facts" aria-label="Zahlungsstand"><SectionTitle title="Zahlungsstand"/>
-      <MetricTiles columns={2}><MetricTile label="Bereits bezahlt" value={`${currency} ${money(Number(draft.paidAmount??0))}`}/><MetricTile label="Offener Betrag" value={`${currency} ${money(outstanding)}`}/></MetricTiles>
+      <MetricTile label="Bereits bezahlt" value={`${currency} ${money(Number(draft.paidAmount??0))}`}/>
     </LocalizedElement>}
     {(Boolean(draft.credits?.length||draft.reminders?.length||draft.refunds?.length||draft.revisesOffer||draft.revisions?.length||draft.sourceOffer||draft.invoiceNumber||draft.note))&&<DetailDisclosure label="Weitere Angaben">
     {isInvoice&&Boolean(draft.credits?.length)&&<section className="document-detail-section"><SectionTitle title="Gutschriften"/>{draft.credits?.map(credit=><p key={credit.number}><b>{credit.number}</b> · {credit.date.split('-').reverse().join('.')} · {currency} {money(Number(credit.amount))}<br/>{credit.reason}</p>)}</section>}
@@ -501,6 +505,7 @@ function DocumentReadView({type,draft,directory}:{type:DocumentKind;draft:Docume
 
 function DocumentEditor({ type, draft, onChange, directory, step,lockedCustomer=false }: { type:DocumentKind; draft:DocumentDraft; onChange:(draft:DocumentDraft)=>void; directory:CustomerDirectory;step?:number;lockedCustomer?:boolean }) {
   const production=useBackendMode();
+  const company=useDocumentCompany();
   const totals=useDocumentTotals(draft);
   const names=Object.keys(directory);
   const [noteOpen,setNoteOpen]=useState(Boolean(draft.note));
@@ -531,13 +536,7 @@ function DocumentEditor({ type, draft, onChange, directory, step,lockedCustomer=
     <section className={`invoice-form ${type==="Angebot"?"offer-form":""}`}>
       <div hidden={step!==undefined&&step!==0} className="form-section customer-form-section">
         <span className="compact-section-label"><LocalizedText>{"Kunde"}</LocalizedText></span>
-        <Field label="Kunde auswählen">
-          <Select disabled={lockedCustomer} value={draft.customerId??Object.entries(directory).find(([,item])=>item===resolveCustomer(draft,directory))?.[0]??''} onChange={e=>{const item=directory[e.target.value];if(item)onChange({...draft,customer:item.name??e.target.value,customerId:item.id,...(type==="Rechnung"&&item.paymentDays!=null?{due:String(item.paymentDays)}:{})})}}>
-            {!resolveCustomer(draft,directory)&&<option value=""><LocalizedText>{"Kunde auswählen"}</LocalizedText></option>}
-            {names.map(key=><option key={key} value={key}><LocalizedText verbatim={true}>{directory[key].name??key}</LocalizedText><LocalizedText>{directory[key].city?' · '+directory[key].city:''}</LocalizedText></option>)}
-          </Select>
-        </Field>
-        {[customer.sector,customer.city].some(Boolean)&&<div className="document-customer-hint"><span>{[customer.sector,customer.city].filter(Boolean).join(" · ")}</span></div>}
+        <Field label="Kunde auswählen"><DirectorySelect label="Kunde auswählen" disabled={lockedCustomer} required endpoint={production?"/api/customers":"/api/demo/data?collection=customers"} value={draft.customerId??''} onChange={(value,item)=>{if(item)onChange({...draft,customer:String(item.name??''),customerId:value,...(type==='Rechnung'?{due:documentDefaults(company.raw,{paymentDays:item.paymentDays==null?undefined:Number(item.paymentDays)},'Rechnung',draft.date).due}:{})})}}/></Field>   {[customer.sector,customer.city].some(Boolean)&&<div className="document-customer-hint"><span>{[customer.sector,customer.city].filter(Boolean).join(" · ")}</span></div>}
       </div>
       <div hidden={step!==undefined&&step!==0&&step!==2} className="form-section">
         <h2><LocalizedText>{step===2?(type==="Angebot"?"Gültig bis":"Zahlungsbedingungen"):"Dokumentdaten"}</LocalizedText></h2>
@@ -551,7 +550,7 @@ function DocumentEditor({ type, draft, onChange, directory, step,lockedCustomer=
         </div>
       </div>
       <div hidden={step!==undefined&&step!==1} className="form-section">
-        <div className="section-title"><h2><LocalizedText>{"Positionen"}</LocalizedText></h2><LocalizedElement as="button" className="icon-action" type="button" onClick={addPosition} aria-label="Position hinzufügen"><Icon name="plus" size={18}/></LocalizedElement></div>
+        <SectionTitle title="Positionen" action={<LocalizedElement as="button" className="icon-action" type="button" onClick={addPosition} aria-label="Position hinzufügen"><Icon name="plus" size={18}/></LocalizedElement>}/>
         <div className="line-items document-line-items">
           <div className="line-head"><span><LocalizedText>{"Beschreibung"}</LocalizedText></span><span><LocalizedText>{"Menge"}</LocalizedText></span><span><LocalizedText>{"Einheit"}</LocalizedText></span><span><LocalizedText>{"Einzelpreis"}</LocalizedText></span><span><LocalizedText>{"Total"}</LocalizedText></span><span/></div>
           {draft.positions.map(item=>{
@@ -573,7 +572,7 @@ function DocumentEditor({ type, draft, onChange, directory, step,lockedCustomer=
         <div className="invoice-totals"><span><LocalizedText>{"Zwischentotal "}</LocalizedText><b><LocalizedText>{draft.currency??"CHF"}</LocalizedText> {money(totals.subtotal)}</b></span><span><LocalizedText>{"MwSt. "}</LocalizedText>{Number(draft.vatRate).toLocaleString("de-CH",{maximumFractionDigits:2})} % <b><LocalizedText>{draft.currency??"CHF"}</LocalizedText> {money(totals.vat)}</b></span><strong><LocalizedText>{"Total "}</LocalizedText><b><LocalizedText>{draft.currency??"CHF"}</LocalizedText> {money(totals.total)}</b></strong></div>
       </div>
       {mobilePositionId&&(()=>{const item=positionDraft;if(!item)return null;return <FormSheet label={"Position bearbeiten"} description={item.description} open={true} onClose={closePosition} busy={false} className={"mobile-position-sheet"} layerClassName={"mobile-position-layer"} ariaLabel={"Position bearbeiten"}><div className="sheet-body mobile-position-fields"><Field label="Beschreibung"><Input value={item.description} onChange={e=>setPositionDraft({...item,description:e.target.value})}/></Field><div><Field label="Menge"><Input inputMode="decimal" value={item.quantity} onChange={e=>setPositionDraft({...item,quantity:e.target.value})}/></Field><Field label="Einheit"><Select value={item.unit??"Stück"} onChange={e=>setPositionDraft({...item,unit:e.target.value})}><option value="Stück"><LocalizedText>{"Stück"}</LocalizedText></option><option value="Stunden"><LocalizedText>{"Stunden"}</LocalizedText></option></Select></Field><Field label="Einzelpreis"><Input inputMode="decimal" value={item.price} onChange={e=>setPositionDraft({...item,price:e.target.value})}/></Field></div><div className="mobile-position-sheet-total"><span><LocalizedText>{"Total"}</LocalizedText></span><b><LocalizedText>{draft.currency??"CHF"}</LocalizedText> {money(numberValue(item.quantity)*numberValue(item.price))}</b></div><button className="text-action mobile-position-remove" type="button" disabled={draft.positions.length===1} onClick={()=>{removePosition(item.id);closePosition()}}><LocalizedText>{"Position entfernen"}</LocalizedText></button></div><FormActions sheet><Button variant="secondary" onClick={closePosition}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button onClick={()=>{updatePosition(item.id,item);closePosition()}}><LocalizedText>{"Übernehmen"}</LocalizedText></Button></FormActions></FormSheet>})()}
-      <div hidden={step!==undefined&&step!==2} className="form-section optional-row document-note-section">{!noteOpen?<button className="text-action add-note-action" type="button" onClick={()=>setNoteOpen(true)}><Icon name="plus" size={16}/><LocalizedText>{" Notiz hinzufügen"}</LocalizedText></button>:<><div className="section-title"><h2><LocalizedText>{"Notiz"}</LocalizedText></h2>{!draft.note&&<button className="text-action" type="button" onClick={()=>setNoteOpen(false)}><LocalizedText>{"Schliessen"}</LocalizedText></button>}</div><Field label="Text für den Kunden"><Textarea autoFocus value={draft.note} onChange={e=>onChange({...draft,note:e.target.value})} placeholder="Optional"/></Field></>}</div>
+      <div hidden={step!==undefined&&step!==2} className="form-section optional-row document-note-section">{!noteOpen?<button className="text-action add-note-action" type="button" onClick={()=>setNoteOpen(true)}><Icon name="plus" size={16}/><LocalizedText>{" Notiz hinzufügen"}</LocalizedText></button>:<><SectionTitle title="Notiz" action={!draft.note&&<button className="text-action" type="button" onClick={()=>setNoteOpen(false)}><LocalizedText>{"Schliessen"}</LocalizedText></button>}/><Field label="Text für den Kunden"><Textarea autoFocus value={draft.note} onChange={e=>onChange({...draft,note:e.target.value})} placeholder="Optional"/></Field></>}</div>
     </section>
   </div>;
 }

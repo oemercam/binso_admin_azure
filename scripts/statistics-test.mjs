@@ -66,8 +66,11 @@ const overviewExports={};
 Function('require','exports','useState','useEffect','businessDate','financialStatisticEvents','statisticBounds','aggregateStatistics','MetricTiles','MetricTile','LocalizedText','Select','SectionTitle','sumMoney','formatCurrency',compileComponent(declaration('cash-statistics.tsx',await fs.readFile('components/cash-statistics.tsx','utf8'),'CashOverview')))(require,overviewExports,initial=>[typeof initial==='function'?initial():initial,()=>{}],()=>{},()=>'2026-10-15',financialStatisticEvents,statisticBounds,aggregateStatistics,Tiles,Tile,textComponent,'select',()=>null,(await import(moneyModuleUrl)).sumMoney,String);
 const fallback=overviewExports.CashOverview({dashboard:true,data:{payments:[{payment_date:'2026-10-10',amount:50}],outflows:[{payment_date:'2026-10-11',amount:20}]}});
 const fallbackMetrics=nodes(fallback).filter(node=>node.type===Tile).map(node=>node.props);
-assert.deepEqual(fallbackMetrics.map(metric=>metric.label),['Monatsumsatz','Zahlungseingänge','Ausgaben','Zahlungssaldo']);
+assert.deepEqual(fallbackMetrics.map(metric=>metric.label),['Fakturiertes Volumen','Zahlungseingänge','Ausgaben','Zahlungssaldo']);
 assert.deepEqual(fallbackMetrics.map(metric=>metric.value),['—',50,20,30],'Missing invoice volume remains unknown; known cash is counted once');
+const incompleteOverview=overviewExports.CashOverview({dashboard:true,data:{incomplete:true,payments:[],outflows:[]}});
+assert.ok(nodes(incompleteOverview).some(node=>node.type==='p'&&JSON.stringify(node.props.children).includes('nur nachgewiesene Zahlungen')),'Dashboard must not hide incomplete outflow evidence');
+
 
 const {PGlite}=await import('@electric-sql/pglite');
 const financeDb=new PGlite();

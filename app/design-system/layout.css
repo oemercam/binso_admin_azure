@@ -119,8 +119,6 @@
 .surface{padding:20px}
 .bo-workspace-section{min-width:0;margin-block:20px;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}
 .bo-workspace-section>h2{margin:0 0 16px;font-size:var(--type-body);font-weight:500;line-height:1.5}
-.bo-quick-create-links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-block:28px;max-width:none}
-.bo-quick-create-links .button{min-width:0;justify-content:flex-start;padding-inline:12px;height:auto;min-height:var(--button-height);white-space:normal;text-align:left}
 .page-container{--page-x:var(--workspace-page-inset);--mobile-page-x:22px}
 .section-title{
   min-height:30px;
@@ -131,8 +129,11 @@
   justify-content:space-between;
   gap:12px;
 }
-.section-title h2{margin:0;font-size:var(--section-title-font);font-weight:600;letter-spacing:0}
-.section-title>a{
+.section-title h2{min-width:0;overflow-wrap:anywhere;margin:0;font-size:var(--section-title-font);font-weight:600;letter-spacing:0}
+.section-title-actions>a:not(.button){
+  display:inline-flex;
+  align-items:center;
+  min-height:var(--touch);
   border:0;
   background:transparent;
   color:var(--color-muted);
@@ -281,7 +282,7 @@
     padding-bottom:0;
     border-bottom:0;
   }
-.section-title>.icon-action{
+.section-title-actions>.icon-action{
     width:var(--desktop-action-h);
     min-width:var(--desktop-action-h);
     height:var(--desktop-action-h);

@@ -4,7 +4,7 @@ import {sumMoney} from "@/lib/money";
 import type {PoolClient} from 'pg';
 import type {SessionUser} from '../session';
 import {tenantCan,ownRecordOnly} from '@/lib/permissions';
-export async function financialSummary(c:PoolClient,s:SessionUser,customerId:string|null){
+export async function financialSummary(c:PoolClient,s:SessionUser,customerId:string|null,includeEvents=false){
  const values=[s.organizationId,customerId];
  const invoices=tenantCan(s.role,'invoices:read')?(await c.query(`select currency,count(*) filter(where status='draft')::int draft_count
  from invoices where organization_id=$1 and archived_at is null and ($2::uuid is null or customer_id=$2) group by currency`,values)).rows:[];
@@ -17,6 +17,7 @@ export async function financialSummary(c:PoolClient,s:SessionUser,customerId:str
   invoice.open_amount=metric.snapshot.receivables;
   const year=String(metric.snapshot.as_of).slice(0,4);
   invoice.revenue=sumMoney(metric.revenueEvents.filter(row=>String(row.date).startsWith(year+'-')).map(row=>row.amount));
+  if(includeEvents)invoice.revenue_events=metric.revenueEvents;
  }
  return {invoices,offers,time};
 }

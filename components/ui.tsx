@@ -133,7 +133,7 @@ export function Input(props:React.ComponentProps<"input">){
  const sized=!props.hidden&&!['checkbox','radio','file','hidden','range','color','button','submit','reset','image'].includes(props.type??'text');
  return <LocalizedElement as="input" {...props} className={[props.className,sized?'form-control':undefined].filter(Boolean).join(' ')||undefined}/>;
 }
-export function Select(props:React.ComponentProps<"select">){return <SelectControl {...props}/>}
+export function Select(props:React.ComponentProps<"select">&{search?:import('./select-control').SelectSearch}){return <SelectControl {...props} SearchInput={Input}/>}
 export function Textarea(props:React.ComponentProps<"textarea">){return <LocalizedElement as="textarea" {...props} className={[props.className,'form-textarea'].filter(Boolean).join(' ')}/>}
 export function Checkbox(props:Omit<React.ComponentProps<"input">,"type">){return <Input {...props} type="checkbox"/>}
 export function DateInput(props:Omit<React.ComponentProps<"input">,"type">){return <Input {...props} type="date"/>}
@@ -162,7 +162,9 @@ export function Field({ label, children, className = "",allowReadOnlyInput=false
       ...(!child.props['aria-label']&&!child.props['aria-labelledby']?{'aria-labelledby':`${id}-label`}:{}),
       ...(message?{'aria-invalid':true}:{}),
       ...(!child.props.placeholder&&[Input,Textarea].includes(child.type as typeof Input)?{placeholder:fieldInputHint(label,String(child.props.type??'text'))}:{}),
-      onInvalid:(event:React.InvalidEvent<HTMLInputElement>)=>{setValidationError(event.currentTarget.validationMessage);(child.props.onInvalid as React.FormEventHandler<HTMLInputElement>|undefined)?.(event);},
+      // SelectControl owns its accessible required-selection error. Rendering the
+      // hidden native select's browser message here would announce it twice.
+      onInvalid:(event:React.InvalidEvent<HTMLInputElement>)=>{if(child.type!==Select)setValidationError(event.currentTarget.validationMessage);(child.props.onInvalid as React.FormEventHandler<HTMLInputElement>|undefined)?.(event);},
       onChange:(event:React.ChangeEvent<HTMLInputElement>)=>{setValidationError(undefined);(child.props.onChange as React.ChangeEventHandler<HTMLInputElement>|undefined)?.(event);},
       onInput:(event:React.FormEvent<HTMLInputElement>)=>{setValidationError(undefined);(child.props.onInput as React.FormEventHandler<HTMLInputElement>|undefined)?.(event);},
       ...(descriptions?{'aria-describedby':descriptions}:{}),

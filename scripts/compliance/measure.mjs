@@ -55,10 +55,11 @@ export async function measureCompliance(page,{output,route,theme,width,state='no
   if(fields.length)add('LAY-007',clipped.length?'failed':'passed',{clipped},'.form-field>span');
   const dividers=all('hr,[role=separator]'),doubled=[];for(let i=1;i<dividers.length;i++){const a=rect(dividers[i-1]),b=rect(dividers[i]);if(Math.abs(a.x-b.x)<=1&&Math.abs(a.width-b.width)<=1&&Math.abs(b.y-a.bottom)<=2)doubled.push({a,b});}
   if(dividers.length)add('LAY-005',doubled.length?'failed':'passed',{dividers:dividers.length,doubled},'hr,[role=separator]');
-  for(const el of all('.toolbar:has(.searchbox):has(.filter-button),.record-controls')){
-   const search=all('.searchbox').find(x=>el.contains(x)),filter=el.querySelector('.filter-button');const tabs=el.querySelector('.chips,.tabs');
-   if(innerWidth<=760&&search&&filter&&visible(filter)){const a=rect(search),b=rect(filter),t=tabs&&visible(tabs)?rect(tabs):null;add('CTL-001',b.x>=a.right-2&&Math.abs(a.y-b.y)<=2&&Math.abs(a.height-b.height)<=2&&(!t||t.y>=a.bottom-1)?'passed':'failed',{search:a,filter:b,tabs:t},'.toolbar,.record-controls');}
-   const sort=el.querySelectorAll('select[aria-label*=Sort],button[aria-label*=Sort]');add('CTL-003',[...sort].filter(visible).length<=1?'passed':'failed',{visibleSorts:[...sort].filter(visible).length},'.record-controls');
+  for(const el of all('.toolbar:has(.searchbox):has(.filter-button),.record-controls,.records-inline-controls')){
+   const search=all('.searchbox').find(x=>el.contains(x)),filter=el.querySelector('.filter-button,.records-filter-action');const tabs=el.querySelector('.chips,.tabs');
+   if(innerWidth<=760&&search&&filter&&visible(filter)){const a=rect(search),b=rect(filter),t=tabs&&visible(tabs)?rect(tabs):null;add('CTL-001',b.x>=a.right-2&&Math.abs(a.y-b.y)<=2&&Math.abs(a.height-b.height)<=2&&(!t||t.y>=a.bottom-1)?'passed':'failed',{search:a,filter:b,tabs:t},'.toolbar,.record-controls,.records-inline-controls');}
+   const sort=[...el.querySelectorAll('.records-sort-control [role=combobox],select[aria-label*=Sort],button[aria-label*=Sort]:not(.records-filter-action,.filter-button,.filter-chip)')].filter(visible);
+   add('CTL-003',sort.length<=1?'passed':'failed',{visibleSorts:sort.length,controls:sort.map(item)},'.record-controls,.records-inline-controls');
   }
   for(const el of all('.tabs,.chips')){const c=getComputedStyle(el);add('CTL-002',el.scrollWidth<=el.clientWidth+1||['auto','scroll'].includes(c.overflowX)?'passed':'failed',{clientWidth:el.clientWidth,scrollWidth:el.scrollWidth,overflowX:c.overflowX},'.tabs,.chips');}
   for(const el of all('.mobile-header'))add('HDR-001',getComputedStyle(el).backdropFilter==='none'?'passed':'failed',{backdropFilter:getComputedStyle(el).backdropFilter,background:getComputedStyle(el).backgroundColor,rect:rect(el)},'.mobile-header');

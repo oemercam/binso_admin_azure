@@ -15,7 +15,7 @@ export function dataDomains(path:string):DataDomain[]{
 }
 export function affectedDomains(path:string):DataDomain[]{
  const [domain]=dataDomains(path);
- if(path.startsWith('/api/workforce-assignments'))return ['identity','customers','projects','time','files','employees','settings'];
+ if(path.startsWith('/api/workforce-assignments'))return ['identity','customers','projects','time','files','employees','settings','dashboard'];
  if(domain==='identity')return ['identity','session'];
  if(path.startsWith('/api/settings/team/'))return ['settings','session','identity'];
  if(path.startsWith('/api/settings/notifications'))return ['settings','notifications'];
@@ -24,8 +24,8 @@ export function affectedDomains(path:string):DataDomain[]{
  customers:['documents','payments','projects','time','finance','dashboard'],
  documents:['customers','finance','dashboard','time','expenses','projects'],
  payments:['documents','customers','finance','dashboard'],
- time:['customers','projects','finance'],timer:['time'],expenses:['customers','employees','projects','finance','documents'],
- employees:['time','expenses'],files:['settings','expenses','employees','support','customers','documents','projects'],projects:['customers','time','documents'],
+ time:['customers','projects','finance','dashboard'],timer:['time','dashboard'],expenses:['customers','employees','projects','finance','documents','dashboard'],
+ employees:['time','expenses','dashboard'],files:['settings','expenses','employees','support','customers','documents','projects'],projects:['customers','time','documents','dashboard'],
  products:['documents'],settings:['documents'],billing:['settings'],records:['customers','documents','payments','finance','dashboard','projects','time','expenses','employees'],
  };
  return [domain,...(dependents[domain]??[])];

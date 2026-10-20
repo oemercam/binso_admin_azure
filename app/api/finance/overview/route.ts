@@ -5,7 +5,7 @@ import {tenantCan} from '@/lib/permissions';
 import {withTenant} from '@/lib/server/db';
 import {financialSummary} from '@/lib/server/repositories/financial-summary';
 import {financeData,cashStatisticsData} from '@/lib/server/repositories/finance';
-import {listApiBusiness} from '@/lib/server/repositories/business-api';
+import {dashboardAttention} from '@/lib/server/repositories/dashboard';
 import {apiError,json} from '@/lib/server/http';
 export async function GET(request:NextRequest){try{
  const s=await requireSession();authorize(s,'organization:read');
@@ -13,8 +13,9 @@ export async function GET(request:NextRequest){try{
  return json(await withTenant(s.organizationId,s.userId,async c=>{
   const summary=await financialSummary(c,s,customerId);
   if(request.nextUrl.searchParams.get('include')!=='workspace')return summary;
-  authorize(s,'documents:read');authorize(s,'accounting:read');
-  const documents=await listApiBusiness(c,s,'documents',customerId?'customer_id=eq.'+encodeURIComponent(customerId):'');
+  authorize(s,'finance-overview:read');
+  authorize(s,'documents:read');
+  const documents=await dashboardAttention(c,s,customerId);
   const data=tenantCan(s.role,'accounting:read')&&request.nextUrl.searchParams.get('view')!=='cash'?await financeData(c,s.organizationId):{};
   const cash=tenantCan(s.role,'accounting:read')?await cashStatisticsData(c,s.organizationId):null;
   return {...summary,documents,data,cash};

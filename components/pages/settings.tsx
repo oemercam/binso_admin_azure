@@ -1,4 +1,5 @@
 "use client";
+import {notificationChannels} from "@/config/notification-channels";
 import {ProgressBar} from "../ui";
 import {SettingsNavigation} from "../settings-navigation";
 import {FileUpload} from "../file-upload";
@@ -48,7 +49,10 @@ export function AccountSettingsPage() {
   const currentValues=JSON.stringify([firstName,lastName,phone,jobTitle]);
   const beginEdit=()=>{setBaseline(currentValues);setEditing(true)};
   const [avatarUrl,setAvatarUrl]=useState("");
-  const uploadAvatar=async(file:File|undefined)=>{if(!file)return;try{const form=new FormData();form.append("file",file);form.append("purpose","profile_avatar");const result=await apiUpload<{item:{id:string;scanStatus:string;available?:boolean}}>("/api/files",form);if(result.item.available!==true&&result.item.scanStatus!=="clean")throw new Error("Das Profilbild wartet auf die Sicherheitsprüfung. Das bisherige Bild bleibt erhalten.");setAvatarUrl("/api/files/"+result.item.id+"/download");window.dispatchEvent(new Event("binso-profile-changed"));setToast("Profilbild gespeichert.");}catch(e){setToast(e instanceof Error?e.message:"Profilbild konnte nicht gespeichert werden.")}};
+  const [avatarUploading,setAvatarUploading]=useState(false);
+  const [avatarError,setAvatarError]=useState("");
+  const avatarPending=useRef(false);
+  const uploadAvatar=async(file:File|undefined)=>{if(!file||avatarPending.current||saveBusy.current)return;avatarPending.current=true;setAvatarUploading(true);setAvatarError("");try{const form=new FormData();form.append("file",file);form.append("purpose","profile_avatar");const result=await apiUpload<{item:{id:string;scanStatus:string;available?:boolean}}>("/api/files",form);if(result.item.available!==true&&result.item.scanStatus!=="clean")throw new Error("Das Profilbild wartet auf die Sicherheitsprüfung. Das bisherige Bild bleibt erhalten.");setAvatarUrl("/api/files/"+result.item.id+"/download");query.refresh();window.dispatchEvent(new Event("binso-profile-changed"));setToast("Profilbild gespeichert.");}catch(e){const message=e instanceof Error?e.message:"Profilbild konnte nicht gespeichert werden.";setAvatarError(message);setToast(message)}finally{avatarPending.current=false;setAvatarUploading(false)}};
 
   useEffect(()=>{
     if(editing||!query.data)return;
@@ -62,7 +66,7 @@ export function AccountSettingsPage() {
   },[editing,query.data]);
 
   const save=async(message="Persönliche Daten gespeichert.")=>{
-    if(loading||loadError||saveBusy.current)return;saveBusy.current=true;setSaving(true);
+    if(loading||loadError||saveBusy.current||avatarPending.current)return;saveBusy.current=true;setSaving(true);
     try{
       if(!isProductionBackendEnabled())throw new Error("Die Vorschau ist schreibgeschützt. Bitte eine Datenbank-Demo starten.");
       await apiPatch("/api/settings/profile",{firstName,lastName,phone,jobTitle});
@@ -80,9 +84,10 @@ export function AccountSettingsPage() {
   return <AppShell title="Persönliche Daten" subtitle="Dein Konto und deine Profildaten." active="einstellungen" editing={editing} unsavedChanges={false} backHref="/einstellungen" backLabel="Einstellungen" mobileActions={!editing?<Button requiresWrite disabled={loading||!!loadError} variant="secondary" className="icon-button" ariaLabel="Bearbeiten" icon="edit" onClick={beginEdit}/>:undefined} actions={!editing?<Button requiresWrite disabled={loading||!!loadError} variant="secondary" icon="edit" onClick={beginEdit}><LocalizedText>{"Bearbeiten"}</LocalizedText></Button>:undefined}>
     {loading?<LoadingState><LocalizedText>{"Einstellungen werden geladen …"}</LocalizedText></LoadingState>:loadError?<ErrorState onRetry={query.refresh} retryLabel="Erneut versuchen"><LocalizedText>{loadError}</LocalizedText></ErrorState>:<div className="settings-detail-grid">
       <section className="surface settings-profile">
-        <Avatar name={displayName==="Benutzer"?"":displayName} identity={email} src={avatarUrl} size="large"/><div><h2>{displayName}</h2><p><LocalizedText verbatim>{email}</LocalizedText></p><p><LocalizedText verbatim={!!jobTitle}>{jobTitle||"Benutzer"}</LocalizedText></p></div>{editing&&<><label className="button button-secondary" htmlFor="profile-avatar-upload"><LocalizedText>{"Bild ändern"}</LocalizedText></label><Input id="profile-avatar-upload" hidden type="file" accept="image/png,image/jpeg,image/webp" onChange={e=>void uploadAvatar(e.target.files?.[0])}/></>}
+        <Avatar name={displayName==="Benutzer"?"":displayName} identity={email} src={avatarUrl} size="large"/><div><h2>{displayName}</h2><p><LocalizedText verbatim>{email}</LocalizedText></p><p><LocalizedText verbatim={!!jobTitle}>{jobTitle||"Benutzer"}</LocalizedText></p></div>
       </section>
-      {editing?<FormSheet workspace label="Persönliche Daten bearbeiten" open onClose={()=>setEditing(false)} busy={saving} dirty={currentValues!==baseline}><form className="settings-form" onSubmit={event=>{event.preventDefault();void save();}}>
+      {editing?<FormSheet workspace label="Persönliche Daten bearbeiten" open onClose={()=>setEditing(false)} busy={saving||avatarUploading} dirty={currentValues!==baseline}><form className="settings-form" onSubmit={event=>{event.preventDefault();void save();}}>
+        <FileUpload id="profile-avatar-upload" label="Profilbild" file={null} preview={avatarUrl||undefined} accept={["image/png","image/jpeg","image/webp"]} busy={saving||avatarUploading} error={avatarError} onSelect={file=>void uploadAvatar(file)}/>
         <div className="form-grid two">
           <Field label="Vorname"><Input value={firstName} onChange={e=>setFirstName(e.target.value)}/></Field>
           <Field label="Nachname"><Input value={lastName} onChange={e=>setLastName(e.target.value)}/></Field>
@@ -90,7 +95,7 @@ export function AccountSettingsPage() {
           <Field label="Telefon"><Input type="tel" value={phone} onChange={e=>setPhone(e.target.value)}/></Field>
           <Field label="Funktion"><Input value={jobTitle} onChange={e=>setJobTitle(e.target.value)}/></Field>
         </div>
-        <FormActions sheet><Button variant="secondary" onClick={()=>setEditing(false)}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button requiresWrite disabled={loading||!!loadError||saving} type="submit"><LocalizedText>{saving?"Wird gespeichert…":"Speichern"}</LocalizedText></Button></FormActions>
+        <FormActions sheet><Button variant="secondary" onClick={()=>setEditing(false)}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button requiresWrite disabled={loading||!!loadError||saving||avatarUploading} type="submit"><LocalizedText>{saving?"Wird gespeichert…":"Speichern"}</LocalizedText></Button></FormActions>
       </form></FormSheet>:<section className="settings-readonly"><dl className="detail-list"><div><dt><LocalizedText>{"Name"}</LocalizedText></dt><dd>{displayName}</dd></div><div><dt><LocalizedText>{"E-Mail"}</LocalizedText></dt><dd><LocalizedText>{email||"—"}</LocalizedText></dd></div><div><dt><LocalizedText>{"Telefon"}</LocalizedText></dt><dd><LocalizedText>{phone||"—"}</LocalizedText></dd></div><div><dt><LocalizedText>{"Funktion"}</LocalizedText></dt><dd><LocalizedText>{jobTitle||"—"}</LocalizedText></dd></div></dl></section>}
     </div>}
     {toast&&<Toast title={toast} tone={["Persönliche Daten gespeichert.","Firmendaten gespeichert.","Profilbild gespeichert.","Firmenlogo gespeichert."].includes(toast)?"success":"danger"}/>}
@@ -345,7 +350,7 @@ export function NotificationSettingsPage() {
   return <AppShell title="Benachrichtigungen" subtitle="Bestimme, wie Binso One dich informiert." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
     {error&&<ErrorState><LocalizedText>{error}</LocalizedText></ErrorState>}
     {!ready&&!error&&<LoadingState><LocalizedText>{"Einstellungen werden geladen …"}</LocalizedText></LoadingState>}
-    <SettingsGroup title="Zustellung"><section className="preference-table">{rows.map(([title,text])=><div className="preference-row" key={title}><div><b><LocalizedText>{title}</LocalizedText></b><small><LocalizedText>{text}</LocalizedText></small></div><div className="preference-channels">{(["email","push"] as const).map(channel=><label key={channel}><span><LocalizedText>{channel==="email"?"E-Mail":"Push"}</LocalizedText></span><Toggle checked={prefs[title][channel]} disabled={!ready||saving.includes(title+channel)} onChange={()=>void toggle(title,channel)} label={`${channel==="email"?"E-Mail":"Push"} ${title}`}/></label>)}</div></div>)}</section></SettingsGroup>
+    <SettingsGroup title="Zustellung"><section className="preference-table">{rows.map(([title,text])=><div className="preference-row" key={title}><div><b><LocalizedText>{title}</LocalizedText></b><small><LocalizedText>{text}</LocalizedText></small></div><div className="preference-channels">{(["email","push"] as const).filter(channel=>notificationChannels[channel]).map(channel=><label key={channel}><span><LocalizedText>{channel==="email"?"E-Mail":"Push"}</LocalizedText></span><Toggle checked={prefs[title][channel]} disabled={!ready||saving.includes(title+channel)} onChange={()=>void toggle(title,channel)} label={`${channel==="email"?"E-Mail":"Push"} ${title}`}/></label>)}</div></div>)}</section></SettingsGroup>
   </AppShell>;
 }
 

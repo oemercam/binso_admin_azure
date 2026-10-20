@@ -11,9 +11,9 @@ for(const role of ['project_manager','manager','member','reader','unknown']){ass
 assert.equal(tenantCanCreateAt('finance','/kunden/neu'),true);assert.equal(tenantCanCreateAt('member','/spesen/neu'),true);
 for(const role of ['owner','admin','finance'])assert.equal(tenantCan(role,'accounting:read'),true);
 for(const role of ['member','reader','hr','project_manager'])assert.equal(tenantCan(role,'accounting:read'),false);
-assert.equal(routePermission('/finanzen'),'documents:read');
+assert.equal(routePermission('/finanzen'),'finance-overview:read');
 assert.equal(routePermission('/finanzen/analyse'),'accounting:read');
-for(const [route,permission] of [['/angebote','sales:read'],['/zeit','time:read'],['/mitarbeiter','employees:read'],['/belege','documents:read']])assert.equal(routePermission(route),permission);
+for(const [route,permission] of [['/angebote','sales:read'],['/zeit','time:read'],['/mitarbeiter','employees:read'],['/belege','finance-overview:read']])assert.equal(routePermission(route),permission);
 assert.equal(operatorCan('platform_support','subscriptions:read'),false);
 assert.equal(operatorCan('platform_billing','subscriptions:read'),true);
 for(const role of ['unknown','__proto__','constructor','']){
@@ -94,3 +94,12 @@ const related=allowed=>renderToStaticMarkup(React.createElement(contextExports.P
 assert.equal(related(false),'Kunde','Denied related record must not expose a navigation link');
 assert.equal(related(true),'<a href="/kunden/related">Kunde</a>','Authorized read navigation remains available without write access');
 console.log('Related-record links respect the AppShell context and retain a text fallback.');
+
+for(const role of ['owner','admin','finance','hr','project_manager','member','reader']){
+ assert.equal(tenantCan(role,routePermission('/einstellungen/team')),tenantCan(role,'users:read'),'Team entry mirrors its read API for '+role);
+ assert.equal(tenantCan(role,routePermission('/einstellungen/abonnement')),tenantCan(role,'billing:read'),'Subscription entry mirrors its read API for '+role);
+ assert.equal(tenantCan(role,routePermission('/einstellungen/konto')),true,'Personal settings remain reachable for '+role);
+}
+
+for(const role of ['member','hr','unknown'])assert.equal(tenantCan(role,'finance-overview:read'),false,'Documents-only access cannot open a financial workspace');
+for(const role of ['owner','admin','finance','project_manager','reader'])assert.equal(tenantCan(role,'finance-overview:read'),true,'Existing financial read capabilities retain their partial workspace');

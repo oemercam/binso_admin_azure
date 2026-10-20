@@ -9,9 +9,9 @@ import { isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend
 import {CashStatistics,CashOverview} from "../cash-statistics";
 import type {CashStatisticsData} from "@/lib/cash-statistics";
 import {financialStatus,financialStatusLabels} from "@/lib/financial-status";
-import {SectionTitle, LoadingState, ErrorState} from "../ui";
+import {SectionTitle, LoadingState, ErrorState, EmptyState} from "../ui";
 import { RecordsControls, useRecordsController } from "../records";
-import { CreateAction } from "../binso-ux";
+import { CreateAction,ListRow } from "../binso-ux";
 
 export function FinanceAnalysisPage() {
  const production=useBackendMode();
@@ -46,7 +46,11 @@ export function FinancePage(){
  const overdue=items.filter(item=>item.kind==='invoice'&&financialStatus(item)==='overdue');
  return <AppShell title="Finanzen" active="finanzen"><FinanceTabs/>{query.loading?<LoadingState><LocalizedText>{"Finanzen werden geladen …"}</LocalizedText></LoadingState>:query.error?<ErrorState onRetry={query.refresh}><LocalizedText>{query.error}</LocalizedText></ErrorState>:<>
   {summary?.cash&&<CashOverview data={summary.cash}/>}
-  {!!summary?.invoices.filter(item=>item.currency!=='CHF').length&&<section className="bo-workspace-section"><SectionTitle title="Offene Forderungen"/>{summary.invoices.filter(item=>item.currency!=='CHF').map(item=><p key={item.currency}>{formatCurrency(item.open_amount,item.currency)}</p>)}</section>}
+  {!summary?.cash&&summary?.invoices.map(item=><section className="bo-workspace-section" key={item.currency}><SectionTitle title="Forderungen"/><ListRow href="/rechnungen?status=Offen" title="Offene Forderungen" meta={item.currency} value={formatCurrency(item.open_amount,item.currency)}/></section>)}
+  {summary?.offers&&<section className="bo-workspace-section"><SectionTitle title="Angebote"/><ListRow href="/angebote?status=Entwurf" title="Entwürfe" meta="Noch nicht versendet" value={String(summary.offers.draft_count)}/><ListRow href="/angebote" title="Aktive Vorgänge" meta="Angebote mit nächstem Schritt" value={String(summary.offers.actionable_count)}/></section>}
+  {summary?.time&&<section className="bo-workspace-section"><SectionTitle title="Arbeitszeit"/><ListRow href="/zeit?tab=entries" title="Zur Abrechnung bereit" meta="Freigegeben und noch nicht verrechnet" value={Number(summary.time.ready_hours).toLocaleString('de-CH',{maximumFractionDigits:2})+' h'}/></section>}
+  {!summary?.cash&&!summary?.invoices.length&&!summary?.offers&&!summary?.time&&<EmptyState title="Keine Finanzinformationen für diesen Zugriff verfügbar"/>}
+  {summary?.cash&&!!summary.invoices.filter(item=>item.currency!=='CHF').length&&<section className="bo-workspace-section"><SectionTitle title="Offene Forderungen"/>{summary.invoices.filter(item=>item.currency!=='CHF').map(item=><p key={item.currency}>{formatCurrency(item.open_amount,item.currency)}</p>)}</section>}
   {overdue.length>0&&<section className="bo-workspace-section"><SectionTitle title="Handlungsbedarf"/>{overdue.slice(0,5).map(item=><DocumentSummaryRow key={item.id} item={item} compact/>)}</section>}
  </>}</AppShell>;
 }

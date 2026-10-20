@@ -231,18 +231,6 @@
 .thread-composer button{width:var(--touch);height:var(--touch);display:grid;place-items:center;border:0;border-radius:var(--shape-medium);background:transparent}
 .thread-composer>.icon-button{width:var(--touch);height:var(--touch);min-height:var(--touch)}
 .thread-composer button:last-child{background:var(--color-inverse-bg);color:var(--color-inverse-fg)}
-.attachment-button{
-  min-height:48px;
-  margin-top:16px;
-  padding:0 13px;
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  border:1px solid var(--color-line);
-  border-radius:var(--radius-md);
-  background:transparent;
-  font-size:var(--type-metadata);
-}
 .ux-lab{padding:16px;max-width:100%;overflow-wrap:anywhere}
 .ux-lab>section{padding:20px 0;border-bottom:1px solid var(--color-line)}
 .ux-lab-viewer{height:600px;display:flex;flex-direction:column;min-width:0}

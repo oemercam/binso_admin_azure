@@ -35,15 +35,19 @@ export async function listProjects(c:PoolClient,s:SessionUser,params:URLSearchPa
  authorize(s,'projects:read');
  const q=(params.get('q')??'').trim().slice(0,200),status=params.get('status')??'';
  const limit=Number(params.get('limit')??1000),offset=Number(params.get('offset')??0);
+ const customerId=params.get('customerId')??'';
+ const id=(params.get('id')??'').replace(/^eq\./,'');
+ if(id&&!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id))throw new ApiError(400,'invalid_project_filter','Ungültiger Auftragfilter.');
+ if(customerId&&!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(customerId))throw new ApiError(400,'invalid_customer_filter','Ungültiger Kundenfilter.');
  const order=params.get('order')??'name.asc',orders:Record<string,string>={'name.asc':'p.name asc,p.id','name.desc':'p.name desc,p.id','customer_name.asc':'c.name asc nulls last,p.id','customer_name.desc':'c.name desc nulls last,p.id','hours.asc':'hours asc,p.id','hours.desc':'hours desc,p.id','status.asc':'p.status asc,p.id','status.desc':'p.status desc,p.id'};
  if(!Number.isInteger(limit)||limit<1||limit>1000||!Number.isInteger(offset)||offset<0||offset>1000000||status&&!projectStatuses.includes(status as typeof projectStatuses[number])||!orders[order])throw new ApiError(400,'invalid_project_filter','Ungültiger Auftragfilter.');
- const where="p.organization_id=$1 and p.archived_at is null and ($2='' or p.name ilike '%'||$2||'%' or c.name ilike '%'||$2||'%') and ($3='' or p.status=$3 or $3='active' and p.status='in_progress')";
+ const where="p.organization_id=$1 and p.archived_at is null and ($2='' or p.name ilike '%'||$2||'%' or c.name ilike '%'||$2||'%') and ($3='' or p.status=$3 or $3='active' and p.status='in_progress') and ($8::text='' or p.customer_id=nullif($8,'')::uuid) and ($9::text='' or p.id=nullif($9,'')::uuid)";
  const canTime=tenantCan(s.role,'time:read'),canInvoices=tenantCan(s.role,'invoices:read');
  const rows=(await c.query(`with input_context as(select $4::boolean own_only,$5::text actor_id) select p.id,p.name,p.customer_id,p.status,p.progress,c.name customer_name,${tenantCan(s.role,'sales:read')?'q.quote_no':'null::text'} source_offer,
  ${canTime?`coalesce((select sum(t.hours) from time_entries t where t.organization_id=p.organization_id and t.project_id=p.id and t.archived_at is null and ($4::boolean=false or t.created_by_user_id=$5)),0)`:'null::numeric'} hours,
  ${canTime?`coalesce((select sum(t.hours) from time_entries t where t.organization_id=p.organization_id and t.project_id=p.id and t.archived_at is null and t.invoiced_invoice_id is not null and ($4::boolean=false or t.created_by_user_id=$5)),0)`:'null::numeric'} invoiced_hours,
  ${canInvoices?`coalesce((select json_agg(distinct i.invoice_no) from time_entries t join invoices i on i.id=t.invoiced_invoice_id and i.organization_id=t.organization_id where t.organization_id=p.organization_id and t.project_id=p.id and t.archived_at is null),'[]'::json)`:`'[]'::json`} invoice_numbers,
- count(*) over() total_count from projects p left join customers c on c.id=p.customer_id and c.organization_id=p.organization_id left join quotes q on q.id=p.source_quote_id and q.organization_id=p.organization_id where ${where} order by ${orders[order]} limit $6 offset $7`,[s.organizationId,q,status,ownRecordOnly(s.role,'zeiterfassung'),s.userId,limit,offset])).rows;
- const total=rows.length?Number(rows[0].total_count):offset?(await c.query(`select count(*) total from projects p left join customers c on c.id=p.customer_id and c.organization_id=p.organization_id where ${where}`,[s.organizationId,q,status])).rows[0].total:0;
+ count(*) over() total_count from projects p left join customers c on c.id=p.customer_id and c.organization_id=p.organization_id left join quotes q on q.id=p.source_quote_id and q.organization_id=p.organization_id where ${where} order by ${orders[order]} limit $6 offset $7`,[s.organizationId,q,status,ownRecordOnly(s.role,'zeiterfassung'),s.userId,limit,offset,customerId,id])).rows;
+ const total=rows.length?Number(rows[0].total_count):offset?(await c.query(`with input_context as(select $4::boolean own_only,$5::text actor_id,$6::int page_limit,$7::int page_offset) select count(*) total from projects p left join customers c on c.id=p.customer_id and c.organization_id=p.organization_id where ${where}`,[s.organizationId,q,status,ownRecordOnly(s.role,'zeiterfassung'),s.userId,limit,offset,customerId,id])).rows[0].total:0;
  return {items:rows,total:Number(total)};
 }

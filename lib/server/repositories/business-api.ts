@@ -92,6 +92,11 @@ export async function listApiBusiness(c:PoolClient,s:SessionUser,table:string,ex
   source=`select d.*,case when d.kind='offer' then case when d.status='sent' and d.valid_until<$${values.length}::text then 'expired' else d.status end when d.status in ('draft','cancelled') then d.status when d.total>0 and round(greatest(0,d.total-d.credit_amount)*100)<=round(greatest(0,d.paid_amount-d.refund_amount)*100) then 'paid' when d.due_date<$${values.length}::text and round(greatest(0,d.total-d.credit_amount)*100)>round(greatest(0,d.paid_amount-d.refund_amount)*100) then 'overdue' when round(greatest(0,d.paid_amount-d.refund_amount)*100)>0 then 'partial' else 'open' end display_status from (${source}) d`;
  }
  const where:string[]=[];
+ if(filters.has('review')){
+  if(table!=='expenses'||filters.get('review')!=='1')throw new ApiError(400,'invalid_filter','Ungültiger Freigabefilter.');
+  if(!tenantCan(s.role,'expenses:write')||!['owner','admin','project_manager','manager'].includes(s.role))throw new ApiError(403,'approval_forbidden','Keine Berechtigung für Freigaben.');
+  values.push(s.userId);where.push(`q.status='submitted' and q.created_by_user_id<>$${values.length}`);
+ }
  if(filters.has('outstanding')){
   if(!customerFinancials||filters.get('outstanding')!=='1')throw new ApiError(400,'invalid_filter','Ungültiger Kundenfilter.');
   where.push('q.has_open=true');

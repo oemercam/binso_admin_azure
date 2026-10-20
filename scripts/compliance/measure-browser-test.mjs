@@ -77,6 +77,21 @@ try{
    assert.equal(palette[0].status,surface==='--color-bg'?'passed':'failed','The ZIP canvas passes and the superseded gray surface stays blocking at every viewport');
   }
  }
+ // RecordsControls now owns these classes; a stale selector must not silently
+ // leave the real mobile toolbar outside the geometry gate.
+ await page.setViewportSize({width:390,height:1000});
+ const toolbar=({reverse=false,stack=false,tabsAbove=false,hidden=false}={})=>`<style>body{margin:0}.records-search-row{display:flex;${stack?'flex-direction:column;':''}}.searchbox{display:block;width:240px;height:44px}.records-filter-action{width:44px;height:44px;${hidden?'display:none;':''}}.tabs{height:30px}</style><div class="records-inline-controls">${tabsAbove?'<div class="tabs">Tabs</div>':''}<div class="records-search-row">${reverse?'<button class="records-filter-action">Filter</button>':''}<label class="searchbox">Search</label>${reverse?'':'<button class="records-filter-action">Filter</button>'}</div>${tabsAbove?'':'<div class="tabs">Tabs</div>'}</div>`;
+ const toolbarCheck=async options=>{await page.setContent(toolbar(options));const result=await measureCompliance(page,{output,route:'/kunden',theme:'light',width:390,state:'toolbar-'+JSON.stringify(options),engine});return result.checks.filter(check=>check.id==='UX-CTL-001');};
+ assert.equal((await toolbarCheck({}))[0].status,'passed','The current RecordsControls owner emits mobile geometry evidence');
+ for(const options of [{reverse:true},{stack:true},{tabsAbove:true}])assert.equal((await toolbarCheck(options))[0].status,'failed','Wrong order, stacked controls and misplaced tabs stay blocking');
+ assert.equal((await toolbarCheck({hidden:true})).length,0,'An invisible filter is not evidence of a measured control pair');
+ await page.setViewportSize({width:1440,height:1000});
+ const sortCheck=async(content,state)=>{await page.setContent(`<div class="records-inline-controls"><button class="records-filter-action" aria-label="Filter und Sortierung">Filter</button>${content}</div>`);const result=await measureCompliance(page,{output,route:'/kunden',theme:'light',width:1440,state,engine});return result.checks.filter(check=>check.id==='UX-CTL-003');};
+ const sortControl='<label class="records-sort-control"><button role="combobox" aria-label="Sortierung">Sortieren</button><select aria-label="Sortierung" hidden><option>Name</option></select></label>';
+ assert.equal((await sortCheck(sortControl,'sort-filter-and-one-choice'))[0].status,'passed','The combined filter action is not a second sort selector; hidden native value model is not a visible control');
+ assert.equal((await sortCheck(sortControl+sortControl,'sort-two-choices'))[0].status,'failed','Two actual sort selectors remain blocking');
+ assert.equal((await sortCheck(sortControl+'<button aria-label="Sortieren">Extra</button>','sort-extra-unowned-choice'))[0].status,'failed','An additional sort action outside its canonical owner remains blocking');
+ assert.equal((await sortCheck(sortControl+'<button class="filter-chip" aria-label="Sortierung zurücksetzen">Reset</button>','sort-reset-chip'))[0].status,'passed','An active-filter reset is not another sort selector');
  await page.close();
  console.log('Scroll-end, desktop-header, exact per-view KPI and ZIP canvas/old-gray-surface adversaries passed. Engine: '+engine);
 }finally{await browser.close();await fs.rm(output,{recursive:true,force:true});}

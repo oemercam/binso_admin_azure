@@ -1,4 +1,6 @@
 import "server-only";
+import type {PoolClient} from 'pg';
+import {ApiError} from './http';
 import {withTenant} from "@/lib/server/db";
 import {isPlanId,planAllowsModule,planLimits,type PlanId} from "@/config/plan-access";
 
@@ -19,14 +21,17 @@ export async function requireModuleEntitlement(organizationId:string,moduleKey:s
  return plan;
 }
 
-export async function requireProjectCapacity(organizationId:string,userId:string){
- const plan=await getOrganizationPlan(organizationId);
- const projectCount=await withTenant(organizationId,userId,async client=>{
-  const result=await client.query<{count:number}>(`select count(*)::int as count from projects where organization_id=$1 and archived_at is null`,[organizationId]);
-  return Number(result.rows[0]?.count??0);
- });
- if(projectCount>=planLimits[plan].projects)throw new Response("Der Auftraglimit deines aktuellen Plans ist erreicht.",{status:409});
- return plan;
+export async function requireProjectCapacity(organizationId:string,userId:string,transaction?:PoolClient){
+ const check=async(client:PoolClient)=>{
+  // Serialize creations per tenant; checking outside the write transaction races.
+  await client.query('select id from organizations where id=$1 for update',[organizationId]);
+  const subscription=await client.query<{plan:string}>('select plan from organization_subscriptions where organization_id=$1',[organizationId]);
+  const plan=appPlan(subscription.rows[0]?.plan||'');
+  const result=await client.query<{count:number}>('select count(*)::int as count from projects where organization_id=$1 and archived_at is null',[organizationId]);
+  if(Number(result.rows[0]?.count??0)>=planLimits[plan].projects)throw new ApiError(409,'project_limit','Das Auftragslimit deines aktuellen Plans ist erreicht.');
+  return plan;
+ };
+ return transaction?check(transaction):withTenant(organizationId,userId,check);
 }
 
 export async function requireUserCapacity(organizationId:string){

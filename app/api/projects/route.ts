@@ -4,6 +4,7 @@ import {listProjects} from '@/lib/server/repositories/project-workspace';
 import {randomUUID} from 'node:crypto';
 import {requireSession} from '@/lib/server/session';
 import {authorize} from '@/lib/server/rbac';
+import {requireProjectCapacity} from '@/lib/server/plan-access';
 import {withTenant} from '@/lib/server/db';
 import {audit} from '@/lib/server/audit';
 import {idempotentBusiness} from '@/lib/server/business-idempotency';
@@ -14,4 +15,5 @@ export async function POST(request:NextRequest){try{assertSameOrigin(request);co
  const item=await withTenant(s.organizationId,s.userId,async c=>{const write=async()=>{let quoteId=null;
  if(sourceOffer){const q=(await c.query("select id,customer_id from quotes where organization_id=$1 and quote_no=$2 and status='accepted' and archived_at is null for update",[s.organizationId,sourceOffer])).rows[0];if(!q||q.customer_id!==customerId)throw new ApiError(409,'offer_invalid','Bitte ein angenommenes Angebot dieses Kunden auswählen.');quoteId=q.id;const previous=(await c.query('select id,name,customer_id,status from projects where organization_id=$1 and source_quote_id=$2 and archived_at is null',[s.organizationId,quoteId])).rows[0];if(previous)return previous;}
  if(customerId&&!(await c.query('select id from customers where organization_id=$1 and id=$2 and archived_at is null',[s.organizationId,customerId])).rowCount)throw new ApiError(400,'customer_invalid','Kunde wurde nicht gefunden.');
+ await requireProjectCapacity(s.organizationId,s.userId,c);
  const result=(await c.query("insert into projects(organization_id,external_id,name,customer_id,status,source_quote_id,created_by_user_id) values($1,$2,$3,$4,'active',$5,$6) returning id,name,customer_id,status",[s.organizationId,randomUUID(),name,customerId||null,quoteId,s.userId])).rows[0];await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'project.created',entityType:'project',entityId:result.id});return result;};return requestKey?idempotentBusiness(c,{organizationId:s.organizationId,userId:s.userId,operation:'project.create',key:requestKey,body:{name,customerId,sourceOffer}},write):write();});return json({item},201);}catch(e){return apiError(e)}}

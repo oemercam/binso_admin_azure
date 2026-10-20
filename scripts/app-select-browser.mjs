@@ -15,7 +15,9 @@ export async function selectAppOption(locator,choice){
  assert.ok(geometry.height>0&&geometry.height<=321,'Visible selection menu has a bounded content height');
  assert.ok(geometry.left>=geometry.viewportLeft&&geometry.right<=geometry.viewportRight+1&&geometry.top>=geometry.viewportTop&&geometry.bottom<=geometry.viewportBottom+1,'Selection popup stays inside the actual visible viewport');
  await locator.page().locator('[role="listbox"][id='+JSON.stringify(id)+']').locator('[role="option"]').nth(index).click();
- return [await native.inputValue()];
+ // A remote customer selection can remount the editor while its directory
+ // refreshes. Re-resolve the labelled control, not its retired React useId.
+ return [await candidate.inputValue()];
 }
 export async function appControlValue(locator){
  return await locator.evaluate(el=>el.tagName)==='BUTTON'?locator.locator('..').locator('select').inputValue():locator.inputValue();

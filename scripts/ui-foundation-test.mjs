@@ -121,16 +121,23 @@ const upward=selectGeometry({left:20,top:740,bottom:784,width:300},{left:0,top:0
 assert.equal(upward.top+upward.height,736,'Upward menus end beside the trigger, not a presumed 320px above it');
 
 // Exercise actual upload callbacks: invalid input and read-only roles cannot mutate form state.
+const {fileSelectionError}=await import(moduleUrl(fs.readFileSync('lib/file-selection.ts','utf8')));
 const fileSource=fs.readFileSync('components/file-upload.tsx','utf8'),fileAst=ts.createSourceFile('file-upload.tsx',fileSource,99,true,4);
 const fileBody=fileAst.statements.filter(n=>!ts.isImportDeclaration(n)).map(n=>n.getText(fileAst)).join('\n'),fileExports={};
 let fileError='',fileSelection=null;
-Function('require','exports','useRef','useState','usePageAccess','LocalizedText','LocalizedElement','limitsConfig','megabytes','Button','Field','Input',ts.transpileModule(fileBody,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText)(require,fileExports,()=>({current:null}),()=>[fileError,value=>{fileError=value}],()=>({write}),({children})=>children,({children})=>children,{maxFileUploadBytes:10*1024*1024},value=>value/1024/1024,ui.Button,ui.Field,ui.Input);
+Function('require','exports','useRef','useState','usePageAccess','LocalizedText','LocalizedElement','limitsConfig','fileSelectionError','Button','Field','Input',ts.transpileModule(fileBody,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText)(require,fileExports,()=>({current:null}),()=>[fileError,value=>{fileError=value}],()=>({write}),({children})=>children,({children})=>children,{maxFileUploadBytes:10*1024*1024},fileSelectionError,ui.Button,ui.Field,ui.Input);
 const uploadProps={label:'Firmenlogo',file:null,accept:['image/png'],onSelect:file=>{fileSelection=file}};
 const selectFile=file=>{const view=fileExports.FileUpload(uploadProps),control=React.Children.toArray(view.props.children)[0];control.props.onChange({target:{files:[file],value:'selected'}})};
 write=true;
 for(const file of [{type:'text/plain',size:10},{type:'image/png',size:0},{type:'image/png',size:10*1024*1024+1}]){selectFile(file);assert.equal(fileSelection,null);assert.ok(fileError,'Rejected file provides a field error');}
 const validLogo={type:'image/png',size:32,name:'synthetic.png'};selectFile(validLogo);assert.equal(fileSelection,validLogo);assert.equal(fileError,'');
 write=false;fileSelection=null;selectFile(validLogo);assert.equal(fileSelection,null,'Read-only upload callbacks fail closed');write=true;
+
+// Shared file boundaries include exact limits and fail closed for malformed metadata.
+for(const size of [1,10*1024*1024])assert.equal(fileSelectionError({type:'image/png',size},['image/png'],10*1024*1024),null);
+for(const size of [0,-1,Infinity,NaN,10*1024*1024+1])assert.ok(fileSelectionError({type:'image/png',size},['image/png'],10*1024*1024));
+uploadProps.busy=true;fileSelection=null;selectFile(validLogo);assert.equal(fileSelection,null,'A busy upload cannot select a second file');uploadProps.busy=false;
+const uploadFailure=html(fileExports.FileUpload({...uploadProps,error:'Synthetic upload rejected'}));assert.ok(uploadFailure.includes('Synthetic upload rejected')&&uploadFailure.includes('role="alert"'),'Upload/scan failure is associated with the field, not only a transient toast');
 
 // Invalid wizard fields keep native validity and inline errors, without a native popover.
 let wizardValid=false,wizardFocused=false,wizardScrolled=false,wizardNext=0;
