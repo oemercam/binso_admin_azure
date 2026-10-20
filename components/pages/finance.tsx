@@ -19,7 +19,7 @@ export function FinanceAnalysisPage() {
  return <AppShell title="Finanzanalyse" active="finanzen"><FinanceTabs/>{query.loading?<LoadingState><LocalizedText>{"Finanzdaten werden geladen …"}</LocalizedText></LoadingState>:query.error?<ErrorState onRetry={query.refresh}><LocalizedText>{query.error}</LocalizedText></ErrorState>:query.data?.cash?<CashStatistics data={query.data.cash} storageKey="finance-analysis"/>:<ErrorState><LocalizedText>{"Finanzdaten sind nicht verfügbar."}</LocalizedText></ErrorState>}</AppShell>;
 }
 
-export function FinancialDocumentsPage({kind,forceDemo=false}:{kind:"offer"|"invoice";forceDemo?:boolean}){
+export function FinancialDocumentsPage({kind}:{kind:"offer"|"invoice"}){
 
  const invoice=kind==="invoice",title=invoice?"Rechnungen":"Angebote",route=invoice?"rechnungen":"angebote",placeholder=title+" suchen...";
  const chips=invoice?["Alle","Entwurf","Offen","Überfällig","Bezahlt","Storniert"]:["Alle","Entwurf","Versendet","Angenommen","Abgelehnt","Abgelaufen","Überarbeitet"];
@@ -34,9 +34,9 @@ export function FinancialDocumentsPage({kind,forceDemo=false}:{kind:"offer"|"inv
  return <AppShell title={title} subtitle={loading?undefined:`${total} ${title}`} active={route} actions={<RecordsControls controller={controller} placeholder={placeholder} chips={chips} columns={columns}><CreateAction href={`/${route}/neu`} label={invoice?"Neue Rechnung":"Neues Angebot"}/></RecordsControls>}><FinanceTabs/><DocumentList items={items} kind={kind} loading={loading} error={error} controller={controller} remote toolbarActions={false} showCount={false} pagination={{total,page:controller.page,pageSize,onPage:controller.setPage}}/></AppShell>;
 }
 
-export function OffersPage({forceDemo=false}:{forceDemo?:boolean}={}){return <FinancialDocumentsPage kind="offer" forceDemo={forceDemo}/>;}
+export function OffersPage(){return <FinancialDocumentsPage kind="offer"/>;}
 
-export function InvoicesPage({forceDemo=false}:{forceDemo?:boolean}={}){return <FinancialDocumentsPage kind="invoice" forceDemo={forceDemo}/>;}
+export function InvoicesPage(){return <FinancialDocumentsPage kind="invoice"/>;}
 
 export type FinancialSummary={invoices:Array<{currency:string;open_count:number;overdue_count:number;draft_count:number;open_amount:number;revenue:number}>;offers:{draft_count:number;actionable_count:number}|null;time:{hours:number;ready_hours:number;invoiced_hours:number}|null};
 

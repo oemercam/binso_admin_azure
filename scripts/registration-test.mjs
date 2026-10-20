@@ -25,7 +25,6 @@ const adapters={
  'lib/server/rate-limit.ts':data('export async function enforceRateLimit(request,bucket){globalThis.__registrationLimits.push(bucket)}'),
  'lib/server/env.ts':data('export const env={databaseUrl:"isolated-test",appUrl:"https://example.invalid",appMode:"production",appEncryptionKey:"synthetic-test-key-not-a-production-secret",sessionTtlHours:168,sessionCookieName:"binso_session"}'),
  'lib/server/email.ts':data('export function mailLayout(title,body,cta,locale){return `<html lang="${locale}">${title}${body}<a href="${cta?.url??""}">${cta?.label??""}</a></html>`} export async function sendMail(mail){globalThis.__registrationMail.push(mail);return {delivered:globalThis.__registrationDelivered}}'),
- 'lib/server/repositories/demo-fixture.ts':data('export async function seedDatabaseDemo(){throw new Error("Public registration must never seed demo business data")}'),
 };
 const modules=new Map();
 async function load(file){

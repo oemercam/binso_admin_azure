@@ -213,7 +213,7 @@ try{
   const memberWork=await dashboardWork(client,{...session,role:'member'});
   assert.equal(memberWork.timeReviews,null);assert.equal(memberWork.expenseReviews,null,'Own work never grants independent review rights');
  }finally{await db.exec('rollback')}
- const fixtureSource=(await fs.readFile('lib/server/repositories/demo-fixture.ts','utf8')).replace('import "server-only";','').replace("'../http'",JSON.stringify(http));
+ const fixtureSource=(await fs.readFile('scripts/fixtures/business-data.ts','utf8')).replace('import "server-only";','').replace("'../../lib/server/http'",JSON.stringify(http));
  const {seedDatabaseDemo}=await import(dataModule(fixtureSource));
  const sandbox='00000000-0000-4000-8000-000000000098';
  await db.query("insert into organizations(id,name,slug,is_demo,status) values($1,'Synthetic sandbox','sandbox-test',true,'trial')",[sandbox]);
@@ -318,15 +318,13 @@ try{
  const provisionSource=(await fs.readFile('lib/server/provisioning.ts','utf8')).replace('import "server-only";','').replace('"./repositories/demo-fixture"',JSON.stringify(fixture)).replace('"@/lib/server/db"',JSON.stringify(transactions)).replace('"@/config/domain"',JSON.stringify(domain)).replace('"@/lib/plans"',JSON.stringify(plans));
  const entitlementModule=dataModule((await fs.readFile('lib/subscription-plans.ts','utf8')).replace("'@/config/domain'",JSON.stringify(domain)).replace("'@/config/plans'",JSON.stringify(planCatalogModuleUrl)));
  const {provisionOrganization}=await import(dataModule(provisionSource.replace("'@/lib/subscription-plans'",JSON.stringify(entitlementModule))));
- const provisioned=await provisionOrganization({userId:'demo-provision-test',email:'demo-provision-test@example.invalid',name:'Demo Test',companyName:'Demo',plan:'business',mode:'demo'});
- assert.equal((await db.query('select email from employees where organization_id=$1 order by external_id limit 1',[provisioned.organizationId])).rows[0].email,'demo-provision-test@example.invalid','Writable demo timers must resolve the seeded user employee');
- assert.equal((await db.query('select is_demo from organizations where id=$1',[provisioned.organizationId])).rows[0].is_demo,true);
- assert.ok((await db.query('select count(*)::int n from invoices where organization_id=$1',[provisioned.organizationId])).rows[0].n>20);
+ await assert.rejects(()=>provisionOrganization({userId:'retired-provision-test',email:'retired@example.invalid',name:'Retired',companyName:'Retired',plan:'business',mode:'demo'}),/entfernt/);
  // Exercise real provisioning for 50 independent production-style trial tenants.
  const trialTenants=[];
  for(let i=0;i<50;i++){
   const trial=await provisionOrganization({userId:`trial-probe-${i}`,email:`trial-probe-${i}@example.invalid`,name:`Synthetic ${i}`,companyName:`Synthetic Company ${i}`,plan:'business',mode:'trial'});
   trialTenants.push(trial.organizationId);
+  assert.equal((await db.query('select count(*)::int n from invoices where organization_id=$1',[trial.organizationId])).rows[0].n,0,'Real signup never seeds demo invoices');
   await db.query("select set_config('app.organization_id',$1,false)",[trial.organizationId]);
   await db.query("insert into customers(organization_id,external_id,customer_no,name) values($1,'same-external-id','K-001',$2)",[trial.organizationId,`Customer ${i}`]);
  }
@@ -418,7 +416,7 @@ try{
  await assert.rejects(globalThis.__provisionTest(c=>startBillingCheckout(c,billingSession,'business','yearly',requestKey)),e=>e.code==='checkout_request_expired');
  assert.equal(checkoutCalls,1);checkoutState='open';
  await assert.rejects(globalThis.__provisionTest(c=>startBillingCheckout(c,billingSession,'start','monthly',requestKey)),e=>e.code==='checkout_request_reused');
- await assert.rejects(globalThis.__provisionTest(c=>startBillingCheckout(c,{...billingSession,organizationId:provisioned.organizationId},'start','monthly',requestKey)),e=>e.status===403);
+ await globalThis.__provisionTest(async c=>{await c.query('update organizations set is_demo=true where id=$1',[billingTenant.organizationId]);await assert.rejects(()=>startBillingCheckout(c,billingSession,'start','monthly',requestKey),e=>e.status===403);await c.query('update organizations set is_demo=false where id=$1',[billingTenant.organizationId]);});
  await globalThis.__provisionTest(c=>startBillingCheckout(c,billingSession,'start','monthly','00000000-0000-4000-8000-000000000036'));
  assert.equal(expireCalls,1);assert.equal(checkoutCalls,2);
  assert.equal((await db.query('select count(*)::int total from billing_checkout_sessions where organization_id=$1 and expires_at>now()',[billingTenant.organizationId])).rows[0].total,1);
@@ -453,7 +451,7 @@ try{
  delete globalThis.__provisionTest;
  delete globalThis.__customerPersistenceTest;
  // Execute the actual timer handlers against the migrated database.
- const timerSession={organizationId:provisioned.organizationId,userId:'demo-provision-test',name:'Demo Test',email:'demo-provision-test@example.invalid',role:'owner'};
+ const timerSession={organizationId:trialTenants[0],userId:'trial-probe-0',name:'Synthetic 0',email:'trial-probe-0@example.invalid',role:'owner'};
  globalThis.__timerSession=timerSession;
  globalThis.__timerTenant=async(org,user,task)=>{await db.exec('begin');try{await db.query("select set_config('app.organization_id',$1,true),set_config('app.user_id',$2,true)",[org,user]);const result=await task(client);await db.exec('commit');return result;}catch(e){await db.exec('rollback');throw e;}};
  const timerHttp=dataModule(`export class ApiError extends Error {constructor(status,code,message){super(message);this.status=status;this.code=code}} export const apiError=e=>({error:e.code,status:e.status});export const json=x=>x;export const assertSameOrigin=()=>{};export const cleanText=(x)=>typeof x==='string'?x.trim():'';export const readJson=async x=>x.body;`);

@@ -10,7 +10,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AppShell } from "../app-shell";
 import { RecordsView, RecordsControls, useRecordsController } from "../records";
-import { appendDemoRow } from "@/lib/demo-storage";
 import {useApiQuery} from "@/lib/client/use-api-query";
 import { apiPost, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 import { AccessLink, Button, EmptyState, ErrorState, LoadingState, Field, Icon, Status, Toast, Select, Input } from "../ui";

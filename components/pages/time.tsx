@@ -27,10 +27,10 @@ import { formatMinutes, swissDate } from "./shared";
 
 type TimeEntry={id:string;created_by_user_id?:string|null;report_month?:string|null;review_note?:string|null;project_id?:string|null;project_name?:string|null;customer_id?:string|null;customer_name?:string|null;employee_name?:string|null;description?:string|null;started_at?:string|null;ended_at?:string|null;duration_minutes?:number|null;billable?:boolean;approved?:boolean;submitted_at?:string|null;invoiced_invoice_id?:string|null;created_at?:string|null};
 
-export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
+export function TimePage() {
   const searchParams=useSearchParams(),router=useRouter();
   const returnTo=searchParams.has("returnTo")?safeAppPath(searchParams.get("returnTo"),"/zeit"):undefined;
-  const production=!forceDemo;
+  const production=true;
   const directoryRevision=useDataRevision(["/api/customers","/api/projects"]);
   const timerRevision=useDataRevision(["/api/time-tracker"]);
   const timerBase=useRef({seconds:0,at:0});
@@ -49,11 +49,11 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const timeBusy=useRef(false);
   const [manualBillable,setManualBillable]=useState(true);
   const [manualRate,setManualRate]=useState("0");
-  const actor=useApiQuery<{user?:{id?:string};tenant?:{role?:string;moduleProfile?:import("@/lib/permissions").ModuleProfile}}>(forceDemo?null:'/api/auth/session');
+  const actor=useApiQuery<{user?:{id?:string};tenant?:{role?:string;moduleProfile?:import("@/lib/permissions").ModuleProfile}}>('/api/auth/session');
   const actorId=actor.data?.user?.id??'',role=actor.data?.tenant?.role??'';
   const timeOnly=actor.data?.tenant?.moduleProfile==='time_only';
   const customerEndpoint=timeOnly?'/api/time-entries/options?kind=customers':'/api/customers',projectEndpoint=timeOnly?'/api/time-entries/options?kind=projects':'/api/projects';
-  const canApprove=['owner','admin','project_manager','manager'].includes(role),canInvoice=tenantCan(role,'invoices:write',actor.data?.tenant?.moduleProfile),canRecord=forceDemo||tenantCan(role,'time:write',actor.data?.tenant?.moduleProfile);
+  const canApprove=['owner','admin','project_manager','manager'].includes(role),canInvoice=tenantCan(role,'invoices:write',actor.data?.tenant?.moduleProfile),canRecord=tenantCan(role,'time:write',actor.data?.tenant?.moduleProfile);
   const [requestedTimeTab,setTimeTab]=useState<'timer'|'entries'>(employeeFilter||searchParams.has('invoice')||searchParams.get('tab')==='entries'?'entries':'timer');
   const timeTab=actor.data&&!canRecord?'entries':requestedTimeTab;
   const [running,setRunning]=useState(false);
@@ -73,7 +73,7 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const [availableProjects,setAvailableProjects]=useState<Array<{id:string;name:string;customer_id?:string|null;status?:string;hours?:number;invoiced_hours?:number;invoice_numbers?:string[]}>>([]);
   const [availableCustomers,setAvailableCustomers]=useState<Array<{id:string;name:string}>>([]);
   const [toast,setToast]=useState<string|null>(null);
-  useEffect(()=>{if(forceDemo||!actor.data)return;let active=true;queueMicrotask(()=>{if(active){setAvailableProjects([]);setAvailableCustomers([])}});Promise.all([apiGet<{items:typeof availableProjects}>(projectEndpoint+(timeOnly?"&":"?")+"limit=50"),apiGet<{items:typeof availableCustomers}>(customerEndpoint+(timeOnly?"&":"?")+"limit=50")]).then(async([projects,customers])=>{if(!active)return;const selectedId=searchParams.get("projectId");let projectItems=projects.items;if(selectedId&&!projectItems.some(item=>item.id===selectedId)){const exact=await apiGet<{items:typeof availableProjects}>(projectEndpoint+(timeOnly?"&":"?")+"id=eq."+encodeURIComponent(selectedId));if(!active)return;projectItems=[...projectItems,...exact.items];}setAvailableProjects(projectItems.filter(item=>projectAllowsTime(item.status??'active')));setAvailableCustomers(customers.items);const selected=projectItems.find(item=>item.id===searchParams.get("projectId"));if(selected){timerContext.current={project:selected.name,projectId:selected.id,customerId:selected.customer_id??null};setManualCustomer(selected.customer_id??"");const state=withIdleTimerContext(await readTimer(),timerContext.current);if(!active)return;setTimerProject(state.project);setTimerProjectId(state.projectId??null);setTimerCustomer(state.customerId??"");setRunning(state.running);timerBase.current={seconds:state.seconds,at:Date.now()};setSeconds(state.seconds)}}).catch(()=>{if(active)setToast("Kunden und Aufträge konnten nicht geladen werden.")});return()=>{active=false};},[forceDemo,searchParams,directoryRevision,production,actor.data,projectEndpoint,customerEndpoint,timeOnly]);
+  useEffect(()=>{if(!actor.data)return;let active=true;queueMicrotask(()=>{if(active){setAvailableProjects([]);setAvailableCustomers([])}});Promise.all([apiGet<{items:typeof availableProjects}>(projectEndpoint+(timeOnly?"&":"?")+"limit=50"),apiGet<{items:typeof availableCustomers}>(customerEndpoint+(timeOnly?"&":"?")+"limit=50")]).then(async([projects,customers])=>{if(!active)return;const selectedId=searchParams.get("projectId");let projectItems=projects.items;if(selectedId&&!projectItems.some(item=>item.id===selectedId)){const exact=await apiGet<{items:typeof availableProjects}>(projectEndpoint+(timeOnly?"&":"?")+"id=eq."+encodeURIComponent(selectedId));if(!active)return;projectItems=[...projectItems,...exact.items];}setAvailableProjects(projectItems.filter(item=>projectAllowsTime(item.status??'active')));setAvailableCustomers(customers.items);const selected=projectItems.find(item=>item.id===searchParams.get("projectId"));if(selected){timerContext.current={project:selected.name,projectId:selected.id,customerId:selected.customer_id??null};setManualCustomer(selected.customer_id??"");const state=withIdleTimerContext(await readTimer(),timerContext.current);if(!active)return;setTimerProject(state.project);setTimerProjectId(state.projectId??null);setTimerCustomer(state.customerId??"");setRunning(state.running);timerBase.current={seconds:state.seconds,at:Date.now()};setSeconds(state.seconds)}}).catch(()=>{if(active)setToast("Kunden und Aufträge konnten nicht geladen werden.")});return()=>{active=false};},[searchParams,directoryRevision,production,actor.data,projectEndpoint,customerEndpoint,timeOnly]);
   const today=businessDate();
   const [debouncedEntryQuery,setDebouncedEntryQuery]=useState('');
   useEffect(()=>{const timer=window.setTimeout(()=>setDebouncedEntryQuery(entryQuery),180);return()=>window.clearTimeout(timer)},[entryQuery]);
@@ -83,7 +83,7 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
   const [pagination,setPagination]=useState({scope:'',page:0});
   const timePage=pagination.scope===filterScope?pagination.page:0;
   const entriesPath='/api/time-entries?'+timeEntryQuery(entryFilters,{...scopeOptions,page:timePage});
-  const entriesResource=useApiQuery<{items:TimeEntry[];total?:number;total_minutes?:number}>(forceDemo?null:entriesPath);
+  const entriesResource=useApiQuery<{items:TimeEntry[];total?:number;total_minutes?:number}>(entriesPath);
   const [entryOverride,setEntryOverride]=useState<{key:string;items:TimeEntry[]}|null>(null);
   const entryKey=entriesPath+':'+dataRevision([entriesPath]);
   const remoteEntries=entryOverride?.key===entryKey?entryOverride.items:entriesResource.data?.items??[];
@@ -169,7 +169,6 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
     window.setTimeout(()=>setToast(null),2400);
   };
 
-  const demoEntries=<div>{[{title:"Website Redesign",meta:"Acme AG · 09:27–11:41",value:"2:14 h"},{title:"Kundenmeeting",meta:"Müller GmbH · 13:00–14:30",value:"1:30 h"},{title:"Planung",meta:"Intern · 15:10–15:54",value:"0:44 h"}].map(item=><TimeEntryRow key={item.title} {...item}/>)}</div>;
   const submitTime=async(id:string)=>{try{const data=await apiPatch<{item:{submitted_at:string;approved:boolean}}>("/api/time-entries/"+encodeURIComponent(id),{action:"submit"});setRemoteEntries(current=>current.map(item=>item.id===id?{...item,submitted_at:data.item.submitted_at,approved:data.item.approved}:item));}catch(e){setToast(e instanceof Error?e.message:"Zeit konnte nicht eingereicht werden.")}};
   const approveTime=async(id:string)=>{try{await apiPatch("/api/time-entries/"+encodeURIComponent(id),{action:"approve"});setRemoteEntries(current=>current.map(item=>item.id===id?{...item,approved:true}:item));setToast("Zeit freigegeben.");}catch(error){setToast(error instanceof Error?error.message:"Zeit konnte nicht freigegeben werden.");}window.setTimeout(()=>setToast(null),2200)};
   const visibleEntries=filterTimeEntries(remoteEntries,{projectId:timeTab==="timer"?timerProjectId:projectFilter,customerId:timeTab==="timer"?timerCustomer||null:searchParams.has("invoice")?searchParams.get("customerId"):null,query:timeTab==="entries"?entryQuery:"",from:timeTab==="timer"?today:entryFrom,to:timeTab==="timer"?today:entryTo,status:timeTab==="entries"&&!reviewMode?entryFilter:"Alle"}).filter(item=>timeTab!=="timer"||((timerCustomer||(!item.customer_id&&!item.billable))&&(timerProjectId||["Arbeitszeit","Interne Planung"].includes(timerProject)||item.project_name===timerProject)));
@@ -203,14 +202,14 @@ export function TimePage({forceDemo=false}:{forceDemo?:boolean}={}) {
           <div className="timer-actions"><Button requiresWrite variant={running||seconds>0?"secondary":"primary"} disabled={timeSaving} onClick={toggleTimer} icon={running?"pause":"clock"}><LocalizedText>{running?"Pause":seconds>0?"Fortsetzen":"Starten"}</LocalizedText></Button>{(running||seconds>0)&&<Button requiresWrite variant="secondary" icon="stop" onClick={()=>void stop()} disabled={timeSaving}><LocalizedText>{"Stoppen"}</LocalizedText></Button>}</div>
           <div className="timer-project"><Field label="Kunde"><DirectorySelect label="Kunde" endpoint={customerEndpoint} emptyLabel="Intern" value={timerCustomer} disabled={running||seconds>0||!!availableProjects.find(item=>item.id===timerProjectId)?.customer_id} onChange={value=>{timerContext.current={project:value?"Arbeitszeit":"Interne Planung",projectId:null,customerId:value||null};setTimerCustomer(value);setTimerProjectId(null);setTimerProject(value?"Arbeitszeit":"Interne Planung")}}/></Field><Field label="Auftrag"><button type="button" disabled={running||seconds>0} onClick={()=>setProjectOpen(true)}>{timerProject} <Icon name="down" size={16}/></button></Field></div>
         </>:<>
-          <SectionTitle title={!forceDemo?"Gesamtzeit":"Heutige Einträge"} action={entriesLoading?<LoadingState/>:<strong><LocalizedText>{!forceDemo?formatMinutes(remoteTotal)+" h":"4:28 h"}</LocalizedText></strong>}/>
-          <LocalizedText>{!forceDemo?entriesView:demoEntries}</LocalizedText>
+          <SectionTitle title={"Gesamtzeit"} action={entriesLoading?<LoadingState/>:<strong><LocalizedText>{formatMinutes(remoteTotal)+" h"}</LocalizedText></strong>}/>
+          <LocalizedText>{entriesView}</LocalizedText>
           <div className="time-entry-actions"><Button requiresWrite variant="secondary" icon="plus" onClick={()=>setManualOpen(true)}><LocalizedText>{"Manuell erfassen"}</LocalizedText></Button>{<MonthlyTimeReport/>}{canInvoice&&billableSelection.length>0&&!mixedCustomers&&<Button onClick={()=>void openBilling()} icon="receipt"><LocalizedText>{"Verrechnen ("}</LocalizedText>{billableSelection.length})</Button>}</div>
         </>}
       </section>
       {timeTab==="timer"&&<section className="time-section time-overview-section">
-        <SectionTitle title="Heute" action={entriesLoading?<LoadingState/>:<strong><LocalizedText>{!forceDemo?formatMinutes(remoteTotal)+" h":"4:28 h"}</LocalizedText></strong>}/>
-        {!forceDemo?entriesView:demoEntries}
+        <SectionTitle title="Heute" action={entriesLoading?<LoadingState/>:<strong><LocalizedText>{formatMinutes(remoteTotal)+" h"}</LocalizedText></strong>}/>
+        {entriesView}
         <Button variant="ghost" icon="plus" className="time-manual-action" onClick={()=>setManualOpen(true)}><LocalizedText>{"Manuell erfassen"}</LocalizedText></Button>{<MonthlyTimeReport/>}
       </section>}
     </div>

@@ -23,12 +23,10 @@ import { useEffect, useRef, useState, useId } from "react";
 import ConfirmDialog from "../confirm-dialog";
 import { AppShell } from "../app-shell";
 import { RecordRow, RecordIdentity, RecordsView, RecordsControls, useRecordsController } from "../records";
-import { customers } from "@/lib/demo-data";
-import { appendDemoRow } from "@/lib/demo-storage";
 import { apiPatch, apiPost, apiDelete, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 import {Button, EmptyState, Field, SectionTitle, Status, Toast, Input, Select, LoadingState, ErrorState, FormActions, FormSection} from "../ui";
 import { ActionRow, ActionSheet, FormSheet, CreateAction, ListRow, DetailTabs, DetailSections, DetailDisclosure, MetricTiles, MetricTile, ListSearch } from "../binso-ux";
-import { useDemoRows, swissDate } from "./shared";
+import { useRemoteRows, swissDate } from "./shared";
 import { FinancialSummary } from "./finance";
 
 export function formatSwissPhone(value:unknown){const raw=String(value??"").trim();const digits=raw.replace(/\D/g,"");if(digits.startsWith("41")&&digits.length===11)return `+41 ${digits.slice(2,4)} ${digits.slice(4,7)} ${digits.slice(7,9)} ${digits.slice(9,11)}`;if(digits.startsWith("0")&&digits.length===10)return `${digits.slice(0,3)} ${digits.slice(3,6)} ${digits.slice(6,8)} ${digits.slice(8,10)}`;return raw;}
@@ -54,7 +52,7 @@ export function CustomersPage() {
   if(controller.query.trim())query.set('q',controller.query.trim());
   if(controller.activeChip==='Mit offenen Beträgen')query.set('outstanding','1');
   if(controller.activeChip==='Aktiv'||controller.activeChip==='Inaktiv')query.set('status',controller.activeChip==='Aktiv'?'active':'inactive');
-  const {rows:customerRows,total,loading,error}=useDemoRows("customers",customers,query.toString());
+  const {rows:customerRows,total,loading,error}=useRemoteRows("customers",query.toString());
   return <AppShell headingPlacement="content" title="Kunden" subtitle="Kontakte, Geschäftsvorgänge und offene Forderungen." active="kunden" actions={<CreateAction href="/kunden/neu" label="Neuer Kunde"/>}>
     {<MetricTiles desktopOnly columns={balances.data?.invoices.length?3:2}><MetricTile label="Kunden gesamt" value={allCustomers.data?.total??"—"}/><MetricTile label="Aktive Kunden" value={activeCustomers.data?.total??"—"}/>{!!balances.data?.invoices.length&&<MetricTile label="Offene Forderungen" value={balances.data.invoices.map(row=>formatCurrency(row.open_amount,row.currency)).join(" · ")}/>}</MetricTiles>}
     <RecordsControls appearance="line" chips={visibleChips} filterChips={chips} controller={controller} placeholder="Kunden suchen..." columns={customerSortColumns}/><RecordsView chips={chips} controller={controller} toolbarActions={false} showCount={false} remote pagination={{total,page:controller.page,pageSize:50,onPage:controller.setPage}} loading={loading} error={error} items={customerRows} countLabel="Kunden" placeholder="Kunden suchen..." columns={columns} rowHref={row=>`/kunden/${row[4]?row[3]:"acme"}`}>{(row)=>{const [name,contact,city,idOrStatus,statusMaybe]=row;const id=statusMaybe?idOrStatus:"acme";return <RecordRow href={"/kunden/"+id} title={name} status={statusMaybe} meta={[contact,city].filter(value=>value&&value!=="—").join(" · ")} />}}</RecordsView>

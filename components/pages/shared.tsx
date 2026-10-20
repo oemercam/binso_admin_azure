@@ -3,7 +3,7 @@
 import { formatCurrency } from "@/lib/financial-status";
 import { formatQuantity, withPriceUnit } from "@/lib/display-format";
 import {useApiQuery} from "@/lib/client/use-api-query";
-import { type DemoCollection } from "@/lib/demo-storage";
+type DataCollection = "customers" | "products" | "employees" | "expenses" | "payments";
 import { isProductionBackendEnabled } from "@/lib/client/backend";
 import {useRecordsController} from "../records";
 
@@ -25,7 +25,7 @@ export function swissDate(value:unknown){
   return parts.length===3?`${parts[2]}.${parts[1]}.${parts[0]}`:value;
 }
 
-export function mapRemoteRows(collection:DemoCollection,items:Record<string,unknown>[]):string[][]{
+export function mapRemoteRows(collection:DataCollection,items:Record<string,unknown>[]):string[][]{
   if(collection==="customers") return items.map(item=>[
     String(item.name??""),String(item.contact??item.contact_name??""),String(item.city??""),String(item.id??""),item.status==="inactive"?"Inaktiv":"Aktiv",String(item.customer_no??""),customerAmounts(item.financials,'revenue'),customerAmounts(item.financials,'open_amount')
   ]);
@@ -56,8 +56,7 @@ function customerAmounts(value:unknown,key:'revenue'|'open_amount'){
  return value.filter(item=>item&&typeof item.currency==='string'&&Number.isFinite(Number(item[key]))).map(item=>formatCurrency(item[key],item.currency)).join(' · ')||'—';
 }
 
-export function useDemoRows(collection:DemoCollection, defaults:string[][],filters="") {
-  void defaults;
+export function useRemoteRows(collection:DataCollection,filters="") {
   const base=`/api/${collection}`;
   const path=base+(filters?(base.includes('?')?'&':'?')+filters:'');
   const {data,loading,error}=useApiQuery<{items:Record<string,unknown>[];total?:number}>(path);
@@ -65,7 +64,7 @@ export function useDemoRows(collection:DemoCollection, defaults:string[][],filte
 }
 
 /** Module configuration changes domain fields, never the committed list state owner. */
-export function useRecordList(collection:DemoCollection,options:Parameters<typeof useRecordsController>[0]&{sortFields:Record<number,string>;defaultOrder?:string;scope?:{customerId?:string|null;employeeId?:string|null;review?:boolean};filterValues:Record<string,{field:'status'|'kind';value:string}>}){
+export function useRecordList(collection:DataCollection,options:Parameters<typeof useRecordsController>[0]&{sortFields:Record<number,string>;defaultOrder?:string;scope?:{customerId?:string|null;employeeId?:string|null;review?:boolean};filterValues:Record<string,{field:'status'|'kind';value:string}>}){
  const controller=useRecordsController(options),pageSize=50;
  const {sortFields,defaultOrder='created_at.desc',filterValues}=options;
  const field=sortFields[controller.sortIndex];
@@ -75,6 +74,6 @@ export function useRecordList(collection:DemoCollection,options:Parameters<typeo
  if(options.scope?.review)filters.set('review','1');
  if(options.scope?.employeeId)filters.set('employee_id','eq.'+options.scope.employeeId);
  const selected=filterValues[controller.activeChip];if(selected)filters.set(selected.field,selected.value);
- const data=useDemoRows(collection,[],filters.toString());
+ const data=useRemoteRows(collection,filters.toString());
  return {...data,controller,pagination:{total:data.total,page:controller.page,pageSize,onPage:controller.setPage}};
 }

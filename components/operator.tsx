@@ -61,25 +61,6 @@ function moneyChf(value:number){
   return "CHF "+value.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2});
 }
 
-const demoPlan=(id:"start"|"business"|"pro")=>{
-  const plan=plans.find(item=>item.id===id);
-  if(!plan)throw new Error("Demo plan configuration is missing: "+id);
-  return {plan:plan.name,mrr:"CHF "+plan.monthly.toLocaleString("de-CH")};
-};
-const demoCustomers = [
-  {id:"acme",name:"Acme AG",...demoPlan("business"),status:"Aktiv"},
-  {id:"mueller",name:"Müller GmbH",...demoPlan("start"),status:"Aktiv"},
-  {id:"berger",name:"Berger Bau AG",...demoPlan("pro"),status:"Aktiv"},
-  {id:"meier",name:"Meier Handel AG",...demoPlan("business"),status:"Eingeschränkt"},
-];
-
-const tickets = [
-  ["#8421","Rechnungsstellung unklar","Acme AG","Offen"],
-  ["#8419","Zahlung fehlgeschlagen","Müller GmbH","In Bearbeitung"],
-  ["#8416","Zugangsproblem","Berger Bau AG","Offen"],
-  ["#8415","Funktionserweiterung","Huber & Söhne","Wartet auf Kunde"],
-];
-
 type OperatorTicket = {
   case_number?:string;
   id:string;
@@ -356,7 +337,6 @@ function OperatorCustomerDetail({tenantId}:{tenantId:string}) {
 
 
 
-  const demoCustomer=demoCustomers.find(item=>item.id===tenantId);
   {}
   {}
 

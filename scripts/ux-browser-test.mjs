@@ -1,3 +1,4 @@
+import {createUiAuthFixture} from './ui-auth-fixture.mjs';
 import {waitForLabReady} from './shared-control-browser.mjs';
 import {selectAppOption,appControlValue} from './app-select-browser.mjs';
 async function openDocumentHistory(page){const details=page.locator('.document-detail-view details');await details.waitFor({state:'attached'});if(!await details.getAttribute('open'))await details.locator('summary').click();}
@@ -49,12 +50,14 @@ const cashFixture=(income=200)=>{
 await fs.mkdir(output,{recursive:true});
 const port=process.env.BINSO_UX_PORT??'3200';
 const base=process.env.BINSO_BASE_URL??'http://127.0.0.1:'+port;
+assert.ok(['127.0.0.1','localhost','[::1]'].includes(new URL(base).hostname),'Synthetic UI fixtures must never target production');
 if(process.env.BINSO_UX_COMPLIANCE==='1'&&!['127.0.0.1','localhost','[::1]'].includes(new URL(base).hostname))throw Error('Compliance fixtures require an isolated loopback test server');
+const uiAuth=await createUiAuthFixture();
 let server;
 if(!process.env.BINSO_BASE_URL){
   let occupied=false;try{occupied=(await fetch(base+'/api/health')).ok;}catch{}
   if(occupied)throw new Error('QA port is occupied; supply BINSO_BASE_URL deliberately or choose BINSO_UX_PORT. Refusing an unidentified/stale server.');
-  server=spawn(process.execPath,process.env.BINSO_UX_SERVER_FILE?[process.env.BINSO_UX_SERVER_FILE]:['node_modules/next/dist/bin/next',process.env.BINSO_UX_SERVER_MODE??'start',...(process.env.BINSO_UX_SERVER_MODE==='dev'?['--webpack']:[]),'--hostname','127.0.0.1','--port',port],{stdio:['ignore','pipe','pipe'],env:{...process.env,PORT:port,HOSTNAME:'127.0.0.1'}});
+  server=spawn(process.execPath,process.env.BINSO_UX_SERVER_FILE?[process.env.BINSO_UX_SERVER_FILE]:['node_modules/next/dist/bin/next',process.env.BINSO_UX_SERVER_MODE??'start',...(process.env.BINSO_UX_SERVER_MODE==='dev'?['--webpack']:[]),'--hostname','127.0.0.1','--port',port],{stdio:['ignore','pipe','pipe'],env:{...process.env,...uiAuth.env,PORT:port,HOSTNAME:'127.0.0.1'}});
   let logs='';server.stdout.on('data',data=>{logs+=data});server.stderr.on('data',data=>{logs+=data});
   for(let attempt=0;;attempt++){
     try{if((await fetch(base+'/api/health')).ok)break;}catch{}
@@ -198,8 +201,7 @@ try{
   operatorAccount.plan='pro';
   browser=await browserType.launch(launchOptions);
   context=await browser.newContext({...(process.env.BINSO_UX_DEVICE?engines.devices[process.env.BINSO_UX_DEVICE]:{}),viewport:{width:1440,height:1000},colorScheme:"dark",serviceWorkers:"block"});
-  await context.addCookies([{name:'binso_demo',value:'1',url:base},{name:'binso_operator_demo',value:'1',url:base}]);
-  if(process.env.BINSO_UX_OPERATOR_PRODUCTION==='1'){if(process.env.BINSO_UX_MATRIX_ONLY!=='1')throw Error('Production operator fixture requires isolated matrix');await context.addInitScript(()=>{const selectClient=()=>document.querySelector('[data-operator-demo="true"]')?.setAttribute('data-operator-demo','false');new MutationObserver(selectClient).observe(document,{childList:true,subtree:true,attributes:true,attributeFilter:['data-operator-demo']});selectClient()});}
+  await context.addCookies([{...uiAuth.cookie,url:base}]);
   await context.addInitScript(mode=>{localStorage.setItem('binso.theme.mode',mode);localStorage.setItem('binso.privacy.preferences.v1',JSON.stringify({essential:true,performance:false,updatedAt:'2026-10-08'}))},theme);
   await context.route('**/api/**',async route=>{
    const req=route.request(),url=new URL(req.url()),p=url.pathname;
@@ -237,7 +239,7 @@ try{
      return route.fulfill({status:201,json:{item:credit}});
     }
     if(p==='/api/documents/preview')return route.fulfill({body:fixturePdf,contentType:'application/pdf'});
-    if(p==='/api/demo/session')return route.fulfill({json:{ok:true,databaseBacked:true,expiresIn:86400}});
+    if(p.startsWith('/api/demo/')||p==='/api/operator/demo-session')return route.fulfill({status:410,json:{error:'demo_retired'}});
     if(p==='/api/expenses'){posts++;await new Promise(resolve=>setTimeout(resolve,150));return route.fulfill({status:failMutation?503:200,json:failMutation?{message:'Fixture offline'}:{item:{...expense,id:'new-expense'}}});}
     if(p==='/api/support/tickets/ticket-one/messages'){messagePosts++;await new Promise(resolve=>setTimeout(resolve,150));const item={id:'sent-'+messagePosts,author_type:'customer',body:JSON.parse(req.postData()).body,created_at:'2026-10-08T10:00:00Z'};if(!failSend)supportMessages.push(item);return route.fulfill({status:failSend?503:200,json:failSend?{message:'Fixture message offline'}:{item}});}
     if(p==='/api/expenses/scan-receipt'){await new Promise(resolve=>{releaseReceiptScan=resolve});return route.fulfill({json:{merchant:'SBB',total:89,currency:'CHF',date:'2026-10-08',confidence:0.95}});}
@@ -294,12 +296,11 @@ try{
    else if(p==='/api/settings/organization')data={organization:{name:customer.name,city:'Bern',country:'CH'}};
    
    else if(p==='/api/finance/overview')data=url.searchParams.get('include')==='workspace'?{...summary,documents:collections.documents,cash:cashFixture(dataPaymentMode?invoice.paid_amount:200),data:{payments:[{payment_date:'2026-09-15',amount:120},{payment_date:'2026-10-05',amount:dataPaymentMode?invoice.paid_amount:200}],expenses:[{expense_date:'2026-09-15',amount:20},{expense_date:'2026-10-05',amount:50}],payroll:[],operatingCosts:[]}}:summary;
-   else if(['/api/operator/finance','/api/demo/platform-finance'].includes(p))data={payments:[{payment_date:'2026-10-05',amount:200}],subscriptions:[{created_at:'2026-10-05',monthly_revenue_chf:79}],operatingCosts:[{cost_date:'2026-10-05',amount:20}]};
+   else if(p==='/api/operator/finance')data={payments:[{payment_date:'2026-10-05',amount:200}],subscriptions:[{created_at:'2026-10-05',monthly_revenue_chf:79}],operatingCosts:[{cost_date:'2026-10-05',amount:20}]};
    else if(p==='/api/finance')data={cash:cashFixture(dataPaymentMode?invoice.paid_amount:200),payments:[{payment_date:'2026-09-15',amount:120},{payment_date:'2026-10-05',amount:dataPaymentMode?invoice.paid_amount:200}],expenses:[{expense_date:'2026-09-15',amount:20},{expense_date:'2026-10-05',amount:50}],payroll:[],operatingCosts:[]};
    else if(p==='/api/customers/duplicates')data={items:url.searchParams.get('name')===customer.name?[customer]:[]};
    else if(p==='/api/documents/AN-REV-1')data={item:revisedOfferFixture};
-   else if(p==='/api/customers'||p==='/api/demo/data'&&url.searchParams.get('collection')==='customers')data=customerListFixture(url.searchParams);
-   else if(p==='/api/demo/data')data=recordListFixture(url.searchParams.get('collection'),url.searchParams);
+   else if(p==='/api/customers')data=customerListFixture(url.searchParams);
    else if(['/api/products','/api/employees','/api/expenses','/api/payments'].includes(p))data=recordListFixture(p.split('/')[2],url.searchParams);
    else if(p==='/api/reports'){
     if(url.searchParams.get('format')==='csv'){reportExports++;await new Promise(resolve=>setTimeout(resolve,150));if(failReportDownload)return route.fulfill({status:503,json:{message:'Synthetic report export unavailable'}});return route.fulfill({headers:{'Content-Type':'text/csv; charset=utf-8','Content-Disposition':'attachment; filename="binso-reports-fixture.csv"'},body:'"Kennzahl";"Wert";"Einheit"\r\n'});}
@@ -309,7 +310,7 @@ try{
    else if(p==='/api/projects')data={items:[projectFixture],total:1};
    else if(p==='/api/projects/project-one')data={item:projectFixture,time:[{id:'project-time',work_date:'2026-10-01',hours:12.5,description:'Synthetic project work',billable:true,approved:true}],totals:{hours:12.5,invoiced_hours:0,entries:1},invoices:[{number:invoice.number,status:invoice.status,currency:'CHF',total_amount:invoice.total}]};
    else if(p==='/api/documents')data={items:collections.documents.filter(item=>!url.searchParams.has('kind')||item.kind===url.searchParams.get('kind'))};
-   else if(p==='/api/dashboard'||p==='/api/demo/dashboard')data={cash:cashFixture(dataPaymentMode?invoice.paid_amount:200),canFinance:true,recent:[invoice],attention:[],invoices:[invoice],payments:[payment],stats:{customer_count:2},analyticsInvoices:[{issue_date:'2026-10-01',total:135.13,invoice_count:1}],analyticsPayments:[{paid_on:'2026-10-01',amount:dataPaymentMode?invoice.paid_amount:100}]};
+   else if(p==='/api/dashboard')data={cash:cashFixture(dataPaymentMode?invoice.paid_amount:200),canFinance:true,recent:[invoice],attention:[],invoices:[invoice],payments:[payment],stats:{customer_count:2},analyticsInvoices:[{issue_date:'2026-10-01',total:135.13,invoice_count:1}],analyticsPayments:[{paid_on:'2026-10-01',amount:dataPaymentMode?invoice.paid_amount:100}]};
    else if(p==='/api/support/tickets')data={items:[ticket]};
    else if(p==='/api/support/tickets/ticket-one/messages')data={items:[...Array.from({length:30},(_,i)=>({id:'message-'+i,author_type:i%2?'support':'customer',body:'Testnachricht '+(i+1)+' – Prüfung des scrollbareren Nachrichtenverlaufs.',created_at:'2026-10-08T10:00:00Z'})),...supportMessages]};
    else if(p==='/api/expenses/options')data={items:[employee]};
@@ -344,7 +345,7 @@ try{
     // Interaction scenarios below still exercise navigation in a persistent page.
     const page=await context.newPage();page.on("pageerror",error=>errors.push(page.url()+": "+error.message));
     await page.setViewportSize({width,height:1000});
-    console.log(`Route ${route}`);const response=await page.goto(base+route);if(route==='/operator/wallboard'){await page.waitForURL('**/operator/login');assert.ok(page.url().endsWith('/operator/login'),'Demo cookie must not grant wallboard access');results.push({theme,width,route,passed:true,scope:'authenticated wallboard denial; positive matrix in observability-browser-test.mjs'});await page.close();continue;}if(route==='/dev/ux-lab'&&process.env.BINSO_UX_SERVER_MODE!=='dev'){assert.equal(response.status(),404,'UX-Lab is never published');results.push({theme,width,route,passed:true,scope:'production 404 guard'});await page.close();continue;}if(route==='/dev/ux-lab'&&process.env.BINSO_UX_SERVER_MODE==='dev')await waitForLabReady(page);else await page.waitForLoadState('networkidle');await page.waitForFunction(()=>!document.querySelector('.app-launch-screen,.app-session-loading,.app-launch'));
+    console.log(`Route ${route}`);if(route==='/operator/wallboard'){const anonymous=await browser.newContext({serviceWorkers:'block'});try{await anonymous.addCookies([{name:'binso_operator_demo',value:'1',url:base}]);const denied=await anonymous.newPage();await denied.goto(base+route);await denied.waitForURL('**/operator/login');assert.ok(denied.url().endsWith('/operator/login'),'Legacy demo cookie must not grant wallboard access');}finally{await anonymous.close();}results.push({theme,width,route,passed:true,scope:'legacy-cookie wallboard denial; positive matrix in observability-browser-test.mjs'});await page.close();continue;}const response=await page.goto(base+route);if(route==='/dev/ux-lab'&&process.env.BINSO_UX_SERVER_MODE!=='dev'){assert.equal(response.status(),404,'UX-Lab is never published');results.push({theme,width,route,passed:true,scope:'production 404 guard'});await page.close();continue;}if(route==='/dev/ux-lab'&&process.env.BINSO_UX_SERVER_MODE==='dev')await waitForLabReady(page);else await page.waitForLoadState('networkidle');await page.waitForFunction(()=>!document.querySelector('.app-launch-screen,.app-session-loading,.app-launch'));
     try{await page.locator(route.startsWith('/preview/')?'h1,h2':'h1').filter({visible:true}).first().waitFor({state:'visible'});}catch(error){console.log('Route render failure',route,width,errors,(await page.locator('body').innerText()).slice(0,5000));await capture(page,{path:path.join(output,`${theme}-${width}-${route.replace(/[^a-zA-Z0-9_.-]/g,'_')}-render-error.png`)});throw error;}
     assert.ok(!(await page.locator('body').innerText()).includes('UI fixture unavailable'),`${route}: a missing fixture cannot pass as content acceptance`);
     if(route==='/einstellungen/abonnement')await page.locator('.plan-hero').getByText('Aktiv',{exact:true}).waitFor();
@@ -1194,15 +1195,12 @@ try{
    await panel.getByRole('button',{name:'Abmelden',exact:true}).click();await panel.getByRole('alert').waitFor();assert.ok(page.url().endsWith('/operator'),'Failed logout must not pretend the session ended');
    await capture(page,{animations:'disabled',path:path.join(output,`${theme}-operator-account.png`)});await page.keyboard.press('Escape');await panel.waitFor({state:'hidden'});
    assert.equal(await page.locator('.operator-app-header').getByRole('button',{name:'Benutzerkonto',exact:true}).evaluate(el=>el===document.activeElement),true,'Operator account restores trigger focus');
-   // Client-renderer fixture only: the server still uses a local demo cookie.
+   // Real isolated operator session; browser API fixtures never claim live SSO coverage.
    // All API requests remain intercepted; this does not claim real operator SSO coverage.
-   await context.addInitScript(()=>{const selectClient=()=>document.querySelector('[data-operator-demo="true"]')?.setAttribute('data-operator-demo','false');new MutationObserver(selectClient).observe(document,{childList:true,subtree:true,attributes:true,attributeFilter:['data-operator-demo']});selectClient()});
    await navigate(base+'/operator');await page.getByRole('heading',{name:'Abrechnung',exact:true}).waitFor();const dashboardMetrics=page.locator('.operator-insight-grid .metric');assert.equal(await dashboardMetrics.count(),2,'Secondary dashboard metrics start in one bounded billing view');await page.getByRole('tab',{name:'Support',exact:true}).click();const supportRing=page.locator('.operator-insight-grid .bo-ring-chart');await supportRing.getByRole('group',{name:'Offen / in Bearbeitung / gelöst: 10',exact:true}).waitFor();assert.deepEqual(await supportRing.locator('circle title').allTextContents(),['Offen: 2 · 20 %','In Bearbeitung: 3 · 30 %','Gelöst: 5 · 50 %'],'Support segments use the actual mutually exclusive ticket counts');assert.equal(await supportRing.locator('.bo-ring-details button').count(),3,'Every support segment has an accessible detail action');await supportRing.getByRole('button',{name:/^In Bearbeitung 3(?: ·)? 30 %$/}).click();assert.equal(await supportRing.locator('output').textContent(),'In Bearbeitung: 3','Support segment selection exposes its label and real count');const openSupportSegment=supportRing.getByRole('button',{name:'Offen: 2',exact:true});await openSupportSegment.focus();await openSupportSegment.press('Enter');assert.equal(await supportRing.locator('output').textContent(),'Offen: 2','Interactive chart segments support keyboard selection');await page.getByRole('tab',{name:'Abrechnung',exact:true}).click();for(const metric of await dashboardMetrics.all()){const boxes=await metric.evaluate(el=>({label:el.querySelector('.metric-top').getBoundingClientRect().toJSON(),value:el.querySelector('strong').getBoundingClientRect().toJSON()}));assert.ok(boxes.value.top>=boxes.label.bottom-1,'Dashboard values and labels occupy separate lines');}
    for(const section of await page.locator('.operator-insight-grid>.bo-workspace-section').all())assert.equal(await section.evaluate(el=>getComputedStyle(el).marginTop),'0px','Dashboard grid owns section spacing');const insightGeometry=await page.locator('.operator-insight-grid').evaluate(el=>({grid:el.getBoundingClientRect().width,section:el.firstElementChild.getBoundingClientRect().width}));assert.ok(insightGeometry.section>=insightGeometry.grid-1,'A single selected dashboard view fills its workspace');
-   // The server prototype cookie selects the demo finance endpoint even when
-   // the client-renderer fixture switches the other operator APIs to production.
    await capture(page,{animations:'disabled',path:path.join(output,theme+'-operator-dashboard-production.png')});
-   const operatorFinancePattern=/\/api\/(?:operator\/finance|demo\/platform-finance)$/;
+   const operatorFinancePattern=/\/api\/operator\/finance$/;
    let emptyFinanceRequests=0;
    const emptyOperatorPayments=route=>route.fulfill({json:{items:[]}}),emptyOperatorFinance=route=>{emptyFinanceRequests++;return route.fulfill({json:{payments:[],subscriptions:[],operatingCosts:[]}})};
    await context.route('**/api/operator/payments',emptyOperatorPayments);await navigate(base+'/operator/zahlungen');await page.getByText('Noch keine Kundenzahlungen',{exact:true}).waitFor();assert.equal(await page.locator('.payment-mini-bars i').count(),0,'Empty payments do not fabricate a trend');assert.equal(await page.locator('.operator-payment-insights .status').count(),0,'Chart classes do not inherit status badge styles');await capture(page,{animations:'disabled',path:path.join(output,theme+'-operator-payments-empty.png')});await context.unroute('**/api/operator/payments',emptyOperatorPayments);
@@ -1252,19 +1250,15 @@ try{
   }
   if(hasInteraction('billing')){
    await page.setViewportSize({width:390,height:740});
-   await page.evaluate(()=>{localStorage.setItem('binso.demo.session','1');localStorage.removeItem('binso.demo.database')});
    await navigate(base+'/einstellungen/abonnement');await page.waitForLoadState('networkidle');
-   for(const date of ['01.10.2026','01.09.2026']){
-    assert.equal(await page.locator('.invoices-panel .compact-list').count(),0,'Billing history uses central rows');await page.locator('.invoices-panel button.document-summary-row').filter({hasText:date}).click();
-    const modal=page.getByRole('dialog',{name:'Rechnungsvorschau'});await modal.locator('canvas[data-rendered-page="1"]').waitFor();
-    assert.equal(await modal.locator('.pdf-page').count(),1,'Billing uses the shared one-page PDF renderer');
-    await modal.getByText('Seite 1 von 1',{exact:true}).waitFor();
-    assert.equal(await modal.getByRole('button',{name:'Vorherige Seite'}).isDisabled(),true);
-    assert.equal(await modal.getByRole('button',{name:'Nächste Seite'}).isDisabled(),true);
-    await capture(page,{animations:'disabled',path:path.join(output,`${theme}-390-billing-${date.slice(3,5)}.png`)});
-    await modal.getByRole('button',{name:'Vorschau schliessen',exact:true}).click();
-   }
-   await page.evaluate(()=>{localStorage.removeItem('binso.demo.session');localStorage.removeItem('binso.demo.database')});
+   await page.locator('.invoices-panel').getByText('Noch keine Billing-Daten',{exact:true}).waitFor();
+   assert.equal(await page.locator('.invoices-panel .document-summary-row').count(),0,'Unconnected billing never fabricates SaaS invoice history');
+   const connected=route=>route.fulfill({json:{item:{plan:'pro',subscription_status:'active',account_status:'active',unit_amount_chf:129,billing_customer_ref:'synthetic-customer',billing_subscription_ref:'synthetic-subscription'}}});
+   await context.route('**/api/settings/subscription',connected);await page.reload();
+   await page.locator('.invoices-panel').getByRole('button',{name:'Billing-Portal',exact:true}).waitFor();
+   assert.equal(await page.locator('.invoices-panel .document-summary-row').count(),0,'Connected SaaS invoices use the real portal, never static examples');
+   await capture(page,{animations:'disabled',path:path.join(output,theme+'-390-billing.png')});
+   await context.unroute('**/api/settings/subscription',connected);
   }
   if(hasInteraction('lab')){
    assert.equal(process.env.BINSO_UX_SERVER_MODE,'dev','UX-Lab checks require a development server');await navigate(base+'/dev/ux-lab');await waitForLabReady(page);
@@ -1360,4 +1354,4 @@ try{
  if(navigationCaptures.length)await writeTestOutput(path.join(output,'navigation-capture.json'),JSON.stringify({schemaVersion:3,provenance:'Explicit 2026-10-18 flat Microsoft material capture; preserved bounds/rights/safe areas/motion; browser fixtures, not physical PWA approval.',cases:navigationCaptures},null,2)+'\n');
  if(process.env.BINSO_UX_VISUAL_AUDIT==='1')await writeTestOutput(path.join(output,'visual-audit.json'),JSON.stringify({scope:'Rendered candidates for human review, not automatic ZIP acceptance',views:visualAudit},null,2));
  console.log(`UX browser checks passed: ${results.length} route/theme/viewport combinations ; interactions: ${process.env.BINSO_UX_MATRIX_ONLY==="1"?"matrix only":requestedInteractions.join(",")}. Artifacts: ${output}`);
-}catch(error){console.error('UX regression failed before fixture cleanup:',error.stack??error);throw error;}finally{await context?.close();await browser?.close();server?.kill();}
+}catch(error){console.error('UX regression failed before fixture cleanup:',error.stack??error);throw error;}finally{await context?.close();await browser?.close();server?.kill();await uiAuth.close();}

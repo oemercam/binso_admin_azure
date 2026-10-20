@@ -13,7 +13,6 @@ import { useRouter,useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { AppShell } from "../app-shell";
 import { RecordRow, RecordsView, RecordsControls, useRecordsController } from "../records";
-import { appendDemoRow } from "@/lib/demo-storage";
 import { apiPatch, apiPost, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 import {Button, Field, Toast, Input, Select, Textarea, FormActions, LoadingState, ErrorState} from "../ui";
 import {allowDraftNavigation} from "../use-browser-back-guard";

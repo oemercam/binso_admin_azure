@@ -17,7 +17,7 @@ try{
  for(const name of (await fs.readdir('database/migrations')).filter(name=>name.endsWith('.sql')).sort())await pool.query(await fs.readFile('database/migrations/'+name,'utf8'));
  await pool.query(await fs.readFile('database/operations/provision-runtime-role.sql','utf8'));
  const http=moduleUrl('export class ApiError extends Error{constructor(status,code,message){super(message);this.status=status;this.code=code}}');
- const demo=await import(moduleUrl((await fs.readFile('lib/server/repositories/demo-fixture.ts','utf8')).replace('import "server-only";','').replace("'../http'",JSON.stringify(http))));
+ const demo=await import(moduleUrl((await fs.readFile('scripts/fixtures/business-data.ts','utf8')).replace('import "server-only";','').replace("'../../lib/server/http'",JSON.stringify(http))));
  const roles=['owner','admin','finance','hr','project_manager','manager','member','reader'];
  const organizations=['00000000-0000-4000-8000-000000000071','00000000-0000-4000-8000-000000000072'];
  const cookies=new Map();

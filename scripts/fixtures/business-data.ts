@@ -1,7 +1,7 @@
 import "server-only";
 import {createHash} from 'node:crypto';
 import type {PoolClient} from 'pg';
-import {ApiError} from '../http';
+import {ApiError} from '../../lib/server/http';
 export const demoTemplateId='00000000-0000-4000-8000-000000000099';
 // Fixed canonical tables, ordered by their foreign keys. No platform or authentication records are copied.
 const tables=['customers','employees','suppliers','products_services','quotes','quote_lines','projects','orders','contracts','invoices','invoice_lines','payments','credit_notes','invoice_refunds','expenses','time_entries','tasks','absences','payroll_runs','operating_costs','customer_contacts','supplier_invoices','accounting_entries','bank_transactions','vat_periods','business_documents','entity_notes','support_cases','support_messages','in_app_notifications','customer_activities'] as const;

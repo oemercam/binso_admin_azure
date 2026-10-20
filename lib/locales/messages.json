@@ -13208,5 +13208,10 @@
     "Access is suspended immediately. The running timer is paused; existing data is retained.",
     "L’accès est suspendu immédiatement. Le minuteur est mis en pause ; les données existantes sont conservées.",
     "L’accesso viene sospeso immediatamente. Il timer attivo viene messo in pausa; i dati esistenti vengono conservati."
+  ],
+  "Jetzt starten": [
+    "Get started",
+    "Commencer",
+    "Inizia ora"
   ]
 }

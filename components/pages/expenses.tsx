@@ -15,7 +15,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { AppShell } from "../app-shell";
 import { RecordRow, RecordsView, RecordsControls, useRecordsController } from "../records";
-import { appendDemoRow } from "@/lib/demo-storage";
 import { apiGet, apiPatch, apiPost, apiUpload, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 import { Button, EmptyState, ErrorState, LoadingState, Field, SectionTitle, Icon, Toast, Input, Select, Textarea, FormActions } from "../ui";
 import { CreateAction } from "../binso-ux";
