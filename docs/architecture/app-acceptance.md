@@ -388,3 +388,33 @@ oder Arbeitsbaum wird dabei gemergt. #296 enthält daher die Änderungen von #29
 bereits: keine zweite Implementierung/cherry-pick. Bei späterer Integration zuerst
 Abhängigkeit entscheiden und anschliessend den tatsächlichen neuen Main-/PR-Stand
 erneut qualifizieren. Diese Prüfung ist keine Merge-Freigabe.
+
+### Integrationsqualifikation ec5f3591: Messfehler blockiert Deployment
+
+Die explizite Nutzerfreigabe für regulären Merge/Deployment galt ausschliesslich
+`ec5f359123c8ad6b0c63fda5533a570b70a3e313` im bestehenden Development-Profil.
+Der vollständige [Lauf 39371890049](https://github.com/oemercam/binso_admin_azure/actions/runs/39371890049)
+besteht alle acht Browserjobs, Build, Checks und Scanner, scheitert jedoch an
+UX-Compliance und abschliessendem Quality. Artefakt 12241918398 enthält genau
+200 Fehler, alle `UX-CTL-003`, jeweils `visibleSorts: 2`. Kein Merge/Deployment.
+
+Ursache: Nach Aufnahme des aktuellen RecordsControls-Owners zählte der breite
+Selektor `button[aria-label*=Sort]` den kombinierten Filter-Button mit Namen
+„Filter und Sortierung“ zusätzlich zum tatsächlichen Sortierfeld. Dieser Button
+öffnet das gemeinsame Filter-/Sortier-Sheet, ist aber kein zweites sichtbares
+Auswahlfeld. Der zentrale Adapter unterscheidet jetzt dessen bekannte Rolle
+und aktive Filter-Rücksetzchips von den eigentlichen Sortiersteuerungen. Er
+erfasst weiterhin das kanonische Combobox-Control sowie unzulässige zusätzliche
+Sortieraktionen ausserhalb dieses Owners. Die Grenze bleibt höchstens eins.
+
+Neue Gegenfälle prüfen: ein Filter plus ein Auswahlfeld, verborgenes natives
+Wertmodell, zwei echte Auswahlfelder, zusätzliche nicht zentralisierte Sortier-
+aktion und ein aktiver Rücksetzchip. Der lokale Chromium-Messadaptertest besteht.
+Keine App-/CSS-/Rechteänderung und keine Abnahme-Promotion durch diese Korrektur.
+Der neue Test-/Inventar-Commit benötigt eigene Qualifikation und vor Merge eine
+erneute explizite SHA-Freigabe; die bestehende Freigabe wird nicht übertragen.
+
+Die Rechnungs-Nachher-Aufnahme aus Artefakt 12241888089 (390px/Light) wurde
+betrachtet: offener Betrag genau einmal oben, bestätigter Eingang weiterhin unter
+Zahlungsstand; Status, Positionen und Navigation erhalten. Damit ist dieser
+einzelne Nachher-Fall belegt, keine vollständige Dokument-/Geräteabnahme.
