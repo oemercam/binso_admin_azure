@@ -3,6 +3,11 @@ name: Read-only lifecycle preflight diagnosis
 on:
   workflow_dispatch:
     inputs:
+      scope:
+        description: 'Read-only metadata scope; test-reset includes all company IDs and dependent row/file counts'
+        type: choice
+        options: [ownerless, test-reset]
+        default: ownerless
       approve_readonly:
         description: 'Authorize only bounded company-ID and membership-count metadata; no repair or deployment'
         required: true
@@ -29,6 +34,12 @@ jobs:
           ref: ${{ github.sha }}
       - uses: ./.github/actions/setup-node
       - name: Read ownerless-company metadata without changing data
+        if: ${{ inputs.scope != 'test-reset' }}
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: node scripts/single-company-preflight.mjs --diagnose-ownerless
+      - name: Inventory test-reset candidates without deleting anything
+        if: ${{ inputs.scope == 'test-reset' }}
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: node scripts/test-data-reset-inventory.mjs
