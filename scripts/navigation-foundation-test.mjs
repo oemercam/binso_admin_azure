@@ -47,9 +47,9 @@ export function navigationAccess(read){
  return {permissions:hash(permissions),destinations:hash(destinations)};
 }
 if(process.argv[1]===fileURLToPath(import.meta.url)){
- const reference=JSON.parse(fs.readFileSync('docs/assets/20261018/stable-navigation-reference.json','utf8'));
+ const reference=JSON.parse(fs.readFileSync('docs/assets/20261020/module-profile-navigation-reference.json','utf8'));
  const read=file=>fs.readFileSync(file,'utf8'),current=navigationFoundation(read);
- assert.deepEqual(navigationAccess(read),reference.access,'Original destinations, access checks and domain permissions remain exact');
+ assert.deepEqual(navigationAccess(read),reference.access,'Approved role-filtered destinations and access checks remain exact');
  assert.equal(current.icons,reference.baseIcons,'Existing navigation icons remain unchanged');
  assert.deepEqual(current,reference.snapshot,'Stable app navigation matches its explicitly generated approved source contract');
  assert.doesNotMatch(read('components/app-shell.tsx'),/navCompact|setNavCompact/,'Scroll never hides app navigation labels');

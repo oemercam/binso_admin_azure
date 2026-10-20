@@ -2,13 +2,12 @@
 
 import {LocalizedText,LocalizedElement,useTranslation} from "@/lib/client/locale";
 import {PageAccessContext} from "@/lib/client/page-access";
-import {routePermission,tenantCan,tenantCanCreateAt,permissionForModule} from "@/lib/permissions";
+import {tenantCanOpenPath,tenantCan,tenantCanCreateAt,permissionForModule,type ModuleProfile} from "@/lib/permissions";
 import {moduleForPath,planAllowsPath,type PlanId} from "@/config/plan-access";
 import Link from "next/link";
 import {loadTheme,saveTheme} from "@/lib/client/theme";
 import {AppStart} from "./app-start";
 import {useNavigationScroll} from "./use-navigation-scroll";
-import {AppVersionNotice} from "./app-version-notice";
 import {TimerResumeNotice} from "./timer-resume-notice";
 import { hasBlockingModal } from "./use-dialog-focus";
 import {pageOrientation} from "@/lib/page-orientation";
@@ -55,7 +54,7 @@ const desktopNavGroups = [
 
 type NotificationItem=PanelNotification;
 
-function accessFromSession(session:ClientSession|null){return session?.authenticated?{role:session.tenant?.role??"reader",plan:session.tenant?.plan??"pro" as PlanId,readOnly:session.tenant?.readOnly===true}:null;}
+function accessFromSession(session:ClientSession|null){return session?.authenticated?{role:session.tenant?.role??"reader",plan:session.tenant?.plan??"pro" as PlanId,readOnly:session.tenant?.readOnly===true,moduleProfile:session.tenant?.moduleProfile??"standard"}:null;}
 
 function AppShellFrame({
   title,
@@ -106,11 +105,11 @@ function AppShellFrame({
   useNavigationScroll(pathname);
   const formActive=editing||pathname.endsWith("/neu");
   const chatActive=/^\/support\/[^/]+$/.test(pathname)&&!pathname.endsWith("/neu");
-  const [access,setAccess]=useState<{role:string;plan:PlanId;readOnly:boolean}|null>(null);
+  const [access,setAccess]=useState<{role:string;plan:PlanId;readOnly:boolean;moduleProfile:ModuleProfile}|null>(null);
   const [accessRetry,setAccessRetry]=useState(0);
   const [accessError,setAccessError]=useState<string|null>(null);
   useEffect(()=>{
-    if(pathname.startsWith('/preview/')){queueMicrotask(()=>{setAccess({role:'owner',plan:'pro',readOnly:true});setAccessError(null)});return;}
+    if(pathname.startsWith('/preview/')){queueMicrotask(()=>{setAccess({role:'owner',plan:'pro',readOnly:true,moduleProfile:'standard'});setAccessError(null)});return;}
     let active=true;let refreshRevision=0;
     const refresh=()=>{const requestedRevision=++refreshRevision;return apiGet<ClientSession>('/api/auth/session').then(session=>{
       if(!active||requestedRevision!==refreshRevision)return;
@@ -127,11 +126,13 @@ function AppShellFrame({
     return()=>{active=false;window.removeEventListener('focus',refresh);document.removeEventListener('visibilitychange',visibility);window.removeEventListener('binso-session-invalid',refresh);window.removeEventListener('storage',storage);window.removeEventListener('pageshow',resume)};
   },[pathname,accessRetry,identityRevision]);
 
-  const canOpen=useCallback((href:string)=>{if(!access)return false;const path=href.split('?')[0];const permission=routePermission(path);const accessModule=moduleForPath(path);return (!permission||tenantCan(access.role,permission))&&planAllowsPath(access.plan,path)&&(!path.endsWith('/neu')||tenantCanCreateAt(access.role,path)&&(!access.readOnly||path.startsWith('/support/'))&&(!accessModule||tenantCan(access.role,permissionForModule(accessModule,'write')??'organization:write')));},[access]);
+  const canOpen=useCallback((href:string)=>{if(!access)return false;const path=href.split('?')[0];const accessModule=moduleForPath(path);return tenantCanOpenPath(access.role,path,access.moduleProfile)&&planAllowsPath(access.plan,path)&&(!path.endsWith('/neu')||tenantCanCreateAt(access.role,path,access.moduleProfile)&&(!access.readOnly||path.startsWith('/support/'))&&(!accessModule||tenantCan(access.role,permissionForModule(accessModule,'write')??'organization:write',access.moduleProfile)));},[access]);
+  useEffect(()=>{if(access?.moduleProfile==='time_only'&&pathname==='/dashboard')router.replace('/zeit');},[access?.moduleProfile,pathname,router]);
+  const homeHref=access?.moduleProfile==='time_only'?'/zeit':'/dashboard';
   const accessModule=moduleForPath(pathname);
   const settingsWrite=pathname==='/einstellungen/team'?'users:manage':pathname==='/einstellungen/abonnement'?'billing:write':['/einstellungen/firma','/einstellungen/dokumente','/einstellungen/zeiterfassung'].includes(pathname)?'organization:write':'organization:read';
   const personalSettings=pathname.startsWith('/einstellungen')&&!['/einstellungen/firma','/einstellungen/dokumente','/einstellungen/team','/einstellungen/abonnement','/einstellungen/zeiterfassung'].includes(pathname);
-  const canWrite=!!access&&(!access.readOnly||personalSettings||active==='support')&&tenantCan(access.role,pathname.startsWith('/einstellungen')?settingsWrite:accessModule?permissionForModule(accessModule,'write')??'organization:read':active==='finanzen'?'accounting:write':'support:write');
+  const canWrite=!!access&&(!access.readOnly||personalSettings||active==='support')&&(access.moduleProfile==='time_only'&&personalSettings?canOpen(pathname):tenantCan(access.role,pathname.startsWith('/einstellungen')?settingsWrite:accessModule?permissionForModule(accessModule,'write')??'organization:read':active==='finanzen'?'accounting:write':'support:write',access.moduleProfile));
   const pageAccess=useMemo(()=>({write:canWrite,canOpen}),[canWrite,canOpen]);
   const listControls=isValidElement<{children?:React.ReactNode}>(actions)&&actions.type===RecordsControls?actions:null;
   const visibleActions=listControls?listControls.props.children:actions;
@@ -195,7 +196,7 @@ function AppShellFrame({
   const [dark, setDark] = useState(false);
 
   const [demoSession,setDemoSession]=useState(false);
-  const companyQuery=useApiQuery<{item:{name?:string}}>(production?"/api/settings/company":null);
+  const companyQuery=useApiQuery<{item:{name?:string}}>(production&&canOpen("/einstellungen/firma")?"/api/settings/company":null);
   const notificationQuery=useApiQuery<{items:NotificationItem[]}>(production?"/api/notifications":null);
   const notifications=notificationQuery.data?.items??[];
   const notificationsLoading=notificationQuery.loading;
@@ -310,10 +311,10 @@ function AppShellFrame({
     <ConfirmDialog open={leaveHref!==null} title="Änderungen verwerfen?" message="Deine Änderungen sind noch nicht gespeichert und gehen verloren." cancelLabel="Weiter bearbeiten" confirmLabel="Änderungen verwerfen" onCancel={()=>setLeaveHref(null)} onConfirm={()=>{const href=leaveHref;setLeaveHref(null);if(href){window.dispatchEvent(new Event("binso-draft-discard"));allowDraftNavigation();if(href==="browser-back"){leaveBack();return;}const url=new URL(href);if(url.origin===window.location.origin)router.replace(url.pathname+url.search+url.hash);else window.location.assign(href);}}}/>
     {logoutError&&<div className="toast" role="alert"><Icon name="close" size={16}/><span><LocalizedText>{logoutError}</LocalizedText></span><button type="button" className="text-action" disabled={logoutBusy} onClick={()=>void logout()}><LocalizedText>{"Erneut versuchen"}</LocalizedText></button></div>}
     <aside id="customer-desktop-navigation" className="app-sidebar">
-      <Link href="/dashboard" className="sidebar-logo" aria-label={translate("Zur Übersicht")}>{pathname==="/dashboard"?<><Logo compact/><span hidden={navigationCollapsed}>One</span></>:<><Icon name="home"/><span hidden={navigationCollapsed}><LocalizedText>{"Start"}</LocalizedText></span></>}</Link>
+      <Link href={homeHref} className="sidebar-logo" aria-label={translate("Zur Übersicht")}>{pathname==="/dashboard"?<><Logo compact/><span hidden={navigationCollapsed}>One</span></>:<><Icon name="home"/><span hidden={navigationCollapsed}><LocalizedText>{"Start"}</LocalizedText></span></>}</Link>
       {companyQuery.data?.item.name&&canOpen("/einstellungen/firma")&&<Link href="/einstellungen/firma" className="workspace-company" title={companyQuery.data.item.name}><Icon name="home" size={20}/>{!navigationCollapsed&&<span>{companyQuery.data.item.name}<small><LocalizedText>{"Unternehmen"}</LocalizedText></small></span>}</Link>}
       <nav aria-label={translate("Navigation")}>
-        <Link href="/dashboard" aria-label={translate("Start")} title={translate("Start")} className={active==="dashboard"?"active":""} aria-current={active==="dashboard"?"page":undefined}><Icon name="home"/><span><LocalizedText>{"Start"}</LocalizedText></span></Link>
+        {canOpen("/dashboard")&&<Link href="/dashboard" aria-label={translate("Start")} title={translate("Start")} className={active==="dashboard"?"active":""} aria-current={active==="dashboard"?"page":undefined}><Icon name="home"/><span><LocalizedText>{"Start"}</LocalizedText></span></Link>}
         {desktopNavGroups.map(group=>desktopNav.some(([href])=>group.paths.includes(href)&&canOpen(href))&&<div className="sidebar-nav-group" key={group.label}><span className="sidebar-nav-label"><LocalizedText>{group.label}</LocalizedText></span>{desktopNav.filter(([href])=>group.paths.includes(href)&&canOpen(href)).map(([href,label,icon])=><Link key={href} href={href} aria-label={translate(label)} title={translate(label)} className={active===href.slice(1)?"active":""} aria-current={active===href.slice(1)?"page":undefined}><Icon name={icon}/><span><LocalizedText>{label}</LocalizedText></span></Link>)}</div>)}
       </nav>
       <div className="sidebar-bottom">
@@ -325,7 +326,7 @@ function AppShellFrame({
     <div className="app-main">
       <div className="desktop-appbar">
         <DesktopNavigationToggle collapsed={navigationCollapsed} onToggle={toggleNavigation} controls="customer-desktop-navigation"/>
-        <div className="workspace-location"><Link href="/dashboard"><LocalizedText>{"Arbeitsbereich"}</LocalizedText></Link><span aria-hidden="true">/</span><span><LocalizedText verbatim={titleIsUserContent}>{title}</LocalizedText></span></div>
+        <div className="workspace-location"><Link href={homeHref}><LocalizedText>{"Arbeitsbereich"}</LocalizedText></Link><span aria-hidden="true">/</span><span><LocalizedText verbatim={titleIsUserContent}>{title}</LocalizedText></span></div>
         {!formActive&&<div className="desktop-appbar-actions"><Button className="desktop-global-search" variant="secondary" ariaLabel="Suche" icon="search" onClick={()=>setSheet("search")}><LocalizedText>{"Alles durchsuchen"}</LocalizedText><kbd>⌘ / Ctrl K</kbd></Button><LocalizedElement as="button" className="desktop-notification-button" type="button" aria-label="Benachrichtigungen" onClick={openNotifications}><Icon name="bell"/>{unreadNotifications>0&&<i className="notification-badge"><LocalizedText>{unreadNotifications>9?"9+":unreadNotifications}</LocalizedText></i>}</LocalizedElement>
           <LocalizedElement as="button" className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={() => setSheet("account")}><Avatar name={profile.name} identity={profile.identity} src={profile.avatar} size="small"/></LocalizedElement>
         </div>}
@@ -342,7 +343,6 @@ function AppShellFrame({
       </AppHeader>
 
       <main className="page-container" data-section={active}>
-        <AppVersionNotice/>
         <div className={backHref ? "page-head page-head-detail" : "page-head"} data-heading-placement={headingPlacement}>
           {backHref ? <DetailHeading verbatimTitle={titleIsUserContent} title={title} subtitle={headingSubtitle} status={status} tone={statusTone} recordLabel={recordLabel} statusPlacement={headingPlacement==="content"?"subtitle":"title"} mobileAction={undefined} action={(headingActions||contextActions)&&allowed?<div className="page-actions">{headingActions}{contextActions&&<div className="context-actions-inline">{contextActions.content}</div>}</div>:undefined} leading={!formActive?<Link scroll={false} className="desktop-back" href={backHref} aria-label={backLabel}><Icon name="back" size={16}/><LocalizedText>{backLabel}</LocalizedText></Link>:undefined}/> : <PageHeading verbatimTitle={titleIsUserContent} title={title} description={headingSubtitle} action={(headingActions||contextActions)&&allowed?<div className="page-actions">{headingActions}{contextActions&&<div className="context-actions-inline">{contextActions.content}</div>}</div>:undefined}/> }
         </div>
@@ -355,10 +355,10 @@ function AppShellFrame({
 
       {timerNotice&&<div className="timer-notice" role="status">{timerNotice}</div>}
 
-      {!preview && !formActive && !chatActive && <MobileDock><LocalizedElement as="nav" className="bottom-nav" aria-label="Hauptnavigation">
-        <Link href="/dashboard" className={active==="dashboard"?"active":""}><Icon name="home"/><span><LocalizedText>{"Start"}</LocalizedText></span></Link>
+      {!preview && !formActive && !chatActive && <MobileDock><LocalizedElement as="nav" className="bottom-nav" data-module-profile={access?.moduleProfile} aria-label="Hauptnavigation">
+        {canOpen("/dashboard")&&<Link href="/dashboard" className={active==="dashboard"?"active":""}><Icon name="home"/><span><LocalizedText>{"Start"}</LocalizedText></span></Link>}
         {canOpen("/kunden")&&<Link href="/kunden" className={active==="kunden"?"active":""}><Icon name="users"/><span><LocalizedText>{"Kunden"}</LocalizedText></span></Link>}
-        <Link href="/finanzen" className={["angebote","rechnungen","zahlungen","belege","finanzen"].includes(active)?"active":""}><Icon name="wallet"/><span><LocalizedText>{"Finanzen"}</LocalizedText></span></Link>
+        {canOpen("/finanzen")&&<Link href="/finanzen" className={["angebote","rechnungen","zahlungen","belege","finanzen"].includes(active)?"active":""}><Icon name="wallet"/><span><LocalizedText>{"Finanzen"}</LocalizedText></span></Link>}
         {canOpen("/zeit")&&<Link href="/zeit" className={active==="zeit"?"active":""}><Icon name="clock"/><span><LocalizedText>{"Zeit"}</LocalizedText></span></Link>}
         <button type="button" className={["produkte","spesen","mitarbeiter","support","einstellungen"].includes(active)?"active":""} onClick={() => setSheet("more")}><Icon name="more"/><span><LocalizedText>{"Mehr"}</LocalizedText></span></button>
       </LocalizedElement></MobileDock>}
@@ -374,7 +374,7 @@ function AppShellFrame({
             ["/finanzen","receipt","Finanzübersicht"],["/angebote","file","Angebote"],["/rechnungen","receipt","Rechnungen"],["/zahlungen","wallet","Zahlungen"],
           ]:[
             ["/angebote","file","Angebote"],["/rechnungen","receipt","Rechnungen"],["/zahlungen","wallet","Zahlungen"],["/produkte","box","Produkte"],["/projekte","box","Aufträge"],["/mitarbeiter","users","Mitarbeiter"],["/spesen","card","Spesen"],["/finanzen/analyse","chart","Finanzanalyse"],["/berichte","chart","Berichte"],["/support","support","Support"],["/einstellungen","settings","Einstellungen"],
-          ]).map(([href,icon,label])=><ActionRow key={href} href={href} icon={icon} title={label} navigation onClick={()=>setSheet(null)}/>)}
+          ]).filter(([href])=>canOpen(href)).map(([href,icon,label])=><ActionRow key={href} href={href} icon={icon} title={label} navigation onClick={()=>setSheet(null)}/>)}
         </div>
         {sheet==="more"&&<div className="sheet-secondary"><ActionRow icon="logout" title={logoutBusy?"Wird abgemeldet…":"Abmelden"} disabled={logoutBusy} onClick={()=>void logout()}/></div>}
       </ActionSheet>

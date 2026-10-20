@@ -7,7 +7,7 @@ import {validBusinessDay} from '@/lib/statistics-period';
 
 /** Call within the caller's tenant-scoped repeatable-read transaction. */
 export async function timeWorkspace(c:PoolClient,s:SessionUser,params:URLSearchParams){
- if(!tenantCan(s.role,'time:read'))throw new ApiError(403,'forbidden','Keine Berechtigung für Arbeitszeiten.');
+ if(!tenantCan(s.role,'time:read',s.moduleProfile))throw new ApiError(403,'forbidden','Keine Berechtigung für Arbeitszeiten.');
  const limit=Number(params.get('limit')??1000),offset=Number(params.get('offset')??0);
  const from=params.get('from')??'',to=params.get('to')??'',query=(params.get('q')??'').trim();
  const status=params.get('status')??'all';
@@ -15,7 +15,7 @@ export async function timeWorkspace(c:PoolClient,s:SessionUser,params:URLSearchP
  if(!Number.isInteger(limit)||limit<1||limit>1000||!Number.isInteger(offset)||offset<0||offset>1000000||query.length>200||from&&!validBusinessDay(from)||to&&!validBusinessDay(to)||from&&to&&from>to||!Object.hasOwn(statuses,status))throw new ApiError(400,'invalid_time_filter','Bitte Suchtext, Zeitraum und Listenseite prüfen.');
  for(const key of ['own','internal','review'])if(params.has(key)&&params.get(key)!=='1')throw new ApiError(400,'invalid_time_filter','Ungültiger Zeitfilter.');
  const review=params.get('review')==='1';
- if(review&&(!tenantCan(s.role,'time:write')||!['owner','admin','project_manager','manager'].includes(s.role)))throw new ApiError(403,'approval_forbidden','Keine Berechtigung für Freigaben.');
+ if(review&&(!tenantCan(s.role,'time:write',s.moduleProfile)||!['owner','admin','project_manager','manager'].includes(s.role)))throw new ApiError(403,'approval_forbidden','Keine Berechtigung für Freigaben.');
  const values:unknown[]=[s.organizationId,s.userId,ownRecordOnly(s.role,'zeiterfassung')||params.get('own')==='1'];
  const where=['t.organization_id=$1','t.archived_at is null','($3::boolean=false or t.created_by_user_id=$2)',statuses[status]];
  const bind=(value:unknown)=>{values.push(value);return '$'+values.length};
@@ -32,5 +32,6 @@ export async function timeWorkspace(c:PoolClient,s:SessionUser,params:URLSearchP
  t.work_date::text started_at,round(t.hours*60) duration_minutes,t.hours,t.billable,t.approved,t.submitted_at,t.invoiced_invoice_id,t.sales_rate,t.report_month,t.review_note,t.created_by_user_id,t.created_at,
  c.name customer_name,coalesce(nullif(concat_ws(' ',e.first_name,e.last_name),''),t.person_name) employee_name
  ${joins} order by t.work_date desc,t.created_at desc,t.id desc limit $${values.length+1} offset $${values.length+2}`,pageValues)).rows;
- return {items,total:Number(totals.total),total_minutes:Number(totals.total_minutes)};
+ const visibleItems=s.moduleProfile==='time_only'?items.map(({sales_rate: _rate,...item})=>item):items;
+ return {items:visibleItems,total:Number(totals.total),total_minutes:Number(totals.total_minutes)};
 }

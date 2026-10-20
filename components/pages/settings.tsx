@@ -342,8 +342,8 @@ export function NotificationSettingsPage() {
     if(channel==="push"&&enabled&&(!("Notification" in window)||Notification.permission!=="granted")){
       setError("Push benötigt eine Browserfreigabe. Aktiviere Benachrichtigungen in den Geräteeinstellungen.");return;
     }
-    pending.current.add(key);setSaving([...pending.current]);setPrefs(current=>({...current,[title]:{...current[title],[channel]:enabled}}));
-    try{await apiPatch("/api/settings/notifications",{kind:title,channel,enabled});setError("");}
+    pending.current.add(key);setSaving([...pending.current]);
+    try{const result=await apiPatch<{ok?:boolean}>("/api/settings/notifications",{kind:title,channel,enabled});if(result.ok!==true)throw new Error("unconfirmed_preference");setPrefs(current=>({...current,[title]:{...current[title],[channel]:enabled}}));setError("");}
     catch{setPrefs(current=>({...current,[title]:{...current[title],[channel]:before}}));setError("Einstellung konnte nicht gespeichert werden.");}
     finally{pending.current.delete(key);setSaving([...pending.current]);}
   };

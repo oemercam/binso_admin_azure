@@ -51,8 +51,10 @@ export function customerFinancialProjection(){return `select
   group by i.currency
  ) totals`;}
 export async function listApiBusiness(c:PoolClient,s:SessionUser,table:string,extra:string):Promise<Row[]>{
+ if(s.moduleProfile==='time_only'&&!['time_entries','support_tickets'].includes(table))throw new ApiError(403,'forbidden','Keine Berechtigung.');
  const filters=new URLSearchParams(extra);const values:unknown[]=[s.organizationId];
  let source=sqlSources[table];
+ if(s.moduleProfile==='time_only'&&source){values.push(s.userId);source+=' and '+(table==='time_entries'?'t.':'')+'created_by_user_id=$2';}
  if(table==='documents'){
   const kind=filters.get('kind')?.replace(/^eq\./,'');
   const sources:string[]=[];

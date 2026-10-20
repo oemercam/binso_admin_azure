@@ -1,3 +1,4 @@
+import {canonicalPlanId,effectiveUserLimit} from '@/config/plans';
 import "server-only";
 import type {PoolClient} from 'pg';
 import {ApiError} from '../http';
@@ -23,7 +24,8 @@ export async function listOperatorBusiness(c:PoolClient,s:OperatorSession,table:
  const requestedOrder=filters.get('order')??'created_at.desc';
  const allowedOrder=/^(created_at|updated_at|paid_on)\.(asc|desc)$/.exec(requestedOrder);
  if(!allowedOrder||allowedOrder[1]==='paid_on'&&table!=='payments')throw new ApiError(400,'invalid_order','Ungültige Sortierung.');
- return (await c.query<Row>(`select * from (${definition.sql}) q ${where.length?'where '+where.join(' and '):''} order by q.${allowedOrder[1]} ${allowedOrder[2]} limit ${limit}`,params)).rows;
+ const rows=(await c.query<Row>(`select * from (${definition.sql}) q ${where.length?'where '+where.join(' and '):''} order by q.${allowedOrder[1]} ${allowedOrder[2]} limit ${limit}`,params)).rows;
+ return rows.map(row=>{if(table==='tenant_accounts'){const plan=canonicalPlanId(row.plan);return plan?{...row,user_limit:effectiveUserLimit(plan,row.user_limit)}:row;}if(table==='tenants'&&row.account){const account=row.account as Row,plan=canonicalPlanId(account.plan);return plan?{...row,account:{...account,user_limit:effectiveUserLimit(plan,account.user_limit)}}:row;}return row;});
 }
 export async function insertOperatorBusiness(c:PoolClient,s:OperatorSession,table:string,data:Row){
  if(table==='support_messages'){
@@ -53,7 +55,8 @@ export async function updateOperatorBusiness(c:PoolClient,s:OperatorSession,tabl
  }
  if(table==='tenant_accounts'){
   if(!operatorCan(s.role,'subscriptions:manage')&&!operatorCan(s.role,'restrictions:manage'))throw new ApiError(403,'forbidden','Keine Berechtigung.');
-  if((data.plan||data.subscription_status||data.user_limit)&&!operatorCan(s.role,'subscriptions:manage'))throw new ApiError(403,'forbidden','Keine Berechtigung.');
+  if((data.plan||data.subscription_status||data.user_limit!==undefined)&&!operatorCan(s.role,'subscriptions:manage'))throw new ApiError(403,'forbidden','Keine Berechtigung.');
+  if(data.user_limit!==undefined){const existing=(await c.query('select plan from organization_subscriptions where organization_id::text=$1 for update',[id])).rows[0];const plan=canonicalPlanId(data.plan??existing?.plan);if(!plan)throw new ApiError(409,'plan_missing','Der Tarif konnte nicht geprüft werden.');const limit=effectiveUserLimit(plan,data.user_limit);if(plan==='pro'&&data.user_limit!==null||plan!=='pro'&&(data.user_limit===null||!Number.isSafeInteger(Number(data.user_limit))||Number(data.user_limit)<1||limit!==Number(data.user_limit)))throw new ApiError(400,'user_limit_invalid','Ungültiges Benutzerlimit für diesen Tarif.');}
   if(data.plan||data.subscription_status){const plan=data.plan==='start'?'starter':data.plan==='pro'?'professional':data.plan==='trial'?null:data.plan;await c.query('update organization_subscriptions set plan=coalesce($2,plan),status=coalesce($3,status),updated_at=now() where organization_id::text=$1',[id,plan??null,data.subscription_status??null]);}
   if(data.user_limit!==undefined){const updated=await c.query('update organization_entitlements set max_users=$2,updated_at=now() where organization_id::text=$1 returning organization_id',[id,data.user_limit]);if(!updated.rows.length)throw new ApiError(409,'entitlements_missing','Benutzerlimit kann ohne vorhandene Kontoberechtigungen nicht geändert werden.');}
   if(data.account_status){if(!operatorCan(s.role,'restrictions:manage'))throw new ApiError(403,'forbidden','Keine Berechtigung.');const status=data.account_status==='restricted'?'read_only':data.account_status;await c.query('update organizations set status=$2,updated_at=now() where id::text=$1',[id,status]);}

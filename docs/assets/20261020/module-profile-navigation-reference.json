@@ -1,0 +1,32 @@
+{
+  "base": "d707edf0e0e6e4231e50059c45af117fb59fcda2",
+  "approval": "20 October 2026 explicit owner approval D16: time_only shows only authorized destinations, fewer than five allowed. Existing material, icons, height, position and blue create remain. Standard-role geometry compared with d707 in a rendered Chromium adapter at 320/390/760px Light/Dark, keyboard and scroll. Not physical PWA acceptance.",
+  "access": {
+    "permissions": "367da761641e93be960c547463ae759f57485234a24f70a964719e710564c166",
+    "destinations": "7435e1239441afb3069e8b69b06978b373d4b777be65f75d3678236dd07d2e64"
+  },
+  "baseIcons": "99168691ba5c419cc713b48ef443a89821fc72f9997fce59676c2ddd5c9c62c5",
+  "snapshot": {
+    "markup": "4ee6115ae986236b48674051d8c0abe21d9dfc5d41ea0a8230916539b4a3d25d",
+    "logic": "cff678debe7d2885db8fade36e53bdc51929db0c92a0f3a79cbb29e6e4476702",
+    "icons": "99168691ba5c419cc713b48ef443a89821fc72f9997fce59676c2ddd5c9c62c5",
+    "rules": "c15bc9272fbd3cf3b00a1c08f15d25d4e621c2c04bff819dce7cab15a25cd816",
+    "tokens": "ce83c096a14e03f4789f91809f499e2eb9db61e70869ee9d2aa22a2e2219ed01",
+    "tokenNames": [
+      "--app-action-accent",
+      "--color-bg",
+      "--color-line",
+      "--color-muted",
+      "--mobile-nav-h",
+      "--motion-ease",
+      "--motion-ease-standard",
+      "--motion-fast",
+      "--safe-bottom",
+      "--safe-left",
+      "--safe-right",
+      "--shape-control-mobile",
+      "--type-metadata"
+    ]
+  },
+  "customerContract": "2990a2dd6794fbc0c579c22da7a8bb3c1f838cb09f0cb06d05d46358e35336cd"
+}

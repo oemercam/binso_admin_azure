@@ -1,4 +1,19 @@
 export type TenantRole="owner"|"admin"|"finance"|"hr"|"project_manager"|"manager"|"member"|"reader";
+export type ModuleProfile='standard'|'time_only';
+const timeOnlyPermissions=new Set(['time:read','time:write','documents:read','support:read','support:write','feedback:write']);
+export function profileAllowsPath(profile:ModuleProfile|undefined,path:string){
+ if(profile===undefined||profile==='standard')return true;
+ if(profile!=='time_only')return false;
+ return path==='/zeit'||path.startsWith('/zeit/')||path==='/support'||path.startsWith('/support/')||['/einstellungen','/einstellungen/konto','/einstellungen/sicherheit','/einstellungen/benachrichtigungen','/einstellungen/darstellung','/einstellungen/sprache','/einstellungen/datenschutz','/benachrichtigungen'].includes(path);
+}
+/** Personal settings never grant company settings or business-data access. */
+export function tenantCanOpenPath(role:string,path:string,profile:ModuleProfile='standard'){
+ if(!profileAllowsPath(profile,path))return false;
+ if(profile==='time_only'&&role!=='member')return false;
+ if(profile==='time_only'&&(path==='/einstellungen'||path.startsWith('/einstellungen/')||path==='/benachrichtigungen'))return true;
+ const permission=routePermission(path);
+ return !permission||tenantCan(role,permission,profile);
+}
 export type LocalUserRole="Inhaber"|"Admin"|"Finanzen"|"Personal"|"Projektleitung"|"Mitarbeiter"|"Lesen";
 
 export type TenantPermission=
@@ -42,14 +57,15 @@ export function normalizeTenantRole(role:string):TenantRole{
  return (["owner","admin","finance","hr","project_manager","member","reader"] as string[]).includes(role)?role as TenantRole:"reader";
 }
 const universalTenantPermissions=new Set<TenantPermission>(["support:read","support:write","feedback:write"]);
-export function tenantCan(role:string,permission:TenantPermission){
+export function tenantCan(role:string,permission:TenantPermission,profile:ModuleProfile='standard'){
+ if(profile!=='standard'&&(profile!=='time_only'||role!=='member'||!timeOnlyPermissions.has(permission)))return false;
  if(!Object.hasOwn(tenantGrants,role))return false;
  const grants=tenantGrants[normalizeTenantRole(role)];
  // Derived read capability, not an additional grant to documents-only roles.
  if(permission==='finance-overview:read')return grants.has('documents:read')&&(['accounting:read','invoices:read','sales:read'] as TenantPermission[]).some(item=>grants.has(item));
  return universalTenantPermissions.has(permission)||grants.has(permission);
 }
-export function tenantPermissions(role:string){return Object.hasOwn(tenantGrants,role)?Array.from(new Set([...tenantGrants[normalizeTenantRole(role)],...universalTenantPermissions,...(tenantCan(role,'finance-overview:read')?['finance-overview:read' as const]:[])])):[]}
+export function tenantPermissions(role:string,profile:ModuleProfile='standard'){return Object.hasOwn(tenantGrants,role)?Array.from(new Set([...tenantGrants[normalizeTenantRole(role)],...universalTenantPermissions,...(tenantCan(role,'finance-overview:read',profile)?['finance-overview:read' as const]:[])])).filter(permission=>tenantCan(role,permission,profile)):[]}
 
 export function localRoleToTenant(role:LocalUserRole|string):TenantRole{
  const map:Record<string,TenantRole>={Inhaber:"owner",Admin:"admin",Finanzen:"finance",Personal:"hr",Projektleitung:"project_manager",Mitarbeiter:"member",Lesen:"reader"};
@@ -82,10 +98,10 @@ export function routePermission(pathname:string):TenantPermission|undefined{
 }
 /** Creating an unassigned customer/order is an administrative boundary.
  * Existing role permissions still control every other creation route. */
-export function tenantCanCreateAt(role:string,path:string){
+export function tenantCanCreateAt(role:string,path:string,profile:ModuleProfile='standard'){
  const area=path.split('/')[1],key=({angebote:'offerten',zeit:'zeiterfassung',mitarbeiter:'personal'} as Record<string,string>)[area]??area;
  const permission=permissionForModule(key,'write');
- if(!permission||!tenantCan(role,permission))return false;
+ if(!permission||!tenantCan(role,permission,profile)||!profileAllowsPath(profile,path))return false;
  if(area==='projekte')return ['owner','admin'].includes(role);
  if(area==='kunden')return ['owner','admin','finance'].includes(role);
  return true;

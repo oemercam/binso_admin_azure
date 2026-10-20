@@ -47,25 +47,10 @@ console.log('Actual workspace/modal rendering, guarded-exit presence, unchanged-
  assert.ok(!markup({status:'Aktiv',statusPlacement:'title'}).includes('bo-detail-meta'),'Desktop title placement remains unchanged');
 }
 
-// Execute the actual update-notice effect/handler with isolated browser services.
-{
- const updateAst=ts.createSourceFile('update.tsx',withoutLocalization(read('components/app-version-notice.tsx')),99,true,4);
- const code=compile(updateAst.statements.filter(n=>!ts.isImportDeclaration(n)).map(n=>n.getText(updateAst)).join('\n'));
- let available=false,blocked=false,index=0,dispose,sha='a'.repeat(40),requests=0,reloads=0,dirty=false;
- const baseline={current:null},events=new Map(),updates={};
- const document={visibilityState:'visible',querySelector:()=>dirty?{}:null,addEventListener:(name,fn)=>events.set(name,fn),removeEventListener:name=>events.delete(name)};
- const window={setTimeout,clearTimeout,location:{reload:()=>reloads++},addEventListener:(name,fn)=>events.set(name,fn),removeEventListener:name=>events.delete(name)};
- Function('require','exports','useEffect','useRef','useState','Button','document','window','fetch',code)(require,updates,fn=>{if(!dispose)dispose=fn()},()=>baseline,()=>{const first=index++===0;return [first?available:blocked,value=>{if(first)available=value;else blocked=value}]},control,document,window,async()=>{requests++;return {ok:true,json:async()=>({sha})}});
- const render=()=>{index=0;return updates.AppVersionNotice()};
- assert.equal(render(),null);await new Promise(resolve=>setImmediate(resolve));
- assert.equal(requests,1);assert.equal(available,false);sha='b'.repeat(40);
- events.get('visibilitychange')();events.get('pageshow')();await new Promise(resolve=>setImmediate(resolve));
- assert.equal(requests,2,'Simultaneous resume events coalesce');assert.equal(available,true);assert.equal(reloads,0,'Discovery never reloads the active editor');
- dirty=true;render().props.children[1].props.onClick();assert.equal(reloads,0);assert.equal(blocked,true,'Unsaved/busy work blocks manual reload');
- dirty=false;render().props.children[1].props.onClick();assert.equal(reloads,1,'An explicit clean-state click performs exactly one reload');
- dispose();assert.equal(events.size,0,'Resume listeners are released');
- console.log('Actual version notice: foreground coalescing, no automatic reload, dirty-state protection and explicit clean-state update passed.');
-}
+// The retired visible update UI cannot return through customer or operator shells.
+assert.equal(fs.existsSync('components/app-version-notice.tsx'),false);
+for(const file of ['components/app-shell.tsx','components/operator.tsx','app/design-system/layout.css'])assert.doesNotMatch(read(file),/AppVersionNotice|app-version-notice/);
+assert.doesNotMatch(read('components/pwa-register.tsx'),/location\.reload|Neue Version verfügbar/,'Silent SW lifecycle never reloads an active editor');
 
 // Actual ActionsMenu state: keep the modal between a busy action's first and second tap.
 const menuAst=ts.createSourceFile('binso-ux.tsx',read('components/binso-ux.tsx'),99,true,4),menuFunction=menuAst.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='ActionsMenu').getText(menuAst);

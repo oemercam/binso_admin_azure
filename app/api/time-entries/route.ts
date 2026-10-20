@@ -44,7 +44,7 @@ export async function POST(request:NextRequest){
       const billable=Boolean(resolvedCustomer)&&body.billable!==false;
       const employee=await c.query("select id from employees where organization_id=$1 and archived_at is null and active and user_id=$2",[s.organizationId,s.userId]);
       if(["member","project_manager","manager"].includes(s.role)&&!employee.rowCount)throw new ApiError(403,"employee_unlinked","Der Benutzerzugang ist keinem aktiven Mitarbeiter zugeordnet.");
-      const approvalRequired=(await c.query("select time_approval_required from organizations where id=$1",[s.organizationId])).rows[0]?.time_approval_required!==false;
+      const approvalRequired=(await c.query("select time_approval_required and not app_is_solo_owner() as time_approval_required from organizations where id=$1",[s.organizationId])).rows[0]?.time_approval_required!==false;
       const result=await c.query(`insert into time_entries(organization_id,external_id,project_id,customer_id,employee_id,project_label,person_name,worker_type,work_date,hours,description,billable,approved,created_by_user_id,sales_rate,report_month)
         values($1,$2,$3,$9,$10,$11,$4,'employee',$5,$6,$7,$12,$14,$8,$13,$15)
         returning id,report_month,project_id,project_label as project_name,description,work_date as started_at,round(hours*60) as duration_minutes,customer_id,employee_id,billable,approved,invoiced_invoice_id,sales_rate,created_at`,

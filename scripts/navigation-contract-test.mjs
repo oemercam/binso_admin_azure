@@ -29,11 +29,11 @@ assert.throws(()=>currentNavigationRead(()=>currentNavigation.replace('(max-widt
 const source=withoutLocalization(fs.readFileSync('components/app-shell.tsx','utf8')),ast=ts.createSourceFile('shell.tsx',source,99,true,4);let navigation;
 function visit(node){if(ts.isJsxElement(node)&&node.openingElement.tagName.getText(ast)==='nav'&&node.openingElement.attributes.getText(ast).includes('bottom-nav'))navigation=node.getText(ast);ts.forEachChild(node,visit)}visit(ast);assert(navigation);
 const styles=[];for(const {file,rule} of navigationRules(file=>fs.readFileSync(file,'utf8'))){for(const selector of rule.selectors.filter(s=>s.includes('.bottom-nav'))){let context='';for(let p=rule.parent;p?.type!=='root';p=p?.parent){if(!p)break;if(p.type==='atrule')context=p.name+' '+p.params+' / '+context}styles.push({file,selector,context,declarations:rule.nodes.filter(n=>n.type==='decl').map(n=>[n.prop,n.value,n.important])})}}
-const reference=JSON.parse(fs.readFileSync('docs/assets/20261018/stable-navigation-reference.json','utf8'));
+const reference=JSON.parse(fs.readFileSync('docs/assets/20261020/module-profile-navigation-reference.json','utf8'));
 // Explicit app-navigation replacement. Historical baselines remain archived;
 // navigation-foundation-test independently enforces unchanged access and destinations.
 const digest=createHash('sha256').update(JSON.stringify({navigation,styles})).digest('hex');
-assert.equal(digest,reference.customerContract,'Navigation matches the explicitly approved 2026-10-18 flat Microsoft contract');
+assert.equal(digest,reference.customerContract,'Navigation matches the explicitly approved D16 role-filtered Microsoft contract');
 console.log('Approved customer destinations and flat Microsoft navigation style contract passed.');
 
 // The navigation also inherits the base focus outline; avoid changing it through

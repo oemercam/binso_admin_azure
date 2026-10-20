@@ -1,0 +1,92 @@
+# V25.4 – Public Trial, Tarife und eingeschränkter Arbeitsbereich
+
+Stand: 20.10.2026. Implementierung auf `feat/v25-4-public-trial`, aufbauend auf
+PR #297 (`d707edf0e0e6e4231e50059c45af117fb59fcda2`). Main und fremde PRs bleiben
+unverändert. Dieser Bericht ist kein neuer UX-Vertrag und keine Produktivfreigabe.
+
+## Quellen und jüngste Entscheidungen
+
+Das unveränderte gelieferte Paket liegt unter [v25-4-source](v25-4-source/README_BINSO_ONE_V25_4.md).
+Die ursprünglichen 45 BP-, 79 UX- und 18 D-IDs bleiben dort erhalten. Die drei
+zusätzlichen Tarifentscheidungen sind ausdrücklich separate Entscheidungen und
+ersetzen nicht gleich nummerierte D-Gates des Business-Registers:
+
+- Pro ohne feste reguläre Benutzerobergrenze; `null` bedeutet unbegrenzt.
+- Aufträge bereits in Start; Preise und Jahrespreise unverändert.
+- Eigenständige Dokumentenverwaltung nur Pro; normale Moduldateien bleiben erhalten.
+- D16 wurde nachträglich freigegeben: beim Profil `time_only` nur erlaubte Ziele,
+  auch weniger als fünf. Material, Icons, Höhe, Position und blauer Plus bleiben.
+
+## Implementierung und Ursachen
+
+| Anforderung | Bisherige Ursache | Owner / Korrektur | Gegenfall / Nachweis | Restgrenze |
+| --- | --- | --- | --- | --- |
+| Öffentliche Demo entfernen | Anonyme Provisionierung und öffentliche CTAs | `/demo` leitet zu Registrierung; Demo-POST benötigt vorhandenen serverseitigen Smoke-Nachweis; Marketing/Auth-Links bereinigt | `demo-session-test`: öffentlich/falscher Nachweis/Origin abgelehnt, isolierte QA erhalten | Kein öffentlicher Reviewer-Zugang eingerichtet |
+| Einheitliche Tarife | Drei auseinanderlaufende Konfigurationen und Pro-10000-Limit | `config/plans.ts`; Marketing-, Modul-, Billing-Projektionen; Kapazitäts- und Operatorprüfungen; Migration 0057 | `plan-catalog-test`, Migrationssuite, Auth-/Dateifälle | Migration nur lokal getestet, kein produktives SQL |
+| Nur Zeiterfassung | Rolle member erlaubte zusätzlich Kunden/Finanzen; kein eigenes Modulprofil | Mitgliedschaft/Einladung/Session/RBAC, Team-Editor; eigene minimalistische Auswahl; Shell/Mehr/Suche und Cache-Identität | `module-profile-test`, echter Options-Endpunkt unter Runtime-RLS in `workforce-regression-test` | Geräte-/vollständige App-Browserabnahme offen |
+| Dateiscope | Allgemeine Dokumentleserechte allein reichen nicht | Eigene Zeit-/Supportdateien und eigenes Profilbild; zusätzliche restriktive Datei-RLS; eigenständige Dokumente Pro | Direkte IDs, anderer Tenant und zugeordnete Kundenanhänge negativ getestet | Keine produktiven Dateien gelesen |
+| Solo-Inhaber | Globale Freigabepflicht blockierte alleinigen Inhaber | Funktion `app_is_solo_owner`; nur ohne andere aktive Mitgliedschaft und ohne fremden aktiven Mitarbeiter; manuelle/timergenerierte eigene Zeiten | Solo positiv, Team-Inhaber/Mitarbeiter negativ; bestehende unabhängige Freigabe bleibt | Fachliche Sätze/Delegation unverändert offen |
+| Sichtbares Update-Banner | Zweiter sichtbarer Update-Owner | Komponente, beide Einbindungen, CSS und obsolete Komponententests entfernt; SW unangetastet | `app-workspace-test`, PWA-Lifecycle | Reale OS-Wiederaufnahme offen |
+| Persistierte Schalter | Benachrichtigungen erschienen vor Serverbestätigung gespeichert | Bestehender Toggle bleibt; Wertwechsel erst nach bestätigtem `{ok:true}` | API lehnt nicht implementiertes Push weiter ab | Keine Push-Zustellung beworben |
+
+## Bestehende korrekte Grundlagen
+
+Keine zweite Foundation. AppStart bleibt initial; keine neue Fortschrittsanzeige.
+Bestehende Quiet-Loading-, Back-/Draft-, Toggle-, Dateiauswahl-, Modal-, Safe-Area-
+und Notification-Channel-Owner werden weiterverwendet. Keine pauschalen CSS- oder
+Testlöschungen. PR #297 liefert bereits die CSS-/Compliance-Korrekturen.
+
+Gezielter gerenderter Chromium/Edge-Adapter: Standardnavigation unverändert gegen
+d707; time_only mit zwei Zielen bei 320/390/760 px in Light/Dark, Tastatur, Scrollen
+und Material-Gegenfällen erfolgreich. Quelle ist das tatsächliche Shell-Nav-JSX und
+die aktuelle CSS-Kaskade; kein Ersatz für die vollständige App-/Geräteabnahme. Die
+neue Referenz unter docs/assets/20261020 wurde nur über den bestehenden Generator
+mit `--approved-time-only` nach diesem Vergleich erzeugt. Historische Referenz bleibt.
+
+Der einmalige bestehende Inventargenerator erfasst aktuell 76 Routen, 12
+Operator-Varianten, 555 Module und keine statischen Runtime-Zyklen. Die Spezifikation
+nennt 13 Operator-Varianten: die Zähldifferenz bleibt offen; keine Variante wurde
+für dieses Paket entfernt. Statische Reichweite ist kein visueller Nachweis.
+
+## Abnahme und Grenzen
+
+Die ergänzende [BP-/UX-Nachweismatrix](v25-4-acceptance-tracking.csv) enthält alle
+124 IDs. Kein statischer Fall wird automatisch visuell bestanden. E01–E10 werden
+nicht aufgrund eines isolierten Unit-/Datenbanktests als vollständig abgenommen.
+
+Erfolgreich gezielt ausgeführt: Demo-Grenze, Tarifkatalog, Modulprofil/Navigation,
+Workspace, Session-/Logout-/Cache-Isolation, Berechtigungen, Auth-Integrität,
+Lokalisierung und Source-Copy-Coverage, Time/Workforce-RLS und Migrations-/fachliche
+Regressionen. Lokaler Produktionsbuild, Typecheck und vollständiges ESLint sind erfolgreich.
+Endgültige CI-/Browserergebnisse gehören zum finalen SHA und
+werden im PR dokumentiert.
+
+Der lokale Gesamtaufruf `pnpm test` ist NICHT erfolgreich: `readiness-integrity-test`
+kann seinen Bash-Testprozess hier nicht starten (`spawnSync`-Status null statt 0).
+Die Assertion bleibt unverändert. Linux-GitHub-Quality muss diesen Nachweis liefern.
+Keine Behauptung einer grünen vollständigen lokalen Suite.
+
+Offen bleiben freigegebene visuelle Einzelabnahmen bei 320/390/760/761/1024/1440,
+Light/Dark und Rollen; reale iPhone-Safari/iOS-PWA, Android-PWA, Assistive Technology,
+physische Tastatur/Safe Areas; finaler Linux-Postgres-/Quality-/CodeQL-/Browserlauf.
+`braces@3.0.3` bleibt die bekannte Dev-Advisory ohne qualifizierten Upstreamfix;
+keine Ausnahmeverlängerung (bestehendes Ende 24.10.2026).
+
+## Native Vorbereitung, keine Store-Freigabe
+
+Am 20.10.2026 anhand der [Apple App Review Guidelines](https://developer.apple.com/app-store/review/guidelines/)
+geprüft: 2.1 verlangt vollständige, auf Geräten geprüfte Funktionen und Review-Zugang;
+3.1.3(c) ist auf den konkret passenden Organisationsvertrieb begrenzt, keine pauschale
+Ausnahme für Einzelkunden; 4.2 verlangt Mehrwert über eine verpackte Website hinaus.
+Daraus folgt hier keine neue native Kaufoberfläche oder Stripe-Verlinkung.
+Build/Signierung/Wrapper/Storefront-/Billing-Entscheidung und isolierter Reviewer-Zugang
+bleiben separate Voraussetzungen. Browser und PWA sind kein nachgewiesener nativer Build.
+
+## Rollout
+
+0057 macht Pro-Benutzergrenzen nullable und bereinigt nur Entitlement-Metadaten.
+0058 ergänzt Profile mit Default `standard`, ohne bestehende Rechte zu ändern.
+0059 definiert die eng begrenzte Solo-Inhaberprüfung. Reihenfolge im regulären
+Migrationsprozess erforderlich; keine Ausführung gegen Produktion aus diesem Auftrag.
+Keine Kundendatenlöschung, Kontoneuanlage, externe Mail/Buchung, Merge oder Deployment.
+D07–D15/D17–D18 bleiben offen; nur D16 wurde im Dialog zusätzlich geschlossen.

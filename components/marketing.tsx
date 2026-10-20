@@ -72,7 +72,6 @@ export function MarketingHeader() {
       <div className="marketing-mobile-actions"><LocaleSwitcher/>
         <Button href="/login" variant="secondary"><LocalizedText>{"Anmelden"}</LocalizedText></Button>
         <Button href="/registrieren"><LocalizedText>{"14 Tage kostenlos testen"}</LocalizedText></Button>
-        <Button href="/demo" variant="ghost"><LocalizedText>{"Demo starten"}</LocalizedText></Button>
       </div>
       <LocalizedElement as="div" className="marketing-mobile-social" aria-label="Binso Social Media">
         <LocalizedElement as="a" href="https://ch.linkedin.com/company/binsogmbh" target="_blank" rel="noreferrer" aria-label="Binso auf LinkedIn"><span aria-hidden="true"><LocalizedText>{"in"}</LocalizedText></span></LocalizedElement>
@@ -90,7 +89,7 @@ export function MarketingFooter() {
     <div className="footer-links">
       <Link href="/produkt"><LocalizedText>{"Produkt"}</LocalizedText></Link>
       <Link href="/preise"><LocalizedText>{"Preise"}</LocalizedText></Link>
-      <Link href="/demo"><LocalizedText>{"Demo"}</LocalizedText></Link>
+      <Link href="/registrieren"><LocalizedText>{"14 Tage kostenlos testen"}</LocalizedText></Link>
       <Link href="/login"><LocalizedText>{"Anmelden"}</LocalizedText></Link>
       <Link href="/impressum"><LocalizedText>{"Impressum"}</LocalizedText></Link>
       <Link href="/datenschutz"><LocalizedText>{"Datenschutz"}</LocalizedText></Link>

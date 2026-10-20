@@ -1,28 +1,9 @@
-import type {ModuleKey} from "@/lib/modules";
-
-export type PlanId="start"|"business"|"pro";
-
-const startModules=new Set<ModuleKey>([
-  "kunden","offerten","auftraege","projekte","zeiterfassung","spesen",
-  "rechnungen","zahlungen","berichte","aufgaben","einstellungen"
-]);
-const businessModules=new Set<ModuleKey>([
-  ...startModules,
-  "lieferanten","eingangsrechnungen","buchhaltung","bank","mwst",
-  "personal","abwesenheiten","produkte"
-]);
-const proModules=new Set<ModuleKey>([
-  ...businessModules,
-  "lohn","dokumente","vertraege"
-]);
-
-const moduleSets:Record<PlanId,Set<ModuleKey>>={start:startModules,business:businessModules,pro:proModules};
-
-export const planLimits:Record<PlanId,{users:number;projects:number}>={
-  start:{users:3,projects:100},
-  business:{users:15,projects:1000},
-  pro:{users:Number.MAX_SAFE_INTEGER,projects:Number.MAX_SAFE_INTEGER},
-};
+import type {ModuleKey} from '@/lib/modules';
+import {planCatalog} from './plans';
+import type {PlanId} from './domain';
+export type {PlanId} from './domain';
+const moduleSets:Record<PlanId,ReadonlySet<string>>={start:new Set(planCatalog.start.modules),business:new Set(planCatalog.business.modules),pro:new Set(planCatalog.pro.modules)};
+export const planLimits:Record<PlanId,{users:number|null;projects:number|null}>={start:planCatalog.start.limits,business:planCatalog.business.limits,pro:planCatalog.pro.limits};
 
 export function isPlanId(value:unknown):value is PlanId{return value==="start"||value==="business"||value==="pro"}
 export function planAllowsModule(plan:PlanId,moduleKey:string){return moduleSets[plan].has(moduleKey as ModuleKey)}

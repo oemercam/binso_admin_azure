@@ -1,3 +1,4 @@
+import {moduleUrl} from './data-test-modules.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import {createHash,randomUUID} from 'node:crypto';
@@ -30,6 +31,35 @@ try{
  }
  const run=async(user,fn)=>{await db.exec('begin');try{await db.exec('set local role binso_runtime');await db.query("select set_config('app.organization_id',$1,true),set_config('app.user_id',$2,true)",[org,user]);const result=await fn();await db.exec('commit');return result;}catch(error){await db.exec('rollback');throw error}};
  const query=(sql,args=[])=>db.query(sql,args);
+ assert.equal((await run(owner,()=>query('select app_is_solo_owner() allowed'))).rows[0].allowed,false,'A team owner is not a solo owner');
+ assert.equal((await run(member,()=>query('select app_is_solo_owner() allowed'))).rows[0].allowed,false,'Employees never inherit the owner exception');
+ await db.query("update organization_memberships set status='invited' where organization_id=$1 and user_id<>$2",[org,owner]);
+ assert.equal((await run(owner,()=>query('select app_is_solo_owner() allowed'))).rows[0].allowed,false,'An employee record still prevents solo approval');
+ await db.query('update employees set active=false where id=$1',[employee]);
+ assert.equal((await run(owner,()=>query('select app_is_solo_owner() allowed'))).rows[0].allowed,true);
+ await db.query('update employees set active=true where id=$1',[employee]);
+ await db.query("update organization_memberships set status='active' where organization_id=$1",[org]);
+ // Execute the real minimal picker against migrated RLS, not a copied query.
+ await db.query("update organization_memberships set module_profile='time_only' where organization_id=$1 and user_id=$2",[org,member]);
+ await assert.rejects(()=>db.query("update organization_memberships set module_profile='time_only' where organization_id=$1 and user_id=$2",[org,owner]),error=>error.code==='23514');
+ const permissionUrl=moduleUrl(await fs.readFile('lib/permissions.ts','utf8'));
+ const rbacUrl=moduleUrl((await fs.readFile('lib/server/rbac.ts','utf8')).replace('import "server-only";','').replace('"@/lib/permissions"',JSON.stringify(permissionUrl)));
+ const httpUrl=moduleUrl("export class ApiError extends Error{constructor(status,code,message){super(message);this.status=status;this.code=code}}export const json=data=>({status:200,data});export const apiError=error=>({status:error.status??500});");
+ globalThis.__profilePickerRun=fn=>run(member,()=>fn({query}));
+ const dependencies={'@/lib/server/http':httpUrl,'@/lib/server/rbac':rbacUrl,'@/lib/server/session':moduleUrl('export const requireSession=async()=>globalThis.__profilePickerSession;'),'@/lib/server/db':moduleUrl('export const withTenant=async(org,user,fn)=>globalThis.__profilePickerRun(fn);')};
+ let pickerSource=await fs.readFile('app/api/time-entries/options/route.ts','utf8');for(const [name,url] of Object.entries(dependencies))pickerSource=pickerSource.replaceAll("'"+name+"'",JSON.stringify(url));
+ const picker=await import(moduleUrl(pickerSource));
+ globalThis.__profilePickerSession={organizationId:org,userId:member,role:'member',moduleProfile:'time_only',organizationStatus:'active'};
+ const pick=search=>picker.GET({nextUrl:new URL('https://fixture.invalid/api/time-entries/options?'+search)});
+ const assigned=await pick('kind=projects');assert.equal(assigned.status,200);assert.deepEqual(assigned.data.items.map(x=>x.id),[project]);assert.deepEqual(Object.keys(assigned.data.items[0]).sort(),['customer_id','id','name','status']);
+ assert.equal((await pick('kind=customers')).data.total,1);
+ assert.equal((await pick('kind=customers&id=eq.'+customers[1])).data.total,0,'Unassigned direct IDs never expand the picker');
+ assert.equal((await pick('kind=customers&id=eq.'+customers[2])).data.total,0,'Cross-tenant direct IDs remain invisible');
+ assert.equal((await pick('kind=projects&limit=500')).status,400);
+ assert.equal((await run(member,()=>query('select id from file_objects where id=$1',[files[0]]))).rows.length,0,'Time-only blocks customer files even with a valid customer assignment');
+ await db.query("update organization_memberships set module_profile='standard' where organization_id=$1 and user_id=$2",[org,member]);
+ delete globalThis.__profilePickerRun;delete globalThis.__profilePickerSession;
+ console.log('Time-only: actual minimal picker, role/profile constraints, assignment/direct-ID/tenant negatives and file RLS passed.');
  assert.deepEqual((await run(member,()=>query('select id from customers'))).rows.map(x=>x.id),[customers[0]]);
  assert.equal((await run(member,()=>query('select id from customers where id=$1',[customers[1]]))).rows.length,0,'Direct unassigned ID is invisible');
  assert.equal((await run(member,()=>query('select id from file_objects where id=$1',[files[0]]))).rows.length,1,'Assigned attachment metadata is visible');

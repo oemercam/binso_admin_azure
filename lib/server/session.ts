@@ -8,6 +8,7 @@ import {env} from "@/lib/server/env";
 import {expireUnpaidTrials} from "@/lib/server/subscription-lifecycle";
 
 export type SessionUser={
+ moduleProfile?:import('@/lib/permissions').ModuleProfile;
  isDemo?:boolean;
  organizationStatus?:string;
  sessionId:string;
@@ -72,7 +73,7 @@ export async function getSession():Promise<SessionUser|null>{
    if(!context)return {rows:[] as SessionUser[]};
    await client.query("select set_config('app.organization_id',$1,true),set_config('app.user_id',$2,true)",[context.organization_id,context.user_id]);
    return client.query<SessionUser>(
-   `select s.id as "sessionId",u.id as "userId",s.organization_id as "organizationId",u.email,u.display_name as name,m.role,o.status as "organizationStatus",o.is_demo as "isDemo",u.mfa_enabled as "mfaEnabled"
+   `select s.id as "sessionId",u.id as "userId",s.organization_id as "organizationId",u.email,u.display_name as name,m.role,m.module_profile as "moduleProfile",o.status as "organizationStatus",o.is_demo as "isDemo",u.mfa_enabled as "mfaEnabled"
       from auth_sessions s
       join app_users u on u.id=s.user_id and u.status='active'
       join organization_memberships m on m.user_id=u.id and m.organization_id=s.organization_id and m.status='active'

@@ -32,7 +32,7 @@ export default function Product(){
         <span className="eyebrow"><LocalizedText>{"PRODUKT"}</LocalizedText></span>
         <h1><LocalizedText>{"Eine Plattform. Klare Prozesse."}</LocalizedText></h1>
         <p><LocalizedText>{"Binso One verbindet die wichtigsten Abläufe deines Unternehmens – vom ersten Kundenkontakt bis zur Zahlung."}</LocalizedText></p>
-        <div className="reference-actions"><Button href="/registrieren">{domainConfig.trialDays}<LocalizedText>{" Tage kostenlos testen"}</LocalizedText></Button><Button href="/demo" variant="secondary"><LocalizedText>{"Demo starten"}</LocalizedText></Button></div>
+        <div className="reference-actions"><Button href="/registrieren">{domainConfig.trialDays}<LocalizedText>{" Tage kostenlos testen"}</LocalizedText></Button><Button href="/preise" variant="secondary"><LocalizedText>{"Tarife vergleichen"}</LocalizedText></Button></div>
       </div>
       <ProductPreview/>
     </section>
@@ -64,8 +64,8 @@ export default function Product(){
     </section>
 
     <section className="marketing-cta product-page-cta">
-      <div><span className="eyebrow"><LocalizedText>{"BINSO ONE"}</LocalizedText></span><h2><LocalizedText>{"Selbst ausprobieren."}</LocalizedText></h2><p><LocalizedText>{"Starte direkt mit der Demo oder richte dein eigenes Konto ein."}</LocalizedText></p></div>
-      <div><Button href="/registrieren">{domainConfig.trialDays}<LocalizedText>{" Tage kostenlos testen"}</LocalizedText></Button><Button href="/demo" variant="secondary"><LocalizedText>{"Demo starten"}</LocalizedText></Button></div>
+      <div><span className="eyebrow"><LocalizedText>{"BINSO ONE"}</LocalizedText></span><h2><LocalizedText>{"Selbst ausprobieren."}</LocalizedText></h2><p><LocalizedText>{"Teste Binso One 14 Tage kostenlos mit deinem eigenen Unternehmen."}</LocalizedText></p></div>
+      <div><Button href="/registrieren">{domainConfig.trialDays}<LocalizedText>{" Tage kostenlos testen"}</LocalizedText></Button><Button href="/preise" variant="secondary"><LocalizedText>{"Tarife vergleichen"}</LocalizedText></Button></div>
     </section>
   </main><MarketingFooter/></>
 }
