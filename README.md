@@ -17,6 +17,7 @@ Prüfergebnisse. Nur die für den konkreten Auftrag relevanten Quellen lesen.
 | QA-Auswahl und Ausführung | `scripts/qa-plan.mjs`, `scripts/qa.mjs`, `package.json`; Pflicht-Gates: `.github/workflows/quality.yml` |
 | Gemeinsame App-Abnahme für Kunden und One Admin | [Prüfprotokoll, Rollen, Geräte und offene Nachweise](docs/architecture/app-acceptance.md), [vollständige Routen-/Unteransichtsmatrix](docs/architecture/app-acceptance-routes.md) |
 | V25.4 Public Trial, Tarife, Modulprofile und Nachweisgrenzen | [Umsetzung und Freigaben](docs/architecture/v25-4-ux-marketing-app-ready.md), [124 BP-/UX-Fälle](docs/architecture/v25-4-acceptance-tracking.csv) |
+| V25.5 Lifecycle und Sicherheitsgrenzen | [Ist/Delta und abhängige Basis](docs/architecture/v25-5-platform-lifecycle.md), [aktives Register aller 390 PL/BP/UX/Gate-IDs](docs/architecture/v25-5-traceability.csv) |
 | Aktuelle technische Foundation-Korrekturen und verbleibende Abnahmegrenzen | [Foundation-Status](docs/architecture/foundation-status.md); historische V21/V22-Inventare sind keine aktuellen Produktregeln |
 | Historische Nachweise | `docs/audit/`, `docs/assets/`, `docs/evidence/`, datierte Inventare unter `docs/architecture/`; [V24-Bericht](docs/audit/v24/README.md) und [älterer QA-Audit](docs/ux-audit-fast-development.md) nur bei Bedarf |
 

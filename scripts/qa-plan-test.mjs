@@ -16,6 +16,9 @@ for(const files of [[],['docs/readme.md','components/ui.tsx'],['docs/product.js'
 }
 assert.deepEqual(planChanges(['components/documents.tsx']).interactions,['documents']);
 assert.equal(planChanges([],{level:'full'}).routes.length,fullRoutes.length);
+for(const width of [320,390,600,760,761,820,1024,1440,1920]){
+ const full=planChanges([],{level:'full'});assert.ok(full.widths.includes(width),'Full Chromium coverage includes V25.5 boundary '+width);assert.ok(full.webkitWidths.includes(width),'Full WebKit coverage includes V25.5 boundary '+width);
+}
 assert(planChanges([],{level:'full'}).webkitWidths.includes(1024),'The release candidate must actually measure the desktop header in WebKit');
 const catalog=JSON.parse(await (await import('node:fs/promises')).readFile('docs/architecture/ux-inventory.json','utf8'));
 for(const entry of catalog.routes){const expression=new RegExp('^'+entry.route.replace(/\[\.\.\.section\]/g,'.+').replace(/\[id\]/g,'[^/]+')+'$');assert.ok(fullRoutes.some(route=>expression.test(route)),'Full QA omits page '+entry.route);}

@@ -47,7 +47,7 @@ export function navigationAccess(read){
  return {permissions:hash(permissions),destinations:hash(destinations)};
 }
 if(process.argv[1]===fileURLToPath(import.meta.url)){
- const reference=JSON.parse(fs.readFileSync('docs/assets/20261020/module-profile-navigation-reference.json','utf8'));
+ const reference=JSON.parse(fs.readFileSync('docs/assets/20261020/authorized-navigation-reference.json','utf8'));
  const read=file=>fs.readFileSync(file,'utf8'),current=navigationFoundation(read);
  assert.deepEqual(navigationAccess(read),reference.access,'Approved role-filtered destinations and access checks remain exact');
  assert.equal(current.icons,reference.baseIcons,'Existing navigation icons remain unchanged');

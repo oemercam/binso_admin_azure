@@ -31,6 +31,9 @@ export async function inviteUser(s:SessionUser,email:string,role:string,key:stri
    await c.query('select pg_advisory_xact_lock(hashtextextended($1,0))',['invitation.identity:'+email]);
    const existing=(await c.query('select id from app_users where lower(email)=lower($1) limit 1',[email])).rows[0];
    const userId=existing?.id??randomUUID();
+   if(existing)await c.query("select set_config('app.user_id',$1,true)",[userId]);
+   if(existing&&(await c.query("select 1 from organization_memberships where user_id=$1 and organization_id<>$2 limit 1",[userId,s.organizationId])).rowCount)throw new ApiError(409,'identity_unavailable','Diese Adresse kann für diese Einladung nicht verwendet werden. Bitte ein separates Konto mit eigener E-Mail verwenden.');
+   await c.query("select set_config('app.user_id',$1,true)",[s.userId]);
    if(!existing)await c.query("insert into app_users(id,email,display_name,status,password_hash) values($1,$2,$2,'invited',$3)",[userId,email,await hashPassword(randomBytes(48).toString('base64url'))]);
    const member=(await c.query('select status from organization_memberships where organization_id=$1 and user_id=$2 for update',[s.organizationId,userId])).rows[0];
    if(member?.status==='active')throw new ApiError(409,'already_member','Diese Person ist bereits im Team.');

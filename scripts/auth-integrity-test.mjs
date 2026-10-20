@@ -37,6 +37,7 @@ const transaction=async fn=>{
 globalThis.__integrity={query,transaction,getSession:()=>({userId:'auth-integrity-fixture',sessionId:'00000000-0000-4000-8000-000000000081',email:'integrity@fixture.invalid',organizationId:'00000000-0000-4000-8000-000000000099',role:'owner',mfaEnabled:true}),createSession:async input=>{const id=await actualSession.createSession(input);created++;return id},jar:{set(...args){cookieSets++;globalThis.__integrity.cookieOptions=args[2]},get(){},delete(){}}};
 globalThis.__integrity.scanStatus='pending';globalThis.__integrity.scanCalls=0;
 const adapters={
+ 'qrcode':import.meta.resolve('qrcode'),
  'server-only':uri(''),
  'next/headers':uri('export const cookies=async()=>globalThis.__integrity.jar;export const headers=async()=>new Headers()'),
  'next/server':uri('export class NextResponse{static json(data,init){return Response.json(data,init)}}'),

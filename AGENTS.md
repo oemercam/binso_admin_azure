@@ -83,6 +83,15 @@ No production migration, merge, deployment or native-store release is authorized
 
 # Codex workflow and context (canonical project instructions)
 
+V25.5 follows the existing V25.4 handoff, never an assumed integrated Main.
+Use docs/architecture/v25-5-platform-lifecycle.md and its single traceability CSV.
+One identity/one active company, submitted-before-independent-time-approval and
+unchanged privileged TOTP remain server/DB boundaries. Passkeys do not silently
+replace privileged MFA. Keep unapproved PL-G/D gates open; no production actions.
+V25.5 expands the authorized-target exception to all roles and tariffs: show only
+permitted destinations, fewer than five allowed; preserve existing navigation
+material, icons, height, position and blue FAB. Historical references stay intact.
+
 - Work toward one clearly bounded objective per assignment. State the outcome,
   affected area and validation scope briefly; do not add cleanup, audits, PRs,
   monitoring or deployment beyond the agreed scope. Respect explicit time limits;

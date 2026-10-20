@@ -55,14 +55,19 @@ Dark Mode und Operator-Varianten sind abgeleitet, keine behauptete Originalfreig
 - Listen teilen RecordsControls/RecordsView, Details DetailHeading/DetailTabs,
   Einstellungen den gemeinsamen Katalog, Chat MessageBubble/Viewport-Owner.
   Gleiche Regeln bedeuten nicht identische fachliche Inhalte oder ein Universalformular.
-- Neue Versionen werden nur beim Wiederöffnen geprüft und angeboten. Kein
-  automatisches Neuladen; ungespeicherte/beschäftigte Aufgaben blockieren Aktualisieren.
+- Neue Versionen werden intern verwaltet, ohne sichtbare PWA-Update-Meldung
+  und ohne unaufgefordertes Neuladen. Entwürfe und beschäftigte Aufgaben bleiben geschützt.
 - Sprache und Darstellung haben eindeutige getrennte Einstiege. Chat-Tagesgruppen
   folgen echten Zeitstempeln in Europe/Zurich, niemals pauschal Heute.
 
 ## Aktive Nachweise und historische Regeln
 
-Aktiver Quellvertrag: docs/assets/20261018/stable-navigation-reference.json.
+Aktiver Quellvertrag ab V25.5: docs/assets/20261020/authorized-navigation-reference.json.
+Nur berechtigte Ziele werden für jede Rolle/jeden Tarif angezeigt. Weniger als fünf
+Ziele sind zulässig; dieselbe vorhandene Navigation verteilt ihre erlaubten Einträge
+ohne neue Icons, Farben, Höhe, Position oder Änderung am blauen Plus-Button.
+Die Referenzen vom 18.10. und module-profile-navigation-reference.json bleiben
+historische Belege der vorherigen Freigabe, keine Wiederherstellung unberechtigter Links.
 Erzeugung ausschliesslich explizit über scripts/navigation-reference.mjs mit
 unveränderten Access-/Ziel-/Icon-Invarianten gegen Main 1a2813d0.
 Die neue abgeleitete Geometriespezifikation ist navigation-baseline.v4.json:

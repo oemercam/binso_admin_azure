@@ -355,10 +355,10 @@ function AppShellFrame({
 
       {timerNotice&&<div className="timer-notice" role="status">{timerNotice}</div>}
 
-      {!preview && !formActive && !chatActive && <MobileDock><LocalizedElement as="nav" className="bottom-nav" data-module-profile={access?.moduleProfile} aria-label="Hauptnavigation">
+      {!preview && !formActive && !chatActive && <MobileDock><LocalizedElement as="nav" className="bottom-nav" data-module-profile={access?.moduleProfile} data-visible-count={1+['/dashboard','/kunden','/finanzen','/zeit'].filter(canOpen).length} aria-label="Hauptnavigation">
         {canOpen("/dashboard")&&<Link href="/dashboard" className={active==="dashboard"?"active":""}><Icon name="home"/><span><LocalizedText>{"Start"}</LocalizedText></span></Link>}
         {canOpen("/kunden")&&<Link href="/kunden" className={active==="kunden"?"active":""}><Icon name="users"/><span><LocalizedText>{"Kunden"}</LocalizedText></span></Link>}
-        {(access?.moduleProfile!=="time_only"||canOpen("/finanzen"))&&<Link href="/finanzen" className={["angebote","rechnungen","zahlungen","belege","finanzen"].includes(active)?"active":""}><Icon name="wallet"/><span><LocalizedText>{"Finanzen"}</LocalizedText></span></Link>}
+        {canOpen("/finanzen")&&<Link href="/finanzen" className={["angebote","rechnungen","zahlungen","belege","finanzen"].includes(active)?"active":""}><Icon name="wallet"/><span><LocalizedText>{"Finanzen"}</LocalizedText></span></Link>}
         {canOpen("/zeit")&&<Link href="/zeit" className={active==="zeit"?"active":""}><Icon name="clock"/><span><LocalizedText>{"Zeit"}</LocalizedText></span></Link>}
         <button type="button" className={["produkte","spesen","mitarbeiter","support","einstellungen"].includes(active)?"active":""} onClick={() => setSheet("more")}><Icon name="more"/><span><LocalizedText>{"Mehr"}</LocalizedText></span></button>
       </LocalizedElement></MobileDock>}

@@ -1,5 +1,5 @@
 {
-  "commit": "e62db162c49e804aab92e632ac3a2eaf701bf745",
+  "commit": "d25bd5b6178f4ae54b5b57d0779e5d845e1f0ee5",
   "method": "Existing TypeScript AST dependency inventory; conditional reachability is not runtime proof",
   "pages": [
     {
@@ -4299,6 +4299,8 @@
         "components/locale-switcher.tsx#LocaleSwitcher",
         "components/app-shell.tsx#ShellRegistration",
         "components/app-shell.tsx#ShellConfiguration",
+        "components/passkey-settings.tsx#PasskeySettings",
+        "components/passkey-settings.tsx#Passkey",
         "components/binso-ux.tsx#FormSheet",
         "components/ui.tsx#SectionTitle",
         "components/security-settings-page.tsx#sessionLabel",
@@ -4312,17 +4314,17 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 109,
+          "line": 112,
           "component": "components/security-settings-page.tsx#SecuritySettingsPage"
         },
         {
           "tag": "FormSheet",
-          "line": 117,
+          "line": 120,
           "component": "components/security-settings-page.tsx#SecuritySettingsPage"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 152,
+          "line": 156,
           "component": "components/security-settings-page.tsx#SecuritySettingsPage"
         },
         {
@@ -4379,6 +4381,11 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 41,
+          "component": "components/passkey-settings.tsx#PasskeySettings"
         },
         {
           "tag": "Sheet",
@@ -4748,17 +4755,22 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 48,
+          "line": 50,
           "component": "components/team-settings.tsx#TeamSettingsPage"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 49,
+          "line": 51,
+          "component": "components/team-settings.tsx#TeamSettingsPage"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 52,
           "component": "components/team-settings.tsx#TeamSettingsPage"
         },
         {
           "tag": "FormSheet",
-          "line": 50,
+          "line": 53,
           "component": "components/team-settings.tsx#TeamSettingsPage"
         },
         {
@@ -4973,8 +4985,7 @@
         "components/header-panel-content.tsx#AccountPanel",
         "components/locale-switcher.tsx#LocaleSwitcher",
         "components/app-shell.tsx#ShellRegistration",
-        "components/app-shell.tsx#ShellConfiguration",
-        "components/ui.tsx#Toggle"
+        "components/app-shell.tsx#ShellConfiguration"
       ],
       "layouts": [
         "app/layout.tsx",
@@ -6735,7 +6746,8 @@
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#dismissActionLabels",
-        "components/ui.tsx#actionSourceText"
+        "components/ui.tsx#actionSourceText",
+        "components/passkey-login.tsx#PasskeyLogin"
       ],
       "layouts": [
         "app/layout.tsx"

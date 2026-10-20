@@ -402,6 +402,12 @@ try{
  };
  await db.query("select set_config('app.organization_id',$1,false)",[billingTenant.organizationId]);
  const requestKey='00000000-0000-4000-8000-000000000034';
+ await assert.rejects(globalThis.__provisionTest(c=>startBillingCheckout(c,billingSession,'business','yearly',requestKey)),e=>e.code==='trial_checkout_policy_pending','Unverified trial has no approved paid start policy');
+ await db.query("update organization_subscriptions set trial_until=now()+interval '5 days' where organization_id=$1",[billingTenant.organizationId]);
+ await assert.rejects(globalThis.__provisionTest(c=>startBillingCheckout(c,billingSession,'business','yearly',requestKey)),e=>e.code==='trial_checkout_policy_pending','Remaining free days cannot be charged under an unapproved policy');
+ assert.equal(checkoutCalls,0);
+ assert.equal((await db.query('select billing_customer_id from organization_subscriptions where organization_id=$1',[billingTenant.organizationId])).rows[0].billing_customer_id,null,'Blocked checkout does not create a provider customer');
+ await db.query("update organization_subscriptions set status='expired',trial_until=now()-interval '1 second' where organization_id=$1",[billingTenant.organizationId]);
  const checkout=await globalThis.__provisionTest(c=>startBillingCheckout(c,billingSession,'business','yearly',requestKey));
  assert.ok(checkout.url.startsWith('https://checkout.stripe.com/'));
  const sameCheckout=await globalThis.__provisionTest(c=>startBillingCheckout(c,billingSession,'business','yearly','00000000-0000-4000-8000-000000000035'));
@@ -420,7 +426,7 @@ try{
  failInvoice=true;
  await assert.rejects(globalThis.__provisionTest(c=>processStripeEvent(c,invoiceEvent)),e=>e.code==='stripe_unavailable');
  assert.equal((await db.query("select * from billing_webhook_events where external_event_id='evt_fixture'")).rows.length,0);
- assert.equal((await db.query('select status from organization_subscriptions where organization_id=$1',[billingTenant.organizationId])).rows[0].status,'trial');
+ assert.equal((await db.query('select status from organization_subscriptions where organization_id=$1',[billingTenant.organizationId])).rows[0].status,'expired','Failed provider processing preserves the post-trial state');
  failInvoice=false;
  assert.equal((await globalThis.__provisionTest(c=>processStripeEvent(c,invoiceEvent))).processed,true);
  assert.equal((await globalThis.__provisionTest(c=>processStripeEvent(c,invoiceEvent))).duplicate,true);
@@ -670,7 +676,7 @@ try{
  const invitationService=dataModule(invitationServiceSource);
  globalThis.__invitationMails=[];globalThis.__invitationMailMode='accepted';
  const teamSource=(await fs.readFile('app/api/settings/team/invitations/route.ts','utf8')).replace('"@/lib/money"',JSON.stringify(moneyModule)).replace('"@/lib/server/http"',JSON.stringify(processHttp)).replace('"@/lib/server/session"',JSON.stringify(processSession)).replace('"@/lib/server/rbac"',JSON.stringify(processRbac)).replace('"@/lib/server/db"',JSON.stringify(processDb)).replace('"@/lib/server/invitations"',JSON.stringify(invitationService));
- const team=await import(dataModule(teamSource));const teamResult=await team.GET();assert.equal(teamResult.status,200);assert.ok(teamResult.data.members.every(m=>m.email&&m.name));assert.ok(teamResult.data.userLimit>0);assert.ok(teamResult.data.plan);
+ const team=await import(dataModule(teamSource));const teamResult=await team.GET();assert.equal(teamResult.status,200);assert.ok(teamResult.data.members.every(m=>m.email&&m.name));assert.equal(teamResult.data.capacityConfigured,false,"Missing subscription cannot imply a guessed seat quota");assert.equal(teamResult.data.userLimit,null);assert.equal(teamResult.data.plan,"unknown");
  await db.query("select set_config('app.organization_id',$1,false)",[demo]);
  await globalThis.__processTransaction(demo,c=>c.query("insert into organization_entitlements(organization_id,max_users) values($1,50) on conflict(organization_id) do update set max_users=50",[demo]));
  await db.query("insert into organization_subscriptions(organization_id,plan,status) values($1,'starter','active') on conflict(organization_id) do nothing",[demo]);
@@ -680,6 +686,15 @@ try{
  for(const [storedPlan,plan,limit] of [['starter','start',3],['business','business',15],['professional','pro',null]]){await db.query('update organization_subscriptions set plan=$2 where organization_id=$1',[demo,storedPlan]);const projection=(await team.GET()).data;assert.equal(projection.plan,plan,'Team API uses the canonical visible tariff');assert.equal(projection.userLimit,limit);}
 
  const inviteRequest=(email,role,key)=>({body:{email,role},headers:new Headers({'Idempotency-Key':key})});
+ const quotaSnapshot=(await db.query('select to_jsonb(e) value from organization_entitlements e where organization_id=$1',[demo])).rows[0].value;
+ await db.query('delete from organization_entitlements where organization_id=$1',[demo]);
+ const unknownQuota=(await team.GET()).data;assert.equal(unknownQuota.capacityConfigured,false);assert.equal(unknownQuota.userLimit,null);assert.equal(unknownQuota.plan,'unknown','Missing quota is neither a guessed Start quota nor unlimited Pro');
+ assert.equal((await team.POST(inviteRequest('unknown-quota@fixture.invalid','member','unknown-quota-invite'))).status,409,'Unknown capacity cannot grant another seat');
+ await db.query('insert into organization_entitlements select * from jsonb_populate_record(null::organization_entitlements,$1::jsonb)',[JSON.stringify(quotaSnapshot)]);
+ assert.equal((await team.GET()).data.capacityConfigured,true);
+ const foreignInvite=await team.POST(inviteRequest('billing-probe@example.invalid','member','invitation-foreign-identity'));
+ assert.equal(foreignInvite.status,409,'A foreign company account cannot be invited into another company');
+ assert.equal((await db.query("select count(*)::int n from organization_invitations where organization_id=$1 and email='billing-probe@example.invalid'",[demo])).rows[0].n,0,'Foreign identity rejection leaves no pending invitation');
  const atomicInvite=await team.POST(inviteRequest('atomic-invite@fixture.invalid','finance','invitation-atomic-fixture'));assert.equal(atomicInvite.status,201,JSON.stringify(atomicInvite));
  assert.equal((await team.POST(inviteRequest('atomic-invite@fixture.invalid','finance','invitation-atomic-fixture'))).data.id,atomicInvite.data.id);assert.equal(globalThis.__invitationMails.length,1,'A timeout replay does not send twice');
  assert.equal((await team.POST(inviteRequest('atomic-invite@fixture.invalid','reader','invitation-atomic-fixture'))).status,409,'A changed role cannot reuse a replay key');
@@ -959,6 +974,7 @@ try{
  globalThis.__processSession={...savedProjectSession,organizationId:sandbox};const foreignReport=await reportHandler.GET(reportRequest());assert.equal(foreignReport.status,200);assert.notEqual(foreignReport.data.customers.total,ownerReport.data.customers.total,'Reports are scoped to the current company');globalThis.__processSession=savedProjectSession;
  console.log('Reports: bounded periods, role masking, company isolation and private formula-safe CSV export passed.');
  const unusedTime=await manualTimeHandler.POST({headers:new Headers(),body:{customerId:documentArgs.p_customer_id,description:'Direct customer work',durationMinutes:60,startedAt:'2026-10-01',billable:true,salesRate:180}});
+ assert.equal((await timeReview.PATCH({body:{action:'submit'}},{params:Promise.resolve({id:unusedTime.data.item.id})})).status,200,'Time enters review before independent approval');
  globalThis.__processSession={...savedProjectSession,userId:'independent-time-reviewer'};assert.equal((await timeReview.PATCH({body:{action:'approve'}},{params:Promise.resolve({id:unusedTime.data.item.id})})).status,200);globalThis.__processSession=savedProjectSession;
  await assert.rejects(()=>atomic('create_document_atomic',{...serviceArgs,p_number:'PROCESS-INTRA-DUP',p_items:[{description:'One',quantity:1,unit_price:180,time_entry_ids:[unusedTime.data.item.id]},{description:'Two',quantity:1,unit_price:180,time_entry_ids:[unusedTime.data.item.id]}]}),e=>e.code==='duplicate_service');
  assert.equal((await db.query('select invoiced_invoice_id from time_entries where id=$1',[unusedTime.data.item.id])).rows[0].invoiced_invoice_id,null);
@@ -1004,8 +1020,9 @@ try{
  const notificationId=(await db.query("insert into in_app_notifications(organization_id,user_id,kind,title,body) values($1,$2,'system','Synthetic notification','No personal data') returning id",[demo,session.userId])).rows[0].id;
  const foreignNotificationId=(await db.query("insert into in_app_notifications(organization_id,user_id,kind,title,body) values($1,null,'system','Foreign synthetic notification','No personal data') returning id",[sandbox])).rows[0].id;
  assert.equal((await notificationRoute.PATCH({body:{all:true}})).status,200);assert.ok((await db.query('select read_at from in_app_notifications where id=$1',[notificationId])).rows[0].read_at);assert.equal((await db.query('select read_at from in_app_notifications where id=$1',[foreignNotificationId])).rows[0].read_at,null,'Read all cannot affect another tenant');
- const policy=await loadProcessRoute('app/api/time-entries/policy/route.ts');assert.equal((await policy.PATCH({body:{required:false}})).status,200);
- const immediate=await manualTimeHandler.POST({headers:new Headers(),body:{customerId:documentArgs.p_customer_id,description:'Direct approved work',durationMinutes:60,billable:true}});assert.equal(immediate.status,201,JSON.stringify(immediate));assert.equal(immediate.data.item.approved,true);
+ const policy=await loadProcessRoute('app/api/time-entries/policy/route.ts');assert.equal((await policy.PATCH({body:{required:false}})).status,409,'Legacy settings cannot disable the independent-review invariant');
+ await db.query('update organizations set time_approval_required=false where id=$1',[demo]);
+ const immediate=await manualTimeHandler.POST({headers:new Headers(),body:{customerId:documentArgs.p_customer_id,description:'Direct work awaits review',durationMinutes:60,billable:true}});assert.equal(immediate.status,201,JSON.stringify(immediate));assert.equal(immediate.data.item.approved,false,'A stored legacy false flag cannot auto-approve normal work');
  const internalProcessTime=await manualTimeHandler.POST({headers:new Headers(),body:{projectName:'Weiterbildung',description:'Internal training',durationMinutes:90,billable:false}});assert.equal(internalProcessTime.status,201);assert.equal(internalProcessTime.data.item.customer_id,null);assert.equal(internalProcessTime.data.item.billable,false);
  await policy.PATCH({body:{required:true}});
  globalThis.__processSession={...globalThis.__processSession,role:'member'};assert.equal((await policy.PATCH({body:{required:false}})).status,403);assert.equal((await projectHandler.POST({body:{name:'Forbidden'}})).status,403);
@@ -1113,7 +1130,7 @@ try{
  // The unused generic record writer was removed. Public finance routes expose no
  // alternate PATCH/DELETE ledger writer that can bypass canonical transitions.
  for(const file of ['app/api/payments/[id]/route.ts','app/api/payments/route.ts']){const source=await fs.readFile(file,'utf8');assert.ok(!/export async function (PATCH|DELETE)/.test(source));}
- console.log('Full customer/offer/project/time/invoice/partial-payment process, direct customer work, internal time, optional approval, exact completion date, overpayment and double-billing protection passed.');
+ console.log('Full customer/offer/project/time/invoice/partial-payment process, direct customer work, internal time, enforced independent approval, exact completion date, overpayment and double-billing protection passed.');
  await db.exec('begin');
  try{
   for(const [table,fields] of Object.entries({products:['name','kind','unit_price','status'],employees:['name','job_title','workload_percent','status'],expenses:['merchant','employee_name','amount','status'],payments:['paid_on','customer_name','invoice_number','amount','status']})){

@@ -43,8 +43,11 @@ export async function POST(request:NextRequest){
    completed=await withTransaction(client=>completeRegistrationVerification(client,userId,email,null));
   }
   if(!completed)return json({error:"invalid_or_expired_code"},400);
+  // A newly issued verification token for an already verified identity is not
+  // a password/TOTP replacement and may never establish another session.
+  if(completed.email_verified_at||completed.mfa_enabled)return json({ok:true,alreadyVerified:true,next:'/login'});
   await endDemoSession();
-  await createSession({userId,organizationId:completed.organization_id,email,name:completed.name,role:completed.role,persistent:body.rememberMe===true,ttlHours:body.rememberMe===true?undefined:12});
+  await createSession({userId,organizationId:completed.organization_id,email,name:completed.name,role:completed.role,persistent:body.rememberMe===true,ttlHours:body.rememberMe===true?undefined:12,expectedAuth:{passwordHash:completed.password_hash,mfaEnabled:completed.mfa_enabled,mfaSecretEnc:completed.mfa_secret_enc}});
   return json({ok:true,...await registrationHandoff(completed.organization_id,completed.role,completed.mfa_enabled)});
  }catch(error){return apiError(error);}
 }

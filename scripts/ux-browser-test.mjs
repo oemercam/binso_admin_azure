@@ -258,7 +258,7 @@ try{
    let data;
    if(p==='/api/auth/register')data={state:'new',context:{plan:null,billingCycle:'monthly',trialDays:14,termsVersion:'2026-10-05',privacyVersion:'2026-10-05.2',dpaVersion:'2026-10-05'}};
    else if(p==='/api/auth/session')data={authenticated:true,...(processRecoveryMode?{user:{id:'process-fixture-user'}}:{}),tenant:{id:'fixture-tenant',role:policyRole,plan:'pro',readOnly:policyReadOnly}};
-   else if(p==='/api/settings/team/invitations')data={members:[{user_id:'member-one',name:'Team Person',email:'team@example.invalid',role:teamMemberRole,created_at:'2026-10-08'}],invitations:teamHasInvitation?[{id:'pending-one',email:'pending@example.invalid',role:'member',status:'pending',expires_at:'2099-01-01',created_at:'2026-10-01'},{id:'expired-one',email:'expired@example.invalid',role:'member',status:'pending',expires_at:'2020-01-01',created_at:'2020-01-01'}]:[{id:'expired-one',email:'expired@example.invalid',role:'member',status:'pending',expires_at:'2020-01-01',created_at:'2020-01-01'}],userLimit:10,plan:'pro'};
+   else if(p==='/api/settings/team/invitations')data={members:[{user_id:'member-one',name:'Team Person',email:'team@example.invalid',role:teamMemberRole,created_at:'2026-10-08'}],invitations:teamHasInvitation?[{id:'pending-one',email:'pending@example.invalid',role:'member',status:'pending',expires_at:'2099-01-01',created_at:'2026-10-01'},{id:'expired-one',email:'expired@example.invalid',role:'member',status:'pending',expires_at:'2020-01-01',created_at:'2020-01-01'}]:[{id:'expired-one',email:'expired@example.invalid',role:'member',status:'pending',expires_at:'2020-01-01',created_at:'2020-01-01'}],capacityConfigured:true,userLimit:null,plan:'pro'};
    else if(p==='/api/notifications')data={items:[{id:'notification-one',kind:'document',title:'Neue Rechnung',body:'Prüffirma AG',href:'/rechnungen/RE-TEST-1',read_at:null,created_at:'2026-10-09T09:00:00Z'},{id:'notification-two',kind:'announcement',title:'Produktinformation',body:'Testinformation',read_at:'2026-10-08T10:00:00Z',created_at:'2026-10-08T09:00:00Z'}]};
    else if(p==='/api/time-entries/policy')data={time_approval_required:policyRequired};
    else if(p==='/api/time-tracker')data={tracker:null};
@@ -289,6 +289,7 @@ try{
    else if(p==='/api/integrations/status')data={items:[{key:'billing',configured:false}]};
    else if(p==='/api/billing/catalog')data={live:false,demo:false,automaticTax:false,items:[]};
    else if(p==='/api/auth/mfa')data={enabled:true,required:true,role:'owner'};
+   else if(p==='/api/auth/passkeys')data={items:[]};
    else if(p==='/api/auth/sessions')data={items:[{id:'session-current',current:true,userAgent:'Mozilla/5.0 (iPhone) Version/17.0 Mobile Safari/605.1.15',lastSeenAt:'2026-10-09T09:00:00Z',expiresAt:'2026-11-09T09:00:00Z'},{id:'session-other',current:false,userAgent:'Mozilla/5.0 (Windows) Chrome/130.0',lastSeenAt:'2026-10-08T09:00:00Z',expiresAt:'2026-11-09T09:00:00Z'}]};
    else if(p==='/api/settings/organization')data={organization:{name:customer.name,city:'Bern',country:'CH'}};
    

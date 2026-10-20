@@ -9,6 +9,8 @@ import {ActionRow,FormSheet,SettingsGroup} from "./binso-ux";
 import {Button, EmptyState, Field, SectionTitle, Status, Toast, Input, ErrorState, LoadingState} from "./ui";
 import {apiDelete,apiGet,apiPatch,apiPost} from "@/lib/client/backend";
 import {safeAppPath} from "@/lib/navigation";
+import Image from 'next/image';
+import {PasskeySettings} from './passkey-settings';
 
 type MfaState={enabled:boolean;required:boolean;role:string;demo?:boolean};
 type SessionItem={id:string;userAgent:string|null;lastSeenAt:string|null;expiresAt:string;current:boolean};
@@ -33,7 +35,7 @@ export function SecuritySettingsPage(){
   const [mfa,setMfa]=useState<MfaState|null>(null);
   const [mfaError,setMfaError]=useState("");
   const [sessionsError,setSessionsError]=useState("");
-  const [setup,setSetup]=useState<{secret:string;otpAuthUri:string}|null>(null);
+  const [setup,setSetup]=useState<{secret:string;otpAuthUri:string;qrDataUrl?:string}|null>(null);
   const [code,setCode]=useState("");
   const [recovery,setRecovery]=useState<string[]>([]);
   const [currentPassword,setCurrentPassword]=useState("");
@@ -61,7 +63,7 @@ export function SecuritySettingsPage(){
 
   const startSetup=async()=>{setToastTone("danger");
     try{
-      const payload=await apiPost<{secret:string;otpAuthUri:string}>("/api/auth/mfa/setup",{});
+      const payload=await apiPost<{secret:string;otpAuthUri:string;qrDataUrl:string}>("/api/auth/mfa/setup",{});
       setSetup(payload);setCode("");setRecovery([]);
     }catch(error){setToast(error instanceof Error?error.message:"Authenticator-Einrichtung konnte nicht gestartet werden.");}
   };
@@ -106,6 +108,7 @@ export function SecuritySettingsPage(){
   return <AppShell title="Sicherheit" subtitle="Mehrstufiger Schutz für dein Binso One Konto." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen" unsavedChanges={!!(currentPassword||newPassword||confirmPassword||code||setup||recovery.length)}>
     {mfaError&&panel!=="mfa"&&<ErrorState onRetry={()=>{setMfaError("");void loadMfa()}} retryLabel="Erneut versuchen"><LocalizedText>{mfaError}</LocalizedText></ErrorState>}
     <SettingsGroup title="Anmeldeschutz"><div className="action-list"><ActionRow icon="lock" title="Passwort ändern" onClick={()=>setPanel("password")}/><ActionRow icon="lock" title="Zwei-Faktor-Authentifizierung" description={!mfa?(mfaError?"Anmeldeschutzstatus nicht verfügbar.":undefined):mfa.demo?"Demo":mfa.enabled?"Aktiv":mfa.required?"Erforderlich":"Empfohlen"} endAdornment={!mfa&&!mfaError?<LoadingState/>:undefined} onClick={()=>setPanel("mfa")}/></div></SettingsGroup>
+    {mfa&&<PasskeySettings enabled={mfa.enabled} demo={mfa.demo===true} onChanged={()=>void loadSessions()}/>}
     <FormSheet open={panel==="password"} label="Passwort ändern" onClose={()=>setPanel(null)} busy={busy} dirty={!!(currentPassword||newPassword||confirmPassword)}><section className="settings-form">
       <div className="form-grid">
         <Field label="Aktuelles Passwort"><Input value={currentPassword} onChange={e=>setCurrentPassword(e.target.value)} type="password" autoComplete="current-password"/></Field>
@@ -120,6 +123,7 @@ export function SecuritySettingsPage(){
         {!setup&&<Button onClick={()=>void startSetup()}><LocalizedText>{"Authenticator einrichten"}</LocalizedText></Button>}
       </>}
       {setup&&<div className="form-grid">
+        {setup.qrDataUrl&&<Image src={setup.qrDataUrl} width={224} height={224} unoptimized alt="Authenticator QR-Code"/>}
         <Field label="Einrichtungsschlüssel"><Input readOnly value={setup.secret}/></Field>
         <p className="settings-note"><LocalizedText>{"Öffne deine Authenticator-App, füge ein neues Konto hinzu und gib den Schlüssel manuell ein. Alternativ kannst du auf einem unterstützten Gerät den folgenden Link öffnen."}</LocalizedText></p>
         <a className="text-action" href={setup.otpAuthUri}><LocalizedText>{"In Authenticator-App öffnen"}</LocalizedText></a>

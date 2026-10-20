@@ -5,6 +5,7 @@ import {getSession} from "@/lib/server/session";
 import {query} from "@/lib/server/db";
 import {ApiError,apiError,assertSameOrigin,json} from "@/lib/server/http";
 import {enforceRateLimit} from "@/lib/server/rate-limit";
+import QRCode from 'qrcode';
 
 export const runtime="nodejs";
 export async function POST(request:NextRequest){
@@ -20,6 +21,7 @@ export async function POST(request:NextRequest){
     const label=encodeURIComponent(`Binso One:${session.email}`);
     const issuer=encodeURIComponent("Binso One");
     const otpAuthUri=`otpauth://totp/${label}?secret=${secret}&issuer=${issuer}&algorithm=SHA1&digits=6&period=30`;
-    return json({secret,otpAuthUri,expiresInMinutes:15});
+    const qrDataUrl=await QRCode.toDataURL(otpAuthUri,{width:224,margin:2,errorCorrectionLevel:'M'});
+    return json({secret,otpAuthUri,qrDataUrl,expiresInMinutes:15});
   }catch(error){return apiError(error);}
 }

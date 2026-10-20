@@ -8,6 +8,7 @@ import {FormEvent,useRef,useState} from "react";
 import {Button, Icon, Input, Field, ErrorState} from "@/components/ui";
 import {clearDemoClientSession} from "@/lib/client/backend";
 import {safeAppPath} from "@/lib/navigation";
+import {PasskeyLogin} from '@/components/passkey-login';
 
 type Stage="credentials"|"email"|"totp"|"verify";
 
@@ -95,7 +96,7 @@ export default function Login(){
       {error&&<ErrorState className="auth-error"><LocalizedText>{error}</LocalizedText></ErrorState>}
       <Button type="submit" disabled={loading}><LocalizedText>{loading?"Anmeldung läuft…":"Weiter"}</LocalizedText></Button>
     </form>
-    <div className="auth-form-demo"><div className="auth-divider"><span><LocalizedText>{"oder"}</LocalizedText></span></div><Button href="/demo" variant="secondary"><LocalizedText>{"Demo starten"}</LocalizedText></Button></div>
+    <PasskeyLogin remember={rememberMe} onAuthenticated={finish} disabled={loading} onBusy={value=>{pending.current=value;setLoading(value)}}/>
     <p className="auth-bottom"><LocalizedText>{"Noch kein Konto? "}</LocalizedText><Link href="/registrieren"><LocalizedText>{"Konto erstellen"}</LocalizedText></Link></p>
   </section></AuthWorkspace>;
 }
