@@ -15,7 +15,7 @@ export async function checkDeployedAuth(base,request=fetch){
   const response=await get('/api/'+route);assert.equal(response.status,410,'Retired endpoint must deny access: '+route);assert.equal(response.headers.get('set-cookie'),null,'No retired endpoint may issue authentication');
  }
  const session=await get('/api/auth/session');assert.equal(session.status,200);assert.equal((await session.json()).authenticated,false,'Legacy cookies must not authenticate');
- for(const route of ['/api/customers','/api/documents','/api/finance/summary','/api/settings/team/invitations','/api/operator/dashboard']){
+ for(const route of ['/api/customers','/api/documents','/api/finance','/api/settings/team/invitations','/api/operator/dashboard']){
   const response=await get(route);assert.ok([401,403].includes(response.status),'Protected API must deny legacy cookies: '+route+' HTTP '+response.status);
  }
  return {retiredEndpoints:6,protectedApis:5,legacyCookiesRejected:true,readOnly:true};

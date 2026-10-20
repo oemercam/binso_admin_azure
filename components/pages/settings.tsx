@@ -10,7 +10,6 @@ import {companyLogoSource} from "@/lib/image-url";
 import {useApiQuery} from "@/lib/client/use-api-query";
 import {Avatar} from "../avatar";
 import {usePageAccess} from "@/lib/client/page-access";
-import {DocumentModal} from "../documents";
 import {ActionRow,ActionSheet,FormSheet,ListRow,SelectionRows,SettingsGroup} from "../binso-ux";
 
 import Link from "next/link";
@@ -204,7 +203,6 @@ export function SubscriptionSettingsPage() {
   const [billingLoading,setBillingLoading]=useState(false);
   const [acceptedPaidTerms,setAcceptedPaidTerms]=useState(false);
   const [toast,setToast]=useState<string|null>(null);
-  const [billingInvoice,setBillingInvoice]=useState<{date:string;amount:string}|null>(null);
   const [referenceNow]=useState(()=>Date.now());
 
   const prices:Record<string,string>=Object.fromEntries(subscriptionPlans.flatMap(p=>[[p.name,String(p.monthly)],[p.id,String(p.monthly)]]));

@@ -134,7 +134,7 @@ try{
  const publicEntries=new Set(['/api/auth/invitation','/api/health','/api/health/ready','/api/demo/session','/api/operator/sso/callback']);
  for(const api of inventory.apis.filter(item=>item.methods.includes('GET'))){
   if(api.path.startsWith('/api/operator/')&&!publicEntries.has(api.path)||api.path.startsWith('/api/demo/')&&!publicEntries.has(api.path)){
-   for(const role of roles)assert.equal((await get(api.path.replace(/\[[^\]]+\]/g,customer.id)+(api.path==='/api/demo/data'?'?collection=customers':''),cookies.get('0:'+role))).status,401,role+' separate session boundary '+api.path);covered.add(api.path);
+   for(const role of roles)assert.equal((await get(api.path.replace(/\[[^\]]+\]/g,customer.id)+(api.path==='/api/demo/data'?'?collection=customers':''),cookies.get('0:'+role))).status,(api.path.startsWith('/api/demo/')||api.path==='/api/operator/demo-session')?410:401,role+' separate session boundary '+api.path);covered.add(api.path);
   }
   assert.ok(covered.has(api.path)||publicEntries.has(api.path),'Uncovered authenticated GET contract: '+api.path);
  }

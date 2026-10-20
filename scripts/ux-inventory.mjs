@@ -30,7 +30,7 @@ export function dependencyGraph(file,name='default',visited=new Set()){
   if(ts.isJsxOpeningElement(n)||ts.isJsxSelfClosingElement(n)){const tag=n.tagName.getText(parsed.ast);if(/Sheet|Dialog|Tabs|Records|List|Table|Upload|Preview|Modal|Chat|Field|Viewer/.test(tag)||['input','select','textarea','form','table','dialog'].includes(tag))widgets.push({tag,line:parsed.ast.getLineAndCharacterOfPosition(n.getStart()).line+1});}
   if(ts.isJsxAttribute(n)&&n.name.getText(parsed.ast)==='className'&&n.initializer){const strings=[];const gather=x=>{if(ts.isStringLiteral(x)||ts.isNoSubstitutionTemplateLiteral(x))strings.push(x.text);if(ts.isTemplateExpression(x)){strings.push(x.head.text,...x.templateSpans.map(s=>s.literal.text));}ts.forEachChild(x,gather)};gather(n.initializer);for(const s of strings)for(const c of s.split(/\s+/))if(/^[\w-]+$/.test(c))classes.add(c);}
   if(ts.isStringLiteral(n)&&n.text.startsWith('/api/'))apis.add(n.text);
-  if(ts.isCallExpression(n)&&n.expression.getText(parsed.ast)==='useDemoRows'&&n.arguments[0]&&ts.isStringLiteral(n.arguments[0]))collections.add(n.arguments[0].text);
+  if(ts.isCallExpression(n)&&n.expression.getText(parsed.ast)==='useRemoteRows'&&n.arguments[0]&&ts.isStringLiteral(n.arguments[0]))collections.add(n.arguments[0].text);
   ts.forEachChild(n,visit);
  };visit(node);
  const result=[{key,file,name,line:parsed.ast.getLineAndCharacterOfPosition(node.getStart()).line+1,classes:[...classes],apis:[...apis],collections:[...collections],widgets,elements,conditions}];

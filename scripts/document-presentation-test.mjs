@@ -166,34 +166,14 @@ assert.equal(employeeInputIssue(employeeInput),null);
 for(const invalid of [{email:'invalid'},{entryDate:'2026-02-30'},{workloadPercent:101},{weeklyHours:0},{weeklyHours:81},{vacationDays:-1}])assert.ok(employeeInputIssue({...employeeInput,...invalid}));
 console.log('QR debtor structured address, exact remaining amount, valid SCOR/invalid references and shared employee validation passed.');
 
-// Resolve the actual UI's dynamic URLs; static filename searches miss these assets.
+// SaaS billing no longer has synthetic invoice rows/PDFs. Genuine document PDF,
+// QR, layout and malformed-response coverage above remains mandatory.
 {
  const settingsSource=await fs.readFile('components/pages/settings.tsx','utf8');
- const settingsAst=ts.createSourceFile('settings.tsx',settingsSource,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
- const rows=[],urls=[];
- const property=(object,name)=>object.properties.find(item=>ts.isPropertyAssignment(item)&&item.name.getText(settingsAst)===name);
- const visit=node=>{
-  if(ts.isArrayLiteralExpression(node)&&node.elements.length&&node.elements.every(item=>ts.isObjectLiteralExpression(item)&&property(item,'date')&&property(item,'number')))rows.push(...Function('return ('+node.getText(settingsAst)+')')());
-  if(ts.isJsxSelfClosingElement(node)&&node.tagName.getText(settingsAst)==='DocumentModal'){
-   const attr=node.attributes.properties.find(item=>ts.isJsxAttribute(item)&&item.name.getText(settingsAst)==='fileUrl');
-   if(attr&&ts.isJsxExpression(attr.initializer)&&attr.initializer.expression)urls.push(Function('billingInvoice','return ('+attr.initializer.expression.getText(settingsAst)+')'));
-  }
-  ts.forEachChild(node,visit);
- };
- visit(settingsAst);assert.equal(urls.length,1,'The demo invoice uses one actual shared PDF URL expression');assert.ok(rows.length>=2,'Read actual demo invoice rows rather than hard-coded test months');
- const validateAssets=async readAsset=>{
-  const resolved=new Set();
-  for(const row of rows){
-   const url=urls[0](row);assert.ok(url.startsWith('/demo/')&&!url.includes('..'),'Demo PDF stays within public/demo');assert.ok(!resolved.has(url),'Each demo month has its own PDF');resolved.add(url);
-   const bytes=await readAsset(path.join('public',url.slice(1)));assert.equal(bytes.subarray(0,5).toString(),'%PDF-','A demo URL must resolve to PDF bytes');
-   const document=await getDocument({data:new Uint8Array(bytes),isEvalSupported:false}).promise;
-   try{assert.equal(document.numPages,1,'Demo billing retains the single-page contract');const page=await document.getPage(1),text=(await page.getTextContent()).items.map(item=>item.str??'').join(' ');assert.ok(text.includes(row.number),'The shipped PDF belongs to the actual invoice row');}finally{await document.destroy();}
-  }
- };
- await validateAssets(file=>fs.readFile(file));
- await assert.rejects(()=>validateAssets(async()=>{throw Object.assign(new Error('missing fixture asset'),{code:'ENOENT'})}),error=>error.code==='ENOENT','A missing dynamically referenced asset must fail');
- await assert.rejects(()=>validateAssets(async()=>Buffer.from('<html>missing</html>')),/PDF bytes/,'A non-PDF response cannot qualify as a working preview');
- console.log('Dynamic demo billing paths: shipped single-page PDFs, invoice identity and missing/non-PDF negative controls passed.');
+ assert.doesNotMatch(settingsSource,/billingInvoice|\/demo\//,'Billing must not revive a fake invoice preview');
+ assert.ok(settingsSource.includes('billing_customer_ref')&&settingsSource.includes('billing_subscription_ref')&&settingsSource.includes('openPortal()'),'Real billing remains bound to the connected Stripe portal');
+ for(const file of ['public/demo/billing-2026-09.pdf','public/demo/billing-2026-10.pdf'])await assert.rejects(()=>fs.access(file),e=>e.code==='ENOENT','Retired demo PDFs must not ship');
+ console.log('SaaS billing uses its real connected portal and ships no fake invoice history or demo PDFs.');
 }
 
 assert.ok(!paidRead.includes("<button"),"Operational document content has no scattered PDF, copy or edit buttons; these actions belong to its existing menu");
