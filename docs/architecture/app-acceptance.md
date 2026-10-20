@@ -1,5 +1,12 @@
 # Gemeinsame App-Abnahme: Kunden-App und One Admin
 
+> Aktuelle Einordnung vom 20.10.2026: Die folgenden Entwicklungsstände und
+> Fehlerverläufe sind datierte Nachweise. PR #295 und #296 wurden inzwischen
+> integriert; Main `d2825134deb33cac67a05c6e703b945ff28066e6` bestand Quality,
+> CodeQL und Full/development und wurde erfolgreich ausgeliefert. Das ersetzt
+> keine vollständige Produkt-/Geräteabnahme. Die Foundation-Korrekturen und ihre
+> offenen Grenzen stehen im [Foundation-Status](foundation-status.md).
+
 Stand: 20.10.2026, Europe/Zurich. Geprüfte Codebasis:
 `c7c95585aafd380db2c70d8a7c27fbd93bdde914`, Branch
 `ux/role-business-flow-consistency`, [Draft-PR #296](https://github.com/oemercam/binso_admin_azure/pull/296).

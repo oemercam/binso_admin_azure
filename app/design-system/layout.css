@@ -349,8 +349,6 @@
     max-width:none;
     margin:0;
     padding-top:var(--mobile-page-top);
-    padding-left:max(var(--mobile-page-x),var(--safe-left));
-    padding-right:max(var(--mobile-page-x),var(--safe-right));
   }
 .page-head{margin-bottom:var(--mobile-page-head-gap);gap:10px}
 .page-head h1{font-size:var(--type-mobile-heading);line-height:1.5;letter-spacing:var(--mobile-title-tracking)}

@@ -1,5 +1,10 @@
 # V21.1 complete cascade candidate matrix
 
+> Historische V21.1-Kandidaten, keine aktuelle Fehlerliste. `app/styles/*` ist
+> abgelöst; diese Werte dürfen nicht als neue Vorgaben verwendet werden.
+> Aktueller Einstieg: [Foundation-Status](foundation-status.md) und das
+> [CSS-Manifest](../../app/design-system/manifest.json).
+
 This lists every property with different declared values for the same selector/context across the canonical sheets. Different state/ordering can be deliberate. No candidate is labelled a confirmed rendered defect without computed-style evidence. Full declarations/props/classes/media/rule source lines are in ux-inventory.json. Removed confirmed obsolete rules are in ../assets/v21-1/css-removal-evidence.json.
 
 | Selector | Context | Property | Ordered sources / values | Assessment |

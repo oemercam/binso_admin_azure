@@ -264,7 +264,7 @@
 .invoice-form .form-section{padding:18px 0}
 .invoice-form .form-section:first-child{padding-top:0}
 .invoice-form .form-section>h2,
-  .invoice-form .section-title h2{font-size:var(--type-body-large);letter-spacing:-.01em}
+  .invoice-form .section-title h2{letter-spacing:-.01em}
 .document-customer-hint{margin:8px 0 0;font-size:var(--type-metadata)}
 .document-customer-hint b,.document-customer-hint span{display:block}
 .document-customer-hint span{margin-top:2px}

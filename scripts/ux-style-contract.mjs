@@ -1,4 +1,10 @@
 /** Validate real parsed declarations and their central root-token definitions. */
+export function styleAcceptance(binding){
+ return `PostCSS prüft die zentrale Bindung ${binding.property}: var(${binding.token}) und deren Root-Definition ${binding.value}; Browser prüfen die berechnete Darstellung je Theme/Viewport.`;
+}
+export function styleDescriptionErrors(rules,bindings){
+ return bindings.filter(binding=>rules.find(rule=>rule.id===binding.id)?.acceptance!==styleAcceptance(binding)).map(binding=>binding.id+': acceptance text must describe the current central binding');
+}
 export function styleBindingErrors(rules,bindings){
  const errors=[];
  for(const binding of bindings){

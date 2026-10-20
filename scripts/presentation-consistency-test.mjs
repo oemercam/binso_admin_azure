@@ -9,6 +9,8 @@ const positive=prune('.label{color:red;padding:4px}.other{color:green}.label{col
 assert.equal(positive.removed.length,1);
 assert.equal(positive.css,'.label{padding:4px}.other{color:green}.label{color:blue}');
 assert.equal(prune('@media(max-width:760px){.label{color:red}.label{color:blue}}').removed.length,1);
+assert.equal(prune('.label{color:red}.label,.other{color:blue}').removed.length,1,'A later plain-selector superset dominates the complete earlier rule');
+assert.equal(prune('.label,.other{color:red}.label,.other,.third{color:blue}').removed.length,1);
 for(const css of [
  '.label{height:100vh}.label{height:100dvh}',
  '.label{color:red}.label{color:color-mix(in srgb,red,blue)}',
@@ -17,6 +19,8 @@ for(const css of [
  '.label{color:red}@media(max-width:760px){.label{color:blue}}',
  '@media(max-width:760px){.label{color:red}}@media(max-width:390px){.label{color:blue}}',
  '.label,.other{color:red}.label{color:blue}',
+ '.label{color:red}.label,:future-pseudo{color:blue}',
+ '.label{color:red}.label,.other{color:blue!important}',
  '.label{color:red}.container .label{color:blue}',
  '@layer{.label{color:red}}@layer{.label{color:blue}}',
  '@keyframes pulse{from{opacity:0}to{opacity:1}}',

@@ -79,7 +79,7 @@ html[data-theme="dark"] .searchbox>input{height:100%;min-width:0;padding:0;borde
   font-weight:750;
 }
 .record-avatar.large{width:52px;height:52px;min-width:52px;font-size:var(--type-section)}
-.desktop-record-table{display:none;width:100%;min-width:0}
+.desktop-record-table{display:none;width:100%}
 .desktop-record-head{min-height:40px;align-items:center;border-bottom:1px solid var(--color-line);grid-template-columns:var(--record-grid)}
 .desktop-record-head>[role="columnheader"]{padding:8px 10px;color:var(--color-muted);font-size:var(--type-metadata);font-weight:400;line-height:1.4}
 .desktop-record-head button{min-width:0;padding:0 10px;border:0;background:transparent;color:var(--color-muted);font-size:var(--type-metadata);font-weight:700;text-align:left;white-space:nowrap;cursor:pointer}

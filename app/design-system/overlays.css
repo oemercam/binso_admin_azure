@@ -10,7 +10,7 @@
 .bottom-sheet[data-wizard] .wizard-progress{position:static;flex:none}
 .bottom-sheet[data-wizard] .form-wizard[data-guided]{height:auto}
 .header-panel-layer{position:fixed;inset:var(--header-panel-top) 0 0;z-index:var(--layer-sheet);display:flex;align-items:flex-start;justify-content:flex-end;padding:8px var(--header-panel-right) 12px 16px;background:var(--palette-rgba-0-0-0-24);overflow:hidden}
-.header-panel{display:flex;flex-direction:column;min-width:0;width:min(420px,100%);max-height:calc(var(--dialog-available-height) - var(--header-panel-top) - 20px);padding:0 16px 16px;background:var(--color-bg);border-radius:var(--shape-group);box-shadow:var(--shadow-modal);overflow:hidden;color:var(--color-fg)}
+.header-panel{display:flex;flex-direction:column;min-width:0;width:min(420px,100%);max-height:calc(var(--dialog-available-height) - var(--header-panel-top) - 20px);padding:0 16px 16px;background:var(--color-bg);border-radius:var(--shape-group);box-shadow:var(--shadow-modal);overflow:hidden}
 .header-panel-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;flex:none;min-height:48px;background:var(--color-bg)}
 .header-panel-heading h2{font-size:var(--type-body);margin:0;font-weight:600}
 .header-panel-heading .icon-button{width:40px;height:40px}
@@ -272,7 +272,7 @@
 
 .header-panel .global-search{flex:1}
 .header-panel-search>.header-panel-heading{display:none}
-.header-panel-heading .icon-button{position:absolute;left:0;margin:0;border:0;border-radius:var(--control-radius);width:44px;height:44px;transform:translateX(-12px)}
+.header-panel-heading .icon-button{position:absolute;left:0;margin:0;width:44px;height:44px;transform:translateX(-12px)}
 .header-panel-heading{position:relative;justify-content:center;min-height:var(--mobile-header-h);padding-inline:44px}
 .header-panel{width:100%;height:100%;max-height:100%;border-radius:0;padding:var(--safe-top) max(var(--mobile-page-x),var(--safe-right)) max(16px,var(--safe-bottom)) max(var(--mobile-page-x),var(--safe-left));box-shadow:none}
 .header-panel-layer{inset:var(--dialog-viewport-top,0px) 0 auto;height:min(var(--dialog-available-height),100dvh);padding:0;justify-content:stretch;background:var(--color-bg)}
