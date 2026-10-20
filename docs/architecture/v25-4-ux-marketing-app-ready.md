@@ -122,3 +122,13 @@ fehlenden Nachweis, Team-Selbstfreigabesperre und den echten Solo-Fall.
 Die Team-API projiziert auch die gespeicherten Tarif-Aliasse starter/professional
 auf start/pro; andernfalls zeigte die Plananzeige trotz gültigem Abo «Unbekannt».
 Der reale Migrations-/API-Test prüft Namen und Grenzen für alle drei Tarife.
+
+Der Entwicklungs-Lab-Lauf wartete einmal auf globale Netzwerkinaktivität trotz
+Next-Hot-Reload-Verbindungen. Nur dieser Entwicklungsweg wartet jetzt auf einen
+nach React-Hydration gesetzten Marker und fertige Schriften, ohne Timeout-Erhöhung
+und ohne entfernte Funktions-/Geometrieassertionen. Fehlende Hydration/Schriften
+bleiben im Gegenfalltest blockierend. Der echte lokale Lab-Lauf bestand Light/Dark
+bei 390/1440 mit Formular-/Dialog-/PDF-Interaktionen (vier Kombinationen).
+Tarifbeschreibungen bewerben keine pauschalen Einkaufs-/Prototypfunktionen mehr;
+Business beschreibt Mitarbeitende, Produkte und Finanzübersicht, Pro den
+freigegebenen unbegrenzten Benutzerumfang. Preise bleiben unverändert.

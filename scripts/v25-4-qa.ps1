@@ -3,7 +3,7 @@ $ErrorActionPreference='Stop'
 . (Join-Path $PSScriptRoot '../../runtime.ps1')
 Push-Location (Join-Path $PSScriptRoot '..')
 try {
-    $binsoChecks=@('module-profile-test','plan-catalog-test','demo-session-test','client-session-test','registration-test','auth-integrity-test','workforce-regression-test','migration-test','app-workspace-test','task-focused-ux-test','navigation-contract-test','navigation-foundation-test','operator-contract-test','localization-test','localization-coverage-test')
+    $binsoChecks=@('module-profile-test','plan-catalog-test','demo-session-test','public-demo-flow-test','client-session-test','registration-test','auth-integrity-test','workforce-regression-test','migration-test','app-workspace-test','lab-readiness-test','task-focused-ux-test','navigation-contract-test','navigation-foundation-test','operator-contract-test','localization-test','localization-coverage-test')
     foreach($binsoCheck in $binsoChecks){
         & node ('scripts/'+$binsoCheck+'.mjs')
         if($LASTEXITCODE -ne 0){throw ('Failed: '+$binsoCheck)}
