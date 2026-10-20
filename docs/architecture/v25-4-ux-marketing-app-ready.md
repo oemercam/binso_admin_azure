@@ -36,7 +36,7 @@ Bestehende Quiet-Loading-, Back-/Draft-, Toggle-, Dateiauswahl-, Modal-, Safe-Ar
 und Notification-Channel-Owner werden weiterverwendet. Keine pauschalen CSS- oder
 Testlöschungen. PR #297 liefert bereits die CSS-/Compliance-Korrekturen.
 
-Gezielter gerenderter Chromium/Edge-Adapter: Standardnavigation unverändert gegen
+Gezielter gerenderter Chromium/Edge-Adapter: Standardnavigation für alle sieben kanonischen Rollen unverändert gegen
 d707; time_only mit zwei Zielen bei 320/390/760 px in Light/Dark, Tastatur, Scrollen
 und Material-Gegenfällen erfolgreich. Quelle ist das tatsächliche Shell-Nav-JSX und
 die aktuelle CSS-Kaskade; kein Ersatz für die vollständige App-/Geräteabnahme. Die
@@ -90,3 +90,15 @@ bleiben separate Voraussetzungen. Browser und PWA sind kein nachgewiesener nativ
 Migrationsprozess erforderlich; keine Ausführung gegen Produktion aus diesem Auftrag.
 Keine Kundendatenlöschung, Kontoneuanlage, externe Mail/Buchung, Merge oder Deployment.
 D07–D15/D17–D18 bleiben offen; nur D16 wurde im Dialog zusätzlich geschlossen.
+
+## Erste Linux-Qualifikation und Korrekturen
+
+Run 39403819211 auf c7403ff4 hat zwei echte veraltete Nachweise gefunden:
+Runtime-Smoke verlangte den anonymen Demo-Login, und die aktive Seitenmatrix
+führte den gelöschten Banner-Owner weiter. Der Smoke-Owner prüft nun öffentliches
+404 ohne Cookie plus Legacy-Redirect und getrennt geschützte lokale QA mit einem
+pro Prozess neu erzeugten Testnachweis. Die neue Prüfung testet die tatsächliche
+Verifier-Funktion positiv/negativ. Kein Zugriffsschutz wurde geöffnet.
+Die Seitenmatrix wurde ausschliesslich über ux-contract-inventory.mjs erneuert;
+alle 76 Routen/12 Varianten bleiben ungeprüft statt erfundener visueller Abnahme.
+Die finale Linux-Qualifikation muss den Nachfolgecommit prüfen.

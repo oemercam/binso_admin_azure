@@ -147,32 +147,22 @@ console.log(`Route/CSS integrity OK: ${routes.length} routes, ${seenAssets.size}
 
 async function verifyDemoFlow(){
   const origin=new URL(base).origin;
-  const response=await fetch(origin+"/api/demo/session",{
-    method:"POST",
-    redirect:"manual",
-    headers:{
-      "content-type":"application/json",
-      "origin":origin,
-      "referer":origin+"/demo",
-      "user-agent":"Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Version/18.0 Mobile/15E148 Safari/604.1",
-    },
-    body:"{}",
-  });
-  const cookie=response.headers.get("set-cookie")||"";
-  if(!response.ok) failures.push(`/api/demo/session: POST returned ${response.status}`);
-  if(!cookie.includes("binso_demo=1")) failures.push("/api/demo/session: demo cookie was not issued");
-  if(response.ok&&cookie.includes("binso_demo=1")){
-    const dashboard=await fetch(origin+"/dashboard",{
-      redirect:"manual",
-      headers:{cookie:"binso_demo=1","cache-control":"no-cache"},
-    });
-    if(dashboard.status>=300&&dashboard.status<400){
-      failures.push(`/dashboard: demo cookie was rejected with redirect ${dashboard.status}`);
-    }else if(!dashboard.ok){
-      failures.push(`/dashboard: demo session returned ${dashboard.status}`);
-    }
-  }
+  const post=headers=>fetch(origin+"/api/demo/session",{method:"POST",redirect:"manual",headers:{"content-type":"application/json",origin,...headers},body:"{}"});
+  const publicResponse=await post({});
+  if(publicResponse.status!==404)failures.push(`/api/demo/session: public POST must be 404, got ${publicResponse.status}`);
+  if(publicResponse.headers.get('set-cookie'))failures.push('Public demo must not issue a cookie');
+  const legacy=await fetch(origin+'/demo',{redirect:'manual'});
+  if(![307,308].includes(legacy.status)||new URL(legacy.headers.get('location')??'',origin).pathname!=='/registrieren')failures.push('Legacy demo must redirect to registration');
+  const local=['127.0.0.1','localhost','[::1]'].includes(new URL(origin).hostname);
+  if(local){
+    if(!process.env.BINSO_SMOKE_TEST_TOKEN){failures.push('Local QA proof missing: run the isolated runtime-smoke harness');return;}
+    const response=await post({'x-binso-smoke-test':process.env.BINSO_SMOKE_TEST_TOKEN});
+    const cookie=response.headers.get('set-cookie')??'';
+    if(!response.ok||!cookie.includes('binso_demo=1'))failures.push('Protected local QA must still issue its isolated cookie');
+    if(response.ok){const dashboard=await fetch(origin+'/dashboard',{redirect:'manual',headers:{cookie:'binso_demo=1','cache-control':'no-cache'}});if(!dashboard.ok)failures.push('Protected local QA dashboard unavailable');}
+  }else console.log('Protected QA provisioning not executed against external targets.');
 }
+
 await verifyDemoFlow();
 
 if(failures.length){
@@ -180,6 +170,6 @@ if(failures.length){
   for(const failure of failures) console.error("- "+failure);
   process.exit(1);
 }
-console.log("Demo flow integrity OK.");
+console.log("Public demo denial/redirect and configured isolated QA integrity OK.");
 
 await import("./check-theme.mjs");

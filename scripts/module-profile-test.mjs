@@ -15,7 +15,7 @@ assert.ok(tenantPermissions('member','time_only').every(permission=>tenantCan('m
 const shell=await fs.readFile('components/app-shell.tsx','utf8');
 assert.match(shell,/tenantCanOpenPath\(access.role,path,access.moduleProfile\)/);
 assert.match(shell,/canOpen\("\/dashboard"\)&&<Link/);
-assert.match(shell,/canOpen\("\/finanzen"\)&&<Link/);
+assert.match(shell,/access\?\.moduleProfile!=="time_only"\|\|canOpen\("\/finanzen"\)/);
 assert.match(shell,/filter\(\(\[href\]\)=>canOpen\(href\)\)/);
 console.log('Module profile navigation: positive/negative permission and shell wiring checks passed.');
 
