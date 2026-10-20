@@ -25,7 +25,7 @@ export async function listOperatorBusiness(c:PoolClient,s:OperatorSession,table:
  const allowedOrder=/^(created_at|updated_at|paid_on)\.(asc|desc)$/.exec(requestedOrder);
  if(!allowedOrder||allowedOrder[1]==='paid_on'&&table!=='payments')throw new ApiError(400,'invalid_order','Ungültige Sortierung.');
  const rows=(await c.query<Row>(`select * from (${definition.sql}) q ${where.length?'where '+where.join(' and '):''} order by q.${allowedOrder[1]} ${allowedOrder[2]} limit ${limit}`,params)).rows;
- return rows.map(row=>{if(table==='tenant_accounts'){const plan=canonicalPlanId(row.plan);return plan&&row.entitlements_configured===true?{...row,user_limit:effectiveUserLimit(plan,row.user_limit)}:row;}if(table==='tenants'&&row.account){const account=row.account as Row,plan=canonicalPlanId(account.plan);return plan&&account.entitlements_configured===true?{...row,account:{...account,user_limit:effectiveUserLimit(plan,account.user_limit)}}:row;}return row;});
+ return rows.map(row=>{if(table==='tenant_accounts'){const plan=canonicalPlanId(row.plan);return plan?{...row,plan,...(row.entitlements_configured===true?{user_limit:effectiveUserLimit(plan,row.user_limit)}:{})}:row;}if(table==='tenants'&&row.account){const account=row.account as Row,plan=canonicalPlanId(account.plan);return plan?{...row,account:{...account,plan,...(account.entitlements_configured===true?{user_limit:effectiveUserLimit(plan,account.user_limit)}:{})}}:row;}return row;});
 }
 export async function insertOperatorBusiness(c:PoolClient,s:OperatorSession,table:string,data:Row){
  if(table==='support_messages'){

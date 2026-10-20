@@ -84,6 +84,8 @@ try{
  await db.query("update organization_subscriptions set plan='professional' where organization_id=$1",[org]);
  const unlimitedAccount=(await repository.listOperatorBusiness(client,globalThis.operatorContractSession,'tenant_accounts','tenant_id=eq.'+org))[0];assert.equal(unlimitedAccount.user_limit,null);assert.equal(unlimitedAccount.entitlements_configured,true);
  assert.equal((await accounts.PATCH(req('/api/operator/accounts/'+org,{userLimit:6},'PATCH'),accountParams)).status,400,'Pro cannot acquire a hidden regular cap');
+ await db.query("update organization_subscriptions set plan='enterprise' where organization_id=$1",[org]);
+ const legacyAccount=(await repository.listOperatorBusiness(client,globalThis.operatorContractSession,'tenant_accounts','tenant_id=eq.'+org))[0];assert.equal(legacyAccount.plan,'pro');assert.equal(legacyAccount.user_limit,null);
  await db.query("update organization_subscriptions set billing_subscription_id='sub_fixture' where organization_id=$1",[org]);assert.equal((await accounts.PATCH(req('/api/operator/accounts/'+org,{plan:'pro'},'PATCH'),accountParams)).status,409,'Stripe subscription cannot be overwritten locally');
  globalThis.operatorContractSession={role:'platform_billing',userId:'fixture',email:'fixture@invalid.test'};assert.equal((await accounts.PATCH(req('/api/operator/accounts/'+org,{accountStatus:'suspended'},'PATCH'),accountParams)).status,403,'Billing role cannot bypass restriction permission through the account API');
  globalThis.operatorContractSession={role:'platform_support',userId:'fixture',email:'fixture@invalid.test'};

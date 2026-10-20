@@ -677,6 +677,8 @@ try{
  const invitationPlanBefore=(await db.query('select plan from organization_subscriptions where organization_id=$1',[demo])).rows[0].plan;
  await db.query("update organization_subscriptions set plan='professional' where organization_id=$1",[demo]);
  assert.equal((await team.GET()).data.userLimit,null,'Pro ignores the old stored finite quota');
+ for(const [storedPlan,plan,limit] of [['starter','start',3],['business','business',15],['professional','pro',null]]){await db.query('update organization_subscriptions set plan=$2 where organization_id=$1',[demo,storedPlan]);const projection=(await team.GET()).data;assert.equal(projection.plan,plan,'Team API uses the canonical visible tariff');assert.equal(projection.userLimit,limit);}
+
  const inviteRequest=(email,role,key)=>({body:{email,role},headers:new Headers({'Idempotency-Key':key})});
  const atomicInvite=await team.POST(inviteRequest('atomic-invite@fixture.invalid','finance','invitation-atomic-fixture'));assert.equal(atomicInvite.status,201,JSON.stringify(atomicInvite));
  assert.equal((await team.POST(inviteRequest('atomic-invite@fixture.invalid','finance','invitation-atomic-fixture'))).data.id,atomicInvite.data.id);assert.equal(globalThis.__invitationMails.length,1,'A timeout replay does not send twice');

@@ -118,3 +118,7 @@ kontrolliert an: Schalter bleibt beim bestätigten Wert, erst das ACK ändert ih
 Die freigegebene Solo-Inhaber-Ausnahme gilt auch beim Einreichen eines belegten
 Monatsrapports; der echte PATCH-Handler und die restriktive Runtime-Rolle prüfen
 fehlenden Nachweis, Team-Selbstfreigabesperre und den echten Solo-Fall.
+
+Die Team-API projiziert auch die gespeicherten Tarif-Aliasse starter/professional
+auf start/pro; andernfalls zeigte die Plananzeige trotz gültigem Abo «Unbekannt».
+Der reale Migrations-/API-Test prüft Namen und Grenzen für alle drei Tarife.
