@@ -267,3 +267,20 @@ eigenen aktuellen CI-Nachweis. Die Browsermatrix ist weiterhin nicht bestanden.
 Aktuelle Nachfolgeläufe und SHA stehen im PR #296. Fehlerhafte Vorläufe bleiben
 verlinkt. Routen, fehlende Originalzustände und Geräte bleiben offen, bis die
 jeweiligen Fälle tatsächlich bestanden sind; keine pauschale App-Freigabe.
+
+### Zahlungsformular: nachgewiesene Lade-Regression
+
+Full/development [Run 39344355315](https://github.com/oemercam/binso_admin_azure/actions/runs/39344355315)
+für `247aa847` hat Build, PostgreSQL-/HTTP-Verträge, Sicherheitsprüfungen und sechs
+von acht Browserjobs bestanden. Beide responsiven Teilmengen 0 scheitern an der
+gleichen initialen Rechnungsauswahl. Lokal reproduziert: Beim Wechsel auf
+DirectorySelect fehlte die bisherige Sperre während `invoicesLoading`. Diese wird
+wieder übergeben. Der Browserfall adressiert das beschriftete Feld und dessen
+zugehöriges natives Wertmodell statt des ersten Selects der gesamten Seite.
+Ladesperre, Rechnungs-ID, Erhalt eingegebenen Betrags und der Notiz sowie die
+Rückfrage bei ungespeicherten Daten bleiben verbindlich. Ein neuer vollständiger
+CI-Nachweis ist erforderlich; die fehlgeschlagenen Jobs zählen nicht als bestanden.
+Der lokale Dev-Browserlauf wurde nach 180 Sekunden am eigenen Prozessbaum
+beendet. Er ist kein bestandener Gesamtnachweis. Typecheck, gezieltes ESLint,
+UX-Regressions-, Architektur- und UX-Vertragsprüfung sind lokal erfolgreich;
+der vollständige Zahlungsdatenablauf wird im aktuellen CI-Kandidaten geprüft.

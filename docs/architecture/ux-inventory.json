@@ -208074,6 +208074,7 @@
           "props": [
             "label=\"Rechnung\"",
             "required",
+            "disabled={invoicesLoading}",
             "endpoint={production?\"/api/documents?kind=invoice&display_status=eq.open\":\"/api/demo/data?collection=documents&kind=invoice\"}",
             "value={invoiceId}",
             "selectable={item=>!['draft','cancelled','paid'].includes(String(item.status))&&openAmount(item)>0}",

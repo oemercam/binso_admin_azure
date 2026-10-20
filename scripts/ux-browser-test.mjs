@@ -1275,9 +1275,11 @@ try{
    const hydrationForm=await trackedPage();
    try{
     await hydrationForm.goto(base+'/zahlungen/neu?invoice=RE-TEST-1');
-    await hydrationForm.waitForFunction(()=>document.querySelector('select')?.disabled);assert.equal(await hydrationForm.getByLabel('Rechnung',{exact:true}).isDisabled(),true,'Invoice lookup is deliberately pending');
+    await hydrationForm.getByLabel('Rechnung',{exact:true}).waitFor({state:'visible'});assert.equal(await hydrationForm.getByLabel('Rechnung',{exact:true}).isDisabled(),true,'Invoice lookup is deliberately pending');
     await hydrationForm.getByLabel('Notiz',{exact:true}).fill('Written before invoice hydration');await hydrationForm.getByLabel('Zahlungsbetrag CHF',{exact:true}).fill('12.50');releaseInvoice();
-    await hydrationForm.waitForFunction(()=>document.querySelector('select')?.value==='invoice-one');
+    const invoiceControlId=await hydrationForm.getByLabel('Rechnung',{exact:true}).locator('..').locator('select').getAttribute('id');
+    try{await hydrationForm.waitForFunction(id=>{const control=document.getElementById(id);return control?.value==='invoice-one'&&!control.disabled;},invoiceControlId);}
+    catch(error){console.log('Invoice hydration controls',await hydrationForm.locator('select').evaluateAll(items=>items.map(el=>({label:el.getAttribute('aria-label'),value:el.value,disabled:el.disabled,options:[...el.options].map(option=>option.value)}))));throw error;}
     assert.equal(await appControlValue(hydrationForm.getByLabel('Zahlungsbetrag CHF',{exact:true})),'12.50','Invoice hydration cannot overwrite an already entered amount');
     await hydrationForm.getByRole('dialog',{name:'Zahlung erfassen',exact:true}).getByRole('button',{name:'Schliessen',exact:true}).click();
     const hydrationDiscard=hydrationForm.getByRole('alertdialog');await hydrationDiscard.waitFor();
