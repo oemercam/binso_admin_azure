@@ -14,9 +14,40 @@ current deployment workflow and browser fixtures depend on demo functionality.
 These code dependencies must be replaced before deleting their live data.
 Production diagnostic findings are retained separately, not published here.
 
-The currently checked-in change only prepares a broader read-only inventory.
-It does not implement the complete retirement or reset, and must not be reported
-as completed demo removal or successful production deployment.
+The initial Main change only prepared a broader read-only inventory. The current
+implementation branch retires demo access and adds a tested, bounded reset engine.
+Complete demo retirement and release qualification remain unfinished; a database
+reset must never be reported as a successful application deployment.
+
+## Updated reset authorization and implementation
+
+The owner subsequently authorized deleting all existing application companies,
+business data and other application users, retaining only the explicitly named
+existing Entra platform owner. This supersedes the earlier requirement to retain
+all personal identities/operator assignments. It does not authorize deleting Entra
+accounts, changing App Roles/RBAC, dropping schemas, changing RLS or Azure resources.
+
+`scripts/test-data-reset.mjs` has no automatic production CLI. Its caller must
+supply the retained email, Entra object/tenant IDs and an independently reviewed
+table allowlist. The plan binds company IDs, owner fingerprints, schema, constraints,
+policies and triggers. Unknown scope, partitions, TRUNCATE triggers or drift block
+execution. Authentication secrets are not exported into the plan.
+
+The apply operation locks the reviewed tables and identity/configuration owners,
+revalidates the plan, and uses one explicit `TRUNCATE ... RESTRICT` statement.
+It never uses CASCADE, disables RLS, grants privileges or drops/recreates objects.
+Other application identities/operator assignments are deleted; the retained
+owner, any matching personal identity and existing owner sessions are compared
+before commit. Schema, policies, constraints, triggers, migration history and
+tariff/operational configuration must remain unchanged. Errors roll back the
+uncommitted transaction; there is no automatic post-commit restore.
+
+`scripts/test-data-reset-test.mjs` applies the full migration lineage in an isolated
+database and tests real owner/FORCE-RLS behavior, exact scope, identity mismatch,
+tampered confirmation, drift denial, empty tables and preserved owner/configuration.
+Production plans, backup findings and receipts remain local, outside this public
+repository. External blob/provider deletion is a separate concern and must never
+be inferred from database truncation or a currently absent storage configuration.
 
 ## Inventory before irreversible action
 
