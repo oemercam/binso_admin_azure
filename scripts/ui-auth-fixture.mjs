@@ -6,7 +6,7 @@ import pg from 'pg';
 /** Real sessions in a disposable loopback database, never an app auth bypass. */
 export async function createUiAuthFixture(){
  const url=new URL(process.env.BINSO_UI_TEST_URL??'postgres://binso_test:binso_test@127.0.0.1:5432/binso_ui_test');
- assert.ok(['127.0.0.1','localhost'].includes(url.hostname)&&url.pathname==='/binso_ui_test'&&url.username==='binso_test','UI authentication requires the isolated loopback QA database');
+ assert.ok(['postgres:','postgresql:'].includes(url.protocol)&&['127.0.0.1','localhost'].includes(url.hostname)&&url.pathname==='/binso_ui_test'&&url.username==='binso_test'&&!url.search&&!url.hash,'UI authentication requires the isolated loopback QA database without connection overrides');
  const adminUrl=new URL(url);adminUrl.pathname='/binso_observability_test';
  const admin=new pg.Client({connectionString:adminUrl.href});await admin.connect();
  try{if(!(await admin.query("select 1 from pg_database where datname='binso_ui_test'")).rowCount)await admin.query('create database binso_ui_test');}finally{await admin.end();}

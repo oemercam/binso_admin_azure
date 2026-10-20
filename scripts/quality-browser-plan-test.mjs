@@ -4,6 +4,7 @@ import {createRequire} from 'node:module';
 import {browserLanes} from './quality-browser-plan.mjs';
 import {planChanges} from './qa-plan.mjs';
 import {partition} from './browser-shards.mjs';
+import {createUiAuthFixture} from './ui-auth-fixture.mjs';
 
 for(const level of ['standard','full']){
  const plan=planChanges(['components/product-form.tsx'],{level});
@@ -32,7 +33,13 @@ for(const gate of ['pnpm lint','pnpm typecheck','pnpm build','pnpm security:scan
 const require=createRequire(import.meta.url);
 const yaml=createRequire(require.resolve('eslint'))('js-yaml');
 const config=yaml.load(workflow);
-assert.equal(config.jobs.browser.services.postgres.image,"${{ matrix.lane == 'functional' && 'postgres:16' || '' }}",'Only real API browser suites start PostgreSQL; responsive fixtures have no database');
+assert.equal(config.jobs.browser.services.postgres.image,'postgres:16','Every UI lane authenticates real isolated operator sessions; no demo-cookie bypass');
+const originalUiUrl=process.env.BINSO_UI_TEST_URL;
+try{
+ for(const address of ['postgres://binso_test:test@production.invalid:5432/binso_ui_test','postgres://binso_test:test@127.0.0.1:5432/production','postgres://owner:test@127.0.0.1:5432/binso_ui_test','postgres://binso_test:test@127.0.0.1:5432/binso_ui_test?host=production.invalid','https://binso_test:test@127.0.0.1/binso_ui_test']){
+  process.env.BINSO_UI_TEST_URL=address;await assert.rejects(()=>createUiAuthFixture(),/isolated loopback QA database/);
+ }
+}finally{if(originalUiUrl===undefined)delete process.env.BINSO_UI_TEST_URL;else process.env.BINSO_UI_TEST_URL=originalUiUrl;}
 for(const step of config.jobs.browser.steps.filter(s=>/node scripts\/|pnpm ux:lab/.test(s.run??''))){
  if(step.run.includes('node scripts/release-artifact.mjs verify')){
   assert.equal(step.name,'Extract exact production candidate','Only shared candidate preparation may run on every lane');

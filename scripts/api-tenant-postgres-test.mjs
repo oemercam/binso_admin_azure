@@ -68,6 +68,9 @@ try{
  const reportRoles=["owner","admin","finance","hr","project_manager","manager","reader"];
  const readContracts=[
   ["/api/reports",reportRoles],
+  ['/api/auth/passkeys',roles],
+  ['/api/time-entries/options?kind=customers',expenseRoles],
+  ['/api/time-entries/options?kind=projects',expenseRoles],
   ['/api/workforce-assignments',['owner','admin']],
   ...['/api/auth/mfa','/api/auth/register','/api/auth/session','/api/auth/sessions','/api/dashboard','/api/files','/api/finance/overview','/api/integrations/status','/api/notifications','/api/search?q=Alpen','/api/settings/company','/api/settings/documents','/api/settings/notifications','/api/settings/profile','/api/support/tickets'].map(path=>[path,roles]),
   ...['/api/billing/catalog','/api/payments','/api/finance','/api/settings/subscription','/api/time-entries/billing','/api/expenses/billing'].map(path=>[path,finance]),
