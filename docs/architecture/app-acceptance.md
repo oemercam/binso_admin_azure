@@ -284,3 +284,11 @@ Der lokale Dev-Browserlauf wurde nach 180 Sekunden am eigenen Prozessbaum
 beendet. Er ist kein bestandener Gesamtnachweis. Typecheck, gezieltes ESLint,
 UX-Regressions-, Architektur- und UX-Vertragsprüfung sind lokal erfolgreich;
 der vollständige Zahlungsdatenablauf wird im aktuellen CI-Kandidaten geprüft.
+Der CI-Nachlauf auf `146d375d` hat diesen Hydrations-/Dirty-Guard-Fall in Chromium
+und WebKit überwunden. Danach meldet er beim gleichnamigen Kundenpaar drei statt
+zwei Optionen: Das zentrale DirectorySelect enthält zusätzlich den unselektierten
+Platzhalter. Der Gegenfall prüft nun exakt die IDs `customer-one` und `customer-two`,
+beide gleichen Namen und separat genau einen leeren Platzhalter. Auswahlwechsel,
+Umbenennung und Erhalt der gewählten ID werden weiterhin geprüft. Der abhängige
+Fingerprint wird nach Abschluss aller Änderungen mit dem vorgesehenen Generator
+erneuert; keine Hashwerte werden manuell eingesetzt.
