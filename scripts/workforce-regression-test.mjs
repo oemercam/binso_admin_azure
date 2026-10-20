@@ -1,3 +1,4 @@
+import {moduleUrl} from './data-test-modules.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import {createHash,randomUUID} from 'node:crypto';
@@ -30,6 +31,35 @@ try{
  }
  const run=async(user,fn)=>{await db.exec('begin');try{await db.exec('set local role binso_runtime');await db.query("select set_config('app.organization_id',$1,true),set_config('app.user_id',$2,true)",[org,user]);const result=await fn();await db.exec('commit');return result;}catch(error){await db.exec('rollback');throw error}};
  const query=(sql,args=[])=>db.query(sql,args);
+ assert.equal((await run(owner,()=>query('select app_is_solo_owner() allowed'))).rows[0].allowed,false,'A team owner is not a solo owner');
+ assert.equal((await run(member,()=>query('select app_is_solo_owner() allowed'))).rows[0].allowed,false,'Employees never inherit the owner exception');
+ await db.query("update organization_memberships set status='invited' where organization_id=$1 and user_id<>$2",[org,owner]);
+ assert.equal((await run(owner,()=>query('select app_is_solo_owner() allowed'))).rows[0].allowed,false,'An employee record still prevents solo approval');
+ await db.query('update employees set active=false where id=$1',[employee]);
+ assert.equal((await run(owner,()=>query('select app_is_solo_owner() allowed'))).rows[0].allowed,true);
+ await db.query('update employees set active=true where id=$1',[employee]);
+ await db.query("update organization_memberships set status='active' where organization_id=$1",[org]);
+ // Execute the real minimal picker against migrated RLS, not a copied query.
+ await db.query("update organization_memberships set module_profile='time_only' where organization_id=$1 and user_id=$2",[org,member]);
+ await assert.rejects(()=>db.query("update organization_memberships set module_profile='time_only' where organization_id=$1 and user_id=$2",[org,owner]),error=>error.code==='23514');
+ const permissionUrl=moduleUrl(await fs.readFile('lib/permissions.ts','utf8'));
+ const rbacUrl=moduleUrl((await fs.readFile('lib/server/rbac.ts','utf8')).replace('import "server-only";','').replace('"@/lib/permissions"',JSON.stringify(permissionUrl)));
+ const httpUrl=moduleUrl("export class ApiError extends Error{constructor(status,code,message){super(message);this.status=status;this.code=code}}export const json=data=>({status:200,data});export const apiError=error=>({status:error.status??500});");
+ globalThis.__profilePickerRun=fn=>run(member,()=>fn({query}));
+ const dependencies={'@/lib/server/http':httpUrl,'@/lib/server/rbac':rbacUrl,'@/lib/server/session':moduleUrl('export const requireSession=async()=>globalThis.__profilePickerSession;'),'@/lib/server/db':moduleUrl('export const withTenant=async(org,user,fn)=>globalThis.__profilePickerRun(fn);')};
+ let pickerSource=await fs.readFile('app/api/time-entries/options/route.ts','utf8');for(const [name,url] of Object.entries(dependencies))pickerSource=pickerSource.replaceAll("'"+name+"'",JSON.stringify(url));
+ const picker=await import(moduleUrl(pickerSource));
+ globalThis.__profilePickerSession={organizationId:org,userId:member,role:'member',moduleProfile:'time_only',organizationStatus:'active'};
+ const pick=search=>picker.GET({nextUrl:new URL('https://fixture.invalid/api/time-entries/options?'+search)});
+ const assigned=await pick('kind=projects');assert.equal(assigned.status,200);assert.deepEqual(assigned.data.items.map(x=>x.id),[project]);assert.deepEqual(Object.keys(assigned.data.items[0]).sort(),['customer_id','id','name','status']);
+ assert.equal((await pick('kind=customers')).data.total,1);
+ assert.equal((await pick('kind=customers&id=eq.'+customers[1])).data.total,0,'Unassigned direct IDs never expand the picker');
+ assert.equal((await pick('kind=customers&id=eq.'+customers[2])).data.total,0,'Cross-tenant direct IDs remain invisible');
+ assert.equal((await pick('kind=projects&limit=500')).status,400);
+ assert.equal((await run(member,()=>query('select id from file_objects where id=$1',[files[0]]))).rows.length,0,'Time-only blocks customer files even with a valid customer assignment');
+ await db.query("update organization_memberships set module_profile='standard' where organization_id=$1 and user_id=$2",[org,member]);
+ delete globalThis.__profilePickerRun;delete globalThis.__profilePickerSession;
+ console.log('Time-only: actual minimal picker, role/profile constraints, assignment/direct-ID/tenant negatives and file RLS passed.');
  assert.deepEqual((await run(member,()=>query('select id from customers'))).rows.map(x=>x.id),[customers[0]]);
  assert.equal((await run(member,()=>query('select id from customers where id=$1',[customers[1]]))).rows.length,0,'Direct unassigned ID is invisible');
  assert.equal((await run(member,()=>query('select id from file_objects where id=$1',[files[0]]))).rows.length,1,'Assigned attachment metadata is visible');
@@ -47,6 +77,9 @@ try{
  await assert.rejects(()=>run(member,()=>insertTime(customers[1],null)),error=>error.code==='42501');
  await assert.rejects(()=>run(member,()=>insertTime(customers[0],project,new Date().toISOString().slice(0,7)+'-01')),error=>error.code==='23514'&&error.constraint==='monthly_time_no_overlap');
  await assert.rejects(()=>run(member,()=>query('update time_entries set approved=true where id=$1',[daily])),error=>error.code==='42501');
+ await assert.rejects(()=>run(reviewer,()=>query('update time_entries set approved=true where id=$1',[daily])),error=>error.code==='42501','Draft approval is forbidden even for an independent admin');
+ await assert.rejects(()=>run(reviewer,()=>query('update time_entries set submitted_at=now(),approved=true where id=$1',[daily])),error=>error.code==='42501','A reviewer cannot manufacture submission in the approval write');
+ await run(member,()=>query('update time_entries set submitted_at=now() where id=$1',[daily]));
  await run(reviewer,()=>query('update time_entries set approved=true where id=$1',[daily]));
  const expense=(await run(member,()=>query("insert into expenses(organization_id,external_id,employee_id,customer_id,expense_date,description,merchant,category,quantity,unit_price,currency,status,created_by_user_id) values($1,'workforce-expense',$2,$3,current_date,'Synthetic meal','Synthetic merchant','expense',1,42,'CHF','submitted',$4) returning id",[org,employee,customers[0],member]))).rows[0].id;
  await assert.rejects(()=>run(member,()=>query('update expenses set customer_id=$2 where id=$1',[expense,customers[1]])),error=>error.code==='42501','Draft edits cannot move an expense to an unassigned customer');
@@ -59,5 +92,36 @@ try{
  assert.equal((await run(member,()=>query('select body from file_contents where file_id=$1',[files[0]]))).rows.length,0,'Revocation also removes attachment access');
  await assert.rejects(()=>run(member,()=>insertTime(customers[0],project)),error=>error.code==='42501');
  assert.equal((await run(member,()=>query('select id from time_entries where id=$1',[daily]))).rows.length,1,'Revocation preserves own recorded history');
+ // Actual monthly submit handler: signed evidence first, solo exception only.
+ const soloOrg=randomUUID(),soloUser='wf-solo-owner';
+ await db.query("insert into organizations(id,name,slug) values($1,'Synthetic solo',$2)",[soloOrg,'wf-'+soloOrg]);
+ await db.query("insert into app_users(id,email,display_name,status) values($1,'wf-solo@example.invalid','Synthetic solo','active')",[soloUser]);
+ await db.query("insert into organization_memberships(organization_id,user_id,email,role,status) values($1,$2,'wf-solo@example.invalid','owner','active')",[soloOrg,soloUser]);
+ const soloCustomer=(await db.query("insert into customers(organization_id,external_id,customer_no,name) values($1,'wf-solo','wf-solo','Synthetic solo customer') returning id",[soloOrg])).rows[0].id;
+ const soloEntry=(await db.query("insert into time_entries(organization_id,external_id,person_name,worker_type,customer_id,work_date,report_month,hours,description,billable,approved,created_by_user_id) values($1,'wf-solo-report','Synthetic solo','employee',$2,date_trunc('month',current_date)::date,date_trunc('month',current_date)::date,198,'Synthetic signed report',true,false,$3) returning id",[soloOrg,soloCustomer,soloUser])).rows[0].id;
+ globalThis.__soloPatchSession={organizationId:soloOrg,userId:soloUser,role:'owner',organizationStatus:'active'};
+ globalThis.__soloPatchRun=async fn=>{await db.exec('begin');try{await db.exec('set local role binso_runtime');await db.query("select set_config('app.organization_id',$1,true),set_config('app.user_id',$2,true)",[globalThis.__soloPatchSession.organizationId,globalThis.__soloPatchSession.userId]);const result=await fn({query:async(sql,args)=>{const r=await db.query(sql,args);return {...r,rowCount:r.rows.length||r.affectedRows||0}}});await db.exec('commit');return result;}catch(error){await db.exec('rollback');throw error}};
+ const patchHttp=moduleUrl("export class ApiError extends Error{constructor(status,code,message){super(message);this.status=status}}export const apiError=e=>({status:e.status??500});export const json=data=>({status:200,data});export const assertSameOrigin=()=>{};export const readJson=async r=>r.body;");
+ const workforceUrl=moduleUrl((await fs.readFile('lib/server/workforce-access.ts','utf8')).replace("import 'server-only';",'').replace("'./http'",JSON.stringify(patchHttp)).replace("'./rbac'",JSON.stringify(rbacUrl)));
+ const patchDependencies={'@/lib/server/http':patchHttp,'@/lib/server/session':moduleUrl('export const requireSession=async()=>globalThis.__soloPatchSession;'),'@/lib/server/db':moduleUrl('export const withTenant=async(org,user,fn)=>globalThis.__soloPatchRun(fn);'),'@/lib/server/rbac':rbacUrl,'@/lib/permissions':permissionUrl,'@/lib/server/workforce-access':workforceUrl,'@/lib/server/file-access':moduleUrl("export const accessibleFileStatuses=()=>['clean'];"),'@/lib/server/audit':moduleUrl('export const audit=async()=>{};')};
+ let patchSource=await fs.readFile('app/api/time-entries/[id]/route.ts','utf8');for(const [name,url] of Object.entries(patchDependencies))patchSource=patchSource.replaceAll(JSON.stringify(name),JSON.stringify(url));
+ const patch=await import(moduleUrl(patchSource)),submit=()=>patch.PATCH({body:{action:'submit'}},{params:Promise.resolve({id:soloEntry})});
+ assert.equal((await submit()).status,409,'Even solo owners must provide a signed monthly report');
+ await db.query("insert into file_objects(organization_id,object_key,original_name,content_type,size_bytes,sha256,scan_status,created_by,purpose,time_entry_id) values($1,$2,'Synthetic signed.txt','text/plain',4,$3,'clean',$4,'time_report',$5)",[soloOrg,soloOrg+'/'+randomUUID(),createHash('sha256').update('test').digest('hex'),soloUser,soloEntry]);
+ const soloColleague='wf-solo-colleague';
+ await db.query("insert into app_users(id,email,display_name,status) values($1,'wf-solo-colleague@example.invalid','Synthetic colleague','active')",[soloColleague]);
+ await db.query("insert into organization_memberships(organization_id,user_id,email,role,status) values($1,$2,'wf-solo-colleague@example.invalid','member','active')",[soloOrg,soloColleague]);
+ const teamSubmit=await submit();assert.equal(teamSubmit.status,200);assert.equal(teamSubmit.data.item.approved,false,'A team owner still needs independent review');
+ const ownApprove=()=>patch.PATCH({body:{action:'approve'}},{params:Promise.resolve({id:soloEntry})});assert.equal((await ownApprove()).status,403);
+ await db.query("update organization_memberships set status='invited' where organization_id=$1 and user_id=$2",[soloOrg,soloColleague]);
+ const soloSubmit=await submit();assert.equal(soloSubmit.status,200);assert.equal(soloSubmit.data.item.approved,true,'Signed solo-owner monthly work becomes billable without false four-eyes review');
+ const internalEntry=(await run(member,()=>query("insert into time_entries(organization_id,external_id,employee_id,person_name,worker_type,work_date,hours,description,billable,approved,created_by_user_id) values($1,$2,$3,'Synthetic','employee',current_date,1,'Internal work',false,false,$4) returning id",[org,randomUUID(),employee,member]))).rows[0].id;
+ globalThis.__soloPatchSession={organizationId:org,userId:member,role:'member',organizationStatus:'active'};
+ const internalSubmit=await patch.PATCH({body:{action:'submit'}},{params:Promise.resolve({id:internalEntry})});assert.equal(internalSubmit.status,200);assert.equal(internalSubmit.data.item.approved,false);assert.equal(internalSubmit.data.item.billable,false);
+ globalThis.__soloPatchSession={organizationId:org,userId:reviewer,role:'admin',organizationStatus:'active'};
+ const internalApproved=await patch.PATCH({body:{action:'approve'}},{params:Promise.resolve({id:internalEntry})});assert.equal(internalApproved.status,200);assert.equal(internalApproved.data.item.approved,true);assert.equal(internalApproved.data.item.billable,false,'Working-time approval never changes billability');
+ assert.equal((await run(reviewer,()=>query('select id from time_entries where id=$1 and billable and approved',[internalEntry]))).rows.length,0,'Internal approved time is excluded from invoicing eligibility');
+ delete globalThis.__soloPatchSession;delete globalThis.__soloPatchRun;
+ console.log('Actual solo-owner monthly API: missing signed evidence denied, team self-approval denied and signed solo submit approved under runtime RLS.');
  console.log('Workforce: real runtime RLS, direct-ID/tenant denial, exact order scope, write/revocation guards, monthly overlap, independent approval and immutable history passed.');
 }finally{await db.close()}

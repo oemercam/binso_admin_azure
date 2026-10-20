@@ -33,8 +33,8 @@ export async function PATCH(request:NextRequest,{params}:{params:Promise<{id:str
     }
     if(body.userLimit!==undefined){
       const limit=Number(body.userLimit);
-      if(!Number.isInteger(limit)||limit<1||limit>10000) return json({error:"user_limit_invalid",message:"Ungültiges Benutzerlimit."},400);
-      patch.user_limit=limit;
+      if(body.userLimit!==null&&(!Number.isSafeInteger(limit)||limit<1)) return json({error:"user_limit_invalid",message:"Ungültiges Benutzerlimit."},400);
+      patch.user_limit=body.userLimit===null?null:limit;
     }
     if(!Object.keys(patch).length) return json({error:"empty_patch",message:"Keine Änderung angegeben."},400);
     const item=await withPlatform(async c=>{

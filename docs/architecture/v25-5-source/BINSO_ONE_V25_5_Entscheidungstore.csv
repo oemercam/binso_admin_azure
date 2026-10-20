@@ -1,0 +1,41 @@
+﻿Gate_ID;Gegenstand;Status;Vorgehen_oder_Freigabevoraussetzung;Normstatus;Zustaendig
+PL-G01;Eine Identität pro Firma;Bestätigt;"Sperre für zweite aktive Mitgliedschaft; Migration existierender Daten prüfen";[B];Identity, DB, Security
+PL-G02;Passkey bevorzugt;Bestätigt;WebAuthn, Face ID Touch ID via Geräte-Signatur und fallback;[B];Security
+PL-G03;Owner Admin Finance MFA;Bestätigt;Kein Abschwächen aktueller TOTP Pflicht, Äquivalenz von Passkeys separat abnehmen;[B/G];Security
+PL-G04;Hochrisiko Recovery Beweisprozess;Freigabegate;Dokumente, Prüfkompetenz, zwei unabhängige Prüfpersonen, Missbrauchstest;[G];Security + Legal
+PL-G05;Hochrisiko Recovery Wartezeit;Freigabegate;"48 Stunden nur Vorschlag; risikobasierte Kriterien schriftlich";[G];Security + Legal
+PL-G06;Firmeninhaber Transfer;Konzeptstandard;Bestätigung beider Nutzer, mindestens ein aktiver Owner, Unternehmensnachweis Sonderfall;[S/G];Product + Security
+PL-G07;Sicherheits-Break Glass;Freigabegate;JIT Dauer Scope Vier Augen Audit und Kundenkommunikation;[G];Security + Platform Admin
+PL-G08;Trial Start und Zeitberechnung;Standardvorschlag;Verifizierte E-Mail plus 14 x 24 h, DST/UTC Tests;[S];Product + Engineering
+PL-G09;Trial ablaufen Read only;Bestätigt;"Kein Autocharge; Lesen Export Support Sicherheit erlauben";[B];Product
+PL-G10;Früher Paid Checkout und Resttage;Freigabegate;Stripe trial_end + AGB + Zahlungstermin + Rechnungsstatus abnehmen;[S/G];Product + Billing + Legal
+PL-G11;Trial Erinnerungstage 7 11 13;Standardvorschlag;Sachliche E-Mails und De-Dup, Marketing Opt-out respektieren;[S];Product
+PL-G12;Trial/Vertragsende Retention;Freigabegate;"90 Tage lesender Exportzeitraum nur Vorschlag; Legal DSG Backup DPA";[G];Legal + Product
+PL-G13;Datenlöschung und rechtliche Aufbewahrung;Freigabegate;Belegfristen, HR-Fristen, Legal Hold, Provider-Blobs, Backups;[G];Legal + Privacy
+PL-G14;SaaS Preise;Bestätigt;Start 29/290, Business 69/690, Pro 129/1290 CHF;[B];Product + Billing
+PL-G15;Tarif-Benutzerlimits;Bestätigt;"Start 3; Business 15; Pro keine feste Obergrenze";[B];Product + Engineering
+PL-G16;Aufträge Start, DMS Pro;Bestätigt;"Start full Aufträge; Pro eigenständiges DMS, Basisanhänge alle Pläne";[B];Product
+PL-G17;Sonstige Quotas und Features;Freigabegate;Speicher/API Dokumente, Payroll/API/Automation tatsächlich verfügbar;[G];Product + Ops
+PL-G18;Individuelle Grants;Bestätigtes Ziel mit Migrationsgate;Role ceiling, Scopes, kein unkontrolliertes Legacy Wildcard;[B/G];Security + Engineering
+PL-G19;UX Navigation und FAB;Bestätigt;"Nur berechtigte Ziele; bestehende Gestaltung, Geometrie, Position unverändert";[B/V];Product + Design
+PL-G20;Visible PWA Update UI;Bestätigt;Keine sichtbare Updatebanner, keine stillen Reloads;[B];Product + UX
+PL-G21;Rechnungsfreigabe;Standardvorschlag;Automatisch vorbereiten, Mensch bestätigt Versand;[S];Product + Finance
+PL-G22;Automatischer Mahnversand;Freigabegate;Nur explizites Opt-in, 10-Tage-Abstand nicht pauschal rechtssicher;[G];Legal + Billing
+PL-G23;Bankabgleich;Freigabegate;CAMT/API Provider, Mandat, Kosten, Security, Double Matching;[G];Finance + Engineering
+PL-G24;Arbeitszeitgenehmigung;Bestätigt;Fremdfreigabe, Solo-Owner Ausnahme, submitted vor approved;[B];Product + HR
+PL-G25;Stundensatz-Priorität;Freigabegate;Vertragssnapshot vor Auftrags-/Kunden-/Firmensatz;[S/G];Product + Finance
+PL-G26;Freigabe-Vertretungsfristen;Freigabegate;"Leitung → Vertreter → unabhängiger Owner; Timer und Eskalation";[S/G];HR + Product
+PL-G27;Payroll schweizerisch;Freigabegate;Keine produktive Payroll ohne aktuelle rechtliche Prüfung;[G];HR + Legal
+PL-G28;SaaS Store Payments;Freigabegate;Apple IAP/B2B/3.1 Guidelines, Vertrags-/Storefall vor Release;[G];Legal + App Team
+PL-G29;Native App Veröffentlichung;Freigabegate;Associated Domains, App Review, Account deletion, native Functions;[G];App Team + Security
+PL-G30;Push Benachrichtigungen;Freigabegate;Provider und echtes Subscription/Sender/Acknowledgement verfügbar;[G];Engineering
+PL-G31;Datenregion und Transfer;Freigabegate;DSG TOM DPA Subprozessor tatsächliche Processing-Locations;[G];Privacy + Legal
+PL-G32;Backups RPO RTO;Freigabegate;RPO/RTO erst nach Recoverytest und SLA Finanzierung;[G];Ops + Product
+PL-G33;Owner Datenexport;Standardvorschlag;CSV JSON PDF Originaldateien mit Manifest/Checksumme und Schutz;[S];Product + Privacy
+PL-G34;Vollständige Altlastenbereinigung;Bestätigt;Nutzungsnachweis, keine Blindlöschung, zentrale Owner, Tests;[B];Engineering
+PL-G35;Änderungen produktiv deployen;Nicht freigegeben;Eigene Merge/Deploy/DB-Migrationsfreigabe nach Tests;[G];Owner
+PL-G36;Konzeptstand verwenden;Keine Codex-Promptfreigabe;Kein neuer Prompt bis User ihn ausdrücklich anfordert;[G];Owner
+PL-G37;E-Mail Provider / Darkmode;Bestätigtes Designziel;Apple Mail Light/Dark Gmail Outlook und Text-Fallback testen;[B/S];UX + Engineering
+PL-G38;Unbegrenzter Pro-User Tarif;Bestätigt;Technische Ressourcen- und Missbrauchsgrenzen klar getrennt halten;[B];Product + Engineering
+PL-G39;Wiederkehrende Vertragsarten;Freigabegate;Stunden Festpreis Wartung Meilenstein intern mit korrektem Vertrag;[S/G];Product + Finance
+PL-G40;B2B DSG Retention / Buchhaltung;Freigabegate;10 Jahre Belege je anwendbarer Pflicht, nicht alle Daten pauschal;[G];Legal + Finance

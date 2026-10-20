@@ -13063,5 +13063,150 @@
     "Recent expenses",
     "Derniers frais",
     "Ultime spese"
+  ],
+  "Funktionen ansehen": [
+    "Explore features",
+    "Découvrir les fonctionnalités",
+    "Scopri le funzioni"
+  ],
+  "Tarife vergleichen": [
+    "Compare plans",
+    "Comparer les offres",
+    "Confronta i piani"
+  ],
+  "Ja. Du kannst Binso One 14 Tage kostenlos mit deinem eigenen Unternehmen testen. Eine Kreditkarte ist zum Testbeginn nicht erforderlich.": [
+    "Yes. Try Binso One free for 14 days with your own company. No credit card is required to start.",
+    "Oui. Testez Binso One gratuitement pendant 14 jours avec votre entreprise. Aucune carte bancaire n’est nécessaire pour commencer.",
+    "Sì. Prova Binso One gratuitamente per 14 giorni con la tua azienda. Non serve una carta di credito per iniziare."
+  ],
+  "Von der ersten Anfrage bis zur bezahlten Rechnung. Organisiere Kunden, Aufträge und Finanzen in einem Arbeitsbereich.": [
+    "From the first enquiry to a paid invoice. Organise customers, orders and finances in one workspace.",
+    "De la première demande à la facture payée. Organisez clients, mandats et finances dans un espace de travail.",
+    "Dalla prima richiesta alla fattura pagata. Organizza clienti, incarichi e finanze in un unico spazio."
+  ],
+  "unbegrenzt": [
+    "unlimited",
+    "illimité",
+    "illimitato"
+  ],
+  "Unbegrenzte Benutzer": [
+    "Unlimited users",
+    "Utilisateurs illimités",
+    "Utenti illimitati"
+  ],
+  "Nur Zeiterfassung": [
+    "Time tracking only",
+    "Saisie du temps uniquement",
+    "Solo registrazione del tempo"
+  ],
+  "Modulprofil": [
+    "Module profile",
+    "Profil de modules",
+    "Profilo moduli"
+  ],
+  "Teste Binso One 14 Tage kostenlos mit deinem eigenen Unternehmen.": [
+    "Try Binso One free for 14 days with your own company.",
+    "Testez Binso One gratuitement pendant 14 jours avec votre entreprise.",
+    "Prova Binso One gratuitamente per 14 giorni con la tua azienda."
+  ],
+  "Für Teams mit Mitarbeitenden, Produkten und einer gemeinsamen Finanzübersicht.": [
+    "For teams managing employees, products and a shared financial overview.",
+    "Pour les équipes qui gèrent collaborateurs, produits et une vue financière commune.",
+    "Per team che gestiscono collaboratori, prodotti e una panoramica finanziaria condivisa."
+  ],
+  "Für wachsende Teams ohne feste Benutzerobergrenze.": [
+    "For growing teams without a fixed user limit.",
+    "Pour les équipes en croissance sans limite fixe d’utilisateurs.",
+    "Per team in crescita senza un limite fisso di utenti."
+  ],
+  "Alleiniger Inhaber": [
+    "Sole owner",
+    "Propriétaire unique",
+    "Titolare unico"
+  ],
+  "Als alleiniger Inhaber kannst du eigene Zeiten ohne Fremdfreigabe verwenden. Monatsrapporte benötigen weiterhin den unterschriebenen Nachweis.": [
+    "As the sole owner, you can use your own time without independent approval. Monthly reports still require signed evidence.",
+    "En tant que propriétaire unique, vous pouvez utiliser vos heures sans validation indépendante. Les rapports mensuels nécessitent toujours un justificatif signé.",
+    "Come titolare unico puoi utilizzare le tue ore senza approvazione indipendente. I rapporti mensili richiedono comunque il documento firmato."
+  ],
+  "Authenticator QR-Code": [
+    "Authenticator QR code",
+    "Code QR pour Authenticator",
+    "Codice QR per Authenticator"
+  ],
+  "Bei eingerichtetem Authenticator bleibt der zusätzliche Code erforderlich.": [
+    "If an authenticator is configured, the additional code remains required.",
+    "Si un authentificateur est configuré, le code supplémentaire reste obligatoire.",
+    "Se è configurato un autenticatore, il codice aggiuntivo rimane obbligatorio."
+  ],
+  "Beim Entfernen werden alle anderen Sitzungen abgemeldet. Passwort und Authenticator bleiben erhalten.": [
+    "Removing this passkey signs out all other sessions. Your password and authenticator remain available.",
+    "La suppression déconnecte toutes les autres sessions. Le mot de passe et l’authentificateur restent disponibles.",
+    "La rimozione disconnette tutte le altre sessioni. La password e l’autenticatore rimangono disponibili."
+  ],
+  "Bitte zuerst den Authenticator einrichten.": [
+    "Please set up the authenticator first.",
+    "Configurez d’abord l’authentificateur.",
+    "Configura prima l’autenticatore."
+  ],
+  "Mit Passkey anmelden": [
+    "Sign in with a passkey",
+    "Se connecter avec une clé d’accès",
+    "Accedi con una passkey"
+  ],
+  "Passkey entfernen": [
+    "Remove passkey",
+    "Supprimer la clé d’accès",
+    "Rimuovi passkey"
+  ],
+  "Passkey hinzufügen": [
+    "Add passkey",
+    "Ajouter une clé d’accès",
+    "Aggiungi passkey"
+  ],
+  "Passkey verwenden": [
+    "Use passkey",
+    "Utiliser une clé d’accès",
+    "Usa passkey"
+  ],
+  "Passkeys": [
+    "Passkeys",
+    "Clés d’accès",
+    "Passkey"
+  ],
+  "Unabhängige Freigabe": [
+    "Independent approval",
+    "Validation indépendante",
+    "Approvazione indipendente"
+  ],
+  "Zeiten werden zuerst eingereicht und durch eine andere berechtigte Person freigegeben.": [
+    "Time entries are submitted first, then approved by another authorized person.",
+    "Les heures sont d’abord soumises, puis validées par une autre personne autorisée.",
+    "Le ore vengono prima inviate e poi approvate da un’altra persona autorizzata."
+  ],
+  "Die Änderung ist gespeichert. Die Sicherheits-E-Mail wurde noch nicht bestätigt.": [
+    "The change is saved. Acceptance of the security email has not yet been confirmed.",
+    "La modification est enregistrée. L’acceptation de l’e-mail de sécurité n’a pas encore été confirmée.",
+    "La modifica è salvata. L’accettazione dell’e-mail di sicurezza non è ancora stata confermata."
+  ],
+  "Zugang sperren": [
+    "Suspend access",
+    "Suspendre l’accès",
+    "Sospendi accesso"
+  ],
+  "Zugang sperren?": [
+    "Suspend access?",
+    "Suspendre l’accès ?",
+    "Sospendere l’accesso?"
+  ],
+  "Zugang gesperrt.": [
+    "Access suspended.",
+    "Accès suspendu.",
+    "Accesso sospeso."
+  ],
+  "Der Zugang wird sofort gesperrt. Laufende Zeit wird pausiert; vorhandene Daten bleiben erhalten.": [
+    "Access is suspended immediately. The running timer is paused; existing data is retained.",
+    "L’accès est suspendu immédiatement. Le minuteur est mis en pause ; les données existantes sont conservées.",
+    "L’accesso viene sospeso immediatamente. Il timer attivo viene messo in pausa; i dati esistenti vengono conservati."
   ]
 }

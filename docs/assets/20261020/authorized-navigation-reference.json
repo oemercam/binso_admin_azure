@@ -1,0 +1,32 @@
+{
+  "base": "d25bd5b6178f4ae54b5b57d0779e5d845e1f0ee5",
+  "approval": "20 October 2026 V25.5 PL-G19 explicit authorized-target rule expands D16 to all roles and plans: only authorized existing targets, fewer than five allowed. No change to material/icons/height/position/blue FAB. Rendered comparisons against qualified d25bd5b6 cover all seven roles and three plans at 320/390/760 Light/Dark, keyboard/scroll and negative material/permission probes. Not physical PWA acceptance.",
+  "access": {
+    "permissions": "367da761641e93be960c547463ae759f57485234a24f70a964719e710564c166",
+    "destinations": "7435e1239441afb3069e8b69b06978b373d4b777be65f75d3678236dd07d2e64"
+  },
+  "baseIcons": "99168691ba5c419cc713b48ef443a89821fc72f9997fce59676c2ddd5c9c62c5",
+  "snapshot": {
+    "markup": "45539f32b315a71087680da8fea9d3e1fe18f1bb2d0a3edeb8b2abde8aa2161e",
+    "logic": "cff678debe7d2885db8fade36e53bdc51929db0c92a0f3a79cbb29e6e4476702",
+    "icons": "99168691ba5c419cc713b48ef443a89821fc72f9997fce59676c2ddd5c9c62c5",
+    "rules": "a0213e29829c93319dff61f89161566ff2f2d63ae84d98fd9233abf88d261a48",
+    "tokens": "ce83c096a14e03f4789f91809f499e2eb9db61e70869ee9d2aa22a2e2219ed01",
+    "tokenNames": [
+      "--app-action-accent",
+      "--color-bg",
+      "--color-line",
+      "--color-muted",
+      "--mobile-nav-h",
+      "--motion-ease",
+      "--motion-ease-standard",
+      "--motion-fast",
+      "--safe-bottom",
+      "--safe-left",
+      "--safe-right",
+      "--shape-control-mobile",
+      "--type-metadata"
+    ]
+  },
+  "customerContract": "83081fdb2568b951a49c25beb9021042f320c416b2e014e632f38c065265ea56"
+}

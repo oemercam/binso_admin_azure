@@ -102,3 +102,9 @@ export async function verifyHeaderTargetRegression(page){
  finally{await target.evaluate((el,style)=>style===null?el.removeAttribute('style'):el.setAttribute('style',style),style);}
  await assertMobileHeaderTargets(page);
 }
+
+/** Development Lab has a persistent HMR connection; await actual hydration and fonts. */
+export async function waitForLabReady(page){
+ await page.locator('main.ux-lab[data-hydrated="true"]').waitFor({state:'visible'});
+ await page.evaluate(()=>document.fonts.ready);
+}

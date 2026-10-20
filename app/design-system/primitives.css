@@ -23,7 +23,6 @@ button{cursor:pointer}
   font-weight:var(--button-font-weight);
   line-height:var(--button-line-height);
   white-space:nowrap;
-  transition:background-color var(--motion-fast) var(--motion-ease),opacity var(--motion-fast) var(--motion-ease);
 }
 .button:not(:disabled):hover{opacity:.9}
 .button:not(:disabled):active{opacity:.78}

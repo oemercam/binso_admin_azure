@@ -12,6 +12,8 @@ export async function startBillingCheckout(c:PoolClient,s:SessionUser,plan:PlanI
  const row=(await c.query(`select s.*,o.name,o.is_demo from organization_subscriptions s join organizations o on o.id=s.organization_id where s.organization_id=$1 for update of s`,[s.organizationId])).rows[0];
  if(!row)throw new ApiError(404,'not_found','Organisation nicht gefunden.');
  if(row.is_demo)throw new ApiError(403,'demo_billing_unavailable','In der Demo werden keine Zahlungen ausgelöst.');
+ // PL-G10 is open: never charge immediately while free trial time remains.
+ if(row.status==='trial'&&(!row.trial_until||new Date(row.trial_until).getTime()>Date.now()))throw new ApiError(409,'trial_checkout_policy_pending','Während der kostenlosen Testphase ist der kostenpflichtige Abschluss noch nicht freigegeben. Nach Testende kann das bestehende Firmenkonto abonniert werden.');
  if(row.billing_subscription_id&&!['cancelled','expired'].includes(row.status))throw new ApiError(409,'subscription_exists','Bitte das bestehende Abonnement im Zahlungsportal verwalten.');
  const cached=(await c.query('select * from billing_checkout_sessions where organization_id=$1 and request_key=$2',[s.organizationId,requestKey])).rows[0];
  if(cached&&(cached.plan!==plan||cached.billing_interval!==billing||new Date(cached.expires_at).getTime()<=Date.now()))throw new ApiError(409,'checkout_request_reused','Bitte einen neuen Checkout starten.');

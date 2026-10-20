@@ -1,3 +1,4 @@
+import {planCatalogModuleUrl,planAccessModuleUrl} from './data-test-modules.mjs';
 import {displayModuleUrl,localeTestModuleUrl} from "./data-test-modules.mjs";
 import {randomUUID} from "node:crypto";
 import {PGlite} from '@electric-sql/pglite';
@@ -60,7 +61,7 @@ try{
  const before=(await db.query('select count(*)::int n from payments')).rows[0].n;
  await db.exec('begin');await db.exec(await fs.readFile('database/migrations/0023_finance_and_demo_fixture.sql','utf8'));await db.exec('commit');
  assert.equal((await db.query('select count(*)::int n from payments')).rows[0].n,before);
- const dataModule=source=>'data:text/javascript;base64,'+Buffer.from(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText).toString('base64');
+ const dataModule=source=>'data:text/javascript;base64,'+Buffer.from(ts.transpileModule(source.replaceAll("'@/config/plans'",JSON.stringify(planCatalogModuleUrl)).replaceAll('"@/config/plans"',JSON.stringify(planCatalogModuleUrl)),{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText).toString('base64');
  const permissions=dataModule(await fs.readFile('lib/permissions.ts','utf8'));
  const audit=dataModule((await fs.readFile('lib/server/audit.ts','utf8')).replace('import "server-only";',''));
  const http=dataModule('export class ApiError extends Error {constructor(status,code,message){super(message);this.status=status;this.code=code}}');
@@ -310,12 +311,12 @@ try{
  await db.exec('reset role');
  assert.equal((await db.query("select count(*)::int n from pg_constraint where contype='f' and not convalidated")).rows[0].n,0);
  const domain=dataModule(await fs.readFile('config/domain.ts','utf8'));
- const plans=dataModule((await fs.readFile('lib/plans.ts','utf8')).replaceAll('"@/config/domain"',JSON.stringify(domain)));
+ const plans=dataModule((await fs.readFile('lib/plans.ts','utf8')).replaceAll('"@/config/domain"',JSON.stringify(domain)).replaceAll("'@/config/domain'",JSON.stringify(domain)).replaceAll("'@/config/plans'",JSON.stringify(planCatalogModuleUrl)));
  const fixture=dataModule(fixtureSource);
  const transactions=dataModule('export async function withTransaction(fn){return globalThis.__provisionTest(fn)}');
  globalThis.__provisionTest=async(fn)=>{await db.exec('begin');try{const result=await fn(client);await db.exec('commit');return result}catch(e){await db.exec('rollback');throw e}};
  const provisionSource=(await fs.readFile('lib/server/provisioning.ts','utf8')).replace('import "server-only";','').replace('"./repositories/demo-fixture"',JSON.stringify(fixture)).replace('"@/lib/server/db"',JSON.stringify(transactions)).replace('"@/config/domain"',JSON.stringify(domain)).replace('"@/lib/plans"',JSON.stringify(plans));
- const entitlementModule=dataModule((await fs.readFile('lib/subscription-plans.ts','utf8')).replace("'@/config/domain'",JSON.stringify(domain)));
+ const entitlementModule=dataModule((await fs.readFile('lib/subscription-plans.ts','utf8')).replace("'@/config/domain'",JSON.stringify(domain)).replace("'@/config/plans'",JSON.stringify(planCatalogModuleUrl)));
  const {provisionOrganization}=await import(dataModule(provisionSource.replace("'@/lib/subscription-plans'",JSON.stringify(entitlementModule))));
  const provisioned=await provisionOrganization({userId:'demo-provision-test',email:'demo-provision-test@example.invalid',name:'Demo Test',companyName:'Demo',plan:'business',mode:'demo'});
  assert.equal((await db.query('select email from employees where organization_id=$1 order by external_id limit 1',[provisioned.organizationId])).rows[0].email,'demo-provision-test@example.invalid','Writable demo timers must resolve the seeded user employee');
@@ -401,6 +402,12 @@ try{
  };
  await db.query("select set_config('app.organization_id',$1,false)",[billingTenant.organizationId]);
  const requestKey='00000000-0000-4000-8000-000000000034';
+ await assert.rejects(globalThis.__provisionTest(c=>startBillingCheckout(c,billingSession,'business','yearly',requestKey)),e=>e.code==='trial_checkout_policy_pending','Unverified trial has no approved paid start policy');
+ await db.query("update organization_subscriptions set trial_until=now()+interval '5 days' where organization_id=$1",[billingTenant.organizationId]);
+ await assert.rejects(globalThis.__provisionTest(c=>startBillingCheckout(c,billingSession,'business','yearly',requestKey)),e=>e.code==='trial_checkout_policy_pending','Remaining free days cannot be charged under an unapproved policy');
+ assert.equal(checkoutCalls,0);
+ assert.equal((await db.query('select billing_customer_id from organization_subscriptions where organization_id=$1',[billingTenant.organizationId])).rows[0].billing_customer_id,null,'Blocked checkout does not create a provider customer');
+ await db.query("update organization_subscriptions set status='expired',trial_until=now()-interval '1 second' where organization_id=$1",[billingTenant.organizationId]);
  const checkout=await globalThis.__provisionTest(c=>startBillingCheckout(c,billingSession,'business','yearly',requestKey));
  assert.ok(checkout.url.startsWith('https://checkout.stripe.com/'));
  const sameCheckout=await globalThis.__provisionTest(c=>startBillingCheckout(c,billingSession,'business','yearly','00000000-0000-4000-8000-000000000035'));
@@ -419,7 +426,7 @@ try{
  failInvoice=true;
  await assert.rejects(globalThis.__provisionTest(c=>processStripeEvent(c,invoiceEvent)),e=>e.code==='stripe_unavailable');
  assert.equal((await db.query("select * from billing_webhook_events where external_event_id='evt_fixture'")).rows.length,0);
- assert.equal((await db.query('select status from organization_subscriptions where organization_id=$1',[billingTenant.organizationId])).rows[0].status,'trial');
+ assert.equal((await db.query('select status from organization_subscriptions where organization_id=$1',[billingTenant.organizationId])).rows[0].status,'expired','Failed provider processing preserves the post-trial state');
  failInvoice=false;
  assert.equal((await globalThis.__provisionTest(c=>processStripeEvent(c,invoiceEvent))).processed,true);
  assert.equal((await globalThis.__provisionTest(c=>processStripeEvent(c,invoiceEvent))).duplicate,true);
@@ -669,10 +676,25 @@ try{
  const invitationService=dataModule(invitationServiceSource);
  globalThis.__invitationMails=[];globalThis.__invitationMailMode='accepted';
  const teamSource=(await fs.readFile('app/api/settings/team/invitations/route.ts','utf8')).replace('"@/lib/money"',JSON.stringify(moneyModule)).replace('"@/lib/server/http"',JSON.stringify(processHttp)).replace('"@/lib/server/session"',JSON.stringify(processSession)).replace('"@/lib/server/rbac"',JSON.stringify(processRbac)).replace('"@/lib/server/db"',JSON.stringify(processDb)).replace('"@/lib/server/invitations"',JSON.stringify(invitationService));
- const team=await import(dataModule(teamSource));const teamResult=await team.GET();assert.equal(teamResult.status,200);assert.ok(teamResult.data.members.every(m=>m.email&&m.name));assert.ok(teamResult.data.userLimit>0);assert.ok(teamResult.data.plan);
+ const team=await import(dataModule(teamSource));const teamResult=await team.GET();assert.equal(teamResult.status,200);assert.ok(teamResult.data.members.every(m=>m.email&&m.name));assert.equal(teamResult.data.capacityConfigured,false,"Missing subscription cannot imply a guessed seat quota");assert.equal(teamResult.data.userLimit,null);assert.equal(teamResult.data.plan,"unknown");
  await db.query("select set_config('app.organization_id',$1,false)",[demo]);
  await globalThis.__processTransaction(demo,c=>c.query("insert into organization_entitlements(organization_id,max_users) values($1,50) on conflict(organization_id) do update set max_users=50",[demo]));
+ await db.query("insert into organization_subscriptions(organization_id,plan,status) values($1,'starter','active') on conflict(organization_id) do nothing",[demo]);
+ const invitationPlanBefore=(await db.query('select plan from organization_subscriptions where organization_id=$1',[demo])).rows[0].plan;
+ await db.query("update organization_subscriptions set plan='professional' where organization_id=$1",[demo]);
+ assert.equal((await team.GET()).data.userLimit,null,'Pro ignores the old stored finite quota');
+ for(const [storedPlan,plan,limit] of [['starter','start',3],['business','business',15],['professional','pro',null]]){await db.query('update organization_subscriptions set plan=$2 where organization_id=$1',[demo,storedPlan]);const projection=(await team.GET()).data;assert.equal(projection.plan,plan,'Team API uses the canonical visible tariff');assert.equal(projection.userLimit,limit);}
+
  const inviteRequest=(email,role,key)=>({body:{email,role},headers:new Headers({'Idempotency-Key':key})});
+ const quotaSnapshot=(await db.query('select to_jsonb(e) value from organization_entitlements e where organization_id=$1',[demo])).rows[0].value;
+ await db.query('delete from organization_entitlements where organization_id=$1',[demo]);
+ const unknownQuota=(await team.GET()).data;assert.equal(unknownQuota.capacityConfigured,false);assert.equal(unknownQuota.userLimit,null);assert.equal(unknownQuota.plan,'unknown','Missing quota is neither a guessed Start quota nor unlimited Pro');
+ assert.equal((await team.POST(inviteRequest('unknown-quota@fixture.invalid','member','unknown-quota-invite'))).status,409,'Unknown capacity cannot grant another seat');
+ await db.query('insert into organization_entitlements select * from jsonb_populate_record(null::organization_entitlements,$1::jsonb)',[JSON.stringify(quotaSnapshot)]);
+ assert.equal((await team.GET()).data.capacityConfigured,true);
+ const foreignInvite=await team.POST(inviteRequest('billing-probe@example.invalid','member','invitation-foreign-identity'));
+ assert.equal(foreignInvite.status,409,'A foreign company account cannot be invited into another company');
+ assert.equal((await db.query("select count(*)::int n from organization_invitations where organization_id=$1 and email='billing-probe@example.invalid'",[demo])).rows[0].n,0,'Foreign identity rejection leaves no pending invitation');
  const atomicInvite=await team.POST(inviteRequest('atomic-invite@fixture.invalid','finance','invitation-atomic-fixture'));assert.equal(atomicInvite.status,201,JSON.stringify(atomicInvite));
  assert.equal((await team.POST(inviteRequest('atomic-invite@fixture.invalid','finance','invitation-atomic-fixture'))).data.id,atomicInvite.data.id);assert.equal(globalThis.__invitationMails.length,1,'A timeout replay does not send twice');
  assert.equal((await team.POST(inviteRequest('atomic-invite@fixture.invalid','reader','invitation-atomic-fixture'))).status,409,'A changed role cannot reuse a replay key');
@@ -691,6 +713,7 @@ try{
  assert.equal((await team.POST(inviteRequest('rollback-invite@fixture.invalid','member','invitation-rollback-fixture'))).status,500);
  assert.equal((await db.query("select count(*)::int n from app_users where email='rollback-invite@fixture.invalid'")).rows[0].n,0);assert.equal((await db.query("select count(*)::int n from organization_invitations where email='rollback-invite@fixture.invalid'")).rows[0].n,0);
  await db.exec('drop trigger reject_fixture_mail on mail_outbox;drop function reject_fixture_mail()');
+ await db.query('update organization_subscriptions set plan=$2 where organization_id=$1',[demo,invitationPlanBefore]);
  delete globalThis.__invitationMails;delete globalThis.__invitationMailMode;
  console.log('Atomic invitation identity/membership/token/outbox, same-key replay, failed-delivery recovery, ambiguous-delivery protection, roles and database rollback passed.');
 
@@ -834,12 +857,12 @@ try{
 
  // Full business process and short paths use actual handlers against isolated PostgreSQL fixtures.
  const projectWorkspaceModule=dataModule((await fs.readFile('lib/server/repositories/project-workspace.ts','utf8')).replace("import 'server-only';",'').replaceAll("'@/lib/projects'",JSON.stringify(dataModule(await fs.readFile('lib/projects.ts','utf8')))).replaceAll("'@/lib/permissions'",JSON.stringify(permissions)).replaceAll("'@/lib/server/http'",JSON.stringify(processHttp)).replaceAll("'@/lib/server/rbac'",JSON.stringify(processRbac)).replaceAll("'@/lib/server/audit'",JSON.stringify(audit)));
- const reportRepoModule=dataModule((await fs.readFile('lib/server/repositories/reports.ts','utf8')).replace("import 'server-only';",'').replaceAll("'@/lib/permissions'",JSON.stringify(permissions)).replaceAll("'@/lib/server/rbac'",JSON.stringify(processRbac)).replaceAll("'@/config/plan-access'",JSON.stringify(dataModule(await fs.readFile('config/plan-access.ts','utf8')))));
+ const reportRepoModule=dataModule((await fs.readFile('lib/server/repositories/reports.ts','utf8')).replace("import 'server-only';",'').replaceAll("'@/lib/permissions'",JSON.stringify(permissions)).replaceAll("'@/lib/server/rbac'",JSON.stringify(processRbac)).replaceAll("'@/config/plan-access'",JSON.stringify(planAccessModuleUrl)));
  const reportExportModule=dataModule((await fs.readFile('lib/report-export.ts','utf8')).replace("'./projects'",JSON.stringify(dataModule(await fs.readFile('lib/projects.ts','utf8')))));
  const reportPeriodModule=dataModule((await fs.readFile('lib/statistics-period.ts','utf8')).replace("'./money'",JSON.stringify(moneyModule)));
  const reportLocaleModule=dataModule("export const asLocale=v=>['de','fr','it','en'].includes(v)?v:'de';export const localeCookie='binso_locale';export const translateMessage=(v,locale)=>locale==='fr'?'FR:'+v:v;");
- const actualPlanModule=dataModule((await fs.readFile('lib/server/plan-access.ts','utf8')).replace('import "server-only";','').replace('"@/lib/server/db"',JSON.stringify(processDb)).replace("'./http'",JSON.stringify(processHttp)).replace('"@/config/plan-access"',JSON.stringify(dataModule(await fs.readFile('config/plan-access.ts','utf8')))));
- const loadProcessRoute=async path=>{let source=await fs.readFile(path,'utf8');for(const [specifier,url] of Object.entries({'@/lib/server/database':dataModule(databaseSource),'@/config/notification-channels':dataModule(await fs.readFile('config/notification-channels.ts','utf8')),'@/config/plan-access':dataModule(await fs.readFile('config/plan-access.ts','utf8')),'@/lib/server/repositories/dashboard':dashboardModule,'@/lib/server/repositories/financial-summary':sharedSummaryModule,'@/lib/server/repositories/finance':financeModule,'@/lib/server/repositories/business-api':businessModule,'@/lib/projects':dataModule(await fs.readFile('lib/projects.ts','utf8')),'@/lib/server/plan-access':dataModule("export {requireProjectCapacity,requireModuleEntitlement} from "+JSON.stringify(actualPlanModule)+"; export const getOrganizationPlan=async()=>globalThis.__processReportPlan??'pro'"),'@/lib/server/repositories/reports':reportRepoModule,'@/lib/report-export':reportExportModule,'@/lib/financial-status':financialModule,'@/lib/statistics-period':reportPeriodModule,'@/lib/locales':reportLocaleModule,'@/lib/server/file-access':dataModule((await fs.readFile('lib/server/file-access.ts','utf8')).replace('import "server-only";','').replace('"./env"',JSON.stringify(dataModule('export const env={}')))),'@/lib/server/workforce-access':workforceModule,'@/lib/server/repositories/project-workspace':projectWorkspaceModule,'@/lib/money':moneyModule,'@/lib/server/http':processHttp,'@/lib/server/session':processSession,'@/lib/server/db':processDb,'@/lib/server/rbac':processRbac,'@/lib/server/audit':audit,'@/lib/server/business-idempotency':idempotencyModule,'@/lib/permissions':permissions,'@/lib/server/validation':dataModule(await fs.readFile('lib/server/validation.ts','utf8').then(source=>source.replace('import "server-only";','').replace('"./http"',JSON.stringify(processHttp))))})){source=source.replaceAll(JSON.stringify(specifier),JSON.stringify(url)).replaceAll("'"+specifier+"'",JSON.stringify(url));}return import(dataModule(source));};
+ const actualPlanModule=dataModule((await fs.readFile('lib/server/plan-access.ts','utf8')).replace('import "server-only";','').replace('"@/lib/server/db"',JSON.stringify(processDb)).replace("'./http'",JSON.stringify(processHttp)).replace('"@/config/plan-access"',JSON.stringify(planAccessModuleUrl)));
+ const loadProcessRoute=async path=>{let source=await fs.readFile(path,'utf8');for(const [specifier,url] of Object.entries({'@/lib/server/database':dataModule(databaseSource),'@/config/notification-channels':dataModule(await fs.readFile('config/notification-channels.ts','utf8')),'@/config/plan-access':planAccessModuleUrl,'@/lib/server/repositories/dashboard':dashboardModule,'@/lib/server/repositories/financial-summary':sharedSummaryModule,'@/lib/server/repositories/finance':financeModule,'@/lib/server/repositories/business-api':businessModule,'@/lib/projects':dataModule(await fs.readFile('lib/projects.ts','utf8')),'@/lib/server/plan-access':dataModule("export {requireProjectCapacity,requireModuleEntitlement} from "+JSON.stringify(actualPlanModule)+"; export const getOrganizationPlan=async()=>globalThis.__processReportPlan??'pro'"),'@/lib/server/repositories/reports':reportRepoModule,'@/lib/report-export':reportExportModule,'@/lib/financial-status':financialModule,'@/lib/statistics-period':reportPeriodModule,'@/lib/locales':reportLocaleModule,'@/lib/server/file-access':dataModule((await fs.readFile('lib/server/file-access.ts','utf8')).replace('import "server-only";','').replace('"./env"',JSON.stringify(dataModule('export const env={}')))),'@/lib/server/workforce-access':workforceModule,'@/lib/server/repositories/project-workspace':projectWorkspaceModule,'@/lib/money':moneyModule,'@/lib/server/http':processHttp,'@/lib/server/session':processSession,'@/lib/server/db':processDb,'@/lib/server/rbac':processRbac,'@/lib/server/audit':audit,'@/lib/server/business-idempotency':idempotencyModule,'@/lib/permissions':permissions,'@/lib/server/validation':dataModule(await fs.readFile('lib/server/validation.ts','utf8').then(source=>source.replace('import "server-only";','').replace('"./http"',JSON.stringify(processHttp))))})){source=source.replaceAll(JSON.stringify(specifier),JSON.stringify(url)).replaceAll("'"+specifier+"'",JSON.stringify(url));}return import(dataModule(source));};
  const financeWorkspaceHandler=await loadProcessRoute('app/api/finance/overview/route.ts');
  for(const role of ['owner','admin','finance','hr','project_manager','member','reader']){
   globalThis.__processSession={...session,role};
@@ -951,6 +974,7 @@ try{
  globalThis.__processSession={...savedProjectSession,organizationId:sandbox};const foreignReport=await reportHandler.GET(reportRequest());assert.equal(foreignReport.status,200);assert.notEqual(foreignReport.data.customers.total,ownerReport.data.customers.total,'Reports are scoped to the current company');globalThis.__processSession=savedProjectSession;
  console.log('Reports: bounded periods, role masking, company isolation and private formula-safe CSV export passed.');
  const unusedTime=await manualTimeHandler.POST({headers:new Headers(),body:{customerId:documentArgs.p_customer_id,description:'Direct customer work',durationMinutes:60,startedAt:'2026-10-01',billable:true,salesRate:180}});
+ assert.equal((await timeReview.PATCH({body:{action:'submit'}},{params:Promise.resolve({id:unusedTime.data.item.id})})).status,200,'Time enters review before independent approval');
  globalThis.__processSession={...savedProjectSession,userId:'independent-time-reviewer'};assert.equal((await timeReview.PATCH({body:{action:'approve'}},{params:Promise.resolve({id:unusedTime.data.item.id})})).status,200);globalThis.__processSession=savedProjectSession;
  await assert.rejects(()=>atomic('create_document_atomic',{...serviceArgs,p_number:'PROCESS-INTRA-DUP',p_items:[{description:'One',quantity:1,unit_price:180,time_entry_ids:[unusedTime.data.item.id]},{description:'Two',quantity:1,unit_price:180,time_entry_ids:[unusedTime.data.item.id]}]}),e=>e.code==='duplicate_service');
  assert.equal((await db.query('select invoiced_invoice_id from time_entries where id=$1',[unusedTime.data.item.id])).rows[0].invoiced_invoice_id,null);
@@ -996,8 +1020,9 @@ try{
  const notificationId=(await db.query("insert into in_app_notifications(organization_id,user_id,kind,title,body) values($1,$2,'system','Synthetic notification','No personal data') returning id",[demo,session.userId])).rows[0].id;
  const foreignNotificationId=(await db.query("insert into in_app_notifications(organization_id,user_id,kind,title,body) values($1,null,'system','Foreign synthetic notification','No personal data') returning id",[sandbox])).rows[0].id;
  assert.equal((await notificationRoute.PATCH({body:{all:true}})).status,200);assert.ok((await db.query('select read_at from in_app_notifications where id=$1',[notificationId])).rows[0].read_at);assert.equal((await db.query('select read_at from in_app_notifications where id=$1',[foreignNotificationId])).rows[0].read_at,null,'Read all cannot affect another tenant');
- const policy=await loadProcessRoute('app/api/time-entries/policy/route.ts');assert.equal((await policy.PATCH({body:{required:false}})).status,200);
- const immediate=await manualTimeHandler.POST({headers:new Headers(),body:{customerId:documentArgs.p_customer_id,description:'Direct approved work',durationMinutes:60,billable:true}});assert.equal(immediate.status,201,JSON.stringify(immediate));assert.equal(immediate.data.item.approved,true);
+ const policy=await loadProcessRoute('app/api/time-entries/policy/route.ts');assert.equal((await policy.PATCH({body:{required:false}})).status,409,'Legacy settings cannot disable the independent-review invariant');
+ await db.query('update organizations set time_approval_required=false where id=$1',[demo]);
+ const immediate=await manualTimeHandler.POST({headers:new Headers(),body:{customerId:documentArgs.p_customer_id,description:'Direct work awaits review',durationMinutes:60,billable:true}});assert.equal(immediate.status,201,JSON.stringify(immediate));assert.equal(immediate.data.item.approved,false,'A stored legacy false flag cannot auto-approve normal work');
  const internalProcessTime=await manualTimeHandler.POST({headers:new Headers(),body:{projectName:'Weiterbildung',description:'Internal training',durationMinutes:90,billable:false}});assert.equal(internalProcessTime.status,201);assert.equal(internalProcessTime.data.item.customer_id,null);assert.equal(internalProcessTime.data.item.billable,false);
  await policy.PATCH({body:{required:true}});
  globalThis.__processSession={...globalThis.__processSession,role:'member'};assert.equal((await policy.PATCH({body:{required:false}})).status,403);assert.equal((await projectHandler.POST({body:{name:'Forbidden'}})).status,403);
@@ -1057,7 +1082,7 @@ try{
  const validation=dataModule((await fs.readFile('lib/server/file-validation.ts','utf8')).replace("'./http'",JSON.stringify(processHttp)));
  const limits=dataModule(await fs.readFile('config/limits.ts','utf8'));
  const fileAccess=dataModule((await fs.readFile('lib/server/file-access.ts','utf8')).replace('import "server-only";','').replace('"./env"',JSON.stringify(dataModule('export const env={}'))));
- const fileRoute=async path=>{let source=await fs.readFile(path,'utf8');for(const [specifier,url] of Object.entries({'@/lib/server/workforce-access':workforceModule,'@/lib/server/file-access':fileAccess,'@/lib/server/file-scan':dataModule('export async function scanFileWithEvidence(){return {status:"pending",evidence:null}}'),'@/lib/server/business-idempotency':idempotencyModule,'@/lib/server/file-relations':fileRelations,'@/lib/server/file-validation':validation,'@/config/limits':limits,'@/lib/server/http':processHttp,'@/lib/server/session':processSession,'@/lib/server/db':processDb,'@/lib/server/rbac':processRbac,'@/lib/permissions':permissions,'@/lib/server/storage':dataModule('export async function getBlobByUrl(){throw new Error("External storage must not be contacted by isolated tests")}')})){source=source.replaceAll(JSON.stringify(specifier),JSON.stringify(url)).replaceAll("'"+specifier+"'",JSON.stringify(url));}return import(dataModule(source));};
+ const fileRoute=async path=>{let source=await fs.readFile(path,'utf8');for(const [specifier,url] of Object.entries({'@/lib/server/plan-access':actualPlanModule,'@/lib/server/workforce-access':workforceModule,'@/lib/server/file-access':fileAccess,'@/lib/server/file-scan':dataModule('export async function scanFileWithEvidence(){return {status:"pending",evidence:null}}'),'@/lib/server/business-idempotency':idempotencyModule,'@/lib/server/file-relations':fileRelations,'@/lib/server/file-validation':validation,'@/config/limits':limits,'@/lib/server/http':processHttp,'@/lib/server/session':processSession,'@/lib/server/db':processDb,'@/lib/server/rbac':processRbac,'@/lib/permissions':permissions,'@/lib/server/storage':dataModule('export async function getBlobByUrl(){throw new Error("External storage must not be contacted by isolated tests")}')})){source=source.replaceAll(JSON.stringify(specifier),JSON.stringify(url)).replaceAll("'"+specifier+"'",JSON.stringify(url));}return import(dataModule(source));};
  const fileUpload=await fileRoute('app/api/files/route.ts'),fileDownload=await fileRoute('app/api/files/[id]/download/route.ts');
  const uploadRequest=(entityId,mime='text/plain',bytes='synthetic attachment',purpose='customer_document')=>{const form=new FormData();form.set('purpose',purpose);form.set('entityId',entityId);form.set('file',new File([bytes],'fixture.txt',{type:mime}));return new Request('https://fixture.invalid/api/files',{method:'POST',headers:{'idempotency-key':crypto.randomUUID()},body:form});};
  const uploaded=await fileUpload.POST(uploadRequest(documentArgs.p_customer_id));assert.equal(uploaded.status,201,JSON.stringify(uploaded));assert.equal(uploaded.data.item.customer_id,documentArgs.p_customer_id);
@@ -1105,7 +1130,7 @@ try{
  // The unused generic record writer was removed. Public finance routes expose no
  // alternate PATCH/DELETE ledger writer that can bypass canonical transitions.
  for(const file of ['app/api/payments/[id]/route.ts','app/api/payments/route.ts']){const source=await fs.readFile(file,'utf8');assert.ok(!/export async function (PATCH|DELETE)/.test(source));}
- console.log('Full customer/offer/project/time/invoice/partial-payment process, direct customer work, internal time, optional approval, exact completion date, overpayment and double-billing protection passed.');
+ console.log('Full customer/offer/project/time/invoice/partial-payment process, direct customer work, internal time, enforced independent approval, exact completion date, overpayment and double-billing protection passed.');
  await db.exec('begin');
  try{
   for(const [table,fields] of Object.entries({products:['name','kind','unit_price','status'],employees:['name','job_title','workload_percent','status'],expenses:['merchant','employee_name','amount','status'],payments:['paid_on','customer_name','invoice_number','amount','status']})){

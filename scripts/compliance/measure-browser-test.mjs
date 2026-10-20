@@ -4,6 +4,7 @@ import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import {measureActionClearance,measureCompliance} from './measure.mjs';
+import {parseCss,pruneSuperseded} from '../presentation-cascade.mjs';
 const engines=await import(process.env.BINSO_PLAYWRIGHT_MODULE?pathToFileURL(process.env.BINSO_PLAYWRIGHT_MODULE).href:'playwright');
 const engine=process.env.BINSO_UX_BROWSER??'chromium';
 const browser=await engines[engine].launch({headless:true,...(engine==='chromium'&&process.env.BINSO_CHROMIUM_EXECUTABLE?{executablePath:process.env.BINSO_CHROMIUM_EXECUTABLE}: {})});
@@ -92,6 +93,14 @@ try{
  assert.equal((await sortCheck(sortControl+sortControl,'sort-two-choices'))[0].status,'failed','Two actual sort selectors remain blocking');
  assert.equal((await sortCheck(sortControl+'<button aria-label="Sortieren">Extra</button>','sort-extra-unowned-choice'))[0].status,'failed','An additional sort action outside its canonical owner remains blocking');
  assert.equal((await sortCheck(sortControl+'<button class="filter-chip" aria-label="Sortierung zurücksetzen">Reset</button>','sort-reset-chip'))[0].status,'passed','An active-filter reset is not another sort selector');
+ // Verify cascade pruning against browser-computed values, not source matching.
+ const originalCss='.probe{color:red;padding:4px;border-radius:8px;transition:opacity 100ms}.probe,.other{color:blue;transition:transform 100ms}.probe:hover{color:green}@media(max-width:760px){.probe{padding:8px}.probe,.other{padding:12px}}';
+ const prunedCss=parseCss(originalCss);assert.ok(pruneSuperseded(prunedCss).length>0);
+ const computed=async css=>{await page.setContent(`<style>${css}</style><button class="probe">Control</button>`);return page.locator('.probe').evaluate(el=>{const c=getComputedStyle(el),r=el.getBoundingClientRect();return {color:c.color,padding:c.padding,radius:c.borderRadius,transition:c.transition,width:r.width,height:r.height};});};
+ for(const width of [390,1440]){
+  await page.setViewportSize({width,height:1000});
+  assert.deepEqual(await computed(prunedCss.toString()),await computed(originalCss),'Pruning preserves actual browser-computed styles at '+width);
+ }
  await page.close();
  console.log('Scroll-end, desktop-header, exact per-view KPI and ZIP canvas/old-gray-surface adversaries passed. Engine: '+engine);
 }finally{await browser.close();await fs.rm(output,{recursive:true,force:true});}

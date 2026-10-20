@@ -37,6 +37,7 @@ const transaction=async fn=>{
 globalThis.__integrity={query,transaction,getSession:()=>({userId:'auth-integrity-fixture',sessionId:'00000000-0000-4000-8000-000000000081',email:'integrity@fixture.invalid',organizationId:'00000000-0000-4000-8000-000000000099',role:'owner',mfaEnabled:true}),createSession:async input=>{const id=await actualSession.createSession(input);created++;return id},jar:{set(...args){cookieSets++;globalThis.__integrity.cookieOptions=args[2]},get(){},delete(){}}};
 globalThis.__integrity.scanStatus='pending';globalThis.__integrity.scanCalls=0;
 const adapters={
+ 'qrcode':import.meta.resolve('qrcode'),
  'server-only':uri(''),
  'next/headers':uri('export const cookies=async()=>globalThis.__integrity.jar;export const headers=async()=>new Headers()'),
  'next/server':uri('export class NextResponse{static json(data,init){return Response.json(data,init)}}'),
@@ -122,6 +123,7 @@ try{
  const finance=await import(await load('app/api/finance/route.ts'));
  recorded.length=0;const cashResponse=await finance.GET(new Request('https://fixture.invalid/api/finance?view=cash'));assert.equal(cashResponse.status,200);assert.ok((await cashResponse.json()).cash);const cashQueries=recorded.filter(sql=>sql.startsWith('select')&&!sql.includes('set_config')).length;assert.equal(cashQueries,4,'Cash-only consumers perform four scoped queries including the separate refund ledger');assert.equal(recorded.filter(sql=>sql.startsWith('select r.refund_date::text')).length,1,'Actual repayment dates are queried once within the scoped cash snapshot');
  recorded.length=0;const legacyResponse=await finance.GET(new Request('https://fixture.invalid/api/finance'));assert.equal(legacyResponse.status,200);assert.ok((await legacyResponse.json()).payments,'Default external API contract preserved');assert.equal(recorded.filter(sql=>sql.startsWith('select')&&!sql.includes('set_config')).length,9);
+ await query("insert into organization_subscriptions(organization_id,plan,status) values($1,'professional','active') on conflict(organization_id) do update set plan='professional'",[sessionInput.organizationId]);
  const files=await import(await load('app/api/files/route.ts'));
  const upload=(text,key)=>{const form=new FormData();form.append('file',new File([text],'synthetic.txt',{type:'text/plain'}));form.append('purpose','document');return new Request('https://fixture.invalid/api/files',{method:'POST',headers:{'idempotency-key':key},body:form});};
  const first=await files.POST(upload('synthetic bytes','synthetic-upload-replay'));assert.equal(first.status,201);const uploaded=(await first.json()).item;assert.equal(uploaded.available,false);

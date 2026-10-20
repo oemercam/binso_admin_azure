@@ -2,7 +2,7 @@
 import {FileUpload} from './file-upload';
 
 import {LocalizedText} from "@/lib/client/locale";
-import {useState} from "react";
+import {useEffect,useRef,useState} from "react";
 import {PageAccessContext} from "@/lib/client/page-access";
 import {PageHeading,DetailHeading,ActionRow,ActionSheet,FormSheet,FilterSheet,ListRow} from "./binso-ux";
 import {HeaderPanel,type HeaderPanelKind} from "./header-panel";
@@ -16,13 +16,15 @@ import {Button,EmptyState,Field,Input,Select,Textarea,Toggle,Status,IconButton,C
 
 /** Local development only. No API calls, authentication or production records. */
 export function UxLab(){
+ const labRoot=useRef<HTMLElement>(null);
+ useEffect(()=>{labRoot.current?.setAttribute("data-hydrated","true")},[]);
  const [panel,setPanel]=useState<HeaderPanelKind|null>(null),[sheet,setSheet]=useState<"action"|"form"|"filter"|"wizard"|null>(null);
  const [query,setQuery]=useState(""),[value,setValue]=useState(""),[checked,setChecked]=useState(false),[step,setStep]=useState(0);
  const [file,setFile]=useState<File|null>(null),[filter,setFilter]=useState<"all"|"unread">("all");
  const [confirm,setConfirm]=useState(false),[showToast,setShowToast]=useState(false);
  const close=()=>setPanel(null),closeSheet=()=>setSheet(null);
  const fields=<><Field label="Name"><Input value={value} onChange={e=>setValue(e.target.value)}/></Field><Field label="Auswahl"><Select><option value={"Beispiel"}><LocalizedText>{"Beispiel"}</LocalizedText></option></Select></Field><Field label="Beschreibung"><Textarea/></Field></>;
- return <PageAccessContext.Provider value={{write:true,canOpen:()=>true}}><main className="ux-lab">
+ return <PageAccessContext.Provider value={{write:true,canOpen:()=>true}}><main className="ux-lab" ref={labRoot}>
   <div className="desktop-appbar"><PageHeading title="UX-Lab"/><IconButton label="Suche" icon="search" onClick={()=>setPanel("search")}/><IconButton label="Benachrichtigungen" icon="bell" onClick={()=>setPanel("notifications")}/><IconButton label="Konto" icon="user" onClick={()=>setPanel("account")}/></div>
   <header className="mobile-header"><b><LocalizedText>{"UX-Lab"}</LocalizedText></b><IconButton label="Suche" icon="search" onClick={()=>setPanel("search")}/><IconButton label="Benachrichtigungen" icon="bell" onClick={()=>setPanel("notifications")}/><IconButton label="Konto" icon="user" onClick={()=>setPanel("account")}/></header>
   <p><LocalizedText>{"Entwicklungsreferenz mit ausschliesslich synthetischen Beispielen."}</LocalizedText></p><DetailHeading title="Detailheader" status="Aktiv" tone="success"/>

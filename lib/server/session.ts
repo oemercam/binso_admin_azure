@@ -8,6 +8,7 @@ import {env} from "@/lib/server/env";
 import {expireUnpaidTrials} from "@/lib/server/subscription-lifecycle";
 
 export type SessionUser={
+ moduleProfile?:import('@/lib/permissions').ModuleProfile;
  isDemo?:boolean;
  organizationStatus?:string;
  sessionId:string;
@@ -22,7 +23,7 @@ export type SessionUser={
 const tokenHash=(token:string)=>createHash("sha256").update(token).digest("hex");
 const ipHash=(value:string)=>createHash("sha256").update(value).digest("hex");
 
-export async function createSession(input:{userId:string;organizationId:string;email:string;name:string;role:SessionUser["role"];ttlHours?:number;persistent?:boolean;cookieName?:string;expectedAuth?:{passwordHash:string;mfaEnabled:boolean;mfaSecretEnc:string|null}}){
+export async function createSession(input:{userId:string;organizationId:string;email:string;name:string;role:SessionUser["role"];ttlHours?:number;persistent?:boolean;cookieName?:string;expectedPasskeyId?:string;expectedAuth?:{passwordHash:string|null;mfaEnabled:boolean;mfaSecretEnc:string|null}}){
  const token=randomBytes(32).toString("base64url");
  const hash=tokenHash(token);
  const ttlHours=Math.max(1,Math.min(input.ttlHours??env.sessionTtlHours,env.sessionTtlHours));
@@ -36,6 +37,10 @@ export async function createSession(input:{userId:string;organizationId:string;e
   const current=(await client.query<{status:string;password_hash:string|null;mfa_enabled:boolean;mfa_secret_enc:string|null}>("select status,password_hash,mfa_enabled,mfa_secret_enc from app_users where id=$1 for update",[input.userId])).rows[0];
   const expected=input.expectedAuth;
   if(current?.status!=="active"||expected&&(current.password_hash!==expected.passwordHash||current.mfa_enabled!==expected.mfaEnabled||current.mfa_secret_enc!==expected.mfaSecretEnc))throw new ApiError(401,"auth_state_changed","Die Sicherheitsdaten wurden geändert. Bitte erneut anmelden.");
+  await client.query("select set_config('app.user_id',$1,true),set_config('app.organization_id',$2,true)",[input.userId,input.organizationId]);
+  if(input.expectedPasskeyId&&!(await client.query('select 1 from auth_passkeys where credential_id=$1 and user_id=$2 and organization_id=$3 and revoked_at is null',[input.expectedPasskeyId,input.userId,input.organizationId])).rowCount)throw new ApiError(401,'auth_state_changed','Bitte erneut anmelden.');
+  const membership=(await client.query("select organization_id from organization_memberships where user_id=$1 and status='active'",[input.userId])).rows;
+  if(membership.length!==1||membership[0].organization_id!==input.organizationId)throw new ApiError(401,'membership_ambiguous','Die Firmenzuordnung muss vor der Anmeldung geklärt werden.');
   return client.query<{id:string}>(
    `insert into auth_sessions(user_id,organization_id,token_hash,expires_at,user_agent,ip_hash)
     values($1,$2,$3,$4,$5,$6) returning id`,
@@ -72,12 +77,13 @@ export async function getSession():Promise<SessionUser|null>{
    if(!context)return {rows:[] as SessionUser[]};
    await client.query("select set_config('app.organization_id',$1,true),set_config('app.user_id',$2,true)",[context.organization_id,context.user_id]);
    return client.query<SessionUser>(
-   `select s.id as "sessionId",u.id as "userId",s.organization_id as "organizationId",u.email,u.display_name as name,m.role,o.status as "organizationStatus",o.is_demo as "isDemo",u.mfa_enabled as "mfaEnabled"
+   `select s.id as "sessionId",u.id as "userId",s.organization_id as "organizationId",u.email,u.display_name as name,m.role,m.module_profile as "moduleProfile",o.status as "organizationStatus",o.is_demo as "isDemo",u.mfa_enabled as "mfaEnabled"
       from auth_sessions s
       join app_users u on u.id=s.user_id and u.status='active'
       join organization_memberships m on m.user_id=u.id and m.organization_id=s.organization_id and m.status='active'
       join organizations o on o.id=s.organization_id and o.status in ('trial','active','grace_period','read_only')
      where s.token_hash=$1 and s.expires_at>now() and ($2::boolean=false or o.is_demo=true)
+       and (select count(*) from organization_memberships all_m where all_m.user_id=u.id and all_m.status='active')=1
      limit 1`,
    [tokenHash(token),demo]
  );

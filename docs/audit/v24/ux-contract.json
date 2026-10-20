@@ -119,7 +119,7 @@
       "scope": ".button",
       "requirement": "min-height: var(--button-height); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
       "owner": "app/design-system/primitives.css",
-      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 42px; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "acceptance": "PostCSS prüft die zentrale Bindung min-height: var(--button-height) und deren Root-Definition 42px; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
       "status": "offen",
       "evidence": [],
       "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
@@ -129,7 +129,7 @@
       "scope": ".button",
       "requirement": "height: var(--button-height); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
       "owner": "app/design-system/primitives.css",
-      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 42px; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "acceptance": "PostCSS prüft die zentrale Bindung height: var(--button-height) und deren Root-Definition 42px; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
       "status": "offen",
       "evidence": [],
       "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
@@ -139,7 +139,7 @@
       "scope": ".button",
       "requirement": "font-size: var(--button-font-size); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
       "owner": "app/design-system/primitives.css",
-      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 14px; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "acceptance": "PostCSS prüft die zentrale Bindung font-size: var(--button-font-size) und deren Root-Definition var(--type-control); Browser prüfen die berechnete Darstellung je Theme/Viewport.",
       "status": "offen",
       "evidence": [],
       "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
@@ -149,7 +149,7 @@
       "scope": ".button",
       "requirement": "font-weight: var(--button-font-weight); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
       "owner": "app/design-system/primitives.css",
-      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 650; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "acceptance": "PostCSS prüft die zentrale Bindung font-weight: var(--button-font-weight) und deren Root-Definition 400; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
       "status": "offen",
       "evidence": [],
       "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
@@ -159,7 +159,7 @@
       "scope": ".button",
       "requirement": "line-height: var(--button-line-height); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
       "owner": "app/design-system/primitives.css",
-      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 1; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "acceptance": "PostCSS prüft die zentrale Bindung line-height: var(--button-line-height) und deren Root-Definition 1; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
       "status": "offen",
       "evidence": [],
       "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
@@ -169,7 +169,7 @@
       "scope": ".button",
       "requirement": "gap: var(--button-gap); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
       "owner": "app/design-system/primitives.css",
-      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 8px; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "acceptance": "PostCSS prüft die zentrale Bindung gap: var(--button-gap) und deren Root-Definition 8px; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
       "status": "offen",
       "evidence": [],
       "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
@@ -179,7 +179,7 @@
       "scope": ".button svg",
       "requirement": "width: var(--button-icon-size); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
       "owner": "app/design-system/primitives.css",
-      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 17px; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "acceptance": "PostCSS prüft die zentrale Bindung width: var(--button-icon-size) und deren Root-Definition 17px; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
       "status": "offen",
       "evidence": [],
       "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
@@ -189,7 +189,7 @@
       "scope": ".button svg",
       "requirement": "height: var(--button-icon-size); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
       "owner": "app/design-system/primitives.css",
-      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 17px; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "acceptance": "PostCSS prüft die zentrale Bindung height: var(--button-icon-size) und deren Root-Definition 17px; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
       "status": "offen",
       "evidence": [],
       "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
@@ -199,7 +199,7 @@
       "scope": ".page-head h1",
       "requirement": "font-size: var(--page-heading-size); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
       "owner": "app/design-system/layout.css",
-      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 28px; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "acceptance": "PostCSS prüft die zentrale Bindung font-size: var(--page-heading-size) und deren Root-Definition var(--type-desktop-heading); Browser prüfen die berechnete Darstellung je Theme/Viewport.",
       "status": "offen",
       "evidence": [],
       "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
@@ -209,7 +209,7 @@
       "scope": ".page-head h1",
       "requirement": "line-height: var(--page-heading-line-height); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
       "owner": "app/design-system/layout.css",
-      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 1.08; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "acceptance": "PostCSS prüft die zentrale Bindung line-height: var(--page-heading-line-height) und deren Root-Definition 1.5; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
       "status": "offen",
       "evidence": [],
       "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
@@ -219,7 +219,7 @@
       "scope": ".page-head h1",
       "requirement": "letter-spacing: var(--page-heading-letter-spacing); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
       "owner": "app/design-system/layout.css",
-      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert -.035em; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "acceptance": "PostCSS prüft die zentrale Bindung letter-spacing: var(--page-heading-letter-spacing) und deren Root-Definition -.6px; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
       "status": "offen",
       "evidence": [],
       "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
@@ -229,7 +229,7 @@
       "scope": ".page-head p",
       "requirement": "font-size: var(--body-font-size); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
       "owner": "app/design-system/layout.css",
-      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 14px; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "acceptance": "PostCSS prüft die zentrale Bindung font-size: var(--body-font-size) und deren Root-Definition 14px; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
       "status": "offen",
       "evidence": [],
       "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
@@ -239,7 +239,7 @@
       "scope": ".page-head p",
       "requirement": "line-height: var(--body-line-height); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
       "owner": "app/design-system/layout.css",
-      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 1.45; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "acceptance": "PostCSS prüft die zentrale Bindung line-height: var(--body-line-height) und deren Root-Definition 1.45; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
       "status": "offen",
       "evidence": [],
       "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
@@ -249,7 +249,7 @@
       "scope": ".metric-top",
       "requirement": "font-size: var(--metric-label-size); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
       "owner": "app/design-system/layout.css",
-      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 11px; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "acceptance": "PostCSS prüft die zentrale Bindung font-size: var(--metric-label-size) und deren Root-Definition var(--type-label); Browser prüfen die berechnete Darstellung je Theme/Viewport.",
       "status": "offen",
       "evidence": [],
       "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
@@ -259,7 +259,7 @@
       "scope": ".metric-top",
       "requirement": "line-height: var(--metric-label-line-height); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
       "owner": "app/design-system/layout.css",
-      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 1.2; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "acceptance": "PostCSS prüft die zentrale Bindung line-height: var(--metric-label-line-height) und deren Root-Definition 1.2; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
       "status": "offen",
       "evidence": [],
       "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
@@ -269,7 +269,7 @@
       "scope": ".metric strong",
       "requirement": "font-size: var(--metric-value-size); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
       "owner": "app/design-system/layout.css",
-      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 20px; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "acceptance": "PostCSS prüft die zentrale Bindung font-size: var(--metric-value-size) und deren Root-Definition var(--workspace-value-size); Browser prüfen die berechnete Darstellung je Theme/Viewport.",
       "status": "offen",
       "evidence": [],
       "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
@@ -279,7 +279,7 @@
       "scope": ".metric strong",
       "requirement": "line-height: var(--metric-value-line-height); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
       "owner": "app/design-system/layout.css",
-      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert 1.05; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "acceptance": "PostCSS prüft die zentrale Bindung line-height: var(--metric-value-line-height) und deren Root-Definition 1.5; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
       "status": "offen",
       "evidence": [],
       "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
@@ -289,7 +289,7 @@
       "scope": ".metric strong",
       "requirement": "letter-spacing: var(--metric-value-letter-spacing); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
       "owner": "app/design-system/layout.css",
-      "acceptance": "PostCSS prüft exakte Bindung und Root-Wert -.025em; Browser verifiziert berechnete Darstellung je Theme/Viewport.",
+      "acceptance": "PostCSS prüft die zentrale Bindung letter-spacing: var(--metric-value-letter-spacing) und deren Root-Definition -1px; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
       "status": "offen",
       "evidence": [],
       "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"

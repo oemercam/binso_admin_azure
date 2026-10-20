@@ -17,11 +17,11 @@ export function collectEvidence(folders,current){
 }
 export function aggregate(requirements,evidence){
  return requirements.map(r=>{
-  const checks=evidence.flatMap(e=>e.checks.filter(c=>c.id===r.id).map(c=>({...c,route:c.route??e.route,state:c.state??e.state,theme:c.theme??e.theme,width:c.width??e.width,engine:c.engine??e.engine,evidence:e.evidence})));
+  const checks=evidence.flatMap(e=>e.checks.filter(c=>c.id===r.id).map(c=>({...c,route:c.route??e.route,state:c.state??e.state,theme:c.theme??e.theme,width:c.width??e.width,engine:c.engine??e.engine,role:c.role??e.role,platform:c.platform??c.device?.platform??e.platform,evidence:e.evidence})));
   const expected=r.expectedCases??[];
-  const covered=expected.length>0&&expected.every(target=>checks.some(c=>c.status==='passed'&&['route','state','theme','width','engine'].every(k=>target[k]===undefined||target[k]===c[k])));
+  const covered=expected.length>0&&expected.every(target=>target&&Object.keys(target).length>0&&checks.some(c=>c.status==='passed'&&Object.keys(target).every(k=>target[k]!==undefined&&target[k]===c[k])));
   const reviewed=checks.length>0&&checks.every(c=>c.status==='passed'&&c.reviewer&&c.approvalReference&&(r.method!=='physical'||c.device?.installedPwa&&c.device?.physical===true));
-  const status=checks.some(c=>c.status==='failed')?'failed':r.method==='static'&&checks.length&&checks.every(c=>c.status==='passed')?'passed':['review','physical'].includes(r.method)&&reviewed?'passed':!['review','physical'].includes(r.method)&&covered?'passed':checks.some(c=>['passed','partial'].includes(c.status))?'partial':r.method==='physical'?'manual-required':r.method==='review'?'review-required':'not-tested';
+  const status=checks.some(c=>c.status==='failed')?'failed':r.method==='static'&&checks.length&&checks.every(c=>c.status==='passed')?'passed':['review','physical'].includes(r.method)&&reviewed&&covered?'passed':!['review','physical'].includes(r.method)&&covered?'passed':checks.some(c=>['passed','partial'].includes(c.status))?'partial':r.method==='physical'?'manual-required':r.method==='review'?'review-required':'not-tested';
   return {...r,status,checks,expectedCases:expected,coverage:covered?'All explicitly registered applicable cases have passing individual evidence':checks.length?'Measured cases only; unspecified or untested route/state/engine combinations remain open':'No current individual evidence'};
  });
 }

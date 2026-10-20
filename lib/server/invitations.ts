@@ -1,3 +1,4 @@
+import {canonicalPlanId,effectiveUserLimit,capacityReached} from '@/config/plans';
 import "server-only";
 import {createHash,randomBytes,randomUUID} from "node:crypto";
 import {ApiError} from "./http";
@@ -12,32 +13,38 @@ import type {SessionUser} from "./session";
 
 /** Cross-tenant identity lookup is required for existing accounts. Every business
  * write still carries the authenticated tenant; no platform identity is exposed. */
-export async function inviteUser(s:SessionUser,email:string,role:string,key:string){
+export async function inviteUser(s:SessionUser,email:string,role:string,key:string,moduleProfile:import("@/lib/permissions").ModuleProfile="standard"){
  authorize(s,'users:manage');
+ if(!['standard','time_only'].includes(moduleProfile)||moduleProfile==='time_only'&&role!=='member')throw new ApiError(400,'profile_invalid','Ungültiges Modulprofil.');
  if(s.isDemo)throw new ApiError(403,'demo_read_only','Einladungen sind in der Demo deaktiviert.');
  const prepared=await withPlatform(async c=>{
   await c.query("select set_config('app.organization_id',$1,true)",[s.organizationId]);
   await c.query("select set_config('app.user_id',$1,true)",[s.userId]);
-  return idempotentBusiness(c,{organizationId:s.organizationId,userId:s.userId,operation:'invitation.create',key,body:{email,role}},async()=>{
+  return idempotentBusiness(c,{organizationId:s.organizationId,userId:s.userId,operation:'invitation.create',key,body:{email,role,moduleProfile}},async()=>{
    await c.query('select id from organizations where id=$1 for update',[s.organizationId]);
-   const capacity=(await c.query("select e.max_users,(select count(*) from organization_memberships m where m.organization_id=e.organization_id and m.status='active')+(select count(*) from organization_invitations i where i.organization_id=e.organization_id and i.status='pending' and i.expires_at>now()) occupied from organization_entitlements e where e.organization_id=$1",[s.organizationId])).rows[0];
-   if(!capacity||Number(capacity.occupied)>=Number(capacity.max_users))throw new ApiError(409,'user_limit','Das Benutzerlimit ist erreicht.');
+   const capacity=(await c.query("select e.max_users,s.plan,(select count(*) from organization_memberships m where m.organization_id=e.organization_id and m.status='active')+(select count(*) from organization_invitations i where i.organization_id=e.organization_id and i.status='pending' and i.expires_at>now()) occupied from organization_entitlements e join organization_subscriptions s on s.organization_id=e.organization_id where e.organization_id=$1",[s.organizationId])).rows[0];
+   const capacityPlan=canonicalPlanId(capacity?.plan);
+   if(!capacity||!capacityPlan)throw new ApiError(409,'user_limit','Das Benutzerlimit konnte nicht geprüft werden.');
+   if(capacityReached(Number(capacity.occupied),effectiveUserLimit(capacityPlan,capacity.max_users)))throw new ApiError(409,'user_limit','Das Benutzerlimit ist erreicht.');
    if((await c.query("select id from organization_invitations where organization_id=$1 and lower(email)=lower($2) and status='pending' and expires_at>now()",[s.organizationId,email])).rowCount)throw new ApiError(409,'already_invited','Für diese Person besteht bereits eine Einladung.');
    // Serialize identity creation across organizations without sharing tenant records.
    await c.query('select pg_advisory_xact_lock(hashtextextended($1,0))',['invitation.identity:'+email]);
    const existing=(await c.query('select id from app_users where lower(email)=lower($1) limit 1',[email])).rows[0];
    const userId=existing?.id??randomUUID();
+   if(existing)await c.query("select set_config('app.user_id',$1,true)",[userId]);
+   if(existing&&(await c.query("select 1 from organization_memberships where user_id=$1 and organization_id<>$2 limit 1",[userId,s.organizationId])).rowCount)throw new ApiError(409,'identity_unavailable','Diese Adresse kann für diese Einladung nicht verwendet werden. Bitte ein separates Konto mit eigener E-Mail verwenden.');
+   await c.query("select set_config('app.user_id',$1,true)",[s.userId]);
    if(!existing)await c.query("insert into app_users(id,email,display_name,status,password_hash) values($1,$2,$2,'invited',$3)",[userId,email,await hashPassword(randomBytes(48).toString('base64url'))]);
    const member=(await c.query('select status from organization_memberships where organization_id=$1 and user_id=$2 for update',[s.organizationId,userId])).rows[0];
    if(member?.status==='active')throw new ApiError(409,'already_member','Diese Person ist bereits im Team.');
    const id=randomUUID(),token=randomBytes(32).toString('base64url');
-   await c.query("insert into organization_invitations(id,organization_id,email,role,status,expires_at,created_by_user_id) values($1,$2,$3,$4,'pending',now()+interval '7 days',$5)",[id,s.organizationId,email,role,s.userId]);
-   await c.query("insert into organization_memberships(organization_id,user_id,role,status,email) values($1,$2,$3,'invited',$4) on conflict(organization_id,user_id) do update set role=excluded.role,status='invited'",[s.organizationId,userId,role,email]);
+   await c.query("insert into organization_invitations(id,organization_id,email,role,status,expires_at,created_by_user_id,module_profile) values($1,$2,$3,$4,'pending',now()+interval '7 days',$5,$6)",[id,s.organizationId,email,role,s.userId,moduleProfile]);
+   await c.query("insert into organization_memberships(organization_id,user_id,role,status,email,module_profile) values($1,$2,$3,'invited',$4,$5) on conflict(organization_id,user_id) do update set role=excluded.role,module_profile=excluded.module_profile,status='invited'",[s.organizationId,userId,role,email,moduleProfile]);
    await c.query("insert into auth_tokens(user_id,organization_id,email,token_hash,token_type,metadata,expires_at) values($1,$2,$3,$4,'invitation',$5::jsonb,now()+interval '7 days')",[userId,s.organizationId,email,createHash('sha256').update(token).digest('hex'),JSON.stringify({invitation_id:id})]);
    const url=env.appUrl+'/einladung?token='+encodeURIComponent(token);
    const html=mailLayout('Einladung zu Binso One','<p>Du wurdest zu einem Binso One Firmenkonto eingeladen.</p>',{label:'Einladung annehmen',url});
    const outbox=(await c.query("insert into mail_outbox(organization_id,deduplication_key,kind,entity_id,recipient,subject,body,attachment_html,created_by) values($1,$2,'invitation',$3,$4,'Einladung zu Binso One',$5,$6,$7) returning id",[s.organizationId,'invitation:'+id,id,email,'Einladung annehmen: '+url,html,s.userId])).rows[0];
-   await audit(c,{organizationId:s.organizationId,userId:s.userId,userName:s.name,action:'Einladung erstellt',entityType:'invitation',entityId:id,metadata:{role,delivery:'queued'}});
+   await audit(c,{organizationId:s.organizationId,userId:s.userId,userName:s.name,action:'Einladung erstellt',entityType:'invitation',entityId:id,metadata:{role,moduleProfile,delivery:'queued'}});
    return {id,outboxId:String(outbox.id)};
   });
  });

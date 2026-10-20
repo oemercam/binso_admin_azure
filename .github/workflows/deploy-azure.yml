@@ -113,6 +113,7 @@ jobs:
             echo "::error::DATABASE_URL for Azure Database for PostgreSQL is required."
             exit 1
           fi
+          node scripts/single-company-preflight.mjs
           pnpm db:migrate
           pnpm db:check
           RETENTION_DRY_RUN=true pnpm retention:cleanup

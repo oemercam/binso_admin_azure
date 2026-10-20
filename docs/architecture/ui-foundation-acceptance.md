@@ -1,5 +1,10 @@
 # V21.1 route acceptance matrix
 
+> Historischer V21.1-Nachweis, keine aktuelle Regel oder Gesamtabnahme. Alte
+> `app/styles/*`-Pfade beschreiben den damaligen Stand. Aktuelle Quellen und
+> offene Nachweise: [Foundation-Status](foundation-status.md) und
+> [App-Abnahme](app-acceptance.md). Keine Altwerte aus dieser Matrix zurückführen.
+
 Every source route is included. Conditional graphs are candidates, not proof of runtime rendering. Production-only redirects/guards and dynamic fixture paths are listed separately. A passed automated geometry case is not visual approval of every component/state.
 
 | Route | Page type | Current component | Canonical responsibility | Layout | CSS sources | Root-cause assessment | Removed legacy / migration | Test | Screenshot | Status |

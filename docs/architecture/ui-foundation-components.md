@@ -1,5 +1,10 @@
 # V21.1 component and use inventory
 
+> Historisches V21.1-Inventar. Komponenten-/CSS-Pfade und Verwendungen sind keine
+> aktuelle Lösch- oder Implementierungsgrundlage. Aktueller Einstieg:
+> [Foundation-Status](foundation-status.md); verbindliche Owner stehen in
+> [Reference Foundation](reference-foundation.md).
+
 All JSX-rendering component declarations, source locations and statically reachable routes. Conditional root-layout branches remain candidates. Props and conditions are retained in renderCatalog in ux-inventory.json.
 
 | Component | Source line | Reachable routes | Canonical owner / status |

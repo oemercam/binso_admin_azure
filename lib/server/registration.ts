@@ -68,20 +68,21 @@ export async function registrationHandoff(organizationId:string,role:TenantRole,
  return {onboardingComplete,mfaSetupRequired,next:mfaSetupRequired?`/einstellungen/sicherheit?setup=1&next=${encodeURIComponent(next)}`:next};
 }
 
-export type VerifiedMember={organization_id:string;role:TenantRole;name:string;email_verified_at:Date|null;mfa_enabled:boolean};
+export type VerifiedMember={organization_id:string;role:TenantRole;name:string;email_verified_at:Date|null;mfa_enabled:boolean;password_hash:string|null;mfa_secret_enc:string|null};
 export async function completeRegistrationVerification(client:PoolClient,userId:string,email:string,organizationId?:string|null){
  await client.query("select set_config('app.user_id',$1,true)",[userId]);
  const membership=await client.query<VerifiedMember>(
-  `select m.organization_id,m.role,u.display_name as name,u.email_verified_at,u.mfa_enabled from app_users u
+  `select m.organization_id,m.role,u.display_name as name,u.email_verified_at,u.mfa_enabled,u.password_hash,u.mfa_secret_enc from app_users u
    join organization_memberships m on m.user_id=u.id and m.status='active'
    join organizations o on o.id=m.organization_id and o.status in ('trial','active','grace_period','read_only')
    where u.id=$1 and u.status='active' and lower(u.email)=lower($2) and ($3::uuid is null or m.organization_id=$3::uuid)
+   and (select count(*) from organization_memberships all_m where all_m.user_id=u.id and all_m.status='active')=1
    order by m.created_at asc limit 1 for update of u`,[userId,email,organizationId??null]);
  const row=membership.rows[0];
  if(!row)return null;
  await client.query("select set_config('app.organization_id',$1,true)",[row.organization_id]);
  await client.query("update app_users set email_verified_at=coalesce(email_verified_at,now()),updated_at=now() where id=$1",[userId]);
- if(!row.email_verified_at&&row.role==='owner')await client.query("update organization_subscriptions set trial_until=coalesce(trial_until,now()+($2||' days')::interval),updated_at=now() where organization_id=$1 and status='trial'",[row.organization_id,String(domainConfig.trialDays)]);
+ if(!row.email_verified_at&&row.role==='owner')await client.query("update organization_subscriptions set trial_until=coalesce(trial_until,now()+($2||' hours')::interval),updated_at=now() where organization_id=$1 and status='trial'",[row.organization_id,String(domainConfig.trialDays*24)]);
  await client.query("update auth_email_codes set consumed_at=coalesce(consumed_at,now()) where user_id=$1 and purpose='verify_email'",[userId]);
  return row;
 }

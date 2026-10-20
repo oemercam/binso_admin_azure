@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {waitForLabReady} from './shared-control-browser.mjs';
+let release,settled=false,fonts=false;
+const gate=new Promise(resolve=>{release=resolve});
+const pending=waitForLabReady({locator:selector=>{assert.equal(selector,'main.ux-lab[data-hydrated="true"]');return {waitFor:async options=>{assert.equal(options.state,'visible');await gate;}}},evaluate:async()=>{fonts=true}}).then(()=>{settled=true});
+await Promise.resolve();assert.equal(settled,false,'SSR presence cannot imply hydrated readiness');assert.equal(fonts,false);
+release();await pending;assert.equal(fonts,true);assert.equal(settled,true);
+await assert.rejects(()=>waitForLabReady({locator:()=>({waitFor:async()=>{throw Error('missing hydration')}}),evaluate:async()=>{throw Error('fonts must not run early')}}),/missing hydration/);
+await assert.rejects(()=>waitForLabReady({locator:()=>({waitFor:async()=>{}}),evaluate:async()=>{throw Error('font readiness failed')}}),/font readiness failed/);
+console.log('Lab readiness: pending/missing hydration and failed fonts stay blocking; confirmed readiness passes without global network idleness.');

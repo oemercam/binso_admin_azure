@@ -66,7 +66,31 @@ short copy without clipping at zoom; security explanations and necessary primary
 actions remain reachable. Business-rule changes need separate regression evidence.
 Production deployment still requires separate explicit authorization.
 
+## V25.4 approved additions (20 October 2026)
+
+See docs/architecture/v25-4-ux-marketing-app-ready.md and the unchanged supplied
+sources there. config/plans.ts is the canonical tariff source: Start includes
+orders; Pro has no regular user cap; independent document management is Pro-only,
+while domain attachments retain their existing module access. Prices stay fixed.
+The owner explicitly approved D16: time_only members see authorized navigation
+targets only, even fewer than five. Preserve material, icons, height, position and
+the blue create action. This scoped permission exception supersedes the old fixed
+slot requirement; no general navigation redesign is authorized. Historical visual
+references remain archived; the new source reference needs rendered countercases.
+Module profiles restrict roles, never replace backend authorization, assignment
+scope or RLS. Public demo provisioning is closed; trusted isolated QA remains.
+No production migration, merge, deployment or native-store release is authorized.
+
 # Codex workflow and context (canonical project instructions)
+
+V25.5 follows the existing V25.4 handoff, never an assumed integrated Main.
+Use docs/architecture/v25-5-platform-lifecycle.md and its single traceability CSV.
+One identity/one active company, submitted-before-independent-time-approval and
+unchanged privileged TOTP remain server/DB boundaries. Passkeys do not silently
+replace privileged MFA. Keep unapproved PL-G/D gates open; no production actions.
+V25.5 expands the authorized-target exception to all roles and tariffs: show only
+permitted destinations, fewer than five allowed; preserve existing navigation
+material, icons, height, position and blue FAB. Historical references stay intact.
 
 - Work toward one clearly bounded objective per assignment. State the outcome,
   affected area and validation scope briefly; do not add cleanup, audits, PRs,

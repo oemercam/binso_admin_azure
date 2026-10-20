@@ -19,7 +19,7 @@ export async function GET(request:NextRequest) {
       const results:SearchItem[]=[];
       for(const source of searchSources){
         const permission=permissionForModule(source.module,"read");
-        if(!permission||!tenantCan(session.role,permission)||!planAllowsModule(plan,source.module))continue;
+        if(!permission||!tenantCan(session.role,permission,session.moduleProfile)||!planAllowsModule(plan,source.module))continue;
         const filters=new URLSearchParams({q:query,limit:String(12-results.length)});
         if("kind" in source)filters.set("kind","eq."+source.kind);
         const rows=await listApiBusiness(client,session,source.table,filters.toString());

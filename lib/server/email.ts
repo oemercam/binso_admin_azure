@@ -1,8 +1,7 @@
 import "server-only";
 import {env} from "@/lib/server/env";
 import {log} from "@/lib/server/logger";
-
-type Mail={to:string;subject:string;html:string;text:string;attachments?:Array<{name:string;contentType:string;content:Buffer}>};
+import {renderMailMessage,type Mail} from './mail-message';
 
 type GraphToken={accessToken:string;expiresAt:number};
 let graphToken:GraphToken|null=null;
@@ -37,23 +36,16 @@ async function getGraphToken(){
 }
 
 async function sendViaGraph(mail:Mail){
+ const message=await renderMailMessage(mail,env.graphSenderUserId!);
  const token=await getGraphToken();
  const response=await fetch(`https://graph.microsoft.com/v1.0/users/${encodeURIComponent(env.graphSenderUserId!)}/sendMail`,{
   method:"POST",
-  headers:{authorization:`Bearer ${token}`,"content-type":"application/json"},
-  body:JSON.stringify({
-   message:{
-    subject:mail.subject,
-    body:{contentType:"HTML",content:mail.html},
-    toRecipients:[{emailAddress:{address:mail.to}}],
-    attachments:mail.attachments?.map(a=>({"@odata.type":"#microsoft.graph.fileAttachment",name:a.name,contentType:a.contentType,contentBytes:a.content.toString("base64")})),
-   },
-   saveToSentItems:true,
-  }),
+  headers:{authorization:`Bearer ${token}`,"content-type":"text/plain"},
+  body:message.toString('base64'),
   cache:"no-store",
   signal:AbortSignal.timeout(20_000),
  });
- if(!response.ok){
+ if(response.status!==202){
   log("error","graph_mail_error",{status:response.status});
   throw new Error("E-Mail konnte nicht über Microsoft Graph versendet werden.");
  }
@@ -81,6 +73,8 @@ export async function checkGraphMailHealth(){
 }
 
 export function mailLayout(title:string,body:string,cta?:{label:string;url:string},locale:"de"|"en"|"fr"|"it"|"tr"="de"){
- const button=cta?`<p style="margin:28px 0"><a href="${cta.url}" style="background:#111;color:#fff;padding:12px 18px;border-radius:8px;text-decoration:none">${cta.label}</a></p>`:"";
- return `<!doctype html><html lang="${locale}"><body style="margin:0;background:#fff;font-family:Arial,sans-serif;color:#111;line-height:1.55"><div style="max-width:620px;margin:auto;padding:40px 28px"><div style="font-size:13px;font-weight:800;letter-spacing:.12em;margin-bottom:30px">BINSO ONE</div><h1 style="margin:0 0 16px;font-size:24px;line-height:1.15">${title}</h1>${body}${button}<hr style="border:0;border-top:1px solid #ddd;margin:34px 0 20px"><small style="color:#666">Binso One · Binso GmbH · Weissbadstrasse 8b · 9050 Appenzell · support@binso.ch</small></div></body></html>`;
+ const escape=(value:string)=>value.replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]!));
+ if(cta&&!/^https?:\/\//i.test(cta.url))throw new Error('Invalid mail action URL');
+ const button=cta?`<p style="margin:24px 0"><a class="mail-cta" href="${escape(cta.url)}" style="display:inline-block;background:#2566bd;color:#fff;padding:12px 20px;border-radius:6px;text-decoration:none;font-weight:600">${escape(cta.label)}</a></p>`:"";
+ return `<!doctype html><html lang="${locale}"><head><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="supported-color-schemes" content="light dark"><style>@media(prefers-color-scheme:dark){.mail-body,.mail-content{background:#17212e!important;color:#f3f6fa!important}.mail-footer{color:#bbc5d2!important}.mail-divider{border-color:#465568!important}.mail-cta{background:#2566bd!important;color:#fff!important}}</style></head><body class="mail-body" style="margin:0;background:#fff;font-family:Arial,sans-serif;color:#263950;font-size:16px;line-height:1.55"><table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"><tr><td align="center"><table class="mail-content" role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width:620px;background:#fff;color:#263950"><tr><td style="padding:32px 24px"><div style="font-size:16px;font-weight:700;margin-bottom:24px">BINSO ONE</div><h1 style="margin:0 0 16px;font-size:24px;line-height:1.25">${escape(title)}</h1>${body}${button}<hr class="mail-divider" style="border:0;border-top:1px solid #edf1f6;margin:28px 0 20px"><p class="mail-footer" style="font-size:13px;color:#647080">Binso One · Binso GmbH · Weissbadstrasse 8b · 9050 Appenzell · support@binso.ch</p></td></tr></table></td></tr></table></body></html>`;
 }

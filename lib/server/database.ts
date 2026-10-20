@@ -28,7 +28,7 @@ const tablePermissions:Record<string,{read:TenantPermission;write:TenantPermissi
  notifications:{read:"organization:read",write:"organization:read"},profiles:{read:"organization:read",write:"organization:read"}
 };
 const featureModules:Record<string,string>={customers:'kunden',customer_contacts:'kunden',employees:'personal',expenses:'spesen',payments:'zahlungen',products:'produkte',time_entries:'zeiterfassung'};
-async function assertTablePermission(session:SessionUser,table:string,action:"read"|"write"){const permission=tablePermissions[table]?.[action];if(permission)authorize(session,permission);const moduleKey=featureModules[table];if(moduleKey)await requireModuleEntitlement(session.organizationId,moduleKey);}
+async function assertTablePermission(session:SessionUser,table:string,action:"read"|"write"){if(session.moduleProfile==='time_only'&&!['time_entries','support_tickets'].includes(table))throw new ApiError(403,'forbidden','Keine Berechtigung.');const permission=tablePermissions[table]?.[action];if(permission)authorize(session,permission);const moduleKey=featureModules[table];if(moduleKey)await requireModuleEntitlement(session.organizationId,moduleKey);}
 const ident=(v:string)=>{if(!/^[a-z_]+$/.test(v)||!names.has(v))throw new ApiError(400,"invalid_table","Ungültige Datenquelle.");return v};
 const selectCols=(v:string)=>v==="*"?"*":v.split(",").map(x=>x.trim()).filter(x=>/^[a-z_]+$/.test(x)).join(",")||"*";
 export async function currentTenant(){const s=await requireSession();return {user:{id:s.userId,email:s.email},token:"",tenantId:s.organizationId,role:s.role,session:s}}

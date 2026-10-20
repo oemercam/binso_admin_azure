@@ -1,11 +1,10 @@
-import {randomUUID} from "node:crypto";
+import {randomUUID,timingSafeEqual} from "node:crypto";
 import {env} from "@/lib/server/env";
 import {provisionOrganization} from "@/lib/server/provisioning";
 import {createSession,destroySession,getSession} from "@/lib/server/session";
-import {enforceRateLimit} from "@/lib/server/rate-limit";
 import { cookies } from "next/headers";
 import { NextRequest } from "next/server";
-import { assertSameOrigin, apiError, json } from "@/lib/server/http";
+import { ApiError,assertSameOrigin, apiError, json } from "@/lib/server/http";
 
 const demoCookie="binso_demo";
 const demoMaxAge=60*60*24;
@@ -20,14 +19,17 @@ export async function GET(){
 export async function POST(request:NextRequest){
   try{
     assertSameOrigin(request);
+    // Preserve only the existing isolated smoke/QA entry, never public provisioning.
+    const provided=request.headers.get('x-binso-smoke-test');
+    const expected=env.smokeTestToken;
+    if(!provided||!expected||Buffer.byteLength(provided)!==Buffer.byteLength(expected)||!timingSafeEqual(Buffer.from(provided),Buffer.from(expected))){
+      throw new ApiError(404,'demo_unavailable','Der öffentliche Demo-Zugang ist nicht verfügbar.');
+    }
     let databaseBacked=false;
     if(env.databaseUrl){
       const current=await getSession();
       const reset=request.nextUrl.searchParams.get('reset')==='1';
       if(!current?.isDemo||reset){
-        const smokeToken=request.headers.get("x-binso-smoke-test");
-        const trustedSmoke=Boolean(env.smokeTestToken&&smokeToken&&smokeToken===env.smokeTestToken);
-        if(!trustedSmoke)await enforceRateLimit(request,'demo-provision',10,60*60*1000);
         const userId='demo-'+randomUUID(),email='nina.mueller.'+userId.slice(-8)+'@demo.example.invalid';
         const created=await provisionOrganization({userId,email,name:'Nina Müller',companyName:'Alpenblick Digital AG',plan:'business',mode:'demo'});
         if(reset&&current?.isDemo)await destroySession('binso_demo_write');

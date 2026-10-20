@@ -76,6 +76,9 @@ const nextConfig: NextConfig = {
   output: "standalone",
   poweredByHeader: false,
   compress: true,
+  // Resolve the retired public demo before streaming can turn a page redirect
+  // into an HTTP-200 meta refresh. The page redirect remains a safe fallback.
+  async redirects() {return [{source:'/demo',destination:'/registrieren',permanent:false}];},
   async headers() {
     return [
       { source: "/(.*)", headers: securityHeaders },

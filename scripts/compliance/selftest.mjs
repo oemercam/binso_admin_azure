@@ -6,6 +6,15 @@ const registry=JSON.parse(fs.readFileSync('ux-compliance/requirements.v1.json','
 const {identity}=await import('./identity.mjs');assert.equal(identity().registryVersion,registry.version,'Evidence records the actual active registry version');
 assert.equal(new Set(registry.requirements.map(r=>r.id)).size,registry.requirements.length);
 for(const r of registry.requirements)for(const key of ['id','description','routes','componentTypes','expected','owner','method','testCase','priority','acceptance'])assert.ok(r[key],r.id+' missing '+key);
+for(const r of registry.requirements.filter(r=>r.method!=='static')){
+ assert.ok(Array.isArray(r.expectedCases)&&r.acceptanceScope,r.id+' needs an explicit case plan or an unresolved historical scope');
+ if(r.id.startsWith('UX-'))assert.ok(r.expectedCases.length,r.id+' current acceptance cannot silently lose its case matrix');
+ assert.equal(new Set(r.expectedCases.map(c=>JSON.stringify(c))).size,r.expectedCases.length,r.id+' duplicate expected cases');
+ for(const c of r.expectedCases){
+  assert.ok(c.route&&c.state,r.id+' each case needs a route and state');
+  if(['browser','interaction'].includes(r.method))assert.ok(c.engine&&c.theme&&Number.isFinite(c.width),r.id+' rendered cases need engine, theme and viewport');
+ }
+}
 for(const name of fixtureCases){const a=fixtureCase(name),b=fixtureCase(name,'ux-tenant-b'),again=fixtureCase(name);assert.deepEqual(a,again);assert.ok(a.invoices.every(i=>i.tenant_id===a.tenant&&i.customer_id.startsWith(a.tenant)));assert.ok(!a.invoices.some(i=>b.invoices.some(j=>i.id===j.id)));if(a.customers.length)a.customers[0].name='mutated';assert.deepEqual(again,fixtureCase(name));}
 assert.equal(fixtureCase('empty').invoices.length,0);assert.equal(fixtureCase('large').customers.length,500);assert.equal(fixtureCase('partial').invoices[0].paid_amount,25);assert.ok(fixtureCase('partial').invoices.every(i=>i.status==='partial'&&i.paid_amount>0&&i.paid_amount<i.total));for(const name of fixtureCases)for(const invoice of fixtureCase(name).invoices){assert.ok(invoice.paid_amount>=0&&invoice.paid_amount<=invoice.total);if(['draft','cancelled'].includes(invoice.status))assert.equal(invoice.paid_amount,0);if(invoice.status==='paid')assert.equal(invoice.paid_amount,invoice.total);}assert.equal(fixtureCase('no-expenses').cash.outflows.length,0);assert.ok(fixtureCase('negative').cash.payments[0].amount<fixtureCase('negative').cash.outflows[0].amount);assert.throws(()=>fixtureCase('few','production-tenant'));
 console.log('Registry and fixture determinism, object isolation, tenant IDs, empty/large/partial/negative cases verified.');

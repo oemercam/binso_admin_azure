@@ -11,6 +11,7 @@ import {apiError,json} from '@/lib/server/http';
 export async function GET(){
  try{
   const session=await requireSession();
+  if(session.moduleProfile==='time_only')authorize(session,'organization:read');
   const plan=await getOrganizationPlan(session.organizationId);
   const canFinance=tenantCan(session.role,'accounting:read');
   const canInvoices=tenantCan(session.role,'invoices:read'),canPayments=tenantCan(session.role,'payments:read');

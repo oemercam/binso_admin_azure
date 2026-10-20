@@ -20,6 +20,27 @@ assert.equal(aggregate(r,[{checks:[{id:'UX-X',status:'passed'}]}])[0].status,'pa
 assert.equal(aggregate([{id:'UX-X',method:'browser',expectedCases:[{route:'/kunden',engine:'chromium',width:390,state:'normal',theme:'light'}]}],[{route:'/kunden',engine:'chromium',width:390,state:'normal',theme:'light',checks:[{id:'UX-X',status:'passed'}]}])[0].status,'passed');
 assert.equal(aggregate([{id:'UX-X',method:'physical'}],[{checks:[{id:'UX-X',status:'passed',reviewer:'UX owner',approvalReference:'Device-recording',device:{physical:false,installedPwa:true}}]}])[0].status,'partial','Desktop emulation cannot satisfy physical-device approval');
 assert.equal(aggregate(r,[{checks:[{id:'UX-X',status:'passed'},{id:'UX-X',status:'failed'}]}])[0].status,'failed');
+// Reviewed samples cannot stand in for missing route, role, viewport or device cases.
+for(const method of ['review','physical']){
+ const target={route:'/kunden',engine:'webkit',width:390,state:'normal',theme:'light',role:'owner',platform:'ios'};
+ const requirement={id:'UX-REVIEW',method,expectedCases:[target,{...target,width:1440}]};
+ const proof=(overrides={})=>({...target,checks:[{id:'UX-REVIEW',status:'passed',reviewer:'fixture reviewer',approvalReference:'fixture approval',device:{physical:true,installedPwa:true},...overrides}]});
+ const status=(requirements,evidence)=>aggregate([requirements],evidence)[0].status;
+ assert.equal(status(requirement,[proof()]),'partial','A missing expected viewport remains open');
+ const complete=[proof(),{...proof(),width:1440}];
+ assert.equal(status(requirement,complete),'passed','Every expected case has individual approved evidence');
+ assert.equal(status({...requirement,expectedCases:[]},complete),'partial','Undefined acceptance scope cannot pass');
+ assert.equal(status({...requirement,expectedCases:[{}]},complete),'partial','An empty target cannot match arbitrary evidence');
+ assert.equal(status({...requirement,expectedCases:[{...target,language:'de-CH'}]},complete),'partial','An additional expected dimension cannot be silently ignored');
+ for(const key of ['route','engine','width','state','theme','role','platform']){
+  const wrong=structuredClone(complete);wrong[0][key]=key==='width'?375:'different';
+  assert.equal(status(requirement,wrong),'partial','A missing '+key+' case remains open');
+ }
+ for(const override of [{reviewer:undefined},{approvalReference:undefined},...(method==='physical'?[{device:{physical:false,installedPwa:true}},{device:{physical:true,installedPwa:false}}]:[])]){
+  assert.equal(status(requirement,[proof(override),complete[1]]),'partial','Approval and physical-device proof cannot be substituted');
+ }
+ assert.equal(status(requirement,[proof({status:'failed'}),complete[1]]),'failed','A failed case dominates complete coverage');
+}
 assert.ok(matchRoute('/kunden/[id]','/kunden/customer-one'));assert.ok(!matchRoute('/kunden/[id]','/kunden/customer-one/bearbeiten'));
 const dir=fs.mkdtempSync(path.join(os.tmpdir(),'binso-compliance-test-'));
 try{fs.writeFileSync(path.join(dir,'compliance-stale.json'),JSON.stringify({schemaVersion:1,sourceDigest:'old',registryVersion:'1.0.0',checks:[{id:'UX-X',status:'passed'}]}));assert.equal(collectEvidence([dir],{sourceDigest:'new',registryVersion:'1.0.0'}).accepted.length,0);assert.equal(collectEvidence([dir],{sourceDigest:'new',registryVersion:'1.0.0'}).rejected.length,1);}finally{fs.rmSync(dir,{recursive:true,force:true});}
@@ -54,5 +75,8 @@ try{
  fs.writeFileSync(path.join(identityDir,'app/page.tsx'),'changed source fixture');assert.notEqual(readIdentity().sourceDigest,initial.sourceDigest,'Source edits remain bound');
  const beforeRegistry=readIdentity();fs.writeFileSync(path.join(identityDir,'ux-compliance/requirements.v1.json'),JSON.stringify({version:'9.9.10'}));const afterRegistry=readIdentity();assert.equal(afterRegistry.registryVersion,'9.9.10');assert.notEqual(afterRegistry.sourceDigest,beforeRegistry.sourceDigest,'A changed visual contract invalidates older evidence');
  fs.mkdirSync(path.join(identityDir,'components'));fs.writeFileSync(path.join(identityDir,'components/new.tsx'),'untracked source fixture');const untracked=readIdentity().sourceDigest;git('add','components/new.tsx');assert.equal(readIdentity().sourceDigest,untracked,'Untracked source is included before staging');
+ fs.mkdirSync(path.join(identityDir,'docs/audit/v24'),{recursive:true});const beforeContract=readIdentity().sourceDigest;
+ fs.writeFileSync(path.join(identityDir,'docs/audit/v24/ux-contract.json'),'{}');assert.notEqual(readIdentity().sourceDigest,beforeContract,'Active presentation contracts invalidate old measurements');
+ const beforeConfig=readIdentity().sourceDigest;fs.mkdirSync(path.join(identityDir,'config'));fs.writeFileSync(path.join(identityDir,'config/domain.ts'),'export const role="owner"');assert.notEqual(readIdentity().sourceDigest,beforeConfig,'Domain configuration is part of source identity');
  console.log('Source identity handles >1 MiB of generated Git paths while retaining tracked/untracked source binding.');
 }finally{fs.rmSync(identityDir,{recursive:true,force:true});}

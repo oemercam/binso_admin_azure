@@ -19,5 +19,6 @@ END $$;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO binso_runtime;
 GRANT EXECUTE ON FUNCTION public.bootstrap_organization(text,text,text,text,text) TO binso_runtime;
 GRANT EXECUTE ON FUNCTION public.runtime_schema_versions() TO binso_runtime;
+GRANT EXECUTE ON FUNCTION public.read_invitation_organization(text,boolean) TO binso_runtime;
 COMMIT;
 -- Future tables require explicit reviewed grants. No ALTER DEFAULT PRIVILEGES.

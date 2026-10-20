@@ -35,7 +35,8 @@ export async function POST(request:NextRequest){
    return (await client.query<{organization_id:string;role:"owner"|"admin"|"finance"|"hr"|"project_manager"|"manager"|"member"|"reader"}>(`
     select m.organization_id,m.role from organization_memberships m
     join organizations o on o.id=m.organization_id and o.status in ('trial','active','grace_period','read_only')
-    where m.user_id=$1 and m.status='active' order by m.created_at asc limit 1`,[identity.id])).rows[0];
+    where m.user_id=$1 and m.status='active'
+      and (select count(*) from organization_memberships all_m where all_m.user_id=m.user_id and all_m.status='active')=1`,[identity.id])).rows[0];
   });
   if(!membership)return json({error:"invalid_credentials",message:"E-Mail oder Passwort ist falsch."},401);
   const user={...identity,...membership,password_hash:identity.password_hash};

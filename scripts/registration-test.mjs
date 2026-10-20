@@ -136,7 +136,11 @@ try{
  response=await register.POST(request('POST',body));assert.equal(response.status,201);assert.equal((await response.json()).resumed,true);assert.equal((await db.query('select count(*)::int n from organizations')).rows[0].n,before,'Receipt replay cannot create another tenant');
  const link=new URL(sent[0].text.split('\n')[1]);assert.equal(link.searchParams.get('lang'),'fr');assert.ok(sent[0].html.includes('lang="fr"'));const token=link.searchParams.get('token');
  jar.clear(); // verification works in another browser, without the receipt cookie
+ await db.query("set time zone 'Europe/Zurich'");
  response=await verify.POST(request('POST',{token},'https://example.invalid/api/auth/verify-email'));assert.equal(response.status,200);payload=await response.json();assert.equal(payload.mfaSetupRequired,true);assert.ok(payload.next.includes(encodeURIComponent('/einstellungen/firma?onboarding=1')));
+ const elapsed=(await db.query('select extract(epoch from s.trial_until-u.email_verified_at)::int seconds from organization_subscriptions s join organization_memberships m on m.organization_id=s.organization_id join app_users u on u.id=m.user_id where s.organization_id=$1',[organization.id])).rows[0].seconds;
+ assert.equal(elapsed,14*24*60*60,'Trial is exactly 14 x 24 hours across Swiss DST, not 14 calendar-day boundaries');
+ await db.query("set time zone 'UTC'");
  assert.ok(jar.has('binso_session'),'A valid unconsumed link establishes an actual server session');
  const trialUntil=(await db.query('select trial_until from organization_subscriptions where organization_id=$1',[organization.id])).rows[0].trial_until;assert.ok(trialUntil);
  jar.clear();response=await verify.POST(request('POST',{token},'https://example.invalid/api/auth/verify-email'));payload=await response.json();assert.equal(payload.alreadyVerified,true);assert.equal(jar.has('binso_session'),false,'A consumed link cannot create another session');
@@ -152,6 +156,13 @@ try{
  await db.query("update app_users set mfa_enabled=true where email='second@example.invalid'");
  const actualSession=await import(await load('lib/server/session.ts'));
  const secondSession=await actualSession.getSession();assert.ok(secondSession);assert.notEqual(secondSession.organizationId,organization.id);
+ const actualRegistration=await import(await load('lib/server/registration.ts'));
+ const sentBeforeReverify=sent.length;
+ await actualRegistration.sendRegistrationVerification({userId:secondSession.userId,email:'second@example.invalid',organizationId:secondSession.organizationId,locale:'de'});
+ assert.equal(sent.length,sentBeforeReverify+1);
+ const reverifyToken=new URL(sent.at(-1).text.split('\n')[1]).searchParams.get('token'),preservedCookie=jar.get('binso_session');
+ const reverified=await verify.POST(request('POST',{token:reverifyToken},'https://example.invalid/api/auth/verify-email'));
+ assert.equal((await reverified.json()).alreadyVerified,true);assert.deepEqual(jar.get('binso_session'),preservedCookie,'Email verification never replaces the strong login of an existing identity');
  await db.query("update organizations set status='suspended' where id=$1",[secondSession.organizationId]);
  assert.equal(await actualSession.getSession(),null,'Suspended organizations cannot revive a valid bearer session');
  await db.query("update organizations set status='trial' where id=$1",[secondSession.organizationId]);
@@ -181,6 +192,18 @@ try{
  assert.equal(await actualSession.getSession(),null,'Unknown bearer cannot establish tenant context');
  jar.set('binso_session',validSessionCookie);
  const current=await actualSession.getSession();assert.ok(current);
+ await assert.rejects(()=>db.query("insert into organization_memberships(organization_id,user_id,email,role,status) values($1,$2,$3,'member','active')",[secondSession.organizationId,current.userId,body.email]),e=>e.code==='23514'&&e.constraint==='single_active_company_identity','Database rejects a second active company without deleting the original');
+ // Deliberately seed historical ambiguity as schema administrator in this
+ // disposable fixture only. The new guard must preserve it but deny login.
+ await db.query('alter table organization_memberships disable trigger single_company_identity');
+ try{await db.query("insert into organization_memberships(organization_id,user_id,email,role,status) values($1,$2,$3,'member','active')",[secondSession.organizationId,current.userId,body.email]);}finally{await db.query('alter table organization_memberships enable trigger single_company_identity')}
+ assert.equal(await actualSession.getSession(),null,'Historical ambiguous membership cannot select the first tenant');
+ const cookieBeforeAmbiguous=jar.get('binso_session');
+ response=await login.POST(request('POST',{email:body.email,password:body.password},'https://example.invalid/api/auth/login'));assert.equal(response.status,401,'Credential proof cannot resolve an ambiguous company by ordering');
+ assert.deepEqual(jar.get('binso_session'),cookieBeforeAmbiguous,'Ambiguous login never mints a session');
+ await assert.rejects(()=>actualSession.createSession({userId:current.userId,organizationId:current.organizationId,email:body.email,name:'Synthetic',role:'owner'}),e=>e.code==='membership_ambiguous','Direct issuance also rejects ambiguity');
+ await db.query("update organization_memberships set status='suspended' where user_id=$1 and organization_id=$2",[current.userId,secondSession.organizationId]);
+ assert.ok(await actualSession.getSession(),'Resolving the fixture ambiguity restores the original valid context');
  await db.query("update auth_sessions set expires_at=now()-interval '1 second' where id=$1",[current.sessionId]);
  assert.equal(await actualSession.getSession(),null,'Expired bearer cannot establish tenant context');
  const originalEmail='first@example.invalid';jar.clear();
