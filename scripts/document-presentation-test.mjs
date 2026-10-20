@@ -122,6 +122,12 @@ const paidRead=renderToStaticMarkup(React.createElement(readExports.DocumentRead
 assert.ok(paidRead.includes('Rechnungsdatum'));assert.ok(paidRead.includes('Bezahlt am'));assert.ok(paidRead.includes('06.10.2026'));assert.ok(!paidRead.includes('Fällig am'));assert.ok(!paidRead.includes('Offener Betrag'));assert.equal((paidRead.match(/>Bezahlt</g)||[]).length,1,'The compact summary explicitly names its paid status');
 const unprovenPaid=renderToStaticMarkup(React.createElement(readExports.DocumentReadView,{type:'Rechnung',draft:{...draft,status:'paid',total:216.2,paidAmount:216.2},directory}));assert.ok(!unprovenPaid.includes('Bezahlt am'),'No completion date is invented for legacy payments');
 const openRead=renderToStaticMarkup(React.createElement(readExports.DocumentReadView,{type:'Rechnung',draft:{...draft,date:'2099-10-01'},directory}));assert.ok(openRead.includes('Offener Betrag'));assert.ok(openRead.includes('Fällig am'));assert.ok(openRead.includes('document-mobile-price'));assert.ok(openRead.includes('× CHF 100.00'));
+for(const status of ['sent','partial']){
+ const partialRead=renderToStaticMarkup(React.createElement(readExports.DocumentReadView,{type:'Rechnung',draft:{...draft,date:'2099-10-01',status,total:216.2,paidAmount:100},directory}));
+ assert.equal((partialRead.match(/Offener Betrag/g)??[]).length,1,'Outstanding balance has one primary presentation');
+ assert.ok(partialRead.includes('Bereits bezahlt')&&partialRead.includes('100.00'),'Payment history retains the confirmed receipt');
+ assert.match(partialRead,/<strong>116\.2<\/strong>/,'The primary numeric balance retains exactly total minus the confirmed payment');
+}
 for(const status of ['draft','cancelled']){
  const html=renderToStaticMarkup(React.createElement(readExports.DocumentReadView,{type:'Rechnung',draft:{...draft,status,total:216.2},directory}));
  assert.ok(!html.includes('Zahlungsstand')&&!html.includes('Offener Betrag'),status+' must not demand payment');

@@ -300,3 +300,91 @@ beschriftete Feld erneut auf und prüft dessen tatsächlichen Wert. Die Dokument
 Tab-Prüfung wartet auf exakt zwei reale Zeilen statt direkt nach dem Tab-Klick zu
 zählen. Beide Dokumente, gemeinsame Suche, Aktionsziele und der Read-only-Gegenfall
 bleiben unverändert vorgeschrieben. Diese Korrekturen brauchen einen neuen CI-Lauf.
+
+## Gezielte Abnahmefortsetzung vom 20.10.2026
+
+Bezugsstand `2163156d9d9ced24b740de643ee01dfa847d02b3`: PR-Quality,
+CodeQL und Full/development [39348704398](https://github.com/oemercam/binso_admin_azure/actions/runs/39348704398)
+sind erfolgreich, einschliesslich aller acht Browserjobs. Das Compliance-Artefakt
+12232677125 enthält 3581 Messfälle ohne gemessenen Fehler, jedoch weiterhin
+`compliant=false`. Diese Entwicklungsqualifikation ist keine vollständige Abnahme.
+Nachfolgende Änderungen benötigen eigene CI-Nachweise; alte Ergebnisse werden
+nicht auf einen neuen SHA umetikettiert.
+
+### Review-Register und aktuelle Rangfolge
+
+[Review-Zuordnung](app-acceptance-review.csv) enthält alle 399 offenen Review-IDs
+genau einmal: sieben aktuelle UX-Reviews, 338 aus V22.1 und 54 aus V22.2.
+Die Zuordnung ist eine Triage, keine Abzeichnung dieser 399 Einzelfälle.
+388 historische Fälle benötigen weiterhin eine konkrete aktuelle Fallbindung;
+sechs aktuelle Reviews haben nur Teilnachweise, einer ist offen. Zwei dunkle
+Materialregeln und die pauschale Drei-KPI-Regel sind durch aktuelle Freigaben
+ersetzt. Der historische Merge-/Live-Auftrag ist in dieser Abnahme nicht freigegeben.
+Kein Eintrag wurde aus dem verbindlichen Registry gelöscht oder auf passed gesetzt.
+Historische Kataloge rechtfertigen weder alte Navigation noch schwarze Plus-Kreise,
+dunkle Statistikflächen oder produktive Aktionen gegen die aktuelle Freigabe.
+
+### Nachgewiesene Korrekturen dieser Fortsetzung
+
+- `UX-CTL-001`: Die Messung verwendete veraltete Toolbar-/Filterklassen und
+  ignorierte `RecordsControls` mit `.records-inline-controls` und
+  `.records-filter-action`. Der zentrale Adapter erfasst nun auch diesen Owner.
+  Lokale Browser-Gegenfälle prüfen richtige Anordnung sowie falsche Reihenfolge,
+  Stapelung, Tabs oberhalb der Suche und unsichtbare Filter. Keine Geometriegrenze
+  gelockert; fehlende Paare bleiben ohne Erfolgsnachweis.
+- Rechnungsdetail, 390px/Light: Im Screenshot steht der offene Betrag sowohl in
+  der primären Zusammenfassung als auch nochmals unter Zahlungsstand. Nur die
+  zweite Wiederholung wurde entfernt; der gemeinsame MetricTile zeigt dort
+  weiterhin den bereits bezahlten Betrag. Positive Renderingfälle für sent und
+  partial prüfen genau eine primäre Restforderung, erhaltenen Zahlungseingang und
+  den exakten numerischen Restbetrag. Paid-/Cancelled-/PDF-/QR-Gegenfälle bleiben.
+
+### Sichtprüfung vorhandener CI-Artefakte
+
+Artefakte 12232936167 und 12232781074 stammen vom Bezugsstand. Bei 390px/Light
+wurden Kundenliste, Kundendossier, Rechnungsdetail, Zeit, Finanzen sowie Firma,
+Sicherheit und Abonnement betrachtet. Die Referenzbilder aus Artefakt 12233105882
+zeigen die originale Microsoft-Referenz bei 390px Inhaltsbreite innerhalb des
+1440px Vorschau-Viewports. Rahmen, Demo-Beträge und Vorschau-Schalter sind keine
+Produktvorgaben; neuere Header-/Kontakt-/KPI-/Aktionsentscheidungen haben Vorrang.
+
+Beobachtet: offene weisse Arbeitsflächen, kompakte Geschäftsdaten, gemeinsame
+Such-/Filterzeile in der Kundenliste, Status rechts, Kontakt/Stammdaten erreichbar,
+vier benannte Finanzkennzahlen mit sechs Monatslabels. Der Rechnungs-Doppelwert
+ist oben als konkreter Fehler erfasst. Die acht Ansichten sind Sichtstichproben,
+keine Freigabe aller Zustände, Rollen, Dark-/Desktop-/Zoom-Varianten. Für Firma,
+Sicherheit, Abonnement und Finanzen fehlt eine gleichwertige originale Detail-
+referenz; sie bleiben abgeleitet. Neue Pixelbaselines wurden nicht akzeptiert.
+Nachher-Rendering der Rechnungsansicht im tatsächlichen Browser bleibt ausstehend.
+
+### Geschäftsabläufe: konkrete vorhandene Belege und verbleibende Grenzen
+
+| Fall | Vorhandener Beleg am Bezugsstand | Noch fehlende durchgehende Abnahme |
+| --- | --- | --- |
+| E01 | registration-test: echte isolierte Mandantenanlage, Verifikation/OTP/MFA, Replay, abgelaufene Links; CI Registrierungs-/Session-Browserjobs | Reale Zustellung, echter SSO-Handoff und Geräte; keine Testmail autorisiert |
+| E02 | migration-test: Kunde → Angebot → Auftrag → Zeit → Rechnung; Customer-/Document-Browserfälle, Pflichtkontakt/Dirty/Defaults | Ein ununterbrochener visueller Mehrrollenablauf mit Annahme, Abbruch und Rückkehr |
+| E03 | Workforce-/PostgreSQL-RLS; Timer-/Freigaberegression; fremde Zuordnung und Eigenfreigabe negativ | Gesamter Mitarbeiter-/Freigeberablauf auf echten Geräten |
+| E04 | migration-test: 198 Stunden, echte zugehörige Datei, Scan-Ausfall, Rückweisung/Korrektur und unabhängige Freigabe | Echter mobiler Dateipicker, signierter Rapport und OS-Tastatur |
+| E05 | Prozess-/Refund-/RLS-Gates; echte mehrsprachige PDF/QR-Renderer; PaymentForm mit verlorener Antwort und acht aktualisierten Verbrauchern | Alle Zustandswechsel durchgehend in UI; Gutschrift/Rückerstattung und PDF-Rückkehr zusammen |
+| E06 | Spesen-/Datei-/Freigabe-/Erstattungs-Integration und Expense-Browserfälle | Vollständiger Mitarbeiter-/Freigeber-/Finance-UI-Ablauf statt zusammengesetzter Teiltests |
+| E07 | Operator-/Tenant-Verträge mit realen isolierten API-Antworten; Kunden- und Operator-Chat-Browserfälle | Durchgehender Zwei-App-Ablauf mit interner Notiz, Abschluss und Wiederöffnen |
+| E08 | Operator-Vertrag: Rollen, Sperrpriorität, Ablauf, atomarer Audit-Rollback; Operator-/Wallboard-Browserjobs | Alle Operator-Abschnitte, Detail-Tabs und Rücknavigation zusammen; echte Entra-Anmeldung |
+| E09 | navigation-return, Prozessentwürfe, Settings-Browserfälle, Serverrollenmatrix | Alle Einstellungsunterseiten je organisatorischem/persönlichem Scope und Rolle |
+| E10 | PWA Offline/Restart und Startup/Session/Persistenz in beiden CI-Engines | Zwei echte installierte Apps, Scope-Abgrenzung, OS-Links/Dateien/Keyboard/Update |
+
+Kein E01–E10-Fall wird durch das Zusammenzählen von Teiltests vollständig bestanden.
+Physische iPhone/Safari/PWA-, Android-, iPad-, Screenreader- und reale p95-Nachweise
+bleiben offen. In dieser Sitzung ist kein solches Gerät oder qualifizierter
+installierter Geräte-Testbuild verfügbar. Keine neuen Zugänge/Umgebungen angelegt.
+
+### Abhängigkeit und Integration
+
+GitHub-Prüfung: #295 offen, Head `c4a55a134453d8b66555917408db4c59f6f21769`;
+#296 offen/Draft, Bezugshead wie oben; beide gegen Main
+`11eff375f6ebfd86ef660236004503edd1dd964f`, beide mergeable/clean.
+`git merge-base --is-ancestor` bestätigt #295 als vollständigen Vorfahren von #296.
+`git merge-tree --write-tree` prüft beide ohne Konflikt; weder Checkout noch Branch
+oder Arbeitsbaum wird dabei gemergt. #296 enthält daher die Änderungen von #295
+bereits: keine zweite Implementierung/cherry-pick. Bei späterer Integration zuerst
+Abhängigkeit entscheiden und anschliessend den tatsächlichen neuen Main-/PR-Stand
+erneut qualifizieren. Diese Prüfung ist keine Merge-Freigabe.

@@ -489,7 +489,7 @@ function DocumentReadView({type,draft,directory}:{type:DocumentKind;draft:Docume
     </section>
     {isInvoice&&Number(draft.creditAmount??0)>0&&<p><LocalizedText>{"Gutschriften"}</LocalizedText>: {currency} {money(Number(draft.creditAmount))}</p>}
     {isInvoice&&!["draft","paid","cancelled"].includes(displayStatus)&&outstanding>0&&<LocalizedElement as="section" className="document-payment-facts" aria-label="Zahlungsstand"><SectionTitle title="Zahlungsstand"/>
-      <MetricTiles columns={2}><MetricTile label="Bereits bezahlt" value={`${currency} ${money(Number(draft.paidAmount??0))}`}/><MetricTile label="Offener Betrag" value={`${currency} ${money(outstanding)}`}/></MetricTiles>
+      <MetricTile label="Bereits bezahlt" value={`${currency} ${money(Number(draft.paidAmount??0))}`}/>
     </LocalizedElement>}
     {(Boolean(draft.credits?.length||draft.reminders?.length||draft.refunds?.length||draft.revisesOffer||draft.revisions?.length||draft.sourceOffer||draft.invoiceNumber||draft.note))&&<DetailDisclosure label="Weitere Angaben">
     {isInvoice&&Boolean(draft.credits?.length)&&<section className="document-detail-section"><SectionTitle title="Gutschriften"/>{draft.credits?.map(credit=><p key={credit.number}><b>{credit.number}</b> · {credit.date.split('-').reverse().join('.')} · {currency} {money(Number(credit.amount))}<br/>{credit.reason}</p>)}</section>}

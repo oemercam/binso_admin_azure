@@ -164692,26 +164692,11 @@
           ]
         },
         {
-          "tag": "MetricTiles",
-          "line": 492,
-          "props": [
-            "columns={2}"
-          ]
-        },
-        {
           "tag": "MetricTile",
           "line": 492,
           "props": [
             "label=\"Bereits bezahlt\"",
             "value={`${currency} ${money(Number(draft.paidAmount??0))}`}"
-          ]
-        },
-        {
-          "tag": "MetricTile",
-          "line": 492,
-          "props": [
-            "label=\"Offener Betrag\"",
-            "value={`${currency} ${money(outstanding)}`}"
           ]
         },
         {
