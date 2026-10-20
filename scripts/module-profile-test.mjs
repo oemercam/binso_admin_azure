@@ -15,7 +15,12 @@ assert.ok(tenantPermissions('member','time_only').every(permission=>tenantCan('m
 const shell=await fs.readFile('components/app-shell.tsx','utf8');
 assert.match(shell,/tenantCanOpenPath\(access.role,path,access.moduleProfile\)/);
 assert.match(shell,/canOpen\("\/dashboard"\)&&<Link/);
-assert.match(shell,/access\?\.moduleProfile!=="time_only"\|\|canOpen\("\/finanzen"\)/);
+// V25.5 authorizes fewer slots for every role/plan, not only time_only.
+function financeVisibility(source){assert.match(source,/canOpen\("\/finanzen"\)&&<Link/);assert.doesNotMatch(source,/moduleProfile!=="time_only"\|\|canOpen\("\/finanzen"\)/);}
+financeVisibility(shell);
+assert.equal(tenantCanOpenPath('reader','/finanzen','standard'),true,'Existing read-only Finance access remains available');
+assert.throws(()=>financeVisibility(shell.replace('canOpen("/finanzen")&&<Link','(access?.moduleProfile!=="time_only"||canOpen("/finanzen"))&&<Link')),'The former unauthorized Finance shortcut must fail');
+for(const role of ['member','hr','unknown'])assert.equal(tenantCanOpenPath(role,'/finanzen','standard'),false,role+' cannot receive a Finance shortcut');
 assert.match(shell,/filter\(\(\[href\]\)=>canOpen\(href\)\)/);
 console.log('Module profile navigation: positive/negative permission and shell wiring checks passed.');
 
