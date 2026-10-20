@@ -87,7 +87,7 @@ No deletion, backup export or external provider action runs from this inventory.
 - Migration 0064 preserves the bootstrap function identity, ACL and fixed search
   path while rejecting the retired demo mode. Historical migrations stay immutable.
 - Synthetic business data is owned by scripts/fixtures, outside production imports.
-  Browser lanes use genuine operator sessions in a disposable loopback PostgreSQL
+  Browser lanes use genuine operator and customer sessions in a disposable loopback PostgreSQL
   database; unidentified/stale databases and external UI targets are refused.
 - Production verification checks exact release/artifact identity, real database
   readiness and protected API/retired-cookie denial without provisioning records.

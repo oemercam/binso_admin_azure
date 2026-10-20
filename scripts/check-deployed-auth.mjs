@@ -14,11 +14,16 @@ export async function checkDeployedAuth(base,request=fetch){
  for(const route of ['demo/session','demo/data','demo/dashboard','demo/finance','demo/platform-finance','operator/demo-session']){
   const response=await get('/api/'+route);assert.equal(response.status,410,'Retired endpoint must deny access: '+route);assert.equal(response.headers.get('set-cookie'),null,'No retired endpoint may issue authentication');
  }
+ for(const route of ['/demo/billing-2026-09.pdf','/demo/billing-2026-10.pdf'])assert.equal((await get(route)).status,404,'Retired demo PDF must not ship: '+route);
+ for(const route of ['/dashboard','/kunden','/projekte/neu','/support/retired']){
+  const response=await get(route);assert.ok([307,308].includes(response.status),'Protected page rejects legacy cookies: '+route);
+  const target=new URL(response.headers.get('location')??'',origin);assert.equal(target.origin,origin.origin);assert.equal(target.pathname,'/login');
+ }
  const session=await get('/api/auth/session');assert.equal(session.status,200);assert.equal((await session.json()).authenticated,false,'Legacy cookies must not authenticate');
  for(const route of ['/api/customers','/api/documents','/api/finance','/api/settings/team/invitations','/api/operator/dashboard']){
   const response=await get(route);assert.ok([401,403].includes(response.status),'Protected API must deny legacy cookies: '+route+' HTTP '+response.status);
  }
- return {retiredEndpoints:6,protectedApis:5,legacyCookiesRejected:true,readOnly:true};
+ return {retiredEndpoints:6,removedDemoAssets:2,protectedPages:4,protectedApis:5,legacyCookiesRejected:true,readOnly:true};
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(path.resolve(process.argv[1])).href){
  console.log(JSON.stringify(await checkDeployedAuth(process.env.BINSO_BASE_URL??'http://127.0.0.1:3000')));

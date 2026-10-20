@@ -201,7 +201,7 @@ try{
   operatorAccount.plan='pro';
   browser=await browserType.launch(launchOptions);
   context=await browser.newContext({...(process.env.BINSO_UX_DEVICE?engines.devices[process.env.BINSO_UX_DEVICE]:{}),viewport:{width:1440,height:1000},colorScheme:"dark",serviceWorkers:"block"});
-  await context.addCookies([{...uiAuth.cookie,url:base}]);
+  await context.addCookies(uiAuth.cookies.map(cookie=>({...cookie,url:base})));
   await context.addInitScript(mode=>{localStorage.setItem('binso.theme.mode',mode);localStorage.setItem('binso.privacy.preferences.v1',JSON.stringify({essential:true,performance:false,updatedAt:'2026-10-08'}))},theme);
   await context.route('**/api/**',async route=>{
    const req=route.request(),url=new URL(req.url()),p=url.pathname;
@@ -288,6 +288,7 @@ try{
    else if(p==='/api/search'){const term=url.searchParams.get('q');if(term==='old')await new Promise(resolve=>{releaseOldSearch=resolve;oldSearchArrived?.()});data={items:term==='none'?[]:[{type:'Kunde',title:term==='old'?'Veraltetes Ergebnis':'Prüffirma AG',meta:'Bern',href:'/kunden/customer-one',icon:'users'},{type:'Rechnung',title:'RE-TEST-1',meta:'Prüffirma AG',href:'/rechnungen/RE-TEST-1',icon:'receipt'}]};}
    else if(p==='/api/settings/documents')data={item:{vat_rate:8.1,payment_terms_days:30,iban:'CH9300762011623852957',qr_iban:'',invoice_intro_text:'Synthetischer Rechnungstext',invoice_footer_text:'Synthetischer Schlusstext',quote_intro_text:'Synthetischer Angebotstext',quote_footer_text:'Synthetischer Schlusstext'}};
    else if(p==='/api/settings/subscription')data={item:{plan:'pro',subscription_status:'active',account_status:'active',unit_amount_chf:79,user_limit:10,storage_limit_bytes:21474836480,current_period_ends_at:'2026-11-09'}};
+   else if(p==='/api/operator/maintenance')data={enabled:false,endsAt:null};
    else if(p==='/api/integrations/status')data={items:[{key:'billing',configured:false}]};
    else if(p==='/api/billing/catalog')data={live:false,demo:false,automaticTax:false,items:[]};
    else if(p==='/api/auth/mfa')data={enabled:true,required:true,role:'owner'};

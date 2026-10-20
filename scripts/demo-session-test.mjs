@@ -39,4 +39,21 @@ const operator=await load('lib/server/operator.ts',{
 await assert.rejects(operator.requireOperator(),/redirect:\/operator\/login/);
 actual={role:'platform_owner',name:'Synthetic Operator',email:'operator@example.invalid'};
 assert.deepEqual(await operator.requireOperator(),{role:actual.role,identity:{name:actual.name,email:actual.email}});assert.equal(validated,1,'Real operator authorization remains mandatory');
+const previousCookieName=process.env.SESSION_COOKIE_NAME;process.env.SESSION_COOKIE_NAME='normal_session';
+try{
+ const response=kind=>({kind,headers:new Headers(kind==='next'?{'x-middleware-next':'1'}:{}),cookies:{set(){}}});
+ const proxyModule=await load('proxy.ts',{
+  './lib/server/maintenance':{maintenanceState:async()=>({enabled:false})},
+  './lib/locales/config':{asLocale:x=>x,localeCookie:'fixture_locale',locales:['de','fr','it','en']},
+  './lib/operator-pages':{validOperatorSection:()=>true},
+  'next/server':{NextResponse:{next:()=>response('next'),rewrite:()=>response('rewrite'),redirect:url=>({...response('redirect'),url:String(url)})}},
+ });
+ const request=(route,cookies)=>({url:'https://fixture.invalid'+route,nextUrl:new URL('https://fixture.invalid'+route),headers:new Headers(),cookies:{get:name=>cookies.has(name)?{value:cookies.get(name)}:undefined}});
+ const legacy=new Map([['binso_demo','1'],['binso_demo_write','old'],['binso_operator_demo','1']]);
+ for(const route of ['/dashboard','/kunden','/projekte/neu','/support/ticket-one']){
+  const denied=await proxyModule.proxy(request(route,legacy));assert.equal(denied.kind,'redirect');assert.equal(new URL(denied.url).pathname,'/login');
+  assert.equal((await proxyModule.proxy(request(route,new Map([['normal_session','opaque-server-validated-session']])))).kind,'next','Normal cookie presence reaches authoritative server validation');
+ }
+ assert.equal((await proxyModule.proxy(request('/produkt',legacy))).kind,'next','Public product access remains public');
+}finally{if(previousCookieName===undefined)delete process.env.SESSION_COOKIE_NAME;else process.env.SESSION_COOKIE_NAME=previousCookieName;}
 console.log('Demo retirement: all six URLs reject legacy access; demo cookies cannot authenticate; normal sessions and operator authorization remain validated.');

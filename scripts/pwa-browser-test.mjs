@@ -1,11 +1,14 @@
+import {createUiAuthFixture} from './ui-auth-fixture.mjs';
 import assert from 'node:assert/strict';
 import {pathToFileURL} from 'node:url';
 import {spawn} from 'node:child_process';
 const {chromium}=await import(process.env.BINSO_PLAYWRIGHT_MODULE?pathToFileURL(process.env.BINSO_PLAYWRIGHT_MODULE).href:'playwright');
 const port='3201',base=process.env.BINSO_BASE_URL??'http://127.0.0.1:'+port;
+assert.ok(['127.0.0.1','localhost'].includes(new URL(base).hostname),'Synthetic browser authentication requires a loopback app server');
+const uiAuth=await createUiAuthFixture();
 let server;
 if(!process.env.BINSO_BASE_URL){
- server=spawn(process.execPath,process.env.BINSO_UX_SERVER_FILE?[process.env.BINSO_UX_SERVER_FILE]:['node_modules/next/dist/bin/next','start','--hostname','127.0.0.1','--port',port],{stdio:['ignore','pipe','pipe'],env:{...process.env,PORT:port,HOSTNAME:'127.0.0.1'}});
+ server=spawn(process.execPath,process.env.BINSO_UX_SERVER_FILE?[process.env.BINSO_UX_SERVER_FILE]:['node_modules/next/dist/bin/next','start','--hostname','127.0.0.1','--port',port],{stdio:['ignore','pipe','pipe'],env:{...process.env,...uiAuth.env,PORT:port,HOSTNAME:'127.0.0.1'}});
  let logs='';server.stdout.on('data',data=>{logs+=data});server.stderr.on('data',data=>{logs+=data});
  for(let attempt=0;;attempt++){try{if((await fetch(base+'/api/health')).ok)break;}catch{}if(attempt>=60||server.exitCode!==null){server.kill();throw new Error('PWA server unavailable: '+logs);}await new Promise(r=>setTimeout(r,250));}
 }
@@ -56,7 +59,7 @@ try{
  assert(cached.includes('/offline'));assert(!cached.some(path=>path.startsWith('/api/')||path==='/dashboard'),'PWA never caches authenticated business data');
  // The same server fixture survives page destruction. No timer state is stored in
  // localStorage; actual TimePage/readTimer must recover it from the API.
- authenticated=true;await context.addCookies([{name:'binso_demo',value:'1',url:base}]);
+ authenticated=true;await context.addCookies(uiAuth.cookies.map(cookie=>({...cookie,url:base})));
  await page.goto(base+'/zeit');await page.getByRole('button',{name:'Starten',exact:true}).click();await page.getByRole('button',{name:'Pause',exact:true}).waitFor();assert.equal(mutations,1);
  await page.goto(base+'/kunden');await page.goto(base+'/zeit');await page.getByRole('button',{name:'Pause',exact:true}).waitFor();assert.equal(mutations,1,'Navigation never starts another timer');
  await page.close();page=await context.newPage();await page.goto(base+'/zeit');await page.getByRole('button',{name:'Pause',exact:true}).waitFor();assert.equal(mutations,1,'PWA page restart restores the running server tracker');
@@ -66,4 +69,4 @@ try{
  authenticated=false;await page.reload();await page.getByRole('link',{name:'Anmelden',exact:true}).filter({visible:true}).waitFor();assert.equal(await page.getByRole('button',{name:'Pause',exact:true}).count(),0,'Expired session cannot expose a private timer');
  console.log('Actual TimePage: navigation, page restart, paused restart, cross-tab pause/stop and expired session passed with a synthetic server ledger.');
  await context.close();console.log('PWA service worker, offline fallback, manifest integrity and page-restart theme persistence passed (browser emulation, not physical installation).');
-}finally{await browser.close();server?.kill();}
+}finally{await browser.close();server?.kill();await uiAuth.close();}

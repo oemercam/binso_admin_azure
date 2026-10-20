@@ -20,7 +20,7 @@ try{
  browser=await engines[process.env.BINSO_UX_BROWSER??'chromium'].launch({headless:true});
  for(const width of [390,768,1440])for(const locale of ['de','fr','it','en']){
   const context=await browser.newContext({viewport:{width,height:900},serviceWorkers:'block'});
-  await context.addCookies([{...uiAuth.cookie,url:base}]);
+  await context.addCookies(uiAuth.cookies.map(cookie=>({...cookie,url:base})));
   await context.route('**/api/**',route=>{const pathname=new URL(route.request().url()).pathname;return route.fulfill({json:pathname==='/api/auth/session'?{authenticated:true,demo:true,user:{id:'fixture'},tenant:{id:'fixture',role:'owner',plan:'pro'}}:pathname==='/api/settings/profile'?{item:{display_name:'Fixture Person',language:locale}}:pathname==='/api/settings/company'?{item:{name:'Synthetic Localization Company'}}:{items:[],tracker:null}})});
   const faults=[],cancelledReloadPrefetches=[];let reloading=false;
   const trackedPage=async()=>{const next=await context.newPage();next.on('pageerror',error=>{
