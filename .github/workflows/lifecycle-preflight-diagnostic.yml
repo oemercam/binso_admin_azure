@@ -1,0 +1,34 @@
+name: Read-only lifecycle preflight diagnosis
+
+on:
+  workflow_dispatch:
+    inputs:
+      approve_readonly:
+        description: 'Authorize only bounded company-ID and membership-count metadata; no repair or deployment'
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lifecycle-preflight-diagnostic
+  cancel-in-progress: false
+
+jobs:
+  diagnose:
+    if: ${{ github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && inputs.approve_readonly == true }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    environment: production
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          ref: ${{ github.sha }}
+      - uses: ./.github/actions/setup-node
+      - name: Read ownerless-company metadata without changing data
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: node scripts/single-company-preflight.mjs --diagnose-ownerless
