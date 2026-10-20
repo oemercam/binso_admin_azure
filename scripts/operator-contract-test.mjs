@@ -75,13 +75,14 @@ try{
  await assert.rejects(()=>repository.listOperatorBusiness(client,globalThis.operatorContractSession,'support_messages','order=created_at.desc;drop'),/Sortierung/);
  const account=(await repository.updateOperatorBusiness(client,globalThis.operatorContractSession,'tenant_accounts','tenant_id=eq.'+org,{subscription_status:'past_due'}))[0];assert.equal(account.subscription_status,'past_due');assert.equal(account.tenant.name,'Contract customer','Full mutation response');
  const accountParams={params:Promise.resolve({id:org})};
+ const missingAccount=(await repository.listOperatorBusiness(client,globalThis.operatorContractSession,'tenant_accounts','tenant_id=eq.'+org))[0];assert.equal(missingAccount.entitlements_configured,false);assert.equal(missingAccount.user_limit,null,'Missing limit remains unknown');
  await db.query("update organization_subscriptions set plan='business' where organization_id=$1",[org]);
  assert.equal((await accounts.PATCH(req('/api/operator/accounts/'+org,{userLimit:5},'PATCH'),accountParams)).status,409,'Missing entitlements cannot report a saved user limit');
  await db.query('insert into organization_entitlements(organization_id,max_users) values($1,3)',[org]);
  const limitResponse=await accounts.PATCH(req('/api/operator/accounts/'+org,{userLimit:5},'PATCH'),accountParams);assert.equal(limitResponse.status,200);assert.equal((await limitResponse.json()).item.user_limit,5);
  failAudit=true;assert.equal((await accounts.PATCH(req('/api/operator/accounts/'+org,{userLimit:6},'PATCH'),accountParams)).status,500);failAudit=false;assert.equal((await db.query('select max_users from organization_entitlements where organization_id=$1',[org])).rows[0].max_users,5,'Account audit failure rolls back the limit');
  await db.query("update organization_subscriptions set plan='professional' where organization_id=$1",[org]);
- assert.equal((await repository.listOperatorBusiness(client,globalThis.operatorContractSession,'tenant_accounts','tenant_id=eq.'+org))[0].user_limit,null);
+ const unlimitedAccount=(await repository.listOperatorBusiness(client,globalThis.operatorContractSession,'tenant_accounts','tenant_id=eq.'+org))[0];assert.equal(unlimitedAccount.user_limit,null);assert.equal(unlimitedAccount.entitlements_configured,true);
  assert.equal((await accounts.PATCH(req('/api/operator/accounts/'+org,{userLimit:6},'PATCH'),accountParams)).status,400,'Pro cannot acquire a hidden regular cap');
  await db.query("update organization_subscriptions set billing_subscription_id='sub_fixture' where organization_id=$1",[org]);assert.equal((await accounts.PATCH(req('/api/operator/accounts/'+org,{plan:'pro'},'PATCH'),accountParams)).status,409,'Stripe subscription cannot be overwritten locally');
  globalThis.operatorContractSession={role:'platform_billing',userId:'fixture',email:'fixture@invalid.test'};assert.equal((await accounts.PATCH(req('/api/operator/accounts/'+org,{accountStatus:'suspended'},'PATCH'),accountParams)).status,403,'Billing role cannot bypass restriction permission through the account API');

@@ -29,7 +29,7 @@ export async function PATCH(request:NextRequest,{params}:{params:Promise<{id:str
       }
       if(submit&&entry.created_by_user_id!==s.userId)throw new ApiError(403,'submission_forbidden','Nur eigene Zeiten können eingereicht werden.');
       if(submit)await assertTimeAssignment(c,s,entry.customer_id,entry.project_id,String(entry.work_date).slice(0,10));
-      if(!submit&&entry.created_by_user_id===s.userId)throw new ApiError(403,'self_approval_forbidden','Eigene Zeiten dürfen nicht selbst freigegeben werden.');
+      if(!submit&&entry.created_by_user_id===s.userId&&(body.action!=='approve'||!(await c.query('select app_is_solo_owner() allowed')).rows[0]?.allowed))throw new ApiError(403,'self_approval_forbidden','Eigene Zeiten dürfen nicht selbst freigegeben werden.');
       if(['project_manager','manager'].includes(s.role))await assertTimeAssignment(c,s,entry.customer_id,entry.project_id,String(entry.work_date).slice(0,10));
       if(submit&&entry.report_month&&!(await c.query("select id from file_objects where organization_id=$1 and time_entry_id=$2 and purpose='time_report' and scan_status=any($3::text[]) limit 1",[s.organizationId,id,accessibleFileStatuses()])).rowCount)throw new ApiError(409,'signed_report_required','Bitte den unterschriebenen Stundenrapport hochladen.');
       if(entry.report_month&&!submit&&!entry.submitted_at)throw new ApiError(409,'report_not_submitted','Der Monatsrapport wurde noch nicht eingereicht.');
@@ -39,7 +39,7 @@ export async function PATCH(request:NextRequest,{params}:{params:Promise<{id:str
         const row=(await c.query('update time_entries set submitted_at=null,review_note=$3 where organization_id=$1 and id=$2 returning id,approved,submitted_at,review_note',[s.organizationId,id,note])).rows[0];
         await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'time.rejected',entityType:'time_entry',entityId:id});return row;
       }
-      const result=await c.query(`update time_entries set ${submit?"submitted_at=coalesce(submitted_at,now())":"approved=true"} where organization_id=$1 and id=$2 and archived_at is null and billable=true and approved=false and invoiced_invoice_id is null and ($3::boolean=false or created_by_user_id=$4) returning id,approved,billable,submitted_at`,[s.organizationId,id,submit,s.userId]);
+      const result=await c.query(`update time_entries set ${submit?"submitted_at=coalesce(submitted_at,now()),approved=app_is_solo_owner()":"approved=true"} where organization_id=$1 and id=$2 and archived_at is null and billable=true and approved=false and invoiced_invoice_id is null and ($3::boolean=false or created_by_user_id=$4) returning id,approved,billable,submitted_at`,[s.organizationId,id,submit,s.userId]);
       if(!result.rowCount)throw new ApiError(404,"time_entry_not_found","Zeiteintrag wurde nicht gefunden oder kann nicht freigegeben werden.");
       await audit(c,{organizationId:s.organizationId,userId:s.userId,action:submit?"time.submitted":"time.approved",entityType:"time_entry",entityId:id});
       return result.rows[0];

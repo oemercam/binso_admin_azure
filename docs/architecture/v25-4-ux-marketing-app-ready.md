@@ -44,7 +44,7 @@ neue Referenz unter docs/assets/20261020 wurde nur über den bestehenden Generat
 mit `--approved-time-only` nach diesem Vergleich erzeugt. Historische Referenz bleibt.
 
 Der einmalige bestehende Inventargenerator erfasst aktuell 76 Routen, 12
-Operator-Varianten, 555 Module und keine statischen Runtime-Zyklen. Die Spezifikation
+Operator-Varianten, 556 Module und keine statischen Runtime-Zyklen. Die Spezifikation
 nennt 13 Operator-Varianten: die Zähldifferenz bleibt offen; keine Variante wurde
 für dieses Paket entfernt. Statische Reichweite ist kein visueller Nachweis.
 
@@ -108,3 +108,13 @@ abgewiesen. Next kann im Streaming-Kontext einen Seitenredirect als HTTP-200-
 Meta-Refresh ausliefern; deshalb wird `/demo` zusätzlich im bestehenden Next-
 Konfigurationsowner vor dem Rendern per 307 nach `/registrieren` umgeleitet.
 Der HTTP-Redirect-Test bleibt streng, mit zusätzlichem Test der echten Next-Konfiguration.
+
+Weitere Browser-Gegenfälle haben die Unterscheidung fehlender Entitlements von
+explizitem Pro-unbegrenzt sowie den neuen bestätigten Speicherschalter geprüft.
+`entitlements_configured` trennt die API-Zustände; fehlende Konfiguration bleibt
+unbekannt und ist kein unbegrenztes Konto. Der echte Datenbank-/Operator-Test
+prüft beide Fälle. Benachrichtigungs-Browsertests halten die Serverantwort
+kontrolliert an: Schalter bleibt beim bestätigten Wert, erst das ACK ändert ihn.
+Die freigegebene Solo-Inhaber-Ausnahme gilt auch beim Einreichen eines belegten
+Monatsrapports; der echte PATCH-Handler und die restriktive Runtime-Rolle prüfen
+fehlenden Nachweis, Team-Selbstfreigabesperre und den echten Solo-Fall.

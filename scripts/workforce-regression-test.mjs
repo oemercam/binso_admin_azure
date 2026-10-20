@@ -89,5 +89,28 @@ try{
  assert.equal((await run(member,()=>query('select body from file_contents where file_id=$1',[files[0]]))).rows.length,0,'Revocation also removes attachment access');
  await assert.rejects(()=>run(member,()=>insertTime(customers[0],project)),error=>error.code==='42501');
  assert.equal((await run(member,()=>query('select id from time_entries where id=$1',[daily]))).rows.length,1,'Revocation preserves own recorded history');
+ // Actual monthly submit handler: signed evidence first, solo exception only.
+ const soloOrg=randomUUID(),soloUser='wf-solo-owner';
+ await db.query("insert into organizations(id,name,slug) values($1,'Synthetic solo',$2)",[soloOrg,'wf-'+soloOrg]);
+ await db.query("insert into app_users(id,email,display_name,status) values($1,'wf-solo@example.invalid','Synthetic solo','active')",[soloUser]);
+ await db.query("insert into organization_memberships(organization_id,user_id,email,role,status) values($1,$2,'wf-solo@example.invalid','owner','active')",[soloOrg,soloUser]);
+ const soloCustomer=(await db.query("insert into customers(organization_id,external_id,customer_no,name) values($1,'wf-solo','wf-solo','Synthetic solo customer') returning id",[soloOrg])).rows[0].id;
+ const soloEntry=(await db.query("insert into time_entries(organization_id,external_id,person_name,worker_type,customer_id,work_date,report_month,hours,description,billable,approved,created_by_user_id) values($1,'wf-solo-report','Synthetic solo','employee',$2,date_trunc('month',current_date)::date,date_trunc('month',current_date)::date,198,'Synthetic signed report',true,false,$3) returning id",[soloOrg,soloCustomer,soloUser])).rows[0].id;
+ globalThis.__soloPatchSession={organizationId:soloOrg,userId:soloUser,role:'owner',organizationStatus:'active'};
+ globalThis.__soloPatchRun=async fn=>{await db.exec('begin');try{await db.exec('set local role binso_runtime');await db.query("select set_config('app.organization_id',$1,true),set_config('app.user_id',$2,true)",[soloOrg,soloUser]);const result=await fn({query:async(sql,args)=>{const r=await db.query(sql,args);return {...r,rowCount:r.rows.length||r.affectedRows||0}}});await db.exec('commit');return result;}catch(error){await db.exec('rollback');throw error}};
+ const patchHttp=moduleUrl("export class ApiError extends Error{constructor(status,code,message){super(message);this.status=status}}export const apiError=e=>({status:e.status??500});export const json=data=>({status:200,data});export const assertSameOrigin=()=>{};export const readJson=async r=>r.body;");
+ const workforceUrl=moduleUrl((await fs.readFile('lib/server/workforce-access.ts','utf8')).replace("import 'server-only';",'').replace("'./http'",JSON.stringify(patchHttp)).replace("'./rbac'",JSON.stringify(rbacUrl)));
+ const patchDependencies={'@/lib/server/http':patchHttp,'@/lib/server/session':moduleUrl('export const requireSession=async()=>globalThis.__soloPatchSession;'),'@/lib/server/db':moduleUrl('export const withTenant=async(org,user,fn)=>globalThis.__soloPatchRun(fn);'),'@/lib/server/rbac':rbacUrl,'@/lib/permissions':permissionUrl,'@/lib/server/workforce-access':workforceUrl,'@/lib/server/file-access':moduleUrl("export const accessibleFileStatuses=()=>['clean'];"),'@/lib/server/audit':moduleUrl('export const audit=async()=>{};')};
+ let patchSource=await fs.readFile('app/api/time-entries/[id]/route.ts','utf8');for(const [name,url] of Object.entries(patchDependencies))patchSource=patchSource.replaceAll(JSON.stringify(name),JSON.stringify(url));
+ const patch=await import(moduleUrl(patchSource)),submit=()=>patch.PATCH({body:{action:'submit'}},{params:Promise.resolve({id:soloEntry})});
+ assert.equal((await submit()).status,409,'Even solo owners must provide a signed monthly report');
+ await db.query("insert into file_objects(organization_id,object_key,original_name,content_type,size_bytes,sha256,scan_status,created_by,purpose,time_entry_id) values($1,$2,'Synthetic signed.txt','text/plain',4,$3,'clean',$4,'time_report',$5)",[soloOrg,soloOrg+'/'+randomUUID(),createHash('sha256').update('test').digest('hex'),soloUser,soloEntry]);
+ await db.query("insert into organization_memberships(organization_id,user_id,email,role,status) values($1,$2,'workforce-member@example.invalid','member','active')",[soloOrg,member]);
+ const teamSubmit=await submit();assert.equal(teamSubmit.status,200);assert.equal(teamSubmit.data.item.approved,false,'A team owner still needs independent review');
+ const ownApprove=()=>patch.PATCH({body:{action:'approve'}},{params:Promise.resolve({id:soloEntry})});assert.equal((await ownApprove()).status,403);
+ await db.query("update organization_memberships set status='invited' where organization_id=$1 and user_id=$2",[soloOrg,member]);
+ const soloSubmit=await submit();assert.equal(soloSubmit.status,200);assert.equal(soloSubmit.data.item.approved,true,'Signed solo-owner monthly work becomes billable without false four-eyes review');
+ delete globalThis.__soloPatchSession;delete globalThis.__soloPatchRun;
+ console.log('Actual solo-owner monthly API: missing signed evidence denied, team self-approval denied and signed solo submit approved under runtime RLS.');
  console.log('Workforce: real runtime RLS, direct-ID/tenant denial, exact order scope, write/revocation guards, monthly overlap, independent approval and immutable history passed.');
 }finally{await db.close()}
