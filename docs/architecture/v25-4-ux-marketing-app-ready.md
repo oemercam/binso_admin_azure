@@ -1,5 +1,8 @@
 # V25.4 – Public Trial, Tarife und eingeschränkter Arbeitsbereich
 
+Aktueller Einstieg: [Lieferstand, Konzeptablage und GitHub-Abhängigkeiten](delivery-status.md).
+Dieser Bericht bewahrt datierte Nachweise; den aktuellen Head und CI im verlinkten PR prüfen.
+
 Stand: 20.10.2026. Implementierung auf `feat/v25-4-public-trial`, aufbauend auf
 PR #297 (`d707edf0e0e6e4231e50059c45af117fb59fcda2`). Main und fremde PRs bleiben
 unverändert. Dieser Bericht ist kein neuer UX-Vertrag und keine Produktivfreigabe.

@@ -195,8 +195,8 @@ try{
  await assert.rejects(()=>db.query("insert into organization_memberships(organization_id,user_id,email,role,status) values($1,$2,$3,'member','active')",[secondSession.organizationId,current.userId,body.email]),e=>e.code==='23514'&&e.constraint==='single_active_company_identity','Database rejects a second active company without deleting the original');
  // Deliberately seed historical ambiguity as schema administrator in this
  // disposable fixture only. The new guard must preserve it but deny login.
- await db.exec('alter table organization_memberships disable trigger single_company_identity');
- try{await db.query("insert into organization_memberships(organization_id,user_id,email,role,status) values($1,$2,$3,'member','active')",[secondSession.organizationId,current.userId,body.email]);}finally{await db.exec('alter table organization_memberships enable trigger single_company_identity')}
+ await db.query('alter table organization_memberships disable trigger single_company_identity');
+ try{await db.query("insert into organization_memberships(organization_id,user_id,email,role,status) values($1,$2,$3,'member','active')",[secondSession.organizationId,current.userId,body.email]);}finally{await db.query('alter table organization_memberships enable trigger single_company_identity')}
  assert.equal(await actualSession.getSession(),null,'Historical ambiguous membership cannot select the first tenant');
  const cookieBeforeAmbiguous=jar.get('binso_session');
  response=await login.POST(request('POST',{email:body.email,password:body.password},'https://example.invalid/api/auth/login'));assert.equal(response.status,401,'Credential proof cannot resolve an ambiguous company by ordering');

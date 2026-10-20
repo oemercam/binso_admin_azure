@@ -1,5 +1,8 @@
 # Technischer Foundation-Status
 
+Aktueller Einstieg: [Lieferstand, Konzeptablage und GitHub-Abhängigkeiten](delivery-status.md).
+Dieser Bericht bewahrt datierte Nachweise; den aktuellen Head und CI im verlinkten PR prüfen.
+
 Stand 20.10.2026. Dieser Bericht ist ein Wegweiser und Implementierungsnachweis;
 er schafft keine weitere UX-Foundation oder parallele Produktregeln. Verbindlich
 bleiben [AGENTS](../../AGENTS.md), [aktuelle UX-Entscheidungen](ux-current-approval.md),

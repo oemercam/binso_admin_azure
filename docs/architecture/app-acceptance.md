@@ -1,5 +1,8 @@
 # Gemeinsame App-Abnahme: Kunden-App und One Admin
 
+Aktueller Einstieg: [Lieferstand, Konzeptablage und GitHub-Abhängigkeiten](delivery-status.md).
+Dieser Bericht bewahrt datierte Nachweise; den aktuellen Head und CI im verlinkten PR prüfen.
+
 > Aktuelle Einordnung vom 20.10.2026: Die folgenden Entwicklungsstände und
 > Fehlerverläufe sind datierte Nachweise. PR #295 und #296 wurden inzwischen
 > integriert; Main `d2825134deb33cac67a05c6e703b945ff28066e6` bestand Quality,
