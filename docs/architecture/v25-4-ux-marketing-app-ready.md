@@ -102,3 +102,9 @@ Verifier-Funktion positiv/negativ. Kein Zugriffsschutz wurde geöffnet.
 Die Seitenmatrix wurde ausschliesslich über ux-contract-inventory.mjs erneuert;
 alle 76 Routen/12 Varianten bleiben ungeprüft statt erfundener visueller Abnahme.
 Die finale Linux-Qualifikation muss den Nachfolgecommit prüfen.
+
+Der zweite Linux-Lauf hat die Legacy-Weiterleitung noch vor der Browsermatrix
+abgewiesen. Next kann im Streaming-Kontext einen Seitenredirect als HTTP-200-
+Meta-Refresh ausliefern; deshalb wird `/demo` zusätzlich im bestehenden Next-
+Konfigurationsowner vor dem Rendern per 307 nach `/registrieren` umgeleitet.
+Der HTTP-Redirect-Test bleibt streng, mit zusätzlichem Test der echten Next-Konfiguration.
