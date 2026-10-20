@@ -1,5 +1,4 @@
 import "server-only";
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { getOperatorSession, requireOperatorSession as requireSession } from "@/lib/server/operator/session";
 
@@ -8,9 +7,7 @@ export async function requireOperatorSession(){
  return {...session,token:""};
 }
 export async function requireOperator(){
- const session=await getOperatorSession();
- if(session)return {prototype:false,role:session.role,identity:{name:session.name,email:session.email}};
- const jar=await cookies();
- if(jar.get("binso_operator_demo")?.value==="1")return {prototype:true,role:"readonly" as const,identity:null};
+ const current=await getOperatorSession();
+ if(current){const session=await requireSession();return {role:session.role,identity:{name:session.name,email:session.email}};}
  redirect("/operator/login");
 }

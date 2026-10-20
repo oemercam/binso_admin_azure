@@ -6,7 +6,6 @@ export const domainConfig = {
   defaultReminderDays: 10,
   reminderStages: ["Zahlungserinnerung","1. Mahnung","2. Mahnung"] as const,
   trialDays: 14,
-  demoSessionHours: 24,
   emailVerificationMinutes: 24 * 60,
   emailCodeMinutes: 10,
   emailCodeMaxAttempts: 5,

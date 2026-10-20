@@ -26,11 +26,11 @@ assert.ok(registrationSheet.includes("search.get(\"plan\")")&&registrationSheet.
 assert.ok(loginRoute.includes('verifiedEmailNow||!emailCode'),'Login must issue a fresh login code after first email verification');
 assert.ok(recoverRoute.includes('domainConfig.passwordResetMinutes'),'Password recovery must use the canonical reset lifetime');
 assert.ok(provisioningSource.includes('input.language??"de"'),'Persisted profile language must remain schema-compatible');
-assert.ok(provisioningSource.includes('input.mode==="demo"?addHours(new Date(),domainConfig.demoSessionHours):null'),'Trial expiry must not start before first email verification');
+assert.ok(provisioningSource.includes('const expiresAt=null'),'Trial expiry must not start before first email verification');
 const appPagesSource=await readPageFile('components/app-pages.tsx','utf8');
 assert.ok(appPagesSource.includes('useLocale()')&&appPagesSource.includes('locales.map('),'Language settings must expose all supported locales through the shared provider');
 for(const legacyMrr of ['CHF 19','CHF 49','CHF 89'])assert.ok(!operatorSource.includes('mrr:"'+legacyMrr+'"'),'Operator demo must not hardcode retired MRR '+legacyMrr);
-assert.ok(operatorSource.includes('demoPlan("start")')&&operatorSource.includes('demoPlan("business")')&&operatorSource.includes('demoPlan("pro")'),'Operator demo MRR must derive from canonical plans');
+assert.ok(!operatorSource.includes('const demoCustomers')&&!operatorSource.includes('demo={'),'Operator must not render demo customer fixtures');
 
 console.log('Release gates passed.');
 
@@ -49,8 +49,8 @@ for(const name of ['GRAPH_TENANT_ID','GRAPH_CLIENT_ID','GRAPH_CLIENT_SECRET','GR
 const deployWorkflow=await readPageFile('.github/workflows/deploy-azure.yml','utf8');
 assert.ok(deployWorkflow.includes('pnpm retention:cleanup'),'Production deploy must enforce retention cleanup');
 assert.ok(deployWorkflow.includes('/api/health/ready'),'Production deploy must verify readiness health');
-assert.ok(deployWorkflow.includes('retry_curl()'),'Production verification must retry transient HTTP failures');
-assert.ok(deployWorkflow.includes('trap cleanup_demo_session EXIT'),'Production demo verification must always clean up its session');
+assert.ok((await readPageFile('scripts/check-deployed-auth.mjs','utf8')).includes('attempt<3'),'Production verification retains bounded transient retries');
+assert.ok(deployWorkflow.includes('scripts/check-deployed-auth.mjs'),'Production verifies retired demo denial and unauthenticated API protection without provisioning data');
 await fs.access('.github/workflows/retention-maintenance.yml');
 await fs.access('.github/workflows/graph-mail-readiness.yml');
 await fs.access('app/api/health/ready/route.ts');

@@ -15,13 +15,13 @@ type Attachment={id:string;fileName:string;mimeType?:string;sizeBytes?:number;cr
 
 /** Entity association is mandatory; every attachment uses the existing file API. */
 export function EntityFiles({purpose,entityId,readOnly=false,title="Dateien",emptyTitle="Keine Dateien vorhanden",className=""}:{purpose:string;entityId:string;readOnly?:boolean;title?:string;emptyTitle?:string;className?:string}){
- const production=useBackendMode(),relation=fileRelations[purpose],input=useRef<HTMLInputElement>(null),busy=useRef(false);
+ const relation=fileRelations[purpose],input=useRef<HTMLInputElement>(null),busy=useRef(false);
  const [uploading,setUploading]=useState(false),[error,setError]=useState<string|null>(null);
  const [search,setSearch]=useState(''),[selected,setSelected]=useState<Attachment|null>(null),[preview,setPreview]=useState(false),[pdf,setPdf]=useState<Blob|null>(null),[previewError,setPreviewError]=useState('');
  const sequence=useRef(0);
- const session=useApiQuery<{demo?:boolean;tenant?:{role?:string;readOnly?:boolean}}>(production?'/api/auth/session':null);
+ const session=useApiQuery<{demo?:boolean;tenant?:{role?:string;readOnly?:boolean}}>('/api/auth/session');
  const allowed=Boolean(!readOnly&&relation&&session.data&&!session.data.tenant?.readOnly&&tenantCan(session.data.tenant?.role??'reader',relation.write));
- const files=useApiQuery<{items:Attachment[]}>(production&&relation&&entityId?'/api/files?'+relation.filter+'='+encodeURIComponent(entityId):null);
+ const files=useApiQuery<{items:Attachment[]}>(relation&&entityId?'/api/files?'+relation.filter+'='+encodeURIComponent(entityId):null);
  const showPdf=async(file:Attachment)=>{const request=++sequence.current;setSelected(null);setPreview(true);setPdf(null);setPreviewError('');try{const result=await apiGetFile('/api/files/'+encodeURIComponent(file.id)+'/download','application/pdf');if(request===sequence.current)setPdf(result.blob)}catch(e){if(request===sequence.current)setPreviewError(e instanceof Error?e.message:'Datei konnte nicht angezeigt werden.')}};
  const upload=async(file:File|undefined)=>{
   if(!file||!allowed||busy.current)return;
@@ -31,7 +31,7 @@ export function EntityFiles({purpose,entityId,readOnly=false,title="Dateien",emp
   catch(e){setError(e instanceof Error?e.message:'Datei konnte nicht hochgeladen werden.');}
   finally{busy.current=false;setUploading(false);if(input.current)input.current.value='';}
  };
- if(!production||!relation||!entityId)return null;
+ if(!relation||!entityId)return null;
  return <section className={["surface",className].filter(Boolean).join(" ")}><SectionTitle title={title} action={allowed?<ActionsMenu label="Dateiaktionen" busy={uploading}><ActionRow requiresWrite icon="upload" title="Datei hinzufügen" onClick={()=>input.current?.click()}/></ActionsMenu>:undefined}/>
   <Input ref={input} hidden type="file" accept="application/pdf,image/png,image/jpeg,image/webp,text/plain,text/csv" aria-label="Anhang auswählen" onChange={e=>{const file=e.target.files?.[0];e.target.value="";void upload(file)}}/>
   {files.loading&&<LoadingState><LocalizedText>{"Anhänge werden geladen …"}</LocalizedText></LoadingState>}

@@ -10,7 +10,6 @@ import {companyLogoSource} from "@/lib/image-url";
 import {useApiQuery} from "@/lib/client/use-api-query";
 import {Avatar} from "../avatar";
 import {usePageAccess} from "@/lib/client/page-access";
-import {DocumentModal} from "../documents";
 import {ActionRow,ActionSheet,FormSheet,ListRow,SelectionRows,SettingsGroup} from "../binso-ux";
 
 import Link from "next/link";
@@ -32,7 +31,7 @@ export function SettingsPage() {
 }
 
 export function AccountSettingsPage() {
-  const production=useBackendMode();
+
   const [profileName,setProfileName]=useState("");
   const [firstName,setFirstName]=useState("");
   const [lastName,setLastName]=useState("");
@@ -41,7 +40,7 @@ export function AccountSettingsPage() {
   const [jobTitle,setJobTitle]=useState("");
   const [toast,setToast]=useState<string|null>(null);
   const [editing,setEditing]=useState(false);
-  const query=useApiQuery<{item?:Record<string,unknown>|null;email?:string|null}>(production?"/api/settings/profile":null);
+  const query=useApiQuery<{item?:Record<string,unknown>|null;email?:string|null}>("/api/settings/profile");
   const loading=query.loading,loadError=query.error;
   const [saving,setSaving]=useState(false);
   const saveBusy=useRef(false);
@@ -68,7 +67,7 @@ export function AccountSettingsPage() {
   const save=async(message="Persönliche Daten gespeichert.")=>{
     if(loading||loadError||saveBusy.current||avatarPending.current)return;saveBusy.current=true;setSaving(true);
     try{
-      if(!isProductionBackendEnabled())throw new Error("Die Vorschau ist schreibgeschützt. Bitte eine Datenbank-Demo starten.");
+      {}
       await apiPatch("/api/settings/profile",{firstName,lastName,phone,jobTitle});
       window.dispatchEvent(new Event("binso-profile-changed"));
       setToast(message);
@@ -103,7 +102,7 @@ export function AccountSettingsPage() {
 }
 
 export function CompanySettingsPage() {
-  const production=useBackendMode();
+
   const router=useRouter(),search=useSearchParams();
   const onboarding=search.get("onboarding")==="1";
   const onboardingOpened=useRef(false);
@@ -118,7 +117,7 @@ export function CompanySettingsPage() {
   const [phone,setPhone]=useState("");
   const [toast,setToast]=useState<string|null>(null);
   const [editing,setEditing]=useState(false);
-  const query=useApiQuery<{item:Record<string,unknown>}>(production?"/api/settings/company":null);
+  const query=useApiQuery<{item:Record<string,unknown>}>("/api/settings/company");
   const loading=query.loading,loadError=query.error;
   const [saving,setSaving]=useState(false);
   const saveBusy=useRef(false);
@@ -146,7 +145,7 @@ export function CompanySettingsPage() {
   const save=async(message="Firmendaten gespeichert.")=>{
     if(loading||loadError||saveBusy.current)return;saveBusy.current=true;setSaving(true);
     try{
-      if(!isProductionBackendEnabled())throw new Error("Die Vorschau ist schreibgeschützt. Bitte eine Datenbank-Demo starten.");
+      {}
       if(!name.trim()){throw new Error("Firmenname ist erforderlich.")}
       if(pendingLogo){const form=new FormData();form.append("file",pendingLogo);form.append("purpose","company_logo");const result=await apiUpload<{item:{id:string;scanStatus:string;available?:boolean}}>("/api/files",form);if(result.item.available!==true&&result.item.scanStatus!=="clean")throw new Error("Das Firmenlogo wartet auf die Sicherheitsprüfung. Das bisherige Logo bleibt erhalten.");setLogoUrl("/api/files/"+result.item.id+"/download");setPendingLogo(null);setLogoPreview("");}
       await apiPatch("/api/settings/company",{name,uid,street,buildingNumber,postalCode,city,email,phone,...(removeLogo?{logoUrl:""}:{}),completeOnboarding:onboarding});
@@ -183,7 +182,7 @@ export function CompanySettingsPage() {
 }
 
 export function SubscriptionSettingsPage() {
-  const production=useBackendMode();
+
   const searchParams=useSearchParams();
   const requestedPlan=searchParams.get("plan");
   const requestedBilling=searchParams.get("billing");
@@ -204,14 +203,13 @@ export function SubscriptionSettingsPage() {
   const [billingLoading,setBillingLoading]=useState(false);
   const [acceptedPaidTerms,setAcceptedPaidTerms]=useState(false);
   const [toast,setToast]=useState<string|null>(null);
-  const [billingInvoice,setBillingInvoice]=useState<{date:string;amount:string}|null>(null);
   const [referenceNow]=useState(()=>Date.now());
 
   const prices:Record<string,string>=Object.fromEntries(subscriptionPlans.flatMap(p=>[[p.name,String(p.monthly)],[p.id,String(p.monthly)]]));
   const confirm=(message:string)=>{setDialog(null);setToast(message);window.setTimeout(()=>setToast(null),2200);};
 
   useEffect(()=>{
-    if(!production) return;
+    {}
     Promise.all([
       apiGet<{item:Record<string,unknown>}>("/api/settings/subscription"),
       apiGet<{items:Array<Record<string,unknown>>}>("/api/integrations/status"),
@@ -242,7 +240,7 @@ export function SubscriptionSettingsPage() {
       window.setTimeout(()=>setToast(null),2200);
     }
     return ()=>{stopped=true;if(refreshTimer)clearTimeout(refreshTimer);};
-  },[production]);
+  },[]);
 
   const startCheckout=async()=>{
     setBillingLoading(true);
@@ -269,17 +267,7 @@ export function SubscriptionSettingsPage() {
     }
   };
 
-  if(!production){
-    return <AppShell title="Abonnement" subtitle="Plan, Nutzung, Zahlungsmittel und Rechnungen." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
-      <p className="technical-hint"><LocalizedText>{"Abonnement-Demo mit synthetischen Beispielen. Es werden keine echten Zahlungen oder Kündigungen ausgelöst."}</LocalizedText></p><section className="plan-hero"><div><span className="eyebrow"><LocalizedText>{"AKTUELLER PLAN"}</LocalizedText></span><h2>{plan}</h2><p><LocalizedText>{"Für wachsende Teams mit allen wichtigen Business-Funktionen."}</LocalizedText></p></div><div className="plan-price"><strong><LocalizedText>{"CHF "}</LocalizedText>{prices[plan]}</strong><span><LocalizedText>{"/ Monat"}</LocalizedText></span></div><Button onClick={()=>setDialog("plan")}><LocalizedText>{"Plan ändern"}</LocalizedText></Button></section>
-      <div className="subscription-detail-grid"><section className="surface"><SectionTitle title="Nutzung"/><div className="usage-row"><span><LocalizedText>{"Benutzer"}</LocalizedText></span><b><LocalizedText>{"4 von 10"}</LocalizedText></b></div><ProgressBar value={4} max={10} label="Benutzer"/><div className="usage-row"><span><LocalizedText>{"Dateispeicher"}</LocalizedText></span><b><LocalizedText>{"2.4 GB von 20 GB"}</LocalizedText></b></div><ProgressBar value={2.4} max={20} label="Dateispeicher"/></section><section className="surface"><SectionTitle title="Zahlungsmittel"/><div className="payment-method"><Icon name="card"/><div><b><LocalizedText>{"Visa •••• 4242"}</LocalizedText></b><small><LocalizedText>{"Läuft 08/29 ab"}</LocalizedText></small></div><Button variant="secondary" onClick={()=>setDialog("payment")}><LocalizedText>{"Ändern"}</LocalizedText></Button></div></section></div>
-      <section className="surface invoices-panel"><SectionTitle title="Rechnungen"/><div>{[{date:"01.10.2026",number:"BO-2026-10"},{date:"01.09.2026",number:"BO-2026-09"}].map(item=><ListRow key={item.number} title={item.number} meta={item.date} value="CHF 49.00" valueLabel="Gesamtbetrag" status="Bezahlt" tone="success" onClick={()=>setBillingInvoice({date:item.date,amount:"CHF 49.00"})}/>)}</div></section>
-      <div className="danger-zone"><div><b><LocalizedText>{"Abonnement kündigen"}</LocalizedText></b><p><LocalizedText>{"Dein Zugriff bleibt bis zum Ende der laufenden Periode aktiv."}</LocalizedText></p></div><Button variant="danger" onClick={()=>setDialog("cancel")}><LocalizedText>{"Kündigung starten"}</LocalizedText></Button></div>
-      {dialog&&<FormSheet label={dialog==="plan"?"Plan ändern":dialog==="payment"?"Zahlungsmittel ändern":"Abonnement kündigen"} description={"Demo-Aktion ohne produktive Zahlungsabwicklung."} open={true} onClose={()=>setDialog(null)} busy={billingLoading} className={"subscription-sheet"} layerClassName={""} ariaLabel={dialog==="plan"?"Plan auswählen":dialog==="payment"?"Zahlungsart":"Abonnement"}>{dialog==="plan"&&<div className="plan-choice-list">{["Start","Business","Pro"].map(name=><button type="button" className={plan===name?"selected":""} onClick={()=>setPlan(name)} key={name}><div><b>{name}</b><small><LocalizedText>{"CHF "}</LocalizedText>{prices[name]}<LocalizedText>{" / Monat"}</LocalizedText></small></div>{plan===name?<Icon name="check"/>:<Icon name="arrow"/>}</button>)}</div>}<FormActions sheet><Button variant="secondary" onClick={()=>setDialog(null)}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button onClick={()=>confirm("Demo-Aktion gespeichert.")}><LocalizedText>{"Speichern"}</LocalizedText></Button></FormActions></FormSheet>}
-      {billingInvoice&&<DocumentModal title="Rechnungsvorschau" pdfNumber={"BO-"+billingInvoice.date.slice(6)+"-"+billingInvoice.date.slice(3,5)} fileUrl={"/demo/billing-"+billingInvoice.date.slice(6)+"-"+billingInvoice.date.slice(3,5)+".pdf"} onClose={()=>setBillingInvoice(null)}/>}
-      {toast&&<Toast title={toast} tone={toast.startsWith("Stripe Checkout abgeschlossen.")||toast==="Planwechsel abgebrochen."?"info":"danger"}/>}
-    </AppShell>;
-  }
+  {}
 
   if(!subscription) return <AppShell title="Abonnement" active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">{billingError?<div role="alert"><EmptyState  title="Abonnement nicht verfügbar" description={billingError}/></div>:<LoadingState/>}</AppShell>;
 
@@ -335,7 +323,7 @@ export function NotificationSettingsPage() {
   const [saving,setSaving]=useState<string[]>([]);
   const [ready,setReady]=useState(false);
   const [error,setError]=useState("");
-  useEffect(()=>{if(!isProductionBackendEnabled())return;apiGet<{items:Array<{kind:string;email:boolean;push:boolean}>}>("/api/settings/notifications").then(data=>setPrefs(current=>{const next={...current};for(const item of data.items)if(next[item.kind])next[item.kind]={email:item.email,push:item.push};return next})).then(()=>setReady(true)).catch(()=>setError("Einstellungen konnten nicht geladen werden."));},[]);
+  useEffect(()=>{{}apiGet<{items:Array<{kind:string;email:boolean;push:boolean}>}>("/api/settings/notifications").then(data=>setPrefs(current=>{const next={...current};for(const item of data.items)if(next[item.kind])next[item.kind]={email:item.email,push:item.push};return next})).then(()=>setReady(true)).catch(()=>setError("Einstellungen konnten nicht geladen werden."));},[]);
   const toggle=async(title:string,channel:"email"|"push")=>{
     const key=title+channel;if(!ready||pending.current.has(key))return;
     const before=prefs[title][channel],enabled=!before;
@@ -356,9 +344,9 @@ export function NotificationSettingsPage() {
 
 /** Language availability reflects the translated interface, not the database enum. */
 function LanguagePreference(){
- const production=useBackendMode();const {locale,choose}=useLocale();
+ const {locale,choose}=useLocale();
  const [error,setError]=useState("");
- const save=async(code:string)=>{const next=asLocale(code);try{if(production)await apiPatch("/api/settings/profile",{language:next});choose(next);setError("");}catch{setError("Sprache konnte nicht gespeichert werden.")}};
+ const save=async(code:string)=>{const next=asLocale(code);try{await apiPatch("/api/settings/profile",{language:next});choose(next);setError("");}catch{setError("Sprache konnte nicht gespeichert werden.")}};
  return <><Field label="Sprache" allowReadOnlyInput><Select value={locale} onChange={event=>void save(event.target.value)}>{locales.map(code=><option key={code} value={code} lang={code}>{localeNames[code]}</option>)}</Select></Field>{error&&<ErrorState><LocalizedText>{error}</LocalizedText></ErrorState>}<p className="settings-note"><LocalizedText>{"Die gewählte Sprache gilt für die gesamte Benutzeroberfläche."}</LocalizedText></p></>;
 }
 

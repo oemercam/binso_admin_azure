@@ -2,16 +2,19 @@
 
 Static AST/source inventory, not proof that every runtime branch is tested. Calls include exact source arguments and locations; dynamic dispatch requires the domain matrix and runtime tests.
 
-104 API route files, 32 client consumers, 57 migrations, 98 declared tables.
+108 API route files, 33 client consumers, 65 migrations, 100 declared tables.
 
 | Endpoint | Methods | Source | Direct data/auth evidence |
 |---|---|---|---|
-| `/api/auth/invitation` | GET, POST | `app/api/auth/invitation/route.ts` | `withPlatform:10`, `c.query:11`, `c.query:15`, `withPlatform:34`, `c.query:35`, `c.query:37`, `c.query:38`, `c.query:40`, `c.query:42`, `c.query:44`, `c.query:46`, `c.query:48`, `c.query:50`, `c.query:51` |
-| `/api/auth/login` | POST | `app/api/auth/login/route.ts` | `query:27`, `client.query:34`, `client.query:35`, `query:63`, `query:78`, `query:79` |
+| `/api/auth/invitation` | GET, POST | `app/api/auth/invitation/route.ts` | `withPlatform:11`, `c.query:12`, `c.query:16`, `c.query:17`, `c.query:19`, `withPlatform:38`, `c.query:39`, `c.query:41`, `c.query:42`, `c.query:44`, `c.query:46`, `c.query:50`, `c.query:51`, `c.query:52`, `c.query:54`, `c.query:56`, `c.query:58`, `c.query:59` |
+| `/api/auth/login` | POST | `app/api/auth/login/route.ts` | `query:27`, `client.query:34`, `client.query:35`, `query:64`, `query:79`, `query:80` |
 | `/api/auth/logout` | POST | `app/api/auth/logout/route.ts` |  |
 | `/api/auth/mfa/confirm` | POST | `app/api/auth/mfa/confirm/route.ts` | `client.query:21`, `client.query:27`, `client.query:28`, `client.query:29` |
 | `/api/auth/mfa` | GET, DELETE | `app/api/auth/mfa/route.ts` | `query:11` |
-| `/api/auth/mfa/setup` | POST | `app/api/auth/mfa/setup/route.ts` | `query:18` |
+| `/api/auth/mfa/setup` | POST | `app/api/auth/mfa/setup/route.ts` | `query:19` |
+| `/api/auth/passkeys/options` | POST | `app/api/auth/passkeys/options/route.ts` | `requireSession:12` |
+| `/api/auth/passkeys` | GET, DELETE | `app/api/auth/passkeys/route.ts` | `requireSession:7`, `requireSession:10` |
+| `/api/auth/passkeys/verify` | POST | `app/api/auth/passkeys/verify/route.ts` | `requireSession:14` |
 | `/api/auth/password` | PATCH | `app/api/auth/password/route.ts` | `requireSession:15`, `query:19`, `c.query:22`, `c.query:22`, `client.query:30`, `client.query:32` |
 | `/api/auth/recover` | POST | `app/api/auth/recover/route.ts` | `query:16` |
 | `/api/auth/register` | GET, POST | `app/api/auth/register/route.ts` | `query:39` |
@@ -31,11 +34,11 @@ Static AST/source inventory, not proof that every runtime branch is tested. Call
 | `/api/customers/[id]` | GET, PATCH, DELETE | `app/api/customers/[id]/route.ts` | `requireSession:14`, `authorize:14`, `withTenant:14`, `tenantList:14`, `requireSession:18`, `authorize:18`, `requireSession:25`, `authorize:25` |
 | `/api/customers/duplicates` | GET | `app/api/customers/duplicates/route.ts` | `requireSession:7`, `authorize:7` |
 | `/api/customers` | GET, POST | `app/api/customers/route.ts` | `requireSession:13`, `authorize:13`, `requireSession:24`, `authorize:24` |
-| `/api/dashboard` | GET | `app/api/dashboard/route.ts` | `requireSession:13`, `authorize:17`, `authorize:18`, `withTenant:19`, `c.query:24`, `c.query:25`, `c.query:26` |
-| `/api/demo/dashboard` | GET | `app/api/demo/dashboard/route.ts` |  |
-| `/api/demo/data` | GET | `app/api/demo/data/route.ts` |  |
-| `/api/demo/finance` | GET | `app/api/demo/finance/route.ts` |  |
-| `/api/demo/platform-finance` | GET | `app/api/demo/platform-finance/route.ts` | `withPlatform:7`, `c.query:8`, `c.query:9` |
+| `/api/dashboard` | GET | `app/api/dashboard/route.ts` | `requireSession:13`, `authorize:14`, `authorize:18`, `authorize:19`, `withTenant:20`, `c.query:25`, `c.query:26`, `c.query:27` |
+| `/api/demo/dashboard` | GET, POST, DELETE | `app/api/demo/dashboard/route.ts` |  |
+| `/api/demo/data` | GET, POST, DELETE | `app/api/demo/data/route.ts` |  |
+| `/api/demo/finance` | GET, POST, DELETE | `app/api/demo/finance/route.ts` |  |
+| `/api/demo/platform-finance` | GET, POST, DELETE | `app/api/demo/platform-finance/route.ts` |  |
 | `/api/demo/session` | GET, POST, DELETE | `app/api/demo/session/route.ts` |  |
 | `/api/documents/[number]/credits` | POST | `app/api/documents/[number]/credits/route.ts` | `requireSession:9`, `withTenant:12` |
 | `/api/documents/[number]/pdf` | GET | `app/api/documents/[number]/pdf/route.ts` | `requireSession:10`, `withTenant:11`, `authorize:14`, `c.query:15` |
@@ -54,15 +57,15 @@ Static AST/source inventory, not proof that every runtime branch is tested. Call
 | `/api/expenses/options` | GET | `app/api/expenses/options/route.ts` | `requireSession:6`, `authorize:6`, `withTenant:7`, `c.query:7` |
 | `/api/expenses` | GET, POST | `app/api/expenses/route.ts` | `tenantListPage:9`, `tenantList:30` |
 | `/api/expenses/scan-receipt` | POST | `app/api/expenses/scan-receipt/route.ts` | `requireSession:9`, `authorize:9` |
-| `/api/files/[id]/download` | GET | `app/api/files/[id]/download/route.ts` | `requireSession:14`, `authorize:15`, `withTenant:16`, `client.query:16`, `authorize:22` |
-| `/api/files` | GET, POST | `app/api/files/route.ts` | `requireSession:21`, `authorize:21`, `authorize:23`, `withTenant:26`, `c.query:26`, `requireSession:31`, `authorize:40`, `authorize:43`, `withTenant:45`, `c.query:45`, `authorize:48`, `withTenant:53`, `c.query:55`, `c.query:61`, `c.query:67`, `c.query:69`, `c.query:70`, `c.query:71`, `c.query:72` |
+| `/api/files/[id]/download` | GET | `app/api/files/[id]/download/route.ts` | `requireSession:15`, `authorize:16`, `withTenant:17`, `client.query:17`, `authorize:24` |
+| `/api/files` | GET, POST | `app/api/files/route.ts` | `requireSession:22`, `authorize:22`, `authorize:24`, `withTenant:32`, `c.query:32`, `requireSession:37`, `authorize:46`, `authorize:50`, `withTenant:52`, `c.query:52`, `authorize:55`, `withTenant:60`, `c.query:62`, `c.query:68`, `c.query:74`, `c.query:76`, `c.query:77`, `c.query:78`, `c.query:79` |
 | `/api/finance/overview` | GET | `app/api/finance/overview/route.ts` | `requireSession:11`, `authorize:11`, `withTenant:13`, `authorize:16`, `authorize:17` |
 | `/api/finance` | GET | `app/api/finance/route.ts` | `requireSession:7`, `authorize:7`, `withTenant:7` |
 | `/api/health/ready` | GET | `app/api/health/ready/route.ts` | `query:26` |
 | `/api/health` | GET | `app/api/health/route.ts` |  |
 | `/api/integrations/status` | GET | `app/api/integrations/status/route.ts` |  |
 | `/api/notifications/[id]` | PATCH | `app/api/notifications/[id]/route.ts` | `requireSession:10`, `withTenant:11`, `c.query:11` |
-| `/api/notifications` | GET, PATCH | `app/api/notifications/route.ts` | `requireSession:7`, `withTenant:7`, `c.query:7`, `requireSession:8`, `withTenant:8`, `c.query:8`, `withTenant:8`, `c.query:8` |
+| `/api/notifications` | GET, PATCH | `app/api/notifications/route.ts` | `requireSession:8`, `withTenant:8`, `c.query:8`, `requireSession:9`, `withTenant:9`, `c.query:9`, `withTenant:9`, `c.query:9` |
 | `/api/operator/accounts/[id]` | PATCH | `app/api/operator/accounts/[id]/route.ts` | `requireOperatorSession:13`, `authorizeOperator:13`, `authorizeOperator:30`, `withPlatform:40`, `c.query:41`, `c.query:42`, `c.query:46` |
 | `/api/operator/accounts` | GET | `app/api/operator/accounts/route.ts` | `requireOperatorSession:7`, `authorizeOperator:7` |
 | `/api/operator/announcements` | GET, POST | `app/api/operator/announcements/route.ts` | `requireOperatorSession:2`, `authorizeOperator:2`, `query:2`, `requireOperatorSession:3`, `authorizeOperator:3`, `withPlatform:3`, `client.query:3`, `client.query:3` |
@@ -70,7 +73,7 @@ Static AST/source inventory, not proof that every runtime branch is tested. Call
 | `/api/operator/customers/[id]` | GET | `app/api/operator/customers/[id]/route.ts` | `requireOperatorSession:8`, `authorizeOperator:8` |
 | `/api/operator/customers` | GET | `app/api/operator/customers/route.ts` | `requireOperatorSession:7`, `authorizeOperator:7` |
 | `/api/operator/dashboard` | GET | `app/api/operator/dashboard/route.ts` | `requireOperatorSession:7`, `authorizeOperator:7`, `withPlatform:9`, `c.query:10`, `c.query:11`, `c.query:12`, `c.query:18`, `c.query:19`, `c.query:20` |
-| `/api/operator/demo-session` | POST | `app/api/operator/demo-session/route.ts` |  |
+| `/api/operator/demo-session` | GET, POST, DELETE | `app/api/operator/demo-session/route.ts` |  |
 | `/api/operator/finance` | GET | `app/api/operator/finance/route.ts` | `requireOperatorSession:8`, `authorizeOperator:8`, `withPlatform:9`, `c.query:11`, `c.query:12`, `c.query:13` |
 | `/api/operator/integrations/email-test` | POST | `app/api/operator/integrations/email-test/route.ts` | `authorizeOperator:9`, `requireOperatorSession:11` |
 | `/api/operator/logout` | POST | `app/api/operator/logout/route.ts` |  |
@@ -96,17 +99,18 @@ Static AST/source inventory, not proof that every runtime branch is tested. Call
 | `/api/settings/documents` | GET, PATCH | `app/api/settings/documents/route.ts` | `requireSession:11`, `authorize:11`, `withTenant:11`, `c.query:11`, `requireSession:12`, `authorize:12`, `withTenant:12`, `c.query:12` |
 | `/api/settings/notifications` | GET, PATCH | `app/api/settings/notifications/route.ts` | `requireSession:7`, `withTenant:7`, `c.query:7`, `requireSession:8`, `withTenant:8`, `c.query:8` |
 | `/api/settings/profile` | GET, PATCH | `app/api/settings/profile/route.ts` |  |
-| `/api/settings/subscription` | GET | `app/api/settings/subscription/route.ts` | `requireSession:6`, `authorize:6`, `withTenant:7`, `c.query:7` |
+| `/api/settings/subscription` | GET | `app/api/settings/subscription/route.ts` | `requireSession:7`, `authorize:7`, `withTenant:8`, `c.query:8` |
 | `/api/settings/team/invitations/[id]` | DELETE | `app/api/settings/team/invitations/[id]/route.ts` | `requireSession:8`, `authorize:8`, `withTenant:9`, `c.query:10`, `c.query:11` |
-| `/api/settings/team/invitations` | GET, POST | `app/api/settings/team/invitations/route.ts` | `requireSession:8`, `authorize:8`, `withTenant:8`, `c.query:8`, `c.query:8`, `c.query:8`, `requireSession:9`, `authorize:9` |
-| `/api/settings/team/members/[userId]` | PATCH | `app/api/settings/team/members/[userId]/route.ts` | `requireSession:8`, `authorize:8`, `withTenant:8`, `c.query:8`, `c.query:8` |
+| `/api/settings/team/invitations` | GET, POST | `app/api/settings/team/invitations/route.ts` | `requireSession:9`, `authorize:9`, `withTenant:9`, `c.query:9`, `c.query:9`, `c.query:9`, `requireSession:10`, `authorize:10` |
+| `/api/settings/team/members/[userId]` | PATCH | `app/api/settings/team/members/[userId]/route.ts` | `requireSession:9`, `authorize:9`, `withTenant:12`, `c.query:13`, `c.query:15`, `c.query:25`, `c.query:26`, `c.query:27`, `c.query:28`, `c.query:29`, `c.query:30`, `c.query:31`, `c.query:39`, `c.query:41` |
 | `/api/support/tickets/[id]/messages` | GET, POST | `app/api/support/tickets/[id]/messages/route.ts` | `requireSession:8`, `authorize:8`, `withTenant:9`, `c.query:9`, `requireSession:12`, `authorize:12`, `withTenant:13`, `c.query:15`, `c.query:17` |
 | `/api/support/tickets/[id]` | PATCH | `app/api/support/tickets/[id]/route.ts` | `requireSession:10`, `authorize:10`, `withTenant:14`, `c.query:15`, `c.query:19` |
 | `/api/support/tickets` | GET, POST | `app/api/support/tickets/route.ts` | `tenantListPage:10`, `requireSession:14`, `authorize:14`, `withTenant:22`, `c.query:23`, `c.query:23`, `c.query:24` |
 | `/api/telemetry/web-vitals` | POST | `app/api/telemetry/web-vitals/route.ts` | `query:12` |
-| `/api/time-entries/[id]` | PATCH | `app/api/time-entries/[id]/route.ts` | `requireSession:14`, `authorize:14`, `withTenant:20`, `c.query:21`, `c.query:27`, `c.query:34`, `c.query:39`, `c.query:42` |
+| `/api/time-entries/[id]` | PATCH | `app/api/time-entries/[id]/route.ts` | `requireSession:14`, `authorize:14`, `withTenant:20`, `c.query:21`, `c.query:27`, `c.query:32`, `c.query:34`, `c.query:36`, `c.query:40`, `c.query:43` |
 | `/api/time-entries/billing` | GET | `app/api/time-entries/billing/route.ts` | `requireSession:10`, `authorize:10`, `withTenant:12`, `c.query:12` |
-| `/api/time-entries/policy` | GET, PATCH | `app/api/time-entries/policy/route.ts` | `requireSession:7`, `authorize:7`, `withTenant:7`, `c.query:7`, `requireSession:8`, `authorize:8`, `withTenant:8`, `c.query:8` |
+| `/api/time-entries/options` | GET | `app/api/time-entries/options/route.ts` | `requireSession:8`, `authorize:8`, `withTenant:12`, `c.query:20`, `c.query:21` |
+| `/api/time-entries/policy` | GET, PATCH | `app/api/time-entries/policy/route.ts` | `requireSession:7`, `authorize:7`, `withTenant:8`, `c.query:8`, `requireSession:12`, `authorize:12`, `withTenant:15`, `c.query:16` |
 | `/api/time-entries` | GET, POST | `app/api/time-entries/route.ts` | `requireSession:14`, `authorize:14`, `withTenant:15`, `requireSession:20`, `authorize:20`, `withTenant:31`, `c.query:33`, `c.query:33`, `c.query:37`, `c.query:45`, `c.query:47`, `c.query:48`, `c.query:52` |
 | `/api/time-tracker` | GET, POST | `app/api/time-tracker/route.ts` | `requireSession:13`, `authorize:13`, `withTenant:14`, `c.query:15`, `requireSession:22`, `authorize:22`, `withTenant:25`, `c.query:26`, `c.query:27`, `c.query:34`, `c.query:37`, `c.query:42`, `c.query:47`, `c.query:48`, `c.query:48`, `c.query:57` |
 | `/api/workforce-assignments` | GET, POST, PATCH | `app/api/workforce-assignments/route.ts` | `requireSession:9`, `authorizeWorkforceManagement:9`, `withTenant:10`, `c.query:11`, `c.query:12`, `c.query:13`, `requireSession:18`, `authorizeWorkforceManagement:18`, `withTenant:22`, `c.query:23`, `c.query:24`, `c.query:26`, `c.query:27`, `c.query:28`, `c.query:29`, `requireSession:35`, `authorizeWorkforceManagement:35`, `withTenant:36`, `c.query:37` |

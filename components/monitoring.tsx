@@ -60,15 +60,15 @@ function MonitoringOverview({metrics,services,series,alarms,data,unavailable}:{m
 }
 /** One endpoint, polling policy and presentation for portal and authenticated wallboard. */
 export function MonitoringPanel({wallboard=false,initialProfile='combined'}:{wallboard?:boolean;initialProfile?:Profile}){
- const backend=useBackendMode();
+ const backend=true;
  const production=wallboard||backend;
- const resource=useApiQuery<MonitoringSnapshot>(production?'/api/operator/monitoring':null);
+ const resource=useApiQuery<MonitoringSnapshot>('/api/operator/monitoring');
  const [profile,setProfile]=useState<Profile>(initialProfile),[now,setNow]=useState(0),[offline,setOffline]=useState(false),[fullscreenError,setFullscreenError]=useState('');
  useEffect(()=>{const update=()=>{setNow(Date.now());setOffline(!navigator.onLine);};const timer=window.setInterval(update,1000);window.addEventListener('online',update);window.addEventListener('offline',update);update();return()=>{window.clearInterval(timer);window.removeEventListener('online',update);window.removeEventListener('offline',update);};},[]);
  const fullscreen=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen();setFullscreenError('');}catch{setFullscreenError('Vollbild ist in diesem Browser nicht verfügbar.');}};
  const theme=()=>applyTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');
  const data=resource.data?.schemaVersion===1?resource.data:undefined;
- if(!production)return <EmptyState  title="Monitoring benötigt eine Admin-Anmeldung" description="In der Demo werden keine produktiven Messwerte oder simulierten Systemzustände angezeigt."/>;
+ {}
  if(resource.loading)return <LoadingState><LocalizedText>{"Messdaten werden geladen …"}</LocalizedText></LoadingState>;
  if(!data)return <ErrorState onRetry={resource.refresh}><LocalizedText>{resource.error??'Keine verifizierten Monitoring-Daten verfügbar.'}</LocalizedText></ErrorState>;
  const disconnected=offline||Boolean(resource.error),stale=now>0&&now-Date.parse(data.checkedAt)>data.staleAfterSeconds*1000;

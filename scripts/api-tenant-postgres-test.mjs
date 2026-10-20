@@ -17,7 +17,7 @@ try{
  for(const name of (await fs.readdir('database/migrations')).filter(name=>name.endsWith('.sql')).sort())await pool.query(await fs.readFile('database/migrations/'+name,'utf8'));
  await pool.query(await fs.readFile('database/operations/provision-runtime-role.sql','utf8'));
  const http=moduleUrl('export class ApiError extends Error{constructor(status,code,message){super(message);this.status=status;this.code=code}}');
- const demo=await import(moduleUrl((await fs.readFile('lib/server/repositories/demo-fixture.ts','utf8')).replace('import "server-only";','').replace("'../http'",JSON.stringify(http))));
+ const demo=await import(moduleUrl((await fs.readFile('scripts/fixtures/business-data.ts','utf8')).replace('import "server-only";','').replace("'../../lib/server/http'",JSON.stringify(http))));
  const roles=['owner','admin','finance','hr','project_manager','manager','member','reader'];
  const organizations=['00000000-0000-4000-8000-000000000071','00000000-0000-4000-8000-000000000072'];
  const cookies=new Map();
@@ -68,6 +68,9 @@ try{
  const reportRoles=["owner","admin","finance","hr","project_manager","manager","reader"];
  const readContracts=[
   ["/api/reports",reportRoles],
+  ['/api/auth/passkeys',roles],
+  ['/api/time-entries/options?kind=customers',expenseRoles],
+  ['/api/time-entries/options?kind=projects',expenseRoles],
   ['/api/workforce-assignments',['owner','admin']],
   ...['/api/auth/mfa','/api/auth/register','/api/auth/session','/api/auth/sessions','/api/dashboard','/api/files','/api/finance/overview','/api/integrations/status','/api/notifications','/api/search?q=Alpen','/api/settings/company','/api/settings/documents','/api/settings/notifications','/api/settings/profile','/api/support/tickets'].map(path=>[path,roles]),
   ...['/api/billing/catalog','/api/payments','/api/finance','/api/settings/subscription','/api/time-entries/billing','/api/expenses/billing'].map(path=>[path,finance]),
@@ -134,7 +137,7 @@ try{
  const publicEntries=new Set(['/api/auth/invitation','/api/health','/api/health/ready','/api/demo/session','/api/operator/sso/callback']);
  for(const api of inventory.apis.filter(item=>item.methods.includes('GET'))){
   if(api.path.startsWith('/api/operator/')&&!publicEntries.has(api.path)||api.path.startsWith('/api/demo/')&&!publicEntries.has(api.path)){
-   for(const role of roles)assert.equal((await get(api.path.replace(/\[[^\]]+\]/g,customer.id)+(api.path==='/api/demo/data'?'?collection=customers':''),cookies.get('0:'+role))).status,401,role+' separate session boundary '+api.path);covered.add(api.path);
+   for(const role of roles)assert.equal((await get(api.path.replace(/\[[^\]]+\]/g,customer.id)+(api.path==='/api/demo/data'?'?collection=customers':''),cookies.get('0:'+role))).status,(api.path.startsWith('/api/demo/')||api.path==='/api/operator/demo-session')?410:401,role+' separate session boundary '+api.path);covered.add(api.path);
   }
   assert.ok(covered.has(api.path)||publicEntries.has(api.path),'Uncovered authenticated GET contract: '+api.path);
  }

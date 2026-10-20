@@ -16,9 +16,8 @@ function routeProxy(request:NextRequest,headers:Headers){
   const isProtected=protectedPrefixes.some(prefix=>pathname===prefix||pathname.startsWith(prefix+"/"));
   if(!isProtected) return NextResponse.next();
 
-  const demo=request.cookies.get("binso_demo")?.value==="1";
   const session=request.cookies.get(process.env.SESSION_COOKIE_NAME||"binso_session")?.value;
-  if(demo||session) return NextResponse.next();
+  if(session) return NextResponse.next();
 
   const login=new URL("/login",request.url);
   login.searchParams.set("next",pathname+request.nextUrl.search);

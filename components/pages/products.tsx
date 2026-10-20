@@ -13,7 +13,6 @@ import { useRouter,useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { AppShell } from "../app-shell";
 import { RecordRow, RecordsView, RecordsControls, useRecordsController } from "../records";
-import { appendDemoRow } from "@/lib/demo-storage";
 import { apiPatch, apiPost, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 import {Button, Field, Toast, Input, Select, Textarea, FormActions, LoadingState, ErrorState} from "../ui";
 import {allowDraftNavigation} from "../use-browser-back-guard";
@@ -32,7 +31,7 @@ export function ProductsPage() {
 export function ProductForm({ existing = false, productId }: { existing?: boolean; productId?: string }) {
   const router=useRouter(),params=useSearchParams();
   const returnTo=existing?"/produkte":safeAppPath(params.get("returnTo"),"/produkte");
-  const production=useBackendMode();
+
   const [name,setName]=useState("");
   const [type,setType]=useState("Dienstleistung");
   const [sku,setSku]=useState("");
@@ -42,13 +41,13 @@ export function ProductForm({ existing = false, productId }: { existing?: boolea
   const [description,setDescription]=useState("");
   const [status,setStatus]=useState("Aktiv");
   const [toast,setToast]=useState<string|null>(null);
-  const recordQuery=useApiQuery<{item?:Record<string,unknown>;items?:Record<string,unknown>[]}>(existing&&productId?(production?"/api/products/"+encodeURIComponent(productId):"/api/demo/data?collection=products&id="+encodeURIComponent(productId)):null);
+  const recordQuery=useApiQuery<{item?:Record<string,unknown>;items?:Record<string,unknown>[]}>(existing&&productId?("/api/products/"+encodeURIComponent(productId)):null);
   const loadingRecord=recordQuery.loading;
   const recordError=recordQuery.error??(existing&&recordQuery.data&&!recordQuery.data.item&&!recordQuery.data.items?.length?"Produkt wurde nicht gefunden.":null);
   const [savingRecord,setSavingRecord]=useState(false);
   const saveRecordPending=useRef(false);
   const {dirty,markPristine}=useDirtySnapshot([name,type,sku,unit,price,vatRate,description,status]);
-  const defaultsQuery=useApiQuery<{item:Record<string,unknown>}>(production&&!existing?"/api/settings/company":null);
+  const defaultsQuery=useApiQuery<{item:Record<string,unknown>}>(!existing?"/api/settings/company":null);
   useEffect(()=>{if(existing||dirty||!defaultsQuery.data)return;const vat=String(defaultsQuery.data.item.vat_rate??8.1);queueMicrotask(()=>{setVatRate(vat);markPristine([name,type,sku,unit,price,vat,description,status]);});},[existing,dirty,defaultsQuery.data,markPristine,name,type,sku,unit,price,description,status]);
   const [savedRecord,setSavedRecord]=useState(false);
   const [editingRecord,setEditingRecord]=useState(!existing);
@@ -83,7 +82,7 @@ export function ProductForm({ existing = false, productId }: { existing?: boolea
       const numericPrice=Number(price.replace(",","."));
       if(!Number.isFinite(numericPrice)||numericPrice<0)throw new Error("Bitte einen gültigen Verkaufspreis erfassen.");
       const payload={name:name.trim(),kind:type==="Produkt"?"product":"service",sku,unit,unitPrice:numericPrice,vatRate:Number(vatRate),description,status:status==="Inaktiv"?"inactive":"active"};
-      if(production){
+      {
         let result:{item?:{id?:string}};
         if(existing&&productId)result=await apiPatch("/api/products/"+encodeURIComponent(productId),payload);
         else{
@@ -91,8 +90,6 @@ export function ProductForm({ existing = false, productId }: { existing?: boolea
          result=await apiPost("/api/products",payload,{idempotencyKey:attempt.key});
         }
         if(!result.item?.id)throw new Error("Die Speicherung konnte nicht bestätigt werden. Bitte erneut versuchen.");
-      }else if(!existing){
-        appendDemoRow("products",[name.trim(),type,"CHF "+numericPrice.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2}),"Aktiv"]);
       }
       setSavedRecord(true);recovery.clear();allowDraftNavigation();
       setToast("Produkt gespeichert.");

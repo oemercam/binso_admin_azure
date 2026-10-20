@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
-# Fresh process-local QA proof; never a repository secret or public bypass.
-export BINSO_SMOKE_TEST_TOKEN="$(node -e 'process.stdout.write(require("node:crypto").randomBytes(32).toString("hex"))')"
 pnpm start --hostname 127.0.0.1 > /tmp/binso-next.log 2>&1 &
 APP_PID=$!
 trap 'kill $APP_PID 2>/dev/null || true' EXIT
@@ -98,20 +96,16 @@ test "$(curl -sS -o /tmp/binso-ready.json -w '%{http_code}' http://127.0.0.1:300
 grep -q '"status":"not_ready"' /tmp/binso-ready.json
 echo "Smoke: unauthenticated session"
 curl -fsS http://127.0.0.1:3000/api/auth/session | grep -q '"authenticated":false'
-echo "Smoke: public demo denied"
-test "$(curl -sS -o /dev/null -w '%{http_code}' -X POST -H 'Content-Type: application/json' http://127.0.0.1:3000/api/demo/session)" = "404"
-echo "Smoke: protected isolated QA session create"
-curl -fsS -c /tmp/binso-demo.cookies -X POST -H "x-binso-smoke-test: $BINSO_SMOKE_TEST_TOKEN" -H 'Content-Type: application/json' http://127.0.0.1:3000/api/demo/session | grep -q '"ok":true'
-curl -fsS -b /tmp/binso-demo.cookies http://127.0.0.1:3000/api/demo/session | grep -q '"active":true'
-curl -fsS -b /tmp/binso-demo.cookies http://127.0.0.1:3000/api/auth/session | grep -q '"demo":true'
-curl -fsS -b /tmp/binso-demo.cookies -X DELETE -H 'Content-Type: application/json' http://127.0.0.1:3000/api/demo/session | grep -q '"active":false'
+echo "Smoke: retired demo and protected authentication"
+BINSO_BASE_URL=http://127.0.0.1:3000 node scripts/check-deployed-auth.mjs
+
 echo "Smoke: protected APIs"
 test "$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/api/integrations/status)" = "401"
 test "$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/api/notifications)" = "401"
 test "$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/api/auth/sessions)" = "401"
 test "$(curl -sS -o /dev/null -w '%{http_code}' -X POST -H 'Content-Type: application/json' -d '{"plan":"business"}' http://127.0.0.1:3000/api/billing/checkout)" = "401"
 test "$(curl -sS -o /dev/null -w '%{http_code}' -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:3000/api/billing/webhook)" = "400"
-test "$(curl -sS -o /dev/null -w '%{http_code}' -X POST -H 'Origin: https://evil.example' http://127.0.0.1:3000/api/demo/session)" = "403"
+test "$(curl -sS -o /dev/null -w '%{http_code}' -X POST -H 'Origin: https://evil.example' http://127.0.0.1:3000/api/demo/session)" = "410"
 test "$(curl -sS -o /dev/null -w '%{http_code}' -X POST -H 'Origin: https://evil.example' http://127.0.0.1:3000/api/files)" = "403"
 echo "Smoke: security headers"
 curl -fsSI http://127.0.0.1:3000/dashboard | grep -qi "x-robots-tag: noindex"

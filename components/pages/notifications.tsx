@@ -32,10 +32,10 @@ export function notificationDate(value:string){
 }
 
 export function NotificationsPage() {
-  const production=useBackendMode();
+
   const [read,setRead]=useState<string[]>(["invoice","offer"]);
   const [view,setView]=useState<"all"|"unread">("all");
-  const query=useApiQuery<{items:NotificationRecord[]}>(production?"/api/notifications":null);
+  const query=useApiQuery<{items:NotificationRecord[]}>("/api/notifications");
   const remoteItems=query.data?.items??[];
   const loading=query.loading;
   const [mutationError,setMutationError]=useState<string|null>(null);
@@ -53,7 +53,7 @@ export function NotificationsPage() {
     catch(err){setMutationError(err instanceof Error?err.message:"Benachrichtigung konnte nicht aktualisiert werden.");}
   };
 
-  if(production){
+  {
     const unreadCount=remoteItems.filter(item=>!item.read_at).length;
     const visible=view==="all"?remoteItems:remoteItems.filter(item=>!item.read_at);
     return <AppShell title="Benachrichtigungen" subtitle="Wichtige Aktivitäten aus deinem Unternehmen." active="einstellungen">

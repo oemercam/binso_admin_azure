@@ -2,7 +2,7 @@
 
 import {AuthWorkspace} from "@/components/auth-workspace";
 
-import {clearDemoClientSession} from "@/lib/client/backend";
+import {clearClientSession} from "@/lib/client/backend";
 import {LocalizedText} from "@/lib/client/locale";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import {Button, Input, Field, ErrorState} from "@/components/ui";
@@ -39,7 +39,7 @@ export default function Page(){
       const response=await fetch("/api/auth/password",{method:"PATCH",signal:AbortSignal.timeout(15000),headers:{"Content-Type":"application/json"},body:JSON.stringify({password,token:new URLSearchParams(window.location.search).get("token")})});
       const payload=await response.json().catch(()=>({}));
       if(!response.ok) throw new Error(typeof payload?.message==="string"?payload.message:"Passwort konnte nicht geändert werden.");
-      clearDemoClientSession();const url=new URL(window.location.href);url.searchParams.delete("token");window.history.replaceState(window.history.state,"",url);setPassword("");setConfirm("");setDone(true);
+      clearClientSession();const url=new URL(window.location.href);url.searchParams.delete("token");window.history.replaceState(window.history.state,"",url);setPassword("");setConfirm("");setDone(true);
     }catch(error){
       setError(error instanceof Error?error.message:"Passwort konnte nicht geändert werden.");
     }finally{pending.current=false;setLoading(false);}

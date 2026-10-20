@@ -3,7 +3,7 @@
 import {useEffect,useRef,useState} from "react";
 import {Button,Logo} from "@/components/ui";
 import {registrationLocale,registrationText,type MailLocale} from "@/lib/i18n";
-import {clearDemoClientSession} from "@/lib/client/backend";
+import {clearClientSession} from "@/lib/client/backend";
 
 export default function VerifyEmailPage(){
  const [state,setState]=useState<'loading'|'success'|'already'|'invalid'>('loading'),[locale,setLocale]=useState<MailLocale>('de'),[next,setNext]=useState('/login');
@@ -17,7 +17,7 @@ export default function VerifyEmailPage(){
    if(!active)return;
    if(!payload.ok){setState('invalid');return;}
    setState(payload.alreadyVerified?'already':'success');
-   if(!payload.alreadyVerified)clearDemoClientSession();
+   if(!payload.alreadyVerified)clearClientSession();
    if(payload.next?.startsWith('/')&&!payload.next.startsWith('//'))setNext(payload.next);
    // A consumed bearer token must not remain in history, analytics or outgoing referrers.
    window.history.replaceState(window.history.state,'','/email-bestaetigen?lang='+registrationLocale(params.get('lang')));

@@ -1,11 +1,3 @@
-import type { Metadata } from "next";
-import { TimePage } from "@/components/pages/time";
+import {redirect} from 'next/navigation';
 
-export const metadata: Metadata = {
-  robots: { index: false, follow: false },
-  title: "Binso One Zeiterfassung Vorschau",
-};
-
-export default function Page(){
-  return <TimePage forceDemo/>;
-}
+export default function RetiredPreview(){redirect('/produkt');}

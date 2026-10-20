@@ -1,3 +1,4 @@
+import {createUiAuthFixture} from './ui-auth-fixture.mjs';
 import {writeTestOutput} from './test-output.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
@@ -6,13 +7,15 @@ import {pathToFileURL} from 'node:url';
 const engines=await import(process.env.BINSO_PLAYWRIGHT_MODULE?pathToFileURL(process.env.BINSO_PLAYWRIGHT_MODULE).href:'playwright');
 const baseline=process.env.BINSO_LOADING_BASELINE==='1',output=process.env.BINSO_LOADING_OUTPUT??'/tmp/binso-loading-after';
 await fs.mkdir(output,{recursive:true});
-const base=process.env.BINSO_BASE_URL??'http://127.0.0.1:3360';let server,logs='';
-if(!process.env.BINSO_BASE_URL){server=spawn(process.execPath,process.env.BINSO_UX_SERVER_FILE?[process.env.BINSO_UX_SERVER_FILE]:['node_modules/next/dist/bin/next','start','--hostname','127.0.0.1','--port','3360'],{env:{...process.env,PORT:'3360',HOSTNAME:'127.0.0.1'},stdio:['ignore','pipe','pipe']});server.stdout.on('data',v=>logs+=v);server.stderr.on('data',v=>logs+=v);for(let i=0;;i++){try{if((await fetch(base+'/api/health')).ok)break;}catch{}if(i===100||server.exitCode!==null)throw Error(logs);await new Promise(r=>setTimeout(r,100));}}
+const base=process.env.BINSO_BASE_URL??'http://127.0.0.1:3360';assert.ok(['127.0.0.1','localhost'].includes(new URL(base).hostname),'Synthetic browser authentication requires a loopback app server');
+const uiAuth=await createUiAuthFixture();
+let server,logs='';
+if(!process.env.BINSO_BASE_URL){server=spawn(process.execPath,process.env.BINSO_UX_SERVER_FILE?[process.env.BINSO_UX_SERVER_FILE]:['node_modules/next/dist/bin/next','start','--hostname','127.0.0.1','--port','3360'],{env:{...process.env,...uiAuth.env,PORT:'3360',HOSTNAME:'127.0.0.1'},stdio:['ignore','pipe','pipe']});server.stdout.on('data',v=>logs+=v);server.stderr.on('data',v=>logs+=v);for(let i=0;;i++){try{if((await fetch(base+'/api/health')).ok)break;}catch{}if(i===100||server.exitCode!==null)throw Error(logs);await new Promise(r=>setTimeout(r,100));}}
 const browser=await engines[process.env.BINSO_UX_BROWSER??'webkit'].launch({headless:true});const results=[];
 try{
  for(const viewport of [{width:390,height:844},{width:1440,height:1000}])for(const theme of ['light','dark']){
   const context=await browser.newContext({viewport,colorScheme:theme,reducedMotion:theme==='dark'?'reduce':'no-preference',serviceWorkers:'block'});
-  await context.addCookies([{name:'binso_demo',value:'1',url:base}]);let authCalls=0,delay=350,authMode='valid',showCustomer=false;const calls={};
+  await context.addCookies(uiAuth.cookies.map(cookie=>({...cookie,url:base})));let authCalls=0,delay=350,authMode='valid',showCustomer=false;const calls={};
   await context.route('**/api/**',async route=>{const p=new URL(route.request().url()).pathname;calls[p]=(calls[p]||0)+1;
    if(p==='/api/auth/session'){authCalls++;await new Promise(r=>setTimeout(r,delay));return route.fulfill({status:authMode==='error'?503:200,json:authMode==='error'?{message:'Initialisierung fehlgeschlagen'}:authMode==='expired'?{authenticated:false}:{authenticated:true,demo:false,tenant:{id:'fixture',role:'owner',plan:'pro'}}});}
    if(p==='/api/customers'&&showCustomer)return route.fulfill({json:{items:[{id:'fixture',name:'Prüffirma AG',status:'active',city:'Bern'}]}});
@@ -60,4 +63,4 @@ try{
   await context.close();
  }
  await writeTestOutput(output+'/measurements.json',JSON.stringify({baseline,browser:process.env.BINSO_UX_BROWSER??'webkit',syntheticAuthDelayMs:350,results,physicalPwa:false},null,2));console.log(JSON.stringify(results,null,2));
-}finally{await browser.close();server?.kill();}
+}finally{await browser.close();server?.kill();await uiAuth.close();}

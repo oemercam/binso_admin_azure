@@ -1,30 +1,59 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import ts from 'typescript';
-let current={isDemo:true,organizationId:'old-demo'},provisionFailure=false;
-const provisioned=[],created=[],destroyed=[];
-const env={databaseUrl:'synthetic',smokeTestToken:'isolated-fixture-proof'};
-const dependencies={
- '@/lib/server/env':{env},
- '@/lib/server/provisioning':{provisionOrganization:async input=>{if(provisionFailure)throw Error('Synthetic provisioning failure');provisioned.push(input);return {organizationId:'new-demo-'+provisioned.length}}},
- '@/lib/server/session':{getSession:async()=>current,createSession:async input=>created.push(input),destroySession:async name=>destroyed.push(name)},
- 'next/headers':{cookies:async()=>new Map([['binso_demo',{value:'1'}]])},
- '@/lib/server/http':{ApiError:class extends Error{constructor(status,code,message){super(message);this.status=status;this.code=code}},assertSameOrigin:request=>{if(request.headers.get('origin')==='https://foreign.invalid')throw Object.assign(Error('Origin'),{status:403})},json:(data,status=200)=>({data,status,cookies:{set(){}}}),apiError:error=>({status:error.status??500})},
- 'node:crypto':await import('node:crypto'),
-};
-const output={};
-const source=ts.transpileModule(await fs.readFile('app/api/demo/session/route.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText;
-Function('require','exports',source)(name=>{if(!Object.hasOwn(dependencies,name))throw Error('Unexpected dependency: '+name);return dependencies[name]},output);
-const request=(search='',origin='https://fixture.invalid',proof=env.smokeTestToken)=>({nextUrl:new URL('https://fixture.invalid/api/demo/session'+search),headers:new Headers({origin,...(proof?{'x-binso-smoke-test':proof}:{})})});
-for(const proof of [null,'wrong-proof','x'.repeat(env.smokeTestToken.length)])assert.equal((await output.POST(request('',undefined,proof))).status,404,'Public or invalid proof cannot provision or resume a demo');
-const configuredProof=env.smokeTestToken;env.smokeTestToken=undefined;assert.equal((await output.POST(request('',undefined,configuredProof))).status,404,'An unconfigured server fails closed');env.smokeTestToken=configuredProof;assert.equal(provisioned.length,0);assert.equal(created.length,0);
 
-assert.equal((await output.POST(request())).status,200);assert.equal(provisioned.length,0,'Resume preserves the current private demo');
-assert.equal((await output.POST(request('?reset=1'))).status,200);assert.equal(provisioned.length,1);assert.equal(provisioned[0].mode,'demo');assert.ok(provisioned[0].email.endsWith('@demo.example.invalid'));
-assert.deepEqual(destroyed,['binso_demo_write']);assert.equal(created[0].cookieName,'binso_demo_write');assert.equal(created[0].organizationId,'new-demo-1');
-provisionFailure=true;assert.equal((await output.POST(request('?reset=1'))).status,500);assert.equal(destroyed.length,1,'A failed replacement cannot revoke the existing demo');provisionFailure=false;
-assert.equal((await output.POST(request('?reset=1','https://foreign.invalid'))).status,403);assert.equal(provisioned.length,1);
-current={isDemo:false,organizationId:'real-account'};assert.equal((await output.GET()).data.active,false);
-assert.equal((await output.POST(request('?reset=1'))).status,200);assert.equal(provisioned.length,2);assert.equal(destroyed.length,1,'A production session is never destroyed by demo replacement');
-assert.equal((await output.DELETE(request())).status,200);assert.ok(destroyed.every(name=>name==='binso_demo_write'));
-console.log('Actual demo route: resume, isolated reset, reserved synthetic email, public provisioning denial, protected QA access and origin denial, provisioning failure recovery and production-cookie preservation passed. No external service is called.');
+async function load(file,dependencies){
+ const source=ts.transpileModule(await fs.readFile(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText;
+ const output={};
+ Function('require','exports',source)(name=>{if(!Object.hasOwn(dependencies,name))throw Error('Unexpected dependency: '+name);return dependencies[name]},output);
+ return output;
+}
+// Retired URLs must not import database, provisioning, cookies or credentials.
+for(const path of ['demo/session','demo/data','demo/dashboard','demo/finance','demo/platform-finance','operator/demo-session']){
+ const route=await load('app/api/'+path+'/route.ts',{'@/lib/server/http':{json:(body,status)=>({body,status})}});
+ for(const method of ['GET','POST','DELETE']){
+  const response=await route[method]({headers:new Headers({'x-binso-smoke-test':'legacy-proof'}),nextUrl:new URL('https://fixture.invalid/api/'+path+'?reset=1')});
+  assert.equal(response.status,410,path+' '+method);
+  assert.equal(response.body.error,'demo_retired');
+ }
+}
+let reads=0;
+const jar=new Map([['binso_demo',{value:'1'}],['binso_demo_write',{value:'old-token'}]]);
+const session=await load('lib/server/session.ts',{
+ 'server-only':{},'node:crypto':await import('node:crypto'),
+ 'next/headers':{cookies:async()=>jar,headers:async()=>new Headers()},
+ '@/lib/server/maintenance':{maintenanceState:async()=>({enabled:false})},
+ '@/lib/server/db':{query:async()=>{throw Error('Unexpected write')},withTransaction:async fn=>{reads++;return fn({query:async()=>({rows:[]})})}},
+ '@/lib/server/http':{ApiError:class extends Error{}},
+ '@/lib/server/env':{env:{sessionCookieName:'real_session'}},
+ '@/lib/server/subscription-lifecycle':{expireUnpaidTrials:async()=>{throw Error('Unexpected trial mutation')}},
+});
+assert.equal(await session.getSession(),null);assert.equal(reads,0,'Legacy demo cookies cannot start a database session');
+jar.set('real_session',{value:'normal-token'});
+assert.equal(await session.getSession(),null);assert.equal(reads,1,'Normal account cookie retains database validation');
+let actual=null,validated=0;
+const operator=await load('lib/server/operator.ts',{
+ 'server-only':{},'next/navigation':{redirect:path=>{throw Error('redirect:'+path)}},
+ '@/lib/server/operator/session':{getOperatorSession:async()=>actual,requireOperatorSession:async()=>{validated++;return actual}},
+});
+await assert.rejects(operator.requireOperator(),/redirect:\/operator\/login/);
+actual={role:'platform_owner',name:'Synthetic Operator',email:'operator@example.invalid'};
+assert.deepEqual(await operator.requireOperator(),{role:actual.role,identity:{name:actual.name,email:actual.email}});assert.equal(validated,1,'Real operator authorization remains mandatory');
+const previousCookieName=process.env.SESSION_COOKIE_NAME;process.env.SESSION_COOKIE_NAME='normal_session';
+try{
+ const response=kind=>({kind,headers:new Headers(kind==='next'?{'x-middleware-next':'1'}:{}),cookies:{set(){}}});
+ const proxyModule=await load('proxy.ts',{
+  './lib/server/maintenance':{maintenanceState:async()=>({enabled:false})},
+  './lib/locales/config':{asLocale:x=>x,localeCookie:'fixture_locale',locales:['de','fr','it','en']},
+  './lib/operator-pages':{validOperatorSection:()=>true},
+  'next/server':{NextResponse:{next:()=>response('next'),rewrite:()=>response('rewrite'),redirect:url=>({...response('redirect'),url:String(url)})}},
+ });
+ const request=(route,cookies)=>({url:'https://fixture.invalid'+route,nextUrl:new URL('https://fixture.invalid'+route),headers:new Headers(),cookies:{get:name=>cookies.has(name)?{value:cookies.get(name)}:undefined}});
+ const legacy=new Map([['binso_demo','1'],['binso_demo_write','old'],['binso_operator_demo','1']]);
+ for(const route of ['/dashboard','/kunden','/projekte/neu','/support/ticket-one']){
+  const denied=await proxyModule.proxy(request(route,legacy));assert.equal(denied.kind,'redirect');assert.equal(new URL(denied.url).pathname,'/login');
+  assert.equal((await proxyModule.proxy(request(route,new Map([['normal_session','opaque-server-validated-session']])))).kind,'next','Normal cookie presence reaches authoritative server validation');
+ }
+ assert.equal((await proxyModule.proxy(request('/produkt',legacy))).kind,'next','Public product access remains public');
+}finally{if(previousCookieName===undefined)delete process.env.SESSION_COOKIE_NAME;else process.env.SESSION_COOKIE_NAME=previousCookieName;}
+console.log('Demo retirement: all six URLs reject legacy access; demo cookies cannot authenticate; normal sessions and operator authorization remain validated.');

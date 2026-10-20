@@ -53,14 +53,14 @@ export function NotificationPanel({items,loading,error,filter,onFilter,onRead,on
  </div>;
 }
 
-export function AccountPanel({profile,demo,logoutBusy,onLogout,onClose}:{profile:{name:string;identity:string;avatar:string};demo:boolean;logoutBusy:boolean;onLogout:()=>void;onClose:()=>void}){
+export function AccountPanel({profile,logoutBusy,onLogout,onClose}:{profile:{name:string;identity:string;avatar:string};logoutBusy:boolean;onLogout:()=>void;onClose:()=>void}){
  const pathname=usePathname(),params=useSearchParams();
  const origin=safeAppPath(params.get("accountReturn"),pathname);
  const target=new URL(origin,"https://binso.invalid");target.searchParams.set("panel","account");
  const back=target.pathname+target.search;
  return <div className="account-sheet"><div className="account-sheet-profile"><Avatar name={profile.name} identity={profile.identity} src={profile.avatar} size="large"/><div><b><LocalizedText verbatim={!!profile.name}>{profile.name||"Persönliches Konto"}</LocalizedText></b><small><LocalizedText verbatim={!!profile.identity}>{profile.identity||"Persönliches Konto"}</LocalizedText></small></div></div>
   <LocaleSwitcher/><SettingsGroup title="Persönlich"><div>{settingsGroups[0].rows.filter(([href])=>href!=="/einstellungen/sprache").map(([href,icon,title])=><PanelLink key={href} href={href+"?accountReturn="+encodeURIComponent(back)} icon={icon} title={href==="/einstellungen/konto"?"Mein Profil":title} onClose={onClose}/>)}</div></SettingsGroup>
-  <SettingsGroup title="Unternehmen"><div className="action-list"><PanelLink href="/einstellungen" icon="settings" title="Unternehmenseinstellungen" onClose={onClose}/>{demo&&<PanelLink href="/registrieren" icon="plus" title="Eigenes Konto erstellen" onClose={onClose}/>}</div></SettingsGroup>
+  <SettingsGroup title="Unternehmen"><div className="action-list"><PanelLink href="/einstellungen" icon="settings" title="Unternehmenseinstellungen" onClose={onClose}/></div></SettingsGroup>
   <SettingsGroup title="Sitzung"><div className="action-list"><ActionRow icon="logout" title={logoutBusy?"Wird abgemeldet…":"Abmelden"} disabled={logoutBusy} onClick={onLogout}/></div></SettingsGroup>
  </div>;
 }

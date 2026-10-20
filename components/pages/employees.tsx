@@ -21,7 +21,6 @@ import { useRouter,useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { AppShell } from "../app-shell";
 import { RecordRow, RecordsView, RecordsControls, useRecordsController, TimeEntryRow } from "../records";
-import { appendDemoRow } from "@/lib/demo-storage";
 import { apiPatch, apiPost, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 import {Button, EmptyState, Field, Icon, SectionTitle, Toast, Input, Select, LoadingState, ErrorState, FormSection} from "../ui";
 import {allowDraftNavigation} from "../use-browser-back-guard";
@@ -40,7 +39,7 @@ export function EmployeesPage() {
 export function EmployeeForm({ existing = false, employeeId }: { existing?: boolean; employeeId?: string }) {
   const router=useRouter(),params=useSearchParams();
   const returnTo=existing?"/mitarbeiter":safeAppPath(params.get("returnTo"),"/mitarbeiter");
-  const production=useBackendMode();
+
   const [firstName,setFirstName]=useState("");
   const [lastName,setLastName]=useState("");
   const [email,setEmail]=useState("");
@@ -55,7 +54,7 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
   const [wizardStep,setWizardStep]=useState(0);
   const [employeeTab,setEmployeeTab]=useState<"overview"|"time"|"expenses"|"documents">("overview");
   const [toast,setToast]=useState<string|null>(null);
-  const recordQuery=useApiQuery<{item?:Record<string,unknown>;items?:Record<string,unknown>[]}>(existing&&employeeId?(production?"/api/employees/"+encodeURIComponent(employeeId):"/api/demo/data?collection=employees&id="+encodeURIComponent(employeeId)):null);
+  const recordQuery=useApiQuery<{item?:Record<string,unknown>;items?:Record<string,unknown>[]}>(existing&&employeeId?("/api/employees/"+encodeURIComponent(employeeId)):null);
   const loadingRecord=recordQuery.loading;
   const recordError=recordQuery.error??(existing&&recordQuery.data&&!recordQuery.data.item&&!recordQuery.data.items?.length?"Mitarbeiter wurde nicht gefunden.":null);
   const [savingRecord,setSavingRecord]=useState(false);
@@ -68,8 +67,8 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
   const tenantRole=actor.data?.tenant?.role??'';
   const mayReadTime=tenantCan(tenantRole,'time:read'),mayReadExpenses=tenantCan(tenantRole,'expenses:read');
   const activeEmployeeTab=employeeTab==='time'&&!mayReadTime||employeeTab==='expenses'&&!mayReadExpenses?'overview':employeeTab;
-  const times=useApiQuery<{items:Array<{id:string;started_at:string;duration_minutes:number;project_name:string;description?:string;approved?:boolean;billable?:boolean;invoiced_invoice_id?:string|null}>;total?:number}>(production&&existing&&employeeId&&activeEmployeeTab==='time'&&mayReadTime?'/api/time-entries?limit=50&employeeId='+encodeURIComponent(employeeId):null);
-  const expenses=useApiQuery<{items:Array<{id:string;merchant:string;amount:number;currency?:string;expense_date:string;status?:string}>;total?:number}>(production&&existing&&employeeId&&activeEmployeeTab==='expenses'&&mayReadExpenses?'/api/expenses?limit=50&employeeId='+encodeURIComponent(employeeId):null);
+  const times=useApiQuery<{items:Array<{id:string;started_at:string;duration_minutes:number;project_name:string;description?:string;approved?:boolean;billable?:boolean;invoiced_invoice_id?:string|null}>;total?:number}>(existing&&employeeId&&activeEmployeeTab==='time'&&mayReadTime?'/api/time-entries?limit=50&employeeId='+encodeURIComponent(employeeId):null);
+  const expenses=useApiQuery<{items:Array<{id:string;merchant:string;amount:number;currency?:string;expense_date:string;status?:string}>;total?:number}>(existing&&employeeId&&activeEmployeeTab==='expenses'&&mayReadExpenses?'/api/expenses?limit=50&employeeId='+encodeURIComponent(employeeId):null);
   const ledger={times:times.data?.items??[],expenses:expenses.data?.items??[]};
   const ledgerLoading=activeEmployeeTab==='time'?times.loading:activeEmployeeTab==='expenses'?expenses.loading:false;
   const ledgerErrors={times:times.error,expenses:expenses.error};
@@ -107,7 +106,7 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
     saveRecordPending.current=true;setSavingRecord(true);
     try{
       const payload={firstName:firstName.trim(),lastName:lastName.trim(),email,phone,jobTitle:role.trim(),workloadPercent:Number(load),entryDate,weeklyHours:Number(weeklyHours),vacationDays:Number(vacationDays),address,status:status==="Inaktiv"?"inactive":"active"};
-      if(production){
+      {
         let result:{item?:{id?:string}};
         if(existing&&employeeId)result=await apiPatch("/api/employees/"+encodeURIComponent(employeeId),payload);
         else{
@@ -115,8 +114,6 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
          result=await apiPost("/api/employees",payload,{idempotencyKey:attempt.key});
         }
         if(!result.item?.id)throw new Error("Die Speicherung konnte nicht bestätigt werden. Bitte erneut versuchen.");
-      }else if(!existing){
-        appendDemoRow("employees",[firstName.trim()+" "+lastName.trim(),role.trim(),load+"%",status]);
       }
       setSavedRecord(true);recovery.clear();allowDraftNavigation();
       setToast("Mitarbeiter gespeichert.");

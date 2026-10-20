@@ -1,3 +1,4 @@
+import {createUiAuthFixture} from './ui-auth-fixture.mjs';
 import {selectAppOption,appControlValue} from './app-select-browser.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
@@ -8,7 +9,8 @@ import {pathToFileURL} from 'node:url';
 const engines=await import(process.env.BINSO_PLAYWRIGHT_MODULE?pathToFileURL(process.env.BINSO_PLAYWRIGHT_MODULE).href:'playwright');
 const base='http://127.0.0.1:3370',output=process.env.BINSO_LOCALIZATION_OUTPUT??await fs.mkdtemp(path.join(os.tmpdir(),'binso-localization-'));
 await fs.mkdir(output,{recursive:true,mode:0o700});
-const server=spawn(process.execPath,process.env.BINSO_UX_SERVER_FILE?[process.env.BINSO_UX_SERVER_FILE]:['node_modules/next/dist/bin/next','start','--hostname','127.0.0.1','--port','3370'],{env:{...process.env,PORT:'3370',HOSTNAME:'127.0.0.1'},stdio:['ignore','pipe','pipe']});
+const uiAuth=await createUiAuthFixture();
+const server=spawn(process.execPath,process.env.BINSO_UX_SERVER_FILE?[process.env.BINSO_UX_SERVER_FILE]:['node_modules/next/dist/bin/next','start','--hostname','127.0.0.1','--port','3370'],{env:{...process.env,...uiAuth.env,PORT:'3370',HOSTNAME:'127.0.0.1'},stdio:['ignore','pipe','pipe']});
 let logs='',browser;server.stdout.on('data',v=>logs+=v);server.stderr.on('data',v=>logs+=v);
 const messages=JSON.parse(await fs.readFile('lib/locales/messages.json','utf8'));
 const text=(source,locale)=>locale==='de'?source:messages[source][{en:0,fr:1,it:2}[locale]];
@@ -18,7 +20,7 @@ try{
  browser=await engines[process.env.BINSO_UX_BROWSER??'chromium'].launch({headless:true});
  for(const width of [390,768,1440])for(const locale of ['de','fr','it','en']){
   const context=await browser.newContext({viewport:{width,height:900},serviceWorkers:'block'});
-  await context.addCookies([{name:'binso_demo',value:'1',url:base},{name:'binso_operator_demo',value:'1',url:base}]);
+  await context.addCookies(uiAuth.cookies.map(cookie=>({...cookie,url:base})));
   await context.route('**/api/**',route=>{const pathname=new URL(route.request().url()).pathname;return route.fulfill({json:pathname==='/api/auth/session'?{authenticated:true,demo:true,user:{id:'fixture'},tenant:{id:'fixture',role:'owner',plan:'pro'}}:pathname==='/api/settings/profile'?{item:{display_name:'Fixture Person',language:locale}}:pathname==='/api/settings/company'?{item:{name:'Synthetic Localization Company'}}:{items:[],tracker:null}})});
   const faults=[],cancelledReloadPrefetches=[];let reloading=false;
   const trackedPage=async()=>{const next=await context.newPage();next.on('pageerror',error=>{
@@ -60,4 +62,4 @@ try{
   assert.deepEqual(faults,[],'No uncaught browser errors');results.push({locale,width,passed:true,cancelledReloadPrefetches});await context.close();
  }
  await fs.writeFile(output+'/results.json',JSON.stringify(results,null,2),{flag:'wx',mode:0o600});console.log('Four-language landing/customer/operator/404, persistent selection and responsive overflow checks passed.');
-}finally{await browser?.close();server.kill()}
+}finally{await browser?.close();server.kill();await uiAuth.close()}

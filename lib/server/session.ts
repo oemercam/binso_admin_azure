@@ -69,8 +69,7 @@ export async function endDemoSession(){
 
 export async function getSession():Promise<SessionUser|null>{
  const jar=await cookies();
- const demo=jar.get("binso_demo")?.value==="1";
- const token=jar.get(demo?"binso_demo_write":env.sessionCookieName)?.value;
+ const token=jar.get(env.sessionCookieName)?.value;
  if(!token)return null;
  const result=await withTransaction(async client=>{
    const context=(await client.query<{user_id:string;organization_id:string}>("select user_id,organization_id from auth_sessions where token_hash=$1 and expires_at>now() limit 1",[tokenHash(token)])).rows[0];
@@ -82,14 +81,14 @@ export async function getSession():Promise<SessionUser|null>{
       join app_users u on u.id=s.user_id and u.status='active'
       join organization_memberships m on m.user_id=u.id and m.organization_id=s.organization_id and m.status='active'
       join organizations o on o.id=s.organization_id and o.status in ('trial','active','grace_period','read_only')
-     where s.token_hash=$1 and s.expires_at>now() and ($2::boolean=false or o.is_demo=true)
+     where s.token_hash=$1 and s.expires_at>now() and o.is_demo=false
        and (select count(*) from organization_memberships all_m where all_m.user_id=u.id and all_m.status='active')=1
      limit 1`,
-   [tokenHash(token),demo]
+   [tokenHash(token)]
  );
  });
  const session=result.rows[0]||null;
- if(session&&!session.isDemo){const expired=await expireUnpaidTrials(session.organizationId,session.userId);if(expired?.rows?.length)session.organizationStatus="read_only";}
+ if(session){const expired=await expireUnpaidTrials(session.organizationId,session.userId);if(expired?.rows?.length)session.organizationStatus="read_only";}
  if(session)void query(`update auth_sessions set last_seen_at=now() where id=$1 and last_seen_at<now()-interval '5 minutes'`,[session.sessionId]).catch(()=>{});
  return session;
 }
@@ -99,7 +98,7 @@ export async function requireSession(options:{allowMfaEnrollment?:boolean}={}){
  const session=await getSession();
  if(!session){const {ApiError}=await import("@/lib/server/http");throw new ApiError(401,"unauthorized","Anmeldung erforderlich.");}
  const privileged=["owner","admin","finance"].includes(session.role);
- if(privileged&&!session.isDemo&&!session.mfaEnabled&&!options.allowMfaEnrollment){
+ if(privileged&&!session.mfaEnabled&&!options.allowMfaEnrollment){
    const {ApiError}=await import("@/lib/server/http");
    throw new ApiError(403,"mfa_enrollment_required","Für dieses Konto muss zuerst die Authenticator-App eingerichtet werden.");
  }

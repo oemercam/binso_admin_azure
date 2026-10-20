@@ -23,12 +23,10 @@ import { useEffect, useRef, useState, useId } from "react";
 import ConfirmDialog from "../confirm-dialog";
 import { AppShell } from "../app-shell";
 import { RecordRow, RecordIdentity, RecordsView, RecordsControls, useRecordsController } from "../records";
-import { customers } from "@/lib/demo-data";
-import { appendDemoRow } from "@/lib/demo-storage";
 import { apiPatch, apiPost, apiDelete, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 import {Button, EmptyState, Field, SectionTitle, Status, Toast, Input, Select, LoadingState, ErrorState, FormActions, FormSection} from "../ui";
 import { ActionRow, ActionSheet, FormSheet, CreateAction, ListRow, DetailTabs, DetailSections, DetailDisclosure, MetricTiles, MetricTile, ListSearch } from "../binso-ux";
-import { useDemoRows, swissDate } from "./shared";
+import { useRemoteRows, swissDate } from "./shared";
 import { FinancialSummary } from "./finance";
 
 export function formatSwissPhone(value:unknown){const raw=String(value??"").trim();const digits=raw.replace(/\D/g,"");if(digits.startsWith("41")&&digits.length===11)return `+41 ${digits.slice(2,4)} ${digits.slice(4,7)} ${digits.slice(7,9)} ${digits.slice(9,11)}`;if(digits.startsWith("0")&&digits.length===10)return `${digits.slice(0,3)} ${digits.slice(3,6)} ${digits.slice(6,8)} ${digits.slice(8,10)}`;return raw;}
@@ -40,31 +38,31 @@ const customerVisibleChips=customerChips.slice(0,3);
 const customerColumns=[{label:"Kunde",index:0,render:(row:string[])=><RecordIdentity name={row[0]} meta={[row[1],row[2]].filter(value=>value&&value!=="—").join(" · ")} identity={row[3]||row[0]}/>},{label:"Status",index:4,status:true},{label:"Umsatz "+businessDate().slice(0,4),index:6,align:"right" as const},{label:"Offen",index:7,align:"right" as const}];
 const customerSortColumns=[{label:"Name",index:0},{label:"Ort",index:2},{label:"Status",index:4}];
 export function CustomersPage() {
-  const production=useBackendMode();
+
   const financialsAllowed=usePageAccess().canOpen("/rechnungen");
   const chips=financialsAllowed?customerChips:customerChips.filter(chip=>chip!=="Mit offenen Beträgen");
   const visibleChips=financialsAllowed?customerVisibleChips:customerVisibleChips.filter(chip=>chip!=="Mit offenen Beträgen");
   const columns=financialsAllowed?customerColumns:customerColumns.filter(column=>column.index<6);
   // Whole-tenant counts remain independent of list search, status and pagination.
-  const allCustomers=useApiQuery<{total:number}>(production?"/api/customers?limit=1":null);
-  const activeCustomers=useApiQuery<{total:number}>(production?"/api/customers?limit=1&status=active":null);
-  const balances=useApiQuery<FinancialSummary>(production&&financialsAllowed?"/api/finance/overview":null);
+  const allCustomers=useApiQuery<{total:number}>("/api/customers?limit=1");
+  const activeCustomers=useApiQuery<{total:number}>("/api/customers?limit=1&status=active");
+  const balances=useApiQuery<FinancialSummary>(financialsAllowed?"/api/finance/overview":null);
   const controller=useRecordsController({placeholder:"Kunden suchen...",columns:customerSortColumns,chips});
   const query=new URLSearchParams({...(financialsAllowed?{include:"financials"}:{}),limit:"50",offset:String(controller.page*50),order:({0:"name",2:"city",4:"status"} as Record<number,string>)[controller.sortIndex]?(controller.sort==='default'?'name.asc':({0:"name",2:"city",4:"status"} as Record<number,string>)[controller.sortIndex]+'.'+controller.sort):'name.asc'});
   if(controller.query.trim())query.set('q',controller.query.trim());
   if(controller.activeChip==='Mit offenen Beträgen')query.set('outstanding','1');
   if(controller.activeChip==='Aktiv'||controller.activeChip==='Inaktiv')query.set('status',controller.activeChip==='Aktiv'?'active':'inactive');
-  const {rows:customerRows,total,loading,error}=useDemoRows("customers",customers,query.toString());
+  const {rows:customerRows,total,loading,error}=useRemoteRows("customers",query.toString());
   return <AppShell headingPlacement="content" title="Kunden" subtitle="Kontakte, Geschäftsvorgänge und offene Forderungen." active="kunden" actions={<CreateAction href="/kunden/neu" label="Neuer Kunde"/>}>
-    {production&&<MetricTiles desktopOnly columns={balances.data?.invoices.length?3:2}><MetricTile label="Kunden gesamt" value={allCustomers.data?.total??"—"}/><MetricTile label="Aktive Kunden" value={activeCustomers.data?.total??"—"}/>{!!balances.data?.invoices.length&&<MetricTile label="Offene Forderungen" value={balances.data.invoices.map(row=>formatCurrency(row.open_amount,row.currency)).join(" · ")}/>}</MetricTiles>}
+    {<MetricTiles desktopOnly columns={balances.data?.invoices.length?3:2}><MetricTile label="Kunden gesamt" value={allCustomers.data?.total??"—"}/><MetricTile label="Aktive Kunden" value={activeCustomers.data?.total??"—"}/>{!!balances.data?.invoices.length&&<MetricTile label="Offene Forderungen" value={balances.data.invoices.map(row=>formatCurrency(row.open_amount,row.currency)).join(" · ")}/>}</MetricTiles>}
     <RecordsControls appearance="line" chips={visibleChips} filterChips={chips} controller={controller} placeholder="Kunden suchen..." columns={customerSortColumns}/><RecordsView chips={chips} controller={controller} toolbarActions={false} showCount={false} remote pagination={{total,page:controller.page,pageSize:50,onPage:controller.setPage}} loading={loading} error={error} items={customerRows} countLabel="Kunden" placeholder="Kunden suchen..." columns={columns} rowHref={row=>`/kunden/${row[4]?row[3]:"acme"}`}>{(row)=>{const [name,contact,city,idOrStatus,statusMaybe]=row;const id=statusMaybe?idOrStatus:"acme";return <RecordRow href={"/kunden/"+id} title={name} status={statusMaybe} meta={[contact,city].filter(value=>value&&value!=="—").join(" · ")} />}}</RecordsView>
   </AppShell>;
 }
 
 export function CustomerDetail({customerId="acme"}:{customerId?:string}) {
-  const production=useBackendMode();
+
   const access=usePageAccess();
-  const workspace=useApiQuery<{item:Record<string,unknown>;contacts:Array<Record<string,unknown>>;documents:Array<Record<string,unknown>>;openInvoices?:Array<Record<string,unknown>>;summary:FinancialSummary;capabilities?:{invoices:boolean;offers:boolean};projects?:Array<{id:string;name:string;status:string;total_count:number}>|null;payments?:Array<{id:string;paid_on:string;amount:number;currency:string;invoice_number:string;status:string;total_count:number}>|null;activity:Array<{at:string;title:string;detail:string}>;statistics:Array<{currency:string;date:string;paid:unknown;billed:unknown;invoice_count:unknown}>|null}>(production?"/api/customers/"+encodeURIComponent(customerId)+"?include=workspace":null);
+  const workspace=useApiQuery<{item:Record<string,unknown>;contacts:Array<Record<string,unknown>>;documents:Array<Record<string,unknown>>;openInvoices?:Array<Record<string,unknown>>;summary:FinancialSummary;capabilities?:{invoices:boolean;offers:boolean};projects?:Array<{id:string;name:string;status:string;total_count:number}>|null;payments?:Array<{id:string;paid_on:string;amount:number;currency:string;invoice_number:string;status:string;total_count:number}>|null;activity:Array<{at:string;title:string;detail:string}>;statistics:Array<{currency:string;date:string;paid:unknown;billed:unknown;invoice_count:unknown}>|null}>("/api/customers/"+encodeURIComponent(customerId)+"?include=workspace");
   const searchParams=useSearchParams();
   const requestedReturnTo=searchParams.get("returnTo");
   const returnTo=safeAppPath(requestedReturnTo,"/kunden");
@@ -111,7 +109,7 @@ export function CustomerDetail({customerId="acme"}:{customerId?:string}) {
     setContacts(current=>current.filter(c=>c.id!==removeContact));setRemoveContact(null);setContactToast("Kontakt entfernt.");
   }catch(e){setContactToast(e instanceof Error?e.message:"Kontakt konnte nicht entfernt werden.")}finally{contactBusy.current=false;setContactSaving(false)}};
   const saveContact=async()=>{
-    if(!production){setContactToast("Die Vorschau ist schreibgeschützt. Bitte eine Datenbank-Demo starten.");return;}
+    {}
     if(contactBusy.current)return;
     if(!firstName.trim()||!lastName.trim()){setContactToast("Vorname und Nachname sind erforderlich.");return;}
     if(contactEmail.trim()&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmail.trim())){setContactToast("Bitte eine gültige E-Mail-Adresse erfassen.");return;}
@@ -205,7 +203,7 @@ export function CustomerForm({customerId}:{customerId?:string}={}) {
   const [allowDuplicate,setAllowDuplicate]=useState(false);
   const [duplicateQuery,setDuplicateQuery]=useState('');
   useEffect(()=>{const timer=window.setTimeout(()=>setDuplicateQuery(new URLSearchParams({name:customerName.trim(),email:email.trim(),uid:uid.trim(),excludeId:customerId??''}).toString()),250);return()=>window.clearTimeout(timer)},[customerName,email,uid,customerId]);
-  const duplicateCheck=useApiQuery<{items:Array<{id:string;customer_no:string;name:string;email?:string}>}>(isProductionBackendEnabled()&&!customerId&&customerName.trim().length>=2&&duplicateQuery?'/api/customers/duplicates?'+duplicateQuery:null);
+  const duplicateCheck=useApiQuery<{items:Array<{id:string;customer_no:string;name:string;email?:string}>}>(!customerId&&customerName.trim().length>=2&&duplicateQuery?'/api/customers/duplicates?'+duplicateQuery:null);
   const duplicateItems=duplicateCheck.data?.items??[];
   const recovery=useProcessDraft({process:customerId?"customer:edit:"+customerId:"customer:create",value:{customerType,company,contactName,contactLastName,email,phone,city,sector,address,postalCode,uid,notes,customerStatus,buildingNumber,paymentDays,replay,allowDuplicate},dirty,enabled:!loadingRecord&&!recordError,onRestore:value=>{
     if(!value||[value.company,value.email,value.phone,value.city,value.sector,value.address,value.postalCode,value.uid,value.notes].some(item=>typeof item!=="string"||item.length>320)||!["active","inactive"].includes(value.customerStatus))return;
@@ -225,14 +223,13 @@ export function CustomerForm({customerId}:{customerId?:string}={}) {
     setToast(null);saveRecordPending.current=true;setSavingRecord(true);
     try{
       let savedCustomerId=customerId;
-      if(isProductionBackendEnabled()){
+      {
         const body={name:customerName.trim(),...(!customerId?{customerType}:{}),sector,email,phone,city,address:[address,buildingNumber].filter(Boolean).join(" "),street:address,buildingNumber,postalCode,uid,notes,status:customerId?customerStatus:"active",...(paymentDays!==null&&paymentDays!==""?{paymentDays:Number(paymentDays)}:{}),...(!customerId?{allowDuplicate,contactFirstName:contactName.trim(),contactLastName:contactLastName.trim()}:{})},serialized=JSON.stringify(body);
         const attempt=replay&&sameCustomerCreation(replay.body,serialized)?{body:serialized,key:replay.key}:{body:serialized,key:crypto.randomUUID()};setReplay(attempt);recovery.persist({customerType,company,contactName,contactLastName,email,phone,city,sector,address,postalCode,uid,notes,customerStatus,buildingNumber,paymentDays,replay:attempt,allowDuplicate});
         const result=customerId?await apiPatch<{item?:{id:string}}>("/api/customers/"+encodeURIComponent(customerId),body):await apiPost<{item?:{id:string}}>("/api/customers",body,{idempotencyKey:attempt.key});
         if(typeof result.item?.id!=="string"||!result.item.id)throw new Error("Die Speicherung konnte nicht bestätigt werden. Bitte den gespeicherten Stand prüfen.");
         savedCustomerId=result.item.id;
       }
-      else appendDemoRow("customers",[customerName.trim(),sector,city.trim(),"Aktiv"]);
       setToast("Kunde gespeichert.");
       setSavedRecord(true);
       recovery.clear();allowDraftNavigation();
