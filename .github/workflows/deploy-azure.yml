@@ -175,7 +175,15 @@ jobs:
           }
 
           has_setting() {
-            jq -e --arg name "$1" '.[] | any(.name == $name)' <<<"$SETTINGS_JSON" > /dev/null
+            local result
+            if jq -e --arg name "$1" 'if type == "array" then any(.[]; .name == $name) else error("Invalid settings collection") end' <<<"$SETTINGS_JSON" > /dev/null; then
+              return 0
+            else
+              result=$?
+              if [ "$result" -eq 1 ]; then return 1; fi
+              echo "::error::App Service setting names could not be validated." >&2
+              exit "$result"
+            fi
           }
 
           OLD_MAIL_PREFIX="RE""SEND"

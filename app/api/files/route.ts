@@ -21,14 +21,20 @@ const fileFields=`id,purpose,expense_id,support_case_id,employee_id,customer_id,
 export async function GET(request:NextRequest){try{
  const s=await requireSession();authorize(s,'documents:read');
  const filters=new URLSearchParams(request.nextUrl.search);const where=['organization_id=$1'];const values:unknown[]=[s.organizationId];
- for(const relation of Object.values(relations)){const value=filters.get(relation.filter);if(value){authorize(s,relation.read);values.push(value);where.push(relation.column+'::text=$'+values.length);}}
- for(const [purpose,relation] of Object.entries(relations)){if(!tenantCan(s.role,relation.read,s.moduleProfile)){values.push(purpose);where.push('purpose<>$'+values.length);}}
+ // Derive the complete readable scope from the session before interpreting URL
+ // filters. Omitting a filter can never omit an authorization check.
+ const readable=Object.entries(relations).filter(([,relation])=>tenantCan(s.role,relation.read,s.moduleProfile));
+ const readableFilters=new Set(readable.map(([,relation])=>relation.filter));
+ if(Object.values(relations).some(relation=>filters.get(relation.filter)&&!readableFilters.has(relation.filter)))throw new ApiError(403,'file_forbidden','Keine Berechtigung für diese Dateien.');
+ const purposes=['profile_avatar','company_logo',...readable.map(([purpose])=>purpose)];
+ if(await getOrganizationPlan(s.organizationId)==='pro')purposes.push('document');
+ values.push(purposes);where.push('purpose=any($'+values.length+'::text[])');
+ for(const [,relation] of readable){const value=filters.get(relation.filter);if(value){values.push(value);where.push(relation.column+'::text=$'+values.length);}}
  if(s.role==='member'){values.push(s.userId);where.push("(purpose<>'expense_receipt' or exists(select 1 from expenses e where e.id=file_objects.expense_id and e.organization_id=file_objects.organization_id and e.created_by_user_id=$"+values.length+"))");}
  if(s.moduleProfile==='time_only'){
   values.push(s.userId);const own='$'+values.length;
   where.push("((purpose='profile_avatar' and created_by="+own+") or (purpose='time_report' and exists(select 1 from time_entries t where t.id=file_objects.time_entry_id and t.organization_id=file_objects.organization_id and t.created_by_user_id="+own+")) or (purpose='support_attachment' and exists(select 1 from support_cases t where t.id=file_objects.support_case_id and t.organization_id=file_objects.organization_id and t.created_by_user_id="+own+")))");
  }
- if(await getOrganizationPlan(s.organizationId)!=='pro')where.push("purpose<>'document'");
  const items=await withTenant(s.organizationId,s.userId,async c=>(await c.query(`select ${fileFields} from file_objects where ${where.join(' and ')} order by created_at desc limit 500`,values)).rows);
  return json({items});
 }catch(e){return apiError(e)}}
@@ -49,7 +55,8 @@ export async function POST(request:NextRequest){
   if(relation){
    authorize(s,relation.write);
    if(!/^[0-9a-f-]{36}$/i.test(entityId))throw new ApiError(400,'entity_required','Eine gültige Zuordnung ist erforderlich.');
-   const found=await withTenant(s.organizationId,s.userId,async c=>(await c.query(`select id from ${relation.table} where id=$1 and organization_id=$2${(purpose==='expense_receipt'&&s.role==='member'||purpose==='support_attachment'&&s.moduleProfile==='time_only')?' and created_by_user_id=$3':''}`,purpose==='expense_receipt'&&s.role==='member'?[entityId,s.organizationId,s.userId]:[entityId,s.organizationId])).rows[0]);
+   const ownAttachment=purpose==='expense_receipt'&&s.role==='member'||purpose==='support_attachment'&&s.moduleProfile==='time_only';
+   const found=await withTenant(s.organizationId,s.userId,async c=>(await c.query(`select id from ${relation.table} where id=$1 and organization_id=$2${ownAttachment?' and created_by_user_id=$3':''}`,ownAttachment?[entityId,s.organizationId,s.userId]:[entityId,s.organizationId])).rows[0]);
    if(!found)throw new ApiError(404,'entity_not_found','Zuordnung wurde nicht gefunden.');
   }
   if(['company_logo','profile_avatar'].includes(purpose)){if(purpose==='company_logo')authorize(s,'organization:write');if(!['image/png','image/jpeg','image/webp'].includes(file.type))throw new ApiError(400,'logo_type_invalid','Bitte eine Bilddatei auswählen.');}

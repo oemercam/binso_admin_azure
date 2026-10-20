@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import {prepareHistoricalFixtureOwner} from './fixtures/template-access.mjs';
 import fs from 'node:fs/promises';
 import {spawn} from 'node:child_process';
 import {createHash,randomBytes} from 'node:crypto';
@@ -16,6 +17,7 @@ try{
  assert.equal((await pool.query("select count(*)::int n from information_schema.tables where table_schema='public'")).rows[0].n,0,'Never resets an existing database');
  for(const name of (await fs.readdir('database/migrations')).filter(name=>name.endsWith('.sql')).sort())await pool.query(await fs.readFile('database/migrations/'+name,'utf8'));
  await pool.query(await fs.readFile('database/operations/provision-runtime-role.sql','utf8'));
+ await prepareHistoricalFixtureOwner(pool);
  const http=moduleUrl('export class ApiError extends Error{constructor(status,code,message){super(message);this.status=status;this.code=code}}');
  const demo=await import(moduleUrl((await fs.readFile('scripts/fixtures/business-data.ts','utf8')).replace('import "server-only";','').replace("'../../lib/server/http'",JSON.stringify(http))));
  const roles=['owner','admin','finance','hr','project_manager','manager','member','reader'];

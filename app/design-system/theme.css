@@ -1,6 +1,5 @@
 /* BINso One / theme — one owner for base, states and responsive behavior. */
 :root{
-  --progress-value:0%;
   --content-progress-duration:1.2s;
   --bar-value:0%;
   /* Shared Microsoft appearance and navigation roles. */
@@ -214,8 +213,6 @@
   --upload-fg:#2e68af;
   --upload-hover:#e1edff;
   --upload-active:#d5e6fc;
-  --progress-track:var(--color-line);
-  --progress-fill:var(--app-action-accent);
   --shape-scale-999:999px;
   --palette-fff:#fff;
   --palette-rgba-0-0-0-2:rgba(0,0,0,.2);

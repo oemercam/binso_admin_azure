@@ -16,7 +16,7 @@ export function PasskeyLogin({remember,onAuthenticated,disabled,onBusy}:{remembe
    setCode('');onAuthenticated(result);
   }catch(e){setError(e instanceof Error?e.message:'Anmeldung nicht möglich.');}finally{pending.current=false;setBusy(false);onBusy(false)}
  };
- return <div className="auth-form-demo">
+ return <div className="auth-passkey">
   {!open?<Button variant="secondary" disabled={disabled} onClick={()=>{setOpen(true);setError('')}}><LocalizedText>{'Mit Passkey anmelden'}</LocalizedText></Button>:<>
    <Field label="Authenticator-Code"><Input value={code} onChange={e=>setCode(e.target.value.replace(/\D/g,'').slice(0,6))} inputMode="numeric" autoComplete="one-time-code" placeholder="000000"/></Field>
    <p className="settings-note"><LocalizedText>{'Bei eingerichtetem Authenticator bleibt der zusätzliche Code erforderlich.'}</LocalizedText></p>

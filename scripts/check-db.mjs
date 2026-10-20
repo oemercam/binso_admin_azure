@@ -48,13 +48,14 @@ const required={
  support_messages:["id","case_id","author_type","author_user_id","message"],
  file_objects:["id","organization_id","object_key","original_name","sha256","scan_status"],
  in_app_notifications:["id","organization_id","kind","title","body"],
+ notification_reads:["organization_id","notification_id","user_id","read_at"],
  platform_feature_flags:["key","enabled"],
  platform_operator_assignments:["user_id","email","role","status"],
  rate_limit_buckets:["bucket_key","count","reset_at","updated_at"],
  schema_migrations:["version","checksum","applied_at"]
 };
-const tenantTables=["invoice_refunds","credit_notes","organization_invitations","document_deliveries","billing_checkout_sessions","customers","projects","quotes","quote_lines","orders","products_services","time_entries","expenses","invoices","invoice_lines","payments","suppliers","supplier_invoices","employees","tasks","absences","contracts","accounting_entries","bank_transactions","vat_periods","payroll_runs","business_documents","operating_costs","active_time_trackers","support_cases","in_app_notifications","file_objects"];
-const forceTables=["invoice_refunds","credit_notes","document_deliveries","billing_checkout_sessions","customers","projects","quotes","quote_lines","orders","products_services","time_entries","expenses","invoices","invoice_lines","payments","suppliers","supplier_invoices","employees","tasks","absences","contracts","accounting_entries","bank_transactions","vat_periods","payroll_runs","business_documents","operating_costs","active_time_trackers"];
+const tenantTables=["invoice_refunds","credit_notes","organization_invitations","document_deliveries","billing_checkout_sessions","customers","projects","quotes","quote_lines","orders","products_services","time_entries","expenses","invoices","invoice_lines","payments","suppliers","supplier_invoices","employees","tasks","absences","contracts","accounting_entries","bank_transactions","vat_periods","payroll_runs","business_documents","operating_costs","active_time_trackers","support_cases","in_app_notifications","notification_reads","file_objects"];
+const forceTables=["notification_reads","invoice_refunds","credit_notes","document_deliveries","billing_checkout_sessions","customers","projects","quotes","quote_lines","orders","products_services","time_entries","expenses","invoices","invoice_lines","payments","suppliers","supplier_invoices","employees","tasks","absences","contracts","accounting_entries","bank_transactions","vat_periods","payroll_runs","business_documents","operating_costs","active_time_trackers"];
 try{
  const meta=await pool.query("select current_database() db,current_user db_user,current_schema() schema,now() now");
  const migrations=await pool.query(restricted?"select public.runtime_schema_versions() as version":"select version from schema_migrations order by version");

@@ -44,7 +44,7 @@
 .auth-options{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:var(--type-label)}
 .auth-card .auth-options label:has(>input[type="checkbox"]){min-height:var(--touch);align-items:center}
 .auth-options .form-link a,.auth-card .auth-bottom a{color:var(--app-accent)}
-.auth-form-demo{display:grid}
+.auth-passkey{display:grid}
 .auth-workspace .auth-card .auth-bottom{margin-top:25px;font-size:var(--type-label);text-align:left}
 .registration-sheet h3{margin:0 0 var(--heading-content-gap);font-size:var(--type-section)}
 .registration-sheet p{overflow-wrap:anywhere}
@@ -56,9 +56,6 @@
 .auth-workspace :focus-visible{outline-color:var(--app-accent)}
 .auth-workspace{
   font-family:var(--workspace-font);color:var(--color-fg);--app-text:var(--workspace-ink);--app-secondary:var(--workspace-muted);--app-divider:var(--workspace-line);--color-fg:var(--workspace-ink);--color-muted:var(--workspace-muted);--color-line:var(--workspace-line);
-}
-@media (min-width:1101px){
-.auth-form-demo{display:none}
 }
 @media (max-width:760px){
 .auth-page{

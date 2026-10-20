@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import {randomUUID} from 'node:crypto';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import {pathToFileURL} from 'node:url';
@@ -182,5 +183,21 @@ try{
  globalThis.__integrity.fileScanSocket=undefined;
  globalThis.__integrity.fileAccessMode=undefined;globalThis.__integrity.releaseProfile=undefined;
  assert.equal((await download.GET(new Request('https://fixture.invalid'),{params:Promise.resolve({id:pendingLogoId})})).status,423,'Removing the explicit mode restores quarantine immediately');
- console.log((native?'PostgreSQL physical parallel clients':'Isolated PGlite')+': auth races, upload replay, strict/default quarantine, explicit development access without verdict mutation, rejected/auth/tenant denial and branding policy passed.');
+ const supportSession=globalThis.__integrity.getSession;
+ const supportCases=[];
+ for(const [tenant,creator] of [[org,user],[org,'another-support-user'],[foreignOrg,user]]){
+  supportCases.push((await query("insert into support_cases(organization_id,case_number,created_by_user_id,category,subject) values($1,$2,$3,'technical','Synthetic attachment test') returning id",[tenant,'ATTACH-'+randomUUID(),creator])).rows[0].id);
+ }
+ const supportUpload=(id,key)=>{const form=new FormData();form.set('file',new File(['Synthetic support evidence'],'support-evidence.txt',{type:'text/plain'}));form.set('purpose','support_attachment');form.set('entityId',id);return new Request('https://fixture.invalid/api/files',{method:'POST',headers:{'idempotency-key':key},body:form});};
+ try{
+  for(const profile of ['standard','time_only']){
+   globalThis.__integrity.getSession=()=>({...supportSession(),role:'member',moduleProfile:profile});
+   assert.equal((await files.POST(supportUpload(supportCases[0],'support-own-'+profile))).status,201,'Own support attachment succeeds for '+profile);
+  }
+  const ownFiles=await files.GET({nextUrl:new URL('https://fixture.invalid/api/files')});assert.equal(ownFiles.status,200);assert.ok((await ownFiles.json()).items.every(item=>['support_attachment','profile_avatar','time_report'].includes(item.purpose)),'No omitted URL filter may reveal an unauthorized purpose');
+  assert.equal((await files.GET({nextUrl:new URL('https://fixture.invalid/api/files?customerId='+supportCases[0])})).status,403,'Forbidden relation filters are rejected before selecting files');
+  assert.equal((await files.POST(supportUpload(supportCases[1],'support-other-user'))).status,404,'Time-only rejects another user case');
+  assert.equal((await files.POST(supportUpload(supportCases[2],'support-other-tenant'))).status,404,'Time-only rejects another tenant case');
+ }finally{globalThis.__integrity.getSession=supportSession;}
+ console.log((native?'PostgreSQL physical parallel clients':'Isolated PGlite')+': auth races, upload replay, strict/default quarantine, explicit development access without verdict mutation, rejected/auth/tenant denial, standard/time-only support attachment boundaries and branding policy passed.');
 }finally{delete globalThis.__integrity;if(native)await db.end();else await db.close();}

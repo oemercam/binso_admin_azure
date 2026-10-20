@@ -1,11 +1,11 @@
 {
   "scope": "Static AST/source inventory, not proof that every runtime branch is tested. Calls include exact source arguments and locations; dynamic dispatch requires the domain matrix and runtime tests.",
-  "base": "89ffc354012e20b735116d24c8c85793e6b18816",
+  "base": "e4932c27aa381108601417d4085af2f288b73e59",
   "counts": {
     "apis": 108,
     "consumers": 33,
-    "migrations": 65,
-    "tables": 100
+    "migrations": 67,
+    "tables": 101
   },
   "apis": [
     {
@@ -2569,16 +2569,8 @@
           ]
         },
         {
-          "callee": "authorize",
-          "line": 24,
-          "arguments": [
-            "s",
-            "relation.read"
-          ]
-        },
-        {
           "callee": "withTenant",
-          "line": 32,
+          "line": 38,
           "arguments": [
             "s.organizationId",
             "s.userId",
@@ -2587,7 +2579,7 @@
         },
         {
           "callee": "c.query",
-          "line": 32,
+          "line": 38,
           "arguments": [
             "`select ${fileFields} from file_objects where ${where.join(' and ')} order by created_at desc limit 500`",
             "values"
@@ -2595,12 +2587,12 @@
         },
         {
           "callee": "requireSession",
-          "line": 37,
+          "line": 43,
           "arguments": []
         },
         {
           "callee": "authorize",
-          "line": 46,
+          "line": 52,
           "arguments": [
             "s",
             "'documents:write'"
@@ -2608,7 +2600,7 @@
         },
         {
           "callee": "authorize",
-          "line": 50,
+          "line": 56,
           "arguments": [
             "s",
             "relation.write"
@@ -2616,24 +2608,24 @@
         },
         {
           "callee": "withTenant",
-          "line": 52,
+          "line": 59,
           "arguments": [
             "s.organizationId",
             "s.userId",
-            "async c=>(await c.query(`select id from ${relation.table} where id=$1 and organization_id=$2${(purpose==='expense_receipt'&&s.role==='member'||purpose==='support_attachment'&&s.moduleProfile==='time_only')?' and created_by_user_id=$3':''}`,purpose==='expense_receipt'&&s.role==='member'?[entityId,s.organizationId,s.userId]:[entityId,s.organizationId])).rows[0]"
+            "async c=>(await c.query(`select id from ${relation.table} where id=$1 and organization_id=$2${ownAttachment?' and created_by_user_id=$3':''}`,ownAttachment?[entityId,s.organizationId,s.userId]:[entityId,s.organizationId])).rows[0]"
           ]
         },
         {
           "callee": "c.query",
-          "line": 52,
+          "line": 59,
           "arguments": [
-            "`select id from ${relation.table} where id=$1 and organization_id=$2${(purpose==='expense_receipt'&&s.role==='member'||purpose==='support_attachment'&&s.moduleProfile==='time_only')?' and created_by_user_id=$3':''}`",
-            "purpose==='expense_receipt'&&s.role==='member'?[entityId,s.organizationId,s.userId]:[entityId,s.organizationId]"
+            "`select id from ${relation.table} where id=$1 and organization_id=$2${ownAttachment?' and created_by_user_id=$3':''}`",
+            "ownAttachment?[entityId,s.organizationId,s.userId]:[entityId,s.organizationId]"
           ]
         },
         {
           "callee": "authorize",
-          "line": 55,
+          "line": 62,
           "arguments": [
             "s",
             "'organization:write'"
@@ -2641,7 +2633,7 @@
         },
         {
           "callee": "withTenant",
-          "line": 60,
+          "line": 67,
           "arguments": [
             "s.organizationId",
             "s.userId",
@@ -2650,7 +2642,7 @@
         },
         {
           "callee": "c.query",
-          "line": 62,
+          "line": 69,
           "arguments": [
             "'select created_by_user_id,approved,submitted_at,report_month,customer_id,project_id,work_date::text as work_date from time_entries where organization_id=$1 and id=$2 for update'",
             "[s.organizationId,entityId]"
@@ -2658,7 +2650,7 @@
         },
         {
           "callee": "c.query",
-          "line": 68,
+          "line": 75,
           "arguments": [
             "\"select status,created_by_user_id from expenses where organization_id=$1 and id=$2 for update\"",
             "[s.organizationId,entityId]"
@@ -2666,7 +2658,7 @@
         },
         {
           "callee": "c.query",
-          "line": 74,
+          "line": 81,
           "arguments": [
             "`insert into file_objects(id,organization_id,object_key,original_name,content_type,size_bytes,sha256,scan_status,created_by,blob_url,purpose,expense_id,support_case_id,employee_id,customer_id,invoice_id,quote_id,project_id,time_entry_id)\n    values($1,$2,$3,$4,$5,$6,$7,$18,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$19) returning ${fileFields}`",
             "[id,s.organizationId,objectKey,file.name.slice(0,240),file.type,file.size,sha256,s.userId,null,purpose,relation?.column==='expense_id'?entityId:null,relation?.column==='support_case_id'?entityId:null,relation?.column==='employee_id'?entityId:null,relation?.column==='customer_id'?entityId:null,relation?.column==='invoice_id'?entityId:null,relation?.column==='quote_id'?entityId:null,relation?.column==='project_id'?entityId:null,scanStatus,relation?.column==='time_entry_id'?entityId:null]"
@@ -2674,7 +2666,7 @@
         },
         {
           "callee": "c.query",
-          "line": 76,
+          "line": 83,
           "arguments": [
             "'insert into file_contents(file_id,organization_id,body) values($1,$2,$3)'",
             "[id,s.organizationId,buffer]"
@@ -2682,7 +2674,7 @@
         },
         {
           "callee": "c.query",
-          "line": 77,
+          "line": 84,
           "arguments": [
             "'update file_objects set scan_evidence=$1::jsonb where id=$2 and organization_id=$3'",
             "[JSON.stringify(scan.evidence),id,s.organizationId]"
@@ -2690,7 +2682,7 @@
         },
         {
           "callee": "c.query",
-          "line": 78,
+          "line": 85,
           "arguments": [
             "'update app_users set avatar_url=$1,updated_at=now() where id=$2'",
             "['/api/files/'+id+'/download',s.userId]"
@@ -2698,7 +2690,7 @@
         },
         {
           "callee": "c.query",
-          "line": 79,
+          "line": 86,
           "arguments": [
             "'update organizations set logo_url=$1,updated_at=now() where id=$2'",
             "['/api/files/'+id+'/download',s.organizationId]"
@@ -2875,29 +2867,23 @@
         "lib/server/maintenance.ts",
         "lib/server/env.ts",
         "lib/server/db.ts",
-        "lib/server/subscription-lifecycle.ts"
+        "lib/server/subscription-lifecycle.ts",
+        "lib/server/repositories/notifications.ts",
+        "lib/permissions.ts"
       ],
       "evidence": [
         {
           "callee": "requireSession",
-          "line": 10,
+          "line": 11,
           "arguments": []
         },
         {
           "callee": "withTenant",
-          "line": 11,
+          "line": 12,
           "arguments": [
             "s.organizationId",
             "s.userId",
-            "c=>c.query(\"update in_app_notifications set read_at=coalesce(read_at,now()) where id::text=$1 and organization_id=$2 and (user_id is null or user_id=$3)\",[id,s.organizationId,s.userId])"
-          ]
-        },
-        {
-          "callee": "c.query",
-          "line": 11,
-          "arguments": [
-            "\"update in_app_notifications set read_at=coalesce(read_at,now()) where id::text=$1 and organization_id=$2 and (user_id is null or user_id=$3)\"",
-            "[id,s.organizationId,s.userId]"
+            "c=>markNotificationsRead(c,s,id)"
           ]
         }
       ]
@@ -2910,14 +2896,15 @@
         "PATCH"
       ],
       "dependencies": [
-        "lib/permissions.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/env.ts",
         "lib/server/db.ts",
         "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
-        "lib/server/validation.ts"
+        "lib/server/validation.ts",
+        "lib/server/repositories/notifications.ts",
+        "lib/permissions.ts"
       ],
       "evidence": [
         {
@@ -2931,15 +2918,7 @@
           "arguments": [
             "s.organizationId",
             "s.userId",
-            "async c=>(await c.query(`select id,kind,title,body,body as message,href,read_at,read_at as \"readAt\",created_at,created_at as \"createdAt\" from in_app_notifications where organization_id=$1 and (user_id is null or user_id=$2) and ($3::boolean=false or user_id=$2) order by created_at desc limit 100`,[s.organizationId,s.userId,s.moduleProfile==='time_only'])).rows"
-          ]
-        },
-        {
-          "callee": "c.query",
-          "line": 8,
-          "arguments": [
-            "`select id,kind,title,body,body as message,href,read_at,read_at as \"readAt\",created_at,created_at as \"createdAt\" from in_app_notifications where organization_id=$1 and (user_id is null or user_id=$2) and ($3::boolean=false or user_id=$2) order by created_at desc limit 100`",
-            "[s.organizationId,s.userId,s.moduleProfile==='time_only']"
+            "c=>notificationList(c,s)"
           ]
         },
         {
@@ -2953,32 +2932,7 @@
           "arguments": [
             "s.organizationId",
             "s.userId",
-            "async c=>c.query(`update in_app_notifications set read_at=coalesce(read_at,now()) where organization_id=$1 and (user_id is null or user_id=$2) and read_at is null`,[s.organizationId,s.userId])"
-          ]
-        },
-        {
-          "callee": "c.query",
-          "line": 9,
-          "arguments": [
-            "`update in_app_notifications set read_at=coalesce(read_at,now()) where organization_id=$1 and (user_id is null or user_id=$2) and read_at is null`",
-            "[s.organizationId,s.userId]"
-          ]
-        },
-        {
-          "callee": "withTenant",
-          "line": 9,
-          "arguments": [
-            "s.organizationId",
-            "s.userId",
-            "async c=>c.query(`update in_app_notifications set read_at=coalesce(read_at,now()) where id=$1 and organization_id=$2 and (user_id is null or user_id=$3)`,[id,s.organizationId,s.userId])"
-          ]
-        },
-        {
-          "callee": "c.query",
-          "line": 9,
-          "arguments": [
-            "`update in_app_notifications set read_at=coalesce(read_at,now()) where id=$1 and organization_id=$2 and (user_id is null or user_id=$3)`",
-            "[id,s.organizationId,s.userId]"
+            "c=>markNotificationsRead(c,s,id)"
           ]
         }
       ]
@@ -7203,14 +7157,14 @@
       "calls": [
         {
           "callee": "useApiQuery",
-          "line": 43,
+          "line": 42,
           "arguments": [
             "\"/api/settings/profile\""
           ]
         },
         {
           "callee": "apiUpload",
-          "line": 54,
+          "line": 53,
           "arguments": [
             "\"/api/files\"",
             "form"
@@ -7218,7 +7172,7 @@
         },
         {
           "callee": "apiPatch",
-          "line": 71,
+          "line": 70,
           "arguments": [
             "\"/api/settings/profile\"",
             "{firstName,lastName,phone,jobTitle}"
@@ -7226,14 +7180,14 @@
         },
         {
           "callee": "useApiQuery",
-          "line": 120,
+          "line": 119,
           "arguments": [
             "\"/api/settings/company\""
           ]
         },
         {
           "callee": "apiUpload",
-          "line": 150,
+          "line": 149,
           "arguments": [
             "\"/api/files\"",
             "form"
@@ -7241,7 +7195,7 @@
         },
         {
           "callee": "apiPatch",
-          "line": 151,
+          "line": 150,
           "arguments": [
             "\"/api/settings/company\"",
             "{name,uid,street,buildingNumber,postalCode,city,email,phone,...(removeLogo?{logoUrl:\"\"}:{}),completeOnboarding:onboarding}"
@@ -7249,35 +7203,35 @@
         },
         {
           "callee": "apiGet",
-          "line": 214,
+          "line": 213,
           "arguments": [
             "\"/api/settings/subscription\""
           ]
         },
         {
           "callee": "apiGet",
-          "line": 215,
+          "line": 214,
           "arguments": [
             "\"/api/integrations/status\""
           ]
         },
         {
           "callee": "apiGet",
-          "line": 216,
+          "line": 215,
           "arguments": [
             "\"/api/billing/catalog\""
           ]
         },
         {
           "callee": "apiGet",
-          "line": 230,
+          "line": 229,
           "arguments": [
             "\"/api/settings/subscription\""
           ]
         },
         {
           "callee": "apiPost",
-          "line": 249,
+          "line": 248,
           "arguments": [
             "\"/api/billing/checkout\"",
             "{plan:selectedPlan,billing:billingCycle,requestKey:checkoutRequest.current.key,acceptedTerms:acceptedPaidTerms,termsVersion:legalConfig.termsVersion,privacyVersion:legalConfig.privacyVersion}"
@@ -7285,7 +7239,7 @@
         },
         {
           "callee": "apiPost",
-          "line": 261,
+          "line": 260,
           "arguments": [
             "\"/api/billing/portal\"",
             "{}"
@@ -7293,35 +7247,35 @@
         },
         {
           "callee": "apiGet<{items:Array<{kind:string;email:boolean;push:boolean}>}>(\"/api/settings/notifications\").then(data=>setPrefs(current=>{const next={...current};for(const item of data.items)if(next[item.kind])next[item.kind]={email:item.email,push:item.push};return next})).then(()=>setReady(true)).catch",
-          "line": 326,
+          "line": 325,
           "arguments": [
             "()=>setError(\"Einstellungen konnten nicht geladen werden.\")"
           ]
         },
         {
           "callee": "apiGet<{items:Array<{kind:string;email:boolean;push:boolean}>}>(\"/api/settings/notifications\").then(data=>setPrefs(current=>{const next={...current};for(const item of data.items)if(next[item.kind])next[item.kind]={email:item.email,push:item.push};return next})).then",
-          "line": 326,
+          "line": 325,
           "arguments": [
             "()=>setReady(true)"
           ]
         },
         {
           "callee": "apiGet<{items:Array<{kind:string;email:boolean;push:boolean}>}>(\"/api/settings/notifications\").then",
-          "line": 326,
+          "line": 325,
           "arguments": [
             "data=>setPrefs(current=>{const next={...current};for(const item of data.items)if(next[item.kind])next[item.kind]={email:item.email,push:item.push};return next})"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 326,
+          "line": 325,
           "arguments": [
             "\"/api/settings/notifications\""
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 334,
+          "line": 333,
           "arguments": [
             "\"/api/settings/notifications\"",
             "{kind:title,channel,enabled}"
@@ -7329,7 +7283,7 @@
         },
         {
           "callee": "apiPatch",
-          "line": 349,
+          "line": 348,
           "arguments": [
             "\"/api/settings/profile\"",
             "{language:next}"
@@ -7675,16 +7629,16 @@
       "file": "components/registration/registration-sheet.tsx",
       "calls": [
         {
-          "callee": "fetch",
-          "line": 33,
+          "callee": "authRequest",
+          "line": 34,
           "arguments": [
             "'/api/auth/register?'+params",
             "{cache:'no-store'}"
           ]
         },
         {
-          "callee": "fetch",
-          "line": 44,
+          "callee": "authRequest",
+          "line": 45,
           "arguments": [
             "url",
             "{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}"
@@ -9582,6 +9536,38 @@
       "tables": [],
       "relations": [],
       "rls": []
+    },
+    {
+      "file": "database/migrations/0065_notification_read_receipts.sql",
+      "tables": [
+        "notification_reads"
+      ],
+      "relations": [
+        {
+          "table": "app_users",
+          "columns": "id"
+        },
+        {
+          "table": "in_app_notifications",
+          "columns": "organization_id,id"
+        }
+      ],
+      "rls": [
+        {
+          "table": "notification_reads",
+          "mode": "enable"
+        },
+        {
+          "table": "notification_reads",
+          "mode": "force"
+        }
+      ]
+    },
+    {
+      "file": "database/migrations/0066_retire_template_workforce_role.sql",
+      "tables": [],
+      "relations": [],
+      "rls": []
     }
   ],
   "repositories": [
@@ -10343,6 +10329,32 @@
       ]
     },
     {
+      "file": "lib/server/repositories/notifications.ts",
+      "imports": [
+        "lib/server/session.ts",
+        "lib/permissions.ts"
+      ],
+      "methods": [],
+      "calls": [
+        {
+          "callee": "c.query",
+          "line": 8,
+          "arguments": [
+            "`select n.id,n.kind,n.title,n.body,n.body as message,n.href,\n coalesce(r.read_at,case when n.user_id=$2 then n.read_at end) as read_at,\n coalesce(r.read_at,case when n.user_id=$2 then n.read_at end) as \"readAt\",n.created_at,n.created_at as \"createdAt\"\n from in_app_notifications n left join notification_reads r on r.notification_id=n.id and r.organization_id=n.organization_id and r.user_id=$2\n where n.organization_id=$1 and (n.user_id is null or n.user_id=$2) and ($3::boolean=false or n.user_id=$2)\n order by n.created_at desc limit 100`",
+            "[s.organizationId,s.userId,s.moduleProfile==='time_only']"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 17,
+          "arguments": [
+            "`insert into notification_reads(organization_id,notification_id,user_id)\n select n.organization_id,n.id,$2 from in_app_notifications n\n where n.organization_id=$1 and (n.user_id is null or n.user_id=$2) and ($3::text is null or n.id::text=$3)\n and ($4::boolean=false or n.user_id=$2)\n on conflict(notification_id,user_id) do nothing`",
+            "[s.organizationId,s.userId,id,s.moduleProfile==='time_only']"
+          ]
+        }
+      ]
+    },
+    {
       "file": "lib/server/repositories/observability.ts",
       "imports": [],
       "methods": [],
@@ -10912,6 +10924,21 @@
     }
   ],
   "clientState": [
+    {
+      "file": "lib/client/auth-request.ts",
+      "imports": [],
+      "methods": [],
+      "calls": [
+        {
+          "callee": "fetch",
+          "line": 4,
+          "arguments": [
+            "path",
+            "{...options,signal:options.signal??AbortSignal.timeout(15000)}"
+          ]
+        }
+      ]
+    },
     {
       "file": "lib/client/backend.ts",
       "imports": [

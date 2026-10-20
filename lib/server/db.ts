@@ -12,7 +12,10 @@ function createPool(){
     max:env.databasePoolMax,
     ssl:env.databaseSsl?{rejectUnauthorized:env.databaseSslRejectUnauthorized}:undefined,
     idleTimeoutMillis:30_000,
-    connectionTimeoutMillis:8_000
+    connectionTimeoutMillis:8_000,
+    // Cancel the statement on the server; a browser abort alone cannot stop SQL.
+    statement_timeout:15_000,
+    idle_in_transaction_session_timeout:30_000
   });
 }
 

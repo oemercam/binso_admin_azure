@@ -3,7 +3,8 @@
 import Link from "next/link";
 import {useRouter,useSearchParams} from "next/navigation";
 import {useEffect,useRef,useState,type FormEvent} from "react";
-import {Eye,EyeOff} from "lucide-react";
+import {PasswordInput} from '@/components/password-input';
+import {authRequest} from '@/lib/client/auth-request';
 import {Button,Logo,Field,Input,Select,ErrorState} from "@/components/ui";
 import {FormSheet} from "@/components/binso-ux";
 import {FormWizard} from "@/components/form-wizard";
@@ -23,14 +24,14 @@ export function RegistrationSheet(){
  const planParam=search.get("plan"),billingParam=search.get("billing");
  const [context,setContext]=useState<Context|null>(null),[open,setOpen]=useState(false),[step,setStep]=useState(0),[stage,setStage]=useState<Stage>("new");
  const [contactName,setContactName]=useState("");
- const [company,setCompany]=useState(""),[email,setEmail]=useState(""),[password,setPassword]=useState(""),[show,setShow]=useState(false),[accepted,setAccepted]=useState(false),[code,setCode]=useState("");
+ const [company,setCompany]=useState(""),[email,setEmail]=useState(""),[password,setPassword]=useState(""),[accepted,setAccepted]=useState(false),[code,setCode]=useState("");
  const [busy,setBusy]=useState(false),[error,setError]=useState(""),[status,setStatus]=useState<RegistrationTextKey|null>(null),[retry,setRetry]=useState(0);
  const saving=useRef(false),form=useRef<HTMLFormElement>(null);
  const dirty=stage==='new'&&!!(company||contactName||email||password||accepted);
  useEffect(()=>{
   let active=true;
   const params=new URLSearchParams();if(planParam)params.set('plan',planParam);if(billingParam)params.set('billing',billingParam);
-  fetch('/api/auth/register?'+params,{cache:'no-store'}).then(async response=>{
+  authRequest('/api/auth/register?'+params,{cache:'no-store'}).then(async response=>{
    const payload=await response.json();if(!response.ok)throw new Error();if(!active)return;
    if(payload.state==='authenticated'&&typeof payload.next==='string'){allowDraftNavigation();window.location.replace(safeAppPath(payload.next));return;}
    setContext(payload.context);setOpen(true);setError('');
@@ -41,7 +42,7 @@ export function RegistrationSheet(){
  const close=()=>{allowDraftNavigation();setOpen(false);router.replace('/preise'+(locale==='de'?'':'?lang='+locale));};
  const requestCancel=()=>{form.current?.closest('.bottom-sheet')?.querySelector<HTMLButtonElement>('.sheet-header button')?.click()};
  const request=async(url:string,body:Record<string,unknown>)=>{
-  const response=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  const response=await authRequest(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
   const payload=await response.json().catch(()=>({}));
   if(!response.ok)throw new Error(['registration_unavailable','duplicate_record'].includes(payload.error)?'conflict':payload.error==='invalid_or_expired_code'?'invalidCode':'failure');
   return payload;
@@ -79,7 +80,7 @@ export function RegistrationSheet(){
    {context&&stage==='new'&&<form ref={form} onSubmit={submit} noValidate>
     <FormWizard labels={labels} step={step} onStep={setStep} busy={busy} ariaLabel={t('title')} backLabel={t('back')} nextLabel={t('next')} progressLabel={(step,total,label)=>t('progress',{step,total,label})} cancelAction={<Button variant="secondary" onClick={requestCancel}>{t('cancel')}</Button>} action={<Button type="submit" disabled={busy||!accepted}>{busy?t('creating'):t('create')}</Button>}>
      <div hidden={step!==0}><Field label={t('language')}><Select value={locale} onChange={event=>{const params=new URLSearchParams(search);params.set('lang',event.target.value);router.replace('/registrieren?'+params,{scroll:false});}}><option value="de">Deutsch (Schweiz)</option><option value="fr">Français (Suisse)</option><option value="it">Italiano (Svizzera)</option><option value="en">English</option><option value="tr">Türkçe</option></Select></Field><h3>{t('company')}</h3><p>{t('companyHelp')}</p><Field label={t('companyName')+' *'}><Input name="company" required minLength={2} maxLength={180} autoComplete="organization" value={company} onChange={e=>setCompany(e.target.value)} placeholder={t('companyExample')}/></Field><Field label={t('contactName')+' *'}><Input name="contactName" required minLength={2} maxLength={180} autoComplete="name" value={contactName} onChange={e=>setContactName(e.target.value)}/></Field></div>
-     <div hidden={step!==1}><h3>{t('access')}</h3><p>{t('accessHelp')}</p><Field label={t('email')+' *'}><Input name="email" required type="email" inputMode="email" autoComplete="email" maxLength={320} value={email} onChange={e=>setEmail(e.target.value)} placeholder="name@firma.ch"/></Field><Field label={t('password')+' *'} hint={t('passwordHelp')}><div className="password-field"><Input name="password" required minLength={12} maxLength={256} type={show?'text':'password'} autoComplete="new-password" value={password} onChange={e=>setPassword(e.target.value)} placeholder={t('passwordHelp')}/><button type="button" className="password-visibility" aria-label={t(show?'hidePassword':'showPassword')} aria-pressed={show} onClick={()=>setShow(!show)}>{show?<EyeOff aria-hidden/>:<Eye aria-hidden/>}</button></div></Field></div>
+     <div hidden={step!==1}><h3>{t('access')}</h3><p>{t('accessHelp')}</p><Field label={t('email')+' *'}><Input name="email" required type="email" inputMode="email" autoComplete="email" maxLength={320} value={email} onChange={e=>setEmail(e.target.value)} placeholder="name@firma.ch"/></Field><Field label={t('password')+' *'} hint={t('passwordHelp')}><PasswordInput name="password" required minLength={12} maxLength={256} autoComplete="new-password" value={password} onChange={e=>setPassword(e.target.value)} placeholder={t('passwordHelp')} showLabel={t('showPassword')} hideLabel={t('hidePassword')}/></Field></div>
      <div hidden={step!==2}><h3>{t('review')}</h3><dl className="registration-summary"><dt>{t('companyName')}</dt><dd>{company}</dd><dt>{t('contactName')}</dt><dd>{contactName}</dd><dt>{t('email')}</dt><dd>{email}</dd><dt>{t('plan')}</dt><dd>{planSummary}</dd></dl><p className="registration-legal-links"><Link href="/agb" target="_blank" rel="noopener noreferrer">{t('terms')}</Link><Link href="/auftragsbearbeitung" target="_blank" rel="noopener noreferrer">{t('dpa')}</Link><Link href="/datenschutz" target="_blank" rel="noopener noreferrer">{t('privacy')}</Link></p><Field label={t('accept')+' *'}><Input name="acceptedTerms" type="checkbox" required checked={accepted} onChange={e=>setAccepted(e.target.checked)}/></Field></div>
      {error&&<ErrorState>{t(error as RegistrationTextKey)}{error==='conflict'&&<p><Link href="/passwort-vergessen" target="_blank" rel="noopener noreferrer">{t('resetPassword')}</Link></p>}</ErrorState>}<p>{t('required')}</p><Link href={'/login?lang='+locale} target="_blank" rel="noopener noreferrer">{t('signIn')}</Link>
     </FormWizard>
