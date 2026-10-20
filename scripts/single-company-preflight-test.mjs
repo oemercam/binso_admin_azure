@@ -1,0 +1,34 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import {PGlite} from '@electric-sql/pglite';
+import {singleCompanyPreflight,PreflightBlocked} from './single-company-preflight.mjs';
+const db=new PGlite(),client={query:sql=>db.exec(sql)};
+try{
+ await db.exec(`create table organizations(id text primary key,status text,is_demo boolean default false);
+ create table app_users(id text primary key,email text);
+ create table organization_memberships(organization_id text,user_id text,role text,status text);
+ create table organization_invitations(organization_id text,email text,status text,expires_at timestamptz);
+ create table organization_subscriptions(organization_id text,status text,trial_until timestamptz);
+ create table billing_checkout_sessions(organization_id text,expires_at timestamptz);
+ insert into organizations values('one','active',false),('two','active',false);
+ insert into app_users values('one-owner','one@fixture.invalid'),('two-owner','two@fixture.invalid');
+ insert into organization_memberships values('one','one-owner','owner','active'),('two','two-owner','owner','active');`);
+ const clean=await singleCompanyPreflight(client);assert.equal(Object.keys(clean).length,4);assert.ok(Object.values(clean).every(n=>n===0));
+ const denied=async key=>assert.rejects(()=>singleCompanyPreflight(client),e=>e instanceof PreflightBlocked&&e.counts[key]===1);
+ await db.exec("insert into organization_memberships values('one','two-owner','member','active')");await denied('ambiguous_active_identities');
+ assert.equal((await db.query("select count(*)::int n from organization_memberships where user_id='two-owner'")).rows[0].n,2,'The preflight never repairs or removes historical membership');
+ await db.exec("delete from organization_memberships where organization_id='one' and user_id='two-owner'");
+ await db.exec("insert into organization_invitations values('one','two@fixture.invalid','pending',now()+interval '1 day')");await denied('foreign_pending_invitations');
+ await db.exec("update organization_invitations set expires_at=now()-interval '1 day'");await singleCompanyPreflight(client);
+ await db.exec("insert into organizations values('three','active',false)");await denied('active_companies_without_owner');await db.exec("update organizations set status='suspended' where id='three'");
+ await db.exec("insert into organization_subscriptions values('one','trial',now()+interval '1 day');insert into billing_checkout_sessions values('one',now()+interval '1 day')");await denied('existing_checkouts_during_free_trial');
+ assert.equal((await db.query('select count(*)::int n from billing_checkout_sessions')).rows[0].n,1,'No automatic provider expiry or checkout deletion');
+ await db.exec("update billing_checkout_sessions set expires_at=now()-interval '1 day'");await singleCompanyPreflight(client);
+ await db.exec("create role preflight_restricted;grant usage on schema public to preflight_restricted;grant select on all tables in schema public to preflight_restricted;alter table organization_memberships enable row level security;alter table organization_memberships force row level security;set role preflight_restricted");
+ await assert.rejects(()=>singleCompanyPreflight(client),e=>e.code==='42501','RLS-filtered rows must never be mistaken for zero conflicts');await db.exec('reset role');
+ const row={...clean,ambiguous_active_identities:'not-a-number'};for(const rows of [[],[row],[clean,clean],...['',null,true].map(value=>[{...clean,ambiguous_active_identities:value}])])await assert.rejects(()=>singleCompanyPreflight({query:async sql=>sql==='rollback'?{}:{rows}}),/Incomplete/);
+ const sql=await fs.readFile('database/operations/single-company-preflight.sql','utf8');assert.equal((sql.match(/begin read only;/g)??[]).length,2);assert.equal((sql.match(/set local row_security=off;/g)??[]).length,2);
+ assert.doesNotMatch(sql.replace(/--[^\n]*/g,''),/\b(insert|update|delete|alter|drop|truncate|grant|revoke)\b/i,'Only read-only statements belong in the deployed preflight');
+ const workflow=await fs.readFile('.github/workflows/deploy-azure.yml','utf8');assert.ok(workflow.indexOf('node scripts/single-company-preflight.mjs')<workflow.indexOf('pnpm db:migrate'));assert.match(workflow,/inputs.approve_production == true/);
+ console.log('Read-only release preflight: all four conflict blockers, no repair/provider changes, expired/inactive negatives, malformed evidence and RLS false-zero denial passed; production approval remains mandatory.');
+}finally{await db.close()}

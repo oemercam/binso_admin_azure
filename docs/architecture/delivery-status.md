@@ -79,8 +79,12 @@ Deployment. Die konkrete Release-SHA und die produktiven Migrationen benötigen
 vor Ausführung die vereinbarte separate Freigabe. Schutzregeln, Pflichtprüfungen,
 Production-Environment, ZIP-Integrität und exakte SHA-Bindung bleiben erhalten.
 0060–0063 sind nur vorbereitet; zusammen mit den Vorgänger-Migrationen sind sie
-vor Rollout als Gesamtpaket zu prüfen. Aggregierter Ein-Firma-/Checkout-Preflight
-und Wiederherstellungsweg sind vor produktiver Änderung nachzuweisen. Keine
+vor Rollout als Gesamtpaket zu prüfen. Der Deployment-Schritt führt den aggregierten Ein-Firma-/Checkout-Preflight
+vor jeder Migration aus. Er verwendet ausschliesslich die bereits geschützte
+Datenbankverbindung; READ ONLY und row_security=off verhindern Schreibaktionen
+und scheinbare Nulltreffer bei fehlendem RLS-Lesezugriff. Jeder Konflikt, fehlende
+Metadaten oder unzureichende Rechte stoppen vor den Migrationen. Der produktive
+Bestand ist noch nicht geprüft. Der Wiederherstellungsweg bleibt zu bestätigen. Keine
 blinde Datenbereinigung, kein automatisches Zurücksetzen der Sicherheitsgrenzen.
 
 Das aktuelle ZIP ist ein Quellcode-Export des benannten Commits, kein ausgeliefertes

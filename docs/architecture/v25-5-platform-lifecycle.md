@@ -134,3 +134,17 @@ Lokale DB-Nachweise verwenden eine isolierte PGlite-PostgreSQL-Engine mit
 binso_runtime/RLS. Zusätzlicher nativer PostgreSQL-Test und vollständige
 Browser-/Security-Qualifikation laufen erst am finalen Draft-PR-SHA in GitHub;
 dieser Absatz behauptet keinen dortigen Erfolg. Keine Produktivverbindungen.
+
+## Blockierende lesende Release-Vorprüfung
+
+Der Deployment-Workflow ruft single-company-preflight.mjs vor db:migrate auf,
+erst innerhalb der bestehenden Production-/SHA-Freigabe. Die bereits vorbereiteten
+vier Aggregatabfragen sind auf public qualifiziert und laufen READ ONLY mit
+row_security=off. Dies umgeht RLS nicht: eingeschränkte Sicht führt zum Fehler,
+nicht zu falschen Nulltreffern. Mehrdeutige aktive Identitäten, fremde offene
+Einladungen, aktive Nicht-Demo-Firmen ohne Owner oder alte offene Trial-Checkouts
+blockieren. Keine IDs/E-Mails, Reparaturen, neuen Rechte oder Provideraktionen.
+Positiv/negativ geprüft: alle vier Zähler, erhaltene Konfliktdaten, abgelaufene
+Einladungen/Checkouts, inaktive Firmen, ungültige Metadaten und echter RLS-Fehler.
+Der Produktionsbestand ist weiterhin unbekannt, bis der freigegebene geschützte
+Lauf diese Vorprüfung ausführt. Bei Blockade kein automatisches Bereinigen.
