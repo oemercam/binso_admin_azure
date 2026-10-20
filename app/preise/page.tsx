@@ -44,6 +44,6 @@ export default function Prices(){
         <ul>{plan.features.map(feature=><li key={feature}><Icon name="check" size={15}/><LocalizedText>{feature}</LocalizedText></li>)}</ul>
       </article>)}
     </div>
-    <section className="pricing-foot"><div><h2><LocalizedText>{"Alle Pläne starten mit 14 Tagen Testphase."}</LocalizedText></h2><p><LocalizedText>{"Keine Kreditkarte nötig. Ohne aktiviertes Abo wechselt das Konto nach der Testphase in den Nur-Lesen-Modus; deine Daten bleiben erhalten."}</LocalizedText></p><small><LocalizedText>{"Geschäftskundenangebot. Alle Preise in CHF, exkl. gesetzlich geschuldeter MWST. Der verbindliche Gesamtbetrag wird vor dem kostenpflichtigen Abschluss im Stripe Checkout angezeigt."}</LocalizedText></small></div><Button href="/demo" variant="secondary"><LocalizedText>{"Demo ohne Registrierung"}</LocalizedText></Button></section>
+    <section className="pricing-foot"><div><h2><LocalizedText>{"Alle Pläne starten mit 14 Tagen Testphase."}</LocalizedText></h2><p><LocalizedText>{"Keine Kreditkarte nötig. Ohne aktiviertes Abo wechselt das Konto nach der Testphase in den Nur-Lesen-Modus; deine Daten bleiben erhalten."}</LocalizedText></p><small><LocalizedText>{"Geschäftskundenangebot. Alle Preise in CHF, exkl. gesetzlich geschuldeter MWST. Der verbindliche Gesamtbetrag wird vor dem kostenpflichtigen Abschluss im Stripe Checkout angezeigt."}</LocalizedText></small></div><Button href="/registrieren" variant="secondary"><LocalizedText>{"Jetzt starten"}</LocalizedText></Button></section>
   </main><MarketingFooter/></>;
 }

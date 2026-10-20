@@ -58,7 +58,7 @@ function customerAmounts(value:unknown,key:'revenue'|'open_amount'){
 
 export function useDemoRows(collection:DemoCollection, defaults:string[][],filters="") {
   void defaults;
-  const base=isProductionBackendEnabled()?`/api/${collection}`:`/api/demo/data?collection=${collection}`;
+  const base=`/api/${collection}`;
   const path=base+(filters?(base.includes('?')?'&':'?')+filters:'');
   const {data,loading,error}=useApiQuery<{items:Record<string,unknown>[];total?:number}>(path);
   return {rows:mapRemoteRows(collection,data?.items??[]),total:data?.total??Number(data?.items?.[0]?.total_count??data?.items?.length??0),loading,error};

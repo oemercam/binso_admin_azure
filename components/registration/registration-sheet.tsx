@@ -8,7 +8,7 @@ import {Button,Logo,Field,Input,Select,ErrorState} from "@/components/ui";
 import {FormSheet} from "@/components/binso-ux";
 import {FormWizard} from "@/components/form-wizard";
 import {allowDraftNavigation} from "@/components/use-browser-back-guard";
-import {clearDemoClientSession} from "@/lib/client/backend";
+import {clearClientSession} from "@/lib/client/backend";
 import {registrationLocale,registrationText,type RegistrationTextKey} from "@/lib/i18n";
 import {safeAppPath} from "@/lib/navigation";
 
@@ -47,7 +47,7 @@ export function RegistrationSheet(){
   return payload;
  };
  const finish=(payload:Record<string,unknown>)=>{
-  setPassword('');clearDemoClientSession();allowDraftNavigation();
+  setPassword('');clearClientSession();allowDraftNavigation();
   if(payload.alreadyVerified){setStage('verified');setStatus('alreadyVerified');return;}
   if(typeof payload.next==='string')window.location.replace(safeAppPath(payload.next));
   else window.location.replace('/login');
@@ -61,7 +61,7 @@ export function RegistrationSheet(){
   try{
    if(stage==='pending'){finish(await request('/api/auth/verify-email',{email,code}));return;}
    const payload=await request('/api/auth/register',{company,name:contactName.trim(),email,password,plan:context.plan?.id??null,billingCycle:context.billingCycle,locale,acceptedTerms:accepted,acceptedDpa:accepted,termsVersion:context.termsVersion,privacyVersion:context.privacyVersion,dpaVersion:context.dpaVersion});
-   clearDemoClientSession();setPassword('');setStage('pending');setStatus(payload.emailSent===false?'deliveryFailed':payload.resumed?'deliveryUnconfirmed':'sent');
+   clearClientSession();setPassword('');setStage('pending');setStatus(payload.emailSent===false?'deliveryFailed':payload.resumed?'deliveryUnconfirmed':'sent');
   }catch(e){setError(e instanceof Error?e.message:'failure');}
   finally{saving.current=false;setBusy(false);}
  };

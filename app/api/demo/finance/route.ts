@@ -1,4 +1,7 @@
-import {withDemo} from '@/lib/server/demo';
-import {financeData,cashStatisticsData} from '@/lib/server/repositories/finance';
-import {apiError,json} from '@/lib/server/http';
-export async function GET(){try{return json(await withDemo(async(c,s)=>({...await financeData(c,s.organizationId),cash:await cashStatisticsData(c,s.organizationId),demo:true})));}catch(e){return apiError(e)}}
+import {json} from "@/lib/server/http";
+
+/** Retired URL: never authenticates, provisions data or grants demo access. */
+const retired=()=>json({error:"demo_retired",message:"Der Demo-Zugang wurde entfernt."},410);
+export const GET=retired;
+export const POST=retired;
+export const DELETE=retired;

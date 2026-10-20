@@ -1,25 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import {dataRevision,publishMutation} from "./data-events";
 import {invalidateClientSession,readClientSession} from "./session-cache";
 
 export function isProductionBackendEnabled(){
-  if(typeof window==="undefined") return false;
-  if(document.querySelector('[data-operator-demo="true"]'))return false;
-  if(window.location.pathname.startsWith("/preview/"))return false;
-  try{return window.localStorage.getItem("binso.demo.session")!=="1" || window.localStorage.getItem("binso.demo.database")==="1"}catch{return true}
+  return true;
 }
 
 export function useBackendMode(){
-  const [enabled,setEnabled]=useState(true);
-  useEffect(()=>{
-    queueMicrotask(()=>setEnabled(isProductionBackendEnabled()));
-  },[]);
-  return enabled;
+  return true;
 }
 
-export function clearDemoClientSession(){
+export function clearClientSession(){
   if(typeof window==="undefined") return;
   invalidateClientSession();
   try{
@@ -37,36 +29,13 @@ export function clearDemoClientSession(){
   }catch{/* Browser storage can be unavailable; server revocation and the memory fence still apply. */}
 }
 
-let demoStart:Promise<void>|null=null;
-export function startDemoClientSession({name="Demo",company="Demo Firma",focus="overview",reset=false}:{name?:string;company?:string;focus?:string;reset?:boolean}={}):Promise<void>{
-  if(typeof window==="undefined")return Promise.reject(new Error("Demo-Sitzung kann nur im Browser gestartet werden."));
-  if(demoStart)return demoStart;
-  const request=(async()=>{
-    const response=await fetchApi(reset?"/api/demo/session?reset=1":"/api/demo/session",{method:"POST",headers:{"Content-Type":"application/json"}});
-    const payload=await parseResponse<{ok?:boolean;databaseBacked?:boolean;expiresIn?:number}>(response,"Demo-Sitzung konnte nicht gestartet werden.");
-    if(payload.ok!==true)throw new Error("Demo-Sitzung konnte nicht gestartet werden.");
-    clearDemoClientSession();
-    const now=Date.now();
-    try{window.localStorage.setItem("binso.demo.session","1");
-    window.localStorage.setItem("binso.demo.name",name.trim()||"Demo");
-    window.localStorage.setItem("binso.demo.company",company.trim()||"Demo Firma");
-    window.localStorage.setItem("binso.demo.focus",focus);
-    window.localStorage.setItem("binso.demo.startedAt",String(now));
-    window.localStorage.setItem("binso.demo.expiresAt",String(now+(payload.expiresIn??86400)*1000));
-    if(payload.databaseBacked===true)window.localStorage.setItem("binso.demo.database","1");}catch{/* Authenticated demo cookies remain authoritative when optional storage is blocked. */}
-  })();
-  demoStart=request;
-  void request.finally(()=>{if(demoStart===request)demoStart=null;}).catch(()=>{});
-  return request;
-}
-
 let logoutPending:Promise<void>|null=null;
 export function logoutClientSession():Promise<void>{
   if(logoutPending)return logoutPending;
   const request=(async()=>{
     const payload=await apiPost<{ok?:boolean}>("/api/auth/logout",{});
     if(payload.ok!==true)throw new Error("Abmelden konnte nicht bestätigt werden. Bitte erneut versuchen.");
-    clearDemoClientSession();
+    clearClientSession();
   })();
   logoutPending=request;
   void request.finally(()=>{if(logoutPending===request)logoutPending=null;}).catch(()=>{});
@@ -79,7 +48,7 @@ export function logoutOperatorClientSession(){
   const request=(async()=>{
     const payload=await apiPost<{ok?:boolean;microsoftLogoutUrl?:string|null}>("/api/operator/logout",{});
     if(payload.ok!==true)throw new Error("Abmelden konnte nicht bestätigt werden. Bitte erneut versuchen.");
-    clearDemoClientSession();
+    clearClientSession();
     return payload;
   })();
   operatorLogoutPending=request;

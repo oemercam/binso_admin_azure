@@ -12,9 +12,8 @@ import {DocumentSummaryRow,type DocumentListItem} from '../document-list';
 import {SectionTitle,LoadingState,ErrorState,EmptyState} from '../ui';
 
 type DashboardData={work?:{hours:number|null;pending:number|null;expenses:number|null;timeReviews?:number|null;expenseReviews?:number|null}|null;cash?:CashStatisticsData|null;canFinance?:boolean;canInvoices?:boolean;canPayments?:boolean;stats?:{customer_count:number|null;project_count?:number|null;employee_count?:number|null};invoices?:DocumentListItem[];attention?:DocumentListItem[];recent?:DocumentListItem[]};
-export function DashboardPage({forceDemo=false}:{forceDemo?:boolean}={}){
- const production=useBackendMode()&&!forceDemo;
- const query=useApiQuery<DashboardData>(isProductionBackendEnabled()&&production?'/api/dashboard':'/api/demo/dashboard');
+export function DashboardPage(){
+ const query=useApiQuery<DashboardData>('/api/dashboard');
  const data=query.data;
  // Attention comes from all authorized overdue invoices, never just the five recent rows.
  const attention=(data?.attention??[]).filter(item=>financialStatus(item)==='overdue');

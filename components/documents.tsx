@@ -71,8 +71,8 @@ type DocumentDraft = {
 
 
 function useCustomerDirectory(enabled=true,selectedId?:string) {
-  const {data,loading,error,refresh}=useApiQuery<{items:Array<{id:string;name:string;sector?:string;street?:string;postal_code?:string;city?:string}>}>(enabled?(isProductionBackendEnabled()?"/api/customers?limit=50":"/api/demo/data?collection=customers&limit=50"):null);
-  const selected=useApiQuery<{item?:Parameters<typeof customerDirectory>[0][number]}>(enabled&&selectedId&&isProductionBackendEnabled()?"/api/customers/"+encodeURIComponent(selectedId):null);
+  const {data,loading,error,refresh}=useApiQuery<{items:Array<{id:string;name:string;sector?:string;street?:string;postal_code?:string;city?:string}>}>(enabled?("/api/customers?limit=50"):null);
+  const selected=useApiQuery<{item?:Parameters<typeof customerDirectory>[0][number]}>(enabled&&selectedId&&true?"/api/customers/"+encodeURIComponent(selectedId):null);
   const directory=useMemo(()=>{const items=data?.items??[],item=selected.data?.item;return customerDirectory(item&&!items.some(row=>row.id===item.id)?[...items,item]:items);},[data,selected.data]);
   return {directory,loading:loading||selected.loading,error:error??selected.error,refresh:()=>{refresh();selected.refresh()}};
 }
@@ -216,7 +216,7 @@ function useExistingDocument(kind:DocumentKind,documentKey:string|undefined,setD
   const [error,setError]=useState<string|null>(null);
   useEffect(()=>{
     if(!documentKey) return;
-    const url=isProductionBackendEnabled()?"/api/documents/"+encodeURIComponent(documentKey):"/api/demo/data?collection=documents&number="+encodeURIComponent(documentKey);
+    const url="/api/documents/"+encodeURIComponent(documentKey);
     let active=true;
     apiGet<{item?:Record<string,unknown>;items?:Array<Record<string,unknown>>}>(url)
       .then(payload=>{if(!active)return;const item=payload.item??payload.items?.[0];if(!item)throw new Error("Dokument wurde nicht gefunden.");setDraft(remoteDraftFromItem(item,kind));setLoading(false);setError(null);})
@@ -241,7 +241,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const searchParams=useSearchParams();
   const plural=kind==="Angebot"?"angebote":"rechnungen";
   const returnTo=!existing?safeAppPath(searchParams.get("returnTo"),"/"+plural):"/"+plural;
-  const production=useBackendMode();
+
   const [preview,setPreview]=useState(false);
   const [editing,setEditing]=useState(!existing);
   const [wizardStep,setWizardStep]=useState(0);
@@ -286,7 +286,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const sourceOffer=kind==="Rechnung"?searchParams.get("sourceOffer"):null;
   const sourceTimeEntriesParam=kind==="Rechnung"?(searchParams.get("timeEntries")??""):"";
 
-  const sourceQuery=useApiQuery<{item?:Record<string,unknown>;items?:Array<Record<string,unknown>>}>(!existing&&sourceOffer?(production?"/api/documents/"+encodeURIComponent(sourceOffer):"/api/demo/data?collection=documents&number="+encodeURIComponent(sourceOffer)):null);
+  const sourceQuery=useApiQuery<{item?:Record<string,unknown>;items?:Array<Record<string,unknown>>}>(!existing&&sourceOffer?("/api/documents/"+encodeURIComponent(sourceOffer)):null);
   const sourceItem=sourceQuery.data?.item??sourceQuery.data?.items?.[0];
   const sourceCustomer=useApiQuery<{item?:Parameters<typeof customerDirectory>[0][number]}>(sourceItem?.customer_id&&sourceOffer?"/api/customers/"+encodeURIComponent(String(sourceItem.customer_id)):null);
   const sourceLoading=sourceQuery.loading||sourceCustomer.loading;
@@ -305,14 +305,14 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
     if(!stored?.draft||!Array.isArray(stored.draft.positions)||!stored.draft.positions.length||stored.draft.id||stored.draft.number||['customer','number','date','due','vatRate','note'].some(key=>typeof (stored.draft as unknown as Record<string,unknown>)[key]!=='string')||stored.draft.positions.some(item=>!item||['id','description','quantity','price'].some(key=>typeof (item as unknown as Record<string,unknown>)[key]!=='string'))||stored.replay&&(typeof stored.replay.body!=='string'||typeof stored.replay.key!=='string'))return;
     draftBaseline.current=editableDocumentSnapshot(draft);setDraft(stored.draft);setWizardStep(Math.max(0,Math.min(3,Number(stored.step)||0)));createRequest.current=stored.replay??null;setDraftReplay(stored.replay??null);setDirty(true);
   }});
-  const timeSource=useApiQuery<{items:Array<{id:string;hours:number;description?:string;sales_rate:number;customer_id:string;customer_name:string;project_name:string}>}>(kind==='Rechnung'&&sourceTimeEntriesParam&&production?'/api/time-entries/billing?ids='+encodeURIComponent(sourceTimeEntriesParam):null);
-  const expenseSource=useApiQuery<{items:Array<{id:string;customer_id:string;customer_name:string;description:string;quantity:number;unit_price:number;vat_rate:number;currency:string}>}>(kind==='Rechnung'&&sourceExpenseParam&&production?'/api/expenses/billing?ids='+encodeURIComponent(sourceExpenseParam):null);
+  const timeSource=useApiQuery<{items:Array<{id:string;hours:number;description?:string;sales_rate:number;customer_id:string;customer_name:string;project_name:string}>}>(kind==='Rechnung'&&sourceTimeEntriesParam&&true?'/api/time-entries/billing?ids='+encodeURIComponent(sourceTimeEntriesParam):null);
+  const expenseSource=useApiQuery<{items:Array<{id:string;customer_id:string;customer_name:string;description:string;quantity:number;unit_price:number;vat_rate:number;currency:string}>}>(kind==='Rechnung'&&sourceExpenseParam&&true?'/api/expenses/billing?ids='+encodeURIComponent(sourceExpenseParam):null);
   const [billingSourceError,setBillingSourceError]=useState<string|null>(null);
   const billingLoading=timeSource.loading||expenseSource.loading;
   const billingError=timeSource.error||expenseSource.error||billingSourceError;
   const importedSources=useRef("");
   useEffect(()=>{
-    if(kind!=="Rechnung"||(!sourceTimeEntriesParam&&!sourceExpenseParam)||!isProductionBackendEnabled()||billingLoading||timeSource.error||expenseSource.error||existing&&(documentLoad.loading||!draft.id))return;
+    if(kind!=="Rechnung"||(!sourceTimeEntriesParam&&!sourceExpenseParam)||!true||billingLoading||timeSource.error||expenseSource.error||existing&&(documentLoad.loading||!draft.id))return;
     const key=(documentKey??'new')+':'+sourceTimeEntriesParam+':'+sourceExpenseParam;
     if(importedSources.current===key)return;importedSources.current=key;
     const load=async()=>{
@@ -332,7 +332,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   },[existing,kind,sourceTimeEntriesParam,sourceExpenseParam,documentLoad.loading,draft,documentKey,setDraft,billingLoading,timeSource.data,timeSource.error,expenseSource.data,expenseSource.error]);
 
   useEffect(()=>{
-    if(existing||!isProductionBackendEnabled()) return;
+    if(existing||!true) return;
     const selected=resolveCustomer({customer:draft.customer,customerId:draft.customerId},directory),first=Object.values(directory)[0];
     if(selected&&((selected.name??draft.customer)!==draft.customer||selected.id!==draft.customerId))queueMicrotask(()=>setDraft(current=>({...current,customer:selected.name??current.customer,customerId:selected.id})));
     else if(!draft.customer&&!draft.customerId&&first&&Object.keys(directory).length===1)queueMicrotask(()=>setDraft(current=>current.customer||current.customerId?current:{...current,customer:first.name??'',customerId:first.id}));
@@ -341,13 +341,13 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const show=(message:string)=>{setToast(message);window.setTimeout(()=>setToast(null),2300);};
   const save=async()=>{
     if(documentSavePending.current||companyPending||documentLoad.loading||documentLoad.error||customersLoading||customersError||sourceLoading||sourceError||billingLoading||billingError||!recovery.ready)return;
-    if(isProductionBackendEnabled()&&!resolveCustomer(draft,directory)){show("Bitte zuerst einen Kunden erfassen.");return;}
+    if(!resolveCustomer(draft,directory)){show("Bitte zuerst einen Kunden erfassen.");return;}
     if(paymentIssue){show(paymentIssue);return;}
     documentSavePending.current=true;setSaving(true);
     let savedNumber=draft.number;
     try{
-      if(!isProductionBackendEnabled())throw new Error("Die Vorschau ist schreibgeschützt. Bitte eine Datenbank-Demo starten.");
-      if(isProductionBackendEnabled()){
+      {}
+      {
         const payload={...documentPayload(kind,draft),sourceOffer:sourceOffer||undefined,customerId:resolveCustomer(draft,directory)?.id??draft.customerId};
         const requestBody=JSON.stringify(payload);
         if(!existing&&createRequest.current?.body!==requestBody){createRequest.current={body:requestBody,key:crypto.randomUUID()};setDraftReplay(createRequest.current);}
@@ -504,7 +504,7 @@ function DocumentReadView({type,draft,directory}:{type:DocumentKind;draft:Docume
 }
 
 function DocumentEditor({ type, draft, onChange, directory, step,lockedCustomer=false }: { type:DocumentKind; draft:DocumentDraft; onChange:(draft:DocumentDraft)=>void; directory:CustomerDirectory;step?:number;lockedCustomer?:boolean }) {
-  const production=useBackendMode();
+
   const company=useDocumentCompany();
   const totals=useDocumentTotals(draft);
   const names=Object.keys(directory);
@@ -528,7 +528,7 @@ function DocumentEditor({ type, draft, onChange, directory, step,lockedCustomer=
     onChange({...draft,positions:draft.positions.filter(item=>item.id!==id)});
   };
 
-  if(production&&names.length===0){
+  if(names.length===0){
     return <div className="invoice-workspace"><section className="invoice-form"><EmptyState  title="Zuerst einen Kunden erfassen"  /><FormActions><Button href="/kunden/neu"><LocalizedText>{"Kunde erfassen"}</LocalizedText></Button></FormActions></section></div>;
   }
 
@@ -536,7 +536,7 @@ function DocumentEditor({ type, draft, onChange, directory, step,lockedCustomer=
     <section className={`invoice-form ${type==="Angebot"?"offer-form":""}`}>
       <div hidden={step!==undefined&&step!==0} className="form-section customer-form-section">
         <span className="compact-section-label"><LocalizedText>{"Kunde"}</LocalizedText></span>
-        <Field label="Kunde auswählen"><DirectorySelect label="Kunde auswählen" disabled={lockedCustomer} required endpoint={production?"/api/customers":"/api/demo/data?collection=customers"} value={draft.customerId??''} onChange={(value,item)=>{if(item)onChange({...draft,customer:String(item.name??''),customerId:value,...(type==='Rechnung'?{due:documentDefaults(company.raw,{paymentDays:item.paymentDays==null?undefined:Number(item.paymentDays)},'Rechnung',draft.date).due}:{})})}}/></Field>   {[customer.sector,customer.city].some(Boolean)&&<div className="document-customer-hint"><span>{[customer.sector,customer.city].filter(Boolean).join(" · ")}</span></div>}
+        <Field label="Kunde auswählen"><DirectorySelect label="Kunde auswählen" disabled={lockedCustomer} required endpoint={"/api/customers"} value={draft.customerId??''} onChange={(value,item)=>{if(item)onChange({...draft,customer:String(item.name??''),customerId:value,...(type==='Rechnung'?{due:documentDefaults(company.raw,{paymentDays:item.paymentDays==null?undefined:Number(item.paymentDays)},'Rechnung',draft.date).due}:{})})}}/></Field>   {[customer.sector,customer.city].some(Boolean)&&<div className="document-customer-hint"><span>{[customer.sector,customer.city].filter(Boolean).join(" · ")}</span></div>}
       </div>
       <div hidden={step!==undefined&&step!==0&&step!==2} className="form-section">
         <h2><LocalizedText>{step===2?(type==="Angebot"?"Gültig bis":"Zahlungsbedingungen"):"Dokumentdaten"}</LocalizedText></h2>
@@ -601,8 +601,8 @@ export function DocumentModal({ title, onClose, pdfNumber, previewDraft, fileUrl
 
 const EMPTY_COMPANY:Record<string,unknown>={};
 function useDocumentCompany(){
- const production=useBackendMode();
- const query=useApiQuery<{item:Record<string,unknown>}>(production?'/api/settings/company':null);
+
+ const query=useApiQuery<{item:Record<string,unknown>}>('/api/settings/company');
  const company=query.data?.item??EMPTY_COMPANY;
  const loading=query.loading,error=query.error;
  return {loading,error,raw:company,name:String(company.legal_name||company.name||''),street:[company.street,company.building_number].filter(Boolean).join(' '),city:[company.postal_code,company.city].filter(Boolean).join(' '),iban:String(company.iban||company.qr_iban||''),logo:String(company.logo_url||''),footer:[company.legal_name||company.name,company.vat_number||company.uid,company.email,company.phone,company.website].filter(Boolean).join(' · ')};

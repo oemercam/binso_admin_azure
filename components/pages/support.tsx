@@ -24,7 +24,7 @@ import { ActionRow, ActionsMenu, CreateAction, FormSheet } from "../binso-ux";
 
 
 export function SupportPage() {
- const production=useBackendMode(),placeholder="Tickets suchen...";
+ const placeholder="Tickets suchen...";
  const chips=["Alle","Neu","Offen","In Bearbeitung","Warten auf Kunde","Gelöst","Geschlossen"];
  const columns=[{label:"Ticket",index:4},{label:"Betreff",index:1},{label:"Aktualisiert",index:2},{label:"Status",index:3,status:true}];
  const controller=useRecordsController({placeholder,chips,columns}),pageSize=50;
@@ -33,7 +33,7 @@ export function SupportPage() {
  if(controller.query.trim())params.set('q',controller.query.trim());
  const statusMap:Record<string,string>={new:"Neu",open:"Offen",in_progress:"In Bearbeitung",waiting_customer:"Warten auf Kunde",resolved:"Gelöst",closed:"Geschlossen"};
  const selected=Object.entries(statusMap).find(([,label])=>label===controller.activeChip)?.[0];if(selected)params.set('status',selected);
- const query=useApiQuery<{items:Array<{id:string;case_number?:string;subject:string;status:string;updated_at:string}>;total?:number}>(production?"/api/support/tickets?"+params:"/api/demo/data?collection=support_tickets&"+params);
+ const query=useApiQuery<{items:Array<{id:string;case_number?:string;subject:string;status:string;updated_at:string}>;total?:number}>("/api/support/tickets?"+params);
  const rows=(query.data?.items??[]).map(item=>[item.id,item.subject?.trim()||"Support-Anfrage",formatDateTime(item.updated_at),statusMap[item.status]??item.status,supportReference(item.id,item.case_number)]);
  const total=query.data?.total??rows.length;
  return <AppShell title="Support" subtitle={query.loading?undefined:`${total} Tickets`} active="support" actions={<RecordsControls controller={controller} placeholder={placeholder} chips={chips} columns={columns}><CreateAction href="/support/neu" label="Neues Ticket"/></RecordsControls>}>
@@ -74,8 +74,8 @@ export function SupportTicketForm() {
     submitPending.current=true;
     setSubmitting(true);
     try{
-      if(!isProductionBackendEnabled())throw new Error("Die Vorschau ist schreibgeschützt. Bitte eine Datenbank-Demo starten.");
-      if(isProductionBackendEnabled()){
+      {}
+      {
         const body={subject:subject.trim(),category,priority:"normal",message:message.trim()},serialized=JSON.stringify(body);
         const attempt=replay?.body===serialized?replay:{body:serialized,key:crypto.randomUUID()};setReplay(attempt);recovery.persist({subject,category,message,replay:attempt,createdId});
         const payload=createdId?{item:{id:createdId}}:await apiPost<{item:{id:string}}>("/api/support/tickets",body,{idempotencyKey:attempt.key});
@@ -90,9 +90,6 @@ export function SupportTicketForm() {
         }
         setSaved(true);recovery.clear();allowDraftNavigation();
         router.push("/support/"+payload.item.id);
-      }else{
-        setToast("Ticket erstellt.");
-        window.setTimeout(()=>router.push("/support/5832"),700);
       }
     }catch(error){
       setToast(error instanceof Error?error.message:"Ticket konnte nicht erstellt werden.");
@@ -124,7 +121,7 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
   const messagesRef=useRef<HTMLDivElement>(null);
   const composerRef=useRef<HTMLTextAreaElement>(null);
   const attachmentRef=useRef<HTMLInputElement>(null);
-  const production=useBackendMode();
+
   const [draft,setDraft]=useState("");
   useEffect(()=>{
     const input=composerRef.current;if(!input)return;
@@ -146,7 +143,7 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
   const [ticket,setTicket]=useState<{id:string;case_number?:string|null;subject?:string|null;status?:string|null;priority?:string|null;created_at?:string|null}|null>(null);
   useEffect(()=>{const list=messagesRef.current;if(list)list.scrollTop=list.scrollHeight},[remote,sent]);
   const ticketReference=supportReference(ticket?.id??ticketId,ticket?.case_number);
-  const ticketSubject=ticket?.subject?.trim()||(!production?"Frage zu einer Rechnung":"Support-Anfrage");
+  const ticketSubject=ticket?.subject?.trim()||("Support-Anfrage");
   const ticketStatus=String(ticket?.status??"open");
   const closed=["resolved","closed"].includes(ticketStatus);
   const reopen=async()=>{if(sendPending.current||!closed)return;sendPending.current=true;setSending(true);try{await apiPatch("/api/support/tickets/"+encodeURIComponent(ticketId),{action:"reopen"});setTicket(current=>current?{...current,status:"open"}:current)}catch(error){setToast(error instanceof Error?error.message:"Ticket konnte nicht geöffnet werden.")}finally{sendPending.current=false;setSending(false)}};
@@ -156,11 +153,7 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
   const uploadSupportFile=async(file:File|undefined)=>{
     if(!file||uploadPending.current||ticketLoading||ticketError||closed)return;
     const issue=fileSelectionError(file,["image/png","image/jpeg","image/webp","application/pdf","text/plain"],limitsConfig.maxFileUploadBytes);if(issue){setToast(issue);return;}
-    if(!isProductionBackendEnabled()){
-      setToast("Datei im Demo-Modus nicht dauerhaft gespeichert.");
-      window.setTimeout(()=>setToast(null),2200);
-      return;
-    }
+    {}
     uploadPending.current=true;
     setUploading(true);
     try{
@@ -180,7 +173,7 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
   };
 
   useEffect(()=>{
-    if(!isProductionBackendEnabled()){queueMicrotask(()=>setTicketLoading(false));return;}
+    {}
     let active=true;
     queueMicrotask(()=>{if(active){setTicketError(null)}});
     Promise.all([
@@ -202,7 +195,7 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
     sendPending.current=true;
     setSending(true);
     setDraft("");
-    if(isProductionBackendEnabled()){
+    {
       try{
         const payload=await apiPost<{item:{id:string;author_type:string;body:string;created_at:string}}>("/api/support/tickets/"+encodeURIComponent(ticketId)+"/messages",{body:value},{idempotencyKey:replyReplay.current.key});
         replyReplay.current=null;
@@ -225,15 +218,9 @@ export function SupportChat({ticketId="5832"}:{ticketId?:string}) {
     <div className="entity-detail-workspace support-detail-workspace">
 
       <div className="desktop-detail-main"><div className="support-thread"><div className="thread-context"><span title={ticketReference}>{ticketSubject}</span>{ticket&&<Status tone={ticketStatus==="resolved"||ticketStatus==="closed"?"success":"info"}>{ticketStatusLabel[ticketStatus]??ticketStatus}</Status>}{closed&&<Button variant="secondary" disabled={sending} onClick={()=>void reopen()}><LocalizedText>{"Wieder öffnen"}</LocalizedText></Button>}</div><LocalizedElement as="div" className="thread-messages" tabIndex={0} role="log" ref={messagesRef} aria-label="Nachrichtenverlauf">
-      {ticketLoading?<LoadingState><LocalizedText>{"Ticket wird geladen …"}</LocalizedText></LoadingState>:ticketError?<ErrorState onRetry={()=>setTicketRetry(value=>value+1)} retryLabel="Erneut versuchen"><LocalizedText>{ticketError}</LocalizedText></ErrorState>:!production&&<div className="thread-day"><LocalizedText>{"Heute"}</LocalizedText></div>}
-      {production ? remote.map((message,index)=><Fragment key={message.id}>{messageDay(message.created_at)!==messageDay(remote[index-1]?.created_at??"")&&<div className="thread-day">{messageDay(message.created_at)}</div>}<MessageBubble outgoing={message.author_type==="customer"} time={<>{new Date(message.created_at).toLocaleTimeString("de-CH",{hour:"2-digit",minute:"2-digit",timeZone:"Europe/Zurich"})}</>} author={message.author_type!=="customer"?"Binso Support":undefined}>{message.body}</MessageBubble></Fragment>) : <>
-        <MessageBubble outgoing={true} time={<>10:24</>}><LocalizedText>{"Ich habe eine Frage zu einer Rechnung. Können Sie mir bitte weiterhelfen?"}</LocalizedText></MessageBubble>
-        <MessageBubble outgoing={false} time={<>10:37</>} author={<><LocalizedText>{"Binso Support"}</LocalizedText></>}><LocalizedText>{"Hallo Thomas. Gerne helfe ich dir weiter. Um welche Rechnung geht es genau?"}</LocalizedText></MessageBubble>
-        <MessageBubble outgoing={true} time={<>10:41</>}><LocalizedText>{"Es geht um die Rechnung RE-2026-019 von Acme AG."}</LocalizedText></MessageBubble>
-        <MessageBubble outgoing={false} time={<>10:42</>} author={<><LocalizedText>{"Binso Support"}</LocalizedText></>}><LocalizedText>{"Super, ich schaue das gerne für dich nach."}</LocalizedText></MessageBubble>
-        {sent.map((text,i)=><MessageBubble outgoing={true} time={<><LocalizedText>{"jetzt"}</LocalizedText></>} key={text+"-"+i}><LocalizedText verbatim={true}>{text}</LocalizedText></MessageBubble>)}
-      </>}
-      {production&&!ticketLoading&&!ticketError&&remote.length===0&&<EmptyState  title="Noch keine Nachrichten" />}
+      {ticketLoading?<LoadingState><LocalizedText>{"Ticket wird geladen …"}</LocalizedText></LoadingState>:ticketError?<ErrorState onRetry={()=>setTicketRetry(value=>value+1)} retryLabel="Erneut versuchen"><LocalizedText>{ticketError}</LocalizedText></ErrorState>:false}
+      {remote.map((message,index)=><Fragment key={message.id}>{messageDay(message.created_at)!==messageDay(remote[index-1]?.created_at??"")&&<div className="thread-day">{messageDay(message.created_at)}</div>}<MessageBubble outgoing={message.author_type==="customer"} time={<>{new Date(message.created_at).toLocaleTimeString("de-CH",{hour:"2-digit",minute:"2-digit",timeZone:"Europe/Zurich"})}</>} author={message.author_type!=="customer"?"Binso Support":undefined}>{message.body}</MessageBubble></Fragment>)}
+      {!ticketLoading&&!ticketError&&remote.length===0&&<EmptyState  title="Noch keine Nachrichten" />}
       </LocalizedElement><div className="thread-composer"><ActionsMenu label="Chataktionen" busy={uploading||ticketLoading||!!ticketError}><ActionRow icon="upload" title="Datei anhängen" onClick={()=>attachmentRef.current?.click()}/></ActionsMenu><Input ref={attachmentRef} id={"support-thread-file-"+ticketId} hidden type="file" disabled={closed||uploading||ticketLoading||!!ticketError} accept="image/png,image/jpeg,image/webp,application/pdf,text/plain" onChange={e=>{const file=e.target.files?.[0];e.target.value="";void uploadSupportFile(file)}}/><Textarea ref={composerRef} rows={1} autoComplete="off" autoCorrect="off" spellCheck={false} enterKeyHint="enter" aria-label="Nachricht" disabled={closed||ticketLoading||!!ticketError} value={draft} onChange={e=>setDraft(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)&&!e.nativeEvent.isComposing){e.preventDefault();void send();}}} placeholder="Nachricht schreiben..."/><LocalizedElement as="button" type="button" onClick={()=>void send()} disabled={closed||sending||ticketLoading||!!ticketError||!draft.trim()} aria-label={sending?"Nachricht wird gesendet":"Senden"}><Icon name="arrow"/></LocalizedElement></div>
     </div></div>
 

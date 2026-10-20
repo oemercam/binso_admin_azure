@@ -109,7 +109,6 @@ function AppShellFrame({
   const [accessRetry,setAccessRetry]=useState(0);
   const [accessError,setAccessError]=useState<string|null>(null);
   useEffect(()=>{
-    if(pathname.startsWith('/preview/')){queueMicrotask(()=>{setAccess({role:'owner',plan:'pro',readOnly:true,moduleProfile:'standard'});setAccessError(null)});return;}
     let active=true;let refreshRevision=0;
     const refresh=()=>{const requestedRevision=++refreshRevision;return apiGet<ClientSession>('/api/auth/session').then(session=>{
       if(!active||requestedRevision!==refreshRevision)return;
@@ -187,7 +186,7 @@ function AppShellFrame({
   const [sheet, setSheet] = useState<"more" | "docs" | "search" | "notifications" | "account" | null>(null);
   useEffect(()=>{if(searchParams.get("panel")==="account")queueMicrotask(()=>setSheet("account"));},[searchParams]);
   const headerPanel=sheet==="search"||sheet==="notifications"||sheet==="account";
-  const production=useBackendMode();
+
   const [query, setQuery] = useState("");
   const [recentSearches,setRecentSearches]=useState<string[]>([]);
   const [clearedSearches,setClearedSearches]=useState<string[]|null>(null);
@@ -195,15 +194,15 @@ function AppShellFrame({
   const [remoteSearch,setRemoteSearch]=useState<{query:string;items:SearchItem[];loading:boolean;error:string|null}>({query:"",items:[],loading:false,error:null});
   const [dark, setDark] = useState(false);
 
-  const [demoSession,setDemoSession]=useState(false);
-  const companyQuery=useApiQuery<{item:{name?:string}}>(production&&canOpen("/einstellungen/firma")?"/api/settings/company":null);
-  const notificationQuery=useApiQuery<{items:NotificationItem[]}>(production?"/api/notifications":null);
+
+  const companyQuery=useApiQuery<{item:{name?:string}}>(canOpen("/einstellungen/firma")?"/api/settings/company":null);
+  const notificationQuery=useApiQuery<{items:NotificationItem[]}>("/api/notifications");
   const notifications=notificationQuery.data?.items??[];
   const notificationsLoading=notificationQuery.loading;
   const [notificationMutationError,setNotificationsError]=useState<string|null>(null);
   const notificationsError=notificationMutationError??notificationQuery.error;
   const [notificationFilter,setNotificationFilter]=useState<"all"|"unread">("all");
-  const profileQuery=useApiQuery<{item?:Record<string,unknown>|null;email?:string}>(production?"/api/settings/profile":null);
+  const profileQuery=useApiQuery<{item?:Record<string,unknown>|null;email?:string}>("/api/settings/profile");
   const profileItem=profileQuery.data?.item;
   const profile={name:String(profileItem?.display_name||[profileItem?.first_name,profileItem?.last_name].filter(Boolean).join(" ")||""),identity:String(profileQuery.data?.email||""),avatar:String(profileItem?.avatar_url||"")};
   const [timerNotice,setTimerNotice]=useState<string|null>(null);
@@ -211,14 +210,7 @@ function AppShellFrame({
   useEffect(() => {
     queueMicrotask(() => {
       setDark(document.documentElement.dataset.theme === "dark");
-      try{const demo=window.localStorage.getItem("binso.demo.session")==="1";
-      const expiresAt=Number(window.localStorage.getItem("binso.demo.expiresAt")??"0");
-      const validDemo=demo&&(!expiresAt||expiresAt>Date.now());
-      setDemoSession(validDemo);
-      if(demo&&!validDemo){
-        window.localStorage.removeItem("binso.demo.session");
-        window.localStorage.removeItem("binso.demo.expiresAt");
-      }}catch{setDemoSession(false)}
+
     });
   }, []);
 
@@ -248,7 +240,7 @@ function AppShellFrame({
   useEffect(()=>{
     let active=true;
     const term=query.trim();
-    if(!production||term.length<2)return;
+    if(term.length<2)return;
     queueMicrotask(()=>{if(active)setRemoteSearch({query:term,items:[],loading:true,error:null})});
     const timer=window.setTimeout(()=>{
       apiGet<{items:SearchItem[]}>("/api/search?q="+encodeURIComponent(term))
@@ -256,16 +248,16 @@ function AppShellFrame({
         .catch(error=>{if(active)setRemoteSearch({query:term,items:[],loading:false,error:error instanceof Error?error.message:"Suche konnte nicht geladen werden."})});
     },180);
     return()=>{active=false;window.clearTimeout(timer)};
-  },[production,query]);
+  },[query]);
 
-  const searchLoading=production&&query.trim().length>=2&&(remoteSearch.query!==query.trim()||remoteSearch.loading);
+  const searchLoading=query.trim().length>=2&&(remoteSearch.query!==query.trim()||remoteSearch.loading);
   const searchError=remoteSearch.query===query.trim()?remoteSearch.error:null;
 
   function loadNotifications(){setNotificationsError(null);notificationQuery.refresh();}
 
   function openNotifications(){
     setSheet("notifications");
-    if(production) void loadNotifications();
+    void loadNotifications();
   }
 
   async function markNotificationRead(id:string){
@@ -278,7 +270,7 @@ function AppShellFrame({
 
   const unreadNotifications=notifications.filter(item=>!item.read_at).length;
 
-  const filtered=production&&query.trim().length>=2&&remoteSearch.query===query.trim()?remoteSearch.items.filter(item=>canOpen(item.href)):[];
+  const filtered=query.trim().length>=2&&remoteSearch.query===query.trim()?remoteSearch.items.filter(item=>canOpen(item.href)):[];
 
 
   useEffect(()=>{
@@ -366,7 +358,7 @@ function AppShellFrame({
       {headerPanel&&<HeaderPanel key={sheet} kind={sheet} label={sheet==="search"?"Suche":sheet==="account"?"Konto":"Benachrichtigungen"} onClose={()=>setSheet(null)}>
         {sheet==="search"&&<SearchPanel query={query} onQuery={setQuery} items={filtered} loading={searchLoading} error={searchError} recent={recentSearches} onRemember={rememberSearch} onClearRecent={()=>{setClearedSearches(recentSearches);setRecentSearches([])}} onUndoRecent={clearedSearches?()=>{setRecentSearches(clearedSearches);setClearedSearches(null)}:undefined} onClose={()=>setSheet(null)}/>}
         {sheet==="notifications"&&<NotificationPanel items={notifications} loading={notificationsLoading} error={notificationsError} filter={notificationFilter} onFilter={setNotificationFilter} onRead={id=>void markNotificationRead(id)} onRetry={()=>void loadNotifications()} onClose={()=>setSheet(null)}/>}
-        {sheet==="account"&&<AccountPanel profile={profile} demo={demoSession} logoutBusy={logoutBusy} onLogout={()=>void logout()} onClose={()=>setSheet(null)}/>}
+        {sheet==="account"&&<AccountPanel profile={profile} logoutBusy={logoutBusy} onLogout={()=>void logout()} onClose={()=>setSheet(null)}/>}
       </HeaderPanel>}
       <ActionSheet label={sheet==="docs"?"Finanzen":"Mehr"} open={!!sheet&&!headerPanel} onClose={()=>setSheet(null)}>
         <div className="action-list">

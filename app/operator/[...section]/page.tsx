@@ -8,5 +8,5 @@ export default async function Page({params}:{params:Promise<{section:string[]}>}
   const {section}=await params;
   const path=section.join('/');
   if(!validOperatorSection(path))notFound();
-  return <OperatorPage section={path} demo={access.prototype} identity={access.identity} role={access.role}/>;
+  return <OperatorPage section={path} identity={access.identity} role={access.role}/>;
 }

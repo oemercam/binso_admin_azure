@@ -36,9 +36,9 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
   const router=useRouter();
   const searchParams=useSearchParams();
   const returnTo=safeAppPath(searchParams.get("returnTo"),"/spesen");
-  const production=useBackendMode();
+
   const [person,setPerson]=useState(existing?"":searchParams.get("employeeId")??"");
-  const employeesQuery=useApiQuery<{items:Array<{id:string;first_name:string;last_name:string}>}>(production?"/api/expenses/options":"/api/demo/data?collection=employees");
+  const employeesQuery=useApiQuery<{items:Array<{id:string;first_name:string;last_name:string}>}>("/api/expenses/options");
   const availableEmployees=employeesQuery.data?.items??[];
   const [date,setDate]=useState(()=>businessDate());
   const [category,setCategory]=useState(existing?"Reise":"Reise");
@@ -70,7 +70,7 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
   const expenseFiles=filesQuery.data?.items??[];
   const [editingExpense,setEditingExpense]=useState(false),[expenseActions,setExpenseActions]=useState(false);
   const [expenseBusy,setExpenseBusy]=useState(false),[reimbursementOpen,setReimbursementOpen]=useState(false);
-  const expenseQuery=useApiQuery<{item?:Record<string,unknown>;items?:Record<string,unknown>[]}>(existing&&expenseId?(production?"/api/expenses/"+encodeURIComponent(expenseId):"/api/demo/data?collection=expenses&id="+encodeURIComponent(expenseId)):null);
+  const expenseQuery=useApiQuery<{item?:Record<string,unknown>;items?:Record<string,unknown>[]}>(existing&&expenseId?("/api/expenses/"+encodeURIComponent(expenseId)):null);
   const canApproveExpense=["owner","admin","project_manager","manager"].includes(role)&&expenseQuery.data?.item?.created_by_user_id!==sessionQuery.data?.user?.id;
   const loadingExpense=expenseQuery.loading;
   const expenseLoadError=expenseQuery.error??(existing&&expenseQuery.data&&!expenseQuery.data.item&&!expenseQuery.data.items?.[0]?"Spese wurde nicht gefunden.":null);
@@ -105,14 +105,11 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
     const issue=fileSelectionError(file,["image/png","image/jpeg","image/webp","application/pdf"],limitsConfig.maxFileUploadBytes);if(issue){setToast(issue);return;}
     receiptScanPending.current=true;setEditedExpense(true);setReceiptFile(file);setScanState("scanning");
     try{
-      if(production){
+      {
         const form=new FormData();form.append("file",file);
         const result=await apiUpload<{merchant?:string;date?:string;total?:number;currency?:string;confidence?:number;filename?:string}>("/api/expenses/scan-receipt",form);
         if(result.merchant)setMerchant(result.merchant);if(result.date)setDate(result.date);if(typeof result.total==="number")setAmount(result.total.toFixed(2));if(result.currency)setCurrency(result.currency);setScanConfidence(result.confidence??null);
         if(result.filename)setReceiptFile(new File([file],result.filename,{type:file.type,lastModified:file.lastModified}));
-      }else{
-        setMerchant("SBB CFF FFS");setDate(new Date().toLocaleDateString("en-CA"));setAmount("89.00");setCurrency("CHF");setVatRate("8.1");setScanConfidence(.96);
-        const ext=(file.name.split(".").pop()||"jpg").toLowerCase();setReceiptFile(new File([file],`${new Date().toLocaleDateString("en-CA")}_SBB-CFF-FFS_89.00-CHF.${ext}`,{type:file.type,lastModified:file.lastModified}));
       }
       setScanState("done");
     }catch(error){setScanState("error");setToast(error instanceof Error?error.message:"Beleg konnte nicht erkannt werden.");window.setTimeout(()=>setToast(null),2800)}finally{receiptScanPending.current=false;}
@@ -127,7 +124,7 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
     expenseMutationPending.current=true;setExpenseBusy(true);try{
       const payload={customerId:expenseCustomer,billable:expenseBillable,employeeId:person,merchant:merchant.trim()||description.trim()||category,expenseDate:date,category,amount:value,currency,vatRate:Number(vatRate),description,status:reviewStatus??statusMap[status]??"submitted"};
       let targetExpenseId=expenseId??createdExpenseId;let receiptUploaded=false;
-      if(production){
+      {
         if(targetExpenseId){
           if(receiptFile){const form=new FormData();form.append('file',receiptFile);form.append('purpose','expense_receipt');form.append('entityId',targetExpenseId);await apiUpload('/api/files',form);receiptUploaded=true;setReceiptFile(null);}
           const result=await apiPatch<{item:{id:string}}>("/api/expenses/"+encodeURIComponent(targetExpenseId),payload);
@@ -145,8 +142,6 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
           form.append("entityId",targetExpenseId);
           await apiUpload("/api/files",form);
         }
-      }else if(!existing){
-        appendDemoRow("expenses",[merchant.trim()||description.trim()||category,person,"CHF "+value.toLocaleString("de-CH",{minimumFractionDigits:2,maximumFractionDigits:2}),"Eingereicht"]);
       }
       expenseRecovery.clear();setSavedExpense(true);
       setToast(receiptFile?"Spese und Beleg gespeichert.":existing?"Spese gespeichert.":"Spese eingereicht.");

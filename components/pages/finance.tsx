@@ -14,13 +14,13 @@ import { RecordsControls, useRecordsController } from "../records";
 import { CreateAction,ListRow } from "../binso-ux";
 
 export function FinanceAnalysisPage() {
- const production=useBackendMode();
- const query=useApiQuery<{cash:CashStatisticsData}>(isProductionBackendEnabled()&&production?"/api/finance?view=cash":"/api/demo/finance");
+
+ const query=useApiQuery<{cash:CashStatisticsData}>("/api/finance?view=cash");
  return <AppShell title="Finanzanalyse" active="finanzen"><FinanceTabs/>{query.loading?<LoadingState><LocalizedText>{"Finanzdaten werden geladen …"}</LocalizedText></LoadingState>:query.error?<ErrorState onRetry={query.refresh}><LocalizedText>{query.error}</LocalizedText></ErrorState>:query.data?.cash?<CashStatistics data={query.data.cash} storageKey="finance-analysis"/>:<ErrorState><LocalizedText>{"Finanzdaten sind nicht verfügbar."}</LocalizedText></ErrorState>}</AppShell>;
 }
 
 export function FinancialDocumentsPage({kind,forceDemo=false}:{kind:"offer"|"invoice";forceDemo?:boolean}){
- const production=useBackendMode()&&!forceDemo;
+
  const invoice=kind==="invoice",title=invoice?"Rechnungen":"Angebote",route=invoice?"rechnungen":"angebote",placeholder=title+" suchen...";
  const chips=invoice?["Alle","Entwurf","Offen","Überfällig","Bezahlt","Storniert"]:["Alle","Entwurf","Versendet","Angenommen","Abgelehnt","Abgelaufen","Überarbeitet"];
  const columns:NonNullable<Parameters<typeof useRecordsController>[0]['columns']>=[{label:'Nummer',index:0},{label:'Kunde',index:1},{label:'Datum',index:2},{label:'Betrag',index:3,align:'right'},{label:'Status',index:5,status:true}];
@@ -29,7 +29,7 @@ export function FinancialDocumentsPage({kind,forceDemo=false}:{kind:"offer"|"inv
  const params=new URLSearchParams({kind,limit:String(pageSize),offset:String(controller.page*pageSize),order:controller.sort==='default'?'created_at.desc':sortFields[controller.sortIndex]+'.'+controller.sort});
  if(controller.query.trim())params.set('q',controller.query.trim());
  const state=Object.entries(financialStatusLabels).find(([,label])=>label===controller.activeChip)?.[0];if(state)params.set('display_status',state);
- const {data,loading,error}=useApiQuery<{items:DocumentListItem[];total?:number}>(production?`/api/documents?${params}`:`/api/demo/data?collection=documents&${params}`);
+ const {data,loading,error}=useApiQuery<{items:DocumentListItem[];total?:number}>(`/api/documents?${params}`);
  const items=data?.items??[],total=data?.total??items.length;
  return <AppShell title={title} subtitle={loading?undefined:`${total} ${title}`} active={route} actions={<RecordsControls controller={controller} placeholder={placeholder} chips={chips} columns={columns}><CreateAction href={`/${route}/neu`} label={invoice?"Neue Rechnung":"Neues Angebot"}/></RecordsControls>}><FinanceTabs/><DocumentList items={items} kind={kind} loading={loading} error={error} controller={controller} remote toolbarActions={false} showCount={false} pagination={{total,page:controller.page,pageSize,onPage:controller.setPage}}/></AppShell>;
 }
