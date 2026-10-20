@@ -292,3 +292,11 @@ beide gleichen Namen und separat genau einen leeren Platzhalter. Auswahlwechsel,
 Umbenennung und Erhalt der gewählten ID werden weiterhin geprüft. Der abhängige
 Fingerprint wird nach Abschluss aller Änderungen mit dem vorgesehenen Generator
 erneuert; keine Hashwerte werden manuell eingesetzt.
+Der Full-Lauf auf `82cb30c5` besteht die Core-Gates, meldet aber zwei weitere
+asynchrone Browser-Gegenfälle: Beim Kundenwechsel erneuert DocumentPage sein
+Verzeichnis und montiert den Editor neu; der Auswahlhelfer darf daher keine alte
+React-Control-ID für die nachfolgende Wertprüfung festhalten. Er löst das bereits
+beschriftete Feld erneut auf und prüft dessen tatsächlichen Wert. Die Dokumenten-
+Tab-Prüfung wartet auf exakt zwei reale Zeilen statt direkt nach dem Tab-Klick zu
+zählen. Beide Dokumente, gemeinsame Suche, Aktionsziele und der Read-only-Gegenfall
+bleiben unverändert vorgeschrieben. Diese Korrekturen brauchen einen neuen CI-Lauf.
