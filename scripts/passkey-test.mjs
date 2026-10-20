@@ -67,6 +67,13 @@ try{
  await assert.rejects(()=>keys.finishPasskeyRegistration(s,registration(options)),e=>e.code==='passkey_challenge_invalid','Failed verification consumes its challenge');
  options=await begin();await assert.rejects(()=>keys.finishPasskeyRegistration(s,registration(options,{uv:false})),e=>e.code==='passkey_invalid');
  options=await begin();await db.query("update app_users set password_hash=$2 where id=$1",[user,await passwords.hashPassword('Synthetic-replacement-password-123')]);await assert.rejects(()=>keys.finishPasskeyRegistration(s,registration(options)),e=>e.code==='auth_state_changed');await db.query('update app_users set password_hash=$2 where id=$1',[user,passwordHash]);
+ options=await begin();const storedProof=(await db.query('select auth_snapshot from auth_passkey_challenges where user_id=$1',[user])).rows[0].auth_snapshot;
+ assert.ok(!storedProof.includes(passwordHash)&&!storedProof.includes(encryptedSecret),'Challenge metadata never exposes the security-state fields');
+ assert.deepEqual(JSON.parse(crypto.decryptSecret(storedProof)),['passkey-auth-state-v1',user,passwordHash,true,encryptedSecret],'Existing authenticated encryption binds the precise identity and auth state');
+ const parts=storedProof.split('.'),tag=Buffer.from(parts[1],'base64url');tag[0]^=1;parts[1]=tag.toString('base64url');await db.query('update auth_passkey_challenges set auth_snapshot=$2 where user_id=$1',[user,parts.join('.')]);
+ await assert.rejects(()=>keys.finishPasskeyRegistration(s,registration(options)),e=>e.code==='auth_state_changed','Authenticated-state tampering must deny enrollment');
+ await assert.rejects(()=>keys.finishPasskeyRegistration(s,registration(options)),e=>e.code==='passkey_challenge_invalid','A tampered proof cannot be retried');
+ assert.equal((await db.query('select count(*)::int n from auth_passkeys where user_id=$1',[user])).rows[0].n,0,'No credential is stored after invalid state proof');
  options=await begin();const created=await keys.finishPasskeyRegistration(s,registration(options));assert.equal(created.ok,true);assert.equal(created.notice,'accepted');assert.equal(sent.length,1);
  assert.equal((await keys.listPasskeys(s)).length,1);assert.deepEqual(Object.keys((await keys.listPasskeys(s))[0]).sort(),['created_at','id','label','last_used_at']);
  assert.equal((await runtime(other,'other-user',false,c=>c.query('select * from auth_passkeys'))).rows.length,0,'Foreign tenant cannot read credentials');

@@ -148,3 +148,19 @@ Positiv/negativ geprüft: alle vier Zähler, erhaltene Konfliktdaten, abgelaufen
 Einladungen/Checkouts, inaktive Firmen, ungültige Metadaten und echter RLS-Fehler.
 Der Produktionsbestand ist weiterhin unbekannt, bis der freigegebene geschützte
 Lauf diese Vorprüfung ausführt. Bei Blockade kein automatisches Bereinigen.
+
+## Sicherheitsreview: Passkey-Zustandsnachweis
+
+CodeQL meldete den vorherigen schnellen Fingerabdruck der Authentifizierungsfelder
+als unzureichenden Passworthash. Dieser diente nicht der Passwortprüfung; diese
+bleibt beim bestehenden langsamen Passwortverfahren. Der kurzlebige Reauth-
+Zustandsnachweis verwendet jetzt die vorhandene authentifizierte AES-256-GCM-
+Verschlüsselung, einschliesslich Identitäts-/Versionsbindung und konstantem
+Bytevergleich nach erfolgreicher Entschlüsselung. Kein neuer Schlüssel oder
+Algorithmus-Fallback. Veränderte/tamperierte Nachweise blockieren und werden
+verbraucht; vorangegangene Änderungen an Passwort/MFA blockieren weiter. Kein
+Alert-Dismissal oder Query-Skip. Positive Entschlüsselungs-/Bindungsprüfung und
+negative GCM-Manipulations-/Replaytests ergänzen die echten WebAuthn-Nachweise.
+Alte ausstehende Zustandsnachweise sind maximal fünf Minuten gültig und schlagen
+nach dem Wechsel sicher fehl; Passkeys, Passwörter und Sitzungen werden dadurch
+nicht gelöscht. Keine zusätzliche Migration erforderlich.

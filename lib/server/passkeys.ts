@@ -1,5 +1,5 @@
 import 'server-only';
-import {createHash,randomBytes,randomUUID} from 'node:crypto';
+import {createHash,randomBytes,randomUUID,timingSafeEqual} from 'node:crypto';
 import {cookies} from 'next/headers';
 import {generateRegistrationOptions,verifyRegistrationResponse,generateAuthenticationOptions,verifyAuthenticationResponse,type RegistrationResponseJSON,type AuthenticationResponseJSON} from '@simplewebauthn/server';
 import type {PoolClient} from 'pg';
@@ -8,7 +8,7 @@ import {env} from './env';
 import {ApiError} from './http';
 import {verifyPassword} from './password';
 import {verifyTotp} from './totp';
-import {decryptSecret} from './crypto';
+import {decryptSecret,encryptSecret} from './crypto';
 import {audit} from './audit';
 import {mailLayout,sendMail} from './email';
 import {createSession,endDemoSession,type SessionUser} from './session';
@@ -17,7 +17,13 @@ import {registrationHandoff} from './registration';
 const cookieName='binso_passkey';
 const digest=(value:string)=>createHash('sha256').update(value).digest('hex');
 type AuthRow={id:string;email:string;display_name:string;password_hash:string|null;mfa_enabled:boolean;mfa_secret_enc:string|null;status:string;email_verified_at:Date|null};
-const snapshot=(row:AuthRow)=>digest(JSON.stringify([row.password_hash,row.mfa_enabled,row.mfa_secret_enc]));
+// Short-lived reauthentication state, never a password verifier. Encrypt the
+// state with existing authenticated encryption; no fast hash of security fields.
+const authState=(row:AuthRow)=>JSON.stringify(['passkey-auth-state-v1',row.id,row.password_hash,row.mfa_enabled,row.mfa_secret_enc]);
+const snapshot=(row:AuthRow)=>encryptSecret(authState(row));
+function snapshotMatches(row:AuthRow,proof:string){
+ try{const expected=Buffer.from(authState(row)),actual=Buffer.from(decryptSecret(proof));return expected.length===actual.length&&timingSafeEqual(expected,actual);}catch{return false;}
+}
 export function passkeyRelyingParty(){
  let url:URL;try{url=new URL(env.appUrl);}catch{throw new ApiError(503,'passkey_unavailable','Passkeys sind nicht konfiguriert.');}
  if(url.protocol!=='https:'&&!(env.appMode!=='production'&&url.protocol==='http:'&&url.hostname==='localhost'))throw new ApiError(503,'passkey_unavailable','Passkeys benötigen eine sichere konfigurierte Herkunft.');
@@ -73,7 +79,7 @@ export async function finishPasskeyRegistration(s:SessionUser,response:Registrat
  if(!checked.verified)throw new ApiError(400,'passkey_invalid','Der Passkey konnte nicht bestätigt werden.');
  const event=await withTenant(s.organizationId,s.userId,async c=>{
   const user=(await c.query<AuthRow>(`select u.* from app_users u join auth_sessions a on a.user_id=u.id where u.id=$1 and u.status='active' and a.id=$2 and a.expires_at>now() for update of u,a`,[s.userId,s.sessionId])).rows[0];
-  if(!user||snapshot(user)!==challenge.auth_snapshot)throw new ApiError(403,'auth_state_changed','Bitte die Sicherheitsprüfung erneut durchführen.');
+  if(!user||!snapshotMatches(user,challenge.auth_snapshot))throw new ApiError(403,'auth_state_changed','Bitte die Sicherheitsprüfung erneut durchführen.');
   const {credential,credentialDeviceType,credentialBackedUp}=checked.registrationInfo;
   await c.query('insert into auth_passkeys(credential_id,user_id,organization_id,public_key,counter,label,transports,device_type,backed_up) values($1,$2,$3,$4,$5,$6,$7,$8,$9)',[credential.id,s.userId,s.organizationId,Buffer.from(credential.publicKey),credential.counter,challenge.label,credential.transports??[],credentialDeviceType,credentialBackedUp]);
   return recordNotice(c,s,'added');
