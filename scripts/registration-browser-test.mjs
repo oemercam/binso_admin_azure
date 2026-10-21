@@ -16,6 +16,8 @@ let browser;
 // Synthetic routing must never be bypassed by a claimed service-worker client.
 // Installed-PWA/offline behavior is exercised separately with workers enabled.
 const evidence=[];
+const {default:PDFDocument}=await import('pdfkit');
+const previewPdf=await new Promise((resolve,reject)=>{const pdf=new PDFDocument({size:'A4'}),chunks=[];pdf.on('data',chunk=>chunks.push(chunk));pdf.on('end',()=>resolve(Buffer.concat(chunks)));pdf.on('error',reject);pdf.text('Synthetic immutable offer PDF; no actual order.');pdf.end();});
 const syntheticEmail='verification.'+'long-address.'.repeat(9)+'test@example.invalid';
 async function assertReviewGeometry(sheet,page,caseName){
  try{await assertChoiceGeometry(sheet.locator('.form-check'));}
@@ -96,11 +98,13 @@ try{
    assert.equal(route.request().method(),'POST');assert.equal(route.request().url().includes(token),false,'The capability must never enter an HTTP URL');assert.equal(route.request().headers().cookie,undefined,'Public proof never borrows the tenant login');
    const body=route.request().postDataJSON();assert.equal(body.token,token);
    if(body.action==='read')return route.fulfill({json:{number:'AN-SYNTHETIC-001',version:2,status,recipientHint:'r…@fixture.invalid',company:{name:'Synthetic Company'},document:{issue_date:'2026-10-21',valid_until:'2099-12-31',currency:'CHF',subtotal:100,vat_amount:8.1,total:108.1,document_snapshot:{intro:'Synthetic offer; no actual order.',closing:'Synthetic conditions.'},items:[{id:'fixture',description:'Synthetic service with a deliberately long description for narrow screens',quantity:1,unit:'Stück',unit_price:100,line_total:100}]},messages:[]}});
+   if(body.action==='pdf')return route.fulfill({contentType:'application/pdf',body:previewPdf});
    if(body.action==='respond'){assert.equal(body.confirmed,true);assert.equal(body.code,'123456');decisions++;status='accepted';await new Promise(resolve=>setTimeout(resolve,100));}
    return route.fulfill({json:{ok:true}});
   });
   await page.goto(base+'/angebot#'+token);await page.getByRole('heading',{name:'Angebot AN-SYNTHETIC-001'}).waitFor();assert.equal(decisions,0,'Opening alone never decides an offer');
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);
+  await page.getByRole('button',{name:'PDF ansehen',exact:true}).click();const preview=page.getByRole('dialog',{name:'Angebots-PDF',exact:true});await preview.waitFor();await preview.locator('canvas[data-rendered-page="1"]').waitFor();assert.equal(await preview.getByRole('button',{name:'Teilen oder herunterladen',exact:true}).isEnabled(),true);await preview.getByRole('button',{name:'Vorschau schliessen',exact:true}).click();await preview.waitFor({state:'hidden'});
   await page.getByRole('button',{name:'Annehmen',exact:true}).click();const dialog=page.getByRole('dialog',{name:'Angebot annehmen',exact:true});await dialog.waitFor();
   assert.equal(await dialog.getByRole('button',{name:'Code anfordern',exact:true}).isDisabled(),true,'Acceptance requires an explicit authority/terms acknowledgement');await dialog.getByRole('checkbox').check();await dialog.getByRole('button',{name:'Code anfordern',exact:true}).click();
   await dialog.getByRole('textbox',{name:'Bestätigungscode',exact:true}).fill('123456');

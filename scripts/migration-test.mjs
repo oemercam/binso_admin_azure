@@ -625,7 +625,9 @@ try{
  await assert.rejects(()=>portal.respondToOffer(token,{...response,code:'invalid'}),e=>e.code==='code_invalid');
  assert.equal((await db.query('select attempts from offer_recipient_codes where link_id=$1 order by created_at desc limit 1',[capability.link.id])).rows[0].attempts,1,'A wrong code persists its attempt instead of rolling back');
  const second=await globalThis.__processTransaction(demo,c=>portal.createOfferLink(c,session,issuedVersion,'other@fixture.invalid')),secondToken=new URL(second.url).hash.slice(1);
+ await db.query("update offer_public_links set locale='fr' where id=$1",[second.link.id]);
  await portal.requestOfferCode(secondToken,'accept');
+ assert.equal(globalThis.__publicMails.at(-1).subject,'Devis '+issuedVersion.number+' – Code de confirmation','Recipient confirmation mail follows the captured link locale');
  // Cross-link fixture must use a different numeric code (random codes may coincide).
  const differentCode=String((Number(acceptCode)+1)%1000000).padStart(6,'0');
  await db.query('update offer_recipient_codes set code_hash=$2 where link_id=$1',[second.link.id,createHmac('sha256','synthetic-public-offer-secret').update(second.link.id+'|accept|'+differentCode).digest('hex')]);

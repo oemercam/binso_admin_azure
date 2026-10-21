@@ -70,3 +70,11 @@ Der Windows-Bash-Fixture-Harness für Readiness kann lokal an POSIX-Pfadsemantik
 - Echte isolierte PGlite-Migrationen mit eingeschränktem Runtime-RLS und Geschäftsprozessen erfolgreich. Auth-/Upload-/Archivierungs-Gegenfälle, WebAuthn-Kryptografie und Recovery-Einmaligkeit erfolgreich. Zusätzliche echte PostgreSQL-/HTTP-Parallelfälle sind für CI vorbereitet, lokal mangels PostgreSQL nicht ausgeführt.
 - Ein gezielter Chromium/Edge-Browserlauf: 15 Fälle erfolgreich (390/1440, Light/Dark, fünf Registrierungssprachen, Abbruch/Navigation/Netzwerkfehler, explizite öffentliche Angebotsannahme mit Code und Doppelklickschutz). Synthetische UI-Transportfixtures, keine echte Kundenmail. Mobile Screens gerendert geprüft; öffentliche Freigabe und vereinfachte Registrierungsseite sind ausdrücklich abgeleitete Ansichten.
 - GitHub-Gesamtqualifikation noch ausstehend. Kein Merge, keine produktive Migration und kein Deployment dieses neuen Pakets.
+
+### Nachgewiesene CI-Korrekturen im selben Paket
+
+Der eingeschränkte PostgreSQL-HTTP-Lauf hat fehlende Testzuordnungen sichtbar gemacht: Projektleiter/Manager/Mitarbeiter erhalten nur die synthetischen Kunden-/Auftragszuordnungen der Positivfälle; ein zusätzlicher nicht zugeordneter Kunde bleibt 404. Keine Produktionsrechte erweitert. Der Folgelauf bestätigte 80 echte Schreib-/Persistenzfälle, alle acht Leserollen, fremde IDs, Dokument-/Dateizugriff und zwei parallele öffentliche Entscheidungen unter NOBYPASSRLS.
+
+Das anonyme API-Gate prüft den öffentlichen Empfängerendpunkt separat: GET 405 und ungültige Capability für Lesen/PDF/Code/Entscheidung jeweils 410. Dabei wurde die fehlende await-Fehlerbehandlung des öffentlichen PDF-Pfads korrigiert (vorher 500 bei ungültigem Token). Die privaten 140 Methoden bleiben weiterhin auf 401/403 beziehungsweise die ausdrücklich stillgelegten Methoden geprüft.
+
+Bestätigungs-/Antwortmails übernehmen nun die gespeicherte Empfängersprache; ein französischer Mailfall ist direkt im tatsächlichen Angebotsservice geprüft. Zusätzlich verhindert die Client-Identitätsgrenze eine Wiederholung einer geschützten Mutation, wenn während der Sicherheitsbestätigung die Sitzung/Firma gewechselt wurde. Ein negativer Regressionstest weist nach, dass dann keine zweite Schreibanfrage gesendet wird. Die öffentliche PDF-Vorschau erhält einen echten synthetischen PDF-Browserfall.

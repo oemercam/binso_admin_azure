@@ -24,7 +24,7 @@ export function FreshAuthenticationDialog(){
   try{
    if(!method){const result=await apiPost<{method:'email'|'totp'}>('/api/auth/reauthenticate',{action:'challenge',password});if(current.current===target)setMethod(result.method);}
    else{const result=await apiPost<{ok:boolean}>('/api/auth/reauthenticate',{action:'confirm',password,code});if(result.ok!==true)throw new Error('Sicherheitsbestätigung konnte nicht bestätigt werden.');if(current.current===target){clear();target?.confirm();}}
-  }catch(failure){setError(failure instanceof Error?failure.message:'Sicherheitsbestätigung fehlgeschlagen.');}finally{pending.current=false;setBusy(false);}
+  }catch(failure){if(current.current===target)setError(failure instanceof Error?failure.message:'Sicherheitsbestätigung fehlgeschlagen.');}finally{pending.current=false;setBusy(false);}
  };
  return <FormSheet open={!!request} label="Aktion bestätigen" busy={busy} onClose={cancel}><form className="settings-form" onSubmit={event=>{event.preventDefault();void submit();}}>
   <p><LocalizedText>{request?.action??'Geschützte Einstellungen ändern'}</LocalizedText></p>

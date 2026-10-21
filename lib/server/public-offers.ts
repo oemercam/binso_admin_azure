@@ -6,7 +6,7 @@ import {ApiError} from './http';
 import {encryptSecret,decryptSecret} from './crypto';
 import {env} from './env';
 import {businessDate} from '@/lib/financial-status';
-import {asLocale} from '@/lib/locales';
+import {asLocale,translateMessage} from '@/lib/locales';
 import {authorize} from './rbac';
 import {audit} from './audit';
 import type {SessionUser} from './session';
@@ -74,9 +74,11 @@ export async function requestOfferCode(token:string,action:'accept'|'decline'|'q
   await c.query('update offer_recipient_codes set consumed_at=now() where organization_id=$1 and link_id=$2 and consumed_at is null',[link.organization_id,link.id]);
   const code=String(randomInt(0,1000000)).padStart(6,'0');
   await c.query("insert into offer_recipient_codes(organization_id,link_id,action,code_hash,expires_at) values($1,$2,$3,$4,now()+interval '10 minutes')",[link.organization_id,link.id,action,codeHash(link.id,action,code)]);
-  return {recipient:link.recipient,number:version.number,version:version.version,code};
+  return {recipient:link.recipient,number:version.number,version:version.version,code,locale:asLocale(link.locale),company:version.company};
  });
- const result=await sendMail({to:delivery.recipient,subject:'Angebot '+delivery.number+' – Bestätigungscode',text:`Dein Code für Angebot ${delivery.number}, Version ${delivery.version}: ${delivery.code}. 10 Minuten gültig. Nur für die von dir angeforderte Aktion verwenden.`,html:mailLayout('Aktion zum Angebot bestätigen',`<p>Angebot ${escape(delivery.number)}, Version ${delivery.version}</p><p><strong>${delivery.code}</strong></p><p>10 Minuten gültig. Nur für die von dir angeforderte Aktion verwenden.</p>`)});
+ const t=(value:string)=>translateMessage(value,delivery.locale),title=t('Aktion zum Angebot bestätigen');
+ const detail=t('Bestätigungscode')+': '+delivery.code+'. '+t('Angebot')+' '+delivery.number+' · '+t('Version')+' '+delivery.version+'. '+t('10 Minuten gültig. Nur für die von dir angeforderte Aktion verwenden.');
+ const result=await sendMail({to:delivery.recipient,senderName:String(delivery.company.legal_name||delivery.company.name||'Binso One').slice(0,160),subject:t('Angebot')+' '+delivery.number+' – '+t('Bestätigungscode'),text:detail,html:mailLayout(title,'<p>'+escape(detail)+'</p>',undefined,delivery.locale,{name:String(delivery.company.legal_name||delivery.company.name||'Binso One')})});
  if(!result.delivered)throw new ApiError(503,'mail_unavailable','Der Bestätigungscode konnte nicht versendet werden.');
  return {ok:true};
 }
@@ -97,14 +99,15 @@ export async function respondToOffer(token:string,input:{action:'accept'|'declin
   await c.query("insert into in_app_notifications(organization_id,user_id,kind,title,body,href) values($1,$2,'system',$3,$4,$5)",[link.organization_id,session.userId,input.action==='question'?'Frage zum Angebot':input.action==='accept'?'Angebot angenommen':'Angebot abgelehnt',version.number+' · Version '+version.version,'/angebote/'+encodeURIComponent(version.number)]);
   await audit(c,{organizationId:link.organization_id,userName:'Verifizierter Angebotsempfänger',action:'offer.public.'+input.action,entityType:'quote',entityId:version.quote_id,metadata:{version:version.version,linkId:link.id,recipientVerified:true}});
   const emailPreference=(await c.query<{email:boolean}>("select email from notification_preferences where organization_id=$1 and user_id=$2 and kind='Angebote'",[link.organization_id,session.userId])).rows[0];
-  return {ok:true,confirmation:'recorded',recipient:link.recipient,number:version.number,version:version.version,linkId:link.id,employeeEmail:emailPreference?.email===true?session.email:null};
+  return {ok:true,confirmation:'recorded',recipient:link.recipient,number:version.number,version:version.version,linkId:link.id,employeeEmail:emailPreference?.email===true?session.email:null,locale:asLocale(link.locale),url:offerLinkUrl(link),company:version.company};
  });
  if('invalid' in outcome)throw new ApiError(403,'code_invalid','Der Code ist ungültig oder abgelaufen.');
  if(!('recipient' in outcome)||typeof outcome.recipient!=='string')return {ok:true,confirmation:outcome.confirmation};
- const title=input.action==='accept'?'Angebot angenommen':input.action==='decline'?'Angebot abgelehnt':'Frage gespeichert';
- const detail=`${outcome.number} · Version ${outcome.version}\n${input.body}`;
+ const t=(value:string)=>translateMessage(value,outcome.locale);
+ const title=t(input.action==='accept'?'Angebot angenommen':input.action==='decline'?'Angebot abgelehnt':'Frage gespeichert');
+ const detail=`${outcome.number} · ${t('Version')} ${outcome.version}\n${input.body}`;
  let accepted=false;
- try{accepted=(await sendMail({to:outcome.recipient,subject:title+' – '+outcome.number,text:detail,html:mailLayout(title,'<p>'+escape(detail).replace(/\n/g,'<br>')+'</p>')})).delivered;}catch{/* Decision is already committed. Never replay it because email is uncertain. */}
+ try{accepted=(await sendMail({to:outcome.recipient,senderName:String(outcome.company.legal_name||outcome.company.name||'Binso One').slice(0,160),subject:title+' – '+outcome.number,text:detail+'\n\n'+outcome.url,html:mailLayout(title,'<p>'+escape(detail).replace(/\n/g,'<br>')+'</p>',{label:t('Angebot und Verlauf ansehen'),url:outcome.url},outcome.locale,{name:String(outcome.company.legal_name||outcome.company.name||'Binso One')})})).delivered;}catch{/* Decision is already committed. Never replay it because email is uncertain. */}
  if(outcome.employeeEmail)try{await sendMail({to:outcome.employeeEmail,subject:title+' – '+outcome.number,text:detail,html:mailLayout(title,'<p>'+escape(detail).replace(/\n/g,'<br>')+'</p>')});}catch{/* The in-app notification remains the source of truth. */}
  try{await withPublicOffer(token,async(c,{link})=>{await c.query("insert into offer_public_events(organization_id,link_id,kind,actor,request_key) values($1,$2,$3,'provider',$4) on conflict(link_id,request_key) do nothing",[link.organization_id,link.id,accepted?'provider_accepted':'provider_unconfirmed','confirmation:'+input.requestKey]);});}catch{/* Concurrent revocation must not undo or obscure the completed decision. */}
  return {ok:true,confirmation:outcome.confirmation,notification:accepted?'provider_accepted':'unconfirmed'};

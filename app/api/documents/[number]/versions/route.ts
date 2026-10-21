@@ -1,3 +1,4 @@
+import {asLocale,translateMessage} from '@/lib/locales';
 import {NextRequest} from 'next/server';
 import {apiError,ApiError,assertSameOrigin,json,readJson} from '@/lib/server/http';
 import {requireSession} from '@/lib/server/session';
@@ -51,11 +52,12 @@ export async function POST(request:NextRequest,{params}:{params:Promise<{number:
   if(prior){if(prior.kind!=='reply'||prior.body!==text)throw new ApiError(409,'key_conflict','Diese Versandkennung wurde anders verwendet.');return null;}
   await c.query("insert into offer_public_events(organization_id,link_id,kind,body,actor,created_by_user_id,request_key) values($1,$2,'reply',$3,'employee',$4,$5)",[s.organizationId,link.id,text,s.userId,key]);
   await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'offer.reply.recorded',entityType:'quote',entityId:quote.id,metadata:{linkId:link.id}});
-  return {to:link.recipient,url:offerLinkUrl(link),linkId:link.id};
+  return {to:link.recipient,url:offerLinkUrl(link),linkId:link.id,locale:asLocale(link.locale)};
  });
  if(!mail)return json({ok:true,notification:'not_repeated'});
+ const t=(value:string)=>translateMessage(value,mail.locale);
  let accepted=false;
- try{accepted=(await sendMail({to:mail.to,subject:'Antwort zu Angebot '+number,text:text+'\n\n'+mail.url,html:mailLayout('Antwort zu Angebot '+number,'<p>'+text.replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]!)).replace(/\n/g,'<br>')+'</p>',{label:'Angebot und Verlauf ansehen',url:mail.url})})).delivered;}catch{/* Keep recorded reply; an ambiguous send must never be replayed automatically. */}
+ try{accepted=(await sendMail({to:mail.to,subject:t('Antwort zu Angebot')+' '+number,text:text+'\n\n'+mail.url,html:mailLayout(t('Antwort zu Angebot')+' '+number,'<p>'+text.replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]!)).replace(/\n/g,'<br>')+'</p>',{label:t('Angebot und Verlauf ansehen'),url:mail.url},mail.locale)})).delivered;}catch{/* Keep recorded reply; an ambiguous send must never be replayed automatically. */}
  await withTenant(s.organizationId,s.userId,c=>c.query("insert into offer_public_events(organization_id,link_id,kind,actor,request_key) values($1,$2,$3,'provider',$4) on conflict(link_id,request_key) do nothing",[s.organizationId,mail.linkId,accepted?'provider_accepted':'provider_unconfirmed','mail:'+key]));
  return json({ok:true,notification:accepted?'provider_accepted':'unconfirmed'});
 }catch(error){return apiError(error);}}

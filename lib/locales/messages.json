@@ -1055,8 +1055,8 @@
     "Offerta – testo conclusivo"
   ],
   "Angebot angenommen": [
-    "Quote accepted",
-    "Devis accepté",
+    "Offer accepted",
+    "Offre acceptée",
     "Offerta accettata"
   ],
   "Angebot erstellen": [
@@ -13493,5 +13493,40 @@
     "PDF requested (unverified)",
     "PDF demandé (non confirmé)",
     "PDF richiesto (non confermato)"
+  ],
+  "Aktion zum Angebot bestätigen": [
+    "Confirm offer action",
+    "Confirmer l’action sur l’offre",
+    "Confermare l’azione sull’offerta"
+  ],
+  "10 Minuten gültig. Nur für die von dir angeforderte Aktion verwenden.": [
+    "Valid for 10 minutes. Use only for the action you requested.",
+    "Valable 10 minutes. À utiliser uniquement pour l’action demandée.",
+    "Valido per 10 minuti. Utilizzare solo per l’azione richiesta."
+  ],
+  "Angebot und Verlauf ansehen": [
+    "View offer and history",
+    "Voir l’offre et l’historique",
+    "Vedere offerta e cronologia"
+  ],
+  "Angebot ansehen und beantworten": [
+    "View and respond to offer",
+    "Voir l’offre et répondre",
+    "Vedere l’offerta e rispondere"
+  ],
+  "Antwort zu Angebot": [
+    "Reply to offer",
+    "Réponse à l’offre",
+    "Risposta all’offerta"
+  ],
+  "Angebot abgelehnt": [
+    "Offer declined",
+    "Offre refusée",
+    "Offerta rifiutata"
+  ],
+  "Frage gespeichert": [
+    "Question saved",
+    "Question enregistrée",
+    "Domanda salvata"
   ]
 }

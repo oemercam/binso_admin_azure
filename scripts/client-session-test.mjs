@@ -89,6 +89,9 @@ try{
  const cancelledChange=backend.apiPatch('/api/settings/documents',{});const cancellation=assert.rejects(cancelledChange,error=>error.code==='fresh_authentication_cancelled');
  for(let i=0;i<20&&!proofRequest;i++)await new Promise(setImmediate);assert.ok(proofRequest);proofRequest.cancel();await cancellation;assert.equal(attempts,1,'Cancellation never repeats a write');
  proofRequest=null;attempts=0;globalThis.fetch=async()=>{attempts++;throw new Error('synthetic network outage')};await assert.rejects(backend.apiPatch('/api/settings/documents',{}),error=>error.code==='network_unavailable');assert.equal(attempts,1);assert.equal(proofRequest,null,'An uncertain transport failure is not a fresh-auth denial');
+ proofRequest=null;attempts=0;globalThis.fetch=async()=>{attempts++;return new Response(JSON.stringify({error:'fresh_authentication_required'}),{status:403})};
+ const staleChange=backend.apiPatch('/api/settings/documents',{iban:'old-tenant-synthetic'}),staleDenial=assert.rejects(staleChange,error=>error.code==='session_changed');
+ for(let i=0;i<20&&!proofRequest;i++)await new Promise(setImmediate);assert.ok(proofRequest);cache.invalidateClientSession();proofRequest.confirm();await staleDenial;assert.equal(attempts,1,'A session/tenant change during confirmation must prevent the write before replay');
  const events=await import(eventsUrl),beforeProof=events.dataRevision([]);globalThis.fetch=async()=>Response.json({ok:true});await backend.apiPost('/api/auth/reauthenticate',{action:'confirm',password:'synthetic',code:'000000'});assert.equal(events.dataRevision([]),beforeProof,'A proof does not invalidate the original pending mutation identity fence');
  console.log('Fresh confirmation: explicit continuation only, one replay, cancellation and network denial without retry, and stable identity fence passed.');
 

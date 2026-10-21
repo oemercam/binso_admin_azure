@@ -73,11 +73,13 @@ export function requestFreshAuthentication(action:string):Promise<void>{
 }
 
 async function fetchApi(path:string,options:RequestInit={}):Promise<Response>{
+  const revision=dataRevision([]);
   try{
     const fetchOnce=()=>fetch(path,{...options,signal:options.signal??AbortSignal.timeout(options.method&&options.method!=="GET"?30000:15000)});
     const response=await fetchOnce();
     if(response.status===403&&(await response.clone().json().catch(()=>null))?.error==='fresh_authentication_required'){
       await requestFreshAuthentication(path.startsWith('/api/settings/team')?'Zugriffsrechte ändern':path.startsWith('/api/auth/')?'Sicherheitseinstellungen ändern':'Geschützte Einstellungen ändern');
+      if(revision!==dataRevision([]))throw new ClientApiError('Die Sitzung wurde geändert. Bitte den gespeicherten Stand prüfen.','session_changed',401);
       // Only the explicit pre-mutation denial is replayed, once, after the user
       // confirms. Network/timeouts and uncertain writes are never retried here.
       return await fetchOnce();
