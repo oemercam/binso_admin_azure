@@ -1,0 +1,4232 @@
+{
+  "routes": [
+    {
+      "route": "/agb",
+      "file": "app/agb/page.tsx",
+      "surface": "public",
+      "roles": [
+        "anonymous",
+        "authenticated"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/angebot",
+      "file": "app/angebot/page.tsx",
+      "surface": "public",
+      "roles": [
+        "anonymous",
+        "authenticated"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/angebote/neu",
+      "file": "app/angebote/neu/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/angebote",
+      "file": "app/angebote/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/angebote/[id]",
+      "file": "app/angebote/[id]/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/auftragsbearbeitung",
+      "file": "app/auftragsbearbeitung/page.tsx",
+      "surface": "public",
+      "roles": [
+        "anonymous",
+        "authenticated"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/belege",
+      "file": "app/belege/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/benachrichtigungen",
+      "file": "app/benachrichtigungen/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/berichte",
+      "file": "app/berichte/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/dashboard",
+      "file": "app/dashboard/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/datenschutz",
+      "file": "app/datenschutz/page.tsx",
+      "surface": "public",
+      "roles": [
+        "anonymous",
+        "authenticated"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/demo",
+      "file": "app/demo/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/dev/ux-lab",
+      "file": "app/dev/ux-lab/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/einladung",
+      "file": "app/einladung/page.tsx",
+      "surface": "public",
+      "roles": [
+        "anonymous",
+        "authenticated"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/einstellungen/abonnement",
+      "file": "app/einstellungen/abonnement/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/einstellungen/benachrichtigungen",
+      "file": "app/einstellungen/benachrichtigungen/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/einstellungen/darstellung",
+      "file": "app/einstellungen/darstellung/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/einstellungen/datenschutz",
+      "file": "app/einstellungen/datenschutz/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/einstellungen/dokumente",
+      "file": "app/einstellungen/dokumente/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/einstellungen/firma",
+      "file": "app/einstellungen/firma/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/einstellungen/konto",
+      "file": "app/einstellungen/konto/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/einstellungen",
+      "file": "app/einstellungen/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/einstellungen/sicherheit",
+      "file": "app/einstellungen/sicherheit/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/einstellungen/sprache",
+      "file": "app/einstellungen/sprache/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/einstellungen/team",
+      "file": "app/einstellungen/team/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/einstellungen/zeiterfassung",
+      "file": "app/einstellungen/zeiterfassung/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/email-bestaetigen",
+      "file": "app/email-bestaetigen/page.tsx",
+      "surface": "public",
+      "roles": [
+        "anonymous",
+        "authenticated"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/finanzen/analyse",
+      "file": "app/finanzen/analyse/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/finanzen",
+      "file": "app/finanzen/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/impressum",
+      "file": "app/impressum/page.tsx",
+      "surface": "public",
+      "roles": [
+        "anonymous",
+        "authenticated"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/kunden/neu",
+      "file": "app/kunden/neu/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/kunden",
+      "file": "app/kunden/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/kunden/[id]/bearbeiten",
+      "file": "app/kunden/[id]/bearbeiten/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/kunden/[id]",
+      "file": "app/kunden/[id]/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/login",
+      "file": "app/login/page.tsx",
+      "surface": "public",
+      "roles": [
+        "anonymous",
+        "authenticated"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/mitarbeiter/neu",
+      "file": "app/mitarbeiter/neu/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/mitarbeiter",
+      "file": "app/mitarbeiter/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/mitarbeiter/[id]",
+      "file": "app/mitarbeiter/[id]/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/offline",
+      "file": "app/offline/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/operator/login",
+      "file": "app/operator/login/page.tsx",
+      "surface": "operator",
+      "roles": [
+        "platform_owner",
+        "platform_admin",
+        "platform_support",
+        "platform_billing",
+        "platform_auditor"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/operator",
+      "file": "app/operator/page.tsx",
+      "surface": "operator",
+      "roles": [
+        "platform_owner",
+        "platform_admin",
+        "platform_support",
+        "platform_billing",
+        "platform_auditor"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/operator/wallboard",
+      "file": "app/operator/wallboard/page.tsx",
+      "surface": "operator",
+      "roles": [
+        "platform_owner",
+        "platform_admin",
+        "platform_support",
+        "platform_billing",
+        "platform_auditor"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/operator/[...section]",
+      "file": "app/operator/[...section]/page.tsx",
+      "surface": "operator",
+      "roles": [
+        "platform_owner",
+        "platform_admin",
+        "platform_support",
+        "platform_billing",
+        "platform_auditor"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/",
+      "file": "app/page.tsx",
+      "surface": "public",
+      "roles": [
+        "anonymous",
+        "authenticated"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/passwort-vergessen",
+      "file": "app/passwort-vergessen/page.tsx",
+      "surface": "public",
+      "roles": [
+        "anonymous",
+        "authenticated"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/passwort-zuruecksetzen",
+      "file": "app/passwort-zuruecksetzen/page.tsx",
+      "surface": "public",
+      "roles": [
+        "anonymous",
+        "authenticated"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/portal/login",
+      "file": "app/portal/login/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/portal",
+      "file": "app/portal/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/portal/registrieren",
+      "file": "app/portal/registrieren/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/preise",
+      "file": "app/preise/page.tsx",
+      "surface": "public",
+      "roles": [
+        "anonymous",
+        "authenticated"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/preview/dashboard",
+      "file": "app/preview/dashboard/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/preview/rechnungen",
+      "file": "app/preview/rechnungen/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/preview/zeit",
+      "file": "app/preview/zeit/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/produkt",
+      "file": "app/produkt/page.tsx",
+      "surface": "public",
+      "roles": [
+        "anonymous",
+        "authenticated"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/produkte/neu",
+      "file": "app/produkte/neu/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/produkte",
+      "file": "app/produkte/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/produkte/[id]",
+      "file": "app/produkte/[id]/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/projekte/neu",
+      "file": "app/projekte/neu/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/projekte",
+      "file": "app/projekte/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/projekte/[id]",
+      "file": "app/projekte/[id]/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/rechnungen/neu",
+      "file": "app/rechnungen/neu/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/rechnungen",
+      "file": "app/rechnungen/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/rechnungen/[id]",
+      "file": "app/rechnungen/[id]/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/registrieren",
+      "file": "app/registrieren/page.tsx",
+      "surface": "public",
+      "roles": [
+        "anonymous",
+        "authenticated"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/spesen/neu",
+      "file": "app/spesen/neu/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/spesen",
+      "file": "app/spesen/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/spesen/[id]",
+      "file": "app/spesen/[id]/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/support/neu",
+      "file": "app/support/neu/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/support",
+      "file": "app/support/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/support/[id]",
+      "file": "app/support/[id]/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/unterauftragsbearbeiter",
+      "file": "app/unterauftragsbearbeiter/page.tsx",
+      "surface": "public",
+      "roles": [
+        "anonymous",
+        "authenticated"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/wartung",
+      "file": "app/wartung/page.tsx",
+      "surface": "public",
+      "roles": [
+        "anonymous",
+        "authenticated"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/willkommen",
+      "file": "app/willkommen/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/zahlungen/neu",
+      "file": "app/zahlungen/neu/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/zahlungen",
+      "file": "app/zahlungen/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/zahlungen/[id]",
+      "file": "app/zahlungen/[id]/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    },
+    {
+      "route": "/zeit",
+      "file": "app/zeit/page.tsx",
+      "surface": "tenant",
+      "roles": [
+        "owner",
+        "admin",
+        "finance",
+        "hr",
+        "project_manager",
+        "manager",
+        "member",
+        "reader"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts",
+      "dataSource": "API-/RLS-Pfad pro Route verifizieren",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen"
+    }
+  ],
+  "components": [
+    "components/app-chrome.tsx",
+    "components/app-shell.tsx",
+    "components/app-start.tsx",
+    "components/auth-workspace.tsx",
+    "components/avatar.tsx",
+    "components/binso-ux.tsx",
+    "components/cash-statistics.tsx",
+    "components/confirm-dialog.tsx",
+    "components/customer-app-layout.tsx",
+    "components/desktop-navigation.tsx",
+    "components/directory-select.tsx",
+    "components/document-list.tsx",
+    "components/document-settings.tsx",
+    "components/documents.tsx",
+    "components/entity-files.tsx",
+    "components/file-upload.tsx",
+    "components/form-wizard.tsx",
+    "components/fresh-authentication-dialog.tsx",
+    "components/header-panel-content.tsx",
+    "components/header-panel.tsx",
+    "components/legal-page.tsx",
+    "components/locale-switcher.tsx",
+    "components/maintenance-control.tsx",
+    "components/marketing.tsx",
+    "components/monitoring-chart.tsx",
+    "components/monitoring.tsx",
+    "components/monthly-time-report.tsx",
+    "components/offer-history.tsx",
+    "components/operator.tsx",
+    "components/pages/customers.tsx",
+    "components/pages/dashboard.tsx",
+    "components/pages/employees.tsx",
+    "components/pages/expenses.tsx",
+    "components/pages/finance.tsx",
+    "components/pages/notifications.tsx",
+    "components/pages/payments.tsx",
+    "components/pages/products.tsx",
+    "components/pages/projects.tsx",
+    "components/pages/reports.tsx",
+    "components/pages/settings.tsx",
+    "components/pages/shared.tsx",
+    "components/pages/support.tsx",
+    "components/pages/time.tsx",
+    "components/passkey-login.tsx",
+    "components/passkey-settings.tsx",
+    "components/password-input.tsx",
+    "components/pdf-preview.tsx",
+    "components/privacy-consent.tsx",
+    "components/project-form.tsx",
+    "components/public-offer.tsx",
+    "components/pwa-register.tsx",
+    "components/records.tsx",
+    "components/registration/registration-page.tsx",
+    "components/security-settings-page.tsx",
+    "components/select-control.tsx",
+    "components/session-data-boundary.tsx",
+    "components/settings-navigation.tsx",
+    "components/statistics.tsx",
+    "components/team-settings.tsx",
+    "components/theme-runtime.tsx",
+    "components/time-settings.tsx",
+    "components/timer-resume-notice.tsx",
+    "components/ui.tsx",
+    "components/ux-lab.tsx",
+    "components/web-vitals-reporter.tsx",
+    "components/workforce-assignments.tsx"
+  ],
+  "apis": [
+    "app/api/auth/invitation/route.ts",
+    "app/api/auth/login/route.ts",
+    "app/api/auth/logout/route.ts",
+    "app/api/auth/mfa/confirm/route.ts",
+    "app/api/auth/mfa/route.ts",
+    "app/api/auth/mfa/setup/route.ts",
+    "app/api/auth/passkeys/options/route.ts",
+    "app/api/auth/passkeys/route.ts",
+    "app/api/auth/passkeys/verify/route.ts",
+    "app/api/auth/password/route.ts",
+    "app/api/auth/reauthenticate/route.ts",
+    "app/api/auth/recover/route.ts",
+    "app/api/auth/register/route.ts",
+    "app/api/auth/resend-verification/route.ts",
+    "app/api/auth/session/route.ts",
+    "app/api/auth/sessions/route.ts",
+    "app/api/auth/sessions/[id]/route.ts",
+    "app/api/auth/verify-email/route.ts",
+    "app/api/billing/catalog/route.ts",
+    "app/api/billing/checkout/route.ts",
+    "app/api/billing/portal/route.ts",
+    "app/api/billing/webhook/route.ts",
+    "app/api/customers/duplicates/route.ts",
+    "app/api/customers/route.ts",
+    "app/api/customers/[id]/activity/route.ts",
+    "app/api/customers/[id]/contacts/route.ts",
+    "app/api/customers/[id]/contacts/[contactId]/route.ts",
+    "app/api/customers/[id]/documents/route.ts",
+    "app/api/customers/[id]/route.ts",
+    "app/api/dashboard/route.ts",
+    "app/api/demo/dashboard/route.ts",
+    "app/api/demo/data/route.ts",
+    "app/api/demo/finance/route.ts",
+    "app/api/demo/platform-finance/route.ts",
+    "app/api/demo/session/route.ts",
+    "app/api/documents/preview/route.ts",
+    "app/api/documents/route.ts",
+    "app/api/documents/[number]/credits/route.ts",
+    "app/api/documents/[number]/pdf/route.ts",
+    "app/api/documents/[number]/refunds/route.ts",
+    "app/api/documents/[number]/revision/route.ts",
+    "app/api/documents/[number]/route.ts",
+    "app/api/documents/[number]/send/route.ts",
+    "app/api/documents/[number]/status/route.ts",
+    "app/api/documents/[number]/versions/route.ts",
+    "app/api/employees/route.ts",
+    "app/api/employees/[id]/route.ts",
+    "app/api/expenses/billing/route.ts",
+    "app/api/expenses/options/route.ts",
+    "app/api/expenses/route.ts",
+    "app/api/expenses/scan-receipt/route.ts",
+    "app/api/expenses/[id]/reimbursement/route.ts",
+    "app/api/expenses/[id]/route.ts",
+    "app/api/files/route.ts",
+    "app/api/files/[id]/download/route.ts",
+    "app/api/files/[id]/route.ts",
+    "app/api/finance/overview/route.ts",
+    "app/api/finance/route.ts",
+    "app/api/health/ready/route.ts",
+    "app/api/health/route.ts",
+    "app/api/integrations/status/route.ts",
+    "app/api/notifications/route.ts",
+    "app/api/notifications/[id]/route.ts",
+    "app/api/operator/accounts/route.ts",
+    "app/api/operator/accounts/[id]/route.ts",
+    "app/api/operator/announcements/route.ts",
+    "app/api/operator/audit/route.ts",
+    "app/api/operator/customers/route.ts",
+    "app/api/operator/customers/[id]/route.ts",
+    "app/api/operator/dashboard/route.ts",
+    "app/api/operator/demo-session/route.ts",
+    "app/api/operator/finance/route.ts",
+    "app/api/operator/integrations/email-test/route.ts",
+    "app/api/operator/logout/route.ts",
+    "app/api/operator/maintenance/route.ts",
+    "app/api/operator/monitoring/route.ts",
+    "app/api/operator/payments/route.ts",
+    "app/api/operator/restrictions/route.ts",
+    "app/api/operator/restrictions/[id]/route.ts",
+    "app/api/operator/sso/callback/route.ts",
+    "app/api/operator/tickets/route.ts",
+    "app/api/operator/tickets/[id]/messages/route.ts",
+    "app/api/operator/tickets/[id]/route.ts",
+    "app/api/operator/users/route.ts",
+    "app/api/payments/route.ts",
+    "app/api/payments/[id]/route.ts",
+    "app/api/products/route.ts",
+    "app/api/products/[id]/route.ts",
+    "app/api/projects/route.ts",
+    "app/api/projects/[id]/route.ts",
+    "app/api/public/offer/route.ts",
+    "app/api/reports/route.ts",
+    "app/api/search/route.ts",
+    "app/api/settings/company/route.ts",
+    "app/api/settings/documents/route.ts",
+    "app/api/settings/notifications/route.ts",
+    "app/api/settings/profile/route.ts",
+    "app/api/settings/subscription/route.ts",
+    "app/api/settings/team/invitations/route.ts",
+    "app/api/settings/team/invitations/[id]/route.ts",
+    "app/api/settings/team/members/[userId]/route.ts",
+    "app/api/support/tickets/route.ts",
+    "app/api/support/tickets/[id]/messages/route.ts",
+    "app/api/support/tickets/[id]/route.ts",
+    "app/api/telemetry/web-vitals/route.ts",
+    "app/api/time-entries/billing/route.ts",
+    "app/api/time-entries/options/route.ts",
+    "app/api/time-entries/policy/route.ts",
+    "app/api/time-entries/route.ts",
+    "app/api/time-entries/[id]/route.ts",
+    "app/api/time-tracker/route.ts",
+    "app/api/workforce-assignments/route.ts"
+  ],
+  "migrations": [
+    "database/migrations/0001_baseline.sql",
+    "database/migrations/0002_auth_memberships.sql",
+    "database/migrations/0003_registration_onboarding.sql",
+    "database/migrations/0004_subscription_billing.sql",
+    "database/migrations/0005_stripe_payment_provider.sql",
+    "database/migrations/0006_production_saas.sql",
+    "database/migrations/0007_subscription_lifecycle.sql",
+    "database/migrations/0008_production_completion.sql",
+    "database/migrations/0009_multitenant_rbac_business_model.sql",
+    "database/migrations/0010_product_simplicity_devsecops.sql",
+    "database/migrations/0011_saas_platform_foundation.sql",
+    "database/migrations/0012_v74_production_hardening.sql",
+    "database/migrations/0013_v75_complete_product_foundation.sql",
+    "database/migrations/0014_v79_demo_access.sql",
+    "database/migrations/0015_v82_normalized_business_core.sql",
+    "database/migrations/0016_self_service_signup.sql",
+    "database/migrations/0017_v150_code_schema_alignment.sql",
+    "database/migrations/0018_v151_organization_profile_alignment.sql",
+    "database/migrations/0019_v163_productivity_ux.sql",
+    "database/migrations/0020_customer_sales_lifecycle.sql",
+    "database/migrations/0021_tenant_branding_documents_payments.sql",
+    "database/migrations/0022_receipt_recognition.sql",
+    "database/migrations/0023_finance_and_demo_fixture.sql",
+    "database/migrations/0024_finance_integrity.sql",
+    "database/migrations/0025_business_api_integrity.sql",
+    "database/migrations/0026_demo_business_fixture.sql",
+    "database/migrations/0027_support_operator_integrity.sql",
+    "database/migrations/0028_user_profile_persistence.sql",
+    "database/migrations/0029_operator_persistence.sql",
+    "database/migrations/0030_notification_preference_isolation.sql",
+    "database/migrations/0031_business_field_persistence.sql",
+    "database/migrations/0032_demo_invoice_payment_setup.sql",
+    "database/migrations/0033_invoice_qr_reference.sql",
+    "database/migrations/0034_stripe_checkout_integrity.sql",
+    "database/migrations/0035_email_otp_and_mfa_enrollment.sql",
+    "database/migrations/0036_entra_operator_identity.sql",
+    "database/migrations/0037_demo_document_presentation.sql",
+    "database/migrations/0038_timer_customer_context.sql",
+    "database/migrations/0039_process_completion.sql",
+    "database/migrations/0040_customer_contact_names.sql",
+    "database/migrations/0041_business_process.sql",
+    "database/migrations/0042_demo_business_process.sql",
+    "database/migrations/0043_demo_customer_profiles.sql",
+    "database/migrations/0044_time_entry_precision.sql",
+    "database/migrations/0045_document_snapshots.sql",
+    "database/migrations/0046_file_business_relations.sql",
+    "database/migrations/0047_runtime_auth_bootstrap.sql",
+    "database/migrations/0048_file_scan_evidence.sql",
+    "database/migrations/0049_canonical_demo_template_read.sql",
+    "database/migrations/0050_platform_maintenance.sql",
+    "database/migrations/0051_document_reminders.sql",
+    "database/migrations/0051_runtime_maintenance_permissions.sql",
+    "database/migrations/0052_invoice_refunds.sql",
+    "database/migrations/0053_offer_revisions.sql",
+    "database/migrations/0054_document_language_snapshot.sql",
+    "database/migrations/0055_workforce_assignments_and_reports.sql",
+    "database/migrations/0056_customer_type.sql",
+    "database/migrations/0057_v254_plan_entitlements.sql",
+    "database/migrations/0058_member_module_profiles.sql",
+    "database/migrations/0059_solo_owner_time.sql",
+    "database/migrations/0060_single_company_identity.sql",
+    "database/migrations/0061_submitted_time_review.sql",
+    "database/migrations/0062_passkey_credentials.sql",
+    "database/migrations/0063_invitation_metadata_boundary.sql",
+    "database/migrations/0064_retire_demo_bootstrap.sql",
+    "database/migrations/0065_notification_read_receipts.sql",
+    "database/migrations/0066_retire_template_workforce_role.sql",
+    "database/migrations/0067_scoped_fresh_authentication.sql",
+    "database/migrations/0068_offer_versions_and_public_responses.sql",
+    "database/migrations/0069_attachment_archival.sql",
+    "database/migrations/0070_issued_invoice_pdf.sql"
+  ]
+}

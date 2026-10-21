@@ -4,8 +4,8 @@
   "counts": {
     "apis": 112,
     "consumers": 37,
-    "migrations": 70,
-    "tables": 105
+    "migrations": 71,
+    "tables": 106
   },
   "apis": [
     {
@@ -64,14 +64,14 @@
         },
         {
           "callee": "withPlatform",
-          "line": 38,
+          "line": 41,
           "arguments": [
-            "async c=>{\n  const row=(await c.query(\"select * from auth_tokens where token_hash=$1 and token_type='invitation' and consumed_at is null and expires_at>now() for update\",[digest(token)])).rows[0];\n  if(!row)throw new ApiError(400,\"invitation_invalid\",\"Die Einladung ist ungültig oder abgelaufen.\");\n  await c.query(\"select set_config('app.organization_id',$1,true)\",[row.organization_id]);\n  const organization=(await c.query('select * from read_invitation_organization($1,true)',[digest(token)])).rows[0];\n  if(!organization||!['trial','active','grace_period'].includes(organization.status))throw new ApiError(409,'organization_unavailable','Das Firmenkonto ist derzeit nicht verfügbar.');\n  const inv=(await c.query(\"select * from organization_invitations where id::text=$1 and organization_id=$2 and status='pending' and expires_at>now() for update\",[row.metadata.invitation_id,row.organization_id])).rows[0];\n  if(!inv)throw new ApiError(400,\"invitation_invalid\",\"Die Einladung ist ungültig oder abgelaufen.\");\n  const capacity=(await c.query(\"select e.max_users,s.plan,(select count(*) from organization_memberships m where m.organization_id=e.organization_id and m.status='active') occupied from organization_entitlements e join organization_subscriptions s on s.organization_id=e.organization_id where e.organization_id=$1\",[row.organization_id])).rows[0];\n  const capacityPlan=canonicalPlanId(capacity?.plan);\n   if(!capacity||!capacityPlan)throw new ApiError(409,'user_limit','Das Benutzerlimit konnte nicht geprüft werden.');\n   if(capacityReached(Number(capacity.occupied),effectiveUserLimit(capacityPlan,capacity.max_users)))throw new ApiError(409,'user_limit','Das Benutzerlimit ist erreicht.');\n  const user=(await c.query(\"select status,password_hash from app_users where id=$1 for update\",[row.user_id])).rows[0];\n  await c.query(\"select set_config('app.user_id',$1,true)\",[row.user_id]);\n  if((await c.query(\"select 1 from organization_memberships where user_id=$1 and organization_id<>$2 limit 1\",[row.user_id,row.organization_id])).rowCount)throw new ApiError(409,'identity_unavailable','Diese Einladung kann mit diesem Konto nicht angenommen werden.');\n  if(user.status==='active'){if(!await verifyPassword(password,user.password_hash))throw new ApiError(403,\"credentials_invalid\",\"Das bestehende Passwort stimmt nicht.\");}\n  else if(user.status==='invited'&&passwordHash)await c.query(\"update app_users set password_hash=$2,status='active',display_name=$3,email_verified_at=now(),updated_at=now() where id=$1\",[row.user_id,passwordHash,cleanText(b.name,200)||row.email]);\n  else throw new ApiError(409,\"account_unavailable\",\"Dieses Konto kann nicht aktiviert werden.\");\n  const updated=await c.query(\"update organization_memberships set status='active',role=$3,module_profile=$4 where organization_id=$1 and user_id=$2 and status='invited' returning user_id\",[row.organization_id,row.user_id,inv.role,inv.module_profile??'standard']);\n  if(!updated.rowCount)throw new ApiError(409,\"membership_changed\",\"Die Teamzuordnung hat sich geändert.\");\n  await c.query(\"update organization_invitations set status='accepted' where id=$1\",[inv.id]);\n  await c.query(\"update auth_tokens set consumed_at=now() where id=$1\",[row.id]);\n }"
+            "async c=>{\n  const row=(await c.query(\"select * from auth_tokens where token_hash=$1 and token_type='invitation' and consumed_at is null and expires_at>now() for update\",[digest(token)])).rows[0];\n  if(!row)throw new ApiError(400,\"invitation_invalid\",\"Die Einladung ist ungültig oder abgelaufen.\");\n  await c.query(\"select set_config('app.organization_id',$1,true)\",[row.organization_id]);\n  const organization=(await c.query('select * from read_invitation_organization($1,true)',[digest(token)])).rows[0];\n  if(!organization||!['trial','active','grace_period'].includes(organization.status))throw new ApiError(409,'organization_unavailable','Das Firmenkonto ist derzeit nicht verfügbar.');\n  const inv=(await c.query(\"select * from organization_invitations where id::text=$1 and organization_id=$2 and status='pending' and expires_at>now() for update\",[row.metadata.invitation_id,row.organization_id])).rows[0];\n  if(!inv)throw new ApiError(400,\"invitation_invalid\",\"Die Einladung ist ungültig oder abgelaufen.\");\n  const capacity=(await c.query(\"select e.max_users,s.plan,(select count(*) from organization_memberships m where m.organization_id=e.organization_id and m.status='active') occupied from organization_entitlements e join organization_subscriptions s on s.organization_id=e.organization_id where e.organization_id=$1\",[row.organization_id])).rows[0];\n  const capacityPlan=canonicalPlanId(capacity?.plan);\n   if(!capacity||!capacityPlan)throw new ApiError(409,'user_limit','Das Benutzerlimit konnte nicht geprüft werden.');\n   if(capacityReached(Number(capacity.occupied),effectiveUserLimit(capacityPlan,capacity.max_users)))throw new ApiError(409,'user_limit','Das Benutzerlimit ist erreicht.');\n  const user=(await c.query(\"select status,password_hash from app_users where id=$1 for update\",[row.user_id])).rows[0];\n  await c.query(\"select set_config('app.user_id',$1,true)\",[row.user_id]);\n  if((await c.query(\"select 1 from organization_memberships where user_id=$1 and organization_id<>$2 limit 1\",[row.user_id,row.organization_id])).rowCount)throw new ApiError(409,'identity_unavailable','Diese Einladung kann mit diesem Konto nicht angenommen werden.');\n  if(user.status==='active'){if(!await verifyPassword(password,user.password_hash))throw new ApiError(403,\"credentials_invalid\",\"Das bestehende Passwort stimmt nicht.\");}\n  else if(user.status==='invited'&&passwordHash)await c.query(\"update app_users set password_hash=$2,status='active',display_name=$3,first_name=coalesce($4,first_name),last_name=coalesce($5,last_name),email_verified_at=now(),updated_at=now() where id=$1\",[row.user_id,passwordHash,structured?[firstName,lastName].join(' '):cleanText(b.name,200)||row.email,structured?firstName:null,structured?lastName:null]);\n  else throw new ApiError(409,\"account_unavailable\",\"Dieses Konto kann nicht aktiviert werden.\");\n  const updated=await c.query(\"update organization_memberships set status='active',role=$3,module_profile=$4 where organization_id=$1 and user_id=$2 and status='invited' returning user_id\",[row.organization_id,row.user_id,inv.role,inv.module_profile??'standard']);\n  if(!updated.rowCount)throw new ApiError(409,\"membership_changed\",\"Die Teamzuordnung hat sich geändert.\");\n  await c.query(\"update organization_invitations set status='accepted' where id=$1\",[inv.id]);\n  await c.query(\"update auth_tokens set consumed_at=now() where id=$1\",[row.id]);\n }"
           ]
         },
         {
           "callee": "c.query",
-          "line": 39,
+          "line": 42,
           "arguments": [
             "\"select * from auth_tokens where token_hash=$1 and token_type='invitation' and consumed_at is null and expires_at>now() for update\"",
             "[digest(token)]"
@@ -79,7 +79,7 @@
         },
         {
           "callee": "c.query",
-          "line": 41,
+          "line": 44,
           "arguments": [
             "\"select set_config('app.organization_id',$1,true)\"",
             "[row.organization_id]"
@@ -87,7 +87,7 @@
         },
         {
           "callee": "c.query",
-          "line": 42,
+          "line": 45,
           "arguments": [
             "'select * from read_invitation_organization($1,true)'",
             "[digest(token)]"
@@ -95,7 +95,7 @@
         },
         {
           "callee": "c.query",
-          "line": 44,
+          "line": 47,
           "arguments": [
             "\"select * from organization_invitations where id::text=$1 and organization_id=$2 and status='pending' and expires_at>now() for update\"",
             "[row.metadata.invitation_id,row.organization_id]"
@@ -103,7 +103,7 @@
         },
         {
           "callee": "c.query",
-          "line": 46,
+          "line": 49,
           "arguments": [
             "\"select e.max_users,s.plan,(select count(*) from organization_memberships m where m.organization_id=e.organization_id and m.status='active') occupied from organization_entitlements e join organization_subscriptions s on s.organization_id=e.organization_id where e.organization_id=$1\"",
             "[row.organization_id]"
@@ -111,7 +111,7 @@
         },
         {
           "callee": "c.query",
-          "line": 50,
+          "line": 53,
           "arguments": [
             "\"select status,password_hash from app_users where id=$1 for update\"",
             "[row.user_id]"
@@ -119,7 +119,7 @@
         },
         {
           "callee": "c.query",
-          "line": 51,
+          "line": 54,
           "arguments": [
             "\"select set_config('app.user_id',$1,true)\"",
             "[row.user_id]"
@@ -127,7 +127,7 @@
         },
         {
           "callee": "c.query",
-          "line": 52,
+          "line": 55,
           "arguments": [
             "\"select 1 from organization_memberships where user_id=$1 and organization_id<>$2 limit 1\"",
             "[row.user_id,row.organization_id]"
@@ -135,15 +135,15 @@
         },
         {
           "callee": "c.query",
-          "line": 54,
+          "line": 57,
           "arguments": [
-            "\"update app_users set password_hash=$2,status='active',display_name=$3,email_verified_at=now(),updated_at=now() where id=$1\"",
-            "[row.user_id,passwordHash,cleanText(b.name,200)||row.email]"
+            "\"update app_users set password_hash=$2,status='active',display_name=$3,first_name=coalesce($4,first_name),last_name=coalesce($5,last_name),email_verified_at=now(),updated_at=now() where id=$1\"",
+            "[row.user_id,passwordHash,structured?[firstName,lastName].join(' '):cleanText(b.name,200)||row.email,structured?firstName:null,structured?lastName:null]"
           ]
         },
         {
           "callee": "c.query",
-          "line": 56,
+          "line": 59,
           "arguments": [
             "\"update organization_memberships set status='active',role=$3,module_profile=$4 where organization_id=$1 and user_id=$2 and status='invited' returning user_id\"",
             "[row.organization_id,row.user_id,inv.role,inv.module_profile??'standard']"
@@ -151,7 +151,7 @@
         },
         {
           "callee": "c.query",
-          "line": 58,
+          "line": 61,
           "arguments": [
             "\"update organization_invitations set status='accepted' where id=$1\"",
             "[inv.id]"
@@ -159,7 +159,7 @@
         },
         {
           "callee": "c.query",
-          "line": 59,
+          "line": 62,
           "arguments": [
             "\"update auth_tokens set consumed_at=now() where id=$1\"",
             "[row.id]"
@@ -730,7 +730,7 @@
       "evidence": [
         {
           "callee": "query",
-          "line": 39,
+          "line": 42,
           "arguments": [
             "\"select 1 from app_users where lower(email)=lower($1) limit 1\"",
             "[email]"
@@ -1170,7 +1170,6 @@
         "lib/financial-status.ts",
         "lib/money.ts",
         "lib/server/audit.ts",
-        "lib/qr-bill.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
@@ -1222,7 +1221,6 @@
         "lib/financial-status.ts",
         "lib/money.ts",
         "lib/server/audit.ts",
-        "lib/qr-bill.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
@@ -1274,7 +1272,6 @@
         "lib/financial-status.ts",
         "lib/money.ts",
         "lib/server/audit.ts",
-        "lib/qr-bill.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
@@ -1318,7 +1315,6 @@
         "lib/server/repositories/business-api.ts",
         "lib/financial-status.ts",
         "lib/money.ts",
-        "lib/qr-bill.ts",
         "lib/server/database.ts",
         "lib/business-list-query.ts",
         "lib/server/repositories/operator-customer-overview.ts",
@@ -1416,8 +1412,7 @@
         "lib/server/business-idempotency.ts",
         "lib/server/repositories/business-api.ts",
         "lib/financial-status.ts",
-        "lib/money.ts",
-        "lib/qr-bill.ts"
+        "lib/money.ts"
       ],
       "evidence": [
         {
@@ -1459,7 +1454,6 @@
         "lib/server/repositories/business-api.ts",
         "lib/financial-status.ts",
         "lib/money.ts",
-        "lib/qr-bill.ts",
         "lib/server/validation.ts"
       ],
       "evidence": [
@@ -1513,7 +1507,6 @@
         "lib/financial-status.ts",
         "lib/money.ts",
         "lib/server/audit.ts",
-        "lib/qr-bill.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts"
       ],
@@ -1720,12 +1713,12 @@
         "lib/financial-status.ts",
         "lib/money.ts",
         "lib/server/audit.ts",
-        "lib/qr-bill.ts",
         "lib/server/document-logo.ts",
         "lib/server/storage.ts",
         "lib/server/document-pdf.ts",
         "lib/locales/index.ts",
         "lib/locales/config.ts",
+        "lib/qr-bill.ts",
         "lib/server/file-access.ts"
       ],
       "evidence": [
@@ -1740,7 +1733,7 @@
           "arguments": [
             "s.organizationId",
             "s.userId",
-            "async c=>{\n  const doc=(await listApiBusiness(c,s,'documents','number=eq.'+encodeURIComponent(number)))[0];\n  if(!doc)throw new Response('Not found',{status:404});\n  authorize(s,doc.kind==='invoice'?'invoices:read':'sales:read');await requireModuleEntitlement(s.organizationId,doc.kind==='invoice'?'rechnungen':'offerten');\n  if(doc.kind==='offer'&&doc.status!=='draft'){\n   const version=(await c.query('select pdf from offer_versions where organization_id=$1 and quote_id=$2 and version=$3',[s.organizationId,doc.id,doc.offer_version])).rows[0];\n   if(version)return Buffer.from(version.pdf);\n  }\n  const company=(await c.query('select * from organizations where id=$1',[s.organizationId])).rows[0];\n  return documentPdf(doc,company,await documentLogo(c,s.organizationId,doc,company));\n }"
+            "async c=>{\n  const doc=(await listApiBusiness(c,s,'documents','number=eq.'+encodeURIComponent(number)))[0];\n  if(!doc)throw new Response('Not found',{status:404});\n  authorize(s,doc.kind==='invoice'?'invoices:read':'sales:read');await requireModuleEntitlement(s.organizationId,doc.kind==='invoice'?'rechnungen':'offerten');\n  if(doc.kind==='invoice'&&doc.status!=='draft'){\n   const issued=(await c.query('select pdf from invoice_versions where organization_id=$1 and invoice_id=$2',[s.organizationId,doc.id])).rows[0];if(issued)return Buffer.from(issued.pdf);\n  }\n  if(doc.kind==='offer'&&doc.status!=='draft'){\n   const version=(await c.query('select pdf from offer_versions where organization_id=$1 and quote_id=$2 and version=$3',[s.organizationId,doc.id,doc.offer_version])).rows[0];\n   if(version)return Buffer.from(version.pdf);\n  }\n  const company=(await c.query('select * from organizations where id=$1',[s.organizationId])).rows[0];\n  return documentPdf(doc,company,await documentLogo(c,s.organizationId,doc,company));\n }"
           ]
         },
         {
@@ -1755,13 +1748,21 @@
           "callee": "c.query",
           "line": 16,
           "arguments": [
+            "'select pdf from invoice_versions where organization_id=$1 and invoice_id=$2'",
+            "[s.organizationId,doc.id]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 19,
+          "arguments": [
             "'select pdf from offer_versions where organization_id=$1 and quote_id=$2 and version=$3'",
             "[s.organizationId,doc.id,doc.offer_version]"
           ]
         },
         {
           "callee": "c.query",
-          "line": 19,
+          "line": 22,
           "arguments": [
             "'select * from organizations where id=$1'",
             "[s.organizationId]"
@@ -1842,11 +1843,11 @@
         "lib/server/repositories/business-api.ts",
         "lib/financial-status.ts",
         "lib/money.ts",
-        "lib/qr-bill.ts",
         "lib/server/offer-versions.ts",
         "lib/server/document-pdf.ts",
         "lib/locales/index.ts",
         "lib/locales/config.ts",
+        "lib/qr-bill.ts",
         "lib/server/document-logo.ts",
         "lib/server/storage.ts",
         "lib/server/file-access.ts"
@@ -1892,7 +1893,6 @@
         "lib/financial-status.ts",
         "lib/money.ts",
         "lib/server/audit.ts",
-        "lib/qr-bill.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
@@ -1979,7 +1979,7 @@
           "arguments": [
             "s.organizationId",
             "s.userId",
-            "async c=>{\n  const {row,kind}=await lockDocument(c,s,number);\n  const prior=(await c.query('select * from document_deliveries where organization_id=$1 and request_key=$2',[s.organizationId,key])).rows[0];\n  if(prior){if(prior.recipient!==recipient||prior.document_id!==row.id||prior.purpose!==purpose||prior.subject!==subject||prior.message!==message)throw new ApiError(409,'key_conflict','Die Versandkennung wurde bereits verwendet.');if(prior.status==='sent')return {sent:true};throw new ApiError(409,'delivery_unconfirmed','Dieser Versand ist noch nicht bestätigt. Prüfe den Versandstatus, bevor du erneut sendest.');}\n  if(row.status==='draft'){\n   if(kind!=='offer'||purpose!=='document'||b.issueConfirmed!==true)throw new ApiError(409,'draft_not_issued','Bitte das Dokument zuerst prüfen und ausstellen. Entwürfe werden nicht versendet.');\n   await changeDocumentStatus(c,s,number,'issue','Explicitly confirmed for email dispatch');row.status='sent';\n  }\n  if(['cancelled','declined','expired','revised'].includes(row.status))throw new ApiError(409,'document_locked','Dieses Dokument kann nicht versendet werden.');\n  if((await c.query(\"select id from document_deliveries where organization_id=$1 and document_id=$2 and status='sending'\",[s.organizationId,row.id])).rowCount)throw new ApiError(409,'delivery_pending','Ein Versand dieses Dokuments ist noch nicht bestätigt.');\n  const document=(await listApiBusiness(c,s,'documents','id=eq.'+row.id+'&kind=eq.'+kind))[0];\n  let reminder:{stage:number;amount:number;deadline:string}|undefined;\n  if(purpose==='reminder'){\n   const history=(await c.query(\"select reminder_stage stage,status,payment_deadline::text deadline,(completed_at at time zone 'Europe/Zurich')::date::text completed_at from document_deliveries where organization_id=$1 and document_id=$2 and purpose='reminder'\",[s.organizationId,row.id])).rows;\n   const plan=planPaymentReminder(document,history);\n   if('error' in plan)throw new ApiError(409,plan.error,plan.error==='reminder_not_due'?'Nur überfällige offene Rechnungen können gemahnt werden.':plan.error==='reminder_too_soon'?'Die letzte Zahlungsfrist ist noch nicht abgelaufen.':plan.error==='reminder_history_invalid'?'Die Mahnhistorie muss vor dem Versand geprüft werden.':'Die vorgesehenen Mahnstufen sind abgeschlossen.');\n   reminder=plan;\n  }\n  const company=(await c.query('select * from organizations where id=$1',[s.organizationId])).rows[0];\n  const version=kind==='offer'?await sealOfferVersion(c,s,row) as OfferVersion:null;\n  const publicLink=version?await createOfferLink(c,s,version,recipient):null;\n  const pdf=version?Buffer.from(version.pdf):await documentPdf(document,company,await documentLogo(c,s.organizationId,document,company));const id=randomUUID();\n  await c.query(\"insert into document_deliveries(id,organization_id,kind,document_id,recipient,status,request_key,created_by_user_id,purpose,reminder_stage,balance_amount,payment_deadline) values($1,$2,$3,$4,$5,'sending',$6,$7,$8,$9,$10,$11)\",[id,s.organizationId,kind,row.id,recipient,key,s.userId,purpose,reminder?.stage??null,reminder?.amount??null,reminder?.deadline??null]);\n  await c.query('update document_deliveries set subject=$3,message=$4,offer_version_id=$5,public_link_id=$6 where organization_id=$1 and id=$2',[s.organizationId,id,subject,message,version?.id??null,publicLink?.link.id??null]);\n  const verifiedReplyTo=(await c.query(\"select u.email from app_users u join organization_memberships m on m.user_id=u.id where m.organization_id=$1 and m.status='active' and u.status='active' and u.email_verified_at is not null and lower(u.email)=lower($2) limit 1\",[s.organizationId,company.mail_reply_to||s.email])).rows[0]?.email;\n  return {sent:false,id,kind,document,pdf,company,reminder,publicLink,verifiedReplyTo};\n }"
+            "async c=>{\n  const {row,kind}=await lockDocument(c,s,number);\n  const prior=(await c.query('select * from document_deliveries where organization_id=$1 and request_key=$2',[s.organizationId,key])).rows[0];\n  if(prior){if(prior.recipient!==recipient||prior.document_id!==row.id||prior.purpose!==purpose||prior.subject!==subject||prior.message!==message)throw new ApiError(409,'key_conflict','Die Versandkennung wurde bereits verwendet.');if(prior.status==='sent')return {sent:true};throw new ApiError(409,'delivery_unconfirmed','Dieser Versand ist noch nicht bestätigt. Prüfe den Versandstatus, bevor du erneut sendest.');}\n  if(row.status==='draft'){\n   if(kind!=='offer'||purpose!=='document'||b.issueConfirmed!==true)throw new ApiError(409,'draft_not_issued','Bitte das Dokument zuerst prüfen und ausstellen. Entwürfe werden nicht versendet.');\n   await changeDocumentStatus(c,s,number,'issue','Explicitly confirmed for email dispatch');row.status='sent';\n  }\n  if(['cancelled','declined','expired','revised'].includes(row.status))throw new ApiError(409,'document_locked','Dieses Dokument kann nicht versendet werden.');\n  if((await c.query(\"select id from document_deliveries where organization_id=$1 and document_id=$2 and status='sending'\",[s.organizationId,row.id])).rowCount)throw new ApiError(409,'delivery_pending','Ein Versand dieses Dokuments ist noch nicht bestätigt.');\n  const document=(await listApiBusiness(c,s,'documents','id=eq.'+row.id+'&kind=eq.'+kind))[0];\n  let reminder:{stage:number;amount:number;deadline:string}|undefined;\n  if(purpose==='reminder'){\n   const history=(await c.query(\"select reminder_stage stage,status,payment_deadline::text deadline,(completed_at at time zone 'Europe/Zurich')::date::text completed_at from document_deliveries where organization_id=$1 and document_id=$2 and purpose='reminder'\",[s.organizationId,row.id])).rows;\n   const plan=planPaymentReminder(document,history);\n   if('error' in plan)throw new ApiError(409,plan.error,plan.error==='reminder_not_due'?'Nur überfällige offene Rechnungen können gemahnt werden.':plan.error==='reminder_too_soon'?'Die letzte Zahlungsfrist ist noch nicht abgelaufen.':plan.error==='reminder_history_invalid'?'Die Mahnhistorie muss vor dem Versand geprüft werden.':'Die vorgesehenen Mahnstufen sind abgeschlossen.');\n   reminder=plan;\n  }\n  const company=(await c.query('select * from organizations where id=$1',[s.organizationId])).rows[0];\n  const version=kind==='offer'?await sealOfferVersion(c,s,row) as OfferVersion:null;\n  const publicLink=version?await createOfferLink(c,s,version,recipient):null;\n  const issued=kind==='invoice'&&!reminder?(await c.query('select pdf from invoice_versions where organization_id=$1 and invoice_id=$2',[s.organizationId,row.id])).rows[0]:null;\n  const pdf=version?Buffer.from(version.pdf):issued?Buffer.from(issued.pdf):await documentPdf(document,company,await documentLogo(c,s.organizationId,document,company));const id=randomUUID();\n  await c.query(\"insert into document_deliveries(id,organization_id,kind,document_id,recipient,status,request_key,created_by_user_id,purpose,reminder_stage,balance_amount,payment_deadline) values($1,$2,$3,$4,$5,'sending',$6,$7,$8,$9,$10,$11)\",[id,s.organizationId,kind,row.id,recipient,key,s.userId,purpose,reminder?.stage??null,reminder?.amount??null,reminder?.deadline??null]);\n  await c.query('update document_deliveries set subject=$3,message=$4,offer_version_id=$5,public_link_id=$6 where organization_id=$1 and id=$2',[s.organizationId,id,subject,message,version?.id??null,publicLink?.link.id??null]);\n  const verifiedReplyTo=(await c.query(\"select u.email from app_users u join organization_memberships m on m.user_id=u.id where m.organization_id=$1 and m.status='active' and u.status='active' and u.email_verified_at is not null and lower(u.email)=lower($2) limit 1\",[s.organizationId,company.mail_reply_to||s.email])).rows[0]?.email;\n  return {sent:false,id,kind,document,pdf,company,reminder,publicLink,verifiedReplyTo};\n }"
           ]
         },
         {
@@ -2016,7 +2016,15 @@
         },
         {
           "callee": "c.query",
-          "line": 50,
+          "line": 49,
+          "arguments": [
+            "'select pdf from invoice_versions where organization_id=$1 and invoice_id=$2'",
+            "[s.organizationId,row.id]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 51,
           "arguments": [
             "\"insert into document_deliveries(id,organization_id,kind,document_id,recipient,status,request_key,created_by_user_id,purpose,reminder_stage,balance_amount,payment_deadline) values($1,$2,$3,$4,$5,'sending',$6,$7,$8,$9,$10,$11)\"",
             "[id,s.organizationId,kind,row.id,recipient,key,s.userId,purpose,reminder?.stage??null,reminder?.amount??null,reminder?.deadline??null]"
@@ -2024,7 +2032,7 @@
         },
         {
           "callee": "c.query",
-          "line": 51,
+          "line": 52,
           "arguments": [
             "'update document_deliveries set subject=$3,message=$4,offer_version_id=$5,public_link_id=$6 where organization_id=$1 and id=$2'",
             "[s.organizationId,id,subject,message,version?.id??null,publicLink?.link.id??null]"
@@ -2032,7 +2040,7 @@
         },
         {
           "callee": "c.query",
-          "line": 52,
+          "line": 53,
           "arguments": [
             "\"select u.email from app_users u join organization_memberships m on m.user_id=u.id where m.organization_id=$1 and m.status='active' and u.status='active' and u.email_verified_at is not null and lower(u.email)=lower($2) limit 1\"",
             "[s.organizationId,company.mail_reply_to||s.email]"
@@ -2040,7 +2048,7 @@
         },
         {
           "callee": "withTenant",
-          "line": 61,
+          "line": 62,
           "arguments": [
             "s.organizationId",
             "s.userId",
@@ -2049,7 +2057,7 @@
         },
         {
           "callee": "withTenant",
-          "line": 71,
+          "line": 72,
           "arguments": [
             "s.organizationId",
             "s.userId",
@@ -2058,7 +2066,7 @@
         },
         {
           "callee": "c.query",
-          "line": 71,
+          "line": 72,
           "arguments": [
             "\"update document_deliveries set status='failed',completed_at=now() where organization_id=$1 and id=$2\"",
             "[s.organizationId,delivery.id]"
@@ -2066,7 +2074,7 @@
         },
         {
           "callee": "withTenant",
-          "line": 75,
+          "line": 76,
           "arguments": [
             "s.organizationId",
             "s.userId",
@@ -2075,7 +2083,7 @@
         },
         {
           "callee": "c.query",
-          "line": 76,
+          "line": 77,
           "arguments": [
             "\"update document_deliveries set status='sent',completed_at=now() where organization_id=$1 and id=$2\"",
             "[s.organizationId,delivery.id]"
@@ -2083,7 +2091,7 @@
         },
         {
           "callee": "c.query",
-          "line": 78,
+          "line": 79,
           "arguments": [
             "`update ${table} set status=case when status='draft' then 'sent' else status end,updated_at=now() where organization_id=$1 and id=$2`",
             "[s.organizationId,delivery.document!.id]"
@@ -2414,7 +2422,6 @@
         "lib/financial-status.ts",
         "lib/money.ts",
         "lib/server/audit.ts",
-        "lib/qr-bill.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
@@ -2477,7 +2484,6 @@
         "lib/financial-status.ts",
         "lib/money.ts",
         "lib/server/audit.ts",
-        "lib/qr-bill.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
@@ -2522,7 +2528,6 @@
         "lib/financial-status.ts",
         "lib/money.ts",
         "lib/server/audit.ts",
-        "lib/qr-bill.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
@@ -2625,7 +2630,6 @@
         "lib/financial-status.ts",
         "lib/money.ts",
         "lib/server/audit.ts",
-        "lib/qr-bill.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
@@ -2770,7 +2774,6 @@
         "lib/financial-status.ts",
         "lib/money.ts",
         "lib/server/audit.ts",
-        "lib/qr-bill.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
@@ -2943,7 +2946,7 @@
           "arguments": [
             "s.organizationId",
             "s.userId",
-            "async c=>{\n   const file=(await c.query('select * from file_objects where id=$1 and organization_id=$2 for update',[id,s.organizationId])).rows[0];\n   if(!file)throw new ApiError(404,'not_found','Datei wurde nicht gefunden.');\n   const relation=fileRelations[file.purpose];\n   if(!relation&&file.purpose!=='document')throw new ApiError(403,'file_forbidden','Diese Datei kann hier nicht entfernt werden.');\n   authorize(s,relation?.write??'documents:write');\n   if(file.purpose==='document')await requireModuleEntitlement(s.organizationId,'dokumente');\n   if(file.created_by!==s.userId&&!['owner','admin'].includes(s.role))throw new ApiError(403,'file_forbidden','Nur eigene Anhänge können entfernt werden.');\n   if(s.moduleProfile==='time_only'&&!['time_report','support_attachment'].includes(file.purpose))throw new ApiError(403,'file_forbidden','Keine Berechtigung für diese Datei.');\n   if(relation){\n    const entity=(await c.query(`select * from ${relation.table} where id=$1 and organization_id=$2 for update`,[file[relation.column],s.organizationId])).rows[0];\n    if(!entity)throw new ApiError(404,'not_found','Zuordnung wurde nicht gefunden.');\n    if((file.purpose==='time_report'&&(entity.created_by_user_id!==s.userId&&!['owner','admin'].includes(s.role)))||(file.purpose==='expense_receipt'&&s.role==='member'&&entity.created_by_user_id!==s.userId)||(file.purpose==='support_attachment'&&s.moduleProfile==='time_only'&&entity.created_by_user_id!==s.userId))throw new ApiError(404,'not_found','Datei wurde nicht gefunden.');\n    if(file.purpose==='time_report'&&(entity.approved||entity.submitted_at)||file.purpose==='expense_receipt'&&['approved','posted'].includes(entity.status)||['invoice_attachment','offer_attachment'].includes(file.purpose)&&entity.status!=='draft')throw new ApiError(409,'attachment_locked','Anhänge abgeschlossener oder eingereichter Vorgänge bleiben erhalten.');\n   }\n   if(file.archived_at)return;\n   await c.query('update file_objects set archived_at=now(),archived_by_user_id=$3 where id=$1 and organization_id=$2',[id,s.organizationId,s.userId]);\n   await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'file_archived',entityType:'file',entityId:id,metadata:{purpose:file.purpose}});\n  }"
+            "async c=>{\n   const file=(await c.query('select * from file_objects where id=$1 and organization_id=$2 for update',[id,s.organizationId])).rows[0];\n   if(!file)throw new ApiError(404,'not_found','Datei wurde nicht gefunden.');\n   const relation=fileRelations[file.purpose];\n   if(file.purpose==='profile_avatar'){\n    if(file.created_by!==s.userId)throw new ApiError(404,'not_found','Datei wurde nicht gefunden.');\n    await c.query(\"update app_users set avatar_url=null,updated_at=now() where id=$1 and avatar_url=$2\",[s.userId,'/api/files/'+id+'/download']);\n    if(!file.archived_at)await c.query('update file_objects set archived_at=now(),archived_by_user_id=$3 where id=$1 and organization_id=$2',[id,s.organizationId,s.userId]);\n    await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'avatar_removed',entityType:'file',entityId:id});return;\n   }\n   if(!relation&&file.purpose!=='document')throw new ApiError(403,'file_forbidden','Diese Datei kann hier nicht entfernt werden.');\n   authorize(s,relation?.write??'documents:write');\n   if(file.purpose==='document')await requireModuleEntitlement(s.organizationId,'dokumente');\n   if(file.created_by!==s.userId&&!['owner','admin'].includes(s.role))throw new ApiError(403,'file_forbidden','Nur eigene Anhänge können entfernt werden.');\n   if(s.moduleProfile==='time_only'&&!['time_report','support_attachment'].includes(file.purpose))throw new ApiError(403,'file_forbidden','Keine Berechtigung für diese Datei.');\n   if(relation){\n    const entity=(await c.query(`select * from ${relation.table} where id=$1 and organization_id=$2 for update`,[file[relation.column],s.organizationId])).rows[0];\n    if(!entity)throw new ApiError(404,'not_found','Zuordnung wurde nicht gefunden.');\n    if((file.purpose==='time_report'&&(entity.created_by_user_id!==s.userId&&!['owner','admin'].includes(s.role)))||(file.purpose==='expense_receipt'&&s.role==='member'&&entity.created_by_user_id!==s.userId)||(file.purpose==='support_attachment'&&s.moduleProfile==='time_only'&&entity.created_by_user_id!==s.userId))throw new ApiError(404,'not_found','Datei wurde nicht gefunden.');\n    if(file.purpose==='time_report'&&(entity.approved||entity.submitted_at)||file.purpose==='expense_receipt'&&['approved','posted'].includes(entity.status)||['invoice_attachment','offer_attachment'].includes(file.purpose)&&entity.status!=='draft')throw new ApiError(409,'attachment_locked','Anhänge abgeschlossener oder eingereichter Vorgänge bleiben erhalten.');\n   }\n   if(file.archived_at)return;\n   await c.query('update file_objects set archived_at=now(),archived_by_user_id=$3 where id=$1 and organization_id=$2',[id,s.organizationId,s.userId]);\n   await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'file_archived',entityType:'file',entityId:id,metadata:{purpose:file.purpose}});\n  }"
           ]
         },
         {
@@ -2955,8 +2958,24 @@
           ]
         },
         {
+          "callee": "c.query",
+          "line": 21,
+          "arguments": [
+            "\"update app_users set avatar_url=null,updated_at=now() where id=$1 and avatar_url=$2\"",
+            "[s.userId,'/api/files/'+id+'/download']"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 22,
+          "arguments": [
+            "'update file_objects set archived_at=now(),archived_by_user_id=$3 where id=$1 and organization_id=$2'",
+            "[id,s.organizationId,s.userId]"
+          ]
+        },
+        {
           "callee": "authorize",
-          "line": 20,
+          "line": 26,
           "arguments": [
             "s",
             "relation?.write??'documents:write'"
@@ -2964,7 +2983,7 @@
         },
         {
           "callee": "c.query",
-          "line": 25,
+          "line": 31,
           "arguments": [
             "`select * from ${relation.table} where id=$1 and organization_id=$2 for update`",
             "[file[relation.column],s.organizationId]"
@@ -2972,7 +2991,7 @@
         },
         {
           "callee": "c.query",
-          "line": 31,
+          "line": 37,
           "arguments": [
             "'update file_objects set archived_at=now(),archived_by_user_id=$3 where id=$1 and organization_id=$2'",
             "[id,s.organizationId,s.userId]"
@@ -3001,6 +3020,7 @@
         "lib/server/rbac.ts",
         "lib/permissions.ts",
         "lib/server/file-relations.ts",
+        "lib/server/profile-image.ts",
         "lib/server/file-validation.ts",
         "lib/server/file-scan.ts",
         "lib/server/file-access.ts"
@@ -3008,12 +3028,12 @@
       "evidence": [
         {
           "callee": "requireSession",
-          "line": 22,
+          "line": 23,
           "arguments": []
         },
         {
           "callee": "authorize",
-          "line": 22,
+          "line": 23,
           "arguments": [
             "s",
             "'documents:read'"
@@ -3021,7 +3041,7 @@
         },
         {
           "callee": "withTenant",
-          "line": 38,
+          "line": 39,
           "arguments": [
             "s.organizationId",
             "s.userId",
@@ -3030,7 +3050,7 @@
         },
         {
           "callee": "c.query",
-          "line": 38,
+          "line": 39,
           "arguments": [
             "`select ${fileFields} from file_objects where ${where.join(' and ')} order by created_at desc limit 500`",
             "values"
@@ -3038,12 +3058,12 @@
         },
         {
           "callee": "requireSession",
-          "line": 43,
+          "line": 44,
           "arguments": []
         },
         {
           "callee": "authorize",
-          "line": 52,
+          "line": 53,
           "arguments": [
             "s",
             "'documents:write'"
@@ -3051,7 +3071,7 @@
         },
         {
           "callee": "authorize",
-          "line": 56,
+          "line": 57,
           "arguments": [
             "s",
             "relation.write"
@@ -3059,7 +3079,7 @@
         },
         {
           "callee": "withTenant",
-          "line": 59,
+          "line": 60,
           "arguments": [
             "s.organizationId",
             "s.userId",
@@ -3068,7 +3088,7 @@
         },
         {
           "callee": "c.query",
-          "line": 59,
+          "line": 60,
           "arguments": [
             "`select id from ${relation.table} where id=$1 and organization_id=$2${ownAttachment?' and created_by_user_id=$3':''}`",
             "ownAttachment?[entityId,s.organizationId,s.userId]:[entityId,s.organizationId]"
@@ -3076,7 +3096,7 @@
         },
         {
           "callee": "authorize",
-          "line": 62,
+          "line": 63,
           "arguments": [
             "s",
             "'organization:write'"
@@ -3084,16 +3104,16 @@
         },
         {
           "callee": "withTenant",
-          "line": 67,
+          "line": 73,
           "arguments": [
             "s.organizationId",
             "s.userId",
-            "async c=>idempotentBusiness(c,{organizationId:s.organizationId,userId:s.userId,operation:\"file-upload\",key:replayKey,body:{sha256,fileName:file.name,mimeType:file.type,size:file.size,purpose,entityId}},async()=>{\n   if(purpose==='time_report'){\n    const entry=(await c.query('select created_by_user_id,approved,submitted_at,report_month,customer_id,project_id,work_date::text as work_date from time_entries where organization_id=$1 and id=$2 for update',[s.organizationId,entityId])).rows[0];\n    if(!entry||entry.created_by_user_id!==s.userId&&!['owner','admin'].includes(s.role))throw new ApiError(404,'time_entry_not_found','Zeiteintrag wurde nicht gefunden.');\n    if(!entry.report_month||entry.approved||entry.submitted_at)throw new ApiError(409,'report_locked','Nachweise können nur vor dem Einreichen eines Monatsrapports ergänzt werden.');\n    await assertTimeAssignment(c,s,entry.customer_id,entry.project_id,String(entry.work_date).slice(0,10));\n   }\n   if(purpose==='expense_receipt'){\n    const expense=(await c.query(\"select status,created_by_user_id from expenses where organization_id=$1 and id=$2 for update\",[s.organizationId,entityId])).rows[0];\n    if(!expense||s.role==='member'&&expense.created_by_user_id!==s.userId)throw new ApiError(404,'not_found','Spese wurde nicht gefunden.');\n    if(['approved','posted'].includes(expense.status))throw new ApiError(409,'expense_locked','Belege genehmigter Spesen können nicht geändert werden.');\n   }\n   const scan=await scanFileWithEvidence(buffer),scanStatus=scan.status;\n   if(scanStatus==='rejected')throw new ApiError(422,'file_scan_rejected','Die Datei wurde von der Sicherheitsprüfung abgelehnt.');\n   const result=await c.query(`insert into file_objects(id,organization_id,object_key,original_name,content_type,size_bytes,sha256,scan_status,created_by,blob_url,purpose,expense_id,support_case_id,employee_id,customer_id,invoice_id,quote_id,project_id,time_entry_id)\n    values($1,$2,$3,$4,$5,$6,$7,$18,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$19) returning ${fileFields}`,[id,s.organizationId,objectKey,file.name.slice(0,240),file.type,file.size,sha256,s.userId,null,purpose,relation?.column==='expense_id'?entityId:null,relation?.column==='support_case_id'?entityId:null,relation?.column==='employee_id'?entityId:null,relation?.column==='customer_id'?entityId:null,relation?.column==='invoice_id'?entityId:null,relation?.column==='quote_id'?entityId:null,relation?.column==='project_id'?entityId:null,scanStatus,relation?.column==='time_entry_id'?entityId:null]);\n   await c.query('insert into file_contents(file_id,organization_id,body) values($1,$2,$3)',[id,s.organizationId,buffer]);\n   if(scan.evidence)await c.query('update file_objects set scan_evidence=$1::jsonb where id=$2 and organization_id=$3',[JSON.stringify(scan.evidence),id,s.organizationId]);\n   if(canAccessFile(scanStatus)&&purpose==='profile_avatar')await c.query('update app_users set avatar_url=$1,updated_at=now() where id=$2',['/api/files/'+id+'/download',s.userId]);\n   if(canAccessFile(scanStatus)&&purpose==='company_logo')await c.query('update organizations set logo_url=$1,updated_at=now() where id=$2',['/api/files/'+id+'/download',s.organizationId]);\n   return result.rows[0];\n  })"
+            "async c=>idempotentBusiness(c,{organizationId:s.organizationId,userId:s.userId,operation:\"file-upload\",key:replayKey,body:{sha256,fileName:file.name,mimeType:file.type,size:buffer.length,purpose,entityId}},async()=>{\n   if(purpose==='time_report'){\n    const entry=(await c.query('select created_by_user_id,approved,submitted_at,report_month,customer_id,project_id,work_date::text as work_date from time_entries where organization_id=$1 and id=$2 for update',[s.organizationId,entityId])).rows[0];\n    if(!entry||entry.created_by_user_id!==s.userId&&!['owner','admin'].includes(s.role))throw new ApiError(404,'time_entry_not_found','Zeiteintrag wurde nicht gefunden.');\n    if(!entry.report_month||entry.approved||entry.submitted_at)throw new ApiError(409,'report_locked','Nachweise können nur vor dem Einreichen eines Monatsrapports ergänzt werden.');\n    await assertTimeAssignment(c,s,entry.customer_id,entry.project_id,String(entry.work_date).slice(0,10));\n   }\n   if(purpose==='expense_receipt'){\n    const expense=(await c.query(\"select status,created_by_user_id from expenses where organization_id=$1 and id=$2 for update\",[s.organizationId,entityId])).rows[0];\n    if(!expense||s.role==='member'&&expense.created_by_user_id!==s.userId)throw new ApiError(404,'not_found','Spese wurde nicht gefunden.');\n    if(['approved','posted'].includes(expense.status))throw new ApiError(409,'expense_locked','Belege genehmigter Spesen können nicht geändert werden.');\n   }\n   const scan=await scanFileWithEvidence(buffer),scanStatus=scan.status;\n   if(scanStatus==='rejected')throw new ApiError(422,'file_scan_rejected','Die Datei wurde von der Sicherheitsprüfung abgelehnt.');\n   const result=await c.query(`insert into file_objects(id,organization_id,object_key,original_name,content_type,size_bytes,sha256,scan_status,created_by,blob_url,purpose,expense_id,support_case_id,employee_id,customer_id,invoice_id,quote_id,project_id,time_entry_id)\n    values($1,$2,$3,$4,$5,$6,$7,$18,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$19) returning ${fileFields}`,[id,s.organizationId,objectKey,file.name.slice(0,240),file.type,buffer.length,sha256,s.userId,null,purpose,relation?.column==='expense_id'?entityId:null,relation?.column==='support_case_id'?entityId:null,relation?.column==='employee_id'?entityId:null,relation?.column==='customer_id'?entityId:null,relation?.column==='invoice_id'?entityId:null,relation?.column==='quote_id'?entityId:null,relation?.column==='project_id'?entityId:null,scanStatus,relation?.column==='time_entry_id'?entityId:null]);\n   await c.query('insert into file_contents(file_id,organization_id,body) values($1,$2,$3)',[id,s.organizationId,buffer]);\n   if(scan.evidence)await c.query('update file_objects set scan_evidence=$1::jsonb where id=$2 and organization_id=$3',[JSON.stringify(scan.evidence),id,s.organizationId]);\n   if(canAccessFile(scanStatus)&&purpose==='profile_avatar')await c.query('update app_users set avatar_url=$1,updated_at=now() where id=$2',['/api/files/'+id+'/download',s.userId]);\n   if(canAccessFile(scanStatus)&&purpose==='company_logo')await c.query('update organizations set logo_url=$1,updated_at=now() where id=$2',['/api/files/'+id+'/download',s.organizationId]);\n   return result.rows[0];\n  })"
           ]
         },
         {
           "callee": "c.query",
-          "line": 69,
+          "line": 75,
           "arguments": [
             "'select created_by_user_id,approved,submitted_at,report_month,customer_id,project_id,work_date::text as work_date from time_entries where organization_id=$1 and id=$2 for update'",
             "[s.organizationId,entityId]"
@@ -3101,7 +3121,7 @@
         },
         {
           "callee": "c.query",
-          "line": 75,
+          "line": 81,
           "arguments": [
             "\"select status,created_by_user_id from expenses where organization_id=$1 and id=$2 for update\"",
             "[s.organizationId,entityId]"
@@ -3109,15 +3129,15 @@
         },
         {
           "callee": "c.query",
-          "line": 81,
+          "line": 87,
           "arguments": [
             "`insert into file_objects(id,organization_id,object_key,original_name,content_type,size_bytes,sha256,scan_status,created_by,blob_url,purpose,expense_id,support_case_id,employee_id,customer_id,invoice_id,quote_id,project_id,time_entry_id)\n    values($1,$2,$3,$4,$5,$6,$7,$18,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$19) returning ${fileFields}`",
-            "[id,s.organizationId,objectKey,file.name.slice(0,240),file.type,file.size,sha256,s.userId,null,purpose,relation?.column==='expense_id'?entityId:null,relation?.column==='support_case_id'?entityId:null,relation?.column==='employee_id'?entityId:null,relation?.column==='customer_id'?entityId:null,relation?.column==='invoice_id'?entityId:null,relation?.column==='quote_id'?entityId:null,relation?.column==='project_id'?entityId:null,scanStatus,relation?.column==='time_entry_id'?entityId:null]"
+            "[id,s.organizationId,objectKey,file.name.slice(0,240),file.type,buffer.length,sha256,s.userId,null,purpose,relation?.column==='expense_id'?entityId:null,relation?.column==='support_case_id'?entityId:null,relation?.column==='employee_id'?entityId:null,relation?.column==='customer_id'?entityId:null,relation?.column==='invoice_id'?entityId:null,relation?.column==='quote_id'?entityId:null,relation?.column==='project_id'?entityId:null,scanStatus,relation?.column==='time_entry_id'?entityId:null]"
           ]
         },
         {
           "callee": "c.query",
-          "line": 83,
+          "line": 89,
           "arguments": [
             "'insert into file_contents(file_id,organization_id,body) values($1,$2,$3)'",
             "[id,s.organizationId,buffer]"
@@ -3125,7 +3145,7 @@
         },
         {
           "callee": "c.query",
-          "line": 84,
+          "line": 90,
           "arguments": [
             "'update file_objects set scan_evidence=$1::jsonb where id=$2 and organization_id=$3'",
             "[JSON.stringify(scan.evidence),id,s.organizationId]"
@@ -3133,7 +3153,7 @@
         },
         {
           "callee": "c.query",
-          "line": 85,
+          "line": 91,
           "arguments": [
             "'update app_users set avatar_url=$1,updated_at=now() where id=$2'",
             "['/api/files/'+id+'/download',s.userId]"
@@ -3141,7 +3161,7 @@
         },
         {
           "callee": "c.query",
-          "line": 86,
+          "line": 92,
           "arguments": [
             "'update organizations set logo_url=$1,updated_at=now() where id=$2'",
             "['/api/files/'+id+'/download',s.organizationId]"
@@ -3172,8 +3192,7 @@
         "lib/server/repositories/business-api.ts",
         "lib/server/business-idempotency.ts",
         "lib/financial-status.ts",
-        "lib/server/audit.ts",
-        "lib/qr-bill.ts"
+        "lib/server/audit.ts"
       ],
       "evidence": [
         {
@@ -3489,7 +3508,6 @@
         "lib/financial-status.ts",
         "lib/money.ts",
         "lib/server/audit.ts",
-        "lib/qr-bill.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
@@ -3652,7 +3670,6 @@
         "lib/financial-status.ts",
         "lib/money.ts",
         "lib/server/audit.ts",
-        "lib/qr-bill.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
@@ -3700,7 +3717,6 @@
         "lib/financial-status.ts",
         "lib/money.ts",
         "lib/server/audit.ts",
-        "lib/qr-bill.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
@@ -4048,7 +4064,6 @@
         "lib/financial-status.ts",
         "lib/money.ts",
         "lib/server/audit.ts",
-        "lib/qr-bill.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
@@ -4262,7 +4277,6 @@
         "lib/financial-status.ts",
         "lib/money.ts",
         "lib/server/audit.ts",
-        "lib/qr-bill.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
@@ -4313,7 +4327,6 @@
         "lib/financial-status.ts",
         "lib/money.ts",
         "lib/server/audit.ts",
-        "lib/qr-bill.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
@@ -4381,7 +4394,6 @@
         "lib/financial-status.ts",
         "lib/money.ts",
         "lib/server/audit.ts",
-        "lib/qr-bill.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
@@ -4467,7 +4479,6 @@
         "lib/financial-status.ts",
         "lib/money.ts",
         "lib/server/audit.ts",
-        "lib/qr-bill.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
@@ -4511,7 +4522,6 @@
         "lib/financial-status.ts",
         "lib/money.ts",
         "lib/server/audit.ts",
-        "lib/qr-bill.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
@@ -4581,7 +4591,6 @@
         "lib/financial-status.ts",
         "lib/money.ts",
         "lib/server/audit.ts",
-        "lib/qr-bill.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
@@ -4625,7 +4634,6 @@
         "lib/financial-status.ts",
         "lib/money.ts",
         "lib/server/audit.ts",
-        "lib/qr-bill.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
@@ -4888,18 +4896,24 @@
         "lib/server/repositories/reports.ts",
         "lib/report-export.ts",
         "lib/projects.ts",
+        "lib/server/document-pdf.ts",
         "lib/locales/index.ts",
-        "lib/locales/config.ts"
+        "lib/locales/config.ts",
+        "lib/qr-bill.ts",
+        "lib/server/document-logo.ts",
+        "lib/server/storage.ts",
+        "lib/server/file-access.ts",
+        "lib/server/audit.ts"
       ],
       "evidence": [
         {
           "callee": "requireSession",
-          "line": 14,
+          "line": 17,
           "arguments": []
         },
         {
           "callee": "authorize",
-          "line": 14,
+          "line": 17,
           "arguments": [
             "s",
             "'reports:read'"
@@ -4907,28 +4921,28 @@
         },
         {
           "callee": "query.get",
-          "line": 15,
+          "line": 18,
           "arguments": [
             "'months'"
           ]
         },
         {
           "callee": "query.get",
-          "line": 16,
+          "line": 19,
           "arguments": [
             "'from'"
           ]
         },
         {
           "callee": "query.get",
-          "line": 16,
+          "line": 19,
           "arguments": [
             "'to'"
           ]
         },
         {
           "callee": "withTenant",
-          "line": 19,
+          "line": 22,
           "arguments": [
             "s.organizationId",
             "s.userId",
@@ -4938,16 +4952,54 @@
         },
         {
           "callee": "query.get",
-          "line": 20,
+          "line": 23,
           "arguments": [
             "'format'"
           ]
         },
         {
           "callee": "query.get",
-          "line": 21,
+          "line": 24,
           "arguments": [
             "'lang'"
+          ]
+        },
+        {
+          "callee": "withTenant",
+          "line": 26,
+          "arguments": [
+            "s.organizationId",
+            "s.userId",
+            "async c=>{const company=(await c.query('select name,legal_name,logo_url from organizations where id=$1',[s.organizationId])).rows[0]??{};await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'report.export',entityType:'report',metadata:{format:query.get('format'),from:period.from,to:period.to}});return {company,logo:query.get('format')==='pdf'?await documentLogo(c,s.organizationId,{},company):undefined};}"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 26,
+          "arguments": [
+            "'select name,legal_name,logo_url from organizations where id=$1'",
+            "[s.organizationId]"
+          ]
+        },
+        {
+          "callee": "query.get",
+          "line": 26,
+          "arguments": [
+            "'format'"
+          ]
+        },
+        {
+          "callee": "query.get",
+          "line": 26,
+          "arguments": [
+            "'format'"
+          ]
+        },
+        {
+          "callee": "query.get",
+          "line": 27,
+          "arguments": [
+            "'format'"
           ]
         }
       ]
@@ -4973,7 +5025,6 @@
         "lib/financial-status.ts",
         "lib/money.ts",
         "lib/server/audit.ts",
-        "lib/qr-bill.ts",
         "lib/search.ts"
       ],
       "evidence": [
@@ -5260,7 +5311,6 @@
         "lib/financial-status.ts",
         "lib/money.ts",
         "lib/server/audit.ts",
-        "lib/qr-bill.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
@@ -5776,7 +5826,6 @@
         "lib/financial-status.ts",
         "lib/money.ts",
         "lib/server/audit.ts",
-        "lib/qr-bill.ts",
         "lib/server/plan-access.ts"
       ],
       "evidence": [
@@ -6601,70 +6650,70 @@
       "calls": [
         {
           "callee": "apiGet<ClientSession>('/api/auth/session').then(session=>{\n      if(!active||requestedRevision!==refreshRevision)return;\n      setAccess(accessFromSession(session));\n      setAccessError(session.authenticated?null:'Deine Sitzung ist beendet. Bitte melde dich erneut an.');\n    }).catch",
-          "line": 114,
+          "line": 115,
           "arguments": [
             "error=>{if(active&&requestedRevision===refreshRevision){setAccess(null);setAccessError(error instanceof Error?error.message:'Zugang konnte nicht geprüft werden.')}}"
           ]
         },
         {
           "callee": "apiGet<ClientSession>('/api/auth/session').then",
-          "line": 114,
+          "line": 115,
           "arguments": [
             "session=>{\n      if(!active||requestedRevision!==refreshRevision)return;\n      setAccess(accessFromSession(session));\n      setAccessError(session.authenticated?null:'Deine Sitzung ist beendet. Bitte melde dich erneut an.');\n    }"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 114,
+          "line": 115,
           "arguments": [
             "'/api/auth/session'"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 199,
+          "line": 200,
           "arguments": [
             "canOpen(\"/einstellungen/firma\")?\"/api/settings/company\":null"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 200,
+          "line": 201,
           "arguments": [
             "workspaceReady?\"/api/notifications\":null"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 206,
+          "line": 207,
           "arguments": [
             "workspaceReady?\"/api/settings/profile\":null"
           ]
         },
         {
           "callee": "apiGet<{items:SearchItem[]}>(\"/api/search?q=\"+encodeURIComponent(term))\n        .then(payload=>{if(active)setRemoteSearch({query:term,items:payload.items,loading:false,error:null})})\n        .catch",
-          "line": 247,
+          "line": 250,
           "arguments": [
             "error=>{if(active)setRemoteSearch({query:term,items:[],loading:false,error:error instanceof Error?error.message:\"Suche konnte nicht geladen werden.\"})}"
           ]
         },
         {
           "callee": "apiGet<{items:SearchItem[]}>(\"/api/search?q=\"+encodeURIComponent(term))\n        .then",
-          "line": 247,
+          "line": 250,
           "arguments": [
             "payload=>{if(active)setRemoteSearch({query:term,items:payload.items,loading:false,error:null})}"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 247,
+          "line": 250,
           "arguments": [
             "\"/api/search?q=\"+encodeURIComponent(term)"
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 266,
+          "line": 269,
           "arguments": [
             "\"/api/notifications/\"+encodeURIComponent(id)",
             "{}"
@@ -7748,17 +7797,17 @@
       "calls": [
         {
           "callee": "useApiQuery",
-          "line": 15,
+          "line": 16,
           "arguments": [
             "'/api/reports?'+query.toString()"
           ]
         },
         {
           "callee": "apiGetFile",
-          "line": 22,
+          "line": 24,
           "arguments": [
-            "'/api/reports?'+query.toString()+'&format=csv&lang='+locale",
-            "'text/csv'"
+            "'/api/reports?'+query.toString()+'&format='+format+'&lang='+locale",
+            "format==='csv'?'text/csv':'application/pdf'"
           ]
         }
       ],
@@ -7777,8 +7826,15 @@
           ]
         },
         {
-          "callee": "apiUpload",
+          "callee": "apiDelete",
           "line": 55,
+          "arguments": [
+            "'/api/files/'+match[1]"
+          ]
+        },
+        {
+          "callee": "apiUpload",
+          "line": 56,
           "arguments": [
             "\"/api/files\"",
             "form"
@@ -7786,7 +7842,7 @@
         },
         {
           "callee": "apiPatch",
-          "line": 72,
+          "line": 73,
           "arguments": [
             "\"/api/settings/profile\"",
             "{firstName,lastName,phone,jobTitle}"
@@ -7794,14 +7850,14 @@
         },
         {
           "callee": "useApiQuery",
-          "line": 121,
+          "line": 122,
           "arguments": [
             "\"/api/settings/company\""
           ]
         },
         {
           "callee": "apiUpload",
-          "line": 151,
+          "line": 152,
           "arguments": [
             "\"/api/files\"",
             "form"
@@ -7809,7 +7865,7 @@
         },
         {
           "callee": "apiPatch",
-          "line": 152,
+          "line": 153,
           "arguments": [
             "\"/api/settings/company\"",
             "{name,uid,street,buildingNumber,postalCode,city,email,phone,...(removeLogo?{logoUrl:\"\"}:{}),completeOnboarding:onboarding}"
@@ -7817,35 +7873,35 @@
         },
         {
           "callee": "apiGet",
-          "line": 221,
-          "arguments": [
-            "\"/api/settings/subscription\""
-          ]
-        },
-        {
-          "callee": "apiGet",
           "line": 222,
           "arguments": [
-            "\"/api/integrations/status\""
+            "\"/api/settings/subscription\""
           ]
         },
         {
           "callee": "apiGet",
           "line": 223,
           "arguments": [
+            "\"/api/integrations/status\""
+          ]
+        },
+        {
+          "callee": "apiGet",
+          "line": 224,
+          "arguments": [
             "\"/api/billing/catalog\""
           ]
         },
         {
           "callee": "apiGet",
-          "line": 237,
+          "line": 238,
           "arguments": [
             "\"/api/settings/subscription\""
           ]
         },
         {
           "callee": "apiPost",
-          "line": 256,
+          "line": 257,
           "arguments": [
             "\"/api/billing/checkout\"",
             "{plan:selectedPlan,billing:billingCycle,requestKey:checkoutRequest.current.key,acceptedTerms:acceptedPaidTerms,termsVersion:legalConfig.termsVersion,privacyVersion:legalConfig.privacyVersion}"
@@ -7853,7 +7909,7 @@
         },
         {
           "callee": "apiPost",
-          "line": 268,
+          "line": 269,
           "arguments": [
             "\"/api/billing/portal\"",
             "{}"
@@ -7861,35 +7917,35 @@
         },
         {
           "callee": "apiGet<{items:Array<{kind:string;email:boolean;push:boolean}>}>(\"/api/settings/notifications\").then(data=>setPrefs(current=>{const next={...current};for(const item of data.items)if(next[item.kind])next[item.kind]={email:item.email,push:item.push};return next})).then(()=>setReady(true)).catch",
-          "line": 333,
+          "line": 334,
           "arguments": [
             "()=>setError(\"Einstellungen konnten nicht geladen werden.\")"
           ]
         },
         {
           "callee": "apiGet<{items:Array<{kind:string;email:boolean;push:boolean}>}>(\"/api/settings/notifications\").then(data=>setPrefs(current=>{const next={...current};for(const item of data.items)if(next[item.kind])next[item.kind]={email:item.email,push:item.push};return next})).then",
-          "line": 333,
+          "line": 334,
           "arguments": [
             "()=>setReady(true)"
           ]
         },
         {
           "callee": "apiGet<{items:Array<{kind:string;email:boolean;push:boolean}>}>(\"/api/settings/notifications\").then",
-          "line": 333,
+          "line": 334,
           "arguments": [
             "data=>setPrefs(current=>{const next={...current};for(const item of data.items)if(next[item.kind])next[item.kind]={email:item.email,push:item.push};return next})"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 333,
+          "line": 334,
           "arguments": [
             "\"/api/settings/notifications\""
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 341,
+          "line": 342,
           "arguments": [
             "\"/api/settings/notifications\"",
             "{kind:title,channel,enabled}"
@@ -7897,7 +7953,7 @@
         },
         {
           "callee": "apiPatch",
-          "line": 356,
+          "line": 357,
           "arguments": [
             "\"/api/settings/profile\"",
             "{language:next}"
@@ -8213,7 +8269,7 @@
       "calls": [
         {
           "callee": "fetch",
-          "line": 95,
+          "line": 113,
           "arguments": [
             "fileUrl??(pdfNumber?\"/api/documents/\"+encodeURIComponent(pdfNumber)+\"/pdf\":\"/api/documents/preview\")",
             "{...(fileUrl||pdfNumber?{}:{method:\"POST\",headers:{\"Content-Type\":\"application/json\"},body:previewJson}),signal:controller.signal,cache:'no-store'}"
@@ -8224,6 +8280,7 @@
         "app/angebot/page.tsx",
         "app/angebote/[id]/page.tsx",
         "app/angebote/neu/page.tsx",
+        "app/berichte/page.tsx",
         "app/dev/ux-lab/page.tsx",
         "app/kunden/[id]/bearbeiten/page.tsx",
         "app/kunden/[id]/page.tsx",
@@ -8289,7 +8346,7 @@
       "calls": [
         {
           "callee": "authRequest",
-          "line": 36,
+          "line": 38,
           "arguments": [
             "'/api/auth/register?'+params",
             "{cache:'no-store'}"
@@ -8297,7 +8354,7 @@
         },
         {
           "callee": "authRequest",
-          "line": 48,
+          "line": 50,
           "arguments": [
             "url",
             "{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}"
@@ -10308,6 +10365,32 @@
         }
       ],
       "rls": []
+    },
+    {
+      "file": "database/migrations/0070_issued_invoice_pdf.sql",
+      "tables": [
+        "invoice_versions"
+      ],
+      "relations": [
+        {
+          "table": "organizations",
+          "columns": "id"
+        },
+        {
+          "table": "invoices",
+          "columns": "organization_id,id"
+        }
+      ],
+      "rls": [
+        {
+          "table": "invoice_versions",
+          "mode": "enable"
+        },
+        {
+          "table": "invoice_versions",
+          "mode": "force"
+        }
+      ]
     }
   ],
   "repositories": [
@@ -10319,7 +10402,6 @@
         "lib/server/audit.ts",
         "lib/server/http.ts",
         "lib/permissions.ts",
-        "lib/qr-bill.ts",
         "lib/server/session.ts"
       ],
       "methods": [],
@@ -10398,15 +10480,7 @@
         },
         {
           "callee": "c.query",
-          "line": 196,
-          "arguments": [
-            "'select name,legal_name,street,postal_code,city,country_code,iban,qr_iban from organizations where id=$1'",
-            "[s.organizationId]"
-          ]
-        },
-        {
-          "callee": "c.query",
-          "line": 203,
+          "line": 200,
           "arguments": [
             "`insert into business_document_counters(organization_id,kind,period,next_value) values($1,$2,$3,coalesce((select max(substring(${numberingColumn} from $4)::integer) from ${numberingTable} where organization_id=$1),0)+2) on conflict(organization_id,kind,period) do update set next_value=greatest(business_document_counters.next_value+1,excluded.next_value) returning next_value-1 number`",
             "[s.organizationId,invoice?'invoice':'quote',year,'^'+pattern]"
@@ -10414,7 +10488,7 @@
         },
         {
           "callee": "c.query",
-          "line": 209,
+          "line": 206,
           "arguments": [
             "'select id from customers where id::text=$1 and organization_id=$2 and archived_at is null'",
             "[args.p_customer_id,s.organizationId]"
@@ -10422,7 +10496,7 @@
         },
         {
           "callee": "c.query",
-          "line": 213,
+          "line": 210,
           "arguments": [
             "\"select id,status,customer_id,currency from quotes where organization_id=$1 and quote_no=$2 and archived_at is null for update\"",
             "[s.organizationId,args.p_source_offer]"
@@ -10430,7 +10504,7 @@
         },
         {
           "callee": "c.query",
-          "line": 215,
+          "line": 212,
           "arguments": [
             "'select id from invoices where organization_id=$1 and source_quote_id=$2 and archived_at is null and status<>\\'cancelled\\''",
             "[s.organizationId,quote.id]"
@@ -10438,7 +10512,7 @@
         },
         {
           "callee": "c.query",
-          "line": 220,
+          "line": 217,
           "arguments": [
             "`select id,status${invoice?',paid_amount':''} from ${table} where ${numberColumn}=$1 and organization_id=$2 and archived_at is null for update`",
             "[args.p_current_number,s.organizationId]"
@@ -10446,7 +10520,7 @@
         },
         {
           "callee": "c.query",
-          "line": 224,
+          "line": 221,
           "arguments": [
             "\"select id from document_deliveries where organization_id=$1 and document_id=$2 and status='sending'\"",
             "[s.organizationId,id]"
@@ -10454,7 +10528,7 @@
         },
         {
           "callee": "c.query",
-          "line": 225,
+          "line": 222,
           "arguments": [
             "`update ${table} set ${numberColumn}=$1,customer_id=$2,issue_date=$3,${invoice?'due_date':'valid_until'}=$4,note=$5,currency=$6,updated_at=now() where id=$7 and organization_id=$8`",
             "[args.p_number,args.p_customer_id,args.p_issue_date,invoice?args.p_due_date:args.p_valid_until,args.p_note,args.p_currency,id,s.organizationId]"
@@ -10462,7 +10536,7 @@
         },
         {
           "callee": "c.query",
-          "line": 226,
+          "line": 223,
           "arguments": [
             "\"update expenses set invoiced_invoice_id=null where organization_id=$1 and invoiced_invoice_id=$2\"",
             "[s.organizationId,id]"
@@ -10470,7 +10544,7 @@
         },
         {
           "callee": "c.query",
-          "line": 227,
+          "line": 224,
           "arguments": [
             "\"update time_entries set invoiced_invoice_id=null where organization_id=$1 and invoiced_invoice_id=$2\"",
             "[s.organizationId,id]"
@@ -10478,7 +10552,7 @@
         },
         {
           "callee": "c.query",
-          "line": 228,
+          "line": 225,
           "arguments": [
             "`delete from ${lineTable} where ${parentColumn}=$1 and organization_id=$2`",
             "[id,s.organizationId]"
@@ -10486,7 +10560,7 @@
         },
         {
           "callee": "c.query",
-          "line": 231,
+          "line": 228,
           "arguments": [
             "`insert into ${table}(id,organization_id,external_id,${numberColumn},customer_id,${invoice?'':'title,'}issue_date,${invoice?'due_date':'valid_until'},status,note,currency,created_by_user_id)\n   values($1,$2,$1::uuid::text,$3,$4,${invoice?'':'$3,'}$5,$6,'draft',$7,$8,$9)`",
             "[id,s.organizationId,args.p_number,args.p_customer_id,args.p_issue_date,invoice?args.p_due_date:args.p_valid_until,args.p_note,args.p_currency,s.userId]"
@@ -10494,7 +10568,7 @@
         },
         {
           "callee": "c.query",
-          "line": 234,
+          "line": 231,
           "arguments": [
             "\"update invoices set source_quote_id=$3 where organization_id=$1 and id=$2\"",
             "[s.organizationId,id,sourceQuoteId]"
@@ -10502,7 +10576,7 @@
         },
         {
           "callee": "c.query",
-          "line": 241,
+          "line": 238,
           "arguments": [
             "`insert into ${lineTable}(organization_id,external_id,${parentColumn},sort_order,description,quantity,unit,unit_price,vat_rate) values($1,$2,$3,$4,$5,$6,$7,$8,$9) returning id`",
             "[s.organizationId,randomUUID(),id,++position,raw.description,raw.quantity,String(raw.unit??\"Stück\").slice(0,40),raw.unit_price,lineVat]"
@@ -10510,7 +10584,7 @@
         },
         {
           "callee": "c.query",
-          "line": 244,
+          "line": 241,
           "arguments": [
             "\"update expenses set invoiced_invoice_id=$3 where organization_id=$1 and id=any($2::uuid[]) and archived_at is null and customer_id=$4 and currency=$5 and billable=true and status in ('approved','posted') and (invoiced_invoice_id is null or invoiced_invoice_id=$3) returning id\"",
             "[s.organizationId,ids,id,args.p_customer_id,args.p_currency]"
@@ -10518,7 +10592,7 @@
         },
         {
           "callee": "c.query",
-          "line": 246,
+          "line": 243,
           "arguments": [
             "'insert into invoice_line_expenses(organization_id,invoice_line_id,expense_id) values($1,$2,$3)'",
             "[s.organizationId,inserted.rows[0].id,row.id]"
@@ -10526,7 +10600,7 @@
         },
         {
           "callee": "c.query",
-          "line": 251,
+          "line": 248,
           "arguments": [
             "`update time_entries set invoiced_invoice_id=$3 where organization_id=$1 and id=any($2::uuid[]) and archived_at is null and customer_id=$4 and billable=true and approved=true and (invoiced_invoice_id is null or invoiced_invoice_id=$3) returning id`",
             "[s.organizationId,ids,id,args.p_customer_id]"
@@ -10534,7 +10608,7 @@
         },
         {
           "callee": "c.query",
-          "line": 253,
+          "line": 250,
           "arguments": [
             "'insert into invoice_line_time_entries(organization_id,invoice_line_id,time_entry_id) values($1,$2,$3)'",
             "[s.organizationId,inserted.rows[0].id,row.id]"
@@ -10542,7 +10616,7 @@
         },
         {
           "callee": "c.query",
-          "line": 256,
+          "line": 253,
           "arguments": [
             "`update invoices set subtotal=x.subtotal,vat_amount=x.vat,total_amount=x.subtotal+x.vat from (select round(sum(quantity*unit_price),2) subtotal,round(sum(quantity*unit_price*vat_rate/100),2) vat from invoice_lines where invoice_id=$1 and organization_id=$2) x where invoices.id=$1 and invoices.organization_id=$2`",
             "[id,s.organizationId]"

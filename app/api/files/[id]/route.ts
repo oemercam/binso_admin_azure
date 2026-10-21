@@ -16,6 +16,12 @@ export async function DELETE(request:NextRequest,{params}:{params:Promise<{id:st
    const file=(await c.query('select * from file_objects where id=$1 and organization_id=$2 for update',[id,s.organizationId])).rows[0];
    if(!file)throw new ApiError(404,'not_found','Datei wurde nicht gefunden.');
    const relation=fileRelations[file.purpose];
+   if(file.purpose==='profile_avatar'){
+    if(file.created_by!==s.userId)throw new ApiError(404,'not_found','Datei wurde nicht gefunden.');
+    await c.query("update app_users set avatar_url=null,updated_at=now() where id=$1 and avatar_url=$2",[s.userId,'/api/files/'+id+'/download']);
+    if(!file.archived_at)await c.query('update file_objects set archived_at=now(),archived_by_user_id=$3 where id=$1 and organization_id=$2',[id,s.organizationId,s.userId]);
+    await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'avatar_removed',entityType:'file',entityId:id});return;
+   }
    if(!relation&&file.purpose!=='document')throw new ApiError(403,'file_forbidden','Diese Datei kann hier nicht entfernt werden.');
    authorize(s,relation?.write??'documents:write');
    if(file.purpose==='document')await requireModuleEntitlement(s.organizationId,'dokumente');

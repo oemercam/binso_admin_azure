@@ -4,9 +4,10 @@ import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
 import {useEffect,useRef,useState} from "react";
 import type {PDFDocumentProxy} from "pdfjs-dist";
 import {Icon, ErrorState, LoadingState} from "./ui";
+import {boundPdfZoom,pdfSwipePage} from '@/lib/pdf-gestures';
 import {useDialogFocus} from "./use-dialog-focus";
 
-function PdfPage({pdf,pageNumber,zoomed}: {pdf:PDFDocumentProxy;pageNumber:number;zoomed:boolean}) {
+function PdfPage({pdf,pageNumber,zoom}: {pdf:PDFDocumentProxy;pageNumber:number;zoom:number}) {
   const canvas=useRef<HTMLCanvasElement>(null);
   const [error,setError]=useState<string|null>(null);
   useEffect(()=>{
@@ -27,8 +28,8 @@ function PdfPage({pdf,pageNumber,zoomed}: {pdf:PDFDocumentProxy;pageNumber:numbe
         if(!active||size!==lastSize)return;
         const base=page.getViewport({scale:1});
         const scale=Math.min((width-24)/base.width,(height-24)/base.height);
-        const viewport=page.getViewport({scale:Math.max(scale,.01)*(zoomed?2.5:1)});
-        const ratio=Math.min(window.devicePixelRatio||1,2);
+        const viewport=page.getViewport({scale:Math.max(scale,.01)*zoom});
+        const ratio=Math.min(window.devicePixelRatio||1,2,8192/viewport.width,8192/viewport.height,Math.sqrt(12_000_000/(viewport.width*viewport.height)));
         element.width=Math.floor(viewport.width*ratio);
         element.height=Math.floor(viewport.height*ratio);
         element.style.width=`${viewport.width}px`;
@@ -40,11 +41,12 @@ function PdfPage({pdf,pageNumber,zoomed}: {pdf:PDFDocumentProxy;pageNumber:numbe
     const observer=new ResizeObserver(()=>{cancelAnimationFrame(frame);frame=requestAnimationFrame(draw)});
     observer.observe(element.closest(".document-page-stage")??element);
     return()=>{active=false;cancelAnimationFrame(frame);observer.disconnect();renderTask?.cancel()};
-  },[pdf,pageNumber,zoomed]);
+  },[pdf,pageNumber,zoom]);
   return <LocalizedElement as="section" className="pdf-page" data-page-number={pageNumber} aria-label={`Seite ${pageNumber} von ${pdf.numPages}`}>{error?<ErrorState><LocalizedText>{error}</LocalizedText></ErrorState>:<LocalizedElement as="canvas" ref={canvas} role="img" aria-label={`PDF-Seite ${pageNumber}`}/>}</LocalizedElement>;
 }
 
-export function DocumentPageViewer({file,zoomed=false}: {file:Blob;zoomed?:boolean}) {
+export function DocumentPageViewer({file,zoom:controlledZoom,onZoom}: {file:Blob;zoom?:number;onZoom?:(value:number)=>void}) {
+  const [localZoom,setLocalZoom]=useState(1);const zoom=controlledZoom??localZoom,setZoom=onZoom??setLocalZoom;
   const [attempt,setAttempt]=useState(0);
   const [loaded,setLoaded]=useState<{file:Blob;attempt:number;pdf:PDFDocumentProxy}|null>(null);
   const [error,setError]=useState<{file:Blob;attempt:number;message:string}|null>(null);
@@ -76,12 +78,28 @@ export function DocumentPageViewer({file,zoomed=false}: {file:Blob;zoomed?:boole
   },[file,attempt]);
   if(error?.file===file&&error.attempt===attempt)return <ErrorState onRetry={()=>setAttempt(value=>value+1)} retryLabel="Erneut versuchen"><LocalizedText>{error.message}</LocalizedText></ErrorState>;
   if(loaded?.file!==file||loaded.attempt!==attempt)return <LoadingState><LocalizedText>{"PDF wird angezeigt …"}</LocalizedText></LoadingState>;
-  return <DocumentPages key={loaded.pdf.fingerprints[0]} pdf={loaded.pdf} zoomed={zoomed}/>;
+  return <DocumentPages key={loaded.pdf.fingerprints[0]} pdf={loaded.pdf} zoom={zoom} onZoom={setZoom}/>;
 }
 
-function DocumentPages({pdf,zoomed}:{pdf:PDFDocumentProxy;zoomed:boolean}){
+function DocumentPages({pdf,zoom,onZoom}:{pdf:PDFDocumentProxy;zoom:number;onZoom:(value:number)=>void}){
   const [pageNumber,setPageNumber]=useState(1);
-  return <div className="document-page-viewer"><div className={`document-page-stage${zoomed?" is-zoomed":""}`}><PdfPage key={`${pageNumber}:${zoomed}`} pdf={pdf} pageNumber={pageNumber} zoomed={zoomed}/></div><LocalizedElement as="nav" className="document-page-navigation" aria-label="Dokumentseiten"><LocalizedElement as="button" type="button" className="icon-button" aria-label="Vorherige Seite" disabled={pageNumber<=1} onClick={()=>setPageNumber(value=>value-1)}><Icon name="back"/></LocalizedElement><span role="status" aria-live="polite"><LocalizedText>{"Seite "}</LocalizedText>{pageNumber}<LocalizedText>{" von "}</LocalizedText>{pdf.numPages}</span><LocalizedElement as="button" type="button" className="icon-button" aria-label="Nächste Seite" disabled={pageNumber>=pdf.numPages} onClick={()=>setPageNumber(value=>value+1)}><Icon name="arrow"/></LocalizedElement></LocalizedElement></div>;
+  const lastTap=useRef({time:0,x:0,y:0}),stage=useRef<HTMLDivElement>(null),pointers=useRef(new Map<number,{x:number;y:number}>()),gesture=useRef({x:0,y:0,left:0,top:0,distance:0,zoom:1,multi:false});
+  return <div className="document-page-viewer"><div ref={stage} tabIndex={0} role="group" aria-label="Dokumentseite" className={`document-page-stage${zoom>1.01?" is-zoomed":""}`} onDoubleClick={()=>onZoom?.(zoom>1.01?1:2.5)} onKeyDown={event=>{if(zoom<=1.01&&['ArrowLeft','ArrowRight'].includes(event.key)){event.preventDefault();setPageNumber(value=>Math.max(1,Math.min(pdf.numPages,value+(event.key==='ArrowLeft'?-1:1))));}}} onPointerDown={event=>{
+   if(event.pointerType==='mouse'&&event.button!==0)return;
+   pointers.current.set(event.pointerId,{x:event.clientX,y:event.clientY});event.currentTarget.setPointerCapture(event.pointerId);
+   if(pointers.current.size===1)gesture.current={x:event.clientX,y:event.clientY,left:event.currentTarget.scrollLeft,top:event.currentTarget.scrollTop,distance:0,zoom,multi:false};
+   if(pointers.current.size===2){const [a,b]=[...pointers.current.values()];gesture.current.distance=Math.hypot(a.x-b.x,a.y-b.y);gesture.current.zoom=zoom;gesture.current.multi=true;}
+  }} onPointerMove={event=>{
+   if(!pointers.current.has(event.pointerId))return;pointers.current.set(event.pointerId,{x:event.clientX,y:event.clientY});
+   if(pointers.current.size===2){const [a,b]=[...pointers.current.values()];if(gesture.current.distance>0)onZoom?.(boundPdfZoom(gesture.current.zoom*Math.hypot(a.x-b.x,a.y-b.y)/gesture.current.distance));}
+   else if(zoom>1.01&&!gesture.current.multi){event.currentTarget.scrollLeft=gesture.current.left+gesture.current.x-event.clientX;event.currentTarget.scrollTop=gesture.current.top+gesture.current.y-event.clientY;}
+  }} onPointerUp={event=>{
+   const start=gesture.current;if(!pointers.current.has(event.pointerId))return;pointers.current.delete(event.pointerId);
+   if(!pointers.current.size){setPageNumber(value=>pdfSwipePage(value,pdf.numPages,event.clientX-start.x,event.clientY-start.y,zoom,start.multi));
+    if(event.pointerType==='touch'&&!start.multi&&Math.hypot(event.clientX-start.x,event.clientY-start.y)<8){const now=Date.now(),previous=lastTap.current;if(now-previous.time<320&&Math.hypot(event.clientX-previous.x,event.clientY-previous.y)<24){onZoom(zoom>1.01?1:2.5);lastTap.current={time:0,x:0,y:0};}else lastTap.current={time:now,x:event.clientX,y:event.clientY};}
+   }
+  }} onPointerCancel={()=>{pointers.current.clear();gesture.current.multi=true;}}><PdfPage key={pageNumber} pdf={pdf} pageNumber={pageNumber} zoom={zoom}/></div><LocalizedElement as="nav" className="document-page-navigation" aria-label="Dokumentseiten"><LocalizedElement as="button" type="button" className="icon-button" aria-label="Vorherige Seite" disabled={pageNumber<=1} onClick={()=>setPageNumber(value=>value-1)}><Icon name="back"/></LocalizedElement><span role="status" aria-live="polite"><LocalizedText>{"Seite "}</LocalizedText>{pageNumber}<LocalizedText>{" von "}</LocalizedText>{pdf.numPages}</span><LocalizedElement as="button" type="button" className="icon-button" aria-label="Nächste Seite" disabled={pageNumber>=pdf.numPages} onClick={()=>setPageNumber(value=>value+1)}><Icon name="arrow"/></LocalizedElement></LocalizedElement></div>;
+
 }
 
 export function DocumentModal({ title, onClose, pdfNumber, previewDraft, fileUrl, fileBlob, fileName }: { title:string; onClose:()=>void; pdfNumber?:string;previewDraft?:unknown;fileUrl?:string;fileBlob?:Blob;fileName?:string }) {
@@ -96,14 +114,14 @@ export function DocumentModal({ title, onClose, pdfNumber, previewDraft, fileUrl
     source.then(blob=>{if(!active)return;window.clearTimeout(timeout);pdfFile.current=new File([blob],(fileName||pdfNumber||"Entwurf")+".pdf",{type:"application/pdf"});setPdfBlob(blob)}).catch(()=>{if(active)setPdfError("PDF konnte nicht geladen werden.")});
     return()=>{active=false;window.clearTimeout(timeout);controller.abort();pdfFile.current=null};
   },[pdfNumber,previewJson,fileUrl,fileBlob,fileName]);
-  const [zoomed,setZoomed]=useState(false);
+  const [zoom,setZoom]=useState(1);
   const modalDialog=useDialogFocus(true,onClose);
   const share=async()=>{
     if(pdfFile.current&&navigator.canShare?.({files:[pdfFile.current]})){try{await navigator.share({title,files:[pdfFile.current]})}catch{/* share dialog closed */}return;}
     if(pdfBlob){const url=URL.createObjectURL(pdfBlob);const link=document.createElement("a");link.href=url;link.download=(fileName||pdfNumber||"Entwurf")+".pdf";link.click();window.setTimeout(()=>URL.revokeObjectURL(url),1000);}
   };
   return <LocalizedElement as="section" ref={modalDialog} tabIndex={-1} className="document-modal" role="dialog" aria-modal="true" aria-label={title}>
-    <header><span className="document-modal-header-spacer" aria-hidden="true"/><strong><LocalizedText>{title}</LocalizedText></strong><div className="document-modal-header-actions"><LocalizedElement as="button" type="button" aria-label={zoomed?"Auf Bildschirm einpassen":"Vorschau vergrössern"} aria-pressed={zoomed} onClick={()=>setZoomed(value=>!value)}><Icon name="search"/></LocalizedElement><LocalizedElement as="button" type="button" disabled={!pdfBlob} aria-label="Teilen oder herunterladen" onClick={()=>void share()}><Icon name="upload"/></LocalizedElement><LocalizedElement as="button" type="button" aria-label="Vorschau schliessen" onClick={onClose}><Icon name="close"/></LocalizedElement></div></header>
-    <div className="document-modal-body">{pdfError?<ErrorState><LocalizedText>{pdfError}</LocalizedText></ErrorState>:pdfBlob?<DocumentPageViewer key={previewJson+String(pdfNumber)} file={pdfBlob} zoomed={zoomed}/>:<LoadingState><LocalizedText>{"PDF wird geladen …"}</LocalizedText></LoadingState>}</div>
+    <header><span className="document-modal-header-spacer" aria-hidden="true"/><strong><LocalizedText>{title}</LocalizedText></strong><div className="document-modal-header-actions"><LocalizedElement as="button" type="button" aria-label={zoom>1.01?"Auf Bildschirm einpassen":"Vorschau vergrössern"} aria-pressed={zoom>1.01} onClick={()=>setZoom(value=>value>1.01?1:2.5)}><Icon name="search"/></LocalizedElement><LocalizedElement as="button" type="button" disabled={!pdfBlob} aria-label="Teilen oder herunterladen" onClick={()=>void share()}><Icon name="upload"/></LocalizedElement><LocalizedElement as="button" type="button" aria-label="Vorschau schliessen" onClick={onClose}><Icon name="close"/></LocalizedElement></div></header>
+    <div className="document-modal-body">{pdfError?<ErrorState><LocalizedText>{pdfError}</LocalizedText></ErrorState>:pdfBlob?<DocumentPageViewer key={previewJson+String(pdfNumber)} file={pdfBlob} zoom={zoom} onZoom={setZoom}/>:<LoadingState><LocalizedText>{"PDF wird geladen …"}</LocalizedText></LoadingState>}</div>
   </LocalizedElement>;
 }

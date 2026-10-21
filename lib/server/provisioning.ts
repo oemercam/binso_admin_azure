@@ -20,7 +20,7 @@ function planDefinition(plan:PlanId){
 
 export async function provisionOrganization(input:{
  userId:string;email:string;name:string;companyName:string;plan:PlanId;billingCycle?:BillingCycle;mode:"trial"|"subscription";
- passwordHash?:string|null;language?:"de"|"en"|"fr"|"it"|"tr";termsVersion?:string|null;privacyVersion?:string|null;dpaVersion?:string|null;
+ firstName?:string;lastName?:string;passwordHash?:string|null;language?:"de"|"en"|"fr"|"it"|"tr";termsVersion?:string|null;privacyVersion?:string|null;dpaVersion?:string|null;
 }){
  if(input.mode!=="trial"&&input.mode!=="subscription")throw new Error("Demo-Provisionierung wurde entfernt.");
  return withTransaction(async client=>{
@@ -44,6 +44,8 @@ export async function provisionOrganization(input:{
       on conflict(id) do update set email=excluded.email,display_name=excluded.display_name,password_hash=coalesce(excluded.password_hash,app_users.password_hash),language=excluded.language,updated_at=now()`,
      [input.userId,email,displayName,input.passwordHash??null,input.language??"de",null,input.termsVersion??null,input.privacyVersion??null]
    );
+   // Structured names are explicit; never infer family names from a display name.
+   if(input.firstName!==undefined&&input.lastName!==undefined)await client.query("update app_users set first_name=$1,last_name=$2 where id=$3",[input.firstName,input.lastName,input.userId]);
    const org=await client.query<{id:string}>(
      "select public.bootstrap_organization($1,$2,$3,$4,$5) as id",
      [input.userId,email,companyName,slug,input.mode]

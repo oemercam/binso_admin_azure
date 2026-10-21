@@ -88,6 +88,9 @@ export function MarketingFooter() {
     <div><Logo/><LocaleSwitcher/><p><LocalizedText>{"Business-Software für Schweizer KMU."}</LocalizedText></p></div>
     <div className="footer-links">
       <Link href="/produkt"><LocalizedText>{"Produkt"}</LocalizedText></Link>
+      <Link href="/#funktionen"><LocalizedText>{"Funktionen"}</LocalizedText></Link>
+      <Link href="/impressum#kontakt"><LocalizedText>{"Kontakt"}</LocalizedText></Link>
+      <Link href="/support"><LocalizedText>{"Support"}</LocalizedText></Link>
       <Link href="/preise"><LocalizedText>{"Preise"}</LocalizedText></Link>
       <Link href="/registrieren"><LocalizedText>{"14 Tage kostenlos testen"}</LocalizedText></Link>
       <Link href="/login"><LocalizedText>{"Anmelden"}</LocalizedText></Link>

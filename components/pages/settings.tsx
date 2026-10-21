@@ -19,7 +19,7 @@ import { saveTheme, type ThemeMode } from "@/lib/client/theme";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { AppShell } from "../app-shell";
-import { apiGet, apiPatch, apiPost, apiUpload, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
+import { apiGet, apiDelete,apiPatch, apiPost, apiUpload, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 import { plans as subscriptionPlans } from "@/lib/plans";
 import { legalConfig } from "@/config/legal";
 import {Button, EmptyState, Field, Icon, SectionTitle, Status, Toast, Toggle, Input, FormActions, Select, LoadingState, ErrorState} from "../ui";
@@ -52,6 +52,7 @@ export function AccountSettingsPage() {
   const [avatarUploading,setAvatarUploading]=useState(false);
   const [avatarError,setAvatarError]=useState("");
   const avatarPending=useRef(false);
+  const removeAvatar=async()=>{const match=avatarUrl.match(/^\/api\/files\/([0-9a-f-]{36})\/download$/i);if(!match||avatarPending.current||saveBusy.current)return;avatarPending.current=true;setAvatarUploading(true);setAvatarError('');try{await apiDelete('/api/files/'+match[1]);setAvatarUrl('');query.refresh();window.dispatchEvent(new Event('binso-profile-changed'));}catch(error){setAvatarError(error instanceof Error?error.message:'Profilbild konnte nicht entfernt werden.');}finally{avatarPending.current=false;setAvatarUploading(false)}};
   const uploadAvatar=async(file:File|undefined)=>{if(!file||avatarPending.current||saveBusy.current)return;avatarPending.current=true;setAvatarUploading(true);setAvatarError("");try{const form=new FormData();form.append("file",file);form.append("purpose","profile_avatar");const result=await apiUpload<{item:{id:string;scanStatus:string;available?:boolean}}>("/api/files",form);if(result.item.available!==true&&result.item.scanStatus!=="clean")throw new Error("Das Profilbild wartet auf die Sicherheitsprüfung. Das bisherige Bild bleibt erhalten.");setAvatarUrl("/api/files/"+result.item.id+"/download");query.refresh();window.dispatchEvent(new Event("binso-profile-changed"));setToast("Profilbild gespeichert.");}catch(e){const message=e instanceof Error?e.message:"Profilbild konnte nicht gespeichert werden.";setAvatarError(message);setToast(message)}finally{avatarPending.current=false;setAvatarUploading(false)}};
 
   useEffect(()=>{
@@ -87,7 +88,7 @@ export function AccountSettingsPage() {
         <Avatar name={displayName==="Benutzer"?"":displayName} identity={email} src={avatarUrl} size="large"/><div><h2>{displayName}</h2><p><LocalizedText verbatim>{email}</LocalizedText></p><p><LocalizedText verbatim={!!jobTitle}>{jobTitle||"Benutzer"}</LocalizedText></p></div>
       </section>
       {editing?<FormSheet workspace label="Persönliche Daten bearbeiten" open onClose={()=>setEditing(false)} busy={saving||avatarUploading} dirty={currentValues!==baseline}><form className="settings-form" onSubmit={event=>{event.preventDefault();void save();}}>
-        <FileUpload id="profile-avatar-upload" label="Profilbild" file={null} preview={avatarUrl||undefined} accept={["image/png","image/jpeg","image/webp"]} busy={saving||avatarUploading} error={avatarError} onSelect={file=>void uploadAvatar(file)}/>
+        <FileUpload id="profile-avatar-upload" label="Profilbild" file={null} preview={avatarUrl||undefined} accept={["image/png","image/jpeg","image/webp"]} busy={saving||avatarUploading} error={avatarError} onSelect={file=>void uploadAvatar(file)} onRemove={()=>void removeAvatar()}/>
         <div className="form-grid two">
           <Field label="Vorname"><Input value={firstName} onChange={e=>setFirstName(e.target.value)}/></Field>
           <Field label="Nachname"><Input value={lastName} onChange={e=>setLastName(e.target.value)}/></Field>

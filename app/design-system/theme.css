@@ -9,7 +9,7 @@
   --workspace-mobile-ink:#213047;
   --workspace-muted:#647080;
   --workspace-line:#edf1f6;
-  --workspace-title-size:27px;
+  --workspace-title-size:22px;
   --mobile-title-tracking:-.8px;
   --mobile-value-tracking:-.8px;
   --workspace-title-weight:600;
@@ -36,7 +36,7 @@
   --control-secondary-fg:#3e6594;
   --control-ghost-fg:#2f73c4;
   --command-text:#475469;
-  --app-control-radius:7px;
+  --app-control-radius:12px;
   --operator-detail-panel-min:420px;
   --group-row-h:64px;
   --check-size:18px;
@@ -47,7 +47,7 @@
   --chart-compact-height:130px;
   --kpi-padding:14px;
   --action-row-height:48px;
-  --section-title-font:18px;
+  --section-title-font:16px;
   color-scheme:light;
   --color-bg:#fff;
   --color-fg:#000;
@@ -73,20 +73,20 @@
   --status-neutral-fg:#555;
   --status-neutral-line:#dededb;
 
-  --font-sans:Inter,system-ui,sans-serif;
+  --font-sans:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   /* Existing shared component values, now centrally owned. No visual change. */
   --button-height:42px;
-  --button-font-size:var(--type-control);
-  --button-font-weight:400;
+  --button-font-size:15px;
+  --button-font-weight:600;
   --button-line-height:1;
   --button-gap:8px;
   --button-padding-inline:16px;
   --button-icon-size:17px;
   --page-heading-size:var(--type-desktop-heading);
-  --page-heading-line-height:1.5;
+  --page-heading-line-height:1.3;
   --page-heading-letter-spacing:-.6px;
   --body-font-size:14px;
-  --body-line-height:1.45;
+  --body-line-height:1.5;
   --metric-label-size:var(--type-label);
   --metric-label-line-height:1.2;
   --metric-value-size:var(--workspace-value-size);
@@ -136,7 +136,8 @@
   --mobile-sheet-row-h:56px;
   --touch:44px;
 
-  --header-avatar-size:30px;
+  --header-avatar-size:34px;
+  --profile-avatar-size:104px;
   --control-focus-width:2px;
   --chart-positive:#57cc91;
   --chart-overview:#5687c7;
@@ -145,18 +146,18 @@
   --chart-neutral:#a2a8b3;
   --chart-ring-size:112px;
   --chart-ring-width:10px;
-  --control-h:40px;
-  --control-h-mobile:44px;
-  --control-font:13px;
+  --control-h:48px;
+  --control-h-mobile:48px;
+  --control-font:16px;
   --control-font-mobile:16px;
   --control-label-font:var(--type-label);
-  --control-label-weight:400;
+  --control-label-weight:500;
   --heading-content-gap:12px;
   --field-label-gap:6px;
   --field-group-gap:14px;
   --sheet-row-gap:10px;
   --control-help-font:var(--type-metadata);
-  --control-x:11px;
+  --control-x:16px;
   --control-radius:var(--app-control-radius);
   --control-textarea-min:110px;
   --control-disabled-opacity:.45;
@@ -186,23 +187,23 @@
   --shape-control-mobile:8px;
   --type-body:14px;
   --type-control:14px;
-  --type-desktop-heading:27px;
+  --type-desktop-heading:22px;
   --type-display-small:30px;
   --type-body-large:15px;
   --shape-mark:2px;
-  --type-section:18px;
+  --type-section:16px;
   --shape-overlay:16px;
-  --type-auth-display:43px;
+  --type-auth-display:28px;
   --shape-group-small:10px;
   --shape-medium:9px;
   --type-subtitle:20px;
   --shape-panel:14px;
   --shape-small:6px;
   --shape-kbd:3px;
-  --type-mobile-heading:25px;
+  --type-mobile-heading:22px;
   --shape-compact:4px;
   --shape-control-desktop:5px;
-  --type-mobile-detail:23px;
+  --type-mobile-detail:22px;
   --shape-feature:24px;
   --record-row-min:86px;
   --record-identity-size:38px;
@@ -240,7 +241,7 @@
   --palette-c43b32:#c43b32;
   --marketing-hero-size:44px;
   --marketing-mobile-hero-size:35px;
-  --access-control-height:46px;
+  --access-control-height:48px;
 }
 @media (display-mode:standalone){
 :root{
@@ -325,9 +326,9 @@ html{scroll-behavior:auto}
 :root{--mobile-page-x:20px}
 }
 @media (max-width:760px){
-:root{--app-control-radius:8px}
+:root{--app-control-radius:12px}
 }
 
 @media (pointer:coarse){
-:root{--button-height:var(--touch);--control-h:var(--touch);--control-font:16px;--desktop-action-h:var(--touch)}
+:root{--button-height:var(--touch);--control-h:48px;--control-font:16px;--desktop-action-h:var(--touch)}
 }

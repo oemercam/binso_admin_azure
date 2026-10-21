@@ -95,6 +95,18 @@ editors retain the existing FormSheet. Navigation and blue FAB remain frozen.
 A green test is not evidence of real mail delivery, a human read or device approval.
 New package merge, production migrations and deployment require exact-SHA approval.
 
+## Revision 7 (21 October 2026) — current complete source
+
+The byte-preserved docs/audit/v25-revision7/source.md supersedes earlier V25
+masters and addenda. All 56 chapters and P0/P1/P2 are binding; P3 is excluded.
+Use docs/architecture/v25-revision7.md and its generated requirement/route/state
+registers. Old implementation reports remain evidence, not competing authority.
+Retain navigation/FAB, server authorization, RLS and independent review rules.
+Existing green PR305 evidence does not qualify new Revision7 changes. No new
+package merge, production migrations or deployment without exact-SHA approval.
+Legal translations, real devices, domains and provider configuration need actual
+external evidence; do not present a generated register as executed acceptance.
+
 # Codex workflow and context (canonical project instructions)
 
 V25.5 follows the existing V25.4 handoff, never an assumed integrated Main.

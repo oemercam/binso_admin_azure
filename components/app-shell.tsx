@@ -1,6 +1,7 @@
 "use client";
 
-import {LocalizedText,LocalizedElement,useTranslation} from "@/lib/client/locale";
+import {LocalizedText,LocalizedElement,useTranslation,useLocale} from "@/lib/client/locale";
+import {asLocale} from '@/lib/locales';
 import {PageAccessContext} from "@/lib/client/page-access";
 import {tenantCanOpenPath,tenantCan,tenantCanCreateAt,permissionForModule,type ModuleProfile} from "@/lib/permissions";
 import {moduleForPath,planAllowsPath,type PlanId} from "@/config/plan-access";
@@ -205,6 +206,8 @@ function AppShellFrame({
   const [notificationFilter,setNotificationFilter]=useState<"all"|"unread">("all");
   const profileQuery=useApiQuery<{item?:Record<string,unknown>|null;email?:string}>(workspaceReady?"/api/settings/profile":null);
   const profileItem=profileQuery.data?.item;
+  const {choose:chooseLocale}=useLocale(),lastProfileLocale=useRef('');
+  useEffect(()=>{if(!profileItem?.id||!profileItem.language)return;const key=String(profileItem.id)+':'+String(profileItem.language);if(lastProfileLocale.current===key)return;lastProfileLocale.current=key;chooseLocale(asLocale(profileItem.language));},[profileItem?.id,profileItem?.language,chooseLocale]);
   const profile={name:String(profileItem?.display_name||[profileItem?.first_name,profileItem?.last_name].filter(Boolean).join(" ")||""),identity:String(profileQuery.data?.email||""),avatar:String(profileItem?.avatar_url||"")};
   const [timerNotice,setTimerNotice]=useState<string|null>(null);
 

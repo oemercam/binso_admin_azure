@@ -2,6 +2,7 @@ import {requireModuleEntitlement,getOrganizationPlan} from "@/lib/server/plan-ac
 import {idempotentBusiness} from "@/lib/server/business-idempotency";
 import {assertTimeAssignment} from "@/lib/server/workforce-access";
 import {fileRelations} from "@/lib/server/file-relations";
+import {prepareProfileImage} from '@/lib/server/profile-image';
 import {validateFileContent} from "@/lib/server/file-validation";
 import {scanFileWithEvidence} from "@/lib/server/file-scan";
 import {canAccessFile} from "@/lib/server/file-access";
@@ -60,11 +61,16 @@ export async function POST(request:NextRequest){
    if(!found)throw new ApiError(404,'entity_not_found','Zuordnung wurde nicht gefunden.');
   }
   if(['company_logo','profile_avatar'].includes(purpose)){if(purpose==='company_logo')authorize(s,'organization:write');if(!['image/png','image/jpeg','image/webp'].includes(file.type))throw new ApiError(400,'logo_type_invalid','Bitte eine Bilddatei auswählen.');}
-  const id=randomUUID(),ext=(file.name.split('.').pop()||'bin').replace(/[^a-zA-Z0-9]/g,'').slice(0,8),objectKey=`${s.organizationId}/files/${id}.${ext}`,buffer=Buffer.from(await file.arrayBuffer());
+  const id=randomUUID(),ext=(file.name.split('.').pop()||'bin').replace(/[^a-zA-Z0-9]/g,'').slice(0,8),objectKey=`${s.organizationId}/files/${id}.${ext}`;
+  let buffer:Buffer=Buffer.from(await file.arrayBuffer());
   if(!file.size)throw new ApiError(400,'file_empty','Die Datei ist leer.');
   validateFileContent(buffer,file.type);
+  if(['company_logo','profile_avatar'].includes(purpose)){
+   try{buffer=await prepareProfileImage(buffer,file.type,purpose==='profile_avatar');}catch{throw new ApiError(400,'image_invalid','Das Bild kann nicht sicher verarbeitet werden. Bitte JPEG, PNG oder WebP mit höchstens 24 Megapixeln auswählen.');}
+   if(buffer.length>limitsConfig.maxFileUploadBytes)throw new ApiError(413,'file_too_large','Das verarbeitete Bild ist zu gross.');
+  }
   const sha256=createHash('sha256').update(buffer).digest('hex');
-  const item=await withTenant(s.organizationId,s.userId,async c=>idempotentBusiness(c,{organizationId:s.organizationId,userId:s.userId,operation:"file-upload",key:replayKey,body:{sha256,fileName:file.name,mimeType:file.type,size:file.size,purpose,entityId}},async()=>{
+  const item=await withTenant(s.organizationId,s.userId,async c=>idempotentBusiness(c,{organizationId:s.organizationId,userId:s.userId,operation:"file-upload",key:replayKey,body:{sha256,fileName:file.name,mimeType:file.type,size:buffer.length,purpose,entityId}},async()=>{
    if(purpose==='time_report'){
     const entry=(await c.query('select created_by_user_id,approved,submitted_at,report_month,customer_id,project_id,work_date::text as work_date from time_entries where organization_id=$1 and id=$2 for update',[s.organizationId,entityId])).rows[0];
     if(!entry||entry.created_by_user_id!==s.userId&&!['owner','admin'].includes(s.role))throw new ApiError(404,'time_entry_not_found','Zeiteintrag wurde nicht gefunden.');
@@ -79,7 +85,7 @@ export async function POST(request:NextRequest){
    const scan=await scanFileWithEvidence(buffer),scanStatus=scan.status;
    if(scanStatus==='rejected')throw new ApiError(422,'file_scan_rejected','Die Datei wurde von der Sicherheitsprüfung abgelehnt.');
    const result=await c.query(`insert into file_objects(id,organization_id,object_key,original_name,content_type,size_bytes,sha256,scan_status,created_by,blob_url,purpose,expense_id,support_case_id,employee_id,customer_id,invoice_id,quote_id,project_id,time_entry_id)
-    values($1,$2,$3,$4,$5,$6,$7,$18,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$19) returning ${fileFields}`,[id,s.organizationId,objectKey,file.name.slice(0,240),file.type,file.size,sha256,s.userId,null,purpose,relation?.column==='expense_id'?entityId:null,relation?.column==='support_case_id'?entityId:null,relation?.column==='employee_id'?entityId:null,relation?.column==='customer_id'?entityId:null,relation?.column==='invoice_id'?entityId:null,relation?.column==='quote_id'?entityId:null,relation?.column==='project_id'?entityId:null,scanStatus,relation?.column==='time_entry_id'?entityId:null]);
+    values($1,$2,$3,$4,$5,$6,$7,$18,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$19) returning ${fileFields}`,[id,s.organizationId,objectKey,file.name.slice(0,240),file.type,buffer.length,sha256,s.userId,null,purpose,relation?.column==='expense_id'?entityId:null,relation?.column==='support_case_id'?entityId:null,relation?.column==='employee_id'?entityId:null,relation?.column==='customer_id'?entityId:null,relation?.column==='invoice_id'?entityId:null,relation?.column==='quote_id'?entityId:null,relation?.column==='project_id'?entityId:null,scanStatus,relation?.column==='time_entry_id'?entityId:null]);
    await c.query('insert into file_contents(file_id,organization_id,body) values($1,$2,$3)',[id,s.organizationId,buffer]);
    if(scan.evidence)await c.query('update file_objects set scan_evidence=$1::jsonb where id=$2 and organization_id=$3',[JSON.stringify(scan.evidence),id,s.organizationId]);
    if(canAccessFile(scanStatus)&&purpose==='profile_avatar')await c.query('update app_users set avatar_url=$1,updated_at=now() where id=$2',['/api/files/'+id+'/download',s.userId]);

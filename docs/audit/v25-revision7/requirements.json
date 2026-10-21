@@ -1,0 +1,2233 @@
+{
+  "sourceSha256": "23bc8bffd954cabb0b265a723e9fde2a713ad42d4e7150a5cb2765c7c367a363",
+  "chapters": 56,
+  "requirements": [
+    {
+      "id": "R7-01-001",
+      "chapter": 1,
+      "title": "Verbindliche Architektur und UX",
+      "priority": "P0–P2",
+      "requirement": "Bestehende Bottom-Navigation unverändert. Blauen Floating-Plus-Button in Position und Gestaltung unverändert lassen; globales Plus öffnet Schnellaktionsmenü, Fachlisten-Plus bleibt kontextbezogen. Sonstige Aktionen über kontextspezifische Drei-Punkte-Menüs, keine verstreuten Aktionsbuttons. Empty States maximal zwei kurze Textzeilen. PWA-Update-Banner überall entfernen. Eine zentrale UX-Foundation, keine Parallelkomponenten, keine lokalen CSS-Workarounds. Vorhandene Referenzlayouts und funktionierende Features bewahren. Ursachen statt Symptome korrigieren. Einheitliche Header, Tabs, Formulare, Suchfelder, Filter, Listen, Status, Dialoge, PDF-Viewer, Abstände, Farben und Typografie. Standardseitenfolge: Header → Tabs → Suche/Filter falls nötig → Inhalt. Keine doppelten Titel oder redundanten Untertitel.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "components/binso-ux.tsx",
+        "app/design-system/manifest.json"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-02-001",
+      "chapter": 2,
+      "title": "Bottom Sheets, Formulare und iOS",
+      "priority": "P0–P2",
+      "requirement": "Gemeinsames Bottom Sheet mit inhaltsabhängiger Höhe, maximalem Viewport, fix erreichbarem Header/Footer, scrollbarem Content, einheitlichen Buttons und Safe-Area. Bei nur einer Aktion kein grosses leeres Sheet. iPhone Safari und PWA keyboard-aware (VisualViewport, dynamische Höhe, Fokus, Scrollposition). Keine verdeckten Felder/Buttons. Einheitliche Input/Select/Textarea/Datepicker-Borders, Fokus, Fehler, Disabled, Innenabstände und Datums-Textausrichtung. Schweizer Format DD.MM.YYYY. Abbrechen verwirft ungespeicherte Änderungen; Wizard-Schritte erhalten Zwischenwerte.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "components/use-workspace-viewport.ts",
+        "components/binso-ux.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-03-001",
+      "chapter": 3,
+      "title": "Registrierung, Anmeldung, Sicherheit",
+      "priority": "P0–P2",
+      "requirement": "Ein Konto = ein Unternehmen. Einfache Registrierung mit E-Mail, Passwort und minimalen Firmendaten; E-Mail-Verifizierung, danach direkt ausprobieren. Keine obligatorische 2FA, keine Kreditkarte und kein überladener Onboarding-Bottom-Sheet. Mehrstufige Einrichtung als eigene, fortsetzbare Ansicht; keine doppelten Hinweise. Anmeldung mit Passwort oder optional Passkey, Autofill und Passwort-Reset. Jeder Benutzer kann später unter Einstellungen → Sicherheit freiwillig TOTP-Authenticator und Passkeys (Face ID/Touch ID via WebAuthn) aktivieren, verwalten und nach sicherer Bestätigung deaktivieren; Recovery-Codes, Geräte/Sitzungen und Abmelden aller Sitzungen. Keine aufdringlichen MFA-Erinnerungen. Kritische Aktionen (Bankdaten, Rechte, Eigentümerwechsel, Sicherheitsänderungen) mit frischer/starker Authentifizierung; vorhandene privilegierte Sicherheitsregeln risikobasiert prüfen, nicht blind schwächen. Rate Limits, Audit, Mandantentrennung und sichere Wiederherstellung.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/fresh-authentication.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-04-001",
+      "chapter": 4,
+      "title": "Kunden und CRM",
+      "priority": "P0–P2",
+      "requirement": "Kundenerstellung/-bearbeitung: Zahlungsfrist mit Firmenstandard, Adresse Schweiz, PLZ, E-Mail, Telefon, Branche, Pflichtfelder und persistente Werte. Kundenübersicht als kompaktes Dashboard mit Name/Status, Hauptkontakt, Kennzahlen, offenen Rechnungen, Aufträgen, Zahlungen und Kundenentwicklung. Bestehende Tabs Übersicht/Kontakte/Dokumente/Aktivitäten. Keine doppelten Kundenentwicklungsüberschriften, keine riesigen leeren Abschnitte. Kontaktaktionen beim Kontakt: Bearbeiten, E-Mail, Anrufen, Hauptkontakt setzen, Entfernen soweit berechtigt; keine isolierten Ellipsen. Im Kontaktformular redundante Zuordnungserklärung entfernen. Kundenentwicklung mit zentralem Zeitraumfilter, korrekten fakturierten/bezahlten/offenen Beträgen und ohne Null-Diagramm.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "components/pages/customers.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-05-001",
+      "chapter": 5,
+      "title": "Angebote und Positionen",
+      "priority": "P0–P2",
+      "requirement": "Detailansicht kompakt: Nummer, Kunde, Status, Gesamtbetrag, Datum/Gültigkeit, Positionen, Summen, Aktivität, Dateien. In Bearbeitung «Dienstleistung · Appenzell» unter Kunde und Angebotsnummer-Feld entfernen; Nummer in Detail/PDF behalten. Datumsfelder korrekt ausrichten/validieren. Positionsnummern 01/02/03, gleiche Typografie und Zeilenbreiten. Funktionierende Einheiten Stück, Stunden, Tage, Pauschal, Meter, m², Kilometer sowie vorhandene Werte. Positionen bearbeiten, duplizieren, nach oben/unten verschieben und direkt entfernen; Reihenfolge persistieren, neu nummerieren und Totale aktualisieren. Gemeinsame Positionslogik für Angebote/Rechnungen soweit fachlich zulässig. Mengen, Preise, Rabatte, Schweizer MwSt., Rundung und CHF-Format zentral korrekt; historische Dokumente nicht rückwirkend ändern.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/document-lines.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-06-001",
+      "chapter": 6,
+      "title": "Angebots-E-Mail-Versand",
+      "priority": "P0–P2",
+      "requirement": "Im Drei-Punkte-Menü «Per E-Mail senden»: Empfänger vorbelegt/editierbar, Betreff, Begleittext, PDF-Anhang, sicherer Kundenlink, Vorschau. «Als versendet erfassen» eindeutig «Als extern versendet erfassen» nennen; kein vorgetäuschter Versand. Serverseitiger Provider, Secrets nur Backend, vorhandene Infrastruktur bevorzugen, idempotente Jobs, signierte Webhooks, Deduplizierung. Versand angefordert, vom Provider angenommen, zugestellt, fehlgeschlagen und extern erfasst unterscheiden. Wiederholter Versand möglich; keine falschen Erfolgsmeldungen.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/email.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-07-001",
+      "chapter": 7,
+      "title": "Öffentliche Angebotsfreigabe",
+      "priority": "P0–P2",
+      "requirement": "Kunde ohne Konto öffnet sicheren, widerrufbaren, nicht erratbaren, versionierten Link. Mobiloptimierte Angebotsseite mit Unternehmensbranding, Nummer, Datum, Gültigkeit, Positionen, Preisen, MwSt., Total, Bedingungen und PDF. Kunde kann Angebot annehmen, ablehnen oder Frage stellen. Jede Entscheidung braucht ausdrückliche Bestätigung; kein Statuswechsel durch GET/Linkscanner. Annahme zeigt verbindliche Version/Betrag/Bedingungen, verifiziert bei Bedarf per E-Mail-Einmalcode, prüft Gültigkeit serverseitig atomar, protokolliert, benachrichtigt und bestätigt. Ablehnung optional mit Grund. Abgelaufene, ersetzte, widerrufene Versionen nicht annehmbar. Schweizer rechtliche Formanforderungen beachten, keine qualifizierte Signatur vortäuschen.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-08-001",
+      "chapter": 8,
+      "title": "Fragen, Antworten und Tracking",
+      "priority": "P0–P2",
+      "requirement": "Angebotsbezogener Nachrichtendialog: Kunde fragt ohne Login, Mitarbeiter antwortet in Binso One, Kunde erhält E-Mail mit sicherem Antwortlink. Verlauf, Absender, Zeit, Version, Rechte, Benachrichtigungen, Spam-Schutz. Vorhandene Nachrichtenservices nutzen, keine zweite Support-Ticket-Lösung. Aktivitätsmodell für E-Mail gesendet/zugestellt/fehlgeschlagen, E-Mail geöffnet soweit erkennbar, Link aufgerufen, plausible Seitenbetrachtung, PDF-Download, Frage, Annahme/Ablehnung. Ereignisse je Angebotsversion und Versand. Apple Mail Privacy Protection und Linkscanner beachten: Öffnung nicht als sicher gelesen bezeichnen; unbekannte Zustände ehrlich zeigen. Datenschutztransparenz, angemessene Aufbewahrung. In Detailansicht Versand-, Aufruf- und Reaktionsverlauf mit Zeiten, letzter Aufruf und Anzahl soweit zuverlässig.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-09-001",
+      "chapter": 9,
+      "title": "Versionierung, Status, Audit",
+      "priority": "P0–P2",
+      "requirement": "Gleiche Angebotsnummer, fortlaufende unveränderliche versendete Versionen/PDFs. Bearbeitung nach Versand schafft neuen Stand; erneuter Versand neuer Version oder derselben Version möglich und separat protokolliert. Alte Links kontrolliert ersetzen/widerrufen. Änderungen, Benutzer, Zeit, Empfänger, Version, Versandresultat auditieren. Konflikte und parallele Änderungen absichern. Status-Badges zentral: Entwurf neutral, Versendet blau, In Bearbeitung orange, Angenommen grün, Abgelehnt rot, Abgelaufen neutral. Fachstatus getrennt von Versand, Tracking und «Änderungen nicht versendet». Nach Annahme optional Auftrag/Projekt aus unveränderlicher Angebotsversion erzeugen, bestehende Module nutzen.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-10-001",
+      "chapter": 10,
+      "title": "E-Mail-Design und Domains",
+      "priority": "P0–P2",
+      "requirement": "Eine zentrale responsive E-Mail-Template-Foundation mit originalem Binso-Logo, weissem Hintergrund, dezenten Linien, blauem CTA, HTML + Plaintext, Inline-CSS, Apple Mail/Gmail/Outlook/Dark Mode. Registrierung: sicherer Bestätigungslink und alternativer sechsstelliger Code mit jeweils eigener Gültigkeit, klare Texte und Footer. Vorlagen für Reset, Sicherheit, Einladungen, Angebote, Annahmen, Ablehnungen, Fragen, Rechnungen, Erinnerungen und Support. Systemmails Binso One, Geschäftsdokumente Mandantenbranding und verifizierte Reply-To-Adresse. Zielarchitektur (nicht ohne Freigabe DNS ändern): `www.binso.ch` Website, `one.binso.ch` App, `go.binso.ch` Kundenlinks, `mail.binso.ch` Versanddomain, `api.one.binso.ch` nur bei Bedarf. SPF, DKIM, DMARC, TLS, Bounces prüfen. Bestehende binso.ch-Mail/Website nicht stören. Fehlende Providerzugänge als Blocker dokumentieren; keine echten Testmails an Kunden.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/email.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-11-001",
+      "chapter": 11,
+      "title": "Finanzen, Analyse und Listen",
+      "priority": "P0–P2",
+      "requirement": "Finanzübersicht als kompaktes 2-Spalten-Raster: fakturiert, offen, Ausgaben, überfällig; fachlich korrekte Definitionen, einheitliches CHF, keine unnötigen Texte. Monatsentwicklung nur bei echten Daten, sonst maximal zweizeiliger Empty State. Angebote/aktive Vorgänge/abrechenbare Stunden kompakt und ohne Doppelzählung. Analyse: Einnahmen, Ausgaben, Zahlungssaldo (kein Bankkontostand), nur sinnvolle Charts, Forderungen kompakt. Gemeinsamer Zeitraumfilter 1/3/6/12 Monate und benutzerdefiniert, Von≤Bis, inklusive Tage, korrektes Bottom Sheet. Angebots-/Rechnungslisten gemeinsame Darstellung mit Dokumenttyp, Nummer, Kunde, Datum, Betrag, Status, separatem Tracking, Suche/Filter und ganz antippbaren Zeilen. Im Kundenkontext Kundennamen nicht redundant wiederholen. PDF-A4, Schweizer MWST/QR-Rechnungsstandards wo relevant, Umbrüche, Positionen, Begleittexte, Vorschau und historische Versionen korrekt.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "components/statistics.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-12-001",
+      "chapter": 12,
+      "title": "Zeiterfassung, Aufträge, Dateien",
+      "priority": "P0–P2",
+      "requirement": "Timer-Seite: Titel/Tabs → Timerstatus und grosse Zeit → Start/Pause/Stop → Kunde/Auftrag/Projekt → heutige Einträge. Keine Auftragsdetails/Dateien oberhalb Timer. Vor Start fachliche Pflichtzuordnungen prüfen; laufende Messung auch bei Reload/PWA nicht verlieren. Einträge mit Suche/Filter/Summe, manuelle Erfassung und Monatsreport über bestehende Aktionsstruktur. Auftragsdetails, Stunden, Dateien und Rechnungen auf Auftragsdetailseite. Dateikomponente für Upload/Vorschau/Download/Entfernen mit Berechtigungen, kompakten Empty States und kleinen kontextuellen Menüs.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "components/pages/time.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-13-001",
+      "chapter": 13,
+      "title": "Globale Suche",
+      "priority": "P0–P2",
+      "requirement": "Eigene Suchansicht, Suchfeld/Abbrechen oben, horizontal scrollbare Kategorien Alle/Kunden/Angebote/Rechnungen/Zahlungen/Aufträge, berechtigungsabhängige Ergebnisse und Schnellzugriffe. Keine mandantenfremden Treffer. iOS-Tastatur darf keine Ergebnisse verdecken, unterliegende Seite nicht durchscheinen; VisualViewport, Safe-Area, Scrollcontainer, Fokus und Navigation in Safari/PWA testen.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "components/app-shell.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-14-001",
+      "chapter": 14,
+      "title": "Benachrichtigungen",
+      "priority": "P0–P2",
+      "requirement": "Tabs Alle/Ungelesen, nach Datum gruppiert, einzeln/alle als gelesen, ungelesene Markierung, direkte Navigation, Rechteprüfung und kurze Leermeldung. Redundanten Eintrag «Alle Benachrichtigungen» auf derselben Seite entfernen. Bestehende Push-Infrastruktur für Angebotsaufruf (nur belastbar), Frage, Annahme, Ablehnung, Versandfehler und Sicherheitsereignisse verwenden. Deduplizieren, Benutzereinstellungen beachten, nicht spammen. Optional Angebots-Nachfass-Erinnerungen erst nach Opt-in, keine nach Annahme/Ablehnung und keine Dubletten.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "components/pages/notifications.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-15-001",
+      "chapter": 15,
+      "title": "Sicherheits- und Datenmodellstandard",
+      "priority": "P0–P2",
+      "requirement": "Serverseitige Mandantentrennung, Rollen/Rechte, Audit, CSRF/XSS/Injection-Schutz, Rate Limits, Token-Rotation/Widerruf, Verschlüsselung, sichere Dokumentablage, keine Geheimnisse in Client/Logs. Entitäten für Angebotsversion, Versand, Empfänger, Zustellereignis, Zugriff, Kundenentscheidung, Nachricht, Dokumentenaktivität, Erinnerung, Audit nach Prüfung vorhandener Tabellen. Constraints, Indizes, Idempotenz, Migrationen und Backward Compatibility; keine Datenverluste. Vertrauliche Links nicht über Referrer/Analytics weitergeben.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/rbac.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-16-001",
+      "chapter": 16,
+      "title": "Qualität, Performance und Abnahme",
+      "priority": "P0–P2",
+      "requirement": "Zuerst Root-Cause-Matrix je Screenshotproblem, betroffene Komponenten und bestehende Abdeckung erstellen. Änderungen in logisch zusammenhängenden Paketen; gezielte Typechecks/Lint/Unit- und Integrationstests während Implementierung. Ein gebündelter Build und gebündelte visuelle Browserprüfung nach Abschluss, keine vollständige Browser-Suite nach jeder Miniänderung. Testfälle: iPhone Safari/PWA, Android, Desktop, Tastatur/Safe-Area, Formulare, Status, Positionsberechnung, PDF, Versionierung, Versandfehler, Linkscanner, Annahme/Ablehnung, Mandantentrennung, Rollen, Passkey/MFA und Notifications. Keine realen Kundendaten/Versandaktionen in Tests. Visuals mit freigegebenen Referenzen bei gleicher Breite vergleichen. CI-Gates nicht umgehen.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-17-001",
+      "chapter": 17,
+      "title": "PR, Deploy und Freigabegrenzen",
+      "priority": "P0–P2",
+      "requirement": "Auf dediziertem Branch arbeiten, nachvollziehbare Commits/PR, bestehende offene PRs nicht überschreiben. Nach erfolgreichen Checks Review-/Branch-Protection-Regeln beachten. Kein Force-Push, kein Überspringen von Security-Gates, keine destruktiven Migrationen. Automatisch deployen nur soweit die bestehende ausdrücklich erteilte Freigabe, Berechtigungen und CI/CD-Regeln dies erlauben. DNS-, E-Mail-Provider-, Domain-, zahlungspflichtige Dienste, Secrets und irreversible Produktivänderungen benötigen gesonderte Freigabe bzw. Konfiguration. Falls ein externer Blocker besteht: nicht fälschlich Erfolg melden; implementierten Stand und exakte Schritte dokumentieren. Deploymentstatus, GitHub Actions und Azure-Live-Funktion nach zulässigem Deploy verifizieren; Fehler anhand Logs ursächlich beheben, keine blinden Retries.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-18-001",
+      "chapter": 18,
+      "title": "Abschlussbericht und Definition of Done",
+      "priority": "P0–P2",
+      "requirement": "Berichte knapp: aktuelle Basis/PRs, Root Causes, erledigt vs. bereits vorhanden, zentrale Komponenten/Services, Migrationen, Tests/CI, visuelle Abnahme, echte Versand-/Tracking-/Freigabefunktion, offene Konfigurationspunkte, PR/Commit/Deploy/Live-Status. Vollständigen Projekt-ZIP-Release erstellen, wenn in der ausführenden Umgebung möglich, und vollständigen PowerShell-Block für Import, `pnpm install`, `pnpm lint`, `pnpm typecheck`, `pnpm build`, `git status`, `git add`, `git commit`, `git pull --rebase`, `git push` und CI/Azure-Verifikation liefern; keine Secrets oder Build-Artefakte unnötig ins ZIP. Keine behauptete Fertigstellung bei nur simulierten Services oder fehlenden Zugangsdaten.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-18-002",
+      "chapter": 18,
+      "title": "Abschlussbericht und Definition of Done",
+      "priority": "P0–P2",
+      "requirement": "**Arbeite autonom innerhalb dieser Freigabegrenzen bis zu einem prüfbaren, integrierten Ergebnis. Nicht bei einer blossen Planung stoppen.**",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-19-001",
+      "chapter": 19,
+      "title": "Binso One Identity – verbindlicher visueller Standard",
+      "priority": "P0–P2",
+      "requirement": "Die letzte freigegebene Chat-Vorschau ist die gestalterische Zielrichtung, nicht eine pixelgenau extrahierbare HTML-Vorlage. Baue eine reproduzierbare HTML-Referenz im Projekt und prüfe die realen Screens bei gleichen Viewports dagegen. Originales Binso-One-Logo oben links; oben rechts exakt auf gleicher Höhe die **rahmenlose Sprachwahl `DE ˅`**. Kein Globus, keine Flagge, keine Pill, keine sichtbare Buttonfläche oder Border; unsichtbare ausreichend grosse Touchfläche und zugängliches Popover mit Deutsch, Français, Italiano, English. Die Sprachwahl bleibt auf Login, Registrierung, Bestätigung und Passwort-Reset an identischer Position.",
+      "status": "teilweise_implementiert",
+      "sourceReferences": [
+        "components/locale-switcher.tsx",
+        "app/design-system/theme.css"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "Gezielte Prüfungen: registration-test, profile-image-test, document-presentation-test, pdf-gestures-test, migration-test; letzter Datenbanklauf bestanden.",
+      "visualComparison": "Ausstehend am aktuellen Revision7-Stand",
+      "blocker": "Vollständige Klauselabnahme und reale Geräte fehlen; nicht als vollständig bestanden werten."
+    },
+    {
+      "id": "R7-19-002",
+      "chapter": 19,
+      "title": "Binso One Identity – verbindlicher visueller Standard",
+      "priority": "P0–P2",
+      "requirement": "Globale Font-Familie `Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif`. Zentrale Skala: Auth-Headline 28px/600, Seitentitel 22px/600, Abschnitt 16px/600, Body 14px/400, Eingabe 16px/400, Label 13px/500, Button 15px/600, Hilfe und Badge 12px (400 bzw. 500). Konsistente Line Heights (Headline 1.2, Titel 1.3, Body 1.5). Alle Eingaben über zentrale Komponenten: **12px Radius, 48px Höhe, 16px Eingabetext, 16px horizontales Padding, 1px neutraler Border, weisser Hintergrund**, einheitlicher blauer Fokus, roter Fehler, Disabled, Readonly, Validierung. Gilt auch für Suche, Filter, Combobox, Datum, Select, Textarea (variable Höhe), Bottom Sheets, mehrstufige Formulare und Admin. Checkbox/Radio/Switch semantisch korrekt belassen. Keine doppelten Umrandungen. Inter sauber und datenschutzkonform ausliefern; Font-Fallback ohne Layoutbruch.",
+      "status": "teilweise_implementiert",
+      "sourceReferences": [
+        "components/locale-switcher.tsx",
+        "app/design-system/theme.css"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "Gezielte Prüfungen: registration-test, profile-image-test, document-presentation-test, pdf-gestures-test, migration-test; letzter Datenbanklauf bestanden.",
+      "visualComparison": "Ausstehend am aktuellen Revision7-Stand",
+      "blocker": "Vollständige Klauselabnahme und reale Geräte fehlen; nicht als vollständig bestanden werten."
+    },
+    {
+      "id": "R7-19-003",
+      "chapter": 19,
+      "title": "Binso One Identity – verbindlicher visueller Standard",
+      "priority": "P0–P2",
+      "requirement": "Login als eigenständige, ruhige Vollbildansicht auf Mobile und zentrierte, begrenzte Spalte auf Desktop: Logo/Sprache → «Willkommen zurück.» → kurzer Untertitel → Passkey → dezentes «oder» → E-Mail → Passwort mit Anzeigen/Umschalten → Passwort vergessen → Anmelden → Konto erstellen. Sinnvolle primäre Aktionshierarchie und keine dekorativen Bilder. Tastatur, Autofill, Passwortmanager, Loading, Fehler, Fokus, Screenreader und Dark-Mode-Lesbarkeit testen. Alle Formulare und Überschriften appweit zentral vereinheitlichen; Bottom-Navigation und blauen FAB unverändert lassen.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "components/locale-switcher.tsx",
+        "app/design-system/theme.css"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-20-001",
+      "chapter": 20,
+      "title": "Registrierung, Ersteinrichtung und lokalisierte Kommunikation",
+      "priority": "P0–P2",
+      "requirement": "Netflix-inspirierte **eigene Vollbild-Schrittfolge statt grossem Bottom Sheet**: 1) E-Mail, 2) Passwort, 3) Firmenname; danach E-Mail verifizieren und direkt ins Produkt. Fortschrittsanzeige, ein klares Ziel je Schritt, Zurück ohne Datenverlust, sicher fortsetzbarer Entwurf. Keine Kreditkarte, kein Pflicht-Authenticator, keine umfangreichen Pflicht-Firmendaten vor Erstnutzung. Ein Konto = ein Unternehmen. E-Mail-Verifizierung vor produktiven sensiblen Aktionen erzwingen; eingeschränkte Testnutzung vor Bestätigung nur wenn bestehende Sicherheitsregeln dies sicher erlauben. Passkey freiwillig anbieten, nicht aufdrängen. 2FA später freiwillig unter Profil → Einstellungen → Sicherheit mit TOTP, Recovery-Codes, sicherer Deaktivierung und Geräteverwaltung; bestehende risikobasierte Step-up-Checks erhalten.",
+      "status": "teilweise_implementiert",
+      "sourceReferences": [
+        "components/registration/registration-page.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "Gezielte Prüfungen: registration-test, profile-image-test, document-presentation-test, pdf-gestures-test, migration-test; letzter Datenbanklauf bestanden.",
+      "visualComparison": "Ausstehend am aktuellen Revision7-Stand",
+      "blocker": "Vollständige Klauselabnahme und reale Geräte fehlen; nicht als vollständig bestanden werten."
+    },
+    {
+      "id": "R7-20-002",
+      "chapter": 20,
+      "title": "Registrierung, Ersteinrichtung und lokalisierte Kommunikation",
+      "priority": "P0–P2",
+      "requirement": "DE/FR/IT/EN über zentrale i18n-Keys, vollständige Übersetzung aller Auth-Seiten, Validierungsfehler, Benachrichtigungen und System-E-Mails; Sprache zunächst lokal, nach Login im Profil speichern, nicht beim Schrittwechsel zurücksetzen. Keine gemischtsprachigen Flows. Fehlende Übersetzungen im CI erkennen. Barrierefreiheit bei längeren französischen/italienischen Texten prüfen. Registrierung, Login und Wiederherstellung müssen dieselbe Auth-Backendlogik nutzen; bestehende Konten und Sessions migrationssicher erhalten.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "components/registration/registration-page.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-21-001",
+      "chapter": 21,
+      "title": "Unternehmens-Ersteinrichtung und Administration",
+      "priority": "P0–P2",
+      "requirement": "Nach Einstieg optionaler, überspringbarer Setup-Guide mit sichtbarem Fortschritt: Unternehmensprofil, Adresse/UID, Rechnungsadresse, Logo/Branding, Standard-MwSt., Bankverbindung, Zahlungsfristen, Nummernkreise, PDF-Begleittexte, Mitarbeiter einladen. Nur tatsächlich notwendige Angaben vor der ersten produktiven Rechnung verbindlich verlangen. Fehlende Pflichtangaben kontextuell beim betreffenden Vorgang nachfordern, statt alles im Signup zu erzwingen. Rollen Owner/Admin/Finance/Mitarbeiter anhand bestehendem Berechtigungsmodell prüfen, keine erfundenen Rollen; Einladungen, Annahme, Ablauf, Widerruf, Austritt/Deaktivierung, Besitzerwechsel mit Step-up, Audit. Nur serverseitig autorisierte Funktionen und Daten anzeigen. Firmenbezogene Einstellungen dürfen nie auf andere Mandanten übergreifen.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-22-001",
+      "chapter": 22,
+      "title": "Durchgängiger Geschäftsprozess und Schweizer Rechnungslogik",
+      "priority": "P0–P2",
+      "requirement": "Prüfe als echte Ende-zu-Ende-Flows: Kunde → Angebot mit Positionen → versionierter E-Mail-Versand → sichere Kundenansicht → Rückfrage/Annahme → bestehender Auftrag/Projekt → Timer/manuelle Zeiten → Rechnung → QR-Zahlteil → Teilzahlung/Vollzahlung → Abschluss. Keine doppelte Erfassung oder Verlust von Herkunftsreferenzen. Schweizer QR-Rechnung gemäss aktuell anwendbaren SIX-Spezifikationen: korrekte IBAN/QR-IBAN, Referenzart, Zahlungsdaten, CHF und gegebenenfalls EUR, gültiger QR-Zahlteil, Druck/PDF, Prüfung mit Testvektoren. QR-IBAN nicht mit gewöhnlicher IBAN verwechseln. MWST-Sätze konfigurierbar und historisiert, inkl. Null-/Sondersätze wo erforderlich; keine hartcodierte 8.1%-Annahme für alle Fälle. Teilzahlungen, Überzahlungen, Gutschriften, Storno, Mahnungen und Unveränderlichkeit verbuchter Dokumente nach geltender Produktlogik prüfen. Daten- und Nummernkreis-Konsistenz bei parallelen Benutzern garantieren. Automatische E-Mails erst nach eindeutiger Aktivierung.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-23-001",
+      "chapter": 23,
+      "title": "Zuverlässigkeit, Offline-Verhalten und Fehlerbehandlung",
+      "priority": "P0–P2",
+      "requirement": "Laufender Timer muss Reload, PWA-Hintergrund und kurzzeitige Netzunterbrechungen überstehen; serverseitige Zeitanker und Synchronisierung verwenden, keine unbemerkten Doppelzeiten. Bei Erfassungsformularen kontrolliertes Draft-Autosave nur wenn sicher/angemessen; Konflikte und Wiederherstellung sichtbar behandeln. Online/Offline-Status und fehlgeschlagene Synchronisierung unaufdringlich kommunizieren; niemals Offline-Versand als erfolgreich melden. Doppelklicks auf Speichern/Senden/Annehmen müssen idempotent sein. Optimistische UI nur mit sauberem Rollback. Konsistente Fehlermeldungen, Retry-Strategie, Feldfehler, Ladezustände, leere Zustände (max. zwei Zeilen) und Bestätigungen für destruktive Aktionen. Keine unkontrollierten Service-Worker-Updates oder PWA-Update-Banner. PWA-Speicher und Offline-Caches dürfen keine fremden Mandantendaten offenlegen.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-24-001",
+      "chapter": 24,
+      "title": "Support, Dokumente und globale Aktionsarchitektur",
+      "priority": "P0–P2",
+      "requirement": "Support: kurze lesbare Ticketnummer statt UUID, kompakte Ticketzeilen, Chat-Header oben, Nachrichten scrollbar, Eingabe bei iOS-Tastatur immer sichtbar. Einheitliche Support-Sheets für Neu, Suche und Filter, ohne doppelten Titel oder doppelte Input-Borders. Dateien: Berechtigungen, Upload-Limits, Typprüfung, Malware-Schutz, Download, PDF-Seitenvorschau, sichere temporäre URLs und Löschregeln. Globales Plus öffnet auf Dashboard das rollenabhängige «Neu erstellen»-Schnellaktionsmenü (Kunde, Angebot, Rechnung, Projekt, Zeiteintrag, Ausgabe); Fachlisten-Plus bleibt kontextspezifisch. Andere Befehle (PDF öffnen/herunterladen, Anhänge, Kopieren, Senden, Löschen) konsistent im jeweiligen Drei-Punkte-Menü. Auf Mobile passende kompakte Aktions-Sheets, Desktop kompakte Menüs. Aktionen auf Datensatz, Abschnitt und Eintrag eindeutig zuordnen. Navigation/Tabs/Formular-Eingaben sind keine Aktionsbefehle.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-25-001",
+      "chapter": 25,
+      "title": "Plattformbetrieb, Datenhoheit, Performance und Accessibility",
+      "priority": "P0–P2",
+      "requirement": "Datenexport des eigenen Unternehmens in geeigneten offenen Formaten und sicherer Dokumentenexport, mit Berechtigung, Audit und Datenschutzkonzept. Aufbewahrung, Archivierung, Löschung und rechtliche Sperren unterscheiden. Monitoring mit korrelierten Request-/Job-IDs, aussagekräftige Logs ohne Geheimnisse oder unnötige Personendaten, Alerting für E-Mail-Queues, API-Fehler, Migrationen und Deployment. Backup und **nachgewiesene Wiederherstellbarkeit**, sichere Migrationen und Rollback-Plan, Feature-Flags für unfertige externe Integrationen. Performance-Budgets für mobile Erstladung, Suche, Listen, PDF-Viewer und grosse Kundendatenmengen; serverseitige Pagination und Query-Indizes. WCAG-orientierte Bedienbarkeit: Kontrast, 44px-Touchziele soweit sinnvoll, Tastatur/Fokus, Screenreader, Labels, Fehlermeldungen, Zoom/Textskalierung und reduzierte Bewegung. Kein Accessibility-Fix darf die freigegebene Formensprache zerstören.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-26-001",
+      "chapter": 26,
+      "title": "Umsetzungsreihenfolge, Abnahmematrix und Grenzen",
+      "priority": "P0–P2",
+      "requirement": "**Phase A – Bestandsaufnahme:** Tatsächlichen Branch, offene PRs, Migrationslage, Provider und alle referenzierten Screenshot-Probleme auf einer Matrix erfassen: Screen/Problem → Root Cause → zentrale Komponente → Änderung → Test → Abnahme. Keine Screenshots als Beweis für bereits behobene Bugs behandeln.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-26-002",
+      "chapter": 26,
+      "title": "Umsetzungsreihenfolge, Abnahmematrix und Grenzen",
+      "priority": "P0–P2",
+      "requirement": "**Phase B – UX-Foundation:** Inter, Typografieskala, 12px-Felder, Spacing, Header/Tabs, Badges, Menüs, Bottom Sheets, Footer/Safe-Area, Suchansicht, Empty States. Danach Login/Signup und Sprache mit reproduzierbarer visueller Referenz. Bottom-Navigation/FAB nicht ändern.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-26-003",
+      "chapter": 26,
+      "title": "Umsetzungsreihenfolge, Abnahmematrix und Grenzen",
+      "priority": "P0–P2",
+      "requirement": "**Phase C – Kernworkflows:** CRM, Angebote/Positionen, Timer, Finanzen, Dokumente, Support, Suche und Benachrichtigungen. Gemeinsame Komponenten nutzen, Daten und Rechte erhalten.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-26-004",
+      "chapter": 26,
+      "title": "Umsetzungsreihenfolge, Abnahmematrix und Grenzen",
+      "priority": "P0–P2",
+      "requirement": "**Phase D – Digitale Dokumentenkommunikation:** Versand, Versionierung, E-Mail-Templates, sichere Kundenlinks, Annahme/Ablehnung, Fragen, Tracking, Erinnerungen; externe Provider, DNS und Secrets nur nach vorhandener Konfiguration bzw. gesonderter Freigabe. Keine simulierten Versand- oder Zustellmeldungen als live deklarieren.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-26-005",
+      "chapter": 26,
+      "title": "Umsetzungsreihenfolge, Abnahmematrix und Grenzen",
+      "priority": "P0–P2",
+      "requirement": "**Phase E – Betriebsreife:** End-to-End-Geschäftsfluss, Schweizer QR-Rechnung, Wiederherstellung, Monitoring, Datenschutz, Rollen, Performance und Accessibility. Wenn ein Teil zu gross ist, in klar abgegrenzten PRs mit überprüfbarer Definition of Done liefern, aber keine Anforderungen stillschweigend auslassen.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-26-006",
+      "chapter": 26,
+      "title": "Umsetzungsreihenfolge, Abnahmematrix und Grenzen",
+      "priority": "P0–P2",
+      "requirement": "**Abnahme pro Modul:** visuelle Prüfung gegen verbindliche Referenz bei identischer Breite; reale Interaktionen und Statusübergänge; mobile Tastatur/Safe-Area; Rechte/Mandantentrennung; Fehler- und Leerzustände; Speicherung/Reload; relevanter Integrationstest. Ein grüner Build ersetzt keine visuelle oder fachliche Abnahme. Keine mehrfachen kompletten Browserläufe nach jeder Kleinigkeit; gezielte Checks während der Arbeit, vollständige Gates am Paketende.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-26-007",
+      "chapter": 26,
+      "title": "Umsetzungsreihenfolge, Abnahmematrix und Grenzen",
+      "priority": "P0–P2",
+      "requirement": "**Freigabegrenzen:** Keine destruktiven Datenmigrationen, keine Änderung von DNS/MX/SPF/DKIM/DMARC, keine kostenpflichtigen Provider, keine produktiven Kundenmails und keine Geheimnisrotation ohne gesonderte Freigabe. Keine Umgehung von Branch Protection oder Security-Gates. PR/Merge/Deploy nur im Umfang bereits erteilter Rechte und Freigaben. Bei externen Blockern alle unabhängigen Arbeiten fortsetzen und Blocker konkret dokumentieren. Endbericht mit Matrix erledigt/offen, Testnachweisen, PR/Commit, Deployment- und Live-Status, ohne erfundene Erfolge.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-26-008",
+      "chapter": 26,
+      "title": "Umsetzungsreihenfolge, Abnahmematrix und Grenzen",
+      "priority": "P0–P2",
+      "requirement": "**Verbindliche Enddefinition:** Ein konsistentes Binso One mit modernem Identity-Flow, rahmenlosem `DE ˅`, Inter, 12px-Rounded-Forms, standardisierten Aktionen und Sheets sowie vollständigen, sicheren Geschäftsprozessen. Bestehende Bottom-Navigation und Floating-Plus-Button bleiben unverändert. Dieser Auftrag ist eine konsolidierte Spezifikation und ersetzt frühere abgeschnittene V25-Chattexte; bei Konflikten mit bereits explizit freigegebenen Sicherheits- oder Produktregeln diese nicht stillschweigend überschreiben, sondern Konflikt benennen.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-26-009",
+      "chapter": 26,
+      "title": "Umsetzungsreihenfolge, Abnahmematrix und Grenzen",
+      "priority": "P0–P2",
+      "requirement": "---\n# REVISION 3 – VERBINDLICHE ERWEITERUNG: P0, P1 UND P2 VOLLSTÄNDIG",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-26-010",
+      "chapter": 26,
+      "title": "Umsetzungsreihenfolge, Abnahmematrix und Grenzen",
+      "priority": "P0–P2",
+      "requirement": "Diese Ergänzung ist Bestandteil des Masterauftrags. **Alle P0-, P1- und P2-Punkte implementieren; P3 ausdrücklich nicht implementieren.** Bestehende funktionierende Lösungen wiederverwenden. Bei Konflikten gelten die konkreteren neueren Anforderungen; geschützte Bottom-Navigation und der bestehende blaue Floating-Plus-Button bleiben unverändert. Externe Konfigurationsblocker dokumentieren und unabhängige Arbeit fortsetzen. Keine unbestätigten Erfolgsmeldungen.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-27-001",
+      "chapter": 27,
+      "title": "Benutzerfreundlichkeit und alle Seiten [P1]",
+      "priority": "P1",
+      "requirement": "Zielgruppe: Schweizer Unternehmen ohne grosse IT-Kenntnisse. Ein klarer nächster Schritt, kurze verständliche Texte, sinnvolle Vorbelegungen, keine doppelte Dateneingabe. Alle Seiten und Unterseiten prüfen: Erstbesuch, Daten vorhanden, leer, Laden, Fehler, offline, keine Berechtigung, Sitzung abgelaufen, iOS-Tastatur, PWA-Neustart, Browser-Zurück und Deep Links. Leere Zustände maximal zwei Zeilen. Aktionen über Drei-Punkte-Menüs bzw. vorhandenes Plus-Menü, keine verstreuten Buttons. Zentrale Bottom Sheets mit inhaltsabhängiger Höhe, fixem erreichbarem Footer, Scroll-Content und Safe-Area. Keine PWA-Update-Meldung.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-28-001",
+      "chapter": 28,
+      "title": "Identity, Rollen und Mitarbeiter [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "Registrierung in eigenständigen Vollbildschritten E-Mail → Passwort → Firmenname → E-Mail-Verifizierung → direkt starten, ohne Kreditkarte oder obligatorische 2FA. Ein Benutzerkonto gehört zu genau einem Unternehmen. Gemeinsamer Login für Owner, Admin, Finance, Member; Rollen nach Authentifizierung serverseitig bestimmen. Passkeys/WebAuthn mit Face ID/Touch ID bevorzugt, Passwort alternativ, TOTP freiwillig nachträglich, Recovery-Codes, sichere Sitzungen, Geräteübersicht, Sitzungen widerrufen, Passwortreset, sichere Wiederherstellung und Step-up bei kritischen Änderungen. Push-Number-Matching nur bei nachweislich verfügbarer, sicherer Identity-Provider-Funktion für externe SaaS-Kunden; keine improvisierte Push-Bestätigung. Inter-Schrift global, Überschriften 28/22/16 px, Body 14, Eingabe 16, Label 13, Button 15, Hilfe/Badge 12 px; 12px abgerundete Felder, 48px Höhe, 16px Padding. Original-Logo links und **rahmenlose Sprachauswahl `DE ˅` rechts**, ohne Globus/Button/Pill; DE/FR/IT/EN auf Auth, App und E-Mails.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/permissions.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-28-002",
+      "chapter": 28,
+      "title": "Identity, Rollen und Mitarbeiter [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "Mitarbeitereinladung: E-Mail + Rolle → Link **7 Tage gültig** → E-Mail-/Identitätsnachweis → aktivieren. Einmalige zufällige Tokens gehasht speichern, blosses Öffnen verbraucht nicht. Offen/angenommen/abgelaufen/widerrufen; kontrolliert erneut senden, alten Token ungültig machen; klare Lösungen für falsches Konto, Passwort vergessen, bereits Mitglied, nicht zugestellt, Netzwerkfehler, Unterbrechung und gesperrte Konten. Rollen Owner/Admin/Finance/Member; **P2 Viewer** ergänzen. Serverseitige Rechte-Matrix nach Aktion und Datensatz. Mitarbeiteraustritt mit Aufgabenübergabe, Sitzungswiderruf und historischer Attribution; Owner-Wechsel besonders absichern.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/permissions.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-28-003",
+      "chapter": 28,
+      "title": "Identity, Rollen und Mitarbeiter [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "Internes Portal `admin.one.binso.ch`: getrennte Plattformrollen (Platform Owner/Admin, Support Operations, Billing Operations, Security Auditor), keine Selbstregistrierung, verpflichtende phishingresistente Authentifizierung, strikte Mandantentrennung. Supportzugriff auf Kundendaten nur zeitlich begrenzt mit Grund, Freigabe und Audit. Unternehmensadmin ist kein Plattformadmin.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/permissions.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-29-001",
+      "chapter": 29,
+      "title": "Einrichtungsstatus und Pflichtfeldprüfung [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "Auf Übersicht kompakte Checkliste «Einrichtung abschliessen»: Pflicht/empfohlen/optional, Fortschritt, nur relevante Aufgaben, optional ausblendbar. Zentraler serverseitiger Readiness-Service für Aktionen, verständliche Meldung fehlender Angaben, direkter Link zum richtigen Feld, Rückkehr zur unterbrochenen Aktion. Rechnung als Entwurf auch ohne komplette Firmenangaben; **Ausstellen/Versenden erst bei erfüllten Pflichtangaben**. QR-Zahlteil nur bei gültigen Bankdaten. Steuerpflicht und UID bedingt, Firmenlogo nicht verpflichtend. Regeln serverseitig erneut prüfen.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-30-001",
+      "chapter": 30,
+      "title": "Zentrale Status- und Lebenszyklen [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "Rechnungen getrennt: Dokument Entwurf/Ausgestellt/Storniert; Zahlung Unbezahlt/Teilweise bezahlt/Bezahlt/Überbezahlt; Fälligkeit Nicht fällig/Heute fällig/Überfällig; Versand Nicht versendet/Versendet/Zugestellt/Fehlgeschlagen. Teilbezahlt und überfällig können zugleich zutreffen. Angebote Entwurf/Versendet/Angenommen/Abgelehnt/Abgelaufen/Zurückgezogen; «Angesehen» und «Rückfrage» als separate Aktivitäten. Projekte Geplant/Aktiv/Pausiert/Abgeschlossen/Archiviert; Aufträge Entwurf/Offen/In Bearbeitung/Abgeschlossen/Storniert; Zeit Laufend/Pausiert/Erfasst/Freigegeben/Verrechnet; Support Offen/In Bearbeitung/Wartet auf Kunde/Gelöst/Geschlossen; Mitarbeiter Eingeladen/Aktiv/Gesperrt/Deaktiviert; Einladungen Offen/Angenommen/Abgelaufen/Widerrufen; Zahlungen Erfasst/Bestätigt/Fehlgeschlagen/Rückerstattet; Ausgaben Entwurf/Erfasst/Bezahlt/Storniert. Bestehende Fachmodelle vor Erweiterung prüfen. Übergänge, Berechtigungen, automatische Ereignisse und Audit zentral; dieselben Badges und Werte in Dashboard, Details, Listen, Suche, Filtern, PDFs und Benachrichtigungen.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-31-001",
+      "chapter": 31,
+      "title": "Vollständiger Angebots- und Rechnungsprozess [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "Angebot: Kunde → nummerierte Positionen → prüfen → Entwurf → versioniertes PDF → E-Mail → öffentliche sichere Angebotsseite → Kunde nimmt an/lehnt ab/stellt Frage → Antwort und Status in App → Auftrag/Projekt → Rechnung. Einheitenauswahl reparieren (Stück/Stunden/Tage/Pauschal/m/m²/km plus bestehende); Positionen bearbeiten, duplizieren, verschieben, entfernen; einheitliche Typografie, Datumsfelder und Berechnung. Unnötige Kunden-Zusatzinformation und Angebotsnummer aus Bearbeitungsformular entfernen. Versand im Drei-Punkte-Menü mit Empfänger, Betreff, Begleittext, PDF, sicherem Link, Vorschau; «Als extern versendet erfassen» separat. Unveränderliche versendete Versionen, erneutes Senden protokollieren, alte Links kontrolliert widerrufen. Kunde ohne Konto kann konkrete Version ausdrücklich bestätigen/ablehnen/Frage stellen. E-Mail-Zustellung, Öffnung (unzuverlässig), Linkaufruf, Scanner, bestätigte Interaktion, PDF-Download und Anzahl Aufrufe unterscheiden. Keine falsche «gelesen»-Behauptung. Erinnerungen nur bewusst aktiviert.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-31-002",
+      "chapter": 31,
+      "title": "Vollständiger Angebots- und Rechnungsprozess [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "Rechnung: Entwurf, Prüfung, Ausstellung, Versand, Schweizer QR-Zahlteil nach geltenden Vorgaben, unveränderliches ausgestelltes PDF und Snapshot der Stammdaten. Eindeutiger Nummernkreis, Schweizer MwSt.-Logik und Rundung. Teil-/Voll-/Überzahlung, Rückerstattung, Gutschrift, Storno, Korrektur, Mahnung, Saldo, Überfälligkeit; doppelte Zahlungen/Rechnungen durch Idempotenz verhindern. Historische Dokumente nie stillschweigend verändern.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-32-001",
+      "chapter": 32,
+      "title": "CRM, Leistungen, Import/Export [P1/P2]",
+      "priority": "P1/P2",
+      "requirement": "Kompakte Kundenübersicht, Kontakte/Dokumente/Aktivitäten in Tabs, Hauptkontakt und sinnvolle kontextspezifische Aktionen. Dublettenwarnung, kontrolliertes Zusammenführen, Archivieren/Wiederherstellen. Einheitliche Dokumentlisten mit Typ, Nummer, Datum, Betrag, Status. **P2 verbindlich:** Artikel-/Dienstleistungskatalog mit Beschreibung, Preis, Einheit, Steuerbehandlung und Archivierung; CSV/XLSX-Import für Kunden/Kontakte mit Feldmapping, Vorschau, Validierung, Dubletten und Fehlerbericht; CSV/PDF-Export eigener Daten mit Berechtigungsprüfung. Keine unbemerkten Überschreibungen.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-33-001",
+      "chapter": 33,
+      "title": "Projekte, Timer, Ausgaben, Dateien, Support [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "Timer-Seite: Titel/Tabs → grosse Zeit/Status → Start/Pause/Stop → Kunde/Projekt → heutige Einträge → manuelle Erfassung. Keine Dateien/Auftragsdetails über dem Timer. Zuordnung vor Start prüfen, Laufzeit nach PWA-Neustart/Offline korrekt wiederherstellen, keine doppelte aktive Zeit. Manuelle Zeit, Korrektur, Freigabe, Überlappung, abrechenbar/verrechnet, Monatsreport, keine Doppelverrechnung. Aufträge/Projekte mit Verantwortlichen, Status, Budget, Zeiten, Dateien und Rechnungsbezug. Ausgaben mit Belegen, Kategorie, Steuer, Zahlung und Korrektur. Dateien mit sicherem Upload, Vorschau, Download, Dateityp-/Grössen-/Schadsoftwareprüfung und Zugriff. Support mit kurzen Ticketnummern, Chat, Anhängen, Zuweisung, Eskalation, Abschluss; Eingabefeld über iOS-Tastatur sichtbar.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-34-001",
+      "chapter": 34,
+      "title": "Finanzanalyse, Suche, Benachrichtigungen und P2-Berichte [P1/P2]",
+      "priority": "P1/P2",
+      "requirement": "Kompakte Finanzkennzahlen fakturiert/offen/ausgegeben/überfällig, Analyse Einnahmen/Ausgaben/Zahlungssaldo fachlich korrekt; keine leeren Diagramme. Einheitlicher Zeitraumfilter 1/3/6/12 Monate + benutzerdefiniert, inklusive Datumsgrenzen. Globale berechtigungsabhängige Suche über Kunden, Angebote, Rechnungen, Zahlungen, Aufträge und weitere Module; keyboard-aware iOS, Deep Links. Benachrichtigungen Alle/Ungelesen, chronologisch, markierbar, keine doppelten Meldungen, Angebotsreaktionen/Zustellfehler integriert. **P2:** exportierbare erweiterte Berichte und konfigurierbare Erinnerungen mit Vorschau, Opt-in und Versandhistorie.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-35-001",
+      "chapter": 35,
+      "title": "E-Mail, Domains und Abonnements [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "Zentrale responsive HTML- und Text-E-Mail-Templates für Verifizierung, Reset, Einladungen, Sicherheitsmeldungen, Angebote, Antworten, Rechnungen, Mahnungen, Support. Original-Logo, weiss-blau, Inter-Fallback, DE/FR/IT/EN, zugängliche Darstellung, sicher escapter Inhalt. System-E-Mails mit Binso-Branding, Geschäftsmails mit Mandantendaten und verifiziertem Reply-To; SPF/DKIM/DMARC, serverseitiger Provider, signierte Webhooks, Retry/Deduplikation und Zustellprotokoll. Vorgesehene Domains: `one.binso.ch`, `go.binso.ch`, `mail.binso.ch`, `admin.one.binso.ch`, ggf. `api.one.binso.ch`; DNS/Provider nur nach tatsächlicher Einrichtung als aktiv markieren. Testphase ohne Kreditkarte, Tarife, Wechsel, Zahlungsfehler, Kündigung, Reaktivierung, Datenexport, Aufbewahrung und keine überraschende Löschung; Provider-Konfiguration als Blocker kennzeichnen, nicht fingieren.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-36-001",
+      "chapter": 36,
+      "title": "P0-Betrieb, Datenschutz, Zuverlässigkeit [P0]",
+      "priority": "P0",
+      "requirement": "Tenant-Isolation, serverseitige Berechtigungen, sichere Sessions, Rate Limits, CSRF/XSS/Injection-Schutz, Audit, Secret-Management, sichere Uploads, Datenaufbewahrung/-löschung. Entwürfe/Autosave, Netzwerkunterbruch und Sitzungsablauf ohne stillen Datenverlust. Transaktionen und Idempotenz bei Rechnungen, Zahlungen, Einladungen, Versand, Angebotsannahmen und Timer. Monitoring, Alerts, datensparsame Logs, Backups, **Wiederherstellungstest**, Migrations-/Rollback-Plan, Performance und Barrierefreiheit (Kontrast, Tastatur, Screenreader, Touchflächen).",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-37-001",
+      "chapter": 37,
+      "title": "Abnahme, Umsetzung, Freigabegrenzen [P0/P1/P2]",
+      "priority": "P0/P1/P2",
+      "requirement": "Zuerst vollständiges Inventar aller Routen, Seiten, Unterseiten, Komponenten, Rollen, Geschäftsprozesse, APIs, Migrationen, PRs und Issues; je Anforderung Status **vorhanden / fehlerhaft / fehlt / extern blockiert**, Code-Referenz und Abnahmetest. Root Causes zentral beheben, keine parallele Foundation. Alle P0/P1/P2-Szenarien durchspielen, auch Fehlerfälle: Einladungsablauf, Rollenwechsel, Passwortreset, Rechnungs-Readiness, QR-PDF, Teilzahlung, Überfälligkeit, Storno, Angebotsversion/Annahme/Frage, Timer-Neustart, iOS-Chat-Tastatur, Datenimport, Export, Abo-Testende und Ausfälle. Gezielte Tests während Implementierung, am Ende gebündelt Lint, Typecheck, Unit-/Integration-/E2E-Tests, Build, visuelle mobile/Desktop-Abnahme und GitHub CI. Keine Volltests nach jeder Kleinänderung. PR und Deployment nur innerhalb bestehender Freigaben und nach erforderlichen Checks; keine eigenmächtige Einrichtung kostenpflichtiger Provider oder DNS-Änderung. Abschlussbericht mit Abnahmematrix für **sämtliche P0/P1/P2-Punkte**, verbleibenden echten Blockern, PR, CI, Deploy, Liveprüfung und Risiken. **P3 nicht implementieren.**",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-38-001",
+      "chapter": 38,
+      "title": "VERBINDLICH: Avatar-Upload, Registrierungsdaten, Onboarding und End-to-End-Datenintegrität [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "**Konkrete gemeldete Defekte:** (A) Beim Hochladen eines Profilbilds/Avatars wurde der Upload nicht erfolgreich abgeschlossen. (B) Während der Firmenregistrierung erfasste Vor- und Nachnamen waren später im Benutzerprofil nicht vorhanden. Diese Fehler sind als reproduzierbare Defekte zu behandeln, nicht bloss als kosmetische UX-Themen. Keine Ursache behaupten, bevor sie anhand von Code, Netzwerkantworten, Logs, Persistenz und Reproduktion nachgewiesen ist.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/provisioning.ts",
+        "app/api/auth/register/route.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-38-002",
+      "chapter": 38,
+      "title": "VERBINDLICH: Avatar-Upload, Registrierungsdaten, Onboarding und End-to-End-Datenintegrität [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "- Vollständigen Ablauf vom Datei-Picker über Client-Validierung, Upload-Request, Authentifizierung, Mandant-/Benutzerberechtigung, API, Storage, Datenbankreferenz, Cache, Profilantwort bis zur Darstellung prüfen.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/provisioning.ts",
+        "app/api/auth/register/route.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-38-003",
+      "chapter": 38,
+      "title": "VERBINDLICH: Avatar-Upload, Registrierungsdaten, Onboarding und End-to-End-Datenintegrität [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "- Auf Dateityp, MIME/Signatur, Grösse, Dateinamen, Bildverarbeitung, EXIF/Orientierung, HEIC/HEIF auf iPhone, JPEG/PNG/WebP, Berechtigungen, CORS, Content-Security-Policy, Uploadlimits, signierte URLs, Token-Ablauf, fehlende Storage-Konfiguration, Netzwerkfehler und iOS-PWA-Eigenheiten prüfen. Unterstützte Formate klar definieren; HEIC entweder zuverlässig verarbeiten oder verständlich und früh ablehnen.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/provisioning.ts",
+        "app/api/auth/register/route.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-38-004",
+      "chapter": 38,
+      "title": "VERBINDLICH: Avatar-Upload, Registrierungsdaten, Onboarding und End-to-End-Datenintegrität [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "- Bild nach erfolgreichem Upload sofort anzeigen und nach Reload, Logout/Login und auf einem zweiten Gerät korrekt laden. Cache-Invalidierung, URL-Ablauf und konsistente Avatarreferenz berücksichtigen. Avatar ersetzen und entfernen ermöglichen; bei Fehlschlag darf das bisherige Bild nicht verloren gehen.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/provisioning.ts",
+        "app/api/auth/register/route.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-38-005",
+      "chapter": 38,
+      "title": "VERBINDLICH: Avatar-Upload, Registrierungsdaten, Onboarding und End-to-End-Datenintegrität [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "- Sichere Dateiprüfung, Grössen-/Pixelgrenzen, serverseitige Validierung, Zugriffsschutz, Schutz vor Schadsoftware, datensparsame Metadatenbehandlung, sichere Speicherung und kontrolliertes Aufräumen verwaister Uploads.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/provisioning.ts",
+        "app/api/auth/register/route.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-38-006",
+      "chapter": 38,
+      "title": "VERBINDLICH: Avatar-Upload, Registrierungsdaten, Onboarding und End-to-End-Datenintegrität [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "- Benutzerfreundliche Meldungen für zu grosse Datei, nicht unterstütztes Format, fehlende Berechtigung, Verbindungsfehler, abgelaufene Sitzung und Serverfehler; Retry ohne Duplikate. Keine stumme Fehlfunktion und keine Erfolgsmeldung vor bestätigter Speicherung.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/provisioning.ts",
+        "app/api/auth/register/route.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-38-007",
+      "chapter": 38,
+      "title": "VERBINDLICH: Avatar-Upload, Registrierungsdaten, Onboarding und End-to-End-Datenintegrität [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "- Tests mit iPhone-Fotos (insbesondere HEIC), Kamera-/Mediathek-Auswahl, iOS-PWA, Safari, Desktop, ungültigen Dateien, langsamer Verbindung, Reload und erneuter Anmeldung.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/provisioning.ts",
+        "app/api/auth/register/route.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-38-008",
+      "chapter": 38,
+      "title": "VERBINDLICH: Avatar-Upload, Registrierungsdaten, Onboarding und End-to-End-Datenintegrität [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "- Sämtliche tatsächlich im Registrierungs- und Onboardingprozess erfassten Werte inventarisieren: Vorname, Nachname, E-Mail, Firmenname, Sprache, ggf. Telefonnummer und weitere Felder. Für jedes Feld eine nachvollziehbare Mapping-Tabelle erstellen: UI-Feld → Validierung → Request-DTO → API → Persistenz/Spalte → Identity-/Profilmodell → Profil-API → Anzeige/Bearbeitung.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/provisioning.ts",
+        "app/api/auth/register/route.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-38-009",
+      "chapter": 38,
+      "title": "VERBINDLICH: Avatar-Upload, Registrierungsdaten, Onboarding und End-to-End-Datenintegrität [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "- Den konkreten Defekt mit verschwundenem Vor- und Nachnamen reproduzieren und die Ursache beheben. Prüfen, ob Namen überhaupt übermittelt, korrekt gespeichert, bei Profilanlage übernommen, bei späteren Onboarding-Schritten überschrieben, aus einem anderen Datensatz gelesen oder durch unvollständige API-Responses verborgen werden.",
+      "status": "teilweise_implementiert",
+      "sourceReferences": [
+        "lib/server/provisioning.ts",
+        "app/api/auth/register/route.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "Gezielte Prüfungen: registration-test, profile-image-test, document-presentation-test, pdf-gestures-test, migration-test; letzter Datenbanklauf bestanden.",
+      "visualComparison": "Ausstehend am aktuellen Revision7-Stand",
+      "blocker": "Vollständige Klauselabnahme und reale Geräte fehlen; nicht als vollständig bestanden werten."
+    },
+    {
+      "id": "R7-38-010",
+      "chapter": 38,
+      "title": "VERBINDLICH: Avatar-Upload, Registrierungsdaten, Onboarding und End-to-End-Datenintegrität [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "- Keine leeren, null- oder Default-Werte dürfen zuvor gültige Profildaten unbeabsichtigt überschreiben. Updates nur auf ausdrücklich bearbeitete Felder anwenden; klare Regeln für fehlende Felder vs. absichtlich geleerte Felder. Veraltete Feldnamen, widersprüchliche Schemas, Duplikatprofile und konkurrierende Schreibvorgänge bereinigen.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/provisioning.ts",
+        "app/api/auth/register/route.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-38-011",
+      "chapter": 38,
+      "title": "VERBINDLICH: Avatar-Upload, Registrierungsdaten, Onboarding und End-to-End-Datenintegrität [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "- Registrierungsfortschritt sicher wiederaufnehmbar gestalten; serverseitig validierte und atomare Konto-/Unternehmensanlage. Ein Benutzerkonto gehört zu genau einem Unternehmen. Wiederholte Requests dürfen keine doppelten Benutzer, Profile, Unternehmen oder Mitgliedschaften erzeugen.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/provisioning.ts",
+        "app/api/auth/register/route.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-38-012",
+      "chapter": 38,
+      "title": "VERBINDLICH: Avatar-Upload, Registrierungsdaten, Onboarding und End-to-End-Datenintegrität [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "- E-Mail-Verifizierung, Einladung und Aktivierung müssen dieselbe Identität konsistent fortführen; eingeladene Mitarbeiter erhalten korrekt zugeordnete Rollen und Unternehmen. Keine unkontrollierte Account-Verknüpfung nur anhand unbestätigter E-Mail-Adressen.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/provisioning.ts",
+        "app/api/auth/register/route.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-38-013",
+      "chapter": 38,
+      "title": "VERBINDLICH: Avatar-Upload, Registrierungsdaten, Onboarding und End-to-End-Datenintegrität [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "- Bei vorhandenen Daten migrationssicher vorgehen: fehlende Profileinträge identifizieren, nur eindeutig belegbare Werte reparieren, keine Namen erfinden und keine historischen Daten stillschweigend überschreiben. Migrationsplan und Audit-Nachvollziehbarkeit dokumentieren.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/provisioning.ts",
+        "app/api/auth/register/route.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-38-014",
+      "chapter": 38,
+      "title": "VERBINDLICH: Avatar-Upload, Registrierungsdaten, Onboarding und End-to-End-Datenintegrität [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "- Für alle vorhandenen Formulare und Geschäftsvorgänge prüfen: Erstellen → Speichern → serverseitige Bestätigung → Laden → Anzeigen → Bearbeiten → erneutes Speichern → Reload → Logout/Login → anderes Gerät bzw. neue Sitzung. Prüfen, dass UI-Anzeige, API-Antwort und persistierte Daten übereinstimmen.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/provisioning.ts",
+        "app/api/auth/register/route.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-38-015",
+      "chapter": 38,
+      "title": "VERBINDLICH: Avatar-Upload, Registrierungsdaten, Onboarding und End-to-End-Datenintegrität [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "- Insbesondere Unternehmensprofil, Benutzerprofil, Sprachwahl, Sicherheitsmethoden, Mitarbeiter/Rollen/Einladungen, Kunden/Kontakte, Angebote/Positionen/Einheiten/Versionen, Rechnungen/Steuern/Bankdaten/QR, Zahlungen, Ausgaben, Projekte/Aufträge, Zeiteinträge/Timer, Dateien, Support, Benachrichtigungen, Einstellungen und Abonnements abdecken.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/provisioning.ts",
+        "app/api/auth/register/route.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-38-016",
+      "chapter": 38,
+      "title": "VERBINDLICH: Avatar-Upload, Registrierungsdaten, Onboarding und End-to-End-Datenintegrität [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "- Validierungsregeln zwischen Frontend, Backend und Datenbank konsistent halten. Pflicht-, optionale und bedingte Felder eindeutig definieren. Fehler beim Speichern sichtbar machen; keine optimistische Erfolgsanzeige ohne abgesicherte Persistenz.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/provisioning.ts",
+        "app/api/auth/register/route.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-38-017",
+      "chapter": 38,
+      "title": "VERBINDLICH: Avatar-Upload, Registrierungsdaten, Onboarding und End-to-End-Datenintegrität [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "- Fehlende Werte nicht als Null oder leere Strings kaschieren, wenn Datenverlust vorliegt. Versehentliches Überschreiben, Race Conditions, parallele Bearbeitung, Cache-Staleness, unvollständige DTO-Mappings, fehlerhafte Defaultwerte, Transaktionsgrenzen, fehlerhafte Migrationen und Datenbank-Constraints prüfen.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/provisioning.ts",
+        "app/api/auth/register/route.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-38-018",
+      "chapter": 38,
+      "title": "VERBINDLICH: Avatar-Upload, Registrierungsdaten, Onboarding und End-to-End-Datenintegrität [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "- Bei Finanz- und Sicherheitsvorgängen atomare Transaktionen, Idempotenz, unveränderliche historische Dokumentversionen, Audit und mandantensichere Abfragen gewährleisten. Autorisierung für jeden Read/Write serverseitig prüfen; keine mandantenübergreifenden Zugriffe.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/provisioning.ts",
+        "app/api/auth/register/route.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-38-019",
+      "chapter": 38,
+      "title": "VERBINDLICH: Avatar-Upload, Registrierungsdaten, Onboarding und End-to-End-Datenintegrität [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "- Eingaben bei Netzwerkunterbruch, Navigation, abgelaufener Sitzung und PWA-Neustart kontrolliert erhalten; keine unsichere lokale Speicherung sensibler Daten. Benutzer bei Konflikten verständlich führen und kein stilles Überschreiben zulassen.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/provisioning.ts",
+        "app/api/auth/register/route.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-38-020",
+      "chapter": 38,
+      "title": "VERBINDLICH: Avatar-Upload, Registrierungsdaten, Onboarding und End-to-End-Datenintegrität [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "- Automatisierte Integrationstests mit Testdaten und realer Testdatenbank beziehungsweise isolierter Testumgebung; negative Tests für Rechte, Fremdmandanten, ungültige Felder und abgebrochene Requests. Keine echten Kundendaten oder produktiven E-Mails für Tests verwenden.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/provisioning.ts",
+        "app/api/auth/register/route.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-38-021",
+      "chapter": 38,
+      "title": "VERBINDLICH: Avatar-Upload, Registrierungsdaten, Onboarding und End-to-End-Datenintegrität [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "1. Ein neuer Owner registriert sich mit Vorname, Nachname, E-Mail und Firmenname; alle erfassten Werte sind nach E-Mail-Verifizierung, erstem Login, Reload und erneutem Login korrekt im Profil und Unternehmenskontext vorhanden.",
+      "status": "teilweise_implementiert",
+      "sourceReferences": [
+        "lib/server/provisioning.ts",
+        "app/api/auth/register/route.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "Gezielte Prüfungen: registration-test, profile-image-test, document-presentation-test, pdf-gestures-test, migration-test; letzter Datenbanklauf bestanden.",
+      "visualComparison": "Ausstehend am aktuellen Revision7-Stand",
+      "blocker": "Vollständige Klauselabnahme und reale Geräte fehlen; nicht als vollständig bestanden werten."
+    },
+    {
+      "id": "R7-38-022",
+      "chapter": 38,
+      "title": "VERBINDLICH: Avatar-Upload, Registrierungsdaten, Onboarding und End-to-End-Datenintegrität [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "2. Ein eingeladener Mitarbeiter aktiviert sein Konto; Profilname, Rolle und Unternehmenszuordnung bleiben korrekt erhalten, auch nach erneutem Login.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/provisioning.ts",
+        "app/api/auth/register/route.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-38-023",
+      "chapter": 38,
+      "title": "VERBINDLICH: Avatar-Upload, Registrierungsdaten, Onboarding und End-to-End-Datenintegrität [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "3. Avatar lässt sich mit unterstütztem Bild hochladen, anzeigen, ersetzen und entfernen; Zustand bleibt nach Reload und neuer Sitzung korrekt. Fehlerfälle werden verständlich behandelt.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/provisioning.ts",
+        "app/api/auth/register/route.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-38-024",
+      "chapter": 38,
+      "title": "VERBINDLICH: Avatar-Upload, Registrierungsdaten, Onboarding und End-to-End-Datenintegrität [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "4. Für jedes P0–P2-Modul existiert ein nachvollziehbarer Datenfluss-/Persistenztest oder eine ausdrücklich dokumentierte, begründete Testlücke.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/provisioning.ts",
+        "app/api/auth/register/route.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-38-025",
+      "chapter": 38,
+      "title": "VERBINDLICH: Avatar-Upload, Registrierungsdaten, Onboarding und End-to-End-Datenintegrität [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "5. Bericht enthält die tatsächlich gefundene Ursache der beiden gemeldeten Defekte, betroffene Dateien/Services, Korrektur, Datenbank-/Migrationsauswirkungen, Testergebnisse und verbleibende Blocker.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/provisioning.ts",
+        "app/api/auth/register/route.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-38-026",
+      "chapter": 38,
+      "title": "VERBINDLICH: Avatar-Upload, Registrierungsdaten, Onboarding und End-to-End-Datenintegrität [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "6. Diese Prüfungen sind Teil der gebündelten Abschlussabnahme aus Kapitel 37. Keine wiederholten vollständigen Testläufe nach jeder Kleinänderung; keine Behauptung einer vollständigen Datenintegritätsprüfung ohne Nachweise.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/provisioning.ts",
+        "app/api/auth/register/route.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-38-027",
+      "chapter": 38,
+      "title": "VERBINDLICH: Avatar-Upload, Registrierungsdaten, Onboarding und End-to-End-Datenintegrität [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "**Priorität:** Fehlerhafte Identitäts-, Mandanten- und Profildatenflüsse als P0 behandeln; Avatar-Funktionalität als P1, Upload-Sicherheit als P0. Alle Punkte dieses Kapitels gehören ausdrücklich zum umzusetzenden P0–P2-Umfang. P3 bleibt ausgeschlossen.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/provisioning.ts",
+        "app/api/auth/register/route.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-39-001",
+      "chapter": 39,
+      "title": "Profile, Firmenlogo, Bild-Uploads und Einstellungen: End-to-End-Qualitätsprüfung [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "- Gemeldeten Avatar-Upload-Fehler reproduzieren und die tatsächliche Ursache über UI, API, Auth, Storage, Bildverarbeitung, Persistenz und Cache nachweisen; nicht bloss kosmetisch beheben.",
+      "status": "teilweise_implementiert",
+      "sourceReferences": [
+        "lib/server/profile-image.ts",
+        "components/file-upload.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "Gezielte Prüfungen: registration-test, profile-image-test, document-presentation-test, pdf-gestures-test, migration-test; letzter Datenbanklauf bestanden.",
+      "visualComparison": "Ausstehend am aktuellen Revision7-Stand",
+      "blocker": "Vollständige Klauselabnahme und reale Geräte fehlen; nicht als vollständig bestanden werten."
+    },
+    {
+      "id": "R7-39-002",
+      "chapter": 39,
+      "title": "Profile, Firmenlogo, Bild-Uploads und Einstellungen: End-to-End-Qualitätsprüfung [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "- Avatar in der Profilansicht 96–112 px, in Listen 36–40 px, im Header 32–36 px; responsive und auf Retina-Geräten scharf (mindestens 2× physische Bildauflösung). Empfohlene Quelldatei 512×512 px; Maximalgrösse 10 MB, sofern Infrastruktur und Sicherheitsgrenzen dies erlauben. Verbindliche Grössen über zentrale Design-Tokens.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/profile-image.ts",
+        "components/file-upload.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-39-003",
+      "chapter": 39,
+      "title": "Profile, Firmenlogo, Bild-Uploads und Einstellungen: End-to-End-Qualitätsprüfung [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "- JPEG, PNG, WebP und iPhone-HEIC/HEIF nach tatsächlich verfügbarer, sicherer serverseitiger Verarbeitung unterstützen; nicht unterstützte Formate verständlich ablehnen. Dateityp anhand Inhalt prüfen, EXIF-Ausrichtung korrigieren, Metadaten minimieren, sicher dekodieren/rekodieren, Grössen und Ressourcen begrenzen, Malware-/Dateiprüfung entsprechend Infrastruktur.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/profile-image.ts",
+        "components/file-upload.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-39-004",
+      "chapter": 39,
+      "title": "Profile, Firmenlogo, Bild-Uploads und Einstellungen: End-to-End-Qualitätsprüfung [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "- Quadratischer Zuschnitt mit Vorschau, korrektes Zentrieren, rundes Rendering ohne Verzerrung; Ersetzen, Entfernen, Fallback-Initialen, Lade-/Fehlerzustände, Cache-Invalidierung, persistente Speicherung nach Reload und neuer Sitzung. Upload-Erfolg erst melden, wenn serverseitig gespeichert und wieder abrufbar.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/profile-image.ts",
+        "components/file-upload.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-39-005",
+      "chapter": 39,
+      "title": "Profile, Firmenlogo, Bild-Uploads und Einstellungen: End-to-End-Qualitätsprüfung [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "- Vorname, Nachname, E-Mail, Telefon und weitere persönliche Felder vom Registrierungsformular über Auth-Provider, API, Datenbank und Profilprojektion verfolgen; kein Verlust bei Verifizierung, Onboarding, Einladung, Login, Aktualisierung oder Rollenwechsel.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/profile-image.ts",
+        "components/file-upload.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-39-006",
+      "chapter": 39,
+      "title": "Profile, Firmenlogo, Bild-Uploads und Einstellungen: End-to-End-Qualitätsprüfung [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "- E-Mail-Änderungen nur mit angemessener Bestätigung; Sicherheitsmethoden, Passkeys, freiwillige MFA, Recovery-Codes, aktive Sitzungen, Geräteabmeldung und Kontowiederherstellung in klar getrennten Profilbereichen.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/profile-image.ts",
+        "components/file-upload.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-39-007",
+      "chapter": 39,
+      "title": "Profile, Firmenlogo, Bild-Uploads und Einstellungen: End-to-End-Qualitätsprüfung [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "- Profilstruktur: kompakter Avatar, Name, E-Mail, Rolle; darunter Persönliche Angaben, Konto & Sicherheit, Sprache & Darstellung, Benachrichtigungen, Aktive Geräte. Keine überlangen Mischformulare.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/profile-image.ts",
+        "components/file-upload.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-39-008",
+      "chapter": 39,
+      "title": "Profile, Firmenlogo, Bild-Uploads und Einstellungen: End-to-End-Qualitätsprüfung [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "- Avatar- und Namensänderungen konsistent in Header, Kommentaren, Aktivitäten und berechtigten Benutzerlisten anzeigen; historische Auditdaten unverfälscht halten.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/profile-image.ts",
+        "components/file-upload.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-39-009",
+      "chapter": 39,
+      "title": "Profile, Firmenlogo, Bild-Uploads und Einstellungen: End-to-End-Qualitätsprüfung [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "- Firmenlogo-Upload, Vorschau, Zuschnitt/Einpassung, Ersetzen, Entfernen und Wiederladen über dieselbe sichere Upload-Foundation wie Avatare prüfen. Eigenes Firmenlogo-Modell, nicht mit persönlichem Avatar verwechseln.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/profile-image.ts",
+        "components/file-upload.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-39-010",
+      "chapter": 39,
+      "title": "Profile, Firmenlogo, Bild-Uploads und Einstellungen: End-to-End-Qualitätsprüfung [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "- Unterschiedliche Seitenverhältnisse unterstützen (breite Wortmarke, quadratisches Signet, transparentes Logo). Originalproportionen erhalten, niemals strecken; contain-Fit und sinnvolle Maximalflächen; transparente PNG/WebP und geeignete weitere Formate korrekt rendern. Mindestqualität für Bildschirm, E-Mail und A4-PDF sicherstellen, ohne willkürlich quadratische Logos zu erzwingen.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/profile-image.ts",
+        "components/file-upload.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-39-011",
+      "chapter": 39,
+      "title": "Profile, Firmenlogo, Bild-Uploads und Einstellungen: End-to-End-Qualitätsprüfung [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "- Originaldatei und abgeleitete sichere Varianten beziehungsweise nachvollziehbare Metadaten nach bestehender Architektur speichern; Anzeige im Unternehmensprofil, App-Branding soweit vorgesehen, Angebots-/Rechnungs-PDF, E-Mail-Templates und öffentlichen Angebotsansichten konsistent prüfen.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/profile-image.ts",
+        "components/file-upload.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-39-012",
+      "chapter": 39,
+      "title": "Profile, Firmenlogo, Bild-Uploads und Einstellungen: End-to-End-Qualitätsprüfung [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "- Vorlagen-Snapshots: Bereits versendete Dokumentversionen dürfen sich durch einen späteren Logowechsel nicht rückwirkend verändern. Neues Branding nur für neue Dokumentversionen verwenden.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/profile-image.ts",
+        "components/file-upload.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-39-013",
+      "chapter": 39,
+      "title": "Profile, Firmenlogo, Bild-Uploads und Einstellungen: End-to-End-Qualitätsprüfung [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "- Firmenname, Rechtsform, Anschrift, UID, MwSt.-Status/-Nummer soweit zutreffend, Kontaktangaben, Bank-/QR-Zahlungsdaten, Rechnungsnummernkreise, Zahlungsfristen, Sprache, Dokumentvorlagen und Abonnement eindeutig als Unternehmensdaten behandeln. Persönliche Benutzerprofile getrennt speichern.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/profile-image.ts",
+        "components/file-upload.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-39-014",
+      "chapter": 39,
+      "title": "Profile, Firmenlogo, Bild-Uploads und Einstellungen: End-to-End-Qualitätsprüfung [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "- Schreibrechte je Feldgruppe serverseitig erzwingen; sensible Bank-, Steuer-, Owner- und Sicherheitsänderungen mit Step-up-Prüfung, Audit und bei Bedarf Bestätigung. Daten nach Save, Reload, Logout/Login und geräteübergreifend prüfen.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/profile-image.ts",
+        "components/file-upload.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-39-015",
+      "chapter": 39,
+      "title": "Profile, Firmenlogo, Bild-Uploads und Einstellungen: End-to-End-Qualitätsprüfung [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "- Fehlende erforderliche Angaben über das zentrale Readiness-System (Kapitel zu Einrichtungsstatus) anzeigen. Logo bleibt optional und blockiert keine Rechnung.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/profile-image.ts",
+        "components/file-upload.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-39-016",
+      "chapter": 39,
+      "title": "Profile, Firmenlogo, Bild-Uploads und Einstellungen: End-to-End-Qualitätsprüfung [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "- Sämtliche P0–P2-Formulare auf Feldmapping, Defaultwerte, Validierung, Upsert, DB-Constraints, Migration, API-Serialisierung, optimistische Updates, Fehler-Rollback, Cache und erneutes Laden prüfen.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/profile-image.ts",
+        "components/file-upload.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-39-017",
+      "chapter": 39,
+      "title": "Profile, Firmenlogo, Bild-Uploads und Einstellungen: End-to-End-Qualitätsprüfung [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "- Automatisierte Tests: Registrierung mit Vor-/Nachname; Einladung; Profiländerung; Avatar/Logo hochladen, ersetzen, löschen; falscher MIME-Typ; zu grosse/defekte Datei; abgebrochener Upload; abgelaufene Sitzung; konkurrierende Änderungen; fremder Mandant; Zugriff nach Rollenentzug; Dokument-PDF mit Logo; E-Mail mit Logo; Historien-Snapshot.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/profile-image.ts",
+        "components/file-upload.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-39-018",
+      "chapter": 39,
+      "title": "Profile, Firmenlogo, Bild-Uploads und Einstellungen: End-to-End-Qualitätsprüfung [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "- Für jeden reproduzierten Defekt Ursache, betroffene Schicht, Korrektur, Test und eventuelle Datenreparatur dokumentieren. Keine echten Kundendateien in Testumgebungen verwenden.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/profile-image.ts",
+        "components/file-upload.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-40-001",
+      "chapter": 40,
+      "title": "iOS-PWA-Bottom-Navigation: Safe-Area-Prüfung ohne Redesign [P1]",
+      "priority": "P1",
+      "requirement": "- Auf echten beziehungsweise geeigneten iPhone-Safari- und installierten PWA-Ansichten messen, weshalb der Abstand zwischen Bottom-Navigation und unterem Displayrand auffällig gross wirkt.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "components/use-workspace-viewport.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-40-002",
+      "chapter": 40,
+      "title": "iOS-PWA-Bottom-Navigation: Safe-Area-Prüfung ohne Redesign [P1]",
+      "priority": "P1",
+      "requirement": "- CSS und Layout prüfen: `env(safe-area-inset-bottom)`, `viewport-fit=cover`, `100dvh`/VisualViewport, feste Footer-Container, doppelte Padding-/Margin-Regeln, Browser-Chrome und Home-Indikator. Safe-Area niemals blind entfernen.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "components/use-workspace-viewport.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-40-003",
+      "chapter": 40,
+      "title": "iOS-PWA-Bottom-Navigation: Safe-Area-Prüfung ohne Redesign [P1]",
+      "priority": "P1",
+      "requirement": "- Nur wenn ein nachweisbarer zusätzlicher oder doppelt angewendeter Abstand vorliegt, diesen an der zentralen Layoutursache korrigieren. Notwendigen Sicherheitsabstand für Home-Indikator und bedienbare Touchziele erhalten.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "components/use-workspace-viewport.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-40-004",
+      "chapter": 40,
+      "title": "iOS-PWA-Bottom-Navigation: Safe-Area-Prüfung ohne Redesign [P1]",
+      "priority": "P1",
+      "requirement": "- **Geschützt:** Gestaltung, Icons, Höhe, Funktion, Navigationspunkte, Reihenfolge und grundsätzliche Position der bestehenden Bottom-Navigation bleiben unverändert. Keine pauschale Verschiebung nach unten; keine neue Navigation. Der bestehende blaue Floating-Plus-Button bleibt in Gestaltung und Position unverändert.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "components/use-workspace-viewport.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-40-005",
+      "chapter": 40,
+      "title": "iOS-PWA-Bottom-Navigation: Safe-Area-Prüfung ohne Redesign [P1]",
+      "priority": "P1",
+      "requirement": "- Auf iPhone mit und ohne Home-Indikator, Safari, installierter iOS-PWA, Android und Desktop prüfen. Tastaturzustand und Bottom Sheets gesondert testen, damit Footer nicht verdeckt oder doppelt gepolstert werden.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "components/use-workspace-viewport.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-40-006",
+      "chapter": 40,
+      "title": "iOS-PWA-Bottom-Navigation: Safe-Area-Prüfung ohne Redesign [P1]",
+      "priority": "P1",
+      "requirement": "- Vorher-/Nachher-Messung und Screenshots in die visuelle Abnahme aufnehmen; falls der Abstand ausschliesslich eine notwendige Safe-Area ist, **keine Änderung** durchführen und dies begründet dokumentieren.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "components/use-workspace-viewport.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-41-001",
+      "chapter": 41,
+      "title": "Geltung, Priorität und Freigabe [P0–P2]",
+      "priority": "P0–P2",
+      "requirement": "- Kapitel 39 und 40 ergänzen alle bisherigen 38 Kapitel; kein bestehender P0–P2-Punkt entfällt. P3 bleibt ausdrücklich ausgeschlossen.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-41-002",
+      "chapter": 41,
+      "title": "Geltung, Priorität und Freigabe [P0–P2]",
+      "priority": "P0–P2",
+      "requirement": "- Erst bestehende Implementierung und offene Arbeiten abgleichen, dann gezielt korrigieren. Keine Parallel-Foundation, keine lokalen CSS-Patches und keine ungeprüften Produktivdatenmigrationen.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-41-003",
+      "chapter": 41,
+      "title": "Geltung, Priorität und Freigabe [P0–P2]",
+      "priority": "P0–P2",
+      "requirement": "- Gezielte Tests während der Entwicklung, gebündelte abschliessende Lint-/Typecheck-/Build-/Integration-/visuelle Abnahme. Dokumentiere tatsächliche Ursachen und Ergebnisse; grüne CI allein ist kein vollständiger Nachweis.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-41-004",
+      "chapter": 41,
+      "title": "Geltung, Priorität und Freigabe [P0–P2]",
+      "priority": "P0–P2",
+      "requirement": "- Bestehende Freigabegrenzen für PR, Merge und Deployment gelten unverändert. Externe Blocker benennen und unabhängig ausführbare Arbeiten fortsetzen.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-42-001",
+      "chapter": 42,
+      "title": "Globale KPI-, Statistik- und Diagrammprüfung JEDER Seite [P1/P2; Datenrechte P0]",
+      "priority": "P1/P2; Datenrechte P0",
+      "requirement": "**Verbindlicher Auftrag:** Inventarisiere aus dem aktuellen Code jede Route, Seite, Unterseite, jeden Tab, jede Detailansicht und alle rollenabhängigen Ansichten inklusive internem Adminportal. Erstelle eine **Seite × Rolle × KPI/Diagramm-Matrix** mit vorhandenem Ist-Zustand, Datenquelle, sinnvoller Sollanzeige, fachlicher Begründung, Priorität, Umsetzung und Testnachweis. **Implementiere alle fachlich nützlichen P1-/P2-Ergänzungen auf allen Seiten** und korrigiere sämtliche bestehenden Kennzahlen und Diagramme. Keine Seite auslassen. Keine dekorativen Diagramme ohne echten Erkenntniswert: Wo keine sinnvolle Statistik existiert, „nicht sinnvoll“ begründet dokumentieren.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "components/statistics.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-42-002",
+      "chapter": 42,
+      "title": "Globale KPI-, Statistik- und Diagrammprüfung JEDER Seite [P1/P2; Datenrechte P0]",
+      "priority": "P1/P2; Datenrechte P0",
+      "requirement": "**Globale Foundation:** Eine wiederverwendbare KPI-/Chart-Bibliothek auf der bestehenden Infrastruktur für kompakte Kennzahlen, Trends, Ring-/Donut-, Linien-, Balken- und gestapelte Diagramme, Legenden, Filter, Drilldowns, Lade-/Fehler-/Leerzustände. Inter-Schrift, zentrale Abstände, responsives Mobile/Desktop-Layout, Dark/Light Mode, Tastatur-/Screenreader-Zugänglichkeit. Auf Mobilgeräten keine überlappenden Achsen, Legenden oder abgeschnittenen Zahlen. Ein Tap auf einen Datenpunkt zeigt exakten Wert und Zeitraum, bei Bedarf die gefilterte Liste. Gemeinsame Zeitfilter 1/3/6/12 Monate und individueller Zeitraum mit korrekten inklusiven Datumsgrenzen.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "components/statistics.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-42-003",
+      "chapter": 42,
+      "title": "Globale KPI-, Statistik- und Diagrammprüfung JEDER Seite [P1/P2; Datenrechte P0]",
+      "priority": "P1/P2; Datenrechte P0",
+      "requirement": "**Semantische Farben:** Grün = bezahlt/erledigt/günstig; Rot = überfällig/kritisch/tatsächlich negative Entwicklung; Orange = Warnung; Blau = aktiv/neutral; Grau = Entwurf/inaktiv. Ausgaben nicht pauschal rot; ein Anstieg ist nicht automatisch positiv. Donutsegmente eindeutig unterscheidbar mit Legende, Anzahl, Prozenten; nie Farbe als einzige Information. Zentrale Badge-/Status-Tokens wiederverwenden.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "components/statistics.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-42-004",
+      "chapter": 42,
+      "title": "Globale KPI-, Statistik- und Diagrammprüfung JEDER Seite [P1/P2; Datenrechte P0]",
+      "priority": "P1/P2; Datenrechte P0",
+      "requirement": "**Fachliche Berechnungen:** Fakturiert ≠ Zahlungseingang; offener Betrag berücksichtigt Teilzahlungen, Gutschriften, Stornos; überfällig nur bei fälligem offenem Restbetrag; Zahlungssaldo ist kein Bankkontostand. Annahmequoten mit definiertem Nenner, keine irreführenden Prozentänderungen bei Basis null. Stunden erfasst/verrechenbar/verrechnet sauber unterscheiden; Budgetabweichungen nur bei vorhandenen Budgets. Zeiträume/Zeitzone, CHF, Netto/Brutto/MwSt. korrekt. Aggregation und Mandanten-/Rollenfilter serverseitig; keine Datenlecks in Charts oder Exporten.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "components/statistics.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-42-005",
+      "chapter": 42,
+      "title": "Globale KPI-, Statistik- und Diagrammprüfung JEDER Seite [P1/P2; Datenrechte P0]",
+      "priority": "P1/P2; Datenrechte P0",
+      "requirement": "**Alle Module prüfen und gezielt erweitern:**",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "components/statistics.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-42-006",
+      "chapter": 42,
+      "title": "Globale KPI-, Statistik- und Diagrammprüfung JEDER Seite [P1/P2; Datenrechte P0]",
+      "priority": "P1/P2; Datenrechte P0",
+      "requirement": "- Übersicht: je nach Einrichtungsstand Aufgaben oder wenige relevante KPI; kein Dashboard voller Nullkarten.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "components/statistics.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-42-007",
+      "chapter": 42,
+      "title": "Globale KPI-, Statistik- und Diagrammprüfung JEDER Seite [P1/P2; Datenrechte P0]",
+      "priority": "P1/P2; Datenrechte P0",
+      "requirement": "- Finanzen/Analyse: Einnahmen, Ausgaben, Zahlungssaldo, fakturiert, offen, überfällig, Monatsverlauf, Kategorien-Donut.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "components/statistics.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-42-008",
+      "chapter": 42,
+      "title": "Globale KPI-, Statistik- und Diagrammprüfung JEDER Seite [P1/P2; Datenrechte P0]",
+      "priority": "P1/P2; Datenrechte P0",
+      "requirement": "- Rechnungen/Zahlungen: überschneidungsfreie Verteilung bezahlt/offen/teilbezahlt/überfällig, Fälligkeiten, Restbeträge, Zahlungsentwicklung.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "components/statistics.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-42-009",
+      "chapter": 42,
+      "title": "Globale KPI-, Statistik- und Diagrammprüfung JEDER Seite [P1/P2; Datenrechte P0]",
+      "priority": "P1/P2; Datenrechte P0",
+      "requirement": "- Angebote: Volumen, Entwurf/versendet/angenommen/abgelehnt, Annahmequote, Aktivitäten und Lesestatus getrennt vom Fachstatus.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "components/statistics.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-42-010",
+      "chapter": 42,
+      "title": "Globale KPI-, Statistik- und Diagrammprüfung JEDER Seite [P1/P2; Datenrechte P0]",
+      "priority": "P1/P2; Datenrechte P0",
+      "requirement": "- Kunden: Umsatz-/Zahlungsentwicklung, Forderungen, Aufträge, Aktivität.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "components/statistics.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-42-011",
+      "chapter": 42,
+      "title": "Globale KPI-, Statistik- und Diagrammprüfung JEDER Seite [P1/P2; Datenrechte P0]",
+      "priority": "P1/P2; Datenrechte P0",
+      "requirement": "- Aufträge/Projekte: Zeit, Status, Budget-/Soll-Ist nur mit echter Datenbasis.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "components/statistics.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-42-012",
+      "chapter": 42,
+      "title": "Globale KPI-, Statistik- und Diagrammprüfung JEDER Seite [P1/P2; Datenrechte P0]",
+      "priority": "P1/P2; Datenrechte P0",
+      "requirement": "- Timer/Zeiterfassung: Tag/Woche/Monat, Projekt/Mitarbeiter, verrechenbar/verrechnet; Timer bleibt oben, Statistiken gehören in passende Analyseansichten.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "components/statistics.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-42-013",
+      "chapter": 42,
+      "title": "Globale KPI-, Statistik- und Diagrammprüfung JEDER Seite [P1/P2; Datenrechte P0]",
+      "priority": "P1/P2; Datenrechte P0",
+      "requirement": "- Ausgaben: Kategorien, Zeitverlauf, Budgetabweichungen soweit konfiguriert.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "components/statistics.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-42-014",
+      "chapter": 42,
+      "title": "Globale KPI-, Statistik- und Diagrammprüfung JEDER Seite [P1/P2; Datenrechte P0]",
+      "priority": "P1/P2; Datenrechte P0",
+      "requirement": "- Support: Ticketstatus und Bearbeitungszeiten, sofern zuverlässig berechenbar.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "components/statistics.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-42-015",
+      "chapter": 42,
+      "title": "Globale KPI-, Statistik- und Diagrammprüfung JEDER Seite [P1/P2; Datenrechte P0]",
+      "priority": "P1/P2; Datenrechte P0",
+      "requirement": "- Internes Adminportal: Unternehmen, Registrierungen, Abos, Zahlungsausfälle, Support, Systemzustand – streng getrennt von Kundendaten.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "components/statistics.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-42-016",
+      "chapter": 42,
+      "title": "Globale KPI-, Statistik- und Diagrammprüfung JEDER Seite [P1/P2; Datenrechte P0]",
+      "priority": "P1/P2; Datenrechte P0",
+      "requirement": "- Profile, Auth, Suche, Einstellungen, Dokumentviewer: nur hilfreiche Status-/Fortschrittsindikatoren, keine künstlichen Charts.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "components/statistics.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-42-017",
+      "chapter": 42,
+      "title": "Globale KPI-, Statistik- und Diagrammprüfung JEDER Seite [P1/P2; Datenrechte P0]",
+      "priority": "P1/P2; Datenrechte P0",
+      "requirement": "- Alle weiteren tatsächlich vorhandenen Routen: explizit in Matrix prüfen und sinnvoll verbessern.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "components/statistics.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-42-018",
+      "chapter": 42,
+      "title": "Globale KPI-, Statistik- und Diagrammprüfung JEDER Seite [P1/P2; Datenrechte P0]",
+      "priority": "P1/P2; Datenrechte P0",
+      "requirement": "Bei fehlenden Daten **maximal zwei kurze Textzeilen**, kein Null-Donut oder leeres Diagrammraster. Bestehende Kennzahlen fachlich testen, danach neue nützliche Diagramme P2 implementieren. Kein Mock als fertige Funktion ausgeben.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "components/statistics.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-43-001",
+      "chapter": 43,
+      "title": "Zeitrapporte, Finanzberichte, PDF/CSV, Export und sicheres Teilen [P2; Sicherheit P0]",
+      "priority": "P2; Sicherheit P0",
+      "requirement": "Eine zentrale Reporting-Foundation, keine isolierten Exportimplementierungen. Berichte nach Zeitraum, Kunde, Auftrag, Projekt, Mitarbeiter (berechtigungsabhängig), Status und Detailgrad filtern; Vorschau → Aktionen im bestehenden Drei-Punkte-Menü: PDF herunterladen, CSV herunterladen, per E-Mail senden, sicher teilen bzw. native Gerätefreigabe. Kein zusätzliches verstreutes Buttonsystem.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/document-pdf.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-43-002",
+      "chapter": 43,
+      "title": "Zeitrapporte, Finanzberichte, PDF/CSV, Export und sicheres Teilen [P2; Sicherheit P0]",
+      "priority": "P2; Sicherheit P0",
+      "requirement": "**Zeitrapporte:** detailliert mit Datum, Tätigkeit, Mitarbeiter, Dauer, Projekt, Kunde, oder zusammengefasst nach Kunde/Projekt/Mitarbeiter; Woche/Monat/individueller Zeitraum, verrechenbar/nicht verrechenbar. Professionelles PDF mit Firmenlogo, Zeitraum, Tabellen, Summen, Seitenzahlen; CSV mit dokumentierten Spalten. Interne Kommentare, vertrauliche Stundensätze und nicht berechtigte Mitarbeiterdaten in Kundenrapporten niemals versehentlich veröffentlichen. Timer-Pausen, Korrekturen, Rundung und Zeitzone korrekt.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/document-pdf.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-43-003",
+      "chapter": 43,
+      "title": "Zeitrapporte, Finanzberichte, PDF/CSV, Export und sicheres Teilen [P2; Sicherheit P0]",
+      "priority": "P2; Sicherheit P0",
+      "requirement": "**Finanzberichte:** Einnahmen/Ausgaben, fakturiert, offen/überfällig, Zahlungseingänge, Angebotsvolumen/-status, Ausgaben nach Kategorien, MwSt.-Auswertung (nicht als vollständige Steuerdeklaration ausgeben), Projektwirtschaftlichkeit nur bei echter Datenbasis. Berichte enthalten Zeitraum, Erstellungsdatum/Datenstand, Einheit, fachlich korrekte Summen und Statusdefinitionen.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/document-pdf.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-43-004",
+      "chapter": 43,
+      "title": "Zeitrapporte, Finanzberichte, PDF/CSV, Export und sicheres Teilen [P2; Sicherheit P0]",
+      "priority": "P2; Sicherheit P0",
+      "requirement": "**Formate und Sicherheit:** PDF im zentralen Viewer; CSV UTF-8 mit stabilen Spalten, Excel-kompatibler Variante, sauberem Dezimal-/Datumsformat und Schutz gegen CSV-Formelinjektion. E-Mail mit Empfänger, Betreff, Begleittext, echtem Anhang und Versand-/Fehlerprotokoll. Sensible Freigabelinks nicht erratbar, befristet, widerrufbar und mit angemessener Empfängerverifikation. Berechtigungen serverseitig, Audit für Freigaben, keine realen Test-E-Mails an Kunden. Grosse Exporte ressourcenschonend und mit verständlichen Fehlern. Optional gespeicherte Filter; automatische Versände nur nach ausdrücklichem Opt-in.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/document-pdf.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-44-001",
+      "chapter": 44,
+      "title": "Kompakte Enterprise-PDF-Vorlagen und Universal-PDF-Viewer [P1/P2; QR-Konformität P0]",
+      "priority": "P1/P2; QR-Konformität P0",
+      "requirement": "**Einheitliche Dokument-Foundation:** A4-Angebote und Rechnungen hochwertig, kompakt, druckoptimiert. Original-Firmenlogo proportional, Absender, Empfängeradressblock (optional Fensterkuvert-Variante), Dokumentüberschrift/Nummer, Datum/Gültigkeit oder Fälligkeit, kurzer Begleittext, nummerierte Positionstabelle (Beschreibung, Menge, Einheit, Einzelpreis, Steuersatz, Betrag), rechtsbündige Zwischensummen/MwSt./Total, Bedingungen, dezente Fusszeile mit Seitenzahl. Einheitliche Typografie und Tabellenlinien, keine riesigen Abstände, keine abgeschnittenen Positionen; wiederholte Tabellenköpfe und korrekte Seitenumbrüche. Kundenbranding aus Mandantendaten, nicht festes Binso-Logo. Historische versendete PDF-Versionen unverändert; Vorschau, Download und Anhang basieren auf denselben PDF-Bytes.",
+      "status": "teilweise_implementiert",
+      "sourceReferences": [
+        "lib/server/document-pdf.ts",
+        "components/pdf-preview.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "Gezielte Prüfungen: registration-test, profile-image-test, document-presentation-test, pdf-gestures-test, migration-test; letzter Datenbanklauf bestanden.",
+      "visualComparison": "Ausstehend am aktuellen Revision7-Stand",
+      "blocker": "Vollständige Klauselabnahme und reale Geräte fehlen; nicht als vollständig bestanden werten."
+    },
+    {
+      "id": "R7-44-002",
+      "chapter": 44,
+      "title": "Kompakte Enterprise-PDF-Vorlagen und Universal-PDF-Viewer [P1/P2; QR-Konformität P0]",
+      "priority": "P1/P2; QR-Konformität P0",
+      "requirement": "**Verbindlicher Binso-One-Standard: QR-Zahlteil IMMER auf eigener letzter A4-Seite.** Rechnungsinhalt auf den vorherigen Seiten, selbst bei kurzer Rechnung. Letzte Seite oberhalb des Zahlteils frei, normgerechter QR-Zahlteil unten: 210 × 105 mm; Empfangsschein 62 × 105 mm links, Zahlteil 148 × 105 mm rechts. Echte aktuelle SIX-Spezifikation inkl. strukturierter Adressen, IBAN/QR-IBAN, Referenzen, Währung, Swiss-QR-Code, Trenn-/Schnittlinien und Scanbarkeit beachten; angekündigte Standardänderungen rechtzeitig vorbereiten. Keine Verzerrung/Skalierung des QR-Zahlteils, keine QR-Icon-Platzhalter. Bei fehlenden Pflicht-Zahlungsdaten QR-Ausstellung verhindern, Entwürfe erlauben. Automatisierte PDF-Mass-/Payload-Tests und Validierung anhand offizieller SIX-Anforderungen. Angebote ohne QR-Zahlteil.",
+      "status": "teilweise_implementiert",
+      "sourceReferences": [
+        "lib/server/document-pdf.ts",
+        "components/pdf-preview.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "Gezielte Prüfungen: registration-test, profile-image-test, document-presentation-test, pdf-gestures-test, migration-test; letzter Datenbanklauf bestanden.",
+      "visualComparison": "Ausstehend am aktuellen Revision7-Stand",
+      "blocker": "Vollständige Klauselabnahme und reale Geräte fehlen; nicht als vollständig bestanden werten."
+    },
+    {
+      "id": "R7-44-003",
+      "chapter": 44,
+      "title": "Kompakte Enterprise-PDF-Vorlagen und Universal-PDF-Viewer [P1/P2; QR-Konformität P0]",
+      "priority": "P1/P2; QR-Konformität P0",
+      "requirement": "**Viewer:** Mobile Vollbild, Desktop zentrierte echte PDF-Seiten. Im Hellmodus hellgrauer Viewer-Hintergrund, im Dunkelmodus anthrazit; Papier selbst bleibt immer weiss/originalfarbig, mit feiner sichtbarer Blattkontur und dezentem Schatten. Auf iPhone/Android **ein Finger horizontal wischen = nächste/vorherige Seite bei Fit-to-Page**, **zwei Finger Pinch-to-Zoom**, **Doppeltipp zoomt ein/zurück**, **ein Finger verschiebt vergrösserte Seite**. Panning darf keinen unbeabsichtigten Seitenwechsel auslösen; iOS-PWA/Safari-Gestenkonflikte prüfen. Seitenanzeige 1/N, Zoom/Fit, Desktop-Maus/Tastatur, barrierefreie Alternative. Vorschau, Download, Druck und Teilen über bestehendes Drei-Punkte-Menü. Echtes PDF rendern, keine HTML-Nachbildung. Tests: Mehrseiten-PDF, QR-Seite, Zoom, Rotation, Light/Dark, iPhone-PWA/Safari, Android, Desktop.",
+      "status": "teilweise_implementiert",
+      "sourceReferences": [
+        "lib/server/document-pdf.ts",
+        "components/pdf-preview.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "Gezielte Prüfungen: registration-test, profile-image-test, document-presentation-test, pdf-gestures-test, migration-test; letzter Datenbanklauf bestanden.",
+      "visualComparison": "Ausstehend am aktuellen Revision7-Stand",
+      "blocker": "Vollständige Klauselabnahme und reale Geräte fehlen; nicht als vollständig bestanden werten."
+    },
+    {
+      "id": "R7-45-001",
+      "chapter": 45,
+      "title": "Verbindliche vollständige Seiten- und End-to-End-Abnahme [P0–P2]",
+      "priority": "P0–P2",
+      "requirement": "1. Aus aktuellem Repository alle Routen, Unterseiten, Tabs, Rollen, Bottom Sheets, Einstellungen, Adminansichten, Dokumente und Sonderzustände inventarisieren.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-45-002",
+      "chapter": 45,
+      "title": "Verbindliche vollständige Seiten- und End-to-End-Abnahme [P0–P2]",
+      "priority": "P0–P2",
+      "requirement": "2. **Jede** Seite auf UX, relevante Kennzahlen/Diagramme, Statusfarben, Filter, Navigation, Drei-Punkte-Aktionen, PDF/CSV, Rechte, Lade-/Fehler-/Leerzustände prüfen. Jede fachlich sinnvolle P0–P2-Verbesserung tatsächlich implementieren, nicht nur vorschlagen.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-45-003",
+      "chapter": 45,
+      "title": "Verbindliche vollständige Seiten- und End-to-End-Abnahme [P0–P2]",
+      "priority": "P0–P2",
+      "requirement": "3. Bestehende und neue Kennzahlen gegen Testdaten inkl. Nullwerten, Teilzahlungen, Storno, Gutschrift, Rollen und Mandantentrennung prüfen.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-45-004",
+      "chapter": 45,
+      "title": "Verbindliche vollständige Seiten- und End-to-End-Abnahme [P0–P2]",
+      "priority": "P0–P2",
+      "requirement": "4. End-to-End: Registrierung → Profilpersistenz/Avatar/Logo → Einladung/Anmeldung → Kunde → Angebot/Version/Versand/Tracking/Annahme → Auftrag/Timer/Zeitrapport → Rechnung/QR-Seite → Zahlung → Finanzbericht/CSV/PDF/Teilen. Fehler- und Wiederaufnahmefälle berücksichtigen.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-45-005",
+      "chapter": 45,
+      "title": "Verbindliche vollständige Seiten- und End-to-End-Abnahme [P0–P2]",
+      "priority": "P0–P2",
+      "requirement": "5. Visuelle Abnahme gebündelt auf iPhone Safari/PWA, Android und Desktop in Hell/Dunkelmodus; vorhandene Referenzscreens und Design-Tokens einhalten. Bestehende Bottom-Navigation und Floating-Plus-Button unverändert; nur nachgewiesene doppelte Safe-Area-Abstände korrigieren.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-45-006",
+      "chapter": 45,
+      "title": "Verbindliche vollständige Seiten- und End-to-End-Abnahme [P0–P2]",
+      "priority": "P0–P2",
+      "requirement": "6. Vollständige Abnahmematrix: Route, Funktion, P0/P1/P2, Ist, Soll, Änderung, Test, Resultat, verbleibender Blocker. Keine erfundenen Implementierungs- oder Deployment-Erfolge. Externe Provider-/DNS-/Secrets-Blocker explizit ausweisen.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-45-007",
+      "chapter": 45,
+      "title": "Verbindliche vollständige Seiten- und End-to-End-Abnahme [P0–P2]",
+      "priority": "P0–P2",
+      "requirement": "7. P3 nicht implementieren. Bestehende PR-/Review-/Security-/Deploymentfreigaben beachten. Gezielte Tests während Entwicklung, gebündelte Schlussprüfung; keine wiederholten kompletten Browser-Tests nach jeder Kleinigkeit. Produktivdeployment nur im erlaubten Rahmen.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-46-001",
+      "chapter": 46,
+      "title": "Einheitliche öffentliche Website und Produktreise [P1]",
+      "priority": "P1",
+      "requirement": "Erfasse alle Landingpage-Routen und Unterseiten (Produkt, Funktionen, Preise, Kontakt, Hilfe, Rechtliches, Registrieren). Gestalte sie als zusammenhängende responsive Produktwebsite mit gemeinsamem Header/Footer, konsistenter Typografie (Inter), präzisen Ausrichtungslinien, sinnvollen CTA, verständlichen echten Produktinformationen und grossen aktuellen, freigegebenen Produktabbildungen. Keine erfundenen Funktionsversprechen, Preise oder Probezeit; bestehende Konditionen aus realer Konfiguration übernehmen. Kein Logo-Splash bei Seitenwechsel. Einheitlicher Einstieg Landingpage → Registrierung → E-Mail-Verifizierung → fortsetzbares Onboarding → App. Alle Zustände inkl. 404, 403, 500, Offline und Wartung berücksichtigen. SEO-Metadaten, semantische Überschriften, Sitemap, Social-Previews und Performance prüfen. Marketing-Footer nur auf öffentlichen Seiten; App/Admin erhalten reduzierte Rechts-/Hilfelinks.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "components/marketing.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-47-001",
+      "chapter": 47,
+      "title": "Eigenständige Responsive-Desktop-Foundation [P1]",
+      "priority": "P1",
+      "requirement": "Desktop ist keine vergrösserte Mobile-App. Gemeinsame Design-Tokens und Business-Services, aber eigenständige Desktop-Informationsarchitektur: einklappbare Sidebar (voll: Icon + Label; kompakt: Icon + Tooltip), persistierter Zustand, Tastatur- und Screenreaderbedienung. Header ca. 64px mit sinnvoller globaler Suche, Benachrichtigungen und Avatar-Menü; KEINE unnötige Zeile «Arbeitsbereich», doppelte Breadcrumbs oder redundante Seitentitel. Avatar-Menü: Profil, Einstellungen, Sprache, Abmelden. Suche auf breiten Bildschirmen als Eingabe, auf schmalen als Suchsymbol. Verankerte Popover für Drei-Punkte-Aktionen, Benachrichtigungen und Profil; kurze Bestätigungen als kompakte Dialoge, Bearbeitung als passende Dialoge/Sidepanels, komplexe Angebote/Rechnungen als eigenständiger Editor mit Vorschau. Einstellungen: linke Kategorienavigation und begrenzter, gut lesbarer Formularbereich rechts.\nRaster: alle Seitentitel, Filter, Tabellen, Cards, Diagramme beginnen auf identischen linken Linien; gleich hohe Cards je Reihe, konsistente Oberkanten und Abstände (8/16/24/32px). Keine willkürlichen Kartenverschachtelungen, Tabs nur bei echtem Nutzen. Breite Tabellen dürfen Raum nutzen; Text/Formulare mit Maximalbreite. Bei 768, 1024, 1440, 1920, 2560+ px, Browserzoom 125/150/200 %, kleinen Fenstern und 4K prüfen; Inhalts-Breakpoints statt nur Gerätetyp. Light/Dark fachgerecht gestalten. Kein grosser Logo-Splash/zentrierter Spinner bei normaler Navigation; Shell sofort sichtbar, nur relevante Inhalte dezent als Skeleton. Mobile Bottom-Navigation und bestehender blauer FAB bleiben unverändert; nur doppelte Safe-Area-Abstände nach Messung korrigieren.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-48-001",
+      "chapter": 48,
+      "title": "Zentrale Identity-UX über alle Oberflächen [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "Gemeinsame Identity-Foundation für öffentliche Registrierung, Login, Einladungsannahme, Passwort-Reset, E-Mail-Verifizierung, Passkeys, TOTP, Recovery und Sessions. Gleiche Inter-Typografie, 12px gerundete Felder, eindeutige Fehler, Autofill, fokussierbare Bedienelemente. Auf öffentlichen Seiten Logo links, rahmenloser Sprachtext «DE ˅» rechts auf Logo-Höhe, KEIN Flaggen-, Globus-, Pill- oder Button-Look. Desktop darf eigenständiges zweispaltiges Loginlayout nutzen; Mobile einspaltig. Registrierung schrittweise, ohne Pflicht-MFA oder Zahlungsdaten. Unternehmensmitarbeiter über Einladung (7 Tage, erneuerbar/widerrufbar, eindeutige Identitätsbindung), nicht als zweite Firma registrieren. Eine Anmeldung für Owner/Admin/Finance/Member; Rechte erst serverseitig bestimmen. Internes Adminportal separat zugriffsgeschützt, starke phishingresistente Authentifizierung, kontrollierte Provisionierung, Audit, kein automatischer Zugriff auf Kundendaten. Abmelden über Avatar-Menü, Sessions widerrufen; Sicherheitszustände und Wiederherstellung vollständig testen.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "components/auth-workspace.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-49-001",
+      "chapter": 49,
+      "title": "Vollständige Internationalisierung [P1; Datenschutz-/Sicherheitsinhalte P0]",
+      "priority": "P1; Datenschutz-/Sicherheitsinhalte P0",
+      "requirement": "Sprachen: de-CH, fr-CH, it-CH, en. Zentrales i18n-System mit Schlüssel-/Fallbackstrategie, Pluralformen, Datums-/Zahlen-/Währungsformaten und automatisierter Prüfung auf fehlende Keys/Hardcodings. Sämtliche Routen, Unterseiten, Menüs, Buttons, Formulare, Fehler, Ladezustände, Status, Tabellen, Diagrammlegenden, Suchergebnisse, Adminportal, Support, Onboarding, E-Mail-/PDF-/Berichtsvorlagen und Rechtstexte abdecken. Kein gemischtsprachiges UI. Öffentliche Sprachwahl minimalistisch «DE ˅» oben rechts, eingeloggte Präferenz im Profil/Avatar-Menü; mobile Einstellungen. Sprache sofort wechseln, Formularfortschritt nicht verlieren; Präferenz vor Login datensparsam merken und nach Login im Benutzerprofil speichern. Dokumentensprache separat wählbar, bestehende Kundenpräferenzen berücksichtigen. Keine maschinell improvisierten juristischen Übersetzungen ungeprüft produktiv schalten; Qualitätssicherung mit Muttersprachlern/Fachprüfung für rechtliche und finanzielle Inhalte.",
+      "status": "teilweise_implementiert",
+      "sourceReferences": [
+        "lib/locales/index.ts",
+        "scripts/localization-coverage-test.mjs"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "Gezielte Prüfungen: registration-test, profile-image-test, document-presentation-test, pdf-gestures-test, migration-test; letzter Datenbanklauf bestanden.",
+      "visualComparison": "Ausstehend am aktuellen Revision7-Stand",
+      "blocker": "Vollständige Klauselabnahme und reale Geräte fehlen; nicht als vollständig bestanden werten."
+    },
+    {
+      "id": "R7-50-001",
+      "chapter": 50,
+      "title": "Globales Toggle-, Auswahl- und Einstellungsverhalten [P1]",
+      "priority": "P1",
+      "requirement": "Zentraler zugänglicher Switch/Toggle für sofort wirksame binäre Ein-/Aus-Einstellungen mit klarer Beschriftung, Status, Fokus, Tastatur, Lade-/Fehler-/Rollbackzustand und persistenter Speicherung. Checkboxen weiter für Mehrfachauswahl, rechtliche Einwilligungen und explizite Bestätigungen; Radio für genau eine Option. Keine blind umgebauten Checkboxen. Kritische Sicherheits- und Unternehmensänderungen benötigen zusätzliche Bestätigung/Reauth und dürfen nicht durch einfaches Umschalten ungeschützt wirksam werden. Einheitliche Profileinstellungen, Benachrichtigungspräferenzen, Dark Mode, Sprache, Sicherheit, Datenschutz, Erinnerungen und automatische E-Mails. Jede Einstellung serverseitig autorisieren und nach Neuladen sowie geräteübergreifend korrekt wiedergeben.",
+      "status": "teilweise_implementiert",
+      "sourceReferences": [
+        "components/ui.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "Gezielte Prüfungen: registration-test, profile-image-test, document-presentation-test, pdf-gestures-test, migration-test; letzter Datenbanklauf bestanden.",
+      "visualComparison": "Ausstehend am aktuellen Revision7-Stand",
+      "blocker": "Vollständige Klauselabnahme und reale Geräte fehlen; nicht als vollständig bestanden werten."
+    },
+    {
+      "id": "R7-51-001",
+      "chapter": 51,
+      "title": "Footer, Cookies und Consent [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "Einheitlicher responsiver Marketing-Footer auf allen öffentlichen Seiten: Produkt, Funktionen, Preise, Kontakt, Support, Impressum, Datenschutz, AGB, Cookie-Einstellungen und weitere tatsächlich erforderliche Rechtstexte. Kunden- und Admin-Workspace erhalten schlanke, konsistente Rechts-/Hilfezugänge statt Marketing-Footer. Ein zentrales Consent-Management für Landingpage und betroffene Unterseiten: notwendige Technologien klar erklärt, nicht abschaltbar; optionale Kategorien standardmässig aus, wo Einwilligung erforderlich; gleichwertige Optionen «Alle akzeptieren», «Alle ablehnen», «Einstellungen», verständliche Toggles je Kategorie, Widerruf jederzeit via Footer. Keine nicht notwendigen Skripte vor wirksamer Einwilligung laden, sofern Einwilligung erforderlich. Consent-Zustand versionieren und mit minimal nötigen Daten nachweisen, Sprachwechsel respektieren, auf PWA und Desktop korrekt verhalten, Banner nicht bei jeder Navigation wiederholen. Cookie-/Tracking-Inventar und tatsächliche Provider zuerst prüfen; keine pauschalen rechtlichen Behauptungen.",
+      "status": "teilweise_implementiert",
+      "sourceReferences": [
+        "components/privacy-consent.tsx"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "Gezielte Prüfungen: registration-test, profile-image-test, document-presentation-test, pdf-gestures-test, migration-test; letzter Datenbanklauf bestanden.",
+      "visualComparison": "Ausstehend am aktuellen Revision7-Stand",
+      "blocker": "Vollständige Klauselabnahme und reale Geräte fehlen; nicht als vollständig bestanden werten."
+    },
+    {
+      "id": "R7-52-001",
+      "chapter": 52,
+      "title": "Rechtliche Seiten und Veröffentlichung [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "Bestandsaufnahme aller Rechtsseiten (Impressum, Datenschutz, Nutzungsbedingungen/AGB, Abonnement/Testphase/Kündigung, Auftragsbearbeitung, Subprozessoren, Cookies, Kontakt). Inhalte mit realem Datenfluss, Hosting, E-Mail, Tracking, Dokumentfreigaben, Mitarbeiterrollen, Speicherfristen, Auskunft/Export/Löschung, grenzüberschreitenden Übermittlungen und Schweizer nDSG sowie ggf. anwendbarer DSGVO abgleichen. Einheitliches responsive Layout, Anker/TOC bei langen Texten, Versionsdatum, mehrsprachige Fassungen, verständliche Sprache, öffentliche Erreichbarkeit. Keine erfundenen Vertragsklauseln, Fristen oder Rechtszusagen; offene rechtliche Fragen markieren und vor Veröffentlichung fachjuristisch freigeben. Bereits veröffentlichte Rechtstexte nicht stillschweigend durch generierte Inhalte ersetzen.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "config/legal.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-53-001",
+      "chapter": 53,
+      "title": "Support-Ticket ohne erzwungenen Live-Chat [P1]",
+      "priority": "P1",
+      "requirement": "Support-Start bietet verständlich «Support-Ticket erstellen» und separat «Chat starten» nur bei tatsächlich verfügbarer Chatfunktion. Ticketanlage erzeugt KEINEN automatischen Live-Chat und keine erzwungene direkte Unterhaltung. Ticketformular: kurze Betreffzeile, Kategorie, Beschreibung, optional prioritätsgerechte Auswahl und Anhänge; klare Validierung, sichere Dateiprüfung, idempotentes Absenden, kurze lesbare Ticketnummer, Status, Bestätigung. Nach Erstellung: Ticketdetail mit Verlauf und asynchronen Antworten, Benachrichtigung, Zuordnung und Status (offen, in Bearbeitung, wartet auf Kunde, gelöst, geschlossen); optional bewusst initiierten Chat ermöglichen, wenn verfügbar. Keine zweite parallele Ticketinfrastruktur. Support-Admin kann zuweisen, antworten, eskalieren, schliessen; Berechtigungen, Mandantentrennung, Audit und Datensparsamkeit prüfen. iOS-PWA/Browser: Eingabefeld bei Tastatur stets sichtbar; einheitliche Bottom Sheets und max. zweizeilige Empty States.",
+      "status": "teilweise_implementiert",
+      "sourceReferences": [
+        "components/pages/support.tsx",
+        "app/api/support/tickets/route.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "Gezielte Prüfungen: registration-test, profile-image-test, document-presentation-test, pdf-gestures-test, migration-test; letzter Datenbanklauf bestanden.",
+      "visualComparison": "Ausstehend am aktuellen Revision7-Stand",
+      "blocker": "Vollständige Klauselabnahme und reale Geräte fehlen; nicht als vollständig bestanden werten."
+    },
+    {
+      "id": "R7-54-001",
+      "chapter": 54,
+      "title": "Einheitliche Fehler-, Lade- und Wiederherstellungszustände [P0/P1]",
+      "priority": "P0/P1",
+      "requirement": "Öffentliche Website, Identity, Workspace, Admin, Tablet, Mobile, PWA: zentrale 401/403/404/409/429/500/502/503, Offline, Wartung, abgelaufener Link, fehlgeschlagener Upload/Export/Versand, ungültiges Formular, Sessionablauf, Konflikt, langsame Verbindung. Klare lokalisierte Sprache, passende sichere Aktion (zurück, erneut versuchen, anmelden, Link erneuern), keine internen Stacktraces. 401 erhält beabsichtigtes Ziel und Entwürfe. Retry nur idempotent; bei Timeout erst serverseitigen Status klären. Keine Arbeit verlieren, Timer nicht verlieren, sichere lokale Draft-Wiederherstellung, keine ungesicherten sensiblen Daten im Cache. Global konsistente Skeletons statt Splash-Logos und Layoutsprünge. Error-Boundaries, datenschutzgerechtes Monitoring, Korrelations-ID für Support, Accessibility und Offline-/Wiederverbindungsprüfungen.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [
+        "lib/server/http.ts",
+        "components/use-process-draft.ts"
+      ],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-55-001",
+      "chapter": 55,
+      "title": "Vollständige Seite-für-Seite UX-, KPI- und Workflow-Prüfung [P0–P2]",
+      "priority": "P0–P2",
+      "requirement": "Aus tatsächlich aktuellem Code ALLE Routen und Zustände inventarisieren: Landingpage und Unterseiten, Login/Onboarding, Kunden-Desktop, Mobile/PWA, Tablet, internes Adminportal, alle Profile/Einstellungen, Listen, Detailseiten, Dialoge, Popover, Footer, Support und Fehlerseiten. Für jede Seite prüfen: funktionaler Zweck, einfachster Weg für nichttechnische Benutzer, korrekte Informationen, Ausrichtung und Grid, Header/Sidebar, sinnvolle Kennzahlen/Diagramme/Statusfarben (keine dekorativen Null-Diagramme), Suche/Filter/Sortierung, Aktionen, Responsiveness, Sprache, Formulare, Datenpersistenz, Lade-/Fehler-/Offlinezustände, Berechtigungen, Exporte, Tastatur/Touch. Nützliche P0–P2-Verbesserungen implementieren, keine wahllosen Diagramme oder unnötigen Tabs. Bestehende mobile Bottom-Navigation/FAB unverändert. Abnahmematrix pro Route und Rolle mit Vorher/Nachher, Tests und Restblockern; visuelle Referenz gegen tatsächliche Browserdarstellung auf mehreren Auflösungen und Hell/Dunkelmodus. Keine Behauptung «vollständig» ohne überprüfbare Evidenz.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    },
+    {
+      "id": "R7-56-001",
+      "chapter": 56,
+      "title": "Technische Umsetzung, Prioritäten und Freigabegrenzen [P0–P2]",
+      "priority": "P0–P2",
+      "requirement": "Revision 7 ersetzt alle früheren V25-Versionen, behält die Anforderungen der Kapitel 1–45 vollständig bei und ergänzt 46–56. P0, P1, P2 implementieren, P3 NICHT. Bestehende PRs und parallele Änderungen respektieren. Root Causes zentral beheben, keine lokalen Workarounds, keine zweite Foundation. Nach Plan/Inventur in zusammenhängenden vertikalen Paketen implementieren (Foundation, Identity/i18n/Consent, Desktop/Public/Admin, Support, Fehlerzustände, E2E). Gezielte Tests pro Paket, gebündelte Lint/Typecheck/Build/E2E/visuelle Abnahme vor PR/Deployment; keine endlosen identischen Testläufe. Security- und Migrationsprüfungen nicht überspringen. Externe DNS/Provider/Secrets, juristische Freigaben und reale Geräteprüfungen als Blocker offen ausweisen; keine Erfolge fingieren. PR, Merge und Deployment nur im zuvor erteilten Berechtigungsrahmen, keine unautorisierte produktive Datenänderung. Vollständige P0–P2-Abnahmematrix und Liveprüfung dokumentieren.",
+      "status": "nicht_abgenommen",
+      "sourceReferences": [],
+      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
+      "test": "offen",
+      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
+      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+    }
+  ]
+}

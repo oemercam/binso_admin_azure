@@ -15,6 +15,9 @@ export function mailText(source:string,locale:MailLocale){
 
 /** Registration UI and transactional mail consume the same locale catalogue. */
 export const registrationMessages={
+ firstName:['Vorname','First name','Prénom','Nome','Ad'],
+ lastName:['Nachname','Last name','Nom','Cognome','Soyad'],
+ stepProgress:['Schritt {step} von {total}','Step {step} of {total}','Étape {step} sur {total}','Passaggio {step} di {total}','Adım {step} / {total}'],
  language:['Sprache','Language','Langue','Lingua','Dil'],
  title:['Binso One einrichten','Set up Binso One','Configurer Binso One','Configura Binso One','Binso One kurulumu'],
  company:['Dein Unternehmen','Your company','Votre entreprise','La tua azienda','Şirketiniz'],

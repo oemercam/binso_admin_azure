@@ -20,7 +20,8 @@ Prüfergebnisse. Nur die für den konkreten Auftrag relevanten Quellen lesen.
 | QA-Auswahl und Ausführung | `scripts/qa-plan.mjs`, `scripts/qa.mjs`, `package.json`; Pflicht-Gates: `.github/workflows/quality.yml` |
 | Gemeinsame App-Abnahme für Kunden und One Admin | [Prüfprotokoll, Rollen, Geräte und offene Nachweise](docs/architecture/app-acceptance.md), [vollständige Routen-/Unteransichtsmatrix](docs/architecture/app-acceptance-routes.md) |
 | V25.4 Public Trial, Tarife, Modulprofile und Nachweisgrenzen | [Umsetzung und Freigaben](docs/architecture/v25-4-ux-marketing-app-ready.md), [124 BP-/UX-Fälle](docs/architecture/v25-4-acceptance-tracking.csv) |
-| Vollständiger V25-Master vom 21.10.2026 | [Aktuelle Umsetzung, Migrationen und Abnahmegrenzen](docs/architecture/v25-complete-master-20261021.md) |
+| Aktuelle Revision 7, 56 Kapitel/P0–P2 | [Umsetzung und vollständiges Abnahmeregister](docs/architecture/v25-revision7.md) |
+| Historischer V25-Master vom 21.10.2026 | [Aktuelle Umsetzung, Migrationen und Abnahmegrenzen](docs/architecture/v25-complete-master-20261021.md) |
 | V25.5 Lifecycle und Sicherheitsgrenzen | [Ist/Delta und abhängige Basis](docs/architecture/v25-5-platform-lifecycle.md), [aktives Register aller 390 PL/BP/UX/Gate-IDs](docs/architecture/v25-5-traceability.csv) |
 | Aktuelle technische Foundation-Korrekturen und verbleibende Abnahmegrenzen | [Foundation-Status](docs/architecture/foundation-status.md); historische V21/V22-Inventare sind keine aktuellen Produktregeln |
 | Systemaudit-Korrekturen: Auth, Benachrichtigungen, Uploads und historische Berechtigungspfade | [Umsetzung, Migrationen und offene Sicherheits-/Gerätenachweise](docs/architecture/system-audit-corrections.md) |
@@ -70,7 +71,7 @@ Es gibt keinen Fallback auf einen zweiten E-Mail-Provider.
 - sechsstellige E-Mail-Verifikation vor produktivem Session-Zugriff
 - zusätzlicher Login-Faktor
 - TOTP mit einmaligen Recovery Codes
-- Owner, Admin und Finance müssen Authenticator MFA verwenden
+- TOTP ist für Kundenrollen freiwillig; aktivierte Faktoren bleiben beim Login verbindlich. Kritische Änderungen benötigen frische sitzungsgebundene Bestätigung.
 - HttpOnly/Secure/SameSite Session-Cookies
 - serverseitige Rollen- und Tenant-Prüfung
 - PostgreSQL-RLS und zusammengesetzte Tenant-Fremdschlüssel

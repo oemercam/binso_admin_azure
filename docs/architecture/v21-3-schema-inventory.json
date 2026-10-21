@@ -70,7 +70,8 @@
     "0066_retire_template_workforce_role.sql",
     "0067_scoped_fresh_authentication.sql",
     "0068_offer_versions_and_public_responses.sql",
-    "0069_attachment_archival.sql"
+    "0069_attachment_archival.sql",
+    "0070_issued_invoice_pdf.sql"
   ],
   "tables": [
     {
@@ -290,6 +291,11 @@
     },
     {
       "name": "invoice_refunds",
+      "rls": true,
+      "forced_rls": true
+    },
+    {
+      "name": "invoice_versions",
       "rls": true,
       "forced_rls": true
     },
@@ -6797,6 +6803,72 @@
       "table_name": "invoice_refunds",
       "column_name": "created_at",
       "ordinal_position": 10,
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "column_default": "now()",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "invoice_versions",
+      "column_name": "organization_id",
+      "ordinal_position": 1,
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "invoice_versions",
+      "column_name": "invoice_id",
+      "ordinal_position": 2,
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "invoice_versions",
+      "column_name": "pdf",
+      "ordinal_position": 3,
+      "data_type": "bytea",
+      "udt_name": "bytea",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "invoice_versions",
+      "column_name": "pdf_sha256",
+      "ordinal_position": 4,
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "invoice_versions",
+      "column_name": "created_by_user_id",
+      "ordinal_position": 5,
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "invoice_versions",
+      "column_name": "created_at",
+      "ordinal_position": 6,
       "data_type": "timestamp with time zone",
       "udt_name": "timestamptz",
       "is_nullable": "NO",
@@ -17085,6 +17157,34 @@
       "definition": "CHECK (((length(TRIM(BOTH FROM reason)) >= 3) AND (length(TRIM(BOTH FROM reason)) <= 2000)))"
     },
     {
+      "table_name": "invoice_versions",
+      "name": "invoice_versions_organization_id_fkey",
+      "type": "f",
+      "validated": true,
+      "definition": "FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "invoice_versions",
+      "name": "invoice_versions_organization_id_invoice_id_fkey",
+      "type": "f",
+      "validated": true,
+      "definition": "FOREIGN KEY (organization_id, invoice_id) REFERENCES invoices(organization_id, id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "invoice_versions",
+      "name": "invoice_versions_pdf_sha256_check",
+      "type": "c",
+      "validated": true,
+      "definition": "CHECK ((pdf_sha256 ~ '^[a-f0-9]{64}$'::text))"
+    },
+    {
+      "table_name": "invoice_versions",
+      "name": "invoice_versions_pkey",
+      "type": "p",
+      "validated": true,
+      "definition": "PRIMARY KEY (organization_id, invoice_id)"
+    },
+    {
       "table_name": "invoices",
       "name": "fk_invoices_project_id_tenant",
       "type": "f",
@@ -19782,6 +19882,14 @@
       "check_expression": "(organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid)"
     },
     {
+      "table_name": "invoice_versions",
+      "name": "tenant_scope",
+      "command": "*",
+      "permissive": true,
+      "using_expression": "(organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid)",
+      "check_expression": "(organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid)"
+    },
+    {
       "table_name": "invoices",
       "name": "invoice_workforce_scope",
       "command": "r",
@@ -21014,6 +21122,11 @@
       "table_name": "invoice_refunds",
       "name": "invoice_refunds_pkey",
       "definition": "CREATE UNIQUE INDEX invoice_refunds_pkey ON public.invoice_refunds USING btree (id)"
+    },
+    {
+      "table_name": "invoice_versions",
+      "name": "invoice_versions_pkey",
+      "definition": "CREATE UNIQUE INDEX invoice_versions_pkey ON public.invoice_versions USING btree (organization_id, invoice_id)"
     },
     {
       "table_name": "invoices",

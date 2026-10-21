@@ -92,6 +92,27 @@ export async function documentPdf(document:Row,liveCompany:Row,logo?:Buffer){
  const footer=[companyName,company.vat_number?t('MWST')+' '+company.vat_number:company.uid,company.website,company.email].filter(Boolean).join(' · ');
  for(let page=0;page<contentPages;page++){pdf.switchToPage(page);const margin=pdf.page.margins.bottom;pdf.page.margins.bottom=0;pdf.font('Liberation Sans').fontSize(8).fillColor('#555');pdf.text(footer,left,pdf.page.height-51,{width:width-70,height:30,ellipsis:true});pdf.text(`${page+1} / ${totalPages}`,right-60,pdf.page.height-51,{width:60,align:'right',lineBreak:false});pdf.page.margins.bottom=margin;}
  pdf.switchToPage(contentPages-1);
- if(bill){pdf.addPage();pdf.font('Liberation Sans-Bold').fontSize(18).fillColor('#111').text(t('ZAHLUNGSINFORMATIONEN'),left,44,{width});pdf.moveDown(.8);paragraph(t('Rechnung')+' '+document.number,11);paragraph(t(paid>0||credited>0?'Bitte nur den offenen Betrag bezahlen.':'Bitte den Rechnungsbetrag mit dem folgenden QR-Zahlteil bezahlen.'),10);paragraph(t('Offener Betrag: ')+document.currency+' '+money(balance),11);bill.attachTo(pdf,0,pdf.page.height-SwissQRBill.height);}
+ if(bill){pdf.addPage();if(document.status!=='draft'&&Number(record(document.document_snapshot).layout_revision??0)<7){pdf.font('Liberation Sans-Bold').fontSize(18).fillColor('#111').text(t('ZAHLUNGSINFORMATIONEN'),left,44,{width});pdf.moveDown(.8);paragraph(t('Rechnung')+' '+document.number,11);paragraph(t(paid>0||credited>0?'Bitte nur den offenen Betrag bezahlen.':'Bitte den Rechnungsbetrag mit dem folgenden QR-Zahlteil bezahlen.'),10);paragraph(t('Offener Betrag: ')+document.currency+' '+money(balance),11);}bill.attachTo(pdf,0,pdf.page.height-SwissQRBill.height);}
+ pdf.end();return finished;
+}
+
+/** The same PDF owner/fonts as documents; only authorized report rows enter here. */
+export async function reportPdf(rows:readonly (readonly string[])[],options:{title:string;company:string;locale:string;logo?:Buffer}){
+ if(rows.length>1000||rows.some(row=>row.length>3||row.some(value=>value.length>2000)))throw new Error('Report size exceeds bounded rendering limits');
+ const pdf=new PDFDocument({size:'A4',margins:{top:44,bottom:60,left:44,right:44},bufferPages:true,info:{Title:options.title,Author:options.company}});
+ const [regular,bold]=await Promise.all(['Regular','Bold'].map(weight=>readFile(join(process.cwd(),'public/fonts/pdf',`LiberationSans-${weight}.ttf`))));
+ pdf.registerFont('Liberation Sans',regular).registerFont('Liberation Sans-Bold',bold);
+ const chunks:Buffer[]=[],finished=new Promise<Buffer>((resolve,reject)=>{pdf.on('data',chunk=>chunks.push(chunk));pdf.on('end',()=>resolve(Buffer.concat(chunks)));pdf.on('error',reject)});
+ if(options.logo){try{pdf.image(options.logo,44,40,{fit:[160,48]});pdf.y=104;}catch{pdf.y=44;}}
+ pdf.font('Liberation Sans-Bold').fontSize(18).text(options.title);pdf.moveDown(.5);pdf.font('Liberation Sans').fontSize(10).text(options.company);pdf.moveDown();
+ const columns=[44,310,475],widths=[250,150,75];
+ const tableRow=(row:readonly string[],heading=false)=>{pdf.font(heading?'Liberation Sans-Bold':'Liberation Sans').fontSize(10);const height=Math.max(18,...row.map((value,index)=>pdf.heightOfString(value,{width:widths[index]})))+12;
+  if(pdf.y+height>pdf.page.height-65){pdf.addPage();if(rows[0]&&row!==rows[0])tableRow(rows[0],true);}
+  const y=pdf.y;row.forEach((value,index)=>{pdf.text(value,columns[index],y,{width:widths[index],align:index===1?'right':'left'});});pdf.y=y+height;
+  if(heading){pdf.moveTo(44,pdf.y-5).lineTo(550,pdf.y-5).strokeColor('#dce5ef').stroke();}
+ };
+ rows.forEach((row,index)=>tableRow(row,index===0));
+ const count=pdf.bufferedPageRange().count;
+ for(let page=0;page<count;page++){pdf.switchToPage(page);pdf.page.margins.bottom=0;pdf.font('Liberation Sans').fontSize(8).text(options.company,44,pdf.page.height-35,{width:400,lineBreak:false});pdf.text(`${page+1} / ${count}`,480,pdf.page.height-35,{width:70,align:'right',lineBreak:false});}
  pdf.end();return finished;
 }

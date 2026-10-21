@@ -13528,5 +13528,45 @@
     "Question saved",
     "Question enregistrée",
     "Domanda salvata"
+  ],
+  "Alle ablehnen": [
+    "Reject all",
+    "Tout refuser",
+    "Rifiuta tutti"
+  ],
+  "Alle akzeptieren": [
+    "Accept all",
+    "Tout accepter",
+    "Accetta tutti"
+  ],
+  "Support-Ticket erstellen": [
+    "Create support ticket",
+    "Créer un ticket de support",
+    "Crea ticket di assistenza"
+  ],
+  "Diese Speichermechanismen sind für Sessions, Kontoschutz und Benutzereinstellungen erforderlich und können nicht deaktiviert werden.": [
+    "This storage is required for sessions, account security and preferences and cannot be disabled.",
+    "Ce stockage est nécessaire pour les sessions, la sécurité du compte et les préférences et ne peut pas être désactivé.",
+    "Questa archiviazione è necessaria per sessioni, sicurezza e preferenze e non può essere disattivata."
+  ],
+  "Datenschutz-Einstellung konnte nicht gespeichert werden.": [
+    "The privacy preference could not be saved.",
+    "Le choix de confidentialité n’a pas pu être enregistré.",
+    "Non è stato possibile salvare la preferenza sulla privacy."
+  ],
+  "Das Bild kann nicht sicher verarbeitet werden. Bitte JPEG, PNG oder WebP mit höchstens 24 Megapixeln auswählen.": [
+    "The image cannot be processed safely. Choose JPEG, PNG or WebP up to 24 megapixels.",
+    "L’image ne peut pas être traitée en toute sécurité. Choisissez un JPEG, PNG ou WebP de 24 mégapixels maximum.",
+    "L’immagine non può essere elaborata in sicurezza. Scegli JPEG, PNG o WebP fino a 24 megapixel."
+  ],
+  "Dokumentseite": [
+    "Document page",
+    "Page du document",
+    "Pagina del documento"
+  ],
+  "PDF ansehen": [
+    "View PDF",
+    "Afficher le PDF",
+    "Visualizza PDF"
   ]
 }

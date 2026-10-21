@@ -109,14 +109,15 @@ try{
  await assert.rejects(()=>globalThis.__registrationQuery("insert into organizations(name,slug) values('Forbidden Direct Create','forbidden-direct-runtime') returning id"),e=>e.code==='42501','Direct organization bootstrap must remain RLS denied');
  await assert.rejects(()=>globalThis.__registrationQuery("select bootstrap_organization('missing-user','missing@example.invalid','Bad Bootstrap','bad-bootstrap','trial')"),e=>e.code==='42501','The fixed helper cannot attach an unknown account');
  assert.equal(translations.registrationLocale('fr-CH'),'fr');assert.equal(translations.registrationLocale('untrusted'),'de');
- const body={name:'Synthetic Contact',company:'Same Company GmbH',email:'first@example.invalid',password:'a sufficiently long password',plan:'business',billingCycle:'yearly',locale:'fr-CH',acceptedTerms:true,acceptedDpa:true,...Object.fromEntries(['termsVersion','privacyVersion','dpaVersion'].map(key=>[key,context[key]]))};
- assert.equal((await register.POST(request('POST',{...body,name:''}))).status,400,'Contact person cannot be omitted');
+ const body={name:'Synthetic Contact',firstName:'Synthetic',lastName:'Contact',company:'Same Company GmbH',email:'first@example.invalid',password:'a sufficiently long password',plan:'business',billingCycle:'yearly',locale:'fr-CH',acceptedTerms:true,acceptedDpa:true,...Object.fromEntries(['termsVersion','privacyVersion','dpaVersion'].map(key=>[key,context[key]]))};
+ assert.equal((await register.POST(request('POST',{...body,firstName:''}))).status,400,'Contact person cannot be omitted');
  assert.equal((await register.POST(request('POST',{...body,acceptedDpa:false}))).status,400);
  assert.equal((await register.POST(request('POST',{...body,dpaVersion:'old'}))).status,409);
  let response=await register.POST(request('POST',body));assert.equal(response.status,201);let payload=await response.json();
  assert.equal(payload.emailSent,false,'An unconfigured/unsuccessful provider must not report a sent email');
  assert.equal((await db.query('select count(*)::int n from app_users where email=$1',[body.email])).rows[0].n,1);
  assert.equal((await db.query('select display_name from app_users where email=$1',[body.email])).rows[0].display_name,body.name,'Contact name is distinct from the registered company');
+ assert.deepEqual((await db.query('select first_name,last_name from app_users where email=$1',[body.email])).rows[0],{first_name:'Synthetic',last_name:'Contact'},'Structured registration names persist without guessing from the company/display name');
  const receipt=jar.get('binso_registration');assert.equal(receipt.options.httpOnly,true);assert.equal(receipt.options.sameSite,'lax');
  payload=await (await register.GET(request('GET',null))).json();assert.equal(payload.state,'pending');assert.equal(payload.pending.email,body.email);assert.equal(payload.pending.company,body.company);
  const organization=(await db.query('select o.id,s.plan,s.billing_interval,s.trial_until from organizations o join organization_subscriptions s on s.organization_id=o.id join organization_memberships m on m.organization_id=o.id join app_users u on u.id=m.user_id where u.email=$1',[body.email])).rows[0];

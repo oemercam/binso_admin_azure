@@ -48,7 +48,7 @@ const logo=await documentLogo(logoClient,'asset-tenant',{}, {logo_url:'/api/file
 assert.equal(logo.subarray(1,4).toString(),'PNG');const queried=logoQueries;
 assert.equal(await documentLogo(logoClient,'asset-tenant',{}, {logo_url:'https://untrusted.example.invalid/logo.png'}),undefined);assert.equal(logoQueries,queried,'Arbitrary URLs never fetch');
 assert.equal(await documentLogo({query:async()=>({rows:[]})},'different-tenant',{}, {logo_url:'/api/files/00000000-0000-4000-8000-000000000001/download'}),undefined);
-const data={number:'RE-QR-QA',kind:'invoice',status:'sent',currency:'CHF',total:216.2,subtotal:200,vat_amount:16.2,paid_amount:100,issue_date:'2026-10-01',due_date:'2026-10-31',customer:{name:'Acme AG',street:'Bahnhofstrasse 123',postal_code:'8001',city:'Zürich'},items:[{description:'IT-Beratung',quantity:2,unit:'Stunde',unit_price:100,line_total:200,vat_rate:8.1}]};
+const data={number:'RE-QR-QA',document_snapshot:{layout_revision:7},kind:'invoice',status:'sent',currency:'CHF',total:216.2,subtotal:200,vat_amount:16.2,paid_amount:100,issue_date:'2026-10-01',due_date:'2026-10-31',customer:{name:'Acme AG',street:'Bahnhofstrasse 123',postal_code:'8001',city:'Zürich'},items:[{description:'IT-Beratung',quantity:2,unit:'Stunde',unit_price:100,line_total:200,vat_rate:8.1}]};
 async function inspectPdf(document,logo){
  const bytes=await documentPdf(document,company.raw,logo);assert.equal(bytes.subarray(0,5).toString(),'%PDF-');
  const pdf=await getDocument({data:new Uint8Array(bytes),isEvalSupported:false}).promise;
@@ -58,6 +58,10 @@ async function inspectPdf(document,logo){
 const withLogo=await inspectPdf(data,logo);assert.ok(withLogo.bytes.toString('latin1').includes('/Subtype /Image'),'Normalized company logo is embedded');
 const generated=await inspectPdf(data),text=generated.pages.join(' ');
 for(const value of ['IT-Beratung','Individuelle Rechnungseinleitung','Individueller Rechnungsabschluss','31.10.2026','216.20','116.20','Zahlteil','Empfangsschein'])assert.ok(text.includes(value),value);
+const qrDocument=await getDocument({data:new Uint8Array(generated.bytes),isEvalSupported:false}).promise;
+const qrPage=await qrDocument.getPage(qrDocument.numPages),qrItems=(await qrPage.getTextContent()).items.filter(item=>item.str?.trim());
+assert.ok(qrItems.length>0);for(const item of qrItems)assert.ok(item.transform[5]<105*72/25.4+5,'The area above the 105mm QR slip stays empty');
+await qrDocument.destroy();
 assert.equal(generated.pages.length,2,'Short payable invoice has a dedicated QR page');assert.ok(!generated.pages[0].includes('Empfangsschein'));assert.ok(generated.pages[1].includes('Empfangsschein'));
 for(const status of ['paid','cancelled','draft']){const result=await inspectPdf({...data,status});assert.ok(!result.pages.join(' ').includes('Empfangsschein'),status+' has no payable QR slip');}
 const invalid=await inspectPdf({...data,status:'sent',currency:'USD'});assert.equal(invalid.pages.length,1);assert.ok(invalid.pages[0].includes('QR-Zahlteil nicht verfügbar'));
@@ -65,7 +69,7 @@ const unusual=await inspectPdf({...data,items:[{...data.items[0],description:'La
 const snap=await inspectPdf({...data,document_snapshot:{version:1,intro:'Persistierte individuelle Einleitung',closing:'Persistierter Abschluss'},issuer_snapshot:{...company.raw,legal_name:'Historische Firma AG'},customer_snapshot:{...data.customer,name:'Historischer Kunde AG'},payment_snapshot:{iban:company.raw.iban}});
 assert.ok(snap.pages[0].includes('Historische Firma AG'));assert.ok(snap.pages[0].includes('Historischer Kunde AG'));assert.ok(snap.pages[0].includes('Persistierte individuelle Einleitung'));assert.ok(!snap.pages[0].includes('Individuelle Rechnungseinleitung'));
 const creditedPdf=await inspectPdf({...data,credit_amount:16.2,status:'partial'});const creditedText=creditedPdf.pages.join(' ');
-assert.ok(creditedText.includes('Gutschriften: CHF 16.20'));assert.ok(creditedText.includes('Offener Betrag: CHF 100.00'),'QR payable amount reflects the credit-adjusted receivable');assert.ok(!creditedPdf.pages.at(-1).includes('116.20'));
+assert.ok(creditedText.includes('Gutschriften: CHF 16.20'));assert.ok(creditedPdf.pages.at(-1).includes('100.00'),'The actual QR slip amount reflects the credit-adjusted receivable');assert.ok(!creditedPdf.pages.at(-1).includes('116.20'));
 const refundedPdf=await inspectPdf({...data,paid_amount:216.2,credit_amount:100,refund_amount:100});const refundedText=refundedPdf.pages.join(' ');
 assert.ok(refundedText.includes('Rückerstattungen: CHF 100.00'));assert.ok(refundedText.includes('Ausgeglichen'));assert.ok(!refundedText.includes('Empfangsschein'));assert.ok(!refundedText.includes('Offen: CHF 0.00'));
 for(const [locale,title,paymentTitle] of [['fr','FACTURE','INFORMATIONS DE PAIEMENT'],['it','FATTURA','INFORMAZIONI DI PAGAMENTO'],['en','INVOICE','PAYMENT INFORMATION']]){

@@ -7,7 +7,7 @@ import type {SessionUser} from "./session";
 import {ApiError} from "./http";
 import {authorize} from "./rbac";
 import {audit} from "./audit";
-import {sealOfferVersion} from './offer-versions';
+import {sealOfferVersion,sealInvoiceVersion} from './offer-versions';
 export async function lockDocument(c:PoolClient,s:SessionUser,number:string){
  for(const [table,column,kind] of [['invoices','invoice_no','invoice'],['quotes','quote_no','offer']] as const){
   const row=(await c.query(`select * from ${table} where organization_id=$1 and ${column}=$2 and archived_at is null for update`,[s.organizationId,number])).rows[0];
@@ -33,8 +33,10 @@ export async function changeDocumentStatus(c:PoolClient,s:SessionUser,number:str
   await c.query("update quotes set status='revised',updated_at=now() where organization_id=$1 and id=$2",[s.organizationId,prior.id]);
   await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'offer.superseded',entityType:'quote',entityId:prior.id,metadata:{revisionId:row.id,revisionNumber:number}});
  }
+ if(kind==='invoice'&&action==='issue')await c.query("update invoices set document_snapshot=jsonb_set(document_snapshot,'{layout_revision}','7'::jsonb) where organization_id=$1 and id=$2",[s.organizationId,row.id]);
  await c.query(`update ${table} set status=$3,updated_at=now()${kind==='offer'&&['accept','decline'].includes(action)?',decision_at=now(),decision_by_user_id=$4,decision_note=$5':''} where organization_id=$1 and id=$2`,[s.organizationId,row.id,next,...(kind==='offer'&&['accept','decline'].includes(action)?[s.userId,note]:[])]);
  if(kind==='offer'&&action==='issue')await sealOfferVersion(c,s,{...row,status:next});
+ if(kind==='invoice'&&action==='issue')await sealInvoiceVersion(c,s,{...row,status:next});
 
  if(next==='cancelled'){await c.query('update time_entries set invoiced_invoice_id=null where organization_id=$1 and invoiced_invoice_id=$2',[s.organizationId,row.id]);await c.query('update expenses set invoiced_invoice_id=null where organization_id=$1 and invoiced_invoice_id=$2',[s.organizationId,row.id]);}
  await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'document.'+action,entityType:table,entityId:row.id,metadata:{previous:row.status,status:next,note}});

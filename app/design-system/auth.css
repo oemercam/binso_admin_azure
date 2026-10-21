@@ -11,7 +11,7 @@
   flex-direction:column;
   align-items:stretch;
 }
-.auth-card h1{margin:0 0 9px;font-size:var(--type-desktop-heading);line-height:1.5;font-weight:600;letter-spacing:-.7px}
+.auth-card h1{margin:0 0 9px;font-size:var(--type-large-heading);line-height:1.2;font-weight:600;letter-spacing:-.7px}
 .auth-inline-action{min-height:var(--touch);margin-top:10px;border:0;background:transparent;color:var(--color-muted);font:inherit;font-size:var(--type-metadata);font-weight:650;text-align:center;cursor:pointer}
 .auth-inline-action:hover{text-decoration:underline;text-underline-offset:3px}
 .auth-card>p{margin:0 0 28px;color:var(--color-muted);font-size:var(--type-control);line-height:1.55}
@@ -27,7 +27,7 @@
 .auth-page{grid-template-columns:minmax(0,1fr);align-items:center}
 .auth-card{width:min(100%,440px);margin-inline:auto}
 .auth-card>.logo{margin-bottom:40px}
-.auth-workspace.auth-page{--app-accent:var(--app-action-accent);--control-label-font:12px;--control-label-weight:400;--control-font:13px;--control-h:var(--access-control-height);--control-radius:5px;--control-border:var(--auth-control-border);--button-radius:5px;display:flex;flex-direction:column;align-items:stretch;padding:28px clamp(20px,4vw,64px);gap:16px;--button-height:var(--access-control-height)}
+.auth-workspace.auth-page{--app-accent:var(--app-action-accent);--control-label-font:13px;--control-label-weight:500;--control-font:16px;--control-h:48px;--control-radius:12px;--control-border:var(--auth-control-border);--button-radius:5px;display:flex;flex-direction:column;align-items:stretch;padding:28px clamp(20px,4vw,64px);gap:16px;--button-height:var(--access-control-height)}
 .auth-workspace-header,.auth-workspace-footer{width:100%;max-width:1024px;margin-inline:auto;display:flex;align-items:center;justify-content:space-between;gap:20px}
 .auth-workspace-body{flex:none;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);align-items:start;gap:65px;width:100%;max-width:970px;margin-inline:auto;padding-block:55px 65px}
 .auth-workspace-intro{min-width:0;max-width:474px;padding-top:15px}
@@ -63,7 +63,7 @@
   }
 .auth-card{max-width:420px;padding-top:0}
 .auth-card>.logo{width:88px;height:28px;margin-bottom:28px}
-.auth-card h1{font-size:var(--type-mobile-heading);line-height:1.15}
+.auth-card h1{font-size:var(--type-large-heading);line-height:1.2}
 .auth-card>p{margin-bottom:24px;font-size:var(--type-control)}
 .auth-card input{font-size:var(--type-subheading)}
 .auth-card .button{width:100%}

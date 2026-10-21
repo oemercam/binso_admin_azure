@@ -1,0 +1,109 @@
+{
+  "baseline": "26dc1ffc7bf61a4058deba8b25b0271e1dc5dad1",
+  "entries": {
+    "R7-19-001": {
+      "status": "teilweise_implementiert",
+      "test": "Gezielte Prüfungen: registration-test, profile-image-test, document-presentation-test, pdf-gestures-test, migration-test; letzter Datenbanklauf bestanden.",
+      "visualComparison": "Ausstehend am aktuellen Revision7-Stand",
+      "blocker": "Vollständige Klauselabnahme und reale Geräte fehlen; nicht als vollständig bestanden werten."
+    },
+    "R7-19-002": {
+      "status": "teilweise_implementiert",
+      "test": "Gezielte Prüfungen: registration-test, profile-image-test, document-presentation-test, pdf-gestures-test, migration-test; letzter Datenbanklauf bestanden.",
+      "visualComparison": "Ausstehend am aktuellen Revision7-Stand",
+      "blocker": "Vollständige Klauselabnahme und reale Geräte fehlen; nicht als vollständig bestanden werten."
+    },
+    "R7-20-001": {
+      "status": "teilweise_implementiert",
+      "test": "Gezielte Prüfungen: registration-test, profile-image-test, document-presentation-test, pdf-gestures-test, migration-test; letzter Datenbanklauf bestanden.",
+      "visualComparison": "Ausstehend am aktuellen Revision7-Stand",
+      "blocker": "Vollständige Klauselabnahme und reale Geräte fehlen; nicht als vollständig bestanden werten."
+    },
+    "R7-38-009": {
+      "status": "teilweise_implementiert",
+      "test": "Gezielte Prüfungen: registration-test, profile-image-test, document-presentation-test, pdf-gestures-test, migration-test; letzter Datenbanklauf bestanden.",
+      "visualComparison": "Ausstehend am aktuellen Revision7-Stand",
+      "blocker": "Vollständige Klauselabnahme und reale Geräte fehlen; nicht als vollständig bestanden werten."
+    },
+    "R7-38-021": {
+      "status": "teilweise_implementiert",
+      "test": "Gezielte Prüfungen: registration-test, profile-image-test, document-presentation-test, pdf-gestures-test, migration-test; letzter Datenbanklauf bestanden.",
+      "visualComparison": "Ausstehend am aktuellen Revision7-Stand",
+      "blocker": "Vollständige Klauselabnahme und reale Geräte fehlen; nicht als vollständig bestanden werten."
+    },
+    "R7-39-001": {
+      "status": "teilweise_implementiert",
+      "test": "Gezielte Prüfungen: registration-test, profile-image-test, document-presentation-test, pdf-gestures-test, migration-test; letzter Datenbanklauf bestanden.",
+      "visualComparison": "Ausstehend am aktuellen Revision7-Stand",
+      "blocker": "Vollständige Klauselabnahme und reale Geräte fehlen; nicht als vollständig bestanden werten."
+    },
+    "R7-44-001": {
+      "status": "teilweise_implementiert",
+      "test": "Gezielte Prüfungen: registration-test, profile-image-test, document-presentation-test, pdf-gestures-test, migration-test; letzter Datenbanklauf bestanden.",
+      "visualComparison": "Ausstehend am aktuellen Revision7-Stand",
+      "blocker": "Vollständige Klauselabnahme und reale Geräte fehlen; nicht als vollständig bestanden werten."
+    },
+    "R7-44-002": {
+      "status": "teilweise_implementiert",
+      "test": "Gezielte Prüfungen: registration-test, profile-image-test, document-presentation-test, pdf-gestures-test, migration-test; letzter Datenbanklauf bestanden.",
+      "visualComparison": "Ausstehend am aktuellen Revision7-Stand",
+      "blocker": "Vollständige Klauselabnahme und reale Geräte fehlen; nicht als vollständig bestanden werten."
+    },
+    "R7-44-003": {
+      "status": "teilweise_implementiert",
+      "test": "Gezielte Prüfungen: registration-test, profile-image-test, document-presentation-test, pdf-gestures-test, migration-test; letzter Datenbanklauf bestanden.",
+      "visualComparison": "Ausstehend am aktuellen Revision7-Stand",
+      "blocker": "Vollständige Klauselabnahme und reale Geräte fehlen; nicht als vollständig bestanden werten."
+    },
+    "R7-49-001": {
+      "status": "teilweise_implementiert",
+      "test": "Gezielte Prüfungen: registration-test, profile-image-test, document-presentation-test, pdf-gestures-test, migration-test; letzter Datenbanklauf bestanden.",
+      "visualComparison": "Ausstehend am aktuellen Revision7-Stand",
+      "blocker": "Vollständige Klauselabnahme und reale Geräte fehlen; nicht als vollständig bestanden werten."
+    },
+    "R7-50-001": {
+      "status": "teilweise_implementiert",
+      "test": "Gezielte Prüfungen: registration-test, profile-image-test, document-presentation-test, pdf-gestures-test, migration-test; letzter Datenbanklauf bestanden.",
+      "visualComparison": "Ausstehend am aktuellen Revision7-Stand",
+      "blocker": "Vollständige Klauselabnahme und reale Geräte fehlen; nicht als vollständig bestanden werten."
+    },
+    "R7-51-001": {
+      "status": "teilweise_implementiert",
+      "test": "Gezielte Prüfungen: registration-test, profile-image-test, document-presentation-test, pdf-gestures-test, migration-test; letzter Datenbanklauf bestanden.",
+      "visualComparison": "Ausstehend am aktuellen Revision7-Stand",
+      "blocker": "Vollständige Klauselabnahme und reale Geräte fehlen; nicht als vollständig bestanden werten."
+    },
+    "R7-53-001": {
+      "status": "teilweise_implementiert",
+      "test": "Gezielte Prüfungen: registration-test, profile-image-test, document-presentation-test, pdf-gestures-test, migration-test; letzter Datenbanklauf bestanden.",
+      "visualComparison": "Ausstehend am aktuellen Revision7-Stand",
+      "blocker": "Vollständige Klauselabnahme und reale Geräte fehlen; nicht als vollständig bestanden werten."
+    }
+  },
+  "tests": {
+    "scripts/registration-test.mjs": "passed (isolated PGlite)",
+    "scripts/profile-image-test.mjs": "passed",
+    "scripts/document-presentation-test.mjs": "passed",
+    "scripts/pdf-gestures-test.mjs": "passed",
+    "scripts/migration-test.mjs": "passed (isolated PGlite; no production)",
+    "scripts/localization-coverage-test.mjs": "passed",
+    "scripts/localization-test.mjs": "passed",
+    "scripts/navigation-contract-test.mjs": "passed",
+    "scripts/data-lifecycle-schema-test.mjs": "passed",
+    "lint": "passed",
+    "typecheck": "passed",
+    "build": "passed",
+    "visual": "14 focused Chromium/Edge responsive/light/dark and four-language browser cases passed; no general visual approval",
+    "CI": "not started",
+    "scripts/ui-foundation-test.mjs": "passed",
+    "scripts/foundation-integration-test.mjs": "passed"
+  },
+  "externalBlockers": [
+    "Physical installed iOS/Android PWA, keyboard and assistive technology acceptance",
+    "Actual mail delivery/bounces and external client rendering",
+    "Qualified legal translations and financial/product acceptance",
+    "Approved domains/DNS/provider/push setup",
+    "Controlled real restore test",
+    "Exact-SHA integration, production-migration and deployment approval"
+  ]
+}

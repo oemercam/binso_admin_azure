@@ -6,7 +6,7 @@ import type { PoolClient } from "pg";
 import { audit } from "../audit";
 import { ApiError } from "../http";
 import { ownRecordOnly, tenantCan } from "@/lib/permissions";
-import { invoicePaymentIssue } from "@/lib/qr-bill";
+
 import type { SessionUser } from "../session";
 
 type Row=Record<string,unknown>;
@@ -192,10 +192,7 @@ async function executeBusinessMutation(c:PoolClient,s:SessionUser,operation:stri
  }
  if(!['create_document_atomic','update_document_atomic'].includes(operation))throw new ApiError(400,'invalid_operation','Ungültige Aktion.');
  const invoice=args.p_kind==='invoice';if(!tenantCan(s.role,invoice?'invoices:write':'sales:write'))throw new ApiError(403,'forbidden','Keine Berechtigung.');
- if(invoice){
-  const company=(await c.query('select name,legal_name,street,postal_code,city,country_code,iban,qr_iban from organizations where id=$1',[s.organizationId])).rows[0];
-  const issue=invoicePaymentIssue(company??{});if(issue)throw new ApiError(409,'invoice_payment_setup_required',issue);
- }
+ // Drafts do not require banking setup. Issue validates complete QR/payment data in document-process.
  if(operation==='create_document_atomic'){
   const year=businessDate().slice(0,4);
   const numberingTable=invoice?'invoices':'quotes',numberingColumn=invoice?'invoice_no':'quote_no';
