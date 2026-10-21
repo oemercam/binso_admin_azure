@@ -846,9 +846,11 @@ try{
   const stalledWorker=route=>route.fulfill({contentType:'text/javascript',body:'await new Promise(()=>{});'});
   await context.route('**/*pdf.worker*.mjs',stalledWorker);
   await navigate(base+'/angebote/AN-TEST-1');
-  await page.clock.install();
   await page.getByRole('button',{name:'Weitere Aktionen',exact:true}).filter({visible:true}).click();
-  await page.getByRole('dialog',{name:'Weitere Aktionen'}).getByRole('button',{name:'Vorschau',exact:true}).click();
+  const previewActions=page.getByRole('dialog',{name:'Weitere Aktionen'});
+  await previewActions.waitFor();
+  await page.clock.install();
+  await previewActions.getByRole('button',{name:'Vorschau',exact:true}).click();
   await page.getByText('PDF wird angezeigt …',{exact:true}).waitFor();
   await page.clock.fastForward(20001);
   await page.getByText('Die PDF-Vorschau dauert zu lange. Bitte erneut versuchen.',{exact:true}).waitFor();
