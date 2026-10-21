@@ -11940,7 +11940,15 @@
         },
         {
           "callee": "c.query",
-          "line": 46,
+          "line": 45,
+          "arguments": [
+            "`select currency,coalesce(nullif(category_label,''),nullif(category,''),'—') category,sum(quantity*unit_price)::text amount from expenses where organization_id=$1 and archived_at is null and status in ('approved','posted') and expense_date between $2::date and $3::date and expense_date<=(now() at time zone 'Europe/Zurich')::date group by currency,coalesce(nullif(category_label,''),nullif(category,''),'—') order by currency,category limit 201`",
+            "args"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 53,
           "arguments": [
             "`select distinct currency from invoices where organization_id=$1 and archived_at is null and status not in ('draft','cancelled') and issue_date<=(now() at time zone 'Europe/Zurich')::date order by currency`",
             "[s.organizationId]"

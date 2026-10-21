@@ -13853,5 +13853,20 @@
     "Use image",
     "Utiliser l’image",
     "Usa immagine"
+  ],
+  "Genehmigte Spesen nach Kategorie": [
+    "Approved expenses by category",
+    "Frais approuvés par catégorie",
+    "Spese approvate per categoria"
+  ],
+  "Nach Belegdatum, einschliesslich noch nicht erstatteter Spesen. Kein Zahlungsabfluss und keine vollständige Kostenrechnung.": [
+    "By expense date, including expenses not yet reimbursed. This is neither cash outflow nor a complete cost statement.",
+    "Selon la date du justificatif, y compris les frais non encore remboursés. Il ne s’agit ni de sorties de trésorerie ni d’un décompte complet des coûts.",
+    "Per data del giustificativo, incluse le spese non ancora rimborsate. Non si tratta di uscite di cassa né di un rendiconto completo dei costi."
+  ],
+  "Keine genehmigten Spesen im Zeitraum": [
+    "No approved expenses in this period",
+    "Aucuns frais approuvés sur cette période",
+    "Nessuna spesa approvata nel periodo"
   ]
 }

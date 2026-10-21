@@ -1,3 +1,4 @@
+import {qaBrowserServer} from './qa-browser-server.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -9,12 +10,12 @@ const engines=await import(process.env.BINSO_PLAYWRIGHT_MODULE?pathToFileURL(pro
 const engine=process.env.BINSO_UX_BROWSER??'chromium';
 const base='http://127.0.0.1:3286';
 try{await fetch(base+'/api/health');throw Error('Test port occupied')}catch(error){if(error.message==='Test port occupied')throw error;}
-const server=spawn(process.execPath,['node_modules/next/dist/bin/next','start','--hostname','127.0.0.1','--port','3286'],{env:{...process.env,DATABASE_URL:'',APP_MODE:'local'},stdio:['ignore','pipe','pipe']});let logs='',browser;
+const launch=qaBrowserServer('3286',{...process.env,DATABASE_URL:'',APP_MODE:'local'});const server=spawn(process.execPath,launch.args,{stdio:['ignore','pipe','pipe'],env:launch.env});let logs='',browser;
 server.stdout.on('data',x=>logs+=x);server.stderr.on('data',x=>logs+=x);
 const walk=async dir=>(await Promise.all((await fs.readdir(dir,{withFileTypes:true})).map(async x=>x.isDirectory()?walk(path.join(dir,x.name)):path.join(dir,x.name)))).flat();
 try{
  for(let n=0;;n++){try{if((await fetch(base+'/api/health')).ok)break}catch{}if(n>120||server.exitCode!==null)throw Error(logs);await new Promise(resolve=>setTimeout(resolve,250));}
- const reporterChunks=[];for(const file of (await walk('.next/static/chunks')).filter(x=>x.endsWith('.js')))if((await fs.readFile(file,'utf8')).includes('/api/telemetry/web-vitals'))reporterChunks.push(path.basename(file));assert.ok(reporterChunks.length,'Locate the actual optional measurement chunk, without stored hashes');
+ const reporterChunks=[];for(const file of (await walk(path.join(launch.staticDirectory,'chunks'))).filter(x=>x.endsWith('.js')))if((await fs.readFile(file,'utf8')).includes('/api/telemetry/web-vitals'))reporterChunks.push(path.basename(file));assert.ok(reporterChunks.length,'Locate the actual optional measurement chunk, without stored hashes');
  browser=await engines[engine].launch({headless:true,...(engine==='chromium'&&process.env.BINSO_CHROMIUM_EXECUTABLE?{executablePath:process.env.BINSO_CHROMIUM_EXECUTABLE}:{})});const results=[];
  for(const theme of ['light','dark'])for(const width of [320,1440])for(const route of ['/offline','/wartung','/unavailable-revision7-fixture']){
   const context=await browser.newContext({serviceWorkers:'block',viewport:{width,height:900}});await context.addInitScript(theme=>{localStorage.setItem('binso.theme.mode',theme);localStorage.setItem('binso.privacy.preferences.v1',JSON.stringify({version:2,essential:true,performance:false,updatedAt:new Date().toISOString()}));},theme);

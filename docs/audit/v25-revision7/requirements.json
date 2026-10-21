@@ -7382,10 +7382,10 @@
         "lib/report-export.ts",
         "components/pages/reports.tsx"
       ],
-      "implementation": "Bericht erweitert um kreditbereinigtes Rechnungsvolumen im Zeitraum und aktuellen offenen/überfälligen Snapshot, gemeinsame bestehende Finance-Berechnung. Cash und Rechnungsvolumen getrennt.",
-      "test": "Tatsächliche Migrations-/Datenbankregression für Aggregatprojektion, HR-Ablehnung, Datumsdefinitionen und unverändertes Rechnungsvolumen nach Refund bestanden. Typecheck/Lint/Sprachabdeckung bestanden.",
+      "implementation": "Bericht erweitert um kreditbereinigtes Rechnungsvolumen im Zeitraum und aktuellen offenen/überfälligen Snapshot, gemeinsame bestehende Finance-Berechnung. Cash und Rechnungsvolumen getrennt. Genehmigte/verbuchte Spesenkategorien nach Belegdatum ergänzt, Erstattungsdatum bleibt separat; Währungen getrennt,200-Gruppen-Grenze mit Fehler.",
+      "test": "Tatsächliche Migrations-/Datenbankregression für Aggregatprojektion, HR-Ablehnung, Datumsdefinitionen und unverändertes Rechnungsvolumen nach Refund bestanden. Typecheck/Lint/Sprachabdeckung bestanden. Tatsächliche DB-Positiv-/Negativtests für Kategorien, Rollen/Mandanten/Zeitraum/Status/Währung/Übergrösse und lokalisierte Exportlabels bestanden.",
       "visualComparison": "Neue Finanzsektion noch nicht visuell abgenommen.",
-      "blocker": "Kategorie-/MwSt.-/Angebotsberichte und vollständige fachliche/visuelle Abnahme fehlen."
+      "blocker": "MwSt.-/Angebotsberichte, direkte Report-Mails/sichere Links und vollständige fachliche/visuelle Abnahme fehlen."
     },
     {
       "id": "R7-43-009",

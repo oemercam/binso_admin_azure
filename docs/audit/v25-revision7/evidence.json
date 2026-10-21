@@ -200,16 +200,16 @@
     "R7-43-008": {
       "sourceTextSha256": "7f9bbd76986aca52fc679aa689867d8aef58f62d3cfe6998887a3f2a30202252",
       "status": "teilweise_implementiert",
-      "implementation": "Bericht erweitert um kreditbereinigtes Rechnungsvolumen im Zeitraum und aktuellen offenen/überfälligen Snapshot, gemeinsame bestehende Finance-Berechnung. Cash und Rechnungsvolumen getrennt.",
+      "implementation": "Bericht erweitert um kreditbereinigtes Rechnungsvolumen im Zeitraum und aktuellen offenen/überfälligen Snapshot, gemeinsame bestehende Finance-Berechnung. Cash und Rechnungsvolumen getrennt. Genehmigte/verbuchte Spesenkategorien nach Belegdatum ergänzt, Erstattungsdatum bleibt separat; Währungen getrennt,200-Gruppen-Grenze mit Fehler.",
       "sourceReferences": [
         "lib/server/repositories/reports.ts",
         "lib/server/repositories/finance.ts",
         "lib/report-export.ts",
         "components/pages/reports.tsx"
       ],
-      "test": "Tatsächliche Migrations-/Datenbankregression für Aggregatprojektion, HR-Ablehnung, Datumsdefinitionen und unverändertes Rechnungsvolumen nach Refund bestanden. Typecheck/Lint/Sprachabdeckung bestanden.",
+      "test": "Tatsächliche Migrations-/Datenbankregression für Aggregatprojektion, HR-Ablehnung, Datumsdefinitionen und unverändertes Rechnungsvolumen nach Refund bestanden. Typecheck/Lint/Sprachabdeckung bestanden. Tatsächliche DB-Positiv-/Negativtests für Kategorien, Rollen/Mandanten/Zeitraum/Status/Währung/Übergrösse und lokalisierte Exportlabels bestanden.",
       "visualComparison": "Neue Finanzsektion noch nicht visuell abgenommen.",
-      "blocker": "Kategorie-/MwSt.-/Angebotsberichte und vollständige fachliche/visuelle Abnahme fehlen."
+      "blocker": "MwSt.-/Angebotsberichte, direkte Report-Mails/sichere Links und vollständige fachliche/visuelle Abnahme fehlen."
     },
     "R7-43-009": {
       "sourceTextSha256": "42e62a1191149d38124c2ec17ff6b4f8a576d13c97857a1fb5c4991c81e6c109",
@@ -374,7 +374,7 @@
     "typecheck": "passed",
     "build": "passed",
     "visual": "14 focused Chromium/Edge responsive/light/dark and four-language browser cases passed; no general visual approval",
-    "CI": "b2f9bed2 Full Development run39642000218: build/checks/scanner passed; browser failed on old12px/500 contracts and actual42px desktop consent targets. Targeted corrections and negative proofs made; fresh full CI required.",
+    "CI": "881dd080 Full Development39647566274 completed: build/checks/scanner/ux-compliance and4 responsive lanes passed;2 responsive lanes failed on retained lang=de history URL,2 functional lanes on incorrect child server startup. Exact route contract and shared qualified-artifact launch corrected with negative tests. Fresh full CI required.",
     "scripts/ui-foundation-test.mjs": "passed",
     "scripts/foundation-integration-test.mjs": "passed",
     "scripts/import-table-test.mjs": "passed, including actual XLSX/conditional formatting, rejection paths and original CSV/XLSX row metadata",
@@ -387,7 +387,8 @@
     "identityReference": "Four actual local Chromium/Edge widths with self-hosted Inter loaded, passkey order and independent derived-reference geometry passed; no physical-device approval.",
     "avatarActivation": "Isolated PostgreSQL/PGlite route/download/ownership/status/drift/replay passed; native HTTP and branding browser cases added, current CI execution pending.",
     "consentTargets": "Four actual local desktop DE/FR/IT/EN cases passed with44px equivalent choices and persisted rejection.",
-    "consentPolicy": "Four actual local DE/FR/IT/EN browser cases passed: policy reachable without stored consent, reopen from footer, equal44px choices, inert restoration, rejection persisted, zero hydration/runtime warnings."
+    "consentPolicy": "Four actual local DE/FR/IT/EN browser cases passed: policy reachable without stored consent, reopen from footer, equal44px choices, inert restoration, rejection persisted, zero hydration/runtime warnings.",
+    "expenseCategories": "Actual isolated PostgreSQL/PGlite positive/negative route/CSV/bounds/authorization cases passed; browser extension awaits CI."
   },
   "externalBlockers": [
     "Physical installed iOS/Android PWA, keyboard and assistive technology acceptance",

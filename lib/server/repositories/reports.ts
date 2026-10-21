@@ -38,6 +38,13 @@ export async function reportSummary(c:PoolClient,s:SessionUser,period:{from:stri
  ) select currency,sum(incoming)::text amount,sum(refunded)::text refund_amount,sum(incoming-refunded)::text net_amount from movements group by currency order by currency`,args)).rows:null;
  const expenses=tenantCan(s.role,'expenses:read')&&planAllowsModule(plan,'spesen')?(await c.query(`select currency,sum(quantity*unit_price)::text amount from expenses where organization_id=$1 and archived_at is null and status in ('approved','posted') and reimbursed_at is not null and (reimbursed_at at time zone 'Europe/Zurich')::date between $2::date and $3::date group by currency order by currency`,args)).rows:null;
  const employees=tenantCan(s.role,'employees:read')&&planAllowsModule(plan,'personal')?(await c.query(`select count(*)::text total,count(*) filter(where active)::text active from employees where organization_id=$1 and archived_at is null`,[s.organizationId])).rows[0]:null;
+ // Recognized expenses use their expense date, not the reimbursement cash date.
+ // Keep currencies separate and export categories only, never staff/receipt data.
+ let expenseCategories:ReportSummary['expenseCategories']=null;
+ if(tenantCan(s.role,'expenses:read')&&planAllowsModule(plan,'spesen')){
+  expenseCategories=(await c.query(`select currency,coalesce(nullif(category_label,''),nullif(category,''),'—') category,sum(quantity*unit_price)::text amount from expenses where organization_id=$1 and archived_at is null and status in ('approved','posted') and expense_date between $2::date and $3::date and expense_date<=(now() at time zone 'Europe/Zurich')::date group by currency,coalesce(nullif(category_label,''),nullif(category,''),'—') order by currency,category limit 201`,args)).rows;
+  if(expenseCategories.length>200)throw new ApiError(400,'report_too_large','Bitte den Zeitraum oder die Filter weiter eingrenzen.');
+ }
  // Reuse issue/credit dates and settlement definitions from live finance charts.
  // Period volume and the current outstanding snapshot are different measures.
  let invoices:ReportSummary['invoices']=null;
@@ -49,5 +56,5 @@ export async function reportSummary(c:PoolClient,s:SessionUser,period:{from:stri
    invoices.push({currency,invoiced:sumMoney(metrics.revenueEvents.filter(event=>String(event.date)>=period.from&&String(event.date)<=period.to).map(event=>event.amount)).toFixed(2),open:String(metrics.snapshot.open),overdue:String(metrics.snapshot.overdue),asOf:String(metrics.snapshot.as_of)});
   }
  }
- return {period,asOf:new Date().toISOString(),customers,projects,time,payments,expenses,employees,invoices} as ReportSummary;
+ return {period,asOf:new Date().toISOString(),customers,projects,time,payments,expenses,expenseCategories,employees,invoices} as ReportSummary;
 }

@@ -1,3 +1,4 @@
+import {qaBrowserServer} from './qa-browser-server.mjs';
 import {createUiAuthFixture} from './ui-auth-fixture.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
@@ -8,7 +9,7 @@ const output=process.env.BINSO_REPORT_OUTPUT;if(!output)throw Error('Explicit is
 const engines=await import(process.env.BINSO_PLAYWRIGHT_MODULE?pathToFileURL(process.env.BINSO_PLAYWRIGHT_MODULE).href:'playwright'),engine=process.env.BINSO_UX_BROWSER??'chromium',port='3288',base='http://127.0.0.1:'+port;
 try{await fetch(base+'/api/health');throw Error('Report browser port occupied')}catch(error){if(error.message==='Report browser port occupied')throw error;}
 const uiAuth=await createUiAuthFixture();
-const server=spawn(process.execPath,['node_modules/next/dist/bin/next','start','--hostname','127.0.0.1','--port',port],{stdio:['ignore','pipe','pipe'],env:{...process.env,...uiAuth.env}});let logs='',browser;server.stdout.on('data',x=>logs+=x);server.stderr.on('data',x=>logs+=x);
+const launch=qaBrowserServer(port,{...process.env,...uiAuth.env});const server=spawn(process.execPath,launch.args,{stdio:['ignore','pipe','pipe'],env:launch.env});let logs='',browser;server.stdout.on('data',x=>logs+=x);server.stderr.on('data',x=>logs+=x);
 try{
  for(let i=0;;i++){try{if((await fetch(base+'/api/health')).ok)break}catch{}if(i>120||server.exitCode!==null)throw Error(logs);await new Promise(resolve=>setTimeout(resolve,250));}
  browser=await engines[engine].launch({headless:true,...(engine==='chromium'&&process.env.BINSO_CHROMIUM_EXECUTABLE?{executablePath:process.env.BINSO_CHROMIUM_EXECUTABLE}:{})});const results=[];
@@ -22,13 +23,17 @@ try{
    if(url.pathname==='/api/time-tracker')json={item:null};
    if(url.pathname==='/api/reports'){
     if(url.searchParams.get('format')==='csv'){exports++;return route.fulfill({contentType:'text/csv; charset=utf-8',headers:{'Content-Disposition':'attachment; filename="binso-fixture.csv"'},body:'"Synthetic metric";"1.00";"CHF"\r\n'});}
-    json={period:{from:'2026-10-01',to:'2026-10-21'},asOf:'2026-10-21T12:00:00Z',customers:null,projects:null,time:null,employees:null,expenses:null,payments:[{currency:'CHF',amount:'2000.00',refund_amount:'100.00',net_amount:'1900.00'}],invoices:[{currency:'CHF',invoiced:'1234.56',open:'400.00',overdue:'50.00',asOf:'2026-10-21'}]};
+    json={period:{from:'2026-10-01',to:'2026-10-21'},asOf:'2026-10-21T12:00:00Z',customers:null,projects:null,time:null,employees:null,expenses:null,expenseCategories:[{currency:'CHF',category:'Synthetic travel category',amount:'25.00'},{currency:'EUR',category:'Synthetic travel category',amount:'7.00'}],payments:[{currency:'CHF',amount:'2000.00',refund_amount:'100.00',net_amount:'1900.00'}],invoices:[{currency:'CHF',invoiced:'1234.56',open:'400.00',overdue:'50.00',asOf:'2026-10-21'}]};
    }
    return route.fulfill({json});
   });
   const page=await context.newPage();await page.goto(base+'/berichte');await page.getByRole('heading',{name:'Rechnungen',exact:true}).waitFor();
   for(const label of ['Fakturiertes Volumen','Offen','Überfällig','Eingegangene Zahlungen','Rückerstattungen','Zahlungseingänge nach Rückerstattungen'])assert.equal(await page.getByText(label,{exact:true}).count(),1,'Distinct financial meaning: '+label);
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,'Financial KPIs never widen the page');
+  const categories=page.locator('section').filter({has:page.getByRole('heading',{name:'Genehmigte Spesen nach Kategorie',exact:true})}).last();
+  assert.equal(await categories.locator('dt').filter({hasText:'Synthetic travel category'}).count(),2,'Same category in two currencies remains two distinct rows');
+  assert.deepEqual(await categories.locator('dd').allTextContents(),['CHF 25.00','EUR 7.00']);
+  await categories.getByText('Nach Belegdatum, einschliesslich noch nicht erstatteter Spesen. Kein Zahlungsabfluss und keine vollständige Kostenrechnung.',{exact:true}).waitFor();
   await page.getByText('Fakturiertes Volumen berücksichtigt Rechnungen und Gutschriften im gewählten Zeitraum. Offene und überfällige Forderungen zeigen den aktuellen Stand.',{exact:true}).waitFor();
   await page.screenshot({path:path.join(output,`${theme}-${width}-report.png`),fullPage:true,animations:'disabled'});
   await page.getByRole('button',{name:'Berichtsaktionen',exact:true}).click();assert.equal(await page.getByRole('button',{name:'Per E-Mail senden',exact:true}).count(),0,'Unimplemented direct report mail is never advertised');

@@ -2106,7 +2106,8 @@
             "resource.loading",
             "data.invoices.length",
             "data.payments.length",
-            "data.expenses.length"
+            "data.expenses.length",
+            "data.expenseCategories.length"
           ],
           "limitation": "Statische bedingte Erreichbarkeit, keine Aussage über sichtbare Rolle oder korrekte Berechnung."
         },
@@ -2125,7 +2126,8 @@
             "resource.loading",
             "data.invoices.length",
             "data.payments.length",
-            "data.expenses.length"
+            "data.expenses.length",
+            "data.expenseCategories.length"
           ],
           "limitation": "Statische bedingte Erreichbarkeit, keine Aussage über sichtbare Rolle oder korrekte Berechnung."
         },
@@ -2144,7 +2146,8 @@
             "resource.loading",
             "data.invoices.length",
             "data.payments.length",
-            "data.expenses.length"
+            "data.expenses.length",
+            "data.expenseCategories.length"
           ],
           "limitation": "Statische bedingte Erreichbarkeit, keine Aussage über sichtbare Rolle oder korrekte Berechnung."
         },
@@ -2163,7 +2166,8 @@
             "resource.loading",
             "data.invoices.length",
             "data.payments.length",
-            "data.expenses.length"
+            "data.expenses.length",
+            "data.expenseCategories.length"
           ],
           "limitation": "Statische bedingte Erreichbarkeit, keine Aussage über sichtbare Rolle oder korrekte Berechnung."
         },
@@ -2182,7 +2186,8 @@
             "resource.loading",
             "data.invoices.length",
             "data.payments.length",
-            "data.expenses.length"
+            "data.expenses.length",
+            "data.expenseCategories.length"
           ],
           "limitation": "Statische bedingte Erreichbarkeit, keine Aussage über sichtbare Rolle oder korrekte Berechnung."
         },
@@ -2201,7 +2206,8 @@
             "resource.loading",
             "data.invoices.length",
             "data.payments.length",
-            "data.expenses.length"
+            "data.expenses.length",
+            "data.expenseCategories.length"
           ],
           "limitation": "Statische bedingte Erreichbarkeit, keine Aussage über sichtbare Rolle oder korrekte Berechnung."
         },
@@ -2220,7 +2226,8 @@
             "resource.loading",
             "data.invoices.length",
             "data.payments.length",
-            "data.expenses.length"
+            "data.expenses.length",
+            "data.expenseCategories.length"
           ],
           "limitation": "Statische bedingte Erreichbarkeit, keine Aussage über sichtbare Rolle oder korrekte Berechnung."
         },
@@ -2240,7 +2247,8 @@
             "resource.loading",
             "data.invoices.length",
             "data.payments.length",
-            "data.expenses.length"
+            "data.expenses.length",
+            "data.expenseCategories.length"
           ],
           "limitation": "Statische bedingte Erreichbarkeit, keine Aussage über sichtbare Rolle oder korrekte Berechnung."
         },
@@ -2260,7 +2268,8 @@
             "resource.loading",
             "data.invoices.length",
             "data.payments.length",
-            "data.expenses.length"
+            "data.expenses.length",
+            "data.expenseCategories.length"
           ],
           "limitation": "Statische bedingte Erreichbarkeit, keine Aussage über sichtbare Rolle oder korrekte Berechnung."
         },
@@ -2280,7 +2289,8 @@
             "resource.loading",
             "data.invoices.length",
             "data.payments.length",
-            "data.expenses.length"
+            "data.expenses.length",
+            "data.expenseCategories.length"
           ],
           "limitation": "Statische bedingte Erreichbarkeit, keine Aussage über sichtbare Rolle oder korrekte Berechnung."
         },
@@ -2300,7 +2310,8 @@
             "resource.loading",
             "data.invoices.length",
             "data.payments.length",
-            "data.expenses.length"
+            "data.expenses.length",
+            "data.expenseCategories.length"
           ],
           "limitation": "Statische bedingte Erreichbarkeit, keine Aussage über sichtbare Rolle oder korrekte Berechnung."
         },
@@ -2320,7 +2331,8 @@
             "resource.loading",
             "data.invoices.length",
             "data.payments.length",
-            "data.expenses.length"
+            "data.expenses.length",
+            "data.expenseCategories.length"
           ],
           "limitation": "Statische bedingte Erreichbarkeit, keine Aussage über sichtbare Rolle oder korrekte Berechnung."
         },
@@ -2340,7 +2352,8 @@
             "resource.loading",
             "data.invoices.length",
             "data.payments.length",
-            "data.expenses.length"
+            "data.expenses.length",
+            "data.expenseCategories.length"
           ],
           "limitation": "Statische bedingte Erreichbarkeit, keine Aussage über sichtbare Rolle oder korrekte Berechnung."
         },
@@ -2361,7 +2374,8 @@
             "resource.loading",
             "data.invoices.length",
             "data.payments.length",
-            "data.expenses.length"
+            "data.expenses.length",
+            "data.expenseCategories.length"
           ],
           "limitation": "Statische bedingte Erreichbarkeit, keine Aussage über sichtbare Rolle oder korrekte Berechnung."
         },

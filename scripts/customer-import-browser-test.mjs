@@ -1,3 +1,4 @@
+import {qaBrowserServer} from './qa-browser-server.mjs';
 import {createUiAuthFixture} from './ui-auth-fixture.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
@@ -8,7 +9,7 @@ const engines=await import(process.env.BINSO_PLAYWRIGHT_MODULE?pathToFileURL(pro
 if(!output)throw Error('Explicit isolated evidence path is required');await fs.mkdir(output,{recursive:true});
 try{if((await fetch(base+'/api/health')).ok)throw Error('Import browser port occupied')}catch(error){if(error.message==='Import browser port occupied')throw error;}
 const uiAuth=await createUiAuthFixture();
-const server=spawn(process.execPath,['node_modules/next/dist/bin/next','start','--hostname','127.0.0.1','--port',port],{stdio:['ignore','pipe','pipe'],env:{...process.env,...uiAuth.env}});let logs='';server.stdout.on('data',chunk=>logs+=chunk);server.stderr.on('data',chunk=>logs+=chunk);let browser;
+const launch=qaBrowserServer(port,{...process.env,...uiAuth.env});const server=spawn(process.execPath,launch.args,{stdio:['ignore','pipe','pipe'],env:launch.env});let logs='';server.stdout.on('data',chunk=>logs+=chunk);server.stderr.on('data',chunk=>logs+=chunk);let browser;
 try{
  for(let i=0;;i++){try{if((await fetch(base+'/api/health')).ok)break}catch{}if(i>120||server.exitCode!==null)throw Error(logs);await new Promise(resolve=>setTimeout(resolve,250));}
  browser=await engines[engine].launch({headless:true,...(engine==='chromium'&&process.env.BINSO_CHROMIUM_EXECUTABLE?{executablePath:process.env.BINSO_CHROMIUM_EXECUTABLE}:{})});const results=[];

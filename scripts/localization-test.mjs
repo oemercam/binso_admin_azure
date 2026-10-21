@@ -1,5 +1,11 @@
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
+import {matchesLocalizedRoute} from './localized-route-contract.mjs';
+for(const locale of ['de','fr','it','en']){
+ const target='https://fixture.invalid/kunden?page=2';
+ for(const actual of [target,target+'&lang='+locale])assert.equal(matchesLocalizedRoute(actual,target,locale),true);
+ for(const actual of ['https://foreign.invalid/kunden?page=2','https://fixture.invalid/kunden/other?page=2',target+'&extra=1',target+'&lang=tr',target+'&lang='+locale+'&lang='+locale,target+'#other','https://fixture.invalid/kunden?page=1'])assert.equal(matchesLocalizedRoute(actual,target,locale),false,'Language reflection must not hide a different route/query: '+actual);
+}
 import {createRequire} from 'node:module';
 import ts from 'typescript';
 import React from 'react';
