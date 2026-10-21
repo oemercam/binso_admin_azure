@@ -172,7 +172,8 @@ async function actionEvidence(page,name,theme){
   assert.ok(rows.length>0,'Entity actions use the central row');
   assert.equal(await dialog.locator('.sheet-menu,.button-danger').count(),0,'No legacy action rows or detached destructive button');
   const labelFont=await dialog.evaluate(el=>getComputedStyle(el).getPropertyValue('--type-label').trim());
-  for(const row of rows){assert.ok(row.height>=44);assert.equal(row.font,labelFont);assert.equal(row.weight,'400');assert.equal(row.text,rows[0].text);if(row.destructive)assert.equal(row.chevron,1,'Destructive row has no navigation arrow');}
+  const labelWeight=await dialog.evaluate(el=>getComputedStyle(el).getPropertyValue('--control-label-weight').trim());assert.equal(labelWeight,'500','Revision7 label typography is13px/500');
+  for(const row of rows){assert.ok(row.height>=44);assert.equal(row.font,labelFont);assert.equal(row.weight,labelWeight);assert.equal(row.text,rows[0].text);if(row.destructive)assert.equal(row.chevron,1,'Destructive row has no navigation arrow');}
  }
  await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${name}-actions.png`)});
 }
@@ -407,7 +408,7 @@ try{
     if(!process.env.BINSO_UX_BASELINE&&width<=760&&await page.locator('.page-container,.operator-app-content').count()){
       const appearance=await page.locator('.page-container,.operator-app-content').first().evaluate(el=>({ink:getComputedStyle(el).color,surface:getComputedStyle(el).getPropertyValue('--app-surface').trim(),controls:[...el.querySelectorAll('.form-control,.form-textarea')].filter(node=>!['checkbox','radio','file'].includes(node.type)&&!node.closest('.searchbox,.thread-composer')).map(node=>({radius:getComputedStyle(node).borderTopLeftRadius,font:getComputedStyle(node).fontSize})),groups:[...el.querySelectorAll('.bo-settings-group-body')].map(node=>({background:getComputedStyle(node).backgroundColor,border:getComputedStyle(node).borderTopWidth}))}));
       assert.equal(appearance.ink,theme==='light'?(route.startsWith('/operator')?'rgb(32, 43, 59)':'rgb(33, 48, 71)'):(route.startsWith('/operator')?'rgb(215, 227, 243)':'rgb(215, 227, 243)'),`${route}: app text uses the central theme`);
-      assert.ok(appearance.controls.every(control=>control.radius==='8px'),`${route}: shared app field corners ${JSON.stringify(appearance.controls)}`);
+      assert.ok(appearance.controls.every(control=>control.radius==='12px'),`${route}: shared app field corners ${JSON.stringify(appearance.controls)}`);
       assert.ok(appearance.groups.every(group=>group.border==='0px'&&group.background===(theme==='light'?'rgb(255, 255, 255)':'rgb(0, 0, 0)')),`${route}: grouped app surfaces in both themes`);
     }
     for(const create of await page.locator('.bo-create-action').filter({visible:true}).all()){
@@ -1127,15 +1128,17 @@ try{
    await capture(page,{animations:'disabled',path:path.join(output,`${theme}-390-grouped-settings.png`)});
 
    // Actual settings UI, controlled scanner verdicts; not a live antivirus-engine test.
-   const imageBytes=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jB1kAAAAASUVORK5CYII=','base64');
+   const imageBytes=await (await import('sharp')).default({create:{width:512,height:512,channels:3,background:'#123456'}}).png().toBuffer();
    const imageFile={name:'synthetic-branding.png',mimeType:'image/png',buffer:imageBytes};
    const oldImage='/api/files/00000000-0000-4000-8000-000000000091/download',newImageId='00000000-0000-4000-8000-000000000092';
-   let scanVerdict='pending',scanFailure=0,companyWrites=0,companyPatch=null,companyLogo=oldImage,profileAvatar=oldImage;
-   const scanUpload=route=>{if(!scanFailure&&scanVerdict==='clean'&&route.request().postData()?.includes('profile_avatar'))profileAvatar='/api/files/'+newImageId+'/download';return route.fulfill(scanFailure?{status:scanFailure,json:{message:'Synthetic scan unavailable'}}:{status:201,json:{item:{id:newImageId,scanStatus:scanVerdict}}});};
+   let scanVerdict='pending',scanFailure=0,companyWrites=0,companyPatch=null,companyLogo=oldImage,profileAvatar=oldImage,activationCalls=0;
+   const scanUpload=route=>{if(!scanFailure&&scanVerdict==='clean'&&route.request().postData()?.includes('profile_avatar'))profileAvatar='/api/files/'+newImageId+'/download';return route.fulfill(scanFailure?{status:scanFailure,json:{message:'Synthetic scan unavailable'}}:{status:201,json:{item:{id:newImageId,scanStatus:scanVerdict,available:scanVerdict==='clean'}}});};
    const logoResource=route=>route.fulfill({json:{item:{name:'Synthetic Branding Company',logo_url:companyLogo}}});
    const avatarResource=route=>route.fulfill({json:{item:{display_name:'Synthetic Branding User',first_name:'Synthetic',last_name:'Branding User',avatar_url:profileAvatar,theme,language:'de'},email:'branding@fixture.invalid'}});
    const logoSettings=route=>{if(route.request().method()==='GET')return logoResource(route);companyWrites++;companyPatch=route.request().postDataJSON();if(companyPatch.logoUrl!==undefined)companyLogo=companyPatch.logoUrl;return route.fulfill({json:{item:{name:'Synthetic Branding Company',logo_url:companyLogo}}});};
    const imageDownload=route=>route.fulfill({contentType:'image/png',body:imageBytes});
+   const activateUpload=async route=>{assert.equal(route.request().method(),'PATCH');assert.deepEqual(route.request().postDataJSON(),{action:'activate_profile_avatar',expectedAvatarUrl:oldImage});activationCalls++;if(scanVerdict!=='clean')return route.fulfill({status:409,json:{error:'avatar_not_ready',message:'Das Profilbild ist noch nicht sicher freigegeben. Das bisherige Bild bleibt erhalten.'}});await new Promise(resolve=>setTimeout(resolve,80));profileAvatar='/api/files/'+newImageId+'/download';return route.fulfill({json:{activated:true,item:{id:newImageId,alreadyActive:false}}});};
+   await context.route('**/api/files/'+newImageId,activateUpload);
    await context.route('**/api/files',scanUpload);await context.route('**/api/files/*/download',imageDownload);
    await context.route('**/api/settings/company',logoSettings);await context.route('**/api/settings/profile',avatarResource);
    await page.setViewportSize({width:390,height:844});await navigate(base+'/einstellungen/konto');await page.locator('.settings-profile h2').getByText('Synthetic Branding User',{exact:true}).waitFor();
@@ -1143,7 +1146,9 @@ try{
    const avatarEditor=page.getByRole('dialog',{name:'Persönliche Daten bearbeiten',exact:true});assert.equal(await avatarEditor.locator('#profile-avatar-upload').count(),1,'Profile upload belongs inside the active modal, never its inert background');assert.equal(await page.locator('.settings-profile input[type=file]').count(),0);await avatarEditor.getByRole('button',{name:'Datei ersetzen',exact:true}).click({trial:true});await capture(page,{animations:'disabled',path:path.join(output,theme+'-390-profile-upload-dialog.png')});
    await page.locator('#profile-avatar-upload').setInputFiles(imageFile);await avatarEditor.getByRole('alert').filter({hasText:'Das Profilbild wartet auf die Sicherheitsprüfung.'}).waitFor();
    assert.equal(await page.locator('.settings-profile img').getAttribute('src'),oldImage,'Quarantined avatar preserves the currently stored image');assert.equal(await page.getByText('Profilbild gespeichert.',{exact:true}).count(),0);
+   await avatarEditor.getByRole('button',{name:'Bild übernehmen',exact:true}).click();await avatarEditor.getByRole('alert').filter({hasText:'Das Profilbild ist noch nicht sicher freigegeben.'}).waitFor();assert.equal(activationCalls,1);assert.equal(await page.locator('.settings-profile img').getAttribute('src'),oldImage,'Explicit adoption cannot bypass a pending verdict');
    scanFailure=503;await page.locator('#profile-avatar-upload').setInputFiles(imageFile);await page.getByRole('status').filter({hasText:'Synthetic scan unavailable'}).waitFor();assert.equal(await page.locator('.settings-profile img').getAttribute('src'),oldImage);
+   scanFailure=0;scanVerdict='clean';await avatarEditor.getByRole('button',{name:'Bild übernehmen',exact:true}).dblclick();await page.getByText('Profilbild gespeichert.',{exact:true}).waitFor();assert.equal(activationCalls,2,'Double tap adopts exactly once after the explicit earlier pending attempt');assert.equal(await page.locator('.settings-profile img').getAttribute('src'),'/api/files/'+newImageId+'/download');
    scanFailure=0;scanVerdict='clean';await page.locator('#profile-avatar-upload').setInputFiles(imageFile);await page.getByText('Profilbild gespeichert.',{exact:true}).waitFor();assert.equal(await page.locator('.settings-profile img').getAttribute('src'),'/api/files/'+newImageId+'/download');
    await navigate(base+'/einstellungen/firma');await page.locator('.company-logo-card b').getByText('Synthetic Branding Company',{exact:true}).waitFor();
    await page.getByRole('button',{name:'Bearbeiten',exact:true}).filter({visible:true}).first().click();

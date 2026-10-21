@@ -1,3 +1,4 @@
+import {verifyConsentRejection} from './privacy-consent-browser.mjs';
 import {createUiAuthFixture} from './ui-auth-fixture.mjs';
 import {selectAppOption,appControlValue} from './app-select-browser.mjs';
 import assert from 'node:assert/strict';
@@ -29,19 +30,11 @@ try{
    // the same error outside that reload phase fatal; retain cancellation evidence.
    if(reloading&&error.message.includes('_rsc=')&&error.message.includes('due to access control checks.'))cancelledReloadPrefetches.push(error.message);
    else faults.push(error.message);
-  });return next};
+  });next.on('console',message=>{if(/hydration|hydrated|server rendered HTML|react\.dev\/errors\/\d+/i.test(message.text()))faults.push('React hydration/runtime: '+message.text());});return next};
   let page=await trackedPage();
   await page.goto(base+'/?lang='+locale,{waitUntil:'networkidle'});await page.locator('.reference-hero').waitFor();
   assert.equal(await page.locator('html').getAttribute('lang'),locale+'-CH');
-  const consent=page.locator('.privacy-consent-layer');if(await consent.isVisible()){
-   const geometry=[];for(const label of ['Alle ablehnen','Einstellungen','Alle akzeptieren']){
-    const button=consent.getByRole('button',{name:text(label,locale),exact:true});assert.equal(await button.isVisible(),true,'All three consent choices remain available in '+locale);
-    geometry.push(await button.evaluate(el=>({height:el.getBoundingClientRect().height,color:getComputedStyle(el).color,background:getComputedStyle(el).backgroundColor})));
-   }
-   assert.ok(geometry.every(item=>item.height>=44),'Consent choices retain accessible touch targets');assert.ok(geometry.every(item=>item.color===geometry[0].color&&item.background===geometry[0].background),'Consent options retain equal visual weight');
-   await consent.getByRole('button',{name:text('Alle ablehnen',locale),exact:true}).click();await consent.waitFor({state:'hidden'});
-   assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('binso.privacy.preferences.v1')).performance),false,'Rejecting optional measurement is persisted');
-  }
+  await verifyConsentRejection(page,text,locale);
   const selector=page.locator('.locale-switcher .app-select-trigger:visible').first();await selectAppOption(selector, locale==='en'?'fr':'en');
   const chosen=locale==='en'?'fr':'en';await page.waitForFunction(code=>document.documentElement.lang===code+'-CH',chosen);
   await page.waitForLoadState('networkidle');reloading=true;try{await page.reload({waitUntil:'networkidle'})}finally{reloading=false}assert.equal(await page.locator('html').getAttribute('lang'),chosen+'-CH','Choice survives reload');

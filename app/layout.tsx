@@ -78,7 +78,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       <body>
         <LocaleProvider initialLocale={locale}>
         <ThemeRuntime />
-        <AppShellLayout>{children}</AppShellLayout>
+        <div id="binso-page-content"><AppShellLayout>{children}</AppShellLayout></div>
         <PrivacyConsent />
         <FreshAuthenticationDialog />
         <PwaRegister />

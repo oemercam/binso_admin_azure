@@ -165,6 +165,25 @@ try{
   const response=await fetch(base+path,{method,headers:{cookie:cookies.get('0:'+role),origin:base,'Content-Type':'application/json','Idempotency-Key':'v215-'+role+'-'+path.replaceAll('/','-')},body:JSON.stringify(body),signal:AbortSignal.timeout(15000)});
   return {status:response.status,data:await response.json()};
  };
+
+ // Personal image activation is self-scoped for every existing tenant role.
+ // Real HTTP/session/runtime-role checks complement the isolated route tests.
+ const avatarImage=await (await import('sharp')).default({create:{width:512,height:512,channels:3,background:'#123456'}}).png().toBuffer();
+ for(const role of roles){
+  const avatarId=(await pool.query('select gen_random_uuid() id')).rows[0].id,userId='http-0-'+role;
+  const previous=(await pool.query('select avatar_url from app_users where id=$1',[userId])).rows[0].avatar_url;
+  await pool.query("insert into file_objects(id,organization_id,object_key,original_name,content_type,size_bytes,sha256,scan_status,created_by,purpose) values($1,$2,$3,'avatar.png','image/png',$4,$5,'pending',$6,'profile_avatar')",[avatarId,organizations[0],organizations[0]+'/avatar-'+role+'.png',avatarImage.length,createHash('sha256').update(avatarImage).digest('hex'),userId]);
+  await pool.query('insert into file_contents(file_id,organization_id,body) values($1,$2,$3)',[avatarId,organizations[0],avatarImage]);
+  const path='/api/files/'+avatarId,body={action:'activate_profile_avatar',expectedAvatarUrl:previous};
+  assert.equal((await write('PATCH',path,body,role)).status,409,role+' pending avatar stays quarantined');
+  await pool.query("update file_objects set scan_status='clean' where id=$1",[avatarId]);
+  assert.equal((await write('PATCH',path,{...body,expectedAvatarUrl:'/api/files/changed/download'},role)).status,409,role+' stale image cannot replace current reference');
+  const changed=await write('PATCH',path,body,role);assert.equal(changed.status,200,JSON.stringify(changed.data));assert.equal(changed.data.activated,true);
+  assert.equal((await write('PATCH',path,body,role)).data.item.alreadyActive,true,role+' replay is harmless');
+  assert.equal((await pool.query("select count(*)::int n from audit_events where organization_id=$1 and entity_id=$2 and action='avatar_activated'",[organizations[0],avatarId])).rows[0].n,1);
+  if(role!=='owner')assert.equal((await write('PATCH',path,body,'owner')).status,404,'An owner cannot adopt a coworker personal image');
+  const foreign=await fetch(base+path,{method:'PATCH',headers:{cookie:cookies.get('1:owner'),origin:base,'Content-Type':'application/json'},body:JSON.stringify(body)});assert.equal(foreign.status,404,'Avatar activation stays tenant-scoped');
+ }
  const archiveRead=await get('/api/customers/archive',cookies.get('0:owner')),archiveRow=archiveRead.data.items.find(item=>item.id===archivedCustomer.id);assert.ok(archiveRow,'Archived HTTP contract has a positive own-tenant fixture');
  assert.ok(!(await get('/api/customers/archive',cookies.get('1:owner'))).data.items.some(item=>item.id===archivedCustomer.id),'Archive listing remains tenant-scoped under the runtime role');
  for(const role of roles.filter(role=>!['owner','admin'].includes(role)))assert.equal((await write('POST','/api/customers/archive',{id:archiveRow.id,revision:archiveRow.revision},role)).status,403,role+' cannot restore a customer');

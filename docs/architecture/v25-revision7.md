@@ -266,3 +266,46 @@ Fragment-URL, Zielfokus und fehlenden horizontalen Overflow. Die kurze
 Subprozessorseite erhält keine unnötige Inhaltssteuerung. Diese technische
 Abnahme ersetzt keine juristische Übersetzungs- oder Inhaltsfreigabe.
 Der Originalfix aus PR306 wurde konfliktfrei mit Herkunftsverweis als lokalem Commit99846008 auf den Revision7-Branch übernommen (Original ccc80833). PR306, sein Branch und Main sind unverändert. Kein separater neuer Timerfix und kein PR-Merge. Nach dem Testquellenwechsel ist das Dependency-Inventar regulär neu generiert; strenger Fingerprint-Test bestanden. Die neue vollständige Browserqualifikation steht noch aus.
+
+Profil-Rescan: Nachgewiesener Codepfad, nicht behauptete Reproduktion des alten
+Produktivfehlers: file-rescan.mjs aktualisiert Verdict/Audit, nicht avatar_url.
+Dafür ergänzt PATCH /api/files/[id] die ausdrückliche Übernahme eines eigenen,
+sauberen, nicht archivierten Avatarbilds mit vorhandenem Inhalt. Fremder Benutzer,
+fremder Mandant, falscher Zweck, Pending/Rejected und abweichende aktuelle
+Avatarreferenz blockieren. Replay ändert weder Referenz noch Audit erneut.
+Die Profilansicht hält den bestätigten Pending-Dateiverweis im Arbeitsspeicher
+und bietet «Bild übernehmen»; kein Polling/automatischer Rescan, kein neuer
+Scannerzugang. Neuere Bilder werden nicht überschrieben. Dieser Verweis ist
+nicht über einen vollständigen Neustart hinweg als neuer persistierter Entwurf
+implementiert. Avatar-/Logo-Erfolg verlangt jetzt ausdrücklich available:true,
+keine Annahme aus einem blossen clean-Textfeld. Bestehende Prelaunch-Ausnahme
+und Quarantäne-/Provider-Regeln sind serverseitig unverändert.
+Datenbanktest inkl. tatsächlichem512px-Download, Rollen-/Mandanten-/Drift- und
+Replay-Fällen bestanden. Native HTTP-Matrix je bestehender Rolle sowie der
+bestehende Branding-Browserfall sind ergänzt; deren Ausführung steht in CI aus.
+
+Full Development b2f9bed2, Lauf39642000218: Build/Checks/Scanner erfolgreich,
+Browser erneut fehlgeschlagen. Alte redundante Radiusprüfung8px sowie
+Aktions-Labelgewicht400 widersprachen den zentralen R7-Tokens12px/500; exakte
+Prüfungen aktualisiert. Neu bestätigter Runtimefehler: Consent-Aktionen waren
+auf Desktop nur42px hoch. Ihr gemeinsamer bestehender CSS-Owner erzwingt nun
+mindestens den44px-Touch-Token für alle drei Optionen; keine globalen
+Navigation-/FAB-/Buttonformen geändert. Gebündelte erneute Browserqualifikation
+erforderlich; keine fehlgeschlagene Lane ignoriert.
+Die vier gezielten Desktop-Consent-Renders in DE/FR/IT/EN bestehen nun tatsächlich mit je44px Höhe und gleichen Farben, Schriftgrösse und Gewicht. Nach Ablehnung ist performance:false gespeichert. Die zentrale Upload-Auswertung verlangt bestätigte UUID, bekannten Scanstatus und boolesche Verfügbarkeit vor einer Erfolgsmutation; negative Antworten erhalten den bisherigen Idempotenzschlüssel und erzeugen keinen Erfolgsbroadcast. Client-Session-/Privacy-Negativfälle bestanden. Das Branding-UI-Fixture verwendet nun ein echtes dekodierbares512px-PNG statt des alten fragilen Ein-Pixel-Strings. Neue Profil-/Branding- und native HTTP-Ausführung bleibt bis zum aktuellen CI-Nachweis offen.
+
+Hydration: Die lokale frische Consent-Prüfung zeigte zuvor eine tatsächliche
+React-Warnung, weil die imperative Dialogsperre einzelne noch hydrierende
+Marketing-Elemente inert markierte. RootLayout und Root-Fehlerzustand besitzen
+jetzt eine stabile Inhaltsgrenze; die Sperre verändert keine Script-/Style-/
+Link-/Template-Knoten. Fokus-/Scroll-/Nested-Lock-Verhalten bleibt erhalten.
+Vier tatsächliche neue Browserfälle DE/FR/IT/EN ohne ausgeblendete Warnungen
+bestanden: Hintergrundgrenze während Dialog inert, nach Ablehnung wieder frei;
+je44px gleichgewichtete Aktionen. Vorhandene A11y-/Theme-Regressionen bestanden;
+der Lokalisierungs-Browserlauf behandelt Hydration-/React-Diagnosen nun als
+Fehler. Keine suppressHydrationWarning-Ausnahme ergänzt. Eine beschädigte,
+rein generierte Next-dev-Typdatei wurde ausserhalb des Compilers gesichert;
+frisch generierte Typen und Typecheck bestehen, kein App-Typfehler kaschiert.
+Avatar-Replay verwendet die kanonische DB-UUID; unterschiedliche Schreibweise
+der gleichen UUID darf keine zweite Übernahme oder Auditierung erzeugen.
+Consent-Informationsweg: Vorher lokal reproduziert, dass der Link zur Datenschutzerklärung zwar navigiert, den Dialog aber über der gesperrten Rechtsseite offen lässt. Der zentrale Link schliesst nun nur die Darstellung, ohne Präferenzen zu speichern. Vier tatsächliche lokale DE/FR/IT/EN-Browserfälle bestehen: Rechtsseite erreichbar, Hintergrund frei, noch kein Consent gespeichert, Einstellungen über Footer wieder geöffnet, Ablehnung persistiert und keine Hydration-/React-Fehler. Der gemeinsame CI-Helfer deckt diesen Weg verbindlich ab. Gezieltes ESLint und Typecheck bestanden. Vollständige aktuelle Browser-CI weiterhin ausstehend.

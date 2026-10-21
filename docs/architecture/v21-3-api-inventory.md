@@ -62,7 +62,7 @@ Static AST/source inventory, not proof that every runtime branch is tested. Call
 | `/api/expenses` | GET, POST | `app/api/expenses/route.ts` | `tenantListPage:9`, `tenantList:30` |
 | `/api/expenses/scan-receipt` | POST | `app/api/expenses/scan-receipt/route.ts` | `requireSession:9`, `authorize:9` |
 | `/api/files/[id]/download` | GET | `app/api/files/[id]/download/route.ts` | `requireSession:15`, `authorize:16`, `withTenant:17`, `client.query:17`, `authorize:24` |
-| `/api/files/[id]` | DELETE | `app/api/files/[id]/route.ts` | `requireSession:13`, `withTenant:15`, `c.query:16`, `c.query:21`, `c.query:22`, `authorize:26`, `c.query:31`, `c.query:37` |
+| `/api/files/[id]` | PATCH, DELETE | `app/api/files/[id]/route.ts` | `requireSession:15`, `withTenant:20`, `c.query:21`, `c.query:24`, `c.query:28`, `requireSession:37`, `withTenant:39`, `c.query:40`, `c.query:45`, `c.query:46`, `authorize:50`, `c.query:55`, `c.query:61` |
 | `/api/files` | GET, POST | `app/api/files/route.ts` | `requireSession:23`, `authorize:23`, `withTenant:39`, `c.query:39`, `requireSession:44`, `authorize:53`, `authorize:57`, `withTenant:60`, `c.query:60`, `authorize:63`, `withTenant:73`, `c.query:75`, `c.query:81`, `c.query:87`, `c.query:89`, `c.query:90`, `c.query:91`, `c.query:92` |
 | `/api/finance/overview` | GET | `app/api/finance/overview/route.ts` | `requireSession:11`, `authorize:11`, `withTenant:13`, `authorize:16`, `authorize:17` |
 | `/api/finance` | GET | `app/api/finance/route.ts` | `requireSession:7`, `authorize:7`, `withTenant:7` |

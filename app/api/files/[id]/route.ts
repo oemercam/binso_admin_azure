@@ -2,12 +2,36 @@ import {fileRelations} from '@/lib/server/file-relations';
 import {requireSession} from '@/lib/server/session';
 import {authorize} from '@/lib/server/rbac';
 import {withTenant} from '@/lib/server/db';
-import {ApiError,apiError,assertSameOrigin,json} from '@/lib/server/http';
+import {ApiError,apiError,assertSameOrigin,json,readJson} from '@/lib/server/http';
 import {audit} from '@/lib/server/audit';
 import {requireModuleEntitlement} from '@/lib/server/plan-access';
 import {NextRequest} from 'next/server';
 
 export const runtime='nodejs';
+/** Explicit adoption after a controlled rescan; never a scanner bypass or an
+ * automatic replacement of a newer profile image. */
+export async function PATCH(request:NextRequest,{params}:{params:Promise<{id:string}>}){
+ try{
+  assertSameOrigin(request);const s=await requireSession(),{id}=await params;
+  if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id))throw new ApiError(404,'not_found','Datei wurde nicht gefunden.');
+  const body=await readJson<{action?:unknown;expectedAvatarUrl?:unknown}>(request,4096);
+  if(body.action!=='activate_profile_avatar'||body.expectedAvatarUrl!==null&&(typeof body.expectedAvatarUrl!=='string'||body.expectedAvatarUrl.length>2048||/[\u0000-\u001f]/.test(body.expectedAvatarUrl)))throw new ApiError(400,'invalid_avatar_action','Ungültige Profilbild-Anfrage.');
+  const expected=body.expectedAvatarUrl||null;
+  const item=await withTenant(s.organizationId,s.userId,async c=>{
+   const file=(await c.query(`select f.id,f.created_by,f.scan_status,f.purpose,f.content_type from file_objects f join file_contents b on b.file_id=f.id and b.organization_id=f.organization_id where f.id=$1 and f.organization_id=$2 and f.archived_at is null for update of f`,[id,s.organizationId])).rows[0];
+   if(!file||file.created_by!==s.userId||file.purpose!=='profile_avatar')throw new ApiError(404,'not_found','Datei wurde nicht gefunden.');
+   if(file.scan_status!=='clean'||!['image/png','image/jpeg','image/webp'].includes(file.content_type))throw new ApiError(409,'avatar_not_ready','Das Profilbild ist noch nicht sicher freigegeben. Das bisherige Bild bleibt erhalten.');
+   const profile=(await c.query('select avatar_url from app_users where id=$1 for update',[s.userId])).rows[0];
+   if(!profile)throw new ApiError(404,'not_found','Profil wurde nicht gefunden.');
+   const canonicalId=String(file.id),target='/api/files/'+canonicalId+'/download';if(profile.avatar_url===target)return {id:canonicalId,alreadyActive:true};
+   if((profile.avatar_url||null)!==expected)throw new ApiError(409,'avatar_changed','Das Profilbild wurde inzwischen geändert. Bitte den aktuellen Stand prüfen.');
+   await c.query('update app_users set avatar_url=$1,updated_at=now() where id=$2',[target,s.userId]);
+   await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'avatar_activated',entityType:'file',entityId:canonicalId});
+   return {id:canonicalId,alreadyActive:false};
+  });
+  return json({item,activated:true});
+ }catch(error){return apiError(error);}
+}
 export async function DELETE(request:NextRequest,{params}:{params:Promise<{id:string}>}){
  try{
   assertSameOrigin(request);const s=await requireSession(),{id}=await params;

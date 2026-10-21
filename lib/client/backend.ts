@@ -108,9 +108,10 @@ async function parseResponse<T>(response:Response,fallback:string):Promise<T>{
   return payload as T;
 }
 
-async function mutationResult<T>(response:Response,path:string,fallback:string,revision:string,method:"POST"|"PATCH"|"DELETE"){
+async function mutationResult<T>(response:Response,path:string,fallback:string,revision:string,method:"POST"|"PATCH"|"DELETE",validate?:(value:unknown)=>void){
   const result=await parseResponse<T>(response,fallback);
   if(revision!==dataRevision([]))throw new ClientApiError("Die Sitzung wurde geändert. Bitte den gespeicherten Stand prüfen.","session_changed",401);
+  validate?.(result);
   // Business creates need their persisted identity before any success broadcast.
   // An unreadable or incomplete response can follow a committed transaction;
   // leave the caller's idempotency key intact for its explicit retry.
@@ -205,5 +206,9 @@ export async function apiUpload<T>(path:string,form:FormData):Promise<T>{
     headers["Idempotency-Key"]=key;
   }
   const response=await fetchApi(path,{method:"POST",body:form,headers});
-  return mutationResult<T>(response,path,"Datei konnte nicht hochgeladen werden.",revision,"POST");
+  return mutationResult<T>(response,path,"Datei konnte nicht hochgeladen werden.",revision,"POST",value=>{
+    if(!['profile_avatar','company_logo'].includes(String(form.get('purpose'))))return;
+    const item=(value as {item?:{id?:unknown;available?:unknown;scanStatus?:unknown}}|null)?.item;
+    if(typeof item?.id!=='string'||!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(item.id)||typeof item.available!=='boolean'||!['clean','pending','rejected'].includes(String(item.scanStatus)))throw new ClientApiError('Die Speicherung konnte nicht bestätigt werden. Bitte den gespeicherten Stand prüfen.','invalid_response',502);
+  });
 }

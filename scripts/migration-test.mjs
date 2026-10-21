@@ -1240,6 +1240,19 @@ try{
  const avatarUpload=await fileUpload.POST(uploadRequest('','image/png',avatarBytes,'profile_avatar'));assert.equal(avatarUpload.status,201,JSON.stringify(avatarUpload));
  assert.equal((await db.query('select avatar_url from app_users where id=$1',[session.userId])).rows[0].avatar_url,priorAvatar,'Quarantined images cannot replace the existing avatar');
  const avatarId=avatarUpload.data.item.id,avatarRoute=await fileRoute('app/api/files/[id]/route.ts');
+ const avatarParams={params:Promise.resolve({id:avatarId})},activateAvatar=(expected=priorAvatar)=>avatarRoute.PATCH({body:{action:'activate_profile_avatar',expectedAvatarUrl:expected}},avatarParams);
+ assert.equal((await activateAvatar()).status,409,'Pending scan never activates an image');
+ assert.equal((await avatarRoute.PATCH({body:{action:'activate_profile_avatar'}},avatarParams)).status,400,'An explicit expected profile reference is mandatory');
+ globalThis.__processSession={...session,userId:'different-user'};assert.equal((await activateAvatar()).status,404,'Same-tenant privilege cannot adopt another user image');
+ globalThis.__processSession={...session,organizationId:sandbox};assert.equal((await activateAvatar()).status,404,'Foreign tenant cannot adopt a personal image');globalThis.__processSession=session;
+ await db.query("update file_objects set scan_status='rejected' where id=$1",[avatarId]);assert.equal((await activateAvatar()).status,409,'Rejected scanner verdict remains blocked');
+ await db.query("update file_objects set scan_status='clean' where id=$1",[avatarId]);assert.equal((await activateAvatar('/api/files/stale/download')).status,409,'Late rescan cannot overwrite an intervening image');
+ const activatedAvatar=await activateAvatar();assert.equal(activatedAvatar.status,200,JSON.stringify(activatedAvatar));assert.equal(activatedAvatar.data.activated,true);assert.equal((await db.query('select avatar_url from app_users where id=$1',[session.userId])).rows[0].avatar_url,'/api/files/'+avatarId+'/download');
+ assert.equal((await activateAvatar()).data.item.alreadyActive,true,'Exact replay is harmless');
+ assert.equal((await avatarRoute.PATCH({body:{action:'activate_profile_avatar',expectedAvatarUrl:priorAvatar}},{params:Promise.resolve({id:avatarId.toUpperCase()})})).data.item.alreadyActive,true,'UUID casing cannot create a second logical activation');
+ assert.equal((await db.query("select count(*)::int n from audit_events where organization_id=$1 and entity_id=$2 and action='avatar_activated'",[demo,avatarId])).rows[0].n,1,'Activation replay does not duplicate audit');
+ const activatedDownload=await fileDownload.GET({},avatarParams);assert.equal(activatedDownload.status,200,'The activated image is really retrievable');const activatedMeta=await sharpImages(Buffer.from(await activatedDownload.arrayBuffer())).metadata();assert.equal(activatedMeta.width,512);assert.equal(activatedMeta.height,512);
+
  globalThis.__processSession={...session,userId:'different-user'};assert.equal((await avatarRoute.DELETE({}, {params:Promise.resolve({id:avatarId})})).status,404,'Another user cannot remove a personal avatar even with the same tenant role');
  globalThis.__processSession=session;const currentAvatar='/api/files/'+avatarId+'/download';await db.query('update app_users set avatar_url=$1 where id=$2',[currentAvatar,session.userId]);
  assert.equal((await avatarRoute.DELETE({}, {params:Promise.resolve({id:avatarId})})).status,200);assert.equal((await db.query('select avatar_url from app_users where id=$1',[session.userId])).rows[0].avatar_url,null);assert.ok((await db.query('select archived_at from file_objects where id=$1',[avatarId])).rows[0].archived_at);

@@ -13828,5 +13828,30 @@
     "Table of contents",
     "Table des matières",
     "Indice dei contenuti"
+  ],
+  "Ungültige Profilbild-Anfrage.": [
+    "Invalid profile image request.",
+    "Demande de photo de profil non valide.",
+    "Richiesta immagine del profilo non valida."
+  ],
+  "Das Profilbild ist noch nicht sicher freigegeben. Das bisherige Bild bleibt erhalten.": [
+    "The profile image has not passed the security review yet. The previous image is retained.",
+    "La photo de profil n’a pas encore passé le contrôle de sécurité. La photo précédente est conservée.",
+    "L’immagine del profilo non ha ancora superato la verifica di sicurezza. L’immagine precedente viene mantenuta."
+  ],
+  "Das Profilbild wurde inzwischen geändert. Bitte den aktuellen Stand prüfen.": [
+    "The profile image has changed in the meantime. Please check the current image.",
+    "La photo de profil a été modifiée entre-temps. Veuillez vérifier la photo actuelle.",
+    "L’immagine del profilo è stata modificata nel frattempo. Verifica l’immagine attuale."
+  ],
+  "Profil wurde nicht gefunden.": [
+    "Profile not found.",
+    "Profil introuvable.",
+    "Profilo non trovato."
+  ],
+  "Bild übernehmen": [
+    "Use image",
+    "Utiliser l’image",
+    "Usa immagine"
   ]
 }

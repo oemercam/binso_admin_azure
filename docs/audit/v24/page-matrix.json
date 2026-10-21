@@ -1,5 +1,5 @@
 {
-  "commit": "b637dd57a96cb8fbb05459388c11f4233a2f610f",
+  "commit": "b2f9bed233f576926909f1c00496dcec9be54202",
   "method": "Existing TypeScript AST dependency inventory; conditional reachability is not runtime proof",
   "pages": [
     {
@@ -3044,7 +3044,7 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 314,
+          "line": 335,
           "component": "components/pages/settings.tsx#SubscriptionSettingsPage"
         },
         {
@@ -4144,12 +4144,12 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 184,
+          "line": 205,
           "component": "components/pages/settings.tsx#CompanySettingsPage"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 187,
+          "line": 208,
           "component": "components/pages/settings.tsx#CompanySettingsPage"
         },
         {
@@ -4371,7 +4371,7 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 90,
+          "line": 110,
           "component": "components/pages/settings.tsx#AccountSettingsPage"
         },
         {

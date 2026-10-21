@@ -5921,15 +5921,16 @@
       "requirement": "Upload-Erfolg erst melden, wenn serverseitig gespeichert und wieder abrufbar.",
       "sourceTextSha256": "bd21d16bf7bdc6f4b66b4e322c4fd2e0f30c9d6f86c5c88bffbe540714b2a91f",
       "sourceParagraph": "### 39.1 Persönliches Profil und Avatar [P1; Sicherheits-/Datenverlustfehler P0]\n- Gemeldeten Avatar-Upload-Fehler reproduzieren und die tatsächliche Ursache über UI, API, Auth, Storage, Bildverarbeitung, Persistenz und Cache nachweisen; nicht bloss kosmetisch beheben.\n- Avatar in der Profilansicht 96–112 px, in Listen 36–40 px, im Header 32–36 px; responsive und auf Retina-Geräten scharf (mindestens 2× physische Bildauflösung). Empfohlene Quelldatei 512×512 px; Maximalgrösse 10 MB, sofern Infrastruktur und Sicherheitsgrenzen dies erlauben. Verbindliche Grössen über zentrale Design-Tokens.\n- JPEG, PNG, WebP und iPhone-HEIC/HEIF nach tatsächlich verfügbarer, sicherer serverseitiger Verarbeitung unterstützen; nicht unterstützte Formate verständlich ablehnen. Dateityp anhand Inhalt prüfen, EXIF-Ausrichtung korrigieren, Metadaten minimieren, sicher dekodieren/rekodieren, Grössen und Ressourcen begrenzen, Malware-/Dateiprüfung entsprechend Infrastruktur.\n- Quadratischer Zuschnitt mit Vorschau, korrektes Zentrieren, rundes Rendering ohne Verzerrung; Ersetzen, Entfernen, Fallback-Initialen, Lade-/Fehlerzustände, Cache-Invalidierung, persistente Speicherung nach Reload und neuer Sitzung. Upload-Erfolg erst melden, wenn serverseitig gespeichert und wieder abrufbar.\n- Vorname, Nachname, E-Mail, Telefon und weitere persönliche Felder vom Registrierungsformular über Auth-Provider, API, Datenbank und Profilprojektion verfolgen; kein Verlust bei Verifizierung, Onboarding, Einladung, Login, Aktualisierung oder Rollenwechsel.\n- E-Mail-Änderungen nur mit angemessener Bestätigung; Sicherheitsmethoden, Passkeys, freiwillige MFA, Recovery-Codes, aktive Sitzungen, Geräteabmeldung und Kontowiederherstellung in klar getrennten Profilbereichen.\n- Profilstruktur: kompakter Avatar, Name, E-Mail, Rolle; darunter Persönliche Angaben, Konto & Sicherheit, Sprache & Darstellung, Benachrichtigungen, Aktive Geräte. Keine überlangen Mischformulare.\n- Avatar- und Namensänderungen konsistent in Header, Kommentaren, Aktivitäten und berechtigten Benutzerlisten anzeigen; historische Auditdaten unverfälscht halten.",
-      "status": "nicht_abgenommen",
+      "status": "teilweise_implementiert",
       "sourceReferences": [
-        "lib/server/profile-image.ts",
-        "components/file-upload.tsx"
+        "lib/client/backend.ts",
+        "components/pages/settings.tsx",
+        "app/api/files/[id]/route.ts"
       ],
-      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "implementation": "Strenge Upload-Antwort vor Erfolgsbroadcast; explizite Übernahme eines eigenen nach Rescan sauberen Avatars mit Referenzvergleich und ohne doppelte Auditierung.",
+      "test": "Isolierte Datenbank-/Routenprüfung inklusive tatsächlichem512px-Download, Pending/Rejected/Foreign/Stale/Replay bestanden; Client-Receipt-Negativfälle und Typecheck/Lint bestanden.",
+      "visualComparison": "Neue Übernahmeaktion im vorhandenen Branding-Browserfall ergänzt, Ausführung in CI offen.",
+      "blocker": "Ursprünglicher produktiver Avatarfehler weiterhin nicht live reproduziert; native HTTP-/Browser-/Geräteabnahme offen. Pending-Verweis nur in laufender Ansicht, kein neuer persistierter Uploadentwurf."
     },
     {
       "id": "R7-39-009",
@@ -8896,12 +8897,14 @@
       "sourceParagraph": "Einheitlicher responsiver Marketing-Footer auf allen öffentlichen Seiten: Produkt, Funktionen, Preise, Kontakt, Support, Impressum, Datenschutz, AGB, Cookie-Einstellungen und weitere tatsächlich erforderliche Rechtstexte. Kunden- und Admin-Workspace erhalten schlanke, konsistente Rechts-/Hilfezugänge statt Marketing-Footer. Ein zentrales Consent-Management für Landingpage und betroffene Unterseiten: notwendige Technologien klar erklärt, nicht abschaltbar; optionale Kategorien standardmässig aus, wo Einwilligung erforderlich; gleichwertige Optionen «Alle akzeptieren», «Alle ablehnen», «Einstellungen», verständliche Toggles je Kategorie, Widerruf jederzeit via Footer. Keine nicht notwendigen Skripte vor wirksamer Einwilligung laden, sofern Einwilligung erforderlich. Consent-Zustand versionieren und mit minimal nötigen Daten nachweisen, Sprachwechsel respektieren, auf PWA und Desktop korrekt verhalten, Banner nicht bei jeder Navigation wiederholen. Cookie-/Tracking-Inventar und tatsächliche Provider zuerst prüfen; keine pauschalen rechtlichen Behauptungen.",
       "status": "teilweise_implementiert",
       "sourceReferences": [
-        "components/privacy-consent.tsx"
+        "components/privacy-consent.tsx",
+        "app/design-system/marketing.css",
+        "scripts/privacy-consent-browser.mjs"
       ],
-      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "scripts/web-vitals-consent-test.mjs bestanden; Typecheck und gezielter ESLint bestanden; Speicherinventar docs/audit/v25-revision7/browser-storage.md.",
-      "visualComparison": "Noch kein vollständiger Referenzvergleich auf aktuellem Head.",
-      "blocker": "Laufzeit-Netzwerknachweis und juristische Einordnung sowie reale PWA-Abnahme offen."
+      "implementation": "Gemeinsamer Consent-Owner mit drei gleichgewichteten Optionen, Toggles und nun mindestens44px Aktionen auch auf Desktop.",
+      "test": "Vier echte lokale Desktopfälle DE/FR/IT/EN: je44px, gleiche Farben/Font/Gewicht, gespeicherte Ablehnung bestanden. Vorhandene Lifecycle-/Widerrufstests bleiben.",
+      "visualComparison": "Gezielte lokale tatsächliche Geometrie; vollständige Browser-/PWA-/Provider- und Rechtsabnahme offen.",
+      "blocker": "Aktuelle gebündelte Browserqualifikation sowie juristischer und tatsächlicher Provider-Nachweis offen."
     },
     {
       "id": "R7-51-004",
@@ -8996,14 +8999,16 @@
       "requirement": "Einheitliches responsive Layout, Anker/TOC bei langen Texten, Versionsdatum, mehrsprachige Fassungen, verständliche Sprache, öffentliche Erreichbarkeit.",
       "sourceTextSha256": "8657a03bc65a45d4d00e1e474e40d7d82a39f475182155161eb8e08d901ffa49",
       "sourceParagraph": "Bestandsaufnahme aller Rechtsseiten (Impressum, Datenschutz, Nutzungsbedingungen/AGB, Abonnement/Testphase/Kündigung, Auftragsbearbeitung, Subprozessoren, Cookies, Kontakt). Inhalte mit realem Datenfluss, Hosting, E-Mail, Tracking, Dokumentfreigaben, Mitarbeiterrollen, Speicherfristen, Auskunft/Export/Löschung, grenzüberschreitenden Übermittlungen und Schweizer nDSG sowie ggf. anwendbarer DSGVO abgleichen. Einheitliches responsive Layout, Anker/TOC bei langen Texten, Versionsdatum, mehrsprachige Fassungen, verständliche Sprache, öffentliche Erreichbarkeit. Keine erfundenen Vertragsklauseln, Fristen oder Rechtszusagen; offene rechtliche Fragen markieren und vor Veröffentlichung fachjuristisch freigeben. Bereits veröffentlichte Rechtstexte nicht stillschweigend durch generierte Inhalte ersetzen.",
-      "status": "nicht_abgenommen",
+      "status": "teilweise_implementiert",
       "sourceReferences": [
-        "config/legal.ts"
+        "components/legal-page.tsx",
+        "app/design-system/marketing.css",
+        "docs/audit/v25-revision7/legal-review.md"
       ],
-      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "implementation": "Vorhandener LegalPage-Owner um Inhaltsverzeichnis und stabile Anker ergänzt; bestehende Kontakt-ID, Textinhalte und Versionsdaten erhalten.",
+      "test": "Tatsächliche SSR-Tests aller5 Rechtsseiten in4 UI-Sprachen;4 lokale Keyboard-/URL-/Fokus-/Overflow-Fälle Hell/Dunkel320/1440 bestanden.",
+      "visualComparison": "Technische Browsernachweise vorhanden; keine juristische Übersetzungs-/Inhaltsfreigabe.",
+      "blocker": "Gemischte/unvollständige rechtliche Sprachfassungen, Demo-Textdrift und externe Vertrags-/Providerprüfung offen."
     },
     {
       "id": "R7-52-004",

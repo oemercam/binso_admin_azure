@@ -74,6 +74,15 @@ try{
   await assert.rejects(backend.apiGet('/api/test-reference-negative'),error=>error.correlationId===undefined&&error.message==='Public error','No mismatched, business-error or arbitrary reference may reach the UI');
  }
  console.log('Support correlation: exact header/body agreement, UUID boundary and negative privacy cases passed.');
+
+ const avatarFile=new File(['synthetic binary; decoder tested separately'],'avatar.png',{type:'image/png'}),form=new FormData();form.append('file',avatarFile);form.append('purpose','profile_avatar');const imageKeys=[],imageEvents=await import(eventsUrl),imageId='6f81c519-5073-4f33-8b45-90bc4ad6157c';
+ for(const item of [{id:imageId,scanStatus:'clean'},{id:imageId,scanStatus:'unverified',available:true},{id:'not-an-id',scanStatus:'clean',available:true}]){
+  const before=imageEvents.dataRevision(['/api/files']);globalThis.fetch=async(path,options)=>{imageKeys.push(options.headers['Idempotency-Key']);return Response.json({item},{status:201});};
+  await assert.rejects(backend.apiUpload('/api/files',form),error=>error.code==='invalid_response');assert.equal(imageEvents.dataRevision(['/api/files']),before,'Incomplete image receipts cannot broadcast a successful upload');
+ }
+ globalThis.fetch=async(path,options)=>{imageKeys.push(options.headers['Idempotency-Key']);return Response.json({item:{id:imageId,scanStatus:'clean',available:true}},{status:201});};assert.equal((await backend.apiUpload('/api/files',form)).item.available,true);assert.equal(new Set(imageKeys).size,1,'Explicit retry keeps the original upload identity');
+ console.log('Image upload receipts: explicit availability/verdict/UUID contract before success and preserved retry identity passed.');
+
  const csvHeaders={'Content-Type':'text/csv; charset=utf-8','Content-Disposition':'attachment; filename="binso-fixture.csv"'};
  globalThis.fetch=async(path,options)=>{assert.equal(path,'/api/reports?format=csv');assert.equal(options.cache,'no-store');assert.equal(options.credentials,'same-origin');assert.equal(options.headers.Accept,'text/csv');return new Response('"Metric";"Value"\r\n', {headers:csvHeaders})};
  const exportFile=await backend.apiGetFile('/api/reports?format=csv','text/csv');assert.equal(exportFile.fileName,'binso-fixture.csv');assert.equal(await exportFile.blob.text(),'"Metric";"Value"\r\n');

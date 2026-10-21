@@ -105,10 +105,11 @@ console.log('Company/customer draft defaults, explicit zeroes, invalid values an
 {
  class Element{constructor(name,children=[]){this.name=name;this.children=children;this.inert=false;}contains(target){return this===target||this.children.some(child=>child.contains(target));}}
  const app=new Element('app'),dialogA=new Element('a'),layerA=new Element('layer-a',[dialogA]),dialogB=new Element('b'),layerB=new Element('layer-b',[dialogB]);
- const doc={body:{children:[app,layerA]}};
+ const script=new Element('script');script.tagName='SCRIPT';const style=new Element('style');style.tagName='STYLE';
+ const doc={body:{children:[app,layerA,script,style]}};
  const body=ts.transpileModule(await readFunction('components/use-dialog-focus.ts',['lockDialogBackground']),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText;
  const lock=Function('backgroundLocks','document','HTMLElement',body+';return lockDialogBackground;')(new Map(),doc,Element);
- const releaseA=lock(dialogA);assert.equal(app.inert,true);assert.equal(layerA.inert,false);doc.body.children.push(layerB);const releaseB=lock(dialogB);assert.equal(layerA.inert,true);releaseA();assert.equal(app.inert,true,'Closing a parent cannot expose the page under its child');releaseB();assert.equal(app.inert,false);assert.equal(layerA.inert,false);
+ const releaseA=lock(dialogA);assert.equal(script.inert,false,'Executable SSR metadata is never mutated by the accessibility lock');assert.equal(style.inert,false,'Styles are not focusable background');assert.equal(app.inert,true);assert.equal(layerA.inert,false);doc.body.children.push(layerB);const releaseB=lock(dialogB);assert.equal(layerA.inert,true);releaseA();assert.equal(app.inert,true,'Closing a parent cannot expose the page under its child');releaseB();assert.equal(app.inert,false);assert.equal(layerA.inert,false);
  app.inert=true;const release=lock(dialogA);release();assert.equal(app.inert,true,'Pre-existing inert state is retained');
  console.log('Modal background ownership: nested dialogs, out-of-order close and pre-existing inert state passed.');
 }

@@ -89,9 +89,15 @@
     "R7-51-003": {
       "sourceTextSha256": "bbf9d022efa18e16af01f8415c3868514d0c8b0fff42d2bfd1c5261abf074f4d",
       "status": "teilweise_implementiert",
-      "test": "scripts/web-vitals-consent-test.mjs bestanden; Typecheck und gezielter ESLint bestanden; Speicherinventar docs/audit/v25-revision7/browser-storage.md.",
-      "visualComparison": "Noch kein vollständiger Referenzvergleich auf aktuellem Head.",
-      "blocker": "Laufzeit-Netzwerknachweis und juristische Einordnung sowie reale PWA-Abnahme offen."
+      "implementation": "Gemeinsamer Consent-Owner mit drei gleichgewichteten Optionen, Toggles und nun mindestens44px Aktionen auch auf Desktop.",
+      "sourceReferences": [
+        "components/privacy-consent.tsx",
+        "app/design-system/marketing.css",
+        "scripts/privacy-consent-browser.mjs"
+      ],
+      "test": "Vier echte lokale Desktopfälle DE/FR/IT/EN: je44px, gleiche Farben/Font/Gewicht, gespeicherte Ablehnung bestanden. Vorhandene Lifecycle-/Widerrufstests bleiben.",
+      "visualComparison": "Gezielte lokale tatsächliche Geometrie; vollständige Browser-/PWA-/Provider- und Rechtsabnahme offen.",
+      "blocker": "Aktuelle gebündelte Browserqualifikation sowie juristischer und tatsächlicher Provider-Nachweis offen."
     },
     "R7-51-004": {
       "sourceTextSha256": "a51b9e66005adcc0f6a7c0a5a72a47125f9c59a4b7630740e5080ece616a3df2",
@@ -326,6 +332,32 @@
       "test": "Client positive/negative Header-/Body-/UUID-/Statusprüfungen, tatsächliche SSR-Ausgabe DE/FR/IT/EN, Verbatim-Schutz, Typecheck/Lint bestanden.",
       "visualComparison": "Supportreferenz ist noch nicht über alle Fehlerseiten/Geräte visuell abgenommen.",
       "blocker": "Vollständige Accessibility-, Offline-/Reconnect- und physische Geräteabnahme offen."
+    },
+    "R7-39-008": {
+      "sourceTextSha256": "bd21d16bf7bdc6f4b66b4e322c4fd2e0f30c9d6f86c5c88bffbe540714b2a91f",
+      "status": "teilweise_implementiert",
+      "implementation": "Strenge Upload-Antwort vor Erfolgsbroadcast; explizite Übernahme eines eigenen nach Rescan sauberen Avatars mit Referenzvergleich und ohne doppelte Auditierung.",
+      "sourceReferences": [
+        "lib/client/backend.ts",
+        "components/pages/settings.tsx",
+        "app/api/files/[id]/route.ts"
+      ],
+      "test": "Isolierte Datenbank-/Routenprüfung inklusive tatsächlichem512px-Download, Pending/Rejected/Foreign/Stale/Replay bestanden; Client-Receipt-Negativfälle und Typecheck/Lint bestanden.",
+      "visualComparison": "Neue Übernahmeaktion im vorhandenen Branding-Browserfall ergänzt, Ausführung in CI offen.",
+      "blocker": "Ursprünglicher produktiver Avatarfehler weiterhin nicht live reproduziert; native HTTP-/Browser-/Geräteabnahme offen. Pending-Verweis nur in laufender Ansicht, kein neuer persistierter Uploadentwurf."
+    },
+    "R7-52-003": {
+      "sourceTextSha256": "8657a03bc65a45d4d00e1e474e40d7d82a39f475182155161eb8e08d901ffa49",
+      "status": "teilweise_implementiert",
+      "implementation": "Vorhandener LegalPage-Owner um Inhaltsverzeichnis und stabile Anker ergänzt; bestehende Kontakt-ID, Textinhalte und Versionsdaten erhalten.",
+      "sourceReferences": [
+        "components/legal-page.tsx",
+        "app/design-system/marketing.css",
+        "docs/audit/v25-revision7/legal-review.md"
+      ],
+      "test": "Tatsächliche SSR-Tests aller5 Rechtsseiten in4 UI-Sprachen;4 lokale Keyboard-/URL-/Fokus-/Overflow-Fälle Hell/Dunkel320/1440 bestanden.",
+      "visualComparison": "Technische Browsernachweise vorhanden; keine juristische Übersetzungs-/Inhaltsfreigabe.",
+      "blocker": "Gemischte/unvollständige rechtliche Sprachfassungen, Demo-Textdrift und externe Vertrags-/Providerprüfung offen."
     }
   },
   "tests": {
@@ -342,7 +374,7 @@
     "typecheck": "passed",
     "build": "passed",
     "visual": "14 focused Chromium/Edge responsive/light/dark and four-language browser cases passed; no general visual approval",
-    "CI": "ea529a5a: checks/build/scanner/analyze successful; ux-compliance still running at last read; browser skipped by existing PR plan. Later identity/font changes require new CI.",
+    "CI": "b2f9bed2 Full Development run39642000218: build/checks/scanner passed; browser failed on old12px/500 contracts and actual42px desktop consent targets. Targeted corrections and negative proofs made; fresh full CI required.",
     "scripts/ui-foundation-test.mjs": "passed",
     "scripts/foundation-integration-test.mjs": "passed",
     "scripts/import-table-test.mjs": "passed, including actual XLSX/conditional formatting, rejection paths and original CSV/XLSX row metadata",
@@ -352,7 +384,10 @@
     "importBuild": "passed",
     "scripts/customer-import-browser-test.mjs": "not executed successfully locally: real UI QA fixture requires native 127.0.0.1:5432, unavailable. Must pass existing Linux/PG CI; no auth bypass.",
     "importLint": "passed for changed import code",
-    "identityReference": "Four actual local Chromium/Edge widths with self-hosted Inter loaded, passkey order and independent derived-reference geometry passed; no physical-device approval."
+    "identityReference": "Four actual local Chromium/Edge widths with self-hosted Inter loaded, passkey order and independent derived-reference geometry passed; no physical-device approval.",
+    "avatarActivation": "Isolated PostgreSQL/PGlite route/download/ownership/status/drift/replay passed; native HTTP and branding browser cases added, current CI execution pending.",
+    "consentTargets": "Four actual local desktop DE/FR/IT/EN cases passed with44px equivalent choices and persisted rejection.",
+    "consentPolicy": "Four actual local DE/FR/IT/EN browser cases passed: policy reachable without stored consent, reopen from footer, equal44px choices, inert restoration, rejection persisted, zero hydration/runtime warnings."
   },
   "externalBlockers": [
     "Physical installed iOS/Android PWA, keyboard and assistive technology acceptance",

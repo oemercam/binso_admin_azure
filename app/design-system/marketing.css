@@ -331,6 +331,7 @@
 .privacy-consent-options strong{font-size:var(--type-metadata)}
 .privacy-consent-options input{width:20px;height:20px;min-height:0}
 .privacy-consent-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px}
+.privacy-consent-actions .button{min-height:var(--touch)}
 .footer-privacy-button{
   padding:0;
   border:0;

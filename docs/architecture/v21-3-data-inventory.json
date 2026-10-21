@@ -3034,6 +3034,7 @@
       "file": "app/api/files/[id]/route.ts",
       "path": "/api/files/[id]",
       "methods": [
+        "PATCH",
         "DELETE"
       ],
       "dependencies": [
@@ -3053,12 +3054,50 @@
       "evidence": [
         {
           "callee": "requireSession",
-          "line": 13,
+          "line": 15,
           "arguments": []
         },
         {
           "callee": "withTenant",
-          "line": 15,
+          "line": 20,
+          "arguments": [
+            "s.organizationId",
+            "s.userId",
+            "async c=>{\n   const file=(await c.query(`select f.id,f.created_by,f.scan_status,f.purpose,f.content_type from file_objects f join file_contents b on b.file_id=f.id and b.organization_id=f.organization_id where f.id=$1 and f.organization_id=$2 and f.archived_at is null for update of f`,[id,s.organizationId])).rows[0];\n   if(!file||file.created_by!==s.userId||file.purpose!=='profile_avatar')throw new ApiError(404,'not_found','Datei wurde nicht gefunden.');\n   if(file.scan_status!=='clean'||!['image/png','image/jpeg','image/webp'].includes(file.content_type))throw new ApiError(409,'avatar_not_ready','Das Profilbild ist noch nicht sicher freigegeben. Das bisherige Bild bleibt erhalten.');\n   const profile=(await c.query('select avatar_url from app_users where id=$1 for update',[s.userId])).rows[0];\n   if(!profile)throw new ApiError(404,'not_found','Profil wurde nicht gefunden.');\n   const canonicalId=String(file.id),target='/api/files/'+canonicalId+'/download';if(profile.avatar_url===target)return {id:canonicalId,alreadyActive:true};\n   if((profile.avatar_url||null)!==expected)throw new ApiError(409,'avatar_changed','Das Profilbild wurde inzwischen geändert. Bitte den aktuellen Stand prüfen.');\n   await c.query('update app_users set avatar_url=$1,updated_at=now() where id=$2',[target,s.userId]);\n   await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'avatar_activated',entityType:'file',entityId:canonicalId});\n   return {id:canonicalId,alreadyActive:false};\n  }"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 21,
+          "arguments": [
+            "`select f.id,f.created_by,f.scan_status,f.purpose,f.content_type from file_objects f join file_contents b on b.file_id=f.id and b.organization_id=f.organization_id where f.id=$1 and f.organization_id=$2 and f.archived_at is null for update of f`",
+            "[id,s.organizationId]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 24,
+          "arguments": [
+            "'select avatar_url from app_users where id=$1 for update'",
+            "[s.userId]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 28,
+          "arguments": [
+            "'update app_users set avatar_url=$1,updated_at=now() where id=$2'",
+            "[target,s.userId]"
+          ]
+        },
+        {
+          "callee": "requireSession",
+          "line": 37,
+          "arguments": []
+        },
+        {
+          "callee": "withTenant",
+          "line": 39,
           "arguments": [
             "s.organizationId",
             "s.userId",
@@ -3067,7 +3106,7 @@
         },
         {
           "callee": "c.query",
-          "line": 16,
+          "line": 40,
           "arguments": [
             "'select * from file_objects where id=$1 and organization_id=$2 for update'",
             "[id,s.organizationId]"
@@ -3075,7 +3114,7 @@
         },
         {
           "callee": "c.query",
-          "line": 21,
+          "line": 45,
           "arguments": [
             "\"update app_users set avatar_url=null,updated_at=now() where id=$1 and avatar_url=$2\"",
             "[s.userId,'/api/files/'+id+'/download']"
@@ -3083,7 +3122,7 @@
         },
         {
           "callee": "c.query",
-          "line": 22,
+          "line": 46,
           "arguments": [
             "'update file_objects set archived_at=now(),archived_by_user_id=$3 where id=$1 and organization_id=$2'",
             "[id,s.organizationId,s.userId]"
@@ -3091,7 +3130,7 @@
         },
         {
           "callee": "authorize",
-          "line": 26,
+          "line": 50,
           "arguments": [
             "s",
             "relation?.write??'documents:write'"
@@ -3099,7 +3138,7 @@
         },
         {
           "callee": "c.query",
-          "line": 31,
+          "line": 55,
           "arguments": [
             "`select * from ${relation.table} where id=$1 and organization_id=$2 for update`",
             "[file[relation.column],s.organizationId]"
@@ -3107,7 +3146,7 @@
         },
         {
           "callee": "c.query",
-          "line": 37,
+          "line": 61,
           "arguments": [
             "'update file_objects set archived_at=now(),archived_by_user_id=$3 where id=$1 and organization_id=$2'",
             "[id,s.organizationId,s.userId]"
@@ -8005,14 +8044,14 @@
         },
         {
           "callee": "apiDelete",
-          "line": 55,
+          "line": 56,
           "arguments": [
             "'/api/files/'+match[1]"
           ]
         },
         {
           "callee": "apiUpload",
-          "line": 56,
+          "line": 61,
           "arguments": [
             "\"/api/files\"",
             "form"
@@ -8020,7 +8059,15 @@
         },
         {
           "callee": "apiPatch",
-          "line": 73,
+          "line": 72,
+          "arguments": [
+            "'/api/files/'+pendingAvatar.id",
+            "{action:'activate_profile_avatar',expectedAvatarUrl:pendingAvatar.expectedUrl}"
+          ]
+        },
+        {
+          "callee": "apiPatch",
+          "line": 93,
           "arguments": [
             "\"/api/settings/profile\"",
             "{firstName,lastName,phone,jobTitle}"
@@ -8028,14 +8075,14 @@
         },
         {
           "callee": "useApiQuery",
-          "line": 122,
+          "line": 143,
           "arguments": [
             "\"/api/settings/company\""
           ]
         },
         {
           "callee": "apiUpload",
-          "line": 152,
+          "line": 173,
           "arguments": [
             "\"/api/files\"",
             "form"
@@ -8043,7 +8090,7 @@
         },
         {
           "callee": "apiPatch",
-          "line": 153,
+          "line": 174,
           "arguments": [
             "\"/api/settings/company\"",
             "{name,uid,street,buildingNumber,postalCode,city,email,phone,...(removeLogo?{logoUrl:\"\"}:{}),completeOnboarding:onboarding}"
@@ -8051,35 +8098,35 @@
         },
         {
           "callee": "apiGet",
-          "line": 222,
+          "line": 243,
           "arguments": [
             "\"/api/settings/subscription\""
           ]
         },
         {
           "callee": "apiGet",
-          "line": 223,
+          "line": 244,
           "arguments": [
             "\"/api/integrations/status\""
           ]
         },
         {
           "callee": "apiGet",
-          "line": 224,
+          "line": 245,
           "arguments": [
             "\"/api/billing/catalog\""
           ]
         },
         {
           "callee": "apiGet",
-          "line": 238,
+          "line": 259,
           "arguments": [
             "\"/api/settings/subscription\""
           ]
         },
         {
           "callee": "apiPost",
-          "line": 257,
+          "line": 278,
           "arguments": [
             "\"/api/billing/checkout\"",
             "{plan:selectedPlan,billing:billingCycle,requestKey:checkoutRequest.current.key,acceptedTerms:acceptedPaidTerms,termsVersion:legalConfig.termsVersion,privacyVersion:legalConfig.privacyVersion}"
@@ -8087,7 +8134,7 @@
         },
         {
           "callee": "apiPost",
-          "line": 269,
+          "line": 290,
           "arguments": [
             "\"/api/billing/portal\"",
             "{}"
@@ -8095,35 +8142,35 @@
         },
         {
           "callee": "apiGet<{items:Array<{kind:string;email:boolean;push:boolean}>}>(\"/api/settings/notifications\").then(data=>setPrefs(current=>{const next={...current};for(const item of data.items)if(next[item.kind])next[item.kind]={email:item.email,push:item.push};return next})).then(()=>setReady(true)).catch",
-          "line": 334,
+          "line": 355,
           "arguments": [
             "()=>setError(\"Einstellungen konnten nicht geladen werden.\")"
           ]
         },
         {
           "callee": "apiGet<{items:Array<{kind:string;email:boolean;push:boolean}>}>(\"/api/settings/notifications\").then(data=>setPrefs(current=>{const next={...current};for(const item of data.items)if(next[item.kind])next[item.kind]={email:item.email,push:item.push};return next})).then",
-          "line": 334,
+          "line": 355,
           "arguments": [
             "()=>setReady(true)"
           ]
         },
         {
           "callee": "apiGet<{items:Array<{kind:string;email:boolean;push:boolean}>}>(\"/api/settings/notifications\").then",
-          "line": 334,
+          "line": 355,
           "arguments": [
             "data=>setPrefs(current=>{const next={...current};for(const item of data.items)if(next[item.kind])next[item.kind]={email:item.email,push:item.push};return next})"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 334,
+          "line": 355,
           "arguments": [
             "\"/api/settings/notifications\""
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 342,
+          "line": 363,
           "arguments": [
             "\"/api/settings/notifications\"",
             "{kind:title,channel,enabled}"
@@ -8131,7 +8178,7 @@
         },
         {
           "callee": "apiPatch",
-          "line": 357,
+          "line": 378,
           "arguments": [
             "\"/api/settings/profile\"",
             "{language:next}"
@@ -12157,7 +12204,7 @@
         },
         {
           "callee": "fetchApi",
-          "line": 132,
+          "line": 133,
           "arguments": [
             "path",
             "{\n    method:\"POST\",\n    headers:{\n      \"Content-Type\":\"application/json\",\n      ...(options.idempotencyKey?{\"Idempotency-Key\":options.idempotencyKey}:{}),\n    },\n    body:JSON.stringify(body),\n  }"
@@ -12165,7 +12212,7 @@
         },
         {
           "callee": "fetchApi",
-          "line": 147,
+          "line": 148,
           "arguments": [
             "path",
             "{method:\"GET\",cache:\"no-store\",credentials:\"same-origin\",redirect:\"error\",headers:{Accept:contentType}}"
@@ -12173,12 +12220,12 @@
         },
         {
           "callee": "(async()=>{\n    const response=await fetchApi(path,{method:\"GET\",cache:\"no-store\",signal:AbortSignal.timeout(15000)});\n    const result=await parseResponse<T>(response,\"Daten konnten nicht geladen werden.\");\n    if(sessionRevision!==dataRevision([]))throw new ClientApiError(\"Die Sitzung wurde geändert. Bitte erneut versuchen.\",\"session_changed\",401);\n    return result;\n  })",
-          "line": 160,
+          "line": 161,
           "arguments": []
         },
         {
           "callee": "fetchApi",
-          "line": 161,
+          "line": 162,
           "arguments": [
             "path",
             "{method:\"GET\",cache:\"no-store\",signal:AbortSignal.timeout(15000)}"
@@ -12186,7 +12233,7 @@
         },
         {
           "callee": "fetchApi",
-          "line": 174,
+          "line": 175,
           "arguments": [
             "path",
             "{method:'POST',...(multipart?{body}:{headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})}"
@@ -12194,7 +12241,7 @@
         },
         {
           "callee": "fetchApi",
-          "line": 182,
+          "line": 183,
           "arguments": [
             "path",
             "{\n    method:\"PATCH\",\n    headers:{\"Content-Type\":\"application/json\"},\n    body:JSON.stringify(body),\n  }"
@@ -12202,7 +12249,7 @@
         },
         {
           "callee": "fetchApi",
-          "line": 192,
+          "line": 193,
           "arguments": [
             "path",
             "{method:\"DELETE\",...(body===undefined?{}:{headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})}"
@@ -12210,7 +12257,7 @@
         },
         {
           "callee": "fetchApi",
-          "line": 207,
+          "line": 208,
           "arguments": [
             "path",
             "{method:\"POST\",body:form,headers}"

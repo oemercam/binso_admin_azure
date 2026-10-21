@@ -62,7 +62,7 @@ export function PrivacyConsent(){
         <span className="eyebrow"><LocalizedText>{"DATENSCHUTZ"}</LocalizedText></span>
         <h2 id="privacy-consent-title"><LocalizedText>{"Datenschutz-Einstellungen"}</LocalizedText></h2>
         <p><LocalizedText>{"Notwendiger Speicher ermöglicht Anmeldung und Einstellungen. Die optionale Performance-Messung verbessert Ladezeiten. Keine Werbung oder Cross-Site-Tracking."}</LocalizedText></p>
-        <Link href="/datenschutz"><LocalizedText>{"Datenschutzerklärung"}</LocalizedText></Link>
+        <Link href="/datenschutz" onClick={()=>setOpen(false)}><LocalizedText>{"Datenschutzerklärung"}</LocalizedText></Link>
       </div>
       {expanded&&<div className="privacy-consent-options">
         <div><span><b><LocalizedText>{"Technisch notwendig"}</LocalizedText></b><small><LocalizedText>{"Für Anmeldung, Sicherheit, Sitzungen und Einstellungen."}</LocalizedText></small></span><strong><LocalizedText>{"Immer aktiv"}</LocalizedText></strong></div>
