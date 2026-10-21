@@ -90,15 +90,16 @@ export default function Login(){
   </section></AuthWorkspace>;
 
   return <AuthWorkspace><section className="auth-card">
-    <h1><LocalizedText>{"Willkommen zurück"}</LocalizedText></h1><p><LocalizedText>{"Melde dich sicher in deinem Binso One Konto an."}</LocalizedText></p>
+    <h1><LocalizedText>{"Willkommen zurück"}</LocalizedText>.</h1><p><LocalizedText>{"Melde dich sicher in deinem Binso One Konto an."}</LocalizedText></p>
+    <PasskeyLogin remember={rememberMe} onAuthenticated={finish} disabled={loading} onBusy={value=>{pending.current=value;setLoading(value)}}/>
+    <div className="auth-divider"><span><LocalizedText>{"oder"}</LocalizedText></span></div>
     <form onSubmit={submitCredentials}>
       <Field label="E-Mail"><Input required value={email} onChange={e=>setEmail(e.target.value)} type="email" inputMode="email" autoComplete="email" placeholder="name@firma.ch"/></Field>
       <Field label="Passwort"><PasswordInput required value={password} onChange={e=>setPassword(e.target.value)} autoComplete="current-password" placeholder="••••••••"/></Field>
       <div className="auth-options"><label><Input type="checkbox" checked={rememberMe} onChange={event=>setRememberMe(event.target.checked)}/><LocalizedText>{"Angemeldet bleiben"}</LocalizedText></label><div className="form-link"><Link href="/passwort-vergessen"><LocalizedText>{"Passwort vergessen?"}</LocalizedText></Link></div></div>
       {error&&<ErrorState className="auth-error"><LocalizedText>{error}</LocalizedText></ErrorState>}
-      <Button type="submit" disabled={loading}><LocalizedText>{loading?"Anmeldung läuft…":"Weiter"}</LocalizedText></Button>
+      <Button type="submit" disabled={loading}><LocalizedText>{loading?"Anmeldung läuft…":"Anmelden"}</LocalizedText></Button>
     </form>
-    <PasskeyLogin remember={rememberMe} onAuthenticated={finish} disabled={loading} onBusy={value=>{pending.current=value;setLoading(value)}}/>
     <p className="auth-bottom"><LocalizedText>{"Noch kein Konto? "}</LocalizedText><Link href="/registrieren"><LocalizedText>{"Konto erstellen"}</LocalizedText></Link></p>
   </section></AuthWorkspace>;
 }

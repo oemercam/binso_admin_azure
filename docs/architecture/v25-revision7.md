@@ -189,3 +189,22 @@ ist lokal durch den fehlenden nativen QA-PostgreSQL blockiert und muss über die
 bestehende CI-Umgebung erfolgen, nicht über eine geschwächte Sessionprüfung.
 
 CI f403d0fb: Build einschliesslich nativem HTTP-/Rollenvertrag, Scanner, UX-Compliance und analyze erfolgreich. Vollständige Tests und Lint bestanden; Checks scheiterte danach ausschliesslich am fehlenden CSS-Owner registration-progress. Die Regel liegt nun im vorhandenen auth.css-Owner; css:check lokal bestanden. Browserjobs wurden nach dem fehlgeschlagenen Checks-Job nicht ausgeführt und bleiben offen. Die zusätzliche Route/Rolle/KPI-Matrix verknüpft tatsächliche Komponenten und Datenquellen; auch sie ist keine ausgeführte fachliche Abnahme.
+
+Identity Kapitel19: Die geerbte Desktop-Werbespalte ist aus dem gemeinsamen
+AuthWorkspace entfernt, nicht lediglich verborgen. Login, Registrierung,
+Bestätigung und Reset behalten denselben Header und die begrenzte zentrale
+Formularspalte. Passkey steht vor den Zugangsdaten; Passwort-/MFA-Handler und
+Sitzungslogik bleiben erhalten. Die eigenständige identity-reference.html ist
+als abgeleitete, nicht zusätzlich visuell freigegebene Referenz gekennzeichnet.
+Vier echte lokale Login-Renders bei320/390/768/1440px bestanden vor dem
+anschliessenden Font-Asset-Paket: 440px-Maximalbreite, Zentrierung,28px-Titel,
+48px-/16px-Felder, kein horizontaler Overflow. Screens bei320/1440px gesichtet.
+Der anschliessende Fontnachweis ist noch erneut auszuführen: Inter war bislang
+nur als Name vorhanden. Unveränderte Inter-v20-Latin-Variable aus Fontsource5.3.0
+mit SIL-OFL wird nun lokal ausgeliefert (48.256Bytes), ohne CDN/Tracking oder
+neue Laufzeitabhängigkeit. Optionaler Fontdisplay-Modus verhindert späten
+Fontwechsel bei langsamer Verbindung; Systemfallback bleibt nutzbar.
+Die Browserprüfung vergleicht Referenz-/Ist-Geometrie und tatsächliches Laden.
+Typecheck, CSS-Architektur, Style-Adversarial, Präsentation und Lokalisierung
+lokal bestanden; neuer CI-/Geräte-/vollständiger Visualnachweis bleibt offen.
+Nachprüfung des Font-Pakets: dieselben vier Breiten bestehen mit tatsächlich geladenem lokalem Inter-Face und erneutem Referenzvergleich (evidence/revision7-identity/font-results.json). Original-Logo in der Referenz wird unverändert eingebettet; kein entfernter Bild-/Fontdienst. Auch diese Prüfung ist Browseremulation, keine physische Geräteabnahme.

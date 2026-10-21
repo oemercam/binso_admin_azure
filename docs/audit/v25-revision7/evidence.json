@@ -8,10 +8,17 @@
       "blocker": "Vollständige Klauselabnahme und reale Geräte fehlen; nicht als vollständig bestanden werten."
     },
     "R7-19-002": {
+      "sourceTextSha256": "d6473927da5ad582a8fd1b57fb78c38df8528d1f6b575a2d45e7fad0a241078c",
       "status": "teilweise_implementiert",
-      "test": "Gezielte Prüfungen: registration-test, profile-image-test, document-presentation-test, pdf-gestures-test, migration-test; letzter Datenbanklauf bestanden.",
-      "visualComparison": "Ausstehend am aktuellen Revision7-Stand",
-      "blocker": "Vollständige Klauselabnahme und reale Geräte fehlen; nicht als vollständig bestanden werten."
+      "implementation": "Gemeinsamer einspaltiger Identity-Owner, Passkey vor Passwort; unabhängige abgeleitete HTML-Referenz vorhanden.",
+      "sourceReferences": [
+        "components/auth-workspace.tsx",
+        "app/login/page.tsx",
+        "docs/audit/v25-revision7/identity-reference.html"
+      ],
+      "test": "Lokale echte Edge-Renders 320/390/768/1440px: zentrierte 440px-Maximalspalte, 28px-Titel,48px-/16px-Eingaben, Passkey-Reihenfolge bestanden; scripts/identity-reference-browser.mjs.",
+      "visualComparison": "Ist/Referenz bei gleichen Breiten gerendert; Screens320/1440 gesichtet. Abgeleitet, keine zusätzliche Original-/Gerätefreigabe.",
+      "blocker": "Aktuelle vollständige Browser-/Dark-/Assistive-Technology-Abnahme und reale Geräte fehlen."
     },
     "R7-20-001": {
       "status": "teilweise_implementiert",
@@ -207,17 +214,27 @@
     },
     "R7-43-011": {
       "sourceTextSha256": "64670a893224a459fbe16930ea9fb8aaac8283883b6332de151acc3e38535082",
-      "status": "teilweise_implementiert",
-      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
-      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
-      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
+      "status": "nicht_implementiert",
+      "implementation": "PDF/CSV/native Freigabe vorhanden; direkte Berichts-E-Mail mit echtem Anhang und befristete widerrufbare Berichtlinks fehlen.",
+      "sourceReferences": [
+        "components/report-actions.tsx",
+        "app/api/reports/route.ts"
+      ],
+      "test": "Keine bestandene Direktmail-/Berichtlinkprüfung; vorhandene Exporttests sind dafür kein Nachweis.",
+      "visualComparison": "Nicht implementierte Aktionen werden nicht als verfügbar beworben.",
+      "blocker": "Sicherer serverseitiger Versand-/Freigabelebenszyklus inklusive Zustellnachweis noch zu implementieren; kein externer Versand freigegeben."
     },
     "R7-43-012": {
       "sourceTextSha256": "e649ea39ba7e878f166b5d1ce5b5b4c82701571f2c8ecfbfa3b0b60b5ca34fda",
-      "status": "teilweise_implementiert",
-      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
-      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
-      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
+      "status": "nicht_implementiert",
+      "implementation": "PDF/CSV/native Freigabe vorhanden; direkte Berichts-E-Mail mit echtem Anhang und befristete widerrufbare Berichtlinks fehlen.",
+      "sourceReferences": [
+        "components/report-actions.tsx",
+        "app/api/reports/route.ts"
+      ],
+      "test": "Keine bestandene Direktmail-/Berichtlinkprüfung; vorhandene Exporttests sind dafür kein Nachweis.",
+      "visualComparison": "Nicht implementierte Aktionen werden nicht als verfügbar beworben.",
+      "blocker": "Sicherer serverseitiger Versand-/Freigabelebenszyklus inklusive Zustellnachweis noch zu implementieren; kein externer Versand freigegeben."
     },
     "R7-43-013": {
       "sourceTextSha256": "15f7661eab570ed043c71e3c706a0410c2c6c13d047b3ae0865ee8a45b8defac",
@@ -239,6 +256,56 @@
       "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
       "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
       "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
+    },
+    "R7-19-014": {
+      "sourceTextSha256": "1f1598905505184582da4c1297c8e5cd406b404074ad8a88276fe8075b66817f",
+      "status": "teilweise_implementiert",
+      "implementation": "Gemeinsamer einspaltiger Identity-Owner, Passkey vor Passwort; unabhängige abgeleitete HTML-Referenz vorhanden.",
+      "sourceReferences": [
+        "components/auth-workspace.tsx",
+        "app/login/page.tsx",
+        "docs/audit/v25-revision7/identity-reference.html"
+      ],
+      "test": "Lokale echte Edge-Renders 320/390/768/1440px: zentrierte 440px-Maximalspalte, 28px-Titel,48px-/16px-Eingaben, Passkey-Reihenfolge bestanden; scripts/identity-reference-browser.mjs.",
+      "visualComparison": "Ist/Referenz bei gleichen Breiten gerendert; Screens320/1440 gesichtet. Abgeleitet, keine zusätzliche Original-/Gerätefreigabe.",
+      "blocker": "Aktuelle vollständige Browser-/Dark-/Assistive-Technology-Abnahme und reale Geräte fehlen."
+    },
+    "R7-19-015": {
+      "sourceTextSha256": "daa7867b056fa4438a1348db9568a7df1a0ce55377961e0b39a8a37b854991f6",
+      "status": "teilweise_implementiert",
+      "implementation": "Gemeinsamer einspaltiger Identity-Owner, Passkey vor Passwort; unabhängige abgeleitete HTML-Referenz vorhanden.",
+      "sourceReferences": [
+        "components/auth-workspace.tsx",
+        "app/login/page.tsx",
+        "docs/audit/v25-revision7/identity-reference.html"
+      ],
+      "test": "Lokale echte Edge-Renders 320/390/768/1440px: zentrierte 440px-Maximalspalte, 28px-Titel,48px-/16px-Eingaben, Passkey-Reihenfolge bestanden; scripts/identity-reference-browser.mjs.",
+      "visualComparison": "Ist/Referenz bei gleichen Breiten gerendert; Screens320/1440 gesichtet. Abgeleitet, keine zusätzliche Original-/Gerätefreigabe.",
+      "blocker": "Aktuelle vollständige Browser-/Dark-/Assistive-Technology-Abnahme und reale Geräte fehlen."
+    },
+    "R7-19-006": {
+      "sourceTextSha256": "60d34016f5974edc6dc78fb3a3b319b568e32d6e42593086b1aa741c47eae719",
+      "status": "teilweise_implementiert",
+      "implementation": "Unveränderte Inter-v20-Latin-Variable lokal mit SIL-OFL; zentraler Theme-Owner, optionaler Fontdisplay und Systemfallback.",
+      "sourceReferences": [
+        "app/design-system/theme.css",
+        "public/fonts/inter/README.md"
+      ],
+      "test": "Tatsächliches geladenes Inter-Face und Referenzgeometrie bei320/390/768/1440px bestanden; CSS-Architektur/Style-Adversarial bestanden.",
+      "visualComparison": "Lokale Screens schmal/breit gesichtet; alle Routen/Schriften/Zoomzustände noch nicht abgenommen.",
+      "blocker": "Appweite visuelle Regression und physische Offline-/Langsamnetz-Abnahme offen."
+    },
+    "R7-19-013": {
+      "sourceTextSha256": "a173e9be35785bf53cc6f20768809e6a0977813086dba03f80552c43a9c0a6d6",
+      "status": "teilweise_implementiert",
+      "implementation": "Unveränderte Inter-v20-Latin-Variable lokal mit SIL-OFL; zentraler Theme-Owner, optionaler Fontdisplay und Systemfallback.",
+      "sourceReferences": [
+        "app/design-system/theme.css",
+        "public/fonts/inter/README.md"
+      ],
+      "test": "Tatsächliches geladenes Inter-Face und Referenzgeometrie bei320/390/768/1440px bestanden; CSS-Architektur/Style-Adversarial bestanden.",
+      "visualComparison": "Lokale Screens schmal/breit gesichtet; alle Routen/Schriften/Zoomzustände noch nicht abgenommen.",
+      "blocker": "Appweite visuelle Regression und physische Offline-/Langsamnetz-Abnahme offen."
     }
   },
   "tests": {
@@ -255,7 +322,7 @@
     "typecheck": "passed",
     "build": "passed",
     "visual": "14 focused Chromium/Edge responsive/light/dark and four-language browser cases passed; no general visual approval",
-    "CI": "not started",
+    "CI": "ea529a5a: checks/build/scanner/analyze successful; ux-compliance still running at last read; browser skipped by existing PR plan. Later identity/font changes require new CI.",
     "scripts/ui-foundation-test.mjs": "passed",
     "scripts/foundation-integration-test.mjs": "passed",
     "scripts/import-table-test.mjs": "passed, including actual XLSX/conditional formatting, rejection paths and original CSV/XLSX row metadata",
@@ -264,7 +331,8 @@
     "importDependencyAudit": "passed; zero reported production advisories after scoped uuid fix",
     "importBuild": "passed",
     "scripts/customer-import-browser-test.mjs": "not executed successfully locally: real UI QA fixture requires native 127.0.0.1:5432, unavailable. Must pass existing Linux/PG CI; no auth bypass.",
-    "importLint": "passed for changed import code"
+    "importLint": "passed for changed import code",
+    "identityReference": "Four actual local Chromium/Edge widths with self-hosted Inter loaded, passkey order and independent derived-reference geometry passed; no physical-device approval."
   },
   "externalBlockers": [
     "Physical installed iOS/Android PWA, keyboard and assistive technology acceptance",

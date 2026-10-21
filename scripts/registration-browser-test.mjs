@@ -1,3 +1,4 @@
+import {assertIdentityReference} from './identity-reference-browser.mjs';
 import {measureCompliance} from './compliance/measure.mjs';
 import {writeTestOutput} from './test-output.mjs';
 import {assertChoiceGeometry} from './form-choice-browser.mjs';
@@ -86,6 +87,7 @@ try{
  for(const width of [390,1440]){
   const context=await browser.newContext({serviceWorkers:'block',viewport:{width,height:740}});await context.addInitScript(()=>localStorage.setItem('binso.privacy.preferences.v1',JSON.stringify({essential:true,performance:false,updatedAt:'2026-10-10'})));const page=await context.newPage();
   await page.goto(base+'/login');const passkey=page.getByRole('button',{name:'Mit Passkey anmelden',exact:true});await passkey.waitFor();assert.equal(await passkey.isVisible(),true,'Real passkey login must be visible on mobile AND desktop');
+  await assertIdentityReference({page,context,width,base,output});
   await page.goto(base+'/passwort-zuruecksetzen?token=synthetic-ui-only-token');const controls=page.locator('.password-field');await controls.first().waitFor();await controls.last().waitFor();assert.equal(await controls.count(),2);
   await controls.first().locator('input').fill('synthetic-reset-password');await controls.first().getByRole('button',{name:'Passwort anzeigen',exact:true}).click();assert.equal(await controls.first().locator('input').getAttribute('type'),'text');assert.equal(await controls.last().locator('input').getAttribute('type'),'password','Each shared password toggle owns its field');await controls.first().getByRole('button',{name:'Passwort ausblenden',exact:true}).click();
   const box=await controls.first().evaluate(el=>({input:el.querySelector('input').getBoundingClientRect().toJSON(),toggle:el.querySelector('button').getBoundingClientRect().toJSON(),overflow:document.documentElement.scrollWidth>innerWidth+1}));assert.equal(box.overflow,false);assert.ok(box.toggle.right<=box.input.right+1&&box.toggle.left>=box.input.left,'Reset visibility control stays inside its field');
