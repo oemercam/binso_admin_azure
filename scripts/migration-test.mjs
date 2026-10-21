@@ -1369,8 +1369,14 @@ try{
   assert.equal((await db.query("select count(*)::int n from audit_events where organization_id=$1 and entity_id=$2 and action='invoice.refund.recorded'",[demo,refund.id])).rows[0].n,1);
   const {cashStatisticsData,financialMetricsData}=await import(financeModule);
   assert.ok((await cashStatisticsData(client,demo)).refunds.some(row=>row.payment_date===refundDate&&Number(row.amount)>=60));
+  const {reportSummary:summaryWithCash}=await import(reportRepoModule),cashPeriod={from:refundDate.slice(0,7)+'-01',to:refundDate};
+  const reportBeforeRefund=(await summaryWithCash(client,session,cashPeriod,'pro')).payments.find(item=>item.currency==='CHF');
   const metricsBefore=await financialMetricsData(client,demo);
   await recordInvoiceRefund(client,session,probe.number,{...refundBody,amount:40},randomUUID());
+  const reportAfterRefund=(await summaryWithCash(client,session,cashPeriod,'pro')).payments.find(item=>item.currency==='CHF');
+  assert.equal(reportAfterRefund.amount,reportBeforeRefund.amount,'Report must preserve gross receipts when recording a refund');
+  assert.equal(Math.round(Number(reportAfterRefund.refund_amount)*100)-Math.round(Number(reportBeforeRefund.refund_amount)*100),4000);
+  assert.equal(Math.round(Number(reportBeforeRefund.net_amount)*100)-Math.round(Number(reportAfterRefund.net_amount)*100),4000,'Net receipt report follows real refund dates instead of adjusting invoiced revenue again');
   const metricsAfter=await financialMetricsData(client,demo);
   assert.equal(Math.round(Number(metricsBefore.snapshot.credit_balance)*100)-Math.round(Number(metricsAfter.snapshot.credit_balance)*100),4000);
   assert.equal(metricsBefore.snapshot.receivables,metricsAfter.snapshot.receivables,'Repaying a credit cannot reopen a settled receivable');

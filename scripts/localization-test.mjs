@@ -32,6 +32,10 @@ assert.equal(locale.translateMessage('Seite 2 von 4','fr'),'Page 2 sur 4');
 assert.equal(locale.translateMessage('Schritt 1 von 3 · Prüfen','it'),'Passaggio 1 di 3 · Verifica');
 assert.equal(locale.translateMessage('Die Datei darf höchstens 10 MB gross sein.','en'),'The file must not exceed 10 MB.');
 const client=compile('lib/client/locale.tsx',{'@/lib/locales':locale});
+const uxAst=ts.createSourceFile('binso-ux.tsx',fs.readFileSync('components/binso-ux.tsx','utf8'),ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
+const metricDeclaration=uxAst.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='MetricTile').getText(uxAst),metricExports={};
+Function('require','exports','useLocale','localeTags','Metric',ts.transpileModule(metricDeclaration,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText)(require,metricExports,client.useLocale,config.localeTags,({value})=>React.createElement('div',null,value));
+for(const language of config.locales){const markup=renderToStaticMarkup(React.createElement(client.LocaleProvider,{initialLocale:language},React.createElement(metricExports.MetricTile,{label:'Fixture',value:1234.5,currency:'CHF'})));assert.ok(markup.replaceAll('&#x27;',"'").includes(new Intl.NumberFormat(config.localeTags[language],{minimumFractionDigits:2,maximumFractionDigits:2}).format(1234.5)),'Shared KPI follows the active locale: '+language+' '+markup);}
 const element=React.createElement;
 for(const [language,label] of [['fr','Factures'],['it','Fatture'],['en','Invoices']]){
  const markup=renderToStaticMarkup(element(client.LocaleProvider,{initialLocale:language},element('main',null,element(client.LocalizedText,null,'Rechnungen'),element(client.LocalizedElement,{as:'input',placeholder:'Kunden suchen...',value:'Rechnungen',readOnly:true}),element('p',null,'Rechnungen'))));

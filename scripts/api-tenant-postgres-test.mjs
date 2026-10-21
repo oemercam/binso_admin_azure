@@ -74,6 +74,8 @@ try{
  const reportRoles=["owner","admin","finance","hr","project_manager","manager","reader"];
  const readContracts=[
   ["/api/reports",reportRoles],
+  ['/api/reports?kind=time',['owner','admin','finance','project_manager','manager']],
+  ['/api/customers/archive',['owner','admin']],
   ['/api/auth/passkeys',roles],
   ['/api/time-entries/options?kind=customers',expenseRoles],
   ['/api/time-entries/options?kind=projects',expenseRoles],
@@ -105,6 +107,7 @@ try{
   await pool.query("insert into workforce_assignments(organization_id,user_id,employee_id,customer_id,project_id,starts_on,created_by_user_id) values($1,$2,$3,$4,$5,'2000-01-01','http-0-owner')",[organizations[0],user,staff.id,linkedProject.customer_id,project.id]);
  }
  const unassigned=(await pool.query("insert into customers(organization_id,external_id,customer_no,name) values($1,'http-unassigned','HTTP-UNASSIGNED','Synthetic unassigned customer') returning id",[organizations[0]])).rows[0];
+ const archivedCustomer=(await pool.query("insert into customers(organization_id,external_id,customer_no,name,archived_at) values($1,'http-archived','HTTP-ARCHIVED','Synthetic archived customer',now()) returning id",[organizations[0]])).rows[0];
  for(const role of ['project_manager','manager','member'])assert.equal((await get('/api/customers/'+unassigned.id,cookies.get('0:'+role))).status,404,role+' cannot read an unassigned customer');
  for(const [path,allowed] of readContracts)for(const role of roles){const r=await get(path,cookies.get('0:'+role));assert.equal(r.status,allowed.includes(role)?200:403,role+' GET '+path+': '+JSON.stringify(r.data));}
  // Workspace access is not accounting access. Keep expectations independent
@@ -162,6 +165,12 @@ try{
   const response=await fetch(base+path,{method,headers:{cookie:cookies.get('0:'+role),origin:base,'Content-Type':'application/json','Idempotency-Key':'v215-'+role+'-'+path.replaceAll('/','-')},body:JSON.stringify(body),signal:AbortSignal.timeout(15000)});
   return {status:response.status,data:await response.json()};
  };
+ const archiveRead=await get('/api/customers/archive',cookies.get('0:owner')),archiveRow=archiveRead.data.items.find(item=>item.id===archivedCustomer.id);assert.ok(archiveRow,'Archived HTTP contract has a positive own-tenant fixture');
+ assert.ok(!(await get('/api/customers/archive',cookies.get('1:owner'))).data.items.some(item=>item.id===archivedCustomer.id),'Archive listing remains tenant-scoped under the runtime role');
+ for(const role of roles.filter(role=>!['owner','admin'].includes(role)))assert.equal((await write('POST','/api/customers/archive',{id:archiveRow.id,revision:archiveRow.revision},role)).status,403,role+' cannot restore a customer');
+ assert.equal((await write('POST','/api/customers/archive',{id:archiveRow.id,revision:'stale'},'owner')).status,409);
+ const restoreHttp=await write('POST','/api/customers/archive',{id:archiveRow.id,revision:archiveRow.revision},'owner');assert.equal(restoreHttp.status,200,JSON.stringify(restoreHttp.data));assert.equal(restoreHttp.data.item.id,archivedCustomer.id);
+ assert.equal((await write('POST','/api/customers/archive',{id:archiveRow.id,revision:archiveRow.revision},'owner')).data.item.restored,false,'HTTP retry does not repeat restoration');
  // Valid independent synthetic payloads exercise successful persistence, not just
  // validation errors. Rejected roles must not change either tenant's row count.
  const customerWriters=['owner','admin','finance'];

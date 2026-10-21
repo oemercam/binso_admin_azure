@@ -69,6 +69,16 @@ Datenbanktests für Export, Status/Zeitraum, Rollen und Übergrössen bestehen.
 Gruppierung nach Kunden-/Auftrags-/Mitarbeiteridentität ist vorbereitet; deren vollständige visuelle Abnahme sowie direkte Berichts-E-Mails, sichere Freigabelinks und der
 vollständige Finanzbericht bleiben offen; Kapitel43 ist nicht vollständig.
 
+Finanzberichte ergänzen nun Rückerstattungen und Netto-Zahlungseingänge getrennt
+vom Bruttoeingang, nach tatsächlichem Buchungsdatum und Währung. Künftige
+Buchungstage zählen nicht als bereits eingegangen. Kein Bankkontostand und keine
+erneute Umsatzkorrektur durch Rückzahlung. Der reale Ledger-Test bestätigt
+unveränderten Bruttoeingang und exakt40CHF Differenz in Rückerstattung/Netto.
+Die bestehende zentrale KPI-Kachel formatiert numerische Währungswerte nach der
+aktiven Profilsprache; SSR-Regression mit echtem LocaleProvider für alle vier
+Sprachen bestanden. Andere alte Display-Formatierer sind damit noch nicht
+pauschal internationalisiert oder vollständig abgenommen.
+
 Support-Paket: Die Kundenprojektion lieferte den rohen Datenbankstatus
 waiting_for_customer, während UI und Operator-API waiting_customer erwarten.
 Zusätzlich fehlte beim Statusfilter das verpflichtende eq.-Präfix. Die zentrale
@@ -124,6 +134,15 @@ Die nachgelagerten lokalen Vertragstests liefen bis zum historischen
 Typografievertrag durch. Dessen vier überholte Werte sind anhand Revision7
 Kapitel20 aktualisiert (15px/600 Buttons,1.3 Titel,1.5 Body); Vertragsprüfung und
 Adversarial-Tests bestehen. Historische Snapshots bleiben unverändert archiviert.
+
+CI d79252de: Kompilierung erfolgreich, der Build-Job scheiterte danach am bewusst
+strengen HTTP-Abdeckungsvertrag für den neuen /api/customers/archive-Endpunkt.
+Unabhängige Owner-/Admin-Erwartung, fremder Mandant, Stale-Revision, erfolgreiche
+Wiederherstellung und Replay sind im nativen HTTP-Test ergänzt; Ausführung dort
+steht mit der nächsten CI noch aus. Checks scheiterte an einem fehlenden
+SystemState-Adapter im isolierten Root-Theme-Test. Dieser verwendet jetzt die
+tatsächliche gemeinsame Fehlerkomponente und zusätzliche Geheimnis-/Referenz-
+Negativfälle; lokale Theme-Prüfung bestanden. Keine Abdeckungsassertion entfernt.
 
 Die optionale Web-Vitals-Implementierung wird nun erst nach ausdrücklichem
 Performance-Opt-in dynamisch geladen. Jeder Versand prüft die aktuelle Zustimmung

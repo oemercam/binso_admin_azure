@@ -13788,5 +13788,20 @@
     "Restore",
     "Restaurer",
     "Ripristina"
+  ],
+  "Zahlungseingänge nach Rückerstattungen": [
+    "Receipts after refunds",
+    "Encaissements après remboursements",
+    "Incassi dopo i rimborsi"
+  ],
+  "Zahlungseingänge nach Rückerstattungen sind kein Bankkontostand.": [
+    "Receipts after refunds are not a bank account balance.",
+    "Les encaissements après remboursements ne constituent pas un solde bancaire.",
+    "Gli incassi dopo i rimborsi non sono un saldo bancario."
+  ],
+  "Zahlungsverkehr": [
+    "Payment activity",
+    "Mouvements de paiement",
+    "Movimenti di pagamento"
   ]
 }

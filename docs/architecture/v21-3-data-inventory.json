@@ -11868,13 +11868,13 @@
           "callee": "c.query",
           "line": 33,
           "arguments": [
-            "`select i.currency,sum(p.amount)::text amount from payments p join invoices i on i.id=p.invoice_id and i.organization_id=p.organization_id where p.organization_id=$1 and p.archived_at is null and p.allocation_status='matched' and p.payment_date between $2::date and $3::date group by i.currency order by i.currency`",
+            "`with movements as (\n  select i.currency,p.amount incoming,0::numeric refunded from payments p join invoices i on i.id=p.invoice_id and i.organization_id=p.organization_id where p.organization_id=$1 and p.archived_at is null and p.allocation_status='matched' and p.payment_date between $2::date and $3::date and p.payment_date<=(now() at time zone 'Europe/Zurich')::date\n  union all select i.currency,0::numeric incoming,r.amount refunded from invoice_refunds r join invoices i on i.id=r.invoice_id and i.organization_id=r.organization_id where r.organization_id=$1 and r.refund_date between $2::date and $3::date and r.refund_date<=(now() at time zone 'Europe/Zurich')::date\n ) select currency,sum(incoming)::text amount,sum(refunded)::text refund_amount,sum(incoming-refunded)::text net_amount from movements group by currency order by currency`",
             "args"
           ]
         },
         {
           "callee": "c.query",
-          "line": 34,
+          "line": 37,
           "arguments": [
             "`select currency,sum(quantity*unit_price)::text amount from expenses where organization_id=$1 and archived_at is null and status in ('approved','posted') and reimbursed_at is not null and (reimbursed_at at time zone 'Europe/Zurich')::date between $2::date and $3::date group by currency order by currency`",
             "args"
@@ -11882,7 +11882,7 @@
         },
         {
           "callee": "c.query",
-          "line": 35,
+          "line": 38,
           "arguments": [
             "`select count(*)::text total,count(*) filter(where active)::text active from employees where organization_id=$1 and archived_at is null`",
             "[s.organizationId]"
