@@ -107,4 +107,3 @@ export function DocumentModal({ title, onClose, pdfNumber, previewDraft, fileUrl
     <div className="document-modal-body">{pdfError?<ErrorState><LocalizedText>{pdfError}</LocalizedText></ErrorState>:pdfBlob?<DocumentPageViewer key={previewJson+String(pdfNumber)} file={pdfBlob} zoomed={zoomed}/>:<LoadingState><LocalizedText>{"PDF wird geladen …"}</LocalizedText></LoadingState>}</div>
   </LocalizedElement>;
 }
-

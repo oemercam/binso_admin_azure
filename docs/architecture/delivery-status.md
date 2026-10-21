@@ -90,4 +90,3 @@ blinde Datenbereinigung, kein automatisches Zurücksetzen der Sicherheitsgrenzen
 Das aktuelle ZIP ist ein Quellcode-Export des benannten Commits, kein ausgeliefertes
 Azure-Artefakt und kein Datenbankbackup. Es enthält Konzepte, Dokumentation und
 Tests, aber keine .env-Dateien, Secrets, node_modules, .next oder privaten Evidence.
-
