@@ -23,6 +23,7 @@ const session=moduleUrl('export async function requireOperatorSession(){return g
 const database=moduleUrl(`import {withPlatform} from ${JSON.stringify(dbModule)};import {listOperatorBusiness} from ${JSON.stringify(repo)};export async function operatorList(table,_select,filters){return withPlatform(c=>listOperatorBusiness(c,globalThis.operatorContractSession,table,filters));}`);
 async function route(file){let source=await read(file);for(const [name,url] of [['operator/session',session],['operator/rbac',authorization],['operator/audit',audit],['db',dbModule],['http',http],['repositories/operator-api',repo],['database',database]])source=source.replaceAll('"@/lib/server/'+name+'"',JSON.stringify(url)).replaceAll("'@/lib/server/"+name+"'",JSON.stringify(url));return import(moduleUrl(source));}
 const accounts=await route('app/api/operator/accounts/[id]/route.ts');
+const preferences=await route('app/api/operator/preferences/route.ts');
 const restrictions=await route('app/api/operator/restrictions/route.ts'),remove=await route('app/api/operator/restrictions/[id]/route.ts'),tickets=await route('app/api/operator/tickets/[id]/route.ts'),messages=await route('app/api/operator/tickets/[id]/messages/route.ts');
 const {NextRequest}=await import('next/server.js');
 const pageModule=moduleUrl((await read('lib/operator-pages.ts')).replace("'./permissions'",JSON.stringify(permissions)));
@@ -48,6 +49,24 @@ try{
  await db.query("insert into organization_subscriptions(organization_id,plan,status) values($1,'starter','active')",[org]);
  globalThis.operatorContractSession={role:'platform_owner',userId:'fixture',email:'fixture@invalid.test'};
  const req=(path,body,method='POST')=>new NextRequest('http://localhost'+path,{method,headers:{origin:'http://localhost','content-type':'application/json'},body:JSON.stringify(body)});
+ const preferenceRoles=['platform_owner','platform_admin','platform_support','platform_billing','platform_auditor'];
+ for(const [index,role] of preferenceRoles.entries()){
+  const id='preference-fixture-'+index;await db.query('insert into platform_operator_assignments(user_id,email,role) values($1,$2,$3)',[id,id+'@example.invalid',role]);
+  globalThis.operatorContractSession={role,userId:id,email:id+'@example.invalid'};
+  assert.equal((await (await preferences.GET()).json()).item.language,null,'Existing identities have no invented preference');
+  for(const language of ['de','fr','it','en']){const result=await preferences.PATCH(req('/api/operator/preferences',{language},'PATCH'));assert.equal(result.status,200);assert.equal((await result.json()).item.language,language);assert.equal((await (await preferences.GET()).json()).item.language,language);}
+  const audits=Number((await db.query("select count(*) n from platform_audit_events where actor_user_id=$1 and action='operator.preference.language'",[id])).rows[0].n);
+  assert.equal((await preferences.PATCH(req('/api/operator/preferences',{language:'en'},'PATCH'))).status,200);assert.equal(Number((await db.query("select count(*) n from platform_audit_events where actor_user_id=$1 and action='operator.preference.language'",[id])).rows[0].n),audits,'An identical repeat does not duplicate audit');
+  for(const body of [null,{},[],{language:'tr'},{language:'FR-ch'},{language:'fr',userId:'other'},{language:'fr',role:'platform_owner'}])assert.equal((await preferences.PATCH(req('/api/operator/preferences',body,'PATCH'))).status,400);
+  assert.equal((await preferences.PATCH(new NextRequest('http://localhost/api/operator/preferences',{method:'PATCH',headers:{origin:'https://foreign.invalid','content-type':'application/json'},body:JSON.stringify({language:'fr'})}))).status,403);
+  failAudit=true;assert.equal((await preferences.PATCH(req('/api/operator/preferences',{language:'fr'},'PATCH'))).status,500);failAudit=false;
+  assert.equal((await (await preferences.GET()).json()).item.language,'en','Failed audit rolls the preference back');assert.equal((await db.query('select role from platform_operator_assignments where user_id=$1',[id])).rows[0].role,role,'Self-service never changes role');
+ }
+ assert.equal((await db.query("select count(*)::int n from platform_operator_assignments where user_id like 'preference-fixture-%' and language='en'")).rows[0].n,preferenceRoles.length,'Each operator changes only their own preference');
+ globalThis.operatorContractSession={role:'platform_owner',userId:'missing-preference-fixture',email:'missing@example.invalid'};assert.equal((await preferences.GET()).status,403);assert.equal((await preferences.PATCH(req('/api/operator/preferences',{language:'fr'},'PATCH'))).status,403);
+ await db.query("update platform_operator_assignments set status='suspended' where user_id='preference-fixture-0'");globalThis.operatorContractSession={role:'platform_owner',userId:'preference-fixture-0',email:'preference-fixture-0@example.invalid'};assert.equal((await preferences.PATCH(req('/api/operator/preferences',{language:'fr'},'PATCH'))).status,403);
+ globalThis.operatorContractSession={role:'platform_owner',userId:'fixture',email:'fixture@invalid.test'};
+ console.log('Operator preference: all5 roles, exact four languages, own identity only, unchanged privileges, cross-origin/extra fields/suspension denial and audit rollback passed. Native session boundary is verified separately.');
  const body={tenantId:org,scope:'all',reason:'Synthetic restriction',note:'Synthetic isolated test'};
  assert.equal((await restrictions.POST(req('/api/operator/restrictions',{...body,endsAt:'2000-01-01'}))).status,400);
  const allResponse=await restrictions.POST(req('/api/operator/restrictions',body));assert.equal(allResponse.status,201);const all=(await allResponse.json()).item;

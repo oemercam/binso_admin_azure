@@ -27,7 +27,7 @@ try{
  globalThis.fetch=async()=>{throw new DOMException('timeout','TimeoutError')};await assert.rejects(cache.readClientSession(),/Sitzungsprüfung dauert zu lange/);
  globalThis.fetch=async()=>new Response(JSON.stringify({authenticated:false}));assert.equal((await cache.readClientSession()).authenticated,false,'A failed check must be retryable');
  const backendSource=(await fs.readFile('lib/client/backend.ts','utf8')).replace('import { useEffect, useState } from "react";','').replace('"./session-cache"',JSON.stringify(cacheUrl)).replace('"./data-events"',JSON.stringify(eventsUrl));
- const backend=await import(moduleUrl(backendSource));
+ const backendUrl=moduleUrl(backendSource),backend=await import(backendUrl);
  assert.equal(backend.startDemoClientSession,undefined,'Demo provisioning is absent');
  assert.equal(backend.isProductionBackendEnabled(),true);
  local.setItem('binso.demo.session','1');local.setItem('binso.demo.database','1');
@@ -82,6 +82,19 @@ try{
  }
  globalThis.fetch=async(path,options)=>{imageKeys.push(options.headers['Idempotency-Key']);return Response.json({item:{id:imageId,scanStatus:'clean',available:true}},{status:201});};assert.equal((await backend.apiUpload('/api/files',form)).item.available,true);assert.equal(new Set(imageKeys).size,1,'Explicit retry keeps the original upload identity');
  console.log('Image upload receipts: explicit availability/verdict/UUID contract before success and preserved retry identity passed.');
+ const languagePreference=await import(moduleUrl((await fs.readFile('lib/client/language-preference.ts','utf8')).replace("'./backend'",JSON.stringify(backendUrl))));
+ for(const locale of ['de','fr','it','en']){
+  for(const response of [null,{ok:true},{item:{language:'unexpected'}},{item:{language:locale+'-CH'}}]){
+   const before=imageEvents.dataRevision(['/api/settings/profile']);globalThis.fetch=async()=>Response.json(response);
+   await assert.rejects(languagePreference.persistLanguagePreference(locale),error=>error.code==='invalid_response');assert.equal(imageEvents.dataRevision(['/api/settings/profile']),before,'Unconfirmed preference never emits a successful profile mutation');
+  }
+  globalThis.fetch=async(path,options)=>{assert.equal(path,'/api/settings/profile');assert.equal(options.method,'PATCH');assert.deepEqual(JSON.parse(options.body),{language:locale});return Response.json({item:{language:locale}})};
+  assert.equal(await languagePreference.persistLanguagePreference(locale),locale);
+ }
+ for(const locale of ['de','fr','it','en']){globalThis.fetch=async(path,options)=>{assert.equal(path,'/api/operator/preferences');assert.deepEqual(JSON.parse(options.body),{language:locale});return Response.json({item:{language:locale}})};assert.equal(await languagePreference.persistLanguagePreference(locale,'operator'),locale);}
+ globalThis.fetch=async()=>Response.json({message:'Storage unavailable'},{status:503});await assert.rejects(languagePreference.persistLanguagePreference('fr'),/Storage unavailable/);
+ let replyLanguage;globalThis.fetch=()=>new Promise(resolve=>{replyLanguage=resolve});const oldLanguage=languagePreference.persistLanguagePreference('it');cache.invalidateClientSession();replyLanguage(Response.json({item:{language:'it'}}));await assert.rejects(oldLanguage,error=>error.code==='session_changed','A response from the previous account cannot change language');
+ console.log('Language preference: exact confirmed profile storage, four languages, no false broadcasts and session-change fence passed.');
 
  const csvHeaders={'Content-Type':'text/csv; charset=utf-8','Content-Disposition':'attachment; filename="binso-fixture.csv"'};
  globalThis.fetch=async(path,options)=>{assert.equal(path,'/api/reports?format=csv');assert.equal(options.cache,'no-store');assert.equal(options.credentials,'same-origin');assert.equal(options.headers.Accept,'text/csv');return new Response('"Metric";"Value"\r\n', {headers:csvHeaders})};

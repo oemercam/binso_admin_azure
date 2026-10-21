@@ -1,11 +1,12 @@
 "use client";
 import {useCallback,useEffect,useRef,useState} from 'react';
 import {readClientSession} from '@/lib/client/session-cache';
-import {draftScope,readProcessDraft,writeProcessDraft,removeProcessDraft} from '@/lib/client/process-draft';
+import {canonicalDraftProcess,draftScope,readProcessDraft,writeProcessDraft,removeProcessDraft} from '@/lib/client/process-draft';
 import {useDataRevision} from '@/lib/client/use-api-query';
 
 /** One recovery owner: identity checked before reading; session fences clear it. */
-export function useProcessDraft<T>({process,value,dirty,enabled,onRestore}:{process:string;value:T;dirty:boolean;enabled:boolean;onRestore:(value:T)=>void}){
+export function useProcessDraft<T>({process:rawProcess,value,dirty,enabled,onRestore}:{process:string;value:T;dirty:boolean;enabled:boolean;onRestore:(value:T)=>void}){
+ const process=canonicalDraftProcess(rawProcess);
  // Query revalidation on focus/visibility is not an identity change. Only the
  // private-session fence can revoke this draft's authenticated ownership.
  const revision=useDataRevision([]);

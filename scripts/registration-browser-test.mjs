@@ -1,3 +1,4 @@
+import {runIndependentChecks} from './independent-checks.mjs';
 import {assertIdentityReference} from './identity-reference-browser.mjs';
 import {measureCompliance} from './compliance/measure.mjs';
 import {writeTestOutput} from './test-output.mjs';
@@ -124,9 +125,13 @@ try{
  await writeTestOutput(path.join(output,'results.json'),JSON.stringify(evidence,null,2));console.log(`Registration and public-offer browser passed: ${evidence.length} responsive/theme and localized workflow cases. Synthetic POST fixtures; real backend integration is separate. Evidence: ${output}`);
 }finally{await browser?.close();server.kill();}
 
-// Additional import interactions reuse the same qualified engine and isolated API fixtures.
-await new Promise((resolve,reject)=>{const child=spawn(process.execPath,['scripts/customer-import-browser-test.mjs'],{stdio:'inherit',env:{...process.env,BINSO_IMPORT_OUTPUT:path.join(output,'imports')}});child.once('error',reject);child.once('exit',code=>code===0?resolve():reject(Error('Customer import browser failed: '+code)));});
-
-await new Promise((resolve,reject)=>{const child=spawn(process.execPath,['scripts/system-state-browser-test.mjs'],{stdio:'inherit',env:{...process.env,BINSO_SYSTEM_STATE_OUTPUT:path.join(output,'system-states')}});child.once('error',reject);child.once('exit',code=>code===0?resolve():reject(Error('System-state browser failed: '+code)));});
-
-await new Promise((resolve,reject)=>{const child=spawn(process.execPath,['scripts/report-summary-browser-test.mjs'],{stdio:'inherit',env:{...process.env,BINSO_REPORT_OUTPUT:path.join(output,'reports')}});child.once('error',reject);child.once('exit',code=>code===0?resolve():reject(Error('Report-summary browser failed: '+code)));});
+// Independent packages run sequentially against the same qualified artifact.
+// Collect every failure, then fail the lane; no omitted or synthetic-green proof.
+await runIndependentChecks([
+ ['customer-import-browser-test.mjs','BINSO_IMPORT_OUTPUT','imports'],
+ ['system-state-browser-test.mjs','BINSO_SYSTEM_STATE_OUTPUT','system-states'],
+ ['report-summary-browser-test.mjs','BINSO_REPORT_OUTPUT','reports'],
+].map(([script,variable,directory])=>({name:script,run:()=>new Promise((resolve,reject)=>{
+ const child=spawn(process.execPath,['scripts/'+script],{stdio:'inherit',env:{...process.env,[variable]:path.join(output,directory)}});
+ child.once('error',reject);child.once('exit',(code,signal)=>code===0?resolve():reject(Error(script+' exited: '+(signal??code))));
+})})));

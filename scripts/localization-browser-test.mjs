@@ -1,4 +1,5 @@
 import {verifyConsentRejection} from './privacy-consent-browser.mjs';
+import {verifyLanguagePreference} from './language-preference-browser.mjs';
 import {createUiAuthFixture} from './ui-auth-fixture.mjs';
 import {selectAppOption,appControlValue} from './app-select-browser.mjs';
 import assert from 'node:assert/strict';
@@ -60,7 +61,8 @@ try{
     await page.screenshot({path:output+'/landing-'+locale+'-'+width+'.png',fullPage:true});
    }
   }
-  assert.deepEqual(faults,[],'No uncaught browser errors');results.push({locale,width,passed:true,cancelledReloadPrefetches});await context.close();
+  await verifyLanguagePreference(page,{base,locale,text});
+  assert.deepEqual(faults,[],'No uncaught browser errors');results.push({locale,width,passed:true,cancelledReloadPrefetches,profilePreference:'failure, pending lock, confirmation, reload and account-menu storage verified'});await context.close();
  }
  await fs.writeFile(output+'/results.json',JSON.stringify(results,null,2),{flag:'wx',mode:0o600});console.log('Four-language landing/customer/operator/404, persistent selection and responsive overflow checks passed.');
 }finally{await browser?.close();server.kill();await uiAuth.close()}

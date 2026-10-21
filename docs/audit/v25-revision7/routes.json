@@ -47,7 +47,59 @@
       "visualEvidence": [],
       "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen",
       "metricSources": [],
-      "apiSources": [],
+      "apiSources": [
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/data-events.ts",
+          "line": 9,
+          "apis": [
+            "/api/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/backend.ts",
+          "line": 79,
+          "apis": [
+            "/api/settings/team",
+            "/api/auth/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/backend.ts",
+          "line": 111,
+          "apis": [
+            "/api/documents",
+            "/api/auth/reauthenticate"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/data-events.ts",
+          "line": 16,
+          "apis": [
+            "/api/workforce-assignments",
+            "/api/settings/team/",
+            "/api/settings/notifications",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        }
+      ],
       "purpose": "Öffentliche Information oder Identity-Prozess; keine dekorativen Geschäftszahlen.",
       "roleExpectations": [
         {
@@ -504,6 +556,16 @@
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
         }
       ],
       "purpose": "Fachobjekt im vorhandenen Formular anlegen.",
@@ -743,6 +805,16 @@
           "line": 6,
           "apis": [
             "/api/time-tracker"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
@@ -1160,6 +1232,16 @@
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
         }
       ],
       "purpose": "Berechtigtes Fachobjekt und kontextbezogene Aktionen.",
@@ -1269,7 +1351,59 @@
       "visualEvidence": [],
       "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen",
       "metricSources": [],
-      "apiSources": [],
+      "apiSources": [
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/data-events.ts",
+          "line": 9,
+          "apis": [
+            "/api/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/backend.ts",
+          "line": 79,
+          "apis": [
+            "/api/settings/team",
+            "/api/auth/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/backend.ts",
+          "line": 111,
+          "apis": [
+            "/api/documents",
+            "/api/auth/reauthenticate"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/data-events.ts",
+          "line": 16,
+          "apis": [
+            "/api/workforce-assignments",
+            "/api/settings/team/",
+            "/api/settings/notifications",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        }
+      ],
       "purpose": "Öffentliche Information oder Identity-Prozess; keine dekorativen Geschäftszahlen.",
       "roleExpectations": [
         {
@@ -1724,6 +1858,16 @@
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
         }
       ],
       "purpose": "Belege erfassen und verwalten.",
@@ -1973,6 +2117,16 @@
           "line": 6,
           "apis": [
             "/api/time-tracker"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
@@ -2532,6 +2686,16 @@
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
         },
         {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
           "owner": "components/report-actions.tsx",
           "line": 10,
           "apis": [
@@ -3058,6 +3222,16 @@
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
         }
       ],
       "purpose": "Deine Geschäftszahlen und nächsten Aufgaben im Blick.",
@@ -3167,7 +3341,59 @@
       "visualEvidence": [],
       "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen",
       "metricSources": [],
-      "apiSources": [],
+      "apiSources": [
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/data-events.ts",
+          "line": 9,
+          "apis": [
+            "/api/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/backend.ts",
+          "line": 79,
+          "apis": [
+            "/api/settings/team",
+            "/api/auth/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/backend.ts",
+          "line": 111,
+          "apis": [
+            "/api/documents",
+            "/api/auth/reauthenticate"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/data-events.ts",
+          "line": 16,
+          "apis": [
+            "/api/workforce-assignments",
+            "/api/settings/team/",
+            "/api/settings/notifications",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        }
+      ],
       "purpose": "Öffentliche Information oder Identity-Prozess; keine dekorativen Geschäftszahlen.",
       "roleExpectations": [
         {
@@ -3305,6 +3531,57 @@
           "line": 18,
           "apis": [
             "/api/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/data-events.ts",
+          "line": 9,
+          "apis": [
+            "/api/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/backend.ts",
+          "line": 79,
+          "apis": [
+            "/api/settings/team",
+            "/api/auth/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/backend.ts",
+          "line": 111,
+          "apis": [
+            "/api/documents",
+            "/api/auth/reauthenticate"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/data-events.ts",
+          "line": 16,
+          "apis": [
+            "/api/workforce-assignments",
+            "/api/settings/team/",
+            "/api/settings/notifications",
+            "/api/settings/profile"
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
@@ -3453,6 +3730,16 @@
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
         }
       ],
       "purpose": "Öffentliche Information oder Identity-Prozess; keine dekorativen Geschäftszahlen.",
@@ -3529,7 +3816,7 @@
       "apiSources": [
         {
           "owner": "components/pages/settings.tsx",
-          "line": 213,
+          "line": 214,
           "apis": [
             "/api/settings/subscription",
             "/api/integrations/status",
@@ -3666,6 +3953,16 @@
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
         }
       ],
       "purpose": "Plan, Nutzung und Abrechnung verwalten.",
@@ -3784,7 +4081,7 @@
       "apiSources": [
         {
           "owner": "components/pages/settings.tsx",
-          "line": 340,
+          "line": 343,
           "apis": [
             "/api/settings/notifications"
           ],
@@ -3914,6 +4211,16 @@
           "line": 6,
           "apis": [
             "/api/time-tracker"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
@@ -4159,6 +4466,16 @@
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
         }
       ],
       "purpose": "Light-, Dark- oder Systemdarstellung wählen.",
@@ -4398,6 +4715,16 @@
           "line": 6,
           "apis": [
             "/api/time-tracker"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
@@ -4652,6 +4979,16 @@
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
         }
       ],
       "purpose": "Vorgaben für Rechnungen und Dokumente festlegen.",
@@ -4770,7 +5107,7 @@
       "apiSources": [
         {
           "owner": "components/pages/settings.tsx",
-          "line": 127,
+          "line": 128,
           "apis": [
             "/api/settings/company",
             "/api/files",
@@ -4905,6 +5242,16 @@
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
         }
       ],
       "purpose": "Unternehmensdaten für Dokumente und Kommunikation pflegen.",
@@ -5023,7 +5370,7 @@
       "apiSources": [
         {
           "owner": "components/pages/settings.tsx",
-          "line": 34,
+          "line": 35,
           "apis": [
             "/api/settings/profile",
             "/api/files/",
@@ -5155,6 +5502,16 @@
           "line": 6,
           "apis": [
             "/api/time-tracker"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
@@ -5397,6 +5754,16 @@
           "line": 6,
           "apis": [
             "/api/time-tracker"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
@@ -5658,6 +6025,16 @@
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
         },
         {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
           "owner": "components/passkey-settings.tsx",
           "line": 9,
           "apis": [
@@ -5911,9 +6288,10 @@
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
         },
         {
-          "owner": "components/pages/settings.tsx",
-          "line": 375,
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
           "apis": [
+            "/api/operator/preferences",
             "/api/settings/profile"
           ],
           "collections": [],
@@ -6169,6 +6547,16 @@
           "line": 6,
           "apis": [
             "/api/time-tracker"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
@@ -6443,6 +6831,16 @@
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
         }
       ],
       "purpose": "Vorgaben für die Zeiterfassung festlegen.",
@@ -6567,6 +6965,57 @@
           "line": 2,
           "apis": [
             "/api/auth/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/data-events.ts",
+          "line": 9,
+          "apis": [
+            "/api/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/backend.ts",
+          "line": 79,
+          "apis": [
+            "/api/settings/team",
+            "/api/auth/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/backend.ts",
+          "line": 111,
+          "apis": [
+            "/api/documents",
+            "/api/auth/reauthenticate"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/data-events.ts",
+          "line": 16,
+          "apis": [
+            "/api/workforce-assignments",
+            "/api/settings/team/",
+            "/api/settings/notifications",
+            "/api/settings/profile"
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
@@ -6975,6 +7424,16 @@
           "line": 6,
           "apis": [
             "/api/time-tracker"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
@@ -7476,6 +7935,16 @@
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
         }
       ],
       "purpose": "Umsatz, offene Forderungen und Zahlungen im Blick.",
@@ -7585,7 +8054,59 @@
       "visualEvidence": [],
       "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen",
       "metricSources": [],
-      "apiSources": [],
+      "apiSources": [
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/data-events.ts",
+          "line": 9,
+          "apis": [
+            "/api/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/backend.ts",
+          "line": 79,
+          "apis": [
+            "/api/settings/team",
+            "/api/auth/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/backend.ts",
+          "line": 111,
+          "apis": [
+            "/api/documents",
+            "/api/auth/reauthenticate"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/data-events.ts",
+          "line": 16,
+          "apis": [
+            "/api/workforce-assignments",
+            "/api/settings/team/",
+            "/api/settings/notifications",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        }
+      ],
       "purpose": "Öffentliche Information oder Identity-Prozess; keine dekorativen Geschäftszahlen.",
       "roleExpectations": [
         {
@@ -7792,6 +8313,16 @@
           "line": 6,
           "apis": [
             "/api/time-tracker"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
@@ -8145,6 +8676,16 @@
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
         },
         {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
           "owner": "components/customer-import.tsx",
           "line": 17,
           "apis": [
@@ -8412,6 +8953,16 @@
           "line": 6,
           "apis": [
             "/api/time-tracker"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
@@ -8965,6 +9516,16 @@
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
         },
         {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
           "owner": "components/customer-import.tsx",
           "line": 17,
           "apis": [
@@ -9134,11 +9695,11 @@
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
         },
         {
-          "owner": "components/passkey-login.tsx",
-          "line": 8,
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
           "apis": [
-            "/api/auth/passkeys/options",
-            "/api/auth/passkeys/verify"
+            "/api/operator/preferences",
+            "/api/settings/profile"
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
@@ -9180,6 +9741,16 @@
             "/api/settings/team/",
             "/api/settings/notifications",
             "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "components/passkey-login.tsx",
+          "line": 8,
+          "apis": [
+            "/api/auth/passkeys/options",
+            "/api/auth/passkeys/verify"
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
@@ -9393,6 +9964,16 @@
           "line": 6,
           "apis": [
             "/api/time-tracker"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
@@ -9660,6 +10241,16 @@
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
         }
       ],
       "purpose": "Mitarbeiter und ihre Geschäftsdaten verwalten.",
@@ -9917,6 +10508,16 @@
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
         },
         {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
           "owner": "components/entity-files.tsx",
           "line": 18,
           "apis": [
@@ -10046,7 +10647,59 @@
       "visualEvidence": [],
       "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen",
       "metricSources": [],
-      "apiSources": [],
+      "apiSources": [
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/data-events.ts",
+          "line": 9,
+          "apis": [
+            "/api/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/backend.ts",
+          "line": 79,
+          "apis": [
+            "/api/settings/team",
+            "/api/auth/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/backend.ts",
+          "line": 111,
+          "apis": [
+            "/api/documents",
+            "/api/auth/reauthenticate"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/data-events.ts",
+          "line": 16,
+          "apis": [
+            "/api/workforce-assignments",
+            "/api/settings/team/",
+            "/api/settings/notifications",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        }
+      ],
       "purpose": "Öffentliche Information oder Identity-Prozess; keine dekorativen Geschäftszahlen.",
       "roleExpectations": [
         {
@@ -10183,7 +10836,7 @@
       "metricSources": [
         {
           "owner": "components/operator.tsx",
-          "line": 363,
+          "line": 367,
           "component": "Metric",
           "props": [
             "label=\"Plan\"",
@@ -10224,7 +10877,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 363,
+          "line": 367,
           "component": "Metric",
           "props": [
             "label=\"Benutzer\"",
@@ -10265,7 +10918,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 363,
+          "line": 367,
           "component": "Metric",
           "props": [
             "label=\"Offene Tickets\"",
@@ -10306,7 +10959,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 363,
+          "line": 367,
           "component": "Metric",
           "props": [
             "label=\"Kundenzahlungen\"",
@@ -10347,7 +11000,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 375,
+          "line": 379,
           "component": "MetricTile",
           "props": [
             "label={label}",
@@ -10374,7 +11027,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 475,
+          "line": 479,
           "component": "MetricTile",
           "props": [
             "key={group.plan}",
@@ -10500,7 +11153,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 221,
+          "line": 225,
           "component": "MetricTile",
           "props": [
             "key={String(label)}",
@@ -10526,7 +11179,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 221,
+          "line": 225,
           "component": "MetricTile",
           "props": [
             "label={String(label)}",
@@ -10550,7 +11203,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 224,
+          "line": 228,
           "component": "MetricTile",
           "props": [
             "label=\"Zahlungen letzte 30 Tage\"",
@@ -10574,7 +11227,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 224,
+          "line": 228,
           "component": "MetricTile",
           "props": [
             "label=\"Monatlicher Vertragswert\"",
@@ -10598,7 +11251,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 224,
+          "line": 228,
           "component": "RingChart",
           "props": [
             "label=\"Offen / in Bearbeitung / gelöst\"",
@@ -10624,10 +11277,10 @@
       ],
       "apiSources": [
         {
-          "owner": "lib/client/backend.ts",
-          "line": 46,
+          "owner": "components/operator.tsx",
+          "line": 123,
           "apis": [
-            "/api/operator/logout"
+            "/api/operator/preferences"
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
@@ -10637,56 +11290,6 @@
           "line": 9,
           "apis": [
             "/api/"
-          ],
-          "collections": [],
-          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
-        },
-        {
-          "owner": "lib/client/backend.ts",
-          "line": 79,
-          "apis": [
-            "/api/settings/team",
-            "/api/auth/"
-          ],
-          "collections": [],
-          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
-        },
-        {
-          "owner": "lib/client/backend.ts",
-          "line": 111,
-          "apis": [
-            "/api/documents",
-            "/api/auth/reauthenticate"
-          ],
-          "collections": [],
-          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
-        },
-        {
-          "owner": "lib/client/data-events.ts",
-          "line": 16,
-          "apis": [
-            "/api/workforce-assignments",
-            "/api/settings/team/",
-            "/api/settings/notifications",
-            "/api/settings/profile"
-          ],
-          "collections": [],
-          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
-        },
-        {
-          "owner": "components/binso-ux.tsx",
-          "line": 18,
-          "apis": [
-            "/api/"
-          ],
-          "collections": [],
-          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
-        },
-        {
-          "owner": "components/operator.tsx",
-          "line": 241,
-          "apis": [
-            "/api/operator/tickets/"
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
@@ -10719,8 +11322,77 @@
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
         },
         {
+          "owner": "lib/client/backend.ts",
+          "line": 79,
+          "apis": [
+            "/api/settings/team",
+            "/api/auth/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/backend.ts",
+          "line": 46,
+          "apis": [
+            "/api/operator/logout"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/backend.ts",
+          "line": 111,
+          "apis": [
+            "/api/documents",
+            "/api/auth/reauthenticate"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/data-events.ts",
+          "line": 16,
+          "apis": [
+            "/api/workforce-assignments",
+            "/api/settings/team/",
+            "/api/settings/notifications",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "components/binso-ux.tsx",
+          "line": 18,
+          "apis": [
+            "/api/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
           "owner": "components/operator.tsx",
-          "line": 329,
+          "line": 245,
+          "apis": [
+            "/api/operator/tickets/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "components/operator.tsx",
+          "line": 333,
           "apis": [
             "/api/operator/customers/"
           ],
@@ -10729,7 +11401,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 101,
+          "line": 102,
           "apis": [
             "/api/operator/tickets"
           ],
@@ -10738,7 +11410,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 111,
+          "line": 112,
           "apis": [
             "/api/operator/customers"
           ],
@@ -10747,7 +11419,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 401,
+          "line": 405,
           "apis": [
             "/api/operator/payments"
           ],
@@ -10756,7 +11428,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 380,
+          "line": 384,
           "apis": [
             "/api/operator/finance"
           ],
@@ -10765,7 +11437,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 439,
+          "line": 443,
           "apis": [
             "/api/operator/accounts",
             "/api/operator/accounts/"
@@ -10775,7 +11447,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 484,
+          "line": 488,
           "apis": [
             "/api/operator/restrictions",
             "/api/operator/restrictions/"
@@ -10803,7 +11475,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 557,
+          "line": 561,
           "apis": [
             "/api/operator/announcements"
           ],
@@ -10812,7 +11484,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 612,
+          "line": 616,
           "apis": [
             "/api/operator/users"
           ],
@@ -10821,7 +11493,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 641,
+          "line": 645,
           "apis": [
             "/api/operator/audit"
           ],
@@ -10830,7 +11502,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 198,
+          "line": 202,
           "apis": [
             "/api/operator/dashboard"
           ],
@@ -11197,7 +11869,7 @@
       "metricSources": [
         {
           "owner": "components/operator.tsx",
-          "line": 363,
+          "line": 367,
           "component": "Metric",
           "props": [
             "label=\"Plan\"",
@@ -11238,7 +11910,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 363,
+          "line": 367,
           "component": "Metric",
           "props": [
             "label=\"Benutzer\"",
@@ -11279,7 +11951,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 363,
+          "line": 367,
           "component": "Metric",
           "props": [
             "label=\"Offene Tickets\"",
@@ -11320,7 +11992,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 363,
+          "line": 367,
           "component": "Metric",
           "props": [
             "label=\"Kundenzahlungen\"",
@@ -11361,7 +12033,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 375,
+          "line": 379,
           "component": "MetricTile",
           "props": [
             "label={label}",
@@ -11388,7 +12060,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 475,
+          "line": 479,
           "component": "MetricTile",
           "props": [
             "key={group.plan}",
@@ -11514,7 +12186,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 221,
+          "line": 225,
           "component": "MetricTile",
           "props": [
             "key={String(label)}",
@@ -11540,7 +12212,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 221,
+          "line": 225,
           "component": "MetricTile",
           "props": [
             "label={String(label)}",
@@ -11564,7 +12236,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 224,
+          "line": 228,
           "component": "MetricTile",
           "props": [
             "label=\"Zahlungen letzte 30 Tage\"",
@@ -11588,7 +12260,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 224,
+          "line": 228,
           "component": "MetricTile",
           "props": [
             "label=\"Monatlicher Vertragswert\"",
@@ -11612,7 +12284,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 224,
+          "line": 228,
           "component": "RingChart",
           "props": [
             "label=\"Offen / in Bearbeitung / gelöst\"",
@@ -11638,10 +12310,10 @@
       ],
       "apiSources": [
         {
-          "owner": "lib/client/backend.ts",
-          "line": 46,
+          "owner": "components/operator.tsx",
+          "line": 123,
           "apis": [
-            "/api/operator/logout"
+            "/api/operator/preferences"
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
@@ -11651,56 +12323,6 @@
           "line": 9,
           "apis": [
             "/api/"
-          ],
-          "collections": [],
-          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
-        },
-        {
-          "owner": "lib/client/backend.ts",
-          "line": 79,
-          "apis": [
-            "/api/settings/team",
-            "/api/auth/"
-          ],
-          "collections": [],
-          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
-        },
-        {
-          "owner": "lib/client/backend.ts",
-          "line": 111,
-          "apis": [
-            "/api/documents",
-            "/api/auth/reauthenticate"
-          ],
-          "collections": [],
-          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
-        },
-        {
-          "owner": "lib/client/data-events.ts",
-          "line": 16,
-          "apis": [
-            "/api/workforce-assignments",
-            "/api/settings/team/",
-            "/api/settings/notifications",
-            "/api/settings/profile"
-          ],
-          "collections": [],
-          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
-        },
-        {
-          "owner": "components/binso-ux.tsx",
-          "line": 18,
-          "apis": [
-            "/api/"
-          ],
-          "collections": [],
-          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
-        },
-        {
-          "owner": "components/operator.tsx",
-          "line": 241,
-          "apis": [
-            "/api/operator/tickets/"
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
@@ -11733,8 +12355,77 @@
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
         },
         {
+          "owner": "lib/client/backend.ts",
+          "line": 79,
+          "apis": [
+            "/api/settings/team",
+            "/api/auth/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/backend.ts",
+          "line": 46,
+          "apis": [
+            "/api/operator/logout"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/backend.ts",
+          "line": 111,
+          "apis": [
+            "/api/documents",
+            "/api/auth/reauthenticate"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/data-events.ts",
+          "line": 16,
+          "apis": [
+            "/api/workforce-assignments",
+            "/api/settings/team/",
+            "/api/settings/notifications",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "components/binso-ux.tsx",
+          "line": 18,
+          "apis": [
+            "/api/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
           "owner": "components/operator.tsx",
-          "line": 329,
+          "line": 245,
+          "apis": [
+            "/api/operator/tickets/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "components/operator.tsx",
+          "line": 333,
           "apis": [
             "/api/operator/customers/"
           ],
@@ -11743,7 +12434,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 101,
+          "line": 102,
           "apis": [
             "/api/operator/tickets"
           ],
@@ -11752,7 +12443,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 111,
+          "line": 112,
           "apis": [
             "/api/operator/customers"
           ],
@@ -11761,7 +12452,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 401,
+          "line": 405,
           "apis": [
             "/api/operator/payments"
           ],
@@ -11770,7 +12461,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 380,
+          "line": 384,
           "apis": [
             "/api/operator/finance"
           ],
@@ -11779,7 +12470,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 439,
+          "line": 443,
           "apis": [
             "/api/operator/accounts",
             "/api/operator/accounts/"
@@ -11789,7 +12480,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 484,
+          "line": 488,
           "apis": [
             "/api/operator/restrictions",
             "/api/operator/restrictions/"
@@ -11817,7 +12508,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 557,
+          "line": 561,
           "apis": [
             "/api/operator/announcements"
           ],
@@ -11826,7 +12517,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 612,
+          "line": 616,
           "apis": [
             "/api/operator/users"
           ],
@@ -11835,7 +12526,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 641,
+          "line": 645,
           "apis": [
             "/api/operator/audit"
           ],
@@ -11844,7 +12535,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 198,
+          "line": 202,
           "apis": [
             "/api/operator/dashboard"
           ],
@@ -11938,7 +12629,59 @@
       "visualEvidence": [],
       "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen",
       "metricSources": [],
-      "apiSources": [],
+      "apiSources": [
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/data-events.ts",
+          "line": 9,
+          "apis": [
+            "/api/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/backend.ts",
+          "line": 79,
+          "apis": [
+            "/api/settings/team",
+            "/api/auth/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/backend.ts",
+          "line": 111,
+          "apis": [
+            "/api/documents",
+            "/api/auth/reauthenticate"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/data-events.ts",
+          "line": 16,
+          "apis": [
+            "/api/workforce-assignments",
+            "/api/settings/team/",
+            "/api/settings/notifications",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        }
+      ],
       "purpose": "Öffentliche Information oder Identity-Prozess; keine dekorativen Geschäftszahlen.",
       "roleExpectations": [
         {
@@ -12019,6 +12762,57 @@
           "line": 2,
           "apis": [
             "/api/auth/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/data-events.ts",
+          "line": 9,
+          "apis": [
+            "/api/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/backend.ts",
+          "line": 79,
+          "apis": [
+            "/api/settings/team",
+            "/api/auth/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/backend.ts",
+          "line": 111,
+          "apis": [
+            "/api/documents",
+            "/api/auth/reauthenticate"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/data-events.ts",
+          "line": 16,
+          "apis": [
+            "/api/workforce-assignments",
+            "/api/settings/team/",
+            "/api/settings/notifications",
+            "/api/settings/profile"
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
@@ -12104,6 +12898,57 @@
           "line": 2,
           "apis": [
             "/api/auth/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/data-events.ts",
+          "line": 9,
+          "apis": [
+            "/api/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/backend.ts",
+          "line": 79,
+          "apis": [
+            "/api/settings/team",
+            "/api/auth/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/backend.ts",
+          "line": 111,
+          "apis": [
+            "/api/documents",
+            "/api/auth/reauthenticate"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/data-events.ts",
+          "line": 16,
+          "apis": [
+            "/api/workforce-assignments",
+            "/api/settings/team/",
+            "/api/settings/notifications",
+            "/api/settings/profile"
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
@@ -12372,7 +13217,59 @@
       "visualEvidence": [],
       "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen",
       "metricSources": [],
-      "apiSources": [],
+      "apiSources": [
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/data-events.ts",
+          "line": 9,
+          "apis": [
+            "/api/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/backend.ts",
+          "line": 79,
+          "apis": [
+            "/api/settings/team",
+            "/api/auth/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/backend.ts",
+          "line": 111,
+          "apis": [
+            "/api/documents",
+            "/api/auth/reauthenticate"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/data-events.ts",
+          "line": 16,
+          "apis": [
+            "/api/workforce-assignments",
+            "/api/settings/team/",
+            "/api/settings/notifications",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        }
+      ],
       "purpose": "Öffentliche Information oder Identity-Prozess; keine dekorativen Geschäftszahlen.",
       "roleExpectations": [
         {
@@ -12636,7 +13533,59 @@
       "visualEvidence": [],
       "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen",
       "metricSources": [],
-      "apiSources": [],
+      "apiSources": [
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/data-events.ts",
+          "line": 9,
+          "apis": [
+            "/api/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/backend.ts",
+          "line": 79,
+          "apis": [
+            "/api/settings/team",
+            "/api/auth/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/backend.ts",
+          "line": 111,
+          "apis": [
+            "/api/documents",
+            "/api/auth/reauthenticate"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/data-events.ts",
+          "line": 16,
+          "apis": [
+            "/api/workforce-assignments",
+            "/api/settings/team/",
+            "/api/settings/notifications",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        }
+      ],
       "purpose": "Öffentliche Information oder Identity-Prozess; keine dekorativen Geschäftszahlen.",
       "roleExpectations": [
         {
@@ -12843,6 +13792,16 @@
           "line": 6,
           "apis": [
             "/api/time-tracker"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
@@ -13085,6 +14044,16 @@
           "line": 6,
           "apis": [
             "/api/time-tracker"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
@@ -13341,6 +14310,16 @@
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
         }
       ],
       "purpose": "Berechtigtes Fachobjekt und kontextbezogene Aktionen.",
@@ -13594,6 +14573,16 @@
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
         }
       ],
       "purpose": "Fachobjekt im vorhandenen Formular anlegen.",
@@ -13842,6 +14831,16 @@
           "line": 6,
           "apis": [
             "/api/time-tracker"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
@@ -14158,6 +15157,16 @@
           "line": 6,
           "apis": [
             "/api/time-tracker"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
@@ -14575,6 +15584,16 @@
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
         }
       ],
       "purpose": "Fachobjekt im vorhandenen Formular anlegen.",
@@ -14814,6 +15833,16 @@
           "line": 6,
           "apis": [
             "/api/time-tracker"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
@@ -15231,6 +16260,16 @@
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
         }
       ],
       "purpose": "Berechtigtes Fachobjekt und kontextbezogene Aktionen.",
@@ -15358,6 +16397,57 @@
           "line": 2,
           "apis": [
             "/api/auth/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/data-events.ts",
+          "line": 9,
+          "apis": [
+            "/api/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/backend.ts",
+          "line": 79,
+          "apis": [
+            "/api/settings/team",
+            "/api/auth/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/backend.ts",
+          "line": 111,
+          "apis": [
+            "/api/documents",
+            "/api/auth/reauthenticate"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/data-events.ts",
+          "line": 16,
+          "apis": [
+            "/api/workforce-assignments",
+            "/api/settings/team/",
+            "/api/settings/notifications",
+            "/api/settings/profile"
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
@@ -15575,6 +16665,16 @@
           "line": 6,
           "apis": [
             "/api/time-tracker"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
@@ -15826,6 +16926,16 @@
           "line": 6,
           "apis": [
             "/api/time-tracker"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
@@ -16090,6 +17200,16 @@
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
         },
         {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
           "owner": "lib/directory-query.ts",
           "line": 2,
           "apis": [
@@ -16349,6 +17469,16 @@
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
         }
       ],
       "purpose": "Fachobjekt im vorhandenen Formular anlegen.",
@@ -16597,6 +17727,16 @@
           "line": 6,
           "apis": [
             "/api/time-tracker"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
@@ -16854,6 +17994,16 @@
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
         }
       ],
       "purpose": "Berechtigtes Fachobjekt und kontextbezogene Aktionen.",
@@ -16963,7 +18113,59 @@
       "visualEvidence": [],
       "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen",
       "metricSources": [],
-      "apiSources": [],
+      "apiSources": [
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/data-events.ts",
+          "line": 9,
+          "apis": [
+            "/api/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/backend.ts",
+          "line": 79,
+          "apis": [
+            "/api/settings/team",
+            "/api/auth/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/backend.ts",
+          "line": 111,
+          "apis": [
+            "/api/documents",
+            "/api/auth/reauthenticate"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/data-events.ts",
+          "line": 16,
+          "apis": [
+            "/api/workforce-assignments",
+            "/api/settings/team/",
+            "/api/settings/notifications",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        }
+      ],
       "purpose": "Öffentliche Information oder Identity-Prozess; keine dekorativen Geschäftszahlen.",
       "roleExpectations": [
         {
@@ -17029,7 +18231,59 @@
       "visualEvidence": [],
       "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen",
       "metricSources": [],
-      "apiSources": [],
+      "apiSources": [
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/data-events.ts",
+          "line": 9,
+          "apis": [
+            "/api/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/backend.ts",
+          "line": 79,
+          "apis": [
+            "/api/settings/team",
+            "/api/auth/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/backend.ts",
+          "line": 111,
+          "apis": [
+            "/api/documents",
+            "/api/auth/reauthenticate"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/data-events.ts",
+          "line": 16,
+          "apis": [
+            "/api/workforce-assignments",
+            "/api/settings/team/",
+            "/api/settings/notifications",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        }
+      ],
       "purpose": "Öffentliche Information oder Identity-Prozess; keine dekorativen Geschäftszahlen.",
       "roleExpectations": [
         {
@@ -17355,6 +18609,16 @@
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
         },
         {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
           "owner": "lib/directory-query.ts",
           "line": 2,
           "apis": [
@@ -17601,6 +18865,16 @@
           "line": 6,
           "apis": [
             "/api/time-tracker"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
@@ -17852,6 +19126,16 @@
           "line": 6,
           "apis": [
             "/api/time-tracker"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
@@ -18169,6 +19453,16 @@
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
         }
       ],
       "purpose": "Arbeitszeiten erfassen und Einträge verwalten.",
@@ -18429,7 +19723,7 @@
       "metricSources": [
         {
           "owner": "components/operator.tsx",
-          "line": 375,
+          "line": 379,
           "component": "MetricTile",
           "props": [
             "label={label}",
@@ -18515,7 +19809,7 @@
       "metricSources": [
         {
           "owner": "components/operator.tsx",
-          "line": 375,
+          "line": 379,
           "component": "MetricTile",
           "props": [
             "label={label}",
@@ -18601,7 +19895,7 @@
       "metricSources": [
         {
           "owner": "components/operator.tsx",
-          "line": 475,
+          "line": 479,
           "component": "MetricTile",
           "props": [
             "key={group.plan}",
@@ -18953,7 +20247,7 @@
       "metricSources": [
         {
           "owner": "components/operator.tsx",
-          "line": 221,
+          "line": 225,
           "component": "MetricTile",
           "props": [
             "key={String(label)}",
@@ -18964,7 +20258,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 221,
+          "line": 225,
           "component": "MetricTile",
           "props": [
             "label={String(label)}",
@@ -18973,7 +20267,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 224,
+          "line": 228,
           "component": "MetricTile",
           "props": [
             "label=\"Zahlungen letzte 30 Tage\"",
@@ -18982,7 +20276,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 224,
+          "line": 228,
           "component": "MetricTile",
           "props": [
             "label=\"Monatlicher Vertragswert\"",
@@ -18991,7 +20285,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 224,
+          "line": 228,
           "component": "RingChart",
           "props": [
             "label=\"Offen / in Bearbeitung / gelöst\"",
@@ -19144,7 +20438,7 @@
       "metricSources": [
         {
           "owner": "components/operator.tsx",
-          "line": 363,
+          "line": 367,
           "component": "Metric",
           "props": [
             "label=\"Plan\"",
@@ -19155,7 +20449,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 363,
+          "line": 367,
           "component": "Metric",
           "props": [
             "label=\"Benutzer\"",
@@ -19166,7 +20460,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 363,
+          "line": 367,
           "component": "Metric",
           "props": [
             "label=\"Offene Tickets\"",
@@ -19177,7 +20471,7 @@
         },
         {
           "owner": "components/operator.tsx",
-          "line": 363,
+          "line": 367,
           "component": "Metric",
           "props": [
             "label=\"Kundenzahlungen\"",
@@ -19347,6 +20641,7 @@
     "app/api/operator/maintenance/route.ts",
     "app/api/operator/monitoring/route.ts",
     "app/api/operator/payments/route.ts",
+    "app/api/operator/preferences/route.ts",
     "app/api/operator/restrictions/route.ts",
     "app/api/operator/restrictions/[id]/route.ts",
     "app/api/operator/sso/callback/route.ts",
@@ -19454,6 +20749,7 @@
     "database/migrations/0067_scoped_fresh_authentication.sql",
     "database/migrations/0068_offer_versions_and_public_responses.sql",
     "database/migrations/0069_attachment_archival.sql",
-    "database/migrations/0070_issued_invoice_pdf.sql"
+    "database/migrations/0070_issued_invoice_pdf.sql",
+    "database/migrations/0071_operator_language_preference.sql"
   ]
 }

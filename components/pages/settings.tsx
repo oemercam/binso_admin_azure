@@ -6,7 +6,8 @@ import {useBrowserBackGuard,allowDraftNavigation} from "../use-browser-back-guar
 import ConfirmDialog from "../confirm-dialog";
 import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
 import {useLocale} from "@/lib/client/locale";
-import {asLocale,localeNames,locales} from "@/lib/locales";
+import {asLocale,localeNames,locales,localeTags} from "@/lib/locales";
+import {useLanguagePreference} from "@/lib/client/use-language-preference";
 import {companyLogoSource} from "@/lib/image-url";
 import {useApiQuery} from "@/lib/client/use-api-query";
 import {Avatar} from "../avatar";
@@ -23,7 +24,7 @@ import { apiGet, apiDelete,apiPatch, apiPost, apiUpload, isProductionBackendEnab
 import { plans as subscriptionPlans } from "@/lib/plans";
 import { legalConfig } from "@/config/legal";
 import {Button, EmptyState, Field, Icon, SectionTitle, Status, Toast, Toggle, Input, FormActions, Select, LoadingState, ErrorState} from "../ui";
-import { moneyChf } from "./shared";
+import {formatCurrency} from "@/lib/financial-status";
 
 export function SettingsPage() {
   return <AppShell title="Einstellungen" active="einstellungen" backHref="/dashboard">
@@ -211,6 +212,8 @@ export function CompanySettingsPage() {
 }
 
 export function SubscriptionSettingsPage() {
+  const {locale}=useLocale();
+  const money=(value:unknown)=>formatCurrency(value,"CHF",localeTags[locale]);
 
   const searchParams=useSearchParams();
   const requestedPlan=searchParams.get("plan");
@@ -311,16 +314,16 @@ export function SubscriptionSettingsPage() {
   const billingIntegration=integrations.find(item=>item.key==="billing");
   const billingConfigured=billingIntegration?.configured===true&&catalog.some(item=>item.available);
   const storageLimit=Number(subscription.storage_limit_bytes??0);
-  const storageLabel=storageLimit>0?(storageLimit/1024/1024/1024).toLocaleString("de-CH",{maximumFractionDigits:1})+" GB":"—";
-  const periodEnd=subscription.current_period_ends_at?new Date(String(subscription.current_period_ends_at)).toLocaleDateString("de-CH"):"—";
+  const storageLabel=storageLimit>0?(storageLimit/1024/1024/1024).toLocaleString(localeTags[locale],{maximumFractionDigits:1})+" GB":"—";
+  const periodEnd=subscription.current_period_ends_at?new Date(String(subscription.current_period_ends_at)).toLocaleDateString(localeTags[locale],{timeZone:"Europe/Zurich"}):"—";
   const trialEndDate=subscription.trial_ends_at?new Date(String(subscription.trial_ends_at)):null;
-  const trialEnd=trialEndDate?trialEndDate.toLocaleDateString("de-CH"):"—";
+  const trialEnd=trialEndDate?trialEndDate.toLocaleDateString(localeTags[locale],{timeZone:"Europe/Zurich"}):"—";
   const trialDaysRemaining=trialEndDate?Math.max(0,Math.ceil((trialEndDate.getTime()-referenceNow)/86400000)):0;
 
   return <AppShell title="Abonnement" subtitle="Plan, Nutzung und Kontostatus." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
     <section className="plan-hero">
       <div><span className="eyebrow"><LocalizedText>{"AKTUELLER PLAN"}</LocalizedText></span><h2><LocalizedText>{planLabel[planKey]??planKey}</LocalizedText></h2><Status tone={subscriptionStatus==="active"?"success":subscriptionStatus==="trial"?"info":"warning"}><LocalizedText>{statusLabel[subscriptionStatus]??"Unbekannt"}</LocalizedText></Status>{!billingDemo&&<p><LocalizedText>{subscriptionStatus==="trial"?"Die Testphase ist aktiv.":"Der hinterlegte Plan für dein Binso One Konto."}</LocalizedText></p>}</div>
-      <div className="plan-price"><strong><LocalizedText>{subscriptionStatus==="trial"?"CHF 0.00":contractAmount==null?"—":moneyChf(contractAmount)}</LocalizedText></strong><span><LocalizedText>{subscriptionStatus==="trial"?`noch ${trialDaysRemaining} ${trialDaysRemaining===1?"Tag":"Tage"}`:subscription.billing_interval==="yearly"?"/ Jahr":"/ Monat"}</LocalizedText></span></div>
+      <div className="plan-price"><strong><LocalizedText>{subscriptionStatus==="trial"?money(0):contractAmount==null?"—":money(contractAmount)}</LocalizedText></strong><span><LocalizedText>{subscriptionStatus==="trial"?`noch ${trialDaysRemaining} ${trialDaysRemaining===1?"Tag":"Tage"}`:subscription.billing_interval==="yearly"?"/ Jahr":"/ Monat"}</LocalizedText></span></div>
       {billingDemo?<Status tone="info"><LocalizedText>{"Demo-Modus"}</LocalizedText></Status>:billingConfigured?(billingConnected?<Button variant="secondary" onClick={()=>void openPortal()} disabled={billingLoading}><LocalizedText>{"Billing verwalten"}</LocalizedText></Button>:<Button onClick={()=>setDialog("plan")}><LocalizedText>{"Plan aktivieren"}</LocalizedText></Button>):<Status tone="warning"><LocalizedText>{"Stripe nicht verfügbar"}</LocalizedText></Status>}
     </section>
     {!stripeLive&&billingConfigured&&<p className="technical-hint"><LocalizedText>{"Stripe-Testmodus · keine echten Zahlungen."}</LocalizedText></p>}
@@ -332,7 +335,7 @@ export function SubscriptionSettingsPage() {
     {billingConfigured&&!billingDemo&&<p className="technical-hint"><LocalizedText>{automaticTax?"Stripe Tax ist für den Checkout aktiviert.":"Steuer-ID wird im Checkout erfasst; allfällige Steuern richten sich nach der produktiven Stripe-Steuerkonfiguration."}</LocalizedText></p>}<section className="surface invoices-panel"><SectionTitle title="SaaS-Abrechnungen"/>{billingConnected?<div className="context-block"><b><LocalizedText>{"Rechnungen und Zahlungsmittel in Stripe"}</LocalizedText></b><span><LocalizedText>{"Binso One speichert keine vollständigen Kartendaten. Öffne das Billing-Portal für Rechnungsdownloads und Zahlungsmittel."}</LocalizedText></span><Button variant="secondary" onClick={()=>void openPortal()} disabled={billingLoading}><LocalizedText>{"Billing-Portal"}</LocalizedText></Button></div>:<EmptyState  title="Noch keine Billing-Daten" />}</section>
     <div className="danger-zone"><div><b><LocalizedText>{"Abonnement verwalten"}</LocalizedText></b><p><LocalizedText>{billingConnected?"Planwechsel, Zahlungsmittel und Kündigung werden über Stripe Billing ausgeführt.":"Ohne verbundenes Billing gibt es hier keine produktive Kündigungsaktion."}</LocalizedText></p></div><Button variant="secondary" disabled={!billingConnected||billingLoading} onClick={()=>void openPortal()}><LocalizedText>{"Abonnement verwalten"}</LocalizedText></Button></div>
 
-    {dialog==="plan"&&billingConfigured&&!billingConnected&&<FormSheet label={"Plan auswählen"} description={"Checkout und Zahlungsdaten werden sicher bei Stripe verarbeitet."} open={true} onClose={()=>setDialog(null)} busy={billingLoading} className={"subscription-sheet"} layerClassName={""} ariaLabel={dialog==="plan"?"Plan auswählen":dialog==="payment"?"Zahlungsart":"Abonnement"}><div className="sheet-body"><Field label="Zahlungszeitraum"><Select value={billingCycle} onChange={e=>setBillingCycle(e.target.value as "monthly"|"yearly")}><option value="monthly"><LocalizedText>{"Monatlich"}</LocalizedText></option><option value="yearly"><LocalizedText>{"Jährlich"}</LocalizedText></option></Select></Field><div className="plan-choice-list">{(["start","business","pro"] as const).map(name=>{const price=catalog.find(item=>item.plan===name&&item.billing===billingCycle);return <button type="button" disabled={!price?.available} className={selectedPlan===name?"selected":""} onClick={()=>setSelectedPlan(name)} key={name}><div><b>{planLabel[name]}</b><small><LocalizedText>{price?.available?moneyChf(price.amount)+(billingCycle==="yearly"?" / Jahr":" / Monat"):"Noch nicht eingerichtet"}</LocalizedText></small></div>{selectedPlan===name?<Icon name="check"/>:<Icon name="arrow"/>}</button>})}</div><label className="billing-legal-consent"><Input type="checkbox" checked={acceptedPaidTerms} onChange={e=>setAcceptedPaidTerms(e.target.checked)}/><span><LocalizedText>{"Ich bestätige den kostenpflichtigen Abschluss gemäss "}</LocalizedText><Link prefetch={false} href="/agb" target="_blank"><LocalizedText>{"AGB"}</LocalizedText></Link><LocalizedText>{" und habe "}</LocalizedText><Link prefetch={false} href="/datenschutz" target="_blank"><LocalizedText>{"Datenschutz"}</LocalizedText></Link><LocalizedText>{" sowie "}</LocalizedText><Link prefetch={false} href="/auftragsbearbeitung" target="_blank"><LocalizedText>{"Auftragsbearbeitung"}</LocalizedText></Link><LocalizedText>{" zur Kenntnis genommen."}</LocalizedText></span></label><p className="technical-hint"><LocalizedText>{"Das Abonnement wird erst durch den erfolgreichen Stripe-Checkout aktiviert. Laufzeit und Preis werden vor dem Abschluss nochmals angezeigt."}</LocalizedText></p></div><FormActions sheet><Button variant="secondary" onClick={()=>setDialog(null)}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button onClick={()=>void startCheckout()} disabled={billingLoading||!acceptedPaidTerms||!catalog.some(item=>item.plan===selectedPlan&&item.billing===billingCycle&&item.available)}><LocalizedText>{billingLoading?"Checkout wird geöffnet…":"Kostenpflichtig zu Stripe"}</LocalizedText></Button></FormActions></FormSheet>}
+    {dialog==="plan"&&billingConfigured&&!billingConnected&&<FormSheet label={"Plan auswählen"} description={"Checkout und Zahlungsdaten werden sicher bei Stripe verarbeitet."} open={true} onClose={()=>setDialog(null)} busy={billingLoading} className={"subscription-sheet"} layerClassName={""} ariaLabel={dialog==="plan"?"Plan auswählen":dialog==="payment"?"Zahlungsart":"Abonnement"}><div className="sheet-body"><Field label="Zahlungszeitraum"><Select value={billingCycle} onChange={e=>setBillingCycle(e.target.value as "monthly"|"yearly")}><option value="monthly"><LocalizedText>{"Monatlich"}</LocalizedText></option><option value="yearly"><LocalizedText>{"Jährlich"}</LocalizedText></option></Select></Field><div className="plan-choice-list">{(["start","business","pro"] as const).map(name=>{const price=catalog.find(item=>item.plan===name&&item.billing===billingCycle);return <button type="button" disabled={!price?.available} className={selectedPlan===name?"selected":""} onClick={()=>setSelectedPlan(name)} key={name}><div><b>{planLabel[name]}</b><small><LocalizedText>{price?.available?money(price.amount)+(billingCycle==="yearly"?" / Jahr":" / Monat"):"Noch nicht eingerichtet"}</LocalizedText></small></div>{selectedPlan===name?<Icon name="check"/>:<Icon name="arrow"/>}</button>})}</div><label className="billing-legal-consent"><Input type="checkbox" checked={acceptedPaidTerms} onChange={e=>setAcceptedPaidTerms(e.target.checked)}/><span><LocalizedText>{"Ich bestätige den kostenpflichtigen Abschluss gemäss "}</LocalizedText><Link prefetch={false} href="/agb" target="_blank"><LocalizedText>{"AGB"}</LocalizedText></Link><LocalizedText>{" und habe "}</LocalizedText><Link prefetch={false} href="/datenschutz" target="_blank"><LocalizedText>{"Datenschutz"}</LocalizedText></Link><LocalizedText>{" sowie "}</LocalizedText><Link prefetch={false} href="/auftragsbearbeitung" target="_blank"><LocalizedText>{"Auftragsbearbeitung"}</LocalizedText></Link><LocalizedText>{" zur Kenntnis genommen."}</LocalizedText></span></label><p className="technical-hint"><LocalizedText>{"Das Abonnement wird erst durch den erfolgreichen Stripe-Checkout aktiviert. Laufzeit und Preis werden vor dem Abschluss nochmals angezeigt."}</LocalizedText></p></div><FormActions sheet><Button variant="secondary" onClick={()=>setDialog(null)}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button onClick={()=>void startCheckout()} disabled={billingLoading||!acceptedPaidTerms||!catalog.some(item=>item.plan===selectedPlan&&item.billing===billingCycle&&item.available)}><LocalizedText>{billingLoading?"Checkout wird geöffnet…":"Kostenpflichtig zu Stripe"}</LocalizedText></Button></FormActions></FormSheet>}
     {toast&&<Toast title={toast} tone={toast.startsWith("Stripe Checkout abgeschlossen.")||toast==="Planwechsel abgebrochen."?"info":"danger"}/>}
   </AppShell>;
 }
@@ -367,16 +370,14 @@ export function NotificationSettingsPage() {
   return <AppShell title="Benachrichtigungen" subtitle="Bestimme, wie Binso One dich informiert." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
     {error&&<ErrorState><LocalizedText>{error}</LocalizedText></ErrorState>}
     {!ready&&!error&&<LoadingState><LocalizedText>{"Einstellungen werden geladen …"}</LocalizedText></LoadingState>}
-    <SettingsGroup title="Zustellung"><section className="preference-table">{rows.map(([title,text])=><div className="preference-row" key={title}><div><b><LocalizedText>{title}</LocalizedText></b><small><LocalizedText>{text}</LocalizedText></small></div><div className="preference-channels">{(["email","push"] as const).filter(channel=>notificationChannels[channel]).map(channel=><label key={channel}><span><LocalizedText>{channel==="email"?"E-Mail":"Push"}</LocalizedText></span><Toggle checked={prefs[title][channel]} disabled={!ready||saving.includes(title+channel)} onChange={()=>void toggle(title,channel)} label={`${channel==="email"?"E-Mail":"Push"} ${title}`}/></label>)}</div></div>)}</section></SettingsGroup>
+    <SettingsGroup title="Zustellung"><section className="preference-table">{rows.map(([title,text])=><div className="preference-row" key={title}><div><b><LocalizedText>{title}</LocalizedText></b><small><LocalizedText>{text}</LocalizedText></small></div><div className="preference-channels">{(["email","push"] as const).filter(channel=>notificationChannels[channel]).map(channel=><label key={channel}><span><LocalizedText>{channel==="email"?"E-Mail":"Push"}</LocalizedText></span><Toggle checked={prefs[title][channel]} disabled={!ready} busy={saving.includes(title+channel)} onChange={()=>void toggle(title,channel)} label={`${channel==="email"?"E-Mail":"Push"} ${title}`}/></label>)}</div></div>)}</section></SettingsGroup>
   </AppShell>;
 }
 
 /** Language availability reflects the translated interface, not the database enum. */
 function LanguagePreference(){
- const {locale,choose}=useLocale();
- const [error,setError]=useState("");
- const save=async(code:string)=>{const next=asLocale(code);try{await apiPatch("/api/settings/profile",{language:next});choose(next);setError("");}catch{setError("Sprache konnte nicht gespeichert werden.")}};
- return <><Field label="Sprache" allowReadOnlyInput><Select value={locale} onChange={event=>void save(event.target.value)}>{locales.map(code=><option key={code} value={code} lang={code}>{localeNames[code]}</option>)}</Select></Field>{error&&<ErrorState><LocalizedText>{error}</LocalizedText></ErrorState>}<p className="settings-note"><LocalizedText>{"Die gewählte Sprache gilt für die gesamte Benutzeroberfläche."}</LocalizedText></p></>;
+ const {locale,save,busy,error}=useLanguagePreference("tenant");
+ return <><Field label="Sprache" allowReadOnlyInput><Select value={locale} disabled={busy} aria-busy={busy||undefined} onChange={event=>void save(event.target.value)}>{locales.map(code=><option key={code} value={code} lang={code}>{localeNames[code]}</option>)}</Select></Field>{error&&<ErrorState><LocalizedText>{error}</LocalizedText></ErrorState>}<p className="settings-note"><LocalizedText>{"Die gewählte Sprache gilt für die gesamte Benutzeroberfläche."}</LocalizedText></p></>;
 }
 
 export function LanguageSettingsPage(){

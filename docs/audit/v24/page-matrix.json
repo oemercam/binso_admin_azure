@@ -1,5 +1,5 @@
 {
-  "commit": "881dd080f1cf3d2f2c9d2d7ede2ce9bf4424d069",
+  "commit": "ad682d38ceacbd796c3991c0f0a0c1e2cbe5cfde",
   "method": "Existing TypeScript AST dependency inventory; conditional reachability is not runtime proof",
   "pages": [
     {
@@ -24,6 +24,7 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
         "components/ui.tsx#dismissActionLabels",
@@ -1213,6 +1214,7 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
         "components/ui.tsx#dismissActionLabels",
@@ -2290,6 +2292,7 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
         "components/ui.tsx#dismissActionLabels",
@@ -2791,11 +2794,12 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
-        "components/privacy-settings-button.tsx#PrivacySettingsButton",
+        "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
         "components/ui.tsx#dismissActionLabels",
         "components/ui.tsx#actionSourceText",
+        "components/privacy-settings-button.tsx#PrivacySettingsButton",
         "components/ui.tsx#Field",
         "components/ui.tsx#Input",
         "components/ui.tsx#Select",
@@ -2808,7 +2812,6 @@
         "components/ui.tsx#FormError",
         "components/password-input.tsx#PasswordInput",
         "components/ui.tsx#LoadingState",
-        "components/ui.tsx#ErrorState",
         "components/confirm-dialog.tsx#ConfirmDialog",
         "components/use-dialog-focus.ts#useDialogFocus",
         "components/use-dialog-focus.ts#lockDialogBackground",
@@ -3032,7 +3035,6 @@
         "components/locale-switcher.tsx#LocaleSwitcher",
         "components/app-shell.tsx#ShellRegistration",
         "components/app-shell.tsx#ShellConfiguration",
-        "components/pages/shared.tsx#moneyChf",
         "components/ui.tsx#SectionTitle",
         "components/binso-ux.tsx#FormSheet"
       ],
@@ -3044,7 +3046,7 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 335,
+          "line": 338,
           "component": "components/pages/settings.tsx#SubscriptionSettingsPage"
         },
         {
@@ -4144,12 +4146,12 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 205,
+          "line": 206,
           "component": "components/pages/settings.tsx#CompanySettingsPage"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 208,
+          "line": 209,
           "component": "components/pages/settings.tsx#CompanySettingsPage"
         },
         {
@@ -4371,7 +4373,7 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 110,
+          "line": 111,
           "component": "components/pages/settings.tsx#AccountSettingsPage"
         },
         {
@@ -6272,6 +6274,7 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
         "components/ui.tsx#dismissActionLabels",
@@ -7461,6 +7464,11 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/ui.tsx#ErrorState",
+        "components/ui.tsx#Button",
+        "components/ui.tsx#Icon",
+        "components/ui.tsx#dismissActionLabels",
+        "components/ui.tsx#actionSourceText",
         "components/privacy-settings-button.tsx#PrivacySettingsButton",
         "components/ui.tsx#Field",
         "components/ui.tsx#Input",
@@ -7472,11 +7480,6 @@
         "components/ui.tsx#CurrencyInput",
         "components/ui.tsx#FormLabel",
         "components/ui.tsx#FormError",
-        "components/ui.tsx#ErrorState",
-        "components/ui.tsx#Button",
-        "components/ui.tsx#Icon",
-        "components/ui.tsx#dismissActionLabels",
-        "components/ui.tsx#actionSourceText",
         "components/passkey-login.tsx#PasskeyLogin",
         "components/password-input.tsx#PasswordInput"
       ],
@@ -8382,11 +8385,12 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
-        "components/privacy-settings-button.tsx#PrivacySettingsButton",
+        "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
         "components/ui.tsx#dismissActionLabels",
-        "components/ui.tsx#actionSourceText"
+        "components/ui.tsx#actionSourceText",
+        "components/privacy-settings-button.tsx#PrivacySettingsButton"
       ],
       "layouts": [
         "app/layout.tsx"
@@ -8543,8 +8547,8 @@
         "components/select-control.tsx#SelectControl",
         "components/select-control.tsx#SelectSearch",
         "components/use-dialog-focus.ts#registerDialogPortal",
-        "components/binso-ux.tsx#ActionRow",
         "components/ui.tsx#ErrorState",
+        "components/binso-ux.tsx#ActionRow",
         "components/app-chrome.tsx#MobileDock",
         "components/binso-ux.tsx#ActionSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -8642,7 +8646,7 @@
       "actions": [
         {
           "tag": "ActionSheet",
-          "line": 158,
+          "line": 162,
           "component": "components/operator.tsx#OperatorPage"
         },
         {
@@ -8677,12 +8681,12 @@
         },
         {
           "tag": "FilterSheet",
-          "line": 394,
+          "line": 398,
           "component": "components/operator.tsx#OperatorFinanceView"
         },
         {
           "tag": "FormSheet",
-          "line": 479,
+          "line": 483,
           "component": "components/operator.tsx#SubscriptionsView"
         },
         {
@@ -8692,12 +8696,12 @@
         },
         {
           "tag": "FormSheet",
-          "line": 536,
+          "line": 540,
           "component": "components/operator.tsx#RestrictionsView"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 549,
+          "line": 553,
           "component": "components/operator.tsx#RestrictionsView"
         },
         {
@@ -8717,7 +8721,7 @@
         },
         {
           "tag": "FormSheet",
-          "line": 602,
+          "line": 606,
           "component": "components/operator.tsx#AnnouncementsView"
         },
         {
@@ -8962,8 +8966,8 @@
         "components/select-control.tsx#SelectControl",
         "components/select-control.tsx#SelectSearch",
         "components/use-dialog-focus.ts#registerDialogPortal",
-        "components/binso-ux.tsx#ActionRow",
         "components/ui.tsx#ErrorState",
+        "components/binso-ux.tsx#ActionRow",
         "components/app-chrome.tsx#MobileDock",
         "components/binso-ux.tsx#ActionSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -9061,7 +9065,7 @@
       "actions": [
         {
           "tag": "ActionSheet",
-          "line": 158,
+          "line": 162,
           "component": "components/operator.tsx#OperatorPage"
         },
         {
@@ -9096,12 +9100,12 @@
         },
         {
           "tag": "FilterSheet",
-          "line": 394,
+          "line": 398,
           "component": "components/operator.tsx#OperatorFinanceView"
         },
         {
           "tag": "FormSheet",
-          "line": 479,
+          "line": 483,
           "component": "components/operator.tsx#SubscriptionsView"
         },
         {
@@ -9111,12 +9115,12 @@
         },
         {
           "tag": "FormSheet",
-          "line": 536,
+          "line": 540,
           "component": "components/operator.tsx#RestrictionsView"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 549,
+          "line": 553,
           "component": "components/operator.tsx#RestrictionsView"
         },
         {
@@ -9136,7 +9140,7 @@
         },
         {
           "tag": "FormSheet",
-          "line": 602,
+          "line": 606,
           "component": "components/operator.tsx#AnnouncementsView"
         },
         {
@@ -9418,6 +9422,7 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
         "components/ui.tsx#dismissActionLabels",
@@ -9565,11 +9570,12 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
-        "components/privacy-settings-button.tsx#PrivacySettingsButton",
+        "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
         "components/ui.tsx#dismissActionLabels",
         "components/ui.tsx#actionSourceText",
+        "components/privacy-settings-button.tsx#PrivacySettingsButton",
         "components/ui.tsx#Field",
         "components/ui.tsx#Input",
         "components/ui.tsx#Select",
@@ -9579,8 +9585,7 @@
         "components/ui.tsx#TimeInput",
         "components/ui.tsx#CurrencyInput",
         "components/ui.tsx#FormLabel",
-        "components/ui.tsx#FormError",
-        "components/ui.tsx#ErrorState"
+        "components/ui.tsx#FormError"
       ],
       "layouts": [
         "app/layout.tsx"
@@ -9721,12 +9726,13 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
-        "components/privacy-settings-button.tsx#PrivacySettingsButton",
-        "components/ui.tsx#LoadingState",
+        "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
         "components/ui.tsx#dismissActionLabels",
         "components/ui.tsx#actionSourceText",
+        "components/privacy-settings-button.tsx#PrivacySettingsButton",
+        "components/ui.tsx#LoadingState",
         "components/ui.tsx#Field",
         "components/ui.tsx#Input",
         "components/ui.tsx#Select",
@@ -9738,7 +9744,6 @@
         "components/ui.tsx#FormLabel",
         "components/ui.tsx#FormError",
         "components/password-input.tsx#PasswordInput",
-        "components/ui.tsx#ErrorState",
         "components/confirm-dialog.tsx#ConfirmDialog",
         "components/use-dialog-focus.ts#useDialogFocus",
         "components/use-dialog-focus.ts#lockDialogBackground",
@@ -10243,6 +10248,7 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
         "components/ui.tsx#dismissActionLabels",
@@ -10742,6 +10748,7 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
         "components/ui.tsx#dismissActionLabels",
@@ -13151,12 +13158,12 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
-        "components/privacy-settings-button.tsx#PrivacySettingsButton",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
         "components/ui.tsx#dismissActionLabels",
         "components/ui.tsx#actionSourceText",
+        "components/privacy-settings-button.tsx#PrivacySettingsButton",
         "components/ui.tsx#LoadingState",
         "components/ui.tsx#Field",
         "components/ui.tsx#Input",
@@ -14694,6 +14701,7 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
         "components/ui.tsx#dismissActionLabels",
@@ -14836,11 +14844,12 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
-        "components/privacy-settings-button.tsx#PrivacySettingsButton",
+        "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
         "components/ui.tsx#dismissActionLabels",
-        "components/ui.tsx#actionSourceText"
+        "components/ui.tsx#actionSourceText",
+        "components/privacy-settings-button.tsx#PrivacySettingsButton"
       ],
       "layouts": [
         "app/layout.tsx"

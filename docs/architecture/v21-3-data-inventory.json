@@ -2,9 +2,9 @@
   "scope": "Static AST/source inventory, not proof that every runtime branch is tested. Calls include exact source arguments and locations; dynamic dispatch requires the domain matrix and runtime tests.",
   "base": "7b90a5c7353cf2061987fcd0f4550210bbc00f92",
   "counts": {
-    "apis": 114,
+    "apis": 115,
     "consumers": 41,
-    "migrations": 71,
+    "migrations": 72,
     "tables": 106
   },
   "apis": [
@@ -4243,6 +4243,90 @@
       ]
     },
     {
+      "file": "app/api/operator/preferences/route.ts",
+      "path": "/api/operator/preferences",
+      "methods": [
+        "GET",
+        "PATCH"
+      ],
+      "dependencies": [
+        "lib/server/operator/session.ts",
+        "lib/server/db.ts",
+        "lib/server/env.ts",
+        "lib/permissions.ts",
+        "lib/server/operator/entra.ts",
+        "lib/server/operator/rbac.ts",
+        "lib/server/operator/audit.ts",
+        "lib/server/http.ts"
+      ],
+      "evidence": [
+        {
+          "callee": "requireOperatorSession",
+          "line": 10,
+          "arguments": []
+        },
+        {
+          "callee": "authorizeOperator",
+          "line": 10,
+          "arguments": [
+            "session",
+            "'platform:read'"
+          ]
+        },
+        {
+          "callee": "withPlatform",
+          "line": 11,
+          "arguments": [
+            "async c=>(await c.query(\"select language from platform_operator_assignments where user_id=$1 and status='active'\",[session.userId])).rows[0]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 11,
+          "arguments": [
+            "\"select language from platform_operator_assignments where user_id=$1 and status='active'\"",
+            "[session.userId]"
+          ]
+        },
+        {
+          "callee": "requireOperatorSession",
+          "line": 16,
+          "arguments": []
+        },
+        {
+          "callee": "authorizeOperator",
+          "line": 16,
+          "arguments": [
+            "session",
+            "'platform:read'"
+          ]
+        },
+        {
+          "callee": "withPlatform",
+          "line": 19,
+          "arguments": [
+            "async c=>{\n  const previous=(await c.query(\"select language from platform_operator_assignments where user_id=$1 and status='active' for update\",[session.userId])).rows[0];\n  if(!previous)throw new ApiError(403,'forbidden','Keine Berechtigung.');\n  if(previous.language===body.language)return previous;\n  const result=(await c.query(\"update platform_operator_assignments set language=$2,updated_at=now() where user_id=$1 and status='active' returning language\",[session.userId,body.language])).rows[0];\n  await platformAudit({userId:session.userId,userEmail:session.email,action:'operator.preference.language',entityType:'platform_operator_assignments',entityId:session.userId,metadata:{language:body.language}},c);\n  return result;\n }"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 20,
+          "arguments": [
+            "\"select language from platform_operator_assignments where user_id=$1 and status='active' for update\"",
+            "[session.userId]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 23,
+          "arguments": [
+            "\"update platform_operator_assignments set language=$2,updated_at=now() where user_id=$1 and status='active' returning language\"",
+            "[session.userId,body.language]"
+          ]
+        }
+      ]
+    },
+    {
       "file": "app/api/operator/restrictions/[id]/route.ts",
       "path": "/api/operator/restrictions/[id]",
       "methods": [
@@ -7423,35 +7507,42 @@
       "calls": [
         {
           "callee": "useApiQuery",
-          "line": 104,
+          "line": 105,
           "arguments": [
             "\"/api/operator/tickets\""
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 114,
+          "line": 115,
           "arguments": [
             "\"/api/operator/customers\""
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 204,
+          "line": 126,
+          "arguments": [
+            "'/api/operator/preferences'"
+          ]
+        },
+        {
+          "callee": "useApiQuery",
+          "line": 208,
           "arguments": [
             "\"/api/operator/dashboard\""
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 243,
+          "line": 247,
           "arguments": [
             "\"/api/operator/tickets/\"+encodeURIComponent(ticketId)"
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 262,
+          "line": 266,
           "arguments": [
             "\"/api/operator/tickets/\"+encodeURIComponent(ticketId)",
             "{[field]:value}"
@@ -7459,7 +7550,7 @@
         },
         {
           "callee": "apiPost",
-          "line": 278,
+          "line": 282,
           "arguments": [
             "\"/api/operator/tickets/\"+encodeURIComponent(ticketId)+\"/messages\"",
             "{body:value,internal}"
@@ -7467,35 +7558,35 @@
         },
         {
           "callee": "useApiQuery",
-          "line": 333,
+          "line": 337,
           "arguments": [
             "\"/api/operator/customers/\"+encodeURIComponent(tenantId)"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 382,
+          "line": 386,
           "arguments": [
             "\"/api/operator/finance\""
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 404,
+          "line": 408,
           "arguments": [
             "\"/api/operator/payments\""
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 443,
+          "line": 447,
           "arguments": [
             "\"/api/operator/accounts\""
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 458,
+          "line": 462,
           "arguments": [
             "\"/api/operator/accounts/\"+encodeURIComponent(tenantId)",
             "patch"
@@ -7503,14 +7594,14 @@
         },
         {
           "callee": "useApiQuery",
-          "line": 488,
+          "line": 492,
           "arguments": [
             "\"/api/operator/restrictions\""
           ]
         },
         {
           "callee": "apiPost",
-          "line": 511,
+          "line": 515,
           "arguments": [
             "\"/api/operator/restrictions\"",
             "{tenantId,scope,reason,note:note.trim()||reason,endsAt:endsAt||null}"
@@ -7518,7 +7609,7 @@
         },
         {
           "callee": "apiPatch",
-          "line": 525,
+          "line": 529,
           "arguments": [
             "\"/api/operator/restrictions/\"+encodeURIComponent(id)",
             "{active:false}"
@@ -7526,14 +7617,14 @@
         },
         {
           "callee": "useApiQuery",
-          "line": 560,
+          "line": 564,
           "arguments": [
             "\"/api/operator/announcements\""
           ]
         },
         {
           "callee": "apiPost",
-          "line": 585,
+          "line": 589,
           "arguments": [
             "\"/api/operator/announcements\"",
             "{title,message:body,kind,organizationId:audience||null}"
@@ -7541,14 +7632,14 @@
         },
         {
           "callee": "useApiQuery",
-          "line": 615,
+          "line": 619,
           "arguments": [
             "\"/api/operator/users\""
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 643,
+          "line": 647,
           "arguments": [
             "'/api/operator/audit'"
           ]
@@ -8037,21 +8128,21 @@
       "calls": [
         {
           "callee": "useApiQuery",
-          "line": 44,
+          "line": 45,
           "arguments": [
             "\"/api/settings/profile\""
           ]
         },
         {
           "callee": "apiDelete",
-          "line": 56,
+          "line": 57,
           "arguments": [
             "'/api/files/'+match[1]"
           ]
         },
         {
           "callee": "apiUpload",
-          "line": 61,
+          "line": 62,
           "arguments": [
             "\"/api/files\"",
             "form"
@@ -8059,7 +8150,7 @@
         },
         {
           "callee": "apiPatch",
-          "line": 72,
+          "line": 73,
           "arguments": [
             "'/api/files/'+pendingAvatar.id",
             "{action:'activate_profile_avatar',expectedAvatarUrl:pendingAvatar.expectedUrl}"
@@ -8067,7 +8158,7 @@
         },
         {
           "callee": "apiPatch",
-          "line": 93,
+          "line": 94,
           "arguments": [
             "\"/api/settings/profile\"",
             "{firstName,lastName,phone,jobTitle}"
@@ -8075,14 +8166,14 @@
         },
         {
           "callee": "useApiQuery",
-          "line": 143,
+          "line": 144,
           "arguments": [
             "\"/api/settings/company\""
           ]
         },
         {
           "callee": "apiUpload",
-          "line": 173,
+          "line": 174,
           "arguments": [
             "\"/api/files\"",
             "form"
@@ -8090,7 +8181,7 @@
         },
         {
           "callee": "apiPatch",
-          "line": 174,
+          "line": 175,
           "arguments": [
             "\"/api/settings/company\"",
             "{name,uid,street,buildingNumber,postalCode,city,email,phone,...(removeLogo?{logoUrl:\"\"}:{}),completeOnboarding:onboarding}"
@@ -8098,35 +8189,35 @@
         },
         {
           "callee": "apiGet",
-          "line": 243,
+          "line": 246,
           "arguments": [
             "\"/api/settings/subscription\""
           ]
         },
         {
           "callee": "apiGet",
-          "line": 244,
+          "line": 247,
           "arguments": [
             "\"/api/integrations/status\""
           ]
         },
         {
           "callee": "apiGet",
-          "line": 245,
+          "line": 248,
           "arguments": [
             "\"/api/billing/catalog\""
           ]
         },
         {
           "callee": "apiGet",
-          "line": 259,
+          "line": 262,
           "arguments": [
             "\"/api/settings/subscription\""
           ]
         },
         {
           "callee": "apiPost",
-          "line": 278,
+          "line": 281,
           "arguments": [
             "\"/api/billing/checkout\"",
             "{plan:selectedPlan,billing:billingCycle,requestKey:checkoutRequest.current.key,acceptedTerms:acceptedPaidTerms,termsVersion:legalConfig.termsVersion,privacyVersion:legalConfig.privacyVersion}"
@@ -8134,7 +8225,7 @@
         },
         {
           "callee": "apiPost",
-          "line": 290,
+          "line": 293,
           "arguments": [
             "\"/api/billing/portal\"",
             "{}"
@@ -8142,46 +8233,38 @@
         },
         {
           "callee": "apiGet<{items:Array<{kind:string;email:boolean;push:boolean}>}>(\"/api/settings/notifications\").then(data=>setPrefs(current=>{const next={...current};for(const item of data.items)if(next[item.kind])next[item.kind]={email:item.email,push:item.push};return next})).then(()=>setReady(true)).catch",
-          "line": 355,
+          "line": 358,
           "arguments": [
             "()=>setError(\"Einstellungen konnten nicht geladen werden.\")"
           ]
         },
         {
           "callee": "apiGet<{items:Array<{kind:string;email:boolean;push:boolean}>}>(\"/api/settings/notifications\").then(data=>setPrefs(current=>{const next={...current};for(const item of data.items)if(next[item.kind])next[item.kind]={email:item.email,push:item.push};return next})).then",
-          "line": 355,
+          "line": 358,
           "arguments": [
             "()=>setReady(true)"
           ]
         },
         {
           "callee": "apiGet<{items:Array<{kind:string;email:boolean;push:boolean}>}>(\"/api/settings/notifications\").then",
-          "line": 355,
+          "line": 358,
           "arguments": [
             "data=>setPrefs(current=>{const next={...current};for(const item of data.items)if(next[item.kind])next[item.kind]={email:item.email,push:item.push};return next})"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 355,
+          "line": 358,
           "arguments": [
             "\"/api/settings/notifications\""
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 363,
+          "line": 366,
           "arguments": [
             "\"/api/settings/notifications\"",
             "{kind:title,channel,enabled}"
-          ]
-        },
-        {
-          "callee": "apiPatch",
-          "line": 378,
-          "arguments": [
-            "\"/api/settings/profile\"",
-            "{language:next}"
           ]
         }
       ],
@@ -8215,13 +8298,6 @@
         }
       ],
       "pages": [
-        "app/einstellungen/abonnement/page.tsx",
-        "app/einstellungen/benachrichtigungen/page.tsx",
-        "app/einstellungen/darstellung/page.tsx",
-        "app/einstellungen/firma/page.tsx",
-        "app/einstellungen/konto/page.tsx",
-        "app/einstellungen/page.tsx",
-        "app/einstellungen/sprache/page.tsx",
         "app/kunden/[id]/bearbeiten/page.tsx",
         "app/kunden/[id]/page.tsx",
         "app/kunden/neu/page.tsx",
@@ -10647,6 +10723,12 @@
           "mode": "force"
         }
       ]
+    },
+    {
+      "file": "database/migrations/0071_operator_language_preference.sql",
+      "tables": [],
+      "relations": [],
+      "rls": []
     }
   ],
   "repositories": [
@@ -12283,6 +12365,25 @@
       "calls": []
     },
     {
+      "file": "lib/client/language-preference.ts",
+      "imports": [
+        "lib/client/backend.ts",
+        "lib/locales/config.ts"
+      ],
+      "methods": [],
+      "calls": [
+        {
+          "callee": "apiPatch",
+          "line": 6,
+          "arguments": [
+            "scope==='operator'?'/api/operator/preferences':'/api/settings/profile'",
+            "{language:locale}",
+            "value=>{\n  if((value as {item?:{language?:unknown}}|null)?.item?.language!==locale)throw new ClientApiError('Sprache konnte nicht gespeichert werden.','invalid_response',502);\n }"
+          ]
+        }
+      ]
+    },
+    {
       "file": "lib/client/list-state.ts",
       "imports": [],
       "methods": [],
@@ -12306,7 +12407,25 @@
       "file": "lib/client/process-draft.ts",
       "imports": [],
       "methods": [],
-      "calls": []
+      "calls": [
+        {
+          "callee": "query.delete",
+          "line": 9,
+          "arguments": [
+            "'lang'"
+          ]
+        },
+        {
+          "callee": "query.sort",
+          "line": 9,
+          "arguments": []
+        },
+        {
+          "callee": "query.toString",
+          "line": 10,
+          "arguments": []
+        }
+      ]
     },
     {
       "file": "lib/client/query-snapshot.ts",
@@ -12428,6 +12547,16 @@
           ]
         }
       ]
+    },
+    {
+      "file": "lib/client/use-language-preference.ts",
+      "imports": [
+        "lib/locales/config.ts",
+        "lib/client/locale.tsx",
+        "lib/client/language-preference.ts"
+      ],
+      "methods": [],
+      "calls": []
     },
     {
       "file": "lib/client/workspace-actions.ts",

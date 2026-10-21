@@ -2,7 +2,7 @@
 
 Static AST/source inventory, not proof that every runtime branch is tested. Calls include exact source arguments and locations; dynamic dispatch requires the domain matrix and runtime tests.
 
-114 API route files, 41 client consumers, 71 migrations, 106 declared tables.
+115 API route files, 41 client consumers, 72 migrations, 106 declared tables.
 
 | Endpoint | Methods | Source | Direct data/auth evidence |
 |---|---|---|---|
@@ -85,6 +85,7 @@ Static AST/source inventory, not proof that every runtime branch is tested. Call
 | `/api/operator/maintenance` | GET, POST | `app/api/operator/maintenance/route.ts` | `requireOperatorSession:10`, `authorizeOperator:10`, `requireOperatorSession:12`, `authorizeOperator:12`, `withPlatform:17`, `client.query:18` |
 | `/api/operator/monitoring` | GET | `app/api/operator/monitoring/route.ts` | `requireOperatorSession:6`, `authorizeOperator:6` |
 | `/api/operator/payments` | GET | `app/api/operator/payments/route.ts` | `requireOperatorSession:7`, `authorizeOperator:7` |
+| `/api/operator/preferences` | GET, PATCH | `app/api/operator/preferences/route.ts` | `requireOperatorSession:10`, `authorizeOperator:10`, `withPlatform:11`, `c.query:11`, `requireOperatorSession:16`, `authorizeOperator:16`, `withPlatform:19`, `c.query:20`, `c.query:23` |
 | `/api/operator/restrictions/[id]` | PATCH | `app/api/operator/restrictions/[id]/route.ts` | `requireOperatorSession:10`, `authorizeOperator:10`, `withPlatform:12`, `c.query:13`, `c.query:15` |
 | `/api/operator/restrictions` | GET, POST | `app/api/operator/restrictions/route.ts` | `requireOperatorSession:10`, `authorizeOperator:10`, `withPlatform:11`, `requireOperatorSession:16`, `authorizeOperator:16`, `withPlatform:23`, `c.query:24` |
 | `/api/operator/sso/callback` | GET | `app/api/operator/sso/callback/route.ts` | `client.query:17`, `client.query:22`, `client.query:32` |

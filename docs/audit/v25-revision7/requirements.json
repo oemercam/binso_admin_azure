@@ -8705,15 +8705,21 @@
       "requirement": "Sprache sofort wechseln, Formularfortschritt nicht verlieren; Präferenz vor Login datensparsam merken und nach Login im Benutzerprofil speichern.",
       "sourceTextSha256": "6e6e3491a9422175587cacbf44bdf75ac92fa31e52ead8f6ef19ac542d69a4b4",
       "sourceParagraph": "Sprachen: de-CH, fr-CH, it-CH, en. Zentrales i18n-System mit Schlüssel-/Fallbackstrategie, Pluralformen, Datums-/Zahlen-/Währungsformaten und automatisierter Prüfung auf fehlende Keys/Hardcodings. Sämtliche Routen, Unterseiten, Menüs, Buttons, Formulare, Fehler, Ladezustände, Status, Tabellen, Diagrammlegenden, Suchergebnisse, Adminportal, Support, Onboarding, E-Mail-/PDF-/Berichtsvorlagen und Rechtstexte abdecken. Kein gemischtsprachiges UI. Öffentliche Sprachwahl minimalistisch «DE ˅» oben rechts, eingeloggte Präferenz im Profil/Avatar-Menü; mobile Einstellungen. Sprache sofort wechseln, Formularfortschritt nicht verlieren; Präferenz vor Login datensparsam merken und nach Login im Benutzerprofil speichern. Dokumentensprache separat wählbar, bestehende Kundenpräferenzen berücksichtigen. Keine maschinell improvisierten juristischen Übersetzungen ungeprüft produktiv schalten; Qualitätssicherung mit Muttersprachlern/Fachprüfung für rechtliche und finanzielle Inhalte.",
-      "status": "nicht_abgenommen",
+      "status": "teilweise_implementiert",
       "sourceReferences": [
-        "lib/locales/index.ts",
-        "scripts/localization-coverage-test.mjs"
+        "components/locale-switcher.tsx",
+        "components/header-panel-content.tsx",
+        "components/pages/settings.tsx",
+        "lib/client/language-preference.ts",
+        "lib/client/use-language-preference.ts",
+        "app/api/operator/preferences/route.ts",
+        "components/operator.tsx",
+        "database/migrations/0071_operator_language_preference.sql"
       ],
-      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "implementation": "Mandanten-Kontomenü und Spracheinstellungen verwenden denselben bestätigten Profil-Speicherweg mit Pending-Sperre, Fehler und unverändertem bestätigtem Wert bei Fehlern. Öffentliche Sprachwahl bleibt lokal. Abonnementdaten verwenden gewählte Zahlen-/Datums-/Währungsformate. Operator-Präferenz separat über aktive eigene Operator-Identität, nullable language-Spalte und unveränderte Entra-/Rollenprüfung implementiert (Migration0071).",
+      "test": "Reale Client-Transporttests für4 Sprachen, fehlerhafte/mismatched Antworten ohne Erfolgsbroadcast,503 und Sessionwechsel bestanden. Browserfälle für Fehler/Pending/Reload/Avatar-Menü ergänzt, noch nicht am neuen Stand ausgeführt. Reale migrierte DB-Prüfung für alle5 Operator-Rollen,4 Sprachen, Eigenidentität, identisches Replay ohne doppeltes Audit, ungültige Zusatzfelder, fremde Origin, Sperrstatus und Audit-Rollback bestanden. Native HTTP-Sitzungsgrenze und neue Browserfälle stehen in aktueller CI aus.",
+      "visualComparison": "Bestehendes gemeinsames Auswahl-Layout erhalten; aktuelle erweiterte Browserabnahme ausstehend.",
+      "blocker": "Aktuelle vollständige Browser-/Geräteabnahme, tatsächlicher Entra-/Gerätewechsel-Nachweis und vollständiger fachlicher Sprachreview bleiben offen."
     },
     {
       "id": "R7-49-007",
@@ -9214,15 +9220,16 @@
       "requirement": "Keine Arbeit verlieren, Timer nicht verlieren, sichere lokale Draft-Wiederherstellung, keine ungesicherten sensiblen Daten im Cache.",
       "sourceTextSha256": "beb278fa30561ad0ff7133fc82732af801386ebda78f58e68514a1629507db19",
       "sourceParagraph": "Öffentliche Website, Identity, Workspace, Admin, Tablet, Mobile, PWA: zentrale 401/403/404/409/429/500/502/503, Offline, Wartung, abgelaufener Link, fehlgeschlagener Upload/Export/Versand, ungültiges Formular, Sessionablauf, Konflikt, langsame Verbindung. Klare lokalisierte Sprache, passende sichere Aktion (zurück, erneut versuchen, anmelden, Link erneuern), keine internen Stacktraces. 401 erhält beabsichtigtes Ziel und Entwürfe. Retry nur idempotent; bei Timeout erst serverseitigen Status klären. Keine Arbeit verlieren, Timer nicht verlieren, sichere lokale Draft-Wiederherstellung, keine ungesicherten sensiblen Daten im Cache. Global konsistente Skeletons statt Splash-Logos und Layoutsprünge. Error-Boundaries, datenschutzgerechtes Monitoring, Korrelations-ID für Support, Accessibility und Offline-/Wiederverbindungsprüfungen.",
-      "status": "nicht_abgenommen",
+      "status": "teilweise_implementiert",
       "sourceReferences": [
-        "lib/server/http.ts",
-        "components/use-process-draft.ts"
+        "lib/client/process-draft.ts",
+        "components/use-process-draft.ts",
+        "components/documents.tsx"
       ],
-      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "implementation": "Sprach-Query vom Dokument-Entwurfskontext getrennt. Sichere Übernahme des neuesten noch gültigen Legacy-Schlüssels derselben Identität/Mandant/Rolle/Quelle; unveränderte Ablaufzeit. Verwerfen entfernt auch gleichartige Sprach-Aliasse.",
+      "test": "Draft-Regressionen für4 Sprachen, Quellen-/Benutzer-/Mandanten-/Rollenisolation, Wiedereinlesen/Schritt/Replay, Migration/TTL/Quota/Verwerfen und echten Session-Fence bestanden. Browserfall erzwingt Sprach-Query vor Reload; aktueller CI-Nachweis ausstehend.",
+      "visualComparison": "Keine Darstellungsänderung. Aktuelle tatsächliche Browser-Wiederherstellung noch nicht bestätigt.",
+      "blocker": "Vollständige sensible-Daten-/Geräte-/Abbruchabnahme und aktuelle Browserqualifikation ausstehend."
     },
     {
       "id": "R7-54-005",

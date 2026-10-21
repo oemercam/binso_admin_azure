@@ -178,14 +178,14 @@ export async function apiReadPost<T>(path:string,body:unknown):Promise<T>{
  return result;
 }
 
-export async function apiPatch<T>(path:string,body:unknown):Promise<T>{
+export async function apiPatch<T>(path:string,body:unknown,validate?:(value:unknown)=>void):Promise<T>{
   const revision=dataRevision([]);
   const response=await fetchApi(path,{
     method:"PATCH",
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify(body),
   });
-  return mutationResult<T>(response,path,"Änderung konnte nicht gespeichert werden.",revision,"PATCH");
+  return mutationResult<T>(response,path,"Änderung konnte nicht gespeichert werden.",revision,"PATCH",validate);
 }
 
 export async function apiDelete<T>(path:string,body?:unknown):Promise<T>{

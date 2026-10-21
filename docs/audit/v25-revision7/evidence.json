@@ -358,6 +358,37 @@
       "test": "Tatsächliche SSR-Tests aller5 Rechtsseiten in4 UI-Sprachen;4 lokale Keyboard-/URL-/Fokus-/Overflow-Fälle Hell/Dunkel320/1440 bestanden.",
       "visualComparison": "Technische Browsernachweise vorhanden; keine juristische Übersetzungs-/Inhaltsfreigabe.",
       "blocker": "Gemischte/unvollständige rechtliche Sprachfassungen, Demo-Textdrift und externe Vertrags-/Providerprüfung offen."
+    },
+    "R7-49-006": {
+      "sourceTextSha256": "6e6e3491a9422175587cacbf44bdf75ac92fa31e52ead8f6ef19ac542d69a4b4",
+      "status": "teilweise_implementiert",
+      "implementation": "Mandanten-Kontomenü und Spracheinstellungen verwenden denselben bestätigten Profil-Speicherweg mit Pending-Sperre, Fehler und unverändertem bestätigtem Wert bei Fehlern. Öffentliche Sprachwahl bleibt lokal. Abonnementdaten verwenden gewählte Zahlen-/Datums-/Währungsformate. Operator-Präferenz separat über aktive eigene Operator-Identität, nullable language-Spalte und unveränderte Entra-/Rollenprüfung implementiert (Migration0071).",
+      "sourceReferences": [
+        "components/locale-switcher.tsx",
+        "components/header-panel-content.tsx",
+        "components/pages/settings.tsx",
+        "lib/client/language-preference.ts",
+        "lib/client/use-language-preference.ts",
+        "app/api/operator/preferences/route.ts",
+        "components/operator.tsx",
+        "database/migrations/0071_operator_language_preference.sql"
+      ],
+      "test": "Reale Client-Transporttests für4 Sprachen, fehlerhafte/mismatched Antworten ohne Erfolgsbroadcast,503 und Sessionwechsel bestanden. Browserfälle für Fehler/Pending/Reload/Avatar-Menü ergänzt, noch nicht am neuen Stand ausgeführt. Reale migrierte DB-Prüfung für alle5 Operator-Rollen,4 Sprachen, Eigenidentität, identisches Replay ohne doppeltes Audit, ungültige Zusatzfelder, fremde Origin, Sperrstatus und Audit-Rollback bestanden. Native HTTP-Sitzungsgrenze und neue Browserfälle stehen in aktueller CI aus.",
+      "visualComparison": "Bestehendes gemeinsames Auswahl-Layout erhalten; aktuelle erweiterte Browserabnahme ausstehend.",
+      "blocker": "Aktuelle vollständige Browser-/Geräteabnahme, tatsächlicher Entra-/Gerätewechsel-Nachweis und vollständiger fachlicher Sprachreview bleiben offen."
+    },
+    "R7-54-004": {
+      "sourceTextSha256": "beb278fa30561ad0ff7133fc82732af801386ebda78f58e68514a1629507db19",
+      "status": "teilweise_implementiert",
+      "implementation": "Sprach-Query vom Dokument-Entwurfskontext getrennt. Sichere Übernahme des neuesten noch gültigen Legacy-Schlüssels derselben Identität/Mandant/Rolle/Quelle; unveränderte Ablaufzeit. Verwerfen entfernt auch gleichartige Sprach-Aliasse.",
+      "sourceReferences": [
+        "lib/client/process-draft.ts",
+        "components/use-process-draft.ts",
+        "components/documents.tsx"
+      ],
+      "test": "Draft-Regressionen für4 Sprachen, Quellen-/Benutzer-/Mandanten-/Rollenisolation, Wiedereinlesen/Schritt/Replay, Migration/TTL/Quota/Verwerfen und echten Session-Fence bestanden. Browserfall erzwingt Sprach-Query vor Reload; aktueller CI-Nachweis ausstehend.",
+      "visualComparison": "Keine Darstellungsänderung. Aktuelle tatsächliche Browser-Wiederherstellung noch nicht bestätigt.",
+      "blocker": "Vollständige sensible-Daten-/Geräte-/Abbruchabnahme und aktuelle Browserqualifikation ausstehend."
     }
   },
   "tests": {
@@ -388,7 +419,10 @@
     "avatarActivation": "Isolated PostgreSQL/PGlite route/download/ownership/status/drift/replay passed; native HTTP and branding browser cases added, current CI execution pending.",
     "consentTargets": "Four actual local desktop DE/FR/IT/EN cases passed with44px equivalent choices and persisted rejection.",
     "consentPolicy": "Four actual local DE/FR/IT/EN browser cases passed: policy reachable without stored consent, reopen from footer, equal44px choices, inert restoration, rejection persisted, zero hydration/runtime warnings.",
-    "expenseCategories": "Actual isolated PostgreSQL/PGlite positive/negative route/CSV/bounds/authorization cases passed; browser extension awaits CI."
+    "expenseCategories": "Actual isolated PostgreSQL/PGlite positive/negative route/CSV/bounds/authorization cases passed; browser extension awaits CI.",
+    "languagePreference": "Client transport positive/negative four-language receipt and session-fence cases passed; shared hook busy/error states and real browser cases added, current execution pending.",
+    "draftLanguage": "Actual scope/storage tests: four languages, exact source/user/tenant/role boundaries, latest legacy alias migration, original expiry, quota recovery and discard without resurrection passed; browser proof pending.",
+    "operatorLanguage": "Actual migrated PostgreSQL/PGlite route tests passed for all5 operator roles; no new role grants or Entra changes. Migration0071 not applied to production."
   },
   "externalBlockers": [
     "Physical installed iOS/Android PWA, keyboard and assistive technology acceptance",
