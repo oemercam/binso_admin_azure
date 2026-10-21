@@ -1,5 +1,5 @@
 {
-  "commit": "c53b72ee8b9e470b514d84d9ca73e67192c628f3",
+  "commit": "f8e04929a1a0b85984fdad6ecbe4354def521f0f",
   "method": "Existing TypeScript AST dependency inventory; conditional reachability is not runtime proof",
   "pages": [
     {
@@ -1886,15 +1886,19 @@
         "components/app-shell.tsx#ShellConfiguration",
         "components/binso-ux.tsx#WorkspaceSection",
         "components/ui.tsx#SectionTitle",
+        "components/report-actions.tsx#ReportActions",
         "components/binso-ux.tsx#ActionsMenu",
         "components/binso-ux.tsx#RowActions",
-        "components/binso-ux.tsx#MetricTiles",
-        "components/binso-ux.tsx#MetricTile",
-        "components/ui.tsx#Metric",
         "components/pdf-preview.tsx#DocumentModal",
         "components/pdf-preview.tsx#DocumentPageViewer",
         "components/pdf-preview.tsx#DocumentPages",
-        "components/pdf-preview.tsx#PdfPage"
+        "components/pdf-preview.tsx#PdfPage",
+        "components/binso-ux.tsx#MetricTiles",
+        "components/binso-ux.tsx#MetricTile",
+        "components/ui.tsx#Metric",
+        "components/time-report.tsx#TimeReportSheet",
+        "components/binso-ux.tsx#FormSheet",
+        "components/binso-ux.tsx#ListRow"
       ],
       "layouts": [
         "app/layout.tsx",
@@ -1903,8 +1907,13 @@
       "roles": "reports:read",
       "actions": [
         {
+          "tag": "TimeReportSheet",
+          "line": 32,
+          "component": "components/pages/reports.tsx#ReportsPage"
+        },
+        {
           "tag": "FilterSheet",
-          "line": 47,
+          "line": 33,
           "component": "components/pages/reports.tsx#ReportsPage"
         },
         {
@@ -1968,6 +1977,16 @@
           "component": "components/binso-ux.tsx#ActionsMenu"
         },
         {
+          "tag": "FormSheet",
+          "line": 16,
+          "component": "components/time-report.tsx#TimeReportSheet"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
+        },
+        {
           "tag": "FreshAuthenticationDialog",
           "line": 83,
           "component": "app/layout.tsx#RootLayout"
@@ -1976,11 +1995,6 @@
           "tag": "FormSheet",
           "line": 29,
           "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
-        },
-        {
-          "tag": "Sheet",
-          "line": 195,
-          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {

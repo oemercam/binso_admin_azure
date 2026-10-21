@@ -4,7 +4,26 @@ import {tenantCan,ownRecordOnly} from '@/lib/permissions';
 import {planAllowsModule,type PlanId} from '@/config/plan-access';
 import {authorize} from '@/lib/server/rbac';
 import type {SessionUser} from '@/lib/server/session';
-import type {ReportSummary} from '@/lib/report-export';
+import type {ReportSummary,TimeReport} from '@/lib/report-export';
+import {timeWorkspace} from './time-workspace';
+import {ApiError} from '@/lib/server/http';
+
+/** Reuse the live list authorization/filter owner, then explicitly remove private
+ * rates, review notes, identities and provenance before any export/preview. */
+export async function timeReport(c:PoolClient,s:SessionUser,period:{from:string;to:string},plan:PlanId,filters:URLSearchParams):Promise<TimeReport>{
+ authorize(s,'reports:read');authorize(s,'time:read');
+ if(!planAllowsModule(plan,'zeiterfassung'))throw new ApiError(403,'module_unavailable','Dieses Modul ist in deinem Tarif nicht verfügbar.');
+ const groupBy=filters.get('groupBy')??'detail';if(!['detail','customer','project','employee'].includes(groupBy))throw new ApiError(400,'invalid_report_group','Ungültige Gruppierung.');
+ const params=new URLSearchParams({from:period.from,to:period.to,limit:'500'});
+ for(const key of ['customerId','projectId','employeeId','status','q'])if(filters.has(key))params.set(key,filters.get(key)!);
+ const result=await timeWorkspace(c,s,params);
+ if(result.total>500)throw new ApiError(400,'report_too_large','Bitte den Zeitraum oder die Filter weiter eingrenzen.');
+ const items=result.items.map(item=>({date:String(item.started_at),customer:String(item.customer_name??''),project:String(item.project_name??''),employee:String(item.employee_name??''),activity:String(item.description??''),minutes:Number(item.duration_minutes),billable:item.billable===true}));
+ // Group by entity identity, never by equal display names of different customers.
+ const groups=new Map<string,{label:string;minutes:number;entries:number}>();
+ if(groupBy!=='detail')result.items.forEach((row,index)=>{const column=groupBy==='customer'?'customer_id':groupBy==='project'?'project_id':'employee_id';const key=String(row[column]??(groupBy==='employee'?row.created_by_user_id:groupBy==='project'?row.project_name:'')??'');const item=items[index],previous=groups.get(key)??{label:item[groupBy as 'customer'|'project'|'employee']||'—',minutes:0,entries:0};previous.minutes+=item.minutes;previous.entries++;groups.set(key,previous);});
+ return {kind:'time',period,asOf:new Date().toISOString(),totalMinutes:result.total_minutes,groupBy:groupBy as TimeReport['groupBy'],groups:[...groups.values()],items};
+}
 export async function reportSummary(c:PoolClient,s:SessionUser,period:{from:string;to:string},plan:PlanId):Promise<ReportSummary>{
  authorize(s,'reports:read');
  const args=[s.organizationId,period.from,period.to];

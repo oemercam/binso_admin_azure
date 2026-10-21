@@ -3,7 +3,7 @@
   "base": "7b90a5c7353cf2061987fcd0f4550210bbc00f92",
   "counts": {
     "apis": 113,
-    "consumers": 38,
+    "consumers": 40,
     "migrations": 71,
     "tables": 106
   },
@@ -4958,6 +4958,7 @@
         "lib/server/repositories/reports.ts",
         "lib/report-export.ts",
         "lib/projects.ts",
+        "lib/server/repositories/time-workspace.ts",
         "lib/server/document-pdf.ts",
         "lib/locales/index.ts",
         "lib/locales/config.ts",
@@ -4992,62 +4993,45 @@
           "callee": "query.get",
           "line": 19,
           "arguments": [
+            "'kind'"
+          ]
+        },
+        {
+          "callee": "query.get",
+          "line": 20,
+          "arguments": [
             "'from'"
           ]
         },
         {
           "callee": "query.get",
-          "line": 19,
+          "line": 20,
           "arguments": [
             "'to'"
           ]
         },
         {
           "callee": "withTenant",
-          "line": 22,
+          "line": 23,
           "arguments": [
             "s.organizationId",
             "s.userId",
-            "c=>reportSummary(c,s,period,plan)",
+            "c=>kind==='time'?timeReport(c,s,period,plan,query):reportSummary(c,s,period,plan)",
             "{snapshot:true}"
-          ]
-        },
-        {
-          "callee": "query.get",
-          "line": 23,
-          "arguments": [
-            "'format'"
           ]
         },
         {
           "callee": "query.get",
           "line": 24,
           "arguments": [
-            "'lang'"
-          ]
-        },
-        {
-          "callee": "withTenant",
-          "line": 26,
-          "arguments": [
-            "s.organizationId",
-            "s.userId",
-            "async c=>{const company=(await c.query('select name,legal_name,logo_url from organizations where id=$1',[s.organizationId])).rows[0]??{};await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'report.export',entityType:'report',metadata:{format:query.get('format'),from:period.from,to:period.to}});return {company,logo:query.get('format')==='pdf'?await documentLogo(c,s.organizationId,{},company):undefined};}"
-          ]
-        },
-        {
-          "callee": "c.query",
-          "line": 26,
-          "arguments": [
-            "'select name,legal_name,logo_url from organizations where id=$1'",
-            "[s.organizationId]"
+            "'format'"
           ]
         },
         {
           "callee": "query.get",
-          "line": 26,
+          "line": 25,
           "arguments": [
-            "'format'"
+            "'lang'"
           ]
         },
         {
@@ -5060,6 +5044,44 @@
         {
           "callee": "query.get",
           "line": 27,
+          "arguments": [
+            "'format'"
+          ]
+        },
+        {
+          "callee": "withTenant",
+          "line": 28,
+          "arguments": [
+            "s.organizationId",
+            "s.userId",
+            "async c=>{const company=(await c.query('select name,legal_name,logo_url from organizations where id=$1',[s.organizationId])).rows[0]??{};await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'report.export',entityType:'report',metadata:{format:query.get('format'),from:period.from,to:period.to}});return {company,logo:query.get('format')==='pdf'?await documentLogo(c,s.organizationId,{},company):undefined};}"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 28,
+          "arguments": [
+            "'select name,legal_name,logo_url from organizations where id=$1'",
+            "[s.organizationId]"
+          ]
+        },
+        {
+          "callee": "query.get",
+          "line": 28,
+          "arguments": [
+            "'format'"
+          ]
+        },
+        {
+          "callee": "query.get",
+          "line": 28,
+          "arguments": [
+            "'format'"
+          ]
+        },
+        {
+          "callee": "query.get",
+          "line": 29,
           "arguments": [
             "'format'"
           ]
@@ -7892,14 +7914,6 @@
           "arguments": [
             "'/api/reports?'+query.toString()"
           ]
-        },
-        {
-          "callee": "apiGetFile",
-          "line": 24,
-          "arguments": [
-            "'/api/reports?'+query.toString()+'&format='+format+'&lang='+locale",
-            "format==='csv'?'text/csv':'application/pdf'"
-          ]
         }
       ],
       "pages": [
@@ -8457,6 +8471,22 @@
       ]
     },
     {
+      "file": "components/report-actions.tsx",
+      "calls": [
+        {
+          "callee": "apiGetFile",
+          "line": 15,
+          "arguments": [
+            "'/api/reports?'+query+'&format='+format+'&lang='+locale",
+            "format==='csv'?'text/csv':'application/pdf'"
+          ]
+        }
+      ],
+      "pages": [
+        "app/berichte/page.tsx"
+      ]
+    },
+    {
       "file": "components/security-settings-page.tsx",
       "calls": [
         {
@@ -8623,6 +8653,21 @@
       ],
       "pages": [
         "app/einstellungen/team/page.tsx"
+      ]
+    },
+    {
+      "file": "components/time-report.tsx",
+      "calls": [
+        {
+          "callee": "useApiQuery",
+          "line": 13,
+          "arguments": [
+            "'/api/reports?'+query"
+          ]
+        }
+      ],
+      "pages": [
+        "app/berichte/page.tsx"
       ]
     },
     {
@@ -11619,13 +11664,31 @@
         "lib/permissions.ts",
         "lib/server/rbac.ts",
         "lib/server/session.ts",
-        "lib/report-export.ts"
+        "lib/report-export.ts",
+        "lib/server/repositories/time-workspace.ts",
+        "lib/server/http.ts"
       ],
       "methods": [],
       "calls": [
         {
           "callee": "authorize",
-          "line": 9,
+          "line": 14,
+          "arguments": [
+            "s",
+            "'reports:read'"
+          ]
+        },
+        {
+          "callee": "authorize",
+          "line": 14,
+          "arguments": [
+            "s",
+            "'time:read'"
+          ]
+        },
+        {
+          "callee": "authorize",
+          "line": 28,
           "arguments": [
             "s",
             "'reports:read'"
@@ -11633,7 +11696,7 @@
         },
         {
           "callee": "c.query",
-          "line": 11,
+          "line": 30,
           "arguments": [
             "`select count(*)::text total,count(*) filter(where (created_at at time zone 'Europe/Zurich')::date between $2::date and $3::date)::text added from customers where organization_id=$1 and archived_at is null`",
             "args"
@@ -11641,7 +11704,7 @@
         },
         {
           "callee": "c.query",
-          "line": 12,
+          "line": 31,
           "arguments": [
             "`select status,count(*)::text count from projects where organization_id=$1 and archived_at is null group by status order by status`",
             "[s.organizationId]"
@@ -11649,7 +11712,7 @@
         },
         {
           "callee": "c.query",
-          "line": 13,
+          "line": 32,
           "arguments": [
             "`select coalesce(sum(hours),0)::text hours,coalesce(sum(hours) filter(where billable),0)::text billable_hours,coalesce(sum(hours) filter(where invoiced_invoice_id is not null),0)::text invoiced_hours from time_entries where organization_id=$1 and archived_at is null and work_date between $2::date and $3::date and ($4::boolean=false or created_by_user_id=$5)`",
             "[...args,ownRecordOnly(s.role,'zeiterfassung'),s.userId]"
@@ -11657,7 +11720,7 @@
         },
         {
           "callee": "c.query",
-          "line": 14,
+          "line": 33,
           "arguments": [
             "`select i.currency,sum(p.amount)::text amount from payments p join invoices i on i.id=p.invoice_id and i.organization_id=p.organization_id where p.organization_id=$1 and p.archived_at is null and p.allocation_status='matched' and p.payment_date between $2::date and $3::date group by i.currency order by i.currency`",
             "args"
@@ -11665,7 +11728,7 @@
         },
         {
           "callee": "c.query",
-          "line": 15,
+          "line": 34,
           "arguments": [
             "`select currency,sum(quantity*unit_price)::text amount from expenses where organization_id=$1 and archived_at is null and status in ('approved','posted') and reimbursed_at is not null and (reimbursed_at at time zone 'Europe/Zurich')::date between $2::date and $3::date group by currency order by currency`",
             "args"
@@ -11673,7 +11736,7 @@
         },
         {
           "callee": "c.query",
-          "line": 16,
+          "line": 35,
           "arguments": [
             "`select count(*)::text total,count(*) filter(where active)::text active from employees where organization_id=$1 and archived_at is null`",
             "[s.organizationId]"

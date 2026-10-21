@@ -26,8 +26,12 @@ assert.ok(!/export function (InvoicePreview|OfferPreview)/.test(source),'Unused 
 const pdfFinancial=financialModuleUrl;
 const pdfModuleSource=(await fs.readFile('lib/server/document-pdf.ts','utf8')).replace('import "server-only";','').replace('"@/lib/locales"',JSON.stringify(await localeTestModuleUrl())).replace('"@/lib/qr-bill"',JSON.stringify('data:text/javascript;base64,'+Buffer.from(qrCompiled).toString('base64'))).replace('"@/lib/financial-status"',JSON.stringify(pdfFinancial)).replace('"pdfkit"',JSON.stringify(pathToFileURL(require.resolve('pdfkit')).href)).replace('"swissqrbill/pdf"',JSON.stringify(pathToFileURL(require.resolve('swissqrbill/pdf')).href));
 const pdfModuleJs=ts.transpileModule(pdfModuleSource,{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText;
-const {documentPdf}=await import('data:text/javascript;base64,'+Buffer.from(pdfModuleJs).toString('base64'));
+const {documentPdf,reportPdf}=await import('data:text/javascript;base64,'+Buffer.from(pdfModuleJs).toString('base64'));
 const {getDocument}=await import('pdfjs-dist/legacy/build/pdf.mjs');
+const longReport=await getDocument({data:new Uint8Array(await reportPdf([['Datum · Kunde · Auftrag','Mitarbeiter · Tätigkeit','Dauer'],['2026-10-01\nSynthetic company','A'.repeat(1900)+' END_REPORT_MARKER','198:00']],{title:'Time report',company:'Synthetic fixture',locale:'en',variant:'time'})),isEvalSupported:false}).promise;
+assert.ok(longReport.numPages>1,'Long activities must continue across report pages');
+let reportText='';for(let n=1;n<=longReport.numPages;n++){const page=await longReport.getPage(n),text=await page.getTextContent();for(const item of text.items){if('str' in item){reportText+=item.str;assert.ok(item.transform[5]>=20&&item.transform[5]<=page.view[3]-20,'Report content stays inside the page');}}}
+assert.ok(reportText.includes('END_REPORT_MARKER'),'Final activity text must not be clipped at a page boundary');assert.ok(reportText.includes('198:00'),'Monthly hours remain visible');await longReport.destroy();
 // Execute the tenant-scoped asset resolver with the real image converter.
 globalThis.__logoPolicy={};
 const policySource=(await fs.readFile('lib/server/file-access.ts','utf8')).replace('import "server-only";','').replace('"./env"',JSON.stringify('data:text/javascript,export const env={get releaseProfile(){return globalThis.__logoPolicy.releaseProfile},get fileAccessMode(){return globalThis.__logoPolicy.fileAccessMode},get fileScanSocket(){return globalThis.__logoPolicy.fileScanSocket}}'));

@@ -7360,14 +7360,14 @@
       "requirement": "Eine zentrale Reporting-Foundation, keine isolierten Exportimplementierungen.",
       "sourceTextSha256": "de7fb8d78f6a7833257d2532b9223302f630e8e89a4e5af07fc24e74f807c80d",
       "sourceParagraph": "Eine zentrale Reporting-Foundation, keine isolierten Exportimplementierungen. Berichte nach Zeitraum, Kunde, Auftrag, Projekt, Mitarbeiter (berechtigungsabhängig), Status und Detailgrad filtern; Vorschau → Aktionen im bestehenden Drei-Punkte-Menü: PDF herunterladen, CSV herunterladen, per E-Mail senden, sicher teilen bzw. native Gerätefreigabe. Kein zusätzliches verstreutes Buttonsystem.",
-      "status": "nicht_abgenommen",
+      "status": "teilweise_implementiert",
       "sourceReferences": [
         "lib/server/document-pdf.ts"
       ],
       "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
+      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
+      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
     },
     {
       "id": "R7-43-002",
@@ -7377,14 +7377,14 @@
       "requirement": "Berichte nach Zeitraum, Kunde, Auftrag, Projekt, Mitarbeiter (berechtigungsabhängig), Status und Detailgrad filtern; Vorschau → Aktionen im bestehenden Drei-Punkte-Menü: PDF herunterladen, CSV herunterladen, per E-Mail senden, sicher teilen bzw. native Gerätefreigabe.",
       "sourceTextSha256": "01e592cfef11fe3a4de63c810e30ecb14dcb92433c39b0bb1ea42ade6830f571",
       "sourceParagraph": "Eine zentrale Reporting-Foundation, keine isolierten Exportimplementierungen. Berichte nach Zeitraum, Kunde, Auftrag, Projekt, Mitarbeiter (berechtigungsabhängig), Status und Detailgrad filtern; Vorschau → Aktionen im bestehenden Drei-Punkte-Menü: PDF herunterladen, CSV herunterladen, per E-Mail senden, sicher teilen bzw. native Gerätefreigabe. Kein zusätzliches verstreutes Buttonsystem.",
-      "status": "nicht_abgenommen",
+      "status": "teilweise_implementiert",
       "sourceReferences": [
         "lib/server/document-pdf.ts"
       ],
       "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
+      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
+      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
     },
     {
       "id": "R7-43-003",
@@ -7394,14 +7394,14 @@
       "requirement": "Kein zusätzliches verstreutes Buttonsystem.",
       "sourceTextSha256": "f6da52b94b9d5892f10c7ce01e0a566abba59129e9a04a498f03115ea771c1a3",
       "sourceParagraph": "Eine zentrale Reporting-Foundation, keine isolierten Exportimplementierungen. Berichte nach Zeitraum, Kunde, Auftrag, Projekt, Mitarbeiter (berechtigungsabhängig), Status und Detailgrad filtern; Vorschau → Aktionen im bestehenden Drei-Punkte-Menü: PDF herunterladen, CSV herunterladen, per E-Mail senden, sicher teilen bzw. native Gerätefreigabe. Kein zusätzliches verstreutes Buttonsystem.",
-      "status": "nicht_abgenommen",
+      "status": "teilweise_implementiert",
       "sourceReferences": [
         "lib/server/document-pdf.ts"
       ],
       "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
+      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
+      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
     },
     {
       "id": "R7-43-004",
@@ -7411,14 +7411,14 @@
       "requirement": "**Zeitrapporte:** detailliert mit Datum, Tätigkeit, Mitarbeiter, Dauer, Projekt, Kunde, oder zusammengefasst nach Kunde/Projekt/Mitarbeiter; Woche/Monat/individueller Zeitraum, verrechenbar/nicht verrechenbar.",
       "sourceTextSha256": "820af352f27eff887d409d75f0064d6595b3d64ff2f66714c75c73b0c54acfe9",
       "sourceParagraph": "**Zeitrapporte:** detailliert mit Datum, Tätigkeit, Mitarbeiter, Dauer, Projekt, Kunde, oder zusammengefasst nach Kunde/Projekt/Mitarbeiter; Woche/Monat/individueller Zeitraum, verrechenbar/nicht verrechenbar. Professionelles PDF mit Firmenlogo, Zeitraum, Tabellen, Summen, Seitenzahlen; CSV mit dokumentierten Spalten. Interne Kommentare, vertrauliche Stundensätze und nicht berechtigte Mitarbeiterdaten in Kundenrapporten niemals versehentlich veröffentlichen. Timer-Pausen, Korrekturen, Rundung und Zeitzone korrekt.",
-      "status": "nicht_abgenommen",
+      "status": "teilweise_implementiert",
       "sourceReferences": [
         "lib/server/document-pdf.ts"
       ],
       "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
+      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
+      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
     },
     {
       "id": "R7-43-005",
@@ -7428,14 +7428,14 @@
       "requirement": "Professionelles PDF mit Firmenlogo, Zeitraum, Tabellen, Summen, Seitenzahlen; CSV mit dokumentierten Spalten.",
       "sourceTextSha256": "f302ab3455d23e2aebfe9abae1f0a0d6df43760952623f1aed3d6d29964f57a5",
       "sourceParagraph": "**Zeitrapporte:** detailliert mit Datum, Tätigkeit, Mitarbeiter, Dauer, Projekt, Kunde, oder zusammengefasst nach Kunde/Projekt/Mitarbeiter; Woche/Monat/individueller Zeitraum, verrechenbar/nicht verrechenbar. Professionelles PDF mit Firmenlogo, Zeitraum, Tabellen, Summen, Seitenzahlen; CSV mit dokumentierten Spalten. Interne Kommentare, vertrauliche Stundensätze und nicht berechtigte Mitarbeiterdaten in Kundenrapporten niemals versehentlich veröffentlichen. Timer-Pausen, Korrekturen, Rundung und Zeitzone korrekt.",
-      "status": "nicht_abgenommen",
+      "status": "teilweise_implementiert",
       "sourceReferences": [
         "lib/server/document-pdf.ts"
       ],
       "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
+      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
+      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
     },
     {
       "id": "R7-43-006",
@@ -7445,14 +7445,14 @@
       "requirement": "Interne Kommentare, vertrauliche Stundensätze und nicht berechtigte Mitarbeiterdaten in Kundenrapporten niemals versehentlich veröffentlichen.",
       "sourceTextSha256": "6ecb4c46add005e12b9fd770019d9c146e009fd74b8837a636b403fb0fa91dfc",
       "sourceParagraph": "**Zeitrapporte:** detailliert mit Datum, Tätigkeit, Mitarbeiter, Dauer, Projekt, Kunde, oder zusammengefasst nach Kunde/Projekt/Mitarbeiter; Woche/Monat/individueller Zeitraum, verrechenbar/nicht verrechenbar. Professionelles PDF mit Firmenlogo, Zeitraum, Tabellen, Summen, Seitenzahlen; CSV mit dokumentierten Spalten. Interne Kommentare, vertrauliche Stundensätze und nicht berechtigte Mitarbeiterdaten in Kundenrapporten niemals versehentlich veröffentlichen. Timer-Pausen, Korrekturen, Rundung und Zeitzone korrekt.",
-      "status": "nicht_abgenommen",
+      "status": "teilweise_implementiert",
       "sourceReferences": [
         "lib/server/document-pdf.ts"
       ],
       "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
+      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
+      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
     },
     {
       "id": "R7-43-007",
@@ -7462,14 +7462,14 @@
       "requirement": "Timer-Pausen, Korrekturen, Rundung und Zeitzone korrekt.",
       "sourceTextSha256": "bc7772c96d2717be2536167bb81490adec1b421da39c4d04857d428128b15e1a",
       "sourceParagraph": "**Zeitrapporte:** detailliert mit Datum, Tätigkeit, Mitarbeiter, Dauer, Projekt, Kunde, oder zusammengefasst nach Kunde/Projekt/Mitarbeiter; Woche/Monat/individueller Zeitraum, verrechenbar/nicht verrechenbar. Professionelles PDF mit Firmenlogo, Zeitraum, Tabellen, Summen, Seitenzahlen; CSV mit dokumentierten Spalten. Interne Kommentare, vertrauliche Stundensätze und nicht berechtigte Mitarbeiterdaten in Kundenrapporten niemals versehentlich veröffentlichen. Timer-Pausen, Korrekturen, Rundung und Zeitzone korrekt.",
-      "status": "nicht_abgenommen",
+      "status": "teilweise_implementiert",
       "sourceReferences": [
         "lib/server/document-pdf.ts"
       ],
       "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
+      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
+      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
     },
     {
       "id": "R7-43-008",
@@ -7479,14 +7479,14 @@
       "requirement": "**Finanzberichte:** Einnahmen/Ausgaben, fakturiert, offen/überfällig, Zahlungseingänge, Angebotsvolumen/-status, Ausgaben nach Kategorien, MwSt.-Auswertung (nicht als vollständige Steuerdeklaration ausgeben), Projektwirtschaftlichkeit nur bei echter Datenbasis.",
       "sourceTextSha256": "7f9bbd76986aca52fc679aa689867d8aef58f62d3cfe6998887a3f2a30202252",
       "sourceParagraph": "**Finanzberichte:** Einnahmen/Ausgaben, fakturiert, offen/überfällig, Zahlungseingänge, Angebotsvolumen/-status, Ausgaben nach Kategorien, MwSt.-Auswertung (nicht als vollständige Steuerdeklaration ausgeben), Projektwirtschaftlichkeit nur bei echter Datenbasis. Berichte enthalten Zeitraum, Erstellungsdatum/Datenstand, Einheit, fachlich korrekte Summen und Statusdefinitionen.",
-      "status": "nicht_abgenommen",
+      "status": "teilweise_implementiert",
       "sourceReferences": [
         "lib/server/document-pdf.ts"
       ],
       "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
+      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
+      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
     },
     {
       "id": "R7-43-009",
@@ -7496,14 +7496,14 @@
       "requirement": "Berichte enthalten Zeitraum, Erstellungsdatum/Datenstand, Einheit, fachlich korrekte Summen und Statusdefinitionen.",
       "sourceTextSha256": "42e62a1191149d38124c2ec17ff6b4f8a576d13c97857a1fb5c4991c81e6c109",
       "sourceParagraph": "**Finanzberichte:** Einnahmen/Ausgaben, fakturiert, offen/überfällig, Zahlungseingänge, Angebotsvolumen/-status, Ausgaben nach Kategorien, MwSt.-Auswertung (nicht als vollständige Steuerdeklaration ausgeben), Projektwirtschaftlichkeit nur bei echter Datenbasis. Berichte enthalten Zeitraum, Erstellungsdatum/Datenstand, Einheit, fachlich korrekte Summen und Statusdefinitionen.",
-      "status": "nicht_abgenommen",
+      "status": "teilweise_implementiert",
       "sourceReferences": [
         "lib/server/document-pdf.ts"
       ],
       "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
+      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
+      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
     },
     {
       "id": "R7-43-010",
@@ -7513,14 +7513,14 @@
       "requirement": "**Formate und Sicherheit:** PDF im zentralen Viewer; CSV UTF-8 mit stabilen Spalten, Excel-kompatibler Variante, sauberem Dezimal-/Datumsformat und Schutz gegen CSV-Formelinjektion.",
       "sourceTextSha256": "0552792c3e70b8398014cbad280b9ab5f4a38f0029269ff39fc2c93c626abd83",
       "sourceParagraph": "**Formate und Sicherheit:** PDF im zentralen Viewer; CSV UTF-8 mit stabilen Spalten, Excel-kompatibler Variante, sauberem Dezimal-/Datumsformat und Schutz gegen CSV-Formelinjektion. E-Mail mit Empfänger, Betreff, Begleittext, echtem Anhang und Versand-/Fehlerprotokoll. Sensible Freigabelinks nicht erratbar, befristet, widerrufbar und mit angemessener Empfängerverifikation. Berechtigungen serverseitig, Audit für Freigaben, keine realen Test-E-Mails an Kunden. Grosse Exporte ressourcenschonend und mit verständlichen Fehlern. Optional gespeicherte Filter; automatische Versände nur nach ausdrücklichem Opt-in.",
-      "status": "nicht_abgenommen",
+      "status": "teilweise_implementiert",
       "sourceReferences": [
         "lib/server/document-pdf.ts"
       ],
       "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
+      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
+      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
     },
     {
       "id": "R7-43-011",
@@ -7530,14 +7530,14 @@
       "requirement": "E-Mail mit Empfänger, Betreff, Begleittext, echtem Anhang und Versand-/Fehlerprotokoll.",
       "sourceTextSha256": "64670a893224a459fbe16930ea9fb8aaac8283883b6332de151acc3e38535082",
       "sourceParagraph": "**Formate und Sicherheit:** PDF im zentralen Viewer; CSV UTF-8 mit stabilen Spalten, Excel-kompatibler Variante, sauberem Dezimal-/Datumsformat und Schutz gegen CSV-Formelinjektion. E-Mail mit Empfänger, Betreff, Begleittext, echtem Anhang und Versand-/Fehlerprotokoll. Sensible Freigabelinks nicht erratbar, befristet, widerrufbar und mit angemessener Empfängerverifikation. Berechtigungen serverseitig, Audit für Freigaben, keine realen Test-E-Mails an Kunden. Grosse Exporte ressourcenschonend und mit verständlichen Fehlern. Optional gespeicherte Filter; automatische Versände nur nach ausdrücklichem Opt-in.",
-      "status": "nicht_abgenommen",
+      "status": "teilweise_implementiert",
       "sourceReferences": [
         "lib/server/document-pdf.ts"
       ],
       "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
+      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
+      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
     },
     {
       "id": "R7-43-012",
@@ -7547,14 +7547,14 @@
       "requirement": "Sensible Freigabelinks nicht erratbar, befristet, widerrufbar und mit angemessener Empfängerverifikation.",
       "sourceTextSha256": "e649ea39ba7e878f166b5d1ce5b5b4c82701571f2c8ecfbfa3b0b60b5ca34fda",
       "sourceParagraph": "**Formate und Sicherheit:** PDF im zentralen Viewer; CSV UTF-8 mit stabilen Spalten, Excel-kompatibler Variante, sauberem Dezimal-/Datumsformat und Schutz gegen CSV-Formelinjektion. E-Mail mit Empfänger, Betreff, Begleittext, echtem Anhang und Versand-/Fehlerprotokoll. Sensible Freigabelinks nicht erratbar, befristet, widerrufbar und mit angemessener Empfängerverifikation. Berechtigungen serverseitig, Audit für Freigaben, keine realen Test-E-Mails an Kunden. Grosse Exporte ressourcenschonend und mit verständlichen Fehlern. Optional gespeicherte Filter; automatische Versände nur nach ausdrücklichem Opt-in.",
-      "status": "nicht_abgenommen",
+      "status": "teilweise_implementiert",
       "sourceReferences": [
         "lib/server/document-pdf.ts"
       ],
       "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
+      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
+      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
     },
     {
       "id": "R7-43-013",
@@ -7564,14 +7564,14 @@
       "requirement": "Berechtigungen serverseitig, Audit für Freigaben, keine realen Test-E-Mails an Kunden.",
       "sourceTextSha256": "15f7661eab570ed043c71e3c706a0410c2c6c13d047b3ae0865ee8a45b8defac",
       "sourceParagraph": "**Formate und Sicherheit:** PDF im zentralen Viewer; CSV UTF-8 mit stabilen Spalten, Excel-kompatibler Variante, sauberem Dezimal-/Datumsformat und Schutz gegen CSV-Formelinjektion. E-Mail mit Empfänger, Betreff, Begleittext, echtem Anhang und Versand-/Fehlerprotokoll. Sensible Freigabelinks nicht erratbar, befristet, widerrufbar und mit angemessener Empfängerverifikation. Berechtigungen serverseitig, Audit für Freigaben, keine realen Test-E-Mails an Kunden. Grosse Exporte ressourcenschonend und mit verständlichen Fehlern. Optional gespeicherte Filter; automatische Versände nur nach ausdrücklichem Opt-in.",
-      "status": "nicht_abgenommen",
+      "status": "teilweise_implementiert",
       "sourceReferences": [
         "lib/server/document-pdf.ts"
       ],
       "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
+      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
+      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
     },
     {
       "id": "R7-43-014",
@@ -7581,14 +7581,14 @@
       "requirement": "Grosse Exporte ressourcenschonend und mit verständlichen Fehlern.",
       "sourceTextSha256": "148a498f94308c524d0f9831394f3ac96f7473dc95dd43f8cc85eb2b06527e19",
       "sourceParagraph": "**Formate und Sicherheit:** PDF im zentralen Viewer; CSV UTF-8 mit stabilen Spalten, Excel-kompatibler Variante, sauberem Dezimal-/Datumsformat und Schutz gegen CSV-Formelinjektion. E-Mail mit Empfänger, Betreff, Begleittext, echtem Anhang und Versand-/Fehlerprotokoll. Sensible Freigabelinks nicht erratbar, befristet, widerrufbar und mit angemessener Empfängerverifikation. Berechtigungen serverseitig, Audit für Freigaben, keine realen Test-E-Mails an Kunden. Grosse Exporte ressourcenschonend und mit verständlichen Fehlern. Optional gespeicherte Filter; automatische Versände nur nach ausdrücklichem Opt-in.",
-      "status": "nicht_abgenommen",
+      "status": "teilweise_implementiert",
       "sourceReferences": [
         "lib/server/document-pdf.ts"
       ],
       "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
+      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
+      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
     },
     {
       "id": "R7-43-015",
@@ -7598,14 +7598,14 @@
       "requirement": "Optional gespeicherte Filter; automatische Versände nur nach ausdrücklichem Opt-in.",
       "sourceTextSha256": "42557c3e07a4fa7163c708ba6876b2f807abcece5e5ac748d232f8bfc5b46cb7",
       "sourceParagraph": "**Formate und Sicherheit:** PDF im zentralen Viewer; CSV UTF-8 mit stabilen Spalten, Excel-kompatibler Variante, sauberem Dezimal-/Datumsformat und Schutz gegen CSV-Formelinjektion. E-Mail mit Empfänger, Betreff, Begleittext, echtem Anhang und Versand-/Fehlerprotokoll. Sensible Freigabelinks nicht erratbar, befristet, widerrufbar und mit angemessener Empfängerverifikation. Berechtigungen serverseitig, Audit für Freigaben, keine realen Test-E-Mails an Kunden. Grosse Exporte ressourcenschonend und mit verständlichen Fehlern. Optional gespeicherte Filter; automatische Versände nur nach ausdrücklichem Opt-in.",
-      "status": "nicht_abgenommen",
+      "status": "teilweise_implementiert",
       "sourceReferences": [
         "lib/server/document-pdf.ts"
       ],
       "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
+      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
+      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
     },
     {
       "id": "R7-44-001",

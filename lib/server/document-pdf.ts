@@ -97,18 +97,26 @@ export async function documentPdf(document:Row,liveCompany:Row,logo?:Buffer){
 }
 
 /** The same PDF owner/fonts as documents; only authorized report rows enter here. */
-export async function reportPdf(rows:readonly (readonly string[])[],options:{title:string;company:string;locale:string;logo?:Buffer}){
- if(rows.length>1000||rows.some(row=>row.length>3||row.some(value=>value.length>2000)))throw new Error('Report size exceeds bounded rendering limits');
+export async function reportPdf(rows:readonly (readonly string[])[],options:{title:string;company:string;locale:string;logo?:Buffer;variant?:'time'}){
+ if(rows.length>1000||rows.some(row=>row.length>3||row.some(value=>value.length>3000)))throw new Error('Report size exceeds bounded rendering limits');
  const pdf=new PDFDocument({size:'A4',margins:{top:44,bottom:60,left:44,right:44},bufferPages:true,info:{Title:options.title,Author:options.company}});
  const [regular,bold]=await Promise.all(['Regular','Bold'].map(weight=>readFile(join(process.cwd(),'public/fonts/pdf',`LiberationSans-${weight}.ttf`))));
  pdf.registerFont('Liberation Sans',regular).registerFont('Liberation Sans-Bold',bold);
  const chunks:Buffer[]=[],finished=new Promise<Buffer>((resolve,reject)=>{pdf.on('data',chunk=>chunks.push(chunk));pdf.on('end',()=>resolve(Buffer.concat(chunks)));pdf.on('error',reject)});
  if(options.logo){try{pdf.image(options.logo,44,40,{fit:[160,48]});pdf.y=104;}catch{pdf.y=44;}}
  pdf.font('Liberation Sans-Bold').fontSize(18).text(options.title);pdf.moveDown(.5);pdf.font('Liberation Sans').fontSize(10).text(options.company);pdf.moveDown();
- const columns=[44,310,475],widths=[250,150,75];
- const tableRow=(row:readonly string[],heading=false)=>{pdf.font(heading?'Liberation Sans-Bold':'Liberation Sans').fontSize(10);const height=Math.max(18,...row.map((value,index)=>pdf.heightOfString(value,{width:widths[index]})))+12;
-  if(pdf.y+height>pdf.page.height-65){pdf.addPage();if(rows[0]&&row!==rows[0])tableRow(rows[0],true);}
-  const y=pdf.y;row.forEach((value,index)=>{pdf.text(value,columns[index],y,{width:widths[index],align:index===1?'right':'left'});});pdf.y=y+height;
+ const columns=options.variant==='time'?[44,218,495]:[44,310,475],widths=options.variant==='time'?[160,263,55]:[250,150,75],numeric=options.variant==='time'?2:1;
+ const wrap=(value:string,width:number)=>value.split('\n').flatMap(paragraph=>{const lines:string[]=[];let line='';for(const character of paragraph){if(line&&pdf.widthOfString(line+character)>width){lines.push(line);line='';}line+=character;}lines.push(line);return lines;});
+ const tableRow=(row:readonly string[],heading=false)=>{
+  pdf.font(heading?'Liberation Sans-Bold':'Liberation Sans').fontSize(10);
+  const cells=row.map((value,index)=>wrap(value,widths[index])),lineHeight=14,count=Math.max(1,...cells.map(lines=>lines.length));
+  for(let offset=0;offset<count;){
+   let available=Math.floor((pdf.page.height-65-pdf.y-12)/lineHeight);
+   if(available<1){pdf.addPage();if(rows[0]&&!heading)tableRow(rows[0],true);pdf.font(heading?'Liberation Sans-Bold':'Liberation Sans').fontSize(10);available=Math.floor((pdf.page.height-65-pdf.y-12)/lineHeight);}
+   const length=Math.min(available,count-offset),y=pdf.y;
+   cells.forEach((lines,index)=>{lines.slice(offset,offset+length).forEach((line,lineIndex)=>pdf.text(line,columns[index],y+lineIndex*lineHeight,{width:widths[index],lineBreak:false,align:index===numeric?'right':'left'}));});
+   offset+=length;pdf.y=y+length*lineHeight+12;
+  }
   if(heading){pdf.moveTo(44,pdf.y-5).lineTo(550,pdf.y-5).strokeColor('#dce5ef').stroke();}
  };
  rows.forEach((row,index)=>tableRow(row,index===0));

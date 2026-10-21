@@ -13703,5 +13703,45 @@
     "Describe your request. You will receive replies in the ticket.",
     "Décrivez votre demande. Vous recevrez les réponses dans le ticket.",
     "Descrivi la tua richiesta. Riceverai le risposte nel ticket."
+  ],
+  "Zeitrapport": [
+    "Time report",
+    "Rapport de temps",
+    "Rapporto ore"
+  ],
+  "Kunde, Auftrag oder Mitarbeiter": [
+    "Customer, order or employee",
+    "Client, mandat ou employé",
+    "Cliente, incarico o dipendente"
+  ],
+  "Keine Einträge im Zeitraum": [
+    "No entries in this period",
+    "Aucune entrée pour cette période",
+    "Nessuna voce nel periodo"
+  ],
+  "Datum · Kunde · Auftrag": [
+    "Date · Customer · Order",
+    "Date · Client · Mandat",
+    "Data · Cliente · Incarico"
+  ],
+  "Mitarbeiter · Tätigkeit": [
+    "Employee · Activity",
+    "Employé · Activité",
+    "Dipendente · Attività"
+  ],
+  "Gruppierung": [
+    "Grouping",
+    "Regroupement",
+    "Raggruppamento"
+  ],
+  "Ungültige Gruppierung.": [
+    "Invalid grouping.",
+    "Regroupement non valide.",
+    "Raggruppamento non valido."
+  ],
+  "Bitte den Zeitraum oder die Filter weiter eingrenzen.": [
+    "Please narrow the period or filters.",
+    "Veuillez réduire la période ou affiner les filtres.",
+    "Restringi il periodo o i filtri."
   ]
 }

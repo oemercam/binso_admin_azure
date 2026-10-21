@@ -29,6 +29,19 @@ Das Register ist eine Vollständigkeitskontrolle, kein Beleg ausgeführter Tests
 
 ## Nachgewiesene Ursachen und Datenfluss
 
+Zeitrapport-Paket: bestehende timeWorkspace-Abfrage mit deren Rollen-, Mandanten-,
+Datums-, Mitarbeiter-/Kunden-/Auftrags- und Statusfiltern wiederverwendet.
+Explizite Projektion nur Datum, Kunde, Auftrag, Mitarbeiter, Tätigkeit, Minuten
+und Verrechenbarkeit; keine internen Prüfanmerkungen, Stundensätze oder
+Benutzer-/Datei-IDs. Berichte-Menü öffnet das vorhandene FormSheet, Suche und
+Statusfilter, PDF-/CSV-Aktionen teilen einen Owner. 500 Einträge pro Rapport,
+danach ausdrücklicher Fehler statt stiller Kürzung. PDF nutzt bestehende Fonts,
+Logo, Seitenzahlen und Viewer; lange Aktivitäten fliessen mit wiederholtem
+Tabellenkopf auf Folgeseiten. Tatsächliche PDF-Text-/Seitenbegrenzungstests und
+Datenbanktests für Export, Status/Zeitraum, Rollen und Übergrössen bestehen.
+Gruppierung nach Kunden-/Auftrags-/Mitarbeiteridentität ist vorbereitet; deren vollständige visuelle Abnahme sowie direkte Berichts-E-Mails, sichere Freigabelinks und der
+vollständige Finanzbericht bleiben offen; Kapitel43 ist nicht vollständig.
+
 Support-Paket: Die Kundenprojektion lieferte den rohen Datenbankstatus
 waiting_for_customer, während UI und Operator-API waiting_customer erwarten.
 Zusätzlich fehlte beim Statusfilter das verpflichtende eq.-Präfix. Die zentrale

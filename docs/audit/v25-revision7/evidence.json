@@ -134,6 +134,111 @@
       "test": "scripts/migration-test.mjs bestanden: tatsächliche Ticketanlage, Reply-Idempotenz, Reopen, Mandantenfilter und Audit. Keine separate Live-Chat-Infrastruktur erzeugt.",
       "visualComparison": "Noch kein vollständiger Referenzvergleich auf aktuellem Head.",
       "blocker": "Vollständige Support-Admin-/Benachrichtigungs- und Geräteabnahme offen."
+    },
+    "R7-43-001": {
+      "sourceTextSha256": "de7fb8d78f6a7833257d2532b9223302f630e8e89a4e5af07fc24e74f807c80d",
+      "status": "teilweise_implementiert",
+      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
+      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
+      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
+    },
+    "R7-43-002": {
+      "sourceTextSha256": "01e592cfef11fe3a4de63c810e30ecb14dcb92433c39b0bb1ea42ade6830f571",
+      "status": "teilweise_implementiert",
+      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
+      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
+      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
+    },
+    "R7-43-003": {
+      "sourceTextSha256": "f6da52b94b9d5892f10c7ce01e0a566abba59129e9a04a498f03115ea771c1a3",
+      "status": "teilweise_implementiert",
+      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
+      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
+      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
+    },
+    "R7-43-004": {
+      "sourceTextSha256": "820af352f27eff887d409d75f0064d6595b3d64ff2f66714c75c73b0c54acfe9",
+      "status": "teilweise_implementiert",
+      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
+      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
+      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
+    },
+    "R7-43-005": {
+      "sourceTextSha256": "f302ab3455d23e2aebfe9abae1f0a0d6df43760952623f1aed3d6d29964f57a5",
+      "status": "teilweise_implementiert",
+      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
+      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
+      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
+    },
+    "R7-43-006": {
+      "sourceTextSha256": "6ecb4c46add005e12b9fd770019d9c146e009fd74b8837a636b403fb0fa91dfc",
+      "status": "teilweise_implementiert",
+      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
+      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
+      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
+    },
+    "R7-43-007": {
+      "sourceTextSha256": "bc7772c96d2717be2536167bb81490adec1b421da39c4d04857d428128b15e1a",
+      "status": "teilweise_implementiert",
+      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
+      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
+      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
+    },
+    "R7-43-008": {
+      "sourceTextSha256": "7f9bbd76986aca52fc679aa689867d8aef58f62d3cfe6998887a3f2a30202252",
+      "status": "teilweise_implementiert",
+      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
+      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
+      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
+    },
+    "R7-43-009": {
+      "sourceTextSha256": "42e62a1191149d38124c2ec17ff6b4f8a576d13c97857a1fb5c4991c81e6c109",
+      "status": "teilweise_implementiert",
+      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
+      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
+      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
+    },
+    "R7-43-010": {
+      "sourceTextSha256": "0552792c3e70b8398014cbad280b9ab5f4a38f0029269ff39fc2c93c626abd83",
+      "status": "teilweise_implementiert",
+      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
+      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
+      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
+    },
+    "R7-43-011": {
+      "sourceTextSha256": "64670a893224a459fbe16930ea9fb8aaac8283883b6332de151acc3e38535082",
+      "status": "teilweise_implementiert",
+      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
+      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
+      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
+    },
+    "R7-43-012": {
+      "sourceTextSha256": "e649ea39ba7e878f166b5d1ce5b5b4c82701571f2c8ecfbfa3b0b60b5ca34fda",
+      "status": "teilweise_implementiert",
+      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
+      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
+      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
+    },
+    "R7-43-013": {
+      "sourceTextSha256": "15f7661eab570ed043c71e3c706a0410c2c6c13d047b3ae0865ee8a45b8defac",
+      "status": "teilweise_implementiert",
+      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
+      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
+      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
+    },
+    "R7-43-014": {
+      "sourceTextSha256": "148a498f94308c524d0f9831394f3ac96f7473dc95dd43f8cc85eb2b06527e19",
+      "status": "teilweise_implementiert",
+      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
+      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
+      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
+    },
+    "R7-43-015": {
+      "sourceTextSha256": "42557c3e07a4fa7163c708ba6876b2f807abcece5e5ac748d232f8bfc5b46cb7",
+      "status": "teilweise_implementiert",
+      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
+      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
+      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
     }
   },
   "tests": {
