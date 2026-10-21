@@ -85,7 +85,9 @@ begin
  if reference is null then return new; end if;
  scope:=nullif(to_jsonb(new)->>'organization_id','')::uuid;
  select id,merged_into_customer_id into found_id,merged_target from customers where id=reference and organization_id=scope for key share;
- if found_id is null then raise exception 'Customer association unavailable' using errcode='23503'; end if;
+ -- Preserve authorization semantics for references hidden by the caller's RLS.
+ -- Do not reveal whether an inaccessible customer exists in another scope.
+ if found_id is null then raise exception 'Customer association unavailable' using errcode='42501'; end if;
  if merged_target is not null then raise exception 'Customer was merged; select the retained customer' using errcode='23514'; end if;
  return new;
 end $$;

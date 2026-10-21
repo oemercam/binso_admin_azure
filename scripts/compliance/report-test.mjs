@@ -1,5 +1,6 @@
 import {pixelDifference} from './visual.mjs';
 import assert from 'node:assert/strict';
+import './authority-test.mjs';
 import {execFileSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
 import {createHash} from 'node:crypto';
@@ -78,5 +79,9 @@ try{
  fs.mkdirSync(path.join(identityDir,'docs/audit/v24'),{recursive:true});const beforeContract=readIdentity().sourceDigest;
  fs.writeFileSync(path.join(identityDir,'docs/audit/v24/ux-contract.json'),'{}');assert.notEqual(readIdentity().sourceDigest,beforeContract,'Active presentation contracts invalidate old measurements');
  const beforeConfig=readIdentity().sourceDigest;fs.mkdirSync(path.join(identityDir,'config'));fs.writeFileSync(path.join(identityDir,'config/domain.ts'),'export const role="owner"');assert.notEqual(readIdentity().sourceDigest,beforeConfig,'Domain configuration is part of source identity');
- console.log('Source identity handles >1 MiB of generated Git paths while retaining tracked/untracked source binding.');
+ fs.mkdirSync(path.join(identityDir,'docs/audit/v25-revision7'),{recursive:true});
+ for(const file of ['source.md','requirements.json']){
+  const before=readIdentity().sourceDigest;fs.writeFileSync(path.join(identityDir,'docs/audit/v25-revision7',file),'Synthetic current authority '+file);assert.notEqual(readIdentity().sourceDigest,before,'Current Revision7 '+file+' invalidates older evidence');
+ }
+ console.log('Source identity handles >1 MiB of generated Git paths while retaining tracked/untracked source and Revision7 source/register binding.');
 }finally{fs.rmSync(identityDir,{recursive:true,force:true});}
