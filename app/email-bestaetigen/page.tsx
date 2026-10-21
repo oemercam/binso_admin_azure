@@ -15,8 +15,10 @@ export default function VerifyEmailPage(){
  useEffect(()=>{const requested=registrationLocale(new URLSearchParams(window.location.search).get('lang')??workspaceLocale);queueMicrotask(()=>setLocale(requested));if(requested!=='tr'&&requested!==workspaceLocale)choose(requested);},[choose,workspaceLocale]);
  const flight=useRef<Promise<{ok:boolean;status:number;alreadyVerified?:boolean;next?:string}>|null>(null);
  useEffect(()=>{
-  const params=new URLSearchParams(window.location.search),token=params.get('token');
-  if(!flight.current)flight.current=token?authRequest('/api/auth/verify-email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token})}).then(async response=>({...await response.json(),ok:response.ok,status:response.status})):Promise.resolve({ok:false,status:400});
+  const params=new URLSearchParams(window.location.search),token=params.get('token')??'';
+  // The server validates every token, including missing/empty input. URL data
+  // must never decide whether the verification security boundary is applied.
+  if(!flight.current)flight.current=authRequest('/api/auth/verify-email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token})}).then(async response=>({...await response.json(),ok:response.ok,status:response.status}));
   let active=true;
   flight.current.then(payload=>{
    if(!active)return;

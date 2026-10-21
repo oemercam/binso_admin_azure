@@ -135,6 +135,11 @@ try{
  response=await register.POST(request('POST',body));assert.equal(response.status,201);assert.equal((await response.json()).resumed,true);assert.equal((await db.query('select count(*)::int n from organizations')).rows[0].n,before,'Receipt replay cannot create another tenant');
  const link=new URL(sent[0].text.split('\n')[1]);assert.equal(link.searchParams.get('lang'),'fr');assert.ok(sent[0].html.includes('lang="fr"'));const token=link.searchParams.get('token');
  jar.clear(); // verification works in another browser, without the receipt cookie
+ for(const invalidToken of ['', 'invalid-token']){
+  assert.equal((await verify.POST(request('POST',{token:invalidToken},'https://example.invalid/api/auth/verify-email'))).status,400,'Empty or malformed URL input is rejected by the server');
+  assert.equal(jar.has('binso_session'),false,'Invalid input never establishes a session');
+ }
+ assert.equal((await db.query('select trial_until from organization_subscriptions where organization_id=$1',[organization.id])).rows[0].trial_until,null,'Invalid input cannot start the trial');
  await db.query("set time zone 'Europe/Zurich'");
  response=await verify.POST(request('POST',{token},'https://example.invalid/api/auth/verify-email'));assert.equal(response.status,200);payload=await response.json();assert.equal(payload.mfaSetupRequired,true);assert.ok(payload.next.includes(encodeURIComponent('/einstellungen/firma?onboarding=1')));
  const elapsed=(await db.query('select extract(epoch from s.trial_until-u.email_verified_at)::int seconds from organization_subscriptions s join organization_memberships m on m.organization_id=s.organization_id join app_users u on u.id=m.user_id where s.organization_id=$1',[organization.id])).rows[0].seconds;
