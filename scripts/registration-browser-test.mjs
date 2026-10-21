@@ -1,3 +1,4 @@
+import {measureCompliance} from './compliance/measure.mjs';
 import {writeTestOutput} from './test-output.mjs';
 import {assertChoiceGeometry} from './form-choice-browser.mjs';
 import assert from 'node:assert/strict';
@@ -102,7 +103,7 @@ try{
    if(body.action==='respond'){assert.equal(body.confirmed,true);assert.equal(body.code,'123456');decisions++;status='accepted';await new Promise(resolve=>setTimeout(resolve,100));}
    return route.fulfill({json:{ok:true}});
   });
-  await page.goto(base+'/angebot#'+token);await page.getByRole('heading',{name:'Angebot AN-SYNTHETIC-001'}).waitFor();assert.equal(decisions,0,'Opening alone never decides an offer');
+  await page.goto(base+'/angebot#'+token);await page.getByRole('heading',{name:'Angebot AN-SYNTHETIC-001'}).waitFor();assert.equal(decisions,0,'Opening alone never decides an offer');await measureCompliance(page,{output:path.join(output,'compliance'),route:'/angebot',theme,width,state:'normal',engine:process.env.BINSO_UX_BROWSER??'chromium'});
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);
   await page.getByRole('button',{name:'PDF ansehen',exact:true}).click();const preview=page.getByRole('dialog',{name:'Angebots-PDF',exact:true});await preview.waitFor();await preview.locator('canvas[data-rendered-page="1"]').waitFor();assert.equal(await preview.getByRole('button',{name:'Teilen oder herunterladen',exact:true}).isEnabled(),true);await preview.getByRole('button',{name:'Vorschau schliessen',exact:true}).click();await preview.waitFor({state:'hidden'});
   await page.getByRole('button',{name:'Annehmen',exact:true}).click();const dialog=page.getByRole('dialog',{name:'Angebot annehmen',exact:true});await dialog.waitFor();

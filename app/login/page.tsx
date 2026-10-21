@@ -78,7 +78,7 @@ export default function Login(){
   };
 
   if(stage!=="credentials")return <AuthWorkspace><section className="auth-card">
-    <h1><LocalizedText>{stage==="totp"?"Authenticator-Code":stage==="verify"?"E-Mail bestätigen":"Anmeldung bestätigen"}</LocalizedText></h1>
+    <h1><LocalizedText>{stage==="totp"?"Authenticator-Code":"E-Mail bestätigen"}</LocalizedText></h1>
     <p><LocalizedText>{stage==="totp"?"Öffne deine Authenticator-App und gib den aktuellen Code oder einen Recovery Code ein.":`Wir haben einen 6-stelligen Code an ${email} gesendet.`}</LocalizedText></p>
     <form onSubmit={submitCode}>
       <Field label={stage==="totp"?"Authenticator- oder Recovery-Code":"6-stelliger Code"}><Input required autoFocus value={code} onChange={e=>setCode(stage==="totp"?e.target.value:e.target.value.replace(/\D/g,"").slice(0,6))} inputMode={stage==="totp"?"text":"numeric"} autoComplete="one-time-code" placeholder={stage==="totp"?"000000 oder Recovery Code":"000000"}/></Field>

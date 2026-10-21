@@ -1979,7 +1979,7 @@
           "arguments": [
             "s.organizationId",
             "s.userId",
-            "async c=>{\n  const {row,kind}=await lockDocument(c,s,number);\n  const prior=(await c.query('select * from document_deliveries where organization_id=$1 and request_key=$2',[s.organizationId,key])).rows[0];\n  if(prior){if(prior.recipient!==recipient||prior.document_id!==row.id||prior.purpose!==purpose||prior.subject!==subject||prior.message!==message)throw new ApiError(409,'key_conflict','Die Versandkennung wurde bereits verwendet.');if(prior.status==='sent')return {sent:true};throw new ApiError(409,'delivery_unconfirmed','Dieser Versand ist noch nicht bestätigt. Prüfe den Versandstatus, bevor du erneut sendest.');}\n  if(row.status==='draft'){\n   if(kind!=='offer'||purpose!=='document'||b.issueConfirmed!==true)throw new ApiError(409,'draft_not_issued','Bitte das Dokument zuerst prüfen und ausstellen. Entwürfe werden nicht versendet.');\n   await changeDocumentStatus(c,s,number,'issue','Explicitly confirmed for email dispatch');row.status='sent';\n  }\n  if(['cancelled','declined','expired','revised'].includes(row.status))throw new ApiError(409,'document_locked','Dieses Dokument kann nicht versendet werden.');\n  if((await c.query(\"select id from document_deliveries where organization_id=$1 and document_id=$2 and status='sending'\",[s.organizationId,row.id])).rowCount)throw new ApiError(409,'delivery_pending','Ein Versand dieses Dokuments ist noch nicht bestätigt.');\n  const document=(await listApiBusiness(c,s,'documents','id=eq.'+row.id+'&kind=eq.'+kind))[0];\n  let reminder:{stage:number;amount:number;deadline:string}|undefined;\n  if(purpose==='reminder'){\n   const history=(await c.query(\"select reminder_stage stage,status,payment_deadline::text deadline,(completed_at at time zone 'Europe/Zurich')::date::text completed_at from document_deliveries where organization_id=$1 and document_id=$2 and purpose='reminder'\",[s.organizationId,row.id])).rows;\n   const plan=planPaymentReminder(document,history);\n   if('error' in plan)throw new ApiError(409,plan.error,plan.error==='reminder_not_due'?'Nur überfällige offene Rechnungen können gemahnt werden.':plan.error==='reminder_too_soon'?'Die letzte Zahlungsfrist ist noch nicht abgelaufen.':plan.error==='reminder_history_invalid'?'Die Mahnhistorie muss vor dem Versand geprüft werden.':'Die vorgesehenen Mahnstufen sind abgeschlossen.');\n   reminder=plan;\n  }\n  const company=(await c.query('select * from organizations where id=$1',[s.organizationId])).rows[0];\n  const version=kind==='offer'?await sealOfferVersion(c,s,row) as OfferVersion:null;\n  const publicLink=version?await createOfferLink(c,s,version,recipient):null;\n  const pdf=version?Buffer.from(version.pdf):await documentPdf(document,company,await documentLogo(c,s.organizationId,document,company));const id=randomUUID();\n  await c.query(\"insert into document_deliveries(id,organization_id,kind,document_id,recipient,status,request_key,created_by_user_id,purpose,reminder_stage,balance_amount,payment_deadline) values($1,$2,$3,$4,$5,'sending',$6,$7,$8,$9,$10,$11)\",[id,s.organizationId,kind,row.id,recipient,key,s.userId,purpose,reminder?.stage??null,reminder?.amount??null,reminder?.deadline??null]);\n  await c.query('update document_deliveries set subject=$3,message=$4,offer_version_id=$5,public_link_id=$6 where organization_id=$1 and id=$2',[s.organizationId,id,subject,message,version?.id??null,publicLink?.link.id??null]);\n  const verifiedReplyTo=(await c.query(\"select u.email from app_users u join organization_memberships m on m.user_id=u.id where m.organization_id=$1 and m.status='active' and u.status='active' and u.email_verified_at is not null and lower(u.email)=lower($2) limit 1\",[s.organizationId,company.mail_reply_to||s.email])).rows[0]?.email;\r\n  return {sent:false,id,kind,document,pdf,company,reminder,publicLink,verifiedReplyTo};\n }"
+            "async c=>{\n  const {row,kind}=await lockDocument(c,s,number);\n  const prior=(await c.query('select * from document_deliveries where organization_id=$1 and request_key=$2',[s.organizationId,key])).rows[0];\n  if(prior){if(prior.recipient!==recipient||prior.document_id!==row.id||prior.purpose!==purpose||prior.subject!==subject||prior.message!==message)throw new ApiError(409,'key_conflict','Die Versandkennung wurde bereits verwendet.');if(prior.status==='sent')return {sent:true};throw new ApiError(409,'delivery_unconfirmed','Dieser Versand ist noch nicht bestätigt. Prüfe den Versandstatus, bevor du erneut sendest.');}\n  if(row.status==='draft'){\n   if(kind!=='offer'||purpose!=='document'||b.issueConfirmed!==true)throw new ApiError(409,'draft_not_issued','Bitte das Dokument zuerst prüfen und ausstellen. Entwürfe werden nicht versendet.');\n   await changeDocumentStatus(c,s,number,'issue','Explicitly confirmed for email dispatch');row.status='sent';\n  }\n  if(['cancelled','declined','expired','revised'].includes(row.status))throw new ApiError(409,'document_locked','Dieses Dokument kann nicht versendet werden.');\n  if((await c.query(\"select id from document_deliveries where organization_id=$1 and document_id=$2 and status='sending'\",[s.organizationId,row.id])).rowCount)throw new ApiError(409,'delivery_pending','Ein Versand dieses Dokuments ist noch nicht bestätigt.');\n  const document=(await listApiBusiness(c,s,'documents','id=eq.'+row.id+'&kind=eq.'+kind))[0];\n  let reminder:{stage:number;amount:number;deadline:string}|undefined;\n  if(purpose==='reminder'){\n   const history=(await c.query(\"select reminder_stage stage,status,payment_deadline::text deadline,(completed_at at time zone 'Europe/Zurich')::date::text completed_at from document_deliveries where organization_id=$1 and document_id=$2 and purpose='reminder'\",[s.organizationId,row.id])).rows;\n   const plan=planPaymentReminder(document,history);\n   if('error' in plan)throw new ApiError(409,plan.error,plan.error==='reminder_not_due'?'Nur überfällige offene Rechnungen können gemahnt werden.':plan.error==='reminder_too_soon'?'Die letzte Zahlungsfrist ist noch nicht abgelaufen.':plan.error==='reminder_history_invalid'?'Die Mahnhistorie muss vor dem Versand geprüft werden.':'Die vorgesehenen Mahnstufen sind abgeschlossen.');\n   reminder=plan;\n  }\n  const company=(await c.query('select * from organizations where id=$1',[s.organizationId])).rows[0];\n  const version=kind==='offer'?await sealOfferVersion(c,s,row) as OfferVersion:null;\n  const publicLink=version?await createOfferLink(c,s,version,recipient):null;\n  const pdf=version?Buffer.from(version.pdf):await documentPdf(document,company,await documentLogo(c,s.organizationId,document,company));const id=randomUUID();\n  await c.query(\"insert into document_deliveries(id,organization_id,kind,document_id,recipient,status,request_key,created_by_user_id,purpose,reminder_stage,balance_amount,payment_deadline) values($1,$2,$3,$4,$5,'sending',$6,$7,$8,$9,$10,$11)\",[id,s.organizationId,kind,row.id,recipient,key,s.userId,purpose,reminder?.stage??null,reminder?.amount??null,reminder?.deadline??null]);\n  await c.query('update document_deliveries set subject=$3,message=$4,offer_version_id=$5,public_link_id=$6 where organization_id=$1 and id=$2',[s.organizationId,id,subject,message,version?.id??null,publicLink?.link.id??null]);\n  const verifiedReplyTo=(await c.query(\"select u.email from app_users u join organization_memberships m on m.user_id=u.id where m.organization_id=$1 and m.status='active' and u.status='active' and u.email_verified_at is not null and lower(u.email)=lower($2) limit 1\",[s.organizationId,company.mail_reply_to||s.email])).rows[0]?.email;\n  return {sent:false,id,kind,document,pdf,company,reminder,publicLink,verifiedReplyTo};\n }"
           ]
         },
         {
@@ -2148,6 +2148,8 @@
         "POST"
       ],
       "dependencies": [
+        "lib/locales/index.ts",
+        "lib/locales/config.ts",
         "lib/server/http.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
@@ -2162,8 +2164,6 @@
         "lib/server/crypto.ts",
         "lib/financial-status.ts",
         "lib/money.ts",
-        "lib/locales/index.ts",
-        "lib/locales/config.ts",
         "lib/server/audit.ts",
         "lib/server/email.ts",
         "lib/server/logger.ts",
@@ -2173,12 +2173,12 @@
       "evidence": [
         {
           "callee": "requireSession",
-          "line": 13,
+          "line": 14,
           "arguments": []
         },
         {
           "callee": "authorize",
-          "line": 13,
+          "line": 14,
           "arguments": [
             "s",
             "'sales:read'"
@@ -2186,7 +2186,7 @@
         },
         {
           "callee": "withTenant",
-          "line": 14,
+          "line": 15,
           "arguments": [
             "s.organizationId",
             "s.userId",
@@ -2195,7 +2195,7 @@
         },
         {
           "callee": "c.query",
-          "line": 15,
+          "line": 16,
           "arguments": [
             "'select id from quotes where organization_id=$1 and quote_no=$2 and archived_at is null'",
             "[s.organizationId,number]"
@@ -2203,7 +2203,7 @@
         },
         {
           "callee": "c.query",
-          "line": 20,
+          "line": 21,
           "arguments": [
             "'select pdf from offer_versions where organization_id=$1 and quote_id=$2 and version=$3'",
             "[s.organizationId,quote.id,Number(version)]"
@@ -2211,7 +2211,7 @@
         },
         {
           "callee": "c.query",
-          "line": 24,
+          "line": 25,
           "arguments": [
             "'select version,number,created_at,pdf_sha256 from offer_versions where organization_id=$1 and quote_id=$2 order by version desc'",
             "[s.organizationId,quote.id]"
@@ -2219,7 +2219,7 @@
         },
         {
           "callee": "c.query",
-          "line": 25,
+          "line": 26,
           "arguments": [
             "`select e.id,e.link_id,e.kind,e.body,e.actor,e.created_at,v.version,l.recipient,l.revoked_at\n   from offer_public_events e join offer_public_links l on l.id=e.link_id and l.organization_id=e.organization_id\n   join offer_versions v on v.id=l.version_id and v.organization_id=l.organization_id\n   where e.organization_id=$1 and v.quote_id=$2 order by e.created_at desc,e.id limit 100`",
             "[s.organizationId,quote.id]"
@@ -2227,7 +2227,7 @@
         },
         {
           "callee": "c.query",
-          "line": 29,
+          "line": 30,
           "arguments": [
             "'select d.id,d.recipient,d.status,d.created_at,d.completed_at,v.version from document_deliveries d left join offer_versions v on v.id=d.offer_version_id and v.organization_id=d.organization_id where d.organization_id=$1 and d.document_id=$2 order by d.created_at desc limit 50'",
             "[s.organizationId,quote.id]"
@@ -2235,12 +2235,12 @@
         },
         {
           "callee": "requireSession",
-          "line": 36,
+          "line": 37,
           "arguments": []
         },
         {
           "callee": "authorize",
-          "line": 36,
+          "line": 37,
           "arguments": [
             "s",
             "'sales:write'"
@@ -2248,16 +2248,16 @@
         },
         {
           "callee": "withTenant",
-          "line": 39,
+          "line": 40,
           "arguments": [
             "s.organizationId",
             "s.userId",
-            "async c=>{\n  const quote=(await c.query('select id,offer_version from quotes where organization_id=$1 and quote_no=$2 and archived_at is null for update',[s.organizationId,number])).rows[0];\n  if(!quote)throw new ApiError(404,'not_found','Angebot nicht gefunden.');\n  const link=(await c.query('select l.* from offer_public_links l join offer_versions v on v.id=l.version_id and v.organization_id=l.organization_id where l.organization_id=$1 and l.id::text=$2 and v.quote_id=$3 and v.version=$4 for update of l',[s.organizationId,linkId,quote.id,quote.offer_version])).rows[0];\n  if(!link)throw new ApiError(404,'not_found','Aktueller Angebotsdialog nicht gefunden.');\n  if(action==='revoke'){\n   await c.query('update offer_public_links set revoked_at=coalesce(revoked_at,now()) where organization_id=$1 and id=$2',[s.organizationId,link.id]);\n   await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'offer.link.revoked',entityType:'quote',entityId:quote.id,metadata:{linkId:link.id}});\n   return null;\n  }\n  if(link.revoked_at||new Date(link.expires_at).getTime()<=Date.now())throw new ApiError(409,'link_inactive','Dieser Angebotsdialog ist nicht mehr aktiv.');\n  const prior=(await c.query('select kind,body from offer_public_events where organization_id=$1 and link_id=$2 and request_key=$3',[s.organizationId,link.id,key])).rows[0];\n  if(prior){if(prior.kind!=='reply'||prior.body!==text)throw new ApiError(409,'key_conflict','Diese Versandkennung wurde anders verwendet.');return null;}\n  await c.query(\"insert into offer_public_events(organization_id,link_id,kind,body,actor,created_by_user_id,request_key) values($1,$2,'reply',$3,'employee',$4,$5)\",[s.organizationId,link.id,text,s.userId,key]);\n  await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'offer.reply.recorded',entityType:'quote',entityId:quote.id,metadata:{linkId:link.id}});\n  return {to:link.recipient,url:offerLinkUrl(link),linkId:link.id};\n }"
+            "async c=>{\n  const quote=(await c.query('select id,offer_version from quotes where organization_id=$1 and quote_no=$2 and archived_at is null for update',[s.organizationId,number])).rows[0];\n  if(!quote)throw new ApiError(404,'not_found','Angebot nicht gefunden.');\n  const link=(await c.query('select l.* from offer_public_links l join offer_versions v on v.id=l.version_id and v.organization_id=l.organization_id where l.organization_id=$1 and l.id::text=$2 and v.quote_id=$3 and v.version=$4 for update of l',[s.organizationId,linkId,quote.id,quote.offer_version])).rows[0];\n  if(!link)throw new ApiError(404,'not_found','Aktueller Angebotsdialog nicht gefunden.');\n  if(action==='revoke'){\n   await c.query('update offer_public_links set revoked_at=coalesce(revoked_at,now()) where organization_id=$1 and id=$2',[s.organizationId,link.id]);\n   await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'offer.link.revoked',entityType:'quote',entityId:quote.id,metadata:{linkId:link.id}});\n   return null;\n  }\n  if(link.revoked_at||new Date(link.expires_at).getTime()<=Date.now())throw new ApiError(409,'link_inactive','Dieser Angebotsdialog ist nicht mehr aktiv.');\n  const prior=(await c.query('select kind,body from offer_public_events where organization_id=$1 and link_id=$2 and request_key=$3',[s.organizationId,link.id,key])).rows[0];\n  if(prior){if(prior.kind!=='reply'||prior.body!==text)throw new ApiError(409,'key_conflict','Diese Versandkennung wurde anders verwendet.');return null;}\n  await c.query(\"insert into offer_public_events(organization_id,link_id,kind,body,actor,created_by_user_id,request_key) values($1,$2,'reply',$3,'employee',$4,$5)\",[s.organizationId,link.id,text,s.userId,key]);\n  await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'offer.reply.recorded',entityType:'quote',entityId:quote.id,metadata:{linkId:link.id}});\n  return {to:link.recipient,url:offerLinkUrl(link),linkId:link.id,locale:asLocale(link.locale)};\n }"
           ]
         },
         {
           "callee": "c.query",
-          "line": 40,
+          "line": 41,
           "arguments": [
             "'select id,offer_version from quotes where organization_id=$1 and quote_no=$2 and archived_at is null for update'",
             "[s.organizationId,number]"
@@ -2265,7 +2265,7 @@
         },
         {
           "callee": "c.query",
-          "line": 42,
+          "line": 43,
           "arguments": [
             "'select l.* from offer_public_links l join offer_versions v on v.id=l.version_id and v.organization_id=l.organization_id where l.organization_id=$1 and l.id::text=$2 and v.quote_id=$3 and v.version=$4 for update of l'",
             "[s.organizationId,linkId,quote.id,quote.offer_version]"
@@ -2273,7 +2273,7 @@
         },
         {
           "callee": "c.query",
-          "line": 45,
+          "line": 46,
           "arguments": [
             "'update offer_public_links set revoked_at=coalesce(revoked_at,now()) where organization_id=$1 and id=$2'",
             "[s.organizationId,link.id]"
@@ -2281,7 +2281,7 @@
         },
         {
           "callee": "c.query",
-          "line": 50,
+          "line": 51,
           "arguments": [
             "'select kind,body from offer_public_events where organization_id=$1 and link_id=$2 and request_key=$3'",
             "[s.organizationId,link.id,key]"
@@ -2289,7 +2289,7 @@
         },
         {
           "callee": "c.query",
-          "line": 52,
+          "line": 53,
           "arguments": [
             "\"insert into offer_public_events(organization_id,link_id,kind,body,actor,created_by_user_id,request_key) values($1,$2,'reply',$3,'employee',$4,$5)\"",
             "[s.organizationId,link.id,text,s.userId,key]"
@@ -2297,7 +2297,7 @@
         },
         {
           "callee": "withTenant",
-          "line": 59,
+          "line": 61,
           "arguments": [
             "s.organizationId",
             "s.userId",
@@ -2306,7 +2306,7 @@
         },
         {
           "callee": "c.query",
-          "line": 59,
+          "line": 61,
           "arguments": [
             "\"insert into offer_public_events(organization_id,link_id,kind,actor,request_key) values($1,$2,$3,'provider',$4) on conflict(link_id,request_key) do nothing\"",
             "[s.organizationId,mail.linkId,accepted?'provider_accepted':'provider_unconfirmed','mail:'+key]"
@@ -11715,7 +11715,7 @@
         },
         {
           "callee": "fetch",
-          "line": 77,
+          "line": 78,
           "arguments": [
             "path",
             "{...options,signal:options.signal??AbortSignal.timeout(options.method&&options.method!==\"GET\"?30000:15000)}"
@@ -11723,17 +11723,17 @@
         },
         {
           "callee": "fetchOnce",
-          "line": 78,
+          "line": 79,
           "arguments": []
         },
         {
           "callee": "fetchOnce",
-          "line": 83,
+          "line": 85,
           "arguments": []
         },
         {
           "callee": "fetchApi",
-          "line": 125,
+          "line": 127,
           "arguments": [
             "path",
             "{\n    method:\"POST\",\n    headers:{\n      \"Content-Type\":\"application/json\",\n      ...(options.idempotencyKey?{\"Idempotency-Key\":options.idempotencyKey}:{}),\n    },\n    body:JSON.stringify(body),\n  }"
@@ -11741,7 +11741,7 @@
         },
         {
           "callee": "fetchApi",
-          "line": 140,
+          "line": 142,
           "arguments": [
             "path",
             "{method:\"GET\",cache:\"no-store\",credentials:\"same-origin\",redirect:\"error\",headers:{Accept:contentType}}"
@@ -11749,12 +11749,12 @@
         },
         {
           "callee": "(async()=>{\n    const response=await fetchApi(path,{method:\"GET\",cache:\"no-store\",signal:AbortSignal.timeout(15000)});\n    const result=await parseResponse<T>(response,\"Daten konnten nicht geladen werden.\");\n    if(sessionRevision!==dataRevision([]))throw new ClientApiError(\"Die Sitzung wurde geändert. Bitte erneut versuchen.\",\"session_changed\",401);\n    return result;\n  })",
-          "line": 153,
+          "line": 155,
           "arguments": []
         },
         {
           "callee": "fetchApi",
-          "line": 154,
+          "line": 156,
           "arguments": [
             "path",
             "{method:\"GET\",cache:\"no-store\",signal:AbortSignal.timeout(15000)}"
@@ -11762,7 +11762,7 @@
         },
         {
           "callee": "fetchApi",
-          "line": 166,
+          "line": 168,
           "arguments": [
             "path",
             "{\n    method:\"PATCH\",\n    headers:{\"Content-Type\":\"application/json\"},\n    body:JSON.stringify(body),\n  }"
@@ -11770,7 +11770,7 @@
         },
         {
           "callee": "fetchApi",
-          "line": 176,
+          "line": 178,
           "arguments": [
             "path",
             "{method:\"DELETE\",...(body===undefined?{}:{headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})}"
@@ -11778,7 +11778,7 @@
         },
         {
           "callee": "fetchApi",
-          "line": 191,
+          "line": 193,
           "arguments": [
             "path",
             "{method:\"POST\",body:form,headers}"

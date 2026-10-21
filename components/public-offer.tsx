@@ -46,7 +46,7 @@ export function PublicOffer(){
   try{const response=await request(token.current,{action:'pdf'});setFile(await response.blob());}catch(reason){setError(reason instanceof Error?reason.message:'PDF konnte nicht geladen werden.');}finally{pending.current=false;setBusy(false);}
  };
  const start=(value:Decision)=>{setError(null);setCode('');setMessage('');setCodeSent(false);setConfirmed(false);key.current=crypto.randomUUID();setDecision(value);};
- if(!offer)return <main className="public-offer">{error?<ErrorState>{error}</ErrorState>:<LoadingState/>}</main>;
+ if(!offer)return <main className="public-offer"><h1>{t('Angebot')}</h1>{error?<ErrorState>{error}</ErrorState>:<LoadingState/>}</main>;
  const doc=offer.document,currency=String(doc.currency||'CHF'),lines=Array.isArray(doc.items)?doc.items as Array<Record<string,unknown>>:[],terms=doc.document_snapshot&&typeof doc.document_snapshot==='object'?doc.document_snapshot as Record<string,unknown>:{};
  return <main className="public-offer">
   <header>{typeof offer.company.logo_data==="string"&&<Image unoptimized width={180} height={72} className="public-offer-logo" src={offer.company.logo_data} alt={t('Unternehmenslogo')}/>}<p className="eyebrow">{String(offer.company.legal_name||offer.company.name||'')}</p><h1>{t('Angebot')} {offer.number}</h1><p>{t('Version')} {offer.version} · {formatDate(String(doc.issue_date))} · {t('Gültig bis')} {formatDate(String(doc.valid_until||''))}</p></header>

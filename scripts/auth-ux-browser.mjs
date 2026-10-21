@@ -23,22 +23,24 @@ export async function verifyMobileLoginGeometry(page,{captureCode}={}){
  finally{await regression.evaluate(node=>node.remove());}
  await assertMobileAuthGeometry(page);
 
- let requests=0;
- const fixture=async route=>{requests++;await route.fulfill({status:202,contentType:'application/json',body:JSON.stringify({mfaMethod:'email'})});};
+ const originalUrl=page.url();let requests=0,mode='totp';
+ const fixture=async route=>{requests++;await route.fulfill({status:mode==='password'?200:202,contentType:'application/json',body:JSON.stringify(mode==='password'?{ok:true,next:'/dashboard'}:mode==='verify'?{requiresEmailVerification:true}:{mfaMethod:'totp'})});};
  await page.route('**/api/auth/login',fixture);
  try{
   await page.locator('.auth-card input[type="email"]').fill('auth-ux@example.invalid');
   await page.locator('.auth-card input[autocomplete="current-password"]').fill('Isolated-UX-Fixture-Only');
   await page.locator('.auth-card button[type="submit"]').click();
-  await page.getByRole('heading',{name:'Anmeldung bestätigen',exact:true}).waitFor();
-  assert.equal(await page.locator('.auth-inline-action').count(),2,'Code state retains resend and back actions');
+  await page.getByRole('heading',{name:'Authenticator-Code',exact:true}).waitFor();
+  assert.equal(await page.locator('.auth-inline-action').count(),1,'An enrolled authenticator has a back action, never an email-factor fallback');
   await assertMobileAuthGeometry(page);
-  if(captureCode)await captureCode();
+
   const back=page.getByRole('button',{name:'Zurück',exact:true});
   await back.focus();await page.keyboard.press('Enter');
   await page.locator('.auth-options>label').waitFor();
   await assertMobileAuthGeometry(page);
   assert.equal(requests,1,'Exactly one isolated credential request; no resend/test email');
+  mode='verify';await page.locator('.auth-card button[type="submit"]').click();await page.getByRole('heading',{name:'E-Mail bestätigen',exact:true}).waitFor();assert.equal(await page.locator('.auth-inline-action').count(),2,'Unverified registration retains resend and back actions');await assertMobileAuthGeometry(page);if(captureCode)await captureCode();await page.getByRole('button',{name:'Zurück',exact:true}).click();await page.locator('.auth-options>label').waitFor();assert.equal(requests,2);
+  mode='password';await page.locator('.auth-card button[type="submit"]').click();await page.waitForURL('**/dashboard');await page.waitForLoadState('networkidle');assert.equal(requests,3,'Verified ordinary password login reaches the workspace with one request and no email-MFA step');await page.goto(originalUrl);await page.locator('.auth-options>label').waitFor();await assertMobileAuthGeometry(page);
   await page.locator('.auth-card input[type="email"]').fill('');
   await page.locator('.auth-card input[autocomplete="current-password"]').fill('');
   await page.locator('.auth-card h1').click();

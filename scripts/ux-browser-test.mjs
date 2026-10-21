@@ -1,7 +1,7 @@
 import {createUiAuthFixture} from './ui-auth-fixture.mjs';
 import {waitForLabReady} from './shared-control-browser.mjs';
 import {selectAppOption,appControlValue} from './app-select-browser.mjs';
-async function openDocumentHistory(page){const details=page.locator('.document-detail-view details');await details.waitFor({state:'attached'});if(!await details.getAttribute('open'))await details.locator('summary').click();}
+async function openDocumentHistory(page){const details=page.locator('.document-detail-view details').filter({has:page.locator('summary',{hasText:'Weitere Angaben'})});await details.waitFor({state:'attached'});if(!await details.getAttribute('open'))await details.locator('summary').click();}
 async function assertReturnPosition(page,target){try{await page.waitForFunction(y=>Math.abs(scrollY-y)<=1,target);}catch(error){console.log('Return position mismatch',await page.evaluate(expected=>({expected,actual:scrollY,height:document.documentElement.scrollHeight,viewport:innerHeight,path:location.pathname}),target));throw error;}}
 async function chooseRecordFilter(page,value){await page.getByRole('button',{name:'Filter und Sortierung',exact:true}).click();const sheet=page.getByRole('dialog',{name:'Filter und Sortierung',exact:true});await selectAppOption(sheet.getByLabel('Status',{exact:true}), value);await sheet.getByRole('button',{name:'Anwenden',exact:true}).click();await sheet.waitFor({state:'hidden'});}
 import {verifyStableAppNavigation} from './app-workspace-browser.mjs';
@@ -219,7 +219,7 @@ try{
     if(p==='/api/documents/AN-TEST-1/revision'){
      revisionPosts++;const key=req.headers()['idempotency-key'];assert.ok(key);revisionKeys.push(key);
      if(failRevision)return route.fulfill({status:503,json:{message:'Synthetic revision unavailable'}});
-     revisedOfferFixture={...offer,id:'offer-revision',number:'AN-REV-1',status:'draft',revises_offer:offer.number};return route.fulfill({status:201,json:{item:revisedOfferFixture}});
+     revisedOfferFixture={...offer,id:offer.id,number:offer.number,status:'draft',offer_version:2};return route.fulfill({status:201,json:{item:revisedOfferFixture}});
     }
     if(p==='/api/documents/RE-TEST-1/refunds'){
      adjustmentPosts++;adjustmentKeys.push(req.headers()['idempotency-key']);assert.ok(adjustmentKeys.at(-1));
@@ -300,7 +300,8 @@ try{
    else if(p==='/api/operator/finance')data={payments:[{payment_date:'2026-10-05',amount:200}],subscriptions:[{created_at:'2026-10-05',monthly_revenue_chf:79}],operatingCosts:[{cost_date:'2026-10-05',amount:20}]};
    else if(p==='/api/finance')data={cash:cashFixture(dataPaymentMode?invoice.paid_amount:200),payments:[{payment_date:'2026-09-15',amount:120},{payment_date:'2026-10-05',amount:dataPaymentMode?invoice.paid_amount:200}],expenses:[{expense_date:'2026-09-15',amount:20},{expense_date:'2026-10-05',amount:50}],payroll:[],operatingCosts:[]};
    else if(p==='/api/customers/duplicates')data={items:url.searchParams.get('name')===customer.name?[customer]:[]};
-   else if(p==='/api/documents/AN-REV-1')data={item:revisedOfferFixture};
+   else if(p==='/api/documents/AN-TEST-1'&&revisedOfferFixture)data={item:revisedOfferFixture};
+   else if(/^\/api\/documents\/[^/]+\/versions$/.test(p)){if(url.searchParams.has('version'))return route.fulfill({contentType:'application/pdf',body:fixturePdf});data={versions:[{version:1,number:offer.number,created_at:'2026-10-21T10:00:00Z'}],events:[],deliveries:[]};}
    else if(p==='/api/customers')data=customerListFixture(url.searchParams);
    else if(['/api/products','/api/employees','/api/expenses','/api/payments'].includes(p))data=recordListFixture(p.split('/')[2],url.searchParams);
    else if(p==='/api/reports'){
@@ -433,13 +434,18 @@ try{
     if(width<=760&&await page.locator('.mobile-header-detail .mobile-header-title').count()){const titleBox=await page.locator('.mobile-header-detail .mobile-header-title').boundingBox();assert.ok(titleBox&&Math.abs(titleBox.x+titleBox.width/2-width/2)<=1.5,`${route}: detail title is geometrically centered`);}
     if(width<=760&&await page.locator('.mobile-back').count()){const back=page.locator('.mobile-back');assert.ok(await back.isVisible(),`${route}: detail back control is visible`);const icon=await back.locator('svg').boundingBox();assert.ok(icon&&icon.width>=18&&icon.height>=18&&icon.x>=0,`${route}: back icon is not clipped`);}
     if(!process.env.BINSO_UX_BASELINE&&['/dashboard','/finanzen'].includes(route)){
-      const ready=await page.waitForFunction(({dashboard})=>{const metrics=document.querySelectorAll('.bo-cash-overview .bo-metric-tiles>.metric').length,actions=[...document.querySelectorAll('.app-section-dashboard .page-actions .bo-create-action')].filter(el=>el.checkVisibility()).length,legacyActions=document.querySelectorAll('.bo-quick-create-links>a').length,bars=document.querySelectorAll('.bo-overview-bars>button').length;return metrics===4&&(dashboard?actions===1:bars===6)?{metrics,actions,legacyActions,bars,analysis:document.querySelectorAll('.bo-ring-chart,.bo-statistics').length}:null},{dashboard:route==='/dashboard'});
+      const ready=await page.waitForFunction(({dashboard})=>{const metrics=document.querySelectorAll('.bo-cash-overview .bo-metric-tiles>.metric').length,actions=[...document.querySelectorAll('.app-section-dashboard .page-actions .bo-create-action')].filter(el=>el.checkVisibility()).length,legacyActions=document.querySelectorAll('.bo-quick-create-links>a').length,bars=document.querySelectorAll('.bo-overview-bars>button').length;return metrics===4&&(dashboard?actions===1:bars>0||!!document.querySelector('.bo-cash-overview .empty-state'))?{metrics,actions,legacyActions,bars,analysis:document.querySelectorAll('.bo-ring-chart,.bo-statistics').length}:null},{dashboard:route==='/dashboard'});
       const overview=await ready.jsonValue();await ready.dispose();
       assert.equal(await page.getByText('undefined',{exact:true}).count(),0,'Finance/overview never renders missing fixture values as text');
       assert.equal(overview.metrics,4,'The original overview has four domain metrics');
       assert.equal(overview.analysis,0,'Detailed analysis is kept out of the compact original overview');
       if(route==='/dashboard'){assert.equal(overview.actions,1,'Dashboard has one page-owned creation trigger');assert.equal(overview.legacyActions,0,'Dashboard has no competing legacy quick links');}
-      else assert.equal(overview.bars,6,'Finance overview uses six real month buckets');
+      else{
+       const periods=page.locator('.bo-cash-overview .bo-statistics-periods');await periods.waitFor();assert.equal(await periods.getByRole('button').count(),5,'Shared 1/3/6/12-month and custom controls remain available');
+       const expectedFrom=new Date(Date.UTC(statisticYear,statisticMonth-6,1)).toISOString().slice(0,10),expected=expectedFrom.split('-').reverse().join('.')+' – '+statisticToday.split('-').reverse().join('.');
+       await periods.getByRole('button',{name:'6 M',exact:true}).click();await page.waitForFunction(expected=>document.querySelector('.bo-cash-overview .bo-statistics-dates')?.textContent===expected,expected);assert.equal(await periods.getByRole('button',{name:'6 M',exact:true}).getAttribute('aria-pressed'),'true','Displayed dates follow the selected inclusive range');
+       await periods.getByRole('button',{name:'1 M',exact:true}).click();await page.waitForFunction(()=>document.querySelector('.bo-cash-overview .bo-statistics-periods button')?.getAttribute('aria-pressed')==='true');
+      }
     }
     if(!process.env.BINSO_UX_BASELINE&&route==='/finanzen/analyse'){
       assert.equal(await page.locator('.bo-statistics .bo-metric-tiles>.metric').count(),3,'The analysis shows income, recorded outflows and their balance');
@@ -710,11 +716,11 @@ try{
    const overview=page.locator('.bo-cash-overview');
    assert.equal(await overview.locator('.metric').count(),4,'Finance opens the compact original overview');
    assert.equal(await overview.locator('.metric>strong').first().textContent(),'CHF 400.00');
-   await selectAppOption(overview.getByRole('combobox',{name:'Statistikzeitraum',exact:true}), '6');
+   await overview.getByRole('button',{name:'6 M',exact:true}).click();
    assert.equal(await overview.locator('.metric>strong').first().textContent(),'CHF 640.00');
    assert.equal(await overview.locator('.metric>strong').nth(1).textContent(),'CHF 200.00','Snapshot balances stay independent of the selected period');
-   assert.equal(await overview.getByRole('button').count(),6,'Monthly development uses six actual month buckets');
-   await overview.getByRole('button').last().click();assert.match(await overview.locator('output').textContent(),/CHF 400/);
+   assert.equal(await overview.locator('.bo-overview-bars>button').count(),6,'Six-month selection produces six actual month buckets');
+   await overview.locator('.bo-overview-bars>button').last().click();assert.match(await overview.locator('output').textContent(),/CHF 400/);
    await page.getByRole('navigation',{name:'Finanzen',exact:true}).getByRole('link',{name:'Analyse',exact:true}).click();await page.waitForLoadState('networkidle');
    const statistics=page.locator('.bo-statistics');
    await statistics.locator('.metric>strong').getByText('CHF 320.00',{exact:true}).waitFor();
@@ -880,8 +886,8 @@ try{
    const revisionActions=page.getByRole('dialog',{name:'Weitere Aktionen'});
    await revisionActions.getByRole('button',{name:'Angebot überarbeiten',exact:true}).click();await revisionActions.getByText('Synthetic revision unavailable',{exact:true}).waitFor();
    assert.equal(new URL(page.url()).pathname,'/angebote/AN-TEST-1');failRevision=false;
-   await revisionActions.getByRole('button',{name:'Angebot überarbeiten',exact:true}).click();await page.waitForURL(base+'/angebote/AN-REV-1');await openDocumentHistory(page);await page.getByRole('link',{name:'AN-TEST-1',exact:true}).waitFor();
-   assert.equal(revisionPosts,2);assert.equal(revisionKeys[0],revisionKeys[1]);assert.equal(offer.status,'sent','Draft revision does not withdraw the issued source');
+   await revisionActions.getByRole('button',{name:'Angebot überarbeiten',exact:true}).click();const revisionEditor=page.getByRole('dialog',{name:'Angebot bearbeiten',exact:true});await revisionEditor.waitFor();await revisionActions.waitFor({state:'hidden'});assert.equal(new URL(page.url()).pathname,'/angebote/AN-TEST-1','Revision retains the business number and route');assert.equal(await revisionEditor.getByLabel('Angebotsnummer',{exact:true}).count(),0,'Number is not an editable field');await revisionEditor.getByRole('button',{name:'Abbrechen',exact:true}).click();await revisionEditor.waitFor({state:'hidden'});await page.locator('.document-reference-row').getByText('Version 2',{exact:true}).waitFor();const versions=page.locator('.document-detail-view details').filter({has:page.locator('summary',{hasText:'Versionen und Verlauf'})});await versions.locator('summary').click();await versions.getByRole('button',{name:/Version 1/}).waitFor();
+   assert.equal(revisionPosts,2);assert.equal(revisionKeys[0],revisionKeys[1]);assert.equal(revisedOfferFixture.status,'draft');assert.equal(revisedOfferFixture.offer_version,2,'Revision advances the current draft while immutable version 1 remains available');revisedOfferFixture=undefined;
    const ledgerBefore={paid_amount:invoice.paid_amount,credit_amount:invoice.credit_amount,refund_amount:invoice.refund_amount,refunds:invoice.refunds,reminders:invoice.reminders,due_date:invoice.due_date};
    invoice.paid_amount=invoice.total;invoice.credit_amount=35.13;invoice.refund_amount=0;adjustmentPosts=0;adjustmentKeys.length=0;
    await navigate(base+'/rechnungen/RE-TEST-1');await page.waitForLoadState('networkidle');

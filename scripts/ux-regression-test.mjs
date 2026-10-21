@@ -294,6 +294,10 @@ console.log('Project-linked idle timer context survives synchronization without 
   await handler('components/documents.tsx','DocumentPage','save',scope)();
   assert.equal(pending.calls(),0,'Source/customer loading or failure must block document writes');
  }
+ let failRevision=true,revisionCalls=0,menuOpen=true,editing=false,dirty=true,currentDraft=null,navigations=0;const revisionKeys=[];
+ const revisionScope={...docScope(),documentKey:'AN-TEST-1',draft:{number:'AN-TEST-1'},documentActionPending:{current:false},revisionKey:{current:null},setActionBusy:noop,setActionError:noop,setMoreOpen:value=>{menuOpen=value},setDirty:value=>{dirty=value},setEditing:value=>{editing=value},setDraft:value=>{currentDraft=value},editableDocumentSnapshot:JSON.stringify,router:{replace:()=>{navigations++}},apiPost:async(_path,_body,options)=>{revisionCalls++;revisionKeys.push(options.idempotencyKey);if(failRevision)throw Error('Synthetic revision unavailable');return {item:{id:'offer-one',number:'AN-TEST-1',status:'draft',offer_version:2}}}};
+ const revise=handler('components/documents.tsx','DocumentPage','reviseOffer',revisionScope);await revise();assert.equal(menuOpen,true,'Failed revision retains its retry surface');assert.equal(editing,false);
+ failRevision=false;const revised=revise();await revise();await revised;assert.equal(revisionCalls,2,'Only one successful revision after one failed request');assert.equal(revisionKeys[0],revisionKeys[1],'Failure retains its revision idempotency key');assert.equal(menuOpen,false,'Successful same-route revision closes the action sheet');assert.equal(editing,true);assert.equal(dirty,false,'Persisted revision starts with a clean editor baseline');assert.equal(currentDraft.number,'AN-TEST-1');assert.equal(navigations,0,'Stable offer number does not trigger redundant navigation');
  console.log('Actual document and expense handlers prevent same-frame double writes, retain successful navigation locks and allow retries after failures.');
 }
 

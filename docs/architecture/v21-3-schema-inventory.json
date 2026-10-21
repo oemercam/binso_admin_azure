@@ -16711,7 +16711,7 @@
       "name": "file_objects_archived_by_user_id_fkey",
       "type": "f",
       "validated": true,
-      "definition": "FOREIGN KEY (archived_by_user_id) REFERENCES app_users(id)"
+      "definition": "FOREIGN KEY (archived_by_user_id) REFERENCES app_users(id) ON DELETE SET NULL"
     },
     {
       "table_name": "file_objects",
