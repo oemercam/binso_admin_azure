@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
-import {moduleUrl,moneyModuleUrl} from './data-test-modules.mjs';
+import {moduleUrl,moneyModuleUrl,financialModuleUrl} from './data-test-modules.mjs';
 const source=(await fs.readFile('lib/statistics-period.ts','utf8')).replace("'./money'",JSON.stringify(moneyModuleUrl));
 const {statisticBounds,aggregateStatistics,validBusinessDay,lineChartCoordinates}=await import(moduleUrl(source));
 for(const day of ['','2026-02-29','2026-13-01','2026-02-30','2026-1-01','NaN'])assert.equal(validBusinessDay(day),false,day);
@@ -32,8 +32,8 @@ const compileComponent=text=>ts.transpileModule(text,{compilerOptions:{module:ts
 const chartSource=await fs.readFile('components/statistics.tsx','utf8');
 const actionExports={};
 Function('require','exports',compileComponent(declaration('ui.tsx',await fs.readFile('components/ui.tsx','utf8'),'FormActions')))(require,actionExports);
-let selection=null;const ringExports={};
-Function('require','exports','useState','formatCurrency','sumMoney','LocalizedText','Button','useTranslation',compileComponent(declaration('statistics.tsx',chartSource,'RingChart')))(require,ringExports,()=>[selection,value=>{selection=value}],amount=>'CHF '+amount.toFixed(2),values=>values.reduce((a,b)=>a+b,0),textComponent,textComponent,()=>value=>value);
+let selection=null,activeLocale='de';const localeTags={de:'de-CH',fr:'fr-CH',it:'it-CH',en:'en-CH'},useLocale=()=>({locale:activeLocale});const ringExports={};
+Function('require','exports','useState','formatCurrency','sumMoney','LocalizedText','Button','useTranslation','useLocale','localeTags',compileComponent(declaration('statistics.tsx',chartSource,'RingChart')))(require,ringExports,()=>[selection,value=>{selection=value}],amount=>'CHF '+amount.toFixed(2),values=>values.reduce((a,b)=>a+b,0),textComponent,textComponent,()=>value=>value,useLocale,localeTags);
 const props={label:'Invoice status',parts:[{key:'paid',label:'Paid',tone:'positive',value:50},{key:'open',label:'Open',tone:'neutral',value:25,href:'/rechnungen?status=open'},{key:'empty',label:'Empty',tone:'negative',value:0}]};
 const nodes=element=>!element||typeof element!=='object'?[]:[element,...React.Children.toArray(element.props?.children).flatMap(nodes)];
 let chart=ringExports.RingChart(props),targets=nodes(chart).filter(n=>n.type==='circle'&&n.props.role==='button');
@@ -49,7 +49,7 @@ assert.ok(nodes(chart).some(n=>n.type==='output'&&JSON.stringify(n.props.childre
 let cursor=0;const states=[];const statisticsExports={};
 const useState=initial=>{const i=cursor++;if(!(i in states))states[i]=typeof initial==='function'?initial():initial;const set=value=>{states[i]=typeof value==='function'?value(states[i]):value};return [states[i],set]};
 const Tile=()=>null,Tiles=()=>null,Button=()=>null;
-Function('require','exports','useId','useState','useEffect','businessDate','statisticBounds','aggregateStatistics','statisticPeriods','formatCurrency','MetricTiles','MetricTile','LocalizedText','LocalizedElement','Button','FilterSheet','Field','Input','ErrorState','Icon','RingChart','LineChart','FormActions',compileComponent(declaration('statistics.tsx',chartSource,'Statistics')+'\n'+declaration('statistics.tsx',chartSource,'StatisticPeriodPicker')))(require,statisticsExports,()=>':metrics:',useState,()=>{},()=>'2026-10-15',statisticBounds,aggregateStatistics,[1,3,6,12],String,Tiles,Tile,textComponent,textComponent,Button,()=>null,()=>null,()=>null,()=>null,()=>null,ringExports.RingChart,()=>null,actionExports.FormActions);
+Function('require','exports','useId','useState','useEffect','businessDate','statisticBounds','aggregateStatistics','statisticPeriods','formatCurrency','MetricTiles','MetricTile','LocalizedText','LocalizedElement','Button','FilterSheet','Field','Input','ErrorState','Icon','RingChart','LineChart','FormActions','useLocale','localeTags',compileComponent(declaration('statistics.tsx',chartSource,'Statistics')+'\n'+declaration('statistics.tsx',chartSource,'StatisticPeriodPicker')))(require,statisticsExports,()=>':metrics:',useState,()=>{},()=>'2026-10-15',statisticBounds,aggregateStatistics,[1,3,6,12],String,Tiles,Tile,textComponent,textComponent,Button,()=>null,()=>null,()=>null,()=>null,()=>null,ringExports.RingChart,()=>null,actionExports.FormActions,useLocale,localeTags);
 const render=()=>{cursor=0;return statisticsExports.Statistics({title:'Statistics',subtitle:'Synthetic',storageKey:'test',events:[],series:[],metrics:()=>Array.from({length:6},(_,i)=>({label:'Metric '+i,value:i===0?-125:i}))})};
 let statistics=render();
 const pickerNode=nodes(statistics).find(n=>n.type===statisticsExports.StatisticPeriodPicker);assert.ok(pickerNode,'Statistics uses the shared period owner');
@@ -142,3 +142,18 @@ const largeRing=ringExports.RingChart({label:'Outstanding invoice balance with a
 assert.equal(nodes(largeRing).some(n=>n.props?.className==='bo-ring-center'),false);
 assert.ok(nodes(largeRing).some(n=>n.props?.className==='bo-ring-total'&&JSON.stringify(n.props.children).includes('999999999999.95')),'Complete amount stays in the unconstrained associated total');
 assert.equal(nodes(ringExports.RingChart({label:'Invalid',parts:[{key:'bad',label:'Bad',tone:'negative',value:-10}]})).some(n=>n.type==='svg'),false,'Invalid compositions never render a misleading financial ring');
+// The actual ring's numeric/percentage labels follow the selected locale;
+// monetary rounding and immutable source values are tested independently.
+for(const locale of ['de','fr','it','en']){
+ activeLocale=locale;
+ const input={label:'Counts',format:'number',parts:[{key:'a',label:'A',tone:'positive',value:1234.5},{key:'b',label:'B',tone:'neutral',value:9876.5}]};
+ const output=ringExports.RingChart(input),all=nodes(output);
+ assert.ok(all.some(node=>node.type==='title'&&node.props.children.includes((1234.5/11111*100).toLocaleString(localeTags[locale],{maximumFractionDigits:1})+' %')),'Percentage locale '+locale);
+ assert.ok(JSON.stringify(all.find(node=>node.props?.className==='bo-ring-total').props.children).includes((11111).toLocaleString(localeTags[locale])),'Total locale '+locale);
+ assert.equal(input.parts[0].value,1234.5,'Formatting never changes business data');
+}
+activeLocale='de';const {formatCurrency:actualCurrency}=await import(financialModuleUrl);
+for(const language of ['de','fr','it','en'])for(const amount of [-1234.56,0,1234.56]){
+ assert.equal(actualCurrency(amount,'CHF',localeTags[language]),'CHF '+amount.toLocaleString(localeTags[language],{minimumFractionDigits:2,maximumFractionDigits:2}).replaceAll('’',"'"));
+}
+console.log('Selected-language chart totals, percentages and actual signed currency formatting passed in DE/FR/IT/EN; arithmetic/source values unchanged.');

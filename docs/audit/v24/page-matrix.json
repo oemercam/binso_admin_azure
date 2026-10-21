@@ -1,5 +1,5 @@
 {
-  "commit": "d79252de9081c319a659c60e79252f16ae9d7597",
+  "commit": "2dda5d0954af24f0e013fee3701a9353fa29a5f1",
   "method": "Existing TypeScript AST dependency inventory; conditional reachability is not runtime proof",
   "pages": [
     {
@@ -1509,7 +1509,7 @@
         },
         {
           "tag": "FilterSheet",
-          "line": 80,
+          "line": 81,
           "component": "components/statistics.tsx#StatisticPeriodPicker"
         },
         {
@@ -2209,7 +2209,7 @@
         },
         {
           "tag": "FilterSheet",
-          "line": 80,
+          "line": 81,
           "component": "components/statistics.tsx#StatisticPeriodPicker"
         },
         {
@@ -2788,9 +2788,9 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
-        "components/ui.tsx#Icon",
         "components/privacy-settings-button.tsx#PrivacySettingsButton",
         "components/ui.tsx#Button",
+        "components/ui.tsx#Icon",
         "components/ui.tsx#dismissActionLabels",
         "components/ui.tsx#actionSourceText",
         "components/ui.tsx#Field",
@@ -5957,7 +5957,7 @@
         },
         {
           "tag": "FilterSheet",
-          "line": 80,
+          "line": 81,
           "component": "components/statistics.tsx#StatisticPeriodPicker"
         },
         {
@@ -6190,7 +6190,7 @@
         },
         {
           "tag": "FilterSheet",
-          "line": 80,
+          "line": 81,
           "component": "components/statistics.tsx#StatisticPeriodPicker"
         },
         {
@@ -6863,7 +6863,7 @@
         },
         {
           "tag": "FilterSheet",
-          "line": 80,
+          "line": 81,
           "component": "components/statistics.tsx#StatisticPeriodPicker"
         },
         {
@@ -7457,7 +7457,6 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
-        "components/ui.tsx#Icon",
         "components/privacy-settings-button.tsx#PrivacySettingsButton",
         "components/ui.tsx#Field",
         "components/ui.tsx#Input",
@@ -7471,10 +7470,11 @@
         "components/ui.tsx#FormError",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
+        "components/ui.tsx#Icon",
         "components/ui.tsx#dismissActionLabels",
         "components/ui.tsx#actionSourceText",
-        "components/password-input.tsx#PasswordInput",
-        "components/passkey-login.tsx#PasskeyLogin"
+        "components/passkey-login.tsx#PasskeyLogin",
+        "components/password-input.tsx#PasswordInput"
       ],
       "layouts": [
         "app/layout.tsx"
@@ -8378,9 +8378,9 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
-        "components/ui.tsx#Icon",
         "components/privacy-settings-button.tsx#PrivacySettingsButton",
         "components/ui.tsx#Button",
+        "components/ui.tsx#Icon",
         "components/ui.tsx#dismissActionLabels",
         "components/ui.tsx#actionSourceText"
       ],
@@ -9561,9 +9561,9 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
-        "components/ui.tsx#Icon",
         "components/privacy-settings-button.tsx#PrivacySettingsButton",
         "components/ui.tsx#Button",
+        "components/ui.tsx#Icon",
         "components/ui.tsx#dismissActionLabels",
         "components/ui.tsx#actionSourceText",
         "components/ui.tsx#Field",
@@ -9717,10 +9717,10 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
-        "components/ui.tsx#Icon",
         "components/privacy-settings-button.tsx#PrivacySettingsButton",
         "components/ui.tsx#LoadingState",
         "components/ui.tsx#Button",
+        "components/ui.tsx#Icon",
         "components/ui.tsx#dismissActionLabels",
         "components/ui.tsx#actionSourceText",
         "components/ui.tsx#Field",
@@ -13147,10 +13147,10 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
-        "components/ui.tsx#Icon",
         "components/privacy-settings-button.tsx#PrivacySettingsButton",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
+        "components/ui.tsx#Icon",
         "components/ui.tsx#dismissActionLabels",
         "components/ui.tsx#actionSourceText",
         "components/ui.tsx#LoadingState",
@@ -14831,9 +14831,9 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
-        "components/ui.tsx#Icon",
         "components/privacy-settings-button.tsx#PrivacySettingsButton",
         "components/ui.tsx#Button",
+        "components/ui.tsx#Icon",
         "components/ui.tsx#dismissActionLabels",
         "components/ui.tsx#actionSourceText"
       ],

@@ -208,3 +208,12 @@ Die Browserprüfung vergleicht Referenz-/Ist-Geometrie und tatsächliches Laden.
 Typecheck, CSS-Architektur, Style-Adversarial, Präsentation und Lokalisierung
 lokal bestanden; neuer CI-/Geräte-/vollständiger Visualnachweis bleibt offen.
 Nachprüfung des Font-Pakets: dieselben vier Breiten bestehen mit tatsächlich geladenem lokalem Inter-Face und erneutem Referenzvergleich (evidence/revision7-identity/font-results.json). Original-Logo in der Referenz wird unverändert eingebettet; kein entfernter Bild-/Fontdienst. Auch diese Prüfung ist Browseremulation, keine physische Geräteabnahme.
+
+Diagramm-Lokalisierung: Der gemeinsame Ring-/Zeitreihen-Owner verwendet nun
+die gewählte Locale für Zahlen, Prozente und Währungen. formatCurrency erhält
+einen optionalen Anzeigeparameter; Standardaufrufe und fachliche Berechnungen
+bleiben kompatibel. Tatsächliche Komponententests für DE/FR/IT/EN sowie positive,
+negative und Null-Beträge bestanden; bestehende Auswahl-/Tastatur-/Perioden-,
+Mandanten-/Gutschrift-/Teilzahlungstests bleiben erfolgreich. Typecheck und
+gezielter Lint bestanden. Das ist keine Behauptung vollständig lokalisierter
+PDFs, Rechtsseiten, Datumshelfer oder aller Fachansichten; diese bleiben offen.

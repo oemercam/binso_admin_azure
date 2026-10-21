@@ -6630,35 +6630,6 @@
         },
         {
           "owner": "components/statistics.tsx",
-          "line": 61,
-          "component": "MetricTile",
-          "props": [
-            "key={metric.label}",
-            "label={metric.label}",
-            "value={metric.format==='number'?value(metric.value,'number'):metric.value}",
-            "currency={metric.format==='number'?undefined:currency}",
-            "hint={metric.hint}"
-          ],
-          "conditions": [
-            "!active",
-            "saved&&statisticBounds(saved,businessDate())",
-            "restored",
-            "format==='number'",
-            "hideHeading",
-            "metric.format==='number'",
-            "metric.format==='number'",
-            "showMoreMetrics",
-            "metric.format==='number'",
-            "metric.format==='number'",
-            "showTrend",
-            "hasTrend",
-            "active",
-            "hasTrend"
-          ],
-          "limitation": "Statische bedingte Erreichbarkeit, keine Aussage über sichtbare Rolle oder korrekte Berechnung."
-        },
-        {
-          "owner": "components/statistics.tsx",
           "line": 62,
           "component": "MetricTile",
           "props": [
@@ -6688,7 +6659,36 @@
         },
         {
           "owner": "components/statistics.tsx",
-          "line": 64,
+          "line": 63,
+          "component": "MetricTile",
+          "props": [
+            "key={metric.label}",
+            "label={metric.label}",
+            "value={metric.format==='number'?value(metric.value,'number'):metric.value}",
+            "currency={metric.format==='number'?undefined:currency}",
+            "hint={metric.hint}"
+          ],
+          "conditions": [
+            "!active",
+            "saved&&statisticBounds(saved,businessDate())",
+            "restored",
+            "format==='number'",
+            "hideHeading",
+            "metric.format==='number'",
+            "metric.format==='number'",
+            "showMoreMetrics",
+            "metric.format==='number'",
+            "metric.format==='number'",
+            "showTrend",
+            "hasTrend",
+            "active",
+            "hasTrend"
+          ],
+          "limitation": "Statische bedingte Erreichbarkeit, keine Aussage über sichtbare Rolle oder korrekte Berechnung."
+        },
+        {
+          "owner": "components/statistics.tsx",
+          "line": 65,
           "component": "RingChart",
           "props": [
             "label={composition.label}",
@@ -6715,7 +6715,7 @@
         },
         {
           "owner": "components/statistics.tsx",
-          "line": 66,
+          "line": 67,
           "component": "LineChart",
           "props": [
             "buckets={aggregated.buckets}",
@@ -8629,35 +8629,6 @@
         },
         {
           "owner": "components/statistics.tsx",
-          "line": 61,
-          "component": "MetricTile",
-          "props": [
-            "key={metric.label}",
-            "label={metric.label}",
-            "value={metric.format==='number'?value(metric.value,'number'):metric.value}",
-            "currency={metric.format==='number'?undefined:currency}",
-            "hint={metric.hint}"
-          ],
-          "conditions": [
-            "!active",
-            "saved&&statisticBounds(saved,businessDate())",
-            "restored",
-            "format==='number'",
-            "hideHeading",
-            "metric.format==='number'",
-            "metric.format==='number'",
-            "showMoreMetrics",
-            "metric.format==='number'",
-            "metric.format==='number'",
-            "showTrend",
-            "hasTrend",
-            "active",
-            "hasTrend"
-          ],
-          "limitation": "Statische bedingte Erreichbarkeit, keine Aussage über sichtbare Rolle oder korrekte Berechnung."
-        },
-        {
-          "owner": "components/statistics.tsx",
           "line": 62,
           "component": "MetricTile",
           "props": [
@@ -8687,7 +8658,36 @@
         },
         {
           "owner": "components/statistics.tsx",
-          "line": 64,
+          "line": 63,
+          "component": "MetricTile",
+          "props": [
+            "key={metric.label}",
+            "label={metric.label}",
+            "value={metric.format==='number'?value(metric.value,'number'):metric.value}",
+            "currency={metric.format==='number'?undefined:currency}",
+            "hint={metric.hint}"
+          ],
+          "conditions": [
+            "!active",
+            "saved&&statisticBounds(saved,businessDate())",
+            "restored",
+            "format==='number'",
+            "hideHeading",
+            "metric.format==='number'",
+            "metric.format==='number'",
+            "showMoreMetrics",
+            "metric.format==='number'",
+            "metric.format==='number'",
+            "showTrend",
+            "hasTrend",
+            "active",
+            "hasTrend"
+          ],
+          "limitation": "Statische bedingte Erreichbarkeit, keine Aussage über sichtbare Rolle oder korrekte Berechnung."
+        },
+        {
+          "owner": "components/statistics.tsx",
+          "line": 65,
           "component": "RingChart",
           "props": [
             "label={composition.label}",
@@ -8714,7 +8714,7 @@
         },
         {
           "owner": "components/statistics.tsx",
-          "line": 66,
+          "line": 67,
           "component": "LineChart",
           "props": [
             "buckets={aggregated.buckets}",

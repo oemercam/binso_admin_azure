@@ -22,7 +22,7 @@ export function financialStatusTone(document:FinancialDocument,state=financialSt
  if(['open','partial','in_progress'].includes(state))return 'warning';
  return 'neutral';
 }
-export function formatCurrency(value:unknown,currency='CHF'){return `${currency} ${Number(value??0).toLocaleString('de-CH',{minimumFractionDigits:2,maximumFractionDigits:2}).replaceAll('’',"'")}`;}
+export function formatCurrency(value:unknown,currency='CHF',locale='de-CH'){return `${currency} ${Number(value??0).toLocaleString(locale,{minimumFractionDigits:2,maximumFractionDigits:2}).replaceAll('’',"'")}`;}
 export function formatDate(value:unknown){const date=String(value??'').slice(0,10);return /^\d{4}-\d{2}-\d{2}$/.test(date)?date.split('-').reverse().join('.'):'';}
 export function documentDateLabel(document:FinancialDocument,today=businessDate()){
  const state=financialStatus(document,today);
