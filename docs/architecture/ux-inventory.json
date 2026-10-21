@@ -6888,6 +6888,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
@@ -6964,6 +6966,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "lib/client/page-access.tsx#usePageAccess",
@@ -7278,6 +7282,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
@@ -7446,6 +7452,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "lib/client/page-access.tsx#usePageAccess",
@@ -8749,6 +8757,8 @@
         "components/select-control.tsx#SelectControl",
         "components/select-control.tsx#SelectSearch",
         "components/use-dialog-focus.ts#registerDialogPortal",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Textarea",
         "components/ui.tsx#Checkbox",
         "components/ui.tsx#DateInput",
@@ -8795,6 +8805,7 @@
         "components/ui.tsx#FormActions",
         "lib/offer-activity.ts#offerActivityLabel",
         "lib/offer-activity.ts#labels",
+        "lib/display-format.ts#formatDateTime",
         "components/binso-ux.tsx#FormSheet",
         "components/binso-ux.tsx#SheetProps",
         "components/binso-ux.tsx#Sheet",
@@ -8827,6 +8838,8 @@
         "components/select-control.tsx#SelectSearch",
         "lib/select-geometry.ts#selectGeometry",
         "components/use-dialog-focus.ts#registerDialogPortal",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Textarea",
         "components/ui.tsx#Checkbox",
         "components/ui.tsx#DateInput",
@@ -9168,6 +9181,8 @@
         "components/select-control.tsx#SelectControl",
         "components/select-control.tsx#SelectSearch",
         "components/use-dialog-focus.ts#registerDialogPortal",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Textarea",
         "components/ui.tsx#Checkbox",
         "components/ui.tsx#DateInput",
@@ -9280,6 +9295,7 @@
         "components/ui.tsx#FormActions",
         "lib/offer-activity.ts#offerActivityLabel",
         "lib/offer-activity.ts#labels",
+        "lib/display-format.ts#formatDateTime",
         "components/binso-ux.tsx#FormSheet",
         "components/binso-ux.tsx#SheetProps",
         "components/binso-ux.tsx#Sheet",
@@ -9312,6 +9328,8 @@
         "components/select-control.tsx#SelectSearch",
         "lib/select-geometry.ts#selectGeometry",
         "components/use-dialog-focus.ts#registerDialogPortal",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Textarea",
         "components/ui.tsx#Checkbox",
         "components/ui.tsx#DateInput",
@@ -10375,17 +10393,7 @@
       "widgets": [
         {
           "tag": "FormSheet",
-          "line": 63,
-          "component": "components/public-offer.tsx#PublicOffer"
-        },
-        {
-          "tag": "Field",
-          "line": 66,
-          "component": "components/public-offer.tsx#PublicOffer"
-        },
-        {
-          "tag": "Field",
-          "line": 67,
+          "line": 65,
           "component": "components/public-offer.tsx#PublicOffer"
         },
         {
@@ -10394,8 +10402,18 @@
           "component": "components/public-offer.tsx#PublicOffer"
         },
         {
+          "tag": "Field",
+          "line": 69,
+          "component": "components/public-offer.tsx#PublicOffer"
+        },
+        {
+          "tag": "Field",
+          "line": 70,
+          "component": "components/public-offer.tsx#PublicOffer"
+        },
+        {
           "tag": "DocumentModal",
-          "line": 71,
+          "line": 73,
           "component": "components/public-offer.tsx#PublicOffer"
         },
         {
@@ -10699,6 +10717,8 @@
         "components/select-control.tsx#SelectControl",
         "components/select-control.tsx#SelectSearch",
         "components/use-dialog-focus.ts#registerDialogPortal",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Textarea",
         "components/ui.tsx#Checkbox",
         "components/ui.tsx#DateInput",
@@ -10914,10 +10934,12 @@
         "components/ui.tsx#SectionTitle",
         "components/documents.tsx#money",
         "components/offer-history.tsx#OfferHistory",
+        "lib/client/locale.tsx#useTranslation",
         "components/offer-history.tsx#History",
         "components/offer-history.tsx#Event",
         "components/binso-ux.tsx#DetailDisclosure",
         "components/binso-ux.tsx#ActionRow",
+        "lib/display-format.ts#formatDateTime",
         "lib/offer-activity.ts#deliveryLabel",
         "lib/offer-activity.ts#offerActivityLabel",
         "lib/offer-activity.ts#labels",
@@ -10961,6 +10983,8 @@
         "components/select-control.tsx#SelectSearch",
         "lib/select-geometry.ts#selectGeometry",
         "components/use-dialog-focus.ts#registerDialogPortal",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Textarea",
         "components/ui.tsx#Checkbox",
         "components/ui.tsx#DateInput",
@@ -10998,7 +11022,6 @@
         "components/app-shell.tsx#ShellProps",
         "components/app-shell.tsx#AppShellFrame",
         "components/desktop-navigation.tsx#useDesktopNavigation",
-        "lib/client/locale.tsx#useTranslation",
         "components/use-navigation-scroll.ts#useNavigationScroll",
         "components/app-shell.tsx#accessFromSession",
         "config/plan-access.ts#moduleForPath",
@@ -11303,6 +11326,8 @@
         "components/select-control.tsx#SelectControl",
         "components/select-control.tsx#SelectSearch",
         "components/use-dialog-focus.ts#registerDialogPortal",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Textarea",
         "components/ui.tsx#Checkbox",
         "components/ui.tsx#DateInput",
@@ -11538,10 +11563,12 @@
         "components/ui.tsx#SectionTitle",
         "components/documents.tsx#money",
         "components/offer-history.tsx#OfferHistory",
+        "lib/client/locale.tsx#useTranslation",
         "components/offer-history.tsx#History",
         "components/offer-history.tsx#Event",
         "components/binso-ux.tsx#DetailDisclosure",
         "components/binso-ux.tsx#ActionRow",
+        "lib/display-format.ts#formatDateTime",
         "lib/offer-activity.ts#deliveryLabel",
         "lib/offer-activity.ts#offerActivityLabel",
         "lib/offer-activity.ts#labels",
@@ -11585,6 +11612,8 @@
         "components/select-control.tsx#SelectSearch",
         "lib/select-geometry.ts#selectGeometry",
         "components/use-dialog-focus.ts#registerDialogPortal",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Textarea",
         "components/ui.tsx#Checkbox",
         "components/ui.tsx#DateInput",
@@ -11622,7 +11651,6 @@
         "components/app-shell.tsx#ShellProps",
         "components/app-shell.tsx#AppShellFrame",
         "components/desktop-navigation.tsx#useDesktopNavigation",
-        "lib/client/locale.tsx#useTranslation",
         "components/use-navigation-scroll.ts#useNavigationScroll",
         "components/app-shell.tsx#accessFromSession",
         "config/plan-access.ts#moduleForPath",
@@ -12940,17 +12968,17 @@
         },
         {
           "tag": "DocumentModal",
-          "line": 33,
+          "line": 36,
           "component": "components/offer-history.tsx#OfferHistory"
         },
         {
           "tag": "FormSheet",
-          "line": 34,
+          "line": 37,
           "component": "components/offer-history.tsx#OfferHistory"
         },
         {
           "tag": "Field",
-          "line": 34,
+          "line": 37,
           "component": "components/offer-history.tsx#OfferHistory"
         },
         {
@@ -13339,6 +13367,8 @@
         "components/select-control.tsx#SelectControl",
         "components/select-control.tsx#SelectSearch",
         "components/use-dialog-focus.ts#registerDialogPortal",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Textarea",
         "components/ui.tsx#Checkbox",
         "components/ui.tsx#DateInput",
@@ -13554,10 +13584,12 @@
         "components/ui.tsx#SectionTitle",
         "components/documents.tsx#money",
         "components/offer-history.tsx#OfferHistory",
+        "lib/client/locale.tsx#useTranslation",
         "components/offer-history.tsx#History",
         "components/offer-history.tsx#Event",
         "components/binso-ux.tsx#DetailDisclosure",
         "components/binso-ux.tsx#ActionRow",
+        "lib/display-format.ts#formatDateTime",
         "lib/offer-activity.ts#deliveryLabel",
         "lib/offer-activity.ts#offerActivityLabel",
         "lib/offer-activity.ts#labels",
@@ -13601,6 +13633,8 @@
         "components/select-control.tsx#SelectSearch",
         "lib/select-geometry.ts#selectGeometry",
         "components/use-dialog-focus.ts#registerDialogPortal",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Textarea",
         "components/ui.tsx#Checkbox",
         "components/ui.tsx#DateInput",
@@ -13638,7 +13672,6 @@
         "components/app-shell.tsx#ShellProps",
         "components/app-shell.tsx#AppShellFrame",
         "components/desktop-navigation.tsx#useDesktopNavigation",
-        "lib/client/locale.tsx#useTranslation",
         "components/use-navigation-scroll.ts#useNavigationScroll",
         "components/app-shell.tsx#accessFromSession",
         "config/plan-access.ts#moduleForPath",
@@ -13943,6 +13976,8 @@
         "components/select-control.tsx#SelectControl",
         "components/select-control.tsx#SelectSearch",
         "components/use-dialog-focus.ts#registerDialogPortal",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Textarea",
         "components/ui.tsx#Checkbox",
         "components/ui.tsx#DateInput",
@@ -14178,10 +14213,12 @@
         "components/ui.tsx#SectionTitle",
         "components/documents.tsx#money",
         "components/offer-history.tsx#OfferHistory",
+        "lib/client/locale.tsx#useTranslation",
         "components/offer-history.tsx#History",
         "components/offer-history.tsx#Event",
         "components/binso-ux.tsx#DetailDisclosure",
         "components/binso-ux.tsx#ActionRow",
+        "lib/display-format.ts#formatDateTime",
         "lib/offer-activity.ts#deliveryLabel",
         "lib/offer-activity.ts#offerActivityLabel",
         "lib/offer-activity.ts#labels",
@@ -14225,6 +14262,8 @@
         "components/select-control.tsx#SelectSearch",
         "lib/select-geometry.ts#selectGeometry",
         "components/use-dialog-focus.ts#registerDialogPortal",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Textarea",
         "components/ui.tsx#Checkbox",
         "components/ui.tsx#DateInput",
@@ -14262,7 +14301,6 @@
         "components/app-shell.tsx#ShellProps",
         "components/app-shell.tsx#AppShellFrame",
         "components/desktop-navigation.tsx#useDesktopNavigation",
-        "lib/client/locale.tsx#useTranslation",
         "components/use-navigation-scroll.ts#useNavigationScroll",
         "components/app-shell.tsx#accessFromSession",
         "config/plan-access.ts#moduleForPath",
@@ -15580,17 +15618,17 @@
         },
         {
           "tag": "DocumentModal",
-          "line": 33,
+          "line": 36,
           "component": "components/offer-history.tsx#OfferHistory"
         },
         {
           "tag": "FormSheet",
-          "line": 34,
+          "line": 37,
           "component": "components/offer-history.tsx#OfferHistory"
         },
         {
           "tag": "Field",
-          "line": 34,
+          "line": 37,
           "component": "components/offer-history.tsx#OfferHistory"
         },
         {
@@ -15927,6 +15965,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -16129,6 +16169,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -16431,6 +16473,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -16654,6 +16698,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -17978,6 +18024,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
@@ -18054,6 +18102,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "lib/client/page-access.tsx#usePageAccess",
@@ -18368,6 +18418,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
@@ -18536,6 +18588,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "lib/client/page-access.tsx#usePageAccess",
@@ -19827,6 +19881,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -20039,6 +20095,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -20341,6 +20399,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -20574,6 +20634,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -21933,6 +21995,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -22125,6 +22189,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -22395,6 +22461,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -22608,6 +22676,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -23791,6 +23861,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
@@ -23884,6 +23956,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "lib/client/page-access.tsx#usePageAccess",
@@ -24196,6 +24270,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
@@ -24366,6 +24442,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "lib/client/page-access.tsx#usePageAccess",
@@ -25667,6 +25745,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -25879,6 +25959,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -26193,6 +26275,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -26425,6 +26509,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -27937,6 +28023,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -28146,6 +28234,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -28445,6 +28535,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -28675,6 +28767,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -30039,6 +30133,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
@@ -30116,6 +30212,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "lib/client/page-access.tsx#usePageAccess",
@@ -30429,6 +30527,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
@@ -30598,6 +30698,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "lib/client/page-access.tsx#usePageAccess",
@@ -31974,6 +32076,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -32226,6 +32330,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -32427,6 +32533,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -33577,6 +33685,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Textarea",
         "components/ui.tsx#Checkbox",
         "components/ui.tsx#DateInput",
@@ -33686,6 +33796,9 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "lib/client/locale.tsx#LocalizedText",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Textarea",
         "components/ui.tsx#Checkbox",
         "components/ui.tsx#DateInput",
@@ -33694,7 +33807,6 @@
         "lib/form-input-hints.ts#fieldInputHint",
         "lib/form-input-hints.ts#examples",
         "components/ui.tsx#FormLabel",
-        "lib/client/locale.tsx#LocalizedText",
         "components/ui.tsx#FormError",
         "components/binso-ux.tsx#PageHeading",
         "components/ui.tsx#IconButton",
@@ -34043,6 +34155,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Textarea",
         "components/ui.tsx#Checkbox",
         "components/ui.tsx#DateInput",
@@ -34191,6 +34305,9 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "lib/client/locale.tsx#LocalizedText",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Textarea",
         "components/ui.tsx#Checkbox",
         "components/ui.tsx#DateInput",
@@ -34199,7 +34316,6 @@
         "lib/form-input-hints.ts#fieldInputHint",
         "lib/form-input-hints.ts#examples",
         "components/ui.tsx#FormLabel",
-        "lib/client/locale.tsx#LocalizedText",
         "components/ui.tsx#FormError",
         "components/binso-ux.tsx#PageHeading",
         "components/ui.tsx#IconButton",
@@ -35759,6 +35875,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
@@ -35863,6 +35981,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "lib/client/page-access.tsx#usePageAccess",
@@ -36208,6 +36328,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
@@ -36383,6 +36505,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "lib/client/page-access.tsx#usePageAccess",
@@ -37645,6 +37769,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -37832,6 +37958,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -38106,6 +38234,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -38313,6 +38443,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -39593,6 +39725,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -39775,6 +39909,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -40048,6 +40184,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -40250,6 +40388,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -41428,6 +41568,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -41619,6 +41761,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -41885,6 +42029,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -42097,6 +42243,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -43266,6 +43414,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -43451,6 +43601,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -43729,6 +43881,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -43928,6 +44082,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -45158,6 +45314,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -45348,6 +45506,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -45615,6 +45775,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -45825,6 +45987,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -47089,6 +47253,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Textarea",
         "components/ui.tsx#Checkbox",
         "components/ui.tsx#DateInput",
@@ -47255,6 +47421,9 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "lib/client/locale.tsx#LocalizedText",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Textarea",
         "components/ui.tsx#Checkbox",
         "components/ui.tsx#DateInput",
@@ -47263,7 +47432,6 @@
         "lib/form-input-hints.ts#fieldInputHint",
         "lib/form-input-hints.ts#examples",
         "components/ui.tsx#FormLabel",
-        "lib/client/locale.tsx#LocalizedText",
         "components/ui.tsx#FormError",
         "lib/file-selection.ts#fileSelectionError",
         "components/ui.tsx#Button",
@@ -47551,6 +47719,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Textarea",
         "components/ui.tsx#Checkbox",
         "components/ui.tsx#DateInput",
@@ -47737,6 +47907,9 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "lib/client/locale.tsx#LocalizedText",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Textarea",
         "components/ui.tsx#Checkbox",
         "components/ui.tsx#DateInput",
@@ -47745,7 +47918,6 @@
         "lib/form-input-hints.ts#fieldInputHint",
         "lib/form-input-hints.ts#examples",
         "components/ui.tsx#FormLabel",
-        "lib/client/locale.tsx#LocalizedText",
         "components/ui.tsx#FormError",
         "lib/file-selection.ts#fileSelectionError",
         "components/ui.tsx#Button",
@@ -49076,6 +49248,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -49269,6 +49443,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -49538,6 +49714,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -49751,6 +49929,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -51030,6 +51210,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -51207,6 +51389,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -51483,6 +51667,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -51681,6 +51867,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -52855,6 +53043,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -53046,6 +53236,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -53325,6 +53517,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -53536,6 +53730,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -54850,6 +55046,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -55028,6 +55226,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -55305,6 +55505,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -55504,6 +55706,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -56687,6 +56891,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -56891,6 +57097,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -57172,6 +57380,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -57396,6 +57606,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -58739,6 +58951,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -58916,6 +59130,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -59192,6 +59408,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -59390,6 +59608,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -60587,6 +60807,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/privacy-settings-button.tsx#PrivacySettingsButton"
       ],
       "pageRenderGraph": [
@@ -60672,6 +60894,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/privacy-settings-button.tsx#PrivacySettingsButton"
       ],
       "layoutRenderGraph": [
@@ -61023,6 +61247,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/privacy-settings-button.tsx#PrivacySettingsButton",
         "components/font-preload.tsx#FontPreload",
         "components/theme-runtime.tsx#ThemeRuntime",
@@ -61199,6 +61425,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/privacy-settings-button.tsx#PrivacySettingsButton",
         "app/layout.tsx#RootLayout",
         "lib/locales/config.ts#localeCookie",
@@ -62440,6 +62668,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -62640,6 +62870,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -62947,6 +63179,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -63168,6 +63402,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -64502,6 +64738,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -64713,6 +64951,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -65014,6 +65254,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -65246,6 +65488,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -66603,6 +66847,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
@@ -66680,6 +66926,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "lib/client/page-access.tsx#usePageAccess",
@@ -66993,6 +67241,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
@@ -67162,6 +67412,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "lib/client/page-access.tsx#usePageAccess",
@@ -68453,6 +68705,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -68658,6 +68912,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -68927,6 +69183,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -69152,6 +69410,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -70468,6 +70728,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -70703,6 +70965,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -71062,6 +71326,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -71317,6 +71583,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -73104,6 +73372,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -73309,6 +73579,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -73578,6 +73850,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -73803,6 +74077,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -75133,6 +75409,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -75364,6 +75642,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -75692,6 +75972,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -75943,6 +76225,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -77453,6 +77737,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
@@ -77542,6 +77828,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "lib/client/page-access.tsx#usePageAccess",
@@ -77891,6 +78179,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
@@ -78061,6 +78351,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "lib/client/page-access.tsx#usePageAccess",
@@ -79364,6 +79656,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -79585,6 +79879,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -79883,6 +80179,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -80124,6 +80422,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -81609,6 +81909,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -81830,6 +82132,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -82128,6 +82432,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -82369,6 +82675,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -83860,6 +84168,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -84066,6 +84376,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -84355,6 +84667,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -84582,6 +84896,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -85836,6 +86152,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
@@ -85910,6 +86228,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "lib/client/page-access.tsx#usePageAccess",
@@ -86211,6 +86531,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
@@ -86377,6 +86699,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "lib/client/page-access.tsx#usePageAccess",
@@ -87659,6 +87983,8 @@
         "components/select-control.tsx#SelectControl",
         "components/select-control.tsx#SelectSearch",
         "components/use-dialog-focus.ts#registerDialogPortal",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/binso-ux.tsx#ActionRow",
         "components/app-chrome.tsx#MobileDock",
@@ -87891,6 +88217,8 @@
         "components/select-control.tsx#SelectSearch",
         "lib/select-geometry.ts#selectGeometry",
         "components/use-dialog-focus.ts#registerDialogPortal",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/binso-ux.tsx#ActionRow",
         "components/app-chrome.tsx#MobileDock",
@@ -88283,6 +88611,8 @@
         "components/select-control.tsx#SelectControl",
         "components/select-control.tsx#SelectSearch",
         "components/use-dialog-focus.ts#registerDialogPortal",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/binso-ux.tsx#ActionRow",
         "components/app-chrome.tsx#MobileDock",
@@ -88557,6 +88887,8 @@
         "components/select-control.tsx#SelectSearch",
         "lib/select-geometry.ts#selectGeometry",
         "components/use-dialog-focus.ts#registerDialogPortal",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/binso-ux.tsx#ActionRow",
         "components/app-chrome.tsx#MobileDock",
@@ -90643,6 +90975,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -90922,6 +91256,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -91123,6 +91459,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -92328,6 +92666,8 @@
         "components/select-control.tsx#SelectControl",
         "components/select-control.tsx#SelectSearch",
         "components/use-dialog-focus.ts#registerDialogPortal",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/binso-ux.tsx#ActionRow",
         "components/app-chrome.tsx#MobileDock",
@@ -92559,6 +92899,8 @@
         "components/select-control.tsx#SelectSearch",
         "lib/select-geometry.ts#selectGeometry",
         "components/use-dialog-focus.ts#registerDialogPortal",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/binso-ux.tsx#ActionRow",
         "components/app-chrome.tsx#MobileDock",
@@ -92946,6 +93288,8 @@
         "components/select-control.tsx#SelectControl",
         "components/select-control.tsx#SelectSearch",
         "components/use-dialog-focus.ts#registerDialogPortal",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/binso-ux.tsx#ActionRow",
         "components/app-chrome.tsx#MobileDock",
@@ -93219,6 +93563,8 @@
         "components/select-control.tsx#SelectSearch",
         "lib/select-geometry.ts#selectGeometry",
         "components/use-dialog-focus.ts#registerDialogPortal",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/binso-ux.tsx#ActionRow",
         "components/app-chrome.tsx#MobileDock",
@@ -95197,6 +95543,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/monitoring.tsx#MonitoringOverview",
         "components/binso-ux.tsx#MetricTiles",
@@ -95359,6 +95707,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/monitoring.tsx#MonitoringOverview",
         "components/binso-ux.tsx#MetricTiles",
@@ -95678,6 +96028,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/monitoring.tsx#MonitoringOverview",
         "components/binso-ux.tsx#MetricTiles",
@@ -95910,6 +96262,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/monitoring.tsx#MonitoringOverview",
         "components/binso-ux.tsx#MetricTiles",
@@ -97307,6 +97661,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
@@ -97390,6 +97746,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "lib/client/page-access.tsx#usePageAccess",
@@ -97732,6 +98090,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
@@ -97907,6 +98267,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "lib/client/page-access.tsx#usePageAccess",
@@ -99247,6 +99609,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
@@ -99331,6 +99695,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "lib/client/page-access.tsx#usePageAccess",
@@ -99661,6 +100027,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
@@ -99827,6 +100195,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "lib/client/page-access.tsx#usePageAccess",
@@ -101118,6 +101488,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
@@ -101214,6 +101586,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "lib/client/page-access.tsx#usePageAccess",
@@ -101563,6 +101937,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
@@ -101730,6 +102106,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "lib/client/page-access.tsx#usePageAccess",
@@ -103095,6 +103473,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -103353,6 +103733,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -103554,6 +103936,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -104815,6 +105199,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -105073,6 +105459,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -105274,6 +105662,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -106535,6 +106925,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -106793,6 +107185,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -106994,6 +107388,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -108183,6 +108579,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
@@ -108257,6 +108655,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "lib/client/page-access.tsx#usePageAccess",
@@ -108602,6 +109002,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
@@ -108768,6 +109170,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "lib/client/page-access.tsx#usePageAccess",
@@ -110156,6 +110560,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -110408,6 +110814,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -110609,6 +111017,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -111859,6 +112269,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -112111,6 +112523,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -112312,6 +112726,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -113562,6 +113978,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -113814,6 +114232,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -114015,6 +114435,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -115193,6 +115615,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
@@ -115270,6 +115694,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "lib/client/page-access.tsx#usePageAccess",
@@ -115617,6 +116043,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
@@ -115786,6 +116214,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "lib/client/page-access.tsx#usePageAccess",
@@ -117109,6 +117539,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -117312,6 +117744,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -117585,6 +118019,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -117808,6 +118244,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -119075,6 +119513,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -119278,6 +119718,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -119551,6 +119993,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -119774,6 +120218,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -121045,6 +121491,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -121251,6 +121699,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -121540,6 +121990,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -121767,6 +122219,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -123043,6 +123497,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -123257,6 +123713,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -123542,6 +124000,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -123776,6 +124236,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -125105,6 +125567,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -125308,6 +125772,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -125578,6 +126044,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -125801,6 +126269,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -127049,6 +127519,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -127246,6 +127718,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -127529,6 +128003,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -127747,6 +128223,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -129075,6 +129553,8 @@
         "components/select-control.tsx#SelectControl",
         "components/select-control.tsx#SelectSearch",
         "components/use-dialog-focus.ts#registerDialogPortal",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Textarea",
         "components/ui.tsx#Checkbox",
         "components/ui.tsx#DateInput",
@@ -129290,10 +129770,12 @@
         "components/ui.tsx#SectionTitle",
         "components/documents.tsx#money",
         "components/offer-history.tsx#OfferHistory",
+        "lib/client/locale.tsx#useTranslation",
         "components/offer-history.tsx#History",
         "components/offer-history.tsx#Event",
         "components/binso-ux.tsx#DetailDisclosure",
         "components/binso-ux.tsx#ActionRow",
+        "lib/display-format.ts#formatDateTime",
         "lib/offer-activity.ts#deliveryLabel",
         "lib/offer-activity.ts#offerActivityLabel",
         "lib/offer-activity.ts#labels",
@@ -129337,6 +129819,8 @@
         "components/select-control.tsx#SelectSearch",
         "lib/select-geometry.ts#selectGeometry",
         "components/use-dialog-focus.ts#registerDialogPortal",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Textarea",
         "components/ui.tsx#Checkbox",
         "components/ui.tsx#DateInput",
@@ -129374,7 +129858,6 @@
         "components/app-shell.tsx#ShellProps",
         "components/app-shell.tsx#AppShellFrame",
         "components/desktop-navigation.tsx#useDesktopNavigation",
-        "lib/client/locale.tsx#useTranslation",
         "components/use-navigation-scroll.ts#useNavigationScroll",
         "components/app-shell.tsx#accessFromSession",
         "config/plan-access.ts#moduleForPath",
@@ -129679,6 +130162,8 @@
         "components/select-control.tsx#SelectControl",
         "components/select-control.tsx#SelectSearch",
         "components/use-dialog-focus.ts#registerDialogPortal",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Textarea",
         "components/ui.tsx#Checkbox",
         "components/ui.tsx#DateInput",
@@ -129914,10 +130399,12 @@
         "components/ui.tsx#SectionTitle",
         "components/documents.tsx#money",
         "components/offer-history.tsx#OfferHistory",
+        "lib/client/locale.tsx#useTranslation",
         "components/offer-history.tsx#History",
         "components/offer-history.tsx#Event",
         "components/binso-ux.tsx#DetailDisclosure",
         "components/binso-ux.tsx#ActionRow",
+        "lib/display-format.ts#formatDateTime",
         "lib/offer-activity.ts#deliveryLabel",
         "lib/offer-activity.ts#offerActivityLabel",
         "lib/offer-activity.ts#labels",
@@ -129961,6 +130448,8 @@
         "components/select-control.tsx#SelectSearch",
         "lib/select-geometry.ts#selectGeometry",
         "components/use-dialog-focus.ts#registerDialogPortal",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Textarea",
         "components/ui.tsx#Checkbox",
         "components/ui.tsx#DateInput",
@@ -129998,7 +130487,6 @@
         "components/app-shell.tsx#ShellProps",
         "components/app-shell.tsx#AppShellFrame",
         "components/desktop-navigation.tsx#useDesktopNavigation",
-        "lib/client/locale.tsx#useTranslation",
         "components/use-navigation-scroll.ts#useNavigationScroll",
         "components/app-shell.tsx#accessFromSession",
         "config/plan-access.ts#moduleForPath",
@@ -131316,17 +131804,17 @@
         },
         {
           "tag": "DocumentModal",
-          "line": 33,
+          "line": 36,
           "component": "components/offer-history.tsx#OfferHistory"
         },
         {
           "tag": "FormSheet",
-          "line": 34,
+          "line": 37,
           "component": "components/offer-history.tsx#OfferHistory"
         },
         {
           "tag": "Field",
-          "line": 34,
+          "line": 37,
           "component": "components/offer-history.tsx#OfferHistory"
         },
         {
@@ -131715,6 +132203,8 @@
         "components/select-control.tsx#SelectControl",
         "components/select-control.tsx#SelectSearch",
         "components/use-dialog-focus.ts#registerDialogPortal",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Textarea",
         "components/ui.tsx#Checkbox",
         "components/ui.tsx#DateInput",
@@ -131930,10 +132420,12 @@
         "components/ui.tsx#SectionTitle",
         "components/documents.tsx#money",
         "components/offer-history.tsx#OfferHistory",
+        "lib/client/locale.tsx#useTranslation",
         "components/offer-history.tsx#History",
         "components/offer-history.tsx#Event",
         "components/binso-ux.tsx#DetailDisclosure",
         "components/binso-ux.tsx#ActionRow",
+        "lib/display-format.ts#formatDateTime",
         "lib/offer-activity.ts#deliveryLabel",
         "lib/offer-activity.ts#offerActivityLabel",
         "lib/offer-activity.ts#labels",
@@ -131977,6 +132469,8 @@
         "components/select-control.tsx#SelectSearch",
         "lib/select-geometry.ts#selectGeometry",
         "components/use-dialog-focus.ts#registerDialogPortal",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Textarea",
         "components/ui.tsx#Checkbox",
         "components/ui.tsx#DateInput",
@@ -132014,7 +132508,6 @@
         "components/app-shell.tsx#ShellProps",
         "components/app-shell.tsx#AppShellFrame",
         "components/desktop-navigation.tsx#useDesktopNavigation",
-        "lib/client/locale.tsx#useTranslation",
         "components/use-navigation-scroll.ts#useNavigationScroll",
         "components/app-shell.tsx#accessFromSession",
         "config/plan-access.ts#moduleForPath",
@@ -132319,6 +132812,8 @@
         "components/select-control.tsx#SelectControl",
         "components/select-control.tsx#SelectSearch",
         "components/use-dialog-focus.ts#registerDialogPortal",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Textarea",
         "components/ui.tsx#Checkbox",
         "components/ui.tsx#DateInput",
@@ -132554,10 +133049,12 @@
         "components/ui.tsx#SectionTitle",
         "components/documents.tsx#money",
         "components/offer-history.tsx#OfferHistory",
+        "lib/client/locale.tsx#useTranslation",
         "components/offer-history.tsx#History",
         "components/offer-history.tsx#Event",
         "components/binso-ux.tsx#DetailDisclosure",
         "components/binso-ux.tsx#ActionRow",
+        "lib/display-format.ts#formatDateTime",
         "lib/offer-activity.ts#deliveryLabel",
         "lib/offer-activity.ts#offerActivityLabel",
         "lib/offer-activity.ts#labels",
@@ -132601,6 +133098,8 @@
         "components/select-control.tsx#SelectSearch",
         "lib/select-geometry.ts#selectGeometry",
         "components/use-dialog-focus.ts#registerDialogPortal",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Textarea",
         "components/ui.tsx#Checkbox",
         "components/ui.tsx#DateInput",
@@ -132638,7 +133137,6 @@
         "components/app-shell.tsx#ShellProps",
         "components/app-shell.tsx#AppShellFrame",
         "components/desktop-navigation.tsx#useDesktopNavigation",
-        "lib/client/locale.tsx#useTranslation",
         "components/use-navigation-scroll.ts#useNavigationScroll",
         "components/app-shell.tsx#accessFromSession",
         "config/plan-access.ts#moduleForPath",
@@ -133956,17 +134454,17 @@
         },
         {
           "tag": "DocumentModal",
-          "line": 33,
+          "line": 36,
           "component": "components/offer-history.tsx#OfferHistory"
         },
         {
           "tag": "FormSheet",
-          "line": 34,
+          "line": 37,
           "component": "components/offer-history.tsx#OfferHistory"
         },
         {
           "tag": "Field",
-          "line": 34,
+          "line": 37,
           "component": "components/offer-history.tsx#OfferHistory"
         },
         {
@@ -134303,6 +134801,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -134505,6 +135005,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -134807,6 +135309,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -135030,6 +135534,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -136346,6 +136852,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
@@ -136453,6 +136961,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "lib/client/page-access.tsx#usePageAccess",
@@ -136755,6 +137265,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
@@ -136932,6 +137444,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "lib/client/page-access.tsx#usePageAccess",
@@ -138240,6 +138754,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -138449,6 +138965,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -138720,6 +139238,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -138949,6 +139469,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -140268,6 +140790,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -140477,6 +141001,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -140748,6 +141274,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -140977,6 +141505,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -142303,6 +142833,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -142509,6 +143041,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -142798,6 +143332,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -143025,6 +143561,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -144299,6 +144837,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -144490,6 +145030,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -144766,6 +145308,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -144978,6 +145522,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -146208,6 +146754,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -146404,6 +146952,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -146681,6 +147231,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -146897,6 +147449,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -148117,6 +148671,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -148313,6 +148869,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -148594,6 +149152,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -148811,6 +149371,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -150084,6 +150646,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
@@ -150160,6 +150724,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "lib/client/page-access.tsx#usePageAccess",
@@ -150475,6 +151041,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
@@ -150643,6 +151211,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "lib/client/page-access.tsx#usePageAccess",
@@ -151923,6 +152493,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
@@ -151997,6 +152569,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "lib/client/page-access.tsx#usePageAccess",
@@ -152298,6 +152872,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
@@ -152464,6 +153040,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "lib/client/page-access.tsx#usePageAccess",
@@ -153811,6 +154389,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -154070,6 +154650,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -154273,6 +154855,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -155434,6 +156018,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -155622,6 +156208,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -155897,6 +156485,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -156106,6 +156696,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -157350,6 +157942,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -157553,6 +158147,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -157824,6 +158420,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -158047,6 +158645,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -159268,6 +159868,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -159476,6 +160078,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -159767,6 +160371,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -159996,6 +160602,8 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Input",
         "components/binso-ux.tsx#FilterSheet",
         "components/binso-ux.tsx#SheetProps",
@@ -161318,6 +161926,8 @@
         "components/select-control.tsx#SelectControl",
         "components/select-control.tsx#SelectSearch",
         "components/use-dialog-focus.ts#registerDialogPortal",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Textarea",
         "components/ui.tsx#Checkbox",
         "components/ui.tsx#DateInput",
@@ -161540,6 +162150,8 @@
         "components/select-control.tsx#SelectSearch",
         "lib/select-geometry.ts#selectGeometry",
         "components/use-dialog-focus.ts#registerDialogPortal",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Textarea",
         "components/ui.tsx#Checkbox",
         "components/ui.tsx#DateInput",
@@ -161851,6 +162463,8 @@
         "components/select-control.tsx#SelectControl",
         "components/select-control.tsx#SelectSearch",
         "components/use-dialog-focus.ts#registerDialogPortal",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Textarea",
         "components/ui.tsx#Checkbox",
         "components/ui.tsx#DateInput",
@@ -162093,6 +162707,8 @@
         "components/select-control.tsx#SelectSearch",
         "lib/select-geometry.ts#selectGeometry",
         "components/use-dialog-focus.ts#registerDialogPortal",
+        "components/select-control.tsx#SelectSearchFeedback",
+        "components/select-control.tsx#SelectSearchPagination",
         "components/ui.tsx#Textarea",
         "components/ui.tsx#Checkbox",
         "components/ui.tsx#DateInput",
@@ -165626,7 +166242,7 @@
       "key": "components/select-control.tsx#SelectControl",
       "file": "components/select-control.tsx",
       "name": "SelectControl",
-      "line": 11,
+      "line": 17,
       "classes": [
         "app-select-control",
         "form-control",
@@ -165635,9 +166251,6 @@
         "form-error",
         "app-select-popup",
         "app-select-search",
-        "sr-only",
-        "button",
-        "button-secondary",
         "app-select-option"
       ],
       "apis": [],
@@ -165646,14 +166259,14 @@
       "elements": [
         {
           "tag": "span",
-          "line": 37,
+          "line": 44,
           "props": [
             "className=\"app-select-control\""
           ]
         },
         {
           "tag": "LocalizedElement",
-          "line": 37,
+          "line": 44,
           "props": [
             "as=\"button\"",
             "ref={trigger}",
@@ -165680,14 +166293,14 @@
         },
         {
           "tag": "span",
-          "line": 45,
+          "line": 52,
           "props": [
             "aria-hidden=\"true\""
           ]
         },
         {
           "tag": "LocalizedElement",
-          "line": 45,
+          "line": 52,
           "props": [
             "as=\"select\"",
             "{...props}",
@@ -165706,7 +166319,7 @@
         },
         {
           "tag": "LocalizedElement",
-          "line": 45,
+          "line": 52,
           "props": [
             "as=\"span\"",
             "role=\"alert\"",
@@ -165715,8 +166328,13 @@
           ]
         },
         {
+          "tag": "LocalizedText",
+          "line": 52,
+          "props": []
+        },
+        {
           "tag": "div",
-          "line": 45,
+          "line": 52,
           "props": [
             "ref={popup}",
             "className=\"app-select-popup\"",
@@ -165732,14 +166350,14 @@
         },
         {
           "tag": "div",
-          "line": 45,
+          "line": 52,
           "props": [
             "className=\"app-select-search\""
           ]
         },
         {
           "tag": "SearchInput",
-          "line": 45,
+          "line": 52,
           "props": [
             "ref={searchInput}",
             "type=\"search\"",
@@ -165752,39 +166370,17 @@
           ]
         },
         {
-          "tag": "LocalizedElement",
-          "line": 45,
+          "tag": "SelectSearchFeedback",
+          "line": 52,
           "props": [
-            "as=\"span\"",
-            "className=\"sr-only\"",
-            "role=\"status\""
+            "loading={search.loading}",
+            "error={search.error}",
+            "onRetry={()=>{searchInput.current?.focus({preventScroll:true});search.onRetry()}}"
           ]
         },
         {
           "tag": "div",
-          "line": 45,
-          "props": [
-            "role=\"alert\""
-          ]
-        },
-        {
-          "tag": "p",
-          "line": 45,
-          "props": []
-        },
-        {
-          "tag": "LocalizedElement",
-          "line": 45,
-          "props": [
-            "as=\"button\"",
-            "type=\"button\"",
-            "className=\"button button-secondary\"",
-            "onClick={()=>{searchInput.current?.focus({preventScroll:true});search.onRetry()}}"
-          ]
-        },
-        {
-          "tag": "div",
-          "line": 45,
+          "line": 52,
           "props": [
             "id={search?id:undefined}",
             "role={search?'listbox':undefined}",
@@ -165794,7 +166390,7 @@
         },
         {
           "tag": "div",
-          "line": 45,
+          "line": 52,
           "props": [
             "key={index}",
             "id={`${id}-${index}`}",
@@ -165810,232 +166406,211 @@
         },
         {
           "tag": "span",
-          "line": 45,
+          "line": 52,
           "props": [
             "aria-hidden=\"true\""
           ]
         },
         {
-          "tag": "div",
-          "line": 45,
+          "tag": "SelectSearchPagination",
+          "line": 52,
           "props": [
-            "className=\"app-select-search\""
-          ]
-        },
-        {
-          "tag": "LocalizedElement",
-          "line": 45,
-          "props": [
-            "as=\"button\"",
-            "type=\"button\"",
-            "className=\"button button-secondary\"",
-            "disabled={search.loading||search.page===0}",
-            "onClick={()=>{searchInput.current?.focus({preventScroll:true});search.onPage(search.page-1)}}"
-          ]
-        },
-        {
-          "tag": "LocalizedElement",
-          "line": 45,
-          "props": [
-            "as=\"button\"",
-            "type=\"button\"",
-            "className=\"button button-secondary\"",
-            "disabled={search.loading||!search.hasNext}",
-            "onClick={()=>{searchInput.current?.focus({preventScroll:true});search.onPage(search.page+1)}}"
+            "search={search}",
+            "onPage={page=>{searchInput.current?.focus({preventScroll:true});search.onPage(page)}}"
           ]
         }
       ],
       "conditions": [
         {
-          "line": 22,
+          "line": 29,
           "expression": "props.disabled||props.multiple||!control.current"
         },
         {
-          "line": 22,
+          "line": 29,
           "expression": "!items.some(option=>!option.disabled)"
         },
         {
-          "line": 22,
+          "line": 29,
           "expression": "items[selected]&&!items[selected].disabled&&!items[selected].hidden"
         },
         {
-          "line": 23,
+          "line": 30,
           "expression": "!open||!control.current"
         },
         {
-          "line": 23,
+          "line": 30,
           "expression": "JSON.stringify(previous)===JSON.stringify(items)"
         },
         {
-          "line": 23,
+          "line": 30,
           "expression": "previous<items.length"
         },
         {
-          "line": 24,
+          "line": 31,
           "expression": "text!==caption"
         },
         {
-          "line": 25,
+          "line": 32,
           "expression": "!enabled(index)||!control.current||!option||!available(option)||option.value!==options[index].value"
         },
         {
-          "line": 27,
+          "line": 34,
           "expression": "!open"
         },
         {
-          "line": 28,
+          "line": 35,
           "expression": "!rect"
         },
         {
-          "line": 28,
+          "line": 35,
           "expression": "popup.current"
         },
         {
-          "line": 30,
+          "line": 37,
           "expression": "event.target instanceof Node&&!trigger.current?.contains(event.target)&&!popup.current?.contains(event.target)"
         },
         {
-          "line": 34,
+          "line": 41,
           "expression": "open"
         },
         {
-          "line": 36,
+          "line": 43,
           "expression": "isValidElement<{children?:React.ReactNode;'aria-hidden'?:boolean}>(child)"
         },
         {
-          "line": 36,
+          "line": 43,
           "expression": "child.type==='option'"
         },
         {
-          "line": 36,
+          "line": 43,
           "expression": "child.type==='optgroup'||child.type===Fragment"
         },
         {
-          "line": 37,
+          "line": 44,
           "expression": "invalid"
         },
         {
-          "line": 37,
+          "line": 44,
           "expression": "open"
         },
         {
-          "line": 37,
+          "line": 44,
           "expression": "open"
         },
         {
-          "line": 37,
+          "line": 44,
           "expression": "open"
         },
         {
-          "line": 37,
+          "line": 44,
           "expression": "!(event.relatedTarget instanceof Node)||!popup.current?.contains(event.relatedTarget)"
         },
         {
-          "line": 38,
+          "line": 45,
           "expression": "event.defaultPrevented||props.multiple"
         },
         {
-          "line": 39,
+          "line": 46,
           "expression": "event.key==='Tab'"
         },
         {
-          "line": 39,
+          "line": 46,
           "expression": "open&&search&&!event.shiftKey"
         },
         {
-          "line": 40,
+          "line": 47,
           "expression": "event.key==='Escape'&&open"
         },
         {
-          "line": 41,
+          "line": 48,
           "expression": "['ArrowDown','ArrowUp','Home','End','Enter',' '].includes(event.key)"
         },
         {
-          "line": 42,
+          "line": 49,
           "expression": "!open"
         },
         {
-          "line": 42,
+          "line": 49,
           "expression": "event.key==='Home'||event.key==='End'"
         },
         {
-          "line": 42,
+          "line": 49,
           "expression": "available(option)"
         },
         {
-          "line": 42,
+          "line": 49,
           "expression": "event.key==='Home'"
         },
         {
-          "line": 42,
+          "line": 49,
           "expression": "event.key==='Enter'||event.key===' '"
         },
         {
-          "line": 43,
+          "line": 50,
           "expression": "event.key==='Home'"
         },
         {
-          "line": 43,
+          "line": 50,
           "expression": "event.key==='End'"
         },
         {
-          "line": 43,
+          "line": 50,
           "expression": "event.key==='ArrowDown'"
         },
         {
-          "line": 44,
+          "line": 51,
           "expression": "event.key.length===1&&!event.ctrlKey&&!event.metaKey&&!event.altKey"
         },
         {
-          "line": 44,
+          "line": 51,
           "expression": "open&&now-typeahead.current.at<700"
         },
         {
-          "line": 44,
+          "line": 51,
           "expression": "!open"
         },
         {
-          "line": 44,
+          "line": 51,
           "expression": "index>=0"
         },
         {
-          "line": 45,
+          "line": 52,
           "expression": "search"
         },
         {
-          "line": 45,
+          "line": 52,
           "expression": "search"
         },
         {
-          "line": 45,
+          "line": 52,
           "expression": "!(event.relatedTarget instanceof Node)||!popup.current?.contains(event.relatedTarget)&&!trigger.current?.contains(event.relatedTarget)"
         },
         {
-          "line": 45,
+          "line": 52,
           "expression": "event.key==='Escape'"
         },
         {
-          "line": 45,
+          "line": 52,
           "expression": "!(event.target instanceof HTMLElement)||!event.target.closest('input,button')"
         },
         {
-          "line": 45,
+          "line": 52,
           "expression": "event.key==='ArrowDown'"
         },
         {
-          "line": 45,
+          "line": 52,
           "expression": "first>=0"
         },
         {
-          "line": 45,
+          "line": 52,
           "expression": "search"
         },
         {
-          "line": 45,
+          "line": 52,
           "expression": "search"
         },
         {
-          "line": 45,
+          "line": 52,
           "expression": "enabled(index)"
         }
       ]
@@ -166222,6 +166797,125 @@
       "collections": [],
       "widgets": [],
       "elements": [],
+      "conditions": []
+    },
+    {
+      "key": "components/select-control.tsx#SelectSearchFeedback",
+      "file": "components/select-control.tsx",
+      "name": "SelectSearchFeedback",
+      "line": 11,
+      "classes": [
+        "sr-only",
+        "button",
+        "button-secondary"
+      ],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [
+        {
+          "tag": "LocalizedElement",
+          "line": 12,
+          "props": [
+            "as=\"span\"",
+            "className=\"sr-only\"",
+            "role=\"status\""
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 12,
+          "props": []
+        },
+        {
+          "tag": "div",
+          "line": 12,
+          "props": [
+            "role=\"alert\""
+          ]
+        },
+        {
+          "tag": "p",
+          "line": 12,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 12,
+          "props": []
+        },
+        {
+          "tag": "LocalizedElement",
+          "line": 12,
+          "props": [
+            "as=\"button\"",
+            "type=\"button\"",
+            "className=\"button button-secondary\"",
+            "onClick={onRetry}"
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 12,
+          "props": []
+        }
+      ],
+      "conditions": []
+    },
+    {
+      "key": "components/select-control.tsx#SelectSearchPagination",
+      "file": "components/select-control.tsx",
+      "name": "SelectSearchPagination",
+      "line": 14,
+      "classes": [
+        "app-select-search",
+        "button",
+        "button-secondary"
+      ],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [
+        {
+          "tag": "div",
+          "line": 15,
+          "props": [
+            "className=\"app-select-search\""
+          ]
+        },
+        {
+          "tag": "LocalizedElement",
+          "line": 15,
+          "props": [
+            "as=\"button\"",
+            "type=\"button\"",
+            "className=\"button button-secondary\"",
+            "disabled={search.loading||search.page===0}",
+            "onClick={()=>onPage(search.page-1)}"
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 15,
+          "props": []
+        },
+        {
+          "tag": "LocalizedElement",
+          "line": 15,
+          "props": [
+            "as=\"button\"",
+            "type=\"button\"",
+            "className=\"button button-secondary\"",
+            "disabled={search.loading||!search.hasNext}",
+            "onClick={()=>onPage(search.page+1)}"
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 15,
+          "props": []
+        }
+      ],
       "conditions": []
     },
     {
@@ -175068,7 +175762,7 @@
       "key": "components/public-offer.tsx#PublicOffer",
       "file": "components/public-offer.tsx",
       "name": "PublicOffer",
-      "line": 18,
+      "line": 20,
       "classes": [
         "public-offer",
         "public-offer-logo",
@@ -175083,48 +175777,26 @@
       "widgets": [
         {
           "tag": "FormSheet",
-          "line": 63
-        },
-        {
-          "tag": "Field",
-          "line": 66
-        },
-        {
-          "tag": "Field",
-          "line": 67
+          "line": 65
         },
         {
           "tag": "Field",
           "line": 68
         },
         {
+          "tag": "Field",
+          "line": 69
+        },
+        {
+          "tag": "Field",
+          "line": 70
+        },
+        {
           "tag": "DocumentModal",
-          "line": 71
+          "line": 73
         }
       ],
       "elements": [
-        {
-          "tag": "main",
-          "line": 49,
-          "props": [
-            "className=\"public-offer\""
-          ]
-        },
-        {
-          "tag": "h1",
-          "line": 49,
-          "props": []
-        },
-        {
-          "tag": "ErrorState",
-          "line": 49,
-          "props": []
-        },
-        {
-          "tag": "LoadingState",
-          "line": 49,
-          "props": []
-        },
         {
           "tag": "main",
           "line": 51,
@@ -175133,13 +175805,35 @@
           ]
         },
         {
+          "tag": "h1",
+          "line": 51,
+          "props": []
+        },
+        {
+          "tag": "ErrorState",
+          "line": 51,
+          "props": []
+        },
+        {
+          "tag": "LoadingState",
+          "line": 51,
+          "props": []
+        },
+        {
+          "tag": "main",
+          "line": 53,
+          "props": [
+            "className=\"public-offer\""
+          ]
+        },
+        {
           "tag": "header",
-          "line": 52,
+          "line": 54,
           "props": []
         },
         {
           "tag": "Image",
-          "line": 52,
+          "line": 54,
           "props": [
             "unoptimized",
             "width={180}",
@@ -175151,139 +175845,72 @@
         },
         {
           "tag": "p",
-          "line": 52,
+          "line": 54,
           "props": [
             "className=\"eyebrow\""
           ]
         },
         {
           "tag": "h1",
-          "line": 52,
+          "line": 54,
           "props": []
         },
         {
           "tag": "p",
-          "line": 52,
+          "line": 54,
           "props": []
         },
         {
           "tag": "ErrorState",
-          "line": 53,
+          "line": 55,
           "props": []
         },
         {
           "tag": "p",
-          "line": 53,
+          "line": 55,
           "props": [
             "role=\"status\""
           ]
         },
         {
           "tag": "section",
-          "line": 54,
+          "line": 56,
           "props": []
         },
         {
           "tag": "SectionTitle",
-          "line": 54,
+          "line": 56,
           "props": [
             "title=\"Leistungen\""
           ]
         },
         {
           "tag": "p",
-          "line": 54,
+          "line": 56,
           "props": []
         },
         {
           "tag": "ol",
-          "line": 55,
+          "line": 57,
           "props": [
             "className=\"public-offer-lines\""
           ]
         },
         {
           "tag": "li",
-          "line": 55,
+          "line": 57,
           "props": [
             "key={String(line.id||index)}"
           ]
         },
         {
           "tag": "div",
-          "line": 55,
+          "line": 57,
           "props": []
         },
         {
           "tag": "strong",
-          "line": 55,
-          "props": []
-        },
-        {
-          "tag": "p",
-          "line": 55,
-          "props": []
-        },
-        {
-          "tag": "strong",
-          "line": 55,
-          "props": []
-        },
-        {
-          "tag": "dl",
-          "line": 56,
-          "props": [
-            "className=\"detail-list\""
-          ]
-        },
-        {
-          "tag": "div",
-          "line": 56,
-          "props": []
-        },
-        {
-          "tag": "dt",
-          "line": 56,
-          "props": []
-        },
-        {
-          "tag": "dd",
-          "line": 56,
-          "props": []
-        },
-        {
-          "tag": "div",
-          "line": 56,
-          "props": []
-        },
-        {
-          "tag": "dt",
-          "line": 56,
-          "props": []
-        },
-        {
-          "tag": "dd",
-          "line": 56,
-          "props": []
-        },
-        {
-          "tag": "div",
-          "line": 56,
-          "props": []
-        },
-        {
-          "tag": "dt",
-          "line": 56,
-          "props": []
-        },
-        {
-          "tag": "dd",
-          "line": 56,
-          "props": []
-        },
-        {
-          "tag": "strong",
-          "line": 56,
+          "line": 57,
           "props": []
         },
         {
@@ -175292,8 +175919,75 @@
           "props": []
         },
         {
-          "tag": "Button",
+          "tag": "strong",
+          "line": 57,
+          "props": []
+        },
+        {
+          "tag": "dl",
           "line": 58,
+          "props": [
+            "className=\"detail-list\""
+          ]
+        },
+        {
+          "tag": "div",
+          "line": 58,
+          "props": []
+        },
+        {
+          "tag": "dt",
+          "line": 58,
+          "props": []
+        },
+        {
+          "tag": "dd",
+          "line": 58,
+          "props": []
+        },
+        {
+          "tag": "div",
+          "line": 58,
+          "props": []
+        },
+        {
+          "tag": "dt",
+          "line": 58,
+          "props": []
+        },
+        {
+          "tag": "dd",
+          "line": 58,
+          "props": []
+        },
+        {
+          "tag": "div",
+          "line": 58,
+          "props": []
+        },
+        {
+          "tag": "dt",
+          "line": 58,
+          "props": []
+        },
+        {
+          "tag": "dd",
+          "line": 58,
+          "props": []
+        },
+        {
+          "tag": "strong",
+          "line": 58,
+          "props": []
+        },
+        {
+          "tag": "p",
+          "line": 59,
+          "props": []
+        },
+        {
+          "tag": "Button",
+          "line": 60,
           "props": [
             "variant=\"secondary\"",
             "disabled={busy}",
@@ -175302,26 +175996,26 @@
         },
         {
           "tag": "section",
-          "line": 60,
+          "line": 62,
           "props": []
         },
         {
           "tag": "SectionTitle",
-          "line": 60,
+          "line": 62,
           "props": [
             "title=\"Antwort\""
           ]
         },
         {
           "tag": "FormActions",
-          "line": 60,
+          "line": 62,
           "props": [
             "sheet"
           ]
         },
         {
           "tag": "Button",
-          "line": 60,
+          "line": 62,
           "props": [
             "disabled={busy}",
             "onClick={()=>start('accept')}"
@@ -175329,7 +176023,7 @@
         },
         {
           "tag": "Button",
-          "line": 60,
+          "line": 62,
           "props": [
             "variant=\"secondary\"",
             "disabled={busy}",
@@ -175338,12 +176032,12 @@
         },
         {
           "tag": "p",
-          "line": 60,
+          "line": 62,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 60,
+          "line": 62,
           "props": [
             "variant=\"secondary\"",
             "disabled={busy}",
@@ -175352,48 +176046,48 @@
         },
         {
           "tag": "section",
-          "line": 61,
+          "line": 63,
           "props": []
         },
         {
           "tag": "SectionTitle",
-          "line": 61,
+          "line": 63,
           "props": [
             "title=\"Verlauf\""
           ]
         },
         {
           "tag": "article",
-          "line": 61,
+          "line": 63,
           "props": [
             "key={index}"
           ]
         },
         {
           "tag": "strong",
-          "line": 61,
+          "line": 63,
           "props": []
         },
         {
           "tag": "p",
-          "line": 61,
+          "line": 63,
           "props": []
         },
         {
           "tag": "small",
-          "line": 61,
+          "line": 63,
           "props": []
         },
         {
           "tag": "p",
-          "line": 62,
+          "line": 64,
           "props": [
             "className=\"technical-hint\""
           ]
         },
         {
           "tag": "FormSheet",
-          "line": 63,
+          "line": 65,
           "props": [
             "open={decision!==null}",
             "label={decision==='accept'?'Angebot annehmen':decision==='decline'?'Angebot ablehnen':'Frage stellen'}",
@@ -175403,31 +176097,31 @@
         },
         {
           "tag": "div",
-          "line": 63,
+          "line": 65,
           "props": [
             "className=\"sheet-body\""
           ]
         },
         {
           "tag": "p",
-          "line": 64,
+          "line": 66,
           "props": []
         },
         {
           "tag": "p",
-          "line": 65,
+          "line": 67,
           "props": []
         },
         {
           "tag": "Field",
-          "line": 66,
+          "line": 68,
           "props": [
             "label=\"Ich bestätige Version, Betrag und Bedingungen und bin zur Annahme berechtigt.\""
           ]
         },
         {
           "tag": "Input",
-          "line": 66,
+          "line": 68,
           "props": [
             "type=\"checkbox\"",
             "checked={confirmed}",
@@ -175436,14 +176130,14 @@
         },
         {
           "tag": "Field",
-          "line": 67,
+          "line": 69,
           "props": [
             "label={decision==='question'?'Frage':'Grund (optional)'}"
           ]
         },
         {
           "tag": "Textarea",
-          "line": 67,
+          "line": 69,
           "props": [
             "value={message}",
             "onChange={event=>setMessage(event.target.value)}",
@@ -175452,14 +176146,14 @@
         },
         {
           "tag": "Field",
-          "line": 68,
+          "line": 70,
           "props": [
             "label=\"Bestätigungscode\""
           ]
         },
         {
           "tag": "Input",
-          "line": 68,
+          "line": 70,
           "props": [
             "inputMode=\"numeric\"",
             "autoComplete=\"one-time-code\"",
@@ -175470,24 +176164,24 @@
         },
         {
           "tag": "p",
-          "line": 68,
+          "line": 70,
           "props": []
         },
         {
           "tag": "ErrorState",
-          "line": 69,
+          "line": 71,
           "props": []
         },
         {
           "tag": "FormActions",
-          "line": 70,
+          "line": 72,
           "props": [
             "sheet"
           ]
         },
         {
           "tag": "Button",
-          "line": 70,
+          "line": 72,
           "props": [
             "variant=\"secondary\"",
             "disabled={busy}",
@@ -175496,7 +176190,7 @@
         },
         {
           "tag": "Button",
-          "line": 70,
+          "line": 72,
           "props": [
             "disabled={busy||(decision==='question'&&!message.trim())||(decision==='accept'&&!confirmed)||(codeSent&&code.length!==6)}",
             "onClick={()=>void act(codeSent?{action:'respond',decision,code,message,requestKey:key.current,confirmed:decision==='accept'?confirmed:true}:{action:'challenge',decision})}"
@@ -175504,7 +176198,7 @@
         },
         {
           "tag": "DocumentModal",
-          "line": 71,
+          "line": 73,
           "props": [
             "title=\"Angebots-PDF\"",
             "fileBlob={file}",
@@ -175515,115 +176209,115 @@
       ],
       "conditions": [
         {
-          "line": 26,
+          "line": 28,
           "expression": "!/^[A-Za-z0-9_-]{43}$/.test(token.current)"
         },
         {
-          "line": 26,
+          "line": 28,
           "expression": "active"
         },
         {
-          "line": 27,
+          "line": 29,
           "expression": "active"
         },
         {
-          "line": 27,
+          "line": 29,
           "expression": "active"
         },
         {
-          "line": 27,
+          "line": 29,
           "expression": "reason instanceof Error"
         },
         {
-          "line": 28,
+          "line": 30,
           "expression": "active&&document.visibilityState===\"visible\""
         },
         {
-          "line": 32,
+          "line": 34,
           "expression": "pending.current"
-        },
-        {
-          "line": 35,
-          "expression": "body.action==='challenge'"
-        },
-        {
-          "line": 36,
-          "expression": "body.action==='respond'"
         },
         {
           "line": 37,
+          "expression": "body.action==='challenge'"
+        },
+        {
+          "line": 38,
+          "expression": "body.action==='respond'"
+        },
+        {
+          "line": 39,
           "expression": "body.decision==='question'"
         },
         {
-          "line": 40,
+          "line": 42,
           "expression": "reason instanceof Error"
-        },
-        {
-          "line": 44,
-          "expression": "pending.current"
         },
         {
           "line": 46,
+          "expression": "pending.current"
+        },
+        {
+          "line": 48,
           "expression": "reason instanceof Error"
         },
         {
-          "line": 49,
+          "line": 51,
           "expression": "!offer"
         },
         {
-          "line": 49,
+          "line": 51,
           "expression": "error"
         },
         {
-          "line": 50,
+          "line": 52,
           "expression": "Array.isArray(doc.items)"
         },
         {
-          "line": 50,
+          "line": 52,
           "expression": "doc.document_snapshot&&typeof doc.document_snapshot==='object'"
         },
         {
-          "line": 60,
+          "line": 62,
           "expression": "offer.status==='sent'"
         },
         {
-          "line": 60,
+          "line": 62,
           "expression": "offer.status==='accepted'"
         },
         {
-          "line": 63,
+          "line": 65,
           "expression": "decision==='accept'"
         },
         {
-          "line": 63,
+          "line": 65,
           "expression": "decision==='decline'"
         },
         {
-          "line": 67,
+          "line": 69,
           "expression": "decision==='question'"
         },
         {
-          "line": 68,
-          "expression": "codeSent"
-        },
-        {
           "line": 70,
           "expression": "codeSent"
         },
         {
-          "line": 70,
+          "line": 72,
+          "expression": "codeSent"
+        },
+        {
+          "line": 72,
           "expression": "decision==='accept'"
         },
         {
-          "line": 70,
+          "line": 72,
           "expression": "codeSent"
         },
         {
-          "line": 70,
+          "line": 72,
           "expression": "decision==='accept'"
         },
         {
-          "line": 70,
+          "line": 72,
           "expression": "decision==='decline'"
         }
       ]
@@ -175632,7 +176326,7 @@
       "key": "components/public-offer.tsx#Offer",
       "file": "components/public-offer.tsx",
       "name": "Offer",
-      "line": 11,
+      "line": 13,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -175644,7 +176338,7 @@
       "key": "components/public-offer.tsx#Decision",
       "file": "components/public-offer.tsx",
       "name": "Decision",
-      "line": 12,
+      "line": 14,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -175656,7 +176350,7 @@
       "key": "components/public-offer.tsx#request",
       "file": "components/public-offer.tsx",
       "name": "request",
-      "line": 13,
+      "line": 15,
       "classes": [],
       "apis": [
         "/api/public/offer"
@@ -175666,7 +176360,7 @@
       "elements": [],
       "conditions": [
         {
-          "line": 15,
+          "line": 17,
           "expression": "!response.ok"
         }
       ]
@@ -175683,8 +176377,12 @@
       "elements": [],
       "conditions": [
         {
-          "line": 26,
-          "expression": "/^\\d{4}-\\d{2}-\\d{2}$/.test(date)"
+          "line": 27,
+          "expression": "!/^\\d{4}-\\d{2}-\\d{2}$/.test(date)"
+        },
+        {
+          "line": 28,
+          "expression": "!Number.isFinite(instant.getTime())||instant.toISOString().slice(0,10)!==date"
         }
       ]
     },
@@ -175764,6 +176462,23 @@
       "widgets": [],
       "elements": [],
       "conditions": []
+    },
+    {
+      "key": "lib/display-format.ts#formatDateTime",
+      "file": "lib/display-format.ts",
+      "name": "formatDateTime",
+      "line": 20,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": [
+        {
+          "line": 21,
+          "expression": "!Number.isFinite(date.getTime())"
+        }
+      ]
     },
     {
       "key": "components/pdf-preview.tsx#DocumentModal",
@@ -179771,7 +180486,7 @@
       "key": "components/offer-history.tsx#OfferHistory",
       "file": "components/offer-history.tsx",
       "name": "OfferHistory",
-      "line": 12,
+      "line": 14,
       "classes": [
         "technical-hint",
         "offer-history-event",
@@ -179784,108 +180499,108 @@
       "widgets": [
         {
           "tag": "DocumentModal",
-          "line": 33
+          "line": 36
         },
         {
           "tag": "FormSheet",
-          "line": 34
+          "line": 37
         },
         {
           "tag": "Field",
-          "line": 34
+          "line": 37
         }
       ],
       "elements": [
         {
           "tag": "ErrorState",
-          "line": 26,
+          "line": 29,
           "props": [
             "onRetry={query.refresh}"
           ]
         },
         {
           "tag": "DetailDisclosure",
-          "line": 28,
+          "line": 31,
           "props": [
             "label=\"Versionen und Verlauf\""
           ]
         },
         {
           "tag": "ErrorState",
-          "line": 29,
+          "line": 32,
           "props": []
         },
         {
           "tag": "p",
-          "line": 29,
+          "line": 32,
           "props": [
             "role=\"status\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 29,
+          "line": 32,
           "props": []
         },
         {
           "tag": "SectionTitle",
-          "line": 30,
+          "line": 33,
           "props": [
             "title=\"Unveränderliche PDFs\""
           ]
         },
         {
           "tag": "ActionRow",
-          "line": 30,
+          "line": 33,
           "props": [
             "key={version.version}",
             "icon=\"file\"",
-            "title={'Version '+version.version}",
-            "metadata={new Date(version.created_at).toLocaleString('de-CH')}",
+            "title={t('Version')+' '+version.version}",
+            "metadata={formatDateTime(version.created_at,localeTags[locale])}",
             "onClick={()=>setPreview(version.version)}"
           ]
         },
         {
           "tag": "SectionTitle",
-          "line": 31,
+          "line": 34,
           "props": [
             "title=\"Versand\""
           ]
         },
         {
           "tag": "p",
-          "line": 31,
+          "line": 34,
           "props": [
             "key={delivery.id}"
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 31,
+          "line": 34,
           "props": []
         },
         {
           "tag": "p",
-          "line": 31,
+          "line": 34,
           "props": [
             "className=\"technical-hint\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 31,
+          "line": 34,
           "props": []
         },
         {
           "tag": "SectionTitle",
-          "line": 32,
+          "line": 35,
           "props": [
             "title=\"Reaktionen\""
           ]
         },
         {
           "tag": "article",
-          "line": 32,
+          "line": 35,
           "props": [
             "key={event.id}",
             "className=\"offer-history-event\""
@@ -179893,39 +180608,44 @@
         },
         {
           "tag": "div",
-          "line": 32,
+          "line": 35,
           "props": []
         },
         {
           "tag": "strong",
-          "line": 32,
+          "line": 35,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 32,
+          "line": 35,
           "props": []
         },
         {
           "tag": "small",
-          "line": 32,
+          "line": 35,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 35,
           "props": []
         },
         {
           "tag": "p",
-          "line": 32,
+          "line": 35,
           "props": []
         },
         {
           "tag": "ActionsMenu",
-          "line": 32,
+          "line": 35,
           "props": [
             "label=\"Nachrichtenaktionen\""
           ]
         },
         {
           "tag": "ActionRow",
-          "line": 32,
+          "line": 35,
           "props": [
             "icon=\"chat\"",
             "title=\"Antworten\"",
@@ -179934,7 +180654,7 @@
         },
         {
           "tag": "ActionRow",
-          "line": 32,
+          "line": 35,
           "props": [
             "icon=\"close\"",
             "title=\"Link widerrufen\"",
@@ -179944,9 +180664,9 @@
         },
         {
           "tag": "DocumentModal",
-          "line": 33,
+          "line": 36,
           "props": [
-            "title={number+\" · Version \"+preview}",
+            "title={number+\" · \"+t('Version')+\" \"+preview}",
             "fileUrl={path+\"?version=\"+preview}",
             "fileName={number+\"-v\"+preview}",
             "onClose={()=>setPreview(null)}"
@@ -179954,7 +180674,7 @@
         },
         {
           "tag": "FormSheet",
-          "line": 34,
+          "line": 37,
           "props": [
             "open={!!reply}",
             "label=\"Zum Angebot antworten\"",
@@ -179964,21 +180684,21 @@
         },
         {
           "tag": "div",
-          "line": 34,
+          "line": 37,
           "props": [
             "className=\"sheet-body\""
           ]
         },
         {
           "tag": "Field",
-          "line": 34,
+          "line": 37,
           "props": [
             "label=\"Antwort\""
           ]
         },
         {
           "tag": "Textarea",
-          "line": 34,
+          "line": 37,
           "props": [
             "value={text}",
             "maxLength={4000}",
@@ -179987,19 +180707,19 @@
         },
         {
           "tag": "ErrorState",
-          "line": 34,
+          "line": 37,
           "props": []
         },
         {
           "tag": "FormActions",
-          "line": 34,
+          "line": 37,
           "props": [
             "sheet"
           ]
         },
         {
           "tag": "Button",
-          "line": 34,
+          "line": 37,
           "props": [
             "variant=\"secondary\"",
             "disabled={busy}",
@@ -180008,7 +180728,7 @@
         },
         {
           "tag": "Button",
-          "line": 34,
+          "line": 37,
           "props": [
             "disabled={busy||!text.trim()}",
             "onClick={()=>reply&&void submit('reply',reply)}"
@@ -180017,35 +180737,35 @@
       ],
       "conditions": [
         {
-          "line": 18,
+          "line": 21,
           "expression": "pending.current"
         },
         {
-          "line": 20,
+          "line": 23,
           "expression": "action==='reply'"
         },
         {
-          "line": 21,
+          "line": 24,
           "expression": "action==='revoke'"
         },
         {
-          "line": 21,
+          "line": 24,
           "expression": "result.notification==='provider_accepted'"
         },
         {
-          "line": 22,
+          "line": 25,
           "expression": "reason instanceof Error"
         },
         {
-          "line": 25,
+          "line": 28,
           "expression": "query.loading"
         },
         {
-          "line": 26,
+          "line": 29,
           "expression": "query.error"
         },
         {
-          "line": 27,
+          "line": 30,
           "expression": "!data||!data.versions.length&&!data.deliveries.length"
         }
       ]
@@ -180054,7 +180774,7 @@
       "key": "components/offer-history.tsx#History",
       "file": "components/offer-history.tsx",
       "name": "History",
-      "line": 10,
+      "line": 12,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -180066,7 +180786,7 @@
       "key": "components/offer-history.tsx#Event",
       "file": "components/offer-history.tsx",
       "name": "Event",
-      "line": 9,
+      "line": 11,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -183799,7 +184519,7 @@
       "key": "lib/financial-status.ts#documentDateLabel",
       "file": "lib/financial-status.ts",
       "name": "documentDateLabel",
-      "line": 27,
+      "line": 31,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -183807,15 +184527,15 @@
       "elements": [],
       "conditions": [
         {
-          "line": 29,
+          "line": 33,
           "expression": "state==='overdue'&&document.due_date"
         },
         {
-          "line": 29,
+          "line": 33,
           "expression": "days===1"
         },
         {
-          "line": 30,
+          "line": 34,
           "expression": "['open','partial'].includes(state)&&document.due_date"
         }
       ]
@@ -187390,23 +188110,6 @@
       "widgets": [],
       "elements": [],
       "conditions": []
-    },
-    {
-      "key": "lib/display-format.ts#formatDateTime",
-      "file": "lib/display-format.ts",
-      "name": "formatDateTime",
-      "line": 20,
-      "classes": [],
-      "apis": [],
-      "collections": [],
-      "widgets": [],
-      "elements": [],
-      "conditions": [
-        {
-          "line": 21,
-          "expression": "!Number.isFinite(date.getTime())"
-        }
-      ]
     },
     {
       "key": "components/report-mail.tsx#deliveryLabels",
@@ -199051,11 +199754,21 @@
           ]
         },
         {
+          "tag": "LocalizedText",
+          "line": 261,
+          "props": []
+        },
+        {
           "tag": "option",
           "line": 261,
           "props": [
             "value=\"person\""
           ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 261,
+          "props": []
         },
         {
           "tag": "Field",
@@ -227590,7 +228303,7 @@
     {
       "file": "components/offer-history.tsx",
       "name": "OfferHistory",
-      "line": 12,
+      "line": 14,
       "usedBy": [
         "/angebote/[id]",
         "/angebote/neu",
@@ -228618,15 +229331,6 @@
     {
       "file": "components/public-offer.tsx",
       "name": "Offer",
-      "line": 11,
-      "usedBy": [
-        "/angebot"
-      ],
-      "frameworkUsedBy": []
-    },
-    {
-      "file": "components/public-offer.tsx",
-      "name": "request",
       "line": 13,
       "usedBy": [
         "/angebot"
@@ -228635,8 +229339,17 @@
     },
     {
       "file": "components/public-offer.tsx",
+      "name": "request",
+      "line": 15,
+      "usedBy": [
+        "/angebot"
+      ],
+      "frameworkUsedBy": []
+    },
+    {
+      "file": "components/public-offer.tsx",
       "name": "PublicOffer",
-      "line": 18,
+      "line": 20,
       "usedBy": [
         "/angebot"
       ],
@@ -229128,8 +229841,190 @@
     },
     {
       "file": "components/select-control.tsx",
-      "name": "SelectControl",
+      "name": "SelectSearchFeedback",
       "line": 11,
+      "usedBy": [
+        "/agb",
+        "/angebot",
+        "/angebote/[id]",
+        "/angebote/neu",
+        "/angebote",
+        "/auftragsbearbeitung",
+        "/belege",
+        "/benachrichtigungen",
+        "/bericht",
+        "/berichte",
+        "/dashboard",
+        "/datenschutz",
+        "/demo",
+        "/dev/ux-lab",
+        "/einladung",
+        "/einstellungen/abonnement",
+        "/einstellungen/benachrichtigungen",
+        "/einstellungen/darstellung",
+        "/einstellungen/datenschutz",
+        "/einstellungen/dokumente",
+        "/einstellungen/firma",
+        "/einstellungen/konto",
+        "/einstellungen",
+        "/einstellungen/sicherheit",
+        "/einstellungen/sprache",
+        "/einstellungen/team",
+        "/einstellungen/zeiterfassung",
+        "/email-bestaetigen",
+        "/finanzen/analyse",
+        "/finanzen",
+        "/impressum",
+        "/kunden/[id]/bearbeiten",
+        "/kunden/[id]",
+        "/kunden/neu",
+        "/kunden",
+        "/login",
+        "/mitarbeiter/[id]",
+        "/mitarbeiter/neu",
+        "/mitarbeiter",
+        "/offline",
+        "/operator/[...section]",
+        "/operator/login",
+        "/operator",
+        "/operator/wallboard",
+        "/",
+        "/passwort-vergessen",
+        "/passwort-zuruecksetzen",
+        "/portal/login",
+        "/portal",
+        "/portal/registrieren",
+        "/preise",
+        "/preview/dashboard",
+        "/preview/rechnungen",
+        "/preview/zeit",
+        "/produkt",
+        "/produkte/[id]",
+        "/produkte/neu",
+        "/produkte",
+        "/projekte/[id]",
+        "/projekte/neu",
+        "/projekte",
+        "/rechnungen/[id]",
+        "/rechnungen/neu",
+        "/rechnungen",
+        "/registrieren",
+        "/spesen/[id]",
+        "/spesen/neu",
+        "/spesen",
+        "/support/[id]",
+        "/support/neu",
+        "/support",
+        "/unterauftragsbearbeiter",
+        "/wartung",
+        "/willkommen",
+        "/zahlungen/[id]",
+        "/zahlungen/neu",
+        "/zahlungen",
+        "/zeit"
+      ],
+      "frameworkUsedBy": [
+        "app/error.tsx",
+        "app/global-error.tsx",
+        "app/loading.tsx",
+        "app/not-found.tsx"
+      ]
+    },
+    {
+      "file": "components/select-control.tsx",
+      "name": "SelectSearchPagination",
+      "line": 14,
+      "usedBy": [
+        "/agb",
+        "/angebot",
+        "/angebote/[id]",
+        "/angebote/neu",
+        "/angebote",
+        "/auftragsbearbeitung",
+        "/belege",
+        "/benachrichtigungen",
+        "/bericht",
+        "/berichte",
+        "/dashboard",
+        "/datenschutz",
+        "/demo",
+        "/dev/ux-lab",
+        "/einladung",
+        "/einstellungen/abonnement",
+        "/einstellungen/benachrichtigungen",
+        "/einstellungen/darstellung",
+        "/einstellungen/datenschutz",
+        "/einstellungen/dokumente",
+        "/einstellungen/firma",
+        "/einstellungen/konto",
+        "/einstellungen",
+        "/einstellungen/sicherheit",
+        "/einstellungen/sprache",
+        "/einstellungen/team",
+        "/einstellungen/zeiterfassung",
+        "/email-bestaetigen",
+        "/finanzen/analyse",
+        "/finanzen",
+        "/impressum",
+        "/kunden/[id]/bearbeiten",
+        "/kunden/[id]",
+        "/kunden/neu",
+        "/kunden",
+        "/login",
+        "/mitarbeiter/[id]",
+        "/mitarbeiter/neu",
+        "/mitarbeiter",
+        "/offline",
+        "/operator/[...section]",
+        "/operator/login",
+        "/operator",
+        "/operator/wallboard",
+        "/",
+        "/passwort-vergessen",
+        "/passwort-zuruecksetzen",
+        "/portal/login",
+        "/portal",
+        "/portal/registrieren",
+        "/preise",
+        "/preview/dashboard",
+        "/preview/rechnungen",
+        "/preview/zeit",
+        "/produkt",
+        "/produkte/[id]",
+        "/produkte/neu",
+        "/produkte",
+        "/projekte/[id]",
+        "/projekte/neu",
+        "/projekte",
+        "/rechnungen/[id]",
+        "/rechnungen/neu",
+        "/rechnungen",
+        "/registrieren",
+        "/spesen/[id]",
+        "/spesen/neu",
+        "/spesen",
+        "/support/[id]",
+        "/support/neu",
+        "/support",
+        "/unterauftragsbearbeiter",
+        "/wartung",
+        "/willkommen",
+        "/zahlungen/[id]",
+        "/zahlungen/neu",
+        "/zahlungen",
+        "/zeit"
+      ],
+      "frameworkUsedBy": [
+        "app/error.tsx",
+        "app/global-error.tsx",
+        "app/loading.tsx",
+        "app/not-found.tsx"
+      ]
+    },
+    {
+      "file": "components/select-control.tsx",
+      "name": "SelectControl",
+      "line": 17,
       "usedBy": [
         "/agb",
         "/angebot",

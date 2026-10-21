@@ -9,7 +9,8 @@ export async function verifyCustomerMergeConcurrency({pool,service,session}){
  const pair=async()=>[await customer(),await customer()];
  const [source,target]=await pair(),preview=await service.previewCustomerMerge(actor,source,target),key=randomUUID();
  const replays=await Promise.all(Array.from({length:6},()=>service.commitCustomerMerge(actor,source,target,preview.revision,key)));
- assert.ok(replays.every(result=>JSON.stringify(result)===JSON.stringify(replays[0])));assert.equal((await pool.query('select count(*)::int n from customer_merges where organization_id=$1 and source_id=$2',[actor.organizationId,source])).rows[0].n,1);
+ for(const result of replays)assert.deepEqual(result,replays[0],'JSONB may reorder keys; all receipt values must remain identical');
+ assert.equal((await pool.query('select count(*)::int n from customer_merges where organization_id=$1 and source_id=$2',[actor.organizationId,source])).rows[0].n,1);
  const [cancelSource,cancelTarget]=await pair(),cancelPreview=await service.previewCustomerMerge(actor,cancelSource,cancelTarget),cancelKey=randomUUID();
  const settled=await Promise.all([service.cancelCustomerMerge(actor,cancelSource,cancelTarget,cancelPreview.revision,cancelKey),service.commitCustomerMerge(actor,cancelSource,cancelTarget,cancelPreview.revision,cancelKey)]);
  assert.deepEqual(settled[0],settled[1],'Concurrent cancel and commit settle one durable intent');

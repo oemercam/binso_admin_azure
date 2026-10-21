@@ -1,4 +1,21 @@
 import ts from 'typescript';
+/** LocalizedElement translates native attributes, never its children. Literal
+ * UI text needs an actual text boundary; dynamic record values remain verbatim. */
+export function unlocalizedJsxText(ast){
+ const boundaries=new Set(['LocalizedText','Button','Status','Toast','LoadingState','ErrorState','EmptyState']),missing=[];
+ const visit=node=>{
+  if(ts.isJsxText(node)){
+   const text=node.text.replace(/\s+/g,' ').trim();
+   if(/[A-Za-zÀ-ž]{2}/.test(text)){
+    let localized=false;
+    for(let parent=node.parent;parent;parent=parent.parent)if(ts.isJsxElement(parent)&&boundaries.has(parent.openingElement.tagName.getText(ast))){localized=true;break;}
+    if(!localized)missing.push({text,line:ast.getLineAndCharacterOfPosition(node.getStart(ast)).line+1});
+   }
+  }
+  ts.forEachChild(node,visit);
+ };
+ visit(ast);return missing;
+}
 /** Ignore translation boundaries when comparing the frozen navigation structure. */
 export function withoutLocalization(source){
  const ast=ts.createSourceFile('source.tsx',source,99,true,4),edits=[];

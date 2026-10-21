@@ -436,6 +436,22 @@
       "status": "teilweise_implementiert",
       "test": "Migrationstest mit tatsächlichem Repository/API und binso_runtime-RLS sowie Client-Quittungsprüfung bestanden; physische Parallel- und Browserprüfungen für CI vorbereitet, noch nicht ausgeführt.",
       "visualComparison": "Gemeinsame vorhandene Komponenten verwendet; aktuelle gerenderte Abnahme offen."
+    },
+    "R7-49-002": {
+      "sourceTextSha256": "c48ed5723431e438ca20b6b00fb1895af71da875a47b726e4d13b95cbda2f949",
+      "status": "teilweise_implementiert",
+      "implementation": "Bestehende zentrale Sprachfoundation; tatsächliche Textgrenzen für gemeinsame Dropdown-Zustände, lokale Optionslabels und Angebotsversionen/Datumswerte ergänzt. Rohes JSX wird zusätzlich auf fehlende Übersetzungsgrenzen geprüft.",
+      "sourceReferences": [
+        "components/select-control.tsx",
+        "components/offer-history.tsx",
+        "components/public-offer.tsx",
+        "lib/financial-status.ts",
+        "scripts/localization-coverage-test.mjs",
+        "docs/audit/v25-revision7/select-localization.md"
+      ],
+      "test": "Echte Feedback-/Pagination-Renderer unter allen vier LocaleProvidern, Pflichtkataloge/Benutzerdaten, zivile Datumswerte und negative Grenzen, Kunden-/Statistikregression, Lint/Typecheck bestanden. Neue Browserfälle vorbereitet, noch offen.",
+      "visualComparison": "Unveränderte zentrale Darstellung; aktuelle gerenderte Vier-Sprachen-Fehler-/Lade-/Popup-Abnahme offen.",
+      "blocker": "Keine vollständige App-/Rollen-/Sprachabnahme. Dynamische Meldungen, vollständiger Kreuzvergleich und finanzielle/juristische Fach- sowie Geräteabnahme bleiben offen."
     }
   },
   "tests": {

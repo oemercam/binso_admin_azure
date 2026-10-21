@@ -8656,15 +8656,19 @@
       "requirement": "Zentrales i18n-System mit Schlüssel-/Fallbackstrategie, Pluralformen, Datums-/Zahlen-/Währungsformaten und automatisierter Prüfung auf fehlende Keys/Hardcodings.",
       "sourceTextSha256": "c48ed5723431e438ca20b6b00fb1895af71da875a47b726e4d13b95cbda2f949",
       "sourceParagraph": "Sprachen: de-CH, fr-CH, it-CH, en. Zentrales i18n-System mit Schlüssel-/Fallbackstrategie, Pluralformen, Datums-/Zahlen-/Währungsformaten und automatisierter Prüfung auf fehlende Keys/Hardcodings. Sämtliche Routen, Unterseiten, Menüs, Buttons, Formulare, Fehler, Ladezustände, Status, Tabellen, Diagrammlegenden, Suchergebnisse, Adminportal, Support, Onboarding, E-Mail-/PDF-/Berichtsvorlagen und Rechtstexte abdecken. Kein gemischtsprachiges UI. Öffentliche Sprachwahl minimalistisch «DE ˅» oben rechts, eingeloggte Präferenz im Profil/Avatar-Menü; mobile Einstellungen. Sprache sofort wechseln, Formularfortschritt nicht verlieren; Präferenz vor Login datensparsam merken und nach Login im Benutzerprofil speichern. Dokumentensprache separat wählbar, bestehende Kundenpräferenzen berücksichtigen. Keine maschinell improvisierten juristischen Übersetzungen ungeprüft produktiv schalten; Qualitätssicherung mit Muttersprachlern/Fachprüfung für rechtliche und finanzielle Inhalte.",
-      "status": "nicht_abgenommen",
+      "status": "teilweise_implementiert",
       "sourceReferences": [
-        "lib/locales/index.ts",
-        "scripts/localization-coverage-test.mjs"
+        "components/select-control.tsx",
+        "components/offer-history.tsx",
+        "components/public-offer.tsx",
+        "lib/financial-status.ts",
+        "scripts/localization-coverage-test.mjs",
+        "docs/audit/v25-revision7/select-localization.md"
       ],
-      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "implementation": "Bestehende zentrale Sprachfoundation; tatsächliche Textgrenzen für gemeinsame Dropdown-Zustände, lokale Optionslabels und Angebotsversionen/Datumswerte ergänzt. Rohes JSX wird zusätzlich auf fehlende Übersetzungsgrenzen geprüft.",
+      "test": "Echte Feedback-/Pagination-Renderer unter allen vier LocaleProvidern, Pflichtkataloge/Benutzerdaten, zivile Datumswerte und negative Grenzen, Kunden-/Statistikregression, Lint/Typecheck bestanden. Neue Browserfälle vorbereitet, noch offen.",
+      "visualComparison": "Unveränderte zentrale Darstellung; aktuelle gerenderte Vier-Sprachen-Fehler-/Lade-/Popup-Abnahme offen.",
+      "blocker": "Keine vollständige App-/Rollen-/Sprachabnahme. Dynamische Meldungen, vollständiger Kreuzvergleich und finanzielle/juristische Fach- sowie Geräteabnahme bleiben offen."
     },
     {
       "id": "R7-49-003",

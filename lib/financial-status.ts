@@ -23,7 +23,11 @@ export function financialStatusTone(document:FinancialDocument,state=financialSt
  return 'neutral';
 }
 export function formatCurrency(value:unknown,currency='CHF',locale='de-CH'){return `${currency} ${Number(value??0).toLocaleString(locale,{minimumFractionDigits:2,maximumFractionDigits:2}).replaceAll('’',"'")}`;}
-export function formatDate(value:unknown){const date=String(value??'').slice(0,10);return /^\d{4}-\d{2}-\d{2}$/.test(date)?date.split('-').reverse().join('.'):'';}
+export function formatDate(value:unknown,locale='de-CH'){
+ const date=String(value??'').slice(0,10);if(!/^\d{4}-\d{2}-\d{2}$/.test(date))return '';
+ const instant=new Date(date+'T00:00:00Z');if(!Number.isFinite(instant.getTime())||instant.toISOString().slice(0,10)!==date)return '';
+ return new Intl.DateTimeFormat(locale,{day:'2-digit',month:'2-digit',year:'numeric',timeZone:'UTC'}).format(instant);
+}
 export function documentDateLabel(document:FinancialDocument,today=businessDate()){
  const state=financialStatus(document,today);
  if(state==='overdue'&&document.due_date){const days=Math.round((Date.parse(today+'T00:00:00Z')-Date.parse(document.due_date.slice(0,10)+'T00:00:00Z'))/86400000);return `${days} ${days===1?'Tag':'Tage'} überfällig`;}

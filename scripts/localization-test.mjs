@@ -27,6 +27,11 @@ function compile(file,deps={}){
 const config=compile('lib/locales/config.ts');
 const locale=compile('lib/locales/index.ts',{'./config':config,'./messages.json':messages,'./templates.json':templates,'./plurals.json':JSON.parse(fs.readFileSync('lib/locales/plurals.json','utf8'))});
 assert.deepEqual(config.locales,['de','fr','it','en']);
+const financialDates=compile('lib/financial-status.ts',{'./money':compile('lib/money.ts')});
+for(const [language,expected] of Object.entries({de:'02.01.2026',fr:'02.01.2026',it:'02.01.2026',en:'02.01.2026'}))assert.equal(financialDates.formatDate('2026-01-02',config.localeTags[language]),expected,'Civil document dates use the chosen Swiss language without timezone day shifts');
+assert.equal(financialDates.formatDate('2026-01-02','en-US'),'01/02/2026','Explicit locale is honored rather than ignored');
+assert.equal(financialDates.formatDate('2026-01-02'),'02.01.2026','Existing default Swiss date presentation remains compatible');
+for(const value of [null,'','invalid','2026-02-30','2026-13-01'])assert.equal(financialDates.formatDate(value),'','Invalid calendar values are never rolled into another month');
 for(const [input,expected] of [['FR-ch','fr'],['it-CH','it'],['en','en'],['de-CH','de'],['<script>alert(1)</script>','de'],['en<script>','de'],['constructor','de'],[null,'de'],[{},'de']])assert.equal(config.asLocale(input),expected,'Only canonical literal locales may leave the boundary');
 for(const [language,label] of [['de','Rechnungen'],['fr','Factures'],['it','Fatture'],['en','Invoices']]){
  assert.equal(locale.translateMessage('Rechnungen',language),label);
@@ -38,6 +43,23 @@ assert.equal(locale.translateMessage('Seite 2 von 4','fr'),'Page 2 sur 4');
 assert.equal(locale.translateMessage('Schritt 1 von 3 · Prüfen','it'),'Passaggio 1 di 3 · Verifica');
 assert.equal(locale.translateMessage('Die Datei darf höchstens 10 MB gross sein.','en'),'The file must not exceed 10 MB.');
 const client=compile('lib/client/locale.tsx',{'@/lib/locales':locale});
+// Render the actual shared search feedback/pager under all real locale contexts.
+const selectAst=ts.createSourceFile('select-control.tsx',fs.readFileSync('components/select-control.tsx','utf8'),99,true,4),selectExports={};
+const selectCopySource=selectAst.statements.filter(node=>ts.isFunctionDeclaration(node)&&['SelectSearchFeedback','SelectSearchPagination'].includes(node.name?.text)).map(node=>node.getText(selectAst)).join('\n');
+assert.ok(selectCopySource.includes('SelectSearchFeedback')&&selectCopySource.includes('SelectSearchPagination'));
+Function('require','exports','LocalizedElement','LocalizedText',ts.transpileModule(selectCopySource,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText)(require,selectExports,client.LocalizedElement,client.LocalizedText);
+for(const language of config.locales){
+ const render=(Component,props)=>renderToStaticMarkup(React.createElement(client.LocaleProvider,{initialLocale:language},React.createElement(Component,props)));
+ const feedback=render(selectExports.SelectSearchFeedback,{loading:true,error:'Die Anfrage konnte nicht verarbeitet werden.',onRetry(){}});
+ for(const label of ['Daten werden geladen …','Die Anfrage konnte nicht verarbeitet werden.','Erneut versuchen'])assert.ok(feedback.includes(locale.translateMessage(label,language)),language+' actual shared feedback: '+label);
+ const search={value:'',onChange(){},onRetry(){},page:1,hasNext:true,loading:false};
+ const pager=render(selectExports.SelectSearchPagination,{search,onPage(){}});
+ for(const label of ['Zurück','Weiter'])assert.ok(pager.includes(locale.translateMessage(label,language)),language+' actual shared pagination: '+label);
+ assert.equal((pager.match(/<button\b[^>]*disabled/g)??[]).length,0,'Available pages stay actionable');
+ const pending=render(selectExports.SelectSearchPagination,{search:{...search,loading:true},onPage(){}});
+ assert.equal((pending.match(/<button\b[^>]*disabled/g)??[]).length,2,'Both paging actions remain blocked during pending data');
+}
+console.log('Actual common select feedback/paging: all four locale renders, localized error/retry/status, and pending action locks passed. DOM interaction is separately tested in the browser.');
 // Render the actual settings and shared switch, not a duplicated label template.
 const uiAst=ts.createSourceFile('ui.tsx',fs.readFileSync('components/ui.tsx','utf8'),99,true,4),toggleExports={};
 const toggleSource=uiAst.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='Toggle').getText(uiAst);
