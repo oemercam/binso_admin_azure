@@ -1,5 +1,5 @@
 {
-  "commit": "26dc1ffc7bf61a4058deba8b25b0271e1dc5dad1",
+  "commit": "a2f09a1ddb89bb6ce691e085954fa7efe6c4fd5c",
   "method": "Existing TypeScript AST dependency inventory; conditional reachability is not runtime proof",
   "pages": [
     {
@@ -6487,7 +6487,7 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 253,
+          "line": 254,
           "component": "components/pages/customers.tsx#CustomerForm"
         },
         {
@@ -6713,6 +6713,13 @@
         "components/document-list.tsx#FinancialSummaryRow",
         "components/binso-ux.tsx#ListRow",
         "components/pages/shared.tsx#swissDate",
+        "components/customer-import.tsx#CustomerImportControl",
+        "components/customer-import.tsx#Table",
+        "components/customer-import.tsx#Reviewed",
+        "components/binso-ux.tsx#ActionsMenu",
+        "components/binso-ux.tsx#RowActions",
+        "components/binso-ux.tsx#FormSheet",
+        "components/file-upload.tsx#FileUpload",
         "components/statistics.tsx#Statistics",
         "components/statistics.tsx#Series",
         "components/statistics.tsx#Metric",
@@ -6732,13 +6739,10 @@
         "components/records.tsx#RecordsPagination",
         "components/entity-files.tsx#EntityFiles",
         "components/entity-files.tsx#Attachment",
-        "components/binso-ux.tsx#ActionsMenu",
-        "components/binso-ux.tsx#RowActions",
         "components/pdf-preview.tsx#DocumentModal",
         "components/pdf-preview.tsx#DocumentPageViewer",
         "components/pdf-preview.tsx#DocumentPages",
-        "components/pdf-preview.tsx#PdfPage",
-        "components/binso-ux.tsx#FormSheet"
+        "components/pdf-preview.tsx#PdfPage"
       ],
       "layouts": [
         "app/layout.tsx",
@@ -6748,12 +6752,7 @@
       "actions": [
         {
           "tag": "ListSearch",
-          "line": 165,
-          "component": "components/pages/customers.tsx#CustomerDetail"
-        },
-        {
-          "tag": "ActionSheet",
-          "line": 167,
+          "line": 166,
           "component": "components/pages/customers.tsx#CustomerDetail"
         },
         {
@@ -6762,13 +6761,18 @@
           "component": "components/pages/customers.tsx#CustomerDetail"
         },
         {
-          "tag": "FormSheet",
+          "tag": "ActionSheet",
           "line": 169,
           "component": "components/pages/customers.tsx#CustomerDetail"
         },
         {
-          "tag": "ConfirmDialog",
+          "tag": "FormSheet",
           "line": 170,
+          "component": "components/pages/customers.tsx#CustomerDetail"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 171,
           "component": "components/pages/customers.tsx#CustomerDetail"
         },
         {
@@ -6827,13 +6831,28 @@
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
         },
         {
+          "tag": "FormSheet",
+          "line": 48,
+          "component": "components/customer-import.tsx#CustomerImportControl"
+        },
+        {
+          "tag": "ActionSheet",
+          "line": 205,
+          "component": "components/binso-ux.tsx#ActionsMenu"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
+        },
+        {
           "tag": "FilterSheet",
           "line": 80,
           "component": "components/statistics.tsx#StatisticPeriodPicker"
         },
         {
           "tag": "ActionSheet",
-          "line": 296,
+          "line": 297,
           "component": "components/pages/customers.tsx#CustomerDocuments"
         },
         {
@@ -6850,16 +6869,6 @@
           "tag": "ConfirmDialog",
           "line": 45,
           "component": "components/entity-files.tsx#EntityFiles"
-        },
-        {
-          "tag": "ActionSheet",
-          "line": 205,
-          "component": "components/binso-ux.tsx#ActionsMenu"
-        },
-        {
-          "tag": "Sheet",
-          "line": 195,
-          "component": "components/binso-ux.tsx#FormSheet"
         },
         {
           "tag": "FreshAuthenticationDialog",
@@ -7024,7 +7033,7 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 253,
+          "line": 254,
           "component": "components/pages/customers.tsx#CustomerForm"
         },
         {
@@ -7251,6 +7260,14 @@
         "components/binso-ux.tsx#MetricTiles",
         "components/binso-ux.tsx#MetricTile",
         "components/ui.tsx#Metric",
+        "components/customer-import.tsx#CustomerImportControl",
+        "components/customer-import.tsx#Table",
+        "components/customer-import.tsx#Reviewed",
+        "components/binso-ux.tsx#ActionsMenu",
+        "components/binso-ux.tsx#RowActions",
+        "components/binso-ux.tsx#FormSheet",
+        "components/file-upload.tsx#FileUpload",
+        "components/binso-ux.tsx#ListRow",
         "components/records.tsx#RecordsView",
         "components/records.tsx#DataTable",
         "components/records.tsx#DataTableHead",
@@ -7258,7 +7275,6 @@
         "components/records.tsx#tableCells",
         "components/records.tsx#DataTableRow",
         "components/records.tsx#tone",
-        "components/binso-ux.tsx#ListRow",
         "components/records.tsx#RecordsPagination",
         "components/records.tsx#RecordRow"
       ],
@@ -7324,6 +7340,21 @@
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
         },
         {
+          "tag": "FormSheet",
+          "line": 48,
+          "component": "components/customer-import.tsx#CustomerImportControl"
+        },
+        {
+          "tag": "ActionSheet",
+          "line": 205,
+          "component": "components/binso-ux.tsx#ActionsMenu"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
+        },
+        {
           "tag": "FreshAuthenticationDialog",
           "line": 83,
           "component": "app/layout.tsx#RootLayout"
@@ -7332,11 +7363,6 @@
           "tag": "FormSheet",
           "line": 29,
           "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
-        },
-        {
-          "tag": "Sheet",
-          "line": 195,
-          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {

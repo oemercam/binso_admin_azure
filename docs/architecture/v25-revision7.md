@@ -14,7 +14,7 @@ P0/P1/P2 vollständig im Auftragsumfang; P3 ausgeschlossen. **Dieser Zwischensta
 ## Register
 
 [Anforderungen](../audit/v25-revision7/requirements.csv), [Routen/Rollen/Zustände](../audit/v25-revision7/route-role-states.csv), [Routen, Komponenten, APIs und Migrationen](../audit/v25-revision7/routes.json).
-Generator: scripts/revision7-inventory.mjs. Erfasst 56 Kapitel, 151 Textklauseln, 77 Routen, 5588 geplante Route/Rolle/Zustand-Fälle. Zusammengesetzte Klauseln behalten den kompletten Originaltext; sie sind nicht pauschal bestanden.
+Generator: scripts/revision7-inventory.mjs. Erfasst 56 Kapitel, 586 Satz-/Prüfklauseln, 77 Routen, 5588 geplante Route/Rolle/Zustand-Fälle. Zusammengesetzte Klauseln behalten den kompletten Originaltext; sie sind nicht pauschal bestanden.
 Das Register ist eine Vollständigkeitskontrolle, kein Beleg ausgeführter Tests. Noch nicht einzeln ausgeführte Zustands-/Rollen-/Visualfälle bleiben ausdrücklich nicht abgenommen.
 
 ## Zusammenhängende Pakete
@@ -24,7 +24,8 @@ Das Register ist eine Vollständigkeitskontrolle, kein Beleg ausgeführter Tests
 3. Consent/Public: gleiche Optionen für Annehmen/Ablehnen/Einstellungen, versionierte datenarme Präferenz, zentrale Toggles, Fokusführung und Fehler bei blockiertem Speicher. Unveränderte ältere Kategorien werden kompatibel gelesen; keine neue Trackingzustimmung unterstellt. Notwendiger Speicher bleibt aktiv. Bestehender Web-Vitals-Sender prüft die Einwilligung unmittelbar vor jeder Übermittlung. Öffentlicher Footer erhält reale Kontakt-/Support-/Funktionsziele. Rechtstexte inhaltlich unverändert; keine juristische Übersetzung veröffentlicht.
 4. Dokumente/Reporting: QR-Zahlteil für neue Ausstellungen auf eigener letzter A4-Seite mit freiem oberen Bereich. Historische Layouts ohne Rendererrevision bleiben erhalten; Migration0070 speichert künftig ausgestellte Rechnungs-PDFs unveränderlich. Keine rückwirkende Scheinarchivierung. Entwürfe ohne Bankdaten zulässig, Ausstellung ohne gültige Zahlungsdaten weiterhin gesperrt. Standard-Neuversand verwendet archivierte Bytes; Mahnung ist eine gesonderte aktuelle Zahlungsinformation. Reporting nutzt vorhandene autorisierte Datenquelle und PDF-Owner für echte PDF-/CSV-Exporte mit Audit, Vorschau und Gerätefreigabe. Sichere öffentliche Rapportlinks, direkte Berichts-E-Mails und vollständige Detailrapporte sind damit **noch nicht** abgenommen.
 5. PDF-Viewer: zentraler Pointerpfad für Fit-Seitenwechsel, begrenzten Pinch-Zoom, Doppeltipp und Panning; Navigation nicht nach Pinch/Pan; begrenzte Canvas-Ressourcen. Tastatur und bestehende Seitenbuttons bleiben als Alternative. Echte iOS-/Android-Gestenabnahme offen.
-6. Noch vollständig abzuarbeiten: atomarer Abgleich aller P0–P2-Klauseln, fehlende Import-/Merge-/Reminder-/Report-Funktionen nach Istprüfung, rollenbezogene KPI-Prüfung jeder Route, vollständige Sprachausgabe/Formatierung und juristische Sprachabnahme, Desktop/Public/Admin-Sonderzustände, reale End-to-End-/visuelle Abnahme. Keine pauschale Erfolgsmeldung für diese Bereiche.
+6. Stammdatenimport: CSV/XLSX mit Feldzuordnung, Vorschau, Fehler-/Dublettenbericht und expliziter Übernahme neuer Kunden bzw. Kontakte. Kein Überschreiben oder automatisches Zusammenführen. Bestehende Repository-Validatoren und eine gemeinsame Transaktion; erneute Vorschau vor geänderten Daten, gleicher Idempotenzschlüssel nach unklarer Antwort. XLSX ohne Makros/Formeln/externe Verknüpfungen, begrenzte ZIP-Grössen, Parser-Worker ohne App-Credentials, Heap-/Zeit-/Konkurrenzgrenzen. Originale Quelldatensatznummern bleiben im Bericht erhalten. Der erste Browserlauf erreichte wegen fehlender echter SSR-QA-Anmeldung nur den Login. Die Titel-Aktionsfläche ist laut CSS auf Mobile verborgen; die vorhandene Command-Bar wird deshalb für Importaktionen verwendet. Dieser statische Befund ersetzt noch keinen erfolgreichen Browsernachweis. Der Test nutzt nun die unveränderte isolierte QA-Session-Foundation; keine Auth-Ausnahme.
+7. Noch vollständig abzuarbeiten: atomarer Abgleich aller P0–P2-Klauseln, noch fehlende Merge-/Restore-/Reminder-/Detailreport-Funktionen nach Istprüfung, rollenbezogene KPI-Prüfung jeder Route, vollständige Sprachausgabe/Formatierung und juristische Sprachabnahme, Desktop/Public/Admin-Sonderzustände, reale End-to-End-/visuelle Abnahme. Keine pauschale Erfolgsmeldung für diese Bereiche.
 
 ## Nachgewiesene Ursachen und Datenfluss
 
@@ -46,3 +47,30 @@ Die fachlichen Inhalte rechtsverbindlicher Übersetzungen benötigen qualifizier
 SIX-Referenz für die QR-Prüfung: [offizielle QR-Rechnungsstandards](https://www.six-group.com/en/products-services/banking-services/payment-standardization/standards/qr-bill.html), [Version2.4](https://www.six-group.com/dam/download/banking-services/standardization/qr-bill/ig-qr-bill-v2.4-en.pdf). Eigene Layoutvorgabe «oben frei» von SIX-Payload-/Massvorgaben unterscheiden; keine Zertifizierung behaupten.
 
 Für eine spätere Integration/Produktion braucht dieses neue Paket eine eigene exakte SHA-Freigabe einschliesslich Migration0070 sowie vorheriger, noch nicht integrierter Migrationen0067–0069. Kein Merge, keine Migration und kein Deployment ausgeführt.
+
+## Projektlokale Abhängigkeiten
+
+Die bisherige node_modules-Verknüpfung in einen anderen Checkout wurde unverändert
+als Junction ausserhalb des Repositories unter Workspace-.qa-tools erhalten.
+Das Projekt hat nun eigene node_modules und über .npmrc einen eigenen
+Workspace-Store ../.qa-store. Keine globalen pnpm-/Node-/Codex-Einstellungen oder
+Versionen geändert. Der externe Checkout wurde nicht verändert. Die zeitweilige
+Junction-Kopie im Repository hätte TypeScript fremde Paket-Deklarationen einlesen
+lassen; sie liegt deshalb ausserhalb des Compiler-Suchbereichs. Keine falschen
+nullable-Hooks durch Änderungen an allen App-Seiten kaschiert.
+
+ExcelJS4.4.0 ist für den verpflichtenden XLSX-Import gepinnt. Die gefundene
+UUID-Advisory [GHSA-w5hq-g745-h8pq](https://github.com/advisories/GHSA-w5hq-g745-h8pq)
+wurde mit einem ausschliesslich auf exceljs>uuid begrenzten Override auf11.1.1
+beseitigt. Die tatsächlich verwendete v4-Schnittstelle wird auch durch einen
+XLSX-Test mit bedingter Formatierung ausgeführt. Registry-Produktionsaudit nach
+der Korrektur: keine gemeldeten Advisories zum Prüfzeitpunkt. Dies ist keine
+Garantie allgemeiner Fehlerfreiheit; Gates und bestehende Meldungen auf Main
+bleiben verbindlich.
+
+Die Prüfklauseln wurden von groben Absatzgruppen auf einzelne Sätze verfeinert.
+Ein alter Teilnachweis wird nur bei exakt identischem Klausel-Hash übernommen;
+verschobene IDs dürfen keinen Nachweis versehentlich einer anderen Anforderung
+zuordnen. Das Register bleibt damit bewusst konservativ. Die Import-UI-Abnahme
+ist lokal durch den fehlenden nativen QA-PostgreSQL blockiert und muss über die
+bestehende CI-Umgebung erfolgen, nicht über eine geschwächte Sessionprüfung.

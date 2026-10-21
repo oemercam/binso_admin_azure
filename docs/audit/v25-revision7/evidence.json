@@ -85,7 +85,7 @@
     "scripts/profile-image-test.mjs": "passed",
     "scripts/document-presentation-test.mjs": "passed",
     "scripts/pdf-gestures-test.mjs": "passed",
-    "scripts/migration-test.mjs": "passed (isolated PGlite; no production)",
+    "scripts/migration-test.mjs": "passed including transactional import, exact replay, invalid batch rollback, primary contact and foreign-parent denial",
     "scripts/localization-coverage-test.mjs": "passed",
     "scripts/localization-test.mjs": "passed",
     "scripts/navigation-contract-test.mjs": "passed",
@@ -96,7 +96,14 @@
     "visual": "14 focused Chromium/Edge responsive/light/dark and four-language browser cases passed; no general visual approval",
     "CI": "not started",
     "scripts/ui-foundation-test.mjs": "passed",
-    "scripts/foundation-integration-test.mjs": "passed"
+    "scripts/foundation-integration-test.mjs": "passed",
+    "scripts/import-table-test.mjs": "passed, including actual XLSX/conditional formatting, rejection paths and original CSV/XLSX row metadata",
+    "scripts/client-session-test.mjs": "passed including read-only POST/no false mutation/session fence",
+    "importBrowser": "blocked locally: native loopback QA PostgreSQL refused 127.0.0.1:5432; first client-only fixture was insufficient for SSR. Existing real UI-auth fixture now used, CI proof required.",
+    "importDependencyAudit": "passed; zero reported production advisories after scoped uuid fix",
+    "importBuild": "passed",
+    "scripts/customer-import-browser-test.mjs": "not executed successfully locally: real UI QA fixture requires native 127.0.0.1:5432, unavailable. Must pass existing Linux/PG CI; no auth bypass.",
+    "importLint": "passed for changed import code"
   },
   "externalBlockers": [
     "Physical installed iOS/Android PWA, keyboard and assistive technology acceptance",

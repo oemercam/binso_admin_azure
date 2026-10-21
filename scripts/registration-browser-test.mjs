@@ -121,3 +121,6 @@ try{
  }
  await writeTestOutput(path.join(output,'results.json'),JSON.stringify(evidence,null,2));console.log(`Registration and public-offer browser passed: ${evidence.length} responsive/theme and localized workflow cases. Synthetic POST fixtures; real backend integration is separate. Evidence: ${output}`);
 }finally{await browser?.close();server.kill();}
+
+// Additional import interactions reuse the same qualified engine and isolated API fixtures.
+await new Promise((resolve,reject)=>{const child=spawn(process.execPath,['scripts/customer-import-browser-test.mjs'],{stdio:'inherit',env:{...process.env,BINSO_IMPORT_OUTPUT:path.join(output,'imports')}});child.once('error',reject);child.once('exit',code=>code===0?resolve():reject(Error('Customer import browser failed: '+code)));});

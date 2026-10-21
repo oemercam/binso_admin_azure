@@ -2,8 +2,8 @@
   "scope": "Static AST/source inventory, not proof that every runtime branch is tested. Calls include exact source arguments and locations; dynamic dispatch requires the domain matrix and runtime tests.",
   "base": "7b90a5c7353cf2061987fcd0f4550210bbc00f92",
   "counts": {
-    "apis": 112,
-    "consumers": 37,
+    "apis": 113,
+    "consumers": 38,
     "migrations": 71,
     "tables": 106
   },
@@ -1426,6 +1426,68 @@
           "arguments": [
             "session",
             "'customers:read'"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "app/api/customers/import/route.ts",
+      "path": "/api/customers/import",
+      "methods": [
+        "POST"
+      ],
+      "dependencies": [
+        "lib/server/session.ts",
+        "lib/server/maintenance.ts",
+        "lib/server/env.ts",
+        "lib/server/db.ts",
+        "lib/server/http.ts",
+        "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
+        "lib/server/rbac.ts",
+        "lib/permissions.ts",
+        "lib/server/plan-access.ts",
+        "lib/server/rate-limit.ts",
+        "lib/import-table.ts",
+        "lib/server/repositories/customer-import.ts",
+        "lib/server/repositories/customers.ts",
+        "lib/server/audit.ts",
+        "lib/server/business-idempotency.ts",
+        "lib/server/repositories/business-api.ts",
+        "lib/financial-status.ts",
+        "lib/money.ts",
+        "lib/server/repositories/contacts.ts"
+      ],
+      "evidence": [
+        {
+          "callee": "requireSession",
+          "line": 14,
+          "arguments": []
+        },
+        {
+          "callee": "authorize",
+          "line": 14,
+          "arguments": [
+            "s",
+            "'customers:write'"
+          ]
+        },
+        {
+          "callee": "withTenant",
+          "line": 30,
+          "arguments": [
+            "s.organizationId",
+            "s.userId",
+            "c=>inspectCustomerImport(c,s,target,rows,customerId)"
+          ]
+        },
+        {
+          "callee": "withTenant",
+          "line": 31,
+          "arguments": [
+            "s.organizationId",
+            "s.userId",
+            "c=>commitCustomerImport(c,s,target,rows,customerId,request.headers.get('idempotency-key')??'')"
           ]
         }
       ]
@@ -6779,6 +6841,26 @@
       ]
     },
     {
+      "file": "components/customer-import.tsx",
+      "calls": [
+        {
+          "callee": "apiPost",
+          "line": 42,
+          "arguments": [
+            "'/api/customers/import'",
+            "body",
+            "{idempotencyKey:request.key}"
+          ]
+        }
+      ],
+      "pages": [
+        "app/kunden/[id]/bearbeiten/page.tsx",
+        "app/kunden/[id]/page.tsx",
+        "app/kunden/neu/page.tsx",
+        "app/kunden/page.tsx"
+      ]
+    },
+    {
       "file": "components/directory-select.tsx",
       "calls": [
         {
@@ -7339,28 +7421,28 @@
       "calls": [
         {
           "callee": "useApiQuery",
-          "line": 47,
+          "line": 48,
           "arguments": [
             "\"/api/customers?limit=1\""
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 48,
+          "line": 49,
           "arguments": [
             "\"/api/customers?limit=1&status=active\""
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 49,
+          "line": 50,
           "arguments": [
             "financialsAllowed?\"/api/finance/overview\":null"
           ]
         },
         {
           "callee": "useRemoteRows",
-          "line": 55,
+          "line": 56,
           "arguments": [
             "\"customers\"",
             "query.toString()"
@@ -7368,14 +7450,14 @@
         },
         {
           "callee": "useApiQuery",
-          "line": 65,
+          "line": 66,
           "arguments": [
             "\"/api/customers/\"+encodeURIComponent(customerId)+\"?include=workspace\""
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 110,
+          "line": 111,
           "arguments": [
             "\"/api/customers/\"+encodeURIComponent(customerId)+\"/contacts/\"+encodeURIComponent(String(contact.id))",
             "{firstName:contact.first_name,lastName:contact.last_name,email:contact.email??'',phone:contact.phone??'',jobTitle:contact.job_title??'',isPrimary:true}"
@@ -7383,28 +7465,28 @@
         },
         {
           "callee": "apiDelete",
-          "line": 116,
+          "line": 117,
           "arguments": [
             "\"/api/customers/\"+encodeURIComponent(customerId)+\"/contacts/\"+encodeURIComponent(removeContact)"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 197,
+          "line": 198,
           "arguments": [
             "customerId?\"/api/customers/\"+encodeURIComponent(customerId):null"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 214,
+          "line": 215,
           "arguments": [
             "!customerId&&customerName.trim().length>=2&&duplicateQuery?'/api/customers/duplicates?'+duplicateQuery:null"
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 237,
+          "line": 238,
           "arguments": [
             "\"/api/customers/\"+encodeURIComponent(customerId)",
             "body"
@@ -7412,7 +7494,7 @@
         },
         {
           "callee": "apiPost",
-          "line": 237,
+          "line": 238,
           "arguments": [
             "\"/api/customers\"",
             "body",
@@ -7421,7 +7503,7 @@
         },
         {
           "callee": "useApiQuery",
-          "line": 293,
+          "line": 294,
           "arguments": [
             "hasDocuments?'/api/documents?'+params:null"
           ]
@@ -10635,17 +10717,8 @@
       "methods": [],
       "calls": [
         {
-          "callee": "withTenant",
-          "line": 14,
-          "arguments": [
-            "s.organizationId",
-            "s.userId",
-            "async c=>{\n  const customer=await c.query(\"select id from customers where organization_id=$1 and id::text=$2 and archived_at is null for update\",[s.organizationId,customerId]);\n  if(!customer.rowCount)throw new ApiError(404,\"not_found\",\"Kunde wurde nicht gefunden.\");\n  const current=contactId?(await c.query(\"select id from customer_contacts where organization_id=$1 and customer_id::text=$2 and id::text=$3 and archived_at is null\",[s.organizationId,customerId,contactId])).rows[0]:null;\n  if(contactId&&!current)throw new ApiError(404,\"not_found\",\"Kontakt wurde nicht gefunden.\");\n  const primary=input.isPrimary===true;\n  if(primary)await c.query(\"update customer_contacts set is_primary=false,updated_at=now() where organization_id=$1 and customer_id::text=$2 and archived_at is null and is_primary=true\",[s.organizationId,customerId]);\n  const values=[s.organizationId,customerId,first,last,email||null,cleanText(input.phone,80)||null,cleanText(input.jobTitle,160)||null,primary];\n  const result=contactId?await c.query(`update customer_contacts set first_name=$3,last_name=$4,name=concat_ws(' ',$3::text,$4::text),email=$5,phone=$6,role_label=$7,is_primary=$8,updated_at=now() where organization_id=$1 and customer_id::text=$2 and id::text=$9 returning ${columns}`,[...values,contactId]):await c.query(`insert into customer_contacts(organization_id,customer_id,first_name,last_name,name,email,phone,role_label,is_primary,external_id) values($1,$2::uuid,$3,$4,concat_ws(' ',$3::text,$4::text),$5,$6,$7,$8,$9) returning ${columns}`,[...values,randomUUID()]);\n  await audit(c,{organizationId:s.organizationId,userId:s.userId,action:contactId?\"contact.updated\":\"contact.created\",entityType:\"customer_contact\",entityId:result.rows[0].id});\n  return result.rows[0];\n }"
-          ]
-        },
-        {
           "callee": "c.query",
-          "line": 15,
+          "line": 21,
           "arguments": [
             "\"select id from customers where organization_id=$1 and id::text=$2 and archived_at is null for update\"",
             "[s.organizationId,customerId]"
@@ -10653,7 +10726,7 @@
         },
         {
           "callee": "c.query",
-          "line": 17,
+          "line": 23,
           "arguments": [
             "\"select id from customer_contacts where organization_id=$1 and customer_id::text=$2 and id::text=$3 and archived_at is null\"",
             "[s.organizationId,customerId,contactId]"
@@ -10661,7 +10734,7 @@
         },
         {
           "callee": "c.query",
-          "line": 20,
+          "line": 26,
           "arguments": [
             "\"update customer_contacts set is_primary=false,updated_at=now() where organization_id=$1 and customer_id::text=$2 and archived_at is null and is_primary=true\"",
             "[s.organizationId,customerId]"
@@ -10669,7 +10742,7 @@
         },
         {
           "callee": "c.query",
-          "line": 22,
+          "line": 28,
           "arguments": [
             "`update customer_contacts set first_name=$3,last_name=$4,name=concat_ws(' ',$3::text,$4::text),email=$5,phone=$6,role_label=$7,is_primary=$8,updated_at=now() where organization_id=$1 and customer_id::text=$2 and id::text=$9 returning ${columns}`",
             "[...values,contactId]"
@@ -10677,7 +10750,7 @@
         },
         {
           "callee": "c.query",
-          "line": 22,
+          "line": 28,
           "arguments": [
             "`insert into customer_contacts(organization_id,customer_id,first_name,last_name,name,email,phone,role_label,is_primary,external_id) values($1,$2::uuid,$3,$4,concat_ws(' ',$3::text,$4::text),$5,$6,$7,$8,$9) returning ${columns}`",
             "[...values,randomUUID()]"
@@ -10685,7 +10758,16 @@
         },
         {
           "callee": "withTenant",
-          "line": 28,
+          "line": 31,
+          "arguments": [
+            "s.organizationId",
+            "s.userId",
+            "execute"
+          ]
+        },
+        {
+          "callee": "withTenant",
+          "line": 34,
           "arguments": [
             "s.organizationId",
             "s.userId",
@@ -10694,7 +10776,7 @@
         },
         {
           "callee": "c.query",
-          "line": 29,
+          "line": 35,
           "arguments": [
             "\"select id from customers where organization_id=$1 and id::text=$2 and archived_at is null for update\"",
             "[s.organizationId,customerId]"
@@ -10702,7 +10784,7 @@
         },
         {
           "callee": "c.query",
-          "line": 30,
+          "line": 36,
           "arguments": [
             "\"select id,is_primary from customer_contacts where organization_id=$1 and customer_id::text=$2 and archived_at is null order by created_at,id for update\"",
             "[s.organizationId,customerId]"
@@ -10710,7 +10792,7 @@
         },
         {
           "callee": "c.query",
-          "line": 34,
+          "line": 40,
           "arguments": [
             "\"update customer_contacts set archived_at=now(),is_primary=false,updated_at=now() where organization_id=$1 and customer_id::text=$2 and id::text=$3 and archived_at is null returning id\"",
             "[s.organizationId,customerId,contactId]"
@@ -10718,7 +10800,7 @@
         },
         {
           "callee": "c.query",
-          "line": 36,
+          "line": 42,
           "arguments": [
             "\"update customer_contacts set is_primary=true,updated_at=now() where organization_id=$1 and id=$2\"",
             "[s.organizationId,next.id]"
@@ -10748,6 +10830,45 @@
           "arguments": [
             "`select * from (${sources.join(' union all ')}) events order by at desc,title,detail limit 100`",
             "needsUser?[s.organizationId,id,s.userId]:[s.organizationId,id]"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "lib/server/repositories/customer-import.ts",
+      "imports": [
+        "lib/server/session.ts",
+        "lib/server/http.ts",
+        "lib/server/repositories/customers.ts",
+        "lib/server/repositories/contacts.ts",
+        "lib/server/business-idempotency.ts",
+        "lib/import-table.ts",
+        "lib/server/audit.ts"
+      ],
+      "methods": [],
+      "calls": [
+        {
+          "callee": "c.query",
+          "line": 13,
+          "arguments": [
+            "'select id from customers where organization_id=$1 and id::text=$2 and archived_at is null'",
+            "[s.organizationId,customerId]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 26,
+          "arguments": [
+            "\"select id from customer_contacts where organization_id=$1 and customer_id::text=$2 and archived_at is null and ((lower(trim(first_name))=$3 and lower(trim(last_name))=$4) or ($5<>'' and lower(trim(email))=$5)) limit 1\"",
+            "[s.organizationId,customerId,normalized(input.firstName),normalized(input.lastName),normalized(input.email)]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 37,
+          "arguments": [
+            "'select pg_advisory_xact_lock(hashtextextended($1,0))'",
+            "[s.organizationId+':customer-create']"
           ]
         }
       ]
@@ -10820,15 +10941,6 @@
           ]
         },
         {
-          "callee": "withTenant",
-          "line": 54,
-          "arguments": [
-            "organizationId",
-            "userId",
-            "async client=>{const write=async()=>{\n await client.query('select pg_advisory_xact_lock(hashtextextended($1,0))',[organizationId+':customer-create']);\n if(!input.allowDuplicate&&(await customerDuplicates(client,organizationId,input)).length)throw new ApiError(409,'customer_duplicate','Mögliche Dublette gefunden. Bitte bestehende Kunden prüfen oder die separate Erfassung bestätigen.');\n const paymentDays=input.paymentDays??Number((await client.query('select payment_terms_days from organizations where id=$1',[organizationId])).rows[0]?.payment_terms_days??30);customerInput({paymentDays},true);\n const id=randomUUID(),{zip,city}=addressParts(input);\n const sequence=await client.query(`insert into business_document_counters(organization_id,kind,period,next_value) values($1,'customer','',2) on conflict(organization_id,kind,period) do update set next_value=business_document_counters.next_value+1 returning next_value-1 number`,[organizationId]);\n const customerNo='K-'+String(sequence.rows[0].number).padStart(6,'0');\n await client.query(`insert into customers(id,organization_id,external_id,customer_no,name,legal_name,contact_name,email,phone,address,zip,city,sector,country,uid,language,payment_days,discount,status,created_by_user_id,notes) values($1,$2,$1::uuid::text,$3,$4,$4,$5,$6,$7,$8,$9,$10,$11,'Schweiz',$12,$13,$14,$15,$16,$17,$18) returning ${columns}`,[id,organizationId,customerNo,input.name,input.contact||null,input.email||null,input.phone||null,input.address||null,zip,city,input.sector||null,input.uid||null,input.language||'de',paymentDays,input.discount??0,statusToDb(input.status??'active'),userId,input.notes||null]);\n await client.query('update customers set customer_type=$3 where organization_id=$1 and id=$2',[organizationId,id,input.customerType??'company']);\n await client.query('update customers set street=$3,building_number=$4,address=coalesce(nullif(concat_ws(\\' \\',nullif($3,\\'\\'),nullif($4,\\'\\')),\\'\\'),address) where organization_id=$1 and id=$2',[organizationId,id,input.street??null,input.buildingNumber??null]);\n await client.query(`insert into customer_contacts(organization_id,customer_id,first_name,last_name,name,email,phone,is_primary,external_id) values($1,$2::uuid,$3,$4,$5,$6,$7,true,$8)`,[organizationId,id,input.contactFirstName,input.contactLastName,input.contact,input.email||null,input.phone||null,randomUUID()]);\n await audit(client,{organizationId,userId,action:'customer.created',entityType:'customer',entityId:id});return (await client.query(`select ${columns} from customers where organization_id=$1 and id=$2`,[organizationId,id])).rows[0];\n};return requestKey?idempotentBusiness(client,{organizationId,userId,operation:'customer.create',key:requestKey,body:input},write):write();\n}"
-          ]
-        },
-        {
           "callee": "client.query",
           "line": 55,
           "arguments": [
@@ -10890,6 +11002,15 @@
           "arguments": [
             "`select ${columns} from customers where organization_id=$1 and id=$2`",
             "[organizationId,id]"
+          ]
+        },
+        {
+          "callee": "withTenant",
+          "line": 67,
+          "arguments": [
+            "organizationId",
+            "userId",
+            "execute"
           ]
         },
         {
@@ -11836,7 +11957,15 @@
         },
         {
           "callee": "fetchApi",
-          "line": 168,
+          "line": 169,
+          "arguments": [
+            "path",
+            "{method:'POST',...(multipart?{body}:{headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})}"
+          ]
+        },
+        {
+          "callee": "fetchApi",
+          "line": 177,
           "arguments": [
             "path",
             "{\n    method:\"PATCH\",\n    headers:{\"Content-Type\":\"application/json\"},\n    body:JSON.stringify(body),\n  }"
@@ -11844,7 +11973,7 @@
         },
         {
           "callee": "fetchApi",
-          "line": 178,
+          "line": 187,
           "arguments": [
             "path",
             "{method:\"DELETE\",...(body===undefined?{}:{headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})}"
@@ -11852,7 +11981,7 @@
         },
         {
           "callee": "fetchApi",
-          "line": 193,
+          "line": 202,
           "arguments": [
             "path",
             "{method:\"POST\",body:form,headers}"

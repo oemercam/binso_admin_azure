@@ -13568,5 +13568,130 @@
     "View PDF",
     "Afficher le PDF",
     "Visualizza PDF"
+  ],
+  "Importieren": [
+    "Import",
+    "Importer",
+    "Importa"
+  ],
+  "Kontakte importieren": [
+    "Import contacts",
+    "Importer des contacts",
+    "Importa contatti"
+  ],
+  "Kunden importieren": [
+    "Import customers",
+    "Importer des clients",
+    "Importa clienti"
+  ],
+  "Importdatei": [
+    "Import file",
+    "Fichier à importer",
+    "File da importare"
+  ],
+  "Arbeitsblatt": [
+    "Worksheet",
+    "Feuille de calcul",
+    "Foglio di lavoro"
+  ],
+  "Nicht zuordnen": [
+    "Do not map",
+    "Ne pas associer",
+    "Non associare"
+  ],
+  "Neue gültige Zeilen": [
+    "Valid new rows",
+    "Nouvelles lignes valides",
+    "Nuove righe valide"
+  ],
+  "Fehler und Dubletten werden nicht übernommen. Bestehende Daten bleiben unverändert.": [
+    "Rows with errors or duplicates are excluded. Existing records remain unchanged.",
+    "Les lignes erronées ou en double sont exclues. Les données existantes restent inchangées.",
+    "Le righe errate o duplicate sono escluse. I dati esistenti restano invariati."
+  ],
+  "Importbericht": [
+    "Import report",
+    "Rapport d’importation",
+    "Rapporto di importazione"
+  ],
+  "Zeile": [
+    "Row",
+    "Ligne",
+    "Riga"
+  ],
+  "Import abgeschlossen": [
+    "Import completed",
+    "Importation terminée",
+    "Importazione completata"
+  ],
+  "CSV als UTF-8 oder XLSX ohne Formeln. Höchstens 500 Datenzeilen, 32 Spalten und 3 MB.": [
+    "UTF-8 CSV or XLSX without formulas. Maximum 500 data rows, 32 columns and 3 MB.",
+    "CSV UTF-8 ou XLSX sans formules. Maximum 500 lignes, 32 colonnes et 3 Mo.",
+    "CSV UTF-8 o XLSX senza formule. Massimo 500 righe, 32 colonne e 3 MB."
+  ],
+  "Wird geprüft …": [
+    "Checking …",
+    "Vérification …",
+    "Verifica …"
+  ],
+  "Datei prüfen": [
+    "Check file",
+    "Vérifier le fichier",
+    "Verifica file"
+  ],
+  "Neue Datensätze importieren": [
+    "Import new records",
+    "Importer les nouvelles données",
+    "Importa nuovi dati"
+  ],
+  "Vorschau prüfen": [
+    "Review preview",
+    "Vérifier l’aperçu",
+    "Verifica anteprima"
+  ],
+  "Import konnte nicht vorbereitet werden.": [
+    "The import could not be prepared.",
+    "L’importation n’a pas pu être préparée.",
+    "Non è stato possibile preparare l’importazione."
+  ],
+  "Import konnte nicht bestätigt werden.": [
+    "The import could not be confirmed.",
+    "L’importation n’a pas pu être confirmée.",
+    "Non è stato possibile confermare l’importazione."
+  ],
+  "Mögliche Dublette. Diese Zeile wird nicht importiert.": [
+    "Possible duplicate. This row will not be imported.",
+    "Doublon possible. Cette ligne ne sera pas importée.",
+    "Possibile duplicato. Questa riga non verrà importata."
+  ],
+  "Die Daten sind ungültig oder bereits vorhanden. Bitte die Vorschau erneut prüfen.": [
+    "The data is invalid or already exists. Review the preview again.",
+    "Les données sont invalides ou existent déjà. Vérifiez à nouveau l’aperçu.",
+    "I dati non sono validi o esistono già. Verifica nuovamente l’anteprima."
+  ],
+  "Ein Kontaktfeld ist ungültig oder zu lang.": [
+    "A contact field is invalid or too long.",
+    "Un champ du contact est invalide ou trop long.",
+    "Un campo del contatto non è valido o è troppo lungo."
+  ],
+  "Für diesen Import fehlt die Berechtigung.": [
+    "You do not have permission for this import.",
+    "Vous n’avez pas l’autorisation pour cette importation.",
+    "Non disponi dell’autorizzazione per questa importazione."
+  ],
+  "Ungültige Datenzeile.": [
+    "Invalid data row.",
+    "Ligne de données invalide.",
+    "Riga di dati non valida."
+  ],
+  "Bitte höchstens 500 Datenzeilen importieren.": [
+    "Import a maximum of 500 data rows.",
+    "Importez au maximum 500 lignes de données.",
+    "Importa al massimo 500 righe di dati."
+  ],
+  "Datei nicht lesbar. Bitte UTF-8-CSV oder XLSX ohne Formeln, Makros und externe Verknüpfungen verwenden; höchstens 500 Zeilen und 32 Spalten.": [
+    "File unreadable. Use UTF-8 CSV or XLSX without formulas, macros or external links; maximum 500 rows and 32 columns.",
+    "Fichier illisible. Utilisez un CSV UTF-8 ou XLSX sans formules, macros ni liens externes ; maximum 500 lignes et 32 colonnes.",
+    "File illeggibile. Usa CSV UTF-8 o XLSX senza formule, macro o collegamenti esterni; massimo 500 righe e 32 colonne."
   ]
 }

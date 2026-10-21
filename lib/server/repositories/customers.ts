@@ -51,7 +51,7 @@ export async function customerDuplicates(client:PoolClient,organizationId:string
   or (length($4)>=2 and regexp_replace(lower(trim(c.name)),'[[:space:]]+',' ','g')=$4)) order by customer_no,id limit 5`,[organizationId,uid,email,name,excludeId])).rows;
 }
 export async function findCustomerDuplicates(session:SessionUser,input:Partial<CustomerInput>,excludeId=''){return withTenant(session.organizationId,session.userId,c=>customerDuplicates(c,session.organizationId,input,excludeId))}
-export async function createCustomer(organizationId:string,userId:string,input:CustomerInput,requestKey=""){input=customerInput(input as unknown as Record<string,unknown>) as CustomerInput;return withTenant(organizationId,userId,async client=>{const write=async()=>{
+export async function createCustomer(organizationId:string,userId:string,input:CustomerInput,requestKey="",transactionClient?:PoolClient){input=customerInput(input as unknown as Record<string,unknown>) as CustomerInput;const execute=async(client:PoolClient)=>{const write=async()=>{
  await client.query('select pg_advisory_xact_lock(hashtextextended($1,0))',[organizationId+':customer-create']);
  if(!input.allowDuplicate&&(await customerDuplicates(client,organizationId,input)).length)throw new ApiError(409,'customer_duplicate','Mögliche Dublette gefunden. Bitte bestehende Kunden prüfen oder die separate Erfassung bestätigen.');
  const paymentDays=input.paymentDays??Number((await client.query('select payment_terms_days from organizations where id=$1',[organizationId])).rows[0]?.payment_terms_days??30);customerInput({paymentDays},true);
@@ -64,7 +64,7 @@ export async function createCustomer(organizationId:string,userId:string,input:C
  await client.query(`insert into customer_contacts(organization_id,customer_id,first_name,last_name,name,email,phone,is_primary,external_id) values($1,$2::uuid,$3,$4,$5,$6,$7,true,$8)`,[organizationId,id,input.contactFirstName,input.contactLastName,input.contact,input.email||null,input.phone||null,randomUUID()]);
  await audit(client,{organizationId,userId,action:'customer.created',entityType:'customer',entityId:id});return (await client.query(`select ${columns} from customers where organization_id=$1 and id=$2`,[organizationId,id])).rows[0];
 };return requestKey?idempotentBusiness(client,{organizationId,userId,operation:'customer.create',key:requestKey,body:input},write):write();
-})}
+};return transactionClient?execute(transactionClient):withTenant(organizationId,userId,execute)}
 export async function updateCustomer(organizationId:string,userId:string,id:string,input:Partial<CustomerInput>){return withTenant(organizationId,userId,async client=>{
  const current=(await client.query('select * from customers where id=$1 and organization_id=$2 and archived_at is null for update',[id,organizationId])).rows[0];if(!current)return null;
  if(input.customerType!==undefined&&input.customerType!==current.customer_type)throw new ApiError(400,'customer_type_immutable','Der Kundentyp kann hier nicht geändert werden.');

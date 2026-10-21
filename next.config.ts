@@ -70,7 +70,7 @@ const sensitiveRoutes = [
 ];
 
 const nextConfig: NextConfig = {
-  serverExternalPackages:["pdfkit"],
+  serverExternalPackages:["pdfkit","exceljs"],
   outputFileTracingIncludes:{"/api/documents/**":["./public/fonts/pdf/*"]},
   reactStrictMode: true,
   env: { BINSO_BUILD_SHA: process.env.BINSO_BUILD_SHA ?? process.env.GITHUB_SHA ?? "development" },
