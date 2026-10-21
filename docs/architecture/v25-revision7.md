@@ -52,6 +52,22 @@ sind dadurch noch nicht vollständig abgenommen.
 
 ## Verifikation und offene Grenzen
 
+CI des Heads6894676f: Build und UX-Compliance erfolgreich, analyze technisch
+erfolgreich; der zusätzliche Code-Scanning-Ergebnischeck meldet zwei High-Flows
+von der Sprachauswahl. Die zentrale Sprachgrenze gibt nun feste Literale statt
+des geprüften Eingabestrings zurück; positive/negative Locale-Regressionen bestehen.
+Neue CodeQL-Auswertung bleibt erforderlich; kein Alert wurde unterdrückt.
+Der Checks-Job scheiterte zuerst am historischen Wortlaut des Consent-Vertrags;
+die Prüfung verlangt jetzt ausdrücklich Ablehnen/Annehmen/Einstellungen.
+Der Scannerjob scheiterte im Testloader an der Paketauflösung für den echten
+Sharp-Decoder. Der Loader löst installierte Pakete nun absolut auf, ohne Mock;
+ein ungültiges altes PNG-Fixture wurde durch ein echt dekodierbares Bild plus
+zusätzlichen Korruptbild-Negativtest ersetzt. Auth-/Upload-Regression und
+release:check bestehen lokal. Der reale ClamAV-Gesamtlauf bleibt in Linux-CI
+erneut nachzuweisen. Ein lokaler pnpm-test-Gesamtlauf stoppt an der vorhandenen
+Bash/Azure-CLI-Fake-Prüfung unter Windows (Subprozessstatus null); kein Test
+wurde deshalb übersprungen oder als erfolgreich gewertet.
+
 Die optionale Web-Vitals-Implementierung wird nun erst nach ausdrücklichem
 Performance-Opt-in dynamisch geladen. Jeder Versand prüft die aktuelle Zustimmung
 erneut. Weil der installierte Next-Reporter seine Observer nicht entfernt,

@@ -21,6 +21,7 @@ function compile(file,deps={}){
 const config=compile('lib/locales/config.ts');
 const locale=compile('lib/locales/index.ts',{'./config':config,'./messages.json':messages,'./templates.json':templates,'./plurals.json':JSON.parse(fs.readFileSync('lib/locales/plurals.json','utf8'))});
 assert.deepEqual(config.locales,['de','fr','it','en']);
+for(const [input,expected] of [['FR-ch','fr'],['it-CH','it'],['en','en'],['de-CH','de'],['<script>alert(1)</script>','de'],['en<script>','de'],['constructor','de'],[null,'de'],[{},'de']])assert.equal(config.asLocale(input),expected,'Only canonical literal locales may leave the boundary');
 for(const [language,label] of [['de','Rechnungen'],['fr','Factures'],['it','Fatture'],['en','Invoices']]){
  assert.equal(locale.translateMessage('Rechnungen',language),label);
  assert.equal(locale.translateMessage('Acme AG',language),'Acme AG');

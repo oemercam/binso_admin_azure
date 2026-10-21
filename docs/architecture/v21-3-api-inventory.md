@@ -108,9 +108,9 @@ Static AST/source inventory, not proof that every runtime branch is tested. Call
 | `/api/settings/team/invitations/[id]` | DELETE | `app/api/settings/team/invitations/[id]/route.ts` | `requireSession:9`, `authorize:9`, `withTenant:10`, `c.query:11`, `c.query:12` |
 | `/api/settings/team/invitations` | GET, POST | `app/api/settings/team/invitations/route.ts` | `requireSession:10`, `authorize:10`, `withTenant:10`, `c.query:10`, `c.query:10`, `c.query:10`, `requireSession:11`, `authorize:11` |
 | `/api/settings/team/members/[userId]` | PATCH | `app/api/settings/team/members/[userId]/route.ts` | `requireSession:10`, `authorize:10`, `withTenant:13`, `c.query:14`, `c.query:16`, `c.query:26`, `c.query:27`, `c.query:28`, `c.query:29`, `c.query:30`, `c.query:31`, `c.query:32`, `c.query:40`, `c.query:42` |
-| `/api/support/tickets/[id]/messages` | GET, POST | `app/api/support/tickets/[id]/messages/route.ts` | `requireSession:8`, `authorize:8`, `withTenant:9`, `c.query:9`, `requireSession:12`, `authorize:12`, `withTenant:13`, `c.query:15`, `c.query:17` |
+| `/api/support/tickets/[id]/messages` | GET, POST | `app/api/support/tickets/[id]/messages/route.ts` | `requireSession:9`, `authorize:9`, `withTenant:10`, `c.query:10`, `requireSession:13`, `authorize:13`, `withTenant:14`, `c.query:16`, `c.query:18`, `c.query:19` |
 | `/api/support/tickets/[id]` | PATCH | `app/api/support/tickets/[id]/route.ts` | `requireSession:10`, `authorize:10`, `withTenant:14`, `c.query:15`, `c.query:19` |
-| `/api/support/tickets` | GET, POST | `app/api/support/tickets/route.ts` | `tenantListPage:10`, `requireSession:14`, `authorize:14`, `withTenant:22`, `c.query:23`, `c.query:23`, `c.query:24` |
+| `/api/support/tickets` | GET, POST | `app/api/support/tickets/route.ts` | `tenantListPage:11`, `requireSession:15`, `authorize:15`, `withTenant:23`, `c.query:24`, `c.query:24`, `c.query:25` |
 | `/api/telemetry/web-vitals` | POST | `app/api/telemetry/web-vitals/route.ts` | `query:11` |
 | `/api/time-entries/[id]` | PATCH | `app/api/time-entries/[id]/route.ts` | `requireSession:14`, `authorize:14`, `withTenant:20`, `c.query:21`, `c.query:27`, `c.query:32`, `c.query:34`, `c.query:36`, `c.query:40`, `c.query:43` |
 | `/api/time-entries/billing` | GET | `app/api/time-entries/billing/route.ts` | `requireSession:10`, `authorize:10`, `withTenant:12`, `c.query:12` |

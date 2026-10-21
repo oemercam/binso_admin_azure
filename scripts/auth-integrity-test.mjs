@@ -7,6 +7,7 @@ import ts from 'typescript';
 import {PGlite} from '@electric-sql/pglite';
 import {pgcrypto} from '@electric-sql/pglite/contrib/pgcrypto';
 import pg from 'pg';
+import sharp from 'sharp';
 const native=process.argv.includes('--postgres');
 let db;
 if(native){
@@ -59,6 +60,9 @@ async function load(file,actualRoot=false){
  for(const match of [...source.matchAll(/(?:from\s*|import\s*)(['"])([^'"]+)\1/g)]){
   const name=match[2];let resolved=adapters[name];
   if(!resolved&&(name.startsWith('@/')||name.startsWith('.'))){let dependency=name.startsWith('@/')?name.slice(2):path.join(path.dirname(file),name);if(!dependency.endsWith('.ts'))dependency+='.ts';resolved=await load(dependency);}
+  // Data URLs have no package resolution base. Keep the real installed package,
+  // including native Sharp decoding; do not replace it with an upload mock.
+  if(!resolved&&!name.startsWith('node:'))resolved=import.meta.resolve(name);
   if(resolved)source=source.replace(match[0],match[0].replace(match[1]+name+match[1],JSON.stringify(resolved)));
  }
  const result=uri(source);cache.set(file,result);return result;
@@ -140,7 +144,9 @@ try{
  assert.equal((await download.GET(new Request('https://fixture.invalid'),{params:Promise.resolve({id:uploaded.id})})).status,423,'Pending files cannot be downloaded');
  await query("update file_objects set scan_status='clean' where id=$1",[uploaded.id]);const clean=await download.GET(new Request('https://fixture.invalid'),{params:Promise.resolve({id:uploaded.id})});assert.equal(clean.status,200);assert.equal(await clean.text(),'synthetic bytes');
  await query("update file_objects set scan_status='rejected' where id=$1",[uploaded.id]);assert.equal((await download.GET(new Request('https://fixture.invalid'),{params:Promise.resolve({id:uploaded.id})})).status,423);
- const imageUpload=(purpose,key)=>{const form=new FormData();form.append('file',new File([Buffer.from('89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c4890000000b49444154789c636000020000050001a5f645400000000049454e44ae426082','hex')],'synthetic.png',{type:'image/png'}));form.append('purpose',purpose);return new Request('https://fixture.invalid/api/files',{method:'POST',headers:{'idempotency-key':key},body:form});};
+ const imageBytes=await sharp({create:{width:4,height:4,channels:4,background:'#4477aa'}}).png().toBuffer();
+ const imageUpload=(purpose,key,bytes=imageBytes)=>{const form=new FormData();form.append('file',new File([bytes],'synthetic.png',{type:'image/png'}));form.append('purpose',purpose);return new Request('https://fixture.invalid/api/files',{method:'POST',headers:{'idempotency-key':key},body:form});};
+ assert.equal((await files.POST(imageUpload('profile_avatar','synthetic-corrupt-image',Buffer.from('89504e470d0a1a0a','hex')))).status,400,'Signature-only PNG is not a decodable image');
  const branding=async()=>({logo:(await query('select logo_url from organizations where id=$1',[org])).rows[0].logo_url,avatar:(await query('select avatar_url from app_users where id=$1',[user])).rows[0].avatar_url});
  const initialBranding=await branding();
  const pendingLogo=await files.POST(imageUpload('company_logo','synthetic-pending-logo'));assert.equal(pendingLogo.status,201);const pendingLogoId=(await pendingLogo.json()).item.id;
