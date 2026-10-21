@@ -1,5 +1,5 @@
 {
-  "commit": "9fb5f6294ce31d4a3333ffa062af24a288c94eb8",
+  "commit": "281cd7fcc976af18558b2347fd66d342cc0c27b7",
   "method": "Existing TypeScript AST dependency inventory; conditional reachability is not runtime proof",
   "pages": [
     {
@@ -1897,12 +1897,16 @@
         "components/pdf-preview.tsx#DocumentPageViewer",
         "components/pdf-preview.tsx#DocumentPages",
         "components/pdf-preview.tsx#PdfPage",
+        "components/report-mail.tsx#ReportMailSheet",
+        "components/report-mail.tsx#Outcome",
+        "components/binso-ux.tsx#FormSheet",
+        "components/binso-ux.tsx#ListRow",
+        "components/report-mail.tsx#deliveryLabels",
+        "components/report-mail.tsx#deliveryTone",
         "components/binso-ux.tsx#MetricTiles",
         "components/binso-ux.tsx#MetricTile",
         "components/ui.tsx#Metric",
-        "components/time-report.tsx#TimeReportSheet",
-        "components/binso-ux.tsx#FormSheet",
-        "components/binso-ux.tsx#ListRow"
+        "components/time-report.tsx#TimeReportSheet"
       ],
       "layouts": [
         "app/layout.tsx",
@@ -1976,19 +1980,29 @@
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
         },
         {
+          "tag": "ReportMailSheet",
+          "line": 37,
+          "component": "components/report-actions.tsx#ReportActions"
+        },
+        {
           "tag": "ActionSheet",
           "line": 207,
           "component": "components/binso-ux.tsx#ActionsMenu"
         },
         {
           "tag": "FormSheet",
-          "line": 16,
-          "component": "components/time-report.tsx#TimeReportSheet"
+          "line": 31,
+          "component": "components/report-mail.tsx#ReportMailSheet"
         },
         {
           "tag": "Sheet",
           "line": 197,
           "component": "components/binso-ux.tsx#FormSheet"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 16,
+          "component": "components/time-report.tsx#TimeReportSheet"
         },
         {
           "tag": "FreshAuthenticationDialog",

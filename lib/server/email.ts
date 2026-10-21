@@ -9,6 +9,8 @@ let graphToken:GraphToken|null=null;
 function graphConfigured(){
  return Boolean(env.graphTenantId&&env.graphClientId&&env.graphClientSecret&&env.graphSenderUserId);
 }
+/** Configuration presence only; does not request a token or send a message. */
+export function mailConfigured(){return graphConfigured();}
 
 async function getGraphToken(){
  if(graphToken&&graphToken.expiresAt>Date.now()+60_000)return graphToken.accessToken;

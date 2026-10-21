@@ -2,7 +2,7 @@
 
 Static AST/source inventory, not proof that every runtime branch is tested. Calls include exact source arguments and locations; dynamic dispatch requires the domain matrix and runtime tests.
 
-117 API route files, 41 client consumers, 73 migrations, 107 declared tables.
+118 API route files, 42 client consumers, 74 migrations, 107 declared tables.
 
 | Endpoint | Methods | Source | Direct data/auth evidence |
 |---|---|---|---|
@@ -101,6 +101,7 @@ Static AST/source inventory, not proof that every runtime branch is tested. Call
 | `/api/projects` | GET, POST | `app/api/projects/route.ts` | `requireSession:12`, `authorize:12`, `withTenant:12`, `requireSession:13`, `authorize:13`, `withTenant:15`, `c.query:16`, `c.query:16`, `c.query:17`, `c.query:19` |
 | `/api/public/offer` | POST | `app/api/public/offer/route.ts` | `c.query:19`, `c.query:25` |
 | `/api/reports/exports/[id]` | GET | `app/api/reports/exports/[id]/route.ts` | `requireSession:9`, `withTenant:10` |
+| `/api/reports/exports/[id]/send` | GET, POST | `app/api/reports/exports/[id]/send/route.ts` | `requireSession:8`, `requireSession:10` |
 | `/api/reports/exports` | POST | `app/api/reports/exports/route.ts` | `requireSession:10`, `authorize:10`, `['query','locale'].includes:13` |
 | `/api/reports` | GET | `app/api/reports/route.ts` | `requireSession:15`, `authorize:15`, `withTenant:18`, `query.get:19`, `query.get:20`, `query.get:21`, `withTenant:22`, `c.query:22`, `query.get:22`, `query.get:22`, `query.get:23` |
 | `/api/search` | GET | `app/api/search/route.ts` | `requireSession:14`, `withTenant:18` |

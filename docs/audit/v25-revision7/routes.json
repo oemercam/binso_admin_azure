@@ -2697,8 +2697,9 @@
         },
         {
           "owner": "components/report-actions.tsx",
-          "line": 10,
+          "line": 14,
           "apis": [
+            "/api/auth/session",
             "/api/reports/exports",
             "/api/reports/exports/",
             "/api/reports?"
@@ -2712,6 +2713,15 @@
           "apis": [
             "/api/documents/",
             "/api/documents/preview"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "components/report-mail.tsx",
+          "line": 14,
+          "apis": [
+            "/api/reports/exports/"
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
@@ -20547,6 +20557,7 @@
     "components/records.tsx",
     "components/registration/registration-page.tsx",
     "components/report-actions.tsx",
+    "components/report-mail.tsx",
     "components/security-settings-page.tsx",
     "components/select-control.tsx",
     "components/session-data-boundary.tsx",
@@ -20661,6 +20672,7 @@
     "app/api/public/offer/route.ts",
     "app/api/reports/exports/route.ts",
     "app/api/reports/exports/[id]/route.ts",
+    "app/api/reports/exports/[id]/send/route.ts",
     "app/api/reports/route.ts",
     "app/api/search/route.ts",
     "app/api/settings/company/route.ts",
@@ -20756,6 +20768,7 @@
     "database/migrations/0069_attachment_archival.sql",
     "database/migrations/0070_issued_invoice_pdf.sql",
     "database/migrations/0071_operator_language_preference.sql",
-    "database/migrations/0072_report_export_snapshots.sql"
+    "database/migrations/0072_report_export_snapshots.sql",
+    "database/migrations/0073_report_mail_outbox.sql"
   ]
 }

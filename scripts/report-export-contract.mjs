@@ -37,6 +37,7 @@ export async function verifyReportExports({db,organizationId,otherOrganizationId
   await globalThis.__processTransaction(organizationId,async c=>{const hash=await snapshotModule.reportAccessScope(c,restricted,'pro');assert.match(hash,/^[a-f0-9]{64}$/);});
  }
  globalThis.__processSession=session;
+ await (await import('./report-mail-contract.mjs')).verifyReportMail({db,organizationId,otherOrganizationId,session,snapshotId:item.id,originalBytes:bytes,loadRoute});
  await db.query('delete from report_exports where organization_id=$1',[organizationId]);
  console.log('Immutable report snapshots: real PDF/hash, replay/conflict, creator/tenant/role/plan, scope and expiry boundaries passed. No outbound mail.');
 }

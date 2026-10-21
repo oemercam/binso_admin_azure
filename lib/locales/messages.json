@@ -13903,5 +13903,75 @@
     "The report could not be loaded securely.",
     "Le rapport n’a pas pu être chargé de manière sécurisée.",
     "Impossibile caricare il rapporto in modo sicuro."
+  ],
+  "Bericht senden": [
+    "Send report",
+    "Envoyer le rapport",
+    "Invia rapporto"
+  ],
+  "Im Anhang findest du den angeforderten Bericht.": [
+    "Please find the requested report attached.",
+    "Vous trouverez le rapport demandé en pièce jointe.",
+    "In allegato trovi il rapporto richiesto."
+  ],
+  "Genau diese Berichtsvorschau wird als PDF angehängt. Es wird kein automatischer Folgeversand aktiviert.": [
+    "This exact report preview will be attached as a PDF. No automatic follow-up sending is enabled.",
+    "Cet aperçu exact du rapport sera joint au format PDF. Aucun envoi automatique ultérieur n’est activé.",
+    "Questa esatta anteprima del rapporto verrà allegata come PDF. Non viene attivato alcun invio automatico successivo."
+  ],
+  "Der Bericht wurde nicht versendet. Bitte die E-Mail-Verbindung prüfen.": [
+    "The report was not sent. Please check the email connection.",
+    "Le rapport n’a pas été envoyé. Vérifiez la connexion de messagerie.",
+    "Il rapporto non è stato inviato. Verifica la connessione email."
+  ],
+  "Der Versand läuft oder ist ungeklärt. Bitte den Versandstatus prüfen, nicht erneut senden.": [
+    "Sending is in progress or unconfirmed. Please check the sending status; do not send again.",
+    "L’envoi est en cours ou non confirmé. Vérifiez son statut sans renvoyer le message.",
+    "L’invio è in corso o non confermato. Verifica lo stato senza inviare nuovamente."
+  ],
+  "Versandstatus prüfen": [
+    "Check sending status",
+    "Vérifier le statut d’envoi",
+    "Verifica lo stato dell’invio"
+  ],
+  "Versand vom E-Mail-Anbieter angenommen. Zustellung noch nicht nachgewiesen.": [
+    "Accepted by the email provider. Delivery has not yet been verified.",
+    "Envoi accepté par le fournisseur de messagerie. La réception n’est pas encore vérifiée.",
+    "Invio accettato dal provider email. La consegna non è ancora verificata."
+  ],
+  "Per E-Mail senden": [
+    "Send by email",
+    "Envoyer par email",
+    "Invia per email"
+  ],
+  "Versand läuft": [
+    "Sending in progress",
+    "Envoi en cours",
+    "Invio in corso"
+  ],
+  "Nicht versendet": [
+    "Not sent",
+    "Non envoyé",
+    "Non inviato"
+  ],
+  "Versand ungeklärt": [
+    "Sending unconfirmed",
+    "Envoi non confirmé",
+    "Invio non confermato"
+  ],
+  "Bitte Empfänger, Betreff und Begleittext prüfen.": [
+    "Please check the recipient, subject and message.",
+    "Vérifiez le destinataire, l’objet et le message.",
+    "Verifica il destinatario, l’oggetto e il messaggio."
+  ],
+  "Der Bericht ist für E-Mail zu gross. Bitte herunterladen oder den Zeitraum eingrenzen.": [
+    "The report is too large for email. Please download it or narrow the period.",
+    "Le rapport est trop volumineux pour un email. Téléchargez-le ou réduisez la période.",
+    "Il rapporto è troppo grande per un’email. Scaricalo o restringi il periodo."
+  ],
+  "Versand ist für diese Testumgebung nicht verfügbar.": [
+    "Sending is unavailable in this test environment.",
+    "L’envoi n’est pas disponible dans cet environnement de test.",
+    "L’invio non è disponibile in questo ambiente di test."
   ]
 }

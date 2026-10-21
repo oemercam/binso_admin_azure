@@ -241,15 +241,18 @@
     },
     "R7-43-011": {
       "sourceTextSha256": "64670a893224a459fbe16930ea9fb8aaac8283883b6332de151acc3e38535082",
-      "status": "nicht_implementiert",
-      "implementation": "PDF/CSV/native Freigabe vorhanden; direkte Berichts-E-Mail mit echtem Anhang und befristete widerrufbare Berichtlinks fehlen.",
+      "status": "teilweise_implementiert",
+      "implementation": "Expliziter Berichtversand über bestehenden Graph-/MIME-/Mail-Outbox-Owner mit Empfänger, Betreff, Begleittext, originalem Snapshot-PDF und eigenem Versandprotokoll. Keine automatische Wiederholung; HTTP202 wird nur als Anbieterannahme bezeichnet.",
       "sourceReferences": [
-        "components/report-actions.tsx",
-        "app/api/reports/route.ts"
+        "lib/server/report-mail.ts",
+        "lib/server/email.ts",
+        "components/report-mail.tsx",
+        "app/api/reports/exports/[id]/send/route.ts",
+        "database/migrations/0073_report_mail_outbox.sql"
       ],
-      "test": "Keine bestandene Direktmail-/Berichtlinkprüfung; vorhandene Exporttests sind dafür kein Nachweis.",
-      "visualComparison": "Nicht implementierte Aktionen werden nicht als verfügbar beworben.",
-      "blocker": "Sicherer serverseitiger Versand-/Freigabelebenszyklus inklusive Zustellnachweis noch zu implementieren; kein externer Versand freigegeben."
+      "test": "Reale migrierte DB und echte PDF-Bytes mit isoliertem Transport: Anhangsgleichheit, HTML-Escaping, Replay/Konflikt, Nichtkonfiguration, Fehler/Unklarheit, Rollen/Mandanten/Read-only und Grössenlimit bestanden. Gemeinsamer echter Graph-MIME-Renderer separat bestanden. Neue UI-/native HTTP-Fälle noch nicht am aktuellen Stand in CI bestanden.",
+      "visualComparison": "Neue gemeinsame FormSheet-Komposition/Statusanzeige noch nicht visuell abgenommen.",
+      "blocker": "Kein echter Versand/Zustellnachweis freigegeben oder behauptet. Aktuelle UI-/HTTP-/Geräteabnahme, Provider-Nachweis und physische Retention-Anbindung bleiben offen; sicherer Freigabelink separat noch nicht implementiert."
     },
     "R7-43-012": {
       "sourceTextSha256": "e649ea39ba7e878f166b5d1ce5b5b4c82701571f2c8ecfbfa3b0b60b5ca34fda",

@@ -72,16 +72,25 @@ try{
  // Independent expected-role contract: do not derive the expectation from the
  // same tenantCan function being tested by the actual HTTP handlers.
  const reportRoles=["owner","admin","finance","hr","project_manager","manager","reader"];
+ let reportFixtureId;const reportReadRoles=new Set(),reportSendReadRoles=new Set();
  for(const role of roles){
   const cookie=cookies.get('0:'+role),body={query:'kind=summary&months=1',locale:'de'},key='native-report-'+role;
   const prepare=()=>fetch(base+'/api/reports/exports',{method:'POST',headers:{cookie,Origin:base,'Content-Type':'application/json','Idempotency-Key':key},body:JSON.stringify(body),signal:AbortSignal.timeout(20000)});
   const response=await prepare();assert.equal(response.status,reportRoles.includes(role)?200:403,'Report preparation enforces the actual HTTP role: '+role);
-  if(!reportRoles.includes(role))continue;
+  if(!reportRoles.includes(role)){
+   assert.equal((await get('/api/reports/exports/'+reportFixtureId,cookie)).status,403);reportReadRoles.add(role);
+   assert.equal((await get('/api/reports/exports/'+reportFixtureId+'/send',cookie)).status,403);reportSendReadRoles.add(role);continue;
+  }
   const {item}=await response.json(),own=await get('/api/reports/exports/'+item.id,cookie);assert.equal(own.status,200);assert.equal(Buffer.from(own.data).subarray(0,5).toString(),'%PDF-');
+  reportFixtureId??=item.id;reportReadRoles.add(role);
+  assert.equal((await get('/api/reports/exports/'+item.id+'/send',cookie)).status,403,'Isolated demo identities never enable a real outbound report transport');
+  reportSendReadRoles.add(role);
+  assert.equal((await fetch(base+'/api/reports/exports/'+item.id+'/send',{method:'POST',headers:{cookie,Origin:base,'Content-Type':'application/json','Idempotency-Key':'native-report-send-'+role},body:JSON.stringify({recipient:'synthetic@example.invalid',subject:'Synthetic',message:'Never send from QA'})})).status,403);
   assert.equal((await get('/api/reports/exports/'+item.id,cookies.get('1:'+role))).status,404,'Snapshots cannot cross tenants');
   const otherRole=role==='owner'?'admin':'owner';assert.equal((await get('/api/reports/exports/'+item.id,cookies.get('0:'+otherRole))).status,404,'Own-tenant role permission does not grant another creator’s snapshot');
   assert.deepEqual((await (await prepare()).json()).item,item,'Native retry keeps immutable identity');
  }
+ assert.equal(reportReadRoles.size,roles.length);assert.equal(reportSendReadRoles.size,roles.length);
  const snapshotCount=Number((await pool.query('select count(*) n from report_exports')).rows[0].n);
  assert.equal((await fetch(base+'/api/reports/exports',{method:'POST',headers:{cookie:cookies.get('0:owner'),Origin:'https://foreign.invalid','Content-Type':'application/json','Idempotency-Key':'foreign-report-request'},body:JSON.stringify({query:'months=1',locale:'de'})})).status,403);
  assert.equal(Number((await pool.query('select count(*) n from report_exports')).rows[0].n),snapshotCount,'Foreign-origin rejection has no persistent side effect');
@@ -166,6 +175,9 @@ try{
  assert.equal((await get('/api/projects/'+project.id,cookies.get('1:owner'))).status,404,'Foreign project workspace ID stays hidden');
  const inventory=JSON.parse(await fs.readFile('docs/architecture/v21-3-data-inventory.json','utf8'));
  const covered=new Set(readContracts.map(([path])=>path.split('?')[0].replace(new RegExp(customer.id+'|'+project.id+'|'+employee.id+'|'+product.id+'|'+payment.id+'|'+ticket.id,'g'),'[id]')));
+ // These dynamic IDs are created and exercised above, including the denied
+ // member role, own-creator boundary and all eight demo-send denials.
+ for(const path of ['/api/reports/exports/[id]','/api/reports/exports/[id]/send'])covered.add(path);
  for(const path of ['/api/expenses/[id]','/api/documents/[number]','/api/documents/[number]/pdf','/api/documents/[number]/versions','/api/files/[id]/download'])covered.add(path);
  const publicEntries=new Set(['/api/auth/invitation','/api/health','/api/health/ready','/api/demo/session','/api/operator/sso/callback']);
  for(const api of inventory.apis.filter(item=>item.methods.includes('GET'))){
