@@ -47,6 +47,7 @@ export async function documentPdf(document:Row,liveCompany:Row,logo?:Buffer){
  paragraph([customer.name,customer.contact_name,customer.address_lines||[customer.street||customer.address,customer.building_number].filter(Boolean).join(' '),customer.address_lines?'':[customer.postal_code||customer.zip,customer.city].filter(Boolean).join(' '),customer.country&& !['CH','Schweiz','Switzerland','Suisse'].includes(String(customer.country))?customer.country:''].filter(Boolean).join('\n'));
  ensure(104);pdf.moveDown(.5);pdf.font('Liberation Sans-Bold').fontSize(22).text(t(invoice?'RECHNUNG':'ANGEBOT'),left,pdf.y,{width});pdf.moveDown(.35);
  paragraph(t(invoice?'Rechnung Nr. ':'Angebot Nr. ')+String(document.number),11);
+ if(!invoice&&Number.isInteger(document.published_version)&&Number(document.published_version)>0)paragraph(t('Version')+' '+document.published_version,9);
  if(draft)paragraph(t('ENTWURF - nicht zur Zahlung / nicht versenden'),10);
  if(cancelled)paragraph(t('STORNIERT - keine Zahlung erforderlich'),10);
  const issueDate=date(document.issue_date),dueDate=date(invoice?document.due_date:document.valid_until);

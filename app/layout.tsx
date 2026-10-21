@@ -11,6 +11,7 @@ import {initializeTheme} from "@/lib/theme";
 import {ThemeRuntime} from "@/components/theme-runtime";
 import { siteConfig } from "@/lib/config";
 import { PrivacyConsent } from "@/components/privacy-consent";
+import {FreshAuthenticationDialog} from '@/components/fresh-authentication-dialog';
 
 const metadataBase = new URL(siteConfig.marketingUrl);
 
@@ -79,6 +80,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         <ThemeRuntime />
         <AppShellLayout>{children}</AppShellLayout>
         <PrivacyConsent />
+        <FreshAuthenticationDialog />
         <PwaRegister />
         <WebVitalsReporter />
         </LocaleProvider>

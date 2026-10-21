@@ -1,0 +1,3 @@
+const labels:Record<string,string>={pdf_requested:'PDF angefordert (unbestätigt)',question:'Frage',reply:'Antwort',accepted:'Angenommen',declined:'Abgelehnt',view_reported:'Seitenaufruf (unbestätigt)',provider_accepted:'Benachrichtigung vom Anbieter angenommen',provider_unconfirmed:'Benachrichtigung nicht bestätigt'};
+export const offerActivityLabel=(kind:string)=>labels[kind]??kind;
+export const deliveryLabel=(status:string)=>status==='sent'?'Vom Anbieter angenommen':status==='failed'?'Versand nicht bestätigt':'Versand angefordert';

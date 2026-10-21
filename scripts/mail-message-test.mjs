@@ -14,6 +14,9 @@ function parts(bytes){return bytes.toString('utf8').split(/\r\n--[^\r\n]+/g).fla
  return [{type,body}];
 })}
 const rendered=await renderMailMessage(message,'sender@fixture.invalid'),decoded=parts(rendered);
+const branded=await renderMailMessage({...message,senderName:'Synthetic Tenant',replyTo:'verified@fixture.invalid'},'sender@fixture.invalid');assert.ok(branded.toString().includes('verified@fixture.invalid'));
+await assert.rejects(()=>renderMailMessage({...message,replyTo:'a@fixture.invalid,b@fixture.invalid'},'sender@fixture.invalid'));
+await assert.rejects(()=>renderMailMessage({...message,senderName:'Injected\r\nBcc: x@fixture.invalid'},'sender@fixture.invalid'));
 assert.equal(decoded.find(p=>p.type.startsWith('text/plain')).body.toString(),message.text);
 assert.equal(decoded.find(p=>p.type.startsWith('text/html')).body.toString(),message.html);
 assert.deepEqual(decoded.find(p=>p.type.startsWith('application/pdf')).body,message.attachments[0].content);

@@ -817,7 +817,7 @@
   "Alle als gelesen": [
     "Mark all as read",
     "Tout marquer comme lu",
-    "Segna tutto come letto"
+    "Segna tutti come letti"
   ],
   "Alle anderen abmelden": [
     "Sign out all other sessions",
@@ -1522,7 +1522,7 @@
   "Authenticator- oder Recovery-Code": [
     "Authenticator or recovery code",
     "Code d’authentification ou de récupération",
-    "Codice di autenticazione o di recupero"
+    "Codice autenticatore o di recupero"
   ],
   "Authenticator-App aktivieren": [
     "Activate authenticator app",
@@ -11505,7 +11505,7 @@
     "Cronologia dei solleciti"
   ],
   "Versand nicht bestätigt": [
-    "Delivery unconfirmed",
+    "Dispatch unconfirmed",
     "Envoi non confirmé",
     "Invio non confermato"
   ],
@@ -13213,5 +13213,285 @@
     "Get started",
     "Commencer",
     "Inizia ora"
+  ],
+  "Aktion bestätigen": [
+    "Confirm action",
+    "Confirmer l’action",
+    "Conferma azione"
+  ],
+  "Antwort": [
+    "Reply",
+    "Réponse",
+    "Risposta"
+  ],
+  "Antworten": [
+    "Reply",
+    "Répondre",
+    "Rispondi"
+  ],
+  "Auftragsdetails": [
+    "Order details",
+    "Détails du mandat",
+    "Dettagli dell’incarico"
+  ],
+  "Authenticator deaktivieren": [
+    "Disable authenticator",
+    "Désactiver l’authentificateur",
+    "Disattiva autenticatore"
+  ],
+  "Authenticator deaktivieren?": [
+    "Disable authenticator?",
+    "Désactiver l’authentificateur ?",
+    "Disattivare l’autenticatore?"
+  ],
+  "Begleittext": [
+    "Cover message",
+    "Message d’accompagnement",
+    "Messaggio di accompagnamento"
+  ],
+  "Bestätigungscode": [
+    "Confirmation code",
+    "Code de confirmation",
+    "Codice di conferma"
+  ],
+  "Der Authenticator ist optional. Für sicherheitsrelevante Änderungen ist eine erneute Bestätigung erforderlich.": [
+    "The authenticator is optional. Security-sensitive changes require renewed confirmation.",
+    "L’authentificateur est facultatif. Les modifications sensibles nécessitent une nouvelle confirmation.",
+    "L’autenticatore è facoltativo. Le modifiche sensibili richiedono una nuova conferma."
+  ],
+  "Die Annahme durch den Anbieter ist kein Zustell- oder Lesenachweis.": [
+    "Provider acceptance does not prove delivery or reading.",
+    "L’acceptation par le fournisseur ne prouve ni la livraison ni la lecture.",
+    "L’accettazione del fornitore non dimostra la consegna o la lettura."
+  ],
+  "Duplizieren": [
+    "Duplicate",
+    "Dupliquer",
+    "Duplica"
+  ],
+  "Geschützte Einstellungen ändern": [
+    "Change protected settings",
+    "Modifier les paramètres protégés",
+    "Modifica impostazioni protette"
+  ],
+  "Keine Entwicklung im Zeitraum": [
+    "No activity in this period",
+    "Aucune évolution sur cette période",
+    "Nessun andamento nel periodo"
+  ],
+  "Leistungen": [
+    "Services",
+    "Prestations",
+    "Prestazioni"
+  ],
+  "Link widerrufen": [
+    "Revoke link",
+    "Révoquer le lien",
+    "Revoca link"
+  ],
+  "Nach oben": [
+    "Move up",
+    "Déplacer vers le haut",
+    "Sposta su"
+  ],
+  "Nach unten": [
+    "Move down",
+    "Déplacer vers le bas",
+    "Sposta giù"
+  ],
+  "Nachrichtenaktionen": [
+    "Message actions",
+    "Actions du message",
+    "Azioni messaggio"
+  ],
+  "PDF und sicherer, versionierter Angebotslink werden versendet.": [
+    "The PDF and a secure, versioned offer link will be sent.",
+    "Le PDF et un lien sécurisé vers la version de l’offre seront envoyés.",
+    "Verranno inviati il PDF e un link sicuro alla versione dell’offerta."
+  ],
+  "Reaktionen": [
+    "Responses",
+    "Réactions",
+    "Riscontri"
+  ],
+  "Unternehmenslogo": [
+    "Company logo",
+    "Logo de l’entreprise",
+    "Logo aziendale"
+  ],
+  "Unveränderliche PDFs": [
+    "Immutable PDFs",
+    "PDF immuables",
+    "PDF immutabili"
+  ],
+  "Verlauf": [
+    "History",
+    "Historique",
+    "Cronologia"
+  ],
+  "Versand": [
+    "Dispatch",
+    "Envoi",
+    "Invio"
+  ],
+  "Versand angefordert": [
+    "Dispatch requested",
+    "Envoi demandé",
+    "Invio richiesto"
+  ],
+  "Versionen und Verlauf": [
+    "Versions and history",
+    "Versions et historique",
+    "Versioni e cronologia"
+  ],
+  "Vom Anbieter angenommen": [
+    "Accepted by provider",
+    "Accepté par le fournisseur",
+    "Accettato dal fornitore"
+  ],
+  "Zum Angebot antworten": [
+    "Reply about the offer",
+    "Répondre à propos de l’offre",
+    "Rispondi all’offerta"
+  ],
+  "E-Mail-Code": [
+    "Email code",
+    "Code par e-mail",
+    "Codice e-mail"
+  ],
+  "Seitenaufruf (unbestätigt)": [
+    "Page request (unverified)",
+    "Consultation de page (non vérifiée)",
+    "Visita della pagina (non verificata)"
+  ],
+  "Benachrichtigung vom Anbieter angenommen": [
+    "Notification accepted by provider",
+    "Notification acceptée par le fournisseur",
+    "Notifica accettata dal fornitore"
+  ],
+  "Benachrichtigung nicht bestätigt": [
+    "Notification unconfirmed",
+    "Notification non confirmée",
+    "Notifica non confermata"
+  ],
+  "Ausstellen und senden": [
+    "Issue and send",
+    "Émettre et envoyer",
+    "Emetti e invia"
+  ],
+  "Mit dem Versand wird diese Angebotsversion verbindlich ausgestellt.": [
+    "Sending formally issues this offer version.",
+    "L’envoi émet formellement cette version de l’offre.",
+    "L’invio emette formalmente questa versione dell’offerta."
+  ],
+  "Später fortsetzen": [
+    "Continue later",
+    "Continuer plus tard",
+    "Continua più tardi"
+  ],
+  "Ich bestätige Version, Betrag und Bedingungen und bin zur Annahme berechtigt.": [
+    "I confirm the version, amount and terms and am authorized to accept.",
+    "Je confirme la version, le montant et les conditions et suis autorisé à accepter.",
+    "Confermo versione, importo e condizioni e sono autorizzato ad accettare."
+  ],
+  "Angebots-PDF": [
+    "Offer PDF",
+    "PDF de l’offre",
+    "PDF dell’offerta"
+  ],
+  "Angebot annehmen": [
+    "Accept offer",
+    "Accepter l’offre",
+    "Accetta offerta"
+  ],
+  "Angebot ablehnen": [
+    "Decline offer",
+    "Refuser l’offre",
+    "Rifiuta offerta"
+  ],
+  "Angebot verbindlich annehmen": [
+    "Accept offer with commitment",
+    "Accepter définitivement l’offre",
+    "Accetta l’offerta con impegno"
+  ],
+  "Ablehnung bestätigen": [
+    "Confirm decline",
+    "Confirmer le refus",
+    "Conferma rifiuto"
+  ],
+  "Code anfordern": [
+    "Request code",
+    "Demander un code",
+    "Richiedi codice"
+  ],
+  "Frage stellen": [
+    "Ask a question",
+    "Poser une question",
+    "Fai una domanda"
+  ],
+  "Frage senden": [
+    "Send question",
+    "Envoyer la question",
+    "Invia domanda"
+  ],
+  "Bestätigungscode an": [
+    "Confirmation code to",
+    "Code de confirmation à",
+    "Codice di conferma a"
+  ],
+  "Dieser Link ist vertraulich.": [
+    "This link is confidential.",
+    "Ce lien est confidentiel.",
+    "Questo link è riservato."
+  ],
+  "Diese Bestätigung ist keine qualifizierte elektronische Signatur.": [
+    "This confirmation is not a qualified electronic signature.",
+    "Cette confirmation n’est pas une signature électronique qualifiée.",
+    "Questa conferma non è una firma elettronica qualificata."
+  ],
+  "Mit der Bestätigung nimmst du diese Angebotsversion einschliesslich der oben und im PDF aufgeführten Bedingungen an.": [
+    "Confirming accepts this version of the offer, including the terms shown above and in the PDF.",
+    "La confirmation accepte cette version de l’offre, y compris les conditions ci-dessus et dans le PDF.",
+    "Confermando accetti questa versione dell’offerta, comprese le condizioni sopra e nel PDF."
+  ],
+  "Ein Code wird ausschliesslich an den hinterlegten Empfänger gesendet.": [
+    "A code is sent only to the recorded recipient.",
+    "Un code est envoyé uniquement au destinataire enregistré.",
+    "Un codice viene inviato solo al destinatario registrato."
+  ],
+  "Deine Frage wurde gespeichert.": [
+    "Your question has been saved.",
+    "Votre question a été enregistrée.",
+    "La tua domanda è stata salvata."
+  ],
+  "Deine Entscheidung wurde gespeichert.": [
+    "Your decision has been saved.",
+    "Votre décision a été enregistrée.",
+    "La tua decisione è stata salvata."
+  ],
+  "Angebot angenommen.": [
+    "Offer accepted.",
+    "Offre acceptée.",
+    "Offerta accettata."
+  ],
+  "Angebot abgelehnt.": [
+    "Offer declined.",
+    "Offre refusée.",
+    "Offerta rifiutata."
+  ],
+  "Datei entfernen?": [
+    "Remove file?",
+    "Retirer le fichier ?",
+    "Rimuovere il file?"
+  ],
+  "Die Datei wird aus den aktiven Anhängen entfernt. Aufbewahrte Nachweise bleiben erhalten.": [
+    "The file is removed from active attachments. Retained evidence is preserved.",
+    "Le fichier est retiré des pièces jointes actives. Les justificatifs conservés sont préservés.",
+    "Il file viene rimosso dagli allegati attivi. Le prove conservate restano disponibili."
+  ],
+  "PDF angefordert (unbestätigt)": [
+    "PDF requested (unverified)",
+    "PDF demandé (non confirmé)",
+    "PDF richiesto (non confermato)"
   ]
 }

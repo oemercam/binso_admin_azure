@@ -1,11 +1,11 @@
 {
   "scope": "Static AST/source inventory, not proof that every runtime branch is tested. Calls include exact source arguments and locations; dynamic dispatch requires the domain matrix and runtime tests.",
-  "base": "e4932c27aa381108601417d4085af2f288b73e59",
+  "base": "7b90a5c7353cf2061987fcd0f4550210bbc00f92",
   "counts": {
-    "apis": 108,
-    "consumers": 33,
-    "migrations": 67,
-    "tables": 101
+    "apis": 112,
+    "consumers": 37,
+    "migrations": 70,
+    "tables": 105
   },
   "apis": [
     {
@@ -181,16 +181,17 @@
         "lib/server/maintenance.ts",
         "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/validation.ts",
         "lib/server/rate-limit.ts",
         "lib/server/crypto.ts",
         "lib/server/totp.ts",
         "lib/server/email-otp.ts",
+        "lib/server/registration.ts",
+        "lib/server/auth-tokens.ts",
         "lib/server/email.ts",
         "lib/server/logger.ts",
         "lib/server/mail-message.ts",
-        "lib/server/registration.ts",
-        "lib/server/auth-tokens.ts",
         "lib/server/mail-i18n.ts",
         "lib/permissions.ts",
         "lib/plans.ts"
@@ -224,21 +225,13 @@
           "callee": "query",
           "line": 64,
           "arguments": [
-            "`update app_users set recovery_code_hashes=recovery_code_hashes - (select ordinality::int-1 from jsonb_array_elements_text(recovery_code_hashes) with ordinality where value=$1 limit 1),updated_at=now()\n      where id=$2 and status='active' and mfa_enabled=true and password_hash=$3 and mfa_secret_enc is not distinct from $4 and recovery_code_hashes @> $5::jsonb returning id`",
-            "[target,user.id,user.password_hash,user.mfa_secret_enc,JSON.stringify([target])]"
-          ]
-        },
-        {
-          "callee": "query",
-          "line": 79,
-          "arguments": [
             "\"update app_users set last_login_at=now(),updated_at=now() where id=$1\"",
             "[user.id]"
           ]
         },
         {
           "callee": "query",
-          "line": 80,
+          "line": 65,
           "arguments": [
             "\"update platform_tenants set last_active_at=now() where organization_id=$1\"",
             "[user.organization_id]"
@@ -259,6 +252,7 @@
         "lib/server/db.ts",
         "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/operator/session.ts",
         "lib/permissions.ts",
         "lib/server/operator/entra.ts"
@@ -272,22 +266,23 @@
         "POST"
       ],
       "dependencies": [
-        "lib/server/audit.ts",
-        "lib/server/crypto.ts",
-        "lib/server/env.ts",
-        "lib/server/totp.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
+        "lib/server/env.ts",
         "lib/server/db.ts",
         "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/audit.ts",
+        "lib/server/crypto.ts",
+        "lib/server/totp.ts",
         "lib/server/validation.ts",
         "lib/server/rate-limit.ts"
       ],
       "evidence": [
         {
           "callee": "client.query",
-          "line": 21,
+          "line": 23,
           "arguments": [
             "\"select mfa_enabled,status,mfa_pending_secret_enc,mfa_pending_expires_at from app_users where id=$1 for update\"",
             "[session.userId]"
@@ -295,7 +290,7 @@
         },
         {
           "callee": "client.query",
-          "line": 27,
+          "line": 29,
           "arguments": [
             "`update app_users set mfa_enabled=true,mfa_secret_enc=$1,recovery_code_hashes=$2::jsonb,mfa_pending_secret_enc=null,mfa_pending_expires_at=null,updated_at=now() where id=$3`",
             "[pending.mfa_pending_secret_enc,JSON.stringify(codes.map(hashRecoveryCode)),session.userId]"
@@ -303,7 +298,7 @@
         },
         {
           "callee": "client.query",
-          "line": 28,
+          "line": 30,
           "arguments": [
             "\"delete from auth_sessions where user_id=$1 and id<>$2\"",
             "[session.userId,session.sessionId]"
@@ -311,7 +306,15 @@
         },
         {
           "callee": "client.query",
-          "line": 29,
+          "line": 31,
+          "arguments": [
+            "'update auth_sessions set step_up_at=null where id=$1'",
+            "[session.sessionId]"
+          ]
+        },
+        {
+          "callee": "client.query",
+          "line": 32,
           "arguments": [
             "\"select set_config('app.organization_id',$1,true)\"",
             "[session.organizationId]"
@@ -332,15 +335,62 @@
         "lib/server/env.ts",
         "lib/server/db.ts",
         "lib/server/http.ts",
-        "lib/server/subscription-lifecycle.ts"
+        "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
+        "lib/server/rate-limit.ts",
+        "lib/server/audit.ts",
+        "lib/server/email.ts",
+        "lib/server/logger.ts",
+        "lib/server/mail-message.ts"
       ],
       "evidence": [
         {
           "callee": "query",
-          "line": 11,
+          "line": 15,
           "arguments": [
             "\"select mfa_enabled from app_users where id=$1 limit 1\"",
             "[session.userId]"
+          ]
+        },
+        {
+          "callee": "withTenant",
+          "line": 24,
+          "arguments": [
+            "session.organizationId",
+            "session.userId",
+            "async client=>{\n  const user=(await client.query(\"select mfa_enabled from app_users where id=$1 and status='active' for update\",[session.userId])).rows[0];\n  if(!user?.mfa_enabled)throw new ApiError(409,'mfa_not_enabled','Der Authenticator ist nicht aktiviert.');\n  await client.query('update app_users set mfa_enabled=false,mfa_secret_enc=null,mfa_pending_secret_enc=null,mfa_pending_expires_at=null,recovery_code_hashes=\\'[]\\'::jsonb,updated_at=now() where id=$1',[session.userId]);\n  await client.query('delete from auth_sessions where user_id=$1 and id<>$2',[session.userId,session.sessionId]);\n  await client.query('update auth_sessions set step_up_at=null where id=$1',[session.sessionId]);\n  await audit(client,{organizationId:session.organizationId,userId:session.userId,action:'auth.mfa_disabled',entityType:'app_users',entityId:session.userId});\n }"
+          ]
+        },
+        {
+          "callee": "client.query",
+          "line": 25,
+          "arguments": [
+            "\"select mfa_enabled from app_users where id=$1 and status='active' for update\"",
+            "[session.userId]"
+          ]
+        },
+        {
+          "callee": "client.query",
+          "line": 27,
+          "arguments": [
+            "'update app_users set mfa_enabled=false,mfa_secret_enc=null,mfa_pending_secret_enc=null,mfa_pending_expires_at=null,recovery_code_hashes=\\'[]\\'::jsonb,updated_at=now() where id=$1'",
+            "[session.userId]"
+          ]
+        },
+        {
+          "callee": "client.query",
+          "line": 28,
+          "arguments": [
+            "'delete from auth_sessions where user_id=$1 and id<>$2'",
+            "[session.userId,session.sessionId]"
+          ]
+        },
+        {
+          "callee": "client.query",
+          "line": 29,
+          "arguments": [
+            "'update auth_sessions set step_up_at=null where id=$1'",
+            "[session.sessionId]"
           ]
         }
       ]
@@ -352,20 +402,21 @@
         "POST"
       ],
       "dependencies": [
-        "lib/server/totp.ts",
-        "lib/server/crypto.ts",
-        "lib/server/env.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
+        "lib/server/env.ts",
         "lib/server/db.ts",
         "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/totp.ts",
+        "lib/server/crypto.ts",
         "lib/server/rate-limit.ts"
       ],
       "evidence": [
         {
           "callee": "query",
-          "line": 19,
+          "line": 21,
           "arguments": [
             "\"update app_users set mfa_pending_secret_enc=$1,mfa_pending_expires_at=$2,updated_at=now() where id=$3 and mfa_enabled=false and status='active' returning id\"",
             "[encryptSecret(secret),expiresAt,session.userId]"
@@ -386,8 +437,8 @@
         "lib/server/db.ts",
         "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/passkeys.ts",
-        "lib/server/password.ts",
         "lib/server/totp.ts",
         "lib/server/crypto.ts",
         "lib/server/audit.ts",
@@ -424,8 +475,8 @@
         "lib/server/db.ts",
         "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/passkeys.ts",
-        "lib/server/password.ts",
         "lib/server/totp.ts",
         "lib/server/crypto.ts",
         "lib/server/audit.ts",
@@ -466,8 +517,8 @@
         "lib/server/db.ts",
         "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/passkeys.ts",
-        "lib/server/password.ts",
         "lib/server/totp.ts",
         "lib/server/crypto.ts",
         "lib/server/audit.ts",
@@ -505,17 +556,18 @@
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/rate-limit.ts"
       ],
       "evidence": [
         {
           "callee": "requireSession",
-          "line": 15,
+          "line": 16,
           "arguments": []
         },
         {
           "callee": "query",
-          "line": 19,
+          "line": 21,
           "arguments": [
             "'select password_hash from app_users where id=$1'",
             "[session.userId]"
@@ -523,7 +575,7 @@
         },
         {
           "callee": "c.query",
-          "line": 22,
+          "line": 24,
           "arguments": [
             "\"update app_users set password_hash=$1,updated_at=now() where id=$2 and status='active' and password_hash=$3 returning id\"",
             "[hash,session.userId,user.password_hash]"
@@ -531,15 +583,23 @@
         },
         {
           "callee": "c.query",
-          "line": 22,
+          "line": 24,
           "arguments": [
             "'delete from auth_sessions where user_id=$1 and id<>$2'",
             "[session.userId,session.sessionId]"
           ]
         },
         {
+          "callee": "c.query",
+          "line": 24,
+          "arguments": [
+            "'update auth_sessions set step_up_at=null where id=$1'",
+            "[session.sessionId]"
+          ]
+        },
+        {
           "callee": "client.query",
-          "line": 30,
+          "line": 32,
           "arguments": [
             "\"update app_users set password_hash=$1,updated_at=now() where id=$2 and status='active' returning id\"",
             "[hash,reset.user_id]"
@@ -547,10 +607,63 @@
         },
         {
           "callee": "client.query",
-          "line": 32,
+          "line": 34,
           "arguments": [
             "\"delete from auth_sessions where user_id=$1\"",
             "[reset.user_id]"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "app/api/auth/reauthenticate/route.ts",
+      "path": "/api/auth/reauthenticate",
+      "methods": [
+        "POST"
+      ],
+      "dependencies": [
+        "lib/server/session.ts",
+        "lib/server/maintenance.ts",
+        "lib/server/env.ts",
+        "lib/server/db.ts",
+        "lib/server/http.ts",
+        "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
+        "lib/server/validation.ts",
+        "lib/server/password.ts",
+        "lib/server/totp.ts",
+        "lib/server/crypto.ts",
+        "lib/server/email-otp.ts",
+        "lib/server/email.ts",
+        "lib/server/logger.ts",
+        "lib/server/mail-message.ts",
+        "lib/server/rate-limit.ts",
+        "lib/server/audit.ts"
+      ],
+      "evidence": [
+        {
+          "callee": "query",
+          "line": 19,
+          "arguments": [
+            "\"select password_hash,mfa_enabled,mfa_secret_enc,email from app_users where id=$1 and status='active'\"",
+            "[session.userId]"
+          ]
+        },
+        {
+          "callee": "withTenant",
+          "line": 34,
+          "arguments": [
+            "session.organizationId",
+            "session.userId",
+            "async client=>{\n  const result=await client.query(`update auth_sessions set step_up_at=now() where id=$1 and user_id=$2 and organization_id=$3 and expires_at>now()\n   and exists(select 1 from app_users u where u.id=$2 and u.status='active' and u.password_hash=$4 and u.mfa_enabled=$5 and u.mfa_secret_enc is not distinct from $6)`,[session.sessionId,session.userId,session.organizationId,identity.password_hash,identity.mfa_enabled,identity.mfa_secret_enc]);\n  if(result.rowCount!==1)throw new ApiError(409,'auth_state_changed','Die Sicherheitsdaten wurden geändert. Bitte melde dich erneut an.');\n  await audit(client,{organizationId:session.organizationId,userId:session.userId,action:'auth.fresh_confirmation',entityType:'auth_sessions',entityId:session.sessionId,metadata:{method}});\n }"
+          ]
+        },
+        {
+          "callee": "client.query",
+          "line": 35,
+          "arguments": [
+            "`update auth_sessions set step_up_at=now() where id=$1 and user_id=$2 and organization_id=$3 and expires_at>now()\n   and exists(select 1 from app_users u where u.id=$2 and u.status='active' and u.password_hash=$4 and u.mfa_enabled=$5 and u.mfa_secret_enc is not distinct from $6)`",
+            "[session.sessionId,session.userId,session.organizationId,identity.password_hash,identity.mfa_enabled,identity.mfa_secret_enc]"
           ]
         }
       ]
@@ -599,6 +712,7 @@
         "lib/server/db.ts",
         "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/validation.ts",
         "lib/server/rate-limit.ts",
         "lib/server/mail-i18n.ts",
@@ -686,7 +800,8 @@
         "lib/server/env.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
-        "lib/server/subscription-lifecycle.ts"
+        "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts"
       ],
       "evidence": []
     },
@@ -702,7 +817,8 @@
         "lib/server/env.ts",
         "lib/server/db.ts",
         "lib/server/http.ts",
-        "lib/server/subscription-lifecycle.ts"
+        "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts"
       ],
       "evidence": [
         {
@@ -735,7 +851,8 @@
         "lib/server/env.ts",
         "lib/server/db.ts",
         "lib/server/http.ts",
-        "lib/server/subscription-lifecycle.ts"
+        "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts"
       ],
       "evidence": [
         {
@@ -784,6 +901,7 @@
         "lib/server/maintenance.ts",
         "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/validation.ts",
         "lib/server/rate-limit.ts",
         "lib/server/registration.ts",
@@ -835,6 +953,7 @@
         "lib/server/db.ts",
         "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts",
         "lib/plans.ts",
@@ -863,6 +982,7 @@
         "POST"
       ],
       "dependencies": [
+        "lib/server/fresh-authentication.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/env.ts",
@@ -880,12 +1000,12 @@
       "evidence": [
         {
           "callee": "requireSession",
-          "line": 15,
+          "line": 16,
           "arguments": []
         },
         {
           "callee": "authorize",
-          "line": 15,
+          "line": 16,
           "arguments": [
             "s",
             "'billing:write'"
@@ -893,7 +1013,7 @@
         },
         {
           "callee": "query",
-          "line": 22,
+          "line": 23,
           "arguments": [
             "'update app_users set terms_version=$1,terms_accepted_at=now(),privacy_version=$2,updated_at=now() where id=$3'",
             "[termsVersion,privacyVersion,s.userId]"
@@ -901,7 +1021,7 @@
         },
         {
           "callee": "withTenant",
-          "line": 25,
+          "line": 26,
           "arguments": [
             "s.organizationId",
             "s.userId",
@@ -917,6 +1037,7 @@
         "POST"
       ],
       "dependencies": [
+        "lib/server/fresh-authentication.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/env.ts",
@@ -930,12 +1051,12 @@
       "evidence": [
         {
           "callee": "requireSession",
-          "line": 1,
+          "line": 2,
           "arguments": []
         },
         {
           "callee": "authorize",
-          "line": 1,
+          "line": 2,
           "arguments": [
             "s",
             "\"billing:write\""
@@ -943,7 +1064,7 @@
         },
         {
           "callee": "query",
-          "line": 1,
+          "line": 2,
           "arguments": [
             "`select s.billing_customer_id stripe_customer_id from organization_subscriptions s join organizations o on o.id=s.organization_id where s.organization_id=$1 and not o.is_demo`",
             "[s.organizationId]"
@@ -966,7 +1087,8 @@
         "lib/subscription-plans.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
-        "lib/server/subscription-lifecycle.ts"
+        "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts"
       ],
       "evidence": [
         {
@@ -991,6 +1113,7 @@
         "lib/server/db.ts",
         "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts",
         "lib/server/repositories/customer-activity.ts",
@@ -1051,6 +1174,7 @@
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts",
         "lib/server/repositories/contacts.ts"
@@ -1102,6 +1226,7 @@
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts",
         "lib/server/repositories/contacts.ts"
@@ -1153,6 +1278,7 @@
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts"
       ],
@@ -1183,6 +1309,7 @@
         "lib/server/db.ts",
         "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts",
         "lib/server/repositories/customers.ts",
@@ -1281,6 +1408,7 @@
         "lib/server/env.ts",
         "lib/server/db.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts",
         "lib/server/repositories/customers.ts",
@@ -1323,6 +1451,7 @@
         "lib/server/db.ts",
         "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/rbac.ts",
         "lib/server/repositories/customers.ts",
         "lib/server/audit.ts",
@@ -1378,6 +1507,7 @@
         "lib/server/db.ts",
         "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/repositories/business-api.ts",
         "lib/server/business-idempotency.ts",
         "lib/financial-status.ts",
@@ -1531,6 +1661,7 @@
         "lib/server/env.ts",
         "lib/server/db.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/credit-notes.ts",
         "lib/server/document-process.ts",
         "lib/qr-bill.ts",
@@ -1540,7 +1671,15 @@
         "lib/server/rbac.ts",
         "lib/permissions.ts",
         "lib/server/audit.ts",
-        "lib/server/business-idempotency.ts"
+        "lib/server/offer-versions.ts",
+        "lib/server/repositories/business-api.ts",
+        "lib/server/business-idempotency.ts",
+        "lib/server/document-pdf.ts",
+        "lib/locales/index.ts",
+        "lib/locales/config.ts",
+        "lib/server/document-logo.ts",
+        "lib/server/storage.ts",
+        "lib/server/file-access.ts"
       ],
       "evidence": [
         {
@@ -1573,6 +1712,7 @@
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts",
         "lib/server/repositories/business-api.ts",
@@ -1600,7 +1740,7 @@
           "arguments": [
             "s.organizationId",
             "s.userId",
-            "async c=>{\n  const doc=(await listApiBusiness(c,s,'documents','number=eq.'+encodeURIComponent(number)))[0];\n  if(!doc)throw new Response('Not found',{status:404});\n  authorize(s,doc.kind==='invoice'?'invoices:read':'sales:read');await requireModuleEntitlement(s.organizationId,doc.kind==='invoice'?'rechnungen':'offerten');\n  const company=(await c.query('select * from organizations where id=$1',[s.organizationId])).rows[0];\n  return documentPdf(doc,company,await documentLogo(c,s.organizationId,doc,company));\n }"
+            "async c=>{\n  const doc=(await listApiBusiness(c,s,'documents','number=eq.'+encodeURIComponent(number)))[0];\n  if(!doc)throw new Response('Not found',{status:404});\n  authorize(s,doc.kind==='invoice'?'invoices:read':'sales:read');await requireModuleEntitlement(s.organizationId,doc.kind==='invoice'?'rechnungen':'offerten');\n  if(doc.kind==='offer'&&doc.status!=='draft'){\n   const version=(await c.query('select pdf from offer_versions where organization_id=$1 and quote_id=$2 and version=$3',[s.organizationId,doc.id,doc.offer_version])).rows[0];\n   if(version)return Buffer.from(version.pdf);\n  }\n  const company=(await c.query('select * from organizations where id=$1',[s.organizationId])).rows[0];\n  return documentPdf(doc,company,await documentLogo(c,s.organizationId,doc,company));\n }"
           ]
         },
         {
@@ -1613,7 +1753,15 @@
         },
         {
           "callee": "c.query",
-          "line": 15,
+          "line": 16,
+          "arguments": [
+            "'select pdf from offer_versions where organization_id=$1 and quote_id=$2 and version=$3'",
+            "[s.organizationId,doc.id,doc.offer_version]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 19,
           "arguments": [
             "'select * from organizations where id=$1'",
             "[s.organizationId]"
@@ -1634,6 +1782,7 @@
         "lib/server/env.ts",
         "lib/server/db.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/credit-notes.ts",
         "lib/server/document-process.ts",
         "lib/qr-bill.ts",
@@ -1643,7 +1792,15 @@
         "lib/server/rbac.ts",
         "lib/permissions.ts",
         "lib/server/audit.ts",
-        "lib/server/business-idempotency.ts"
+        "lib/server/offer-versions.ts",
+        "lib/server/repositories/business-api.ts",
+        "lib/server/business-idempotency.ts",
+        "lib/server/document-pdf.ts",
+        "lib/locales/index.ts",
+        "lib/locales/config.ts",
+        "lib/server/document-logo.ts",
+        "lib/server/storage.ts",
+        "lib/server/file-access.ts"
       ],
       "evidence": [
         {
@@ -1675,6 +1832,7 @@
         "lib/server/env.ts",
         "lib/server/db.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/offer-revisions.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts",
@@ -1684,7 +1842,14 @@
         "lib/server/repositories/business-api.ts",
         "lib/financial-status.ts",
         "lib/money.ts",
-        "lib/qr-bill.ts"
+        "lib/qr-bill.ts",
+        "lib/server/offer-versions.ts",
+        "lib/server/document-pdf.ts",
+        "lib/locales/index.ts",
+        "lib/locales/config.ts",
+        "lib/server/document-logo.ts",
+        "lib/server/storage.ts",
+        "lib/server/file-access.ts"
       ],
       "evidence": [
         {
@@ -1731,6 +1896,7 @@
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts"
       ],
@@ -1781,40 +1947,44 @@
         "lib/server/env.ts",
         "lib/server/db.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/document-process.ts",
         "lib/qr-bill.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts",
         "lib/server/audit.ts",
+        "lib/server/offer-versions.ts",
         "lib/server/repositories/business-api.ts",
         "lib/server/business-idempotency.ts",
+        "lib/server/document-pdf.ts",
         "lib/server/document-logo.ts",
         "lib/server/storage.ts",
-        "lib/server/document-pdf.ts",
         "lib/server/file-access.ts",
         "lib/server/email.ts",
         "lib/server/logger.ts",
-        "lib/server/mail-message.ts"
+        "lib/server/mail-message.ts",
+        "lib/server/public-offers.ts",
+        "lib/server/crypto.ts"
       ],
       "evidence": [
         {
           "callee": "requireSession",
-          "line": 18,
+          "line": 20,
           "arguments": []
         },
         {
           "callee": "withTenant",
-          "line": 24,
+          "line": 28,
           "arguments": [
             "s.organizationId",
             "s.userId",
-            "async c=>{\n  const {row,kind}=await lockDocument(c,s,number);\n  const prior=(await c.query('select * from document_deliveries where organization_id=$1 and request_key=$2',[s.organizationId,key])).rows[0];\n  if(prior){if(prior.recipient!==recipient||prior.document_id!==row.id||prior.purpose!==purpose)throw new ApiError(409,'key_conflict','Die Versandkennung wurde bereits verwendet.');if(prior.status==='sent')return {sent:true};throw new ApiError(409,'delivery_unconfirmed','Dieser Versand ist noch nicht bestätigt. Prüfe den Versandstatus, bevor du erneut sendest.');}\n  if(row.status==='draft')throw new ApiError(409,'draft_not_issued','Bitte das Dokument zuerst prüfen und ausstellen. Entwürfe werden nicht versendet.');\n  if(['cancelled','declined','expired','revised'].includes(row.status))throw new ApiError(409,'document_locked','Dieses Dokument kann nicht versendet werden.');\n  if((await c.query(\"select id from document_deliveries where organization_id=$1 and document_id=$2 and status='sending'\",[s.organizationId,row.id])).rowCount)throw new ApiError(409,'delivery_pending','Ein Versand dieses Dokuments ist noch nicht bestätigt.');\n  const document=(await listApiBusiness(c,s,'documents','id=eq.'+row.id+'&kind=eq.'+kind))[0];\n  let reminder:{stage:number;amount:number;deadline:string}|undefined;\n  if(purpose==='reminder'){\n   const history=(await c.query(\"select reminder_stage stage,status,payment_deadline::text deadline,(completed_at at time zone 'Europe/Zurich')::date::text completed_at from document_deliveries where organization_id=$1 and document_id=$2 and purpose='reminder'\",[s.organizationId,row.id])).rows;\n   const plan=planPaymentReminder(document,history);\n   if('error' in plan)throw new ApiError(409,plan.error,plan.error==='reminder_not_due'?'Nur überfällige offene Rechnungen können gemahnt werden.':plan.error==='reminder_too_soon'?'Die letzte Zahlungsfrist ist noch nicht abgelaufen.':plan.error==='reminder_history_invalid'?'Die Mahnhistorie muss vor dem Versand geprüft werden.':'Die vorgesehenen Mahnstufen sind abgeschlossen.');\n   reminder=plan;\n  }\n  const company=(await c.query('select * from organizations where id=$1',[s.organizationId])).rows[0];\n  const pdf=await documentPdf(document,company,await documentLogo(c,s.organizationId,document,company));const id=randomUUID();\n  await c.query(\"insert into document_deliveries(id,organization_id,kind,document_id,recipient,status,request_key,created_by_user_id,purpose,reminder_stage,balance_amount,payment_deadline) values($1,$2,$3,$4,$5,'sending',$6,$7,$8,$9,$10,$11)\",[id,s.organizationId,kind,row.id,recipient,key,s.userId,purpose,reminder?.stage??null,reminder?.amount??null,reminder?.deadline??null]);\n  return {sent:false,id,kind,document,pdf,company,reminder};\n }"
+            "async c=>{\n  const {row,kind}=await lockDocument(c,s,number);\n  const prior=(await c.query('select * from document_deliveries where organization_id=$1 and request_key=$2',[s.organizationId,key])).rows[0];\n  if(prior){if(prior.recipient!==recipient||prior.document_id!==row.id||prior.purpose!==purpose||prior.subject!==subject||prior.message!==message)throw new ApiError(409,'key_conflict','Die Versandkennung wurde bereits verwendet.');if(prior.status==='sent')return {sent:true};throw new ApiError(409,'delivery_unconfirmed','Dieser Versand ist noch nicht bestätigt. Prüfe den Versandstatus, bevor du erneut sendest.');}\n  if(row.status==='draft'){\n   if(kind!=='offer'||purpose!=='document'||b.issueConfirmed!==true)throw new ApiError(409,'draft_not_issued','Bitte das Dokument zuerst prüfen und ausstellen. Entwürfe werden nicht versendet.');\n   await changeDocumentStatus(c,s,number,'issue','Explicitly confirmed for email dispatch');row.status='sent';\n  }\n  if(['cancelled','declined','expired','revised'].includes(row.status))throw new ApiError(409,'document_locked','Dieses Dokument kann nicht versendet werden.');\n  if((await c.query(\"select id from document_deliveries where organization_id=$1 and document_id=$2 and status='sending'\",[s.organizationId,row.id])).rowCount)throw new ApiError(409,'delivery_pending','Ein Versand dieses Dokuments ist noch nicht bestätigt.');\n  const document=(await listApiBusiness(c,s,'documents','id=eq.'+row.id+'&kind=eq.'+kind))[0];\n  let reminder:{stage:number;amount:number;deadline:string}|undefined;\n  if(purpose==='reminder'){\n   const history=(await c.query(\"select reminder_stage stage,status,payment_deadline::text deadline,(completed_at at time zone 'Europe/Zurich')::date::text completed_at from document_deliveries where organization_id=$1 and document_id=$2 and purpose='reminder'\",[s.organizationId,row.id])).rows;\n   const plan=planPaymentReminder(document,history);\n   if('error' in plan)throw new ApiError(409,plan.error,plan.error==='reminder_not_due'?'Nur überfällige offene Rechnungen können gemahnt werden.':plan.error==='reminder_too_soon'?'Die letzte Zahlungsfrist ist noch nicht abgelaufen.':plan.error==='reminder_history_invalid'?'Die Mahnhistorie muss vor dem Versand geprüft werden.':'Die vorgesehenen Mahnstufen sind abgeschlossen.');\n   reminder=plan;\n  }\n  const company=(await c.query('select * from organizations where id=$1',[s.organizationId])).rows[0];\n  const version=kind==='offer'?await sealOfferVersion(c,s,row) as OfferVersion:null;\n  const publicLink=version?await createOfferLink(c,s,version,recipient):null;\n  const pdf=version?Buffer.from(version.pdf):await documentPdf(document,company,await documentLogo(c,s.organizationId,document,company));const id=randomUUID();\n  await c.query(\"insert into document_deliveries(id,organization_id,kind,document_id,recipient,status,request_key,created_by_user_id,purpose,reminder_stage,balance_amount,payment_deadline) values($1,$2,$3,$4,$5,'sending',$6,$7,$8,$9,$10,$11)\",[id,s.organizationId,kind,row.id,recipient,key,s.userId,purpose,reminder?.stage??null,reminder?.amount??null,reminder?.deadline??null]);\n  await c.query('update document_deliveries set subject=$3,message=$4,offer_version_id=$5,public_link_id=$6 where organization_id=$1 and id=$2',[s.organizationId,id,subject,message,version?.id??null,publicLink?.link.id??null]);\n  const verifiedReplyTo=(await c.query(\"select u.email from app_users u join organization_memberships m on m.user_id=u.id where m.organization_id=$1 and m.status='active' and u.status='active' and u.email_verified_at is not null and lower(u.email)=lower($2) limit 1\",[s.organizationId,company.mail_reply_to||s.email])).rows[0]?.email;\r\n  return {sent:false,id,kind,document,pdf,company,reminder,publicLink,verifiedReplyTo};\n }"
           ]
         },
         {
           "callee": "c.query",
-          "line": 26,
+          "line": 30,
           "arguments": [
             "'select * from document_deliveries where organization_id=$1 and request_key=$2'",
             "[s.organizationId,key]"
@@ -1822,7 +1992,7 @@
         },
         {
           "callee": "c.query",
-          "line": 30,
+          "line": 37,
           "arguments": [
             "\"select id from document_deliveries where organization_id=$1 and document_id=$2 and status='sending'\"",
             "[s.organizationId,row.id]"
@@ -1830,7 +2000,7 @@
         },
         {
           "callee": "c.query",
-          "line": 34,
+          "line": 41,
           "arguments": [
             "\"select reminder_stage stage,status,payment_deadline::text deadline,(completed_at at time zone 'Europe/Zurich')::date::text completed_at from document_deliveries where organization_id=$1 and document_id=$2 and purpose='reminder'\"",
             "[s.organizationId,row.id]"
@@ -1838,7 +2008,7 @@
         },
         {
           "callee": "c.query",
-          "line": 39,
+          "line": 46,
           "arguments": [
             "'select * from organizations where id=$1'",
             "[s.organizationId]"
@@ -1846,15 +2016,31 @@
         },
         {
           "callee": "c.query",
-          "line": 41,
+          "line": 50,
           "arguments": [
             "\"insert into document_deliveries(id,organization_id,kind,document_id,recipient,status,request_key,created_by_user_id,purpose,reminder_stage,balance_amount,payment_deadline) values($1,$2,$3,$4,$5,'sending',$6,$7,$8,$9,$10,$11)\"",
             "[id,s.organizationId,kind,row.id,recipient,key,s.userId,purpose,reminder?.stage??null,reminder?.amount??null,reminder?.deadline??null]"
           ]
         },
         {
+          "callee": "c.query",
+          "line": 51,
+          "arguments": [
+            "'update document_deliveries set subject=$3,message=$4,offer_version_id=$5,public_link_id=$6 where organization_id=$1 and id=$2'",
+            "[s.organizationId,id,subject,message,version?.id??null,publicLink?.link.id??null]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 52,
+          "arguments": [
+            "\"select u.email from app_users u join organization_memberships m on m.user_id=u.id where m.organization_id=$1 and m.status='active' and u.status='active' and u.email_verified_at is not null and lower(u.email)=lower($2) limit 1\"",
+            "[s.organizationId,company.mail_reply_to||s.email]"
+          ]
+        },
+        {
           "callee": "withTenant",
-          "line": 50,
+          "line": 61,
           "arguments": [
             "s.organizationId",
             "s.userId",
@@ -1863,7 +2049,7 @@
         },
         {
           "callee": "withTenant",
-          "line": 58,
+          "line": 71,
           "arguments": [
             "s.organizationId",
             "s.userId",
@@ -1872,7 +2058,7 @@
         },
         {
           "callee": "c.query",
-          "line": 58,
+          "line": 71,
           "arguments": [
             "\"update document_deliveries set status='failed',completed_at=now() where organization_id=$1 and id=$2\"",
             "[s.organizationId,delivery.id]"
@@ -1880,7 +2066,7 @@
         },
         {
           "callee": "withTenant",
-          "line": 62,
+          "line": 75,
           "arguments": [
             "s.organizationId",
             "s.userId",
@@ -1889,7 +2075,7 @@
         },
         {
           "callee": "c.query",
-          "line": 63,
+          "line": 76,
           "arguments": [
             "\"update document_deliveries set status='sent',completed_at=now() where organization_id=$1 and id=$2\"",
             "[s.organizationId,delivery.id]"
@@ -1897,7 +2083,7 @@
         },
         {
           "callee": "c.query",
-          "line": 65,
+          "line": 78,
           "arguments": [
             "`update ${table} set status=case when status='draft' then 'sent' else status end,updated_at=now() where organization_id=$1 and id=$2`",
             "[s.organizationId,delivery.document!.id]"
@@ -1918,6 +2104,7 @@
         "lib/server/env.ts",
         "lib/server/db.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/document-process.ts",
         "lib/qr-bill.ts",
         "lib/financial-status.ts",
@@ -1925,7 +2112,16 @@
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts",
-        "lib/server/audit.ts"
+        "lib/server/audit.ts",
+        "lib/server/offer-versions.ts",
+        "lib/server/repositories/business-api.ts",
+        "lib/server/business-idempotency.ts",
+        "lib/server/document-pdf.ts",
+        "lib/locales/index.ts",
+        "lib/locales/config.ts",
+        "lib/server/document-logo.ts",
+        "lib/server/storage.ts",
+        "lib/server/file-access.ts"
       ],
       "evidence": [
         {
@@ -1945,6 +2141,180 @@
       ]
     },
     {
+      "file": "app/api/documents/[number]/versions/route.ts",
+      "path": "/api/documents/[number]/versions",
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "dependencies": [
+        "lib/server/http.ts",
+        "lib/server/session.ts",
+        "lib/server/maintenance.ts",
+        "lib/server/env.ts",
+        "lib/server/db.ts",
+        "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
+        "lib/server/rbac.ts",
+        "lib/permissions.ts",
+        "lib/server/validation.ts",
+        "lib/server/public-offers.ts",
+        "lib/server/crypto.ts",
+        "lib/financial-status.ts",
+        "lib/money.ts",
+        "lib/locales/index.ts",
+        "lib/locales/config.ts",
+        "lib/server/audit.ts",
+        "lib/server/email.ts",
+        "lib/server/logger.ts",
+        "lib/server/mail-message.ts",
+        "lib/server/rate-limit.ts"
+      ],
+      "evidence": [
+        {
+          "callee": "requireSession",
+          "line": 13,
+          "arguments": []
+        },
+        {
+          "callee": "authorize",
+          "line": 13,
+          "arguments": [
+            "s",
+            "'sales:read'"
+          ]
+        },
+        {
+          "callee": "withTenant",
+          "line": 14,
+          "arguments": [
+            "s.organizationId",
+            "s.userId",
+            "async c=>{\n  const quote=(await c.query('select id from quotes where organization_id=$1 and quote_no=$2 and archived_at is null',[s.organizationId,number])).rows[0];\n  if(!quote)throw new ApiError(404,'not_found','Angebot nicht gefunden.');\n  const version=request.nextUrl.searchParams.get('version');\n  if(version){\n   if(!/^[1-9]\\d{0,5}$/.test(version))throw new ApiError(400,'version_invalid','Ungültige Version.');\n   const archived=(await c.query('select pdf from offer_versions where organization_id=$1 and quote_id=$2 and version=$3',[s.organizationId,quote.id,Number(version)])).rows[0];\n   if(!archived)throw new ApiError(404,'not_found','Version nicht gefunden.');\n   return new Response(new Uint8Array(archived.pdf),{headers:{'content-type':'application/pdf','cache-control':'private, no-store','x-content-type-options':'nosniff'}});\n  }\n  const versions=(await c.query('select version,number,created_at,pdf_sha256 from offer_versions where organization_id=$1 and quote_id=$2 order by version desc',[s.organizationId,quote.id])).rows;\n  const events=(await c.query(`select e.id,e.link_id,e.kind,e.body,e.actor,e.created_at,v.version,l.recipient,l.revoked_at\n   from offer_public_events e join offer_public_links l on l.id=e.link_id and l.organization_id=e.organization_id\n   join offer_versions v on v.id=l.version_id and v.organization_id=l.organization_id\n   where e.organization_id=$1 and v.quote_id=$2 order by e.created_at desc,e.id limit 100`,[s.organizationId,quote.id])).rows;\n  const deliveries=(await c.query('select d.id,d.recipient,d.status,d.created_at,d.completed_at,v.version from document_deliveries d left join offer_versions v on v.id=d.offer_version_id and v.organization_id=d.organization_id where d.organization_id=$1 and d.document_id=$2 order by d.created_at desc limit 50',[s.organizationId,quote.id])).rows;\n  return json({versions,events,deliveries,deliveryNote:'Vom Anbieter angenommen bedeutet nicht zugestellt. Seitenaufrufe sind unbestätigte Clientmeldungen.'});\n }"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 15,
+          "arguments": [
+            "'select id from quotes where organization_id=$1 and quote_no=$2 and archived_at is null'",
+            "[s.organizationId,number]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 20,
+          "arguments": [
+            "'select pdf from offer_versions where organization_id=$1 and quote_id=$2 and version=$3'",
+            "[s.organizationId,quote.id,Number(version)]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 24,
+          "arguments": [
+            "'select version,number,created_at,pdf_sha256 from offer_versions where organization_id=$1 and quote_id=$2 order by version desc'",
+            "[s.organizationId,quote.id]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 25,
+          "arguments": [
+            "`select e.id,e.link_id,e.kind,e.body,e.actor,e.created_at,v.version,l.recipient,l.revoked_at\n   from offer_public_events e join offer_public_links l on l.id=e.link_id and l.organization_id=e.organization_id\n   join offer_versions v on v.id=l.version_id and v.organization_id=l.organization_id\n   where e.organization_id=$1 and v.quote_id=$2 order by e.created_at desc,e.id limit 100`",
+            "[s.organizationId,quote.id]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 29,
+          "arguments": [
+            "'select d.id,d.recipient,d.status,d.created_at,d.completed_at,v.version from document_deliveries d left join offer_versions v on v.id=d.offer_version_id and v.organization_id=d.organization_id where d.organization_id=$1 and d.document_id=$2 order by d.created_at desc limit 50'",
+            "[s.organizationId,quote.id]"
+          ]
+        },
+        {
+          "callee": "requireSession",
+          "line": 36,
+          "arguments": []
+        },
+        {
+          "callee": "authorize",
+          "line": 36,
+          "arguments": [
+            "s",
+            "'sales:write'"
+          ]
+        },
+        {
+          "callee": "withTenant",
+          "line": 39,
+          "arguments": [
+            "s.organizationId",
+            "s.userId",
+            "async c=>{\n  const quote=(await c.query('select id,offer_version from quotes where organization_id=$1 and quote_no=$2 and archived_at is null for update',[s.organizationId,number])).rows[0];\n  if(!quote)throw new ApiError(404,'not_found','Angebot nicht gefunden.');\n  const link=(await c.query('select l.* from offer_public_links l join offer_versions v on v.id=l.version_id and v.organization_id=l.organization_id where l.organization_id=$1 and l.id::text=$2 and v.quote_id=$3 and v.version=$4 for update of l',[s.organizationId,linkId,quote.id,quote.offer_version])).rows[0];\n  if(!link)throw new ApiError(404,'not_found','Aktueller Angebotsdialog nicht gefunden.');\n  if(action==='revoke'){\n   await c.query('update offer_public_links set revoked_at=coalesce(revoked_at,now()) where organization_id=$1 and id=$2',[s.organizationId,link.id]);\n   await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'offer.link.revoked',entityType:'quote',entityId:quote.id,metadata:{linkId:link.id}});\n   return null;\n  }\n  if(link.revoked_at||new Date(link.expires_at).getTime()<=Date.now())throw new ApiError(409,'link_inactive','Dieser Angebotsdialog ist nicht mehr aktiv.');\n  const prior=(await c.query('select kind,body from offer_public_events where organization_id=$1 and link_id=$2 and request_key=$3',[s.organizationId,link.id,key])).rows[0];\n  if(prior){if(prior.kind!=='reply'||prior.body!==text)throw new ApiError(409,'key_conflict','Diese Versandkennung wurde anders verwendet.');return null;}\n  await c.query(\"insert into offer_public_events(organization_id,link_id,kind,body,actor,created_by_user_id,request_key) values($1,$2,'reply',$3,'employee',$4,$5)\",[s.organizationId,link.id,text,s.userId,key]);\n  await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'offer.reply.recorded',entityType:'quote',entityId:quote.id,metadata:{linkId:link.id}});\n  return {to:link.recipient,url:offerLinkUrl(link),linkId:link.id};\n }"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 40,
+          "arguments": [
+            "'select id,offer_version from quotes where organization_id=$1 and quote_no=$2 and archived_at is null for update'",
+            "[s.organizationId,number]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 42,
+          "arguments": [
+            "'select l.* from offer_public_links l join offer_versions v on v.id=l.version_id and v.organization_id=l.organization_id where l.organization_id=$1 and l.id::text=$2 and v.quote_id=$3 and v.version=$4 for update of l'",
+            "[s.organizationId,linkId,quote.id,quote.offer_version]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 45,
+          "arguments": [
+            "'update offer_public_links set revoked_at=coalesce(revoked_at,now()) where organization_id=$1 and id=$2'",
+            "[s.organizationId,link.id]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 50,
+          "arguments": [
+            "'select kind,body from offer_public_events where organization_id=$1 and link_id=$2 and request_key=$3'",
+            "[s.organizationId,link.id,key]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 52,
+          "arguments": [
+            "\"insert into offer_public_events(organization_id,link_id,kind,body,actor,created_by_user_id,request_key) values($1,$2,'reply',$3,'employee',$4,$5)\"",
+            "[s.organizationId,link.id,text,s.userId,key]"
+          ]
+        },
+        {
+          "callee": "withTenant",
+          "line": 59,
+          "arguments": [
+            "s.organizationId",
+            "s.userId",
+            "c=>c.query(\"insert into offer_public_events(organization_id,link_id,kind,actor,request_key) values($1,$2,$3,'provider',$4) on conflict(link_id,request_key) do nothing\",[s.organizationId,mail.linkId,accepted?'provider_accepted':'provider_unconfirmed','mail:'+key])"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 59,
+          "arguments": [
+            "\"insert into offer_public_events(organization_id,link_id,kind,actor,request_key) values($1,$2,$3,'provider',$4) on conflict(link_id,request_key) do nothing\"",
+            "[s.organizationId,mail.linkId,accepted?'provider_accepted':'provider_unconfirmed','mail:'+key]"
+          ]
+        }
+      ]
+    },
+    {
       "file": "app/api/documents/preview/route.ts",
       "path": "/api/documents/preview",
       "methods": [
@@ -1958,6 +2328,7 @@
         "lib/server/env.ts",
         "lib/server/db.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts",
         "lib/server/plan-access.ts",
@@ -2047,6 +2418,7 @@
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts"
       ],
@@ -2109,6 +2481,7 @@
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts"
       ],
@@ -2153,6 +2526,7 @@
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts"
       ],
@@ -2181,6 +2555,7 @@
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts",
         "lib/server/audit.ts"
@@ -2254,6 +2629,7 @@
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts"
       ],
@@ -2283,6 +2659,7 @@
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts"
       ],
@@ -2332,6 +2709,7 @@
         "lib/server/env.ts",
         "lib/server/db.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts"
       ],
@@ -2396,6 +2774,7 @@
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts"
       ],
@@ -2434,6 +2813,7 @@
         "lib/server/env.ts",
         "lib/server/db.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts"
       ],
@@ -2484,6 +2864,7 @@
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts",
         "lib/server/storage.ts",
@@ -2509,14 +2890,14 @@
           "arguments": [
             "s.organizationId",
             "s.userId",
-            "async client=>(await client.query<{fileName:string;storagePath:string|null;mimeType:string;body:Buffer|null;purpose:string;scanStatus:string;expenseOwner:string|null}>(\n      `select f.original_name as \"fileName\", f.blob_url as \"storagePath\",f.content_type as \"mimeType\",b.body,f.purpose,f.scan_status as \"scanStatus\",(select e.created_by_user_id from expenses e where e.id=f.expense_id and e.organization_id=f.organization_id) as \"expenseOwner\" from file_objects f left join file_contents b on b.file_id=f.id and b.organization_id=f.organization_id where f.id=$1 and f.organization_id=$2 ${s.moduleProfile==='time_only'?\"and ((f.purpose='profile_avatar' and f.created_by=$3) or (f.purpose='time_report' and exists(select 1 from time_entries t where t.id=f.time_entry_id and t.organization_id=f.organization_id and t.created_by_user_id=$3)) or (f.purpose='support_attachment' and exists(select 1 from support_cases t where t.id=f.support_case_id and t.organization_id=f.organization_id and t.created_by_user_id=$3)))\":''} limit 1`,\n      s.moduleProfile==='time_only'?[id,s.organizationId,s.userId]:[id,s.organizationId]\n    )).rows[0]"
+            "async client=>(await client.query<{fileName:string;storagePath:string|null;mimeType:string;body:Buffer|null;purpose:string;scanStatus:string;expenseOwner:string|null}>(\n      `select f.original_name as \"fileName\", f.blob_url as \"storagePath\",f.content_type as \"mimeType\",b.body,f.purpose,f.scan_status as \"scanStatus\",(select e.created_by_user_id from expenses e where e.id=f.expense_id and e.organization_id=f.organization_id) as \"expenseOwner\" from file_objects f left join file_contents b on b.file_id=f.id and b.organization_id=f.organization_id where f.id=$1 and f.organization_id=$2 and f.archived_at is null ${s.moduleProfile==='time_only'?\"and ((f.purpose='profile_avatar' and f.created_by=$3) or (f.purpose='time_report' and exists(select 1 from time_entries t where t.id=f.time_entry_id and t.organization_id=f.organization_id and t.created_by_user_id=$3)) or (f.purpose='support_attachment' and exists(select 1 from support_cases t where t.id=f.support_case_id and t.organization_id=f.organization_id and t.created_by_user_id=$3)))\":''} limit 1`,\n      s.moduleProfile==='time_only'?[id,s.organizationId,s.userId]:[id,s.organizationId]\n    )).rows[0]"
           ]
         },
         {
           "callee": "client.query",
           "line": 17,
           "arguments": [
-            "`select f.original_name as \"fileName\", f.blob_url as \"storagePath\",f.content_type as \"mimeType\",b.body,f.purpose,f.scan_status as \"scanStatus\",(select e.created_by_user_id from expenses e where e.id=f.expense_id and e.organization_id=f.organization_id) as \"expenseOwner\" from file_objects f left join file_contents b on b.file_id=f.id and b.organization_id=f.organization_id where f.id=$1 and f.organization_id=$2 ${s.moduleProfile==='time_only'?\"and ((f.purpose='profile_avatar' and f.created_by=$3) or (f.purpose='time_report' and exists(select 1 from time_entries t where t.id=f.time_entry_id and t.organization_id=f.organization_id and t.created_by_user_id=$3)) or (f.purpose='support_attachment' and exists(select 1 from support_cases t where t.id=f.support_case_id and t.organization_id=f.organization_id and t.created_by_user_id=$3)))\":''} limit 1`",
+            "`select f.original_name as \"fileName\", f.blob_url as \"storagePath\",f.content_type as \"mimeType\",b.body,f.purpose,f.scan_status as \"scanStatus\",(select e.created_by_user_id from expenses e where e.id=f.expense_id and e.organization_id=f.organization_id) as \"expenseOwner\" from file_objects f left join file_contents b on b.file_id=f.id and b.organization_id=f.organization_id where f.id=$1 and f.organization_id=$2 and f.archived_at is null ${s.moduleProfile==='time_only'?\"and ((f.purpose='profile_avatar' and f.created_by=$3) or (f.purpose='time_report' and exists(select 1 from time_entries t where t.id=f.time_entry_id and t.organization_id=f.organization_id and t.created_by_user_id=$3)) or (f.purpose='support_attachment' and exists(select 1 from support_cases t where t.id=f.support_case_id and t.organization_id=f.organization_id and t.created_by_user_id=$3)))\":''} limit 1`",
             "s.moduleProfile==='time_only'?[id,s.organizationId,s.userId]:[id,s.organizationId]"
           ]
         },
@@ -2526,6 +2907,75 @@
           "arguments": [
             "s",
             "relation.read"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "app/api/files/[id]/route.ts",
+      "path": "/api/files/[id]",
+      "methods": [
+        "DELETE"
+      ],
+      "dependencies": [
+        "lib/server/file-relations.ts",
+        "lib/server/session.ts",
+        "lib/server/maintenance.ts",
+        "lib/server/env.ts",
+        "lib/server/db.ts",
+        "lib/server/http.ts",
+        "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
+        "lib/server/rbac.ts",
+        "lib/permissions.ts",
+        "lib/server/audit.ts",
+        "lib/server/plan-access.ts"
+      ],
+      "evidence": [
+        {
+          "callee": "requireSession",
+          "line": 13,
+          "arguments": []
+        },
+        {
+          "callee": "withTenant",
+          "line": 15,
+          "arguments": [
+            "s.organizationId",
+            "s.userId",
+            "async c=>{\n   const file=(await c.query('select * from file_objects where id=$1 and organization_id=$2 for update',[id,s.organizationId])).rows[0];\n   if(!file)throw new ApiError(404,'not_found','Datei wurde nicht gefunden.');\n   const relation=fileRelations[file.purpose];\n   if(!relation&&file.purpose!=='document')throw new ApiError(403,'file_forbidden','Diese Datei kann hier nicht entfernt werden.');\n   authorize(s,relation?.write??'documents:write');\n   if(file.purpose==='document')await requireModuleEntitlement(s.organizationId,'dokumente');\n   if(file.created_by!==s.userId&&!['owner','admin'].includes(s.role))throw new ApiError(403,'file_forbidden','Nur eigene Anhänge können entfernt werden.');\n   if(s.moduleProfile==='time_only'&&!['time_report','support_attachment'].includes(file.purpose))throw new ApiError(403,'file_forbidden','Keine Berechtigung für diese Datei.');\n   if(relation){\n    const entity=(await c.query(`select * from ${relation.table} where id=$1 and organization_id=$2 for update`,[file[relation.column],s.organizationId])).rows[0];\n    if(!entity)throw new ApiError(404,'not_found','Zuordnung wurde nicht gefunden.');\n    if((file.purpose==='time_report'&&(entity.created_by_user_id!==s.userId&&!['owner','admin'].includes(s.role)))||(file.purpose==='expense_receipt'&&s.role==='member'&&entity.created_by_user_id!==s.userId)||(file.purpose==='support_attachment'&&s.moduleProfile==='time_only'&&entity.created_by_user_id!==s.userId))throw new ApiError(404,'not_found','Datei wurde nicht gefunden.');\n    if(file.purpose==='time_report'&&(entity.approved||entity.submitted_at)||file.purpose==='expense_receipt'&&['approved','posted'].includes(entity.status)||['invoice_attachment','offer_attachment'].includes(file.purpose)&&entity.status!=='draft')throw new ApiError(409,'attachment_locked','Anhänge abgeschlossener oder eingereichter Vorgänge bleiben erhalten.');\n   }\n   if(file.archived_at)return;\n   await c.query('update file_objects set archived_at=now(),archived_by_user_id=$3 where id=$1 and organization_id=$2',[id,s.organizationId,s.userId]);\n   await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'file_archived',entityType:'file',entityId:id,metadata:{purpose:file.purpose}});\n  }"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 16,
+          "arguments": [
+            "'select * from file_objects where id=$1 and organization_id=$2 for update'",
+            "[id,s.organizationId]"
+          ]
+        },
+        {
+          "callee": "authorize",
+          "line": 20,
+          "arguments": [
+            "s",
+            "relation?.write??'documents:write'"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 25,
+          "arguments": [
+            "`select * from ${relation.table} where id=$1 and organization_id=$2 for update`",
+            "[file[relation.column],s.organizationId]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 31,
+          "arguments": [
+            "'update file_objects set archived_at=now(),archived_by_user_id=$3 where id=$1 and organization_id=$2'",
+            "[id,s.organizationId,s.userId]"
           ]
         }
       ]
@@ -2547,6 +2997,7 @@
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts",
         "lib/server/file-relations.ts",
@@ -2711,6 +3162,7 @@
         "lib/server/db.ts",
         "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts",
         "lib/server/repositories/financial-summary.ts",
@@ -2779,6 +3231,7 @@
         "lib/server/env.ts",
         "lib/server/db.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/permissions.ts",
         "lib/server/repositories/finance.ts"
       ],
@@ -2851,7 +3304,8 @@
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/db.ts",
-        "lib/server/subscription-lifecycle.ts"
+        "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts"
       ],
       "evidence": []
     },
@@ -2868,6 +3322,7 @@
         "lib/server/env.ts",
         "lib/server/db.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/repositories/notifications.ts",
         "lib/permissions.ts"
       ],
@@ -2902,6 +3357,7 @@
         "lib/server/db.ts",
         "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/validation.ts",
         "lib/server/repositories/notifications.ts",
         "lib/permissions.ts"
@@ -3037,6 +3493,7 @@
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts"
       ],
@@ -3199,6 +3656,7 @@
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts"
       ],
@@ -3246,6 +3704,7 @@
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts"
       ],
@@ -3593,6 +4052,7 @@
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts"
       ],
@@ -3806,6 +4266,7 @@
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts"
       ],
@@ -3856,6 +4317,7 @@
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts"
       ],
@@ -3923,6 +4385,7 @@
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts"
       ],
@@ -4008,6 +4471,7 @@
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts"
       ],
@@ -4051,6 +4515,7 @@
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts"
       ],
@@ -4120,6 +4585,7 @@
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts"
       ],
@@ -4163,6 +4629,7 @@
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts"
       ],
@@ -4191,6 +4658,7 @@
         "lib/server/db.ts",
         "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts",
         "lib/server/validation.ts",
@@ -4262,6 +4730,7 @@
         "lib/server/db.ts",
         "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/rbac.ts",
         "lib/server/audit.ts",
         "lib/projects.ts",
@@ -4349,6 +4818,54 @@
       ]
     },
     {
+      "file": "app/api/public/offer/route.ts",
+      "path": "/api/public/offer",
+      "methods": [
+        "POST"
+      ],
+      "dependencies": [
+        "lib/server/http.ts",
+        "lib/server/validation.ts",
+        "lib/server/rate-limit.ts",
+        "lib/server/env.ts",
+        "lib/server/db.ts",
+        "lib/server/public-offers.ts",
+        "lib/server/crypto.ts",
+        "lib/financial-status.ts",
+        "lib/money.ts",
+        "lib/locales/index.ts",
+        "lib/locales/config.ts",
+        "lib/server/rbac.ts",
+        "lib/server/session.ts",
+        "lib/server/maintenance.ts",
+        "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
+        "lib/permissions.ts",
+        "lib/server/audit.ts",
+        "lib/server/email.ts",
+        "lib/server/logger.ts",
+        "lib/server/mail-message.ts"
+      ],
+      "evidence": [
+        {
+          "callee": "c.query",
+          "line": 19,
+          "arguments": [
+            "\"insert into offer_public_events(organization_id,link_id,kind,actor,request_key) values($1,$2,'pdf_requested','unverified_client',$3) on conflict(link_id,request_key) do nothing\"",
+            "[link.organization_id,link.id,'pdf:'+businessDate()]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 25,
+          "arguments": [
+            "\"insert into offer_public_events(organization_id,link_id,kind,actor,request_key) values($1,$2,'view_reported','unverified_client',$3) on conflict(link_id,request_key) do nothing\"",
+            "[link.organization_id,link.id,key]"
+          ]
+        }
+      ]
+    },
+    {
       "file": "app/api/reports/route.ts",
       "path": "/api/reports",
       "methods": [
@@ -4361,6 +4878,7 @@
         "lib/server/db.ts",
         "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts",
         "lib/financial-status.ts",
@@ -4447,6 +4965,7 @@
         "lib/server/db.ts",
         "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/permissions.ts",
         "lib/server/plan-access.ts",
         "lib/server/repositories/business-api.ts",
@@ -4488,6 +5007,7 @@
         "lib/server/env.ts",
         "lib/server/db.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts",
         "lib/server/file-access.ts"
@@ -4579,25 +5099,26 @@
         "PATCH"
       ],
       "dependencies": [
-        "lib/qr-bill.ts",
-        "lib/server/http.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/env.ts",
         "lib/server/db.ts",
+        "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/qr-bill.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts"
       ],
       "evidence": [
         {
           "callee": "requireSession",
-          "line": 11,
+          "line": 12,
           "arguments": []
         },
         {
           "callee": "authorize",
-          "line": 11,
+          "line": 12,
           "arguments": [
             "s",
             "\"organization:read\""
@@ -4605,7 +5126,7 @@
         },
         {
           "callee": "withTenant",
-          "line": 11,
+          "line": 12,
           "arguments": [
             "s.organizationId",
             "s.userId",
@@ -4614,7 +5135,7 @@
         },
         {
           "callee": "c.query",
-          "line": 11,
+          "line": 12,
           "arguments": [
             "`select ${fields} from organizations where id=$1`",
             "[s.organizationId]"
@@ -4622,12 +5143,12 @@
         },
         {
           "callee": "requireSession",
-          "line": 12,
+          "line": 13,
           "arguments": []
         },
         {
           "callee": "authorize",
-          "line": 12,
+          "line": 13,
           "arguments": [
             "s",
             "\"organization:write\""
@@ -4635,7 +5156,7 @@
         },
         {
           "callee": "withTenant",
-          "line": 12,
+          "line": 13,
           "arguments": [
             "s.organizationId",
             "s.userId",
@@ -4644,7 +5165,7 @@
         },
         {
           "callee": "c.query",
-          "line": 12,
+          "line": 13,
           "arguments": [
             "`update organizations set vat_rate=$1,payment_terms_days=$2,iban=$3,qr_iban=$4,invoice_intro_text=$5,invoice_footer_text=$6,quote_intro_text=$7,quote_footer_text=$8,updated_at=now() where id=$9 returning ${fields}`",
             "vals"
@@ -4665,7 +5186,8 @@
         "lib/server/env.ts",
         "lib/server/db.ts",
         "lib/server/http.ts",
-        "lib/server/subscription-lifecycle.ts"
+        "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts"
       ],
       "evidence": [
         {
@@ -4742,6 +5264,7 @@
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts",
         "lib/server/auth.ts"
@@ -4761,6 +5284,7 @@
         "lib/server/db.ts",
         "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts"
       ],
@@ -4804,11 +5328,12 @@
         "DELETE"
       ],
       "dependencies": [
-        "lib/server/http.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/env.ts",
         "lib/server/db.ts",
+        "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts",
@@ -4817,12 +5342,12 @@
       "evidence": [
         {
           "callee": "requireSession",
-          "line": 8,
+          "line": 9,
           "arguments": []
         },
         {
           "callee": "authorize",
-          "line": 8,
+          "line": 9,
           "arguments": [
             "s",
             "'users:manage'"
@@ -4830,7 +5355,7 @@
         },
         {
           "callee": "withTenant",
-          "line": 9,
+          "line": 10,
           "arguments": [
             "s.organizationId",
             "s.userId",
@@ -4839,7 +5364,7 @@
         },
         {
           "callee": "c.query",
-          "line": 10,
+          "line": 11,
           "arguments": [
             "\"update organization_invitations set status='revoked' where organization_id=$1 and id::text=$2 and status='pending' returning id\"",
             "[s.organizationId,id]"
@@ -4847,7 +5372,7 @@
         },
         {
           "callee": "c.query",
-          "line": 11,
+          "line": 12,
           "arguments": [
             "\"update mail_outbox set status='cancelled',updated_at=now() where organization_id=$1 and kind='invitation' and entity_id=$2 and status in ('queued','failed')\"",
             "[s.organizationId,id]"
@@ -4863,11 +5388,12 @@
         "POST"
       ],
       "dependencies": [
-        "lib/server/http.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/env.ts",
         "lib/server/db.ts",
+        "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts",
@@ -4882,12 +5408,12 @@
       "evidence": [
         {
           "callee": "requireSession",
-          "line": 9,
+          "line": 10,
           "arguments": []
         },
         {
           "callee": "authorize",
-          "line": 9,
+          "line": 10,
           "arguments": [
             "s",
             "\"users:read\""
@@ -4895,7 +5421,7 @@
         },
         {
           "callee": "withTenant",
-          "line": 9,
+          "line": 10,
           "arguments": [
             "s.organizationId",
             "s.userId",
@@ -4904,7 +5430,7 @@
         },
         {
           "callee": "c.query",
-          "line": 9,
+          "line": 10,
           "arguments": [
             "\"select m.user_id,m.role,m.module_profile,m.status,m.created_at,u.display_name name,u.email from organization_memberships m join app_users u on u.id=m.user_id where m.organization_id=$1 and m.status='active' order by m.created_at\"",
             "[s.organizationId]"
@@ -4912,7 +5438,7 @@
         },
         {
           "callee": "c.query",
-          "line": 9,
+          "line": 10,
           "arguments": [
             "\"select id,email,role,module_profile,status,expires_at,created_at from organization_invitations where organization_id=$1 order by created_at desc\"",
             "[s.organizationId]"
@@ -4920,7 +5446,7 @@
         },
         {
           "callee": "c.query",
-          "line": 9,
+          "line": 10,
           "arguments": [
             "\"select e.max_users user_limit,s.plan from organization_entitlements e join organization_subscriptions s on s.organization_id=e.organization_id where e.organization_id=$1\"",
             "[s.organizationId]"
@@ -4928,12 +5454,12 @@
         },
         {
           "callee": "requireSession",
-          "line": 10,
+          "line": 11,
           "arguments": []
         },
         {
           "callee": "authorize",
-          "line": 10,
+          "line": 11,
           "arguments": [
             "s",
             "\"users:manage\""
@@ -4948,25 +5474,26 @@
         "PATCH"
       ],
       "dependencies": [
-        "lib/server/audit.ts",
-        "lib/server/http.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/env.ts",
         "lib/server/db.ts",
+        "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/audit.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts"
       ],
       "evidence": [
         {
           "callee": "requireSession",
-          "line": 9,
+          "line": 10,
           "arguments": []
         },
         {
           "callee": "authorize",
-          "line": 9,
+          "line": 10,
           "arguments": [
             "s",
             "\"users:manage\""
@@ -4974,7 +5501,7 @@
         },
         {
           "callee": "withTenant",
-          "line": 12,
+          "line": 13,
           "arguments": [
             "s.organizationId",
             "s.userId",
@@ -4983,7 +5510,7 @@
         },
         {
           "callee": "c.query",
-          "line": 13,
+          "line": 14,
           "arguments": [
             "\"select role from organization_memberships where organization_id=$1 and user_id=$2 and status='active' for share\"",
             "[s.organizationId,s.userId]"
@@ -4991,7 +5518,7 @@
         },
         {
           "callee": "c.query",
-          "line": 15,
+          "line": 16,
           "arguments": [
             "\"select role,module_profile,status from organization_memberships where organization_id=$1 and user_id=$2 for update\"",
             "[s.organizationId,userId]"
@@ -4999,7 +5526,7 @@
         },
         {
           "callee": "c.query",
-          "line": 25,
+          "line": 26,
           "arguments": [
             "\"select set_config('app.user_id',$1,true)\"",
             "[userId]"
@@ -5007,7 +5534,7 @@
         },
         {
           "callee": "c.query",
-          "line": 26,
+          "line": 27,
           "arguments": [
             "\"update active_time_trackers set accumulated_seconds=accumulated_seconds+case when state='running' and active_since is not null then greatest(0,extract(epoch from now()-active_since)::integer) else 0 end,state='paused',active_since=null,updated_at=now() where organization_id=$1 and user_id=$2\"",
             "[s.organizationId,userId]"
@@ -5015,7 +5542,7 @@
         },
         {
           "callee": "c.query",
-          "line": 27,
+          "line": 28,
           "arguments": [
             "\"select set_config('app.user_id',$1,true)\"",
             "[s.userId]"
@@ -5023,7 +5550,7 @@
         },
         {
           "callee": "c.query",
-          "line": 28,
+          "line": 29,
           "arguments": [
             "\"update organization_memberships set status='suspended' where organization_id=$1 and user_id=$2\"",
             "[s.organizationId,userId]"
@@ -5031,7 +5558,7 @@
         },
         {
           "callee": "c.query",
-          "line": 29,
+          "line": 30,
           "arguments": [
             "'delete from auth_sessions where organization_id=$1 and user_id=$2'",
             "[s.organizationId,userId]"
@@ -5039,7 +5566,7 @@
         },
         {
           "callee": "c.query",
-          "line": 30,
+          "line": 31,
           "arguments": [
             "\"update organization_invitations set status='revoked' where organization_id=$1 and lower(email)=(select lower(email) from app_users where id=$2) and status='pending'\"",
             "[s.organizationId,userId]"
@@ -5047,7 +5574,7 @@
         },
         {
           "callee": "c.query",
-          "line": 31,
+          "line": 32,
           "arguments": [
             "\"update auth_tokens set consumed_at=coalesce(consumed_at,now()) where organization_id=$1 and user_id=$2 and token_type='invitation'\"",
             "[s.organizationId,userId]"
@@ -5055,7 +5582,7 @@
         },
         {
           "callee": "c.query",
-          "line": 39,
+          "line": 40,
           "arguments": [
             "'update organization_memberships set role=$1,module_profile=$4 where organization_id=$2 and user_id=$3 returning user_id,role,module_profile,created_at'",
             "[role,s.organizationId,userId,moduleProfile]"
@@ -5063,7 +5590,7 @@
         },
         {
           "callee": "c.query",
-          "line": 41,
+          "line": 42,
           "arguments": [
             "'delete from auth_sessions where organization_id=$1 and user_id=$2'",
             "[s.organizationId,userId]"
@@ -5085,6 +5612,7 @@
         "lib/server/db.ts",
         "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts",
         "lib/server/business-idempotency.ts"
@@ -5173,6 +5701,7 @@
         "lib/server/db.ts",
         "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts",
         "lib/server/audit.ts"
@@ -5232,6 +5761,7 @@
         "lib/server/db.ts",
         "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts",
         "lib/server/database.ts",
@@ -5317,15 +5847,16 @@
         "lib/server/http.ts",
         "lib/server/rate-limit.ts",
         "lib/server/env.ts",
-        "lib/server/db.ts"
+        "lib/server/db.ts",
+        "lib/web-vitals.ts"
       ],
       "evidence": [
         {
           "callee": "query",
-          "line": 12,
+          "line": 11,
           "arguments": [
             "\"insert into web_vitals(metric,value,rating,route,created_at) values($1,$2,$3,$4,now())\"",
-            "[metric,value,rating,route]"
+            "[body.name,body.value,body.rating,body.route]"
           ]
         }
       ]
@@ -5343,6 +5874,7 @@
         "lib/server/env.ts",
         "lib/server/db.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts",
         "lib/server/audit.ts",
@@ -5442,6 +5974,7 @@
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts"
       ],
@@ -5491,6 +6024,7 @@
         "lib/server/db.ts",
         "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts"
       ],
@@ -5550,6 +6084,7 @@
         "lib/server/db.ts",
         "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts"
       ],
@@ -5629,6 +6164,7 @@
         "lib/server/db.ts",
         "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts",
         "lib/projects.ts",
@@ -5758,6 +6294,7 @@
         "lib/server/db.ts",
         "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts",
         "lib/projects.ts"
@@ -5898,6 +6435,7 @@
         "PATCH"
       ],
       "dependencies": [
+        "lib/server/fresh-authentication.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/env.ts",
@@ -5912,12 +6450,12 @@
       "evidence": [
         {
           "callee": "requireSession",
-          "line": 9,
+          "line": 10,
           "arguments": []
         },
         {
           "callee": "authorizeWorkforceManagement",
-          "line": 9,
+          "line": 10,
           "arguments": [
             "s",
             "false"
@@ -5925,7 +6463,7 @@
         },
         {
           "callee": "withTenant",
-          "line": 10,
+          "line": 11,
           "arguments": [
             "s.organizationId",
             "s.userId",
@@ -5934,7 +6472,7 @@
         },
         {
           "callee": "c.query",
-          "line": 11,
+          "line": 12,
           "arguments": [
             "`select a.*,e.name employee_name,c.name customer_name,p.name project_name from workforce_assignments a join employees e on e.id=a.employee_id and e.organization_id=a.organization_id join customers c on c.id=a.customer_id and c.organization_id=a.organization_id left join projects p on p.id=a.project_id and p.organization_id=a.organization_id where a.organization_id=$1 order by a.created_at desc limit 1000`",
             "[s.organizationId]"
@@ -5942,7 +6480,7 @@
         },
         {
           "callee": "c.query",
-          "line": 12,
+          "line": 13,
           "arguments": [
             "'select id,name,user_id from employees where organization_id=$1 and archived_at is null and active order by name'",
             "[s.organizationId]"
@@ -5950,7 +6488,7 @@
         },
         {
           "callee": "c.query",
-          "line": 13,
+          "line": 14,
           "arguments": [
             "\"select user_id,email,role from organization_memberships where organization_id=$1 and status='active' order by email\"",
             "[s.organizationId]"
@@ -5958,19 +6496,19 @@
         },
         {
           "callee": "requireSession",
-          "line": 18,
+          "line": 19,
           "arguments": []
         },
         {
           "callee": "authorizeWorkforceManagement",
-          "line": 18,
+          "line": 19,
           "arguments": [
             "s"
           ]
         },
         {
           "callee": "withTenant",
-          "line": 22,
+          "line": 23,
           "arguments": [
             "s.organizationId",
             "s.userId",
@@ -5979,7 +6517,7 @@
         },
         {
           "callee": "c.query",
-          "line": 23,
+          "line": 24,
           "arguments": [
             "\"select user_id from organization_memberships where organization_id=$1 and user_id=$2 and status='active' for share\"",
             "[s.organizationId,userId]"
@@ -5987,7 +6525,7 @@
         },
         {
           "callee": "c.query",
-          "line": 24,
+          "line": 25,
           "arguments": [
             "'select id,user_id from employees where organization_id=$1 and id::text=$2 and active and archived_at is null for update'",
             "[s.organizationId,employeeId]"
@@ -5995,7 +6533,7 @@
         },
         {
           "callee": "c.query",
-          "line": 26,
+          "line": 27,
           "arguments": [
             "'select id from customers where organization_id=$1 and id::text=$2 and archived_at is null'",
             "[s.organizationId,customerId]"
@@ -6003,7 +6541,7 @@
         },
         {
           "callee": "c.query",
-          "line": 27,
+          "line": 28,
           "arguments": [
             "'select id from projects where organization_id=$1 and id::text=$2 and customer_id::text=$3 and archived_at is null'",
             "[s.organizationId,projectId,customerId]"
@@ -6011,7 +6549,7 @@
         },
         {
           "callee": "c.query",
-          "line": 28,
+          "line": 29,
           "arguments": [
             "'update employees set user_id=$3 where organization_id=$1 and id::text=$2'",
             "[s.organizationId,employeeId,userId]"
@@ -6019,7 +6557,7 @@
         },
         {
           "callee": "c.query",
-          "line": 29,
+          "line": 30,
           "arguments": [
             "'insert into workforce_assignments(organization_id,user_id,employee_id,customer_id,project_id,starts_on,ends_on,created_by_user_id) values($1,$2,$3,$4,$5,$6,$7,$8) returning *'",
             "[s.organizationId,userId,employeeId,customerId,projectId||null,startsOn,endsOn||null,s.userId]"
@@ -6027,19 +6565,19 @@
         },
         {
           "callee": "requireSession",
-          "line": 35,
+          "line": 36,
           "arguments": []
         },
         {
           "callee": "authorizeWorkforceManagement",
-          "line": 35,
+          "line": 36,
           "arguments": [
             "s"
           ]
         },
         {
           "callee": "withTenant",
-          "line": 36,
+          "line": 37,
           "arguments": [
             "s.organizationId",
             "s.userId",
@@ -6048,7 +6586,7 @@
         },
         {
           "callee": "c.query",
-          "line": 37,
+          "line": 38,
           "arguments": [
             "'update workforce_assignments set revoked_at=now() where organization_id=$1 and id::text=$2 and revoked_at is null returning id'",
             "[s.organizationId,id]"
@@ -6063,70 +6601,70 @@
       "calls": [
         {
           "callee": "apiGet<ClientSession>('/api/auth/session').then(session=>{\n      if(!active||requestedRevision!==refreshRevision)return;\n      setAccess(accessFromSession(session));\n      setAccessError(session.authenticated?null:'Deine Sitzung ist beendet. Bitte melde dich erneut an.');\n    }).catch",
-          "line": 113,
+          "line": 114,
           "arguments": [
             "error=>{if(active&&requestedRevision===refreshRevision){setAccess(null);setAccessError(error instanceof Error?error.message:'Zugang konnte nicht geprüft werden.')}}"
           ]
         },
         {
           "callee": "apiGet<ClientSession>('/api/auth/session').then",
-          "line": 113,
+          "line": 114,
           "arguments": [
             "session=>{\n      if(!active||requestedRevision!==refreshRevision)return;\n      setAccess(accessFromSession(session));\n      setAccessError(session.authenticated?null:'Deine Sitzung ist beendet. Bitte melde dich erneut an.');\n    }"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 113,
+          "line": 114,
           "arguments": [
             "'/api/auth/session'"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 198,
+          "line": 199,
           "arguments": [
             "canOpen(\"/einstellungen/firma\")?\"/api/settings/company\":null"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 199,
+          "line": 200,
           "arguments": [
-            "\"/api/notifications\""
+            "workspaceReady?\"/api/notifications\":null"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 205,
+          "line": 206,
           "arguments": [
-            "\"/api/settings/profile\""
+            "workspaceReady?\"/api/settings/profile\":null"
           ]
         },
         {
           "callee": "apiGet<{items:SearchItem[]}>(\"/api/search?q=\"+encodeURIComponent(term))\n        .then(payload=>{if(active)setRemoteSearch({query:term,items:payload.items,loading:false,error:null})})\n        .catch",
-          "line": 246,
+          "line": 247,
           "arguments": [
             "error=>{if(active)setRemoteSearch({query:term,items:[],loading:false,error:error instanceof Error?error.message:\"Suche konnte nicht geladen werden.\"})}"
           ]
         },
         {
           "callee": "apiGet<{items:SearchItem[]}>(\"/api/search?q=\"+encodeURIComponent(term))\n        .then",
-          "line": 246,
+          "line": 247,
           "arguments": [
             "payload=>{if(active)setRemoteSearch({query:term,items:payload.items,loading:false,error:null})}"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 246,
+          "line": 247,
           "arguments": [
             "\"/api/search?q=\"+encodeURIComponent(term)"
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 265,
+          "line": 266,
           "arguments": [
             "\"/api/notifications/\"+encodeURIComponent(id)",
             "{}"
@@ -6252,98 +6790,98 @@
       "calls": [
         {
           "callee": "useApiQuery",
-          "line": 74,
+          "line": 78,
           "arguments": [
             "enabled?(\"/api/customers?limit=50\"):null"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 75,
+          "line": 79,
           "arguments": [
             "enabled&&selectedId&&true?\"/api/customers/\"+encodeURIComponent(selectedId):null"
           ]
         },
         {
           "callee": "apiGet<{item?:Record<string,unknown>;items?:Array<Record<string,unknown>>}>(url)\n      .then(payload=>{if(!active)return;const item=payload.item??payload.items?.[0];if(!item)throw new Error(\"Dokument wurde nicht gefunden.\");setDraft(remoteDraftFromItem(item,kind));setLoading(false);setError(null);})\n      .catch",
-          "line": 221,
+          "line": 214,
           "arguments": [
             "error=>{if(active){setLoading(false);setError(error instanceof Error?error.message:\"Dokument konnte nicht geladen werden.\");}}"
           ]
         },
         {
           "callee": "apiGet<{item?:Record<string,unknown>;items?:Array<Record<string,unknown>>}>(url)\n      .then",
-          "line": 221,
+          "line": 214,
           "arguments": [
             "payload=>{if(!active)return;const item=payload.item??payload.items?.[0];if(!item)throw new Error(\"Dokument wurde nicht gefunden.\");setDraft(remoteDraftFromItem(item,kind));setLoading(false);setError(null);}"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 221,
+          "line": 214,
           "arguments": [
             "url"
           ]
         },
         {
           "callee": "apiGet<{demo?:boolean;tenant?:{role?:string;readOnly?:boolean}}>(\"/api/auth/session\").then(s=>{setDocumentRole(s.tenant?.role??\"\");setDocumentReadOnly(s.tenant?.readOnly===true);setDemoDocument(s.demo===true)}).catch",
-          "line": 262,
+          "line": 257,
           "arguments": [
             "()=>{}"
           ]
         },
         {
           "callee": "apiGet<{demo?:boolean;tenant?:{role?:string;readOnly?:boolean}}>(\"/api/auth/session\").then",
-          "line": 262,
+          "line": 257,
           "arguments": [
             "s=>{setDocumentRole(s.tenant?.role??\"\");setDocumentReadOnly(s.tenant?.readOnly===true);setDemoDocument(s.demo===true)}"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 262,
+          "line": 257,
           "arguments": [
             "\"/api/auth/session\""
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 280,
+          "line": 276,
           "arguments": [
             "selectedProductId?\"/api/products/\"+encodeURIComponent(selectedProductId):null"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 289,
+          "line": 285,
           "arguments": [
             "!existing&&sourceOffer?(\"/api/documents/\"+encodeURIComponent(sourceOffer)):null"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 291,
+          "line": 287,
           "arguments": [
             "sourceItem?.customer_id&&sourceOffer?\"/api/customers/\"+encodeURIComponent(String(sourceItem.customer_id)):null"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 308,
+          "line": 304,
           "arguments": [
             "kind==='Rechnung'&&sourceTimeEntriesParam&&true?'/api/time-entries/billing?ids='+encodeURIComponent(sourceTimeEntriesParam):null"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 309,
+          "line": 305,
           "arguments": [
             "kind==='Rechnung'&&sourceExpenseParam&&true?'/api/expenses/billing?ids='+encodeURIComponent(sourceExpenseParam):null"
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 355,
+          "line": 351,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)",
             "payload"
@@ -6351,7 +6889,7 @@
         },
         {
           "callee": "apiPost",
-          "line": 355,
+          "line": 351,
           "arguments": [
             "\"/api/documents\"",
             "payload",
@@ -6360,7 +6898,7 @@
         },
         {
           "callee": "apiPost",
-          "line": 371,
+          "line": 367,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)+\"/status\"",
             "{action}"
@@ -6368,14 +6906,14 @@
         },
         {
           "callee": "apiGet",
-          "line": 371,
+          "line": 367,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)"
           ]
         },
         {
           "callee": "apiPost",
-          "line": 373,
+          "line": 369,
           "arguments": [
             "'/api/documents/'+encodeURIComponent(documentKey??draft.number)+'/revision'",
             "{}",
@@ -6384,7 +6922,7 @@
         },
         {
           "callee": "apiPost",
-          "line": 374,
+          "line": 370,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)+(adjustmentIsRefund?\"/refunds\":\"/credits\")",
             "{amount:Number(creditAmount),reason:creditReason,...(adjustmentIsRefund?{date:refundDate}:{})}",
@@ -6393,37 +6931,29 @@
         },
         {
           "callee": "apiGet",
-          "line": 374,
+          "line": 370,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)"
           ]
         },
         {
           "callee": "apiPost",
-          "line": 375,
+          "line": 371,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)+\"/send\"",
-            "{recipient,requestKey:sendKey,purpose:sendPurpose}"
+            "{recipient,requestKey:sendKey,purpose:sendPurpose,...(sendPurpose===\"document\"?{subject:mailSubject,message:mailMessage,issueConfirmed:kind===\"Angebot\"&&draft.status===\"draft\"}:{})}"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 375,
+          "line": 371,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)"
           ]
         },
         {
-          "callee": "fetch",
-          "line": 587,
-          "arguments": [
-            "fileUrl??(pdfNumber?\"/api/documents/\"+encodeURIComponent(pdfNumber)+\"/pdf\":\"/api/documents/preview\")",
-            "fileUrl||pdfNumber?undefined:{method:\"POST\",headers:{\"Content-Type\":\"application/json\"},body:previewJson}"
-          ]
-        },
-        {
           "callee": "useApiQuery",
-          "line": 605,
+          "line": 581,
           "arguments": [
             "'/api/settings/company'"
           ]
@@ -6454,11 +6984,10 @@
           ]
         },
         {
-          "callee": "apiGetFile",
+          "callee": "apiDelete",
           "line": 25,
           "arguments": [
-            "'/api/files/'+encodeURIComponent(file.id)+'/download'",
-            "'application/pdf'"
+            "'/api/files/'+encodeURIComponent(removing.id)"
           ]
         },
         {
@@ -6484,6 +7013,28 @@
         "app/rechnungen/neu/page.tsx",
         "app/zeit/page.tsx"
       ]
+    },
+    {
+      "file": "components/fresh-authentication-dialog.tsx",
+      "calls": [
+        {
+          "callee": "apiPost",
+          "line": 25,
+          "arguments": [
+            "'/api/auth/reauthenticate'",
+            "{action:'challenge',password}"
+          ]
+        },
+        {
+          "callee": "apiPost",
+          "line": 26,
+          "arguments": [
+            "'/api/auth/reauthenticate'",
+            "{action:'confirm',password,code}"
+          ]
+        }
+      ],
+      "pages": []
     },
     {
       "file": "components/maintenance-control.tsx",
@@ -6565,6 +7116,32 @@
       ],
       "pages": [
         "app/zeit/page.tsx"
+      ]
+    },
+    {
+      "file": "components/offer-history.tsx",
+      "calls": [
+        {
+          "callee": "useApiQuery",
+          "line": 13,
+          "arguments": [
+            "path"
+          ]
+        },
+        {
+          "callee": "apiPost",
+          "line": 20,
+          "arguments": [
+            "path",
+            "{action,linkId:event.link_id,message:text,requestKey:action==='reply'?key.current:crypto.randomUUID()}"
+          ]
+        }
+      ],
+      "pages": [
+        "app/angebote/[id]/page.tsx",
+        "app/angebote/neu/page.tsx",
+        "app/rechnungen/[id]/page.tsx",
+        "app/rechnungen/neu/page.tsx"
       ]
     },
     {
@@ -6748,29 +7325,37 @@
           ]
         },
         {
+          "callee": "apiPatch",
+          "line": 110,
+          "arguments": [
+            "\"/api/customers/\"+encodeURIComponent(customerId)+\"/contacts/\"+encodeURIComponent(String(contact.id))",
+            "{firstName:contact.first_name,lastName:contact.last_name,email:contact.email??'',phone:contact.phone??'',jobTitle:contact.job_title??'',isPrimary:true}"
+          ]
+        },
+        {
           "callee": "apiDelete",
-          "line": 108,
+          "line": 116,
           "arguments": [
             "\"/api/customers/\"+encodeURIComponent(customerId)+\"/contacts/\"+encodeURIComponent(removeContact)"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 189,
+          "line": 197,
           "arguments": [
             "customerId?\"/api/customers/\"+encodeURIComponent(customerId):null"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 206,
+          "line": 214,
           "arguments": [
             "!customerId&&customerName.trim().length>=2&&duplicateQuery?'/api/customers/duplicates?'+duplicateQuery:null"
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 229,
+          "line": 237,
           "arguments": [
             "\"/api/customers/\"+encodeURIComponent(customerId)",
             "body"
@@ -6778,7 +7363,7 @@
         },
         {
           "callee": "apiPost",
-          "line": 229,
+          "line": 237,
           "arguments": [
             "\"/api/customers\"",
             "body",
@@ -6787,7 +7372,7 @@
         },
         {
           "callee": "useApiQuery",
-          "line": 285,
+          "line": 293,
           "arguments": [
             "hasDocuments?'/api/documents?'+params:null"
           ]
@@ -7006,17 +7591,46 @@
       "calls": [
         {
           "callee": "useApiQuery",
-          "line": 38,
+          "line": 41,
           "arguments": [
             "\"/api/notifications\""
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 52,
+          "line": 48,
           "arguments": [
             "\"/api/notifications/\"+encodeURIComponent(id)",
             "{}"
+          ]
+        },
+        {
+          "callee": "apiPatch(\"/api/notifications\",{all:true}).then(()=>setMutationError(null)).catch(err=>setMutationError(err instanceof Error?err.message:\"Aktualisierung fehlgeschlagen.\")).finally",
+          "line": 62,
+          "arguments": [
+            "()=>setBusy(false)"
+          ]
+        },
+        {
+          "callee": "apiPatch(\"/api/notifications\",{all:true}).then(()=>setMutationError(null)).catch",
+          "line": 62,
+          "arguments": [
+            "err=>setMutationError(err instanceof Error?err.message:\"Aktualisierung fehlgeschlagen.\")"
+          ]
+        },
+        {
+          "callee": "apiPatch(\"/api/notifications\",{all:true}).then",
+          "line": 62,
+          "arguments": [
+            "()=>setMutationError(null)"
+          ]
+        },
+        {
+          "callee": "apiPatch",
+          "line": 62,
+          "arguments": [
+            "\"/api/notifications\"",
+            "{all:true}"
           ]
         }
       ],
@@ -7157,14 +7771,14 @@
       "calls": [
         {
           "callee": "useApiQuery",
-          "line": 42,
+          "line": 44,
           "arguments": [
             "\"/api/settings/profile\""
           ]
         },
         {
           "callee": "apiUpload",
-          "line": 53,
+          "line": 55,
           "arguments": [
             "\"/api/files\"",
             "form"
@@ -7172,7 +7786,7 @@
         },
         {
           "callee": "apiPatch",
-          "line": 70,
+          "line": 72,
           "arguments": [
             "\"/api/settings/profile\"",
             "{firstName,lastName,phone,jobTitle}"
@@ -7180,14 +7794,14 @@
         },
         {
           "callee": "useApiQuery",
-          "line": 119,
+          "line": 121,
           "arguments": [
             "\"/api/settings/company\""
           ]
         },
         {
           "callee": "apiUpload",
-          "line": 149,
+          "line": 151,
           "arguments": [
             "\"/api/files\"",
             "form"
@@ -7195,7 +7809,7 @@
         },
         {
           "callee": "apiPatch",
-          "line": 150,
+          "line": 152,
           "arguments": [
             "\"/api/settings/company\"",
             "{name,uid,street,buildingNumber,postalCode,city,email,phone,...(removeLogo?{logoUrl:\"\"}:{}),completeOnboarding:onboarding}"
@@ -7203,35 +7817,35 @@
         },
         {
           "callee": "apiGet",
-          "line": 213,
+          "line": 221,
           "arguments": [
             "\"/api/settings/subscription\""
           ]
         },
         {
           "callee": "apiGet",
-          "line": 214,
+          "line": 222,
           "arguments": [
             "\"/api/integrations/status\""
           ]
         },
         {
           "callee": "apiGet",
-          "line": 215,
+          "line": 223,
           "arguments": [
             "\"/api/billing/catalog\""
           ]
         },
         {
           "callee": "apiGet",
-          "line": 229,
+          "line": 237,
           "arguments": [
             "\"/api/settings/subscription\""
           ]
         },
         {
           "callee": "apiPost",
-          "line": 248,
+          "line": 256,
           "arguments": [
             "\"/api/billing/checkout\"",
             "{plan:selectedPlan,billing:billingCycle,requestKey:checkoutRequest.current.key,acceptedTerms:acceptedPaidTerms,termsVersion:legalConfig.termsVersion,privacyVersion:legalConfig.privacyVersion}"
@@ -7239,7 +7853,7 @@
         },
         {
           "callee": "apiPost",
-          "line": 260,
+          "line": 268,
           "arguments": [
             "\"/api/billing/portal\"",
             "{}"
@@ -7247,35 +7861,35 @@
         },
         {
           "callee": "apiGet<{items:Array<{kind:string;email:boolean;push:boolean}>}>(\"/api/settings/notifications\").then(data=>setPrefs(current=>{const next={...current};for(const item of data.items)if(next[item.kind])next[item.kind]={email:item.email,push:item.push};return next})).then(()=>setReady(true)).catch",
-          "line": 325,
+          "line": 333,
           "arguments": [
             "()=>setError(\"Einstellungen konnten nicht geladen werden.\")"
           ]
         },
         {
           "callee": "apiGet<{items:Array<{kind:string;email:boolean;push:boolean}>}>(\"/api/settings/notifications\").then(data=>setPrefs(current=>{const next={...current};for(const item of data.items)if(next[item.kind])next[item.kind]={email:item.email,push:item.push};return next})).then",
-          "line": 325,
+          "line": 333,
           "arguments": [
             "()=>setReady(true)"
           ]
         },
         {
           "callee": "apiGet<{items:Array<{kind:string;email:boolean;push:boolean}>}>(\"/api/settings/notifications\").then",
-          "line": 325,
+          "line": 333,
           "arguments": [
             "data=>setPrefs(current=>{const next={...current};for(const item of data.items)if(next[item.kind])next[item.kind]={email:item.email,push:item.push};return next})"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 325,
+          "line": 333,
           "arguments": [
             "\"/api/settings/notifications\""
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 333,
+          "line": 341,
           "arguments": [
             "\"/api/settings/notifications\"",
             "{kind:title,channel,enabled}"
@@ -7283,7 +7897,7 @@
         },
         {
           "callee": "apiPatch",
-          "line": 348,
+          "line": 356,
           "arguments": [
             "\"/api/settings/profile\"",
             "{language:next}"
@@ -7566,24 +8180,24 @@
           ]
         },
         {
-          "callee": "fetch",
+          "callee": "apiDelete",
           "line": 21,
           "arguments": [
             "'/api/auth/passkeys'",
-            "{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:target.id,password,code}),signal:AbortSignal.timeout(20000)}"
+            "{id:target.id}"
           ]
         },
         {
           "callee": "apiPost",
-          "line": 24,
+          "line": 23,
           "arguments": [
             "'/api/auth/passkeys/options'",
-            "{mode:'register',password,code,label}"
+            "{mode:'register',label}"
           ]
         },
         {
           "callee": "apiPost",
-          "line": 27,
+          "line": 25,
           "arguments": [
             "'/api/auth/passkeys/verify'",
             "{mode:'register',response}"
@@ -7592,6 +8206,35 @@
       ],
       "pages": [
         "app/einstellungen/sicherheit/page.tsx"
+      ]
+    },
+    {
+      "file": "components/pdf-preview.tsx",
+      "calls": [
+        {
+          "callee": "fetch",
+          "line": 95,
+          "arguments": [
+            "fileUrl??(pdfNumber?\"/api/documents/\"+encodeURIComponent(pdfNumber)+\"/pdf\":\"/api/documents/preview\")",
+            "{...(fileUrl||pdfNumber?{}:{method:\"POST\",headers:{\"Content-Type\":\"application/json\"},body:previewJson}),signal:controller.signal,cache:'no-store'}"
+          ]
+        }
+      ],
+      "pages": [
+        "app/angebot/page.tsx",
+        "app/angebote/[id]/page.tsx",
+        "app/angebote/neu/page.tsx",
+        "app/dev/ux-lab/page.tsx",
+        "app/kunden/[id]/bearbeiten/page.tsx",
+        "app/kunden/[id]/page.tsx",
+        "app/kunden/neu/page.tsx",
+        "app/kunden/page.tsx",
+        "app/mitarbeiter/[id]/page.tsx",
+        "app/mitarbeiter/neu/page.tsx",
+        "app/mitarbeiter/page.tsx",
+        "app/rechnungen/[id]/page.tsx",
+        "app/rechnungen/neu/page.tsx",
+        "app/zeit/page.tsx"
       ]
     },
     {
@@ -7626,11 +8269,27 @@
       ]
     },
     {
-      "file": "components/registration/registration-sheet.tsx",
+      "file": "components/public-offer.tsx",
+      "calls": [
+        {
+          "callee": "fetch",
+          "line": 14,
+          "arguments": [
+            "'/api/public/offer'",
+            "{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({token,...body}),cache:'no-store',credentials:'omit',signal:AbortSignal.timeout(20000)}"
+          ]
+        }
+      ],
+      "pages": [
+        "app/angebot/page.tsx"
+      ]
+    },
+    {
+      "file": "components/registration/registration-page.tsx",
       "calls": [
         {
           "callee": "authRequest",
-          "line": 34,
+          "line": 36,
           "arguments": [
             "'/api/auth/register?'+params",
             "{cache:'no-store'}"
@@ -7638,7 +8297,7 @@
         },
         {
           "callee": "authRequest",
-          "line": 45,
+          "line": 48,
           "arguments": [
             "url",
             "{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}"
@@ -7654,56 +8313,56 @@
       "calls": [
         {
           "callee": "apiGet<MfaState>(\"/api/auth/mfa\").then(setMfa).catch",
-          "line": 52,
+          "line": 53,
           "arguments": [
             "error=>setMfaError(error instanceof Error?error.message:\"Sicherheitsstatus konnte nicht geladen werden.\")"
           ]
         },
         {
           "callee": "apiGet<MfaState>(\"/api/auth/mfa\").then",
-          "line": 52,
+          "line": 53,
           "arguments": [
             "setMfa"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 52,
+          "line": 53,
           "arguments": [
             "\"/api/auth/mfa\""
           ]
         },
         {
           "callee": "apiGet<{items:SessionItem[]}>(\"/api/auth/sessions\")\n      .then(payload=>setSessions(payload.items))\n      .catch(error=>setSessionsError(error instanceof Error?error.message:\"Sitzungen konnten nicht geladen werden.\"))\n      .finally",
-          "line": 55,
+          "line": 56,
           "arguments": [
             "()=>setSessionsLoading(false)"
           ]
         },
         {
           "callee": "apiGet<{items:SessionItem[]}>(\"/api/auth/sessions\")\n      .then(payload=>setSessions(payload.items))\n      .catch",
-          "line": 55,
+          "line": 56,
           "arguments": [
             "error=>setSessionsError(error instanceof Error?error.message:\"Sitzungen konnten nicht geladen werden.\")"
           ]
         },
         {
           "callee": "apiGet<{items:SessionItem[]}>(\"/api/auth/sessions\")\n      .then",
-          "line": 55,
+          "line": 56,
           "arguments": [
             "payload=>setSessions(payload.items)"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 55,
+          "line": 56,
           "arguments": [
             "\"/api/auth/sessions\""
           ]
         },
         {
           "callee": "apiPost",
-          "line": 66,
+          "line": 68,
           "arguments": [
             "\"/api/auth/mfa/setup\"",
             "{}"
@@ -7711,7 +8370,7 @@
         },
         {
           "callee": "apiPost",
-          "line": 73,
+          "line": 76,
           "arguments": [
             "\"/api/auth/mfa/confirm\"",
             "{code}"
@@ -7719,7 +8378,7 @@
         },
         {
           "callee": "apiPatch",
-          "line": 85,
+          "line": 88,
           "arguments": [
             "\"/api/auth/password\"",
             "{password:newPassword,currentPassword}"
@@ -7727,14 +8386,21 @@
         },
         {
           "callee": "apiDelete",
-          "line": 93,
+          "line": 95,
+          "arguments": [
+            "'/api/auth/mfa'"
+          ]
+        },
+        {
+          "callee": "apiDelete",
+          "line": 102,
           "arguments": [
             "\"/api/auth/sessions/\"+encodeURIComponent(id)"
           ]
         },
         {
           "callee": "apiDelete",
-          "line": 102,
+          "line": 111,
           "arguments": [
             "\"/api/auth/sessions\""
           ]
@@ -7845,7 +8511,7 @@
       "calls": [
         {
           "callee": "fetch",
-          "line": 22,
+          "line": 27,
           "arguments": [
             "\"/api/telemetry/web-vitals\"",
             "{method:\"POST\",headers:{\"Content-Type\":\"application/json\"},body,keepalive:true}"
@@ -9568,6 +10234,80 @@
       "tables": [],
       "relations": [],
       "rls": []
+    },
+    {
+      "file": "database/migrations/0067_scoped_fresh_authentication.sql",
+      "tables": [],
+      "relations": [
+        {
+          "table": "auth_sessions",
+          "columns": "id"
+        }
+      ],
+      "rls": []
+    },
+    {
+      "file": "database/migrations/0068_offer_versions_and_public_responses.sql",
+      "tables": [
+        "offer_versions",
+        "offer_public_links",
+        "offer_public_events",
+        "offer_recipient_codes"
+      ],
+      "relations": [
+        {
+          "table": "organizations",
+          "columns": "id"
+        },
+        {
+          "table": "quotes",
+          "columns": "id"
+        },
+        {
+          "table": "organizations",
+          "columns": "id"
+        },
+        {
+          "table": "offer_versions",
+          "columns": "organization_id,id"
+        },
+        {
+          "table": "organizations",
+          "columns": "id"
+        },
+        {
+          "table": "offer_public_links",
+          "columns": "id"
+        },
+        {
+          "table": "organizations",
+          "columns": "id"
+        },
+        {
+          "table": "offer_public_links",
+          "columns": "id"
+        },
+        {
+          "table": "offer_versions",
+          "columns": "id"
+        },
+        {
+          "table": "offer_public_links",
+          "columns": "id"
+        }
+      ],
+      "rls": []
+    },
+    {
+      "file": "database/migrations/0069_attachment_archival.sql",
+      "tables": [],
+      "relations": [
+        {
+          "table": "app_users",
+          "columns": "id"
+        }
+      ],
+      "rls": []
     }
   ],
   "repositories": [
@@ -10975,15 +11715,25 @@
         },
         {
           "callee": "fetch",
-          "line": 64,
+          "line": 77,
           "arguments": [
             "path",
             "{...options,signal:options.signal??AbortSignal.timeout(options.method&&options.method!==\"GET\"?30000:15000)}"
           ]
         },
         {
+          "callee": "fetchOnce",
+          "line": 78,
+          "arguments": []
+        },
+        {
+          "callee": "fetchOnce",
+          "line": 83,
+          "arguments": []
+        },
+        {
           "callee": "fetchApi",
-          "line": 102,
+          "line": 125,
           "arguments": [
             "path",
             "{\n    method:\"POST\",\n    headers:{\n      \"Content-Type\":\"application/json\",\n      ...(options.idempotencyKey?{\"Idempotency-Key\":options.idempotencyKey}:{}),\n    },\n    body:JSON.stringify(body),\n  }"
@@ -10991,7 +11741,7 @@
         },
         {
           "callee": "fetchApi",
-          "line": 117,
+          "line": 140,
           "arguments": [
             "path",
             "{method:\"GET\",cache:\"no-store\",credentials:\"same-origin\",redirect:\"error\",headers:{Accept:contentType}}"
@@ -10999,12 +11749,12 @@
         },
         {
           "callee": "(async()=>{\n    const response=await fetchApi(path,{method:\"GET\",cache:\"no-store\",signal:AbortSignal.timeout(15000)});\n    const result=await parseResponse<T>(response,\"Daten konnten nicht geladen werden.\");\n    if(sessionRevision!==dataRevision([]))throw new ClientApiError(\"Die Sitzung wurde geändert. Bitte erneut versuchen.\",\"session_changed\",401);\n    return result;\n  })",
-          "line": 130,
+          "line": 153,
           "arguments": []
         },
         {
           "callee": "fetchApi",
-          "line": 131,
+          "line": 154,
           "arguments": [
             "path",
             "{method:\"GET\",cache:\"no-store\",signal:AbortSignal.timeout(15000)}"
@@ -11012,7 +11762,7 @@
         },
         {
           "callee": "fetchApi",
-          "line": 143,
+          "line": 166,
           "arguments": [
             "path",
             "{\n    method:\"PATCH\",\n    headers:{\"Content-Type\":\"application/json\"},\n    body:JSON.stringify(body),\n  }"
@@ -11020,15 +11770,15 @@
         },
         {
           "callee": "fetchApi",
-          "line": 153,
+          "line": 176,
           "arguments": [
             "path",
-            "{method:\"DELETE\"}"
+            "{method:\"DELETE\",...(body===undefined?{}:{headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})}"
           ]
         },
         {
           "callee": "fetchApi",
-          "line": 168,
+          "line": 191,
           "arguments": [
             "path",
             "{method:\"POST\",body:form,headers}"
@@ -11085,7 +11835,7 @@
       "methods": [],
       "calls": [
         {
-          "callee": "(async()=>{\n    const response=await fetch(\"/api/auth/session\",{cache:\"no-store\",signal:AbortSignal.timeout(15000)}).catch(error=>{if(error instanceof DOMException&&[\"TimeoutError\",\"AbortError\"].includes(error.name))throw new Error(\"Die Sitzungsprüfung dauert zu lange. Bitte erneut versuchen.\");throw error;});\n    const payload=await response.json().catch(()=>({}));\n    if(!response.ok)throw new Error(typeof payload.message===\"string\"?payload.message:\"Zugang konnte nicht geprüft werden.\");\n    if(typeof payload.authenticated!==\"boolean\")throw new Error(\"Zugang konnte nicht geprüft werden.\");\n    if(startedRevision!==revision)throw new Error(\"Die Sitzung wurde geändert. Bitte erneut versuchen.\");\n    const identity=JSON.stringify([payload.authenticated,payload.demo,payload.user?.id,payload.tenant?.id,payload.tenant?.role,payload.tenant?.moduleProfile,payload.tenant?.plan,payload.tenant?.readOnly]);\n    if(lastIdentity!==null&&lastIdentity!==identity)resetClientData(false);\n    lastIdentity=identity;\n    cached=payload;validUntil=Date.now()+30000;\n    return payload as ClientSession;\n  })",
+          "callee": "(async()=>{\n    const response=await fetch(\"/api/auth/session\",{cache:\"no-store\",signal:AbortSignal.timeout(15000)}).catch(error=>{if(error instanceof DOMException&&[\"TimeoutError\",\"AbortError\"].includes(error.name))throw new Error(\"Die Sitzungsprüfung dauert zu lange. Bitte erneut versuchen.\");throw error;});\n    const payload=await response.json().catch(()=>({}));\n    if(!response.ok)throw new Error(typeof payload.message===\"string\"?payload.message:\"Zugang konnte nicht geprüft werden.\");\n    if(typeof payload.authenticated!==\"boolean\")throw new Error(\"Zugang konnte nicht geprüft werden.\");\n    if(startedRevision!==revision)throw new Error(\"Die Sitzung wurde geändert. Bitte erneut versuchen.\");\n    const identity=JSON.stringify([payload.authenticated,payload.demo,payload.user?.id,payload.tenant?.id,payload.tenant?.role,payload.tenant?.moduleProfile,payload.tenant?.plan,payload.tenant?.readOnly,payload.security?.mfaEnabled,payload.security?.enrollmentRequired]);\n    if(lastIdentity!==null&&lastIdentity!==identity)resetClientData(false);\n    lastIdentity=identity;\n    cached=payload;validUntil=Date.now()+30000;\n    return payload as ClientSession;\n  })",
           "line": 22,
           "arguments": []
         },

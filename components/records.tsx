@@ -44,9 +44,10 @@ export function DataTableRow({children,href,onClick,className="desktop-record-ro
 
 function tone(status: string): "success" | "danger" | "warning" | "neutral" | "info" {
   if (["Bezahlt","Aktiv","Genehmigt","Angenommen","Verbucht","Gelöst","Verrechnet","Freigegeben"].includes(status)) return "success";
-  if (["Überfällig","Abgelehnt","Abgelaufen"].includes(status)) return "danger";
-  if (["Offen","Teilweise bezahlt","Eingereicht","Gesendet","Versendet","Ausstehend","Zuordnen","Zur Prüfung"].includes(status)) return "warning";
-  if (["In Bearbeitung"].includes(status)) return "info";
+  if (status==="Versendet") return "info";
+  if (["Überfällig","Abgelehnt"].includes(status)) return "danger";
+  if (["Offen","Teilweise bezahlt","Eingereicht","Gesendet","Ausstehend","Zuordnen","Zur Prüfung"].includes(status)) return "warning";
+  if (["In Bearbeitung"].includes(status)) return "warning";
   return "neutral";
 }
 

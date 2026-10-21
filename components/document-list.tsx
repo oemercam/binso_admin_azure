@@ -5,7 +5,7 @@ import {usePathname} from "next/navigation";
 import Link from "next/link";
 import {ListRow,DetailTabs} from "./binso-ux";
 
-import {financialStatus,financialStatusLabels,documentDateLabel,openAmount,formatCurrency,formatDate,type FinancialDocument} from '@/lib/financial-status';
+import {financialStatus,financialStatusTone,financialStatusLabels,documentDateLabel,openAmount,formatCurrency,formatDate,type FinancialDocument} from '@/lib/financial-status';
 import {RecordsView, type RecordsController} from './records';
 export type DocumentListItem=FinancialDocument&{id?:string};
 export function DocumentList({items,kind,loading=false,error=null,outstanding=false,context='default',returnTo,controller,remote=false,pagination,toolbarActions=true,showCount=true}:{items:DocumentListItem[];kind?:'offer'|'invoice';loading?:boolean;error?:string|null;outstanding?:boolean;context?:'default'|'customer';returnTo?:string;controller?:RecordsController;remote?:boolean;pagination?:Parameters<typeof RecordsView>[0]['pagination'];toolbarActions?:boolean;showCount?:boolean}){
@@ -25,7 +25,7 @@ export function FinanceTabs(){
 export function DocumentSummaryRow({item,customerHeading=false,compact=false,returnTo}:{item:DocumentListItem;customerHeading?:boolean;compact?:boolean;returnTo?:string}){
  const state=financialStatus(item),open=item.kind==='invoice'&&['open','partial','overdue'].includes(state);
  const label=financialStatusLabels[state]??item.status??'';
- const tone=state==='paid'||state==='accepted'?'success':state==='overdue'||state==='cancelled'?'danger':open?'warning':'neutral';
+ const tone=financialStatusTone(item);
  const amount=formatCurrency(open?openAmount(item):item.total,item.currency);
  return <FinancialSummaryRow title={customerHeading?item.customer?.name||'Kunde':item.number??''} status={label} tone={tone} meta={compact?[customerHeading?item.number:null,documentDateLabel(item)].filter(Boolean).join(' · '):[customerHeading?item.number:item.customer?.name,formatDate(item.issue_date)].filter(Boolean).join(' · ')} amount={amount} amountLabel={open?'Offen':compact&&state!=='draft'?undefined:'Total'} compact={compact} href={(item.kind==='offer'?'/angebote/':'/rechnungen/')+encodeURIComponent(item.number??'')+(returnTo?'?returnTo='+encodeURIComponent(returnTo):'')}/>;
 }

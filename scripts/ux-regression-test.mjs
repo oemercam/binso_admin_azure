@@ -81,7 +81,7 @@ console.log('Apple and PWA installation icons use the Binso One artwork with One
 // Document detail contract: operational workspace; customer-facing rendering belongs to preview only.
 {
   const documents=read("components/documents.tsx");
-  assert(documents.includes("<DocumentReadView type={kind} draft={draft} directory={directory}/>"),"Document detail must expose the operational read view.");
+  assert(documents.includes("<DocumentReadView type={kind} draft={draft} directory={directory} canWrite={canWrite}/>"),"Document detail must expose the operational read view.");
   assert(!documents.includes('detailTab===\\\"document\\\"'),"Invoice and offer detail pages must not embed a second document-shaped preview.");
   assert(!documents.includes("document-inline-preview"),"The final customer document belongs exclusively to the preview action.");
   assert(documents.includes('IconButton label="Vorschau" icon="file"'),"Document detail must keep preview directly accessible.");

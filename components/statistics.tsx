@@ -39,33 +39,44 @@ export function LineChart({buckets,series,selected,onSelect,value}:{buckets:read
 }
 
 /** One period control, signed line chart and shared KPI renderer. */
-export function Statistics({title,subtitle,events,series,metrics,currency='CHF',storageKey,notice,metricKeys=[],composition,defaultTrendVisible}:{title:string;subtitle:string;events:readonly StatisticEvent[];series:readonly Series[];metrics:(totals:Record<string,number>)=>readonly Metric[];currency?:string;storageKey:string;notice?:string;metricKeys?:readonly string[];composition?:{label:string;parts:readonly RingPart[]};defaultTrendVisible?:boolean}){
+export function Statistics({title,subtitle,events,series,metrics,currency='CHF',storageKey,notice,metricKeys=[],composition,defaultTrendVisible,hideHeading=false}:{hideHeading?:boolean;title:string;subtitle:string;events:readonly StatisticEvent[];series:readonly Series[];metrics:(totals:Record<string,number>)=>readonly Metric[];currency?:string;storageKey:string;notice?:string;metricKeys?:readonly string[];composition?:{label:string;parts:readonly RingPart[]};defaultTrendVisible?:boolean}){
  const id=useId();
  const [period,setPeriod]=useState<StatisticPeriod>({months:6,from:'',to:''});
- const [restored,setRestored]=useState(false),[open,setOpen]=useState(false),[draft,setDraft]=useState(period),[selected,setSelected]=useState<string|null>(null);
+ const [restored,setRestored]=useState(false),[selected,setSelected]=useState<string|null>(null);
  const [showTrend,setShowTrend]=useState(defaultTrendVisible??!composition);
  const [showMoreMetrics,setShowMoreMetrics]=useState(false);
  const today=businessDate();
  useEffect(()=>{let saved:StatisticPeriod|undefined;try{saved=JSON.parse(sessionStorage.getItem('binso.statistics:'+storageKey)??'null')??undefined;}catch{}let active=true;queueMicrotask(()=>{if(!active)return;if(saved&&statisticBounds(saved,businessDate()))setPeriod(saved);setRestored(true)});return()=>{active=false}},[storageKey]);
  useEffect(()=>{if(restored)try{sessionStorage.setItem('binso.statistics:'+storageKey,JSON.stringify(period))}catch{}},[period,restored,storageKey]);
- const bounds=statisticBounds(period,today),pending=statisticBounds(draft,today);
+ const bounds=statisticBounds(period,today);
  const aggregated=aggregateStatistics(events,bounds??{from:'',to:''},[...new Set([...series.map(item=>item.key),...metricKeys])]);
  const active=aggregated.buckets.find(bucket=>bucket.key===selected),kpis=metrics(aggregated.totals);
  const value=(amount:number,format:Metric['format']='money')=>format==='number'?amount.toLocaleString('de-CH'):formatCurrency(amount,currency);
  const hasEntries=events.some(event=>bounds&&event.date>=bounds.from&&event.date<=bounds.to);
+ const hasTrend=hasEntries&&aggregated.buckets.some(bucket=>series.some(item=>bucket.values[item.key]!==0));
  const choose=(next:StatisticPeriod)=>{setPeriod(next);setSelected(null)};
  return <section className="bo-statistics" aria-labelledby={id}>
-  <header className="bo-statistics-heading"><div><h2 id={id}><LocalizedText>{title}</LocalizedText></h2><p><LocalizedText>{subtitle}</LocalizedText></p></div><LocalizedElement as="div" className="bo-statistics-periods" role="group" aria-label="Statistikzeitraum">{statisticPeriods.map(months=><button type="button" key={months} aria-pressed={period.months===months} onClick={()=>choose({...period,months})}>{months}<LocalizedText>{" M"}</LocalizedText></button>)}<LocalizedElement as="button" type="button" aria-label="Eigenen Statistikzeitraum wählen" aria-pressed={period.months==='custom'} onClick={()=>{setDraft(period.months==='custom'?period:{months:'custom',from:bounds?.from??today,to:bounds?.to??today});setOpen(true)}}><Icon name="calendar" size={18}/></LocalizedElement></LocalizedElement></header>
+  <header className="bo-statistics-heading"><div className={hideHeading?"visually-hidden":undefined}><h2 id={id}><LocalizedText>{title}</LocalizedText></h2>{subtitle&&<p><LocalizedText>{subtitle}</LocalizedText></p>}</div><StatisticPeriodPicker period={period} onChange={choose}/></header>
   <p className="bo-statistics-dates">{bounds?.from.split('-').reverse().join('.')} – {bounds?.to.split('-').reverse().join('.')}</p>
   <MetricTiles columns={Math.min(4,Math.max(2,kpis.length)) as 2|3|4}>{kpis.slice(0,4).map(metric=><MetricTile key={metric.label} label={metric.label} value={metric.format==='number'?value(metric.value,'number'):metric.value} currency={metric.format==='number'?undefined:currency} hint={metric.hint}/>)}</MetricTiles>
   {kpis.length>4&&<><Button variant="ghost" aria-expanded={showMoreMetrics} aria-controls={id+'-more-metrics'} onClick={()=>setShowMoreMetrics(value=>!value)}><LocalizedText>{showMoreMetrics?'Weniger anzeigen':'Mehr anzeigen'}</LocalizedText></Button><div id={id+'-more-metrics'} hidden={!showMoreMetrics}><MetricTiles>{kpis.slice(4).map(metric=><MetricTile key={metric.label} label={metric.label} value={metric.format==='number'?value(metric.value,'number'):metric.value} currency={metric.format==='number'?undefined:currency} hint={metric.hint}/>)}</MetricTiles></div></>}
   {notice&&<details className="bo-statistics-notice"><summary><LocalizedText>{"Datenhinweise"}</LocalizedText></summary><p><LocalizedText>{notice}</LocalizedText></p></details>}
-  {composition&&<RingChart label={composition.label} currency={currency} parts={composition.parts}/>}{(composition||defaultTrendVisible===false)&&<button type="button" className="text-action" aria-expanded={showTrend} aria-controls={id+"-trend"} onClick={()=>setShowTrend(value=>!value)}><LocalizedText>{showTrend?"Zeitverlauf ausblenden":"Zeitverlauf anzeigen"}</LocalizedText></button>}
+  {composition&&<RingChart label={composition.label} currency={currency} parts={composition.parts}/>}{hasTrend&&(composition||defaultTrendVisible===false)&&<button type="button" className="text-action" aria-expanded={showTrend} aria-controls={id+"-trend"} onClick={()=>setShowTrend(value=>!value)}><LocalizedText>{showTrend?"Zeitverlauf ausblenden":"Zeitverlauf anzeigen"}</LocalizedText></button>}
   <div id={id+"-trend"} hidden={!showTrend}>
-  <LineChart buckets={aggregated.buckets} series={series} selected={selected} onSelect={setSelected} value={value}/>
-  <div className="bo-statistics-legend">{series.map(item=><span key={item.key}><i className={'bo-statistics-'+item.tone}/><LocalizedText>{item.label}</LocalizedText></span>)}</div>
+  {hasTrend?<LineChart buckets={aggregated.buckets} series={series} selected={selected} onSelect={setSelected} value={value}/>:null}
+  {hasTrend&&<div className="bo-statistics-legend">{series.map(item=><span key={item.key}><i className={'bo-statistics-'+item.tone}/><LocalizedText>{item.label}</LocalizedText></span>)}</div>}
   </div>
-  {(showTrend||!hasEntries)&&<p className="bo-statistics-detail" role="status"><LocalizedText>{active?active.label+': '+series.map(item=>item.label+' '+value(active.values[item.key])).join(' · '):hasEntries?'Datenpunkt auswählen für Details.':'Keine Buchungen im gewählten Zeitraum.'}</LocalizedText></p>}
-  <FilterSheet label="Statistikzeitraum" open={open} onClose={()=>setOpen(false)}><p><LocalizedText>{"Beide Tage sind eingeschlossen."}</LocalizedText></p><div className="form-grid two"><Field allowReadOnlyInput label="Von *"><Input type="date" required min="1900-01-01" max={draft.to||'9998-12-31'} value={draft.from} onChange={event=>setDraft({...draft,months:'custom',from:event.target.value})}/></Field><Field allowReadOnlyInput label="Bis *"><Input type="date" required min={draft.from||'1900-01-01'} max="9998-12-31" value={draft.to} onChange={event=>setDraft({...draft,months:'custom',to:event.target.value})}/></Field></div>{!pending&&<ErrorState><LocalizedText>{"Bitte einen gültigen Zeitraum wählen. Beginn darf nicht nach Ende liegen."}</LocalizedText></ErrorState>}<FormActions sheet><Button variant="secondary" onClick={()=>setOpen(false)}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button disabled={!pending} onClick={()=>{choose({...draft,months:'custom'});setOpen(false)}}><LocalizedText>{"Anwenden"}</LocalizedText></Button></FormActions></FilterSheet>
+  {(showTrend||!hasTrend)&&<p className="bo-statistics-detail" role="status"><LocalizedText>{active?active.label+': '+series.map(item=>item.label+' '+value(active.values[item.key])).join(' · '):hasTrend?'Datenpunkt auswählen für Details.':'Keine Entwicklung im Zeitraum'}</LocalizedText></p>}
+
  </section>;
+}
+
+/** One period control for customer, finance and ledger charts. Inclusive validation. */
+export function StatisticPeriodPicker({period,onChange}:{period:StatisticPeriod;onChange:(period:StatisticPeriod)=>void}){
+ const [open,setOpen]=useState(false),[draft,setDraft]=useState(period);
+ const today=businessDate(),bounds=statisticBounds(period,today),pending=statisticBounds(draft,today);
+ const choose=onChange;
+ return <><LocalizedElement as="div" className="bo-statistics-periods" role="group" aria-label="Statistikzeitraum">{statisticPeriods.map(months=><button type="button" key={months} aria-pressed={period.months===months} onClick={()=>choose({...period,months})}>{months}<LocalizedText>{" M"}</LocalizedText></button>)}<LocalizedElement as="button" type="button" aria-label="Eigenen Statistikzeitraum wählen" aria-pressed={period.months==='custom'} onClick={()=>{setDraft(period.months==='custom'?period:{months:'custom',from:bounds?.from??today,to:bounds?.to??today});setOpen(true)}}><Icon name="calendar" size={18}/></LocalizedElement></LocalizedElement>
+  <FilterSheet label="Statistikzeitraum" open={open} onClose={()=>setOpen(false)}><p><LocalizedText>{"Beide Tage sind eingeschlossen."}</LocalizedText></p><div className="form-grid two"><Field allowReadOnlyInput label="Von *"><Input type="date" required min="1900-01-01" max={draft.to||'9998-12-31'} value={draft.from} onChange={event=>setDraft({...draft,months:'custom',from:event.target.value})}/></Field><Field allowReadOnlyInput label="Bis *"><Input type="date" required min={draft.from||'1900-01-01'} max="9998-12-31" value={draft.to} onChange={event=>setDraft({...draft,months:'custom',to:event.target.value})}/></Field></div>{!pending&&<ErrorState><LocalizedText>{"Bitte einen gültigen Zeitraum wählen. Beginn darf nicht nach Ende liegen."}</LocalizedText></ErrorState>}<FormActions sheet><Button variant="secondary" onClick={()=>setOpen(false)}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button disabled={!pending} onClick={()=>{choose({...draft,months:'custom'});setOpen(false)}}><LocalizedText>{"Anwenden"}</LocalizedText></Button></FormActions></FilterSheet>
+ </>;
 }

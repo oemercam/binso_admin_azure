@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import pg from 'pg';
-import {moduleUrl,financialModuleUrl} from './data-test-modules.mjs';
+import {moduleUrl,financialModuleUrl,localeTestModuleUrl} from './data-test-modules.mjs';
 // Deliberately accept only this disposable localhost test database. No DATABASE_URL
 // fallback, production credentials, schema reset or destructive cleanup is used.
 const address=process.env.BINSO_DB_PARALLEL_TEST_URL;
@@ -29,7 +29,9 @@ try{
  const scopedDb=moduleUrl('export async function query(sql,args){return globalThis.__binsoParallelPool.query(sql,args)} export async function withTenant(org,user,fn){const c=await globalThis.__binsoParallelPool.connect();try{await c.query("begin");await c.query("select set_config(\'app.organization_id\',$1,true),set_config(\'app.user_id\',$2,true)",[org,user]);const value=await fn(c);await c.query("commit");return value}catch(e){await c.query("rollback");throw e}finally{c.release()}}');
  const planService=await compile('lib/server/plan-access.ts',{'@/lib/server/db':scopedDb,'@/config/plan-access':plans,'@/config/plans':planCatalogModuleUrl,'./http':http});
  const rbac=await compile('lib/server/rbac.ts',{'@/lib/permissions':permissions});
- const process=await import(await compile('lib/server/document-process.ts',{'@/lib/qr-bill':qr,'@/lib/financial-status':financialModuleUrl,'@/lib/server/plan-access':planService,'./http':http,'./rbac':rbac,'./audit':audit}));
+ const pdfModule=await compile('lib/server/document-pdf.ts',{'@/lib/locales':await localeTestModuleUrl(),'pdfkit':import.meta.resolve('pdfkit'),'swissqrbill/pdf':import.meta.resolve('swissqrbill/pdf'),'@/lib/qr-bill':qr,'@/lib/financial-status':financialModuleUrl});
+ const versionsModule=await compile('lib/server/offer-versions.ts',{'./http':http,'./repositories/business-api':businessModule,'./document-pdf':pdfModule,'./document-logo':moduleUrl('export async function documentLogo(){return undefined}')});
+ const process=await import(await compile('lib/server/document-process.ts',{'./offer-versions':versionsModule,'@/lib/qr-bill':qr,'@/lib/financial-status':financialModuleUrl,'@/lib/server/plan-access':planService,'./http':http,'./rbac':rbac,'./audit':audit}));
  const organizationId='00000000-0000-4000-8000-000000000099';
  await pool.query("insert into organization_subscriptions(organization_id,plan,status) values($1,'professional','active') on conflict(organization_id) do update set plan='professional',status='active'",[organizationId]);
  const session={organizationId,userId:'v213-parallel-fixture',name:'Concurrency fixture',role:'owner'};
@@ -72,7 +74,7 @@ try{
  assert.equal(new Set(ids.map(row=>row.number)).size,10);assert.equal(new Set(ids.map(row=>row.id)).size,10);
  const replayArgs={...args,p_idempotency_key:'parallel-document-replay'};
  const replays=await Promise.all(Array.from({length:6},()=>txn(c=>business.mutateApiBusiness(c,session,'create_document_atomic',replayArgs))));assert.equal(new Set(replays.map(row=>row.id)).size,1);
- const offerRevisionModule=await compile('lib/server/offer-revisions.ts',{'./http':http,'./rbac':rbac,'./plan-access':planService,'./business-idempotency':replay,'./audit':audit,'./repositories/business-api':businessModule,'@/lib/financial-status':financialModuleUrl,'@/config/domain':moduleUrl(await fs.readFile('config/domain.ts','utf8'))});
+ const offerRevisionModule=await compile('lib/server/offer-revisions.ts',{'./offer-versions':versionsModule,'./http':http,'./rbac':rbac,'./plan-access':planService,'./business-idempotency':replay,'./audit':audit,'./repositories/business-api':businessModule,'@/lib/financial-status':financialModuleUrl,'@/config/domain':moduleUrl(await fs.readFile('config/domain.ts','utf8'))});
  const {createOfferRevision}=await import(offerRevisionModule);
  const sourceOffer=await txn(c=>business.mutateApiBusiness(c,session,'create_document_atomic',{p_kind:'offer',p_customer_id:customer.id,p_number:'',p_issue_date:'2026-10-09',p_valid_until:'2099-12-31',p_currency:'CHF',p_vat_rate:8.1,p_note:'Parallel offer revision fixture',p_items:[{description:'Synthetic item',quantity:1,unit_price:100,vat_rate:8.1}],p_idempotency_key:'parallel-offer-source'}));
  await txn(c=>process.changeDocumentStatus(c,session,sourceOffer.number,'issue',''));

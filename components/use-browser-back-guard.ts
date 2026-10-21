@@ -2,7 +2,7 @@
 
 import {useLayoutEffect,useRef} from "react";
 
-type DraftGuard={blocked:()=>void;protectUnload:()=>boolean};
+type DraftGuard={blocked:()=>void;protectUnload:()=>boolean;navigate?:(url:string)=>void};
 const guards=new Set<DraftGuard>();
 let boundary:{release:()=>void;allow:()=>void;cleanup:()=>void}|null=null;
 
@@ -18,8 +18,16 @@ function armBoundary(){
   if(leaving||location.href!==url||event.state?.binsoDraftBoundary===owner)return;
   event.stopImmediatePropagation();history.pushState(state,"",url);[...guards].at(-1)?.blocked();
  };
- const detach=()=>{window.removeEventListener("popstate",back,true);window.removeEventListener("beforeunload",unload)};
- window.addEventListener("popstate",back,true);window.addEventListener("beforeunload",unload);
+ const click=(event:MouseEvent)=>{
+  if(leaving||event.defaultPrevented||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
+  const anchor=event.target instanceof Element?event.target.closest<HTMLAnchorElement>('a[href]'):null;
+  if(!anchor||anchor.download||anchor.target&&anchor.target!=='_self')return;
+  const target=new URL(anchor.href,location.href),guard=[...guards].at(-1);
+  if(!guard?.navigate||!/^https?:$/.test(target.protocol)||target.href===location.href)return;
+  event.preventDefault();event.stopImmediatePropagation();guard.navigate(target.href);
+ };
+ const detach=()=>{window.removeEventListener("popstate",back,true);window.removeEventListener("beforeunload",unload);document.removeEventListener('click',click,true)};
+ window.addEventListener("popstate",back,true);window.addEventListener("beforeunload",unload);document.addEventListener('click',click,true);
  return {
   release:()=>{leaving=true;detach();history.go(-2)},
   allow:()=>{leaving=true;detach()},
@@ -33,15 +41,17 @@ function armBoundary(){
  };
 }
 
-export function useBrowserBackGuard(dirty:boolean,onBlocked:()=>void,protectUnload=true){
+export function useBrowserBackGuard(dirty:boolean,onBlocked:()=>void,protectUnload=true,onNavigate?:(url:string)=>void){
  // Register before paint: browser back may follow the input commit before passive effects run.
  const blocked=useRef(onBlocked);
  const unload=useRef(protectUnload);
+ const navigate=useRef(onNavigate),supportsNavigation=Boolean(onNavigate);
+ useLayoutEffect(()=>{navigate.current=onNavigate},[onNavigate]);
  useLayoutEffect(()=>{unload.current=protectUnload},[protectUnload]);
  useLayoutEffect(()=>{blocked.current=onBlocked},[onBlocked]);
  useLayoutEffect(()=>{
   if(!dirty)return;
-  const guard:DraftGuard={blocked:()=>blocked.current(),protectUnload:()=>unload.current};guards.add(guard);
+  const guard:DraftGuard={blocked:()=>blocked.current(),protectUnload:()=>unload.current,...(supportsNavigation?{navigate:(url:string)=>navigate.current?.(url)}:{})};guards.add(guard);
   if(!boundary)boundary=armBoundary();
   return()=>{
    guards.delete(guard);
@@ -52,7 +62,7 @@ export function useBrowserBackGuard(dirty:boolean,onBlocked:()=>void,protectUnlo
     queueMicrotask(()=>{if(!guards.size&&boundary===retiring){boundary=null;retiring?.cleanup()}});
    }
   };
- },[dirty]);
+ },[dirty,supportsNavigation]);
  return ()=>boundary?.release();
 }
 

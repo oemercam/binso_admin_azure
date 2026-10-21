@@ -7,6 +7,7 @@ import type {SessionUser} from "./session";
 import {ApiError} from "./http";
 import {authorize} from "./rbac";
 import {audit} from "./audit";
+import {sealOfferVersion} from './offer-versions';
 export async function lockDocument(c:PoolClient,s:SessionUser,number:string){
  for(const [table,column,kind] of [['invoices','invoice_no','invoice'],['quotes','quote_no','offer']] as const){
   const row=(await c.query(`select * from ${table} where organization_id=$1 and ${column}=$2 and archived_at is null for update`,[s.organizationId,number])).rows[0];
@@ -25,7 +26,7 @@ export async function changeDocumentStatus(c:PoolClient,s:SessionUser,number:str
  }else if(kind==='invoice'&&action==='cancel'&&['draft','sent','overdue'].includes(row.status)&&Number(row.paid_amount)===0)next='cancelled';
  else throw new ApiError(409,'transition_invalid','Dieser Statuswechsel ist nicht möglich.');
  if(next==='cancelled'&&(await c.query('select id from credit_notes where organization_id=$1 and invoice_id=$2 limit 1',[s.organizationId,row.id])).rowCount)throw new ApiError(409,'credit_exists','Eine Rechnung mit Gutschriften kann nicht storniert werden.');
- if(kind==='offer'&&action==='issue'&&row.revises_quote_id){
+ if(kind==='offer'&&action==='issue'&&row.revises_quote_id&&row.offer_version===1){
   const prior=(await c.query('select id,quote_no,status from quotes where organization_id=$1 and id=$2 and archived_at is null for update',[s.organizationId,row.revises_quote_id])).rows[0];
   if(!prior||!['sent','declined','expired'].includes(prior.status))throw new ApiError(409,'revision_source_changed','Die vorherige Angebotsversion wurde geändert. Bitte den Entwurf prüfen.');
   if((await c.query("select id from document_deliveries where organization_id=$1 and document_id=$2 and status='sending'",[s.organizationId,prior.id])).rowCount)throw new ApiError(409,'delivery_pending','Der Versand wird noch geprüft.');
@@ -33,6 +34,7 @@ export async function changeDocumentStatus(c:PoolClient,s:SessionUser,number:str
   await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'offer.superseded',entityType:'quote',entityId:prior.id,metadata:{revisionId:row.id,revisionNumber:number}});
  }
  await c.query(`update ${table} set status=$3,updated_at=now()${kind==='offer'&&['accept','decline'].includes(action)?',decision_at=now(),decision_by_user_id=$4,decision_note=$5':''} where organization_id=$1 and id=$2`,[s.organizationId,row.id,next,...(kind==='offer'&&['accept','decline'].includes(action)?[s.userId,note]:[])]);
+ if(kind==='offer'&&action==='issue')await sealOfferVersion(c,s,{...row,status:next});
 
  if(next==='cancelled'){await c.query('update time_entries set invoiced_invoice_id=null where organization_id=$1 and invoiced_invoice_id=$2',[s.organizationId,row.id]);await c.query('update expenses set invoiced_invoice_id=null where organization_id=$1 and invoiced_invoice_id=$2',[s.organizationId,row.id]);}
  await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'document.'+action,entityType:table,entityId:row.id,metadata:{previous:row.status,status:next,note}});

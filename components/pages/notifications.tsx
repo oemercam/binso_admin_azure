@@ -2,13 +2,15 @@
 
 import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
 import Link from "next/link";
-import {ActionRow,DetailTabs} from "../binso-ux";
+import {ActionRow,DetailTabs,SettingsGroup} from "../binso-ux";
 import {useApiQuery} from "@/lib/client/use-api-query";
 import { useState } from "react";
 import { AppShell } from "../app-shell";
-import { apiPatch, useBackendMode } from "@/lib/client/backend";
-import { EmptyState, Icon, LoadingState, ErrorState } from "../ui";
+import { apiPatch } from "@/lib/client/backend";
+import { Button, EmptyState, Icon, LoadingState, ErrorState } from "../ui";
 
+import {notificationGroups} from "@/lib/notification-groups";
+import {usePageAccess} from "@/lib/client/page-access";
 export type NotificationRecord={
   id:string;
   kind:string;
@@ -33,20 +35,14 @@ export function notificationDate(value:string){
 
 export function NotificationsPage() {
 
-  const [read,setRead]=useState<string[]>(["invoice","offer"]);
+  const access=usePageAccess();
+  const [busy,setBusy]=useState(false);
   const [view,setView]=useState<"all"|"unread">("all");
   const query=useApiQuery<{items:NotificationRecord[]}>("/api/notifications");
-  const remoteItems=query.data?.items??[];
+  const remoteItems=(query.data?.items??[]).filter(item=>!item.href||access.canOpen(item.href));
   const loading=query.loading;
   const [mutationError,setMutationError]=useState<string|null>(null);
   const error=mutationError??query.error;
-  const items=[
-    ["invoice","wallet","Rechnung bezahlt","Acme AG · RE-2026-019 · CHF 4’346.40","vor 12 Minuten","/rechnungen/RE-2026-019"],
-    ["support","support","Neue Support-Antwort","Ticket #5832 wurde beantwortet.","vor 1 Stunde","/support/5832"],
-    ["offer","file","Angebot angenommen","Acme AG · AN-2026-012","heute","/angebote/AN-2026-012"],
-    ["time","clock","Zeitmessung läuft","Website Redesign · Acme AG","seit 2 Stunden","/zeit"],
-  ];
-
   const load=()=>{setMutationError(null);query.refresh();};
   const markRead=async(id:string)=>{
     try{await apiPatch("/api/notifications/"+encodeURIComponent(id),{});setMutationError(null);}
@@ -62,19 +58,11 @@ export function NotificationsPage() {
         {loading&&remoteItems.length===0&&<LoadingState><LocalizedText>{"Benachrichtigungen werden geladen …"}</LocalizedText></LoadingState>}
         {error&&<ErrorState onRetry={load} retryLabel="Erneut laden"><LocalizedText>{error}</LocalizedText></ErrorState>}
         {!loading&&!error&&visible.length===0&&<EmptyState  title={view==="unread"?"Alles gelesen":"Noch keine Benachrichtigungen"} />}
-        {!error&&visible.length>0&&<div className="action-list">{visible.map(item=><ActionRow href={item.href||"/dashboard"} key={item.id} icon={notificationIcon(item.kind)} title={item.title} description={item.body} metadata={notificationDate(item.created_at)} endAdornment={!item.read_at?<LocalizedElement as="i" className="unread-dot" aria-label="Ungelesen"/>:undefined} onClick={()=>void markRead(item.id)}/>)}</div>}
+        {!error&&visible.length>0&&notificationGroups(visible).map(group=><SettingsGroup key={group.label} title={group.label}><div className="action-list">{group.items.map(item=><ActionRow href={item.href||"/dashboard"} key={item.id} icon={notificationIcon(item.kind)} title={item.title} description={item.body} metadata={notificationDate(item.created_at)} endAdornment={!item.read_at?<LocalizedElement as="i" className="unread-dot" aria-label="Ungelesen"/>:undefined} onClick={()=>void markRead(item.id)}/>)}</div></SettingsGroup>)}
+        {unreadCount>0&&<Button variant="secondary" disabled={busy} onClick={()=>{setBusy(true);void apiPatch("/api/notifications",{all:true}).then(()=>setMutationError(null)).catch(err=>setMutationError(err instanceof Error?err.message:"Aktualisierung fehlgeschlagen.")).finally(()=>setBusy(false));}}><LocalizedText>{"Alle als gelesen"}</LocalizedText></Button>}
         <Link className="notification-preferences" href="/einstellungen/benachrichtigungen"><Icon name="settings" size={17}/><span><LocalizedText>{"Benachrichtigungseinstellungen"}</LocalizedText></span><Icon name="arrow" size={15}/></Link>
       </div>
     </AppShell>;
   }
 
-  const visible=view==="all"?items:items.filter(([id])=>!read.includes(id));
-  const unreadCount=items.length-read.length;
-  return <AppShell title="Benachrichtigungen" subtitle="Wichtige Aktivitäten aus deinem Unternehmen." active="einstellungen">
-    <div className="notification-center">
-      <DetailTabs label="Benachrichtigungen"><button className={view==="all"?"active":""} onClick={()=>setView("all")}><LocalizedText>{"Alle"}</LocalizedText></button><button className={view==="unread"?"active":""} onClick={()=>setView("unread")}><LocalizedText>{"Ungelesen"}</LocalizedText><LocalizedText>{unreadCount>0?` (${unreadCount})`:""}</LocalizedText></button></DetailTabs>
-      {visible.length?<div className="action-list">{visible.map(([id,icon,title,text,time,href])=><ActionRow href={href} key={id} icon={icon} title={title} description={text} metadata={time} endAdornment={!read.includes(id)?<LocalizedElement as="i" className="unread-dot" aria-label="Ungelesen"/>:undefined} onClick={()=>setRead(current=>current.includes(id)?current:[...current,id])}/>)}</div>:<EmptyState  title="Alles gelesen" />}
-      <Link className="notification-preferences" href="/einstellungen/benachrichtigungen"><Icon name="settings" size={17}/><span><LocalizedText>{"Benachrichtigungseinstellungen"}</LocalizedText></span><Icon name="arrow" size={15}/></Link>
-    </div>
-  </AppShell>;
 }

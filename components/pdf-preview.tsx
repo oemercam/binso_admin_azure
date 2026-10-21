@@ -4,6 +4,7 @@ import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
 import {useEffect,useRef,useState} from "react";
 import type {PDFDocumentProxy} from "pdfjs-dist";
 import {Icon, ErrorState, LoadingState} from "./ui";
+import {useDialogFocus} from "./use-dialog-focus";
 
 function PdfPage({pdf,pageNumber,zoomed}: {pdf:PDFDocumentProxy;pageNumber:number;zoomed:boolean}) {
   const canvas=useRef<HTMLCanvasElement>(null);
@@ -82,3 +83,28 @@ function DocumentPages({pdf,zoomed}:{pdf:PDFDocumentProxy;zoomed:boolean}){
   const [pageNumber,setPageNumber]=useState(1);
   return <div className="document-page-viewer"><div className={`document-page-stage${zoomed?" is-zoomed":""}`}><PdfPage key={`${pageNumber}:${zoomed}`} pdf={pdf} pageNumber={pageNumber} zoomed={zoomed}/></div><LocalizedElement as="nav" className="document-page-navigation" aria-label="Dokumentseiten"><LocalizedElement as="button" type="button" className="icon-button" aria-label="Vorherige Seite" disabled={pageNumber<=1} onClick={()=>setPageNumber(value=>value-1)}><Icon name="back"/></LocalizedElement><span role="status" aria-live="polite"><LocalizedText>{"Seite "}</LocalizedText>{pageNumber}<LocalizedText>{" von "}</LocalizedText>{pdf.numPages}</span><LocalizedElement as="button" type="button" className="icon-button" aria-label="Nächste Seite" disabled={pageNumber>=pdf.numPages} onClick={()=>setPageNumber(value=>value+1)}><Icon name="arrow"/></LocalizedElement></LocalizedElement></div>;
 }
+
+export function DocumentModal({ title, onClose, pdfNumber, previewDraft, fileUrl, fileBlob, fileName }: { title:string; onClose:()=>void; pdfNumber?:string;previewDraft?:unknown;fileUrl?:string;fileBlob?:Blob;fileName?:string }) {
+  const [pdfBlob,setPdfBlob]=useState<Blob|null>(null);
+  const [pdfError,setPdfError]=useState<string|null>(null);
+  const pdfFile=useRef<File|null>(null);
+  const previewJson=JSON.stringify(previewDraft);
+  useEffect(()=>{
+    let active=true;
+    const controller=new AbortController(),timeout=window.setTimeout(()=>controller.abort(),20000);
+    const source=fileBlob?Promise.resolve(fileBlob):fetch(fileUrl??(pdfNumber?"/api/documents/"+encodeURIComponent(pdfNumber)+"/pdf":"/api/documents/preview"),{...(fileUrl||pdfNumber?{}:{method:"POST",headers:{"Content-Type":"application/json"},body:previewJson}),signal:controller.signal,cache:'no-store'}).then(async response=>{if(!response.ok)throw new Error("PDF konnte nicht geladen werden.");return response.blob()});
+    source.then(blob=>{if(!active)return;window.clearTimeout(timeout);pdfFile.current=new File([blob],(fileName||pdfNumber||"Entwurf")+".pdf",{type:"application/pdf"});setPdfBlob(blob)}).catch(()=>{if(active)setPdfError("PDF konnte nicht geladen werden.")});
+    return()=>{active=false;window.clearTimeout(timeout);controller.abort();pdfFile.current=null};
+  },[pdfNumber,previewJson,fileUrl,fileBlob,fileName]);
+  const [zoomed,setZoomed]=useState(false);
+  const modalDialog=useDialogFocus(true,onClose);
+  const share=async()=>{
+    if(pdfFile.current&&navigator.canShare?.({files:[pdfFile.current]})){try{await navigator.share({title,files:[pdfFile.current]})}catch{/* share dialog closed */}return;}
+    if(pdfBlob){const url=URL.createObjectURL(pdfBlob);const link=document.createElement("a");link.href=url;link.download=(fileName||pdfNumber||"Entwurf")+".pdf";link.click();window.setTimeout(()=>URL.revokeObjectURL(url),1000);}
+  };
+  return <LocalizedElement as="section" ref={modalDialog} tabIndex={-1} className="document-modal" role="dialog" aria-modal="true" aria-label={title}>
+    <header><span className="document-modal-header-spacer" aria-hidden="true"/><strong><LocalizedText>{title}</LocalizedText></strong><div className="document-modal-header-actions"><LocalizedElement as="button" type="button" aria-label={zoomed?"Auf Bildschirm einpassen":"Vorschau vergrössern"} aria-pressed={zoomed} onClick={()=>setZoomed(value=>!value)}><Icon name="search"/></LocalizedElement><LocalizedElement as="button" type="button" disabled={!pdfBlob} aria-label="Teilen oder herunterladen" onClick={()=>void share()}><Icon name="upload"/></LocalizedElement><LocalizedElement as="button" type="button" aria-label="Vorschau schliessen" onClick={onClose}><Icon name="close"/></LocalizedElement></div></header>
+    <div className="document-modal-body">{pdfError?<ErrorState><LocalizedText>{pdfError}</LocalizedText></ErrorState>:pdfBlob?<DocumentPageViewer key={previewJson+String(pdfNumber)} file={pdfBlob} zoomed={zoomed}/>:<LoadingState><LocalizedText>{"PDF wird geladen …"}</LocalizedText></LoadingState>}</div>
+  </LocalizedElement>;
+}
+

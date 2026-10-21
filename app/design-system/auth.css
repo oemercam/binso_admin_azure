@@ -46,12 +46,8 @@
 .auth-options .form-link a,.auth-card .auth-bottom a{color:var(--app-accent)}
 .auth-passkey{display:grid}
 .auth-workspace .auth-card .auth-bottom{margin-top:25px;font-size:var(--type-label);text-align:left}
-.registration-sheet h3{margin:0 0 var(--heading-content-gap);font-size:var(--type-section)}
-.registration-sheet p{overflow-wrap:anywhere}
-.registration-summary{margin:0;display:grid;gap:var(--field-group-gap)}
-.registration-summary dt{color:var(--color-muted);font-size:var(--type-label)}
-.registration-summary dd{margin:0;overflow-wrap:anywhere}
-.registration-summary dd p:first-child{margin-top:0}
+.registration-page h2{margin:0 0 var(--heading-content-gap);font-size:var(--type-section)}
+.registration-page p{overflow-wrap:anywhere}
 .registration-legal-links{display:flex;flex-wrap:wrap;gap:var(--field-group-gap)}
 .auth-workspace :focus-visible{outline-color:var(--app-accent)}
 .auth-workspace{

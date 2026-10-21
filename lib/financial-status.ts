@@ -14,6 +14,14 @@ export function financialStatus(document:FinancialDocument,today=businessDate())
  return paymentStatus(document);
 }
 export const financialStatusLabels:Record<string,string>={draft:'Entwurf',sent:'Versendet',accepted:'Angenommen',declined:'Abgelehnt',revised:'Überarbeitet',expired:'Abgelaufen',open:'Offen',partial:'Teilweise bezahlt',paid:'Bezahlt',overdue:'Überfällig',cancelled:'Storniert'};
+/** One tone contract for document list, detail and compact summaries. */
+export function financialStatusTone(document:FinancialDocument,state=financialStatus(document)):'neutral'|'info'|'success'|'warning'|'danger'{
+ if(state==='accepted'||state==='paid')return 'success';
+ if(state==='declined'||state==='overdue'||state==='cancelled')return 'danger';
+ if(state==='sent'&&document.kind==='offer')return 'info';
+ if(['open','partial','in_progress'].includes(state))return 'warning';
+ return 'neutral';
+}
 export function formatCurrency(value:unknown,currency='CHF'){return `${currency} ${Number(value??0).toLocaleString('de-CH',{minimumFractionDigits:2,maximumFractionDigits:2}).replaceAll('’',"'")}`;}
 export function formatDate(value:unknown){const date=String(value??'').slice(0,10);return /^\d{4}-\d{2}-\d{2}$/.test(date)?date.split('-').reverse().join('.'):'';}
 export function documentDateLabel(document:FinancialDocument,today=businessDate()){

@@ -26,7 +26,7 @@ const pool=new Pool({
 
 const quoted=value=>'"'+String(value).replaceAll('"','""')+'"';
 const sensitiveKey=/(password|secret|token|recovery|hash|encryption|sas|credential|passkey|challenge|auth_snapshot|public_key)/i;
-function exportableTable(table){return table!=="organizations"&&!table.startsWith('auth_');}
+function exportableTable(table){return table!=="organizations"&&!table.startsWith('auth_')&&table!=='offer_recipient_codes';}
 function sanitize(value){
   if(value instanceof Date)return value.toISOString();
   if(Buffer.isBuffer(value))return {encoding:"base64",value:value.toString("base64")};
@@ -108,7 +108,7 @@ async function exportOrganization(client){
     organizationId,
     generatedAt:new Date().toISOString(),
     tables:counts,
-    excludedAuthenticationTables:tables.filter(table=>table.startsWith('auth_')),
+    excludedAuthenticationTables:tables.filter(table=>table.startsWith('auth_')||table==='offer_recipient_codes'),
     note:"Authentication credentials, password hashes, secrets, tokens and recovery material are intentionally excluded."
   };
   await fs.writeFile(path.join(root,"manifest.json"),JSON.stringify(manifest,null,2),{mode:0o600});

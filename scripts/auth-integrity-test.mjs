@@ -79,12 +79,16 @@ try{
  const password='Synthetic-integrity-password-123',hash=await passwords.hashPassword(password),user='auth-integrity-fixture',org='00000000-0000-4000-8000-000000000099';
  await query("insert into app_users(id,email,display_name,status,password_hash,email_verified_at) values($1,'integrity@fixture.invalid','Synthetic Auth','active',$2,now())",[user,hash]);
  await query("insert into organization_memberships(organization_id,user_id,email,role,status) values($1,$2,'integrity@fixture.invalid','owner','active')",[org,user]);
+ const seedFreshSession=()=>query("insert into auth_sessions(id,user_id,organization_id,token_hash,expires_at,step_up_at) values('00000000-0000-4000-8000-000000000081',$1,$2,'synthetic-current-proof',now()+interval '1 hour',now()) on conflict(id) do update set step_up_at=now(),expires_at=now()+interval '1 hour'",[user,org]);
  const setup=await import(await load('app/api/auth/mfa/setup/route.ts')),confirm=await import(await load('app/api/auth/mfa/confirm/route.ts'));
+ assert.equal((await setup.POST(req({}))).status,403,'Authenticator setup cannot bypass fresh authentication');
+ await seedFreshSession();
  const staged=await setup.POST(req({}));assert.equal(staged.status,200);const secret=(await staged.json()).secret;
  await query("insert into auth_sessions(id,user_id,organization_id,token_hash,expires_at) values('00000000-0000-4000-8000-000000000082',$1,$2,'synthetic-token-hash',now()+interval '1 hour')",[user,org]);
  assert.equal((await confirm.POST(req({code:'nototp'}))).status,400);
  const enabled=await confirm.POST(req({code:totp.totp(secret)}));assert.equal(enabled.status,200);assert.ok(lockObserved,'Confirmation reads and verifies the locked pending factor');const recovery=(await enabled.json()).recoveryCodes;assert.equal(recovery.length,8);
- assert.equal((await query('select count(*)::int n from auth_sessions where user_id=$1',[user])).rows[0].n,0,'Other sessions revoked on enrollment');
+ assert.equal((await query('select count(*)::int n from auth_sessions where user_id=$1',[user])).rows[0].n,1,'Only the authenticated current session survives enrollment');
+ await seedFreshSession();
  const factor=(await query('select mfa_secret_enc from app_users where id=$1',[user])).rows[0].mfa_secret_enc;
  assert.equal((await setup.POST(req({}))).status,409,'Enabled factor cannot be replaced by setup');assert.equal((await confirm.POST(req({code:totp.totp(secret)}))).status,409,'Enabled factor cannot be replaced by confirm');assert.equal((await query('select mfa_secret_enc from app_users where id=$1',[user])).rows[0].mfa_secret_enc,factor);
  assert.equal(crypto.decryptSecret(factor),secret);
@@ -106,6 +110,7 @@ try{
  assert.equal(cookieSets,cookiesBeforeStaleLogin,'Rejected stale authentication never publishes a new session cookie');
  console.log(JSON.stringify({probe:'stale-login-after-committed-password-reset',status:staleLogin.status,persistedSessionsAfterReset:lateSessions,synthetic:true}));
  assert.equal((await login.POST(req({email:'integrity@fixture.invalid',password:thirdPassword,mfaCode:totp.totp(secret)}))).status,200,'Fresh credential proof still creates a real session');
+ await seedFreshSession();
  const finalToken=await tokens.createAuthToken({type:'password_reset',email:'integrity@fixture.invalid',userId:user,ttlMinutes:10});
  const finalPassword='Synthetic-final-password-after-reset-012';
  const staleChange=await raceAfterRead(sql=>sql==='select password_hash from app_users where id=$1',()=>reset.PATCH(req({currentPassword:thirdPassword,password:'Synthetic-stale-password-must-not-win-345'})),async()=>assert.equal((await reset.PATCH(req({token:finalToken,password:finalPassword}))).status,200));
@@ -198,6 +203,29 @@ try{
   assert.equal((await files.GET({nextUrl:new URL('https://fixture.invalid/api/files?customerId='+supportCases[0])})).status,403,'Forbidden relation filters are rejected before selecting files');
   assert.equal((await files.POST(supportUpload(supportCases[1],'support-other-user'))).status,404,'Time-only rejects another user case');
   assert.equal((await files.POST(supportUpload(supportCases[2],'support-other-tenant'))).status,404,'Time-only rejects another tenant case');
+
+  const removal=await import(await load('app/api/files/[id]/route.ts'));
+  const attachment=(await query("select id from file_objects where support_case_id=$1 order by created_at limit 1",[supportCases[0]])).rows[0].id;
+  const context={params:Promise.resolve({id:attachment})};
+  const removeRequest=()=>new Request('https://fixture.invalid/api/files/'+attachment,{method:'DELETE'});
+  globalThis.__integrity.getSession=()=>({...supportSession(),role:'member',userId:'another-support-user'});
+  assert.equal((await removal.DELETE(removeRequest(),context)).status,403,'Another uploader cannot remove an attachment');
+  globalThis.__integrity.getSession=()=>({...supportSession(),organizationId:foreignOrg});
+  assert.equal((await removal.DELETE(removeRequest(),context)).status,404,'Foreign tenant cannot remove an attachment');
+  globalThis.__integrity.getSession=()=>({...supportSession(),role:'member',moduleProfile:'time_only'});
+  assert.equal((await removal.DELETE(removeRequest(),context)).status,200,'Own permitted support attachment can be removed');
+  assert.equal((await removal.DELETE(removeRequest(),context)).status,200,'Repeated removal is idempotent');
+  assert.ok((await query('select archived_at from file_objects where id=$1',[attachment])).rows[0].archived_at);
+  assert.equal((await query('select count(*)::int n from file_contents where file_id=$1',[attachment])).rows[0].n,1,'Removal preserves retained file bytes');
+  assert.equal((await download.GET(removeRequest(),context)).status,404,'Archived attachment cannot be downloaded');
+  assert.ok(!(await (await files.GET({nextUrl:new URL('https://fixture.invalid/api/files')})).json()).items.some(item=>item.id===attachment),'Archived attachment is absent from active lists');
+  globalThis.__integrity.getSession=supportSession;
+  const archiveCustomer=(await query("insert into customers(organization_id,customer_no,external_id,name) values($1,$2,$2,'Synthetic archival customer') returning id",[org,'ARCH-'+randomUUID()])).rows[0].id;
+  const expense=(await query("insert into expenses(organization_id,customer_id,external_id,expense_date,description,category,status,created_by_user_id) values($1,$2,gen_random_uuid()::text,current_date,'Synthetic locked receipt','expense','approved',$3) returning id",[org,archiveCustomer,user])).rows[0].id;
+  const receipt=(await query("insert into file_objects(organization_id,object_key,original_name,content_type,size_bytes,sha256,scan_status,created_by,purpose,expense_id) values($1::uuid,$1::text||'/files/'||$2,'receipt.txt','text/plain',0,repeat('0',64),'clean',$3,'expense_receipt',$4) returning id",[org,randomUUID(),user,expense])).rows[0].id;
+  assert.equal((await removal.DELETE(removeRequest(),{params:Promise.resolve({id:receipt})})).status,409,'Approved expense evidence cannot be removed');
+  assert.equal((await query('select archived_at from file_objects where id=$1',[receipt])).rows[0].archived_at,null);
+  assert.equal((await removal.DELETE(removeRequest(),{params:Promise.resolve({id:pendingLogoId})})).status,403,'Branding cannot be removed through attachment API');
  }finally{globalThis.__integrity.getSession=supportSession;}
  console.log((native?'PostgreSQL physical parallel clients':'Isolated PGlite')+': auth races, upload replay, strict/default quarantine, explicit development access without verdict mutation, rejected/auth/tenant denial, standard/time-only support attachment boundaries and branding policy passed.');
 }finally{delete globalThis.__integrity;if(native)await db.end();else await db.close();}

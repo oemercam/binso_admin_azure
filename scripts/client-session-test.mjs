@@ -49,10 +49,15 @@ try{
  const get=route.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='GET').getText(route);
  const compiled=ts.transpileModule(get,{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText;
  const exports={};const env={databaseUrl:'postgres://fixture'};
- Function('exports','getSession','getOrganizationPlan','cookies','json','env',compiled)(exports,async()=>null,async()=>'business',async()=>({get:()=>({value:'1'})}),value=>value,env);
+ let routeSession=null;
+ Function('exports','getSession','getOrganizationPlan','cookies','json','env',compiled)(exports,async()=>routeSession,async()=>'business',async()=>({get:()=>({value:'1'})}),value=>value,env);
  assert.equal((await exports.GET()).authenticated,false,'An expired database demo must never regain fake owner permissions through its marker cookie');
  env.databaseUrl='';assert.equal((await exports.GET()).authenticated,false,'No database and a forged preview cookie cannot authenticate');
  console.log('Expired database demo is unauthenticated; static cookie preview remains unauthenticated.');
+ routeSession={role:'owner',userId:'fixture',organizationId:'fixture-org',mfaEnabled:false};
+ assert.equal((await exports.GET()).security.enrollmentRequired,false,'21 October approval: owner workspace access does not require optional TOTP');
+ routeSession={...routeSession,mfaEnabled:true};assert.equal((await exports.GET()).security.enrollmentRequired,false,'Completed MFA is immediately reflected by the server');
+ routeSession={...routeSession,role:'member',mfaEnabled:false};assert.equal((await exports.GET()).security.enrollmentRequired,false,'Non-privileged users are not forced into the privileged gate');
  window.localStorage={removeItem(){throw new DOMException('blocked','SecurityError')},setItem(){throw new DOMException('blocked','SecurityError')}};
  assert.equal(backend.isProductionBackendEnabled(),true,'Blocked browser storage defers to authenticated server APIs');
  globalThis.fetch=async()=>new Response(JSON.stringify({ok:true}));await backend.logoutClientSession();assert.equal(cache.cachedClientSession(),null,'Blocked storage cannot prevent confirmed logout and the private-memory fence');window.localStorage=local;
@@ -71,5 +76,20 @@ try{
  let deliverExport;globalThis.fetch=()=>new Promise(resolve=>{deliverExport=resolve});const obsoleteExport=backend.apiGetFile('/api/reports?format=csv','text/csv');cache.invalidateClientSession();deliverExport(new Response('private old tenant CSV',{headers:csvHeaders}));await assert.rejects(obsoleteExport,error=>error.code==='session_changed');
  let body;globalThis.fetch=async()=>new Response(new ReadableStream({start(controller){body=controller}}),{headers:csvHeaders});const lateExport=backend.apiGetFile('/api/reports?format=csv','text/csv');await Promise.resolve();cache.invalidateClientSession();body.enqueue(new TextEncoder().encode('private late CSV'));body.close();await assert.rejects(lateExport,error=>error.code==='session_changed');
  console.log('File exports: verified CSV content/name, private request, HTTP errors, expired sessions, wrong MIME and tenant changes before/after headers passed.');
+
+ window.setTimeout=setTimeout;window.clearTimeout=clearTimeout;
+ let proofRequest=null,attempts=0;
+ window.dispatchEvent=event=>{if(event.type==='binso-fresh-authentication')proofRequest=event.detail;};
+ globalThis.fetch=async()=>{attempts++;return attempts===1?new Response(JSON.stringify({error:'fresh_authentication_required'}),{status:403}):Response.json({ok:true})};
+ const protectedChange=backend.apiPatch('/api/settings/documents',{iban:'synthetic'});
+ for(let i=0;i<20&&!proofRequest;i++)await new Promise(setImmediate);
+ assert.ok(proofRequest);assert.equal(attempts,1,'A pre-mutation denial cannot retry until explicitly confirmed');
+ proofRequest.confirm();await protectedChange;assert.equal(attempts,2,'The explicitly confirmed mutation is retried exactly once');
+ proofRequest=null;attempts=0;globalThis.fetch=async()=>{attempts++;return new Response(JSON.stringify({error:'fresh_authentication_required'}),{status:403})};
+ const cancelledChange=backend.apiPatch('/api/settings/documents',{});const cancellation=assert.rejects(cancelledChange,error=>error.code==='fresh_authentication_cancelled');
+ for(let i=0;i<20&&!proofRequest;i++)await new Promise(setImmediate);assert.ok(proofRequest);proofRequest.cancel();await cancellation;assert.equal(attempts,1,'Cancellation never repeats a write');
+ proofRequest=null;attempts=0;globalThis.fetch=async()=>{attempts++;throw new Error('synthetic network outage')};await assert.rejects(backend.apiPatch('/api/settings/documents',{}),error=>error.code==='network_unavailable');assert.equal(attempts,1);assert.equal(proofRequest,null,'An uncertain transport failure is not a fresh-auth denial');
+ const events=await import(eventsUrl),beforeProof=events.dataRevision([]);globalThis.fetch=async()=>Response.json({ok:true});await backend.apiPost('/api/auth/reauthenticate',{action:'confirm',password:'synthetic',code:'000000'});assert.equal(events.dataRevision([]),beforeProof,'A proof does not invalidate the original pending mutation identity fence');
+ console.log('Fresh confirmation: explicit continuation only, one replay, cancellation and network denial without retry, and stable identity fence passed.');
 
 }finally{globalThis.BroadcastChannel=originalBroadcastChannel;globalThis.fetch=originalFetch;delete globalThis.window;delete globalThis.document;}

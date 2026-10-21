@@ -12,7 +12,7 @@ import {clearClientSession} from "@/lib/client/backend";
 import {safeAppPath} from "@/lib/navigation";
 import {PasskeyLogin} from '@/components/passkey-login';
 
-type Stage="credentials"|"email"|"totp"|"verify";
+type Stage="credentials"|"totp"|"verify";
 
 export default function Login(){
   const pending=useRef(false);
@@ -29,7 +29,7 @@ export default function Login(){
     clearClientSession();
     const explicitNext=new URLSearchParams(window.location.search).get("next");
     const next=explicitNext?nextPath():safeAppPath(payload.next,nextPath());
-    window.location.replace(payload.mfaSetupRequired===true&&!next.startsWith("/einstellungen/sicherheit?setup=1")?`/einstellungen/sicherheit?setup=1&next=${encodeURIComponent(next)}`:next);
+    window.location.replace(next);
   };
 
   const loginRequest=async(extra:Record<string,string>={})=>{
@@ -38,7 +38,8 @@ export default function Login(){
     if(response.status===202){
       setCode("");
       if(payload.requiresEmailVerification)setStage("verify");
-      else setStage(payload.mfaMethod==="totp"?"totp":"email");
+      else if(payload.mfaMethod==="totp")setStage("totp");
+      else throw new Error("Die Anmeldung konnte nicht eindeutig bestätigt werden.");
       return;
     }
     if(!response.ok){
@@ -62,7 +63,7 @@ export default function Login(){
         if(!response.ok)throw new Error(typeof payload?.message==="string"?payload.message:"Code konnte nicht bestätigt werden.");
         finish(payload);return;
       }
-      await loginRequest(stage==="totp"?{mfaCode:code}:{emailCode:code});
+      await loginRequest({mfaCode:code});
     }catch(error){setError(error instanceof Error?error.message:"Code konnte nicht bestätigt werden.");}
     finally{pending.current=false;setLoading(false);}
   };
@@ -71,7 +72,7 @@ export default function Login(){
     if(pending.current)return;pending.current=true;setLoading(true);setError("");
     try{
       if(stage==="verify"){const response=await fetch("/api/auth/resend-verification",{method:"POST",signal:AbortSignal.timeout(15000),headers:{"Content-Type":"application/json"},body:JSON.stringify({email})});if(!response.ok)throw new Error("Code konnte nicht erneut gesendet werden.");}
-      else if(stage==="email")await loginRequest();
+
     }catch(error){setError(error instanceof Error?error.message:"Code konnte nicht erneut gesendet werden.");}
     finally{pending.current=false;setLoading(false);}
   };

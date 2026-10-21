@@ -60,9 +60,32 @@ export class ClientApiError extends Error {
   constructor(message:string,public code:string,public status:number){super(message);}
 }
 
+export type FreshAuthenticationRequest={action:string;confirm:()=>void;cancel:()=>void};
+let freshAuthentication:Promise<void>|null=null;
+export function requestFreshAuthentication(action:string):Promise<void>{
+  if(freshAuthentication)return freshAuthentication;
+  const pending=new Promise<void>((resolve,reject)=>{
+    const timer=window.setTimeout(()=>{window.dispatchEvent(new Event('binso-fresh-authentication-expired'));reject(new ClientApiError('Die Sicherheitsbestätigung ist abgelaufen.','fresh_authentication_expired',0));},120_000);
+    const finish=(confirmed:boolean)=>{window.clearTimeout(timer);if(confirmed)resolve();else reject(new ClientApiError('Sicherheitsbestätigung abgebrochen.','fresh_authentication_cancelled',0));};
+    window.dispatchEvent(new CustomEvent<FreshAuthenticationRequest>('binso-fresh-authentication',{detail:{action,confirm:()=>finish(true),cancel:()=>finish(false)}}));
+  });
+  freshAuthentication=pending;void pending.finally(()=>{if(freshAuthentication===pending)freshAuthentication=null;}).catch(()=>{});return pending;
+}
+
 async function fetchApi(path:string,options:RequestInit={}):Promise<Response>{
-  try{return await fetch(path,{...options,signal:options.signal??AbortSignal.timeout(options.method&&options.method!=="GET"?30000:15000)});}
+  try{
+    const fetchOnce=()=>fetch(path,{...options,signal:options.signal??AbortSignal.timeout(options.method&&options.method!=="GET"?30000:15000)});
+    const response=await fetchOnce();
+    if(response.status===403&&(await response.clone().json().catch(()=>null))?.error==='fresh_authentication_required'){
+      await requestFreshAuthentication(path.startsWith('/api/settings/team')?'Zugriffsrechte ändern':path.startsWith('/api/auth/')?'Sicherheitseinstellungen ändern':'Geschützte Einstellungen ändern');
+      // Only the explicit pre-mutation denial is replayed, once, after the user
+      // confirms. Network/timeouts and uncertain writes are never retried here.
+      return await fetchOnce();
+    }
+    return response;
+  }
   catch(error){
+    if(error instanceof ClientApiError)throw error;
     const timeout=error instanceof DOMException&&["TimeoutError","AbortError"].includes(error.name);
     throw new ClientApiError(timeout?"Die Anfrage dauert zu lange. Bitte den gespeicherten Stand vor einer Wiederholung prüfen.":"Keine Verbindung zum Server. Bitte die Verbindung und den gespeicherten Stand prüfen.",timeout?"request_timeout":"network_unavailable",0);
   }
@@ -70,7 +93,7 @@ async function fetchApi(path:string,options:RequestInit={}):Promise<Response>{
 
 async function parseResponse<T>(response:Response,fallback:string):Promise<T>{
   const payload=await response.json().catch(()=>{throw new ClientApiError("Die Serverantwort konnte nicht gelesen werden. Bitte den gespeicherten Stand prüfen.","invalid_response",502);});
-  if(response.status===401){invalidateClientSession(false);if(typeof window!=="undefined")window.dispatchEvent(new Event("binso-session-invalid"));}
+  if(response.status===401||response.status===403&&payload?.error==='mfa_enrollment_required'){invalidateClientSession(false);if(typeof window!=="undefined")window.dispatchEvent(new Event("binso-session-invalid"));}
   if(!response.ok){
     const message=typeof payload?.message==="string"?payload.message:fallback;
     throw new ClientApiError(message,typeof payload?.error==="string"?payload.error:"request_failed",response.status);
@@ -93,7 +116,7 @@ async function mutationResult<T>(response:Response,path:string,fallback:string,r
       throw new ClientApiError("Die Speicherung konnte nicht bestätigt werden. Bitte den gespeicherten Stand prüfen.","invalid_response",502);
     }
   }
-  publishMutation(path);
+  if(endpoint!=='/api/auth/reauthenticate')publishMutation(path);
   return result;
 }
 
@@ -148,9 +171,9 @@ export async function apiPatch<T>(path:string,body:unknown):Promise<T>{
   return mutationResult<T>(response,path,"Änderung konnte nicht gespeichert werden.",revision,"PATCH");
 }
 
-export async function apiDelete<T>(path:string):Promise<T>{
+export async function apiDelete<T>(path:string,body?:unknown):Promise<T>{
   const revision=dataRevision([]);
-  const response=await fetchApi(path,{method:"DELETE"});
+  const response=await fetchApi(path,{method:"DELETE",...(body===undefined?{}:{headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})});
   return mutationResult<T>(response,path,"Löschen konnte nicht ausgeführt werden.",revision,"DELETE");
 }
 

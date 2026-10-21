@@ -106,6 +106,7 @@ function AppShellFrame({
   const formActive=editing||pathname.endsWith("/neu");
   const chatActive=/^\/support\/[^/]+$/.test(pathname)&&!pathname.endsWith("/neu");
   const [access,setAccess]=useState<{role:string;plan:PlanId;readOnly:boolean;moduleProfile:ModuleProfile}|null>(null);
+  const workspaceReady=!!access;
   const [accessRetry,setAccessRetry]=useState(0);
   const [accessError,setAccessError]=useState<string|null>(null);
   useEffect(()=>{
@@ -196,13 +197,13 @@ function AppShellFrame({
 
 
   const companyQuery=useApiQuery<{item:{name?:string}}>(canOpen("/einstellungen/firma")?"/api/settings/company":null);
-  const notificationQuery=useApiQuery<{items:NotificationItem[]}>("/api/notifications");
+  const notificationQuery=useApiQuery<{items:NotificationItem[]}>(workspaceReady?"/api/notifications":null);
   const notifications=notificationQuery.data?.items??[];
   const notificationsLoading=notificationQuery.loading;
   const [notificationMutationError,setNotificationsError]=useState<string|null>(null);
   const notificationsError=notificationMutationError??notificationQuery.error;
   const [notificationFilter,setNotificationFilter]=useState<"all"|"unread">("all");
-  const profileQuery=useApiQuery<{item?:Record<string,unknown>|null;email?:string}>("/api/settings/profile");
+  const profileQuery=useApiQuery<{item?:Record<string,unknown>|null;email?:string}>(workspaceReady?"/api/settings/profile":null);
   const profileItem=profileQuery.data?.item;
   const profile={name:String(profileItem?.display_name||[profileItem?.first_name,profileItem?.last_name].filter(Boolean).join(" ")||""),identity:String(profileQuery.data?.email||""),avatar:String(profileItem?.avatar_url||"")};
   const [timerNotice,setTimerNotice]=useState<string|null>(null);
@@ -276,9 +277,9 @@ function AppShellFrame({
   useEffect(()=>{
     const listener=(event:Event)=>setDark((event as CustomEvent<{resolved:string}>).detail.resolved==="dark");
     window.addEventListener("binso-theme",listener);
-    void loadTheme().catch(()=>{});
+    if(workspaceReady)void loadTheme().catch(()=>{});
     return()=>window.removeEventListener("binso-theme",listener);
-  },[]);
+  },[workspaceReady]);
   async function toggleTheme(){try{await saveTheme(dark?"light":"dark");}catch{setTimerNotice("Darstellung konnte nicht gespeichert werden.");}}
 
 
@@ -299,7 +300,7 @@ function AppShellFrame({
     {!access&&!accessError&&<AppStart/>}
     <div hidden={!access&&!accessError} ref={shellRef} data-unsaved={dirty||undefined} data-navigation-collapsed={navigationCollapsed||undefined} className={`app-root app-section-${active} ${preview ? "app-preview" : ""} ${formActive ? "app-editing" : ""} ${chatActive ? "app-chat" : ""}`}>
     <ConfirmDialog open={confirmLogout} busy={logoutBusy} title="Änderungen verwerfen und abmelden?" message="Deine Änderungen sind noch nicht gespeichert." confirmLabel="Abmelden" onCancel={()=>setConfirmLogout(false)} onConfirm={()=>void logout(true)}/>
-    <TimerResumeNotice enabled={!!access&&!preview} onOpenTimer={()=>{if(dirty)setLeaveHref(new URL('/zeit',window.location.origin).href);else router.push('/zeit');}}/>
+    <TimerResumeNotice enabled={workspaceReady&&!preview} onOpenTimer={()=>{if(dirty)setLeaveHref(new URL('/zeit',window.location.origin).href);else router.push('/zeit');}}/>
     <ConfirmDialog open={leaveHref!==null} title="Änderungen verwerfen?" message="Deine Änderungen sind noch nicht gespeichert und gehen verloren." cancelLabel="Weiter bearbeiten" confirmLabel="Änderungen verwerfen" onCancel={()=>setLeaveHref(null)} onConfirm={()=>{const href=leaveHref;setLeaveHref(null);if(href){window.dispatchEvent(new Event("binso-draft-discard"));allowDraftNavigation();if(href==="browser-back"){leaveBack();return;}const url=new URL(href);if(url.origin===window.location.origin)router.replace(url.pathname+url.search+url.hash);else window.location.assign(href);}}}/>
     {logoutError&&<div className="toast" role="alert"><Icon name="close" size={16}/><span><LocalizedText>{logoutError}</LocalizedText></span><button type="button" className="text-action" disabled={logoutBusy} onClick={()=>void logout()}><LocalizedText>{"Erneut versuchen"}</LocalizedText></button></div>}
     <aside id="customer-desktop-navigation" className="app-sidebar">

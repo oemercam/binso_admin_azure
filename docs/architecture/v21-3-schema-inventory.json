@@ -67,7 +67,10 @@
     "0063_invitation_metadata_boundary.sql",
     "0064_retire_demo_bootstrap.sql",
     "0065_notification_read_receipts.sql",
-    "0066_retire_template_workforce_role.sql"
+    "0066_retire_template_workforce_role.sql",
+    "0067_scoped_fresh_authentication.sql",
+    "0068_offer_versions_and_public_responses.sql",
+    "0069_attachment_archival.sql"
   ],
   "tables": [
     {
@@ -319,6 +322,26 @@
       "name": "number_sequences",
       "rls": true,
       "forced_rls": false
+    },
+    {
+      "name": "offer_public_events",
+      "rls": true,
+      "forced_rls": true
+    },
+    {
+      "name": "offer_public_links",
+      "rls": true,
+      "forced_rls": true
+    },
+    {
+      "name": "offer_recipient_codes",
+      "rls": true,
+      "forced_rls": true
+    },
+    {
+      "name": "offer_versions",
+      "rls": true,
+      "forced_rls": true
     },
     {
       "name": "operating_costs",
@@ -1667,6 +1690,17 @@
       "numeric_scale": null
     },
     {
+      "table_name": "auth_email_codes",
+      "column_name": "session_id",
+      "ordinal_position": 11,
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "YES",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
       "table_name": "auth_passkey_challenges",
       "column_name": "token_hash",
       "ordinal_position": 1,
@@ -2004,6 +2038,17 @@
       "udt_name": "timestamptz",
       "is_nullable": "NO",
       "column_default": "now()",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "auth_sessions",
+      "column_name": "step_up_at",
+      "ordinal_position": 10,
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "YES",
+      "column_default": null,
       "numeric_precision": null,
       "numeric_scale": null
     },
@@ -4560,6 +4605,50 @@
       "numeric_scale": null
     },
     {
+      "table_name": "document_deliveries",
+      "column_name": "offer_version_id",
+      "ordinal_position": 15,
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "YES",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "document_deliveries",
+      "column_name": "public_link_id",
+      "ordinal_position": 16,
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "YES",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "document_deliveries",
+      "column_name": "subject",
+      "ordinal_position": 17,
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "document_deliveries",
+      "column_name": "message",
+      "ordinal_position": 18,
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
       "table_name": "document_templates",
       "column_name": "key",
       "ordinal_position": 1,
@@ -5907,6 +5996,28 @@
       "ordinal_position": 21,
       "data_type": "uuid",
       "udt_name": "uuid",
+      "is_nullable": "YES",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "file_objects",
+      "column_name": "archived_at",
+      "ordinal_position": 22,
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "YES",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "file_objects",
+      "column_name": "archived_by_user_id",
+      "ordinal_position": 23,
+      "data_type": "text",
+      "udt_name": "text",
       "is_nullable": "YES",
       "column_default": null,
       "numeric_precision": null,
@@ -7647,6 +7758,446 @@
       "udt_name": "bool",
       "is_nullable": "NO",
       "column_default": "true",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "offer_public_events",
+      "column_name": "id",
+      "ordinal_position": 1,
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "offer_public_events",
+      "column_name": "organization_id",
+      "ordinal_position": 2,
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "offer_public_events",
+      "column_name": "link_id",
+      "ordinal_position": 3,
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "offer_public_events",
+      "column_name": "kind",
+      "ordinal_position": 4,
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "offer_public_events",
+      "column_name": "body",
+      "ordinal_position": 5,
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": "''::text",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "offer_public_events",
+      "column_name": "actor",
+      "ordinal_position": 6,
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "offer_public_events",
+      "column_name": "created_by_user_id",
+      "ordinal_position": 7,
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "offer_public_events",
+      "column_name": "request_key",
+      "ordinal_position": 8,
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "offer_public_events",
+      "column_name": "created_at",
+      "ordinal_position": 9,
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "column_default": "now()",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "offer_public_links",
+      "column_name": "id",
+      "ordinal_position": 1,
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "offer_public_links",
+      "column_name": "organization_id",
+      "ordinal_position": 2,
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "offer_public_links",
+      "column_name": "version_id",
+      "ordinal_position": 3,
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "offer_public_links",
+      "column_name": "token_hash",
+      "ordinal_position": 4,
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "offer_public_links",
+      "column_name": "token_enc",
+      "ordinal_position": 5,
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "offer_public_links",
+      "column_name": "recipient",
+      "ordinal_position": 6,
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "offer_public_links",
+      "column_name": "locale",
+      "ordinal_position": 7,
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": "'de'::text",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "offer_public_links",
+      "column_name": "created_by_user_id",
+      "ordinal_position": 8,
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "offer_public_links",
+      "column_name": "expires_at",
+      "ordinal_position": 9,
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "offer_public_links",
+      "column_name": "revoked_at",
+      "ordinal_position": 10,
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "YES",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "offer_public_links",
+      "column_name": "created_at",
+      "ordinal_position": 11,
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "column_default": "now()",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "offer_recipient_codes",
+      "column_name": "id",
+      "ordinal_position": 1,
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "offer_recipient_codes",
+      "column_name": "organization_id",
+      "ordinal_position": 2,
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "offer_recipient_codes",
+      "column_name": "link_id",
+      "ordinal_position": 3,
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "offer_recipient_codes",
+      "column_name": "action",
+      "ordinal_position": 4,
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "offer_recipient_codes",
+      "column_name": "code_hash",
+      "ordinal_position": 5,
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "offer_recipient_codes",
+      "column_name": "expires_at",
+      "ordinal_position": 6,
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "offer_recipient_codes",
+      "column_name": "attempts",
+      "ordinal_position": 7,
+      "data_type": "integer",
+      "udt_name": "int4",
+      "is_nullable": "NO",
+      "column_default": "0",
+      "numeric_precision": 32,
+      "numeric_scale": 0
+    },
+    {
+      "table_name": "offer_recipient_codes",
+      "column_name": "consumed_at",
+      "ordinal_position": 8,
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "YES",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "offer_recipient_codes",
+      "column_name": "created_at",
+      "ordinal_position": 9,
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "column_default": "now()",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "offer_versions",
+      "column_name": "id",
+      "ordinal_position": 1,
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "offer_versions",
+      "column_name": "organization_id",
+      "ordinal_position": 2,
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "offer_versions",
+      "column_name": "quote_id",
+      "ordinal_position": 3,
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "offer_versions",
+      "column_name": "version",
+      "ordinal_position": 4,
+      "data_type": "integer",
+      "udt_name": "int4",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": 32,
+      "numeric_scale": 0
+    },
+    {
+      "table_name": "offer_versions",
+      "column_name": "number",
+      "ordinal_position": 5,
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "offer_versions",
+      "column_name": "document",
+      "ordinal_position": 6,
+      "data_type": "jsonb",
+      "udt_name": "jsonb",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "offer_versions",
+      "column_name": "company",
+      "ordinal_position": 7,
+      "data_type": "jsonb",
+      "udt_name": "jsonb",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "offer_versions",
+      "column_name": "pdf",
+      "ordinal_position": 8,
+      "data_type": "bytea",
+      "udt_name": "bytea",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "offer_versions",
+      "column_name": "pdf_sha256",
+      "ordinal_position": 9,
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "offer_versions",
+      "column_name": "created_by_user_id",
+      "ordinal_position": 10,
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "offer_versions",
+      "column_name": "created_at",
+      "ordinal_position": 11,
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "column_default": "now()",
       "numeric_precision": null,
       "numeric_scale": null
     },
@@ -12348,6 +12899,17 @@
       "numeric_scale": null
     },
     {
+      "table_name": "quotes",
+      "column_name": "offer_version",
+      "ordinal_position": 41,
+      "data_type": "integer",
+      "udt_name": "int4",
+      "is_nullable": "NO",
+      "column_default": "1",
+      "numeric_precision": 32,
+      "numeric_scale": 0
+    },
+    {
       "table_name": "rate_limit_buckets",
       "column_name": "bucket_key",
       "ordinal_position": 1,
@@ -14987,7 +15549,14 @@
       "name": "auth_email_codes_purpose_check",
       "type": "c",
       "validated": true,
-      "definition": "CHECK ((purpose = ANY (ARRAY['verify_email'::text, 'login'::text])))"
+      "definition": "CHECK ((purpose = ANY (ARRAY['verify_email'::text, 'login'::text, 'step_up'::text])))"
+    },
+    {
+      "table_name": "auth_email_codes",
+      "name": "auth_email_codes_session_id_fkey",
+      "type": "f",
+      "validated": true,
+      "definition": "FOREIGN KEY (session_id) REFERENCES auth_sessions(id) ON DELETE CASCADE"
     },
     {
       "table_name": "auth_email_codes",
@@ -14995,6 +15564,13 @@
       "type": "f",
       "validated": true,
       "definition": "FOREIGN KEY (user_id) REFERENCES app_users(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "auth_email_codes",
+      "name": "step_up_requires_session",
+      "type": "c",
+      "validated": true,
+      "definition": "CHECK (((purpose <> 'step_up'::text) OR (session_id IS NOT NULL)))"
     },
     {
       "table_name": "auth_passkey_challenges",
@@ -15740,6 +16316,13 @@
     },
     {
       "table_name": "document_deliveries",
+      "name": "document_deliveries_offer_version_id_fkey",
+      "type": "f",
+      "validated": true,
+      "definition": "FOREIGN KEY (offer_version_id) REFERENCES offer_versions(id) ON DELETE SET NULL"
+    },
+    {
+      "table_name": "document_deliveries",
       "name": "document_deliveries_organization_id_fkey",
       "type": "f",
       "validated": true,
@@ -15758,6 +16341,13 @@
       "type": "p",
       "validated": true,
       "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "document_deliveries",
+      "name": "document_deliveries_public_link_id_fkey",
+      "type": "f",
+      "validated": true,
+      "definition": "FOREIGN KEY (public_link_id) REFERENCES offer_public_links(id) ON DELETE SET NULL"
     },
     {
       "table_name": "document_deliveries",
@@ -16115,6 +16705,13 @@
       "type": "f",
       "validated": true,
       "definition": "FOREIGN KEY (organization_id, invoice_id) REFERENCES invoices(organization_id, id)"
+    },
+    {
+      "table_name": "file_objects",
+      "name": "file_objects_archived_by_user_id_fkey",
+      "type": "f",
+      "validated": true,
+      "definition": "FOREIGN KEY (archived_by_user_id) REFERENCES app_users(id)"
     },
     {
       "table_name": "file_objects",
@@ -16724,6 +17321,181 @@
       "type": "p",
       "validated": true,
       "definition": "PRIMARY KEY (organization_id, kind)"
+    },
+    {
+      "table_name": "offer_public_events",
+      "name": "offer_public_events_actor_check",
+      "type": "c",
+      "validated": true,
+      "definition": "CHECK ((actor = ANY (ARRAY['recipient'::text, 'employee'::text, 'unverified_client'::text, 'provider'::text])))"
+    },
+    {
+      "table_name": "offer_public_events",
+      "name": "offer_public_events_body_check",
+      "type": "c",
+      "validated": true,
+      "definition": "CHECK ((length(body) <= 4000))"
+    },
+    {
+      "table_name": "offer_public_events",
+      "name": "offer_public_events_kind_check",
+      "type": "c",
+      "validated": true,
+      "definition": "CHECK ((kind = ANY (ARRAY['link_requested'::text, 'view_reported'::text, 'pdf_requested'::text, 'question'::text, 'reply'::text, 'accepted'::text, 'declined'::text, 'code_requested'::text, 'provider_accepted'::text, 'provider_unconfirmed'::text])))"
+    },
+    {
+      "table_name": "offer_public_events",
+      "name": "offer_public_events_link_id_fkey",
+      "type": "f",
+      "validated": true,
+      "definition": "FOREIGN KEY (link_id) REFERENCES offer_public_links(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "offer_public_events",
+      "name": "offer_public_events_link_id_request_key_key",
+      "type": "u",
+      "validated": true,
+      "definition": "UNIQUE (link_id, request_key)"
+    },
+    {
+      "table_name": "offer_public_events",
+      "name": "offer_public_events_organization_id_fkey",
+      "type": "f",
+      "validated": true,
+      "definition": "FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "offer_public_events",
+      "name": "offer_public_events_pkey",
+      "type": "p",
+      "validated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "offer_public_links",
+      "name": "offer_public_links_locale_check",
+      "type": "c",
+      "validated": true,
+      "definition": "CHECK ((locale = ANY (ARRAY['de'::text, 'en'::text, 'fr'::text, 'it'::text])))"
+    },
+    {
+      "table_name": "offer_public_links",
+      "name": "offer_public_links_organization_id_fkey",
+      "type": "f",
+      "validated": true,
+      "definition": "FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "offer_public_links",
+      "name": "offer_public_links_organization_id_version_id_fkey",
+      "type": "f",
+      "validated": true,
+      "definition": "FOREIGN KEY (organization_id, version_id) REFERENCES offer_versions(organization_id, id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "offer_public_links",
+      "name": "offer_public_links_pkey",
+      "type": "p",
+      "validated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "offer_public_links",
+      "name": "offer_public_links_token_hash_check",
+      "type": "c",
+      "validated": true,
+      "definition": "CHECK ((token_hash ~ '^[a-f0-9]{64}$'::text))"
+    },
+    {
+      "table_name": "offer_public_links",
+      "name": "offer_public_links_token_hash_key",
+      "type": "u",
+      "validated": true,
+      "definition": "UNIQUE (token_hash)"
+    },
+    {
+      "table_name": "offer_recipient_codes",
+      "name": "offer_recipient_codes_action_check",
+      "type": "c",
+      "validated": true,
+      "definition": "CHECK ((action = ANY (ARRAY['accept'::text, 'decline'::text, 'question'::text])))"
+    },
+    {
+      "table_name": "offer_recipient_codes",
+      "name": "offer_recipient_codes_attempts_check",
+      "type": "c",
+      "validated": true,
+      "definition": "CHECK (((attempts >= 0) AND (attempts <= 5)))"
+    },
+    {
+      "table_name": "offer_recipient_codes",
+      "name": "offer_recipient_codes_link_id_fkey",
+      "type": "f",
+      "validated": true,
+      "definition": "FOREIGN KEY (link_id) REFERENCES offer_public_links(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "offer_recipient_codes",
+      "name": "offer_recipient_codes_organization_id_fkey",
+      "type": "f",
+      "validated": true,
+      "definition": "FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "offer_recipient_codes",
+      "name": "offer_recipient_codes_pkey",
+      "type": "p",
+      "validated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "offer_versions",
+      "name": "offer_versions_organization_id_fkey",
+      "type": "f",
+      "validated": true,
+      "definition": "FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "offer_versions",
+      "name": "offer_versions_organization_id_id_key",
+      "type": "u",
+      "validated": true,
+      "definition": "UNIQUE (organization_id, id)"
+    },
+    {
+      "table_name": "offer_versions",
+      "name": "offer_versions_organization_id_quote_id_version_key",
+      "type": "u",
+      "validated": true,
+      "definition": "UNIQUE (organization_id, quote_id, version)"
+    },
+    {
+      "table_name": "offer_versions",
+      "name": "offer_versions_pdf_sha256_check",
+      "type": "c",
+      "validated": true,
+      "definition": "CHECK ((pdf_sha256 ~ '^[a-f0-9]{64}$'::text))"
+    },
+    {
+      "table_name": "offer_versions",
+      "name": "offer_versions_pkey",
+      "type": "p",
+      "validated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "offer_versions",
+      "name": "offer_versions_quote_id_fkey",
+      "type": "f",
+      "validated": true,
+      "definition": "FOREIGN KEY (quote_id) REFERENCES quotes(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "offer_versions",
+      "name": "offer_versions_version_check",
+      "type": "c",
+      "validated": true,
+      "definition": "CHECK ((version > 0))"
     },
     {
       "table_name": "operating_costs",
@@ -17910,6 +18682,13 @@
     },
     {
       "table_name": "quotes",
+      "name": "quotes_offer_version_check",
+      "type": "c",
+      "validated": true,
+      "definition": "CHECK ((offer_version > 0))"
+    },
+    {
+      "table_name": "quotes",
       "name": "quotes_organization_id_fkey",
       "type": "f",
       "validated": true,
@@ -19051,6 +19830,46 @@
       "check_expression": "(organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid)"
     },
     {
+      "table_name": "offer_public_events",
+      "name": "tenant_scope",
+      "command": "*",
+      "permissive": true,
+      "using_expression": "(organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid)",
+      "check_expression": "(organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid)"
+    },
+    {
+      "table_name": "offer_public_links",
+      "name": "capability_lookup",
+      "command": "r",
+      "permissive": true,
+      "using_expression": "(token_hash = NULLIF(current_setting('app.offer_token_hash'::text, true), ''::text))",
+      "check_expression": null
+    },
+    {
+      "table_name": "offer_public_links",
+      "name": "tenant_scope",
+      "command": "*",
+      "permissive": true,
+      "using_expression": "(organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid)",
+      "check_expression": "(organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid)"
+    },
+    {
+      "table_name": "offer_recipient_codes",
+      "name": "tenant_scope",
+      "command": "*",
+      "permissive": true,
+      "using_expression": "(organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid)",
+      "check_expression": "(organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid)"
+    },
+    {
+      "table_name": "offer_versions",
+      "name": "tenant_scope",
+      "command": "*",
+      "permissive": true,
+      "using_expression": "(organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid)",
+      "check_expression": "(organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid)"
+    },
+    {
       "table_name": "operating_costs",
       "name": "operating_costs_platform",
       "command": "*",
@@ -19525,6 +20344,11 @@
       "table_name": "auth_email_codes",
       "name": "auth_email_codes_pkey",
       "definition": "CREATE UNIQUE INDEX auth_email_codes_pkey ON public.auth_email_codes USING btree (id)"
+    },
+    {
+      "table_name": "auth_email_codes",
+      "name": "auth_email_codes_session_scope",
+      "definition": "CREATE INDEX auth_email_codes_session_scope ON public.auth_email_codes USING btree (session_id, created_at DESC) WHERE ((purpose = 'step_up'::text) AND (consumed_at IS NULL))"
     },
     {
       "table_name": "auth_email_codes",
@@ -20053,6 +20877,11 @@
     },
     {
       "table_name": "file_objects",
+      "name": "file_objects_active_entity_idx",
+      "definition": "CREATE INDEX file_objects_active_entity_idx ON public.file_objects USING btree (organization_id, purpose, created_at DESC) WHERE (archived_at IS NULL)"
+    },
+    {
+      "table_name": "file_objects",
       "name": "file_objects_object_key_key",
       "definition": "CREATE UNIQUE INDEX file_objects_object_key_key ON public.file_objects USING btree (object_key)"
     },
@@ -20315,6 +21144,61 @@
       "table_name": "number_sequences",
       "name": "number_sequences_pkey",
       "definition": "CREATE UNIQUE INDEX number_sequences_pkey ON public.number_sequences USING btree (organization_id, kind)"
+    },
+    {
+      "table_name": "offer_public_events",
+      "name": "offer_events_link",
+      "definition": "CREATE INDEX offer_events_link ON public.offer_public_events USING btree (organization_id, link_id, created_at)"
+    },
+    {
+      "table_name": "offer_public_events",
+      "name": "offer_public_events_link_id_request_key_key",
+      "definition": "CREATE UNIQUE INDEX offer_public_events_link_id_request_key_key ON public.offer_public_events USING btree (link_id, request_key)"
+    },
+    {
+      "table_name": "offer_public_events",
+      "name": "offer_public_events_pkey",
+      "definition": "CREATE UNIQUE INDEX offer_public_events_pkey ON public.offer_public_events USING btree (id)"
+    },
+    {
+      "table_name": "offer_public_links",
+      "name": "offer_links_version",
+      "definition": "CREATE INDEX offer_links_version ON public.offer_public_links USING btree (organization_id, version_id)"
+    },
+    {
+      "table_name": "offer_public_links",
+      "name": "offer_public_links_pkey",
+      "definition": "CREATE UNIQUE INDEX offer_public_links_pkey ON public.offer_public_links USING btree (id)"
+    },
+    {
+      "table_name": "offer_public_links",
+      "name": "offer_public_links_token_hash_key",
+      "definition": "CREATE UNIQUE INDEX offer_public_links_token_hash_key ON public.offer_public_links USING btree (token_hash)"
+    },
+    {
+      "table_name": "offer_recipient_codes",
+      "name": "offer_codes_link",
+      "definition": "CREATE INDEX offer_codes_link ON public.offer_recipient_codes USING btree (organization_id, link_id, created_at DESC)"
+    },
+    {
+      "table_name": "offer_recipient_codes",
+      "name": "offer_recipient_codes_pkey",
+      "definition": "CREATE UNIQUE INDEX offer_recipient_codes_pkey ON public.offer_recipient_codes USING btree (id)"
+    },
+    {
+      "table_name": "offer_versions",
+      "name": "offer_versions_organization_id_id_key",
+      "definition": "CREATE UNIQUE INDEX offer_versions_organization_id_id_key ON public.offer_versions USING btree (organization_id, id)"
+    },
+    {
+      "table_name": "offer_versions",
+      "name": "offer_versions_organization_id_quote_id_version_key",
+      "definition": "CREATE UNIQUE INDEX offer_versions_organization_id_quote_id_version_key ON public.offer_versions USING btree (organization_id, quote_id, version)"
+    },
+    {
+      "table_name": "offer_versions",
+      "name": "offer_versions_pkey",
+      "definition": "CREATE UNIQUE INDEX offer_versions_pkey ON public.offer_versions USING btree (id)"
     },
     {
       "table_name": "operating_costs",

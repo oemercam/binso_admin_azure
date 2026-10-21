@@ -1,5 +1,5 @@
 {
-  "commit": "f33187d46bc8735018bf112e326771e650448526",
+  "commit": "ba4234604ac16b2209bef70a532ccd94f4953035",
   "method": "Existing TypeScript AST dependency inventory; conditional reachability is not runtime proof",
   "pages": [
     {
@@ -38,9 +38,9 @@
       "roles": "Public or route-level session: see source",
       "actions": [
         {
-          "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
         },
         {
           "tag": "ConfirmDialog",
@@ -48,23 +48,28 @@
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -91,6 +96,195 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
+        }
+      ],
+      "dimensions": {
+        "widths": [
+          320,
+          360,
+          390,
+          430,
+          768,
+          1280,
+          1920
+        ],
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "states": [
+          "loading",
+          "empty",
+          "error",
+          "forbidden",
+          "long-text"
+        ],
+        "languages": [
+          "de-CH",
+          "fr-CH",
+          "it-CH",
+          "en"
+        ],
+        "devices": [
+          "browser emulation",
+          "physical iOS PWA",
+          "physical Android PWA"
+        ]
+      },
+      "status": "nicht geprüft",
+      "evidence": [],
+      "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+    },
+    {
+      "file": "app/angebot/page.tsx",
+      "route": "/angebot",
+      "family": "PublicPage",
+      "components": [
+        "components/public-offer.tsx#PublicOffer",
+        "components/public-offer.tsx#Offer",
+        "components/public-offer.tsx#Decision",
+        "components/public-offer.tsx#request",
+        "components/ui.tsx#ErrorState",
+        "components/ui.tsx#Button",
+        "components/ui.tsx#Icon",
+        "components/ui.tsx#dismissActionLabels",
+        "components/ui.tsx#actionSourceText",
+        "components/ui.tsx#LoadingState",
+        "components/ui.tsx#SectionTitle",
+        "components/ui.tsx#FormActions",
+        "components/binso-ux.tsx#FormSheet",
+        "components/binso-ux.tsx#SheetProps",
+        "components/binso-ux.tsx#Sheet",
+        "components/use-browser-back-guard.ts#useBrowserBackGuard",
+        "components/use-browser-back-guard.ts#DraftGuard",
+        "components/use-browser-back-guard.ts#guards",
+        "components/use-browser-back-guard.ts#boundary",
+        "components/use-browser-back-guard.ts#armBoundary",
+        "components/use-dialog-focus.ts#useDialogFocus",
+        "components/page-scroll-lock.ts#lockPageScroll",
+        "components/page-scroll-lock.ts#locks",
+        "components/page-scroll-lock.ts#bodyOverflow",
+        "components/page-scroll-lock.ts#rootOverflow",
+        "components/page-scroll-lock.ts#x",
+        "components/page-scroll-lock.ts#y",
+        "components/page-scroll-lock.ts#guard",
+        "components/use-dialog-focus.ts#lockDialogBackground",
+        "components/use-dialog-focus.ts#backgroundLocks",
+        "components/use-dialog-focus.ts#modalStack",
+        "components/use-dialog-focus.ts#dialogPortals",
+        "components/binso-ux.tsx#sheetValues",
+        "components/binso-ux.tsx#sheetChildren",
+        "components/binso-ux.tsx#sheetForm",
+        "components/confirm-dialog.tsx#ConfirmDialog",
+        "components/use-browser-back-guard.ts#allowDraftNavigation",
+        "components/ui.tsx#Field",
+        "components/ui.tsx#Input",
+        "components/ui.tsx#Select",
+        "components/select-control.tsx#SelectControl",
+        "components/select-control.tsx#SelectSearch",
+        "components/use-dialog-focus.ts#registerDialogPortal",
+        "components/ui.tsx#Textarea",
+        "components/ui.tsx#Checkbox",
+        "components/ui.tsx#DateInput",
+        "components/ui.tsx#TimeInput",
+        "components/ui.tsx#CurrencyInput",
+        "components/ui.tsx#FormLabel",
+        "components/ui.tsx#FormError",
+        "components/pdf-preview.tsx#DocumentModal",
+        "components/pdf-preview.tsx#DocumentPageViewer",
+        "components/pdf-preview.tsx#DocumentPages",
+        "components/pdf-preview.tsx#PdfPage"
+      ],
+      "layouts": [
+        "app/layout.tsx"
+      ],
+      "roles": "Public or route-level session: see source",
+      "actions": [
+        {
+          "tag": "FormSheet",
+          "line": 63,
+          "component": "components/public-offer.tsx#PublicOffer"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 191,
+          "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 303,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
+          "tag": "ActionSheet",
+          "line": 365,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
+          "tag": "ListSearch",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "Sheet",
+          "line": 196,
+          "component": "components/binso-ux.tsx#FilterSheet"
+        },
+        {
+          "tag": "ActionSheet",
+          "line": 62,
+          "component": "components/binso-ux.tsx#QuickCreateAction"
+        },
+        {
+          "tag": "Sheet",
+          "line": 194,
+          "component": "components/binso-ux.tsx#ActionSheet"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 34,
+          "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
         }
       ],
       "dimensions": {
@@ -177,9 +371,11 @@
         "components/documents.tsx#isoToSwiss",
         "components/ui.tsx#SectionTitle",
         "components/documents.tsx#money",
+        "components/offer-history.tsx#OfferHistory",
+        "components/offer-history.tsx#History",
+        "components/offer-history.tsx#Event",
         "components/binso-ux.tsx#DetailDisclosure",
-        "components/entity-files.tsx#EntityFiles",
-        "components/entity-files.tsx#Attachment",
+        "components/binso-ux.tsx#ActionRow",
         "components/binso-ux.tsx#ActionsMenu",
         "components/binso-ux.tsx#RowActions",
         "components/binso-ux.tsx#ActionSheet",
@@ -206,18 +402,13 @@
         "components/ui.tsx#FormActions",
         "components/binso-ux.tsx#sheetForm",
         "components/confirm-dialog.tsx#ConfirmDialog",
-        "components/binso-ux.tsx#ActionRow",
-        "components/ui.tsx#Input",
-        "components/binso-ux.tsx#ListSearch",
-        "components/binso-ux.tsx#ListRow",
-        "components/binso-ux.tsx#FormSheet",
+        "components/pdf-preview.tsx#DocumentModal",
         "components/pdf-preview.tsx#DocumentPageViewer",
         "components/pdf-preview.tsx#DocumentPages",
         "components/pdf-preview.tsx#PdfPage",
-        "components/form-wizard.tsx#FormWizard",
-        "components/ui.tsx#FormSection",
-        "components/documents.tsx#DocumentEditor",
+        "components/binso-ux.tsx#FormSheet",
         "components/ui.tsx#Field",
+        "components/ui.tsx#Input",
         "components/ui.tsx#Select",
         "components/select-control.tsx#SelectControl",
         "components/select-control.tsx#SelectSearch",
@@ -228,6 +419,13 @@
         "components/ui.tsx#TimeInput",
         "components/ui.tsx#CurrencyInput",
         "components/ui.tsx#FormError",
+        "components/entity-files.tsx#EntityFiles",
+        "components/entity-files.tsx#Attachment",
+        "components/binso-ux.tsx#ListSearch",
+        "components/binso-ux.tsx#ListRow",
+        "components/form-wizard.tsx#FormWizard",
+        "components/ui.tsx#FormSection",
+        "components/documents.tsx#DocumentEditor",
         "components/directory-select.tsx#DirectorySelect",
         "components/directory-select.tsx#Item",
         "components/directory-select.tsx#Page",
@@ -273,8 +471,7 @@
         "components/header-panel-content.tsx#AccountPanel",
         "components/locale-switcher.tsx#LocaleSwitcher",
         "components/app-shell.tsx#ShellRegistration",
-        "components/app-shell.tsx#ShellConfiguration",
-        "components/documents.tsx#DocumentModal"
+        "components/app-shell.tsx#ShellConfiguration"
       ],
       "layouts": [
         "app/layout.tsx",
@@ -284,43 +481,33 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 408,
+          "line": 405,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 408,
+          "line": 405,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "ActionSheet",
-          "line": 410,
+          "line": 407,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 427,
+          "line": 424,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 428,
+          "line": 425,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
-          "tag": "ListSearch",
-          "line": 39,
-          "component": "components/entity-files.tsx#EntityFiles"
-        },
-        {
-          "tag": "ActionSheet",
-          "line": 43,
-          "component": "components/entity-files.tsx#EntityFiles"
-        },
-        {
           "tag": "FormSheet",
-          "line": 44,
-          "component": "components/entity-files.tsx#EntityFiles"
+          "line": 34,
+          "component": "components/offer-history.tsx#OfferHistory"
         },
         {
           "tag": "ActionSheet",
@@ -343,14 +530,24 @@
           "component": "components/binso-ux.tsx#FormSheet"
         },
         {
-          "tag": "FormSheet",
-          "line": 574,
-          "component": "components/documents.tsx#DocumentEditor"
+          "tag": "ListSearch",
+          "line": 39,
+          "component": "components/entity-files.tsx#EntityFiles"
+        },
+        {
+          "tag": "ActionSheet",
+          "line": 43,
+          "component": "components/entity-files.tsx#EntityFiles"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
+          "line": 45,
+          "component": "components/entity-files.tsx#EntityFiles"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 572,
+          "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "ConfirmDialog",
@@ -358,23 +555,28 @@
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -391,6 +593,16 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
         }
       ],
       "dimensions": {
@@ -477,9 +689,11 @@
         "components/documents.tsx#isoToSwiss",
         "components/ui.tsx#SectionTitle",
         "components/documents.tsx#money",
+        "components/offer-history.tsx#OfferHistory",
+        "components/offer-history.tsx#History",
+        "components/offer-history.tsx#Event",
         "components/binso-ux.tsx#DetailDisclosure",
-        "components/entity-files.tsx#EntityFiles",
-        "components/entity-files.tsx#Attachment",
+        "components/binso-ux.tsx#ActionRow",
         "components/binso-ux.tsx#ActionsMenu",
         "components/binso-ux.tsx#RowActions",
         "components/binso-ux.tsx#ActionSheet",
@@ -506,18 +720,13 @@
         "components/ui.tsx#FormActions",
         "components/binso-ux.tsx#sheetForm",
         "components/confirm-dialog.tsx#ConfirmDialog",
-        "components/binso-ux.tsx#ActionRow",
-        "components/ui.tsx#Input",
-        "components/binso-ux.tsx#ListSearch",
-        "components/binso-ux.tsx#ListRow",
-        "components/binso-ux.tsx#FormSheet",
+        "components/pdf-preview.tsx#DocumentModal",
         "components/pdf-preview.tsx#DocumentPageViewer",
         "components/pdf-preview.tsx#DocumentPages",
         "components/pdf-preview.tsx#PdfPage",
-        "components/form-wizard.tsx#FormWizard",
-        "components/ui.tsx#FormSection",
-        "components/documents.tsx#DocumentEditor",
+        "components/binso-ux.tsx#FormSheet",
         "components/ui.tsx#Field",
+        "components/ui.tsx#Input",
         "components/ui.tsx#Select",
         "components/select-control.tsx#SelectControl",
         "components/select-control.tsx#SelectSearch",
@@ -528,6 +737,13 @@
         "components/ui.tsx#TimeInput",
         "components/ui.tsx#CurrencyInput",
         "components/ui.tsx#FormError",
+        "components/entity-files.tsx#EntityFiles",
+        "components/entity-files.tsx#Attachment",
+        "components/binso-ux.tsx#ListSearch",
+        "components/binso-ux.tsx#ListRow",
+        "components/form-wizard.tsx#FormWizard",
+        "components/ui.tsx#FormSection",
+        "components/documents.tsx#DocumentEditor",
         "components/directory-select.tsx#DirectorySelect",
         "components/directory-select.tsx#Item",
         "components/directory-select.tsx#Page",
@@ -573,8 +789,7 @@
         "components/header-panel-content.tsx#AccountPanel",
         "components/locale-switcher.tsx#LocaleSwitcher",
         "components/app-shell.tsx#ShellRegistration",
-        "components/app-shell.tsx#ShellConfiguration",
-        "components/documents.tsx#DocumentModal"
+        "components/app-shell.tsx#ShellConfiguration"
       ],
       "layouts": [
         "app/layout.tsx",
@@ -584,43 +799,33 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 408,
+          "line": 405,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 408,
+          "line": 405,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "ActionSheet",
-          "line": 410,
+          "line": 407,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 427,
+          "line": 424,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 428,
+          "line": 425,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
-          "tag": "ListSearch",
-          "line": 39,
-          "component": "components/entity-files.tsx#EntityFiles"
-        },
-        {
-          "tag": "ActionSheet",
-          "line": 43,
-          "component": "components/entity-files.tsx#EntityFiles"
-        },
-        {
           "tag": "FormSheet",
-          "line": 44,
-          "component": "components/entity-files.tsx#EntityFiles"
+          "line": 34,
+          "component": "components/offer-history.tsx#OfferHistory"
         },
         {
           "tag": "ActionSheet",
@@ -643,14 +848,24 @@
           "component": "components/binso-ux.tsx#FormSheet"
         },
         {
-          "tag": "FormSheet",
-          "line": 574,
-          "component": "components/documents.tsx#DocumentEditor"
+          "tag": "ListSearch",
+          "line": 39,
+          "component": "components/entity-files.tsx#EntityFiles"
+        },
+        {
+          "tag": "ActionSheet",
+          "line": 43,
+          "component": "components/entity-files.tsx#EntityFiles"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
+          "line": 45,
+          "component": "components/entity-files.tsx#EntityFiles"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 572,
+          "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "ConfirmDialog",
@@ -658,23 +873,28 @@
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -691,6 +911,16 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
         }
       ],
       "dimensions": {
@@ -855,32 +1085,32 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "ConfirmDialog",
           "line": 303,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -907,6 +1137,21 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -983,9 +1228,9 @@
       "roles": "Public or route-level session: see source",
       "actions": [
         {
-          "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
         },
         {
           "tag": "ConfirmDialog",
@@ -993,23 +1238,28 @@
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -1036,6 +1286,16 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -1182,6 +1442,7 @@
         "components/binso-ux.tsx#DetailTabs",
         "components/cash-statistics.tsx#CashOverview",
         "components/ui.tsx#SectionTitle",
+        "components/statistics.tsx#StatisticPeriodPicker",
         "components/binso-ux.tsx#MetricTiles",
         "components/binso-ux.tsx#MetricTile",
         "components/ui.tsx#Metric",
@@ -1197,32 +1458,32 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "ConfirmDialog",
           "line": 303,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -1249,6 +1510,26 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 80,
+          "component": "components/statistics.tsx#StatisticPeriodPicker"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -1401,32 +1682,32 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "ConfirmDialog",
           "line": 303,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -1453,6 +1734,21 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -1613,32 +1909,32 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "ConfirmDialog",
           "line": 303,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -1670,6 +1966,21 @@
           "tag": "ActionSheet",
           "line": 205,
           "component": "components/binso-ux.tsx#ActionsMenu"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -1814,6 +2125,7 @@
         "components/app-shell.tsx#ShellRegistration",
         "components/app-shell.tsx#ShellConfiguration",
         "components/cash-statistics.tsx#CashOverview",
+        "components/statistics.tsx#StatisticPeriodPicker",
         "components/binso-ux.tsx#MetricTiles",
         "components/binso-ux.tsx#MetricTile",
         "components/ui.tsx#Metric",
@@ -1828,32 +2140,32 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "ConfirmDialog",
           "line": 303,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -1880,6 +2192,26 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 80,
+          "component": "components/statistics.tsx#StatisticPeriodPicker"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -1956,9 +2288,9 @@
       "roles": "Public or route-level session: see source",
       "actions": [
         {
-          "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
         },
         {
           "tag": "ConfirmDialog",
@@ -1966,23 +2298,28 @@
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -2009,6 +2346,16 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -2060,9 +2407,9 @@
       "roles": "Public or route-level session: see source",
       "actions": [
         {
-          "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
         },
         {
           "tag": "ConfirmDialog",
@@ -2070,23 +2417,28 @@
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -2113,6 +2465,16 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -2282,17 +2644,17 @@
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -2316,9 +2678,9 @@
           "component": "components/binso-ux.tsx#FormSheet"
         },
         {
-          "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
         },
         {
           "tag": "ConfirmDialog",
@@ -2326,8 +2688,13 @@
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -2339,6 +2706,11 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
         }
       ],
       "dimensions": {
@@ -2433,9 +2805,9 @@
           "component": "app/einladung/page.tsx#Page"
         },
         {
-          "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
         },
         {
           "tag": "ConfirmDialog",
@@ -2443,23 +2815,28 @@
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -2486,6 +2863,16 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -2637,13 +3024,8 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 305,
+          "line": 313,
           "component": "components/pages/settings.tsx#SubscriptionSettingsPage"
-        },
-        {
-          "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
@@ -2651,23 +3033,28 @@
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -2699,6 +3086,16 @@
           "tag": "Sheet",
           "line": 195,
           "component": "components/binso-ux.tsx#FormSheet"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
         }
       ],
       "dimensions": {
@@ -2848,32 +3245,32 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "ConfirmDialog",
           "line": 303,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -2900,6 +3297,21 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -3050,32 +3462,32 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "ConfirmDialog",
           "line": 303,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -3102,6 +3514,21 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -3256,32 +3683,32 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "ConfirmDialog",
           "line": 303,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -3308,6 +3735,21 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -3463,32 +3905,32 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "ConfirmDialog",
           "line": 303,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -3520,6 +3962,16 @@
           "tag": "Sheet",
           "line": 195,
           "component": "components/binso-ux.tsx#FormSheet"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
         }
       ],
       "dimensions": {
@@ -3566,21 +4018,15 @@
       "family": "SettingsPage",
       "components": [
         "components/pages/settings.tsx#CompanySettingsPage",
-        "components/app-shell.tsx#AppShell",
-        "components/app-shell.tsx#ShellProps",
-        "components/app-shell.tsx#AppShellFrame",
-        "components/desktop-navigation.tsx#useDesktopNavigation",
-        "components/use-navigation-scroll.ts#useNavigationScroll",
-        "components/app-shell.tsx#accessFromSession",
-        "components/records.tsx#RecordsControls",
-        "components/records.tsx#RecordsController",
-        "components/records.tsx#useRecordsController",
-        "components/records.tsx#RecordsColumns",
-        "components/ui.tsx#Icon",
-        "components/binso-ux.tsx#ListSearch",
-        "components/ui.tsx#Button",
-        "components/ui.tsx#dismissActionLabels",
-        "components/ui.tsx#actionSourceText",
+        "components/use-browser-back-guard.ts#allowDraftNavigation",
+        "components/use-browser-back-guard.ts#boundary",
+        "components/use-browser-back-guard.ts#useBrowserBackGuard",
+        "components/use-browser-back-guard.ts#DraftGuard",
+        "components/use-browser-back-guard.ts#guards",
+        "components/use-browser-back-guard.ts#armBoundary",
+        "components/file-upload.tsx#FileUpload",
+        "components/ui.tsx#Field",
+        "components/ui.tsx#Input",
         "components/ui.tsx#Select",
         "components/select-control.tsx#SelectControl",
         "components/select-control.tsx#SelectSearch",
@@ -3594,25 +4040,6 @@
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
-        "components/ui.tsx#Input",
-        "components/binso-ux.tsx#FilterSheet",
-        "components/binso-ux.tsx#SheetProps",
-        "components/binso-ux.tsx#Sheet",
-        "components/use-browser-back-guard.ts#useBrowserBackGuard",
-        "components/use-browser-back-guard.ts#DraftGuard",
-        "components/use-browser-back-guard.ts#guards",
-        "components/use-browser-back-guard.ts#boundary",
-        "components/use-browser-back-guard.ts#armBoundary",
-        "components/use-dialog-focus.ts#useDialogFocus",
-        "components/use-dialog-focus.ts#lockDialogBackground",
-        "components/use-dialog-focus.ts#backgroundLocks",
-        "components/binso-ux.tsx#sheetValues",
-        "components/binso-ux.tsx#sheetChildren",
-        "components/ui.tsx#FormActions",
-        "components/binso-ux.tsx#sheetForm",
-        "components/confirm-dialog.tsx#ConfirmDialog",
-        "components/use-browser-back-guard.ts#allowDraftNavigation",
-        "components/ui.tsx#Field",
         "components/ui.tsx#Textarea",
         "components/ui.tsx#Checkbox",
         "components/ui.tsx#DateInput",
@@ -3620,6 +4047,32 @@
         "components/ui.tsx#CurrencyInput",
         "components/ui.tsx#FormLabel",
         "components/ui.tsx#FormError",
+        "components/ui.tsx#Button",
+        "components/ui.tsx#Icon",
+        "components/ui.tsx#dismissActionLabels",
+        "components/ui.tsx#actionSourceText",
+        "components/ui.tsx#FormActions",
+        "components/app-shell.tsx#AppShell",
+        "components/app-shell.tsx#ShellProps",
+        "components/app-shell.tsx#AppShellFrame",
+        "components/desktop-navigation.tsx#useDesktopNavigation",
+        "components/use-navigation-scroll.ts#useNavigationScroll",
+        "components/app-shell.tsx#accessFromSession",
+        "components/records.tsx#RecordsControls",
+        "components/records.tsx#RecordsController",
+        "components/records.tsx#useRecordsController",
+        "components/records.tsx#RecordsColumns",
+        "components/binso-ux.tsx#ListSearch",
+        "components/binso-ux.tsx#FilterSheet",
+        "components/binso-ux.tsx#SheetProps",
+        "components/binso-ux.tsx#Sheet",
+        "components/use-dialog-focus.ts#useDialogFocus",
+        "components/use-dialog-focus.ts#lockDialogBackground",
+        "components/use-dialog-focus.ts#backgroundLocks",
+        "components/binso-ux.tsx#sheetValues",
+        "components/binso-ux.tsx#sheetChildren",
+        "components/binso-ux.tsx#sheetForm",
+        "components/confirm-dialog.tsx#ConfirmDialog",
         "components/binso-ux.tsx#CreateAction",
         "components/binso-ux.tsx#QuickCreateAction",
         "components/binso-ux.tsx#ActionSheet",
@@ -3659,8 +4112,7 @@
         "components/locale-switcher.tsx#LocaleSwitcher",
         "components/app-shell.tsx#ShellRegistration",
         "components/app-shell.tsx#ShellConfiguration",
-        "components/binso-ux.tsx#FormSheet",
-        "components/file-upload.tsx#FileUpload"
+        "components/binso-ux.tsx#FormSheet"
       ],
       "layouts": [
         "app/layout.tsx",
@@ -3670,13 +4122,13 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 166,
+          "line": 183,
           "component": "components/pages/settings.tsx#CompanySettingsPage"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
+          "line": 186,
+          "component": "components/pages/settings.tsx#CompanySettingsPage"
         },
         {
           "tag": "ConfirmDialog",
@@ -3684,23 +4136,28 @@
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -3732,6 +4189,16 @@
           "tag": "Sheet",
           "line": 195,
           "component": "components/binso-ux.tsx#FormSheet"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
         }
       ],
       "dimensions": {
@@ -3882,13 +4349,8 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 87,
+          "line": 89,
           "component": "components/pages/settings.tsx#AccountSettingsPage"
-        },
-        {
-          "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
@@ -3896,23 +4358,28 @@
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -3944,6 +4411,16 @@
           "tag": "Sheet",
           "line": 195,
           "component": "components/binso-ux.tsx#FormSheet"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
         }
       ],
       "dimensions": {
@@ -4092,32 +4569,32 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "ConfirmDialog",
           "line": 303,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -4144,6 +4621,21 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -4300,23 +4792,23 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 112,
+          "line": 121,
           "component": "components/security-settings-page.tsx#SecuritySettingsPage"
         },
         {
           "tag": "FormSheet",
-          "line": 120,
+          "line": 129,
           "component": "components/security-settings-page.tsx#SecuritySettingsPage"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 156,
+          "line": 166,
           "component": "components/security-settings-page.tsx#SecuritySettingsPage"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
+          "line": 167,
+          "component": "components/security-settings-page.tsx#SecuritySettingsPage"
         },
         {
           "tag": "ConfirmDialog",
@@ -4324,23 +4816,28 @@
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -4370,13 +4867,23 @@
         },
         {
           "tag": "FormSheet",
-          "line": 41,
+          "line": 39,
           "component": "components/passkey-settings.tsx#PasskeySettings"
         },
         {
           "tag": "Sheet",
           "line": 195,
           "component": "components/binso-ux.tsx#FormSheet"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
         }
       ],
       "dimensions": {
@@ -4526,32 +5033,32 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "ConfirmDialog",
           "line": 303,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -4578,6 +5085,21 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -4760,32 +5282,32 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "ConfirmDialog",
           "line": 303,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -4832,6 +5354,16 @@
           "tag": "ConfirmDialog",
           "line": 31,
           "component": "components/workforce-assignments.tsx#WorkforceAssignments"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
         }
       ],
       "dimensions": {
@@ -4980,32 +5512,32 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "ConfirmDialog",
           "line": 303,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -5032,6 +5564,21 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -5107,9 +5654,9 @@
       "roles": "Public or route-level session: see source",
       "actions": [
         {
-          "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
         },
         {
           "tag": "ConfirmDialog",
@@ -5117,23 +5664,28 @@
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -5160,6 +5712,16 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -5306,6 +5868,7 @@
         "components/statistics.tsx#Series",
         "components/statistics.tsx#Metric",
         "components/statistics.tsx#RingPart",
+        "components/statistics.tsx#StatisticPeriodPicker",
         "components/binso-ux.tsx#MetricTiles",
         "components/binso-ux.tsx#MetricTile",
         "components/ui.tsx#Metric",
@@ -5321,32 +5884,32 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "ConfirmDialog",
           "line": 303,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -5376,8 +5939,23 @@
         },
         {
           "tag": "FilterSheet",
-          "line": 69,
-          "component": "components/statistics.tsx#Statistics"
+          "line": 80,
+          "component": "components/statistics.tsx#StatisticPeriodPicker"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -5523,6 +6101,7 @@
         "components/binso-ux.tsx#DetailTabs",
         "components/cash-statistics.tsx#CashOverview",
         "components/ui.tsx#SectionTitle",
+        "components/statistics.tsx#StatisticPeriodPicker",
         "components/binso-ux.tsx#MetricTiles",
         "components/binso-ux.tsx#MetricTile",
         "components/ui.tsx#Metric",
@@ -5538,32 +6117,32 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "ConfirmDialog",
           "line": 303,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -5590,6 +6169,26 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 80,
+          "component": "components/statistics.tsx#StatisticPeriodPicker"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -5666,9 +6265,9 @@
       "roles": "Public or route-level session: see source",
       "actions": [
         {
-          "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
         },
         {
           "tag": "ConfirmDialog",
@@ -5676,23 +6275,28 @@
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -5719,6 +6323,16 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -5873,13 +6487,8 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 245,
+          "line": 253,
           "component": "components/pages/customers.tsx#CustomerForm"
-        },
-        {
-          "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
@@ -5887,23 +6496,28 @@
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -5935,6 +6549,16 @@
           "tag": "Sheet",
           "line": 195,
           "component": "components/binso-ux.tsx#FormSheet"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
         }
       ],
       "dimensions": {
@@ -6093,6 +6717,7 @@
         "components/statistics.tsx#Series",
         "components/statistics.tsx#Metric",
         "components/statistics.tsx#RingPart",
+        "components/statistics.tsx#StatisticPeriodPicker",
         "components/statistics.tsx#RingChart",
         "components/statistics.tsx#LineChart",
         "components/pages/customers.tsx#CustomerDocuments",
@@ -6109,10 +6734,11 @@
         "components/entity-files.tsx#Attachment",
         "components/binso-ux.tsx#ActionsMenu",
         "components/binso-ux.tsx#RowActions",
-        "components/binso-ux.tsx#FormSheet",
+        "components/pdf-preview.tsx#DocumentModal",
         "components/pdf-preview.tsx#DocumentPageViewer",
         "components/pdf-preview.tsx#DocumentPages",
-        "components/pdf-preview.tsx#PdfPage"
+        "components/pdf-preview.tsx#PdfPage",
+        "components/binso-ux.tsx#FormSheet"
       ],
       "layouts": [
         "app/layout.tsx",
@@ -6122,33 +6748,28 @@
       "actions": [
         {
           "tag": "ListSearch",
-          "line": 157,
+          "line": 165,
           "component": "components/pages/customers.tsx#CustomerDetail"
         },
         {
           "tag": "ActionSheet",
-          "line": 159,
+          "line": 167,
           "component": "components/pages/customers.tsx#CustomerDetail"
         },
         {
           "tag": "ActionSheet",
-          "line": 160,
+          "line": 168,
           "component": "components/pages/customers.tsx#CustomerDetail"
         },
         {
           "tag": "FormSheet",
-          "line": 161,
+          "line": 169,
           "component": "components/pages/customers.tsx#CustomerDetail"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 162,
+          "line": 170,
           "component": "components/pages/customers.tsx#CustomerDetail"
-        },
-        {
-          "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
@@ -6156,23 +6777,28 @@
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -6202,12 +6828,12 @@
         },
         {
           "tag": "FilterSheet",
-          "line": 69,
-          "component": "components/statistics.tsx#Statistics"
+          "line": 80,
+          "component": "components/statistics.tsx#StatisticPeriodPicker"
         },
         {
           "tag": "ActionSheet",
-          "line": 288,
+          "line": 296,
           "component": "components/pages/customers.tsx#CustomerDocuments"
         },
         {
@@ -6221,8 +6847,8 @@
           "component": "components/entity-files.tsx#EntityFiles"
         },
         {
-          "tag": "FormSheet",
-          "line": 44,
+          "tag": "ConfirmDialog",
+          "line": 45,
           "component": "components/entity-files.tsx#EntityFiles"
         },
         {
@@ -6234,6 +6860,16 @@
           "tag": "Sheet",
           "line": 195,
           "component": "components/binso-ux.tsx#FormSheet"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
         }
       ],
       "dimensions": {
@@ -6388,13 +7024,8 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 245,
+          "line": 253,
           "component": "components/pages/customers.tsx#CustomerForm"
-        },
-        {
-          "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
@@ -6402,23 +7033,28 @@
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -6450,6 +7086,16 @@
           "tag": "Sheet",
           "line": 195,
           "component": "components/binso-ux.tsx#FormSheet"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
         }
       ],
       "dimensions": {
@@ -6624,32 +7270,32 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "ConfirmDialog",
           "line": 303,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -6676,6 +7322,21 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -6760,9 +7421,9 @@
       "roles": "Public or route-level session: see source",
       "actions": [
         {
-          "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
         },
         {
           "tag": "ConfirmDialog",
@@ -6770,23 +7431,28 @@
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -6813,6 +7479,16 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -6969,6 +7645,7 @@
         "components/pages/shared.tsx#formatMinutes",
         "components/entity-files.tsx#EntityFiles",
         "components/entity-files.tsx#Attachment",
+        "components/pdf-preview.tsx#DocumentModal",
         "components/pdf-preview.tsx#DocumentPageViewer",
         "components/pdf-preview.tsx#DocumentPages",
         "components/pdf-preview.tsx#PdfPage",
@@ -6987,32 +7664,32 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "ConfirmDialog",
           "line": 303,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -7061,14 +7738,24 @@
           "component": "components/entity-files.tsx#EntityFiles"
         },
         {
-          "tag": "FormSheet",
-          "line": 44,
+          "tag": "ConfirmDialog",
+          "line": 45,
           "component": "components/entity-files.tsx#EntityFiles"
         },
         {
           "tag": "ActionSheet",
           "line": 52,
           "component": "components/binso-ux.tsx#ContextActions"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
         }
       ],
       "dimensions": {
@@ -7225,6 +7912,7 @@
         "components/pages/shared.tsx#formatMinutes",
         "components/entity-files.tsx#EntityFiles",
         "components/entity-files.tsx#Attachment",
+        "components/pdf-preview.tsx#DocumentModal",
         "components/pdf-preview.tsx#DocumentPageViewer",
         "components/pdf-preview.tsx#DocumentPages",
         "components/pdf-preview.tsx#PdfPage",
@@ -7243,32 +7931,32 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "ConfirmDialog",
           "line": 303,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -7317,14 +8005,24 @@
           "component": "components/entity-files.tsx#EntityFiles"
         },
         {
-          "tag": "FormSheet",
-          "line": 44,
+          "tag": "ConfirmDialog",
+          "line": 45,
           "component": "components/entity-files.tsx#EntityFiles"
         },
         {
           "tag": "ActionSheet",
           "line": 52,
           "component": "components/binso-ux.tsx#ContextActions"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
         }
       ],
       "dimensions": {
@@ -7491,32 +8189,32 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "ConfirmDialog",
           "line": 303,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -7543,6 +8241,21 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -7596,9 +8309,9 @@
       "roles": "Public or route-level session: see source",
       "actions": [
         {
-          "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
         },
         {
           "tag": "ConfirmDialog",
@@ -7606,23 +8319,28 @@
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -7649,6 +8367,16 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -7844,17 +8572,17 @@
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -7908,9 +8636,9 @@
           "component": "components/operator.tsx#AnnouncementsView"
         },
         {
-          "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
         },
         {
           "tag": "ConfirmDialog",
@@ -7918,8 +8646,13 @@
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -7931,6 +8664,11 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
         }
       ],
       "dimensions": {
@@ -7990,9 +8728,9 @@
       "roles": "requireOperator / section-specific operator grants",
       "actions": [
         {
-          "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
         },
         {
           "tag": "ConfirmDialog",
@@ -8000,23 +8738,28 @@
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -8043,6 +8786,16 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -8238,17 +8991,17 @@
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -8302,9 +9055,9 @@
           "component": "components/operator.tsx#AnnouncementsView"
         },
         {
-          "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
         },
         {
           "tag": "ConfirmDialog",
@@ -8312,8 +9065,13 @@
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -8325,6 +9083,11 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
         }
       ],
       "dimensions": {
@@ -8452,9 +9215,9 @@
           "component": "components/binso-ux.tsx#Sheet"
         },
         {
-          "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
         },
         {
           "tag": "ConfirmDialog",
@@ -8462,23 +9225,28 @@
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -8500,6 +9268,11 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
         }
       ],
       "dimensions": {
@@ -8581,9 +9354,9 @@
       "roles": "organization:read",
       "actions": [
         {
-          "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
         },
         {
           "tag": "ConfirmDialog",
@@ -8591,23 +9364,28 @@
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -8634,6 +9412,16 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -8716,9 +9504,9 @@
       "roles": "Public or route-level session: see source",
       "actions": [
         {
-          "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
         },
         {
           "tag": "ConfirmDialog",
@@ -8726,23 +9514,28 @@
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -8769,6 +9562,16 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -8867,9 +9670,9 @@
           "component": "app/passwort-zuruecksetzen/page.tsx#Page"
         },
         {
-          "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
         },
         {
           "tag": "ConfirmDialog",
@@ -8877,23 +9680,28 @@
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -8920,6 +9728,16 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -8972,9 +9790,9 @@
       "roles": "Portal session / public registration",
       "actions": [
         {
-          "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
         },
         {
           "tag": "ConfirmDialog",
@@ -8982,23 +9800,28 @@
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -9025,6 +9848,16 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -9077,9 +9910,9 @@
       "roles": "Portal session / public registration",
       "actions": [
         {
-          "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
         },
         {
           "tag": "ConfirmDialog",
@@ -9087,23 +9920,28 @@
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -9130,6 +9968,16 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -9182,9 +10030,9 @@
       "roles": "Portal session / public registration",
       "actions": [
         {
-          "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
         },
         {
           "tag": "ConfirmDialog",
@@ -9192,23 +10040,28 @@
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -9235,6 +10088,16 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -9311,9 +10174,9 @@
       "roles": "Public or route-level session: see source",
       "actions": [
         {
-          "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
         },
         {
           "tag": "ConfirmDialog",
@@ -9321,23 +10184,28 @@
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -9364,6 +10232,16 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -9415,9 +10293,9 @@
       "roles": "Public or route-level session: see source",
       "actions": [
         {
-          "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
         },
         {
           "tag": "ConfirmDialog",
@@ -9425,23 +10303,28 @@
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -9468,6 +10351,16 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -9519,9 +10412,9 @@
       "roles": "Public or route-level session: see source",
       "actions": [
         {
-          "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
         },
         {
           "tag": "ConfirmDialog",
@@ -9529,23 +10422,28 @@
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -9572,6 +10470,16 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -9623,9 +10531,9 @@
       "roles": "Public or route-level session: see source",
       "actions": [
         {
-          "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
         },
         {
           "tag": "ConfirmDialog",
@@ -9633,23 +10541,28 @@
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -9676,6 +10589,16 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -9755,9 +10678,9 @@
       "roles": "Public or route-level session: see source",
       "actions": [
         {
-          "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
         },
         {
           "tag": "ConfirmDialog",
@@ -9765,23 +10688,28 @@
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -9808,6 +10736,16 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -9966,32 +10904,32 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "ConfirmDialog",
           "line": 303,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -10028,6 +10966,16 @@
           "tag": "Sheet",
           "line": 195,
           "component": "components/binso-ux.tsx#FormSheet"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
         }
       ],
       "dimensions": {
@@ -10186,32 +11134,32 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "ConfirmDialog",
           "line": 303,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -10248,6 +11196,16 @@
           "tag": "Sheet",
           "line": 195,
           "component": "components/binso-ux.tsx#FormSheet"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
         }
       ],
       "dimensions": {
@@ -10414,32 +11372,32 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "ConfirmDialog",
           "line": 303,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -10466,6 +11424,21 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -10636,32 +11609,32 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "ConfirmDialog",
           "line": 303,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -10698,6 +11671,16 @@
           "tag": "Sheet",
           "line": 195,
           "component": "components/binso-ux.tsx#FormSheet"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
         }
       ],
       "dimensions": {
@@ -10857,32 +11840,32 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "ConfirmDialog",
           "line": 303,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -10914,6 +11897,16 @@
           "tag": "Sheet",
           "line": 195,
           "component": "components/binso-ux.tsx#FormSheet"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
         }
       ],
       "dimensions": {
@@ -11074,32 +12067,32 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "ConfirmDialog",
           "line": 303,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -11126,6 +12119,21 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -11212,9 +12220,11 @@
         "components/documents.tsx#isoToSwiss",
         "components/ui.tsx#SectionTitle",
         "components/documents.tsx#money",
+        "components/offer-history.tsx#OfferHistory",
+        "components/offer-history.tsx#History",
+        "components/offer-history.tsx#Event",
         "components/binso-ux.tsx#DetailDisclosure",
-        "components/entity-files.tsx#EntityFiles",
-        "components/entity-files.tsx#Attachment",
+        "components/binso-ux.tsx#ActionRow",
         "components/binso-ux.tsx#ActionsMenu",
         "components/binso-ux.tsx#RowActions",
         "components/binso-ux.tsx#ActionSheet",
@@ -11241,18 +12251,13 @@
         "components/ui.tsx#FormActions",
         "components/binso-ux.tsx#sheetForm",
         "components/confirm-dialog.tsx#ConfirmDialog",
-        "components/binso-ux.tsx#ActionRow",
-        "components/ui.tsx#Input",
-        "components/binso-ux.tsx#ListSearch",
-        "components/binso-ux.tsx#ListRow",
-        "components/binso-ux.tsx#FormSheet",
+        "components/pdf-preview.tsx#DocumentModal",
         "components/pdf-preview.tsx#DocumentPageViewer",
         "components/pdf-preview.tsx#DocumentPages",
         "components/pdf-preview.tsx#PdfPage",
-        "components/form-wizard.tsx#FormWizard",
-        "components/ui.tsx#FormSection",
-        "components/documents.tsx#DocumentEditor",
+        "components/binso-ux.tsx#FormSheet",
         "components/ui.tsx#Field",
+        "components/ui.tsx#Input",
         "components/ui.tsx#Select",
         "components/select-control.tsx#SelectControl",
         "components/select-control.tsx#SelectSearch",
@@ -11263,6 +12268,13 @@
         "components/ui.tsx#TimeInput",
         "components/ui.tsx#CurrencyInput",
         "components/ui.tsx#FormError",
+        "components/entity-files.tsx#EntityFiles",
+        "components/entity-files.tsx#Attachment",
+        "components/binso-ux.tsx#ListSearch",
+        "components/binso-ux.tsx#ListRow",
+        "components/form-wizard.tsx#FormWizard",
+        "components/ui.tsx#FormSection",
+        "components/documents.tsx#DocumentEditor",
         "components/directory-select.tsx#DirectorySelect",
         "components/directory-select.tsx#Item",
         "components/directory-select.tsx#Page",
@@ -11308,8 +12320,7 @@
         "components/header-panel-content.tsx#AccountPanel",
         "components/locale-switcher.tsx#LocaleSwitcher",
         "components/app-shell.tsx#ShellRegistration",
-        "components/app-shell.tsx#ShellConfiguration",
-        "components/documents.tsx#DocumentModal"
+        "components/app-shell.tsx#ShellConfiguration"
       ],
       "layouts": [
         "app/layout.tsx",
@@ -11319,43 +12330,33 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 408,
+          "line": 405,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 408,
+          "line": 405,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "ActionSheet",
-          "line": 410,
+          "line": 407,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 427,
+          "line": 424,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 428,
+          "line": 425,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
-          "tag": "ListSearch",
-          "line": 39,
-          "component": "components/entity-files.tsx#EntityFiles"
-        },
-        {
-          "tag": "ActionSheet",
-          "line": 43,
-          "component": "components/entity-files.tsx#EntityFiles"
-        },
-        {
           "tag": "FormSheet",
-          "line": 44,
-          "component": "components/entity-files.tsx#EntityFiles"
+          "line": 34,
+          "component": "components/offer-history.tsx#OfferHistory"
         },
         {
           "tag": "ActionSheet",
@@ -11378,14 +12379,24 @@
           "component": "components/binso-ux.tsx#FormSheet"
         },
         {
-          "tag": "FormSheet",
-          "line": 574,
-          "component": "components/documents.tsx#DocumentEditor"
+          "tag": "ListSearch",
+          "line": 39,
+          "component": "components/entity-files.tsx#EntityFiles"
+        },
+        {
+          "tag": "ActionSheet",
+          "line": 43,
+          "component": "components/entity-files.tsx#EntityFiles"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
+          "line": 45,
+          "component": "components/entity-files.tsx#EntityFiles"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 572,
+          "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "ConfirmDialog",
@@ -11393,23 +12404,28 @@
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -11426,6 +12442,16 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
         }
       ],
       "dimensions": {
@@ -11512,9 +12538,11 @@
         "components/documents.tsx#isoToSwiss",
         "components/ui.tsx#SectionTitle",
         "components/documents.tsx#money",
+        "components/offer-history.tsx#OfferHistory",
+        "components/offer-history.tsx#History",
+        "components/offer-history.tsx#Event",
         "components/binso-ux.tsx#DetailDisclosure",
-        "components/entity-files.tsx#EntityFiles",
-        "components/entity-files.tsx#Attachment",
+        "components/binso-ux.tsx#ActionRow",
         "components/binso-ux.tsx#ActionsMenu",
         "components/binso-ux.tsx#RowActions",
         "components/binso-ux.tsx#ActionSheet",
@@ -11541,18 +12569,13 @@
         "components/ui.tsx#FormActions",
         "components/binso-ux.tsx#sheetForm",
         "components/confirm-dialog.tsx#ConfirmDialog",
-        "components/binso-ux.tsx#ActionRow",
-        "components/ui.tsx#Input",
-        "components/binso-ux.tsx#ListSearch",
-        "components/binso-ux.tsx#ListRow",
-        "components/binso-ux.tsx#FormSheet",
+        "components/pdf-preview.tsx#DocumentModal",
         "components/pdf-preview.tsx#DocumentPageViewer",
         "components/pdf-preview.tsx#DocumentPages",
         "components/pdf-preview.tsx#PdfPage",
-        "components/form-wizard.tsx#FormWizard",
-        "components/ui.tsx#FormSection",
-        "components/documents.tsx#DocumentEditor",
+        "components/binso-ux.tsx#FormSheet",
         "components/ui.tsx#Field",
+        "components/ui.tsx#Input",
         "components/ui.tsx#Select",
         "components/select-control.tsx#SelectControl",
         "components/select-control.tsx#SelectSearch",
@@ -11563,6 +12586,13 @@
         "components/ui.tsx#TimeInput",
         "components/ui.tsx#CurrencyInput",
         "components/ui.tsx#FormError",
+        "components/entity-files.tsx#EntityFiles",
+        "components/entity-files.tsx#Attachment",
+        "components/binso-ux.tsx#ListSearch",
+        "components/binso-ux.tsx#ListRow",
+        "components/form-wizard.tsx#FormWizard",
+        "components/ui.tsx#FormSection",
+        "components/documents.tsx#DocumentEditor",
         "components/directory-select.tsx#DirectorySelect",
         "components/directory-select.tsx#Item",
         "components/directory-select.tsx#Page",
@@ -11608,8 +12638,7 @@
         "components/header-panel-content.tsx#AccountPanel",
         "components/locale-switcher.tsx#LocaleSwitcher",
         "components/app-shell.tsx#ShellRegistration",
-        "components/app-shell.tsx#ShellConfiguration",
-        "components/documents.tsx#DocumentModal"
+        "components/app-shell.tsx#ShellConfiguration"
       ],
       "layouts": [
         "app/layout.tsx",
@@ -11619,43 +12648,33 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 408,
+          "line": 405,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 408,
+          "line": 405,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "ActionSheet",
-          "line": 410,
+          "line": 407,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 427,
+          "line": 424,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 428,
+          "line": 425,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
-          "tag": "ListSearch",
-          "line": 39,
-          "component": "components/entity-files.tsx#EntityFiles"
-        },
-        {
-          "tag": "ActionSheet",
-          "line": 43,
-          "component": "components/entity-files.tsx#EntityFiles"
-        },
-        {
           "tag": "FormSheet",
-          "line": 44,
-          "component": "components/entity-files.tsx#EntityFiles"
+          "line": 34,
+          "component": "components/offer-history.tsx#OfferHistory"
         },
         {
           "tag": "ActionSheet",
@@ -11678,14 +12697,24 @@
           "component": "components/binso-ux.tsx#FormSheet"
         },
         {
-          "tag": "FormSheet",
-          "line": 574,
-          "component": "components/documents.tsx#DocumentEditor"
+          "tag": "ListSearch",
+          "line": 39,
+          "component": "components/entity-files.tsx#EntityFiles"
+        },
+        {
+          "tag": "ActionSheet",
+          "line": 43,
+          "component": "components/entity-files.tsx#EntityFiles"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
+          "line": 45,
+          "component": "components/entity-files.tsx#EntityFiles"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 572,
+          "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "ConfirmDialog",
@@ -11693,23 +12722,28 @@
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -11726,6 +12760,16 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
         }
       ],
       "dimensions": {
@@ -11890,32 +12934,32 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "ConfirmDialog",
           "line": 303,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -11942,6 +12986,21 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -11987,25 +13046,21 @@
       "route": "/registrieren",
       "family": "AuthenticationPage",
       "components": [
-        "components/registration/registration-sheet.tsx#RegistrationSheet",
-        "components/registration/registration-sheet.tsx#Context",
-        "components/registration/registration-sheet.tsx#Stage",
+        "components/registration/registration-page.tsx#RegistrationPage",
+        "components/registration/registration-page.tsx#Context",
+        "components/registration/registration-page.tsx#Stage",
         "components/use-browser-back-guard.ts#allowDraftNavigation",
         "components/use-browser-back-guard.ts#boundary",
-        "components/ui.tsx#Logo",
-        "components/ui.tsx#ErrorState",
-        "components/ui.tsx#Button",
-        "components/ui.tsx#Icon",
-        "components/ui.tsx#dismissActionLabels",
-        "components/ui.tsx#actionSourceText",
-        "components/binso-ux.tsx#FormSheet",
-        "components/binso-ux.tsx#SheetProps",
-        "components/binso-ux.tsx#Sheet",
         "components/use-browser-back-guard.ts#useBrowserBackGuard",
         "components/use-browser-back-guard.ts#DraftGuard",
         "components/use-browser-back-guard.ts#guards",
         "components/use-browser-back-guard.ts#armBoundary",
-        "components/use-dialog-focus.ts#useDialogFocus",
+        "components/auth-workspace.tsx#AuthWorkspace",
+        "components/ui.tsx#Logo",
+        "components/locale-switcher.tsx#LocaleSwitcher",
+        "components/ui.tsx#Select",
+        "components/select-control.tsx#SelectControl",
+        "components/select-control.tsx#SelectSearch",
         "components/page-scroll-lock.ts#lockPageScroll",
         "components/page-scroll-lock.ts#locks",
         "components/page-scroll-lock.ts#bodyOverflow",
@@ -12013,24 +13068,17 @@
         "components/page-scroll-lock.ts#x",
         "components/page-scroll-lock.ts#y",
         "components/page-scroll-lock.ts#guard",
-        "components/use-dialog-focus.ts#lockDialogBackground",
-        "components/use-dialog-focus.ts#backgroundLocks",
+        "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
-        "components/binso-ux.tsx#sheetValues",
-        "components/binso-ux.tsx#sheetChildren",
-        "components/ui.tsx#FormActions",
-        "components/binso-ux.tsx#sheetForm",
-        "components/confirm-dialog.tsx#ConfirmDialog",
-        "components/form-wizard.tsx#FormWizard",
-        "components/ui.tsx#FormSection",
-        "components/ui.tsx#SectionTitle",
-        "components/ui.tsx#Field",
         "components/ui.tsx#Input",
-        "components/ui.tsx#Select",
-        "components/select-control.tsx#SelectControl",
-        "components/select-control.tsx#SelectSearch",
-        "components/use-dialog-focus.ts#registerDialogPortal",
+        "components/ui.tsx#Icon",
+        "components/ui.tsx#ErrorState",
+        "components/ui.tsx#Button",
+        "components/ui.tsx#dismissActionLabels",
+        "components/ui.tsx#actionSourceText",
+        "components/ui.tsx#LoadingState",
+        "components/ui.tsx#Field",
         "components/ui.tsx#Textarea",
         "components/ui.tsx#Checkbox",
         "components/ui.tsx#DateInput",
@@ -12038,7 +13086,12 @@
         "components/ui.tsx#CurrencyInput",
         "components/ui.tsx#FormLabel",
         "components/ui.tsx#FormError",
-        "components/password-input.tsx#PasswordInput"
+        "components/password-input.tsx#PasswordInput",
+        "components/binso-ux.tsx#DetailDisclosure",
+        "components/confirm-dialog.tsx#ConfirmDialog",
+        "components/use-dialog-focus.ts#useDialogFocus",
+        "components/use-dialog-focus.ts#lockDialogBackground",
+        "components/use-dialog-focus.ts#backgroundLocks"
       ],
       "layouts": [
         "app/layout.tsx"
@@ -12046,29 +13099,14 @@
       "roles": "Public or route-level session: see source",
       "actions": [
         {
-          "tag": "RegistrationSheet",
-          "line": 3,
-          "component": "app/registrieren/page.tsx#Register"
-        },
-        {
-          "tag": "FormSheet",
-          "line": 79,
-          "component": "components/registration/registration-sheet.tsx#RegistrationSheet"
-        },
-        {
-          "tag": "Sheet",
-          "line": 195,
-          "component": "components/binso-ux.tsx#FormSheet"
-        },
-        {
           "tag": "ConfirmDialog",
-          "line": 191,
-          "component": "components/binso-ux.tsx#Sheet"
+          "line": 96,
+          "component": "components/registration/registration-page.tsx#RegistrationPage"
         },
         {
-          "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
         },
         {
           "tag": "ConfirmDialog",
@@ -12076,17 +13114,17 @@
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
@@ -12096,9 +13134,19 @@
           "component": "components/records.tsx#RecordsControls"
         },
         {
+          "tag": "FilterSheet",
+          "line": 109,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
           "tag": "Sheet",
           "line": 196,
           "component": "components/binso-ux.tsx#FilterSheet"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 191,
+          "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "ActionSheet",
@@ -12114,6 +13162,16 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -12283,32 +13341,32 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "ConfirmDialog",
           "line": 303,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -12340,6 +13398,16 @@
           "tag": "Sheet",
           "line": 195,
           "component": "components/binso-ux.tsx#FormSheet"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
         }
       ],
       "dimensions": {
@@ -12509,32 +13577,32 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "ConfirmDialog",
           "line": 303,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -12566,6 +13634,16 @@
           "tag": "Sheet",
           "line": 195,
           "component": "components/binso-ux.tsx#FormSheet"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
         }
       ],
       "dimensions": {
@@ -12732,32 +13810,32 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "ConfirmDialog",
           "line": 303,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -12784,6 +13862,21 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -12936,32 +14029,32 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "ConfirmDialog",
           "line": 303,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -12993,6 +14086,21 @@
           "tag": "ActionSheet",
           "line": 205,
           "component": "components/binso-ux.tsx#ActionsMenu"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -13150,32 +14258,32 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "ConfirmDialog",
           "line": 303,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -13207,6 +14315,16 @@
           "tag": "Sheet",
           "line": 195,
           "component": "components/binso-ux.tsx#FormSheet"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
         }
       ],
       "dimensions": {
@@ -13365,32 +14483,32 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "ConfirmDialog",
           "line": 303,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -13417,6 +14535,21 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -13493,9 +14626,9 @@
       "roles": "Public or route-level session: see source",
       "actions": [
         {
-          "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
         },
         {
           "tag": "ConfirmDialog",
@@ -13503,23 +14636,28 @@
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -13546,6 +14684,16 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -13603,9 +14751,9 @@
       "roles": "Public or route-level session: see source",
       "actions": [
         {
-          "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
         },
         {
           "tag": "ConfirmDialog",
@@ -13613,23 +14761,28 @@
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -13656,6 +14809,16 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -13708,9 +14871,9 @@
       "roles": "Public or route-level session: see source",
       "actions": [
         {
-          "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
         },
         {
           "tag": "ConfirmDialog",
@@ -13718,23 +14881,28 @@
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -13761,6 +14929,16 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -13913,32 +15091,32 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "ConfirmDialog",
           "line": 303,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -13970,6 +15148,21 @@
           "tag": "ActionSheet",
           "line": 52,
           "component": "components/binso-ux.tsx#ContextActions"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -14128,32 +15321,32 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "ConfirmDialog",
           "line": 303,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -14185,6 +15378,16 @@
           "tag": "Sheet",
           "line": 195,
           "component": "components/binso-ux.tsx#FormSheet"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
         }
       ],
       "dimensions": {
@@ -14353,32 +15556,32 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "ConfirmDialog",
           "line": 303,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -14405,6 +15608,21 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 195,
+          "component": "components/binso-ux.tsx#FormSheet"
         }
       ],
       "dimensions": {
@@ -14522,6 +15740,7 @@
         "components/binso-ux.tsx#ActionRow",
         "components/binso-ux.tsx#ListSearch",
         "components/ui.tsx#EmptyState",
+        "components/pdf-preview.tsx#DocumentModal",
         "components/pdf-preview.tsx#DocumentPageViewer",
         "components/pdf-preview.tsx#DocumentPages",
         "components/pdf-preview.tsx#PdfPage",
@@ -14578,27 +15797,27 @@
       "actions": [
         {
           "tag": "ListSearch",
-          "line": 191,
+          "line": 189,
           "component": "components/pages/time.tsx#TimePage"
         },
         {
           "tag": "FilterSheet",
-          "line": 192,
+          "line": 190,
           "component": "components/pages/time.tsx#TimePage"
         },
         {
           "tag": "ActionSheet",
+          "line": 215,
+          "component": "components/pages/time.tsx#TimePage"
+        },
+        {
+          "tag": "FormSheet",
           "line": 216,
           "component": "components/pages/time.tsx#TimePage"
         },
         {
           "tag": "FormSheet",
           "line": 217,
-          "component": "components/pages/time.tsx#TimePage"
-        },
-        {
-          "tag": "FormSheet",
-          "line": 218,
           "component": "components/pages/time.tsx#TimePage"
         },
         {
@@ -14627,8 +15846,8 @@
           "component": "components/entity-files.tsx#EntityFiles"
         },
         {
-          "tag": "FormSheet",
-          "line": 44,
+          "tag": "ConfirmDialog",
+          "line": 45,
           "component": "components/entity-files.tsx#EntityFiles"
         },
         {
@@ -14643,32 +15862,32 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 301,
-          "component": "components/app-shell.tsx#AppShellFrame"
-        },
-        {
-          "tag": "ConfirmDialog",
           "line": 303,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
           "tag": "ActionSheet",
-          "line": 363,
+          "line": 365,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ListSearch",
-          "line": 106,
-          "component": "components/records.tsx#RecordsControls"
-        },
-        {
-          "tag": "FilterSheet",
           "line": 107,
           "component": "components/records.tsx#RecordsControls"
         },
         {
           "tag": "FilterSheet",
           "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
           "component": "components/records.tsx#RecordsControls"
         },
         {
@@ -14685,6 +15904,16 @@
           "tag": "ConfirmDialog",
           "line": 34,
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 83,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
         }
       ],
       "dimensions": {

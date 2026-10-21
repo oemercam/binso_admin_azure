@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {prepareHistoricalFixtureOwner} from './fixtures/template-access.mjs';
 import fs from 'node:fs/promises';
 import {spawn} from 'node:child_process';
-import {createHash,randomBytes} from 'node:crypto';
+import {createHash,createHmac,createCipheriv,randomBytes} from 'node:crypto';
 import pg from 'pg';
 import {moduleUrl} from './data-test-modules.mjs';
 
@@ -30,7 +30,7 @@ try{
    const user='http-'+index+'-'+role,token=randomBytes(32).toString('base64url');
    await pool.query("insert into app_users(id,email,display_name,status,mfa_enabled) values($1,$2,$1,'active',true)",[user,user+'@fixture.invalid']);
    await pool.query("insert into organization_memberships(organization_id,user_id,email,role,status) values($1,$2,$3,$4,'active')",[organizationId,user,user+'@fixture.invalid',role]);
-   await pool.query("insert into auth_sessions(user_id,organization_id,token_hash,expires_at) values($1,$2,$3,now()+interval '1 hour')",[user,organizationId,createHash('sha256').update(token).digest('hex')]);
+   await pool.query("insert into auth_sessions(user_id,organization_id,token_hash,expires_at,step_up_at) values($1,$2,$3,now()+interval '1 hour',now())",[user,organizationId,createHash('sha256').update(token).digest('hex')]);
    cookies.set(index+':'+role,'binso_v213_test_session='+token);
   }
   const c=await pool.connect();try{await c.query('begin');await c.query('set local role binso_runtime');await c.query("select set_config('app.organization_id',$1,true),set_config('app.user_id',$2,true)",[organizationId,'http-'+index+'-owner']);assert.equal((await c.query('select id from organizations where id=$1',[demo.demoTemplateId])).rowCount,0,'Template profile is hidden outside its explicit seeding context');await demo.seedDatabaseDemo(c,organizationId,'http-'+index+'-owner');await c.query("select set_config('app.organization_id',$1,true)",[demo.demoTemplateId]);assert.equal((await c.query("update organizations set name=name where id=$1",[demo.demoTemplateId])).rowCount,0,'Runtime cannot modify the canonical template profile');await c.query('commit');}catch(e){await c.query('rollback');throw e;}finally{c.release();}
@@ -42,8 +42,11 @@ try{
  for(const role of ['project_manager','manager','member'])await pool.query("insert into employees(organization_id,external_id,name,email,role,employment_type,user_id) values($1,$2,$2,$3,'employee','hourly',$4)",[organizations[0],'http-linked-'+role,'linked-'+role+'@fixture.invalid','http-0-'+role]);
  const base='http://127.0.0.1:3218';
  try{await fetch(base+'/api/health');throw new Error('Refusing an occupied HTTP test port');}catch(e){if(e.message==='Refusing an occupied HTTP test port')throw e;}
- const serverEnv={...process.env,APP_URL:base,DATABASE_URL:address,DATABASE_SSL:'false',SESSION_COOKIE_NAME:'binso_v213_test_session'};
- for(const key of Object.keys(serverEnv))if(key.startsWith('STRIPE_'))delete serverEnv[key];
+ await pool.query("alter role binso_runtime password 'synthetic_v25_http_runtime'");
+ const runtimeUrl=new URL(address);runtimeUrl.username='binso_runtime';runtimeUrl.password='synthetic_v25_http_runtime';
+ const testEncryptionKey='synthetic-v25-http-encryption-key';
+ const serverEnv={...process.env,APP_URL:base,DATABASE_URL:runtimeUrl.href,DATABASE_SSL:'false',APP_ENCRYPTION_KEY:testEncryptionKey,SESSION_COOKIE_NAME:'binso_v213_test_session'};
+ for(const key of Object.keys(serverEnv))if(key.startsWith('STRIPE_')||key.startsWith('GRAPH_'))delete serverEnv[key];
  server=spawn(process.execPath,['node_modules/next/dist/bin/next','start','--hostname','127.0.0.1','--port','3218'],{stdio:['ignore','pipe','pipe'],env:serverEnv});
  let logs='';server.stdout.on('data',data=>{logs+=data});server.stderr.on('data',data=>{logs+=data});
  for(let i=0;;i++){if(server.exitCode!==null)throw new Error('Synthetic HTTP server exited: '+logs);try{if((await fetch(base+'/api/health')).ok)break;}catch{}if(i>80)throw new Error('Synthetic server unavailable');await new Promise(resolve=>setTimeout(resolve,250));}
@@ -55,6 +58,7 @@ try{
   const foreign=await get('/api/'+path+'/'+own.id,cookies.get('1:owner'));assert.equal(foreign.status,404,path+' foreign direct ID');positive.push(path);
  }
  const invoice=(await pool.query('select invoice_no from invoices where organization_id=$1 order by id limit 1',[organizations[0]])).rows[0];
+ const offer=(await pool.query('select id,quote_no from quotes where organization_id=$1 and archived_at is null order by id limit 1',[organizations[0]])).rows[0];
  assert.equal((await get('/api/documents/'+invoice.invoice_no,cookies.get('0:owner'))).status,200);
  // Numbers may repeat legally in separate tenants: compare the returned object ID.
  const ownDocument=await get('/api/documents/'+invoice.invoice_no,cookies.get('0:owner'));
@@ -84,6 +88,7 @@ try{
   ...['/api/expenses','/api/expenses/options','/api/time-entries','/api/time-entries/policy','/api/time-tracker'].map(path=>[path,expenseRoles]),
   ['/api/employees',employeeRoles],['/api/settings/team/invitations',teamRoles],
  ];
+ readContracts.push(['/api/documents/'+encodeURIComponent(offer.quote_no)+'/versions',documentRoles]);
  const project=(await pool.query('select id from projects where organization_id=$1 order by id limit 1',[organizations[0]])).rows[0];
  const employee=(await pool.query('select id from employees where organization_id=$1 order by id limit 1',[organizations[0]])).rows[0];
  const product=(await pool.query('select id from products_services where organization_id=$1 order by id limit 1',[organizations[0]])).rows[0];
@@ -135,7 +140,7 @@ try{
  assert.equal((await get('/api/projects/'+project.id,cookies.get('1:owner'))).status,404,'Foreign project workspace ID stays hidden');
  const inventory=JSON.parse(await fs.readFile('docs/architecture/v21-3-data-inventory.json','utf8'));
  const covered=new Set(readContracts.map(([path])=>path.split('?')[0].replace(new RegExp(customer.id+'|'+project.id+'|'+employee.id+'|'+product.id+'|'+payment.id+'|'+ticket.id,'g'),'[id]')));
- for(const path of ['/api/expenses/[id]','/api/documents/[number]','/api/documents/[number]/pdf','/api/files/[id]/download'])covered.add(path);
+ for(const path of ['/api/expenses/[id]','/api/documents/[number]','/api/documents/[number]/pdf','/api/documents/[number]/versions','/api/files/[id]/download'])covered.add(path);
  const publicEntries=new Set(['/api/auth/invitation','/api/health','/api/health/ready','/api/demo/session','/api/operator/sso/callback']);
  for(const api of inventory.apis.filter(item=>item.methods.includes('GET'))){
   if(api.path.startsWith('/api/operator/')&&!publicEntries.has(api.path)||api.path.startsWith('/api/demo/')&&!publicEntries.has(api.path)){
@@ -220,6 +225,35 @@ try{
  console.log('Authenticated read-role contract: every inventoried private GET route across all eight tenant roles, including binary PDF/files, own-record expense filtering, every operator/demo boundary; public/token entry points explicitly excluded. Write-role coverage is separate and incomplete.');
  for(const [role,allowed] of [['owner',true],['admin',true],['finance',true],['hr',false],['project_manager',false],['manager',false],['member',false],['reader',false]])assert.equal((await get('/api/payments',cookies.get('0:'+role))).status,allowed?200:403,role+' payment read policy');
  for(const role of roles)assert.equal((await get('/api/operator/dashboard',cookies.get('0:'+role))).status,401,'Tenant '+role+' cannot gain operator access');
+ // Actual Next handlers and a NOBYPASSRLS database login, never a real mail provider.
+ await pool.query("update app_users set mfa_enabled=false where id='http-0-owner'");
+ assert.equal((await get('/api/settings/profile',cookies.get('0:owner'))).status,200,'Optional MFA cannot lock ordinary profile access');
+ await pool.query("update auth_sessions set step_up_at=null where user_id='http-0-owner'");
+ assert.equal((await write('PATCH','/api/settings/documents',{},'owner')).data.error,'fresh_authentication_required','Bank/settings mutations require fresh proof before validation or writes');
+ await pool.query("update auth_sessions set step_up_at=now() where user_id='http-0-owner'");
+ const capabilityQuote=(await pool.query("select id,quote_no from quotes where organization_id=$1 and archived_at is null and status in ('sent','draft') order by id limit 1",[organizations[0]])).rows[0];
+ await pool.query("update quotes set status='sent',valid_until='2099-12-31' where id=$1",[capabilityQuote.id]);
+ const document=(await get('/api/documents/'+encodeURIComponent(capabilityQuote.quote_no),cookies.get('0:owner'))).data.item;
+ const pdfResponse=await get('/api/documents/'+encodeURIComponent(capabilityQuote.quote_no)+'/pdf',cookies.get('0:owner'));assert.equal(pdfResponse.status,200);const pdf=Buffer.from(pdfResponse.data);
+ const version=(await pool.query('insert into offer_versions(organization_id,quote_id,version,number,document,company,pdf,pdf_sha256,created_by_user_id) values($1,$2,1,$3,$4,$5,$6,$7,$8) returning id',[organizations[0],capabilityQuote.id,capabilityQuote.quote_no,JSON.stringify(document),JSON.stringify({name:'Synthetic HTTP Company'}),pdf,createHash('sha256').update(pdf).digest('hex'),'http-0-owner'])).rows[0];
+ const publicPost=async body=>{const response=await fetch(base+'/api/public/offer',{method:'POST',headers:{origin:base,'content-type':'application/json'},body:JSON.stringify(body)});return {status:response.status,data:await response.json()}};
+ const links=[];
+ for(const action of ['accept','decline']){
+  const token=randomBytes(32).toString('base64url'),iv=randomBytes(12),cipher=createCipheriv('aes-256-gcm',createHash('sha256').update(testEncryptionKey).digest(),iv),encrypted=Buffer.concat([cipher.update(token,'utf8'),cipher.final()]),tokenEnc=[iv,cipher.getAuthTag(),encrypted].map(bytes=>bytes.toString('base64url')).join('.');
+  const link=(await pool.query("insert into offer_public_links(organization_id,version_id,token_hash,token_enc,recipient,created_by_user_id,expires_at) values($1,$2,$3,$4,'synthetic-recipient@fixture.invalid','http-0-owner',now()+interval '1 day') returning id",[organizations[0],version.id,createHash('sha256').update(token).digest('hex'),tokenEnc])).rows[0];
+  const code=action==='accept'?'123456':'654321';
+  await pool.query("insert into offer_recipient_codes(organization_id,link_id,action,code_hash,expires_at) values($1,$2,$3,$4,now()+interval '10 minutes')",[organizations[0],link.id,action,createHmac('sha256',testEncryptionKey).update(link.id+'|'+action+'|'+code).digest('hex')]);
+  links.push({token,action,code,id:link.id});
+ }
+ assert.equal((await fetch(base+'/api/public/offer')).status,405,'GET cannot trigger any public offer action');
+ assert.equal((await publicPost({token:links[0].token,action:'read'})).status,200);
+ assert.equal((await pool.query('select status from quotes where id=$1',[capabilityQuote.id])).rows[0].status,'sent','Opening cannot decide');
+ assert.equal((await publicPost({token:'x'.repeat(43),action:'read'})).status,410);
+ const decisions=await Promise.all(links.map(link=>publicPost({token:link.token,action:'respond',decision:link.action,code:link.code,message:'',requestKey:randomBytes(16).toString('hex'),confirmed:true})));
+ assert.deepEqual(decisions.map(result=>result.status).sort(),[200,409],'Competing HTTP decisions produce exactly one committed winner');
+ assert.equal((await pool.query("select count(*)::int n from offer_public_events where link_id=any($1::uuid[]) and kind in ('accepted','declined')",[links.map(link=>link.id)])).rows[0].n,1);
+ assert.equal((await get('/api/documents/'+encodeURIComponent(capabilityQuote.quote_no)+'/versions?version=1',cookies.get('1:owner'))).status,404,'Foreign tenant cannot fetch the archived PDF');
+ console.log('Real HTTP public offers: restricted runtime login, GET refusal, scoped capability lookup, atomic two-client acceptance/decline and archived-PDF tenant denial passed; no Graph credentials.');
  const ownRows=await get('/api/customers',cookies.get('0:owner')),foreignRows=await get('/api/customers',cookies.get('1:owner'));
  const ownIds=new Set(ownRows.data.items.map(item=>item.id));assert.ok(!foreignRows.data.items.some(item=>ownIds.has(item.id)));
  await pool.query("update auth_sessions set expires_at=now()-interval '1 second' where user_id='http-0-owner'");assert.equal((await get('/api/customers',cookies.get('0:owner'))).status,401,'Expired real database session is denied');

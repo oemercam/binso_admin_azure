@@ -1,3 +1,4 @@
+import {requireFreshAuthentication} from '@/lib/server/fresh-authentication';
 import {NextRequest} from 'next/server';
 import {requireSession} from '@/lib/server/session';
 import {withTenant} from '@/lib/server/db';
@@ -15,7 +16,7 @@ export async function GET(){try{
 }catch(e){return apiError(e)}}
 
 export async function POST(request:NextRequest){try{
- assertSameOrigin(request);const s=await requireSession();authorizeWorkforceManagement(s);
+ assertSameOrigin(request);const s=await requireSession();authorizeWorkforceManagement(s);await requireFreshAuthentication(s);
  const body=await readJson<Record<string,unknown>>(request,8192);
  const employeeId=cleanText(body.employeeId,80),userId=cleanText(body.userId,200),customerId=cleanText(body.customerId,80),projectId=cleanText(body.projectId,80),startsOn=cleanText(body.startsOn,10),endsOn=cleanText(body.endsOn,10);
  if(!employeeId||!userId||!customerId||!/^\d{4}-\d{2}-\d{2}$/.test(startsOn)||endsOn&&(!/^\d{4}-\d{2}-\d{2}$/.test(endsOn)||endsOn<startsOn))throw new ApiError(400,'assignment_invalid','Bitte Mitarbeiter, Zugang, Kunde und Zeitraum prüfen.');
@@ -32,7 +33,7 @@ export async function POST(request:NextRequest){try{
 }catch(e){return apiError(e)}}
 
 export async function PATCH(request:NextRequest){try{
- assertSameOrigin(request);const s=await requireSession();authorizeWorkforceManagement(s);const body=await readJson<{id?:string}>(request,1024);const id=cleanText(body.id,80);
+ assertSameOrigin(request);const s=await requireSession();authorizeWorkforceManagement(s);await requireFreshAuthentication(s);const body=await readJson<{id?:string}>(request,1024);const id=cleanText(body.id,80);
  await withTenant(s.organizationId,s.userId,async c=>{
   const row=(await c.query('update workforce_assignments set revoked_at=now() where organization_id=$1 and id::text=$2 and revoked_at is null returning id',[s.organizationId,id])).rows[0];
   if(!row)throw new ApiError(404,'assignment_not_found','Zuordnung wurde nicht gefunden.');

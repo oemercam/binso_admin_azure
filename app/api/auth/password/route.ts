@@ -3,6 +3,7 @@ import { ApiError, apiError, assertSameOrigin, json, readJson } from "@/lib/serv
 import { consumeAuthToken } from "@/lib/server/auth-tokens";
 import { hashPassword, verifyPassword } from "@/lib/server/password";
 import {requireSession} from "@/lib/server/session";
+import {requireFreshAuthentication} from '@/lib/server/fresh-authentication';
 import {enforceRateLimit} from "@/lib/server/rate-limit";
 import { query,withTransaction } from "@/lib/server/db";
 export async function PATCH(request:NextRequest){
@@ -14,12 +15,13 @@ export async function PATCH(request:NextRequest){
   if(!token){
     const session=await requireSession();
     if(session.isDemo)return json({error:'demo_action_unavailable',message:'Demo-Zugang benötigt kein Passwort.'},403);
+    await requireFreshAuthentication(session);
     await enforceRateLimit(request,'password-change',5,15*60*1000);
     const current=typeof body.currentPassword==='string'?body.currentPassword:'';
     const user=(await query<{password_hash:string}>('select password_hash from app_users where id=$1',[session.userId])).rows[0];
     if(!user?.password_hash||!await verifyPassword(current,user.password_hash))return json({error:'reauth_required',message:'Das aktuelle Passwort stimmt nicht.'},403);
     const hash=await hashPassword(password);
-    await withTransaction(async c=>{const changed=await c.query("update app_users set password_hash=$1,updated_at=now() where id=$2 and status='active' and password_hash=$3 returning id",[hash,session.userId,user.password_hash]);if(!changed.rowCount)throw new ApiError(409,"auth_state_changed","Die Sicherheitsdaten wurden geändert. Bitte erneut anmelden.");await c.query('delete from auth_sessions where user_id=$1 and id<>$2',[session.userId,session.sessionId]);});
+    await withTransaction(async c=>{const changed=await c.query("update app_users set password_hash=$1,updated_at=now() where id=$2 and status='active' and password_hash=$3 returning id",[hash,session.userId,user.password_hash]);if(!changed.rowCount)throw new ApiError(409,"auth_state_changed","Die Sicherheitsdaten wurden geändert. Bitte erneut anmelden.");await c.query('delete from auth_sessions where user_id=$1 and id<>$2',[session.userId,session.sessionId]);await c.query('update auth_sessions set step_up_at=null where id=$1',[session.sessionId]);});
     return json({ok:true});
   }
   await enforceRateLimit(request,"password-reset",5,15*60_000);

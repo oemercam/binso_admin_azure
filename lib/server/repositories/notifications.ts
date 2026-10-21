@@ -11,7 +11,7 @@ export async function notificationList(c:PoolClient,s:SessionUser){
  from in_app_notifications n left join notification_reads r on r.notification_id=n.id and r.organization_id=n.organization_id and r.user_id=$2
  where n.organization_id=$1 and (n.user_id is null or n.user_id=$2) and ($3::boolean=false or n.user_id=$2)
  order by n.created_at desc limit 100`,[s.organizationId,s.userId,s.moduleProfile==='time_only'])).rows;
- return s.moduleProfile==='time_only'?rows.filter(item=>!!item.href&&tenantCanOpenPath(s.role,item.href.split('?')[0],s.moduleProfile)):rows;
+ return rows.filter(item=>item.href?tenantCanOpenPath(s.role,item.href.split('?')[0],s.moduleProfile):s.moduleProfile!=='time_only');
 }
 export async function markNotificationsRead(c:PoolClient,s:SessionUser,id:string|null){
  await c.query(`insert into notification_reads(organization_id,notification_id,user_id)

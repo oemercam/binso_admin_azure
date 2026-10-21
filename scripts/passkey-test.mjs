@@ -60,8 +60,10 @@ try{
  const keys=await import(await load('lib/server/passkeys.ts')),session=await import(await load('lib/server/session.ts'));
  const begin=()=>keys.beginPasskeyRegistration(s,password,totp.totp(secret),'Synthetic key');
  globalThis.__passkey.appUrl='http://evil.invalid';assert.throws(()=>keys.passkeyRelyingParty(),e=>e.code==='passkey_unavailable');globalThis.__passkey.appUrl='https://fixture.invalid';
- await assert.rejects(()=>keys.beginPasskeyRegistration(s,'wrong',totp.totp(secret),'key'),e=>e.code==='reauth_required');
- await assert.rejects(()=>keys.beginPasskeyRegistration(s,password,'111xxx','key'),e=>e.code==='reauth_required');
+ await assert.rejects(()=>keys.beginPasskeyRegistration(s,password,totp.totp(secret),'key'),e=>e.code==='fresh_authentication_required','Registration requires a server-side fresh proof, not merely request fields');
+ await db.query("update auth_sessions set step_up_at=now()-interval '6 minutes' where id=$1",[s.sessionId]);
+ await assert.rejects(()=>keys.beginPasskeyRegistration(s,password,totp.totp(secret),'key'),e=>e.code==='fresh_authentication_required','An expired proof cannot register a credential');
+ await db.query('update auth_sessions set step_up_at=now() where id=$1',[s.sessionId]);
  let options=await begin();assert.equal(options.authenticatorSelection.userVerification,'required');assert.equal(jar.get('binso_passkey').options.httpOnly,true);assert.equal(jar.get('binso_passkey').options.sameSite,'strict');
  await assert.rejects(()=>keys.finishPasskeyRegistration(s,registration(options,{origin:'https://evil.invalid'})),e=>e.code==='passkey_invalid');
  await assert.rejects(()=>keys.finishPasskeyRegistration(s,registration(options)),e=>e.code==='passkey_challenge_invalid','Failed verification consumes its challenge');
@@ -83,7 +85,8 @@ try{
  await assert.rejects(()=>keys.finishPasskeyAuthentication(authentication(auth),totp.totp(secret),false),e=>e.code==='passkey_challenge_invalid','Replay cannot mint another session');
  auth=await keys.beginPasskeyAuthentication();await assert.rejects(()=>keys.finishPasskeyAuthentication(authentication(auth),totp.totp(secret),false),e=>e.code==='invalid_credentials','Cloned non-zero counter is rejected');
  auth=await keys.beginPasskeyAuthentication();await db.query("update auth_passkey_challenges set expires_at=now()-interval '1 second'");await assert.rejects(()=>keys.finishPasskeyAuthentication(authentication(auth,{counter:2}),totp.totp(secret),false),e=>e.code==='passkey_challenge_invalid');
- await assert.rejects(()=>keys.removePasskey(s,credentialId,'wrong',totp.totp(secret)),e=>e.code==='reauth_required');
+ await assert.rejects(()=>keys.removePasskey(s,credentialId,password,totp.totp(secret)),e=>e.code==='fresh_authentication_required','The enrollment proof is invalidated when the security state changes');
+ await db.query('update auth_sessions set step_up_at=now() where id=$1',[s.sessionId]);
  const removed=await keys.removePasskey(s,credentialId,password,totp.totp(secret));assert.equal(removed.ok,true);assert.equal((await keys.listPasskeys(s)).length,0);assert.equal(sent.length,2);
  assert.equal((await db.query('select count(*)::int n from auth_sessions where user_id=$1',[user])).rows[0].n,1,'Only the explicitly current session remains after credential revoke');
  await assert.rejects(()=>session.createSession({userId:user,organizationId:org,email:s.email,name:'Synthetic',role:'owner',expectedPasskeyId:credentialId,expectedAuth:{passwordHash,mfaEnabled:true,mfaSecretEnc:encryptedSecret}}),e=>e.code==='auth_state_changed','Revoked credentials cannot issue a late session');
@@ -127,6 +130,8 @@ try{
  jar.set('binso_session',{value:'pk-current-token'});
  const memberRoute=await import(await load('app/api/settings/team/members/[userId]/route.ts'));
  const memberPatch=(id,body)=>memberRoute.PATCH({headers:new Headers(),nextUrl:new URL('https://fixture.invalid/api/settings/team/members/'+id),body:new Response(JSON.stringify(body)).body},{params:Promise.resolve({userId:id})});
+ assert.equal((await memberPatch(user,{action:'deactivate'})).status,403,'Membership mutations require a new proof after credential revocation');
+ await db.query('update auth_sessions set step_up_at=now() where id=$1',[s.sessionId]);
  assert.equal((await memberPatch(user,{action:'deactivate'})).status,409,'Owner access cannot be removed through normal membership management');
  assert.equal((await memberPatch(foreign,{action:'deactivate'})).status,404,'A foreign direct ID cannot be suspended');
  const targetSession=randomUUID();await db.query("insert into auth_sessions(id,user_id,organization_id,token_hash,expires_at) values($1,$2,$3,'synthetic-member-token',now()+interval '1 hour')",[targetSession,normalUser,org]);
@@ -143,5 +148,5 @@ try{
  await db.query("update organization_memberships set role='admin' where organization_id=$1 and user_id=$2",[org,user]);assert.equal((await memberPatch(user,{action:'deactivate'})).status,409,'Admins cannot suspend their own remaining access');
  await db.query("update organization_memberships set role='reader' where organization_id=$1 and user_id=$2",[org,user]);assert.equal((await memberPatch(normalUser,{role:'admin'})).status,403,'A downgraded actor cannot reuse an old admin session for privilege assignment');
  await db.query("update organization_memberships set role='owner' where organization_id=$1 and user_id=$2",[org,user]);
- console.log('Passkey: real P-256/WebAuthn registration and signature verification, RP/origin/UV/challenge/counter negatives, fresh TOTP/password, stale-proof denial, RLS, replay/expiry, preserved privileged MFA, notices and revoke/session guards passed. Physical authenticators remain untested.');
+ console.log('Passkey: real P-256/WebAuthn registration and signature verification, RP/origin/UV/challenge/counter negatives, fresh session-bound proof, stale-proof denial, RLS, replay/expiry, configured optional TOTP enforced without a role enrollment barrier, notices and revoke/session guards passed. Physical authenticators remain untested.');
 }finally{if(native)await db.end();else await db.close();delete globalThis.__passkey}

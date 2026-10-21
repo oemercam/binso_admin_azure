@@ -38,6 +38,7 @@ const noStoreHeaders = [
 ];
 
 const sensitiveRoutes = [
+  "/angebot",
   "/dashboard/:path*",
   "/kunden/:path*",
   "/angebote/:path*",
@@ -82,6 +83,7 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       { source: "/(.*)", headers: securityHeaders },
+       { source: "/angebot", headers: [{key:"Referrer-Policy",value:"no-referrer"}] },
       ...sensitiveRoutes.map((source) => ({ source, headers: noStoreHeaders })),
       {
         source: "/sw.js",

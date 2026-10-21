@@ -41,8 +41,9 @@ try{
   const lifecycle=await fs.readFile("scripts/organization-data-lifecycle.mjs","utf8");
   const sanitizerSource=lifecycle.slice(lifecycle.indexOf('const sensitiveKey='),lifecycle.indexOf('async function tenantTables'));
   const {sanitize,exportableTable}=Function('Buffer',sanitizerSource+';return {sanitize,exportableTable};')(Buffer);
-  for(const table of ['auth_sessions','auth_tokens','auth_passkeys','auth_passkey_challenges'])assert.equal(exportableTable(table),false,'Authentication records never enter a business export');
-  for(const table of ['customers','invoices','time_entries','file_objects'])assert.equal(exportableTable(table),true,'Business data remains exportable');
+  for(const table of ['auth_sessions','auth_tokens','auth_passkeys','auth_passkey_challenges','offer_recipient_codes'])assert.equal(exportableTable(table),false,'Authentication records never enter a business export');
+  for(const table of ['customers','invoices','time_entries','file_objects','offer_versions','offer_public_events','offer_public_links'])assert.equal(exportableTable(table),true,'Business data remains exportable');
+  assert.deepEqual(sanitize({recipient:'synthetic@fixture.invalid',token_enc:'private',token_hash:'private',version:2}),{recipient:'synthetic@fixture.invalid',version:2},'Capability secrets never enter an exported business record');
   assert.deepEqual(sanitize({name:'Synthetic',amount:12,nested:{challenge:'private',public_key:'private',auth_snapshot:'private',credential_id:'private',description:'Retained'}}),{name:'Synthetic',amount:12,nested:{description:'Retained'}},'Nested authentication material is excluded while business values remain');
   assert.ok(lifecycle.includes("restrictiveOrgFks"),"Final deletion must explicitly handle restrictive direct organization foreign keys.");
   assert.ok(lifecycle.includes("con.confdeltype<>'c'"),"Deletion plan must discover non-cascading organization foreign keys.");

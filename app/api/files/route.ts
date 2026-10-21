@@ -17,10 +17,10 @@ export const runtime="nodejs";
 const allowed=new Set(["application/pdf","image/png","image/jpeg","image/webp","text/plain","text/csv"]);
 
 const relations=fileRelations;
-const fileFields=`id,purpose,expense_id,support_case_id,employee_id,customer_id,invoice_id,quote_id,project_id,time_entry_id,original_name as "fileName",content_type as "mimeType",size_bytes as "sizeBytes",scan_status as "scanStatus",created_at as "createdAt"`;
+const fileFields=`id,created_by as "createdBy",purpose,expense_id,support_case_id,employee_id,customer_id,invoice_id,quote_id,project_id,time_entry_id,original_name as "fileName",content_type as "mimeType",size_bytes as "sizeBytes",scan_status as "scanStatus",created_at as "createdAt"`;
 export async function GET(request:NextRequest){try{
  const s=await requireSession();authorize(s,'documents:read');
- const filters=new URLSearchParams(request.nextUrl.search);const where=['organization_id=$1'];const values:unknown[]=[s.organizationId];
+ const filters=new URLSearchParams(request.nextUrl.search);const where=['organization_id=$1','archived_at is null'];const values:unknown[]=[s.organizationId];
  // Derive the complete readable scope from the session before interpreting URL
  // filters. Omitting a filter can never omit an authorization check.
  const readable=Object.entries(relations).filter(([,relation])=>tenantCan(s.role,relation.read,s.moduleProfile));

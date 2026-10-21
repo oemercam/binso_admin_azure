@@ -9,3 +9,11 @@ export function totp(secret:string,time=Date.now(),step=30,digits=6){const count
 export function verifyTotp(secret:string,code:string){const normalized=code.replace(/\s/g,"");for(const drift of [-1,0,1]){const expected=totp(secret,Date.now()+drift*30_000);const a=Buffer.from(expected);const b=Buffer.from(normalized);if(a.length===b.length&&timingSafeEqual(a,b))return true}return false}
 export function generateRecoveryCodes(){return Array.from({length:8},()=>`${randomBytes(3).toString("hex").toUpperCase()}-${randomBytes(3).toString("hex").toUpperCase()}`)}
 export function hashRecoveryCode(code:string){return createHash("sha256").update(code.toUpperCase()).digest("hex")}
+/** Consume one code against current credentials; concurrent writers never restore
+ * a previously consumed code or authorize proof from changed credentials. */
+export async function consumeRecoveryCode(database:{query:(sql:string,values:unknown[])=>Promise<{rowCount:number|null}>},input:{userId:string;passwordHash:string;mfaSecretEnc:string|null;code:string}){
+ const target=hashRecoveryCode(input.code);
+ const result=await database.query(`update app_users set recovery_code_hashes=recovery_code_hashes - (select ordinality::int-1 from jsonb_array_elements_text(recovery_code_hashes) with ordinality where value=$1 limit 1),updated_at=now()
+  where id=$2 and status='active' and mfa_enabled=true and password_hash=$3 and mfa_secret_enc is not distinct from $4 and recovery_code_hashes @> $5::jsonb returning id`,[target,input.userId,input.passwordHash,input.mfaSecretEnc,JSON.stringify([target])]);
+ return result.rowCount===1;
+}
