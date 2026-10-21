@@ -13803,5 +13803,20 @@
     "Payment activity",
     "Mouvements de paiement",
     "Movimenti di pagamento"
+  ],
+  "Forderungsstand": [
+    "Receivables as of",
+    "Créances au",
+    "Crediti al"
+  ],
+  "Fakturiertes Volumen berücksichtigt Rechnungen und Gutschriften im gewählten Zeitraum. Offene und überfällige Forderungen zeigen den aktuellen Stand.": [
+    "Invoiced volume includes invoices and credit notes in the selected period. Open and overdue receivables show the current balance.",
+    "Le volume facturé tient compte des factures et des avoirs de la période sélectionnée. Les créances ouvertes et en retard indiquent le solde actuel.",
+    "Il volume fatturato comprende fatture e note di credito nel periodo selezionato. I crediti aperti e scaduti mostrano il saldo attuale."
+  ],
+  "Keine Rechnungen vorhanden": [
+    "No invoices available",
+    "Aucune facture disponible",
+    "Nessuna fattura disponibile"
   ]
 }

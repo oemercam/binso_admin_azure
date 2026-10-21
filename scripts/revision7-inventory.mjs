@@ -23,7 +23,7 @@ for(let i=0;i<headers.length;i++){
  for(const block of body.split(/\r?\n\s*\r?\n/)){
   const text=block.trim();if(!text||/^---$/.test(text)||/^# REVISION/.test(text))continue;
   for(const clause of text.split(/\r?\n(?=[-*]|\d+\.)/).flatMap(part=>part.split(/(?<=[.!?])\s+(?=[A-ZÄÖÜ*«„])/u))){
-   if(/^###/.test(clause))continue;
+   if(/^###/.test(clause)||/^\d+\.$/.test(clause.trim()))continue;
    const id=`R7-${String(chapter).padStart(2,'0')}-${String(++seq).padStart(3,'0')}`;
    requirements.push({id,chapter,title:match[2],priority:match[2].match(/\[(P[^\]]+)\]/)?.[1]??'P0–P2',requirement:clause.trim(),sourceTextSha256:crypto.createHash('sha256').update(clause.trim()).digest('hex'),sourceParagraph:text,status:'nicht_abgenommen',sourceReferences:(refs[chapter]??[]).filter(x=>fs.existsSync(x)),implementation:'Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.',test:'offen',visualComparison:'offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens',blocker:'Keine Gesamtfreigabe aus generiertem Inventar ableiten.'});
   }
@@ -73,7 +73,7 @@ function kpiIntent(row,expected){
 for(const row of requirements){const observation=evidence.entries[row.id];if(observation?.sourceTextSha256===row.sourceTextSha256)Object.assign(row,observation);}
 const csv=rows=>rows.map(row=>row.map(x=>'"'+String(typeof x==='object'?JSON.stringify(x):x).replaceAll('"','""')+'"').join(',')).join('\n')+'\n';
 fs.writeFileSync(root+'/requirements.json',JSON.stringify({sourceSha256:crypto.createHash('sha256').update(fs.readFileSync(root+'/source.md')).digest('hex'),chapters:56,requirements},null,2)+'\n');
-fs.writeFileSync(root+'/requirements.csv',csv([['ID','Kapitel','Priorität','Anforderung','Ist/Abnahme','Code','Test','Visuell','Blocker'],...requirements.map(x=>[x.id,x.chapter,x.priority,x.requirement,x.status,x.sourceReferences,x.test,x.visualComparison,x.blocker])]));
+fs.writeFileSync(root+'/requirements.csv',csv([['ID','Kapitel','Priorität','Soll/Anforderung','Ist/Abnahme','Implementierung/Änderung','Code','Test/Resultat','Visueller Vergleich','Blocker'],...requirements.map(x=>[x.id,x.chapter,x.priority,x.requirement,x.status,x.implementation,x.sourceReferences,x.test,x.visualComparison,x.blocker])]));
 fs.writeFileSync(root+'/routes.json',JSON.stringify({routes,operatorVariants,components:walk('components').filter(x=>/\.tsx$/.test(x)),apis:walk('app/api').filter(x=>x.endsWith('/route.ts')),migrations:walk('database/migrations').filter(x=>x.endsWith('.sql'))},null,2)+'\n');
 fs.writeFileSync(root+'/route-role-states.csv',csv([['Route','Rolle','Zustand','Status','Seitenziel','Rollen-Navigation','Nur-Zeit-Profil','KPI','Datenquelle','Visuell','Blocker'],...routeCases.flatMap(x=>x.roleExpectations.flatMap(expected=>x.states.map(state=>[x.route,expected.role,state,x.status,expected.purpose,expected.standard,expected.timeOnly,x.kpiAssessment,x.dataSource,'offen',x.blocker+'; '+expected.limitation])))]));
 fs.writeFileSync(root+'/route-role-kpi.csv',csv([['Route','Rolle','Seitenziel','Bedingte KPI/Charts im Code','Datenquellen','Fachlicher Status','Visuell'],...routeCases.flatMap(row=>row.roleExpectations.map(expected=>[row.route,expected.role,expected.purpose,row.metricSources.map(metric=>metric.component+'@'+metric.owner+':'+metric.line).join('; '),'routes.json: '+row.route,kpiIntent(row,expected)+' Noch nicht nach Rolle, Tarif und Zustand abgenommen.','offen']))]));

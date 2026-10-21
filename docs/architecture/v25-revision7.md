@@ -14,7 +14,7 @@ P0/P1/P2 vollständig im Auftragsumfang; P3 ausgeschlossen. **Dieser Zwischensta
 ## Register
 
 [Anforderungen](../audit/v25-revision7/requirements.csv), [Routen/Rollen/Zustände](../audit/v25-revision7/route-role-states.csv), [Routen, Komponenten, APIs und Migrationen](../audit/v25-revision7/routes.json).
-Generator: scripts/revision7-inventory.mjs. Erfasst 56 Kapitel, 586 Satz-/Prüfklauseln, 77 Routen, 12 konkrete Operator-Varianten und 5566 geplante Route/Rolle/Zustand-Fälle. Zusammengesetzte Klauseln behalten den kompletten Originaltext; sie sind nicht pauschal bestanden.
+Generator: scripts/revision7-inventory.mjs. Erfasst 56 Kapitel, 573 Satz-/Prüfklauseln, 77 Routen, 12 konkrete Operator-Varianten und 5566 geplante Route/Rolle/Zustand-Fälle. Zusammengesetzte Klauseln behalten den kompletten Originaltext; sie sind nicht pauschal bestanden.
 Das Register ist eine Vollständigkeitskontrolle, kein Beleg ausgeführter Tests. Noch nicht einzeln ausgeführte Zustands-/Rollen-/Visualfälle bleiben ausdrücklich nicht abgenommen.
 
 ## Zusammenhängende Pakete
@@ -217,3 +217,26 @@ negative und Null-Beträge bestanden; bestehende Auswahl-/Tastatur-/Perioden-,
 Mandanten-/Gutschrift-/Teilzahlungstests bleiben erfolgreich. Typecheck und
 gezielter Lint bestanden. Das ist keine Behauptung vollständig lokalisierter
 PDFs, Rechtsseiten, Datumshelfer oder aller Fachansichten; diese bleiben offen.
+Fehlerreferenz Kapitel54: Unerwartete API-Fehler liefern schon serverseitig eine
+zufällige Korrelations-ID ohne Rohfehlerdetail. Der Client bewahrt jetzt nur
+übereinstimmende Header-/Body-UUIDv4 bei5xx auf; falsche, beliebige und bei
+Fachfehlern gelieferte Referenzen werden verworfen. Bestehende Fehlermeldungen
+zeigen die Supportreferenz, und LocalizedText übersetzt Meldung und Label
+getrennt, ohne die ID oder als verbatim markierte Nutzereingaben umzuschreiben.
+Positive/negative Client- und echte SSR-Lokalisierungsprüfungen bestanden;
+Sitzungsfence und Nicht-Wiederholung unklarer Mutationen bleiben geprüft.
+Die Registerbereinigung entfernt13 alleinstehende Listennummern aus der
+Anforderungszählung; der Originalabsatz bleibt erhalten. Damit573 Klauseln,
+weiterhin alle56 Kapitel. CSV enthält nun auch tatsächliche Implementierung/
+Änderung; nicht ausgeführte Abnahmen bleiben offen.
+Finanzbericht ergänzt: vorhandener financialMetricsData-Owner liefert pro
+Währung das kreditbereinigte fakturierte Volumen des ausgewählten Zeitraums
+sowie offene/überfällige Forderungen als ausdrücklich aktuellen Snapshot.
+UI,CSV undPDF nutzen dieselben Werte. Serverseitig invoices:read plus bestehendes
+Rechnungsmodul; HR erhält keine Rechnungszahlen. Tatsächliche Datenbanktests
+prüfen die genehmigte Aggregatprojektion, Datumsabgleich zum Finance-Owner und
+dass eine Rückerstattung Cash, aber nicht erneut Umsatz/Forderung verändert.
+Migrationstest, Typecheck, gezielter Lint und Übersetzungsabdeckung bestanden.
+Neue Rechnungssektion noch nicht visuell abgenommen. Vollständige Kategorie-/
+MwSt.-/Angebotsberichte, Direktmail und sichere Berichtlinks bleiben offen;
+keine umfassende Steuerdeklaration oder vollständiges Kapitel43 behauptet.

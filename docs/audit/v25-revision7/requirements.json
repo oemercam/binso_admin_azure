@@ -5594,24 +5594,6 @@
       "chapter": 38,
       "title": "VERBINDLICH: Avatar-Upload, Registrierungsdaten, Onboarding und End-to-End-Datenintegrität [P0/P1]",
       "priority": "P0/P1",
-      "requirement": "1.",
-      "sourceTextSha256": "c977dbe785221d34114d345fdf8ff4e18bb4af66750751dbea29407f9738735f",
-      "sourceParagraph": "1. Ein neuer Owner registriert sich mit Vorname, Nachname, E-Mail und Firmenname; alle erfassten Werte sind nach E-Mail-Verifizierung, erstem Login, Reload und erneutem Login korrekt im Profil und Unternehmenskontext vorhanden.\n2. Ein eingeladener Mitarbeiter aktiviert sein Konto; Profilname, Rolle und Unternehmenszuordnung bleiben korrekt erhalten, auch nach erneutem Login.\n3. Avatar lässt sich mit unterstütztem Bild hochladen, anzeigen, ersetzen und entfernen; Zustand bleibt nach Reload und neuer Sitzung korrekt. Fehlerfälle werden verständlich behandelt.\n4. Für jedes P0–P2-Modul existiert ein nachvollziehbarer Datenfluss-/Persistenztest oder eine ausdrücklich dokumentierte, begründete Testlücke.\n5. Bericht enthält die tatsächlich gefundene Ursache der beiden gemeldeten Defekte, betroffene Dateien/Services, Korrektur, Datenbank-/Migrationsauswirkungen, Testergebnisse und verbleibende Blocker.\n6. Diese Prüfungen sind Teil der gebündelten Abschlussabnahme aus Kapitel 37. Keine wiederholten vollständigen Testläufe nach jeder Kleinänderung; keine Behauptung einer vollständigen Datenintegritätsprüfung ohne Nachweise.",
-      "status": "nicht_abgenommen",
-      "sourceReferences": [
-        "lib/server/provisioning.ts",
-        "app/api/auth/register/route.ts"
-      ],
-      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
-    },
-    {
-      "id": "R7-38-044",
-      "chapter": 38,
-      "title": "VERBINDLICH: Avatar-Upload, Registrierungsdaten, Onboarding und End-to-End-Datenintegrität [P0/P1]",
-      "priority": "P0/P1",
       "requirement": "Ein neuer Owner registriert sich mit Vorname, Nachname, E-Mail und Firmenname; alle erfassten Werte sind nach E-Mail-Verifizierung, erstem Login, Reload und erneutem Login korrekt im Profil und Unternehmenskontext vorhanden.",
       "sourceTextSha256": "b53839500b5af6f773734561bdc33eb7466b6f948be4c3dc07dbc942385b743e",
       "sourceParagraph": "1. Ein neuer Owner registriert sich mit Vorname, Nachname, E-Mail und Firmenname; alle erfassten Werte sind nach E-Mail-Verifizierung, erstem Login, Reload und erneutem Login korrekt im Profil und Unternehmenskontext vorhanden.\n2. Ein eingeladener Mitarbeiter aktiviert sein Konto; Profilname, Rolle und Unternehmenszuordnung bleiben korrekt erhalten, auch nach erneutem Login.\n3. Avatar lässt sich mit unterstütztem Bild hochladen, anzeigen, ersetzen und entfernen; Zustand bleibt nach Reload und neuer Sitzung korrekt. Fehlerfälle werden verständlich behandelt.\n4. Für jedes P0–P2-Modul existiert ein nachvollziehbarer Datenfluss-/Persistenztest oder eine ausdrücklich dokumentierte, begründete Testlücke.\n5. Bericht enthält die tatsächlich gefundene Ursache der beiden gemeldeten Defekte, betroffene Dateien/Services, Korrektur, Datenbank-/Migrationsauswirkungen, Testergebnisse und verbleibende Blocker.\n6. Diese Prüfungen sind Teil der gebündelten Abschlussabnahme aus Kapitel 37. Keine wiederholten vollständigen Testläufe nach jeder Kleinänderung; keine Behauptung einer vollständigen Datenintegritätsprüfung ohne Nachweise.",
@@ -5626,25 +5608,7 @@
       "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
     },
     {
-      "id": "R7-38-045",
-      "chapter": 38,
-      "title": "VERBINDLICH: Avatar-Upload, Registrierungsdaten, Onboarding und End-to-End-Datenintegrität [P0/P1]",
-      "priority": "P0/P1",
-      "requirement": "2.",
-      "sourceTextSha256": "6bc54f13bea593dc5e1c8e6b16249e669d1ce99cbeac65f2a10f36e1d86f1fd4",
-      "sourceParagraph": "1. Ein neuer Owner registriert sich mit Vorname, Nachname, E-Mail und Firmenname; alle erfassten Werte sind nach E-Mail-Verifizierung, erstem Login, Reload und erneutem Login korrekt im Profil und Unternehmenskontext vorhanden.\n2. Ein eingeladener Mitarbeiter aktiviert sein Konto; Profilname, Rolle und Unternehmenszuordnung bleiben korrekt erhalten, auch nach erneutem Login.\n3. Avatar lässt sich mit unterstütztem Bild hochladen, anzeigen, ersetzen und entfernen; Zustand bleibt nach Reload und neuer Sitzung korrekt. Fehlerfälle werden verständlich behandelt.\n4. Für jedes P0–P2-Modul existiert ein nachvollziehbarer Datenfluss-/Persistenztest oder eine ausdrücklich dokumentierte, begründete Testlücke.\n5. Bericht enthält die tatsächlich gefundene Ursache der beiden gemeldeten Defekte, betroffene Dateien/Services, Korrektur, Datenbank-/Migrationsauswirkungen, Testergebnisse und verbleibende Blocker.\n6. Diese Prüfungen sind Teil der gebündelten Abschlussabnahme aus Kapitel 37. Keine wiederholten vollständigen Testläufe nach jeder Kleinänderung; keine Behauptung einer vollständigen Datenintegritätsprüfung ohne Nachweise.",
-      "status": "nicht_abgenommen",
-      "sourceReferences": [
-        "lib/server/provisioning.ts",
-        "app/api/auth/register/route.ts"
-      ],
-      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
-    },
-    {
-      "id": "R7-38-046",
+      "id": "R7-38-044",
       "chapter": 38,
       "title": "VERBINDLICH: Avatar-Upload, Registrierungsdaten, Onboarding und End-to-End-Datenintegrität [P0/P1]",
       "priority": "P0/P1",
@@ -5662,25 +5626,7 @@
       "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
     },
     {
-      "id": "R7-38-047",
-      "chapter": 38,
-      "title": "VERBINDLICH: Avatar-Upload, Registrierungsdaten, Onboarding und End-to-End-Datenintegrität [P0/P1]",
-      "priority": "P0/P1",
-      "requirement": "3.",
-      "sourceTextSha256": "267c23695b6e8fc29bd88b9f5d1962d3d208fa9c2fafd974614e6ab3b84fa55c",
-      "sourceParagraph": "1. Ein neuer Owner registriert sich mit Vorname, Nachname, E-Mail und Firmenname; alle erfassten Werte sind nach E-Mail-Verifizierung, erstem Login, Reload und erneutem Login korrekt im Profil und Unternehmenskontext vorhanden.\n2. Ein eingeladener Mitarbeiter aktiviert sein Konto; Profilname, Rolle und Unternehmenszuordnung bleiben korrekt erhalten, auch nach erneutem Login.\n3. Avatar lässt sich mit unterstütztem Bild hochladen, anzeigen, ersetzen und entfernen; Zustand bleibt nach Reload und neuer Sitzung korrekt. Fehlerfälle werden verständlich behandelt.\n4. Für jedes P0–P2-Modul existiert ein nachvollziehbarer Datenfluss-/Persistenztest oder eine ausdrücklich dokumentierte, begründete Testlücke.\n5. Bericht enthält die tatsächlich gefundene Ursache der beiden gemeldeten Defekte, betroffene Dateien/Services, Korrektur, Datenbank-/Migrationsauswirkungen, Testergebnisse und verbleibende Blocker.\n6. Diese Prüfungen sind Teil der gebündelten Abschlussabnahme aus Kapitel 37. Keine wiederholten vollständigen Testläufe nach jeder Kleinänderung; keine Behauptung einer vollständigen Datenintegritätsprüfung ohne Nachweise.",
-      "status": "nicht_abgenommen",
-      "sourceReferences": [
-        "lib/server/provisioning.ts",
-        "app/api/auth/register/route.ts"
-      ],
-      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
-    },
-    {
-      "id": "R7-38-048",
+      "id": "R7-38-045",
       "chapter": 38,
       "title": "VERBINDLICH: Avatar-Upload, Registrierungsdaten, Onboarding und End-to-End-Datenintegrität [P0/P1]",
       "priority": "P0/P1",
@@ -5698,7 +5644,7 @@
       "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
     },
     {
-      "id": "R7-38-049",
+      "id": "R7-38-046",
       "chapter": 38,
       "title": "VERBINDLICH: Avatar-Upload, Registrierungsdaten, Onboarding und End-to-End-Datenintegrität [P0/P1]",
       "priority": "P0/P1",
@@ -5716,25 +5662,7 @@
       "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
     },
     {
-      "id": "R7-38-050",
-      "chapter": 38,
-      "title": "VERBINDLICH: Avatar-Upload, Registrierungsdaten, Onboarding und End-to-End-Datenintegrität [P0/P1]",
-      "priority": "P0/P1",
-      "requirement": "4.",
-      "sourceTextSha256": "23f663630e2f28250c09d7a0c370f55eebf635772f9ce27e46797ab8ef297f4b",
-      "sourceParagraph": "1. Ein neuer Owner registriert sich mit Vorname, Nachname, E-Mail und Firmenname; alle erfassten Werte sind nach E-Mail-Verifizierung, erstem Login, Reload und erneutem Login korrekt im Profil und Unternehmenskontext vorhanden.\n2. Ein eingeladener Mitarbeiter aktiviert sein Konto; Profilname, Rolle und Unternehmenszuordnung bleiben korrekt erhalten, auch nach erneutem Login.\n3. Avatar lässt sich mit unterstütztem Bild hochladen, anzeigen, ersetzen und entfernen; Zustand bleibt nach Reload und neuer Sitzung korrekt. Fehlerfälle werden verständlich behandelt.\n4. Für jedes P0–P2-Modul existiert ein nachvollziehbarer Datenfluss-/Persistenztest oder eine ausdrücklich dokumentierte, begründete Testlücke.\n5. Bericht enthält die tatsächlich gefundene Ursache der beiden gemeldeten Defekte, betroffene Dateien/Services, Korrektur, Datenbank-/Migrationsauswirkungen, Testergebnisse und verbleibende Blocker.\n6. Diese Prüfungen sind Teil der gebündelten Abschlussabnahme aus Kapitel 37. Keine wiederholten vollständigen Testläufe nach jeder Kleinänderung; keine Behauptung einer vollständigen Datenintegritätsprüfung ohne Nachweise.",
-      "status": "nicht_abgenommen",
-      "sourceReferences": [
-        "lib/server/provisioning.ts",
-        "app/api/auth/register/route.ts"
-      ],
-      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
-    },
-    {
-      "id": "R7-38-051",
+      "id": "R7-38-047",
       "chapter": 38,
       "title": "VERBINDLICH: Avatar-Upload, Registrierungsdaten, Onboarding und End-to-End-Datenintegrität [P0/P1]",
       "priority": "P0/P1",
@@ -5752,25 +5680,7 @@
       "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
     },
     {
-      "id": "R7-38-052",
-      "chapter": 38,
-      "title": "VERBINDLICH: Avatar-Upload, Registrierungsdaten, Onboarding und End-to-End-Datenintegrität [P0/P1]",
-      "priority": "P0/P1",
-      "requirement": "5.",
-      "sourceTextSha256": "540dd397b2d380dcc3f59796c4facc43379929f1a3b5e6cc9a218274391b635b",
-      "sourceParagraph": "1. Ein neuer Owner registriert sich mit Vorname, Nachname, E-Mail und Firmenname; alle erfassten Werte sind nach E-Mail-Verifizierung, erstem Login, Reload und erneutem Login korrekt im Profil und Unternehmenskontext vorhanden.\n2. Ein eingeladener Mitarbeiter aktiviert sein Konto; Profilname, Rolle und Unternehmenszuordnung bleiben korrekt erhalten, auch nach erneutem Login.\n3. Avatar lässt sich mit unterstütztem Bild hochladen, anzeigen, ersetzen und entfernen; Zustand bleibt nach Reload und neuer Sitzung korrekt. Fehlerfälle werden verständlich behandelt.\n4. Für jedes P0–P2-Modul existiert ein nachvollziehbarer Datenfluss-/Persistenztest oder eine ausdrücklich dokumentierte, begründete Testlücke.\n5. Bericht enthält die tatsächlich gefundene Ursache der beiden gemeldeten Defekte, betroffene Dateien/Services, Korrektur, Datenbank-/Migrationsauswirkungen, Testergebnisse und verbleibende Blocker.\n6. Diese Prüfungen sind Teil der gebündelten Abschlussabnahme aus Kapitel 37. Keine wiederholten vollständigen Testläufe nach jeder Kleinänderung; keine Behauptung einer vollständigen Datenintegritätsprüfung ohne Nachweise.",
-      "status": "nicht_abgenommen",
-      "sourceReferences": [
-        "lib/server/provisioning.ts",
-        "app/api/auth/register/route.ts"
-      ],
-      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
-    },
-    {
-      "id": "R7-38-053",
+      "id": "R7-38-048",
       "chapter": 38,
       "title": "VERBINDLICH: Avatar-Upload, Registrierungsdaten, Onboarding und End-to-End-Datenintegrität [P0/P1]",
       "priority": "P0/P1",
@@ -5788,25 +5698,7 @@
       "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
     },
     {
-      "id": "R7-38-054",
-      "chapter": 38,
-      "title": "VERBINDLICH: Avatar-Upload, Registrierungsdaten, Onboarding und End-to-End-Datenintegrität [P0/P1]",
-      "priority": "P0/P1",
-      "requirement": "6.",
-      "sourceTextSha256": "d80edd7fb074b51d1fbf46a3dcf5cae5237ceb888dcdd8bd1b7df117d53afdc4",
-      "sourceParagraph": "1. Ein neuer Owner registriert sich mit Vorname, Nachname, E-Mail und Firmenname; alle erfassten Werte sind nach E-Mail-Verifizierung, erstem Login, Reload und erneutem Login korrekt im Profil und Unternehmenskontext vorhanden.\n2. Ein eingeladener Mitarbeiter aktiviert sein Konto; Profilname, Rolle und Unternehmenszuordnung bleiben korrekt erhalten, auch nach erneutem Login.\n3. Avatar lässt sich mit unterstütztem Bild hochladen, anzeigen, ersetzen und entfernen; Zustand bleibt nach Reload und neuer Sitzung korrekt. Fehlerfälle werden verständlich behandelt.\n4. Für jedes P0–P2-Modul existiert ein nachvollziehbarer Datenfluss-/Persistenztest oder eine ausdrücklich dokumentierte, begründete Testlücke.\n5. Bericht enthält die tatsächlich gefundene Ursache der beiden gemeldeten Defekte, betroffene Dateien/Services, Korrektur, Datenbank-/Migrationsauswirkungen, Testergebnisse und verbleibende Blocker.\n6. Diese Prüfungen sind Teil der gebündelten Abschlussabnahme aus Kapitel 37. Keine wiederholten vollständigen Testläufe nach jeder Kleinänderung; keine Behauptung einer vollständigen Datenintegritätsprüfung ohne Nachweise.",
-      "status": "nicht_abgenommen",
-      "sourceReferences": [
-        "lib/server/provisioning.ts",
-        "app/api/auth/register/route.ts"
-      ],
-      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
-    },
-    {
-      "id": "R7-38-055",
+      "id": "R7-38-049",
       "chapter": 38,
       "title": "VERBINDLICH: Avatar-Upload, Registrierungsdaten, Onboarding und End-to-End-Datenintegrität [P0/P1]",
       "priority": "P0/P1",
@@ -5824,7 +5716,7 @@
       "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
     },
     {
-      "id": "R7-38-056",
+      "id": "R7-38-050",
       "chapter": 38,
       "title": "VERBINDLICH: Avatar-Upload, Registrierungsdaten, Onboarding und End-to-End-Datenintegrität [P0/P1]",
       "priority": "P0/P1",
@@ -5842,7 +5734,7 @@
       "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
     },
     {
-      "id": "R7-38-057",
+      "id": "R7-38-051",
       "chapter": 38,
       "title": "VERBINDLICH: Avatar-Upload, Registrierungsdaten, Onboarding und End-to-End-Datenintegrität [P0/P1]",
       "priority": "P0/P1",
@@ -5860,7 +5752,7 @@
       "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
     },
     {
-      "id": "R7-38-058",
+      "id": "R7-38-052",
       "chapter": 38,
       "title": "VERBINDLICH: Avatar-Upload, Registrierungsdaten, Onboarding und End-to-End-Datenintegrität [P0/P1]",
       "priority": "P0/P1",
@@ -5878,7 +5770,7 @@
       "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
     },
     {
-      "id": "R7-38-059",
+      "id": "R7-38-053",
       "chapter": 38,
       "title": "VERBINDLICH: Avatar-Upload, Registrierungsdaten, Onboarding und End-to-End-Datenintegrität [P0/P1]",
       "priority": "P0/P1",
@@ -7484,12 +7376,15 @@
       "sourceParagraph": "**Finanzberichte:** Einnahmen/Ausgaben, fakturiert, offen/überfällig, Zahlungseingänge, Angebotsvolumen/-status, Ausgaben nach Kategorien, MwSt.-Auswertung (nicht als vollständige Steuerdeklaration ausgeben), Projektwirtschaftlichkeit nur bei echter Datenbasis. Berichte enthalten Zeitraum, Erstellungsdatum/Datenstand, Einheit, fachlich korrekte Summen und Statusdefinitionen.",
       "status": "teilweise_implementiert",
       "sourceReferences": [
-        "lib/server/document-pdf.ts"
+        "lib/server/repositories/reports.ts",
+        "lib/server/repositories/finance.ts",
+        "lib/report-export.ts",
+        "components/pages/reports.tsx"
       ],
-      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
-      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
-      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
+      "implementation": "Bericht erweitert um kreditbereinigtes Rechnungsvolumen im Zeitraum und aktuellen offenen/überfälligen Snapshot, gemeinsame bestehende Finance-Berechnung. Cash und Rechnungsvolumen getrennt.",
+      "test": "Tatsächliche Migrations-/Datenbankregression für Aggregatprojektion, HR-Ablehnung, Datumsdefinitionen und unverändertes Rechnungsvolumen nach Refund bestanden. Typecheck/Lint/Sprachabdeckung bestanden.",
+      "visualComparison": "Neue Finanzsektion noch nicht visuell abgenommen.",
+      "blocker": "Kategorie-/MwSt.-/Angebotsberichte und vollständige fachliche/visuelle Abnahme fehlen."
     },
     {
       "id": "R7-43-009",
@@ -7977,21 +7872,6 @@
       "chapter": 45,
       "title": "Verbindliche vollständige Seiten- und End-to-End-Abnahme [P0–P2]",
       "priority": "P0–P2",
-      "requirement": "1.",
-      "sourceTextSha256": "c977dbe785221d34114d345fdf8ff4e18bb4af66750751dbea29407f9738735f",
-      "sourceParagraph": "1. Aus aktuellem Repository alle Routen, Unterseiten, Tabs, Rollen, Bottom Sheets, Einstellungen, Adminansichten, Dokumente und Sonderzustände inventarisieren.\n2. **Jede** Seite auf UX, relevante Kennzahlen/Diagramme, Statusfarben, Filter, Navigation, Drei-Punkte-Aktionen, PDF/CSV, Rechte, Lade-/Fehler-/Leerzustände prüfen. Jede fachlich sinnvolle P0–P2-Verbesserung tatsächlich implementieren, nicht nur vorschlagen.\n3. Bestehende und neue Kennzahlen gegen Testdaten inkl. Nullwerten, Teilzahlungen, Storno, Gutschrift, Rollen und Mandantentrennung prüfen.\n4. End-to-End: Registrierung → Profilpersistenz/Avatar/Logo → Einladung/Anmeldung → Kunde → Angebot/Version/Versand/Tracking/Annahme → Auftrag/Timer/Zeitrapport → Rechnung/QR-Seite → Zahlung → Finanzbericht/CSV/PDF/Teilen. Fehler- und Wiederaufnahmefälle berücksichtigen.\n5. Visuelle Abnahme gebündelt auf iPhone Safari/PWA, Android und Desktop in Hell/Dunkelmodus; vorhandene Referenzscreens und Design-Tokens einhalten. Bestehende Bottom-Navigation und Floating-Plus-Button unverändert; nur nachgewiesene doppelte Safe-Area-Abstände korrigieren.\n6. Vollständige Abnahmematrix: Route, Funktion, P0/P1/P2, Ist, Soll, Änderung, Test, Resultat, verbleibender Blocker. Keine erfundenen Implementierungs- oder Deployment-Erfolge. Externe Provider-/DNS-/Secrets-Blocker explizit ausweisen.\n7. P3 nicht implementieren. Bestehende PR-/Review-/Security-/Deploymentfreigaben beachten. Gezielte Tests während Entwicklung, gebündelte Schlussprüfung; keine wiederholten kompletten Browser-Tests nach jeder Kleinigkeit. Produktivdeployment nur im erlaubten Rahmen.",
-      "status": "nicht_abgenommen",
-      "sourceReferences": [],
-      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
-    },
-    {
-      "id": "R7-45-002",
-      "chapter": 45,
-      "title": "Verbindliche vollständige Seiten- und End-to-End-Abnahme [P0–P2]",
-      "priority": "P0–P2",
       "requirement": "Aus aktuellem Repository alle Routen, Unterseiten, Tabs, Rollen, Bottom Sheets, Einstellungen, Adminansichten, Dokumente und Sonderzustände inventarisieren.",
       "sourceTextSha256": "a0f45803d243a6988e0105470305262f9349e48ccb176d112ad3b2703ecc0b34",
       "sourceParagraph": "1. Aus aktuellem Repository alle Routen, Unterseiten, Tabs, Rollen, Bottom Sheets, Einstellungen, Adminansichten, Dokumente und Sonderzustände inventarisieren.\n2. **Jede** Seite auf UX, relevante Kennzahlen/Diagramme, Statusfarben, Filter, Navigation, Drei-Punkte-Aktionen, PDF/CSV, Rechte, Lade-/Fehler-/Leerzustände prüfen. Jede fachlich sinnvolle P0–P2-Verbesserung tatsächlich implementieren, nicht nur vorschlagen.\n3. Bestehende und neue Kennzahlen gegen Testdaten inkl. Nullwerten, Teilzahlungen, Storno, Gutschrift, Rollen und Mandantentrennung prüfen.\n4. End-to-End: Registrierung → Profilpersistenz/Avatar/Logo → Einladung/Anmeldung → Kunde → Angebot/Version/Versand/Tracking/Annahme → Auftrag/Timer/Zeitrapport → Rechnung/QR-Seite → Zahlung → Finanzbericht/CSV/PDF/Teilen. Fehler- und Wiederaufnahmefälle berücksichtigen.\n5. Visuelle Abnahme gebündelt auf iPhone Safari/PWA, Android und Desktop in Hell/Dunkelmodus; vorhandene Referenzscreens und Design-Tokens einhalten. Bestehende Bottom-Navigation und Floating-Plus-Button unverändert; nur nachgewiesene doppelte Safe-Area-Abstände korrigieren.\n6. Vollständige Abnahmematrix: Route, Funktion, P0/P1/P2, Ist, Soll, Änderung, Test, Resultat, verbleibender Blocker. Keine erfundenen Implementierungs- oder Deployment-Erfolge. Externe Provider-/DNS-/Secrets-Blocker explizit ausweisen.\n7. P3 nicht implementieren. Bestehende PR-/Review-/Security-/Deploymentfreigaben beachten. Gezielte Tests während Entwicklung, gebündelte Schlussprüfung; keine wiederholten kompletten Browser-Tests nach jeder Kleinigkeit. Produktivdeployment nur im erlaubten Rahmen.",
@@ -8003,22 +7883,7 @@
       "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
     },
     {
-      "id": "R7-45-003",
-      "chapter": 45,
-      "title": "Verbindliche vollständige Seiten- und End-to-End-Abnahme [P0–P2]",
-      "priority": "P0–P2",
-      "requirement": "2.",
-      "sourceTextSha256": "6bc54f13bea593dc5e1c8e6b16249e669d1ce99cbeac65f2a10f36e1d86f1fd4",
-      "sourceParagraph": "1. Aus aktuellem Repository alle Routen, Unterseiten, Tabs, Rollen, Bottom Sheets, Einstellungen, Adminansichten, Dokumente und Sonderzustände inventarisieren.\n2. **Jede** Seite auf UX, relevante Kennzahlen/Diagramme, Statusfarben, Filter, Navigation, Drei-Punkte-Aktionen, PDF/CSV, Rechte, Lade-/Fehler-/Leerzustände prüfen. Jede fachlich sinnvolle P0–P2-Verbesserung tatsächlich implementieren, nicht nur vorschlagen.\n3. Bestehende und neue Kennzahlen gegen Testdaten inkl. Nullwerten, Teilzahlungen, Storno, Gutschrift, Rollen und Mandantentrennung prüfen.\n4. End-to-End: Registrierung → Profilpersistenz/Avatar/Logo → Einladung/Anmeldung → Kunde → Angebot/Version/Versand/Tracking/Annahme → Auftrag/Timer/Zeitrapport → Rechnung/QR-Seite → Zahlung → Finanzbericht/CSV/PDF/Teilen. Fehler- und Wiederaufnahmefälle berücksichtigen.\n5. Visuelle Abnahme gebündelt auf iPhone Safari/PWA, Android und Desktop in Hell/Dunkelmodus; vorhandene Referenzscreens und Design-Tokens einhalten. Bestehende Bottom-Navigation und Floating-Plus-Button unverändert; nur nachgewiesene doppelte Safe-Area-Abstände korrigieren.\n6. Vollständige Abnahmematrix: Route, Funktion, P0/P1/P2, Ist, Soll, Änderung, Test, Resultat, verbleibender Blocker. Keine erfundenen Implementierungs- oder Deployment-Erfolge. Externe Provider-/DNS-/Secrets-Blocker explizit ausweisen.\n7. P3 nicht implementieren. Bestehende PR-/Review-/Security-/Deploymentfreigaben beachten. Gezielte Tests während Entwicklung, gebündelte Schlussprüfung; keine wiederholten kompletten Browser-Tests nach jeder Kleinigkeit. Produktivdeployment nur im erlaubten Rahmen.",
-      "status": "nicht_abgenommen",
-      "sourceReferences": [],
-      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
-    },
-    {
-      "id": "R7-45-004",
+      "id": "R7-45-002",
       "chapter": 45,
       "title": "Verbindliche vollständige Seiten- und End-to-End-Abnahme [P0–P2]",
       "priority": "P0–P2",
@@ -8033,7 +7898,7 @@
       "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
     },
     {
-      "id": "R7-45-005",
+      "id": "R7-45-003",
       "chapter": 45,
       "title": "Verbindliche vollständige Seiten- und End-to-End-Abnahme [P0–P2]",
       "priority": "P0–P2",
@@ -8048,22 +7913,7 @@
       "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
     },
     {
-      "id": "R7-45-006",
-      "chapter": 45,
-      "title": "Verbindliche vollständige Seiten- und End-to-End-Abnahme [P0–P2]",
-      "priority": "P0–P2",
-      "requirement": "3.",
-      "sourceTextSha256": "267c23695b6e8fc29bd88b9f5d1962d3d208fa9c2fafd974614e6ab3b84fa55c",
-      "sourceParagraph": "1. Aus aktuellem Repository alle Routen, Unterseiten, Tabs, Rollen, Bottom Sheets, Einstellungen, Adminansichten, Dokumente und Sonderzustände inventarisieren.\n2. **Jede** Seite auf UX, relevante Kennzahlen/Diagramme, Statusfarben, Filter, Navigation, Drei-Punkte-Aktionen, PDF/CSV, Rechte, Lade-/Fehler-/Leerzustände prüfen. Jede fachlich sinnvolle P0–P2-Verbesserung tatsächlich implementieren, nicht nur vorschlagen.\n3. Bestehende und neue Kennzahlen gegen Testdaten inkl. Nullwerten, Teilzahlungen, Storno, Gutschrift, Rollen und Mandantentrennung prüfen.\n4. End-to-End: Registrierung → Profilpersistenz/Avatar/Logo → Einladung/Anmeldung → Kunde → Angebot/Version/Versand/Tracking/Annahme → Auftrag/Timer/Zeitrapport → Rechnung/QR-Seite → Zahlung → Finanzbericht/CSV/PDF/Teilen. Fehler- und Wiederaufnahmefälle berücksichtigen.\n5. Visuelle Abnahme gebündelt auf iPhone Safari/PWA, Android und Desktop in Hell/Dunkelmodus; vorhandene Referenzscreens und Design-Tokens einhalten. Bestehende Bottom-Navigation und Floating-Plus-Button unverändert; nur nachgewiesene doppelte Safe-Area-Abstände korrigieren.\n6. Vollständige Abnahmematrix: Route, Funktion, P0/P1/P2, Ist, Soll, Änderung, Test, Resultat, verbleibender Blocker. Keine erfundenen Implementierungs- oder Deployment-Erfolge. Externe Provider-/DNS-/Secrets-Blocker explizit ausweisen.\n7. P3 nicht implementieren. Bestehende PR-/Review-/Security-/Deploymentfreigaben beachten. Gezielte Tests während Entwicklung, gebündelte Schlussprüfung; keine wiederholten kompletten Browser-Tests nach jeder Kleinigkeit. Produktivdeployment nur im erlaubten Rahmen.",
-      "status": "nicht_abgenommen",
-      "sourceReferences": [],
-      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
-    },
-    {
-      "id": "R7-45-007",
+      "id": "R7-45-004",
       "chapter": 45,
       "title": "Verbindliche vollständige Seiten- und End-to-End-Abnahme [P0–P2]",
       "priority": "P0–P2",
@@ -8078,7 +7928,7 @@
       "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
     },
     {
-      "id": "R7-45-008",
+      "id": "R7-45-005",
       "chapter": 45,
       "title": "Verbindliche vollständige Seiten- und End-to-End-Abnahme [P0–P2]",
       "priority": "P0–P2",
@@ -8093,22 +7943,7 @@
       "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
     },
     {
-      "id": "R7-45-009",
-      "chapter": 45,
-      "title": "Verbindliche vollständige Seiten- und End-to-End-Abnahme [P0–P2]",
-      "priority": "P0–P2",
-      "requirement": "4.",
-      "sourceTextSha256": "23f663630e2f28250c09d7a0c370f55eebf635772f9ce27e46797ab8ef297f4b",
-      "sourceParagraph": "1. Aus aktuellem Repository alle Routen, Unterseiten, Tabs, Rollen, Bottom Sheets, Einstellungen, Adminansichten, Dokumente und Sonderzustände inventarisieren.\n2. **Jede** Seite auf UX, relevante Kennzahlen/Diagramme, Statusfarben, Filter, Navigation, Drei-Punkte-Aktionen, PDF/CSV, Rechte, Lade-/Fehler-/Leerzustände prüfen. Jede fachlich sinnvolle P0–P2-Verbesserung tatsächlich implementieren, nicht nur vorschlagen.\n3. Bestehende und neue Kennzahlen gegen Testdaten inkl. Nullwerten, Teilzahlungen, Storno, Gutschrift, Rollen und Mandantentrennung prüfen.\n4. End-to-End: Registrierung → Profilpersistenz/Avatar/Logo → Einladung/Anmeldung → Kunde → Angebot/Version/Versand/Tracking/Annahme → Auftrag/Timer/Zeitrapport → Rechnung/QR-Seite → Zahlung → Finanzbericht/CSV/PDF/Teilen. Fehler- und Wiederaufnahmefälle berücksichtigen.\n5. Visuelle Abnahme gebündelt auf iPhone Safari/PWA, Android und Desktop in Hell/Dunkelmodus; vorhandene Referenzscreens und Design-Tokens einhalten. Bestehende Bottom-Navigation und Floating-Plus-Button unverändert; nur nachgewiesene doppelte Safe-Area-Abstände korrigieren.\n6. Vollständige Abnahmematrix: Route, Funktion, P0/P1/P2, Ist, Soll, Änderung, Test, Resultat, verbleibender Blocker. Keine erfundenen Implementierungs- oder Deployment-Erfolge. Externe Provider-/DNS-/Secrets-Blocker explizit ausweisen.\n7. P3 nicht implementieren. Bestehende PR-/Review-/Security-/Deploymentfreigaben beachten. Gezielte Tests während Entwicklung, gebündelte Schlussprüfung; keine wiederholten kompletten Browser-Tests nach jeder Kleinigkeit. Produktivdeployment nur im erlaubten Rahmen.",
-      "status": "nicht_abgenommen",
-      "sourceReferences": [],
-      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
-    },
-    {
-      "id": "R7-45-010",
+      "id": "R7-45-006",
       "chapter": 45,
       "title": "Verbindliche vollständige Seiten- und End-to-End-Abnahme [P0–P2]",
       "priority": "P0–P2",
@@ -8123,7 +7958,7 @@
       "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
     },
     {
-      "id": "R7-45-011",
+      "id": "R7-45-007",
       "chapter": 45,
       "title": "Verbindliche vollständige Seiten- und End-to-End-Abnahme [P0–P2]",
       "priority": "P0–P2",
@@ -8138,22 +7973,7 @@
       "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
     },
     {
-      "id": "R7-45-012",
-      "chapter": 45,
-      "title": "Verbindliche vollständige Seiten- und End-to-End-Abnahme [P0–P2]",
-      "priority": "P0–P2",
-      "requirement": "5.",
-      "sourceTextSha256": "540dd397b2d380dcc3f59796c4facc43379929f1a3b5e6cc9a218274391b635b",
-      "sourceParagraph": "1. Aus aktuellem Repository alle Routen, Unterseiten, Tabs, Rollen, Bottom Sheets, Einstellungen, Adminansichten, Dokumente und Sonderzustände inventarisieren.\n2. **Jede** Seite auf UX, relevante Kennzahlen/Diagramme, Statusfarben, Filter, Navigation, Drei-Punkte-Aktionen, PDF/CSV, Rechte, Lade-/Fehler-/Leerzustände prüfen. Jede fachlich sinnvolle P0–P2-Verbesserung tatsächlich implementieren, nicht nur vorschlagen.\n3. Bestehende und neue Kennzahlen gegen Testdaten inkl. Nullwerten, Teilzahlungen, Storno, Gutschrift, Rollen und Mandantentrennung prüfen.\n4. End-to-End: Registrierung → Profilpersistenz/Avatar/Logo → Einladung/Anmeldung → Kunde → Angebot/Version/Versand/Tracking/Annahme → Auftrag/Timer/Zeitrapport → Rechnung/QR-Seite → Zahlung → Finanzbericht/CSV/PDF/Teilen. Fehler- und Wiederaufnahmefälle berücksichtigen.\n5. Visuelle Abnahme gebündelt auf iPhone Safari/PWA, Android und Desktop in Hell/Dunkelmodus; vorhandene Referenzscreens und Design-Tokens einhalten. Bestehende Bottom-Navigation und Floating-Plus-Button unverändert; nur nachgewiesene doppelte Safe-Area-Abstände korrigieren.\n6. Vollständige Abnahmematrix: Route, Funktion, P0/P1/P2, Ist, Soll, Änderung, Test, Resultat, verbleibender Blocker. Keine erfundenen Implementierungs- oder Deployment-Erfolge. Externe Provider-/DNS-/Secrets-Blocker explizit ausweisen.\n7. P3 nicht implementieren. Bestehende PR-/Review-/Security-/Deploymentfreigaben beachten. Gezielte Tests während Entwicklung, gebündelte Schlussprüfung; keine wiederholten kompletten Browser-Tests nach jeder Kleinigkeit. Produktivdeployment nur im erlaubten Rahmen.",
-      "status": "nicht_abgenommen",
-      "sourceReferences": [],
-      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
-    },
-    {
-      "id": "R7-45-013",
+      "id": "R7-45-008",
       "chapter": 45,
       "title": "Verbindliche vollständige Seiten- und End-to-End-Abnahme [P0–P2]",
       "priority": "P0–P2",
@@ -8168,7 +7988,7 @@
       "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
     },
     {
-      "id": "R7-45-014",
+      "id": "R7-45-009",
       "chapter": 45,
       "title": "Verbindliche vollständige Seiten- und End-to-End-Abnahme [P0–P2]",
       "priority": "P0–P2",
@@ -8183,22 +8003,7 @@
       "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
     },
     {
-      "id": "R7-45-015",
-      "chapter": 45,
-      "title": "Verbindliche vollständige Seiten- und End-to-End-Abnahme [P0–P2]",
-      "priority": "P0–P2",
-      "requirement": "6.",
-      "sourceTextSha256": "d80edd7fb074b51d1fbf46a3dcf5cae5237ceb888dcdd8bd1b7df117d53afdc4",
-      "sourceParagraph": "1. Aus aktuellem Repository alle Routen, Unterseiten, Tabs, Rollen, Bottom Sheets, Einstellungen, Adminansichten, Dokumente und Sonderzustände inventarisieren.\n2. **Jede** Seite auf UX, relevante Kennzahlen/Diagramme, Statusfarben, Filter, Navigation, Drei-Punkte-Aktionen, PDF/CSV, Rechte, Lade-/Fehler-/Leerzustände prüfen. Jede fachlich sinnvolle P0–P2-Verbesserung tatsächlich implementieren, nicht nur vorschlagen.\n3. Bestehende und neue Kennzahlen gegen Testdaten inkl. Nullwerten, Teilzahlungen, Storno, Gutschrift, Rollen und Mandantentrennung prüfen.\n4. End-to-End: Registrierung → Profilpersistenz/Avatar/Logo → Einladung/Anmeldung → Kunde → Angebot/Version/Versand/Tracking/Annahme → Auftrag/Timer/Zeitrapport → Rechnung/QR-Seite → Zahlung → Finanzbericht/CSV/PDF/Teilen. Fehler- und Wiederaufnahmefälle berücksichtigen.\n5. Visuelle Abnahme gebündelt auf iPhone Safari/PWA, Android und Desktop in Hell/Dunkelmodus; vorhandene Referenzscreens und Design-Tokens einhalten. Bestehende Bottom-Navigation und Floating-Plus-Button unverändert; nur nachgewiesene doppelte Safe-Area-Abstände korrigieren.\n6. Vollständige Abnahmematrix: Route, Funktion, P0/P1/P2, Ist, Soll, Änderung, Test, Resultat, verbleibender Blocker. Keine erfundenen Implementierungs- oder Deployment-Erfolge. Externe Provider-/DNS-/Secrets-Blocker explizit ausweisen.\n7. P3 nicht implementieren. Bestehende PR-/Review-/Security-/Deploymentfreigaben beachten. Gezielte Tests während Entwicklung, gebündelte Schlussprüfung; keine wiederholten kompletten Browser-Tests nach jeder Kleinigkeit. Produktivdeployment nur im erlaubten Rahmen.",
-      "status": "nicht_abgenommen",
-      "sourceReferences": [],
-      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
-    },
-    {
-      "id": "R7-45-016",
+      "id": "R7-45-010",
       "chapter": 45,
       "title": "Verbindliche vollständige Seiten- und End-to-End-Abnahme [P0–P2]",
       "priority": "P0–P2",
@@ -8213,7 +8018,7 @@
       "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
     },
     {
-      "id": "R7-45-017",
+      "id": "R7-45-011",
       "chapter": 45,
       "title": "Verbindliche vollständige Seiten- und End-to-End-Abnahme [P0–P2]",
       "priority": "P0–P2",
@@ -8228,7 +8033,7 @@
       "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
     },
     {
-      "id": "R7-45-018",
+      "id": "R7-45-012",
       "chapter": 45,
       "title": "Verbindliche vollständige Seiten- und End-to-End-Abnahme [P0–P2]",
       "priority": "P0–P2",
@@ -8243,22 +8048,7 @@
       "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
     },
     {
-      "id": "R7-45-019",
-      "chapter": 45,
-      "title": "Verbindliche vollständige Seiten- und End-to-End-Abnahme [P0–P2]",
-      "priority": "P0–P2",
-      "requirement": "7.",
-      "sourceTextSha256": "a50aa8b9a9806899e1d67d0d09c1ce40221cb0dffc52483e8e6da18ff1753a38",
-      "sourceParagraph": "1. Aus aktuellem Repository alle Routen, Unterseiten, Tabs, Rollen, Bottom Sheets, Einstellungen, Adminansichten, Dokumente und Sonderzustände inventarisieren.\n2. **Jede** Seite auf UX, relevante Kennzahlen/Diagramme, Statusfarben, Filter, Navigation, Drei-Punkte-Aktionen, PDF/CSV, Rechte, Lade-/Fehler-/Leerzustände prüfen. Jede fachlich sinnvolle P0–P2-Verbesserung tatsächlich implementieren, nicht nur vorschlagen.\n3. Bestehende und neue Kennzahlen gegen Testdaten inkl. Nullwerten, Teilzahlungen, Storno, Gutschrift, Rollen und Mandantentrennung prüfen.\n4. End-to-End: Registrierung → Profilpersistenz/Avatar/Logo → Einladung/Anmeldung → Kunde → Angebot/Version/Versand/Tracking/Annahme → Auftrag/Timer/Zeitrapport → Rechnung/QR-Seite → Zahlung → Finanzbericht/CSV/PDF/Teilen. Fehler- und Wiederaufnahmefälle berücksichtigen.\n5. Visuelle Abnahme gebündelt auf iPhone Safari/PWA, Android und Desktop in Hell/Dunkelmodus; vorhandene Referenzscreens und Design-Tokens einhalten. Bestehende Bottom-Navigation und Floating-Plus-Button unverändert; nur nachgewiesene doppelte Safe-Area-Abstände korrigieren.\n6. Vollständige Abnahmematrix: Route, Funktion, P0/P1/P2, Ist, Soll, Änderung, Test, Resultat, verbleibender Blocker. Keine erfundenen Implementierungs- oder Deployment-Erfolge. Externe Provider-/DNS-/Secrets-Blocker explizit ausweisen.\n7. P3 nicht implementieren. Bestehende PR-/Review-/Security-/Deploymentfreigaben beachten. Gezielte Tests während Entwicklung, gebündelte Schlussprüfung; keine wiederholten kompletten Browser-Tests nach jeder Kleinigkeit. Produktivdeployment nur im erlaubten Rahmen.",
-      "status": "nicht_abgenommen",
-      "sourceReferences": [],
-      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
-    },
-    {
-      "id": "R7-45-020",
+      "id": "R7-45-013",
       "chapter": 45,
       "title": "Verbindliche vollständige Seiten- und End-to-End-Abnahme [P0–P2]",
       "priority": "P0–P2",
@@ -8273,7 +8063,7 @@
       "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
     },
     {
-      "id": "R7-45-021",
+      "id": "R7-45-014",
       "chapter": 45,
       "title": "Verbindliche vollständige Seiten- und End-to-End-Abnahme [P0–P2]",
       "priority": "P0–P2",
@@ -8288,7 +8078,7 @@
       "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
     },
     {
-      "id": "R7-45-022",
+      "id": "R7-45-015",
       "chapter": 45,
       "title": "Verbindliche vollständige Seiten- und End-to-End-Abnahme [P0–P2]",
       "priority": "P0–P2",
@@ -8303,7 +8093,7 @@
       "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
     },
     {
-      "id": "R7-45-023",
+      "id": "R7-45-016",
       "chapter": 45,
       "title": "Verbindliche vollständige Seiten- und End-to-End-Abnahme [P0–P2]",
       "priority": "P0–P2",
@@ -9455,15 +9245,16 @@
       "requirement": "Error-Boundaries, datenschutzgerechtes Monitoring, Korrelations-ID für Support, Accessibility und Offline-/Wiederverbindungsprüfungen.",
       "sourceTextSha256": "da3cffb25db9697c8ab54537c22ce8f25e0c522b12ab466affd6274df76901cc",
       "sourceParagraph": "Öffentliche Website, Identity, Workspace, Admin, Tablet, Mobile, PWA: zentrale 401/403/404/409/429/500/502/503, Offline, Wartung, abgelaufener Link, fehlgeschlagener Upload/Export/Versand, ungültiges Formular, Sessionablauf, Konflikt, langsame Verbindung. Klare lokalisierte Sprache, passende sichere Aktion (zurück, erneut versuchen, anmelden, Link erneuern), keine internen Stacktraces. 401 erhält beabsichtigtes Ziel und Entwürfe. Retry nur idempotent; bei Timeout erst serverseitigen Status klären. Keine Arbeit verlieren, Timer nicht verlieren, sichere lokale Draft-Wiederherstellung, keine ungesicherten sensiblen Daten im Cache. Global konsistente Skeletons statt Splash-Logos und Layoutsprünge. Error-Boundaries, datenschutzgerechtes Monitoring, Korrelations-ID für Support, Accessibility und Offline-/Wiederverbindungsprüfungen.",
-      "status": "nicht_abgenommen",
+      "status": "teilweise_implementiert",
       "sourceReferences": [
         "lib/server/http.ts",
-        "components/use-process-draft.ts"
+        "lib/client/backend.ts",
+        "lib/client/locale.tsx"
       ],
-      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "implementation": "Bestehende Error-Boundaries und consentgebundene Messung; nun begrenzte serverseitige Support-UUID im Client erhalten und getrennt lokalisiert.",
+      "test": "Client positive/negative Header-/Body-/UUID-/Statusprüfungen, tatsächliche SSR-Ausgabe DE/FR/IT/EN, Verbatim-Schutz, Typecheck/Lint bestanden.",
+      "visualComparison": "Supportreferenz ist noch nicht über alle Fehlerseiten/Geräte visuell abgenommen.",
+      "blocker": "Vollständige Accessibility-, Offline-/Reconnect- und physische Geräteabnahme offen."
     },
     {
       "id": "R7-55-001",

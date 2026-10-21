@@ -302,7 +302,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -338,7 +338,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -377,7 +377,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -631,7 +631,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -658,7 +658,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -691,7 +691,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -958,7 +958,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -994,7 +994,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -1033,7 +1033,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -1609,7 +1609,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -1636,7 +1636,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -1669,7 +1669,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -1861,7 +1861,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -1888,7 +1888,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -1898,7 +1898,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -2104,6 +2104,7 @@
             "data?.time",
             "resource.error",
             "resource.loading",
+            "data.invoices.length",
             "data.payments.length",
             "data.expenses.length"
           ],
@@ -2122,6 +2123,7 @@
             "data?.time",
             "resource.error",
             "resource.loading",
+            "data.invoices.length",
             "data.payments.length",
             "data.expenses.length"
           ],
@@ -2140,6 +2142,7 @@
             "data?.time",
             "resource.error",
             "resource.loading",
+            "data.invoices.length",
             "data.payments.length",
             "data.expenses.length"
           ],
@@ -2158,6 +2161,7 @@
             "data?.time",
             "resource.error",
             "resource.loading",
+            "data.invoices.length",
             "data.payments.length",
             "data.expenses.length"
           ],
@@ -2176,6 +2180,7 @@
             "data?.time",
             "resource.error",
             "resource.loading",
+            "data.invoices.length",
             "data.payments.length",
             "data.expenses.length"
           ],
@@ -2194,6 +2199,7 @@
             "data?.time",
             "resource.error",
             "resource.loading",
+            "data.invoices.length",
             "data.payments.length",
             "data.expenses.length"
           ],
@@ -2212,6 +2218,7 @@
             "data?.time",
             "resource.error",
             "resource.loading",
+            "data.invoices.length",
             "data.payments.length",
             "data.expenses.length"
           ],
@@ -2220,6 +2227,66 @@
         {
           "owner": "components/pages/reports.tsx",
           "line": 28,
+          "component": "MetricTile",
+          "props": [
+            "label=\"Fakturiertes Volumen\"",
+            "value={Number(item.invoiced)}",
+            "currency={item.currency}"
+          ],
+          "conditions": [
+            "data",
+            "data?.time",
+            "resource.error",
+            "resource.loading",
+            "data.invoices.length",
+            "data.payments.length",
+            "data.expenses.length"
+          ],
+          "limitation": "Statische bedingte Erreichbarkeit, keine Aussage über sichtbare Rolle oder korrekte Berechnung."
+        },
+        {
+          "owner": "components/pages/reports.tsx",
+          "line": 28,
+          "component": "MetricTile",
+          "props": [
+            "label=\"Offen\"",
+            "value={Number(item.open)}",
+            "currency={item.currency}"
+          ],
+          "conditions": [
+            "data",
+            "data?.time",
+            "resource.error",
+            "resource.loading",
+            "data.invoices.length",
+            "data.payments.length",
+            "data.expenses.length"
+          ],
+          "limitation": "Statische bedingte Erreichbarkeit, keine Aussage über sichtbare Rolle oder korrekte Berechnung."
+        },
+        {
+          "owner": "components/pages/reports.tsx",
+          "line": 28,
+          "component": "MetricTile",
+          "props": [
+            "label=\"Überfällig\"",
+            "value={Number(item.overdue)}",
+            "currency={item.currency}"
+          ],
+          "conditions": [
+            "data",
+            "data?.time",
+            "resource.error",
+            "resource.loading",
+            "data.invoices.length",
+            "data.payments.length",
+            "data.expenses.length"
+          ],
+          "limitation": "Statische bedingte Erreichbarkeit, keine Aussage über sichtbare Rolle oder korrekte Berechnung."
+        },
+        {
+          "owner": "components/pages/reports.tsx",
+          "line": 29,
           "component": "MetricTile",
           "props": [
             "label=\"Eingegangene Zahlungen\"",
@@ -2231,6 +2298,7 @@
             "data?.time",
             "resource.error",
             "resource.loading",
+            "data.invoices.length",
             "data.payments.length",
             "data.expenses.length"
           ],
@@ -2238,7 +2306,7 @@
         },
         {
           "owner": "components/pages/reports.tsx",
-          "line": 28,
+          "line": 29,
           "component": "MetricTile",
           "props": [
             "label=\"Rückerstattungen\"",
@@ -2250,6 +2318,7 @@
             "data?.time",
             "resource.error",
             "resource.loading",
+            "data.invoices.length",
             "data.payments.length",
             "data.expenses.length"
           ],
@@ -2257,7 +2326,7 @@
         },
         {
           "owner": "components/pages/reports.tsx",
-          "line": 28,
+          "line": 29,
           "component": "MetricTile",
           "props": [
             "label=\"Zahlungseingänge nach Rückerstattungen\"",
@@ -2269,6 +2338,7 @@
             "data?.time",
             "resource.error",
             "resource.loading",
+            "data.invoices.length",
             "data.payments.length",
             "data.expenses.length"
           ],
@@ -2276,7 +2346,7 @@
         },
         {
           "owner": "components/pages/reports.tsx",
-          "line": 29,
+          "line": 30,
           "component": "MetricTile",
           "props": [
             "key={item.currency}",
@@ -2289,6 +2359,7 @@
             "data?.time",
             "resource.error",
             "resource.loading",
+            "data.invoices.length",
             "data.payments.length",
             "data.expenses.length"
           ],
@@ -2330,7 +2401,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -2357,7 +2428,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -2390,7 +2461,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -2858,7 +2929,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -2885,7 +2956,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -2918,7 +2989,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -3303,7 +3374,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -3339,7 +3410,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -3349,7 +3420,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -3457,7 +3528,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -3493,7 +3564,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -3503,7 +3574,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -3708,7 +3779,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -3744,7 +3815,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -3754,7 +3825,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -3968,7 +4039,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -3978,7 +4049,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -4014,7 +4085,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -4215,7 +4286,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -4242,7 +4313,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -4261,7 +4332,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -4452,7 +4523,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -4479,7 +4550,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -4489,7 +4560,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -4705,7 +4776,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -4732,7 +4803,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -4742,7 +4813,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -4958,7 +5029,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -4985,7 +5056,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -4995,7 +5066,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -5214,7 +5285,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -5241,7 +5312,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -5260,7 +5331,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -5447,7 +5518,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -5483,7 +5554,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -5493,7 +5564,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -5723,7 +5794,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -5750,7 +5821,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -5769,7 +5840,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -5972,7 +6043,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -5999,7 +6070,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -6009,7 +6080,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -6234,7 +6305,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -6270,7 +6341,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -6303,7 +6374,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -6778,7 +6849,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -6805,7 +6876,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -6838,7 +6909,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -7276,7 +7347,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -7303,7 +7374,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -7336,7 +7407,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -7595,7 +7666,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -7622,7 +7693,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -7632,7 +7703,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -7943,7 +8014,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -7970,7 +8041,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -8003,7 +8074,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -8215,7 +8286,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -8242,7 +8313,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -8252,7 +8323,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -8763,7 +8834,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -8790,7 +8861,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -8800,7 +8871,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -9069,7 +9140,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -9079,7 +9150,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -9196,7 +9267,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -9223,7 +9294,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -9233,7 +9304,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -9460,7 +9531,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -9487,7 +9558,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -9520,7 +9591,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -9715,7 +9786,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -9742,7 +9813,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -9752,7 +9823,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -10558,7 +10629,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -10568,7 +10639,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -10608,7 +10679,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -10976,7 +11047,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -11003,7 +11074,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -11572,7 +11643,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -11582,7 +11653,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -11622,7 +11693,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -12646,7 +12717,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -12673,7 +12744,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -12683,7 +12754,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -12888,7 +12959,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -12915,7 +12986,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -12948,7 +13019,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -13141,7 +13212,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -13168,7 +13239,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -13178,7 +13249,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -13394,7 +13465,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -13421,7 +13492,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -13431,7 +13502,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -13645,7 +13716,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -13672,7 +13743,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -13705,7 +13776,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -13961,7 +14032,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -13988,7 +14059,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -13998,7 +14069,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -14288,7 +14359,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -14324,7 +14395,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -14363,7 +14434,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -14617,7 +14688,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -14644,7 +14715,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -14677,7 +14748,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -14944,7 +15015,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -14980,7 +15051,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -15019,7 +15090,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -15378,7 +15449,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -15405,7 +15476,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -15415,7 +15486,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -15629,7 +15700,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -15656,7 +15727,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -15689,7 +15760,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -15888,7 +15959,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -15915,7 +15986,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -15925,7 +15996,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -16167,7 +16238,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -16177,7 +16248,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -16213,7 +16284,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -16400,7 +16471,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -16427,7 +16498,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -16460,7 +16531,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -16654,7 +16725,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -16664,7 +16735,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -16686,7 +16757,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -17153,7 +17224,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -17180,7 +17251,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -17190,7 +17261,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -17404,7 +17475,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -17431,7 +17502,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -17464,7 +17535,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -17655,7 +17726,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -17682,7 +17753,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -17715,7 +17786,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"
@@ -17915,7 +17986,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 150,
+          "line": 155,
           "apis": [
             "/api/auth/session"
           ],
@@ -17942,7 +18013,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 75,
+          "line": 79,
           "apis": [
             "/api/settings/team",
             "/api/auth/"
@@ -17970,7 +18041,7 @@
         },
         {
           "owner": "lib/client/backend.ts",
-          "line": 106,
+          "line": 111,
           "apis": [
             "/api/documents",
             "/api/auth/reauthenticate"

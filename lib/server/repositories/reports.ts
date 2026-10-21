@@ -6,6 +6,8 @@ import {authorize} from '@/lib/server/rbac';
 import type {SessionUser} from '@/lib/server/session';
 import type {ReportSummary,TimeReport} from '@/lib/report-export';
 import {timeWorkspace} from './time-workspace';
+import {financialMetricsData} from './finance';
+import {sumMoney} from '@/lib/money';
 import {ApiError} from '@/lib/server/http';
 
 /** Reuse the live list authorization/filter owner, then explicitly remove private
@@ -36,5 +38,16 @@ export async function reportSummary(c:PoolClient,s:SessionUser,period:{from:stri
  ) select currency,sum(incoming)::text amount,sum(refunded)::text refund_amount,sum(incoming-refunded)::text net_amount from movements group by currency order by currency`,args)).rows:null;
  const expenses=tenantCan(s.role,'expenses:read')&&planAllowsModule(plan,'spesen')?(await c.query(`select currency,sum(quantity*unit_price)::text amount from expenses where organization_id=$1 and archived_at is null and status in ('approved','posted') and reimbursed_at is not null and (reimbursed_at at time zone 'Europe/Zurich')::date between $2::date and $3::date group by currency order by currency`,args)).rows:null;
  const employees=tenantCan(s.role,'employees:read')&&planAllowsModule(plan,'personal')?(await c.query(`select count(*)::text total,count(*) filter(where active)::text active from employees where organization_id=$1 and archived_at is null`,[s.organizationId])).rows[0]:null;
- return {period,asOf:new Date().toISOString(),customers,projects,time,payments,expenses,employees} as ReportSummary;
+ // Reuse issue/credit dates and settlement definitions from live finance charts.
+ // Period volume and the current outstanding snapshot are different measures.
+ let invoices:ReportSummary['invoices']=null;
+ if(tenantCan(s.role,'invoices:read')&&planAllowsModule(plan,'rechnungen')){
+  invoices=[];
+  const currencies=(await c.query(`select distinct currency from invoices where organization_id=$1 and archived_at is null and status not in ('draft','cancelled') and issue_date<=(now() at time zone 'Europe/Zurich')::date order by currency`,[s.organizationId])).rows;
+  for(const row of currencies){
+   const currency=String(row.currency),metrics=await financialMetricsData(c,s.organizationId,{currency});
+   invoices.push({currency,invoiced:sumMoney(metrics.revenueEvents.filter(event=>String(event.date)>=period.from&&String(event.date)<=period.to).map(event=>event.amount)).toFixed(2),open:String(metrics.snapshot.open),overdue:String(metrics.snapshot.overdue),asOf:String(metrics.snapshot.as_of)});
+  }
+ }
+ return {period,asOf:new Date().toISOString(),customers,projects,time,payments,expenses,employees,invoices} as ReportSummary;
 }

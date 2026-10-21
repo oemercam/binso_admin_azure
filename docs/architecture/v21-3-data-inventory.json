@@ -5013,6 +5013,7 @@
         "lib/report-export.ts",
         "lib/projects.ts",
         "lib/server/repositories/time-workspace.ts",
+        "lib/server/repositories/finance.ts",
         "lib/server/document-pdf.ts",
         "lib/locales/index.ts",
         "lib/locales/config.ts",
@@ -11812,13 +11813,15 @@
         "lib/server/session.ts",
         "lib/report-export.ts",
         "lib/server/repositories/time-workspace.ts",
+        "lib/server/repositories/finance.ts",
+        "lib/money.ts",
         "lib/server/http.ts"
       ],
       "methods": [],
       "calls": [
         {
           "callee": "authorize",
-          "line": 14,
+          "line": 16,
           "arguments": [
             "s",
             "'reports:read'"
@@ -11826,7 +11829,7 @@
         },
         {
           "callee": "authorize",
-          "line": 14,
+          "line": 16,
           "arguments": [
             "s",
             "'time:read'"
@@ -11834,7 +11837,7 @@
         },
         {
           "callee": "authorize",
-          "line": 28,
+          "line": 30,
           "arguments": [
             "s",
             "'reports:read'"
@@ -11842,7 +11845,7 @@
         },
         {
           "callee": "c.query",
-          "line": 30,
+          "line": 32,
           "arguments": [
             "`select count(*)::text total,count(*) filter(where (created_at at time zone 'Europe/Zurich')::date between $2::date and $3::date)::text added from customers where organization_id=$1 and archived_at is null`",
             "args"
@@ -11850,7 +11853,7 @@
         },
         {
           "callee": "c.query",
-          "line": 31,
+          "line": 33,
           "arguments": [
             "`select status,count(*)::text count from projects where organization_id=$1 and archived_at is null group by status order by status`",
             "[s.organizationId]"
@@ -11858,7 +11861,7 @@
         },
         {
           "callee": "c.query",
-          "line": 32,
+          "line": 34,
           "arguments": [
             "`select coalesce(sum(hours),0)::text hours,coalesce(sum(hours) filter(where billable),0)::text billable_hours,coalesce(sum(hours) filter(where invoiced_invoice_id is not null),0)::text invoiced_hours from time_entries where organization_id=$1 and archived_at is null and work_date between $2::date and $3::date and ($4::boolean=false or created_by_user_id=$5)`",
             "[...args,ownRecordOnly(s.role,'zeiterfassung'),s.userId]"
@@ -11866,7 +11869,7 @@
         },
         {
           "callee": "c.query",
-          "line": 33,
+          "line": 35,
           "arguments": [
             "`with movements as (\n  select i.currency,p.amount incoming,0::numeric refunded from payments p join invoices i on i.id=p.invoice_id and i.organization_id=p.organization_id where p.organization_id=$1 and p.archived_at is null and p.allocation_status='matched' and p.payment_date between $2::date and $3::date and p.payment_date<=(now() at time zone 'Europe/Zurich')::date\n  union all select i.currency,0::numeric incoming,r.amount refunded from invoice_refunds r join invoices i on i.id=r.invoice_id and i.organization_id=r.organization_id where r.organization_id=$1 and r.refund_date between $2::date and $3::date and r.refund_date<=(now() at time zone 'Europe/Zurich')::date\n ) select currency,sum(incoming)::text amount,sum(refunded)::text refund_amount,sum(incoming-refunded)::text net_amount from movements group by currency order by currency`",
             "args"
@@ -11874,7 +11877,7 @@
         },
         {
           "callee": "c.query",
-          "line": 37,
+          "line": 39,
           "arguments": [
             "`select currency,sum(quantity*unit_price)::text amount from expenses where organization_id=$1 and archived_at is null and status in ('approved','posted') and reimbursed_at is not null and (reimbursed_at at time zone 'Europe/Zurich')::date between $2::date and $3::date group by currency order by currency`",
             "args"
@@ -11882,9 +11885,17 @@
         },
         {
           "callee": "c.query",
-          "line": 38,
+          "line": 40,
           "arguments": [
             "`select count(*)::text total,count(*) filter(where active)::text active from employees where organization_id=$1 and archived_at is null`",
+            "[s.organizationId]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 46,
+          "arguments": [
+            "`select distinct currency from invoices where organization_id=$1 and archived_at is null and status not in ('draft','cancelled') and issue_date<=(now() at time zone 'Europe/Zurich')::date order by currency`",
             "[s.organizationId]"
           ]
         }
@@ -12128,7 +12139,7 @@
         },
         {
           "callee": "fetch",
-          "line": 78,
+          "line": 82,
           "arguments": [
             "path",
             "{...options,signal:options.signal??AbortSignal.timeout(options.method&&options.method!==\"GET\"?30000:15000)}"
@@ -12136,17 +12147,17 @@
         },
         {
           "callee": "fetchOnce",
-          "line": 79,
+          "line": 83,
           "arguments": []
         },
         {
           "callee": "fetchOnce",
-          "line": 85,
+          "line": 89,
           "arguments": []
         },
         {
           "callee": "fetchApi",
-          "line": 127,
+          "line": 132,
           "arguments": [
             "path",
             "{\n    method:\"POST\",\n    headers:{\n      \"Content-Type\":\"application/json\",\n      ...(options.idempotencyKey?{\"Idempotency-Key\":options.idempotencyKey}:{}),\n    },\n    body:JSON.stringify(body),\n  }"
@@ -12154,7 +12165,7 @@
         },
         {
           "callee": "fetchApi",
-          "line": 142,
+          "line": 147,
           "arguments": [
             "path",
             "{method:\"GET\",cache:\"no-store\",credentials:\"same-origin\",redirect:\"error\",headers:{Accept:contentType}}"
@@ -12162,12 +12173,12 @@
         },
         {
           "callee": "(async()=>{\n    const response=await fetchApi(path,{method:\"GET\",cache:\"no-store\",signal:AbortSignal.timeout(15000)});\n    const result=await parseResponse<T>(response,\"Daten konnten nicht geladen werden.\");\n    if(sessionRevision!==dataRevision([]))throw new ClientApiError(\"Die Sitzung wurde geändert. Bitte erneut versuchen.\",\"session_changed\",401);\n    return result;\n  })",
-          "line": 155,
+          "line": 160,
           "arguments": []
         },
         {
           "callee": "fetchApi",
-          "line": 156,
+          "line": 161,
           "arguments": [
             "path",
             "{method:\"GET\",cache:\"no-store\",signal:AbortSignal.timeout(15000)}"
@@ -12175,7 +12186,7 @@
         },
         {
           "callee": "fetchApi",
-          "line": 169,
+          "line": 174,
           "arguments": [
             "path",
             "{method:'POST',...(multipart?{body}:{headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})}"
@@ -12183,7 +12194,7 @@
         },
         {
           "callee": "fetchApi",
-          "line": 177,
+          "line": 182,
           "arguments": [
             "path",
             "{\n    method:\"PATCH\",\n    headers:{\"Content-Type\":\"application/json\"},\n    body:JSON.stringify(body),\n  }"
@@ -12191,7 +12202,7 @@
         },
         {
           "callee": "fetchApi",
-          "line": 187,
+          "line": 192,
           "arguments": [
             "path",
             "{method:\"DELETE\",...(body===undefined?{}:{headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})}"
@@ -12199,7 +12210,7 @@
         },
         {
           "callee": "fetchApi",
-          "line": 202,
+          "line": 207,
           "arguments": [
             "path",
             "{method:\"POST\",body:form,headers}"

@@ -194,9 +194,16 @@
     "R7-43-008": {
       "sourceTextSha256": "7f9bbd76986aca52fc679aa689867d8aef58f62d3cfe6998887a3f2a30202252",
       "status": "teilweise_implementiert",
-      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
-      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
-      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
+      "implementation": "Bericht erweitert um kreditbereinigtes Rechnungsvolumen im Zeitraum und aktuellen offenen/überfälligen Snapshot, gemeinsame bestehende Finance-Berechnung. Cash und Rechnungsvolumen getrennt.",
+      "sourceReferences": [
+        "lib/server/repositories/reports.ts",
+        "lib/server/repositories/finance.ts",
+        "lib/report-export.ts",
+        "components/pages/reports.tsx"
+      ],
+      "test": "Tatsächliche Migrations-/Datenbankregression für Aggregatprojektion, HR-Ablehnung, Datumsdefinitionen und unverändertes Rechnungsvolumen nach Refund bestanden. Typecheck/Lint/Sprachabdeckung bestanden.",
+      "visualComparison": "Neue Finanzsektion noch nicht visuell abgenommen.",
+      "blocker": "Kategorie-/MwSt.-/Angebotsberichte und vollständige fachliche/visuelle Abnahme fehlen."
     },
     "R7-43-009": {
       "sourceTextSha256": "42e62a1191149d38124c2ec17ff6b4f8a576d13c97857a1fb5c4991c81e6c109",
@@ -306,6 +313,19 @@
       "test": "Tatsächliches geladenes Inter-Face und Referenzgeometrie bei320/390/768/1440px bestanden; CSS-Architektur/Style-Adversarial bestanden.",
       "visualComparison": "Lokale Screens schmal/breit gesichtet; alle Routen/Schriften/Zoomzustände noch nicht abgenommen.",
       "blocker": "Appweite visuelle Regression und physische Offline-/Langsamnetz-Abnahme offen."
+    },
+    "R7-54-006": {
+      "sourceTextSha256": "da3cffb25db9697c8ab54537c22ce8f25e0c522b12ab466affd6274df76901cc",
+      "status": "teilweise_implementiert",
+      "implementation": "Bestehende Error-Boundaries und consentgebundene Messung; nun begrenzte serverseitige Support-UUID im Client erhalten und getrennt lokalisiert.",
+      "sourceReferences": [
+        "lib/server/http.ts",
+        "lib/client/backend.ts",
+        "lib/client/locale.tsx"
+      ],
+      "test": "Client positive/negative Header-/Body-/UUID-/Statusprüfungen, tatsächliche SSR-Ausgabe DE/FR/IT/EN, Verbatim-Schutz, Typecheck/Lint bestanden.",
+      "visualComparison": "Supportreferenz ist noch nicht über alle Fehlerseiten/Geräte visuell abgenommen.",
+      "blocker": "Vollständige Accessibility-, Offline-/Reconnect- und physische Geräteabnahme offen."
     }
   },
   "tests": {
