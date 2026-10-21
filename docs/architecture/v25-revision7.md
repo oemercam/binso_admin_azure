@@ -29,6 +29,18 @@ Das Register ist eine Vollständigkeitskontrolle, kein Beleg ausgeführter Tests
 
 ## Nachgewiesene Ursachen und Datenfluss
 
+Support-Paket: Die Kundenprojektion lieferte den rohen Datenbankstatus
+waiting_for_customer, während UI und Operator-API waiting_customer erwarten.
+Zusätzlich fehlte beim Statusfilter das verpflichtende eq.-Präfix. Die zentrale
+Projektion und der UI-Aufruf sind korrigiert; gespeicherte Statuswerte bleiben
+erhalten. Ticketanlage und Antworten schreiben datensparsame Audit-Ereignisse
+in derselben Transaktion, ein Retry dupliziert sie nicht. Antworten aktualisieren
+den Listenzeitpunkt. Es wird kein Live-Chat angelegt; Formulartext und Aktionen
+benennen das asynchrone Ticket. Tote lokale Demo-Antwortpfade wurden entfernt.
+Die realen Datenbanktests, Übersetzungsabdeckung und Typecheck bestehen.
+Support-Admin-Zuordnung, sämtliche Benachrichtigungen und reale PWA-Tastatur
+sind dadurch noch nicht vollständig abgenommen.
+
 | Feld/Defekt | Ursache / Pfad | Korrektur / Grenze |
 |---|---|---|
 | Registrierungsname | UI übermittelte einen Kontaktnamen; provisioning schrieb nur display_name, Profil las first_name/last_name | Explizite Felder → Register-DTO → provisioning → app_users.first_name/last_name → Profil-API. Keine Namen aus Firmen-/Displaynamen erraten; kein produktives Backfill. |

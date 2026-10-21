@@ -32,7 +32,7 @@ export function SupportPage() {
  const params=new URLSearchParams({limit:String(pageSize),offset:String(controller.page*pageSize),order:controller.sort==='default'?'updated_at.desc':fields[controller.sortIndex]+'.'+controller.sort});
  if(controller.query.trim())params.set('q',controller.query.trim());
  const statusMap:Record<string,string>={new:"Neu",open:"Offen",in_progress:"In Bearbeitung",waiting_customer:"Warten auf Kunde",resolved:"Gelöst",closed:"Geschlossen"};
- const selected=Object.entries(statusMap).find(([,label])=>label===controller.activeChip)?.[0];if(selected)params.set('status',selected);
+ const selected=Object.entries(statusMap).find(([,label])=>label===controller.activeChip)?.[0];if(selected)params.set('status','eq.'+selected);
  const query=useApiQuery<{items:Array<{id:string;case_number?:string;subject:string;status:string;updated_at:string}>;total?:number}>("/api/support/tickets?"+params);
  const rows=(query.data?.items??[]).map(item=>[item.id,item.subject?.trim()||"Support-Anfrage",formatDateTime(item.updated_at),statusMap[item.status]??item.status,supportReference(item.id,item.case_number)]);
  const total=query.data?.total??rows.length;
@@ -99,7 +99,7 @@ export function SupportTicketForm() {
       setSubmitting(false);
     }
   };
-  return <AppShell title="Neue Support-Anfrage" editing unsavedChanges={false} subtitle="Beschreibe kurz, wobei wir helfen können." active="support" backHref={returnTo} backLabel="Support">
+  return <AppShell title="Neue Support-Anfrage" editing unsavedChanges={false} subtitle="Beschreibe dein Anliegen. Antworten erhältst du im Ticket." active="support" backHref={returnTo} backLabel="Support">
     <FormSheet workspace label="Neue Support-Anfrage" open={open} onClose={close} busy={submitting} dirty={dirty&&!saved}>
     <form onSubmit={event=>{event.preventDefault();void save()}}>
       <div className="form-grid">
@@ -137,11 +137,10 @@ export function SupportChat({ticketId}:{ticketId:string}) {
   const sendPending=useRef(false),replyReplay=useRef<{body:string;key:string}|null>(null);
   const uploadPending=useRef(false);
   const [uploading,setUploading]=useState(false);
-  const [sent,setSent]=useState<string[]>([]);
   const [remote,setRemote]=useState<Array<{id:string;author_type:string;body:string;created_at:string}>>([]);
   const [toast,setToast]=useState<string|null>(null);
   const [ticket,setTicket]=useState<{id:string;case_number?:string|null;subject?:string|null;status?:string|null;priority?:string|null;created_at?:string|null}|null>(null);
-  useEffect(()=>{const list=messagesRef.current;if(list)list.scrollTop=list.scrollHeight},[remote,sent]);
+  useEffect(()=>{const list=messagesRef.current;if(list)list.scrollTop=list.scrollHeight},[remote]);
   const ticketReference=supportReference(ticket?.id??ticketId,ticket?.case_number);
   const ticketSubject=ticket?.subject?.trim()||("Support-Anfrage");
   const ticketStatus=String(ticket?.status??"open");
@@ -209,9 +208,6 @@ export function SupportChat({ticketId}:{ticketId:string}) {
       setSending(false);
       return;
     }
-    setSent(current=>[...current,value]);
-    sendPending.current=false;
-    setSending(false);
   };
 
   return <AppShell headingPlacement="header" title="Support" active="support" backHref="/support" backLabel="Support">
@@ -221,7 +217,7 @@ export function SupportChat({ticketId}:{ticketId:string}) {
       {ticketLoading?<LoadingState><LocalizedText>{"Ticket wird geladen …"}</LocalizedText></LoadingState>:ticketError?<ErrorState onRetry={()=>setTicketRetry(value=>value+1)} retryLabel="Erneut versuchen"><LocalizedText>{ticketError}</LocalizedText></ErrorState>:false}
       {remote.map((message,index)=><Fragment key={message.id}>{messageDay(message.created_at)!==messageDay(remote[index-1]?.created_at??"")&&<div className="thread-day">{messageDay(message.created_at)}</div>}<MessageBubble outgoing={message.author_type==="customer"} time={<>{new Date(message.created_at).toLocaleTimeString("de-CH",{hour:"2-digit",minute:"2-digit",timeZone:"Europe/Zurich"})}</>} author={message.author_type!=="customer"?"Binso Support":undefined}>{message.body}</MessageBubble></Fragment>)}
       {!ticketLoading&&!ticketError&&remote.length===0&&<EmptyState  title="Noch keine Nachrichten" />}
-      </LocalizedElement><div className="thread-composer"><ActionsMenu label="Chataktionen" busy={uploading||ticketLoading||!!ticketError}><ActionRow icon="upload" title="Datei anhängen" onClick={()=>attachmentRef.current?.click()}/></ActionsMenu><Input ref={attachmentRef} id={"support-thread-file-"+ticketId} hidden type="file" disabled={closed||uploading||ticketLoading||!!ticketError} accept="image/png,image/jpeg,image/webp,application/pdf,text/plain" onChange={e=>{const file=e.target.files?.[0];e.target.value="";void uploadSupportFile(file)}}/><Textarea ref={composerRef} rows={1} autoComplete="off" autoCorrect="off" spellCheck={false} enterKeyHint="enter" aria-label="Nachricht" disabled={closed||ticketLoading||!!ticketError} value={draft} onChange={e=>setDraft(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)&&!e.nativeEvent.isComposing){e.preventDefault();void send();}}} placeholder="Nachricht schreiben..."/><LocalizedElement as="button" type="button" onClick={()=>void send()} disabled={closed||sending||ticketLoading||!!ticketError||!draft.trim()} aria-label={sending?"Nachricht wird gesendet":"Senden"}><Icon name="arrow"/></LocalizedElement></div>
+      </LocalizedElement><div className="thread-composer"><ActionsMenu label="Ticketaktionen" busy={uploading||ticketLoading||!!ticketError}><ActionRow icon="upload" title="Datei anhängen" onClick={()=>attachmentRef.current?.click()}/></ActionsMenu><Input ref={attachmentRef} id={"support-thread-file-"+ticketId} hidden type="file" disabled={closed||uploading||ticketLoading||!!ticketError} accept="image/png,image/jpeg,image/webp,application/pdf,text/plain" onChange={e=>{const file=e.target.files?.[0];e.target.value="";void uploadSupportFile(file)}}/><Textarea ref={composerRef} rows={1} autoComplete="off" autoCorrect="off" spellCheck={false} enterKeyHint="enter" aria-label="Nachricht" disabled={closed||ticketLoading||!!ticketError} value={draft} onChange={e=>setDraft(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)&&!e.nativeEvent.isComposing){e.preventDefault();void send();}}} placeholder="Nachricht schreiben..."/><LocalizedElement as="button" type="button" onClick={()=>void send()} disabled={closed||sending||ticketLoading||!!ticketError||!draft.trim()} aria-label={sending?"Nachricht wird gesendet":"Senden"}><Icon name="arrow"/></LocalizedElement></div>
     </div></div>
 
     </div>

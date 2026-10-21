@@ -9099,14 +9099,14 @@
       "requirement": "Ein zentrales Consent-Management für Landingpage und betroffene Unterseiten: notwendige Technologien klar erklärt, nicht abschaltbar; optionale Kategorien standardmässig aus, wo Einwilligung erforderlich; gleichwertige Optionen «Alle akzeptieren», «Alle ablehnen», «Einstellungen», verständliche Toggles je Kategorie, Widerruf jederzeit via Footer.",
       "sourceTextSha256": "bbf9d022efa18e16af01f8415c3868514d0c8b0fff42d2bfd1c5261abf074f4d",
       "sourceParagraph": "Einheitlicher responsiver Marketing-Footer auf allen öffentlichen Seiten: Produkt, Funktionen, Preise, Kontakt, Support, Impressum, Datenschutz, AGB, Cookie-Einstellungen und weitere tatsächlich erforderliche Rechtstexte. Kunden- und Admin-Workspace erhalten schlanke, konsistente Rechts-/Hilfezugänge statt Marketing-Footer. Ein zentrales Consent-Management für Landingpage und betroffene Unterseiten: notwendige Technologien klar erklärt, nicht abschaltbar; optionale Kategorien standardmässig aus, wo Einwilligung erforderlich; gleichwertige Optionen «Alle akzeptieren», «Alle ablehnen», «Einstellungen», verständliche Toggles je Kategorie, Widerruf jederzeit via Footer. Keine nicht notwendigen Skripte vor wirksamer Einwilligung laden, sofern Einwilligung erforderlich. Consent-Zustand versionieren und mit minimal nötigen Daten nachweisen, Sprachwechsel respektieren, auf PWA und Desktop korrekt verhalten, Banner nicht bei jeder Navigation wiederholen. Cookie-/Tracking-Inventar und tatsächliche Provider zuerst prüfen; keine pauschalen rechtlichen Behauptungen.",
-      "status": "nicht_abgenommen",
+      "status": "teilweise_implementiert",
       "sourceReferences": [
         "components/privacy-consent.tsx"
       ],
       "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "test": "scripts/web-vitals-consent-test.mjs bestanden; Typecheck und gezielter ESLint bestanden; Speicherinventar docs/audit/v25-revision7/browser-storage.md.",
+      "visualComparison": "Noch kein vollständiger Referenzvergleich auf aktuellem Head.",
+      "blocker": "Laufzeit-Netzwerknachweis und juristische Einordnung sowie reale PWA-Abnahme offen."
     },
     {
       "id": "R7-51-004",
@@ -9116,14 +9116,14 @@
       "requirement": "Keine nicht notwendigen Skripte vor wirksamer Einwilligung laden, sofern Einwilligung erforderlich.",
       "sourceTextSha256": "a51b9e66005adcc0f6a7c0a5a72a47125f9c59a4b7630740e5080ece616a3df2",
       "sourceParagraph": "Einheitlicher responsiver Marketing-Footer auf allen öffentlichen Seiten: Produkt, Funktionen, Preise, Kontakt, Support, Impressum, Datenschutz, AGB, Cookie-Einstellungen und weitere tatsächlich erforderliche Rechtstexte. Kunden- und Admin-Workspace erhalten schlanke, konsistente Rechts-/Hilfezugänge statt Marketing-Footer. Ein zentrales Consent-Management für Landingpage und betroffene Unterseiten: notwendige Technologien klar erklärt, nicht abschaltbar; optionale Kategorien standardmässig aus, wo Einwilligung erforderlich; gleichwertige Optionen «Alle akzeptieren», «Alle ablehnen», «Einstellungen», verständliche Toggles je Kategorie, Widerruf jederzeit via Footer. Keine nicht notwendigen Skripte vor wirksamer Einwilligung laden, sofern Einwilligung erforderlich. Consent-Zustand versionieren und mit minimal nötigen Daten nachweisen, Sprachwechsel respektieren, auf PWA und Desktop korrekt verhalten, Banner nicht bei jeder Navigation wiederholen. Cookie-/Tracking-Inventar und tatsächliche Provider zuerst prüfen; keine pauschalen rechtlichen Behauptungen.",
-      "status": "nicht_abgenommen",
+      "status": "teilweise_implementiert",
       "sourceReferences": [
         "components/privacy-consent.tsx"
       ],
       "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "test": "scripts/web-vitals-consent-test.mjs bestanden; Typecheck und gezielter ESLint bestanden; Speicherinventar docs/audit/v25-revision7/browser-storage.md.",
+      "visualComparison": "Noch kein vollständiger Referenzvergleich auf aktuellem Head.",
+      "blocker": "Laufzeit-Netzwerknachweis und juristische Einordnung sowie reale PWA-Abnahme offen."
     },
     {
       "id": "R7-51-005",
@@ -9133,14 +9133,14 @@
       "requirement": "Consent-Zustand versionieren und mit minimal nötigen Daten nachweisen, Sprachwechsel respektieren, auf PWA und Desktop korrekt verhalten, Banner nicht bei jeder Navigation wiederholen.",
       "sourceTextSha256": "1819c54a9545ee190866a82249216df61e73825b6fed840c1be1f1cb98364514",
       "sourceParagraph": "Einheitlicher responsiver Marketing-Footer auf allen öffentlichen Seiten: Produkt, Funktionen, Preise, Kontakt, Support, Impressum, Datenschutz, AGB, Cookie-Einstellungen und weitere tatsächlich erforderliche Rechtstexte. Kunden- und Admin-Workspace erhalten schlanke, konsistente Rechts-/Hilfezugänge statt Marketing-Footer. Ein zentrales Consent-Management für Landingpage und betroffene Unterseiten: notwendige Technologien klar erklärt, nicht abschaltbar; optionale Kategorien standardmässig aus, wo Einwilligung erforderlich; gleichwertige Optionen «Alle akzeptieren», «Alle ablehnen», «Einstellungen», verständliche Toggles je Kategorie, Widerruf jederzeit via Footer. Keine nicht notwendigen Skripte vor wirksamer Einwilligung laden, sofern Einwilligung erforderlich. Consent-Zustand versionieren und mit minimal nötigen Daten nachweisen, Sprachwechsel respektieren, auf PWA und Desktop korrekt verhalten, Banner nicht bei jeder Navigation wiederholen. Cookie-/Tracking-Inventar und tatsächliche Provider zuerst prüfen; keine pauschalen rechtlichen Behauptungen.",
-      "status": "nicht_abgenommen",
+      "status": "teilweise_implementiert",
       "sourceReferences": [
         "components/privacy-consent.tsx"
       ],
       "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "test": "scripts/web-vitals-consent-test.mjs bestanden; Typecheck und gezielter ESLint bestanden; Speicherinventar docs/audit/v25-revision7/browser-storage.md.",
+      "visualComparison": "Noch kein vollständiger Referenzvergleich auf aktuellem Head.",
+      "blocker": "Laufzeit-Netzwerknachweis und juristische Einordnung sowie reale PWA-Abnahme offen."
     },
     {
       "id": "R7-51-006",
@@ -9150,14 +9150,14 @@
       "requirement": "Cookie-/Tracking-Inventar und tatsächliche Provider zuerst prüfen; keine pauschalen rechtlichen Behauptungen.",
       "sourceTextSha256": "5bb4ff42ce6300e49fd365af8075ac6abc558b0989b80b031e8e55070858c872",
       "sourceParagraph": "Einheitlicher responsiver Marketing-Footer auf allen öffentlichen Seiten: Produkt, Funktionen, Preise, Kontakt, Support, Impressum, Datenschutz, AGB, Cookie-Einstellungen und weitere tatsächlich erforderliche Rechtstexte. Kunden- und Admin-Workspace erhalten schlanke, konsistente Rechts-/Hilfezugänge statt Marketing-Footer. Ein zentrales Consent-Management für Landingpage und betroffene Unterseiten: notwendige Technologien klar erklärt, nicht abschaltbar; optionale Kategorien standardmässig aus, wo Einwilligung erforderlich; gleichwertige Optionen «Alle akzeptieren», «Alle ablehnen», «Einstellungen», verständliche Toggles je Kategorie, Widerruf jederzeit via Footer. Keine nicht notwendigen Skripte vor wirksamer Einwilligung laden, sofern Einwilligung erforderlich. Consent-Zustand versionieren und mit minimal nötigen Daten nachweisen, Sprachwechsel respektieren, auf PWA und Desktop korrekt verhalten, Banner nicht bei jeder Navigation wiederholen. Cookie-/Tracking-Inventar und tatsächliche Provider zuerst prüfen; keine pauschalen rechtlichen Behauptungen.",
-      "status": "nicht_abgenommen",
+      "status": "teilweise_implementiert",
       "sourceReferences": [
         "components/privacy-consent.tsx"
       ],
       "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "test": "scripts/web-vitals-consent-test.mjs bestanden; Typecheck und gezielter ESLint bestanden; Speicherinventar docs/audit/v25-revision7/browser-storage.md.",
+      "visualComparison": "Noch kein vollständiger Referenzvergleich auf aktuellem Head.",
+      "blocker": "Laufzeit-Netzwerknachweis und juristische Einordnung sowie reale PWA-Abnahme offen."
     },
     {
       "id": "R7-52-001",
@@ -9270,15 +9270,15 @@
       "requirement": "Ticketanlage erzeugt KEINEN automatischen Live-Chat und keine erzwungene direkte Unterhaltung.",
       "sourceTextSha256": "4f9939b23d79938e99a0251926b87d275b3d8537fbffc75847562d68291cd787",
       "sourceParagraph": "Support-Start bietet verständlich «Support-Ticket erstellen» und separat «Chat starten» nur bei tatsächlich verfügbarer Chatfunktion. Ticketanlage erzeugt KEINEN automatischen Live-Chat und keine erzwungene direkte Unterhaltung. Ticketformular: kurze Betreffzeile, Kategorie, Beschreibung, optional prioritätsgerechte Auswahl und Anhänge; klare Validierung, sichere Dateiprüfung, idempotentes Absenden, kurze lesbare Ticketnummer, Status, Bestätigung. Nach Erstellung: Ticketdetail mit Verlauf und asynchronen Antworten, Benachrichtigung, Zuordnung und Status (offen, in Bearbeitung, wartet auf Kunde, gelöst, geschlossen); optional bewusst initiierten Chat ermöglichen, wenn verfügbar. Keine zweite parallele Ticketinfrastruktur. Support-Admin kann zuweisen, antworten, eskalieren, schliessen; Berechtigungen, Mandantentrennung, Audit und Datensparsamkeit prüfen. iOS-PWA/Browser: Eingabefeld bei Tastatur stets sichtbar; einheitliche Bottom Sheets und max. zweizeilige Empty States.",
-      "status": "nicht_abgenommen",
+      "status": "teilweise_implementiert",
       "sourceReferences": [
         "components/pages/support.tsx",
         "app/api/support/tickets/route.ts"
       ],
       "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "test": "scripts/migration-test.mjs bestanden: tatsächliche Ticketanlage, Reply-Idempotenz, Reopen, Mandantenfilter und Audit. Keine separate Live-Chat-Infrastruktur erzeugt.",
+      "visualComparison": "Noch kein vollständiger Referenzvergleich auf aktuellem Head.",
+      "blocker": "Vollständige Support-Admin-/Benachrichtigungs- und Geräteabnahme offen."
     },
     {
       "id": "R7-53-003",
@@ -9288,15 +9288,15 @@
       "requirement": "Ticketformular: kurze Betreffzeile, Kategorie, Beschreibung, optional prioritätsgerechte Auswahl und Anhänge; klare Validierung, sichere Dateiprüfung, idempotentes Absenden, kurze lesbare Ticketnummer, Status, Bestätigung.",
       "sourceTextSha256": "f36accf4d062b348a545ca2fbfb3561e6114407ecc7197e43e89a6b7afe41cca",
       "sourceParagraph": "Support-Start bietet verständlich «Support-Ticket erstellen» und separat «Chat starten» nur bei tatsächlich verfügbarer Chatfunktion. Ticketanlage erzeugt KEINEN automatischen Live-Chat und keine erzwungene direkte Unterhaltung. Ticketformular: kurze Betreffzeile, Kategorie, Beschreibung, optional prioritätsgerechte Auswahl und Anhänge; klare Validierung, sichere Dateiprüfung, idempotentes Absenden, kurze lesbare Ticketnummer, Status, Bestätigung. Nach Erstellung: Ticketdetail mit Verlauf und asynchronen Antworten, Benachrichtigung, Zuordnung und Status (offen, in Bearbeitung, wartet auf Kunde, gelöst, geschlossen); optional bewusst initiierten Chat ermöglichen, wenn verfügbar. Keine zweite parallele Ticketinfrastruktur. Support-Admin kann zuweisen, antworten, eskalieren, schliessen; Berechtigungen, Mandantentrennung, Audit und Datensparsamkeit prüfen. iOS-PWA/Browser: Eingabefeld bei Tastatur stets sichtbar; einheitliche Bottom Sheets und max. zweizeilige Empty States.",
-      "status": "nicht_abgenommen",
+      "status": "teilweise_implementiert",
       "sourceReferences": [
         "components/pages/support.tsx",
         "app/api/support/tickets/route.ts"
       ],
       "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "test": "scripts/migration-test.mjs bestanden: tatsächliche Ticketanlage, Reply-Idempotenz, Reopen, Mandantenfilter und Audit. Keine separate Live-Chat-Infrastruktur erzeugt.",
+      "visualComparison": "Noch kein vollständiger Referenzvergleich auf aktuellem Head.",
+      "blocker": "Vollständige Support-Admin-/Benachrichtigungs- und Geräteabnahme offen."
     },
     {
       "id": "R7-53-004",
@@ -9306,15 +9306,15 @@
       "requirement": "Nach Erstellung: Ticketdetail mit Verlauf und asynchronen Antworten, Benachrichtigung, Zuordnung und Status (offen, in Bearbeitung, wartet auf Kunde, gelöst, geschlossen); optional bewusst initiierten Chat ermöglichen, wenn verfügbar.",
       "sourceTextSha256": "c493481f448ae20c04228248c477516844d8ed43526cbe4da3c84b43434b877e",
       "sourceParagraph": "Support-Start bietet verständlich «Support-Ticket erstellen» und separat «Chat starten» nur bei tatsächlich verfügbarer Chatfunktion. Ticketanlage erzeugt KEINEN automatischen Live-Chat und keine erzwungene direkte Unterhaltung. Ticketformular: kurze Betreffzeile, Kategorie, Beschreibung, optional prioritätsgerechte Auswahl und Anhänge; klare Validierung, sichere Dateiprüfung, idempotentes Absenden, kurze lesbare Ticketnummer, Status, Bestätigung. Nach Erstellung: Ticketdetail mit Verlauf und asynchronen Antworten, Benachrichtigung, Zuordnung und Status (offen, in Bearbeitung, wartet auf Kunde, gelöst, geschlossen); optional bewusst initiierten Chat ermöglichen, wenn verfügbar. Keine zweite parallele Ticketinfrastruktur. Support-Admin kann zuweisen, antworten, eskalieren, schliessen; Berechtigungen, Mandantentrennung, Audit und Datensparsamkeit prüfen. iOS-PWA/Browser: Eingabefeld bei Tastatur stets sichtbar; einheitliche Bottom Sheets und max. zweizeilige Empty States.",
-      "status": "nicht_abgenommen",
+      "status": "teilweise_implementiert",
       "sourceReferences": [
         "components/pages/support.tsx",
         "app/api/support/tickets/route.ts"
       ],
       "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "test": "scripts/migration-test.mjs bestanden: tatsächliche Ticketanlage, Reply-Idempotenz, Reopen, Mandantenfilter und Audit. Keine separate Live-Chat-Infrastruktur erzeugt.",
+      "visualComparison": "Noch kein vollständiger Referenzvergleich auf aktuellem Head.",
+      "blocker": "Vollständige Support-Admin-/Benachrichtigungs- und Geräteabnahme offen."
     },
     {
       "id": "R7-53-005",
@@ -9324,15 +9324,15 @@
       "requirement": "Keine zweite parallele Ticketinfrastruktur.",
       "sourceTextSha256": "a996d30dfe613c3ef9ed7e9c5e7e6768364163dcf103b0a80b597cae6c107386",
       "sourceParagraph": "Support-Start bietet verständlich «Support-Ticket erstellen» und separat «Chat starten» nur bei tatsächlich verfügbarer Chatfunktion. Ticketanlage erzeugt KEINEN automatischen Live-Chat und keine erzwungene direkte Unterhaltung. Ticketformular: kurze Betreffzeile, Kategorie, Beschreibung, optional prioritätsgerechte Auswahl und Anhänge; klare Validierung, sichere Dateiprüfung, idempotentes Absenden, kurze lesbare Ticketnummer, Status, Bestätigung. Nach Erstellung: Ticketdetail mit Verlauf und asynchronen Antworten, Benachrichtigung, Zuordnung und Status (offen, in Bearbeitung, wartet auf Kunde, gelöst, geschlossen); optional bewusst initiierten Chat ermöglichen, wenn verfügbar. Keine zweite parallele Ticketinfrastruktur. Support-Admin kann zuweisen, antworten, eskalieren, schliessen; Berechtigungen, Mandantentrennung, Audit und Datensparsamkeit prüfen. iOS-PWA/Browser: Eingabefeld bei Tastatur stets sichtbar; einheitliche Bottom Sheets und max. zweizeilige Empty States.",
-      "status": "nicht_abgenommen",
+      "status": "teilweise_implementiert",
       "sourceReferences": [
         "components/pages/support.tsx",
         "app/api/support/tickets/route.ts"
       ],
       "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "test": "scripts/migration-test.mjs bestanden: tatsächliche Ticketanlage, Reply-Idempotenz, Reopen, Mandantenfilter und Audit. Keine separate Live-Chat-Infrastruktur erzeugt.",
+      "visualComparison": "Noch kein vollständiger Referenzvergleich auf aktuellem Head.",
+      "blocker": "Vollständige Support-Admin-/Benachrichtigungs- und Geräteabnahme offen."
     },
     {
       "id": "R7-53-006",

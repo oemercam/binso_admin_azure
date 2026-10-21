@@ -78,6 +78,62 @@
       "test": "Gezielte Prüfungen: registration-test, profile-image-test, document-presentation-test, pdf-gestures-test, migration-test; letzter Datenbanklauf bestanden.",
       "visualComparison": "Ausstehend am aktuellen Revision7-Stand",
       "blocker": "Vollständige Klauselabnahme und reale Geräte fehlen; nicht als vollständig bestanden werten."
+    },
+    "R7-51-003": {
+      "sourceTextSha256": "bbf9d022efa18e16af01f8415c3868514d0c8b0fff42d2bfd1c5261abf074f4d",
+      "status": "teilweise_implementiert",
+      "test": "scripts/web-vitals-consent-test.mjs bestanden; Typecheck und gezielter ESLint bestanden; Speicherinventar docs/audit/v25-revision7/browser-storage.md.",
+      "visualComparison": "Noch kein vollständiger Referenzvergleich auf aktuellem Head.",
+      "blocker": "Laufzeit-Netzwerknachweis und juristische Einordnung sowie reale PWA-Abnahme offen."
+    },
+    "R7-51-004": {
+      "sourceTextSha256": "a51b9e66005adcc0f6a7c0a5a72a47125f9c59a4b7630740e5080ece616a3df2",
+      "status": "teilweise_implementiert",
+      "test": "scripts/web-vitals-consent-test.mjs bestanden; Typecheck und gezielter ESLint bestanden; Speicherinventar docs/audit/v25-revision7/browser-storage.md.",
+      "visualComparison": "Noch kein vollständiger Referenzvergleich auf aktuellem Head.",
+      "blocker": "Laufzeit-Netzwerknachweis und juristische Einordnung sowie reale PWA-Abnahme offen."
+    },
+    "R7-51-005": {
+      "sourceTextSha256": "1819c54a9545ee190866a82249216df61e73825b6fed840c1be1f1cb98364514",
+      "status": "teilweise_implementiert",
+      "test": "scripts/web-vitals-consent-test.mjs bestanden; Typecheck und gezielter ESLint bestanden; Speicherinventar docs/audit/v25-revision7/browser-storage.md.",
+      "visualComparison": "Noch kein vollständiger Referenzvergleich auf aktuellem Head.",
+      "blocker": "Laufzeit-Netzwerknachweis und juristische Einordnung sowie reale PWA-Abnahme offen."
+    },
+    "R7-51-006": {
+      "sourceTextSha256": "5bb4ff42ce6300e49fd365af8075ac6abc558b0989b80b031e8e55070858c872",
+      "status": "teilweise_implementiert",
+      "test": "scripts/web-vitals-consent-test.mjs bestanden; Typecheck und gezielter ESLint bestanden; Speicherinventar docs/audit/v25-revision7/browser-storage.md.",
+      "visualComparison": "Noch kein vollständiger Referenzvergleich auf aktuellem Head.",
+      "blocker": "Laufzeit-Netzwerknachweis und juristische Einordnung sowie reale PWA-Abnahme offen."
+    },
+    "R7-53-002": {
+      "sourceTextSha256": "4f9939b23d79938e99a0251926b87d275b3d8537fbffc75847562d68291cd787",
+      "status": "teilweise_implementiert",
+      "test": "scripts/migration-test.mjs bestanden: tatsächliche Ticketanlage, Reply-Idempotenz, Reopen, Mandantenfilter und Audit. Keine separate Live-Chat-Infrastruktur erzeugt.",
+      "visualComparison": "Noch kein vollständiger Referenzvergleich auf aktuellem Head.",
+      "blocker": "Vollständige Support-Admin-/Benachrichtigungs- und Geräteabnahme offen."
+    },
+    "R7-53-003": {
+      "sourceTextSha256": "f36accf4d062b348a545ca2fbfb3561e6114407ecc7197e43e89a6b7afe41cca",
+      "status": "teilweise_implementiert",
+      "test": "scripts/migration-test.mjs bestanden: tatsächliche Ticketanlage, Reply-Idempotenz, Reopen, Mandantenfilter und Audit. Keine separate Live-Chat-Infrastruktur erzeugt.",
+      "visualComparison": "Noch kein vollständiger Referenzvergleich auf aktuellem Head.",
+      "blocker": "Vollständige Support-Admin-/Benachrichtigungs- und Geräteabnahme offen."
+    },
+    "R7-53-004": {
+      "sourceTextSha256": "c493481f448ae20c04228248c477516844d8ed43526cbe4da3c84b43434b877e",
+      "status": "teilweise_implementiert",
+      "test": "scripts/migration-test.mjs bestanden: tatsächliche Ticketanlage, Reply-Idempotenz, Reopen, Mandantenfilter und Audit. Keine separate Live-Chat-Infrastruktur erzeugt.",
+      "visualComparison": "Noch kein vollständiger Referenzvergleich auf aktuellem Head.",
+      "blocker": "Vollständige Support-Admin-/Benachrichtigungs- und Geräteabnahme offen."
+    },
+    "R7-53-005": {
+      "sourceTextSha256": "a996d30dfe613c3ef9ed7e9c5e7e6768364163dcf103b0a80b597cae6c107386",
+      "status": "teilweise_implementiert",
+      "test": "scripts/migration-test.mjs bestanden: tatsächliche Ticketanlage, Reply-Idempotenz, Reopen, Mandantenfilter und Audit. Keine separate Live-Chat-Infrastruktur erzeugt.",
+      "visualComparison": "Noch kein vollständiger Referenzvergleich auf aktuellem Head.",
+      "blocker": "Vollständige Support-Admin-/Benachrichtigungs- und Geräteabnahme offen."
     }
   },
   "tests": {

@@ -5727,17 +5727,18 @@
         "lib/server/fresh-authentication.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts",
+        "lib/server/audit.ts",
         "lib/server/business-idempotency.ts"
       ],
       "evidence": [
         {
           "callee": "requireSession",
-          "line": 8,
+          "line": 9,
           "arguments": []
         },
         {
           "callee": "authorize",
-          "line": 8,
+          "line": 9,
           "arguments": [
             "s",
             "'support:read'"
@@ -5745,7 +5746,7 @@
         },
         {
           "callee": "withTenant",
-          "line": 9,
+          "line": 10,
           "arguments": [
             "s.organizationId",
             "s.userId",
@@ -5754,7 +5755,7 @@
         },
         {
           "callee": "c.query",
-          "line": 9,
+          "line": 10,
           "arguments": [
             "'select m.id,m.case_id ticket_id,m.author_user_id,m.author_type,m.message body,m.created_at from support_messages m join support_cases t on t.id=m.case_id where t.organization_id=$1 and t.id::text=$2 and not m.internal order by m.created_at'",
             "[s.organizationId,id]"
@@ -5762,12 +5763,12 @@
         },
         {
           "callee": "requireSession",
-          "line": 12,
+          "line": 13,
           "arguments": []
         },
         {
           "callee": "authorize",
-          "line": 12,
+          "line": 13,
           "arguments": [
             "s",
             "'support:write'"
@@ -5775,16 +5776,16 @@
         },
         {
           "callee": "withTenant",
-          "line": 13,
+          "line": 14,
           "arguments": [
             "s.organizationId",
             "s.userId",
-            "async c=>{\n  const write=async()=>{\n   const ticket=await c.query('select id,status from support_cases where organization_id=$1 and id::text=$2 for update',[s.organizationId,id]);if(!ticket.rowCount)throw new ApiError(404,'not_found','Ticket wurde nicht gefunden.');\n   if(['resolved','closed'].includes(ticket.rows[0].status))throw new ApiError(409,'ticket_closed','Bitte das Ticket vor einer weiteren Antwort wieder öffnen.');\n   return (await c.query(\"insert into support_messages(case_id,author_type,author_user_id,message) values($1,'customer',$2,$3) returning id,author_type,message body,created_at\",[ticket.rows[0].id,s.userId,message])).rows[0];\n  };\n  const key=request.headers?.get('idempotency-key')?.trim()??'';\n  return key?idempotentBusiness(c,{organizationId:s.organizationId,userId:s.userId,operation:'support.reply',key,body:{id,message}},write):write();\n }"
+            "async c=>{\n  const write=async()=>{\n   const ticket=await c.query('select id,status from support_cases where organization_id=$1 and id::text=$2 for update',[s.organizationId,id]);if(!ticket.rowCount)throw new ApiError(404,'not_found','Ticket wurde nicht gefunden.');\n   if(['resolved','closed'].includes(ticket.rows[0].status))throw new ApiError(409,'ticket_closed','Bitte das Ticket vor einer weiteren Antwort wieder öffnen.');\n   const reply=(await c.query(\"insert into support_messages(case_id,author_type,author_user_id,message) values($1,'customer',$2,$3) returning id,author_type,message body,created_at\",[ticket.rows[0].id,s.userId,message])).rows[0];\n   await c.query('update support_cases set updated_at=now() where id=$1 and organization_id=$2',[ticket.rows[0].id,s.organizationId]);\n   await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'support.reply.created',entityType:'support_case',entityId:ticket.rows[0].id,metadata:{messageId:reply.id}});\n   return reply;\n  };\n  const key=request.headers?.get('idempotency-key')?.trim()??'';\n  return key?idempotentBusiness(c,{organizationId:s.organizationId,userId:s.userId,operation:'support.reply',key,body:{id,message}},write):write();\n }"
           ]
         },
         {
           "callee": "c.query",
-          "line": 15,
+          "line": 16,
           "arguments": [
             "'select id,status from support_cases where organization_id=$1 and id::text=$2 for update'",
             "[s.organizationId,id]"
@@ -5792,10 +5793,18 @@
         },
         {
           "callee": "c.query",
-          "line": 17,
+          "line": 18,
           "arguments": [
             "\"insert into support_messages(case_id,author_type,author_user_id,message) values($1,'customer',$2,$3) returning id,author_type,message body,created_at\"",
             "[ticket.rows[0].id,s.userId,message]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 19,
+          "arguments": [
+            "'update support_cases set updated_at=now() where id=$1 and organization_id=$2'",
+            "[ticket.rows[0].id,s.organizationId]"
           ]
         }
       ]
@@ -5893,7 +5902,7 @@
       "evidence": [
         {
           "callee": "tenantListPage",
-          "line": 10,
+          "line": 11,
           "arguments": [
             "'support_tickets'",
             "request.nextUrl.searchParams",
@@ -5903,12 +5912,12 @@
         },
         {
           "callee": "requireSession",
-          "line": 14,
+          "line": 15,
           "arguments": []
         },
         {
           "callee": "authorize",
-          "line": 14,
+          "line": 15,
           "arguments": [
             "s",
             "'support:write'"
@@ -5916,23 +5925,23 @@
         },
         {
           "callee": "withTenant",
-          "line": 22,
+          "line": 23,
           "arguments": [
             "s.organizationId",
             "s.userId",
-            "async c=>{const write=async()=>{\n   const id=randomUUID();const number=await c.query<{case_number:string}>(\"select 'SUP-' || extract(year from now() at time zone 'Europe/Zurich')::text || '-' || case when n<10000 then lpad(n::text,4,'0') else n::text end as case_number from (select nextval('support_case_number_seq') as n) numbering\");const r=await c.query(\"insert into support_cases(id,organization_id,case_number,created_by_user_id,category,subject,status,description,priority,browser,build_version) values($1,$2,$3,$4,$5,$6,'open',$7,$8,$9,$10) returning id,case_number,subject,status\",[id,s.organizationId,number.rows[0].case_number,s.userId,category,subject,message,priority,request.headers.get(\"user-agent\")?.slice(0,500)??null,process.env.BINSO_BUILD_SHA??null]);\n   await c.query(\"insert into support_messages(case_id,author_type,author_user_id,message) values($1,'customer',$2,$3)\",[id,s.userId,message]);return r.rows[0];\n  };return key?idempotentBusiness(c,{organizationId:s.organizationId,userId:s.userId,operation:'support.create',key,body:{subject,message,category,priority}},write):write();}"
+            "async c=>{const write=async()=>{\n   const id=randomUUID();const number=await c.query<{case_number:string}>(\"select 'SUP-' || extract(year from now() at time zone 'Europe/Zurich')::text || '-' || case when n<10000 then lpad(n::text,4,'0') else n::text end as case_number from (select nextval('support_case_number_seq') as n) numbering\");const r=await c.query(\"insert into support_cases(id,organization_id,case_number,created_by_user_id,category,subject,status,description,priority,browser,build_version) values($1,$2,$3,$4,$5,$6,'open',$7,$8,$9,$10) returning id,case_number,subject,status\",[id,s.organizationId,number.rows[0].case_number,s.userId,category,subject,message,priority,request.headers.get(\"user-agent\")?.slice(0,500)??null,process.env.BINSO_BUILD_SHA??null]);\n   await c.query(\"insert into support_messages(case_id,author_type,author_user_id,message) values($1,'customer',$2,$3)\",[id,s.userId,message]);\n   await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'support.created',entityType:'support_case',entityId:id,metadata:{category,priority}});return r.rows[0];\n  };return key?idempotentBusiness(c,{organizationId:s.organizationId,userId:s.userId,operation:'support.create',key,body:{subject,message,category,priority}},write):write();}"
           ]
         },
         {
           "callee": "c.query",
-          "line": 23,
+          "line": 24,
           "arguments": [
             "\"select 'SUP-' || extract(year from now() at time zone 'Europe/Zurich')::text || '-' || case when n<10000 then lpad(n::text,4,'0') else n::text end as case_number from (select nextval('support_case_number_seq') as n) numbering\""
           ]
         },
         {
           "callee": "c.query",
-          "line": 23,
+          "line": 24,
           "arguments": [
             "\"insert into support_cases(id,organization_id,case_number,created_by_user_id,category,subject,status,description,priority,browser,build_version) values($1,$2,$3,$4,$5,$6,'open',$7,$8,$9,$10) returning id,case_number,subject,status\"",
             "[id,s.organizationId,number.rows[0].case_number,s.userId,category,subject,message,priority,request.headers.get(\"user-agent\")?.slice(0,500)??null,process.env.BINSO_BUILD_SHA??null]"
@@ -5940,7 +5949,7 @@
         },
         {
           "callee": "c.query",
-          "line": 24,
+          "line": 25,
           "arguments": [
             "\"insert into support_messages(case_id,author_type,author_user_id,message) values($1,'customer',$2,$3)\"",
             "[id,s.userId,message]"
@@ -8129,7 +8138,7 @@
         },
         {
           "callee": "apiPatch",
-          "line": 149,
+          "line": 148,
           "arguments": [
             "\"/api/support/tickets/\"+encodeURIComponent(ticketId)",
             "{action:\"reopen\"}"
@@ -8137,7 +8146,7 @@
         },
         {
           "callee": "apiUpload",
-          "line": 164,
+          "line": 163,
           "arguments": [
             "\"/api/files\"",
             "form"
@@ -8145,21 +8154,21 @@
         },
         {
           "callee": "apiGet",
-          "line": 180,
+          "line": 179,
           "arguments": [
             "\"/api/support/tickets?id=\"+encodeURIComponent(ticketId)"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 181,
+          "line": 180,
           "arguments": [
             "\"/api/support/tickets/\"+encodeURIComponent(ticketId)+\"/messages\""
           ]
         },
         {
           "callee": "apiPost",
-          "line": 200,
+          "line": 199,
           "arguments": [
             "\"/api/support/tickets/\"+encodeURIComponent(ticketId)+\"/messages\"",
             "{body:value}",

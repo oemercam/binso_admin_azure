@@ -13693,5 +13693,15 @@
     "File unreadable. Use UTF-8 CSV or XLSX without formulas, macros or external links; maximum 500 rows and 32 columns.",
     "Fichier illisible. Utilisez un CSV UTF-8 ou XLSX sans formules, macros ni liens externes ; maximum 500 lignes et 32 colonnes.",
     "File illeggibile. Usa CSV UTF-8 o XLSX senza formule, macro o collegamenti esterni; massimo 500 righe e 32 colonne."
+  ],
+  "Ticketaktionen": [
+    "Ticket actions",
+    "Actions du ticket",
+    "Azioni del ticket"
+  ],
+  "Beschreibe dein Anliegen. Antworten erhältst du im Ticket.": [
+    "Describe your request. You will receive replies in the ticket.",
+    "Décrivez votre demande. Vous recevrez les réponses dans le ticket.",
+    "Descrivi la tua richiesta. Riceverai le risposte nel ticket."
   ]
 }
