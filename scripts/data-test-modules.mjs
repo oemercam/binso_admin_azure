@@ -6,6 +6,7 @@ export const planAccessModuleUrl=moduleUrl((await fs.readFile('config/plan-acces
 export const moneyModuleUrl=moduleUrl(await fs.readFile('lib/money.ts','utf8'));
 export const financialModuleUrl=moduleUrl((await fs.readFile('lib/financial-status.ts','utf8')).replace('"./money"',JSON.stringify(moneyModuleUrl)));
 export const displayModuleUrl=moduleUrl((await fs.readFile('lib/display-format.ts','utf8')).replace('"./financial-status"',JSON.stringify(financialModuleUrl)));
+export const documentAmountSqlModuleUrl=moduleUrl((await fs.readFile('lib/server/document-amount-sql.ts','utf8')).replace("import 'server-only';",''));
 
 let localeModule;
 export async function localeTestModuleUrl(){

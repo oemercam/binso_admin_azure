@@ -1,4 +1,4 @@
-import {financialModuleUrl} from "./data-test-modules.mjs";
+import {financialModuleUrl,documentAmountSqlModuleUrl} from "./data-test-modules.mjs";
 import fs from 'node:fs/promises';
 import assert from 'node:assert/strict';
 import ts from 'typescript';
@@ -27,6 +27,7 @@ console.log('Finance and operator permission matrix passed.');
 const moduleUrl=source=>'data:text/javascript;base64,'+Buffer.from(source).toString('base64');
 let businessSource=(await fs.readFile('lib/server/repositories/business-api.ts','utf8')).replace('import "server-only";','');
 const businessDependencies={
+ '../document-amount-sql':documentAmountSqlModuleUrl,
  '../business-idempotency':moduleUrl('export async function idempotentBusiness(c,input,write){return write()}'),
  '../audit':moduleUrl('export async function audit(){}'),
  '../http':moduleUrl('export class ApiError extends Error {}'),

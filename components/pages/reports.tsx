@@ -3,18 +3,20 @@ import {Fragment,useState} from 'react';
 import {useLocale,LocalizedText} from '@/lib/client/locale';
 import {localeTags} from '@/lib/locales/config';
 import {useApiQuery} from '@/lib/client/use-api-query';
-import type {ReportSummary} from '@/lib/report-export';
+import {offerDecisionTotals,type ReportSummary} from '@/lib/report-export';
 import {ReportActions} from '../report-actions';
 import {TimeReportSheet} from '../time-report';
-import {businessDate,formatCurrency} from '@/lib/financial-status';
+import {businessDate,formatCurrency,financialStatusLabels,financialStatusTone} from '@/lib/financial-status';
+import {RingChart} from '../statistics';
 import {AppShell} from '../app-shell';
 import {FilterSheet,MetricTiles,MetricTile,WorkspaceSection} from '../binso-ux';
-import {Button,Field,Input,Select,ErrorState,LoadingState,EmptyState,SectionTitle, FormActions} from '../ui';
+import {Button,Field,Input,Select,ErrorState,LoadingState,EmptyState,SectionTitle,Status, FormActions} from '../ui';
 import {projectStatusLabels as projectLabels} from '@/lib/projects';
 export function ReportsPage(){
  const {locale}=useLocale(),[period,setPeriod]=useState({months:'1',from:businessDate().slice(0,7)+'-01',to:businessDate()}),[draft,setDraft]=useState(period),[open,setOpen]=useState(false);
  const query=new URLSearchParams(period),resource=useApiQuery<ReportSummary>('/api/reports?'+query.toString()),data=resource.data;
- const hasAccess=!!data&&[data.customers,data.projects,data.time,data.payments,data.expenses,data.expenseCategories,data.employees,data.invoices].some(value=>value!=null);
+ const hasAccess=!!data&&[data.customers,data.projects,data.time,data.payments,data.expenses,data.expenseCategories,data.employees,data.invoices,data.offers].some(value=>value!=null);
+ const decisions=offerDecisionTotals(data?.offers??[]);
  const [timeOpen,setTimeOpen]=useState(false);
  const date=(value:string)=>new Intl.DateTimeFormat(localeTags[locale],{dateStyle:'short',timeZone:'UTC'}).format(new Date(value+'T12:00:00Z'));
  const number=(value:string)=>Number(value).toLocaleString(localeTags[locale],{maximumFractionDigits:2});
@@ -25,6 +27,7 @@ export function ReportsPage(){
    {(data.customers||data.projects||data.employees)&&<WorkspaceSection><SectionTitle title="Aktueller Bestand"/><p><LocalizedText>Stand</LocalizedText>: {new Intl.DateTimeFormat(localeTags[locale],{dateStyle:"short",timeStyle:"short",timeZone:"Europe/Zurich"}).format(new Date(data.asOf))}</p><MetricTiles columns={2}>{data.customers&&<MetricTile label="Kunden gesamt" value={number(data.customers.total)}/>} {data.employees&&<MetricTile label="Aktive Mitarbeiter" value={number(data.employees.active)}/>} {data.projects&&<MetricTile label="Aufträge" value={number(String(data.projects.reduce((sum,item)=>sum+Number(item.count),0)))}/>}</MetricTiles>{data.projects&&data.projects.length>0&&<dl className="detail-list">{data.projects.map(item=><div key={item.status}><dt><LocalizedText>{projectLabels[item.status]??item.status}</LocalizedText></dt><dd>{number(item.count)}</dd></div>)}</dl>}</WorkspaceSection>}
    {data.customers&&<WorkspaceSection><MetricTiles columns={2}><MetricTile label="Neue Kunden" value={number(data.customers.added)}/></MetricTiles></WorkspaceSection>}
    {data.time&&<WorkspaceSection><SectionTitle title="Arbeitszeit im Zeitraum"/><MetricTiles columns={2}><MetricTile label="Arbeitszeit" value={number(data.time.hours)+' h'}/><MetricTile label="Verrechnete Zeit" value={number(data.time.invoiced_hours)+' h'}/><MetricTile label="Verrechenbare Zeit" value={number(data.time.billable_hours)+' h'}/></MetricTiles></WorkspaceSection>}
+   {data.offers&&<WorkspaceSection><SectionTitle title="Angebote im Zeitraum"/><p><LocalizedText>Nach Angebotsdatum und aktuellem Status. Die Annahmequote berücksichtigt nur angenommene und abgelehnte Angebote.</LocalizedText></p>{data.offers.length?<><dl className="detail-list">{data.offers.map(item=><div key={item.currency+':'+item.status}><dt><Status appearance="pill" tone={financialStatusTone({kind:'offer',status:item.status,total:0},item.status)}>{financialStatusLabels[item.status]??'Unbekannt'}</Status> · {number(item.count)}</dt><dd>{formatCurrency(item.volume,item.currency,localeTags[locale])}</dd></div>)}</dl>{decisions.total>0?<RingChart label="Angebotsentscheidungen" format="number" parts={[{key:'accepted',label:'Angenommen',tone:'positive',value:decisions.accepted},{key:'declined',label:'Abgelehnt',tone:'negative',value:decisions.declined}]}/>:<p><LocalizedText>Noch keine Angebotsentscheidungen</LocalizedText></p>}</>:<EmptyState title="Keine Angebote im Zeitraum"/>}</WorkspaceSection>}
    {data.invoices&&<WorkspaceSection><SectionTitle title="Rechnungen"/>{data.invoices.length?<><MetricTiles columns={3}>{data.invoices.map(item=><Fragment key={item.currency}><MetricTile label="Fakturiertes Volumen" value={Number(item.invoiced)} currency={item.currency}/><MetricTile label="Offen" value={Number(item.open)} currency={item.currency}/><MetricTile label="Überfällig" value={Number(item.overdue)} currency={item.currency}/></Fragment>)}</MetricTiles><p><LocalizedText>Fakturiertes Volumen berücksichtigt Rechnungen und Gutschriften im gewählten Zeitraum. Offene und überfällige Forderungen zeigen den aktuellen Stand.</LocalizedText></p></>:<EmptyState title="Keine Rechnungen vorhanden"/>}</WorkspaceSection>}
    {data.payments&&<WorkspaceSection><SectionTitle title="Zahlungsverkehr"/>{data.payments.length?<MetricTiles columns={3}>{data.payments.map(item=><Fragment key={item.currency}><MetricTile label="Eingegangene Zahlungen" value={Number(item.amount)} currency={item.currency}/>{item.refund_amount!==undefined&&<MetricTile label="Rückerstattungen" value={Number(item.refund_amount)} currency={item.currency}/>} {item.net_amount!==undefined&&<MetricTile label="Zahlungseingänge nach Rückerstattungen" value={Number(item.net_amount)} currency={item.currency}/>}</Fragment>)}</MetricTiles>:<EmptyState  title="Keine Zahlungen im Zeitraum" />}</WorkspaceSection>}
    {data.expenses&&<WorkspaceSection><SectionTitle title="Erstattete Spesen"/>{data.expenses.length?<MetricTiles columns={2}>{data.expenses.map(item=><MetricTile key={item.currency} label="Betrag" value={Number(item.amount)} currency={item.currency}/>)}</MetricTiles>:<EmptyState  title="Keine Spesenerstattungen im Zeitraum" />}</WorkspaceSection>}

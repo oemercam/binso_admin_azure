@@ -40,7 +40,7 @@ for(const path of ['lib/server/file-scan.ts','app/api/files/route.ts','app/api/s
  const suites=planChanges([path],{level:'fast'}).suites;
  assert.ok(suites.includes('file-scan-test')&&suites.includes('auth-integrity-test'),'FAST retains scan protocol and database publication checks for '+path);
 }
-for(const path of ['lib/server/public-reports.ts','lib/server/report-exports.ts','lib/server/report-mail.ts','lib/server/report-document.ts','lib/server/plan-access.ts'])assert.ok(planChanges([path],{level:'fast'}).suites.includes('migration-test'),'FAST preserves actual service-owner DB boundaries: '+path);
+for(const path of ['lib/server/public-reports.ts','lib/server/report-exports.ts','lib/server/report-mail.ts','lib/server/report-document.ts','lib/server/plan-access.ts','lib/server/document-amount-sql.ts'])assert.ok(planChanges([path],{level:'fast'}).suites.includes('migration-test'),'FAST preserves actual service-owner DB boundaries: '+path);
 for(const path of ['lib/server/public-reports.ts','lib/server/report-mail.ts']){const plan=planChanges([path],{level:'fast'});assert.ok(plan.suites.includes('mail-message-test')&&plan.suites.includes('web-vitals-consent-test'));assert.ok(plan.routes.includes('/bericht')&&plan.routes.includes('/berichte'));}
 for(const path of ['components/product-form.tsx','docs/report-mail-notes.md'])assert.equal(planChanges([path],{level:'fast'}).suites.includes('mail-message-test'),false,'Unrelated products/prose do not run mail contracts');
 

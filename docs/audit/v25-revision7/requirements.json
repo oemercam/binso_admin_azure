@@ -7388,10 +7388,10 @@
         "lib/report-export.ts",
         "components/pages/reports.tsx"
       ],
-      "implementation": "Bericht erweitert um kreditbereinigtes Rechnungsvolumen im Zeitraum und aktuellen offenen/überfälligen Snapshot, gemeinsame bestehende Finance-Berechnung. Cash und Rechnungsvolumen getrennt. Genehmigte/verbuchte Spesenkategorien nach Belegdatum ergänzt, Erstattungsdatum bleibt separat; Währungen getrennt,200-Gruppen-Grenze mit Fehler.",
-      "test": "Tatsächliche Migrations-/Datenbankregression für Aggregatprojektion, HR-Ablehnung, Datumsdefinitionen und unverändertes Rechnungsvolumen nach Refund bestanden. Typecheck/Lint/Sprachabdeckung bestanden. Tatsächliche DB-Positiv-/Negativtests für Kategorien, Rollen/Mandanten/Zeitraum/Status/Währung/Übergrösse und lokalisierte Exportlabels bestanden.",
-      "visualComparison": "Neue Finanzsektion noch nicht visuell abgenommen.",
-      "blocker": "Vollständige fachliche/visuelle/Geräte- und Providerabnahme offen; MwSt.-/Angebotsberichte und physische Retention-Anbindung fehlen. Mail-/Link-Backend isoliert geprüft, aktuelle HTTP-/UI-Abnahme offen."
+      "implementation": "Existing aggregate report now includes offer status/count/volume by currency and issue-date cohort, canonical sum-then-round VAT and expiry, explicit accepted/declined decision denominator; retains cash/invoices/expense categories.",
+      "test": "Actual migrated DB and canonical document-list parity, role/tenant/Start, temporal and fractional-VAT negative cases passed.",
+      "visualComparison": "New report UI browser cases added, not yet visually accepted.",
+      "blocker": "VAT report, real-data project profitability, current complete CI and rendered reference/device acceptance remain open."
     },
     {
       "id": "R7-43-009",

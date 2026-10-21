@@ -1,6 +1,6 @@
 import {readDesignCss} from './design-system.mjs';
 import './localization-test-adapter.mjs';
-import {financialModuleUrl,moneyModuleUrl} from "./data-test-modules.mjs";
+import {financialModuleUrl,moneyModuleUrl,documentAmountSqlModuleUrl} from "./data-test-modules.mjs";
 import {readPageFile} from "./page-source.mjs";
 import fs from 'node:fs/promises';
 import assert from 'node:assert/strict';
@@ -21,6 +21,7 @@ const requireReadCache=new Map(await Promise.all(['components/documents.tsx','co
 let source=await readPageFile('lib/server/repositories/business-api.ts','utf8');
 source=source.replace('import "server-only";','');
 const dependencies={
+ '../document-amount-sql':`export * from ${JSON.stringify(documentAmountSqlModuleUrl)}`,
  '../business-idempotency':'export async function idempotentBusiness(c,input,write){return write()}',
  '../audit':'export async function audit(){}',
  '../http':'export class ApiError extends Error {constructor(status,code,message){super(message);this.status=status;this.code=code}}',

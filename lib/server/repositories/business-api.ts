@@ -1,5 +1,6 @@
 import {idempotentBusiness} from "../business-idempotency";
 import "server-only";
+import {offerTotalSql,offerStatusSql} from "../document-amount-sql";
 import {businessDate,financialStatus,openAmount,paymentStatus} from "@/lib/financial-status";
 import { randomUUID } from "node:crypto";
 import type { PoolClient } from "pg";
@@ -76,7 +77,7 @@ export async function listApiBusiness(c:PoolClient,s:SessionUser,table:string,ex
      ${k==='offer'?`(select p.id from projects p where p.source_quote_id=d.id and p.organization_id=d.organization_id and p.archived_at is null limit 1)`:'null::uuid'} project_id,
      ${k==='invoice'?'d.subtotal':`coalesce((select round(sum(l.quantity*l.unit_price),2) from ${lines} l where l.${fk}=d.id and l.organization_id=d.organization_id),0)`} subtotal,
      ${k==='invoice'?'d.vat_amount':`coalesce((select round(sum(l.quantity*l.unit_price*l.vat_rate/100),2) from ${lines} l where l.${fk}=d.id and l.organization_id=d.organization_id),0)`} vat_amount,
-     ${k==='invoice'?'d.total_amount':`coalesce((select round(sum(l.quantity*l.unit_price),2)+round(sum(l.quantity*l.unit_price*l.vat_rate/100),2) from ${lines} l where l.${fk}=d.id and l.organization_id=d.organization_id),0)`} total,
+     ${k==='invoice'?'d.total_amount':offerTotalSql('d')} total,
      coalesce((select max(l.vat_rate) from ${lines} l where l.${fk}=d.id and l.organization_id=d.organization_id),0) vat_rate,
      json_build_object('name',c.name,'number',c.customer_no,'street',c.address,'postal_code',c.zip,'city',c.city,'country',c.country,'language',c.language) customer,
      coalesce((select json_agg(json_build_object('id',l.id,'position',l.sort_order,'description',l.description,'quantity',l.quantity,'unit_price',l.unit_price,'unit',l.unit,'vat_rate',l.vat_rate,'line_total',l.quantity*l.unit_price,'expense_ids',${k==='invoice'?`coalesce((select json_agg(x.expense_id) from invoice_line_expenses x where x.invoice_line_id=l.id),'[]'::json)`:"'[]'::json"},'time_entry_ids',${k==='invoice'?`coalesce((select json_agg(x.time_entry_id) from invoice_line_time_entries x where x.invoice_line_id=l.id),'[]'::json)`:"'[]'::json"}) order by l.sort_order) from ${lines} l where l.${fk}=d.id and l.organization_id=d.organization_id),'[]'::json) items
@@ -91,7 +92,7 @@ export async function listApiBusiness(c:PoolClient,s:SessionUser,table:string,ex
  // Persisted legacy statuses and document snapshots remain unchanged.
  if(table==='documents'){
   values.push(businessDate());
-  source=`select d.*,case when d.kind='offer' then case when d.status='sent' and d.valid_until<$${values.length}::text then 'expired' else d.status end when d.status in ('draft','cancelled') then d.status when d.total>0 and round(greatest(0,d.total-d.credit_amount)*100)<=round(greatest(0,d.paid_amount-d.refund_amount)*100) then 'paid' when d.due_date<$${values.length}::text and round(greatest(0,d.total-d.credit_amount)*100)>round(greatest(0,d.paid_amount-d.refund_amount)*100) then 'overdue' when round(greatest(0,d.paid_amount-d.refund_amount)*100)>0 then 'partial' else 'open' end display_status from (${source}) d`;
+  source=`select d.*,case when d.kind='offer' then ${offerStatusSql('d',`$${values.length}`)} when d.status in ('draft','cancelled') then d.status when d.total>0 and round(greatest(0,d.total-d.credit_amount)*100)<=round(greatest(0,d.paid_amount-d.refund_amount)*100) then 'paid' when d.due_date<$${values.length}::text and round(greatest(0,d.total-d.credit_amount)*100)>round(greatest(0,d.paid_amount-d.refund_amount)*100) then 'overdue' when round(greatest(0,d.paid_amount-d.refund_amount)*100)>0 then 'partial' else 'open' end display_status from (${source}) d`;
  }
  const where:string[]=[];
  if(filters.has('review')){

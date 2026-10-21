@@ -9,7 +9,7 @@ function exportsFrom(file,bindings={}){
  const exported={};Function('exports',...Object.keys(bindings),compiled)(exported,...Object.values(bindings));return exported;
 }
 class ApiError extends Error{constructor(status,code,message){super(message);this.status=status;this.code=code;}}
-const {customerFinancialProjection,listApiBusiness}=exportsFrom('lib/server/repositories/business-api.ts',{tenantCan:role=>role!=='hr',ApiError,businessDate:()=>new Date().toLocaleDateString('en-CA',{timeZone:'Europe/Zurich'})});
+const {customerFinancialProjection,listApiBusiness}=exportsFrom('lib/server/repositories/business-api.ts',{...exportsFrom('lib/server/document-amount-sql.ts'),tenantCan:role=>role!=='hr',ApiError,businessDate:()=>new Date().toLocaleDateString('en-CA',{timeZone:'Europe/Zurich'})});
 const {financialMetricsData}=exportsFrom('lib/server/repositories/finance.ts');
 const db=new PGlite(),organization='11111111-1111-4111-8111-111111111111',other='22222222-2222-4222-8222-222222222222';
 const ids=['aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa','bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb','cccccccc-cccc-4ccc-8ccc-cccccccccccc'];

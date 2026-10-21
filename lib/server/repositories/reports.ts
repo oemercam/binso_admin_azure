@@ -9,6 +9,8 @@ import {timeWorkspace} from './time-workspace';
 import {financialMetricsData} from './finance';
 import {sumMoney} from '@/lib/money';
 import {ApiError} from '@/lib/server/http';
+import {businessDate} from '@/lib/financial-status';
+import {offerTotalSql,offerStatusSql} from '../document-amount-sql';
 
 /** Reuse the live list authorization/filter owner, then explicitly remove private
  * rates, review notes, identities and provenance before any export/preview. */
@@ -38,6 +40,11 @@ export async function reportSummary(c:PoolClient,s:SessionUser,period:{from:stri
  ) select currency,sum(incoming)::text amount,sum(refunded)::text refund_amount,sum(incoming-refunded)::text net_amount from movements group by currency order by currency`,args)).rows:null;
  const expenses=tenantCan(s.role,'expenses:read')&&planAllowsModule(plan,'spesen')?(await c.query(`select currency,sum(quantity*unit_price)::text amount from expenses where organization_id=$1 and archived_at is null and status in ('approved','posted') and reimbursed_at is not null and (reimbursed_at at time zone 'Europe/Zurich')::date between $2::date and $3::date group by currency order by currency`,args)).rows:null;
  const employees=tenantCan(s.role,'employees:read')&&planAllowsModule(plan,'personal')?(await c.query(`select count(*)::text total,count(*) filter(where active)::text active from employees where organization_id=$1 and archived_at is null`,[s.organizationId])).rows[0]:null;
+ let offers:ReportSummary['offers']=null;
+ if(tenantCan(s.role,'sales:read')&&planAllowsModule(plan,'offerten')){
+  offers=(await c.query(`with scoped as(select q.currency,${offerStatusSql('q','$4')} status,${offerTotalSql('q')} gross from quotes q where q.organization_id=$1 and q.archived_at is null and q.issue_date between $2::date and $3::date and q.issue_date<=$4::date) select currency,status,count(*)::text count,sum(gross)::text volume from scoped group by currency,status order by currency,status limit 201`,[...args,businessDate()])).rows;
+  if(offers.length>200)throw new ApiError(400,'report_too_large','Bitte den Zeitraum oder die Filter weiter eingrenzen.');
+ }
  // Recognized expenses use their expense date, not the reimbursement cash date.
  // Keep currencies separate and export categories only, never staff/receipt data.
  let expenseCategories:ReportSummary['expenseCategories']=null;
@@ -56,5 +63,5 @@ export async function reportSummary(c:PoolClient,s:SessionUser,period:{from:stri
    invoices.push({currency,invoiced:sumMoney(metrics.revenueEvents.filter(event=>String(event.date)>=period.from&&String(event.date)<=period.to).map(event=>event.amount)).toFixed(2),open:String(metrics.snapshot.open),overdue:String(metrics.snapshot.overdue),asOf:String(metrics.snapshot.as_of)});
   }
  }
- return {period,asOf:new Date().toISOString(),customers,projects,time,payments,expenses,expenseCategories,employees,invoices} as ReportSummary;
+ return {period,asOf:new Date().toISOString(),customers,projects,time,payments,expenses,expenseCategories,employees,invoices,offers} as ReportSummary;
 }

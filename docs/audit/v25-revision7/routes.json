@@ -2384,7 +2384,7 @@
       "metricSources": [
         {
           "owner": "components/pages/reports.tsx",
-          "line": 25,
+          "line": 27,
           "component": "MetricTile",
           "props": [
             "label=\"Kunden gesamt\"",
@@ -2395,6 +2395,8 @@
             "data?.time",
             "resource.error",
             "resource.loading",
+            "data.offers.length",
+            "decisions.total>0",
             "data.invoices.length",
             "data.payments.length",
             "data.expenses.length",
@@ -2404,7 +2406,7 @@
         },
         {
           "owner": "components/pages/reports.tsx",
-          "line": 25,
+          "line": 27,
           "component": "MetricTile",
           "props": [
             "label=\"Aktive Mitarbeiter\"",
@@ -2415,6 +2417,8 @@
             "data?.time",
             "resource.error",
             "resource.loading",
+            "data.offers.length",
+            "decisions.total>0",
             "data.invoices.length",
             "data.payments.length",
             "data.expenses.length",
@@ -2424,7 +2428,7 @@
         },
         {
           "owner": "components/pages/reports.tsx",
-          "line": 25,
+          "line": 27,
           "component": "MetricTile",
           "props": [
             "label=\"Aufträge\"",
@@ -2435,86 +2439,8 @@
             "data?.time",
             "resource.error",
             "resource.loading",
-            "data.invoices.length",
-            "data.payments.length",
-            "data.expenses.length",
-            "data.expenseCategories.length"
-          ],
-          "limitation": "Statische bedingte Erreichbarkeit, keine Aussage über sichtbare Rolle oder korrekte Berechnung."
-        },
-        {
-          "owner": "components/pages/reports.tsx",
-          "line": 26,
-          "component": "MetricTile",
-          "props": [
-            "label=\"Neue Kunden\"",
-            "value={number(data.customers.added)}"
-          ],
-          "conditions": [
-            "data",
-            "data?.time",
-            "resource.error",
-            "resource.loading",
-            "data.invoices.length",
-            "data.payments.length",
-            "data.expenses.length",
-            "data.expenseCategories.length"
-          ],
-          "limitation": "Statische bedingte Erreichbarkeit, keine Aussage über sichtbare Rolle oder korrekte Berechnung."
-        },
-        {
-          "owner": "components/pages/reports.tsx",
-          "line": 27,
-          "component": "MetricTile",
-          "props": [
-            "label=\"Arbeitszeit\"",
-            "value={number(data.time.hours)+' h'}"
-          ],
-          "conditions": [
-            "data",
-            "data?.time",
-            "resource.error",
-            "resource.loading",
-            "data.invoices.length",
-            "data.payments.length",
-            "data.expenses.length",
-            "data.expenseCategories.length"
-          ],
-          "limitation": "Statische bedingte Erreichbarkeit, keine Aussage über sichtbare Rolle oder korrekte Berechnung."
-        },
-        {
-          "owner": "components/pages/reports.tsx",
-          "line": 27,
-          "component": "MetricTile",
-          "props": [
-            "label=\"Verrechnete Zeit\"",
-            "value={number(data.time.invoiced_hours)+' h'}"
-          ],
-          "conditions": [
-            "data",
-            "data?.time",
-            "resource.error",
-            "resource.loading",
-            "data.invoices.length",
-            "data.payments.length",
-            "data.expenses.length",
-            "data.expenseCategories.length"
-          ],
-          "limitation": "Statische bedingte Erreichbarkeit, keine Aussage über sichtbare Rolle oder korrekte Berechnung."
-        },
-        {
-          "owner": "components/pages/reports.tsx",
-          "line": 27,
-          "component": "MetricTile",
-          "props": [
-            "label=\"Verrechenbare Zeit\"",
-            "value={number(data.time.billable_hours)+' h'}"
-          ],
-          "conditions": [
-            "data",
-            "data?.time",
-            "resource.error",
-            "resource.loading",
+            "data.offers.length",
+            "decisions.total>0",
             "data.invoices.length",
             "data.payments.length",
             "data.expenses.length",
@@ -2525,6 +2451,117 @@
         {
           "owner": "components/pages/reports.tsx",
           "line": 28,
+          "component": "MetricTile",
+          "props": [
+            "label=\"Neue Kunden\"",
+            "value={number(data.customers.added)}"
+          ],
+          "conditions": [
+            "data",
+            "data?.time",
+            "resource.error",
+            "resource.loading",
+            "data.offers.length",
+            "decisions.total>0",
+            "data.invoices.length",
+            "data.payments.length",
+            "data.expenses.length",
+            "data.expenseCategories.length"
+          ],
+          "limitation": "Statische bedingte Erreichbarkeit, keine Aussage über sichtbare Rolle oder korrekte Berechnung."
+        },
+        {
+          "owner": "components/pages/reports.tsx",
+          "line": 29,
+          "component": "MetricTile",
+          "props": [
+            "label=\"Arbeitszeit\"",
+            "value={number(data.time.hours)+' h'}"
+          ],
+          "conditions": [
+            "data",
+            "data?.time",
+            "resource.error",
+            "resource.loading",
+            "data.offers.length",
+            "decisions.total>0",
+            "data.invoices.length",
+            "data.payments.length",
+            "data.expenses.length",
+            "data.expenseCategories.length"
+          ],
+          "limitation": "Statische bedingte Erreichbarkeit, keine Aussage über sichtbare Rolle oder korrekte Berechnung."
+        },
+        {
+          "owner": "components/pages/reports.tsx",
+          "line": 29,
+          "component": "MetricTile",
+          "props": [
+            "label=\"Verrechnete Zeit\"",
+            "value={number(data.time.invoiced_hours)+' h'}"
+          ],
+          "conditions": [
+            "data",
+            "data?.time",
+            "resource.error",
+            "resource.loading",
+            "data.offers.length",
+            "decisions.total>0",
+            "data.invoices.length",
+            "data.payments.length",
+            "data.expenses.length",
+            "data.expenseCategories.length"
+          ],
+          "limitation": "Statische bedingte Erreichbarkeit, keine Aussage über sichtbare Rolle oder korrekte Berechnung."
+        },
+        {
+          "owner": "components/pages/reports.tsx",
+          "line": 29,
+          "component": "MetricTile",
+          "props": [
+            "label=\"Verrechenbare Zeit\"",
+            "value={number(data.time.billable_hours)+' h'}"
+          ],
+          "conditions": [
+            "data",
+            "data?.time",
+            "resource.error",
+            "resource.loading",
+            "data.offers.length",
+            "decisions.total>0",
+            "data.invoices.length",
+            "data.payments.length",
+            "data.expenses.length",
+            "data.expenseCategories.length"
+          ],
+          "limitation": "Statische bedingte Erreichbarkeit, keine Aussage über sichtbare Rolle oder korrekte Berechnung."
+        },
+        {
+          "owner": "components/pages/reports.tsx",
+          "line": 30,
+          "component": "RingChart",
+          "props": [
+            "label=\"Angebotsentscheidungen\"",
+            "format=\"number\"",
+            "parts={[{key:'accepted',label:'Angenommen',tone:'positive',value:decisions.accepted},{key:'declined',label:'Abgelehnt',tone:'negative',value:decisions.declined}]}"
+          ],
+          "conditions": [
+            "data",
+            "data?.time",
+            "resource.error",
+            "resource.loading",
+            "data.offers.length",
+            "decisions.total>0",
+            "data.invoices.length",
+            "data.payments.length",
+            "data.expenses.length",
+            "data.expenseCategories.length"
+          ],
+          "limitation": "Statische bedingte Erreichbarkeit, keine Aussage über sichtbare Rolle oder korrekte Berechnung."
+        },
+        {
+          "owner": "components/pages/reports.tsx",
+          "line": 31,
           "component": "MetricTile",
           "props": [
             "label=\"Fakturiertes Volumen\"",
@@ -2536,6 +2573,8 @@
             "data?.time",
             "resource.error",
             "resource.loading",
+            "data.offers.length",
+            "decisions.total>0",
             "data.invoices.length",
             "data.payments.length",
             "data.expenses.length",
@@ -2545,7 +2584,7 @@
         },
         {
           "owner": "components/pages/reports.tsx",
-          "line": 28,
+          "line": 31,
           "component": "MetricTile",
           "props": [
             "label=\"Offen\"",
@@ -2557,6 +2596,8 @@
             "data?.time",
             "resource.error",
             "resource.loading",
+            "data.offers.length",
+            "decisions.total>0",
             "data.invoices.length",
             "data.payments.length",
             "data.expenses.length",
@@ -2566,7 +2607,7 @@
         },
         {
           "owner": "components/pages/reports.tsx",
-          "line": 28,
+          "line": 31,
           "component": "MetricTile",
           "props": [
             "label=\"Überfällig\"",
@@ -2578,6 +2619,8 @@
             "data?.time",
             "resource.error",
             "resource.loading",
+            "data.offers.length",
+            "decisions.total>0",
             "data.invoices.length",
             "data.payments.length",
             "data.expenses.length",
@@ -2587,7 +2630,7 @@
         },
         {
           "owner": "components/pages/reports.tsx",
-          "line": 29,
+          "line": 32,
           "component": "MetricTile",
           "props": [
             "label=\"Eingegangene Zahlungen\"",
@@ -2599,6 +2642,8 @@
             "data?.time",
             "resource.error",
             "resource.loading",
+            "data.offers.length",
+            "decisions.total>0",
             "data.invoices.length",
             "data.payments.length",
             "data.expenses.length",
@@ -2608,7 +2653,7 @@
         },
         {
           "owner": "components/pages/reports.tsx",
-          "line": 29,
+          "line": 32,
           "component": "MetricTile",
           "props": [
             "label=\"Rückerstattungen\"",
@@ -2620,6 +2665,8 @@
             "data?.time",
             "resource.error",
             "resource.loading",
+            "data.offers.length",
+            "decisions.total>0",
             "data.invoices.length",
             "data.payments.length",
             "data.expenses.length",
@@ -2629,7 +2676,7 @@
         },
         {
           "owner": "components/pages/reports.tsx",
-          "line": 29,
+          "line": 32,
           "component": "MetricTile",
           "props": [
             "label=\"Zahlungseingänge nach Rückerstattungen\"",
@@ -2641,6 +2688,8 @@
             "data?.time",
             "resource.error",
             "resource.loading",
+            "data.offers.length",
+            "decisions.total>0",
             "data.invoices.length",
             "data.payments.length",
             "data.expenses.length",
@@ -2650,7 +2699,7 @@
         },
         {
           "owner": "components/pages/reports.tsx",
-          "line": 30,
+          "line": 33,
           "component": "MetricTile",
           "props": [
             "key={item.currency}",
@@ -2663,6 +2712,8 @@
             "data?.time",
             "resource.error",
             "resource.loading",
+            "data.offers.length",
+            "decisions.total>0",
             "data.invoices.length",
             "data.payments.length",
             "data.expenses.length",
@@ -2688,7 +2739,7 @@
       "apiSources": [
         {
           "owner": "components/pages/reports.tsx",
-          "line": 14,
+          "line": 15,
           "apis": [
             "/api/reports?"
           ],
@@ -7322,35 +7373,6 @@
         },
         {
           "owner": "components/statistics.tsx",
-          "line": 62,
-          "component": "MetricTile",
-          "props": [
-            "key={metric.label}",
-            "label={metric.label}",
-            "value={metric.format==='number'?value(metric.value,'number'):metric.value}",
-            "currency={metric.format==='number'?undefined:currency}",
-            "hint={metric.hint}"
-          ],
-          "conditions": [
-            "!active",
-            "saved&&statisticBounds(saved,businessDate())",
-            "restored",
-            "format==='number'",
-            "hideHeading",
-            "metric.format==='number'",
-            "metric.format==='number'",
-            "showMoreMetrics",
-            "metric.format==='number'",
-            "metric.format==='number'",
-            "showTrend",
-            "hasTrend",
-            "active",
-            "hasTrend"
-          ],
-          "limitation": "Statische bedingte Erreichbarkeit, keine Aussage über sichtbare Rolle oder korrekte Berechnung."
-        },
-        {
-          "owner": "components/statistics.tsx",
           "line": 63,
           "component": "MetricTile",
           "props": [
@@ -7380,7 +7402,36 @@
         },
         {
           "owner": "components/statistics.tsx",
-          "line": 65,
+          "line": 64,
+          "component": "MetricTile",
+          "props": [
+            "key={metric.label}",
+            "label={metric.label}",
+            "value={metric.format==='number'?value(metric.value,'number'):metric.value}",
+            "currency={metric.format==='number'?undefined:currency}",
+            "hint={metric.hint}"
+          ],
+          "conditions": [
+            "!active",
+            "saved&&statisticBounds(saved,businessDate())",
+            "restored",
+            "format==='number'",
+            "hideHeading",
+            "metric.format==='number'",
+            "metric.format==='number'",
+            "showMoreMetrics",
+            "metric.format==='number'",
+            "metric.format==='number'",
+            "showTrend",
+            "hasTrend",
+            "active",
+            "hasTrend"
+          ],
+          "limitation": "Statische bedingte Erreichbarkeit, keine Aussage über sichtbare Rolle oder korrekte Berechnung."
+        },
+        {
+          "owner": "components/statistics.tsx",
+          "line": 66,
           "component": "RingChart",
           "props": [
             "label={composition.label}",
@@ -7407,7 +7458,7 @@
         },
         {
           "owner": "components/statistics.tsx",
-          "line": 67,
+          "line": 68,
           "component": "LineChart",
           "props": [
             "buckets={aggregated.buckets}",
@@ -9423,35 +9474,6 @@
         },
         {
           "owner": "components/statistics.tsx",
-          "line": 62,
-          "component": "MetricTile",
-          "props": [
-            "key={metric.label}",
-            "label={metric.label}",
-            "value={metric.format==='number'?value(metric.value,'number'):metric.value}",
-            "currency={metric.format==='number'?undefined:currency}",
-            "hint={metric.hint}"
-          ],
-          "conditions": [
-            "!active",
-            "saved&&statisticBounds(saved,businessDate())",
-            "restored",
-            "format==='number'",
-            "hideHeading",
-            "metric.format==='number'",
-            "metric.format==='number'",
-            "showMoreMetrics",
-            "metric.format==='number'",
-            "metric.format==='number'",
-            "showTrend",
-            "hasTrend",
-            "active",
-            "hasTrend"
-          ],
-          "limitation": "Statische bedingte Erreichbarkeit, keine Aussage über sichtbare Rolle oder korrekte Berechnung."
-        },
-        {
-          "owner": "components/statistics.tsx",
           "line": 63,
           "component": "MetricTile",
           "props": [
@@ -9481,7 +9503,36 @@
         },
         {
           "owner": "components/statistics.tsx",
-          "line": 65,
+          "line": 64,
+          "component": "MetricTile",
+          "props": [
+            "key={metric.label}",
+            "label={metric.label}",
+            "value={metric.format==='number'?value(metric.value,'number'):metric.value}",
+            "currency={metric.format==='number'?undefined:currency}",
+            "hint={metric.hint}"
+          ],
+          "conditions": [
+            "!active",
+            "saved&&statisticBounds(saved,businessDate())",
+            "restored",
+            "format==='number'",
+            "hideHeading",
+            "metric.format==='number'",
+            "metric.format==='number'",
+            "showMoreMetrics",
+            "metric.format==='number'",
+            "metric.format==='number'",
+            "showTrend",
+            "hasTrend",
+            "active",
+            "hasTrend"
+          ],
+          "limitation": "Statische bedingte Erreichbarkeit, keine Aussage über sichtbare Rolle oder korrekte Berechnung."
+        },
+        {
+          "owner": "components/statistics.tsx",
+          "line": 66,
           "component": "RingChart",
           "props": [
             "label={composition.label}",
@@ -9508,7 +9559,7 @@
         },
         {
           "owner": "components/statistics.tsx",
-          "line": 67,
+          "line": 68,
           "component": "LineChart",
           "props": [
             "buckets={aggregated.buckets}",

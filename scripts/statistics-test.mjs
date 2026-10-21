@@ -26,6 +26,7 @@ console.log('Central statistics: presets, inclusive dates, invalid dates, UTC/DS
 const ts=(await import('typescript')).default;
 const {createRequire}=await import('node:module'),require=createRequire(import.meta.url);
 const React=await import('react');
+const {renderToStaticMarkup}=await import('react-dom/server');
 const textComponent=({children})=>children;
 const declaration=(file,text,name)=>{const ast=ts.createSourceFile(file,text,99,true,4);return ast.statements.find(n=>ts.isFunctionDeclaration(n)&&n.name?.text===name).getText(ast)};
 const compileComponent=text=>ts.transpileModule(text,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
@@ -33,7 +34,9 @@ const chartSource=await fs.readFile('components/statistics.tsx','utf8');
 const actionExports={};
 Function('require','exports',compileComponent(declaration('ui.tsx',await fs.readFile('components/ui.tsx','utf8'),'FormActions')))(require,actionExports);
 let selection=null,activeLocale='de';const localeTags={de:'de-CH',fr:'fr-CH',it:'it-CH',en:'en-CH'},useLocale=()=>({locale:activeLocale});const ringExports={};
-Function('require','exports','useState','formatCurrency','sumMoney','LocalizedText','Button','useTranslation','useLocale','localeTags',compileComponent(declaration('statistics.tsx',chartSource,'RingChart')))(require,ringExports,()=>[selection,value=>{selection=value}],amount=>'CHF '+amount.toFixed(2),values=>values.reduce((a,b)=>a+b,0),textComponent,textComponent,()=>value=>value,useLocale,localeTags);
+const ringTranslate=value=>activeLocale==='fr'?({'Invoice status':'Statut des factures',Open:'Ouvert'}[value]??value):value;
+const ringText=({children})=>typeof children==='string'?ringTranslate(children):children;
+Function('require','exports','useState','formatCurrency','sumMoney','LocalizedText','Button','useTranslation','useLocale','localeTags',compileComponent(declaration('statistics.tsx',chartSource,'RingChart')))(require,ringExports,()=>[selection,value=>{selection=value}],amount=>'CHF '+amount.toFixed(2),values=>values.reduce((a,b)=>a+b,0),ringText,textComponent,()=>ringTranslate,useLocale,localeTags);
 const props={label:'Invoice status',parts:[{key:'paid',label:'Paid',tone:'positive',value:50},{key:'open',label:'Open',tone:'neutral',value:25,href:'/rechnungen?status=open'},{key:'empty',label:'Empty',tone:'negative',value:0}]};
 const nodes=element=>!element||typeof element!=='object'?[]:[element,...React.Children.toArray(element.props?.children).flatMap(nodes)];
 let chart=ringExports.RingChart(props),targets=nodes(chart).filter(n=>n.type==='circle'&&n.props.role==='button');
@@ -44,7 +47,8 @@ let prevented=false;targets[1].props.onKeyDown({key:' ',preventDefault(){prevent
 selection=null;targets[1].props.onKeyDown({key:'ArrowRight',preventDefault(){throw Error('Unrelated key consumed')}});assert.equal(selection,null);
 targets[1].props.onKeyDown({key:'Enter',preventDefault(){}});chart=ringExports.RingChart(props);
 assert.ok(nodes(chart).some(n=>n.props?.href==='/rechnungen?status=open'),'Selected segment exposes its permission-aware drilldown button');
-assert.ok(nodes(chart).some(n=>n.type==='output'&&JSON.stringify(n.props.children).includes('Open: CHF 25.00')),'Accessible output identifies amount and selected status');
+assert.match(renderToStaticMarkup(nodes(chart).find(n=>n.type==='output')),/>Open: CHF 25\.00</,'Accessible output identifies amount and selected status');
+activeLocale='fr';const frenchRing=ringExports.RingChart(props);assert.equal(nodes(frenchRing).find(n=>n.type==='svg').props['aria-label'],'Statut des factures: CHF 75.00');assert.match(renderToStaticMarkup(nodes(frenchRing).find(n=>n.type==='output')),/>Ouvert: CHF 25\.00</,'Selected label is translated independently of the formatted amount');activeLocale='de';
 
 let cursor=0;const states=[];const statisticsExports={};
 const useState=initial=>{const i=cursor++;if(!(i in states))states[i]=typeof initial==='function'?initial():initial;const set=value=>{states[i]=typeof value==='function'?value(states[i]):value};return [states[i],set]};

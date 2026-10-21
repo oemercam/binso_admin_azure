@@ -1,5 +1,5 @@
 {
-  "commit": "c286e2edd77a5dae661a9ed2c3dbe951a9de894d",
+  "commit": "2892e7b144af2d48faf1f8cda9e30ef0a3ad8927",
   "method": "Existing TypeScript AST dependency inventory; conditional reachability is not runtime proof",
   "pages": [
     {
@@ -1513,7 +1513,7 @@
         },
         {
           "tag": "FilterSheet",
-          "line": 81,
+          "line": 82,
           "component": "components/statistics.tsx#StatisticPeriodPicker"
         },
         {
@@ -2069,6 +2069,9 @@
         "components/binso-ux.tsx#MetricTiles",
         "components/binso-ux.tsx#MetricTile",
         "components/ui.tsx#Metric",
+        "components/statistics.tsx#RingChart",
+        "components/statistics.tsx#RingPart",
+        "components/statistics.tsx#Series",
         "components/time-report.tsx#TimeReportSheet"
       ],
       "layouts": [
@@ -2079,12 +2082,12 @@
       "actions": [
         {
           "tag": "TimeReportSheet",
-          "line": 34,
+          "line": 37,
           "component": "components/pages/reports.tsx#ReportsPage"
         },
         {
           "tag": "FilterSheet",
-          "line": 35,
+          "line": 38,
           "component": "components/pages/reports.tsx#ReportsPage"
         },
         {
@@ -2405,7 +2408,7 @@
         },
         {
           "tag": "FilterSheet",
-          "line": 81,
+          "line": 82,
           "component": "components/statistics.tsx#StatisticPeriodPicker"
         },
         {
@@ -6154,7 +6157,7 @@
         },
         {
           "tag": "FilterSheet",
-          "line": 81,
+          "line": 82,
           "component": "components/statistics.tsx#StatisticPeriodPicker"
         },
         {
@@ -6387,7 +6390,7 @@
         },
         {
           "tag": "FilterSheet",
-          "line": 81,
+          "line": 82,
           "component": "components/statistics.tsx#StatisticPeriodPicker"
         },
         {
@@ -7062,7 +7065,7 @@
         },
         {
           "tag": "FilterSheet",
-          "line": 81,
+          "line": 82,
           "component": "components/statistics.tsx#StatisticPeriodPicker"
         },
         {

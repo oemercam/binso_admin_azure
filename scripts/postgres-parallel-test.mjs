@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import pg from 'pg';
-import {moduleUrl,financialModuleUrl,localeTestModuleUrl} from './data-test-modules.mjs';
+import {moduleUrl,financialModuleUrl,localeTestModuleUrl,documentAmountSqlModuleUrl} from './data-test-modules.mjs';
 // Deliberately accept only this disposable localhost test database. No DATABASE_URL
 // fallback, production credentials, schema reset or destructive cleanup is used.
 const address=process.env.BINSO_DB_PARALLEL_TEST_URL;
@@ -24,7 +24,7 @@ try{
  const qr=moduleUrl((await fs.readFile('lib/qr-bill.ts','utf8')).replace('"swissqrbill/utils"',JSON.stringify(new URL('../node_modules/swissqrbill/lib/esm/shared/utils.js',import.meta.url).href)));
  const replay=moduleUrl((await fs.readFile('lib/server/business-idempotency.ts','utf8')).replace("import 'server-only';",'').replace("'./http'",JSON.stringify(http)));
  const compile=async(path,replacements)=>{let source=(await fs.readFile(path,'utf8')).replace('import "server-only";','').replace("import 'server-only';",'');for(const [name,value] of Object.entries(replacements))source=source.replaceAll(JSON.stringify(name),JSON.stringify(value)).replaceAll("'"+name+"'",JSON.stringify(value));return moduleUrl(source);};
- const businessModule=await compile('lib/server/repositories/business-api.ts',{'../business-idempotency':replay,'@/lib/financial-status':financialModuleUrl,'../http':http,'../audit':audit,'@/lib/permissions':permissions,'@/lib/qr-bill':qr});const business=await import(businessModule);
+ const businessModule=await compile('lib/server/repositories/business-api.ts',{'../document-amount-sql':documentAmountSqlModuleUrl,'../business-idempotency':replay,'@/lib/financial-status':financialModuleUrl,'../http':http,'../audit':audit,'@/lib/permissions':permissions,'@/lib/qr-bill':qr});const business=await import(businessModule);
  const plans=planAccessModuleUrl;
  const scopedDb=moduleUrl('export async function query(sql,args){return globalThis.__binsoParallelPool.query(sql,args)} export async function withTenant(org,user,fn){const c=await globalThis.__binsoParallelPool.connect();try{await c.query("begin");await c.query("select set_config(\'app.organization_id\',$1,true),set_config(\'app.user_id\',$2,true)",[org,user]);const value=await fn(c);await c.query("commit");return value}catch(e){await c.query("rollback");throw e}finally{c.release()}}');
  const planService=await compile('lib/server/plan-access.ts',{'@/lib/server/db':scopedDb,'@/config/plan-access':plans,'@/config/plans':planCatalogModuleUrl,'./http':http});

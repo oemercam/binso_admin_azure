@@ -22,10 +22,10 @@ export function authorizeReportDelivery(s:SessionUser){authorize(s,'reports:read
  * lost rights, assignments or entitlements require a newly authorized preview. */
 export async function reportAccessScope(c:PoolClient,s:SessionUser,plan:PlanId){
  authorize(s,'reports:read');
- const capabilities=[['customers:read','kunden'],['projects:read','projekte'],['time:read','zeiterfassung'],['payments:read','zahlungen'],['expenses:read','spesen'],['employees:read','personal'],['invoices:read','rechnungen']] as const;
+ const capabilities=[['customers:read','kunden'],['projects:read','projekte'],['time:read','zeiterfassung'],['payments:read','zahlungen'],['expenses:read','spesen'],['employees:read','personal'],['invoices:read','rechnungen'],['sales:read','offerten']] as const;
  const grants=capabilities.map(([permission,module])=>[permission,tenantCan(s.role,permission,s.moduleProfile)&&planAllowsModule(plan,module)]);
  const assignments=['project_manager','manager'].includes(s.role)?(await c.query(`select a.customer_id,a.project_id,a.starts_on::text,a.ends_on::text from workforce_assignments a join employees e on e.id=a.employee_id and e.organization_id=a.organization_id where a.organization_id=$1 and a.user_id=$2 and e.user_id=$2 and e.active and e.archived_at is null and a.revoked_at is null and current_date>=a.starts_on and (a.ends_on is null or current_date<=a.ends_on) order by a.customer_id,a.project_id,a.starts_on,a.ends_on`,[s.organizationId,s.userId])).rows:[];
- return hash(JSON.stringify({policy:1,user:s.userId,organization:s.organizationId,role:s.role,profile:s.moduleProfile??'standard',plan,grants,assignments}));
+ return hash(JSON.stringify({policy:2,user:s.userId,organization:s.organizationId,role:s.role,profile:s.moduleProfile??'standard',plan,grants,assignments}));
 }
 function canonicalQuery(input:ReportInput){
  const query=new URLSearchParams({kind:input.kind,months:'custom',from:input.period.from,to:input.period.to});

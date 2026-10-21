@@ -147,7 +147,12 @@ try{
  const unassigned=(await pool.query("insert into customers(organization_id,external_id,customer_no,name) values($1,'http-unassigned','HTTP-UNASSIGNED','Synthetic unassigned customer') returning id",[organizations[0]])).rows[0];
  const archivedCustomer=(await pool.query("insert into customers(organization_id,external_id,customer_no,name,archived_at) values($1,'http-archived','HTTP-ARCHIVED','Synthetic archived customer',now()) returning id",[organizations[0]])).rows[0];
  for(const role of ['project_manager','manager','member'])assert.equal((await get('/api/customers/'+unassigned.id,cookies.get('0:'+role))).status,404,role+' cannot read an unassigned customer');
- for(const [path,allowed] of readContracts)for(const role of roles){const r=await get(path,cookies.get('0:'+role));assert.equal(r.status,allowed.includes(role)?200:403,role+' GET '+path+': '+JSON.stringify(r.data));}
+ for(const [path,allowed] of readContracts)for(const role of roles){const r=await get(path,cookies.get('0:'+role));assert.equal(r.status,allowed.includes(role)?200:403,role+' GET '+path+': '+JSON.stringify(r.data));
+  if(path==='/api/reports'&&r.status===200){
+   if(role==='hr')assert.equal(r.data.offers,null,'HR has no sales grant');
+   else {assert.ok(Array.isArray(r.data.offers),role+' retains its existing sales grant');for(const item of r.data.offers)assert.deepEqual(Object.keys(item).sort(),['count','currency','status','volume'],'Only offer aggregates leave the native HTTP boundary');}
+  }
+ }
  // Workspace access is not accounting access. Keep expectations independent
  // of the production permission helper and verify the actual response content.
  for(const role of roles)for(const suffix of ['', '&view=cash', '&customerId='+customer.id]){

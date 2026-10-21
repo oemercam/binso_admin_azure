@@ -14108,5 +14108,45 @@
     "Report sharing is not yet configured correctly.",
     "Le partage de rapports n’est pas encore correctement configuré.",
     "La condivisione dei rapporti non è ancora configurata correttamente."
+  ],
+  "Angebote im Zeitraum": [
+    "Quotes in the period",
+    "Devis de la période",
+    "Offerte nel periodo"
+  ],
+  "Nach Angebotsdatum und aktuellem Status. Die Annahmequote berücksichtigt nur angenommene und abgelehnte Angebote.": [
+    "By quote date and current status. The acceptance rate includes only accepted and declined quotes.",
+    "Selon la date du devis et le statut actuel. Le taux d’acceptation tient uniquement compte des devis acceptés ou refusés.",
+    "Per data dell’offerta e stato attuale. Il tasso di accettazione considera solo le offerte accettate o rifiutate."
+  ],
+  "Angebotsentscheidungen": [
+    "Quote decisions",
+    "Décisions sur les devis",
+    "Decisioni sulle offerte"
+  ],
+  "Noch keine Angebotsentscheidungen": [
+    "No quote decisions yet",
+    "Aucune décision sur les devis",
+    "Nessuna decisione sulle offerte"
+  ],
+  "Keine Angebote im Zeitraum": [
+    "No quotes in the period",
+    "Aucun devis sur la période",
+    "Nessuna offerta nel periodo"
+  ],
+  "Angenommene oder abgelehnte Angebote": [
+    "Accepted or declined quotes",
+    "Devis acceptés ou refusés",
+    "Offerte accettate o rifiutate"
+  ],
+  "Annahmequote": [
+    "Acceptance rate",
+    "Taux d’acceptation",
+    "Tasso di accettazione"
+  ],
+  "Angebotsvolumen": [
+    "Quote volume",
+    "Volume des devis",
+    "Volume delle offerte"
   ]
 }

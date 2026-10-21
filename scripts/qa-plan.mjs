@@ -67,7 +67,7 @@ export function planChanges(files,{level='standard'}={}){
  if(paths.some(p=>/database|server\/repositories|app\/api/.test(p)))suites.add('migration-test');
  // Service-owner-only edits must retain their actual DB/code/PDF security
  // contracts, even when no route file happens to be touched in the same task.
- if(paths.some(p=>/^lib\/server\/(public-reports|report-(exports|mail|document)|plan-access)\./.test(p)))suites.add('migration-test');
+ if(paths.some(p=>/^lib\/server\/(public-reports|report-(exports|mail|document)|plan-access|document-amount-sql)\./.test(p)))suites.add('migration-test');
  if(paths.some(p=>/^lib\/server\/(public-reports|report-mail)\./.test(p))){suites.add('mail-message-test');suites.add('web-vitals-consent-test');}
  if(infrastructure||unknown)suites.add('qa-plan-test');
  return {level:full?'full':level,files:paths,global,reason:full?'Release/CI/auth/schema or unknown dependency: full coverage':broad?'Shared/unknown dependency: representative cross-module coverage':'Changed modules only',routes,webkitRoutes:full?webkitFullRoutes:routes,interactions:full||broad?allInteractions:[...new Set(matched.flatMap(g=>g.interactions))],suites:[...suites],widths:full?[320,375,390,430,600,760,761,768,820,1024,1440,1920]:level==='fast'?[390]:[390,768,1440],webkitWidths:full?[320,375,390,430,600,760,761,768,820,1024,1440,1920]:[390,768],themes:level==='fast'?['light']:['light','dark']};

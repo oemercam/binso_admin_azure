@@ -45,13 +45,15 @@ try{
    if(url.pathname==='/api/time-tracker')json={item:null};
    if(url.pathname==='/api/reports'){
     if(url.searchParams.get('format')==='csv'){exports++;return route.fulfill({contentType:'text/csv; charset=utf-8',headers:{'Content-Disposition':'attachment; filename="binso-fixture.csv"'},body:'"Synthetic metric";"1.00";"CHF"\r\n'});}
-    json={period:{from:'2026-10-01',to:'2026-10-21'},asOf:'2026-10-21T12:00:00Z',customers:null,projects:null,time:null,employees:null,expenses:null,expenseCategories:[{currency:'CHF',category:'Synthetic travel category',amount:'25.00'},{currency:'EUR',category:'Synthetic travel category',amount:'7.00'}],payments:[{currency:'CHF',amount:'2000.00',refund_amount:'100.00',net_amount:'1900.00'}],invoices:[{currency:'CHF',invoiced:'1234.56',open:'400.00',overdue:'50.00',asOf:'2026-10-21'}]};
+    json={period:{from:'2026-10-01',to:'2026-10-21'},asOf:'2026-10-21T12:00:00Z',customers:null,projects:null,time:null,employees:null,expenses:null,offers:[{currency:'CHF',status:'accepted',count:'2',volume:'1000.00'},{currency:'CHF',status:'declined',count:'1',volume:'500.00'},{currency:'CHF',status:'draft',count:'900',volume:'900.00'},{currency:'EUR',status:'sent',count:'500',volume:'500.00'}],expenseCategories:[{currency:'CHF',category:'Synthetic travel category',amount:'25.00'},{currency:'EUR',category:'Synthetic travel category',amount:'7.00'}],payments:[{currency:'CHF',amount:'2000.00',refund_amount:'100.00',net_amount:'1900.00'}],invoices:[{currency:'CHF',invoiced:'1234.56',open:'400.00',overdue:'50.00',asOf:'2026-10-21'}]};
    }
    return route.fulfill({json});
   });
   const page=await context.newPage();await page.goto(base+'/berichte');await page.getByRole('heading',{name:'Rechnungen',exact:true}).waitFor();
   for(const label of ['Fakturiertes Volumen','Offen','Überfällig','Eingegangene Zahlungen','Rückerstattungen','Zahlungseingänge nach Rückerstattungen'])assert.equal(await page.getByText(label,{exact:true}).count(),1,'Distinct financial meaning: '+label);
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,'Financial KPIs never widen the page');
+  const decisions=page.locator('.bo-ring-chart');await decisions.getByRole('group',{name:'Angebotsentscheidungen: 3',exact:true}).waitFor();
+  const accepted=decisions.getByRole('button',{name:'Angenommen: 2',exact:true});await accepted.focus();await accepted.press('Enter');await page.waitForFunction(()=>document.querySelector('.bo-ring-chart output')?.textContent==='Angenommen: 2');assert.equal(await accepted.getAttribute('aria-pressed'),'true','Actual common ring exposes keyboard selection without including drafts/pending');
   const categories=page.locator('section').filter({has:page.getByRole('heading',{name:'Genehmigte Spesen nach Kategorie',exact:true})}).last();
   assert.equal(await categories.locator('dt').filter({hasText:'Synthetic travel category'}).count(),2,'Same category in two currencies remains two distinct rows');
   assert.deepEqual(await categories.locator('dd').allTextContents(),['CHF 25.00','EUR 7.00']);
