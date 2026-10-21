@@ -9,3 +9,6 @@ export function matchesLocalizedRoute(actual,expected,locale){
  current.searchParams.sort();target.searchParams.sort();
  return current.search===target.search;
 }
+export function waitForLocalizedRoute(page,expected,locale='de'){
+ return page.waitForURL(url=>matchesLocalizedRoute(url,expected,locale));
+}

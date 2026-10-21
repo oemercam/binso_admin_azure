@@ -1,5 +1,6 @@
 import {runIndependentChecks} from './independent-checks.mjs';
 import {assertIdentityReference} from './identity-reference-browser.mjs';
+import {verifyFontDelivery} from './font-delivery-browser.mjs';
 import {measureCompliance} from './compliance/measure.mjs';
 import {writeTestOutput} from './test-output.mjs';
 import {assertChoiceGeometry} from './form-choice-browser.mjs';
@@ -32,6 +33,7 @@ async function assertReviewGeometry(sheet,page,caseName){
 try{
  for(let attempt=0;;attempt++){try{if((await fetch(base+'/api/health')).ok)break}catch{}if(attempt>120||server.exitCode!==null)throw new Error(logs);await new Promise(resolve=>setTimeout(resolve,250));}
  browser=await engines[process.env.BINSO_UX_BROWSER??'chromium'].launch({headless:true,...(process.env.BINSO_CHROMIUM_EXECUTABLE?{executablePath:process.env.BINSO_CHROMIUM_EXECUTABLE,args:['--no-sandbox','--disable-dev-shm-usage','--use-gl=angle','--use-angle=swiftshader']}:{})});
+ evidence.push({phase:'first-party-font-delivery',observed:await verifyFontDelivery(browser,{base,output})});
  const widths=process.env.BINSO_REGISTRATION_WIDTHS?.split(',').map(Number)??[320,360,375,390,430,768,820,1024,1280,1440,1920];
  for(const theme of ['light','dark'])for(const width of widths){
   const context=await browser.newContext({serviceWorkers:'block',viewport:{width,height:width<768?580:900}});

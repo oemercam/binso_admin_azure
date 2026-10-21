@@ -299,26 +299,32 @@
     "R7-19-006": {
       "sourceTextSha256": "60d34016f5974edc6dc78fb3a3b319b568e32d6e42593086b1aa741c47eae719",
       "status": "teilweise_implementiert",
-      "implementation": "Unveränderte Inter-v20-Latin-Variable lokal mit SIL-OFL; zentraler Theme-Owner, optionaler Fontdisplay und Systemfallback.",
+      "implementation": "Gemeinsamer erster Font-Preload in RootLayout und unabhängigem Root-Fehlerzustand; bestehendes optionales, selbst gehostetes Inter bleibt ohne späten Austausch.",
       "sourceReferences": [
+        "components/font-preload.tsx",
+        "app/layout.tsx",
+        "app/global-error.tsx",
         "app/design-system/theme.css",
-        "public/fonts/inter/README.md"
+        "docs/audit/v25-revision7/font-proof-20261021.json"
       ],
-      "test": "Tatsächliches geladenes Inter-Face und Referenzgeometrie bei320/390/768/1440px bestanden; CSS-Architektur/Style-Adversarial bestanden.",
-      "visualComparison": "Lokale Screens schmal/breit gesichtet; alle Routen/Schriften/Zoomzustände noch nicht abgenommen.",
-      "blocker": "Appweite visuelle Regression und physische Offline-/Langsamnetz-Abnahme offen."
+      "test": "Tatsächliche lokale Glyphenmessung: vorher Segoe trotz Inter-loaded; nachher Inter. Verzögerter Font bleibt stabiler Systemfallback,0 gemessener CLS-Zuwachs. Reale Serif-Override-Negativprüfung und Root-Fehler-SSR bestanden. Neue CI-Prüfung integriert.",
+      "visualComparison": "CI-Ist/abgeleitete Referenz390/1440 gesichtet; Schriftabweichung gefunden und lokal korrigiert. Keine pauschale Pixel-/Gerätefreigabe.",
+      "blocker": "Aktuelle vollständige CI-/WebKit-/Geräte-/Fallback- und visuelle Gesamtabnahme offen."
     },
     "R7-19-013": {
       "sourceTextSha256": "a173e9be35785bf53cc6f20768809e6a0977813086dba03f80552c43a9c0a6d6",
       "status": "teilweise_implementiert",
-      "implementation": "Unveränderte Inter-v20-Latin-Variable lokal mit SIL-OFL; zentraler Theme-Owner, optionaler Fontdisplay und Systemfallback.",
+      "implementation": "Gemeinsamer erster Font-Preload in RootLayout und unabhängigem Root-Fehlerzustand; bestehendes optionales, selbst gehostetes Inter bleibt ohne späten Austausch.",
       "sourceReferences": [
+        "components/font-preload.tsx",
+        "app/layout.tsx",
+        "app/global-error.tsx",
         "app/design-system/theme.css",
-        "public/fonts/inter/README.md"
+        "docs/audit/v25-revision7/font-proof-20261021.json"
       ],
-      "test": "Tatsächliches geladenes Inter-Face und Referenzgeometrie bei320/390/768/1440px bestanden; CSS-Architektur/Style-Adversarial bestanden.",
-      "visualComparison": "Lokale Screens schmal/breit gesichtet; alle Routen/Schriften/Zoomzustände noch nicht abgenommen.",
-      "blocker": "Appweite visuelle Regression und physische Offline-/Langsamnetz-Abnahme offen."
+      "test": "Tatsächliche lokale Glyphenmessung: vorher Segoe trotz Inter-loaded; nachher Inter. Verzögerter Font bleibt stabiler Systemfallback,0 gemessener CLS-Zuwachs. Reale Serif-Override-Negativprüfung und Root-Fehler-SSR bestanden. Neue CI-Prüfung integriert.",
+      "visualComparison": "CI-Ist/abgeleitete Referenz390/1440 gesichtet; Schriftabweichung gefunden und lokal korrigiert. Keine pauschale Pixel-/Gerätefreigabe.",
+      "blocker": "Aktuelle vollständige CI-/WebKit-/Geräte-/Fallback- und visuelle Gesamtabnahme offen."
     },
     "R7-54-006": {
       "sourceTextSha256": "da3cffb25db9697c8ab54537c22ce8f25e0c522b12ab466affd6274df76901cc",
@@ -405,7 +411,7 @@
     "typecheck": "passed",
     "build": "passed",
     "visual": "14 focused Chromium/Edge responsive/light/dark and four-language browser cases passed; no general visual approval",
-    "CI": "881dd080 Full Development39647566274 completed: build/checks/scanner/ux-compliance and4 responsive lanes passed;2 responsive lanes failed on retained lang=de history URL,2 functional lanes on incorrect child server startup. Exact route contract and shared qualified-artifact launch corrected with negative tests. Fresh full CI required.",
+    "CI": "30aeca77 full run39654596838: build/checks/scanner and responsive2 lanes passed at last read; functional lanes failed on broad alert-count assertion including Next route announcer; responsive1 failed on further exact return URLs. Common strict localized route matcher now covers32 fixed destinations; next current qualification required.",
     "scripts/ui-foundation-test.mjs": "passed",
     "scripts/foundation-integration-test.mjs": "passed",
     "scripts/import-table-test.mjs": "passed, including actual XLSX/conditional formatting, rejection paths and original CSV/XLSX row metadata",
@@ -421,8 +427,9 @@
     "consentPolicy": "Four actual local DE/FR/IT/EN browser cases passed: policy reachable without stored consent, reopen from footer, equal44px choices, inert restoration, rejection persisted, zero hydration/runtime warnings.",
     "expenseCategories": "Actual isolated PostgreSQL/PGlite positive/negative route/CSV/bounds/authorization cases passed; browser extension awaits CI.",
     "languagePreference": "Client transport positive/negative four-language receipt and session-fence cases passed; shared hook busy/error states and real browser cases added, current execution pending.",
-    "draftLanguage": "Actual scope/storage tests: four languages, exact source/user/tenant/role boundaries, latest legacy alias migration, original expiry, quota recovery and discard without resurrection passed; browser proof pending.",
-    "operatorLanguage": "Actual migrated PostgreSQL/PGlite route tests passed for all5 operator roles; no new role grants or Entra changes. Migration0071 not applied to production."
+    "draftLanguage": "Actual scope/storage tests: four languages, exact source/user/tenant/role boundaries, latest legacy alias migration, original expiry, quota recovery and discard without resurrection passed; browser proof pending. CI30aeca77 progressed past restored offer contents/step through subsequent parent-back/discard; lane later failed on another strict unlocalized return URL.",
+    "operatorLanguage": "Actual migrated PostgreSQL/PGlite route tests passed for all5 operator roles; no new role grants or Entra changes. Migration0071 not applied to production.",
+    "fontGlyphUsage": "Actual local Edge CDP glyph usage before/after, real wrong-family override rejection, stable deliberately delayed fallback and zero measured layout shift passed. Root fallback SSR verified with actual shared preload component."
   },
   "externalBlockers": [
     "Physical installed iOS/Android PWA, keyboard and assistive technology acceptance",

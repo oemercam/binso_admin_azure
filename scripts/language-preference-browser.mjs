@@ -20,7 +20,10 @@ export async function verifyLanguagePreference(page,{base,locale,text}){
  phase='hold';await selectAppOption(control,next);await received;
  assert.equal(await control.isEnabled(),false,'Slow writes cannot race another selection');assert.equal(await control.getAttribute('aria-busy'),'true');assert.equal(await appControlValue(control),locale);
  release();await page.waitForFunction(locale=>document.documentElement.lang===locale+'-CH',next);
- assert.equal(await appControlValue(control),next);assert.equal(updates,2);assert.equal(await page.getByRole('alert').count(),0);
+ assert.equal(await appControlValue(control),next);assert.equal(updates,2);
+ // Next's separate route announcer deliberately has role=alert. Assert the
+ // actual preference error has cleared in every language, not all live regions.
+ for(const language of ['de','fr','it','en'])await page.getByRole('alert').filter({hasText:text('Sprache konnte nicht gespeichert werden.',language)}).waitFor({state:'hidden'});
  await page.reload({waitUntil:'networkidle'});assert.equal(await appControlValue(control),next,'Confirmed server preference survives reload');assert.equal(updates,2,'Reload never repeats the write');
  phase='ready';await page.locator('button.avatar-button:visible').first().click();
  const account=page.locator('.account-sheet .locale-switcher .app-select-trigger');await selectAppOption(account,locale);

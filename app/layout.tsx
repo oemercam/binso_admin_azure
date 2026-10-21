@@ -1,3 +1,4 @@
+import {FontPreload} from "@/components/font-preload";
 import {localizeMetadata} from "@/lib/server/locale";
 import {cookies} from "next/headers";
 import {LocaleProvider} from "@/lib/client/locale";
@@ -74,7 +75,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   const locale=asLocale((await cookies()).get(localeCookie)?.value);
   return (
     <html lang={localeTags[locale]} suppressHydrationWarning data-scroll-behavior="smooth">
-      <head><script id="binso-theme-init" dangerouslySetInnerHTML={{__html:`(${initializeTheme.toString()})();`}} /></head>
+      <head><FontPreload/><script id="binso-theme-init" dangerouslySetInnerHTML={{__html:`(${initializeTheme.toString()})();`}} /></head>
       <body>
         <LocaleProvider initialLocale={locale}>
         <ThemeRuntime />
