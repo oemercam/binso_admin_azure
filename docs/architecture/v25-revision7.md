@@ -240,3 +240,4 @@ Migrationstest, Typecheck, gezielter Lint und Übersetzungsabdeckung bestanden.
 Neue Rechnungssektion noch nicht visuell abgenommen. Vollständige Kategorie-/
 MwSt.-/Angebotsberichte, Direktmail und sichere Berichtlinks bleiben offen;
 keine umfassende Steuerdeklaration oder vollständiges Kapitel43 behauptet.
+Für die neue Finanzsektion ist eine isolierte Browserregression in die vorhandene Registration-Funktionslane eingebunden: echte lokale SSR-QA-Sitzung, synthetische Aggregatantworten, Hell/Dunkel bei390/1440px, keine Überbreite, getrennte Kennzahlbedeutung und genau ein ausdrücklicher CSV-Download. Kein neuer Workflow und keine Rechteerweiterung. Lokal nur Syntax/Lint geprüft; Ausführung benötigt den bekannten nativen QA-PostgreSQL und bleibt bis CI offen. Der gemeinsam mit PR306 bearbeitete ux-browser-test.mjs bleibt unverändert.

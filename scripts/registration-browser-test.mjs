@@ -128,3 +128,5 @@ try{
 await new Promise((resolve,reject)=>{const child=spawn(process.execPath,['scripts/customer-import-browser-test.mjs'],{stdio:'inherit',env:{...process.env,BINSO_IMPORT_OUTPUT:path.join(output,'imports')}});child.once('error',reject);child.once('exit',code=>code===0?resolve():reject(Error('Customer import browser failed: '+code)));});
 
 await new Promise((resolve,reject)=>{const child=spawn(process.execPath,['scripts/system-state-browser-test.mjs'],{stdio:'inherit',env:{...process.env,BINSO_SYSTEM_STATE_OUTPUT:path.join(output,'system-states')}});child.once('error',reject);child.once('exit',code=>code===0?resolve():reject(Error('System-state browser failed: '+code)));});
+
+await new Promise((resolve,reject)=>{const child=spawn(process.execPath,['scripts/report-summary-browser-test.mjs'],{stdio:'inherit',env:{...process.env,BINSO_REPORT_OUTPUT:path.join(output,'reports')}});child.once('error',reject);child.once('exit',code=>code===0?resolve():reject(Error('Report-summary browser failed: '+code)));});
