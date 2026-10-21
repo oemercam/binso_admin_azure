@@ -8783,14 +8783,16 @@
       "requirement": "Zentraler zugänglicher Switch/Toggle für sofort wirksame binäre Ein-/Aus-Einstellungen mit klarer Beschriftung, Status, Fokus, Tastatur, Lade-/Fehler-/Rollbackzustand und persistenter Speicherung.",
       "sourceTextSha256": "6c55cb7e4c3e9e1afaac6dc9b3e78444f858097913a988a38867dbde83d3a94e",
       "sourceParagraph": "Zentraler zugänglicher Switch/Toggle für sofort wirksame binäre Ein-/Aus-Einstellungen mit klarer Beschriftung, Status, Fokus, Tastatur, Lade-/Fehler-/Rollbackzustand und persistenter Speicherung. Checkboxen weiter für Mehrfachauswahl, rechtliche Einwilligungen und explizite Bestätigungen; Radio für genau eine Option. Keine blind umgebauten Checkboxen. Kritische Sicherheits- und Unternehmensänderungen benötigen zusätzliche Bestätigung/Reauth und dürfen nicht durch einfaches Umschalten ungeschützt wirksam werden. Einheitliche Profileinstellungen, Benachrichtigungspräferenzen, Dark Mode, Sprache, Sicherheit, Datenschutz, Erinnerungen und automatische E-Mails. Jede Einstellung serverseitig autorisieren und nach Neuladen sowie geräteübergreifend korrekt wiedergeben.",
-      "status": "nicht_abgenommen",
+      "status": "teilweise_implementiert",
       "sourceReferences": [
-        "components/ui.tsx"
+        "components/ui.tsx",
+        "components/pages/settings.tsx",
+        "app/api/settings/notifications/route.ts"
       ],
-      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "implementation": "Existing switch uses visible translated channel/topic labels through aria-labelledby; confirmed-state persistence, native keyboard, busy/disabled and safe fallback naming retained.",
+      "test": "Actual server-rendered notification settings and shared switch:5 unique names in4 languages, referenced IDs, no stale concatenated aria-label, both checked states, busy/disabled and button semantics passed. Typecheck, changed lint and unchanged navigation contract passed.",
+      "visualComparison": "Interactive failure/pending/keyboard/reload browser cases added; current execution and visual/device acceptance pending.",
+      "blocker": "Current complete CI, all setting families and actual device/assistive-technology acceptance remain open."
     },
     {
       "id": "R7-50-002",

@@ -8515,35 +8515,35 @@
         },
         {
           "callee": "apiGet<{items:Array<{kind:string;email:boolean;push:boolean}>}>(\"/api/settings/notifications\").then(data=>setPrefs(current=>{const next={...current};for(const item of data.items)if(next[item.kind])next[item.kind]={email:item.email,push:item.push};return next})).then(()=>setReady(true)).catch",
-          "line": 358,
+          "line": 359,
           "arguments": [
             "()=>setError(\"Einstellungen konnten nicht geladen werden.\")"
           ]
         },
         {
           "callee": "apiGet<{items:Array<{kind:string;email:boolean;push:boolean}>}>(\"/api/settings/notifications\").then(data=>setPrefs(current=>{const next={...current};for(const item of data.items)if(next[item.kind])next[item.kind]={email:item.email,push:item.push};return next})).then",
-          "line": 358,
+          "line": 359,
           "arguments": [
             "()=>setReady(true)"
           ]
         },
         {
           "callee": "apiGet<{items:Array<{kind:string;email:boolean;push:boolean}>}>(\"/api/settings/notifications\").then",
-          "line": 358,
+          "line": 359,
           "arguments": [
             "data=>setPrefs(current=>{const next={...current};for(const item of data.items)if(next[item.kind])next[item.kind]={email:item.email,push:item.push};return next})"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 358,
+          "line": 359,
           "arguments": [
             "\"/api/settings/notifications\""
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 366,
+          "line": 367,
           "arguments": [
             "\"/api/settings/notifications\"",
             "{kind:title,channel,enabled}"

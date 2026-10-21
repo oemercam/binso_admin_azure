@@ -38,6 +38,26 @@ assert.equal(locale.translateMessage('Seite 2 von 4','fr'),'Page 2 sur 4');
 assert.equal(locale.translateMessage('Schritt 1 von 3 · Prüfen','it'),'Passaggio 1 di 3 · Verifica');
 assert.equal(locale.translateMessage('Die Datei darf höchstens 10 MB gross sein.','en'),'The file must not exceed 10 MB.');
 const client=compile('lib/client/locale.tsx',{'@/lib/locales':locale});
+// Render the actual settings and shared switch, not a duplicated label template.
+const uiAst=ts.createSourceFile('ui.tsx',fs.readFileSync('components/ui.tsx','utf8'),99,true,4),toggleExports={};
+const toggleSource=uiAst.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='Toggle').getText(uiAst);
+Function('require','exports','LocalizedElement',ts.transpileModule(toggleSource,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText)(require,toggleExports,client.LocalizedElement);
+const settingsAst=ts.createSourceFile('settings.tsx',fs.readFileSync('components/pages/settings.tsx','utf8'),99,true,4),notificationExports={};
+const notificationSource=settingsAst.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='NotificationSettingsPage').getText(settingsAst);
+const wrapper=({children})=>React.createElement('div',null,children);
+Function('require','exports','useId','useRef','useState','useEffect','AppShell','ErrorState','LoadingState','SettingsGroup','LocalizedText','Toggle','notificationChannels',ts.transpileModule(notificationSource,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText)(require,notificationExports,React.useId,React.useRef,React.useState,React.useEffect,wrapper,wrapper,wrapper,wrapper,client.LocalizedText,toggleExports.Toggle,{email:true,push:false});
+for(const language of config.locales){
+ const markup=renderToStaticMarkup(React.createElement(client.LocaleProvider,{initialLocale:language},React.createElement(notificationExports.NotificationSettingsPage)));
+ const labels=new Map([...markup.matchAll(/<(?:b|span) id="([^"]+)">([^<]+)<\/(?:b|span)>/g)].map(match=>[match[1],match[2]]));
+ const switches=[...markup.matchAll(/<button[^>]*role="switch"[^>]*>/g)];assert.equal(switches.length,5);
+ const names=switches.map(([tag])=>{assert.doesNotMatch(tag,/aria-label=/,'Do not shadow translated visible labels with a concatenated German name');const ids=tag.match(/aria-labelledby="([^"]+)"/)[1].split(' ');assert.equal(ids.length,2);return ids.map(id=>{assert.ok(labels.has(id),'Every naming reference exists in the actual page');return labels.get(id)}).join(' ')});
+ assert.equal(names[0],locale.translateMessage('E-Mail',language)+' '+locale.translateMessage('Rechnungen',language));
+ assert.equal(new Set(names).size,5,'Every preference has a unique channel and topic');
+}
+for(const checked of [false,true]){
+ const markup=renderToStaticMarkup(React.createElement(toggleExports.Toggle,{checked,label:'Fallback',busy:true}));
+ assert.match(markup,new RegExp('aria-checked="'+checked+'"'));assert.match(markup,/aria-busy="true"/);assert.match(markup,/disabled=""/);assert.match(markup,/type="button"/);assert.match(markup,/aria-label="Fallback"/);
+}
 const uxAst=ts.createSourceFile('binso-ux.tsx',fs.readFileSync('components/binso-ux.tsx','utf8'),ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
 const metricDeclaration=uxAst.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='MetricTile').getText(uxAst),metricExports={};
 Function('require','exports','useLocale','localeTags','Metric',ts.transpileModule(metricDeclaration,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText)(require,metricExports,client.useLocale,config.localeTags,({value})=>React.createElement('div',null,value));

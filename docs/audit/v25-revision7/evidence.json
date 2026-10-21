@@ -70,9 +70,16 @@
     },
     "R7-50-001": {
       "status": "teilweise_implementiert",
-      "test": "Gezielte Prüfungen: registration-test, profile-image-test, document-presentation-test, pdf-gestures-test, migration-test; letzter Datenbanklauf bestanden.",
-      "visualComparison": "Ausstehend am aktuellen Revision7-Stand",
-      "blocker": "Vollständige Klauselabnahme und reale Geräte fehlen; nicht als vollständig bestanden werten."
+      "test": "Actual server-rendered notification settings and shared switch:5 unique names in4 languages, referenced IDs, no stale concatenated aria-label, both checked states, busy/disabled and button semantics passed. Typecheck, changed lint and unchanged navigation contract passed.",
+      "visualComparison": "Interactive failure/pending/keyboard/reload browser cases added; current execution and visual/device acceptance pending.",
+      "blocker": "Current complete CI, all setting families and actual device/assistive-technology acceptance remain open.",
+      "sourceTextSha256": "6c55cb7e4c3e9e1afaac6dc9b3e78444f858097913a988a38867dbde83d3a94e",
+      "implementation": "Existing switch uses visible translated channel/topic labels through aria-labelledby; confirmed-state persistence, native keyboard, busy/disabled and safe fallback naming retained.",
+      "sourceReferences": [
+        "components/ui.tsx",
+        "components/pages/settings.tsx",
+        "app/api/settings/notifications/route.ts"
+      ]
     },
     "R7-51-001": {
       "status": "teilweise_implementiert",
