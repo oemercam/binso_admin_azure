@@ -265,3 +265,4 @@ bestanden. Vier lokale Browserfälle320/1440px, Hell/Dunkel, bestätigen Tastatu
 Fragment-URL, Zielfokus und fehlenden horizontalen Overflow. Die kurze
 Subprozessorseite erhält keine unnötige Inhaltssteuerung. Diese technische
 Abnahme ersetzt keine juristische Übersetzungs- oder Inhaltsfreigabe.
+Der Originalfix aus PR306 wurde konfliktfrei mit Herkunftsverweis als lokalem Commit99846008 auf den Revision7-Branch übernommen (Original ccc80833). PR306, sein Branch und Main sind unverändert. Kein separater neuer Timerfix und kein PR-Merge. Nach dem Testquellenwechsel ist das Dependency-Inventar regulär neu generiert; strenger Fingerprint-Test bestanden. Die neue vollständige Browserqualifikation steht noch aus.
