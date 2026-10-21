@@ -8,6 +8,7 @@ export function profileAllowsPath(profile:ModuleProfile|undefined,path:string){
 }
 /** Personal settings never grant company settings or business-data access. */
 export function tenantCanOpenPath(role:string,path:string,profile:ModuleProfile='standard'){
+ if(!Object.hasOwn(tenantGrants,role))return false;
  if(!profileAllowsPath(profile,path))return false;
  if(profile==='time_only'&&role!=='member')return false;
  if(profile==='time_only'&&(path==='/einstellungen'||path.startsWith('/einstellungen/')||path==='/benachrichtigungen'))return true;
@@ -87,6 +88,7 @@ export const modulePermissionMap:Record<string,{read:TenantPermission;write:Tena
 
 export function permissionForModule(moduleKey:string,action:"read"|"write"){return modulePermissionMap[moduleKey]?.[action]}
 export function routePermission(pathname:string):TenantPermission|undefined{
+ if(pathname==='/benachrichtigungen')return 'organization:read';
  if(pathname==="/finanzen"||pathname==="/belege")return "finance-overview:read";
  if(pathname==="/einstellungen/team")return "users:read";
  if(pathname==="/einstellungen/abonnement")return "billing:read";

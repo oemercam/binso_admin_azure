@@ -12,6 +12,9 @@ try{
  await db.exec('create extension pgcrypto');
  for(const name of (await fs.readdir('database/migrations')).filter(x=>x.endsWith('.sql')).sort())await db.exec(await fs.readFile('database/migrations/'+name,'utf8'));
  await db.exec(await fs.readFile('database/operations/provision-runtime-role.sql','utf8'));
+ await db.query("select set_config('app.organization_id','00000000-0000-4000-8000-000000000099',false),set_config('app.user_id','unknown-template-user',false)");
+ assert.equal((await db.query('select app_workforce_role() role')).rows[0].role,'none','Historical template ID never grants a role');
+ await db.query("select set_config('app.organization_id','',false),set_config('app.user_id','',false)");
  for(const id of [org,other])await db.query("insert into organizations(id,name,slug) values($1,'Synthetic workforce',$2)",[id,'wf-'+id]);
  for(const [user,role] of [[owner,'owner'],[member,'member'],[reviewer,'admin']]){
   await db.query("insert into app_users(id,email,display_name,status) values($1,$2,'Synthetic','active')",[user,user+'@example.invalid']);

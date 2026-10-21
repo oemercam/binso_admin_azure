@@ -9,6 +9,9 @@ export async function seedDatabaseDemo(c:PoolClient,organizationId:string,userId
  const target=await c.query('select is_demo from organizations where id=$1',[organizationId]);
  if(target.rows[0]?.is_demo!==true||organizationId===demoTemplateId)throw new ApiError(403,'demo_target_invalid','Ungültiger Demo-Mandant.');
  await c.query("select set_config('app.organization_id',$1,true)",[demoTemplateId]);
+ // Real synthetic membership prepared by the isolated QA harness; no ID-based
+ // special role exists in the production database functions anymore.
+ await c.query("select set_config('app.user_id','demo-readonly',true)");
  const template=await c.query('select is_demo,legal_name,invoice_intro_text,invoice_footer_text,quote_intro_text,quote_footer_text,street,building_number,postal_code,city,country_code,iban,qr_iban from organizations where id=$1',[demoTemplateId]);
  if(template.rows[0]?.is_demo!==true)throw new ApiError(503,'demo_unavailable','Demo-Vorlage ist nicht verfügbar.');
  const source=new Map<string,Record<string,unknown>[]>(),ids=new Map<string,string>();

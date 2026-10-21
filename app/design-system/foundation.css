@@ -156,5 +156,3 @@ html[data-theme="dark"] textarea{
   white-space:nowrap;
   border:0;
 }
-.progress-track{height:4px;width:100%;background:var(--progress-track);overflow:hidden;border-radius:var(--shape-mark);margin-block:8px 18px}
-.progress-track>span{display:block;height:100%;width:var(--progress-value,0%);background:var(--progress-fill);transition:width var(--motion-base) var(--motion-ease)}

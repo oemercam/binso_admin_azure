@@ -6,6 +6,7 @@ import {LocalizedText} from "@/lib/client/locale";
 import Link from "next/link";
 import { FormEvent, useRef, useState } from "react";
 import {Button, Input, Field, ErrorState} from "@/components/ui";
+import {authRequest} from '@/lib/client/auth-request';
 
 export default function Page() {
   const pending=useRef(false);
@@ -18,7 +19,7 @@ export default function Page() {
     event.preventDefault();if(pending.current)return;pending.current=true;
     setLoading(true);setError("");
     try{
-      const response=await fetch("/api/auth/recover",{method:"POST",signal:AbortSignal.timeout(15000),headers:{"Content-Type":"application/json"},body:JSON.stringify({email})});
+      const response=await authRequest("/api/auth/recover",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email})});
       const payload=await response.json().catch(()=>({}));
       if(!response.ok) throw new Error(typeof payload?.message==="string"?payload.message:"Link konnte nicht gesendet werden.");
       setSent(true);

@@ -2,10 +2,12 @@
 
 import {AuthWorkspace} from "@/components/auth-workspace";
 
-import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
+import {LocalizedText} from "@/lib/client/locale";
 import Link from "next/link";
 import {FormEvent,useRef,useState} from "react";
-import {Button, Icon, Input, Field, ErrorState} from "@/components/ui";
+import {Button, Input, Field, ErrorState} from "@/components/ui";
+import {PasswordInput} from '@/components/password-input';
+import {authRequest} from '@/lib/client/auth-request';
 import {clearClientSession} from "@/lib/client/backend";
 import {safeAppPath} from "@/lib/navigation";
 import {PasskeyLogin} from '@/components/passkey-login';
@@ -14,7 +16,6 @@ type Stage="credentials"|"email"|"totp"|"verify";
 
 export default function Login(){
   const pending=useRef(false);
-  const [show,setShow]=useState(false);
   const [rememberMe,setRememberMe]=useState(false);
   const [email,setEmail]=useState("");
   const [password,setPassword]=useState("");
@@ -32,7 +33,7 @@ export default function Login(){
   };
 
   const loginRequest=async(extra:Record<string,string>={})=>{
-    const response=await fetch("/api/auth/login",{method:"POST",signal:AbortSignal.timeout(15000),headers:{"Content-Type":"application/json"},body:JSON.stringify({email,password,rememberMe,...extra})});
+    const response=await authRequest("/api/auth/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email,password,rememberMe,...extra})});
     const payload=await response.json().catch(()=>({}));
     if(response.status===202){
       setCode("");
@@ -91,7 +92,7 @@ export default function Login(){
     <h1><LocalizedText>{"Willkommen zurück"}</LocalizedText></h1><p><LocalizedText>{"Melde dich sicher in deinem Binso One Konto an."}</LocalizedText></p>
     <form onSubmit={submitCredentials}>
       <Field label="E-Mail"><Input required value={email} onChange={e=>setEmail(e.target.value)} type="email" inputMode="email" autoComplete="email" placeholder="name@firma.ch"/></Field>
-      <Field label="Passwort"><div className="password-field"><Input required value={password} onChange={e=>setPassword(e.target.value)} type={show?"text":"password"} autoComplete="current-password" placeholder="••••••••"/><LocalizedElement as="button" className="password-visibility" type="button" onClick={()=>setShow(!show)} aria-label={show?"Passwort ausblenden":"Passwort anzeigen"} aria-pressed={show}><Icon name={show?"eye-off":"eye"} size={18}/></LocalizedElement></div></Field>
+      <Field label="Passwort"><PasswordInput required value={password} onChange={e=>setPassword(e.target.value)} autoComplete="current-password" placeholder="••••••••"/></Field>
       <div className="auth-options"><label><Input type="checkbox" checked={rememberMe} onChange={event=>setRememberMe(event.target.checked)}/><LocalizedText>{"Angemeldet bleiben"}</LocalizedText></label><div className="form-link"><Link href="/passwort-vergessen"><LocalizedText>{"Passwort vergessen?"}</LocalizedText></Link></div></div>
       {error&&<ErrorState className="auth-error"><LocalizedText>{error}</LocalizedText></ErrorState>}
       <Button type="submit" disabled={loading}><LocalizedText>{loading?"Anmeldung läuft…":"Weiter"}</LocalizedText></Button>

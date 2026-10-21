@@ -159,13 +159,14 @@ console.log('Role overview invalidation: work/review/context changes refresh the
   for(const directory of ['app/api/probe','components','lib','database/migrations'])await fs.mkdir(path.join(root,directory),{recursive:true});
   await fs.writeFile(path.join(root,'lib/probe.ts'),'export const read=()=>1;');
   await fs.writeFile(path.join(root,'app/api/probe/route.ts'),"import {read} from '../../../lib/probe'; export function GET(){return read()}");
-  await fs.writeFile(path.join(root,'components/probe.tsx'),"import {read} from '@/lib/probe'; export function Probe(){return apiGet('/api/probe')+read()}");
+  await fs.writeFile(path.join(root,'components/probe.tsx'),"import {read} from '@/lib/probe'; export function Probe(){return apiGet('/api/probe')+authRequest('/api/auth/register')+read()}");
   await fs.writeFile(path.join(root,'app/page.tsx'),"import {Probe} from '../components/probe'; export default Probe;");
   await fs.writeFile(path.join(root,'database/migrations/0001.sql'),'create table probe(id uuid);');
   execFileSync(process.execPath,[path.resolve('scripts/data-inventory.mjs')],{cwd:root,stdio:'pipe'});
   const report=JSON.parse(await fs.readFile(path.join(root,'docs/architecture/v21-3-data-inventory.json'),'utf8'));
   assert.equal(report.counts.apis,1);assert.equal(report.counts.consumers,1);assert.equal(report.counts.tables,1);
   assert.deepEqual(report.apis[0].dependencies,['lib/probe.ts']);assert.deepEqual(report.consumers[0].pages,['app/page.tsx']);
+  assert.ok(report.consumers[0].calls.some(call=>call.callee==='authRequest'),'Central auth requests remain visible in the source inventory');
   assert.ok(report.apis.every(item=>!item.file.includes('\\')));
  }finally{await fs.rm(root,{recursive:true,force:true})}
  console.log('Real data inventory: platform-neutral API paths, relative/alias imports and page consumers passed.');

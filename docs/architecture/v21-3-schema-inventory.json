@@ -46,7 +46,28 @@
     "0043_demo_customer_profiles.sql",
     "0044_time_entry_precision.sql",
     "0045_document_snapshots.sql",
-    "0046_file_business_relations.sql"
+    "0046_file_business_relations.sql",
+    "0047_runtime_auth_bootstrap.sql",
+    "0048_file_scan_evidence.sql",
+    "0049_canonical_demo_template_read.sql",
+    "0050_platform_maintenance.sql",
+    "0051_document_reminders.sql",
+    "0051_runtime_maintenance_permissions.sql",
+    "0052_invoice_refunds.sql",
+    "0053_offer_revisions.sql",
+    "0054_document_language_snapshot.sql",
+    "0055_workforce_assignments_and_reports.sql",
+    "0056_customer_type.sql",
+    "0057_v254_plan_entitlements.sql",
+    "0058_member_module_profiles.sql",
+    "0059_solo_owner_time.sql",
+    "0060_single_company_identity.sql",
+    "0061_submitted_time_review.sql",
+    "0062_passkey_credentials.sql",
+    "0063_invitation_metadata_boundary.sql",
+    "0064_retire_demo_bootstrap.sql",
+    "0065_notification_read_receipts.sql",
+    "0066_retire_template_workforce_role.sql"
   ],
   "tables": [
     {
@@ -82,6 +103,16 @@
     {
       "name": "auth_email_codes",
       "rls": false,
+      "forced_rls": false
+    },
+    {
+      "name": "auth_passkey_challenges",
+      "rls": true,
+      "forced_rls": false
+    },
+    {
+      "name": "auth_passkeys",
+      "rls": true,
       "forced_rls": false
     },
     {
@@ -255,6 +286,11 @@
       "forced_rls": true
     },
     {
+      "name": "invoice_refunds",
+      "rls": true,
+      "forced_rls": true
+    },
+    {
       "name": "invoices",
       "rls": true,
       "forced_rls": true
@@ -271,6 +307,11 @@
     },
     {
       "name": "notification_preferences",
+      "rls": true,
+      "forced_rls": true
+    },
+    {
+      "name": "notification_reads",
       "rls": true,
       "forced_rls": true
     },
@@ -393,6 +434,11 @@
       "name": "platform_internal_notes",
       "rls": false,
       "forced_rls": false
+    },
+    {
+      "name": "platform_maintenance",
+      "rls": true,
+      "forced_rls": true
     },
     {
       "name": "platform_operator_assignments",
@@ -523,6 +569,11 @@
       "name": "web_vitals",
       "rls": false,
       "forced_rls": false
+    },
+    {
+      "name": "workforce_assignments",
+      "rls": true,
+      "forced_rls": true
     }
   ],
   "columns": [
@@ -1612,6 +1663,248 @@
       "udt_name": "timestamptz",
       "is_nullable": "NO",
       "column_default": "now()",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "auth_passkey_challenges",
+      "column_name": "token_hash",
+      "ordinal_position": 1,
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "auth_passkey_challenges",
+      "column_name": "challenge",
+      "ordinal_position": 2,
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "auth_passkey_challenges",
+      "column_name": "purpose",
+      "ordinal_position": 3,
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "auth_passkey_challenges",
+      "column_name": "user_id",
+      "ordinal_position": 4,
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "auth_passkey_challenges",
+      "column_name": "organization_id",
+      "ordinal_position": 5,
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "YES",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "auth_passkey_challenges",
+      "column_name": "session_id",
+      "ordinal_position": 6,
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "YES",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "auth_passkey_challenges",
+      "column_name": "auth_snapshot",
+      "ordinal_position": 7,
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "auth_passkey_challenges",
+      "column_name": "label",
+      "ordinal_position": 8,
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "auth_passkey_challenges",
+      "column_name": "expires_at",
+      "ordinal_position": 9,
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "auth_passkey_challenges",
+      "column_name": "created_at",
+      "ordinal_position": 10,
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "column_default": "now()",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "auth_passkeys",
+      "column_name": "credential_id",
+      "ordinal_position": 1,
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "auth_passkeys",
+      "column_name": "user_id",
+      "ordinal_position": 2,
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "auth_passkeys",
+      "column_name": "organization_id",
+      "ordinal_position": 3,
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "auth_passkeys",
+      "column_name": "public_key",
+      "ordinal_position": 4,
+      "data_type": "bytea",
+      "udt_name": "bytea",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "auth_passkeys",
+      "column_name": "counter",
+      "ordinal_position": 5,
+      "data_type": "bigint",
+      "udt_name": "int8",
+      "is_nullable": "NO",
+      "column_default": "0",
+      "numeric_precision": 64,
+      "numeric_scale": 0
+    },
+    {
+      "table_name": "auth_passkeys",
+      "column_name": "label",
+      "ordinal_position": 6,
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "auth_passkeys",
+      "column_name": "transports",
+      "ordinal_position": 7,
+      "data_type": "ARRAY",
+      "udt_name": "_text",
+      "is_nullable": "NO",
+      "column_default": "'{}'::text[]",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "auth_passkeys",
+      "column_name": "device_type",
+      "ordinal_position": 8,
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "auth_passkeys",
+      "column_name": "backed_up",
+      "ordinal_position": 9,
+      "data_type": "boolean",
+      "udt_name": "bool",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "auth_passkeys",
+      "column_name": "created_at",
+      "ordinal_position": 10,
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "column_default": "now()",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "auth_passkeys",
+      "column_name": "last_used_at",
+      "ordinal_position": 11,
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "YES",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "auth_passkeys",
+      "column_name": "revoked_at",
+      "ordinal_position": 12,
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "YES",
+      "column_default": null,
       "numeric_precision": null,
       "numeric_scale": null
     },
@@ -3970,6 +4263,39 @@
       "numeric_scale": null
     },
     {
+      "table_name": "customers",
+      "column_name": "street",
+      "ordinal_position": 27,
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "customers",
+      "column_name": "building_number",
+      "ordinal_position": 28,
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "customers",
+      "column_name": "customer_type",
+      "ordinal_position": 29,
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
       "table_name": "data_lifecycle_requests",
       "column_name": "id",
       "ordinal_position": 1,
@@ -4184,6 +4510,50 @@
       "ordinal_position": 10,
       "data_type": "timestamp with time zone",
       "udt_name": "timestamptz",
+      "is_nullable": "YES",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "document_deliveries",
+      "column_name": "purpose",
+      "ordinal_position": 11,
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": "'document'::text",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "document_deliveries",
+      "column_name": "reminder_stage",
+      "ordinal_position": 12,
+      "data_type": "smallint",
+      "udt_name": "int2",
+      "is_nullable": "YES",
+      "column_default": null,
+      "numeric_precision": 16,
+      "numeric_scale": 0
+    },
+    {
+      "table_name": "document_deliveries",
+      "column_name": "balance_amount",
+      "ordinal_position": 13,
+      "data_type": "numeric",
+      "udt_name": "numeric",
+      "is_nullable": "YES",
+      "column_default": null,
+      "numeric_precision": 14,
+      "numeric_scale": 2
+    },
+    {
+      "table_name": "document_deliveries",
+      "column_name": "payment_deadline",
+      "ordinal_position": 14,
+      "data_type": "date",
+      "udt_name": "date",
       "is_nullable": "YES",
       "column_default": null,
       "numeric_precision": null,
@@ -4633,6 +5003,17 @@
       "table_name": "employees",
       "column_name": "last_name",
       "ordinal_position": 32,
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "employees",
+      "column_name": "user_id",
+      "ordinal_position": 33,
       "data_type": "text",
       "udt_name": "text",
       "is_nullable": "YES",
@@ -5510,6 +5891,28 @@
       "numeric_scale": null
     },
     {
+      "table_name": "file_objects",
+      "column_name": "scan_evidence",
+      "ordinal_position": 20,
+      "data_type": "jsonb",
+      "udt_name": "jsonb",
+      "is_nullable": "YES",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "file_objects",
+      "column_name": "time_entry_id",
+      "ordinal_position": 21,
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "YES",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
       "table_name": "help_center_articles",
       "column_name": "id",
       "ordinal_position": 1,
@@ -6177,6 +6580,116 @@
       "udt_name": "_text",
       "is_nullable": "NO",
       "column_default": "'{}'::text[]",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "invoice_refunds",
+      "column_name": "id",
+      "ordinal_position": 1,
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "invoice_refunds",
+      "column_name": "organization_id",
+      "ordinal_position": 2,
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "invoice_refunds",
+      "column_name": "external_id",
+      "ordinal_position": 3,
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "invoice_refunds",
+      "column_name": "invoice_id",
+      "ordinal_position": 4,
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "invoice_refunds",
+      "column_name": "customer_id",
+      "ordinal_position": 5,
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "invoice_refunds",
+      "column_name": "refund_date",
+      "ordinal_position": 6,
+      "data_type": "date",
+      "udt_name": "date",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "invoice_refunds",
+      "column_name": "amount",
+      "ordinal_position": 7,
+      "data_type": "numeric",
+      "udt_name": "numeric",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": 14,
+      "numeric_scale": 2
+    },
+    {
+      "table_name": "invoice_refunds",
+      "column_name": "reason",
+      "ordinal_position": 8,
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "invoice_refunds",
+      "column_name": "created_by_user_id",
+      "ordinal_position": 9,
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "invoice_refunds",
+      "column_name": "created_at",
+      "ordinal_position": 10,
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "column_default": "now()",
       "numeric_precision": null,
       "numeric_scale": null
     },
@@ -7028,6 +7541,50 @@
       "numeric_scale": null
     },
     {
+      "table_name": "notification_reads",
+      "column_name": "organization_id",
+      "ordinal_position": 1,
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "notification_reads",
+      "column_name": "notification_id",
+      "ordinal_position": 2,
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "notification_reads",
+      "column_name": "user_id",
+      "ordinal_position": 3,
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "notification_reads",
+      "column_name": "read_at",
+      "ordinal_position": 4,
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "column_default": "now()",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
       "table_name": "number_sequences",
       "column_name": "organization_id",
       "ordinal_position": 1,
@@ -7616,7 +8173,7 @@
       "ordinal_position": 3,
       "data_type": "integer",
       "udt_name": "int4",
-      "is_nullable": "NO",
+      "is_nullable": "YES",
       "column_default": "1",
       "numeric_precision": 32,
       "numeric_scale": 0
@@ -7809,6 +8366,17 @@
       "numeric_scale": null
     },
     {
+      "table_name": "organization_invitations",
+      "column_name": "module_profile",
+      "ordinal_position": 9,
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": "'standard'::text",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
       "table_name": "organization_memberships",
       "column_name": "id",
       "ordinal_position": 1,
@@ -7904,6 +8472,17 @@
       "udt_name": "uuid",
       "is_nullable": "YES",
       "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "organization_memberships",
+      "column_name": "module_profile",
+      "ordinal_position": 10,
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": "'standard'::text",
       "numeric_precision": null,
       "numeric_scale": null
     },
@@ -8265,7 +8844,7 @@
       "ordinal_position": 5,
       "data_type": "integer",
       "udt_name": "int4",
-      "is_nullable": "NO",
+      "is_nullable": "YES",
       "column_default": "1",
       "numeric_precision": 32,
       "numeric_scale": 0
@@ -9954,6 +10533,61 @@
       "numeric_scale": null
     },
     {
+      "table_name": "platform_maintenance",
+      "column_name": "id",
+      "ordinal_position": 1,
+      "data_type": "integer",
+      "udt_name": "int4",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": 32,
+      "numeric_scale": 0
+    },
+    {
+      "table_name": "platform_maintenance",
+      "column_name": "enabled",
+      "ordinal_position": 2,
+      "data_type": "boolean",
+      "udt_name": "bool",
+      "is_nullable": "NO",
+      "column_default": "false",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "platform_maintenance",
+      "column_name": "ends_at",
+      "ordinal_position": 3,
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "YES",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "platform_maintenance",
+      "column_name": "updated_at",
+      "ordinal_position": 4,
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "column_default": "now()",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "platform_maintenance",
+      "column_name": "updated_by_user_id",
+      "ordinal_position": 5,
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "YES",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
       "table_name": "platform_operator_assignments",
       "column_name": "user_id",
       "ordinal_position": 1,
@@ -10289,7 +10923,7 @@
       "ordinal_position": 6,
       "data_type": "integer",
       "udt_name": "int4",
-      "is_nullable": "NO",
+      "is_nullable": "YES",
       "column_default": "1",
       "numeric_precision": 32,
       "numeric_scale": 0
@@ -11697,6 +12331,17 @@
       "ordinal_position": 39,
       "data_type": "text",
       "udt_name": "text",
+      "is_nullable": "YES",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "quotes",
+      "column_name": "revises_quote_id",
+      "ordinal_position": 40,
+      "data_type": "uuid",
+      "udt_name": "uuid",
       "is_nullable": "YES",
       "column_default": null,
       "numeric_precision": null,
@@ -13771,6 +14416,28 @@
       "numeric_scale": null
     },
     {
+      "table_name": "time_entries",
+      "column_name": "report_month",
+      "ordinal_position": 31,
+      "data_type": "date",
+      "udt_name": "date",
+      "is_nullable": "YES",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "time_entries",
+      "column_name": "review_note",
+      "ordinal_position": 32,
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
       "table_name": "vat_periods",
       "column_name": "id",
       "ordinal_position": 1,
@@ -13961,6 +14628,127 @@
       "table_name": "web_vitals",
       "column_name": "created_at",
       "ordinal_position": 6,
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "column_default": "now()",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "workforce_assignments",
+      "column_name": "id",
+      "ordinal_position": 1,
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "workforce_assignments",
+      "column_name": "organization_id",
+      "ordinal_position": 2,
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "workforce_assignments",
+      "column_name": "user_id",
+      "ordinal_position": 3,
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "workforce_assignments",
+      "column_name": "employee_id",
+      "ordinal_position": 4,
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "workforce_assignments",
+      "column_name": "customer_id",
+      "ordinal_position": 5,
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "workforce_assignments",
+      "column_name": "project_id",
+      "ordinal_position": 6,
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "YES",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "workforce_assignments",
+      "column_name": "starts_on",
+      "ordinal_position": 7,
+      "data_type": "date",
+      "udt_name": "date",
+      "is_nullable": "NO",
+      "column_default": "CURRENT_DATE",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "workforce_assignments",
+      "column_name": "ends_on",
+      "ordinal_position": 8,
+      "data_type": "date",
+      "udt_name": "date",
+      "is_nullable": "YES",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "workforce_assignments",
+      "column_name": "revoked_at",
+      "ordinal_position": 9,
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "YES",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "workforce_assignments",
+      "column_name": "created_by_user_id",
+      "ordinal_position": 10,
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "workforce_assignments",
+      "column_name": "created_at",
+      "ordinal_position": 11,
       "data_type": "timestamp with time zone",
       "udt_name": "timestamptz",
       "is_nullable": "NO",
@@ -14207,6 +14995,90 @@
       "type": "f",
       "validated": true,
       "definition": "FOREIGN KEY (user_id) REFERENCES app_users(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "auth_passkey_challenges",
+      "name": "auth_passkey_challenges_organization_id_fkey",
+      "type": "f",
+      "validated": true,
+      "definition": "FOREIGN KEY (organization_id) REFERENCES organizations(id)"
+    },
+    {
+      "table_name": "auth_passkey_challenges",
+      "name": "auth_passkey_challenges_organization_id_user_id_fkey",
+      "type": "f",
+      "validated": true,
+      "definition": "FOREIGN KEY (organization_id, user_id) REFERENCES organization_memberships(organization_id, user_id)"
+    },
+    {
+      "table_name": "auth_passkey_challenges",
+      "name": "auth_passkey_challenges_pkey",
+      "type": "p",
+      "validated": true,
+      "definition": "PRIMARY KEY (token_hash)"
+    },
+    {
+      "table_name": "auth_passkey_challenges",
+      "name": "auth_passkey_challenges_purpose_check",
+      "type": "c",
+      "validated": true,
+      "definition": "CHECK ((purpose = ANY (ARRAY['register'::text, 'authenticate'::text])))"
+    },
+    {
+      "table_name": "auth_passkey_challenges",
+      "name": "auth_passkey_challenges_session_id_fkey",
+      "type": "f",
+      "validated": true,
+      "definition": "FOREIGN KEY (session_id) REFERENCES auth_sessions(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "auth_passkey_challenges",
+      "name": "auth_passkey_challenges_user_id_fkey",
+      "type": "f",
+      "validated": true,
+      "definition": "FOREIGN KEY (user_id) REFERENCES app_users(id)"
+    },
+    {
+      "table_name": "auth_passkeys",
+      "name": "auth_passkeys_counter_check",
+      "type": "c",
+      "validated": true,
+      "definition": "CHECK ((counter >= 0))"
+    },
+    {
+      "table_name": "auth_passkeys",
+      "name": "auth_passkeys_label_check",
+      "type": "c",
+      "validated": true,
+      "definition": "CHECK (((length(label) >= 1) AND (length(label) <= 100)))"
+    },
+    {
+      "table_name": "auth_passkeys",
+      "name": "auth_passkeys_organization_id_fkey",
+      "type": "f",
+      "validated": true,
+      "definition": "FOREIGN KEY (organization_id) REFERENCES organizations(id)"
+    },
+    {
+      "table_name": "auth_passkeys",
+      "name": "auth_passkeys_organization_id_user_id_fkey",
+      "type": "f",
+      "validated": true,
+      "definition": "FOREIGN KEY (organization_id, user_id) REFERENCES organization_memberships(organization_id, user_id)"
+    },
+    {
+      "table_name": "auth_passkeys",
+      "name": "auth_passkeys_pkey",
+      "type": "p",
+      "validated": true,
+      "definition": "PRIMARY KEY (credential_id)"
+    },
+    {
+      "table_name": "auth_passkeys",
+      "name": "auth_passkeys_user_id_fkey",
+      "type": "f",
+      "validated": true,
+      "definition": "FOREIGN KEY (user_id) REFERENCES app_users(id)"
     },
     {
       "table_name": "auth_sessions",
@@ -14791,6 +15663,13 @@
     },
     {
       "table_name": "customers",
+      "name": "customers_customer_type_check",
+      "type": "c",
+      "validated": true,
+      "definition": "CHECK ((customer_type = ANY (ARRAY['company'::text, 'person'::text])))"
+    },
+    {
+      "table_name": "customers",
       "name": "customers_organization_id_fkey",
       "type": "f",
       "validated": true,
@@ -14882,10 +15761,24 @@
     },
     {
       "table_name": "document_deliveries",
+      "name": "document_deliveries_purpose_check",
+      "type": "c",
+      "validated": true,
+      "definition": "CHECK ((purpose = ANY (ARRAY['document'::text, 'reminder'::text])))"
+    },
+    {
+      "table_name": "document_deliveries",
       "name": "document_deliveries_status_check",
       "type": "c",
       "validated": true,
       "definition": "CHECK ((status = ANY (ARRAY['sending'::text, 'sent'::text, 'failed'::text])))"
+    },
+    {
+      "table_name": "document_deliveries",
+      "name": "document_reminder_metadata",
+      "type": "c",
+      "validated": true,
+      "definition": "CHECK ((((purpose = 'document'::text) AND (reminder_stage IS NULL) AND (balance_amount IS NULL) AND (payment_deadline IS NULL)) OR ((purpose = 'reminder'::text) AND (kind = 'invoice'::text) AND ((reminder_stage >= 1) AND (reminder_stage <= 3)) AND (reminder_stage IS NOT NULL) AND (balance_amount > (0)::numeric) AND (balance_amount IS NOT NULL) AND (payment_deadline IS NOT NULL))))"
     },
     {
       "table_name": "document_templates",
@@ -14935,6 +15828,13 @@
       "type": "c",
       "validated": true,
       "definition": "CHECK ((role = ANY (ARRAY['owner'::text, 'admin'::text, 'finance'::text, 'employee'::text])))"
+    },
+    {
+      "table_name": "employees",
+      "name": "employees_user_id_fkey",
+      "type": "f",
+      "validated": true,
+      "definition": "FOREIGN KEY (user_id) REFERENCES app_users(id)"
     },
     {
       "table_name": "employees",
@@ -15288,6 +16188,13 @@
     },
     {
       "table_name": "file_objects",
+      "name": "file_scan_evidence_matches_bytes",
+      "type": "c",
+      "validated": true,
+      "definition": "CHECK (((scan_evidence IS NULL) OR (((jsonb_typeof(scan_evidence) = 'object'::text) AND (jsonb_typeof((scan_evidence -> 'signaturesVersion'::text)) = 'number'::text) AND ((scan_evidence ->> 'engine'::text) = 'ClamAV'::text) AND ((scan_evidence ->> 'sha256'::text) = sha256) AND (scan_evidence ?& ARRAY['engineVersion'::text, 'signaturesVersion'::text, 'signaturesAt'::text, 'startedAt'::text, 'completedAt'::text])) IS TRUE)))"
+    },
+    {
+      "table_name": "file_objects",
       "name": "file_single_business_owner",
       "type": "c",
       "validated": true,
@@ -15299,6 +16206,13 @@
       "type": "f",
       "validated": true,
       "definition": "FOREIGN KEY (organization_id, support_case_id) REFERENCES support_cases(organization_id, id)"
+    },
+    {
+      "table_name": "file_objects",
+      "name": "file_time_entry_tenant_fk",
+      "type": "f",
+      "validated": true,
+      "definition": "FOREIGN KEY (organization_id, time_entry_id) REFERENCES time_entries(organization_id, id)"
     },
     {
       "table_name": "help_center_articles",
@@ -15518,6 +16432,62 @@
       "definition": "PRIMARY KEY (id)"
     },
     {
+      "table_name": "invoice_refunds",
+      "name": "invoice_refunds_amount_check",
+      "type": "c",
+      "validated": true,
+      "definition": "CHECK ((amount > (0)::numeric))"
+    },
+    {
+      "table_name": "invoice_refunds",
+      "name": "invoice_refunds_organization_id_customer_id_fkey",
+      "type": "f",
+      "validated": true,
+      "definition": "FOREIGN KEY (organization_id, customer_id) REFERENCES customers(organization_id, id)"
+    },
+    {
+      "table_name": "invoice_refunds",
+      "name": "invoice_refunds_organization_id_external_id_key",
+      "type": "u",
+      "validated": true,
+      "definition": "UNIQUE (organization_id, external_id)"
+    },
+    {
+      "table_name": "invoice_refunds",
+      "name": "invoice_refunds_organization_id_fkey",
+      "type": "f",
+      "validated": true,
+      "definition": "FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "invoice_refunds",
+      "name": "invoice_refunds_organization_id_id_key",
+      "type": "u",
+      "validated": true,
+      "definition": "UNIQUE (organization_id, id)"
+    },
+    {
+      "table_name": "invoice_refunds",
+      "name": "invoice_refunds_organization_id_invoice_id_fkey",
+      "type": "f",
+      "validated": true,
+      "definition": "FOREIGN KEY (organization_id, invoice_id) REFERENCES invoices(organization_id, id)"
+    },
+    {
+      "table_name": "invoice_refunds",
+      "name": "invoice_refunds_pkey",
+      "type": "p",
+      "validated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "invoice_refunds",
+      "name": "invoice_refunds_reason_check",
+      "type": "c",
+      "validated": true,
+      "definition": "CHECK (((length(TRIM(BOTH FROM reason)) >= 3) AND (length(TRIM(BOTH FROM reason)) <= 2000)))"
+    },
+    {
       "table_name": "invoices",
       "name": "fk_invoices_project_id_tenant",
       "type": "f",
@@ -15662,7 +16632,7 @@
       "name": "mail_outbox_kind_check",
       "type": "c",
       "validated": true,
-      "definition": "CHECK ((kind = ANY (ARRAY['quote'::text, 'invoice'::text, 'reminder'::text, 'invitation'::text])))"
+      "definition": "CHECK ((kind = ANY (ARRAY['quote'::text, 'invoice'::text, 'reminder'::text, 'invitation'::text, 'security'::text])))"
     },
     {
       "table_name": "mail_outbox",
@@ -15709,6 +16679,27 @@
     {
       "table_name": "notification_preferences",
       "name": "notification_preferences_user_id_fkey",
+      "type": "f",
+      "validated": true,
+      "definition": "FOREIGN KEY (user_id) REFERENCES app_users(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "notification_reads",
+      "name": "notification_reads_organization_id_notification_id_fkey",
+      "type": "f",
+      "validated": true,
+      "definition": "FOREIGN KEY (organization_id, notification_id) REFERENCES in_app_notifications(organization_id, id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "notification_reads",
+      "name": "notification_reads_pkey",
+      "type": "p",
+      "validated": true,
+      "definition": "PRIMARY KEY (notification_id, user_id)"
+    },
+    {
+      "table_name": "notification_reads",
+      "name": "notification_reads_user_id_fkey",
       "type": "f",
       "validated": true,
       "definition": "FOREIGN KEY (user_id) REFERENCES app_users(id) ON DELETE CASCADE"
@@ -15946,6 +16937,13 @@
     },
     {
       "table_name": "organization_invitations",
+      "name": "invitation_module_profile",
+      "type": "c",
+      "validated": true,
+      "definition": "CHECK (((module_profile = 'standard'::text) OR ((module_profile = 'time_only'::text) AND (role = 'member'::text))))"
+    },
+    {
+      "table_name": "organization_invitations",
       "name": "organization_invitations_organization_id_fkey",
       "type": "f",
       "validated": true,
@@ -15971,6 +16969,13 @@
       "type": "c",
       "validated": true,
       "definition": "CHECK ((status = ANY (ARRAY['pending'::text, 'accepted'::text, 'revoked'::text])))"
+    },
+    {
+      "table_name": "organization_memberships",
+      "name": "membership_module_profile",
+      "type": "c",
+      "validated": true,
+      "definition": "CHECK (((module_profile = 'standard'::text) OR ((module_profile = 'time_only'::text) AND (role = 'member'::text))))"
     },
     {
       "table_name": "organization_memberships",
@@ -16505,6 +17510,27 @@
       "definition": "FOREIGN KEY (tenant_id) REFERENCES organizations(id) ON DELETE CASCADE"
     },
     {
+      "table_name": "platform_maintenance",
+      "name": "platform_maintenance_check",
+      "type": "c",
+      "validated": true,
+      "definition": "CHECK (((NOT enabled) OR (ends_at IS NOT NULL)))"
+    },
+    {
+      "table_name": "platform_maintenance",
+      "name": "platform_maintenance_id_check",
+      "type": "c",
+      "validated": true,
+      "definition": "CHECK ((id = 1))"
+    },
+    {
+      "table_name": "platform_maintenance",
+      "name": "platform_maintenance_pkey",
+      "type": "p",
+      "validated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
       "table_name": "platform_operator_assignments",
       "name": "platform_operator_assignments_auth_source_check",
       "type": "c",
@@ -16846,6 +17872,20 @@
       "type": "f",
       "validated": true,
       "definition": "FOREIGN KEY (organization_id, customer_id) REFERENCES customers(organization_id, id)"
+    },
+    {
+      "table_name": "quotes",
+      "name": "quote_revision_not_self",
+      "type": "c",
+      "validated": true,
+      "definition": "CHECK (((revises_quote_id IS NULL) OR (revises_quote_id <> id)))"
+    },
+    {
+      "table_name": "quotes",
+      "name": "quote_revision_tenant",
+      "type": "f",
+      "validated": true,
+      "definition": "FOREIGN KEY (organization_id, revises_quote_id) REFERENCES quotes(organization_id, id)"
     },
     {
       "table_name": "quotes",
@@ -17444,6 +18484,13 @@
     },
     {
       "table_name": "time_entries",
+      "name": "report_month_start",
+      "type": "c",
+      "validated": true,
+      "definition": "CHECK (((report_month IS NULL) OR ((EXTRACT(day FROM report_month) = (1)::numeric) AND (work_date = report_month))))"
+    },
+    {
+      "table_name": "time_entries",
       "name": "time_entries_break_minutes_check",
       "type": "c",
       "validated": true,
@@ -17567,6 +18614,55 @@
       "type": "p",
       "validated": true,
       "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "workforce_assignments",
+      "name": "workforce_assignments_check",
+      "type": "c",
+      "validated": true,
+      "definition": "CHECK (((ends_on IS NULL) OR (ends_on >= starts_on)))"
+    },
+    {
+      "table_name": "workforce_assignments",
+      "name": "workforce_assignments_organization_id_customer_id_fkey",
+      "type": "f",
+      "validated": true,
+      "definition": "FOREIGN KEY (organization_id, customer_id) REFERENCES customers(organization_id, id)"
+    },
+    {
+      "table_name": "workforce_assignments",
+      "name": "workforce_assignments_organization_id_employee_id_fkey",
+      "type": "f",
+      "validated": true,
+      "definition": "FOREIGN KEY (organization_id, employee_id) REFERENCES employees(organization_id, id)"
+    },
+    {
+      "table_name": "workforce_assignments",
+      "name": "workforce_assignments_organization_id_fkey",
+      "type": "f",
+      "validated": true,
+      "definition": "FOREIGN KEY (organization_id) REFERENCES organizations(id)"
+    },
+    {
+      "table_name": "workforce_assignments",
+      "name": "workforce_assignments_organization_id_project_id_fkey",
+      "type": "f",
+      "validated": true,
+      "definition": "FOREIGN KEY (organization_id, project_id) REFERENCES projects(organization_id, id)"
+    },
+    {
+      "table_name": "workforce_assignments",
+      "name": "workforce_assignments_organization_id_user_id_fkey",
+      "type": "f",
+      "validated": true,
+      "definition": "FOREIGN KEY (organization_id, user_id) REFERENCES organization_memberships(organization_id, user_id)"
+    },
+    {
+      "table_name": "workforce_assignments",
+      "name": "workforce_assignments_pkey",
+      "type": "p",
+      "validated": true,
+      "definition": "PRIMARY KEY (id)"
     }
   ],
   "policies": [
@@ -17601,6 +18697,22 @@
       "permissive": true,
       "using_expression": "(organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid)",
       "check_expression": "(organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid)"
+    },
+    {
+      "table_name": "auth_passkey_challenges",
+      "name": "passkey_challenge_scope",
+      "command": "*",
+      "permissive": true,
+      "using_expression": "((current_setting('app.platform_operator'::text, true) = 'true'::text) OR ((user_id = current_setting('app.user_id'::text, true)) AND (organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid)))",
+      "check_expression": "((current_setting('app.platform_operator'::text, true) = 'true'::text) OR ((user_id = current_setting('app.user_id'::text, true)) AND (organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid)))"
+    },
+    {
+      "table_name": "auth_passkeys",
+      "name": "passkey_identity_scope",
+      "command": "*",
+      "permissive": true,
+      "using_expression": "((current_setting('app.platform_operator'::text, true) = 'true'::text) OR ((user_id = current_setting('app.user_id'::text, true)) AND (organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid)))",
+      "check_expression": "((current_setting('app.platform_operator'::text, true) = 'true'::text) OR ((user_id = current_setting('app.user_id'::text, true)) AND (organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid)))"
     },
     {
       "table_name": "bank_transactions",
@@ -17684,11 +18796,35 @@
     },
     {
       "table_name": "customer_contacts",
+      "name": "contact_workforce_scope",
+      "command": "r",
+      "permissive": false,
+      "using_expression": "app_workforce_access(customer_id, NULL::uuid)",
+      "check_expression": null
+    },
+    {
+      "table_name": "customer_contacts",
       "name": "tenant_isolation",
       "command": "*",
       "permissive": true,
       "using_expression": "((organization_id)::text = NULLIF(current_setting('app.organization_id'::text, true), ''::text))",
       "check_expression": "((organization_id)::text = NULLIF(current_setting('app.organization_id'::text, true), ''::text))"
+    },
+    {
+      "table_name": "customers",
+      "name": "customer_workforce_create",
+      "command": "a",
+      "permissive": false,
+      "using_expression": null,
+      "check_expression": "(app_workforce_role() = ANY (ARRAY['owner'::text, 'admin'::text, 'finance'::text, 'demo_template'::text]))"
+    },
+    {
+      "table_name": "customers",
+      "name": "customer_workforce_scope",
+      "command": "r",
+      "permissive": false,
+      "using_expression": "app_workforce_access(id, NULL::uuid)",
+      "check_expression": null
     },
     {
       "table_name": "customers",
@@ -17748,6 +18884,14 @@
     },
     {
       "table_name": "expenses",
+      "name": "expense_workforce_read",
+      "command": "r",
+      "permissive": false,
+      "using_expression": "((app_workforce_role() = ANY (ARRAY['owner'::text, 'admin'::text, 'finance'::text, 'hr'::text, 'reader'::text, 'demo_template'::text])) OR (created_by_user_id = current_setting('app.user_id'::text, true)) OR ((app_workforce_role() = ANY (ARRAY['project_manager'::text, 'manager'::text])) AND app_workforce_access(customer_id, NULL::uuid, expense_date)))",
+      "check_expression": null
+    },
+    {
+      "table_name": "expenses",
       "name": "tenant_isolation",
       "command": "*",
       "permissive": true,
@@ -17764,11 +18908,35 @@
     },
     {
       "table_name": "file_contents",
+      "name": "file_content_workforce_scope",
+      "command": "r",
+      "permissive": false,
+      "using_expression": "(EXISTS ( SELECT 1\n   FROM file_objects f\n  WHERE ((f.id = file_contents.file_id) AND (f.organization_id = file_contents.organization_id))))",
+      "check_expression": null
+    },
+    {
+      "table_name": "file_contents",
       "name": "file_contents_tenant",
       "command": "*",
       "permissive": true,
       "using_expression": "(organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid)",
       "check_expression": "(organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid)"
+    },
+    {
+      "table_name": "file_objects",
+      "name": "file_module_profile_read",
+      "command": "r",
+      "permissive": false,
+      "using_expression": "((app_member_module_profile() <> 'time_only'::text) OR ((purpose = 'profile_avatar'::text) AND (created_by = current_setting('app.user_id'::text, true))) OR ((purpose = 'time_report'::text) AND (EXISTS ( SELECT 1\n   FROM time_entries t\n  WHERE ((t.id = file_objects.time_entry_id) AND (t.organization_id = file_objects.organization_id) AND (t.created_by_user_id = current_setting('app.user_id'::text, true)))))) OR ((purpose = 'support_attachment'::text) AND (EXISTS ( SELECT 1\n   FROM support_cases t\n  WHERE ((t.id = file_objects.support_case_id) AND (t.organization_id = file_objects.organization_id) AND (t.created_by_user_id = current_setting('app.user_id'::text, true)))))))",
+      "check_expression": null
+    },
+    {
+      "table_name": "file_objects",
+      "name": "file_workforce_scope",
+      "command": "r",
+      "permissive": false,
+      "using_expression": "((app_workforce_role() = ANY (ARRAY['owner'::text, 'admin'::text, 'finance'::text, 'hr'::text, 'reader'::text, 'demo_template'::text])) OR ((purpose = 'profile_avatar'::text) AND (created_by = current_setting('app.user_id'::text, true))) OR (purpose = 'company_logo'::text) OR ((purpose = 'support_attachment'::text) AND (EXISTS ( SELECT 1\n   FROM support_cases s\n  WHERE ((s.id = file_objects.support_case_id) AND (s.organization_id = file_objects.organization_id) AND (s.created_by_user_id = current_setting('app.user_id'::text, true)))))) OR ((purpose = 'expense_receipt'::text) AND (EXISTS ( SELECT 1\n   FROM expenses e\n  WHERE ((e.id = file_objects.expense_id) AND (e.organization_id = file_objects.organization_id) AND ((e.created_by_user_id = current_setting('app.user_id'::text, true)) OR ((app_workforce_role() = ANY (ARRAY['project_manager'::text, 'manager'::text])) AND app_workforce_access(e.customer_id, NULL::uuid, e.expense_date))))))) OR ((purpose = 'time_report'::text) AND (EXISTS ( SELECT 1\n   FROM time_entries t\n  WHERE ((t.id = file_objects.time_entry_id) AND (t.organization_id = file_objects.organization_id) AND ((t.created_by_user_id = current_setting('app.user_id'::text, true)) OR ((app_workforce_role() = ANY (ARRAY['project_manager'::text, 'manager'::text])) AND app_workforce_access(t.customer_id, t.project_id, t.work_date, true))))))) OR ((purpose = 'customer_document'::text) AND app_workforce_access(customer_id, NULL::uuid)) OR ((purpose = 'offer_attachment'::text) AND (EXISTS ( SELECT 1\n   FROM quotes q\n  WHERE ((q.id = file_objects.quote_id) AND (q.organization_id = file_objects.organization_id) AND app_workforce_access(q.customer_id, NULL::uuid))))) OR ((purpose = 'invoice_attachment'::text) AND (EXISTS ( SELECT 1\n   FROM invoices i\n  WHERE ((i.id = file_objects.invoice_id) AND (i.organization_id = file_objects.organization_id) AND app_workforce_access(i.customer_id, NULL::uuid))))) OR ((purpose = 'project_document'::text) AND (EXISTS ( SELECT 1\n   FROM projects p\n  WHERE ((p.id = file_objects.project_id) AND (p.organization_id = file_objects.organization_id) AND app_workforce_access(p.customer_id, p.id))))))",
+      "check_expression": null
     },
     {
       "table_name": "file_objects",
@@ -17812,11 +18980,35 @@
     },
     {
       "table_name": "invoice_lines",
+      "name": "invoice_line_workforce_scope",
+      "command": "r",
+      "permissive": false,
+      "using_expression": "(EXISTS ( SELECT 1\n   FROM invoices i\n  WHERE ((i.id = invoice_lines.invoice_id) AND (i.organization_id = invoice_lines.organization_id))))",
+      "check_expression": null
+    },
+    {
+      "table_name": "invoice_lines",
       "name": "tenant_isolation",
       "command": "*",
       "permissive": true,
       "using_expression": "((organization_id)::text = NULLIF(current_setting('app.organization_id'::text, true), ''::text))",
       "check_expression": "((organization_id)::text = NULLIF(current_setting('app.organization_id'::text, true), ''::text))"
+    },
+    {
+      "table_name": "invoice_refunds",
+      "name": "refund_scope",
+      "command": "*",
+      "permissive": true,
+      "using_expression": "(organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid)",
+      "check_expression": "(organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid)"
+    },
+    {
+      "table_name": "invoices",
+      "name": "invoice_workforce_scope",
+      "command": "r",
+      "permissive": false,
+      "using_expression": "app_workforce_access(customer_id, NULL::uuid)",
+      "check_expression": null
     },
     {
       "table_name": "invoices",
@@ -17841,6 +19033,14 @@
       "permissive": true,
       "using_expression": "(((organization_id)::text = NULLIF(current_setting('app.organization_id'::text, true), ''::text)) AND (user_id = NULLIF(current_setting('app.user_id'::text, true), ''::text)))",
       "check_expression": "(((organization_id)::text = NULLIF(current_setting('app.organization_id'::text, true), ''::text)) AND (user_id = NULLIF(current_setting('app.user_id'::text, true), ''::text)))"
+    },
+    {
+      "table_name": "notification_reads",
+      "name": "own_notification_receipt",
+      "command": "*",
+      "permissive": true,
+      "using_expression": "((organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid) AND (user_id = current_setting('app.user_id'::text, true)))",
+      "check_expression": "((organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid) AND (user_id = current_setting('app.user_id'::text, true)) AND (EXISTS ( SELECT 1\n   FROM in_app_notifications n\n  WHERE ((n.id = notification_reads.notification_id) AND (n.organization_id = notification_reads.organization_id) AND ((n.user_id IS NULL) OR (n.user_id = notification_reads.user_id))))))"
     },
     {
       "table_name": "number_sequences",
@@ -17900,6 +19100,14 @@
     },
     {
       "table_name": "organization_memberships",
+      "name": "identity_membership_lookup",
+      "command": "r",
+      "permissive": true,
+      "using_expression": "(user_id = NULLIF(current_setting('app.user_id'::text, true), ''::text))",
+      "check_expression": null
+    },
+    {
+      "table_name": "organization_memberships",
       "name": "tenant_isolation",
       "command": "*",
       "permissive": true,
@@ -17956,6 +19164,14 @@
     },
     {
       "table_name": "organizations",
+      "name": "canonical_demo_template_read",
+      "command": "r",
+      "permissive": true,
+      "using_expression": "((id = '00000000-0000-4000-8000-000000000099'::uuid) AND (is_demo = true) AND ((NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid = id))",
+      "check_expression": null
+    },
+    {
+      "table_name": "organizations",
       "name": "organization_membership_access",
       "command": "*",
       "permissive": true,
@@ -17987,6 +19203,22 @@
       "check_expression": "(current_setting('app.platform_operator'::text, true) = 'true'::text)"
     },
     {
+      "table_name": "platform_maintenance",
+      "name": "maintenance_operator_update",
+      "command": "w",
+      "permissive": true,
+      "using_expression": "(current_setting('app.platform_operator'::text, true) = 'true'::text)",
+      "check_expression": "(current_setting('app.platform_operator'::text, true) = 'true'::text)"
+    },
+    {
+      "table_name": "platform_maintenance",
+      "name": "maintenance_read",
+      "command": "r",
+      "permissive": true,
+      "using_expression": "true",
+      "check_expression": null
+    },
+    {
       "table_name": "product_events",
       "name": "tenant_isolation",
       "command": "*",
@@ -18012,6 +19244,22 @@
     },
     {
       "table_name": "projects",
+      "name": "project_workforce_create",
+      "command": "a",
+      "permissive": false,
+      "using_expression": null,
+      "check_expression": "(app_workforce_role() = ANY (ARRAY['owner'::text, 'admin'::text, 'demo_template'::text]))"
+    },
+    {
+      "table_name": "projects",
+      "name": "project_workforce_scope",
+      "command": "r",
+      "permissive": false,
+      "using_expression": "app_workforce_access(customer_id, id)",
+      "check_expression": null
+    },
+    {
+      "table_name": "projects",
       "name": "tenant_isolation",
       "command": "*",
       "permissive": true,
@@ -18020,11 +19268,27 @@
     },
     {
       "table_name": "quote_lines",
+      "name": "quote_line_workforce_scope",
+      "command": "r",
+      "permissive": false,
+      "using_expression": "(EXISTS ( SELECT 1\n   FROM quotes q\n  WHERE ((q.id = quote_lines.quote_id) AND (q.organization_id = quote_lines.organization_id))))",
+      "check_expression": null
+    },
+    {
+      "table_name": "quote_lines",
       "name": "tenant_isolation",
       "command": "*",
       "permissive": true,
       "using_expression": "((organization_id)::text = NULLIF(current_setting('app.organization_id'::text, true), ''::text))",
       "check_expression": "((organization_id)::text = NULLIF(current_setting('app.organization_id'::text, true), ''::text))"
+    },
+    {
+      "table_name": "quotes",
+      "name": "quote_workforce_scope",
+      "command": "r",
+      "permissive": false,
+      "using_expression": "app_workforce_access(customer_id, NULL::uuid)",
+      "check_expression": null
     },
     {
       "table_name": "quotes",
@@ -18115,12 +19379,60 @@
       "check_expression": "((organization_id)::text = NULLIF(current_setting('app.organization_id'::text, true), ''::text))"
     },
     {
+      "table_name": "time_entries",
+      "name": "time_workforce_read",
+      "command": "r",
+      "permissive": false,
+      "using_expression": "((app_workforce_role() = ANY (ARRAY['owner'::text, 'admin'::text, 'finance'::text, 'hr'::text, 'reader'::text, 'demo_template'::text])) OR (created_by_user_id = current_setting('app.user_id'::text, true)) OR ((app_workforce_role() = ANY (ARRAY['project_manager'::text, 'manager'::text])) AND app_workforce_access(customer_id, project_id, work_date, true)))",
+      "check_expression": null
+    },
+    {
       "table_name": "vat_periods",
       "name": "tenant_isolation",
       "command": "*",
       "permissive": true,
       "using_expression": "((organization_id)::text = NULLIF(current_setting('app.organization_id'::text, true), ''::text))",
       "check_expression": "((organization_id)::text = NULLIF(current_setting('app.organization_id'::text, true), ''::text))"
+    },
+    {
+      "table_name": "workforce_assignments",
+      "name": "tenant_isolation",
+      "command": "*",
+      "permissive": true,
+      "using_expression": "(organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid)",
+      "check_expression": "(organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid)"
+    },
+    {
+      "table_name": "workforce_assignments",
+      "name": "workforce_delete",
+      "command": "d",
+      "permissive": false,
+      "using_expression": "false",
+      "check_expression": null
+    },
+    {
+      "table_name": "workforce_assignments",
+      "name": "workforce_insert",
+      "command": "a",
+      "permissive": false,
+      "using_expression": null,
+      "check_expression": "(app_workforce_role() = ANY (ARRAY['owner'::text, 'admin'::text]))"
+    },
+    {
+      "table_name": "workforce_assignments",
+      "name": "workforce_read",
+      "command": "r",
+      "permissive": false,
+      "using_expression": "((user_id = current_setting('app.user_id'::text, true)) OR (app_workforce_role() = ANY (ARRAY['owner'::text, 'admin'::text])))",
+      "check_expression": null
+    },
+    {
+      "table_name": "workforce_assignments",
+      "name": "workforce_update",
+      "command": "w",
+      "permissive": false,
+      "using_expression": "(app_workforce_role() = ANY (ARRAY['owner'::text, 'admin'::text]))",
+      "check_expression": "(app_workforce_role() = ANY (ARRAY['owner'::text, 'admin'::text]))"
     }
   ],
   "indexes": [
@@ -18223,6 +19535,21 @@
       "table_name": "auth_email_codes",
       "name": "idx_auth_email_codes_lookup",
       "definition": "CREATE INDEX idx_auth_email_codes_lookup ON public.auth_email_codes USING btree (lower(email), purpose, created_at DESC)"
+    },
+    {
+      "table_name": "auth_passkey_challenges",
+      "name": "auth_passkey_challenges_pkey",
+      "definition": "CREATE UNIQUE INDEX auth_passkey_challenges_pkey ON public.auth_passkey_challenges USING btree (token_hash)"
+    },
+    {
+      "table_name": "auth_passkey_challenges",
+      "name": "passkey_challenge_expiry",
+      "definition": "CREATE INDEX passkey_challenge_expiry ON public.auth_passkey_challenges USING btree (expires_at)"
+    },
+    {
+      "table_name": "auth_passkeys",
+      "name": "auth_passkeys_pkey",
+      "definition": "CREATE UNIQUE INDEX auth_passkeys_pkey ON public.auth_passkeys USING btree (credential_id)"
     },
     {
       "table_name": "auth_sessions",
@@ -18580,6 +19907,11 @@
       "definition": "CREATE UNIQUE INDEX document_deliveries_pkey ON public.document_deliveries USING btree (id)"
     },
     {
+      "table_name": "document_deliveries",
+      "name": "document_reminder_history",
+      "definition": "CREATE INDEX document_reminder_history ON public.document_deliveries USING btree (organization_id, document_id, completed_at DESC) WHERE (purpose = 'reminder'::text)"
+    },
+    {
       "table_name": "document_templates",
       "name": "document_templates_pkey",
       "definition": "CREATE UNIQUE INDEX document_templates_pkey ON public.document_templates USING btree (organization_id, key)"
@@ -18588,6 +19920,11 @@
       "table_name": "employees",
       "name": "employees_pkey",
       "definition": "CREATE UNIQUE INDEX employees_pkey ON public.employees USING btree (id)"
+    },
+    {
+      "table_name": "employees",
+      "name": "employees_user_identity",
+      "definition": "CREATE UNIQUE INDEX employees_user_identity ON public.employees USING btree (organization_id, user_id) WHERE ((user_id IS NOT NULL) AND (archived_at IS NULL))"
     },
     {
       "table_name": "employees",
@@ -18746,6 +20083,11 @@
     },
     {
       "table_name": "file_objects",
+      "name": "file_time_report_lookup",
+      "definition": "CREATE INDEX file_time_report_lookup ON public.file_objects USING btree (organization_id, time_entry_id) WHERE (time_entry_id IS NOT NULL)"
+    },
+    {
+      "table_name": "file_objects",
       "name": "idx_file_objects_support",
       "definition": "CREATE INDEX idx_file_objects_support ON public.file_objects USING btree (organization_id, support_case_id, created_at DESC)"
     },
@@ -18795,6 +20137,11 @@
       "definition": "CREATE UNIQUE INDEX in_app_notifications_pkey ON public.in_app_notifications USING btree (id)"
     },
     {
+      "table_name": "in_app_notifications",
+      "name": "notification_tenant_identity",
+      "definition": "CREATE UNIQUE INDEX notification_tenant_identity ON public.in_app_notifications USING btree (organization_id, id)"
+    },
+    {
       "table_name": "invoice_line_expenses",
       "name": "invoice_line_expenses_pkey",
       "definition": "CREATE UNIQUE INDEX invoice_line_expenses_pkey ON public.invoice_line_expenses USING btree (invoice_line_id, expense_id)"
@@ -18818,6 +20165,26 @@
       "table_name": "invoice_lines",
       "name": "uq_invoice_lines_org_id",
       "definition": "CREATE UNIQUE INDEX uq_invoice_lines_org_id ON public.invoice_lines USING btree (organization_id, id)"
+    },
+    {
+      "table_name": "invoice_refunds",
+      "name": "invoice_refunds_ledger",
+      "definition": "CREATE INDEX invoice_refunds_ledger ON public.invoice_refunds USING btree (organization_id, invoice_id, refund_date)"
+    },
+    {
+      "table_name": "invoice_refunds",
+      "name": "invoice_refunds_organization_id_external_id_key",
+      "definition": "CREATE UNIQUE INDEX invoice_refunds_organization_id_external_id_key ON public.invoice_refunds USING btree (organization_id, external_id)"
+    },
+    {
+      "table_name": "invoice_refunds",
+      "name": "invoice_refunds_organization_id_id_key",
+      "definition": "CREATE UNIQUE INDEX invoice_refunds_organization_id_id_key ON public.invoice_refunds USING btree (organization_id, id)"
+    },
+    {
+      "table_name": "invoice_refunds",
+      "name": "invoice_refunds_pkey",
+      "definition": "CREATE UNIQUE INDEX invoice_refunds_pkey ON public.invoice_refunds USING btree (id)"
     },
     {
       "table_name": "invoices",
@@ -18933,6 +20300,16 @@
       "table_name": "notification_preferences",
       "name": "notification_preferences_pkey",
       "definition": "CREATE UNIQUE INDEX notification_preferences_pkey ON public.notification_preferences USING btree (organization_id, user_id, kind)"
+    },
+    {
+      "table_name": "notification_reads",
+      "name": "notification_reads_pkey",
+      "definition": "CREATE UNIQUE INDEX notification_reads_pkey ON public.notification_reads USING btree (notification_id, user_id)"
+    },
+    {
+      "table_name": "notification_reads",
+      "name": "notification_reads_user_scope",
+      "definition": "CREATE INDEX notification_reads_user_scope ON public.notification_reads USING btree (user_id, organization_id, notification_id)"
     },
     {
       "table_name": "number_sequences",
@@ -19275,6 +20652,11 @@
       "definition": "CREATE UNIQUE INDEX platform_internal_notes_pkey ON public.platform_internal_notes USING btree (id)"
     },
     {
+      "table_name": "platform_maintenance",
+      "name": "platform_maintenance_pkey",
+      "definition": "CREATE UNIQUE INDEX platform_maintenance_pkey ON public.platform_maintenance USING btree (id)"
+    },
+    {
       "table_name": "platform_operator_assignments",
       "name": "idx_platform_operator_auth_source",
       "definition": "CREATE INDEX idx_platform_operator_auth_source ON public.platform_operator_assignments USING btree (auth_source, status)"
@@ -19478,6 +20860,11 @@
       "table_name": "quotes",
       "name": "idx_quotes_project_id_tenant",
       "definition": "CREATE INDEX idx_quotes_project_id_tenant ON public.quotes USING btree (organization_id, project_id)"
+    },
+    {
+      "table_name": "quotes",
+      "name": "quote_revision_one_draft",
+      "definition": "CREATE UNIQUE INDEX quote_revision_one_draft ON public.quotes USING btree (organization_id, revises_quote_id) WHERE ((revises_quote_id IS NOT NULL) AND (status = 'draft'::text) AND (archived_at IS NULL))"
     },
     {
       "table_name": "quotes",
@@ -19798,6 +21185,16 @@
       "table_name": "web_vitals",
       "name": "web_vitals_pkey",
       "definition": "CREATE UNIQUE INDEX web_vitals_pkey ON public.web_vitals USING btree (id)"
+    },
+    {
+      "table_name": "workforce_assignments",
+      "name": "workforce_assignments_pkey",
+      "definition": "CREATE UNIQUE INDEX workforce_assignments_pkey ON public.workforce_assignments USING btree (id)"
+    },
+    {
+      "table_name": "workforce_assignments",
+      "name": "workforce_scope_lookup",
+      "definition": "CREATE INDEX workforce_scope_lookup ON public.workforce_assignments USING btree (organization_id, user_id, customer_id, project_id) WHERE (revoked_at IS NULL)"
     }
   ],
   "views": []

@@ -9,6 +9,7 @@ assert.equal(tenantCan('member','time:write','time_only'),true);
 assert.equal(tenantCanCreateAt('member','/zeit/neu','time_only'),true);
 assert.equal(tenantCanCreateAt('member','/kunden/neu','time_only'),false);
 for(const role of ['owner','admin','reader','unknown'])assert.equal(tenantCanOpenPath(role,'/zeit','time_only'),false,role);
+for(const path of ['/dashboard','/support','/benachrichtigungen','/einstellungen/konto','/unknown'])assert.equal(tenantCanOpenPath('unknown',path),false,'An unknown role never receives a destination, including paths without a mapped module');
 assert.equal(tenantCanOpenPath('member','/kunden','standard'),true);
 assert.equal(tenantCanOpenPath('owner','/finanzen','standard'),true);
 assert.ok(tenantPermissions('member','time_only').every(permission=>tenantCan('member',permission,'time_only')));

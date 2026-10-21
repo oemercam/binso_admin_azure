@@ -1,0 +1,40 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import {PGlite} from '@electric-sql/pglite';
+import {pgcrypto} from '@electric-sql/pglite/contrib/pgcrypto';
+import {moduleUrl} from './data-test-modules.mjs';
+const permissions=moduleUrl(await fs.readFile('lib/permissions.ts','utf8'));
+const repo=await import(moduleUrl((await fs.readFile('lib/server/repositories/notifications.ts','utf8')).replace("import 'server-only';",'').replace("'@/lib/permissions'",JSON.stringify(permissions))));
+const db=new PGlite({extensions:{pgcrypto}});
+const org='00000000-0000-4000-8000-000000000071',other='00000000-0000-4000-8000-000000000072';
+const shared='00000000-0000-4000-8000-000000000073',personal='00000000-0000-4000-8000-000000000074',foreign='00000000-0000-4000-8000-000000000075';
+const asUser=async(user,fn,profile='standard')=>db.transaction(async c=>{
+ await c.exec('set local role binso_runtime');
+ await c.query("select set_config('app.organization_id',$1,true),set_config('app.user_id',$2,true)",[org,user]);
+ return fn(c,{organizationId:org,userId:user,role:'member',moduleProfile:profile});
+});
+try{
+ await db.exec('create extension pgcrypto; create role schema_owner; grant usage,create on schema public to schema_owner; set role schema_owner');
+ for(const file of (await fs.readdir('database/migrations')).filter(f=>f.endsWith('.sql')).sort())await db.exec(await fs.readFile('database/migrations/'+file,'utf8'));
+ await db.exec('reset role');await db.exec(await fs.readFile('database/operations/provision-runtime-role.sql','utf8'));
+ await db.query("insert into organizations(id,name,slug) values($1,'Receipt test A','receipt-test-a'),($2,'Receipt test B','receipt-test-b')",[org,other]);
+ for(const user of ['receipt-a','receipt-b'])await db.query("insert into app_users(id,email,display_name,status) values($1,$2,$1,'active')",[user,user+'@fixture.invalid']);
+ await db.query("insert into in_app_notifications(id,organization_id,user_id,kind,title,body,href,read_at) values($1,$2,null,'system','Shared','Synthetic','/zeit',now()),($3,$2,'receipt-a','system','Personal','Synthetic','/zeit',now()),($4,$5,null,'system','Foreign','Synthetic','/zeit',null)",[shared,org,personal,foreign,other]);
+ const list=user=>asUser(user,(c,s)=>repo.notificationList(c,s));
+ assert.equal((await list('receipt-a')).find(n=>n.id===personal).readAt!==null,true,'Personal legacy reads are preserved');
+ assert.equal((await list('receipt-b')).find(n=>n.id===shared).readAt,null,'A historical shared read is not attributed to all users');
+ await asUser('receipt-a',(c,s)=>repo.markNotificationsRead(c,s,shared));
+ assert.ok((await list('receipt-a')).find(n=>n.id===shared).readAt);
+ assert.equal((await list('receipt-b')).find(n=>n.id===shared).readAt,null,'User A must not read a shared notification for User B');
+ const first=(await list('receipt-a')).find(n=>n.id===shared).readAt;
+ await asUser('receipt-a',(c,s)=>repo.markNotificationsRead(c,s,shared));
+ assert.equal(String((await list('receipt-a')).find(n=>n.id===shared).readAt),String(first),'Replay preserves the first read timestamp');
+ await asUser('receipt-b',(c,s)=>repo.markNotificationsRead(c,s,null));
+ assert.ok((await list('receipt-b')).find(n=>n.id===shared).readAt,'Mark-all is personal too');
+ assert.equal((await list('receipt-b')).some(n=>n.id===personal||n.id===foreign),false,'Personal and other-tenant notifications are private');
+ await asUser('receipt-b',(c,s)=>repo.markNotificationsRead(c,s,foreign));
+ await assert.rejects(()=>asUser('receipt-a',c=>c.query('insert into notification_reads values($1,$2,$3,now())',[org,personal,'receipt-b'])),e=>e.code==='42501','RLS prevents writing another user receipt');
+ await assert.rejects(()=>asUser('receipt-b',c=>c.query('insert into notification_reads values($1,$2,$3,now())',[org,personal,'receipt-b'])),e=>e.code==='42501','RLS prevents receipts for another user personal notification');
+ assert.equal((await asUser('receipt-b',(c,s)=>repo.notificationList(c,s),'time_only')).length,0,'Time-only does not expose shared notifications');
+ console.log('Notification receipts: migrated schema, real restricted RLS, two-user shared/read-all isolation, personal legacy reads, replay and cross-user/tenant denial passed.');
+}finally{await db.close();}

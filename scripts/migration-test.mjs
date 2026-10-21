@@ -1,4 +1,5 @@
 import {planCatalogModuleUrl,planAccessModuleUrl} from './data-test-modules.mjs';
+import {prepareHistoricalFixtureOwner} from './fixtures/template-access.mjs';
 import {displayModuleUrl,localeTestModuleUrl} from "./data-test-modules.mjs";
 import {randomUUID} from "node:crypto";
 import {PGlite} from '@electric-sql/pglite';
@@ -40,6 +41,8 @@ try{
   }catch(e){await db.exec('rollback');throw new Error(file+': '+e.message)}
  }
  await db.exec('reset role');
+ await prepareHistoricalFixtureOwner(db);
+ await db.query("select set_config('app.user_id','demo-readonly',false)");
  const demoProfiles=(await db.query("select c.id,c.city,c.address,c.email,(select count(*)::int from customer_contacts cc where cc.organization_id=c.organization_id and cc.customer_id=c.id and cc.is_primary and cc.archived_at is null) primary_contacts from customers c where c.organization_id=$1 and c.external_id in ('demo-customer-acme','demo-customer-alpin','demo-customer-nova')",[demo])).rows;
  assert.equal(demoProfiles.length,3);assert.ok(demoProfiles.every(c=>c.city&&c.address&&c.email&&!c.email.endsWith('example.invalid')&&c.primary_contacts===1),'Every canonical demo customer needs a plausible profile and one main contact');
  await db.exec(await fs.readFile('database/operations/provision-runtime-role.sql','utf8'));
@@ -490,7 +493,7 @@ try{
  const processSession=dataModule('export async function requireSession(){return globalThis.__processSession}');
  const processDb=dataModule('export async function withTenant(org,user,fn){return globalThis.__processTransaction(org,fn)} export async function withPlatform(fn){return globalThis.__processPlatform(fn)}');
  globalThis.__processSession={...session,isDemo:false,organizationStatus:'active',email:'process@example.invalid'};
- globalThis.__processTransaction=async(org,fn)=>{await db.exec('begin');try{await db.query("select set_config('app.organization_id',$1,true)",[org]);const r=await fn(client);await db.exec('commit');return r}catch(e){await db.exec('rollback');throw e}};
+ globalThis.__processTransaction=async(org,fn)=>{await db.exec('begin');try{await db.query("select set_config('app.organization_id',$1,true),set_config('app.user_id',$2,true)",[org,globalThis.__processSession.userId]);const r=await fn(client);await db.exec('commit');return r}catch(e){await db.exec('rollback');throw e}};
  globalThis.__processPlatform=async(fn)=>{await db.exec('begin');try{await db.query("select set_config('app.platform_operator','true',true)");const r=await fn(client);await db.exec('commit');return r}catch(e){await db.exec('rollback');throw e}};
  const timePeriodModule=dataModule((await fs.readFile('lib/statistics-period.ts','utf8')).replace("'./money'",JSON.stringify(moneyModule)));
  const timeWorkspaceModule=dataModule((await fs.readFile('lib/server/repositories/time-workspace.ts','utf8')).replace("import 'server-only';",'').replace("'../http'",JSON.stringify(processHttp)).replace("'@/lib/permissions'",JSON.stringify(permissions)).replace("'@/lib/statistics-period'",JSON.stringify(timePeriodModule)));
@@ -515,10 +518,11 @@ try{
  const historyOrganization=randomUUID(),historySession=globalThis.__processSession;
  try{
   await db.query("insert into organizations(id,name,slug,status) values($1,'Synthetic paged time',$2,'active')",[historyOrganization,'time-history-'+historyOrganization]);
-  await db.query("insert into organization_memberships(organization_id,user_id,email,role,status) values($1,$2,'history@example.invalid','owner','active')",[historyOrganization,session.userId]);
+  await db.query("insert into app_users(id,email,display_name,status) values('history-fixture-owner','history@example.invalid','Synthetic history owner','active')");
+  await db.query("insert into organization_memberships(organization_id,user_id,email,role,status) values($1,'history-fixture-owner','history@example.invalid','owner','active')",[historyOrganization]);
   await db.query("select set_config('app.organization_id',$1,false)",[historyOrganization]);
-  await db.query("insert into time_entries(organization_id,external_id,project_label,person_name,worker_type,work_date,hours,description,billable,approved,created_by_user_id) select $1,'history-'||n,'Synthetic history','Synthetic owner','employee','2005-01-01'::date+n,1,'Synthetic paged history '||n,false,false,$2 from generate_series(1,1101) n",[historyOrganization,session.userId]);
-  globalThis.__processSession={...session,organizationId:historyOrganization};
+  await db.query("insert into time_entries(organization_id,external_id,project_label,person_name,worker_type,work_date,hours,description,billable,approved,created_by_user_id) select $1,'history-'||n,'Synthetic history','Synthetic owner','employee','2005-01-01'::date+n,1,'Synthetic paged history '||n,false,false,'history-fixture-owner' from generate_series(1,1101) n",[historyOrganization]);
+  globalThis.__processSession={...session,organizationId:historyOrganization,userId:'history-fixture-owner'};
   const historyRequest=extra=>({nextUrl:new URL('https://fixture.invalid/api/time-entries?limit=50&status=internal&own=1&q=Synthetic%20paged%20history&'+extra)});
   const first=await manualTimeHandler.GET(historyRequest('offset=0')),old=await manualTimeHandler.GET(historyRequest('offset=1100'));
   assert.equal(first.status,200,JSON.stringify(first));assert.equal(first.data.items.length,50);assert.equal(old.data.items.length,1);assert.equal(old.data.items[0].description,'Synthetic paged history 1');
@@ -823,6 +827,10 @@ try{
  assert.equal((await sender.POST({body:{recipient:'fixture@example.invalid',requestKey:'demo-block'}},{params:Promise.resolve({number:failedInvoice.number})})).status,403);
  delete globalThis.__sendCount;delete globalThis.__sendFail;delete globalThis.__lastMail;
  // Invitation activation is atomic, expires/revokes safely and never resets an existing password.
+ const activationPlan=(await db.query('select plan from organization_subscriptions where organization_id=$1',[demo])).rows[0].plan;
+ // Seat-limit countercases are exercised above. These identity/password cases
+ // need room for the newly explicit, independent synthetic reviewers.
+ await db.query("update organization_subscriptions set plan='professional' where organization_id=$1",[demo]);
  const passwords=dataModule((await fs.readFile('lib/server/password.ts','utf8')).replace('import "server-only";',''));const {hashPassword}=await import(passwords);
  const invitationSource=(await fs.readFile('app/api/auth/invitation/route.ts','utf8')).replace('"@/lib/money"',JSON.stringify(moneyModule)).replace('"@/lib/server/http"',JSON.stringify(processHttp)).replace('"@/lib/server/db"',JSON.stringify(processDb)).replace('"@/lib/server/password"',JSON.stringify(passwords)).replace('"@/lib/server/rate-limit"',JSON.stringify(dataModule('export async function enforceRateLimit(){}')));
  const invitationHandler=await import(dataModule(invitationSource));
@@ -850,6 +858,7 @@ try{
  assert.equal((await db.query('select password_hash from app_users where id=$1',['flow-existing-user'])).rows[0].password_hash,originalHash);
  const revoked=await seedInvitation('flow-revoked-user','flow-revoked@example.invalid','invited',originalPassword,'flow-revoked-token');await db.query("update organization_invitations set status='revoked' where id=$1",[revoked]);
  assert.equal((await invitationHandler.POST({body:{token:'flow-revoked-token',password:originalPassword}})).status,400);
+ await db.query('update organization_subscriptions set plan=$2 where organization_id=$1',[demo,activationPlan]);
  console.log('PDF/QR generation, send idempotency/failure/demo guards, cancellation release and new/existing/revoked invitation acceptance passed with synthetic fixtures only.');
  console.log('Team schema, entitlement limits, document status/locks/conversion, expense approval/reimbursement/billing and tenant isolation passed.');
 
@@ -860,7 +869,7 @@ try{
  const reportPeriodModule=dataModule((await fs.readFile('lib/statistics-period.ts','utf8')).replace("'./money'",JSON.stringify(moneyModule)));
  const reportLocaleModule=dataModule("export const asLocale=v=>['de','fr','it','en'].includes(v)?v:'de';export const localeCookie='binso_locale';export const translateMessage=(v,locale)=>locale==='fr'?'FR:'+v:v;");
  const actualPlanModule=dataModule((await fs.readFile('lib/server/plan-access.ts','utf8')).replace('import "server-only";','').replace('"@/lib/server/db"',JSON.stringify(processDb)).replace("'./http'",JSON.stringify(processHttp)).replace('"@/config/plan-access"',JSON.stringify(planAccessModuleUrl)));
- const loadProcessRoute=async path=>{let source=await fs.readFile(path,'utf8');for(const [specifier,url] of Object.entries({'@/lib/server/database':dataModule(databaseSource),'@/config/notification-channels':dataModule(await fs.readFile('config/notification-channels.ts','utf8')),'@/config/plan-access':planAccessModuleUrl,'@/lib/server/repositories/dashboard':dashboardModule,'@/lib/server/repositories/financial-summary':sharedSummaryModule,'@/lib/server/repositories/finance':financeModule,'@/lib/server/repositories/business-api':businessModule,'@/lib/projects':dataModule(await fs.readFile('lib/projects.ts','utf8')),'@/lib/server/plan-access':dataModule("export {requireProjectCapacity,requireModuleEntitlement} from "+JSON.stringify(actualPlanModule)+"; export const getOrganizationPlan=async()=>globalThis.__processReportPlan??'pro'"),'@/lib/server/repositories/reports':reportRepoModule,'@/lib/report-export':reportExportModule,'@/lib/financial-status':financialModule,'@/lib/statistics-period':reportPeriodModule,'@/lib/locales':reportLocaleModule,'@/lib/server/file-access':dataModule((await fs.readFile('lib/server/file-access.ts','utf8')).replace('import "server-only";','').replace('"./env"',JSON.stringify(dataModule('export const env={}')))),'@/lib/server/workforce-access':workforceModule,'@/lib/server/repositories/project-workspace':projectWorkspaceModule,'@/lib/money':moneyModule,'@/lib/server/http':processHttp,'@/lib/server/session':processSession,'@/lib/server/db':processDb,'@/lib/server/rbac':processRbac,'@/lib/server/audit':audit,'@/lib/server/business-idempotency':idempotencyModule,'@/lib/permissions':permissions,'@/lib/server/validation':dataModule(await fs.readFile('lib/server/validation.ts','utf8').then(source=>source.replace('import "server-only";','').replace('"./http"',JSON.stringify(processHttp))))})){source=source.replaceAll(JSON.stringify(specifier),JSON.stringify(url)).replaceAll("'"+specifier+"'",JSON.stringify(url));}return import(dataModule(source));};
+ const loadProcessRoute=async path=>{let source=await fs.readFile(path,'utf8');for(const [specifier,url] of Object.entries({'@/lib/server/repositories/notifications':dataModule((await fs.readFile('lib/server/repositories/notifications.ts','utf8')).replace("import 'server-only';",'').replace("'@/lib/permissions'",JSON.stringify(permissions))),'@/lib/server/database':dataModule(databaseSource),'@/config/notification-channels':dataModule(await fs.readFile('config/notification-channels.ts','utf8')),'@/config/plan-access':planAccessModuleUrl,'@/lib/server/repositories/dashboard':dashboardModule,'@/lib/server/repositories/financial-summary':sharedSummaryModule,'@/lib/server/repositories/finance':financeModule,'@/lib/server/repositories/business-api':businessModule,'@/lib/projects':dataModule(await fs.readFile('lib/projects.ts','utf8')),'@/lib/server/plan-access':dataModule("export {requireProjectCapacity,requireModuleEntitlement} from "+JSON.stringify(actualPlanModule)+"; export const getOrganizationPlan=async()=>globalThis.__processReportPlan??'pro'"),'@/lib/server/repositories/reports':reportRepoModule,'@/lib/report-export':reportExportModule,'@/lib/financial-status':financialModule,'@/lib/statistics-period':reportPeriodModule,'@/lib/locales':reportLocaleModule,'@/lib/server/file-access':dataModule((await fs.readFile('lib/server/file-access.ts','utf8')).replace('import "server-only";','').replace('"./env"',JSON.stringify(dataModule('export const env={}')))),'@/lib/server/workforce-access':workforceModule,'@/lib/server/repositories/project-workspace':projectWorkspaceModule,'@/lib/money':moneyModule,'@/lib/server/http':processHttp,'@/lib/server/session':processSession,'@/lib/server/db':processDb,'@/lib/server/rbac':processRbac,'@/lib/server/audit':audit,'@/lib/server/business-idempotency':idempotencyModule,'@/lib/permissions':permissions,'@/lib/server/validation':dataModule(await fs.readFile('lib/server/validation.ts','utf8').then(source=>source.replace('import "server-only";','').replace('"./http"',JSON.stringify(processHttp))))})){source=source.replaceAll(JSON.stringify(specifier),JSON.stringify(url)).replaceAll("'"+specifier+"'",JSON.stringify(url));}return import(dataModule(source));};
  const financeWorkspaceHandler=await loadProcessRoute('app/api/finance/overview/route.ts');
  for(const role of ['owner','admin','finance','hr','project_manager','member','reader']){
   globalThis.__processSession={...session,role};
@@ -1017,7 +1026,7 @@ try{
  const notificationRoute=await loadProcessRoute('app/api/notifications/route.ts');
  const notificationId=(await db.query("insert into in_app_notifications(organization_id,user_id,kind,title,body) values($1,$2,'system','Synthetic notification','No personal data') returning id",[demo,session.userId])).rows[0].id;
  const foreignNotificationId=(await db.query("insert into in_app_notifications(organization_id,user_id,kind,title,body) values($1,null,'system','Foreign synthetic notification','No personal data') returning id",[sandbox])).rows[0].id;
- assert.equal((await notificationRoute.PATCH({body:{all:true}})).status,200);assert.ok((await db.query('select read_at from in_app_notifications where id=$1',[notificationId])).rows[0].read_at);assert.equal((await db.query('select read_at from in_app_notifications where id=$1',[foreignNotificationId])).rows[0].read_at,null,'Read all cannot affect another tenant');
+ assert.equal((await notificationRoute.PATCH({body:{all:true}})).status,200);assert.ok((await notificationRoute.GET()).data.items.find(item=>item.id===notificationId).readAt);assert.equal((await db.query('select read_at from in_app_notifications where id=$1',[foreignNotificationId])).rows[0].read_at,null,'Read all cannot affect another tenant');
  const policy=await loadProcessRoute('app/api/time-entries/policy/route.ts');assert.equal((await policy.PATCH({body:{required:false}})).status,409,'Legacy settings cannot disable the independent-review invariant');
  await db.query('update organizations set time_approval_required=false where id=$1',[demo]);
  const immediate=await manualTimeHandler.POST({headers:new Headers(),body:{customerId:documentArgs.p_customer_id,description:'Direct work awaits review',durationMinutes:60,billable:true}});assert.equal(immediate.status,201,JSON.stringify(immediate));assert.equal(immediate.data.item.approved,false,'A stored legacy false flag cannot auto-approve normal work');

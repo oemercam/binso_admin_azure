@@ -1,6 +1,5 @@
 "use client";
 import {notificationChannels} from "@/config/notification-channels";
-import {ProgressBar} from "../ui";
 import {SettingsNavigation} from "../settings-navigation";
 import {FileUpload} from "../file-upload";
 import {LocalizedText,LocalizedElement} from "@/lib/client/locale";

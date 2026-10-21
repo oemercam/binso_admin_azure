@@ -67,6 +67,7 @@ assert.ok(outgoing.includes('message-user'));assert.ok(outgoing.includes('<span>
 const catalog=inventory(),publicPage=catalog.routes.find(r=>r.route==='/login');assert.equal(publicPage.family,'AuthenticationPage');assert.ok(!publicPage.pageRenderGraph.some(k=>k.endsWith('#AppShellFrame')),'Inactive root shell branches must not become the actual public page graph');assert.ok(catalog.operatorVariants.some(v=>v.route==='/operator/sperrungen'&&v.component.endsWith('#RestrictionsView')));assert.ok(catalog.apiRoutes.some(r=>r.route==='/api/documents/preview'&&r.methods.includes('POST')));
 assert.ok(!fs.existsSync('components/pages/compatibility.tsx'));assert.ok(!fs.readFileSync('components/operator.tsx','utf8').includes('operator-modal-layer'));
 assert.ok(!fs.existsSync('components/app-pages.tsx'),'Unused runtime compatibility barrel stays retired; test-only page-source reads the actual owners.');
+assert.ok(catalog.componentCatalog.find(component=>component.file==='components/app-shell.tsx'&&component.name==='RouteLoading').frameworkUsedBy.includes('app/loading.tsx'),'Framework loading entries are real consumers, never unused-component deletion candidates');
 console.log('UI foundation: rejecting copied controls/wrappers/states/imports; field validation association; read-only permissions; native types; cascade fallback/context; route/layout/operator/API inventory passed.');
 
 const wizardSource=fs.readFileSync('components/form-wizard.tsx','utf8');

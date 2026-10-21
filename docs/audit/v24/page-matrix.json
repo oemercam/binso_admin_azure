@@ -1,5 +1,5 @@
 {
-  "commit": "cb3119763f70fc8f63f7cf16dd0b94aed24e3162",
+  "commit": "f33187d46bc8735018bf112e326771e650448526",
   "method": "Existing TypeScript AST dependency inventory; conditional reachability is not runtime proof",
   "pages": [
     {
@@ -1397,7 +1397,7 @@
         "app/layout.tsx",
         "app/benachrichtigungen/layout.tsx"
       ],
-      "roles": "Public or route-level session: see source",
+      "roles": "organization:read",
       "actions": [
         {
           "tag": "ConfirmDialog",
@@ -2637,7 +2637,7 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 306,
+          "line": 305,
           "component": "components/pages/settings.tsx#SubscriptionSettingsPage"
         },
         {
@@ -3670,7 +3670,7 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 167,
+          "line": 166,
           "component": "components/pages/settings.tsx#CompanySettingsPage"
         },
         {
@@ -3882,7 +3882,7 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 88,
+          "line": 87,
           "component": "components/pages/settings.tsx#AccountSettingsPage"
         },
         {
@@ -5078,10 +5078,28 @@
       "family": "AuthenticationPage",
       "components": [
         "components/ui.tsx#Logo",
+        "components/ui.tsx#LoadingState",
+        "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#Icon",
         "components/ui.tsx#dismissActionLabels",
-        "components/ui.tsx#actionSourceText"
+        "components/ui.tsx#actionSourceText",
+        "components/auth-workspace.tsx#AuthWorkspace",
+        "components/locale-switcher.tsx#LocaleSwitcher",
+        "components/ui.tsx#Select",
+        "components/select-control.tsx#SelectControl",
+        "components/select-control.tsx#SelectSearch",
+        "components/page-scroll-lock.ts#lockPageScroll",
+        "components/page-scroll-lock.ts#locks",
+        "components/page-scroll-lock.ts#bodyOverflow",
+        "components/page-scroll-lock.ts#rootOverflow",
+        "components/page-scroll-lock.ts#x",
+        "components/page-scroll-lock.ts#y",
+        "components/page-scroll-lock.ts#guard",
+        "components/use-dialog-focus.ts#registerDialogPortal",
+        "components/use-dialog-focus.ts#modalStack",
+        "components/use-dialog-focus.ts#dialogPortals",
+        "components/ui.tsx#Input"
       ],
       "layouts": [
         "app/layout.tsx"
@@ -6733,6 +6751,7 @@
         "components/ui.tsx#Button",
         "components/ui.tsx#dismissActionLabels",
         "components/ui.tsx#actionSourceText",
+        "components/password-input.tsx#PasswordInput",
         "components/passkey-login.tsx#PasskeyLogin"
       ],
       "layouts": [
@@ -8818,6 +8837,7 @@
         "components/use-dialog-focus.ts#dialogPortals",
         "components/ui.tsx#Input",
         "components/ui.tsx#Icon",
+        "components/ui.tsx#LoadingState",
         "components/ui.tsx#Button",
         "components/ui.tsx#dismissActionLabels",
         "components/ui.tsx#actionSourceText",
@@ -8829,6 +8849,7 @@
         "components/ui.tsx#CurrencyInput",
         "components/ui.tsx#FormLabel",
         "components/ui.tsx#FormError",
+        "components/password-input.tsx#PasswordInput",
         "components/ui.tsx#ErrorState",
         "components/confirm-dialog.tsx#ConfirmDialog",
         "components/use-dialog-focus.ts#useDialogFocus",
@@ -8842,7 +8863,7 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 59,
+          "line": 60,
           "component": "app/passwort-zuruecksetzen/page.tsx#Page"
         },
         {
@@ -12016,7 +12037,8 @@
         "components/ui.tsx#TimeInput",
         "components/ui.tsx#CurrencyInput",
         "components/ui.tsx#FormLabel",
-        "components/ui.tsx#FormError"
+        "components/ui.tsx#FormError",
+        "components/password-input.tsx#PasswordInput"
       ],
       "layouts": [
         "app/layout.tsx"
@@ -12030,7 +12052,7 @@
         },
         {
           "tag": "FormSheet",
-          "line": 78,
+          "line": 79,
           "component": "components/registration/registration-sheet.tsx#RegistrationSheet"
         },
         {
