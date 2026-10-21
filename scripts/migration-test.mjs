@@ -1,7 +1,7 @@
 import {planCatalogModuleUrl,planAccessModuleUrl} from './data-test-modules.mjs';
 import {prepareHistoricalFixtureOwner} from './fixtures/template-access.mjs';
 import {displayModuleUrl,localeTestModuleUrl} from "./data-test-modules.mjs";
-import {randomUUID} from "node:crypto";
+import {randomUUID,createHmac} from "node:crypto";
 import {PGlite} from '@electric-sql/pglite';
 import {pgcrypto} from '@electric-sql/pglite/contrib/pgcrypto';
 import fs from 'node:fs/promises';
@@ -627,7 +627,8 @@ try{
  const second=await globalThis.__processTransaction(demo,c=>portal.createOfferLink(c,session,issuedVersion,'other@fixture.invalid')),secondToken=new URL(second.url).hash.slice(1);
  await portal.requestOfferCode(secondToken,'accept');
  // Cross-link fixture must use a different numeric code (random codes may coincide).
- if(globalThis.__publicMails.at(-1).text.includes(': '+acceptCode+'.'))await db.query("update offer_recipient_codes set code_hash='synthetic-nonmatching-code' where link_id=$1",[second.link.id]);
+ const differentCode=String((Number(acceptCode)+1)%1000000).padStart(6,'0');
+ await db.query('update offer_recipient_codes set code_hash=$2 where link_id=$1',[second.link.id,createHmac('sha256','synthetic-public-offer-secret').update(second.link.id+'|accept|'+differentCode).digest('hex')]);
  await assert.rejects(()=>portal.respondToOffer(secondToken,response),e=>e.code==='code_invalid','Recipient code cannot authorize another link');
  const accepted=await portal.respondToOffer(token,response);assert.equal(accepted.ok,true);assert.equal((await db.query('select status from quotes where id=$1',[revised.id])).rows[0].status,'accepted');
  assert.equal((await portal.respondToOffer(token,response)).confirmation,'already_recorded');

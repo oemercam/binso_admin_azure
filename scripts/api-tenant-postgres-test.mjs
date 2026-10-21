@@ -96,6 +96,16 @@ try{
  const expense=(await pool.query('select id from expenses where organization_id=$1 order by id limit 1',[organizations[0]])).rows[0];
  const ticket=(await pool.query('select id from support_cases where organization_id=$1 order by id limit 1',[organizations[0]])).rows[0];
  readContracts.push(['/api/projects/'+project.id,projectRoles],['/api/employees/'+employee.id,employeeRoles],['/api/products/'+product.id,projectRoles],['/api/payments/'+payment.id,finance],['/api/support/tickets/'+ticket.id+'/messages',roles]);
+ // Restricted runtime must receive real, narrowly scoped workforce fixtures.
+ const scopedCustomers=(await pool.query("select distinct id from customers where organization_id=$1 and (id=$2 or id in(select customer_id from quotes where id=$3) or id in(select customer_id from projects where id=$4) or id in(select customer_id from expenses where id=$5))",[organizations[0],customer.id,offer.id,project.id,expense.id])).rows;
+ for(const role of ['project_manager','manager','member']){
+  const user='http-0-'+role,staff=(await pool.query('select id from employees where organization_id=$1 and user_id=$2',[organizations[0],user])).rows[0];
+  for(const row of scopedCustomers)await pool.query("insert into workforce_assignments(organization_id,user_id,employee_id,customer_id,starts_on,created_by_user_id) values($1,$2,$3,$4,'2000-01-01','http-0-owner')",[organizations[0],user,staff.id,row.id]);
+  const linkedProject=(await pool.query('select customer_id from projects where id=$1',[project.id])).rows[0];
+  await pool.query("insert into workforce_assignments(organization_id,user_id,employee_id,customer_id,project_id,starts_on,created_by_user_id) values($1,$2,$3,$4,$5,'2000-01-01','http-0-owner')",[organizations[0],user,staff.id,linkedProject.customer_id,project.id]);
+ }
+ const unassigned=(await pool.query("insert into customers(organization_id,external_id,customer_no,name) values($1,'http-unassigned','HTTP-UNASSIGNED','Synthetic unassigned customer') returning id",[organizations[0]])).rows[0];
+ for(const role of ['project_manager','manager','member'])assert.equal((await get('/api/customers/'+unassigned.id,cookies.get('0:'+role))).status,404,role+' cannot read an unassigned customer');
  for(const [path,allowed] of readContracts)for(const role of roles){const r=await get(path,cookies.get('0:'+role));assert.equal(r.status,allowed.includes(role)?200:403,role+' GET '+path+': '+JSON.stringify(r.data));}
  // Workspace access is not accounting access. Keep expectations independent
  // of the production permission helper and verify the actual response content.
