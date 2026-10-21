@@ -82,6 +82,17 @@ try{
  }
  globalThis.fetch=async(path,options)=>{imageKeys.push(options.headers['Idempotency-Key']);return Response.json({item:{id:imageId,scanStatus:'clean',available:true}},{status:201});};assert.equal((await backend.apiUpload('/api/files',form)).item.available,true);assert.equal(new Set(imageKeys).size,1,'Explicit retry keeps the original upload identity');
  console.log('Image upload receipts: explicit availability/verdict/UUID contract before success and preserved retry identity passed.');
+ const mergeContract=await import(moduleUrl(await fs.readFile('lib/customer-merge.ts','utf8'))),mergeSource='0dcd8673-f466-4d52-9a81-a65455d6e986',mergeTarget='fedcedcb-ad50-4941-a078-c322dc471829';
+ const receipt={item:{merged:true,id:mergeTarget,sourceId:mergeSource,contactsMoved:1,activitiesMoved:0}};
+ for(const response of [null,{ok:true},{item:{...receipt.item,sourceId:mergeTarget}},{item:{...receipt.item,contactsMoved:-1}},{item:{...receipt.item,merged:false}}]){
+  const before=imageEvents.dataRevision(['/api/customers']);globalThis.fetch=async()=>Response.json(response);
+  await assert.rejects(backend.apiPost('/api/customers/merge',{}, {validate:value=>{if(!mergeContract.isCustomerMergeReceipt(value,mergeSource,mergeTarget))throw new backend.ClientApiError('Unconfirmed','invalid_response',502);}}),error=>error.code==='invalid_response');
+  assert.equal(imageEvents.dataRevision(['/api/customers']),before,'A malformed merge receipt cannot invalidate data as a successful mutation');
+ }
+ globalThis.fetch=async()=>Response.json(receipt);const mergeRevision=imageEvents.dataRevision(['/api/customers']);
+ assert.deepEqual(await backend.apiPost('/api/customers/merge',{}, {validate:value=>assert.ok(mergeContract.isCustomerMergeReceipt(value,mergeSource,mergeTarget))}),receipt);
+ assert.notEqual(imageEvents.dataRevision(['/api/customers']),mergeRevision,'A verified merge publishes its actual successful mutation');
+ console.log('Customer merge client receipts: exact identities, counts and completed result required before mutation publication.');
  const languagePreference=await import(moduleUrl((await fs.readFile('lib/client/language-preference.ts','utf8')).replace("'./backend'",JSON.stringify(backendUrl))));
  for(const locale of ['de','fr','it','en']){
   for(const response of [null,{ok:true},{item:{language:'unexpected'}},{item:{language:locale+'-CH'}}]){

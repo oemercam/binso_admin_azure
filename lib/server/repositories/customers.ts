@@ -42,8 +42,9 @@ function addressParts(input:Partial<CustomerInput>,current:Record<string,unknown
 const statusToDb=(value:string)=>/inaktiv|inactive/i.test(value)?'inactive':'active';
 export async function listCustomers(session:SessionUser,filters="order=name.asc"){return withTenant(session.organizationId,session.userId,client=>listApiBusiness(client,session,'customers',filters))}
 /** Exact identifiers only; candidate review never exposes another tenant. */
+export function customerIdentity(input:Partial<CustomerInput>){return {uid:(input.uid??'').toUpperCase().replace(/[^A-Z0-9]/g,'').replace(/(MWST|TVA|IVA)$/,''),email:(input.email??'').trim().toLowerCase(),name:(input.name??'').trim().replace(/\s+/g,' ').toLowerCase()};}
 export async function customerDuplicates(client:PoolClient,organizationId:string,input:Partial<CustomerInput>,excludeId=''){
- const uid=(input.uid??'').toUpperCase().replace(/[^A-Z0-9]/g,'').replace(/(MWST|TVA|IVA)$/,''),email=(input.email??'').trim().toLowerCase(),name=(input.name??'').trim().replace(/\s+/g,' ').toLowerCase();
+ const {uid,email,name}=customerIdentity(input);
  if(!uid&&!email&&name.length<2)return [];
  return (await client.query(`select id,customer_no,name,email from customers c where organization_id=$1 and archived_at is null and id::text<>$5 and (
   ($2<>'' and regexp_replace(regexp_replace(upper(coalesce(c.uid,'')),'[^A-Z0-9]','','g'),'(MWST|TVA|IVA)$','')=$2)
@@ -53,7 +54,7 @@ export async function customerDuplicates(client:PoolClient,organizationId:string
 export async function findCustomerDuplicates(session:SessionUser,input:Partial<CustomerInput>,excludeId=''){return withTenant(session.organizationId,session.userId,c=>customerDuplicates(c,session.organizationId,input,excludeId))}
 export async function archivedCustomers(session:SessionUser,query:string,offset:number){
  return withTenant(session.organizationId,session.userId,async c=>{
-  const items=(await c.query("select id,customer_no,name,status,archived_at,updated_at::text revision,count(*) over()::int total from customers where organization_id=$1 and archived_at is not null and ($2='' or name ilike $2 escape '\\' or customer_no ilike $2 escape '\\') order by archived_at desc,id limit 50 offset $3",[session.organizationId,query?'%'+query.replace(/[\\%_]/g,'\\$&')+'%':'',offset])).rows;
+  const items=(await c.query("select c.id,c.customer_no,c.name,c.status,c.archived_at,c.updated_at::text revision,c.merged_into_customer_id,(target.archived_at is not null) merge_target_archived,count(*) over()::int total from customers c left join customers target on target.organization_id=c.organization_id and target.id=c.merged_into_customer_id where c.organization_id=$1 and c.archived_at is not null and ($2='' or c.name ilike $2 escape '\\' or c.customer_no ilike $2 escape '\\') order by c.archived_at desc,c.id limit 50 offset $3",[session.organizationId,query?'%'+query.replace(/[\\%_]/g,'\\$&')+'%':'',offset])).rows;
   const total=items.length?Number(items[0].total):Number((await c.query("select count(*)::int total from customers where organization_id=$1 and archived_at is not null and ($2='' or name ilike $2 escape '\\' or customer_no ilike $2 escape '\\')",[session.organizationId,query?'%'+query.replace(/[\\%_]/g,'\\$&')+'%':''])).rows[0].total);
   return {items:items.map(({total:_total,...row})=>row),total};
  });
@@ -64,6 +65,7 @@ export async function restoreCustomer(session:SessionUser,id:string,revision:str
   await c.query('select pg_advisory_xact_lock(hashtextextended($1,0))',[session.organizationId+':customer-create']);
   const current=(await c.query('select *,updated_at::text revision from customers where organization_id=$1 and id::text=$2 for update',[session.organizationId,id])).rows[0];
   if(!current)throw new ApiError(404,'not_found','Kunde wurde nicht gefunden.');
+  if(current.merged_into_customer_id)throw new ApiError(409,'customer_merged','Dieser Kunde wurde zusammengeführt. Bitte den Zielkunden verwenden.');
   if(!current.archived_at)return {id:current.id,restored:false};
   if(current.revision!==revision)throw new ApiError(409,'customer_changed','Der Kunde wurde geändert. Bitte die Ansicht aktualisieren.');
   if((await customerDuplicates(c,session.organizationId,current,id)).length)throw new ApiError(409,'customer_duplicate','Eine mögliche Dublette ist vorhanden. Bitte die Kundendaten zuerst prüfen.');

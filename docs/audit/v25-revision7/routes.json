@@ -71,6 +71,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -392,6 +393,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -722,6 +724,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -1068,6 +1071,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -1375,6 +1379,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -1772,6 +1777,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -2034,6 +2040,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -2272,6 +2279,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -2873,6 +2881,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -3432,6 +3441,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -3661,6 +3671,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -3854,6 +3865,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -3999,6 +4011,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -4163,6 +4176,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -4424,6 +4438,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -4658,6 +4673,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -4942,6 +4958,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -5189,6 +5206,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -5452,6 +5470,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -5715,6 +5734,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -5981,6 +6001,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -6233,6 +6254,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -6510,6 +6532,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -6760,6 +6783,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -7041,6 +7065,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -7288,6 +7313,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -7637,6 +7663,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -8145,6 +8172,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -8374,6 +8402,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -8477,7 +8506,7 @@
       "apiSources": [
         {
           "owner": "components/pages/customers.tsx",
-          "line": 177,
+          "line": 178,
           "apis": [
             "/api/customers/",
             "/api/customers/duplicates?",
@@ -8526,6 +8555,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -8884,6 +8914,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -8992,10 +9023,29 @@
         },
         {
           "owner": "components/customer-data-actions.tsx",
-          "line": 14,
+          "line": 15,
           "apis": [
             "/api/customers/archive?",
             "/api/customers/archive"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "components/customer-merge.tsx",
+          "line": 13,
+          "apis": [
+            "/api/customers/merge",
+            "/api/customers"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/directory-query.ts",
+          "line": 2,
+          "apis": [
+            "/api/projects"
           ],
           "collections": [],
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
@@ -9117,7 +9167,7 @@
       "apiSources": [
         {
           "owner": "components/pages/customers.tsx",
-          "line": 177,
+          "line": 178,
           "apis": [
             "/api/customers/",
             "/api/customers/duplicates?",
@@ -9166,6 +9216,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -9379,7 +9430,7 @@
       "metricSources": [
         {
           "owner": "components/pages/customers.tsx",
-          "line": 157,
+          "line": 158,
           "component": "MetricTile",
           "props": [
             "label={<><LocalizedText>{\"Fakturiert\"}</LocalizedText> {businessDate().slice(0,4)}</>}",
@@ -9389,7 +9440,8 @@
           ],
           "conditions": [
             "['overview','contacts','finances','activity'].includes(requestedTab??'')",
-            "workspace.data",
+            "workspace.data?.contacts",
+            "target&&/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(target)&&target!==customerId",
             "contact",
             "contactBusy.current",
             "item.id===payload.item.id",
@@ -9433,7 +9485,7 @@
         },
         {
           "owner": "components/pages/customers.tsx",
-          "line": 157,
+          "line": 158,
           "component": "MetricTile",
           "props": [
             "label=\"Offen\"",
@@ -9443,7 +9495,8 @@
           ],
           "conditions": [
             "['overview','contacts','finances','activity'].includes(requestedTab??'')",
-            "workspace.data",
+            "workspace.data?.contacts",
+            "target&&/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(target)&&target!==customerId",
             "contact",
             "contactBusy.current",
             "item.id===payload.item.id",
@@ -9487,7 +9540,7 @@
         },
         {
           "owner": "components/pages/customers.tsx",
-          "line": 164,
+          "line": 165,
           "component": "Statistics",
           "props": [
             "hideHeading",
@@ -9503,7 +9556,8 @@
           ],
           "conditions": [
             "['overview','contacts','finances','activity'].includes(requestedTab??'')",
-            "workspace.data",
+            "workspace.data?.contacts",
+            "target&&/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(target)&&target!==customerId",
             "contact",
             "contactBusy.current",
             "item.id===payload.item.id",
@@ -9724,6 +9778,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -9832,7 +9887,7 @@
         },
         {
           "owner": "components/pages/customers.tsx",
-          "line": 287,
+          "line": 288,
           "apis": [
             "/api/documents?"
           ],
@@ -10013,6 +10068,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -10177,6 +10233,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -10451,6 +10508,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -10716,6 +10774,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -10967,6 +11026,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -11621,6 +11681,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -12058,6 +12119,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -12654,6 +12716,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -12949,6 +13012,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -13085,6 +13149,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -13221,6 +13286,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -13537,6 +13603,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -13853,6 +13920,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -14005,6 +14073,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -14257,6 +14326,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -14520,6 +14590,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -14783,6 +14854,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -15044,6 +15116,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -15370,6 +15443,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -15716,6 +15790,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -16046,6 +16121,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -16392,6 +16468,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -16720,6 +16797,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -16878,6 +16956,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -17139,6 +17218,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -17408,6 +17488,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -17670,6 +17751,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -17940,6 +18022,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -18177,6 +18260,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -18433,6 +18517,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -18551,6 +18636,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -18817,6 +18903,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -19078,6 +19165,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -19339,6 +19427,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -19609,6 +19698,7 @@
           "owner": "lib/client/backend.ts",
           "line": 79,
           "apis": [
+            "/api/customers/merge",
             "/api/settings/team",
             "/api/auth/"
           ],
@@ -20794,6 +20884,7 @@
     "components/customer-app-layout.tsx",
     "components/customer-data-actions.tsx",
     "components/customer-import.tsx",
+    "components/customer-merge.tsx",
     "components/desktop-navigation.tsx",
     "components/directory-select.tsx",
     "components/document-list.tsx",
@@ -20887,6 +20978,7 @@
     "app/api/customers/archive/route.ts",
     "app/api/customers/duplicates/route.ts",
     "app/api/customers/import/route.ts",
+    "app/api/customers/merge/route.ts",
     "app/api/customers/route.ts",
     "app/api/customers/[id]/activity/route.ts",
     "app/api/customers/[id]/contacts/route.ts",
@@ -21058,6 +21150,7 @@
     "database/migrations/0071_operator_language_preference.sql",
     "database/migrations/0072_report_export_snapshots.sql",
     "database/migrations/0073_report_mail_outbox.sql",
-    "database/migrations/0074_report_recipient_shares.sql"
+    "database/migrations/0074_report_recipient_shares.sql",
+    "database/migrations/0075_controlled_customer_duplicates.sql"
   ]
 }

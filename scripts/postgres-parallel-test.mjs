@@ -42,6 +42,11 @@ try{
  // Six physical clients retry the same customer request; the counter advances once.
  const customerRepository=await import(await compile('lib/server/repositories/customers.ts',{'@/lib/server/db':scopedDb,'@/lib/server/audit':audit,'@/lib/server/http':http,'../business-idempotency':replay,'./business-api':businessModule}));
  const customerCounter=async()=>Number((await pool.query("select next_value from business_document_counters where organization_id=$1 and kind='customer' and period=''",[organizationId])).rows[0]?.next_value??1);
+ const mergeDto=moduleUrl(await fs.readFile('lib/customer-merge.ts','utf8'));
+ const mergeFresh=await compile('lib/server/fresh-authentication.ts',{'./db':scopedDb,'./http':http});
+ const mergeCustomers=await compile('lib/server/repositories/customers.ts',{'@/lib/server/db':scopedDb,'@/lib/server/audit':audit,'@/lib/server/http':http,'../business-idempotency':replay,'./business-api':businessModule});
+ const mergeService=await import(await compile('lib/server/repositories/customer-merge.ts',{'../db':scopedDb,'../http':http,'../rbac':rbac,'../audit':audit,'../fresh-authentication':mergeFresh,'../business-idempotency':replay,'./customers':mergeCustomers,'@/lib/permissions':permissions,'@/lib/customer-merge':mergeDto}));
+ await (await import('./customer-merge-concurrency-contract.mjs')).verifyCustomerMergeConcurrency({pool,service:mergeService,session});
  const beforeCustomers=await customerCounter();
  const sameCustomers=await Promise.all(Array.from({length:6},()=>customerRepository.createCustomer(organizationId,session.userId,{contactFirstName:"Synthetic",contactLastName:"Contact",name:'Synthetic parallel minimal customer'},'parallel-customer-replay')));
  assert.equal(new Set(sameCustomers.map(row=>row.id)).size,1);assert.equal(new Set(sameCustomers.map(row=>row.customer_no)).size,1);assert.equal(await customerCounter(),beforeCustomers+1);assert.equal((await pool.query('select count(*)::int n from customers where organization_id=$1 and name=$2',[organizationId,'Synthetic parallel minimal customer'])).rows[0].n,1);

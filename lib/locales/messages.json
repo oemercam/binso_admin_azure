@@ -14203,5 +14203,215 @@
     "No VAT records in this period",
     "Aucune pièce TVA sur cette période",
     "Nessun documento IVA nel periodo"
+  ],
+  "Kundendubletten zusammenführen": [
+    "Merge duplicate customers",
+    "Fusionner les clients en double",
+    "Unisci clienti duplicati"
+  ],
+  "Dubletten zusammenführen": [
+    "Merge duplicates",
+    "Fusionner les doublons",
+    "Unisci duplicati"
+  ],
+  "Nur noch nicht geschäftlich verwendete Dubletten. Bestehende Zieldaten bleiben erhalten; fehlende Angaben werden ergänzt.": [
+    "Only duplicates not yet used in business records. Existing target data is preserved; missing details are filled in.",
+    "Uniquement les doublons sans utilisation commerciale. Les données existantes du client cible sont conservées ; les informations manquantes sont complétées.",
+    "Solo duplicati non ancora utilizzati nei documenti aziendali. I dati esistenti del cliente di destinazione vengono conservati; quelli mancanti vengono completati."
+  ],
+  "Dublette": [
+    "Duplicate",
+    "Doublon",
+    "Duplicato"
+  ],
+  "Zielkunde": [
+    "Target customer",
+    "Client cible",
+    "Cliente di destinazione"
+  ],
+  "Kontakte übernehmen": [
+    "Transfer contacts",
+    "Transférer les contacts",
+    "Trasferisci contatti"
+  ],
+  "Aktivitäten übernehmen": [
+    "Transfer activities",
+    "Transférer les activités",
+    "Trasferisci attività"
+  ],
+  "Wird ergänzt": [
+    "Will be filled in",
+    "Sera complété",
+    "Verrà completato"
+  ],
+  "Wert der Dublette bleibt im Archiv": [
+    "Duplicate value is retained in the archive",
+    "La valeur du doublon reste dans les archives",
+    "Il valore del duplicato resta in archivio"
+  ],
+  "Keine geschützten Verknüpfungen gefunden": [
+    "No protected links found",
+    "Aucun lien protégé trouvé",
+    "Nessun collegamento protetto trovato"
+  ],
+  "Kontakte und Aktivitäten werden übernommen. Die Dublette bleibt mit ihren ursprünglichen Angaben im Archiv und kann nicht einzeln wiederhergestellt werden. Geschäftliche Belege und Berechtigungen werden nicht verschoben.": [
+    "Contacts and activities are transferred. The duplicate remains archived with its original details and cannot be restored separately. Business documents and permissions are not transferred.",
+    "Les contacts et activités sont transférés. Le doublon reste archivé avec ses données originales et ne peut pas être restauré séparément. Les pièces commerciales et autorisations ne sont pas déplacées.",
+    "Contatti e attività vengono trasferiti. Il duplicato resta archiviato con i dati originali e non può essere ripristinato separatamente. Documenti aziendali e autorizzazioni non vengono trasferiti."
+  ],
+  "Ich bestätige, dass beide Datensätze denselben Kunden betreffen.": [
+    "I confirm that both records refer to the same customer.",
+    "Je confirme que les deux fiches concernent le même client.",
+    "Confermo che entrambi i record riguardano lo stesso cliente."
+  ],
+  "Diese Dublette kann nicht direkt zusammengeführt werden.": [
+    "This duplicate cannot be merged directly.",
+    "Ce doublon ne peut pas être fusionné directement.",
+    "Questo duplicato non può essere unito direttamente."
+  ],
+  "Bei unklarer Antwort zuerst den Status prüfen. Abbrechen setzt keinen abgeschlossenen Vorgang zurück.": [
+    "If the response is unclear, check the status first. Cancelling does not undo a completed operation.",
+    "Si la réponse est incertaine, vérifiez d’abord le statut. Annuler ne révoque pas une opération terminée.",
+    "Se la risposta è incerta, verifica prima lo stato. L’annullamento non ripristina un’operazione completata."
+  ],
+  "Erneut bestätigen": [
+    "Confirm again",
+    "Confirmer à nouveau",
+    "Conferma di nuovo"
+  ],
+  "Zusammenführen": [
+    "Merge",
+    "Fusionner",
+    "Unisci"
+  ],
+  "Zusammengeführt": [
+    "Merged",
+    "Fusionné",
+    "Unito"
+  ],
+  "Zielkunde archiviert": [
+    "Target customer archived",
+    "Client cible archivé",
+    "Cliente di destinazione archiviato"
+  ],
+  "Zielkunde ansehen": [
+    "View target customer",
+    "Voir le client cible",
+    "Visualizza cliente di destinazione"
+  ],
+  "Dieser Vorgang wurde abgebrochen.": [
+    "This operation was cancelled.",
+    "Cette opération a été annulée.",
+    "Questa operazione è stata annullata."
+  ],
+  "Noch kein gespeichertes Ergebnis. Eine erneute Bestätigung verwendet denselben Vorgang.": [
+    "No saved result yet. Confirming again uses the same operation.",
+    "Aucun résultat enregistré pour le moment. Une nouvelle confirmation utilise la même opération.",
+    "Nessun risultato ancora salvato. Una nuova conferma utilizza la stessa operazione."
+  ],
+  "Der Vorgang läuft noch. Bitte den Status später erneut prüfen.": [
+    "The operation is still running. Please check its status again later.",
+    "L’opération est toujours en cours. Vérifiez à nouveau son statut plus tard.",
+    "L’operazione è ancora in corso. Verifica nuovamente lo stato più tardi."
+  ],
+  "Der Vorgang konnte nicht bestätigt werden. Bitte den Status prüfen.": [
+    "The operation could not be confirmed. Please check its status.",
+    "L’opération n’a pas pu être confirmée. Vérifiez son statut.",
+    "Non è stato possibile confermare l’operazione. Verifica lo stato."
+  ],
+  "Die Kundenidentitäten stimmen nicht überein.": [
+    "The customer identities do not match.",
+    "Les identités des clients ne correspondent pas.",
+    "Le identità dei clienti non corrispondono."
+  ],
+  "Keine übereinstimmende Kundenidentität gefunden.": [
+    "No matching customer identity found.",
+    "Aucune identité client correspondante trouvée.",
+    "Nessuna identità cliente corrispondente trovata."
+  ],
+  "Die Herkunft dieses Datensatzes muss zuerst geprüft werden.": [
+    "The origin of this record must be reviewed first.",
+    "L’origine de cette fiche doit d’abord être vérifiée.",
+    "È necessario verificare prima l’origine di questo record."
+  ],
+  "Eine Verknüpfung kann nicht sicher geprüft werden.": [
+    "A link cannot be checked safely.",
+    "Un lien ne peut pas être vérifié de façon sûre.",
+    "Un collegamento non può essere verificato in sicurezza."
+  ],
+  "Weitere Verknüpfungen": [
+    "Other links",
+    "Autres liens",
+    "Altri collegamenti"
+  ],
+  "Bereits zusammengeführte Datensätze": [
+    "Previously merged records",
+    "Fiches déjà fusionnées",
+    "Record già uniti"
+  ],
+  "Dieser Vorgang ist für die direkte Zusammenführung zu gross.": [
+    "This operation is too large for direct merging.",
+    "Cette opération est trop volumineuse pour une fusion directe.",
+    "Questa operazione è troppo grande per l’unione diretta."
+  ],
+  "Bitte zwei unterschiedliche Kunden wählen.": [
+    "Please select two different customers.",
+    "Veuillez sélectionner deux clients différents.",
+    "Seleziona due clienti diversi."
+  ],
+  "Bitte zwei aktuelle, nicht zusammengeführte Kunden wählen.": [
+    "Please select two current customers that have not been merged.",
+    "Veuillez sélectionner deux clients actuels non fusionnés.",
+    "Seleziona due clienti attuali non ancora uniti."
+  ],
+  "Die Kunden oder Kontakte wurden geändert. Bitte die Vorschau erneut prüfen.": [
+    "Customers or contacts have changed. Please review the preview again.",
+    "Les clients ou contacts ont été modifiés. Vérifiez à nouveau l’aperçu.",
+    "I clienti o i contatti sono cambiati. Verifica nuovamente l’anteprima."
+  ],
+  "Geschäftlich verwendete oder nicht eindeutig zugeordnete Kunden werden nicht zusammengeführt.": [
+    "Customers used in business records or without a clear identity are not merged.",
+    "Les clients utilisés commercialement ou sans identité certaine ne sont pas fusionnés.",
+    "I clienti utilizzati nei documenti aziendali o non identificati con certezza non vengono uniti."
+  ],
+  "Der gespeicherte Vorgang konnte nicht bestätigt werden.": [
+    "The saved operation could not be confirmed.",
+    "L’opération enregistrée n’a pas pu être confirmée.",
+    "Non è stato possibile confermare l’operazione salvata."
+  ],
+  "Status prüfen": [
+    "Check status",
+    "Vérifier le statut",
+    "Verifica stato"
+  ],
+  "Dieser Kunde wurde zusammengeführt. Bitte den Zielkunden verwenden.": [
+    "This customer was merged. Please use the retained customer.",
+    "Ce client a été fusionné. Veuillez utiliser le client cible.",
+    "Questo cliente è stato unito. Utilizza il cliente di destinazione."
+  ],
+  "Bitte die Kundenauswahl prüfen.": [
+    "Please check the customer selection.",
+    "Veuillez vérifier la sélection des clients.",
+    "Verifica la selezione dei clienti."
+  ],
+  "Ungültige Vorgangskennung.": [
+    "Invalid operation identifier.",
+    "Identifiant d’opération non valide.",
+    "Identificativo operazione non valido."
+  ],
+  "Bitte zwei gültige Kunden wählen.": [
+    "Please select two valid customers.",
+    "Veuillez sélectionner deux clients valides.",
+    "Seleziona due clienti validi."
+  ],
+  "Bitte die Kundenauswahl erneut prüfen.": [
+    "Please check the customer selection again.",
+    "Veuillez vérifier à nouveau la sélection des clients.",
+    "Verifica nuovamente la selezione dei clienti."
+  ],
+  "Die geprüfte Vorschau muss ausdrücklich bestätigt werden.": [
+    "The reviewed preview requires explicit confirmation.",
+    "L’aperçu vérifié doit être confirmé explicitement.",
+    "L’anteprima verificata deve essere confermata esplicitamente."
   ]
 }

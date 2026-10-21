@@ -131,6 +131,7 @@ try{
 // Collect every failure, then fail the lane; no omitted or synthetic-green proof.
 await runIndependentChecks([
  ['customer-import-browser-test.mjs','BINSO_IMPORT_OUTPUT','imports'],
+ ['customer-merge-browser-test.mjs','BINSO_MERGE_OUTPUT','merges'],
  ['system-state-browser-test.mjs','BINSO_SYSTEM_STATE_OUTPUT','system-states'],
  ['report-summary-browser-test.mjs','BINSO_REPORT_OUTPUT','reports'],
 ].map(([script,variable,directory])=>({name:script,run:()=>new Promise((resolve,reject)=>{

@@ -422,6 +422,20 @@
       "test": "Draft-Regressionen für4 Sprachen, Quellen-/Benutzer-/Mandanten-/Rollenisolation, Wiedereinlesen/Schritt/Replay, Migration/TTL/Quota/Verwerfen und echten Session-Fence bestanden. Browserfall erzwingt Sprach-Query vor Reload; aktueller CI-Nachweis ausstehend.",
       "visualComparison": "Keine Darstellungsänderung. Aktuelle tatsächliche Browser-Wiederherstellung noch nicht bestätigt.",
       "blocker": "Vollständige sensible-Daten-/Geräte-/Abbruchabnahme und aktuelle Browserqualifikation ausstehend."
+    },
+    "R7-32-002": {
+      "implementation": "Dublettenwarnung und Archiv/Wiederherstellung vorhanden; explizite Vorschau und transaktionale Owner/Admin-Zusammenführung bislang unbenutzter Dubletten. Historische Belege und Zuordnungen blockieren.",
+      "sourceTextSha256": "996667cf7f2caa947b8f89ef2672d08158051f4287d0a2663e8a7269b59f0e1a",
+      "blocker": "Keine Gesamtabnahme; vollständige Browser-/Parallel-/Geräteprüfung und Integration offen. Geschäftlich verwendete Kunden bleiben kontrolliert gesperrt.",
+      "sourceReferences": [
+        "components/customer-merge.tsx",
+        "lib/server/repositories/customer-merge.ts",
+        "database/migrations/0075_controlled_customer_duplicates.sql",
+        "docs/audit/v25-revision7/customer-consolidation.md"
+      ],
+      "status": "teilweise_implementiert",
+      "test": "Migrationstest mit tatsächlichem Repository/API und binso_runtime-RLS sowie Client-Quittungsprüfung bestanden; physische Parallel- und Browserprüfungen für CI vorbereitet, noch nicht ausgeführt.",
+      "visualComparison": "Gemeinsame vorhandene Komponenten verwendet; aktuelle gerenderte Abnahme offen."
     }
   },
   "tests": {

@@ -64,7 +64,7 @@ export function CustomersPage() {
 export function CustomerDetail({customerId="acme"}:{customerId?:string}) {
 
   const access=usePageAccess();
-  const workspace=useApiQuery<{item:Record<string,unknown>;contacts:Array<Record<string,unknown>>;documents:Array<Record<string,unknown>>;openInvoices?:Array<Record<string,unknown>>;summary:FinancialSummary;capabilities?:{invoices:boolean;offers:boolean};projects?:Array<{id:string;name:string;status:string;total_count:number}>|null;payments?:Array<{id:string;paid_on:string;amount:number;currency:string;invoice_number:string;status:string;total_count:number}>|null;activity:Array<{at:string;title:string;detail:string}>;statistics:Array<{currency:string;date:string;paid:unknown;billed:unknown;invoice_count:unknown}>|null}>("/api/customers/"+encodeURIComponent(customerId)+"?include=workspace");
+  const workspace=useApiQuery<{redirectTo?:string;item?:Record<string,unknown>;contacts?:Array<Record<string,unknown>>;documents:Array<Record<string,unknown>>;openInvoices?:Array<Record<string,unknown>>;summary:FinancialSummary;capabilities?:{invoices:boolean;offers:boolean};projects?:Array<{id:string;name:string;status:string;total_count:number}>|null;payments?:Array<{id:string;paid_on:string;amount:number;currency:string;invoice_number:string;status:string;total_count:number}>|null;activity:Array<{at:string;title:string;detail:string}>;statistics:Array<{currency:string;date:string;paid:unknown;billed:unknown;invoice_count:unknown}>|null}>("/api/customers/"+encodeURIComponent(customerId)+"?include=workspace");
   const searchParams=useSearchParams();
   const requestedReturnTo=searchParams.get("returnTo");
   const returnTo=safeAppPath(requestedReturnTo,"/kunden");
@@ -98,7 +98,8 @@ export function CustomerDetail({customerId="acme"}:{customerId?:string}) {
   const [contactPhone,setContactPhone]=useState("");
   const [contactRole,setContactRole]=useState("");
 
-  useEffect(()=>{if(workspace.data)queueMicrotask(()=>setContacts(workspace.data!.contacts));},[workspace.data]);
+  useEffect(()=>{if(workspace.data?.contacts)queueMicrotask(()=>setContacts(workspace.data!.contacts!));},[workspace.data]);
+  useEffect(()=>{const target=workspace.data?.redirectTo;if(target&&/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(target)&&target!==customerId)router.replace('/kunden/'+encodeURIComponent(target)+'?'+searchParams.toString(),{scroll:false});},[workspace.data?.redirectTo,customerId,router,searchParams]);
 
   const openContact=(contact?:Record<string,unknown>)=>{
     setContactId(contact?String(contact.id):null);

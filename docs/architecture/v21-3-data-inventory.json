@@ -2,10 +2,10 @@
   "scope": "Static AST/source inventory, not proof that every runtime branch is tested. Calls include exact source arguments and locations; dynamic dispatch requires the domain matrix and runtime tests.",
   "base": "7b90a5c7353cf2061987fcd0f4550210bbc00f92",
   "counts": {
-    "apis": 120,
-    "consumers": 44,
-    "migrations": 75,
-    "tables": 109
+    "apis": 121,
+    "consumers": 45,
+    "migrations": 76,
+    "tables": 110
   },
   "apis": [
     {
@@ -1549,6 +1549,49 @@
             "s.organizationId",
             "s.userId",
             "c=>commitCustomerImport(c,s,target,rows,customerId,request.headers.get('idempotency-key')??'')"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "app/api/customers/merge/route.ts",
+      "path": "/api/customers/merge",
+      "methods": [
+        "POST"
+      ],
+      "dependencies": [
+        "lib/server/session.ts",
+        "lib/server/maintenance.ts",
+        "lib/server/env.ts",
+        "lib/server/db.ts",
+        "lib/server/http.ts",
+        "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
+        "lib/server/plan-access.ts",
+        "lib/server/rate-limit.ts",
+        "lib/server/repositories/customer-merge.ts",
+        "lib/server/rbac.ts",
+        "lib/permissions.ts",
+        "lib/server/audit.ts",
+        "lib/server/business-idempotency.ts",
+        "lib/server/repositories/customers.ts",
+        "lib/server/repositories/business-api.ts",
+        "lib/server/document-amount-sql.ts",
+        "lib/financial-status.ts",
+        "lib/money.ts",
+        "lib/customer-merge.ts"
+      ],
+      "evidence": [
+        {
+          "callee": "requireSession",
+          "line": 9,
+          "arguments": []
+        },
+        {
+          "callee": "authorizeCustomerMergeReview",
+          "line": 9,
+          "arguments": [
+            "s"
           ]
         }
       ]
@@ -7328,14 +7371,14 @@
       "calls": [
         {
           "callee": "useApiQuery",
-          "line": 16,
+          "line": 17,
           "arguments": [
             "'/api/customers/archive?'+new URLSearchParams({q:query,offset:String(page*50)})"
           ]
         },
         {
           "callee": "apiPost",
-          "line": 17,
+          "line": 18,
           "arguments": [
             "'/api/customers/archive'",
             "{id:selected.id,revision:selected.revision}"
@@ -7370,6 +7413,35 @@
       ]
     },
     {
+      "file": "components/customer-merge.tsx",
+      "calls": [
+        {
+          "callee": "apiPost",
+          "line": 33,
+          "arguments": [
+            "'/api/customers/merge'",
+            "{action:'commit',sourceId:next.sourceId,targetId:next.targetId,revision:next.revision,confirmed:true}",
+            "{idempotencyKey:next.key,validate:value=>{if(isCustomerMergeCancellation(value,next.sourceId,next.targetId))throw new ClientApiError('Dieser Vorgang wurde abgebrochen.','merge_cancelled',409);if(!isCustomerMergeReceipt(value,next.sourceId,next.targetId))throw invalid();}}"
+          ]
+        },
+        {
+          "callee": "apiPost",
+          "line": 47,
+          "arguments": [
+            "'/api/customers/merge'",
+            "{action:'cancel',sourceId:intent.sourceId,targetId:intent.targetId,revision:intent.revision}",
+            "{idempotencyKey:intent.key,validate:value=>{if(!isCustomerMergeReceipt(value,intent.sourceId,intent.targetId)&&!isCustomerMergeCancellation(value,intent.sourceId,intent.targetId))throw invalid();}}"
+          ]
+        }
+      ],
+      "pages": [
+        "app/kunden/[id]/bearbeiten/page.tsx",
+        "app/kunden/[id]/page.tsx",
+        "app/kunden/neu/page.tsx",
+        "app/kunden/page.tsx"
+      ]
+    },
+    {
       "file": "components/directory-select.tsx",
       "calls": [
         {
@@ -7391,6 +7463,10 @@
         "app/angebote/[id]/page.tsx",
         "app/angebote/neu/page.tsx",
         "app/einstellungen/team/page.tsx",
+        "app/kunden/[id]/bearbeiten/page.tsx",
+        "app/kunden/[id]/page.tsx",
+        "app/kunden/neu/page.tsx",
+        "app/kunden/page.tsx",
         "app/rechnungen/[id]/page.tsx",
         "app/rechnungen/neu/page.tsx",
         "app/spesen/[id]/page.tsx",
@@ -7973,7 +8049,7 @@
         },
         {
           "callee": "apiPatch",
-          "line": 112,
+          "line": 113,
           "arguments": [
             "\"/api/customers/\"+encodeURIComponent(customerId)+\"/contacts/\"+encodeURIComponent(String(contact.id))",
             "{firstName:contact.first_name,lastName:contact.last_name,email:contact.email??'',phone:contact.phone??'',jobTitle:contact.job_title??'',isPrimary:true}"
@@ -7981,28 +8057,28 @@
         },
         {
           "callee": "apiDelete",
-          "line": 118,
+          "line": 119,
           "arguments": [
             "\"/api/customers/\"+encodeURIComponent(customerId)+\"/contacts/\"+encodeURIComponent(removeContact)"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 199,
+          "line": 200,
           "arguments": [
             "customerId?\"/api/customers/\"+encodeURIComponent(customerId):null"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 216,
+          "line": 217,
           "arguments": [
             "!customerId&&customerName.trim().length>=2&&duplicateQuery?'/api/customers/duplicates?'+duplicateQuery:null"
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 239,
+          "line": 240,
           "arguments": [
             "\"/api/customers/\"+encodeURIComponent(customerId)",
             "body"
@@ -8010,7 +8086,7 @@
         },
         {
           "callee": "apiPost",
-          "line": 239,
+          "line": 240,
           "arguments": [
             "\"/api/customers\"",
             "body",
@@ -8019,7 +8095,7 @@
         },
         {
           "callee": "useApiQuery",
-          "line": 295,
+          "line": 296,
           "arguments": [
             "hasDocuments?'/api/documents?'+params:null"
           ]
@@ -11162,6 +11238,40 @@
         }
       ],
       "rls": []
+    },
+    {
+      "file": "database/migrations/0075_controlled_customer_duplicates.sql",
+      "tables": [
+        "customer_merges"
+      ],
+      "relations": [
+        {
+          "table": "customers",
+          "columns": "organization_id,id"
+        },
+        {
+          "table": "organizations",
+          "columns": "id"
+        },
+        {
+          "table": "customers",
+          "columns": "organization_id,id"
+        },
+        {
+          "table": "customers",
+          "columns": "organization_id,id"
+        }
+      ],
+      "rls": [
+        {
+          "table": "customer_merges",
+          "mode": "enable"
+        },
+        {
+          "table": "customer_merges",
+          "mode": "force"
+        }
+      ]
     }
   ],
   "repositories": [
@@ -11564,6 +11674,239 @@
       ]
     },
     {
+      "file": "lib/server/repositories/customer-merge.ts",
+      "imports": [
+        "lib/server/session.ts",
+        "lib/server/db.ts",
+        "lib/server/rbac.ts",
+        "lib/permissions.ts",
+        "lib/server/http.ts",
+        "lib/server/audit.ts",
+        "lib/server/fresh-authentication.ts",
+        "lib/server/business-idempotency.ts",
+        "lib/server/repositories/customers.ts",
+        "lib/customer-merge.ts"
+      ],
+      "methods": [],
+      "calls": [
+        {
+          "callee": "authorize",
+          "line": 20,
+          "arguments": [
+            "s",
+            "'customers:read'"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 25,
+          "arguments": [
+            "'select * from customers where organization_id=$1 and id=any($2::uuid[]) order by id'+(lock?' for update':'')",
+            "[s.organizationId,[sourceId,targetId]]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 33,
+          "arguments": [
+            "`select distinct t.relname table_name,a.attname column_name,exists(select 1 from pg_attribute scope where scope.attrelid=t.oid and scope.attname='organization_id' and not scope.attisdropped) scoped from pg_constraint f join pg_class t on t.oid=f.conrelid join pg_namespace n on n.oid=t.relnamespace join lateral unnest(f.conkey,f.confkey) k(local_key,foreign_key) on true join pg_attribute a on a.attrelid=t.oid and a.attnum=k.local_key join pg_attribute parent on parent.attrelid=f.confrelid and parent.attnum=k.foreign_key where f.contype='f' and f.confrelid='public.customers'::regclass and parent.attname='id' and n.nspname='public' order by table_name,column_name`"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 38,
+          "arguments": [
+            "`select exists(select 1 from public.${identifier(ref.table_name)} where organization_id=$1 and ${identifier(ref.column_name)}=$2) used`",
+            "[s.organizationId,sourceId]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 43,
+          "arguments": [
+            "`select t.relname table_name,a.attname column_name from pg_class t join pg_namespace n on n.oid=t.relnamespace join pg_attribute a on a.attrelid=t.oid where n.nspname='public' and t.relkind='r' and not a.attisdropped and a.attname in ('entity_external_id','related_entity_external_id','source_external_id') and exists(select 1 from pg_attribute scope where scope.attrelid=t.oid and scope.attname='organization_id' and not scope.attisdropped) order by table_name,column_name`"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 44,
+          "arguments": [
+            "`select exists(select 1 from public.${identifier(ref.table_name)} where organization_id=$1 and ${identifier(ref.column_name)}=$2) used`",
+            "[s.organizationId,sourceId]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 45,
+          "arguments": [
+            "'select * from customer_contacts where organization_id=$1 and customer_id=any($2::uuid[]) order by id limit 1001'+(lock?' for update':'')",
+            "[s.organizationId,[sourceId,targetId]]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 46,
+          "arguments": [
+            "'select * from customer_activities where organization_id=$1 and customer_id=$2 order by id limit 1001'+(lock?' for update':'')",
+            "[s.organizationId,sourceId]"
+          ]
+        },
+        {
+          "callee": "authorizeCustomerMergeReview",
+          "line": 53,
+          "arguments": [
+            "s"
+          ]
+        },
+        {
+          "callee": "withTenant",
+          "line": 53,
+          "arguments": [
+            "s.organizationId",
+            "s.userId",
+            "async c=>(await inspect(c,s,sourceId,targetId)).preview",
+            "{snapshot:true}"
+          ]
+        },
+        {
+          "callee": "authorizeCustomerMergeReview",
+          "line": 55,
+          "arguments": [
+            "s"
+          ]
+        },
+        {
+          "callee": "authorize",
+          "line": 55,
+          "arguments": [
+            "s",
+            "'customers:delete'"
+          ]
+        },
+        {
+          "callee": "authorize",
+          "line": 55,
+          "arguments": [
+            "s",
+            "'customers:write'"
+          ]
+        },
+        {
+          "callee": "withTenant",
+          "line": 56,
+          "arguments": [
+            "s.organizationId",
+            "s.userId",
+            "async c=>{\n  await requireFreshAuthentication(s,c);\n  const result=await idempotentBusiness<CustomerMergeReceipt|CustomerMergeCancellation>(c,{organizationId:s.organizationId,userId:s.userId,operation:'customer.merge',key,body:{sourceId,targetId,revision}},async()=>{\n   await c.query('select pg_advisory_xact_lock(hashtextextended($1,0))',[s.organizationId+':customer-create']);\n   const {preview,source,contacts}=await inspect(c,s,sourceId,targetId,true);\n   if(preview.revision!==revision)throw new ApiError(409,'customer_changed','Die Kunden oder Kontakte wurden geändert. Bitte die Vorschau erneut prüfen.');\n   if(!preview.eligible)throw new ApiError(409,'customer_merge_blocked','Geschäftlich verwendete oder nicht eindeutig zugeordnete Kunden werden nicht zusammengeführt.');\n   const fill=preview.changes.filter(item=>item.mode==='fill');\n   if(fill.length)await c.query('update customers set '+fill.map((item,index)=>identifier(item.field)+'=$'+(index+3)).join(',')+',updated_at=now() where organization_id=$1 and id=$2',[s.organizationId,targetId,...fill.map(item=>source[item.field])]);\n   if(contacts.some(row=>row.customer_id===targetId&&row.is_primary&&!row.archived_at))await c.query('update customer_contacts set is_primary=false,updated_at=now() where organization_id=$1 and customer_id=$2 and is_primary',[s.organizationId,sourceId]);\n   const movedContacts=await c.query('update customer_contacts set customer_id=$2,updated_at=now() where organization_id=$1 and customer_id=$3 returning id',[s.organizationId,targetId,sourceId]);\n   const movedActivities=await c.query('update customer_activities set customer_id=$2 where organization_id=$1 and customer_id=$3 returning id',[s.organizationId,targetId,sourceId]);\n   await c.query('update customers set archived_at=now(),merged_into_customer_id=$2,updated_at=now() where organization_id=$1 and id=$3',[s.organizationId,targetId,sourceId]);\n   await c.query('insert into customer_merges(organization_id,source_id,target_id,created_by_user_id) values($1,$2,$3,$4)',[s.organizationId,sourceId,targetId,s.userId]);\n   const result:CustomerMergeReceipt={item:{merged:true,id:targetId,sourceId,contactsMoved:movedContacts.rows.length,activitiesMoved:movedActivities.rows.length}};\n   await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'customer.merged',entityType:'customer',entityId:targetId,metadata:{sourceId,filledFields:fill.map(item=>item.field),contactsMoved:result.item.contactsMoved,activitiesMoved:result.item.activitiesMoved}});\n   return result;\n  });\n  return checkedOutcome(result,sourceId,targetId);\n }"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 59,
+          "arguments": [
+            "'select pg_advisory_xact_lock(hashtextextended($1,0))'",
+            "[s.organizationId+':customer-create']"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 64,
+          "arguments": [
+            "'update customers set '+fill.map((item,index)=>identifier(item.field)+'=$'+(index+3)).join(',')+',updated_at=now() where organization_id=$1 and id=$2'",
+            "[s.organizationId,targetId,...fill.map(item=>source[item.field])]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 65,
+          "arguments": [
+            "'update customer_contacts set is_primary=false,updated_at=now() where organization_id=$1 and customer_id=$2 and is_primary'",
+            "[s.organizationId,sourceId]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 66,
+          "arguments": [
+            "'update customer_contacts set customer_id=$2,updated_at=now() where organization_id=$1 and customer_id=$3 returning id'",
+            "[s.organizationId,targetId,sourceId]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 67,
+          "arguments": [
+            "'update customer_activities set customer_id=$2 where organization_id=$1 and customer_id=$3 returning id'",
+            "[s.organizationId,targetId,sourceId]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 68,
+          "arguments": [
+            "'update customers set archived_at=now(),merged_into_customer_id=$2,updated_at=now() where organization_id=$1 and id=$3'",
+            "[s.organizationId,targetId,sourceId]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 69,
+          "arguments": [
+            "'insert into customer_merges(organization_id,source_id,target_id,created_by_user_id) values($1,$2,$3,$4)'",
+            "[s.organizationId,sourceId,targetId,s.userId]"
+          ]
+        },
+        {
+          "callee": "authorizeCustomerMergeReview",
+          "line": 80,
+          "arguments": [
+            "s"
+          ]
+        },
+        {
+          "callee": "withTenant",
+          "line": 80,
+          "arguments": [
+            "s.organizationId",
+            "s.userId",
+            "c=>idempotentBusiness<CustomerMergeReceipt|CustomerMergeCancellation>(c,{organizationId:s.organizationId,userId:s.userId,operation:'customer.merge',key,body:{sourceId,targetId,revision}},async()=>{await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'customer.merge.cancelled',entityType:'customer',entityId:targetId,metadata:{sourceId}});return {cancelled:true,id:targetId,sourceId};}).then(result=>checkedOutcome(result,sourceId,targetId))"
+          ]
+        },
+        {
+          "callee": "authorizeCustomerMergeReview",
+          "line": 83,
+          "arguments": [
+            "s"
+          ]
+        },
+        {
+          "callee": "withTenant",
+          "line": 83,
+          "arguments": [
+            "s.organizationId",
+            "s.userId",
+            "async c=>{\n  const locked=(await c.query('select pg_try_advisory_xact_lock(hashtextextended($1,0)) locked',[s.organizationId+':customer.merge:'+key])).rows[0].locked;\n  if(!locked)return {state:'pending' as const};\n  const stored=(await c.query<{response_json:unknown}>('select response_json from business_idempotency_keys where organization_id=$1 and operation=$2 and idempotency_key=$3 and created_by_user_id=$4',[s.organizationId,'customer.merge',key,s.userId])).rows[0];\n  if(!stored)return {state:'not_recorded' as const};\n  const result=stored.response_json;\n  if(!result||typeof result!=='object')throw new ApiError(500,'merge_integrity_failed','Der gespeicherte Vorgang konnte nicht bestätigt werden.');\n  const cancelled=result as CustomerMergeCancellation;\n  if(typeof cancelled.id==='string'&&typeof cancelled.sourceId==='string'&&isCustomerMergeCancellation(result,cancelled.sourceId,cancelled.id))return {state:'cancelled' as const,result:cancelled};\n  const item=(result as CustomerMergeReceipt).item;\n  if(!item||!isCustomerMergeReceipt(result,item.sourceId,item.id))throw new ApiError(500,'merge_integrity_failed','Der gespeicherte Vorgang konnte nicht bestätigt werden.');\n  return {state:'completed' as const,result};\n }"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 84,
+          "arguments": [
+            "'select pg_try_advisory_xact_lock(hashtextextended($1,0)) locked'",
+            "[s.organizationId+':customer.merge:'+key]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 86,
+          "arguments": [
+            "'select response_json from business_idempotency_keys where organization_id=$1 and operation=$2 and idempotency_key=$3 and created_by_user_id=$4'",
+            "[s.organizationId,'customer.merge',key,s.userId]"
+          ]
+        }
+      ]
+    },
+    {
       "file": "lib/server/repositories/customer-workspace.ts",
       "imports": [
         "lib/server/session.ts",
@@ -11576,15 +11919,23 @@
       "methods": [],
       "calls": [
         {
+          "callee": "c.query",
+          "line": 14,
+          "arguments": [
+            "'select merged_into_customer_id from customers where organization_id=$1 and id::text=$2 and merged_into_customer_id is not null'",
+            "[s.organizationId,id]"
+          ]
+        },
+        {
           "callee": "(await c.query(`\n  select currency,issue_date::text date,0::numeric billed,count(*)::int invoice_count,0::numeric paid\n  from invoices where organization_id=$1 and customer_id=$2 and archived_at is null and status not in ('draft','cancelled') and issue_date<=(now() at time zone 'Europe/Zurich')::date group by currency,issue_date\n  union all\n  select i.currency,p.payment_date::text date,0::numeric billed,0::int invoice_count,sum(p.amount) paid\n  from payments p join invoices i on i.id=p.invoice_id and i.organization_id=p.organization_id\n  where p.organization_id=$1 and i.customer_id=$2 and p.archived_at is null and p.allocation_status='matched' and p.payment_date<=(now() at time zone 'Europe/Zurich')::date group by i.currency,p.payment_date\n  union all\n  select i.currency,r.refund_date::text date,0::numeric billed,0::int invoice_count,-sum(r.amount) paid\n  from invoice_refunds r join invoices i on i.id=r.invoice_id and i.organization_id=r.organization_id\n  where r.organization_id=$1 and i.customer_id=$2 and r.refund_date<=(now() at time zone 'Europe/Zurich')::date group by i.currency,r.refund_date\n `,[s.organizationId,String(item.id)])).rows.concat",
-          "line": 22,
+          "line": 29,
           "arguments": [
             "summary.invoices.flatMap(row=>(row.revenue_events??[]).map((event:{date:string;amount:unknown})=>({currency:row.currency,date:event.date,billed:event.amount,invoice_count:0,paid:0})))"
           ]
         },
         {
           "callee": "c.query",
-          "line": 22,
+          "line": 29,
           "arguments": [
             "`\n  select currency,issue_date::text date,0::numeric billed,count(*)::int invoice_count,0::numeric paid\n  from invoices where organization_id=$1 and customer_id=$2 and archived_at is null and status not in ('draft','cancelled') and issue_date<=(now() at time zone 'Europe/Zurich')::date group by currency,issue_date\n  union all\n  select i.currency,p.payment_date::text date,0::numeric billed,0::int invoice_count,sum(p.amount) paid\n  from payments p join invoices i on i.id=p.invoice_id and i.organization_id=p.organization_id\n  where p.organization_id=$1 and i.customer_id=$2 and p.archived_at is null and p.allocation_status='matched' and p.payment_date<=(now() at time zone 'Europe/Zurich')::date group by i.currency,p.payment_date\n  union all\n  select i.currency,r.refund_date::text date,0::numeric billed,0::int invoice_count,-sum(r.amount) paid\n  from invoice_refunds r join invoices i on i.id=r.invoice_id and i.organization_id=r.organization_id\n  where r.organization_id=$1 and i.customer_id=$2 and r.refund_date<=(now() at time zone 'Europe/Zurich')::date group by i.currency,r.refund_date\n `",
             "[s.organizationId,String(item.id)]"
@@ -11615,7 +11966,7 @@
         },
         {
           "callee": "client.query",
-          "line": 48,
+          "line": 49,
           "arguments": [
             "`select id,customer_no,name,email from customers c where organization_id=$1 and archived_at is null and id::text<>$5 and (\n  ($2<>'' and regexp_replace(regexp_replace(upper(coalesce(c.uid,'')),'[^A-Z0-9]','','g'),'(MWST|TVA|IVA)$','')=$2)\n  or ($3<>'' and lower(trim(coalesce(c.email,'')))=$3)\n  or (length($4)>=2 and regexp_replace(lower(trim(c.name)),'[[:space:]]+',' ','g')=$4)) order by customer_no,id limit 5`",
             "[organizationId,uid,email,name,excludeId]"
@@ -11623,7 +11974,7 @@
         },
         {
           "callee": "withTenant",
-          "line": 53,
+          "line": 54,
           "arguments": [
             "session.organizationId",
             "session.userId",
@@ -11632,24 +11983,24 @@
         },
         {
           "callee": "withTenant",
-          "line": 55,
+          "line": 56,
           "arguments": [
             "session.organizationId",
             "session.userId",
-            "async c=>{\n  const items=(await c.query(\"select id,customer_no,name,status,archived_at,updated_at::text revision,count(*) over()::int total from customers where organization_id=$1 and archived_at is not null and ($2='' or name ilike $2 escape '\\\\' or customer_no ilike $2 escape '\\\\') order by archived_at desc,id limit 50 offset $3\",[session.organizationId,query?'%'+query.replace(/[\\\\%_]/g,'\\\\$&')+'%':'',offset])).rows;\n  const total=items.length?Number(items[0].total):Number((await c.query(\"select count(*)::int total from customers where organization_id=$1 and archived_at is not null and ($2='' or name ilike $2 escape '\\\\' or customer_no ilike $2 escape '\\\\')\",[session.organizationId,query?'%'+query.replace(/[\\\\%_]/g,'\\\\$&')+'%':''])).rows[0].total);\n  return {items:items.map(({total:_total,...row})=>row),total};\n }"
+            "async c=>{\n  const items=(await c.query(\"select c.id,c.customer_no,c.name,c.status,c.archived_at,c.updated_at::text revision,c.merged_into_customer_id,(target.archived_at is not null) merge_target_archived,count(*) over()::int total from customers c left join customers target on target.organization_id=c.organization_id and target.id=c.merged_into_customer_id where c.organization_id=$1 and c.archived_at is not null and ($2='' or c.name ilike $2 escape '\\\\' or c.customer_no ilike $2 escape '\\\\') order by c.archived_at desc,c.id limit 50 offset $3\",[session.organizationId,query?'%'+query.replace(/[\\\\%_]/g,'\\\\$&')+'%':'',offset])).rows;\n  const total=items.length?Number(items[0].total):Number((await c.query(\"select count(*)::int total from customers where organization_id=$1 and archived_at is not null and ($2='' or name ilike $2 escape '\\\\' or customer_no ilike $2 escape '\\\\')\",[session.organizationId,query?'%'+query.replace(/[\\\\%_]/g,'\\\\$&')+'%':''])).rows[0].total);\n  return {items:items.map(({total:_total,...row})=>row),total};\n }"
           ]
         },
         {
           "callee": "c.query",
-          "line": 56,
+          "line": 57,
           "arguments": [
-            "\"select id,customer_no,name,status,archived_at,updated_at::text revision,count(*) over()::int total from customers where organization_id=$1 and archived_at is not null and ($2='' or name ilike $2 escape '\\\\' or customer_no ilike $2 escape '\\\\') order by archived_at desc,id limit 50 offset $3\"",
+            "\"select c.id,c.customer_no,c.name,c.status,c.archived_at,c.updated_at::text revision,c.merged_into_customer_id,(target.archived_at is not null) merge_target_archived,count(*) over()::int total from customers c left join customers target on target.organization_id=c.organization_id and target.id=c.merged_into_customer_id where c.organization_id=$1 and c.archived_at is not null and ($2='' or c.name ilike $2 escape '\\\\' or c.customer_no ilike $2 escape '\\\\') order by c.archived_at desc,c.id limit 50 offset $3\"",
             "[session.organizationId,query?'%'+query.replace(/[\\\\%_]/g,'\\\\$&')+'%':'',offset]"
           ]
         },
         {
           "callee": "query.replace",
-          "line": 56,
+          "line": 57,
           "arguments": [
             "/[\\\\%_]/g",
             "'\\\\$&'"
@@ -11657,7 +12008,7 @@
         },
         {
           "callee": "c.query",
-          "line": 57,
+          "line": 58,
           "arguments": [
             "\"select count(*)::int total from customers where organization_id=$1 and archived_at is not null and ($2='' or name ilike $2 escape '\\\\' or customer_no ilike $2 escape '\\\\')\"",
             "[session.organizationId,query?'%'+query.replace(/[\\\\%_]/g,'\\\\$&')+'%':'']"
@@ -11665,7 +12016,7 @@
         },
         {
           "callee": "query.replace",
-          "line": 57,
+          "line": 58,
           "arguments": [
             "/[\\\\%_]/g",
             "'\\\\$&'"
@@ -11673,16 +12024,16 @@
         },
         {
           "callee": "withTenant",
-          "line": 63,
+          "line": 64,
           "arguments": [
             "session.organizationId",
             "session.userId",
-            "async c=>{\n  await c.query('select pg_advisory_xact_lock(hashtextextended($1,0))',[session.organizationId+':customer-create']);\n  const current=(await c.query('select *,updated_at::text revision from customers where organization_id=$1 and id::text=$2 for update',[session.organizationId,id])).rows[0];\n  if(!current)throw new ApiError(404,'not_found','Kunde wurde nicht gefunden.');\n  if(!current.archived_at)return {id:current.id,restored:false};\n  if(current.revision!==revision)throw new ApiError(409,'customer_changed','Der Kunde wurde geändert. Bitte die Ansicht aktualisieren.');\n  if((await customerDuplicates(c,session.organizationId,current,id)).length)throw new ApiError(409,'customer_duplicate','Eine mögliche Dublette ist vorhanden. Bitte die Kundendaten zuerst prüfen.');\n  await c.query('update customers set archived_at=null,updated_at=now() where organization_id=$1 and id=$2',[session.organizationId,current.id]);\n  await audit(c,{organizationId:session.organizationId,userId:session.userId,action:'customer.restored',entityType:'customer',entityId:current.id});\n  return {id:current.id,restored:true};\n }"
+            "async c=>{\n  await c.query('select pg_advisory_xact_lock(hashtextextended($1,0))',[session.organizationId+':customer-create']);\n  const current=(await c.query('select *,updated_at::text revision from customers where organization_id=$1 and id::text=$2 for update',[session.organizationId,id])).rows[0];\n  if(!current)throw new ApiError(404,'not_found','Kunde wurde nicht gefunden.');\n  if(current.merged_into_customer_id)throw new ApiError(409,'customer_merged','Dieser Kunde wurde zusammengeführt. Bitte den Zielkunden verwenden.');\n  if(!current.archived_at)return {id:current.id,restored:false};\n  if(current.revision!==revision)throw new ApiError(409,'customer_changed','Der Kunde wurde geändert. Bitte die Ansicht aktualisieren.');\n  if((await customerDuplicates(c,session.organizationId,current,id)).length)throw new ApiError(409,'customer_duplicate','Eine mögliche Dublette ist vorhanden. Bitte die Kundendaten zuerst prüfen.');\n  await c.query('update customers set archived_at=null,updated_at=now() where organization_id=$1 and id=$2',[session.organizationId,current.id]);\n  await audit(c,{organizationId:session.organizationId,userId:session.userId,action:'customer.restored',entityType:'customer',entityId:current.id});\n  return {id:current.id,restored:true};\n }"
           ]
         },
         {
           "callee": "c.query",
-          "line": 64,
+          "line": 65,
           "arguments": [
             "'select pg_advisory_xact_lock(hashtextextended($1,0))'",
             "[session.organizationId+':customer-create']"
@@ -11690,7 +12041,7 @@
         },
         {
           "callee": "c.query",
-          "line": 65,
+          "line": 66,
           "arguments": [
             "'select *,updated_at::text revision from customers where organization_id=$1 and id::text=$2 for update'",
             "[session.organizationId,id]"
@@ -11698,7 +12049,7 @@
         },
         {
           "callee": "c.query",
-          "line": 70,
+          "line": 72,
           "arguments": [
             "'update customers set archived_at=null,updated_at=now() where organization_id=$1 and id=$2'",
             "[session.organizationId,current.id]"
@@ -11706,7 +12057,7 @@
         },
         {
           "callee": "client.query",
-          "line": 76,
+          "line": 78,
           "arguments": [
             "'select pg_advisory_xact_lock(hashtextextended($1,0))'",
             "[organizationId+':customer-create']"
@@ -11714,7 +12065,7 @@
         },
         {
           "callee": "client.query",
-          "line": 78,
+          "line": 80,
           "arguments": [
             "'select payment_terms_days from organizations where id=$1'",
             "[organizationId]"
@@ -11722,7 +12073,7 @@
         },
         {
           "callee": "client.query",
-          "line": 80,
+          "line": 82,
           "arguments": [
             "`insert into business_document_counters(organization_id,kind,period,next_value) values($1,'customer','',2) on conflict(organization_id,kind,period) do update set next_value=business_document_counters.next_value+1 returning next_value-1 number`",
             "[organizationId]"
@@ -11730,7 +12081,7 @@
         },
         {
           "callee": "client.query",
-          "line": 82,
+          "line": 84,
           "arguments": [
             "`insert into customers(id,organization_id,external_id,customer_no,name,legal_name,contact_name,email,phone,address,zip,city,sector,country,uid,language,payment_days,discount,status,created_by_user_id,notes) values($1,$2,$1::uuid::text,$3,$4,$4,$5,$6,$7,$8,$9,$10,$11,'Schweiz',$12,$13,$14,$15,$16,$17,$18) returning ${columns}`",
             "[id,organizationId,customerNo,input.name,input.contact||null,input.email||null,input.phone||null,input.address||null,zip,city,input.sector||null,input.uid||null,input.language||'de',paymentDays,input.discount??0,statusToDb(input.status??'active'),userId,input.notes||null]"
@@ -11738,7 +12089,7 @@
         },
         {
           "callee": "client.query",
-          "line": 83,
+          "line": 85,
           "arguments": [
             "'update customers set customer_type=$3 where organization_id=$1 and id=$2'",
             "[organizationId,id,input.customerType??'company']"
@@ -11746,7 +12097,7 @@
         },
         {
           "callee": "client.query",
-          "line": 84,
+          "line": 86,
           "arguments": [
             "'update customers set street=$3,building_number=$4,address=coalesce(nullif(concat_ws(\\' \\',nullif($3,\\'\\'),nullif($4,\\'\\')),\\'\\'),address) where organization_id=$1 and id=$2'",
             "[organizationId,id,input.street??null,input.buildingNumber??null]"
@@ -11754,7 +12105,7 @@
         },
         {
           "callee": "client.query",
-          "line": 85,
+          "line": 87,
           "arguments": [
             "`insert into customer_contacts(organization_id,customer_id,first_name,last_name,name,email,phone,is_primary,external_id) values($1,$2::uuid,$3,$4,$5,$6,$7,true,$8)`",
             "[organizationId,id,input.contactFirstName,input.contactLastName,input.contact,input.email||null,input.phone||null,randomUUID()]"
@@ -11762,7 +12113,7 @@
         },
         {
           "callee": "client.query",
-          "line": 86,
+          "line": 88,
           "arguments": [
             "`select ${columns} from customers where organization_id=$1 and id=$2`",
             "[organizationId,id]"
@@ -11770,7 +12121,7 @@
         },
         {
           "callee": "withTenant",
-          "line": 88,
+          "line": 90,
           "arguments": [
             "organizationId",
             "userId",
@@ -11779,7 +12130,7 @@
         },
         {
           "callee": "withTenant",
-          "line": 89,
+          "line": 91,
           "arguments": [
             "organizationId",
             "userId",
@@ -11788,7 +12139,7 @@
         },
         {
           "callee": "client.query",
-          "line": 90,
+          "line": 92,
           "arguments": [
             "'select * from customers where id=$1 and organization_id=$2 and archived_at is null for update'",
             "[id,organizationId]"
@@ -11796,7 +12147,7 @@
         },
         {
           "callee": "client.query",
-          "line": 93,
+          "line": 95,
           "arguments": [
             "`update customers set name=$1,legal_name=$1,contact_name=$2,email=$3,phone=$4,address=$5,zip=$6,city=$7,sector=$8,uid=$9,language=$10,payment_days=$11,discount=$12,status=$13,notes=$16,updated_at=now() where id=$14 and organization_id=$15 returning ${columns}`",
             "[input.name??current.name,input.contact??current.contact_name,input.email??current.email,input.phone??current.phone,input.address??current.address,zip,city,input.sector??current.sector,input.uid??current.uid,input.language??current.language,input.paymentDays??current.payment_days,input.discount??current.discount,input.status?statusToDb(input.status):current.status,id,organizationId,input.notes??current.notes]"
@@ -11804,7 +12155,7 @@
         },
         {
           "callee": "client.query",
-          "line": 94,
+          "line": 96,
           "arguments": [
             "\"update customers set street=$3,building_number=$4,address=concat_ws(' ',nullif($3,''),nullif($4,'')) where organization_id=$1 and id=$2\"",
             "[organizationId,id,input.street??current.street??current.address,input.buildingNumber??current.building_number??null]"
@@ -11812,7 +12163,7 @@
         },
         {
           "callee": "client.query",
-          "line": 95,
+          "line": 97,
           "arguments": [
             "`select ${columns} from customers where organization_id=$1 and id=$2`",
             "[organizationId,id]"
@@ -11820,7 +12171,7 @@
         },
         {
           "callee": "withTenant",
-          "line": 97,
+          "line": 99,
           "arguments": [
             "organizationId",
             "userId",
@@ -11829,7 +12180,7 @@
         },
         {
           "callee": "client.query",
-          "line": 97,
+          "line": 99,
           "arguments": [
             "'select id from customers c where c.organization_id=$1 and c.id=$2 and (exists(select 1 from invoices i where i.organization_id=c.organization_id and i.customer_id=c.id) or exists(select 1 from quotes q where q.organization_id=c.organization_id and q.customer_id=c.id) or exists(select 1 from projects p where p.organization_id=c.organization_id and p.customer_id=c.id) or exists(select 1 from time_entries t where t.organization_id=c.organization_id and t.customer_id=c.id)) for update'",
             "[organizationId,id]"
@@ -11837,7 +12188,7 @@
         },
         {
           "callee": "client.query",
-          "line": 97,
+          "line": 99,
           "arguments": [
             "used?\"update customers set status='inactive',updated_at=now() where id=$1 and organization_id=$2 and archived_at is null returning id\":'update customers set archived_at=now(),updated_at=now() where id=$1 and organization_id=$2 and archived_at is null returning id'",
             "[id,organizationId]"

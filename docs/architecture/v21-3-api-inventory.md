@@ -2,7 +2,7 @@
 
 Static AST/source inventory, not proof that every runtime branch is tested. Calls include exact source arguments and locations; dynamic dispatch requires the domain matrix and runtime tests.
 
-120 API route files, 44 client consumers, 75 migrations, 109 declared tables.
+121 API route files, 45 client consumers, 76 migrations, 110 declared tables.
 
 | Endpoint | Methods | Source | Direct data/auth evidence |
 |---|---|---|---|
@@ -36,6 +36,7 @@ Static AST/source inventory, not proof that every runtime branch is tested. Call
 | `/api/customers/archive` | GET, POST | `app/api/customers/archive/route.ts` | `requireSession:8`, `authorize:8`, `requireSession:14`, `authorize:14` |
 | `/api/customers/duplicates` | GET | `app/api/customers/duplicates/route.ts` | `requireSession:7`, `authorize:7` |
 | `/api/customers/import` | POST | `app/api/customers/import/route.ts` | `requireSession:14`, `authorize:14`, `withTenant:30`, `withTenant:31` |
+| `/api/customers/merge` | POST | `app/api/customers/merge/route.ts` | `requireSession:9`, `authorizeCustomerMergeReview:9` |
 | `/api/customers` | GET, POST | `app/api/customers/route.ts` | `requireSession:13`, `authorize:13`, `requireSession:24`, `authorize:24` |
 | `/api/dashboard` | GET | `app/api/dashboard/route.ts` | `requireSession:13`, `authorize:14`, `authorize:18`, `authorize:19`, `withTenant:20`, `c.query:25`, `c.query:26`, `c.query:27` |
 | `/api/demo/dashboard` | GET, POST, DELETE | `app/api/demo/dashboard/route.ts` |  |
