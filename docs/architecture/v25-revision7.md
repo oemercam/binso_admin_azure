@@ -241,3 +241,27 @@ Neue Rechnungssektion noch nicht visuell abgenommen. Vollständige Kategorie-/
 MwSt.-/Angebotsberichte, Direktmail und sichere Berichtlinks bleiben offen;
 keine umfassende Steuerdeklaration oder vollständiges Kapitel43 behauptet.
 Für die neue Finanzsektion ist eine isolierte Browserregression in die vorhandene Registration-Funktionslane eingebunden: echte lokale SSR-QA-Sitzung, synthetische Aggregatantworten, Hell/Dunkel bei390/1440px, keine Überbreite, getrennte Kennzahlbedeutung und genau ein ausdrücklicher CSV-Download. Kein neuer Workflow und keine Rechteerweiterung. Lokal nur Syntax/Lint geprüft; Ausführung benötigt den bekannten nativen QA-PostgreSQL und bleibt bis CI offen. Der gemeinsam mit PR306 bearbeitete ux-browser-test.mjs bleibt unverändert.
+
+Full Development b637dd57, Lauf39639453378: Build, Checks und Scanner bestanden;
+Browsermatrix fehlgeschlagen. Nachgewiesene alte Browserverträge: Auth-Titel22px
+statt Kapitel19/28px; Felder44/11/7–8 statt48/16/12; Consent «Nur notwendige»
+statt ausdrücklichem «Alle ablehnen». Keine Runtime unter den neuen Standard
+zurückgesetzt. Gemeinsame Geometrieprüfungen verlangen nun exakt die R7-Werte;
+negative Tests gegen alte Höhe/Inset/Radius/Schrift und Auth-Titel lokal auf
+der echten Loginseite bestanden. Consent-Lokalisierung prüft zusätzlich alle
+drei gleichgewichteten Optionen und gespeicherte Ablehnung. Syntax/Lint bestanden,
+vollständiger nächster CI-Nachweis offen. PR306 wurde auf Überschneidung geprüft:
+sein einziger Commit ccc8083359759bd8005d5d615f09433c3d843c48 betrifft allein die
+Reihenfolge der künstlichen PDF-Testuhr; keine Überschneidung mit dem Geometrieblock.
+Dieser bestehende Fix wird übernommen statt neu implementiert; PR306 selbst
+bleibt offen und unverändert, kein Main-Merge.
+
+Rechtsseiten: technischer Bericht legal-review.md benennt Demo-Textdrift und
+unvollständige Sprach-/Provider-/Rechtsnachweise. Der gemeinsame LegalPage-Owner
+liefert jetzt für lange Dokumente ein natives, aufklappbares Inhaltsverzeichnis,
+sprachstabile Anker und Tastaturfokus; vorhandener Kontaktanker und Text-/Versions-
+inhalte bleiben unverändert. Echte SSR-Tests aller5 Rechtsseiten in4 UI-Sprachen
+bestanden. Vier lokale Browserfälle320/1440px, Hell/Dunkel, bestätigen Tastatur,
+Fragment-URL, Zielfokus und fehlenden horizontalen Overflow. Die kurze
+Subprozessorseite erhält keine unnötige Inhaltssteuerung. Diese technische
+Abnahme ersetzt keine juristische Übersetzungs- oder Inhaltsfreigabe.

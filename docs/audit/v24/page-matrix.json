@@ -1,5 +1,5 @@
 {
-  "commit": "7ea6a6211624d8a9b0fd9f1243e7fff69bbc6709",
+  "commit": "b637dd57a96cb8fbb05459388c11f4233a2f610f",
   "method": "Existing TypeScript AST dependency inventory; conditional reachability is not runtime proof",
   "pages": [
     {
@@ -8,6 +8,7 @@
       "family": "LegalPage",
       "components": [
         "components/legal-page.tsx#LegalPage",
+        "components/legal-page.tsx#headingText",
         "components/marketing.tsx#MarketingHeader",
         "components/ui.tsx#Logo",
         "components/locale-switcher.tsx#LocaleSwitcher",
@@ -1196,6 +1197,7 @@
       "family": "LegalPage",
       "components": [
         "components/legal-page.tsx#LegalPage",
+        "components/legal-page.tsx#headingText",
         "components/marketing.tsx#MarketingHeader",
         "components/ui.tsx#Logo",
         "components/locale-switcher.tsx#LocaleSwitcher",
@@ -2272,6 +2274,7 @@
       "family": "LegalPage",
       "components": [
         "components/legal-page.tsx#LegalPage",
+        "components/legal-page.tsx#headingText",
         "components/marketing.tsx#MarketingHeader",
         "components/ui.tsx#Logo",
         "components/locale-switcher.tsx#LocaleSwitcher",
@@ -6253,6 +6256,7 @@
       "family": "LegalPage",
       "components": [
         "components/legal-page.tsx#LegalPage",
+        "components/legal-page.tsx#headingText",
         "components/marketing.tsx#MarketingHeader",
         "components/ui.tsx#Logo",
         "components/locale-switcher.tsx#LocaleSwitcher",
@@ -14674,6 +14678,7 @@
       "family": "LegalPage",
       "components": [
         "components/legal-page.tsx#LegalPage",
+        "components/legal-page.tsx#headingText",
         "components/marketing.tsx#MarketingHeader",
         "components/ui.tsx#Logo",
         "components/locale-switcher.tsx#LocaleSwitcher",

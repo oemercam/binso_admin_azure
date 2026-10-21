@@ -13818,5 +13818,15 @@
     "No invoices available",
     "Aucune facture disponible",
     "Nessuna fattura disponibile"
+  ],
+  "Inhalt": [
+    "Contents",
+    "Sommaire",
+    "Indice"
+  ],
+  "Inhaltsverzeichnis": [
+    "Table of contents",
+    "Table des matières",
+    "Indice dei contenuti"
   ]
 }

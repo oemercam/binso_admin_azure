@@ -7,9 +7,10 @@ async function assertMobileAuthGeometry(page){
   const targets=[...document.querySelectorAll('.auth-options>label,.auth-inline-action,.auth-cancel')]
    .filter(node=>node.getClientRects().length)
    .map(node=>({tag:node.tagName,height:node.getBoundingClientRect().height}));
-  return {font:getComputedStyle(heading).fontSize,expected:getComputedStyle(heading).getPropertyValue('--type-mobile-heading').trim(),targets};
+  return {font:getComputedStyle(heading).fontSize,expected:getComputedStyle(heading).getPropertyValue('--type-large-heading').trim(),targets};
  });
- assert.equal(geometry.font,geometry.expected,'Auth heading uses the shared mobile heading token');
+ assert.equal(geometry.expected,'28px','Revision7 chapter19 fixes the auth headline at28px');
+ assert.equal(geometry.font,geometry.expected,'Auth heading uses the shared Revision7 auth headline token');
  assert.ok(geometry.targets.length>0,'The actual auth state must expose checked action targets');
  for(const target of geometry.targets)assert.ok(target.height>=44,'Auth touch target must be at least 44px: '+JSON.stringify(target));
 }
@@ -21,6 +22,10 @@ export async function verifyMobileLoginGeometry(page,{captureCode}={}){
  const regression=await page.addStyleTag({content:'.auth-options>label{min-height:18px!important;height:18px!important}'});
  try{await assert.rejects(()=>assertMobileAuthGeometry(page),/Auth touch target must be at least 44px/);}
  finally{await regression.evaluate(node=>node.remove());}
+ await assertMobileAuthGeometry(page);
+ const retiredHeading=await page.addStyleTag({content:'.auth-card h1{font-size:22px!important}'});
+ try{await assert.rejects(()=>assertMobileAuthGeometry(page),/Auth heading uses the shared Revision7 auth headline token/);}
+ finally{await retiredHeading.evaluate(node=>node.remove());}
  await assertMobileAuthGeometry(page);
 
  const originalUrl=page.url();let requests=0,mode='totp';

@@ -33,7 +33,15 @@ try{
   let page=await trackedPage();
   await page.goto(base+'/?lang='+locale,{waitUntil:'networkidle'});await page.locator('.reference-hero').waitFor();
   assert.equal(await page.locator('html').getAttribute('lang'),locale+'-CH');
-  const consent=page.locator('.privacy-consent-layer');if(await consent.isVisible()){await consent.getByRole('button',{name:text('Nur notwendige',locale),exact:true}).click();await consent.waitFor({state:'hidden'});}
+  const consent=page.locator('.privacy-consent-layer');if(await consent.isVisible()){
+   const geometry=[];for(const label of ['Alle ablehnen','Einstellungen','Alle akzeptieren']){
+    const button=consent.getByRole('button',{name:text(label,locale),exact:true});assert.equal(await button.isVisible(),true,'All three consent choices remain available in '+locale);
+    geometry.push(await button.evaluate(el=>({height:el.getBoundingClientRect().height,color:getComputedStyle(el).color,background:getComputedStyle(el).backgroundColor})));
+   }
+   assert.ok(geometry.every(item=>item.height>=44),'Consent choices retain accessible touch targets');assert.ok(geometry.every(item=>item.color===geometry[0].color&&item.background===geometry[0].background),'Consent options retain equal visual weight');
+   await consent.getByRole('button',{name:text('Alle ablehnen',locale),exact:true}).click();await consent.waitFor({state:'hidden'});
+   assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('binso.privacy.preferences.v1')).performance),false,'Rejecting optional measurement is persisted');
+  }
   const selector=page.locator('.locale-switcher .app-select-trigger:visible').first();await selectAppOption(selector, locale==='en'?'fr':'en');
   const chosen=locale==='en'?'fr':'en';await page.waitForFunction(code=>document.documentElement.lang===code+'-CH',chosen);
   await page.waitForLoadState('networkidle');reloading=true;try{await page.reload({waitUntil:'networkidle'})}finally{reloading=false}assert.equal(await page.locator('html').getAttribute('lang'),chosen+'-CH','Choice survives reload');

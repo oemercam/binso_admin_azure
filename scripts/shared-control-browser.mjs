@@ -1,5 +1,28 @@
 import assert from 'node:assert/strict';
 
+/** Revision7 chapter19: closed fields share one geometry across surfaces.
+ * Textareas and checkbox/radio controls have their own semantic geometry. */
+export async function assertCanonicalClosedFields(page,route=''){
+ const fields=page.locator('.form-field>.form-control:not(textarea):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),.form-field .app-select-trigger').filter({visible:true});
+ for(const control of await fields.all()){
+  const geometry=await control.evaluate(el=>{const css=getComputedStyle(el);return {height:el.getBoundingClientRect().height,padding:css.paddingLeft,radius:css.borderRadius,font:css.fontSize};});
+  assert.equal(geometry.height,48,route+': canonical closed field height');
+  assert.equal(geometry.padding,'16px',route+': canonical field inset');
+  assert.equal(geometry.radius,'12px',route+': canonical field radius');
+  assert.equal(geometry.font,'16px',route+': canonical field text');
+ }
+}
+
+export async function verifyCanonicalFieldRegression(page){
+ const field=page.locator('.form-field>.form-control:not(textarea):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"])').filter({visible:true}).first();assert.ok(await field.count(),'A real closed field is required for the negative controls');
+ const original=await field.getAttribute('style');
+ for(const [properties,message] of [[{'height':'40px','min-height':'40px'},/canonical closed field height/],[{'padding-left':'11px'},/canonical field inset/],[{'border-radius':'7px'},/canonical field radius/],[{'font-size':'14px'},/canonical field text/]]){
+  try{await field.evaluate((el,properties)=>{for(const [key,value] of Object.entries(properties))el.style.setProperty(key,value,'important');},properties);await assert.rejects(()=>assertCanonicalClosedFields(page),message);}
+  finally{await field.evaluate((el,value)=>value===null?el.removeAttribute('style'):el.setAttribute('style',value),original);}
+ }
+ await assertCanonicalClosedFields(page);
+}
+
 export async function assertOpaqueChrome(page){
  const surfaces=await page.locator('.app-header,.app-header-actions,.desktop-appbar,.bottom-nav,.operator-mobile-nav').evaluateAll(nodes=>nodes.filter(el=>el.checkVisibility()).map(el=>{const c=getComputedStyle(el);return {name:el.className,blur:c.backdropFilter,webkitBlur:c.webkitBackdropFilter,shadow:c.boxShadow}}));
  for(const surface of surfaces){

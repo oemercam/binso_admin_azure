@@ -3,6 +3,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import {spawn} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
+import {verifyLegalPage} from './legal-page-browser.mjs';
 const output=process.env.BINSO_SYSTEM_STATE_OUTPUT;if(!output)throw Error('Explicit evidence directory required');await fs.mkdir(output,{recursive:true});
 const engines=await import(process.env.BINSO_PLAYWRIGHT_MODULE?pathToFileURL(process.env.BINSO_PLAYWRIGHT_MODULE).href:'playwright');
 const engine=process.env.BINSO_UX_BROWSER??'chromium';
@@ -28,5 +29,9 @@ try{
   const reject=dialog.getByRole('button',{name:'Alle ablehnen',exact:true});await reject.scrollIntoViewIfNeeded();const action=await reject.boundingBox();assert.ok(action&&action.y>=0&&action.y+action.height<=401,'A real consent choice stays scroll-reachable on short screens');
   results.push({route,width,theme,status:'passed',reference:'derived shared recovery layout; not an original-approved visual comparison',consent:'optional chunk absent; footer opens settings'});await context.close();
  }
- await fs.writeFile(path.join(output,'results.json'),JSON.stringify(results,null,2)+'\n');console.log('12 local recovery renders: real404, responsive themes, no promotional intro, consent-gated measurement chunk and settings access passed. Physical devices and original-reference comparison remain open.');
+ for(const theme of ['light','dark'])for(const width of [320,1440]){
+  const context=await browser.newContext({serviceWorkers:'block',viewport:{width,height:900}});await context.addInitScript(theme=>{localStorage.setItem('binso.theme.mode',theme);localStorage.setItem('binso.privacy.preferences.v1',JSON.stringify({version:2,essential:true,performance:false,updatedAt:new Date().toISOString()}));},theme);
+  results.push(await verifyLegalPage(await context.newPage(),{base,width,theme,output}));await context.close();
+ }
+ await fs.writeFile(path.join(output,'results.json'),JSON.stringify(results,null,2)+'\n');console.log('12 recovery and4 legal-navigation cases passed: real404, responsive themes, consent-gated measurement, settings access and keyboard/deep-link navigation. Physical devices and original-reference/legal approval remain open.');
 }finally{await browser?.close();server.kill();}

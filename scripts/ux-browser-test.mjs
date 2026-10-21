@@ -24,7 +24,7 @@ import {assertCustomerDossier,verifyCustomerStates} from './customer-ux-browser.
 import {assertNavigationToggle,verifyNavigationPersistence,assertFlatMobileNavigation,verifyFlatNavigationAdversaries} from './navigation-ux-browser.mjs';
 import {verifyPreviewControls} from './document-controls-browser.mjs';
 import {verifyTimeWorkspace} from './time-workspace-browser.mjs';
-import {assertMobileHeaderTargets,assertChatTargets,assertOpaqueChrome,verifyHeaderTargetRegression,waitForFiniteAnimations,assertPresentationControls,verifyPresentationControlRegression} from './shared-control-browser.mjs';
+import {assertMobileHeaderTargets,assertChatTargets,assertOpaqueChrome,verifyHeaderTargetRegression,waitForFiniteAnimations,assertPresentationControls,verifyPresentationControlRegression,assertCanonicalClosedFields} from './shared-control-browser.mjs';
 
 // Synthetic UI fixtures: real business/RLS integration is covered by migration-test.mjs.
 // No request reaches a production system; unhandled fixture APIs fail closed.
@@ -495,10 +495,7 @@ try{
       });
       const visible=await page.evaluate(()=>{const composer=document.querySelector('.thread-composer').getBoundingClientRect(),nav=document.querySelector('.bottom-nav');const limit=nav?.getClientRects().length?nav.getBoundingClientRect().top:innerHeight;return composer.bottom<=limit+1&&composer.top>=0&&scrollY===0});assert.ok(visible,'Chat input stays above navigation in every app viewport');
     }
-    if(!process.env.BINSO_UX_BASELINE){await waitForFiniteAnimations(page);for(const control of await page.locator('.form-field>.form-control,.form-field .app-select-trigger').filter({visible:true}).all()){
-     const g=await control.evaluate(el=>{const c=getComputedStyle(el);return {height:el.getBoundingClientRect().height,radius:c.borderRadius,padding:c.paddingLeft,font:c.fontSize,coarse:matchMedia('(pointer:coarse)').matches,auth:!!el.closest('.auth-workspace'),app:!!el.closest('.page-container,.operator-app-content,.bottom-sheet,.header-panel,.confirm-dialog')}});
-     assert.equal(g.height,width<=760?44:g.auth?46:g.coarse?44:40,`${route}: canonical closed field height`);assert.equal(g.padding,'11px',`${route}: canonical field inset`);assert.equal(g.radius,g.auth?'5px':width<=760?'8px':'7px',`${route}: canonical field radius`);
-    }}
+    if(!process.env.BINSO_UX_BASELINE){await waitForFiniteAnimations(page);await assertCanonicalClosedFields(page,route);}
     for(const label of await page.locator('.detail-list dt').filter({visible:true}).all()){const confined=await label.evaluate(el=>{const r=el.getBoundingClientRect(),range=document.createRange();range.selectNodeContents(el);return [...range.getClientRects()].every(text=>text.right<=r.right+1)});assert.ok(confined,`${route}: detail labels never overlap their values`);}
     if(width<=760&&await page.locator('.mobile-header-detail').count()){assert.equal(await page.locator('.mobile-header-title .status').count(),0,'Status never displaces the centered header title');assert.ok(await page.locator('.page-head .status').filter({visible:true}).count()<=1,'One content status badge, without duplicate header status');}
     if(width<=760&&await page.locator('.mobile-header-detail').count())assert.equal(await page.locator('.page-head h1,.desktop-back').filter({visible:true}).count(),0,route+' '+width+': app detail header owns its title/back once, including tablet');

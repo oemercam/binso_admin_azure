@@ -94,3 +94,25 @@ for(const language of config.locales){
  assert.equal(value.title,'Factures');assert.equal(value.openGraph.images[0].url,'/opengraph-image?lang=fr');assert.equal(value.twitter.images[0],'/opengraph-image?lang=fr');assert.equal(value.alternates.canonical,'/preise?lang=fr');
  console.log('Localized metadata binds canonical alternatives and social-image URLs to the selected language.');
 }
+
+// Render actual legal documents with the shared owner: anchors cannot change
+// by UI language, existing deep links and the untouched document text survive.
+{
+ const legal=compile('components/legal-page.tsx',{'@/lib/client/locale':client,'next/link':({children,...props})=>element('a',props,children),'@/components/marketing':{MarketingHeader:()=>null,MarketingFooter:()=>null}});
+ const legalConfig=compile('config/legal.ts');
+ for(const file of ['impressum','datenschutz','agb','auftragsbearbeitung','unterauftragsbearbeiter']){
+  const page=compile('app/'+file+'/page.tsx',{'@/lib/client/locale':client,'@/components/legal-page':legal,'@/config/legal':legalConfig,'next/link':({children,...props})=>element('a',props,children)}).default;
+  let baseline;
+  for(const language of ['de','fr','it','en']){
+   const markup=renderToStaticMarkup(element(client.LocaleProvider,{initialLocale:language},element(page)));
+   const ids=[...markup.matchAll(/<section[^>]* id="([^"]+)"/g)].map(match=>match[1]);assert.ok(ids.length>=2);assert.equal(new Set(ids).size,ids.length,'No duplicate legal anchors');
+   if(baseline)assert.deepEqual(ids,baseline,'Section URLs stay stable across UI languages');else baseline=ids;
+   for(const [,id] of markup.matchAll(/href="#([^"]+)"/g))assert.ok(ids.includes(id),'Every table-of-contents link has a real section');
+   if(file==='impressum')assert.ok(ids.includes('kontakt'),'Existing contact deep link preserved');
+   if(ids.length>=5){assert.ok(markup.includes('<details class="legal-toc">'));assert.ok(markup.includes(locale.translateMessage('Inhaltsverzeichnis',language)));}
+   else assert.ok(!markup.includes('class="legal-toc"'),'Short documents need no redundant contents control');
+   assert.ok(markup.includes('5. Oktober 2026'),'Legal version date is not silently rewritten');
+  }
+ }
+ console.log('Actual legal documents: stable unique TOC anchors, preserved contact deep link, translated control labels, short-document omission and unchanged version dates passed. Legal language/substance approval remains separate.');
+}
