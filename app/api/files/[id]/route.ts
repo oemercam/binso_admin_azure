@@ -11,7 +11,7 @@ export const runtime='nodejs';
 export async function DELETE(request:NextRequest,{params}:{params:Promise<{id:string}>}){
  try{
   assertSameOrigin(request);const s=await requireSession(),{id}=await params;
-  if(!/^[0-9a-f-]{36}$/i.test(id))throw new ApiError(404,'not_found','Datei wurde nicht gefunden.');
+  if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id))throw new ApiError(404,'not_found','Datei wurde nicht gefunden.');
   await withTenant(s.organizationId,s.userId,async c=>{
    const file=(await c.query('select * from file_objects where id=$1 and organization_id=$2 for update',[id,s.organizationId])).rows[0];
    if(!file)throw new ApiError(404,'not_found','Datei wurde nicht gefunden.');

@@ -207,6 +207,7 @@ try{
   const removal=await import(await load('app/api/files/[id]/route.ts'));
   const attachment=(await query("select id from file_objects where support_case_id=$1 order by created_at limit 1",[supportCases[0]])).rows[0].id;
   const context={params:Promise.resolve({id:attachment})};
+  assert.equal((await removal.DELETE(new Request('https://fixture.invalid/api/files/invalid',{method:'DELETE'}),{params:Promise.resolve({id:'-'.repeat(36)})})).status,404,'Malformed UUID must be rejected before a database cast');
   const removeRequest=()=>new Request('https://fixture.invalid/api/files/'+attachment,{method:'DELETE'});
   globalThis.__integrity.getSession=()=>({...supportSession(),role:'member',userId:'another-support-user'});
   assert.equal((await removal.DELETE(removeRequest(),context)).status,403,'Another uploader cannot remove an attachment');

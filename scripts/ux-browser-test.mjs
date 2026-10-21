@@ -743,10 +743,10 @@ try{
    assert.equal(await page.locator('.bo-statistics .metric>strong').first().textContent(),'CHF 120.00','Custom period survives actual same-tab navigation');
    await page.locator('.bo-statistics').getByRole('button',{name:'Eigenen Statistikzeitraum wählen',exact:true}).click();
    const emptySheet=page.getByRole('dialog',{name:'Statistikzeitraum',exact:true});await emptySheet.getByLabel('Von *',{exact:true}).fill('2020-01-01');await emptySheet.getByLabel('Bis *',{exact:true}).fill('2020-01-02');await emptySheet.getByRole('button',{name:'Anwenden',exact:true}).click();
-   await page.getByText('Keine Buchungen im gewählten Zeitraum.',{exact:true}).waitFor();
-   const emptyTrend=page.getByRole('button',{name:'Zeitverlauf anzeigen',exact:true});if(await emptyTrend.count())await emptyTrend.click();
-   assert.ok((await page.locator('.bo-statistics-point').evaluateAll(elements=>elements.map(el=>Number(el.getAttribute('data-value'))))).every(value=>value===0),'Empty period has only real zero observations');
-   await page.getByText('Keine Buchungen im gewählten Zeitraum.',{exact:true}).waitFor();
+   await page.getByText('Keine Entwicklung im Zeitraum',{exact:true}).waitFor();
+   const emptyTrend=page.getByRole('button',{name:'Zeitverlauf anzeigen',exact:true});assert.equal(await emptyTrend.count(),0,'An empty period must not offer a meaningless trend toggle');
+   assert.equal(await page.locator('.bo-statistics-line,.bo-statistics-point').count(),0,'An empty period renders no fabricated zero chart');
+   await page.getByText('Keine Entwicklung im Zeitraum',{exact:true}).waitFor();
    const snapshot=page.locator('.financial-snapshot');if(!await snapshot.getAttribute('open'))await snapshot.locator('summary').click();const overdueSegment=snapshot.locator('.bo-ring-details').getByRole('button').filter({hasText:'Überfällig'});await overdueSegment.focus();await overdueSegment.press('Enter');const overdueLink=snapshot.getByRole('link',{name:'Details anzeigen',exact:true});await overdueLink.focus();await overdueLink.press('Enter');await page.waitForURL(url=>url.pathname==='/rechnungen'&&url.searchParams.get('status')==='Überfällig');
    await page.locator('.records-active-filters .filter-chip').filter({hasText:'Überfällig'}).waitFor();
    await chooseRecordFilter(page,'Alle');assert.equal(new URL(page.url()).searchParams.has('status'),false,'A user filter change clears the consumed chart drilldown');

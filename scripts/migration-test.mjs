@@ -1175,6 +1175,10 @@ try{
  const reportUpload=await fileUpload.POST(uploadRequest(monthly.data.item.id,'text/plain','Synthetic signed timesheet, 198 hours','time_report'));assert.equal(reportUpload.status,201,JSON.stringify(reportUpload));assert.equal(reportUpload.data.item.time_entry_id,monthly.data.item.id);
  assert.equal((await timeReview.PATCH({body:{action:'submit'}},monthlyParams)).status,409,'Pending evidence cannot bypass the strict scan policy');
  await db.query("update file_objects set scan_status='clean' where id=$1",[reportUpload.data.item.id]);
+ await db.query('update file_objects set archived_at=now() where id=$1',[reportUpload.data.item.id]);
+ assert.equal((await timeReview.PATCH({body:{action:'submit'}},monthlyParams)).status,409,'An archived proof must not satisfy the signed monthly-report requirement');
+ assert.equal((await db.query('select submitted_at from time_entries where id=$1',[monthly.data.item.id])).rows[0].submitted_at,null,'Rejected evidence cannot submit the report');
+ await db.query('update file_objects set archived_at=null where id=$1',[reportUpload.data.item.id]);
  assert.equal((await timeReview.PATCH({body:{action:'submit'}},monthlyParams)).status,200);
  assert.equal((await fileUpload.POST(uploadRequest(monthly.data.item.id,'text/plain','Extra evidence','time_report'))).status,409,'Submitted report evidence is locked');
  assert.equal((await timeReview.PATCH({body:{action:'approve'}},monthlyParams)).status,403,'A monthly report cannot be self-approved');
