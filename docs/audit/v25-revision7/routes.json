@@ -4040,6 +4040,7 @@
     "components/timer-resume-notice.tsx",
     "components/ui.tsx",
     "components/ux-lab.tsx",
+    "components/web-vitals-active.tsx",
     "components/web-vitals-reporter.tsx",
     "components/workforce-assignments.tsx"
   ],

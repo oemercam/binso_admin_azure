@@ -40,6 +40,15 @@ Das Register ist eine Vollständigkeitskontrolle, kein Beleg ausgeführter Tests
 
 ## Verifikation und offene Grenzen
 
+Die optionale Web-Vitals-Implementierung wird nun erst nach ausdrücklichem
+Performance-Opt-in dynamisch geladen. Jeder Versand prüft die aktuelle Zustimmung
+erneut. Weil der installierte Next-Reporter seine Observer nicht entfernt,
+blockiert der abgemeldete Komponentenlebenszyklus alte Callbacks auch nach einer
+erneuten Zustimmung; identische Messungen werden begrenzt dedupliziert.
+Gezielte ausführbare Regressionen für Ablehnung, Zustimmung, Widerruf, ungültige
+Werte und veraltete Observer sowie Typecheck sind bestanden. Dies ersetzt weder
+das vollständige Provider-Inventar noch die juristische Consent-Abnahme.
+
 Tatsächliche Testergebnisse werden in evidence.json und im Paketbericht fortgeschrieben, niemals aus Dateiexistenz abgeleitet. Zwischenprüfungen: Registrierung/PGlite, Bildverarbeitung, PDF-/QR-Berechnungen, Lokalisierungsabdeckung, Navigation und Gestenhelfer. Gebündelte Build-/Browser-/CI-Abnahme steht noch aus.
 
 Die fachlichen Inhalte rechtsverbindlicher Übersetzungen benötigen qualifizierte Prüfung. DNS/TLS/SPF/DKIM/DMARC, reale Graph-Zustellung/Bounces, Push-Infrastruktur und Wiederherstellungsnachweis sind externe Voraussetzungen. Keine neue Berechtigung oder Infrastruktur eigenmächtig anlegen. Physische Geräte-/PWA-/Tastaturprüfungen nicht durch Desktopemulation ersetzen.

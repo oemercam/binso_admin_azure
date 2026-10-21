@@ -8646,11 +8646,11 @@
       ]
     },
     {
-      "file": "components/web-vitals-reporter.tsx",
+      "file": "components/web-vitals-active.tsx",
       "calls": [
         {
           "callee": "fetch",
-          "line": 27,
+          "line": 31,
           "arguments": [
             "\"/api/telemetry/web-vitals\"",
             "{method:\"POST\",headers:{\"Content-Type\":\"application/json\"},body,keepalive:true}"
