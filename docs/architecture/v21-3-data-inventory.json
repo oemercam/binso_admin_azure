@@ -4,7 +4,7 @@
   "counts": {
     "apis": 121,
     "consumers": 45,
-    "migrations": 76,
+    "migrations": 77,
     "tables": 110
   },
   "apis": [
@@ -11272,6 +11272,12 @@
           "mode": "force"
         }
       ]
+    },
+    {
+      "file": "database/migrations/0076_report_snapshot_expiry_index.sql",
+      "tables": [],
+      "relations": [],
+      "rls": []
     }
   ],
   "repositories": [

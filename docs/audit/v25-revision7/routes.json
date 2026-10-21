@@ -21151,6 +21151,7 @@
     "database/migrations/0072_report_export_snapshots.sql",
     "database/migrations/0073_report_mail_outbox.sql",
     "database/migrations/0074_report_recipient_shares.sql",
-    "database/migrations/0075_controlled_customer_duplicates.sql"
+    "database/migrations/0075_controlled_customer_duplicates.sql",
+    "database/migrations/0076_report_snapshot_expiry_index.sql"
   ]
 }

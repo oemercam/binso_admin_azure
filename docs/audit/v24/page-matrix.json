@@ -1,5 +1,5 @@
 {
-  "commit": "7bead356ab78cc5e49730e1f2f986b84a4282a1c",
+  "commit": "55772790e92d14ccd50c1bfa1cd6db23206f999b",
   "method": "Existing TypeScript AST dependency inventory; conditional reachability is not runtime proof",
   "pages": [
     {
@@ -6705,7 +6705,7 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 255,
+          "line": 256,
           "component": "components/pages/customers.tsx#CustomerForm"
         },
         {
@@ -6970,12 +6970,7 @@
       "actions": [
         {
           "tag": "ListSearch",
-          "line": 167,
-          "component": "components/pages/customers.tsx#CustomerDetail"
-        },
-        {
-          "tag": "ActionSheet",
-          "line": 169,
+          "line": 168,
           "component": "components/pages/customers.tsx#CustomerDetail"
         },
         {
@@ -6984,13 +6979,18 @@
           "component": "components/pages/customers.tsx#CustomerDetail"
         },
         {
-          "tag": "FormSheet",
+          "tag": "ActionSheet",
           "line": 171,
           "component": "components/pages/customers.tsx#CustomerDetail"
         },
         {
-          "tag": "ConfirmDialog",
+          "tag": "FormSheet",
           "line": 172,
+          "component": "components/pages/customers.tsx#CustomerDetail"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 173,
           "component": "components/pages/customers.tsx#CustomerDetail"
         },
         {
@@ -7070,7 +7070,7 @@
         },
         {
           "tag": "ActionSheet",
-          "line": 298,
+          "line": 299,
           "component": "components/pages/customers.tsx#CustomerDocuments"
         },
         {
@@ -7251,7 +7251,7 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 255,
+          "line": 256,
           "component": "components/pages/customers.tsx#CustomerForm"
         },
         {
@@ -7489,6 +7489,12 @@
         "components/binso-ux.tsx#ListRow",
         "components/customer-data-actions.tsx#ArchiveSheet",
         "components/customer-data-actions.tsx#Archived",
+        "components/customer-merge.tsx#CustomerMergeSheet",
+        "components/customer-merge.tsx#Intent",
+        "components/directory-select.tsx#DirectorySelect",
+        "components/directory-select.tsx#Item",
+        "components/directory-select.tsx#Page",
+        "components/customer-merge.tsx#changeLabel",
         "components/records.tsx#RecordsView",
         "components/records.tsx#DataTable",
         "components/records.tsx#DataTableHead",
@@ -7562,7 +7568,12 @@
         },
         {
           "tag": "ArchiveSheet",
-          "line": 27,
+          "line": 28,
+          "component": "components/customer-data-actions.tsx#CustomerDataActions"
+        },
+        {
+          "tag": "CustomerMergeSheet",
+          "line": 28,
           "component": "components/customer-data-actions.tsx#CustomerDataActions"
         },
         {
@@ -7582,13 +7593,18 @@
         },
         {
           "tag": "FormSheet",
-          "line": 18,
+          "line": 19,
           "component": "components/customer-data-actions.tsx#ArchiveSheet"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 21,
+          "line": 22,
           "component": "components/customer-data-actions.tsx#ArchiveSheet"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 52,
+          "component": "components/customer-merge.tsx#CustomerMergeSheet"
         },
         {
           "tag": "FreshAuthenticationDialog",

@@ -59,6 +59,7 @@ try{
     assert.ok(lifecycle.includes(required),"Lifecycle deletion safeguard missing: "+required);
   }
 
+  await (await import('./report-retention-contract.mjs')).verifyReportRetention(db);
   console.log("Organization data lifecycle schema and deletion safeguards passed.");
 }finally{
   await db.close();
