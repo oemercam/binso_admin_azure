@@ -1,5 +1,7 @@
 import {qaBrowserServer} from './qa-browser-server.mjs';
 import {verifyPdfZoom} from './document-controls-browser.mjs';
+import {verifyPublicReport} from './public-report-browser.mjs';
+import {selectAppOption} from './app-select-browser.mjs';
 import {createUiAuthFixture} from './ui-auth-fixture.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
@@ -18,7 +20,7 @@ try{
  browser=await engines[engine].launch({headless:true,...(engine==='chromium'&&process.env.BINSO_CHROMIUM_EXECUTABLE?{executablePath:process.env.BINSO_CHROMIUM_EXECUTABLE}:{})});const results=[];
  for(const theme of ['light','dark'])for(const width of [390,1440]){
   const context=await browser.newContext({serviceWorkers:'block',viewport:{width,height:780}});await context.addCookies(uiAuth.cookies.map(cookie=>({...cookie,url:base})));await context.addInitScript(theme=>{localStorage.setItem('binso.theme.mode',theme);localStorage.setItem('binso.privacy.preferences.v1',JSON.stringify({essential:true,performance:false}));},theme);
-  let exports=0,prepared=0,pdfReads=0,currentRole='owner',readOnly=false;const sendKeys=[];await context.route('**/api/**',async route=>{
+  let exports=0,prepared=0,pdfReads=0,currentRole='owner',readOnly=false;const sendKeys=[],shareRequests=[],shareRows=[];await context.route('**/api/**',async route=>{
    const request=route.request(),url=new URL(request.url());let json={items:[],total:0};
    if(url.pathname==='/api/reports/exports'){
     assert.equal(request.method(),'POST');assert.match(request.headers()['idempotency-key'],/^[0-9a-f-]{36}$/i);const body=request.postDataJSON();assert.equal(body.locale,'de');assert.equal(typeof body.query,'string');prepared++;
@@ -28,6 +30,12 @@ try{
     if(request.method()==='GET')return route.fulfill({json:{items:[]}});
     assert.equal(request.method(),'POST');const body=request.postDataJSON();assert.deepEqual(body,{recipient:'recipient@example.invalid',subject:'Synthetic subject',message:'Synthetic report message'});sendKeys.push(request.headers()['idempotency-key']);await new Promise(resolve=>setTimeout(resolve,150));
     return route.fulfill({json:{id:'00000000-0000-4000-8000-000000000073',status:'uncertain',providerAccepted:false,deliveryConfirmed:false}});
+   }
+   if(url.pathname==='/api/reports/exports/00000000-0000-4000-8000-000000000072/share'){
+    if(request.method()==='GET')return route.fulfill({json:{items:shareRows}});
+    assert.equal(request.method(),'POST');const body=request.postDataJSON();shareRequests.push(body);
+    if(body.action==='create'){assert.deepEqual(body,{action:'create',recipient:'recipient@example.invalid',days:7});assert.match(request.headers()['idempotency-key'],/^[0-9a-f-]{36}$/i);const item={id:'00000000-0000-4000-8000-000000000074',recipient:body.recipient,expiresAt:'2030-01-01T00:00:00Z',revokedAt:null,active:true};shareRows.push(item);return route.fulfill({json:{item:{...item,url:base+'/bericht?lang=de#'+'R'.repeat(43)}}});}
+    assert.deepEqual(body,{action:'revoke',linkId:shareRows[0].id});shareRows[0].active=false;shareRows[0].revokedAt='2026-10-21T12:00:00Z';return route.fulfill({json:{ok:true}});
    }
    assert.equal(request.method(),'GET','Only explicit snapshot preparation/send may POST in this isolated UI proof');
    if(url.pathname==='/api/reports/exports/00000000-0000-4000-8000-000000000072'){pdfReads++;return route.fulfill({contentType:'application/pdf',body:reportPdf});}
@@ -63,8 +71,14 @@ try{
   await compose.getByRole('button',{name:'Per E-Mail senden',exact:true}).dblclick();await compose.getByText('Der Versand läuft oder ist ungeklärt. Bitte den Versandstatus prüfen, nicht erneut senden.',{exact:true}).waitFor();assert.equal(sendKeys.length,1,'One explicit send despite double click');assert.equal(await compose.getByLabel('Empfänger',{exact:true}).isDisabled(),true);
   await Promise.all([page.waitForResponse(response=>response.url().endsWith('/send')&&response.request().method()==='POST'),compose.getByRole('button',{name:'Versandstatus prüfen',exact:true}).click()]);assert.equal(sendKeys.length,2);assert.equal(sendKeys[0],sendKeys[1],'Outcome checks retain the exact request identity');
   await compose.getByRole('button',{name:'Schliessen',exact:true}).last().click();await page.getByRole('alertdialog').getByRole('button',{name:'Änderungen verwerfen',exact:true}).click();await compose.waitFor({state:'hidden'});
-  currentRole='reader';await page.reload({waitUntil:'networkidle'});await page.getByRole('button',{name:'Berichtsaktionen',exact:true}).click();assert.equal(await page.getByRole('button',{name:'Per E-Mail senden',exact:true}).count(),0,'Readers retain exports but no outbound send');await page.keyboard.press('Escape');
+  await page.getByRole('button',{name:'Berichtsaktionen',exact:true}).click();await page.getByRole('button',{name:'Freigabelink',exact:true}).click();const share=page.getByRole('dialog',{name:'Bericht freigeben',exact:true});await share.waitFor();
+  await share.getByLabel('Empfänger',{exact:true}).fill('recipient@example.invalid');await selectAppOption(share.getByLabel('Gültigkeit',{exact:true}),'7');await share.getByRole('button',{name:'Link erstellen',exact:true}).click();const shareUrl=share.getByLabel('Freigabelink',{exact:true});await shareUrl.waitFor();assert.ok((await shareUrl.inputValue()).endsWith('#'+'R'.repeat(43)));assert.equal(shareRequests.length,1,'Link creation is explicit and does not send mail');
+  await page.screenshot({path:path.join(output,`${theme}-${width}-report-share.png`),animations:'disabled'});
+  await share.getByRole('button',{name:'Widerrufen',exact:true}).click();const revoke=page.getByRole('alertdialog');await revoke.waitFor();await revoke.getByRole('button',{name:'Abbrechen',exact:true}).click();assert.equal(shareRequests.length,1,'Cancelling revocation has no side effect');
+  await share.getByRole('button',{name:'Widerrufen',exact:true}).click();await page.getByRole('alertdialog').getByRole('button',{name:'Widerrufen',exact:true}).click();await share.getByText('Widerrufen',{exact:true}).waitFor();await shareUrl.waitFor({state:'hidden'});assert.equal(shareRequests.length,2);await share.getByRole('button',{name:'Schliessen',exact:true}).last().click();await share.waitFor({state:'hidden'});
+  currentRole='reader';await page.reload({waitUntil:'networkidle'});await page.getByRole('button',{name:'Berichtsaktionen',exact:true}).click();assert.equal(await page.getByRole('button',{name:'Per E-Mail senden',exact:true}).count(),0,'Readers retain exports but no outbound send');assert.equal(await page.getByRole('button',{name:'Freigabelink',exact:true}).count(),0);await page.keyboard.press('Escape');
   currentRole='owner';readOnly=true;await page.reload({waitUntil:'networkidle'});await page.getByRole('button',{name:'Berichtsaktionen',exact:true}).click();assert.equal(await page.getByRole('button',{name:'Per E-Mail senden',exact:true}).count(),0,'Read-only company access never offers outbound send');await page.keyboard.press('Escape');
+  await verifyPublicReport(page,{base,pdf:reportPdf,capture:phase=>page.screenshot({path:path.join(output,`${theme}-${width}-public-report-${phase}.png`),animations:'disabled'})});
   results.push({theme,width,status:'passed',scope:'Synthetic aggregate HTTP UI and download proof with real isolated SSR session; database and field-right tests are separate'});await context.close();
  }
  await fs.writeFile(path.join(output,'results.json'),JSON.stringify(results,null,2));console.log('Report UI: distinct period/current/cash/refund meanings, central actions, one export and responsive light/dark geometry passed.');

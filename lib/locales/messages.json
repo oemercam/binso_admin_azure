@@ -13973,5 +13973,140 @@
     "Sending is unavailable in this test environment.",
     "L’envoi n’est pas disponible dans cet environnement de test.",
     "L’invio non è disponibile in questo ambiente di test."
+  ],
+  "1 Tag": [
+    "1 day",
+    "1 jour",
+    "1 giorno"
+  ],
+  "7 Tage": [
+    "7 days",
+    "7 jours",
+    "7 giorni"
+  ],
+  "Bericht freigeben": [
+    "Share report",
+    "Partager le rapport",
+    "Condividi rapporto"
+  ],
+  "Bitte den vollständigen Berichtslink aus deiner E-Mail öffnen.": [
+    "Please open the complete report link from your email.",
+    "Ouvrez le lien complet du rapport depuis votre email.",
+    "Apri il link completo del rapporto dalla tua email."
+  ],
+  "Der Link gibt den Bericht erst nach einem Code an den festgelegten Empfänger frei. Die Laufzeit endet spätestens mit der Berichtsvorschau. Es wird keine E-Mail automatisch versendet.": [
+    "The link releases the report only after a code sent to the specified recipient. It expires no later than the report preview. No email is sent automatically.",
+    "Le lien donne accès au rapport uniquement après un code envoyé au destinataire défini. Il expire au plus tard avec l’aperçu du rapport. Aucun email n’est envoyé automatiquement.",
+    "Il link rende disponibile il rapporto solo dopo un codice inviato al destinatario definito. Scade al più tardi insieme all’anteprima. Non viene inviata alcuna email automaticamente."
+  ],
+  "Dieser Bericht ist geschützt. Fordere einen Code an die festgelegte E-Mail-Adresse an, um ihn anzusehen.": [
+    "This report is protected. Request a code at the specified email address to view it.",
+    "Ce rapport est protégé. Demandez un code à l’adresse email définie pour le consulter.",
+    "Questo rapporto è protetto. Richiedi un codice all’indirizzo email definito per visualizzarlo."
+  ],
+  "Freigabe widerrufen?": [
+    "Revoke access?",
+    "Révoquer l’accès ?",
+    "Revocare l’accesso?"
+  ],
+  "Freigabelink": [
+    "Sharing link",
+    "Lien de partage",
+    "Link di condivisione"
+  ],
+  "Gültigkeit": [
+    "Validity",
+    "Validité",
+    "Validità"
+  ],
+  "Link kopiert": [
+    "Link copied",
+    "Lien copié",
+    "Link copiato"
+  ],
+  "Neuen Code anfordern": [
+    "Request a new code",
+    "Demander un nouveau code",
+    "Richiedi un nuovo codice"
+  ],
+  "Widerruf verhindert weitere Abrufe. Bereits gespeicherte Dateien können nicht zurückgerufen werden.": [
+    "Revocation prevents further downloads. Files already saved cannot be recalled.",
+    "La révocation empêche de nouveaux téléchargements. Les fichiers déjà enregistrés ne peuvent pas être rappelés.",
+    "La revoca impedisce ulteriori download. I file già salvati non possono essere richiamati."
+  ],
+  "Der Empfänger kann diesen Link anschliessend nicht mehr verwenden.": [
+    "The recipient will no longer be able to use this link.",
+    "Le destinataire ne pourra plus utiliser ce lien.",
+    "Il destinatario non potrà più utilizzare questo link."
+  ],
+  "Freigabelink konnte nicht erstellt werden.": [
+    "The sharing link could not be created.",
+    "Le lien de partage n’a pas pu être créé.",
+    "Impossibile creare il link di condivisione."
+  ],
+  "Freigabelink konnte nicht widerrufen werden.": [
+    "The sharing link could not be revoked.",
+    "Le lien de partage n’a pas pu être révoqué.",
+    "Impossibile revocare il link di condivisione."
+  ],
+  "Link konnte nicht kopiert werden.": [
+    "The link could not be copied.",
+    "Le lien n’a pas pu être copié.",
+    "Impossibile copiare il link."
+  ],
+  "Bitte Empfänger und Gültigkeit prüfen.": [
+    "Please check the recipient and validity.",
+    "Vérifiez le destinataire et la validité.",
+    "Verifica il destinatario e la validità."
+  ],
+  "Dieser Berichtslink ist abgelaufen, widerrufen oder nicht mehr verfügbar.": [
+    "This report link has expired, been revoked or is no longer available.",
+    "Ce lien de rapport a expiré, a été révoqué ou n’est plus disponible.",
+    "Questo link del rapporto è scaduto, è stato revocato o non è più disponibile."
+  ],
+  "Bitte zuerst nicht mehr benötigte Berichtslinks widerrufen.": [
+    "Please revoke report links that are no longer needed first.",
+    "Révoquez d’abord les liens de rapport devenus inutiles.",
+    "Revoca prima i link dei rapporti che non servono più."
+  ],
+  "Der Bestätigungscode kann momentan nicht versendet werden.": [
+    "The verification code cannot be sent at the moment.",
+    "Le code de vérification ne peut pas être envoyé pour le moment.",
+    "Al momento non è possibile inviare il codice di verifica."
+  ],
+  "Der Codeversand konnte nicht bestätigt werden. Bitte den Posteingang prüfen.": [
+    "Sending the code could not be confirmed. Please check your inbox.",
+    "L’envoi du code n’a pas pu être confirmé. Vérifiez votre boîte de réception.",
+    "Impossibile confermare l’invio del codice. Controlla la posta in arrivo."
+  ],
+  "Bitte den vollständigen Berichtslink öffnen.": [
+    "Please open the complete report link.",
+    "Ouvrez le lien complet du rapport.",
+    "Apri il link completo del rapporto."
+  ],
+  "Bitte den sechsstelligen Code eingeben.": [
+    "Please enter the six-digit code.",
+    "Saisissez le code à six chiffres.",
+    "Inserisci il codice a sei cifre."
+  ],
+  "Bericht öffnen": [
+    "Open report",
+    "Ouvrir le rapport",
+    "Apri rapporto"
+  ],
+  "Link erstellen": [
+    "Create link",
+    "Créer le lien",
+    "Crea link"
+  ],
+  "Link kopieren": [
+    "Copy link",
+    "Copier le lien",
+    "Copia link"
+  ],
+  "Die Berichtsfreigabe ist noch nicht korrekt konfiguriert.": [
+    "Report sharing is not yet configured correctly.",
+    "Le partage de rapports n’est pas encore correctement configuré.",
+    "La condivisione dei rapporti non è ancora configurata correttamente."
   ]
 }

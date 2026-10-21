@@ -4,8 +4,8 @@ import fs from 'node:fs';
 
 export const fullRoutes=['/','/dashboard','/portal','/login','/registrieren','/preise','/produkt','/demo','/operator/login','/operator','/operator/kunden','/operator/tickets','/operator/monitoring','/operator/zahlungen','/operator/sicherheit','/operator/audit','/kunden','/produkte','/mitarbeiter','/spesen','/zahlungen','/angebote','/rechnungen','/finanzen','/finanzen/analyse','/support','/zeit','/einstellungen','/einstellungen/darstellung','/kunden/customer-one','/produkte/product-one','/mitarbeiter/employee-one','/spesen/expense-one','/zahlungen/payment-one','/rechnungen/RE-TEST-1','/angebote/AN-TEST-1','/support/ticket-one','/produkte/neu','/mitarbeiter/neu','/spesen/neu','/projekte/neu','/kunden/neu','/rechnungen/neu','/angebote/neu','/zahlungen/neu','/support/neu','/benachrichtigungen','/kunden/customer-one/bearbeiten','/einstellungen/konto','/einstellungen/firma','/einstellungen/dokumente','/einstellungen/team','/einstellungen/abonnement','/einstellungen/benachrichtigungen','/einstellungen/sprache','/einstellungen/sicherheit','/einstellungen/datenschutz','/einstellungen/zeiterfassung'];
 // Include every page file, redirect, read-only preview and operator section.
-fullRoutes.push('/angebot','/berichte','/projekte','/projekte/project-one','/wartung','/operator/wallboard','/dev/ux-lab','/offline','/agb','/datenschutz','/impressum','/auftragsbearbeitung','/unterauftragsbearbeiter','/passwort-vergessen','/passwort-zuruecksetzen','/email-bestaetigen','/einladung','/willkommen','/belege','/portal/login','/portal/registrieren','/preview/zeit','/preview/dashboard','/preview/rechnungen','/operator/finanzen','/operator/abonnemente','/operator/sperrungen','/operator/ankuendigungen');
-export const webkitFullRoutes=['/angebot','/berichte','/projekte','/projekte/project-one','/dashboard','/finanzen','/support/ticket-one','/rechnungen','/zeit','/mitarbeiter/neu','/mitarbeiter/employee-one','/projekte/neu','/rechnungen/RE-TEST-1','/kunden/neu','/produkte/neu','/spesen/neu','/angebote/neu','/zahlungen/neu'];
+fullRoutes.push('/bericht','/angebot','/berichte','/projekte','/projekte/project-one','/wartung','/operator/wallboard','/dev/ux-lab','/offline','/agb','/datenschutz','/impressum','/auftragsbearbeitung','/unterauftragsbearbeiter','/passwort-vergessen','/passwort-zuruecksetzen','/email-bestaetigen','/einladung','/willkommen','/belege','/portal/login','/portal/registrieren','/preview/zeit','/preview/dashboard','/preview/rechnungen','/operator/finanzen','/operator/abonnemente','/operator/sperrungen','/operator/ankuendigungen');
+export const webkitFullRoutes=['/bericht','/angebot','/berichte','/projekte','/projekte/project-one','/dashboard','/finanzen','/support/ticket-one','/rechnungen','/zeit','/mitarbeiter/neu','/mitarbeiter/employee-one','/projekte/neu','/rechnungen/RE-TEST-1','/kunden/neu','/produkte/neu','/spesen/neu','/angebote/neu','/zahlungen/neu'];
 const groups={
  products:{match:/product|produkt/,routes:['/produkte','/produkte/product-one','/produkte/neu'],interactions:['products']},
  customers:{match:/customer|kunden|contact/,routes:['/kunden','/kunden/customer-one','/kunden/neu'],interactions:['customers']},
@@ -13,12 +13,13 @@ const groups={
  documents:{match:/document|invoice|quote|pdf|qr-bill|rechnungen|angebote/,routes:['/rechnungen','/rechnungen/RE-TEST-1','/rechnungen/neu','/angebote','/angebote/AN-TEST-1','/angebote/neu'],interactions:['documents']},
  payments:{match:/payment|zahlungen/,routes:['/zahlungen','/zahlungen/payment-one','/zahlungen/neu'],interactions:['data']},
  finance:{match:/finance|finanzen|dashboard|revenue/,routes:['/dashboard','/finanzen','/finanzen/analyse'],interactions:['finance']},
+ reports:{match:/report|berichte|bericht/,routes:['/berichte','/bericht'],interactions:[]},
  time:{match:/time|timer|zeit|project|projekte|auftraege/,routes:['/zeit','/projekte/neu','/einstellungen/zeiterfassung'],interactions:['time']},
  expenses:{match:/expense|spesen/,routes:['/spesen','/spesen/expense-one','/spesen/neu'],interactions:['expenses']},
  chat:{match:/support|chat|ticket|workspace-viewport/,routes:['/support','/support/ticket-one','/support/neu'],interactions:['chat']},
  settings:{match:/setting|einstellungen/,routes:['/einstellungen','/einstellungen/darstellung','/benachrichtigungen','/einstellungen/abonnement'],interactions:['billing','settings']},
  operator:{match:/operator/,routes:fullRoutes.filter(r=>r.startsWith('/operator')),interactions:['operator']},
- public:{match:/marketing|landing|portal|login|registr|preis|produkt\/|demo|onboarding|manifest|service-worker|public\//,routes:['/','/portal','/login','/registrieren','/preise','/produkt','/demo','/angebot'],interactions:[]},
+ public:{match:/marketing|landing|portal|login|registr|preis|produkt\/|demo|onboarding|manifest|service-worker|public(?:\/|-report)/,routes:['/','/portal','/login','/registrieren','/preise','/produkt','/demo','/angebot','/bericht'],interactions:[]},
 };
 const representative=['/dashboard','/finanzen','/kunden','/kunden/customer-one','/kunden/neu','/produkte','/produkte/product-one','/produkte/neu','/rechnungen','/rechnungen/RE-TEST-1','/rechnungen/neu','/mitarbeiter/employee-one','/mitarbeiter/neu','/zeit','/projekte/neu','/spesen/neu','/support/ticket-one','/einstellungen','/operator','/operator/kunden','/login'];
 const allInteractions=['data','customers','products','employees','documents','finance','time','expenses','chat','billing','header','operator','settings','chrome'];
@@ -64,6 +65,10 @@ export function planChanges(files,{level='standard'}={}){
  if(paths.some(p=>/ux-compliance|scripts\/compliance/.test(p))){suites.add('compliance/selftest');suites.add('compliance/report-test');}
  if(paths.some(p=>/permission|role|page-access/.test(p)))suites.add('permission-selfcheck');
  if(paths.some(p=>/database|server\/repositories|app\/api/.test(p)))suites.add('migration-test');
+ // Service-owner-only edits must retain their actual DB/code/PDF security
+ // contracts, even when no route file happens to be touched in the same task.
+ if(paths.some(p=>/^lib\/server\/(public-reports|report-(exports|mail|document)|plan-access)\./.test(p)))suites.add('migration-test');
+ if(paths.some(p=>/^lib\/server\/(public-reports|report-mail)\./.test(p))){suites.add('mail-message-test');suites.add('web-vitals-consent-test');}
  if(infrastructure||unknown)suites.add('qa-plan-test');
  return {level:full?'full':level,files:paths,global,reason:full?'Release/CI/auth/schema or unknown dependency: full coverage':broad?'Shared/unknown dependency: representative cross-module coverage':'Changed modules only',routes,webkitRoutes:full?webkitFullRoutes:routes,interactions:full||broad?allInteractions:[...new Set(matched.flatMap(g=>g.interactions))],suites:[...suites],widths:full?[320,375,390,430,600,760,761,768,820,1024,1440,1920]:level==='fast'?[390]:[390,768,1440],webkitWidths:full?[320,375,390,430,600,760,761,768,820,1024,1440,1920]:[390,768],themes:level==='fast'?['light']:['light','dark']};
 }

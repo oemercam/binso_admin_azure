@@ -9,7 +9,8 @@ const contract={};Function('exports',transpile(validation))(contract);
 let consent=false,callback,cleanup;const sent=[];
 const hooks={useRef:value=>({current:value}),useEffect:effect=>{cleanup=effect();},useCallback:value=>value};
 const dependencies={react:hooks,'next/web-vitals':{useReportWebVitals:value=>{callback=value;}},'@/components/privacy-consent':{readPerformanceConsent:()=>consent},'@/lib/web-vitals':contract};
-const component={};Function('exports','require','window','navigator',transpile(source))(component,key=>{assert.ok(dependencies[key],key);return dependencies[key];},{location:{pathname:'/kunden/123456789012345678901234567890'}},{sendBeacon:(url,body)=>{sent.push({url,body});return true;}});
+const browserWindow={location:{pathname:'/kunden/123456789012345678901234567890'}};
+const component={};Function('exports','require','window','navigator',transpile(source))(component,key=>{assert.ok(dependencies[key],key);return dependencies[key];},browserWindow,{sendBeacon:(url,body)=>{sent.push({url,body});return true;}});
 component.default();
 const metric={name:'LCP',id:'fixture',value:100,rating:'good'};
 callback(metric);assert.equal(sent.length,0,'No measurement without consent');
@@ -20,5 +21,8 @@ callback({...metric,name:'FID'});callback({...metric,value:-1});callback({...met
 consent=false;callback({...metric,value:200});assert.equal(sent.length,1,'Withdrawal blocks existing observers immediately');
 const obsolete=callback;cleanup();consent=true;obsolete({...metric,value:300});assert.equal(sent.length,1,'Unmounted observers stay blocked after a new opt-in');
 component.default();callback({...metric,value:400});assert.equal(sent.length,2,'New opt-in mounts a fresh reporter');obsolete({...metric,value:500});assert.equal(sent.length,2);
+const capability='R'.repeat(43);browserWindow.location={pathname:'/bericht',href:'https://fixture.invalid/bericht?lang=de#'+capability,search:'?lang=de',hash:'#'+capability};
+callback({...metric,id:'report:'+capability,value:600});assert.equal(sent.length,3);
+const reportMeasurement=JSON.parse(await sent[2].body.text());assert.equal(reportMeasurement.route,'/bericht');assert.deepEqual(Object.keys(reportMeasurement).sort(),['name','rating','route','value']);assert.ok(!JSON.stringify(reportMeasurement).includes(capability),'Even opted-in measurement cannot disclose fragment capabilities or metric identifiers');
 cleanup();
 console.log('Consent refusal, opt-in, withdrawal, duplicate/invalid metrics, private-route minimization and obsolete observer isolation passed.');

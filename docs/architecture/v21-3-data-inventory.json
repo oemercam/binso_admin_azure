@@ -2,10 +2,10 @@
   "scope": "Static AST/source inventory, not proof that every runtime branch is tested. Calls include exact source arguments and locations; dynamic dispatch requires the domain matrix and runtime tests.",
   "base": "7b90a5c7353cf2061987fcd0f4550210bbc00f92",
   "counts": {
-    "apis": 118,
-    "consumers": 42,
-    "migrations": 74,
-    "tables": 107
+    "apis": 120,
+    "consumers": 44,
+    "migrations": 75,
+    "tables": 109
   },
   "apis": [
     {
@@ -5113,6 +5113,51 @@
       ]
     },
     {
+      "file": "app/api/public/report/route.ts",
+      "path": "/api/public/report",
+      "methods": [
+        "POST"
+      ],
+      "dependencies": [
+        "lib/server/http.ts",
+        "lib/server/rate-limit.ts",
+        "lib/server/env.ts",
+        "lib/server/db.ts",
+        "lib/server/public-reports.ts",
+        "lib/server/session.ts",
+        "lib/server/maintenance.ts",
+        "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
+        "lib/server/report-exports.ts",
+        "lib/server/rbac.ts",
+        "lib/permissions.ts",
+        "lib/server/audit.ts",
+        "lib/server/business-idempotency.ts",
+        "lib/server/plan-access.ts",
+        "lib/locales/index.ts",
+        "lib/locales/config.ts",
+        "lib/server/report-document.ts",
+        "lib/financial-status.ts",
+        "lib/money.ts",
+        "lib/statistics-period.ts",
+        "lib/server/repositories/reports.ts",
+        "lib/report-export.ts",
+        "lib/projects.ts",
+        "lib/server/repositories/time-workspace.ts",
+        "lib/server/repositories/finance.ts",
+        "lib/server/document-pdf.ts",
+        "lib/qr-bill.ts",
+        "lib/server/document-logo.ts",
+        "lib/server/storage.ts",
+        "lib/server/file-access.ts",
+        "lib/server/crypto.ts",
+        "lib/server/email.ts",
+        "lib/server/logger.ts",
+        "lib/server/mail-message.ts"
+      ],
+      "evidence": []
+    },
+    {
       "file": "app/api/reports/exports/[id]/route.ts",
       "path": "/api/reports/exports/[id]",
       "methods": [
@@ -5184,11 +5229,11 @@
         "lib/server/fresh-authentication.ts",
         "lib/server/rate-limit.ts",
         "lib/server/report-mail.ts",
-        "lib/server/rbac.ts",
-        "lib/permissions.ts",
         "lib/server/audit.ts",
         "lib/server/plan-access.ts",
         "lib/server/report-exports.ts",
+        "lib/server/rbac.ts",
+        "lib/permissions.ts",
         "lib/server/business-idempotency.ts",
         "lib/locales/index.ts",
         "lib/locales/config.ts",
@@ -5206,6 +5251,63 @@
         "lib/server/document-logo.ts",
         "lib/server/storage.ts",
         "lib/server/file-access.ts",
+        "lib/server/email.ts",
+        "lib/server/logger.ts",
+        "lib/server/mail-message.ts"
+      ],
+      "evidence": [
+        {
+          "callee": "requireSession",
+          "line": 8,
+          "arguments": []
+        },
+        {
+          "callee": "requireSession",
+          "line": 10,
+          "arguments": []
+        }
+      ]
+    },
+    {
+      "file": "app/api/reports/exports/[id]/share/route.ts",
+      "path": "/api/reports/exports/[id]/share",
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "dependencies": [
+        "lib/server/session.ts",
+        "lib/server/maintenance.ts",
+        "lib/server/env.ts",
+        "lib/server/db.ts",
+        "lib/server/http.ts",
+        "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
+        "lib/server/rate-limit.ts",
+        "lib/server/public-reports.ts",
+        "lib/server/report-exports.ts",
+        "lib/server/rbac.ts",
+        "lib/permissions.ts",
+        "lib/server/audit.ts",
+        "lib/server/business-idempotency.ts",
+        "lib/server/plan-access.ts",
+        "lib/locales/index.ts",
+        "lib/locales/config.ts",
+        "lib/server/report-document.ts",
+        "lib/financial-status.ts",
+        "lib/money.ts",
+        "lib/statistics-period.ts",
+        "lib/server/repositories/reports.ts",
+        "lib/report-export.ts",
+        "lib/projects.ts",
+        "lib/server/repositories/time-workspace.ts",
+        "lib/server/repositories/finance.ts",
+        "lib/server/document-pdf.ts",
+        "lib/qr-bill.ts",
+        "lib/server/document-logo.ts",
+        "lib/server/storage.ts",
+        "lib/server/file-access.ts",
+        "lib/server/crypto.ts",
         "lib/server/email.ts",
         "lib/server/logger.ts",
         "lib/server/mail-message.ts"
@@ -8719,6 +8821,7 @@
         "app/angebot/page.tsx",
         "app/angebote/[id]/page.tsx",
         "app/angebote/neu/page.tsx",
+        "app/bericht/page.tsx",
         "app/berichte/page.tsx",
         "app/dev/ux-lab/page.tsx",
         "app/kunden/[id]/bearbeiten/page.tsx",
@@ -8781,6 +8884,22 @@
       ]
     },
     {
+      "file": "components/public-report.tsx",
+      "calls": [
+        {
+          "callee": "fetch",
+          "line": 15,
+          "arguments": [
+            "'/api/public/report'",
+            "{method:'POST',credentials:'omit',cache:'no-store',redirect:'error',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:token.current,action,...(action==='pdf'?{code,key:key.current}:{})}),signal:AbortSignal.timeout(20000)}"
+          ]
+        }
+      ],
+      "pages": [
+        "app/bericht/page.tsx"
+      ]
+    },
+    {
       "file": "components/registration/registration-page.tsx",
       "calls": [
         {
@@ -8809,14 +8928,14 @@
       "calls": [
         {
           "callee": "useApiQuery",
-          "line": 17,
+          "line": 18,
           "arguments": [
             "'/api/auth/session'"
           ]
         },
         {
           "callee": "apiPost",
-          "line": 26,
+          "line": 28,
           "arguments": [
             "'/api/reports/exports'",
             "{query,locale}",
@@ -8825,7 +8944,7 @@
         },
         {
           "callee": "apiGetFile",
-          "line": 28,
+          "line": 30,
           "arguments": [
             "'/api/reports/exports/'+response.item.id",
             "'application/pdf'"
@@ -8833,7 +8952,7 @@
         },
         {
           "callee": "apiGetFile",
-          "line": 31,
+          "line": 33,
           "arguments": [
             "'/api/reports?'+query+'&format=csv&lang='+locale",
             "'text/csv'"
@@ -8849,18 +8968,50 @@
       "calls": [
         {
           "callee": "useApiQuery",
-          "line": 17,
+          "line": 19,
           "arguments": [
             "'/api/reports/exports/'+id+'/send'"
           ]
         },
         {
           "callee": "apiPost",
-          "line": 25,
+          "line": 27,
           "arguments": [
             "'/api/reports/exports/'+id+'/send'",
             "{recipient,subject,message}",
             "{idempotencyKey:key.current}"
+          ]
+        }
+      ],
+      "pages": [
+        "app/berichte/page.tsx"
+      ]
+    },
+    {
+      "file": "components/report-share.tsx",
+      "calls": [
+        {
+          "callee": "useApiQuery",
+          "line": 14,
+          "arguments": [
+            "'/api/reports/exports/'+id+'/share'"
+          ]
+        },
+        {
+          "callee": "apiPost",
+          "line": 19,
+          "arguments": [
+            "'/api/reports/exports/'+id+'/share'",
+            "{action:'create',recipient,days:Number(days)}",
+            "{idempotencyKey:key.current}"
+          ]
+        },
+        {
+          "callee": "apiPost",
+          "line": 26,
+          "arguments": [
+            "'/api/reports/exports/'+id+'/share'",
+            "{action:'revoke',linkId:revoke}"
           ]
         }
       ],
@@ -10942,6 +11093,32 @@
       "file": "database/migrations/0073_report_mail_outbox.sql",
       "tables": [],
       "relations": [],
+      "rls": []
+    },
+    {
+      "file": "database/migrations/0074_report_recipient_shares.sql",
+      "tables": [
+        "report_public_links",
+        "report_recipient_codes"
+      ],
+      "relations": [
+        {
+          "table": "organizations",
+          "columns": "id"
+        },
+        {
+          "table": "report_exports",
+          "columns": "organization_id,id"
+        },
+        {
+          "table": "organizations",
+          "columns": "id"
+        },
+        {
+          "table": "report_public_links",
+          "columns": "organization_id,id"
+        }
+      ],
       "rls": []
     }
   ],

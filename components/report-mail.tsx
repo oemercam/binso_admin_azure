@@ -4,6 +4,8 @@ import {apiPost} from '@/lib/client/backend';
 import {useApiQuery} from '@/lib/client/use-api-query';
 import {LocalizedText,useLocale} from '@/lib/client/locale';
 import {translateMessage} from '@/lib/locales';
+import {localeTags} from '@/lib/locales/config';
+import {formatDateTime} from '@/lib/display-format';
 import {FormSheet,ListRow} from './binso-ux';
 import {Button,Field,Input,Textarea,FormActions,ErrorState,LoadingState} from './ui';
 import {DocumentModal} from './pdf-preview';
@@ -14,7 +16,7 @@ const deliveryTone=(status:string)=>status==='failed'?'danger':status==='uncerta
 export function ReportMailSheet({id,blob,onClose}:{id:string;blob:Blob;onClose:()=>void}){
  const {locale}=useLocale(),[recipient,setRecipient]=useState(''),[subject,setSubject]=useState(()=>translateMessage('Berichte',locale)),[message,setMessage]=useState(()=>translateMessage('Im Anhang findest du den angeforderten Bericht.',locale));
  const key=useRef(crypto.randomUUID()),pending=useRef(false),[busy,setBusy]=useState(false),[error,setError]=useState(''),[outcome,setOutcome]=useState<Outcome|null>(null),[preview,setPreview]=useState(false),[dirty,setDirty]=useState(false);
- const history=useApiQuery<{items:Array<{id:string;recipient:string;subject:string;status:string}>}>('/api/reports/exports/'+id+'/send');
+ const history=useApiQuery<{items:Array<{id:string;recipient:string;subject:string;status:string;created_at:string}>}>('/api/reports/exports/'+id+'/send');
  const frozen=busy||!!outcome&&outcome.status!=='failed';
  const accepted=outcome?.status==='accepted';
  const outcomeMessage=accepted?'Versand vom E-Mail-Anbieter angenommen. Zustellung noch nicht nachgewiesen.':outcome?.status==='failed'?'Der Bericht wurde nicht versendet. Bitte die E-Mail-Verbindung prüfen.':'Der Versand läuft oder ist ungeklärt. Bitte den Versandstatus prüfen, nicht erneut senden.';
@@ -36,6 +38,6 @@ export function ReportMailSheet({id,blob,onClose}:{id:string;blob:Blob;onClose:(
   <p><LocalizedText>Genau diese Berichtsvorschau wird als PDF angehängt. Es wird kein automatischer Folgeversand aktiviert.</LocalizedText></p>
   {outcome&&<p role="status"><LocalizedText>{outcomeMessage}</LocalizedText></p>}
   {error&&<ErrorState>{error}</ErrorState>}
-  {history.error?<ErrorState onRetry={history.refresh}>{history.error}</ErrorState>:history.loading?<LoadingState/>:history.data?.items.map(row=><ListRow key={row.id} title={row.recipient} translateTitle={false} meta={row.subject} status={deliveryLabels[row.status]??'Versand ungeklärt'} tone={deliveryTone(row.status)}/>)}
+  {history.error?<ErrorState onRetry={history.refresh}>{history.error}</ErrorState>:history.loading?<LoadingState/>:history.data?.items.map(row=><ListRow key={row.id} title={row.recipient} translateTitle={false} meta={[row.subject,formatDateTime(row.created_at,localeTags[locale])].filter(Boolean).join(' · ')} status={deliveryLabels[row.status]??'Versand ungeklärt'} tone={deliveryTone(row.status)}/>)}
  </div><FormActions><Button variant="secondary" disabled={busy} data-sheet-dismiss="true">Schliessen</Button>{!accepted&&<Button type="submit" disabled={busy||!recipient||!subject.trim()||!message.trim()}><LocalizedText>{outcome?'Versandstatus prüfen':'Per E-Mail senden'}</LocalizedText></Button>}</FormActions></form></FormSheet>{preview&&<DocumentModal title="Berichte" fileBlob={blob} fileName="binso-report" onClose={()=>setPreview(false)}/>}</>;
 }

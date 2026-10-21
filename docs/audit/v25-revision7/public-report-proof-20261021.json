@@ -1,0 +1,32 @@
+{
+  "date": "2026-10-21",
+  "scope": "Local development/Edge; synthetic public recipient-code responses. Actual backend/RLS is a separate migrated DB contract. No real delivery/device/reference acceptance.",
+  "viewport": {
+    "width": 390,
+    "height": 780
+  },
+  "theme": "light",
+  "locale": "de",
+  "sourceHashes": {
+    "components/public-report.tsx": "99fd6e80d8cc429d0c2511410f091c8b5d7f81290375a5ffa1533e948b6d39e8",
+    "app/bericht/page.tsx": "8b5dc825b9ab6f5d138fb7b2e462f6c3b7fdc59afe080621448016caffef9e17",
+    "scripts/public-report-browser.mjs": "3f1e95cfadfed97ae1296b002f03a2f688bf0a93a4c5c7210a21969f7baf213d"
+  },
+  "images": [
+    {
+      "file": "../evidence/revision7-public-report-unverified.png",
+      "sha256": "cb08969d1568a36706f3f300cf01fcda458066ebb92ca15851c731e9e4df6665"
+    },
+    {
+      "file": "../evidence/revision7-public-report-verified-preview.png",
+      "sha256": "448c31454983ad9ea93ddac428c14a0a6277c96085568cf01aaf034e1e9e36ff"
+    }
+  ],
+  "checks": [
+    "No request before explicit challenge",
+    "Wrong code reveals no PDF",
+    "Verified synthetic response renders actual PDF viewer",
+    "Capability absent from HTTP URL",
+    "Incomplete link sends no request"
+  ]
+}

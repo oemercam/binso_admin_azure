@@ -16,6 +16,7 @@ import {reportPdf} from './document-pdf';
 import {documentLogo} from './document-logo';
 
 const hash=(value:string|Buffer)=>createHash('sha256').update(value).digest('hex');
+export function authorizeReportDelivery(s:SessionUser){authorize(s,'reports:read');authorize(s,'documents:write');if(s.isDemo)throw new ApiError(403,'demo_send_disabled','Versand ist für diese Testumgebung nicht verfügbar.');}
 /** Includes effective policy and currently active assignment scope, not changing
  * business values. Historical reports stay immutable after a payment/correction;
  * lost rights, assignments or entitlements require a newly authorized preview. */

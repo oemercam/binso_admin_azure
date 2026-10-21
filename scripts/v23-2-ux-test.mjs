@@ -117,3 +117,9 @@ console.log('Actual operator send: same-frame lock, late-completion draft preser
  }
  console.log('App light/dark themes: primary text, secondary labels and accent meet 4.5:1 contrast on all three surfaces.');
 }
+
+const localizedStamps=[];for(const locale of ['de-CH','en-CH','fr-CH','it-CH']){
+ const summer=formatDateTime('2026-10-21T23:30:00Z',locale),winter=formatDateTime('2026-12-31T23:30:00Z',locale);localizedStamps.push(summer);
+ assert.ok(summer.includes('22')&&summer.includes('01:30'),'Summer business timestamp belongs to the next Swiss day');
+ assert.ok(winter.includes('2027')&&winter.includes('00:30'),'Winter business timestamp crosses the Swiss year boundary');assert.equal(formatDateTime('invalid',locale),'');
+}assert.ok(new Set(localizedStamps).size>1,'The requested language changes timestamp formatting instead of silently remaining German');

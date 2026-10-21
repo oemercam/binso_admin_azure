@@ -17,9 +17,9 @@ export function timeMetadata(description:unknown,project:unknown,person:unknown,
 export function formatHours(value:unknown){
  const hours=Number(value);return Number.isFinite(hours)?hours.toLocaleString("de-DE",{maximumFractionDigits:2})+" h":"—";
 }
-export function formatDateTime(value:unknown){
+export function formatDateTime(value:unknown,locale='de-CH'){
  const date=new Date(String(value??""));if(!Number.isFinite(date.getTime()))return "";
- return new Intl.DateTimeFormat("de-CH",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit",timeZone:"Europe/Zurich"}).format(date);
+ return new Intl.DateTimeFormat(locale,{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit",timeZone:"Europe/Zurich"}).format(date);
 }
 /** Chat day boundaries use the same Swiss business timezone as other timestamps. */
 export function messageDay(value:string){

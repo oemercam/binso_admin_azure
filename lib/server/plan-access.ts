@@ -11,10 +11,11 @@ function appPlan(value:string):PlanId{
  return mapped;
 }
 
-export async function getOrganizationPlan(organizationId:string):Promise<PlanId>{
- const result=await withTenant(organizationId,'',client=>client.query<{plan:string}>(`select plan from organization_subscriptions where organization_id=$1 limit 1`,[organizationId]));
+export async function organizationPlanInTransaction(client:PoolClient,organizationId:string):Promise<PlanId>{
+ const result=await client.query<{plan:string}>(`select plan from organization_subscriptions where organization_id=$1 limit 1`,[organizationId]);
  return appPlan(result.rows[0]?.plan||"");
 }
+export async function getOrganizationPlan(organizationId:string):Promise<PlanId>{return withTenant(organizationId,'',client=>organizationPlanInTransaction(client,organizationId));}
 
 export async function requireModuleEntitlement(organizationId:string,moduleKey:string){
  const plan=await getOrganizationPlan(organizationId);

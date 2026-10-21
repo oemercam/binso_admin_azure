@@ -2193,6 +2193,143 @@
       ]
     },
     {
+      "route": "/bericht",
+      "file": "app/bericht/page.tsx",
+      "surface": "public",
+      "roles": [
+        "anonymous",
+        "authenticated"
+      ],
+      "states": [
+        "Erstbesuch",
+        "Daten vorhanden",
+        "leer",
+        "laden",
+        "Fehler",
+        "offline",
+        "kein Zugriff",
+        "Sitzung abgelaufen",
+        "Tastatur",
+        "Zurück/Deep-Link",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440,
+        1920,
+        2560
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "locales": [
+        "de-CH",
+        "fr-CH",
+        "it-CH",
+        "en"
+      ],
+      "status": "nicht_abgenommen",
+      "kpiAssessment": "Keine dekorativen KPI: Information, Identity, Einstellungen oder fokussierte Eingabe. Fachliche Ausnahmen separat prüfen.",
+      "dataSource": "Statische API-/KPI-Quellen in routes.json für /bericht; tatsächlicher Rollen-/RLS-Abgleich offen.",
+      "tests": [],
+      "visualEvidence": [],
+      "blocker": "Ausführung und fachlich geprüfter Referenzvergleich fehlen",
+      "metricSources": [],
+      "apiSources": [
+        {
+          "owner": "components/public-report.tsx",
+          "line": 8,
+          "apis": [
+            "/api/public/report"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/language-preference.ts",
+          "line": 5,
+          "apis": [
+            "/api/operator/preferences",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/data-events.ts",
+          "line": 9,
+          "apis": [
+            "/api/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/backend.ts",
+          "line": 79,
+          "apis": [
+            "/api/settings/team",
+            "/api/auth/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/backend.ts",
+          "line": 111,
+          "apis": [
+            "/api/documents",
+            "/api/auth/reauthenticate"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "lib/client/data-events.ts",
+          "line": 16,
+          "apis": [
+            "/api/workforce-assignments",
+            "/api/settings/team/",
+            "/api/settings/notifications",
+            "/api/settings/profile"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "components/pdf-preview.tsx",
+          "line": 107,
+          "apis": [
+            "/api/documents/",
+            "/api/documents/preview"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        }
+      ],
+      "purpose": "Öffentliche Information oder Identity-Prozess; keine dekorativen Geschäftszahlen.",
+      "roleExpectations": [
+        {
+          "role": "anonymous",
+          "purpose": "Öffentliche Information oder Identity-Prozess; keine dekorativen Geschäftszahlen.",
+          "standard": "surface_guard_to_verify",
+          "timeOnly": "not_applicable",
+          "limitation": "Navigationserwartung aus aktuellem Code, kein Nachweis für API, RLS, Tarif, Assignment oder Zustand."
+        },
+        {
+          "role": "authenticated",
+          "purpose": "Öffentliche Information oder Identity-Prozess; keine dekorativen Geschäftszahlen.",
+          "standard": "surface_guard_to_verify",
+          "timeOnly": "not_applicable",
+          "limitation": "Navigationserwartung aus aktuellem Code, kein Nachweis für API, RLS, Tarif, Assignment oder Zustand."
+        }
+      ]
+    },
+    {
       "route": "/berichte",
       "file": "app/berichte/page.tsx",
       "surface": "tenant",
@@ -2697,7 +2834,7 @@
         },
         {
           "owner": "components/report-actions.tsx",
-          "line": 14,
+          "line": 15,
           "apis": [
             "/api/auth/session",
             "/api/reports/exports",
@@ -2719,7 +2856,16 @@
         },
         {
           "owner": "components/report-mail.tsx",
-          "line": 14,
+          "line": 16,
+          "apis": [
+            "/api/reports/exports/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
+          "owner": "components/report-share.tsx",
+          "line": 12,
           "apis": [
             "/api/reports/exports/"
           ],
@@ -20553,11 +20699,13 @@
     "components/privacy-settings-button.tsx",
     "components/project-form.tsx",
     "components/public-offer.tsx",
+    "components/public-report.tsx",
     "components/pwa-register.tsx",
     "components/records.tsx",
     "components/registration/registration-page.tsx",
     "components/report-actions.tsx",
     "components/report-mail.tsx",
+    "components/report-share.tsx",
     "components/security-settings-page.tsx",
     "components/select-control.tsx",
     "components/session-data-boundary.tsx",
@@ -20670,9 +20818,11 @@
     "app/api/projects/route.ts",
     "app/api/projects/[id]/route.ts",
     "app/api/public/offer/route.ts",
+    "app/api/public/report/route.ts",
     "app/api/reports/exports/route.ts",
     "app/api/reports/exports/[id]/route.ts",
     "app/api/reports/exports/[id]/send/route.ts",
+    "app/api/reports/exports/[id]/share/route.ts",
     "app/api/reports/route.ts",
     "app/api/search/route.ts",
     "app/api/settings/company/route.ts",
@@ -20769,6 +20919,7 @@
     "database/migrations/0070_issued_invoice_pdf.sql",
     "database/migrations/0071_operator_language_preference.sql",
     "database/migrations/0072_report_export_snapshots.sql",
-    "database/migrations/0073_report_mail_outbox.sql"
+    "database/migrations/0073_report_mail_outbox.sql",
+    "database/migrations/0074_report_recipient_shares.sql"
   ]
 }

@@ -7,7 +7,7 @@ const port=process.env.BINSO_AUTH_TEST_PORT??'3217',base='http://127.0.0.1:'+por
 const inventory=JSON.parse(await fs.readFile('docs/architecture/v21-3-data-inventory.json','utf8'));
 const publicPaths=new Set([
  '/api/auth/invitation','/api/auth/login','/api/auth/logout','/api/auth/password','/api/auth/recover','/api/auth/register','/api/auth/resend-verification','/api/auth/session','/api/auth/verify-email',
- '/api/public/offer','/api/billing/catalog','/api/billing/webhook','/api/health','/api/health/ready','/api/telemetry/web-vitals',
+ '/api/public/offer','/api/public/report','/api/billing/catalog','/api/billing/webhook','/api/health','/api/health/ready','/api/telemetry/web-vitals',
  '/api/demo/session','/api/operator/demo-session','/api/operator/logout','/api/operator/sso/callback',
 ]);
 // Passkey routes are dual-purpose: registration remains private and is probed
@@ -22,6 +22,8 @@ try{
  // The recipient endpoint is intentionally public, but still requires a valid
  // capability for every action; no session or disabled assertion substitutes it.
  assert.equal((await fetch(base+'/api/public/offer')).status,405,'GET never executes a public offer operation');
+ assert.equal((await fetch(base+'/api/public/report')).status,405,'GET never sends a report code or returns report bytes');
+ const report=await fetch(base+'/api/public/report',{method:'POST',headers:{origin:base,'content-type':'application/json'},body:JSON.stringify({token:'!'.repeat(43),action:'pdf',code:'123456',key:'synthetic-denied-report'})});assert.equal(report.status,410,'Invalid capability cannot expose report content');
  for(const action of ['read','pdf','challenge','respond']){
   const response=await fetch(base+'/api/public/offer',{method:'POST',headers:{origin:base,'content-type':'application/json'},body:JSON.stringify({token:'!'.repeat(43),action,decision:'accept',confirmed:true,code:'123456',requestKey:'synthetic-public-denial'})});
   assert.equal(response.status,410,action+' rejects an invalid public capability before tenant access');

@@ -1,23 +1,21 @@
 import 'server-only';
 import type {SessionUser} from './session';
 import {withTenant} from './db';
-import {authorize} from './rbac';
 import {ApiError,validEmail} from './http';
 import {audit} from './audit';
 import {getOrganizationPlan} from './plan-access';
-import {readReportExport} from './report-exports';
+import {readReportExport,authorizeReportDelivery} from './report-exports';
 import {sendMail,mailLayout,mailConfigured} from './email';
 
 type SendInput={recipient:string;subject:string;message:string;key:string};
 type Delivery={id:string;recipient:string;subject:string;body:string;entity_id:string;created_by:string;status:string;created_at:string|Date};
 const escape=(value:string)=>value.replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]!));
-function permitted(s:SessionUser){authorize(s,'reports:read');authorize(s,'documents:write');if(s.isDemo)throw new ApiError(403,'demo_send_disabled','Versand ist für diese Testumgebung nicht verfügbar.');}
 function result(row:Pick<Delivery,'id'|'status'>){return {id:row.id,status:row.status,providerAccepted:row.status==='accepted',deliveryConfirmed:false};}
 
 /** One explicit send, no retry worker. A lost response can be checked using the
  * same key; sending/uncertain requests never trigger another provider call. */
 export async function sendReport(s:SessionUser,id:string,input:SendInput){
- permitted(s);id=id.toLowerCase();
+ authorizeReportDelivery(s);id=id.toLowerCase();
  const recipient=input.recipient.trim().toLowerCase(),subject=input.subject.trim(),message=input.message.trim();
  if(!validEmail(recipient)||recipient.length>254||/[<>,;"\r\n]/.test(recipient)||!subject||subject.length>180||/[\r\n]/.test(subject)||!message||message.length>4000||input.key.length<8||input.key.length>128)throw new ApiError(400,'invalid_report_mail','Bitte Empfänger, Betreff und Begleittext prüfen.');
  const plan=await getOrganizationPlan(s.organizationId);
@@ -56,7 +54,7 @@ export async function sendReport(s:SessionUser,id:string,input:SendInput){
 }
 
 export async function reportDeliveries(s:SessionUser,id:string){
- permitted(s);const plan=await getOrganizationPlan(s.organizationId);
+ authorizeReportDelivery(s);const plan=await getOrganizationPlan(s.organizationId);
  return withTenant(s.organizationId,s.userId,async c=>{
   await readReportExport(c,s,id,plan);
   return (await c.query("select id,recipient,subject,status,created_at,updated_at from mail_outbox where organization_id=$1 and created_by=$2 and entity_id=$3 and kind='report' order by created_at desc,id desc limit 20",[s.organizationId,s.userId,id])).rows;

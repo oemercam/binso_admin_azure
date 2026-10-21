@@ -72,25 +72,41 @@ try{
  // Independent expected-role contract: do not derive the expectation from the
  // same tenantCan function being tested by the actual HTTP handlers.
  const reportRoles=["owner","admin","finance","hr","project_manager","manager","reader"];
- let reportFixtureId;const reportReadRoles=new Set(),reportSendReadRoles=new Set();
+ const reportDeliveryRoles=['owner','admin','finance','hr','project_manager','manager'];
+ let reportFixtureId,nativeReportShare;const reportReadRoles=new Set(),reportSendReadRoles=new Set(),reportShareReadRoles=new Set();
  for(const role of roles){
   const cookie=cookies.get('0:'+role),body={query:'kind=summary&months=1',locale:'de'},key='native-report-'+role;
   const prepare=()=>fetch(base+'/api/reports/exports',{method:'POST',headers:{cookie,Origin:base,'Content-Type':'application/json','Idempotency-Key':key},body:JSON.stringify(body),signal:AbortSignal.timeout(20000)});
   const response=await prepare();assert.equal(response.status,reportRoles.includes(role)?200:403,'Report preparation enforces the actual HTTP role: '+role);
   if(!reportRoles.includes(role)){
    assert.equal((await get('/api/reports/exports/'+reportFixtureId,cookie)).status,403);reportReadRoles.add(role);
-   assert.equal((await get('/api/reports/exports/'+reportFixtureId+'/send',cookie)).status,403);reportSendReadRoles.add(role);continue;
+   assert.equal((await get('/api/reports/exports/'+reportFixtureId+'/send',cookie)).status,403);reportSendReadRoles.add(role);assert.equal((await get('/api/reports/exports/'+reportFixtureId+'/share',cookie)).status,403);reportShareReadRoles.add(role);continue;
   }
   const {item}=await response.json(),own=await get('/api/reports/exports/'+item.id,cookie);assert.equal(own.status,200);assert.equal(Buffer.from(own.data).subarray(0,5).toString(),'%PDF-');
   reportFixtureId??=item.id;reportReadRoles.add(role);
-  assert.equal((await get('/api/reports/exports/'+item.id+'/send',cookie)).status,403,'Isolated demo identities never enable a real outbound report transport');
-  reportSendReadRoles.add(role);
-  assert.equal((await fetch(base+'/api/reports/exports/'+item.id+'/send',{method:'POST',headers:{cookie,Origin:base,'Content-Type':'application/json','Idempotency-Key':'native-report-send-'+role},body:JSON.stringify({recipient:'synthetic@example.invalid',subject:'Synthetic',message:'Never send from QA'})})).status,403);
+  const canDeliver=reportDeliveryRoles.includes(role);
+  assert.equal((await get('/api/reports/exports/'+item.id+'/send',cookie)).status,canDeliver?200:403);reportSendReadRoles.add(role);
+  assert.equal((await get('/api/reports/exports/'+item.id+'/share',cookie)).status,canDeliver?200:403);reportShareReadRoles.add(role);
+  const mailResponse=await fetch(base+'/api/reports/exports/'+item.id+'/send',{method:'POST',headers:{cookie,Origin:base,'Content-Type':'application/json','Idempotency-Key':'native-report-send-'+role},body:JSON.stringify({recipient:'synthetic@example.invalid',subject:'Synthetic',message:'No provider configured in isolated QA'})});assert.equal(mailResponse.status,canDeliver?200:403);
+  if(canDeliver){const sent=await mailResponse.json();assert.equal(sent.status,'failed');assert.equal(sent.providerAccepted,false);assert.equal(sent.deliveryConfirmed,false,'Missing credentials cannot simulate delivery');}
+  const shareResponse=await fetch(base+'/api/reports/exports/'+item.id+'/share',{method:'POST',headers:{cookie,Origin:base,'Content-Type':'application/json','Idempotency-Key':'native-report-share-'+role},body:JSON.stringify({action:'create',recipient:'synthetic@example.invalid',days:1})});assert.equal(shareResponse.status,canDeliver?200:403);
+  if(canDeliver){const shared=(await shareResponse.json()).item;const url=new URL(shared.url);assert.equal(url.pathname,'/bericht');assert.match(url.hash,/^#[A-Za-z0-9_-]{43}$/);assert.ok(!url.search.includes(url.hash.slice(1)));if(role==='owner')nativeReportShare={...shared,token:url.hash.slice(1),pdf:Buffer.from(own.data),exportId:item.id};}
   assert.equal((await get('/api/reports/exports/'+item.id,cookies.get('1:'+role))).status,404,'Snapshots cannot cross tenants');
   const otherRole=role==='owner'?'admin':'owner';assert.equal((await get('/api/reports/exports/'+item.id,cookies.get('0:'+otherRole))).status,404,'Own-tenant role permission does not grant another creator’s snapshot');
   assert.deepEqual((await (await prepare()).json()).item,item,'Native retry keeps immutable identity');
  }
- assert.equal(reportReadRoles.size,roles.length);assert.equal(reportSendReadRoles.size,roles.length);
+ assert.equal(reportReadRoles.size,roles.length);assert.equal(reportSendReadRoles.size,roles.length);assert.equal(reportShareReadRoles.size,roles.length);
+ const queuedReports=(await pool.query("select status,attempts from mail_outbox where kind='report'")).rows;assert.equal(queuedReports.length,reportDeliveryRoles.length);assert.ok(queuedReports.every(row=>row.status==='failed'&&row.attempts===0),'Configuration guard performs no transport attempt');
+ assert.ok(nativeReportShare);
+ const publicReport=async body=>{const response=await fetch(base+'/api/public/report',{method:'POST',headers:{origin:base,'content-type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(15000)});return {status:response.status,data:response.headers.get('content-type')?.includes('json')?await response.json():Buffer.from(await response.arrayBuffer())};};
+ assert.equal((await fetch(base+'/api/public/report')).status,405);
+ const reportProof={token:nativeReportShare.token,action:'pdf',code:'123456',key:'native-report-proof'};assert.equal((await publicReport(reportProof)).status,403,'An unverified capability cannot read a report');
+ assert.equal((await publicReport({token:nativeReportShare.token,action:'challenge'})).status,503,'Missing real mail credentials cannot pretend to send a recipient code');assert.equal(Number((await pool.query('select count(*) n from report_recipient_codes where link_id=$1',[nativeReportShare.id])).rows[0].n),0);
+ await pool.query("insert into report_recipient_codes(organization_id,link_id,code_hash) values($1,$2,$3)",[organizations[0],nativeReportShare.id,createHmac('sha256',testEncryptionKey).update(nativeReportShare.id+'|report.pdf|123456').digest('hex')]);
+ assert.equal((await publicReport({...reportProof,code:'000000'})).status,403);assert.equal((await pool.query('select attempts from report_recipient_codes where link_id=$1',[nativeReportShare.id])).rows[0].attempts,1);
+ const verified=await publicReport(reportProof);assert.equal(verified.status,200);assert.deepEqual(verified.data,nativeReportShare.pdf);assert.deepEqual((await publicReport(reportProof)).data,nativeReportShare.pdf);
+ assert.equal((await publicReport({...reportProof,key:'different-native-proof'})).status,403);
+ const revoked=await fetch(base+'/api/reports/exports/'+nativeReportShare.exportId+'/share',{method:'POST',headers:{cookie:cookies.get('0:owner'),origin:base,'content-type':'application/json'},body:JSON.stringify({action:'revoke',linkId:nativeReportShare.id})});assert.equal(revoked.status,200);assert.equal((await publicReport(reportProof)).status,410);
  const snapshotCount=Number((await pool.query('select count(*) n from report_exports')).rows[0].n);
  assert.equal((await fetch(base+'/api/reports/exports',{method:'POST',headers:{cookie:cookies.get('0:owner'),Origin:'https://foreign.invalid','Content-Type':'application/json','Idempotency-Key':'foreign-report-request'},body:JSON.stringify({query:'months=1',locale:'de'})})).status,403);
  assert.equal(Number((await pool.query('select count(*) n from report_exports')).rows[0].n),snapshotCount,'Foreign-origin rejection has no persistent side effect');
@@ -176,8 +192,9 @@ try{
  const inventory=JSON.parse(await fs.readFile('docs/architecture/v21-3-data-inventory.json','utf8'));
  const covered=new Set(readContracts.map(([path])=>path.split('?')[0].replace(new RegExp(customer.id+'|'+project.id+'|'+employee.id+'|'+product.id+'|'+payment.id+'|'+ticket.id,'g'),'[id]')));
  // These dynamic IDs are created and exercised above, including the denied
- // member role, own-creator boundary and all eight demo-send denials.
- for(const path of ['/api/reports/exports/[id]','/api/reports/exports/[id]/send'])covered.add(path);
+ // member role, own-creator boundary and actual delivery permissions. Providers
+ // are absent; allowed sends must record failure with zero transport attempts.
+ for(const path of ['/api/reports/exports/[id]','/api/reports/exports/[id]/send','/api/reports/exports/[id]/share'])covered.add(path);
  for(const path of ['/api/expenses/[id]','/api/documents/[number]','/api/documents/[number]/pdf','/api/documents/[number]/versions','/api/files/[id]/download'])covered.add(path);
  const publicEntries=new Set(['/api/auth/invitation','/api/health','/api/health/ready','/api/demo/session','/api/operator/sso/callback']);
  for(const api of inventory.apis.filter(item=>item.methods.includes('GET'))){

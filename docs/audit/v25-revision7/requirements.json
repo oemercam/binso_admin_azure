@@ -7269,7 +7269,7 @@
       "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
       "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
       "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
-      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
+      "blocker": "Vollständige fachliche/visuelle/Geräte- und Providerabnahme offen; MwSt.-/Angebotsberichte und physische Retention-Anbindung fehlen. Mail-/Link-Backend isoliert geprüft, aktuelle HTTP-/UI-Abnahme offen."
     },
     {
       "id": "R7-43-002",
@@ -7286,7 +7286,7 @@
       "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
       "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
       "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
-      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
+      "blocker": "Vollständige fachliche/visuelle/Geräte- und Providerabnahme offen; MwSt.-/Angebotsberichte und physische Retention-Anbindung fehlen. Mail-/Link-Backend isoliert geprüft, aktuelle HTTP-/UI-Abnahme offen."
     },
     {
       "id": "R7-43-003",
@@ -7303,7 +7303,7 @@
       "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
       "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
       "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
-      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
+      "blocker": "Vollständige fachliche/visuelle/Geräte- und Providerabnahme offen; MwSt.-/Angebotsberichte und physische Retention-Anbindung fehlen. Mail-/Link-Backend isoliert geprüft, aktuelle HTTP-/UI-Abnahme offen."
     },
     {
       "id": "R7-43-004",
@@ -7320,7 +7320,7 @@
       "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
       "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
       "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
-      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
+      "blocker": "Vollständige fachliche/visuelle/Geräte- und Providerabnahme offen; MwSt.-/Angebotsberichte und physische Retention-Anbindung fehlen. Mail-/Link-Backend isoliert geprüft, aktuelle HTTP-/UI-Abnahme offen."
     },
     {
       "id": "R7-43-005",
@@ -7337,7 +7337,7 @@
       "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
       "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
       "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
-      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
+      "blocker": "Vollständige fachliche/visuelle/Geräte- und Providerabnahme offen; MwSt.-/Angebotsberichte und physische Retention-Anbindung fehlen. Mail-/Link-Backend isoliert geprüft, aktuelle HTTP-/UI-Abnahme offen."
     },
     {
       "id": "R7-43-006",
@@ -7354,7 +7354,7 @@
       "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
       "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
       "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
-      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
+      "blocker": "Vollständige fachliche/visuelle/Geräte- und Providerabnahme offen; MwSt.-/Angebotsberichte und physische Retention-Anbindung fehlen. Mail-/Link-Backend isoliert geprüft, aktuelle HTTP-/UI-Abnahme offen."
     },
     {
       "id": "R7-43-007",
@@ -7371,7 +7371,7 @@
       "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
       "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
       "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
-      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
+      "blocker": "Vollständige fachliche/visuelle/Geräte- und Providerabnahme offen; MwSt.-/Angebotsberichte und physische Retention-Anbindung fehlen. Mail-/Link-Backend isoliert geprüft, aktuelle HTTP-/UI-Abnahme offen."
     },
     {
       "id": "R7-43-008",
@@ -7391,7 +7391,7 @@
       "implementation": "Bericht erweitert um kreditbereinigtes Rechnungsvolumen im Zeitraum und aktuellen offenen/überfälligen Snapshot, gemeinsame bestehende Finance-Berechnung. Cash und Rechnungsvolumen getrennt. Genehmigte/verbuchte Spesenkategorien nach Belegdatum ergänzt, Erstattungsdatum bleibt separat; Währungen getrennt,200-Gruppen-Grenze mit Fehler.",
       "test": "Tatsächliche Migrations-/Datenbankregression für Aggregatprojektion, HR-Ablehnung, Datumsdefinitionen und unverändertes Rechnungsvolumen nach Refund bestanden. Typecheck/Lint/Sprachabdeckung bestanden. Tatsächliche DB-Positiv-/Negativtests für Kategorien, Rollen/Mandanten/Zeitraum/Status/Währung/Übergrösse und lokalisierte Exportlabels bestanden.",
       "visualComparison": "Neue Finanzsektion noch nicht visuell abgenommen.",
-      "blocker": "MwSt.-/Angebotsberichte, direkte Report-Mails/sichere Links und vollständige fachliche/visuelle Abnahme fehlen."
+      "blocker": "Vollständige fachliche/visuelle/Geräte- und Providerabnahme offen; MwSt.-/Angebotsberichte und physische Retention-Anbindung fehlen. Mail-/Link-Backend isoliert geprüft, aktuelle HTTP-/UI-Abnahme offen."
     },
     {
       "id": "R7-43-009",
@@ -7411,7 +7411,7 @@
       "implementation": "Gemeinsame Berichtsprojektion/PDF-Erzeugung und unveränderliche private Berichtskopie mit Ablauf, Scope-Revalidierung, Idempotenz und SHA-256. Vorschau und Download verwenden dieselben Bytes.",
       "test": "Reale migrierte DB-/PDF-Tests für Replay, Hash, Ersteller/Mandant/Rolle/Tarif, Ablauf und Unveränderlichkeit bestanden. Native HTTP- und neue Snapshot-Browserfälle ergänzt, aktuelle CI ausstehend.",
       "visualComparison": "Lokale gemeinsame PDF-Zoom-/Containmentprüfung einschliesslich CSS-Negativfall bestanden; Report-Seiten-/Geräteabnahme weiterhin offen.",
-      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
+      "blocker": "Vollständige fachliche/visuelle/Geräte- und Providerabnahme offen; MwSt.-/Angebotsberichte und physische Retention-Anbindung fehlen. Mail-/Link-Backend isoliert geprüft, aktuelle HTTP-/UI-Abnahme offen."
     },
     {
       "id": "R7-43-010",
@@ -7431,7 +7431,7 @@
       "implementation": "Gemeinsame Berichtsprojektion/PDF-Erzeugung und unveränderliche private Berichtskopie mit Ablauf, Scope-Revalidierung, Idempotenz und SHA-256. Vorschau und Download verwenden dieselben Bytes.",
       "test": "Reale migrierte DB-/PDF-Tests für Replay, Hash, Ersteller/Mandant/Rolle/Tarif, Ablauf und Unveränderlichkeit bestanden. Native HTTP- und neue Snapshot-Browserfälle ergänzt, aktuelle CI ausstehend.",
       "visualComparison": "Lokale gemeinsame PDF-Zoom-/Containmentprüfung einschliesslich CSS-Negativfall bestanden; Report-Seiten-/Geräteabnahme weiterhin offen.",
-      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
+      "blocker": "Vollständige fachliche/visuelle/Geräte- und Providerabnahme offen; MwSt.-/Angebotsberichte und physische Retention-Anbindung fehlen. Mail-/Link-Backend isoliert geprüft, aktuelle HTTP-/UI-Abnahme offen."
     },
     {
       "id": "R7-43-011",
@@ -7462,15 +7462,18 @@
       "requirement": "Sensible Freigabelinks nicht erratbar, befristet, widerrufbar und mit angemessener Empfängerverifikation.",
       "sourceTextSha256": "e649ea39ba7e878f166b5d1ce5b5b4c82701571f2c8ecfbfa3b0b60b5ca34fda",
       "sourceParagraph": "**Formate und Sicherheit:** PDF im zentralen Viewer; CSV UTF-8 mit stabilen Spalten, Excel-kompatibler Variante, sauberem Dezimal-/Datumsformat und Schutz gegen CSV-Formelinjektion. E-Mail mit Empfänger, Betreff, Begleittext, echtem Anhang und Versand-/Fehlerprotokoll. Sensible Freigabelinks nicht erratbar, befristet, widerrufbar und mit angemessener Empfängerverifikation. Berechtigungen serverseitig, Audit für Freigaben, keine realen Test-E-Mails an Kunden. Grosse Exporte ressourcenschonend und mit verständlichen Fehlern. Optional gespeicherte Filter; automatische Versände nur nach ausdrücklichem Opt-in.",
-      "status": "nicht_implementiert",
+      "status": "teilweise_implementiert",
       "sourceReferences": [
-        "components/report-actions.tsx",
-        "app/api/reports/route.ts"
+        "lib/server/public-reports.ts",
+        "database/migrations/0074_report_recipient_shares.sql",
+        "components/report-share.tsx",
+        "components/public-report.tsx",
+        "app/api/public/report/route.ts"
       ],
-      "implementation": "PDF/CSV/native Freigabe vorhanden; direkte Berichts-E-Mail mit echtem Anhang und befristete widerrufbare Berichtlinks fehlen.",
-      "test": "Keine bestandene Direktmail-/Berichtlinkprüfung; vorhandene Exporttests sind dafür kein Nachweis.",
-      "visualComparison": "Nicht implementierte Aktionen werden nicht als verfügbar beworben.",
-      "blocker": "Sicherer serverseitiger Versand-/Freigabelebenszyklus inklusive Zustellnachweis noch zu implementieren; kein externer Versand freigegeben."
+      "implementation": "Befristete widerrufbare Report-Links mit 256-Bit-Fragment-Capability, verschlüsseltem Replay, enger RLS-Suche, Herausgeber-/Tarif-/Scope-Neuprüfung und Empfänger-Einmalcode vor PDF-Ausgabe. Kein GET-Effekt, kein öffentlicher Bericht vor Verifikation, kein neuer DB-Login oder Bypass.",
+      "test": "Reale migrierte DB mit binso_runtime: narrow lookup, keine breiten Reads/SQL-Writes, Original-PDF, Codeversand an feste Adresse, persistierte Fehlversuche/Sperre, Replay/Widerruf/Ablauf, Rollen-/Mandanten-/Herausgeberentzug, verschlüsselte Replay-Daten, unsicheres HTTP-Konfigurations-Rollback und sichtbare 20-Link-Grenze bestanden. Lokaler Edge-UI-Test mit synthetischer Code-API bestanden. Neue native HTTP-/private UI-Fälle in CI noch ausstehend.",
+      "visualComparison": "Öffentliche Oberfläche aus vorhandenem AuthWorkspace/PDF-Owner abgeleitet; lokaler DE/Light/390-Screenshot gesichtet, keine Original- oder Gerätefreigabe.",
+      "blocker": "Keine echte Mail-/Zustell-/Gerätefreigabe. Aktuelle Gesamt-CI und vollständige fachliche/visuelle Abnahme sowie physische Retention-Anbindung fehlen."
     },
     {
       "id": "R7-43-013",
@@ -7487,7 +7490,7 @@
       "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
       "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
       "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
-      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
+      "blocker": "Vollständige fachliche/visuelle/Geräte- und Providerabnahme offen; MwSt.-/Angebotsberichte und physische Retention-Anbindung fehlen. Mail-/Link-Backend isoliert geprüft, aktuelle HTTP-/UI-Abnahme offen."
     },
     {
       "id": "R7-43-014",
@@ -7504,7 +7507,7 @@
       "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
       "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
       "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
-      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
+      "blocker": "Vollständige fachliche/visuelle/Geräte- und Providerabnahme offen; MwSt.-/Angebotsberichte und physische Retention-Anbindung fehlen. Mail-/Link-Backend isoliert geprüft, aktuelle HTTP-/UI-Abnahme offen."
     },
     {
       "id": "R7-43-015",
@@ -7521,7 +7524,7 @@
       "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
       "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
       "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
-      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
+      "blocker": "Vollständige fachliche/visuelle/Geräte- und Providerabnahme offen; MwSt.-/Angebotsberichte und physische Retention-Anbindung fehlen. Mail-/Link-Backend isoliert geprüft, aktuelle HTTP-/UI-Abnahme offen."
     },
     {
       "id": "R7-44-001",

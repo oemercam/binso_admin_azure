@@ -3,7 +3,7 @@ import {createHash} from 'node:crypto';
 
 /** Actual migrated PostgreSQL, real PDF generator and actual request handlers.
  * Session/transport adapters are supplied by the isolated migration harness. */
-export async function verifyReportExports({db,organizationId,otherOrganizationId,session,loadRoute,snapshotModule}){
+export async function verifyReportExports({db,organizationId,otherOrganizationId,session,loadRoute,snapshotModule,shareEnvironment}){
  const create=await loadRoute('app/api/reports/exports/route.ts'),get=await loadRoute('app/api/reports/exports/[id]/route.ts');
  const query='kind=summary&months=custom&from=2026-10-01&to=2026-10-21';
  const request=(key,body={query,locale:'de'})=>({headers:new Headers({'Idempotency-Key':key}),body});
@@ -38,6 +38,7 @@ export async function verifyReportExports({db,organizationId,otherOrganizationId
  }
  globalThis.__processSession=session;
  await (await import('./report-mail-contract.mjs')).verifyReportMail({db,organizationId,otherOrganizationId,session,snapshotId:item.id,originalBytes:bytes,loadRoute});
+ await (await import('./report-share-contract.mjs')).verifyReportShares({db,organizationId,otherOrganizationId,session,snapshotId:item.id,originalBytes:bytes,loadRoute,shareEnvironment});
  await db.query('delete from report_exports where organization_id=$1',[organizationId]);
  console.log('Immutable report snapshots: real PDF/hash, replay/conflict, creator/tenant/role/plan, scope and expiry boundaries passed. No outbound mail.');
 }

@@ -1,5 +1,5 @@
 {
-  "commit": "281cd7fcc976af18558b2347fd66d342cc0c27b7",
+  "commit": "c286e2edd77a5dae661a9ed2c3dbe951a9de894d",
   "method": "Existing TypeScript AST dependency inventory; conditional reachability is not runtime proof",
   "pages": [
     {
@@ -1790,6 +1790,167 @@
       "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
     },
     {
+      "file": "app/bericht/page.tsx",
+      "route": "/bericht",
+      "family": "PublicPage",
+      "components": [
+        "components/public-report.tsx#PublicReport",
+        "components/auth-workspace.tsx#AuthWorkspace",
+        "components/ui.tsx#Logo",
+        "components/locale-switcher.tsx#LocaleSwitcher",
+        "components/select-control.tsx#SelectControl",
+        "components/select-control.tsx#SelectSearch",
+        "components/page-scroll-lock.ts#lockPageScroll",
+        "components/page-scroll-lock.ts#locks",
+        "components/page-scroll-lock.ts#bodyOverflow",
+        "components/page-scroll-lock.ts#rootOverflow",
+        "components/page-scroll-lock.ts#x",
+        "components/page-scroll-lock.ts#y",
+        "components/page-scroll-lock.ts#guard",
+        "components/use-dialog-focus.ts#registerDialogPortal",
+        "components/use-dialog-focus.ts#modalStack",
+        "components/use-dialog-focus.ts#dialogPortals",
+        "components/ui.tsx#ErrorState",
+        "components/ui.tsx#Button",
+        "components/ui.tsx#Icon",
+        "components/ui.tsx#dismissActionLabels",
+        "components/ui.tsx#actionSourceText",
+        "components/privacy-settings-button.tsx#PrivacySettingsButton",
+        "components/ui.tsx#LoadingState",
+        "components/ui.tsx#Field",
+        "components/ui.tsx#Input",
+        "components/ui.tsx#Select",
+        "components/ui.tsx#Textarea",
+        "components/ui.tsx#Checkbox",
+        "components/ui.tsx#DateInput",
+        "components/ui.tsx#TimeInput",
+        "components/ui.tsx#CurrencyInput",
+        "components/ui.tsx#FormLabel",
+        "components/ui.tsx#FormError",
+        "components/ui.tsx#FormActions",
+        "components/pdf-preview.tsx#DocumentModal",
+        "components/use-dialog-focus.ts#useDialogFocus",
+        "components/use-dialog-focus.ts#lockDialogBackground",
+        "components/use-dialog-focus.ts#backgroundLocks",
+        "components/pdf-preview.tsx#DocumentPageViewer",
+        "components/pdf-preview.tsx#DocumentPages",
+        "components/pdf-preview.tsx#PdfPage"
+      ],
+      "layouts": [
+        "app/layout.tsx"
+      ],
+      "roles": "Public or route-level session: see source",
+      "actions": [
+        {
+          "tag": "FreshAuthenticationDialog",
+          "line": 84,
+          "component": "app/layout.tsx#RootLayout"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 305,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 307,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
+          "tag": "ActionSheet",
+          "line": 367,
+          "component": "components/app-shell.tsx#AppShellFrame"
+        },
+        {
+          "tag": "ListSearch",
+          "line": 107,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 108,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "FilterSheet",
+          "line": 109,
+          "component": "components/records.tsx#RecordsControls"
+        },
+        {
+          "tag": "Sheet",
+          "line": 198,
+          "component": "components/binso-ux.tsx#FilterSheet"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 193,
+          "component": "components/binso-ux.tsx#Sheet"
+        },
+        {
+          "tag": "ActionSheet",
+          "line": 63,
+          "component": "components/binso-ux.tsx#QuickCreateAction"
+        },
+        {
+          "tag": "Sheet",
+          "line": 196,
+          "component": "components/binso-ux.tsx#ActionSheet"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 34,
+          "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog"
+        },
+        {
+          "tag": "Sheet",
+          "line": 197,
+          "component": "components/binso-ux.tsx#FormSheet"
+        }
+      ],
+      "dimensions": {
+        "widths": [
+          320,
+          360,
+          390,
+          430,
+          768,
+          1280,
+          1920
+        ],
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "states": [
+          "loading",
+          "empty",
+          "error",
+          "forbidden",
+          "long-text"
+        ],
+        "languages": [
+          "de-CH",
+          "fr-CH",
+          "it-CH",
+          "en"
+        ],
+        "devices": [
+          "browser emulation",
+          "physical iOS PWA",
+          "physical Android PWA"
+        ]
+      },
+      "status": "nicht geprüft",
+      "evidence": [],
+      "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+    },
+    {
       "file": "app/berichte/page.tsx",
       "route": "/berichte",
       "family": "AppPage",
@@ -1903,6 +2064,8 @@
         "components/binso-ux.tsx#ListRow",
         "components/report-mail.tsx#deliveryLabels",
         "components/report-mail.tsx#deliveryTone",
+        "components/report-share.tsx#ReportShareSheet",
+        "components/report-share.tsx#Share",
         "components/binso-ux.tsx#MetricTiles",
         "components/binso-ux.tsx#MetricTile",
         "components/ui.tsx#Metric",
@@ -1981,7 +2144,12 @@
         },
         {
           "tag": "ReportMailSheet",
-          "line": 37,
+          "line": 39,
+          "component": "components/report-actions.tsx#ReportActions"
+        },
+        {
+          "tag": "ReportShareSheet",
+          "line": 39,
           "component": "components/report-actions.tsx#ReportActions"
         },
         {
@@ -1991,13 +2159,23 @@
         },
         {
           "tag": "FormSheet",
-          "line": 31,
+          "line": 33,
           "component": "components/report-mail.tsx#ReportMailSheet"
         },
         {
           "tag": "Sheet",
           "line": 197,
           "component": "components/binso-ux.tsx#FormSheet"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 28,
+          "component": "components/report-share.tsx#ReportShareSheet"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 37,
+          "component": "components/report-share.tsx#ReportShareSheet"
         },
         {
           "tag": "FormSheet",
