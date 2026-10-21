@@ -13743,5 +13743,50 @@
     "Please narrow the period or filters.",
     "Veuillez réduire la période ou affiner les filtres.",
     "Restringi il periodo o i filtri."
+  ],
+  "Kundenarchiv": [
+    "Customer archive",
+    "Archives clients",
+    "Archivio clienti"
+  ],
+  "Keine archivierten Kunden": [
+    "No archived customers",
+    "Aucun client archivé",
+    "Nessun cliente archiviato"
+  ],
+  "Kunde wiederherstellen?": [
+    "Restore customer?",
+    "Restaurer le client ?",
+    "Ripristinare il cliente?"
+  ],
+  "Der Kunde wird mit seinen bisherigen Daten wieder sichtbar. Bestehende Dokumente bleiben unverändert.": [
+    "The customer becomes visible again with their existing data. Existing documents remain unchanged.",
+    "Le client redevient visible avec ses données existantes. Les documents existants restent inchangés.",
+    "Il cliente torna visibile con i dati esistenti. I documenti esistenti restano invariati."
+  ],
+  "Kunde konnte nicht wiederhergestellt werden.": [
+    "The customer could not be restored.",
+    "Le client n’a pas pu être restauré.",
+    "Impossibile ripristinare il cliente."
+  ],
+  "Der Kunde wurde geändert. Bitte die Ansicht aktualisieren.": [
+    "The customer has changed. Please refresh the view.",
+    "Le client a été modifié. Veuillez actualiser la vue.",
+    "Il cliente è stato modificato. Aggiorna la vista."
+  ],
+  "Eine mögliche Dublette ist vorhanden. Bitte die Kundendaten zuerst prüfen.": [
+    "A possible duplicate exists. Please check the customer data first.",
+    "Un doublon potentiel existe. Vérifiez d’abord les données du client.",
+    "Esiste un possibile duplicato. Verifica prima i dati del cliente."
+  ],
+  "Archiv": [
+    "Archive",
+    "Archives",
+    "Archivio"
+  ],
+  "Wiederherstellen": [
+    "Restore",
+    "Restaurer",
+    "Ripristina"
   ]
 }

@@ -39,6 +39,8 @@
 .auth-workspace-intro li svg{color:var(--app-accent)}
 .auth-workspace-intro>.text-action{display:inline-flex;align-items:center;gap:8px;color:var(--app-accent);min-height:var(--touch)}
 .auth-workspace-body>.auth-card{width:100%;max-width:none;border-left:1px solid var(--color-line);padding:20px 0 10px 40px}
+.auth-workspace[data-layout="message"] .auth-workspace-body{grid-template-columns:minmax(0,480px);justify-content:center}
+.auth-workspace[data-layout="message"] .auth-workspace-body>.auth-card{border:0;padding-inline:0}
 .auth-workspace-footer{font-size:var(--type-label);color:var(--color-muted);padding-top:20px;border-top:1px solid var(--color-line)}
 .auth-workspace-footer nav{display:flex;gap:20px;flex-wrap:wrap}
 .auth-options{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:var(--type-label)}

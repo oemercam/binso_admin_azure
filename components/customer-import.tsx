@@ -14,7 +14,7 @@ import {ActionsMenu,ActionRow,FormSheet,ListRow} from './binso-ux';
 import {Button,Field,Select,FormActions,ErrorState,Status} from './ui';
 type Table={headers:string[];rows:string[][];sheets:string[];sheet:string;rowNumbers:number[]};
 type Reviewed={row:number;input:Record<string,unknown>;issues:string[];duplicate:boolean};
-export function CustomerImportControl({customerId}:{customerId?:string}){
+export function CustomerImportControl({customerId,onOpenArchive}:{customerId?:string;onOpenArchive?:()=>void}){
  const {locale}=useLocale(),revision=useDataRevision([]),scope=useRef(revision);
  const [allowed,setAllowed]=useState(false),[open,setOpen]=useState(false),[file,setFile]=useState<File|null>(null),[table,setTable]=useState<Table|null>(null),[mapping,setMapping]=useState<Record<string,number>>({}),[review,setReview]=useState<Reviewed[]|null>(null),[count,setCount]=useState<number|null>(null),[busy,setBusy]=useState(false),[error,setError]=useState('');
  const pending=useRef(false),replay=useRef<{body:string;key:string}|null>(null),attempt=useRef(0);
@@ -45,7 +45,7 @@ export function CustomerImportControl({customerId}:{customerId?:string}){
  };
  const report=()=>{if(!review)return;const rows=[['Zeile','Status','Hinweis'],...review.map(row=>[String(row.row),translateMessage(row.issues.length?'Prüfen':'Bereit',locale),row.issues.map(issue=>translateMessage(issue,locale)).join(' ')])];const url=URL.createObjectURL(new Blob([reportCsv(rows)],{type:'text/csv;charset=utf-8'})),anchor=document.createElement('a');anchor.href=url;anchor.download='binso-importbericht.csv';anchor.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
  if(!allowed)return null;
- return <><ActionsMenu label={customerId?'Kontaktaktionen':'Kundenaktionen'}><ActionRow title="Importieren" icon="upload" onClick={()=>{reset();setOpen(true)}}/></ActionsMenu><FormSheet label={customerId?'Kontakte importieren':'Kunden importieren'} open={open} onClose={()=>{setOpen(false);reset()}} busy={busy} dirty={!!file&&count===null}>
+ return <><ActionsMenu label={customerId?'Kontaktaktionen':'Kundenaktionen'}><ActionRow title="Importieren" icon="upload" onClick={()=>{reset();setOpen(true)}}/>{onOpenArchive&&<ActionRow title="Archiv" icon="file" onClick={onOpenArchive}/>}</ActionsMenu><FormSheet label={customerId?'Kontakte importieren':'Kunden importieren'} open={open} onClose={()=>{setOpen(false);reset()}} busy={busy} dirty={!!file&&count===null}>
  {count!==null?<Status tone="success"><LocalizedText>Import abgeschlossen</LocalizedText>: {count}</Status>:<>
  {!table?<FileUpload label="Importdatei" file={file} accept={['.csv','.xlsx','text/csv','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']} maxBytes={importLimits.bytes} busy={busy} onSelect={file=>{setFile(file);setReview(null)}} onRemove={()=>{setFile(null);setReview(null)}}/>:<>
  {table.sheets.length>1&&<Field label="Arbeitsblatt"><Select disabled={busy} value={table.sheet} onChange={event=>void load(event.target.value)}>{table.sheets.map(sheet=><option key={sheet} value={sheet}>{sheet}</option>)}</Select></Field>}

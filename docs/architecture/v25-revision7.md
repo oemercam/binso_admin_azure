@@ -29,6 +29,33 @@ Das Register ist eine Vollständigkeitskontrolle, kein Beleg ausgeführter Tests
 
 ## Nachgewiesene Ursachen und Datenfluss
 
+Wiederherstellung: Kundenarchiv mit paginierter Suche im vorhandenen
+Kunden-Aktionsmenü. Nur bestehende customers:delete-Berechtigung und
+Kundenmodul-Entitlement; keine neue Rolle. Explizite Bestätigung,
+Revisionsvergleich und Dublettenprüfung vor Wiederherstellung derselben ID.
+Kein Kopieren, keine Umverteilung von Geschäftsbezügen und keine Änderung an
+Kontakten; Replay erzeugt kein zweites Audit-Ereignis. Datenbankregressionen
+prüfen erfolgreiche Wiederherstellung, Rollen-/Mandantenablehnung, veraltete
+Revision, neue Dublette sowie unveränderte Kontaktdaten. Kontrolliertes
+Kundenzusammenführen bleibt gesondert offen.
+
+Systemzustände: 404, Offline, Wartung und Root-/Seitenfehler verwenden den
+bestehenden AuthWorkspace als reduzierte Meldungsvariante, gemeinsame
+Sprachwahl und Datenschutz-Einstieg. Keine Marketing-Introspalte im Fehlerfall,
+keine Fehlerobjekte/Stacktraces; nur begrenzte Referenz-ID. Build bestanden.
+Zwölf echte lokale Chromium-/Edge-Renders bei320/1440px und Hell/Dunkel
+bestanden (evidence/revision7-system-states im Workspace), darunter echter
+HTTP404, kein horizontaler Overflow und kein optionaler Mess-Chunk vor Consent.
+Zwei Screens wurden zusätzlich visuell geprüft. Das sind abgeleitete Ansichten,
+keine vollständige Originalreferenz- oder Geräteabnahme. Die danach ergänzte
+Scrollbegrenzung des Consent-Dialogs bei400px Höhe muss die nächste CI-Runde
+noch bestätigen.
+
+Die Rollenmatrix verwendet nun die tatsächlichen Permission-/Orientierungs-
+Owner statt alle öffentlichen und Legacy-Einstiege als Mandantenseiten zu
+klassifizieren. 77 Routen und4961 geplante Route/Rolle/Zustand-Fälle bleiben
+ausgewiesen; Navigationserwartungen sind keine API-/RLS-/Tarif-Abnahme.
+
 Zeitrapport-Paket: bestehende timeWorkspace-Abfrage mit deren Rollen-, Mandanten-,
 Datums-, Mitarbeiter-/Kunden-/Auftrags- und Statusfiltern wiederverwendet.
 Explizite Projektion nur Datum, Kunde, Auftrag, Mitarbeiter, Tätigkeit, Minuten
@@ -80,6 +107,23 @@ release:check bestehen lokal. Der reale ClamAV-Gesamtlauf bleibt in Linux-CI
 erneut nachzuweisen. Ein lokaler pnpm-test-Gesamtlauf stoppt an der vorhandenen
 Bash/Azure-CLI-Fake-Prüfung unter Windows (Subprozessstatus null); kein Test
 wurde deshalb übersprungen oder als erfolgreich gewertet.
+
+Am Head43c5ce1d sind Build, realer Scanner, UX-Compliance und analyze erfolgreich.
+Der CodeQL-Branchfilter für PR307 zeigt0 offene und2 geschlossene Befunde;
+keine eigene Unterdrückung vorgenommen. Der zusätzliche Ergebnischeck bleibt
+neutral mit «1 configuration not found» gegenüber main: vollständige
+Konfigurationsvergleichbarkeit ist damit weiterhin nicht nachgewiesen.
+Quality scheiterte diesmal im Protokoll-Peer: sein Signaturdatum wurde für jede
+VERSION-Abfrage aus der aktuellen Uhrzeit neu erzeugt. Der Fake hält jetzt den
+Zeitstempel einer Signaturversion pro Scan konstant; echte Wechsel, Timeout und
+Ausfall bleiben negative Fälle. Windows-In-Memory-Protokollprüfung bestanden;
+erneute Linux-CI mit Unix-Socket erforderlich. Der PDF-Timeout-Harness verwendet
+nach zusätzlichem Zoom-State keine festen State-Array-Indizes mehr; tatsächliche
+Timeout-/Late-result-/Unmount-Prüfungen bleiben erhalten und bestehen.
+Die nachgelagerten lokalen Vertragstests liefen bis zum historischen
+Typografievertrag durch. Dessen vier überholte Werte sind anhand Revision7
+Kapitel20 aktualisiert (15px/600 Buttons,1.3 Titel,1.5 Body); Vertragsprüfung und
+Adversarial-Tests bestehen. Historische Snapshots bleiben unverändert archiviert.
 
 Die optionale Web-Vitals-Implementierung wird nun erst nach ausdrücklichem
 Performance-Opt-in dynamisch geladen. Jeder Versand prüft die aktuelle Zustimmung

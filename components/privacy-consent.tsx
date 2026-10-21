@@ -79,11 +79,6 @@ export function PrivacyConsent(){
   </div>;
 }
 
-export function PrivacySettingsButton(){
-  return <button type="button" className="footer-privacy-button" onClick={()=>window.dispatchEvent(new Event("binso:open-privacy-settings"))}><LocalizedText>{"Cookie-/Datenschutz-Einstellungen"}</LocalizedText></button>;
-}
-
-
 export function PrivacySettingsPage(){
   const [performance,setPerformance]=useState(false);
   const [saved,setSaved]=useState(false),[saveError,setSaveError]=useState("");

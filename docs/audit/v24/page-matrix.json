@@ -1,5 +1,5 @@
 {
-  "commit": "f8e04929a1a0b85984fdad6ecbe4354def521f0f",
+  "commit": "43c5ce1d09af8d11cc65d5d19b40303348788456",
   "method": "Existing TypeScript AST dependency inventory; conditional reachability is not runtime proof",
   "pages": [
     {
@@ -28,7 +28,7 @@
         "components/ui.tsx#dismissActionLabels",
         "components/ui.tsx#actionSourceText",
         "components/marketing.tsx#MarketingFooter",
-        "components/privacy-consent.tsx#PrivacySettingsButton"
+        "components/privacy-settings-button.tsx#PrivacySettingsButton"
       ],
       "layouts": [
         "app/layout.tsx"
@@ -1216,7 +1216,7 @@
         "components/ui.tsx#dismissActionLabels",
         "components/ui.tsx#actionSourceText",
         "components/marketing.tsx#MarketingFooter",
-        "components/privacy-consent.tsx#PrivacySettingsButton"
+        "components/privacy-settings-button.tsx#PrivacySettingsButton"
       ],
       "layouts": [
         "app/layout.tsx"
@@ -2292,7 +2292,7 @@
         "components/ui.tsx#dismissActionLabels",
         "components/ui.tsx#actionSourceText",
         "components/marketing.tsx#MarketingFooter",
-        "components/privacy-consent.tsx#PrivacySettingsButton"
+        "components/privacy-settings-button.tsx#PrivacySettingsButton"
       ],
       "layouts": [
         "app/layout.tsx"
@@ -2789,6 +2789,7 @@
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
         "components/ui.tsx#Icon",
+        "components/privacy-settings-button.tsx#PrivacySettingsButton",
         "components/ui.tsx#Button",
         "components/ui.tsx#dismissActionLabels",
         "components/ui.tsx#actionSourceText",
@@ -5662,7 +5663,8 @@
         "components/page-scroll-lock.ts#guard",
         "components/use-dialog-focus.ts#registerDialogPortal",
         "components/use-dialog-focus.ts#modalStack",
-        "components/use-dialog-focus.ts#dialogPortals"
+        "components/use-dialog-focus.ts#dialogPortals",
+        "components/privacy-settings-button.tsx#PrivacySettingsButton"
       ],
       "layouts": [
         "app/layout.tsx"
@@ -6271,7 +6273,7 @@
         "components/ui.tsx#dismissActionLabels",
         "components/ui.tsx#actionSourceText",
         "components/marketing.tsx#MarketingFooter",
-        "components/privacy-consent.tsx#PrivacySettingsButton"
+        "components/privacy-settings-button.tsx#PrivacySettingsButton"
       ],
       "layouts": [
         "app/layout.tsx"
@@ -6501,7 +6503,7 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 254,
+          "line": 255,
           "component": "components/pages/customers.tsx#CustomerForm"
         },
         {
@@ -6766,12 +6768,7 @@
       "actions": [
         {
           "tag": "ListSearch",
-          "line": 166,
-          "component": "components/pages/customers.tsx#CustomerDetail"
-        },
-        {
-          "tag": "ActionSheet",
-          "line": 168,
+          "line": 167,
           "component": "components/pages/customers.tsx#CustomerDetail"
         },
         {
@@ -6780,13 +6777,18 @@
           "component": "components/pages/customers.tsx#CustomerDetail"
         },
         {
-          "tag": "FormSheet",
+          "tag": "ActionSheet",
           "line": 170,
           "component": "components/pages/customers.tsx#CustomerDetail"
         },
         {
-          "tag": "ConfirmDialog",
+          "tag": "FormSheet",
           "line": 171,
+          "component": "components/pages/customers.tsx#CustomerDetail"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 172,
           "component": "components/pages/customers.tsx#CustomerDetail"
         },
         {
@@ -6866,7 +6868,7 @@
         },
         {
           "tag": "ActionSheet",
-          "line": 297,
+          "line": 298,
           "component": "components/pages/customers.tsx#CustomerDocuments"
         },
         {
@@ -7047,7 +7049,7 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 254,
+          "line": 255,
           "component": "components/pages/customers.tsx#CustomerForm"
         },
         {
@@ -7274,6 +7276,7 @@
         "components/binso-ux.tsx#MetricTiles",
         "components/binso-ux.tsx#MetricTile",
         "components/ui.tsx#Metric",
+        "components/customer-data-actions.tsx#CustomerDataActions",
         "components/customer-import.tsx#CustomerImportControl",
         "components/customer-import.tsx#Table",
         "components/customer-import.tsx#Reviewed",
@@ -7282,6 +7285,8 @@
         "components/binso-ux.tsx#FormSheet",
         "components/file-upload.tsx#FileUpload",
         "components/binso-ux.tsx#ListRow",
+        "components/customer-data-actions.tsx#ArchiveSheet",
+        "components/customer-data-actions.tsx#Archived",
         "components/records.tsx#RecordsView",
         "components/records.tsx#DataTable",
         "components/records.tsx#DataTableHead",
@@ -7354,6 +7359,11 @@
           "component": "components/timer-resume-notice.tsx#TimerResumeNotice"
         },
         {
+          "tag": "ArchiveSheet",
+          "line": 27,
+          "component": "components/customer-data-actions.tsx#CustomerDataActions"
+        },
+        {
           "tag": "FormSheet",
           "line": 48,
           "component": "components/customer-import.tsx#CustomerImportControl"
@@ -7367,6 +7377,16 @@
           "tag": "Sheet",
           "line": 195,
           "component": "components/binso-ux.tsx#FormSheet"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 18,
+          "component": "components/customer-data-actions.tsx#ArchiveSheet"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 21,
+          "component": "components/customer-data-actions.tsx#ArchiveSheet"
         },
         {
           "tag": "FreshAuthenticationDialog",
@@ -7438,6 +7458,7 @@
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
         "components/ui.tsx#Icon",
+        "components/privacy-settings-button.tsx#PrivacySettingsButton",
         "components/ui.tsx#Field",
         "components/ui.tsx#Input",
         "components/ui.tsx#Select",
@@ -8341,7 +8362,27 @@
       "route": "/offline",
       "family": "PublicPage",
       "components": [
-        "components/ui.tsx#Logo"
+        "components/system-state.tsx#SystemState",
+        "components/auth-workspace.tsx#AuthWorkspace",
+        "components/ui.tsx#Logo",
+        "components/locale-switcher.tsx#LocaleSwitcher",
+        "components/select-control.tsx#SelectControl",
+        "components/select-control.tsx#SelectSearch",
+        "components/page-scroll-lock.ts#lockPageScroll",
+        "components/page-scroll-lock.ts#locks",
+        "components/page-scroll-lock.ts#bodyOverflow",
+        "components/page-scroll-lock.ts#rootOverflow",
+        "components/page-scroll-lock.ts#x",
+        "components/page-scroll-lock.ts#y",
+        "components/page-scroll-lock.ts#guard",
+        "components/use-dialog-focus.ts#registerDialogPortal",
+        "components/use-dialog-focus.ts#modalStack",
+        "components/use-dialog-focus.ts#dialogPortals",
+        "components/ui.tsx#Icon",
+        "components/privacy-settings-button.tsx#PrivacySettingsButton",
+        "components/ui.tsx#Button",
+        "components/ui.tsx#dismissActionLabels",
+        "components/ui.tsx#actionSourceText"
       ],
       "layouts": [
         "app/layout.tsx"
@@ -9384,7 +9425,7 @@
         "components/marketing.tsx#ReferenceFeatures",
         "components/binso-ux.tsx#DetailTabs",
         "components/marketing.tsx#MarketingFooter",
-        "components/privacy-consent.tsx#PrivacySettingsButton"
+        "components/privacy-settings-button.tsx#PrivacySettingsButton"
       ],
       "layouts": [
         "app/layout.tsx"
@@ -9521,6 +9562,7 @@
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
         "components/ui.tsx#Icon",
+        "components/privacy-settings-button.tsx#PrivacySettingsButton",
         "components/ui.tsx#Button",
         "components/ui.tsx#dismissActionLabels",
         "components/ui.tsx#actionSourceText",
@@ -9676,6 +9718,7 @@
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
         "components/ui.tsx#Icon",
+        "components/privacy-settings-button.tsx#PrivacySettingsButton",
         "components/ui.tsx#LoadingState",
         "components/ui.tsx#Button",
         "components/ui.tsx#dismissActionLabels",
@@ -10201,7 +10244,7 @@
         "components/ui.tsx#dismissActionLabels",
         "components/ui.tsx#actionSourceText",
         "components/marketing.tsx#MarketingFooter",
-        "components/privacy-consent.tsx#PrivacySettingsButton"
+        "components/privacy-settings-button.tsx#PrivacySettingsButton"
       ],
       "layouts": [
         "app/layout.tsx",
@@ -10703,7 +10746,7 @@
         "components/marketing.tsx#ProductView",
         "components/marketing.tsx#productViews",
         "components/marketing.tsx#MarketingFooter",
-        "components/privacy-consent.tsx#PrivacySettingsButton"
+        "components/privacy-settings-button.tsx#PrivacySettingsButton"
       ],
       "layouts": [
         "app/layout.tsx",
@@ -13105,6 +13148,7 @@
         "components/use-dialog-focus.ts#modalStack",
         "components/use-dialog-focus.ts#dialogPortals",
         "components/ui.tsx#Icon",
+        "components/privacy-settings-button.tsx#PrivacySettingsButton",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
         "components/ui.tsx#dismissActionLabels",
@@ -14650,7 +14694,7 @@
         "components/ui.tsx#dismissActionLabels",
         "components/ui.tsx#actionSourceText",
         "components/marketing.tsx#MarketingFooter",
-        "components/privacy-consent.tsx#PrivacySettingsButton"
+        "components/privacy-settings-button.tsx#PrivacySettingsButton"
       ],
       "layouts": [
         "app/layout.tsx"
@@ -14771,9 +14815,25 @@
       "route": "/wartung",
       "family": "PublicPage",
       "components": [
+        "components/system-state.tsx#SystemState",
+        "components/auth-workspace.tsx#AuthWorkspace",
         "components/ui.tsx#Logo",
-        "components/ui.tsx#Button",
+        "components/locale-switcher.tsx#LocaleSwitcher",
+        "components/select-control.tsx#SelectControl",
+        "components/select-control.tsx#SelectSearch",
+        "components/page-scroll-lock.ts#lockPageScroll",
+        "components/page-scroll-lock.ts#locks",
+        "components/page-scroll-lock.ts#bodyOverflow",
+        "components/page-scroll-lock.ts#rootOverflow",
+        "components/page-scroll-lock.ts#x",
+        "components/page-scroll-lock.ts#y",
+        "components/page-scroll-lock.ts#guard",
+        "components/use-dialog-focus.ts#registerDialogPortal",
+        "components/use-dialog-focus.ts#modalStack",
+        "components/use-dialog-focus.ts#dialogPortals",
         "components/ui.tsx#Icon",
+        "components/privacy-settings-button.tsx#PrivacySettingsButton",
+        "components/ui.tsx#Button",
         "components/ui.tsx#dismissActionLabels",
         "components/ui.tsx#actionSourceText"
       ],

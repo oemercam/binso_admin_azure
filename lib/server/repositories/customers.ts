@@ -51,6 +51,27 @@ export async function customerDuplicates(client:PoolClient,organizationId:string
   or (length($4)>=2 and regexp_replace(lower(trim(c.name)),'[[:space:]]+',' ','g')=$4)) order by customer_no,id limit 5`,[organizationId,uid,email,name,excludeId])).rows;
 }
 export async function findCustomerDuplicates(session:SessionUser,input:Partial<CustomerInput>,excludeId=''){return withTenant(session.organizationId,session.userId,c=>customerDuplicates(c,session.organizationId,input,excludeId))}
+export async function archivedCustomers(session:SessionUser,query:string,offset:number){
+ return withTenant(session.organizationId,session.userId,async c=>{
+  const items=(await c.query("select id,customer_no,name,status,archived_at,updated_at::text revision,count(*) over()::int total from customers where organization_id=$1 and archived_at is not null and ($2='' or name ilike $2 escape '\\' or customer_no ilike $2 escape '\\') order by archived_at desc,id limit 50 offset $3",[session.organizationId,query?'%'+query.replace(/[\\%_]/g,'\\$&')+'%':'',offset])).rows;
+  const total=items.length?Number(items[0].total):Number((await c.query("select count(*)::int total from customers where organization_id=$1 and archived_at is not null and ($2='' or name ilike $2 escape '\\' or customer_no ilike $2 escape '\\')",[session.organizationId,query?'%'+query.replace(/[\\%_]/g,'\\$&')+'%':''])).rows[0].total);
+  return {items:items.map(({total:_total,...row})=>row),total};
+ });
+}
+/** Restore the same identity only. No reassignment, overwrites or cascade restore. */
+export async function restoreCustomer(session:SessionUser,id:string,revision:string){
+ return withTenant(session.organizationId,session.userId,async c=>{
+  await c.query('select pg_advisory_xact_lock(hashtextextended($1,0))',[session.organizationId+':customer-create']);
+  const current=(await c.query('select *,updated_at::text revision from customers where organization_id=$1 and id::text=$2 for update',[session.organizationId,id])).rows[0];
+  if(!current)throw new ApiError(404,'not_found','Kunde wurde nicht gefunden.');
+  if(!current.archived_at)return {id:current.id,restored:false};
+  if(current.revision!==revision)throw new ApiError(409,'customer_changed','Der Kunde wurde geändert. Bitte die Ansicht aktualisieren.');
+  if((await customerDuplicates(c,session.organizationId,current,id)).length)throw new ApiError(409,'customer_duplicate','Eine mögliche Dublette ist vorhanden. Bitte die Kundendaten zuerst prüfen.');
+  await c.query('update customers set archived_at=null,updated_at=now() where organization_id=$1 and id=$2',[session.organizationId,current.id]);
+  await audit(c,{organizationId:session.organizationId,userId:session.userId,action:'customer.restored',entityType:'customer',entityId:current.id});
+  return {id:current.id,restored:true};
+ });
+}
 export async function createCustomer(organizationId:string,userId:string,input:CustomerInput,requestKey="",transactionClient?:PoolClient){input=customerInput(input as unknown as Record<string,unknown>) as CustomerInput;const execute=async(client:PoolClient)=>{const write=async()=>{
  await client.query('select pg_advisory_xact_lock(hashtextextended($1,0))',[organizationId+':customer-create']);
  if(!input.allowDuplicate&&(await customerDuplicates(client,organizationId,input)).length)throw new ApiError(409,'customer_duplicate','Mögliche Dublette gefunden. Bitte bestehende Kunden prüfen oder die separate Erfassung bestätigen.');

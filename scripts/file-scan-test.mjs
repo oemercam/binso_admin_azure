@@ -24,6 +24,9 @@ const directory=await fs.mkdtemp(path.join(os.tmpdir(),'binso-scan-'));
 let cases=0;
 async function peer({reply,fragment=false,drop=false,stall=false,early=false,bytes=Buffer.from('synthetic'),timeoutMs=1000,expected='clean',versionReply,expectBytes=true}){
  const id=cases++,socketPath=memory?`/synthetic-protocol/s${id}.sock`:path.join(directory,`s${id}.sock`),sockets=new Set();let received,versions=0;
+ // Signature publication time belongs to a database version, not the current
+ // wall-clock second of each VERSION request. Keep the peer stable per scan.
+ const stableVersion='ClamAV 1.4.6/28000/'+new Date().toUTCString().replace('GMT','')+'\0';
  const handleSocket=socket=>{
   sockets.add(socket);socket.on('close',()=>sockets.delete(socket));socket.on('error',()=>{});
   if(early){socket.end('stream: OK\0');return;}
@@ -33,7 +36,7 @@ async function peer({reply,fragment=false,drop=false,stall=false,early=false,byt
    if(!command){
     const end=buffered.indexOf(0);if(end<0)return;
     const name=buffered.subarray(0,end+1).toString();
-    if(name==='zVERSION\0'){socket.end(typeof versionReply==='function'?versionReply(++versions):versionReply??('ClamAV 1.4.6/28000/'+new Date().toUTCString().replace('GMT','')+'\0'));return;}
+    if(name==='zVERSION\0'){socket.end(typeof versionReply==='function'?versionReply(++versions):versionReply??stableVersion);return;}
     assert.equal(name,'zINSTREAM\0');buffered=buffered.subarray(end+1);command=true;
    }
    while(buffered.length>=4){

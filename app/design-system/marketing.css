@@ -295,6 +295,9 @@
 }
 .privacy-consent-card{
   width:min(760px,100%);
+  max-height:calc(100dvh - 40px);
+  overflow-y:auto;
+  overscroll-behavior:contain;
   display:grid;
   gap:18px;
   padding:22px;
@@ -473,7 +476,7 @@
 }
 @media (max-width:640px){
 .privacy-consent-layer{padding:10px}
-.privacy-consent-card{padding:18px;border-radius:var(--shape-panel)}
+.privacy-consent-card{padding:18px;border-radius:var(--shape-panel);max-height:calc(100dvh - 20px)}
 .privacy-consent-actions{display:grid;grid-template-columns:1fr}
 .privacy-consent-actions .button{width:100%}
 }

@@ -8,7 +8,7 @@ import {LocaleSwitcher} from "./locale-switcher";
 import { useEffect, useState } from "react";
 import { Button, Icon, Logo } from "./ui";
 import {DetailTabs} from "./binso-ux";
-import {PrivacySettingsButton} from "./privacy-consent";
+import {PrivacySettingsButton} from "./privacy-settings-button";
 
 export function ProductCapabilities(){
  return <div className="reference-capabilities">{['Kunden & Kontakte','Angebote & Rechnungen','Aufträge & Zeit','Schweizer QR-Rechnung'].map(label=><span key={label}><LocalizedText>{label}</LocalizedText></span>)}</div>;
