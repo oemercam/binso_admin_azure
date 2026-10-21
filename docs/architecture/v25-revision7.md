@@ -14,7 +14,7 @@ P0/P1/P2 vollständig im Auftragsumfang; P3 ausgeschlossen. **Dieser Zwischensta
 ## Register
 
 [Anforderungen](../audit/v25-revision7/requirements.csv), [Routen/Rollen/Zustände](../audit/v25-revision7/route-role-states.csv), [Routen, Komponenten, APIs und Migrationen](../audit/v25-revision7/routes.json).
-Generator: scripts/revision7-inventory.mjs. Erfasst 56 Kapitel, 586 Satz-/Prüfklauseln, 77 Routen, 5588 geplante Route/Rolle/Zustand-Fälle. Zusammengesetzte Klauseln behalten den kompletten Originaltext; sie sind nicht pauschal bestanden.
+Generator: scripts/revision7-inventory.mjs. Erfasst 56 Kapitel, 586 Satz-/Prüfklauseln, 77 Routen, 12 konkrete Operator-Varianten und 5566 geplante Route/Rolle/Zustand-Fälle. Zusammengesetzte Klauseln behalten den kompletten Originaltext; sie sind nicht pauschal bestanden.
 Das Register ist eine Vollständigkeitskontrolle, kein Beleg ausgeführter Tests. Noch nicht einzeln ausgeführte Zustands-/Rollen-/Visualfälle bleiben ausdrücklich nicht abgenommen.
 
 ## Zusammenhängende Pakete
@@ -53,7 +53,7 @@ noch bestätigen.
 
 Die Rollenmatrix verwendet nun die tatsächlichen Permission-/Orientierungs-
 Owner statt alle öffentlichen und Legacy-Einstiege als Mandantenseiten zu
-klassifizieren. 77 Routen und4961 geplante Route/Rolle/Zustand-Fälle bleiben
+klassifizieren. 77 Routen,12 konkrete Operator-Varianten und5566 geplante Route/Rolle/Zustand-Fälle bleiben
 ausgewiesen; Navigationserwartungen sind keine API-/RLS-/Tarif-Abnahme.
 
 Zeitrapport-Paket: bestehende timeWorkspace-Abfrage mit deren Rollen-, Mandanten-,
@@ -187,3 +187,5 @@ verschobene IDs dürfen keinen Nachweis versehentlich einer anderen Anforderung
 zuordnen. Das Register bleibt damit bewusst konservativ. Die Import-UI-Abnahme
 ist lokal durch den fehlenden nativen QA-PostgreSQL blockiert und muss über die
 bestehende CI-Umgebung erfolgen, nicht über eine geschwächte Sessionprüfung.
+
+CI f403d0fb: Build einschliesslich nativem HTTP-/Rollenvertrag, Scanner, UX-Compliance und analyze erfolgreich. Vollständige Tests und Lint bestanden; Checks scheiterte danach ausschliesslich am fehlenden CSS-Owner registration-progress. Die Regel liegt nun im vorhandenen auth.css-Owner; css:check lokal bestanden. Browserjobs wurden nach dem fehlgeschlagenen Checks-Job nicht ausgeführt und bleiben offen. Die zusätzliche Route/Rolle/KPI-Matrix verknüpft tatsächliche Komponenten und Datenquellen; auch sie ist keine ausgeführte fachliche Abnahme.

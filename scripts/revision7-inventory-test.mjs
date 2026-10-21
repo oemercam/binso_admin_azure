@@ -16,4 +16,10 @@ const expected=(route,role)=>routes.routes.find(row=>row.route===route).roleExpe
 assert.equal(expected('/kunden/neu','member').standard,'role_navigation_denied');assert.equal(expected('/kunden/neu','owner').standard,'role_navigation_allowed');
 assert.equal(expected('/kunden','member').timeOnly,'role_navigation_denied');assert.equal(expected('/zeit','member').timeOnly,'role_navigation_allowed');
 assert.ok(expected('/dashboard','member').purpose.includes('Arbeitszeit'),'Role-specific page purpose comes from the existing orientation owner');
+assert.ok(routes.routes.find(row=>row.route==='/berichte').metricSources.some(metric=>metric.component==='MetricTile'));
+assert.ok(routes.routes.find(row=>row.route==='/berichte').apiSources.some(source=>source.apis.some(api=>api.startsWith('/api/reports'))));
+assert.ok(fs.readFileSync(root+'/route-role-kpi.csv','utf8').includes('Bedingte KPI/Charts im Code'),'KPI reachability cannot be mislabeled as visual acceptance');
+assert.ok(routes.operatorVariants.some(row=>row.route==='/operator/tickets/[id]'));
+const ticketVariant=routes.operatorVariants.find(row=>row.route==='/operator/tickets');assert.equal(ticketVariant.roleExpectations.find(row=>row.role==='platform_support').standard,'operator_navigation_allowed');assert.equal(ticketVariant.roleExpectations.find(row=>row.role==='platform_billing').standard,'operator_navigation_denied');
+assert.ok(fs.readFileSync(root+'/route-role-states.csv','utf8').includes('/operator/kunden/[id]'),'Dynamic operator details cannot disappear behind one catch-all page entry');
 console.log('Revision7 inventory: all56 chapters, every route, explicit roles/states and no unsupported completion claim passed.');

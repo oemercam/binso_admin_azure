@@ -3,6 +3,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import ts from 'typescript';
 import {createRequire} from 'node:module';
+import {dependencyGraph,inventory} from './ux-inventory.mjs';
 const require=createRequire(import.meta.url),compiled=new Map();
 function sourceModule(file){
  file=path.resolve(file);if(compiled.has(file))return compiled.get(file);
@@ -11,6 +12,7 @@ function sourceModule(file){
  Function('exports','require',code)(exports,name=>name.startsWith('.')||name.startsWith('@/')?sourceModule((name.startsWith('@/')?name.slice(2):path.resolve(path.dirname(file),name))+'.ts'):require(name));return exports;
 }
 const permissions=sourceModule('lib/permissions.ts'),orientation=sourceModule('lib/page-orientation.ts');
+const operatorPolicy=sourceModule('lib/operator-pages.ts');
 const root='docs/audit/v25-revision7',source=fs.readFileSync(root+'/source.md','utf8');
 const headers=[...source.matchAll(/^## (\d+)\. (.+)$/gm)];
 if(headers.length!==56||new Set(headers.map(x=>x[1])).size!==56)throw Error('Expected all 56 chapters');
@@ -35,6 +37,10 @@ const publics=new Set(['','produkt','preise','login','registrieren','passwort-ve
 const states=['Erstbesuch','Daten vorhanden','leer','laden','Fehler','offline','kein Zugriff','Sitzung abgelaufen','Tastatur','Zurück/Deep-Link','Speichern/Reload/neue Sitzung'];
 const routes=pages.map(file=>{const route='/'+file.replace(/^app\//,'').replace(/\/?page\.tsx$/,'').split('/').filter(x=>!/^\(.*\)$/.test(x)).join('/');const group=route.startsWith('/operator')?'operator':publics.has(route.slice(1))?'public':'tenant';return {route,file,surface:group,roles:group==='operator'?operator:group==='public'?['anonymous','authenticated']:tenant,states,viewports:[320,390,768,1024,1440,1920,2560],themes:['light','dark'],locales:['de-CH','fr-CH','it-CH','en'],status:'nicht_abgenommen',kpiAssessment:'offen; Auth/Profil/Rechtliches benötigen keine dekorativen Charts',dataSource:'API-/RLS-Pfad pro Route verifizieren',tests:[],visualEvidence:[],blocker:'Ausführung und fachlich geprüfter Referenzvergleich fehlen'};});
 for(const row of routes){
+ const reachable=dependencyGraph(row.file);
+ row.metricSources=reachable.flatMap(node=>node.elements.filter(element=>['Metric','MetricTile','Statistics','CashOverview','CashStatistics','RingChart','LineChart'].includes(element.tag)).map(element=>({owner:node.file,line:element.line,component:element.tag,props:element.props,conditions:node.conditions.map(condition=>condition.expression),limitation:'Statische bedingte Erreichbarkeit, keine Aussage über sichtbare Rolle oder korrekte Berechnung.'})));
+ row.apiSources=reachable.filter(node=>node.apis.length||node.collections.length).map(node=>({owner:node.file,line:node.line,apis:node.apis,collections:node.collections,limitation:'Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen.'}));
+ row.dataSource='Statische API-/KPI-Quellen in routes.json für '+row.route+'; tatsächlicher Rollen-/RLS-Abgleich offen.';
  if(publics.has(row.route.slice(1))){row.surface='public';row.roles=['anonymous','authenticated'];}
  if(row.route.startsWith('/preview/')||row.route.startsWith('/portal')||row.route==='/demo'){row.surface='legacy_entry';row.roles=['anonymous','authenticated'];}
  if(row.route==='/dev/ux-lab'){row.surface='isolated_qa';row.roles=['anonymous','authenticated'];}
@@ -43,10 +49,32 @@ for(const row of routes){
  row.kpiAssessment=row.surface!=='tenant'||row.route.startsWith('/einstellungen')||row.route.endsWith('/neu')||row.route.endsWith('/bearbeiten')?'Keine dekorativen KPI: Information, Identity, Einstellungen oder fokussierte Eingabe. Fachliche Ausnahmen separat prüfen.':'Moduleigene Zahlen, Zeitraum, Währung/Einheit und berechtigte Datenquelle gegen tatsächliche UI/API prüfen; keine Abnahme aus Bestandsliste.';
 }
 const evidence=JSON.parse(fs.readFileSync(root+'/evidence.json','utf8'));
+const operatorVariants=inventory().operatorVariants.map(variant=>({...variant,roles:operator,states,status:'nicht_abgenommen',roleExpectations:operator.map(role=>({role,purpose:'Operator-Aufgabe '+variant.route+' ohne automatischen Zugriff auf Kundengeschäftsdaten.',standard:operatorPolicy.canOpenOperatorSection(role,variant.route.replace(/^\/operator\/?/,''))?'operator_navigation_allowed':'operator_navigation_denied',timeOnly:'not_applicable',limitation:'Getrennte Operatorsitzung, tatsächliche API-/Feldrechte und RLS bleiben zusätzlich zu prüfen.'})),metricSources:dependencyGraph(...variant.component.split('#')).flatMap(node=>node.elements.filter(element=>/^(Metric|MetricTile|Statistics|RingChart|LineChart)$/.test(element.tag)).map(element=>({owner:node.file,line:element.line,component:element.tag,props:element.props}))),kpiAssessment:'Plattformeigene Zahlen nur gemäss Operator-Grants; keine ungeprüften Kundeninhalte oder dekorativen Charts.',dataSource:variant.component,blocker:'Operator-Zustands-/Feld-/KPI-Abnahme und visuelle Referenz offen.'}));
+const routeCases=[...routes,...operatorVariants.filter(variant=>!routes.some(route=>route.route===variant.route))];
+function kpiIntent(row,expected){
+ if(expected.standard.endsWith('_denied'))return 'Keine Geschäftsdaten; zugängliche Rücknavigation bzw. sichere Ablehnung.';
+ const route=row.route,role=expected.role;
+ if(row.surface&&row.surface!=='tenant')return row.kpiAssessment;
+ if(route.startsWith('/operator'))return row.kpiAssessment;
+ if(route.startsWith('/einstellungen'))return 'Keine dekorativen Unternehmens-KPI; konkrete Plan-/Sicherheitsnutzung nur im zuständigen Abschnitt.';
+ if(route.endsWith('/neu')||route.endsWith('/bearbeiten'))return 'Fokussierte Eingabe; nur notwendige Positionssummen/Validierung, keine zusätzlichen Übersichtsdiagramme.';
+ if(route.startsWith('/kunden'))return 'Berechtigte Kunden/Kontakte und Beziehung; '+(permissions.tenantCan(role,'invoices:read')?'Fakturiert, offene/überfällige Restbeträge nach Gutschriften/Teilzahlungen, nach Währung.':'Keine Rechnungs-/Zahlungszahlen ohne eigenes Recht.');
+ if(['/dashboard','/finanzen','/finanzen/analyse','/berichte'].includes(route))return role==='member'?'Eigene Zeit, Einträge und nächste Aufgaben; kein unternehmensweiter Finanzsaldo.':role==='hr'?'Berechtigte Personal-/Arbeitsinformationen; keine Buchhaltungsdaten.':(permissions.tenantCan(role,'payments:read')?'Bruttoeingang, echte Rückerstattung und Nettoeingang getrennt; kein Bankkontostand. ':'Keine Cash-Werte. ')+(permissions.tenantCan(role,'invoices:read')?'Fakturiert und Forderungen getrennt, Währungen/Zeiträume und Gutschriften korrekt.':'Berechtigte Aufträge, Zeiten und Freigaben; keine fremden Finanzdaten.');
+ if(route.startsWith('/zeit'))return 'Erfasste, verrechenbare, freigegebene und verrechnete Zeit getrennt; eigene/zugewiesene Daten, keine vertraulichen Stundensätze als Dekoration.';
+ if(route.startsWith('/projekte'))return 'Auftragsstatus und berechtigte Zeiten; Budgetvergleich nur bei vorhandenen Budgets und freigegebenen Finanzrechten.';
+ if(route.startsWith('/rechnungen'))return 'Dokument-/Zahlungs-/Fälligkeits-/Versandstatus getrennt; offene Restbeträge nach Zahlungen, Gutschriften und Rückerstattungen, keine unnötigen Detailcharts.';
+ if(route.startsWith('/angebote'))return 'Angebotsvolumen und tatsächlicher Entscheidungsstatus; Annahmequote nur mit definiertem Nenner, keine gelesenen Mails behaupten.';
+ if(route.startsWith('/zahlungen'))return 'Tatsächlicher Eingang, Zuordnung und gegebenenfalls Rückerstattung; kein fakturiertes Volumen als Cash.';
+ if(route.startsWith('/spesen')||route==='/belege')return 'Berechtigte eigene bzw. freizugebende Belege; erfasst, genehmigt und tatsächlich erstattet unterscheiden.';
+ if(route.startsWith('/mitarbeiter'))return 'Berechtigter Personalbestand und relevante Zeit-/Abwesenheitsdaten; sensible Detaildaten nur nach eigenem Recht.';
+ if(route.startsWith('/produkte'))return 'Preis, Einheit und Steuerbehandlung; Nutzungsstatistik nur bei tatsächlich vorhandener Datenbasis, kein Null-Diagramm.';
+ return 'Konkrete Aufgaben/Status und notwendige Listenanzahl; ohne fachlichen Vergleich keine zusätzlichen Charts.';
+}
 for(const row of requirements){const observation=evidence.entries[row.id];if(observation?.sourceTextSha256===row.sourceTextSha256)Object.assign(row,observation);}
 const csv=rows=>rows.map(row=>row.map(x=>'"'+String(typeof x==='object'?JSON.stringify(x):x).replaceAll('"','""')+'"').join(',')).join('\n')+'\n';
 fs.writeFileSync(root+'/requirements.json',JSON.stringify({sourceSha256:crypto.createHash('sha256').update(fs.readFileSync(root+'/source.md')).digest('hex'),chapters:56,requirements},null,2)+'\n');
 fs.writeFileSync(root+'/requirements.csv',csv([['ID','Kapitel','Priorität','Anforderung','Ist/Abnahme','Code','Test','Visuell','Blocker'],...requirements.map(x=>[x.id,x.chapter,x.priority,x.requirement,x.status,x.sourceReferences,x.test,x.visualComparison,x.blocker])]));
-fs.writeFileSync(root+'/routes.json',JSON.stringify({routes,components:walk('components').filter(x=>/\.tsx$/.test(x)),apis:walk('app/api').filter(x=>x.endsWith('/route.ts')),migrations:walk('database/migrations').filter(x=>x.endsWith('.sql'))},null,2)+'\n');
-fs.writeFileSync(root+'/route-role-states.csv',csv([['Route','Rolle','Zustand','Status','Seitenziel','Rollen-Navigation','Nur-Zeit-Profil','KPI','Datenquelle','Visuell','Blocker'],...routes.flatMap(x=>x.roleExpectations.flatMap(expected=>x.states.map(state=>[x.route,expected.role,state,x.status,expected.purpose,expected.standard,expected.timeOnly,x.kpiAssessment,x.dataSource,'offen',x.blocker+'; '+expected.limitation])))]));
-console.log(JSON.stringify({chapters:56,requirements:requirements.length,routes:routes.length,routeRoleStateCases:routes.reduce((n,x)=>n+x.roles.length*x.states.length,0)}));
+fs.writeFileSync(root+'/routes.json',JSON.stringify({routes,operatorVariants,components:walk('components').filter(x=>/\.tsx$/.test(x)),apis:walk('app/api').filter(x=>x.endsWith('/route.ts')),migrations:walk('database/migrations').filter(x=>x.endsWith('.sql'))},null,2)+'\n');
+fs.writeFileSync(root+'/route-role-states.csv',csv([['Route','Rolle','Zustand','Status','Seitenziel','Rollen-Navigation','Nur-Zeit-Profil','KPI','Datenquelle','Visuell','Blocker'],...routeCases.flatMap(x=>x.roleExpectations.flatMap(expected=>x.states.map(state=>[x.route,expected.role,state,x.status,expected.purpose,expected.standard,expected.timeOnly,x.kpiAssessment,x.dataSource,'offen',x.blocker+'; '+expected.limitation])))]));
+fs.writeFileSync(root+'/route-role-kpi.csv',csv([['Route','Rolle','Seitenziel','Bedingte KPI/Charts im Code','Datenquellen','Fachlicher Status','Visuell'],...routeCases.flatMap(row=>row.roleExpectations.map(expected=>[row.route,expected.role,expected.purpose,row.metricSources.map(metric=>metric.component+'@'+metric.owner+':'+metric.line).join('; '),'routes.json: '+row.route,kpiIntent(row,expected)+' Noch nicht nach Rolle, Tarif und Zustand abgenommen.','offen']))]));
+console.log(JSON.stringify({chapters:56,requirements:requirements.length,routes:routes.length,operatorVariants:operatorVariants.length,routeRoleStateCases:routeCases.reduce((n,x)=>n+x.roles.length*x.states.length,0)}));
