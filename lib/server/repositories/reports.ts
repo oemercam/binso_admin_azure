@@ -63,5 +63,16 @@ export async function reportSummary(c:PoolClient,s:SessionUser,period:{from:stri
    invoices.push({currency,invoiced:sumMoney(metrics.revenueEvents.filter(event=>String(event.date)>=period.from&&String(event.date)<=period.to).map(event=>event.amount)).toFixed(2),open:String(metrics.snapshot.open),overdue:String(metrics.snapshot.overdue),asOf:String(metrics.snapshot.as_of)});
   }
  }
- return {period,asOf:new Date().toISOString(),customers,projects,time,payments,expenses,expenseCategories,employees,invoices,offers} as ReportSummary;
+ let vat:ReportSummary['vat']=null;
+ if(tenantCan(s.role,'vat:read')&&planAllowsModule(plan,'mwst')){
+  // Read recorded issued amounts, including archived issued documents. Never
+  // invent a tax allocation from gross-only credit notes or expense amounts.
+  vat=(await c.query(`with events as (
+   select i.currency,1::numeric invoice_count,i.subtotal net,i.vat_amount vat,i.total_amount gross,0::numeric credit_count,0::numeric credit_gross
+   from invoices i where i.organization_id=$1 and i.status not in ('draft','cancelled') and i.issue_date between $2::date and $3::date and i.issue_date<=$4::date
+   union all select i.currency,0,0,0,0,1,n.amount from credit_notes n join invoices i on i.id=n.invoice_id and i.organization_id=n.organization_id where n.organization_id=$1 and n.credit_date between $2::date and $3::date and n.credit_date<=$4::date
+  ) select currency,sum(invoice_count)::text "invoiceCount",sum(net)::text "netBeforeCredits",sum(vat)::text "vatBeforeCredits",sum(gross)::text "grossBeforeCredits",sum(credit_count)::text "unallocatedCreditCount",sum(credit_gross)::text "unallocatedCreditGross" from events group by currency order by currency limit 201`,[...args,businessDate()])).rows;
+  if(vat.length>200)throw new ApiError(400,'report_too_large','Bitte den Zeitraum oder die Filter weiter eingrenzen.');
+ }
+ return {period,asOf:new Date().toISOString(),customers,projects,time,payments,expenses,expenseCategories,employees,invoices,offers,vat} as ReportSummary;
 }

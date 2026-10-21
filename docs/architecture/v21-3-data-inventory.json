@@ -12479,6 +12479,14 @@
             "`select distinct currency from invoices where organization_id=$1 and archived_at is null and status not in ('draft','cancelled') and issue_date<=(now() at time zone 'Europe/Zurich')::date order by currency`",
             "[s.organizationId]"
           ]
+        },
+        {
+          "callee": "c.query",
+          "line": 70,
+          "arguments": [
+            "`with events as (\n   select i.currency,1::numeric invoice_count,i.subtotal net,i.vat_amount vat,i.total_amount gross,0::numeric credit_count,0::numeric credit_gross\n   from invoices i where i.organization_id=$1 and i.status not in ('draft','cancelled') and i.issue_date between $2::date and $3::date and i.issue_date<=$4::date\n   union all select i.currency,0,0,0,0,1,n.amount from credit_notes n join invoices i on i.id=n.invoice_id and i.organization_id=n.organization_id where n.organization_id=$1 and n.credit_date between $2::date and $3::date and n.credit_date<=$4::date\n  ) select currency,sum(invoice_count)::text \"invoiceCount\",sum(net)::text \"netBeforeCredits\",sum(vat)::text \"vatBeforeCredits\",sum(gross)::text \"grossBeforeCredits\",sum(credit_count)::text \"unallocatedCreditCount\",sum(credit_gross)::text \"unallocatedCreditGross\" from events group by currency order by currency limit 201`",
+            "[...args,businessDate()]"
+          ]
         }
       ]
     },

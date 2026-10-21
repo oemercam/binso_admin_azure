@@ -7388,10 +7388,10 @@
         "lib/report-export.ts",
         "components/pages/reports.tsx"
       ],
-      "implementation": "Existing aggregate report now includes offer status/count/volume by currency and issue-date cohort, canonical sum-then-round VAT and expiry, explicit accepted/declined decision denominator; retains cash/invoices/expense categories.",
-      "test": "Actual migrated DB and canonical document-list parity, role/tenant/Start, temporal and fractional-VAT negative cases passed.",
+      "implementation": "Existing aggregate report now includes offer status/count/volume by currency and issue-date cohort, canonical sum-then-round VAT and expiry, explicit accepted/declined decision denominator; retains cash/invoices/expense categories. Informational recorded invoice net/VAT/gross before credits added; gross-only credit notes shown separately with explicit uncertainty and no inferred tax adjustment. Includes archived issued records, excludes draft/cancelled/future records.",
+      "test": "Actual migrated DB and canonical document-list parity, role/tenant/Start, temporal and fractional-VAT negative cases passed. Migrated VAT-report positive/negative amount/date/archive/role/plan/tenant and CSV disclaimer cases passed.",
       "visualComparison": "New report UI browser cases added, not yet visually accepted.",
-      "blocker": "VAT report, real-data project profitability, current complete CI and rendered reference/device acceptance remain open."
+      "blocker": "Allocated credit VAT/input-tax data and actual-data project profitability remain unavailable; current full CI, reference/device and financial acceptance pending."
     },
     {
       "id": "R7-43-009",

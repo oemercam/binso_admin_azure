@@ -149,6 +149,8 @@ try{
  for(const role of ['project_manager','manager','member'])assert.equal((await get('/api/customers/'+unassigned.id,cookies.get('0:'+role))).status,404,role+' cannot read an unassigned customer');
  for(const [path,allowed] of readContracts)for(const role of roles){const r=await get(path,cookies.get('0:'+role));assert.equal(r.status,allowed.includes(role)?200:403,role+' GET '+path+': '+JSON.stringify(r.data));
   if(path==='/api/reports'&&r.status===200){
+   if(['owner','admin','finance'].includes(role)){assert.ok(Array.isArray(r.data.vat),role+' retains VAT reporting under the existing Pro fixture');for(const item of r.data.vat)assert.deepEqual(Object.keys(item).sort(),['currency','grossBeforeCredits','invoiceCount','netBeforeCredits','unallocatedCreditCount','unallocatedCreditGross','vatBeforeCredits'],'No invoice identity or invented allocated tax leaves the native boundary');}
+   else assert.equal(r.data.vat,null,role+' cannot receive VAT data');
    if(role==='hr')assert.equal(r.data.offers,null,'HR has no sales grant');
    else {assert.ok(Array.isArray(r.data.offers),role+' retains its existing sales grant');for(const item of r.data.offers)assert.deepEqual(Object.keys(item).sort(),['count','currency','status','volume'],'Only offer aggregates leave the native HTTP boundary');}
   }

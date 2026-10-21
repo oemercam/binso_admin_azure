@@ -1,6 +1,10 @@
 import assert from 'node:assert/strict';
 /** Computed font-family and a loaded FontFace do not prove glyph usage. */
 async function renderedFonts(page){
+ // CDP reports the last laid-out glyph run. After removing the deliberate
+ // wrong-font adversary, force layout before reading it; cached pre-layout
+ // glyph data is not evidence of the restored stylesheet's actual rendering.
+ await page.locator('.auth-card h1').evaluate(node=>node.getBoundingClientRect());
  const session=await page.context().newCDPSession(page);
  try{await session.send('DOM.enable');await session.send('CSS.enable');const {root}=await session.send('DOM.getDocument');const {nodeId}=await session.send('DOM.querySelector',{nodeId:root.nodeId,selector:'.auth-card h1'});return (await session.send('CSS.getPlatformFontsForNode',{nodeId})).fonts;}finally{await session.detach();}
 }

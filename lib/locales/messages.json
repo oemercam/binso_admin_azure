@@ -14148,5 +14148,60 @@
     "Quote volume",
     "Volume des devis",
     "Volume delle offerte"
+  ],
+  "MwSt.-Datenbasis": [
+    "VAT data basis",
+    "Base des données TVA",
+    "Base dei dati IVA"
+  ],
+  "Rechnungswerte vor Gutschriften; keine Steuerdeklaration": [
+    "Invoice values before credit notes; not a tax return",
+    "Valeurs des factures avant notes de crédit ; pas une déclaration fiscale",
+    "Valori delle fatture prima delle note di credito; non è una dichiarazione fiscale"
+  ],
+  "Netto vor Gutschriften": [
+    "Net before credit notes",
+    "Net avant notes de crédit",
+    "Netto prima delle note di credito"
+  ],
+  "Ausgewiesene MwSt. vor Gutschriften": [
+    "Recorded VAT before credit notes",
+    "TVA indiquée avant notes de crédit",
+    "IVA indicata prima delle note di credito"
+  ],
+  "Brutto vor Gutschriften": [
+    "Gross before credit notes",
+    "Brut avant notes de crédit",
+    "Lordo prima delle note di credito"
+  ],
+  "Gutschriften ohne MwSt.-Zuordnung": [
+    "Credit notes without VAT allocation",
+    "Notes de crédit sans ventilation TVA",
+    "Note di credito senza ripartizione IVA"
+  ],
+  "Nicht zugeordnete Gutschriften": [
+    "Unallocated credit notes",
+    "Notes de crédit non ventilées",
+    "Note di credito non ripartite"
+  ],
+  "MwSt. laut Rechnungen": [
+    "VAT recorded on invoices",
+    "TVA indiquée sur les factures",
+    "IVA indicata nelle fatture"
+  ],
+  "Ausgestellte Rechnungen nach Rechnungsdatum, einschliesslich archivierter Belege. Werte vor Gutschriften; keine Steuerdeklaration und keine Vorsteuerberechnung.": [
+    "Issued invoices by invoice date, including archived records. Values before credit notes; not a tax return or an input-tax calculation.",
+    "Factures émises selon la date de facturation, y compris les pièces archivées. Valeurs avant notes de crédit ; ni déclaration fiscale ni calcul de l’impôt préalable.",
+    "Fatture emesse per data di fatturazione, inclusi i documenti archiviati. Valori prima delle note di credito; non è una dichiarazione fiscale né un calcolo dell’imposta precedente."
+  ],
+  "Erfasste Gutschriften sind nicht nach Steuersätzen aufgeteilt. Sie werden hier mit ihrem Gesamtbetrag am Gutschriftdatum separat gezeigt und nicht von der ausgewiesenen Steuer abgezogen.": [
+    "Recorded credit notes are not allocated by tax rate. Their gross amount is shown separately on the credit-note date and is not deducted from the recorded tax.",
+    "Les notes de crédit enregistrées ne sont pas ventilées par taux. Leur montant total est présenté séparément à la date de la note de crédit et ne réduit pas la taxe indiquée.",
+    "Le note di credito registrate non sono ripartite per aliquota. L’importo totale è mostrato separatamente alla data della nota di credito e non viene sottratto dall’imposta indicata."
+  ],
+  "Keine MwSt.-Belege im Zeitraum": [
+    "No VAT records in this period",
+    "Aucune pièce TVA sur cette période",
+    "Nessun documento IVA nel periodo"
   ]
 }

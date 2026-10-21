@@ -2398,6 +2398,7 @@
             "data.offers.length",
             "decisions.total>0",
             "data.invoices.length",
+            "data.vat.length",
             "data.payments.length",
             "data.expenses.length",
             "data.expenseCategories.length"
@@ -2420,6 +2421,7 @@
             "data.offers.length",
             "decisions.total>0",
             "data.invoices.length",
+            "data.vat.length",
             "data.payments.length",
             "data.expenses.length",
             "data.expenseCategories.length"
@@ -2442,6 +2444,7 @@
             "data.offers.length",
             "decisions.total>0",
             "data.invoices.length",
+            "data.vat.length",
             "data.payments.length",
             "data.expenses.length",
             "data.expenseCategories.length"
@@ -2464,6 +2467,7 @@
             "data.offers.length",
             "decisions.total>0",
             "data.invoices.length",
+            "data.vat.length",
             "data.payments.length",
             "data.expenses.length",
             "data.expenseCategories.length"
@@ -2486,6 +2490,7 @@
             "data.offers.length",
             "decisions.total>0",
             "data.invoices.length",
+            "data.vat.length",
             "data.payments.length",
             "data.expenses.length",
             "data.expenseCategories.length"
@@ -2508,6 +2513,7 @@
             "data.offers.length",
             "decisions.total>0",
             "data.invoices.length",
+            "data.vat.length",
             "data.payments.length",
             "data.expenses.length",
             "data.expenseCategories.length"
@@ -2530,6 +2536,7 @@
             "data.offers.length",
             "decisions.total>0",
             "data.invoices.length",
+            "data.vat.length",
             "data.payments.length",
             "data.expenses.length",
             "data.expenseCategories.length"
@@ -2553,6 +2560,7 @@
             "data.offers.length",
             "decisions.total>0",
             "data.invoices.length",
+            "data.vat.length",
             "data.payments.length",
             "data.expenses.length",
             "data.expenseCategories.length"
@@ -2576,6 +2584,7 @@
             "data.offers.length",
             "decisions.total>0",
             "data.invoices.length",
+            "data.vat.length",
             "data.payments.length",
             "data.expenses.length",
             "data.expenseCategories.length"
@@ -2599,6 +2608,7 @@
             "data.offers.length",
             "decisions.total>0",
             "data.invoices.length",
+            "data.vat.length",
             "data.payments.length",
             "data.expenses.length",
             "data.expenseCategories.length"
@@ -2622,6 +2632,7 @@
             "data.offers.length",
             "decisions.total>0",
             "data.invoices.length",
+            "data.vat.length",
             "data.payments.length",
             "data.expenses.length",
             "data.expenseCategories.length"
@@ -2631,6 +2642,78 @@
         {
           "owner": "components/pages/reports.tsx",
           "line": 32,
+          "component": "MetricTile",
+          "props": [
+            "label=\"Netto vor Gutschriften\"",
+            "value={Number(item.netBeforeCredits)}",
+            "currency={item.currency}"
+          ],
+          "conditions": [
+            "data",
+            "data?.time",
+            "resource.error",
+            "resource.loading",
+            "data.offers.length",
+            "decisions.total>0",
+            "data.invoices.length",
+            "data.vat.length",
+            "data.payments.length",
+            "data.expenses.length",
+            "data.expenseCategories.length"
+          ],
+          "limitation": "Statische bedingte Erreichbarkeit, keine Aussage über sichtbare Rolle oder korrekte Berechnung."
+        },
+        {
+          "owner": "components/pages/reports.tsx",
+          "line": 32,
+          "component": "MetricTile",
+          "props": [
+            "label=\"Ausgewiesene MwSt. vor Gutschriften\"",
+            "value={Number(item.vatBeforeCredits)}",
+            "currency={item.currency}"
+          ],
+          "conditions": [
+            "data",
+            "data?.time",
+            "resource.error",
+            "resource.loading",
+            "data.offers.length",
+            "decisions.total>0",
+            "data.invoices.length",
+            "data.vat.length",
+            "data.payments.length",
+            "data.expenses.length",
+            "data.expenseCategories.length"
+          ],
+          "limitation": "Statische bedingte Erreichbarkeit, keine Aussage über sichtbare Rolle oder korrekte Berechnung."
+        },
+        {
+          "owner": "components/pages/reports.tsx",
+          "line": 32,
+          "component": "MetricTile",
+          "props": [
+            "label=\"Brutto vor Gutschriften\"",
+            "value={Number(item.grossBeforeCredits)}",
+            "currency={item.currency}"
+          ],
+          "conditions": [
+            "data",
+            "data?.time",
+            "resource.error",
+            "resource.loading",
+            "data.offers.length",
+            "decisions.total>0",
+            "data.invoices.length",
+            "data.vat.length",
+            "data.payments.length",
+            "data.expenses.length",
+            "data.expenseCategories.length"
+          ],
+          "limitation": "Statische bedingte Erreichbarkeit, keine Aussage über sichtbare Rolle oder korrekte Berechnung."
+        },
+        {
+          "owner": "components/pages/reports.tsx",
+          "line": 33,
           "component": "MetricTile",
           "props": [
             "label=\"Eingegangene Zahlungen\"",
@@ -2645,6 +2728,7 @@
             "data.offers.length",
             "decisions.total>0",
             "data.invoices.length",
+            "data.vat.length",
             "data.payments.length",
             "data.expenses.length",
             "data.expenseCategories.length"
@@ -2653,7 +2737,7 @@
         },
         {
           "owner": "components/pages/reports.tsx",
-          "line": 32,
+          "line": 33,
           "component": "MetricTile",
           "props": [
             "label=\"Rückerstattungen\"",
@@ -2668,6 +2752,7 @@
             "data.offers.length",
             "decisions.total>0",
             "data.invoices.length",
+            "data.vat.length",
             "data.payments.length",
             "data.expenses.length",
             "data.expenseCategories.length"
@@ -2676,7 +2761,7 @@
         },
         {
           "owner": "components/pages/reports.tsx",
-          "line": 32,
+          "line": 33,
           "component": "MetricTile",
           "props": [
             "label=\"Zahlungseingänge nach Rückerstattungen\"",
@@ -2691,6 +2776,7 @@
             "data.offers.length",
             "decisions.total>0",
             "data.invoices.length",
+            "data.vat.length",
             "data.payments.length",
             "data.expenses.length",
             "data.expenseCategories.length"
@@ -2699,7 +2785,7 @@
         },
         {
           "owner": "components/pages/reports.tsx",
-          "line": 33,
+          "line": 34,
           "component": "MetricTile",
           "props": [
             "key={item.currency}",
@@ -2715,6 +2801,7 @@
             "data.offers.length",
             "decisions.total>0",
             "data.invoices.length",
+            "data.vat.length",
             "data.payments.length",
             "data.expenses.length",
             "data.expenseCategories.length"

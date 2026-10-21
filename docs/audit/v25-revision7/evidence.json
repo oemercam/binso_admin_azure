@@ -207,16 +207,16 @@
     "R7-43-008": {
       "sourceTextSha256": "7f9bbd76986aca52fc679aa689867d8aef58f62d3cfe6998887a3f2a30202252",
       "status": "teilweise_implementiert",
-      "implementation": "Existing aggregate report now includes offer status/count/volume by currency and issue-date cohort, canonical sum-then-round VAT and expiry, explicit accepted/declined decision denominator; retains cash/invoices/expense categories.",
+      "implementation": "Existing aggregate report now includes offer status/count/volume by currency and issue-date cohort, canonical sum-then-round VAT and expiry, explicit accepted/declined decision denominator; retains cash/invoices/expense categories. Informational recorded invoice net/VAT/gross before credits added; gross-only credit notes shown separately with explicit uncertainty and no inferred tax adjustment. Includes archived issued records, excludes draft/cancelled/future records.",
       "sourceReferences": [
         "lib/server/repositories/reports.ts",
         "lib/server/repositories/finance.ts",
         "lib/report-export.ts",
         "components/pages/reports.tsx"
       ],
-      "test": "Actual migrated DB and canonical document-list parity, role/tenant/Start, temporal and fractional-VAT negative cases passed.",
+      "test": "Actual migrated DB and canonical document-list parity, role/tenant/Start, temporal and fractional-VAT negative cases passed. Migrated VAT-report positive/negative amount/date/archive/role/plan/tenant and CSV disclaimer cases passed.",
       "visualComparison": "New report UI browser cases added, not yet visually accepted.",
-      "blocker": "VAT report, real-data project profitability, current complete CI and rendered reference/device acceptance remain open."
+      "blocker": "Allocated credit VAT/input-tax data and actual-data project profitability remain unavailable; current full CI, reference/device and financial acceptance pending."
     },
     "R7-43-009": {
       "sourceTextSha256": "42e62a1191149d38124c2ec17ff6b4f8a576d13c97857a1fb5c4991c81e6c109",
@@ -467,6 +467,7 @@
     "Exact-SHA integration, production-migration and deployment approval"
   ],
   "checks": {
-    "offerReports": "Actual isolated migrated DB/list precision and expiry parity, dates/archive/currency, HR denial, tenant-before/after, Start entitlement, CSV translation and explicit decision denominator passed. Native HTTP and interactive browser cases added; current execution pending."
+    "offerReports": "Actual isolated migrated DB/list precision and expiry parity, dates/archive/currency, HR denial, tenant-before/after, Start entitlement, CSV translation and explicit decision denominator passed. Native HTTP and interactive browser cases added; current execution pending.",
+    "invoiceTaxReport": "Actual migrated DB: issued/archive records, exact recorded components, separate currencies, gross-only credits on their own dates, draft/cancelled/future denial, role/tariff/tenant masking and translated CSV limitation passed. Native HTTP and actual UI cases added; current CI pending. No allocated credit tax/input tax/tax-return claim."
   }
 }

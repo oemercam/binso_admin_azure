@@ -34,8 +34,9 @@ export function localizedReportRows(kind:ReportInput['kind'],result:TimeReport|R
   let label=row[0];
   if(label.startsWith('Genehmigte Spesen nach Kategorie · '))label=translate('Genehmigte Spesen nach Kategorie')+' · '+label.slice('Genehmigte Spesen nach Kategorie · '.length);
   else if(label.startsWith('Aufträge · '))label=translate('Aufträge')+' · '+translate(label.slice('Aufträge · '.length));
+  else if(label.startsWith('Rechnungen · ')||label.startsWith('Nicht zugeordnete Gutschriften · ')){const [name,currency]=label.split(' · ');label=translate(name)+' · '+currency;}
   else if(label.startsWith('Angebote · ')||label.startsWith('Angebotsvolumen · ')){const [name,status,currency]=label.split(' · ');label=[translate(name),translate(status),currency].filter(Boolean).join(' · ');}
   else label=translate(label);
-  return [label,...row.slice(1)];
+  return [label,...(row[0]==='MwSt.-Datenbasis'?[translate(row[1]),...row.slice(2)]:row.slice(1))];
  });
 }
