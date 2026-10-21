@@ -7403,11 +7403,14 @@
       "sourceParagraph": "**Finanzberichte:** Einnahmen/Ausgaben, fakturiert, offen/überfällig, Zahlungseingänge, Angebotsvolumen/-status, Ausgaben nach Kategorien, MwSt.-Auswertung (nicht als vollständige Steuerdeklaration ausgeben), Projektwirtschaftlichkeit nur bei echter Datenbasis. Berichte enthalten Zeitraum, Erstellungsdatum/Datenstand, Einheit, fachlich korrekte Summen und Statusdefinitionen.",
       "status": "teilweise_implementiert",
       "sourceReferences": [
-        "lib/server/document-pdf.ts"
+        "lib/server/report-document.ts",
+        "lib/server/report-exports.ts",
+        "database/migrations/0072_report_export_snapshots.sql",
+        "components/report-actions.tsx"
       ],
-      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
-      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
+      "implementation": "Gemeinsame Berichtsprojektion/PDF-Erzeugung und unveränderliche private Berichtskopie mit Ablauf, Scope-Revalidierung, Idempotenz und SHA-256. Vorschau und Download verwenden dieselben Bytes.",
+      "test": "Reale migrierte DB-/PDF-Tests für Replay, Hash, Ersteller/Mandant/Rolle/Tarif, Ablauf und Unveränderlichkeit bestanden. Native HTTP- und neue Snapshot-Browserfälle ergänzt, aktuelle CI ausstehend.",
+      "visualComparison": "Lokale gemeinsame PDF-Zoom-/Containmentprüfung einschliesslich CSS-Negativfall bestanden; Report-Seiten-/Geräteabnahme weiterhin offen.",
       "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
     },
     {
@@ -7420,11 +7423,14 @@
       "sourceParagraph": "**Formate und Sicherheit:** PDF im zentralen Viewer; CSV UTF-8 mit stabilen Spalten, Excel-kompatibler Variante, sauberem Dezimal-/Datumsformat und Schutz gegen CSV-Formelinjektion. E-Mail mit Empfänger, Betreff, Begleittext, echtem Anhang und Versand-/Fehlerprotokoll. Sensible Freigabelinks nicht erratbar, befristet, widerrufbar und mit angemessener Empfängerverifikation. Berechtigungen serverseitig, Audit für Freigaben, keine realen Test-E-Mails an Kunden. Grosse Exporte ressourcenschonend und mit verständlichen Fehlern. Optional gespeicherte Filter; automatische Versände nur nach ausdrücklichem Opt-in.",
       "status": "teilweise_implementiert",
       "sourceReferences": [
-        "lib/server/document-pdf.ts"
+        "lib/server/report-document.ts",
+        "lib/server/report-exports.ts",
+        "database/migrations/0072_report_export_snapshots.sql",
+        "components/report-actions.tsx"
       ],
-      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
-      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
+      "implementation": "Gemeinsame Berichtsprojektion/PDF-Erzeugung und unveränderliche private Berichtskopie mit Ablauf, Scope-Revalidierung, Idempotenz und SHA-256. Vorschau und Download verwenden dieselben Bytes.",
+      "test": "Reale migrierte DB-/PDF-Tests für Replay, Hash, Ersteller/Mandant/Rolle/Tarif, Ablauf und Unveränderlichkeit bestanden. Native HTTP- und neue Snapshot-Browserfälle ergänzt, aktuelle CI ausstehend.",
+      "visualComparison": "Lokale gemeinsame PDF-Zoom-/Containmentprüfung einschliesslich CSS-Negativfall bestanden; Report-Seiten-/Geräteabnahme weiterhin offen.",
       "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
     },
     {

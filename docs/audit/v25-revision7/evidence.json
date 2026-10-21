@@ -214,16 +214,30 @@
     "R7-43-009": {
       "sourceTextSha256": "42e62a1191149d38124c2ec17ff6b4f8a576d13c97857a1fb5c4991c81e6c109",
       "status": "teilweise_implementiert",
-      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
-      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
-      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
+      "test": "Reale migrierte DB-/PDF-Tests für Replay, Hash, Ersteller/Mandant/Rolle/Tarif, Ablauf und Unveränderlichkeit bestanden. Native HTTP- und neue Snapshot-Browserfälle ergänzt, aktuelle CI ausstehend.",
+      "visualComparison": "Lokale gemeinsame PDF-Zoom-/Containmentprüfung einschliesslich CSS-Negativfall bestanden; Report-Seiten-/Geräteabnahme weiterhin offen.",
+      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43.",
+      "implementation": "Gemeinsame Berichtsprojektion/PDF-Erzeugung und unveränderliche private Berichtskopie mit Ablauf, Scope-Revalidierung, Idempotenz und SHA-256. Vorschau und Download verwenden dieselben Bytes.",
+      "sourceReferences": [
+        "lib/server/report-document.ts",
+        "lib/server/report-exports.ts",
+        "database/migrations/0072_report_export_snapshots.sql",
+        "components/report-actions.tsx"
+      ]
     },
     "R7-43-010": {
       "sourceTextSha256": "0552792c3e70b8398014cbad280b9ab5f4a38f0029269ff39fc2c93c626abd83",
       "status": "teilweise_implementiert",
-      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
-      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
-      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43."
+      "test": "Reale migrierte DB-/PDF-Tests für Replay, Hash, Ersteller/Mandant/Rolle/Tarif, Ablauf und Unveränderlichkeit bestanden. Native HTTP- und neue Snapshot-Browserfälle ergänzt, aktuelle CI ausstehend.",
+      "visualComparison": "Lokale gemeinsame PDF-Zoom-/Containmentprüfung einschliesslich CSS-Negativfall bestanden; Report-Seiten-/Geräteabnahme weiterhin offen.",
+      "blocker": "Direkter E-Mail-Versand, sichere Freigabelinks, vollständiger Finanzbericht, Gruppen-/Geräte-/Referenzabnahme offen. Keine Gesamtfertigstellung von Kapitel43.",
+      "implementation": "Gemeinsame Berichtsprojektion/PDF-Erzeugung und unveränderliche private Berichtskopie mit Ablauf, Scope-Revalidierung, Idempotenz und SHA-256. Vorschau und Download verwenden dieselben Bytes.",
+      "sourceReferences": [
+        "lib/server/report-document.ts",
+        "lib/server/report-exports.ts",
+        "database/migrations/0072_report_export_snapshots.sql",
+        "components/report-actions.tsx"
+      ]
     },
     "R7-43-011": {
       "sourceTextSha256": "64670a893224a459fbe16930ea9fb8aaac8283883b6332de151acc3e38535082",

@@ -1,5 +1,24 @@
 import assert from 'node:assert/strict';
 
+export async function assertPdfScrollBoundary(page){
+ const geometry=await page.locator('.document-page-stage').evaluate(stage=>({overflow:getComputedStyle(stage).overflow,root:document.documentElement.scrollWidth,viewport:innerWidth,width:stage.clientWidth,height:stage.clientHeight,scrollWidth:stage.scrollWidth,scrollHeight:stage.scrollHeight}));
+ assert.equal(geometry.overflow,'auto','PDF panning remains inside the document scroll owner');
+ assert.ok(geometry.root<=geometry.viewport+1,'PDF zoom never widens the application');
+ assert.ok(geometry.scrollWidth>geometry.width||geometry.scrollHeight>geometry.height,'The rendered zoom creates an internal scroll range');
+}
+
+export async function verifyPdfZoom(page){
+ const stage=page.locator('.document-page-stage'),canvas=stage.locator('canvas');
+ await stage.locator('canvas[data-rendered-page="1"][data-rendered-zoom="1"]').waitFor();
+ const fit=await canvas.boundingBox();await stage.dblclick();
+ await stage.locator('canvas[data-rendered-page="1"][data-rendered-zoom="2.5"]').waitFor();
+ const zoom=await canvas.boundingBox();assert.ok(Math.abs(zoom.width/fit.width-2.5)<.02&&Math.abs(zoom.height/fit.height-2.5)<.02,'Wait for actual 2.5x canvas completion, not a stale page-number marker');
+ await assertPdfScrollBoundary(page);
+ const broken=await page.addStyleTag({content:'.document-page-stage{overflow:visible!important}'});
+ try{await assert.rejects(()=>assertPdfScrollBoundary(page),/document scroll owner/)}finally{await broken.evaluate(element=>element.remove())}
+ await assertPdfScrollBoundary(page);await stage.dblclick();await stage.locator('canvas[data-rendered-page="1"][data-rendered-zoom="1"]').waitFor();
+}
+
 async function assertPreviewTargets(page){
  const controls=page.locator('.document-modal-header-actions button,.document-page-navigation button');
  assert.equal(await controls.count(),5,'Preview retains zoom, download, close and both page controls');

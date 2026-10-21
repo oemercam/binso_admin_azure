@@ -13873,5 +13873,35 @@
     "Please choose an available language.",
     "Veuillez choisir une langue disponible.",
     "Seleziona una lingua disponibile."
+  ],
+  "Bitte die Berichtsfilter und Sprache prüfen.": [
+    "Please check the report filters and language.",
+    "Vérifiez les filtres du rapport et la langue.",
+    "Verifica i filtri del rapporto e la lingua."
+  ],
+  "Bitte die Berichtsfilter eingrenzen.": [
+    "Please narrow the report filters.",
+    "Veuillez affiner les filtres du rapport.",
+    "Restringi i filtri del rapporto."
+  ],
+  "Die Berechtigung oder Zuordnung hat sich geändert. Bitte den Bericht neu erstellen.": [
+    "Your permissions or assignment have changed. Please create the report again.",
+    "Vos droits ou votre affectation ont changé. Veuillez recréer le rapport.",
+    "Le autorizzazioni o l’assegnazione sono cambiate. Crea nuovamente il rapporto."
+  ],
+  "Diese Berichtsvorschau ist abgelaufen. Bitte den Bericht neu erstellen.": [
+    "This report preview has expired. Please create the report again.",
+    "Cet aperçu du rapport a expiré. Veuillez recréer le rapport.",
+    "Questa anteprima del rapporto è scaduta. Crea nuovamente il rapporto."
+  ],
+  "Bericht wurde nicht gefunden.": [
+    "Report not found.",
+    "Rapport introuvable.",
+    "Rapporto non trovato."
+  ],
+  "Bericht konnte nicht sicher geladen werden.": [
+    "The report could not be loaded securely.",
+    "Le rapport n’a pas pu être chargé de manière sécurisée.",
+    "Impossibile caricare il rapporto in modo sicuro."
   ]
 }

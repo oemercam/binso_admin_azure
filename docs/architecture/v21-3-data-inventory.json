@@ -2,10 +2,10 @@
   "scope": "Static AST/source inventory, not proof that every runtime branch is tested. Calls include exact source arguments and locations; dynamic dispatch requires the domain matrix and runtime tests.",
   "base": "7b90a5c7353cf2061987fcd0f4550210bbc00f92",
   "counts": {
-    "apis": 115,
+    "apis": 117,
     "consumers": 41,
-    "migrations": 72,
-    "tables": 106
+    "migrations": 73,
+    "tables": 107
   },
   "apis": [
     {
@@ -5113,6 +5113,122 @@
       ]
     },
     {
+      "file": "app/api/reports/exports/[id]/route.ts",
+      "path": "/api/reports/exports/[id]",
+      "methods": [
+        "GET"
+      ],
+      "dependencies": [
+        "lib/server/session.ts",
+        "lib/server/maintenance.ts",
+        "lib/server/env.ts",
+        "lib/server/db.ts",
+        "lib/server/http.ts",
+        "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
+        "lib/server/plan-access.ts",
+        "lib/server/report-exports.ts",
+        "lib/server/rbac.ts",
+        "lib/permissions.ts",
+        "lib/server/audit.ts",
+        "lib/server/business-idempotency.ts",
+        "lib/locales/index.ts",
+        "lib/locales/config.ts",
+        "lib/server/report-document.ts",
+        "lib/financial-status.ts",
+        "lib/money.ts",
+        "lib/statistics-period.ts",
+        "lib/server/repositories/reports.ts",
+        "lib/report-export.ts",
+        "lib/projects.ts",
+        "lib/server/repositories/time-workspace.ts",
+        "lib/server/repositories/finance.ts",
+        "lib/server/document-pdf.ts",
+        "lib/qr-bill.ts",
+        "lib/server/document-logo.ts",
+        "lib/server/storage.ts",
+        "lib/server/file-access.ts"
+      ],
+      "evidence": [
+        {
+          "callee": "requireSession",
+          "line": 9,
+          "arguments": []
+        },
+        {
+          "callee": "withTenant",
+          "line": 10,
+          "arguments": [
+            "s.organizationId",
+            "s.userId",
+            "c=>readReportExport(c,s,id,plan)",
+            "{snapshot:true}"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "app/api/reports/exports/route.ts",
+      "path": "/api/reports/exports",
+      "methods": [
+        "POST"
+      ],
+      "dependencies": [
+        "lib/server/session.ts",
+        "lib/server/maintenance.ts",
+        "lib/server/env.ts",
+        "lib/server/db.ts",
+        "lib/server/http.ts",
+        "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
+        "lib/server/rbac.ts",
+        "lib/permissions.ts",
+        "lib/server/rate-limit.ts",
+        "lib/server/report-exports.ts",
+        "lib/server/audit.ts",
+        "lib/server/business-idempotency.ts",
+        "lib/server/plan-access.ts",
+        "lib/locales/index.ts",
+        "lib/locales/config.ts",
+        "lib/server/report-document.ts",
+        "lib/financial-status.ts",
+        "lib/money.ts",
+        "lib/statistics-period.ts",
+        "lib/server/repositories/reports.ts",
+        "lib/report-export.ts",
+        "lib/projects.ts",
+        "lib/server/repositories/time-workspace.ts",
+        "lib/server/repositories/finance.ts",
+        "lib/server/document-pdf.ts",
+        "lib/qr-bill.ts",
+        "lib/server/document-logo.ts",
+        "lib/server/storage.ts",
+        "lib/server/file-access.ts"
+      ],
+      "evidence": [
+        {
+          "callee": "requireSession",
+          "line": 10,
+          "arguments": []
+        },
+        {
+          "callee": "authorize",
+          "line": 10,
+          "arguments": [
+            "s",
+            "'reports:read'"
+          ]
+        },
+        {
+          "callee": "['query','locale'].includes",
+          "line": 13,
+          "arguments": [
+            "key"
+          ]
+        }
+      ]
+    },
+    {
       "file": "app/api/reports/route.ts",
       "path": "/api/reports",
       "methods": [
@@ -5128,18 +5244,19 @@
         "lib/server/fresh-authentication.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts",
+        "lib/server/plan-access.ts",
+        "lib/server/report-document.ts",
         "lib/financial-status.ts",
         "lib/money.ts",
         "lib/statistics-period.ts",
-        "lib/server/plan-access.ts",
         "lib/server/repositories/reports.ts",
         "lib/report-export.ts",
         "lib/projects.ts",
         "lib/server/repositories/time-workspace.ts",
         "lib/server/repositories/finance.ts",
-        "lib/server/document-pdf.ts",
         "lib/locales/index.ts",
         "lib/locales/config.ts",
+        "lib/server/document-pdf.ts",
         "lib/qr-bill.ts",
         "lib/server/document-logo.ts",
         "lib/server/storage.ts",
@@ -5149,86 +5266,51 @@
       "evidence": [
         {
           "callee": "requireSession",
-          "line": 17,
+          "line": 15,
           "arguments": []
         },
         {
           "callee": "authorize",
-          "line": 17,
+          "line": 15,
           "arguments": [
             "s",
             "'reports:read'"
           ]
         },
         {
-          "callee": "query.get",
+          "callee": "withTenant",
           "line": 18,
           "arguments": [
-            "'months'"
+            "s.organizationId",
+            "s.userId",
+            "c=>readReport(c,s,input,plan)",
+            "{snapshot:true}"
           ]
         },
         {
           "callee": "query.get",
           "line": 19,
           "arguments": [
-            "'kind'"
-          ]
-        },
-        {
-          "callee": "query.get",
-          "line": 20,
-          "arguments": [
-            "'from'"
-          ]
-        },
-        {
-          "callee": "query.get",
-          "line": 20,
-          "arguments": [
-            "'to'"
-          ]
-        },
-        {
-          "callee": "withTenant",
-          "line": 23,
-          "arguments": [
-            "s.organizationId",
-            "s.userId",
-            "c=>kind==='time'?timeReport(c,s,period,plan,query):reportSummary(c,s,period,plan)",
-            "{snapshot:true}"
-          ]
-        },
-        {
-          "callee": "query.get",
-          "line": 24,
-          "arguments": [
             "'format'"
           ]
         },
         {
           "callee": "query.get",
-          "line": 25,
+          "line": 20,
           "arguments": [
             "'lang'"
           ]
         },
         {
           "callee": "query.get",
-          "line": 26,
-          "arguments": [
-            "'format'"
-          ]
-        },
-        {
-          "callee": "query.get",
-          "line": 27,
+          "line": 21,
           "arguments": [
             "'format'"
           ]
         },
         {
           "callee": "withTenant",
-          "line": 28,
+          "line": 22,
           "arguments": [
             "s.organizationId",
             "s.userId",
@@ -5237,7 +5319,7 @@
         },
         {
           "callee": "c.query",
-          "line": 28,
+          "line": 22,
           "arguments": [
             "'select name,legal_name,logo_url from organizations where id=$1'",
             "[s.organizationId]"
@@ -5245,21 +5327,21 @@
         },
         {
           "callee": "query.get",
-          "line": 28,
+          "line": 22,
           "arguments": [
             "'format'"
           ]
         },
         {
           "callee": "query.get",
-          "line": 28,
+          "line": 22,
           "arguments": [
             "'format'"
           ]
         },
         {
           "callee": "query.get",
-          "line": 29,
+          "line": 23,
           "arguments": [
             "'format'"
           ]
@@ -8570,7 +8652,7 @@
       "calls": [
         {
           "callee": "fetch",
-          "line": 113,
+          "line": 115,
           "arguments": [
             "fileUrl??(pdfNumber?\"/api/documents/\"+encodeURIComponent(pdfNumber)+\"/pdf\":\"/api/documents/preview\")",
             "{...(fileUrl||pdfNumber?{}:{method:\"POST\",headers:{\"Content-Type\":\"application/json\"},body:previewJson}),signal:controller.signal,cache:'no-store'}"
@@ -8670,11 +8752,28 @@
       "file": "components/report-actions.tsx",
       "calls": [
         {
-          "callee": "apiGetFile",
-          "line": 15,
+          "callee": "apiPost",
+          "line": 20,
           "arguments": [
-            "'/api/reports?'+query+'&format='+format+'&lang='+locale",
-            "format==='csv'?'text/csv':'application/pdf'"
+            "'/api/reports/exports'",
+            "{query,locale}",
+            "{idempotencyKey:preparation.current.key}"
+          ]
+        },
+        {
+          "callee": "apiGetFile",
+          "line": 22,
+          "arguments": [
+            "'/api/reports/exports/'+response.item.id",
+            "'application/pdf'"
+          ]
+        },
+        {
+          "callee": "apiGetFile",
+          "line": 25,
+          "arguments": [
+            "'/api/reports?'+query+'&format=csv&lang='+locale",
+            "'text/csv'"
           ]
         }
       ],
@@ -10729,6 +10828,28 @@
       "tables": [],
       "relations": [],
       "rls": []
+    },
+    {
+      "file": "database/migrations/0072_report_export_snapshots.sql",
+      "tables": [
+        "report_exports"
+      ],
+      "relations": [
+        {
+          "table": "organizations",
+          "columns": "id"
+        }
+      ],
+      "rls": [
+        {
+          "table": "report_exports",
+          "mode": "enable"
+        },
+        {
+          "table": "report_exports",
+          "mode": "force"
+        }
+      ]
     }
   ],
   "repositories": [

@@ -1,4 +1,5 @@
 import {qaBrowserServer} from './qa-browser-server.mjs';
+import {verifyPdfZoom} from './document-controls-browser.mjs';
 import {createUiAuthFixture} from './ui-auth-fixture.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
@@ -9,14 +10,22 @@ const output=process.env.BINSO_REPORT_OUTPUT;if(!output)throw Error('Explicit is
 const engines=await import(process.env.BINSO_PLAYWRIGHT_MODULE?pathToFileURL(process.env.BINSO_PLAYWRIGHT_MODULE).href:'playwright'),engine=process.env.BINSO_UX_BROWSER??'chromium',port='3288',base='http://127.0.0.1:'+port;
 try{await fetch(base+'/api/health');throw Error('Report browser port occupied')}catch(error){if(error.message==='Report browser port occupied')throw error;}
 const uiAuth=await createUiAuthFixture();
+const {default:PDFDocument}=await import('pdfkit');
+const reportPdf=await new Promise((resolve,reject)=>{const doc=new PDFDocument({size:'A4'}),chunks=[];doc.on('data',chunk=>chunks.push(chunk));doc.on('error',reject);doc.on('end',()=>resolve(Buffer.concat(chunks)));doc.text('Synthetic immutable report. No production data.');doc.end();});
 const launch=qaBrowserServer(port,{...process.env,...uiAuth.env});const server=spawn(process.execPath,launch.args,{stdio:['ignore','pipe','pipe'],env:launch.env});let logs='',browser;server.stdout.on('data',x=>logs+=x);server.stderr.on('data',x=>logs+=x);
 try{
  for(let i=0;;i++){try{if((await fetch(base+'/api/health')).ok)break}catch{}if(i>120||server.exitCode!==null)throw Error(logs);await new Promise(resolve=>setTimeout(resolve,250));}
  browser=await engines[engine].launch({headless:true,...(engine==='chromium'&&process.env.BINSO_CHROMIUM_EXECUTABLE?{executablePath:process.env.BINSO_CHROMIUM_EXECUTABLE}:{})});const results=[];
  for(const theme of ['light','dark'])for(const width of [390,1440]){
   const context=await browser.newContext({serviceWorkers:'block',viewport:{width,height:780}});await context.addCookies(uiAuth.cookies.map(cookie=>({...cookie,url:base})));await context.addInitScript(theme=>{localStorage.setItem('binso.theme.mode',theme);localStorage.setItem('binso.privacy.preferences.v1',JSON.stringify({essential:true,performance:false}));},theme);
-  let exports=0;await context.route('**/api/**',async route=>{
-   const request=route.request(),url=new URL(request.url());assert.equal(request.method(),'GET','This UI proof cannot mutate data');let json={items:[],total:0};
+  let exports=0,prepared=0,pdfReads=0;await context.route('**/api/**',async route=>{
+   const request=route.request(),url=new URL(request.url());let json={items:[],total:0};
+   if(url.pathname==='/api/reports/exports'){
+    assert.equal(request.method(),'POST');assert.match(request.headers()['idempotency-key'],/^[0-9a-f-]{36}$/i);const body=request.postDataJSON();assert.equal(body.locale,'de');assert.equal(typeof body.query,'string');prepared++;
+    return route.fulfill({json:{item:{id:'00000000-0000-4000-8000-000000000072'}}});
+   }
+   assert.equal(request.method(),'GET','Only explicit snapshot preparation may POST in this isolated UI proof');
+   if(url.pathname==='/api/reports/exports/00000000-0000-4000-8000-000000000072'){pdfReads++;return route.fulfill({contentType:'application/pdf',body:reportPdf});}
    if(url.pathname==='/api/auth/session')json={authenticated:true,configured:true,user:{id:'fixture-owner'},tenant:{id:'00000000-0000-4000-8000-000000000001',role:'owner',plan:'pro',moduleProfile:'standard',readOnly:false},security:{mfaEnabled:false,enrollmentRequired:false}};
    if(url.pathname==='/api/settings/profile')json={item:{display_name:'Synthetic Owner',language:'de',theme},email:'fixture@example.invalid'};
    if(url.pathname==='/api/settings/company')json={item:{name:'Synthetic Company'}};
@@ -38,6 +47,11 @@ try{
   await page.screenshot({path:path.join(output,`${theme}-${width}-report.png`),fullPage:true,animations:'disabled'});
   await page.getByRole('button',{name:'Berichtsaktionen',exact:true}).click();assert.equal(await page.getByRole('button',{name:'Per E-Mail senden',exact:true}).count(),0,'Unimplemented direct report mail is never advertised');
   const [download]=await Promise.all([page.waitForEvent('download'),page.getByRole('button',{name:'CSV exportieren',exact:true}).click()]);assert.equal(download.suggestedFilename(),'binso-fixture.csv');assert.equal(exports,1,'One explicit export request');
+  await page.getByRole('button',{name:'Berichtsaktionen',exact:true}).click();await page.getByRole('button',{name:'PDF ansehen',exact:true}).click();
+  const preview=page.getByRole('dialog',{name:'Berichte',exact:true});await preview.locator('canvas[data-rendered-page="1"][data-rendered-zoom="1"]').waitFor();assert.equal(prepared,1);assert.equal(pdfReads,1,'Preview uses the one immutable prepared snapshot');
+  await verifyPdfZoom(page);
+  await page.evaluate(()=>Object.defineProperty(navigator,'canShare',{value:()=>false,configurable:true}));const saved=page.waitForEvent('download');await preview.getByRole('button',{name:'Teilen oder herunterladen',exact:true}).click();const pdfDownload=await saved;
+  assert.deepEqual(await fs.readFile(await pdfDownload.path()),reportPdf,'Preview and downloaded report use byte-identical immutable content');assert.equal(pdfReads,1,'Download never silently regenerates the report');await preview.getByRole('button',{name:'Vorschau schliessen',exact:true}).click();
   results.push({theme,width,status:'passed',scope:'Synthetic aggregate HTTP UI and download proof with real isolated SSR session; database and field-right tests are separate'});await context.close();
  }
  await fs.writeFile(path.join(output,'results.json'),JSON.stringify(results,null,2));console.log('Report UI: distinct period/current/cash/refund meanings, central actions, one export and responsive light/dark geometry passed.');

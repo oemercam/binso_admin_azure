@@ -25,10 +25,12 @@ export async function verifyLanguagePreference(page,{base,locale,text}){
  // actual preference error has cleared in every language, not all live regions.
  for(const language of ['de','fr','it','en'])await page.getByRole('alert').filter({hasText:text('Sprache konnte nicht gespeichert werden.',language)}).waitFor({state:'hidden'});
  await page.reload({waitUntil:'networkidle'});assert.equal(await appControlValue(control),next,'Confirmed server preference survives reload');assert.equal(updates,2,'Reload never repeats the write');
- phase='ready';await page.locator('button.avatar-button:visible').first().click();
+ // A mobile settings detail intentionally has a Back header, not a duplicate
+ // account action. Open the account panel from the actual workspace header.
+ phase='ready';await page.goto(base+'/dashboard?lang='+next,{waitUntil:'networkidle'});await page.locator('button.avatar-button:visible').first().click();
  const account=page.locator('.account-sheet .locale-switcher .app-select-trigger');await selectAppOption(account,locale);
  await page.waitForFunction(locale=>document.documentElement.lang===locale+'-CH',locale);assert.equal(updates,3,'The account menu uses the same persisted preference path');
- await page.keyboard.press('Escape');await page.reload({waitUntil:'networkidle'});assert.equal(await appControlValue(control),locale);assert.equal(updates,3);
+ await page.keyboard.press('Escape');await page.goto(base+'/einstellungen/sprache?lang='+locale,{waitUntil:'networkidle'});assert.equal(await appControlValue(control),locale);assert.equal(updates,3);
  let operatorLocale=null,operatorUpdates=0;
  await page.route('**/api/operator/preferences',route=>{
   if(route.request().method()==='PATCH'){operatorUpdates++;operatorLocale=route.request().postDataJSON().language;}

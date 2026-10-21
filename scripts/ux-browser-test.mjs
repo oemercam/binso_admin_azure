@@ -831,11 +831,11 @@ try{
   assert.equal(await next.isDisabled(),true);
   for(let number=expectedPdfPages-1;number>=1;number--){await previous.click();await rendered(number);}
   await page.getByRole('button',{name:'Vorschau vergrössern',exact:true}).click();
-  await page.locator('.document-page-stage.is-zoomed canvas[data-rendered-page="1"]').waitFor();
+  await page.locator('.document-page-stage.is-zoomed canvas[data-rendered-page="1"][data-rendered-zoom="2.5"]').waitFor();
   const zoom=await page.evaluate(()=>({page:document.documentElement.scrollWidth,viewport:innerWidth,document:document.querySelector('.document-page-stage').scrollWidth}));
   assert.ok(zoom.page<=zoom.viewport+1&&zoom.document>zoom.viewport,'Zoom scrolls only inside the document area');
   await page.getByRole('button',{name:'Auf Bildschirm einpassen',exact:true}).click();
-  await page.locator('.document-page-stage:not(.is-zoomed) canvas[data-rendered-page="1"]').waitFor();
+  await page.locator('.document-page-stage:not(.is-zoomed) canvas[data-rendered-page="1"][data-rendered-zoom="1"]').waitFor();
   await page.setViewportSize({width:430,height:400});await settleLayout(page);
   const nav=await page.locator('.document-page-navigation').boundingBox(),small=await page.locator('.pdf-page canvas').boundingBox();assert.ok(nav.y+nav.height<=401&&small.y+small.height<=nav.y+1,'Full page and navigation remain reachable at short height');await page.setViewportSize({width:430,height:1000});
   // Deliberately exercise the browser-download capability fallback; no native share UI is simulated.

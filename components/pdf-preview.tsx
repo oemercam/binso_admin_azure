@@ -23,6 +23,8 @@ function PdfPage({pdf,pageNumber,zoom}: {pdf:PDFDocumentProxy;pageNumber:number;
       const size=`${width}:${height}`;
       if(width<=0||height<=0||size===lastSize)return;
       lastSize=size;
+      delete element.dataset.renderedPage;
+      delete element.dataset.renderedZoom;
       renderTask?.cancel();
       void pdf.getPage(pageNumber).then(page=>{
         if(!active||size!==lastSize)return;
@@ -35,7 +37,7 @@ function PdfPage({pdf,pageNumber,zoom}: {pdf:PDFDocumentProxy;pageNumber:number;
         element.style.width=`${viewport.width}px`;
         element.style.height=`${viewport.height}px`;
         renderTask=page.render({canvas:element,viewport,transform:ratio===1?undefined:[ratio,0,0,ratio,0,0]});
-        return renderTask.promise.then(()=>{if(active&&size===lastSize)element.dataset.renderedPage=String(pageNumber)});
+        return renderTask.promise.then(()=>{if(active&&size===lastSize){element.dataset.renderedPage=String(pageNumber);element.dataset.renderedZoom=String(zoom);}});
       }).catch(reason=>{if(active&&reason?.name!=="RenderingCancelledException")setError("PDF-Seite konnte nicht angezeigt werden.")});
     };
     const observer=new ResizeObserver(()=>{cancelAnimationFrame(frame);frame=requestAnimationFrame(draw)});

@@ -177,7 +177,7 @@
         },
         {
           "owner": "components/pdf-preview.tsx",
-          "line": 105,
+          "line": 107,
           "apis": [
             "/api/documents/",
             "/api/documents/preview"
@@ -469,7 +469,7 @@
         },
         {
           "owner": "components/pdf-preview.tsx",
-          "line": 105,
+          "line": 107,
           "apis": [
             "/api/documents/",
             "/api/documents/preview"
@@ -1145,7 +1145,7 @@
         },
         {
           "owner": "components/pdf-preview.tsx",
-          "line": 105,
+          "line": 107,
           "apis": [
             "/api/documents/",
             "/api/documents/preview"
@@ -2699,6 +2699,8 @@
           "owner": "components/report-actions.tsx",
           "line": 10,
           "apis": [
+            "/api/reports/exports",
+            "/api/reports/exports/",
             "/api/reports?"
           ],
           "collections": [],
@@ -2706,7 +2708,7 @@
         },
         {
           "owner": "components/pdf-preview.tsx",
-          "line": 105,
+          "line": 107,
           "apis": [
             "/api/documents/",
             "/api/documents/preview"
@@ -9557,7 +9559,7 @@
         },
         {
           "owner": "components/pdf-preview.tsx",
-          "line": 105,
+          "line": 107,
           "apis": [
             "/api/documents/",
             "/api/documents/preview"
@@ -9992,7 +9994,7 @@
         },
         {
           "owner": "components/pdf-preview.tsx",
-          "line": 105,
+          "line": 107,
           "apis": [
             "/api/documents/",
             "/api/documents/preview"
@@ -10531,7 +10533,7 @@
         },
         {
           "owner": "components/pdf-preview.tsx",
-          "line": 105,
+          "line": 107,
           "apis": [
             "/api/documents/",
             "/api/documents/preview"
@@ -15497,7 +15499,7 @@
         },
         {
           "owner": "components/pdf-preview.tsx",
-          "line": 105,
+          "line": 107,
           "apis": [
             "/api/documents/",
             "/api/documents/preview"
@@ -16173,7 +16175,7 @@
         },
         {
           "owner": "components/pdf-preview.tsx",
-          "line": 105,
+          "line": 107,
           "apis": [
             "/api/documents/",
             "/api/documents/preview"
@@ -19405,7 +19407,7 @@
         },
         {
           "owner": "components/pdf-preview.tsx",
-          "line": 105,
+          "line": 107,
           "apis": [
             "/api/documents/",
             "/api/documents/preview"
@@ -20657,6 +20659,8 @@
     "app/api/projects/route.ts",
     "app/api/projects/[id]/route.ts",
     "app/api/public/offer/route.ts",
+    "app/api/reports/exports/route.ts",
+    "app/api/reports/exports/[id]/route.ts",
     "app/api/reports/route.ts",
     "app/api/search/route.ts",
     "app/api/settings/company/route.ts",
@@ -20751,6 +20755,7 @@
     "database/migrations/0068_offer_versions_and_public_responses.sql",
     "database/migrations/0069_attachment_archival.sql",
     "database/migrations/0070_issued_invoice_pdf.sql",
-    "database/migrations/0071_operator_language_preference.sql"
+    "database/migrations/0071_operator_language_preference.sql",
+    "database/migrations/0072_report_export_snapshots.sql"
   ]
 }

@@ -72,6 +72,19 @@ try{
  // Independent expected-role contract: do not derive the expectation from the
  // same tenantCan function being tested by the actual HTTP handlers.
  const reportRoles=["owner","admin","finance","hr","project_manager","manager","reader"];
+ for(const role of roles){
+  const cookie=cookies.get('0:'+role),body={query:'kind=summary&months=1',locale:'de'},key='native-report-'+role;
+  const prepare=()=>fetch(base+'/api/reports/exports',{method:'POST',headers:{cookie,Origin:base,'Content-Type':'application/json','Idempotency-Key':key},body:JSON.stringify(body),signal:AbortSignal.timeout(20000)});
+  const response=await prepare();assert.equal(response.status,reportRoles.includes(role)?200:403,'Report preparation enforces the actual HTTP role: '+role);
+  if(!reportRoles.includes(role))continue;
+  const {item}=await response.json(),own=await get('/api/reports/exports/'+item.id,cookie);assert.equal(own.status,200);assert.equal(Buffer.from(own.data).subarray(0,5).toString(),'%PDF-');
+  assert.equal((await get('/api/reports/exports/'+item.id,cookies.get('1:'+role))).status,404,'Snapshots cannot cross tenants');
+  const otherRole=role==='owner'?'admin':'owner';assert.equal((await get('/api/reports/exports/'+item.id,cookies.get('0:'+otherRole))).status,404,'Own-tenant role permission does not grant another creator’s snapshot');
+  assert.deepEqual((await (await prepare()).json()).item,item,'Native retry keeps immutable identity');
+ }
+ const snapshotCount=Number((await pool.query('select count(*) n from report_exports')).rows[0].n);
+ assert.equal((await fetch(base+'/api/reports/exports',{method:'POST',headers:{cookie:cookies.get('0:owner'),Origin:'https://foreign.invalid','Content-Type':'application/json','Idempotency-Key':'foreign-report-request'},body:JSON.stringify({query:'months=1',locale:'de'})})).status,403);
+ assert.equal(Number((await pool.query('select count(*) n from report_exports')).rows[0].n),snapshotCount,'Foreign-origin rejection has no persistent side effect');
  const readContracts=[
   ["/api/reports",reportRoles],
   ['/api/reports?kind=time',['owner','admin','finance','project_manager','manager']],
