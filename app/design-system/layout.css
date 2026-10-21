@@ -197,9 +197,6 @@
 .workspace-company{display:flex;align-items:center;gap:10px;min-height:44px;padding:10px 8px;margin-bottom:20px;font-size:var(--type-label);line-height:1.4;color:var(--color-fg)}
 .workspace-company>span{min-width:0;overflow-wrap:anywhere}
 .workspace-company small{display:block;color:var(--color-muted);font-size:var(--type-metadata);margin-top:3px}
-.workspace-location{display:flex;gap:18px;align-items:center;font-size:var(--type-label);min-width:0;overflow:hidden}
-.workspace-location>a,.workspace-location>span[aria-hidden]{color:var(--color-muted);flex:none}
-.workspace-location>span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 @media (min-width:761px){
 .page-head-detail{margin-bottom:20px;position:sticky;top:var(--desktop-header-h);z-index:17;background:var(--color-bg)}
 }

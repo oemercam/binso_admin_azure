@@ -455,6 +455,20 @@
       "test": "Echte Vier-Sprachen-Renderer, statische API-/JSX-/Navigationstabellen-Abdeckung, API-Verweigerungen, Benutzertextschutz, zivile und Zeitpunkt-Datumsgrenzen, Typecheck und Lint bestanden. 7bc770a4: Quality, CodeQL und Full Development39691829176 mit beiden funktionalen Browserjobs und allen sechs Responsive-Jobs erfolgreich. Folgekorrekturen und vollständige Label-Sichtbarkeitsassertion benötigen aktuellen Browserlauf.",
       "visualComparison": "Tatsächliche WebKit-Screens EN/Hell/390, FR/Dunkel/390 und IT/Hell/1440 aus7bc770a4 gesichtet. Neue abgeleitete Dialogfälle, keine Originalfreigabe. Sichtbarer fehlender dynamischer Gruppentitel korrigiert; vollständige App-/Rollen-/Sprachabnahme offen.",
       "blocker": "Keine vollständige App-/Rollen-/Sprachabnahme. Dynamische Meldungen, vollständiger Kreuzvergleich und finanzielle/juristische Fach- sowie Geräteabnahme bleiben offen."
+    },
+    "R7-47-003": {
+      "sourceTextSha256": "afe85e1ef9a63d08874ae9b91213ef3dcd6725e9fe24aed3798bb836f8d0ed4f",
+      "status": "teilweise_implementiert",
+      "implementation": "Zentrale redundante Desktop-Arbeitsbereich/Breadcrumb-Zeile samt ausschliesslich zugehörigen CSS-Regeln entfernt. Seitentitel bleibt im Inhalt; gemeinsame Suche, Benachrichtigungen, Avatar und Sidebar-Toggle bleiben erhalten. Keine Mobile-/FAB-Änderung.",
+      "sourceReferences": [
+        "components/app-shell.tsx",
+        "app/design-system/layout.css",
+        "scripts/compliance/measure.mjs",
+        "scripts/compliance/measure-browser-test.mjs"
+      ],
+      "test": "Echte lokale Edge/Chromium-Messung: normaler Header besteht; Breadcrumb mit Link, ohne Link und unzulässige Aktionen scheitern. Unveränderter Navigations-/Rechte-/Icon-/Geometrievertrag besteht. Aktuelle tatsächliche App-Browserfälle und vollständige Breiten-/Geräteabnahme offen.",
+      "visualComparison": "Auslöser: tatsächlicher italienischer WebKit-Desktop-Screen7bc770a4 widerspricht Kapitel47. Aktuelle Nachher-Browseraufnahme steht aus.",
+      "blocker": "Vollständige aktuelle Header-/Popover-/Zoom-/Geräteabnahme und übrige Klauselbedingungen nicht aus dieser gezielten Korrektur ableiten."
     }
   },
   "tests": {

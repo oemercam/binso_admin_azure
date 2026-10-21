@@ -14923,5 +14923,15 @@
     "Access & roles",
     "Accès et rôles",
     "Accesso e ruoli"
+  ],
+  "h/Woche": [
+    "h/week",
+    "h/semaine",
+    "h/settimana"
+  ],
+  "Tage/Jahr": [
+    "days/year",
+    "jours/an",
+    "giorni/anno"
   ]
 }

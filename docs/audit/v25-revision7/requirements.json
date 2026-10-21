@@ -8305,12 +8305,17 @@
       "requirement": "Header ca. 64px mit sinnvoller globaler Suche, Benachrichtigungen und Avatar-Menü; KEINE unnötige Zeile «Arbeitsbereich», doppelte Breadcrumbs oder redundante Seitentitel.",
       "sourceTextSha256": "afe85e1ef9a63d08874ae9b91213ef3dcd6725e9fe24aed3798bb836f8d0ed4f",
       "sourceParagraph": "Desktop ist keine vergrösserte Mobile-App. Gemeinsame Design-Tokens und Business-Services, aber eigenständige Desktop-Informationsarchitektur: einklappbare Sidebar (voll: Icon + Label; kompakt: Icon + Tooltip), persistierter Zustand, Tastatur- und Screenreaderbedienung. Header ca. 64px mit sinnvoller globaler Suche, Benachrichtigungen und Avatar-Menü; KEINE unnötige Zeile «Arbeitsbereich», doppelte Breadcrumbs oder redundante Seitentitel. Avatar-Menü: Profil, Einstellungen, Sprache, Abmelden. Suche auf breiten Bildschirmen als Eingabe, auf schmalen als Suchsymbol. Verankerte Popover für Drei-Punkte-Aktionen, Benachrichtigungen und Profil; kurze Bestätigungen als kompakte Dialoge, Bearbeitung als passende Dialoge/Sidepanels, komplexe Angebote/Rechnungen als eigenständiger Editor mit Vorschau. Einstellungen: linke Kategorienavigation und begrenzter, gut lesbarer Formularbereich rechts.\nRaster: alle Seitentitel, Filter, Tabellen, Cards, Diagramme beginnen auf identischen linken Linien; gleich hohe Cards je Reihe, konsistente Oberkanten und Abstände (8/16/24/32px). Keine willkürlichen Kartenverschachtelungen, Tabs nur bei echtem Nutzen. Breite Tabellen dürfen Raum nutzen; Text/Formulare mit Maximalbreite. Bei 768, 1024, 1440, 1920, 2560+ px, Browserzoom 125/150/200 %, kleinen Fenstern und 4K prüfen; Inhalts-Breakpoints statt nur Gerätetyp. Light/Dark fachgerecht gestalten. Kein grosser Logo-Splash/zentrierter Spinner bei normaler Navigation; Shell sofort sichtbar, nur relevante Inhalte dezent als Skeleton. Mobile Bottom-Navigation und bestehender blauer FAB bleiben unverändert; nur doppelte Safe-Area-Abstände nach Messung korrigieren.",
-      "status": "nicht_abgenommen",
-      "sourceReferences": [],
-      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "status": "teilweise_implementiert",
+      "sourceReferences": [
+        "components/app-shell.tsx",
+        "app/design-system/layout.css",
+        "scripts/compliance/measure.mjs",
+        "scripts/compliance/measure-browser-test.mjs"
+      ],
+      "implementation": "Zentrale redundante Desktop-Arbeitsbereich/Breadcrumb-Zeile samt ausschliesslich zugehörigen CSS-Regeln entfernt. Seitentitel bleibt im Inhalt; gemeinsame Suche, Benachrichtigungen, Avatar und Sidebar-Toggle bleiben erhalten. Keine Mobile-/FAB-Änderung.",
+      "test": "Echte lokale Edge/Chromium-Messung: normaler Header besteht; Breadcrumb mit Link, ohne Link und unzulässige Aktionen scheitern. Unveränderter Navigations-/Rechte-/Icon-/Geometrievertrag besteht. Aktuelle tatsächliche App-Browserfälle und vollständige Breiten-/Geräteabnahme offen.",
+      "visualComparison": "Auslöser: tatsächlicher italienischer WebKit-Desktop-Screen7bc770a4 widerspricht Kapitel47. Aktuelle Nachher-Browseraufnahme steht aus.",
+      "blocker": "Vollständige aktuelle Header-/Popover-/Zoom-/Geräteabnahme und übrige Klauselbedingungen nicht aus dieser gezielten Korrektur ableiten."
     },
     {
       "id": "R7-47-004",

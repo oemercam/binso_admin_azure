@@ -10182,7 +10182,7 @@
       "apiSources": [
         {
           "owner": "components/pages/employees.tsx",
-          "line": 39,
+          "line": 40,
           "apis": [
             "/api/employees/",
             "/api/auth/session",
@@ -10723,7 +10723,7 @@
       "apiSources": [
         {
           "owner": "components/pages/employees.tsx",
-          "line": 39,
+          "line": 40,
           "apis": [
             "/api/employees/",
             "/api/auth/session",
@@ -14024,7 +14024,7 @@
       "apiSources": [
         {
           "owner": "components/pages/products.tsx",
-          "line": 31,
+          "line": 32,
           "apis": [
             "/api/products/",
             "/api/settings/company",
@@ -14541,7 +14541,7 @@
       "apiSources": [
         {
           "owner": "components/pages/products.tsx",
-          "line": 31,
+          "line": 32,
           "apis": [
             "/api/products/",
             "/api/settings/company",

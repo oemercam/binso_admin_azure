@@ -1,0 +1,2228 @@
+{
+  "commit": "7bc770a43bc3215ae5dba956dbb617c56d391c5c",
+  "sourceDigest": "531208287c85b06261cd261cd3a2c8d004e188e0e687fce43e4ea4ef34e54856",
+  "run": 39691829176,
+  "artifact": 12388958731,
+  "reportSha256": "092c25de95f865b7e461b5ab2d8a0a9edb5e14421fb035cd26a08e0a25e2e33e",
+  "currentClauses": 573,
+  "activeCoverage": 613,
+  "historicalRecords": 392,
+  "statuses": {
+    "passed": 8,
+    "partial": 21,
+    "review-required": 580,
+    "not-tested": 3,
+    "manual-required": 1
+  },
+  "failedChecks": 0,
+  "compliant": false,
+  "developmentRelease": {
+    "profile": "development-20261012",
+    "ready": true,
+    "productionAcceptance": false,
+    "blockers": [],
+    "deferredProductionEvidence": [
+      "trusted-live-scanner-and-existing-file-rescan",
+      "complete-432-requirement-approval",
+      "named-pixel-and-physical-pwa-approval",
+      "full-ingress-spoof-proof",
+      "runtime-performance-and-historical-domain-review",
+      "alarm-delivery-proof"
+    ]
+  },
+  "limitations": [
+    "Revision7 clause-level review and complete current route/role/state acceptance remain open; historical V22 records are traceability only",
+    "Physical installed iOS/Android PWA and OS keyboard unavailable",
+    "All route/state/role combinations have not yet been individually instrumented",
+    "Visual baseline requires reviewed same-commit capture; no auto-update",
+    "React component attribution is static reachability + selector mount; no React fiber identity claim"
+  ],
+  "routes": [
+    {
+      "route": "/agb",
+      "recordedRuntimeCases": 48,
+      "engines": [
+        "chromium"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/angebot",
+      "recordedRuntimeCases": 104,
+      "engines": [
+        "chromium",
+        "webkit"
+      ],
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/angebote/[id]",
+      "recordedRuntimeCases": 156,
+      "engines": [
+        "chromium",
+        "webkit"
+      ],
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/angebote/neu",
+      "recordedRuntimeCases": 96,
+      "engines": [
+        "chromium",
+        "webkit"
+      ],
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/angebote",
+      "recordedRuntimeCases": 60,
+      "engines": [
+        "chromium"
+      ],
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/auftragsbearbeitung",
+      "recordedRuntimeCases": 48,
+      "engines": [
+        "chromium"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/belege",
+      "recordedRuntimeCases": 60,
+      "engines": [
+        "chromium"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/benachrichtigungen",
+      "recordedRuntimeCases": 60,
+      "engines": [
+        "chromium"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/bericht",
+      "recordedRuntimeCases": 96,
+      "engines": [
+        "chromium",
+        "webkit"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/berichte",
+      "recordedRuntimeCases": 120,
+      "engines": [
+        "chromium",
+        "webkit"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/dashboard",
+      "recordedRuntimeCases": 208,
+      "engines": [
+        "chromium",
+        "webkit"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/datenschutz",
+      "recordedRuntimeCases": 48,
+      "engines": [
+        "chromium"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/demo",
+      "recordedRuntimeCases": 24,
+      "engines": [
+        "chromium"
+      ],
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/dev/ux-lab",
+      "recordedRuntimeCases": 0,
+      "engines": [],
+      "themes": [],
+      "widths": [],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/einladung",
+      "recordedRuntimeCases": 48,
+      "engines": [
+        "chromium"
+      ],
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/einstellungen/abonnement",
+      "recordedRuntimeCases": 68,
+      "engines": [
+        "chromium",
+        "webkit"
+      ],
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/einstellungen/benachrichtigungen",
+      "recordedRuntimeCases": 68,
+      "engines": [
+        "chromium",
+        "webkit"
+      ],
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/einstellungen/darstellung",
+      "recordedRuntimeCases": 88,
+      "engines": [
+        "chromium",
+        "webkit"
+      ],
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/einstellungen/datenschutz",
+      "recordedRuntimeCases": 60,
+      "engines": [
+        "chromium"
+      ],
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/einstellungen/dokumente",
+      "recordedRuntimeCases": 64,
+      "engines": [
+        "chromium",
+        "webkit"
+      ],
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/einstellungen/firma",
+      "recordedRuntimeCases": 60,
+      "engines": [
+        "chromium"
+      ],
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/einstellungen/konto",
+      "recordedRuntimeCases": 76,
+      "engines": [
+        "chromium",
+        "webkit"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/einstellungen",
+      "recordedRuntimeCases": 64,
+      "engines": [
+        "chromium",
+        "webkit"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/einstellungen/sicherheit",
+      "recordedRuntimeCases": 68,
+      "engines": [
+        "chromium",
+        "webkit"
+      ],
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/einstellungen/sprache",
+      "recordedRuntimeCases": 60,
+      "engines": [
+        "chromium"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/einstellungen/team",
+      "recordedRuntimeCases": 60,
+      "engines": [
+        "chromium"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/einstellungen/zeiterfassung",
+      "recordedRuntimeCases": 64,
+      "engines": [
+        "chromium",
+        "webkit"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/email-bestaetigen",
+      "recordedRuntimeCases": 48,
+      "engines": [
+        "chromium"
+      ],
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/finanzen/analyse",
+      "recordedRuntimeCases": 68,
+      "engines": [
+        "chromium",
+        "webkit"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/finanzen",
+      "recordedRuntimeCases": 124,
+      "engines": [
+        "chromium",
+        "webkit"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/impressum",
+      "recordedRuntimeCases": 48,
+      "engines": [
+        "chromium"
+      ],
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/kunden/[id]/bearbeiten",
+      "recordedRuntimeCases": 48,
+      "engines": [
+        "chromium"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/kunden/[id]",
+      "recordedRuntimeCases": 220,
+      "engines": [
+        "chromium",
+        "webkit"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/kunden/neu",
+      "recordedRuntimeCases": 100,
+      "engines": [
+        "chromium",
+        "webkit"
+      ],
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/kunden",
+      "recordedRuntimeCases": 71,
+      "engines": [
+        "chromium",
+        "webkit"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/login",
+      "recordedRuntimeCases": 108,
+      "engines": [
+        "chromium"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/mitarbeiter/[id]",
+      "recordedRuntimeCases": 236,
+      "engines": [
+        "chromium",
+        "webkit"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/mitarbeiter/neu",
+      "recordedRuntimeCases": 100,
+      "engines": [
+        "chromium",
+        "webkit"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/mitarbeiter",
+      "recordedRuntimeCases": 60,
+      "engines": [
+        "chromium"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/offline",
+      "recordedRuntimeCases": 48,
+      "engines": [
+        "chromium"
+      ],
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/operator/[...section]",
+      "recordedRuntimeCases": 604,
+      "engines": [
+        "chromium",
+        "webkit"
+      ],
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/operator/login",
+      "recordedRuntimeCases": 48,
+      "engines": [
+        "chromium"
+      ],
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/operator",
+      "recordedRuntimeCases": 64,
+      "engines": [
+        "chromium",
+        "webkit"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/operator/wallboard",
+      "recordedRuntimeCases": 0,
+      "engines": [],
+      "themes": [],
+      "widths": [],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/",
+      "recordedRuntimeCases": 48,
+      "engines": [
+        "chromium"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/passwort-vergessen",
+      "recordedRuntimeCases": 48,
+      "engines": [
+        "chromium"
+      ],
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/passwort-zuruecksetzen",
+      "recordedRuntimeCases": 48,
+      "engines": [
+        "chromium"
+      ],
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/portal/login",
+      "recordedRuntimeCases": 24,
+      "engines": [
+        "chromium"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/portal",
+      "recordedRuntimeCases": 24,
+      "engines": [
+        "chromium"
+      ],
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/portal/registrieren",
+      "recordedRuntimeCases": 24,
+      "engines": [
+        "chromium"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/preise",
+      "recordedRuntimeCases": 48,
+      "engines": [
+        "chromium"
+      ],
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/preview/dashboard",
+      "recordedRuntimeCases": 24,
+      "engines": [
+        "chromium"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/preview/rechnungen",
+      "recordedRuntimeCases": 24,
+      "engines": [
+        "chromium"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/preview/zeit",
+      "recordedRuntimeCases": 24,
+      "engines": [
+        "chromium"
+      ],
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/produkt",
+      "recordedRuntimeCases": 120,
+      "engines": [
+        "chromium"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/produkte/[id]",
+      "recordedRuntimeCases": 164,
+      "engines": [
+        "chromium",
+        "webkit"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/produkte/neu",
+      "recordedRuntimeCases": 96,
+      "engines": [
+        "chromium",
+        "webkit"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/produkte",
+      "recordedRuntimeCases": 60,
+      "engines": [
+        "chromium"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/projekte/[id]",
+      "recordedRuntimeCases": 220,
+      "engines": [
+        "chromium",
+        "webkit"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/projekte/neu",
+      "recordedRuntimeCases": 96,
+      "engines": [
+        "chromium",
+        "webkit"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/projekte",
+      "recordedRuntimeCases": 120,
+      "engines": [
+        "chromium",
+        "webkit"
+      ],
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/rechnungen/[id]",
+      "recordedRuntimeCases": 212,
+      "engines": [
+        "chromium",
+        "webkit"
+      ],
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/rechnungen/neu",
+      "recordedRuntimeCases": 56,
+      "engines": [
+        "chromium",
+        "webkit"
+      ],
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/rechnungen",
+      "recordedRuntimeCases": 121,
+      "engines": [
+        "chromium",
+        "webkit"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/registrieren",
+      "recordedRuntimeCases": 96,
+      "engines": [
+        "chromium"
+      ],
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/spesen/[id]",
+      "recordedRuntimeCases": 156,
+      "engines": [
+        "chromium",
+        "webkit"
+      ],
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/spesen/neu",
+      "recordedRuntimeCases": 96,
+      "engines": [
+        "chromium",
+        "webkit"
+      ],
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/spesen",
+      "recordedRuntimeCases": 60,
+      "engines": [
+        "chromium"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/support/[id]",
+      "recordedRuntimeCases": 148,
+      "engines": [
+        "chromium",
+        "webkit"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/support/neu",
+      "recordedRuntimeCases": 48,
+      "engines": [
+        "chromium"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/support",
+      "recordedRuntimeCases": 64,
+      "engines": [
+        "chromium",
+        "webkit"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/unterauftragsbearbeiter",
+      "recordedRuntimeCases": 48,
+      "engines": [
+        "chromium"
+      ],
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/wartung",
+      "recordedRuntimeCases": 48,
+      "engines": [
+        "chromium"
+      ],
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/willkommen",
+      "recordedRuntimeCases": 24,
+      "engines": [
+        "chromium"
+      ],
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/zahlungen/[id]",
+      "recordedRuntimeCases": 156,
+      "engines": [
+        "chromium",
+        "webkit"
+      ],
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/zahlungen/neu",
+      "recordedRuntimeCases": 96,
+      "engines": [
+        "chromium",
+        "webkit"
+      ],
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/zahlungen",
+      "recordedRuntimeCases": 60,
+      "engines": [
+        "chromium"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    },
+    {
+      "route": "/zeit",
+      "recordedRuntimeCases": 153,
+      "engines": [
+        "chromium",
+        "webkit"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        320,
+        375,
+        390,
+        430,
+        600,
+        760,
+        761,
+        768,
+        820,
+        1024,
+        1440,
+        1920
+      ],
+      "roles": "not recorded by these measurements; do not infer exhaustive role coverage",
+      "locales": "not recorded by these measurements; separate functional cases are not the full cross-product",
+      "acceptance": "not accepted; current reviewed reference comparison and full state/role evidence required"
+    }
+  ]
+}

@@ -100,3 +100,23 @@ Tenant-/Operator-Navigationstabellen fand ausserdem «Zugriff & Rollen». Beide 
 wurden übersetzt. Die Prüfung wurde zuerst mit dem echten fehlenden zweiten Label
 rot und besteht nach der Korrektur. Summe:104 neue Katalogeinträge, zwei entfernte
 unbenutzte Zählertexte und keine überschriebenen bestehenden Übersetzungen.
+
+## Zentrale Preis-, Mengen- und Personalzusätze
+
+Die gemeinsame Zeilenprojektion formatierte Produkte, Mitarbeiter, Spesen,
+Zahlungen und Kundenkennzahlen unabhängig von der aktiven Sprache mit de-CH.
+Die vorhandenen Formatter erhalten jetzt die aktive Locale. Standard-Preiseinheiten
+werden vor dem Zusammensetzen durch denselben bestehenden Sprachkatalog übersetzt;
+eigene Einheiten und Datensatznamen bleiben unverändert, auch bei Kollision mit
+einem Katalogwort. Geerbte Objektschlüssel sind keine Standard-Preiseinheiten.
+Produktdetails und Mitarbeiterdetails verwenden denselben Weg. Die beiden
+Personalzusätze h/Woche und Tage/Jahr besitzen eigene Katalogeinträge.
+
+Tests führen die echte gemeinsame Zeilenprojektion in vier Sprachen aus: vorhandene
+Standard-Einheiten, Dezimalwerte, unveränderte Produktnamen/Originalpreise,
+benutzerdefinierte Einheiten und Prototype-Schlüssel sowie fehlende finanzielle
+Daten als Gedankenstrich. Die früheren deutschen Standardausgaben bleiben mit
+Defaultargument kompatibel. Echte Formularhandler-Regressionen, Mengen-/Preis-
+Regressionssuite, Typecheck und betroffener Lint bestehen. Der Formular-Testadapter
+stellt die nun verwendeten Locale-Kontexte bereit; seine Sperr-, Wiederholungs-,
+Navigations- und Fehlerassertionen bleiben vollständig erhalten.

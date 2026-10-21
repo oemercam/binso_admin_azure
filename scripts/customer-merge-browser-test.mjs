@@ -42,7 +42,9 @@ try{
    }
    await route.fulfill({json});
   });
-  await page.goto(base+'/kunden?lang='+locale);await page.getByRole('button',{name:text('Kundenaktionen'),exact:true}).click();directoryPhase='fail';await page.getByRole('button',{name:text('Dubletten zusammenführen'),exact:true}).click();const dialog=page.getByRole('dialog',{name:text('Kundendubletten zusammenführen'),exact:true});await dialog.waitFor();
+  await page.goto(base+'/kunden?lang='+locale);
+  if(width>=1024){await page.getByRole('heading',{name:text('Kunden'),exact:true}).waitFor();assert.equal(await page.locator('.desktop-appbar .workspace-location').count(),0,'Revision7 keeps the title in the content instead of repeating workspace breadcrumbs');assert.equal(await page.locator('.desktop-appbar .desktop-navigation-toggle').isVisible(),true,'Desktop navigation remains available');}
+  await page.getByRole('button',{name:text('Kundenaktionen'),exact:true}).click();directoryPhase='fail';await page.getByRole('button',{name:text('Dubletten zusammenführen'),exact:true}).click();const dialog=page.getByRole('dialog',{name:text('Kundendubletten zusammenführen'),exact:true});await dialog.waitFor();
   await dialog.getByRole('combobox',{name:text('Dublette'),exact:true}).click();
   const popup=page.locator('.app-select-popup');await popup.getByText(text('Die Anfrage konnte nicht verarbeitet werden.'),{exact:true}).waitFor();
   directoryPhase='hold';await popup.getByRole('button',{name:text('Erneut versuchen'),exact:true}).click();await directoryReceived;

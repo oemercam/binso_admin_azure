@@ -32,6 +32,21 @@ for(const [language,expected] of Object.entries({de:'02.01.2026',fr:'02.01.2026'
 assert.equal(financialDates.formatDate('2026-01-02','en-US'),'01/02/2026','Explicit locale is honored rather than ignored');
 assert.equal(financialDates.formatDate('2026-01-02'),'02.01.2026','Existing default Swiss date presentation remains compatible');
 const timestampDates=compile('lib/display-format.ts',{'./financial-status':financialDates});
+const sharedRows=compile('components/pages/shared.tsx',{'@/lib/financial-status':financialDates,'@/lib/display-format':timestampDates,'@/lib/client/use-api-query':{},'@/lib/client/locale':{},'@/lib/locales/config':config,'@/lib/client/backend':{},'../records':{}});
+const productFixture={id:'fixture-product',name:'Stück',kind:'product',unit:'hour',unit_price:'1234.50',status:'active'},productBefore=structuredClone(productFixture);
+for(const [language,unit] of [['de','Std.'],['en','hr'],['fr','h'],['it','ore']]){
+ const tag=config.localeTags[language],translate=value=>locale.translateMessage(value,language),options={locale:tag,translateUnit:translate};
+ const row=sharedRows.mapRemoteRows('products',[productFixture],options)[0];
+ assert.equal(row[0],'Stück','Actual product names remain verbatim even when matching a catalogue key');
+ assert.equal(row[2],'CHF '+Number(productFixture.unit_price).toLocaleString(tag,{minimumFractionDigits:2,maximumFractionDigits:2})+' / '+unit,'Actual remote rows use locale numbers and translated standard units');
+ assert.equal(sharedRows.mapRemoteRows('employees',[{id:'fixture-employee',first_name:'Tag',last_name:'Jahr',workload_percent:'83.75'}],options)[0][2],Number('83.75').toLocaleString(tag)+' %');
+ assert.equal(timestampDates.withPriceUnit('CHF 10','Stück',translate),'CHF 10 / Stück','Custom units remain user content even when they collide with a translated label');
+ assert.equal(timestampDates.withPriceUnit('CHF 10','constructor',translate),'CHF 10 / constructor','Prototype property names cannot resolve to unit labels');
+ const financials=sharedRows.mapRemoteRows('customers',[{id:'fixture-customer',name:'Kunde',financials:[]}],options)[0];assert.equal(financials[0],'Kunde');assert.equal(financials[6],'—','Missing financial permission/data cannot become a synthetic zero');
+ assert.deepEqual([translate('h/Woche'),translate('Tage/Jahr')],{de:['h/Woche','Tage/Jahr'],en:['h/week','days/year'],fr:['h/semaine','jours/an'],it:['h/settimana','giorni/anno']}[language],'Employment unit labels are translated separately from numeric/user content');
+}
+assert.deepEqual(productFixture,productBefore,'Localized presentation never rewrites source prices, units or names');
+assert.equal(timestampDates.formatQuantity('1234.5','%','en-US'),'1,234.5 %','Explicit numeric locale is honored');
 assert.equal(timestampDates.formatTimestampDate('2026-10-25T23:30:00Z'),'26.10.2026','Reimbursement instants use the actual Swiss business day, including DST boundaries');
 assert.equal(financialDates.formatDate('2026-10-25'),'25.10.2026','Civil invoice/expense dates are not shifted as timestamps');
 assert.equal(timestampDates.formatTimestampDate('invalid'),'','Invalid timestamps cannot crash a localized detail page');

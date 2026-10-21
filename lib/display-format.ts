@@ -1,14 +1,15 @@
 import {formatCurrency} from "./financial-status";
 /** Display-only helpers: never normalize persisted numeric values. */
-export function formatQuantity(value:unknown,unit:string){
+export function formatQuantity(value:unknown,unit:string,locale='de-CH'){
  const number=Number(value);
- return `${Number.isFinite(number)?number.toLocaleString("de-CH",{maximumFractionDigits:6}):String(value??"—")} ${unit}`;
+ return `${Number.isFinite(number)?number.toLocaleString(locale,{maximumFractionDigits:6}):String(value??"—")} ${unit}`;
 }
+const priceUnits:Record<string,string>={hour:"Std.",piece:"Stück",flat:"Pauschal",day:"Tag",month:"Monat",year:"Jahr",kg:"kg",m:"m",m2:"m²"};
 export function priceUnit(unit:unknown){
  const raw=String(unit??"");
- return ({hour:"Std.",piece:"Stück",flat:"Pauschal",day:"Tag",month:"Monat",year:"Jahr",kg:"kg",m:"m",m2:"m²"} as Record<string,string>)[raw]??raw;
+ return Object.hasOwn(priceUnits,raw)?priceUnits[raw]:raw;
 }
-export function withPriceUnit(price:string,unit:unknown){const label=priceUnit(unit);return label?`${price} / ${label}`:price}
+export function withPriceUnit(price:string,unit:unknown,translate:(label:string)=>string=label=>label){const label=priceUnit(unit);return label?`${price} / ${Object.hasOwn(priceUnits,String(unit??""))?translate(label):label}`:price}
 export function timeMetadata(description:unknown,project:unknown,person:unknown,date:string){
  return [...new Set([project,person,date].map(v=>String(v??"").trim()).filter(v=>v&&v!==String(description??"").trim()))].join(" · ");
 }

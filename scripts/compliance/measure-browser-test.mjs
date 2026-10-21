@@ -45,7 +45,8 @@ try{
   const evidence=await measureCompliance(page,{output,route:'/dashboard',theme:'light',width:page.viewportSize().width,state,engine});
   return evidence.checks.filter(c=>c.id==='UX-LAY-003');
  };
- assert.equal((await checkHeader(normalActions,'header-breadcrumb','<div class="workspace-location"><a href="/dashboard">Workspace</a><span>/ Customers</span></div>'))[0].status,'passed','The ZIP workspace breadcrumb is navigation, not a business action');
+ assert.equal((await checkHeader(normalActions,'header-breadcrumb','<div class="workspace-location"><a href="/dashboard">Workspace</a><span>/ Customers</span></div>'))[0].status,'failed','Revision7 chapter47 prohibits redundant workspace breadcrumbs beside the existing page title');
+ assert.equal((await checkHeader(normalActions,'header-text-breadcrumb','<div class="workspace-location"><span>Workspace / Customers</span></div>'))[0].status,'failed','Removing only the breadcrumb link cannot hide a redundant title');
  assert.equal((await checkHeader(normalActions,'header-fake-breadcrumb','<div class="workspace-location"><a href="/zahlungen">Pay</a></div>'))[0].status,'failed','The breadcrumb owner cannot authorize arbitrary business destinations');
  const normal=await checkHeader(normalActions,'header-normal');
  assert.equal(normal.length,1,'The actual desktop action owner must produce evidence');

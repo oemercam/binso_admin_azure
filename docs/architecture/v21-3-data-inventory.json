@@ -8128,35 +8128,35 @@
       "calls": [
         {
           "callee": "useApiQuery",
-          "line": 57,
+          "line": 59,
           "arguments": [
             "existing&&employeeId?(\"/api/employees/\"+encodeURIComponent(employeeId)):null"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 66,
+          "line": 68,
           "arguments": [
             "'/api/auth/session'"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 70,
+          "line": 72,
           "arguments": [
             "existing&&employeeId&&activeEmployeeTab==='time'&&mayReadTime?'/api/time-entries?limit=50&employeeId='+encodeURIComponent(employeeId):null"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 71,
+          "line": 73,
           "arguments": [
             "existing&&employeeId&&activeEmployeeTab==='expenses'&&mayReadExpenses?'/api/expenses?limit=50&employeeId='+encodeURIComponent(employeeId):null"
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 111,
+          "line": 113,
           "arguments": [
             "\"/api/employees/\"+encodeURIComponent(employeeId)",
             "payload"
@@ -8164,7 +8164,7 @@
         },
         {
           "callee": "apiPost",
-          "line": 114,
+          "line": 116,
           "arguments": [
             "\"/api/employees\"",
             "payload",
@@ -8399,21 +8399,21 @@
       "calls": [
         {
           "callee": "useApiQuery",
-          "line": 44,
+          "line": 46,
           "arguments": [
             "existing&&productId?(\"/api/products/\"+encodeURIComponent(productId)):null"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 50,
+          "line": 52,
           "arguments": [
             "!existing?\"/api/settings/company\":null"
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 87,
+          "line": 89,
           "arguments": [
             "\"/api/products/\"+encodeURIComponent(productId)",
             "payload"
@@ -8421,7 +8421,7 @@
         },
         {
           "callee": "apiPost",
-          "line": 90,
+          "line": 92,
           "arguments": [
             "\"/api/products\"",
             "payload",
@@ -8641,14 +8641,14 @@
       "calls": [
         {
           "callee": "useApiQuery",
-          "line": 62,
+          "line": 65,
           "arguments": [
             "path"
           ]
         },
         {
           "callee": "useRemoteRows",
-          "line": 77,
+          "line": 80,
           "arguments": [
             "collection",
             "filters.toString()"

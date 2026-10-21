@@ -322,7 +322,6 @@ function AppShellFrame({
     <div className="app-main">
       <div className="desktop-appbar">
         <DesktopNavigationToggle collapsed={navigationCollapsed} onToggle={toggleNavigation} controls="customer-desktop-navigation"/>
-        <div className="workspace-location"><Link href={homeHref}><LocalizedText>{"Arbeitsbereich"}</LocalizedText></Link><span aria-hidden="true">/</span><span><LocalizedText verbatim={titleIsUserContent}>{title}</LocalizedText></span></div>
         {!formActive&&<div className="desktop-appbar-actions"><Button className="desktop-global-search" variant="secondary" ariaLabel="Suche" icon="search" onClick={()=>setSheet("search")}><LocalizedText>{"Alles durchsuchen"}</LocalizedText><kbd>⌘ / Ctrl K</kbd></Button><LocalizedElement as="button" className="desktop-notification-button" type="button" aria-label="Benachrichtigungen" onClick={openNotifications}><Icon name="bell"/>{unreadNotifications>0&&<i className="notification-badge"><LocalizedText>{unreadNotifications>9?"9+":unreadNotifications}</LocalizedText></i>}</LocalizedElement>
           <LocalizedElement as="button" className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={() => setSheet("account")}><Avatar name={profile.name} identity={profile.identity} src={profile.avatar} size="small"/></LocalizedElement>
         </div>}
