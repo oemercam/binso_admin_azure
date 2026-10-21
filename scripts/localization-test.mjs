@@ -44,7 +44,14 @@ for(const [language,label] of [['fr','Factures'],['it','Fatture'],['en','Invoice
  assert.ok(markup.includes('<p>Rechnungen</p>'),'Unmarked user text remains unchanged');
  assert.ok(!markup.includes('placeholder="Kunden suchen..."'),'Accessible native attributes are translated');
 }
-console.log('Locale catalogues: complete EN/FR/IT tuples, preserved template tokens, server-rendered language, native attributes and unchanged user data passed.');
+for(const language of config.locales){
+ const id='6f81c519-5073-4f33-8b45-90bc4ad6157c',message='Die Anfrage konnte nicht verarbeitet werden.';
+ const markup=renderToStaticMarkup(element(client.LocaleProvider,{initialLocale:language},element(client.LocalizedText,null,message+' · #'+id)));
+ assert.ok(markup.includes(locale.translateMessage(message,language)),'Error copy remains localized with reference '+language);
+ assert.ok(markup.includes(locale.translateMessage('Referenz',language)+': '+id),'Support reference remains exact and separately labeled '+language);
+ const userMarkup=renderToStaticMarkup(element(client.LocaleProvider,{initialLocale:language},element(client.LocalizedText,{verbatim:true},message+' · #'+id)));
+ assert.equal(userMarkup,message+' · #'+id,'Verbatim user content never gains application-error semantics');
+}console.log('Locale catalogues: complete EN/FR/IT tuples, preserved template tokens, server-rendered language, native attributes and unchanged user data passed.');
 // Exercise the real recovery handler with isolated token/mail delivery adapters.
 {
  let user={id:'fixture',language:'de'},sent=null,failMail=false;

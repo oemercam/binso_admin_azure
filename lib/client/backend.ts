@@ -57,7 +57,11 @@ export function logoutOperatorClientSession(){
 }
 
 export class ClientApiError extends Error {
-  constructor(message:string,public code:string,public status:number){super(message);}
+  readonly correlationId?:string;
+  constructor(message:string,public code:string,public status:number,reference?:unknown){
+    const id=typeof reference==='string'&&/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(reference)?reference.toLowerCase():undefined;
+    super(message+(id?' · #'+id:''));this.correlationId=id;
+  }
 }
 
 export type FreshAuthenticationRequest={action:string;confirm:()=>void;cancel:()=>void};
@@ -98,7 +102,8 @@ async function parseResponse<T>(response:Response,fallback:string):Promise<T>{
   if(response.status===401||response.status===403&&payload?.error==='mfa_enrollment_required'){invalidateClientSession(false);if(typeof window!=="undefined")window.dispatchEvent(new Event("binso-session-invalid"));}
   if(!response.ok){
     const message=typeof payload?.message==="string"?payload.message:fallback;
-    throw new ClientApiError(message,typeof payload?.error==="string"?payload.error:"request_failed",response.status);
+    const reference=response.status>=500&&payload?.correlationId===response.headers.get('X-Correlation-ID')?payload.correlationId:undefined;
+    throw new ClientApiError(message,typeof payload?.error==="string"?payload.error:"request_failed",response.status,reference);
   }
   return payload as T;
 }

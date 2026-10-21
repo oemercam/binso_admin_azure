@@ -66,6 +66,14 @@ try{
  assert.doesNotThrow(()=>isolatedEvents.resetClientData(false),'Blocked cross-tab channels cannot break in-memory invalidation');globalThis.BroadcastChannel=undefined;
  console.log('Confirmed logout remains successful when browser storage or BroadcastChannel is blocked.');
 
+ const reference='6f81c519-5073-4f33-8b45-90bc4ad6157c';
+ globalThis.fetch=async()=>Response.json({error:'internal_error',message:'Die Anfrage konnte nicht verarbeitet werden.',correlationId:reference},{status:500,headers:{'X-Correlation-ID':reference}});
+ await assert.rejects(backend.apiGet('/api/test-reference'),error=>error.correlationId===reference&&error.message.endsWith(' · #'+reference),'Only matching bounded server reference is exposed');
+ for(const [payloadId,header,status] of [[reference,'different',500],[reference,reference,400],['private-token','private-token',500]]){
+  globalThis.fetch=async()=>Response.json({error:'internal_error',message:'Public error',correlationId:payloadId},{status,headers:{'X-Correlation-ID':header}});
+  await assert.rejects(backend.apiGet('/api/test-reference-negative'),error=>error.correlationId===undefined&&error.message==='Public error','No mismatched, business-error or arbitrary reference may reach the UI');
+ }
+ console.log('Support correlation: exact header/body agreement, UUID boundary and negative privacy cases passed.');
  const csvHeaders={'Content-Type':'text/csv; charset=utf-8','Content-Disposition':'attachment; filename="binso-fixture.csv"'};
  globalThis.fetch=async(path,options)=>{assert.equal(path,'/api/reports?format=csv');assert.equal(options.cache,'no-store');assert.equal(options.credentials,'same-origin');assert.equal(options.headers.Accept,'text/csv');return new Response('"Metric";"Value"\r\n', {headers:csvHeaders})};
  const exportFile=await backend.apiGetFile('/api/reports?format=csv','text/csv');assert.equal(exportFile.fileName,'binso-fixture.csv');assert.equal(await exportFile.blob.text(),'"Metric";"Value"\r\n');
