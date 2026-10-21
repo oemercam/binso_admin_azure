@@ -440,17 +440,20 @@
     "R7-49-002": {
       "sourceTextSha256": "c48ed5723431e438ca20b6b00fb1895af71da875a47b726e4d13b95cbda2f949",
       "status": "teilweise_implementiert",
-      "implementation": "Bestehende zentrale Sprachfoundation; tatsächliche Textgrenzen für gemeinsame Dropdown-Zustände, lokale Optionslabels und Angebotsversionen/Datumswerte ergänzt. Rohes JSX wird zusätzlich auf fehlende Übersetzungsgrenzen geprüft.",
+      "implementation": "Bestehende zentrale Sprachfoundation; tatsächliche Textgrenzen für gemeinsame Dropdown-Zustände, lokale Optionslabels und Angebotsversionen/Datumswerte ergänzt. Rohes JSX wird zusätzlich auf fehlende Übersetzungsgrenzen geprüft. Öffentliche statische API-Fehlermeldungen, zusätzliche Bedienlabels und beide datengesteuerten Desktop-Navigationstabellen besitzen kontrollierte Katalogabdeckung; Spesen nutzen aktive Locale-Formatter und unveränderte Kundennamen.",
       "sourceReferences": [
         "components/select-control.tsx",
         "components/offer-history.tsx",
         "components/public-offer.tsx",
         "lib/financial-status.ts",
         "scripts/localization-coverage-test.mjs",
-        "docs/audit/v25-revision7/select-localization.md"
+        "docs/audit/v25-revision7/select-localization.md",
+        "components/pages/expenses.tsx",
+        "lib/display-format.ts",
+        "lib/locales/messages.json"
       ],
-      "test": "Echte Feedback-/Pagination-Renderer unter allen vier LocaleProvidern, Pflichtkataloge/Benutzerdaten, zivile Datumswerte und negative Grenzen, Kunden-/Statistikregression, Lint/Typecheck bestanden. Neue Browserfälle vorbereitet, noch offen.",
-      "visualComparison": "Unveränderte zentrale Darstellung; aktuelle gerenderte Vier-Sprachen-Fehler-/Lade-/Popup-Abnahme offen.",
+      "test": "Echte Vier-Sprachen-Renderer, statische API-/JSX-/Navigationstabellen-Abdeckung, API-Verweigerungen, Benutzertextschutz, zivile und Zeitpunkt-Datumsgrenzen, Typecheck und Lint bestanden. 7bc770a4: Quality, CodeQL und Full Development39691829176 mit beiden funktionalen Browserjobs und allen sechs Responsive-Jobs erfolgreich. Folgekorrekturen und vollständige Label-Sichtbarkeitsassertion benötigen aktuellen Browserlauf.",
+      "visualComparison": "Tatsächliche WebKit-Screens EN/Hell/390, FR/Dunkel/390 und IT/Hell/1440 aus7bc770a4 gesichtet. Neue abgeleitete Dialogfälle, keine Originalfreigabe. Sichtbarer fehlender dynamischer Gruppentitel korrigiert; vollständige App-/Rollen-/Sprachabnahme offen.",
       "blocker": "Keine vollständige App-/Rollen-/Sprachabnahme. Dynamische Meldungen, vollständiger Kreuzvergleich und finanzielle/juristische Fach- sowie Geräteabnahme bleiben offen."
     }
   },
@@ -499,5 +502,23 @@
   "checks": {
     "offerReports": "Actual isolated migrated DB/list precision and expiry parity, dates/archive/currency, HR denial, tenant-before/after, Start entitlement, CSV translation and explicit decision denominator passed. Native HTTP and interactive browser cases added; current execution pending.",
     "invoiceTaxReport": "Actual migrated DB: issued/archive records, exact recorded components, separate currencies, gross-only credits on their own dates, draft/cancelled/future denial, role/tariff/tenant masking and translated CSV limitation passed. Native HTTP and actual UI cases added; current CI pending. No allocated credit tax/input tax/tax-return claim."
+  },
+  "integrationEvidence": {
+    "commit": "7bc770a43bc3215ae5dba956dbb617c56d391c5c",
+    "quality": {
+      "run": 39691340506,
+      "conclusion": "success"
+    },
+    "codeql": {
+      "run": 39691340507,
+      "conclusion": "success"
+    },
+    "fullDevelopment": {
+      "run": 39691829176,
+      "conclusion": "success",
+      "functionalBrowserJobs": 2,
+      "responsiveBrowserJobs": 6
+    },
+    "scope": "Development qualification including native PostgreSQL concurrency; not full Revision7 clause/role/device/visual acceptance. Subsequent source changes require new checks."
   }
 }

@@ -50,3 +50,27 @@ Der Wächter verwendet nun wieder die generische Zugriffsverweigerung42501,
 ohne die Existenz eines fremden Kunden preiszugeben. Die unveränderten
 `workforce-regression-test.mjs`-Assertions und tatsächliche Runtime-RLS bestehen.
 Kein Test wurde abgeschwächt; die früher fehlgeschlagene CI bleibt fehlgeschlagen.
+
+## Evidenzbindung ohne Ergebnis-Zirkelschluss
+
+Die Quellidentität bindet weiterhin alle ausführbaren App-, Komponenten-, API-,
+Konfigurations-, Skript- und UX-Vertragsquellen sowie die unveränderten Originalbytes.
+Für das Revision7-Register wird zusätzlich seine validierte normative Projektion
+gebunden: Klausel-ID, Kapitelzuordnung, Priorität, Originaltext/-hash und konkrete
+Reviewpflichten. Veränderliche Ergebnisprosa und generierter Implementierungsstatus
+sind keine normative Quelle. Ihr Nachtragen darf identischen Code nicht nachträglich
+zu einem anderen geprüften Programm machen. Dies erteilt keine Klauselfreigabe.
+
+Der echte Git-Fixturetest weist nach: Ergebnisprosa lässt den Digest unverändert;
+eine Prioritätsänderung verändert ihn; ersetzte Klauseln und veränderte Originalbytes
+mit veraltetem Register werden abgelehnt. Bereits vorhandene negative Review- und
+Quellbindungsprüfungen bleiben erhalten. Kein fehlgeschlagener Fall wird akzeptiert.
+
+## Gesicherter Integrationsnachweis
+
+Commit 7bc770a43bc3215ae5dba956dbb617c56d391c5c: Standard-Quality39691340506,
+CodeQL39691340507 und Full Development39691829176 erfolgreich, einschliesslich
+echter PostgreSQL-Parallelprüfungen, beider funktionalen Browserjobs und aller sechs
+Responsive-Jobs. Diese erfolgreichen Entwicklungsgates sind keine vollständige
+fachliche oder visuelle Abnahme der573 Klauseln. Nachfolgende Quellenänderungen
+benötigen eigene aktuelle Prüfungen.

@@ -16,6 +16,12 @@ export function revision7Authority(source,register){
  return {name:'BINSO ONE V25 Complete Master Implementation Revision7',source:authorityPaths[0],sourceSha256,chapters:56,clauseCount:requirements.length,priorities:'P0/P1/P2; P3 excluded',requirements};
 }
 export function readRevision7Authority(){return revision7Authority(fs.readFileSync(authorityPaths[0],'utf8'),JSON.parse(fs.readFileSync(authorityPaths[1],'utf8')));}
+/** Bind normative clauses/case obligations, not mutable result prose. Otherwise
+ * recording a test result would invalidate the very unchanged code it proves. */
+export function revision7Identity(){
+ const authority=readRevision7Authority();
+ return JSON.stringify({...authority,requirements:[...authority.requirements].sort((a,b)=>a.id<b.id?-1:a.id>b.id?1:0)});
+}
 export function partitionHistoricalRegistry(registry){
  if(!Array.isArray(registry?.requirements)||!registry.requirements.length)throw Error('Missing technical compliance registry');
  const historical=[],technical=[];

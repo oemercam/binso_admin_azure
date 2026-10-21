@@ -1,20 +1,42 @@
 import ts from 'typescript';
+function renderedLiterals(value){
+ if(ts.isStringLiteral(value)||ts.isNoSubstitutionTemplateLiteral(value))return [value];
+ if(ts.isConditionalExpression(value))return [...renderedLiterals(value.whenTrue),...renderedLiterals(value.whenFalse)];
+ if(ts.isParenthesizedExpression(value))return renderedLiterals(value.expression);
+ if(ts.isBinaryExpression(value)&&[ts.SyntaxKind.BarBarToken,ts.SyntaxKind.QuestionQuestionToken,ts.SyntaxKind.AmpersandAmpersandToken].includes(value.operatorToken.kind))return [...renderedLiterals(value.left),...renderedLiterals(value.right)];
+ return [];
+}
 /** LocalizedElement translates native attributes, never its children. Literal
  * UI text needs an actual text boundary; dynamic record values remain verbatim. */
-export function unlocalizedJsxText(ast){
- const boundaries=new Set(['LocalizedText','Button','Status','Toast','LoadingState','ErrorState','EmptyState']),missing=[];
+export function jsxCopyNodes(ast){
+ const boundaries=new Set(['LocalizedText','Button','Status','Toast','LoadingState','ErrorState','EmptyState']),messages=[];
  const visit=node=>{
-  if(ts.isJsxText(node)){
-   const text=node.text.replace(/\s+/g,' ').trim();
+  const rendered=ts.isJsxText(node)?[node]:ts.isJsxExpression(node)&&node.expression&&(ts.isJsxElement(node.parent)||ts.isJsxFragment(node.parent))?renderedLiterals(node.expression):[];
+  for(const literal of rendered){
+   const text=literal.text.replace(/\s+/g,' ').trim();
    if(/[A-Za-zÀ-ž]{2}/.test(text)){
     let localized=false;
     for(let parent=node.parent;parent;parent=parent.parent)if(ts.isJsxElement(parent)&&boundaries.has(parent.openingElement.tagName.getText(ast))){localized=true;break;}
-    if(!localized)missing.push({text,line:ast.getLineAndCharacterOfPosition(node.getStart(ast)).line+1});
+    messages.push({text,line:ast.getLineAndCharacterOfPosition(literal.getStart(ast)).line+1,localized});
    }
   }
   ts.forEachChild(node,visit);
  };
- visit(ast);return missing;
+ visit(ast);return messages;
+}
+export function unlocalizedJsxText(ast){return jsxCopyNodes(ast).filter(row=>!row.localized).map(({localized:_localized,...row})=>row);}
+/** Only deliberately public ApiError messages; internal Error diagnostics and
+ * dynamic record content must not be copied into the translation catalogue. */
+export function apiMessageLiterals(ast){
+ const messages=[];
+ const visit=node=>{
+  if(ts.isNewExpression(node)&&node.expression.getText(ast)==='ApiError'){
+   const value=node.arguments?.[2];
+   if(value)for(const literal of renderedLiterals(value))messages.push({text:literal.text,line:ast.getLineAndCharacterOfPosition(literal.getStart(ast)).line+1});
+  }
+  ts.forEachChild(node,visit);
+ };
+ visit(ast);return messages;
 }
 /** Ignore translation boundaries when comparing the frozen navigation structure. */
 export function withoutLocalization(source){

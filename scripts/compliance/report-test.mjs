@@ -80,8 +80,15 @@ try{
  fs.writeFileSync(path.join(identityDir,'docs/audit/v24/ux-contract.json'),'{}');assert.notEqual(readIdentity().sourceDigest,beforeContract,'Active presentation contracts invalidate old measurements');
  const beforeConfig=readIdentity().sourceDigest;fs.mkdirSync(path.join(identityDir,'config'));fs.writeFileSync(path.join(identityDir,'config/domain.ts'),'export const role="owner"');assert.notEqual(readIdentity().sourceDigest,beforeConfig,'Domain configuration is part of source identity');
  fs.mkdirSync(path.join(identityDir,'docs/audit/v25-revision7'),{recursive:true});
- for(const file of ['source.md','requirements.json']){
-  const before=readIdentity().sourceDigest;fs.writeFileSync(path.join(identityDir,'docs/audit/v25-revision7',file),'Synthetic current authority '+file);assert.notEqual(readIdentity().sourceDigest,before,'Current Revision7 '+file+' invalidates older evidence');
- }
+ const beforeAuthority=readIdentity().sourceDigest;
+ for(const file of ['source.md','requirements.json'])fs.copyFileSync(path.resolve('docs/audit/v25-revision7',file),path.join(identityDir,'docs/audit/v25-revision7',file));
+ assert.notEqual(readIdentity().sourceDigest,beforeAuthority,'Current Revision7 source and normative register are bound');
+ const copyPath=path.join(identityDir,'docs/audit/v25-revision7/requirements.json'),copy=JSON.parse(fs.readFileSync(copyPath,'utf8')),beforeResult=readIdentity().sourceDigest;
+ copy.requirements[0].status='passed';copy.requirements[0].test='Synthetic result prose, not a review';fs.writeFileSync(copyPath,JSON.stringify(copy));
+ assert.equal(readIdentity().sourceDigest,beforeResult,'Recording result prose cannot invalidate unchanged executable or normative requirements');
+ copy.requirements[0].priority='P1';fs.writeFileSync(copyPath,JSON.stringify(copy));assert.notEqual(readIdentity().sourceDigest,beforeResult,'Normative priority changes still invalidate old evidence');
+ copy.requirements[0].requirement='Tampered source clause';fs.writeFileSync(copyPath,JSON.stringify(copy));assert.throws(readIdentity,'A substituted clause must block, never fall back to old evidence');
+ fs.copyFileSync(path.resolve('docs/audit/v25-revision7/requirements.json'),copyPath);
+ fs.appendFileSync(path.join(identityDir,'docs/audit/v25-revision7/source.md'),'\nUnapproved source drift');assert.throws(readIdentity,'Source drift without a matching register blocks');
  console.log('Source identity handles >1 MiB of generated Git paths while retaining tracked/untracked source and Revision7 source/register binding.');
 }finally{fs.rmSync(identityDir,{recursive:true,force:true});}

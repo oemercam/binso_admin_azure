@@ -17,10 +17,13 @@ export function timeMetadata(description:unknown,project:unknown,person:unknown,
 export function formatHours(value:unknown){
  const hours=Number(value);return Number.isFinite(hours)?hours.toLocaleString("de-DE",{maximumFractionDigits:2})+" h":"—";
 }
-export function formatDateTime(value:unknown,locale='de-CH'){
+function formatTimestamp(value:unknown,locale:string,withTime:boolean){
  const date=new Date(String(value??""));if(!Number.isFinite(date.getTime()))return "";
- return new Intl.DateTimeFormat(locale,{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit",timeZone:"Europe/Zurich"}).format(date);
+ return new Intl.DateTimeFormat(locale,withTime?{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit",timeZone:"Europe/Zurich"}:{day:"2-digit",month:"2-digit",year:"numeric",timeZone:"Europe/Zurich"}).format(date);
 }
+export function formatDateTime(value:unknown,locale='de-CH'){return formatTimestamp(value,locale,true);}
+/** Actual timestamps use the Swiss business day; civil document dates do not. */
+export function formatTimestampDate(value:unknown,locale='de-CH'){return formatTimestamp(value,locale,false);}
 /** Chat day boundaries use the same Swiss business timezone as other timestamps. */
 export function messageDay(value:string){
  const date=new Date(value);if(!Number.isFinite(date.getTime()))return "";

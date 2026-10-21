@@ -16901,7 +16901,7 @@
       "apiSources": [
         {
           "owner": "components/pages/expenses.tsx",
-          "line": 34,
+          "line": 36,
           "apis": [
             "/api/expenses/options",
             "/api/auth/session",
@@ -17433,7 +17433,7 @@
       "apiSources": [
         {
           "owner": "components/pages/expenses.tsx",
-          "line": 34,
+          "line": 36,
           "apis": [
             "/api/expenses/options",
             "/api/auth/session",

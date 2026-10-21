@@ -51,7 +51,11 @@ try{
   directoryPhase='success';releaseDirectory();await page.getByRole('option',{name:'Synthetic duplicate',exact:true}).click();
   await dialog.getByRole('combobox',{name:text('Zielkunde'),exact:true}).click();await page.getByRole('option',{name:'Synthetic retained',exact:true}).click();
   await dialog.getByRole('button',{name:text('Vorschau prüfen'),exact:true}).click();await dialog.getByText(text('Keine geschützten Verknüpfungen gefunden'),{exact:true}).waitFor();assert.equal(writes,0);
-  assert.equal(await dialog.getByRole('button',{name:text('Zusammenführen'),exact:true}).isDisabled(),true);await dialog.getByRole('checkbox').check();
+  assert.equal(await dialog.getByRole('button',{name:text('Zusammenführen'),exact:true}).isDisabled(),true);
+  const confirmation=dialog.locator('.form-field').filter({has:page.getByRole('checkbox')});await confirmation.scrollIntoViewIfNeeded();
+  const visibility=await confirmation.evaluate(field=>{const area=field.closest('.sheet-body').getBoundingClientRect(),rect=field.getBoundingClientRect();return {top:rect.top,bottom:rect.bottom,areaTop:area.top,areaBottom:area.bottom};});
+  assert.ok(visibility.top>=visibility.areaTop-1&&visibility.bottom<=visibility.areaBottom+1,'The entire translated confirmation label can be read above the fixed footer');
+  await dialog.getByRole('checkbox').check();
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);await page.screenshot({path:path.join(output,`${theme}-${width}-preview.png`),animations:'disabled'});
   await dialog.getByRole('button',{name:text('Zusammenführen'),exact:true}).click();await dialog.getByText('Synthetic unknown response',{exact:true}).waitFor();assert.equal(writes,1,'No automatic retry after an uncertain response');
   await dialog.getByRole('button',{name:text('Status prüfen'),exact:true}).click();await dialog.getByRole('button',{name:text('Erneut bestätigen'),exact:true}).waitFor();assert.equal(statusReads,1);assert.equal(writes,1,'Status reads cannot repeat a mutation');

@@ -31,6 +31,10 @@ const financialDates=compile('lib/financial-status.ts',{'./money':compile('lib/m
 for(const [language,expected] of Object.entries({de:'02.01.2026',fr:'02.01.2026',it:'02.01.2026',en:'02.01.2026'}))assert.equal(financialDates.formatDate('2026-01-02',config.localeTags[language]),expected,'Civil document dates use the chosen Swiss language without timezone day shifts');
 assert.equal(financialDates.formatDate('2026-01-02','en-US'),'01/02/2026','Explicit locale is honored rather than ignored');
 assert.equal(financialDates.formatDate('2026-01-02'),'02.01.2026','Existing default Swiss date presentation remains compatible');
+const timestampDates=compile('lib/display-format.ts',{'./financial-status':financialDates});
+assert.equal(timestampDates.formatTimestampDate('2026-10-25T23:30:00Z'),'26.10.2026','Reimbursement instants use the actual Swiss business day, including DST boundaries');
+assert.equal(financialDates.formatDate('2026-10-25'),'25.10.2026','Civil invoice/expense dates are not shifted as timestamps');
+assert.equal(timestampDates.formatTimestampDate('invalid'),'','Invalid timestamps cannot crash a localized detail page');
 for(const value of [null,'','invalid','2026-02-30','2026-13-01'])assert.equal(financialDates.formatDate(value),'','Invalid calendar values are never rolled into another month');
 for(const [input,expected] of [['FR-ch','fr'],['it-CH','it'],['en','en'],['de-CH','de'],['<script>alert(1)</script>','de'],['en<script>','de'],['constructor','de'],[null,'de'],[{},'de']])assert.equal(config.asLocale(input),expected,'Only canonical literal locales may leave the boundary');
 for(const [language,label] of [['de','Rechnungen'],['fr','Factures'],['it','Fatture'],['en','Invoices']]){
@@ -43,6 +47,16 @@ assert.equal(locale.translateMessage('Seite 2 von 4','fr'),'Page 2 sur 4');
 assert.equal(locale.translateMessage('Schritt 1 von 3 · Prüfen','it'),'Passaggio 1 di 3 · Verifica');
 assert.equal(locale.translateMessage('Die Datei darf höchstens 10 MB gross sein.','en'),'The file must not exceed 10 MB.');
 const client=compile('lib/client/locale.tsx',{'@/lib/locales':locale});
+for(const [language,confirmation,approval] of [
+ ['en','Please confirm this security-sensitive action again.','You cannot approve your own time entries.'],
+ ['fr','Veuillez confirmer à nouveau cette action sensible.','Vous ne pouvez pas approuver vos propres heures.'],
+ ['it','Conferma nuovamente questa operazione sensibile.','Non puoi approvare le tue ore.'],
+]){
+ const render=value=>renderToStaticMarkup(React.createElement(client.LocaleProvider,{initialLocale:language},React.createElement(client.LocalizedText,null,value)));
+ assert.equal(render('Bitte bestätige diese sicherheitsrelevante Aktion erneut.'),confirmation);
+ assert.equal(render('Eigene Zeiten dürfen nicht selbst freigegeben werden.'),approval);
+ assert.equal(render('Synthetic user record'),'Synthetic user record','Unrecognized user text remains verbatim');
+}
 // Render the actual shared search feedback/pager under all real locale contexts.
 const selectAst=ts.createSourceFile('select-control.tsx',fs.readFileSync('components/select-control.tsx','utf8'),99,true,4),selectExports={};
 const selectCopySource=selectAst.statements.filter(node=>ts.isFunctionDeclaration(node)&&['SelectSearchFeedback','SelectSearchPagination'].includes(node.name?.text)).map(node=>node.getText(selectAst)).join('\n');

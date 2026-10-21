@@ -14229,16 +14229,6 @@
     "Client cible",
     "Cliente di destinazione"
   ],
-  "Kontakte übernehmen": [
-    "Transfer contacts",
-    "Transférer les contacts",
-    "Trasferisci contatti"
-  ],
-  "Aktivitäten übernehmen": [
-    "Transfer activities",
-    "Transférer les activités",
-    "Trasferisci attività"
-  ],
   "Wird ergänzt": [
     "Will be filled in",
     "Sera complété",
@@ -14413,5 +14403,525 @@
     "The reviewed preview requires explicit confirmation.",
     "L’aperçu vérifié doit être confirmé explicitement.",
     "L’anteprima verificata deve essere confermata esplicitamente."
+  ],
+  "Bitte zuerst den Mitarbeiterzugang zuordnen lassen.": [
+    "Please have your employee access assigned first.",
+    "Veuillez d’abord faire attribuer votre accès collaborateur.",
+    "Fai prima assegnare il tuo accesso collaboratore."
+  ],
+  "Bitte bestätige diese sicherheitsrelevante Aktion erneut.": [
+    "Please confirm this security-sensitive action again.",
+    "Veuillez confirmer à nouveau cette action sensible.",
+    "Conferma nuovamente questa operazione sensibile."
+  ],
+  "Ungültiges Modulprofil.": [
+    "Invalid module profile.",
+    "Profil de modules non valide.",
+    "Profilo dei moduli non valido."
+  ],
+  "Das Benutzerlimit konnte nicht geprüft werden.": [
+    "The user limit could not be checked.",
+    "La limite d’utilisateurs n’a pas pu être vérifiée.",
+    "Non è stato possibile verificare il limite di utenti."
+  ],
+  "Diese Adresse kann für diese Einladung nicht verwendet werden. Bitte ein separates Konto mit eigener E-Mail verwenden.": [
+    "This address cannot be used for this invitation. Please use a separate account with its own email address.",
+    "Cette adresse ne peut pas être utilisée pour cette invitation. Veuillez utiliser un compte distinct avec sa propre adresse e-mail.",
+    "Questo indirizzo non può essere utilizzato per questo invito. Utilizza un account separato con un proprio indirizzo e-mail."
+  ],
+  "Dieses Angebot wird bereits als Entwurf überarbeitet.": [
+    "This quote is already being revised as a draft.",
+    "Ce devis est déjà en cours de révision sous forme de brouillon.",
+    "Questa offerta è già in revisione come bozza."
+  ],
+  "Entwürfe sind keine freigegebenen Angebotsversionen.": [
+    "Drafts are not released quote versions.",
+    "Les brouillons ne sont pas des versions de devis validées.",
+    "Le bozze non sono versioni approvate dell’offerta."
+  ],
+  "Angebot nicht gefunden.": [
+    "Quote not found.",
+    "Devis introuvable.",
+    "Offerta non trovata."
+  ],
+  "Entwürfe sind keine ausgestellten Rechnungen.": [
+    "Drafts are not issued invoices.",
+    "Les brouillons ne sont pas des factures émises.",
+    "Le bozze non sono fatture emesse."
+  ],
+  "Rechnung nicht gefunden.": [
+    "Invoice not found.",
+    "Facture introuvable.",
+    "Fattura non trovata."
+  ],
+  "Passkeys sind nicht konfiguriert.": [
+    "Passkeys are not configured.",
+    "Les passkeys ne sont pas configurées.",
+    "Le passkey non sono configurate."
+  ],
+  "Passkeys benötigen eine sichere konfigurierte Herkunft.": [
+    "Passkeys require a configured secure origin.",
+    "Les passkeys nécessitent une origine sécurisée configurée.",
+    "Le passkey richiedono un’origine sicura configurata."
+  ],
+  "Die Passkey-Anfrage ist abgelaufen. Bitte neu starten.": [
+    "The passkey request has expired. Please start again.",
+    "La demande de passkey a expiré. Veuillez recommencer.",
+    "La richiesta della passkey è scaduta. Ricomincia."
+  ],
+  "Passkeys sind im Testzugang deaktiviert.": [
+    "Passkeys are disabled in test access.",
+    "Les passkeys sont désactivées dans l’accès de test.",
+    "Le passkey sono disattivate nell’accesso di prova."
+  ],
+  "Der Passkey konnte nicht bestätigt werden.": [
+    "The passkey could not be verified.",
+    "La passkey n’a pas pu être vérifiée.",
+    "Non è stato possibile verificare la passkey."
+  ],
+  "Bitte die Sicherheitsprüfung erneut durchführen.": [
+    "Please repeat the security check.",
+    "Veuillez effectuer à nouveau la vérification de sécurité.",
+    "Ripeti la verifica di sicurezza."
+  ],
+  "Ungültiger Passkey.": [
+    "Invalid passkey.",
+    "Passkey non valide.",
+    "Passkey non valida."
+  ],
+  "Passkey nicht gefunden.": [
+    "Passkey not found.",
+    "Passkey introuvable.",
+    "Passkey non trovata."
+  ],
+  "Authenticator-Code erforderlich. Bitte mit dem Code erneut anmelden.": [
+    "An authenticator code is required. Please sign in again with the code.",
+    "Un code d’authentification est requis. Veuillez vous reconnecter avec ce code.",
+    "È richiesto un codice dell’app di autenticazione. Accedi di nuovo con il codice."
+  ],
+  "Das Auftragslimit deines aktuellen Plans ist erreicht.": [
+    "You have reached the job limit of your current plan.",
+    "La limite de mandats de votre formule actuelle est atteinte.",
+    "Hai raggiunto il limite di commesse del tuo piano attuale."
+  ],
+  "Dieser Angebotslink ist abgelaufen, ersetzt oder nicht mehr verfügbar.": [
+    "This quote link has expired, been replaced or is no longer available.",
+    "Ce lien de devis a expiré, a été remplacé ou n’est plus disponible.",
+    "Questo link dell’offerta è scaduto, è stato sostituito o non è più disponibile."
+  ],
+  "Für dieses Angebot wurde bereits entschieden.": [
+    "A decision has already been recorded for this quote.",
+    "Une décision a déjà été enregistrée pour ce devis.",
+    "È già stata registrata una decisione per questa offerta."
+  ],
+  "Bitte vor einem neuen Code warten.": [
+    "Please wait before requesting another code.",
+    "Veuillez patienter avant de demander un nouveau code.",
+    "Attendi prima di richiedere un nuovo codice."
+  ],
+  "Der Bestätigungscode konnte nicht versendet werden.": [
+    "The confirmation code could not be sent.",
+    "Le code de confirmation n’a pas pu être envoyé.",
+    "Non è stato possibile inviare il codice di conferma."
+  ],
+  "Die Aktion wurde bereits anders verwendet.": [
+    "This action has already been used for a different operation.",
+    "Cette action a déjà été utilisée pour une autre opération.",
+    "Questa azione è già stata utilizzata per un’altra operazione."
+  ],
+  "Bitte die Aktion ausdrücklich bestätigen.": [
+    "Please explicitly confirm the action.",
+    "Veuillez confirmer explicitement l’action.",
+    "Conferma esplicitamente l’azione."
+  ],
+  "Ungültiger Bericht.": [
+    "Invalid report.",
+    "Rapport non valide.",
+    "Rapporto non valido."
+  ],
+  "Ungültiger Freigabefilter.": [
+    "Invalid approval filter.",
+    "Filtre d’approbation non valide.",
+    "Filtro di approvazione non valido."
+  ],
+  "Keine Berechtigung für Freigaben.": [
+    "You do not have permission to approve.",
+    "Vous n’avez pas l’autorisation d’approuver.",
+    "Non disponi dell’autorizzazione per approvare."
+  ],
+  "Ungültiger Kundenfilter.": [
+    "Invalid customer filter.",
+    "Filtre client non valide.",
+    "Filtro cliente non valido."
+  ],
+  "Bitte einen gültigen Kundentyp wählen.": [
+    "Please select a valid customer type.",
+    "Veuillez sélectionner un type de client valide.",
+    "Seleziona un tipo di cliente valido."
+  ],
+  "Ungültiges Kundenfeld: allowDuplicate": [
+    "Invalid customer field: allowDuplicate",
+    "Champ client non valide : allowDuplicate",
+    "Campo cliente non valido: allowDuplicate"
+  ],
+  "Bitte eine Kontaktperson eingeben.": [
+    "Please enter a contact person.",
+    "Veuillez saisir une personne de contact.",
+    "Inserisci una persona di contatto."
+  ],
+  "Hausnummer ist zu lang.": [
+    "The building number is too long.",
+    "Le numéro de bâtiment est trop long.",
+    "Il numero civico è troppo lungo."
+  ],
+  "Der Kundentyp kann hier nicht geändert werden.": [
+    "The customer type cannot be changed here.",
+    "Le type de client ne peut pas être modifié ici.",
+    "Il tipo di cliente non può essere modificato qui."
+  ],
+  "Der Tarif konnte nicht geprüft werden.": [
+    "The subscription plan could not be checked.",
+    "La formule d’abonnement n’a pas pu être vérifiée.",
+    "Non è stato possibile verificare il piano di abbonamento."
+  ],
+  "Ungültiges Benutzerlimit für diesen Tarif.": [
+    "Invalid user limit for this plan.",
+    "Limite d’utilisateurs non valide pour cette formule.",
+    "Limite di utenti non valido per questo piano."
+  ],
+  "Dieses Modul ist in deinem Tarif nicht verfügbar.": [
+    "This module is not available in your plan.",
+    "Ce module n’est pas disponible dans votre formule.",
+    "Questo modulo non è disponibile nel tuo piano."
+  ],
+  "Während der kostenlosen Testphase ist der kostenpflichtige Abschluss noch nicht freigegeben. Nach Testende kann das bestehende Firmenkonto abonniert werden.": [
+    "Paid subscription checkout is not yet available during the free trial. After the trial ends, you can subscribe using the existing company account.",
+    "La souscription payante n’est pas encore disponible pendant l’essai gratuit. À la fin de l’essai, un abonnement peut être souscrit avec le compte d’entreprise existant.",
+    "La sottoscrizione a pagamento non è ancora disponibile durante la prova gratuita. Al termine della prova puoi abbonarti con l’account aziendale esistente."
+  ],
+  "Keine Berechtigung für Arbeitszeiten.": [
+    "You do not have permission to access working hours.",
+    "Vous n’avez pas l’autorisation d’accéder aux heures de travail.",
+    "Non disponi dell’autorizzazione per accedere alle ore lavorate."
+  ],
+  "Bitte Suchtext, Zeitraum und Listenseite prüfen.": [
+    "Please check the search text, date range and list page.",
+    "Veuillez vérifier le texte de recherche, la période et la page de la liste.",
+    "Verifica il testo di ricerca, il periodo e la pagina dell’elenco."
+  ],
+  "Ungültiger Zeitfilter.": [
+    "Invalid time filter.",
+    "Filtre de temps non valide.",
+    "Filtro delle ore non valido."
+  ],
+  "Die Firmenzuordnung muss vor der Anmeldung geklärt werden.": [
+    "The company assignment must be resolved before signing in.",
+    "L’affectation à l’entreprise doit être clarifiée avant la connexion.",
+    "L’assegnazione all’azienda deve essere chiarita prima dell’accesso."
+  ],
+  "Nur berechtigte Administratoren dürfen Zuordnungen verwalten.": [
+    "Only authorized administrators may manage assignments.",
+    "Seuls les administrateurs autorisés peuvent gérer les affectations.",
+    "Solo gli amministratori autorizzati possono gestire le assegnazioni."
+  ],
+  "Für diesen Kunden oder Auftrag fehlt eine gültige Zuordnung.": [
+    "There is no valid assignment for this customer or job.",
+    "Aucune affectation valide n’existe pour ce client ou ce mandat.",
+    "Manca un’assegnazione valida per questo cliente o questa commessa."
+  ],
+  "Bitte Vorname und Nachname eingeben.": [
+    "Please enter a first and last name.",
+    "Veuillez saisir un prénom et un nom.",
+    "Inserisci nome e cognome."
+  ],
+  "Diese Einladung kann mit diesem Konto nicht angenommen werden.": [
+    "This invitation cannot be accepted with this account.",
+    "Cette invitation ne peut pas être acceptée avec ce compte.",
+    "Questo invito non può essere accettato con questo account."
+  ],
+  "Der Authenticator ist nicht aktiviert.": [
+    "The authenticator is not enabled.",
+    "L’authentificateur n’est pas activé.",
+    "L’app di autenticazione non è attivata."
+  ],
+  "Ungültige Passkey-Antwort.": [
+    "Invalid passkey response.",
+    "Réponse de passkey non valide.",
+    "Risposta della passkey non valida."
+  ],
+  "Die Bestätigung ist nicht gültig.": [
+    "The confirmation is not valid.",
+    "La confirmation n’est pas valide.",
+    "La conferma non è valida."
+  ],
+  "Der Sicherheitscode konnte nicht versendet werden.": [
+    "The security code could not be sent.",
+    "Le code de sécurité n’a pas pu être envoyé.",
+    "Non è stato possibile inviare il codice di sicurezza."
+  ],
+  "Ungültige Sicherheitsbestätigung.": [
+    "Invalid security confirmation.",
+    "Confirmation de sécurité non valide.",
+    "Conferma di sicurezza non valida."
+  ],
+  "Der Sicherheitscode ist ungültig oder abgelaufen.": [
+    "The security code is invalid or has expired.",
+    "Le code de sécurité est non valide ou a expiré.",
+    "Il codice di sicurezza non è valido o è scaduto."
+  ],
+  "Die Sicherheitsdaten wurden geändert. Bitte melde dich erneut an.": [
+    "The security details have changed. Please sign in again.",
+    "Les données de sécurité ont été modifiées. Veuillez vous reconnecter.",
+    "I dati di sicurezza sono cambiati. Accedi di nuovo."
+  ],
+  "Bitte den Kunden erneut auswählen.": [
+    "Please select the customer again.",
+    "Veuillez sélectionner à nouveau le client.",
+    "Seleziona nuovamente il cliente."
+  ],
+  "Bitte eine CSV- oder XLSX-Datei bis 3 MB auswählen.": [
+    "Please select a CSV or XLSX file up to 3 MB.",
+    "Veuillez sélectionner un fichier CSV ou XLSX de 3 Mo maximum.",
+    "Seleziona un file CSV o XLSX fino a 3 MB."
+  ],
+  "Ungültiger Import.": [
+    "Invalid import.",
+    "Importation non valide.",
+    "Importazione non valida."
+  ],
+  "Bitte einen Kunden zuordnen.": [
+    "Please assign a customer.",
+    "Veuillez affecter un client.",
+    "Assegna un cliente."
+  ],
+  "Neue Kunden werden durch Inhaber, Administratoren oder Finanzen erfasst.": [
+    "New customers are created by owners, administrators or finance staff.",
+    "Les nouveaux clients sont créés par les propriétaires, les administrateurs ou le personnel des finances.",
+    "I nuovi clienti vengono creati da proprietari, amministratori o personale delle finanze."
+  ],
+  "Bitte einen gültigen Betreff eingeben.": [
+    "Please enter a valid subject.",
+    "Veuillez saisir un objet valide.",
+    "Inserisci un oggetto valido."
+  ],
+  "Ungültige Version.": [
+    "Invalid version.",
+    "Version non valide.",
+    "Versione non valida."
+  ],
+  "Version nicht gefunden.": [
+    "Version not found.",
+    "Version introuvable.",
+    "Versione non trovata."
+  ],
+  "Aktueller Angebotsdialog nicht gefunden.": [
+    "The current quote conversation was not found.",
+    "La conversation actuelle du devis est introuvable.",
+    "La conversazione attuale dell’offerta non è stata trovata."
+  ],
+  "Dieser Angebotsdialog ist nicht mehr aktiv.": [
+    "This quote conversation is no longer active.",
+    "Cette conversation de devis n’est plus active.",
+    "Questa conversazione dell’offerta non è più attiva."
+  ],
+  "Diese Versandkennung wurde anders verwendet.": [
+    "This delivery identifier has been used for a different operation.",
+    "Cet identifiant d’envoi a été utilisé pour une autre opération.",
+    "Questo identificativo di invio è stato utilizzato per un’altra operazione."
+  ],
+  "Keine Berechtigung für diese Dateien.": [
+    "You do not have permission to access these files.",
+    "Vous n’avez pas l’autorisation d’accéder à ces fichiers.",
+    "Non disponi dell’autorizzazione per accedere a questi file."
+  ],
+  "Keine Berechtigung für diese Datei.": [
+    "You do not have permission to access this file.",
+    "Vous n’avez pas l’autorisation d’accéder à ce fichier.",
+    "Non disponi dell’autorizzazione per accedere a questo file."
+  ],
+  "Das verarbeitete Bild ist zu gross.": [
+    "The processed image is too large.",
+    "L’image traitée est trop volumineuse.",
+    "L’immagine elaborata è troppo grande."
+  ],
+  "Zeiteintrag wurde nicht gefunden.": [
+    "Time entry not found.",
+    "Saisie de temps introuvable.",
+    "Registrazione ore non trovata."
+  ],
+  "Nachweise können nur vor dem Einreichen eines Monatsrapports ergänzt werden.": [
+    "Evidence can only be added before submitting a monthly timesheet.",
+    "Les justificatifs ne peuvent être ajoutés qu’avant la soumission d’un rapport mensuel.",
+    "I giustificativi possono essere aggiunti solo prima di presentare un rapporto mensile."
+  ],
+  "Datei wurde nicht gefunden.": [
+    "File not found.",
+    "Fichier introuvable.",
+    "File non trovato."
+  ],
+  "Diese Datei kann hier nicht entfernt werden.": [
+    "This file cannot be removed here.",
+    "Ce fichier ne peut pas être supprimé ici.",
+    "Questo file non può essere rimosso qui."
+  ],
+  "Nur eigene Anhänge können entfernt werden.": [
+    "Only your own attachments can be removed.",
+    "Seules vos propres pièces jointes peuvent être supprimées.",
+    "Puoi rimuovere solo i tuoi allegati."
+  ],
+  "Anhänge abgeschlossener oder eingereichter Vorgänge bleiben erhalten.": [
+    "Attachments to completed or submitted records are retained.",
+    "Les pièces jointes des opérations terminées ou soumises sont conservées.",
+    "Gli allegati delle operazioni completate o presentate vengono conservati."
+  ],
+  "Neue Aufträge werden durch Inhaber oder Administratoren freigegeben.": [
+    "New jobs are approved by owners or administrators.",
+    "Les nouveaux mandats sont approuvés par les propriétaires ou les administrateurs.",
+    "Le nuove commesse vengono approvate dai proprietari o dagli amministratori."
+  ],
+  "Bitte eine Auftragsbezeichnung eingeben.": [
+    "Please enter a job name.",
+    "Veuillez saisir un nom de mandat.",
+    "Inserisci un nome per la commessa."
+  ],
+  "Die Integrität dieser PDF-Version konnte nicht bestätigt werden.": [
+    "The integrity of this PDF version could not be verified.",
+    "L’intégrité de cette version PDF n’a pas pu être vérifiée.",
+    "Non è stato possibile verificare l’integrità di questa versione PDF."
+  ],
+  "Bitte ausdrücklich bestätigen.": [
+    "Please confirm explicitly.",
+    "Veuillez confirmer explicitement.",
+    "Conferma esplicitamente."
+  ],
+  "Der eigene Zugang kann hier nicht gesperrt werden.": [
+    "You cannot block your own access here.",
+    "Vous ne pouvez pas bloquer votre propre accès ici.",
+    "Non puoi bloccare il tuo accesso qui."
+  ],
+  "Bitte das Ticket vor einer weiteren Antwort wieder öffnen.": [
+    "Please reopen the ticket before replying again.",
+    "Veuillez rouvrir le ticket avant de répondre à nouveau.",
+    "Riapri il ticket prima di rispondere di nuovo."
+  ],
+  "Ungültige Ticketaktion.": [
+    "Invalid ticket action.",
+    "Action de ticket non valide.",
+    "Azione del ticket non valida."
+  ],
+  "Dieses Ticket ist bereits in Bearbeitung.": [
+    "This ticket is already being handled.",
+    "Ce ticket est déjà en cours de traitement.",
+    "Questo ticket è già in lavorazione."
+  ],
+  "Ungültige Auswahl.": [
+    "Invalid selection.",
+    "Sélection non valide.",
+    "Selezione non valida."
+  ],
+  "Die Freigabe folgt der aktiven Teamzuordnung und kann hier nicht geändert werden.": [
+    "Approval follows the active team assignment and cannot be changed here.",
+    "L’approbation suit l’affectation active à l’équipe et ne peut pas être modifiée ici.",
+    "L’approvazione segue l’assegnazione attiva al team e non può essere modificata qui."
+  ],
+  "Ungültiger Monat.": [
+    "Invalid month.",
+    "Mois non valide.",
+    "Mese non valido."
+  ],
+  "Für diesen Auftrag können momentan keine Zeiten erfasst werden.": [
+    "Time cannot currently be recorded for this job.",
+    "Il n’est actuellement pas possible de saisir du temps pour ce mandat.",
+    "Al momento non è possibile registrare ore per questa commessa."
+  ],
+  "Ein Monatsrapport benötigt einen Kunden und verrechenbare Stunden.": [
+    "A monthly timesheet requires a customer and billable hours.",
+    "Un rapport mensuel nécessite un client et des heures facturables.",
+    "Un rapporto mensile richiede un cliente e ore fatturabili."
+  ],
+  "Der Benutzerzugang ist keinem aktiven Mitarbeiter zugeordnet.": [
+    "This user account is not assigned to an active employee.",
+    "Ce compte utilisateur n’est affecté à aucun collaborateur actif.",
+    "Questo account utente non è assegnato a un collaboratore attivo."
+  ],
+  "Dieser Eintrag kann nicht bearbeitet werden.": [
+    "This entry cannot be edited.",
+    "Cette saisie ne peut pas être modifiée.",
+    "Questa registrazione non può essere modificata."
+  ],
+  "Nur eigene Zeiten können eingereicht werden.": [
+    "You can only submit your own time entries.",
+    "Vous ne pouvez soumettre que vos propres heures.",
+    "Puoi presentare solo le tue ore."
+  ],
+  "Eigene Zeiten dürfen nicht selbst freigegeben werden.": [
+    "You cannot approve your own time entries.",
+    "Vous ne pouvez pas approuver vos propres heures.",
+    "Non puoi approvare le tue ore."
+  ],
+  "Bitte den unterschriebenen Stundenrapport hochladen.": [
+    "Please upload the signed timesheet.",
+    "Veuillez téléverser le relevé d’heures signé.",
+    "Carica il rapporto ore firmato."
+  ],
+  "Der Monatsrapport wurde noch nicht eingereicht.": [
+    "The monthly timesheet has not been submitted yet.",
+    "Le rapport mensuel n’a pas encore été soumis.",
+    "Il rapporto mensile non è ancora stato presentato."
+  ],
+  "Der Zeiteintrag muss zuerst eingereicht werden.": [
+    "The time entry must be submitted first.",
+    "La saisie de temps doit d’abord être soumise.",
+    "La registrazione ore deve prima essere presentata."
+  ],
+  "Bitte eine Begründung eingeben.": [
+    "Please enter a reason.",
+    "Veuillez saisir un motif.",
+    "Inserisci una motivazione."
+  ],
+  "Freigegebene oder verrechnete Zeiten können nicht zurückgewiesen werden.": [
+    "Approved or invoiced time entries cannot be rejected.",
+    "Les heures approuvées ou facturées ne peuvent pas être refusées.",
+    "Le ore approvate o fatturate non possono essere respinte."
+  ],
+  "Bitte Mitarbeiter, Zugang, Kunde und Zeitraum prüfen.": [
+    "Please check the employee, access account, customer and date range.",
+    "Veuillez vérifier le collaborateur, le compte d’accès, le client et la période.",
+    "Verifica il collaboratore, l’account di accesso, il cliente e il periodo."
+  ],
+  "Mitarbeiter und Benutzerzugang müssen eindeutig zugeordnet sein.": [
+    "The employee and user account must be assigned unambiguously.",
+    "Le collaborateur et le compte utilisateur doivent être affectés sans ambiguïté.",
+    "Il collaboratore e l’account utente devono essere associati senza ambiguità."
+  ],
+  "PDF-Vorschau": [
+    "PDF preview",
+    "Aperçu PDF",
+    "Anteprima PDF"
+  ],
+  "Antwort senden": [
+    "Send reply",
+    "Envoyer la réponse",
+    "Invia risposta"
+  ],
+  "Widerrufen": [
+    "Revoke",
+    "Révoquer",
+    "Revoca"
+  ],
+  "Beendet": [
+    "Ended",
+    "Terminé",
+    "Terminato"
+  ],
+  "Arbeit & Team": [
+    "Work & team",
+    "Travail et équipe",
+    "Lavoro e team"
+  ],
+  "Zugriff & Rollen": [
+    "Access & roles",
+    "Accès et rôles",
+    "Accesso e ruoli"
   ]
 }

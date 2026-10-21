@@ -55,3 +55,48 @@ Eine echte lokale JSONB-Abfrage bestätigt identische Werte bei anderer Reihenfo
 Der Paralleltest vergleicht nun alle Ergebniswerte strikt mit `deepEqual`, behält
 Ledger-/Replay-/Konkurrenzassertionen und ist noch gegen echtes PostgreSQL in CI
 erneut auszuführen. Es wurde kein Sicherheitsgate gelockert.
+
+## Folgekorrektur: API-Texte und Spesen
+
+Eine gezielte AST-Prüfung fand98 fehlende öffentliche API-Fehlermeldungen sowie vier
+fehlende Bedienlabels im Sprachkatalog. Diese besitzen nun EN-/FR-/IT-Übersetzungen;
+ein grammatisch falscher Auftragshinweis verwendet den bereits vorhandenen korrekten
+Katalogschlüssel. Bestehende Übersetzungen wurden nicht überschrieben. Zwei nach der
+Dialogverkürzung unbenutzte Zählertexte wurden entfernt. Der physische Tastaturhinweis
+«⌘ / Ctrl K» bleibt sprachneutral; deutsche Bedienlabels sind keine Neutral-Ausnahmen.
+
+Die Quellenprüfung unterscheidet unmittelbar gerenderte bedingte Literale und echte
+Übersetzungsgrenzen von Attributübersetzung, dynamischen Datensatznamen, internen
+Error-Diagnosen und Bedingungscodes. Öffentliche statische ApiError-Meldungen werden
+zusätzlich geprüft. Dynamisch zusammengesetzte Meldungen und die tatsächliche
+Darstellung aller API-Zustände bleiben gesonderte Abnahmeaufgaben. Echte Renderer-
+Tests prüfen drei repräsentative Verweigerungen in EN/FR/IT und unveränderten Benutzertext.
+
+Spesen verwenden den gemeinsamen aktiven Locale-Formatter für Beträge, zivile
+Belegtage und tatsächliche Erstattungszeitpunkte. Die Schweiz-Zeitzone bleibt für
+Zeitpunkte erhalten; zivile Kalendertage werden nicht verschoben. Der generische
+Kunden-Fallback wird übersetzt, echte Kundennamen bleiben unverändert. Positive und
+ungültige Datumsfälle sowie Kunden-Finanzprojektion wurden gezielt geprüft.
+
+## Tatsächliche Browser-/Sichtprüfung und ihre Grenzen
+
+7bc770a4 besteht nun beide funktionalen CI-Browserjobs inklusive der vier konkreten
+Dialogfälle und echtes PostgreSQL. Zwei tatsächliche WebKit-Mobile-Screens wurden
+visuell geprüft. Der vorhandene gemeinsame Sheet-Owner ist flach/undurchsichtig;
+französische lange Zählerlabels beanspruchen unnötig mehrere Zeilen. Sie werden auf
+«Kontakte»/«Aktivitäten» verkürzt. Der Folgetest scrollt die vollständige Zustimmung
+in den Formularbereich und prüft deren gesamte sichtbare Höhe oberhalb des festen
+Footers. Dieser neue Nachweis steht bis zum nächsten Browserlauf aus.
+
+Die Screens verwenden synthetische Transportdaten, getrennt von echten migrierten
+Persistenz-/RLS-Tests. Sie sind abgeleitete Komponentenansichten, keine neue Original-
+Referenzfreigabe. Vollständige Sprache×Viewport×Rolle×Zustand-Abnahme und reale
+Geräte bleiben offen. Kein Produktivdeploy und keine Migration wurden ausgeführt.
+
+Die anschliessende tatsächliche italienische Desktop-Sichtprüfung zeigte zusätzlich
+«Arbeit & Team» als deutschen Gruppentitel. Der vorhandene Text-Owner war korrekt;
+der dynamisch referenzierte Katalogeintrag fehlte. Eine neue AST-Prüfung beider
+Tenant-/Operator-Navigationstabellen fand ausserdem «Zugriff & Rollen». Beide Labels
+wurden übersetzt. Die Prüfung wurde zuerst mit dem echten fehlenden zweiten Label
+rot und besteht nach der Korrektur. Summe:104 neue Katalogeinträge, zwei entfernte
+unbenutzte Zählertexte und keine überschriebenen bestehenden Übersetzungen.

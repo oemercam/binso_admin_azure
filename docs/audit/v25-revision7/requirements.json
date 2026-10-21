@@ -8663,11 +8663,14 @@
         "components/public-offer.tsx",
         "lib/financial-status.ts",
         "scripts/localization-coverage-test.mjs",
-        "docs/audit/v25-revision7/select-localization.md"
+        "docs/audit/v25-revision7/select-localization.md",
+        "components/pages/expenses.tsx",
+        "lib/display-format.ts",
+        "lib/locales/messages.json"
       ],
-      "implementation": "Bestehende zentrale Sprachfoundation; tatsächliche Textgrenzen für gemeinsame Dropdown-Zustände, lokale Optionslabels und Angebotsversionen/Datumswerte ergänzt. Rohes JSX wird zusätzlich auf fehlende Übersetzungsgrenzen geprüft.",
-      "test": "Echte Feedback-/Pagination-Renderer unter allen vier LocaleProvidern, Pflichtkataloge/Benutzerdaten, zivile Datumswerte und negative Grenzen, Kunden-/Statistikregression, Lint/Typecheck bestanden. Neue Browserfälle vorbereitet, noch offen.",
-      "visualComparison": "Unveränderte zentrale Darstellung; aktuelle gerenderte Vier-Sprachen-Fehler-/Lade-/Popup-Abnahme offen.",
+      "implementation": "Bestehende zentrale Sprachfoundation; tatsächliche Textgrenzen für gemeinsame Dropdown-Zustände, lokale Optionslabels und Angebotsversionen/Datumswerte ergänzt. Rohes JSX wird zusätzlich auf fehlende Übersetzungsgrenzen geprüft. Öffentliche statische API-Fehlermeldungen, zusätzliche Bedienlabels und beide datengesteuerten Desktop-Navigationstabellen besitzen kontrollierte Katalogabdeckung; Spesen nutzen aktive Locale-Formatter und unveränderte Kundennamen.",
+      "test": "Echte Vier-Sprachen-Renderer, statische API-/JSX-/Navigationstabellen-Abdeckung, API-Verweigerungen, Benutzertextschutz, zivile und Zeitpunkt-Datumsgrenzen, Typecheck und Lint bestanden. 7bc770a4: Quality, CodeQL und Full Development39691829176 mit beiden funktionalen Browserjobs und allen sechs Responsive-Jobs erfolgreich. Folgekorrekturen und vollständige Label-Sichtbarkeitsassertion benötigen aktuellen Browserlauf.",
+      "visualComparison": "Tatsächliche WebKit-Screens EN/Hell/390, FR/Dunkel/390 und IT/Hell/1440 aus7bc770a4 gesichtet. Neue abgeleitete Dialogfälle, keine Originalfreigabe. Sichtbarer fehlender dynamischer Gruppentitel korrigiert; vollständige App-/Rollen-/Sprachabnahme offen.",
       "blocker": "Keine vollständige App-/Rollen-/Sprachabnahme. Dynamische Meldungen, vollständiger Kreuzvergleich und finanzielle/juristische Fach- sowie Geräteabnahme bleiben offen."
     },
     {

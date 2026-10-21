@@ -8806,6 +8806,7 @@
         "lib/offer-activity.ts#offerActivityLabel",
         "lib/offer-activity.ts#labels",
         "lib/display-format.ts#formatDateTime",
+        "lib/display-format.ts#formatTimestamp",
         "components/binso-ux.tsx#FormSheet",
         "components/binso-ux.tsx#SheetProps",
         "components/binso-ux.tsx#Sheet",
@@ -9296,6 +9297,7 @@
         "lib/offer-activity.ts#offerActivityLabel",
         "lib/offer-activity.ts#labels",
         "lib/display-format.ts#formatDateTime",
+        "lib/display-format.ts#formatTimestamp",
         "components/binso-ux.tsx#FormSheet",
         "components/binso-ux.tsx#SheetProps",
         "components/binso-ux.tsx#Sheet",
@@ -10940,6 +10942,7 @@
         "components/binso-ux.tsx#DetailDisclosure",
         "components/binso-ux.tsx#ActionRow",
         "lib/display-format.ts#formatDateTime",
+        "lib/display-format.ts#formatTimestamp",
         "lib/offer-activity.ts#deliveryLabel",
         "lib/offer-activity.ts#offerActivityLabel",
         "lib/offer-activity.ts#labels",
@@ -11569,6 +11572,7 @@
         "components/binso-ux.tsx#DetailDisclosure",
         "components/binso-ux.tsx#ActionRow",
         "lib/display-format.ts#formatDateTime",
+        "lib/display-format.ts#formatTimestamp",
         "lib/offer-activity.ts#deliveryLabel",
         "lib/offer-activity.ts#offerActivityLabel",
         "lib/offer-activity.ts#labels",
@@ -13590,6 +13594,7 @@
         "components/binso-ux.tsx#DetailDisclosure",
         "components/binso-ux.tsx#ActionRow",
         "lib/display-format.ts#formatDateTime",
+        "lib/display-format.ts#formatTimestamp",
         "lib/offer-activity.ts#deliveryLabel",
         "lib/offer-activity.ts#offerActivityLabel",
         "lib/offer-activity.ts#labels",
@@ -14219,6 +14224,7 @@
         "components/binso-ux.tsx#DetailDisclosure",
         "components/binso-ux.tsx#ActionRow",
         "lib/display-format.ts#formatDateTime",
+        "lib/display-format.ts#formatTimestamp",
         "lib/offer-activity.ts#deliveryLabel",
         "lib/offer-activity.ts#offerActivityLabel",
         "lib/offer-activity.ts#labels",
@@ -26078,6 +26084,7 @@
         "components/binso-ux.tsx#FormSheet",
         "components/binso-ux.tsx#ListRow",
         "lib/display-format.ts#formatDateTime",
+        "lib/display-format.ts#formatTimestamp",
         "components/report-mail.tsx#deliveryLabels",
         "components/report-mail.tsx#deliveryTone",
         "components/report-share.tsx#ReportShareSheet",
@@ -26628,6 +26635,7 @@
         "components/binso-ux.tsx#FormSheet",
         "components/binso-ux.tsx#ListRow",
         "lib/display-format.ts#formatDateTime",
+        "lib/display-format.ts#formatTimestamp",
         "components/report-mail.tsx#deliveryLabels",
         "components/report-mail.tsx#deliveryTone",
         "components/report-share.tsx#ReportShareSheet",
@@ -88272,6 +88280,7 @@
         "components/records.tsx#RecordsColumns",
         "lib/list-filter.ts#listStatusOverride",
         "lib/display-format.ts#formatDateTime",
+        "lib/display-format.ts#formatTimestamp",
         "components/records.tsx#RecordsControls",
         "components/records.tsx#RecordsController",
         "components/binso-ux.tsx#ListSearch",
@@ -88942,6 +88951,7 @@
         "components/records.tsx#RecordsColumns",
         "lib/list-filter.ts#listStatusOverride",
         "lib/display-format.ts#formatDateTime",
+        "lib/display-format.ts#formatTimestamp",
         "components/records.tsx#RecordsControls",
         "components/records.tsx#RecordsController",
         "components/binso-ux.tsx#ListSearch",
@@ -92954,6 +92964,7 @@
         "components/records.tsx#RecordsColumns",
         "lib/list-filter.ts#listStatusOverride",
         "lib/display-format.ts#formatDateTime",
+        "lib/display-format.ts#formatTimestamp",
         "components/records.tsx#RecordsControls",
         "components/records.tsx#RecordsController",
         "components/binso-ux.tsx#ListSearch",
@@ -93618,6 +93629,7 @@
         "components/records.tsx#RecordsColumns",
         "lib/list-filter.ts#listStatusOverride",
         "lib/display-format.ts#formatDateTime",
+        "lib/display-format.ts#formatTimestamp",
         "components/records.tsx#RecordsControls",
         "components/records.tsx#RecordsController",
         "components/binso-ux.tsx#ListSearch",
@@ -129776,6 +129788,7 @@
         "components/binso-ux.tsx#DetailDisclosure",
         "components/binso-ux.tsx#ActionRow",
         "lib/display-format.ts#formatDateTime",
+        "lib/display-format.ts#formatTimestamp",
         "lib/offer-activity.ts#deliveryLabel",
         "lib/offer-activity.ts#offerActivityLabel",
         "lib/offer-activity.ts#labels",
@@ -130405,6 +130418,7 @@
         "components/binso-ux.tsx#DetailDisclosure",
         "components/binso-ux.tsx#ActionRow",
         "lib/display-format.ts#formatDateTime",
+        "lib/display-format.ts#formatTimestamp",
         "lib/offer-activity.ts#deliveryLabel",
         "lib/offer-activity.ts#offerActivityLabel",
         "lib/offer-activity.ts#labels",
@@ -132426,6 +132440,7 @@
         "components/binso-ux.tsx#DetailDisclosure",
         "components/binso-ux.tsx#ActionRow",
         "lib/display-format.ts#formatDateTime",
+        "lib/display-format.ts#formatTimestamp",
         "lib/offer-activity.ts#deliveryLabel",
         "lib/offer-activity.ts#offerActivityLabel",
         "lib/offer-activity.ts#labels",
@@ -133055,6 +133070,7 @@
         "components/binso-ux.tsx#DetailDisclosure",
         "components/binso-ux.tsx#ActionRow",
         "lib/display-format.ts#formatDateTime",
+        "lib/display-format.ts#formatTimestamp",
         "lib/offer-activity.ts#deliveryLabel",
         "lib/offer-activity.ts#offerActivityLabel",
         "lib/offer-activity.ts#labels",
@@ -138830,6 +138846,8 @@
       "pageRenderGraph": [
         "app/spesen/[id]/page.tsx#Page",
         "components/pages/expenses.tsx#ExpenseForm",
+        "lib/client/locale.tsx#useLocale",
+        "lib/client/locale.tsx#LocaleContext",
         "lib/navigation.ts#safeAppPath",
         "lib/client/use-api-query.ts#useApiQuery",
         "lib/client/use-api-query.ts#useDataRevision",
@@ -138901,8 +138919,6 @@
         "components/app-shell.tsx#AppShellFrame",
         "components/desktop-navigation.tsx#useDesktopNavigation",
         "lib/client/locale.tsx#useTranslation",
-        "lib/client/locale.tsx#useLocale",
-        "lib/client/locale.tsx#LocaleContext",
         "lib/locales/index.ts#translateMessage",
         "lib/locales/config.ts#Locale",
         "lib/locales/config.ts#locales",
@@ -139063,6 +139079,10 @@
         "components/app-shell.tsx#ShellRegistration",
         "components/app-shell.tsx#ShellConfiguration",
         "components/ui.tsx#SectionTitle",
+        "lib/financial-status.ts#formatCurrency",
+        "lib/financial-status.ts#formatDate",
+        "lib/display-format.ts#formatTimestampDate",
+        "lib/display-format.ts#formatTimestamp",
         "components/directory-select.tsx#DirectorySelect",
         "components/directory-select.tsx#Item",
         "components/directory-select.tsx#Page",
@@ -139334,6 +139354,8 @@
       "renderGraph": [
         "app/spesen/[id]/page.tsx#Page",
         "components/pages/expenses.tsx#ExpenseForm",
+        "lib/client/locale.tsx#useLocale",
+        "lib/client/locale.tsx#LocaleContext",
         "lib/navigation.ts#safeAppPath",
         "lib/client/use-api-query.ts#useApiQuery",
         "lib/client/use-api-query.ts#useDataRevision",
@@ -139405,8 +139427,6 @@
         "components/app-shell.tsx#AppShellFrame",
         "components/desktop-navigation.tsx#useDesktopNavigation",
         "lib/client/locale.tsx#useTranslation",
-        "lib/client/locale.tsx#useLocale",
-        "lib/client/locale.tsx#LocaleContext",
         "lib/locales/index.ts#translateMessage",
         "lib/locales/config.ts#Locale",
         "lib/locales/config.ts#locales",
@@ -139567,6 +139587,10 @@
         "components/app-shell.tsx#ShellRegistration",
         "components/app-shell.tsx#ShellConfiguration",
         "components/ui.tsx#SectionTitle",
+        "lib/financial-status.ts#formatCurrency",
+        "lib/financial-status.ts#formatDate",
+        "lib/display-format.ts#formatTimestampDate",
+        "lib/display-format.ts#formatTimestamp",
         "components/directory-select.tsx#DirectorySelect",
         "components/directory-select.tsx#Item",
         "components/directory-select.tsx#Page",
@@ -140474,21 +140498,6 @@
       "widgets": [
         {
           "tag": "Field",
-          "line": 170,
-          "component": "components/pages/expenses.tsx#ExpenseForm"
-        },
-        {
-          "tag": "Field",
-          "line": 171,
-          "component": "components/pages/expenses.tsx#ExpenseForm"
-        },
-        {
-          "tag": "Field",
-          "line": 172,
-          "component": "components/pages/expenses.tsx#ExpenseForm"
-        },
-        {
-          "tag": "Field",
           "line": 173,
           "component": "components/pages/expenses.tsx#ExpenseForm"
         },
@@ -140528,23 +140537,38 @@
           "component": "components/pages/expenses.tsx#ExpenseForm"
         },
         {
-          "tag": "ActionSheet",
-          "line": 184,
-          "component": "components/pages/expenses.tsx#ExpenseForm"
-        },
-        {
-          "tag": "FormSheet",
-          "line": 188,
-          "component": "components/pages/expenses.tsx#ExpenseForm"
-        },
-        {
-          "tag": "FormSheet",
-          "line": 189,
+          "tag": "Field",
+          "line": 181,
           "component": "components/pages/expenses.tsx#ExpenseForm"
         },
         {
           "tag": "Field",
-          "line": 189,
+          "line": 182,
+          "component": "components/pages/expenses.tsx#ExpenseForm"
+        },
+        {
+          "tag": "Field",
+          "line": 183,
+          "component": "components/pages/expenses.tsx#ExpenseForm"
+        },
+        {
+          "tag": "ActionSheet",
+          "line": 187,
+          "component": "components/pages/expenses.tsx#ExpenseForm"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 191,
+          "component": "components/pages/expenses.tsx#ExpenseForm"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 192,
+          "component": "components/pages/expenses.tsx#ExpenseForm"
+        },
+        {
+          "tag": "Field",
+          "line": 192,
           "component": "components/pages/expenses.tsx#ExpenseForm"
         },
         {
@@ -140866,6 +140890,8 @@
       "pageRenderGraph": [
         "app/spesen/neu/page.tsx#Page",
         "components/pages/expenses.tsx#ExpenseForm",
+        "lib/client/locale.tsx#useLocale",
+        "lib/client/locale.tsx#LocaleContext",
         "lib/navigation.ts#safeAppPath",
         "lib/client/use-api-query.ts#useApiQuery",
         "lib/client/use-api-query.ts#useDataRevision",
@@ -140937,8 +140963,6 @@
         "components/app-shell.tsx#AppShellFrame",
         "components/desktop-navigation.tsx#useDesktopNavigation",
         "lib/client/locale.tsx#useTranslation",
-        "lib/client/locale.tsx#useLocale",
-        "lib/client/locale.tsx#LocaleContext",
         "lib/locales/index.ts#translateMessage",
         "lib/locales/config.ts#Locale",
         "lib/locales/config.ts#locales",
@@ -141099,6 +141123,10 @@
         "components/app-shell.tsx#ShellRegistration",
         "components/app-shell.tsx#ShellConfiguration",
         "components/ui.tsx#SectionTitle",
+        "lib/financial-status.ts#formatCurrency",
+        "lib/financial-status.ts#formatDate",
+        "lib/display-format.ts#formatTimestampDate",
+        "lib/display-format.ts#formatTimestamp",
         "components/directory-select.tsx#DirectorySelect",
         "components/directory-select.tsx#Item",
         "components/directory-select.tsx#Page",
@@ -141370,6 +141398,8 @@
       "renderGraph": [
         "app/spesen/neu/page.tsx#Page",
         "components/pages/expenses.tsx#ExpenseForm",
+        "lib/client/locale.tsx#useLocale",
+        "lib/client/locale.tsx#LocaleContext",
         "lib/navigation.ts#safeAppPath",
         "lib/client/use-api-query.ts#useApiQuery",
         "lib/client/use-api-query.ts#useDataRevision",
@@ -141441,8 +141471,6 @@
         "components/app-shell.tsx#AppShellFrame",
         "components/desktop-navigation.tsx#useDesktopNavigation",
         "lib/client/locale.tsx#useTranslation",
-        "lib/client/locale.tsx#useLocale",
-        "lib/client/locale.tsx#LocaleContext",
         "lib/locales/index.ts#translateMessage",
         "lib/locales/config.ts#Locale",
         "lib/locales/config.ts#locales",
@@ -141603,6 +141631,10 @@
         "components/app-shell.tsx#ShellRegistration",
         "components/app-shell.tsx#ShellConfiguration",
         "components/ui.tsx#SectionTitle",
+        "lib/financial-status.ts#formatCurrency",
+        "lib/financial-status.ts#formatDate",
+        "lib/display-format.ts#formatTimestampDate",
+        "lib/display-format.ts#formatTimestamp",
         "components/directory-select.tsx#DirectorySelect",
         "components/directory-select.tsx#Item",
         "components/directory-select.tsx#Page",
@@ -142510,21 +142542,6 @@
       "widgets": [
         {
           "tag": "Field",
-          "line": 170,
-          "component": "components/pages/expenses.tsx#ExpenseForm"
-        },
-        {
-          "tag": "Field",
-          "line": 171,
-          "component": "components/pages/expenses.tsx#ExpenseForm"
-        },
-        {
-          "tag": "Field",
-          "line": 172,
-          "component": "components/pages/expenses.tsx#ExpenseForm"
-        },
-        {
-          "tag": "Field",
           "line": 173,
           "component": "components/pages/expenses.tsx#ExpenseForm"
         },
@@ -142564,23 +142581,38 @@
           "component": "components/pages/expenses.tsx#ExpenseForm"
         },
         {
-          "tag": "ActionSheet",
-          "line": 184,
-          "component": "components/pages/expenses.tsx#ExpenseForm"
-        },
-        {
-          "tag": "FormSheet",
-          "line": 188,
-          "component": "components/pages/expenses.tsx#ExpenseForm"
-        },
-        {
-          "tag": "FormSheet",
-          "line": 189,
+          "tag": "Field",
+          "line": 181,
           "component": "components/pages/expenses.tsx#ExpenseForm"
         },
         {
           "tag": "Field",
-          "line": 189,
+          "line": 182,
+          "component": "components/pages/expenses.tsx#ExpenseForm"
+        },
+        {
+          "tag": "Field",
+          "line": 183,
+          "component": "components/pages/expenses.tsx#ExpenseForm"
+        },
+        {
+          "tag": "ActionSheet",
+          "line": 187,
+          "component": "components/pages/expenses.tsx#ExpenseForm"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 191,
+          "component": "components/pages/expenses.tsx#ExpenseForm"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 192,
+          "component": "components/pages/expenses.tsx#ExpenseForm"
+        },
+        {
+          "tag": "Field",
+          "line": 192,
           "component": "components/pages/expenses.tsx#ExpenseForm"
         },
         {
@@ -144546,12 +144578,12 @@
       "widgets": [
         {
           "tag": "RecordsControls",
-          "line": 29,
+          "line": 31,
           "component": "components/pages/expenses.tsx#ExpensesPage"
         },
         {
           "tag": "RecordsView",
-          "line": 30,
+          "line": 32,
           "component": "components/pages/expenses.tsx#ExpensesPage"
         },
         {
@@ -148801,6 +148833,7 @@
         "lib/client/query-snapshot.ts#writeQuerySnapshot",
         "lib/client/query-snapshot.ts#clearQuerySnapshots",
         "lib/display-format.ts#formatDateTime",
+        "lib/display-format.ts#formatTimestamp",
         "lib/support-reference.ts#supportReference",
         "components/app-shell.tsx#AppShell",
         "components/app-shell.tsx#ShellProps",
@@ -149303,6 +149336,7 @@
         "lib/client/query-snapshot.ts#writeQuerySnapshot",
         "lib/client/query-snapshot.ts#clearQuerySnapshots",
         "lib/display-format.ts#formatDateTime",
+        "lib/display-format.ts#formatTimestamp",
         "lib/support-reference.ts#supportReference",
         "components/app-shell.tsx#AppShell",
         "components/app-shell.tsx#ShellProps",
@@ -176467,6 +176501,18 @@
       "key": "lib/display-format.ts#formatDateTime",
       "file": "lib/display-format.ts",
       "name": "formatDateTime",
+      "line": 24,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": []
+    },
+    {
+      "key": "lib/display-format.ts#formatTimestamp",
+      "file": "lib/display-format.ts",
+      "name": "formatTimestamp",
       "line": 20,
       "classes": [],
       "apis": [],
@@ -176477,6 +176523,10 @@
         {
           "line": 21,
           "expression": "!Number.isFinite(date.getTime())"
+        },
+        {
+          "line": 22,
+          "expression": "withTime"
         }
       ]
     },
@@ -202637,7 +202687,7 @@
       "key": "lib/display-format.ts#activityDays",
       "file": "lib/display-format.ts",
       "name": "activityDays",
-      "line": 30,
+      "line": 33,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -202649,7 +202699,7 @@
       "key": "lib/display-format.ts#messageDay",
       "file": "lib/display-format.ts",
       "name": "messageDay",
-      "line": 25,
+      "line": 28,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -202657,7 +202707,7 @@
       "elements": [],
       "conditions": [
         {
-          "line": 26,
+          "line": 29,
           "expression": "!Number.isFinite(date.getTime())"
         }
       ]
@@ -218790,7 +218840,7 @@
       "key": "components/pages/expenses.tsx#ExpenseForm",
       "file": "components/pages/expenses.tsx",
       "name": "ExpenseForm",
-      "line": 34,
+      "line": 36,
       "classes": [
         "page-actions",
         "entity-detail-workspace",
@@ -218824,18 +218874,6 @@
       "widgets": [
         {
           "tag": "Field",
-          "line": 170
-        },
-        {
-          "tag": "Field",
-          "line": 171
-        },
-        {
-          "tag": "Field",
-          "line": 172
-        },
-        {
-          "tag": "Field",
           "line": 173
         },
         {
@@ -218867,26 +218905,38 @@
           "line": 180
         },
         {
-          "tag": "ActionSheet",
-          "line": 184
-        },
-        {
-          "tag": "FormSheet",
-          "line": 188
-        },
-        {
-          "tag": "FormSheet",
-          "line": 189
+          "tag": "Field",
+          "line": 181
         },
         {
           "tag": "Field",
-          "line": 189
+          "line": 182
+        },
+        {
+          "tag": "Field",
+          "line": 183
+        },
+        {
+          "tag": "ActionSheet",
+          "line": 187
+        },
+        {
+          "tag": "FormSheet",
+          "line": 191
+        },
+        {
+          "tag": "FormSheet",
+          "line": 192
+        },
+        {
+          "tag": "Field",
+          "line": 192
         }
       ],
       "elements": [
         {
           "tag": "AppShell",
-          "line": 159,
+          "line": 162,
           "props": [
             "title=\"Spese\"",
             "subtitle={expenseLoadError?\"Spesendaten nicht verfügbar\":undefined}",
@@ -218897,19 +218947,19 @@
         },
         {
           "tag": "LoadingState",
-          "line": 159,
+          "line": 162,
           "props": []
         },
         {
           "tag": "div",
-          "line": 159,
+          "line": 162,
           "props": [
             "role=\"alert\""
           ]
         },
         {
           "tag": "EmptyState",
-          "line": 159,
+          "line": 162,
           "props": [
             "title=\"Spese konnte nicht geladen werden\"",
             "description={expenseLoadError??\"Bitte versuche es erneut.\"}"
@@ -218917,26 +218967,26 @@
         },
         {
           "tag": "div",
-          "line": 159,
+          "line": 162,
           "props": [
             "className=\"page-actions\""
           ]
         },
         {
           "tag": "Button",
-          "line": 159,
+          "line": 162,
           "props": [
             "onClick={expenseQuery.refresh}"
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 159,
+          "line": 162,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 159,
+          "line": 162,
           "props": [
             "href=\"/spesen\"",
             "variant=\"ghost\""
@@ -218944,12 +218994,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 159,
+          "line": 162,
           "props": []
         },
         {
           "tag": "Toast",
-          "line": 162,
+          "line": 165,
           "props": [
             "title={toast}",
             "tone=\"success\""
@@ -218957,24 +219007,24 @@
         },
         {
           "tag": "ErrorState",
-          "line": 162,
+          "line": 165,
           "props": []
         },
         {
           "tag": "div",
-          "line": 163,
+          "line": 166,
           "props": [
             "role=\"alert\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 163,
+          "line": 166,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 163,
+          "line": 166,
           "props": [
             "variant=\"ghost\"",
             "onClick={()=>{employeesQuery.refresh();customersQuery.refresh();filesQuery.refresh()}}"
@@ -218982,12 +219032,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 163,
+          "line": 166,
           "props": []
         },
         {
           "tag": "div",
-          "line": 164,
+          "line": 167,
           "props": [
             "className={existing?\"entity-detail-workspace expense-detail-workspace\":\"expense-layout\"}",
             "onChangeCapture={()=>setEditedExpense(true)}"
@@ -218995,7 +219045,7 @@
         },
         {
           "tag": "Button",
-          "line": 166,
+          "line": 169,
           "props": [
             "requiresWrite",
             "variant=\"upload\"",
@@ -219007,29 +219057,29 @@
         },
         {
           "tag": "b",
-          "line": 166,
+          "line": 169,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 166,
+          "line": 169,
           "props": [
             "verbatim={scanState!==\"scanning\"&&!!receiptFile}"
           ]
         },
         {
           "tag": "small",
-          "line": 166,
+          "line": 169,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 166,
+          "line": 169,
           "props": []
         },
         {
           "tag": "Input",
-          "line": 166,
+          "line": 169,
           "props": [
             "id=\"expense-receipt-upload\"",
             "hidden",
@@ -219042,33 +219092,33 @@
         },
         {
           "tag": "div",
-          "line": 167,
+          "line": 170,
           "props": [
             "className=\"form-page\""
           ]
         },
         {
           "tag": "section",
-          "line": 168,
+          "line": 171,
           "props": []
         },
         {
           "tag": "SectionTitle",
-          "line": 168,
+          "line": 171,
           "props": [
             "title=\"Quittungen\""
           ]
         },
         {
           "tag": "div",
-          "line": 168,
+          "line": 171,
           "props": [
             "className=\"compact-list\""
           ]
         },
         {
           "tag": "a",
-          "line": 168,
+          "line": 171,
           "props": [
             "key={f.id}",
             "href={'/api/files/'+f.id+'/download'}"
@@ -219076,85 +219126,90 @@
         },
         {
           "tag": "span",
-          "line": 168,
+          "line": 171,
           "props": []
         },
         {
           "tag": "Icon",
-          "line": 168,
+          "line": 171,
           "props": [
             "name=\"file\""
           ]
         },
         {
           "tag": "section",
-          "line": 169,
+          "line": 172,
           "props": [
             "className=\"expense-summary\""
           ]
         },
         {
           "tag": "h2",
-          "line": 169,
+          "line": 172,
           "props": []
         },
         {
           "tag": "strong",
-          "line": 169,
+          "line": 172,
           "props": [
             "className=\"expense-summary-amount\""
           ]
         },
         {
           "tag": "p",
-          "line": 169,
+          "line": 172,
           "props": []
         },
         {
           "tag": "p",
-          "line": 169,
+          "line": 172,
           "props": []
         },
         {
           "tag": "details",
-          "line": 169,
+          "line": 172,
           "props": []
         },
         {
           "tag": "summary",
-          "line": 169,
+          "line": 172,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 169,
+          "line": 172,
           "props": []
         },
         {
           "tag": "p",
-          "line": 169,
+          "line": 172,
           "props": []
         },
         {
           "tag": "Link",
-          "line": 169,
+          "line": 172,
           "props": [
             "href={'/kunden/'+encodeURIComponent(expenseCustomer)}"
           ]
         },
         {
+          "tag": "LocalizedText",
+          "line": 172,
+          "props": []
+        },
+        {
           "tag": "p",
-          "line": 169,
+          "line": 172,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 169,
+          "line": 172,
           "props": []
         },
         {
           "tag": "fieldset",
-          "line": 169,
+          "line": 172,
           "props": [
             "disabled={lockedExpense||expenseBusy||scanState===\"scanning\"}",
             "className=\"form-grid two form-fieldset\""
@@ -219162,14 +219217,14 @@
         },
         {
           "tag": "Field",
-          "line": 170,
+          "line": 173,
           "props": [
             "label=\"Händler\""
           ]
         },
         {
           "tag": "Input",
-          "line": 170,
+          "line": 173,
           "props": [
             "value={merchant}",
             "onChange={e=>setMerchant(e.target.value)}",
@@ -219178,14 +219233,14 @@
         },
         {
           "tag": "Field",
-          "line": 171,
+          "line": 174,
           "props": [
             "label=\"Mitarbeiter\""
           ]
         },
         {
           "tag": "Select",
-          "line": 171,
+          "line": 174,
           "props": [
             "value={person}",
             "onChange={e=>setPerson(e.target.value)}"
@@ -219193,19 +219248,19 @@
         },
         {
           "tag": "option",
-          "line": 171,
+          "line": 174,
           "props": [
             "value=\"\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 171,
+          "line": 174,
           "props": []
         },
         {
           "tag": "option",
-          "line": 171,
+          "line": 174,
           "props": [
             "key={item.id}",
             "value={item.id}"
@@ -219213,14 +219268,14 @@
         },
         {
           "tag": "Field",
-          "line": 172,
+          "line": 175,
           "props": [
             "label=\"Datum\""
           ]
         },
         {
           "tag": "Input",
-          "line": 172,
+          "line": 175,
           "props": [
             "type=\"date\"",
             "value={date}",
@@ -219229,14 +219284,14 @@
         },
         {
           "tag": "Field",
-          "line": 173,
+          "line": 176,
           "props": [
             "label=\"Kategorie\""
           ]
         },
         {
           "tag": "Select",
-          "line": 173,
+          "line": 176,
           "props": [
             "value={category}",
             "onChange={e=>setCategory(e.target.value)}"
@@ -219244,62 +219299,62 @@
         },
         {
           "tag": "option",
-          "line": 173,
+          "line": 176,
           "props": [
             "value={\"Reise\"}"
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 173,
+          "line": 176,
           "props": []
         },
         {
           "tag": "option",
-          "line": 173,
+          "line": 176,
           "props": [
             "value={\"Verpflegung\"}"
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 173,
+          "line": 176,
           "props": []
         },
         {
           "tag": "option",
-          "line": 173,
+          "line": 176,
           "props": [
             "value={\"Material\"}"
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 173,
+          "line": 176,
           "props": []
         },
         {
           "tag": "option",
-          "line": 173,
+          "line": 176,
           "props": [
             "value={\"Sonstiges\"}"
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 173,
+          "line": 176,
           "props": []
         },
         {
           "tag": "Field",
-          "line": 174,
+          "line": 177,
           "props": [
             "label=\"Betrag\""
           ]
         },
         {
           "tag": "Input",
-          "line": 174,
+          "line": 177,
           "props": [
             "inputMode=\"decimal\"",
             "value={amount}",
@@ -219309,14 +219364,14 @@
         },
         {
           "tag": "Field",
-          "line": 175,
+          "line": 178,
           "props": [
             "label=\"Währung\""
           ]
         },
         {
           "tag": "Select",
-          "line": 175,
+          "line": 178,
           "props": [
             "value={currency}",
             "onChange={e=>setCurrency(e.target.value)}"
@@ -219324,38 +219379,38 @@
         },
         {
           "tag": "option",
-          "line": 175,
+          "line": 178,
           "props": [
             "value={\"CHF\"}"
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 175,
+          "line": 178,
           "props": []
         },
         {
           "tag": "option",
-          "line": 175,
+          "line": 178,
           "props": [
             "value={\"EUR\"}"
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 175,
+          "line": 178,
           "props": []
         },
         {
           "tag": "Field",
-          "line": 176,
+          "line": 179,
           "props": [
             "label=\"MwSt.\""
           ]
         },
         {
           "tag": "Select",
-          "line": 176,
+          "line": 179,
           "props": [
             "value={vatRate}",
             "onChange={e=>setVatRate(e.target.value)}"
@@ -219363,35 +219418,35 @@
         },
         {
           "tag": "option",
-          "line": 176,
+          "line": 179,
           "props": [
             "value=\"8.1\""
           ]
         },
         {
           "tag": "option",
-          "line": 176,
+          "line": 179,
           "props": [
             "value=\"2.6\""
           ]
         },
         {
           "tag": "option",
-          "line": 176,
+          "line": 179,
           "props": [
             "value=\"0\""
           ]
         },
         {
           "tag": "Field",
-          "line": 177,
+          "line": 180,
           "props": [
             "label=\"Status\""
           ]
         },
         {
           "tag": "Select",
-          "line": 177,
+          "line": 180,
           "props": [
             "value={status}",
             "onChange={e=>setStatus(e.target.value)}"
@@ -219399,31 +219454,31 @@
         },
         {
           "tag": "option",
-          "line": 177,
+          "line": 180,
           "props": [
             "value={\"Entwurf\"}"
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 177,
+          "line": 180,
           "props": []
         },
         {
           "tag": "option",
-          "line": 177,
+          "line": 180,
           "props": [
             "value={\"Eingereicht\"}"
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 177,
+          "line": 180,
           "props": []
         },
         {
           "tag": "option",
-          "line": 177,
+          "line": 180,
           "props": [
             "value={\"Genehmigt\"}",
             "disabled={!canApproveExpense}"
@@ -219431,12 +219486,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 177,
+          "line": 180,
           "props": []
         },
         {
           "tag": "option",
-          "line": 177,
+          "line": 180,
           "props": [
             "value={\"Abgelehnt\"}",
             "disabled={!canApproveExpense}"
@@ -219444,19 +219499,19 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 177,
+          "line": 180,
           "props": []
         },
         {
           "tag": "Field",
-          "line": 178,
+          "line": 181,
           "props": [
             "label=\"Weiterverrechnen\""
           ]
         },
         {
           "tag": "Select",
-          "line": 178,
+          "line": 181,
           "props": [
             "value={expenseBillable?'yes':'no'}",
             "onChange={e=>setExpenseBillable(e.target.value==='yes')}"
@@ -219464,38 +219519,38 @@
         },
         {
           "tag": "option",
-          "line": 178,
+          "line": 181,
           "props": [
             "value=\"no\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 178,
+          "line": 181,
           "props": []
         },
         {
           "tag": "option",
-          "line": 178,
+          "line": 181,
           "props": [
             "value=\"yes\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 178,
+          "line": 181,
           "props": []
         },
         {
           "tag": "Field",
-          "line": 179,
+          "line": 182,
           "props": [
             "label=\"Kunde\""
           ]
         },
         {
           "tag": "DirectorySelect",
-          "line": 179,
+          "line": 182,
           "props": [
             "label=\"Kunde\"",
             "required",
@@ -219506,7 +219561,7 @@
         },
         {
           "tag": "Field",
-          "line": 180,
+          "line": 183,
           "props": [
             "label=\"Beschreibung\"",
             "className=\"full\""
@@ -219514,7 +219569,7 @@
         },
         {
           "tag": "Textarea",
-          "line": 180,
+          "line": 183,
           "props": [
             "value={description}",
             "onChange={e=>setDescription(e.target.value)}",
@@ -219523,7 +219578,7 @@
         },
         {
           "tag": "ActionSheet",
-          "line": 184,
+          "line": 187,
           "props": [
             "label=\"Spesenaktionen\"",
             "open={expenseActions}",
@@ -219532,14 +219587,14 @@
         },
         {
           "tag": "section",
-          "line": 184,
+          "line": 187,
           "props": [
             "className=\"context-action-group\""
           ]
         },
         {
           "tag": "Button",
-          "line": 184,
+          "line": 187,
           "props": [
             "requiresWrite",
             "disabled={expenseBusy}",
@@ -219548,12 +219603,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 184,
+          "line": 187,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 184,
+          "line": 187,
           "props": [
             "requiresWrite",
             "variant=\"secondary\"",
@@ -219563,12 +219618,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 184,
+          "line": 187,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 184,
+          "line": 187,
           "props": [
             "requiresWrite",
             "variant=\"secondary\"",
@@ -219578,32 +219633,32 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 184,
+          "line": 187,
           "props": []
         },
         {
           "tag": "p",
-          "line": 184,
+          "line": 187,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 184,
+          "line": 187,
           "props": []
         },
         {
           "tag": "p",
-          "line": 184,
+          "line": 187,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 184,
+          "line": 187,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 184,
+          "line": 187,
           "props": [
             "variant=\"secondary\"",
             "onClick={()=>setReimbursementOpen(true)}"
@@ -219611,12 +219666,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 184,
+          "line": 187,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 184,
+          "line": 187,
           "props": [
             "href={'/rechnungen/neu?expenses='+encodeURIComponent(expenseId??'')}",
             "variant=\"secondary\""
@@ -219624,61 +219679,61 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 184,
+          "line": 187,
           "props": []
         },
         {
           "tag": "p",
-          "line": 184,
+          "line": 187,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 184,
+          "line": 187,
           "props": []
         },
         {
           "tag": "Link",
-          "line": 184,
+          "line": 187,
           "props": [
             "href=\"/spesen\""
           ]
         },
         {
           "tag": "Icon",
-          "line": 184,
+          "line": 187,
           "props": [
             "name=\"card\""
           ]
         },
         {
           "tag": "span",
-          "line": 184,
+          "line": 187,
           "props": []
         },
         {
           "tag": "b",
-          "line": 184,
+          "line": 187,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 184,
+          "line": 187,
           "props": []
         },
         {
           "tag": "small",
-          "line": 184,
+          "line": 187,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 184,
+          "line": 187,
           "props": []
         },
         {
           "tag": "Icon",
-          "line": 184,
+          "line": 187,
           "props": [
             "name=\"arrow\"",
             "size={15}"
@@ -219686,7 +219741,7 @@
         },
         {
           "tag": "AppShell",
-          "line": 187,
+          "line": 190,
           "props": [
             "titleIsUserContent={false}",
             "editing={!existing||editingExpense}",
@@ -219703,7 +219758,7 @@
         },
         {
           "tag": "Button",
-          "line": 187,
+          "line": 190,
           "props": [
             "variant=\"ghost\"",
             "icon=\"more\"",
@@ -219713,7 +219768,7 @@
         },
         {
           "tag": "FormSheet",
-          "line": 188,
+          "line": 191,
           "props": [
             "workspace",
             "label={existing?\"Spese bearbeiten\":\"Spese erfassen\"}",
@@ -219727,7 +219782,7 @@
         },
         {
           "tag": "Button",
-          "line": 188,
+          "line": 191,
           "props": [
             "variant=\"secondary\"",
             "onClick={close}"
@@ -219735,12 +219790,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 188,
+          "line": 191,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 188,
+          "line": 191,
           "props": [
             "requiresWrite",
             "disabled={expenseBusy||scanState===\"scanning\"}",
@@ -219749,12 +219804,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 188,
+          "line": 191,
           "props": []
         },
         {
           "tag": "FormSheet",
-          "line": 189,
+          "line": 192,
           "props": [
             "label={\"Erfolgte Erstattung erfassen\"}",
             "description={\"Die Zahlung muss bereits erfolgt sein. Es wird keine Überweisung ausgelöst.\"}",
@@ -219768,14 +219823,14 @@
         },
         {
           "tag": "Field",
-          "line": 189,
+          "line": 192,
           "props": [
             "label=\"Zahlungsreferenz\""
           ]
         },
         {
           "tag": "Input",
-          "line": 189,
+          "line": 192,
           "props": [
             "value={reimbursementRef}",
             "onChange={e=>setReimbursementRef(e.target.value)}"
@@ -219783,14 +219838,14 @@
         },
         {
           "tag": "FormActions",
-          "line": 189,
+          "line": 192,
           "props": [
             "sheet"
           ]
         },
         {
           "tag": "Button",
-          "line": 189,
+          "line": 192,
           "props": [
             "variant=\"secondary\"",
             "onClick={()=>setReimbursementOpen(false)}"
@@ -219798,12 +219853,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 189,
+          "line": 192,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 189,
+          "line": 192,
           "props": [
             "disabled={expenseBusy||!reimbursementRef.trim()}",
             "onClick={()=>void recordReimbursement()}"
@@ -219811,12 +219866,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 189,
+          "line": 192,
           "props": []
         },
         {
           "tag": "Toast",
-          "line": 190,
+          "line": 193,
           "props": [
             "title={toast}",
             "tone={[\"Spese und Beleg gespeichert.\",\"Spese gespeichert.\",\"Spese eingereicht.\",\"Erstattung erfasst.\"].includes(toast)?\"success\":\"danger\"}"
@@ -219825,246 +219880,258 @@
       ],
       "conditions": [
         {
-          "line": 39,
+          "line": 42,
           "expression": "existing"
         },
         {
-          "line": 43,
+          "line": 46,
           "expression": "existing"
         },
         {
-          "line": 51,
+          "line": 54,
           "expression": "existing"
         },
         {
-          "line": 68,
+          "line": 71,
           "expression": "expenseId"
         },
         {
-          "line": 72,
+          "line": 75,
           "expression": "existing&&expenseId"
         },
         {
-          "line": 75,
+          "line": 78,
           "expression": "existing&&expenseQuery.data&&!expenseQuery.data.item&&!expenseQuery.data.items?.[0]"
         },
         {
-          "line": 81,
+          "line": 84,
           "expression": "editedExpense||!expenseQuery.data"
         },
         {
-          "line": 82,
+          "line": 85,
           "expression": "!item"
         },
         {
-          "line": 83,
+          "line": 86,
           "expression": "!active"
         },
         {
-          "line": 84,
+          "line": 87,
           "expression": "item.reimbursed_at"
         },
         {
-          "line": 84,
+          "line": 87,
           "expression": "item.invoiced_invoice_id"
         },
         {
-          "line": 99,
+          "line": 102,
           "expression": "!value||[value.person,value.date,value.category,value.amount,value.currency,value.vatRate,value.merchant,value.description,value.status,value.expenseCustomer,value.createdExpenseId,value.requestKey].some(field=>typeof field!==\"string\"||field.length>4000)||typeof value.expenseBillable!==\"boolean\""
         },
         {
-          "line": 103,
+          "line": 106,
           "expression": "receiptScanPending.current||expenseMutationPending.current||lockedExpense||!file"
         },
         {
-          "line": 104,
+          "line": 107,
           "expression": "issue"
         },
         {
-          "line": 110,
+          "line": 113,
           "expression": "result.merchant"
         },
         {
-          "line": 110,
+          "line": 113,
           "expression": "result.date"
         },
         {
-          "line": 110,
+          "line": 113,
           "expression": "typeof result.total===\"number\""
         },
         {
-          "line": 110,
+          "line": 113,
           "expression": "result.currency"
         },
         {
-          "line": 111,
+          "line": 114,
           "expression": "result.filename"
         },
         {
-          "line": 114,
+          "line": 117,
           "expression": "error instanceof Error"
-        },
-        {
-          "line": 118,
-          "expression": "expenseMutationPending.current||receiptScanPending.current||lockedExpense||loadingExpense||expenseLoadError||!existing&&!expenseRecovery.ready"
-        },
-        {
-          "line": 120,
-          "expression": "expenseBillable&&!expenseCustomer"
         },
         {
           "line": 121,
+          "expression": "expenseMutationPending.current||receiptScanPending.current||lockedExpense||loadingExpense||expenseLoadError||!existing&&!expenseRecovery.ready"
+        },
+        {
+          "line": 123,
+          "expression": "expenseBillable&&!expenseCustomer"
+        },
+        {
+          "line": 124,
           "expression": "!Number.isFinite(value)||value<=0"
         },
         {
-          "line": 127,
+          "line": 130,
           "expression": "targetExpenseId"
         },
         {
-          "line": 128,
+          "line": 131,
           "expression": "receiptFile"
         },
         {
-          "line": 132,
+          "line": 135,
           "expression": "!expenseRequestKey.current"
         },
         {
-          "line": 137,
+          "line": 140,
           "expression": "receiptFile&&targetExpenseId&&!receiptUploaded"
         },
         {
-          "line": 146,
+          "line": 149,
           "expression": "receiptFile"
         },
         {
-          "line": 146,
+          "line": 149,
           "expression": "existing"
         },
         {
-          "line": 150,
+          "line": 153,
           "expression": "error instanceof Error"
         },
         {
-          "line": 155,
+          "line": 158,
           "expression": "expenseMutationPending.current||!expenseId"
         },
         {
-          "line": 155,
+          "line": 158,
           "expression": "e instanceof Error"
         },
         {
-          "line": 158,
+          "line": 161,
           "expression": "selectedEmployee"
         },
         {
-          "line": 159,
+          "line": 162,
           "expression": "existing&&(loadingExpense||expenseLoadError)"
         },
         {
-          "line": 159,
+          "line": 162,
           "expression": "expenseLoadError"
         },
         {
-          "line": 159,
+          "line": 162,
           "expression": "loadingExpense"
         },
         {
-          "line": 160,
+          "line": 163,
           "expression": "existing"
         },
         {
-          "line": 162,
+          "line": 165,
           "expression": "savedExpense"
         },
         {
-          "line": 164,
+          "line": 167,
           "expression": "existing"
-        },
-        {
-          "line": 166,
-          "expression": "scanState===\"scanning\""
-        },
-        {
-          "line": 166,
-          "expression": "scanState===\"scanning\""
-        },
-        {
-          "line": 166,
-          "expression": "receiptFile"
-        },
-        {
-          "line": 166,
-          "expression": "scanState===\"done\""
-        },
-        {
-          "line": 166,
-          "expression": "scanConfidence!==null"
-        },
-        {
-          "line": 166,
-          "expression": "scanState===\"error\""
         },
         {
           "line": 169,
+          "expression": "scanState===\"scanning\""
+        },
+        {
+          "line": 169,
+          "expression": "scanState===\"scanning\""
+        },
+        {
+          "line": 169,
+          "expression": "receiptFile"
+        },
+        {
+          "line": 169,
+          "expression": "scanState===\"done\""
+        },
+        {
+          "line": 169,
+          "expression": "scanConfidence!==null"
+        },
+        {
+          "line": 169,
+          "expression": "scanState===\"error\""
+        },
+        {
+          "line": 172,
           "expression": "existing&&!editingExpense"
         },
         {
-          "line": 178,
+          "line": 181,
           "expression": "expenseBillable"
         },
         {
-          "line": 184,
+          "line": 187,
           "expression": "canApproveExpense"
         },
         {
-          "line": 184,
+          "line": 187,
           "expression": "reimbursedAt"
         },
         {
-          "line": 187,
-          "expression": "existing"
-        },
-        {
-          "line": 187,
-          "expression": "existing"
-        },
-        {
-          "line": 187,
-          "expression": "status===\"Genehmigt\"||status===\"Verbucht\""
-        },
-        {
-          "line": 187,
-          "expression": "status===\"Abgelehnt\""
-        },
-        {
-          "line": 187,
-          "expression": "status===\"Eingereicht\""
-        },
-        {
-          "line": 187,
-          "expression": "existing"
-        },
-        {
-          "line": 187,
-          "expression": "existing&&!editingExpense"
-        },
-        {
-          "line": 188,
-          "expression": "existing&&!editingExpense"
-        },
-        {
-          "line": 188,
-          "expression": "existing"
-        },
-        {
-          "line": 188,
+          "line": 190,
           "expression": "existing"
         },
         {
           "line": 190,
+          "expression": "existing"
+        },
+        {
+          "line": 190,
+          "expression": "status===\"Genehmigt\"||status===\"Verbucht\""
+        },
+        {
+          "line": 190,
+          "expression": "status===\"Abgelehnt\""
+        },
+        {
+          "line": 190,
+          "expression": "status===\"Eingereicht\""
+        },
+        {
+          "line": 190,
+          "expression": "existing"
+        },
+        {
+          "line": 190,
+          "expression": "existing&&!editingExpense"
+        },
+        {
+          "line": 191,
+          "expression": "existing&&!editingExpense"
+        },
+        {
+          "line": 191,
+          "expression": "existing"
+        },
+        {
+          "line": 191,
+          "expression": "existing"
+        },
+        {
+          "line": 193,
           "expression": "[\"Spese und Beleg gespeichert.\",\"Spese gespeichert.\",\"Spese eingereicht.\",\"Erstattung erfasst.\"].includes(toast)"
         }
       ]
+    },
+    {
+      "key": "lib/display-format.ts#formatTimestampDate",
+      "file": "lib/display-format.ts",
+      "name": "formatTimestampDate",
+      "line": 26,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": []
     },
     {
       "key": "app/spesen/neu/page.tsx#Page",
@@ -220106,24 +220173,24 @@
       "key": "components/pages/expenses.tsx#ExpensesPage",
       "file": "components/pages/expenses.tsx",
       "name": "ExpensesPage",
-      "line": 24,
+      "line": 26,
       "classes": [],
       "apis": [],
       "collections": [],
       "widgets": [
         {
           "tag": "RecordsControls",
-          "line": 29
+          "line": 31
         },
         {
           "tag": "RecordsView",
-          "line": 30
+          "line": 32
         }
       ],
       "elements": [
         {
           "tag": "AppShell",
-          "line": 29,
+          "line": 31,
           "props": [
             "title=\"Spesen\"",
             "subtitle={loading?undefined:`${total} Spesen`}",
@@ -220133,7 +220200,7 @@
         },
         {
           "tag": "RecordsControls",
-          "line": 29,
+          "line": 31,
           "props": [
             "controller={controller}",
             "placeholder=\"Spesen suchen...\"",
@@ -220143,7 +220210,7 @@
         },
         {
           "tag": "CreateAction",
-          "line": 29,
+          "line": 31,
           "props": [
             "href=\"/spesen/neu\"",
             "label=\"Spese erfassen\""
@@ -220151,7 +220218,7 @@
         },
         {
           "tag": "RecordsView",
-          "line": 30,
+          "line": 32,
           "props": [
             "controller={controller}",
             "toolbarActions={false}",
@@ -220170,7 +220237,7 @@
         },
         {
           "tag": "RecordRow",
-          "line": 30,
+          "line": 32,
           "props": [
             "href={\"/spesen/\"+id}",
             "icon=\"card\"",
@@ -220183,15 +220250,15 @@
       ],
       "conditions": [
         {
-          "line": 29,
+          "line": 31,
           "expression": "loading"
         },
         {
-          "line": 30,
+          "line": 32,
           "expression": "row[4]"
         },
         {
-          "line": 30,
+          "line": 32,
           "expression": "statusMaybe"
         }
       ]
@@ -228599,7 +228666,7 @@
     {
       "file": "components/pages/expenses.tsx",
       "name": "ExpensesPage",
-      "line": 24,
+      "line": 26,
       "usedBy": [
         "/spesen"
       ],
@@ -228608,7 +228675,7 @@
     {
       "file": "components/pages/expenses.tsx",
       "name": "ExpenseForm",
-      "line": 34,
+      "line": 36,
       "usedBy": [
         "/spesen/[id]",
         "/spesen/neu"
