@@ -7,6 +7,7 @@ import ts from 'typescript';
 import {PGlite} from '@electric-sql/pglite';
 import {pgcrypto} from '@electric-sql/pglite/contrib/pgcrypto';
 import {verifySupplierContract} from './supplier-contract.mjs';
+import {verifyExpensePaymentContract} from './expense-payment-contract.mjs';
 
 // Execute the actual routes, repository, authorization, SQL and audit against
 // migrated PostgreSQL/RLS. Replace only session/connection boundaries, never SQL.
@@ -144,6 +145,7 @@ try{
  auditFailure=true;assert.equal((await routes.POST(request({...input,lastName:'Rollback'}))).status,500);auditFailure=false;
  assert.equal((await transaction(org,session.userId,c=>c.query('select count(*)::int n from employees'))).rows[0].n,employeeCount,'Failed create audit rolls back employee and replay receipt');
  await verifySupplierContract({load,db,transaction,org,other,act,request,setAuditFailure:value=>{auditFailure=value;}});
+ await verifyExpensePaymentContract({load,db,transaction,org,other,act,request,setAuditFailure:value=>{auditFailure=value;}});
  mock('lib/server/maintenance.ts',{maintenanceState:async()=>({enabled:false,endsAt:null})});
  const proxy=load('proxy.ts'),headers=await load('next.config.ts').default.headers();
  assert.ok(proxy.config.matcher.includes('/lieferanten/:path*'),'Supplier pages are in the actual proxy matcher');

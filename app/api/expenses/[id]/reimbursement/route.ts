@@ -13,6 +13,7 @@ export async function POST(request:NextRequest,{params}:{params:Promise<{id:stri
   const row=(await c.query('select * from expenses where organization_id=$1 and id::text=$2 and archived_at is null for update',[s.organizationId,id])).rows[0];
   if(!row)throw new ApiError(404,'not_found','Spese wurde nicht gefunden.');
   if(row.reimbursed_at){if(row.reimbursement_reference===reference)return row;throw new ApiError(409,'already_reimbursed','Diese Spese ist bereits als erstattet erfasst.');}
+  if(row.payment_kind!=='private')throw new ApiError(409,'private_payment_required','Nur nachweislich privat bezahlte Spesen können erstattet werden.');
   if(!['approved','posted'].includes(row.status))throw new ApiError(409,'approval_required','Nur genehmigte Spesen können als erstattet erfasst werden.');
   const result=(await c.query('update expenses set reimbursed_at=now(),reimbursed_by_user_id=$3,reimbursement_reference=$4,updated_at=now() where organization_id=$1 and id=$2 returning id,reimbursed_at,reimbursement_reference',[s.organizationId,row.id,s.userId,reference])).rows[0];
   await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'expense.reimbursement_recorded',entityType:'expenses',entityId:row.id,metadata:{reference,amount:Number(row.quantity)*Number(row.unit_price)}});return result;

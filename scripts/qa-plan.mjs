@@ -51,7 +51,7 @@ export function planChanges(files,{level='standard'}={}){
  let dependencyRoutes=[];try{const catalog=JSON.parse(fs.readFileSync('docs/architecture/ux-inventory.json','utf8'));dependencyRoutes=catalog.routes.filter(r=>modulePaths.some(p=>r.components.some(c=>c.startsWith(p+'#')))).map(r=>r.route).filter(r=>!r.startsWith('/preview')&&!r.startsWith('/operator')).map(r=>r.replace('[id]',r.startsWith('/kunden')?'customer-one':r.startsWith('/produkte')?'product-one':r.startsWith('/mitarbeiter')?'employee-one':r.startsWith('/lieferanten')?'supplier-one':r.startsWith('/spesen')?'expense-one':r.startsWith('/zahlungen')?'payment-one':r.startsWith('/support')?'ticket-one':r.startsWith('/rechnungen')?'RE-TEST-1':'AN-TEST-1'));}catch{}
  const routes=full?fullRoutes:broad?representative:modulePaths.length&&dependencyRoutes.length?[...new Set([...dependencyRoutes,...matched.flatMap(g=>g.routes).filter(r=>r.startsWith('/einstellungen/zeiterfassung'))])]:[...new Set(matched.flatMap(g=>g.routes))];
  const suites=new Set();
- if(paths.some(p=>/employee|employment|mitarbeiter|supplier|lieferanten|lib\/server\/(database|repositories\/business-api)\.ts/.test(p)))suites.add('employee-dossier-test');
+ if(paths.some(p=>/employee|employment|mitarbeiter|supplier|lieferanten|expense|spesen|lib\/server\/(database|repositories\/business-api)\.ts/.test(p)))suites.add('employee-dossier-test');
  if(global||paths.some(p=>/customer|kunden|business-api|financial/.test(p)))suites.add('customer-financial-projection-test');
  if(global||infrastructure){suites.add('ux-contract-check');suites.add('foundation-integration-test');}
  if(paths.some(p=>/process-draft/.test(p)))suites.add('process-draft-test');

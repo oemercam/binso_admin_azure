@@ -26,3 +26,7 @@ Prüfstrategie: gezielte risikogerechte Regressionen am Ende eines zusammenhäng
 - Für Migration0085 vor späterem produktivem Rollout: Schema-/Runtimegrants und RLS prüfen, Backup/Restore und additive Upgradefolge qualifizieren. Fachliche Korrektur erzeugt neue Revision; historisches Löschen ist kein normaler App-Vorgang. Ein Rollback auf vor0084 benötigt explizite Prüfung inzwischen gespeicherter NULL-E-Mails; keine destruktive automatisierte Down-Migration.
 
 Dieser Block ist kein Abschluss von V26. Weitere Pakete bleiben offen. Ein grüner lokaler Test ersetzt weder native PostgreSQL-/HTTP-/CI- noch gerenderte Abnahme am später veröffentlichten SHA.
+
+## Zweiter lokaler Entwicklungsblock
+
+P29: bestehende Spesen/API/Formular um ausdrücklich gewählte Zahlungsquelle ergänzt (privat/Firmenkarte/direkt Firma/ungeklärt). Keine Bestandsklassifikation; ausgelassene Felder alter Clients erhalten den Stand. Erstattungsanspruch wird aus Quelle, Review und tatsächlicher Erstattung abgeleitet, unabhängig von Weiterverrechnung. API und DB blockieren neue Nicht-Privat-Erstattungen sowie Quellenänderung bei Review/gesperrten Belegen. Migration0087 nur isoliert. Gezielte tatsächliche Routen-/SQL-/RLS-Prüfungen inklusive Replay, Rollen, Tenant, unabhängiger Freigabe und Auditrollback bestehen. Typecheck besteht; Browserfall erweitert, Ausführung weiterhin offen. Kein Push/Deployment. P30 Zahlungsdatum/Betragsabgleich und Fresh-Auth folgen als getrennte Scheibe.

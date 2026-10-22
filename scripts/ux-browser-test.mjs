@@ -1012,7 +1012,7 @@ try{
   }
   if(hasInteraction('expenses')){
   failMutation=true;posts=0;uploads=0;
-  await page.waitForLoadState("networkidle");await navigate(base+'/spesen/neu');await page.waitForLoadState('networkidle');await page.getByLabel('Händler',{exact:true}).fill('SBB');await page.getByLabel('Betrag',{exact:true}).fill('89');
+  await page.waitForLoadState("networkidle");await navigate(base+'/spesen/neu');await page.waitForLoadState('networkidle');await page.getByLabel('Händler',{exact:true}).fill('SBB');await page.getByLabel('Betrag',{exact:true}).fill('89');await page.getByLabel('Bezahlt mit',{exact:true}).selectOption('company_card');
   await page.locator('#expense-receipt-upload').setInputFiles({name:'receipt.png',mimeType:'image/png',buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jB1kAAAAASUVORK5CYII=','base64')});
   await page.waitForFunction(()=>[...document.querySelectorAll('button')].some(button=>button.textContent==='Einreichen'&&button.disabled));
   assert.equal(await page.getByRole('button',{name:'Einreichen',exact:true}).filter({visible:true}).first().isEnabled(),false,'Cannot submit while receipt recognition is running');
@@ -1021,6 +1021,7 @@ try{
   await page.getByRole('button',{name:'Einreichen',exact:true}).filter({visible:true}).first().dblclick();
   await page.getByText('Fixture offline',{exact:true}).waitFor();assert.equal(posts,1,'Two rapid clicks must issue one expense write');
   assert.equal(Number(await appControlValue(page.getByLabel('Betrag',{exact:true}))),89,'Failed submission preserves input');
+  assert.equal(await appControlValue(page.getByLabel('Bezahlt mit',{exact:true})),'company_card','Failed submission preserves explicit payer');
   failMutation=false;await page.getByRole('button',{name:'Einreichen',exact:true}).filter({visible:true}).first().click();
   await waitForLocalizedRoute(page,base+'/spesen');await page.locator('.mobile-record-list').getByText('SBB',{exact:true}).waitFor();await page.waitForLoadState('networkidle');assert.equal(posts,2,'Failed expense write can be retried');assert.equal(uploads,1,'Receipt is uploaded once after a successful expense save');
   }

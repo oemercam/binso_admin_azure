@@ -1,8 +1,9 @@
 import { NextRequest } from "next/server";
 import { ApiError, apiError, assertSameOrigin, cleanText, json, readJson } from "@/lib/server/http";
 import { tenantInsert, tenantList, tenantListPage, requireTenantFeature } from "@/lib/server/database";
+import {isExpensePaymentKind} from '@/lib/expense-payment';
 
-type ExpenseBody={employeeId?:unknown;employeeName?:unknown;merchant?:unknown;expenseDate?:unknown;category?:unknown;amount?:unknown;currency?:unknown;vatRate?:unknown;description?:unknown;status?:unknown;customerId?:unknown;billable?:unknown};
+type ExpenseBody={paymentKind?:unknown;employeeId?:unknown;employeeName?:unknown;merchant?:unknown;expenseDate?:unknown;category?:unknown;amount?:unknown;currency?:unknown;vatRate?:unknown;description?:unknown;status?:unknown;customerId?:unknown;billable?:unknown};
 
 export async function GET(request:NextRequest){
   try{
@@ -15,6 +16,7 @@ export async function POST(request:NextRequest){
     const tenant=await requireTenantFeature("expenses");
     assertSameOrigin(request);
     const body=await readJson<ExpenseBody>(request,16384);
+    if(body.paymentKind!==undefined&&!isExpensePaymentKind(body.paymentKind))throw new ApiError(400,'payment_kind_invalid','Bitte eine gültige Zahlungsart wählen.');
     if(["approved","rejected"].includes(String(body.status))&&!["owner","admin","project_manager","manager"].includes(tenant.role))throw new ApiError(403,"approval_forbidden","Nur berechtigte Personen können Spesen genehmigen oder ablehnen.");
     if(["approved","rejected"].includes(String(body.status)))throw new ApiError(409,"submission_required","Die Spese muss zuerst eingereicht und anschließend geprüft werden.");
     const merchant=cleanText(body.merchant,200);
@@ -30,7 +32,7 @@ export async function POST(request:NextRequest){
       const matches=await tenantList<{id:string}>("employees","id","first_name=eq."+encodeURIComponent(firstName)+"&last_name=eq."+encodeURIComponent(lastName)+"&limit=1");
       employeeId=matches[0]?.id??null;
     }
-    const rows=await tenantInsert("expenses",{customer_id:cleanText(body.customerId,80)||null,billable:body.billable===true,employee_id:employeeId,merchant,expense_date:cleanText(body.expenseDate,20)||new Date().toISOString().slice(0,10),category:cleanText(body.category,120)||null,amount,currency:cleanText(body.currency,3)||"CHF",vat_rate:Number.isFinite(vatRate)?vatRate:8.1,description:cleanText(body.description,2000)||null,status:["draft","submitted","approved","rejected"].includes(String(body.status))?String(body.status):"draft"},request.headers?.get("Idempotency-Key")?.slice(0,128)||undefined);
+    const rows=await tenantInsert("expenses",{customer_id:cleanText(body.customerId,80)||null,billable:body.billable===true,payment_kind:body.paymentKind??'unknown',employee_id:employeeId,merchant,expense_date:cleanText(body.expenseDate,20)||new Date().toISOString().slice(0,10),category:cleanText(body.category,120)||null,amount,currency:cleanText(body.currency,3)||"CHF",vat_rate:Number.isFinite(vatRate)?vatRate:8.1,description:cleanText(body.description,2000)||null,status:["draft","submitted","approved","rejected"].includes(String(body.status))?String(body.status):"draft"},request.headers?.get("Idempotency-Key")?.slice(0,128)||undefined);
     return json({item:rows[0]},201);
   }catch(error){return apiError(error);}
 }

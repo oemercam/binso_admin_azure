@@ -1,4 +1,11 @@
 {
+  "Bezahlt mit": ["Paid with","Payé avec","Pagato con"],
+  "Zahlungsart ungeklärt": ["Payment source unresolved","Mode de paiement à clarifier","Modalità di pagamento da chiarire"],
+  "Privat bezahlt": ["Paid personally","Payé à titre privé","Pagato privatamente"],
+  "Firmenkarte": ["Company card","Carte de société","Carta aziendale"],
+  "Direkt durch die Firma bezahlt": ["Paid directly by the company","Payé directement par la société","Pagato direttamente dall’azienda"],
+  "Bitte eine gültige Zahlungsart wählen.": ["Please select a valid payment source.","Veuillez choisir un mode de paiement valide.","Seleziona una modalità di pagamento valida."],
+  "Nur nachweislich privat bezahlte Spesen können erstattet werden.": ["Only expenses explicitly paid personally can be reimbursed.","Seuls les frais explicitement payés à titre privé peuvent être remboursés.","Possono essere rimborsate solo le spese esplicitamente pagate privatamente."],
   "Lieferanten suchen...": ["Search suppliers...", "Rechercher des fournisseurs...", "Cerca fornitori..."],
   "Lieferant hinzufügen": ["Add supplier", "Ajouter un fournisseur", "Aggiungi fornitore"],
   "Lieferant bearbeiten": ["Edit supplier", "Modifier le fournisseur", "Modifica fornitore"],
