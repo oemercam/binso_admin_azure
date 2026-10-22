@@ -203536,6 +203536,16 @@
           ]
         },
         {
+          "tag": "small",
+          "line": 644,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 644,
+          "props": []
+        },
+        {
           "tag": "div",
           "line": 645,
           "props": [
@@ -203792,6 +203802,16 @@
             "value={item.price}",
             "onChange={e=>setPositionDraft({...item,price:e.target.value})}"
           ]
+        },
+        {
+          "tag": "small",
+          "line": 652,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 652,
+          "props": []
         },
         {
           "tag": "DiscountFields",
@@ -204105,6 +204125,10 @@
         {
           "line": 592,
           "expression": "item.timeAllocations?.length===1"
+        },
+        {
+          "line": 592,
+          "expression": "capacity.loading||capacity.error"
         },
         {
           "line": 593,
