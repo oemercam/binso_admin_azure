@@ -26,10 +26,10 @@ export async function timeWorkspace(c:PoolClient,s:SessionUser,params:URLSearchP
  if(params.get('projectLabel'))where.push('coalesce(p.name,t.project_label,t.description)='+bind(params.get('projectLabel')));
  if(query)where.push("concat_ws(' ',c.name,coalesce(p.name,t.project_label),coalesce(nullif(concat_ws(' ',e.first_name,e.last_name),''),t.person_name),t.description) ilike "+bind('%'+query.replace(/[\\%_]/g,'\\$&')+'%'));
  const joins='from time_entries t left join projects p on p.id=t.project_id and p.organization_id=t.organization_id left join customers c on c.id=t.customer_id and c.organization_id=t.organization_id left join employees e on e.id=t.employee_id and e.organization_id=t.organization_id where '+where.join(' and ');
- const totals=(await c.query('select count(*)::int total,coalesce(sum(round(t.hours*60)),0) total_minutes '+joins,values)).rows[0];
+ const totals=(await c.query('select count(*)::int total,coalesce(sum(coalesce(t.recorded_duration_minutes,round(t.hours*60))),0) total_minutes '+joins,values)).rows[0];
  const pageValues=[...values,limit,offset];
  const items=(await c.query(`select t.id,coalesce(p.name,t.project_label,t.description) project_name,t.description,t.employee_id,t.customer_id,t.project_id,
- t.work_date::text started_at,round(t.hours*60) duration_minutes,t.hours,t.billable,t.approved,t.submitted_at,t.invoiced_invoice_id,t.sales_rate,t.report_month,t.review_note,t.created_by_user_id,t.created_at,
+ t.external_resource_id,t.external_assignment_id,t.time_category,t.is_work_time,t.payroll_relevant,t.work_date::text started_at,coalesce(t.recorded_duration_minutes,round(t.hours*60)) duration_minutes,t.hours,t.billable,t.approved,t.submitted_at,t.invoiced_invoice_id,t.sales_rate,t.report_month,t.review_note,t.created_by_user_id,t.created_at,
  c.name customer_name,coalesce(nullif(concat_ws(' ',e.first_name,e.last_name),''),t.person_name) employee_name
  ${joins} order by t.work_date desc,t.created_at desc,t.id desc limit $${values.length+1} offset $${values.length+2}`,pageValues)).rows;
  const visibleItems=s.moduleProfile==='time_only'?items.map(({sales_rate: _rate,...item})=>item):items;
