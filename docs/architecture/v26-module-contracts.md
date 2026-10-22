@@ -45,3 +45,7 @@ Titel, Modul und Rollenzuordnung weiter aus `lib/modules.ts`/`permissions.ts`/`p
 ## Fachentscheidungen und sichere Fortsetzung
 
 F01/F02 wurden nach der Planung ausdrücklich bestätigt: bestehende Preise/Bestandsmodule, zusätzliche HR-/Payroll-Fachgrants und separate eigene Lohnabrechnungen. Siehe tatsächlicher Fortschritt und Entscheidungsprotokoll in v26-execution.md. F03–F10 bleiben sichtbar. Keine abweichende Provisionierung, keine implizite Feiertags-/Lohn-/Steuerregel und keine neuen bezahlten Dienste. Existierende Mitarbeiter-Basisrechte werden erhalten; neue sensible Funktionen bleiben serverseitig gesperrt. Sichere Stamm-/Schnittstellenarbeit kann weitergehen.
+
+## Implementierter Lohnvertragsowner (P06)
+
+`employee_wage_definitions` ergänzt die bestehende employee-/Anstellungsidentität; die allgemeine Mitarbeiterprojektion liefert keine Lohnbeträge. `/api/employees/[id]/wages` und revisionsbezogenes PATCH verlangen persistierte `hr_sensitive:read/write`, bestehendes Personalentitlement sowie bei Mutation Fresh-Auth. Künftige Payroll übernimmt nur ausdrücklich validierte Definition-/Anstellungsrevisionen über einen fachlich freigegebenen Adapter, niemals Beträge aus allgemeinen DTOs oder alte pauschale Stammdaten. Finanz-/Familien-/Self-Service-Grants bleiben getrennt. Ein einfacher Auszahlungstag und 13.-Auszahlungsmonat sind Vertragsmetadaten und lösen weder Abrechnung noch Zahlung aus. Geteilte 13.-Auszahlungen/zeitanteilige Berechnung benötigen den späteren fachlichen Vertrag, keine automatische 12-/13-Division.

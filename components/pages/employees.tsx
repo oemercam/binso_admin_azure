@@ -12,6 +12,8 @@ import {useDirtySnapshot} from "../use-dirty-snapshot";
 import {FormWizard} from "../form-wizard";
 import {Avatar} from "../avatar";
 import {EmploymentPeriods} from '../employment-periods';
+import {WageDefinitions} from '../wage-definitions';
+import type {SensitiveCapability} from '@/lib/sensitive-access';
 
 import { formatQuantity, timeMetadata } from "@/lib/display-format";
 import { formatCurrency } from "@/lib/financial-status";
@@ -57,7 +59,7 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
   const [address,setAddress]=useState("");
   const [status,setStatus]=useState("Aktiv");
   const [wizardStep,setWizardStep]=useState(0);
-  const [employeeTab,setEmployeeTab]=useState<"overview"|"employment"|"time"|"expenses"|"documents">("overview");
+  const [employeeTab,setEmployeeTab]=useState<"overview"|"employment"|"wages"|"time"|"expenses"|"documents">("overview");
   const [toast,setToast]=useState<string|null>(null);
   const recordQuery=useApiQuery<{item?:Record<string,unknown>;items?:Record<string,unknown>[]}>(existing&&employeeId?("/api/employees/"+encodeURIComponent(employeeId)):null);
   const loadingRecord=recordQuery.loading;
@@ -71,7 +73,9 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
   const actor=useApiQuery<{tenant?:{role?:string}}>('/api/auth/session');
   const tenantRole=actor.data?.tenant?.role??'';
   const mayReadTime=tenantCan(tenantRole,'time:read'),mayReadExpenses=tenantCan(tenantRole,'expenses:read');
-  const activeEmployeeTab=employeeTab==='time'&&!mayReadTime||employeeTab==='expenses'&&!mayReadExpenses?'overview':employeeTab;
+  const sensitiveAccess=useApiQuery<{capabilities:SensitiveCapability[]}>(existing?'/api/auth/sensitive-access':null);
+  const mayReadWages=sensitiveAccess.data?.capabilities.includes('hr_sensitive:read')??false,mayWriteWages=sensitiveAccess.data?.capabilities.includes('hr_sensitive:write')??false;
+  const activeEmployeeTab=employeeTab==='time'&&!mayReadTime||employeeTab==='expenses'&&!mayReadExpenses||employeeTab==='wages'&&!mayReadWages?'overview':employeeTab;
   const times=useApiQuery<{items:Array<{id:string;started_at:string;duration_minutes:number;project_name:string;description?:string;approved?:boolean;billable?:boolean;invoiced_invoice_id?:string|null}>;total?:number}>(existing&&employeeId&&activeEmployeeTab==='time'&&mayReadTime?'/api/time-entries?limit=50&employeeId='+encodeURIComponent(employeeId):null);
   const expenses=useApiQuery<{items:Array<{id:string;merchant:string;amount:number;currency?:string;expense_date:string;status?:string}>;total?:number}>(existing&&employeeId&&activeEmployeeTab==='expenses'&&mayReadExpenses?'/api/expenses?limit=50&employeeId='+encodeURIComponent(employeeId):null);
   const ledger={times:times.data?.items??[],expenses:expenses.data?.items??[]};
@@ -142,11 +146,13 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
     {existing && <DetailTabs role="tablist" label="Mitarbeiterbereiche">
       <button role="tab" aria-selected={activeEmployeeTab==="overview"} className={activeEmployeeTab==="overview"?"active":""} onClick={()=>setEmployeeTab("overview")}><LocalizedText>{"Übersicht"}</LocalizedText></button>
       <button role="tab" aria-selected={activeEmployeeTab==="employment"} className={activeEmployeeTab==="employment"?"active":""} onClick={()=>setEmployeeTab('employment')}><LocalizedText>{'Anstellung'}</LocalizedText></button>
+      {mayReadWages&&<button role="tab" aria-selected={activeEmployeeTab==='wages'} className={activeEmployeeTab==='wages'?'active':''} onClick={()=>setEmployeeTab('wages')}><LocalizedText>{'Lohnvertrag'}</LocalizedText></button>}
       {mayReadTime&&<button role="tab" aria-selected={activeEmployeeTab==="time"} className={activeEmployeeTab==="time"?"active":""} onClick={()=>setEmployeeTab("time")}><LocalizedText>{"Arbeitszeit"}</LocalizedText></button>}
       {mayReadExpenses&&<button role="tab" aria-selected={activeEmployeeTab==="expenses"} className={activeEmployeeTab==="expenses"?"active":""} onClick={()=>setEmployeeTab("expenses")}><LocalizedText>{"Spesen"}</LocalizedText></button>}
       <button role="tab" aria-selected={activeEmployeeTab==="documents"} className={activeEmployeeTab==="documents"?"active":""} onClick={()=>setEmployeeTab("documents")}><LocalizedText>{"Dokumente"}</LocalizedText></button>
     </DetailTabs>}
     {existing&&employeeId&&activeEmployeeTab==='employment'&&<EmploymentPeriods employeeId={employeeId} mayWrite={tenantCan(tenantRole,'employees:write')} prefill={{startsOn:entryDate,endsOn:endDate,workloadPercent:load,weeklyHours,vacationDays,jobTitle:role,workLocation}}/>}
+    {existing&&employeeId&&activeEmployeeTab==='wages'&&mayReadWages&&<WageDefinitions employeeId={employeeId} mayWrite={mayWriteWages}/>}
     {(!existing||activeEmployeeTab==="overview")&&<div className="form-page" inert={savingRecord}>
       {!editingRecord?<><dl className="detail-list">
         <div><dt><LocalizedText>{"E-Mail"}</LocalizedText></dt><dd>{email?<a href={contactHref("email",email)}>{email}</a>:<LocalizedText>Keine E-Mail hinterlegt</LocalizedText>}</dd></div>

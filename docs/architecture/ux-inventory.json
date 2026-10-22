@@ -3196,6 +3196,100 @@
       ]
     },
     {
+      "route": "/api/employees/[id]/wages/[definitionId]",
+      "file": "app/api/employees/[id]/wages/[definitionId]/route.ts",
+      "methods": [
+        "PATCH"
+      ],
+      "imports": [
+        {
+          "local": "requireSession",
+          "target": "lib/server/session.ts",
+          "exported": "requireSession"
+        },
+        {
+          "local": "withTenant",
+          "target": "lib/server/db.ts",
+          "exported": "withTenant"
+        },
+        {
+          "local": "apiError",
+          "target": "lib/server/http.ts",
+          "exported": "apiError"
+        },
+        {
+          "local": "assertSameOrigin",
+          "target": "lib/server/http.ts",
+          "exported": "assertSameOrigin"
+        },
+        {
+          "local": "json",
+          "target": "lib/server/http.ts",
+          "exported": "json"
+        },
+        {
+          "local": "readJson",
+          "target": "lib/server/http.ts",
+          "exported": "readJson"
+        },
+        {
+          "local": "writeWageDefinition",
+          "target": "lib/server/repositories/wage-definitions.ts",
+          "exported": "writeWageDefinition"
+        }
+      ]
+    },
+    {
+      "route": "/api/employees/[id]/wages",
+      "file": "app/api/employees/[id]/wages/route.ts",
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "imports": [
+        {
+          "local": "requireSession",
+          "target": "lib/server/session.ts",
+          "exported": "requireSession"
+        },
+        {
+          "local": "withTenant",
+          "target": "lib/server/db.ts",
+          "exported": "withTenant"
+        },
+        {
+          "local": "apiError",
+          "target": "lib/server/http.ts",
+          "exported": "apiError"
+        },
+        {
+          "local": "assertSameOrigin",
+          "target": "lib/server/http.ts",
+          "exported": "assertSameOrigin"
+        },
+        {
+          "local": "json",
+          "target": "lib/server/http.ts",
+          "exported": "json"
+        },
+        {
+          "local": "readJson",
+          "target": "lib/server/http.ts",
+          "exported": "readJson"
+        },
+        {
+          "local": "listWageDefinitions",
+          "target": "lib/server/repositories/wage-definitions.ts",
+          "exported": "listWageDefinitions"
+        },
+        {
+          "local": "writeWageDefinition",
+          "target": "lib/server/repositories/wage-definitions.ts",
+          "exported": "writeWageDefinition"
+        }
+      ]
+    },
+    {
       "route": "/api/employees",
       "file": "app/api/employees/route.ts",
       "methods": [
@@ -87957,6 +88051,13 @@
         "components/employment-periods.tsx#Period",
         "components/ui.tsx#SectionTitle",
         "components/binso-ux.tsx#FormSheet",
+        "components/wage-definitions.tsx#WageDefinitions",
+        "components/wage-definitions.tsx#Wage",
+        "components/wage-definitions.tsx#Period",
+        "components/wage-definitions.tsx#Draft",
+        "components/wage-definitions.tsx#blank",
+        "components/wage-definitions.tsx#modelLabels",
+        "components/wage-definitions.tsx#basisLabels",
         "components/pages/shared.tsx#swissDate",
         "components/form-wizard.tsx#FormWizard",
         "components/ui.tsx#FormSection",
@@ -88045,6 +88146,8 @@
         "lib/permissions.ts#baseRead",
         "lib/permissions.ts#normalizeTenantRole",
         "lib/permissions.ts#universalTenantPermissions",
+        "lib/sensitive-access.ts#SensitiveCapability",
+        "lib/sensitive-access.ts#sensitiveCapabilities",
         "components/use-process-draft.ts#useProcessDraft",
         "lib/client/process-draft.ts#canonicalDraftProcess",
         "lib/client/process-draft.ts#draftScope",
@@ -88217,6 +88320,18 @@
         "lib/display-format.ts#formatTimestamp",
         "components/ui.tsx#SectionTitle",
         "components/binso-ux.tsx#FormSheet",
+        "components/wage-definitions.tsx#WageDefinitions",
+        "components/wage-definitions.tsx#Wage",
+        "lib/wage-definition.ts#WageModel",
+        "lib/wage-definition.ts#AnnualBasis",
+        "components/wage-definitions.tsx#Period",
+        "components/wage-definitions.tsx#Draft",
+        "components/wage-definitions.tsx#blank",
+        "lib/wage-definition.ts#WageDefinitionInput",
+        "lib/wage-definition.ts#wageDefinitionIssue",
+        "lib/wage-definition.ts#date",
+        "components/wage-definitions.tsx#modelLabels",
+        "components/wage-definitions.tsx#basisLabels",
         "lib/contact-links.ts#contactHref",
         "components/pages/shared.tsx#swissDate",
         "components/form-wizard.tsx#FormWizard",
@@ -88489,6 +88604,13 @@
         "components/employment-periods.tsx#Period",
         "components/ui.tsx#SectionTitle",
         "components/binso-ux.tsx#FormSheet",
+        "components/wage-definitions.tsx#WageDefinitions",
+        "components/wage-definitions.tsx#Wage",
+        "components/wage-definitions.tsx#Period",
+        "components/wage-definitions.tsx#Draft",
+        "components/wage-definitions.tsx#blank",
+        "components/wage-definitions.tsx#modelLabels",
+        "components/wage-definitions.tsx#basisLabels",
         "components/pages/shared.tsx#swissDate",
         "components/form-wizard.tsx#FormWizard",
         "components/ui.tsx#FormSection",
@@ -88597,6 +88719,8 @@
         "lib/permissions.ts#baseRead",
         "lib/permissions.ts#normalizeTenantRole",
         "lib/permissions.ts#universalTenantPermissions",
+        "lib/sensitive-access.ts#SensitiveCapability",
+        "lib/sensitive-access.ts#sensitiveCapabilities",
         "components/use-process-draft.ts#useProcessDraft",
         "lib/client/process-draft.ts#canonicalDraftProcess",
         "lib/client/process-draft.ts#draftScope",
@@ -88769,6 +88893,18 @@
         "lib/display-format.ts#formatTimestamp",
         "components/ui.tsx#SectionTitle",
         "components/binso-ux.tsx#FormSheet",
+        "components/wage-definitions.tsx#WageDefinitions",
+        "components/wage-definitions.tsx#Wage",
+        "lib/wage-definition.ts#WageModel",
+        "lib/wage-definition.ts#AnnualBasis",
+        "components/wage-definitions.tsx#Period",
+        "components/wage-definitions.tsx#Draft",
+        "components/wage-definitions.tsx#blank",
+        "lib/wage-definition.ts#WageDefinitionInput",
+        "lib/wage-definition.ts#wageDefinitionIssue",
+        "lib/wage-definition.ts#date",
+        "components/wage-definitions.tsx#modelLabels",
+        "components/wage-definitions.tsx#basisLabels",
         "lib/contact-links.ts#contactHref",
         "components/pages/shared.tsx#swissDate",
         "components/form-wizard.tsx#FormWizard",
@@ -89778,6 +89914,7 @@
       "data": [
         "/api/employees/",
         "/api/auth/session",
+        "/api/auth/sensitive-access",
         "/api/time-entries?limit=50&employeeId=",
         "/api/expenses?limit=50&employeeId=",
         "/api/employees",
@@ -89813,42 +89950,17 @@
       "widgets": [
         {
           "tag": "DetailTabs",
-          "line": 142,
+          "line": 146,
           "component": "components/pages/employees.tsx#EmployeeForm"
         },
         {
           "tag": "FormSheet",
-          "line": 160,
-          "component": "components/pages/employees.tsx#EmployeeForm"
-        },
-        {
-          "tag": "Field",
-          "line": 161,
-          "component": "components/pages/employees.tsx#EmployeeForm"
-        },
-        {
-          "tag": "Field",
-          "line": 162,
-          "component": "components/pages/employees.tsx#EmployeeForm"
-        },
-        {
-          "tag": "Field",
-          "line": 163,
-          "component": "components/pages/employees.tsx#EmployeeForm"
-        },
-        {
-          "tag": "Field",
-          "line": 164,
-          "component": "components/pages/employees.tsx#EmployeeForm"
-        },
-        {
-          "tag": "Field",
-          "line": 165,
-          "component": "components/pages/employees.tsx#EmployeeForm"
-        },
-        {
-          "tag": "Field",
           "line": 166,
+          "component": "components/pages/employees.tsx#EmployeeForm"
+        },
+        {
+          "tag": "Field",
+          "line": 167,
           "component": "components/pages/employees.tsx#EmployeeForm"
         },
         {
@@ -89878,12 +89990,37 @@
         },
         {
           "tag": "Field",
-          "line": 173,
+          "line": 174,
           "component": "components/pages/employees.tsx#EmployeeForm"
         },
         {
           "tag": "Field",
-          "line": 174,
+          "line": 175,
+          "component": "components/pages/employees.tsx#EmployeeForm"
+        },
+        {
+          "tag": "Field",
+          "line": 176,
+          "component": "components/pages/employees.tsx#EmployeeForm"
+        },
+        {
+          "tag": "Field",
+          "line": 177,
+          "component": "components/pages/employees.tsx#EmployeeForm"
+        },
+        {
+          "tag": "Field",
+          "line": 178,
+          "component": "components/pages/employees.tsx#EmployeeForm"
+        },
+        {
+          "tag": "Field",
+          "line": 179,
+          "component": "components/pages/employees.tsx#EmployeeForm"
+        },
+        {
+          "tag": "Field",
+          "line": 180,
           "component": "components/pages/employees.tsx#EmployeeForm"
         },
         {
@@ -90020,6 +90157,66 @@
           "tag": "Sheet",
           "line": 197,
           "component": "components/binso-ux.tsx#FormSheet"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 52,
+          "component": "components/wage-definitions.tsx#WageDefinitions"
+        },
+        {
+          "tag": "form",
+          "line": 53,
+          "component": "components/wage-definitions.tsx#WageDefinitions"
+        },
+        {
+          "tag": "Field",
+          "line": 54,
+          "component": "components/wage-definitions.tsx#WageDefinitions"
+        },
+        {
+          "tag": "Field",
+          "line": 55,
+          "component": "components/wage-definitions.tsx#WageDefinitions"
+        },
+        {
+          "tag": "Field",
+          "line": 56,
+          "component": "components/wage-definitions.tsx#WageDefinitions"
+        },
+        {
+          "tag": "Field",
+          "line": 56,
+          "component": "components/wage-definitions.tsx#WageDefinitions"
+        },
+        {
+          "tag": "Field",
+          "line": 57,
+          "component": "components/wage-definitions.tsx#WageDefinitions"
+        },
+        {
+          "tag": "Field",
+          "line": 57,
+          "component": "components/wage-definitions.tsx#WageDefinitions"
+        },
+        {
+          "tag": "Field",
+          "line": 58,
+          "component": "components/wage-definitions.tsx#WageDefinitions"
+        },
+        {
+          "tag": "Field",
+          "line": 58,
+          "component": "components/wage-definitions.tsx#WageDefinitions"
+        },
+        {
+          "tag": "Field",
+          "line": 59,
+          "component": "components/wage-definitions.tsx#WageDefinitions"
+        },
+        {
+          "tag": "Field",
+          "line": 60,
+          "component": "components/wage-definitions.tsx#WageDefinitions"
         },
         {
           "tag": "ListRow",
@@ -90295,6 +90492,13 @@
         "components/employment-periods.tsx#Period",
         "components/ui.tsx#SectionTitle",
         "components/binso-ux.tsx#FormSheet",
+        "components/wage-definitions.tsx#WageDefinitions",
+        "components/wage-definitions.tsx#Wage",
+        "components/wage-definitions.tsx#Period",
+        "components/wage-definitions.tsx#Draft",
+        "components/wage-definitions.tsx#blank",
+        "components/wage-definitions.tsx#modelLabels",
+        "components/wage-definitions.tsx#basisLabels",
         "components/pages/shared.tsx#swissDate",
         "components/form-wizard.tsx#FormWizard",
         "components/ui.tsx#FormSection",
@@ -90383,6 +90587,8 @@
         "lib/permissions.ts#baseRead",
         "lib/permissions.ts#normalizeTenantRole",
         "lib/permissions.ts#universalTenantPermissions",
+        "lib/sensitive-access.ts#SensitiveCapability",
+        "lib/sensitive-access.ts#sensitiveCapabilities",
         "components/use-process-draft.ts#useProcessDraft",
         "lib/client/process-draft.ts#canonicalDraftProcess",
         "lib/client/process-draft.ts#draftScope",
@@ -90555,6 +90761,18 @@
         "lib/display-format.ts#formatTimestamp",
         "components/ui.tsx#SectionTitle",
         "components/binso-ux.tsx#FormSheet",
+        "components/wage-definitions.tsx#WageDefinitions",
+        "components/wage-definitions.tsx#Wage",
+        "lib/wage-definition.ts#WageModel",
+        "lib/wage-definition.ts#AnnualBasis",
+        "components/wage-definitions.tsx#Period",
+        "components/wage-definitions.tsx#Draft",
+        "components/wage-definitions.tsx#blank",
+        "lib/wage-definition.ts#WageDefinitionInput",
+        "lib/wage-definition.ts#wageDefinitionIssue",
+        "lib/wage-definition.ts#date",
+        "components/wage-definitions.tsx#modelLabels",
+        "components/wage-definitions.tsx#basisLabels",
         "lib/contact-links.ts#contactHref",
         "components/pages/shared.tsx#swissDate",
         "components/form-wizard.tsx#FormWizard",
@@ -90827,6 +91045,13 @@
         "components/employment-periods.tsx#Period",
         "components/ui.tsx#SectionTitle",
         "components/binso-ux.tsx#FormSheet",
+        "components/wage-definitions.tsx#WageDefinitions",
+        "components/wage-definitions.tsx#Wage",
+        "components/wage-definitions.tsx#Period",
+        "components/wage-definitions.tsx#Draft",
+        "components/wage-definitions.tsx#blank",
+        "components/wage-definitions.tsx#modelLabels",
+        "components/wage-definitions.tsx#basisLabels",
         "components/pages/shared.tsx#swissDate",
         "components/form-wizard.tsx#FormWizard",
         "components/ui.tsx#FormSection",
@@ -90935,6 +91160,8 @@
         "lib/permissions.ts#baseRead",
         "lib/permissions.ts#normalizeTenantRole",
         "lib/permissions.ts#universalTenantPermissions",
+        "lib/sensitive-access.ts#SensitiveCapability",
+        "lib/sensitive-access.ts#sensitiveCapabilities",
         "components/use-process-draft.ts#useProcessDraft",
         "lib/client/process-draft.ts#canonicalDraftProcess",
         "lib/client/process-draft.ts#draftScope",
@@ -91107,6 +91334,18 @@
         "lib/display-format.ts#formatTimestamp",
         "components/ui.tsx#SectionTitle",
         "components/binso-ux.tsx#FormSheet",
+        "components/wage-definitions.tsx#WageDefinitions",
+        "components/wage-definitions.tsx#Wage",
+        "lib/wage-definition.ts#WageModel",
+        "lib/wage-definition.ts#AnnualBasis",
+        "components/wage-definitions.tsx#Period",
+        "components/wage-definitions.tsx#Draft",
+        "components/wage-definitions.tsx#blank",
+        "lib/wage-definition.ts#WageDefinitionInput",
+        "lib/wage-definition.ts#wageDefinitionIssue",
+        "lib/wage-definition.ts#date",
+        "components/wage-definitions.tsx#modelLabels",
+        "components/wage-definitions.tsx#basisLabels",
         "lib/contact-links.ts#contactHref",
         "components/pages/shared.tsx#swissDate",
         "components/form-wizard.tsx#FormWizard",
@@ -92116,6 +92355,7 @@
       "data": [
         "/api/employees/",
         "/api/auth/session",
+        "/api/auth/sensitive-access",
         "/api/time-entries?limit=50&employeeId=",
         "/api/expenses?limit=50&employeeId=",
         "/api/employees",
@@ -92151,42 +92391,17 @@
       "widgets": [
         {
           "tag": "DetailTabs",
-          "line": 142,
+          "line": 146,
           "component": "components/pages/employees.tsx#EmployeeForm"
         },
         {
           "tag": "FormSheet",
-          "line": 160,
-          "component": "components/pages/employees.tsx#EmployeeForm"
-        },
-        {
-          "tag": "Field",
-          "line": 161,
-          "component": "components/pages/employees.tsx#EmployeeForm"
-        },
-        {
-          "tag": "Field",
-          "line": 162,
-          "component": "components/pages/employees.tsx#EmployeeForm"
-        },
-        {
-          "tag": "Field",
-          "line": 163,
-          "component": "components/pages/employees.tsx#EmployeeForm"
-        },
-        {
-          "tag": "Field",
-          "line": 164,
-          "component": "components/pages/employees.tsx#EmployeeForm"
-        },
-        {
-          "tag": "Field",
-          "line": 165,
-          "component": "components/pages/employees.tsx#EmployeeForm"
-        },
-        {
-          "tag": "Field",
           "line": 166,
+          "component": "components/pages/employees.tsx#EmployeeForm"
+        },
+        {
+          "tag": "Field",
+          "line": 167,
           "component": "components/pages/employees.tsx#EmployeeForm"
         },
         {
@@ -92216,12 +92431,37 @@
         },
         {
           "tag": "Field",
-          "line": 173,
+          "line": 174,
           "component": "components/pages/employees.tsx#EmployeeForm"
         },
         {
           "tag": "Field",
-          "line": 174,
+          "line": 175,
+          "component": "components/pages/employees.tsx#EmployeeForm"
+        },
+        {
+          "tag": "Field",
+          "line": 176,
+          "component": "components/pages/employees.tsx#EmployeeForm"
+        },
+        {
+          "tag": "Field",
+          "line": 177,
+          "component": "components/pages/employees.tsx#EmployeeForm"
+        },
+        {
+          "tag": "Field",
+          "line": 178,
+          "component": "components/pages/employees.tsx#EmployeeForm"
+        },
+        {
+          "tag": "Field",
+          "line": 179,
+          "component": "components/pages/employees.tsx#EmployeeForm"
+        },
+        {
+          "tag": "Field",
+          "line": 180,
           "component": "components/pages/employees.tsx#EmployeeForm"
         },
         {
@@ -92358,6 +92598,66 @@
           "tag": "Sheet",
           "line": 197,
           "component": "components/binso-ux.tsx#FormSheet"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 52,
+          "component": "components/wage-definitions.tsx#WageDefinitions"
+        },
+        {
+          "tag": "form",
+          "line": 53,
+          "component": "components/wage-definitions.tsx#WageDefinitions"
+        },
+        {
+          "tag": "Field",
+          "line": 54,
+          "component": "components/wage-definitions.tsx#WageDefinitions"
+        },
+        {
+          "tag": "Field",
+          "line": 55,
+          "component": "components/wage-definitions.tsx#WageDefinitions"
+        },
+        {
+          "tag": "Field",
+          "line": 56,
+          "component": "components/wage-definitions.tsx#WageDefinitions"
+        },
+        {
+          "tag": "Field",
+          "line": 56,
+          "component": "components/wage-definitions.tsx#WageDefinitions"
+        },
+        {
+          "tag": "Field",
+          "line": 57,
+          "component": "components/wage-definitions.tsx#WageDefinitions"
+        },
+        {
+          "tag": "Field",
+          "line": 57,
+          "component": "components/wage-definitions.tsx#WageDefinitions"
+        },
+        {
+          "tag": "Field",
+          "line": 58,
+          "component": "components/wage-definitions.tsx#WageDefinitions"
+        },
+        {
+          "tag": "Field",
+          "line": 58,
+          "component": "components/wage-definitions.tsx#WageDefinitions"
+        },
+        {
+          "tag": "Field",
+          "line": 59,
+          "component": "components/wage-definitions.tsx#WageDefinitions"
+        },
+        {
+          "tag": "Field",
+          "line": 60,
+          "component": "components/wage-definitions.tsx#WageDefinitions"
         },
         {
           "tag": "ListRow",
@@ -94283,12 +94583,12 @@
       "widgets": [
         {
           "tag": "RecordsControls",
-          "line": 36,
+          "line": 38,
           "component": "components/pages/employees.tsx#EmployeesPage"
         },
         {
           "tag": "RecordsView",
-          "line": 37,
+          "line": 39,
           "component": "components/pages/employees.tsx#EmployeesPage"
         },
         {
@@ -218479,7 +218779,7 @@
       "key": "components/pages/employees.tsx#EmployeeForm",
       "file": "components/pages/employees.tsx",
       "name": "EmployeeForm",
-      "line": 41,
+      "line": 43,
       "classes": [
         "page-actions",
         "entity-detail-workspace",
@@ -218488,6 +218788,7 @@
         "overview",
         "active",
         "employment",
+        "wages",
         "time",
         "expenses",
         "documents",
@@ -218503,6 +218804,7 @@
       "apis": [
         "/api/employees/",
         "/api/auth/session",
+        "/api/auth/sensitive-access",
         "/api/time-entries?limit=50&employeeId=",
         "/api/expenses?limit=50&employeeId=",
         "/api/employees"
@@ -218511,35 +218813,15 @@
       "widgets": [
         {
           "tag": "DetailTabs",
-          "line": 142
+          "line": 146
         },
         {
           "tag": "FormSheet",
-          "line": 160
-        },
-        {
-          "tag": "Field",
-          "line": 161
-        },
-        {
-          "tag": "Field",
-          "line": 162
-        },
-        {
-          "tag": "Field",
-          "line": 163
-        },
-        {
-          "tag": "Field",
-          "line": 164
-        },
-        {
-          "tag": "Field",
-          "line": 165
-        },
-        {
-          "tag": "Field",
           "line": 166
+        },
+        {
+          "tag": "Field",
+          "line": 167
         },
         {
           "tag": "Field",
@@ -218563,17 +218845,37 @@
         },
         {
           "tag": "Field",
-          "line": 173
+          "line": 174
         },
         {
           "tag": "Field",
-          "line": 174
+          "line": 175
+        },
+        {
+          "tag": "Field",
+          "line": 176
+        },
+        {
+          "tag": "Field",
+          "line": 177
+        },
+        {
+          "tag": "Field",
+          "line": 178
+        },
+        {
+          "tag": "Field",
+          "line": 179
+        },
+        {
+          "tag": "Field",
+          "line": 180
         }
       ],
       "elements": [
         {
           "tag": "AppShell",
-          "line": 137,
+          "line": 141,
           "props": [
             "title=\"Mitarbeiter\"",
             "subtitle={recordError?\"Mitarbeiterdaten nicht verfügbar\":undefined}",
@@ -218584,19 +218886,19 @@
         },
         {
           "tag": "LoadingState",
-          "line": 137,
+          "line": 141,
           "props": []
         },
         {
           "tag": "div",
-          "line": 137,
+          "line": 141,
           "props": [
             "role=\"alert\""
           ]
         },
         {
           "tag": "EmptyState",
-          "line": 137,
+          "line": 141,
           "props": [
             "title=\"Mitarbeiter konnte nicht geladen werden\"",
             "description={recordError??\"Bitte versuche es erneut.\"}"
@@ -218604,26 +218906,26 @@
         },
         {
           "tag": "div",
-          "line": 137,
+          "line": 141,
           "props": [
             "className=\"page-actions\""
           ]
         },
         {
           "tag": "Button",
-          "line": 137,
+          "line": 141,
           "props": [
             "onClick={recordQuery.refresh}"
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 137,
+          "line": 141,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 137,
+          "line": 141,
           "props": [
             "href=\"/mitarbeiter\"",
             "variant=\"ghost\""
@@ -218631,12 +218933,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 137,
+          "line": 141,
           "props": []
         },
         {
           "tag": "AppShell",
-          "line": 138,
+          "line": 142,
           "props": [
             "titleIsUserContent={existing&&!!displayName}",
             "unsavedChanges={false}",
@@ -218653,7 +218955,7 @@
         },
         {
           "tag": "ActionsMenu",
-          "line": 138,
+          "line": 142,
           "props": [
             "label=\"Mitarbeiteraktionen\"",
             "busy={savingRecord}"
@@ -218661,7 +218963,7 @@
         },
         {
           "tag": "ActionRow",
-          "line": 138,
+          "line": 142,
           "props": [
             "requiresWrite",
             "icon=\"edit\"",
@@ -218672,7 +218974,7 @@
         },
         {
           "tag": "ActionRow",
-          "line": 138,
+          "line": 142,
           "props": [
             "href={\"/zeit?employeeId=\"+encodeURIComponent(employeeId??\"\")+\"&returnTo=\"+encodeURIComponent(\"/mitarbeiter/\"+(employeeId??\"\"))}",
             "icon=\"clock\"",
@@ -218682,7 +218984,7 @@
         },
         {
           "tag": "ActionRow",
-          "line": 138,
+          "line": 142,
           "props": [
             "href={\"/spesen/neu?employeeId=\"+encodeURIComponent(employeeId??\"\")+\"&returnTo=\"+encodeURIComponent(\"/mitarbeiter/\"+(employeeId??\"\"))}",
             "icon=\"card\"",
@@ -218692,21 +218994,21 @@
         },
         {
           "tag": "div",
-          "line": 139,
+          "line": 143,
           "props": [
             "className={existing?\"entity-detail-workspace\":\"desktop-detail-single\"}"
           ]
         },
         {
           "tag": "div",
-          "line": 141,
+          "line": 145,
           "props": [
             "className=\"desktop-detail-main\""
           ]
         },
         {
           "tag": "DetailTabs",
-          "line": 142,
+          "line": 146,
           "props": [
             "role=\"tablist\"",
             "label=\"Mitarbeiterbereiche\""
@@ -218714,7 +219016,7 @@
         },
         {
           "tag": "button",
-          "line": 143,
+          "line": 147,
           "props": [
             "role=\"tab\"",
             "aria-selected={activeEmployeeTab===\"overview\"}",
@@ -218724,12 +219026,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 143,
+          "line": 147,
           "props": []
         },
         {
           "tag": "button",
-          "line": 144,
+          "line": 148,
           "props": [
             "role=\"tab\"",
             "aria-selected={activeEmployeeTab===\"employment\"}",
@@ -218739,12 +219041,27 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 144,
+          "line": 148,
           "props": []
         },
         {
           "tag": "button",
-          "line": 145,
+          "line": 149,
+          "props": [
+            "role=\"tab\"",
+            "aria-selected={activeEmployeeTab==='wages'}",
+            "className={activeEmployeeTab==='wages'?'active':''}",
+            "onClick={()=>setEmployeeTab('wages')}"
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 149,
+          "props": []
+        },
+        {
+          "tag": "button",
+          "line": 150,
           "props": [
             "role=\"tab\"",
             "aria-selected={activeEmployeeTab===\"time\"}",
@@ -218754,12 +219071,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 145,
+          "line": 150,
           "props": []
         },
         {
           "tag": "button",
-          "line": 146,
+          "line": 151,
           "props": [
             "role=\"tab\"",
             "aria-selected={activeEmployeeTab===\"expenses\"}",
@@ -218769,12 +219086,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 146,
+          "line": 151,
           "props": []
         },
         {
           "tag": "button",
-          "line": 147,
+          "line": 152,
           "props": [
             "role=\"tab\"",
             "aria-selected={activeEmployeeTab===\"documents\"}",
@@ -218784,12 +219101,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 147,
+          "line": 152,
           "props": []
         },
         {
           "tag": "EmploymentPeriods",
-          "line": 149,
+          "line": 154,
           "props": [
             "employeeId={employeeId}",
             "mayWrite={tenantCan(tenantRole,'employees:write')}",
@@ -218797,8 +219114,16 @@
           ]
         },
         {
+          "tag": "WageDefinitions",
+          "line": 155,
+          "props": [
+            "employeeId={employeeId}",
+            "mayWrite={mayWriteWages}"
+          ]
+        },
+        {
           "tag": "div",
-          "line": 150,
+          "line": 156,
           "props": [
             "className=\"form-page\"",
             "inert={savingRecord}"
@@ -218806,193 +219131,193 @@
         },
         {
           "tag": "dl",
-          "line": 151,
+          "line": 157,
           "props": [
             "className=\"detail-list\""
           ]
         },
         {
           "tag": "div",
-          "line": 152,
+          "line": 158,
           "props": []
         },
         {
           "tag": "dt",
-          "line": 152,
+          "line": 158,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 152,
+          "line": 158,
           "props": []
         },
         {
           "tag": "dd",
-          "line": 152,
+          "line": 158,
           "props": []
         },
         {
           "tag": "a",
-          "line": 152,
+          "line": 158,
           "props": [
             "href={contactHref(\"email\",email)}"
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 152,
+          "line": 158,
           "props": []
         },
         {
           "tag": "div",
-          "line": 153,
+          "line": 159,
           "props": []
         },
         {
           "tag": "dt",
-          "line": 153,
+          "line": 159,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 153,
+          "line": 159,
           "props": []
         },
         {
           "tag": "dd",
-          "line": 153,
+          "line": 159,
           "props": []
         },
         {
           "tag": "a",
-          "line": 153,
+          "line": 159,
           "props": [
             "href={contactHref(\"phone\",phone)}"
           ]
         },
         {
           "tag": "div",
-          "line": 154,
+          "line": 160,
           "props": []
         },
         {
           "tag": "dt",
-          "line": 154,
+          "line": 160,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 154,
+          "line": 160,
           "props": []
         },
         {
           "tag": "dd",
-          "line": 154,
+          "line": 160,
           "props": []
         },
         {
           "tag": "div",
-          "line": 155,
+          "line": 161,
           "props": []
         },
         {
           "tag": "dt",
-          "line": 155,
+          "line": 161,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 155,
+          "line": 161,
           "props": []
         },
         {
           "tag": "dd",
-          "line": 155,
+          "line": 161,
           "props": []
         },
         {
           "tag": "div",
-          "line": 156,
+          "line": 162,
           "props": []
         },
         {
           "tag": "dt",
-          "line": 156,
+          "line": 162,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 156,
+          "line": 162,
           "props": []
         },
         {
           "tag": "dd",
-          "line": 156,
+          "line": 162,
           "props": []
         },
         {
           "tag": "div",
-          "line": 157,
+          "line": 163,
           "props": []
         },
         {
           "tag": "dt",
-          "line": 157,
+          "line": 163,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 157,
+          "line": 163,
           "props": []
         },
         {
           "tag": "dd",
-          "line": 157,
+          "line": 163,
           "props": []
         },
         {
           "tag": "div",
-          "line": 158,
+          "line": 164,
           "props": []
         },
         {
           "tag": "dt",
-          "line": 158,
+          "line": 164,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 158,
+          "line": 164,
           "props": []
         },
         {
           "tag": "dd",
-          "line": 158,
+          "line": 164,
           "props": []
         },
         {
           "tag": "div",
-          "line": 159,
+          "line": 165,
           "props": []
         },
         {
           "tag": "dt",
-          "line": 159,
+          "line": 165,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 159,
+          "line": 165,
           "props": []
         },
         {
           "tag": "dd",
-          "line": 159,
+          "line": 165,
           "props": []
         },
         {
           "tag": "FormSheet",
-          "line": 160,
+          "line": 166,
           "props": [
             "workspace",
             "label={existing?\"Mitarbeiter bearbeiten\":\"Mitarbeiter hinzufügen\"}",
@@ -219005,7 +219330,7 @@
         },
         {
           "tag": "FormWizard",
-          "line": 160,
+          "line": 166,
           "props": [
             "cancelAction={<Button variant=\"secondary\" onClick={()=>{recovery.clear();allowDraftNavigation();if(existing)setEditingRecord(false);else router.push(returnTo)}} disabled={savingRecord}><LocalizedText>{\"Abbrechen\"}</LocalizedText></Button>}",
             "guided={!existing}",
@@ -219018,7 +219343,7 @@
         },
         {
           "tag": "Button",
-          "line": 160,
+          "line": 166,
           "props": [
             "variant=\"secondary\"",
             "onClick={()=>{recovery.clear();allowDraftNavigation();if(existing)setEditingRecord(false);else router.push(returnTo)}}",
@@ -219027,12 +219352,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 160,
+          "line": 166,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 160,
+          "line": 166,
           "props": [
             "requiresWrite",
             "disabled={savingRecord}",
@@ -219041,12 +219366,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 160,
+          "line": 166,
           "props": []
         },
         {
           "tag": "FormSection",
-          "line": 160,
+          "line": 166,
           "props": [
             "title=\"Persönliche Daten\"",
             "hidden={!existing&&wizardStep!==0}"
@@ -219054,21 +219379,21 @@
         },
         {
           "tag": "div",
-          "line": 160,
+          "line": 166,
           "props": [
             "className=\"form-grid two\""
           ]
         },
         {
           "tag": "Field",
-          "line": 161,
+          "line": 167,
           "props": [
             "label=\"Vorname\""
           ]
         },
         {
           "tag": "Input",
-          "line": 161,
+          "line": 167,
           "props": [
             "required",
             "autoComplete=\"given-name\"",
@@ -219078,14 +219403,14 @@
         },
         {
           "tag": "Field",
-          "line": 162,
+          "line": 168,
           "props": [
             "label=\"Nachname\""
           ]
         },
         {
           "tag": "Input",
-          "line": 162,
+          "line": 168,
           "props": [
             "required",
             "autoComplete=\"family-name\"",
@@ -219095,7 +219420,7 @@
         },
         {
           "tag": "Field",
-          "line": 163,
+          "line": 169,
           "props": [
             "label=\"E-Mail\"",
             "hint=\"Optional · erstellt keinen App-Zugang\""
@@ -219103,7 +219428,7 @@
         },
         {
           "tag": "Input",
-          "line": 163,
+          "line": 169,
           "props": [
             "autoComplete=\"email\"",
             "type=\"email\"",
@@ -219113,14 +219438,14 @@
         },
         {
           "tag": "Field",
-          "line": 164,
+          "line": 170,
           "props": [
             "label=\"Telefon\""
           ]
         },
         {
           "tag": "Input",
-          "line": 164,
+          "line": 170,
           "props": [
             "type=\"tel\"",
             "inputMode=\"tel\"",
@@ -219130,14 +219455,14 @@
         },
         {
           "tag": "Field",
-          "line": 165,
+          "line": 171,
           "props": [
             "label=\"Funktion\""
           ]
         },
         {
           "tag": "Input",
-          "line": 165,
+          "line": 171,
           "props": [
             "required",
             "value={role}",
@@ -219146,14 +219471,14 @@
         },
         {
           "tag": "Field",
-          "line": 166,
+          "line": 172,
           "props": [
             "label=\"Pensum (%)\""
           ]
         },
         {
           "tag": "Input",
-          "line": 166,
+          "line": 172,
           "props": [
             "type=\"number\"",
             "min=\"0\"",
@@ -219167,7 +219492,7 @@
         },
         {
           "tag": "FormSection",
-          "line": 167,
+          "line": 173,
           "props": [
             "title=\"Arbeitsverhältnis\"",
             "hidden={!existing&&wizardStep!==1}"
@@ -219175,21 +219500,21 @@
         },
         {
           "tag": "div",
-          "line": 167,
+          "line": 173,
           "props": [
             "className=\"form-grid two\""
           ]
         },
         {
           "tag": "Field",
-          "line": 168,
+          "line": 174,
           "props": [
             "label=\"Eintritt\""
           ]
         },
         {
           "tag": "Input",
-          "line": 168,
+          "line": 174,
           "props": [
             "type=\"date\"",
             "value={entryDate}",
@@ -219198,14 +219523,14 @@
         },
         {
           "tag": "Field",
-          "line": 169,
+          "line": 175,
           "props": [
             "label=\"Austritt\""
           ]
         },
         {
           "tag": "Input",
-          "line": 169,
+          "line": 175,
           "props": [
             "type=\"date\"",
             "min={entryDate||undefined}",
@@ -219215,14 +219540,14 @@
         },
         {
           "tag": "Field",
-          "line": 170,
+          "line": 176,
           "props": [
             "label=\"Arbeitsort\""
           ]
         },
         {
           "tag": "Input",
-          "line": 170,
+          "line": 176,
           "props": [
             "maxLength={180}",
             "value={workLocation}",
@@ -219231,14 +219556,14 @@
         },
         {
           "tag": "Field",
-          "line": 171,
+          "line": 177,
           "props": [
             "label=\"Wochenstunden (h/Woche)\""
           ]
         },
         {
           "tag": "Input",
-          "line": 171,
+          "line": 177,
           "props": [
             "type=\"number\"",
             "min=\"0.1\"",
@@ -219252,7 +219577,7 @@
         },
         {
           "tag": "Field",
-          "line": 172,
+          "line": 178,
           "props": [
             "label=\"Ferientage\"",
             "hint=\"Pro Jahr\""
@@ -219260,7 +219585,7 @@
         },
         {
           "tag": "Input",
-          "line": 172,
+          "line": 178,
           "props": [
             "type=\"number\"",
             "min=\"0\"",
@@ -219274,7 +219599,7 @@
         },
         {
           "tag": "Field",
-          "line": 173,
+          "line": 179,
           "props": [
             "label=\"Adresse\"",
             "className=\"full\""
@@ -219282,7 +219607,7 @@
         },
         {
           "tag": "Input",
-          "line": 173,
+          "line": 179,
           "props": [
             "value={address}",
             "onChange={e=>setAddress(e.target.value)}",
@@ -219291,14 +219616,14 @@
         },
         {
           "tag": "Field",
-          "line": 174,
+          "line": 180,
           "props": [
             "label=\"Status\""
           ]
         },
         {
           "tag": "Select",
-          "line": 174,
+          "line": 180,
           "props": [
             "value={status}",
             "onChange={e=>setStatus(e.target.value)}"
@@ -219306,38 +219631,38 @@
         },
         {
           "tag": "option",
-          "line": 174,
+          "line": 180,
           "props": [
             "value={\"Aktiv\"}"
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 174,
+          "line": 180,
           "props": []
         },
         {
           "tag": "option",
-          "line": 174,
+          "line": 180,
           "props": [
             "value={\"Inaktiv\"}"
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 174,
+          "line": 180,
           "props": []
         },
         {
           "tag": "section",
-          "line": 177,
+          "line": 183,
           "props": [
             "className=\"surface employee-tab-panel\""
           ]
         },
         {
           "tag": "SectionTitle",
-          "line": 177,
+          "line": 183,
           "props": [
             "title=\"Letzte Arbeitszeiten\"",
             "action={<Button href={\"/zeit?employeeId=\"+encodeURIComponent(employeeId??\"\")+\"&returnTo=\"+encodeURIComponent(\"/mitarbeiter/\"+(employeeId??\"\"))} variant=\"secondary\"><LocalizedText>{\"Zeiterfassung öffnen\"}</LocalizedText></Button>}"
@@ -219345,7 +219670,7 @@
         },
         {
           "tag": "Button",
-          "line": 177,
+          "line": 183,
           "props": [
             "href={\"/zeit?employeeId=\"+encodeURIComponent(employeeId??\"\")+\"&returnTo=\"+encodeURIComponent(\"/mitarbeiter/\"+(employeeId??\"\"))}",
             "variant=\"secondary\""
@@ -219353,22 +219678,22 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 177,
+          "line": 183,
           "props": []
         },
         {
           "tag": "LoadingState",
-          "line": 177,
+          "line": 183,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 177,
+          "line": 183,
           "props": []
         },
         {
           "tag": "ErrorState",
-          "line": 177,
+          "line": 183,
           "props": [
             "onRetry={times.refresh}",
             "retryLabel=\"Erneut versuchen\""
@@ -219376,12 +219701,12 @@
         },
         {
           "tag": "div",
-          "line": 177,
+          "line": 183,
           "props": []
         },
         {
           "tag": "TimeEntryRow",
-          "line": 177,
+          "line": 183,
           "props": [
             "key={item.id}",
             "title={item.description||item.project_name||\"Zeiteintrag\"}",
@@ -219392,21 +219717,21 @@
         },
         {
           "tag": "EmptyState",
-          "line": 177,
+          "line": 183,
           "props": [
             "title=\"Keine Arbeitszeiten erfasst\""
           ]
         },
         {
           "tag": "section",
-          "line": 178,
+          "line": 184,
           "props": [
             "className=\"surface employee-tab-panel\""
           ]
         },
         {
           "tag": "SectionTitle",
-          "line": 178,
+          "line": 184,
           "props": [
             "title=\"Letzte Spesen\"",
             "action={<Button href={\"/spesen/neu?employeeId=\"+encodeURIComponent(employeeId??\"\")+\"&returnTo=\"+encodeURIComponent(\"/mitarbeiter/\"+(employeeId??\"\"))} variant=\"secondary\"><LocalizedText>{\"Spese erfassen\"}</LocalizedText></Button>}"
@@ -219414,7 +219739,7 @@
         },
         {
           "tag": "Button",
-          "line": 178,
+          "line": 184,
           "props": [
             "href={\"/spesen/neu?employeeId=\"+encodeURIComponent(employeeId??\"\")+\"&returnTo=\"+encodeURIComponent(\"/mitarbeiter/\"+(employeeId??\"\"))}",
             "variant=\"secondary\""
@@ -219422,22 +219747,22 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 178,
+          "line": 184,
           "props": []
         },
         {
           "tag": "LoadingState",
-          "line": 178,
+          "line": 184,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 178,
+          "line": 184,
           "props": []
         },
         {
           "tag": "ErrorState",
-          "line": 178,
+          "line": 184,
           "props": [
             "onRetry={expenses.refresh}",
             "retryLabel=\"Erneut versuchen\""
@@ -219445,12 +219770,12 @@
         },
         {
           "tag": "div",
-          "line": 178,
+          "line": 184,
           "props": []
         },
         {
           "tag": "RecordRow",
-          "line": 178,
+          "line": 184,
           "props": [
             "key={item.id}",
             "href={\"/spesen/\"+item.id}",
@@ -219462,7 +219787,7 @@
         },
         {
           "tag": "Button",
-          "line": 178,
+          "line": 184,
           "props": [
             "href={\"/spesen?employeeId=\"+encodeURIComponent(employeeId??\"\")+\"&returnTo=\"+encodeURIComponent(\"/mitarbeiter/\"+(employeeId??\"\"))}",
             "variant=\"secondary\""
@@ -219470,19 +219795,19 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 178,
+          "line": 184,
           "props": []
         },
         {
           "tag": "EmptyState",
-          "line": 178,
+          "line": 184,
           "props": [
             "title=\"Keine Spesen erfasst\""
           ]
         },
         {
           "tag": "EntityFiles",
-          "line": 179,
+          "line": 185,
           "props": [
             "purpose=\"employee_document\"",
             "entityId={employeeId??\"\"}",
@@ -219493,58 +219818,58 @@
         },
         {
           "tag": "ContextActions",
-          "line": 181,
+          "line": 187,
           "props": []
         },
         {
           "tag": "section",
-          "line": 181,
+          "line": 187,
           "props": [
             "className=\"context-action-group\""
           ]
         },
         {
           "tag": "Link",
-          "line": 181,
+          "line": 187,
           "props": [
             "href={\"/zeit?employeeId=\"+encodeURIComponent(employeeId??\"\")+\"&returnTo=\"+encodeURIComponent(\"/mitarbeiter/\"+(employeeId??\"\"))}"
           ]
         },
         {
           "tag": "Icon",
-          "line": 181,
+          "line": 187,
           "props": [
             "name=\"clock\""
           ]
         },
         {
           "tag": "span",
-          "line": 181,
+          "line": 187,
           "props": []
         },
         {
           "tag": "b",
-          "line": 181,
+          "line": 187,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 181,
+          "line": 187,
           "props": []
         },
         {
           "tag": "small",
-          "line": 181,
+          "line": 187,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 181,
+          "line": 187,
           "props": []
         },
         {
           "tag": "Icon",
-          "line": 181,
+          "line": 187,
           "props": [
             "name=\"arrow\"",
             "size={15}"
@@ -219552,46 +219877,46 @@
         },
         {
           "tag": "Link",
-          "line": 181,
+          "line": 187,
           "props": [
             "href={\"/spesen/neu?employeeId=\"+encodeURIComponent(employeeId??\"\")+\"&returnTo=\"+encodeURIComponent(\"/mitarbeiter/\"+(employeeId??\"\"))}"
           ]
         },
         {
           "tag": "Icon",
-          "line": 181,
+          "line": 187,
           "props": [
             "name=\"card\""
           ]
         },
         {
           "tag": "span",
-          "line": 181,
+          "line": 187,
           "props": []
         },
         {
           "tag": "b",
-          "line": 181,
+          "line": 187,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 181,
+          "line": 187,
           "props": []
         },
         {
           "tag": "small",
-          "line": 181,
+          "line": 187,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 181,
+          "line": 187,
           "props": []
         },
         {
           "tag": "Icon",
-          "line": 181,
+          "line": 187,
           "props": [
             "name=\"arrow\"",
             "size={15}"
@@ -219599,7 +219924,7 @@
         },
         {
           "tag": "Toast",
-          "line": 183,
+          "line": 189,
           "props": [
             "title={toast}",
             "tone={toast===\"Mitarbeiter gespeichert.\"||toast===\"Dokument hinzugefügt.\"?\"success\":\"danger\"}"
@@ -219608,215 +219933,223 @@
       ],
       "conditions": [
         {
-          "line": 44,
+          "line": 46,
           "expression": "existing"
         },
         {
-          "line": 51,
+          "line": 53,
           "expression": "existing"
-        },
-        {
-          "line": 62,
-          "expression": "existing&&employeeId"
         },
         {
           "line": 64,
-          "expression": "existing&&recordQuery.data&&!recordQuery.data.item&&!recordQuery.data.items?.length"
-        },
-        {
-          "line": 74,
-          "expression": "employeeTab==='time'&&!mayReadTime||employeeTab==='expenses'&&!mayReadExpenses"
-        },
-        {
-          "line": 75,
-          "expression": "existing&&employeeId&&activeEmployeeTab==='time'&&mayReadTime"
-        },
-        {
-          "line": 76,
-          "expression": "existing&&employeeId&&activeEmployeeTab==='expenses'&&mayReadExpenses"
-        },
-        {
-          "line": 78,
-          "expression": "activeEmployeeTab==='time'"
-        },
-        {
-          "line": 78,
-          "expression": "activeEmployeeTab==='expenses'"
-        },
-        {
-          "line": 81,
-          "expression": "!recordQuery.data||editingRecord"
-        },
-        {
-          "line": 83,
-          "expression": "!item"
-        },
-        {
-          "line": 97,
-          "expression": "item.status===\"inactive\""
-        },
-        {
-          "line": 98,
-          "expression": "item.status===\"inactive\""
-        },
-        {
-          "line": 104,
-          "expression": "!value||[value.firstName,value.lastName,value.email,value.phone,value.role,value.load,value.entryDate,value.weeklyHours,value.vacationDays,value.address,value.status].some(field=>typeof field!==\"string\"||field.length>2000)"
-        },
-        {
-          "line": 106,
-          "expression": "typeof value.endDate==='string'"
-        },
-        {
-          "line": 106,
-          "expression": "typeof value.workLocation==='string'"
-        },
-        {
-          "line": 107,
-          "expression": "value.replay&&typeof value.replay.body==='string'&&value.replay.body.length<16000&&typeof value.replay.key==='string'&&value.replay.key.length>=8&&value.replay.key.length<=128"
-        },
-        {
-          "line": 110,
-          "expression": "saveRecordPending.current||loadingRecord||recordError||!existing&&!recovery.ready"
-        },
-        {
-          "line": 111,
-          "expression": "!firstName.trim()||!lastName.trim()||!role.trim()"
-        },
-        {
-          "line": 113,
-          "expression": "validation"
-        },
-        {
-          "line": 116,
-          "expression": "status===\"Inaktiv\""
-        },
-        {
-          "line": 119,
           "expression": "existing&&employeeId"
         },
         {
-          "line": 121,
+          "line": 66,
+          "expression": "existing&&recordQuery.data&&!recordQuery.data.item&&!recordQuery.data.items?.length"
+        },
+        {
+          "line": 76,
+          "expression": "existing"
+        },
+        {
+          "line": 78,
+          "expression": "employeeTab==='time'&&!mayReadTime||employeeTab==='expenses'&&!mayReadExpenses||employeeTab==='wages'&&!mayReadWages"
+        },
+        {
+          "line": 79,
+          "expression": "existing&&employeeId&&activeEmployeeTab==='time'&&mayReadTime"
+        },
+        {
+          "line": 80,
+          "expression": "existing&&employeeId&&activeEmployeeTab==='expenses'&&mayReadExpenses"
+        },
+        {
+          "line": 82,
+          "expression": "activeEmployeeTab==='time'"
+        },
+        {
+          "line": 82,
+          "expression": "activeEmployeeTab==='expenses'"
+        },
+        {
+          "line": 85,
+          "expression": "!recordQuery.data||editingRecord"
+        },
+        {
+          "line": 87,
+          "expression": "!item"
+        },
+        {
+          "line": 101,
+          "expression": "item.status===\"inactive\""
+        },
+        {
+          "line": 102,
+          "expression": "item.status===\"inactive\""
+        },
+        {
+          "line": 108,
+          "expression": "!value||[value.firstName,value.lastName,value.email,value.phone,value.role,value.load,value.entryDate,value.weeklyHours,value.vacationDays,value.address,value.status].some(field=>typeof field!==\"string\"||field.length>2000)"
+        },
+        {
+          "line": 110,
+          "expression": "typeof value.endDate==='string'"
+        },
+        {
+          "line": 110,
+          "expression": "typeof value.workLocation==='string'"
+        },
+        {
+          "line": 111,
+          "expression": "value.replay&&typeof value.replay.body==='string'&&value.replay.body.length<16000&&typeof value.replay.key==='string'&&value.replay.key.length>=8&&value.replay.key.length<=128"
+        },
+        {
+          "line": 114,
+          "expression": "saveRecordPending.current||loadingRecord||recordError||!existing&&!recovery.ready"
+        },
+        {
+          "line": 115,
+          "expression": "!firstName.trim()||!lastName.trim()||!role.trim()"
+        },
+        {
+          "line": 117,
+          "expression": "validation"
+        },
+        {
+          "line": 120,
+          "expression": "status===\"Inaktiv\""
+        },
+        {
+          "line": 123,
+          "expression": "existing&&employeeId"
+        },
+        {
+          "line": 125,
           "expression": "replay?.body===serialized"
         },
         {
-          "line": 124,
+          "line": 128,
           "expression": "!result.item?.id"
         },
         {
-          "line": 131,
+          "line": 135,
           "expression": "error instanceof Error"
         },
         {
-          "line": 137,
+          "line": 141,
           "expression": "loadingRecord||recordError"
         },
         {
-          "line": 137,
+          "line": 141,
           "expression": "recordError"
         },
         {
-          "line": 137,
+          "line": 141,
           "expression": "loadingRecord"
         },
         {
-          "line": 138,
+          "line": 142,
           "expression": "existing"
         },
         {
-          "line": 138,
+          "line": 142,
           "expression": "existing"
         },
         {
-          "line": 138,
+          "line": 142,
           "expression": "status===\"Aktiv\""
         },
         {
-          "line": 138,
+          "line": 142,
           "expression": "existing"
         },
         {
-          "line": 138,
-          "expression": "existing"
-        },
-        {
-          "line": 139,
+          "line": 142,
           "expression": "existing"
         },
         {
           "line": 143,
-          "expression": "activeEmployeeTab===\"overview\""
-        },
-        {
-          "line": 144,
-          "expression": "activeEmployeeTab===\"employment\""
-        },
-        {
-          "line": 145,
-          "expression": "activeEmployeeTab===\"time\""
-        },
-        {
-          "line": 146,
-          "expression": "activeEmployeeTab===\"expenses\""
+          "expression": "existing"
         },
         {
           "line": 147,
-          "expression": "activeEmployeeTab===\"documents\""
+          "expression": "activeEmployeeTab===\"overview\""
+        },
+        {
+          "line": 148,
+          "expression": "activeEmployeeTab===\"employment\""
+        },
+        {
+          "line": 149,
+          "expression": "activeEmployeeTab==='wages'"
+        },
+        {
+          "line": 150,
+          "expression": "activeEmployeeTab===\"time\""
         },
         {
           "line": 151,
-          "expression": "!editingRecord"
+          "expression": "activeEmployeeTab===\"expenses\""
         },
         {
           "line": 152,
+          "expression": "activeEmployeeTab===\"documents\""
+        },
+        {
+          "line": 157,
+          "expression": "!editingRecord"
+        },
+        {
+          "line": 158,
           "expression": "email"
         },
         {
-          "line": 160,
+          "line": 166,
           "expression": "existing"
         },
         {
-          "line": 160,
+          "line": 166,
           "expression": "existing"
         },
         {
-          "line": 160,
+          "line": 166,
           "expression": "existing"
         },
         {
-          "line": 160,
+          "line": 166,
           "expression": "savingRecord"
         },
         {
-          "line": 177,
+          "line": 183,
           "expression": "ledgerLoading"
-        },
-        {
-          "line": 177,
-          "expression": "ledgerErrors.times"
-        },
-        {
-          "line": 177,
-          "expression": "item.invoiced_invoice_id"
-        },
-        {
-          "line": 177,
-          "expression": "item.approved"
-        },
-        {
-          "line": 177,
-          "expression": "item.billable===false"
-        },
-        {
-          "line": 178,
-          "expression": "ledgerLoading"
-        },
-        {
-          "line": 178,
-          "expression": "ledgerErrors.expenses"
         },
         {
           "line": 183,
+          "expression": "ledgerErrors.times"
+        },
+        {
+          "line": 183,
+          "expression": "item.invoiced_invoice_id"
+        },
+        {
+          "line": 183,
+          "expression": "item.approved"
+        },
+        {
+          "line": 183,
+          "expression": "item.billable===false"
+        },
+        {
+          "line": 184,
+          "expression": "ledgerLoading"
+        },
+        {
+          "line": 184,
+          "expression": "ledgerErrors.expenses"
+        },
+        {
+          "line": 189,
           "expression": "toast===\"Mitarbeiter gespeichert.\"||toast===\"Dokument hinzugefügt.\""
         }
       ]
@@ -220338,6 +220671,902 @@
       "conditions": []
     },
     {
+      "key": "components/wage-definitions.tsx#WageDefinitions",
+      "file": "components/wage-definitions.tsx",
+      "name": "WageDefinitions",
+      "line": 18,
+      "classes": [
+        "bo-workspace-section",
+        "action-list",
+        "assignment-row",
+        "form-grid",
+        "two"
+      ],
+      "apis": [
+        "/api/employees/"
+      ],
+      "collections": [],
+      "widgets": [
+        {
+          "tag": "FormSheet",
+          "line": 52
+        },
+        {
+          "tag": "form",
+          "line": 53
+        },
+        {
+          "tag": "Field",
+          "line": 54
+        },
+        {
+          "tag": "Field",
+          "line": 55
+        },
+        {
+          "tag": "Field",
+          "line": 56
+        },
+        {
+          "tag": "Field",
+          "line": 56
+        },
+        {
+          "tag": "Field",
+          "line": 57
+        },
+        {
+          "tag": "Field",
+          "line": 57
+        },
+        {
+          "tag": "Field",
+          "line": 58
+        },
+        {
+          "tag": "Field",
+          "line": 58
+        },
+        {
+          "tag": "Field",
+          "line": 59
+        },
+        {
+          "tag": "Field",
+          "line": 60
+        }
+      ],
+      "elements": [
+        {
+          "tag": "section",
+          "line": 40,
+          "props": [
+            "className=\"bo-workspace-section\""
+          ]
+        },
+        {
+          "tag": "SectionTitle",
+          "line": 41,
+          "props": [
+            "title=\"Lohnvertrag\"",
+            "action={mayWrite?<ActionsMenu label=\"Lohnvertragsaktionen\"><ActionRow requiresWrite icon=\"plus\" title=\"Lohndefinition hinzufügen\" onClick={()=>edit(null)}/></ActionsMenu>:undefined}"
+          ]
+        },
+        {
+          "tag": "ActionsMenu",
+          "line": 41,
+          "props": [
+            "label=\"Lohnvertragsaktionen\""
+          ]
+        },
+        {
+          "tag": "ActionRow",
+          "line": 41,
+          "props": [
+            "requiresWrite",
+            "icon=\"plus\"",
+            "title=\"Lohndefinition hinzufügen\"",
+            "onClick={()=>edit(null)}"
+          ]
+        },
+        {
+          "tag": "p",
+          "line": 42,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 42,
+          "props": []
+        },
+        {
+          "tag": "LoadingState",
+          "line": 43,
+          "props": []
+        },
+        {
+          "tag": "ErrorState",
+          "line": 43,
+          "props": [
+            "onRetry={query.refresh}"
+          ]
+        },
+        {
+          "tag": "EmptyState",
+          "line": 43,
+          "props": [
+            "title=\"Keine Lohndefinitionen\""
+          ]
+        },
+        {
+          "tag": "div",
+          "line": 43,
+          "props": [
+            "className=\"action-list\""
+          ]
+        },
+        {
+          "tag": "div",
+          "line": 43,
+          "props": [
+            "className=\"assignment-row\"",
+            "key={item.id}"
+          ]
+        },
+        {
+          "tag": "div",
+          "line": 44,
+          "props": []
+        },
+        {
+          "tag": "b",
+          "line": 44,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 44,
+          "props": []
+        },
+        {
+          "tag": "p",
+          "line": 44,
+          "props": []
+        },
+        {
+          "tag": "p",
+          "line": 45,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 45,
+          "props": []
+        },
+        {
+          "tag": "p",
+          "line": 46,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 46,
+          "props": []
+        },
+        {
+          "tag": "small",
+          "line": 47,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 47,
+          "props": []
+        },
+        {
+          "tag": "ErrorState",
+          "line": 48,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 48,
+          "props": []
+        },
+        {
+          "tag": "Status",
+          "line": 49,
+          "props": [
+            "tone={item.is_current?'info':'neutral'}"
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 49,
+          "props": []
+        },
+        {
+          "tag": "ActionsMenu",
+          "line": 50,
+          "props": [
+            "label=\"Lohnvertragsaktionen\""
+          ]
+        },
+        {
+          "tag": "ActionRow",
+          "line": 50,
+          "props": [
+            "requiresWrite",
+            "icon=\"edit\"",
+            "title=\"Lohndefinition korrigieren\"",
+            "onClick={()=>edit(item)}"
+          ]
+        },
+        {
+          "tag": "FormSheet",
+          "line": 52,
+          "props": [
+            "open={open}",
+            "onClose={()=>setOpen(false)}",
+            "label={selected?'Lohndefinition korrigieren':'Lohndefinition hinzufügen'}",
+            "busy={busy}",
+            "dirty={JSON.stringify(draft)!==initial}"
+          ]
+        },
+        {
+          "tag": "ErrorState",
+          "line": 53,
+          "props": [
+            "onRetry={periods.refresh}"
+          ]
+        },
+        {
+          "tag": "LoadingState",
+          "line": 53,
+          "props": []
+        },
+        {
+          "tag": "form",
+          "line": 53,
+          "props": [
+            "id={formId}",
+            "onSubmit={e=>{e.preventDefault();void save();}}"
+          ]
+        },
+        {
+          "tag": "div",
+          "line": 53,
+          "props": [
+            "className=\"form-grid two\""
+          ]
+        },
+        {
+          "tag": "Field",
+          "line": 54,
+          "props": [
+            "label=\"Anstellungsrevision\""
+          ]
+        },
+        {
+          "tag": "Select",
+          "line": 54,
+          "props": [
+            "required",
+            "value={draft.employmentRevisionId}",
+            "onChange={e=>field('employmentRevisionId',e.target.value)}"
+          ]
+        },
+        {
+          "tag": "option",
+          "line": 54,
+          "props": [
+            "value=\"\""
+          ]
+        },
+        {
+          "tag": "option",
+          "line": 54,
+          "props": [
+            "value={draft.employmentRevisionId}",
+            "disabled"
+          ]
+        },
+        {
+          "tag": "option",
+          "line": 54,
+          "props": [
+            "key={p.id}",
+            "value={p.id}"
+          ]
+        },
+        {
+          "tag": "Field",
+          "line": 55,
+          "props": [
+            "label=\"Lohnmodell\""
+          ]
+        },
+        {
+          "tag": "Select",
+          "line": 55,
+          "props": [
+            "required",
+            "value={draft.model}",
+            "onChange={e=>setDraft(d=>({...d,model:e.target.value,annualBasis:'',entitlement:'',thirteenthPayoutMonth:''}))}"
+          ]
+        },
+        {
+          "tag": "option",
+          "line": 55,
+          "props": [
+            "value=\"\""
+          ]
+        },
+        {
+          "tag": "option",
+          "line": 55,
+          "props": [
+            "key={value}",
+            "value={value}"
+          ]
+        },
+        {
+          "tag": "Field",
+          "line": 56,
+          "props": [
+            "label=\"Gültig ab\""
+          ]
+        },
+        {
+          "tag": "Input",
+          "line": 56,
+          "props": [
+            "required",
+            "type=\"date\"",
+            "value={draft.startsOn}",
+            "onChange={e=>field('startsOn',e.target.value)}"
+          ]
+        },
+        {
+          "tag": "Field",
+          "line": 56,
+          "props": [
+            "label=\"Gültig bis\""
+          ]
+        },
+        {
+          "tag": "Input",
+          "line": 56,
+          "props": [
+            "type=\"date\"",
+            "min={draft.startsOn||undefined}",
+            "value={draft.endsOn}",
+            "onChange={e=>field('endsOn',e.target.value)}"
+          ]
+        },
+        {
+          "tag": "Field",
+          "line": 57,
+          "props": [
+            "label=\"Vertragsbetrag\""
+          ]
+        },
+        {
+          "tag": "Input",
+          "line": 57,
+          "props": [
+            "required",
+            "inputMode=\"decimal\"",
+            "value={draft.amount}",
+            "onChange={e=>field('amount',e.target.value)}",
+            "maxLength={13}"
+          ]
+        },
+        {
+          "tag": "Field",
+          "line": 57,
+          "props": [
+            "label=\"Währung\""
+          ]
+        },
+        {
+          "tag": "Select",
+          "line": 57,
+          "props": [
+            "value={draft.currency}",
+            "onChange={e=>field('currency',e.target.value)}"
+          ]
+        },
+        {
+          "tag": "option",
+          "line": 57,
+          "props": [
+            "value=\"CHF\""
+          ]
+        },
+        {
+          "tag": "option",
+          "line": 57,
+          "props": [
+            "value=\"EUR\""
+          ]
+        },
+        {
+          "tag": "Field",
+          "line": 58,
+          "props": [
+            "label=\"Jahreslohnbasis\""
+          ]
+        },
+        {
+          "tag": "Select",
+          "line": 58,
+          "props": [
+            "required",
+            "value={draft.annualBasis}",
+            "onChange={e=>setDraft(d=>({...d,annualBasis:e.target.value,entitlement:e.target.value?(e.target.value==='without_13th'?'no':'yes'):'',thirteenthPayoutMonth:''}))}"
+          ]
+        },
+        {
+          "tag": "option",
+          "line": 58,
+          "props": [
+            "value=\"\""
+          ]
+        },
+        {
+          "tag": "option",
+          "line": 58,
+          "props": [
+            "key={value}",
+            "value={value}"
+          ]
+        },
+        {
+          "tag": "Field",
+          "line": 58,
+          "props": [
+            "label=\"Anspruch auf 13. Monatslohn\""
+          ]
+        },
+        {
+          "tag": "Select",
+          "line": 58,
+          "props": [
+            "required",
+            "value={draft.entitlement}",
+            "onChange={e=>setDraft(d=>({...d,entitlement:e.target.value,thirteenthPayoutMonth:''}))}"
+          ]
+        },
+        {
+          "tag": "option",
+          "line": 58,
+          "props": [
+            "value=\"\""
+          ]
+        },
+        {
+          "tag": "option",
+          "line": 58,
+          "props": [
+            "value=\"yes\""
+          ]
+        },
+        {
+          "tag": "option",
+          "line": 58,
+          "props": [
+            "value=\"no\""
+          ]
+        },
+        {
+          "tag": "Field",
+          "line": 59,
+          "props": [
+            "label=\"Auszahlungstag\""
+          ]
+        },
+        {
+          "tag": "Select",
+          "line": 59,
+          "props": [
+            "required",
+            "value={draft.payoutDay}",
+            "onChange={e=>field('payoutDay',e.target.value)}"
+          ]
+        },
+        {
+          "tag": "option",
+          "line": 59,
+          "props": [
+            "value=\"\""
+          ]
+        },
+        {
+          "tag": "option",
+          "line": 59,
+          "props": [
+            "key={i+1}",
+            "value={i+1}"
+          ]
+        },
+        {
+          "tag": "option",
+          "line": 59,
+          "props": [
+            "value=\"last_day\""
+          ]
+        },
+        {
+          "tag": "Field",
+          "line": 60,
+          "props": [
+            "label=\"Auszahlungsmonat 13. Monatslohn\""
+          ]
+        },
+        {
+          "tag": "Select",
+          "line": 60,
+          "props": [
+            "required",
+            "value={draft.thirteenthPayoutMonth}",
+            "onChange={e=>field('thirteenthPayoutMonth',e.target.value)}"
+          ]
+        },
+        {
+          "tag": "option",
+          "line": 60,
+          "props": [
+            "value=\"\""
+          ]
+        },
+        {
+          "tag": "option",
+          "line": 60,
+          "props": [
+            "key={i+1}",
+            "value={i+1}"
+          ]
+        },
+        {
+          "tag": "ErrorState",
+          "line": 62,
+          "props": []
+        },
+        {
+          "tag": "FormActions",
+          "line": 63,
+          "props": [
+            "sheet"
+          ]
+        },
+        {
+          "tag": "Button",
+          "line": 63,
+          "props": [
+            "variant=\"secondary\"",
+            "disabled={busy}",
+            "onClick={()=>setOpen(false)}"
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 63,
+          "props": []
+        },
+        {
+          "tag": "Button",
+          "line": 63,
+          "props": [
+            "requiresWrite",
+            "type=\"submit\"",
+            "form={formId}",
+            "disabled={busy||!mayWrite||periods.loading||!!periods.error||!currentPeriods.length}"
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 63,
+          "props": []
+        }
+      ],
+      "conditions": [
+        {
+          "line": 23,
+          "expression": "item"
+        },
+        {
+          "line": 23,
+          "expression": "item.thirteenth_entitled"
+        },
+        {
+          "line": 23,
+          "expression": "item.payout_last_day"
+        },
+        {
+          "line": 23,
+          "expression": "item.thirteenth_payout_month"
+        },
+        {
+          "line": 28,
+          "expression": "pending.current"
+        },
+        {
+          "line": 29,
+          "expression": "!draft.model||!draft.entitlement||!draft.payoutDay"
+        },
+        {
+          "line": 30,
+          "expression": "draft.payoutDay==='last_day'"
+        },
+        {
+          "line": 30,
+          "expression": "draft.entitlement==='yes'"
+        },
+        {
+          "line": 30,
+          "expression": "selected"
+        },
+        {
+          "line": 31,
+          "expression": "issue"
+        },
+        {
+          "line": 34,
+          "expression": "attempt.current?.body!==serialized"
+        },
+        {
+          "line": 35,
+          "expression": "!result||typeof result!=='object'||!('item' in result)||!result.item||typeof result.item!=='object'||!('id' in result.item)||!result.item.id"
+        },
+        {
+          "line": 36,
+          "expression": "selected"
+        },
+        {
+          "line": 38,
+          "expression": "cause instanceof Error"
+        },
+        {
+          "line": 41,
+          "expression": "mayWrite"
+        },
+        {
+          "line": 43,
+          "expression": "query.loading"
+        },
+        {
+          "line": 43,
+          "expression": "query.error"
+        },
+        {
+          "line": 43,
+          "expression": "!query.data?.items.length"
+        },
+        {
+          "line": 46,
+          "expression": "item.thirteenth_entitled"
+        },
+        {
+          "line": 46,
+          "expression": "item.thirteenth_payout_month"
+        },
+        {
+          "line": 47,
+          "expression": "item.payout_last_day"
+        },
+        {
+          "line": 49,
+          "expression": "item.is_current"
+        },
+        {
+          "line": 49,
+          "expression": "item.is_current"
+        },
+        {
+          "line": 52,
+          "expression": "selected"
+        },
+        {
+          "line": 53,
+          "expression": "periods.error"
+        },
+        {
+          "line": 53,
+          "expression": "periods.loading"
+        },
+        {
+          "line": 58,
+          "expression": "draft.model==='annual'"
+        },
+        {
+          "line": 58,
+          "expression": "e.target.value"
+        },
+        {
+          "line": 58,
+          "expression": "e.target.value==='without_13th'"
+        }
+      ]
+    },
+    {
+      "key": "components/wage-definitions.tsx#Wage",
+      "file": "components/wage-definitions.tsx",
+      "name": "Wage",
+      "line": 12,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": []
+    },
+    {
+      "key": "lib/wage-definition.ts#WageModel",
+      "file": "lib/wage-definition.ts",
+      "name": "WageModel",
+      "line": 1,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": []
+    },
+    {
+      "key": "lib/wage-definition.ts#AnnualBasis",
+      "file": "lib/wage-definition.ts",
+      "name": "AnnualBasis",
+      "line": 2,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": []
+    },
+    {
+      "key": "components/wage-definitions.tsx#Period",
+      "file": "components/wage-definitions.tsx",
+      "name": "Period",
+      "line": 13,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": []
+    },
+    {
+      "key": "components/wage-definitions.tsx#Draft",
+      "file": "components/wage-definitions.tsx",
+      "name": "Draft",
+      "line": 14,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": []
+    },
+    {
+      "key": "components/wage-definitions.tsx#blank",
+      "file": "components/wage-definitions.tsx",
+      "name": "blank",
+      "line": 15,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": []
+    },
+    {
+      "key": "lib/wage-definition.ts#WageDefinitionInput",
+      "file": "lib/wage-definition.ts",
+      "name": "WageDefinitionInput",
+      "line": 3,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": []
+    },
+    {
+      "key": "lib/wage-definition.ts#wageDefinitionIssue",
+      "file": "lib/wage-definition.ts",
+      "name": "wageDefinitionIssue",
+      "line": 6,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": [
+        {
+          "line": 7,
+          "expression": "!input||typeof input!=='object'||Array.isArray(input)"
+        },
+        {
+          "line": 9,
+          "expression": "Object.keys(b).some(key=>!keys.includes(key))||!['monthly','hourly','annual'].includes(String(b.model))||!['CHF','EUR'].includes(String(b.currency))||typeof b.thirteenthEntitled!=='boolean'||typeof b.employmentRevisionId!=='string'||! /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(b.employmentRevisionId)"
+        },
+        {
+          "line": 10,
+          "expression": "!date(b.startsOn)||(b.endsOn!==null&&!date(b.endsOn))||(typeof b.endsOn==='string'&&b.endsOn<String(b.startsOn))"
+        },
+        {
+          "line": 11,
+          "expression": "typeof b.amount!=='string'||! /^(?:0|[1-9]\\d{0,9})(?:\\.\\d{1,2})?$/.test(b.amount)||! /[1-9]/.test(b.amount)"
+        },
+        {
+          "line": 12,
+          "expression": "b.model==='annual'"
+        },
+        {
+          "line": 13,
+          "expression": "!['including_13th','excluding_13th','without_13th'].includes(String(b.annualBasis))||b.thirteenthEntitled!==(b.annualBasis!=='without_13th')"
+        },
+        {
+          "line": 14,
+          "expression": "b.annualBasis!==null"
+        },
+        {
+          "line": 15,
+          "expression": "b.payoutDay!=='last_day'&&(!Number.isInteger(b.payoutDay)||Number(b.payoutDay)<1||Number(b.payoutDay)>28)"
+        },
+        {
+          "line": 16,
+          "expression": "b.thirteenthEntitled?(!Number.isInteger(b.thirteenthPayoutMonth)||Number(b.thirteenthPayoutMonth)<1||Number(b.thirteenthPayoutMonth)>12):b.thirteenthPayoutMonth!==null"
+        },
+        {
+          "line": 16,
+          "expression": "b.thirteenthEntitled"
+        },
+        {
+          "line": 17,
+          "expression": "b.expectedRevision!==undefined&&(!Number.isSafeInteger(b.expectedRevision)||Number(b.expectedRevision)<1)"
+        }
+      ]
+    },
+    {
+      "key": "lib/wage-definition.ts#date",
+      "file": "lib/wage-definition.ts",
+      "name": "date",
+      "line": 4,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": []
+    },
+    {
+      "key": "components/wage-definitions.tsx#modelLabels",
+      "file": "components/wage-definitions.tsx",
+      "name": "modelLabels",
+      "line": 16,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": []
+    },
+    {
+      "key": "components/wage-definitions.tsx#basisLabels",
+      "file": "components/wage-definitions.tsx",
+      "name": "basisLabels",
+      "line": 17,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": []
+    },
+    {
       "key": "components/records.tsx#TimeEntryRow",
       "file": "components/records.tsx",
       "name": "TimeEntryRow",
@@ -220526,7 +221755,7 @@
       "key": "components/pages/employees.tsx#EmployeesPage",
       "file": "components/pages/employees.tsx",
       "name": "EmployeesPage",
-      "line": 32,
+      "line": 34,
       "classes": [
         "person-record"
       ],
@@ -220535,24 +221764,24 @@
       "widgets": [
         {
           "tag": "RecordsControls",
-          "line": 36
+          "line": 38
         },
         {
           "tag": "RecordsView",
-          "line": 37
+          "line": 39
         }
       ],
       "elements": [
         {
           "tag": "span",
-          "line": 33,
+          "line": 35,
           "props": [
             "className=\"person-record\""
           ]
         },
         {
           "tag": "Avatar",
-          "line": 33,
+          "line": 35,
           "props": [
             "name={row[0]}",
             "identity={row[4]?row[3]:row[0]}"
@@ -220560,12 +221789,12 @@
         },
         {
           "tag": "span",
-          "line": 33,
+          "line": 35,
           "props": []
         },
         {
           "tag": "AppShell",
-          "line": 36,
+          "line": 38,
           "props": [
             "title=\"Mitarbeiter\"",
             "subtitle={loading?undefined:`${total} Mitarbeiter`}",
@@ -220575,7 +221804,7 @@
         },
         {
           "tag": "RecordsControls",
-          "line": 36,
+          "line": 38,
           "props": [
             "controller={controller}",
             "placeholder=\"Mitarbeiter suchen...\"",
@@ -220585,7 +221814,7 @@
         },
         {
           "tag": "CreateAction",
-          "line": 36,
+          "line": 38,
           "props": [
             "href=\"/mitarbeiter/neu\"",
             "label=\"Mitarbeiter hinzufügen\""
@@ -220593,7 +221822,7 @@
         },
         {
           "tag": "RecordsView",
-          "line": 37,
+          "line": 39,
           "props": [
             "controller={controller}",
             "toolbarActions={false}",
@@ -220612,7 +221841,7 @@
         },
         {
           "tag": "RecordRow",
-          "line": 37,
+          "line": 39,
           "props": [
             "personIdentity={id}",
             "href={\"/mitarbeiter/\"+id}",
@@ -220625,19 +221854,19 @@
       ],
       "conditions": [
         {
-          "line": 33,
+          "line": 35,
           "expression": "row[4]"
         },
         {
-          "line": 36,
+          "line": 38,
           "expression": "loading"
         },
         {
-          "line": 37,
+          "line": 39,
           "expression": "row[4]"
         },
         {
-          "line": 37,
+          "line": 39,
           "expression": "statusMaybe"
         }
       ]
@@ -243485,7 +244714,7 @@
     {
       "file": "components/pages/employees.tsx",
       "name": "EmployeesPage",
-      "line": 32,
+      "line": 34,
       "usedBy": [
         "/mitarbeiter"
       ],
@@ -243494,7 +244723,7 @@
     {
       "file": "components/pages/employees.tsx",
       "name": "EmployeeForm",
-      "line": 41,
+      "line": 43,
       "usedBy": [
         "/mitarbeiter/[id]",
         "/mitarbeiter/neu"
@@ -247773,6 +249002,36 @@
       "line": 18,
       "usedBy": [
         "/dev/ux-lab"
+      ],
+      "frameworkUsedBy": []
+    },
+    {
+      "file": "components/wage-definitions.tsx",
+      "name": "modelLabels",
+      "line": 16,
+      "usedBy": [
+        "/mitarbeiter/[id]",
+        "/mitarbeiter/neu"
+      ],
+      "frameworkUsedBy": []
+    },
+    {
+      "file": "components/wage-definitions.tsx",
+      "name": "basisLabels",
+      "line": 17,
+      "usedBy": [
+        "/mitarbeiter/[id]",
+        "/mitarbeiter/neu"
+      ],
+      "frameworkUsedBy": []
+    },
+    {
+      "file": "components/wage-definitions.tsx",
+      "name": "WageDefinitions",
+      "line": 18,
+      "usedBy": [
+        "/mitarbeiter/[id]",
+        "/mitarbeiter/neu"
       ],
       "frameworkUsedBy": []
     },
