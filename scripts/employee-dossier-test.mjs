@@ -1,3 +1,4 @@
+import {verifyTimePriceSources} from './time-price-source-contract.mjs';
 import {verifyExternalTimeContract} from './external-time-contract.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -193,7 +194,8 @@ try{
  await verifyAbsenceContract({load,db,transaction,org,other,act,request,setAuditFailure:value=>{auditFailure=value;}});
  await verifyCommercialContract({load,db,transaction,org,other,act,request,setAuditFailure:value=>{auditFailure=value;}});
  await verifyContractDocuments({load,db,transaction,org,other,act,request,setAuditFailure:value=>{auditFailure=value;}});
- await verifyExternalTimeContract({load,db,transaction,org,other,act,request,setAuditFailure:value=>{auditFailure=value;}});
+ const timePriceFixture=await verifyExternalTimeContract({load,db,transaction,org,other,act,request,setAuditFailure:value=>{auditFailure=value;}});
+ await verifyTimePriceSources({load,db,transaction,org,other,act,request,fixture:timePriceFixture,setAuditFailure:value=>{auditFailure=value;}});
  invitationPlatformEnabled=true;
  try{await verifyInvitationContract({load,mock,db,transaction,org,other,act,request,setAuditFailure:value=>{auditFailure=value;}});}finally{invitationPlatformEnabled=false;}
  mock('lib/server/maintenance.ts',{maintenanceState:async()=>({enabled:false,endsAt:null})});

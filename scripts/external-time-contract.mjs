@@ -82,5 +82,8 @@ export async function verifyExternalTimeContract({load,db,transaction,org,other,
  await transaction(org,'employee-dossier-owner',c=>c.query('update external_resource_assignments set revoked_at=now(),revoked_by_user_id=$2 where id=$1',[f.assignment,'employee-dossier-owner']));assert.equal((await create(body)).status,403,'Revocation stops new capture');
  assert.equal((await db.query('select count(*)::int n from app_users')).rows[0].n,beforeUsers);assert.equal((await db.query('select count(*)::int n from employees')).rows[0].n,beforeEmployees);
  await db.query('update organization_subscriptions set plan=$2 where organization_id=$1',[other,initialOtherPlan]);
+ const time=(await db.query('select version from time_entries where id=$1',[entry.id])).rows[0];
+ const result={...f,entryId:entry.id,timeVersion:time.version,workDate:day};
  console.log('External time: actual create/correct/submit/reject/independent approval, exact minutes, no payroll or automatic billing, replay, current assignments, role/tenant/plan boundaries and audit rollback passed.');
+ return result;
 }

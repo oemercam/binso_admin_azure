@@ -7872,6 +7872,66 @@
       ]
     },
     {
+      "route": "/api/time-entries/[id]/pricing",
+      "file": "app/api/time-entries/[id]/pricing/route.ts",
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "imports": [
+        {
+          "local": "requireSession",
+          "target": "lib/server/session.ts",
+          "exported": "requireSession"
+        },
+        {
+          "local": "withTenant",
+          "target": "lib/server/db.ts",
+          "exported": "withTenant"
+        },
+        {
+          "local": "ApiError",
+          "target": "lib/server/http.ts",
+          "exported": "ApiError"
+        },
+        {
+          "local": "apiError",
+          "target": "lib/server/http.ts",
+          "exported": "apiError"
+        },
+        {
+          "local": "assertSameOrigin",
+          "target": "lib/server/http.ts",
+          "exported": "assertSameOrigin"
+        },
+        {
+          "local": "json",
+          "target": "lib/server/http.ts",
+          "exported": "json"
+        },
+        {
+          "local": "readJson",
+          "target": "lib/server/http.ts",
+          "exported": "readJson"
+        },
+        {
+          "local": "timePriceState",
+          "target": "lib/server/repositories/time-price-sources.ts",
+          "exported": "timePriceState"
+        },
+        {
+          "local": "bindTimePriceSource",
+          "target": "lib/server/repositories/time-price-sources.ts",
+          "exported": "bindTimePriceSource"
+        },
+        {
+          "local": "TimePriceSide",
+          "target": "lib/server/repositories/time-price-sources.ts",
+          "exported": "TimePriceSide"
+        }
+      ]
+    },
+    {
       "route": "/api/time-entries/[id]",
       "file": "app/api/time-entries/[id]/route.ts",
       "methods": [
@@ -180504,8 +180564,12 @@
         "components/records.tsx#tone",
         "components/pages/shared.tsx#swissDate",
         "components/ui.tsx#Input",
-        "components/monthly-time-report.tsx#MonthlyTimeReport",
-        "components/monthly-time-report.tsx#Entry",
+        "components/time-price-source.tsx#TimePriceSource",
+        "components/time-price-source.tsx#Side",
+        "components/time-price-source.tsx#PriceState",
+        "components/time-price-source.tsx#Snapshot",
+        "components/time-price-source.tsx#Condition",
+        "components/time-price-source.tsx#ContractDetail",
         "components/binso-ux.tsx#FormSheet",
         "components/binso-ux.tsx#SheetProps",
         "components/binso-ux.tsx#Sheet",
@@ -180549,6 +180613,8 @@
         "components/directory-select.tsx#DirectorySelect",
         "components/directory-select.tsx#Item",
         "components/directory-select.tsx#Page",
+        "components/monthly-time-report.tsx#MonthlyTimeReport",
+        "components/monthly-time-report.tsx#Entry",
         "components/entity-files.tsx#EntityFiles",
         "components/entity-files.tsx#Attachment",
         "components/ui.tsx#SectionTitle",
@@ -180729,8 +180795,12 @@
         "lib/display-format.ts#timeMetadata",
         "components/pages/shared.tsx#swissDate",
         "components/ui.tsx#Input",
-        "components/monthly-time-report.tsx#MonthlyTimeReport",
-        "components/monthly-time-report.tsx#Entry",
+        "components/time-price-source.tsx#TimePriceSource",
+        "components/time-price-source.tsx#Side",
+        "components/time-price-source.tsx#PriceState",
+        "components/time-price-source.tsx#Snapshot",
+        "components/time-price-source.tsx#Condition",
+        "components/time-price-source.tsx#ContractDetail",
         "components/binso-ux.tsx#FormSheet",
         "components/binso-ux.tsx#SheetProps",
         "components/binso-ux.tsx#Sheet",
@@ -180774,10 +180844,15 @@
         "lib/form-input-hints.ts#examples",
         "components/ui.tsx#FormLabel",
         "components/ui.tsx#FormError",
+        "lib/display-format.ts#formatTimestampDate",
+        "lib/display-format.ts#formatTimestamp",
+        "lib/display-format.ts#formatQuantity",
         "components/directory-select.tsx#DirectorySelect",
         "components/directory-select.tsx#Item",
         "components/directory-select.tsx#Page",
         "lib/directory-query.ts#directoryQuery",
+        "components/monthly-time-report.tsx#MonthlyTimeReport",
+        "components/monthly-time-report.tsx#Entry",
         "components/entity-files.tsx#EntityFiles",
         "lib/file-associations.ts#fileRelations",
         "components/entity-files.tsx#Attachment",
@@ -181042,8 +181117,12 @@
         "components/records.tsx#tone",
         "components/pages/shared.tsx#swissDate",
         "components/ui.tsx#Input",
-        "components/monthly-time-report.tsx#MonthlyTimeReport",
-        "components/monthly-time-report.tsx#Entry",
+        "components/time-price-source.tsx#TimePriceSource",
+        "components/time-price-source.tsx#Side",
+        "components/time-price-source.tsx#PriceState",
+        "components/time-price-source.tsx#Snapshot",
+        "components/time-price-source.tsx#Condition",
+        "components/time-price-source.tsx#ContractDetail",
         "components/binso-ux.tsx#FormSheet",
         "components/binso-ux.tsx#SheetProps",
         "components/binso-ux.tsx#Sheet",
@@ -181087,6 +181166,8 @@
         "components/directory-select.tsx#DirectorySelect",
         "components/directory-select.tsx#Item",
         "components/directory-select.tsx#Page",
+        "components/monthly-time-report.tsx#MonthlyTimeReport",
+        "components/monthly-time-report.tsx#Entry",
         "components/entity-files.tsx#EntityFiles",
         "components/entity-files.tsx#Attachment",
         "components/ui.tsx#SectionTitle",
@@ -181287,8 +181368,12 @@
         "lib/display-format.ts#timeMetadata",
         "components/pages/shared.tsx#swissDate",
         "components/ui.tsx#Input",
-        "components/monthly-time-report.tsx#MonthlyTimeReport",
-        "components/monthly-time-report.tsx#Entry",
+        "components/time-price-source.tsx#TimePriceSource",
+        "components/time-price-source.tsx#Side",
+        "components/time-price-source.tsx#PriceState",
+        "components/time-price-source.tsx#Snapshot",
+        "components/time-price-source.tsx#Condition",
+        "components/time-price-source.tsx#ContractDetail",
         "components/binso-ux.tsx#FormSheet",
         "components/binso-ux.tsx#SheetProps",
         "components/binso-ux.tsx#Sheet",
@@ -181332,10 +181417,15 @@
         "lib/form-input-hints.ts#examples",
         "components/ui.tsx#FormLabel",
         "components/ui.tsx#FormError",
+        "lib/display-format.ts#formatTimestampDate",
+        "lib/display-format.ts#formatTimestamp",
+        "lib/display-format.ts#formatQuantity",
         "components/directory-select.tsx#DirectorySelect",
         "components/directory-select.tsx#Item",
         "components/directory-select.tsx#Page",
         "lib/directory-query.ts#directoryQuery",
+        "components/monthly-time-report.tsx#MonthlyTimeReport",
+        "components/monthly-time-report.tsx#Entry",
         "components/entity-files.tsx#EntityFiles",
         "lib/file-associations.ts#fileRelations",
         "components/entity-files.tsx#Attachment",
@@ -182448,6 +182538,8 @@
         "/api/settings/company",
         "/api/settings/documents",
         "/api/settings/profile",
+        "/api/contracts/",
+        "/api/contracts?status=active&side=",
         "/api/files?",
         "/api/files/",
         "/api/files",
@@ -182466,121 +182558,51 @@
       "widgets": [
         {
           "tag": "RecordsPagination",
-          "line": 189,
+          "line": 190,
           "component": "components/pages/time.tsx#TimePage"
         },
         {
           "tag": "DetailTabs",
-          "line": 192,
+          "line": 193,
           "component": "components/pages/time.tsx#TimePage"
         },
         {
           "tag": "ListSearch",
-          "line": 195,
+          "line": 196,
           "component": "components/pages/time.tsx#TimePage"
         },
         {
           "tag": "FilterSheet",
-          "line": 196,
+          "line": 197,
           "component": "components/pages/time.tsx#TimePage"
         },
         {
           "tag": "Field",
-          "line": 196,
+          "line": 197,
           "component": "components/pages/time.tsx#TimePage"
         },
         {
           "tag": "Field",
-          "line": 196,
+          "line": 197,
           "component": "components/pages/time.tsx#TimePage"
         },
         {
           "tag": "Field",
-          "line": 196,
+          "line": 197,
           "component": "components/pages/time.tsx#TimePage"
         },
         {
           "tag": "Field",
-          "line": 208,
+          "line": 209,
           "component": "components/pages/time.tsx#TimePage"
         },
         {
           "tag": "Field",
-          "line": 208,
+          "line": 209,
           "component": "components/pages/time.tsx#TimePage"
         },
         {
           "tag": "ActionSheet",
-          "line": 221,
-          "component": "components/pages/time.tsx#TimePage"
-        },
-        {
-          "tag": "Field",
-          "line": 221,
-          "component": "components/pages/time.tsx#TimePage"
-        },
-        {
-          "tag": "FormSheet",
-          "line": 222,
-          "component": "components/pages/time.tsx#TimePage"
-        },
-        {
-          "tag": "Field",
-          "line": 222,
-          "component": "components/pages/time.tsx#TimePage"
-        },
-        {
-          "tag": "Field",
-          "line": 222,
-          "component": "components/pages/time.tsx#TimePage"
-        },
-        {
-          "tag": "Field",
-          "line": 222,
-          "component": "components/pages/time.tsx#TimePage"
-        },
-        {
-          "tag": "Field",
-          "line": 222,
-          "component": "components/pages/time.tsx#TimePage"
-        },
-        {
-          "tag": "Field",
-          "line": 222,
-          "component": "components/pages/time.tsx#TimePage"
-        },
-        {
-          "tag": "Field",
-          "line": 222,
-          "component": "components/pages/time.tsx#TimePage"
-        },
-        {
-          "tag": "Field",
-          "line": 222,
-          "component": "components/pages/time.tsx#TimePage"
-        },
-        {
-          "tag": "Field",
-          "line": 222,
-          "component": "components/pages/time.tsx#TimePage"
-        },
-        {
-          "tag": "Field",
-          "line": 222,
-          "component": "components/pages/time.tsx#TimePage"
-        },
-        {
-          "tag": "Field",
-          "line": 222,
-          "component": "components/pages/time.tsx#TimePage"
-        },
-        {
-          "tag": "Field",
-          "line": 222,
-          "component": "components/pages/time.tsx#TimePage"
-        },
-        {
-          "tag": "Field",
           "line": 222,
           "component": "components/pages/time.tsx#TimePage"
         },
@@ -182597,12 +182619,142 @@
         {
           "tag": "Field",
           "line": 223,
+          "component": "components/pages/time.tsx#TimePage"
+        },
+        {
+          "tag": "Field",
+          "line": 223,
+          "component": "components/pages/time.tsx#TimePage"
+        },
+        {
+          "tag": "Field",
+          "line": 223,
+          "component": "components/pages/time.tsx#TimePage"
+        },
+        {
+          "tag": "Field",
+          "line": 223,
+          "component": "components/pages/time.tsx#TimePage"
+        },
+        {
+          "tag": "Field",
+          "line": 223,
+          "component": "components/pages/time.tsx#TimePage"
+        },
+        {
+          "tag": "Field",
+          "line": 223,
+          "component": "components/pages/time.tsx#TimePage"
+        },
+        {
+          "tag": "Field",
+          "line": 223,
+          "component": "components/pages/time.tsx#TimePage"
+        },
+        {
+          "tag": "Field",
+          "line": 223,
+          "component": "components/pages/time.tsx#TimePage"
+        },
+        {
+          "tag": "Field",
+          "line": 223,
+          "component": "components/pages/time.tsx#TimePage"
+        },
+        {
+          "tag": "Field",
+          "line": 223,
+          "component": "components/pages/time.tsx#TimePage"
+        },
+        {
+          "tag": "Field",
+          "line": 223,
+          "component": "components/pages/time.tsx#TimePage"
+        },
+        {
+          "tag": "Field",
+          "line": 223,
+          "component": "components/pages/time.tsx#TimePage"
+        },
+        {
+          "tag": "Field",
+          "line": 223,
+          "component": "components/pages/time.tsx#TimePage"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 224,
+          "component": "components/pages/time.tsx#TimePage"
+        },
+        {
+          "tag": "Field",
+          "line": 224,
           "component": "components/pages/time.tsx#TimePage"
         },
         {
           "tag": "ListRow",
           "line": 217,
           "component": "components/records.tsx#RecordRow"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 40,
+          "component": "components/time-price-source.tsx#TimePriceSource"
+        },
+        {
+          "tag": "Field",
+          "line": 41,
+          "component": "components/time-price-source.tsx#TimePriceSource"
+        },
+        {
+          "tag": "Field",
+          "line": 44,
+          "component": "components/time-price-source.tsx#TimePriceSource"
+        },
+        {
+          "tag": "Field",
+          "line": 44,
+          "component": "components/time-price-source.tsx#TimePriceSource"
+        },
+        {
+          "tag": "Field",
+          "line": 45,
+          "component": "components/time-price-source.tsx#TimePriceSource"
+        },
+        {
+          "tag": "Field",
+          "line": 47,
+          "component": "components/time-price-source.tsx#TimePriceSource"
+        },
+        {
+          "tag": "Field",
+          "line": 48,
+          "component": "components/time-price-source.tsx#TimePriceSource"
+        },
+        {
+          "tag": "Field",
+          "line": 52,
+          "component": "components/time-price-source.tsx#TimePriceSource"
+        },
+        {
+          "tag": "Field",
+          "line": 52,
+          "component": "components/time-price-source.tsx#TimePriceSource"
+        },
+        {
+          "tag": "Field",
+          "line": 52,
+          "component": "components/time-price-source.tsx#TimePriceSource"
+        },
+        {
+          "tag": "Sheet",
+          "line": 197,
+          "component": "components/binso-ux.tsx#FormSheet"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 193,
+          "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "FormSheet",
@@ -182638,16 +182790,6 @@
           "tag": "Field",
           "line": 38,
           "component": "components/monthly-time-report.tsx#MonthlyTimeReport"
-        },
-        {
-          "tag": "Sheet",
-          "line": 197,
-          "component": "components/binso-ux.tsx#FormSheet"
-        },
-        {
-          "tag": "ConfirmDialog",
-          "line": 193,
-          "component": "components/binso-ux.tsx#Sheet"
         },
         {
           "tag": "ListSearch",
@@ -251307,7 +251449,7 @@
       "key": "components/pages/time.tsx#TimePage",
       "file": "components/pages/time.tsx",
       "name": "TimePage",
-      "line": 30,
+      "line": 31,
       "classes": [
         "time-groups",
         "text-action",
@@ -251355,98 +251497,42 @@
       "widgets": [
         {
           "tag": "RecordsPagination",
-          "line": 189
+          "line": 190
         },
         {
           "tag": "DetailTabs",
-          "line": 192
+          "line": 193
         },
         {
           "tag": "ListSearch",
-          "line": 195
+          "line": 196
         },
         {
           "tag": "FilterSheet",
-          "line": 196
+          "line": 197
         },
         {
           "tag": "Field",
-          "line": 196
+          "line": 197
         },
         {
           "tag": "Field",
-          "line": 196
+          "line": 197
         },
         {
           "tag": "Field",
-          "line": 196
+          "line": 197
         },
         {
           "tag": "Field",
-          "line": 208
+          "line": 209
         },
         {
           "tag": "Field",
-          "line": 208
+          "line": 209
         },
         {
           "tag": "ActionSheet",
-          "line": 221
-        },
-        {
-          "tag": "Field",
-          "line": 221
-        },
-        {
-          "tag": "FormSheet",
-          "line": 222
-        },
-        {
-          "tag": "Field",
-          "line": 222
-        },
-        {
-          "tag": "Field",
-          "line": 222
-        },
-        {
-          "tag": "Field",
-          "line": 222
-        },
-        {
-          "tag": "Field",
-          "line": 222
-        },
-        {
-          "tag": "Field",
-          "line": 222
-        },
-        {
-          "tag": "Field",
-          "line": 222
-        },
-        {
-          "tag": "Field",
-          "line": 222
-        },
-        {
-          "tag": "Field",
-          "line": 222
-        },
-        {
-          "tag": "Field",
-          "line": 222
-        },
-        {
-          "tag": "Field",
-          "line": 222
-        },
-        {
-          "tag": "Field",
-          "line": 222
-        },
-        {
-          "tag": "Field",
           "line": 222
         },
         {
@@ -251460,39 +251546,95 @@
         {
           "tag": "Field",
           "line": 223
+        },
+        {
+          "tag": "Field",
+          "line": 223
+        },
+        {
+          "tag": "Field",
+          "line": 223
+        },
+        {
+          "tag": "Field",
+          "line": 223
+        },
+        {
+          "tag": "Field",
+          "line": 223
+        },
+        {
+          "tag": "Field",
+          "line": 223
+        },
+        {
+          "tag": "Field",
+          "line": 223
+        },
+        {
+          "tag": "Field",
+          "line": 223
+        },
+        {
+          "tag": "Field",
+          "line": 223
+        },
+        {
+          "tag": "Field",
+          "line": 223
+        },
+        {
+          "tag": "Field",
+          "line": 223
+        },
+        {
+          "tag": "Field",
+          "line": 223
+        },
+        {
+          "tag": "Field",
+          "line": 223
+        },
+        {
+          "tag": "FormSheet",
+          "line": 224
+        },
+        {
+          "tag": "Field",
+          "line": 224
         }
       ],
       "elements": [
         {
           "tag": "LoadingState",
-          "line": 187,
+          "line": 188,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 187,
+          "line": 188,
           "props": []
         },
         {
           "tag": "ErrorState",
-          "line": 187,
+          "line": 188,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 187,
+          "line": 188,
           "props": []
         },
         {
           "tag": "div",
-          "line": 187,
+          "line": 188,
           "props": [
             "className=\"time-groups\""
           ]
         },
         {
           "tag": "TimeEntryGroup",
-          "line": 187,
+          "line": 188,
           "props": [
             "key={group}",
             "titleVerbatim={!!items[0].customer_name}",
@@ -251504,7 +251646,7 @@
         },
         {
           "tag": "TimeEntryRow",
-          "line": 187,
+          "line": 188,
           "props": [
             "key={item.id}",
             "title={item.description||item.project_name||\"Zeiteintrag\"}",
@@ -251512,12 +251654,12 @@
             "value={formatMinutes(Number(item.duration_minutes??0))+\" h\"}",
             "status={item.invoiced_invoice_id?\"Verrechnet\":item.billable&&!item.customer_id?\"Zuordnen\":item.approved?\"Freigegeben\":item.submitted_at?\"Zur Prüfung\":item.billable?\"Erfasst\":\"Intern\"}",
             "selection={canInvoice&&!item.external_resource_id&&item.customer_id&&item.billable&&item.approved&&!item.invoiced_invoice_id?<Input type=\"checkbox\" aria-label=\"Zeit für Rechnung auswählen\" checked={selectedTimeIds.includes(item.id)} onChange={e=>setSelectedTimeIds(current=>e.target.checked?[...current,item.id]:current.filter(id=>id!==item.id))}/>:undefined}",
-            "action={<>{item.report_month&&<MonthlyTimeReport timeOnly={timeOnly} entry={item} readOnly={item.created_by_user_id!==actorId} canReview={canApprove&&item.created_by_user_id!==actorId&&!!item.submitted_at&&!item.approved}/>}{!item.report_month&&!item.invoiced_invoice_id&&!item.approved?(canApprove&&item.created_by_user_id!==actorId&&!!item.submitted_at?<button type=\"button\" className=\"text-action\" onClick={()=>void approveTime(item.id)}><LocalizedText>{\"Freigeben\"}</LocalizedText></button>:canRecord&&item.created_by_user_id===actorId&&!item.submitted_at?<button type=\"button\" className=\"text-action\" onClick={()=>void submitTime(item.id)}><LocalizedText>{\"Zur Prüfung\"}</LocalizedText></button>:undefined):undefined}</>}"
+            "action={<>{item.external_resource_id&&item.approved&&canInvoice&&actor.data?.tenant?.plan==='pro'&&<TimePriceSource entryId={item.id} billable={item.billable===true}/>}{item.report_month&&<MonthlyTimeReport timeOnly={timeOnly} entry={item} readOnly={item.created_by_user_id!==actorId} canReview={canApprove&&item.created_by_user_id!==actorId&&!!item.submitted_at&&!item.approved}/>}{!item.report_month&&!item.invoiced_invoice_id&&!item.approved?(canApprove&&item.created_by_user_id!==actorId&&!!item.submitted_at?<button type=\"button\" className=\"text-action\" onClick={()=>void approveTime(item.id)}><LocalizedText>{\"Freigeben\"}</LocalizedText></button>:canRecord&&item.created_by_user_id===actorId&&!item.submitted_at?<button type=\"button\" className=\"text-action\" onClick={()=>void submitTime(item.id)}><LocalizedText>{\"Zur Prüfung\"}</LocalizedText></button>:undefined):undefined}</>}"
           ]
         },
         {
           "tag": "Input",
-          "line": 187,
+          "line": 188,
           "props": [
             "type=\"checkbox\"",
             "aria-label=\"Zeit für Rechnung auswählen\"",
@@ -251526,8 +251668,16 @@
           ]
         },
         {
+          "tag": "TimePriceSource",
+          "line": 188,
+          "props": [
+            "entryId={item.id}",
+            "billable={item.billable===true}"
+          ]
+        },
+        {
           "tag": "MonthlyTimeReport",
-          "line": 187,
+          "line": 188,
           "props": [
             "timeOnly={timeOnly}",
             "entry={item}",
@@ -251537,7 +251687,7 @@
         },
         {
           "tag": "button",
-          "line": 187,
+          "line": 188,
           "props": [
             "type=\"button\"",
             "className=\"text-action\"",
@@ -251546,12 +251696,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 187,
+          "line": 188,
           "props": []
         },
         {
           "tag": "button",
-          "line": 187,
+          "line": 188,
           "props": [
             "type=\"button\"",
             "className=\"text-action\"",
@@ -251560,19 +251710,19 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 187,
+          "line": 188,
           "props": []
         },
         {
           "tag": "EmptyState",
-          "line": 187,
+          "line": 188,
           "props": [
             "title={remoteEntries.length?\"Keine Zeiteinträge für diese Auswahl\":\"Keine Zeiteinträge erfasst\"}"
           ]
         },
         {
           "tag": "RecordsPagination",
-          "line": 189,
+          "line": 190,
           "props": [
             "total={entriesResource.data?.total??remoteEntries.length}",
             "page={timePage}",
@@ -251583,7 +251733,7 @@
         },
         {
           "tag": "AppShell",
-          "line": 190,
+          "line": 191,
           "props": [
             "title=\"Zeiterfassung\"",
             "active=\"zeit\"",
@@ -251593,7 +251743,7 @@
         },
         {
           "tag": "DetailTabs",
-          "line": 192,
+          "line": 193,
           "props": [
             "role=\"tablist\"",
             "label=\"Zeiterfassung\""
@@ -251601,7 +251751,7 @@
         },
         {
           "tag": "button",
-          "line": 192,
+          "line": 193,
           "props": [
             "role=\"tab\"",
             "aria-selected={timeTab===\"timer\"}",
@@ -251611,12 +251761,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 192,
+          "line": 193,
           "props": []
         },
         {
           "tag": "button",
-          "line": 192,
+          "line": 193,
           "props": [
             "role=\"tab\"",
             "aria-selected={timeTab===\"entries\"}",
@@ -251626,12 +251776,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 192,
+          "line": 193,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 193,
+          "line": 194,
           "props": [
             "className=\"time-project-create\"",
             "variant=\"secondary\"",
@@ -251641,43 +251791,43 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 193,
+          "line": 194,
           "props": []
         },
         {
           "tag": "p",
-          "line": 194,
+          "line": 195,
           "props": [
             "role=\"status\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 194,
+          "line": 195,
           "props": []
         },
         {
           "tag": "Link",
-          "line": 194,
+          "line": 195,
           "props": [
             "href=\"/zeit\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 194,
+          "line": 195,
           "props": []
         },
         {
           "tag": "div",
-          "line": 195,
+          "line": 196,
           "props": [
             "className=\"toolbar time-filter-toolbar\""
           ]
         },
         {
           "tag": "ListSearch",
-          "line": 195,
+          "line": 196,
           "props": [
             "ariaLabel=\"Zeiteinträge suchen\"",
             "placeholder=\"Kunde, Mitarbeiter oder Tätigkeit suchen\"",
@@ -251687,7 +251837,7 @@
         },
         {
           "tag": "IconButton",
-          "line": 195,
+          "line": 196,
           "props": [
             "label=\"Zeitfilter\"",
             "icon=\"filter\"",
@@ -251698,7 +251848,7 @@
         },
         {
           "tag": "FilterSheet",
-          "line": 196,
+          "line": 197,
           "props": [
             "label=\"Zeitfilter\"",
             "open={timeFilterOpen}",
@@ -251707,14 +251857,14 @@
         },
         {
           "tag": "div",
-          "line": 196,
+          "line": 197,
           "props": [
             "className=\"sheet-body form-grid two\""
           ]
         },
         {
           "tag": "Field",
-          "line": 196,
+          "line": 197,
           "props": [
             "allowReadOnlyInput",
             "label=\"Status\""
@@ -251722,7 +251872,7 @@
         },
         {
           "tag": "Select",
-          "line": 196,
+          "line": 197,
           "props": [
             "value={pendingStatus}",
             "onChange={e=>setPendingStatus(e.target.value)}"
@@ -251730,7 +251880,7 @@
         },
         {
           "tag": "option",
-          "line": 196,
+          "line": 197,
           "props": [
             "key={status}",
             "value={status}"
@@ -251738,7 +251888,7 @@
         },
         {
           "tag": "Field",
-          "line": 196,
+          "line": 197,
           "props": [
             "allowReadOnlyInput",
             "label=\"Von\""
@@ -251746,7 +251896,7 @@
         },
         {
           "tag": "Input",
-          "line": 196,
+          "line": 197,
           "props": [
             "type=\"date\"",
             "value={pendingFrom}",
@@ -251756,7 +251906,7 @@
         },
         {
           "tag": "Field",
-          "line": 196,
+          "line": 197,
           "props": [
             "allowReadOnlyInput",
             "label=\"Bis\""
@@ -251764,7 +251914,7 @@
         },
         {
           "tag": "Input",
-          "line": 196,
+          "line": 197,
           "props": [
             "type=\"date\"",
             "value={pendingTo}",
@@ -251774,14 +251924,14 @@
         },
         {
           "tag": "FormActions",
-          "line": 196,
+          "line": 197,
           "props": [
             "sheet"
           ]
         },
         {
           "tag": "Button",
-          "line": 196,
+          "line": 197,
           "props": [
             "variant=\"secondary\"",
             "onClick={()=>{setEntryQuery(\"\");setEntryFrom(\"\");setEntryTo(\"\");setEntryFilter(\"Alle\");setSelectedTimeIds([]);setTimeFilterOpen(false)}}"
@@ -251789,12 +251939,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 196,
+          "line": 197,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 196,
+          "line": 197,
           "props": [
             "disabled={!!pendingFrom&&!!pendingTo&&pendingFrom>pendingTo}",
             "onClick={()=>{setEntryFilter(pendingStatus);setEntryFrom(pendingFrom);setEntryTo(pendingTo);setTimeFilterOpen(false)}}"
@@ -251802,12 +251952,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 196,
+          "line": 197,
           "props": []
         },
         {
           "tag": "button",
-          "line": 197,
+          "line": 198,
           "props": [
             "className=\"filter-chip\"",
             "type=\"button\"",
@@ -251816,7 +251966,7 @@
         },
         {
           "tag": "Icon",
-          "line": 197,
+          "line": 198,
           "props": [
             "name=\"close\"",
             "size={14}"
@@ -251824,65 +251974,65 @@
         },
         {
           "tag": "ErrorState",
-          "line": 198,
+          "line": 199,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 198,
+          "line": 199,
           "props": []
         },
         {
           "tag": "div",
-          "line": 200,
+          "line": 201,
           "props": [
             "className=\"time-layout\""
           ]
         },
         {
           "tag": "section",
-          "line": 201,
+          "line": 202,
           "props": [
             "className=\"time-section timer-card\""
           ]
         },
         {
           "tag": "div",
-          "line": 205,
+          "line": 206,
           "props": [
             "className={`timer-display ${running?\"is-running\":seconds>0?\"is-paused\":\"is-ready\"}`}"
           ]
         },
         {
           "tag": "div",
-          "line": 205,
+          "line": 206,
           "props": []
         },
         {
           "tag": "small",
-          "line": 205,
+          "line": 206,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 205,
+          "line": 206,
           "props": []
         },
         {
           "tag": "strong",
-          "line": 205,
+          "line": 206,
           "props": []
         },
         {
           "tag": "div",
-          "line": 206,
+          "line": 207,
           "props": [
             "className=\"timer-actions\""
           ]
         },
         {
           "tag": "Button",
-          "line": 206,
+          "line": 207,
           "props": [
             "requiresWrite",
             "variant={running||seconds>0?\"secondary\":\"primary\"}",
@@ -251893,12 +252043,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 206,
+          "line": 207,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 206,
+          "line": 207,
           "props": [
             "requiresWrite",
             "variant=\"secondary\"",
@@ -251909,12 +252059,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 206,
+          "line": 207,
           "props": []
         },
         {
           "tag": "Link",
-          "line": 207,
+          "line": 208,
           "props": [
             "className=\"text-action\"",
             "href={\"/projekte/\"+encodeURIComponent(timerProjectId)}"
@@ -251922,26 +252072,26 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 207,
+          "line": 208,
           "props": []
         },
         {
           "tag": "div",
-          "line": 208,
+          "line": 209,
           "props": [
             "className=\"timer-project\""
           ]
         },
         {
           "tag": "Field",
-          "line": 208,
+          "line": 209,
           "props": [
             "label=\"Kunde\""
           ]
         },
         {
           "tag": "DirectorySelect",
-          "line": 208,
+          "line": 209,
           "props": [
             "label=\"Kunde\"",
             "endpoint={customerEndpoint}",
@@ -251953,14 +252103,14 @@
         },
         {
           "tag": "Field",
-          "line": 208,
+          "line": 209,
           "props": [
             "label=\"Auftrag\""
           ]
         },
         {
           "tag": "button",
-          "line": 208,
+          "line": 209,
           "props": [
             "type=\"button\"",
             "disabled={running||seconds>0}",
@@ -251969,7 +252119,7 @@
         },
         {
           "tag": "Icon",
-          "line": 208,
+          "line": 209,
           "props": [
             "name=\"down\"",
             "size={16}"
@@ -251977,7 +252127,7 @@
         },
         {
           "tag": "SectionTitle",
-          "line": 210,
+          "line": 211,
           "props": [
             "title={\"Gesamtzeit\"}",
             "action={entriesLoading?<LoadingState/>:<strong><LocalizedText>{formatMinutes(remoteTotal)+\" h\"}</LocalizedText></strong>}"
@@ -251985,17 +252135,12 @@
         },
         {
           "tag": "LoadingState",
-          "line": 210,
+          "line": 211,
           "props": []
         },
         {
           "tag": "strong",
-          "line": 210,
-          "props": []
-        },
-        {
-          "tag": "LocalizedText",
-          "line": 210,
+          "line": 211,
           "props": []
         },
         {
@@ -252004,15 +252149,20 @@
           "props": []
         },
         {
-          "tag": "div",
+          "tag": "LocalizedText",
           "line": 212,
+          "props": []
+        },
+        {
+          "tag": "div",
+          "line": 213,
           "props": [
             "className=\"time-entry-actions\""
           ]
         },
         {
           "tag": "Button",
-          "line": 212,
+          "line": 213,
           "props": [
             "requiresWrite",
             "variant=\"secondary\"",
@@ -252022,17 +252172,17 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 212,
+          "line": 213,
           "props": []
         },
         {
           "tag": "MonthlyTimeReport",
-          "line": 212,
+          "line": 213,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 212,
+          "line": 213,
           "props": [
             "onClick={()=>void openBilling()}",
             "icon=\"receipt\""
@@ -252040,19 +252190,19 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 212,
+          "line": 213,
           "props": []
         },
         {
           "tag": "section",
-          "line": 215,
+          "line": 216,
           "props": [
             "className=\"time-section time-overview-section\""
           ]
         },
         {
           "tag": "SectionTitle",
-          "line": 216,
+          "line": 217,
           "props": [
             "title=\"Heute\"",
             "action={entriesLoading?<LoadingState/>:<strong><LocalizedText>{formatMinutes(remoteTotal)+\" h\"}</LocalizedText></strong>}"
@@ -252060,22 +252210,22 @@
         },
         {
           "tag": "LoadingState",
-          "line": 216,
+          "line": 217,
           "props": []
         },
         {
           "tag": "strong",
-          "line": 216,
+          "line": 217,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 216,
+          "line": 217,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 218,
+          "line": 219,
           "props": [
             "variant=\"ghost\"",
             "icon=\"plus\"",
@@ -252085,17 +252235,17 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 218,
+          "line": 219,
           "props": []
         },
         {
           "tag": "MonthlyTimeReport",
-          "line": 218,
+          "line": 219,
           "props": []
         },
         {
           "tag": "ActionSheet",
-          "line": 221,
+          "line": 222,
           "props": [
             "label=\"Auftrag wählen\"",
             "description=\"Die Zeit wird direkt dem gewählten Auftrag zugeordnet.\"",
@@ -252106,14 +252256,14 @@
         },
         {
           "tag": "div",
-          "line": 221,
+          "line": 222,
           "props": [
             "className=\"choice-list\""
           ]
         },
         {
           "tag": "button",
-          "line": 221,
+          "line": 222,
           "props": [
             "type=\"button\"",
             "key={project.id}",
@@ -252123,50 +252273,50 @@
         },
         {
           "tag": "div",
-          "line": 221,
+          "line": 222,
           "props": []
         },
         {
           "tag": "b",
-          "line": 221,
+          "line": 222,
           "props": []
         },
         {
           "tag": "small",
-          "line": 221,
+          "line": 222,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 221,
+          "line": 222,
           "props": [
             "verbatim={!!project.customer_id}"
           ]
         },
         {
           "tag": "Icon",
-          "line": 221,
+          "line": 222,
           "props": [
             "name=\"check\""
           ]
         },
         {
           "tag": "Icon",
-          "line": 221,
+          "line": 222,
           "props": [
             "name=\"arrow\""
           ]
         },
         {
           "tag": "Field",
-          "line": 221,
+          "line": 222,
           "props": [
             "label=\"Auftrag\""
           ]
         },
         {
           "tag": "DirectorySelect",
-          "line": 221,
+          "line": 222,
           "props": [
             "label=\"Auftrag\"",
             "emptyLabel=\"Auftrag auswählen\"",
@@ -252178,7 +252328,7 @@
         },
         {
           "tag": "FormSheet",
-          "line": 222,
+          "line": 223,
           "props": [
             "label=\"Zeit erfassen\"",
             "ariaLabel=\"Zeit manuell erfassen\"",
@@ -252191,28 +252341,28 @@
         },
         {
           "tag": "div",
-          "line": 222,
+          "line": 223,
           "props": [
             "className=\"sheet-body\""
           ]
         },
         {
           "tag": "div",
-          "line": 222,
+          "line": 223,
           "props": [
             "className=\"form-grid two\""
           ]
         },
         {
           "tag": "Field",
-          "line": 222,
+          "line": 223,
           "props": [
             "label=\"Leistungserbringer\""
           ]
         },
         {
           "tag": "Select",
-          "line": 222,
+          "line": 223,
           "props": [
             "value={manualExternal?\"external\":\"internal\"}",
             "onChange={e=>{setManualExternal(e.target.value===\"external\");setManualAssignment(\"\");setManualPayroll(false)}}"
@@ -252220,38 +252370,38 @@
         },
         {
           "tag": "option",
-          "line": 222,
+          "line": 223,
           "props": [
             "value=\"internal\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 222,
+          "line": 223,
           "props": []
         },
         {
           "tag": "option",
-          "line": 222,
+          "line": 223,
           "props": [
             "value=\"external\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 222,
+          "line": 223,
           "props": []
         },
         {
           "tag": "Field",
-          "line": 222,
+          "line": 223,
           "props": [
             "label=\"Datum\""
           ]
         },
         {
           "tag": "Input",
-          "line": 222,
+          "line": 223,
           "props": [
             "type=\"date\"",
             "value={manualDate}",
@@ -252260,14 +252410,14 @@
         },
         {
           "tag": "Field",
-          "line": 222,
+          "line": 223,
           "props": [
             "label=\"Dauer\""
           ]
         },
         {
           "tag": "Input",
-          "line": 222,
+          "line": 223,
           "props": [
             "type=\"text\"",
             "inputMode=\"text\"",
@@ -252280,14 +252430,14 @@
         },
         {
           "tag": "Field",
-          "line": 222,
+          "line": 223,
           "props": [
             "label=\"Kunde\""
           ]
         },
         {
           "tag": "DirectorySelect",
-          "line": 222,
+          "line": 223,
           "props": [
             "label=\"Kunde\"",
             "endpoint={customerEndpoint}",
@@ -252299,14 +252449,14 @@
         },
         {
           "tag": "Field",
-          "line": 222,
+          "line": 223,
           "props": [
             "label=\"Auftrag\""
           ]
         },
         {
           "tag": "DirectorySelect",
-          "line": 222,
+          "line": 223,
           "props": [
             "label=\"Auftrag\"",
             "emptyLabel=\"Ohne Auftrag\"",
@@ -252319,14 +252469,14 @@
         },
         {
           "tag": "Field",
-          "line": 222,
+          "line": 223,
           "props": [
             "label=\"Externe Ressource\""
           ]
         },
         {
           "tag": "DirectorySelect",
-          "line": 222,
+          "line": 223,
           "props": [
             "label=\"Externe Ressource\"",
             "emptyLabel=\"Ressource auswählen\"",
@@ -252339,14 +252489,14 @@
         },
         {
           "tag": "Field",
-          "line": 222,
+          "line": 223,
           "props": [
             "label=\"Interne Tätigkeit\""
           ]
         },
         {
           "tag": "Select",
-          "line": 222,
+          "line": 223,
           "props": [
             "value={manualInternalCategory}",
             "onChange={e=>setManualInternalCategory(e.target.value)}"
@@ -252354,50 +252504,50 @@
         },
         {
           "tag": "option",
-          "line": 222,
+          "line": 223,
           "props": [
             "value={\"Administration\"}"
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 222,
+          "line": 223,
           "props": []
         },
         {
           "tag": "option",
-          "line": 222,
+          "line": 223,
           "props": [
             "value={\"Weiterbildung\"}"
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 222,
+          "line": 223,
           "props": []
         },
         {
           "tag": "option",
-          "line": 222,
+          "line": 223,
           "props": [
             "value={\"Interne IT\"}"
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 222,
+          "line": 223,
           "props": []
         },
         {
           "tag": "Field",
-          "line": 222,
+          "line": 223,
           "props": [
             "label=\"Zeitart\""
           ]
         },
         {
           "tag": "Select",
-          "line": 222,
+          "line": 223,
           "props": [
             "value={manualCategory}",
             "onChange={e=>setManualCategory(e.target.value)}"
@@ -252405,62 +252555,62 @@
         },
         {
           "tag": "option",
-          "line": 222,
+          "line": 223,
           "props": [
             "value=\"work\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 222,
+          "line": 223,
           "props": []
         },
         {
           "tag": "option",
-          "line": 222,
+          "line": 223,
           "props": [
             "value=\"travel\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 222,
+          "line": 223,
           "props": []
         },
         {
           "tag": "option",
-          "line": 222,
+          "line": 223,
           "props": [
             "value=\"break\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 222,
+          "line": 223,
           "props": []
         },
         {
           "tag": "option",
-          "line": 222,
+          "line": 223,
           "props": [
             "value=\"other\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 222,
+          "line": 223,
           "props": []
         },
         {
           "tag": "Field",
-          "line": 222,
+          "line": 223,
           "props": [
             "label=\"Arbeitszeit\""
           ]
         },
         {
           "tag": "Input",
-          "line": 222,
+          "line": 223,
           "props": [
             "type=\"checkbox\"",
             "checked={manualWorkTime}",
@@ -252469,14 +252619,14 @@
         },
         {
           "tag": "Field",
-          "line": 222,
+          "line": 223,
           "props": [
             "label=\"Lohnrelevanz beantragen\""
           ]
         },
         {
           "tag": "Input",
-          "line": 222,
+          "line": 223,
           "props": [
             "type=\"checkbox\"",
             "checked={manualPayroll}",
@@ -252485,7 +252635,7 @@
         },
         {
           "tag": "Field",
-          "line": 222,
+          "line": 223,
           "props": [
             "className=\"full\"",
             "label=\"Beschreibung\""
@@ -252493,7 +252643,7 @@
         },
         {
           "tag": "Input",
-          "line": 222,
+          "line": 223,
           "props": [
             "value={manualDescription}",
             "onChange={e=>setManualDescription(e.target.value)}",
@@ -252502,14 +252652,14 @@
         },
         {
           "tag": "Field",
-          "line": 222,
+          "line": 223,
           "props": [
             "label=\"Verrechenbar\""
           ]
         },
         {
           "tag": "Input",
-          "line": 222,
+          "line": 223,
           "props": [
             "type=\"checkbox\"",
             "checked={manualBillable}",
@@ -252518,14 +252668,14 @@
         },
         {
           "tag": "Field",
-          "line": 222,
+          "line": 223,
           "props": [
             "label=\"Stundensatz CHF\""
           ]
         },
         {
           "tag": "Input",
-          "line": 222,
+          "line": 223,
           "props": [
             "type=\"number\"",
             "min=\"0\"",
@@ -252537,14 +252687,14 @@
         },
         {
           "tag": "FormActions",
-          "line": 222,
+          "line": 223,
           "props": [
             "sheet"
           ]
         },
         {
           "tag": "Button",
-          "line": 222,
+          "line": 223,
           "props": [
             "variant=\"secondary\"",
             "onClick={closeManual}"
@@ -252552,12 +252702,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 222,
+          "line": 223,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 222,
+          "line": 223,
           "props": [
             "requiresWrite",
             "disabled={timeSaving||!manualRecovery.ready||manualExternal&&(!canRecordExternal||!manualAssignment)}",
@@ -252566,12 +252716,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 222,
+          "line": 223,
           "props": []
         },
         {
           "tag": "FormSheet",
-          "line": 223,
+          "line": 224,
           "props": [
             "label=\"Zeiten verrechnen\"",
             "description=\"Die Verknüpfung erfolgt erst beim Speichern der Rechnung.\"",
@@ -252581,7 +252731,7 @@
         },
         {
           "tag": "Field",
-          "line": 223,
+          "line": 224,
           "props": [
             "allowReadOnlyInput",
             "label=\"Rechnung\""
@@ -252589,7 +252739,7 @@
         },
         {
           "tag": "Select",
-          "line": 223,
+          "line": 224,
           "props": [
             "value={billingTarget}",
             "onChange={e=>setBillingTarget(e.target.value)}"
@@ -252597,19 +252747,19 @@
         },
         {
           "tag": "option",
-          "line": 223,
+          "line": 224,
           "props": [
             "value=\"\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 223,
+          "line": 224,
           "props": []
         },
         {
           "tag": "option",
-          "line": 223,
+          "line": 224,
           "props": [
             "key={i.number}",
             "value={i.number}"
@@ -252617,29 +252767,29 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 223,
+          "line": 224,
           "props": []
         },
         {
           "tag": "ErrorState",
-          "line": 223,
+          "line": 224,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 223,
+          "line": 224,
           "props": []
         },
         {
           "tag": "FormActions",
-          "line": 223,
+          "line": 224,
           "props": [
             "sheet"
           ]
         },
         {
           "tag": "Button",
-          "line": 223,
+          "line": 224,
           "props": [
             "variant=\"secondary\"",
             "onClick={()=>setBillingOpen(false)}"
@@ -252647,12 +252797,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 223,
+          "line": 224,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 223,
+          "line": 224,
           "props": [
             "disabled={!billableSelection.length||mixedCustomers||!!billingError}",
             "href={billingTarget?'/rechnungen/'+encodeURIComponent(billingTarget)+'?timeEntries='+encodeURIComponent(billableSelection.map(i=>i.id).join(',')):invoiceHref}"
@@ -252660,12 +252810,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 223,
+          "line": 224,
           "props": []
         },
         {
           "tag": "Toast",
-          "line": 224,
+          "line": 225,
           "props": [
             "title={toast}",
             "tone={[\"Zeiteintrag gespeichert.\",\"Zeit freigegeben.\"].includes(toast)?\"success\":\"danger\"}"
@@ -252674,463 +252824,463 @@
       ],
       "conditions": [
         {
-          "line": 33,
+          "line": 34,
           "expression": "item.time_category"
         },
         {
-          "line": 33,
+          "line": 34,
           "expression": "item.external_resource_id"
         },
         {
-          "line": 33,
+          "line": 34,
           "expression": "item.is_work_time"
         },
         {
-          "line": 33,
+          "line": 34,
           "expression": "item.payroll_relevant"
         },
         {
-          "line": 34,
+          "line": 35,
           "expression": "searchParams.has(\"returnTo\")"
         },
         {
-          "line": 42,
+          "line": 43,
           "expression": "searchParams.has(\"invoice\")"
         },
         {
-          "line": 60,
+          "line": 61,
           "expression": "timeOnly"
         },
         {
-          "line": 60,
+          "line": 61,
           "expression": "timeOnly"
-        },
-        {
-          "line": 62,
-          "expression": "employeeFilter||searchParams.has('invoice')||searchParams.get('tab')==='entries'"
         },
         {
           "line": 63,
+          "expression": "employeeFilter||searchParams.has('invoice')||searchParams.get('tab')==='entries'"
+        },
+        {
+          "line": 64,
           "expression": "actor.data&&!canRecord"
         },
         {
-          "line": 81,
+          "line": 82,
           "expression": "!actor.data"
         },
         {
-          "line": 81,
+          "line": 82,
           "expression": "active"
         },
         {
-          "line": 81,
+          "line": 82,
           "expression": "timeOnly"
         },
         {
-          "line": 81,
+          "line": 82,
           "expression": "timeOnly"
         },
         {
-          "line": 81,
+          "line": 82,
           "expression": "!active"
         },
         {
-          "line": 81,
+          "line": 82,
           "expression": "selectedId&&!projectItems.some(item=>item.id===selectedId)"
         },
         {
-          "line": 81,
+          "line": 82,
           "expression": "timeOnly"
         },
         {
-          "line": 81,
+          "line": 82,
           "expression": "!active"
         },
         {
-          "line": 81,
+          "line": 82,
           "expression": "selected"
         },
         {
-          "line": 81,
+          "line": 82,
           "expression": "!active"
         },
         {
-          "line": 81,
+          "line": 82,
           "expression": "active"
-        },
-        {
-          "line": 85,
-          "expression": "timeTab==='timer'"
-        },
-        {
-          "line": 85,
-          "expression": "timeTab==='timer'"
-        },
-        {
-          "line": 85,
-          "expression": "searchParams.has('invoice')"
-        },
-        {
-          "line": 85,
-          "expression": "timeTab==='entries'"
-        },
-        {
-          "line": 85,
-          "expression": "timeTab==='timer'"
-        },
-        {
-          "line": 85,
-          "expression": "timeTab==='timer'"
-        },
-        {
-          "line": 85,
-          "expression": "timeTab==='entries'&&!reviewMode"
         },
         {
           "line": 86,
+          "expression": "timeTab==='timer'"
+        },
+        {
+          "line": 86,
+          "expression": "timeTab==='timer'"
+        },
+        {
+          "line": 86,
+          "expression": "searchParams.has('invoice')"
+        },
+        {
+          "line": 86,
+          "expression": "timeTab==='entries'"
+        },
+        {
+          "line": 86,
+          "expression": "timeTab==='timer'"
+        },
+        {
+          "line": 86,
+          "expression": "timeTab==='timer'"
+        },
+        {
+          "line": 86,
+          "expression": "timeTab==='entries'&&!reviewMode"
+        },
+        {
+          "line": 87,
           "expression": "timeTab==='timer'&&!timerProjectId&&!['Arbeitszeit','Interne Planung'].includes(timerProject)"
         },
         {
-          "line": 89,
+          "line": 90,
           "expression": "pagination.scope===filterScope"
         },
         {
-          "line": 94,
+          "line": 95,
           "expression": "entryOverride?.key===entryKey"
         },
         {
-          "line": 96,
+          "line": 97,
           "expression": "current?.key===key"
         },
         {
-          "line": 96,
+          "line": 97,
           "expression": "typeof next==='function'"
         },
         {
-          "line": 97,
+          "line": 98,
           "expression": "active"
         },
         {
-          "line": 101,
+          "line": 102,
           "expression": "e instanceof Error"
         },
         {
-          "line": 105,
+          "line": 106,
           "expression": "!active||request!==sequence"
         },
         {
-          "line": 116,
+          "line": 117,
           "expression": "!running"
         },
         {
-          "line": 120,
+          "line": 121,
           "expression": "error instanceof Error"
-        },
-        {
-          "line": 123,
-          "expression": "timeBusy.current"
         },
         {
           "line": 124,
-          "expression": "running"
-        },
-        {
-          "line": 125,
-          "expression": "error instanceof Error"
-        },
-        {
-          "line": 132,
           "expression": "timeBusy.current"
         },
         {
-          "line": 136,
-          "expression": "employeeFilter"
+          "line": 125,
+          "expression": "running"
+        },
+        {
+          "line": 126,
+          "expression": "error instanceof Error"
+        },
+        {
+          "line": 133,
+          "expression": "timeBusy.current"
         },
         {
           "line": 137,
+          "expression": "employeeFilter"
+        },
+        {
+          "line": 138,
           "expression": "error instanceof Error"
         },
         {
-          "line": 144,
+          "line": 145,
           "expression": "!value||[value.manualDate,value.manualDuration,value.manualCustomer,value.manualProject,value.manualDescription,value.manualInternalCategory,value.manualRate].some(field=>typeof field!==\"string\"||field.length>2000)||typeof value.manualBillable!==\"boolean\""
         },
         {
-          "line": 145,
+          "line": 146,
           "expression": "typeof value.manualExternal==='boolean'"
         },
         {
-          "line": 145,
+          "line": 146,
           "expression": "typeof value.manualAssignment==='string'"
         },
         {
-          "line": 145,
+          "line": 146,
           "expression": "['work','travel','break','other'].includes(value.manualCategory)"
         },
         {
-          "line": 145,
+          "line": 146,
           "expression": "typeof value.manualWorkTime==='boolean'"
         },
         {
-          "line": 145,
+          "line": 146,
           "expression": "typeof value.manualPayroll==='boolean'"
         },
         {
-          "line": 147,
+          "line": 148,
           "expression": "value.manualReplay&&typeof value.manualReplay.body===\"string\"&&value.manualReplay.body.length<16000&&typeof value.manualReplay.key===\"string\"&&value.manualReplay.key.length>=8&&value.manualReplay.key.length<=128"
         },
         {
-          "line": 149,
+          "line": 150,
           "expression": "returnTo"
         },
         {
-          "line": 151,
+          "line": 152,
           "expression": "timeBusy.current||!manualRecovery.ready"
         },
         {
-          "line": 153,
+          "line": 154,
           "expression": "Number.isFinite(hours)"
         },
         {
-          "line": 153,
+          "line": 154,
           "expression": "Number.isFinite(minutes)"
         },
         {
-          "line": 154,
+          "line": 155,
           "expression": "!/^\\d{1,2}:[0-5]\\d$/.test(manualDuration)||durationMinutes<=0||durationMinutes>1440||!/^\\d{4}-\\d{2}-\\d{2}$/.test(manualDate)"
         },
         {
-          "line": 163,
+          "line": 164,
           "expression": "manualExternal"
-        },
-        {
-          "line": 163,
-          "expression": "manualCustomer"
         },
         {
           "line": 164,
+          "expression": "manualCustomer"
+        },
+        {
+          "line": 165,
           "expression": "manualReplay?.body===serialized"
         },
         {
-          "line": 172,
+          "line": 173,
           "expression": "error instanceof Error"
         },
         {
-          "line": 178,
+          "line": 179,
           "expression": "item.id===id"
         },
         {
-          "line": 178,
+          "line": 179,
           "expression": "e instanceof Error"
         },
         {
-          "line": 179,
+          "line": 180,
           "expression": "item.id===id"
         },
         {
-          "line": 179,
+          "line": 180,
           "expression": "error instanceof Error"
         },
         {
-          "line": 180,
+          "line": 181,
           "expression": "timeTab===\"timer\""
         },
         {
-          "line": 180,
+          "line": 181,
           "expression": "timeTab===\"timer\""
         },
         {
-          "line": 180,
+          "line": 181,
           "expression": "searchParams.has(\"invoice\")"
         },
         {
-          "line": 180,
+          "line": 181,
           "expression": "timeTab===\"entries\""
         },
         {
-          "line": 180,
+          "line": 181,
           "expression": "timeTab===\"timer\""
         },
         {
-          "line": 180,
+          "line": 181,
           "expression": "timeTab===\"timer\""
         },
         {
-          "line": 180,
+          "line": 181,
           "expression": "timeTab===\"entries\"&&!reviewMode"
         },
         {
-          "line": 184,
+          "line": 185,
           "expression": "entriesResource.data?.total_minutes==null"
         },
         {
-          "line": 185,
+          "line": 186,
           "expression": "billableSelection.length"
         },
         {
-          "line": 186,
+          "line": 187,
           "expression": "item.billable"
         },
         {
-          "line": 187,
+          "line": 188,
           "expression": "entriesLoading"
         },
         {
-          "line": 187,
+          "line": 188,
           "expression": "entriesError"
         },
         {
-          "line": 187,
+          "line": 188,
           "expression": "visibleEntries.length"
         },
         {
-          "line": 187,
+          "line": 188,
           "expression": "items[0].billable"
         },
         {
-          "line": 187,
+          "line": 188,
           "expression": "item.invoiced_invoice_id"
         },
         {
-          "line": 187,
+          "line": 188,
           "expression": "item.billable&&!item.customer_id"
         },
         {
-          "line": 187,
+          "line": 188,
           "expression": "item.approved"
         },
         {
-          "line": 187,
+          "line": 188,
           "expression": "item.submitted_at"
         },
         {
-          "line": 187,
+          "line": 188,
           "expression": "item.billable"
         },
         {
-          "line": 187,
+          "line": 188,
           "expression": "canInvoice&&!item.external_resource_id&&item.customer_id&&item.billable&&item.approved&&!item.invoiced_invoice_id"
         },
         {
-          "line": 187,
+          "line": 188,
           "expression": "e.target.checked"
         },
         {
-          "line": 187,
+          "line": 188,
           "expression": "!item.report_month&&!item.invoiced_invoice_id&&!item.approved"
         },
         {
-          "line": 187,
+          "line": 188,
           "expression": "canApprove&&item.created_by_user_id!==actorId&&!!item.submitted_at"
         },
         {
-          "line": 187,
+          "line": 188,
           "expression": "canRecord&&item.created_by_user_id===actorId&&!item.submitted_at"
         },
         {
-          "line": 187,
+          "line": 188,
           "expression": "remoteEntries.length"
         },
         {
-          "line": 192,
+          "line": 193,
           "expression": "timeTab===\"timer\""
         },
         {
-          "line": 192,
+          "line": 193,
           "expression": "timeTab===\"entries\""
         },
         {
-          "line": 202,
+          "line": 203,
           "expression": "timeTab===\"timer\""
         },
         {
-          "line": 205,
+          "line": 206,
           "expression": "running"
         },
         {
-          "line": 205,
-          "expression": "seconds>0"
-        },
-        {
-          "line": 205,
-          "expression": "running"
-        },
-        {
-          "line": 205,
+          "line": 206,
           "expression": "seconds>0"
         },
         {
           "line": 206,
+          "expression": "running"
+        },
+        {
+          "line": 206,
+          "expression": "seconds>0"
+        },
+        {
+          "line": 207,
           "expression": "running||seconds>0"
         },
         {
-          "line": 206,
+          "line": 207,
           "expression": "running"
         },
         {
-          "line": 206,
+          "line": 207,
           "expression": "running"
         },
         {
-          "line": 206,
+          "line": 207,
           "expression": "seconds>0"
         },
         {
-          "line": 208,
+          "line": 209,
           "expression": "value"
         },
         {
-          "line": 208,
+          "line": 209,
           "expression": "value"
         },
         {
-          "line": 210,
+          "line": 211,
           "expression": "entriesLoading"
         },
         {
-          "line": 216,
+          "line": 217,
           "expression": "entriesLoading"
         },
         {
-          "line": 221,
+          "line": 222,
           "expression": "timerProjectId===project.id||!timerProjectId&&timerProject===project.name"
         },
         {
-          "line": 221,
+          "line": 222,
           "expression": "(timerProjectId===project.id||!timerProjectId&&timerProject===project.name)"
         },
         {
-          "line": 221,
-          "expression": "item"
-        },
-        {
-          "line": 221,
-          "expression": "item.customer_id"
-        },
-        {
-          "line": 222,
-          "expression": "manualExternal"
-        },
-        {
           "line": 222,
           "expression": "item"
         },
         {
           "line": 222,
           "expression": "item.customer_id"
-        },
-        {
-          "line": 222,
-          "expression": "manualProject"
-        },
-        {
-          "line": 222,
-          "expression": "timeSaving"
         },
         {
           "line": 223,
-          "expression": "billingTarget"
+          "expression": "manualExternal"
+        },
+        {
+          "line": 223,
+          "expression": "item"
+        },
+        {
+          "line": 223,
+          "expression": "item.customer_id"
+        },
+        {
+          "line": 223,
+          "expression": "manualProject"
+        },
+        {
+          "line": 223,
+          "expression": "timeSaving"
         },
         {
           "line": 224,
+          "expression": "billingTarget"
+        },
+        {
+          "line": 225,
           "expression": "[\"Zeiteintrag gespeichert.\",\"Zeit freigegeben.\"].includes(toast)"
         }
       ]
@@ -253139,7 +253289,7 @@
       "key": "components/pages/time.tsx#TimeEntry",
       "file": "components/pages/time.tsx",
       "name": "TimeEntry",
-      "line": 28,
+      "line": 29,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -253363,6 +253513,554 @@
           ]
         }
       ],
+      "conditions": []
+    },
+    {
+      "key": "components/time-price-source.tsx#TimePriceSource",
+      "file": "components/time-price-source.tsx",
+      "name": "TimePriceSource",
+      "line": 18,
+      "classes": [
+        "text-action"
+      ],
+      "apis": [
+        "/api/contracts/",
+        "/api/time-entries/",
+        "/api/contracts?status=active&side="
+      ],
+      "collections": [],
+      "widgets": [
+        {
+          "tag": "FormSheet",
+          "line": 40
+        },
+        {
+          "tag": "Field",
+          "line": 41
+        },
+        {
+          "tag": "Field",
+          "line": 44
+        },
+        {
+          "tag": "Field",
+          "line": 44
+        },
+        {
+          "tag": "Field",
+          "line": 45
+        },
+        {
+          "tag": "Field",
+          "line": 47
+        },
+        {
+          "tag": "Field",
+          "line": 48
+        },
+        {
+          "tag": "Field",
+          "line": 52
+        },
+        {
+          "tag": "Field",
+          "line": 52
+        },
+        {
+          "tag": "Field",
+          "line": 52
+        }
+      ],
+      "elements": [
+        {
+          "tag": "button",
+          "line": 40,
+          "props": [
+            "type=\"button\"",
+            "className=\"text-action\"",
+            "onClick={launch}"
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 40,
+          "props": []
+        },
+        {
+          "tag": "FormSheet",
+          "line": 40,
+          "props": [
+            "label=\"Preisquelle bestätigen\"",
+            "description=\"Einkauf und Verkauf werden getrennt gespeichert. Es wird keine Rechnung erzeugt.\"",
+            "open={open}",
+            "onClose={close}",
+            "busy={saving}",
+            "dirty={!!selection}"
+          ]
+        },
+        {
+          "tag": "Field",
+          "line": 41,
+          "props": [
+            "label=\"Richtung\""
+          ]
+        },
+        {
+          "tag": "Select",
+          "line": 41,
+          "props": [
+            "value={side}",
+            "disabled={saving}",
+            "onChange={e=>void load(e.target.value as Side)}"
+          ]
+        },
+        {
+          "tag": "option",
+          "line": 41,
+          "props": [
+            "value=\"sale\"",
+            "disabled={!billable}"
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 41,
+          "props": []
+        },
+        {
+          "tag": "option",
+          "line": 41,
+          "props": [
+            "value=\"purchase\""
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 41,
+          "props": []
+        },
+        {
+          "tag": "LoadingState",
+          "line": 42,
+          "props": []
+        },
+        {
+          "tag": "ErrorState",
+          "line": 42,
+          "props": []
+        },
+        {
+          "tag": "Button",
+          "line": 42,
+          "props": [
+            "variant=\"secondary\"",
+            "disabled={saving}",
+            "onClick={()=>void load(side)}"
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 42,
+          "props": []
+        },
+        {
+          "tag": "Button",
+          "line": 43,
+          "props": [
+            "variant=\"secondary\"",
+            "onClick={()=>void load(side)}"
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 43,
+          "props": []
+        },
+        {
+          "tag": "Field",
+          "line": 44,
+          "props": [
+            "label=\"Leistungsdatum\""
+          ]
+        },
+        {
+          "tag": "Input",
+          "line": 44,
+          "props": [
+            "readOnly",
+            "value={formatTimestampDate(state.time.work_date,localeTags[locale])}"
+          ]
+        },
+        {
+          "tag": "Field",
+          "line": 44,
+          "props": [
+            "label=\"Ressource\""
+          ]
+        },
+        {
+          "tag": "Input",
+          "line": 44,
+          "props": [
+            "readOnly",
+            "value={state.time.person_name}"
+          ]
+        },
+        {
+          "tag": "Field",
+          "line": 45,
+          "props": [
+            "label=\"Gespeicherte Preisquelle\""
+          ]
+        },
+        {
+          "tag": "Input",
+          "line": 45,
+          "props": [
+            "readOnly",
+            "value={state.item?formatQuantity(state.item.source_snapshot.unitPrice,state.item.source_snapshot.currency,localeTags[locale])+' / h':'—'}"
+          ]
+        },
+        {
+          "tag": "Button",
+          "line": 46,
+          "props": [
+            "variant=\"ghost\"",
+            "href={'/vertraege/'+encodeURIComponent(state.item.source_snapshot.contractId)}"
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 46,
+          "props": []
+        },
+        {
+          "tag": "p",
+          "line": 47,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 47,
+          "props": []
+        },
+        {
+          "tag": "Field",
+          "line": 47,
+          "props": [
+            "label=\"Vertrag\""
+          ]
+        },
+        {
+          "tag": "DirectorySelect",
+          "line": 47,
+          "props": [
+            "label=\"Vertrag\"",
+            "emptyLabel=\"Vertrag auswählen\"",
+            "endpoint={'/api/contracts?status=active&side='+side+'&partyId='+encodeURIComponent(side==='sale'?state.time.customer_id??'':state.time.supplier_id)}",
+            "value={contractId}",
+            "onChange={value=>{setContractId(value);setSelection(null)}}"
+          ]
+        },
+        {
+          "tag": "Field",
+          "line": 48,
+          "props": [
+            "label=\"Freigegebener Stundensatz\""
+          ]
+        },
+        {
+          "tag": "Select",
+          "line": 48,
+          "props": [
+            "value={selection?.condition.id??''}",
+            "disabled={!detail||saving}",
+            "onChange={e=>{const row=conditions.find(row=>row.id===e.target.value);setSelection(row&&detail?{contractId,contractVersion:detail.item.version,condition:row}:null)}}"
+          ]
+        },
+        {
+          "tag": "option",
+          "line": 48,
+          "props": [
+            "value=\"\""
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 48,
+          "props": []
+        },
+        {
+          "tag": "option",
+          "line": 48,
+          "props": [
+            "key={row.id}",
+            "value={row.id}"
+          ]
+        },
+        {
+          "tag": "LoadingState",
+          "line": 49,
+          "props": []
+        },
+        {
+          "tag": "ErrorState",
+          "line": 49,
+          "props": []
+        },
+        {
+          "tag": "ErrorState",
+          "line": 50,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 50,
+          "props": []
+        },
+        {
+          "tag": "Button",
+          "line": 50,
+          "props": [
+            "variant=\"secondary\"",
+            "onClick={()=>{setSelection(null);contract.refresh()}}"
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 50,
+          "props": []
+        },
+        {
+          "tag": "p",
+          "line": 51,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 51,
+          "props": []
+        },
+        {
+          "tag": "Field",
+          "line": 52,
+          "props": [
+            "label=\"Steuerbehandlung\""
+          ]
+        },
+        {
+          "tag": "Input",
+          "line": 52,
+          "props": [
+            "readOnly",
+            "value={t(selection.condition.tax_treatment==='taxable'?'Steuerpflichtig':selection.condition.tax_treatment==='exempt'?'Steuerbefreit':'Ausserhalb des Steuerbereichs')}"
+          ]
+        },
+        {
+          "tag": "Field",
+          "line": 52,
+          "props": [
+            "label=\"MwSt.\""
+          ]
+        },
+        {
+          "tag": "Input",
+          "line": 52,
+          "props": [
+            "readOnly",
+            "value={formatQuantity(selection.condition.vat_rate,'%',localeTags[locale])}"
+          ]
+        },
+        {
+          "tag": "Field",
+          "line": 52,
+          "props": [
+            "label=\"Begründung\""
+          ]
+        },
+        {
+          "tag": "Input",
+          "line": 52,
+          "props": [
+            "readOnly",
+            "value={selection.condition.tax_reason}"
+          ]
+        },
+        {
+          "tag": "p",
+          "line": 52,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 52,
+          "props": []
+        },
+        {
+          "tag": "FormActions",
+          "line": 55,
+          "props": [
+            "sheet"
+          ]
+        },
+        {
+          "tag": "Button",
+          "line": 55,
+          "props": [
+            "variant=\"secondary\"",
+            "disabled={saving}",
+            "onClick={close}"
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 55,
+          "props": []
+        },
+        {
+          "tag": "Button",
+          "line": 55,
+          "props": [
+            "requiresWrite",
+            "disabled={saving||!state||state.allocated||!selection||!detail||selectionChanged||contract.loading}",
+            "onClick={()=>void save()}"
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 55,
+          "props": []
+        }
+      ],
+      "conditions": [
+        {
+          "line": 21,
+          "expression": "billable"
+        },
+        {
+          "line": 24,
+          "expression": "open&&contractId"
+        },
+        {
+          "line": 28,
+          "expression": "serial===sequence.current"
+        },
+        {
+          "line": 28,
+          "expression": "serial===sequence.current"
+        },
+        {
+          "line": 28,
+          "expression": "e instanceof Error"
+        },
+        {
+          "line": 28,
+          "expression": "serial===sequence.current"
+        },
+        {
+          "line": 30,
+          "expression": "billable"
+        },
+        {
+          "line": 31,
+          "expression": "contract.data?.item.id===contractId"
+        },
+        {
+          "line": 35,
+          "expression": "busy.current||!state||!selection||!detail||selectionChanged||contract.loading||state.allocated"
+        },
+        {
+          "line": 37,
+          "expression": "replay?.body===serialized"
+        },
+        {
+          "line": 38,
+          "expression": "e instanceof Error"
+        },
+        {
+          "line": 45,
+          "expression": "state.item"
+        },
+        {
+          "line": 47,
+          "expression": "state.allocated"
+        },
+        {
+          "line": 47,
+          "expression": "side==='sale'"
+        },
+        {
+          "line": 48,
+          "expression": "row&&detail"
+        },
+        {
+          "line": 52,
+          "expression": "selection.condition.tax_treatment==='taxable'"
+        },
+        {
+          "line": 52,
+          "expression": "selection.condition.tax_treatment==='exempt'"
+        }
+      ]
+    },
+    {
+      "key": "components/time-price-source.tsx#Side",
+      "file": "components/time-price-source.tsx",
+      "name": "Side",
+      "line": 12,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": []
+    },
+    {
+      "key": "components/time-price-source.tsx#PriceState",
+      "file": "components/time-price-source.tsx",
+      "name": "PriceState",
+      "line": 14,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": []
+    },
+    {
+      "key": "components/time-price-source.tsx#Snapshot",
+      "file": "components/time-price-source.tsx",
+      "name": "Snapshot",
+      "line": 13,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": []
+    },
+    {
+      "key": "components/time-price-source.tsx#Condition",
+      "file": "components/time-price-source.tsx",
+      "name": "Condition",
+      "line": 15,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": []
+    },
+    {
+      "key": "components/time-price-source.tsx#ContractDetail",
+      "file": "components/time-price-source.tsx",
+      "name": "ContractDetail",
+      "line": 16,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
       "conditions": []
     },
     {
@@ -258679,7 +259377,7 @@
     {
       "file": "components/pages/time.tsx",
       "name": "TimePage",
-      "line": 30,
+      "line": 31,
       "usedBy": [
         "/zeit"
       ],
@@ -260523,6 +261221,15 @@
       "frameworkUsedBy": [
         "app/global-error.tsx"
       ]
+    },
+    {
+      "file": "components/time-price-source.tsx",
+      "name": "TimePriceSource",
+      "line": 18,
+      "usedBy": [
+        "/zeit"
+      ],
+      "frameworkUsedBy": []
     },
     {
       "file": "components/time-report.tsx",
