@@ -6,6 +6,7 @@ import {randomUUID} from 'node:crypto';
 import ts from 'typescript';
 import {PGlite} from '@electric-sql/pglite';
 import {pgcrypto} from '@electric-sql/pglite/contrib/pgcrypto';
+import {verifySupplierContract} from './supplier-contract.mjs';
 
 // Execute the actual routes, repository, authorization, SQL and audit against
 // migrated PostgreSQL/RLS. Replace only session/connection boundaries, never SQL.
@@ -142,6 +143,7 @@ try{
  const employeeCount=(await transaction(org,session.userId,c=>c.query('select count(*)::int n from employees'))).rows[0].n;
  auditFailure=true;assert.equal((await routes.POST(request({...input,lastName:'Rollback'}))).status,500);auditFailure=false;
  assert.equal((await transaction(org,session.userId,c=>c.query('select count(*)::int n from employees'))).rows[0].n,employeeCount,'Failed create audit rolls back employee and replay receipt');
+ await verifySupplierContract({load,db,transaction,org,other,act,request,setAuditFailure:value=>{auditFailure=value;}});
  session=null;assert.equal((await read(id)).status,401);
  console.log('Employee dossier: actual POST/PATCH/GET, optional email/account, persistence, replay/conflict, legacy field preservation, eight roles, plans, tenants/RLS, date constraints and atomic audit rollback passed.');
  console.log('Employment: separate reentry, immutable revisions, replay/stale conflict, database overlap protection, restricted RLS and supersede/audit rollback passed; no payroll or identity mutation.');

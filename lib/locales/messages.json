@@ -1,4 +1,11 @@
 {
+  "Diese Lieferantenangaben können hier nicht geändert werden.": ["These supplier details cannot be changed here.", "Ces informations sur le fournisseur ne peuvent pas être modifiées ici.", "Questi dati del fornitore non possono essere modificati qui."],
+  "Die Lieferantenangaben sind ungültig.": ["The supplier details are invalid.", "Les informations sur le fournisseur sont invalides.", "I dati del fornitore non sono validi."],
+  "Bitte einen Lieferantennamen eingeben.": ["Please enter a supplier name.", "Veuillez saisir un nom de fournisseur.", "Inserisci un nome del fornitore."],
+  "Bitte eine Zahlungsfrist zwischen 0 und 180 Tagen erfassen.": ["Please enter a payment term between 0 and 180 days.", "Veuillez saisir un délai de paiement entre 0 et 180 jours.", "Inserisci un termine di pagamento compreso tra 0 e 180 giorni."],
+  "Lieferant wurde nicht gefunden.": ["Supplier not found.", "Fournisseur introuvable.", "Fornitore non trovato."],
+  "Der Lieferant wurde geändert. Bitte die Ansicht aktualisieren.": ["The supplier has changed. Please refresh the view.", "Le fournisseur a été modifié. Veuillez actualiser la vue.", "Il fornitore è stato modificato. Aggiorna la vista."],
+  "Eine mögliche Lieferantendublette ist vorhanden. Bitte die Stammdaten zuerst prüfen.": ["A possible duplicate supplier exists. Please check the master data first.", "Un doublon potentiel du fournisseur existe. Veuillez d’abord vérifier les données de base.", "Esiste un possibile duplicato del fornitore. Verifica prima i dati di base."],
   "Anstellung": ["Employment", "Emploi", "Impiego"],
   "Anstellungsperioden": ["Employment periods", "Périodes d’emploi", "Periodi di impiego"],
   "Anstellungsaktionen": ["Employment actions", "Actions relatives à l’emploi", "Azioni relative all’impiego"],
