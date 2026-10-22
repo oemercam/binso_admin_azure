@@ -78,3 +78,9 @@ angelegte Runtime-Rolle erneut zu provisionieren. Die strenge Ablehnung bleibt
 erhalten; der isolierte Test kopiert den geprüften Rechtevertrag stattdessen auf
 eine eigene temporäre Rolle ohne Superuser/RLS-Bypass und entfernt sie danach.
 Beide Fehler werden durch einen neuen CI-Lauf nachgewiesen, nicht übergangen.
+
+Auf006f0c3b bestehen die nativen HTTP-/Parallelprüfungen, Security-Audit,
+Build und exakter ZIP-Smoke. Die Browserprüfung fand noch zwei alte Erwartungen:
+einen Status statt der drei unabhängigen Achsen und einen Auftrags-Rechnungslink
+ohne den neuen Rückkehrparameter. Die Nachfolgetests verlangen jede erwartete
+Achse genau einmal und den exakten Rückkehrlink. Kein Gate wird übersprungen.

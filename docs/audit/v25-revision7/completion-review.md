@@ -43,6 +43,16 @@ oder Nachweisaufträge. Ungeprüfte Klauseln bleiben ausdrücklich ungeprüft.
 | P0/P1 / R7-06-003–004, R7-35-003 | Verifizierte Provider-Zustell-/Bounce-Verarbeitung und dauerhafte idempotente Wiederaufnahme sind nicht vollständig vorhanden. | Zuerst tatsächlichen Provider-Vertrag festlegen; anschliessend authentifizierte Ereignisverarbeitung und positive/negative Replay-/Signaturtests. Keine erfundene Graph-Webhook-Signatur oder fingierter Zustellstatus. |
 | P0 / R7-25-003, R7-36-004 | Benachrichtigungs-/Eskalationsanbindung für alle genannten Betriebsereignisse nicht vollständig vorhanden. `lib/server/observability.ts` nennt diese Grenzen ausdrücklich. Eine zusätzliche eigene persistente Alarmhistorie ist keine ausdrücklich vorgeschriebene Funktion. | Bestehende Mess- und Auditquellen nutzen; erst tatsächlichen freigegebenen Alarm-/Providerweg anschliessen. Keine parallele neue Infrastruktur aus einem Codeaudit heraus. |
 
+Weitere gezielt am aktuellen Code geprüfte Lücken:
+
+| Priorität / Klausel | Konkreter Befund | Einordnung |
+| --- | --- | --- |
+| P0/P1 / R7-29-001–002 | Dashboard/API haben keine zentrale Einrichtungs-Checkliste; Ausstellung prüft echte QR-/Firmendaten, aber es fehlt der gemeinsame Readiness-Vertrag mit Feldziel und Rückkehr zur Aktion. | Noch zu implementieren; nicht durch fehlende Geräte oder Provider blockiert. Sicherheitsprüfung nicht ersetzen. |
+| P1 / R7-05-008 | Kundenrabatt wird gespeichert; der gemeinsame Dokumentpositions-/Summen-/PDF-Datenfluss besitzt keinen expliziten Rabatt. | Noch nicht vollständig implementiert; Rabattbasis, Besteuerung, Persistenz und unveränderliche historische Werte gemeinsam klären/prüfen. Kein stilles Abändern von Preisen. |
+| P1 / R7-39-007 | Sichere Bildnormalisierung und serverseitiger zentrierter512px-Zuschnitt sind vorhanden. Die neue Datei wird aber direkt hochgeladen; eine überprüfbare Zuschnittvorschau vor Übernahme fehlt. | Implementierbare UI-Lücke zusätzlich zum offenen realen Upload-/Gerätenachweis. |
+| P0/P1 / R7-06-003, R7-35-003 | Entscheidungs-/Mitarbeitermails in public-offers.ts werden nach Entscheidungscommit direkt versendet; Fehler sind ehrlich unbestätigt, aber ohne dauerhaften Wiederaufnahmejob. | Eigene Codeintegrationslücke zusätzlich zum unbekannten Provider-Zustell-/Webhookvertrag; sichere Entscheidung und In-App-Nachricht sind bereits vorhanden. |
+| P0 / R7-28-014 | Plattformrollen und erneute Entra-Identitätsbindung sind im Code vorhanden; daraus folgt kein Nachweis phishingresistenter Conditional-Access-Authentifizierung. | Tatsächliche Entra-Richtlinienzuweisung unbekannt, nicht als fehlende Identität behauptet; nur lesende externe Verifizierung erforderlich. |
+
 Diese Liste enthält nachgewiesene Lücken, keine Behauptung, dass alle übrigen
 Klauseln bereits vollständig implementiert sind. Offene fachliche Entscheidungen
 und unbekannte Provider-Verträge werden nicht durch vermutete Anforderungen ersetzt.
@@ -62,5 +72,5 @@ und unbekannte Provider-Verträge werden nicht durch vermutete Anforderungen ers
 Die vollständige Development-Qualifikation von d052a3be ist erfolgreich. Die neue
 Zahlungs-/Statusimplementierung ist damit noch nicht qualifiziert. Offen bleiben
 die oben genannten Implementierungspakete und die individuelle Klauselabnahme.
-47 Klauseln besitzen konkrete Teilbefunde;526 sind noch nicht einzeln abschliessend
+55 Klauseln besitzen konkrete Teilbefunde;518 sind noch nicht einzeln abschliessend
 als implementiert oder fehlend bewertet. Dieser Zwischenstand ist ausdrücklich keine technische Gesamtabnahme.

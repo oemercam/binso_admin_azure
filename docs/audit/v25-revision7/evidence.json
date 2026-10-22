@@ -522,7 +522,7 @@
       "sourceTextSha256": "348fff27ece7bb924f40153eab3b238e7e886985e28066a4f482fd5ad6722ac2",
       "status": "teilweise_implementiert",
       "implementationStatus": "teilweise_belegt",
-      "implementation": "Bestehender serverseitiger Mail-/Dokumentweg um dauerhafte Unterscheidung zwischen bestätigtem Nichtversand und unklarem Transportausgang ergänzt. Auch neue Kennungen und konkurrierende Dokumentmutationen bleiben bei ungeklärtem Ausgang gesperrt; historische failed-Werte werden nicht automatisch freigegeben.",
+      "implementation": "Bestehender serverseitiger Mail-/Dokumentweg um dauerhafte Unterscheidung zwischen bestätigtem Nichtversand und unklarem Transportausgang ergänzt. Auch neue Kennungen und konkurrierende Dokumentmutationen bleiben bei ungeklärtem Ausgang gesperrt; historische failed-Werte werden nicht automatisch freigegeben. Ergänzter konkreter Codebefund: public-offers.ts versendet Entscheidungs-/Mitarbeiterbenachrichtigungen direkt nach dem Entscheidungscommit und behandelt Fehler ohne dauerhaften Wiederaufnahmejob. Die Entscheidung bleibt korrekt gespeichert, aber eine garantierte idempotente Wiederaufnahme dieser E-Mails ist nicht implementiert. Das ist zusätzlich zum unbekannten signierten Provider-Ereignisvertrag eine Codeintegrationslücke.",
       "sourceReferences": [
         "app/api/documents/[number]/send/route.ts",
         "lib/server/document-process.ts",
@@ -531,11 +531,13 @@
         "lib/server/credit-notes.ts",
         "database/migrations/0078_document_delivery_outcomes.sql",
         "scripts/migration-test.mjs",
-        "docs/audit/v25-revision7/document-delivery-outcomes.md"
+        "docs/audit/v25-revision7/document-delivery-outcomes.md",
+        "lib/server/public-offers.ts",
+        "lib/server/email.ts"
       ],
-      "test": "Isolierter tatsächlicher Migrationstest mit positivem Versand, Replay, neuem Schlüssel bei unklarem/historischem Fehler, fehlendem Provider ohne Transport, explizitem neuem Versand nach Einrichtung und Zahlungsänderung bestanden; zusätzliche aktuelle Gesamt-CI erforderlich.",
+      "test": "Aktuelle native Tests beweisen sichere Entscheidung, Replay und getrennte Providerannahme; keinen dauerhaften Wiederanlauf der Entscheidungsmails.",
       "visualComparison": "Gemeinsame History-Beschriftung erweitert; aktuelle gerenderte Abnahme offen.",
-      "blocker": "Echte Zustell-/Bounce-Nachweise, authentifizierte Provider-Ereignisse und kontrollierter Auflösungsweg für unklare historische Versände bleiben offen. Keine produktive Migration oder Kundenmail ausgeführt."
+      "blocker": "Dauerhafte Mailjob-Integration noch zu implementieren; signierter Provider-Zustell-/Bounce-Vertrag und echte Zustellung separat extern zu verifizieren."
     },
     "R7-06-004": {
       "sourceTextSha256": "f9b165c0f21cbfb49b32c42602762c65163658ad4d736cd62656885c18704f1f",
@@ -579,7 +581,7 @@
       "sourceTextSha256": "16d425bf832868462bbed0e15222ab8ca625257335f659b37435518a5622ecf0",
       "status": "teilweise_implementiert",
       "implementationStatus": "teilweise_belegt",
-      "implementation": "Bestehender serverseitiger Mail-/Dokumentweg um dauerhafte Unterscheidung zwischen bestätigtem Nichtversand und unklarem Transportausgang ergänzt. Auch neue Kennungen und konkurrierende Dokumentmutationen bleiben bei ungeklärtem Ausgang gesperrt; historische failed-Werte werden nicht automatisch freigegeben.",
+      "implementation": "Bestehender serverseitiger Mail-/Dokumentweg um dauerhafte Unterscheidung zwischen bestätigtem Nichtversand und unklarem Transportausgang ergänzt. Auch neue Kennungen und konkurrierende Dokumentmutationen bleiben bei ungeklärtem Ausgang gesperrt; historische failed-Werte werden nicht automatisch freigegeben. Ergänzter konkreter Codebefund: public-offers.ts versendet Entscheidungs-/Mitarbeiterbenachrichtigungen direkt nach dem Entscheidungscommit und behandelt Fehler ohne dauerhaften Wiederaufnahmejob. Die Entscheidung bleibt korrekt gespeichert, aber eine garantierte idempotente Wiederaufnahme dieser E-Mails ist nicht implementiert. Das ist zusätzlich zum unbekannten signierten Provider-Ereignisvertrag eine Codeintegrationslücke.",
       "sourceReferences": [
         "app/api/documents/[number]/send/route.ts",
         "lib/server/document-process.ts",
@@ -588,11 +590,13 @@
         "lib/server/credit-notes.ts",
         "database/migrations/0078_document_delivery_outcomes.sql",
         "scripts/migration-test.mjs",
-        "docs/audit/v25-revision7/document-delivery-outcomes.md"
+        "docs/audit/v25-revision7/document-delivery-outcomes.md",
+        "lib/server/public-offers.ts",
+        "lib/server/email.ts"
       ],
-      "test": "Isolierter tatsächlicher Migrationstest mit positivem Versand, Replay, neuem Schlüssel bei unklarem/historischem Fehler, fehlendem Provider ohne Transport, explizitem neuem Versand nach Einrichtung und Zahlungsänderung bestanden; zusätzliche aktuelle Gesamt-CI erforderlich.",
+      "test": "Aktuelle native Tests beweisen sichere Entscheidung, Replay und getrennte Providerannahme; keinen dauerhaften Wiederanlauf der Entscheidungsmails.",
       "visualComparison": "Gemeinsame History-Beschriftung erweitert; aktuelle gerenderte Abnahme offen.",
-      "blocker": "Echte Zustell-/Bounce-Nachweise, authentifizierte Provider-Ereignisse und kontrollierter Auflösungsweg für unklare historische Versände bleiben offen. Keine produktive Migration oder Kundenmail ausgeführt."
+      "blocker": "Dauerhafte Mailjob-Integration noch zu implementieren; signierter Provider-Zustell-/Bounce-Vertrag und echte Zustellung separat extern zu verifizieren."
     },
     "R7-36-003": {
       "sourceTextSha256": "d8df29dbb13203c22dac7c8067c417f2242b94adb45a6b1c1d79a2f7d81b3106",
@@ -702,6 +706,81 @@
       "test": "Lokale Migration, Status-SQL/JS, SSR/PDF, Statistik, Localization, UX, gezieltes Lint und Typecheck bestanden; aktuelle native HTTP/Parallel-/Browser-CI noch ausstehend.",
       "visualComparison": "Gezielte echte SSR-Projektion; neue Browser-/Geräteabnahme noch offen.",
       "blocker": "Aktuelle Gesamt-CI, individuelle Klausel-/Fachabnahme, reale Geräte und verifizierter Zustellkanal offen. Keine Produktionsmigration freigegeben."
+    },
+    "R7-05-008": {
+      "sourceTextSha256": "a19b8c4f0dcc04f49c8bd66c779e100c10c036a145026f72efbe8eabe2131d98",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "test": "Gezielte Codepfadprüfung am006f0c3b; vorhandene erfolgreiche Tests werden nicht als Nachweis der genannten fehlenden Funktion umgedeutet.",
+      "visualComparison": "Keine vollständige aktuelle visuelle/physische Abnahme.",
+      "implementation": "Nachgewiesene Implementierungslücke: Kunden besitzen discount, aber der aktuelle gemeinsame Positions-/Summen-/PDF-Datenfluss enthält keinen ausdrücklichen Dokumentrabatt. Bestehende MwSt.-/Rundungs-/Historientests sind kein Rabattnachweis. Rabattbasis, Persistenz, Vorschau/PDF und unveränderliche Historie müssen gemeinsam ergänzt werden; nicht einfach Kundenpreise still verändern.",
+      "sourceReferences": [
+        "lib/document-lines.ts",
+        "lib/money.ts",
+        "lib/server/repositories/business-api.ts",
+        "lib/server/repositories/customers.ts",
+        "lib/server/document-pdf.ts",
+        "components/documents.tsx"
+      ],
+      "blocker": "Implementierbare Code-/Datenflusslücke; keine externe Freigabe als vorgeschobener Blocker. Gezielte positive/negative Berechnungs- und Historiennachweise noch erforderlich."
+    },
+    "R7-29-001": {
+      "sourceTextSha256": "9a8508511147cb777ccf3a47244c3e48b11e675df1bc977dee1dfc41c860097b",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "test": "Gezielte Codepfadprüfung am006f0c3b; vorhandene erfolgreiche Tests werden nicht als Nachweis der genannten fehlenden Funktion umgedeutet.",
+      "visualComparison": "Keine vollständige aktuelle visuelle/physische Abnahme.",
+      "implementation": "Nachgewiesene Implementierungslücke: Dashboard/API liefern Arbeits-/Finanzdaten, aber keine zentrale optionale Einrichtungs-Checkliste mit Pflicht-/Empfehlungs-/Optionalfortschritt. Das bestehende überspringbare Firmenformular ist kein solcher Dashboard-Fortschritt.",
+      "sourceReferences": [
+        "app/api/dashboard/route.ts",
+        "components/pages/dashboard.tsx",
+        "components/pages/settings.tsx"
+      ],
+      "blocker": "Implementierbare Checklist-/Persistenzlücke; keine Geräte- oder Provider-Abhängigkeit."
+    },
+    "R7-29-002": {
+      "sourceTextSha256": "dc3bb2dd5d7dc185f212a9ec19da0ce36776e138de4c00087021d60b0a87b298",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "test": "Gezielte Codepfadprüfung am006f0c3b; vorhandene erfolgreiche Tests werden nicht als Nachweis der genannten fehlenden Funktion umgedeutet.",
+      "visualComparison": "Keine vollständige aktuelle visuelle/physische Abnahme.",
+      "implementation": "Nachgewiesene Implementierungslücke: document-process prüft bei Ausstellung den echten QR-/Firmen-/Schuldnervertrag; ein gemeinsamer Aktions-Readiness-Service mit strukturierter Feldnavigation/Rückkehr fehlt. Die bestehende Sicherheitsprüfung bleibt verbindlich und darf nicht durch eine reine UI-Checkliste ersetzt werden.",
+      "sourceReferences": [
+        "lib/server/document-process.ts",
+        "lib/qr-bill.ts",
+        "components/documents.tsx",
+        "components/pages/settings.tsx"
+      ],
+      "blocker": "Implementierbare zentrale Service-/UI-Vertragslücke; isolierte Daten-/Rollen-/Deep-Link-Tests erforderlich."
+    },
+    "R7-39-007": {
+      "sourceTextSha256": "554a3d8c4f7fc7a0185a711279d59de8625ec7ff9f5a09c4fbf6536fd9756705",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "test": "Gezielte Codepfadprüfung am006f0c3b; vorhandene erfolgreiche Tests werden nicht als Nachweis der genannten fehlenden Funktion umgedeutet.",
+      "visualComparison": "Keine vollständige aktuelle visuelle/physische Abnahme.",
+      "implementation": "Teilweise implementiert: prepareProfileImage normalisiert Orientierung und zentriert serverseitig auf512px; bestehendes Bild wird nach autorisiertem Upload dargestellt, Ersetzen/Entfernen und Quarantäne erhalten Altbild. FileUpload ruft aber direkt uploadAvatar auf; eine ausdrückliche Vorschau des neuen quadratischen Zuschnitts vor Übernahme fehlt.",
+      "sourceReferences": [
+        "lib/server/profile-image.ts",
+        "components/file-upload.tsx",
+        "components/pages/settings.tsx",
+        "scripts/profile-image-test.mjs"
+      ],
+      "blocker": "Implementierbare Vorschau-/Bestätigungslücke zusätzlich zu offenen realen iPhone-/PWA-Prüfungen. Ursprünglicher Produktions-Uploadfehler ist dadurch nicht reproduziert."
+    },
+    "R7-28-014": {
+      "sourceTextSha256": "dc1dc3cceef35586b1a4cc756ebb3af33849d96fb8bf48fd1ef075e65a21a587",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "test": "Gezielte Codepfadprüfung am006f0c3b; vorhandene erfolgreiche Tests werden nicht als Nachweis der genannten fehlenden Funktion umgedeutet.",
+      "visualComparison": "Keine vollständige aktuelle visuelle/physische Abnahme.",
+      "implementation": "Getrennte Plattformrollen und Entra-Identitätsbindung sind vorhanden. requireOperatorSession erzwingt im Produktivmodus dieselbe Entra-Identität/Rolle; diese Codeprüfung allein beweist keine phishingresistente Entra-Authentifizierungsstärke. Tatsächliche Conditional-Access-/Authentifizierungsrichtlinie wurde in dieser Fortsetzung nicht verifiziert.",
+      "sourceReferences": [
+        "lib/server/operator/entra.ts",
+        "lib/server/operator/session.ts",
+        "lib/server/operator/rbac.ts"
+      ],
+      "blocker": "Externer lesender Nachweis der tatsächlich zugewiesenen Entra-Authentifizierungsstärke und Ingress-Vertrauensgrenze fehlt. Keine Richtlinien-/Rollenänderung autorisiert."
     }
   },
   "tests": {

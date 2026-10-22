@@ -787,16 +787,21 @@
       "requirement": "Mengen, Preise, Rabatte, Schweizer MwSt., Rundung und CHF-Format zentral korrekt; historische Dokumente nicht rückwirkend ändern.",
       "sourceTextSha256": "a19b8c4f0dcc04f49c8bd66c779e100c10c036a145026f72efbe8eabe2131d98",
       "sourceParagraph": "Detailansicht kompakt: Nummer, Kunde, Status, Gesamtbetrag, Datum/Gültigkeit, Positionen, Summen, Aktivität, Dateien. In Bearbeitung «Dienstleistung · Appenzell» unter Kunde und Angebotsnummer-Feld entfernen; Nummer in Detail/PDF behalten. Datumsfelder korrekt ausrichten/validieren. Positionsnummern 01/02/03, gleiche Typografie und Zeilenbreiten. Funktionierende Einheiten Stück, Stunden, Tage, Pauschal, Meter, m², Kilometer sowie vorhandene Werte. Positionen bearbeiten, duplizieren, nach oben/unten verschieben und direkt entfernen; Reihenfolge persistieren, neu nummerieren und Totale aktualisieren. Gemeinsame Positionslogik für Angebote/Rechnungen soweit fachlich zulässig. Mengen, Preise, Rabatte, Schweizer MwSt., Rundung und CHF-Format zentral korrekt; historische Dokumente nicht rückwirkend ändern.",
-      "status": "nicht_abgenommen",
-      "implementationStatus": "ungeprueft",
-      "acceptanceStatus": "nicht_abgenommen",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "acceptanceStatus": "teilweise_implementiert",
       "sourceReferences": [
-        "lib/document-lines.ts"
+        "lib/document-lines.ts",
+        "lib/money.ts",
+        "lib/server/repositories/business-api.ts",
+        "lib/server/repositories/customers.ts",
+        "lib/server/document-pdf.ts",
+        "components/documents.tsx"
       ],
-      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "implementation": "Nachgewiesene Implementierungslücke: Kunden besitzen discount, aber der aktuelle gemeinsame Positions-/Summen-/PDF-Datenfluss enthält keinen ausdrücklichen Dokumentrabatt. Bestehende MwSt.-/Rundungs-/Historientests sind kein Rabattnachweis. Rabattbasis, Persistenz, Vorschau/PDF und unveränderliche Historie müssen gemeinsam ergänzt werden; nicht einfach Kundenpreise still verändern.",
+      "test": "Gezielte Codepfadprüfung am006f0c3b; vorhandene erfolgreiche Tests werden nicht als Nachweis der genannten fehlenden Funktion umgedeutet.",
+      "visualComparison": "Keine vollständige aktuelle visuelle/physische Abnahme.",
+      "blocker": "Implementierbare Code-/Datenflusslücke; keine externe Freigabe als vorgeschobener Blocker. Gezielte positive/negative Berechnungs- und Historiennachweise noch erforderlich."
     },
     {
       "id": "R7-06-001",
@@ -855,12 +860,14 @@
         "lib/server/credit-notes.ts",
         "database/migrations/0078_document_delivery_outcomes.sql",
         "scripts/migration-test.mjs",
-        "docs/audit/v25-revision7/document-delivery-outcomes.md"
+        "docs/audit/v25-revision7/document-delivery-outcomes.md",
+        "lib/server/public-offers.ts",
+        "lib/server/email.ts"
       ],
-      "implementation": "Bestehender serverseitiger Mail-/Dokumentweg um dauerhafte Unterscheidung zwischen bestätigtem Nichtversand und unklarem Transportausgang ergänzt. Auch neue Kennungen und konkurrierende Dokumentmutationen bleiben bei ungeklärtem Ausgang gesperrt; historische failed-Werte werden nicht automatisch freigegeben.",
-      "test": "Isolierter tatsächlicher Migrationstest mit positivem Versand, Replay, neuem Schlüssel bei unklarem/historischem Fehler, fehlendem Provider ohne Transport, explizitem neuem Versand nach Einrichtung und Zahlungsänderung bestanden; zusätzliche aktuelle Gesamt-CI erforderlich.",
+      "implementation": "Bestehender serverseitiger Mail-/Dokumentweg um dauerhafte Unterscheidung zwischen bestätigtem Nichtversand und unklarem Transportausgang ergänzt. Auch neue Kennungen und konkurrierende Dokumentmutationen bleiben bei ungeklärtem Ausgang gesperrt; historische failed-Werte werden nicht automatisch freigegeben. Ergänzter konkreter Codebefund: public-offers.ts versendet Entscheidungs-/Mitarbeiterbenachrichtigungen direkt nach dem Entscheidungscommit und behandelt Fehler ohne dauerhaften Wiederaufnahmejob. Die Entscheidung bleibt korrekt gespeichert, aber eine garantierte idempotente Wiederaufnahme dieser E-Mails ist nicht implementiert. Das ist zusätzlich zum unbekannten signierten Provider-Ereignisvertrag eine Codeintegrationslücke.",
+      "test": "Aktuelle native Tests beweisen sichere Entscheidung, Replay und getrennte Providerannahme; keinen dauerhaften Wiederanlauf der Entscheidungsmails.",
       "visualComparison": "Gemeinsame History-Beschriftung erweitert; aktuelle gerenderte Abnahme offen.",
-      "blocker": "Echte Zustell-/Bounce-Nachweise, authentifizierte Provider-Ereignisse und kontrollierter Auflösungsweg für unklare historische Versände bleiben offen. Keine produktive Migration oder Kundenmail ausgeführt."
+      "blocker": "Dauerhafte Mailjob-Integration noch zu implementieren; signierter Provider-Zustell-/Bounce-Vertrag und echte Zustellung separat extern zu verifizieren."
     },
     {
       "id": "R7-06-004",
@@ -4395,16 +4402,18 @@
       "requirement": "Internes Portal `admin.one.binso.ch`: getrennte Plattformrollen (Platform Owner/Admin, Support Operations, Billing Operations, Security Auditor), keine Selbstregistrierung, verpflichtende phishingresistente Authentifizierung, strikte Mandantentrennung.",
       "sourceTextSha256": "dc1dc3cceef35586b1a4cc756ebb3af33849d96fb8bf48fd1ef075e65a21a587",
       "sourceParagraph": "Internes Portal `admin.one.binso.ch`: getrennte Plattformrollen (Platform Owner/Admin, Support Operations, Billing Operations, Security Auditor), keine Selbstregistrierung, verpflichtende phishingresistente Authentifizierung, strikte Mandantentrennung. Supportzugriff auf Kundendaten nur zeitlich begrenzt mit Grund, Freigabe und Audit. Unternehmensadmin ist kein Plattformadmin.",
-      "status": "nicht_abgenommen",
-      "implementationStatus": "ungeprueft",
-      "acceptanceStatus": "nicht_abgenommen",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "acceptanceStatus": "teilweise_implementiert",
       "sourceReferences": [
-        "lib/permissions.ts"
+        "lib/server/operator/entra.ts",
+        "lib/server/operator/session.ts",
+        "lib/server/operator/rbac.ts"
       ],
-      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "implementation": "Getrennte Plattformrollen und Entra-Identitätsbindung sind vorhanden. requireOperatorSession erzwingt im Produktivmodus dieselbe Entra-Identität/Rolle; diese Codeprüfung allein beweist keine phishingresistente Entra-Authentifizierungsstärke. Tatsächliche Conditional-Access-/Authentifizierungsrichtlinie wurde in dieser Fortsetzung nicht verifiziert.",
+      "test": "Gezielte Codepfadprüfung am006f0c3b; vorhandene erfolgreiche Tests werden nicht als Nachweis der genannten fehlenden Funktion umgedeutet.",
+      "visualComparison": "Keine vollständige aktuelle visuelle/physische Abnahme.",
+      "blocker": "Externer lesender Nachweis der tatsächlich zugewiesenen Entra-Authentifizierungsstärke und Ingress-Vertrauensgrenze fehlt. Keine Richtlinien-/Rollenänderung autorisiert."
     },
     {
       "id": "R7-28-015",
@@ -4452,14 +4461,18 @@
       "requirement": "Auf Übersicht kompakte Checkliste «Einrichtung abschliessen»: Pflicht/empfohlen/optional, Fortschritt, nur relevante Aufgaben, optional ausblendbar.",
       "sourceTextSha256": "9a8508511147cb777ccf3a47244c3e48b11e675df1bc977dee1dfc41c860097b",
       "sourceParagraph": "Auf Übersicht kompakte Checkliste «Einrichtung abschliessen»: Pflicht/empfohlen/optional, Fortschritt, nur relevante Aufgaben, optional ausblendbar. Zentraler serverseitiger Readiness-Service für Aktionen, verständliche Meldung fehlender Angaben, direkter Link zum richtigen Feld, Rückkehr zur unterbrochenen Aktion. Rechnung als Entwurf auch ohne komplette Firmenangaben; **Ausstellen/Versenden erst bei erfüllten Pflichtangaben**. QR-Zahlteil nur bei gültigen Bankdaten. Steuerpflicht und UID bedingt, Firmenlogo nicht verpflichtend. Regeln serverseitig erneut prüfen.",
-      "status": "nicht_abgenommen",
-      "implementationStatus": "ungeprueft",
-      "acceptanceStatus": "nicht_abgenommen",
-      "sourceReferences": [],
-      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "acceptanceStatus": "teilweise_implementiert",
+      "sourceReferences": [
+        "app/api/dashboard/route.ts",
+        "components/pages/dashboard.tsx",
+        "components/pages/settings.tsx"
+      ],
+      "implementation": "Nachgewiesene Implementierungslücke: Dashboard/API liefern Arbeits-/Finanzdaten, aber keine zentrale optionale Einrichtungs-Checkliste mit Pflicht-/Empfehlungs-/Optionalfortschritt. Das bestehende überspringbare Firmenformular ist kein solcher Dashboard-Fortschritt.",
+      "test": "Gezielte Codepfadprüfung am006f0c3b; vorhandene erfolgreiche Tests werden nicht als Nachweis der genannten fehlenden Funktion umgedeutet.",
+      "visualComparison": "Keine vollständige aktuelle visuelle/physische Abnahme.",
+      "blocker": "Implementierbare Checklist-/Persistenzlücke; keine Geräte- oder Provider-Abhängigkeit."
     },
     {
       "id": "R7-29-002",
@@ -4469,14 +4482,19 @@
       "requirement": "Zentraler serverseitiger Readiness-Service für Aktionen, verständliche Meldung fehlender Angaben, direkter Link zum richtigen Feld, Rückkehr zur unterbrochenen Aktion.",
       "sourceTextSha256": "dc3bb2dd5d7dc185f212a9ec19da0ce36776e138de4c00087021d60b0a87b298",
       "sourceParagraph": "Auf Übersicht kompakte Checkliste «Einrichtung abschliessen»: Pflicht/empfohlen/optional, Fortschritt, nur relevante Aufgaben, optional ausblendbar. Zentraler serverseitiger Readiness-Service für Aktionen, verständliche Meldung fehlender Angaben, direkter Link zum richtigen Feld, Rückkehr zur unterbrochenen Aktion. Rechnung als Entwurf auch ohne komplette Firmenangaben; **Ausstellen/Versenden erst bei erfüllten Pflichtangaben**. QR-Zahlteil nur bei gültigen Bankdaten. Steuerpflicht und UID bedingt, Firmenlogo nicht verpflichtend. Regeln serverseitig erneut prüfen.",
-      "status": "nicht_abgenommen",
-      "implementationStatus": "ungeprueft",
-      "acceptanceStatus": "nicht_abgenommen",
-      "sourceReferences": [],
-      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "acceptanceStatus": "teilweise_implementiert",
+      "sourceReferences": [
+        "lib/server/document-process.ts",
+        "lib/qr-bill.ts",
+        "components/documents.tsx",
+        "components/pages/settings.tsx"
+      ],
+      "implementation": "Nachgewiesene Implementierungslücke: document-process prüft bei Ausstellung den echten QR-/Firmen-/Schuldnervertrag; ein gemeinsamer Aktions-Readiness-Service mit strukturierter Feldnavigation/Rückkehr fehlt. Die bestehende Sicherheitsprüfung bleibt verbindlich und darf nicht durch eine reine UI-Checkliste ersetzt werden.",
+      "test": "Gezielte Codepfadprüfung am006f0c3b; vorhandene erfolgreiche Tests werden nicht als Nachweis der genannten fehlenden Funktion umgedeutet.",
+      "visualComparison": "Keine vollständige aktuelle visuelle/physische Abnahme.",
+      "blocker": "Implementierbare zentrale Service-/UI-Vertragslücke; isolierte Daten-/Rollen-/Deep-Link-Tests erforderlich."
     },
     {
       "id": "R7-29-003",
@@ -5279,12 +5297,14 @@
         "lib/server/credit-notes.ts",
         "database/migrations/0078_document_delivery_outcomes.sql",
         "scripts/migration-test.mjs",
-        "docs/audit/v25-revision7/document-delivery-outcomes.md"
+        "docs/audit/v25-revision7/document-delivery-outcomes.md",
+        "lib/server/public-offers.ts",
+        "lib/server/email.ts"
       ],
-      "implementation": "Bestehender serverseitiger Mail-/Dokumentweg um dauerhafte Unterscheidung zwischen bestätigtem Nichtversand und unklarem Transportausgang ergänzt. Auch neue Kennungen und konkurrierende Dokumentmutationen bleiben bei ungeklärtem Ausgang gesperrt; historische failed-Werte werden nicht automatisch freigegeben.",
-      "test": "Isolierter tatsächlicher Migrationstest mit positivem Versand, Replay, neuem Schlüssel bei unklarem/historischem Fehler, fehlendem Provider ohne Transport, explizitem neuem Versand nach Einrichtung und Zahlungsänderung bestanden; zusätzliche aktuelle Gesamt-CI erforderlich.",
+      "implementation": "Bestehender serverseitiger Mail-/Dokumentweg um dauerhafte Unterscheidung zwischen bestätigtem Nichtversand und unklarem Transportausgang ergänzt. Auch neue Kennungen und konkurrierende Dokumentmutationen bleiben bei ungeklärtem Ausgang gesperrt; historische failed-Werte werden nicht automatisch freigegeben. Ergänzter konkreter Codebefund: public-offers.ts versendet Entscheidungs-/Mitarbeiterbenachrichtigungen direkt nach dem Entscheidungscommit und behandelt Fehler ohne dauerhaften Wiederaufnahmejob. Die Entscheidung bleibt korrekt gespeichert, aber eine garantierte idempotente Wiederaufnahme dieser E-Mails ist nicht implementiert. Das ist zusätzlich zum unbekannten signierten Provider-Ereignisvertrag eine Codeintegrationslücke.",
+      "test": "Aktuelle native Tests beweisen sichere Entscheidung, Replay und getrennte Providerannahme; keinen dauerhaften Wiederanlauf der Entscheidungsmails.",
       "visualComparison": "Gemeinsame History-Beschriftung erweitert; aktuelle gerenderte Abnahme offen.",
-      "blocker": "Echte Zustell-/Bounce-Nachweise, authentifizierte Provider-Ereignisse und kontrollierter Auflösungsweg für unklare historische Versände bleiben offen. Keine produktive Migration oder Kundenmail ausgeführt."
+      "blocker": "Dauerhafte Mailjob-Integration noch zu implementieren; signierter Provider-Zustell-/Bounce-Vertrag und echte Zustellung separat extern zu verifizieren."
     },
     {
       "id": "R7-35-004",
@@ -6721,17 +6741,19 @@
       "requirement": "- Quadratischer Zuschnitt mit Vorschau, korrektes Zentrieren, rundes Rendering ohne Verzerrung; Ersetzen, Entfernen, Fallback-Initialen, Lade-/Fehlerzustände, Cache-Invalidierung, persistente Speicherung nach Reload und neuer Sitzung.",
       "sourceTextSha256": "554a3d8c4f7fc7a0185a711279d59de8625ec7ff9f5a09c4fbf6536fd9756705",
       "sourceParagraph": "### 39.1 Persönliches Profil und Avatar [P1; Sicherheits-/Datenverlustfehler P0]\n- Gemeldeten Avatar-Upload-Fehler reproduzieren und die tatsächliche Ursache über UI, API, Auth, Storage, Bildverarbeitung, Persistenz und Cache nachweisen; nicht bloss kosmetisch beheben.\n- Avatar in der Profilansicht 96–112 px, in Listen 36–40 px, im Header 32–36 px; responsive und auf Retina-Geräten scharf (mindestens 2× physische Bildauflösung). Empfohlene Quelldatei 512×512 px; Maximalgrösse 10 MB, sofern Infrastruktur und Sicherheitsgrenzen dies erlauben. Verbindliche Grössen über zentrale Design-Tokens.\n- JPEG, PNG, WebP und iPhone-HEIC/HEIF nach tatsächlich verfügbarer, sicherer serverseitiger Verarbeitung unterstützen; nicht unterstützte Formate verständlich ablehnen. Dateityp anhand Inhalt prüfen, EXIF-Ausrichtung korrigieren, Metadaten minimieren, sicher dekodieren/rekodieren, Grössen und Ressourcen begrenzen, Malware-/Dateiprüfung entsprechend Infrastruktur.\n- Quadratischer Zuschnitt mit Vorschau, korrektes Zentrieren, rundes Rendering ohne Verzerrung; Ersetzen, Entfernen, Fallback-Initialen, Lade-/Fehlerzustände, Cache-Invalidierung, persistente Speicherung nach Reload und neuer Sitzung. Upload-Erfolg erst melden, wenn serverseitig gespeichert und wieder abrufbar.\n- Vorname, Nachname, E-Mail, Telefon und weitere persönliche Felder vom Registrierungsformular über Auth-Provider, API, Datenbank und Profilprojektion verfolgen; kein Verlust bei Verifizierung, Onboarding, Einladung, Login, Aktualisierung oder Rollenwechsel.\n- E-Mail-Änderungen nur mit angemessener Bestätigung; Sicherheitsmethoden, Passkeys, freiwillige MFA, Recovery-Codes, aktive Sitzungen, Geräteabmeldung und Kontowiederherstellung in klar getrennten Profilbereichen.\n- Profilstruktur: kompakter Avatar, Name, E-Mail, Rolle; darunter Persönliche Angaben, Konto & Sicherheit, Sprache & Darstellung, Benachrichtigungen, Aktive Geräte. Keine überlangen Mischformulare.\n- Avatar- und Namensänderungen konsistent in Header, Kommentaren, Aktivitäten und berechtigten Benutzerlisten anzeigen; historische Auditdaten unverfälscht halten.",
-      "status": "nicht_abgenommen",
-      "implementationStatus": "ungeprueft",
-      "acceptanceStatus": "nicht_abgenommen",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "acceptanceStatus": "teilweise_implementiert",
       "sourceReferences": [
         "lib/server/profile-image.ts",
-        "components/file-upload.tsx"
+        "components/file-upload.tsx",
+        "components/pages/settings.tsx",
+        "scripts/profile-image-test.mjs"
       ],
-      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "implementation": "Teilweise implementiert: prepareProfileImage normalisiert Orientierung und zentriert serverseitig auf512px; bestehendes Bild wird nach autorisiertem Upload dargestellt, Ersetzen/Entfernen und Quarantäne erhalten Altbild. FileUpload ruft aber direkt uploadAvatar auf; eine ausdrückliche Vorschau des neuen quadratischen Zuschnitts vor Übernahme fehlt.",
+      "test": "Gezielte Codepfadprüfung am006f0c3b; vorhandene erfolgreiche Tests werden nicht als Nachweis der genannten fehlenden Funktion umgedeutet.",
+      "visualComparison": "Keine vollständige aktuelle visuelle/physische Abnahme.",
+      "blocker": "Implementierbare Vorschau-/Bestätigungslücke zusätzlich zu offenen realen iPhone-/PWA-Prüfungen. Ursprünglicher Produktions-Uploadfehler ist dadurch nicht reproduziert."
     },
     {
       "id": "R7-39-008",
