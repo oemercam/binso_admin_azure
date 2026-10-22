@@ -11,6 +11,7 @@ import {verifyExpensePaymentContract} from './expense-payment-contract.mjs';
 import {verifySupplierBankContract} from './supplier-bank-contract.mjs';
 import {verifyEmployeeIdentityContract} from './employee-identity-contract.mjs';
 import {verifyInvitationContract} from './invitation-contract.mjs';
+import {verifySupplierInvoiceContract} from './supplier-invoice-contract.mjs';
 
 // Execute the actual routes, repository, authorization, SQL and audit against
 // migrated PostgreSQL/RLS. Replace only session/connection boundaries, never SQL.
@@ -160,6 +161,7 @@ try{
  await verifyExpensePaymentContract({load,db,transaction,org,other,act,request,setAuditFailure:value=>{auditFailure=value;}});
  await verifySupplierBankContract({load,db,transaction,org,other,act,request,setAuditFailure:value=>{auditFailure=value;}});
  await verifyEmployeeIdentityContract({load,db,transaction,org,other,act,request,setAuditFailure:value=>{auditFailure=value;}});
+ await verifySupplierInvoiceContract({load,db,transaction,org,other,act,request,setAuditFailure:value=>{auditFailure=value;}});
  invitationPlatformEnabled=true;
  try{await verifyInvitationContract({load,mock,db,transaction,org,other,act,request,setAuditFailure:value=>{auditFailure=value;}});}finally{invitationPlatformEnabled=false;}
  mock('lib/server/maintenance.ts',{maintenanceState:async()=>({enabled:false,endsAt:null})});
