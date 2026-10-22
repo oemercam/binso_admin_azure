@@ -1,0 +1,118 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import {createRequire} from 'node:module';
+import {randomUUID} from 'node:crypto';
+import ts from 'typescript';
+import {PGlite} from '@electric-sql/pglite';
+import {pgcrypto} from '@electric-sql/pglite/contrib/pgcrypto';
+
+// Execute the actual routes, repository, authorization, SQL and audit against
+// migrated PostgreSQL/RLS. Replace only session/connection boundaries, never SQL.
+const require=createRequire(import.meta.url),cache=new Map(),overrides=new Map();
+function load(file){
+ file=path.resolve(file);if(overrides.has(file))return overrides.get(file);if(cache.has(file))return cache.get(file);
+ const exports={};cache.set(file,exports);
+ const source=ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,esModuleInterop:true,jsx:ts.JsxEmit.ReactJSX}}).outputText;
+ const resolve=name=>{
+  if(name==='server-only')return {};
+  const base=name.startsWith('@/')?path.resolve(name.slice(2)):name.startsWith('.')?path.resolve(path.dirname(file),name):null;
+  if(!base)return require(name);
+  const target=[base,base+'.ts',base+'.tsx',base+'/index.ts'].find(p=>fs.existsSync(p)&&fs.statSync(p).isFile());
+  if(!target)throw Error('Unresolved employee test dependency: '+name);
+  return /\.json$/.test(target)?JSON.parse(fs.readFileSync(target,'utf8')):load(target);
+ };
+ Function('require','exports',source)(resolve,exports);return exports;
+}
+const mock=(file,exports)=>overrides.set(path.resolve(file),exports),unavailable=()=>{throw Error('Unrelated platform operation must not be called');};
+const db=new PGlite({extensions:{pgcrypto}}),org=randomUUID(),other=randomUUID();
+let session,auditFailure=false;
+const transaction=async(organizationId,userId,fn)=>{
+ await db.exec('begin');try{
+  await db.exec('set local role binso_runtime');
+  await db.query("select set_config('app.organization_id',$1,true),set_config('app.user_id',$2,true),set_config('app.platform_operator','false',true)",[organizationId,userId]);
+  const result=await fn(db);await db.exec('commit');return result;
+ }catch(error){await db.exec('rollback');throw error;}
+};
+mock('lib/server/db.ts',{withTenant:transaction,withPlatform:unavailable});
+mock('lib/server/session.ts',{requireSession:async()=>{if(!session)throw new Response('Unauthenticated',{status:401});return session;}});
+mock('lib/server/operator/session.ts',{requireOperatorSession:unavailable});
+mock('lib/server/operator/audit.ts',{platformAudit:unavailable});
+mock('lib/server/repositories/operator-api.ts',{listOperatorBusiness:unavailable,insertOperatorBusiness:unavailable,updateOperatorBusiness:unavailable});
+mock('lib/server/repositories/operator-customer-overview.ts',{operatorCustomerReadings:unavailable});
+const realAudit=load('lib/server/audit.ts').audit;
+mock('lib/server/audit.ts',{audit:async(...args)=>{await realAudit(...args);if(auditFailure)throw Error('Synthetic audit outage');}});
+const routes=load('app/api/employees/route.ts'),detail=load('app/api/employees/[id]/route.ts');
+const {NextRequest}=require('next/server');
+const input={firstName:'Synthetic',lastName:'Employee',email:'',jobTitle:'Consultant',workloadPercent:80,weeklyHours:33.6,vacationDays:25,entryDate:'2026-01-01',endDate:'2026-12-31',workLocation:'Bern'};
+const request=(body,key=randomUUID(),method='POST')=>new NextRequest('https://employee.invalid/api/employees',{method,headers:{origin:'https://employee.invalid','content-type':'application/json','idempotency-key':key},body:JSON.stringify(body)});
+const patch=(id,body)=>detail.PATCH(request(body,randomUUID(),'PATCH'),{params:Promise.resolve({id})});
+const read=id=>detail.GET(new Request('https://employee.invalid/api/employees/'+id),{params:Promise.resolve({id})});
+const act=(role,organizationId=org,extra={})=>session={organizationId,userId:'employee-dossier-'+role,role,moduleProfile:'standard',organizationStatus:'active',...extra};
+try{
+ await db.exec('create extension pgcrypto');
+ const files=fs.readdirSync('database/migrations').filter(f=>f.endsWith('.sql')).sort();
+ let baseline;
+ for(const file of files){
+  if(file==='0084_employee_basic_dossier.sql')baseline=(await db.query('select to_jsonb(e) item from employees e order by id')).rows;
+  await db.exec(fs.readFileSync('database/migrations/'+file,'utf8'));
+ }
+ assert.deepEqual((await db.query("select to_jsonb(e)-'end_date'-'work_location' item from employees e order by id")).rows,baseline,'Migration preserves all existing employee values');
+ await db.exec(fs.readFileSync('database/operations/provision-runtime-role.sql','utf8'));
+ for(const id of [org,other]){
+  await db.query("insert into organizations(id,name,slug) values($1,'Synthetic dossier',$2)",[id,'dossier-'+id]);
+  await db.query("insert into organization_subscriptions(organization_id,plan,status,billing_interval,unit_amount_chf) values($1,'business','active','monthly',69)",[id]);
+ }
+ for(const role of ['owner','admin','hr','finance','project_manager','manager','member','reader']){
+  const id='employee-dossier-'+role;
+  await db.query("insert into app_users(id,email,display_name,status) values($1,$2,'Synthetic','active')",[id,id+'@example.invalid']);
+  await db.query("insert into organization_memberships(organization_id,user_id,email,role,status) values($1,$2,$3,$4,'active')",[org,id,id+'@example.invalid',role]);
+ }
+ const identityBefore=(await db.query('select count(*)::int n from app_users')).rows[0].n;
+ act('owner');const key=randomUUID();
+ const first=await routes.POST(request(input,key));assert.equal(first.status,201,await first.clone().text());
+ const id=(await first.json()).item.id;
+ const replay=await routes.POST(request(input,key));assert.equal(replay.status,201);assert.equal((await replay.json()).item.id,id);
+ assert.equal((await routes.POST(request({...input,workLocation:'Basel'},key))).status,409,'Changed body cannot reuse a committed request key');
+ const stored=(await transaction(org,session.userId,c=>c.query('select email,user_id,end_date::text,work_location from employees where id=$1',[id]))).rows[0];
+ assert.deepEqual(stored,{email:null,user_id:null,end_date:'2026-12-31',work_location:'Bern'});
+ assert.equal((await db.query('select count(*)::int n from app_users')).rows[0].n,identityBefore,'No implicit app account or invitation');
+ const second=await routes.POST(request({...input,lastName:'Second'}));assert.equal(second.status,201,'Multiple employees may have no email');
+ for(const extra of [{user_id:randomUUID()},{organization_id:other},{role:'owner'},{iban:'CH-synthetic'},{monthly_gross:1000},{birthDate:'2000-01-01'},{child_allowance:100}]){
+  assert.equal((await routes.POST(request({...input,...extra}))).status,400);
+  assert.equal((await patch(id,{...input,...extra})).status,400,'Reject unsupported/sensitive fields before any write');
+ }
+ for(const extra of [{email:'invalid'},{entryDate:'2026-02-30'},{endDate:'2026-02-30'},{endDate:'2025-12-31'},{workLocation:'x'.repeat(181)}])assert.equal((await patch(id,{...input,...extra})).status,400);
+ const legacy={...input};delete legacy.endDate;delete legacy.workLocation;
+ assert.equal((await patch(id,{...legacy,jobTitle:'Updated'})).status,200);
+ let response=await read(id);assert.equal(response.status,200);let item=(await response.json()).item;
+ assert.equal(item.end_date.slice(0,10),'2026-12-31');assert.equal(item.work_location,'Bern','Old editor omitting new fields preserves them');
+ for(const field of ['user_id','iban','monthly_gross','ahv_number','child_allowance','internal_cost_rate'])assert.equal(Object.hasOwn(item,field),false,'No sensitive fields in general DTO: '+field);
+ for(const role of ['owner','admin','hr']){act(role);assert.equal((await read(id)).status,200);assert.equal((await patch(id,input)).status,200);}
+ for(const role of ['finance','project_manager','manager','member','reader']){act(role);assert.equal((await read(id)).status,403);assert.equal((await patch(id,input)).status,403);assert.equal((await routes.POST(request(input))).status,403);}
+ act('owner',org,{organizationStatus:'read_only'});assert.equal((await patch(id,input)).status,403);
+ act('member',org,{moduleProfile:'time_only'});assert.equal((await read(id)).status,403);
+ act('owner');await db.query("update organization_subscriptions set plan='starter' where organization_id=$1",[org]);
+ assert.equal((await read(id)).status,403,'Start has no personnel entitlement');
+ await db.query("update organization_subscriptions set plan='business' where organization_id=$1",[org]);
+ // A genuine second tenant and owner prove both API scoping and runtime RLS.
+ const foreign='employee-dossier-foreign';
+ await db.query("insert into app_users(id,email,display_name,status) values($1,'dossier-foreign@example.invalid','Synthetic','active')",[foreign]);
+ await db.query("insert into organization_memberships(organization_id,user_id,email,role,status) values($1,$2,'dossier-foreign@example.invalid','owner','active')",[other,foreign]);
+ session={...session,organizationId:other,userId:foreign};
+ assert.equal((await read(id)).status,404);assert.equal((await patch(id,input)).status,404);
+ assert.equal((await transaction(other,foreign,c=>c.query('select id from employees where id=$1',[id]))).rows.length,0);
+ assert.equal((await transaction('',foreign,c=>c.query('select id from employees where id=$1',[id]))).rows.length,0,'Contextless runtime cannot see employee');
+ act('owner');
+ await assert.rejects(()=>transaction(org,session.userId,c=>c.query("update employees set end_date='2000-01-01' where id=$1",[id])),e=>e.code==='23514','Database enforces dates independently of API');
+ const before=(await transaction(org,session.userId,c=>c.query('select name,title,work_location from employees where id=$1',[id]))).rows;
+ const auditBefore=(await db.query("select count(*)::int n from audit_events where organization_id=$1 and entity_type='employees'",[org])).rows[0].n;
+ auditFailure=true;assert.equal((await patch(id,{...input,workLocation:'Rollback probe'})).status,500);auditFailure=false;
+ assert.deepEqual((await transaction(org,session.userId,c=>c.query('select name,title,work_location from employees where id=$1',[id]))).rows,before,'Failed audit rolls employee changes back');
+ assert.equal((await db.query("select count(*)::int n from audit_events where organization_id=$1 and entity_type='employees'",[org])).rows[0].n,auditBefore);
+ const employeeCount=(await transaction(org,session.userId,c=>c.query('select count(*)::int n from employees'))).rows[0].n;
+ auditFailure=true;assert.equal((await routes.POST(request({...input,lastName:'Rollback'}))).status,500);auditFailure=false;
+ assert.equal((await transaction(org,session.userId,c=>c.query('select count(*)::int n from employees'))).rows[0].n,employeeCount,'Failed create audit rolls back employee and replay receipt');
+ session=null;assert.equal((await read(id)).status,401);
+ console.log('Employee dossier: actual POST/PATCH/GET, optional email/account, persistence, replay/conflict, legacy field preservation, eight roles, plans, tenants/RLS, date constraints and atomic audit rollback passed.');
+}finally{await db.close();}

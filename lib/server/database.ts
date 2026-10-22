@@ -67,6 +67,7 @@ export async function tenantInsert<T extends Row>(table:string,data:T,requestKey
  if(table==='expenses'){
   await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'expense.created',entityType:'expenses',entityId:String(result[0].id),metadata:{status:fields.status}});
  }
+ if(table==='employees')await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'employee.created',entityType:'employees',entityId:String(result[0].id)});
  if(replayOperation&&requestKey)await c.query("insert into business_idempotency_keys(organization_id,operation,idempotency_key,request_hash,response_json,created_by_user_id) values($1,$6,$2,$3,$4::jsonb,$5)",[s.organizationId,requestKey,requestHash,JSON.stringify(result),s.userId,replayOperation]);
  return result;});
 }
@@ -89,7 +90,9 @@ export async function tenantUpdate<T extends Row>(table:string,id:string,data:T)
   }
   await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'expense.updated',entityType:'expenses',entityId:current.id,metadata:{previous:current.status,status:next}});
  }
- return (await c.query(`update ${translated.target} set ${keys.map((k,i)=>k+'=$'+(i+1)).join(',')},updated_at=now() where id::text=$${keys.length+1} and organization_id=$${keys.length+2}${own?` and created_by_user_id=$${keys.length+3}`:''} returning id`,[...Object.values(translated.data),id,s.organizationId,...(own?[s.userId]:[])])).rows;});
+ const result=(await c.query(`update ${translated.target} set ${keys.map((k,i)=>k+'=$'+(i+1)).join(',')},updated_at=now() where id::text=$${keys.length+1} and organization_id=$${keys.length+2}${own?` and created_by_user_id=$${keys.length+3}`:''} returning id`,[...Object.values(translated.data),id,s.organizationId,...(own?[s.userId]:[])])).rows;
+ if(table==='employees'&&result[0])await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'employee.updated',entityType:'employees',entityId:String(result[0].id)});
+ return result;});
 }
 export async function currentCompany(){const s=await requireSession();return withTenant(s.organizationId,s.userId,async c=>(await c.query("select * from organizations where id=$1",[s.organizationId])).rows[0])}
 export async function currentProfile(){const s=await requireSession();return withTenant(s.organizationId,s.userId,async c=>(await c.query("select id,email,display_name,first_name,last_name,phone,job_title,language,theme,avatar_url from app_users where id=$1",[s.userId])).rows[0]??null)}

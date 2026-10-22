@@ -3,7 +3,7 @@ import { NextRequest } from "next/server";
 import { apiError, assertSameOrigin, cleanText, json, readJson } from "@/lib/server/http";
 import { tenantInsert, tenantListPage, requireTenantFeature } from "@/lib/server/database";
 
-type EmployeeBody={firstName?:unknown;lastName?:unknown;email?:unknown;phone?:unknown;jobTitle?:unknown;workloadPercent?:unknown;entryDate?:unknown;weeklyHours?:unknown;vacationDays?:unknown;address?:unknown;status?:unknown};
+type EmployeeBody={firstName?:unknown;lastName?:unknown;email?:unknown;phone?:unknown;jobTitle?:unknown;workloadPercent?:unknown;entryDate?:unknown;endDate?:unknown;workLocation?:unknown;weeklyHours?:unknown;vacationDays?:unknown;address?:unknown;status?:unknown};
 
 export async function GET(request:NextRequest){
   try{
@@ -24,7 +24,7 @@ export async function POST(request:NextRequest){
     if(!Number.isFinite(workload)||workload<0||workload>100) return json({error:"workload_invalid",message:"Pensum muss zwischen 0 und 100 liegen."},400);
     if(!Number.isFinite(weeklyHours)||weeklyHours<=0||weeklyHours>80) return json({error:"weekly_hours_invalid",message:"Wochenstunden müssen zwischen 0 und 80 liegen."},400);
     if(!Number.isFinite(vacationDays)||vacationDays<0||vacationDays>60) return json({error:"vacation_days_invalid",message:"Ferientage müssen zwischen 0 und 60 liegen."},400);
-    const rows=await tenantInsert("employees",{first_name:firstName,last_name:lastName,email:cleanText(body.email,320)||null,phone:cleanText(body.phone,80)||null,job_title:jobTitle,workload_percent:workload,start_date:cleanText(body.entryDate,20)||null,weekly_hours:weeklyHours,vacation_days:vacationDays,address:cleanText(body.address,500)||null,status:body.status==="inactive"?"inactive":"active"},request.headers?.get("idempotency-key")?.trim());
+    const rows=await tenantInsert("employees",{first_name:firstName,last_name:lastName,email:cleanText(body.email,320)||null,phone:cleanText(body.phone,80)||null,job_title:jobTitle,workload_percent:workload,start_date:cleanText(body.entryDate,20)||null,end_date:cleanText(body.endDate,20)||null,work_location:cleanText(body.workLocation,180)||null,weekly_hours:weeklyHours,vacation_days:vacationDays,address:cleanText(body.address,500)||null,status:body.status==="inactive"?"inactive":"active"},request.headers?.get("idempotency-key")?.trim());
     return json({item:rows[0]},201);
   }catch(error){return apiError(error);}
 }
