@@ -111,6 +111,7 @@ try{
  assert.equal((await fetch(base+'/api/reports/exports',{method:'POST',headers:{cookie:cookies.get('0:owner'),Origin:'https://foreign.invalid','Content-Type':'application/json','Idempotency-Key':'foreign-report-request'},body:JSON.stringify({query:'months=1',locale:'de'})})).status,403);
  assert.equal(Number((await pool.query('select count(*) n from report_exports')).rows[0].n),snapshotCount,'Foreign-origin rejection has no persistent side effect');
  const readContracts=[
+  ['/api/settings/readiness',['owner','admin']],
   ["/api/reports",reportRoles],
   ['/api/reports?kind=time',['owner','admin','finance','project_manager','manager']],
   ['/api/customers/archive',['owner','admin']],
@@ -273,6 +274,16 @@ try{
   if(table==='invoices'&&allowed.includes(role))createdInvoices.set(role,result.data.item);
   writeCases++;
  }
+ const readinessPath='/api/settings/readiness?action=issue_invoice&number='+encodeURIComponent(createdInvoices.get('owner').number);
+ for(const role of roles){const response=await get(readinessPath,cookies.get('0:'+role));assert.equal(response.status,finance.includes(role)?200:403,'Actual invoice preflight role '+role);if(finance.includes(role)){assert.equal(response.data.item.ready,true);assert.equal(response.data.item.number,createdInvoices.get('owner').number);}}
+ assert.equal((await get(readinessPath,cookies.get('1:owner'))).status,404,'Foreign tenant cannot inspect readiness');
+ for(const role of roles){const result=await write('PATCH','/api/settings/readiness',{dismissed:true},role);assert.equal(result.status,['owner','admin'].includes(role)?200:403,'Actual personal setup preference '+role);}
+ assert.equal((await write('PATCH','/api/settings/readiness',{dismissed:'true'},'owner')).status,400);
+ assert.equal((await write('PATCH','/api/settings/readiness',{dismissed:true,userId:'http-0-admin'},'owner')).status,400,'Recipient override rejected');
+ assert.equal((await get('/api/settings/readiness',cookies.get('0:owner'))).data.item.dismissed,true);
+ assert.equal((await get('/api/settings/readiness',cookies.get('1:owner'))).data.item.dismissed,false,'A preference never crosses tenants');
+ assert.equal((await get('/api/settings/readiness?action=unexpected',cookies.get('0:owner'))).status,400);
+ console.log('Native HTTP readiness: all eight read/write roles, personal persistence, foreign tenant, exact invoice binding, invalid boolean/recipient/action rejection passed.');
  // Real HTTP status changes: successful finance roles each use their own draft;
  // denied roles must leave the invoice row exactly unchanged.
  for(const role of roles){

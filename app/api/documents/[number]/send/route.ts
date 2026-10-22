@@ -1,3 +1,4 @@
+import {verifiedMailReplyTo} from '@/lib/server/mail-identity';
 import {NextRequest} from "next/server";
 import {asLocale,translateMessage} from "@/lib/locales";
 import {domainConfig} from "@/config/domain";
@@ -50,7 +51,7 @@ export async function POST(request:NextRequest,{params}:{params:Promise<{number:
   const pdf=version?Buffer.from(version.pdf):issued?Buffer.from(issued.pdf):await documentPdf(document,company,await documentLogo(c,s.organizationId,document,company));const id=randomUUID();
   await c.query("insert into document_deliveries(id,organization_id,kind,document_id,recipient,status,request_key,created_by_user_id,purpose,reminder_stage,balance_amount,payment_deadline) values($1,$2,$3,$4,$5,'sending',$6,$7,$8,$9,$10,$11)",[id,s.organizationId,kind,row.id,recipient,key,s.userId,purpose,reminder?.stage??null,reminder?.amount??null,reminder?.deadline??null]);
   await c.query('update document_deliveries set subject=$3,message=$4,offer_version_id=$5,public_link_id=$6 where organization_id=$1 and id=$2',[s.organizationId,id,subject,message,version?.id??null,publicLink?.link.id??null]);
-  const verifiedReplyTo=(await c.query("select u.email from app_users u join organization_memberships m on m.user_id=u.id where m.organization_id=$1 and m.status='active' and u.status='active' and u.email_verified_at is not null and lower(u.email)=lower($2) limit 1",[s.organizationId,company.mail_reply_to||s.email])).rows[0]?.email;
+  const verifiedReplyTo=await verifiedMailReplyTo(c,s.organizationId,company.mail_reply_to||s.email);
   return {sent:false,id,kind,document,pdf,company,reminder,publicLink,verifiedReplyTo};
  });
  if(delivery.sent)return json({ok:true});

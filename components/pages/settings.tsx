@@ -1,4 +1,7 @@
 "use client";
+import {useSetupField} from "../use-setup-field";
+import {setupFieldIds} from "@/lib/action-readiness";
+import {SetupGuidePreference} from "../setup-guide";
 import {notificationChannels} from "@/config/notification-channels";
 import {SettingsNavigation} from "../settings-navigation";
 import {FileUpload} from "../file-upload";
@@ -10,6 +13,7 @@ import {asLocale,localeNames,locales,localeTags} from "@/lib/locales";
 import {useLanguagePreference} from "@/lib/client/use-language-preference";
 import {companyLogoSource} from "@/lib/image-url";
 import {useApiQuery} from "@/lib/client/use-api-query";
+import {AvatarUpload} from "../avatar-upload";
 import {Avatar} from "../avatar";
 import {usePageAccess} from "@/lib/client/page-access";
 import {ActionRow,ActionSheet,FormSheet,ListRow,SelectionRows,SettingsGroup} from "../binso-ux";
@@ -28,7 +32,7 @@ import {formatCurrency} from "@/lib/financial-status";
 
 export function SettingsPage() {
   return <AppShell title="Einstellungen" active="einstellungen" backHref="/dashboard">
-    <SettingsNavigation/>
+    <SetupGuidePreference/><SettingsNavigation/>
   </AppShell>;
 }
 
@@ -56,16 +60,16 @@ export function AccountSettingsPage() {
   const [pendingAvatar,setPendingAvatar]=useState<{id:string;expectedUrl:string}|null>(null);
   const removeAvatar=async()=>{const match=avatarUrl.match(/^\/api\/files\/([0-9a-f-]{36})\/download$/i);if(!match||avatarPending.current||saveBusy.current)return;avatarPending.current=true;setAvatarUploading(true);setAvatarError('');try{await apiDelete('/api/files/'+match[1]);setAvatarUrl('');setPendingAvatar(null);query.refresh();window.dispatchEvent(new Event('binso-profile-changed'));}catch(error){setAvatarError(error instanceof Error?error.message:'Profilbild konnte nicht entfernt werden.');}finally{avatarPending.current=false;setAvatarUploading(false)}};
   const uploadAvatar=async(file:File|undefined)=>{
-    if(!file||avatarPending.current||saveBusy.current)return;avatarPending.current=true;setAvatarUploading(true);setAvatarError("");
+    if(!file||avatarPending.current||saveBusy.current)return false;avatarPending.current=true;setAvatarUploading(true);setAvatarError("");
     try{
       const form=new FormData();form.append("file",file);form.append("purpose","profile_avatar");
       const result=await apiUpload<{item:{id:string;scanStatus:string;available:boolean}}>("/api/files",form);
       if(result.item.available!==true){
         setPendingAvatar({id:result.item.id,expectedUrl:avatarUrl});
-        throw new Error("Das Profilbild wartet auf die Sicherheitsprüfung. Das bisherige Bild bleibt erhalten.");
+        const message="Das Profilbild wartet auf die Sicherheitsprüfung. Das bisherige Bild bleibt erhalten.";setAvatarError(message);setToast(message);return true;
       }
-      setPendingAvatar(null);setAvatarUrl("/api/files/"+result.item.id+"/download");query.refresh();window.dispatchEvent(new Event("binso-profile-changed"));setToast("Profilbild gespeichert.");
-    }catch(e){const message=e instanceof Error?e.message:"Profilbild konnte nicht gespeichert werden.";setAvatarError(message);setToast(message)}finally{avatarPending.current=false;setAvatarUploading(false)}
+      setPendingAvatar(null);setAvatarUrl("/api/files/"+result.item.id+"/download");query.refresh();window.dispatchEvent(new Event("binso-profile-changed"));setToast("Profilbild gespeichert.");return true;
+    }catch(e){const message=e instanceof Error?e.message:"Profilbild konnte nicht gespeichert werden.";setAvatarError(message);setToast(message);return false;}finally{avatarPending.current=false;setAvatarUploading(false)}
   };
   const activatePendingAvatar=async()=>{
     if(!pendingAvatar||avatarPending.current||saveBusy.current)return;avatarPending.current=true;setAvatarUploading(true);setAvatarError('');
@@ -109,7 +113,7 @@ export function AccountSettingsPage() {
         <Avatar name={displayName==="Benutzer"?"":displayName} identity={email} src={avatarUrl} size="large"/><div><h2>{displayName}</h2><p><LocalizedText verbatim>{email}</LocalizedText></p><p><LocalizedText verbatim={!!jobTitle}>{jobTitle||"Benutzer"}</LocalizedText></p></div>
       </section>
       {editing?<FormSheet workspace label="Persönliche Daten bearbeiten" open onClose={()=>setEditing(false)} busy={saving||avatarUploading} dirty={currentValues!==baseline}><form className="settings-form" onSubmit={event=>{event.preventDefault();void save();}}>
-        <FileUpload id="profile-avatar-upload" label="Profilbild" file={null} preview={avatarUrl||undefined} accept={["image/png","image/jpeg","image/webp"]} busy={saving||avatarUploading} error={avatarError} onSelect={file=>void uploadAvatar(file)} onRemove={()=>void removeAvatar()}/>
+        <AvatarUpload name={displayName} src={avatarUrl} busy={saving||avatarUploading} error={avatarError} onConfirm={uploadAvatar} onRemove={()=>void removeAvatar()}/>
         {pendingAvatar&&<Button variant="secondary" disabled={saving||avatarUploading} onClick={()=>void activatePendingAvatar()}><LocalizedText>Bild übernehmen</LocalizedText></Button>}
         <div className="form-grid two">
           <Field label="Vorname"><Input value={firstName} onChange={e=>setFirstName(e.target.value)}/></Field>
@@ -131,6 +135,8 @@ export function CompanySettingsPage() {
   const onboarding=search.get("onboarding")==="1";
   const onboardingOpened=useRef(false);
   const [name,setName]=useState("");
+  const [legalName,setLegalName]=useState(""),[countryCode,setCountryCode]=useState("CH");
+  const {write}=usePageAccess();
   const [uid,setUid]=useState("");
   const [logoUrl,setLogoUrl]=useState("");
   const [street,setStreet]=useState("");
@@ -146,12 +152,15 @@ export function CompanySettingsPage() {
   const [saving,setSaving]=useState(false);
   const saveBusy=useRef(false);
   const [baseline,setBaseline]=useState("");
-  const currentValues=JSON.stringify([name,uid,street,buildingNumber,postalCode,city,email,phone]);
-  const beginEdit=()=>{setPendingLogo(null);setLogoPreview("");setRemoveLogo(false);setBaseline(currentValues);setEditing(true)};
+  const currentValues=JSON.stringify([name,uid,street,buildingNumber,postalCode,city,email,phone,legalName,countryCode]);
+
+
 
   const [pendingLogo,setPendingLogo]=useState<File|null>(null);
   const [removeLogo,setRemoveLogo]=useState(false);
   const [logoPreview,setLogoPreview]=useState("");
+  const beginEdit=()=>{setPendingLogo(null);setLogoPreview("");setRemoveLogo(false);setBaseline(currentValues);setEditing(true)};
+  const fieldRecovery=useSetupField(["name","legalName","street","postalCode","city","countryCode","logo"],!loading&&!loadError,editing,beginEdit,write&&!onboarding);
   useEffect(()=>()=>{if(logoPreview)URL.revokeObjectURL(logoPreview)},[logoPreview]);
   const uploadLogo=(file:File)=>{setPendingLogo(file);setRemoveLogo(false);setLogoPreview(URL.createObjectURL(file))};
 
@@ -159,9 +168,9 @@ export function CompanySettingsPage() {
     if(editing||!query.data)return;
     const item=query.data.item;let active=true;
     queueMicrotask(()=>{if(!active)return;
-      setName(String(item.name??""));setUid(String(item.uid??""));setLogoUrl(String(item.logo_url??""));setStreet(String(item.street??""));setBuildingNumber(String(item.building_number??""));
+      setName(String(item.name??""));setLegalName(String(item.legal_name??""));setCountryCode(String(item.country_code??"CH"));setUid(String(item.uid??""));setLogoUrl(String(item.logo_url??""));setStreet(String(item.street??""));setBuildingNumber(String(item.building_number??""));
       setPostalCode(String(item.postal_code??""));setCity(String(item.city??""));setEmail(String(item.email??""));setPhone(String(item.phone??""));
-      if(onboarding&&!onboardingOpened.current){onboardingOpened.current=true;setBaseline(JSON.stringify([String(item.name??""),String(item.uid??""),String(item.street??""),String(item.building_number??""),String(item.postal_code??""),String(item.city??""),String(item.email??""),String(item.phone??"")]));setEditing(true);}
+      if(onboarding&&!onboardingOpened.current){onboardingOpened.current=true;setBaseline(JSON.stringify([String(item.name??""),String(item.uid??""),String(item.street??""),String(item.building_number??""),String(item.postal_code??""),String(item.city??""),String(item.email??""),String(item.phone??""),String(item.legal_name??""),String(item.country_code??"CH")]));setEditing(true);}
     });
     return()=>{active=false};
   },[editing,query.data,onboarding]);
@@ -172,12 +181,13 @@ export function CompanySettingsPage() {
       {}
       if(!name.trim()){throw new Error("Firmenname ist erforderlich.")}
       if(pendingLogo){const form=new FormData();form.append("file",pendingLogo);form.append("purpose","company_logo");const result=await apiUpload<{item:{id:string;scanStatus:string;available:boolean}}>("/api/files",form);if(result.item.available!==true)throw new Error("Das Firmenlogo wartet auf die Sicherheitsprüfung. Das bisherige Logo bleibt erhalten.");setLogoUrl("/api/files/"+result.item.id+"/download");setPendingLogo(null);setLogoPreview("");}
-      await apiPatch("/api/settings/company",{name,uid,street,buildingNumber,postalCode,city,email,phone,...(removeLogo?{logoUrl:""}:{}),completeOnboarding:onboarding});
+      await apiPatch("/api/settings/company",{name,uid,street,buildingNumber,postalCode,city,email,phone,legalName,countryCode,...(removeLogo?{logoUrl:""}:{}),completeOnboarding:onboarding});
       if(removeLogo){setLogoUrl("");setRemoveLogo(false);}
       query.refresh();
       if(onboarding){allowDraftNavigation();router.replace("/dashboard");return;}
       setToast(message);
       setEditing(false);
+      if(fieldRecovery.returnTo){allowDraftNavigation();router.push(fieldRecovery.returnTo);}
     }catch(error){
       setToast(error instanceof Error?error.message:"Firmendaten konnten nicht gespeichert werden.");
     }
@@ -190,12 +200,12 @@ export function CompanySettingsPage() {
   const leaveSetup=useBrowserBackGuard(onboarding&&(setupDirty||saving),()=>{if(!saving){setSetupDestination(null);setSetupBack(true);setSetupDiscard(true)}},setupDirty||saving,url=>{if(!saving){setSetupDestination(url);setSetupBack(false);setSetupDiscard(true)}});
   const companyForm=<><form id="company-settings-form" className="settings-form" onSubmit={event=>{event.preventDefault();void save();}}>
         <div className="form-grid two"><FileUpload id="company-logo-upload" label="Firmenlogo" className="full" file={pendingLogo} preview={companyLogoSource(removeLogo?"":logoPreview||logoUrl)||undefined} accept={['image/png','image/jpeg','image/webp']} onSelect={uploadLogo} onRemove={()=>{setPendingLogo(null);setLogoPreview("");setRemoveLogo(true);}} busy={saving}/>
-          <Field label="Firmenname *"><Input required autoComplete="organization" value={name} onChange={e=>setName(e.target.value)}/></Field>
-          <Field label="UID"><Input value={uid} onChange={e=>setUid(e.target.value)}/></Field>
-          <Field label="Strasse"><Input value={street} onChange={e=>setStreet(e.target.value)}/></Field><Field label="Hausnummer"><Input maxLength={30} value={buildingNumber} onChange={e=>setBuildingNumber(e.target.value)}/></Field>
-          <Field label="PLZ"><Input value={postalCode} onChange={e=>setPostalCode(e.target.value)}/></Field>
-          <Field label="Ort"><Input value={city} onChange={e=>setCity(e.target.value)}/></Field>
-          <Field label="E-Mail"><Input type="email" value={email} onChange={e=>setEmail(e.target.value)}/></Field>
+          <Field label="Firmenname *"><Input id={setupFieldIds.name} required autoComplete="organization" value={name} onChange={e=>setName(e.target.value)}/></Field>
+          <Field label="Rechtlicher Firmenname"><Input id={setupFieldIds.legalName} value={legalName} maxLength={70} onChange={e=>setLegalName(e.target.value)}/></Field><Field label="UID"><Input value={uid} onChange={e=>setUid(e.target.value)}/></Field>
+          <Field label="Strasse"><Input id={setupFieldIds.street} value={street} onChange={e=>setStreet(e.target.value)}/></Field><Field label="Hausnummer"><Input maxLength={30} value={buildingNumber} onChange={e=>setBuildingNumber(e.target.value)}/></Field>
+          <Field label="PLZ"><Input id={setupFieldIds.postalCode} value={postalCode} onChange={e=>setPostalCode(e.target.value)}/></Field>
+          <Field label="Ort"><Input id={setupFieldIds.city} value={city} onChange={e=>setCity(e.target.value)}/></Field>
+          <Field label="Ländercode"><Input id={setupFieldIds.countryCode} autoComplete="country" maxLength={2} value={countryCode} onChange={e=>setCountryCode(e.target.value.toUpperCase())}/></Field><Field label="E-Mail"><Input type="email" value={email} onChange={e=>setEmail(e.target.value)}/></Field>
           <Field label="Telefon"><Input type="tel" value={phone} onChange={e=>setPhone(e.target.value)}/></Field>
         </div>
         </form><FormActions sheet>{onboarding&&<Button variant="secondary" disabled={saving} onClick={()=>{setSetupDestination(null);setSetupBack(false);if(setupDirty)setSetupDiscard(true);else router.replace("/dashboard")}}><LocalizedText>{"Später fortsetzen"}</LocalizedText></Button>}<Button requiresWrite disabled={loading||!!loadError||saving} type="submit" form="company-settings-form"><LocalizedText>{saving?"Wird gespeichert…":onboarding?"Einrichtung abschliessen":"Speichern"}</LocalizedText></Button></FormActions>

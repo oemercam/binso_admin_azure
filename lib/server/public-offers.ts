@@ -1,3 +1,4 @@
+import {verifiedMailReplyTo} from './mail-identity';
 import 'server-only';
 import {createHash,createHmac,randomBytes,randomInt,timingSafeEqual} from 'node:crypto';
 import type {PoolClient} from 'pg';
@@ -86,7 +87,7 @@ export async function respondToOffer(token:string,input:{action:'accept'|'declin
  const outcome=await withPublicOffer(token,async(c,{link,version,status,session})=>{
   const kind=input.action==='accept'?'accepted':input.action==='decline'?'declined':'question';
   const prior=(await c.query<{kind:string;body:string}>("select kind,body from offer_public_events where organization_id=$1 and link_id=$2 and request_key=$3",[link.organization_id,link.id,input.requestKey])).rows[0];
-  if(prior){if(prior.kind!==kind||prior.body!==input.body)throw new ApiError(409,'key_conflict','Die Aktion wurde bereits anders verwendet.');return {ok:true,confirmation:'already_recorded'};}
+  if(prior){if(prior.kind!==kind||prior.body!==input.body)throw new ApiError(409,'key_conflict','Die Aktion wurde bereits anders verwendet.');return {ok:true,confirmation:'already_recorded',resume:true};}
   if(!input.confirmed)throw new ApiError(400,'confirmation_required','Bitte die Aktion ausdrücklich bestätigen.');
   if(input.action!=='question'&&status!=='sent')throw new ApiError(409,'decision_recorded','Für dieses Angebot wurde bereits entschieden.');
   const challenge=(await c.query<{id:string;code_hash:string;attempts:number}>("select id,code_hash,attempts from offer_recipient_codes where organization_id=$1 and link_id=$2 and action=$3 and consumed_at is null and expires_at>now() order by created_at desc limit 1 for update",[link.organization_id,link.id,input.action])).rows[0];
@@ -99,16 +100,50 @@ export async function respondToOffer(token:string,input:{action:'accept'|'declin
   await c.query("insert into in_app_notifications(organization_id,user_id,kind,title,body,href) values($1,$2,'system',$3,$4,$5)",[link.organization_id,session.userId,input.action==='question'?'Frage zum Angebot':input.action==='accept'?'Angebot angenommen':'Angebot abgelehnt',version.number+' · Version '+version.version,'/angebote/'+encodeURIComponent(version.number)]);
   await audit(c,{organizationId:link.organization_id,userName:'Verifizierter Angebotsempfänger',action:'offer.public.'+input.action,entityType:'quote',entityId:version.quote_id,metadata:{version:version.version,linkId:link.id,recipientVerified:true}});
   const emailPreference=(await c.query<{email:boolean}>("select email from notification_preferences where organization_id=$1 and user_id=$2 and kind='Angebote'",[link.organization_id,session.userId])).rows[0];
-  return {ok:true,confirmation:'recorded',recipient:link.recipient,number:version.number,version:version.version,linkId:link.id,employeeEmail:emailPreference?.email===true?session.email:null,locale:asLocale(link.locale),url:offerLinkUrl(link),company:version.company};
+  const locale=asLocale(link.locale),t=(value:string)=>translateMessage(value,locale),title=t(input.action==='accept'?'Angebot angenommen':input.action==='decline'?'Angebot abgelehnt':'Frage gespeichert');
+  const detail=version.number+' · '+t('Version')+' '+version.version+'\n'+input.body,url=offerLinkUrl(link),branding={name:String(version.company.legal_name||version.company.name||'Binso One')};
+  const messages=[{kind:'offer_confirmation',recipient:link.recipient,text:detail+'\n\n'+url,html:mailLayout(title,'<p>'+escape(detail).replace(/\n/g,'<br>')+'</p>',{label:t('Angebot und Verlauf ansehen'),url},locale,branding)}];
+  if(emailPreference?.email===true)messages.push({kind:'offer_employee',recipient:session.email,text:detail,html:mailLayout(title,'<p>'+escape(detail).replace(/\n/g,'<br>')+'</p>')});
+  for(const message of messages)await c.query("insert into mail_outbox(organization_id,deduplication_key,kind,entity_id,recipient,subject,body,attachment_html,created_by) values($1,$2,$3,$4,$5,$6,$7,$8,$9) on conflict(organization_id,deduplication_key) do nothing",[link.organization_id,'offer-response:'+link.id+':'+input.requestKey+':'+message.kind,message.kind,link.id+':'+input.requestKey,message.recipient,title+' – '+version.number,message.text,message.html,session.userId]);
+  return {ok:true,confirmation:'recorded',resume:true};
  });
  if('invalid' in outcome)throw new ApiError(403,'code_invalid','Der Code ist ungültig oder abgelaufen.');
- if(!('recipient' in outcome)||typeof outcome.recipient!=='string')return {ok:true,confirmation:outcome.confirmation};
- const t=(value:string)=>translateMessage(value,outcome.locale);
- const title=t(input.action==='accept'?'Angebot angenommen':input.action==='decline'?'Angebot abgelehnt':'Frage gespeichert');
- const detail=`${outcome.number} · ${t('Version')} ${outcome.version}\n${input.body}`;
- let accepted=false;
- try{accepted=(await sendMail({to:outcome.recipient,senderName:String(outcome.company.legal_name||outcome.company.name||'Binso One').slice(0,160),subject:title+' – '+outcome.number,text:detail+'\n\n'+outcome.url,html:mailLayout(title,'<p>'+escape(detail).replace(/\n/g,'<br>')+'</p>',{label:t('Angebot und Verlauf ansehen'),url:outcome.url},outcome.locale,{name:String(outcome.company.legal_name||outcome.company.name||'Binso One')})})).delivered;}catch{/* Decision is already committed. Never replay it because email is uncertain. */}
- if(outcome.employeeEmail)try{await sendMail({to:outcome.employeeEmail,subject:title+' – '+outcome.number,text:detail,html:mailLayout(title,'<p>'+escape(detail).replace(/\n/g,'<br>')+'</p>')});}catch{/* The in-app notification remains the source of truth. */}
- try{await withPublicOffer(token,async(c,{link})=>{await c.query("insert into offer_public_events(organization_id,link_id,kind,actor,request_key) values($1,$2,$3,'provider',$4) on conflict(link_id,request_key) do nothing",[link.organization_id,link.id,accepted?'provider_accepted':'provider_unconfirmed','confirmation:'+input.requestKey]);});}catch{/* Concurrent revocation must not undo or obscure the completed decision. */}
- return {ok:true,confirmation:outcome.confirmation,notification:accepted?'provider_accepted':'unconfirmed'};
+ const notification=await resumeOfferResponseMail(token,input.requestKey).catch(()=> 'unconfirmed');
+ return {ok:true,confirmation:outcome.confirmation,notification};
+}
+/** Replays resume only definitely unattempted/failed work. Sending/uncertain
+ * attempts remain blocked, even after a crash; Graph202 is not inbox delivery. */
+export async function resumeOfferResponseMail(token:string,requestKey:string,staffReply?:{createdBy:string}){
+ let customerAccepted=false;
+ for(const kind of (staffReply?['offer_confirmation']:['offer_confirmation','offer_employee'])){
+  const claim=await withPublicOffer(token,async(c,{link,session,version})=>{
+   const key=(staffReply?'offer-reply:':'offer-response:')+link.id+':'+requestKey+':'+kind;
+   const row=(await c.query<{id:string;status:string;recipient:string;subject:string;body:string;attachment_html:string}>("select id,status,recipient,subject,body,attachment_html from mail_outbox where organization_id=$1 and deduplication_key=$2 and kind=$3 and created_by=$4 for update",[link.organization_id,key,kind,staffReply?.createdBy??session.userId])).rows[0];
+   if(!row)return null;
+   if(staffReply){const actor=(await c.query<{role:SessionUser['role'];module_profile:SessionUser['moduleProfile']}>("select m.role,m.module_profile from organization_memberships m join app_users u on u.id=m.user_id and u.status='active' where m.organization_id=$1 and m.user_id=$2 and m.status='active'",[link.organization_id,staffReply.createdBy])).rows[0];if(!actor)throw unavailable();authorize({...session,userId:staffReply.createdBy,role:actor.role,moduleProfile:actor.module_profile},'sales:write');}
+   if(row.status==='accepted')return {row,send:false,company:version.company};
+   if(!['queued','failed'].includes(row.status))return {row,send:false,company:version.company};
+   // A retry must respect current notification preferences and the same creator.
+   const preference=kind==='offer_employee'?(await c.query<{email:boolean}>("select email from notification_preferences where organization_id=$1 and user_id=$2 and kind='Angebote'",[link.organization_id,session.userId])).rows[0]:null;
+   if(kind==='offer_employee'&&(preference?.email!==true||row.recipient!==session.email)){
+    await c.query("update mail_outbox set status='cancelled',last_error='recipient_preference_changed',updated_at=now() where organization_id=$1 and id=$2",[link.organization_id,row.id]);
+    await audit(c,{organizationId:link.organization_id,userId:staffReply?.createdBy??session.userId,action:'offer.response.mail.cancelled',entityType:'mail_outbox',entityId:row.id});return null;
+   }
+   await c.query("update mail_outbox set status='sending',attempts=attempts+1,last_error=null,updated_at=now() where organization_id=$1 and id=$2",[link.organization_id,row.id]);
+   await audit(c,{organizationId:link.organization_id,userId:staffReply?.createdBy??session.userId,action:'offer.response.mail.claimed',entityType:'mail_outbox',entityId:row.id});
+   return {row,send:true,company:version.company,replyTo:await verifiedMailReplyTo(c,link.organization_id,version.company.mail_reply_to||session.email)};
+  });
+  if(!claim)continue;
+  if(!claim.send){if(kind==='offer_confirmation'&&claim.row.status==='accepted')customerAccepted=true;continue;}
+  let status='uncertain';
+  try{status=(await sendMail({to:claim.row.recipient,subject:claim.row.subject,text:claim.row.body,html:claim.row.attachment_html,replyTo:claim.replyTo,senderName:String(claim.company.legal_name||claim.company.name||'Binso One').slice(0,160)})).delivered?'accepted':'failed';}catch{/* Never infer a safe retry from an ambiguous provider/network error. */}
+  try{await withPublicOffer(token,async(c,{link,session})=>{
+   const saved=await c.query("update mail_outbox set status=$3,last_error=$4,updated_at=now() where organization_id=$1 and id=$2 and status='sending' returning id",[link.organization_id,claim.row.id,status,status==='accepted'?null:status==='failed'?'delivery_unavailable':'delivery_uncertain']);
+   if(!saved.rowCount)throw new ApiError(409,'delivery_uncertain','Versand konnte nicht bestätigt werden.');
+   await audit(c,{organizationId:link.organization_id,userId:staffReply?.createdBy??session.userId,action:'offer.response.mail.result',entityType:'mail_outbox',entityId:claim.row.id,metadata:{status}});
+   if(kind==='offer_confirmation')await c.query("insert into offer_public_events(organization_id,link_id,kind,actor,request_key) values($1,$2,$3,'provider',$4) on conflict(link_id,request_key) do nothing",[link.organization_id,link.id,status==='accepted'?'provider_accepted':'provider_unconfirmed',(staffReply?'reply:':'confirmation:')+requestKey+':'+status]);
+  });if(kind==='offer_confirmation'&&status==='accepted')customerAccepted=true;}
+  catch{/* The decision stays committed. Unrecorded results remain sending, never resendable. */}
+ }
+ return customerAccepted?'provider_accepted':'unconfirmed';
 }

@@ -6,3 +6,9 @@ export type CashStatisticsData={financial?:FinancialMetricsData;payments?:Array<
 export function cashStatisticEvents(data:CashStatisticsData):StatisticEvent[]{return [...(data.refunds??[]).map(row=>({date:row.payment_date,values:{income:-sumMoney([row.amount]),costs:0}})),...(data.payments??[]).map(row=>({date:row.payment_date,values:{income:row.amount,costs:0}})),...(data.outflows??[]).map(row=>({date:row.payment_date,values:{income:0,costs:row.amount}}))];}
 
 export function financialStatisticEvents(data:CashStatisticsData):StatisticEvent[]{return [...cashStatisticEvents(data),...(data.financial?.revenueEvents??[]).map(row=>({date:row.date,values:{revenue:row.amount}}))];}
+
+/** Only a complete, known-empty snapshot may hide first-run zero tiles. Unknown data is not zero. */
+export function hasFinancialHistory(data:CashStatisticsData):boolean{
+ if(data.incomplete||!data.financial||![data.payments,data.outflows,data.refunds,data.financial.revenueEvents].every(Array.isArray))return true;
+ return [data.payments,data.outflows,data.refunds,data.financial.revenueEvents].some(rows=>rows!.length>0)||[data.financial.snapshot.paid,data.financial.snapshot.open,data.financial.snapshot.overdue,data.financial.snapshot.credit_balance].some(value=>value==null||value===''||!Number.isFinite(Number(value))||Number(value)!==0);
+}

@@ -19,6 +19,8 @@ export function affectedDomains(path:string):DataDomain[]{
  if(domain==='identity')return ['identity','session'];
  if(path.startsWith('/api/settings/team/'))return ['settings','session','identity'];
  if(path.startsWith('/api/settings/notifications'))return ['settings','notifications'];
+ if(path.startsWith('/api/settings/readiness'))return ['settings','dashboard'];
+ if(path.startsWith('/api/settings/company')||path.startsWith('/api/settings/documents'))return ['settings','documents','dashboard'];
  if(path.startsWith('/api/settings/profile'))return ['settings'];
  const dependents:Partial<Record<DataDomain,DataDomain[]>>={
  customers:['documents','payments','projects','time','finance','dashboard'],

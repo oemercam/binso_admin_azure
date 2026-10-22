@@ -314,7 +314,7 @@ console.log('Project-linked idle timer context survives synchronization without 
  };
  const makeWrite=()=>{let calls=0,resolve,reject;return {write:()=>{calls++;return new Promise((ok,fail)=>{resolve=ok;reject=fail})},calls:()=>calls,resolve:()=>resolve({item:{id:'saved',number:'TEST-1'}}),reject:()=>reject(new Error('offline'))}};
  const noop=()=>{};
- const docScope=()=>({billingLoading:false,billingError:null,sourceQuery:{loading:false},sourceLoading:false,sourceError:null,recovery:{ready:true,persist:()=>{},clear:()=>{}},wizardStep:0,setDraftReplay:()=>{},resolveCustomer:()=>({id:"customer"}),createRequest:{current:null},crypto:{randomUUID:()=>"fixture-create-key"},draftBaseline:{current:null},documentSavePending:{current:false},companyPending:false,documentLoad:{loading:false,error:null},customersLoading:false,customersError:null,isProductionBackendEnabled:()=>true,draft:{customer:'Test',number:''},show:noop,paymentIssue:null,setSaving:noop,kind:'Angebot',documentPayload:()=>({}),sourceOffer:null,directory:{Test:{id:'customer'}},existing:false,documentKey:null,setDraft:noop,remoteDraftFromItem:x=>x,setDirty:noop,setEditing:noop,window:{setTimeout:noop},router:{push:noop},plural:'angebote'});
+ const docScope=()=>({billingLoading:false,billingError:null,sourceQuery:{loading:false},sourceLoading:false,sourceError:null,recovery:{ready:true,persist:()=>{},clear:()=>{}},wizardStep:0,setDraftReplay:()=>{},resolveCustomer:()=>({id:"customer"}),createRequest:{current:null},crypto:{randomUUID:()=>"fixture-create-key"},draftBaseline:{current:null},documentSavePending:{current:false},companyPending:false,company:{error:null},documentLoad:{loading:false,error:null},customersLoading:false,customersError:null,isProductionBackendEnabled:()=>true,draft:{customer:'Test',number:''},show:noop,paymentIssue:null,setSaving:noop,kind:'Angebot',documentPayload:()=>({}),sourceOffer:null,directory:{Test:{id:'customer'}},existing:false,documentKey:null,setDraft:noop,remoteDraftFromItem:x=>x,setDirty:noop,setEditing:noop,window:{setTimeout:noop},router:{push:noop},plural:'angebote'});
  const expenseScope=()=>({expenseRecovery:{ready:true,persist:()=>{},clear:()=>{}},expenseDraft:{},setExpenseReplayKey:()=>{},expenseMutationPending:{current:false},receiptScanPending:{current:false},lockedExpense:false,loadingExpense:false,expenseLoadError:null,amount:'89',expenseBillable:false,expenseCustomer:'',setToast:noop,window:{setTimeout:noop},status:'Eingereicht',setExpenseBusy:noop,person:'',merchant:'SBB',description:'',category:'Reise',date:'2026-10-08',currency:'CHF',vatRate:'8.1',expenseId:null,createdExpenseId:'',receiptFile:null,production:true,expenseRequestKey:{current:''},setCreatedExpenseId:noop,setReceiptFile:noop,apiUpload:noop,apiPatch:noop,appendDemoRow:noop,setSavedExpense:noop,existing:false,router:{push:noop}});
  for(const [file,fn,scopeFactory] of [['components/documents.tsx','DocumentPage',docScope],['components/app-pages.tsx','ExpenseForm',expenseScope]]){
   const pending=makeWrite();const scope=scopeFactory();scope.apiPost=pending.write;scope.apiPatch=pending.write;
@@ -322,11 +322,13 @@ console.log('Project-linked idle timer context survives synchronization without 
   const retry=makeWrite();const retryScope=scopeFactory();retryScope.apiPost=retry.write;retryScope.apiPatch=retry.write;
   const retryRun=handler(file,fn,'save',retryScope);const failure=retryRun();retry.reject();await failure;const next=retryRun();assert.equal(retry.calls(),2,fn+' releases the lock after failure');retry.resolve();await next;
  }
- for(const blocked of [{sourceLoading:true},{sourceError:'Source unavailable'},{customersLoading:true},{customersError:'Customer unavailable'}]){
+ for(const blocked of [{company:{error:'Company unavailable'}},{sourceLoading:true},{sourceError:'Source unavailable'},{customersLoading:true},{customersError:'Customer unavailable'}]){
   const pending=makeWrite(),scope={...docScope(),...blocked,apiPost:pending.write,apiPatch:pending.write};
   await handler('components/documents.tsx','DocumentPage','save',scope)();
   assert.equal(pending.calls(),0,'Source/customer loading or failure must block document writes');
  }
+ const draftOnly=makeWrite(),draftOnlyScope={...docScope(),kind:'Rechnung',paymentIssue:'Bank details missing',apiPost:draftOnly.write,apiPatch:draftOnly.write};
+ const draftSaved=handler('components/documents.tsx','DocumentPage','save',draftOnlyScope)();assert.equal(draftOnly.calls(),1,'Missing bank data cannot block a saved invoice draft');draftOnly.resolve();await draftSaved;
  let failRevision=true,revisionCalls=0,menuOpen=true,editing=false,dirty=true,currentDraft=null,navigations=0;const revisionKeys=[];
  const revisionScope={...docScope(),documentKey:'AN-TEST-1',draft:{number:'AN-TEST-1'},documentActionPending:{current:false},revisionKey:{current:null},setActionBusy:noop,setActionError:noop,setMoreOpen:value=>{menuOpen=value},setDirty:value=>{dirty=value},setEditing:value=>{editing=value},setDraft:value=>{currentDraft=value},editableDocumentSnapshot:JSON.stringify,router:{replace:()=>{navigations++}},apiPost:async(_path,_body,options)=>{revisionCalls++;revisionKeys.push(options.idempotencyKey);if(failRevision)throw Error('Synthetic revision unavailable');return {item:{id:'offer-one',number:'AN-TEST-1',status:'draft',offer_version:2}}}};
  const revise=handler('components/documents.tsx','DocumentPage','reviseOffer',revisionScope);await revise();assert.equal(menuOpen,true,'Failed revision retains its retry surface');assert.equal(editing,false);
@@ -366,6 +368,15 @@ console.log('Project-linked idle timer context survives synchronization without 
  const {avatarIdentity}=await import(moduleUrl(ts.transpileModule(node.getText(ast),{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText));
  assert.equal(avatarIdentity('  Nina  Müller ','person-1').initials,'NM');
  assert.equal(avatarIdentity('Ömer Cam','person-2').initials,'ÖC');
+ const avatarNode=ast.statements.find(n=>ts.isFunctionDeclaration(n)&&n.name?.text==='Avatar');
+ const imageValidator=(await fs.readFile('lib/image-url.ts','utf8'));
+ const compiledAvatar=ts.transpileModule('import React,{useState} from '+JSON.stringify(new URL('../node_modules/react/index.js',import.meta.url).href)+'; const LocalizedElement=globalThis.LocalizedElement;const Icon=()=>React.createElement("span");'+imageValidator+node.getText(ast)+avatarNode.getText(ast),{compilerOptions:{module:ts.ModuleKind.ESNext,jsx:ts.JsxEmit.React}}).outputText;
+ const {Avatar}=await import(moduleUrl(compiledAvatar));
+ const previewUrl='blob:https://example.invalid/12345678-1234-1234-1234-123456789abc';
+ assert.ok(!renderToStaticMarkup(React.createElement(Avatar,{name:'Nina Müller',src:previewUrl})).includes('<img'),'Local blobs are never accepted as ordinary stored avatars');
+ assert.ok(renderToStaticMarkup(React.createElement(Avatar,{name:'Nina Müller',src:previewUrl,preview:true})).includes('<img'),'Explicit local preview uses the real shared avatar renderer');
+ for(const src of ['javascript:alert(1)','data:image/svg+xml,<svg/>','blob:https://example.invalid/<script>'])assert.ok(!renderToStaticMarkup(React.createElement(Avatar,{src,preview:true})).includes('<img'),'Preview does not authorize malformed image sources');
+
  assert.equal(avatarIdentity('', 'unknown').tone,5);
  assert.equal(avatarIdentity('Nina Müller','person-1').tone,avatarIdentity('Nina Meier','person-1').tone,'Identity, not render order or changed name, owns the color');
  for(let i=0;i<100;i++)assert.deepEqual(avatarIdentity('Nina Müller','person-1'),avatarIdentity('Nina Müller','person-1'));

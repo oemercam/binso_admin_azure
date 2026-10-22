@@ -171,3 +171,13 @@ console.log('Role overview invalidation: work/review/context changes refresh the
  }finally{await fs.rm(root,{recursive:true,force:true})}
  console.log('Real data inventory: platform-neutral API paths, relative/alias imports and page consumers passed.');
 }
+
+{
+ const cash=await import(moduleUrl((await fs.readFile('lib/cash-statistics.ts','utf8')).replace("'./money'",JSON.stringify(moneyModuleUrl))));
+ const empty={payments:[],outflows:[],refunds:[],financial:{revenueEvents:[],snapshot:{as_of:'2026-10-22',paid:0,open:0,overdue:0,credit_balance:0}}};
+ assert.equal(cash.hasFinancialHistory(empty),false);
+ assert.equal(cash.hasFinancialHistory({}),true,'Unknown is never a verified zero');
+ assert.equal(cash.hasFinancialHistory({...empty,incomplete:true}),true,'Incomplete coverage remains visible');
+ assert.equal(cash.hasFinancialHistory({...empty,payments:[{payment_date:'2026-10-22',amount:1}]}),true);
+ assert.equal(cash.hasFinancialHistory({...empty,financial:{...empty.financial,snapshot:{...empty.financial.snapshot,credit_balance:1}}}),true,'Customer credit remains a real financial fact');
+}

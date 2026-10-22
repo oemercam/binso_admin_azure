@@ -1,6 +1,12 @@
 # Priorisierte Restbewertung — keine vollständige Abnahme
 
-Stand: 22.10.2026. Diese Bewertung trennt Code, ausführbare Nachweise und externe
+Aktualisierung Phase1: Readiness/Einrichtung, Avatar-Vorschau und Antwort-Outbox
+sind inzwischen als lokaler WIP implementiert und gesichert, aber noch nicht durch
+aktuelle Gesamt-CI qualifiziert. Die folgenden früheren Fehlbefunde beschreiben
+den Stand vor diesem WIP. Die aktuelle Paket-/Statuszuordnung steht verbindlich
+in [phase1-fast-mode.md](phase1-fast-mode.md); keine Neuimplementierung daraus ableiten.
+
+Stand der folgenden Detailbewertung: 22.10.2026 vor dem WIP. Diese Bewertung trennt Code, ausführbare Nachweise und externe
 Freigaben. Der [CI-Abgleich](evidence-reconciliation.md) bestimmt, für welchen
 Quellstand ein Test gilt. Aus573 Klauseln werden nicht573 angeblich fehlende
 Funktionen abgeleitet: Viele Klauseln enthalten mehrere Pflichten, Sicherheitsgrenzen

@@ -52,3 +52,5 @@ for(const level of ['fast','integration']){
 for(const level of ['standard','full']) assert.equal(shouldRunBrowser(level),true);
 for(const level of ['fast','integration','standard','full'])
  assert.equal(shouldRunBrowser(level,['--browser','--no-browser']),false);
+
+for(const width of [2560,3840]){const wide=planChanges(["components/ui.tsx"],{level:"full"});assert.ok(wide.widths.includes(width));assert.ok(wide.webkitWidths.includes(width));}

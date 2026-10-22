@@ -1,3 +1,4 @@
+import {canConfigureSetup,readSetupGuide} from '@/lib/server/business-readiness';
 import {cashStatisticsData} from '@/lib/server/repositories/finance';
 import {tenantCan} from '@/lib/permissions';
 import {dashboardAttention,dashboardWork} from '@/lib/server/repositories/dashboard';
@@ -25,7 +26,7 @@ export async function GET(){
    const customerCount=tenantCan(session.role,'customers:read')?Number((await c.query('select count(*) count from customers where organization_id=$1 and archived_at is null',[session.organizationId])).rows[0].count):null;
    const projectCount=tenantCan(session.role,'projects:read')?Number((await c.query("select count(*) count from projects where organization_id=$1 and archived_at is null and status in ('active','in_progress')",[session.organizationId])).rows[0].count):null;
    const employeeCount=tenantCan(session.role,'employees:read')&&planAllowsModule(plan,'personal')?Number((await c.query('select count(*) count from employees where organization_id=$1 and archived_at is null and active',[session.organizationId])).rows[0].count):null;
-   return {attention,recent,cash,work,canFinance,stats:{customer_count:customerCount,project_count:projectCount,employee_count:employeeCount},canInvoices,canPayments};
+   return {setup:canConfigureSetup(session)?await readSetupGuide(c,session):null,attention,recent,cash,work,canFinance,stats:{customer_count:customerCount,project_count:projectCount,employee_count:employeeCount},canInvoices,canPayments};
   },{snapshot:true}));
  }catch(error){return apiError(error);}
 }

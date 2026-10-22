@@ -4,7 +4,11 @@ Die unveränderte [vollständige Quelle](source.md) ist verbindlich. P0/P1/P2 si
 im Auftrag, P3 ist ausgeschlossen. Diese Ablage ersetzt keine ausdrückliche
 fachliche, visuelle oder produktive Freigabe.
 
-Aktuelle Codequalifikation: [1567eff4, Full Development39726655822](ci-1567eff4.json).
+Phase1 am22.10.2026: [Gesicherter Abbruchstand und kleine Arbeitspakete](phase1-fast-mode.md).
+Neue lokale Readiness-/Avatar-/Outbox-Änderungen sind noch nicht durch die unten
+genannte CI qualifiziert. Kein Merge/Deployment.
+
+Letzte vollständig belegte Codequalifikation: [1567eff4, Full Development39726655822](ci-1567eff4.json).
 Alle acht Browserjobs, native PostgreSQL-/RLS-/HTTP-/Parallelprüfungen und Gates
 sind erfolgreich. [868 Git-Blobs](ci-1567eff4-source.json) reproduzieren den
 Originalreport-Digest exakt. Die vollständige Klausel-/Fachabnahme bleibt offen.

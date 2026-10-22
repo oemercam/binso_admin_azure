@@ -134,7 +134,8 @@ function AppShellFrame({
   const settingsWrite=pathname==='/einstellungen/team'?'users:manage':pathname==='/einstellungen/abonnement'?'billing:write':['/einstellungen/firma','/einstellungen/dokumente','/einstellungen/zeiterfassung'].includes(pathname)?'organization:write':'organization:read';
   const personalSettings=pathname.startsWith('/einstellungen')&&!['/einstellungen/firma','/einstellungen/dokumente','/einstellungen/team','/einstellungen/abonnement','/einstellungen/zeiterfassung'].includes(pathname);
   const canWrite=!!access&&(!access.readOnly||personalSettings||active==='support')&&(access.moduleProfile==='time_only'&&personalSettings?canOpen(pathname):tenantCan(access.role,pathname.startsWith('/einstellungen')?settingsWrite:accessModule?permissionForModule(accessModule,'write')??'organization:read':active==='finanzen'?'accounting:write':'support:write',access.moduleProfile));
-  const pageAccess=useMemo(()=>({write:canWrite,canOpen}),[canWrite,canOpen]);
+  const hasPermission=useCallback((permission:Parameters<typeof tenantCan>[1])=>!!access&&tenantCan(access.role,permission,access.moduleProfile),[access]);
+  const pageAccess=useMemo(()=>({write:canWrite,canOpen,hasPermission}),[canWrite,canOpen,hasPermission]);
   const listControls=isValidElement<{children?:React.ReactNode}>(actions)&&actions.type===RecordsControls?actions:null;
   const visibleActions=listControls?listControls.props.children:actions;
   const contentCreate=isValidElement<{icon?:string}>(visibleActions)&&(visibleActions.type===CreateAction||visibleActions.type===QuickCreateAction||visibleActions.type===Button&&visibleActions.props.icon==="plus");

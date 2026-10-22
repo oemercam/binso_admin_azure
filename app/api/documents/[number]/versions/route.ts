@@ -5,8 +5,8 @@ import {requireSession} from '@/lib/server/session';
 import {withTenant} from '@/lib/server/db';
 import {authorize} from '@/lib/server/rbac';
 import {asObject,enumField,stringField} from '@/lib/server/validation';
-import {offerLinkUrl} from '@/lib/server/public-offers';
-import {mailLayout,sendMail} from '@/lib/server/email';
+import {offerLinkUrl,resumeOfferResponseMail} from '@/lib/server/public-offers';
+import {mailLayout} from '@/lib/server/email';
 import {audit} from '@/lib/server/audit';
 import {enforceRateLimit} from '@/lib/server/rate-limit';
 export const runtime='nodejs';
@@ -40,7 +40,7 @@ export async function POST(request:NextRequest,{params}:{params:Promise<{number:
  const mail=await withTenant(s.organizationId,s.userId,async c=>{
   const quote=(await c.query('select id,offer_version from quotes where organization_id=$1 and quote_no=$2 and archived_at is null for update',[s.organizationId,number])).rows[0];
   if(!quote)throw new ApiError(404,'not_found','Angebot nicht gefunden.');
-  const link=(await c.query('select l.* from offer_public_links l join offer_versions v on v.id=l.version_id and v.organization_id=l.organization_id where l.organization_id=$1 and l.id::text=$2 and v.quote_id=$3 and v.version=$4 for update of l',[s.organizationId,linkId,quote.id,quote.offer_version])).rows[0];
+  const link=(await c.query('select l.*,v.company as issuer_company from offer_public_links l join offer_versions v on v.id=l.version_id and v.organization_id=l.organization_id where l.organization_id=$1 and l.id::text=$2 and v.quote_id=$3 and v.version=$4 for update of l',[s.organizationId,linkId,quote.id,quote.offer_version])).rows[0];
   if(!link)throw new ApiError(404,'not_found','Aktueller Angebotsdialog nicht gefunden.');
   if(action==='revoke'){
    await c.query('update offer_public_links set revoked_at=coalesce(revoked_at,now()) where organization_id=$1 and id=$2',[s.organizationId,link.id]);
@@ -48,16 +48,16 @@ export async function POST(request:NextRequest,{params}:{params:Promise<{number:
    return null;
   }
   if(link.revoked_at||new Date(link.expires_at).getTime()<=Date.now())throw new ApiError(409,'link_inactive','Dieser Angebotsdialog ist nicht mehr aktiv.');
-  const prior=(await c.query('select kind,body from offer_public_events where organization_id=$1 and link_id=$2 and request_key=$3',[s.organizationId,link.id,key])).rows[0];
-  if(prior){if(prior.kind!=='reply'||prior.body!==text)throw new ApiError(409,'key_conflict','Diese Versandkennung wurde anders verwendet.');return null;}
+  const prior=(await c.query('select kind,body,created_by_user_id from offer_public_events where organization_id=$1 and link_id=$2 and request_key=$3',[s.organizationId,link.id,key])).rows[0];
+  if(prior){if(prior.kind!=='reply'||prior.body!==text||prior.created_by_user_id!==s.userId)throw new ApiError(409,'key_conflict','Diese Versandkennung wurde anders verwendet.');return {token:new URL(offerLinkUrl(link)).hash.slice(1)};}
   await c.query("insert into offer_public_events(organization_id,link_id,kind,body,actor,created_by_user_id,request_key) values($1,$2,'reply',$3,'employee',$4,$5)",[s.organizationId,link.id,text,s.userId,key]);
   await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'offer.reply.recorded',entityType:'quote',entityId:quote.id,metadata:{linkId:link.id}});
-  return {to:link.recipient,url:offerLinkUrl(link),linkId:link.id,locale:asLocale(link.locale)};
+  const locale=asLocale(link.locale),t=(value:string)=>translateMessage(value,locale),url=offerLinkUrl(link),title=t('Antwort zu Angebot')+' '+number,company=link.issuer_company??{};
+  const html=mailLayout(title,'<p>'+text.replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]!)).replace(/\n/g,'<br>')+'</p>',{label:t('Angebot und Verlauf ansehen'),url},locale,{name:String(company.legal_name||company.name||'Binso One')});
+  await c.query("insert into mail_outbox(organization_id,deduplication_key,kind,entity_id,recipient,subject,body,attachment_html,created_by) values($1,$2,'offer_confirmation',$3,$4,$5,$6,$7,$8) on conflict(organization_id,deduplication_key) do nothing",[s.organizationId,'offer-reply:'+link.id+':'+key+':offer_confirmation',link.id+':'+key,link.recipient,title,text+'\n\n'+url,html,s.userId]);
+  return {token:new URL(url).hash.slice(1)};
  });
  if(!mail)return json({ok:true,notification:'not_repeated'});
- const t=(value:string)=>translateMessage(value,mail.locale);
- let accepted=false;
- try{accepted=(await sendMail({to:mail.to,subject:t('Antwort zu Angebot')+' '+number,text:text+'\n\n'+mail.url,html:mailLayout(t('Antwort zu Angebot')+' '+number,'<p>'+text.replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]!)).replace(/\n/g,'<br>')+'</p>',{label:t('Angebot und Verlauf ansehen'),url:mail.url},mail.locale)})).delivered;}catch{/* Keep recorded reply; an ambiguous send must never be replayed automatically. */}
- await withTenant(s.organizationId,s.userId,c=>c.query("insert into offer_public_events(organization_id,link_id,kind,actor,request_key) values($1,$2,$3,'provider',$4) on conflict(link_id,request_key) do nothing",[s.organizationId,mail.linkId,accepted?'provider_accepted':'provider_unconfirmed','mail:'+key]));
- return json({ok:true,notification:accepted?'provider_accepted':'unconfirmed'});
+ const notification=await resumeOfferResponseMail(mail.token,key,{createdBy:s.userId}).catch(()=> 'unconfirmed');
+ return json({ok:true,notification});
 }catch(error){return apiError(error);}}

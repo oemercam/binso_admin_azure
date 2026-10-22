@@ -522,22 +522,19 @@
       "sourceTextSha256": "348fff27ece7bb924f40153eab3b238e7e886985e28066a4f482fd5ad6722ac2",
       "status": "teilweise_implementiert",
       "implementationStatus": "teilweise_belegt",
-      "implementation": "Bestehender serverseitiger Mail-/Dokumentweg um dauerhafte Unterscheidung zwischen bestätigtem Nichtversand und unklarem Transportausgang ergänzt. Auch neue Kennungen und konkurrierende Dokumentmutationen bleiben bei ungeklärtem Ausgang gesperrt; historische failed-Werte werden nicht automatisch freigegeben. Ergänzter konkreter Codebefund: public-offers.ts versendet Entscheidungs-/Mitarbeiterbenachrichtigungen direkt nach dem Entscheidungscommit und behandelt Fehler ohne dauerhaften Wiederaufnahmejob. Die Entscheidung bleibt korrekt gespeichert, aber eine garantierte idempotente Wiederaufnahme dieser E-Mails ist nicht implementiert. Das ist zusätzlich zum unbekannten signierten Provider-Ereignisvertrag eine Codeintegrationslücke.",
+      "implementation": "Angebotsentscheidungs-, Empfänger-/Mitarbeiter- und private Mitarbeiterrückantwortmails verwenden die bestehende dauerhafte Mail-Outbox. Entscheidung/Antwort und Auftrag sind atomar; sichere Wiederaufnahme derselben Anfrage nur bei queued/definitiv fehlgeschlagen, keine Wiederholung von accepted/sending/uncertain. Aktuelle Mitarbeiterpräferenzen, Mitgliedschaften und verifizierte tenantgebundene Reply-To werden geprüft. Echter Provider-Zustell-/Bounce-/Signaturvertrag, DNS und unbeaufsichtigte Betriebsanbindung bleiben nicht nachgewiesen.",
       "sourceReferences": [
-        "app/api/documents/[number]/send/route.ts",
-        "lib/server/document-process.ts",
-        "lib/server/offer-revisions.ts",
-        "lib/server/repositories/business-api.ts",
-        "lib/server/credit-notes.ts",
-        "database/migrations/0078_document_delivery_outcomes.sql",
-        "scripts/migration-test.mjs",
-        "docs/audit/v25-revision7/document-delivery-outcomes.md",
         "lib/server/public-offers.ts",
-        "lib/server/email.ts"
+        "lib/server/mail-identity.ts",
+        "app/api/documents/[number]/versions/route.ts",
+        "app/api/documents/[number]/send/route.ts",
+        "database/migrations/0081_offer_response_mail_outbox.sql",
+        "scripts/offer-response-mail-contract.mjs",
+        "scripts/postgres-parallel-test.mjs"
       ],
-      "test": "Aktuelle native Tests beweisen sichere Entscheidung, Replay und getrennte Providerannahme; keinen dauerhaften Wiederanlauf der Entscheidungsmails.",
-      "visualComparison": "Gemeinsame History-Beschriftung erweitert; aktuelle gerenderte Abnahme offen.",
-      "blocker": "Dauerhafte Mailjob-Integration noch zu implementieren; signierter Provider-Zustell-/Bounce-Vertrag und echte Zustellung separat extern zu verifizieren."
+      "test": "Lokale gezielte Regressionen bestanden; native PostgreSQL-/Browser-/Gesamt-CI dieses neuen Pakets noch ausstehend.",
+      "visualComparison": "Neue Ansichten sind aus bestehenden zentralen Komponenten abgeleitet; aktuelle Browser-/Referenzabnahme und reale Geräte noch offen.",
+      "blocker": "Keine Gesamt-, Produktions- oder Gerätefreigabe. Siehe setup-and-response-recovery.md und completion-review.md."
     },
     "R7-06-004": {
       "sourceTextSha256": "f9b165c0f21cbfb49b32c42602762c65163658ad4d736cd62656885c18704f1f",
@@ -581,22 +578,19 @@
       "sourceTextSha256": "16d425bf832868462bbed0e15222ab8ca625257335f659b37435518a5622ecf0",
       "status": "teilweise_implementiert",
       "implementationStatus": "teilweise_belegt",
-      "implementation": "Bestehender serverseitiger Mail-/Dokumentweg um dauerhafte Unterscheidung zwischen bestätigtem Nichtversand und unklarem Transportausgang ergänzt. Auch neue Kennungen und konkurrierende Dokumentmutationen bleiben bei ungeklärtem Ausgang gesperrt; historische failed-Werte werden nicht automatisch freigegeben. Ergänzter konkreter Codebefund: public-offers.ts versendet Entscheidungs-/Mitarbeiterbenachrichtigungen direkt nach dem Entscheidungscommit und behandelt Fehler ohne dauerhaften Wiederaufnahmejob. Die Entscheidung bleibt korrekt gespeichert, aber eine garantierte idempotente Wiederaufnahme dieser E-Mails ist nicht implementiert. Das ist zusätzlich zum unbekannten signierten Provider-Ereignisvertrag eine Codeintegrationslücke.",
+      "implementation": "Angebotsentscheidungs-, Empfänger-/Mitarbeiter- und private Mitarbeiterrückantwortmails verwenden die bestehende dauerhafte Mail-Outbox. Entscheidung/Antwort und Auftrag sind atomar; sichere Wiederaufnahme derselben Anfrage nur bei queued/definitiv fehlgeschlagen, keine Wiederholung von accepted/sending/uncertain. Aktuelle Mitarbeiterpräferenzen, Mitgliedschaften und verifizierte tenantgebundene Reply-To werden geprüft. Echter Provider-Zustell-/Bounce-/Signaturvertrag, DNS und unbeaufsichtigte Betriebsanbindung bleiben nicht nachgewiesen.",
       "sourceReferences": [
-        "app/api/documents/[number]/send/route.ts",
-        "lib/server/document-process.ts",
-        "lib/server/offer-revisions.ts",
-        "lib/server/repositories/business-api.ts",
-        "lib/server/credit-notes.ts",
-        "database/migrations/0078_document_delivery_outcomes.sql",
-        "scripts/migration-test.mjs",
-        "docs/audit/v25-revision7/document-delivery-outcomes.md",
         "lib/server/public-offers.ts",
-        "lib/server/email.ts"
+        "lib/server/mail-identity.ts",
+        "app/api/documents/[number]/versions/route.ts",
+        "app/api/documents/[number]/send/route.ts",
+        "database/migrations/0081_offer_response_mail_outbox.sql",
+        "scripts/offer-response-mail-contract.mjs",
+        "scripts/postgres-parallel-test.mjs"
       ],
-      "test": "Aktuelle native Tests beweisen sichere Entscheidung, Replay und getrennte Providerannahme; keinen dauerhaften Wiederanlauf der Entscheidungsmails.",
-      "visualComparison": "Gemeinsame History-Beschriftung erweitert; aktuelle gerenderte Abnahme offen.",
-      "blocker": "Dauerhafte Mailjob-Integration noch zu implementieren; signierter Provider-Zustell-/Bounce-Vertrag und echte Zustellung separat extern zu verifizieren."
+      "test": "Lokale gezielte Regressionen bestanden; native PostgreSQL-/Browser-/Gesamt-CI dieses neuen Pakets noch ausstehend.",
+      "visualComparison": "Neue Ansichten sind aus bestehenden zentralen Komponenten abgeleitet; aktuelle Browser-/Referenzabnahme und reale Geräte noch offen.",
+      "blocker": "Keine Gesamt-, Produktions- oder Gerätefreigabe. Siehe setup-and-response-recovery.md und completion-review.md."
     },
     "R7-36-003": {
       "sourceTextSha256": "d8df29dbb13203c22dac7c8067c417f2242b94adb45a6b1c1d79a2f7d81b3106",
@@ -726,47 +720,61 @@
     },
     "R7-29-001": {
       "sourceTextSha256": "9a8508511147cb777ccf3a47244c3e48b11e675df1bc977dee1dfc41c860097b",
-      "status": "nicht_implementiert",
-      "implementationStatus": "nicht_implementiert",
-      "test": "Gezielte Codepfadprüfung am006f0c3b; vorhandene erfolgreiche Tests werden nicht als Nachweis der genannten fehlenden Funktion umgedeutet.",
-      "visualComparison": "Keine vollständige aktuelle visuelle/physische Abnahme.",
-      "implementation": "Nachgewiesene Implementierungslücke: Dashboard/API liefern Arbeits-/Finanzdaten, aber keine zentrale optionale Einrichtungs-Checkliste mit Pflicht-/Empfehlungs-/Optionalfortschritt. Das bestehende überspringbare Firmenformular ist kein solcher Dashboard-Fortschritt.",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "implementiert",
+      "test": "Lokale gezielte Regressionen bestanden; native PostgreSQL-/Browser-/Gesamt-CI dieses neuen Pakets noch ausstehend.",
+      "visualComparison": "Neue Ansichten sind aus bestehenden zentralen Komponenten abgeleitet; aktuelle Browser-/Referenzabnahme und reale Geräte noch offen.",
+      "implementation": "Optionale rollenbezogene Einrichtungshilfe mit Pflicht/Empfohlen/Optional, Fortschritt, persönlichen RLS-geschützten Anzeigeeinstellungen und bestätigtem Toggle. Bankdaten sind für Ausstellung erforderlich, nicht für Entwurf oder Nutzung der Plattform.",
       "sourceReferences": [
-        "app/api/dashboard/route.ts",
-        "components/pages/dashboard.tsx",
-        "components/pages/settings.tsx"
+        "lib/server/business-readiness.ts",
+        "lib/action-readiness.ts",
+        "app/api/settings/readiness/route.ts",
+        "components/setup-guide.tsx",
+        "components/use-setup-field.ts",
+        "database/migrations/0080_personal_setup_preferences.sql",
+        "scripts/business-readiness-contract.mjs",
+        "scripts/business-readiness-browser.mjs"
       ],
-      "blocker": "Implementierbare Checklist-/Persistenzlücke; keine Geräte- oder Provider-Abhängigkeit."
+      "blocker": "Keine Gesamt-, Produktions- oder Gerätefreigabe. Siehe setup-and-response-recovery.md und completion-review.md."
     },
     "R7-29-002": {
       "sourceTextSha256": "dc3bb2dd5d7dc185f212a9ec19da0ce36776e138de4c00087021d60b0a87b298",
       "status": "teilweise_implementiert",
       "implementationStatus": "teilweise_belegt",
-      "test": "Gezielte Codepfadprüfung am006f0c3b; vorhandene erfolgreiche Tests werden nicht als Nachweis der genannten fehlenden Funktion umgedeutet.",
-      "visualComparison": "Keine vollständige aktuelle visuelle/physische Abnahme.",
-      "implementation": "Nachgewiesene Implementierungslücke: document-process prüft bei Ausstellung den echten QR-/Firmen-/Schuldnervertrag; ein gemeinsamer Aktions-Readiness-Service mit strukturierter Feldnavigation/Rückkehr fehlt. Die bestehende Sicherheitsprüfung bleibt verbindlich und darf nicht durch eine reine UI-Checkliste ersetzt werden.",
+      "test": "Lokale gezielte Regressionen bestanden; native PostgreSQL-/Browser-/Gesamt-CI dieses neuen Pakets noch ausstehend.",
+      "visualComparison": "Neue Ansichten sind aus bestehenden zentralen Komponenten abgeleitet; aktuelle Browser-/Referenzabnahme und reale Geräte noch offen.",
+      "implementation": "Gemeinsamer serverseitiger Rechnungs-Readiness-Service nutzt denselben QR-Validator wie finale Ausstellung; fehlende Angaben erhalten erlaubte feste Feldziele und sichere Rückkehr zum bestehenden Entwurf. Kein automatisches Ausstellen nach Einstellungsänderung. Weitere Aktionsfamilien nicht pauschal damit abgenommen.",
       "sourceReferences": [
-        "lib/server/document-process.ts",
-        "lib/qr-bill.ts",
+        "lib/server/business-readiness.ts",
+        "lib/action-readiness.ts",
+        "app/api/settings/readiness/route.ts",
+        "components/setup-guide.tsx",
+        "components/use-setup-field.ts",
+        "database/migrations/0080_personal_setup_preferences.sql",
+        "scripts/business-readiness-contract.mjs",
+        "scripts/business-readiness-browser.mjs",
         "components/documents.tsx",
-        "components/pages/settings.tsx"
+        "components/pages/settings.tsx",
+        "components/document-settings.tsx"
       ],
-      "blocker": "Implementierbare zentrale Service-/UI-Vertragslücke; isolierte Daten-/Rollen-/Deep-Link-Tests erforderlich."
+      "blocker": "Keine Gesamt-, Produktions- oder Gerätefreigabe. Siehe setup-and-response-recovery.md und completion-review.md."
     },
     "R7-39-007": {
       "sourceTextSha256": "554a3d8c4f7fc7a0185a711279d59de8625ec7ff9f5a09c4fbf6536fd9756705",
       "status": "teilweise_implementiert",
       "implementationStatus": "teilweise_belegt",
-      "test": "Gezielte Codepfadprüfung am006f0c3b; vorhandene erfolgreiche Tests werden nicht als Nachweis der genannten fehlenden Funktion umgedeutet.",
-      "visualComparison": "Keine vollständige aktuelle visuelle/physische Abnahme.",
-      "implementation": "Teilweise implementiert: prepareProfileImage normalisiert Orientierung und zentriert serverseitig auf512px; bestehendes Bild wird nach autorisiertem Upload dargestellt, Ersetzen/Entfernen und Quarantäne erhalten Altbild. FileUpload ruft aber direkt uploadAvatar auf; eine ausdrückliche Vorschau des neuen quadratischen Zuschnitts vor Übernahme fehlt.",
+      "test": "Lokale gezielte Regressionen bestanden; native PostgreSQL-/Browser-/Gesamt-CI dieses neuen Pakets noch ausstehend.",
+      "visualComparison": "Neue Ansichten sind aus bestehenden zentralen Komponenten abgeleitet; aktuelle Browser-/Referenzabnahme und reale Geräte noch offen.",
+      "implementation": "Dateiauswahl zeigt zuerst lokale quadratische/kreisförmige Vorschau über gemeinsamen Avatar-Owner. Erst Bestätigung startet den bestehenden autorisierten Upload. Abbruch ohne POST, Quarantäne/Fälle erhalten Altbild, sichere Normalisierung unverändert. Reale Geräte-/Persistenzabnahme weiterhin offen.",
       "sourceReferences": [
-        "lib/server/profile-image.ts",
-        "components/file-upload.tsx",
+        "components/avatar-upload.tsx",
+        "components/avatar.tsx",
         "components/pages/settings.tsx",
-        "scripts/profile-image-test.mjs"
+        "lib/server/profile-image.ts",
+        "scripts/ux-regression-test.mjs",
+        "scripts/ux-browser-test.mjs"
       ],
-      "blocker": "Implementierbare Vorschau-/Bestätigungslücke zusätzlich zu offenen realen iPhone-/PWA-Prüfungen. Ursprünglicher Produktions-Uploadfehler ist dadurch nicht reproduziert."
+      "blocker": "Keine Gesamt-, Produktions- oder Gerätefreigabe. Siehe setup-and-response-recovery.md und completion-review.md."
     },
     "R7-28-014": {
       "sourceTextSha256": "dc1dc3cceef35586b1a4cc756ebb3af33849d96fb8bf48fd1ef075e65a21a587",
@@ -781,6 +789,110 @@
         "lib/server/operator/rbac.ts"
       ],
       "blocker": "Externer lesender Nachweis der tatsächlich zugewiesenen Entra-Authentifizierungsstärke und Ingress-Vertrauensgrenze fehlt. Keine Richtlinien-/Rollenänderung autorisiert."
+    },
+    "R7-29-003": {
+      "sourceTextSha256": "42b9d41c07d7a91efc06a89f8cd79b8376d1cb2fc369ccb33f3d335e012566ab",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "implementiert",
+      "implementation": "Nachgewiesene UI-/Server-Abweichung behoben: Entwürfe dürfen bei fehlender Bankverbindung gespeichert werden. Echte Firmenladefehler blockieren weiterhin. Ausstellen bleibt serverseitig gesperrt; Vorprüfung ersetzt den finalen Guard nicht.",
+      "sourceReferences": [
+        "lib/server/business-readiness.ts",
+        "lib/action-readiness.ts",
+        "app/api/settings/readiness/route.ts",
+        "components/setup-guide.tsx",
+        "components/use-setup-field.ts",
+        "database/migrations/0080_personal_setup_preferences.sql",
+        "scripts/business-readiness-contract.mjs",
+        "scripts/business-readiness-browser.mjs",
+        "components/documents.tsx",
+        "lib/server/document-process.ts",
+        "scripts/ux-regression-test.mjs"
+      ],
+      "test": "Lokale gezielte Regressionen bestanden; native PostgreSQL-/Browser-/Gesamt-CI dieses neuen Pakets noch ausstehend.",
+      "visualComparison": "Neue Ansichten sind aus bestehenden zentralen Komponenten abgeleitet; aktuelle Browser-/Referenzabnahme und reale Geräte noch offen.",
+      "blocker": "Keine Gesamt-, Produktions- oder Gerätefreigabe. Siehe setup-and-response-recovery.md und completion-review.md."
+    },
+    "R7-29-004": {
+      "sourceTextSha256": "e98ddfaf350b2e27aefc7c557e22388ba2662c16f1bfce024021efa02672fda7",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "implementation": "Echter QR-Vertrag bleibt zentral; strukturierte Feldfehler und letzte serverseitige Validierung stimmen überein. Ungültiger Betrag/Referenz/Währung/Bank/Adresse darf keine QR-Ausstellung erlauben. Entwürfe bleiben möglich. Keine neue SIX-Zertifizierung behauptet.",
+      "sourceReferences": [
+        "lib/qr-bill.ts",
+        "lib/server/document-process.ts",
+        "scripts/document-presentation-test.mjs",
+        "scripts/business-readiness-contract.mjs"
+      ],
+      "test": "Lokale gezielte Regressionen bestanden; native PostgreSQL-/Browser-/Gesamt-CI dieses neuen Pakets noch ausstehend.",
+      "visualComparison": "Neue Ansichten sind aus bestehenden zentralen Komponenten abgeleitet; aktuelle Browser-/Referenzabnahme und reale Geräte noch offen.",
+      "blocker": "Keine Gesamt-, Produktions- oder Gerätefreigabe. Siehe setup-and-response-recovery.md und completion-review.md."
+    },
+    "R7-29-006": {
+      "sourceTextSha256": "ea874b5341bdbdd7b5056c019e02ec511bc7e82ee5d9b4c81a7da8b8c4fb9334",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "implementiert",
+      "implementation": "Finale Ausstellung validiert weiterhin unter Dokumentlock; direkte Mutation trotz fehlender Bankdaten wird im tatsächlichen Datenbankprozess verworfen. Eine positive lesende Vorprüfung erteilt keine zeitlich unbeschränkte Freigabe.",
+      "sourceReferences": [
+        "lib/server/business-readiness.ts",
+        "lib/action-readiness.ts",
+        "app/api/settings/readiness/route.ts",
+        "components/setup-guide.tsx",
+        "components/use-setup-field.ts",
+        "database/migrations/0080_personal_setup_preferences.sql",
+        "scripts/business-readiness-contract.mjs",
+        "scripts/business-readiness-browser.mjs",
+        "lib/server/document-process.ts"
+      ],
+      "test": "Lokale gezielte Regressionen bestanden; native PostgreSQL-/Browser-/Gesamt-CI dieses neuen Pakets noch ausstehend.",
+      "visualComparison": "Neue Ansichten sind aus bestehenden zentralen Komponenten abgeleitet; aktuelle Browser-/Referenzabnahme und reale Geräte noch offen.",
+      "blocker": "Keine Gesamt-, Produktions- oder Gerätefreigabe. Siehe setup-and-response-recovery.md und completion-review.md."
+    },
+    "R7-21-001": {
+      "sourceTextSha256": "83eee283877b003399f940e8dc6b70fa27354d052d430a018c1fb66d94bb0a71",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "implementation": "Einrichtungshilfe ergänzt; nicht als vollständige Abnahme aller Unternehmens-/Steuer-/Nummernkreisfelder deklarieren. Vorhandene automatische Nummernvergabe ist keine frei konfigurierbare Nummernkreismaske.",
+      "sourceReferences": [
+        "lib/server/business-readiness.ts",
+        "lib/action-readiness.ts",
+        "app/api/settings/readiness/route.ts",
+        "components/setup-guide.tsx",
+        "components/use-setup-field.ts",
+        "database/migrations/0080_personal_setup_preferences.sql",
+        "scripts/business-readiness-contract.mjs",
+        "scripts/business-readiness-browser.mjs"
+      ],
+      "test": "Lokale gezielte Regressionen bestanden; native PostgreSQL-/Browser-/Gesamt-CI dieses neuen Pakets noch ausstehend.",
+      "visualComparison": "Neue Ansichten sind aus bestehenden zentralen Komponenten abgeleitet; aktuelle Browser-/Referenzabnahme und reale Geräte noch offen.",
+      "blocker": "Keine Gesamt-, Produktions- oder Gerätefreigabe. Siehe setup-and-response-recovery.md und completion-review.md."
+    },
+    "R7-42-021": {
+      "sourceTextSha256": "feba701b246ecf9d2a321248b1294f4fca1ced93abd69c7358f665759b7cc667",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "implementation": "Die initiale Übersicht mit sichtbarer Einrichtungshilfe verbirgt belegbar leere Finanzkacheln sowie leere Rechnungsliste. Unvollständige/unbekannte Finanzdaten werden nicht als Null kaschiert; bestehende Zahlungen, Forderungen, Guthaben oder Historie bleiben sichtbar.",
+      "sourceReferences": [
+        "components/pages/dashboard.tsx",
+        "lib/cash-statistics.ts",
+        "scripts/data-foundation-test.mjs"
+      ],
+      "test": "Lokale gezielte Regressionen bestanden; native PostgreSQL-/Browser-/Gesamt-CI dieses neuen Pakets noch ausstehend.",
+      "visualComparison": "Neue Ansichten sind aus bestehenden zentralen Komponenten abgeleitet; aktuelle Browser-/Referenzabnahme und reale Geräte noch offen.",
+      "blocker": "Keine Gesamt-, Produktions- oder Gerätefreigabe. Siehe setup-and-response-recovery.md und completion-review.md."
+    },
+    "R7-47-011": {
+      "sourceTextSha256": "b5854e07fd2ea9f2e977f398131a596c329ab13aeb30c13f80f2bdcb396b5313",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "implementation": "Vollständige Chromium-/WebKit-Planung um2560/3840px erweitert. Echte Browserzoom125/150/200%-Bedienung ist damit nicht bewiesen; weder Viewport noch deviceScaleFactor sind ein solcher Ersatz.",
+      "sourceReferences": [
+        "scripts/qa-plan.mjs",
+        "scripts/qa-plan-test.mjs",
+        "scripts/browser-shards.mjs"
+      ],
+      "test": "Lokale gezielte Regressionen bestanden; native PostgreSQL-/Browser-/Gesamt-CI dieses neuen Pakets noch ausstehend.",
+      "visualComparison": "Neue Ansichten sind aus bestehenden zentralen Komponenten abgeleitet; aktuelle Browser-/Referenzabnahme und reale Geräte noch offen.",
+      "blocker": "Keine Gesamt-, Produktions- oder Gerätefreigabe. Siehe setup-and-response-recovery.md und completion-review.md."
     }
   },
   "tests": {

@@ -15143,5 +15143,105 @@
     "Recorded customer credit, not additional invoiced volume",
     "Avoir client enregistré, sans volume facturé supplémentaire",
     "Credito cliente registrato, nessun volume fatturato aggiuntivo"
+  ],
+  "Einrichtungshilfe anzeigen": [
+    "Show setup guide",
+    "Afficher l’aide à la configuration",
+    "Mostra la guida alla configurazione"
+  ],
+  "Persönliche Anzeige auf der Übersicht": [
+    "Personal display on the overview",
+    "Affichage personnel sur la vue d’ensemble",
+    "Visualizzazione personale nella panoramica"
+  ],
+  "Pflichtangaben": [
+    "Required details",
+    "Informations obligatoires",
+    "Dati obbligatori"
+  ],
+  "Pflicht": [
+    "Required",
+    "Obligatoire",
+    "Obbligatorio"
+  ],
+  "Automatische Nummerierung": [
+    "Automatic numbering",
+    "Numérotation automatique",
+    "Numerazione automatica"
+  ],
+  "Rechtlicher Firmenname": [
+    "Legal company name",
+    "Raison sociale légale",
+    "Ragione sociale legale"
+  ],
+  "Ländercode": [
+    "Country code",
+    "Code du pays",
+    "Codice paese"
+  ],
+  "Profilbild prüfen": [
+    "Review profile picture",
+    "Vérifier la photo de profil",
+    "Verifica la foto del profilo"
+  ],
+  "Der mittige Bildausschnitt wird als Profilbild verwendet.": [
+    "The centre crop will be used as your profile picture.",
+    "Le cadrage central sera utilisé comme photo de profil.",
+    "Il ritaglio centrale verrà usato come foto del profilo."
+  ],
+  "Einstellung konnte nicht bestätigt werden.": [
+    "The setting could not be confirmed.",
+    "Le réglage n’a pas pu être confirmé.",
+    "Impossibile confermare l’impostazione."
+  ],
+  "Prüfung konnte nicht bestätigt werden.": [
+    "The check could not be confirmed.",
+    "Le contrôle n’a pas pu être confirmé.",
+    "Impossibile confermare la verifica."
+  ],
+  "Bitte Rechnungsangaben prüfen.": [
+    "Please check the invoice details.",
+    "Veuillez vérifier les données de la facture.",
+    "Verifica i dati della fattura."
+  ],
+  "Angaben ergänzen": [
+    "Complete details",
+    "Compléter les données",
+    "Completa i dati"
+  ],
+  "Rechnung prüfen": [
+    "Review invoice",
+    "Vérifier la facture",
+    "Verifica la fattura"
+  ],
+  "Der Dokumentstatus hat sich geändert. Bitte den gespeicherten Stand prüfen.": [
+    "The document status has changed. Please review the saved version.",
+    "Le statut du document a changé. Veuillez vérifier la version enregistrée.",
+    "Lo stato del documento è cambiato. Verifica la versione salvata."
+  ],
+  "Für das Ausstellen von Rechnungen. Entwürfe sind auch vorher möglich.": [
+    "For issuing invoices. Drafts can be saved beforehand.",
+    "Pour émettre des factures. Les brouillons peuvent être enregistrés auparavant.",
+    "Per emettere fatture. Le bozze possono essere salvate prima."
+  ],
+  "Einrichtung": [
+    "Setup",
+    "Configuration",
+    "Configurazione"
+  ],
+  "Unternehmen wurde nicht gefunden.": [
+    "Company not found.",
+    "Entreprise introuvable.",
+    "Azienda non trovata."
+  ],
+  "Bitte eine gültige Einstellung wählen.": [
+    "Please choose a valid setting.",
+    "Veuillez choisir un réglage valide.",
+    "Scegli un’impostazione valida."
+  ],
+  "Bitte eine gültige Dokumentnummer wählen.": [
+    "Please choose a valid document number.",
+    "Veuillez choisir un numéro de document valide.",
+    "Scegli un numero di documento valido."
   ]
 }
