@@ -92,3 +92,18 @@ stehen im Abschlussbericht. Keine vollständige V25-Browsermatrix.
 
 Physische Geräte und menschliche visuelle Freigabe sind separate Abnahmen.
 Kein Merge, keine produktive Migration, kein Deployment; Paket7 nicht begonnen.
+
+## CI-Korrektur nach dem ersten Paketlauf
+
+Am Commit `3f262255` bestanden Build, authentifizierte native HTTP-/PostgreSQL-
+Prüfung, CodeQL, Rechnungs-Readiness und Avatar. Zwei Testadapter scheiterten:
+Der extrahierte Speicherhandler benötigte die tatsächlichen Berechnungshelfer
+und eine vollständige Zahlen-Fixture; der mobile Browser suchte den Vorschlag
+als exakten Text ohne den tatsächlich angezeigten Zusatz `: 5 %`.
+
+Die Adapter verwenden jetzt die vorhandene zentrale Berechnung mit passendem
+Entwurf/Servertotal und den vollständigen sichtbaren Vorschlag. Die bisherigen
+Erwartungen bleiben erhalten; zusätzlich wird ein Speicherversuch mit 101 %
+Rabatt ohne API-Schreibzugriff geprüft. `ux-regression-test.mjs` besteht lokal.
+Der korrigierte Browserfall bleibt bis zum erfolgreichen neuen CI-Lauf offen.
+Keine Produktlogik, Sicherheitsprüfung oder Pflichtprüfung wurde abgeschwächt.
