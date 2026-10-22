@@ -1,4 +1,7 @@
 {
+  "Tatsächliches Zahlungsdatum": ["Actual payment date","Date effective du paiement","Data effettiva del pagamento"],
+  "Bitte den Erstattungsbetrag und die Währung prüfen.": ["Please check the reimbursement amount and currency.","Veuillez vérifier le montant et la devise du remboursement.","Verifica l’importo e la valuta del rimborso."],
+  "Der Spesenbetrag wurde geändert. Bitte den aktuellen Stand prüfen.": ["The expense amount has changed. Please check the current details.","Le montant des frais a changé. Veuillez vérifier les données actuelles.","L’importo delle spese è cambiato. Verifica i dati attuali."],
   "Bezahlt mit": ["Paid with","Payé avec","Pagato con"],
   "Zahlungsart ungeklärt": ["Payment source unresolved","Mode de paiement à clarifier","Modalità di pagamento da chiarire"],
   "Privat bezahlt": ["Paid personally","Payé à titre privé","Pagato privatamente"],
