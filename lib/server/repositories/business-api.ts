@@ -219,7 +219,7 @@ async function executeBusinessMutation(c:PoolClient,s:SessionUser,operation:stri
   if(args.p_number!==args.p_current_number)throw new ApiError(409,'number_immutable','Die bestehende Dokumentnummer kann nicht geändert werden.');
   const row=existing.rows[0];if(!row)throw new ApiError(404,'not_found','Dokument wurde nicht gefunden.');
   if(row.status!=='draft')throw new ApiError(409,'document_locked','Dieses Dokument kann nicht mehr geändert werden.');id=row.id;
-  if((await c.query("select id from document_deliveries where organization_id=$1 and document_id=$2 and status='sending'",[s.organizationId,id])).rowCount)throw new ApiError(409,'delivery_pending','Ein Versand dieses Dokuments ist noch nicht bestätigt.');
+  if((await c.query("select id from document_deliveries where organization_id=$1 and document_id=$2 and status in ('sending','uncertain','failed')",[s.organizationId,id])).rowCount)throw new ApiError(409,'delivery_pending','Ein Versand dieses Dokuments ist noch nicht bestätigt.');
   await c.query(`update ${table} set ${numberColumn}=$1,customer_id=$2,issue_date=$3,${invoice?'due_date':'valid_until'}=$4,note=$5,currency=$6,updated_at=now() where id=$7 and organization_id=$8`,[args.p_number,args.p_customer_id,args.p_issue_date,invoice?args.p_due_date:args.p_valid_until,args.p_note,args.p_currency,id,s.organizationId]);
   if(invoice)await c.query("update expenses set invoiced_invoice_id=null where organization_id=$1 and invoiced_invoice_id=$2",[s.organizationId,id]);
   if(invoice)await c.query("update time_entries set invoiced_invoice_id=null where organization_id=$1 and invoiced_invoice_id=$2",[s.organizationId,id]);

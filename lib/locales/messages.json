@@ -3990,9 +3990,9 @@
     "Invia e-mail"
   ],
   "E-Mail-Versand ist nicht konfiguriert.": [
-    "Email delivery is not configured.",
+    "Email sending is not configured.",
     "L’envoi d’e-mails n’est pas configuré.",
-    "L’invio e-mail non è configurato."
+    "L’invio di e-mail non è configurato."
   ],
   "E-Mail:": [
     "Email:",
@@ -14933,5 +14933,75 @@
     "days/year",
     "jours/an",
     "giorni/anno"
+  ],
+  "In-App-Hinweis erstellt": [
+    "In-app reminder created",
+    "Rappel dans l’application créé",
+    "Promemoria nell’app creato"
+  ],
+  "Nicht mehr erforderlich": [
+    "No longer required",
+    "Plus nécessaire",
+    "Non più necessario"
+  ],
+  "Persönlicher In-App-Hinweis beim Öffnen der Benachrichtigungen. Keine E-Mail und kein Hintergrundversand.": [
+    "Personal in-app reminder when opening notifications. No email or background delivery.",
+    "Rappel personnel dans l’application à l’ouverture des notifications. Aucun e-mail ni envoi en arrière-plan.",
+    "Promemoria personale nell’app all’apertura delle notifiche. Nessuna e-mail o invio in background."
+  ],
+  "Erinnerung planen": [
+    "Schedule reminder",
+    "Planifier un rappel",
+    "Pianifica promemoria"
+  ],
+  "Angebot nachfassen": [
+    "Follow up on offer",
+    "Relancer l’offre",
+    "Sollecita offerta"
+  ],
+  "Persönliche Erinnerung aktivieren": [
+    "Enable personal reminder",
+    "Activer le rappel personnel",
+    "Attiva promemoria personale"
+  ],
+  "Nach einer Entscheidung, bei Ablauf oder Versionswechsel wird kein Hinweis erstellt. Deaktivierte Angebotsbenachrichtigungen werden berücksichtigt.": [
+    "No reminder is created after a decision, expiry or version change. Disabled offer notifications are respected.",
+    "Aucun rappel après une décision, l’expiration ou un changement de version. Les notifications d’offres désactivées sont respectées.",
+    "Nessun promemoria dopo una decisione, la scadenza o un cambio di versione. Le notifiche delle offerte disattivate sono rispettate."
+  ],
+  "Erinnerung entfernen": [
+    "Remove reminder",
+    "Supprimer le rappel",
+    "Rimuovi promemoria"
+  ],
+  "Bitte die Erinnerung bestätigen und ein gültiges Datum wählen.": [
+    "Confirm the reminder and choose a valid date.",
+    "Confirmez le rappel et choisissez une date valide.",
+    "Conferma il promemoria e scegli una data valida."
+  ],
+  "Für dieses Angebot ist keine Erinnerung möglich.": [
+    "A reminder is not available for this offer.",
+    "Aucun rappel possible pour cette offre.",
+    "Non è possibile un promemoria per questa offerta."
+  ],
+  "Für diese Version wurde die Erinnerung bereits abgeschlossen.": [
+    "The reminder for this version is already completed.",
+    "Le rappel pour cette version est déjà terminé.",
+    "Il promemoria per questa versione è già concluso."
+  ],
+  "Erinnerung": [
+    "Reminder",
+    "Rappel",
+    "Promemoria"
+  ],
+  "Diese Aktion ist nicht verfügbar.": [
+    "This action is not available.",
+    "Cette action n’est pas disponible.",
+    "Questa azione non è disponibile."
+  ],
+  "Bitte das Angebot zuerst ausstellen.": [
+    "Issue the offer first.",
+    "Émettez d’abord l’offre.",
+    "Emetti prima l’offerta."
   ]
 }

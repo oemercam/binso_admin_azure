@@ -4,6 +4,8 @@ import {documentDefaults,invoiceDraftFromOffer} from "@/lib/document-defaults";
 import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
 import {safeAppPath} from "@/lib/navigation";
 import {OfferHistory} from "./offer-history";
+import {OfferFollowup} from "./offer-followup";
+import {deliveryLabel} from "@/lib/offer-activity";
 import {EntityFiles} from "./entity-files";
 import {DirectorySelect} from "./directory-select";
 import {customerDirectory,resolveCustomer,type CustomerDirectory} from "@/lib/customer-identity";
@@ -15,7 +17,7 @@ import {allowDraftNavigation} from "./use-browser-back-guard";
 import {useProcessDraft} from "./use-process-draft";
 import {businessDate,financialStatus,financialStatusTone,financialStatusLabels,openAmount} from "@/lib/financial-status";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import {tenantCan} from "@/lib/permissions";
 import { invoicePaymentIssue } from "@/lib/qr-bill";
@@ -240,6 +242,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const [wizardStep,setWizardStep]=useState(0);
   const documentActionPending=useRef(false);
   const [moreOpen,setMoreOpen]=useState(false);
+  const [followupOpen,setFollowupOpen]=useState(false);
   const [documentRole,setDocumentRole]=useState("");
   const [demoDocument,setDemoDocument]=useState(true);
   const [documentReadOnly,setDocumentReadOnly]=useState(true);
@@ -392,7 +395,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
     {customersLoading?<LoadingState><LocalizedText>{"Kunden werden geladen …"}</LocalizedText></LoadingState>:customersError?<ErrorState onRetry={refreshCustomers}><LocalizedText>{customersError}</LocalizedText></ErrorState>:sourceLoading?<LoadingState><LocalizedText>{"Ursprungsangebot wird geladen …"}</LocalizedText></LoadingState>:sourceError?<ErrorState onRetry={()=>{sourceQuery.refresh();sourceCustomer.refresh()}}><LocalizedText>{sourceError}</LocalizedText></ErrorState>:billingLoading?<LoadingState><LocalizedText>{"Verrechenbare Positionen werden geladen …"}</LocalizedText></LoadingState>:billingError?<ErrorState onRetry={()=>{timeSource.refresh();expenseSource.refresh()}}><LocalizedText>{billingError}</LocalizedText></ErrorState>:documentLoad.loading?<LoadingState><LocalizedText>{"Dokument wird geladen …"}</LocalizedText></LoadingState>:documentLoad.error?<EmptyState  title="Dokument konnte nicht geladen werden" description={documentLoad.error}/>:existing&&!editing
       ? <div className="document-desktop-workspace">
           <div className="document-desktop-detail">
-            <DocumentReadView type={kind} draft={draft} directory={directory} canWrite={canWrite}/>
+            <DocumentReadView type={kind} draft={draft} directory={directory} canWrite={canWrite} followup={kind==="Angebot"&&canWrite?<OfferFollowup number={draft.number} open={followupOpen} onClose={()=>setFollowupOpen(false)}/>:undefined}/>
             {draft.id&&<EntityFiles purpose={kind==="Rechnung"?"invoice_attachment":"offer_attachment"} entityId={draft.id}/>}
           </div>
 
@@ -413,6 +416,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
       <ActionRow onClick={()=>{setMoreOpen(false);setPreview(true)}} icon="file" title="Vorschau" navigation/>
       <ActionRow href={"/api/documents/"+encodeURIComponent(documentKey??draft.number)+"/pdf"} icon="file" title="PDF herunterladen"/>
       {canWrite&&!(kind==='Rechnung'&&draft.status==='draft')&&!['cancelled','declined','expired','revised'].includes(draft.status??'')&&<ActionRow disabled={demoDocument||actionBusy} onClick={()=>{recipientTouched.current=false;setRecipient(resolveCustomer(draft,directory)?.email??"");setMailSubject(kind+" "+draft.number);setMailMessage("Guten Tag\n\nIm Anhang findest du "+(kind==="Angebot"?"unser Angebot.":"unsere Rechnung.")+(kind==="Angebot"?" Über den sicheren Link kannst du das Angebot prüfen und beantworten.":"")+"\n\nFreundliche Grüsse");setSendPurpose('document');setSendKey(crypto.randomUUID());setActionError(null);setMoreOpen(false);setSendOpen(true)}} icon="mail" title={demoDocument?'Versand in der Demo deaktiviert':'Per E-Mail senden'} navigation/>}
+      {canWrite&&kind==='Angebot'&&presentation.displayStatus==='sent'&&<ActionRow icon="clock" title="Erinnerung" navigation onClick={()=>{setMoreOpen(false);setFollowupOpen(true)}}/>}
       {canWrite&&kind==='Rechnung'&&presentation.displayStatus==='overdue'&&<ActionRow disabled={demoDocument||actionBusy} onClick={()=>{setSendPurpose('reminder');setSendKey(crypto.randomUUID());setActionError(null);setMoreOpen(false);setSendOpen(true)}} icon="mail" title={demoDocument?'Versand in der Demo deaktiviert':'Zahlungserinnerung senden'} navigation/>}
       {canWrite&&draft.status==='draft'&&<ActionRow disabled={actionBusy} onClick={()=>void processAction('issue')} icon="check" title={kind==='Rechnung'?'Rechnung stellen':'Als extern versendet erfassen'}/>}
       {canWrite&&kind==='Angebot'&&['sent','expired','declined'].includes(draft.status??'')&&<ActionRow disabled={actionBusy} onClick={()=>void reviseOffer()} icon="edit" title="Angebot überarbeiten" navigation/>}
@@ -447,7 +451,7 @@ function documentPresentation(type:DocumentKind,draft:DocumentDraft,total:number
   return {displayStatus,statusLabel,statusTone,dueDate};
 }
 
-function DocumentReadView({type,draft,directory,canWrite}:{type:DocumentKind;draft:DocumentDraft;directory:CustomerDirectory;canWrite:boolean}){
+function DocumentReadView({type,draft,directory,canWrite,followup}:{type:DocumentKind;draft:DocumentDraft;directory:CustomerDirectory;canWrite:boolean;followup?:ReactNode}){
   const totals=useDocumentTotals(draft);
   const currency=draft.currency??"CHF";
   const isInvoice=type==="Rechnung";
@@ -488,10 +492,10 @@ function DocumentReadView({type,draft,directory,canWrite}:{type:DocumentKind;dra
     {isInvoice&&!["draft","paid","cancelled"].includes(displayStatus)&&outstanding>0&&<LocalizedElement as="section" className="document-payment-facts" aria-label="Zahlungsstand"><SectionTitle title="Zahlungsstand"/>
       <MetricTile label="Bereits bezahlt" value={`${currency} ${money(Number(draft.paidAmount??0))}`}/>
     </LocalizedElement>}
-    {!isInvoice&&draft.number&&<OfferHistory number={draft.number} canWrite={canWrite}/>}
+    {!isInvoice&&draft.number&&<OfferHistory number={draft.number} canWrite={canWrite}/>}{followup}
     {(Boolean(draft.credits?.length||draft.reminders?.length||draft.refunds?.length||draft.revisesOffer||draft.revisions?.length||draft.sourceOffer||draft.invoiceNumber||draft.note))&&<DetailDisclosure label="Weitere Angaben">
     {isInvoice&&Boolean(draft.credits?.length)&&<section className="document-detail-section"><SectionTitle title="Gutschriften"/>{draft.credits?.map(credit=><p key={credit.number}><b>{credit.number}</b> · {credit.date.split('-').reverse().join('.')} · {currency} {money(Number(credit.amount))}<br/>{credit.reason}</p>)}</section>}
-    {isInvoice&&Boolean(draft.reminders?.length)&&<section className="document-detail-section"><SectionTitle title="Mahnhistorie"/>{draft.reminders?.map(reminder=><p key={reminder.id}><b><LocalizedText>{reminder.stage===1?'Zahlungserinnerung':reminder.stage===2?'1. Mahnung':'2. Mahnung'}</LocalizedText></b> · <LocalizedText>{({sent:'Versendet',failed:'Versand nicht bestätigt'} as Record<string,string>)[reminder.status]??'Versand wird geprüft'}</LocalizedText><br/>{reminder.recipient} · {currency} {money(Number(reminder.amount))} · <LocalizedText>{"Zahlungsfrist"}</LocalizedText>: {reminder.deadline.split('-').reverse().join('.')}</p>)}</section>}
+    {isInvoice&&Boolean(draft.reminders?.length)&&<section className="document-detail-section"><SectionTitle title="Mahnhistorie"/>{draft.reminders?.map(reminder=><p key={reminder.id}><b><LocalizedText>{reminder.stage===1?'Zahlungserinnerung':reminder.stage===2?'1. Mahnung':'2. Mahnung'}</LocalizedText></b> · <LocalizedText>{deliveryLabel(reminder.status)}</LocalizedText><br/>{reminder.recipient} · {currency} {money(Number(reminder.amount))} · <LocalizedText>{"Zahlungsfrist"}</LocalizedText>: {reminder.deadline.split('-').reverse().join('.')}</p>)}</section>}
     {isInvoice&&Boolean(draft.refunds?.length)&&<section className="document-detail-section"><SectionTitle title="Rückerstattungen"/>{draft.refunds?.map(refund=><p key={refund.id}>{refund.date.split('-').reverse().join('.')} · {currency} {money(Number(refund.amount))}<br/>{refund.reason}</p>)}</section>}
     {draft.revisesOffer&&<p><LocalizedText>{"Vorherige Angebotsversion"}</LocalizedText>: <Link href={'/angebote/'+encodeURIComponent(draft.revisesOffer)}>{draft.revisesOffer}</Link></p>}
     {Boolean(draft.revisions?.length)&&<section className="document-detail-section"><SectionTitle title="Überarbeitete Angebotsversionen"/>{draft.revisions?.map(revision=><p key={revision.number}><Link href={'/angebote/'+encodeURIComponent(revision.number)}>{revision.number}</Link> · <LocalizedText>{financialStatusLabels[revision.status]??revision.status}</LocalizedText></p>)}</section>}

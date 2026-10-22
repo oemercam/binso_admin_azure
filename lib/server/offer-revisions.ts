@@ -17,7 +17,7 @@ export async function createOfferRevision(c:PoolClient,s:SessionUser,number:stri
   if(!source)throw new ApiError(404,'not_found','Dokument wurde nicht gefunden.');
   if(source.status==='draft')throw new ApiError(409,'revision_exists','Dieses Angebot wird bereits als Entwurf überarbeitet.');
   if(!['sent','declined','expired'].includes(source.status))throw new ApiError(409,'revision_invalid','Nur versendete, abgelaufene oder abgelehnte Angebote können überarbeitet werden.');
-  if((await c.query("select id from document_deliveries where organization_id=$1 and document_id=$2 and status='sending'",[s.organizationId,source.id])).rowCount)throw new ApiError(409,'delivery_pending','Der Versand wird noch geprüft.');
+  if((await c.query("select id from document_deliveries where organization_id=$1 and document_id=$2 and status in ('sending','uncertain','failed')",[s.organizationId,source.id])).rowCount)throw new ApiError(409,'delivery_pending','Der Versand wird noch geprüft.');
   if((await c.query("select id from quotes where organization_id=$1 and revises_quote_id=$2 and status='draft' and archived_at is null",[s.organizationId,source.id])).rowCount)throw new ApiError(409,'revision_exists','Zu diesem Angebot besteht bereits ein überarbeiteter Entwurf.');
   const historical=await sealOfferVersion(c,s,source);
   const today=businessDate();

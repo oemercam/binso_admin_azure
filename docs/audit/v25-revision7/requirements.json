@@ -844,16 +844,23 @@
       "requirement": "Serverseitiger Provider, Secrets nur Backend, vorhandene Infrastruktur bevorzugen, idempotente Jobs, signierte Webhooks, Deduplizierung.",
       "sourceTextSha256": "348fff27ece7bb924f40153eab3b238e7e886985e28066a4f482fd5ad6722ac2",
       "sourceParagraph": "Im Drei-Punkte-Menü «Per E-Mail senden»: Empfänger vorbelegt/editierbar, Betreff, Begleittext, PDF-Anhang, sicherer Kundenlink, Vorschau. «Als versendet erfassen» eindeutig «Als extern versendet erfassen» nennen; kein vorgetäuschter Versand. Serverseitiger Provider, Secrets nur Backend, vorhandene Infrastruktur bevorzugen, idempotente Jobs, signierte Webhooks, Deduplizierung. Versand angefordert, vom Provider angenommen, zugestellt, fehlgeschlagen und extern erfasst unterscheiden. Wiederholter Versand möglich; keine falschen Erfolgsmeldungen.",
-      "status": "nicht_abgenommen",
-      "implementationStatus": "ungeprueft",
-      "acceptanceStatus": "nicht_abgenommen",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "acceptanceStatus": "teilweise_implementiert",
       "sourceReferences": [
-        "lib/server/email.ts"
+        "app/api/documents/[number]/send/route.ts",
+        "lib/server/document-process.ts",
+        "lib/server/offer-revisions.ts",
+        "lib/server/repositories/business-api.ts",
+        "lib/server/credit-notes.ts",
+        "database/migrations/0078_document_delivery_outcomes.sql",
+        "scripts/migration-test.mjs",
+        "docs/audit/v25-revision7/document-delivery-outcomes.md"
       ],
-      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "implementation": "Bestehender serverseitiger Mail-/Dokumentweg um dauerhafte Unterscheidung zwischen bestätigtem Nichtversand und unklarem Transportausgang ergänzt. Auch neue Kennungen und konkurrierende Dokumentmutationen bleiben bei ungeklärtem Ausgang gesperrt; historische failed-Werte werden nicht automatisch freigegeben.",
+      "test": "Isolierter tatsächlicher Migrationstest mit positivem Versand, Replay, neuem Schlüssel bei unklarem/historischem Fehler, fehlendem Provider ohne Transport, explizitem neuem Versand nach Einrichtung und Zahlungsänderung bestanden; zusätzliche aktuelle Gesamt-CI erforderlich.",
+      "visualComparison": "Gemeinsame History-Beschriftung erweitert; aktuelle gerenderte Abnahme offen.",
+      "blocker": "Echte Zustell-/Bounce-Nachweise, authentifizierte Provider-Ereignisse und kontrollierter Auflösungsweg für unklare historische Versände bleiben offen. Keine produktive Migration oder Kundenmail ausgeführt."
     },
     {
       "id": "R7-06-004",
@@ -863,16 +870,23 @@
       "requirement": "Versand angefordert, vom Provider angenommen, zugestellt, fehlgeschlagen und extern erfasst unterscheiden.",
       "sourceTextSha256": "f9b165c0f21cbfb49b32c42602762c65163658ad4d736cd62656885c18704f1f",
       "sourceParagraph": "Im Drei-Punkte-Menü «Per E-Mail senden»: Empfänger vorbelegt/editierbar, Betreff, Begleittext, PDF-Anhang, sicherer Kundenlink, Vorschau. «Als versendet erfassen» eindeutig «Als extern versendet erfassen» nennen; kein vorgetäuschter Versand. Serverseitiger Provider, Secrets nur Backend, vorhandene Infrastruktur bevorzugen, idempotente Jobs, signierte Webhooks, Deduplizierung. Versand angefordert, vom Provider angenommen, zugestellt, fehlgeschlagen und extern erfasst unterscheiden. Wiederholter Versand möglich; keine falschen Erfolgsmeldungen.",
-      "status": "nicht_abgenommen",
-      "implementationStatus": "ungeprueft",
-      "acceptanceStatus": "nicht_abgenommen",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "acceptanceStatus": "teilweise_implementiert",
       "sourceReferences": [
-        "lib/server/email.ts"
+        "app/api/documents/[number]/send/route.ts",
+        "lib/server/document-process.ts",
+        "lib/server/offer-revisions.ts",
+        "lib/server/repositories/business-api.ts",
+        "lib/server/credit-notes.ts",
+        "database/migrations/0078_document_delivery_outcomes.sql",
+        "scripts/migration-test.mjs",
+        "docs/audit/v25-revision7/document-delivery-outcomes.md"
       ],
-      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "implementation": "Bestehender serverseitiger Mail-/Dokumentweg um dauerhafte Unterscheidung zwischen bestätigtem Nichtversand und unklarem Transportausgang ergänzt. Auch neue Kennungen und konkurrierende Dokumentmutationen bleiben bei ungeklärtem Ausgang gesperrt; historische failed-Werte werden nicht automatisch freigegeben.",
+      "test": "Isolierter tatsächlicher Migrationstest mit positivem Versand, Replay, neuem Schlüssel bei unklarem/historischem Fehler, fehlendem Provider ohne Transport, explizitem neuem Versand nach Einrichtung und Zahlungsänderung bestanden; zusätzliche aktuelle Gesamt-CI erforderlich.",
+      "visualComparison": "Gemeinsame History-Beschriftung erweitert; aktuelle gerenderte Abnahme offen.",
+      "blocker": "Echte Zustell-/Bounce-Nachweise, authentifizierte Provider-Ereignisse und kontrollierter Auflösungsweg für unklare historische Versände bleiben offen. Keine produktive Migration oder Kundenmail ausgeführt."
     },
     {
       "id": "R7-06-005",
@@ -882,16 +896,23 @@
       "requirement": "Wiederholter Versand möglich; keine falschen Erfolgsmeldungen.",
       "sourceTextSha256": "144c47e45ffaf0d47347109d01741b412a8efb6d4f1cd09e2681a4684b2c1a87",
       "sourceParagraph": "Im Drei-Punkte-Menü «Per E-Mail senden»: Empfänger vorbelegt/editierbar, Betreff, Begleittext, PDF-Anhang, sicherer Kundenlink, Vorschau. «Als versendet erfassen» eindeutig «Als extern versendet erfassen» nennen; kein vorgetäuschter Versand. Serverseitiger Provider, Secrets nur Backend, vorhandene Infrastruktur bevorzugen, idempotente Jobs, signierte Webhooks, Deduplizierung. Versand angefordert, vom Provider angenommen, zugestellt, fehlgeschlagen und extern erfasst unterscheiden. Wiederholter Versand möglich; keine falschen Erfolgsmeldungen.",
-      "status": "nicht_abgenommen",
-      "implementationStatus": "ungeprueft",
-      "acceptanceStatus": "nicht_abgenommen",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "acceptanceStatus": "teilweise_implementiert",
       "sourceReferences": [
-        "lib/server/email.ts"
+        "app/api/documents/[number]/send/route.ts",
+        "lib/server/document-process.ts",
+        "lib/server/offer-revisions.ts",
+        "lib/server/repositories/business-api.ts",
+        "lib/server/credit-notes.ts",
+        "database/migrations/0078_document_delivery_outcomes.sql",
+        "scripts/migration-test.mjs",
+        "docs/audit/v25-revision7/document-delivery-outcomes.md"
       ],
-      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "implementation": "Bestehender serverseitiger Mail-/Dokumentweg um dauerhafte Unterscheidung zwischen bestätigtem Nichtversand und unklarem Transportausgang ergänzt. Auch neue Kennungen und konkurrierende Dokumentmutationen bleiben bei ungeklärtem Ausgang gesperrt; historische failed-Werte werden nicht automatisch freigegeben.",
+      "test": "Isolierter tatsächlicher Migrationstest mit positivem Versand, Replay, neuem Schlüssel bei unklarem/historischem Fehler, fehlendem Provider ohne Transport, explizitem neuem Versand nach Einrichtung und Zahlungsänderung bestanden; zusätzliche aktuelle Gesamt-CI erforderlich.",
+      "visualComparison": "Gemeinsame History-Beschriftung erweitert; aktuelle gerenderte Abnahme offen.",
+      "blocker": "Echte Zustell-/Bounce-Nachweise, authentifizierte Provider-Ereignisse und kontrollierter Auflösungsweg für unklare historische Versände bleiben offen. Keine produktive Migration oder Kundenmail ausgeführt."
     },
     {
       "id": "R7-07-001",
@@ -1889,16 +1910,20 @@
       "requirement": "Optional Angebots-Nachfass-Erinnerungen erst nach Opt-in, keine nach Annahme/Ablehnung und keine Dubletten.",
       "sourceTextSha256": "30089178853a0d23a9e85637ee65520c3fb43df7da162d771ba8b737afec27c8",
       "sourceParagraph": "Tabs Alle/Ungelesen, nach Datum gruppiert, einzeln/alle als gelesen, ungelesene Markierung, direkte Navigation, Rechteprüfung und kurze Leermeldung. Redundanten Eintrag «Alle Benachrichtigungen» auf derselben Seite entfernen. Bestehende Push-Infrastruktur für Angebotsaufruf (nur belastbar), Frage, Annahme, Ablehnung, Versandfehler und Sicherheitsereignisse verwenden. Deduplizieren, Benutzereinstellungen beachten, nicht spammen. Optional Angebots-Nachfass-Erinnerungen erst nach Opt-in, keine nach Annahme/Ablehnung und keine Dubletten.",
-      "status": "nicht_abgenommen",
-      "implementationStatus": "ungeprueft",
-      "acceptanceStatus": "nicht_abgenommen",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "acceptanceStatus": "teilweise_implementiert",
       "sourceReferences": [
-        "components/pages/notifications.tsx"
+        "components/offer-followup.tsx",
+        "lib/server/offer-followups.ts",
+        "database/migrations/0077_personal_offer_followups.sql",
+        "scripts/offer-followup-contract.mjs",
+        "docs/audit/v25-revision7/offer-followups.md"
       ],
-      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "implementation": "Persönliche versions-/benutzer-/mandantengebundene In-App-Erinnerung mit explizitem Opt-in, Datumsvalidierung, Vorschau, Verlauf, Rollen/RLS, atomarer Benachrichtigung und Audit implementiert. Ausführung beim Öffnen der Benachrichtigungen, kein garantierter Hintergrund-Mailversand.",
+      "test": "Tatsächlicher isolierter Migrationstest mit eingeschränkter Rolle bestanden: Positiv-/Negativfälle, Fälligkeit, Abbruch, Replay, Status/Version, Präferenz und Audit-Rollback. Aktuelle native Parallel-/Browser-CI noch ausstehend.",
+      "visualComparison": "Bestehende gemeinsame FormSheet-/DetailDisclosure-/ActionRow-Owner verwendet. Aktuelle gerenderte Abnahme offen, kein neuer Originalscreen behauptet.",
+      "blocker": "Garantierter Hintergrund-Mailversand, echte Providerzustellung sowie vollständige fachliche/visuelle/Geräteabnahme fehlen; kein Produktivlauf oder Versand ausgeführt."
     },
     {
       "id": "R7-15-001",
@@ -5146,14 +5171,20 @@
       "requirement": "**P2:** exportierbare erweiterte Berichte und konfigurierbare Erinnerungen mit Vorschau, Opt-in und Versandhistorie.",
       "sourceTextSha256": "73880bf8c0debcc2a4ee30490768edcb4697297bdf15cd94266ffa0991e05ab1",
       "sourceParagraph": "Kompakte Finanzkennzahlen fakturiert/offen/ausgegeben/überfällig, Analyse Einnahmen/Ausgaben/Zahlungssaldo fachlich korrekt; keine leeren Diagramme. Einheitlicher Zeitraumfilter 1/3/6/12 Monate + benutzerdefiniert, inklusive Datumsgrenzen. Globale berechtigungsabhängige Suche über Kunden, Angebote, Rechnungen, Zahlungen, Aufträge und weitere Module; keyboard-aware iOS, Deep Links. Benachrichtigungen Alle/Ungelesen, chronologisch, markierbar, keine doppelten Meldungen, Angebotsreaktionen/Zustellfehler integriert. **P2:** exportierbare erweiterte Berichte und konfigurierbare Erinnerungen mit Vorschau, Opt-in und Versandhistorie.",
-      "status": "nicht_abgenommen",
-      "implementationStatus": "ungeprueft",
-      "acceptanceStatus": "nicht_abgenommen",
-      "sourceReferences": [],
-      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "acceptanceStatus": "teilweise_implementiert",
+      "sourceReferences": [
+        "components/offer-followup.tsx",
+        "lib/server/offer-followups.ts",
+        "database/migrations/0077_personal_offer_followups.sql",
+        "scripts/offer-followup-contract.mjs",
+        "docs/audit/v25-revision7/offer-followups.md"
+      ],
+      "implementation": "Persönliche versions-/benutzer-/mandantengebundene In-App-Erinnerung mit explizitem Opt-in, Datumsvalidierung, Vorschau, Verlauf, Rollen/RLS, atomarer Benachrichtigung und Audit implementiert. Ausführung beim Öffnen der Benachrichtigungen, kein garantierter Hintergrund-Mailversand.",
+      "test": "Tatsächlicher isolierter Migrationstest mit eingeschränkter Rolle bestanden: Positiv-/Negativfälle, Fälligkeit, Abbruch, Replay, Status/Version, Präferenz und Audit-Rollback. Aktuelle native Parallel-/Browser-CI noch ausstehend.",
+      "visualComparison": "Bestehende gemeinsame FormSheet-/DetailDisclosure-/ActionRow-Owner verwendet. Aktuelle gerenderte Abnahme offen, kein neuer Originalscreen behauptet.",
+      "blocker": "Garantierter Hintergrund-Mailversand, echte Providerzustellung sowie vollständige fachliche/visuelle/Geräteabnahme fehlen; kein Produktivlauf oder Versand ausgeführt."
     },
     {
       "id": "R7-35-001",
@@ -5197,14 +5228,23 @@
       "requirement": "System-E-Mails mit Binso-Branding, Geschäftsmails mit Mandantendaten und verifiziertem Reply-To; SPF/DKIM/DMARC, serverseitiger Provider, signierte Webhooks, Retry/Deduplikation und Zustellprotokoll.",
       "sourceTextSha256": "16d425bf832868462bbed0e15222ab8ca625257335f659b37435518a5622ecf0",
       "sourceParagraph": "Zentrale responsive HTML- und Text-E-Mail-Templates für Verifizierung, Reset, Einladungen, Sicherheitsmeldungen, Angebote, Antworten, Rechnungen, Mahnungen, Support. Original-Logo, weiss-blau, Inter-Fallback, DE/FR/IT/EN, zugängliche Darstellung, sicher escapter Inhalt. System-E-Mails mit Binso-Branding, Geschäftsmails mit Mandantendaten und verifiziertem Reply-To; SPF/DKIM/DMARC, serverseitiger Provider, signierte Webhooks, Retry/Deduplikation und Zustellprotokoll. Vorgesehene Domains: `one.binso.ch`, `go.binso.ch`, `mail.binso.ch`, `admin.one.binso.ch`, ggf. `api.one.binso.ch`; DNS/Provider nur nach tatsächlicher Einrichtung als aktiv markieren. Testphase ohne Kreditkarte, Tarife, Wechsel, Zahlungsfehler, Kündigung, Reaktivierung, Datenexport, Aufbewahrung und keine überraschende Löschung; Provider-Konfiguration als Blocker kennzeichnen, nicht fingieren.",
-      "status": "nicht_abgenommen",
-      "implementationStatus": "ungeprueft",
-      "acceptanceStatus": "nicht_abgenommen",
-      "sourceReferences": [],
-      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "acceptanceStatus": "teilweise_implementiert",
+      "sourceReferences": [
+        "app/api/documents/[number]/send/route.ts",
+        "lib/server/document-process.ts",
+        "lib/server/offer-revisions.ts",
+        "lib/server/repositories/business-api.ts",
+        "lib/server/credit-notes.ts",
+        "database/migrations/0078_document_delivery_outcomes.sql",
+        "scripts/migration-test.mjs",
+        "docs/audit/v25-revision7/document-delivery-outcomes.md"
+      ],
+      "implementation": "Bestehender serverseitiger Mail-/Dokumentweg um dauerhafte Unterscheidung zwischen bestätigtem Nichtversand und unklarem Transportausgang ergänzt. Auch neue Kennungen und konkurrierende Dokumentmutationen bleiben bei ungeklärtem Ausgang gesperrt; historische failed-Werte werden nicht automatisch freigegeben.",
+      "test": "Isolierter tatsächlicher Migrationstest mit positivem Versand, Replay, neuem Schlüssel bei unklarem/historischem Fehler, fehlendem Provider ohne Transport, explizitem neuem Versand nach Einrichtung und Zahlungsänderung bestanden; zusätzliche aktuelle Gesamt-CI erforderlich.",
+      "visualComparison": "Gemeinsame History-Beschriftung erweitert; aktuelle gerenderte Abnahme offen.",
+      "blocker": "Echte Zustell-/Bounce-Nachweise, authentifizierte Provider-Ereignisse und kontrollierter Auflösungsweg für unklare historische Versände bleiben offen. Keine produktive Migration oder Kundenmail ausgeführt."
     },
     {
       "id": "R7-35-004",
@@ -5282,14 +5322,23 @@
       "requirement": "Transaktionen und Idempotenz bei Rechnungen, Zahlungen, Einladungen, Versand, Angebotsannahmen und Timer.",
       "sourceTextSha256": "d8df29dbb13203c22dac7c8067c417f2242b94adb45a6b1c1d79a2f7d81b3106",
       "sourceParagraph": "Tenant-Isolation, serverseitige Berechtigungen, sichere Sessions, Rate Limits, CSRF/XSS/Injection-Schutz, Audit, Secret-Management, sichere Uploads, Datenaufbewahrung/-löschung. Entwürfe/Autosave, Netzwerkunterbruch und Sitzungsablauf ohne stillen Datenverlust. Transaktionen und Idempotenz bei Rechnungen, Zahlungen, Einladungen, Versand, Angebotsannahmen und Timer. Monitoring, Alerts, datensparsame Logs, Backups, **Wiederherstellungstest**, Migrations-/Rollback-Plan, Performance und Barrierefreiheit (Kontrast, Tastatur, Screenreader, Touchflächen).",
-      "status": "nicht_abgenommen",
-      "implementationStatus": "ungeprueft",
-      "acceptanceStatus": "nicht_abgenommen",
-      "sourceReferences": [],
-      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "acceptanceStatus": "teilweise_implementiert",
+      "sourceReferences": [
+        "app/api/documents/[number]/send/route.ts",
+        "lib/server/document-process.ts",
+        "lib/server/offer-revisions.ts",
+        "lib/server/repositories/business-api.ts",
+        "lib/server/credit-notes.ts",
+        "database/migrations/0078_document_delivery_outcomes.sql",
+        "scripts/migration-test.mjs",
+        "docs/audit/v25-revision7/document-delivery-outcomes.md"
+      ],
+      "implementation": "Bestehender serverseitiger Mail-/Dokumentweg um dauerhafte Unterscheidung zwischen bestätigtem Nichtversand und unklarem Transportausgang ergänzt. Auch neue Kennungen und konkurrierende Dokumentmutationen bleiben bei ungeklärtem Ausgang gesperrt; historische failed-Werte werden nicht automatisch freigegeben.",
+      "test": "Isolierter tatsächlicher Migrationstest mit positivem Versand, Replay, neuem Schlüssel bei unklarem/historischem Fehler, fehlendem Provider ohne Transport, explizitem neuem Versand nach Einrichtung und Zahlungsänderung bestanden; zusätzliche aktuelle Gesamt-CI erforderlich.",
+      "visualComparison": "Gemeinsame History-Beschriftung erweitert; aktuelle gerenderte Abnahme offen.",
+      "blocker": "Echte Zustell-/Bounce-Nachweise, authentifizierte Provider-Ereignisse und kontrollierter Auflösungsweg für unklare historische Versände bleiben offen. Keine produktive Migration oder Kundenmail ausgeführt."
     },
     {
       "id": "R7-36-004",
@@ -9934,16 +9983,20 @@
       "requirement": "Einheitliche Profileinstellungen, Benachrichtigungspräferenzen, Dark Mode, Sprache, Sicherheit, Datenschutz, Erinnerungen und automatische E-Mails.",
       "sourceTextSha256": "0fa2223a556616b01ab952a0ecf71e72339e17f8fafba16229841846aa7d25d1",
       "sourceParagraph": "Zentraler zugänglicher Switch/Toggle für sofort wirksame binäre Ein-/Aus-Einstellungen mit klarer Beschriftung, Status, Fokus, Tastatur, Lade-/Fehler-/Rollbackzustand und persistenter Speicherung. Checkboxen weiter für Mehrfachauswahl, rechtliche Einwilligungen und explizite Bestätigungen; Radio für genau eine Option. Keine blind umgebauten Checkboxen. Kritische Sicherheits- und Unternehmensänderungen benötigen zusätzliche Bestätigung/Reauth und dürfen nicht durch einfaches Umschalten ungeschützt wirksam werden. Einheitliche Profileinstellungen, Benachrichtigungspräferenzen, Dark Mode, Sprache, Sicherheit, Datenschutz, Erinnerungen und automatische E-Mails. Jede Einstellung serverseitig autorisieren und nach Neuladen sowie geräteübergreifend korrekt wiedergeben.",
-      "status": "nicht_abgenommen",
-      "implementationStatus": "ungeprueft",
-      "acceptanceStatus": "nicht_abgenommen",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "acceptanceStatus": "teilweise_implementiert",
       "sourceReferences": [
-        "components/ui.tsx"
+        "components/offer-followup.tsx",
+        "lib/server/offer-followups.ts",
+        "database/migrations/0077_personal_offer_followups.sql",
+        "scripts/offer-followup-contract.mjs",
+        "docs/audit/v25-revision7/offer-followups.md"
       ],
-      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "implementation": "Persönliche versions-/benutzer-/mandantengebundene In-App-Erinnerung mit explizitem Opt-in, Datumsvalidierung, Vorschau, Verlauf, Rollen/RLS, atomarer Benachrichtigung und Audit implementiert. Ausführung beim Öffnen der Benachrichtigungen, kein garantierter Hintergrund-Mailversand.",
+      "test": "Tatsächlicher isolierter Migrationstest mit eingeschränkter Rolle bestanden: Positiv-/Negativfälle, Fälligkeit, Abbruch, Replay, Status/Version, Präferenz und Audit-Rollback. Aktuelle native Parallel-/Browser-CI noch ausstehend.",
+      "visualComparison": "Bestehende gemeinsame FormSheet-/DetailDisclosure-/ActionRow-Owner verwendet. Aktuelle gerenderte Abnahme offen, kein neuer Originalscreen behauptet.",
+      "blocker": "Garantierter Hintergrund-Mailversand, echte Providerzustellung sowie vollständige fachliche/visuelle/Geräteabnahme fehlen; kein Produktivlauf oder Versand ausgeführt."
     },
     {
       "id": "R7-50-006",

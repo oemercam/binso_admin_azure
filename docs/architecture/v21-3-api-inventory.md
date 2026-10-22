@@ -2,7 +2,7 @@
 
 Static AST/source inventory, not proof that every runtime branch is tested. Calls include exact source arguments and locations; dynamic dispatch requires the domain matrix and runtime tests.
 
-121 API route files, 45 client consumers, 77 migrations, 110 declared tables.
+123 API route files, 46 client consumers, 79 migrations, 111 declared tables.
 
 | Endpoint | Methods | Source | Direct data/auth evidence |
 |---|---|---|---|
@@ -45,11 +45,12 @@ Static AST/source inventory, not proof that every runtime branch is tested. Call
 | `/api/demo/platform-finance` | GET, POST, DELETE | `app/api/demo/platform-finance/route.ts` |  |
 | `/api/demo/session` | GET, POST, DELETE | `app/api/demo/session/route.ts` |  |
 | `/api/documents/[number]/credits` | POST | `app/api/documents/[number]/credits/route.ts` | `requireSession:9`, `withTenant:12` |
+| `/api/documents/[number]/followups` | GET, POST | `app/api/documents/[number]/followups/route.ts` | `requireSession:10`, `withTenant:11`, `requireSession:14`, `withTenant:17` |
 | `/api/documents/[number]/pdf` | GET | `app/api/documents/[number]/pdf/route.ts` | `requireSession:10`, `withTenant:11`, `authorize:14`, `c.query:16`, `c.query:19`, `c.query:22` |
 | `/api/documents/[number]/refunds` | POST | `app/api/documents/[number]/refunds/route.ts` | `requireSession:9`, `withTenant:11` |
 | `/api/documents/[number]/revision` | POST | `app/api/documents/[number]/revision/route.ts` | `requireSession:7`, `withTenant:8` |
 | `/api/documents/[number]` | GET, PATCH | `app/api/documents/[number]/route.ts` | `tenantList:14`, `tenantList:37`, `tenantRpc:54` |
-| `/api/documents/[number]/send` | POST | `app/api/documents/[number]/send/route.ts` | `requireSession:20`, `withTenant:28`, `c.query:30`, `c.query:37`, `c.query:41`, `c.query:46`, `c.query:49`, `c.query:51`, `c.query:52`, `c.query:53`, `withTenant:62`, `withTenant:72`, `c.query:72`, `withTenant:76`, `c.query:77`, `c.query:79` |
+| `/api/documents/[number]/send` | POST | `app/api/documents/[number]/send/route.ts` | `requireSession:20`, `withTenant:28`, `c.query:30`, `c.query:37`, `c.query:41`, `c.query:46`, `c.query:49`, `c.query:51`, `c.query:52`, `c.query:53`, `withTenant:63`, `withTenant:75`, `c.query:76`, `withTenant:82`, `c.query:83`, `c.query:85` |
 | `/api/documents/[number]/status` | POST | `app/api/documents/[number]/status/route.ts` | `requireSession:7`, `withTenant:9` |
 | `/api/documents/[number]/versions` | GET, POST | `app/api/documents/[number]/versions/route.ts` | `requireSession:14`, `authorize:14`, `withTenant:15`, `c.query:16`, `c.query:21`, `c.query:25`, `c.query:26`, `c.query:30`, `requireSession:37`, `authorize:37`, `withTenant:40`, `c.query:41`, `c.query:43`, `c.query:46`, `c.query:51`, `c.query:53`, `withTenant:61`, `c.query:61` |
 | `/api/documents/preview` | POST | `app/api/documents/preview/route.ts` | `requireSession:13`, `authorize:14`, `withTenant:21`, `c.query:22`, `c.query:23`, `c.query:25` |
@@ -71,6 +72,7 @@ Static AST/source inventory, not proof that every runtime branch is tested. Call
 | `/api/health` | GET | `app/api/health/route.ts` |  |
 | `/api/integrations/status` | GET | `app/api/integrations/status/route.ts` |  |
 | `/api/notifications/[id]` | PATCH | `app/api/notifications/[id]/route.ts` | `requireSession:11`, `withTenant:12` |
+| `/api/notifications/followups` | POST | `app/api/notifications/followups/route.ts` | `requireSession:9`, `withTenant:10` |
 | `/api/notifications` | GET, PATCH | `app/api/notifications/route.ts` | `requireSession:8`, `withTenant:8`, `requireSession:9`, `withTenant:9` |
 | `/api/operator/accounts/[id]` | PATCH | `app/api/operator/accounts/[id]/route.ts` | `requireOperatorSession:13`, `authorizeOperator:13`, `authorizeOperator:30`, `withPlatform:40`, `c.query:41`, `c.query:42`, `c.query:46` |
 | `/api/operator/accounts` | GET | `app/api/operator/accounts/route.ts` | `requireOperatorSession:7`, `authorizeOperator:7` |

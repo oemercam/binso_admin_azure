@@ -37,6 +37,11 @@ fachliche, visuelle oder produktive Freigabe.
   Freigabe als neue Revision7-Abnahme.
 - [Berichtskopien-Aufbewahrung](report-retention.md): begrenzter, standardmässig
   trockener Cleanup vorbereitet; produktive Scope-/Environment-Konfiguration fehlt.
+- [Persönliche Angebots-Erinnerungen](offer-followups.md): ausdrückliches Opt-in,
+  Vorschau und persönlicher Verlauf mit atomarer, versionsgebundener In-App-Prüfung;
+  kein vorgetäuschter Hintergrund-Mailversand.
+- [Unklare Versandausgänge](document-delivery-outcomes.md): dauerhafte Sperre auch
+  bei neuer Kennung; bestätigten Nichtversand getrennt von unbekanntem Ausgang.
 
 ## Was ausdrücklich noch nicht nachgewiesen ist
 

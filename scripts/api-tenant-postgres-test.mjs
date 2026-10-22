@@ -4,7 +4,7 @@ import fs from 'node:fs/promises';
 import {spawn} from 'node:child_process';
 import {createHash,createHmac,createCipheriv,randomBytes} from 'node:crypto';
 import pg from 'pg';
-import {moduleUrl} from './data-test-modules.mjs';
+import {moduleUrl,financialModuleUrl} from './data-test-modules.mjs';
 
 const address=process.env.BINSO_DB_PARALLEL_TEST_URL;
 if(!address)throw new Error('Explicit isolated PostgreSQL URL required');
@@ -129,6 +129,7 @@ try{
   ['/api/employees',employeeRoles],['/api/settings/team/invitations',teamRoles],
  ];
  readContracts.push(['/api/documents/'+encodeURIComponent(offer.quote_no)+'/versions',documentRoles]);
+ readContracts.push(['/api/documents/'+encodeURIComponent(offer.quote_no)+'/followups',['owner','admin','project_manager','manager']]);
  const project=(await pool.query('select id from projects where organization_id=$1 order by id limit 1',[organizations[0]])).rows[0];
  const employee=(await pool.query('select id from employees where organization_id=$1 order by id limit 1',[organizations[0]])).rows[0];
  const product=(await pool.query('select id from products_services where organization_id=$1 order by id limit 1',[organizations[0]])).rows[0];
@@ -202,7 +203,7 @@ try{
  // member role, own-creator boundary and actual delivery permissions. Providers
  // are absent; allowed sends must record failure with zero transport attempts.
  for(const path of ['/api/reports/exports/[id]','/api/reports/exports/[id]/send','/api/reports/exports/[id]/share'])covered.add(path);
- for(const path of ['/api/expenses/[id]','/api/documents/[number]','/api/documents/[number]/pdf','/api/documents/[number]/versions','/api/files/[id]/download'])covered.add(path);
+ for(const path of ['/api/expenses/[id]','/api/documents/[number]','/api/documents/[number]/pdf','/api/documents/[number]/versions','/api/documents/[number]/followups','/api/files/[id]/download'])covered.add(path);
  const publicEntries=new Set(['/api/auth/invitation','/api/health','/api/health/ready','/api/demo/session','/api/operator/sso/callback']);
  for(const api of inventory.apis.filter(item=>item.methods.includes('GET'))){
   if(api.path.startsWith('/api/operator/')&&!publicEntries.has(api.path)||api.path.startsWith('/api/demo/')&&!publicEntries.has(api.path)){
@@ -318,11 +319,25 @@ try{
  await pool.query("update auth_sessions set step_up_at=null where user_id='http-0-owner'");
  assert.equal((await write('PATCH','/api/settings/documents',{},'owner')).data.error,'fresh_authentication_required','Bank/settings mutations require fresh proof before validation or writes');
  await pool.query("update auth_sessions set step_up_at=now() where user_id='http-0-owner'");
- const capabilityQuote=(await pool.query("select id,quote_no from quotes where organization_id=$1 and archived_at is null and status in ('sent','draft') order by id limit 1",[organizations[0]])).rows[0];
+ const capabilityQuote=(await pool.query("select id,quote_no from quotes where organization_id=$1 and customer_id=$2 and archived_at is null and status in ('sent','draft') order by id limit 1",[organizations[0],customer.id])).rows[0];
  await pool.query("update quotes set status='sent',valid_until='2099-12-31' where id=$1",[capabilityQuote.id]);
  const document=(await get('/api/documents/'+encodeURIComponent(capabilityQuote.quote_no),cookies.get('0:owner'))).data.item;
  const pdfResponse=await get('/api/documents/'+encodeURIComponent(capabilityQuote.quote_no)+'/pdf',cookies.get('0:owner'));assert.equal(pdfResponse.status,200);const pdf=Buffer.from(pdfResponse.data);
  const version=(await pool.query('insert into offer_versions(organization_id,quote_id,version,number,document,company,pdf,pdf_sha256,created_by_user_id) values($1,$2,1,$3,$4,$5,$6,$7,$8) returning id',[organizations[0],capabilityQuote.id,capabilityQuote.quote_no,JSON.stringify(document),JSON.stringify({name:'Synthetic HTTP Company'}),pdf,createHash('sha256').update(pdf).digest('hex'),'http-0-owner'])).rows[0];
+ const followupPath='/api/documents/'+encodeURIComponent(capabilityQuote.quote_no)+'/followups';
+ const postFollowup=async(path,body,role='owner',tenant=0)=>{const response=await fetch(base+path,{method:'POST',headers:{cookie:cookies.get(tenant+':'+role),origin:base,'content-type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(15000)});return {status:response.status,data:await response.json()};};
+ const followupToday=(await import(financialModuleUrl)).businessDate(),followupBody={action:'schedule',dueDate:followupToday,optIn:true};
+ for(const role of roles){const response=await postFollowup(followupPath,followupBody,role);assert.equal(response.status,['owner','admin','project_manager','manager'].includes(role)?200:403,'Native personal reminder write '+role+': '+JSON.stringify(response.data));}
+ assert.equal((await postFollowup(followupPath,{...followupBody,optIn:false})).status,400);
+ assert.equal((await postFollowup(followupPath,{...followupBody,dueDate:'2026-02-30'})).status,400);
+ assert.equal((await postFollowup(followupPath,{...followupBody,userId:'http-0-admin'})).status,400,'Caller cannot choose a recipient user');
+ assert.equal((await postFollowup(followupPath,followupBody,'owner',1)).status,404);
+ assert.equal((await postFollowup(followupPath,followupBody)).status,200,'Same plan is idempotent');
+ const personalHistory=await get(followupPath,cookies.get('0:owner'));assert.equal(personalHistory.status,200);assert.equal(personalHistory.data.items.length,1);
+ const ownFollowupId=personalHistory.data.items[0].id;assert.ok((await get(followupPath,cookies.get('0:admin'))).data.items.every(item=>item.id!==ownFollowupId),'Own-tenant admin cannot read another user reminder');
+ assert.equal((await postFollowup(followupPath,{action:'cancel'})).status,200);assert.equal((await get(followupPath,cookies.get('0:owner'))).data.items[0].state,'cancelled');
+ for(const role of roles)assert.equal((await postFollowup('/api/notifications/followups',{},role)).status,200,'Read-authorized notifications remain usable for '+role);
+ console.log('Real HTTP personal offer followups: all eight write roles, explicit opt-in/date, forbidden recipient override, replay/cancel, personal and cross-tenant boundaries passed. No mail transport.');
  const publicPost=async body=>{const response=await fetch(base+'/api/public/offer',{method:'POST',headers:{origin:base,'content-type':'application/json'},body:JSON.stringify(body)});return {status:response.status,data:await response.json()}};
  const links=[];
  for(const action of ['accept','decline']){

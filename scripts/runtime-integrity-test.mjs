@@ -46,4 +46,5 @@ assert.ok(!JSON.stringify(captured).includes('synthetic-sensitive-marker'));asse
 const events={},deleted=[],keys=['binso-one-shell-v6','binso-one-shell-v7','other-app-cache','binso-other-feature'];let claimed=false;
 vm.runInNewContext(await fs.readFile('public/sw.js','utf8'),{self:{location:{origin:'https://fixture.invalid'},clients:{claim:()=>{claimed=true}},addEventListener:(name,fn)=>events[name]=fn},caches:{keys:async()=>keys,delete:async key=>deleted.push(key)},URL});
 let activated;events.activate({waitUntil:promise=>activated=promise});await activated;assert.deepEqual(deleted,['binso-one-shell-v6']);assert.ok(claimed);
+await import('./package-patches-test.mjs');
 console.log('Bounded chunked/UTF-8/declared-size/JSON reads, sensitive-log suppression and service-worker owned-cache cleanup passed.');

@@ -17,7 +17,7 @@ export async function lockDocument(c:PoolClient,s:SessionUser,number:string){
 }
 export async function changeDocumentStatus(c:PoolClient,s:SessionUser,number:string,action:string,note:string){
  const {row,table,kind}=await lockDocument(c,s,number);
- if((await c.query("select id from document_deliveries where organization_id=$1 and document_id=$2 and status='sending'",[s.organizationId,row.id])).rowCount)throw new ApiError(409,'delivery_pending','Der Versand wird noch geprüft.');
+ if((await c.query("select id from document_deliveries where organization_id=$1 and document_id=$2 and status in ('sending','uncertain','failed')",[s.organizationId,row.id])).rowCount)throw new ApiError(409,'delivery_pending','Der Versand wird noch geprüft.');
  let next:string;
  if(action==='issue'&&row.status==='draft'){const amount=kind==='invoice'?Number(row.total_amount):Number((await c.query('select coalesce(sum(quantity*unit_price),0) total from quote_lines where organization_id=$1 and quote_id=$2',[s.organizationId,row.id])).rows[0].total);if(amount<=0)throw new ApiError(409,'document_empty','Ein Dokument ohne positiven Betrag kann nicht ausgestellt werden.');if(kind==='invoice'){const company=(await c.query('select * from organizations where id=$1',[s.organizationId])).rows[0];const debtor=(await c.query('select name,address as street,zip as postal_code,city,country from customers where organization_id=$1 and id=$2',[s.organizationId,row.customer_id])).rows[0];try{createQrBillData(company,{number,reference:row.qr_reference,total:amount,currency:row.currency,debtor});}catch(error){throw new ApiError(409,'payment_data_invalid',error instanceof Error?error.message:'Bitte Zahlungsdaten prüfen.');}}next='sent';}
  else if(kind==='offer'&&['accept','decline'].includes(action)&&row.status==='sent'){
@@ -29,7 +29,7 @@ export async function changeDocumentStatus(c:PoolClient,s:SessionUser,number:str
  if(kind==='offer'&&action==='issue'&&row.revises_quote_id&&row.offer_version===1){
   const prior=(await c.query('select id,quote_no,status from quotes where organization_id=$1 and id=$2 and archived_at is null for update',[s.organizationId,row.revises_quote_id])).rows[0];
   if(!prior||!['sent','declined','expired'].includes(prior.status))throw new ApiError(409,'revision_source_changed','Die vorherige Angebotsversion wurde geändert. Bitte den Entwurf prüfen.');
-  if((await c.query("select id from document_deliveries where organization_id=$1 and document_id=$2 and status='sending'",[s.organizationId,prior.id])).rowCount)throw new ApiError(409,'delivery_pending','Der Versand wird noch geprüft.');
+  if((await c.query("select id from document_deliveries where organization_id=$1 and document_id=$2 and status in ('sending','uncertain','failed')",[s.organizationId,prior.id])).rowCount)throw new ApiError(409,'delivery_pending','Der Versand wird noch geprüft.');
   await c.query("update quotes set status='revised',updated_at=now() where organization_id=$1 and id=$2",[s.organizationId,prior.id]);
   await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'offer.superseded',entityType:'quote',entityId:prior.id,metadata:{revisionId:row.id,revisionNumber:number}});
  }

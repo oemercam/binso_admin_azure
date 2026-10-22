@@ -2,10 +2,10 @@
   "scope": "Static AST/source inventory, not proof that every runtime branch is tested. Calls include exact source arguments and locations; dynamic dispatch requires the domain matrix and runtime tests.",
   "base": "7b90a5c7353cf2061987fcd0f4550210bbc00f92",
   "counts": {
-    "apis": 121,
-    "consumers": 45,
-    "migrations": 77,
-    "tables": 110
+    "apis": 123,
+    "consumers": 46,
+    "migrations": 79,
+    "tables": 111
   },
   "apis": [
     {
@@ -1861,6 +1861,62 @@
       ]
     },
     {
+      "file": "app/api/documents/[number]/followups/route.ts",
+      "path": "/api/documents/[number]/followups",
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "dependencies": [
+        "lib/server/http.ts",
+        "lib/server/session.ts",
+        "lib/server/maintenance.ts",
+        "lib/server/env.ts",
+        "lib/server/db.ts",
+        "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
+        "lib/server/validation.ts",
+        "lib/server/offer-followups.ts",
+        "lib/server/rbac.ts",
+        "lib/permissions.ts",
+        "lib/server/audit.ts",
+        "lib/financial-status.ts",
+        "lib/money.ts",
+        "lib/server/plan-access.ts",
+        "lib/server/rate-limit.ts"
+      ],
+      "evidence": [
+        {
+          "callee": "requireSession",
+          "line": 10,
+          "arguments": []
+        },
+        {
+          "callee": "withTenant",
+          "line": 11,
+          "arguments": [
+            "s.organizationId",
+            "s.userId",
+            "c=>offerFollowupHistory(c,s,number)"
+          ]
+        },
+        {
+          "callee": "requireSession",
+          "line": 14,
+          "arguments": []
+        },
+        {
+          "callee": "withTenant",
+          "line": 17,
+          "arguments": [
+            "s.organizationId",
+            "s.userId",
+            "c=>configureOfferFollowup(c,s,number,{action,dueDate,optIn:b.optIn===true})"
+          ]
+        }
+      ]
+    },
+    {
       "file": "app/api/documents/[number]/pdf/route.ts",
       "path": "/api/documents/[number]/pdf",
       "methods": [
@@ -2153,7 +2209,7 @@
           "arguments": [
             "s.organizationId",
             "s.userId",
-            "async c=>{\n  const {row,kind}=await lockDocument(c,s,number);\n  const prior=(await c.query('select * from document_deliveries where organization_id=$1 and request_key=$2',[s.organizationId,key])).rows[0];\n  if(prior){if(prior.recipient!==recipient||prior.document_id!==row.id||prior.purpose!==purpose||prior.subject!==subject||prior.message!==message)throw new ApiError(409,'key_conflict','Die Versandkennung wurde bereits verwendet.');if(prior.status==='sent')return {sent:true};throw new ApiError(409,'delivery_unconfirmed','Dieser Versand ist noch nicht bestätigt. Prüfe den Versandstatus, bevor du erneut sendest.');}\n  if(row.status==='draft'){\n   if(kind!=='offer'||purpose!=='document'||b.issueConfirmed!==true)throw new ApiError(409,'draft_not_issued','Bitte das Dokument zuerst prüfen und ausstellen. Entwürfe werden nicht versendet.');\n   await changeDocumentStatus(c,s,number,'issue','Explicitly confirmed for email dispatch');row.status='sent';\n  }\n  if(['cancelled','declined','expired','revised'].includes(row.status))throw new ApiError(409,'document_locked','Dieses Dokument kann nicht versendet werden.');\n  if((await c.query(\"select id from document_deliveries where organization_id=$1 and document_id=$2 and status='sending'\",[s.organizationId,row.id])).rowCount)throw new ApiError(409,'delivery_pending','Ein Versand dieses Dokuments ist noch nicht bestätigt.');\n  const document=(await listApiBusiness(c,s,'documents','id=eq.'+row.id+'&kind=eq.'+kind))[0];\n  let reminder:{stage:number;amount:number;deadline:string}|undefined;\n  if(purpose==='reminder'){\n   const history=(await c.query(\"select reminder_stage stage,status,payment_deadline::text deadline,(completed_at at time zone 'Europe/Zurich')::date::text completed_at from document_deliveries where organization_id=$1 and document_id=$2 and purpose='reminder'\",[s.organizationId,row.id])).rows;\n   const plan=planPaymentReminder(document,history);\n   if('error' in plan)throw new ApiError(409,plan.error,plan.error==='reminder_not_due'?'Nur überfällige offene Rechnungen können gemahnt werden.':plan.error==='reminder_too_soon'?'Die letzte Zahlungsfrist ist noch nicht abgelaufen.':plan.error==='reminder_history_invalid'?'Die Mahnhistorie muss vor dem Versand geprüft werden.':'Die vorgesehenen Mahnstufen sind abgeschlossen.');\n   reminder=plan;\n  }\n  const company=(await c.query('select * from organizations where id=$1',[s.organizationId])).rows[0];\n  const version=kind==='offer'?await sealOfferVersion(c,s,row) as OfferVersion:null;\n  const publicLink=version?await createOfferLink(c,s,version,recipient):null;\n  const issued=kind==='invoice'&&!reminder?(await c.query('select pdf from invoice_versions where organization_id=$1 and invoice_id=$2',[s.organizationId,row.id])).rows[0]:null;\n  const pdf=version?Buffer.from(version.pdf):issued?Buffer.from(issued.pdf):await documentPdf(document,company,await documentLogo(c,s.organizationId,document,company));const id=randomUUID();\n  await c.query(\"insert into document_deliveries(id,organization_id,kind,document_id,recipient,status,request_key,created_by_user_id,purpose,reminder_stage,balance_amount,payment_deadline) values($1,$2,$3,$4,$5,'sending',$6,$7,$8,$9,$10,$11)\",[id,s.organizationId,kind,row.id,recipient,key,s.userId,purpose,reminder?.stage??null,reminder?.amount??null,reminder?.deadline??null]);\n  await c.query('update document_deliveries set subject=$3,message=$4,offer_version_id=$5,public_link_id=$6 where organization_id=$1 and id=$2',[s.organizationId,id,subject,message,version?.id??null,publicLink?.link.id??null]);\n  const verifiedReplyTo=(await c.query(\"select u.email from app_users u join organization_memberships m on m.user_id=u.id where m.organization_id=$1 and m.status='active' and u.status='active' and u.email_verified_at is not null and lower(u.email)=lower($2) limit 1\",[s.organizationId,company.mail_reply_to||s.email])).rows[0]?.email;\n  return {sent:false,id,kind,document,pdf,company,reminder,publicLink,verifiedReplyTo};\n }"
+            "async c=>{\n  const {row,kind}=await lockDocument(c,s,number);\n  const prior=(await c.query('select * from document_deliveries where organization_id=$1 and request_key=$2',[s.organizationId,key])).rows[0];\n  if(prior){if(prior.recipient!==recipient||prior.document_id!==row.id||prior.purpose!==purpose||prior.subject!==subject||prior.message!==message)throw new ApiError(409,'key_conflict','Die Versandkennung wurde bereits verwendet.');if(prior.status==='sent')return {sent:true};throw new ApiError(409,'delivery_unconfirmed','Dieser Versand ist noch nicht bestätigt. Prüfe den Versandstatus, bevor du erneut sendest.');}\n  if(row.status==='draft'){\n   if(kind!=='offer'||purpose!=='document'||b.issueConfirmed!==true)throw new ApiError(409,'draft_not_issued','Bitte das Dokument zuerst prüfen und ausstellen. Entwürfe werden nicht versendet.');\n   await changeDocumentStatus(c,s,number,'issue','Explicitly confirmed for email dispatch');row.status='sent';\n  }\n  if(['cancelled','declined','expired','revised'].includes(row.status))throw new ApiError(409,'document_locked','Dieses Dokument kann nicht versendet werden.');\n  if((await c.query(\"select id from document_deliveries where organization_id=$1 and document_id=$2 and status in ('sending','uncertain','failed')\",[s.organizationId,row.id])).rowCount)throw new ApiError(409,'delivery_pending','Ein Versand dieses Dokuments ist noch nicht bestätigt.');\n  const document=(await listApiBusiness(c,s,'documents','id=eq.'+row.id+'&kind=eq.'+kind))[0];\n  let reminder:{stage:number;amount:number;deadline:string}|undefined;\n  if(purpose==='reminder'){\n   const history=(await c.query(\"select reminder_stage stage,status,payment_deadline::text deadline,(completed_at at time zone 'Europe/Zurich')::date::text completed_at from document_deliveries where organization_id=$1 and document_id=$2 and purpose='reminder'\",[s.organizationId,row.id])).rows;\n   const plan=planPaymentReminder(document,history);\n   if('error' in plan)throw new ApiError(409,plan.error,plan.error==='reminder_not_due'?'Nur überfällige offene Rechnungen können gemahnt werden.':plan.error==='reminder_too_soon'?'Die letzte Zahlungsfrist ist noch nicht abgelaufen.':plan.error==='reminder_history_invalid'?'Die Mahnhistorie muss vor dem Versand geprüft werden.':'Die vorgesehenen Mahnstufen sind abgeschlossen.');\n   reminder=plan;\n  }\n  const company=(await c.query('select * from organizations where id=$1',[s.organizationId])).rows[0];\n  const version=kind==='offer'?await sealOfferVersion(c,s,row) as OfferVersion:null;\n  const publicLink=version?await createOfferLink(c,s,version,recipient):null;\n  const issued=kind==='invoice'&&!reminder?(await c.query('select pdf from invoice_versions where organization_id=$1 and invoice_id=$2',[s.organizationId,row.id])).rows[0]:null;\n  const pdf=version?Buffer.from(version.pdf):issued?Buffer.from(issued.pdf):await documentPdf(document,company,await documentLogo(c,s.organizationId,document,company));const id=randomUUID();\n  await c.query(\"insert into document_deliveries(id,organization_id,kind,document_id,recipient,status,request_key,created_by_user_id,purpose,reminder_stage,balance_amount,payment_deadline) values($1,$2,$3,$4,$5,'sending',$6,$7,$8,$9,$10,$11)\",[id,s.organizationId,kind,row.id,recipient,key,s.userId,purpose,reminder?.stage??null,reminder?.amount??null,reminder?.deadline??null]);\n  await c.query('update document_deliveries set subject=$3,message=$4,offer_version_id=$5,public_link_id=$6 where organization_id=$1 and id=$2',[s.organizationId,id,subject,message,version?.id??null,publicLink?.link.id??null]);\n  const verifiedReplyTo=(await c.query(\"select u.email from app_users u join organization_memberships m on m.user_id=u.id where m.organization_id=$1 and m.status='active' and u.status='active' and u.email_verified_at is not null and lower(u.email)=lower($2) limit 1\",[s.organizationId,company.mail_reply_to||s.email])).rows[0]?.email;\n  return {sent:false,id,kind,document,pdf,company,reminder,publicLink,verifiedReplyTo};\n }"
           ]
         },
         {
@@ -2168,7 +2224,7 @@
           "callee": "c.query",
           "line": 37,
           "arguments": [
-            "\"select id from document_deliveries where organization_id=$1 and document_id=$2 and status='sending'\"",
+            "\"select id from document_deliveries where organization_id=$1 and document_id=$2 and status in ('sending','uncertain','failed')\"",
             "[s.organizationId,row.id]"
           ]
         },
@@ -2222,7 +2278,7 @@
         },
         {
           "callee": "withTenant",
-          "line": 62,
+          "line": 63,
           "arguments": [
             "s.organizationId",
             "s.userId",
@@ -2231,24 +2287,24 @@
         },
         {
           "callee": "withTenant",
-          "line": 72,
+          "line": 75,
           "arguments": [
             "s.organizationId",
             "s.userId",
-            "c=>c.query(\"update document_deliveries set status='failed',completed_at=now() where organization_id=$1 and id=$2\",[s.organizationId,delivery.id])"
+            "async c=>{\n   await c.query(\"update document_deliveries set status=$3,completed_at=now() where organization_id=$1 and id=$2\",[s.organizationId,delivery.id,transportStarted?'uncertain':'not_attempted']);\n   await audit(c,{organizationId:s.organizationId,userId:s.userId,action:transportStarted?'document.delivery.unconfirmed':'document.delivery.not_attempted',entityType:delivery.kind==='invoice'?'invoices':'quotes',entityId:String(delivery.document!.id),metadata:{deliveryId:delivery.id,purpose}});\n  }"
           ]
         },
         {
           "callee": "c.query",
-          "line": 72,
+          "line": 76,
           "arguments": [
-            "\"update document_deliveries set status='failed',completed_at=now() where organization_id=$1 and id=$2\"",
-            "[s.organizationId,delivery.id]"
+            "\"update document_deliveries set status=$3,completed_at=now() where organization_id=$1 and id=$2\"",
+            "[s.organizationId,delivery.id,transportStarted?'uncertain':'not_attempted']"
           ]
         },
         {
           "callee": "withTenant",
-          "line": 76,
+          "line": 82,
           "arguments": [
             "s.organizationId",
             "s.userId",
@@ -2257,7 +2313,7 @@
         },
         {
           "callee": "c.query",
-          "line": 77,
+          "line": 83,
           "arguments": [
             "\"update document_deliveries set status='sent',completed_at=now() where organization_id=$1 and id=$2\"",
             "[s.organizationId,delivery.id]"
@@ -2265,7 +2321,7 @@
         },
         {
           "callee": "c.query",
-          "line": 79,
+          "line": 85,
           "arguments": [
             "`update ${table} set status=case when status='draft' then 'sent' else status end,updated_at=now() where organization_id=$1 and id=$2`",
             "[s.organizationId,delivery.document!.id]"
@@ -3578,6 +3634,46 @@
             "s.organizationId",
             "s.userId",
             "c=>markNotificationsRead(c,s,id)"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "app/api/notifications/followups/route.ts",
+      "path": "/api/notifications/followups",
+      "methods": [
+        "POST"
+      ],
+      "dependencies": [
+        "lib/server/http.ts",
+        "lib/server/session.ts",
+        "lib/server/maintenance.ts",
+        "lib/server/env.ts",
+        "lib/server/db.ts",
+        "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
+        "lib/server/offer-followups.ts",
+        "lib/server/rbac.ts",
+        "lib/permissions.ts",
+        "lib/server/audit.ts",
+        "lib/financial-status.ts",
+        "lib/money.ts",
+        "lib/server/plan-access.ts",
+        "lib/server/rate-limit.ts"
+      ],
+      "evidence": [
+        {
+          "callee": "requireSession",
+          "line": 9,
+          "arguments": []
+        },
+        {
+          "callee": "withTenant",
+          "line": 10,
+          "arguments": [
+            "s.organizationId",
+            "s.userId",
+            "c=>checkOfferFollowups(c,s)"
           ]
         }
       ]
@@ -7308,8 +7404,16 @@
           ]
         },
         {
+          "callee": "apiPost",
+          "line": 262,
+          "arguments": [
+            "'/api/notifications/followups'",
+            "{}"
+          ]
+        },
+        {
           "callee": "apiPatch",
-          "line": 269,
+          "line": 273,
           "arguments": [
             "\"/api/notifications/\"+encodeURIComponent(id)",
             "{}"
@@ -7506,98 +7610,98 @@
       "calls": [
         {
           "callee": "useApiQuery",
-          "line": 78,
+          "line": 80,
           "arguments": [
             "enabled?(\"/api/customers?limit=50\"):null"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 79,
+          "line": 81,
           "arguments": [
             "enabled&&selectedId&&true?\"/api/customers/\"+encodeURIComponent(selectedId):null"
           ]
         },
         {
           "callee": "apiGet<{item?:Record<string,unknown>;items?:Array<Record<string,unknown>>}>(url)\n      .then(payload=>{if(!active)return;const item=payload.item??payload.items?.[0];if(!item)throw new Error(\"Dokument wurde nicht gefunden.\");setDraft(remoteDraftFromItem(item,kind));setLoading(false);setError(null);})\n      .catch",
-          "line": 214,
+          "line": 216,
           "arguments": [
             "error=>{if(active){setLoading(false);setError(error instanceof Error?error.message:\"Dokument konnte nicht geladen werden.\");}}"
           ]
         },
         {
           "callee": "apiGet<{item?:Record<string,unknown>;items?:Array<Record<string,unknown>>}>(url)\n      .then",
-          "line": 214,
+          "line": 216,
           "arguments": [
             "payload=>{if(!active)return;const item=payload.item??payload.items?.[0];if(!item)throw new Error(\"Dokument wurde nicht gefunden.\");setDraft(remoteDraftFromItem(item,kind));setLoading(false);setError(null);}"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 214,
+          "line": 216,
           "arguments": [
             "url"
           ]
         },
         {
           "callee": "apiGet<{demo?:boolean;tenant?:{role?:string;readOnly?:boolean}}>(\"/api/auth/session\").then(s=>{setDocumentRole(s.tenant?.role??\"\");setDocumentReadOnly(s.tenant?.readOnly===true);setDemoDocument(s.demo===true)}).catch",
-          "line": 257,
+          "line": 260,
           "arguments": [
             "()=>{}"
           ]
         },
         {
           "callee": "apiGet<{demo?:boolean;tenant?:{role?:string;readOnly?:boolean}}>(\"/api/auth/session\").then",
-          "line": 257,
+          "line": 260,
           "arguments": [
             "s=>{setDocumentRole(s.tenant?.role??\"\");setDocumentReadOnly(s.tenant?.readOnly===true);setDemoDocument(s.demo===true)}"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 257,
+          "line": 260,
           "arguments": [
             "\"/api/auth/session\""
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 276,
+          "line": 279,
           "arguments": [
             "selectedProductId?\"/api/products/\"+encodeURIComponent(selectedProductId):null"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 285,
+          "line": 288,
           "arguments": [
             "!existing&&sourceOffer?(\"/api/documents/\"+encodeURIComponent(sourceOffer)):null"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 287,
+          "line": 290,
           "arguments": [
             "sourceItem?.customer_id&&sourceOffer?\"/api/customers/\"+encodeURIComponent(String(sourceItem.customer_id)):null"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 304,
+          "line": 307,
           "arguments": [
             "kind==='Rechnung'&&sourceTimeEntriesParam&&true?'/api/time-entries/billing?ids='+encodeURIComponent(sourceTimeEntriesParam):null"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 305,
+          "line": 308,
           "arguments": [
             "kind==='Rechnung'&&sourceExpenseParam&&true?'/api/expenses/billing?ids='+encodeURIComponent(sourceExpenseParam):null"
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 351,
+          "line": 354,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)",
             "payload"
@@ -7605,7 +7709,7 @@
         },
         {
           "callee": "apiPost",
-          "line": 351,
+          "line": 354,
           "arguments": [
             "\"/api/documents\"",
             "payload",
@@ -7614,7 +7718,7 @@
         },
         {
           "callee": "apiPost",
-          "line": 367,
+          "line": 370,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)+\"/status\"",
             "{action}"
@@ -7622,14 +7726,14 @@
         },
         {
           "callee": "apiGet",
-          "line": 367,
+          "line": 370,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)"
           ]
         },
         {
           "callee": "apiPost",
-          "line": 369,
+          "line": 372,
           "arguments": [
             "'/api/documents/'+encodeURIComponent(documentKey??draft.number)+'/revision'",
             "{}",
@@ -7638,7 +7742,7 @@
         },
         {
           "callee": "apiPost",
-          "line": 370,
+          "line": 373,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)+(adjustmentIsRefund?\"/refunds\":\"/credits\")",
             "{amount:Number(creditAmount),reason:creditReason,...(adjustmentIsRefund?{date:refundDate}:{})}",
@@ -7647,14 +7751,14 @@
         },
         {
           "callee": "apiGet",
-          "line": 370,
+          "line": 373,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)"
           ]
         },
         {
           "callee": "apiPost",
-          "line": 371,
+          "line": 374,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)+\"/send\"",
             "{recipient,requestKey:sendKey,purpose:sendPurpose,...(sendPurpose===\"document\"?{subject:mailSubject,message:mailMessage,issueConfirmed:kind===\"Angebot\"&&draft.status===\"draft\"}:{})}"
@@ -7662,14 +7766,14 @@
         },
         {
           "callee": "apiGet",
-          "line": 371,
+          "line": 374,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 581,
+          "line": 585,
           "arguments": [
             "'/api/settings/company'"
           ]
@@ -7832,6 +7936,33 @@
       ],
       "pages": [
         "app/zeit/page.tsx"
+      ]
+    },
+    {
+      "file": "components/offer-followup.tsx",
+      "calls": [
+        {
+          "callee": "useApiQuery",
+          "line": 14,
+          "arguments": [
+            "path"
+          ]
+        },
+        {
+          "callee": "apiPost",
+          "line": 27,
+          "arguments": [
+            "path",
+            "action==='schedule'?{action,dueDate:date,optIn}:{action}",
+            "{validate:value=>{if(!value||typeof value!=='object'||!('ok' in value)||value.ok!==true)throw new Error('Die Speicherung konnte nicht bestätigt werden. Bitte den gespeicherten Stand prüfen.');}}"
+          ]
+        }
+      ],
+      "pages": [
+        "app/angebote/[id]/page.tsx",
+        "app/angebote/neu/page.tsx",
+        "app/rechnungen/[id]/page.tsx",
+        "app/rechnungen/neu/page.tsx"
       ]
     },
     {
@@ -8320,8 +8451,23 @@
           ]
         },
         {
+          "callee": "apiPost('/api/notifications/followups',{}).catch",
+          "line": 47,
+          "arguments": [
+            "error=>{if(active)setMutationError(error instanceof Error?error.message:'Aktion fehlgeschlagen.');}"
+          ]
+        },
+        {
+          "callee": "apiPost",
+          "line": 47,
+          "arguments": [
+            "'/api/notifications/followups'",
+            "{}"
+          ]
+        },
+        {
           "callee": "apiPatch",
-          "line": 48,
+          "line": 53,
           "arguments": [
             "\"/api/notifications/\"+encodeURIComponent(id)",
             "{}"
@@ -8329,28 +8475,28 @@
         },
         {
           "callee": "apiPatch(\"/api/notifications\",{all:true}).then(()=>setMutationError(null)).catch(err=>setMutationError(err instanceof Error?err.message:\"Aktualisierung fehlgeschlagen.\")).finally",
-          "line": 62,
+          "line": 67,
           "arguments": [
             "()=>setBusy(false)"
           ]
         },
         {
           "callee": "apiPatch(\"/api/notifications\",{all:true}).then(()=>setMutationError(null)).catch",
-          "line": 62,
+          "line": 67,
           "arguments": [
             "err=>setMutationError(err instanceof Error?err.message:\"Aktualisierung fehlgeschlagen.\")"
           ]
         },
         {
           "callee": "apiPatch(\"/api/notifications\",{all:true}).then",
-          "line": 62,
+          "line": 67,
           "arguments": [
             "()=>setMutationError(null)"
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 62,
+          "line": 67,
           "arguments": [
             "\"/api/notifications\"",
             "{all:true}"
@@ -11278,6 +11424,46 @@
       "tables": [],
       "relations": [],
       "rls": []
+    },
+    {
+      "file": "database/migrations/0077_personal_offer_followups.sql",
+      "tables": [
+        "offer_followups"
+      ],
+      "relations": [
+        {
+          "table": "organizations",
+          "columns": "id"
+        },
+        {
+          "table": "app_users",
+          "columns": "id"
+        },
+        {
+          "table": "in_app_notifications",
+          "columns": "id"
+        },
+        {
+          "table": "offer_versions",
+          "columns": "organization_id,id"
+        }
+      ],
+      "rls": [
+        {
+          "table": "offer_followups",
+          "mode": "enable"
+        },
+        {
+          "table": "offer_followups",
+          "mode": "force"
+        }
+      ]
+    },
+    {
+      "file": "database/migrations/0078_document_delivery_outcomes.sql",
+      "tables": [],
+      "relations": [],
+      "rls": []
     }
   ],
   "repositories": [
@@ -11410,7 +11596,7 @@
           "callee": "c.query",
           "line": 222,
           "arguments": [
-            "\"select id from document_deliveries where organization_id=$1 and document_id=$2 and status='sending'\"",
+            "\"select id from document_deliveries where organization_id=$1 and document_id=$2 and status in ('sending','uncertain','failed')\"",
             "[s.organizationId,id]"
           ]
         },

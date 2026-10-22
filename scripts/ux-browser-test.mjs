@@ -191,6 +191,7 @@ let projectSourceMode=false,failProjectSource=false,projectSourceTitle='Syntheti
 let incompleteProductResponse=false;let failReportDownload=false,reportExports=0;
 let projectPosts=0,failProjectCreate=false,loseProjectResponse=false;const projectReplays=new Map();
 let revisionPosts=0,failRevision=false,revisedOfferFixture;const revisionKeys=[];
+let offerFollowups=[],followupPosts=0,failFollowup=false;
 let customerPosts=0,failCustomerCreate=false,loseCustomerResponse=false;const customerReplays=new Map();
 let teamMemberRole='member';let supportMessages=[];
 const operatorAccount={tenant_id:'tenant-one',tenant:{name:'Prüffirma AG'},plan:'pro',subscription_status:'active',account_status:'active',user_limit:10,updated_at:'2026-10-09'};
@@ -199,7 +200,7 @@ let releaseOldSearch,oldSearchArrived;
 let context;
 try{
  for(const theme of (process.env.BINSO_UX_THEMES?.split(",")??["light","dark"])){
-  projectFixture={...projectSeed};teamMemberRole='member';supportMessages=[];let preferenceTheme=theme;
+  projectFixture={...projectSeed};teamMemberRole='member';supportMessages=[];offerFollowups=[];let preferenceTheme=theme;
   operatorAccount.plan='pro';
   browser=await browserType.launch(launchOptions);
   context=await browser.newContext({...(process.env.BINSO_UX_DEVICE?engines.devices[process.env.BINSO_UX_DEVICE]:{}),viewport:{width:1440,height:1000},colorScheme:"dark",serviceWorkers:"block"});
@@ -207,6 +208,12 @@ try{
   await context.addInitScript(mode=>{localStorage.setItem('binso.theme.mode',mode);localStorage.setItem('binso.privacy.preferences.v1',JSON.stringify({essential:true,performance:false,updatedAt:'2026-10-08'}))},theme);
   await context.route('**/api/**',async route=>{
    const req=route.request(),url=new URL(req.url()),p=url.pathname;
+   if(/^\/api\/documents\/[^/]+\/followups$/.test(p)&&req.method()==='POST'){
+    followupPosts++;const body=req.postDataJSON();if(failFollowup)return route.fulfill({status:503,json:{message:'Synthetic reminder unavailable'}});
+    if(body.action==='cancel')offerFollowups=offerFollowups.map(item=>({...item,state:'cancelled'}));
+    else{assert.equal(body.optIn,true);offerFollowups=[{id:'personal-followup',due_date:body.dueDate,version:1,state:'scheduled'}];}
+    return route.fulfill({json:{ok:true}});
+   }
    if(p==='/api/health'&&req.method()==='GET')return route.fulfill({json:{status:'ok',sha:'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'}});
    if(previewState==='error'&&req.method()==='GET'&&p==='/api/customers')return route.fulfill({status:503,json:{message:'Kundendaten vorübergehend nicht verfügbar.'}});
    if(req.method()!=='GET'){
@@ -303,6 +310,8 @@ try{
    else if(p==='/api/finance')data={cash:cashFixture(dataPaymentMode?invoice.paid_amount:200),payments:[{payment_date:'2026-09-15',amount:120},{payment_date:'2026-10-05',amount:dataPaymentMode?invoice.paid_amount:200}],expenses:[{expense_date:'2026-09-15',amount:20},{expense_date:'2026-10-05',amount:50}],payroll:[],operatingCosts:[]};
    else if(p==='/api/customers/duplicates')data={items:url.searchParams.get('name')===customer.name?[customer]:[]};
    else if(p==='/api/documents/AN-TEST-1'&&revisedOfferFixture)data={item:revisedOfferFixture};
+   else if(/^\/api\/documents\/[^/]+\/followups$/.test(p))data={eligible:(revisedOfferFixture??offer).status==='sent',currentVersion:(revisedOfferFixture??offer).offer_version??1,items:offerFollowups};
+   else if(p==='/api/notifications/followups')data={processed:0};
    else if(/^\/api\/documents\/[^/]+\/versions$/.test(p)){if(url.searchParams.has('version'))return route.fulfill({contentType:'application/pdf',body:fixturePdf});data={versions:[{version:1,number:offer.number,created_at:'2026-10-21T10:00:00Z'}],events:[],deliveries:[]};}
    else if(p==='/api/customers')data=customerListFixture(url.searchParams);
    else if(['/api/products','/api/employees','/api/expenses','/api/payments'].includes(p))data=recordListFixture(p.split('/')[2],url.searchParams);
@@ -889,6 +898,18 @@ try{
    assert.equal(new URL(page.url()).pathname,'/angebote/AN-TEST-1');failRevision=false;
    await revisionActions.getByRole('button',{name:'Angebot überarbeiten',exact:true}).click();const revisionEditor=page.getByRole('dialog',{name:'Angebot bearbeiten',exact:true});await revisionEditor.waitFor();await revisionActions.waitFor({state:'hidden'});assert.equal(new URL(page.url()).pathname,'/angebote/AN-TEST-1','Revision retains the business number and route');assert.equal(await revisionEditor.getByLabel('Angebotsnummer',{exact:true}).count(),0,'Number is not an editable field');await revisionEditor.getByRole('button',{name:'Abbrechen',exact:true}).click();await revisionEditor.waitFor({state:'hidden'});await page.locator('.document-reference-row').getByText('Version 2',{exact:true}).waitFor();const versions=page.locator('.document-detail-view details').filter({has:page.locator('summary',{hasText:'Versionen und Verlauf'})});await versions.locator('summary').click();await versions.getByRole('button',{name:/Version 1/}).waitFor();
    assert.equal(revisionPosts,2);assert.equal(revisionKeys[0],revisionKeys[1]);assert.equal(revisedOfferFixture.status,'draft');assert.equal(revisedOfferFixture.offer_version,2,'Revision advances the current draft while immutable version 1 remains available');revisedOfferFixture=undefined;
+   await navigate(base+'/angebote/AN-TEST-1');await page.waitForLoadState('networkidle');
+   const followupSection=page.locator('.document-detail-view details').filter({has:page.locator('summary',{hasText:'Erinnerung'})});
+   await page.getByRole('button',{name:'Weitere Aktionen',exact:true}).filter({visible:true}).click();await page.getByRole('dialog',{name:'Weitere Aktionen',exact:true}).getByRole('button',{name:'Erinnerung',exact:true}).click();
+   const followupDialog=page.getByRole('dialog',{name:'Erinnerung planen',exact:true});await followupDialog.waitFor();
+   assert.equal(await followupDialog.getByRole('button',{name:'Speichern',exact:true}).isDisabled(),true,'Reminder is never opted in by default');
+   await followupDialog.getByLabel('Persönliche Erinnerung aktivieren',{exact:true}).check();
+   failFollowup=true;const beforeFollowup=followupPosts;await followupDialog.getByRole('button',{name:'Speichern',exact:true}).click();await followupDialog.getByText('Synthetic reminder unavailable',{exact:true}).waitFor();
+   assert.equal(await followupDialog.getByLabel('Persönliche Erinnerung aktivieren',{exact:true}).isChecked(),true,'Failure preserves explicit draft opt-in');
+   failFollowup=false;await followupDialog.getByRole('button',{name:'Speichern',exact:true}).click();await followupDialog.waitFor({state:'hidden'});
+   await followupSection.locator('summary').click();await followupSection.getByText('Geplant',{exact:true}).waitFor();assert.equal(followupPosts,beforeFollowup+2);assert.equal(offerFollowups.length,1);
+   await page.getByRole('button',{name:'Weitere Aktionen',exact:true}).filter({visible:true}).click();await page.getByRole('dialog',{name:'Weitere Aktionen',exact:true}).getByRole('button',{name:'Erinnerung',exact:true}).click();await followupDialog.waitFor();await followupDialog.getByRole('button',{name:'Erinnerung entfernen',exact:true}).click();await followupDialog.waitFor({state:'hidden'});
+   assert.equal(offerFollowups[0].state,'cancelled');offerFollowups=[];
    const ledgerBefore={paid_amount:invoice.paid_amount,credit_amount:invoice.credit_amount,refund_amount:invoice.refund_amount,refunds:invoice.refunds,reminders:invoice.reminders,due_date:invoice.due_date};
    invoice.paid_amount=invoice.total;invoice.credit_amount=35.13;invoice.refund_amount=0;adjustmentPosts=0;adjustmentKeys.length=0;
    await navigate(base+'/rechnungen/RE-TEST-1');await page.waitForLoadState('networkidle');

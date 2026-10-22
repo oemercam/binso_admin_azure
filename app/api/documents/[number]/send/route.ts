@@ -11,7 +11,7 @@ import {lockDocument,changeDocumentStatus} from "@/lib/server/document-process";
 import {listApiBusiness} from "@/lib/server/repositories/business-api";
 import {documentLogo} from "@/lib/server/document-logo";
 import {documentPdf} from "@/lib/server/document-pdf";
-import {sendMail,mailLayout} from "@/lib/server/email";
+import {sendMail,mailLayout,mailConfigured} from "@/lib/server/email";
 import {audit} from "@/lib/server/audit";
 import {sealOfferVersion} from '@/lib/server/offer-versions';
 import {createOfferLink,type OfferVersion} from '@/lib/server/public-offers';
@@ -34,7 +34,7 @@ export async function POST(request:NextRequest,{params}:{params:Promise<{number:
    await changeDocumentStatus(c,s,number,'issue','Explicitly confirmed for email dispatch');row.status='sent';
   }
   if(['cancelled','declined','expired','revised'].includes(row.status))throw new ApiError(409,'document_locked','Dieses Dokument kann nicht versendet werden.');
-  if((await c.query("select id from document_deliveries where organization_id=$1 and document_id=$2 and status='sending'",[s.organizationId,row.id])).rowCount)throw new ApiError(409,'delivery_pending','Ein Versand dieses Dokuments ist noch nicht bestätigt.');
+  if((await c.query("select id from document_deliveries where organization_id=$1 and document_id=$2 and status in ('sending','uncertain','failed')",[s.organizationId,row.id])).rowCount)throw new ApiError(409,'delivery_pending','Ein Versand dieses Dokuments ist noch nicht bestätigt.');
   const document=(await listApiBusiness(c,s,'documents','id=eq.'+row.id+'&kind=eq.'+kind))[0];
   let reminder:{stage:number;amount:number;deadline:string}|undefined;
   if(purpose==='reminder'){
@@ -58,6 +58,7 @@ export async function POST(request:NextRequest,{params}:{params:Promise<{number:
  const label=t(delivery.reminder?domainConfig.reminderStages[delivery.reminder.stage-1]:delivery.kind==='invoice'?'Rechnung':'Angebot');
  const detail=delivery.reminder?t('Offener Betrag')+': '+formatCurrency(delivery.reminder.amount,String(delivery.document!.currency))+'. '+t('Zahlungsfrist')+': '+formatDate(delivery.reminder.deadline)+'. '+t('Bereits verbuchte Zahlungen und Gutschriften sind berücksichtigt.'):t('Das ausgestellte Dokument wird als PDF versendet.');
 
+ let transportStarted=false;
  try{
   if(delivery.reminder)await withTenant(s.organizationId,s.userId,async c=>{
    const {row}=await lockDocument(c,s,number);
@@ -66,10 +67,15 @@ export async function POST(request:NextRequest,{params}:{params:Promise<{number:
   });
   const mailSubject=purpose==='document'&&subject?subject:label+' '+number;
   const mailBody=purpose==='document'&&message!==null?message:detail;
+  if(!mailConfigured())throw new ApiError(503,'mail_unconfigured','E-Mail-Versand ist nicht konfiguriert.');
+  transportStarted=true;
   const result=await sendMail({to:recipient,senderName:String(delivery.company!.mail_sender_name||delivery.company!.legal_name||delivery.company!.name).slice(0,160),replyTo:delivery.verifiedReplyTo,subject:mailSubject,text:`${mailSubject} · ${delivery.company!.legal_name||delivery.company!.name}.\n${mailBody}${delivery.publicLink?'\n'+t('Angebot ansehen und beantworten')+': '+delivery.publicLink.url:''}`,html:mailLayout(mailSubject,'<p>'+escape(mailBody).replace(/\n/g,'<br>')+'</p>',delivery.publicLink?{label:t('Angebot ansehen'),url:delivery.publicLink.url}:undefined,locale,{name:String(delivery.company!.legal_name||delivery.company!.name)}),attachments:[{name:number.replace(/[^\w.-]/g,'_')+'.pdf',contentType:'application/pdf',content:delivery.pdf!}]});
-  if(!result.delivered)throw new Error('E-Mail-Versand ist nicht konfiguriert.');
+  if(!result.delivered){transportStarted=false;throw new Error('E-Mail-Versand ist nicht konfiguriert.');}
  }catch(error){
-  await withTenant(s.organizationId,s.userId,c=>c.query("update document_deliveries set status='failed',completed_at=now() where organization_id=$1 and id=$2",[s.organizationId,delivery.id]));
+  await withTenant(s.organizationId,s.userId,async c=>{
+   await c.query("update document_deliveries set status=$3,completed_at=now() where organization_id=$1 and id=$2",[s.organizationId,delivery.id,transportStarted?'uncertain':'not_attempted']);
+   await audit(c,{organizationId:s.organizationId,userId:s.userId,action:transportStarted?'document.delivery.unconfirmed':'document.delivery.not_attempted',entityType:delivery.kind==='invoice'?'invoices':'quotes',entityId:String(delivery.document!.id),metadata:{deliveryId:delivery.id,purpose}});
+  });
   if(error instanceof ApiError)throw error;
   throw new ApiError(502,'delivery_unconfirmed','Der Versand konnte nicht bestätigt werden. Prüfe den Postausgang vor einem erneuten Versand.');
  }

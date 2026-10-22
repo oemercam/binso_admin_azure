@@ -41,6 +41,16 @@ Die vollständige Linux-CI muss den neuen Commit zusätzlich qualifizieren. Ält
 grüne Läufe und dieser lokale Befund schliessen keinen GitHub-Alert auf Main und
 erteilen weder technische Gesamt- noch Produktionsfreigabe.
 
+Der erste Folge-CI-Lauf39707525079 bestätigte die tatsächlichen Linux-Tests und
+CodeQL39707524892, scheiterte jedoch korrekt bei der Produktionspaketierung:
+Das vorhandene Packaging kopierte nur Manifest/Lockfile, nicht den darin genannten
+Patch. Auch eine reine Produktionsinstallation benötigt die Patchdatei für pnpm-
+Integritätsprüfung. `package-patches.mjs` ergänzt deshalb ausschliesslich deklarierte,
+unveränderte Patchbytes vor der weiterhin eingefrorenen Installation. Fehlende,
+leere, absolute, Traversal- und Symlinkpfade blockieren. Keine Ausnahme oder
+Lockfile-Umgehung wurde eingeführt. Positive/negative Regressionen laufen im
+bestehenden Runtime-Test; die vollständige Paketierung benötigt den Folge-CI-Lauf.
+
 Bei einem späteren Upstream-Update muss der eng versionsgebundene Patch bewusst
 geprüft oder durch eine nachweislich reparierte Originalversion ersetzt werden.
 Ein nicht mehr anwendbarer Patch muss die Installation blockieren.

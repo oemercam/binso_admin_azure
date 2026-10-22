@@ -1,5 +1,5 @@
 {
-  "commit": "a9b7e1fcdd0920fa9cb636ca535bdf9a96a2ebb6",
+  "commit": "336aaea58d3a73c0820f799471599da2d7869172",
   "method": "Existing TypeScript AST dependency inventory; conditional reachability is not runtime proof",
   "pages": [
     {
@@ -46,17 +46,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -237,17 +237,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -425,6 +425,11 @@
         "components/ui.tsx#TimeInput",
         "components/ui.tsx#CurrencyInput",
         "components/ui.tsx#FormError",
+        "components/offer-followup.tsx#OfferFollowup",
+        "components/offer-followup.tsx#History",
+        "components/offer-followup.tsx#explanation",
+        "components/offer-followup.tsx#stateLabel",
+        "components/offer-followup.tsx#FollowupEditor",
         "components/entity-files.tsx#EntityFiles",
         "components/entity-files.tsx#Attachment",
         "components/binso-ux.tsx#ListSearch",
@@ -487,27 +492,27 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 405,
+          "line": 408,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 405,
+          "line": 408,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "ActionSheet",
-          "line": 407,
+          "line": 410,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 424,
+          "line": 428,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 425,
+          "line": 429,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
@@ -536,6 +541,16 @@
           "component": "components/binso-ux.tsx#FormSheet"
         },
         {
+          "tag": "FormSheet",
+          "line": 17,
+          "component": "components/offer-followup.tsx#OfferFollowup"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 31,
+          "component": "components/offer-followup.tsx#FollowupEditor"
+        },
+        {
           "tag": "ListSearch",
           "line": 39,
           "component": "components/entity-files.tsx#EntityFiles"
@@ -552,22 +567,22 @@
         },
         {
           "tag": "FormSheet",
-          "line": 572,
+          "line": 576,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -745,6 +760,11 @@
         "components/ui.tsx#TimeInput",
         "components/ui.tsx#CurrencyInput",
         "components/ui.tsx#FormError",
+        "components/offer-followup.tsx#OfferFollowup",
+        "components/offer-followup.tsx#History",
+        "components/offer-followup.tsx#explanation",
+        "components/offer-followup.tsx#stateLabel",
+        "components/offer-followup.tsx#FollowupEditor",
         "components/entity-files.tsx#EntityFiles",
         "components/entity-files.tsx#Attachment",
         "components/binso-ux.tsx#ListSearch",
@@ -807,27 +827,27 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 405,
+          "line": 408,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 405,
+          "line": 408,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "ActionSheet",
-          "line": 407,
+          "line": 410,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 424,
+          "line": 428,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 425,
+          "line": 429,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
@@ -856,6 +876,16 @@
           "component": "components/binso-ux.tsx#FormSheet"
         },
         {
+          "tag": "FormSheet",
+          "line": 17,
+          "component": "components/offer-followup.tsx#OfferFollowup"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 31,
+          "component": "components/offer-followup.tsx#FollowupEditor"
+        },
+        {
           "tag": "ListSearch",
           "line": 39,
           "component": "components/entity-files.tsx#EntityFiles"
@@ -872,22 +902,22 @@
         },
         {
           "tag": "FormSheet",
-          "line": 572,
+          "line": 576,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -1095,17 +1125,17 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -1246,17 +1276,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -1472,17 +1502,17 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -1698,17 +1728,17 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -1866,17 +1896,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -2112,17 +2142,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -2375,17 +2405,17 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -2531,17 +2561,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -2650,17 +2680,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -2923,17 +2953,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -3057,17 +3087,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -3276,17 +3306,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -3494,17 +3524,17 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -3713,17 +3743,17 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -3938,17 +3968,17 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -4162,17 +4192,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -4391,17 +4421,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -4615,17 +4645,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -4832,17 +4862,17 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -5077,17 +5107,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -5300,17 +5330,17 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -5551,17 +5581,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -5783,17 +5813,17 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -5932,17 +5962,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -6158,17 +6188,17 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -6393,17 +6423,17 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -6549,17 +6579,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -6772,17 +6802,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -7059,17 +7089,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -7322,17 +7352,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -7581,17 +7611,17 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -7776,17 +7806,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -8015,17 +8045,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -8284,17 +8314,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -8544,17 +8574,17 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -8693,17 +8723,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -9022,17 +9052,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -9114,17 +9144,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -9443,17 +9473,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -9605,17 +9635,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -9745,17 +9775,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -9898,17 +9928,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -10067,17 +10097,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -10187,17 +10217,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -10307,17 +10337,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -10427,17 +10457,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -10572,17 +10602,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -10691,17 +10721,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -10810,17 +10840,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -10929,17 +10959,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -11077,17 +11107,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -11299,17 +11329,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -11531,17 +11561,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -11771,17 +11801,17 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -12010,17 +12040,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -12243,17 +12273,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -12472,17 +12502,17 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -12675,6 +12705,11 @@
         "components/ui.tsx#TimeInput",
         "components/ui.tsx#CurrencyInput",
         "components/ui.tsx#FormError",
+        "components/offer-followup.tsx#OfferFollowup",
+        "components/offer-followup.tsx#History",
+        "components/offer-followup.tsx#explanation",
+        "components/offer-followup.tsx#stateLabel",
+        "components/offer-followup.tsx#FollowupEditor",
         "components/entity-files.tsx#EntityFiles",
         "components/entity-files.tsx#Attachment",
         "components/binso-ux.tsx#ListSearch",
@@ -12737,27 +12772,27 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 405,
+          "line": 408,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 405,
+          "line": 408,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "ActionSheet",
-          "line": 407,
+          "line": 410,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 424,
+          "line": 428,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 425,
+          "line": 429,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
@@ -12786,6 +12821,16 @@
           "component": "components/binso-ux.tsx#FormSheet"
         },
         {
+          "tag": "FormSheet",
+          "line": 17,
+          "component": "components/offer-followup.tsx#OfferFollowup"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 31,
+          "component": "components/offer-followup.tsx#FollowupEditor"
+        },
+        {
           "tag": "ListSearch",
           "line": 39,
           "component": "components/entity-files.tsx#EntityFiles"
@@ -12802,22 +12847,22 @@
         },
         {
           "tag": "FormSheet",
-          "line": 572,
+          "line": 576,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -12995,6 +13040,11 @@
         "components/ui.tsx#TimeInput",
         "components/ui.tsx#CurrencyInput",
         "components/ui.tsx#FormError",
+        "components/offer-followup.tsx#OfferFollowup",
+        "components/offer-followup.tsx#History",
+        "components/offer-followup.tsx#explanation",
+        "components/offer-followup.tsx#stateLabel",
+        "components/offer-followup.tsx#FollowupEditor",
         "components/entity-files.tsx#EntityFiles",
         "components/entity-files.tsx#Attachment",
         "components/binso-ux.tsx#ListSearch",
@@ -13057,27 +13107,27 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 405,
+          "line": 408,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 405,
+          "line": 408,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "ActionSheet",
-          "line": 407,
+          "line": 410,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 424,
+          "line": 428,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 425,
+          "line": 429,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
@@ -13106,6 +13156,16 @@
           "component": "components/binso-ux.tsx#FormSheet"
         },
         {
+          "tag": "FormSheet",
+          "line": 17,
+          "component": "components/offer-followup.tsx#OfferFollowup"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 31,
+          "component": "components/offer-followup.tsx#FollowupEditor"
+        },
+        {
           "tag": "ListSearch",
           "line": 39,
           "component": "components/entity-files.tsx#EntityFiles"
@@ -13122,22 +13182,22 @@
         },
         {
           "tag": "FormSheet",
-          "line": 572,
+          "line": 576,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -13345,17 +13405,17 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -13524,17 +13584,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -13757,17 +13817,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -13995,17 +14055,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -14230,17 +14290,17 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -14451,17 +14511,17 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -14682,17 +14742,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -14909,17 +14969,17 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -15060,17 +15120,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -15204,17 +15264,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -15324,17 +15384,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -15540,17 +15600,17 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -15772,17 +15832,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -16009,17 +16069,17 @@
       "actions": [
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
@@ -16317,17 +16377,17 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 305,
+          "line": 309,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 307,
+          "line": 311,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {
           "tag": "ActionSheet",
-          "line": 366,
+          "line": 370,
           "component": "components/app-shell.tsx#AppShellFrame"
         },
         {

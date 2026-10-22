@@ -260,7 +260,7 @@
       "metricSources": [
         {
           "owner": "components/documents.tsx",
-          "line": 462,
+          "line": 466,
           "component": "MetricTile",
           "props": [
             "label={isInvoice&&![\"draft\",\"paid\",\"cancelled\"].includes(displayStatus)?\"Offener Betrag\":\"Total\"}",
@@ -282,7 +282,7 @@
         },
         {
           "owner": "components/documents.tsx",
-          "line": 462,
+          "line": 466,
           "component": "MetricTile",
           "props": [
             "label=\"Status\"",
@@ -303,7 +303,7 @@
         },
         {
           "owner": "components/documents.tsx",
-          "line": 489,
+          "line": 493,
           "component": "MetricTile",
           "props": [
             "label=\"Bereits bezahlt\"",
@@ -340,7 +340,7 @@
       "apiSources": [
         {
           "owner": "components/documents.tsx",
-          "line": 232,
+          "line": 234,
           "apis": [
             "/api/auth/session",
             "/api/products/",
@@ -402,7 +402,7 @@
         },
         {
           "owner": "components/documents.tsx",
-          "line": 77,
+          "line": 79,
           "apis": [
             "/api/customers?limit=50",
             "/api/customers/"
@@ -412,7 +412,7 @@
         },
         {
           "owner": "components/documents.tsx",
-          "line": 579,
+          "line": 583,
           "apis": [
             "/api/settings/company"
           ],
@@ -421,7 +421,7 @@
         },
         {
           "owner": "components/documents.tsx",
-          "line": 206,
+          "line": 208,
           "apis": [
             "/api/documents",
             "/api/documents/"
@@ -480,6 +480,15 @@
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
         },
         {
+          "owner": "components/offer-followup.tsx",
+          "line": 13,
+          "apis": [
+            "/api/documents/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
           "owner": "components/entity-files.tsx",
           "line": 18,
           "apis": [
@@ -493,7 +502,7 @@
         },
         {
           "owner": "components/documents.tsx",
-          "line": 504,
+          "line": 508,
           "apis": [
             "/api/customers"
           ],
@@ -518,6 +527,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -740,6 +750,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -938,7 +949,7 @@
       "metricSources": [
         {
           "owner": "components/documents.tsx",
-          "line": 462,
+          "line": 466,
           "component": "MetricTile",
           "props": [
             "label={isInvoice&&![\"draft\",\"paid\",\"cancelled\"].includes(displayStatus)?\"Offener Betrag\":\"Total\"}",
@@ -960,7 +971,7 @@
         },
         {
           "owner": "components/documents.tsx",
-          "line": 462,
+          "line": 466,
           "component": "MetricTile",
           "props": [
             "label=\"Status\"",
@@ -981,7 +992,7 @@
         },
         {
           "owner": "components/documents.tsx",
-          "line": 489,
+          "line": 493,
           "component": "MetricTile",
           "props": [
             "label=\"Bereits bezahlt\"",
@@ -1018,7 +1029,7 @@
       "apiSources": [
         {
           "owner": "components/documents.tsx",
-          "line": 232,
+          "line": 234,
           "apis": [
             "/api/auth/session",
             "/api/products/",
@@ -1080,7 +1091,7 @@
         },
         {
           "owner": "components/documents.tsx",
-          "line": 77,
+          "line": 79,
           "apis": [
             "/api/customers?limit=50",
             "/api/customers/"
@@ -1090,7 +1101,7 @@
         },
         {
           "owner": "components/documents.tsx",
-          "line": 579,
+          "line": 583,
           "apis": [
             "/api/settings/company"
           ],
@@ -1099,7 +1110,7 @@
         },
         {
           "owner": "components/documents.tsx",
-          "line": 206,
+          "line": 208,
           "apis": [
             "/api/documents",
             "/api/documents/"
@@ -1158,6 +1169,15 @@
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
         },
         {
+          "owner": "components/offer-followup.tsx",
+          "line": 13,
+          "apis": [
+            "/api/documents/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
           "owner": "components/entity-files.tsx",
           "line": 18,
           "apis": [
@@ -1171,7 +1191,7 @@
         },
         {
           "owner": "components/documents.tsx",
-          "line": 504,
+          "line": 508,
           "apis": [
             "/api/customers"
           ],
@@ -1196,6 +1216,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -1793,6 +1814,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -1995,6 +2017,7 @@
           "line": 36,
           "apis": [
             "/api/notifications",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -2078,6 +2101,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -2897,6 +2921,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -3457,6 +3482,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -4214,6 +4240,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -4476,6 +4503,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -4711,6 +4739,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -4913,6 +4942,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -5244,6 +5274,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -5508,6 +5539,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -5772,6 +5804,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -5956,6 +5989,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -6292,6 +6326,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -6487,6 +6522,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -6821,6 +6857,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -7081,6 +7118,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -7679,6 +7717,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -8188,6 +8227,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -8593,6 +8633,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -8930,6 +8971,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -9254,6 +9296,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -9816,6 +9859,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -10271,6 +10315,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -10524,6 +10569,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -10812,6 +10858,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -14111,6 +14158,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -14342,6 +14390,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -14628,6 +14677,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -14892,6 +14942,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -15132,6 +15183,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -15481,6 +15533,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -15657,7 +15710,7 @@
       "metricSources": [
         {
           "owner": "components/documents.tsx",
-          "line": 462,
+          "line": 466,
           "component": "MetricTile",
           "props": [
             "label={isInvoice&&![\"draft\",\"paid\",\"cancelled\"].includes(displayStatus)?\"Offener Betrag\":\"Total\"}",
@@ -15679,7 +15732,7 @@
         },
         {
           "owner": "components/documents.tsx",
-          "line": 462,
+          "line": 466,
           "component": "MetricTile",
           "props": [
             "label=\"Status\"",
@@ -15700,7 +15753,7 @@
         },
         {
           "owner": "components/documents.tsx",
-          "line": 489,
+          "line": 493,
           "component": "MetricTile",
           "props": [
             "label=\"Bereits bezahlt\"",
@@ -15737,7 +15790,7 @@
       "apiSources": [
         {
           "owner": "components/documents.tsx",
-          "line": 232,
+          "line": 234,
           "apis": [
             "/api/auth/session",
             "/api/products/",
@@ -15799,7 +15852,7 @@
         },
         {
           "owner": "components/documents.tsx",
-          "line": 77,
+          "line": 79,
           "apis": [
             "/api/customers?limit=50",
             "/api/customers/"
@@ -15809,7 +15862,7 @@
         },
         {
           "owner": "components/documents.tsx",
-          "line": 579,
+          "line": 583,
           "apis": [
             "/api/settings/company"
           ],
@@ -15818,7 +15871,7 @@
         },
         {
           "owner": "components/documents.tsx",
-          "line": 206,
+          "line": 208,
           "apis": [
             "/api/documents",
             "/api/documents/"
@@ -15877,6 +15930,15 @@
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
         },
         {
+          "owner": "components/offer-followup.tsx",
+          "line": 13,
+          "apis": [
+            "/api/documents/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
           "owner": "components/entity-files.tsx",
           "line": 18,
           "apis": [
@@ -15890,7 +15952,7 @@
         },
         {
           "owner": "components/documents.tsx",
-          "line": 504,
+          "line": 508,
           "apis": [
             "/api/customers"
           ],
@@ -15915,6 +15977,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -16137,6 +16200,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -16335,7 +16399,7 @@
       "metricSources": [
         {
           "owner": "components/documents.tsx",
-          "line": 462,
+          "line": 466,
           "component": "MetricTile",
           "props": [
             "label={isInvoice&&![\"draft\",\"paid\",\"cancelled\"].includes(displayStatus)?\"Offener Betrag\":\"Total\"}",
@@ -16357,7 +16421,7 @@
         },
         {
           "owner": "components/documents.tsx",
-          "line": 462,
+          "line": 466,
           "component": "MetricTile",
           "props": [
             "label=\"Status\"",
@@ -16378,7 +16442,7 @@
         },
         {
           "owner": "components/documents.tsx",
-          "line": 489,
+          "line": 493,
           "component": "MetricTile",
           "props": [
             "label=\"Bereits bezahlt\"",
@@ -16415,7 +16479,7 @@
       "apiSources": [
         {
           "owner": "components/documents.tsx",
-          "line": 232,
+          "line": 234,
           "apis": [
             "/api/auth/session",
             "/api/products/",
@@ -16477,7 +16541,7 @@
         },
         {
           "owner": "components/documents.tsx",
-          "line": 77,
+          "line": 79,
           "apis": [
             "/api/customers?limit=50",
             "/api/customers/"
@@ -16487,7 +16551,7 @@
         },
         {
           "owner": "components/documents.tsx",
-          "line": 579,
+          "line": 583,
           "apis": [
             "/api/settings/company"
           ],
@@ -16496,7 +16560,7 @@
         },
         {
           "owner": "components/documents.tsx",
-          "line": 206,
+          "line": 208,
           "apis": [
             "/api/documents",
             "/api/documents/"
@@ -16555,6 +16619,15 @@
           "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
         },
         {
+          "owner": "components/offer-followup.tsx",
+          "line": 13,
+          "apis": [
+            "/api/documents/"
+          ],
+          "collections": [],
+          "limitation": "Dynamische URLs, Backend-Autorisierung und RLS zusätzlich ausführen."
+        },
+        {
           "owner": "components/entity-files.tsx",
           "line": 18,
           "apis": [
@@ -16568,7 +16641,7 @@
         },
         {
           "owner": "components/documents.tsx",
-          "line": 504,
+          "line": 508,
           "apis": [
             "/api/customers"
           ],
@@ -16593,6 +16666,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -16994,6 +17068,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -17234,6 +17309,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -17526,6 +17602,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -17789,6 +17866,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -18038,6 +18116,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -18325,6 +18404,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -18941,6 +19021,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -19181,6 +19262,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -19443,6 +19525,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -19808,6 +19891,7 @@
             "/api/notifications",
             "/api/settings/profile",
             "/api/search?q=",
+            "/api/notifications/followups",
             "/api/notifications/"
           ],
           "collections": [],
@@ -20904,6 +20988,7 @@
     "components/monitoring-chart.tsx",
     "components/monitoring.tsx",
     "components/monthly-time-report.tsx",
+    "components/offer-followup.tsx",
     "components/offer-history.tsx",
     "components/operator.tsx",
     "components/pages/customers.tsx",
@@ -20994,6 +21079,7 @@
     "app/api/documents/preview/route.ts",
     "app/api/documents/route.ts",
     "app/api/documents/[number]/credits/route.ts",
+    "app/api/documents/[number]/followups/route.ts",
     "app/api/documents/[number]/pdf/route.ts",
     "app/api/documents/[number]/refunds/route.ts",
     "app/api/documents/[number]/revision/route.ts",
@@ -21017,6 +21103,7 @@
     "app/api/health/ready/route.ts",
     "app/api/health/route.ts",
     "app/api/integrations/status/route.ts",
+    "app/api/notifications/followups/route.ts",
     "app/api/notifications/route.ts",
     "app/api/notifications/[id]/route.ts",
     "app/api/operator/accounts/route.ts",
@@ -21152,6 +21239,8 @@
     "database/migrations/0073_report_mail_outbox.sql",
     "database/migrations/0074_report_recipient_shares.sql",
     "database/migrations/0075_controlled_customer_duplicates.sql",
-    "database/migrations/0076_report_snapshot_expiry_index.sql"
+    "database/migrations/0076_report_snapshot_expiry_index.sql",
+    "database/migrations/0077_personal_offer_followups.sql",
+    "database/migrations/0078_document_delivery_outcomes.sql"
   ]
 }

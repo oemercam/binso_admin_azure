@@ -4,9 +4,9 @@ import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
 import Link from "next/link";
 import {ActionRow,DetailTabs,SettingsGroup} from "../binso-ux";
 import {useApiQuery} from "@/lib/client/use-api-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AppShell } from "../app-shell";
-import { apiPatch } from "@/lib/client/backend";
+import { apiPatch, apiPost } from "@/lib/client/backend";
 import { Button, EmptyState, Icon, LoadingState, ErrorState } from "../ui";
 
 import {notificationGroups} from "@/lib/notification-groups";
@@ -42,6 +42,11 @@ export function NotificationsPage() {
   const remoteItems=(query.data?.items??[]).filter(item=>!item.href||access.canOpen(item.href));
   const loading=query.loading;
   const [mutationError,setMutationError]=useState<string|null>(null);
+  useEffect(()=>{
+    let active=true;
+    void apiPost('/api/notifications/followups',{}).catch(error=>{if(active)setMutationError(error instanceof Error?error.message:'Aktion fehlgeschlagen.');});
+    return()=>{active=false;};
+  },[]);
   const error=mutationError??query.error;
   const load=()=>{setMutationError(null);query.refresh();};
   const markRead=async(id:string)=>{

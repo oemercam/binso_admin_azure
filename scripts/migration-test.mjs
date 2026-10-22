@@ -826,7 +826,7 @@ try{
  assert.equal((await previewRoute.POST({body:{...previewBody,customerId:clonedCustomer.id}})).status,404,'Preview cannot read another tenant customer');
  assert.equal((await previewRoute.POST({body:{...previewBody,positions:[{quantity:-1,price:100}]}})).status,400);
  globalThis.__sendCount=0;globalThis.__sendFail=false;
- const mailFixture=dataModule(`export const mailLayout=(title,body)=>title+body;export async function sendMail(mail){globalThis.__sendCount++;globalThis.__lastMail=mail;if(!mail.attachments[0].content.subarray(0,4).toString().includes('%PDF'))throw Error('Missing PDF');if(globalThis.__sendFail)throw Error('Fixture provider failure');return {delivered:true}}`);
+ const mailFixture=dataModule(`export const mailConfigured=()=>globalThis.__sendConfigured!==false;export const mailLayout=(title,body)=>title+body;export async function sendMail(mail){globalThis.__sendCount++;globalThis.__lastMail=mail;if(!mail.attachments[0].content.subarray(0,4).toString().includes('%PDF'))throw Error('Missing PDF');if(globalThis.__sendFail)throw Error('Fixture provider failure');return {delivered:true}}`);
  const domainModule=dataModule(await fs.readFile('config/domain.ts','utf8'));
  const reminderModule=dataModule((await fs.readFile('lib/payment-reminder.ts','utf8')).replace("'@/config/domain'",JSON.stringify(domainModule)).replace("'./financial-status'",JSON.stringify(financialModule)));
  const localeConfigModule=dataModule(await fs.readFile('lib/locales/config.ts','utf8'));
@@ -850,6 +850,20 @@ try{
  assert.equal((await db.query('select status from invoices where id=$1',[failedInvoice.id])).rows[0].status,'sent');
  assert.equal((await sender.POST(failedRequest,{params:Promise.resolve({number:failedInvoice.number})})).status,409);
  assert.equal(globalThis.__sendCount,2,'Unconfirmed sends do not retry automatically');
+ assert.equal((await db.query('select status from document_deliveries where organization_id=$1 and request_key=$2',[demo,'send-failure'])).rows[0].status,'uncertain');
+ assert.equal(Number((await db.query("select count(*) n from audit_events where organization_id=$1 and entity_id=$2 and action='document.delivery.unconfirmed'",[demo,failedInvoice.id])).rows[0].n),1,'The unconfirmed result is durably audited exactly once');
+ assert.equal((await sender.POST({body:{...failedRequest.body,requestKey:'send-failure-new-key'}},{params:Promise.resolve({number:failedInvoice.number})})).status,409,'A new key cannot resend an ambiguous provider attempt');
+ await assert.rejects(()=>changeDocumentStatus(client,session,failedInvoice.number,'cancel',''),error=>error.code==='delivery_pending');
+ await db.query("update document_deliveries set status='failed' where organization_id=$1 and request_key='send-failure'",[demo]);
+ assert.equal((await sender.POST({body:{...failedRequest.body,requestKey:'send-legacy-new-key'}},{params:Promise.resolve({number:failedInvoice.number})})).status,409,'Historical failures lack evidence for a safe resend');
+ assert.equal(globalThis.__sendCount,2);
+ const noProviderInvoice=await mutateApiBusiness(client,session,'create_document_atomic',{...documentArgs,p_number:'FLOW-NO-PROVIDER'});await changeDocumentStatus(client,session,noProviderInvoice.number,'issue','');
+ globalThis.__sendConfigured=false;
+ assert.equal((await sender.POST({body:{recipient:'fixture@example.invalid',requestKey:'send-no-provider'}},{params:Promise.resolve({number:noProviderInvoice.number})})).status,503);
+ assert.equal((await db.query("select status from document_deliveries where organization_id=$1 and request_key='send-no-provider'",[demo])).rows[0].status,'not_attempted');assert.equal(globalThis.__sendCount,2,'Missing configuration performs no transport');
+ globalThis.__sendConfigured=true;globalThis.__sendFail=false;
+ assert.equal((await sender.POST({body:{recipient:'fixture@example.invalid',requestKey:'send-configured-explicit'}},{params:Promise.resolve({number:noProviderInvoice.number})})).status,200,'A confirmed non-attempt permits a new explicit send');
+
  globalThis.__sendFail=false;
  const reminderInvoice=await mutateApiBusiness(client,session,'create_document_atomic',{...documentArgs,p_number:'FLOW-REMINDER'});
  await changeDocumentStatus(client,session,reminderInvoice.number,'issue','');
@@ -895,7 +909,7 @@ try{
  globalThis.__processTransaction=async(org,fn)=>{const result=await priorTransaction(org,fn);if(result?.reminder)await db.query("update invoices set paid_amount=10,status='partial' where id=$1",[changedReminder.id]);return result};
  try{assert.equal((await sender.POST(reminderRequest('reminder-changed'),{params:Promise.resolve({number:changedReminder.number})})).data.error,'reminder_changed');}finally{globalThis.__processTransaction=priorTransaction}
  assert.equal(globalThis.__sendCount,beforeChangedSend,'A payment arriving before dispatch prevents an obsolete reminder');
- assert.equal((await db.query("select status from document_deliveries where organization_id=$1 and request_key='reminder-changed'",[demo])).rows[0].status,'failed');
+ assert.equal((await db.query("select status from document_deliveries where organization_id=$1 and request_key='reminder-changed'",[demo])).rows[0].status,'not_attempted');
  const beforeFailedReminder=globalThis.__sendCount;globalThis.__sendFail=true;
  assert.equal((await sender.POST(reminderRequest('reminder-provider-failed'),{params:Promise.resolve({number:changedReminder.number})})).status,502);
  assert.equal((await sender.POST(reminderRequest('reminder-provider-failed'),{params:Promise.resolve({number:changedReminder.number})})).status,409);
@@ -1448,6 +1462,19 @@ try{
   assert.equal((await db.query('select status from invoices where id=$1',[cancelProbe.id])).rows[0].status,'sent');
   console.log('Credit-adjusted list/detail/payment parity, future-credit exclusion, exact balance limit, payment replay and cancellation integrity passed.');
  }finally{await db.exec('rollback')}
+ {
+  const replacements={'./rbac':processRbac,'./http':processHttp,'./audit':audit,'@/lib/financial-status':financialModule,'@/lib/permissions':permissions,'@/config/plan-access':planAccessModuleUrl};
+  let planSource=(await fs.readFile('lib/server/plan-access.ts','utf8')).replace('import "server-only";','');
+  for(const [name,value] of Object.entries({'@/lib/server/db':processDb,'@/config/plan-access':planAccessModuleUrl,'./http':processHttp}))planSource=planSource.replaceAll(JSON.stringify(name),JSON.stringify(value)).replaceAll("'"+name+"'",JSON.stringify(value));
+  replacements['./plan-access']=dataModule(planSource);
+  let source=(await fs.readFile('lib/server/offer-followups.ts','utf8')).replace("import 'server-only';",'');
+  for(const [name,value] of Object.entries(replacements))source=source.replaceAll("'"+name+"'",JSON.stringify(value));
+  const service=await import(dataModule(source));
+  const transaction=async(actor,fn)=>{await db.exec('begin');try{await db.exec('set local role binso_runtime');await db.query("select set_config('app.organization_id',$1,true),set_config('app.user_id',$2,true)",[actor.organizationId,actor.userId]);const result=await fn(client);await db.exec('commit');return result;}catch(error){await db.exec('rollback');throw error;}};
+  const added=(await db.query("insert into organization_subscriptions(organization_id,plan,status) values($1,'professional','active') on conflict(organization_id) do nothing returning id",[demo])).rows.length;
+  try{await (await import('./offer-followup-contract.mjs')).verifyOfferFollowups({service,sql:(...args)=>db.query(...args),transaction,session,today:(await import(financialModule)).businessDate(),createIssued:async()=>{const row=await mutateApiBusiness(client,session,'create_document_atomic',{...documentArgs,p_kind:'offer',p_number:'',p_valid_until:'2099-12-31'});await changeDocumentStatus(client,session,row.number,'issue','');return row;}});}
+  finally{if(added)await db.query('delete from organization_subscriptions where organization_id=$1',[demo]);}
+ }
  delete globalThis.__processSession;delete globalThis.__processTransaction;delete globalThis.__processPlatform;
  console.log('PostgreSQL migrations, deterministic fixtures and tenant/platform RLS passed.');
 }finally{await db.close()}

@@ -22,7 +22,7 @@ import ConfirmDialog from "./confirm-dialog";
 import { ActionRow, ActionSheet, PageHeading, DetailHeading, CreateAction, QuickCreateAction } from "./binso-ux";
 import {Button, EmptyState, Icon, IconButton, Logo, LoadingState, FormActions} from "./ui";
 import {useApiQuery,useDataRevision} from "@/lib/client/use-api-query";
-import { apiGet, apiPatch, logoutClientSession, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
+import { apiGet, apiPatch, apiPost, logoutClientSession, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 import {invalidateClientSession,type ClientSession} from "@/lib/client/session-cache";
 import type { SearchItem } from "@/lib/search";
 import {SearchPanel,NotificationPanel,AccountPanel,type PanelNotification} from "./header-panel-content";
@@ -257,7 +257,11 @@ function AppShellFrame({
   const searchLoading=query.trim().length>=2&&(remoteSearch.query!==query.trim()||remoteSearch.loading);
   const searchError=remoteSearch.query===query.trim()?remoteSearch.error:null;
 
-  function loadNotifications(){setNotificationsError(null);notificationQuery.refresh();}
+  async function loadNotifications(){
+    setNotificationsError(null);
+    try{await apiPost('/api/notifications/followups',{});}
+    catch(error){setNotificationsError(error instanceof Error?error.message:'Aktion fehlgeschlagen.');}
+  }
 
   function openNotifications(){
     setSheet("notifications");

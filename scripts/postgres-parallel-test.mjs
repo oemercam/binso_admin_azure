@@ -1,7 +1,7 @@
 import {planCatalogModuleUrl,planAccessModuleUrl} from './data-test-modules.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
-import {createHash} from 'node:crypto';
+import {createHash,randomUUID} from 'node:crypto';
 import pg from 'pg';
 import {moduleUrl,financialModuleUrl,localeTestModuleUrl,documentAmountSqlModuleUrl} from './data-test-modules.mjs';
 // Deliberately accept only this disposable localhost test database. No DATABASE_URL
@@ -107,5 +107,13 @@ try{
  const finishes=await Promise.all([0,1].map(()=>timer.POST({body:{action:'finish'}})));assert.equal(finishes.filter(result=>result.item).length,1);
  assert.equal((await pool.query('select count(*)::int n from time_entries where organization_id=$1 and created_by_user_id=$2',[organizationId,session.userId])).rows[0].n,baseline+1,'Concurrent stop stores one time entry');assert.equal((await timer.GET()).tracker,null);delete globalThis.__parallelTimerSession;
  console.log('Real PostgreSQL: concurrent device timer start/stop yields one tracker and one time entry.');
+ // Exercise the same personal reminder contract on six physical connections.
+ await pool.query('create role binso_followup_fixture nologin nosuperuser nocreatedb nocreaterole noinherit noreplication nobypassrls');
+ await pool.query('grant usage on schema public to binso_followup_fixture');
+ await pool.query('grant select,insert,update,delete on offer_followups,offer_versions,quotes,organization_subscriptions,notification_preferences,in_app_notifications,audit_events to binso_followup_fixture');
+ const followup=await import(await compile('lib/server/offer-followups.ts',{'./rbac':rbac,'./http':http,'./audit':audit,'@/lib/financial-status':financialModuleUrl,'@/lib/permissions':permissions,'@/config/plan-access':plans,'./plan-access':planService}));
+ const followupTransaction=async(actor,fn)=>{const c=await pool.connect();try{await c.query('begin');await c.query('set local role binso_followup_fixture');await c.query("select set_config('app.organization_id',$1,true),set_config('app.user_id',$2,true)",[actor.organizationId,actor.userId]);const result=await fn(c);await c.query('commit');return result;}catch(error){await c.query('rollback');throw error;}finally{c.release();}};
+ try{await (await import('./offer-followup-contract.mjs')).verifyOfferFollowups({service:followup,sql:(...values)=>pool.query(...values),transaction:followupTransaction,session,today:(await import(financialModuleUrl)).businessDate(),parallel:true,createIssued:()=>txn(async c=>{const row=await business.mutateApiBusiness(c,session,'create_document_atomic',{...args,p_kind:'offer',p_number:'',p_valid_until:'2099-12-31',p_idempotency_key:randomUUID()});await process.changeDocumentStatus(c,session,row.number,'issue','');return row;})});}
+ finally{await pool.query('revoke all on offer_followups,offer_versions,quotes,organization_subscriptions,notification_preferences,in_app_notifications,audit_events from binso_followup_fixture');await pool.query('revoke usage on schema public from binso_followup_fixture');await pool.query('drop role binso_followup_fixture');}
  console.log('Real PostgreSQL: ten parallel numbers, concurrent document/payment replay and competing final payments passed across independent connections. Synthetic disposable database only.');
 }finally{delete globalThis.__parallelProjectSession;delete globalThis.__binsoParallelPool;await pool.end();}

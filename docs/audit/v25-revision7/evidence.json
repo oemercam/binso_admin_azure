@@ -469,6 +469,149 @@
       "test": "Echte lokale Edge/Chromium-Messung: normaler Header besteht; Breadcrumb mit Link, ohne Link und unzulässige Aktionen scheitern. Unveränderter Navigations-/Rechte-/Icon-/Geometrievertrag besteht. Aktuelle tatsächliche App-Browserfälle und vollständige Breiten-/Geräteabnahme offen.",
       "visualComparison": "Auslöser: tatsächlicher italienischer WebKit-Desktop-Screen7bc770a4 widerspricht Kapitel47. Aktuelle Nachher-Browseraufnahme steht aus.",
       "blocker": "Vollständige aktuelle Header-/Popover-/Zoom-/Geräteabnahme und übrige Klauselbedingungen nicht aus dieser gezielten Korrektur ableiten."
+    },
+    "R7-14-005": {
+      "sourceTextSha256": "30089178853a0d23a9e85637ee65520c3fb43df7da162d771ba8b737afec27c8",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "implementation": "Persönliche versions-/benutzer-/mandantengebundene In-App-Erinnerung mit explizitem Opt-in, Datumsvalidierung, Vorschau, Verlauf, Rollen/RLS, atomarer Benachrichtigung und Audit implementiert. Ausführung beim Öffnen der Benachrichtigungen, kein garantierter Hintergrund-Mailversand.",
+      "sourceReferences": [
+        "components/offer-followup.tsx",
+        "lib/server/offer-followups.ts",
+        "database/migrations/0077_personal_offer_followups.sql",
+        "scripts/offer-followup-contract.mjs",
+        "docs/audit/v25-revision7/offer-followups.md"
+      ],
+      "test": "Tatsächlicher isolierter Migrationstest mit eingeschränkter Rolle bestanden: Positiv-/Negativfälle, Fälligkeit, Abbruch, Replay, Status/Version, Präferenz und Audit-Rollback. Aktuelle native Parallel-/Browser-CI noch ausstehend.",
+      "visualComparison": "Bestehende gemeinsame FormSheet-/DetailDisclosure-/ActionRow-Owner verwendet. Aktuelle gerenderte Abnahme offen, kein neuer Originalscreen behauptet.",
+      "blocker": "Garantierter Hintergrund-Mailversand, echte Providerzustellung sowie vollständige fachliche/visuelle/Geräteabnahme fehlen; kein Produktivlauf oder Versand ausgeführt."
+    },
+    "R7-34-005": {
+      "sourceTextSha256": "73880bf8c0debcc2a4ee30490768edcb4697297bdf15cd94266ffa0991e05ab1",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "implementation": "Persönliche versions-/benutzer-/mandantengebundene In-App-Erinnerung mit explizitem Opt-in, Datumsvalidierung, Vorschau, Verlauf, Rollen/RLS, atomarer Benachrichtigung und Audit implementiert. Ausführung beim Öffnen der Benachrichtigungen, kein garantierter Hintergrund-Mailversand.",
+      "sourceReferences": [
+        "components/offer-followup.tsx",
+        "lib/server/offer-followups.ts",
+        "database/migrations/0077_personal_offer_followups.sql",
+        "scripts/offer-followup-contract.mjs",
+        "docs/audit/v25-revision7/offer-followups.md"
+      ],
+      "test": "Tatsächlicher isolierter Migrationstest mit eingeschränkter Rolle bestanden: Positiv-/Negativfälle, Fälligkeit, Abbruch, Replay, Status/Version, Präferenz und Audit-Rollback. Aktuelle native Parallel-/Browser-CI noch ausstehend.",
+      "visualComparison": "Bestehende gemeinsame FormSheet-/DetailDisclosure-/ActionRow-Owner verwendet. Aktuelle gerenderte Abnahme offen, kein neuer Originalscreen behauptet.",
+      "blocker": "Garantierter Hintergrund-Mailversand, echte Providerzustellung sowie vollständige fachliche/visuelle/Geräteabnahme fehlen; kein Produktivlauf oder Versand ausgeführt."
+    },
+    "R7-50-005": {
+      "sourceTextSha256": "0fa2223a556616b01ab952a0ecf71e72339e17f8fafba16229841846aa7d25d1",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "implementation": "Persönliche versions-/benutzer-/mandantengebundene In-App-Erinnerung mit explizitem Opt-in, Datumsvalidierung, Vorschau, Verlauf, Rollen/RLS, atomarer Benachrichtigung und Audit implementiert. Ausführung beim Öffnen der Benachrichtigungen, kein garantierter Hintergrund-Mailversand.",
+      "sourceReferences": [
+        "components/offer-followup.tsx",
+        "lib/server/offer-followups.ts",
+        "database/migrations/0077_personal_offer_followups.sql",
+        "scripts/offer-followup-contract.mjs",
+        "docs/audit/v25-revision7/offer-followups.md"
+      ],
+      "test": "Tatsächlicher isolierter Migrationstest mit eingeschränkter Rolle bestanden: Positiv-/Negativfälle, Fälligkeit, Abbruch, Replay, Status/Version, Präferenz und Audit-Rollback. Aktuelle native Parallel-/Browser-CI noch ausstehend.",
+      "visualComparison": "Bestehende gemeinsame FormSheet-/DetailDisclosure-/ActionRow-Owner verwendet. Aktuelle gerenderte Abnahme offen, kein neuer Originalscreen behauptet.",
+      "blocker": "Garantierter Hintergrund-Mailversand, echte Providerzustellung sowie vollständige fachliche/visuelle/Geräteabnahme fehlen; kein Produktivlauf oder Versand ausgeführt."
+    },
+    "R7-06-003": {
+      "sourceTextSha256": "348fff27ece7bb924f40153eab3b238e7e886985e28066a4f482fd5ad6722ac2",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "implementation": "Bestehender serverseitiger Mail-/Dokumentweg um dauerhafte Unterscheidung zwischen bestätigtem Nichtversand und unklarem Transportausgang ergänzt. Auch neue Kennungen und konkurrierende Dokumentmutationen bleiben bei ungeklärtem Ausgang gesperrt; historische failed-Werte werden nicht automatisch freigegeben.",
+      "sourceReferences": [
+        "app/api/documents/[number]/send/route.ts",
+        "lib/server/document-process.ts",
+        "lib/server/offer-revisions.ts",
+        "lib/server/repositories/business-api.ts",
+        "lib/server/credit-notes.ts",
+        "database/migrations/0078_document_delivery_outcomes.sql",
+        "scripts/migration-test.mjs",
+        "docs/audit/v25-revision7/document-delivery-outcomes.md"
+      ],
+      "test": "Isolierter tatsächlicher Migrationstest mit positivem Versand, Replay, neuem Schlüssel bei unklarem/historischem Fehler, fehlendem Provider ohne Transport, explizitem neuem Versand nach Einrichtung und Zahlungsänderung bestanden; zusätzliche aktuelle Gesamt-CI erforderlich.",
+      "visualComparison": "Gemeinsame History-Beschriftung erweitert; aktuelle gerenderte Abnahme offen.",
+      "blocker": "Echte Zustell-/Bounce-Nachweise, authentifizierte Provider-Ereignisse und kontrollierter Auflösungsweg für unklare historische Versände bleiben offen. Keine produktive Migration oder Kundenmail ausgeführt."
+    },
+    "R7-06-004": {
+      "sourceTextSha256": "f9b165c0f21cbfb49b32c42602762c65163658ad4d736cd62656885c18704f1f",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "implementation": "Bestehender serverseitiger Mail-/Dokumentweg um dauerhafte Unterscheidung zwischen bestätigtem Nichtversand und unklarem Transportausgang ergänzt. Auch neue Kennungen und konkurrierende Dokumentmutationen bleiben bei ungeklärtem Ausgang gesperrt; historische failed-Werte werden nicht automatisch freigegeben.",
+      "sourceReferences": [
+        "app/api/documents/[number]/send/route.ts",
+        "lib/server/document-process.ts",
+        "lib/server/offer-revisions.ts",
+        "lib/server/repositories/business-api.ts",
+        "lib/server/credit-notes.ts",
+        "database/migrations/0078_document_delivery_outcomes.sql",
+        "scripts/migration-test.mjs",
+        "docs/audit/v25-revision7/document-delivery-outcomes.md"
+      ],
+      "test": "Isolierter tatsächlicher Migrationstest mit positivem Versand, Replay, neuem Schlüssel bei unklarem/historischem Fehler, fehlendem Provider ohne Transport, explizitem neuem Versand nach Einrichtung und Zahlungsänderung bestanden; zusätzliche aktuelle Gesamt-CI erforderlich.",
+      "visualComparison": "Gemeinsame History-Beschriftung erweitert; aktuelle gerenderte Abnahme offen.",
+      "blocker": "Echte Zustell-/Bounce-Nachweise, authentifizierte Provider-Ereignisse und kontrollierter Auflösungsweg für unklare historische Versände bleiben offen. Keine produktive Migration oder Kundenmail ausgeführt."
+    },
+    "R7-06-005": {
+      "sourceTextSha256": "144c47e45ffaf0d47347109d01741b412a8efb6d4f1cd09e2681a4684b2c1a87",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "implementation": "Bestehender serverseitiger Mail-/Dokumentweg um dauerhafte Unterscheidung zwischen bestätigtem Nichtversand und unklarem Transportausgang ergänzt. Auch neue Kennungen und konkurrierende Dokumentmutationen bleiben bei ungeklärtem Ausgang gesperrt; historische failed-Werte werden nicht automatisch freigegeben.",
+      "sourceReferences": [
+        "app/api/documents/[number]/send/route.ts",
+        "lib/server/document-process.ts",
+        "lib/server/offer-revisions.ts",
+        "lib/server/repositories/business-api.ts",
+        "lib/server/credit-notes.ts",
+        "database/migrations/0078_document_delivery_outcomes.sql",
+        "scripts/migration-test.mjs",
+        "docs/audit/v25-revision7/document-delivery-outcomes.md"
+      ],
+      "test": "Isolierter tatsächlicher Migrationstest mit positivem Versand, Replay, neuem Schlüssel bei unklarem/historischem Fehler, fehlendem Provider ohne Transport, explizitem neuem Versand nach Einrichtung und Zahlungsänderung bestanden; zusätzliche aktuelle Gesamt-CI erforderlich.",
+      "visualComparison": "Gemeinsame History-Beschriftung erweitert; aktuelle gerenderte Abnahme offen.",
+      "blocker": "Echte Zustell-/Bounce-Nachweise, authentifizierte Provider-Ereignisse und kontrollierter Auflösungsweg für unklare historische Versände bleiben offen. Keine produktive Migration oder Kundenmail ausgeführt."
+    },
+    "R7-35-003": {
+      "sourceTextSha256": "16d425bf832868462bbed0e15222ab8ca625257335f659b37435518a5622ecf0",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "implementation": "Bestehender serverseitiger Mail-/Dokumentweg um dauerhafte Unterscheidung zwischen bestätigtem Nichtversand und unklarem Transportausgang ergänzt. Auch neue Kennungen und konkurrierende Dokumentmutationen bleiben bei ungeklärtem Ausgang gesperrt; historische failed-Werte werden nicht automatisch freigegeben.",
+      "sourceReferences": [
+        "app/api/documents/[number]/send/route.ts",
+        "lib/server/document-process.ts",
+        "lib/server/offer-revisions.ts",
+        "lib/server/repositories/business-api.ts",
+        "lib/server/credit-notes.ts",
+        "database/migrations/0078_document_delivery_outcomes.sql",
+        "scripts/migration-test.mjs",
+        "docs/audit/v25-revision7/document-delivery-outcomes.md"
+      ],
+      "test": "Isolierter tatsächlicher Migrationstest mit positivem Versand, Replay, neuem Schlüssel bei unklarem/historischem Fehler, fehlendem Provider ohne Transport, explizitem neuem Versand nach Einrichtung und Zahlungsänderung bestanden; zusätzliche aktuelle Gesamt-CI erforderlich.",
+      "visualComparison": "Gemeinsame History-Beschriftung erweitert; aktuelle gerenderte Abnahme offen.",
+      "blocker": "Echte Zustell-/Bounce-Nachweise, authentifizierte Provider-Ereignisse und kontrollierter Auflösungsweg für unklare historische Versände bleiben offen. Keine produktive Migration oder Kundenmail ausgeführt."
+    },
+    "R7-36-003": {
+      "sourceTextSha256": "d8df29dbb13203c22dac7c8067c417f2242b94adb45a6b1c1d79a2f7d81b3106",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "implementation": "Bestehender serverseitiger Mail-/Dokumentweg um dauerhafte Unterscheidung zwischen bestätigtem Nichtversand und unklarem Transportausgang ergänzt. Auch neue Kennungen und konkurrierende Dokumentmutationen bleiben bei ungeklärtem Ausgang gesperrt; historische failed-Werte werden nicht automatisch freigegeben.",
+      "sourceReferences": [
+        "app/api/documents/[number]/send/route.ts",
+        "lib/server/document-process.ts",
+        "lib/server/offer-revisions.ts",
+        "lib/server/repositories/business-api.ts",
+        "lib/server/credit-notes.ts",
+        "database/migrations/0078_document_delivery_outcomes.sql",
+        "scripts/migration-test.mjs",
+        "docs/audit/v25-revision7/document-delivery-outcomes.md"
+      ],
+      "test": "Isolierter tatsächlicher Migrationstest mit positivem Versand, Replay, neuem Schlüssel bei unklarem/historischem Fehler, fehlendem Provider ohne Transport, explizitem neuem Versand nach Einrichtung und Zahlungsänderung bestanden; zusätzliche aktuelle Gesamt-CI erforderlich.",
+      "visualComparison": "Gemeinsame History-Beschriftung erweitert; aktuelle gerenderte Abnahme offen.",
+      "blocker": "Echte Zustell-/Bounce-Nachweise, authentifizierte Provider-Ereignisse und kontrollierter Auflösungsweg für unklare historische Versände bleiben offen. Keine produktive Migration oder Kundenmail ausgeführt."
     }
   },
   "tests": {
