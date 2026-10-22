@@ -47,12 +47,13 @@ const desktopNav = [
   ["/mitarbeiter","Mitarbeiter","users"],
   ["/abwesenheiten","Abwesenheiten","calendar"],
   ["/lieferanten","Lieferanten","building"],
+  ["/vertraege","Verträge","file"],
 ] as const;
 
 const desktopNavGroups = [
   {label:"Verkauf",paths:["/kunden","/angebote","/rechnungen","/produkte"]},
   {label:"Arbeit & Team",paths:["/projekte","/zeit","/mitarbeiter","/abwesenheiten"]},
-  {label:"Finanzen",paths:["/zahlungen","/spesen","/lieferanten","/finanzen","/berichte"]},
+  {label:"Finanzen",paths:["/zahlungen","/spesen","/lieferanten","/vertraege","/finanzen","/berichte"]},
 ];
 
 type NotificationItem=PanelNotification;
@@ -398,7 +399,7 @@ export function AppShell(props:ShellProps){
  },[register,pathname,title,titleIsUserContent,headingPlacement,recordLabel,subtitle,active,actions,mobileActions,backHref,backLabel,preview,editing,unsavedChanges,status,statusTone]);
  return register?props.children:<AppShellFrame {...props}/>;
 }
-const appSections:Record<string,string>={berichte:"Berichte",projekte:"Aufträge",dashboard:"Übersicht",kunden:"Kunden",angebote:"Angebote",rechnungen:"Rechnungen",zahlungen:"Zahlungen",produkte:"Produkte",mitarbeiter:"Mitarbeiter",spesen:"Spesen",zeit:"Zeiterfassung",support:"Support",einstellungen:"Einstellungen",belege:"Belege",benachrichtigungen:"Benachrichtigungen",finanzen:"Finanzen"};
+const appSections:Record<string,string>={vertraege:"Verträge",abwesenheiten:"Abwesenheiten",berichte:"Berichte",projekte:"Aufträge",dashboard:"Übersicht",kunden:"Kunden",angebote:"Angebote",rechnungen:"Rechnungen",zahlungen:"Zahlungen",produkte:"Produkte",mitarbeiter:"Mitarbeiter",spesen:"Spesen",zeit:"Zeiterfassung",support:"Support",einstellungen:"Einstellungen",belege:"Belege",benachrichtigungen:"Benachrichtigungen",finanzen:"Finanzen"};
 export function AppShellLayout({children}:{children:React.ReactNode}){
  const pathname=usePathname(),section=pathname.split("/")[1];
  const [configuration,setConfiguration]=useState<ShellConfiguration|null>(null);

@@ -6,6 +6,7 @@ import {ApiError,apiError,assertSameOrigin,json,readJson} from '@/lib/server/htt
 import {audit} from '@/lib/server/audit';
 import {requireModuleEntitlement} from '@/lib/server/plan-access';
 import {NextRequest} from 'next/server';
+import {requireFreshAuthentication} from '@/lib/server/fresh-authentication';
 
 export const runtime='nodejs';
 /** Explicit adoption after a controlled rescan; never a scanner bypass or an
@@ -37,6 +38,8 @@ export async function DELETE(request:NextRequest,{params}:{params:Promise<{id:st
   assertSameOrigin(request);const s=await requireSession(),{id}=await params;
   if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id))throw new ApiError(404,'not_found','Datei wurde nicht gefunden.');
   await withTenant(s.organizationId,s.userId,async c=>{
+   const preview=(await c.query('select purpose,contract_id from file_objects where id=$1 and organization_id=$2',[id,s.organizationId])).rows[0];
+   if(preview?.purpose==='contract_document')await c.query('select id from contracts where organization_id=$1 and id=$2 for update',[s.organizationId,preview.contract_id]);
    const file=(await c.query('select * from file_objects where id=$1 and organization_id=$2 for update',[id,s.organizationId])).rows[0];
    if(!file)throw new ApiError(404,'not_found','Datei wurde nicht gefunden.');
    const relation=fileRelations[file.purpose];
@@ -50,12 +53,17 @@ export async function DELETE(request:NextRequest,{params}:{params:Promise<{id:st
    authorize(s,relation?.write??'documents:write');
    if(file.purpose==='document')await requireModuleEntitlement(s.organizationId,'dokumente');
    if(file.purpose==='supplier_invoice_receipt')await requireModuleEntitlement(s.organizationId,'lieferanten');
+   if(file.purpose==='contract_document'){await requireModuleEntitlement(s.organizationId,'vertraege');await requireFreshAuthentication(s,c);await c.query("select set_config('app.contract_review_session',$1,true)",[s.sessionId]);}
    if(file.created_by!==s.userId&&!['owner','admin'].includes(s.role))throw new ApiError(403,'file_forbidden','Nur eigene Anhänge können entfernt werden.');
    if(s.moduleProfile==='time_only'&&!['time_report','support_attachment'].includes(file.purpose))throw new ApiError(403,'file_forbidden','Keine Berechtigung für diese Datei.');
    if(relation){
     const entity=(await c.query(`select * from ${relation.table} where id=$1 and organization_id=$2 for update`,[file[relation.column],s.organizationId])).rows[0];
     if(!entity)throw new ApiError(404,'not_found','Zuordnung wurde nicht gefunden.');
     if(file.purpose==='supplier_invoice_receipt'&&entity.status!=='draft')throw new ApiError(409,'attachment_locked','Anhänge abgeschlossener oder eingereichter Vorgänge bleiben erhalten.');
+    if(file.purpose==='contract_document'){
+     if(!['draft','paused'].includes(entity.status))throw new ApiError(409,'attachment_locked','Vertragsanhänge können nur im Entwurf oder nach ausdrücklichem Pausieren ergänzt werden.');
+     if((await c.query("select 1 from contract_review_snapshots where organization_id=$1 and contract_id=$2 and documents@>jsonb_build_array(jsonb_build_object('fileId',$3::text))",[s.organizationId,file.contract_id,id])).rowCount)throw new ApiError(409,'attachment_locked','Bereits geprüfte Vertragsdateien bleiben als Nachweis erhalten.');
+    }
     if((file.purpose==='time_report'&&(entity.created_by_user_id!==s.userId&&!['owner','admin'].includes(s.role)))||(file.purpose==='expense_receipt'&&s.role==='member'&&entity.created_by_user_id!==s.userId)||(file.purpose==='support_attachment'&&s.moduleProfile==='time_only'&&entity.created_by_user_id!==s.userId))throw new ApiError(404,'not_found','Datei wurde nicht gefunden.');
     if(file.purpose==='time_report'&&(entity.approved||entity.submitted_at)||file.purpose==='expense_receipt'&&['approved','posted'].includes(entity.status)||['invoice_attachment','offer_attachment'].includes(file.purpose)&&entity.status!=='draft')throw new ApiError(409,'attachment_locked','Anhänge abgeschlossener oder eingereichter Vorgänge bleiben erhalten.');
    }

@@ -1,7 +1,7 @@
 import {clearListState} from './list-state';
 import {clearProcessDrafts} from './process-draft';
 /** Metadata-only invalidation; business responses are never persisted in the browser. */
-export type DataDomain = 'customers'|'documents'|'payments'|'finance'|'dashboard'|'projects'|'time'|'timer'|'expenses'|'employees'|'files'|'support'|'notifications'|'settings'|'billing'|'operator'|'records'|'session'|'products'|'identity';
+export type DataDomain = 'customers'|'documents'|'payments'|'finance'|'dashboard'|'projects'|'time'|'timer'|'expenses'|'employees'|'files'|'support'|'notifications'|'settings'|'billing'|'operator'|'records'|'session'|'products'|'identity'|'contracts';
 const revisions=new Map<DataDomain,number>();
 const listeners=new Set<()=>void>();
 let channel:BroadcastChannel|null=null;
@@ -27,7 +27,7 @@ export function affectedDomains(path:string):DataDomain[]{
  documents:['customers','finance','dashboard','time','expenses','projects'],
  payments:['documents','customers','finance','dashboard'],
  time:['customers','projects','finance','dashboard'],timer:['time','dashboard'],expenses:['customers','employees','projects','finance','documents','dashboard'],
- employees:['time','expenses','dashboard'],files:['settings','expenses','employees','support','customers','documents','projects'],projects:['customers','time','documents','dashboard'],
+ employees:['time','expenses','dashboard'],files:['settings','expenses','employees','support','customers','documents','projects','contracts'],contracts:['files'],projects:['customers','time','documents','dashboard'],
  products:['documents'],settings:['documents'],billing:['settings'],records:['customers','documents','payments','finance','dashboard','projects','time','expenses','employees'],
  };
  return [domain,...(dependents[domain]??[])];

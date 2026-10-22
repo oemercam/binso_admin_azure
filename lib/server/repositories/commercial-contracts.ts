@@ -10,7 +10,7 @@ import {commercialContractIssue,contractConditionIssue,contractConditionReadines
 import {idempotentBusiness} from '../business-idempotency';
 import {audit} from '../audit';
 
-const columns=`c.id,c.contract_no,c.name,c.customer_id,c.supplier_id,c.project_id,c.start_date::text,c.end_date::text,c.status,c.notice_days,c.billing_interval,c.notes,c.version,c.is_v26_contract,c.created_by_user_id,c.reviewed_by_user_id,c.reviewed_at,case when c.supplier_id is null then 'sale' else 'purchase' end side`;
+const columns=`c.id,c.contract_no,c.name,c.customer_id,c.supplier_id,c.project_id,c.start_date::text,c.end_date::text,c.status,c.notice_days,c.billing_interval,c.notes,c.version,c.is_v26_contract,c.created_by_user_id,c.reviewed_by_user_id,c.reviewed_at,case when c.supplier_id is null then 'sale' else 'purchase' end side,coalesce((select name from suppliers where organization_id=c.organization_id and id=c.supplier_id),(select name from customers where organization_id=c.organization_id and id=c.customer_id)) party_name`;
 const conditionColumns='id,condition_id,revision,is_current,resource_id,starts_on::text,ends_on::text,unit,unit_price::text,currency,tax_treatment,vat_rate::text,tax_reason,expense_policy,status,created_by_user_id,reviewed_by_user_id,reviewed_at';
 async function access(c:PoolClient,s:SessionUser,write=false){
  authorize(s,write?'contracts:write':'contracts:read');
@@ -23,13 +23,27 @@ async function root(c:PoolClient,s:SessionUser,id:string,write=false){
  if(!item)throw new ApiError(404,'not_found','Vertrag wurde nicht gefunden.');return item;
 }
 const conditionInput=(r:Record<string,unknown>):ContractConditionInput=>({resourceId:r.resource_id as string|null,startsOn:String(r.starts_on),endsOn:r.ends_on===null?null:String(r.ends_on),unit:r.unit as ContractConditionInput['unit'],unitPrice:r.unit_price===null?null:String(r.unit_price),currency:r.currency as ContractConditionInput['currency'],taxTreatment:r.tax_treatment as ContractConditionInput['taxTreatment'],vatRate:r.vat_rate===null?null:String(r.vat_rate),taxReason:String(r.tax_reason??''),expensePolicy:r.expense_policy as ContractConditionInput['expensePolicy']});
-export async function listCommercialContracts(c:PoolClient,s:SessionUser,offset:number){
- await access(c,s);const where='c.organization_id=$1 and c.archived_at is null and app_commercial_access(c.customer_id,c.supplier_id,c.project_id)';
- return {items:(await c.query(`select ${columns} from contracts c where ${where} order by c.created_at desc,c.id desc limit 50 offset $2`,[s.organizationId,offset])).rows,total:(await c.query(`select count(*)::int total from contracts c where ${where}`,[s.organizationId])).rows[0].total};
+export async function listCommercialContracts(c:PoolClient,s:SessionUser,offset:number,filters:{q:string;status:string;side:string;partyId:string;order:string}={q:'',status:'all',side:'all',partyId:'',order:'created_at.desc'}){
+ await access(c,s);const where=['c.organization_id=$1','c.archived_at is null','app_commercial_access(c.customer_id,c.supplier_id,c.project_id)'],values:unknown[]=[s.organizationId];
+ if(filters.q){values.push('%'+filters.q+'%');where.push(`(c.name ilike $${values.length} or c.contract_no ilike $${values.length})`);}
+ if(filters.status!=='all'){values.push(filters.status);where.push('c.status=$'+values.length);}
+ if(filters.side!=='all')where.push(filters.side==='purchase'?'c.supplier_id is not null':'c.customer_id is not null');
+ if(filters.partyId){values.push(filters.partyId);where.push(`coalesce(c.customer_id,c.supplier_id)=$${values.length}::uuid`);}
+ if(! /^(name|contract_no|status|side|start_date|created_at)\.(asc|desc)$/.test(filters.order))throw new ApiError(400,'query_invalid','Bitte eine gültige Sortierung wählen.');
+ const [field,direction]=filters.order.split('.'),sort=({name:'c.name',contract_no:'c.contract_no',status:'c.status',side:'side',start_date:'c.start_date',created_at:'c.created_at'} as Record<string,string>)[field];
+ if(!sort||!['asc','desc'].includes(direction))throw new ApiError(400,'query_invalid','Bitte eine gültige Sortierung wählen.');
+ return {items:(await c.query(`select ${columns} from contracts c where ${where.join(' and ')} order by ${sort} ${direction},c.id desc limit 50 offset $${values.length+1}`,[...values,offset])).rows,total:(await c.query(`select count(*)::int total from contracts c where ${where.join(' and ')}`,values)).rows[0].total};
 }
 export async function commercialContractDetail(c:PoolClient,s:SessionUser,id:string){
- const item=await root(c,s,id),rows=(await c.query(`select ${conditionColumns} from contract_condition_revisions where organization_id=$1 and contract_id=$2 order by condition_id,revision desc limit 500`,[s.organizationId,id])).rows;
- return {item,conditions:rows.map(r=>({...r,missing:contractConditionReadiness(conditionInput(r))}))};
+ const item=await root(c,s,id),rows=(await c.query(`select ${conditionColumns},(select name from external_resources r where r.organization_id=contract_condition_revisions.organization_id and r.id=resource_id) resource_name,(select supplier_id from external_resources r where r.organization_id=contract_condition_revisions.organization_id and r.id=resource_id) resource_supplier_id from contract_condition_revisions where organization_id=$1 and contract_id=$2 order by condition_id,revision desc limit 500`,[s.organizationId,id])).rows;
+ const manifest=await contractDocuments(c,s,id);
+ const reviewSnapshot=(await c.query('select id,contract_version,document_manifest,reviewed_at,jsonb_array_length(documents) document_count from contract_review_snapshots where organization_id=$1 and contract_id=$2 order by contract_version desc limit 1',[s.organizationId,id])).rows[0]??null;
+ return {item,conditions:rows.map(r=>({...r,missing:contractConditionReadiness(conditionInput(r))})),documentManifest:manifest.hash,documentsReady:manifest.ready,documentCount:manifest.rows.length,reviewSnapshot};
+}
+async function contractDocuments(c:PoolClient,s:SessionUser,id:string,lock=false){
+ const rows=(await c.query(`select id,sha256,scan_status from file_objects where organization_id=$1 and contract_id=$2 and purpose='contract_document' and archived_at is null order by id${lock?' for share':''}`,[s.organizationId,id])).rows;
+ const hash=(await c.query('select contract_document_manifest($1::uuid) manifest',[id])).rows[0].manifest as string;
+ return {rows,hash,ready:rows.every(row=>row.scan_status==='clean')};
 }
 export async function writeCommercialContract(c:PoolClient,s:SessionUser,id:string|null,body:unknown,key:string){
  await access(c,s,true);const issue=commercialContractIssue(body);if(issue)throw new ApiError(400,'contract_invalid',issue);const b=body as CommercialContractInput;
@@ -70,12 +84,21 @@ export async function reviewContractCondition(c:PoolClient,s:SessionUser,contrac
  });
 }
 export async function transitionCommercialContract(c:PoolClient,s:SessionUser,id:string,body:unknown,key:string){
- await access(c,s,true);const b=body as {status?:unknown;expectedRevision?:unknown};if(!b||typeof b!=='object'||Array.isArray(b)||Object.keys(b).some(k=>!['status','expectedRevision'].includes(k))||!['active','paused','ended','cancelled'].includes(String(b.status))||!Number.isSafeInteger(b.expectedRevision)||Number(b.expectedRevision)<1)throw new ApiError(400,'contract_transition_invalid','Bitte Vertragsstatus und Revisionsstand angeben.');
+ await access(c,s,true);const b=body as {status?:unknown;expectedRevision?:unknown;expectedDocumentManifest?:unknown};if(!b||typeof b!=='object'||Array.isArray(b)||Object.keys(b).some(k=>!['status','expectedRevision','expectedDocumentManifest'].includes(k))||!['active','paused','ended','cancelled'].includes(String(b.status))||!Number.isSafeInteger(b.expectedRevision)||Number(b.expectedRevision)<1||(b.status==='active'||b.expectedDocumentManifest!==undefined)&&(typeof b.expectedDocumentManifest!=='string'||! /^[0-9a-f]{64}$/.test(b.expectedDocumentManifest)))throw new ApiError(400,'contract_transition_invalid','Bitte Vertragsstatus, Dateistand und Revisionsstand angeben.');
  return idempotentBusiness(c,{organizationId:s.organizationId,userId:s.userId,operation:'commercial_contract.transition',key,body:{id,...b}},async()=>{
   const previous=await root(c,s,id,true);if(!previous.is_v26_contract||previous.version!==b.expectedRevision)throw new ApiError(409,'contract_changed','Der Vertrag wurde geändert. Bitte den aktuellen Stand prüfen.');
   if(!((previous.status==='draft'&&['active','cancelled'].includes(String(b.status)))||(previous.status==='active'&&['paused','ended','cancelled'].includes(String(b.status)))||(previous.status==='paused'&&['active','ended','cancelled'].includes(String(b.status)))))throw new ApiError(409,'contract_transition_invalid','Dieser Vertragsstatus kann hier nicht geändert werden.');
-  if(b.status==='active'){if(previous.created_by_user_id===s.userId)throw new ApiError(403,'independent_review_required','Die Prüfung muss durch eine andere berechtigte Person erfolgen.');if(!(await c.query("select 1 from contract_condition_revisions where organization_id=$1 and contract_id=$2 and status='approved' limit 1",[s.organizationId,id])).rowCount)throw new ApiError(409,'condition_not_ready','Bitte zuerst vollständige Konditionen unabhängig freigeben.');await c.query("select set_config('app.contract_review_session',$1,true)",[s.sessionId]);}
-  const item=(await c.query(`update contracts set status=$3,reviewed_by_user_id=case when $3='active' then $4 else reviewed_by_user_id end,reviewed_at=case when $3='active' then now() else reviewed_at end where organization_id=$1 and id=$2 returning id,status,version`,[s.organizationId,id,b.status,s.userId])).rows[0];await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'commercial_contract.'+String(b.status),entityType:'contract',entityId:id,metadata:{version:item.version,status:item.status}});return {contractId:id,item};
+  let documents:Awaited<ReturnType<typeof contractDocuments>>|undefined;
+  if(b.status==='active'){
+   if(previous.created_by_user_id===s.userId)throw new ApiError(403,'independent_review_required','Die Prüfung muss durch eine andere berechtigte Person erfolgen.');if(!(await c.query("select 1 from contract_condition_revisions where organization_id=$1 and contract_id=$2 and status='approved' limit 1",[s.organizationId,id])).rowCount)throw new ApiError(409,'condition_not_ready','Bitte zuerst vollständige Konditionen unabhängig freigeben.');
+   documents=await contractDocuments(c,s,id,true);
+   if(documents.hash!==b.expectedDocumentManifest)throw new ApiError(409,'contract_documents_changed','Der Dateistand wurde geändert. Bitte den Vertrag erneut prüfen.');
+   if(!documents.ready)throw new ApiError(409,'contract_documents_not_ready','Bitte die Sicherheitsfreigabe aller Vertragsdateien abwarten oder ungeprüfte Anhänge kontrolliert entfernen.');
+   await c.query("select set_config('app.contract_review_session',$1,true),set_config('app.contract_document_manifest',$2,true)",[s.sessionId,documents.hash]);
+  }
+  const item=(await c.query(`update contracts set status=$3,reviewed_by_user_id=case when $3='active' then $4 else reviewed_by_user_id end,reviewed_at=case when $3='active' then now() else reviewed_at end where organization_id=$1 and id=$2 returning id,status,version`,[s.organizationId,id,b.status,s.userId])).rows[0];
+  if(documents)await c.query('insert into contract_review_snapshots(organization_id,contract_id,contract_version,document_manifest,documents,reviewed_by_user_id) values($1,$2,$3,$4,$5::jsonb,$6)',[s.organizationId,id,item.version,documents.hash,JSON.stringify(documents.rows.map(row=>({fileId:row.id,sha256:row.sha256}))),s.userId]);
+  await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'commercial_contract.'+String(b.status),entityType:'contract',entityId:id,metadata:{version:item.version,status:item.status,...(documents?{documentManifest:documents.hash,documentCount:documents.rows.length}:{})}});return {contractId:id,item};
  });
 }
 /** Explicit approved source, never automatic precedence or purchase-to-sale fallback. */

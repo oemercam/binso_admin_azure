@@ -1,6 +1,7 @@
 import type {TenantPermission} from '@/lib/permissions';
 /** All entity attachments use the same upload, storage and download path. */
 export const fileRelations:Record<string,{table:string;column:string;filter:string;read:TenantPermission;write:TenantPermission}>={
+ contract_document:{table:'contracts',column:'contract_id',filter:'contractId',read:'contracts:read',write:'contracts:write'},
  supplier_invoice_receipt:{table:'supplier_invoices',column:'supplier_invoice_id',filter:'supplierInvoiceId',read:'purchasing:read',write:'purchasing:write'},
  time_report:{table:'time_entries',column:'time_entry_id',filter:'timeEntryId',read:'time:read',write:'time:write'},
  expense_receipt:{table:'expenses',column:'expense_id',filter:'expenseId',read:'expenses:read',write:'expenses:write'},

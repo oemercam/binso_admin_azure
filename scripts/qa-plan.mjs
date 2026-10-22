@@ -7,10 +7,13 @@ export const fullRoutes=['/','/dashboard','/portal','/login','/registrieren','/p
 fullRoutes.push('/bericht','/angebot','/berichte','/projekte','/projekte/project-one','/wartung','/operator/wallboard','/dev/ux-lab','/offline','/agb','/datenschutz','/impressum','/auftragsbearbeitung','/unterauftragsbearbeiter','/passwort-vergessen','/passwort-zuruecksetzen','/email-bestaetigen','/einladung','/willkommen','/belege','/portal/login','/portal/registrieren','/preview/zeit','/preview/dashboard','/preview/rechnungen','/operator/finanzen','/operator/abonnemente','/operator/sperrungen','/operator/ankuendigungen');
 fullRoutes.push('/lieferanten','/lieferanten/neu','/lieferanten/supplier-one');
 fullRoutes.push('/abwesenheiten','/einstellungen/abwesenheiten');
+fullRoutes.push('/vertraege','/vertraege/contract-one');
 export const webkitFullRoutes=['/bericht','/angebot','/berichte','/projekte','/projekte/project-one','/dashboard','/finanzen','/support/ticket-one','/rechnungen','/zeit','/mitarbeiter/neu','/mitarbeiter/employee-one','/projekte/neu','/rechnungen/RE-TEST-1','/kunden/neu','/produkte/neu','/spesen/neu','/angebote/neu','/zahlungen/neu'];
 webkitFullRoutes.push('/lieferanten/neu','/lieferanten/supplier-one');
 webkitFullRoutes.push('/abwesenheiten','/einstellungen/abwesenheiten');
+webkitFullRoutes.push('/vertraege','/vertraege/contract-one');
 const groups={
+ contracts:{match:/commercial-contract|contract-document|vertraege|app\/api\/contracts/,routes:['/vertraege','/vertraege/contract-one'],interactions:[]},
  absences:{match:/absence|abwesenheit/,routes:['/abwesenheiten','/einstellungen/abwesenheiten'],interactions:[]},
  suppliers:{match:/supplier|lieferant/,routes:['/lieferanten','/lieferanten/neu','/lieferanten/supplier-one'],interactions:[]},
  products:{match:/product|produkt/,routes:['/produkte','/produkte/product-one','/produkte/neu'],interactions:['products']},

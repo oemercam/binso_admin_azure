@@ -80,6 +80,7 @@ const browserType=engines[process.env.BINSO_UX_BROWSER??"chromium"];
 const launchOptions={headless:true,...(process.env.BINSO_CHROMIUM_EXECUTABLE&&(process.env.BINSO_UX_BROWSER??'chromium')==='chromium'?{executablePath:process.env.BINSO_CHROMIUM_EXECUTABLE,args:['--no-sandbox','--disable-dev-shm-usage','--use-gl=angle','--use-angle=swiftshader']}: {})};
 let browser;
 const customer={paymentDays:30,id:'customer-one',customer_no:'K-000001',name:'Prüffirma AG',city:'Bern',status:'active',contact_name:'Test Person',email:'test@example.invalid',street:'Teststrasse 1',postal_code:'3000'};
+const commercialContract={id:'contract-one',contract_no:'V-TEST-1',name:'Servicevereinbarung',customer_id:'00000000-0000-4000-8000-000000000002',supplier_id:null,project_id:null,party_name:customer.name,start_date:'2026-01-01',end_date:'2026-12-31',status:'draft',notice_days:30,billing_interval:'monthly',notes:'',version:1,is_v26_contract:true,created_by_user_id:'fixture-owner',side:'sale'};
 const product={id:'product-one',name:'Beratung',kind:'service',unit:'hour',unit_price:125,vat_rate:8.1,status:'active'};
 const employee={id:'employee-one',first_name:'Test',last_name:'Person',email:'mitarbeiterin.mit.langem.namen@internationales-unternehmen.example.invalid',start_date:'2025-01-01',job_title:'ICT',workload_percent:80,weekly_hours:42,status:'active'};
 const supplier={id:'supplier-one',supplier_no:'L-000001',name:'Synthetic Partner AG',contact_name:'Synthetic Contact',email:'partner@example.invalid',phone:'',address:'Bern',uid:'',payment_days:30,status:'active',revision:'2026-10-22 12:00:00+00'};
@@ -308,6 +309,8 @@ try{
    else if(/^\/api\/employees\/[^/]+\/family$/.test(p))data={children:[],claims:[]};
    else if(p==='/api/absences')data={items:[],total:0,ownEmployeeId:null,mayRequest:false,mayReadTeam:false,mayReview:false};
    else if(p==='/api/absences/context')data={items:[]};
+   else if(p==='/api/contracts')data={items:[commercialContract],total:1};
+   else if(p==='/api/contracts/contract-one')data={item:commercialContract,conditions:[],documentManifest:'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',documentsReady:true,documentCount:0,reviewSnapshot:null};
    else if(p==='/api/auth/invitation')data={email:'eingeladen@example.invalid',organization:customer.name,existingAccount:false};
 
 

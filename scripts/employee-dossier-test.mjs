@@ -19,6 +19,7 @@ import {verifyWageDefinitionContract} from './wage-definition-contract.mjs';
 import {verifyEmployeeFamilyContract} from './employee-family-contract.mjs';
 import {verifyAbsenceContract} from './absence-contract.mjs';
 import {verifyCommercialContract} from './commercial-contract-test.mjs';
+import {verifyContractDocuments} from './contract-document-test.mjs';
 
 // Execute the actual routes, repository, authorization, SQL and audit against
 // migrated PostgreSQL/RLS. Replace only session/connection boundaries, never SQL.
@@ -190,19 +191,20 @@ try{
  await verifyEmployeeFamilyContract({load,db,transaction,org,other,act,request,employeeId:id,setAuditFailure:value=>{auditFailure=value;}});
  await verifyAbsenceContract({load,db,transaction,org,other,act,request,setAuditFailure:value=>{auditFailure=value;}});
  await verifyCommercialContract({load,db,transaction,org,other,act,request,setAuditFailure:value=>{auditFailure=value;}});
+ await verifyContractDocuments({load,db,transaction,org,other,act,request,setAuditFailure:value=>{auditFailure=value;}});
  invitationPlatformEnabled=true;
  try{await verifyInvitationContract({load,mock,db,transaction,org,other,act,request,setAuditFailure:value=>{auditFailure=value;}});}finally{invitationPlatformEnabled=false;}
  mock('lib/server/maintenance.ts',{maintenanceState:async()=>({enabled:false,endsAt:null})});
  const proxy=load('proxy.ts'),headers=await load('next.config.ts').default.headers();
  assert.ok(proxy.config.matcher.includes('/lieferanten/:path*'),'Supplier pages are in the actual proxy matcher');
- for(const pathname of ['/lieferanten','/lieferanten/neu','/lieferanten/supplier-one','/abwesenheiten','/einstellungen/abwesenheiten']){
+ for(const pathname of ['/lieferanten','/lieferanten/neu','/lieferanten/supplier-one','/abwesenheiten','/einstellungen/abwesenheiten','/vertraege','/vertraege/contract-one']){
   const response=await proxy.proxy(new NextRequest('https://employee.invalid'+pathname));
   assert.equal(response.status,307);assert.equal(new URL(response.headers.get('location')).pathname,'/login');
  }
  const supplierHeaders=headers.find(rule=>rule.source==='/lieferanten/:path*')?.headers;
  assert.ok(supplierHeaders?.some(header=>header.key==='Cache-Control'&&header.value.includes('no-store')));
  assert.ok(supplierHeaders?.some(header=>header.key==='X-Robots-Tag'&&header.value.includes('noindex')));
- for(const source of ['/abwesenheiten/:path*','/einstellungen/:path*']){const protectedHeaders=headers.find(rule=>rule.source===source)?.headers;assert.ok(protectedHeaders?.some(h=>h.key==='Cache-Control'&&h.value.includes('no-store')));assert.ok(protectedHeaders?.some(h=>h.key==='X-Robots-Tag'&&h.value.includes('noindex')));}
+ for(const source of ['/abwesenheiten/:path*','/einstellungen/:path*','/vertraege/:path*']){const protectedHeaders=headers.find(rule=>rule.source===source)?.headers;assert.ok(protectedHeaders?.some(h=>h.key==='Cache-Control'&&h.value.includes('no-store')));assert.ok(protectedHeaders?.some(h=>h.key==='X-Robots-Tag'&&h.value.includes('noindex')));}
  session=null;assert.equal((await read(id)).status,401);
  console.log('Employee dossier: actual POST/PATCH/GET, optional email/account, persistence, replay/conflict, legacy field preservation, eight roles, plans, tenants/RLS, date constraints and atomic audit rollback passed.');
  console.log('Employment: separate reentry, immutable revisions, replay/stale conflict, database overlap protection, restricted RLS and supersede/audit rollback passed; no payroll or identity mutation.');

@@ -5,7 +5,7 @@ import { requireSession } from "@/lib/server/session";
 import { authorize } from "@/lib/server/rbac";
 import { withTenant } from "@/lib/server/db";
 import { getBlobByUrl } from "@/lib/server/storage";
-import {canAccessFile} from "@/lib/server/file-access";
+import {canAccessFile,requiresCleanFile} from "@/lib/server/file-access";
 
 export const runtime="nodejs";
 
@@ -21,10 +21,11 @@ export async function GET(_request:Request,{params}:{params:Promise<{id:string}>
     if(!row)return new Response("Nicht gefunden.",{status:404});
     if(row.purpose==='document')await requireModuleEntitlement(s.organizationId,'dokumente');
     if(row.purpose==='supplier_invoice_receipt')await requireModuleEntitlement(s.organizationId,'lieferanten');
+    if(row.purpose==='contract_document')await requireModuleEntitlement(s.organizationId,'vertraege');
     const relation=fileRelations[row.purpose];
     if(relation)authorize(s,relation.read);
     if(row.purpose==='expense_receipt'&&s.role==='member'&&row.expenseOwner!==s.userId)return new Response("Nicht gefunden.",{status:404});
-    if(row.purpose==='supplier_invoice_receipt'?row.scanStatus!=='clean':!canAccessFile(row.scanStatus))return new Response("Datei ist noch nicht für den Download freigegeben.",{status:423,headers:{"cache-control":"private, no-store","x-content-type-options":"nosniff"}});
+    if(requiresCleanFile(row.purpose)?row.scanStatus!=='clean':!canAccessFile(row.scanStatus))return new Response("Datei ist noch nicht für den Download freigegeben.",{status:423,headers:{"cache-control":"private, no-store","x-content-type-options":"nosniff"}});
     const blob=row.body?{body:new Uint8Array(row.body),contentType:row.mimeType}:row.storagePath?await getBlobByUrl(row.storagePath):null;
     if(!blob)return new Response("Dateiinhalt nicht verfügbar.",{status:404});
     return new Response(blob.body,{headers:{"content-type":blob.contentType,"content-disposition":`attachment; filename*=UTF-8''${encodeURIComponent(row.fileName)}`,"cache-control":"private, no-store","x-content-type-options":"nosniff","x-binso-file-scan-status":row.scanStatus,"content-security-policy":"sandbox; default-src 'none'"}});

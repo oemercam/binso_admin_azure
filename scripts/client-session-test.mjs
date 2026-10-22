@@ -76,6 +76,8 @@ try{
  console.log('Support correlation: exact header/body agreement, UUID boundary and negative privacy cases passed.');
 
  const avatarFile=new File(['synthetic binary; decoder tested separately'],'avatar.png',{type:'image/png'}),form=new FormData();form.append('file',avatarFile);form.append('purpose','profile_avatar');const imageKeys=[],imageEvents=await import(eventsUrl),imageId='6f81c519-5073-4f33-8b45-90bc4ad6157c';
+ const contractBefore=imageEvents.dataRevision(['/api/contracts/contract-one']);imageEvents.publishMutation('/api/files');assert.notEqual(imageEvents.dataRevision(['/api/contracts/contract-one']),contractBefore,'Document changes invalidate the contract manifest view');
+ const filesBefore=imageEvents.dataRevision(['/api/files']);imageEvents.publishMutation('/api/contracts/contract-one/status');assert.notEqual(imageEvents.dataRevision(['/api/files']),filesBefore,'Contract changes invalidate their attachment view');
  for(const item of [{id:imageId,scanStatus:'clean'},{id:imageId,scanStatus:'unverified',available:true},{id:'not-an-id',scanStatus:'clean',available:true}]){
   const before=imageEvents.dataRevision(['/api/files']);globalThis.fetch=async(path,options)=>{imageKeys.push(options.headers['Idempotency-Key']);return Response.json({item},{status:201});};
   await assert.rejects(backend.apiUpload('/api/files',form),error=>error.code==='invalid_response');assert.equal(imageEvents.dataRevision(['/api/files']),before,'Incomplete image receipts cannot broadcast a successful upload');
