@@ -128,3 +128,9 @@ am Produktdiagramm. Die ersten1280px-Aufnahmen wurden lokal gesichtet: Dialog-
 Footer und Grundraster sichtbar; die Rechnungsliste zeigt eine Datums-Ellipse.
 Deren fachliche/visuelle Freigabe bleibt ein P2-Folgepunkt; keine pauschale
 Behauptung, sämtliche Tabelleninhalte seien vollständig ungekürzt sichtbar.
+
+Der erweiterte Chartlauf39771211159 stoppte an einem fehlerhaften SVG-XPath
+des neuen Testadapters. Der Namespace-neutral korrigierte Locator wurde lokal
+im tatsächlichen Chromium mit alter Nulltreffermenge und neuer Geometriemessung
+reproduziert/geprüft. Kein Produktchart oder Geometriegate geändert. Der neue
+CI-Gesamtstand bleibt bis zum tatsächlichen Ergebnis offen.

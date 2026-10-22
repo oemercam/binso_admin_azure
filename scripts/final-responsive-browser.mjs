@@ -51,7 +51,7 @@ export async function verifyFinalResponsiveSample({page,base,theme,locale,naviga
     const development=page.locator('details.financial-snapshot');await development.locator('summary').click();
     await development.getByRole('button',{name:t('Zeitverlauf anzeigen'),exact:true}).click();await settle();
     const chart=development.locator('.bo-statistics-line').first();await chart.waitFor({state:'visible'});
-    const bounds=await chart.locator('xpath=ancestor::svg').boundingBox();
+    const bounds=await chart.locator('xpath=ancestor::*[local-name()="svg"]').boundingBox();
     assert.ok(bounds.width>0&&bounds.height>0&&bounds.x>=0&&bounds.x+bounds.width<=width+1,'Expanded real chart fits the content viewport');
     await inspect();await capture(page,name+'-chart');
    }
