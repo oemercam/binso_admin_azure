@@ -1,4 +1,10 @@
 {
+  "Bankverbindung bearbeiten": ["Edit bank details","Modifier les coordonnées bancaires","Modifica le coordinate bancarie"],
+  "Keine Bankverbindung": ["No bank details","Aucune coordonnée bancaire","Nessuna coordinata bancaria"],
+  "Schweiz oder Liechtenstein. Leer lassen, um die Bankverbindung zu entfernen.": ["Switzerland or Liechtenstein. Leave empty to remove the bank details.","Suisse ou Liechtenstein. Laissez vide pour supprimer les coordonnées bancaires.","Svizzera o Liechtenstein. Lascia vuoto per rimuovere le coordinate bancarie."],
+  "Die Änderung benötigt eine Sicherheitsbestätigung. Es wird keine Zahlung ausgelöst.": ["The change requires security confirmation. No payment will be initiated.","La modification nécessite une confirmation de sécurité. Aucun paiement ne sera déclenché.","La modifica richiede una conferma di sicurezza. Non verrà avviato alcun pagamento."],
+  "Bitte die Bankverbindung und den aktuellen Stand prüfen.": ["Please check the bank details and current version.","Veuillez vérifier les coordonnées bancaires et la version actuelle.","Verifica le coordinate bancarie e la versione attuale."],
+  "Bitte eine gültige Schweizer oder Liechtensteiner IBAN eingeben.": ["Please enter a valid Swiss or Liechtenstein IBAN.","Veuillez saisir un IBAN suisse ou liechtensteinois valide.","Inserisci un IBAN svizzero o del Liechtenstein valido."],
   "Tatsächliches Zahlungsdatum": ["Actual payment date","Date effective du paiement","Data effettiva del pagamento"],
   "Bitte den Erstattungsbetrag und die Währung prüfen.": ["Please check the reimbursement amount and currency.","Veuillez vérifier le montant et la devise du remboursement.","Verifica l’importo e la valuta del rimborso."],
   "Der Spesenbetrag wurde geändert. Bitte den aktuellen Stand prüfen.": ["The expense amount has changed. Please check the current details.","Le montant des frais a changé. Veuillez vérifier les données actuelles.","L’importo delle spese è cambiato. Verifica i dati attuali."],

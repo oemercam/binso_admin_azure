@@ -14,6 +14,8 @@ import {useRecordList} from './shared';
 import {useDirtySnapshot} from '../use-dirty-snapshot';
 import {useProcessDraft} from '../use-process-draft';
 import {allowDraftNavigation} from '../use-browser-back-guard';
+import {SupplierBank} from '../supplier-bank';
+import {tenantCan} from '@/lib/permissions';
 
 export function SuppliersPage(){
  const columns:NonNullable<Parameters<typeof useRecordsController>[0]['columns']>=[{label:'Lieferant',index:0},{label:'Kontakt',index:1},{label:'Nr.',index:2},{label:'Status',index:4,status:true}],chips=['Alle','Aktiv','Inaktiv'];
@@ -27,6 +29,8 @@ const blank:Draft={name:'',contactName:'',email:'',phone:'',address:'',uid:'',pa
 type Supplier={id:string;supplier_no:string;name:string;contact_name:string|null;email:string|null;phone:string|null;address:string|null;uid:string|null;payment_days:number;status:string;revision:string};
 export function SupplierForm({supplierId}:{supplierId?:string}){
  const formId=useId();
+ const session=useApiQuery<{tenant?:{role?:string;moduleProfile?:'standard'|'time_only'}}>(supplierId?'/api/auth/session':null);
+ const role=session.data?.tenant?.role??'',profile=session.data?.tenant?.moduleProfile;
  const existing=!!supplierId,router=useRouter(),params=useSearchParams(),returnTo=safeAppPath(params.get('returnTo'),'/lieferanten');
  const endpoint='/api/suppliers'+(supplierId?'/'+encodeURIComponent(supplierId):'');
  const query=useApiQuery<{item:Supplier}>(existing?endpoint:null),[draft,setDraft]=useState<Draft>(blank),[revision,setRevision]=useState(''),[editing,setEditing]=useState(!existing),[busy,setBusy]=useState(false),[error,setError]=useState('');
@@ -60,6 +64,7 @@ export function SupplierForm({supplierId}:{supplierId?:string}){
  if(existing&&(query.loading||query.error||!query.data?.item))return <AppShell title="Lieferant" active="lieferanten" backHref={returnTo} backLabel="Lieferanten">{query.loading?<LoadingState/>:query.error?<ErrorState onRetry={query.refresh}>{query.error}</ErrorState>:<EmptyState title="Lieferant wurde nicht gefunden."/>}</AppShell>;
  return <AppShell title={existing?draft.name:'Lieferant hinzufügen'} titleIsUserContent={existing} active="lieferanten" backHref={returnTo} backLabel="Lieferanten" editing={editing} actions={existing&&!editing?<ActionsMenu label="Lieferantenaktionen"><ActionRow requiresWrite icon="edit" title="Bearbeiten" onClick={()=>setEditing(true)}/></ActionsMenu>:undefined}>
   {!editing&&<section className="surface"><SectionTitle title="Stammdaten"/><dl className="detail-list">{[['Nr.',query.data?.item.supplier_no],['Kontakt',draft.contactName],['E-Mail',draft.email],['Telefon',draft.phone],['Adresse',draft.address],['UID',draft.uid],['Zahlungsfrist',draft.paymentDays]].filter(([,value])=>value).map(([label,value])=><div key={label}><dt><LocalizedText>{label}</LocalizedText></dt><dd>{value}</dd></div>)}</dl></section>}
+  {!editing&&supplierId&&tenantCan(role,'bank:read',profile)&&<SupplierBank supplierId={supplierId} mayWrite={tenantCan(role,'bank:write',profile)} onSaved={query.refresh}/>}
   <FormSheet workspace open={editing} onClose={close} label={existing?'Lieferant bearbeiten':'Lieferant hinzufügen'} busy={busy} dirty={dirty}>
    <form id={formId} onSubmit={event=>{event.preventDefault();void save();}}><div className="form-grid two">
     <Field label="Lieferant"><Input required maxLength={200} value={draft.name} onChange={event=>field('name',event.target.value)}/></Field>
