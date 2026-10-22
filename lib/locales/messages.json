@@ -1,4 +1,10 @@
 {
+  "Einladung erneut senden": ["Resend invitation","Renvoyer l’invitation","Invia di nuovo l’invito"],
+  "Einladung erneut senden?": ["Resend invitation?","Renvoyer l’invitation ?","Inviare di nuovo l’invito?"],
+  "Der bisherige Link wird ungültig. Die neue Einladung gilt sieben Tage; Rolle und Modulprofil bleiben erhalten.": ["The previous link becomes invalid. The new invitation is valid for seven days; role and module profile are preserved.","Le lien précédent devient invalide. La nouvelle invitation est valable sept jours ; le rôle et le profil de modules sont conservés.","Il link precedente non sarà più valido. Il nuovo invito vale sette giorni; ruolo e profilo dei moduli restano invariati."],
+  "Neue Einladung an Versand übergeben.": ["New invitation submitted for sending.","Nouvelle invitation transmise pour envoi.","Nuovo invito inoltrato per l’invio."],
+  "Diese Einladung wurde geändert oder ist nicht mehr offen.": ["This invitation has changed or is no longer pending.","Cette invitation a changé ou n’est plus en attente.","Questo invito è cambiato o non è più in sospeso."],
+  "Einladung wurde nicht gefunden.": ["Invitation not found.","Invitation introuvable.","Invito non trovato."],
   "Mitarbeiterzugang verknüpfen": ["Link employee account","Associer l’accès du collaborateur","Collega l’accesso del collaboratore"],
   "Die Verknüpfung erstellt weder ein Konto noch eine Kunden- oder Auftragsfreigabe.": ["Linking does not create an account or grant customer or project access.","L’association ne crée aucun compte et n’accorde aucun accès aux clients ou aux mandats.","Il collegamento non crea un account e non concede accesso a clienti o incarichi."],
   "Bitte Mitarbeiter und bestehenden Zugang prüfen.": ["Please check the employee and existing account.","Veuillez vérifier le collaborateur et l’accès existant.","Verifica il collaboratore e l’accesso esistente."],

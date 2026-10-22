@@ -10,6 +10,7 @@ import {verifySupplierContract} from './supplier-contract.mjs';
 import {verifyExpensePaymentContract} from './expense-payment-contract.mjs';
 import {verifySupplierBankContract} from './supplier-bank-contract.mjs';
 import {verifyEmployeeIdentityContract} from './employee-identity-contract.mjs';
+import {verifyInvitationContract} from './invitation-contract.mjs';
 
 // Execute the actual routes, repository, authorization, SQL and audit against
 // migrated PostgreSQL/RLS. Replace only session/connection boundaries, never SQL.
@@ -40,7 +41,16 @@ const transaction=async(organizationId,userId,fn)=>{
   const result=await fn(client);await db.exec('commit');return result;
  }catch(error){await db.exec('rollback');throw error;}
 };
-mock('lib/server/db.ts',{withTenant:transaction,withPlatform:unavailable});
+let invitationPlatformEnabled=false;
+const platformTransaction=async fn=>{
+ if(!invitationPlatformEnabled)return unavailable();
+ await db.exec('begin');try{
+  await db.exec('set local role binso_runtime');
+  await db.query("select set_config('app.organization_id','',true),set_config('app.user_id','',true),set_config('app.platform_operator','true',true)");
+  const result=await fn(client);await db.exec('commit');return result;
+ }catch(error){await db.exec('rollback');throw error;}
+};
+mock('lib/server/db.ts',{withTenant:transaction,withPlatform:platformTransaction});
 mock('lib/server/session.ts',{requireSession:async()=>{if(!session)throw new Response('Unauthenticated',{status:401});return session;}});
 mock('lib/server/operator/session.ts',{requireOperatorSession:unavailable});
 mock('lib/server/operator/audit.ts',{platformAudit:unavailable});
@@ -150,6 +160,8 @@ try{
  await verifyExpensePaymentContract({load,db,transaction,org,other,act,request,setAuditFailure:value=>{auditFailure=value;}});
  await verifySupplierBankContract({load,db,transaction,org,other,act,request,setAuditFailure:value=>{auditFailure=value;}});
  await verifyEmployeeIdentityContract({load,db,transaction,org,other,act,request,setAuditFailure:value=>{auditFailure=value;}});
+ invitationPlatformEnabled=true;
+ try{await verifyInvitationContract({load,mock,db,transaction,org,other,act,request,setAuditFailure:value=>{auditFailure=value;}});}finally{invitationPlatformEnabled=false;}
  mock('lib/server/maintenance.ts',{maintenanceState:async()=>({enabled:false,endsAt:null})});
  const proxy=load('proxy.ts'),headers=await load('next.config.ts').default.headers();
  assert.ok(proxy.config.matcher.includes('/lieferanten/:path*'),'Supplier pages are in the actual proxy matcher');
