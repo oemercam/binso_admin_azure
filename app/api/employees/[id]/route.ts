@@ -1,4 +1,4 @@
-import {employeeInputIssue} from "@/lib/employee-validation";
+import {employeeBodyFieldIssue,employeeInputIssue} from "@/lib/employee-validation";
 import { NextRequest } from "next/server";
 import { apiError, assertSameOrigin, cleanText, json, readJson } from "@/lib/server/http";
 import { tenantList, tenantUpdate, requireTenantFeature } from "@/lib/server/database";
@@ -21,6 +21,7 @@ export async function PATCH(request:NextRequest,{params}:{params:Promise<{id:str
     assertSameOrigin(request);
     const {id}=await params;
     const body=await readJson<Body>(request,16384);
+    const fieldIssue=employeeBodyFieldIssue(body);if(fieldIssue)return json({error:"employee_fields_invalid",message:fieldIssue},400);
     const issue=employeeInputIssue(body);if(issue)return json({error:"invalid_employee",message:issue},400);
     const firstName=cleanText(body.firstName,120),lastName=cleanText(body.lastName,120),jobTitle=cleanText(body.jobTitle,160);
     const workload=Number(body.workloadPercent);const weeklyHours=body.weeklyHours===undefined?42:Number(body.weeklyHours);const vacationDays=body.vacationDays===undefined?25:Number(body.vacationDays);

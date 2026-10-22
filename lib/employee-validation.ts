@@ -1,3 +1,9 @@
+/** The general employee endpoint never manages identity, salary, bank or family data. */
+export function employeeBodyFieldIssue(input:Record<string,unknown>):string|null {
+ const allowed=new Set(['firstName','lastName','email','phone','jobTitle','workloadPercent','entryDate','weeklyHours','vacationDays','address','status']);
+ return Object.keys(input).some(key=>!allowed.has(key))?'Diese Mitarbeiterangaben können hier nicht geändert werden.':null;
+}
+
 /** Shared client/server validation; the entry date is optional. */
 export function employeeInputIssue(input:{email?:unknown;entryDate?:unknown;workloadPercent?:unknown;weeklyHours?:unknown;vacationDays?:unknown}):string|null {
  const email=String(input.email??"").trim();
