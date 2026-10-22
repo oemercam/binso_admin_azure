@@ -156,7 +156,7 @@ function remoteDraftFromItem(item:Record<string,unknown>,kind:DocumentKind):Docu
   const issueDate=dateOnly(item.issue_date);
   const dueDate=dateOnly(item.due_date);
   let due="";
-  if(kind==="Angebot") due=dateOnly(item.valid_until)||issueDate;
+  if(kind==="Angebot") due=dateOnly(item.valid_until);
   else if(dueDate){
     const start=new Date(issueDate+"T12:00:00");
     const end=new Date(dueDate+"T12:00:00");

@@ -484,7 +484,7 @@
       ],
       "test": "Tatsächlicher isolierter Migrationstest mit eingeschränkter Rolle bestanden: Positiv-/Negativfälle, Fälligkeit, Abbruch, Replay, Status/Version, Präferenz und Audit-Rollback. Aktuelle native Parallel-/Browser-CI noch ausstehend.",
       "visualComparison": "Bestehende gemeinsame FormSheet-/DetailDisclosure-/ActionRow-Owner verwendet. Aktuelle gerenderte Abnahme offen, kein neuer Originalscreen behauptet.",
-      "blocker": "Garantierter Hintergrund-Mailversand, echte Providerzustellung sowie vollständige fachliche/visuelle/Geräteabnahme fehlen; kein Produktivlauf oder Versand ausgeführt."
+      "blocker": "Aktuelle native Parallel-/Browser-CI sowie vollständige fachliche/visuelle/Geräteabnahme fehlen. Der Wortlaut dieser Klausel fordert keinen garantierten Hintergrund-Mailkanal; dessen Fehlen wird nicht als nachgewiesene Funktionslücke dieser Klausel gewertet. Kein Produktivlauf oder Versand ausgeführt."
     },
     "R7-34-005": {
       "sourceTextSha256": "73880bf8c0debcc2a4ee30490768edcb4697297bdf15cd94266ffa0991e05ab1",

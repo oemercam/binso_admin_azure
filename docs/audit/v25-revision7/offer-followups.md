@@ -55,3 +55,23 @@ ausdrücklich noch nicht als umgesetzt oder abgenommen erklärt.
 
 Migration0077 ist additiv und bisher ausschliesslich im isolierten Test ausgeführt.
 Ihre produktive Ausführung erfordert die separate exakte Commit-Freigabe.
+
+## Aktueller CI-Befund und gezielte Testkorrekturen
+
+Am Stand `d11a847b` bestanden der gesamte Migrationstest, der echte native
+HTTP-/Rollen-Test und Build samt Paket-Smoke. Zwei neue Testvorbereitungen waren
+fehlerhaft: Die isolierte native Testrolle konnte die bestehenden INVOKER-RLS-
+Resolver nicht lesen; der Browserdatensatz enthielt kein Angebots-Gültigkeitsdatum.
+Zusätzlich wurde dadurch ein echter Darstellungsfehler sichtbar: Die Detailabbildung
+ersetzte ein fehlendes Gültigkeitsdatum durch das Ausstellungsdatum und konnte
+dadurch im Gegensatz zu API/Liste fälschlich Ablauf anzeigen. Dieser Ersatz wurde
+entfernt; der echte Mapper und die echte Statusprojektion werden positiv/negativ
+mit fehlendem, zukünftigem und abgelaufenem Datum verglichen.
+Die Testkorrektur ergänzt ausschliesslich SELECT auf die drei Resolver-Abhängigkeiten
+in der temporären Testrolle und ein ausdrücklich gültiges synthetisches Angebot.
+Ein zusätzlicher Browser-Gegenfall prüft das abgelaufene Angebot. Der Testvertrag
+weist Nicht-Superuser und fehlenden RLS-Bypass ausdrücklich nach. Ein isolierter
+Resolver-Test reproduzierte erst den Rechtefehler und danach den Erfolg mit genau
+diesen drei Leserechten. Keine produktive Rolle oder Policy wurde geändert.
+Die native Parallel- und Browserabnahme ist erst nach neuem erfolgreichem CI-Lauf
+für den korrigierten Quellstand belegt.

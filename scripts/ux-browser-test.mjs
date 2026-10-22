@@ -77,7 +77,7 @@ const product={id:'product-one',name:'Beratung',kind:'service',unit:'hour',unit_
 const employee={id:'employee-one',first_name:'Test',last_name:'Person',email:'mitarbeiterin.mit.langem.namen@internationales-unternehmen.example.invalid',start_date:'2025-01-01',job_title:'ICT',workload_percent:80,weekly_hours:42,status:'active'};
 const expense={id:'expense-one',merchant:'SBB',amount:89,currency:'CHF',expense_date:'2026-10-08',status:'submitted',employee_id:employee.id,employee};
 const invoice={id:'invoice-one',number:'RE-TEST-1',kind:'invoice',customer_id:customer.id,customer,total:135.13,subtotal:125,vat:10.13,paid_amount:100,currency:'CHF',issue_date:'2026-10-08',due_date:'2026-11-08',status:'partial',items:[{description:'Beratung',quantity:1,unit:'hour',unit_price:125,vat_rate:8.1}]};
-const offer={...invoice,id:'offer-one',kind:'offer',number:'AN-TEST-1',status:'sent',paid_amount:0};
+const offer={...invoice,id:'offer-one',kind:'offer',number:'AN-TEST-1',status:'sent',valid_until:'2099-12-31',paid_amount:0};
 const payment={id:'payment-one',amount:100,currency:'CHF',paid_on:'2026-10-08',method:'bank',status:'booked',customer_id:customer.id,customer,invoice};
 const ticket={id:'ticket-one',case_number:'T-TEST-1',subject:'Testanfrage',status:'open',priority:'normal',created_at:'2026-10-08T10:00:00Z',updated_at:'2026-10-08T10:00:00Z'};
 const projectSeed={id:'project-one',name:'Cloud Migration',customer_id:customer.id,customer_name:customer.name,status:'active',hours:12.5,hours_budget:120,progress:10,notes:'Synthetic project notes',version:1,source_offer:offer.number};
@@ -898,6 +898,11 @@ try{
    assert.equal(new URL(page.url()).pathname,'/angebote/AN-TEST-1');failRevision=false;
    await revisionActions.getByRole('button',{name:'Angebot überarbeiten',exact:true}).click();const revisionEditor=page.getByRole('dialog',{name:'Angebot bearbeiten',exact:true});await revisionEditor.waitFor();await revisionActions.waitFor({state:'hidden'});assert.equal(new URL(page.url()).pathname,'/angebote/AN-TEST-1','Revision retains the business number and route');assert.equal(await revisionEditor.getByLabel('Angebotsnummer',{exact:true}).count(),0,'Number is not an editable field');await revisionEditor.getByRole('button',{name:'Abbrechen',exact:true}).click();await revisionEditor.waitFor({state:'hidden'});await page.locator('.document-reference-row').getByText('Version 2',{exact:true}).waitFor();const versions=page.locator('.document-detail-view details').filter({has:page.locator('summary',{hasText:'Versionen und Verlauf'})});await versions.locator('summary').click();await versions.getByRole('button',{name:/Version 1/}).waitFor();
    assert.equal(revisionPosts,2);assert.equal(revisionKeys[0],revisionKeys[1]);assert.equal(revisedOfferFixture.status,'draft');assert.equal(revisedOfferFixture.offer_version,2,'Revision advances the current draft while immutable version 1 remains available');revisedOfferFixture=undefined;
+   const validOfferUntil=offer.valid_until;offer.valid_until='2020-01-01';
+   await navigate(base+'/angebote/AN-TEST-1');await page.waitForLoadState('networkidle');
+   await page.getByRole('button',{name:'Weitere Aktionen',exact:true}).filter({visible:true}).click();
+   assert.equal(await page.getByRole('dialog',{name:'Weitere Aktionen',exact:true}).getByRole('button',{name:'Erinnerung',exact:true}).count(),0,'Expired offers cannot schedule reminders');
+   offer.valid_until=validOfferUntil;
    await navigate(base+'/angebote/AN-TEST-1');await page.waitForLoadState('networkidle');
    const followupSection=page.locator('.document-detail-view details').filter({has:page.locator('summary',{hasText:'Erinnerung'})});
    await page.getByRole('button',{name:'Weitere Aktionen',exact:true}).filter({visible:true}).click();await page.getByRole('dialog',{name:'Weitere Aktionen',exact:true}).getByRole('button',{name:'Erinnerung',exact:true}).click();

@@ -121,11 +121,17 @@ if(process.env.BINSO_BILLING_SAMPLE_DIR){
 
 const financial=await import(financialModuleUrl);
 const {documentTotals}=await import(moneyModuleUrl);
-const readNodes=new Set(['DocumentReadView','useDocumentTotals','numberValue','money','dateOnly','isoToSwiss','invoiceDueDate','documentPresentation']);
-const readFragment=ast.statements.filter(node=>ts.isFunctionDeclaration(node)&&readNodes.has(node.name?.text)).map(node=>node.getText(ast)).join('\n')+'\nexport {DocumentReadView};';
+const readNodes=new Set(['DocumentReadView','remoteDraftFromItem','useDocumentTotals','numberValue','money','dateOnly','isoToSwiss','invoiceDueDate','documentPresentation']);
+const readFragment=ast.statements.filter(node=>ts.isFunctionDeclaration(node)&&readNodes.has(node.name?.text)).map(node=>node.getText(ast)).join('\n')+'\nexport {DocumentReadView,remoteDraftFromItem,documentPresentation};';
 const readCompiled=ts.transpileModule(readFragment,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
 const readExports={};
 Function('require','exports','useState','Button','useMemo','Status','Link','financialStatus','financialStatusLabels','financialStatusTone','documentTotals','openAmount','resolveCustomer','MetricTiles','MetricTile','DetailDisclosure','SectionTitle',readCompiled)(require,readExports,React.useState,({ariaLabel})=>React.createElement('button',{'aria-label':ariaLabel}),callback=>callback(),({children})=>React.createElement('span',null,children),({children,href})=>React.createElement('a',{href},children),financial.financialStatus,financial.financialStatusLabels,financial.financialStatusTone,documentTotals,financial.openAmount,(await import(moduleUrl(await fs.readFile('lib/customer-identity.ts','utf8')))).resolveCustomer,({children})=>React.createElement('div',null,children),({label,value})=>React.createElement('div',null,label,React.createElement('strong',null,value)),({label,children})=>React.createElement('details',null,React.createElement('summary',null,label),children),({title})=>React.createElement('h2',null,title));
+for(const validUntil of [null,'2099-12-31','2020-01-01']){
+ const stored={kind:'offer',status:'sent',issue_date:'2020-01-01',valid_until:validUntil,items:[],total:100};
+ const mapped=readExports.remoteDraftFromItem(stored,'Angebot');
+ assert.equal(mapped.due,validUntil??'','Missing validity must not be fabricated from the issue date');
+ assert.equal(readExports.documentPresentation('Angebot',mapped,100).displayStatus,financial.financialStatus(stored),'List/API and operational detail use the same actual validity, including missing and expired dates');
+}
 const paidRead=renderToStaticMarkup(React.createElement(readExports.DocumentReadView,{type:'Rechnung',draft:{...draft,status:'paid',total:216.2,paidAmount:216.2,paidOn:'2026-10-06'},directory}));
 assert.ok(paidRead.includes('Rechnungsdatum'));assert.ok(paidRead.includes('Bezahlt am'));assert.ok(paidRead.includes('06.10.2026'));assert.ok(!paidRead.includes('Fällig am'));assert.ok(!paidRead.includes('Offener Betrag'));assert.equal((paidRead.match(/>Bezahlt</g)||[]).length,1,'The compact summary explicitly names its paid status');
 const unprovenPaid=renderToStaticMarkup(React.createElement(readExports.DocumentReadView,{type:'Rechnung',draft:{...draft,status:'paid',total:216.2,paidAmount:216.2},directory}));assert.ok(!unprovenPaid.includes('Bezahlt am'),'No completion date is invented for legacy payments');

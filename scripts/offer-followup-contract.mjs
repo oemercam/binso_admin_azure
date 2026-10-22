@@ -4,6 +4,11 @@ export async function verifyOfferFollowups({service,sql,transaction,session,crea
  const s={...session,isDemo:false,organizationStatus:'active'},org=s.organizationId;
  const preferenceBefore=(await sql("select in_app,updated_at from notification_preferences where organization_id=$1 and user_id=$2 and kind='Angebote'",[org,s.userId])).rows[0];
  const inTenant=(fn,actor=s)=>transaction(actor,client=>fn(client,actor));
+ await inTenant(async c=>{
+  const guard=(await c.query('select current_user as role,rolsuper,rolbypassrls from pg_roles where rolname=current_user')).rows[0];
+  assert.equal(guard.rolsuper,false);assert.equal(guard.rolbypassrls,false);
+  assert.ok(['binso_runtime','binso_followup_fixture'].includes(guard.role),'RLS assertions must execute as the restricted runtime/test role, never the schema owner');
+ });
  const offer=await createIssued(),schedule={action:'schedule',dueDate:today,optIn:true};
  assert.equal((await inTenant((c,a)=>service.offerFollowupHistory(c,a,offer.number))).items.length,0,'No default opt-in');
  for(const input of [{...schedule,optIn:false},{...schedule,dueDate:'2026-02-30'},{...schedule,dueDate:'1900-01-01'},{...schedule,dueDate:'2999-12-31'}])await assert.rejects(()=>inTenant((c,a)=>service.configureOfferFollowup(c,a,offer.number,input)),e=>e.code==='followup_invalid');
