@@ -14,6 +14,7 @@ import {useLanguagePreference} from "@/lib/client/use-language-preference";
 import {companyLogoSource} from "@/lib/image-url";
 import {useApiQuery} from "@/lib/client/use-api-query";
 import {AvatarUpload} from "../avatar-upload";
+import type {AvatarCrop} from '@/lib/avatar-crop';
 import {Avatar} from "../avatar";
 import {usePageAccess} from "@/lib/client/page-access";
 import {ActionRow,ActionSheet,FormSheet,ListRow,SelectionRows,SettingsGroup} from "../binso-ux";
@@ -59,10 +60,11 @@ export function AccountSettingsPage() {
   const avatarPending=useRef(false);
   const [pendingAvatar,setPendingAvatar]=useState<{id:string;expectedUrl:string}|null>(null);
   const removeAvatar=async()=>{const match=avatarUrl.match(/^\/api\/files\/([0-9a-f-]{36})\/download$/i);if(!match||avatarPending.current||saveBusy.current)return;avatarPending.current=true;setAvatarUploading(true);setAvatarError('');try{await apiDelete('/api/files/'+match[1]);setAvatarUrl('');setPendingAvatar(null);query.refresh();window.dispatchEvent(new Event('binso-profile-changed'));}catch(error){setAvatarError(error instanceof Error?error.message:'Profilbild konnte nicht entfernt werden.');}finally{avatarPending.current=false;setAvatarUploading(false)}};
-  const uploadAvatar=async(file:File|undefined)=>{
+  const uploadAvatar=async(file:File|undefined,crop?:AvatarCrop)=>{
     if(!file||avatarPending.current||saveBusy.current)return false;avatarPending.current=true;setAvatarUploading(true);setAvatarError("");
     try{
       const form=new FormData();form.append("file",file);form.append("purpose","profile_avatar");
+      if(crop)form.append('avatarCrop',JSON.stringify(crop));
       const result=await apiUpload<{item:{id:string;scanStatus:string;available:boolean}}>("/api/files",form);
       if(result.item.available!==true){
         setPendingAvatar({id:result.item.id,expectedUrl:avatarUrl});

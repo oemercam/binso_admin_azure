@@ -1,0 +1,76 @@
+name: Avatar profile
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/avatar-profile.yml'
+      - 'components/avatar*.tsx'
+      - 'components/file-upload.tsx'
+      - 'components/pages/settings.tsx'
+      - 'lib/avatar-crop.ts'
+      - 'lib/server/profile-image.ts'
+      - 'lib/client/backend.ts'
+      - 'app/api/files/**'
+      - 'scripts/avatar-browser.mjs'
+      - 'scripts/profile-image-test.mjs'
+      - 'app/design-system/primitives.css'
+permissions:
+  contents: read
+jobs:
+  avatar:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        engine: [chromium, webkit]
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: binso_test
+          POSTGRES_PASSWORD: binso_test
+          POSTGRES_DB: binso_observability_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U binso_test -d binso_observability_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-node
+      - name: Image normalization and existing upload security contracts
+        run: |
+          node scripts/profile-image-test.mjs
+          node scripts/auth-integrity-test.mjs
+      - name: Build current application
+        run: pnpm build
+      - name: Install pinned browser
+        env:
+          ENGINE: ${{ matrix.engine }}
+        run: |
+          npm install --prefix "$RUNNER_TEMP/binso-browser" --no-package-lock --ignore-scripts playwright@1.62.1
+          if [ "$ENGINE" = chromium ]; then
+            node "$RUNNER_TEMP/binso-browser/node_modules/playwright/cli.js" install --with-deps --only-shell chromium
+          else
+            node "$RUNNER_TEMP/binso-browser/node_modules/playwright/cli.js" install --with-deps webkit
+          fi
+      - name: Focused avatar selection, crop, persistence and removal
+        env:
+          BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs
+          BINSO_UX_BROWSER: ${{ matrix.engine }}
+          BINSO_UX_INTERACTIONS: avatar
+          BINSO_UX_ROUTES: /einstellungen/konto
+          BINSO_UX_WIDTHS: '390'
+          BINSO_UX_THEMES: light
+          BINSO_UX_OUTPUT: ${{ runner.temp }}/avatar-profile
+        run: node scripts/ux-browser-test.mjs
+      - name: Preserve focused browser evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: avatar-profile-${{ matrix.engine }}-${{ github.event.pull_request.head.sha }}
+          path: ${{ runner.temp }}/avatar-profile
+          if-no-files-found: warn
+          retention-days: 2

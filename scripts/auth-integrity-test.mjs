@@ -145,10 +145,15 @@ try{
  await query("update file_objects set scan_status='clean' where id=$1",[uploaded.id]);const clean=await download.GET(new Request('https://fixture.invalid'),{params:Promise.resolve({id:uploaded.id})});assert.equal(clean.status,200);assert.equal(await clean.text(),'synthetic bytes');
  await query("update file_objects set scan_status='rejected' where id=$1",[uploaded.id]);assert.equal((await download.GET(new Request('https://fixture.invalid'),{params:Promise.resolve({id:uploaded.id})})).status,423);
  const imageBytes=await sharp({create:{width:4,height:4,channels:4,background:'#4477aa'}}).png().toBuffer();
- const imageUpload=(purpose,key,bytes=imageBytes)=>{const form=new FormData();form.append('file',new File([bytes],'synthetic.png',{type:'image/png'}));form.append('purpose',purpose);return new Request('https://fixture.invalid/api/files',{method:'POST',headers:{'idempotency-key':key},body:form});};
+ const imageUpload=(purpose,key,bytes=imageBytes,crop)=>{const form=new FormData();form.append('file',new File([bytes],'synthetic.png',{type:'image/png'}));form.append('purpose',purpose);if(crop!==undefined)form.append('avatarCrop',JSON.stringify(crop));return new Request('https://fixture.invalid/api/files',{method:'POST',headers:{'idempotency-key':key},body:form});};
  assert.equal((await files.POST(imageUpload('profile_avatar','synthetic-corrupt-image',Buffer.from('89504e470d0a1a0a','hex')))).status,400,'Signature-only PNG is not a decodable image');
  const branding=async()=>({logo:(await query('select logo_url from organizations where id=$1',[org])).rows[0].logo_url,avatar:(await query('select avatar_url from app_users where id=$1',[user])).rows[0].avatar_url});
  const initialBranding=await branding();
+ const scansBeforeCrop=globalThis.__integrity.scanCalls;
+ for(const crop of [null,{},[],{x:2,y:0,zoom:1},{x:0,y:0,zoom:0}])assert.equal((await files.POST(imageUpload('profile_avatar','invalid-crop-'+randomUUID(),imageBytes,crop))).status,400,'Invalid crop never reaches storage or the scanner');
+ const {limitsConfig}=await import(await load('config/limits.ts'));
+ assert.equal((await files.POST(imageUpload('profile_avatar','oversized-avatar-'+randomUUID(),Buffer.alloc(limitsConfig.maxFileUploadBytes+1)))).status,413,'Oversized avatar rejected before decoding');
+ assert.equal(globalThis.__integrity.scanCalls,scansBeforeCrop);assert.deepEqual(await branding(),initialBranding);
  const pendingLogo=await files.POST(imageUpload('company_logo','synthetic-pending-logo'));assert.equal(pendingLogo.status,201);const pendingLogoId=(await pendingLogo.json()).item.id;
  assert.equal((await files.POST(imageUpload('profile_avatar','synthetic-pending-avatar'))).status,201);assert.deepEqual(await branding(),initialBranding,'Quarantined images never replace existing branding');
  const beforeReject=(await query('select count(*)::int n from file_objects where organization_id=$1',[org])).rows[0].n;

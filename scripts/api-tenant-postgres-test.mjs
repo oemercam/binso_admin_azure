@@ -234,6 +234,13 @@ try{
   assert.equal((await pool.query("select count(*)::int n from audit_events where organization_id=$1 and entity_id=$2 and action='avatar_activated'",[organizations[0],avatarId])).rows[0].n,1);
   if(role!=='owner')assert.equal((await write('PATCH',path,body,'owner')).status,404,'An owner cannot adopt a coworker personal image');
   const foreign=await fetch(base+path,{method:'PATCH',headers:{cookie:cookies.get('1:owner'),origin:base,'Content-Type':'application/json'},body:JSON.stringify(body)});assert.equal(foreign.status,404,'Avatar activation stays tenant-scoped');
+  const freshToken=randomBytes(32).toString('base64url');await pool.query("insert into auth_sessions(user_id,organization_id,token_hash,expires_at) values($1,$2,$3,now()+interval '1 hour')",[userId,organizations[0],createHash('sha256').update(freshToken).digest('hex')]);
+  const freshCookie='binso_v213_test_session='+freshToken;
+  assert.equal((await get('/api/settings/profile',freshCookie)).data.item.avatar_url,'/api/files/'+avatarId+'/download',role+' new authenticated session reads the persisted avatar');
+  assert.equal((await get(path+'/download',freshCookie)).status,200,role+' own image remains accessible');
+  const removed=await write('DELETE',path,{},role);assert.equal(removed.status,200,JSON.stringify(removed.data));
+  assert.equal((await get('/api/settings/profile',freshCookie)).data.item.avatar_url,null,role+' removal clears the persisted profile reference');
+  assert.equal((await get(path+'/download',freshCookie)).status,404,role+' removed image cannot be downloaded');
  }
  const archiveRead=await get('/api/customers/archive',cookies.get('0:owner')),archiveRow=archiveRead.data.items.find(item=>item.id===archivedCustomer.id);assert.ok(archiveRow,'Archived HTTP contract has a positive own-tenant fixture');
  assert.ok(!(await get('/api/customers/archive',cookies.get('1:owner'))).data.items.some(item=>item.id===archivedCustomer.id),'Archive listing remains tenant-scoped under the runtime role');

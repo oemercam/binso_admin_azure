@@ -1,4 +1,5 @@
 import {verifyBusinessReadinessBrowser} from './business-readiness-browser.mjs';
+import {verifyAvatarBrowser} from './avatar-browser.mjs';
 import {createUiAuthFixture} from './ui-auth-fixture.mjs';
 import {matchesLocalizedRoute,waitForLocalizedRoute} from './localized-route-contract.mjs';
 import {waitForLabReady} from './shared-control-browser.mjs';
@@ -1240,6 +1241,7 @@ try{
    await navigate(base+'/einstellungen/abonnement');await page.getByText('Nutzung',{exact:true}).waitFor();await capture(page,{animations:'disabled',path:path.join(output,`${theme}-320-subscription-settings.png`)});
   }
   if(hasInteraction('readiness'))await verifyBusinessReadinessBrowser({page,context,navigate:url=>page.goto(url),base,invoice,capture:state=>capture(page,{animations:'disabled',path:path.join(output,theme+'-readiness-'+state+'.png')})});
+  if(hasInteraction('avatar'))await verifyAvatarBrowser({page,context,base,capture:state=>capture(page,{animations:'disabled',path:path.join(output,theme+'-avatar-'+state+'.png')})});
   if(hasInteraction('operator')){
    await page.setViewportSize({width:320,height:740});await navigate(base+'/operator/sperrungen');await page.waitForLoadState('networkidle');const notice=await page.locator('.notice').evaluate(el=>[...el.children].map(child=>child.getBoundingClientRect().toJSON()));for(let i=1;i<notice.length;i++)assert.ok(notice[i].top>=notice[i-1].bottom+7,'Restriction details occupy separated rows');await capture(page,{animations:'disabled',path:path.join(output,`${theme}-320-operator-restrictions.png`)});
    await navigate(base+'/operator');await page.waitForLoadState('networkidle');

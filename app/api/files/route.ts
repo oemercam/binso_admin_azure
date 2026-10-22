@@ -66,7 +66,7 @@ export async function POST(request:NextRequest){
   if(!file.size)throw new ApiError(400,'file_empty','Die Datei ist leer.');
   validateFileContent(buffer,file.type);
   if(['company_logo','profile_avatar'].includes(purpose)){
-   try{buffer=await prepareProfileImage(buffer,file.type,purpose==='profile_avatar');}catch{throw new ApiError(400,'image_invalid','Das Bild kann nicht sicher verarbeitet werden. Bitte JPEG, PNG oder WebP mit höchstens 24 Megapixeln auswählen.');}
+   try{const crop=form.get('avatarCrop');buffer=await prepareProfileImage(buffer,file.type,purpose==='profile_avatar',crop===null?undefined:JSON.parse(String(crop)));}catch{throw new ApiError(400,'image_invalid','Das Bild kann nicht sicher verarbeitet werden. Bitte JPEG, PNG oder WebP mit höchstens 24 Megapixeln auswählen.');}
    if(buffer.length>limitsConfig.maxFileUploadBytes)throw new ApiError(413,'file_too_large','Das verarbeitete Bild ist zu gross.');
   }
   const sha256=createHash('sha256').update(buffer).digest('hex');

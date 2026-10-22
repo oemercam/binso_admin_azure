@@ -15243,5 +15243,35 @@
     "Please choose a valid document number.",
     "Veuillez choisir un numéro de document valide.",
     "Scegli un numero di documento valido."
+  ],
+  "Foto aufnehmen": [
+    "Take a photo",
+    "Prendre une photo",
+    "Scatta una foto"
+  ],
+  "Vergrösserung": [
+    "Zoom",
+    "Agrandissement",
+    "Ingrandimento"
+  ],
+  "Horizontaler Ausschnitt": [
+    "Horizontal position",
+    "Position horizontale",
+    "Posizione orizzontale"
+  ],
+  "Vertikaler Ausschnitt": [
+    "Vertical position",
+    "Position verticale",
+    "Posizione verticale"
+  ],
+  "Wähle den Bildausschnitt. Erst mit „Bild übernehmen“ wird das Bild hochgeladen.": [
+    "Choose the crop. The image is uploaded only when you select “Use image”.",
+    "Choisis le cadrage. L’image est envoyée uniquement après confirmation avec « Utiliser l’image ».",
+    "Scegli il ritaglio. L’immagine viene caricata solo dopo aver selezionato « Usa immagine »."
+  ],
+  "JPEG, PNG oder WebP. HEIC/HEIF bitte als JPEG exportieren.": [
+    "JPEG, PNG or WebP. Please export HEIC/HEIF as JPEG.",
+    "JPEG, PNG ou WebP. Exporte les fichiers HEIC/HEIF au format JPEG.",
+    "JPEG, PNG o WebP. Esporta i file HEIC/HEIF in formato JPEG."
   ]
 }

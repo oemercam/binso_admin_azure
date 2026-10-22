@@ -200,7 +200,7 @@ export async function apiUpload<T>(path:string,form:FormData):Promise<T>{
   const file=form.get("file");
   const headers:Record<string,string>={};
   if(file instanceof File){
-    const scope=JSON.stringify([path,form.get("purpose"),form.get("entityId")]);
+    const scope=JSON.stringify([path,form.get("purpose"),form.get("entityId"),...(form.has('avatarCrop')?[form.get('avatarCrop')]:[])]);
     let keys=uploadReplayKeys.get(file);if(!keys){keys=new Map();uploadReplayKeys.set(file,keys);}
     let key=keys.get(scope);if(!key){key=crypto.randomUUID();keys.set(scope,key);}
     headers["Idempotency-Key"]=key;
