@@ -1,0 +1,16 @@
+# V26 — Voraussetzungen für einen Release
+
+Stand22.10.2026: **nicht deploymentbereit**. Der Nutzer hat ausdrücklich vollständiges V26 vor dem Release gewählt. Bestehende V25-Funktionen bleiben Grundlage; kein Teilrelease als vollständiges V26 ausweisen. Tatsächliche Implementierung und Nachweise stehen in [v26-execution.md](v26-execution.md), fachliche Abhängigkeiten im [Paketplan](v26-gap-and-packages.md).
+
+| Grenze | Tatsächlicher Stand / nächster Nachweis |
+| --- | --- |
+| Funktionen | HR-/Lieferantenbasis, Dossierbindung/Einladungsrotation, Spesen-Zahlungsquelle/Erstattungsbestätigung und manuelle AP-Entwürfe/Belege lokal implementiert. Weitere Paketfunktionen fehlen; siehe aktuelle Paketstände, keine pauschale Vollständigkeit. |
+| Lokal gezielt geprüft | Tatsächliche API-/DB-/Runtime-RLS-/Rollen-/Fresh-Auth-/Replay-/Auditrollback-Kontrakte, Typecheck, betroffene ESLint-Dateien, Übersetzungsabdeckung, Workforce-Regression, Lifecycle-Sicherungen, mobile Navigationsgrenze und Foundation-Quellvertrag. Die Einzelprotokolle begrenzen diese Aussage. |
+| Browser / native Datenbank | Echte isolierte Browser-Anmeldefixture scheitert vor Browserstart mit ECONNREFUSED an Loopback-PostgreSQL. Docker Desktop gestartet, Engine bislang nicht erreichbar; Nutzer um lokalen Start/QA-Verbindung gebeten. Keine Auth-Umgehung. Gerenderte Abnahme und native Mehrverbindungs-/Parallelitätstests offen. |
+| Fachentscheidungen | F01–F10 bleiben gemäss Paketplan offen, insbesondere zusätzliche sensible HR-/Familien-/Payrollrechte, bestätigte Arbeits-/Ferien-/Lohnregeln, validierte Schweizer Payrollparameter/-engine, AP-Prüf-/Zahlungsregeln und Produktvorschläge. Neue sensible Felder/produktive Payroll bleiben geschlossen; bestehende Tarife/Rechte unverändert. |
+| Provider / Geräte / Betrieb | Reale Mailzustellung, tatsächliche Malwareengine-/Scannerintegration, Smartphone/PWA-Geräteabnahme, Domains/Operator-Entra, Monitoring sowie Backup/Restore brauchen echte externe Evidenz. Synthetische Transport-/Scannerzustände ersetzen sie nicht. |
+| GitHub / Release-Gates | V26 nur lokal, keine neuen GitHub-Prüfungen für diesen Stand. Später exakten Kandidaten veröffentlichen und unveränderte Pflichtprüfungen bestehen lassen. Vor Release erforderliche Integrations-/Build-/Security-/Browserprüfungen gebündelt am Kandidaten ausführen; bislang keine Vollsuite/Matrix. |
+| Migrationen |0084ff ausschliesslich in synthetischer Datenbank angewendet. Native Upgradefolge, Runtimegrants/RLS, Backup/Restore und konkreter Rollback-/Forward-Fix-Plan vor produktiver Anwendung qualifizieren. Keine produktive Migration erfolgt. |
+| Produktivfreigabe | Kein Push/Workflowstart/Merge/Deployment in bisherigen lokalen Entwicklungsblöcken. Der Nutzer möchte nach vollständigem V26 deployen. Konkreten Commit, bestandene Gates und verbleibende Risiken vor der gemäss AGENTS.md erforderlichen Freigabe des exakten SHAs vorlegen. |
+
+Ein grüner isolierter Kontrakt bedeutet weder vollständiges V26 noch Produktionsfreigabe. Fachlich oder extern blockierte Funktionen und tatsächlich noch nicht implementierte Pakete getrennt nachführen.

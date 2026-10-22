@@ -49,11 +49,13 @@ export async function DELETE(request:NextRequest,{params}:{params:Promise<{id:st
    if(!relation&&file.purpose!=='document')throw new ApiError(403,'file_forbidden','Diese Datei kann hier nicht entfernt werden.');
    authorize(s,relation?.write??'documents:write');
    if(file.purpose==='document')await requireModuleEntitlement(s.organizationId,'dokumente');
+   if(file.purpose==='supplier_invoice_receipt')await requireModuleEntitlement(s.organizationId,'lieferanten');
    if(file.created_by!==s.userId&&!['owner','admin'].includes(s.role))throw new ApiError(403,'file_forbidden','Nur eigene Anhänge können entfernt werden.');
    if(s.moduleProfile==='time_only'&&!['time_report','support_attachment'].includes(file.purpose))throw new ApiError(403,'file_forbidden','Keine Berechtigung für diese Datei.');
    if(relation){
     const entity=(await c.query(`select * from ${relation.table} where id=$1 and organization_id=$2 for update`,[file[relation.column],s.organizationId])).rows[0];
     if(!entity)throw new ApiError(404,'not_found','Zuordnung wurde nicht gefunden.');
+    if(file.purpose==='supplier_invoice_receipt'&&entity.status!=='draft')throw new ApiError(409,'attachment_locked','Anhänge abgeschlossener oder eingereichter Vorgänge bleiben erhalten.');
     if((file.purpose==='time_report'&&(entity.created_by_user_id!==s.userId&&!['owner','admin'].includes(s.role)))||(file.purpose==='expense_receipt'&&s.role==='member'&&entity.created_by_user_id!==s.userId)||(file.purpose==='support_attachment'&&s.moduleProfile==='time_only'&&entity.created_by_user_id!==s.userId))throw new ApiError(404,'not_found','Datei wurde nicht gefunden.');
     if(file.purpose==='time_report'&&(entity.approved||entity.submitted_at)||file.purpose==='expense_receipt'&&['approved','posted'].includes(entity.status)||['invoice_attachment','offer_attachment'].includes(file.purpose)&&entity.status!=='draft')throw new ApiError(409,'attachment_locked','Anhänge abgeschlossener oder eingereichter Vorgänge bleiben erhalten.');
    }

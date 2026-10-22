@@ -5,6 +5,7 @@ import {useApiQuery} from '@/lib/client/use-api-query';
 import {LocalizedText,useLocale} from '@/lib/client/locale';
 import {localeTags} from '@/lib/locales/config';
 import {formatCurrency} from '@/lib/financial-status';
+import {EntityFiles} from './entity-files';
 import {ActionRow,ActionsMenu,FormSheet} from './binso-ux';
 import {Button,EmptyState,ErrorState,Field,FormActions,Input,LoadingState,SectionTitle,Select} from './ui';
 
@@ -14,6 +15,7 @@ const blank:Draft={number:'',invoiceDate:'',dueDate:'',netAmount:'',vatAmount:''
 export function SupplierInvoices({supplierId,mayWrite}:{supplierId:string;mayWrite:boolean}){
  const endpoint='/api/suppliers/'+encodeURIComponent(supplierId)+'/invoices',query=useApiQuery<{items:Invoice[]}>(endpoint),formId=useId(),{locale}=useLocale();
  const [draft,setDraft]=useState<Draft>(blank),[selected,setSelected]=useState<Invoice|null>(null),[original,setOriginal]=useState(JSON.stringify(blank)),[open,setOpen]=useState(false),[busy,setBusy]=useState(false),[error,setError]=useState('');
+ const [receipts,setReceipts]=useState<Invoice|null>(null);
  const pending=useRef(false),attempt=useRef<{body:string;key:string}|null>(null);
  const edit=(invoice:Invoice|null)=>{
   const next=invoice?{number:invoice.supplier_invoice_no??'',invoiceDate:invoice.invoice_date??'',dueDate:invoice.due_date??'',netAmount:invoice.net_amount??'',vatAmount:invoice.vat_amount??'',totalAmount:invoice.total_amount??'',currency:invoice.currency??'',note:invoice.note??''}:blank;
@@ -34,7 +36,8 @@ export function SupplierInvoices({supplierId,mayWrite}:{supplierId:string;mayWri
  return <section className="surface">
   <SectionTitle title="Eingangsrechnungen" action={mayWrite?<ActionsMenu label="Eingangsrechnungen"><ActionRow requiresWrite icon="plus" title="Eingangsrechnungsentwurf" onClick={()=>edit(null)}/></ActionsMenu>:undefined}/>
   <p className="technical-hint"><LocalizedText>{'Entwürfe können unvollständig gespeichert werden. Sie sind weder freigegeben noch bezahlt.'}</LocalizedText></p>
-  {query.loading?<LoadingState/>:query.error?<ErrorState onRetry={query.refresh}>{query.error}</ErrorState>:!query.data?.items.length?<EmptyState title="Keine Eingangsrechnungen"/>:<div className="action-list">{query.data.items.map(invoice=><div key={invoice.id} className="assignment-row"><div><b>{invoice.supplier_invoice_no||<LocalizedText>{'Nummer offen'}</LocalizedText>}</b><p>{invoice.total_amount===null?<LocalizedText>{'Betrag offen'}</LocalizedText>:invoice.currency?formatCurrency(Number(invoice.total_amount),invoice.currency,localeTags[locale]):<>{invoice.total_amount}{' '}<LocalizedText>{'Währung ungeklärt'}</LocalizedText></>}</p></div><span><LocalizedText>{({draft:'Entwurf',open:'Offen',review:'In Prüfung',paid:'Bezahlt'} as Record<string,string>)[invoice.status]??invoice.status}</LocalizedText></span>{invoice.status==='draft'&&mayWrite&&<ActionsMenu label="Eingangsrechnungen"><ActionRow requiresWrite icon="edit" title="Entwurf bearbeiten" onClick={()=>edit(invoice)}/></ActionsMenu>}</div>)}</div>}
+  {query.loading?<LoadingState/>:query.error?<ErrorState onRetry={query.refresh}>{query.error}</ErrorState>:!query.data?.items.length?<EmptyState title="Keine Eingangsrechnungen"/>:<div className="action-list">{query.data.items.map(invoice=><div key={invoice.id} className="assignment-row"><div><b>{invoice.supplier_invoice_no||<LocalizedText>{'Nummer offen'}</LocalizedText>}</b><p>{invoice.total_amount===null?<LocalizedText>{'Betrag offen'}</LocalizedText>:invoice.currency?formatCurrency(Number(invoice.total_amount),invoice.currency,localeTags[locale]):<>{invoice.total_amount}{' '}<LocalizedText>{'Währung ungeklärt'}</LocalizedText></>}</p></div><span><LocalizedText>{({draft:'Entwurf',open:'Offen',review:'In Prüfung',paid:'Bezahlt'} as Record<string,string>)[invoice.status]??invoice.status}</LocalizedText></span><ActionsMenu label="Eingangsrechnungen"><ActionRow icon="file" title="Belege" onClick={()=>setReceipts(invoice)}/>{invoice.status==='draft'&&mayWrite&&<ActionRow requiresWrite icon="edit" title="Entwurf bearbeiten" onClick={()=>edit(invoice)}/>}</ActionsMenu></div>)}</div>}
+  {receipts&&<FormSheet open onClose={()=>setReceipts(null)} label="Eingangsrechnungsbelege"><EntityFiles purpose="supplier_invoice_receipt" entityId={receipts.id} readOnly={!mayWrite||receipts.status!=='draft'} title="Belege"/></FormSheet>}
   <FormSheet open={open} onClose={()=>setOpen(false)} label="Eingangsrechnungsentwurf" busy={busy} dirty={JSON.stringify(draft)!==original}>
    <form id={formId} onSubmit={event=>{event.preventDefault();void save();}}><div className="form-grid two">
     <Field label="Rechnungsnummer"><Input maxLength={120} value={draft.number} onChange={event=>field('number',event.target.value)}/></Field>

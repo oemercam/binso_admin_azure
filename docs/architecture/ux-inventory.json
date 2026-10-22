@@ -3274,6 +3274,11 @@
           "exported": "requireSession"
         },
         {
+          "local": "requireFreshAuthentication",
+          "target": "lib/server/fresh-authentication.ts",
+          "exported": "requireFreshAuthentication"
+        },
+        {
           "local": "authorize",
           "target": "lib/server/rbac.ts",
           "exported": "authorize"
@@ -3287,6 +3292,16 @@
           "local": "audit",
           "target": "lib/server/audit.ts",
           "exported": "audit"
+        },
+        {
+          "local": "businessDate",
+          "target": "lib/financial-status.ts",
+          "exported": "businessDate"
+        },
+        {
+          "local": "moneyMinor",
+          "target": "lib/money.ts",
+          "exported": "moneyMinor"
         }
       ]
     },
@@ -3342,6 +3357,11 @@
           "local": "requireTenantFeature",
           "target": "lib/server/database.ts",
           "exported": "requireTenantFeature"
+        },
+        {
+          "local": "isExpensePaymentKind",
+          "target": "lib/expense-payment.ts",
+          "exported": "isExpensePaymentKind"
         }
       ]
     },
@@ -3480,6 +3500,11 @@
           "local": "requireTenantFeature",
           "target": "lib/server/database.ts",
           "exported": "requireTenantFeature"
+        },
+        {
+          "local": "isExpensePaymentKind",
+          "target": "lib/expense-payment.ts",
+          "exported": "isExpensePaymentKind"
         }
       ]
     },
@@ -3653,6 +3678,11 @@
           "local": "getOrganizationPlan",
           "target": "lib/server/plan-access.ts",
           "exported": "getOrganizationPlan"
+        },
+        {
+          "local": "planAllowsModule",
+          "target": "config/plan-access.ts",
+          "exported": "planAllowsModule"
         },
         {
           "local": "idempotentBusiness",
@@ -6180,6 +6210,7 @@
       "route": "/api/settings/team/invitations/[id]",
       "file": "app/api/settings/team/invitations/[id]/route.ts",
       "methods": [
+        "POST",
         "DELETE"
       ],
       "imports": [
@@ -6222,6 +6253,11 @@
           "local": "audit",
           "target": "lib/server/audit.ts",
           "exported": "audit"
+        },
+        {
+          "local": "resendInvitation",
+          "target": "lib/server/invitations.ts",
+          "exported": "resendInvitation"
         }
       ]
     },
@@ -6361,6 +6397,146 @@
           "local": "withTenant",
           "target": "lib/server/db.ts",
           "exported": "withTenant"
+        }
+      ]
+    },
+    {
+      "route": "/api/suppliers/[id]/bank",
+      "file": "app/api/suppliers/[id]/bank/route.ts",
+      "methods": [
+        "GET",
+        "PATCH"
+      ],
+      "imports": [
+        {
+          "local": "requireSession",
+          "target": "lib/server/session.ts",
+          "exported": "requireSession"
+        },
+        {
+          "local": "authorize",
+          "target": "lib/server/rbac.ts",
+          "exported": "authorize"
+        },
+        {
+          "local": "requireModuleEntitlement",
+          "target": "lib/server/plan-access.ts",
+          "exported": "requireModuleEntitlement"
+        },
+        {
+          "local": "withTenant",
+          "target": "lib/server/db.ts",
+          "exported": "withTenant"
+        },
+        {
+          "local": "requireFreshAuthentication",
+          "target": "lib/server/fresh-authentication.ts",
+          "exported": "requireFreshAuthentication"
+        },
+        {
+          "local": "ApiError",
+          "target": "lib/server/http.ts",
+          "exported": "ApiError"
+        },
+        {
+          "local": "apiError",
+          "target": "lib/server/http.ts",
+          "exported": "apiError"
+        },
+        {
+          "local": "assertSameOrigin",
+          "target": "lib/server/http.ts",
+          "exported": "assertSameOrigin"
+        },
+        {
+          "local": "json",
+          "target": "lib/server/http.ts",
+          "exported": "json"
+        },
+        {
+          "local": "readJson",
+          "target": "lib/server/http.ts",
+          "exported": "readJson"
+        },
+        {
+          "local": "normalizeIban",
+          "target": "lib/qr-bill.ts",
+          "exported": "normalizeIban"
+        },
+        {
+          "local": "validSwissIban",
+          "target": "lib/qr-bill.ts",
+          "exported": "validSwissIban"
+        },
+        {
+          "local": "idempotentBusiness",
+          "target": "lib/server/business-idempotency.ts",
+          "exported": "idempotentBusiness"
+        },
+        {
+          "local": "audit",
+          "target": "lib/server/audit.ts",
+          "exported": "audit"
+        }
+      ]
+    },
+    {
+      "route": "/api/suppliers/[id]/invoices",
+      "file": "app/api/suppliers/[id]/invoices/route.ts",
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "imports": [
+        {
+          "local": "requireSession",
+          "target": "lib/server/session.ts",
+          "exported": "requireSession"
+        },
+        {
+          "local": "authorize",
+          "target": "lib/server/rbac.ts",
+          "exported": "authorize"
+        },
+        {
+          "local": "requireModuleEntitlement",
+          "target": "lib/server/plan-access.ts",
+          "exported": "requireModuleEntitlement"
+        },
+        {
+          "local": "withTenant",
+          "target": "lib/server/db.ts",
+          "exported": "withTenant"
+        },
+        {
+          "local": "apiError",
+          "target": "lib/server/http.ts",
+          "exported": "apiError"
+        },
+        {
+          "local": "assertSameOrigin",
+          "target": "lib/server/http.ts",
+          "exported": "assertSameOrigin"
+        },
+        {
+          "local": "json",
+          "target": "lib/server/http.ts",
+          "exported": "json"
+        },
+        {
+          "local": "readJson",
+          "target": "lib/server/http.ts",
+          "exported": "readJson"
+        },
+        {
+          "local": "listSupplierInvoices",
+          "target": "lib/server/repositories/supplier-invoices.ts",
+          "exported": "listSupplierInvoices"
+        },
+        {
+          "local": "saveSupplierInvoice",
+          "target": "lib/server/repositories/supplier-invoices.ts",
+          "exported": "saveSupplierInvoice"
         }
       ]
     },
@@ -7092,6 +7268,16 @@
           "local": "authorizeWorkforceManagement",
           "target": "lib/server/workforce-access.ts",
           "exported": "authorizeWorkforceManagement"
+        },
+        {
+          "local": "bindEmployeeIdentity",
+          "target": "lib/server/repositories/employee-identity.ts",
+          "exported": "bindEmployeeIdentity"
+        },
+        {
+          "local": "requireModuleEntitlement",
+          "target": "lib/server/plan-access.ts",
+          "exported": "requireModuleEntitlement"
         },
         {
           "local": "ApiError",
@@ -58264,6 +58450,7 @@
         "components/binso-ux.tsx#RowActions",
         "components/binso-ux.tsx#FormSheet",
         "components/workforce-assignments.tsx#WorkforceAssignments",
+        "config/plan-access.ts#isPlanId",
         "components/workforce-assignments.tsx#Payload",
         "components/workforce-assignments.tsx#Assignment",
         "lib/financial-status.ts#businessDate",
@@ -58774,6 +58961,7 @@
         "components/binso-ux.tsx#RowActions",
         "components/binso-ux.tsx#FormSheet",
         "components/workforce-assignments.tsx#WorkforceAssignments",
+        "config/plan-access.ts#isPlanId",
         "components/workforce-assignments.tsx#Payload",
         "components/workforce-assignments.tsx#Assignment",
         "lib/financial-status.ts#businessDate",
@@ -59680,31 +59868,6 @@
       "viewVariants": [],
       "widgets": [
         {
-          "tag": "FormSheet",
-          "line": 50,
-          "component": "components/team-settings.tsx#TeamSettingsPage"
-        },
-        {
-          "tag": "Field",
-          "line": 50,
-          "component": "components/team-settings.tsx#TeamSettingsPage"
-        },
-        {
-          "tag": "Field",
-          "line": 50,
-          "component": "components/team-settings.tsx#TeamSettingsPage"
-        },
-        {
-          "tag": "Field",
-          "line": 50,
-          "component": "components/team-settings.tsx#TeamSettingsPage"
-        },
-        {
-          "tag": "ConfirmDialog",
-          "line": 51,
-          "component": "components/team-settings.tsx#TeamSettingsPage"
-        },
-        {
           "tag": "ConfirmDialog",
           "line": 52,
           "component": "components/team-settings.tsx#TeamSettingsPage"
@@ -59722,6 +59885,36 @@
         {
           "tag": "Field",
           "line": 53,
+          "component": "components/team-settings.tsx#TeamSettingsPage"
+        },
+        {
+          "tag": "Field",
+          "line": 53,
+          "component": "components/team-settings.tsx#TeamSettingsPage"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 54,
+          "component": "components/team-settings.tsx#TeamSettingsPage"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 55,
+          "component": "components/team-settings.tsx#TeamSettingsPage"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 56,
+          "component": "components/team-settings.tsx#TeamSettingsPage"
+        },
+        {
+          "tag": "Field",
+          "line": 56,
+          "component": "components/team-settings.tsx#TeamSettingsPage"
+        },
+        {
+          "tag": "Field",
+          "line": 56,
           "component": "components/team-settings.tsx#TeamSettingsPage"
         },
         {
@@ -59816,31 +60009,11 @@
         },
         {
           "tag": "FormSheet",
-          "line": 23,
-          "component": "components/workforce-assignments.tsx#WorkforceAssignments"
-        },
-        {
-          "tag": "form",
-          "line": 24,
-          "component": "components/workforce-assignments.tsx#WorkforceAssignments"
-        },
-        {
-          "tag": "Field",
-          "line": 25,
-          "component": "components/workforce-assignments.tsx#WorkforceAssignments"
-        },
-        {
-          "tag": "Field",
-          "line": 26,
-          "component": "components/workforce-assignments.tsx#WorkforceAssignments"
-        },
-        {
-          "tag": "Field",
           "line": 27,
           "component": "components/workforce-assignments.tsx#WorkforceAssignments"
         },
         {
-          "tag": "Field",
+          "tag": "form",
           "line": 28,
           "component": "components/workforce-assignments.tsx#WorkforceAssignments"
         },
@@ -59851,12 +60024,32 @@
         },
         {
           "tag": "Field",
-          "line": 29,
+          "line": 30,
+          "component": "components/workforce-assignments.tsx#WorkforceAssignments"
+        },
+        {
+          "tag": "Field",
+          "line": 32,
+          "component": "components/workforce-assignments.tsx#WorkforceAssignments"
+        },
+        {
+          "tag": "Field",
+          "line": 33,
+          "component": "components/workforce-assignments.tsx#WorkforceAssignments"
+        },
+        {
+          "tag": "Field",
+          "line": 34,
+          "component": "components/workforce-assignments.tsx#WorkforceAssignments"
+        },
+        {
+          "tag": "Field",
+          "line": 34,
           "component": "components/workforce-assignments.tsx#WorkforceAssignments"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 31,
+          "line": 38,
           "component": "components/workforce-assignments.tsx#WorkforceAssignments"
         },
         {
@@ -78939,12 +79132,24 @@
         "components/binso-ux.tsx#ActionsMenu",
         "components/binso-ux.tsx#RowActions",
         "components/ui.tsx#SectionTitle",
-        "components/binso-ux.tsx#FormSheet"
+        "components/supplier-bank.tsx#SupplierBank",
+        "components/supplier-bank.tsx#Bank",
+        "components/binso-ux.tsx#FormSheet",
+        "components/supplier-invoices.tsx#SupplierInvoices",
+        "components/supplier-invoices.tsx#Invoice",
+        "components/supplier-invoices.tsx#Draft",
+        "components/supplier-invoices.tsx#blank",
+        "components/entity-files.tsx#EntityFiles",
+        "components/entity-files.tsx#Attachment",
+        "components/binso-ux.tsx#ListRow",
+        "components/pdf-preview.tsx#DocumentModal",
+        "components/pdf-preview.tsx#DocumentPageViewer",
+        "components/pdf-preview.tsx#DocumentPages",
+        "components/pdf-preview.tsx#PdfPage"
       ],
       "pageRenderGraph": [
         "app/lieferanten/[id]/page.tsx#Page",
         "components/pages/suppliers.tsx#SupplierForm",
-        "lib/navigation.ts#safeAppPath",
         "lib/client/use-api-query.ts#useApiQuery",
         "lib/client/use-api-query.ts#useDataRevision",
         "lib/client/data-events.ts#subscribeClientData",
@@ -78990,6 +79195,7 @@
         "lib/client/backend.ts#parseResponse",
         "lib/client/query-snapshot.ts#writeQuerySnapshot",
         "lib/client/query-snapshot.ts#clearQuerySnapshots",
+        "lib/navigation.ts#safeAppPath",
         "components/pages/suppliers.tsx#Supplier",
         "components/pages/suppliers.tsx#Draft",
         "components/pages/suppliers.tsx#blank",
@@ -79180,7 +79386,29 @@
         "components/binso-ux.tsx#ActionsMenu",
         "components/binso-ux.tsx#RowActions",
         "components/ui.tsx#SectionTitle",
-        "components/binso-ux.tsx#FormSheet"
+        "components/supplier-bank.tsx#SupplierBank",
+        "components/supplier-bank.tsx#Bank",
+        "components/binso-ux.tsx#FormSheet",
+        "components/supplier-invoices.tsx#SupplierInvoices",
+        "components/supplier-invoices.tsx#Invoice",
+        "components/supplier-invoices.tsx#Draft",
+        "components/supplier-invoices.tsx#blank",
+        "lib/financial-status.ts#formatCurrency",
+        "components/entity-files.tsx#EntityFiles",
+        "lib/file-associations.ts#fileRelations",
+        "components/entity-files.tsx#Attachment",
+        "lib/client/backend.ts#apiDelete",
+        "lib/file-selection.ts#fileSelectionError",
+        "config/limits.ts#limitsConfig",
+        "lib/client/backend.ts#apiUpload",
+        "lib/client/backend.ts#uploadReplayKeys",
+        "components/binso-ux.tsx#ListRow",
+        "components/pdf-preview.tsx#DocumentModal",
+        "components/pdf-preview.tsx#DocumentPageViewer",
+        "components/pdf-preview.tsx#DocumentPages",
+        "lib/pdf-gestures.ts#boundPdfZoom",
+        "lib/pdf-gestures.ts#pdfSwipePage",
+        "components/pdf-preview.tsx#PdfPage"
       ],
       "layoutRenderGraph": [
         "app/layout.tsx#RootLayout",
@@ -79418,7 +79646,20 @@
         "components/binso-ux.tsx#ActionsMenu",
         "components/binso-ux.tsx#RowActions",
         "components/ui.tsx#SectionTitle",
+        "components/supplier-bank.tsx#SupplierBank",
+        "components/supplier-bank.tsx#Bank",
         "components/binso-ux.tsx#FormSheet",
+        "components/supplier-invoices.tsx#SupplierInvoices",
+        "components/supplier-invoices.tsx#Invoice",
+        "components/supplier-invoices.tsx#Draft",
+        "components/supplier-invoices.tsx#blank",
+        "components/entity-files.tsx#EntityFiles",
+        "components/entity-files.tsx#Attachment",
+        "components/binso-ux.tsx#ListRow",
+        "components/pdf-preview.tsx#DocumentModal",
+        "components/pdf-preview.tsx#DocumentPageViewer",
+        "components/pdf-preview.tsx#DocumentPages",
+        "components/pdf-preview.tsx#PdfPage",
         "components/font-preload.tsx#FontPreload",
         "components/theme-runtime.tsx#ThemeRuntime",
         "components/app-shell.tsx#AppShellLayout",
@@ -79441,7 +79682,6 @@
       "renderGraph": [
         "app/lieferanten/[id]/page.tsx#Page",
         "components/pages/suppliers.tsx#SupplierForm",
-        "lib/navigation.ts#safeAppPath",
         "lib/client/use-api-query.ts#useApiQuery",
         "lib/client/use-api-query.ts#useDataRevision",
         "lib/client/data-events.ts#subscribeClientData",
@@ -79487,6 +79727,7 @@
         "lib/client/backend.ts#parseResponse",
         "lib/client/query-snapshot.ts#writeQuerySnapshot",
         "lib/client/query-snapshot.ts#clearQuerySnapshots",
+        "lib/navigation.ts#safeAppPath",
         "components/pages/suppliers.tsx#Supplier",
         "components/pages/suppliers.tsx#Draft",
         "components/pages/suppliers.tsx#blank",
@@ -79677,7 +79918,29 @@
         "components/binso-ux.tsx#ActionsMenu",
         "components/binso-ux.tsx#RowActions",
         "components/ui.tsx#SectionTitle",
+        "components/supplier-bank.tsx#SupplierBank",
+        "components/supplier-bank.tsx#Bank",
         "components/binso-ux.tsx#FormSheet",
+        "components/supplier-invoices.tsx#SupplierInvoices",
+        "components/supplier-invoices.tsx#Invoice",
+        "components/supplier-invoices.tsx#Draft",
+        "components/supplier-invoices.tsx#blank",
+        "lib/financial-status.ts#formatCurrency",
+        "components/entity-files.tsx#EntityFiles",
+        "lib/file-associations.ts#fileRelations",
+        "components/entity-files.tsx#Attachment",
+        "lib/client/backend.ts#apiDelete",
+        "lib/file-selection.ts#fileSelectionError",
+        "config/limits.ts#limitsConfig",
+        "lib/client/backend.ts#apiUpload",
+        "lib/client/backend.ts#uploadReplayKeys",
+        "components/binso-ux.tsx#ListRow",
+        "components/pdf-preview.tsx#DocumentModal",
+        "components/pdf-preview.tsx#DocumentPageViewer",
+        "components/pdf-preview.tsx#DocumentPages",
+        "lib/pdf-gestures.ts#boundPdfZoom",
+        "lib/pdf-gestures.ts#pdfSwipePage",
+        "components/pdf-preview.tsx#PdfPage",
         "app/layout.tsx#RootLayout",
         "lib/locales/config.ts#localeCookie",
         "components/font-preload.tsx#FontPreload",
@@ -80054,6 +80317,10 @@
         475,
         476,
         477,
+        478,
+        479,
+        480,
+        481,
         482,
         483,
         484,
@@ -80319,13 +80586,38 @@
         864,
         875,
         970,
+        1018,
+        1019,
+        1020,
+        1021,
+        1029,
+        1030,
+        1031,
+        1032,
+        1033,
+        1034,
+        1035,
+        1036,
+        1037,
+        1038,
+        1039,
+        1049,
+        1050,
+        1051,
         1054,
+        1056,
+        1057,
+        1058,
         1061,
         1062,
         1063,
         1064,
         1065,
         1066,
+        1077,
+        1078,
+        1079,
+        1080,
         1085,
         1108,
         1121,
@@ -80336,6 +80628,8 @@
         1143,
         1144,
         1145,
+        1168,
+        1172,
         1173,
         1175,
         1201,
@@ -80552,9 +80846,9 @@
         2237
       ],
       "data": [
+        "/api/auth/session",
         "/api/suppliers",
         "/api/",
-        "/api/auth/session",
         "/api/customers/merge",
         "/api/settings/team",
         "/api/auth/",
@@ -80573,7 +80867,13 @@
         "/api/notifications/",
         "/api/auth/logout",
         "/api/time-tracker",
-        "/api/operator/preferences"
+        "/api/operator/preferences",
+        "/api/suppliers/",
+        "/api/files?",
+        "/api/files/",
+        "/api/files",
+        "/api/documents/",
+        "/api/documents/preview"
       ],
       "collections": [],
       "permission": "purchasing:read",
@@ -80581,52 +80881,52 @@
       "widgets": [
         {
           "tag": "FormSheet",
-          "line": 63,
-          "component": "components/pages/suppliers.tsx#SupplierForm"
-        },
-        {
-          "tag": "form",
-          "line": 64,
-          "component": "components/pages/suppliers.tsx#SupplierForm"
-        },
-        {
-          "tag": "Field",
-          "line": 65,
-          "component": "components/pages/suppliers.tsx#SupplierForm"
-        },
-        {
-          "tag": "Field",
-          "line": 66,
-          "component": "components/pages/suppliers.tsx#SupplierForm"
-        },
-        {
-          "tag": "Field",
-          "line": 67,
-          "component": "components/pages/suppliers.tsx#SupplierForm"
-        },
-        {
-          "tag": "Field",
-          "line": 68,
-          "component": "components/pages/suppliers.tsx#SupplierForm"
-        },
-        {
-          "tag": "Field",
-          "line": 69,
-          "component": "components/pages/suppliers.tsx#SupplierForm"
-        },
-        {
-          "tag": "Field",
           "line": 70,
           "component": "components/pages/suppliers.tsx#SupplierForm"
         },
         {
-          "tag": "Field",
+          "tag": "form",
           "line": 71,
           "component": "components/pages/suppliers.tsx#SupplierForm"
         },
         {
           "tag": "Field",
           "line": 72,
+          "component": "components/pages/suppliers.tsx#SupplierForm"
+        },
+        {
+          "tag": "Field",
+          "line": 73,
+          "component": "components/pages/suppliers.tsx#SupplierForm"
+        },
+        {
+          "tag": "Field",
+          "line": 74,
+          "component": "components/pages/suppliers.tsx#SupplierForm"
+        },
+        {
+          "tag": "Field",
+          "line": 75,
+          "component": "components/pages/suppliers.tsx#SupplierForm"
+        },
+        {
+          "tag": "Field",
+          "line": 76,
+          "component": "components/pages/suppliers.tsx#SupplierForm"
+        },
+        {
+          "tag": "Field",
+          "line": 77,
+          "component": "components/pages/suppliers.tsx#SupplierForm"
+        },
+        {
+          "tag": "Field",
+          "line": 78,
+          "component": "components/pages/suppliers.tsx#SupplierForm"
+        },
+        {
+          "tag": "Field",
+          "line": 79,
           "component": "components/pages/suppliers.tsx#SupplierForm"
         },
         {
@@ -80715,9 +81015,109 @@
           "component": "components/binso-ux.tsx#ActionsMenu"
         },
         {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/supplier-bank.tsx#SupplierBank"
+        },
+        {
+          "tag": "form",
+          "line": 30,
+          "component": "components/supplier-bank.tsx#SupplierBank"
+        },
+        {
+          "tag": "Field",
+          "line": 30,
+          "component": "components/supplier-bank.tsx#SupplierBank"
+        },
+        {
           "tag": "Sheet",
           "line": 197,
           "component": "components/binso-ux.tsx#FormSheet"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 40,
+          "component": "components/supplier-invoices.tsx#SupplierInvoices"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 41,
+          "component": "components/supplier-invoices.tsx#SupplierInvoices"
+        },
+        {
+          "tag": "form",
+          "line": 42,
+          "component": "components/supplier-invoices.tsx#SupplierInvoices"
+        },
+        {
+          "tag": "Field",
+          "line": 43,
+          "component": "components/supplier-invoices.tsx#SupplierInvoices"
+        },
+        {
+          "tag": "Field",
+          "line": 44,
+          "component": "components/supplier-invoices.tsx#SupplierInvoices"
+        },
+        {
+          "tag": "Field",
+          "line": 45,
+          "component": "components/supplier-invoices.tsx#SupplierInvoices"
+        },
+        {
+          "tag": "Field",
+          "line": 46,
+          "component": "components/supplier-invoices.tsx#SupplierInvoices"
+        },
+        {
+          "tag": "Field",
+          "line": 47,
+          "component": "components/supplier-invoices.tsx#SupplierInvoices"
+        },
+        {
+          "tag": "Field",
+          "line": 48,
+          "component": "components/supplier-invoices.tsx#SupplierInvoices"
+        },
+        {
+          "tag": "Field",
+          "line": 49,
+          "component": "components/supplier-invoices.tsx#SupplierInvoices"
+        },
+        {
+          "tag": "Field",
+          "line": 50,
+          "component": "components/supplier-invoices.tsx#SupplierInvoices"
+        },
+        {
+          "tag": "ListSearch",
+          "line": 39,
+          "component": "components/entity-files.tsx#EntityFiles"
+        },
+        {
+          "tag": "ListRow",
+          "line": 40,
+          "component": "components/entity-files.tsx#EntityFiles"
+        },
+        {
+          "tag": "ActionSheet",
+          "line": 43,
+          "component": "components/entity-files.tsx#EntityFiles"
+        },
+        {
+          "tag": "DocumentModal",
+          "line": 44,
+          "component": "components/entity-files.tsx#EntityFiles"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 45,
+          "component": "components/entity-files.tsx#EntityFiles"
+        },
+        {
+          "tag": "DocumentPageViewer",
+          "line": 127,
+          "component": "components/pdf-preview.tsx#DocumentModal"
         },
         {
           "tag": "FreshAuthenticationDialog",
@@ -80947,12 +81347,24 @@
         "components/binso-ux.tsx#ActionsMenu",
         "components/binso-ux.tsx#RowActions",
         "components/ui.tsx#SectionTitle",
-        "components/binso-ux.tsx#FormSheet"
+        "components/supplier-bank.tsx#SupplierBank",
+        "components/supplier-bank.tsx#Bank",
+        "components/binso-ux.tsx#FormSheet",
+        "components/supplier-invoices.tsx#SupplierInvoices",
+        "components/supplier-invoices.tsx#Invoice",
+        "components/supplier-invoices.tsx#Draft",
+        "components/supplier-invoices.tsx#blank",
+        "components/entity-files.tsx#EntityFiles",
+        "components/entity-files.tsx#Attachment",
+        "components/binso-ux.tsx#ListRow",
+        "components/pdf-preview.tsx#DocumentModal",
+        "components/pdf-preview.tsx#DocumentPageViewer",
+        "components/pdf-preview.tsx#DocumentPages",
+        "components/pdf-preview.tsx#PdfPage"
       ],
       "pageRenderGraph": [
         "app/lieferanten/neu/page.tsx#Page",
         "components/pages/suppliers.tsx#SupplierForm",
-        "lib/navigation.ts#safeAppPath",
         "lib/client/use-api-query.ts#useApiQuery",
         "lib/client/use-api-query.ts#useDataRevision",
         "lib/client/data-events.ts#subscribeClientData",
@@ -80998,6 +81410,7 @@
         "lib/client/backend.ts#parseResponse",
         "lib/client/query-snapshot.ts#writeQuerySnapshot",
         "lib/client/query-snapshot.ts#clearQuerySnapshots",
+        "lib/navigation.ts#safeAppPath",
         "components/pages/suppliers.tsx#Supplier",
         "components/pages/suppliers.tsx#Draft",
         "components/pages/suppliers.tsx#blank",
@@ -81188,7 +81601,29 @@
         "components/binso-ux.tsx#ActionsMenu",
         "components/binso-ux.tsx#RowActions",
         "components/ui.tsx#SectionTitle",
-        "components/binso-ux.tsx#FormSheet"
+        "components/supplier-bank.tsx#SupplierBank",
+        "components/supplier-bank.tsx#Bank",
+        "components/binso-ux.tsx#FormSheet",
+        "components/supplier-invoices.tsx#SupplierInvoices",
+        "components/supplier-invoices.tsx#Invoice",
+        "components/supplier-invoices.tsx#Draft",
+        "components/supplier-invoices.tsx#blank",
+        "lib/financial-status.ts#formatCurrency",
+        "components/entity-files.tsx#EntityFiles",
+        "lib/file-associations.ts#fileRelations",
+        "components/entity-files.tsx#Attachment",
+        "lib/client/backend.ts#apiDelete",
+        "lib/file-selection.ts#fileSelectionError",
+        "config/limits.ts#limitsConfig",
+        "lib/client/backend.ts#apiUpload",
+        "lib/client/backend.ts#uploadReplayKeys",
+        "components/binso-ux.tsx#ListRow",
+        "components/pdf-preview.tsx#DocumentModal",
+        "components/pdf-preview.tsx#DocumentPageViewer",
+        "components/pdf-preview.tsx#DocumentPages",
+        "lib/pdf-gestures.ts#boundPdfZoom",
+        "lib/pdf-gestures.ts#pdfSwipePage",
+        "components/pdf-preview.tsx#PdfPage"
       ],
       "layoutRenderGraph": [
         "app/layout.tsx#RootLayout",
@@ -81426,7 +81861,20 @@
         "components/binso-ux.tsx#ActionsMenu",
         "components/binso-ux.tsx#RowActions",
         "components/ui.tsx#SectionTitle",
+        "components/supplier-bank.tsx#SupplierBank",
+        "components/supplier-bank.tsx#Bank",
         "components/binso-ux.tsx#FormSheet",
+        "components/supplier-invoices.tsx#SupplierInvoices",
+        "components/supplier-invoices.tsx#Invoice",
+        "components/supplier-invoices.tsx#Draft",
+        "components/supplier-invoices.tsx#blank",
+        "components/entity-files.tsx#EntityFiles",
+        "components/entity-files.tsx#Attachment",
+        "components/binso-ux.tsx#ListRow",
+        "components/pdf-preview.tsx#DocumentModal",
+        "components/pdf-preview.tsx#DocumentPageViewer",
+        "components/pdf-preview.tsx#DocumentPages",
+        "components/pdf-preview.tsx#PdfPage",
         "components/font-preload.tsx#FontPreload",
         "components/theme-runtime.tsx#ThemeRuntime",
         "components/app-shell.tsx#AppShellLayout",
@@ -81449,7 +81897,6 @@
       "renderGraph": [
         "app/lieferanten/neu/page.tsx#Page",
         "components/pages/suppliers.tsx#SupplierForm",
-        "lib/navigation.ts#safeAppPath",
         "lib/client/use-api-query.ts#useApiQuery",
         "lib/client/use-api-query.ts#useDataRevision",
         "lib/client/data-events.ts#subscribeClientData",
@@ -81495,6 +81942,7 @@
         "lib/client/backend.ts#parseResponse",
         "lib/client/query-snapshot.ts#writeQuerySnapshot",
         "lib/client/query-snapshot.ts#clearQuerySnapshots",
+        "lib/navigation.ts#safeAppPath",
         "components/pages/suppliers.tsx#Supplier",
         "components/pages/suppliers.tsx#Draft",
         "components/pages/suppliers.tsx#blank",
@@ -81685,7 +82133,29 @@
         "components/binso-ux.tsx#ActionsMenu",
         "components/binso-ux.tsx#RowActions",
         "components/ui.tsx#SectionTitle",
+        "components/supplier-bank.tsx#SupplierBank",
+        "components/supplier-bank.tsx#Bank",
         "components/binso-ux.tsx#FormSheet",
+        "components/supplier-invoices.tsx#SupplierInvoices",
+        "components/supplier-invoices.tsx#Invoice",
+        "components/supplier-invoices.tsx#Draft",
+        "components/supplier-invoices.tsx#blank",
+        "lib/financial-status.ts#formatCurrency",
+        "components/entity-files.tsx#EntityFiles",
+        "lib/file-associations.ts#fileRelations",
+        "components/entity-files.tsx#Attachment",
+        "lib/client/backend.ts#apiDelete",
+        "lib/file-selection.ts#fileSelectionError",
+        "config/limits.ts#limitsConfig",
+        "lib/client/backend.ts#apiUpload",
+        "lib/client/backend.ts#uploadReplayKeys",
+        "components/binso-ux.tsx#ListRow",
+        "components/pdf-preview.tsx#DocumentModal",
+        "components/pdf-preview.tsx#DocumentPageViewer",
+        "components/pdf-preview.tsx#DocumentPages",
+        "lib/pdf-gestures.ts#boundPdfZoom",
+        "lib/pdf-gestures.ts#pdfSwipePage",
+        "components/pdf-preview.tsx#PdfPage",
         "app/layout.tsx#RootLayout",
         "lib/locales/config.ts#localeCookie",
         "components/font-preload.tsx#FontPreload",
@@ -82062,6 +82532,10 @@
         475,
         476,
         477,
+        478,
+        479,
+        480,
+        481,
         482,
         483,
         484,
@@ -82327,13 +82801,38 @@
         864,
         875,
         970,
+        1018,
+        1019,
+        1020,
+        1021,
+        1029,
+        1030,
+        1031,
+        1032,
+        1033,
+        1034,
+        1035,
+        1036,
+        1037,
+        1038,
+        1039,
+        1049,
+        1050,
+        1051,
         1054,
+        1056,
+        1057,
+        1058,
         1061,
         1062,
         1063,
         1064,
         1065,
         1066,
+        1077,
+        1078,
+        1079,
+        1080,
         1085,
         1108,
         1121,
@@ -82344,6 +82843,8 @@
         1143,
         1144,
         1145,
+        1168,
+        1172,
         1173,
         1175,
         1201,
@@ -82560,9 +83061,9 @@
         2237
       ],
       "data": [
+        "/api/auth/session",
         "/api/suppliers",
         "/api/",
-        "/api/auth/session",
         "/api/customers/merge",
         "/api/settings/team",
         "/api/auth/",
@@ -82581,7 +83082,13 @@
         "/api/notifications/",
         "/api/auth/logout",
         "/api/time-tracker",
-        "/api/operator/preferences"
+        "/api/operator/preferences",
+        "/api/suppliers/",
+        "/api/files?",
+        "/api/files/",
+        "/api/files",
+        "/api/documents/",
+        "/api/documents/preview"
       ],
       "collections": [],
       "permission": "purchasing:read",
@@ -82589,52 +83096,52 @@
       "widgets": [
         {
           "tag": "FormSheet",
-          "line": 63,
-          "component": "components/pages/suppliers.tsx#SupplierForm"
-        },
-        {
-          "tag": "form",
-          "line": 64,
-          "component": "components/pages/suppliers.tsx#SupplierForm"
-        },
-        {
-          "tag": "Field",
-          "line": 65,
-          "component": "components/pages/suppliers.tsx#SupplierForm"
-        },
-        {
-          "tag": "Field",
-          "line": 66,
-          "component": "components/pages/suppliers.tsx#SupplierForm"
-        },
-        {
-          "tag": "Field",
-          "line": 67,
-          "component": "components/pages/suppliers.tsx#SupplierForm"
-        },
-        {
-          "tag": "Field",
-          "line": 68,
-          "component": "components/pages/suppliers.tsx#SupplierForm"
-        },
-        {
-          "tag": "Field",
-          "line": 69,
-          "component": "components/pages/suppliers.tsx#SupplierForm"
-        },
-        {
-          "tag": "Field",
           "line": 70,
           "component": "components/pages/suppliers.tsx#SupplierForm"
         },
         {
-          "tag": "Field",
+          "tag": "form",
           "line": 71,
           "component": "components/pages/suppliers.tsx#SupplierForm"
         },
         {
           "tag": "Field",
           "line": 72,
+          "component": "components/pages/suppliers.tsx#SupplierForm"
+        },
+        {
+          "tag": "Field",
+          "line": 73,
+          "component": "components/pages/suppliers.tsx#SupplierForm"
+        },
+        {
+          "tag": "Field",
+          "line": 74,
+          "component": "components/pages/suppliers.tsx#SupplierForm"
+        },
+        {
+          "tag": "Field",
+          "line": 75,
+          "component": "components/pages/suppliers.tsx#SupplierForm"
+        },
+        {
+          "tag": "Field",
+          "line": 76,
+          "component": "components/pages/suppliers.tsx#SupplierForm"
+        },
+        {
+          "tag": "Field",
+          "line": 77,
+          "component": "components/pages/suppliers.tsx#SupplierForm"
+        },
+        {
+          "tag": "Field",
+          "line": 78,
+          "component": "components/pages/suppliers.tsx#SupplierForm"
+        },
+        {
+          "tag": "Field",
+          "line": 79,
           "component": "components/pages/suppliers.tsx#SupplierForm"
         },
         {
@@ -82723,9 +83230,109 @@
           "component": "components/binso-ux.tsx#ActionsMenu"
         },
         {
+          "tag": "FormSheet",
+          "line": 29,
+          "component": "components/supplier-bank.tsx#SupplierBank"
+        },
+        {
+          "tag": "form",
+          "line": 30,
+          "component": "components/supplier-bank.tsx#SupplierBank"
+        },
+        {
+          "tag": "Field",
+          "line": 30,
+          "component": "components/supplier-bank.tsx#SupplierBank"
+        },
+        {
           "tag": "Sheet",
           "line": 197,
           "component": "components/binso-ux.tsx#FormSheet"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 40,
+          "component": "components/supplier-invoices.tsx#SupplierInvoices"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 41,
+          "component": "components/supplier-invoices.tsx#SupplierInvoices"
+        },
+        {
+          "tag": "form",
+          "line": 42,
+          "component": "components/supplier-invoices.tsx#SupplierInvoices"
+        },
+        {
+          "tag": "Field",
+          "line": 43,
+          "component": "components/supplier-invoices.tsx#SupplierInvoices"
+        },
+        {
+          "tag": "Field",
+          "line": 44,
+          "component": "components/supplier-invoices.tsx#SupplierInvoices"
+        },
+        {
+          "tag": "Field",
+          "line": 45,
+          "component": "components/supplier-invoices.tsx#SupplierInvoices"
+        },
+        {
+          "tag": "Field",
+          "line": 46,
+          "component": "components/supplier-invoices.tsx#SupplierInvoices"
+        },
+        {
+          "tag": "Field",
+          "line": 47,
+          "component": "components/supplier-invoices.tsx#SupplierInvoices"
+        },
+        {
+          "tag": "Field",
+          "line": 48,
+          "component": "components/supplier-invoices.tsx#SupplierInvoices"
+        },
+        {
+          "tag": "Field",
+          "line": 49,
+          "component": "components/supplier-invoices.tsx#SupplierInvoices"
+        },
+        {
+          "tag": "Field",
+          "line": 50,
+          "component": "components/supplier-invoices.tsx#SupplierInvoices"
+        },
+        {
+          "tag": "ListSearch",
+          "line": 39,
+          "component": "components/entity-files.tsx#EntityFiles"
+        },
+        {
+          "tag": "ListRow",
+          "line": 40,
+          "component": "components/entity-files.tsx#EntityFiles"
+        },
+        {
+          "tag": "ActionSheet",
+          "line": 43,
+          "component": "components/entity-files.tsx#EntityFiles"
+        },
+        {
+          "tag": "DocumentModal",
+          "line": 44,
+          "component": "components/entity-files.tsx#EntityFiles"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 45,
+          "component": "components/entity-files.tsx#EntityFiles"
+        },
+        {
+          "tag": "DocumentPageViewer",
+          "line": 127,
+          "component": "components/pdf-preview.tsx#DocumentModal"
         },
         {
           "tag": "FreshAuthenticationDialog",
@@ -84596,12 +85203,12 @@
       "widgets": [
         {
           "tag": "RecordsControls",
-          "line": 21,
+          "line": 24,
           "component": "components/pages/suppliers.tsx#SuppliersPage"
         },
         {
           "tag": "RecordsView",
-          "line": 22,
+          "line": 25,
           "component": "components/pages/suppliers.tsx#SuppliersPage"
         },
         {
@@ -146770,6 +147377,9 @@
         "lib/client/query-snapshot.ts#writeQuerySnapshot",
         "lib/client/query-snapshot.ts#clearQuerySnapshots",
         "lib/financial-status.ts#businessDate",
+        "lib/expense-payment.ts#ExpensePaymentKind",
+        "lib/expense-payment.ts#expensePaymentKinds",
+        "lib/expense-payment.ts#isExpensePaymentKind",
         "components/use-process-draft.ts#useProcessDraft",
         "lib/client/process-draft.ts#canonicalDraftProcess",
         "lib/client/process-draft.ts#draftScope",
@@ -146963,6 +147573,7 @@
         "components/directory-select.tsx#Item",
         "components/directory-select.tsx#Page",
         "lib/directory-query.ts#directoryQuery",
+        "lib/expense-payment.ts#expenseClaimStatus",
         "components/binso-ux.tsx#FormSheet"
       ],
       "layoutRenderGraph": [
@@ -147279,6 +147890,9 @@
         "lib/client/query-snapshot.ts#writeQuerySnapshot",
         "lib/client/query-snapshot.ts#clearQuerySnapshots",
         "lib/financial-status.ts#businessDate",
+        "lib/expense-payment.ts#ExpensePaymentKind",
+        "lib/expense-payment.ts#expensePaymentKinds",
+        "lib/expense-payment.ts#isExpensePaymentKind",
         "components/use-process-draft.ts#useProcessDraft",
         "lib/client/process-draft.ts#canonicalDraftProcess",
         "lib/client/process-draft.ts#draftScope",
@@ -147472,6 +148086,7 @@
         "components/directory-select.tsx#Item",
         "components/directory-select.tsx#Page",
         "lib/directory-query.ts#directoryQuery",
+        "lib/expense-payment.ts#expenseClaimStatus",
         "components/binso-ux.tsx#FormSheet",
         "app/layout.tsx#RootLayout",
         "lib/locales/config.ts#localeCookie",
@@ -148377,31 +148992,6 @@
       "widgets": [
         {
           "tag": "Field",
-          "line": 173,
-          "component": "components/pages/expenses.tsx#ExpenseForm"
-        },
-        {
-          "tag": "Field",
-          "line": 174,
-          "component": "components/pages/expenses.tsx#ExpenseForm"
-        },
-        {
-          "tag": "Field",
-          "line": 175,
-          "component": "components/pages/expenses.tsx#ExpenseForm"
-        },
-        {
-          "tag": "Field",
-          "line": 176,
-          "component": "components/pages/expenses.tsx#ExpenseForm"
-        },
-        {
-          "tag": "Field",
-          "line": 177,
-          "component": "components/pages/expenses.tsx#ExpenseForm"
-        },
-        {
-          "tag": "Field",
           "line": 178,
           "component": "components/pages/expenses.tsx#ExpenseForm"
         },
@@ -148431,23 +149021,58 @@
           "component": "components/pages/expenses.tsx#ExpenseForm"
         },
         {
-          "tag": "ActionSheet",
-          "line": 187,
-          "component": "components/pages/expenses.tsx#ExpenseForm"
-        },
-        {
-          "tag": "FormSheet",
-          "line": 191,
-          "component": "components/pages/expenses.tsx#ExpenseForm"
-        },
-        {
-          "tag": "FormSheet",
-          "line": 192,
+          "tag": "Field",
+          "line": 184,
           "component": "components/pages/expenses.tsx#ExpenseForm"
         },
         {
           "tag": "Field",
-          "line": 192,
+          "line": 185,
+          "component": "components/pages/expenses.tsx#ExpenseForm"
+        },
+        {
+          "tag": "Field",
+          "line": 186,
+          "component": "components/pages/expenses.tsx#ExpenseForm"
+        },
+        {
+          "tag": "Field",
+          "line": 187,
+          "component": "components/pages/expenses.tsx#ExpenseForm"
+        },
+        {
+          "tag": "Field",
+          "line": 188,
+          "component": "components/pages/expenses.tsx#ExpenseForm"
+        },
+        {
+          "tag": "Field",
+          "line": 189,
+          "component": "components/pages/expenses.tsx#ExpenseForm"
+        },
+        {
+          "tag": "ActionSheet",
+          "line": 193,
+          "component": "components/pages/expenses.tsx#ExpenseForm"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 197,
+          "component": "components/pages/expenses.tsx#ExpenseForm"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 198,
+          "component": "components/pages/expenses.tsx#ExpenseForm"
+        },
+        {
+          "tag": "Field",
+          "line": 198,
+          "component": "components/pages/expenses.tsx#ExpenseForm"
+        },
+        {
+          "tag": "Field",
+          "line": 198,
           "component": "components/pages/expenses.tsx#ExpenseForm"
         },
         {
@@ -148818,6 +149443,9 @@
         "lib/client/query-snapshot.ts#writeQuerySnapshot",
         "lib/client/query-snapshot.ts#clearQuerySnapshots",
         "lib/financial-status.ts#businessDate",
+        "lib/expense-payment.ts#ExpensePaymentKind",
+        "lib/expense-payment.ts#expensePaymentKinds",
+        "lib/expense-payment.ts#isExpensePaymentKind",
         "components/use-process-draft.ts#useProcessDraft",
         "lib/client/process-draft.ts#canonicalDraftProcess",
         "lib/client/process-draft.ts#draftScope",
@@ -149011,6 +149639,7 @@
         "components/directory-select.tsx#Item",
         "components/directory-select.tsx#Page",
         "lib/directory-query.ts#directoryQuery",
+        "lib/expense-payment.ts#expenseClaimStatus",
         "components/binso-ux.tsx#FormSheet"
       ],
       "layoutRenderGraph": [
@@ -149327,6 +149956,9 @@
         "lib/client/query-snapshot.ts#writeQuerySnapshot",
         "lib/client/query-snapshot.ts#clearQuerySnapshots",
         "lib/financial-status.ts#businessDate",
+        "lib/expense-payment.ts#ExpensePaymentKind",
+        "lib/expense-payment.ts#expensePaymentKinds",
+        "lib/expense-payment.ts#isExpensePaymentKind",
         "components/use-process-draft.ts#useProcessDraft",
         "lib/client/process-draft.ts#canonicalDraftProcess",
         "lib/client/process-draft.ts#draftScope",
@@ -149520,6 +150152,7 @@
         "components/directory-select.tsx#Item",
         "components/directory-select.tsx#Page",
         "lib/directory-query.ts#directoryQuery",
+        "lib/expense-payment.ts#expenseClaimStatus",
         "components/binso-ux.tsx#FormSheet",
         "app/layout.tsx#RootLayout",
         "lib/locales/config.ts#localeCookie",
@@ -150425,31 +151058,6 @@
       "widgets": [
         {
           "tag": "Field",
-          "line": 173,
-          "component": "components/pages/expenses.tsx#ExpenseForm"
-        },
-        {
-          "tag": "Field",
-          "line": 174,
-          "component": "components/pages/expenses.tsx#ExpenseForm"
-        },
-        {
-          "tag": "Field",
-          "line": 175,
-          "component": "components/pages/expenses.tsx#ExpenseForm"
-        },
-        {
-          "tag": "Field",
-          "line": 176,
-          "component": "components/pages/expenses.tsx#ExpenseForm"
-        },
-        {
-          "tag": "Field",
-          "line": 177,
-          "component": "components/pages/expenses.tsx#ExpenseForm"
-        },
-        {
-          "tag": "Field",
           "line": 178,
           "component": "components/pages/expenses.tsx#ExpenseForm"
         },
@@ -150479,23 +151087,58 @@
           "component": "components/pages/expenses.tsx#ExpenseForm"
         },
         {
-          "tag": "ActionSheet",
-          "line": 187,
-          "component": "components/pages/expenses.tsx#ExpenseForm"
-        },
-        {
-          "tag": "FormSheet",
-          "line": 191,
-          "component": "components/pages/expenses.tsx#ExpenseForm"
-        },
-        {
-          "tag": "FormSheet",
-          "line": 192,
+          "tag": "Field",
+          "line": 184,
           "component": "components/pages/expenses.tsx#ExpenseForm"
         },
         {
           "tag": "Field",
-          "line": 192,
+          "line": 185,
+          "component": "components/pages/expenses.tsx#ExpenseForm"
+        },
+        {
+          "tag": "Field",
+          "line": 186,
+          "component": "components/pages/expenses.tsx#ExpenseForm"
+        },
+        {
+          "tag": "Field",
+          "line": 187,
+          "component": "components/pages/expenses.tsx#ExpenseForm"
+        },
+        {
+          "tag": "Field",
+          "line": 188,
+          "component": "components/pages/expenses.tsx#ExpenseForm"
+        },
+        {
+          "tag": "Field",
+          "line": 189,
+          "component": "components/pages/expenses.tsx#ExpenseForm"
+        },
+        {
+          "tag": "ActionSheet",
+          "line": 193,
+          "component": "components/pages/expenses.tsx#ExpenseForm"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 197,
+          "component": "components/pages/expenses.tsx#ExpenseForm"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 198,
+          "component": "components/pages/expenses.tsx#ExpenseForm"
+        },
+        {
+          "tag": "Field",
+          "line": 198,
+          "component": "components/pages/expenses.tsx#ExpenseForm"
+        },
+        {
+          "tag": "Field",
+          "line": 198,
           "component": "components/pages/expenses.tsx#ExpenseForm"
         },
         {
@@ -152467,12 +153110,12 @@
       "widgets": [
         {
           "tag": "RecordsControls",
-          "line": 31,
+          "line": 32,
           "component": "components/pages/expenses.tsx#ExpensesPage"
         },
         {
           "tag": "RecordsView",
-          "line": 32,
+          "line": 33,
           "component": "components/pages/expenses.tsx#ExpensesPage"
         },
         {
@@ -207060,26 +207703,6 @@
       "collections": [],
       "widgets": [
         {
-          "tag": "FormSheet",
-          "line": 50
-        },
-        {
-          "tag": "Field",
-          "line": 50
-        },
-        {
-          "tag": "Field",
-          "line": 50
-        },
-        {
-          "tag": "Field",
-          "line": 50
-        },
-        {
-          "tag": "ConfirmDialog",
-          "line": 51
-        },
-        {
           "tag": "ConfirmDialog",
           "line": 52
         },
@@ -207094,12 +207717,36 @@
         {
           "tag": "Field",
           "line": 53
+        },
+        {
+          "tag": "Field",
+          "line": 53
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 54
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 55
+        },
+        {
+          "tag": "FormSheet",
+          "line": 56
+        },
+        {
+          "tag": "Field",
+          "line": 56
+        },
+        {
+          "tag": "Field",
+          "line": 56
         }
       ],
       "elements": [
         {
           "tag": "AppShell",
-          "line": 45,
+          "line": 47,
           "props": [
             "title=\"Benutzer & Rollen\"",
             "subtitle=\"Zugänge, Rollen und Einladungen verwalten.\"",
@@ -207111,7 +207758,7 @@
         },
         {
           "tag": "Button",
-          "line": 45,
+          "line": 47,
           "props": [
             "icon=\"plus\"",
             "disabled={!data.capacityConfigured}",
@@ -207122,68 +207769,68 @@
         },
         {
           "tag": "span",
-          "line": 45,
+          "line": 47,
           "props": [
             "className=\"create-action-label\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 45,
+          "line": 47,
           "props": []
         },
         {
           "tag": "p",
-          "line": 46,
+          "line": 48,
           "props": [
             "className=\"settings-note\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 46,
+          "line": 48,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 46,
+          "line": 48,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 46,
+          "line": 48,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 46,
+          "line": 48,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 46,
+          "line": 48,
           "props": []
         },
         {
           "tag": "div",
-          "line": 47,
+          "line": 49,
           "props": [
             "className=\"settings-choice-list team-list\""
           ]
         },
         {
           "tag": "LoadingState",
-          "line": 47,
+          "line": 49,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 47,
+          "line": 49,
           "props": []
         },
         {
           "tag": "ErrorState",
-          "line": 47,
+          "line": 49,
           "props": [
             "onRetry={()=>void load()}",
             "retryLabel=\"Erneut laden\""
@@ -207191,12 +207838,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 47,
+          "line": 49,
           "props": []
         },
         {
           "tag": "button",
-          "line": 47,
+          "line": 49,
           "props": [
             "type=\"button\"",
             "key={m.user_id}",
@@ -207206,7 +207853,7 @@
         },
         {
           "tag": "Avatar",
-          "line": 47,
+          "line": 49,
           "props": [
             "name={m.name||m.email||\"\"}",
             "identity={m.user_id}"
@@ -207214,51 +207861,51 @@
         },
         {
           "tag": "div",
-          "line": 47,
+          "line": 49,
           "props": []
         },
         {
           "tag": "b",
-          "line": 47,
+          "line": 49,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 47,
+          "line": 49,
           "props": [
             "verbatim={!!(m.name||m.email)}"
           ]
         },
         {
           "tag": "small",
-          "line": 47,
+          "line": 49,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 47,
+          "line": 49,
           "props": []
         },
         {
           "tag": "small",
-          "line": 47,
+          "line": 49,
           "props": []
         },
         {
           "tag": "Status",
-          "line": 47,
+          "line": 49,
           "props": [
             "tone=\"success\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 47,
+          "line": 49,
           "props": []
         },
         {
           "tag": "Icon",
-          "line": 47,
+          "line": 49,
           "props": [
             "name=\"arrow\"",
             "size={17}"
@@ -207266,35 +207913,35 @@
         },
         {
           "tag": "EmptyState",
-          "line": 47,
+          "line": 49,
           "props": [
             "title=\"Keine Mitarbeitenden\""
           ]
         },
         {
           "tag": "section",
-          "line": 48,
+          "line": 50,
           "props": [
             "className=\"settings-section\""
           ]
         },
         {
           "tag": "SectionTitle",
-          "line": 48,
+          "line": 50,
           "props": [
             "title=\"Offene Einladungen\""
           ]
         },
         {
           "tag": "div",
-          "line": 48,
+          "line": 50,
           "props": [
             "className=\"settings-choice-list\""
           ]
         },
         {
           "tag": "div",
-          "line": 48,
+          "line": 50,
           "props": [
             "className=\"settings-static-row\"",
             "key={i.id}"
@@ -207302,41 +207949,41 @@
         },
         {
           "tag": "Icon",
-          "line": 48,
+          "line": 50,
           "props": [
             "name=\"mail\""
           ]
         },
         {
           "tag": "div",
-          "line": 48,
+          "line": 50,
           "props": []
         },
         {
           "tag": "b",
-          "line": 48,
+          "line": 50,
           "props": []
         },
         {
           "tag": "small",
-          "line": 48,
+          "line": 50,
           "props": []
         },
         {
           "tag": "Status",
-          "line": 48,
+          "line": 50,
           "props": [
             "tone=\"warning\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 48,
+          "line": 50,
           "props": []
         },
         {
           "tag": "ActionsMenu",
-          "line": 48,
+          "line": 50,
           "props": [
             "label=\"Einladungsaktionen\"",
             "busy={saving}"
@@ -207344,7 +207991,16 @@
         },
         {
           "tag": "ActionRow",
-          "line": 48,
+          "line": 50,
+          "props": [
+            "title=\"Einladung erneut senden\"",
+            "icon=\"mail\"",
+            "onClick={()=>setResendId(i.id)}"
+          ]
+        },
+        {
+          "tag": "ActionRow",
+          "line": 50,
           "props": [
             "danger",
             "title=\"Zurückziehen\"",
@@ -207353,8 +208009,21 @@
           ]
         },
         {
+          "tag": "ConfirmDialog",
+          "line": 52,
+          "props": [
+            "open={!!resendId}",
+            "busy={saving}",
+            "title=\"Einladung erneut senden?\"",
+            "message=\"Der bisherige Link wird ungültig. Die neue Einladung gilt sieben Tage; Rolle und Modulprofil bleiben erhalten.\"",
+            "confirmLabel=\"Einladung erneut senden\"",
+            "onCancel={()=>setResendId(null)}",
+            "onConfirm={()=>void resend()}"
+          ]
+        },
+        {
           "tag": "FormSheet",
-          "line": 50,
+          "line": 53,
           "props": [
             "label={\"Mitarbeiter einladen\"}",
             "description={\"Zugang und Rolle können später geändert werden.\"}",
@@ -207368,21 +208037,21 @@
         },
         {
           "tag": "div",
-          "line": 50,
+          "line": 53,
           "props": [
             "className=\"form-grid\""
           ]
         },
         {
           "tag": "Field",
-          "line": 50,
+          "line": 53,
           "props": [
             "label=\"E-Mail\""
           ]
         },
         {
           "tag": "Input",
-          "line": 50,
+          "line": 53,
           "props": [
             "type=\"email\"",
             "value={email}",
@@ -207392,14 +208061,14 @@
         },
         {
           "tag": "Field",
-          "line": 50,
+          "line": 53,
           "props": [
             "label=\"Rolle\""
           ]
         },
         {
           "tag": "Select",
-          "line": 50,
+          "line": 53,
           "props": [
             "value={role}",
             "onChange={e=>setRole(e.target.value)}"
@@ -207407,98 +208076,98 @@
         },
         {
           "tag": "option",
-          "line": 50,
+          "line": 53,
           "props": [
             "value=\"member\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 50,
+          "line": 53,
           "props": []
         },
         {
           "tag": "option",
-          "line": 50,
+          "line": 53,
           "props": [
             "value=\"reader\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 50,
+          "line": 53,
           "props": []
         },
         {
           "tag": "option",
-          "line": 50,
+          "line": 53,
           "props": [
             "value=\"project_manager\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 50,
+          "line": 53,
           "props": []
         },
         {
           "tag": "option",
-          "line": 50,
+          "line": 53,
           "props": [
             "value=\"manager\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 50,
+          "line": 53,
           "props": []
         },
         {
           "tag": "option",
-          "line": 50,
+          "line": 53,
           "props": [
             "value=\"finance\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 50,
+          "line": 53,
           "props": []
         },
         {
           "tag": "option",
-          "line": 50,
+          "line": 53,
           "props": [
             "value=\"hr\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 50,
+          "line": 53,
           "props": []
         },
         {
           "tag": "option",
-          "line": 50,
+          "line": 53,
           "props": [
             "value=\"admin\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 50,
+          "line": 53,
           "props": []
         },
         {
           "tag": "Field",
-          "line": 50,
+          "line": 53,
           "props": [
             "label=\"Modulprofil\""
           ]
         },
         {
           "tag": "Select",
-          "line": 50,
+          "line": 53,
           "props": [
             "value={moduleProfile}",
             "onChange={e=>setModuleProfile(e.target.value as \"standard\"|\"time_only\")}"
@@ -207506,38 +208175,38 @@
         },
         {
           "tag": "option",
-          "line": 50,
+          "line": 53,
           "props": [
             "value=\"standard\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 50,
+          "line": 53,
           "props": []
         },
         {
           "tag": "option",
-          "line": 50,
+          "line": 53,
           "props": [
             "value=\"time_only\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 50,
+          "line": 53,
           "props": []
         },
         {
           "tag": "FormActions",
-          "line": 50,
+          "line": 53,
           "props": [
             "sheet"
           ]
         },
         {
           "tag": "Button",
-          "line": 50,
+          "line": 53,
           "props": [
             "variant=\"secondary\"",
             "disabled={saving}",
@@ -207546,12 +208215,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 50,
+          "line": 53,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 50,
+          "line": 53,
           "props": [
             "onClick={()=>void invite()}",
             "disabled={saving||!data.capacityConfigured||data.userLimit!==null&&occupied>=data.userLimit}"
@@ -207559,12 +208228,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 50,
+          "line": 53,
           "props": []
         },
         {
           "tag": "ConfirmDialog",
-          "line": 51,
+          "line": 54,
           "props": [
             "open={confirmRole}",
             "busy={saving}",
@@ -207577,7 +208246,7 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 52,
+          "line": 55,
           "props": [
             "open={confirmDeactivate}",
             "busy={saving}",
@@ -207590,7 +208259,7 @@
         },
         {
           "tag": "FormSheet",
-          "line": 53,
+          "line": 56,
           "props": [
             "label={selected.name||selected.email||\"Mitarbeiter\"}",
             "description={selected.email||selected.user_id}",
@@ -207604,14 +208273,14 @@
         },
         {
           "tag": "Field",
-          "line": 53,
+          "line": 56,
           "props": [
             "label=\"Rolle\""
           ]
         },
         {
           "tag": "Select",
-          "line": 53,
+          "line": 56,
           "props": [
             "value={editRole}",
             "disabled={selected.role===\"owner\"}",
@@ -207620,110 +208289,110 @@
         },
         {
           "tag": "option",
-          "line": 53,
+          "line": 56,
           "props": [
             "value=\"member\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 53,
+          "line": 56,
           "props": []
         },
         {
           "tag": "option",
-          "line": 53,
+          "line": 56,
           "props": [
             "value=\"reader\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 53,
+          "line": 56,
           "props": []
         },
         {
           "tag": "option",
-          "line": 53,
+          "line": 56,
           "props": [
             "value=\"project_manager\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 53,
+          "line": 56,
           "props": []
         },
         {
           "tag": "option",
-          "line": 53,
+          "line": 56,
           "props": [
             "value=\"manager\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 53,
+          "line": 56,
           "props": []
         },
         {
           "tag": "option",
-          "line": 53,
+          "line": 56,
           "props": [
             "value=\"finance\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 53,
+          "line": 56,
           "props": []
         },
         {
           "tag": "option",
-          "line": 53,
+          "line": 56,
           "props": [
             "value=\"hr\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 53,
+          "line": 56,
           "props": []
         },
         {
           "tag": "option",
-          "line": 53,
+          "line": 56,
           "props": [
             "value=\"admin\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 53,
+          "line": 56,
           "props": []
         },
         {
           "tag": "option",
-          "line": 53,
+          "line": 56,
           "props": [
             "value=\"owner\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 53,
+          "line": 56,
           "props": []
         },
         {
           "tag": "Field",
-          "line": 53,
+          "line": 56,
           "props": [
             "label=\"Modulprofil\""
           ]
         },
         {
           "tag": "Select",
-          "line": 53,
+          "line": 56,
           "props": [
             "value={editProfile}",
             "onChange={e=>setEditProfile(e.target.value as \"standard\"|\"time_only\")}"
@@ -207731,31 +208400,31 @@
         },
         {
           "tag": "option",
-          "line": 53,
+          "line": 56,
           "props": [
             "value=\"standard\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 53,
+          "line": 56,
           "props": []
         },
         {
           "tag": "option",
-          "line": 53,
+          "line": 56,
           "props": [
             "value=\"time_only\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 53,
+          "line": 56,
           "props": []
         },
         {
           "tag": "ActionRow",
-          "line": 53,
+          "line": 56,
           "props": [
             "danger",
             "icon=\"lock\"",
@@ -207765,14 +208434,14 @@
         },
         {
           "tag": "FormActions",
-          "line": 53,
+          "line": 56,
           "props": [
             "sheet"
           ]
         },
         {
           "tag": "Button",
-          "line": 53,
+          "line": 56,
           "props": [
             "variant=\"secondary\"",
             "disabled={saving}",
@@ -207781,12 +208450,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 53,
+          "line": 56,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 53,
+          "line": 56,
           "props": [
             "disabled={saving||selected.role===editRole&&(selected.module_profile??\"standard\")===(editRole===\"member\"?editProfile:\"standard\")}",
             "onClick={()=>setConfirmRole(true)}"
@@ -207794,12 +208463,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 53,
+          "line": 56,
           "props": []
         },
         {
           "tag": "Toast",
-          "line": 54,
+          "line": 57,
           "props": [
             "title={toast}",
             "tone={toast.includes(\"konnte\")?\"danger\":\"success\"}"
@@ -207807,7 +208476,7 @@
         },
         {
           "tag": "WorkforceAssignments",
-          "line": 55,
+          "line": 58,
           "props": []
         }
       ],
@@ -207882,38 +208551,58 @@
         },
         {
           "line": 45,
+          "expression": "!canManage||!resendId||mutation.current"
+        },
+        {
+          "line": 45,
+          "expression": "resendRequest.current?.id!==resendId"
+        },
+        {
+          "line": 45,
+          "expression": "result.ok!==true"
+        },
+        {
+          "line": 45,
+          "expression": "error instanceof Error"
+        },
+        {
+          "line": 47,
           "expression": "canManage"
         },
         {
-          "line": 46,
+          "line": 48,
           "expression": "!data.capacityConfigured"
         },
         {
-          "line": 46,
+          "line": 48,
           "expression": "data.userLimit===null"
         },
         {
-          "line": 46,
+          "line": 48,
           "expression": "data.plan===\"trial\""
         },
         {
-          "line": 47,
+          "line": 49,
           "expression": "loading"
         },
         {
-          "line": 47,
+          "line": 49,
           "expression": "loadError"
         },
         {
-          "line": 47,
+          "line": 49,
           "expression": "data.members.length"
         },
         {
-          "line": 53,
+          "line": 50,
+          "expression": "new Date(i.expires_at)>new Date()"
+        },
+        {
+          "line": 56,
           "expression": "editRole===\"member\""
         },
         {
-          "line": 54,
+          "line": 57,
           "expression": "toast.includes(\"konnte\")"
         }
       ]
@@ -207970,7 +208659,7 @@
       "key": "components/workforce-assignments.tsx#WorkforceAssignments",
       "file": "components/workforce-assignments.tsx",
       "name": "WorkforceAssignments",
-      "line": 14,
+      "line": 15,
       "classes": [
         "bo-workspace-section",
         "technical-hint",
@@ -207978,6 +208667,7 @@
         "assignment-row"
       ],
       "apis": [
+        "/api/auth/session",
         "/api/workforce-assignments",
         "/api/customers",
         "/api/projects"
@@ -207986,26 +208676,10 @@
       "widgets": [
         {
           "tag": "FormSheet",
-          "line": 23
-        },
-        {
-          "tag": "form",
-          "line": 24
-        },
-        {
-          "tag": "Field",
-          "line": 25
-        },
-        {
-          "tag": "Field",
-          "line": 26
-        },
-        {
-          "tag": "Field",
           "line": 27
         },
         {
-          "tag": "Field",
+          "tag": "form",
           "line": 28
         },
         {
@@ -208014,87 +208688,113 @@
         },
         {
           "tag": "Field",
-          "line": 29
+          "line": 30
+        },
+        {
+          "tag": "Field",
+          "line": 32
+        },
+        {
+          "tag": "Field",
+          "line": 33
+        },
+        {
+          "tag": "Field",
+          "line": 34
+        },
+        {
+          "tag": "Field",
+          "line": 34
         },
         {
           "tag": "ConfirmDialog",
-          "line": 31
+          "line": 38
         }
       ],
       "elements": [
         {
           "tag": "section",
-          "line": 20,
+          "line": 24,
           "props": [
             "className=\"bo-workspace-section\""
           ]
         },
         {
           "tag": "SectionTitle",
-          "line": 20,
+          "line": 24,
           "props": [
             "title=\"Zuordnungen\"",
-            "action={<ActionsMenu label=\"Zuordnungsaktionen\"><ActionRow requiresWrite icon=\"plus\" title=\"Zuordnung hinzufügen\" onClick={()=>setOpen(true)}/></ActionsMenu>}"
+            "action={<ActionsMenu label=\"Zuordnungsaktionen\"><ActionRow requiresWrite icon=\"plus\" title=\"Zuordnung hinzufügen\" onClick={()=>{setIdentityOnly(false);setOpen(true)}}/>{canBind&&<ActionRow requiresWrite icon=\"user\" title=\"Mitarbeiterzugang verknüpfen\" onClick={()=>{setIdentityOnly(true);setOpen(true)}}/>}</ActionsMenu>}"
           ]
         },
         {
           "tag": "ActionsMenu",
-          "line": 20,
+          "line": 24,
           "props": [
             "label=\"Zuordnungsaktionen\""
           ]
         },
         {
           "tag": "ActionRow",
-          "line": 20,
+          "line": 24,
           "props": [
             "requiresWrite",
             "icon=\"plus\"",
             "title=\"Zuordnung hinzufügen\"",
-            "onClick={()=>setOpen(true)}"
+            "onClick={()=>{setIdentityOnly(false);setOpen(true)}}"
+          ]
+        },
+        {
+          "tag": "ActionRow",
+          "line": 24,
+          "props": [
+            "requiresWrite",
+            "icon=\"user\"",
+            "title=\"Mitarbeiterzugang verknüpfen\"",
+            "onClick={()=>{setIdentityOnly(true);setOpen(true)}}"
           ]
         },
         {
           "tag": "p",
-          "line": 20,
+          "line": 24,
           "props": [
             "className=\"technical-hint\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 20,
+          "line": 24,
           "props": []
         },
         {
           "tag": "LoadingState",
-          "line": 21,
+          "line": 25,
           "props": []
         },
         {
           "tag": "ErrorState",
-          "line": 21,
+          "line": 25,
           "props": [
             "onRetry={data.refresh}"
           ]
         },
         {
           "tag": "EmptyState",
-          "line": 21,
+          "line": 25,
           "props": [
             "title=\"Keine Zuordnungen\""
           ]
         },
         {
           "tag": "div",
-          "line": 21,
+          "line": 25,
           "props": [
             "className=\"action-list\""
           ]
         },
         {
           "tag": "div",
-          "line": 21,
+          "line": 25,
           "props": [
             "key={item.id}",
             "className=\"assignment-row\""
@@ -208102,41 +208802,41 @@
         },
         {
           "tag": "div",
-          "line": 21,
+          "line": 25,
           "props": []
         },
         {
           "tag": "b",
-          "line": 21,
+          "line": 25,
           "props": []
         },
         {
           "tag": "p",
-          "line": 21,
+          "line": 25,
           "props": []
         },
         {
           "tag": "small",
-          "line": 21,
+          "line": 25,
           "props": []
         },
         {
           "tag": "Status",
-          "line": 21,
+          "line": 25,
           "props": [
             "tone={!item.revoked_at&&String(item.starts_on).slice(0,10)<=businessDate()&&(!item.ends_on||String(item.ends_on).slice(0,10)>=businessDate())?'success':'neutral'}"
           ]
         },
         {
           "tag": "ActionsMenu",
-          "line": 21,
+          "line": 25,
           "props": [
             "label=\"Zuordnungsaktionen\""
           ]
         },
         {
           "tag": "ActionRow",
-          "line": 21,
+          "line": 25,
           "props": [
             "requiresWrite",
             "icon=\"close\"",
@@ -208147,23 +208847,23 @@
         },
         {
           "tag": "ErrorState",
-          "line": 22,
+          "line": 26,
           "props": []
         },
         {
           "tag": "FormSheet",
-          "line": 23,
+          "line": 27,
           "props": [
             "open={open}",
             "onClose={close}",
-            "label=\"Zuordnung\"",
+            "label={identityOnly?\"Mitarbeiterzugang verknüpfen\":\"Zuordnung\"}",
             "busy={busy}",
             "dirty={!!(employee||user||customer||project||end)||start!==businessDate()}"
           ]
         },
         {
           "tag": "form",
-          "line": 24,
+          "line": 28,
           "props": [
             "id={formId}",
             "onSubmit={event=>{event.preventDefault();void mutate()}}"
@@ -208171,14 +208871,14 @@
         },
         {
           "tag": "Field",
-          "line": 25,
+          "line": 29,
           "props": [
             "label=\"Mitarbeiter\""
           ]
         },
         {
           "tag": "Select",
-          "line": 25,
+          "line": 29,
           "props": [
             "required",
             "value={employee}",
@@ -208187,14 +208887,14 @@
         },
         {
           "tag": "option",
-          "line": 25,
+          "line": 29,
           "props": [
             "value=\"\""
           ]
         },
         {
           "tag": "option",
-          "line": 25,
+          "line": 29,
           "props": [
             "key={item.id}",
             "value={item.id}"
@@ -208202,14 +208902,14 @@
         },
         {
           "tag": "Field",
-          "line": 26,
+          "line": 30,
           "props": [
             "label=\"Zugang\""
           ]
         },
         {
           "tag": "Select",
-          "line": 26,
+          "line": 30,
           "props": [
             "required",
             "value={user}",
@@ -208218,14 +208918,14 @@
         },
         {
           "tag": "option",
-          "line": 26,
+          "line": 30,
           "props": [
             "value=\"\""
           ]
         },
         {
           "tag": "option",
-          "line": 26,
+          "line": 30,
           "props": [
             "key={item.user_id}",
             "value={item.user_id}"
@@ -208233,14 +208933,14 @@
         },
         {
           "tag": "Field",
-          "line": 27,
+          "line": 32,
           "props": [
             "label=\"Kunde\""
           ]
         },
         {
           "tag": "DirectorySelect",
-          "line": 27,
+          "line": 32,
           "props": [
             "label=\"Kunde\"",
             "required",
@@ -208251,14 +208951,14 @@
         },
         {
           "tag": "Field",
-          "line": 28,
+          "line": 33,
           "props": [
             "label=\"Auftrag\""
           ]
         },
         {
           "tag": "DirectorySelect",
-          "line": 28,
+          "line": 33,
           "props": [
             "label=\"Auftrag\"",
             "endpoint={customer?\"/api/projects\":null}",
@@ -208271,14 +208971,14 @@
         },
         {
           "tag": "Field",
-          "line": 29,
+          "line": 34,
           "props": [
             "label=\"Beginn\""
           ]
         },
         {
           "tag": "Input",
-          "line": 29,
+          "line": 34,
           "props": [
             "required",
             "type=\"date\"",
@@ -208288,14 +208988,14 @@
         },
         {
           "tag": "Field",
-          "line": 29,
+          "line": 34,
           "props": [
             "label=\"Ende\""
           ]
         },
         {
           "tag": "Input",
-          "line": 29,
+          "line": 34,
           "props": [
             "type=\"date\"",
             "min={start}",
@@ -208304,20 +209004,30 @@
           ]
         },
         {
+          "tag": "p",
+          "line": 36,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 36,
+          "props": []
+        },
+        {
           "tag": "ErrorState",
-          "line": 30,
+          "line": 37,
           "props": []
         },
         {
           "tag": "FormActions",
-          "line": 30,
+          "line": 37,
           "props": [
             "sheet"
           ]
         },
         {
           "tag": "Button",
-          "line": 30,
+          "line": 37,
           "props": [
             "variant=\"secondary\"",
             "onClick={close}"
@@ -208325,27 +209035,27 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 30,
+          "line": 37,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 30,
+          "line": 37,
           "props": [
             "requiresWrite",
-            "disabled={busy||!employee||!user||!customer||!start}",
+            "disabled={busy||!employee||!user||!identityOnly&&(!customer||!start)}",
             "type=\"submit\"",
             "form={formId}"
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 30,
+          "line": 37,
           "props": []
         },
         {
           "tag": "ConfirmDialog",
-          "line": 31,
+          "line": 38,
           "props": [
             "open={!!revoking}",
             "title=\"Zugriff entziehen?\"",
@@ -208358,64 +209068,88 @@
       ],
       "conditions": [
         {
-          "line": 19,
+          "line": 23,
           "expression": "pending.current"
         },
         {
-          "line": 19,
+          "line": 23,
           "expression": "revoke"
         },
         {
-          "line": 19,
+          "line": 23,
+          "expression": "identityOnly"
+        },
+        {
+          "line": 23,
+          "expression": "bindingAttempt.current?.body!==serialized"
+        },
+        {
+          "line": 23,
           "expression": "e instanceof Error"
         },
         {
-          "line": 21,
+          "line": 25,
           "expression": "data.loading"
         },
         {
-          "line": 21,
+          "line": 25,
           "expression": "data.error"
         },
         {
-          "line": 21,
+          "line": 25,
           "expression": "!data.data?.items.length"
         },
         {
-          "line": 21,
+          "line": 25,
           "expression": "item.project_name"
         },
         {
-          "line": 21,
+          "line": 25,
           "expression": "item.ends_on"
         },
         {
-          "line": 21,
+          "line": 25,
           "expression": "!item.revoked_at&&String(item.starts_on).slice(0,10)<=businessDate()&&(!item.ends_on||String(item.ends_on).slice(0,10)>=businessDate())"
         },
         {
-          "line": 21,
+          "line": 25,
           "expression": "item.revoked_at||item.ends_on&&String(item.ends_on).slice(0,10)<businessDate()"
         },
         {
-          "line": 21,
+          "line": 25,
           "expression": "String(item.starts_on).slice(0,10)>businessDate()"
         },
         {
-          "line": 28,
+          "line": 27,
+          "expression": "identityOnly"
+        },
+        {
+          "line": 33,
           "expression": "customer"
         },
         {
-          "line": 31,
+          "line": 38,
           "expression": "revoking"
         }
       ]
     },
     {
+      "key": "config/plan-access.ts#isPlanId",
+      "file": "config/plan-access.ts",
+      "name": "isPlanId",
+      "line": 8,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": []
+    },
+    {
       "key": "components/workforce-assignments.tsx#Payload",
       "file": "components/workforce-assignments.tsx",
       "name": "Payload",
-      "line": 13,
+      "line": 14,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -208427,7 +209161,7 @@
       "key": "components/workforce-assignments.tsx#Assignment",
       "file": "components/workforce-assignments.tsx",
       "name": "Assignment",
-      "line": 12,
+      "line": 13,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -214413,7 +215147,7 @@
       "key": "components/pages/suppliers.tsx#SupplierForm",
       "file": "components/pages/suppliers.tsx",
       "name": "SupplierForm",
-      "line": 28,
+      "line": 31,
       "classes": [
         "surface",
         "detail-list",
@@ -214421,55 +215155,56 @@
         "two"
       ],
       "apis": [
+        "/api/auth/session",
         "/api/suppliers"
       ],
       "collections": [],
       "widgets": [
         {
           "tag": "FormSheet",
-          "line": 63
-        },
-        {
-          "tag": "form",
-          "line": 64
-        },
-        {
-          "tag": "Field",
-          "line": 65
-        },
-        {
-          "tag": "Field",
-          "line": 66
-        },
-        {
-          "tag": "Field",
-          "line": 67
-        },
-        {
-          "tag": "Field",
-          "line": 68
-        },
-        {
-          "tag": "Field",
-          "line": 69
-        },
-        {
-          "tag": "Field",
           "line": 70
         },
         {
-          "tag": "Field",
+          "tag": "form",
           "line": 71
         },
         {
           "tag": "Field",
           "line": 72
+        },
+        {
+          "tag": "Field",
+          "line": 73
+        },
+        {
+          "tag": "Field",
+          "line": 74
+        },
+        {
+          "tag": "Field",
+          "line": 75
+        },
+        {
+          "tag": "Field",
+          "line": 76
+        },
+        {
+          "tag": "Field",
+          "line": 77
+        },
+        {
+          "tag": "Field",
+          "line": 78
+        },
+        {
+          "tag": "Field",
+          "line": 79
         }
       ],
       "elements": [
         {
           "tag": "AppShell",
-          "line": 60,
+          "line": 65,
           "props": [
             "title=\"Lieferant\"",
             "active=\"lieferanten\"",
@@ -214479,26 +215214,26 @@
         },
         {
           "tag": "LoadingState",
-          "line": 60,
+          "line": 65,
           "props": []
         },
         {
           "tag": "ErrorState",
-          "line": 60,
+          "line": 65,
           "props": [
             "onRetry={query.refresh}"
           ]
         },
         {
           "tag": "EmptyState",
-          "line": 60,
+          "line": 65,
           "props": [
             "title=\"Lieferant wurde nicht gefunden.\""
           ]
         },
         {
           "tag": "AppShell",
-          "line": 61,
+          "line": 66,
           "props": [
             "title={existing?draft.name:'Lieferant hinzufügen'}",
             "titleIsUserContent={existing}",
@@ -214511,14 +215246,14 @@
         },
         {
           "tag": "ActionsMenu",
-          "line": 61,
+          "line": 66,
           "props": [
             "label=\"Lieferantenaktionen\""
           ]
         },
         {
           "tag": "ActionRow",
-          "line": 61,
+          "line": 66,
           "props": [
             "requiresWrite",
             "icon=\"edit\"",
@@ -214528,50 +215263,67 @@
         },
         {
           "tag": "section",
-          "line": 62,
+          "line": 67,
           "props": [
             "className=\"surface\""
           ]
         },
         {
           "tag": "SectionTitle",
-          "line": 62,
+          "line": 67,
           "props": [
             "title=\"Stammdaten\""
           ]
         },
         {
           "tag": "dl",
-          "line": 62,
+          "line": 67,
           "props": [
             "className=\"detail-list\""
           ]
         },
         {
           "tag": "div",
-          "line": 62,
+          "line": 67,
           "props": [
             "key={label}"
           ]
         },
         {
           "tag": "dt",
-          "line": 62,
+          "line": 67,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 62,
+          "line": 67,
           "props": []
         },
         {
           "tag": "dd",
-          "line": 62,
+          "line": 67,
           "props": []
         },
         {
+          "tag": "SupplierBank",
+          "line": 68,
+          "props": [
+            "supplierId={supplierId}",
+            "mayWrite={tenantCan(role,'bank:write',profile)}",
+            "onSaved={query.refresh}"
+          ]
+        },
+        {
+          "tag": "SupplierInvoices",
+          "line": 69,
+          "props": [
+            "supplierId={supplierId}",
+            "mayWrite={tenantCan(role,'purchasing:write',profile)}"
+          ]
+        },
+        {
           "tag": "FormSheet",
-          "line": 63,
+          "line": 70,
           "props": [
             "workspace",
             "open={editing}",
@@ -214583,7 +215335,7 @@
         },
         {
           "tag": "form",
-          "line": 64,
+          "line": 71,
           "props": [
             "id={formId}",
             "onSubmit={event=>{event.preventDefault();void save();}}"
@@ -214591,21 +215343,21 @@
         },
         {
           "tag": "div",
-          "line": 64,
+          "line": 71,
           "props": [
             "className=\"form-grid two\""
           ]
         },
         {
           "tag": "Field",
-          "line": 65,
+          "line": 72,
           "props": [
             "label=\"Lieferant\""
           ]
         },
         {
           "tag": "Input",
-          "line": 65,
+          "line": 72,
           "props": [
             "required",
             "maxLength={200}",
@@ -214615,14 +215367,14 @@
         },
         {
           "tag": "Field",
-          "line": 66,
+          "line": 73,
           "props": [
             "label=\"Kontakt\""
           ]
         },
         {
           "tag": "Input",
-          "line": 66,
+          "line": 73,
           "props": [
             "maxLength={200}",
             "value={draft.contactName}",
@@ -214631,14 +215383,14 @@
         },
         {
           "tag": "Field",
-          "line": 67,
+          "line": 74,
           "props": [
             "label=\"E-Mail\""
           ]
         },
         {
           "tag": "Input",
-          "line": 67,
+          "line": 74,
           "props": [
             "type=\"email\"",
             "maxLength={320}",
@@ -214648,14 +215400,14 @@
         },
         {
           "tag": "Field",
-          "line": 68,
+          "line": 75,
           "props": [
             "label=\"Telefon\""
           ]
         },
         {
           "tag": "Input",
-          "line": 68,
+          "line": 75,
           "props": [
             "type=\"tel\"",
             "maxLength={80}",
@@ -214665,14 +215417,14 @@
         },
         {
           "tag": "Field",
-          "line": 69,
+          "line": 76,
           "props": [
             "label=\"Adresse\""
           ]
         },
         {
           "tag": "Input",
-          "line": 69,
+          "line": 76,
           "props": [
             "maxLength={500}",
             "value={draft.address}",
@@ -214681,14 +215433,14 @@
         },
         {
           "tag": "Field",
-          "line": 70,
+          "line": 77,
           "props": [
             "label=\"UID\""
           ]
         },
         {
           "tag": "Input",
-          "line": 70,
+          "line": 77,
           "props": [
             "maxLength={80}",
             "value={draft.uid}",
@@ -214697,7 +215449,7 @@
         },
         {
           "tag": "Field",
-          "line": 71,
+          "line": 78,
           "props": [
             "label=\"Zahlungsfrist\"",
             "hint=\"Tage\""
@@ -214705,7 +215457,7 @@
         },
         {
           "tag": "Input",
-          "line": 71,
+          "line": 78,
           "props": [
             "required",
             "type=\"number\"",
@@ -214718,14 +215470,14 @@
         },
         {
           "tag": "Field",
-          "line": 72,
+          "line": 79,
           "props": [
             "label=\"Status\""
           ]
         },
         {
           "tag": "Select",
-          "line": 72,
+          "line": 79,
           "props": [
             "value={draft.status}",
             "onChange={event=>field('status',event.target.value)}"
@@ -214733,43 +215485,43 @@
         },
         {
           "tag": "option",
-          "line": 72,
+          "line": 79,
           "props": [
             "value=\"active\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 72,
+          "line": 79,
           "props": []
         },
         {
           "tag": "option",
-          "line": 72,
+          "line": 79,
           "props": [
             "value=\"inactive\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 72,
+          "line": 79,
           "props": []
         },
         {
           "tag": "ErrorState",
-          "line": 74,
+          "line": 81,
           "props": []
         },
         {
           "tag": "FormActions",
-          "line": 75,
+          "line": 82,
           "props": [
             "sheet"
           ]
         },
         {
           "tag": "Button",
-          "line": 75,
+          "line": 82,
           "props": [
             "variant=\"secondary\"",
             "disabled={busy}",
@@ -214778,12 +215530,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 75,
+          "line": 82,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 75,
+          "line": 82,
           "props": [
             "requiresWrite",
             "type=\"submit\"",
@@ -214793,85 +215545,89 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 75,
+          "line": 82,
           "props": []
         }
       ],
       "conditions": [
         {
-          "line": 31,
+          "line": 33,
           "expression": "supplierId"
         },
         {
-          "line": 32,
-          "expression": "existing"
+          "line": 36,
+          "expression": "supplierId"
         },
         {
-          "line": 36,
-          "expression": "!query.data?.item||editing"
+          "line": 37,
+          "expression": "existing"
         },
         {
           "line": 41,
-          "expression": "!value||Object.keys(blank).some(key=>typeof value[key as keyof Draft]!=='string'||value[key as keyof Draft].length>500)"
-        },
-        {
-          "line": 43,
-          "expression": "value.replay&&typeof value.replay.body==='string'&&value.replay.body.length<=8192&&typeof value.replay.key==='string'&&value.replay.key.length>=8&&value.replay.key.length<=128"
+          "expression": "!query.data?.item||editing"
         },
         {
           "line": 46,
-          "expression": "existing"
+          "expression": "!value||Object.keys(blank).some(key=>typeof value[key as keyof Draft]!=='string'||value[key as keyof Draft].length>500)"
         },
         {
           "line": 48,
-          "expression": "pending.current||existing&&(query.loading||query.error)||!existing&&!recovery.ready"
+          "expression": "value.replay&&typeof value.replay.body==='string'&&value.replay.body.length<=8192&&typeof value.replay.key==='string'&&value.replay.key.length>=8&&value.replay.key.length<=128"
         },
         {
           "line": 51,
           "expression": "existing"
         },
         {
-          "line": 52,
-          "expression": "attempt.current?.body!==serialized"
-        },
-        {
           "line": 53,
-          "expression": "!existing"
+          "expression": "pending.current||existing&&(query.loading||query.error)||!existing&&!recovery.ready"
         },
         {
-          "line": 54,
+          "line": 56,
           "expression": "existing"
-        },
-        {
-          "line": 55,
-          "expression": "!result.item?.id"
         },
         {
           "line": 57,
-          "expression": "cause instanceof Error"
+          "expression": "attempt?.body===serialized"
         },
         {
-          "line": 60,
-          "expression": "existing&&(query.loading||query.error||!query.data?.item)"
+          "line": 58,
+          "expression": "!existing"
         },
         {
-          "line": 60,
-          "expression": "query.loading"
-        },
-        {
-          "line": 60,
-          "expression": "query.error"
-        },
-        {
-          "line": 61,
+          "line": 59,
           "expression": "existing"
         },
         {
-          "line": 61,
+          "line": 60,
+          "expression": "!result.item?.id"
+        },
+        {
+          "line": 62,
+          "expression": "cause instanceof Error"
+        },
+        {
+          "line": 65,
+          "expression": "existing&&(query.loading||query.error||!query.data?.item)"
+        },
+        {
+          "line": 65,
+          "expression": "query.loading"
+        },
+        {
+          "line": 65,
+          "expression": "query.error"
+        },
+        {
+          "line": 66,
+          "expression": "existing"
+        },
+        {
+          "line": 66,
           "expression": "existing&&!editing"
         },
         {
-          "line": 63,
+          "line": 70,
           "expression": "existing"
         }
       ]
@@ -214880,7 +215636,7 @@
       "key": "components/pages/suppliers.tsx#Supplier",
       "file": "components/pages/suppliers.tsx",
       "name": "Supplier",
-      "line": 27,
+      "line": 30,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -214892,7 +215648,7 @@
       "key": "components/pages/suppliers.tsx#Draft",
       "file": "components/pages/suppliers.tsx",
       "name": "Draft",
-      "line": 25,
+      "line": 28,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -214904,7 +215660,766 @@
       "key": "components/pages/suppliers.tsx#blank",
       "file": "components/pages/suppliers.tsx",
       "name": "blank",
-      "line": 26,
+      "line": 29,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": []
+    },
+    {
+      "key": "components/supplier-bank.tsx#SupplierBank",
+      "file": "components/supplier-bank.tsx",
+      "name": "SupplierBank",
+      "line": 10,
+      "classes": [
+        "surface"
+      ],
+      "apis": [
+        "/api/suppliers/"
+      ],
+      "collections": [],
+      "widgets": [
+        {
+          "tag": "FormSheet",
+          "line": 29
+        },
+        {
+          "tag": "form",
+          "line": 30
+        },
+        {
+          "tag": "Field",
+          "line": 30
+        }
+      ],
+      "elements": [
+        {
+          "tag": "section",
+          "line": 26,
+          "props": [
+            "className=\"surface\""
+          ]
+        },
+        {
+          "tag": "SectionTitle",
+          "line": 27,
+          "props": [
+            "title=\"Bankverbindung\"",
+            "action={mayWrite&&query.data?.item?<ActionsMenu label=\"Bankverbindung\"><ActionRow requiresWrite icon=\"edit\" title=\"Bankverbindung bearbeiten\" onClick={edit}/></ActionsMenu>:undefined}"
+          ]
+        },
+        {
+          "tag": "ActionsMenu",
+          "line": 27,
+          "props": [
+            "label=\"Bankverbindung\""
+          ]
+        },
+        {
+          "tag": "ActionRow",
+          "line": 27,
+          "props": [
+            "requiresWrite",
+            "icon=\"edit\"",
+            "title=\"Bankverbindung bearbeiten\"",
+            "onClick={edit}"
+          ]
+        },
+        {
+          "tag": "LoadingState",
+          "line": 28,
+          "props": []
+        },
+        {
+          "tag": "ErrorState",
+          "line": 28,
+          "props": [
+            "onRetry={query.refresh}"
+          ]
+        },
+        {
+          "tag": "p",
+          "line": 28,
+          "props": []
+        },
+        {
+          "tag": "EmptyState",
+          "line": 28,
+          "props": [
+            "title=\"Keine Bankverbindung\""
+          ]
+        },
+        {
+          "tag": "FormSheet",
+          "line": 29,
+          "props": [
+            "open={open}",
+            "onClose={()=>setOpen(false)}",
+            "label=\"Bankverbindung bearbeiten\"",
+            "dirty={iban!==original}",
+            "busy={busy}"
+          ]
+        },
+        {
+          "tag": "form",
+          "line": 30,
+          "props": [
+            "id={formId}",
+            "onSubmit={event=>{event.preventDefault();void save();}}"
+          ]
+        },
+        {
+          "tag": "Field",
+          "line": 30,
+          "props": [
+            "label=\"IBAN\"",
+            "hint=\"Schweiz oder Liechtenstein. Leer lassen, um die Bankverbindung zu entfernen.\""
+          ]
+        },
+        {
+          "tag": "Input",
+          "line": 30,
+          "props": [
+            "value={iban}",
+            "maxLength={50}",
+            "autoComplete=\"off\"",
+            "onChange={event=>setIban(event.target.value)}"
+          ]
+        },
+        {
+          "tag": "p",
+          "line": 31,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 31,
+          "props": []
+        },
+        {
+          "tag": "ErrorState",
+          "line": 32,
+          "props": []
+        },
+        {
+          "tag": "FormActions",
+          "line": 33,
+          "props": [
+            "sheet"
+          ]
+        },
+        {
+          "tag": "Button",
+          "line": 33,
+          "props": [
+            "variant=\"secondary\"",
+            "disabled={busy}",
+            "onClick={()=>setOpen(false)}"
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 33,
+          "props": []
+        },
+        {
+          "tag": "Button",
+          "line": 33,
+          "props": [
+            "requiresWrite",
+            "type=\"submit\"",
+            "form={formId}",
+            "disabled={busy}"
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 33,
+          "props": []
+        }
+      ],
+      "conditions": [
+        {
+          "line": 14,
+          "expression": "!query.data?.item"
+        },
+        {
+          "line": 16,
+          "expression": "pending.current"
+        },
+        {
+          "line": 19,
+          "expression": "attempt.current?.body!==serialized"
+        },
+        {
+          "line": 21,
+          "expression": "!result.item?.id"
+        },
+        {
+          "line": 23,
+          "expression": "cause instanceof Error"
+        },
+        {
+          "line": 27,
+          "expression": "mayWrite&&query.data?.item"
+        },
+        {
+          "line": 28,
+          "expression": "query.loading"
+        },
+        {
+          "line": 28,
+          "expression": "query.error"
+        },
+        {
+          "line": 28,
+          "expression": "query.data?.item.iban"
+        }
+      ]
+    },
+    {
+      "key": "components/supplier-bank.tsx#Bank",
+      "file": "components/supplier-bank.tsx",
+      "name": "Bank",
+      "line": 9,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": []
+    },
+    {
+      "key": "components/supplier-invoices.tsx#SupplierInvoices",
+      "file": "components/supplier-invoices.tsx",
+      "name": "SupplierInvoices",
+      "line": 15,
+      "classes": [
+        "surface",
+        "technical-hint",
+        "action-list",
+        "assignment-row",
+        "form-grid",
+        "two"
+      ],
+      "apis": [
+        "/api/suppliers/"
+      ],
+      "collections": [],
+      "widgets": [
+        {
+          "tag": "FormSheet",
+          "line": 40
+        },
+        {
+          "tag": "FormSheet",
+          "line": 41
+        },
+        {
+          "tag": "form",
+          "line": 42
+        },
+        {
+          "tag": "Field",
+          "line": 43
+        },
+        {
+          "tag": "Field",
+          "line": 44
+        },
+        {
+          "tag": "Field",
+          "line": 45
+        },
+        {
+          "tag": "Field",
+          "line": 46
+        },
+        {
+          "tag": "Field",
+          "line": 47
+        },
+        {
+          "tag": "Field",
+          "line": 48
+        },
+        {
+          "tag": "Field",
+          "line": 49
+        },
+        {
+          "tag": "Field",
+          "line": 50
+        }
+      ],
+      "elements": [
+        {
+          "tag": "section",
+          "line": 36,
+          "props": [
+            "className=\"surface\""
+          ]
+        },
+        {
+          "tag": "SectionTitle",
+          "line": 37,
+          "props": [
+            "title=\"Eingangsrechnungen\"",
+            "action={mayWrite?<ActionsMenu label=\"Eingangsrechnungen\"><ActionRow requiresWrite icon=\"plus\" title=\"Eingangsrechnungsentwurf\" onClick={()=>edit(null)}/></ActionsMenu>:undefined}"
+          ]
+        },
+        {
+          "tag": "ActionsMenu",
+          "line": 37,
+          "props": [
+            "label=\"Eingangsrechnungen\""
+          ]
+        },
+        {
+          "tag": "ActionRow",
+          "line": 37,
+          "props": [
+            "requiresWrite",
+            "icon=\"plus\"",
+            "title=\"Eingangsrechnungsentwurf\"",
+            "onClick={()=>edit(null)}"
+          ]
+        },
+        {
+          "tag": "p",
+          "line": 38,
+          "props": [
+            "className=\"technical-hint\""
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 38,
+          "props": []
+        },
+        {
+          "tag": "LoadingState",
+          "line": 39,
+          "props": []
+        },
+        {
+          "tag": "ErrorState",
+          "line": 39,
+          "props": [
+            "onRetry={query.refresh}"
+          ]
+        },
+        {
+          "tag": "EmptyState",
+          "line": 39,
+          "props": [
+            "title=\"Keine Eingangsrechnungen\""
+          ]
+        },
+        {
+          "tag": "div",
+          "line": 39,
+          "props": [
+            "className=\"action-list\""
+          ]
+        },
+        {
+          "tag": "div",
+          "line": 39,
+          "props": [
+            "key={invoice.id}",
+            "className=\"assignment-row\""
+          ]
+        },
+        {
+          "tag": "div",
+          "line": 39,
+          "props": []
+        },
+        {
+          "tag": "b",
+          "line": 39,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 39,
+          "props": []
+        },
+        {
+          "tag": "p",
+          "line": 39,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 39,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 39,
+          "props": []
+        },
+        {
+          "tag": "span",
+          "line": 39,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 39,
+          "props": []
+        },
+        {
+          "tag": "ActionsMenu",
+          "line": 39,
+          "props": [
+            "label=\"Eingangsrechnungen\""
+          ]
+        },
+        {
+          "tag": "ActionRow",
+          "line": 39,
+          "props": [
+            "icon=\"file\"",
+            "title=\"Belege\"",
+            "onClick={()=>setReceipts(invoice)}"
+          ]
+        },
+        {
+          "tag": "ActionRow",
+          "line": 39,
+          "props": [
+            "requiresWrite",
+            "icon=\"edit\"",
+            "title=\"Entwurf bearbeiten\"",
+            "onClick={()=>edit(invoice)}"
+          ]
+        },
+        {
+          "tag": "FormSheet",
+          "line": 40,
+          "props": [
+            "open",
+            "onClose={()=>setReceipts(null)}",
+            "label=\"Eingangsrechnungsbelege\""
+          ]
+        },
+        {
+          "tag": "EntityFiles",
+          "line": 40,
+          "props": [
+            "purpose=\"supplier_invoice_receipt\"",
+            "entityId={receipts.id}",
+            "readOnly={!mayWrite||receipts.status!=='draft'}",
+            "title=\"Belege\""
+          ]
+        },
+        {
+          "tag": "FormSheet",
+          "line": 41,
+          "props": [
+            "open={open}",
+            "onClose={()=>setOpen(false)}",
+            "label=\"Eingangsrechnungsentwurf\"",
+            "busy={busy}",
+            "dirty={JSON.stringify(draft)!==original}"
+          ]
+        },
+        {
+          "tag": "form",
+          "line": 42,
+          "props": [
+            "id={formId}",
+            "onSubmit={event=>{event.preventDefault();void save();}}"
+          ]
+        },
+        {
+          "tag": "div",
+          "line": 42,
+          "props": [
+            "className=\"form-grid two\""
+          ]
+        },
+        {
+          "tag": "Field",
+          "line": 43,
+          "props": [
+            "label=\"Rechnungsnummer\""
+          ]
+        },
+        {
+          "tag": "Input",
+          "line": 43,
+          "props": [
+            "maxLength={120}",
+            "value={draft.number}",
+            "onChange={event=>field('number',event.target.value)}"
+          ]
+        },
+        {
+          "tag": "Field",
+          "line": 44,
+          "props": [
+            "label=\"Währung\""
+          ]
+        },
+        {
+          "tag": "Select",
+          "line": 44,
+          "props": [
+            "value={draft.currency}",
+            "onChange={event=>field('currency',event.target.value)}"
+          ]
+        },
+        {
+          "tag": "option",
+          "line": 44,
+          "props": [
+            "value=\"\""
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 44,
+          "props": []
+        },
+        {
+          "tag": "option",
+          "line": 44,
+          "props": [
+            "value=\"CHF\""
+          ]
+        },
+        {
+          "tag": "option",
+          "line": 44,
+          "props": [
+            "value=\"EUR\""
+          ]
+        },
+        {
+          "tag": "Field",
+          "line": 45,
+          "props": [
+            "label=\"Rechnungsdatum\""
+          ]
+        },
+        {
+          "tag": "Input",
+          "line": 45,
+          "props": [
+            "type=\"date\"",
+            "value={draft.invoiceDate}",
+            "onChange={event=>field('invoiceDate',event.target.value)}"
+          ]
+        },
+        {
+          "tag": "Field",
+          "line": 46,
+          "props": [
+            "label=\"Fällig am\""
+          ]
+        },
+        {
+          "tag": "Input",
+          "line": 46,
+          "props": [
+            "type=\"date\"",
+            "min={draft.invoiceDate||undefined}",
+            "value={draft.dueDate}",
+            "onChange={event=>field('dueDate',event.target.value)}"
+          ]
+        },
+        {
+          "tag": "Field",
+          "line": 47,
+          "props": [
+            "label=\"Nettobetrag\""
+          ]
+        },
+        {
+          "tag": "Input",
+          "line": 47,
+          "props": [
+            "inputMode=\"decimal\"",
+            "value={draft.netAmount}",
+            "onChange={event=>field('netAmount',event.target.value.replace(',','.'))}"
+          ]
+        },
+        {
+          "tag": "Field",
+          "line": 48,
+          "props": [
+            "label=\"MwSt.-Betrag\""
+          ]
+        },
+        {
+          "tag": "Input",
+          "line": 48,
+          "props": [
+            "inputMode=\"decimal\"",
+            "value={draft.vatAmount}",
+            "onChange={event=>field('vatAmount',event.target.value.replace(',','.'))}"
+          ]
+        },
+        {
+          "tag": "Field",
+          "line": 49,
+          "props": [
+            "label=\"Gesamtbetrag\""
+          ]
+        },
+        {
+          "tag": "Input",
+          "line": 49,
+          "props": [
+            "inputMode=\"decimal\"",
+            "value={draft.totalAmount}",
+            "onChange={event=>field('totalAmount',event.target.value.replace(',','.'))}"
+          ]
+        },
+        {
+          "tag": "Field",
+          "line": 50,
+          "props": [
+            "label=\"Notiz\""
+          ]
+        },
+        {
+          "tag": "Input",
+          "line": 50,
+          "props": [
+            "maxLength={2000}",
+            "value={draft.note}",
+            "onChange={event=>field('note',event.target.value)}"
+          ]
+        },
+        {
+          "tag": "ErrorState",
+          "line": 52,
+          "props": []
+        },
+        {
+          "tag": "FormActions",
+          "line": 53,
+          "props": [
+            "sheet"
+          ]
+        },
+        {
+          "tag": "Button",
+          "line": 53,
+          "props": [
+            "variant=\"secondary\"",
+            "disabled={busy}",
+            "onClick={()=>setOpen(false)}"
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 53,
+          "props": []
+        },
+        {
+          "tag": "Button",
+          "line": 53,
+          "props": [
+            "requiresWrite",
+            "type=\"submit\"",
+            "form={formId}",
+            "disabled={busy}"
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 53,
+          "props": []
+        }
+      ],
+      "conditions": [
+        {
+          "line": 21,
+          "expression": "invoice"
+        },
+        {
+          "line": 26,
+          "expression": "pending.current"
+        },
+        {
+          "line": 28,
+          "expression": "selected"
+        },
+        {
+          "line": 29,
+          "expression": "attempt.current?.body!==serialized"
+        },
+        {
+          "line": 31,
+          "expression": "!result.item?.id"
+        },
+        {
+          "line": 33,
+          "expression": "cause instanceof Error"
+        },
+        {
+          "line": 37,
+          "expression": "mayWrite"
+        },
+        {
+          "line": 39,
+          "expression": "query.loading"
+        },
+        {
+          "line": 39,
+          "expression": "query.error"
+        },
+        {
+          "line": 39,
+          "expression": "!query.data?.items.length"
+        },
+        {
+          "line": 39,
+          "expression": "invoice.total_amount===null"
+        },
+        {
+          "line": 39,
+          "expression": "invoice.currency"
+        }
+      ]
+    },
+    {
+      "key": "components/supplier-invoices.tsx#Invoice",
+      "file": "components/supplier-invoices.tsx",
+      "name": "Invoice",
+      "line": 12,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": []
+    },
+    {
+      "key": "components/supplier-invoices.tsx#Draft",
+      "file": "components/supplier-invoices.tsx",
+      "name": "Draft",
+      "line": 13,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": []
+    },
+    {
+      "key": "components/supplier-invoices.tsx#blank",
+      "file": "components/supplier-invoices.tsx",
+      "name": "blank",
+      "line": 14,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -214952,24 +216467,24 @@
       "key": "components/pages/suppliers.tsx#SuppliersPage",
       "file": "components/pages/suppliers.tsx",
       "name": "SuppliersPage",
-      "line": 18,
+      "line": 21,
       "classes": [],
       "apis": [],
       "collections": [],
       "widgets": [
         {
           "tag": "RecordsControls",
-          "line": 21
+          "line": 24
         },
         {
           "tag": "RecordsView",
-          "line": 22
+          "line": 25
         }
       ],
       "elements": [
         {
           "tag": "AppShell",
-          "line": 21,
+          "line": 24,
           "props": [
             "title=\"Lieferanten\"",
             "active=\"lieferanten\"",
@@ -214978,7 +216493,7 @@
         },
         {
           "tag": "RecordsControls",
-          "line": 21,
+          "line": 24,
           "props": [
             "controller={data.controller}",
             "placeholder=\"Lieferanten suchen...\"",
@@ -214988,7 +216503,7 @@
         },
         {
           "tag": "CreateAction",
-          "line": 21,
+          "line": 24,
           "props": [
             "href=\"/lieferanten/neu\"",
             "label=\"Lieferant hinzufügen\""
@@ -214996,7 +216511,7 @@
         },
         {
           "tag": "RecordsView",
-          "line": 22,
+          "line": 25,
           "props": [
             "controller={data.controller}",
             "toolbarActions={false}",
@@ -215015,7 +216530,7 @@
         },
         {
           "tag": "RecordRow",
-          "line": 22,
+          "line": 25,
           "props": [
             "href={'/lieferanten/'+row[3]}",
             "icon=\"building\"",
@@ -230379,7 +231894,7 @@
       "key": "components/pages/expenses.tsx#ExpenseForm",
       "file": "components/pages/expenses.tsx",
       "name": "ExpenseForm",
-      "line": 36,
+      "line": 37,
       "classes": [
         "page-actions",
         "entity-detail-workspace",
@@ -230413,26 +231928,6 @@
       "widgets": [
         {
           "tag": "Field",
-          "line": 173
-        },
-        {
-          "tag": "Field",
-          "line": 174
-        },
-        {
-          "tag": "Field",
-          "line": 175
-        },
-        {
-          "tag": "Field",
-          "line": 176
-        },
-        {
-          "tag": "Field",
-          "line": 177
-        },
-        {
-          "tag": "Field",
           "line": 178
         },
         {
@@ -230456,26 +231951,54 @@
           "line": 183
         },
         {
-          "tag": "ActionSheet",
-          "line": 187
-        },
-        {
-          "tag": "FormSheet",
-          "line": 191
-        },
-        {
-          "tag": "FormSheet",
-          "line": 192
+          "tag": "Field",
+          "line": 184
         },
         {
           "tag": "Field",
-          "line": 192
+          "line": 185
+        },
+        {
+          "tag": "Field",
+          "line": 186
+        },
+        {
+          "tag": "Field",
+          "line": 187
+        },
+        {
+          "tag": "Field",
+          "line": 188
+        },
+        {
+          "tag": "Field",
+          "line": 189
+        },
+        {
+          "tag": "ActionSheet",
+          "line": 193
+        },
+        {
+          "tag": "FormSheet",
+          "line": 197
+        },
+        {
+          "tag": "FormSheet",
+          "line": 198
+        },
+        {
+          "tag": "Field",
+          "line": 198
+        },
+        {
+          "tag": "Field",
+          "line": 198
         }
       ],
       "elements": [
         {
           "tag": "AppShell",
-          "line": 162,
+          "line": 167,
           "props": [
             "title=\"Spese\"",
             "subtitle={expenseLoadError?\"Spesendaten nicht verfügbar\":undefined}",
@@ -230486,19 +232009,19 @@
         },
         {
           "tag": "LoadingState",
-          "line": 162,
+          "line": 167,
           "props": []
         },
         {
           "tag": "div",
-          "line": 162,
+          "line": 167,
           "props": [
             "role=\"alert\""
           ]
         },
         {
           "tag": "EmptyState",
-          "line": 162,
+          "line": 167,
           "props": [
             "title=\"Spese konnte nicht geladen werden\"",
             "description={expenseLoadError??\"Bitte versuche es erneut.\"}"
@@ -230506,26 +232029,26 @@
         },
         {
           "tag": "div",
-          "line": 162,
+          "line": 167,
           "props": [
             "className=\"page-actions\""
           ]
         },
         {
           "tag": "Button",
-          "line": 162,
+          "line": 167,
           "props": [
             "onClick={expenseQuery.refresh}"
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 162,
+          "line": 167,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 162,
+          "line": 167,
           "props": [
             "href=\"/spesen\"",
             "variant=\"ghost\""
@@ -230533,12 +232056,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 162,
+          "line": 167,
           "props": []
         },
         {
           "tag": "Toast",
-          "line": 165,
+          "line": 170,
           "props": [
             "title={toast}",
             "tone=\"success\""
@@ -230546,24 +232069,24 @@
         },
         {
           "tag": "ErrorState",
-          "line": 165,
+          "line": 170,
           "props": []
         },
         {
           "tag": "div",
-          "line": 166,
+          "line": 171,
           "props": [
             "role=\"alert\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 166,
+          "line": 171,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 166,
+          "line": 171,
           "props": [
             "variant=\"ghost\"",
             "onClick={()=>{employeesQuery.refresh();customersQuery.refresh();filesQuery.refresh()}}"
@@ -230571,12 +232094,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 166,
+          "line": 171,
           "props": []
         },
         {
           "tag": "div",
-          "line": 167,
+          "line": 172,
           "props": [
             "className={existing?\"entity-detail-workspace expense-detail-workspace\":\"expense-layout\"}",
             "onChangeCapture={()=>setEditedExpense(true)}"
@@ -230584,7 +232107,7 @@
         },
         {
           "tag": "Button",
-          "line": 169,
+          "line": 174,
           "props": [
             "requiresWrite",
             "variant=\"upload\"",
@@ -230596,29 +232119,29 @@
         },
         {
           "tag": "b",
-          "line": 169,
+          "line": 174,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 169,
+          "line": 174,
           "props": [
             "verbatim={scanState!==\"scanning\"&&!!receiptFile}"
           ]
         },
         {
           "tag": "small",
-          "line": 169,
+          "line": 174,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 169,
+          "line": 174,
           "props": []
         },
         {
           "tag": "Input",
-          "line": 169,
+          "line": 174,
           "props": [
             "id=\"expense-receipt-upload\"",
             "hidden",
@@ -230631,33 +232154,33 @@
         },
         {
           "tag": "div",
-          "line": 170,
+          "line": 175,
           "props": [
             "className=\"form-page\""
           ]
         },
         {
           "tag": "section",
-          "line": 171,
+          "line": 176,
           "props": []
         },
         {
           "tag": "SectionTitle",
-          "line": 171,
+          "line": 176,
           "props": [
             "title=\"Quittungen\""
           ]
         },
         {
           "tag": "div",
-          "line": 171,
+          "line": 176,
           "props": [
             "className=\"compact-list\""
           ]
         },
         {
           "tag": "a",
-          "line": 171,
+          "line": 176,
           "props": [
             "key={f.id}",
             "href={'/api/files/'+f.id+'/download'}"
@@ -230665,90 +232188,100 @@
         },
         {
           "tag": "span",
-          "line": 171,
+          "line": 176,
           "props": []
         },
         {
           "tag": "Icon",
-          "line": 171,
+          "line": 176,
           "props": [
             "name=\"file\""
           ]
         },
         {
           "tag": "section",
-          "line": 172,
+          "line": 177,
           "props": [
             "className=\"expense-summary\""
           ]
         },
         {
           "tag": "h2",
-          "line": 172,
+          "line": 177,
           "props": []
         },
         {
           "tag": "strong",
-          "line": 172,
+          "line": 177,
           "props": [
             "className=\"expense-summary-amount\""
           ]
         },
         {
           "tag": "p",
-          "line": 172,
+          "line": 177,
           "props": []
         },
         {
           "tag": "p",
-          "line": 172,
+          "line": 177,
           "props": []
         },
         {
           "tag": "details",
-          "line": 172,
+          "line": 177,
           "props": []
         },
         {
           "tag": "summary",
-          "line": 172,
+          "line": 177,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 172,
+          "line": 177,
           "props": []
         },
         {
           "tag": "p",
-          "line": 172,
+          "line": 177,
+          "props": []
+        },
+        {
+          "tag": "p",
+          "line": 177,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 177,
           "props": []
         },
         {
           "tag": "Link",
-          "line": 172,
+          "line": 177,
           "props": [
             "href={'/kunden/'+encodeURIComponent(expenseCustomer)}"
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 172,
+          "line": 177,
           "props": []
         },
         {
           "tag": "p",
-          "line": 172,
+          "line": 177,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 172,
+          "line": 177,
           "props": []
         },
         {
           "tag": "fieldset",
-          "line": 172,
+          "line": 177,
           "props": [
             "disabled={lockedExpense||expenseBusy||scanState===\"scanning\"}",
             "className=\"form-grid two form-fieldset\""
@@ -230756,14 +232289,14 @@
         },
         {
           "tag": "Field",
-          "line": 173,
+          "line": 178,
           "props": [
             "label=\"Händler\""
           ]
         },
         {
           "tag": "Input",
-          "line": 173,
+          "line": 178,
           "props": [
             "value={merchant}",
             "onChange={e=>setMerchant(e.target.value)}",
@@ -230772,14 +232305,14 @@
         },
         {
           "tag": "Field",
-          "line": 174,
+          "line": 179,
           "props": [
             "label=\"Mitarbeiter\""
           ]
         },
         {
           "tag": "Select",
-          "line": 174,
+          "line": 179,
           "props": [
             "value={person}",
             "onChange={e=>setPerson(e.target.value)}"
@@ -230787,19 +232320,19 @@
         },
         {
           "tag": "option",
-          "line": 174,
+          "line": 179,
           "props": [
             "value=\"\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 174,
+          "line": 179,
           "props": []
         },
         {
           "tag": "option",
-          "line": 174,
+          "line": 179,
           "props": [
             "key={item.id}",
             "value={item.id}"
@@ -230807,14 +232340,14 @@
         },
         {
           "tag": "Field",
-          "line": 175,
+          "line": 180,
           "props": [
             "label=\"Datum\""
           ]
         },
         {
           "tag": "Input",
-          "line": 175,
+          "line": 180,
           "props": [
             "type=\"date\"",
             "value={date}",
@@ -230823,14 +232356,14 @@
         },
         {
           "tag": "Field",
-          "line": 176,
+          "line": 181,
           "props": [
             "label=\"Kategorie\""
           ]
         },
         {
           "tag": "Select",
-          "line": 176,
+          "line": 181,
           "props": [
             "value={category}",
             "onChange={e=>setCategory(e.target.value)}"
@@ -230838,62 +232371,62 @@
         },
         {
           "tag": "option",
-          "line": 176,
+          "line": 181,
           "props": [
             "value={\"Reise\"}"
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 176,
+          "line": 181,
           "props": []
         },
         {
           "tag": "option",
-          "line": 176,
+          "line": 181,
           "props": [
             "value={\"Verpflegung\"}"
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 176,
+          "line": 181,
           "props": []
         },
         {
           "tag": "option",
-          "line": 176,
+          "line": 181,
           "props": [
             "value={\"Material\"}"
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 176,
+          "line": 181,
           "props": []
         },
         {
           "tag": "option",
-          "line": 176,
+          "line": 181,
           "props": [
             "value={\"Sonstiges\"}"
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 176,
+          "line": 181,
           "props": []
         },
         {
           "tag": "Field",
-          "line": 177,
+          "line": 182,
           "props": [
             "label=\"Betrag\""
           ]
         },
         {
           "tag": "Input",
-          "line": 177,
+          "line": 182,
           "props": [
             "inputMode=\"decimal\"",
             "value={amount}",
@@ -230903,14 +232436,14 @@
         },
         {
           "tag": "Field",
-          "line": 178,
+          "line": 183,
           "props": [
             "label=\"Währung\""
           ]
         },
         {
           "tag": "Select",
-          "line": 178,
+          "line": 183,
           "props": [
             "value={currency}",
             "onChange={e=>setCurrency(e.target.value)}"
@@ -230918,38 +232451,66 @@
         },
         {
           "tag": "option",
-          "line": 178,
+          "line": 183,
           "props": [
             "value={\"CHF\"}"
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 178,
+          "line": 183,
           "props": []
         },
         {
           "tag": "option",
-          "line": 178,
+          "line": 183,
           "props": [
             "value={\"EUR\"}"
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 178,
+          "line": 183,
           "props": []
         },
         {
           "tag": "Field",
-          "line": 179,
+          "line": 184,
+          "props": [
+            "label=\"Bezahlt mit\""
+          ]
+        },
+        {
+          "tag": "Select",
+          "line": 184,
+          "props": [
+            "value={paymentKind}",
+            "onChange={e=>{if(isExpensePaymentKind(e.target.value))setPaymentKind(e.target.value)}}"
+          ]
+        },
+        {
+          "tag": "option",
+          "line": 184,
+          "props": [
+            "key={value}",
+            "value={value}"
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 184,
+          "props": []
+        },
+        {
+          "tag": "Field",
+          "line": 185,
           "props": [
             "label=\"MwSt.\""
           ]
         },
         {
           "tag": "Select",
-          "line": 179,
+          "line": 185,
           "props": [
             "value={vatRate}",
             "onChange={e=>setVatRate(e.target.value)}"
@@ -230957,35 +232518,35 @@
         },
         {
           "tag": "option",
-          "line": 179,
+          "line": 185,
           "props": [
             "value=\"8.1\""
           ]
         },
         {
           "tag": "option",
-          "line": 179,
+          "line": 185,
           "props": [
             "value=\"2.6\""
           ]
         },
         {
           "tag": "option",
-          "line": 179,
+          "line": 185,
           "props": [
             "value=\"0\""
           ]
         },
         {
           "tag": "Field",
-          "line": 180,
+          "line": 186,
           "props": [
             "label=\"Status\""
           ]
         },
         {
           "tag": "Select",
-          "line": 180,
+          "line": 186,
           "props": [
             "value={status}",
             "onChange={e=>setStatus(e.target.value)}"
@@ -230993,31 +232554,31 @@
         },
         {
           "tag": "option",
-          "line": 180,
+          "line": 186,
           "props": [
             "value={\"Entwurf\"}"
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 180,
+          "line": 186,
           "props": []
         },
         {
           "tag": "option",
-          "line": 180,
+          "line": 186,
           "props": [
             "value={\"Eingereicht\"}"
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 180,
+          "line": 186,
           "props": []
         },
         {
           "tag": "option",
-          "line": 180,
+          "line": 186,
           "props": [
             "value={\"Genehmigt\"}",
             "disabled={!canApproveExpense}"
@@ -231025,12 +232586,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 180,
+          "line": 186,
           "props": []
         },
         {
           "tag": "option",
-          "line": 180,
+          "line": 186,
           "props": [
             "value={\"Abgelehnt\"}",
             "disabled={!canApproveExpense}"
@@ -231038,19 +232599,19 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 180,
+          "line": 186,
           "props": []
         },
         {
           "tag": "Field",
-          "line": 181,
+          "line": 187,
           "props": [
             "label=\"Weiterverrechnen\""
           ]
         },
         {
           "tag": "Select",
-          "line": 181,
+          "line": 187,
           "props": [
             "value={expenseBillable?'yes':'no'}",
             "onChange={e=>setExpenseBillable(e.target.value==='yes')}"
@@ -231058,38 +232619,38 @@
         },
         {
           "tag": "option",
-          "line": 181,
+          "line": 187,
           "props": [
             "value=\"no\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 181,
+          "line": 187,
           "props": []
         },
         {
           "tag": "option",
-          "line": 181,
+          "line": 187,
           "props": [
             "value=\"yes\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 181,
+          "line": 187,
           "props": []
         },
         {
           "tag": "Field",
-          "line": 182,
+          "line": 188,
           "props": [
             "label=\"Kunde\""
           ]
         },
         {
           "tag": "DirectorySelect",
-          "line": 182,
+          "line": 188,
           "props": [
             "label=\"Kunde\"",
             "required",
@@ -231100,7 +232661,7 @@
         },
         {
           "tag": "Field",
-          "line": 183,
+          "line": 189,
           "props": [
             "label=\"Beschreibung\"",
             "className=\"full\""
@@ -231108,7 +232669,7 @@
         },
         {
           "tag": "Textarea",
-          "line": 183,
+          "line": 189,
           "props": [
             "value={description}",
             "onChange={e=>setDescription(e.target.value)}",
@@ -231117,7 +232678,7 @@
         },
         {
           "tag": "ActionSheet",
-          "line": 187,
+          "line": 193,
           "props": [
             "label=\"Spesenaktionen\"",
             "open={expenseActions}",
@@ -231126,14 +232687,14 @@
         },
         {
           "tag": "section",
-          "line": 187,
+          "line": 193,
           "props": [
             "className=\"context-action-group\""
           ]
         },
         {
           "tag": "Button",
-          "line": 187,
+          "line": 193,
           "props": [
             "requiresWrite",
             "disabled={expenseBusy}",
@@ -231142,12 +232703,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 187,
+          "line": 193,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 187,
+          "line": 193,
           "props": [
             "requiresWrite",
             "variant=\"secondary\"",
@@ -231157,12 +232718,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 187,
+          "line": 193,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 187,
+          "line": 193,
           "props": [
             "requiresWrite",
             "variant=\"secondary\"",
@@ -231172,32 +232733,32 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 187,
+          "line": 193,
           "props": []
         },
         {
           "tag": "p",
-          "line": 187,
+          "line": 193,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 187,
+          "line": 193,
           "props": []
         },
         {
           "tag": "p",
-          "line": 187,
+          "line": 193,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 187,
+          "line": 193,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 187,
+          "line": 193,
           "props": [
             "variant=\"secondary\"",
             "onClick={()=>setReimbursementOpen(true)}"
@@ -231205,12 +232766,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 187,
+          "line": 193,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 187,
+          "line": 193,
           "props": [
             "href={'/rechnungen/neu?expenses='+encodeURIComponent(expenseId??'')}",
             "variant=\"secondary\""
@@ -231218,61 +232779,61 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 187,
+          "line": 193,
           "props": []
         },
         {
           "tag": "p",
-          "line": 187,
+          "line": 193,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 187,
+          "line": 193,
           "props": []
         },
         {
           "tag": "Link",
-          "line": 187,
+          "line": 193,
           "props": [
             "href=\"/spesen\""
           ]
         },
         {
           "tag": "Icon",
-          "line": 187,
+          "line": 193,
           "props": [
             "name=\"card\""
           ]
         },
         {
           "tag": "span",
-          "line": 187,
+          "line": 193,
           "props": []
         },
         {
           "tag": "b",
-          "line": 187,
+          "line": 193,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 187,
+          "line": 193,
           "props": []
         },
         {
           "tag": "small",
-          "line": 187,
+          "line": 193,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 187,
+          "line": 193,
           "props": []
         },
         {
           "tag": "Icon",
-          "line": 187,
+          "line": 193,
           "props": [
             "name=\"arrow\"",
             "size={15}"
@@ -231280,7 +232841,7 @@
         },
         {
           "tag": "AppShell",
-          "line": 190,
+          "line": 196,
           "props": [
             "titleIsUserContent={false}",
             "editing={!existing||editingExpense}",
@@ -231297,7 +232858,7 @@
         },
         {
           "tag": "Button",
-          "line": 190,
+          "line": 196,
           "props": [
             "variant=\"ghost\"",
             "icon=\"more\"",
@@ -231307,7 +232868,7 @@
         },
         {
           "tag": "FormSheet",
-          "line": 191,
+          "line": 197,
           "props": [
             "workspace",
             "label={existing?\"Spese bearbeiten\":\"Spese erfassen\"}",
@@ -231321,7 +232882,7 @@
         },
         {
           "tag": "Button",
-          "line": 191,
+          "line": 197,
           "props": [
             "variant=\"secondary\"",
             "onClick={close}"
@@ -231329,12 +232890,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 191,
+          "line": 197,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 191,
+          "line": 197,
           "props": [
             "requiresWrite",
             "disabled={expenseBusy||scanState===\"scanning\"}",
@@ -231343,12 +232904,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 191,
+          "line": 197,
           "props": []
         },
         {
           "tag": "FormSheet",
-          "line": 192,
+          "line": 198,
           "props": [
             "label={\"Erfolgte Erstattung erfassen\"}",
             "description={\"Die Zahlung muss bereits erfolgt sein. Es wird keine Überweisung ausgelöst.\"}",
@@ -231361,15 +232922,37 @@
           ]
         },
         {
+          "tag": "p",
+          "line": 198,
+          "props": []
+        },
+        {
           "tag": "Field",
-          "line": 192,
+          "line": 198,
+          "props": [
+            "label=\"Tatsächliches Zahlungsdatum\""
+          ]
+        },
+        {
+          "tag": "Input",
+          "line": 198,
+          "props": [
+            "type=\"date\"",
+            "max={businessDate()}",
+            "value={reimbursementDate}",
+            "onChange={e=>setReimbursementDate(e.target.value)}"
+          ]
+        },
+        {
+          "tag": "Field",
+          "line": 198,
           "props": [
             "label=\"Zahlungsreferenz\""
           ]
         },
         {
           "tag": "Input",
-          "line": 192,
+          "line": 198,
           "props": [
             "value={reimbursementRef}",
             "onChange={e=>setReimbursementRef(e.target.value)}"
@@ -231377,14 +232960,14 @@
         },
         {
           "tag": "FormActions",
-          "line": 192,
+          "line": 198,
           "props": [
             "sheet"
           ]
         },
         {
           "tag": "Button",
-          "line": 192,
+          "line": 198,
           "props": [
             "variant=\"secondary\"",
             "onClick={()=>setReimbursementOpen(false)}"
@@ -231392,25 +232975,25 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 192,
+          "line": 198,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 192,
+          "line": 198,
           "props": [
-            "disabled={expenseBusy||!reimbursementRef.trim()}",
+            "disabled={expenseBusy||!reimbursementRef.trim()||!reimbursementDate}",
             "onClick={()=>void recordReimbursement()}"
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 192,
+          "line": 198,
           "props": []
         },
         {
           "tag": "Toast",
-          "line": 193,
+          "line": 199,
           "props": [
             "title={toast}",
             "tone={[\"Spese und Beleg gespeichert.\",\"Spese gespeichert.\",\"Spese eingereicht.\",\"Erstattung erfasst.\"].includes(toast)?\"success\":\"danger\"}"
@@ -231419,244 +233002,325 @@
       ],
       "conditions": [
         {
-          "line": 42,
+          "line": 43,
           "expression": "existing"
         },
         {
-          "line": 46,
+          "line": 47,
           "expression": "existing"
         },
         {
-          "line": 54,
+          "line": 56,
           "expression": "existing"
         },
         {
-          "line": 71,
+          "line": 74,
           "expression": "expenseId"
         },
         {
-          "line": 75,
+          "line": 78,
           "expression": "existing&&expenseId"
         },
         {
-          "line": 78,
+          "line": 81,
           "expression": "existing&&expenseQuery.data&&!expenseQuery.data.item&&!expenseQuery.data.items?.[0]"
         },
         {
-          "line": 84,
+          "line": 87,
           "expression": "editedExpense||!expenseQuery.data"
         },
         {
-          "line": 85,
+          "line": 88,
           "expression": "!item"
         },
         {
-          "line": 86,
+          "line": 89,
           "expression": "!active"
         },
         {
-          "line": 87,
+          "line": 90,
           "expression": "item.reimbursed_at"
         },
         {
-          "line": 87,
+          "line": 90,
           "expression": "item.invoiced_invoice_id"
         },
         {
-          "line": 102,
-          "expression": "!value||[value.person,value.date,value.category,value.amount,value.currency,value.vatRate,value.merchant,value.description,value.status,value.expenseCustomer,value.createdExpenseId,value.requestKey].some(field=>typeof field!==\"string\"||field.length>4000)||typeof value.expenseBillable!==\"boolean\""
+          "line": 95,
+          "expression": "isExpensePaymentKind(item.payment_kind)"
         },
         {
           "line": 106,
-          "expression": "receiptScanPending.current||expenseMutationPending.current||lockedExpense||!file"
+          "expression": "!value||[value.person,value.date,value.category,value.amount,value.currency,value.vatRate,value.merchant,value.description,value.status,value.expenseCustomer,value.createdExpenseId,value.requestKey].some(field=>typeof field!==\"string\"||field.length>4000)||typeof value.expenseBillable!==\"boolean\""
         },
         {
           "line": 107,
+          "expression": "isExpensePaymentKind(value.paymentKind)"
+        },
+        {
+          "line": 110,
+          "expression": "receiptScanPending.current||expenseMutationPending.current||lockedExpense||!file"
+        },
+        {
+          "line": 111,
           "expression": "issue"
         },
         {
-          "line": 113,
+          "line": 117,
           "expression": "result.merchant"
         },
         {
-          "line": 113,
+          "line": 117,
           "expression": "result.date"
         },
         {
-          "line": 113,
+          "line": 117,
           "expression": "typeof result.total===\"number\""
         },
         {
-          "line": 113,
+          "line": 117,
           "expression": "result.currency"
         },
         {
-          "line": 114,
+          "line": 118,
           "expression": "result.filename"
         },
         {
-          "line": 117,
+          "line": 121,
           "expression": "error instanceof Error"
         },
         {
-          "line": 121,
+          "line": 125,
           "expression": "expenseMutationPending.current||receiptScanPending.current||lockedExpense||loadingExpense||expenseLoadError||!existing&&!expenseRecovery.ready"
         },
         {
-          "line": 123,
+          "line": 127,
           "expression": "expenseBillable&&!expenseCustomer"
         },
         {
-          "line": 124,
+          "line": 128,
           "expression": "!Number.isFinite(value)||value<=0"
         },
         {
-          "line": 130,
+          "line": 134,
           "expression": "targetExpenseId"
         },
         {
-          "line": 131,
+          "line": 135,
           "expression": "receiptFile"
         },
         {
-          "line": 135,
+          "line": 139,
           "expression": "!expenseRequestKey.current"
         },
         {
-          "line": 140,
+          "line": 144,
           "expression": "receiptFile&&targetExpenseId&&!receiptUploaded"
         },
         {
-          "line": 149,
+          "line": 153,
           "expression": "receiptFile"
-        },
-        {
-          "line": 149,
-          "expression": "existing"
         },
         {
           "line": 153,
+          "expression": "existing"
+        },
+        {
+          "line": 157,
           "expression": "error instanceof Error"
         },
         {
-          "line": 158,
+          "line": 162,
           "expression": "expenseMutationPending.current||!expenseId"
         },
         {
-          "line": 158,
+          "line": 162,
           "expression": "e instanceof Error"
         },
         {
-          "line": 161,
+          "line": 166,
           "expression": "selectedEmployee"
         },
         {
-          "line": 162,
+          "line": 167,
           "expression": "existing&&(loadingExpense||expenseLoadError)"
         },
         {
-          "line": 162,
+          "line": 167,
           "expression": "expenseLoadError"
         },
         {
-          "line": 162,
+          "line": 167,
           "expression": "loadingExpense"
         },
         {
-          "line": 163,
+          "line": 168,
           "expression": "existing"
         },
         {
-          "line": 165,
+          "line": 170,
           "expression": "savedExpense"
         },
         {
-          "line": 167,
+          "line": 172,
           "expression": "existing"
         },
         {
-          "line": 169,
+          "line": 174,
           "expression": "scanState===\"scanning\""
         },
         {
-          "line": 169,
+          "line": 174,
           "expression": "scanState===\"scanning\""
         },
         {
-          "line": 169,
+          "line": 174,
           "expression": "receiptFile"
         },
         {
-          "line": 169,
+          "line": 174,
           "expression": "scanState===\"done\""
         },
         {
-          "line": 169,
+          "line": 174,
           "expression": "scanConfidence!==null"
         },
         {
-          "line": 169,
+          "line": 174,
           "expression": "scanState===\"error\""
         },
         {
-          "line": 172,
+          "line": 177,
           "expression": "existing&&!editingExpense"
         },
         {
-          "line": 181,
+          "line": 184,
+          "expression": "isExpensePaymentKind(e.target.value)"
+        },
+        {
+          "line": 187,
           "expression": "expenseBillable"
         },
         {
-          "line": 187,
+          "line": 193,
           "expression": "canApproveExpense"
         },
         {
-          "line": 187,
+          "line": 193,
           "expression": "reimbursedAt"
         },
         {
-          "line": 190,
+          "line": 196,
           "expression": "existing"
         },
         {
-          "line": 190,
+          "line": 196,
           "expression": "existing"
         },
         {
-          "line": 190,
+          "line": 196,
           "expression": "status===\"Genehmigt\"||status===\"Verbucht\""
         },
         {
-          "line": 190,
+          "line": 196,
           "expression": "status===\"Abgelehnt\""
         },
         {
-          "line": 190,
+          "line": 196,
           "expression": "status===\"Eingereicht\""
         },
         {
-          "line": 190,
+          "line": 196,
           "expression": "existing"
         },
         {
-          "line": 190,
+          "line": 196,
           "expression": "existing&&!editingExpense"
         },
         {
-          "line": 191,
+          "line": 197,
           "expression": "existing&&!editingExpense"
         },
         {
-          "line": 191,
+          "line": 197,
           "expression": "existing"
         },
         {
-          "line": 191,
+          "line": 197,
           "expression": "existing"
         },
         {
-          "line": 193,
+          "line": 199,
           "expression": "[\"Spese und Beleg gespeichert.\",\"Spese gespeichert.\",\"Spese eingereicht.\",\"Erstattung erfasst.\"].includes(toast)"
+        }
+      ]
+    },
+    {
+      "key": "lib/expense-payment.ts#ExpensePaymentKind",
+      "file": "lib/expense-payment.ts",
+      "name": "ExpensePaymentKind",
+      "line": 3,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": []
+    },
+    {
+      "key": "lib/expense-payment.ts#expensePaymentKinds",
+      "file": "lib/expense-payment.ts",
+      "name": "expensePaymentKinds",
+      "line": 2,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": []
+    },
+    {
+      "key": "lib/expense-payment.ts#isExpensePaymentKind",
+      "file": "lib/expense-payment.ts",
+      "name": "isExpensePaymentKind",
+      "line": 4,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": []
+    },
+    {
+      "key": "lib/expense-payment.ts#expenseClaimStatus",
+      "file": "lib/expense-payment.ts",
+      "name": "expenseClaimStatus",
+      "line": 7,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": [
+        {
+          "line": 8,
+          "expression": "reimbursedAt"
+        },
+        {
+          "line": 9,
+          "expression": "paymentKind === 'company_card' || paymentKind === 'company_direct'"
+        },
+        {
+          "line": 10,
+          "expression": "paymentKind !== 'private'"
+        },
+        {
+          "line": 11,
+          "expression": "status === 'rejected'"
+        },
+        {
+          "line": 12,
+          "expression": "status === 'approved' || status === 'posted'"
         }
       ]
     },
@@ -231700,24 +233364,24 @@
       "key": "components/pages/expenses.tsx#ExpensesPage",
       "file": "components/pages/expenses.tsx",
       "name": "ExpensesPage",
-      "line": 26,
+      "line": 27,
       "classes": [],
       "apis": [],
       "collections": [],
       "widgets": [
         {
           "tag": "RecordsControls",
-          "line": 31
+          "line": 32
         },
         {
           "tag": "RecordsView",
-          "line": 32
+          "line": 33
         }
       ],
       "elements": [
         {
           "tag": "AppShell",
-          "line": 31,
+          "line": 32,
           "props": [
             "title=\"Spesen\"",
             "subtitle={loading?undefined:`${total} Spesen`}",
@@ -231727,7 +233391,7 @@
         },
         {
           "tag": "RecordsControls",
-          "line": 31,
+          "line": 32,
           "props": [
             "controller={controller}",
             "placeholder=\"Spesen suchen...\"",
@@ -231737,7 +233401,7 @@
         },
         {
           "tag": "CreateAction",
-          "line": 31,
+          "line": 32,
           "props": [
             "href=\"/spesen/neu\"",
             "label=\"Spese erfassen\""
@@ -231745,7 +233409,7 @@
         },
         {
           "tag": "RecordsView",
-          "line": 32,
+          "line": 33,
           "props": [
             "controller={controller}",
             "toolbarActions={false}",
@@ -231764,7 +233428,7 @@
         },
         {
           "tag": "RecordRow",
-          "line": 32,
+          "line": 33,
           "props": [
             "href={\"/spesen/\"+id}",
             "icon=\"card\"",
@@ -231777,15 +233441,15 @@
       ],
       "conditions": [
         {
-          "line": 31,
+          "line": 32,
           "expression": "loading"
         },
         {
-          "line": 32,
+          "line": 33,
           "expression": "row[4]"
         },
         {
-          "line": 32,
+          "line": 33,
           "expression": "statusMaybe"
         }
       ]
@@ -238712,6 +240376,8 @@
         "/finanzen",
         "/kunden/[id]",
         "/kunden",
+        "/lieferanten/[id]",
+        "/lieferanten/neu",
         "/lieferanten",
         "/mitarbeiter/[id]",
         "/mitarbeiter/neu",
@@ -239313,6 +240979,8 @@
         "/angebote/[id]",
         "/angebote/neu",
         "/kunden/[id]",
+        "/lieferanten/[id]",
+        "/lieferanten/neu",
         "/mitarbeiter/[id]",
         "/mitarbeiter/neu",
         "/rechnungen/[id]",
@@ -240552,7 +242220,7 @@
     {
       "file": "components/pages/expenses.tsx",
       "name": "ExpensesPage",
-      "line": 26,
+      "line": 27,
       "usedBy": [
         "/spesen"
       ],
@@ -240561,7 +242229,7 @@
     {
       "file": "components/pages/expenses.tsx",
       "name": "ExpenseForm",
-      "line": 36,
+      "line": 37,
       "usedBy": [
         "/spesen/[id]",
         "/spesen/neu"
@@ -240855,7 +242523,7 @@
     {
       "file": "components/pages/suppliers.tsx",
       "name": "SuppliersPage",
-      "line": 18,
+      "line": 21,
       "usedBy": [
         "/lieferanten"
       ],
@@ -240864,7 +242532,7 @@
     {
       "file": "components/pages/suppliers.tsx",
       "name": "SupplierForm",
-      "line": 28,
+      "line": 31,
       "usedBy": [
         "/lieferanten/[id]",
         "/lieferanten/neu"
@@ -241026,6 +242694,8 @@
         "/berichte",
         "/dev/ux-lab",
         "/kunden/[id]",
+        "/lieferanten/[id]",
+        "/lieferanten/neu",
         "/mitarbeiter/[id]",
         "/mitarbeiter/neu",
         "/rechnungen/[id]",
@@ -241046,6 +242716,8 @@
         "/berichte",
         "/dev/ux-lab",
         "/kunden/[id]",
+        "/lieferanten/[id]",
+        "/lieferanten/neu",
         "/mitarbeiter/[id]",
         "/mitarbeiter/neu",
         "/rechnungen/[id]",
@@ -241066,6 +242738,8 @@
         "/berichte",
         "/dev/ux-lab",
         "/kunden/[id]",
+        "/lieferanten/[id]",
+        "/lieferanten/neu",
         "/mitarbeiter/[id]",
         "/mitarbeiter/neu",
         "/rechnungen/[id]",
@@ -241085,6 +242759,8 @@
         "/bericht",
         "/berichte",
         "/kunden/[id]",
+        "/lieferanten/[id]",
+        "/lieferanten/neu",
         "/mitarbeiter/[id]",
         "/mitarbeiter/neu",
         "/rechnungen/[id]",
@@ -242520,6 +244196,26 @@
         "/finanzen/analyse",
         "/finanzen",
         "/kunden/[id]"
+      ],
+      "frameworkUsedBy": []
+    },
+    {
+      "file": "components/supplier-bank.tsx",
+      "name": "SupplierBank",
+      "line": 10,
+      "usedBy": [
+        "/lieferanten/[id]",
+        "/lieferanten/neu"
+      ],
+      "frameworkUsedBy": []
+    },
+    {
+      "file": "components/supplier-invoices.tsx",
+      "name": "SupplierInvoices",
+      "line": 15,
+      "usedBy": [
+        "/lieferanten/[id]",
+        "/lieferanten/neu"
       ],
       "frameworkUsedBy": []
     },
@@ -244877,7 +246573,7 @@
     {
       "file": "components/workforce-assignments.tsx",
       "name": "WorkforceAssignments",
-      "line": 14,
+      "line": 15,
       "usedBy": [
         "/einstellungen/team"
       ],

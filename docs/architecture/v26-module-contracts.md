@@ -38,7 +38,7 @@ Kritische Operation: Auth/Entitlement → Tenanttransaktion → Quellrevision sp
 | Route / Registereinstieg | Zweck / Owner / Hauptaktion | Rechte/Tarif | Zustände / Rückkehr |
 | --- | --- | --- | --- |
 | `/mitarbeiter`, `/mitarbeiter/neu`, `/mitarbeiter/[id]` | Bestehender Mitarbeiterstamm, `components/pages/employees.tsx`; vorhandene Liste/FormSheet, explizit speichern | employees:read/write + personal-Entitlement; keine neuen Payrollfelder | Empty/Loading/Error/ReadOnly, Dirty/Abbruch,409/Sessionablauf; sicherer `returnTo`, kein automatisches Einladen |
-| `/lieferanten` und zukünftige Detail-/Neurouten | Supplier-Stamm im vorhandenen List-/FormSheetowner; explizit speichern | purchasing:read/write + lieferanten-Entitlement; Business/Pro-Bestandsrecht | Zunächst nicht implementiert, keine aktive Attrappe. Dokument-/AP-Verknüpfung nur autorisierte Kurzansicht plus Deep Link; Rückkehr zum Ursprungsprozess |
+| `/lieferanten` und zukünftige Detail-/Neurouten | Supplier-Stamm im vorhandenen List-/FormSheetowner; explizit speichern | purchasing:read/write + lieferanten-Entitlement; Business/Pro-Bestandsrecht | Lokal implementierter Lieferantenstamm mit geschütztem Bankunterbereich und manuellen AP-Entwürfen/zentralen Belegen; gerenderte Abnahme offen. Keine AP-Freigabe/Zahlung. Rückkehr zum Ursprungsprozess |
 
 Titel, Modul und Rollenzuordnung weiter aus `lib/modules.ts`/`permissions.ts`/`plan-access.ts`; gerenderte Route-/API-/State-Evidence wird mit bestehendem Generator nach betroffenem Funktionsblock aktualisiert. Dieser Vertrag ist keine ausführbare zweite Navigationsregistrierung.
 

@@ -2,6 +2,8 @@
 
 Stand: 22.10.2026. Basis: Anwendung `00bfe5ce`, veröffentlichter V25-Head `759ab6e0`, Main `ba423460`. [V25-Status und Integrationsentscheidung](v26-preparation.md). Fachliche Quelle: unveränderte [Revision3, Kapitel1–28](v26-source/BINSO_ONE_V26_MODULAR_MASTERKONZEPT.md). **Planung, keine Implementierung oder neue Produktfreigabe.**
 
+Fortschreibung der tatsächlichen lokalen Umsetzung: [Paketstand und Prüfgrenzen](v26-execution.md). Die folgende Matrix bewahrt den V25-Ausgangsabgleich und ist keine Behauptung über den aktuellen V26-Fertigstellungsgrad.
+
 ## B. Gap-Matrix
 
 Statusbegriffe: **vorhanden/belegt** = konkreter Code plus vorhandener begrenzter Nachweis; **vorhanden/offen** = Code vorhanden, V26-Abnahme fehlt; **erweitern** = konkrete Grenze des bestehenden Modells/Flows; **neu** = im gezielt geprüften Owner fehlt das benötigte Fachobjekt/Verfahren; **extern blockiert** = Produkt-/Fach-/Betriebsevidenz erforderlich. „Neu“ bedeutet eine Ergänzung des zuständigen Moduls, kein paralleles System. Die folgende Auswahl ist keine vollständige Codeanalyse und keine neue komplette Routeninventur.

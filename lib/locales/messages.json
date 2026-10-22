@@ -1,4 +1,5 @@
 {
+  "Eingangsrechnungsbelege": ["Supplier invoice receipts", "Justificatifs de facture fournisseur", "Giustificativi della fattura fornitore"],
   "Eingangsrechnungsentwurf": ["Supplier invoice draft","Brouillon de facture fournisseur","Bozza di fattura fornitore"],
   "Entwürfe können unvollständig gespeichert werden. Sie sind weder freigegeben noch bezahlt.": ["Drafts may be saved incomplete. They are neither approved nor paid.","Les brouillons peuvent être enregistrés incomplets. Ils ne sont ni approuvés ni payés.","Le bozze possono essere salvate incomplete. Non sono né approvate né pagate."],
   "Keine Eingangsrechnungen": ["No supplier invoices","Aucune facture fournisseur","Nessuna fattura fornitore"],

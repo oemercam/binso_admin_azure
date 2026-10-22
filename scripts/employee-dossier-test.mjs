@@ -12,6 +12,7 @@ import {verifySupplierBankContract} from './supplier-bank-contract.mjs';
 import {verifyEmployeeIdentityContract} from './employee-identity-contract.mjs';
 import {verifyInvitationContract} from './invitation-contract.mjs';
 import {verifySupplierInvoiceContract} from './supplier-invoice-contract.mjs';
+import {verifySupplierReceiptContract} from './supplier-receipt-contract.mjs';
 
 // Execute the actual routes, repository, authorization, SQL and audit against
 // migrated PostgreSQL/RLS. Replace only session/connection boundaries, never SQL.
@@ -34,13 +35,27 @@ const mock=(file,exports)=>overrides.set(path.resolve(file),exports),unavailable
 const db=new PGlite({extensions:{pgcrypto}}),org=randomUUID(),other=randomUUID();
 // Match pg.PoolClient's result shape; PGlite names command counts affectedRows.
 const client={query:async(...args)=>{const result=await db.query(...args);return {...result,rowCount:result.rows.length||result.affectedRows||0};}};
-let session,auditFailure=false;
+let session,auditFailure=false,tenantDepth=0;
 const transaction=async(organizationId,userId,fn)=>{
- await db.exec('begin');try{
+ // PGlite has one connection. Emulate a separate nested READ transaction's
+ // tenant GUCs with a savepoint, then restore the caller's context. Never use
+ // this to claim native multi-connection write/concurrency coverage.
+ if(tenantDepth){
+  const depth=tenantDepth++,savepoint='nested_tenant_'+depth;
+  const prior=(await db.query("select current_setting('app.organization_id',true) org,current_setting('app.user_id',true) usr,current_setting('app.platform_operator',true) platform")).rows[0];
+  await db.exec('savepoint '+savepoint);
+  try{
+   await db.query("select set_config('app.organization_id',$1,true),set_config('app.user_id',$2,true),set_config('app.platform_operator','false',true)",[organizationId,userId]);
+   const result=await fn({query:async(sql,...args)=>{if(!/^\s*select\b/i.test(sql))throw Error('Nested write requires native separate-connection coverage');return client.query(sql,...args);}});
+   await db.exec('release savepoint '+savepoint);return result;
+  }catch(error){await db.exec('rollback to savepoint '+savepoint);await db.exec('release savepoint '+savepoint);throw error;}
+  finally{tenantDepth--;await db.query("select set_config('app.organization_id',$1,true),set_config('app.user_id',$2,true),set_config('app.platform_operator',$3,true)",[prior.org??'',prior.usr??'',prior.platform??'false']);}
+ }
+ tenantDepth++;await db.exec('begin');try{
   await db.exec('set local role binso_runtime');
   await db.query("select set_config('app.organization_id',$1,true),set_config('app.user_id',$2,true),set_config('app.platform_operator','false',true)",[organizationId,userId]);
   const result=await fn(client);await db.exec('commit');return result;
- }catch(error){await db.exec('rollback');throw error;}
+ }catch(error){await db.exec('rollback');throw error;}finally{tenantDepth--;}
 };
 let invitationPlatformEnabled=false;
 const platformTransaction=async fn=>{
@@ -162,6 +177,7 @@ try{
  await verifySupplierBankContract({load,db,transaction,org,other,act,request,setAuditFailure:value=>{auditFailure=value;}});
  await verifyEmployeeIdentityContract({load,db,transaction,org,other,act,request,setAuditFailure:value=>{auditFailure=value;}});
  await verifySupplierInvoiceContract({load,db,transaction,org,other,act,request,setAuditFailure:value=>{auditFailure=value;}});
+ await verifySupplierReceiptContract({load,mock,db,transaction,org,other,act,request});
  invitationPlatformEnabled=true;
  try{await verifyInvitationContract({load,mock,db,transaction,org,other,act,request,setAuditFailure:value=>{auditFailure=value;}});}finally{invitationPlatformEnabled=false;}
  mock('lib/server/maintenance.ts',{maintenanceState:async()=>({enabled:false,endsAt:null})});
