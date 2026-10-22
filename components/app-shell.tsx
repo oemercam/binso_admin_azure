@@ -45,12 +45,13 @@ const desktopNav = [
   ["/finanzen","Finanzen","chart"],
   ["/berichte","Berichte","chart"],
   ["/mitarbeiter","Mitarbeiter","users"],
+  ["/abwesenheiten","Abwesenheiten","calendar"],
   ["/lieferanten","Lieferanten","building"],
 ] as const;
 
 const desktopNavGroups = [
   {label:"Verkauf",paths:["/kunden","/angebote","/rechnungen","/produkte"]},
-  {label:"Arbeit & Team",paths:["/projekte","/zeit","/mitarbeiter"]},
+  {label:"Arbeit & Team",paths:["/projekte","/zeit","/mitarbeiter","/abwesenheiten"]},
   {label:"Finanzen",paths:["/zahlungen","/spesen","/lieferanten","/finanzen","/berichte"]},
 ];
 

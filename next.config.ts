@@ -50,6 +50,7 @@ const sensitiveRoutes = [
   "/produkte/:path*",
   "/mitarbeiter/:path*",
   "/lieferanten/:path*",
+  "/abwesenheiten/:path*",
   "/spesen/:path*",
   "/zeit/:path*",
   "/support/:path*",

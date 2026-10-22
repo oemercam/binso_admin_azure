@@ -5,7 +5,7 @@ import {validOperatorSection} from './lib/operator-pages';
 
 const protectedPrefixes=[
   "/dashboard","/kunden","/angebote","/rechnungen","/zahlungen","/produkte",
-  "/mitarbeiter","/spesen","/zeit","/support","/einstellungen","/belege",
+  "/mitarbeiter","/abwesenheiten","/spesen","/zeit","/support","/einstellungen","/belege",
   "/benachrichtigungen","/willkommen","/finanzen","/projekte","/berichte","/lieferanten"
 ];
 
@@ -40,7 +40,7 @@ export const config={
   matcher:[
     "/","/angebot","/bericht","/opengraph-image","/produkt","/preise","/login","/registrieren","/portal/:path*","/demo","/agb","/datenschutz","/impressum","/auftragsbearbeitung","/unterauftragsbearbeiter","/email-bestaetigen","/einladung","/passwort-vergessen","/passwort-zuruecksetzen",
     "/operator/:path*","/dev/:path*","/dashboard/:path*","/kunden/:path*","/angebote/:path*","/rechnungen/:path*",
-    "/zahlungen/:path*","/produkte/:path*","/mitarbeiter/:path*","/spesen/:path*",
+    "/zahlungen/:path*","/produkte/:path*","/mitarbeiter/:path*","/abwesenheiten/:path*","/spesen/:path*",
     "/zeit/:path*","/support/:path*","/einstellungen/:path*","/belege/:path*",
     "/berichte/:path*","/projekte/:path*","/benachrichtigungen/:path*","/willkommen/:path*","/finanzen/:path*","/lieferanten/:path*"
   ]

@@ -306,6 +306,8 @@ try{
    else if(p==='/api/auth/sensitive-access')data={capabilities:[]};
    else if(/^\/api\/employees\/[^/]+\/wages$/.test(p))data={items:[]};
    else if(/^\/api\/employees\/[^/]+\/family$/.test(p))data={children:[],claims:[]};
+   else if(p==='/api/absences')data={items:[],total:0,ownEmployeeId:null,mayRequest:false,mayReadTeam:false,mayReview:false};
+   else if(p==='/api/absences/context')data={items:[]};
    else if(p==='/api/auth/invitation')data={email:'eingeladen@example.invalid',organization:customer.name,existingAccount:false};
 
 
