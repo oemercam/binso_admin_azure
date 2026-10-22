@@ -54,3 +54,15 @@ bestehenden Runtime-Test; die vollständige Paketierung benötigt den Folge-CI-L
 Bei einem späteren Upstream-Update muss der eng versionsgebundene Patch bewusst
 geprüft oder durch eine nachweislich reparierte Originalversion ersetzt werden.
 Ein nicht mehr anwendbarer Patch muss die Installation blockieren.
+
+## Aktueller Commit-Nachweis
+
+Am Commit `d052a3be539a0cf358f550a54eecb33e7c0451f2` sind
+[PR-Quality39715765343](https://github.com/oemercam/binso_admin_azure/actions/runs/39715765343)
+und [CodeQL39715765346](https://github.com/oemercam/binso_admin_azure/actions/runs/39715765346)
+erfolgreich. Auch der Checks-Job119619903410 der vollständigen Entwicklungsprüfung
+bestätigt echte Next-Regel/Glob-Gegenfälle, fehlende High-/Critical-Ausnahmen und
+Produktions- sowie vollständigen Abhängigkeitsaudit ohne bekannte Schwachstellen.
+Die Produktionspaketierung und der Smoke-Test des exakten Artefakts bestehen.
+Dies schliesst weiterhin keinen Alert auf dem unveränderten Main und erteilt keine
+Produktions- oder vollständige Klauselfreigabe.

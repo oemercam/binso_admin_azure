@@ -50,3 +50,31 @@ Evidence-Pfaden. Schema-, Rechte-, Patch-, Workflow- und Konfigurationsänderung
 die normative573-Klausel-Projektion bleibt gebunden. Gefälschte Klauseln,
 Prioritätsänderungen und veränderte Originalbytes bleiben ausdrücklich Fehler.
 Diese verbesserten Messregeln erteilen weiterhin keine fachliche Freigabe.
+
+## Aktuelle Fortsetzung
+
+Code-Commit `d052a3be539a0cf358f550a54eecb33e7c0451f2`, V2-CI-/Git-Blob-Digest
+`dddf66c6b614d9bd077720f3f3d70329de69714c46446f394accaf932eea3e19`:
+PR-Quality39715765343 und CodeQL39715765346 sind erfolgreich. Die separate
+vollständige Development-Prüfung39715830625 ist ebenfalls erfolgreich, einschliesslich
+aller acht Browserjobs und des abschliessenden Quality-Gates. Die [Report-Zusammenfassung](ci-d052a3be.json)
+enthält die tatsächlich geprüften ZIP-/Report-Hashes, Messzahlen und weiterhin offenen Freigaben.
+Der vorherige Lauf39713295626 auf `d11a847b` ist fehlgeschlagen, seine grünen
+Teiljobs ersetzen die neue Gesamtprüfung nicht. Die isolierte Testrollenvorbereitung
+und die falsche Angebots-Datumsprojektion wurden gezielt korrigiert, nicht übersprungen.
+
+Der aktuelle native Checks-Job119619903410 besteht einschliesslich sechs physisch
+paralleler Reminder-Verarbeiter, Rollen-/RLS-Gegenfällen und vollständigem Audit.
+Nachträgliche reine Ergebnis-/Reviewnotizen ändern den Source-Digest nicht. Diese
+Quellgleichheit wird tatsächlich berechnet; ein Dokumentations-Head ist deshalb
+nicht stillschweigend derselbe Commit wie der geprüfte Code-Head.
+
+Die lokale Rohbyte-Identität lautet abweichend
+`9190cf3c0091660bb7fff418ee9b7c4c57e7e7bcafb8e97d6e2c165bebcaa77e`.
+69 bestehende lokale Dateien enthalten CRLF, ihre eingecheckten Git-Blobs LF.
+[Der konkrete Vergleich](ci-d052a3be-source.json) liest alle865 relevanten Git-Blobs,
+reproduziert daraus exakt den CI-Digest und weist für jede abweichende Datei
+ausschliesslich CRLF→LF bei ansonsten identischen Bytes nach. Keine andere
+Inhaltsabweichung wurde akzeptiert. Die unveränderten Originalbytes der Revision7
+bleiben separat geprüft. Keine pauschale Normalisierung, keine Massenänderung der
+Dateien, kein manuell eingesetzter Hash und keine Aufweichung des CI-Gates.

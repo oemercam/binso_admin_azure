@@ -1,0 +1,423 @@
+{
+  "commit": "d052a3be539a0cf358f550a54eecb33e7c0451f2",
+  "sourceFiles": 865,
+  "gitBlobSourceDigest": "dddf66c6b614d9bd077720f3f3d70329de69714c46446f394accaf932eea3e19",
+  "workingTreeRawSourceDigest": "9190cf3c0091660bb7fff418ee9b7c4c57e7e7bcafb8e97d6e2c165bebcaa77e",
+  "nonEolDifferences": 0,
+  "eolOnlyDifferences": [
+    {
+      "path": ".env.example",
+      "gitBlob": "40c9d57090fab855d4b2b722265467468f3c13e1",
+      "workingTreeSha256": "369761b3bc05b337577c846e3abbd5d5faecc4f1886c49c9c250d4ad62885438",
+      "gitBytesSha256": "c3118459d1e6176fbda3bab2e26bd82fb7196a7ba37af107efd1c0b9552ffe30"
+    },
+    {
+      "path": "database/migrations/0001_baseline.sql",
+      "gitBlob": "b741777a9cb9e05b79e091d1d034af035b85e8db",
+      "workingTreeSha256": "5b9a581fe1051d233bc2ef88962354c8365049a6334f09aca4ef00dbf73afa8b",
+      "gitBytesSha256": "8e6aaf10fe24efe5bd9909ea177d4eb34354a812cb829eb123eb09d7d1178c14"
+    },
+    {
+      "path": "database/migrations/0002_auth_memberships.sql",
+      "gitBlob": "e78863b986fdc8a21413534479ffae8bfeb9cd53",
+      "workingTreeSha256": "5f2a1f29fbdcaf217c11d0fbf507535d23df597ba55e918cb5fb642c0f947fd4",
+      "gitBytesSha256": "31929ff48bd53c4cc04e62fe3d6bab9cbda51254f3626bdf1bb85c9cb56430d2"
+    },
+    {
+      "path": "database/migrations/0003_registration_onboarding.sql",
+      "gitBlob": "09bf0c04472a51da4fb613f03e1e9947e7a2c8a1",
+      "workingTreeSha256": "6db1b78ae2761d3fac48159d3e1b747f234e97c3661d5cd5a9e8c6973c6ee603",
+      "gitBytesSha256": "1b17c41d53935c6fc3deb52154763010649e6f2949cc87c9134041d52e11e1c6"
+    },
+    {
+      "path": "database/migrations/0004_subscription_billing.sql",
+      "gitBlob": "af638cce815edb32044fbdcf8a36c38351230c4b",
+      "workingTreeSha256": "feec707a0e1a81e948b0682ddca9ab395411bfcf1208f0290841cf8022d9e088",
+      "gitBytesSha256": "b070d2e477a56b1f6e2962ab2ef649142a30ef5f9bf8555c09f36431383e432f"
+    },
+    {
+      "path": "database/migrations/0005_stripe_payment_provider.sql",
+      "gitBlob": "d43d6041ed92ebb46463e244d7b45fdc51c11c85",
+      "workingTreeSha256": "a02bdd02466291a5e3f0d567ad4f1b79142c3902dd24c3216fef966b684553ad",
+      "gitBytesSha256": "46bf59e64f1f8a5dbf12692b098c617fd3ca6b0ba640d7303b33ee5c3310fd03"
+    },
+    {
+      "path": "database/migrations/0006_production_saas.sql",
+      "gitBlob": "4e26cb344e074640c34a8f96ebc27973b2b1b495",
+      "workingTreeSha256": "b6adf4c01601762602b397e9a6fbae53ad0250f67ea7ec301372c6d30d04f89a",
+      "gitBytesSha256": "a1d481f8d9462ca924a4b36fc9d869c5f950441af8074d703645d1a278c04053"
+    },
+    {
+      "path": "database/migrations/0007_subscription_lifecycle.sql",
+      "gitBlob": "3be7b74b2043188e5b7b5b58ab94cd437fdb8dfa",
+      "workingTreeSha256": "b6d6cfc1d1711884bdf75fecc0fb3ad77c60e07fade023fd89d6e71cc47115db",
+      "gitBytesSha256": "b54e570aa95ad8ffe812f832969ba89e84f023db950a72427a448e8937ac6146"
+    },
+    {
+      "path": "database/migrations/0008_production_completion.sql",
+      "gitBlob": "fa56fffdc00f010a6b4a771ff8d4e796ea45fe71",
+      "workingTreeSha256": "3bc0f4db22505629257e97a2bff99e5d2d25641120662464ce9e79722e3a13ff",
+      "gitBytesSha256": "faad11e0cf3f90f17177253cc73da52a73a208da14036a05318d3cf9ccb8f187"
+    },
+    {
+      "path": "database/migrations/0009_multitenant_rbac_business_model.sql",
+      "gitBlob": "97e0f54ab187142c029ce3a28cf07bba916f3f2b",
+      "workingTreeSha256": "d8f06f093d9972240c11c665f8298b336628d237fe9b23bccb1fe81d2792a93d",
+      "gitBytesSha256": "ae44690a3fd7eea72a00c3bbd78eb59b8cfe69f55bc6d9c2cd262ddbe0f2c528"
+    },
+    {
+      "path": "database/migrations/0010_product_simplicity_devsecops.sql",
+      "gitBlob": "551a04d628d2d60200bd6b258703b7565112fd9b",
+      "workingTreeSha256": "670c67dff36e21ddf2c4bacc5727f54cab4ac980ecf1b59a5aa4145523d545cb",
+      "gitBytesSha256": "555f71daa136e1ec3e348751e5d11800506a308faf75b9b2b5e56e92feb20c91"
+    },
+    {
+      "path": "database/migrations/0011_saas_platform_foundation.sql",
+      "gitBlob": "775c0ca5fac2eafbd02d86ac6e2df4b29d272645",
+      "workingTreeSha256": "cba3df026be44423467e3e4fa90974d4e5df4ab0858ecb441a152fcf74da654d",
+      "gitBytesSha256": "0c37ee44b6f347af56273d4dc28d4f4f37062b26547d7ac1b993c3de1b1d8feb"
+    },
+    {
+      "path": "database/migrations/0012_v74_production_hardening.sql",
+      "gitBlob": "269cbef8f05023713ac5e445316b3a70b04a6345",
+      "workingTreeSha256": "7f56e158e8d6d3a94d84507c99ffd6febe0f0527f0516cc57d2f102b97e81cd0",
+      "gitBytesSha256": "1613a1812993b79c548d24cf49bb4212455fefa757b0cd578000b68e9c2bac5f"
+    },
+    {
+      "path": "database/migrations/0013_v75_complete_product_foundation.sql",
+      "gitBlob": "3fc5fe644b0a728a46767d435b7cfda3fd5d4470",
+      "workingTreeSha256": "dd01deaf1d884273d57a5e532b17d8d71659246695580986323823a42358e7d4",
+      "gitBytesSha256": "e48c8efdb6907725fb9a17436ce617b71e0f3bd089366f11d7f6d21a1349f40d"
+    },
+    {
+      "path": "database/migrations/0014_v79_demo_access.sql",
+      "gitBlob": "73a5f4ab1f93ec108c131dd1bfd86c42fa97270c",
+      "workingTreeSha256": "0e0d5667f9f2cccdad2e010e8de15218bf4bfa7f7cff95a3913b26c67611c265",
+      "gitBytesSha256": "28d0bc721c38b7ea54e95059112d3ccf0167191a0929fdc6d0c5f4e79da0c28c"
+    },
+    {
+      "path": "database/migrations/0015_v82_normalized_business_core.sql",
+      "gitBlob": "795ad3389d8060b6a06dc351d60581a41f3d0a79",
+      "workingTreeSha256": "422917ac1a01170c7370066d85506fed7d1e8652d9fe1fd65533aa379b6c42b9",
+      "gitBytesSha256": "c97099246727d5ac8df09f8f70da668f0d9be45c47da38bdb021bbd30ce86aa2"
+    },
+    {
+      "path": "database/migrations/0016_self_service_signup.sql",
+      "gitBlob": "e4b3721bf67009dc4e37e042541d5ded0f20b8a3",
+      "workingTreeSha256": "6c314047e3c9cf5c7385ab916a542e68d069b30ba8fc37bf4eedcadc9f0eb256",
+      "gitBytesSha256": "639b88d99a1ea235485623e316a8800be3b736ae6efdfb9660740c2f461a9dc0"
+    },
+    {
+      "path": "database/migrations/0017_v150_code_schema_alignment.sql",
+      "gitBlob": "5a9007a7f22f768780a278587fd7b6633dad7262",
+      "workingTreeSha256": "0067c6e6ca5806f96c53c5431536b6d863fc4cc20bc5aa602c441789fda5bcfe",
+      "gitBytesSha256": "8aba84d68bb4dccd34e97dea3f787ca0cf09fa12ed0406ebd28df4ff06b37a65"
+    },
+    {
+      "path": "database/migrations/0018_v151_organization_profile_alignment.sql",
+      "gitBlob": "58cb914acf0f359288c0d42e738884390851d9d5",
+      "workingTreeSha256": "ccb6ce87d67e4d82ba9c4e92eed088755b81b98a85d4a86acd1babd0471a8514",
+      "gitBytesSha256": "efff329a2e36e7fdb7be2d49ad4f017c31dabdc1a7577fd7378377ffbe734652"
+    },
+    {
+      "path": "database/migrations/0019_v163_productivity_ux.sql",
+      "gitBlob": "a5a41d03ee5dcf02cbc453ff5a28fd9937d67bf9",
+      "workingTreeSha256": "fd8e84a46b032f38126a6a25160984e4c61759d5483d9ac80d19247052fc85fd",
+      "gitBytesSha256": "2f33d69f06eacd18a490970b647408705ece613d336c4efb5f343a49b98062ca"
+    },
+    {
+      "path": "database/migrations/0020_customer_sales_lifecycle.sql",
+      "gitBlob": "03af45921625ac135cd19e22e842e9aa47c0ab13",
+      "workingTreeSha256": "6a7bb660c1b2dd28d18b688f2da3f8d6c13fc3d2e6899c264e669bddb6a2fc58",
+      "gitBytesSha256": "b9d1be43f2a64471d94556ad300943ec47494656fe02eb5fecfe6a1d89809315"
+    },
+    {
+      "path": "database/migrations/0021_tenant_branding_documents_payments.sql",
+      "gitBlob": "bdc791129ee1e5fc688ef68e737758f93d095d86",
+      "workingTreeSha256": "d6c923c16a65090f59c1d3c5fa90aae059d1d826a782ff7f62080ffda3a97ce5",
+      "gitBytesSha256": "07ed1e56bb5134508d4f025ac58dc6dc22d2dcbb6239560b9b29de1671334a85"
+    },
+    {
+      "path": "database/migrations/0022_receipt_recognition.sql",
+      "gitBlob": "033f8c44990edd61a4bec8525f6714e4c5c2227c",
+      "workingTreeSha256": "7cc0303167641b6333d1ca3f2c7c3fcf724b027ceefa106d5fe0bb8980a77686",
+      "gitBytesSha256": "9170d35c2738b8fb520d307094c9fde8d6b8a9e2e9460b26ec5d223b05e583e0"
+    },
+    {
+      "path": "database/migrations/0023_finance_and_demo_fixture.sql",
+      "gitBlob": "7ca90a75769dbba6cf2324afe203e262d5310eba",
+      "workingTreeSha256": "e3d088a71b4b594ba1bebd297d0fe281b1f90b6509ce5c21441508935b4df39b",
+      "gitBytesSha256": "6ad068c03f23876adc26df855f9fc4280bb974fab32226bd43c7afc3f98979b5"
+    },
+    {
+      "path": "database/migrations/0024_finance_integrity.sql",
+      "gitBlob": "005fb231efb801b3d1d75285232561ca6db3ee40",
+      "workingTreeSha256": "7dbc1f0e569cef5bb422e50db3d434ab0de99044a509dc70826c84e5e06b22e9",
+      "gitBytesSha256": "4914ab75d276b7ec44db3893ea87ee2e401fbcc63e01b44a5cf9ed9e9c91b0ce"
+    },
+    {
+      "path": "database/migrations/0025_business_api_integrity.sql",
+      "gitBlob": "504e959f45f5bd4af1e383ddf436f84ddcc0a6fa",
+      "workingTreeSha256": "6292affef76df74d003e9ea8b3fede51f06fe534f85cb49ffdae78d873a18149",
+      "gitBytesSha256": "d246b72bc05959aa0119e3512547562b295e1fff0dff66794f060751b7d1a9ea"
+    },
+    {
+      "path": "database/migrations/0026_demo_business_fixture.sql",
+      "gitBlob": "6b5e70e37d3460f9c6adf562d0672a5c3ae89de4",
+      "workingTreeSha256": "0428aeb87c290c39a2f704091b64d596d1a4c10924c36186e1d499e9efe072c5",
+      "gitBytesSha256": "9014ba4091867088fcc31f9d96b77c2602222200e0057c71f650b375b75713f3"
+    },
+    {
+      "path": "database/migrations/0027_support_operator_integrity.sql",
+      "gitBlob": "1551b49013ffc88769fe2f8b701d5f03a944aef4",
+      "workingTreeSha256": "483fa41b53ec032d0902c1edf47ca74bf0d79108d0c722dcaf02d259a5293273",
+      "gitBytesSha256": "95ea7c3918405def7dbf1bdfd575a314f6cd2b032404d8aad0451a25631f6513"
+    },
+    {
+      "path": "database/migrations/0028_user_profile_persistence.sql",
+      "gitBlob": "e1f76052a4f2fbfbe85449079978a14a7aba218a",
+      "workingTreeSha256": "baa5ff28f77ab3b39ef270b057cbf941a2ff7a0ec427aa08ac1b0fa3128fbb25",
+      "gitBytesSha256": "c8e13e0097d4087a2c7d3bd7a5ae8f93a8b1d1623b14e423f20c48631f5df038"
+    },
+    {
+      "path": "database/migrations/0029_operator_persistence.sql",
+      "gitBlob": "98fb0ac92955e724735538a87b7b89573154c3fd",
+      "workingTreeSha256": "3619856ea3377696a506dca4fa41eaa4cdff00eb6609113349a5d9c97214e724",
+      "gitBytesSha256": "fe84adb2c3377022300a9d434d764332a884443ffeacd64f36adf7853ae3735e"
+    },
+    {
+      "path": "database/migrations/0030_notification_preference_isolation.sql",
+      "gitBlob": "097665412511528161b574f58e6a6816952db62e",
+      "workingTreeSha256": "db899175cc7709a22abe4c2a1772fa3a2d30fd6ad5e833c9341d401a1ff39c61",
+      "gitBytesSha256": "26c0e2f319e8e91ef6c3f5df175553557f4a825b6b530124e926e13f7a14571f"
+    },
+    {
+      "path": "database/migrations/0031_business_field_persistence.sql",
+      "gitBlob": "878b37674c54cc221744456411d0e04655ea7430",
+      "workingTreeSha256": "4bda63b1c2a2583b21d698f093095399db7ba31e35f38470150ff15a071d4710",
+      "gitBytesSha256": "1322030cb29481bf248b041736895008e84dd03d6abc97f940e14c8133bdf1bf"
+    },
+    {
+      "path": "database/migrations/0032_demo_invoice_payment_setup.sql",
+      "gitBlob": "a58dd405c5fc426731f878a4be52100d6e33cec7",
+      "workingTreeSha256": "c7b02207c5f3b920f51c9e20a2f60bf0cba5a3c1073db14630b5e056620e465b",
+      "gitBytesSha256": "68ae74e83f896fde132adb9a4ff0ad5f20605d4fd33993f8131a8e824970309b"
+    },
+    {
+      "path": "database/migrations/0033_invoice_qr_reference.sql",
+      "gitBlob": "3fb0b81245894b88dca8de29385855c3f6b43313",
+      "workingTreeSha256": "298f44b122c0ba14a5af8930f57c2aa5b6b2b88c0599b2884bf34816eda1af13",
+      "gitBytesSha256": "e8d22df06a61c21e9a1329d35f1ab50a8e9da5a70beff10db6fa37ec0f7882f6"
+    },
+    {
+      "path": "database/migrations/0034_stripe_checkout_integrity.sql",
+      "gitBlob": "4bfe1790a53cb81acec9de21acc7f0ba073c9e39",
+      "workingTreeSha256": "1cd25e0beaee86fa147355bee49962c75a1655734b1a830ba9ad6b24da763716",
+      "gitBytesSha256": "b8faef520f08b2f69db5b440826937a0d9041517af59253de8b4db196b353e1e"
+    },
+    {
+      "path": "database/migrations/0035_email_otp_and_mfa_enrollment.sql",
+      "gitBlob": "7508312aca3621543063d98e8720098f78f35d12",
+      "workingTreeSha256": "464f8b044e21c71627c228ec4f012058a3a1ffd3c6905874be84ab083b877506",
+      "gitBytesSha256": "31c71a3ce6b11dcc4b2ee637be528cc92b6cf51346a1a89bc2ec3ce2eee63d7c"
+    },
+    {
+      "path": "database/migrations/0036_entra_operator_identity.sql",
+      "gitBlob": "9cc4cf240737197bc1f8df61f87c6e5c8797f511",
+      "workingTreeSha256": "d026075b64e666d1318cd1fe9b610159b6eb791df167f3c8d390e978582539f7",
+      "gitBytesSha256": "cef6561a00f75d9da1268bad9a879aaf99df15d7adefcabf84e066779be6091a"
+    },
+    {
+      "path": "database/migrations/0037_demo_document_presentation.sql",
+      "gitBlob": "22aed468c79068f0ae14e080d50575c4e105edf0",
+      "workingTreeSha256": "6820d9c3bb88ca87f1e068aa2662c9d03d2d7276824ddb4ea59449565cb1ff3e",
+      "gitBytesSha256": "ca4684f8026ad5f9d9e64904af8513179425e486d1432069704f11795d82bd19"
+    },
+    {
+      "path": "database/migrations/0038_timer_customer_context.sql",
+      "gitBlob": "9cbded1a4a95a46fac7c9dbbca0f6a8149c87450",
+      "workingTreeSha256": "5b3ee7e86692d1f9d0c6d3714933de8d58403a6ca861651c255c2d3f95b2bc4d",
+      "gitBytesSha256": "2f9d2cdcd60280121ea2faa738d76fe27bdb97c049d6f527a305f223b66ea02a"
+    },
+    {
+      "path": "database/migrations/0039_process_completion.sql",
+      "gitBlob": "703ae32ea5d88228c42a9fce5445601b5db3aa14",
+      "workingTreeSha256": "fe18bdc10fddd67a1f15192c078bc331e5d797840d42d1b15ca1b86ec64f0e3c",
+      "gitBytesSha256": "f8c2bf75d388f74d1699a795a1a856b6681b8b4a65aebc6804ac9b867e3d9789"
+    },
+    {
+      "path": "database/migrations/0040_customer_contact_names.sql",
+      "gitBlob": "420c48566d3e52f564d7368a5908acc12f470c09",
+      "workingTreeSha256": "3d46e1b80b3e790842b75c42c184b22f57361417e491fcbaf8782261751a51a4",
+      "gitBytesSha256": "1a407813bb5d10d9712e52ddc6ce5dc1fc4b7cfe39afa96048e4bea08acb53d9"
+    },
+    {
+      "path": "database/migrations/0041_business_process.sql",
+      "gitBlob": "f9bc1f67715e018ce303989f24ba32238cb0c373",
+      "workingTreeSha256": "c9c16ed4eef43c624baa321db24a2ca0bc389f311aabf096d5b6e85c75296353",
+      "gitBytesSha256": "4500a0c5c72228151c30362f2a6d79d0f5428e9e8b72170a1e4e35050f3eef69"
+    },
+    {
+      "path": "database/migrations/0042_demo_business_process.sql",
+      "gitBlob": "96b5432496e390cc4e0166658f9d892c2de2565c",
+      "workingTreeSha256": "bc8b2327e99808020383031df80aae4ebf9304e39b0654911b0c6db53770c950",
+      "gitBytesSha256": "2797e7a668a29cd0b76e5bbef0140106c803fa58d89dcda2416e8e9b1b8859a3"
+    },
+    {
+      "path": "database/migrations/0043_demo_customer_profiles.sql",
+      "gitBlob": "a5ca603b96dcdf150d9bdab88e833de3cbe151e9",
+      "workingTreeSha256": "b6a53d8d8f5c364e52edf390a869af717526e2fe8b89e889b4da14d45019a27b",
+      "gitBytesSha256": "42a7180144ef9fe27eddc39206d70a79110dbc368d2ff92b18e55707c40f9375"
+    },
+    {
+      "path": "database/migrations/0044_time_entry_precision.sql",
+      "gitBlob": "a8fac2b9ebf3ef0bbc4bf9387fd3f5480530f5e0",
+      "workingTreeSha256": "b12a85a8c7d5deba4279333e46ba54e0684330e98ecd749c273bd7c5bc988f0a",
+      "gitBytesSha256": "b89d61cbf840c7a9cf9851e1ff3cf93710c5aa528276d479b3e162198e688fb1"
+    },
+    {
+      "path": "database/migrations/0045_document_snapshots.sql",
+      "gitBlob": "aa9f08374ad72adf80eb71c5b68c7c82a5144ed5",
+      "workingTreeSha256": "b91b1f6c9b4c1037d2426867be022ac225443b4f71cbdbeb188f8b16214d4d34",
+      "gitBytesSha256": "9031ed85400875cfe41c4758f6b0e779d69d96d3ce2ae358be5a1445ade0a97d"
+    },
+    {
+      "path": "database/migrations/0046_file_business_relations.sql",
+      "gitBlob": "c7946a6cf5064a1d0e30c7cac1a3a401b604d0f8",
+      "workingTreeSha256": "e287d0fea42c814a8a90a054a7ed477eed431379c06b82e8d1b7bea4a579970c",
+      "gitBytesSha256": "d15c3379efea5513f622c2d733e3cfa8dcf88318292c4c6b933800db4fb427c2"
+    },
+    {
+      "path": "database/migrations/0047_runtime_auth_bootstrap.sql",
+      "gitBlob": "8da7321100f55df84f0344a129c7e16d7d7e0c9a",
+      "workingTreeSha256": "090c0e33464fcb6e9a11a610c5628e62fe4099311775c50d6fbf059d959d97b9",
+      "gitBytesSha256": "12ac04fea7edb4ae71cb97d80da476d13ed42c6574fd670346484f86c16f858f"
+    },
+    {
+      "path": "database/migrations/0048_file_scan_evidence.sql",
+      "gitBlob": "93b79d1b522567c4a6b8421792c018e20b726ded",
+      "workingTreeSha256": "909698ad6848f80c6a83f2d2033325d912fe2fd18104f0dd32c4f236a1b41a50",
+      "gitBytesSha256": "71f8d4254ae9186db6e823e93d427b5e89f546d39ea00b498abb3aa7572cfa66"
+    },
+    {
+      "path": "database/migrations/0049_canonical_demo_template_read.sql",
+      "gitBlob": "6770c29e580f25dab84d3163f95cd0bc2429da04",
+      "workingTreeSha256": "c3ae1f0009c1830c679358b630e6d74adcedde8fa2bae5beba6ec269b2f0c31d",
+      "gitBytesSha256": "97176451fdbafa5ba049b714824246e0d9417b5cc74cf32200a6c4f291b7fcb0"
+    },
+    {
+      "path": "database/migrations/0050_platform_maintenance.sql",
+      "gitBlob": "689ed8fef6b31745d4700e849f0ec8473fce7da5",
+      "workingTreeSha256": "9727a0eff59cb840b1e087ded0d899a90d47abc8a800b0aeeaf6792937c4483c",
+      "gitBytesSha256": "362dba6164ad9bbdfd2262e699fc832b497ebf480f18f066402b52701e45f90a"
+    },
+    {
+      "path": "database/migrations/0051_document_reminders.sql",
+      "gitBlob": "220e228f4339f8e7c5b6b1c0fd33f883304031e6",
+      "workingTreeSha256": "7de0061bcb45dde195812c377ca0057d33801ad644fd5e331fbdb312da6a8ad3",
+      "gitBytesSha256": "39ecd05f09391f9ac3c5891b914d3d1b3ee7c0f0dd27ab463c94b50b9f55e4b8"
+    },
+    {
+      "path": "database/migrations/0051_runtime_maintenance_permissions.sql",
+      "gitBlob": "f81e3a0cd8f36d145330cc7894d75f9e281b006d",
+      "workingTreeSha256": "58c586364e423c2abe06d8f0f2c542ab005a5e813fb922acbb3759f7b759c6fb",
+      "gitBytesSha256": "3e5572185c12cd30b85fdcba7662c09aaa739d59275451d7d443d6f86e252477"
+    },
+    {
+      "path": "database/migrations/0052_invoice_refunds.sql",
+      "gitBlob": "668811e9063693507d578954b780d980d421f6da",
+      "workingTreeSha256": "ad42f930fc467925bc7ecb44eec4f43858039012980b39b6ec5a315dd0f2f0fb",
+      "gitBytesSha256": "fcdcc809e2b6ed35c035d327aea764c17e53faeee740f6f7e464a8c30e77eba2"
+    },
+    {
+      "path": "database/migrations/0053_offer_revisions.sql",
+      "gitBlob": "72e0027a9f6d8d9d8b59e7b2a27b58fc17bb02eb",
+      "workingTreeSha256": "0dc694e8ae9b3ed86e9f9a7b463664e5e6e92130f1837d905125e4fbfbe8d033",
+      "gitBytesSha256": "b5130fef0a37786eacdbe94a93a6e7c6eaa652b0ca081db8718fb322bb535140"
+    },
+    {
+      "path": "database/migrations/0054_document_language_snapshot.sql",
+      "gitBlob": "47371ee88fe2e4c6fbe6b2b1509da95d2057ae39",
+      "workingTreeSha256": "fdf0d25fc8a59a93a372853018b7489f3ae984a63d3f29efc2cc2c887ee851da",
+      "gitBytesSha256": "df54e8c7c34368ddc10a9811224df3219cbffe8883030cbffad245690bcba786"
+    },
+    {
+      "path": "lib/server/clamav-protocol.d.mts",
+      "gitBlob": "59731e055b764636e0b0add22f1ccf12d45ed5a2",
+      "workingTreeSha256": "ee337ad6c1adf26046741f7273c785375ef381f913018d51ac4667bd5ad019b1",
+      "gitBytesSha256": "d210cca092b2a9451ed8eee4707a25e788f9f46d22084493d870d8deff08dd30"
+    },
+    {
+      "path": "public/brand/icon-black.svg",
+      "gitBlob": "6b67db1be342b32c477549e9263fac87742071f4",
+      "workingTreeSha256": "c06815beac05e34f0f2e1bef6319553fc31d07868de3051ac97a41bf32e4ad21",
+      "gitBytesSha256": "f55fa6eda37cd356c59c7ef73d2ab3c68b9d2aa8c4dbc36c4211cc7b2fc851e6"
+    },
+    {
+      "path": "public/brand/icon-maskable.svg",
+      "gitBlob": "28aaff752a8ff6df4c6e8b51c22e26f8385fa143",
+      "workingTreeSha256": "020c07c083d619dd8f52a42e1ec5d8fe2a9efd6d877a15145b3f86ffedaa983e",
+      "gitBytesSha256": "fe7e2f2f63352eea01db359991386d9a3056b441dd3bf6e65df724ffed838077"
+    },
+    {
+      "path": "public/brand/icon-white.svg",
+      "gitBlob": "fc0f0d51443b6b5cd87e469158e9d5ecf5313582",
+      "workingTreeSha256": "ced28e441d898e247bf881f95da4f603079751bde86b9ac88b499211568282e4",
+      "gitBytesSha256": "1ccd3c6a2771ff3dfb0c2c7625ef8686ca394afb7d873547e0df151fa479a244"
+    },
+    {
+      "path": "public/brand/logo-black.svg",
+      "gitBlob": "ef038588b26f2f52fb9d9022d02a609a49cb6ae6",
+      "workingTreeSha256": "aadd1e485726bf9330f5016839cb834275580b5357d22fffd4122b78c867f1ce",
+      "gitBytesSha256": "4fd894473bc089e52b96d276c9557c43b4bc14e5f72e9dffdd00f80db6c60689"
+    },
+    {
+      "path": "public/brand/logo-white.svg",
+      "gitBlob": "f6baa8a1fa7457a89bdeb140510d5491759fe0da",
+      "workingTreeSha256": "81cfb2b7ce588b4728cca51d0c6314c6addfab98c5a6fbd6627a03e2c16c3cc4",
+      "gitBytesSha256": "fbcbce7000ff37118f11dce6adfcef5ac5d5c382722befb9d3bc9cf4f99034df"
+    },
+    {
+      "path": "public/manifest-admin.webmanifest",
+      "gitBlob": "4a5b44e9257538139a6614b939ef0474f02b5c80",
+      "workingTreeSha256": "bd182b208096efb36fd9f50f8470bcb0bf7a77cf6379e4ab79d90fe29c912ba4",
+      "gitBytesSha256": "6fcc9bb6d82331ac4db3230e99e54bc335437513eec2d6b589c8e0e76c677e1f"
+    },
+    {
+      "path": "public/manifest-app.webmanifest",
+      "gitBlob": "e202297e8015ceaee323b7a78dc9e54b94af4e80",
+      "workingTreeSha256": "decb271d0f7ef5f61c95910ec03c418964bab94e0dd3497cd6afdf0b612726aa",
+      "gitBytesSha256": "a71084dd22788fbd344012230743adcf396456a911c62b77e10165ae82034ea2"
+    },
+    {
+      "path": "public/manifest-portal.webmanifest",
+      "gitBlob": "0959e2577962ebad5df090ca672b7db09c0d64e5",
+      "workingTreeSha256": "c1e6f420f5187641ebd99ddc64115a0723d7591c69834159f929af7abd3e5885",
+      "gitBytesSha256": "027f60d63e3024612b73f7c9bf8e4a8d69c6a019e22dce08d521c91288bca4e9"
+    },
+    {
+      "path": "scripts/sql/runtime-role-check.sql",
+      "gitBlob": "f6171d3de53a8966be41a44a240351782622ed54",
+      "workingTreeSha256": "6d8bf60997d36a3d9f4bba51f0eb22eab139c856e35fa917e4af588bf14f3081",
+      "gitBytesSha256": "75bd5dad6a48d00bb4d2fd2f8012cd033d30629785e3f9f4eb71b3805c642789"
+    },
+    {
+      "path": "scripts/ux-review-gallery.py",
+      "gitBlob": "c4cab05516cf690b721083dae4f5321540b5593f",
+      "workingTreeSha256": "9f59ba48370adfd17e9c3f832e9313a4ca7bc1276f62b16e9a88d1001e2855fc",
+      "gitBytesSha256": "9484d2a68faf9661b7bb0f4b3f3c6098a0c418dc533af5f59c4a73d082c2c3f4"
+    },
+    {
+      "path": "scripts/v22-1-review.ps1",
+      "gitBlob": "322c4ef4cdb4c999a9a61546c7146f162225eaac",
+      "workingTreeSha256": "e02157705c1b25111ca4f76149c4234b30214aa8cc5a2fa6cacd023d0b518963",
+      "gitBytesSha256": "4ab5c97f082682e8a5a30d1b3b7b6cadbfecc8be1e67373290ff1c847fbccd98"
+    },
+    {
+      "path": "scripts/visual-blueprint-report.py",
+      "gitBlob": "8eebff1f8bee63058648ca879d3d7eb2c70ecf7a",
+      "workingTreeSha256": "dbde75bffad3f3fdcf64d8d209cf40caee7eb0f1203404a4d88af2575abafaae",
+      "gitBytesSha256": "4895d993fd4b22ad1d49560a7738727a6bd40246c267206e53fa76763333a94b"
+    }
+  ]
+}

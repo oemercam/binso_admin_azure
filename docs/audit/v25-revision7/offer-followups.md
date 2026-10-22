@@ -75,3 +75,11 @@ Resolver-Test reproduzierte erst den Rechtefehler und danach den Erfolg mit gena
 diesen drei Leserechten. Keine produktive Rolle oder Policy wurde geändert.
 Die native Parallel- und Browserabnahme ist erst nach neuem erfolgreichem CI-Lauf
 für den korrigierten Quellstand belegt.
+
+Dieser Folge-Lauf ist für `d052a3be539a0cf358f550a54eecb33e7c0451f2`
+jetzt erfolgreich: [Full Development39715830625](https://github.com/oemercam/binso_admin_azure/actions/runs/39715830625),
+einschliesslich sechs physischer PostgreSQL-Verarbeiter und aller acht Browserjobs.
+Der Erinnerungsfall besteht in Chromium und WebKit mit Standard-aus, erhaltenem
+Opt-in nach Fehler, erneutem Speichern, Verlauf, Entfernung und abgelaufenem
+Gegenfall. Das ist funktionale synthetische Browserabnahme, keine Originalscreen-,
+physische Geräte-, echte Versand- oder vollständige Klauselfreigabe.

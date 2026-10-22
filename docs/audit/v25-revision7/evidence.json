@@ -482,9 +482,9 @@
         "scripts/offer-followup-contract.mjs",
         "docs/audit/v25-revision7/offer-followups.md"
       ],
-      "test": "Tatsächlicher isolierter Migrationstest mit eingeschränkter Rolle bestanden: Positiv-/Negativfälle, Fälligkeit, Abbruch, Replay, Status/Version, Präferenz und Audit-Rollback. Aktuelle native Parallel-/Browser-CI noch ausstehend.",
+      "test": "Aktuelle gezielte lokale Prüfungen sowie Full Development39715830625 auf d052a3be bestanden: tatsächlicher isolierter Migrationstest, native PostgreSQL-RLS-Rolle und sechs physische parallele Prozessoren, Chromium/WebKit mit Opt-in, Fehlererhalt, Wiederholen, Verlauf, Entfernen und abgelaufenem Gegenfall. Keine echte Mail oder Produktion verwendet.",
       "visualComparison": "Bestehende gemeinsame FormSheet-/DetailDisclosure-/ActionRow-Owner verwendet. Aktuelle gerenderte Abnahme offen, kein neuer Originalscreen behauptet.",
-      "blocker": "Aktuelle native Parallel-/Browser-CI sowie vollständige fachliche/visuelle/Geräteabnahme fehlen. Der Wortlaut dieser Klausel fordert keinen garantierten Hintergrund-Mailkanal; dessen Fehlen wird nicht als nachgewiesene Funktionslücke dieser Klausel gewertet. Kein Produktivlauf oder Versand ausgeführt."
+      "blocker": "Vollständige fachliche/visuelle/Geräteabnahme fehlt. Der Wortlaut dieser Klausel fordert keinen garantierten Hintergrund-Mailkanal; dessen Fehlen wird nicht als nachgewiesene Funktionslücke dieser Klausel gewertet. Kein Produktivlauf oder Versand ausgeführt."
     },
     "R7-34-005": {
       "sourceTextSha256": "73880bf8c0debcc2a4ee30490768edcb4697297bdf15cd94266ffa0991e05ab1",
@@ -498,7 +498,7 @@
         "scripts/offer-followup-contract.mjs",
         "docs/audit/v25-revision7/offer-followups.md"
       ],
-      "test": "Tatsächlicher isolierter Migrationstest mit eingeschränkter Rolle bestanden: Positiv-/Negativfälle, Fälligkeit, Abbruch, Replay, Status/Version, Präferenz und Audit-Rollback. Aktuelle native Parallel-/Browser-CI noch ausstehend.",
+      "test": "Aktuelle gezielte lokale Prüfungen sowie Full Development39715830625 auf d052a3be bestanden: tatsächlicher isolierter Migrationstest, native PostgreSQL-RLS-Rolle und sechs physische parallele Prozessoren, Chromium/WebKit mit Opt-in, Fehlererhalt, Wiederholen, Verlauf, Entfernen und abgelaufenem Gegenfall. Keine echte Mail oder Produktion verwendet.",
       "visualComparison": "Bestehende gemeinsame FormSheet-/DetailDisclosure-/ActionRow-Owner verwendet. Aktuelle gerenderte Abnahme offen, kein neuer Originalscreen behauptet.",
       "blocker": "Garantierter Hintergrund-Mailversand, echte Providerzustellung sowie vollständige fachliche/visuelle/Geräteabnahme fehlen; kein Produktivlauf oder Versand ausgeführt."
     },
@@ -514,7 +514,7 @@
         "scripts/offer-followup-contract.mjs",
         "docs/audit/v25-revision7/offer-followups.md"
       ],
-      "test": "Tatsächlicher isolierter Migrationstest mit eingeschränkter Rolle bestanden: Positiv-/Negativfälle, Fälligkeit, Abbruch, Replay, Status/Version, Präferenz und Audit-Rollback. Aktuelle native Parallel-/Browser-CI noch ausstehend.",
+      "test": "Aktuelle gezielte lokale Prüfungen sowie Full Development39715830625 auf d052a3be bestanden: tatsächlicher isolierter Migrationstest, native PostgreSQL-RLS-Rolle und sechs physische parallele Prozessoren, Chromium/WebKit mit Opt-in, Fehlererhalt, Wiederholen, Verlauf, Entfernen und abgelaufenem Gegenfall. Keine echte Mail oder Produktion verwendet.",
       "visualComparison": "Bestehende gemeinsame FormSheet-/DetailDisclosure-/ActionRow-Owner verwendet. Aktuelle gerenderte Abnahme offen, kein neuer Originalscreen behauptet.",
       "blocker": "Garantierter Hintergrund-Mailversand, echte Providerzustellung sowie vollständige fachliche/visuelle/Geräteabnahme fehlen; kein Produktivlauf oder Versand ausgeführt."
     },
@@ -612,6 +612,42 @@
       "test": "Isolierter tatsächlicher Migrationstest mit positivem Versand, Replay, neuem Schlüssel bei unklarem/historischem Fehler, fehlendem Provider ohne Transport, explizitem neuem Versand nach Einrichtung und Zahlungsänderung bestanden; zusätzliche aktuelle Gesamt-CI erforderlich.",
       "visualComparison": "Gemeinsame History-Beschriftung erweitert; aktuelle gerenderte Abnahme offen.",
       "blocker": "Echte Zustell-/Bounce-Nachweise, authentifizierte Provider-Ereignisse und kontrollierter Auflösungsweg für unklare historische Versände bleiben offen. Keine produktive Migration oder Kundenmail ausgeführt."
+    },
+    "R7-30-001": {
+      "sourceTextSha256": "6323bd3939a48b3d70311a5af9a62a13dd4a9a7a4874c3cf06b5ed3b54af8d3d",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "implementation": "Teil-/Vollzahlung, Gutschrift, Rückerstattung und offene Restbeträge besitzen echte Implementierungen. Eine direkte Überzahlung wird aktuell jedoch mit payment_exceeds_balance abgelehnt; dies ist keine umgesetzte Überzahlungsbuchung. Die kompakte Statusprojektion unterscheidet Zahlung und Fälligkeit nicht als vollständige unabhängige Achsen.",
+      "sourceReferences": [
+        "lib/server/repositories/business-api.ts",
+        "lib/financial-status.ts",
+        "components/documents.tsx",
+        "scripts/migration-test.mjs",
+        "scripts/postgres-parallel-test.mjs",
+        "lib/server/credit-notes.ts",
+        "lib/server/repositories/finance.ts"
+      ],
+      "test": "Tatsächlicher aktueller Migrationstest bestanden, einschliesslich expliziter Ablehnung einer Überzahlung und Doppelzahlungs-/Überbuchungsschutz. Dieser Negativnachweis ist kein positiver Test der laut Klausel geforderten Überzahlungsfunktion.",
+      "visualComparison": "Vollständige unabhängige Statusachsen und Überzahlungsdarstellung nicht abgenommen.",
+      "blocker": "Nachgewiesene Implementierungslücke, kein lediglich fehlender Gerätetest: die explizite Erfassung tatsächlicher Überzahlung und vollständige unabhängige Statusachsen fehlen. Ein datierter Guthaben-/Rückerstattungsweg ist für Gutschriften bereits vorhanden (lib/server/credit-notes.ts und repositories/finance.ts); seine direkte Überzahlungsanbindung und deren positive Parallel-/Cash-Prüfungen fehlen. Bestehende Überbuchungssperre nicht einfach entfernen. Keine produktive Datenänderung."
+    },
+    "R7-31-012": {
+      "sourceTextSha256": "f7f49d5dd0c0b1edb643652712d4d25dd45c47c0cb1532ad39f60b752e02756d",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "implementation": "Teil-/Vollzahlung, Gutschrift, Rückerstattung und offene Restbeträge besitzen echte Implementierungen. Eine direkte Überzahlung wird aktuell jedoch mit payment_exceeds_balance abgelehnt; dies ist keine umgesetzte Überzahlungsbuchung. Die kompakte Statusprojektion unterscheidet Zahlung und Fälligkeit nicht als vollständige unabhängige Achsen.",
+      "sourceReferences": [
+        "lib/server/repositories/business-api.ts",
+        "lib/financial-status.ts",
+        "components/documents.tsx",
+        "scripts/migration-test.mjs",
+        "scripts/postgres-parallel-test.mjs",
+        "lib/server/credit-notes.ts",
+        "lib/server/repositories/finance.ts"
+      ],
+      "test": "Tatsächlicher aktueller Migrationstest bestanden, einschliesslich expliziter Ablehnung einer Überzahlung und Doppelzahlungs-/Überbuchungsschutz. Dieser Negativnachweis ist kein positiver Test der laut Klausel geforderten Überzahlungsfunktion.",
+      "visualComparison": "Vollständige unabhängige Statusachsen und Überzahlungsdarstellung nicht abgenommen.",
+      "blocker": "Nachgewiesene Implementierungslücke, kein lediglich fehlender Gerätetest: die explizite Erfassung tatsächlicher Überzahlung und vollständige unabhängige Statusachsen fehlen. Ein datierter Guthaben-/Rückerstattungsweg ist für Gutschriften bereits vorhanden (lib/server/credit-notes.ts und repositories/finance.ts); seine direkte Überzahlungsanbindung und deren positive Parallel-/Cash-Prüfungen fehlen. Bestehende Überbuchungssperre nicht einfach entfernen. Keine produktive Datenänderung."
     }
   },
   "tests": {

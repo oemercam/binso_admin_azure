@@ -14,6 +14,7 @@ fachliche, visuelle oder produktive Freigabe.
 | [Rollenfokus und Kennzahlen](route-role-kpi.csv) | Rollenabhängiger Seitenzweck und erreichbare Daten-/KPI-Owner; keine Berechnungs- oder Sichtfreigabe aus dem Importgraphen. |
 | [Implementierungsnachweise](evidence.json) | Quellhashgebundene Teilnachweise und explizite externe Blocker. Ergebnisnotizen allein erteilen keine Freigabe. |
 | [Abgleich7bc/a9b](evidence-reconciliation.md) / [a9b-Report](ci-a9b7e1fc.json) | Getrennte tatsächliche Commit-/Run-/Artefaktnachweise; neue Quellen benötigen neue Prüfungen. |
+| [Aktueller CI-Report](ci-d052a3be.json) / [Git-Blob-Abgleich](ci-d052a3be-source.json) | Full Development39715830625 auf d052a3be erfolgreich; 865 Quellen und 69 reine lokale Zeilenendenabweichungen konkret abgeglichen. |
 | [Priorisierte Restbewertung](completion-review.md) | Implementierungslücken, fehlende Abnahmen und externe Konfiguration getrennt. |
 
 ## Zentrale Implementierungspakete
@@ -45,7 +46,7 @@ fachliche, visuelle oder produktive Freigabe.
 
 ## Was ausdrücklich noch nicht nachgewiesen ist
 
-Der erfolgreiche vollständige Development-Lauf39697429990 aufa9b7e1fc enthält
+Der aktuelle erfolgreiche vollständige Development-Lauf39715830625 aufd052a3be enthält
 beide funktionalen Browserjobs und alle sechs Responsive-Jobs sowie tatsächliche
 PostgreSQL-Parallelprüfungen. Der Compliance-Report bleibt `compliant:false`:
 0 fehlgeschlagene Checks bedeuten nicht573 unabhängige Klauselfreigaben. Er enthält
@@ -64,8 +65,9 @@ diese Punkte nicht. Die MwSt.-Auswertung ist keine vollständige Steuerdeklarati
 Der bisher offene Entwicklungsbefund `braces` wurde im aktuellen Folgequellbaum
 [ursächlich aus dem Next-Lintpfad entfernt](security-braces.md). Die Audit-Ausnahme
 ist entfernt; alle High-/Critical-Befunde bleiben blockierend. Lokale gezielte Tests,
-Frozen-Installation, Lint und Dependency-Audits bestehen. Neue vollständige Commit-CI
-ist für diesen Folgequellstand noch erforderlich; Main wurde dadurch nicht geändert.
+Frozen-Installation, Lint und Dependency-Audits bestehen. Aktuelle PR-Quality, CodeQL
+und Full Development einschliesslich aller acht Browserjobs sind erfolgreich; Main
+wurde dadurch nicht geändert. Der Default-Branch-Alert wird nicht als geschlossen behauptet.
 
 Alle Änderungen liegen auf `feat/v25-revision7`, Draft-PR307. Main, bestehende
 Sicherheitsarbeiten und andere offene PRs bleiben erhalten. Neue Migrationen wurden
