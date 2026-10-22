@@ -1,4 +1,69 @@
 {
+  "Kein Rabatt": [
+    "No discount",
+    "Aucune remise",
+    "Nessuno sconto"
+  ],
+  "Prozent": [
+    "Percent",
+    "Pourcentage",
+    "Percentuale"
+  ],
+  "Fixbetrag": [
+    "Fixed amount",
+    "Montant fixe",
+    "Importo fisso"
+  ],
+  "Rabatt in Prozent": [
+    "Discount percentage",
+    "Remise en pourcentage",
+    "Sconto percentuale"
+  ],
+  "Rabattbetrag": [
+    "Discount amount",
+    "Montant de la remise",
+    "Importo dello sconto"
+  ],
+  "Positionsrabatt": [
+    "Line discount",
+    "Remise de position",
+    "Sconto sulla posizione"
+  ],
+  "Positionsrabatte": [
+    "Line discounts",
+    "Remises de position",
+    "Sconti sulle posizioni"
+  ],
+  "Rabattart": [
+    "Discount type",
+    "Type de remise",
+    "Tipo di sconto"
+  ],
+  "Kundenrabatt vorgeschlagen": [
+    "Suggested customer discount",
+    "Remise client proposée",
+    "Sconto cliente proposto"
+  ],
+  "Rabattoptionen": [
+    "Discount options",
+    "Options de remise",
+    "Opzioni di sconto"
+  ],
+  "Kundenrabatt übernehmen": [
+    "Apply customer discount",
+    "Appliquer la remise client",
+    "Applica lo sconto cliente"
+  ],
+  "Berechnung wurde geändert. Bitte den gespeicherten Stand prüfen.": [
+    "The calculation changed. Please review the saved document.",
+    "Le calcul a changé. Veuillez vérifier le document enregistré.",
+    "Il calcolo è cambiato. Verifica il documento salvato."
+  ],
+  "Dokument wurde inzwischen geändert. Bitte neu laden und Angaben prüfen.": [
+    "The document has changed. Please reload and review the details.",
+    "Le document a été modifié. Veuillez le recharger et vérifier les données.",
+    "Il documento è stato modificato. Ricaricalo e verifica i dati."
+  ],
   "Rabatt": [
     "Discount",
     "Remise",

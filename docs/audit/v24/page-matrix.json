@@ -1,5 +1,5 @@
 {
-  "commit": "864d1b534cda06706db0b67ec55a981b115891b6",
+  "commit": "6d8eb7697f342c65eabe0add54de22434aca26ea",
   "method": "Existing TypeScript AST dependency inventory; conditional reachability is not runtime proof",
   "pages": [
     {
@@ -349,6 +349,9 @@
         "components/documents.tsx#dateOnly",
         "components/use-process-draft.ts#useProcessDraft",
         "components/documents.tsx#editableDocumentSnapshot",
+        "components/documents.tsx#calculateDraft",
+        "components/documents.tsx#decimalInput",
+        "components/documents.tsx#cleanDiscount",
         "components/documents.tsx#documentPayload",
         "components/documents.tsx#invoiceDueIso",
         "components/documents.tsx#numberValue",
@@ -375,6 +378,8 @@
         "components/documents.tsx#isoToSwiss",
         "components/ui.tsx#SectionTitle",
         "components/documents.tsx#money",
+        "components/documents.tsx#lineAmount",
+        "components/documents.tsx#DocumentTotals",
         "components/offer-history.tsx#OfferHistory",
         "components/offer-history.tsx#History",
         "components/offer-history.tsx#Event",
@@ -440,6 +445,7 @@
         "components/directory-select.tsx#DirectorySelect",
         "components/directory-select.tsx#Item",
         "components/directory-select.tsx#Page",
+        "components/documents.tsx#DiscountFields",
         "components/documents.tsx#DocumentReview",
         "components/app-shell.tsx#AppShell",
         "components/app-shell.tsx#ShellProps",
@@ -482,7 +488,8 @@
         "components/header-panel-content.tsx#AccountPanel",
         "components/locale-switcher.tsx#LocaleSwitcher",
         "components/app-shell.tsx#ShellRegistration",
-        "components/app-shell.tsx#ShellConfiguration"
+        "components/app-shell.tsx#ShellConfiguration",
+        "components/documents.tsx#documentPreviewPayload"
       ],
       "layouts": [
         "app/layout.tsx",
@@ -492,27 +499,27 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 416,
+          "line": 442,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 416,
+          "line": 442,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "ActionSheet",
-          "line": 418,
+          "line": 444,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 436,
+          "line": 462,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 437,
+          "line": 463,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
@@ -567,7 +574,12 @@
         },
         {
           "tag": "FormSheet",
-          "line": 587,
+          "line": 629,
+          "component": "components/documents.tsx#DocumentEditor"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 630,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
@@ -684,6 +696,9 @@
         "components/documents.tsx#dateOnly",
         "components/use-process-draft.ts#useProcessDraft",
         "components/documents.tsx#editableDocumentSnapshot",
+        "components/documents.tsx#calculateDraft",
+        "components/documents.tsx#decimalInput",
+        "components/documents.tsx#cleanDiscount",
         "components/documents.tsx#documentPayload",
         "components/documents.tsx#invoiceDueIso",
         "components/documents.tsx#numberValue",
@@ -710,6 +725,8 @@
         "components/documents.tsx#isoToSwiss",
         "components/ui.tsx#SectionTitle",
         "components/documents.tsx#money",
+        "components/documents.tsx#lineAmount",
+        "components/documents.tsx#DocumentTotals",
         "components/offer-history.tsx#OfferHistory",
         "components/offer-history.tsx#History",
         "components/offer-history.tsx#Event",
@@ -775,6 +792,7 @@
         "components/directory-select.tsx#DirectorySelect",
         "components/directory-select.tsx#Item",
         "components/directory-select.tsx#Page",
+        "components/documents.tsx#DiscountFields",
         "components/documents.tsx#DocumentReview",
         "components/app-shell.tsx#AppShell",
         "components/app-shell.tsx#ShellProps",
@@ -817,7 +835,8 @@
         "components/header-panel-content.tsx#AccountPanel",
         "components/locale-switcher.tsx#LocaleSwitcher",
         "components/app-shell.tsx#ShellRegistration",
-        "components/app-shell.tsx#ShellConfiguration"
+        "components/app-shell.tsx#ShellConfiguration",
+        "components/documents.tsx#documentPreviewPayload"
       ],
       "layouts": [
         "app/layout.tsx",
@@ -827,27 +846,27 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 416,
+          "line": 442,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 416,
+          "line": 442,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "ActionSheet",
-          "line": 418,
+          "line": 444,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 436,
+          "line": 462,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 437,
+          "line": 463,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
@@ -902,7 +921,12 @@
         },
         {
           "tag": "FormSheet",
-          "line": 587,
+          "line": 629,
+          "component": "components/documents.tsx#DocumentEditor"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 630,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
@@ -3302,7 +3326,7 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 348,
+          "line": 350,
           "component": "components/pages/settings.tsx#SubscriptionSettingsPage"
         },
         {
@@ -4414,12 +4438,12 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 216,
+          "line": 218,
           "component": "components/pages/settings.tsx#CompanySettingsPage"
         },
         {
           "tag": "ConfirmDialog",
-          "line": 219,
+          "line": 221,
           "component": "components/pages/settings.tsx#CompanySettingsPage"
         },
         {
@@ -4644,7 +4668,7 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 115,
+          "line": 117,
           "component": "components/pages/settings.tsx#AccountSettingsPage"
         },
         {
@@ -4709,7 +4733,7 @@
         },
         {
           "tag": "FormSheet",
-          "line": 13,
+          "line": 17,
           "component": "components/avatar-upload.tsx#AvatarUpload"
         },
         {
@@ -12644,6 +12668,9 @@
         "components/documents.tsx#dateOnly",
         "components/use-process-draft.ts#useProcessDraft",
         "components/documents.tsx#editableDocumentSnapshot",
+        "components/documents.tsx#calculateDraft",
+        "components/documents.tsx#decimalInput",
+        "components/documents.tsx#cleanDiscount",
         "components/documents.tsx#documentPayload",
         "components/documents.tsx#invoiceDueIso",
         "components/documents.tsx#numberValue",
@@ -12670,6 +12697,8 @@
         "components/documents.tsx#isoToSwiss",
         "components/ui.tsx#SectionTitle",
         "components/documents.tsx#money",
+        "components/documents.tsx#lineAmount",
+        "components/documents.tsx#DocumentTotals",
         "components/offer-history.tsx#OfferHistory",
         "components/offer-history.tsx#History",
         "components/offer-history.tsx#Event",
@@ -12735,6 +12764,7 @@
         "components/directory-select.tsx#DirectorySelect",
         "components/directory-select.tsx#Item",
         "components/directory-select.tsx#Page",
+        "components/documents.tsx#DiscountFields",
         "components/documents.tsx#DocumentReview",
         "components/app-shell.tsx#AppShell",
         "components/app-shell.tsx#ShellProps",
@@ -12777,7 +12807,8 @@
         "components/header-panel-content.tsx#AccountPanel",
         "components/locale-switcher.tsx#LocaleSwitcher",
         "components/app-shell.tsx#ShellRegistration",
-        "components/app-shell.tsx#ShellConfiguration"
+        "components/app-shell.tsx#ShellConfiguration",
+        "components/documents.tsx#documentPreviewPayload"
       ],
       "layouts": [
         "app/layout.tsx",
@@ -12787,27 +12818,27 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 416,
+          "line": 442,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 416,
+          "line": 442,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "ActionSheet",
-          "line": 418,
+          "line": 444,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 436,
+          "line": 462,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 437,
+          "line": 463,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
@@ -12862,7 +12893,12 @@
         },
         {
           "tag": "FormSheet",
-          "line": 587,
+          "line": 629,
+          "component": "components/documents.tsx#DocumentEditor"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 630,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
@@ -12979,6 +13015,9 @@
         "components/documents.tsx#dateOnly",
         "components/use-process-draft.ts#useProcessDraft",
         "components/documents.tsx#editableDocumentSnapshot",
+        "components/documents.tsx#calculateDraft",
+        "components/documents.tsx#decimalInput",
+        "components/documents.tsx#cleanDiscount",
         "components/documents.tsx#documentPayload",
         "components/documents.tsx#invoiceDueIso",
         "components/documents.tsx#numberValue",
@@ -13005,6 +13044,8 @@
         "components/documents.tsx#isoToSwiss",
         "components/ui.tsx#SectionTitle",
         "components/documents.tsx#money",
+        "components/documents.tsx#lineAmount",
+        "components/documents.tsx#DocumentTotals",
         "components/offer-history.tsx#OfferHistory",
         "components/offer-history.tsx#History",
         "components/offer-history.tsx#Event",
@@ -13070,6 +13111,7 @@
         "components/directory-select.tsx#DirectorySelect",
         "components/directory-select.tsx#Item",
         "components/directory-select.tsx#Page",
+        "components/documents.tsx#DiscountFields",
         "components/documents.tsx#DocumentReview",
         "components/app-shell.tsx#AppShell",
         "components/app-shell.tsx#ShellProps",
@@ -13112,7 +13154,8 @@
         "components/header-panel-content.tsx#AccountPanel",
         "components/locale-switcher.tsx#LocaleSwitcher",
         "components/app-shell.tsx#ShellRegistration",
-        "components/app-shell.tsx#ShellConfiguration"
+        "components/app-shell.tsx#ShellConfiguration",
+        "components/documents.tsx#documentPreviewPayload"
       ],
       "layouts": [
         "app/layout.tsx",
@@ -13122,27 +13165,27 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 416,
+          "line": 442,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 416,
+          "line": 442,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "ActionSheet",
-          "line": 418,
+          "line": 444,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 436,
+          "line": 462,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 437,
+          "line": 463,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
@@ -13197,7 +13240,12 @@
         },
         {
           "tag": "FormSheet",
-          "line": 587,
+          "line": 629,
+          "component": "components/documents.tsx#DocumentEditor"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 630,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {

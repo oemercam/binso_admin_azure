@@ -178,11 +178,11 @@ export async function apiReadPost<T>(path:string,body:unknown):Promise<T>{
  return result;
 }
 
-export async function apiPatch<T>(path:string,body:unknown,validate?:(value:unknown)=>void):Promise<T>{
+export async function apiPatch<T>(path:string,body:unknown,validate?:(value:unknown)=>void,options:{idempotencyKey?:string}={}):Promise<T>{
   const revision=dataRevision([]);
   const response=await fetchApi(path,{
     method:"PATCH",
-    headers:{"Content-Type":"application/json"},
+    headers:{"Content-Type":"application/json",...(options.idempotencyKey?{"Idempotency-Key":options.idempotencyKey}:{})},
     body:JSON.stringify(body),
   });
   return mutationResult<T>(response,path,"Änderung konnte nicht gespeichert werden.",revision,"PATCH",validate);

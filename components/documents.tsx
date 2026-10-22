@@ -10,7 +10,7 @@ import {deliveryLabel} from "@/lib/offer-activity";
 import {EntityFiles} from "./entity-files";
 import {DirectorySelect} from "./directory-select";
 import {customerDirectory,resolveCustomer,type CustomerDirectory} from "@/lib/customer-identity";
-import {documentTotals} from "@/lib/money";
+import {calculateDocument,type Discount} from "@/lib/money";
 import {documentUnitOptions,positionNumber,moveDocumentLine,duplicateDocumentLine,canDuplicateDocumentLine} from '@/lib/document-lines';
 import {useApiQuery,useDataRevision} from "@/lib/client/use-api-query";
 import {FormWizard} from "./form-wizard";
@@ -38,6 +38,9 @@ type LineItem = {
   description: string;
   quantity: string;
   price: string;
+  discount?:Discount;
+  taxExempt?:boolean;
+  lineTotal?:string;
   vatRate?: string;
   unit?: string;
   expenseIds?: string[];
@@ -45,6 +48,10 @@ type LineItem = {
 };
 
 type DocumentDraft = {
+  discount?:Discount;
+  discountOrigin?:'manual'|'customer'|'removed';
+  calculation?:ReturnType<typeof calculateDocument>;
+  updatedAt?:string;
   id?: string;
   reference?: string;
   title?: string;
@@ -79,7 +86,7 @@ type DocumentDraft = {
 
 
 function useCustomerDirectory(enabled=true,selectedId?:string) {
-  const {data,loading,error,refresh}=useApiQuery<{items:Array<{id:string;name:string;email?:string;sector?:string;street?:string;postal_code?:string;city?:string}>}>(enabled?("/api/customers?limit=50"):null);
+  const {data,loading,error,refresh}=useApiQuery<{items:Array<{id:string;name:string;email?:string;discount?:number;sector?:string;street?:string;postal_code?:string;city?:string}>}>(enabled?("/api/customers?limit=50"):null);
   const selected=useApiQuery<{item?:Parameters<typeof customerDirectory>[0][number]}>(enabled&&selectedId&&true?"/api/customers/"+encodeURIComponent(selectedId):null);
   const directory=useMemo(()=>{const items=data?.items??[],item=selected.data?.item;return customerDirectory(item&&!items.some(row=>row.id===item.id)?[...items,item]:items);},[data,selected.data]);
   return {directory,loading:loading||selected.loading,error:error??selected.error,refresh:()=>{refresh();selected.refresh()}};
@@ -127,6 +134,10 @@ function invoiceDueIso(date:string,days:string) {
 
 function documentPayload(kind:DocumentKind,draft:DocumentDraft) {
   return {
+    discount:cleanDiscount(draft.discount,draft.currency??'CHF'),
+    discountOrigin:draft.discount?.kind==='none'?'removed':draft.id?'manual':draft.discountOrigin??'manual',
+    calculationRevision:1,
+    expectedUpdatedAt:draft.id?draft.updatedAt:undefined,
     kind:kind==="Rechnung"?"invoice":"offer",
     customerName:draft.customer,
     customerId:draft.customerId,
@@ -137,20 +148,26 @@ function documentPayload(kind:DocumentKind,draft:DocumentDraft) {
     vatRate:numberValue(draft.vatRate),
     note:draft.note,
     currency:draft.currency??"CHF",
-    items:draft.positions.map(item=>({unit:item.unit??"Stück",description:item.description,quantity:numberValue(item.quantity),unitPrice:numberValue(item.price),vatRate:numberValue(item.vatRate??draft.vatRate),expenseIds:item.expenseIds??[],timeEntryIds:item.timeEntryIds??[]})),
+    items:draft.positions.map(item=>({discount:cleanDiscount(item.discount,draft.currency??'CHF'),taxExempt:item.taxExempt??false,unit:item.unit??"Stück",description:item.description,quantity:numberValue(item.quantity),unitPrice:numberValue(item.price),vatRate:numberValue(item.vatRate??draft.vatRate),expenseIds:item.expenseIds??[],timeEntryIds:item.timeEntryIds??[]})),
   };
 }
 
+function documentPreviewPayload(kind:DocumentKind,draft:DocumentDraft,sourceNumber?:string){return {...draft,kind,sourceNumber,discount:cleanDiscount(draft.discount,draft.currency??'CHF'),positions:draft.positions.map(item=>({...item,quantity:decimalInput(item.quantity),price:decimalInput(item.price),vatRate:decimalInput(item.vatRate??draft.vatRate),discount:cleanDiscount(item.discount,draft.currency??'CHF')}))};}
 function useDocumentDraft(initial:DocumentDraft) {
   return useState(initial);
 }
 
-function useDocumentTotals(draft:DocumentDraft) {
-  return useMemo(()=>{
-    const {subtotal,vat,total}=documentTotals(draft.positions.map(item=>({quantity:numberValue(item.quantity),unit_price:numberValue(item.price),vat_rate:numberValue(item.vatRate??draft.vatRate)})));
-    return { subtotal:Number.isFinite(draft.subtotal)?draft.subtotal!:subtotal, vat:Number.isFinite(draft.vat)?draft.vat!:vat, total:Number.isFinite(draft.total)?draft.total!:total };
-  },[draft]);
+function decimalInput(value:string){return value.replace(/['’\s]/g,'').replace(',','.');}
+function cleanDiscount(value:Discount|undefined,currency:string):Discount{if(!value||value.kind==='none')return {kind:'none'};return value.kind==='percent'?{kind:'percent',value:decimalInput(value.value)}:{kind:'fixed',value:decimalInput(value.value),currency:value.currency||currency};}
+function calculateDraft(draft:DocumentDraft){
+ if(draft.total!==undefined&&!draft.calculation)return {subtotal:draft.subtotal??0,vat:draft.vat??0,total:draft.total,calculation:undefined,error:null as string|null};
+ try{
+  const calculation=draft.total!==undefined&&draft.calculation?draft.calculation:calculateDocument(draft.positions.map(item=>({quantity:decimalInput(item.quantity),unit_price:decimalInput(item.price),vat_rate:decimalInput(item.vatRate??draft.vatRate),discount:cleanDiscount(item.discount,draft.currency??'CHF'),tax_exempt:item.taxExempt??false})),draft.currency??'CHF',cleanDiscount(draft.discount,draft.currency??'CHF'));
+  return {subtotal:draft.subtotal??Number(calculation.subtotal),vat:draft.vat??Number(calculation.vat),total:draft.total??Number(calculation.total),calculation,error:null as string|null};
+ }catch(error){return {subtotal:0,vat:0,total:0,calculation:undefined,error:error instanceof Error?error.message:'Ungültige Berechnung.'};}
 }
+function useDocumentTotals(draft:DocumentDraft){return useMemo(()=>calculateDraft(draft),[draft]);}
+function lineAmount(item:LineItem,calculation:ReturnType<typeof calculateDocument>|undefined,index:number){return Number(calculation?.lines[index]?.net??item.lineTotal??0);}
 
 function remoteDraftFromItem(item:Record<string,unknown>,kind:DocumentKind):DocumentDraft {
   const customer=item.customer as {name?:string}|null|undefined;
@@ -166,6 +183,10 @@ function remoteDraftFromItem(item:Record<string,unknown>,kind:DocumentKind):Docu
     due=Number.isFinite(days)?String(days):"";
   }
   return {
+    discount:(item.calculation as DocumentDraft['calculation'])?.discount??{kind:'none'},
+    calculation:item.calculation as DocumentDraft['calculation'],
+    updatedAt:String(item.document_revision??item.updated_at??''),
+    discountOrigin:'manual',
     id:String(item.id??""),
     reference:String(item.qr_reference??""),
     title:String(item.title??""),
@@ -197,6 +218,9 @@ function remoteDraftFromItem(item:Record<string,unknown>,kind:DocumentKind):Docu
     note:String(item.note??""),
     positions:rawItems.sort((a,b)=>Number(a.position??0)-Number(b.position??0)).map((line,index)=>({
       id:String(line.id??("line-"+(index+1))),
+      discount:line.discount as Discount??{kind:'none'},
+      taxExempt:line.tax_exempt===true,
+      lineTotal:String(line.line_total??0),
       description:String(line.description??""),
       quantity:String(line.quantity??"1"),
       price:String(line.unit_price??"0.00"),
@@ -225,7 +249,7 @@ function useExistingDocument(kind:DocumentKind,documentKey:string|undefined,setD
   return {loading,error,refresh:()=>setRefreshVersion(value=>value+1)};
 }
 
-function editableDocumentSnapshot(draft:DocumentDraft){const value={...draft};delete value.subtotal;delete value.vat;delete value.total;return JSON.stringify(value);}
+function editableDocumentSnapshot(draft:DocumentDraft){const value={...draft};delete value.subtotal;delete value.vat;delete value.total;delete value.calculation;return JSON.stringify(value);}
 
 export function OfferEditor({ existing = false, documentKey }: { existing?: boolean; documentKey?: string }) {
   return <DocumentPage kind="Angebot" existing={existing} documentKey={documentKey}/>;
@@ -345,6 +369,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const show=(message:string)=>{setToast(message);window.setTimeout(()=>setToast(null),2300);};
   const save=async()=>{
     if(documentSavePending.current||companyPending||documentLoad.loading||documentLoad.error||customersLoading||customersError||sourceLoading||sourceError||billingLoading||billingError||!recovery.ready)return;
+    const totals=calculateDraft({...draft,subtotal:undefined,vat:undefined,total:undefined,calculation:undefined});if(totals.error){show(totals.error);return;}
     if(!resolveCustomer(draft,directory)){show("Bitte zuerst einen Kunden erfassen.");return;}
     if(company.error){show(company.error);return;}
     documentSavePending.current=true;setSaving(true);
@@ -354,9 +379,10 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
       {
         const payload={...documentPayload(kind,draft),sourceOffer:sourceOffer||undefined,customerId:resolveCustomer(draft,directory)?.id??draft.customerId};
         const requestBody=JSON.stringify(payload);
-        if(!existing&&createRequest.current?.body!==requestBody){createRequest.current={body:requestBody,key:crypto.randomUUID()};setDraftReplay(createRequest.current);}
+        if(createRequest.current?.body!==requestBody){createRequest.current={body:requestBody,key:crypto.randomUUID()};setDraftReplay(createRequest.current);}
         if(!existing)recovery.persist({draft,step:wizardStep,replay:createRequest.current});
-        const response=existing?await apiPatch<{item:Record<string,unknown>}>("/api/documents/"+encodeURIComponent(documentKey??draft.number),payload):await apiPost<{item:Record<string,unknown>}>("/api/documents",payload,{idempotencyKey:createRequest.current?.key});
+        const response=existing?await apiPatch<{item:Record<string,unknown>}>("/api/documents/"+encodeURIComponent(documentKey??draft.number),payload,undefined,{idempotencyKey:createRequest.current?.key}):await apiPost<{item:Record<string,unknown>}>("/api/documents",payload,{idempotencyKey:createRequest.current?.key});
+        if(Number(response.item.total)!==totals.total)throw new Error('Berechnung wurde geändert. Bitte den gespeicherten Stand prüfen.');
         savedNumber=String(response.item.number);
         setDraft(remoteDraftFromItem(response.item,kind));
       }
@@ -408,13 +434,13 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
           </div>
 
         </div>
-      : !existing?<FormWizard cancelAction={<Button variant="secondary" onClick={closeCreation} disabled={saving}><LocalizedText>{"Abbrechen"}</LocalizedText></Button>} labels={["Kunde und Dokumentdaten","Positionen",kind==="Angebot"?"Gültig bis":"Zahlungsbedingungen","Prüfen und als Entwurf speichern"]} step={wizardStep} onStep={setWizardStep} busy={saving} action={<Button disabled={saving||productQuery.loading||Boolean(productQuery.error)||companyPending||Boolean(company.error)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)} onClick={()=>void save()}><LocalizedText>{saving?"Wird gespeichert…":existing?"Speichern":"Als Entwurf speichern"}</LocalizedText></Button>}><DocumentEditor type={kind} draft={draft} onChange={next=>{draftBaseline.current??=editableDocumentSnapshot(draft);setDirty(editableDocumentSnapshot(next)!==draftBaseline.current);setDraft({...next,subtotal:undefined,vat:undefined,total:undefined})}} directory={directory} lockedCustomer={Boolean(sourceOffer)} step={!existing?wizardStep:undefined}/>{wizardStep===3&&<DocumentReview type={kind} draft={draft} onStep={setWizardStep}/>}{wizardStep===1&&editing&&kind==="Rechnung"&&draft.customerId&&tenantCan(documentRole,"invoices:write")&&<Button variant="secondary" href={"/zeit?invoice="+encodeURIComponent(existing?draft.number:"")+"&customerId="+encodeURIComponent(draft.customerId)}><LocalizedText>{"Freigegebene Zeiten hinzufügen"}</LocalizedText></Button>}</FormWizard>:<DocumentEditor type={kind} draft={draft} onChange={next=>{draftBaseline.current??=editableDocumentSnapshot(draft);setDirty(editableDocumentSnapshot(next)!==draftBaseline.current);setDraft({...next,subtotal:undefined,vat:undefined,total:undefined})}} directory={directory} lockedCustomer={Boolean(sourceOffer)} step={!existing?wizardStep:undefined}/>}
+      : !existing?<FormWizard cancelAction={<Button variant="secondary" onClick={closeCreation} disabled={saving}><LocalizedText>{"Abbrechen"}</LocalizedText></Button>} labels={["Kunde und Dokumentdaten","Positionen",kind==="Angebot"?"Gültig bis":"Zahlungsbedingungen","Prüfen und als Entwurf speichern"]} step={wizardStep} onStep={setWizardStep} busy={saving} action={<Button disabled={saving||productQuery.loading||Boolean(productQuery.error)||companyPending||Boolean(company.error)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)} onClick={()=>void save()}><LocalizedText>{saving?"Wird gespeichert…":existing?"Speichern":"Als Entwurf speichern"}</LocalizedText></Button>}><DocumentEditor type={kind} draft={draft} onChange={next=>{draftBaseline.current??=editableDocumentSnapshot(draft);setDirty(editableDocumentSnapshot(next)!==draftBaseline.current);setDraft({...next,calculation:undefined,subtotal:undefined,vat:undefined,total:undefined})}} directory={directory} lockedCustomer={Boolean(sourceOffer)} step={!existing?wizardStep:undefined}/>{wizardStep===3&&<DocumentReview type={kind} draft={draft} onStep={setWizardStep}/>}{wizardStep===1&&editing&&kind==="Rechnung"&&draft.customerId&&tenantCan(documentRole,"invoices:write")&&<Button variant="secondary" href={"/zeit?invoice="+encodeURIComponent(existing?draft.number:"")+"&customerId="+encodeURIComponent(draft.customerId)}><LocalizedText>{"Freigegebene Zeiten hinzufügen"}</LocalizedText></Button>}</FormWizard>:<DocumentEditor type={kind} draft={draft} onChange={next=>{draftBaseline.current??=editableDocumentSnapshot(draft);setDirty(editableDocumentSnapshot(next)!==draftBaseline.current);setDraft({...next,subtotal:undefined,vat:undefined,total:undefined})}} directory={directory} lockedCustomer={Boolean(sourceOffer)} step={!existing?wizardStep:undefined}/>}
     {editing&&existing&&kind==="Rechnung"&&draft.customerId&&tenantCan(documentRole,"invoices:write")&&<Button variant="secondary" href={"/zeit?invoice="+encodeURIComponent(draft.number)+"&customerId="+encodeURIComponent(draft.customerId)}><LocalizedText>{"Freigegebene Zeiten hinzufügen"}</LocalizedText></Button>}
     {editing&&existing&&<FormActions><Button variant="secondary" onClick={closeEdit}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button disabled={saving||companyPending||Boolean(company.error)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)} onClick={()=>void save()}><LocalizedText>{saving?"Wird gespeichert…":existing?"Speichern":kind+" erstellen"}</LocalizedText></Button></FormActions>}
   </>;
   return <AppShell title={existing?editing?kind+" bearbeiten":kind:title} titleIsUserContent={false} status={undefined} statusTone={presentation.statusTone} subtitle={undefined} active={plural} backHref={returnTo} backLabel={returnTo==="/dashboard"?"Übersicht":kind==="Angebot"?"Angebote":"Rechnungen"} actions={desktopActions} mobileActions={existing&&!editing?headerActions:undefined} preview={preview} editing={editing} unsavedChanges={false}>
     {existing?(editing?<FormSheet workspace label={kind+" bearbeiten"} open onClose={closeEdit} busy={saving} dirty={dirty}>{documentContent}</FormSheet>:documentContent):<FormSheet workspace label={title} open onClose={closeCreation} busy={saving} dirty={dirty} wizard className="document-entry-workspace">{documentContent}</FormSheet>}
-    {preview&&<DocumentModal previewDraft={{...draft,kind,sourceNumber:existing&&editing?documentKey:undefined}} pdfNumber={existing&&!editing?documentKey??draft.number:undefined} title={kind==="Angebot"?"Angebotsvorschau":"Rechnungsvorschau"} onClose={()=>setPreview(false)}/>}
+    {preview&&<DocumentModal previewDraft={documentPreviewPayload(kind,draft,existing&&editing?documentKey:undefined)} pdfNumber={existing&&!editing?documentKey??draft.number:undefined} title={kind==="Angebot"?"Angebotsvorschau":"Rechnungsvorschau"} onClose={()=>setPreview(false)}/>}
     <ActionSheet label="Weitere Aktionen" open={moreOpen} busy={actionBusy} onClose={()=>setMoreOpen(false)}><div className="action-list">
       {canEdit&&<ActionRow icon="edit" title="Bearbeiten" onClick={()=>{draftBaseline.current=editableDocumentSnapshot(draft);setMoreOpen(false);setEditing(true)}} navigation/>}
       <ActionRow icon="copy" title="Nummer kopieren" onClick={()=>{void navigator.clipboard.writeText(draft.number).then(()=>{setMoreOpen(false);show("Nummer kopiert.")}).catch(()=>{setActionError("Nummer konnte nicht kopiert werden.")})}}/>
@@ -444,9 +470,9 @@ function DocumentReview({type,draft,onStep}:{type:DocumentKind;draft:DocumentDra
  const totals=useDocumentTotals(draft),currency=draft.currency??"CHF";
  return <div className="document-review">
   <section className="form-section"><SectionTitle title="Kunde" action={<Button variant="ghost" icon="edit" onClick={()=>onStep(0)}><LocalizedText>{"Bearbeiten"}</LocalizedText></Button>}/><strong>{draft.customer}</strong><p><LocalizedText>{type==="Rechnung"?"Rechnungsdatum":"Angebotsdatum"}</LocalizedText>: {isoToSwiss(draft.date)}</p></section>
-  <section className="form-section"><SectionTitle title="Positionen" action={<Button variant="ghost" icon="edit" onClick={()=>onStep(1)}><LocalizedText>{"Bearbeiten"}</LocalizedText></Button>}/><div className="document-review-positions">{draft.positions.map(item=><div key={item.id}><span><b>{item.description}</b><small>{item.quantity} × {currency} {money(numberValue(item.price))}</small></span><strong>{currency} {money(numberValue(item.quantity)*numberValue(item.price))}</strong></div>)}</div></section>
+  <section className="form-section"><SectionTitle title="Positionen" action={<Button variant="ghost" icon="edit" onClick={()=>onStep(1)}><LocalizedText>{"Bearbeiten"}</LocalizedText></Button>}/><div className="document-review-positions">{draft.positions.map((item,index)=><div key={item.id}><span><b>{item.description}</b><small>{item.quantity} × {currency} {money(numberValue(item.price))}</small></span><strong>{currency} {money(lineAmount(item,totals.calculation,draft.positions.indexOf(item)))}</strong></div>)}</div></section>
   <section className="form-section"><SectionTitle title={type==="Angebot"?"Gültig bis":"Zahlungsbedingungen"} action={<Button variant="ghost" icon="edit" onClick={()=>onStep(2)}><LocalizedText>{"Bearbeiten"}</LocalizedText></Button>}/><p>{type==="Rechnung"?<>{draft.due}<LocalizedText>{" Tage"}</LocalizedText></>:isoToSwiss(draft.due)}</p>{draft.note&&<p>{draft.note}</p>}</section>
-  <div className="invoice-totals"><span><LocalizedText>{"Zwischentotal "}</LocalizedText><b>{currency} {money(totals.subtotal)}</b></span><span><LocalizedText>{"MwSt. "}</LocalizedText><b>{currency} {money(totals.vat)}</b></span><strong><LocalizedText>{"Total "}</LocalizedText><b>{currency} {money(totals.total)}</b></strong></div>
+  <DocumentTotals draft={draft} totals={totals}/>
  </div>;
 }
 
@@ -489,14 +515,10 @@ function DocumentReadView({type,draft,directory,canWrite,followup}:{type:Documen
           <b><LocalizedText verbatim={true}>{item.description}</LocalizedText></b>
           <span>{item.quantity} <LocalizedText>{({hour:"Std.",piece:"Stück",flat:"Pauschal"} as Record<string,string>)[item.unit??""]??item.unit??"Stück"}</LocalizedText><small className="document-mobile-price"><LocalizedText>{" × "}</LocalizedText>{currency} {money(numberValue(item.price))}</small></span>
           <span>{currency} {money(numberValue(item.price))}</span>
-          <strong>{currency} {money(numberValue(item.quantity)*numberValue(item.price))}</strong>
+          <strong>{currency} {money(lineAmount(item,totals.calculation,draft.positions.indexOf(item)))}</strong>
         </div>)}
       </div>
-      <div className="invoice-totals">
-        <span><LocalizedText>{"Zwischentotal "}</LocalizedText><b>{currency} {money(totals.subtotal)}</b></span>
-        <span><LocalizedText>{"MwSt. "}</LocalizedText>{Number(draft.vatRate).toLocaleString("de-CH",{maximumFractionDigits:2})} % <b>{currency} {money(totals.vat)}</b></span>
-        <strong><LocalizedText>{"Total "}</LocalizedText><b>{currency} {money(totals.total)}</b></strong>
-      </div>
+      <DocumentTotals draft={draft} totals={totals}/>
     </section>
     {isInvoice&&Number(draft.creditAmount??0)>0&&<p><LocalizedText>{"Gutschriften"}</LocalizedText>: {currency} {money(Number(draft.creditAmount))}</p>}
     {isInvoice&&creditBalance>0&&<MetricTile label="Kundenguthaben" value={`${currency} ${money(creditBalance)}`}/>}
@@ -516,6 +538,21 @@ function DocumentReadView({type,draft,directory,canWrite,followup}:{type:Documen
   </div>;
 }
 
+function DiscountFields({value,onChange,currency,label}:{value:Discount;onChange:(value:Discount)=>void;currency:string;label:string}){
+ return <section className="document-discount-fields"><Field label={label}><Select value={value.kind} onChange={e=>onChange(e.target.value==='none'?{kind:'none'}:e.target.value==='percent'?{kind:'percent',value:'0'}:{kind:'fixed',value:'0',currency})}><option value="none"><LocalizedText>{"Kein Rabatt"}</LocalizedText></option><option value="percent"><LocalizedText>{"Prozent"}</LocalizedText></option><option value="fixed"><LocalizedText>{"Fixbetrag"}</LocalizedText></option></Select></Field>{value.kind!=='none'&&<Field label={value.kind==='percent'?'Rabatt in Prozent':'Rabattbetrag'}><Input inputMode="decimal" value={value.value} onChange={e=>onChange({...value,value:e.target.value})}/></Field>}</section>;
+}
+function DocumentTotals({draft,totals}:{draft:DocumentDraft;totals:ReturnType<typeof calculateDraft>}){
+ const currency=draft.currency??'CHF',c=totals.calculation;
+ if(totals.error)return <ErrorState><LocalizedText>{totals.error}</LocalizedText></ErrorState>;
+ return <div className="invoice-totals"><span><LocalizedText>{"Zwischentotal"}</LocalizedText><b>{currency} {money(c?Number(c.raw):totals.subtotal)}</b></span>
+ {c?.lines.some(l=>l.discount.kind!=='none')&&<span><LocalizedText>{"Positionsrabatte"}</LocalizedText><b>−{currency} {money(Number(c.positionDiscountDisplay))}</b></span>}
+ {c&&c.discount.kind!=='none'&&<span><LocalizedText>{"Gesamtrabatt"}</LocalizedText><b>−{currency} {money(Number(c.discountDisplay))}</b></span>}
+ {c?c.taxGroups.map((g,index)=><span key={index}><span><LocalizedText>{g.exempt?'Steuerbefreit':'MwSt.'}</LocalizedText>{!g.exempt&&' '+Number(g.rate)+' %'}</span><b>{currency} {money(Number(g.tax))}</b></span>):<span><LocalizedText>{"MwSt."}</LocalizedText><b>{currency} {money(totals.vat)}</b></span>}
+ {c&&c.positionRoundingCents!=='0'&&<span><LocalizedText>{"Rundung"}</LocalizedText><b>{currency} {money(Number(c.positionRoundingCents)/100)}</b></span>}
+ {c&&c.discountRoundingCents!=='0'&&<span><LocalizedText>{"Rundung"}</LocalizedText><b>{currency} {money(Number(c.discountRoundingCents)/100)}</b></span>}
+ <strong><LocalizedText>{"Total"}</LocalizedText><b>{currency} {money(totals.total)}</b></strong></div>;
+}
+
 function DocumentEditor({ type, draft, onChange, directory, step,lockedCustomer=false }: { type:DocumentKind; draft:DocumentDraft; onChange:(draft:DocumentDraft)=>void; directory:CustomerDirectory;step?:number;lockedCustomer?:boolean }) {
 
   const company=useDocumentCompany();
@@ -524,6 +561,11 @@ function DocumentEditor({ type, draft, onChange, directory, step,lockedCustomer=
   const [noteOpen,setNoteOpen]=useState(Boolean(draft.note));
   const [mobilePositionId,setMobilePositionId]=useState<string|null>(null);
   const [positionDraft,setPositionDraft]=useState<LineItem|null>(null);
+  const [discountOpen,setDiscountOpen]=useState(false),[discountDraft,setDiscountDraft]=useState<Discount>({kind:'none'}),[discountOrigin,setDiscountOrigin]=useState<'manual'|'customer'>('manual');
+  const customerDiscount=Number(resolveCustomer(draft,directory)?.discount??0);
+  const discountTotals=calculateDraft({...draft,discount:discountDraft,calculation:undefined,subtotal:undefined,vat:undefined,total:undefined});
+  const positionTotals=positionDraft?calculateDraft({...draft,positions:draft.positions.map(l=>l.id===positionDraft.id?positionDraft:l),calculation:undefined,subtotal:undefined,vat:undefined,total:undefined}):totals;
+  const openDiscount=(customer=false)=>{setDiscountDraft(customer?{kind:'percent',value:String(customerDiscount)}:draft.discount??{kind:'none'});setDiscountOrigin(customer?'customer':'manual');setDiscountOpen(true);};
   const closePosition=()=>{setMobilePositionId(null);setPositionDraft(null);};
 
 
@@ -559,7 +601,7 @@ function DocumentEditor({ type, draft, onChange, directory, step,lockedCustomer=
           <div hidden={step===0}><Field label={type==="Rechnung" ? "Zahlungsfrist" : "Gültig bis"}>
             {type==="Rechnung" ? <Select value={draft.due} onChange={e=>onChange({...draft,due:e.target.value})}>{!["10","30","45"].includes(draft.due)&&<option value={draft.due}>{draft.due}<LocalizedText>{" Tage"}</LocalizedText></option>}<option value="10"><LocalizedText>{"10 Tage"}</LocalizedText></option><option value="30"><LocalizedText>{"30 Tage"}</LocalizedText></option><option value="45"><LocalizedText>{"45 Tage"}</LocalizedText></option></Select> : <Input type="date" value={draft.due} onChange={e=>onChange({...draft,due:e.target.value})}/>}
           </Field></div>
-          <div hidden={step===0}><Field label="MwSt."><Select value={draft.vatRate} onChange={e=>onChange({...draft,vatRate:e.target.value,positions:draft.positions.map(item=>({...item,vatRate:e.target.value}))})}>{domainConfig.vatRates.map(rate=><option key={rate} value={rate}>{rate.toLocaleString("de-CH")} %</option>)}</Select></Field></div>
+          <div hidden={step===0}><Field label="MwSt."><Select value={draft.vatRate} onChange={e=>onChange({...draft,vatRate:e.target.value,positions:draft.positions.map(item=>({...item,vatRate:e.target.value,taxExempt:false}))})}>{domainConfig.vatRates.map(rate=><option key={rate} value={rate}>{rate.toLocaleString("de-CH")} %</option>)}</Select></Field></div>
         </div>
       </div>
       <div hidden={step!==undefined&&step!==1} className="form-section">
@@ -567,7 +609,7 @@ function DocumentEditor({ type, draft, onChange, directory, step,lockedCustomer=
         <div className="line-items document-line-items">
           <div className="line-head"><span><LocalizedText>{"Beschreibung"}</LocalizedText></span><span><LocalizedText>{"Menge"}</LocalizedText></span><span><LocalizedText>{"Einheit"}</LocalizedText></span><span><LocalizedText>{"Einzelpreis"}</LocalizedText></span><span><LocalizedText>{"Total"}</LocalizedText></span><span/></div>
           {draft.positions.map((item,index)=>{
-            const lineTotal=numberValue(item.quantity)*numberValue(item.price);
+            const lineTotal=lineAmount(item,totals.calculation,index);
             return <div className="document-line-item" key={item.id}>
               <button className="mobile-position-summary" type="button" onClick={()=>{setPositionDraft({...item});setMobilePositionId(item.id)}}>
                 <span><b>{positionNumber(index)} <LocalizedText verbatim={true}>{item.description}</LocalizedText></b><small>{item.quantity} <LocalizedText>{({hour:"Std.",piece:"Stück",flat:"Pauschal"} as Record<string,string>)[item.unit??""]??item.unit??"Stück"}</LocalizedText><LocalizedText>{" × "}</LocalizedText><LocalizedText>{draft.currency??"CHF"}</LocalizedText> {money(numberValue(item.price))}</small></span>
@@ -578,13 +620,14 @@ function DocumentEditor({ type, draft, onChange, directory, step,lockedCustomer=
               <label className="mobile-line-field"><span><LocalizedText>{"Einheit"}</LocalizedText></span><Select aria-label="Einheit" value={item.unit??"Stück"} onChange={e=>updatePosition(item.id,{unit:e.target.value})}>{documentUnitOptions(item.unit).map(unit=><option key={unit} value={unit}><LocalizedText>{unit}</LocalizedText></option>)}</Select></label>
               <label className="mobile-line-field"><span><LocalizedText>{"Einzelpreis"}</LocalizedText></span><Input aria-label="Einzelpreis" inputMode="decimal" value={item.price} onChange={e=>updatePosition(item.id,{price:e.target.value})}/></label>
               <div className="mobile-line-total"><span><LocalizedText>{"Total"}</LocalizedText></span><b>{money(lineTotal)}</b></div>
-              <div className="document-line-actions"><ActionsMenu label={'Position '+positionNumber(index)}><ActionRow title="Bearbeiten" icon="edit" onClick={()=>{setPositionDraft({...item});setMobilePositionId(item.id)}}/><ActionRow title="Duplizieren" icon="copy" disabled={!canDuplicateDocumentLine(item)} onClick={()=>onChange({...draft,positions:duplicateDocumentLine(draft.positions,item.id,crypto.randomUUID())})}/><ActionRow title="Nach oben" icon="arrow" disabled={index===0} onClick={()=>onChange({...draft,positions:moveDocumentLine(draft.positions,item.id,-1)})}/><ActionRow title="Nach unten" icon="arrow" disabled={index===draft.positions.length-1} onClick={()=>onChange({...draft,positions:moveDocumentLine(draft.positions,item.id,1)})}/><ActionRow title="Entfernen" icon="trash" disabled={draft.positions.length===1} onClick={()=>removePosition(item.id)}/></ActionsMenu></div>
+              <div className="document-line-actions"><ActionsMenu label={'Position '+positionNumber(index)}><ActionRow title="Bearbeiten" icon="edit" onClick={()=>{setPositionDraft({...item});setMobilePositionId(item.id)}}/><ActionRow title="Rabatt" icon="edit" onClick={()=>{setPositionDraft({...item});setMobilePositionId(item.id)}}/><ActionRow title="Duplizieren" icon="copy" disabled={!canDuplicateDocumentLine(item)} onClick={()=>onChange({...draft,positions:duplicateDocumentLine(draft.positions,item.id,crypto.randomUUID())})}/><ActionRow title="Nach oben" icon="arrow" disabled={index===0} onClick={()=>onChange({...draft,positions:moveDocumentLine(draft.positions,item.id,-1)})}/><ActionRow title="Nach unten" icon="arrow" disabled={index===draft.positions.length-1} onClick={()=>onChange({...draft,positions:moveDocumentLine(draft.positions,item.id,1)})}/><ActionRow title="Entfernen" icon="trash" disabled={draft.positions.length===1} onClick={()=>removePosition(item.id)}/></ActionsMenu></div>
             </div>;
           })}
         </div>
-        <div className="invoice-totals"><span><LocalizedText>{"Zwischentotal "}</LocalizedText><b><LocalizedText>{draft.currency??"CHF"}</LocalizedText> {money(totals.subtotal)}</b></span><span><LocalizedText>{"MwSt. "}</LocalizedText>{Number(draft.vatRate).toLocaleString("de-CH",{maximumFractionDigits:2})} % <b><LocalizedText>{draft.currency??"CHF"}</LocalizedText> {money(totals.vat)}</b></span><strong><LocalizedText>{"Total "}</LocalizedText><b><LocalizedText>{draft.currency??"CHF"}</LocalizedText> {money(totals.total)}</b></strong></div>
+        <div className="document-discount-actions">{!draft.id&&!draft.sourceOffer&&draft.discount===undefined&&customerDiscount>0&&<p><LocalizedText>{"Kundenrabatt vorgeschlagen"}</LocalizedText>: {customerDiscount} %</p>}<ActionsMenu label="Rabattoptionen"><ActionRow title="Gesamtrabatt" icon="edit" onClick={()=>openDiscount()}/>{!draft.id&&!draft.sourceOffer&&customerDiscount>0&&<ActionRow title="Kundenrabatt übernehmen" icon="check" onClick={()=>openDiscount(true)}/>}</ActionsMenu></div><DocumentTotals draft={draft} totals={totals}/>
       </div>
-      {mobilePositionId&&(()=>{const item=positionDraft;if(!item)return null;return <FormSheet label={"Position bearbeiten"} description={item.description} open={true} onClose={closePosition} busy={false} className={"mobile-position-sheet"} layerClassName={"mobile-position-layer"} ariaLabel={"Position bearbeiten"}><div className="sheet-body mobile-position-fields"><Field label="Beschreibung"><Input value={item.description} onChange={e=>setPositionDraft({...item,description:e.target.value})}/></Field><div><Field label="Menge"><Input inputMode="decimal" value={item.quantity} onChange={e=>setPositionDraft({...item,quantity:e.target.value})}/></Field><Field label="Einheit"><Select value={item.unit??"Stück"} onChange={e=>setPositionDraft({...item,unit:e.target.value})}>{documentUnitOptions(item.unit).map(unit=><option key={unit} value={unit}><LocalizedText>{unit}</LocalizedText></option>)}</Select></Field><Field label="Einzelpreis"><Input inputMode="decimal" value={item.price} onChange={e=>setPositionDraft({...item,price:e.target.value})}/></Field></div><div className="mobile-position-sheet-total"><span><LocalizedText>{"Total"}</LocalizedText></span><b><LocalizedText>{draft.currency??"CHF"}</LocalizedText> {money(numberValue(item.quantity)*numberValue(item.price))}</b></div><button className="text-action mobile-position-remove" type="button" disabled={draft.positions.length===1} onClick={()=>{removePosition(item.id);closePosition()}}><LocalizedText>{"Position entfernen"}</LocalizedText></button></div><FormActions sheet><Button variant="secondary" onClick={closePosition}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button onClick={()=>{updatePosition(item.id,item);closePosition()}}><LocalizedText>{"Übernehmen"}</LocalizedText></Button></FormActions></FormSheet>})()}
+      {mobilePositionId&&(()=>{const item=positionDraft;if(!item)return null;return <FormSheet label={"Position bearbeiten"} description={item.description} open={true} onClose={closePosition} busy={false} className={"mobile-position-sheet"} layerClassName={"mobile-position-layer"} ariaLabel={"Position bearbeiten"}><div className="sheet-body mobile-position-fields"><Field label="Beschreibung"><Input value={item.description} onChange={e=>setPositionDraft({...item,description:e.target.value})}/></Field><div><Field label="Menge"><Input inputMode="decimal" value={item.quantity} onChange={e=>setPositionDraft({...item,quantity:e.target.value})}/></Field><Field label="Einheit"><Select value={item.unit??"Stück"} onChange={e=>setPositionDraft({...item,unit:e.target.value})}>{documentUnitOptions(item.unit).map(unit=><option key={unit} value={unit}><LocalizedText>{unit}</LocalizedText></option>)}</Select></Field><Field label="Einzelpreis"><Input inputMode="decimal" value={item.price} onChange={e=>setPositionDraft({...item,price:e.target.value})}/></Field></div><DiscountFields value={item.discount??{kind:'none'}} currency={draft.currency??'CHF'} label="Positionsrabatt" onChange={discount=>setPositionDraft({...item,discount})}/><Field label="MwSt."><Select value={item.vatRate??draft.vatRate} disabled={item.taxExempt} onChange={e=>setPositionDraft({...item,vatRate:e.target.value})}>{domainConfig.vatRates.map(rate=><option key={rate} value={rate}>{rate} %</option>)}</Select></Field><Field label="Steuerbefreit"><Input type="checkbox" checked={item.taxExempt??false} onChange={e=>setPositionDraft({...item,taxExempt:e.target.checked,...(e.target.checked?{vatRate:'0'}:{})})}/></Field>{positionTotals.error&&<ErrorState><LocalizedText>{positionTotals.error}</LocalizedText></ErrorState>}<div className="mobile-position-sheet-total"><span><LocalizedText>{"Total"}</LocalizedText></span><b><LocalizedText>{draft.currency??"CHF"}</LocalizedText> {money(lineAmount(item,positionTotals.calculation,draft.positions.findIndex(l=>l.id===item.id)))}</b></div><button className="text-action mobile-position-remove" type="button" disabled={draft.positions.length===1} onClick={()=>{removePosition(item.id);closePosition()}}><LocalizedText>{"Position entfernen"}</LocalizedText></button></div><FormActions sheet><Button variant="secondary" onClick={closePosition}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button disabled={Boolean(positionTotals.error)} onClick={()=>{updatePosition(item.id,item);closePosition()}}><LocalizedText>{"Übernehmen"}</LocalizedText></Button></FormActions></FormSheet>})()}
+      <FormSheet label="Gesamtrabatt" open={discountOpen} onClose={()=>setDiscountOpen(false)} layerClassName="mobile-position-layer"><div className="sheet-body"><DiscountFields value={discountDraft} currency={draft.currency??'CHF'} label="Rabattart" onChange={value=>{setDiscountDraft(value);setDiscountOrigin('manual')}}/>{discountTotals.error?<ErrorState><LocalizedText>{discountTotals.error}</LocalizedText></ErrorState>:<DocumentTotals draft={draft} totals={discountTotals}/>}</div><FormActions sheet><Button variant="secondary" onClick={()=>setDiscountOpen(false)}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button disabled={Boolean(discountTotals.error)} onClick={()=>{onChange({...draft,discount:discountDraft,discountOrigin:discountDraft.kind==='none'?'removed':discountOrigin});setDiscountOpen(false)}}><LocalizedText>{"Übernehmen"}</LocalizedText></Button></FormActions></FormSheet>
       <div hidden={step!==undefined&&step!==2} className="form-section optional-row document-note-section">{!noteOpen?<button className="text-action add-note-action" type="button" onClick={()=>setNoteOpen(true)}><Icon name="plus" size={16}/><LocalizedText>{" Notiz hinzufügen"}</LocalizedText></button>:<><SectionTitle title="Notiz" action={!draft.note&&<button className="text-action" type="button" onClick={()=>setNoteOpen(false)}><LocalizedText>{"Schliessen"}</LocalizedText></button>}/><Field label="Text für den Kunden"><Textarea autoFocus value={draft.note} onChange={e=>onChange({...draft,note:e.target.value})} placeholder="Optional"/></Field></>}</div>
     </section>
   </div>;

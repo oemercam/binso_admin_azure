@@ -23,6 +23,11 @@ implementiert diesen Vertrag zentral für neue Dokumente und bestätigte Entwür
 Der Paket-4-Eintrag bezeichnet den damaligen Dokumentationsumfang. Native aktuelle
 CI und spätere Bedienungsabnahme sind gesondert nachzuweisen; keine Produktionsfreigabe.
 
+[Paket 6: Editor-/Vorschau-/PDF-Integration](../audit/v25-revision7/package6-discount-editor-pdf.md)
+verbindet den freigegebenen Rechen-Owner mit Rabattbedienung, Wiederaufnahme,
+Dokumentversion und QR-Ausgabe. Gezielte Browser-/HTTP-Abnahme am Paketcommit bleibt
+vom lokalen Rechen-/PDF-Nachweis getrennt; Navigation/FAB bleiben unverändert.
+
 [Anforderungen](../audit/v25-revision7/requirements.csv), [Routen/Rollen/Zustände](../audit/v25-revision7/route-role-states.csv), [Routen, Komponenten, APIs und Migrationen](../audit/v25-revision7/routes.json).
 Generator: scripts/revision7-inventory.mjs. Aktuell 56 Kapitel, 573 Satz-/Prüfklauseln, 78 Routen, 12 konkrete Operator-Varianten und 5588 geplante Route/Rolle/Zustand-Fälle. Zusammengesetzte Klauseln behalten den kompletten Originaltext; sie sind nicht pauschal bestanden.
 Das Register ist eine Vollständigkeitskontrolle, kein Beleg ausgeführter Tests. Noch nicht einzeln ausgeführte Zustands-/Rollen-/Visualfälle bleiben ausdrücklich nicht abgenommen.

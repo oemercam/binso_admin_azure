@@ -1,7 +1,7 @@
-export type CustomerChoice={id?:string;name?:string;email?:string;sector:string;city:string;address:string;zip:string;paymentDays?:number};
+export type CustomerChoice={id?:string;name?:string;email?:string;sector:string;city:string;address:string;zip:string;discount?:number;paymentDays?:number};
 export type CustomerDirectory=Record<string,CustomerChoice>;
-export function customerDirectory(rows:readonly {id:string;name:string;email?:string;sector?:string;city?:string;street?:string;building_number?:string;postal_code?:string;paymentDays?:number}[]):CustomerDirectory{
- return Object.fromEntries(rows.map(item=>[item.id,{id:item.id,name:item.name,...(item.email?{email:item.email}:{}),sector:item.sector??'',city:item.city??'',address:[item.street,item.building_number].filter(Boolean).join(' '),zip:item.postal_code??'',...(item.paymentDays!=null?{paymentDays:item.paymentDays}:{})}]));
+export function customerDirectory(rows:readonly {id:string;name:string;email?:string;sector?:string;city?:string;street?:string;building_number?:string;postal_code?:string;discount?:number;paymentDays?:number}[]):CustomerDirectory{
+ return Object.fromEntries(rows.map(item=>[item.id,{id:item.id,name:item.name,...(item.email?{email:item.email}:{}),discount:item.discount??0,sector:item.sector??'',city:item.city??'',address:[item.street,item.building_number].filter(Boolean).join(' '),zip:item.postal_code??'',...(item.paymentDays!=null?{paymentDays:item.paymentDays}:{})}]));
 }
 /** A persisted ID always wins. Never select another customer after rename/archive.
  * Legacy name-only drafts resolve only when the name is unambiguous. */

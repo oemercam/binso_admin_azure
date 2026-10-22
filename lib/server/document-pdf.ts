@@ -70,19 +70,19 @@ export async function documentPdf(document:Row,liveCompany:Row,logo?:Buffer){
   if(pdf.page===startPage){pdf.fontSize(9).text(quantity,291,y,{width:65,align:'right'});pdf.text(money(item.unit_price),366,y,{width:83,align:'right'});pdf.text(money(amount),459,y,{width:right-459,align:'right'});pdf.fontSize(8).fillColor('#555').text(t('MWST')+' '+Number(item.vat_rate||0).toLocaleString(localeTags[locale])+' %',366,y+15,{width:83,align:'right'});pdf.y=Math.max(after,y+34)+12;}
   else{pdf.y=after;paragraph(`${quantity} × ${money(item.unit_price)} · ${t('MWST')} ${item.vat_rate}% · ${t('Betrag')} ${money(amount)}`,9);}
  }
- ensure(98);const summary=(label:string,value:unknown,bold=false)=>{const y=pdf.y;pdf.font(bold?'Liberation Sans-Bold':'Liberation Sans').fontSize(bold?12:10).fillColor('#111').text(label,300,y,{width:145});pdf.text(money(value),459,y,{width:right-459,align:'right'});pdf.y=y+(bold?27:21)};
+ ensure(98);const summary=(label:string,value:unknown,bold=false)=>{if(record(document.calculation).revision===1)ensure(bold?32:25);const y=pdf.y;pdf.font(bold?'Liberation Sans-Bold':'Liberation Sans').fontSize(bold?12:10).fillColor('#111').text(label,300,y,{width:145});pdf.text(money(value),459,y,{width:right-459,align:'right'});pdf.y=y+(bold?27:21)};
  pdf.moveTo(left,pdf.y).lineTo(right,pdf.y).strokeColor('#aaa').stroke();pdf.y+=14;
  const calculation=record(document.calculation);
- if(calculation.revision===1&&(record(calculation.discount).kind!=='none'||((calculation.lines??[]) as Row[]).some(line=>record(line.discount).kind!=='none')||((calculation.taxGroups??[]) as Row[]).some(group=>group.exempt)||((calculation.taxGroups??[]) as Row[]).length>1)){
-  summary(t('Betrag'),calculation.raw);
-  summary(t('Rabatt')+' '+t('Positionen'),'-'+String(calculation.positionDiscountDisplay));
+ if(calculation.revision===1){
+  summary(t('Zwischentotal'),calculation.raw);
+  if(((calculation.lines??[]) as Row[]).some(line=>record(line.discount).kind!=='none'))summary(t('Positionsrabatte'),'-'+String(calculation.positionDiscountDisplay));
   const discount=record(calculation.discount);
-  summary(t('Gesamtrabatt')+(discount.kind==='percent'?' '+String(discount.value)+' %':''),'-'+String(calculation.discountDisplay));
-  for(const group of (calculation.taxGroups??[]) as Row[]){ensure(25);summary(t('MWST')+' '+String(group.rate)+' %'+(group.exempt?' · '+t('Steuerbefreit'):''),group.tax);}
+  if(discount.kind!=='none')summary(t('Gesamtrabatt')+(discount.kind==='percent'?' '+String(discount.value)+' %':''),'-'+String(calculation.discountDisplay));
+  for(const group of (calculation.taxGroups??[]) as Row[])summary(group.exempt?t('Steuerbefreit'):t('MWST')+' '+Number(group.rate)+' %',group.tax);
   if(calculation.positionRoundingCents!=='0')paragraph(t('Rundung')+' · '+t('Positionen')+': '+String(calculation.positionRoundingCents)+' × 0.01 '+String(document.currency),8);
   if(calculation.discountRoundingCents!=='0')paragraph(t('Rundung')+' · '+t('Gesamtrabatt')+': '+String(calculation.discountRoundingCents)+' × 0.01 '+String(document.currency),8);
- }
- summary(t('Zwischentotal'),document.subtotal);summary(t('MWST'),document.vat_amount??document.vat);summary(t('Gesamtbetrag')+' '+String(document.currency||'CHF'),total,true);
+ }else{summary(t('Zwischentotal'),document.subtotal);summary(t('MWST'),document.vat_amount??document.vat);}
+ summary(t('Gesamtbetrag')+' '+String(document.currency||'CHF'),total,true);
  // Validate before adding a page; an invalid setup never creates a phantom page.
  let bill:SwissQRBill|null=null,qrError='';
  let paymentData:ReturnType<typeof createQrBillData>|null=null;

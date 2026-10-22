@@ -4,7 +4,7 @@ import { tenantList, tenantRpc } from "@/lib/server/database";
 
 type Line={discount?:unknown;taxExempt?:unknown;unit?:unknown;description?:unknown;quantity?:unknown;unitPrice?:unknown;vatRate?:unknown;expenseIds?:unknown;timeEntryIds?:unknown};
 type DocumentBody={
-  discountOrigin?:unknown;discount?:unknown;calculationRevision?:unknown;sourceOffer?:unknown;kind?:unknown;customerName?:unknown;customerId?:unknown;number?:unknown;issueDate?:unknown;dueDate?:unknown;validUntil?:unknown;
+  expectedUpdatedAt?:unknown;discountOrigin?:unknown;discount?:unknown;calculationRevision?:unknown;sourceOffer?:unknown;kind?:unknown;customerName?:unknown;customerId?:unknown;number?:unknown;issueDate?:unknown;dueDate?:unknown;validUntil?:unknown;
   vatRate?:unknown;note?:unknown;currency?:unknown;items?:unknown;
 };
 
@@ -54,6 +54,7 @@ export async function PATCH(request:NextRequest,{params}:{params:Promise<{number
     }
 
     const result=await tenantRpc("update_document_atomic",{
+      p_expected_updated_at:body.expectedUpdatedAt,
       p_current_number:currentNumber,
       p_idempotency_key:request.headers.get("idempotency-key")?.trim()??"",
       p_discount:body.discount,

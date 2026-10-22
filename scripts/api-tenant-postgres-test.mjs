@@ -421,6 +421,15 @@ try{
  assert.equal(Number((await pool.query("select count(*) n from audit_events where entity_id=$1 and action='document.updated'",[discountInvoice.id])).rows[0].n),1);
  assert.equal((await discountRequest({...discountSave,note:'Conflicting payload'},'owner',0,'PATCH','/api/documents/'+discountInvoice.number,discountSaveKey)).status,409);
  assert.equal((await get('/api/documents/'+discountInvoice.number,cookies.get('1:owner'))).status,404);
+ const previewDiscountBody={kind:'Rechnung',customerId:customer.id,date:'2026-10-22',currency:'CHF',discount:discountBody.discount,positions:discountBody.items.map(l=>({description:l.description,quantity:l.quantity,price:l.unitPrice,vatRate:l.vatRate,discount:l.discount}))};
+ const previewCalculation=await discountRequest({...previewDiscountBody,output:'calculation'},'owner',0,'POST','/api/documents/preview');assert.equal(previewCalculation.status,200);assert.equal(previewCalculation.data.calculation.total,'924.26');
+ const previewResponse=await fetch(base+'/api/documents/preview',{method:'POST',headers:{cookie:cookies.get('0:owner'),origin:base,'content-type':'application/json'},body:JSON.stringify(previewDiscountBody)});assert.equal(previewResponse.status,200);
+ const previewPdf=await (await import('pdfjs-dist/legacy/build/pdf.mjs')).getDocument({data:new Uint8Array(await previewResponse.arrayBuffer()),useSystemFonts:true}).promise;
+ let previewText='';for(let i=1;i<=previewPdf.numPages;i++)previewText+=(await (await previewPdf.getPage(i)).getTextContent()).items.map(item=>item.str??'').join(' ');await previewPdf.destroy();assert.match(previewText,/924.26/);assert.match(previewText,/69.26/);
+ const editRevision=discountSaves[0].data.item.document_revision;assert.ok(editRevision);
+ const concurrentEdits=await Promise.all(['A','B'].map(note=>discountRequest({...discountSave,note,expectedUpdatedAt:editRevision},'owner',0,'PATCH','/api/documents/'+discountInvoice.number)));
+ assert.deepEqual(concurrentEdits.map(r=>r.status).sort(),[200,409],'Two different edits to one loaded revision have one winner');
+ assert.equal(concurrentEdits.find(r=>r.status===409).data.error,'document_changed');
  const priorCustomerDiscount=(await pool.query('select discount from customers where id=$1',[customer.id])).rows[0].discount;
  try{await pool.query('update customers set discount=5 where id=$1',[customer.id]);const proposal=await discountRequest({kind:'Rechnung',customerId:customer.id,date:'2026-10-22',currency:'CHF',output:'calculation',positions:[{description:'Synthetic proposal',quantity:2,price:500,vatRate:8.1}]},'owner',0,'POST','/api/documents/preview');assert.equal(proposal.status,200);assert.equal(Number(proposal.data.customerDiscountProposal.value),5);assert.equal(proposal.data.customerDiscountProposal.applied,false);assert.equal(proposal.data.calculation.discount.kind,'none');}
  finally{await pool.query('update customers set discount=$2 where id=$1',[customer.id,priorCustomerDiscount]);}

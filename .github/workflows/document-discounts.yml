@@ -1,0 +1,60 @@
+name: Document discounts
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/document-discounts.yml'
+      - 'components/documents.tsx'
+      - 'lib/money.ts'
+      - 'lib/client/backend.ts'
+      - 'lib/customer-identity.ts'
+      - 'lib/server/document-pdf.ts'
+      - 'app/api/documents/**'
+      - 'app/design-system/documents.css'
+      - 'scripts/document-discount-browser.mjs'
+      - 'scripts/discount-*.mjs'
+permissions:
+  contents: read
+jobs:
+  discounts:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: binso_test
+          POSTGRES_PASSWORD: binso_test
+          POSTGRES_DB: binso_observability_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U binso_test -d binso_observability_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-node
+      - name: Build current application
+        run: pnpm build
+      - name: Install pinned Chromium
+        run: |
+          npm install --prefix "$RUNNER_TEMP/binso-browser" --no-package-lock --ignore-scripts playwright@1.62.1
+          node "$RUNNER_TEMP/binso-browser/node_modules/playwright/cli.js" install --with-deps --only-shell chromium
+      - name: Focused discount editor desktop and mobile browser check
+        env:
+          BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs
+          BINSO_UX_INTERACTIONS: discounts
+          BINSO_UX_ROUTES: /rechnungen
+          BINSO_UX_WIDTHS: '390'
+          BINSO_UX_THEMES: light
+          BINSO_UX_OUTPUT: ${{ runner.temp }}/document-discounts
+        run: node scripts/ux-browser-test.mjs
+      - name: Preserve focused browser evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: document-discounts-${{ github.event.pull_request.head.sha }}
+          path: ${{ runner.temp }}/document-discounts
+          if-no-files-found: warn
+          retention-days: 2

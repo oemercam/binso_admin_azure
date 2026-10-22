@@ -47,6 +47,7 @@ export async function verifyDiscountPersistence({business,financial,sql,transact
   const saved=parallel?await Promise.all(Array.from({length:6},save)):[await save(),await save()];assert.ok(saved.every(d=>d.id===created.id&&Number(d.total)===864.80));
   assert.equal(Number((await sql("select count(*) n from audit_events where entity_id=$1 and action='document.updated'",[created.id])).rows[0].n),1,'Same update key has one mutation/audit');
   await assert.rejects(()=>transaction(session,c=>business.mutateApiBusiness(c,session,'update_document_atomic',{...update,p_note:'Changed request'})),e=>e.code==='idempotency_conflict');
+  await assert.rejects(()=>transaction(session,c=>business.mutateApiBusiness(c,session,'update_document_atomic',{...update,p_idempotency_key:randomUUID(),p_expected_updated_at:'superseded-revision'})),e=>e.code==='document_changed');
   const before=JSON.stringify((await sql('select calculation from '+(kind==='invoice'?'invoices':'quotes')+' where id=$1',[created.id])).rows);
   await assert.rejects(()=>transaction(session,async c=>{await business.mutateApiBusiness(c,session,'update_document_atomic',{...update,p_idempotency_key:randomUUID(),p_discount:{kind:'none'}});throw Error('Synthetic transaction rollback');}),/Synthetic transaction rollback/);
   assert.equal(JSON.stringify((await sql('select calculation from '+(kind==='invoice'?'invoices':'quotes')+' where id=$1',[created.id])).rows),before);
