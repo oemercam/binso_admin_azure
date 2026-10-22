@@ -182,3 +182,23 @@ material, icons, height, position and blue FAB. Historical references stay intac
   agreed assignment. Productive interventions require explicit user authorization.
   Preserve existing workflow configuration and mandatory gates unless a change
   to those is itself authorized. A green check alone never authorizes production.
+
+## Current V26 implementation (22 October 2026)
+
+The user authorized implementing the packages from docs/architecture/v26-gap-and-packages.md
+locally on a separate feature branch, reusing the V25 foundation. The unchanged
+docs/architecture/v26-source/BINSO_ONE_V26_MODULAR_MASTERKONZEPT.md is the V26
+Revision3 business target. See docs/architecture/v26-module-contracts.md for
+module ownership and docs/architecture/v26-execution.md for actual progress.
+The current branch is feat/v26-modular-revision3, based on a64582c7, including
+the unpublished V25 IBAN fix 00bfe5ce. Do not overwrite the V25 branch or treat
+it as merged Main. Local commits per package; no pushes in this development
+block. Bundle relevant tests per coherent block; do not rerun full suites,
+builds or browser matrices after small edits. Relevant P0 authorization,
+RLS, audit rollback and integrity checks remain required. No per-package
+permission question when implementation is already authorized. Unanswered
+business decisions are not approval: new sensitive HR/payroll/family fields,
+commercial changes and unvalidated payroll stay closed. Existing tariffs,
+Identity, finance/document engines, mobile navigation and blue FAB remain.
+No merge, production migration, deployment, bank transfer, paid service or
+productive payroll without the separate applicable approval.

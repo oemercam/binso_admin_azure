@@ -23,10 +23,12 @@ export function supplierInput(body:Record<string,unknown>):SupplierInput{
 export async function listSuppliers(c:PoolClient,s:SessionUser,params:URLSearchParams){
  authorize(s,'purchasing:read');
  const q=(params.get('q')??'').trim(),status=(params.get('status')??'').replace(/^eq\./,''),limit=Number(params.get('limit')??50),offset=Number(params.get('offset')??0);
+ const [sort='name',direction='asc']=(params.get('order')??'name.asc').split('.');
+ if(!['name','contact_name','supplier_no','status','created_at'].includes(sort)||!['asc','desc'].includes(direction))throw new ApiError(400,'invalid_filter','Ungültiger Filter.');
  if(q.length>200||!['','active','inactive'].includes(status)||!Number.isInteger(limit)||limit<1||limit>100||!Number.isInteger(offset)||offset<0||offset>100000)throw new ApiError(400,'invalid_filter','Ungültiger Filter.');
  const values=[s.organizationId,q?'%'+q.replace(/[\\%_]/g,'\\$&')+'%':'',status],where="organization_id=$1 and archived_at is null and ($2='' or concat_ws(' ',name,supplier_no,contact_name,email,uid) ilike $2) and ($3='' or status=$3)";
  const total=Number((await c.query('select count(*)::int total from suppliers where '+where,values)).rows[0].total);
- const items=(await c.query(`select ${columns} from suppliers where ${where} order by name,id limit $4 offset $5`,[...values,limit,offset])).rows;
+ const items=(await c.query(`select ${columns} from suppliers where ${where} order by ${sort} ${direction},id limit $4 offset $5`,[...values,limit,offset])).rows;
  return {items,total};
 }
 export async function getSupplier(c:PoolClient,s:SessionUser,id:string){

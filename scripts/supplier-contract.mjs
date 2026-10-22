@@ -19,11 +19,18 @@ export async function verifySupplierContract({load,db,transaction,org,other,act,
  assert.equal((await post(input)).status,409,'Possible duplicate requires review');
  for(const extra of [{iban:'CH-private'},{organization_id:other},{supplier_no:'L-FAKE'},{user_id:'privileged'}])assert.equal((await post({...input,...extra})).status,400);
  for(const extra of [{name:''},{email:'invalid'},{paymentDays:-1},{paymentDays:181},{status:'paid'}])assert.equal((await post({...input,...extra})).status,400);
+ await db.query("update suppliers set iban='SYNTHETIC-PRIVATE-BANK' where id=$1",[id]);
+ item.revision=(await (await read(id)).json()).item.revision;
  const change={...input,phone:'031 000 00 00',expectedRevision:item.revision},changeKey=randomUUID();
  let response=await patch(id,change,changeKey);assert.equal(response.status,200,await response.clone().text());const updated=(await response.json()).item;
  assert.equal((await patch(id,change,changeKey)).status,200,'A lost update response replays the same saved result');
  assert.equal((await patch(id,{...change,phone:'Stale'})).status,409,'Stale supplier revision rejected');
  const persisted=await read(id);assert.equal(persisted.status,200);assert.equal((await persisted.json()).item.phone,'031 000 00 00');
+ assert.equal((await db.query('select iban from suppliers where id=$1',[id])).rows[0].iban,'SYNTHETIC-PRIVATE-BANK','Editing public supplier fields preserves existing protected bank data');
+ const {NextRequest}=await import('next/server.js');
+ const list=await root.GET(new NextRequest('https://employee.invalid/api/suppliers?q=Synthetic&order=name.desc&limit=1&offset=0'));
+ assert.equal(list.status,200);const page=await list.json();assert.equal(page.total,1);assert.equal(page.items[0].id,id);
+ assert.equal((await root.GET(new NextRequest('https://employee.invalid/api/suppliers?order=iban.asc'))).status,400,'Only explicit public sort fields are accepted');
  for(const field of ['iban','settlement_override','created_by_user_id'])assert.equal(Object.hasOwn(updated,field),false,'General supplier DTO omits '+field);
  for(const role of ['owner','admin','finance']){act(role);assert.equal((await read(id)).status,200);}
  for(const role of ['hr','project_manager','manager','member','reader']){act(role);assert.equal((await read(id)).status,403);assert.equal((await post(input)).status,403);assert.equal((await patch(id,change)).status,403);}

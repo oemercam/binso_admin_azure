@@ -82,6 +82,7 @@ let browser;
 const customer={paymentDays:30,id:'customer-one',customer_no:'K-000001',name:'Prüffirma AG',city:'Bern',status:'active',contact_name:'Test Person',email:'test@example.invalid',street:'Teststrasse 1',postal_code:'3000'};
 const product={id:'product-one',name:'Beratung',kind:'service',unit:'hour',unit_price:125,vat_rate:8.1,status:'active'};
 const employee={id:'employee-one',first_name:'Test',last_name:'Person',email:'mitarbeiterin.mit.langem.namen@internationales-unternehmen.example.invalid',start_date:'2025-01-01',job_title:'ICT',workload_percent:80,weekly_hours:42,status:'active'};
+const supplier={id:'supplier-one',supplier_no:'L-000001',name:'Synthetic Partner AG',contact_name:'Synthetic Contact',email:'partner@example.invalid',phone:'',address:'Bern',uid:'',payment_days:30,status:'active',revision:'2026-10-22 12:00:00+00'};
 const expense={id:'expense-one',merchant:'SBB',amount:89,currency:'CHF',expense_date:'2026-10-08',status:'submitted',employee_id:employee.id,employee};
 const invoice={id:'invoice-one',number:'RE-TEST-1',kind:'invoice',customer_id:customer.id,customer,total:135.13,subtotal:125,vat:10.13,paid_amount:100,currency:'CHF',issue_date:'2026-10-08',due_date:'2026-11-08',status:'partial',items:[{description:'Beratung',quantity:1,unit:'hour',unit_price:125,vat_rate:8.1}]};
 const offer={...invoice,id:'offer-one',kind:'offer',number:'AN-TEST-1',status:'sent',valid_until:'2099-12-31',paid_amount:0};
@@ -89,7 +90,7 @@ const payment={id:'payment-one',amount:100,currency:'CHF',paid_on:'2026-10-08',m
 const ticket={id:'ticket-one',case_number:'T-TEST-1',subject:'Testanfrage',status:'open',priority:'normal',created_at:'2026-10-08T10:00:00Z',updated_at:'2026-10-08T10:00:00Z'};
 const projectSeed={id:'project-one',name:'Cloud Migration',customer_id:customer.id,customer_name:customer.name,status:'active',hours:12.5,hours_budget:120,progress:10,notes:'Synthetic project notes',version:1,source_offer:offer.number};
 let projectFixture={...projectSeed};
-const collections={customers:[customer],products:[product],employees:[employee],expenses:[expense],payments:[payment],documents:[invoice,offer],projects:[],time_entries:[]};
+const collections={customers:[customer],products:[product],employees:[employee],suppliers:[supplier],expenses:[expense],payments:[payment],documents:[invoice,offer],projects:[],time_entries:[]};
 // Comparable reference content belongs to the isolated browser fixture only.
 // Never seed a tenant/database or change the application response for a screenshot.
 if(process.env.BINSO_UX_REFERENCE_DATA==='1'){
@@ -330,7 +331,7 @@ try{
    else if(p==='/api/notifications/followups')data={processed:0};
    else if(/^\/api\/documents\/[^/]+\/versions$/.test(p)){if(url.searchParams.has('version'))return route.fulfill({contentType:'application/pdf',body:fixturePdf});data={versions:[{version:1,number:offer.number,created_at:'2026-10-21T10:00:00Z'}],events:[],deliveries:[]};}
    else if(p==='/api/customers')data=customerListFixture(url.searchParams);
-   else if(['/api/products','/api/employees','/api/expenses','/api/payments'].includes(p))data=recordListFixture(p.split('/')[2],url.searchParams);
+   else if(['/api/products','/api/employees','/api/suppliers','/api/expenses','/api/payments'].includes(p))data=recordListFixture(p.split('/')[2],url.searchParams);
    else if(/^\/api\/employees\/[^/]+\/employment$/.test(p))data={items:[]};
    else if(p==='/api/reports'){
     if(url.searchParams.get('format')==='csv'){reportExports++;await new Promise(resolve=>setTimeout(resolve,150));if(failReportDownload)return route.fulfill({status:503,json:{message:'Synthetic report export unavailable'}});return route.fulfill({headers:{'Content-Type':'text/csv; charset=utf-8','Content-Disposition':'attachment; filename="binso-reports-fixture.csv"'},body:'"Kennzahl";"Wert";"Einheit"\r\n'});}

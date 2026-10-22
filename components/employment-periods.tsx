@@ -4,7 +4,7 @@ import {apiPatch,apiPost} from '@/lib/client/backend';
 import {useApiQuery} from '@/lib/client/use-api-query';
 import {LocalizedText,useLocale,useTranslation} from '@/lib/client/locale';
 import {localeTags} from '@/lib/locales/config';
-import {formatQuantity} from '@/lib/display-format';
+import {formatQuantity,formatTimestampDate} from '@/lib/display-format';
 import {Button,EmptyState,ErrorState,Field,FormActions,Input,LoadingState,SectionTitle,Status} from './ui';
 import {ActionRow,ActionsMenu,FormSheet} from './binso-ux';
 
@@ -15,7 +15,7 @@ export function EmploymentPeriods({employeeId,mayWrite,prefill}:{employeeId:stri
  const query=useApiQuery<{items:Period[]}>(endpoint),formId=useId(),{locale}=useLocale(),translate=useTranslation();
  const [open,setOpen]=useState(false),[selected,setSelected]=useState<Period|null>(null),[draft,setDraft]=useState<Draft>(prefill),[initial,setInitial]=useState(JSON.stringify(prefill));
  const [error,setError]=useState(''),[busy,setBusy]=useState(false);const pending=useRef(false),attempt=useRef<{body:string;key:string}|null>(null);
- const date=(value:string)=>new Intl.DateTimeFormat(localeTags[locale],{day:'2-digit',month:'2-digit',year:'numeric',timeZone:'UTC'}).format(new Date(value+'T00:00:00Z'));
+ const date=(value:string)=>formatTimestampDate(value+'T00:00:00Z',localeTags[locale]);
  const edit=(period:Period|null)=>{
   const next=period?{startsOn:period.starts_on,endsOn:period.ends_on??'',workloadPercent:String(period.workload_percent),weeklyHours:String(period.weekly_hours),vacationDays:String(period.vacation_days),jobTitle:period.job_title,workLocation:period.work_location??''}:prefill;
   setSelected(period);setDraft(next);setInitial(JSON.stringify(next));setError('');attempt.current=null;setOpen(true);

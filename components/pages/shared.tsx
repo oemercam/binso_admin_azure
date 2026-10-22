@@ -5,7 +5,7 @@ import { formatQuantity, withPriceUnit } from "@/lib/display-format";
 import {useApiQuery} from "@/lib/client/use-api-query";
 import {useLocale,useTranslation} from "@/lib/client/locale";
 import {localeTags} from "@/lib/locales/config";
-type DataCollection = "customers" | "products" | "employees" | "expenses" | "payments";
+type DataCollection = "customers" | "products" | "employees" | "expenses" | "payments" | "suppliers";
 import { isProductionBackendEnabled } from "@/lib/client/backend";
 import {useRecordsController} from "../records";
 
@@ -28,6 +28,7 @@ export function swissDate(value:unknown){
 }
 
 export function mapRemoteRows(collection:DataCollection,items:Record<string,unknown>[],{locale='de-CH',translateUnit=label=>label}:{locale?:string;translateUnit?:(label:string)=>string}={}):string[][]{
+  if(collection==='suppliers')return items.map(item=>[String(item.name??''),String(item.contact_name??''),String(item.supplier_no??''),String(item.id??''),item.status==='inactive'?'Inaktiv':'Aktiv']);
   if(collection==="customers") return items.map(item=>[
     String(item.name??""),String(item.contact??item.contact_name??""),String(item.city??""),String(item.id??""),item.status==="inactive"?"Inaktiv":"Aktiv",String(item.customer_no??""),customerAmounts(item.financials,'revenue',locale),customerAmounts(item.financials,'open_amount',locale)
   ]);

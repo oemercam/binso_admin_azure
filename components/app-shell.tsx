@@ -45,12 +45,13 @@ const desktopNav = [
   ["/finanzen","Finanzen","chart"],
   ["/berichte","Berichte","chart"],
   ["/mitarbeiter","Mitarbeiter","users"],
+  ["/lieferanten","Lieferanten","building"],
 ] as const;
 
 const desktopNavGroups = [
   {label:"Verkauf",paths:["/kunden","/angebote","/rechnungen","/produkte"]},
   {label:"Arbeit & Team",paths:["/projekte","/zeit","/mitarbeiter"]},
-  {label:"Finanzen",paths:["/zahlungen","/spesen","/finanzen","/berichte"]},
+  {label:"Finanzen",paths:["/zahlungen","/spesen","/lieferanten","/finanzen","/berichte"]},
 ];
 
 type NotificationItem=PanelNotification;

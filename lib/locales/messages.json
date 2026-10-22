@@ -1,4 +1,8 @@
 {
+  "Lieferanten suchen...": ["Search suppliers...", "Rechercher des fournisseurs...", "Cerca fornitori..."],
+  "Lieferant hinzufügen": ["Add supplier", "Ajouter un fournisseur", "Aggiungi fornitore"],
+  "Lieferant bearbeiten": ["Edit supplier", "Modifier le fournisseur", "Modifica fornitore"],
+  "Lieferantenaktionen": ["Supplier actions", "Actions relatives au fournisseur", "Azioni relative al fornitore"],
   "Diese Lieferantenangaben können hier nicht geändert werden.": ["These supplier details cannot be changed here.", "Ces informations sur le fournisseur ne peuvent pas être modifiées ici.", "Questi dati del fornitore non possono essere modificati qui."],
   "Die Lieferantenangaben sind ungültig.": ["The supplier details are invalid.", "Les informations sur le fournisseur sont invalides.", "I dati del fornitore non sono validi."],
   "Bitte einen Lieferantennamen eingeben.": ["Please enter a supplier name.", "Veuillez saisir un nom de fournisseur.", "Inserisci un nome del fornitore."],

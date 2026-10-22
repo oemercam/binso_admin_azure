@@ -13,6 +13,7 @@ Prüfergebnisse. Nur die für den konkreten Auftrag relevanten Quellen lesen.
 
 | Gesucht | Einstieg |
 | --- | --- |
+| V26 Revision3, lokale Umsetzung ohne Push | [Tatsächlicher Paketstand und Prüfgrenzen](docs/architecture/v26-execution.md), [Modul-/Übergabeverträge](docs/architecture/v26-module-contracts.md), [Gap-Matrix und Pakete](docs/architecture/v26-gap-and-packages.md) |
 | Freigegebene UX und Rangfolge | [Originalreferenzen](docs/audit/v24/reference/IMPLEMENTIERUNG.md), [Vorschau](docs/audit/v24/reference/index.html) |
 | UI-Architektur und Komponenten-Owner | [Reference Foundation](docs/architecture/reference-foundation.md), `app/design-system/manifest.json` |
 | Laufzeit, Sicherheit und Daten | Architektur-/Sicherheitsübersicht unten; `app/`, `lib/server/`, `database/migrations/` gezielt nach betroffener Funktion |

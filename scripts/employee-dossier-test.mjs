@@ -144,7 +144,18 @@ try{
  auditFailure=true;assert.equal((await routes.POST(request({...input,lastName:'Rollback'}))).status,500);auditFailure=false;
  assert.equal((await transaction(org,session.userId,c=>c.query('select count(*)::int n from employees'))).rows[0].n,employeeCount,'Failed create audit rolls back employee and replay receipt');
  await verifySupplierContract({load,db,transaction,org,other,act,request,setAuditFailure:value=>{auditFailure=value;}});
+ mock('lib/server/maintenance.ts',{maintenanceState:async()=>({enabled:false,endsAt:null})});
+ const proxy=load('proxy.ts'),headers=await load('next.config.ts').default.headers();
+ assert.ok(proxy.config.matcher.includes('/lieferanten/:path*'),'Supplier pages are in the actual proxy matcher');
+ for(const pathname of ['/lieferanten','/lieferanten/neu','/lieferanten/supplier-one']){
+  const response=await proxy.proxy(new NextRequest('https://employee.invalid'+pathname));
+  assert.equal(response.status,307);assert.equal(new URL(response.headers.get('location')).pathname,'/login');
+ }
+ const supplierHeaders=headers.find(rule=>rule.source==='/lieferanten/:path*')?.headers;
+ assert.ok(supplierHeaders?.some(header=>header.key==='Cache-Control'&&header.value.includes('no-store')));
+ assert.ok(supplierHeaders?.some(header=>header.key==='X-Robots-Tag'&&header.value.includes('noindex')));
  session=null;assert.equal((await read(id)).status,401);
  console.log('Employee dossier: actual POST/PATCH/GET, optional email/account, persistence, replay/conflict, legacy field preservation, eight roles, plans, tenants/RLS, date constraints and atomic audit rollback passed.');
  console.log('Employment: separate reentry, immutable revisions, replay/stale conflict, database overlap protection, restricted RLS and supersede/audit rollback passed; no payroll or identity mutation.');
+ console.log('Supplier pages: actual proxy matcher/anonymous redirect and private no-store/noindex headers passed.');
 }finally{await db.close();}

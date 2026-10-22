@@ -21,6 +21,11 @@ for(const width of [320,390,600,760,761,820,1024,1440,1920]){
 }
 assert(planChanges([],{level:'full'}).webkitWidths.includes(1024),'The release candidate must actually measure the desktop header in WebKit');
 const catalog=JSON.parse(await (await import('node:fs/promises')).readFile('docs/architecture/ux-inventory.json','utf8'));
+for(const file of ['components/pages/suppliers.tsx','lib/server/repositories/suppliers.ts','components/pages/employees.tsx','lib/server/repositories/employment.ts']){
+ assert.ok(planChanges([file],{level:'fast'}).suites.includes('employee-dossier-test'),'The shared isolated HR/supplier contract remains selected for '+file);
+}
+for(const route of ['/lieferanten','/lieferanten/neu','/lieferanten/supplier-one'])assert.ok(fullRoutes.includes(route),'Required coverage retains '+route);
+assert.ok(planChanges(['components/pages/suppliers.tsx'],{level:'fast'}).routes.includes('/lieferanten/supplier-one'),'Supplier detail uses its own existing QA fixture, never an offer ID');
 for(const entry of catalog.routes){const expression=new RegExp('^'+entry.route.replace(/\[\.\.\.section\]/g,'.+').replace(/\[id\]/g,'[^/]+')+'$');assert.ok(fullRoutes.some(route=>expression.test(route)),'Full QA omits page '+entry.route);}
 assert(planChanges(['components/unmapped.tsx'],{level:'fast'}).routes.includes('/kunden/neu'),'Unknown FAST dependencies must retain representative browser coverage');
 assert.throws(()=>planChanges([],{level:'skip'}));
