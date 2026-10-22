@@ -24,6 +24,21 @@ export async function verifyBusinessReadiness({service,sql,transaction,session,c
   await assert.rejects(()=>run(c=>c.query('insert into user_setup_preferences(organization_id,user_id,dismissed) values($1,$2,true) on conflict(organization_id,user_id) do update set dismissed=true',[org,actor.userId]),{...actor,userId:other.id}),/row-level security/);
   const draft=await createDraft();
   assert.equal((await run((c,s)=>service.readInvoiceReadiness(c,s,draft.number))).ready,true);
+  for(const role of ['owner','admin','finance','hr','project_manager','manager','member','reader']){
+   if(['owner','admin','finance'].includes(role))assert.equal((await run((c,s)=>service.readInvoiceReadiness(c,s,draft.number),{...actor,role})).ready,true);
+   else await assert.rejects(()=>run((c,s)=>service.readInvoiceReadiness(c,s,draft.number),{...actor,role}),e=>e.status===403);
+  }
+  await assert.rejects(()=>run((c,s)=>service.readInvoiceReadiness(c,s,draft.number),{...actor,organizationId:'00000000-0000-4000-8000-000000000001'}),e=>[403,404].includes(e.status));
+  // A successful preflight is advisory, never a reusable authorization to issue.
+  for(const [field,value,target] of [['iban','CH0000000000000000000','iban'],['street','','street'],['postal_code','','postalCode'],['city','','city'],['country_code','XXX','countryCode']]){
+   const before=(await sql('select '+field+' value from organizations where id=$1',[org])).rows[0].value;
+   try{
+    await sql('update organizations set '+field+'=$2 where id=$1',[org,value]);
+    const result=await run((c,s)=>service.readInvoiceReadiness(c,s,draft.number));assert.equal(result.ready,false);assert.ok(result.message);assert.match(result.recovery.href,new RegExp('setupField='+target));
+    await assert.rejects(()=>run((c,s)=>issue(c,s,draft.number)),e=>e.code==='payment_data_invalid');
+    assert.equal((await sql('select status from invoices where organization_id=$1 and invoice_no=$2',[org,draft.number])).rows[0].status,'draft');
+   }finally{await sql('update organizations set '+field+'=$2 where id=$1',[org,before]);}
+  }
   await sql("update organizations set iban='',qr_iban='' where id=$1",[org]);
   const owner=await run((c,s)=>service.readInvoiceReadiness(c,s,draft.number));assert.equal(owner.ready,false);assert.match(owner.recovery.href,/setupField=iban/);assert.match(owner.recovery.href,/returnTo=/);
   const finance=await run((c,s)=>service.readInvoiceReadiness(c,s,draft.number),{...actor,role:'finance'});assert.equal(finance.ready,false);assert.equal(finance.recovery,undefined,'Finance has no unauthorized settings link');
@@ -34,6 +49,9 @@ export async function verifyBusinessReadiness({service,sql,transaction,session,c
   await sql("update organizations set iban='CH9300762011623852957' where id=$1",[org]);
   assert.equal((await run((c,s)=>service.readInvoiceReadiness(c,s,unconfigured.number))).ready,true,'Corrected settings make the same saved draft eligible, without issuing it');
   assert.equal((await sql('select status from invoices where organization_id=$1 and invoice_no=$2',[org,unconfigured.number])).rows[0].status,'draft');
+  await run((c,s)=>issue(c,s,unconfigured.number));
+  assert.equal((await sql('select status from invoices where organization_id=$1 and invoice_no=$2',[org,unconfigured.number])).rows[0].status,'sent','Only an explicit fresh issue transaction publishes the corrected draft');
+  assert.equal((await run((c,s)=>service.readInvoiceReadiness(c,s,unconfigured.number))).ready,false,'Already issued records cannot be reused as drafts');
  }finally{await restore();await sql('delete from user_setup_preferences where organization_id=$1 and user_id=$2',[org,actor.userId]);}
  console.log('Business readiness: real migrated/RLS personal preference, role/read-only/demo boundaries, audit rollback/replay, missing-bank draft, final issuance rejection and corrected-record recovery passed.');
 }

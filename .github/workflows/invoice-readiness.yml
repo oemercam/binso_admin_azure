@@ -1,0 +1,69 @@
+name: Invoice readiness
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/invoice-readiness.yml'
+      - 'scripts/business-readiness-*.mjs'
+      - 'lib/server/business-readiness.ts'
+      - 'lib/action-readiness.ts'
+      - 'components/use-setup-field.ts'
+      - 'components/documents.tsx'
+      - 'components/document-settings.tsx'
+      - 'components/pages/settings.tsx'
+      - 'lib/qr-bill.ts'
+      - 'lib/server/document-process.ts'
+      - 'app/api/settings/readiness/route.ts'
+permissions:
+  contents: read
+jobs:
+  readiness:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: binso_test
+          POSTGRES_PASSWORD: binso_test
+          POSTGRES_DB: binso_observability_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U binso_test -d binso_observability_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-node
+      - name: Prepare empty isolated readiness database
+        env:
+          PGPASSWORD: binso_test
+        run: psql -h 127.0.0.1 -U binso_test -d binso_observability_test -v ON_ERROR_STOP=1 -c 'create database binso_readiness_test'
+      - name: Native database, runtime RLS and invoice issuance contract
+        env:
+          BINSO_READINESS_TEST_URL: postgres://binso_test:binso_test@127.0.0.1:5432/binso_readiness_test
+        run: node scripts/business-readiness-test.mjs
+      - name: Build current application
+        run: pnpm build
+      - name: Install pinned Chromium
+        run: |
+          npm install --prefix "$RUNNER_TEMP/binso-browser" --no-package-lock --ignore-scripts playwright@1.62.1
+          node "$RUNNER_TEMP/binso-browser/node_modules/playwright/cli.js" install --with-deps --only-shell chromium
+      - name: Focused draft, field recovery and explicit issuance browser check
+        env:
+          BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs
+          BINSO_UX_INTERACTIONS: readiness
+          BINSO_UX_ROUTES: /rechnungen
+          BINSO_UX_WIDTHS: '390'
+          BINSO_UX_THEMES: light
+          BINSO_UX_OUTPUT: ${{ runner.temp }}/invoice-readiness
+        run: node scripts/ux-browser-test.mjs
+      - name: Preserve focused browser evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: invoice-readiness-${{ github.event.pull_request.head.sha }}
+          path: ${{ runner.temp }}/invoice-readiness
+          if-no-files-found: warn
+          retention-days: 2
