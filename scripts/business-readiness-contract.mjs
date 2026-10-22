@@ -1,9 +1,13 @@
 import assert from 'node:assert/strict';
+import {randomUUID} from 'node:crypto';
 export async function verifyBusinessReadiness({service,sql,transaction,session,createDraft,issue}){
  const org=session.organizationId,actor={...session,isDemo:false,organizationStatus:'active'},run=(fn,s=actor)=>transaction(s,c=>fn(c,s));
  const original=(await sql('select name,legal_name,street,postal_code,city,country_code,iban,qr_iban from organizations where id=$1',[org])).rows[0];
+ const peer='readiness-peer-'+randomUUID();
  const keys=Object.keys(original),restore=()=>sql('update organizations set '+keys.map((key,index)=>key+'=$'+(index+2)).join(',')+' where id=$1',[org,...Object.values(original)]);
  try{
+  await sql("insert into app_users(id,email,display_name,status) values($1,$2,'Synthetic readiness peer','active')",[peer,peer+'@fixture.invalid']);
+  await sql("insert into organization_memberships(organization_id,user_id,email,role,status) values($1,$2,$3,'member','active')",[org,peer,peer+'@fixture.invalid']);
   await sql("update organizations set name='Readiness Fixture',legal_name='',street='Hauptstrasse',postal_code='3000',city='Bern',country_code='CH',iban='CH9300762011623852957',qr_iban='' where id=$1",[org]);
   for(const role of ['owner','admin','finance','hr','project_manager','manager','member','reader']){
    if(['owner','admin'].includes(role)){const guide=await run((c,s)=>service.readSetupGuide(c,s),{...actor,role});assert.equal(guide.requiredComplete,3);assert.ok(guide.tasks.every(task=>typeof task.complete==='boolean'));assert.ok(!JSON.stringify(guide).includes('CH9300'),'Metadata must not disclose account values');}
@@ -19,7 +23,7 @@ export async function verifyBusinessReadiness({service,sql,transaction,session,c
   assert.equal((await run((c,s)=>service.readSetupGuide(c,s))).dismissed,false,'Failed audit rolls preference back');
   await run((c,s)=>service.setSetupGuideDismissed(c,s,true));await run((c,s)=>service.setSetupGuideDismissed(c,s,true));assert.equal(await audits(),before+1,'Same preference is idempotent');
   assert.equal((await run((c,s)=>service.readSetupGuide(c,s))).dismissed,true,'Fresh read persists own choice');
-  const other=(await sql('select id from app_users where id<>$1 order by id limit 1',[actor.userId])).rows[0];assert.ok(other);
+  const other=(await sql('select id from app_users where id=$1',[peer])).rows[0];assert.ok(other);
   assert.equal((await run(c=>c.query('select * from user_setup_preferences where organization_id=$1 and user_id=$2',[org,actor.userId]),{...actor,userId:other.id})).rows.length,0,'Same tenant cannot read another personal preference');
   await assert.rejects(()=>run(c=>c.query('insert into user_setup_preferences(organization_id,user_id,dismissed) values($1,$2,true) on conflict(organization_id,user_id) do update set dismissed=true',[org,actor.userId]),{...actor,userId:other.id}),/row-level security/);
   const draft=await createDraft();
@@ -52,6 +56,6 @@ export async function verifyBusinessReadiness({service,sql,transaction,session,c
   await run((c,s)=>issue(c,s,unconfigured.number));
   assert.equal((await sql('select status from invoices where organization_id=$1 and invoice_no=$2',[org,unconfigured.number])).rows[0].status,'sent','Only an explicit fresh issue transaction publishes the corrected draft');
   assert.equal((await run((c,s)=>service.readInvoiceReadiness(c,s,unconfigured.number))).ready,false,'Already issued records cannot be reused as drafts');
- }finally{await restore();await sql('delete from user_setup_preferences where organization_id=$1 and user_id=$2',[org,actor.userId]);}
+ }finally{await restore();await sql('delete from user_setup_preferences where organization_id=$1 and user_id=$2',[org,actor.userId]);await sql('delete from organization_memberships where organization_id=$1 and user_id=$2',[org,peer]);await sql('delete from app_users where id=$1',[peer]);}
  console.log('Business readiness: real migrated/RLS personal preference, role/read-only/demo boundaries, audit rollback/replay, missing-bank draft, final issuance rejection and corrected-record recovery passed.');
 }
