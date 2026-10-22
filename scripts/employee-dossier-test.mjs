@@ -9,6 +9,7 @@ import {pgcrypto} from '@electric-sql/pglite/contrib/pgcrypto';
 import {verifySupplierContract} from './supplier-contract.mjs';
 import {verifyExpensePaymentContract} from './expense-payment-contract.mjs';
 import {verifySupplierBankContract} from './supplier-bank-contract.mjs';
+import {verifyEmployeeIdentityContract} from './employee-identity-contract.mjs';
 
 // Execute the actual routes, repository, authorization, SQL and audit against
 // migrated PostgreSQL/RLS. Replace only session/connection boundaries, never SQL.
@@ -148,6 +149,7 @@ try{
  await verifySupplierContract({load,db,transaction,org,other,act,request,setAuditFailure:value=>{auditFailure=value;}});
  await verifyExpensePaymentContract({load,db,transaction,org,other,act,request,setAuditFailure:value=>{auditFailure=value;}});
  await verifySupplierBankContract({load,db,transaction,org,other,act,request,setAuditFailure:value=>{auditFailure=value;}});
+ await verifyEmployeeIdentityContract({load,db,transaction,org,other,act,request,setAuditFailure:value=>{auditFailure=value;}});
  mock('lib/server/maintenance.ts',{maintenanceState:async()=>({enabled:false,endsAt:null})});
  const proxy=load('proxy.ts'),headers=await load('next.config.ts').default.headers();
  assert.ok(proxy.config.matcher.includes('/lieferanten/:path*'),'Supplier pages are in the actual proxy matcher');

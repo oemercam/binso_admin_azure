@@ -1,4 +1,7 @@
 {
+  "Mitarbeiterzugang verknüpfen": ["Link employee account","Associer l’accès du collaborateur","Collega l’accesso del collaboratore"],
+  "Die Verknüpfung erstellt weder ein Konto noch eine Kunden- oder Auftragsfreigabe.": ["Linking does not create an account or grant customer or project access.","L’association ne crée aucun compte et n’accorde aucun accès aux clients ou aux mandats.","Il collegamento non crea un account e non concede accesso a clienti o incarichi."],
+  "Bitte Mitarbeiter und bestehenden Zugang prüfen.": ["Please check the employee and existing account.","Veuillez vérifier le collaborateur et l’accès existant.","Verifica il collaboratore e l’accesso esistente."],
   "Bankverbindung bearbeiten": ["Edit bank details","Modifier les coordonnées bancaires","Modifica le coordinate bancarie"],
   "Keine Bankverbindung": ["No bank details","Aucune coordonnée bancaire","Nessuna coordinata bancaria"],
   "Schweiz oder Liechtenstein. Leer lassen, um die Bankverbindung zu entfernen.": ["Switzerland or Liechtenstein. Leave empty to remove the bank details.","Suisse ou Liechtenstein. Laissez vide pour supprimer les coordonnées bancaires.","Svizzera o Liechtenstein. Lascia vuoto per rimuovere le coordinate bancarie."],

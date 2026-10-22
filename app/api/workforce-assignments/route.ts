@@ -3,6 +3,8 @@ import {NextRequest} from 'next/server';
 import {requireSession} from '@/lib/server/session';
 import {withTenant} from '@/lib/server/db';
 import {authorizeWorkforceManagement} from '@/lib/server/workforce-access';
+import {bindEmployeeIdentity} from '@/lib/server/repositories/employee-identity';
+import {requireModuleEntitlement} from '@/lib/server/plan-access';
 import {ApiError,apiError,assertSameOrigin,cleanText,json,readJson} from '@/lib/server/http';
 import {audit} from '@/lib/server/audit';
 
@@ -18,6 +20,11 @@ export async function GET(){try{
 export async function POST(request:NextRequest){try{
  assertSameOrigin(request);const s=await requireSession();authorizeWorkforceManagement(s);await requireFreshAuthentication(s);
  const body=await readJson<Record<string,unknown>>(request,8192);
+ if(body.mode==='bind_identity'){
+  await requireModuleEntitlement(s.organizationId,'personal');
+  return json(await withTenant(s.organizationId,s.userId,c=>bindEmployeeIdentity(c,s,body,request.headers.get('idempotency-key')??'')),201);
+ }
+ if(body.mode!==undefined)throw new ApiError(400,'assignment_invalid','Bitte Mitarbeiter, Zugang, Kunde und Zeitraum prüfen.');
  const employeeId=cleanText(body.employeeId,80),userId=cleanText(body.userId,200),customerId=cleanText(body.customerId,80),projectId=cleanText(body.projectId,80),startsOn=cleanText(body.startsOn,10),endsOn=cleanText(body.endsOn,10);
  if(!employeeId||!userId||!customerId||!/^\d{4}-\d{2}-\d{2}$/.test(startsOn)||endsOn&&(!/^\d{4}-\d{2}-\d{2}$/.test(endsOn)||endsOn<startsOn))throw new ApiError(400,'assignment_invalid','Bitte Mitarbeiter, Zugang, Kunde und Zeitraum prüfen.');
  const item=await withTenant(s.organizationId,s.userId,async c=>{
