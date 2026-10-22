@@ -124,6 +124,7 @@ export function RecordsView({
   typeIndex=1,
   emptyLabel,
   sortValue,
+  matchesStatus,
   controller,
   toolbarActions=true,
   remote=false,
@@ -136,6 +137,7 @@ export function RecordsView({
   toolbarActions?:boolean;
   remote?:boolean;
   sortValue?:(item:string[],index:number)=>string|number;
+  matchesStatus?:(item:string[],label:string)=>boolean|undefined;
   countLabel?:string;
   typeIndex?:number;
   emptyLabel?:(chip:string)=>string;
@@ -167,7 +169,7 @@ export function RecordsView({
       const matchesQuery=!query.trim() || item.join(" ").toLowerCase().includes(query.trim().toLowerCase());
       const state=(statusIndex===undefined?item.at(-1):item[statusIndex]) ?? "";
       const type=item[typeIndex] ?? "";
-      const matchesChip=matchesRecordChip(activeChip,state,type,statusGroups);
+      const matchesChip=matchesStatus?.(item,activeChip)??matchesRecordChip(activeChip,state,type,statusGroups);
       return matchesQuery && matchesChip;
     });
 
@@ -176,7 +178,7 @@ export function RecordsView({
       const result=compareRecordValues(sortValue?.(a,sortIndex)??a[sortIndex]??"",sortValue?.(b,sortIndex)??b[sortIndex]??"");
       return sort==="asc" ? result : -result;
     });
-  },[activeChip,items,query,sort,sortIndex,statusGroups,typeIndex,statusIndex,sortValue,remote]);
+  },[activeChip,items,query,sort,sortIndex,statusGroups,typeIndex,statusIndex,sortValue,matchesStatus,remote]);
 
   const hasFilters=query.trim().length>0 || activeChip!==(chips[0]??"Alle") || sort!=="default";
   const singularCountLabel=({Einträge:"Eintrag",Kunden:"Kunde",Zahlungen:"Zahlung",Rechnungen:"Rechnung",Angebote:"Angebot",Dokumente:"Dokument",Produkte:"Produkt",Mitarbeiter:"Mitarbeiter",Spesen:"Spese",Tickets:"Ticket"} as Record<string,string>)[countLabel]??countLabel;

@@ -1,5 +1,5 @@
 {
-  "commit": "d11a847b3b12802c1f261310ee75953aa7538e20",
+  "commit": "5f175c878758c9798cb421199397bfea21523aeb",
   "method": "Existing TypeScript AST dependency inventory; conditional reachability is not runtime proof",
   "pages": [
     {
@@ -492,27 +492,27 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 408,
-          "component": "components/documents.tsx#DocumentPage"
-        },
-        {
-          "tag": "FormSheet",
-          "line": 408,
-          "component": "components/documents.tsx#DocumentPage"
-        },
-        {
-          "tag": "ActionSheet",
           "line": 410,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 428,
+          "line": 410,
+          "component": "components/documents.tsx#DocumentPage"
+        },
+        {
+          "tag": "ActionSheet",
+          "line": 412,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 429,
+          "line": 430,
+          "component": "components/documents.tsx#DocumentPage"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 431,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
@@ -567,7 +567,7 @@
         },
         {
           "tag": "FormSheet",
-          "line": 576,
+          "line": 581,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
@@ -827,27 +827,27 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 408,
-          "component": "components/documents.tsx#DocumentPage"
-        },
-        {
-          "tag": "FormSheet",
-          "line": 408,
-          "component": "components/documents.tsx#DocumentPage"
-        },
-        {
-          "tag": "ActionSheet",
           "line": 410,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 428,
+          "line": 410,
+          "component": "components/documents.tsx#DocumentPage"
+        },
+        {
+          "tag": "ActionSheet",
+          "line": 412,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 429,
+          "line": 430,
+          "component": "components/documents.tsx#DocumentPage"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 431,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
@@ -902,7 +902,7 @@
         },
         {
           "tag": "FormSheet",
-          "line": 576,
+          "line": 581,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
@@ -11916,6 +11916,7 @@
         "components/pages/projects.tsx#ProjectDetail",
         "components/pages/projects.tsx#Workspace",
         "components/pages/projects.tsx#Project",
+        "components/document-list.tsx#DocumentListItem",
         "components/use-process-draft.ts#useProcessDraft",
         "components/app-shell.tsx#AppShell",
         "components/app-shell.tsx#ShellProps",
@@ -12025,6 +12026,8 @@
         "components/binso-ux.tsx#ListRow",
         "components/records.tsx#tone",
         "components/pages/shared.tsx#swissDate",
+        "components/document-list.tsx#DocumentSummaryRow",
+        "components/document-list.tsx#FinancialSummaryRow",
         "components/binso-ux.tsx#FormSheet"
       ],
       "layouts": [
@@ -12772,27 +12775,27 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 408,
-          "component": "components/documents.tsx#DocumentPage"
-        },
-        {
-          "tag": "FormSheet",
-          "line": 408,
-          "component": "components/documents.tsx#DocumentPage"
-        },
-        {
-          "tag": "ActionSheet",
           "line": 410,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 428,
+          "line": 410,
+          "component": "components/documents.tsx#DocumentPage"
+        },
+        {
+          "tag": "ActionSheet",
+          "line": 412,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 429,
+          "line": 430,
+          "component": "components/documents.tsx#DocumentPage"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 431,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
@@ -12847,7 +12850,7 @@
         },
         {
           "tag": "FormSheet",
-          "line": 576,
+          "line": 581,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
@@ -13107,27 +13110,27 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 408,
-          "component": "components/documents.tsx#DocumentPage"
-        },
-        {
-          "tag": "FormSheet",
-          "line": 408,
-          "component": "components/documents.tsx#DocumentPage"
-        },
-        {
-          "tag": "ActionSheet",
           "line": 410,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 428,
+          "line": 410,
+          "component": "components/documents.tsx#DocumentPage"
+        },
+        {
+          "tag": "ActionSheet",
+          "line": 412,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 429,
+          "line": 430,
+          "component": "components/documents.tsx#DocumentPage"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 431,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
@@ -13182,7 +13185,7 @@
         },
         {
           "tag": "FormSheet",
-          "line": 576,
+          "line": 581,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
@@ -15827,7 +15830,7 @@
       "actions": [
         {
           "tag": "FormSheet",
-          "line": 78,
+          "line": 85,
           "component": "components/pages/payments.tsx#PaymentForm"
         },
         {

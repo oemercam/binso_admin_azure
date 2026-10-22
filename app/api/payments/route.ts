@@ -1,8 +1,9 @@
 import { NextRequest } from "next/server";
 import { apiError, assertSameOrigin, cleanText, json, readJson } from "@/lib/server/http";
 import { tenantList, tenantListPage, tenantRpc } from "@/lib/server/database";
+import {businessDate,isPaymentBalanceReview} from '@/lib/financial-status';
 
-type PaymentBody={invoiceId?:unknown;invoiceNumber?:unknown;customerId?:unknown;customerName?:unknown;paidOn?:unknown;amount?:unknown;method?:unknown;note?:unknown};
+type PaymentBody={invoiceId?:unknown;invoiceNumber?:unknown;customerId?:unknown;customerName?:unknown;paidOn?:unknown;amount?:unknown;method?:unknown;note?:unknown;confirmOverpayment?:unknown;expectedBalance?:unknown};
 
 export async function GET(request:NextRequest){
   try{return json(await tenantListPage("payments",request.nextUrl.searchParams,"paid_on.desc"));}
@@ -16,7 +17,8 @@ export async function POST(request:NextRequest){
     const idempotencyKey=request.headers.get("idempotency-key")?.trim()??"";
     if(idempotencyKey.length<8||idempotencyKey.length>128) return json({error:"idempotency_required",message:"Idempotency-Key fehlt oder ist ungültig."},400);
     const amount=Number(body.amount);
-    if(!Number.isFinite(amount)||amount<=0) return json({error:"amount_invalid",message:"Bitte gültigen Betrag eingeben."},400);
+    if(typeof body.amount!=='number'||!Number.isFinite(amount)||amount<=0) return json({error:"amount_invalid",message:"Bitte gültigen Betrag eingeben."},400);
+    if(body.confirmOverpayment!==undefined&&typeof body.confirmOverpayment!=='boolean'||body.confirmOverpayment===true&&!isPaymentBalanceReview(body.expectedBalance)||body.expectedBalance!==undefined&&body.confirmOverpayment!==true)return json({error:'overpayment_confirmation_invalid',message:'Bitte die Überzahlung und den aktuellen Zahlungsstand ausdrücklich bestätigen.'},400);
     let invoiceId=cleanText(body.invoiceId,80)||null;
     let customerId=cleanText(body.customerId,80)||null;
     const invoiceNumber=cleanText(body.invoiceNumber,80);
@@ -32,11 +34,12 @@ export async function POST(request:NextRequest){
     const item=await tenantRpc<Record<string,unknown>>("create_payment_idempotent",{
       p_invoice_id:invoiceId,
       p_customer_id:customerId,
-      p_paid_on:cleanText(body.paidOn,20)||new Date().toISOString().slice(0,10),
+      p_paid_on:cleanText(body.paidOn,20)||businessDate(),
       p_amount:amount,
       p_method:cleanText(body.method,40)||"bank",
       p_note:cleanText(body.note,1000)||null,
       p_idempotency_key:idempotencyKey,
+      ...(body.confirmOverpayment===true?{p_overpayment_confirmed:true,p_expected_balance:body.expectedBalance}:{}),
     });
     return json({item},201);
   }catch(error){return apiError(error);}

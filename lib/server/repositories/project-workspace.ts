@@ -6,6 +6,8 @@ import {ApiError} from '@/lib/server/http';
 import {authorize} from '@/lib/server/rbac';
 import {audit} from '@/lib/server/audit';
 import {projectStatuses} from '@/lib/projects';
+import {financialStatus,invoiceStatusAxes,customerCredit} from '@/lib/financial-status';
+import {invoiceCreditSql,invoiceRefundSql} from '@/lib/server/document-amount-sql';
 export async function projectWorkspace(c:PoolClient,s:SessionUser,id:string){
  authorize(s,'projects:read');
  const item=(await c.query(`select p.id,p.name,p.customer_id,p.status,p.source_quote_id,p.hours_budget,p.progress,p.start_date,p.end_date,p.notes,p.version,p.updated_at,c.name customer_name,${tenantCan(s.role,'sales:read')?'q.quote_no':'null::text'} source_offer from projects p left join customers c on c.id=p.customer_id and c.organization_id=p.organization_id left join quotes q on q.id=p.source_quote_id and q.organization_id=p.organization_id where p.organization_id=$1 and p.id::text=$2 and p.archived_at is null`,[s.organizationId,id])).rows[0];
@@ -13,8 +15,8 @@ export async function projectWorkspace(c:PoolClient,s:SessionUser,id:string){
  const canTime=tenantCan(s.role,'time:read');
  const time=canTime?(await c.query(`select t.id,t.work_date,t.hours,t.description,t.billable,t.approved,t.invoiced_invoice_id from time_entries t where t.organization_id=$1 and t.project_id::text=$2 and t.archived_at is null and ($4::boolean=false or t.created_by_user_id=$3) order by t.work_date desc,t.created_at desc limit 100`,[s.organizationId,id,s.userId,ownRecordOnly(s.role,'zeiterfassung')])).rows:null;
  const totals=canTime?(await c.query(`select coalesce(sum(hours),0) hours,coalesce(sum(hours) filter(where invoiced_invoice_id is not null),0) invoiced_hours,count(*) entries from time_entries where organization_id=$1 and project_id::text=$2 and archived_at is null and ($4::boolean=false or created_by_user_id=$3)`,[s.organizationId,id,s.userId,ownRecordOnly(s.role,'zeiterfassung')])).rows[0]:null;
- const invoices=tenantCan(s.role,'invoices:read')?(await c.query(`select distinct i.invoice_no number,i.status,i.currency,i.total_amount from invoices i where i.organization_id=$1 and i.archived_at is null and (i.project_id::text=$2 or exists(select 1 from time_entries t where t.organization_id=i.organization_id and t.project_id::text=$2 and t.invoiced_invoice_id=i.id and t.archived_at is null)) order by i.invoice_no desc limit 100`,[s.organizationId,id])).rows:null;
- return {item,time,totals,invoices};
+ const invoices=tenantCan(s.role,'invoices:read')?(await c.query(`select distinct i.invoice_no number,i.status,i.currency,i.total_amount,i.total_amount total,i.paid_amount,i.issue_date::text issue_date,i.due_date::text due_date,${invoiceCreditSql('i')} credit_amount,${invoiceRefundSql('i')} refund_amount from invoices i where i.organization_id=$1 and i.archived_at is null and (i.project_id::text=$2 or exists(select 1 from time_entries t where t.organization_id=i.organization_id and t.project_id::text=$2 and t.invoiced_invoice_id=i.id and t.archived_at is null)) order by i.invoice_no desc limit 100`,[s.organizationId,id])).rows:null;
+ return {item,time,totals,invoices:invoices?.map(row=>{const axes=invoiceStatusAxes(row);return {...row,kind:'invoice',document_status:axes.document,payment_status:axes.payment,due_status:axes.due,customer_credit:customerCredit(row),display_status:financialStatus(row)};})??null};
 }
 export async function updateProject(c:PoolClient,s:SessionUser,id:string,body:Record<string,unknown>){
  authorize(s,'projects:write');

@@ -34,11 +34,11 @@ oder Nachweisaufträge. Ungeprüfte Klauseln bleiben ausdrücklich ungeprüft.
   offen. Das neue Feld `implementationStatus: ungeprueft` darf weder als Fehlerliste
   noch als erledigte Implementierung ausgegeben werden.
 
-## Nachweislich noch nicht vollständig implementiert
+## Neue Implementierung, verbleibende Code- und Integrationslücken
 
 | Priorität / Klauseln | Tatsächliche Lücke | Nächster begrenzter Umsetzungsschritt |
 | --- | --- | --- |
-| P0/P1 / R7-30-001, R7-31-012 | Direkte Überzahlungen sind nicht implementiert: `business-api.ts` lehnt Beträge oberhalb der offenen Rechnung mit `payment_exceeds_balance` ab; Migrationstest und Paralleltest weisen genau diese Sperre nach. Die kompakte Statusprojektion ist ausserdem keine vollständige Trennung von Dokument-/Zahlungs-/Fälligkeits-/Versandachse. | Die vorhandenen datierten Guthaben-/Rückerstattungswege in `credit-notes.ts` und `repositories/finance.ts` wiederverwenden und an ausdrücklich erfasste tatsächliche Überzahlungen anschliessen; Statusachsen konsistent erweitern. Die sichere bisherige Sperre darf nicht bloss entfernt und ihr Negativtest grün umgeschrieben werden. Zusammenhängende Ledger-, Parallel-, Cash-/Gutschrift- und Fachabnahme erforderlich. Das ist eine Implementierungslücke, kein externer Gerätetest-Blocker. |
+| P0/P1 / R7-30-001, R7-31-012 | Die zuvor fehlende ausdrückliche Überzahlung und getrennte Rechnungsachsen sind jetzt [implementiert und lokal geprüft](invoice-settlement.md). Die aktuelle native HTTP-/Parallel- und Browserqualifikation dieser neuen Quelle steht noch aus; nicht mit d052a3be abnehmen. Zustellnachweise und die vollständige Statusabnahme aller anderen Fachmodelle bleiben offen. | Aktuelle Gesamt-CI, unabhängige Fachabnahme und weitere Klauselprüfung; keine neue Produktionsfreigabe. |
 | P2 / R7-14-005, R7-34-005, R7-50-005 | Persönliche Opt-in-In-App-Erinnerung mit Vorschau und Verlauf ist implementiert; die aktuelle native Parallel-/Browserprüfung ist erfolgreich, die vollständige fachliche/physische Abnahme ist offen. Automatische Erinnerungs-E-Mails sind davon getrennt nicht angeschlossen. R7-14-005 verlangt selbst keinen garantierten Hintergrund-Mailkanal; dessen Fehlen ist deshalb kein Beleg für eine fehlende Umsetzung dieser Klausel. Die bestehende manuelle dreistufige Rechnungsmahnung bleibt eine andere Funktion. | Funktionsnachweise sind aktuell; die vollständige Fach-/Geräteabnahme bleibt offen. Für automatische E-Mails tatsächlichen Provider-/Betriebsvertrag verifizieren; atomare Reservierung, Status-Neuprüfung und Deduplikation erhalten. Kein echter Versand ohne Freigabe. |
 | P0/P1 / R7-06-003–004, R7-35-003 | Verifizierte Provider-Zustell-/Bounce-Verarbeitung und dauerhafte idempotente Wiederaufnahme sind nicht vollständig vorhanden. | Zuerst tatsächlichen Provider-Vertrag festlegen; anschliessend authentifizierte Ereignisverarbeitung und positive/negative Replay-/Signaturtests. Keine erfundene Graph-Webhook-Signatur oder fingierter Zustellstatus. |
 | P0 / R7-25-003, R7-36-004 | Benachrichtigungs-/Eskalationsanbindung für alle genannten Betriebsereignisse nicht vollständig vorhanden. `lib/server/observability.ts` nennt diese Grenzen ausdrücklich. Eine zusätzliche eigene persistente Alarmhistorie ist keine ausdrücklich vorgeschriebene Funktion. | Bestehende Mess- und Auditquellen nutzen; erst tatsächlichen freigegebenen Alarm-/Providerweg anschliessen. Keine parallele neue Infrastruktur aus einem Codeaudit heraus. |
@@ -59,7 +59,8 @@ und unbekannte Provider-Verträge werden nicht durch vermutete Anforderungen ers
 | P1/P2 | Berichtskopien-Retention im Betrieb | Bestehender Cleanup ist implementiert und isoliert geprüft. Explizite Tenant-Scopes, Environment-Zuordnung, produktive Indexmigration und echter Trockenlauf brauchen separate Freigabe; siehe [Retention](report-retention.md). |
 | P0 | Integration / Migration / Deployment | Exakte neue Commit-Freigabe und sämtliche bestehenden Schutzregeln; Draft307 bleibt offen. |
 
-Die aktuelle vollständige Development-Qualifikation ist erfolgreich. Offen bleiben
+Die vollständige Development-Qualifikation von d052a3be ist erfolgreich. Die neue
+Zahlungs-/Statusimplementierung ist damit noch nicht qualifiziert. Offen bleiben
 die oben genannten Implementierungspakete und die individuelle Klauselabnahme.
 47 Klauseln besitzen konkrete Teilbefunde;526 sind noch nicht einzeln abschliessend
 als implementiert oder fehlend bewertet. Dieser Zwischenstand ist ausdrücklich keine technische Gesamtabnahme.

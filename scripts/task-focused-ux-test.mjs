@@ -156,6 +156,8 @@ assert.equal(pageOrientation('/kunden/one',false,'reader'),undefined,'Record det
 const listQueries=await import(moduleUrl(await fs.readFile('lib/business-list-query.ts','utf8')));
 const publicQuery=listQueries.businessListQuery('documents',new URLSearchParams({customer_id:'eq.customer-a',id:'eq.invoice-a',display_status:'open',untrusted:'ignore'}));
 assert.equal(publicQuery.get('customer_id'),'eq.customer-a');assert.equal(publicQuery.get('id'),'eq.invoice-a');assert.equal(publicQuery.get('display_status'),'eq.open');assert.equal(publicQuery.has('untrusted'),false);
+const independentPayment=listQueries.businessListQuery('documents',new URLSearchParams({payment_status:'partial',due_status:'eq.overdue',payment_candidates:'1'}));assert.equal(independentPayment.get('payment_status'),'eq.partial');assert.equal(independentPayment.get('due_status'),'eq.overdue');assert.equal(independentPayment.get('payment_candidates'),'1');
+assert.equal(listQueries.businessListQuery('customers',new URLSearchParams({payment_status:'partial',payment_candidates:'1'})).has('payment_status'),false,'Invoice-only filters cannot leak into other directories');
 assert.equal(listQueries.businessListQuery('expenses',new URLSearchParams({employee_id:'attacker',review:'1'}),'created_at.desc',{employee_id:'route-owned'}).get('employee_id'),'eq.route-owned','Route-owned scope overrides query input');
 assert.equal(listQueries.businessListQuery('customers',new URLSearchParams({id:'eq.saved-customer'})).get('id'),'eq.saved-customer','A selected ID survives a reload beyond the loaded page');
 

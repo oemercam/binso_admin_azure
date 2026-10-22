@@ -617,37 +617,91 @@
       "sourceTextSha256": "6323bd3939a48b3d70311a5af9a62a13dd4a9a7a4874c3cf06b5ed3b54af8d3d",
       "status": "teilweise_implementiert",
       "implementationStatus": "teilweise_belegt",
-      "implementation": "Teil-/Vollzahlung, Gutschrift, Rückerstattung und offene Restbeträge besitzen echte Implementierungen. Eine direkte Überzahlung wird aktuell jedoch mit payment_exceeds_balance abgelehnt; dies ist keine umgesetzte Überzahlungsbuchung. Die kompakte Statusprojektion unterscheidet Zahlung und Fälligkeit nicht als vollständige unabhängige Achsen.",
+      "implementation": "Rechnungsachsen Dokument/Zahlung/Fälligkeit zentral in JavaScript und SQL; tatsächlicher letzter Versandnachweis getrennt. Ausdrücklich bestätigte echte Überzahlung mit vierfacher Saldenbindung, bestehendem Guthaben/Refund, Idempotenz/Audit/RLS; kontextgerechte Angebotsbezeichnung. Siehe invoice-settlement.md; keine pauschale Abnahme anderer Fachmodelle oder externer Zustellung.",
       "sourceReferences": [
-        "lib/server/repositories/business-api.ts",
         "lib/financial-status.ts",
+        "lib/server/document-amount-sql.ts",
+        "lib/server/repositories/business-api.ts",
+        "app/api/payments/route.ts",
+        "components/pages/payments.tsx",
         "components/documents.tsx",
-        "scripts/migration-test.mjs",
-        "scripts/postgres-parallel-test.mjs",
-        "lib/server/credit-notes.ts",
-        "lib/server/repositories/finance.ts"
+        "docs/audit/v25-revision7/invoice-settlement.md"
       ],
-      "test": "Tatsächlicher aktueller Migrationstest bestanden, einschliesslich expliziter Ablehnung einer Überzahlung und Doppelzahlungs-/Überbuchungsschutz. Dieser Negativnachweis ist kein positiver Test der laut Klausel geforderten Überzahlungsfunktion.",
-      "visualComparison": "Vollständige unabhängige Statusachsen und Überzahlungsdarstellung nicht abgenommen.",
-      "blocker": "Nachgewiesene Implementierungslücke, kein lediglich fehlender Gerätetest: die explizite Erfassung tatsächlicher Überzahlung und vollständige unabhängige Statusachsen fehlen. Ein datierter Guthaben-/Rückerstattungsweg ist für Gutschriften bereits vorhanden (lib/server/credit-notes.ts und repositories/finance.ts); seine direkte Überzahlungsanbindung und deren positive Parallel-/Cash-Prüfungen fehlen. Bestehende Überbuchungssperre nicht einfach entfernen. Keine produktive Datenänderung."
+      "test": "Lokale Migration, Status-SQL/JS, SSR/PDF, Statistik, Localization, UX, gezieltes Lint und Typecheck bestanden; aktuelle native HTTP/Parallel-/Browser-CI noch ausstehend.",
+      "visualComparison": "Gezielte echte SSR-Projektion; neue Browser-/Geräteabnahme noch offen.",
+      "blocker": "Aktuelle Gesamt-CI, individuelle Klausel-/Fachabnahme, reale Geräte und verifizierter Zustellkanal offen. Keine Produktionsmigration freigegeben."
     },
     "R7-31-012": {
       "sourceTextSha256": "f7f49d5dd0c0b1edb643652712d4d25dd45c47c0cb1532ad39f60b752e02756d",
       "status": "teilweise_implementiert",
       "implementationStatus": "teilweise_belegt",
-      "implementation": "Teil-/Vollzahlung, Gutschrift, Rückerstattung und offene Restbeträge besitzen echte Implementierungen. Eine direkte Überzahlung wird aktuell jedoch mit payment_exceeds_balance abgelehnt; dies ist keine umgesetzte Überzahlungsbuchung. Die kompakte Statusprojektion unterscheidet Zahlung und Fälligkeit nicht als vollständige unabhängige Achsen.",
+      "implementation": "Rechnungsachsen Dokument/Zahlung/Fälligkeit zentral in JavaScript und SQL; tatsächlicher letzter Versandnachweis getrennt. Ausdrücklich bestätigte echte Überzahlung mit vierfacher Saldenbindung, bestehendem Guthaben/Refund, Idempotenz/Audit/RLS; kontextgerechte Angebotsbezeichnung. Siehe invoice-settlement.md; keine pauschale Abnahme anderer Fachmodelle oder externer Zustellung.",
       "sourceReferences": [
-        "lib/server/repositories/business-api.ts",
         "lib/financial-status.ts",
+        "lib/server/document-amount-sql.ts",
+        "lib/server/repositories/business-api.ts",
+        "app/api/payments/route.ts",
+        "components/pages/payments.tsx",
         "components/documents.tsx",
-        "scripts/migration-test.mjs",
-        "scripts/postgres-parallel-test.mjs",
-        "lib/server/credit-notes.ts",
-        "lib/server/repositories/finance.ts"
+        "docs/audit/v25-revision7/invoice-settlement.md"
       ],
-      "test": "Tatsächlicher aktueller Migrationstest bestanden, einschliesslich expliziter Ablehnung einer Überzahlung und Doppelzahlungs-/Überbuchungsschutz. Dieser Negativnachweis ist kein positiver Test der laut Klausel geforderten Überzahlungsfunktion.",
-      "visualComparison": "Vollständige unabhängige Statusachsen und Überzahlungsdarstellung nicht abgenommen.",
-      "blocker": "Nachgewiesene Implementierungslücke, kein lediglich fehlender Gerätetest: die explizite Erfassung tatsächlicher Überzahlung und vollständige unabhängige Statusachsen fehlen. Ein datierter Guthaben-/Rückerstattungsweg ist für Gutschriften bereits vorhanden (lib/server/credit-notes.ts und repositories/finance.ts); seine direkte Überzahlungsanbindung und deren positive Parallel-/Cash-Prüfungen fehlen. Bestehende Überbuchungssperre nicht einfach entfernen. Keine produktive Datenänderung."
+      "test": "Lokale Migration, Status-SQL/JS, SSR/PDF, Statistik, Localization, UX, gezieltes Lint und Typecheck bestanden; aktuelle native HTTP/Parallel-/Browser-CI noch ausstehend.",
+      "visualComparison": "Gezielte echte SSR-Projektion; neue Browser-/Geräteabnahme noch offen.",
+      "blocker": "Aktuelle Gesamt-CI, individuelle Klausel-/Fachabnahme, reale Geräte und verifizierter Zustellkanal offen. Keine Produktionsmigration freigegeben."
+    },
+    "R7-30-002": {
+      "sourceTextSha256": "83433a4ba1b5b9397cd91edc7379875a64ed3afa81b3e0ab3b01e9f06b775267",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "implementation": "Rechnungsachsen Dokument/Zahlung/Fälligkeit zentral in JavaScript und SQL; tatsächlicher letzter Versandnachweis getrennt. Ausdrücklich bestätigte echte Überzahlung mit vierfacher Saldenbindung, bestehendem Guthaben/Refund, Idempotenz/Audit/RLS; kontextgerechte Angebotsbezeichnung. Siehe invoice-settlement.md; keine pauschale Abnahme anderer Fachmodelle oder externer Zustellung.",
+      "sourceReferences": [
+        "lib/financial-status.ts",
+        "lib/server/document-amount-sql.ts",
+        "lib/server/repositories/business-api.ts",
+        "app/api/payments/route.ts",
+        "components/pages/payments.tsx",
+        "components/documents.tsx",
+        "docs/audit/v25-revision7/invoice-settlement.md"
+      ],
+      "test": "Lokale Migration, Status-SQL/JS, SSR/PDF, Statistik, Localization, UX, gezieltes Lint und Typecheck bestanden; aktuelle native HTTP/Parallel-/Browser-CI noch ausstehend.",
+      "visualComparison": "Gezielte echte SSR-Projektion; neue Browser-/Geräteabnahme noch offen.",
+      "blocker": "Aktuelle Gesamt-CI, individuelle Klausel-/Fachabnahme, reale Geräte und verifizierter Zustellkanal offen. Keine Produktionsmigration freigegeben."
+    },
+    "R7-30-003": {
+      "sourceTextSha256": "23a1e790bde1084c725f167199b44aded6ad37184b326e2dcbfd85ae6a7d7eb4",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "implementation": "Rechnungsachsen Dokument/Zahlung/Fälligkeit zentral in JavaScript und SQL; tatsächlicher letzter Versandnachweis getrennt. Ausdrücklich bestätigte echte Überzahlung mit vierfacher Saldenbindung, bestehendem Guthaben/Refund, Idempotenz/Audit/RLS; kontextgerechte Angebotsbezeichnung. Siehe invoice-settlement.md; keine pauschale Abnahme anderer Fachmodelle oder externer Zustellung.",
+      "sourceReferences": [
+        "lib/financial-status.ts",
+        "lib/server/document-amount-sql.ts",
+        "lib/server/repositories/business-api.ts",
+        "app/api/payments/route.ts",
+        "components/pages/payments.tsx",
+        "components/documents.tsx",
+        "docs/audit/v25-revision7/invoice-settlement.md"
+      ],
+      "test": "Lokale Migration, Status-SQL/JS, SSR/PDF, Statistik, Localization, UX, gezieltes Lint und Typecheck bestanden; aktuelle native HTTP/Parallel-/Browser-CI noch ausstehend.",
+      "visualComparison": "Gezielte echte SSR-Projektion; neue Browser-/Geräteabnahme noch offen.",
+      "blocker": "Aktuelle Gesamt-CI, individuelle Klausel-/Fachabnahme, reale Geräte und verifizierter Zustellkanal offen. Keine Produktionsmigration freigegeben."
+    },
+    "R7-30-006": {
+      "sourceTextSha256": "3787243dd02f7370e677975d7a522ca18d7175b3a131c59d1922f9f8d4c16748",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "implementation": "Rechnungsachsen Dokument/Zahlung/Fälligkeit zentral in JavaScript und SQL; tatsächlicher letzter Versandnachweis getrennt. Ausdrücklich bestätigte echte Überzahlung mit vierfacher Saldenbindung, bestehendem Guthaben/Refund, Idempotenz/Audit/RLS; kontextgerechte Angebotsbezeichnung. Siehe invoice-settlement.md; keine pauschale Abnahme anderer Fachmodelle oder externer Zustellung.",
+      "sourceReferences": [
+        "lib/financial-status.ts",
+        "lib/server/document-amount-sql.ts",
+        "lib/server/repositories/business-api.ts",
+        "app/api/payments/route.ts",
+        "components/pages/payments.tsx",
+        "components/documents.tsx",
+        "docs/audit/v25-revision7/invoice-settlement.md"
+      ],
+      "test": "Lokale Migration, Status-SQL/JS, SSR/PDF, Statistik, Localization, UX, gezieltes Lint und Typecheck bestanden; aktuelle native HTTP/Parallel-/Browser-CI noch ausstehend.",
+      "visualComparison": "Gezielte echte SSR-Projektion; neue Browser-/Geräteabnahme noch offen.",
+      "blocker": "Aktuelle Gesamt-CI, individuelle Klausel-/Fachabnahme, reale Geräte und verifizierter Zustellkanal offen. Keine Produktionsmigration freigegeben."
     }
   },
   "tests": {

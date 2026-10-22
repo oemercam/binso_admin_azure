@@ -73,3 +73,6 @@ Alle Änderungen liegen auf `feat/v25-revision7`, Draft-PR307. Main, bestehende
 Sicherheitsarbeiten und andere offene PRs bleiben erhalten. Neue Migrationen wurden
 nur isoliert getestet. Merge, produktive Migrationen und Deployment benötigen eine
 separate exakte Commit-Freigabe; kein Bypass und keine vorgetäuschte Vier-Augen-Abnahme.
+
+Neu in Fortsetzung: [Rechnungszahlung und Statusachsen](invoice-settlement.md).
+Die neue Quelle benötigt eigene CI; ältere grüne Nachweise qualifizieren sie nicht.

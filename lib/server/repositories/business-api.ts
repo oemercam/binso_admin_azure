@@ -1,7 +1,7 @@
 import {idempotentBusiness} from "../business-idempotency";
 import "server-only";
-import {offerTotalSql,offerStatusSql} from "../document-amount-sql";
-import {businessDate,financialStatus,openAmount,paymentStatus} from "@/lib/financial-status";
+import {offerTotalSql,offerStatusSql,invoiceCreditSql,invoiceRefundSql,invoicePaymentStatusSql,invoiceDueStatusSql,invoiceDisplayStatusSql} from "../document-amount-sql";
+import {businessDate,financialStatus,openAmount,invoiceStatusAxes,customerCredit,paymentEntryIssue,paymentBalance,samePaymentBalance,maxRecordedPayment} from "@/lib/financial-status";
 import { randomUUID } from "node:crypto";
 import type { PoolClient } from "pg";
 import { audit } from "../audit";
@@ -64,10 +64,11 @@ export async function listApiBusiness(c:PoolClient,s:SessionUser,table:string,ex
    if(!tenantCan(s.role,k==='invoice'?'invoices:read':'sales:read'))continue;
    const lines=k==='invoice'?'invoice_lines':'quote_lines';
    sources.push(`select d.id,d.customer_id,'${k}' kind,d.${no} number,d.status,${k==='offer'?'d.offer_version':'null::integer'} offer_version,${k==='offer'?'d.title':'null::text'} title,${k==='invoice'?'d.qr_reference':'null::text'} qr_reference,d.issue_date::text issue_date,${k==='invoice'?'d.due_date::text':'null::text'} due_date,${k==='offer'?'d.valid_until::text':'null::text'} valid_until,d.note,d.intro_text,d.issuer_snapshot,d.customer_snapshot,d.document_snapshot,${k==='invoice'?'d.payment_snapshot':"'{}'::jsonb"} payment_snapshot,d.currency,d.created_at,d.updated_at,${k==='invoice'?'d.paid_amount':'0::numeric'} paid_amount,
-     ${k==='invoice'?`coalesce((select sum(n.amount) from credit_notes n where n.organization_id=d.organization_id and n.invoice_id=d.id and n.credit_date<=(now() at time zone 'Europe/Zurich')::date),0)`:'0::numeric'} credit_amount,
+     ${k==='invoice'?invoiceCreditSql('d'):'0::numeric'} credit_amount,
+     ${k==='invoice'?`(select v.status from document_deliveries v where v.organization_id=d.organization_id and v.kind='invoice' and v.document_id=d.id and v.purpose='document' order by v.created_at desc,v.id desc limit 1)`:'null::text'} delivery_status,
      ${k==='invoice'?`coalesce((select json_agg(json_build_object('number',n.credit_no,'date',n.credit_date::text,'amount',n.amount,'reason',n.reason) order by n.credit_date,n.created_at,n.id) from credit_notes n where n.organization_id=d.organization_id and n.invoice_id=d.id),'[]'::json)`:`'[]'::json`} credits,
      ${k==='invoice'?`coalesce((select json_agg(json_build_object('id',r.id,'stage',r.reminder_stage,'status',r.status,'recipient',r.recipient,'amount',r.balance_amount,'deadline',r.payment_deadline::text,'completed_at',r.completed_at) order by r.created_at,r.id) from document_deliveries r where r.organization_id=d.organization_id and r.document_id=d.id and r.purpose='reminder'),'[]'::json)`:`'[]'::json`} reminders,
-     ${k==='invoice'?`coalesce((select sum(r.amount) from invoice_refunds r where r.organization_id=d.organization_id and r.invoice_id=d.id and r.refund_date<=(now() at time zone 'Europe/Zurich')::date),0)`:'0::numeric'} refund_amount,
+     ${k==='invoice'?invoiceRefundSql('d'):'0::numeric'} refund_amount,
      ${k==='invoice'?`coalesce((select json_agg(json_build_object('id',r.id,'date',r.refund_date::text,'amount',r.amount,'reason',r.reason) order by r.refund_date,r.created_at,r.id) from invoice_refunds r where r.organization_id=d.organization_id and r.invoice_id=d.id),'[]'::json)`:`'[]'::json`} refunds,
      ${k==='invoice'?`(select min(x.payment_date)::text from (select p.payment_date,sum(p.amount) over(order by p.payment_date,p.created_at,p.id) accumulated,sum(p.amount) over() recorded_total from payments p where p.organization_id=d.organization_id and p.invoice_id=d.id and p.archived_at is null and p.allocation_status='matched') x where x.accumulated>=d.total_amount and x.recorded_total=d.paid_amount and d.total_amount>0 and d.paid_amount>=d.total_amount)`:'null::text'} paid_on,
      ${k==='invoice'?`(select q.quote_no from quotes q where q.id=d.source_quote_id and q.organization_id=d.organization_id)`:'null::text'} source_offer,
@@ -92,7 +93,8 @@ export async function listApiBusiness(c:PoolClient,s:SessionUser,table:string,ex
  // Persisted legacy statuses and document snapshots remain unchanged.
  if(table==='documents'){
   values.push(businessDate());
-  source=`select d.*,case when d.kind='offer' then ${offerStatusSql('d',`$${values.length}`)} when d.status in ('draft','cancelled') then d.status when d.total>0 and round(greatest(0,d.total-d.credit_amount)*100)<=round(greatest(0,d.paid_amount-d.refund_amount)*100) then 'paid' when d.due_date<$${values.length}::text and round(greatest(0,d.total-d.credit_amount)*100)>round(greatest(0,d.paid_amount-d.refund_amount)*100) then 'overdue' when round(greatest(0,d.paid_amount-d.refund_amount)*100)>0 then 'partial' else 'open' end display_status from (${source}) d`;
+  const today=`$${values.length}`;
+  source=`select d.*,case when d.kind='offer' then ${offerStatusSql('d',today)} else ${invoiceDisplayStatusSql('d',today)} end display_status,case when d.kind='invoice' then ${invoicePaymentStatusSql('d')} else null end payment_status,case when d.kind='invoice' then ${invoiceDueStatusSql('d',today)} else null end due_status from (${source}) d`;
  }
  const where:string[]=[];
  if(filters.has('review')){
@@ -104,11 +106,20 @@ export async function listApiBusiness(c:PoolClient,s:SessionUser,table:string,ex
   if(!customerFinancials||filters.get('outstanding')!=='1')throw new ApiError(400,'invalid_filter','Ungültiger Kundenfilter.');
   where.push('q.has_open=true');
  }
+ if(filters.has('payment_candidates')){
+  if(table!=='documents'||filters.get('payment_candidates')!=='1')throw new ApiError(400,'invalid_filter','Ungültiger Rechnungsfilter.');
+  where.push("q.kind='invoice' and q.status not in ('draft','cancelled')");
+ }
  const display=filters.get('display_status');
  if(display){
-  if(table!=='documents'||!/^eq\.(draft|open|partial|overdue|paid|sent|accepted|declined|expired|revised|cancelled)$/.test(display))throw new ApiError(400,'invalid_filter','Ungültiger Dokumentstatus.');
+  if(table!=='documents'||!/^eq\.(draft|open|partial|overdue|paid|overpaid|credited|sent|accepted|declined|expired|revised|cancelled)$/.test(display))throw new ApiError(400,'invalid_filter','Ungültiger Dokumentstatus.');
   const state=display.slice(3);if(state!=='open')values.push(state);
   where.push(state==='open'?"q.display_status in ('open','partial','overdue')":`q.display_status=$${values.length}`);
+ }
+ for(const [key,allowed] of [['payment_status',/^eq\.(unpaid|partial|paid|overpaid|credited)$/],['due_status',/^eq\.(not_due|due_today|overdue|unknown)$/]] as const){
+  const value=filters.get(key);if(!value)continue;
+  if(table!=='documents'||!allowed.test(value))throw new ApiError(400,'invalid_filter','Ungültiger Dokumentstatus.');
+  values.push(value.slice(3));where.push(`q.${key}=$${values.length}`);
  }
 
  for(const key of ['id','name','number','customer_id','status',...(table==='products'?['kind']:[]),...(table==='expenses'?['employee_id']:[]),...(table==='employees'?['first_name','last_name']:[])]){
@@ -139,7 +150,7 @@ export async function listApiBusiness(c:PoolClient,s:SessionUser,table:string,ex
  if(!Number.isSafeInteger(offset)||offset<0||offset>10_000_000)throw new ApiError(400,'invalid_offset','Ungültige Listenseite.');
  const result=await c.query<Row>(`select *,count(*) over()::int total_count from (${source}) q ${where.length?'where '+where.join(' and '):''} order by ${sortTerms.join(',')},q.id desc limit ${limit}${offset?' offset '+offset:''}`,values);
  if(table==='customers'&&['member','project_manager','manager'].includes(s.role))return result.rows.map(row=>Object.fromEntries(['id','customer_no','name','contact','contact_name','status','total_count'].filter(key=>Object.hasOwn(row,key)).map(key=>[key,row[key]])));
- return table==='documents'?result.rows.map(row=>({...row,document_status:row.kind==='invoice'&&!['draft','cancelled'].includes(String(row.status))?'issued':row.status,payment_status:row.kind==='invoice'?paymentStatus(row):null,overdue:financialStatus(row)==='overdue',display_status:financialStatus(row)})):result.rows;
+ return table==='documents'?result.rows.map(row=>{const axes=row.kind==='invoice'?invoiceStatusAxes(row):null;return {...row,document_status:axes?.document??row.status,payment_status:axes?.payment??null,due_status:axes?.due??null,customer_credit:axes?customerCredit(row):null,overdue:axes?.due==='overdue',display_status:financialStatus(row)};}):result.rows;
 }
 export function translateBusinessWrite(table:string,data:Row,insert:boolean){
  const out:Row={};let target=table;
@@ -176,19 +187,31 @@ async function executeBusinessMutation(c:PoolClient,s:SessionUser,operation:stri
    if(previous.rows[0].request_hash!==hash)throw new ApiError(409,'idempotency_conflict','Idempotency-Key wurde bereits verwendet.');
    return previous.rows[0].response_json;
   }
-  const amount=Number(args.p_amount);if(!Number.isFinite(amount)||amount<=0)throw new ApiError(400,'amount_invalid','Ungültiger Betrag.');
+  const amount=Number(args.p_amount);if(typeof args.p_amount!=='number'||!Number.isFinite(amount)||amount<=0)throw new ApiError(400,'amount_invalid','Ungültiger Betrag.');
+  const paidOn=String(args.p_paid_on??''),paidDate=new Date(paidOn+'T12:00:00Z');
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(paidOn)||!Number.isFinite(paidDate.getTime())||paidDate.toISOString().slice(0,10)!==paidOn||paidOn>businessDate())throw new ApiError(400,'payment_date_invalid','Bitte ein gültiges Zahlungsdatum bis heute eingeben.');
   const invoice=await c.query('select id,customer_id,total_amount,paid_amount,status from invoices where id::text=$1 and organization_id=$2 and archived_at is null for update',[args.p_invoice_id,s.organizationId]);
-  const row=invoice.rows[0];if(!row||['draft','cancelled'].includes(row.status))throw new ApiError(400,'invoice_invalid','Bitte eine offene Rechnung auswählen.');
+  const row=invoice.rows[0];if(!row||['draft','cancelled'].includes(row.status))throw new ApiError(400,'invoice_invalid','Bitte eine ausgestellte Rechnung auswählen.');
+  // Existing dated advance receipts remain valid; never relabel their cash date
+  // to the later invoice date. A future date is not an actual received payment.
   const credits=(await c.query("select coalesce(sum(amount),0) amount from credit_notes where organization_id=$1 and invoice_id=$2 and credit_date<=(now() at time zone 'Europe/Zurich')::date",[s.organizationId,row.id])).rows[0].amount;
   const refunds=(await c.query("select coalesce(sum(amount),0) amount from invoice_refunds where organization_id=$1 and invoice_id=$2 and refund_date<=(now() at time zone 'Europe/Zurich')::date",[s.organizationId,row.id])).rows[0].amount;
   const remaining=openAmount({total:row.total_amount,paid_amount:row.paid_amount,credit_amount:credits,refund_amount:refunds});
-  if(amount!==Math.round(amount*100)/100||amount>remaining||remaining===0)throw new ApiError(409,'payment_exceeds_balance','Der Zahlungsbetrag darf den offenen Rechnungsbetrag nicht überschreiten. Bitte Zahlungsstand aktualisieren.');
+  const confirmed=args.p_overpayment_confirmed===true,balance=paymentBalance({total:row.total_amount,paid_amount:row.paid_amount,credit_amount:credits,refund_amount:refunds});
+  if(confirmed&&!samePaymentBalance(args.p_expected_balance,balance))throw new ApiError(409,'payment_balance_changed','Der Zahlungsstand hat sich geändert. Bitte Betrag und Überzahlung erneut prüfen.');
+  const issue=paymentEntryIssue(amount,remaining,confirmed,confirmed?balance.openAmount:undefined);
+  if(issue)throw new ApiError(issue==='amount_invalid'?400:409,issue,issue==='payment_balance_changed'?'Der Zahlungsstand hat sich geändert. Bitte Betrag und Überzahlung erneut prüfen.':issue==='amount_invalid'?'Bitte gültigen Betrag eingeben.':'Der Zahlungsbetrag darf den offenen Rechnungsbetrag ohne ausdrückliche Überzahlungsbestätigung nicht überschreiten.');
+  if(Math.round(Number(row.paid_amount)*100)+Math.round(amount*100)>Math.round(maxRecordedPayment*100))throw new ApiError(400,'amount_invalid','Bitte gültigen Betrag eingeben.');
+  if(confirmed){
+   const recorded=Number((await c.query("select coalesce(sum(amount),0) amount from payments where organization_id=$1 and invoice_id=$2 and archived_at is null and allocation_status='matched'",[s.organizationId,row.id])).rows[0].amount);
+   if(recorded!==Number(row.paid_amount))throw new ApiError(409,'payment_ledger_mismatch','Der Zahlungsstand muss vor der Überzahlung geprüft werden.');
+  }
   if(args.p_customer_id&&String(args.p_customer_id)!==String(row.customer_id))throw new ApiError(400,'customer_mismatch','Kunde stimmt nicht mit der Rechnung überein.');
   const payment=await c.query(`insert into payments(organization_id,external_id,invoice_id,payer_customer_id,payment_date,amount,method,reference,allocation_status,created_by_user_id)
    values($1,$2,$3,$4,$5,$6,$7,$8,'matched',$9) returning id,amount,payment_date paid_on`,[s.organizationId,randomUUID(),row.id,row.customer_id,args.p_paid_on,amount,args.p_method,args.p_note,s.userId]);
   await c.query("update invoices set paid_amount=paid_amount+$1,status=case when paid_amount+$1-$5::numeric>=greatest(0,total_amount-$4::numeric) then 'paid' else 'partial' end,updated_at=now() where id=$2 and organization_id=$3",[amount,row.id,s.organizationId,credits,refunds]);
   await c.query('insert into business_idempotency_keys(organization_id,operation,idempotency_key,request_hash,response_json,created_by_user_id) values($1,$2,$3,$4,$5::jsonb,$6)',[s.organizationId,operation,key,hash,JSON.stringify(payment.rows[0]),s.userId]);
-  await audit(c,{organizationId:s.organizationId,userId:s.userId,action:"payment.created",entityType:"payment",entityId:payment.rows[0].id});
+  await audit(c,{organizationId:s.organizationId,userId:s.userId,action:"payment.created",entityType:"payment",entityId:payment.rows[0].id,...(confirmed?{metadata:{invoiceId:row.id,overpaymentConfirmed:true,reviewedBalance:balance,overpaymentAmount:Math.round((amount-remaining)*100)/100}}:{})});
   return payment.rows[0];
  }
  if(!['create_document_atomic','update_document_atomic'].includes(operation))throw new ApiError(400,'invalid_operation','Ungültige Aktion.');

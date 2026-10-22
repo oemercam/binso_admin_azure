@@ -15003,5 +15003,145 @@
     "Issue the offer first.",
     "Émettez d’abord l’offre.",
     "Emetti prima l’offerta."
+  ],
+  "Der Zahlungsstand hat sich geändert. Bitte Betrag und Überzahlung erneut prüfen.": [
+    "The payment balance has changed. Review the amount and overpayment again.",
+    "Le solde a changé. Vérifiez à nouveau le montant et le trop-perçu.",
+    "Il saldo è cambiato. Verifica nuovamente l’importo e il pagamento in eccesso."
+  ],
+  "Der Zahlungsbetrag darf den offenen Rechnungsbetrag ohne ausdrückliche Überzahlungsbestätigung nicht überschreiten.": [
+    "The payment cannot exceed the outstanding invoice balance without explicit overpayment confirmation.",
+    "Le paiement ne peut pas dépasser le solde de la facture sans confirmation explicite du trop-perçu.",
+    "Il pagamento non può superare il saldo della fattura senza conferma esplicita del pagamento in eccesso."
+  ],
+  "Der Zahlungsstand muss vor der Überzahlung geprüft werden.": [
+    "The payment ledger must be checked before recording an overpayment.",
+    "Le registre des paiements doit être vérifié avant d’enregistrer un trop-perçu.",
+    "Il registro dei pagamenti deve essere verificato prima di registrare un pagamento in eccesso."
+  ],
+  "Bitte die Überzahlung und den aktuellen Zahlungsstand ausdrücklich bestätigen.": [
+    "Explicitly confirm the overpayment and the current payment balance.",
+    "Confirmez explicitement le trop-perçu et le solde actuel.",
+    "Conferma esplicitamente il pagamento in eccesso e il saldo attuale."
+  ],
+  "Bitte die tatsächlich eingegangene Überzahlung bestätigen.": [
+    "Confirm the overpayment actually received.",
+    "Confirmez le trop-perçu effectivement reçu.",
+    "Conferma il pagamento in eccesso effettivamente ricevuto."
+  ],
+  "Tatsächliche Überzahlung bestätigen": [
+    "Confirm actual overpayment",
+    "Confirmer le trop-perçu effectif",
+    "Conferma il pagamento in eccesso effettivo"
+  ],
+  "Zusätzliches Kundenguthaben": [
+    "Additional customer credit",
+    "Avoir client supplémentaire",
+    "Credito cliente aggiuntivo"
+  ],
+  "Kundenguthaben": [
+    "Customer credit",
+    "Avoir client",
+    "Credito cliente"
+  ],
+  "Nur einen tatsächlich eingegangenen Betrag erfassen. Das zusätzliche Guthaben wird nicht als Umsatz gezählt. Es wird keine Bankzahlung ausgelöst.": [
+    "Record only a payment actually received. Additional credit is not counted as revenue. No bank payment is initiated.",
+    "Enregistrez uniquement un paiement effectivement reçu. L’avoir supplémentaire n’est pas compté comme chiffre d’affaires. Aucun paiement bancaire n’est déclenché.",
+    "Registra solo un pagamento effettivamente ricevuto. Il credito aggiuntivo non è conteggiato come fatturato. Non viene avviato alcun pagamento bancario."
+  ],
+  "Bitte ein gültiges Zahlungsdatum bis heute eingeben.": [
+    "Enter a valid payment date no later than today.",
+    "Saisissez une date de paiement valide, au plus tard aujourd’hui.",
+    "Inserisci una data di pagamento valida non successiva a oggi."
+  ],
+  "Ungültiger Rechnungsfilter.": [
+    "Invalid invoice filter.",
+    "Filtre de factures non valide.",
+    "Filtro delle fatture non valido."
+  ],
+  "Bitte eine ausgestellte Rechnung auswählen.": [
+    "Select an issued invoice.",
+    "Sélectionnez une facture émise.",
+    "Seleziona una fattura emessa."
+  ],
+  "Überbezahlt": [
+    "Overpaid",
+    "Trop-perçu",
+    "Pagamento eccedente"
+  ],
+  "Gutgeschrieben": [
+    "Credited",
+    "Crédité",
+    "Accreditato"
+  ],
+  "Unbezahlt": [
+    "Unpaid",
+    "Impayé",
+    "Non pagato"
+  ],
+  "Ausgestellt": [
+    "Issued",
+    "Émis",
+    "Emesso"
+  ],
+  "Heute fällig": [
+    "Due today",
+    "Échéance aujourd’hui",
+    "In scadenza oggi"
+  ],
+  "Nicht fällig": [
+    "Not yet due",
+    "Non échu",
+    "Non ancora scaduto"
+  ],
+  "Letzter Versand": [
+    "Latest send attempt",
+    "Dernier envoi",
+    "Ultimo invio"
+  ],
+  "Kein Versandnachweis": [
+    "No send evidence",
+    "Aucune preuve d’envoi",
+    "Nessuna prova di invio"
+  ],
+  "Zurückgezogen": [
+    "Withdrawn",
+    "Retiré",
+    "Ritirato"
+  ],
+  "Keine überarbeiteten Angebote": [
+    "No revised quotes",
+    "Aucune offre révisée",
+    "Nessuna offerta rivista"
+  ],
+  "Keine zurückgezogenen Angebote": [
+    "No withdrawn quotes",
+    "Aucune offre retirée",
+    "Nessuna offerta ritirata"
+  ],
+  "Keine teilweise bezahlten Rechnungen": [
+    "No partially paid invoices",
+    "Aucune facture partiellement payée",
+    "Nessuna fattura parzialmente pagata"
+  ],
+  "Keine heute fälligen Rechnungen": [
+    "No invoices due today",
+    "Aucune facture à échéance aujourd’hui",
+    "Nessuna fattura in scadenza oggi"
+  ],
+  "Keine überbezahlten Rechnungen": [
+    "No overpaid invoices",
+    "Aucune facture avec trop-perçu",
+    "Nessuna fattura con pagamento eccedente"
+  ],
+  "Keine gutgeschriebenen Rechnungen": [
+    "No credited invoices",
+    "Aucune facture créditée",
+    "Nessuna fattura accreditata"
+  ],
+  "Erfasstes Kundenguthaben, kein zusätzliches fakturiertes Volumen": [
+    "Recorded customer credit, not additional invoiced volume",
+    "Avoir client enregistré, sans volume facturé supplémentaire",
+    "Credito cliente registrato, nessun volume fatturato aggiuntivo"
   ]
 }

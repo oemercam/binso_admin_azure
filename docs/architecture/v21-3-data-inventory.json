@@ -4,7 +4,7 @@
   "counts": {
     "apis": 123,
     "consumers": 46,
-    "migrations": 79,
+    "migrations": 80,
     "tables": 111
   },
   "apis": [
@@ -4941,7 +4941,7 @@
       "evidence": [
         {
           "callee": "tenantListPage",
-          "line": 8,
+          "line": 9,
           "arguments": [
             "\"payments\"",
             "request.nextUrl.searchParams",
@@ -4950,7 +4950,7 @@
         },
         {
           "callee": "tenantList",
-          "line": 25,
+          "line": 27,
           "arguments": [
             "\"documents\"",
             "\"id\"",
@@ -4959,7 +4959,7 @@
         },
         {
           "callee": "tenantList",
-          "line": 29,
+          "line": 31,
           "arguments": [
             "\"customers\"",
             "\"id\"",
@@ -4968,10 +4968,10 @@
         },
         {
           "callee": "tenantRpc",
-          "line": 32,
+          "line": 34,
           "arguments": [
             "\"create_payment_idempotent\"",
-            "{\n      p_invoice_id:invoiceId,\n      p_customer_id:customerId,\n      p_paid_on:cleanText(body.paidOn,20)||new Date().toISOString().slice(0,10),\n      p_amount:amount,\n      p_method:cleanText(body.method,40)||\"bank\",\n      p_note:cleanText(body.note,1000)||null,\n      p_idempotency_key:idempotencyKey,\n    }"
+            "{\n      p_invoice_id:invoiceId,\n      p_customer_id:customerId,\n      p_paid_on:cleanText(body.paidOn,20)||businessDate(),\n      p_amount:amount,\n      p_method:cleanText(body.method,40)||\"bank\",\n      p_note:cleanText(body.note,1000)||null,\n      p_idempotency_key:idempotencyKey,\n      ...(body.confirmOverpayment===true?{p_overpayment_confirmed:true,p_expected_balance:body.expectedBalance}:{}),\n    }"
           ]
         }
       ]
@@ -5083,7 +5083,10 @@
         "lib/server/validation.ts",
         "lib/server/repositories/project-workspace.ts",
         "lib/server/audit.ts",
-        "lib/projects.ts"
+        "lib/projects.ts",
+        "lib/financial-status.ts",
+        "lib/money.ts",
+        "lib/server/document-amount-sql.ts"
       ],
       "evidence": [
         {
@@ -5153,6 +5156,9 @@
         "lib/server/rbac.ts",
         "lib/server/audit.ts",
         "lib/projects.ts",
+        "lib/financial-status.ts",
+        "lib/money.ts",
+        "lib/server/document-amount-sql.ts",
         "lib/server/plan-access.ts",
         "lib/server/business-idempotency.ts"
       ],
@@ -7559,7 +7565,7 @@
           "callee": "useApiQuery",
           "line": 18,
           "arguments": [
-            "endpoint&&value&&!selectedLabel?directoryQuery(endpoint,{id:value,customerId}):null"
+            "endpoint&&value&&!selectedLabel&&selectedItem?.id!==value?directoryQuery(endpoint,{id:value,customerId}):null"
           ]
         }
       ],
@@ -7610,98 +7616,98 @@
       "calls": [
         {
           "callee": "useApiQuery",
-          "line": 80,
+          "line": 81,
           "arguments": [
             "enabled?(\"/api/customers?limit=50\"):null"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 81,
+          "line": 82,
           "arguments": [
             "enabled&&selectedId&&true?\"/api/customers/\"+encodeURIComponent(selectedId):null"
           ]
         },
         {
           "callee": "apiGet<{item?:Record<string,unknown>;items?:Array<Record<string,unknown>>}>(url)\n      .then(payload=>{if(!active)return;const item=payload.item??payload.items?.[0];if(!item)throw new Error(\"Dokument wurde nicht gefunden.\");setDraft(remoteDraftFromItem(item,kind));setLoading(false);setError(null);})\n      .catch",
-          "line": 216,
+          "line": 218,
           "arguments": [
             "error=>{if(active){setLoading(false);setError(error instanceof Error?error.message:\"Dokument konnte nicht geladen werden.\");}}"
           ]
         },
         {
           "callee": "apiGet<{item?:Record<string,unknown>;items?:Array<Record<string,unknown>>}>(url)\n      .then",
-          "line": 216,
+          "line": 218,
           "arguments": [
             "payload=>{if(!active)return;const item=payload.item??payload.items?.[0];if(!item)throw new Error(\"Dokument wurde nicht gefunden.\");setDraft(remoteDraftFromItem(item,kind));setLoading(false);setError(null);}"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 216,
+          "line": 218,
           "arguments": [
             "url"
           ]
         },
         {
           "callee": "apiGet<{demo?:boolean;tenant?:{role?:string;readOnly?:boolean}}>(\"/api/auth/session\").then(s=>{setDocumentRole(s.tenant?.role??\"\");setDocumentReadOnly(s.tenant?.readOnly===true);setDemoDocument(s.demo===true)}).catch",
-          "line": 260,
+          "line": 262,
           "arguments": [
             "()=>{}"
           ]
         },
         {
           "callee": "apiGet<{demo?:boolean;tenant?:{role?:string;readOnly?:boolean}}>(\"/api/auth/session\").then",
-          "line": 260,
+          "line": 262,
           "arguments": [
             "s=>{setDocumentRole(s.tenant?.role??\"\");setDocumentReadOnly(s.tenant?.readOnly===true);setDemoDocument(s.demo===true)}"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 260,
+          "line": 262,
           "arguments": [
             "\"/api/auth/session\""
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 279,
+          "line": 281,
           "arguments": [
             "selectedProductId?\"/api/products/\"+encodeURIComponent(selectedProductId):null"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 288,
+          "line": 290,
           "arguments": [
             "!existing&&sourceOffer?(\"/api/documents/\"+encodeURIComponent(sourceOffer)):null"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 290,
+          "line": 292,
           "arguments": [
             "sourceItem?.customer_id&&sourceOffer?\"/api/customers/\"+encodeURIComponent(String(sourceItem.customer_id)):null"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 307,
+          "line": 309,
           "arguments": [
             "kind==='Rechnung'&&sourceTimeEntriesParam&&true?'/api/time-entries/billing?ids='+encodeURIComponent(sourceTimeEntriesParam):null"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 308,
+          "line": 310,
           "arguments": [
             "kind==='Rechnung'&&sourceExpenseParam&&true?'/api/expenses/billing?ids='+encodeURIComponent(sourceExpenseParam):null"
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 354,
+          "line": 356,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)",
             "payload"
@@ -7709,7 +7715,7 @@
         },
         {
           "callee": "apiPost",
-          "line": 354,
+          "line": 356,
           "arguments": [
             "\"/api/documents\"",
             "payload",
@@ -7718,7 +7724,7 @@
         },
         {
           "callee": "apiPost",
-          "line": 370,
+          "line": 372,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)+\"/status\"",
             "{action}"
@@ -7726,14 +7732,14 @@
         },
         {
           "callee": "apiGet",
-          "line": 370,
+          "line": 372,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)"
           ]
         },
         {
           "callee": "apiPost",
-          "line": 372,
+          "line": 374,
           "arguments": [
             "'/api/documents/'+encodeURIComponent(documentKey??draft.number)+'/revision'",
             "{}",
@@ -7742,7 +7748,7 @@
         },
         {
           "callee": "apiPost",
-          "line": 373,
+          "line": 375,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)+(adjustmentIsRefund?\"/refunds\":\"/credits\")",
             "{amount:Number(creditAmount),reason:creditReason,...(adjustmentIsRefund?{date:refundDate}:{})}",
@@ -7751,14 +7757,14 @@
         },
         {
           "callee": "apiGet",
-          "line": 373,
+          "line": 375,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)"
           ]
         },
         {
           "callee": "apiPost",
-          "line": 374,
+          "line": 376,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)+\"/send\"",
             "{recipient,requestKey:sendKey,purpose:sendPurpose,...(sendPurpose===\"document\"?{subject:mailSubject,message:mailMessage,issueConfirmed:kind===\"Angebot\"&&draft.status===\"draft\"}:{})}"
@@ -7766,14 +7772,14 @@
         },
         {
           "callee": "apiGet",
-          "line": 374,
+          "line": 376,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 585,
+          "line": 590,
           "arguments": [
             "'/api/settings/company'"
           ]
@@ -8512,23 +8518,23 @@
       "calls": [
         {
           "callee": "useApiQuery",
-          "line": 49,
+          "line": 51,
           "arguments": [
-            "\"/api/documents?kind=invoice&limit=50\"+(sourceInvoice?\"&number=eq.\"+encodeURIComponent(sourceInvoice):\"&display_status=eq.open\")"
+            "selectedNumber?'/api/documents/'+encodeURIComponent(selectedNumber):null"
           ]
         },
         {
           "callee": "apiPost",
-          "line": 67,
+          "line": 73,
           "arguments": [
             "\"/api/payments\"",
-            "{invoiceId,paidOn:date,amount:value,method,note}",
+            "{invoiceId,paidOn:date,amount:value,method,note,...(overpaymentConfirmed?{confirmOverpayment:true,expectedBalance:overpaymentReview.balance}:{})}",
             "{idempotencyKey:key}"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 99,
+          "line": 107,
           "arguments": [
             "\"/api/payments/\"+encodeURIComponent(paymentId)"
           ]
@@ -11464,6 +11470,12 @@
       "tables": [],
       "relations": [],
       "rls": []
+    },
+    {
+      "file": "database/migrations/0079_document_delivery_lookup.sql",
+      "tables": [],
+      "relations": [],
+      "rls": []
     }
   ],
   "repositories": [
@@ -11482,7 +11494,7 @@
       "calls": [
         {
           "callee": "c.query",
-          "line": 140,
+          "line": 151,
           "arguments": [
             "`select *,count(*) over()::int total_count from (${source}) q ${where.length?'where '+where.join(' and '):''} order by ${sortTerms.join(',')},q.id desc limit ${limit}${offset?' offset '+offset:''}`",
             "values"
@@ -11490,7 +11502,7 @@
         },
         {
           "callee": "c.query",
-          "line": 173,
+          "line": 184,
           "arguments": [
             "'select pg_advisory_xact_lock(hashtextextended($1,0))'",
             "[s.organizationId+':payment:'+key]"
@@ -11498,7 +11510,7 @@
         },
         {
           "callee": "c.query",
-          "line": 174,
+          "line": 185,
           "arguments": [
             "'select request_hash,response_json from business_idempotency_keys where organization_id=$1 and operation=$2 and idempotency_key=$3'",
             "[s.organizationId,operation,key]"
@@ -11506,7 +11518,7 @@
         },
         {
           "callee": "c.query",
-          "line": 180,
+          "line": 193,
           "arguments": [
             "'select id,customer_id,total_amount,paid_amount,status from invoices where id::text=$1 and organization_id=$2 and archived_at is null for update'",
             "[args.p_invoice_id,s.organizationId]"
@@ -11514,7 +11526,7 @@
         },
         {
           "callee": "c.query",
-          "line": 182,
+          "line": 197,
           "arguments": [
             "\"select coalesce(sum(amount),0) amount from credit_notes where organization_id=$1 and invoice_id=$2 and credit_date<=(now() at time zone 'Europe/Zurich')::date\"",
             "[s.organizationId,row.id]"
@@ -11522,7 +11534,7 @@
         },
         {
           "callee": "c.query",
-          "line": 183,
+          "line": 198,
           "arguments": [
             "\"select coalesce(sum(amount),0) amount from invoice_refunds where organization_id=$1 and invoice_id=$2 and refund_date<=(now() at time zone 'Europe/Zurich')::date\"",
             "[s.organizationId,row.id]"
@@ -11530,7 +11542,15 @@
         },
         {
           "callee": "c.query",
-          "line": 187,
+          "line": 206,
+          "arguments": [
+            "\"select coalesce(sum(amount),0) amount from payments where organization_id=$1 and invoice_id=$2 and archived_at is null and allocation_status='matched'\"",
+            "[s.organizationId,row.id]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 210,
           "arguments": [
             "`insert into payments(organization_id,external_id,invoice_id,payer_customer_id,payment_date,amount,method,reference,allocation_status,created_by_user_id)\n   values($1,$2,$3,$4,$5,$6,$7,$8,'matched',$9) returning id,amount,payment_date paid_on`",
             "[s.organizationId,randomUUID(),row.id,row.customer_id,args.p_paid_on,amount,args.p_method,args.p_note,s.userId]"
@@ -11538,7 +11558,7 @@
         },
         {
           "callee": "c.query",
-          "line": 189,
+          "line": 212,
           "arguments": [
             "\"update invoices set paid_amount=paid_amount+$1,status=case when paid_amount+$1-$5::numeric>=greatest(0,total_amount-$4::numeric) then 'paid' else 'partial' end,updated_at=now() where id=$2 and organization_id=$3\"",
             "[amount,row.id,s.organizationId,credits,refunds]"
@@ -11546,7 +11566,7 @@
         },
         {
           "callee": "c.query",
-          "line": 190,
+          "line": 213,
           "arguments": [
             "'insert into business_idempotency_keys(organization_id,operation,idempotency_key,request_hash,response_json,created_by_user_id) values($1,$2,$3,$4,$5::jsonb,$6)'",
             "[s.organizationId,operation,key,hash,JSON.stringify(payment.rows[0]),s.userId]"
@@ -11554,7 +11574,7 @@
         },
         {
           "callee": "c.query",
-          "line": 201,
+          "line": 224,
           "arguments": [
             "`insert into business_document_counters(organization_id,kind,period,next_value) values($1,$2,$3,coalesce((select max(substring(${numberingColumn} from $4)::integer) from ${numberingTable} where organization_id=$1),0)+2) on conflict(organization_id,kind,period) do update set next_value=greatest(business_document_counters.next_value+1,excluded.next_value) returning next_value-1 number`",
             "[s.organizationId,invoice?'invoice':'quote',year,'^'+pattern]"
@@ -11562,7 +11582,7 @@
         },
         {
           "callee": "c.query",
-          "line": 207,
+          "line": 230,
           "arguments": [
             "'select id from customers where id::text=$1 and organization_id=$2 and archived_at is null'",
             "[args.p_customer_id,s.organizationId]"
@@ -11570,7 +11590,7 @@
         },
         {
           "callee": "c.query",
-          "line": 211,
+          "line": 234,
           "arguments": [
             "\"select id,status,customer_id,currency from quotes where organization_id=$1 and quote_no=$2 and archived_at is null for update\"",
             "[s.organizationId,args.p_source_offer]"
@@ -11578,7 +11598,7 @@
         },
         {
           "callee": "c.query",
-          "line": 213,
+          "line": 236,
           "arguments": [
             "'select id from invoices where organization_id=$1 and source_quote_id=$2 and archived_at is null and status<>\\'cancelled\\''",
             "[s.organizationId,quote.id]"
@@ -11586,7 +11606,7 @@
         },
         {
           "callee": "c.query",
-          "line": 218,
+          "line": 241,
           "arguments": [
             "`select id,status${invoice?',paid_amount':''} from ${table} where ${numberColumn}=$1 and organization_id=$2 and archived_at is null for update`",
             "[args.p_current_number,s.organizationId]"
@@ -11594,7 +11614,7 @@
         },
         {
           "callee": "c.query",
-          "line": 222,
+          "line": 245,
           "arguments": [
             "\"select id from document_deliveries where organization_id=$1 and document_id=$2 and status in ('sending','uncertain','failed')\"",
             "[s.organizationId,id]"
@@ -11602,7 +11622,7 @@
         },
         {
           "callee": "c.query",
-          "line": 223,
+          "line": 246,
           "arguments": [
             "`update ${table} set ${numberColumn}=$1,customer_id=$2,issue_date=$3,${invoice?'due_date':'valid_until'}=$4,note=$5,currency=$6,updated_at=now() where id=$7 and organization_id=$8`",
             "[args.p_number,args.p_customer_id,args.p_issue_date,invoice?args.p_due_date:args.p_valid_until,args.p_note,args.p_currency,id,s.organizationId]"
@@ -11610,7 +11630,7 @@
         },
         {
           "callee": "c.query",
-          "line": 224,
+          "line": 247,
           "arguments": [
             "\"update expenses set invoiced_invoice_id=null where organization_id=$1 and invoiced_invoice_id=$2\"",
             "[s.organizationId,id]"
@@ -11618,7 +11638,7 @@
         },
         {
           "callee": "c.query",
-          "line": 225,
+          "line": 248,
           "arguments": [
             "\"update time_entries set invoiced_invoice_id=null where organization_id=$1 and invoiced_invoice_id=$2\"",
             "[s.organizationId,id]"
@@ -11626,7 +11646,7 @@
         },
         {
           "callee": "c.query",
-          "line": 226,
+          "line": 249,
           "arguments": [
             "`delete from ${lineTable} where ${parentColumn}=$1 and organization_id=$2`",
             "[id,s.organizationId]"
@@ -11634,7 +11654,7 @@
         },
         {
           "callee": "c.query",
-          "line": 229,
+          "line": 252,
           "arguments": [
             "`insert into ${table}(id,organization_id,external_id,${numberColumn},customer_id,${invoice?'':'title,'}issue_date,${invoice?'due_date':'valid_until'},status,note,currency,created_by_user_id)\n   values($1,$2,$1::uuid::text,$3,$4,${invoice?'':'$3,'}$5,$6,'draft',$7,$8,$9)`",
             "[id,s.organizationId,args.p_number,args.p_customer_id,args.p_issue_date,invoice?args.p_due_date:args.p_valid_until,args.p_note,args.p_currency,s.userId]"
@@ -11642,7 +11662,7 @@
         },
         {
           "callee": "c.query",
-          "line": 232,
+          "line": 255,
           "arguments": [
             "\"update invoices set source_quote_id=$3 where organization_id=$1 and id=$2\"",
             "[s.organizationId,id,sourceQuoteId]"
@@ -11650,7 +11670,7 @@
         },
         {
           "callee": "c.query",
-          "line": 239,
+          "line": 262,
           "arguments": [
             "`insert into ${lineTable}(organization_id,external_id,${parentColumn},sort_order,description,quantity,unit,unit_price,vat_rate) values($1,$2,$3,$4,$5,$6,$7,$8,$9) returning id`",
             "[s.organizationId,randomUUID(),id,++position,raw.description,raw.quantity,String(raw.unit??\"Stück\").slice(0,40),raw.unit_price,lineVat]"
@@ -11658,7 +11678,7 @@
         },
         {
           "callee": "c.query",
-          "line": 242,
+          "line": 265,
           "arguments": [
             "\"update expenses set invoiced_invoice_id=$3 where organization_id=$1 and id=any($2::uuid[]) and archived_at is null and customer_id=$4 and currency=$5 and billable=true and status in ('approved','posted') and (invoiced_invoice_id is null or invoiced_invoice_id=$3) returning id\"",
             "[s.organizationId,ids,id,args.p_customer_id,args.p_currency]"
@@ -11666,7 +11686,7 @@
         },
         {
           "callee": "c.query",
-          "line": 244,
+          "line": 267,
           "arguments": [
             "'insert into invoice_line_expenses(organization_id,invoice_line_id,expense_id) values($1,$2,$3)'",
             "[s.organizationId,inserted.rows[0].id,row.id]"
@@ -11674,7 +11694,7 @@
         },
         {
           "callee": "c.query",
-          "line": 249,
+          "line": 272,
           "arguments": [
             "`update time_entries set invoiced_invoice_id=$3 where organization_id=$1 and id=any($2::uuid[]) and archived_at is null and customer_id=$4 and billable=true and approved=true and (invoiced_invoice_id is null or invoiced_invoice_id=$3) returning id`",
             "[s.organizationId,ids,id,args.p_customer_id]"
@@ -11682,7 +11702,7 @@
         },
         {
           "callee": "c.query",
-          "line": 251,
+          "line": 274,
           "arguments": [
             "'insert into invoice_line_time_entries(organization_id,invoice_line_id,time_entry_id) values($1,$2,$3)'",
             "[s.organizationId,inserted.rows[0].id,row.id]"
@@ -11690,7 +11710,7 @@
         },
         {
           "callee": "c.query",
-          "line": 254,
+          "line": 277,
           "arguments": [
             "`update invoices set subtotal=x.subtotal,vat_amount=x.vat,total_amount=x.subtotal+x.vat from (select round(sum(quantity*unit_price),2) subtotal,round(sum(quantity*unit_price*vat_rate/100),2) vat from invoice_lines where invoice_id=$1 and organization_id=$2) x where invoices.id=$1 and invoices.organization_id=$2`",
             "[id,s.organizationId]"
@@ -12809,13 +12829,15 @@
         "lib/server/http.ts",
         "lib/server/rbac.ts",
         "lib/server/audit.ts",
-        "lib/projects.ts"
+        "lib/projects.ts",
+        "lib/financial-status.ts",
+        "lib/server/document-amount-sql.ts"
       ],
       "methods": [],
       "calls": [
         {
           "callee": "authorize",
-          "line": 10,
+          "line": 12,
           "arguments": [
             "s",
             "'projects:read'"
@@ -12823,7 +12845,7 @@
         },
         {
           "callee": "c.query",
-          "line": 11,
+          "line": 13,
           "arguments": [
             "`select p.id,p.name,p.customer_id,p.status,p.source_quote_id,p.hours_budget,p.progress,p.start_date,p.end_date,p.notes,p.version,p.updated_at,c.name customer_name,${tenantCan(s.role,'sales:read')?'q.quote_no':'null::text'} source_offer from projects p left join customers c on c.id=p.customer_id and c.organization_id=p.organization_id left join quotes q on q.id=p.source_quote_id and q.organization_id=p.organization_id where p.organization_id=$1 and p.id::text=$2 and p.archived_at is null`",
             "[s.organizationId,id]"
@@ -12831,7 +12853,7 @@
         },
         {
           "callee": "c.query",
-          "line": 14,
+          "line": 16,
           "arguments": [
             "`select t.id,t.work_date,t.hours,t.description,t.billable,t.approved,t.invoiced_invoice_id from time_entries t where t.organization_id=$1 and t.project_id::text=$2 and t.archived_at is null and ($4::boolean=false or t.created_by_user_id=$3) order by t.work_date desc,t.created_at desc limit 100`",
             "[s.organizationId,id,s.userId,ownRecordOnly(s.role,'zeiterfassung')]"
@@ -12839,7 +12861,7 @@
         },
         {
           "callee": "c.query",
-          "line": 15,
+          "line": 17,
           "arguments": [
             "`select coalesce(sum(hours),0) hours,coalesce(sum(hours) filter(where invoiced_invoice_id is not null),0) invoiced_hours,count(*) entries from time_entries where organization_id=$1 and project_id::text=$2 and archived_at is null and ($4::boolean=false or created_by_user_id=$3)`",
             "[s.organizationId,id,s.userId,ownRecordOnly(s.role,'zeiterfassung')]"
@@ -12847,15 +12869,15 @@
         },
         {
           "callee": "c.query",
-          "line": 16,
+          "line": 18,
           "arguments": [
-            "`select distinct i.invoice_no number,i.status,i.currency,i.total_amount from invoices i where i.organization_id=$1 and i.archived_at is null and (i.project_id::text=$2 or exists(select 1 from time_entries t where t.organization_id=i.organization_id and t.project_id::text=$2 and t.invoiced_invoice_id=i.id and t.archived_at is null)) order by i.invoice_no desc limit 100`",
+            "`select distinct i.invoice_no number,i.status,i.currency,i.total_amount,i.total_amount total,i.paid_amount,i.issue_date::text issue_date,i.due_date::text due_date,${invoiceCreditSql('i')} credit_amount,${invoiceRefundSql('i')} refund_amount from invoices i where i.organization_id=$1 and i.archived_at is null and (i.project_id::text=$2 or exists(select 1 from time_entries t where t.organization_id=i.organization_id and t.project_id::text=$2 and t.invoiced_invoice_id=i.id and t.archived_at is null)) order by i.invoice_no desc limit 100`",
             "[s.organizationId,id]"
           ]
         },
         {
           "callee": "authorize",
-          "line": 20,
+          "line": 22,
           "arguments": [
             "s",
             "'projects:write'"
@@ -12863,7 +12885,7 @@
         },
         {
           "callee": "c.query",
-          "line": 26,
+          "line": 28,
           "arguments": [
             "'select id,version,status from projects where organization_id=$1 and id::text=$2 and archived_at is null for update'",
             "[s.organizationId,id]"
@@ -12871,7 +12893,7 @@
         },
         {
           "callee": "c.query",
-          "line": 29,
+          "line": 31,
           "arguments": [
             "\"select 1 from active_time_trackers where organization_id=$1 and project_id::text=$2 and (state='running' or accumulated_seconds>0) limit 1\"",
             "[s.organizationId,id]"
@@ -12879,7 +12901,7 @@
         },
         {
           "callee": "c.query",
-          "line": 30,
+          "line": 32,
           "arguments": [
             "`update projects set name=$3,status=$4,notes=$5,hours_budget=$6,version=version+1,updated_at=now() where organization_id=$1 and id::text=$2 returning id,name,status,notes,hours_budget,version`",
             "[s.organizationId,id,name,status,notes,hoursBudget]"
@@ -12887,7 +12909,7 @@
         },
         {
           "callee": "authorize",
-          "line": 35,
+          "line": 37,
           "arguments": [
             "s",
             "'projects:read'"
@@ -12895,7 +12917,7 @@
         },
         {
           "callee": "c.query",
-          "line": 46,
+          "line": 48,
           "arguments": [
             "`with input_context as(select $4::boolean own_only,$5::text actor_id) select p.id,p.name,p.customer_id,p.status,p.progress,c.name customer_name,${tenantCan(s.role,'sales:read')?'q.quote_no':'null::text'} source_offer,\n ${canTime?`coalesce((select sum(t.hours) from time_entries t where t.organization_id=p.organization_id and t.project_id=p.id and t.archived_at is null and ($4::boolean=false or t.created_by_user_id=$5)),0)`:'null::numeric'} hours,\n ${canTime?`coalesce((select sum(t.hours) from time_entries t where t.organization_id=p.organization_id and t.project_id=p.id and t.archived_at is null and t.invoiced_invoice_id is not null and ($4::boolean=false or t.created_by_user_id=$5)),0)`:'null::numeric'} invoiced_hours,\n ${canInvoices?`coalesce((select json_agg(distinct i.invoice_no) from time_entries t join invoices i on i.id=t.invoiced_invoice_id and i.organization_id=t.organization_id where t.organization_id=p.organization_id and t.project_id=p.id and t.archived_at is null),'[]'::json)`:`'[]'::json`} invoice_numbers,\n count(*) over() total_count from projects p left join customers c on c.id=p.customer_id and c.organization_id=p.organization_id left join quotes q on q.id=p.source_quote_id and q.organization_id=p.organization_id where ${where} order by ${orders[order]} limit $6 offset $7`",
             "[s.organizationId,q,status,ownRecordOnly(s.role,'zeiterfassung'),s.userId,limit,offset,customerId,id]"
@@ -12903,7 +12925,7 @@
         },
         {
           "callee": "c.query",
-          "line": 51,
+          "line": 53,
           "arguments": [
             "`with input_context as(select $4::boolean own_only,$5::text actor_id,$6::int page_limit,$7::int page_offset) select count(*) total from projects p left join customers c on c.id=p.customer_id and c.organization_id=p.organization_id where ${where}`",
             "[s.organizationId,q,status,ownRecordOnly(s.role,'zeiterfassung'),s.userId,limit,offset,customerId,id]"

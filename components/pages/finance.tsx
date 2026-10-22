@@ -8,7 +8,7 @@ import {useApiQuery} from "@/lib/client/use-api-query";
 import { isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 import {CashStatistics,CashOverview} from "../cash-statistics";
 import type {CashStatisticsData} from "@/lib/cash-statistics";
-import {financialStatus,financialStatusLabels} from "@/lib/financial-status";
+import {financialStatus,documentFilters,documentFilterQuery} from "@/lib/financial-status";
 import {SectionTitle, LoadingState, ErrorState, EmptyState} from "../ui";
 import { RecordsControls, useRecordsController } from "../records";
 import { CreateAction,ListRow } from "../binso-ux";
@@ -22,13 +22,13 @@ export function FinanceAnalysisPage() {
 export function FinancialDocumentsPage({kind}:{kind:"offer"|"invoice"}){
 
  const invoice=kind==="invoice",title=invoice?"Rechnungen":"Angebote",route=invoice?"rechnungen":"angebote",placeholder=title+" suchen...";
- const chips=invoice?["Alle","Entwurf","Offen","Überfällig","Bezahlt","Storniert"]:["Alle","Entwurf","Versendet","Angenommen","Abgelehnt","Abgelaufen","Überarbeitet"];
+ const chips=documentFilters(kind);
  const columns:NonNullable<Parameters<typeof useRecordsController>[0]['columns']>=[{label:'Nummer',index:0},{label:'Kunde',index:1},{label:'Datum',index:2},{label:'Betrag',index:3,align:'right'},{label:'Status',index:5,status:true}];
  const controller=useRecordsController({placeholder,chips,columns}),pageSize=50;
  const sortFields:Record<number,string>={0:'number',1:'customer_name',2:invoice?'due_date':'issue_date',3:'total',5:'display_status'};
  const params=new URLSearchParams({kind,limit:String(pageSize),offset:String(controller.page*pageSize),order:controller.sort==='default'?'created_at.desc':sortFields[controller.sortIndex]+'.'+controller.sort});
  if(controller.query.trim())params.set('q',controller.query.trim());
- const state=Object.entries(financialStatusLabels).find(([,label])=>label===controller.activeChip)?.[0];if(state)params.set('display_status',state);
+ const filter=documentFilterQuery(kind,controller.activeChip);if(filter)params.set(filter.field,filter.value);
  const {data,loading,error}=useApiQuery<{items:DocumentListItem[];total?:number}>(`/api/documents?${params}`);
  const items=data?.items??[],total=data?.total??items.length;
  return <AppShell title={title} subtitle={loading?undefined:`${total} ${title}`} active={route} actions={<RecordsControls controller={controller} placeholder={placeholder} chips={chips} columns={columns}><CreateAction href={`/${route}/neu`} label={invoice?"Neue Rechnung":"Neues Angebot"}/></RecordsControls>}><FinanceTabs/><DocumentList items={items} kind={kind} loading={loading} error={error} controller={controller} remote toolbarActions={false} showCount={false} pagination={{total,page:controller.page,pageSize,onPage:controller.setPage}}/></AppShell>;

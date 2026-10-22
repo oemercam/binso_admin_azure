@@ -15,7 +15,7 @@ import {useApiQuery,useDataRevision} from "@/lib/client/use-api-query";
 import {FormWizard} from "./form-wizard";
 import {allowDraftNavigation} from "./use-browser-back-guard";
 import {useProcessDraft} from "./use-process-draft";
-import {businessDate,financialStatus,financialStatusTone,financialStatusLabels,openAmount} from "@/lib/financial-status";
+import {businessDate,financialStatus,financialStatusTone,financialStatusText,invoiceStatusAxes,openAmount,customerCredit} from "@/lib/financial-status";
 
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
@@ -58,6 +58,7 @@ type DocumentDraft = {
   credits?:Array<{number:string;date:string;amount:number;reason:string}>;
   reminders?:Array<{id:string;stage:number;status:string;recipient:string;amount:number;deadline:string;completed_at:string|null}>;
   paidOn?:string;
+  deliveryStatus?:string|null;
   sourceOffer?:string;
   revisesOffer?:string;
   revisions?:Array<{number:string;status:string}>;
@@ -178,6 +179,7 @@ function remoteDraftFromItem(item:Record<string,unknown>,kind:DocumentKind):Docu
     credits:Array.isArray(item.credits)?item.credits:[],
     reminders:Array.isArray(item.reminders)?item.reminders:[],
     paidOn:String(item.paid_on??""),
+    deliveryStatus:['sending','sent','failed','uncertain','not_attempted'].includes(String(item.delivery_status))?String(item.delivery_status):null,
     sourceOffer:String(item.source_offer??""),
     revisesOffer:String(item.revises_offer??""),
     offerVersion:Number(item.offer_version)||undefined,
@@ -266,7 +268,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const [dirty,setDirty]=useState(false);
   const draftBaseline=useRef<string|null>(null);
   const [draft,setDraft]=useDocumentDraft(createInitialDraft(kind));
-  const refundableAmount=Math.max(0,Number(draft.paidAmount??0)-Math.max(0,Number(draft.total??0)-Number(draft.creditAmount??0))-Number(draft.refundAmount??0));
+  const refundableAmount=customerCredit({total:draft.total,paid_amount:draft.paidAmount,credit_amount:draft.creditAmount,refund_amount:draft.refundAmount});
   const {directory,loading:customersLoading,error:customersError,refresh:refreshCustomers}=useCustomerDirectory(editing||sendOpen,draft.customerId??searchParams.get("customerId")??undefined);
   useEffect(()=>{if(!sendOpen||recipientTouched.current)return;const email=resolveCustomer(draft,directory)?.email;if(email){recipientTouched.current=true;queueMicrotask(()=>setRecipient(email));}},[sendOpen,draft,directory]);
   const company=useDocumentCompany();
@@ -374,7 +376,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const sendDocument=async()=>{if(documentActionPending.current||documentSavePending.current)return;documentActionPending.current=true;setActionBusy(true);setActionError(null);try{await apiPost("/api/documents/"+encodeURIComponent(documentKey??draft.number)+"/send",{recipient,requestKey:sendKey,purpose:sendPurpose,...(sendPurpose==="document"?{subject:mailSubject,message:mailMessage,issueConfirmed:kind==="Angebot"&&draft.status==="draft"}:{})});const payload=await apiGet<{item:Record<string,unknown>}>("/api/documents/"+encodeURIComponent(documentKey??draft.number));setDraft(remoteDraftFromItem(payload.item,kind));setSendOpen(false);show('Versand vom E-Mail-Anbieter angenommen. Zustellung noch nicht nachgewiesen.')}catch(e){setActionError(e instanceof Error?e.message:"Versand konnte nicht bestätigt werden.")}finally{documentActionPending.current=false;setActionBusy(false)}};
   const sendingReminder=sendPurpose==='reminder';
   const sendButtonLabel=actionBusy?"Wird versendet …":sendingReminder?"Zahlungserinnerung senden":kind==="Angebot"&&draft.status==="draft"?"Ausstellen und senden":"PDF senden";
-  const canRecordPayment=tenantCan(documentRole,"payments:write")&&kind==="Rechnung"&&!["draft","paid","cancelled"].includes(draft.status??"draft")&&openAmount({total:draft.total,paid_amount:draft.paidAmount,credit_amount:draft.creditAmount,refund_amount:draft.refundAmount})>0;
+  const canRecordPayment=!documentReadOnly&&tenantCan(documentRole,"payments:write")&&kind==="Rechnung"&&!["draft","cancelled"].includes(draft.status??"draft");
   const presentation=documentPresentation(kind,draft,useDocumentTotals(draft).total);
   const title=existing?kind:`${kind} erstellen`;
   const headerActions=existing&&!editing
@@ -446,7 +448,7 @@ function documentPresentation(type:DocumentKind,draft:DocumentDraft,total:number
   const isInvoice=type==="Rechnung";
   const dueDate=isInvoice&&draft.date&&draft.due?invoiceDueDate(draft.date,draft.due):"";
   const displayStatus=financialStatus({kind:isInvoice?"invoice":"offer",status:draft.status,total,paid_amount:draft.paidAmount,credit_amount:draft.creditAmount,refund_amount:draft.refundAmount,due_date:dueDate?dueDate.split(".").reverse().join("-"):null,valid_until:isInvoice?null:draft.due});
-  const statusLabel=financialStatusLabels[displayStatus]??({draft:"Entwurf",sent:type==="Angebot"?"Versendet":"Gestellt",open:"Offen",paid:"Bezahlt",partial:"Teilweise bezahlt",overdue:"Überfällig",cancelled:"Storniert",accepted:"Angenommen",declined:"Abgelehnt",expired:"Abgelaufen",rejected:"Abgelehnt"} as Record<string,string>)[draft.status??""]??draft.status;
+  const statusLabel=financialStatusText(displayStatus,isInvoice?'invoice':'offer');
   const statusTone=financialStatusTone({kind:isInvoice?"invoice":"offer",status:displayStatus,total,paid_amount:draft.paidAmount,credit_amount:draft.creditAmount,refund_amount:draft.refundAmount},displayStatus);
   return {displayStatus,statusLabel,statusTone,dueDate};
 }
@@ -457,18 +459,20 @@ function DocumentReadView({type,draft,directory,canWrite,followup}:{type:Documen
   const isInvoice=type==="Rechnung";
   const dueDate=isInvoice&&draft.date&&draft.due?invoiceDueDate(draft.date,draft.due):"";
   const outstanding=openAmount({total:totals.total,paid_amount:draft.paidAmount,credit_amount:draft.creditAmount,refund_amount:draft.refundAmount});
-  const {displayStatus,statusLabel,statusTone}=documentPresentation(type,draft,totals.total);
+  const document={kind:'invoice',status:draft.status,total:totals.total,paid_amount:draft.paidAmount,credit_amount:draft.creditAmount,refund_amount:draft.refundAmount,due_date:dueDate?dueDate.split('.').reverse().join('-'):null};
+  const axes=invoiceStatusAxes(document),creditBalance=customerCredit(document),hasClaim=isInvoice&&axes.document==='issued'&&outstanding>0;
+  const {statusLabel,statusTone}=documentPresentation(type,draft,totals.total);
   return <div className="document-detail-view">
     <section className="document-detail-section">
       <div className="document-reference-row"><strong>{draft.number}</strong>{!isInvoice&&draft.offerVersion&&<span><LocalizedText>{"Version"}</LocalizedText> {draft.offerVersion}</span>}</div>
       <div className="document-customer-heading"><h2>{draft.customerId?<Link href={"/kunden/"+encodeURIComponent(draft.customerId)}>{draft.customer}</Link>:draft.customer}</h2></div>
     </section>
-    <section className="document-detail-section"><MetricTiles columns={2}><MetricTile label={isInvoice&&!["draft","paid","cancelled"].includes(displayStatus)?"Offener Betrag":"Total"} value={isInvoice&&!["draft","paid","cancelled"].includes(displayStatus)?outstanding:totals.total} currency={currency}/><MetricTile label="Status" value={<Status appearance="pill" tone={statusTone}>{statusLabel}</Status>}/></MetricTiles></section>
+    <section className="document-detail-section"><MetricTiles columns={2}><MetricTile label={hasClaim?"Offener Betrag":"Total"} value={hasClaim?outstanding:totals.total} currency={currency}/><MetricTile label={isInvoice&&axes.payment?'Zahlung':'Status'} value={<Status appearance="pill" tone={isInvoice&&axes.payment?financialStatusTone(document,axes.payment):statusTone}>{isInvoice&&axes.payment?financialStatusText(axes.payment,'invoice'):statusLabel}</Status>}/></MetricTiles></section>
     <section className="document-facts">
       <div><small><LocalizedText>{type==="Rechnung"?"Rechnungsdatum":"Angebotsdatum"}</LocalizedText></small><b>{isoToSwiss(draft.date)}</b></div>
       {type==="Angebot"
         ? <div><small><LocalizedText>{"Gültig bis"}</LocalizedText></small><b><LocalizedText>{draft.due&&isoToSwiss(draft.due)}</LocalizedText></b></div>
-        : <>{displayStatus==="paid"?(draft.paidOn&&<div><small><LocalizedText>{"Bezahlt am"}</LocalizedText></small><b>{isoToSwiss(draft.paidOn)}</b></div>):dueDate&&<div><small><LocalizedText>{"Fällig am"}</LocalizedText></small><b>{dueDate}</b></div>}</>}
+        : <>{['paid','overpaid'].includes(axes.payment??'')&&draft.paidOn?<div><small><LocalizedText>{"Bezahlt am"}</LocalizedText></small><b>{isoToSwiss(draft.paidOn)}</b></div>:axes.due&&<div><small><LocalizedText>{"Fällig am"}</LocalizedText></small>{dueDate&&<b>{dueDate}</b>}<Status appearance="pill" tone={financialStatusTone(document,axes.due)}>{financialStatusText(axes.due)}</Status></div>}{axes.document==='issued'&&<div><small><LocalizedText>Dokument</LocalizedText></small><Status appearance="pill" tone="info"><LocalizedText>Ausgestellt</LocalizedText></Status></div>}<div><small><LocalizedText>Letzter Versand</LocalizedText></small><b><LocalizedText>{draft.deliveryStatus?deliveryLabel(draft.deliveryStatus):'Kein Versandnachweis'}</LocalizedText></b></div></>}
       {isInvoice&&draft.due&&<div className="document-payment-term"><small><LocalizedText>{"Zahlungsfrist"}</LocalizedText></small><b>{draft.due}<LocalizedText>{" Tage"}</LocalizedText></b></div>}
     </section>
     <section className="document-detail-section document-lines-section">
@@ -489,7 +493,8 @@ function DocumentReadView({type,draft,directory,canWrite,followup}:{type:Documen
       </div>
     </section>
     {isInvoice&&Number(draft.creditAmount??0)>0&&<p><LocalizedText>{"Gutschriften"}</LocalizedText>: {currency} {money(Number(draft.creditAmount))}</p>}
-    {isInvoice&&!["draft","paid","cancelled"].includes(displayStatus)&&outstanding>0&&<LocalizedElement as="section" className="document-payment-facts" aria-label="Zahlungsstand"><SectionTitle title="Zahlungsstand"/>
+    {isInvoice&&creditBalance>0&&<MetricTile label="Kundenguthaben" value={`${currency} ${money(creditBalance)}`}/>}
+    {hasClaim&&<LocalizedElement as="section" className="document-payment-facts" aria-label="Zahlungsstand"><SectionTitle title="Zahlungsstand"/>
       <MetricTile label="Bereits bezahlt" value={`${currency} ${money(Number(draft.paidAmount??0))}`}/>
     </LocalizedElement>}
     {!isInvoice&&draft.number&&<OfferHistory number={draft.number} canWrite={canWrite}/>}{followup}
@@ -498,7 +503,7 @@ function DocumentReadView({type,draft,directory,canWrite,followup}:{type:Documen
     {isInvoice&&Boolean(draft.reminders?.length)&&<section className="document-detail-section"><SectionTitle title="Mahnhistorie"/>{draft.reminders?.map(reminder=><p key={reminder.id}><b><LocalizedText>{reminder.stage===1?'Zahlungserinnerung':reminder.stage===2?'1. Mahnung':'2. Mahnung'}</LocalizedText></b> · <LocalizedText>{deliveryLabel(reminder.status)}</LocalizedText><br/>{reminder.recipient} · {currency} {money(Number(reminder.amount))} · <LocalizedText>{"Zahlungsfrist"}</LocalizedText>: {reminder.deadline.split('-').reverse().join('.')}</p>)}</section>}
     {isInvoice&&Boolean(draft.refunds?.length)&&<section className="document-detail-section"><SectionTitle title="Rückerstattungen"/>{draft.refunds?.map(refund=><p key={refund.id}>{refund.date.split('-').reverse().join('.')} · {currency} {money(Number(refund.amount))}<br/>{refund.reason}</p>)}</section>}
     {draft.revisesOffer&&<p><LocalizedText>{"Vorherige Angebotsversion"}</LocalizedText>: <Link href={'/angebote/'+encodeURIComponent(draft.revisesOffer)}>{draft.revisesOffer}</Link></p>}
-    {Boolean(draft.revisions?.length)&&<section className="document-detail-section"><SectionTitle title="Überarbeitete Angebotsversionen"/>{draft.revisions?.map(revision=><p key={revision.number}><Link href={'/angebote/'+encodeURIComponent(revision.number)}>{revision.number}</Link> · <LocalizedText>{financialStatusLabels[revision.status]??revision.status}</LocalizedText></p>)}</section>}
+    {Boolean(draft.revisions?.length)&&<section className="document-detail-section"><SectionTitle title="Überarbeitete Angebotsversionen"/>{draft.revisions?.map(revision=>{const label=financialStatusText(revision.status,'offer');return <p key={revision.number}><Link href={'/angebote/'+encodeURIComponent(revision.number)}>{revision.number}</Link> · <LocalizedText>{label}</LocalizedText></p>})}</section>}
     {draft.sourceOffer&&<p><LocalizedText>{"Ursprungsangebot: "}</LocalizedText><Link href={"/angebote/"+encodeURIComponent(draft.sourceOffer)}>{draft.sourceOffer}</Link></p>}{draft.invoiceNumber&&<p><LocalizedText>{"Rechnung: "}</LocalizedText><Link href={"/rechnungen/"+encodeURIComponent(draft.invoiceNumber)}>{draft.invoiceNumber}</Link></p>}
     {draft.note&&<section className="document-detail-section"><span className="eyebrow"><LocalizedText>{"NOTIZ"}</LocalizedText></span><p>{draft.note}</p></section>}
     </DetailDisclosure>}

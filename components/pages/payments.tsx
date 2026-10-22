@@ -1,18 +1,18 @@
 "use client";
 import {DirectorySelect} from "../directory-select";
 import {ContextActions} from "../binso-ux";
-import {LocalizedText} from "@/lib/client/locale";
+import {LocalizedText,useTranslation} from "@/lib/client/locale";
 import {safeAppPath} from "@/lib/navigation";
 
 import { FinancialSummaryRow, FinanceTabs } from "../document-list";
-import { openAmount, formatCurrency, businessDate } from "@/lib/financial-status";
+import { openAmount, formatCurrency, businessDate, financialStatus, financialStatusText, paymentEntryIssue, paymentBalance, samePaymentBalance, type PaymentBalanceReview } from "@/lib/financial-status";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AppShell } from "../app-shell";
 import { RecordsView, RecordsControls, useRecordsController } from "../records";
 import {useApiQuery} from "@/lib/client/use-api-query";
-import { apiPost, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
-import { AccessLink, Button, EmptyState, ErrorState, LoadingState, Field, Icon, Status, Toast, Select, Input } from "../ui";
+import { apiPost, ClientApiError, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
+import { AccessLink, Button, Checkbox, EmptyState, ErrorState, LoadingState, Field, Icon, Status, Toast, Select, Input } from "../ui";
 import { CreateAction,FormSheet } from "../binso-ux";
 import {useDirtySnapshot} from '../use-dirty-snapshot';
 import {allowDraftNavigation} from '../use-browser-back-guard';
@@ -30,6 +30,7 @@ export function PaymentsPage() {
 
 export function PaymentForm() {
   const router=useRouter();
+  const t=useTranslation();
   const searchParams=useSearchParams();
   const sourceInvoice=searchParams.get("invoice");
   const [saving,setSaving]=useState(false);
@@ -42,21 +43,26 @@ export function PaymentForm() {
   const [idempotencyKey,setIdempotencyKey]=useState("");
   const [invoiceId,setInvoiceId]=useState("");
   const [note,setNote]=useState("");
+  const [overpaymentReview,setOverpaymentReview]=useState<{invoiceId:string;amount:number;balance:PaymentBalanceReview}|null>(null);
   const initialFields=useRef({date,method,note});
   const {dirty,markPristine}=useDirtySnapshot([invoiceId,date,amount,method,note]);
 
-  const [chosenInvoice,setChosenInvoice]=useState<{id:string;number:string;total:number;paid_amount:number;credit_amount:number;refund_amount:number;currency:string;status:string;customer?:{name:string}}|null>(null);
-  const {data:invoiceData,error:invoiceError,loading:invoicesLoading}=useApiQuery<{items:Array<{id:string;number:string;total:number;paid_amount:number;currency?:string;status:string;customer?:{name?:string}}> }>("/api/documents?kind=invoice&limit=50"+(sourceInvoice?"&number=eq."+encodeURIComponent(sourceInvoice):"&display_status=eq.open"));
-  const availableInvoices=useMemo(()=>[...(invoiceData?.items??[]),...(chosenInvoice&&!invoiceData?.items.some(item=>item.id===chosenInvoice.id)?[chosenInvoice]:[])].filter(item=>!["draft","cancelled","paid"].includes(item.status)&&openAmount(item)>0) ,[invoiceData,chosenInvoice]);
-  useEffect(()=>{if(!sourceInvoice||invoiceId)return;const item=availableInvoices.find(row=>row.number===sourceInvoice);if(item)queueMicrotask(()=>{setInvoiceId(item.id);setAmount(current=>current||String(openAmount(item)));markPristine([item.id,initialFields.current.date,String(openAmount(item)),initialFields.current.method,initialFields.current.note]);});},[sourceInvoice,availableInvoices,invoiceId,markPristine]);
-  const selectedInvoice=availableInvoices.find(item=>item.id===invoiceId);
+  const [chosenNumber,setChosenNumber]=useState<string|null>(null),selectedNumber=chosenNumber??sourceInvoice;
+  const invoiceQuery=useApiQuery<{item:{id:string;number:string;kind:string;total:number;paid_amount:number;credit_amount:number;refund_amount:number;currency:string;status:string;customer?:{name:string};[key:string]:unknown}}>(selectedNumber?'/api/documents/'+encodeURIComponent(selectedNumber):null);
+  const candidate=invoiceQuery.data?.item,validInvoice=candidate?.kind==='invoice'&&!['draft','cancelled'].includes(candidate.status);
+  const invoiceError=invoiceQuery.error||(invoiceQuery.data&&!validInvoice?t('Bitte eine ausgestellte Rechnung auswählen.'):null);
+  useEffect(()=>{if(!sourceInvoice||invoiceId||!candidate||!validInvoice)return;const item=candidate,initialAmount=openAmount(item)>0?String(openAmount(item)):'';queueMicrotask(()=>{setInvoiceId(item.id);setAmount(current=>current||initialAmount);markPristine([item.id,initialFields.current.date,initialAmount,initialFields.current.method,initialFields.current.note]);});},[sourceInvoice,candidate,validInvoice,invoiceId,markPristine]);
+  const selectedInvoice=validInvoice&&candidate?.id===invoiceId?candidate:null;
+  const numericAmount=Number(amount.replace(',','.')),remaining=selectedInvoice?openAmount(selectedInvoice):0;
+  const overpayment=Number.isFinite(numericAmount)?Math.max(0,Math.round((numericAmount-remaining)*100)/100):0;
+  const overpaymentConfirmed=!!overpaymentReview&&overpaymentReview.invoiceId===invoiceId&&overpaymentReview.amount===numericAmount&&!!selectedInvoice&&samePaymentBalance(overpaymentReview.balance,paymentBalance(selectedInvoice));
   const returnTo=sourceInvoice?"/rechnungen/"+encodeURIComponent(sourceInvoice):safeAppPath(searchParams.get("returnTo"),"/zahlungen");
 
   const save=async()=>{
     if(savePending.current)return;
     const value=Number(amount.replace(",","."));
-    if(!selectedInvoice||!Number.isFinite(value)||value<=0||value>openAmount(selectedInvoice)){
-      setToast("Bitte einen gültigen Betrag erfassen.");
+    if(!selectedInvoice||paymentEntryIssue(value,remaining,overpaymentConfirmed,overpaymentReview?.balance.openAmount)){
+      setToast(overpayment>0?"Bitte die tatsächlich eingegangene Überzahlung bestätigen.":"Bitte einen gültigen Betrag erfassen.");
       return;
     }
     savePending.current=true;setSaving(true);setToast(null);
@@ -64,29 +70,31 @@ export function PaymentForm() {
       {
         const key=idempotencyKey||window.crypto.randomUUID();
         if(!idempotencyKey) setIdempotencyKey(key);
-        await apiPost("/api/payments",{invoiceId,paidOn:date,amount:value,method,note},{idempotencyKey:key});
+        await apiPost("/api/payments",{invoiceId,paidOn:date,amount:value,method,note,...(overpaymentConfirmed?{confirmOverpayment:true,expectedBalance:overpaymentReview.balance}:{})},{idempotencyKey:key});
       }
       setSaved(true);allowDraftNavigation();setToast("Zahlung gespeichert.");
       window.setTimeout(()=>router.push(returnTo),700);
     }catch(error){
       savePending.current=false;setSaving(false);
+      if(error instanceof ClientApiError&&error.code==='payment_balance_changed'){setOverpaymentReview(null);void invoiceQuery.refresh();}
       setToast(error instanceof Error?error.message:"Zahlung konnte nicht gespeichert werden.");
     }
   };
   const close=()=>{allowDraftNavigation();router.push(returnTo)};
   return <AppShell editing unsavedChanges={false} title="Zahlung erfassen" active="zahlungen" backHref={returnTo} backLabel="Zahlungen">
-    <FormSheet workspace label="Zahlung erfassen" description="Rechnungsdaten werden automatisch übernommen." open onClose={close} busy={saving} dirty={dirty&&!saved} actions={<><Button variant="secondary" onClick={close}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button onClick={save} disabled={saving||!selectedInvoice}><LocalizedText>{saving?"Wird gespeichert…":"Zahlung speichern"}</LocalizedText></Button></>}>
+    <FormSheet workspace label="Zahlung erfassen" description="Rechnungsdaten werden automatisch übernommen." open onClose={close} busy={saving} dirty={dirty&&!saved} actions={<><Button variant="secondary" onClick={close}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button onClick={save} disabled={saving||!selectedInvoice||overpayment>0&&!overpaymentConfirmed}><LocalizedText>{saving?"Wird gespeichert…":"Zahlung speichern"}</LocalizedText></Button></>}>
     {toast&&toast!=="Zahlung gespeichert."&&<ErrorState>{toast}</ErrorState>}
     <div className="form-page narrow" inert={saving}>
-      <Field label="Rechnung"><DirectorySelect label="Rechnung" required disabled={invoicesLoading} endpoint={"/api/documents?kind=invoice&display_status=eq.open"} value={invoiceId} selectable={item=>!['draft','cancelled','paid'].includes(String(item.status))&&openAmount(item)>0} formatOption={item=>String(item.number)+' · '+String((item.customer as {name?:string})?.name??'')+' · '+formatCurrency(openAmount(item),String(item.currency??'CHF'))} onChange={(value,item)=>{setInvoiceId(value);setIdempotencyKey('');setAmount(item?String(openAmount(item)):'');setChosenInvoice(item?{id:value,number:String(item.number),total:Number(item.total),paid_amount:Number(item.paid_amount),credit_amount:Number(item.credit_amount??0),refund_amount:Number(item.refund_amount??0),currency:String(item.currency??'CHF'),status:String(item.status),customer:item.customer as {name:string}|undefined}:null)}}/></Field>
-      {invoiceError&&<ErrorState><LocalizedText>{invoiceError}</LocalizedText></ErrorState>}
+      <Field label="Rechnung"><DirectorySelect label="Rechnung" required endpoint={"/api/documents?kind=invoice&payment_candidates=1"} value={invoiceId} selectedItem={selectedInvoice??undefined} selectable={item=>!['draft','cancelled'].includes(String(item.status))} formatOption={item=>String(item.number)+' · '+String((item.customer as {name?:string})?.name??'')+' · '+(openAmount(item)>0?formatCurrency(openAmount(item),String(item.currency??'CHF')):t(financialStatusText(financialStatus({...item,kind:'invoice'}),'invoice')))} onChange={(value,item)=>{setInvoiceId(value);setIdempotencyKey('');setOverpaymentReview(null);setAmount(item&&openAmount(item)>0?String(openAmount(item)):'');setChosenNumber(item?String(item.number):null)}}/></Field>
+      {invoiceError&&<ErrorState onRetry={invoiceQuery.refresh}><LocalizedText>{invoiceError}</LocalizedText></ErrorState>}
       {selectedInvoice&&<p><LocalizedText>{"Offener Betrag: "}</LocalizedText>{formatCurrency(openAmount(selectedInvoice),selectedInvoice.currency)}</p>}
       <div className="form-grid two">
-        <Field label="Zahlungsdatum"><Input type="date" value={date} onChange={e=>{setDate(e.target.value);setIdempotencyKey("")}}/></Field>
+        <Field label="Zahlungsdatum"><Input type="date" max={businessDate()} value={date} onChange={e=>{setDate(e.target.value);setIdempotencyKey("")}}/></Field>
         <Field label={"Zahlungsbetrag "+(selectedInvoice?.currency??"CHF")}><Input inputMode="decimal" value={amount} onChange={e=>{setAmount(e.target.value);setIdempotencyKey("")}}/></Field>
         <Field label="Zahlungsmethode"><Select value={method} onChange={e=>{setMethod(e.target.value);setIdempotencyKey("")}}><option value={"Banküberweisung"}><LocalizedText>{"Banküberweisung"}</LocalizedText></option><option value={"Kreditkarte"}><LocalizedText>{"Kreditkarte"}</LocalizedText></option><option value={"TWINT"}><LocalizedText>{"TWINT"}</LocalizedText></option><option value={"Bar"}><LocalizedText>{"Bar"}</LocalizedText></option></Select></Field>
         <Field label="Notiz"><Input placeholder="Optional" value={note} onChange={e=>{setNote(e.target.value);setIdempotencyKey("")}}/></Field>
       </div>
+      {selectedInvoice&&overpayment>0&&<><p><LocalizedText>Zusätzliches Kundenguthaben</LocalizedText>: {formatCurrency(overpayment,selectedInvoice.currency)}</p><Field label="Tatsächliche Überzahlung bestätigen"><Checkbox checked={overpaymentConfirmed} onChange={event=>{setOverpaymentReview(event.target.checked?{invoiceId,amount:numericAmount,balance:paymentBalance(selectedInvoice)}:null);setIdempotencyKey('');}}/></Field><p><LocalizedText>Nur einen tatsächlich eingegangenen Betrag erfassen. Das zusätzliche Guthaben wird nicht als Umsatz gezählt. Es wird keine Bankzahlung ausgelöst.</LocalizedText></p></>}
     </div>
     </FormSheet>
     {toast==="Zahlung gespeichert."&&<Toast title={toast} tone="success"/>}

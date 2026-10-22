@@ -2,7 +2,7 @@
 
 Static AST/source inventory, not proof that every runtime branch is tested. Calls include exact source arguments and locations; dynamic dispatch requires the domain matrix and runtime tests.
 
-123 API route files, 46 client consumers, 79 migrations, 111 declared tables.
+123 API route files, 46 client consumers, 80 migrations, 111 declared tables.
 
 | Endpoint | Methods | Source | Direct data/auth evidence |
 |---|---|---|---|
@@ -97,7 +97,7 @@ Static AST/source inventory, not proof that every runtime branch is tested. Call
 | `/api/operator/tickets` | GET | `app/api/operator/tickets/route.ts` | `requireOperatorSession:7`, `authorizeOperator:7` |
 | `/api/operator/users` | GET, POST | `app/api/operator/users/route.ts` | `requireOperatorSession:10`, `authorizeOperator:11`, `query:12` |
 | `/api/payments/[id]` | GET | `app/api/payments/[id]/route.ts` | `tenantList:7` |
-| `/api/payments` | GET, POST | `app/api/payments/route.ts` | `tenantListPage:8`, `tenantList:25`, `tenantList:29`, `tenantRpc:32` |
+| `/api/payments` | GET, POST | `app/api/payments/route.ts` | `tenantListPage:9`, `tenantList:27`, `tenantList:31`, `tenantRpc:34` |
 | `/api/products/[id]` | GET, PATCH | `app/api/products/[id]/route.ts` | `tenantList:10` |
 | `/api/products` | GET, POST | `app/api/products/route.ts` | `tenantListPage:8` |
 | `/api/projects/[id]` | GET, PATCH | `app/api/projects/[id]/route.ts` | `requireSession:9`, `authorize:9`, `withTenant:9`, `requireSession:10`, `authorize:10`, `withTenant:10` |

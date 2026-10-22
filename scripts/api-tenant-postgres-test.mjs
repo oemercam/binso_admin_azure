@@ -284,6 +284,32 @@ try{
   if(finance.includes(role)){assert.equal(after.status,'sent');assert.equal(after.paid_amount,before.paid_amount);}
   else assert.deepEqual(after,before,'Forbidden role cannot issue invoice');
  }
+ // Actual HTTP overpayment: explicit reviewed balances, all eight roles, replay
+ // and foreign-tenant failures. No payment provider or bank transfer is invoked.
+ let receiptSequence=0;
+ const postReceipt=async(body,role='owner',key='r7-http-receipt-'+(++receiptSequence),tenant=0)=>{
+  const response=await fetch(base+'/api/payments',{method:'POST',headers:{cookie:cookies.get(tenant+':'+role),origin:base,'content-type':'application/json','idempotency-key':key},body:JSON.stringify(body),signal:AbortSignal.timeout(15000)});
+  return {status:response.status,data:await response.json()};
+ };
+ const receiptCount=async()=>(await pool.query('select count(*)::int n from payments where organization_id=$1',[organizations[0]])).rows[0].n;
+ for(const role of roles){
+  const doc=createdInvoices.get(role)??createdInvoices.get('owner'),canonical=(await get('/api/documents/'+encodeURIComponent(doc.number),cookies.get('0:owner'))).data.item;
+  const total=Number(canonical.total),paid=Number(canonical.paid_amount),credit=Number(canonical.credit_amount??0),refund=Number(canonical.refund_amount??0),open=Math.max(0,Math.round((total-credit-paid+refund)*100)/100);
+  const body={invoiceId:doc.id,paidOn:new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Zurich'}).format(new Date()),amount:Math.round((open+10)*100)/100,method:'bank',confirmOverpayment:true,expectedBalance:{openAmount:open,paidAmount:paid,creditAmount:credit,refundAmount:refund}};
+  const before=await receiptCount();
+  if(!finance.includes(role)){const denied=await postReceipt(body,role);assert.equal(denied.status,403,role+' cannot record confirmed overpayment');assert.equal(await receiptCount(),before);continue;}
+  assert.equal((await postReceipt({...body,confirmOverpayment:undefined,expectedBalance:undefined},role)).data.error,'payment_exceeds_balance','Ordinary excess remains blocked over real HTTP');
+  for(const invalid of [{...body,confirmOverpayment:'true'},{...body,expectedBalance:undefined},{...body,expectedBalance:{openAmount:open}},{...body,amount:String(body.amount)},{...body,amount:-1},{...body,amount:1.001},{...body,paidOn:'2099-01-01'}])assert.equal((await postReceipt(invalid,role)).status,400,'Malformed confirmation/amount/date is rejected before mutation');
+  const stale=await postReceipt({...body,expectedBalance:{...body.expectedBalance,paidAmount:paid+1}},role);assert.equal(stale.status,409);assert.equal(stale.data.error,'payment_balance_changed');assert.equal(await receiptCount(),before);
+  const key='r7-http-confirmed-'+role,result=await postReceipt(body,role,key);assert.equal(result.status,201,JSON.stringify(result.data));assert.ok(result.data.item.id);
+  const replay=await postReceipt(body,role,key);assert.equal(replay.status,201);assert.deepEqual(replay.data.item,result.data.item,'Real route replays the immutable receipt');assert.equal(await receiptCount(),before+1);
+  const after=(await get('/api/documents/'+encodeURIComponent(doc.number),cookies.get('0:owner'))).data.item;
+  assert.equal(Number(after.total),total,'Receipt never increases invoice/revenue');assert.equal(Number(after.customer_credit),10);assert.equal(after.payment_status,'overpaid');assert.equal(after.display_status,'overpaid');assert.equal(after.due_status,null);
+  const filtered=await get('/api/documents?kind=invoice&payment_status=eq.overpaid',cookies.get('0:'+role));assert.equal(filtered.status,200);assert.ok(filtered.data.items.some(row=>row.id===doc.id));assert.ok(filtered.data.items.every(row=>row.payment_status==='overpaid'),'Real SQL filters independently before pagination');
+  const candidates=await get('/api/documents?kind=invoice&payment_candidates=1&id=eq.'+encodeURIComponent(doc.id),cookies.get('0:'+role));assert.equal(candidates.status,200);assert.ok(candidates.data.items.some(row=>row.id===doc.id),'Settled invoices remain exact payment candidates');
+  const foreign=await postReceipt(body,role,'r7-http-foreign-'+role,1);assert.equal(foreign.status,400);assert.equal(foreign.data.error,'invoice_invalid');assert.equal(await receiptCount(),before+1);
+ }
+ console.log('Native HTTP confirmed overpayment: three finance roles succeed/replay once; five roles and cross-tenant access denied; malformed/stale confirmations, ordinary excess, precision and future dates blocked; independent status axes and unchanged invoice total passed.');
  const issued=createdInvoices.get('owner');
  const invalidState=await write('POST','/api/documents/'+encodeURIComponent(issued.number)+'/status',{action:'accept'},'owner');
  assert.equal(invalidState.status,409,'Invoice cannot use offer-only accept transition');
