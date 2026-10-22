@@ -82,7 +82,39 @@ console.log('Apple and PWA installation icons use the Binso One artwork with One
 // Document detail contract: operational workspace; customer-facing rendering belongs to preview only.
 {
   const documents=read("components/documents.tsx");
-  assert(documents.includes("<DocumentReadView type={kind} draft={draft} directory={directory} canWrite={canWrite}/>"),"Document detail must expose the operational read view.");
+  const hasOperationalView=source=>{
+    const ast=ts.createSourceFile('documents.tsx',source,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
+    const owner=ast.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='DocumentPage');
+    const content=owner?.body?.statements.filter(ts.isVariableStatement).flatMap(statement=>statement.declarationList.declarations).find(node=>ts.isIdentifier(node.name)&&node.name.text==='documentContent');
+    let mounted=false;
+    const required={type:'kind',draft:'draft',directory:'directory',canWrite:'canWrite'};
+    const view=node=>{
+      if(ts.isJsxSelfClosingElement(node)&&node.tagName.getText(ast)==='DocumentReadView'){
+        const props=node.attributes.properties;
+        mounted||=!props.some(ts.isJsxSpreadAttribute)&&Object.entries(required).every(([name,value])=>{
+          const found=props.filter(prop=>ts.isJsxAttribute(prop)&&prop.name.getText(ast)===name);
+          const expression=found[0]?.initializer;
+          return found.length===1&&expression&&ts.isJsxExpression(expression)&&expression.expression&&ts.isIdentifier(expression.expression)&&expression.expression.text===value;
+        });
+      }
+      ts.forEachChild(node,view);
+    };
+    const visit=node=>{
+      if(ts.isConditionalExpression(node)){
+        const condition=node.condition;
+        if(ts.isBinaryExpression(condition)&&condition.operatorToken.kind===ts.SyntaxKind.AmpersandAmpersandToken&&ts.isIdentifier(condition.left)&&condition.left.text==='existing'&&ts.isPrefixUnaryExpression(condition.right)&&condition.right.operator===ts.SyntaxKind.ExclamationToken&&ts.isIdentifier(condition.right.operand)&&condition.right.operand.text==='editing')view(node.whenTrue);
+      }
+      ts.forEachChild(node,visit);
+    };
+    if(content?.initializer)visit(content.initializer);
+    return mounted;
+  };
+  const fixture=(tag,condition='existing&&!editing')=>'function DocumentPage(){const documentContent='+condition+'?'+tag+':null;return documentContent}';
+  const readView='<DocumentReadView type={kind} draft={draft} directory={directory} canWrite={canWrite}/>';
+  assert.equal(hasOperationalView(fixture(readView)),true);
+  assert.equal(hasOperationalView(fixture(readView.replace('/>',' followup={<OfferFollowup/>}/>'))),true,'An additional central slot must preserve the existing read-view contract');
+  for(const source of [fixture(readView.replace('canWrite={canWrite}','canWrite={true}')),fixture(readView.replace('draft={draft}','draft={other}')),fixture(readView.replace('/>',' {...override}/>')),fixture('<Other/>'),fixture(readView,'existing&&editing'),'function DocumentPage(){const documentContent=null;/* '+readView+' */return documentContent}'])assert.equal(hasOperationalView(source),false,'Missing/incorrect/unreachable view or overridden permission cannot pass');
+  assert(hasOperationalView(documents),"Document detail must expose the operational read view with its current data and rights in the existing non-editing branch.");
   assert(!documents.includes('detailTab===\\\"document\\\"'),"Invoice and offer detail pages must not embed a second document-shaped preview.");
   assert(!documents.includes("document-inline-preview"),"The final customer document belongs exclusively to the preview action.");
   assert(documents.includes('IconButton label="Vorschau" icon="file"'),"Document detail must keep preview directly accessible.");
