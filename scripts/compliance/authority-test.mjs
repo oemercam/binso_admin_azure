@@ -15,7 +15,12 @@ assert.ok(aggregate(revision7Authority(source,forgedRegister).requirements,[]).e
 for(const alter of [r=>r.sourceSha256='0'.repeat(64),r=>r.requirements.pop(),r=>r.requirements[1].id=r.requirements[0].id,r=>r.requirements[0].requirement='Substituted clause',r=>r.requirements[0].sourceTextSha256='0'.repeat(64),r=>r.requirements[0].chapter=55]){
  const invalid=structuredClone(register);alter(invalid);assert.throws(()=>revision7Authority(source,invalid),'Stale, missing, duplicate or substituted source clauses block');
 }
+const repeated=structuredClone(register),replacedId=repeated.requirements[1].id;
+repeated.requirements[1]={...repeated.requirements[0],id:replacedId};
+assert.throws(()=>revision7Authority(source,repeated),'Repeating a different real source clause under a valid missing-clause ID cannot omit an obligation');
+const downgraded=structuredClone(register);downgraded.requirements[0].priority='P3';assert.throws(()=>revision7Authority(source,downgraded),'Generated priorities cannot downgrade binding P0-P2 clauses to excluded work');
 assert.throws(()=>revision7Authority(source+'\nUnreviewed source change',register));
+const alteredSource=source+'\nUnreviewed source change',alteredRegister=structuredClone(register);alteredRegister.sourceSha256=(await import('node:crypto')).createHash('sha256').update(alteredSource).digest('hex');assert.throws(()=>revision7Authority(alteredSource,alteredRegister),'Changing both source and register cannot replace the explicitly supplied master');
 assert.throws(()=>partitionHistoricalRegistry({requirements:[{id:'UNCLASSIFIED'}]}),'Unknown requirements cannot silently disappear');
 const clause=authority.requirements[0],target=clause.expectedCases[0],proof={...target,checks:[{...target,id:clause.id,status:'passed',reviewer:'Synthetic independent reviewer',approvalReference:'Synthetic clause evidence'}]};
 assert.equal(aggregate([clause],[proof])[0].status,'passed','Exact clause-bound independently reviewed synthetic proof exercises the approval mechanism only');

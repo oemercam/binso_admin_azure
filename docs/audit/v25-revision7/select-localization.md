@@ -120,3 +120,12 @@ Defaultargument kompatibel. Echte Formularhandler-Regressionen, Mengen-/Preis-
 Regressionssuite, Typecheck und betroffener Lint bestehen. Der Formular-Testadapter
 stellt die nun verwendeten Locale-Kontexte bereit; seine Sperr-, Wiederholungs-,
 Navigations- und Fehlerassertionen bleiben vollständig erhalten.
+
+Die tatsächlich heruntergeladenen Chromium-Artefakte aus Full Development39695330278
+(a100c1ee, funktionales Artefakt12391456587) bestätigen alle vier Dialogfälle.
+FR/Dunkel/390 zeigt den vollständigen Bestätigungstext oberhalb des festen Footers;
+IT/Hell/1440 zeigt den übersetzten Gruppentitel. Diese beiden Screens wurden gesichtet.
+Der danach gefundene zusammengesetzte Kunden-Spaltenkopf «Umsatz 2026» benötigt eine
+Template-Übersetzung. «Umsatz {0}» verwendet nun den bestehenden zentralen
+Template-Owner, erhält das tatsächliche Geschäftsjahr und besteht vier Sprachfälle.
+Die gesamte a100c1ee-Matrix ist grün; spätere Quellenänderungen bleiben separat zu prüfen.

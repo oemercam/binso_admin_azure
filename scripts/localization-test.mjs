@@ -26,6 +26,7 @@ function compile(file,deps={}){
 }
 const config=compile('lib/locales/config.ts');
 const locale=compile('lib/locales/index.ts',{'./config':config,'./messages.json':messages,'./templates.json':templates,'./plurals.json':JSON.parse(fs.readFileSync('lib/locales/plurals.json','utf8'))});
+for(const [language,expected] of [['de','Umsatz 2026'],['en','Revenue 2026'],['fr','Chiffre d’affaires 2026'],['it','Ricavi 2026']])assert.equal(locale.translateMessage('Umsatz 2026',language),expected,'Customer revenue headers translate the label while preserving the actual business year');
 assert.deepEqual(config.locales,['de','fr','it','en']);
 const financialDates=compile('lib/financial-status.ts',{'./money':compile('lib/money.ts')});
 for(const [language,expected] of Object.entries({de:'02.01.2026',fr:'02.01.2026',it:'02.01.2026',en:'02.01.2026'}))assert.equal(financialDates.formatDate('2026-01-02',config.localeTags[language]),expected,'Civil document dates use the chosen Swiss language without timezone day shifts');

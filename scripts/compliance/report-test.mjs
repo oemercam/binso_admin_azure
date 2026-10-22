@@ -86,7 +86,7 @@ try{
  const copyPath=path.join(identityDir,'docs/audit/v25-revision7/requirements.json'),copy=JSON.parse(fs.readFileSync(copyPath,'utf8')),beforeResult=readIdentity().sourceDigest;
  copy.requirements[0].status='passed';copy.requirements[0].test='Synthetic result prose, not a review';fs.writeFileSync(copyPath,JSON.stringify(copy));
  assert.equal(readIdentity().sourceDigest,beforeResult,'Recording result prose cannot invalidate unchanged executable or normative requirements');
- copy.requirements[0].priority='P1';fs.writeFileSync(copyPath,JSON.stringify(copy));assert.notEqual(readIdentity().sourceDigest,beforeResult,'Normative priority changes still invalidate old evidence');
+ copy.requirements[0].priority='P1';fs.writeFileSync(copyPath,JSON.stringify(copy));assert.throws(readIdentity,'A priority differing from the binding original cannot supply valid evidence');
  copy.requirements[0].requirement='Tampered source clause';fs.writeFileSync(copyPath,JSON.stringify(copy));assert.throws(readIdentity,'A substituted clause must block, never fall back to old evidence');
  fs.copyFileSync(path.resolve('docs/audit/v25-revision7/requirements.json'),copyPath);
  fs.appendFileSync(path.join(identityDir,'docs/audit/v25-revision7/source.md'),'\nUnapproved source drift');assert.throws(readIdentity,'Source drift without a matching register blocks');

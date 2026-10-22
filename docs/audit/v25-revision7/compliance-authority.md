@@ -62,8 +62,8 @@ sind keine normative Quelle. Ihr Nachtragen darf identischen Code nicht nachträ
 zu einem anderen geprüften Programm machen. Dies erteilt keine Klauselfreigabe.
 
 Der echte Git-Fixturetest weist nach: Ergebnisprosa lässt den Digest unverändert;
-eine Prioritätsänderung verändert ihn; ersetzte Klauseln und veränderte Originalbytes
-mit veraltetem Register werden abgelehnt. Bereits vorhandene negative Review- und
+eine abweichende Priorität wird abgelehnt; ersetzte Klauseln und veränderte Originalbytes
+werden abgelehnt. Bereits vorhandene negative Review- und
 Quellbindungsprüfungen bleiben erhalten. Kein fehlgeschlagener Fall wird akzeptiert.
 
 ## Gesicherter Integrationsnachweis
@@ -74,3 +74,24 @@ echter PostgreSQL-Parallelprüfungen, beider funktionalen Browserjobs und aller 
 Responsive-Jobs. Diese erfolgreichen Entwicklungsgates sind keine vollständige
 fachliche oder visuelle Abnahme der573 Klauseln. Nachfolgende Quellenänderungen
 benötigen eigene aktuelle Prüfungen.
+
+## Vollständigkeit statt nur Anzahl und Textzugehörigkeit
+
+Der gemeinsame `scripts/revision7-source.mjs`-Parser wird vom Registergenerator und
+vom Compliance-Gate verwendet. Er bindet den bekannten SHA-256 der unveränderten
+Benutzerdatei sowie alle573 Klauseln an ihre56 geordneten Kapitel und exakten IDs,
+Titel, Prioritäten, Texte und Text-Hashes. Eine andere gültige Quellenklausel darf
+nicht unter der ID einer ausgelassenen Klausel wiederholt werden. Ebenso darf eine
+generierte P3-Einstufung keine Pflicht aus dem Auftrag entfernen. Selbst gemeinsam
+geänderte Originaldatei und Register ersetzen nicht die ausdrücklich gelieferte Quelle.
+Eine neue Benutzerrevision würde eine bewusste Aktualisierung dieser Bindung erfordern.
+
+Die Positivprüfung des tatsächlichen Registers und Negativfälle für wiederholte
+echte Klausel, P3-Herabstufung und gleichzeitige Quellen-/Registeränderung bestehen.
+Der vorherige reine Prioritäts-Digestvergleich ist zur strikteren Ablehnung eines
+Widerspruchs zur Quelle verschärft. Ergebnisprosa kann weiterhin weder eine Freigabe
+erteilen noch die Identität unveränderten Codes verändern. Keine Pflicht wurde entfernt.
+
+Der vollständige Entwicklungslauf39695330278 für a100c1ee ist erfolgreich, ebenso
+Standard-Quality39695282449 und CodeQL39695282461. Alle acht Browserjobs bestanden.
+Diese Nachweise qualifizieren nicht die danach geänderten Header-/Format-/Parserquellen.
