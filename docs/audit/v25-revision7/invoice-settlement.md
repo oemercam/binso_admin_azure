@@ -84,3 +84,9 @@ Build und exakter ZIP-Smoke. Die Browserprüfung fand noch zwei alte Erwartungen
 einen Status statt der drei unabhängigen Achsen und einen Auftrags-Rechnungslink
 ohne den neuen Rückkehrparameter. Die Nachfolgetests verlangen jede erwartete
 Achse genau einmal und den exakten Rückkehrlink. Kein Gate wird übersprungen.
+
+Der Browserlauf aufe99d361f prüfte zusätzlich die verzögerte Erstladung: Die
+Rechnungswahl war nach Umstellung auf den Einzelabruf nicht mehr gesperrt. Der
+Nachfolger stellt die Lade-Sperre wieder her; Betrag/Notiz bleiben bearbeitbar.
+Der vorhandene Negativtest verzögert nun auch die tatsächliche Einzelabfrage.
+Keine neue vollständige Abnahme aus den vorherigen Teilergebnissen ableiten.

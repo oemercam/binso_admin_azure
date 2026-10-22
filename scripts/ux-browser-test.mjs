@@ -1322,7 +1322,7 @@ try{
   if(hasInteraction('data')){
    // Server hydration may fill invoice fields, but cannot make already typed input pristine.
    let releaseInvoice;const delayedInvoice=new Promise(resolve=>{releaseInvoice=resolve});
-   const delayInvoiceRoute=async route=>{const url=new URL(route.request().url());if(url.searchParams.get('kind')==='invoice'&&(url.pathname==='/api/documents'||url.pathname==='/api/demo/data'))await delayedInvoice;await route.fallback()};
+   const delayInvoiceRoute=async route=>{const url=new URL(route.request().url());if(url.pathname==='/api/documents/RE-TEST-1'||url.searchParams.get('kind')==='invoice'&&(url.pathname==='/api/documents'||url.pathname==='/api/demo/data'))await delayedInvoice;await route.fallback()};
    await context.route('**/api/**',delayInvoiceRoute);
    const hydrationForm=await trackedPage();
    try{

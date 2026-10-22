@@ -44,5 +44,9 @@
     "All route/state/role combinations have not yet been individually instrumented",
     "Visual baseline requires reviewed same-commit capture; no auto-update",
     "React component attribution is static reachability + selector mount; no React fiber identity claim"
-  ]
+  ],
+  "measurementMeaning": "Legacy measurements counts route assignments, not distinct files or independent clause approvals.",
+  "routeMeasurementAssignments": 6825,
+  "distinctAssignedMeasurementFiles": 5993,
+  "acceptedMeasurementFiles": 6001
 }

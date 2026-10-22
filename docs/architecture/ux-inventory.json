@@ -222995,6 +222995,7 @@
           "props": [
             "label=\"Rechnung\"",
             "required",
+            "disabled={!!sourceInvoice&&invoiceQuery.loading}",
             "endpoint={\"/api/documents?kind=invoice&payment_candidates=1\"}",
             "value={invoiceId}",
             "selectedItem={selectedInvoice??undefined}",

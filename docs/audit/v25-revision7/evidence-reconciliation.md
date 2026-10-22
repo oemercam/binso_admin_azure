@@ -18,7 +18,9 @@ Ergebnisse dürfen nicht zwischen diesen Quellen zusammenkopiert werden.
 
 Der a9b-Originalreport wurde vor Übernahme seines Inhalts gegen SHA256
 `501dfb8ada411219bda017efb7451fdadb876d0ea4453dd819821427ede1b510` geprüft.
-Er enthält6825 Messdatensätze,76 von78 Routen und613 aktive Einträge:573 Klauseln
+Sein Original-Markdown zählt6001 akzeptierte Messdateien. Die6825 Routen-Zuordnungen
+verweisen auf5993 unterschiedliche zugeordnete Dateien; geteilte Messungen werden
+mehreren passenden Routen zugeordnet. Er enthält76 von78 Routen und613 aktive Einträge:573 Klauseln
 plus40 technische Verträge.8 passed,21 partial,580 review-required,3 not-tested,
 1 manual-required,0 fehlgeschlagene Checks. `compliant:false` bleibt bestehen.
 Die zwei nicht vermessenen Routen sind `/dev/ux-lab` und `/operator/wallboard`;
