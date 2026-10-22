@@ -1,18 +1,32 @@
 import assert from 'node:assert/strict';
 import sharp from 'sharp';
+import {createHash} from 'node:crypto';
 
 /** Actual profile components with isolated API fixtures; native HTTP/RLS is separate. */
 export async function verifyAvatarBrowser({page,context,base,capture}){
  const bytes=await sharp({create:{width:1200,height:600,channels:3,background:'#234567'}}).png().toBuffer();
  const file={name:'synthetic-avatar.png',mimeType:'image/png',buffer:bytes};
+ const expectedHash=createHash('sha256').update(bytes).digest('hex');
+ // Observe the real FormData without replacing its body or response. WebKit's
+ // request protocol can omit binary multipart bytes; this also checks their hash.
+ await page.addInitScript(()=>{
+  const original=window.fetch;window.__avatarUploadEvidence=[];
+  window.fetch=async(input,init)=>{
+   if(new URL(typeof input==='string'?input:input instanceof URL?input.href:input.url,location.href).pathname==='/api/files'&&init?.body instanceof FormData){
+    const body=init.body,file=body.get('file');
+    if(file instanceof File){const hash=await crypto.subtle.digest('SHA-256',await file.arrayBuffer());window.__avatarUploadEvidence.push({size:file.size,type:file.type,purpose:body.get('purpose'),crop:body.get('avatarCrop'),sha256:Array.from(new Uint8Array(hash),byte=>byte.toString(16).padStart(2,'0')).join('')});}
+   }
+   return original.call(window,input,init);
+  };
+ });
  const old='/api/files/00000000-0000-4000-8000-000000000091/download',id='00000000-0000-4000-8000-000000000092',next='/api/files/'+id+'/download';
  let avatar=old,uploads=0,removals=0,failUpload=false,failRemove=false,verdict='clean';const keys=[],crops=[];
  const profile=route=>route.fulfill({json:{item:{id:'avatar-fixture',display_name:'Synthetic Avatar User',first_name:'Synthetic',last_name:'Avatar User',avatar_url:avatar,theme:'light',language:'de'},email:'avatar@fixture.invalid'}});
  const image=route=>route.fulfill({contentType:'image/png',body:bytes});
  const upload=async route=>{
   uploads++;keys.push(route.request().headers()['idempotency-key']);
-  const form=await new Response(route.request().postDataBuffer(),{headers:{'content-type':route.request().headers()['content-type']}}).formData();
-  assert.equal(form.get('purpose'),'profile_avatar');assert.equal(form.get('file').size,bytes.length,'Original file goes through the central server decoder');crops.push(JSON.parse(form.get('avatarCrop')));
+  const evidence=await page.evaluate(()=>window.__avatarUploadEvidence.at(-1));
+  assert.equal(evidence.purpose,'profile_avatar');assert.equal(evidence.size,bytes.length,'Original file goes through the central server decoder');assert.equal(evidence.sha256,expectedHash,'Actual browser FormData preserves every original byte');assert.equal(evidence.type,'image/png');crops.push(JSON.parse(evidence.crop));
   if(failUpload)return route.fulfill({status:503,json:{message:'Synthetic avatar upload unavailable'}});
   if(verdict==='clean')avatar=next;
   return route.fulfill({status:201,json:{item:{id,scanStatus:verdict,available:verdict==='clean'}}});
