@@ -49,6 +49,8 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
   const [role,setRole]=useState("");
   const [load,setLoad]=useState(existing?"100":"100");
   const [entryDate,setEntryDate]=useState("");
+  const [endDate,setEndDate]=useState("");
+  const [workLocation,setWorkLocation]=useState("");
   const [weeklyHours,setWeeklyHours]=useState("42");
   const [vacationDays,setVacationDays]=useState("25");
   const [address,setAddress]=useState("");
@@ -61,7 +63,7 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
   const recordError=recordQuery.error??(existing&&recordQuery.data&&!recordQuery.data.item&&!recordQuery.data.items?.length?"Mitarbeiter wurde nicht gefunden.":null);
   const [savingRecord,setSavingRecord]=useState(false);
   const saveRecordPending=useRef(false);
-  const {dirty,markPristine}=useDirtySnapshot([firstName,lastName,email,phone,role,load,entryDate,weeklyHours,vacationDays,address,status]);
+  const {dirty,markPristine}=useDirtySnapshot([firstName,lastName,email,phone,role,load,entryDate,weeklyHours,vacationDays,address,status,endDate,workLocation]);
   const [savedRecord,setSavedRecord]=useState(false);
   const [editingRecord,setEditingRecord]=useState(!existing);
 
@@ -86,33 +88,36 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
         setRole(String(item.job_title??""));
         setLoad(String(Number(item.workload_percent??100)));
         setEntryDate(String(item.entry_date??item.start_date??"").slice(0,10));
+        setEndDate(String(item.end_date??"").slice(0,10));
+        setWorkLocation(String(item.work_location??""));
         setWeeklyHours(String(Number(item.weekly_hours??42)));
         setVacationDays(String(Number(item.vacation_days??25)));
         setAddress(String(item.address??""));
         setStatus(item.status==="inactive"?"Inaktiv":"Aktiv");
-        markPristine([String(item.first_name??""),String(item.last_name??""),String(item.email??""),String(item.phone??""),String(item.job_title??""),String(Number(item.workload_percent??100)),String(item.entry_date??item.start_date??"").slice(0,10),String(Number(item.weekly_hours??42)),String(Number(item.vacation_days??25)),String(item.address??""),item.status==="inactive"?"Inaktiv":"Aktiv"]);
+        markPristine([String(item.first_name??""),String(item.last_name??""),String(item.email??""),String(item.phone??""),String(item.job_title??""),String(Number(item.workload_percent??100)),String(item.entry_date??item.start_date??"").slice(0,10),String(Number(item.weekly_hours??42)),String(Number(item.vacation_days??25)),String(item.address??""),item.status==="inactive"?"Inaktiv":"Aktiv",String(item.end_date??"").slice(0,10),String(item.work_location??"")]);
       });
   },[recordQuery.data,editingRecord,markPristine]);
 
   const [replay,setReplay]=useState<{body:string;key:string}|null>(null);
-  const recovery=useProcessDraft({process:"employee:create",value:{firstName,lastName,email,phone,role,load,entryDate,weeklyHours,vacationDays,address,status,replay},dirty,enabled:!existing,onRestore:value=>{
+  const recovery=useProcessDraft({process:"employee:create",value:{firstName,lastName,email,phone,role,load,entryDate,endDate,workLocation,weeklyHours,vacationDays,address,status,replay},dirty,enabled:!existing,onRestore:value=>{
    if(!value||[value.firstName,value.lastName,value.email,value.phone,value.role,value.load,value.entryDate,value.weeklyHours,value.vacationDays,value.address,value.status].some(field=>typeof field!=="string"||field.length>2000))return;
    setFirstName(value.firstName);setLastName(value.lastName);setEmail(value.email);setPhone(value.phone);setRole(value.role);setLoad(value.load);setEntryDate(value.entryDate);setWeeklyHours(value.weeklyHours);setVacationDays(value.vacationDays);setAddress(value.address);setStatus(value.status);
+   setEndDate(typeof value.endDate==='string'?value.endDate:'');setWorkLocation(typeof value.workLocation==='string'?value.workLocation:'');
    if(value.replay&&typeof value.replay.body==='string'&&value.replay.body.length<16000&&typeof value.replay.key==='string'&&value.replay.key.length>=8&&value.replay.key.length<=128)setReplay(value.replay);
   }});
   const save=async()=>{
     if(saveRecordPending.current||loadingRecord||recordError||!existing&&!recovery.ready)return;
     if(!firstName.trim()||!lastName.trim()||!role.trim()){setToast("Name und Funktion sind erforderlich.");window.setTimeout(()=>setToast(null),2200);return;}
-    const validation=employeeInputIssue({email,entryDate,workloadPercent:load,weeklyHours,vacationDays});
+    const validation=employeeInputIssue({email,entryDate,endDate,workLocation,workloadPercent:load,weeklyHours,vacationDays});
     if(validation){setToast(validation);return;}
     saveRecordPending.current=true;setSavingRecord(true);
     try{
-      const payload={firstName:firstName.trim(),lastName:lastName.trim(),email,phone,jobTitle:role.trim(),workloadPercent:Number(load),entryDate,weeklyHours:Number(weeklyHours),vacationDays:Number(vacationDays),address,status:status==="Inaktiv"?"inactive":"active"};
+      const payload={firstName:firstName.trim(),lastName:lastName.trim(),email,phone,jobTitle:role.trim(),workloadPercent:Number(load),entryDate,endDate,workLocation,weeklyHours:Number(weeklyHours),vacationDays:Number(vacationDays),address,status:status==="Inaktiv"?"inactive":"active"};
       {
         let result:{item?:{id?:string}};
         if(existing&&employeeId)result=await apiPatch("/api/employees/"+encodeURIComponent(employeeId),payload);
         else{
-         const serialized=JSON.stringify(payload),attempt=replay?.body===serialized?replay:{body:serialized,key:crypto.randomUUID()};setReplay(attempt);recovery.persist({firstName,lastName,email,phone,role,load,entryDate,weeklyHours,vacationDays,address,status,replay:attempt});
+         const serialized=JSON.stringify(payload),attempt=replay?.body===serialized?replay:{body:serialized,key:crypto.randomUUID()};setReplay(attempt);recovery.persist({firstName,lastName,email,phone,role,load,entryDate,endDate,workLocation,weeklyHours,vacationDays,address,status,replay:attempt});
          result=await apiPost("/api/employees",payload,{idempotencyKey:attempt.key});
         }
         if(!result.item?.id)throw new Error("Die Speicherung konnte nicht bestätigt werden. Bitte erneut versuchen.");
@@ -144,18 +149,22 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
         <div><dt><LocalizedText>{"E-Mail"}</LocalizedText></dt><dd>{email?<a href={contactHref("email",email)}>{email}</a>:<LocalizedText>Keine E-Mail hinterlegt</LocalizedText>}</dd></div>
         {phone&&<div><dt><LocalizedText>{"Telefon"}</LocalizedText></dt><dd><a href={contactHref("phone",phone)}>{phone}</a></dd></div>}
         {entryDate&&<div><dt><LocalizedText>{"Eintritt"}</LocalizedText></dt><dd>{swissDate(entryDate)}</dd></div>}
+        {endDate&&<div><dt><LocalizedText>{"Austritt"}</LocalizedText></dt><dd>{swissDate(endDate)}</dd></div>}
+        {workLocation&&<div><dt><LocalizedText>{"Arbeitsort"}</LocalizedText></dt><dd>{workLocation}</dd></div>}
         <div><dt><LocalizedText>{"Wochenstunden"}</LocalizedText></dt><dd>{formatQuantity(weeklyHours,translate("h/Woche"),localeTags[locale])}</dd></div>
         <div><dt><LocalizedText>{"Ferientage / Jahr"}</LocalizedText></dt><dd>{formatQuantity(vacationDays,translate("Tage/Jahr"),localeTags[locale])}</dd></div>
         {address&&<div><dt><LocalizedText>{"Adresse"}</LocalizedText></dt><dd>{address}</dd></div>}
       </dl></>:<FormSheet workspace label={existing?"Mitarbeiter bearbeiten":"Mitarbeiter hinzufügen"} open={editingRecord} onClose={()=>{recovery.clear();allowDraftNavigation();if(existing)setEditingRecord(false);else router.push(returnTo)}} busy={savingRecord} dirty={dirty&&!savedRecord} wizard><FormWizard cancelAction={<Button variant="secondary" onClick={()=>{recovery.clear();allowDraftNavigation();if(existing)setEditingRecord(false);else router.push(returnTo)}} disabled={savingRecord}><LocalizedText>{"Abbrechen"}</LocalizedText></Button>} guided={!existing} labels={["Persönliche Daten","Arbeitsverhältnis"]} step={wizardStep} onStep={setWizardStep} busy={savingRecord} action={<Button requiresWrite disabled={savingRecord} onClick={()=>void save()}><LocalizedText>{savingRecord?"Wird gespeichert…":"Speichern"}</LocalizedText></Button>}><FormSection title="Persönliche Daten" hidden={!existing&&wizardStep!==0}><div className="form-grid two">
         <Field label="Vorname"><Input required autoComplete="given-name" value={firstName} onChange={e=>setFirstName(e.target.value)}/></Field>
         <Field label="Nachname"><Input required autoComplete="family-name" value={lastName} onChange={e=>setLastName(e.target.value)}/></Field>
-        <Field label="E-Mail"><Input required autoComplete="email" type="email" value={email} onChange={e=>setEmail(e.target.value)}/></Field>
+        <Field label="E-Mail" hint="Optional · erstellt keinen App-Zugang"><Input autoComplete="email" type="email" value={email} onChange={e=>setEmail(e.target.value)}/></Field>
         <Field label="Telefon"><Input type="tel" inputMode="tel" value={phone} onChange={e=>setPhone(e.target.value)}/></Field>
         <Field label="Funktion"><Input required value={role} onChange={e=>setRole(e.target.value)}/></Field>
         <Field label="Pensum (%)"><Input type="number" min="0" max="100" required inputMode="numeric" value={load} onChange={e=>setLoad(e.target.value)} placeholder="%"/></Field>
       </div></FormSection><FormSection title="Arbeitsverhältnis" hidden={!existing&&wizardStep!==1}><div className="form-grid two">
         <Field label="Eintritt"><Input type="date" value={entryDate} onChange={e=>setEntryDate(e.target.value)}/></Field>
+        <Field label="Austritt"><Input type="date" min={entryDate||undefined} value={endDate} onChange={e=>setEndDate(e.target.value)}/></Field>
+        <Field label="Arbeitsort"><Input maxLength={180} value={workLocation} onChange={e=>setWorkLocation(e.target.value)}/></Field>
         <Field label="Wochenstunden (h/Woche)"><Input type="number" min="0.1" max="80" step="0.1" required inputMode="decimal" value={weeklyHours} onChange={e=>setWeeklyHours(e.target.value)}/></Field>
         <Field label="Ferientage" hint="Pro Jahr"><Input type="number" min="0" max="60" step="0.5" required inputMode="decimal" value={vacationDays} onChange={e=>setVacationDays(e.target.value)}/></Field>
         <Field label="Adresse" className="full"><Input value={address} onChange={e=>setAddress(e.target.value)} placeholder="Strasse, PLZ Ort"/></Field>

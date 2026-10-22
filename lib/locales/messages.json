@@ -1,4 +1,7 @@
 {
+  "Arbeitsort": ["Workplace", "Lieu de travail", "Luogo di lavoro"],
+  "Austritt": ["Leaving date", "Date de départ", "Data di uscita"],
+  "Optional · erstellt keinen App-Zugang": ["Optional · does not create app access", "Facultatif · ne crée pas d’accès à l’application", "Facoltativo · non crea un accesso all’app"],
   "Bitte ein gültiges Austrittsdatum erfassen.": ["Please enter a valid leaving date.", "Veuillez saisir une date de départ valide.", "Inserisci una data di uscita valida."],
   "Der Austritt darf nicht vor dem Eintritt liegen.": ["The leaving date must not precede the start date.", "La date de départ ne peut pas précéder la date d’entrée.", "La data di uscita non può precedere la data di entrata."],
   "Bitte einen Arbeitsort mit höchstens 180 Zeichen erfassen.": ["Please enter a workplace with no more than 180 characters.", "Veuillez saisir un lieu de travail de 180 caractères maximum.", "Inserisci un luogo di lavoro di massimo 180 caratteri."],

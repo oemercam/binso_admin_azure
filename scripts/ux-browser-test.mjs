@@ -710,12 +710,14 @@ try{
 
   }
   if(hasInteraction('employees')){
+  processRecoveryMode=true;
   await page.waitForLoadState("networkidle");await navigate(base+'/mitarbeiter/neu');await page.waitForLoadState('networkidle');
   assert.equal(await page.getByRole('button',{name:'Zurück',exact:true}).count(),0,'First wizard step has no dead back button');
   await page.getByRole('button',{name:'Abbrechen',exact:true}).click();await waitForLocalizedRoute(page,base+"/mitarbeiter");await navigate(base+'/mitarbeiter/neu');await page.waitForLoadState('networkidle');
-  await page.getByLabel('Vorname',{exact:true}).fill('Test');await page.getByLabel('Nachname',{exact:true}).fill('Person');await page.getByLabel('E-Mail',{exact:true}).fill('test@example.invalid');await page.getByLabel('Funktion',{exact:true}).fill('ICT');
+  await page.getByLabel('Vorname',{exact:true}).fill('Test');await page.getByLabel('Nachname',{exact:true}).fill('Person');assert.equal(await page.getByLabel('E-Mail',{exact:true}).getAttribute('required'),null,'An employee dossier does not require app access or email');await page.getByLabel('Funktion',{exact:true}).fill('ICT');
   const employeeFooter=await page.locator('.mobile-sticky-save').boundingBox();await page.getByRole('button',{name:'Weiter',exact:true}).click();await page.getByRole('button',{name:'Speichern',exact:true}).filter({visible:true}).waitFor();
   assert.equal(await page.getByRole('button',{name:'Speichern',exact:true}).filter({visible:true}).count(),1,'Employee wizard has one final save');
+  await page.getByLabel('Eintritt',{exact:true}).fill('2026-01-01');await page.getByLabel('Austritt',{exact:true}).fill('2026-12-31');await page.getByLabel('Arbeitsort',{exact:true}).fill('Bern');
   const employeeSave=await page.locator('.mobile-sticky-save').boundingBox();assert.equal(employeeSave.y,employeeFooter.y,'Full-page wizard actions remain fixed across steps');assert.ok(employeeSave.y+employeeSave.height<=page.viewportSize().height+1,'Wizard save stays in the visible viewport');await page.getByText('Ferientage',{exact:true}).scrollIntoViewIfNeeded();
   await page.setViewportSize({width:430,height:400});
   await settleLayout(page);
@@ -724,8 +726,11 @@ try{
   const afterScroll=await page.locator('.form-wizard .mobile-sticky-save').boundingBox();assert.ok(Math.abs(shortFooter.y-afterScroll.y)<2,'Only wizard content scrolls');
   await capture(page,{animations:'disabled',path:path.join(output,`${theme}-430-400-employee-wizard.png`)});
   await page.setViewportSize({width:430,height:900});
+  await page.reload();await page.waitForFunction(()=>document.querySelector('input[autocomplete="given-name"]')?.value==='Test');
+  await page.getByRole('button',{name:'Weiter',exact:true}).click();assert.equal(await page.getByLabel('Austritt',{exact:true}).inputValue(),'2026-12-31');assert.equal(await page.getByLabel('Arbeitsort',{exact:true}).inputValue(),'Bern','New basic fields survive authenticated draft reload');
   await page.getByRole('button',{name:'Zurück',exact:true}).click();assert.equal(await appControlValue(page.getByLabel('Vorname',{exact:true})),'Test','Wizard retains input without navigation or dirty warnings');
   await page.getByRole('button',{name:'Abbrechen',exact:true}).click();await page.getByRole('button',{name:'Weiter bearbeiten',exact:true}).click();assert.equal(await appControlValue(page.getByLabel('Vorname',{exact:true})),'Test','Cancel guard retains draft');await page.getByRole('button',{name:'Abbrechen',exact:true}).click();await page.getByRole('button',{name:'Änderungen verwerfen',exact:true}).click();await waitForLocalizedRoute(page,base+"/mitarbeiter");
+  processRecoveryMode=false;
 
   }
   if(hasInteraction('time')){
