@@ -14396,13 +14396,13 @@
         "components/documents.tsx#documentPayload",
         "components/documents.tsx#invoiceDueIso",
         "components/documents.tsx#numberValue",
+        "components/use-browser-back-guard.ts#allowDraftNavigation",
+        "components/use-browser-back-guard.ts#boundary",
         "components/documents.tsx#documentPresentation",
         "components/documents.tsx#invoiceDueDate",
         "components/documents.tsx#useDocumentTotals",
         "components/ui.tsx#IconButton",
         "components/ui.tsx#Icon",
-        "components/use-browser-back-guard.ts#allowDraftNavigation",
-        "components/use-browser-back-guard.ts#boundary",
         "components/ui.tsx#Toast",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
@@ -14670,6 +14670,9 @@
         "lib/permissions.ts#baseRead",
         "lib/permissions.ts#normalizeTenantRole",
         "lib/permissions.ts#universalTenantPermissions",
+        "lib/client/backend.ts#apiDelete",
+        "components/use-browser-back-guard.ts#allowDraftNavigation",
+        "components/use-browser-back-guard.ts#boundary",
         "components/documents.tsx#documentPresentation",
         "components/documents.tsx#invoiceDueDate",
         "lib/financial-status.ts#financialStatusText",
@@ -14691,8 +14694,6 @@
         "lib/locales/index.ts#templatePatterns",
         "components/ui.tsx#Icon",
         "lib/client/locale.tsx#LocalizedText",
-        "components/use-browser-back-guard.ts#allowDraftNavigation",
-        "components/use-browser-back-guard.ts#boundary",
         "components/ui.tsx#Toast",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
@@ -14784,7 +14785,6 @@
         "components/entity-files.tsx#EntityFiles",
         "lib/file-associations.ts#fileRelations",
         "components/entity-files.tsx#Attachment",
-        "lib/client/backend.ts#apiDelete",
         "lib/file-selection.ts#fileSelectionError",
         "config/limits.ts#limitsConfig",
         "lib/client/backend.ts#apiUpload",
@@ -15055,13 +15055,13 @@
         "components/documents.tsx#documentPayload",
         "components/documents.tsx#invoiceDueIso",
         "components/documents.tsx#numberValue",
+        "components/use-browser-back-guard.ts#allowDraftNavigation",
+        "components/use-browser-back-guard.ts#boundary",
         "components/documents.tsx#documentPresentation",
         "components/documents.tsx#invoiceDueDate",
         "components/documents.tsx#useDocumentTotals",
         "components/ui.tsx#IconButton",
         "components/ui.tsx#Icon",
-        "components/use-browser-back-guard.ts#allowDraftNavigation",
-        "components/use-browser-back-guard.ts#boundary",
         "components/ui.tsx#Toast",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
@@ -15349,6 +15349,9 @@
         "lib/permissions.ts#baseRead",
         "lib/permissions.ts#normalizeTenantRole",
         "lib/permissions.ts#universalTenantPermissions",
+        "lib/client/backend.ts#apiDelete",
+        "components/use-browser-back-guard.ts#allowDraftNavigation",
+        "components/use-browser-back-guard.ts#boundary",
         "components/documents.tsx#documentPresentation",
         "components/documents.tsx#invoiceDueDate",
         "lib/financial-status.ts#financialStatusText",
@@ -15370,8 +15373,6 @@
         "lib/locales/index.ts#templatePatterns",
         "components/ui.tsx#Icon",
         "lib/client/locale.tsx#LocalizedText",
-        "components/use-browser-back-guard.ts#allowDraftNavigation",
-        "components/use-browser-back-guard.ts#boundary",
         "components/ui.tsx#Toast",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
@@ -15463,7 +15464,6 @@
         "components/entity-files.tsx#EntityFiles",
         "lib/file-associations.ts#fileRelations",
         "components/entity-files.tsx#Attachment",
-        "lib/client/backend.ts#apiDelete",
         "lib/file-selection.ts#fileSelectionError",
         "config/limits.ts#limitsConfig",
         "lib/client/backend.ts#apiUpload",
@@ -16714,7 +16714,7 @@
         "/api/products/",
         "/api/documents/",
         "/api/customers/",
-        "/api/time-entries/billing?ids=",
+        "/api/time-entries/billing?minuteAllocations=1&ids=",
         "/api/expenses/billing?ids=",
         "/api/documents",
         "/api/settings/readiness?",
@@ -16735,6 +16735,7 @@
         "/api/files?",
         "/api/files/",
         "/api/files",
+        "/api/time-entries/billing?",
         "/api/customers",
         "/api/projects",
         "/api/notifications",
@@ -16751,67 +16752,72 @@
       "widgets": [
         {
           "tag": "FormSheet",
-          "line": 442,
+          "line": 458,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 442,
+          "line": 458,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "DocumentModal",
-          "line": 443,
+          "line": 459,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "ActionSheet",
-          "line": 444,
+          "line": 460,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 462,
+          "line": 479,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "form",
-          "line": 462,
+          "line": 479,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "Field",
-          "line": 462,
+          "line": 479,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "Field",
-          "line": 462,
+          "line": 479,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "Field",
-          "line": 462,
+          "line": 479,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 463,
+          "line": 480,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "Field",
-          "line": 463,
+          "line": 480,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "Field",
-          "line": 463,
+          "line": 480,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "Field",
-          "line": 463,
+          "line": 480,
+          "component": "components/documents.tsx#DocumentPage"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 481,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
@@ -16906,92 +16912,92 @@
         },
         {
           "tag": "Field",
-          "line": 594,
+          "line": 616,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 599,
+          "line": 621,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 600,
+          "line": 622,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 601,
+          "line": 623,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 604,
+          "line": 626,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "FormSheet",
-          "line": 629,
+          "line": 652,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 629,
+          "line": 652,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 629,
+          "line": 652,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 629,
+          "line": 652,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 629,
+          "line": 652,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "DiscountFields",
-          "line": 629,
+          "line": 652,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 629,
+          "line": 652,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 629,
+          "line": 652,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "FormSheet",
-          "line": 630,
+          "line": 653,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "DiscountFields",
-          "line": 630,
+          "line": 653,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 631,
+          "line": 654,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 542,
+          "line": 560,
           "component": "components/documents.tsx#DiscountFields"
         },
         {
           "tag": "Field",
-          "line": 542,
+          "line": 560,
           "component": "components/documents.tsx#DiscountFields"
         },
         {
@@ -17213,13 +17219,13 @@
         "components/documents.tsx#documentPayload",
         "components/documents.tsx#invoiceDueIso",
         "components/documents.tsx#numberValue",
+        "components/use-browser-back-guard.ts#allowDraftNavigation",
+        "components/use-browser-back-guard.ts#boundary",
         "components/documents.tsx#documentPresentation",
         "components/documents.tsx#invoiceDueDate",
         "components/documents.tsx#useDocumentTotals",
         "components/ui.tsx#IconButton",
         "components/ui.tsx#Icon",
-        "components/use-browser-back-guard.ts#allowDraftNavigation",
-        "components/use-browser-back-guard.ts#boundary",
         "components/ui.tsx#Toast",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
@@ -17487,6 +17493,9 @@
         "lib/permissions.ts#baseRead",
         "lib/permissions.ts#normalizeTenantRole",
         "lib/permissions.ts#universalTenantPermissions",
+        "lib/client/backend.ts#apiDelete",
+        "components/use-browser-back-guard.ts#allowDraftNavigation",
+        "components/use-browser-back-guard.ts#boundary",
         "components/documents.tsx#documentPresentation",
         "components/documents.tsx#invoiceDueDate",
         "lib/financial-status.ts#financialStatusText",
@@ -17508,8 +17517,6 @@
         "lib/locales/index.ts#templatePatterns",
         "components/ui.tsx#Icon",
         "lib/client/locale.tsx#LocalizedText",
-        "components/use-browser-back-guard.ts#allowDraftNavigation",
-        "components/use-browser-back-guard.ts#boundary",
         "components/ui.tsx#Toast",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
@@ -17601,7 +17608,6 @@
         "components/entity-files.tsx#EntityFiles",
         "lib/file-associations.ts#fileRelations",
         "components/entity-files.tsx#Attachment",
-        "lib/client/backend.ts#apiDelete",
         "lib/file-selection.ts#fileSelectionError",
         "config/limits.ts#limitsConfig",
         "lib/client/backend.ts#apiUpload",
@@ -17872,13 +17878,13 @@
         "components/documents.tsx#documentPayload",
         "components/documents.tsx#invoiceDueIso",
         "components/documents.tsx#numberValue",
+        "components/use-browser-back-guard.ts#allowDraftNavigation",
+        "components/use-browser-back-guard.ts#boundary",
         "components/documents.tsx#documentPresentation",
         "components/documents.tsx#invoiceDueDate",
         "components/documents.tsx#useDocumentTotals",
         "components/ui.tsx#IconButton",
         "components/ui.tsx#Icon",
-        "components/use-browser-back-guard.ts#allowDraftNavigation",
-        "components/use-browser-back-guard.ts#boundary",
         "components/ui.tsx#Toast",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
@@ -18166,6 +18172,9 @@
         "lib/permissions.ts#baseRead",
         "lib/permissions.ts#normalizeTenantRole",
         "lib/permissions.ts#universalTenantPermissions",
+        "lib/client/backend.ts#apiDelete",
+        "components/use-browser-back-guard.ts#allowDraftNavigation",
+        "components/use-browser-back-guard.ts#boundary",
         "components/documents.tsx#documentPresentation",
         "components/documents.tsx#invoiceDueDate",
         "lib/financial-status.ts#financialStatusText",
@@ -18187,8 +18196,6 @@
         "lib/locales/index.ts#templatePatterns",
         "components/ui.tsx#Icon",
         "lib/client/locale.tsx#LocalizedText",
-        "components/use-browser-back-guard.ts#allowDraftNavigation",
-        "components/use-browser-back-guard.ts#boundary",
         "components/ui.tsx#Toast",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
@@ -18280,7 +18287,6 @@
         "components/entity-files.tsx#EntityFiles",
         "lib/file-associations.ts#fileRelations",
         "components/entity-files.tsx#Attachment",
-        "lib/client/backend.ts#apiDelete",
         "lib/file-selection.ts#fileSelectionError",
         "config/limits.ts#limitsConfig",
         "lib/client/backend.ts#apiUpload",
@@ -19531,7 +19537,7 @@
         "/api/products/",
         "/api/documents/",
         "/api/customers/",
-        "/api/time-entries/billing?ids=",
+        "/api/time-entries/billing?minuteAllocations=1&ids=",
         "/api/expenses/billing?ids=",
         "/api/documents",
         "/api/settings/readiness?",
@@ -19552,6 +19558,7 @@
         "/api/files?",
         "/api/files/",
         "/api/files",
+        "/api/time-entries/billing?",
         "/api/customers",
         "/api/projects",
         "/api/notifications",
@@ -19568,67 +19575,72 @@
       "widgets": [
         {
           "tag": "FormSheet",
-          "line": 442,
+          "line": 458,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 442,
+          "line": 458,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "DocumentModal",
-          "line": 443,
+          "line": 459,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "ActionSheet",
-          "line": 444,
+          "line": 460,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 462,
+          "line": 479,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "form",
-          "line": 462,
+          "line": 479,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "Field",
-          "line": 462,
+          "line": 479,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "Field",
-          "line": 462,
+          "line": 479,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "Field",
-          "line": 462,
+          "line": 479,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 463,
+          "line": 480,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "Field",
-          "line": 463,
+          "line": 480,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "Field",
-          "line": 463,
+          "line": 480,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "Field",
-          "line": 463,
+          "line": 480,
+          "component": "components/documents.tsx#DocumentPage"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 481,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
@@ -19723,92 +19735,92 @@
         },
         {
           "tag": "Field",
-          "line": 594,
+          "line": 616,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 599,
+          "line": 621,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 600,
+          "line": 622,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 601,
+          "line": 623,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 604,
+          "line": 626,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "FormSheet",
-          "line": 629,
+          "line": 652,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 629,
+          "line": 652,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 629,
+          "line": 652,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 629,
+          "line": 652,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 629,
+          "line": 652,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "DiscountFields",
-          "line": 629,
+          "line": 652,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 629,
+          "line": 652,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 629,
+          "line": 652,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "FormSheet",
-          "line": 630,
+          "line": 653,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "DiscountFields",
-          "line": 630,
+          "line": 653,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 631,
+          "line": 654,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 542,
+          "line": 560,
           "component": "components/documents.tsx#DiscountFields"
         },
         {
           "tag": "Field",
-          "line": 542,
+          "line": 560,
           "component": "components/documents.tsx#DiscountFields"
         },
         {
@@ -143340,13 +143352,13 @@
         "components/documents.tsx#documentPayload",
         "components/documents.tsx#invoiceDueIso",
         "components/documents.tsx#numberValue",
+        "components/use-browser-back-guard.ts#allowDraftNavigation",
+        "components/use-browser-back-guard.ts#boundary",
         "components/documents.tsx#documentPresentation",
         "components/documents.tsx#invoiceDueDate",
         "components/documents.tsx#useDocumentTotals",
         "components/ui.tsx#IconButton",
         "components/ui.tsx#Icon",
-        "components/use-browser-back-guard.ts#allowDraftNavigation",
-        "components/use-browser-back-guard.ts#boundary",
         "components/ui.tsx#Toast",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
@@ -143614,6 +143626,9 @@
         "lib/permissions.ts#baseRead",
         "lib/permissions.ts#normalizeTenantRole",
         "lib/permissions.ts#universalTenantPermissions",
+        "lib/client/backend.ts#apiDelete",
+        "components/use-browser-back-guard.ts#allowDraftNavigation",
+        "components/use-browser-back-guard.ts#boundary",
         "components/documents.tsx#documentPresentation",
         "components/documents.tsx#invoiceDueDate",
         "lib/financial-status.ts#financialStatusText",
@@ -143635,8 +143650,6 @@
         "lib/locales/index.ts#templatePatterns",
         "components/ui.tsx#Icon",
         "lib/client/locale.tsx#LocalizedText",
-        "components/use-browser-back-guard.ts#allowDraftNavigation",
-        "components/use-browser-back-guard.ts#boundary",
         "components/ui.tsx#Toast",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
@@ -143728,7 +143741,6 @@
         "components/entity-files.tsx#EntityFiles",
         "lib/file-associations.ts#fileRelations",
         "components/entity-files.tsx#Attachment",
-        "lib/client/backend.ts#apiDelete",
         "lib/file-selection.ts#fileSelectionError",
         "config/limits.ts#limitsConfig",
         "lib/client/backend.ts#apiUpload",
@@ -143999,13 +144011,13 @@
         "components/documents.tsx#documentPayload",
         "components/documents.tsx#invoiceDueIso",
         "components/documents.tsx#numberValue",
+        "components/use-browser-back-guard.ts#allowDraftNavigation",
+        "components/use-browser-back-guard.ts#boundary",
         "components/documents.tsx#documentPresentation",
         "components/documents.tsx#invoiceDueDate",
         "components/documents.tsx#useDocumentTotals",
         "components/ui.tsx#IconButton",
         "components/ui.tsx#Icon",
-        "components/use-browser-back-guard.ts#allowDraftNavigation",
-        "components/use-browser-back-guard.ts#boundary",
         "components/ui.tsx#Toast",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
@@ -144293,6 +144305,9 @@
         "lib/permissions.ts#baseRead",
         "lib/permissions.ts#normalizeTenantRole",
         "lib/permissions.ts#universalTenantPermissions",
+        "lib/client/backend.ts#apiDelete",
+        "components/use-browser-back-guard.ts#allowDraftNavigation",
+        "components/use-browser-back-guard.ts#boundary",
         "components/documents.tsx#documentPresentation",
         "components/documents.tsx#invoiceDueDate",
         "lib/financial-status.ts#financialStatusText",
@@ -144314,8 +144329,6 @@
         "lib/locales/index.ts#templatePatterns",
         "components/ui.tsx#Icon",
         "lib/client/locale.tsx#LocalizedText",
-        "components/use-browser-back-guard.ts#allowDraftNavigation",
-        "components/use-browser-back-guard.ts#boundary",
         "components/ui.tsx#Toast",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
@@ -144407,7 +144420,6 @@
         "components/entity-files.tsx#EntityFiles",
         "lib/file-associations.ts#fileRelations",
         "components/entity-files.tsx#Attachment",
-        "lib/client/backend.ts#apiDelete",
         "lib/file-selection.ts#fileSelectionError",
         "config/limits.ts#limitsConfig",
         "lib/client/backend.ts#apiUpload",
@@ -145658,7 +145670,7 @@
         "/api/products/",
         "/api/documents/",
         "/api/customers/",
-        "/api/time-entries/billing?ids=",
+        "/api/time-entries/billing?minuteAllocations=1&ids=",
         "/api/expenses/billing?ids=",
         "/api/documents",
         "/api/settings/readiness?",
@@ -145679,6 +145691,7 @@
         "/api/files?",
         "/api/files/",
         "/api/files",
+        "/api/time-entries/billing?",
         "/api/customers",
         "/api/projects",
         "/api/notifications",
@@ -145695,67 +145708,72 @@
       "widgets": [
         {
           "tag": "FormSheet",
-          "line": 442,
+          "line": 458,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 442,
+          "line": 458,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "DocumentModal",
-          "line": 443,
+          "line": 459,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "ActionSheet",
-          "line": 444,
+          "line": 460,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 462,
+          "line": 479,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "form",
-          "line": 462,
+          "line": 479,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "Field",
-          "line": 462,
+          "line": 479,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "Field",
-          "line": 462,
+          "line": 479,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "Field",
-          "line": 462,
+          "line": 479,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 463,
+          "line": 480,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "Field",
-          "line": 463,
+          "line": 480,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "Field",
-          "line": 463,
+          "line": 480,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "Field",
-          "line": 463,
+          "line": 480,
+          "component": "components/documents.tsx#DocumentPage"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 481,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
@@ -145850,92 +145868,92 @@
         },
         {
           "tag": "Field",
-          "line": 594,
+          "line": 616,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 599,
+          "line": 621,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 600,
+          "line": 622,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 601,
+          "line": 623,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 604,
+          "line": 626,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "FormSheet",
-          "line": 629,
+          "line": 652,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 629,
+          "line": 652,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 629,
+          "line": 652,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 629,
+          "line": 652,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 629,
+          "line": 652,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "DiscountFields",
-          "line": 629,
+          "line": 652,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 629,
+          "line": 652,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 629,
+          "line": 652,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "FormSheet",
-          "line": 630,
+          "line": 653,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "DiscountFields",
-          "line": 630,
+          "line": 653,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 631,
+          "line": 654,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 542,
+          "line": 560,
           "component": "components/documents.tsx#DiscountFields"
         },
         {
           "tag": "Field",
-          "line": 542,
+          "line": 560,
           "component": "components/documents.tsx#DiscountFields"
         },
         {
@@ -146157,13 +146175,13 @@
         "components/documents.tsx#documentPayload",
         "components/documents.tsx#invoiceDueIso",
         "components/documents.tsx#numberValue",
+        "components/use-browser-back-guard.ts#allowDraftNavigation",
+        "components/use-browser-back-guard.ts#boundary",
         "components/documents.tsx#documentPresentation",
         "components/documents.tsx#invoiceDueDate",
         "components/documents.tsx#useDocumentTotals",
         "components/ui.tsx#IconButton",
         "components/ui.tsx#Icon",
-        "components/use-browser-back-guard.ts#allowDraftNavigation",
-        "components/use-browser-back-guard.ts#boundary",
         "components/ui.tsx#Toast",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
@@ -146431,6 +146449,9 @@
         "lib/permissions.ts#baseRead",
         "lib/permissions.ts#normalizeTenantRole",
         "lib/permissions.ts#universalTenantPermissions",
+        "lib/client/backend.ts#apiDelete",
+        "components/use-browser-back-guard.ts#allowDraftNavigation",
+        "components/use-browser-back-guard.ts#boundary",
         "components/documents.tsx#documentPresentation",
         "components/documents.tsx#invoiceDueDate",
         "lib/financial-status.ts#financialStatusText",
@@ -146452,8 +146473,6 @@
         "lib/locales/index.ts#templatePatterns",
         "components/ui.tsx#Icon",
         "lib/client/locale.tsx#LocalizedText",
-        "components/use-browser-back-guard.ts#allowDraftNavigation",
-        "components/use-browser-back-guard.ts#boundary",
         "components/ui.tsx#Toast",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
@@ -146545,7 +146564,6 @@
         "components/entity-files.tsx#EntityFiles",
         "lib/file-associations.ts#fileRelations",
         "components/entity-files.tsx#Attachment",
-        "lib/client/backend.ts#apiDelete",
         "lib/file-selection.ts#fileSelectionError",
         "config/limits.ts#limitsConfig",
         "lib/client/backend.ts#apiUpload",
@@ -146816,13 +146834,13 @@
         "components/documents.tsx#documentPayload",
         "components/documents.tsx#invoiceDueIso",
         "components/documents.tsx#numberValue",
+        "components/use-browser-back-guard.ts#allowDraftNavigation",
+        "components/use-browser-back-guard.ts#boundary",
         "components/documents.tsx#documentPresentation",
         "components/documents.tsx#invoiceDueDate",
         "components/documents.tsx#useDocumentTotals",
         "components/ui.tsx#IconButton",
         "components/ui.tsx#Icon",
-        "components/use-browser-back-guard.ts#allowDraftNavigation",
-        "components/use-browser-back-guard.ts#boundary",
         "components/ui.tsx#Toast",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
@@ -147110,6 +147128,9 @@
         "lib/permissions.ts#baseRead",
         "lib/permissions.ts#normalizeTenantRole",
         "lib/permissions.ts#universalTenantPermissions",
+        "lib/client/backend.ts#apiDelete",
+        "components/use-browser-back-guard.ts#allowDraftNavigation",
+        "components/use-browser-back-guard.ts#boundary",
         "components/documents.tsx#documentPresentation",
         "components/documents.tsx#invoiceDueDate",
         "lib/financial-status.ts#financialStatusText",
@@ -147131,8 +147152,6 @@
         "lib/locales/index.ts#templatePatterns",
         "components/ui.tsx#Icon",
         "lib/client/locale.tsx#LocalizedText",
-        "components/use-browser-back-guard.ts#allowDraftNavigation",
-        "components/use-browser-back-guard.ts#boundary",
         "components/ui.tsx#Toast",
         "components/ui.tsx#ErrorState",
         "components/ui.tsx#Button",
@@ -147224,7 +147243,6 @@
         "components/entity-files.tsx#EntityFiles",
         "lib/file-associations.ts#fileRelations",
         "components/entity-files.tsx#Attachment",
-        "lib/client/backend.ts#apiDelete",
         "lib/file-selection.ts#fileSelectionError",
         "config/limits.ts#limitsConfig",
         "lib/client/backend.ts#apiUpload",
@@ -148475,7 +148493,7 @@
         "/api/products/",
         "/api/documents/",
         "/api/customers/",
-        "/api/time-entries/billing?ids=",
+        "/api/time-entries/billing?minuteAllocations=1&ids=",
         "/api/expenses/billing?ids=",
         "/api/documents",
         "/api/settings/readiness?",
@@ -148496,6 +148514,7 @@
         "/api/files?",
         "/api/files/",
         "/api/files",
+        "/api/time-entries/billing?",
         "/api/customers",
         "/api/projects",
         "/api/notifications",
@@ -148512,67 +148531,72 @@
       "widgets": [
         {
           "tag": "FormSheet",
-          "line": 442,
+          "line": 458,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 442,
+          "line": 458,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "DocumentModal",
-          "line": 443,
+          "line": 459,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "ActionSheet",
-          "line": 444,
+          "line": 460,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 462,
+          "line": 479,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "form",
-          "line": 462,
+          "line": 479,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "Field",
-          "line": 462,
+          "line": 479,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "Field",
-          "line": 462,
+          "line": 479,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "Field",
-          "line": 462,
+          "line": 479,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "FormSheet",
-          "line": 463,
+          "line": 480,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "Field",
-          "line": 463,
+          "line": 480,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "Field",
-          "line": 463,
+          "line": 480,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
           "tag": "Field",
-          "line": 463,
+          "line": 480,
+          "component": "components/documents.tsx#DocumentPage"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 481,
           "component": "components/documents.tsx#DocumentPage"
         },
         {
@@ -148667,92 +148691,92 @@
         },
         {
           "tag": "Field",
-          "line": 594,
+          "line": 616,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 599,
+          "line": 621,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 600,
+          "line": 622,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 601,
+          "line": 623,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 604,
+          "line": 626,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "FormSheet",
-          "line": 629,
+          "line": 652,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 629,
+          "line": 652,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 629,
+          "line": 652,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 629,
+          "line": 652,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 629,
+          "line": 652,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "DiscountFields",
-          "line": 629,
+          "line": 652,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 629,
+          "line": 652,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 629,
+          "line": 652,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "FormSheet",
-          "line": 630,
+          "line": 653,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "DiscountFields",
-          "line": 630,
+          "line": 653,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 631,
+          "line": 654,
           "component": "components/documents.tsx#DocumentEditor"
         },
         {
           "tag": "Field",
-          "line": 542,
+          "line": 560,
           "component": "components/documents.tsx#DiscountFields"
         },
         {
           "tag": "Field",
-          "line": 542,
+          "line": 560,
           "component": "components/documents.tsx#DiscountFields"
         },
         {
@@ -196977,7 +197001,7 @@
       "key": "components/documents.tsx#OfferEditor",
       "file": "components/documents.tsx",
       "name": "OfferEditor",
-      "line": 254,
+      "line": 260,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -196985,7 +197009,7 @@
       "elements": [
         {
           "tag": "DocumentPage",
-          "line": 255,
+          "line": 261,
           "props": [
             "kind=\"Angebot\"",
             "existing={existing}",
@@ -196999,7 +197023,7 @@
       "key": "components/documents.tsx#DocumentPage",
       "file": "components/documents.tsx",
       "name": "DocumentPage",
-      "line": 262,
+      "line": 268,
       "classes": [
         "document-header-icons",
         "document-source-note",
@@ -197014,7 +197038,7 @@
         "/api/products/",
         "/api/documents/",
         "/api/customers/",
-        "/api/time-entries/billing?ids=",
+        "/api/time-entries/billing?minuteAllocations=1&ids=",
         "/api/expenses/billing?ids=",
         "/api/documents",
         "/api/settings/readiness?"
@@ -197023,68 +197047,72 @@
       "widgets": [
         {
           "tag": "FormSheet",
-          "line": 442
+          "line": 458
         },
         {
           "tag": "FormSheet",
-          "line": 442
+          "line": 458
         },
         {
           "tag": "DocumentModal",
-          "line": 443
+          "line": 459
         },
         {
           "tag": "ActionSheet",
-          "line": 444
+          "line": 460
         },
         {
           "tag": "FormSheet",
-          "line": 462
+          "line": 479
         },
         {
           "tag": "form",
-          "line": 462
+          "line": 479
         },
         {
           "tag": "Field",
-          "line": 462
+          "line": 479
         },
         {
           "tag": "Field",
-          "line": 462
+          "line": 479
         },
         {
           "tag": "Field",
-          "line": 462
+          "line": 479
         },
         {
           "tag": "FormSheet",
-          "line": 463
+          "line": 480
         },
         {
           "tag": "Field",
-          "line": 463
+          "line": 480
         },
         {
           "tag": "Field",
-          "line": 463
+          "line": 480
         },
         {
           "tag": "Field",
-          "line": 463
+          "line": 480
+        },
+        {
+          "tag": "FormSheet",
+          "line": 481
         }
       ],
       "elements": [
         {
           "tag": "div",
-          "line": 412,
+          "line": 428,
           "props": [
             "className=\"document-header-icons\""
           ]
         },
         {
           "tag": "IconButton",
-          "line": 412,
+          "line": 428,
           "props": [
             "label=\"Weitere Aktionen\"",
             "icon=\"more\"",
@@ -197093,14 +197121,14 @@
         },
         {
           "tag": "div",
-          "line": 413,
+          "line": 429,
           "props": [
             "className=\"document-header-icons\""
           ]
         },
         {
           "tag": "IconButton",
-          "line": 413,
+          "line": 429,
           "props": [
             "label=\"Vorschau\"",
             "icon=\"file\"",
@@ -197109,7 +197137,7 @@
         },
         {
           "tag": "Toast",
-          "line": 418,
+          "line": 434,
           "props": [
             "title={toast}",
             "tone={[`${kind} gespeichert.`,`${kind} erstellt.`,\"Status aktualisiert.\",\"Dokument als PDF versendet.\",\"Gutschrift erfasst.\",\"Rückerstattung erfasst.\",\"Zahlungserinnerung versendet.\",\"Nummer kopiert.\"].includes(toast)?\"success\":\"danger\"}"
@@ -197117,17 +197145,17 @@
         },
         {
           "tag": "ErrorState",
-          "line": 419,
+          "line": 435,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 419,
+          "line": 435,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 419,
+          "line": 435,
           "props": [
             "variant=\"secondary\"",
             "onClick={()=>{const target=issueReadiness.recovery!.href;if(target===\"/rechnungen/\"+encodeURIComponent(documentKey??draft.number)){documentLoad.refresh();company.refresh();setIssueReadiness(null);setMoreOpen(false)}else router.push(safeAppPath(target,\"/einstellungen\"))}}"
@@ -197135,46 +197163,46 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 419,
+          "line": 435,
           "props": []
         },
         {
           "tag": "ErrorState",
-          "line": 422,
+          "line": 438,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 422,
+          "line": 438,
           "props": []
         },
         {
           "tag": "ErrorState",
-          "line": 423,
+          "line": 439,
           "props": [
             "onRetry={productQuery.refresh}"
           ]
         },
         {
           "tag": "ErrorState",
-          "line": 425,
+          "line": 441,
           "props": [
             "onRetry={company.refresh}"
           ]
         },
         {
           "tag": "LoadingState",
-          "line": 426,
+          "line": 442,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 426,
+          "line": 442,
           "props": []
         },
         {
           "tag": "div",
-          "line": 427,
+          "line": 443,
           "props": [
             "className=\"document-source-note\"",
             "role=\"status\""
@@ -197182,127 +197210,127 @@
         },
         {
           "tag": "span",
-          "line": 427,
+          "line": 443,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 427,
+          "line": 443,
           "props": []
         },
         {
           "tag": "Link",
-          "line": 427,
+          "line": 443,
           "props": [
             "href=\"/einstellungen/dokumente\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 427,
+          "line": 443,
           "props": []
         },
         {
           "tag": "div",
-          "line": 428,
+          "line": 444,
           "props": [
             "className=\"document-source-note\""
           ]
         },
         {
           "tag": "span",
-          "line": 428,
+          "line": 444,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 428,
+          "line": 444,
           "props": []
         },
         {
           "tag": "b",
-          "line": 428,
+          "line": 444,
           "props": []
         },
         {
           "tag": "LoadingState",
-          "line": 429,
+          "line": 445,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 429,
+          "line": 445,
           "props": []
         },
         {
           "tag": "ErrorState",
-          "line": 429,
+          "line": 445,
           "props": [
             "onRetry={refreshCustomers}"
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 429,
+          "line": 445,
           "props": []
         },
         {
           "tag": "LoadingState",
-          "line": 429,
+          "line": 445,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 429,
+          "line": 445,
           "props": []
         },
         {
           "tag": "ErrorState",
-          "line": 429,
+          "line": 445,
           "props": [
             "onRetry={()=>{sourceQuery.refresh();sourceCustomer.refresh()}}"
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 429,
+          "line": 445,
           "props": []
         },
         {
           "tag": "LoadingState",
-          "line": 429,
+          "line": 445,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 429,
+          "line": 445,
           "props": []
         },
         {
           "tag": "ErrorState",
-          "line": 429,
+          "line": 445,
           "props": [
             "onRetry={()=>{timeSource.refresh();expenseSource.refresh()}}"
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 429,
+          "line": 445,
           "props": []
         },
         {
           "tag": "LoadingState",
-          "line": 429,
+          "line": 445,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 429,
+          "line": 445,
           "props": []
         },
         {
           "tag": "EmptyState",
-          "line": 429,
+          "line": 445,
           "props": [
             "title=\"Dokument konnte nicht geladen werden\"",
             "description={documentLoad.error}"
@@ -197310,21 +197338,21 @@
         },
         {
           "tag": "div",
-          "line": 430,
+          "line": 446,
           "props": [
             "className=\"document-desktop-workspace\""
           ]
         },
         {
           "tag": "div",
-          "line": 431,
+          "line": 447,
           "props": [
             "className=\"document-desktop-detail\""
           ]
         },
         {
           "tag": "DocumentReadView",
-          "line": 432,
+          "line": 448,
           "props": [
             "type={kind}",
             "draft={draft}",
@@ -197335,7 +197363,7 @@
         },
         {
           "tag": "OfferFollowup",
-          "line": 432,
+          "line": 448,
           "props": [
             "number={draft.number}",
             "open={followupOpen}",
@@ -197344,7 +197372,7 @@
         },
         {
           "tag": "EntityFiles",
-          "line": 433,
+          "line": 449,
           "props": [
             "purpose={kind===\"Rechnung\"?\"invoice_attachment\":\"offer_attachment\"}",
             "entityId={draft.id}"
@@ -197352,7 +197380,7 @@
         },
         {
           "tag": "FormWizard",
-          "line": 437,
+          "line": 453,
           "props": [
             "cancelAction={<Button variant=\"secondary\" onClick={closeCreation} disabled={saving}><LocalizedText>{\"Abbrechen\"}</LocalizedText></Button>}",
             "labels={[\"Kunde und Dokumentdaten\",\"Positionen\",kind===\"Angebot\"?\"Gültig bis\":\"Zahlungsbedingungen\",\"Prüfen und als Entwurf speichern\"]}",
@@ -197364,7 +197392,7 @@
         },
         {
           "tag": "Button",
-          "line": 437,
+          "line": 453,
           "props": [
             "variant=\"secondary\"",
             "onClick={closeCreation}",
@@ -197373,12 +197401,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 437,
+          "line": 453,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 437,
+          "line": 453,
           "props": [
             "disabled={saving||productQuery.loading||Boolean(productQuery.error)||companyPending||Boolean(company.error)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)}",
             "onClick={()=>void save()}"
@@ -197386,12 +197414,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 437,
+          "line": 453,
           "props": []
         },
         {
           "tag": "DocumentEditor",
-          "line": 437,
+          "line": 453,
           "props": [
             "type={kind}",
             "draft={draft}",
@@ -197403,7 +197431,7 @@
         },
         {
           "tag": "DocumentReview",
-          "line": 437,
+          "line": 453,
           "props": [
             "type={kind}",
             "draft={draft}",
@@ -197412,7 +197440,7 @@
         },
         {
           "tag": "Button",
-          "line": 437,
+          "line": 453,
           "props": [
             "variant=\"secondary\"",
             "href={\"/zeit?invoice=\"+encodeURIComponent(existing?draft.number:\"\")+\"&customerId=\"+encodeURIComponent(draft.customerId)}"
@@ -197420,12 +197448,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 437,
+          "line": 453,
           "props": []
         },
         {
           "tag": "DocumentEditor",
-          "line": 437,
+          "line": 453,
           "props": [
             "type={kind}",
             "draft={draft}",
@@ -197437,7 +197465,7 @@
         },
         {
           "tag": "Button",
-          "line": 438,
+          "line": 454,
           "props": [
             "variant=\"secondary\"",
             "href={\"/zeit?invoice=\"+encodeURIComponent(draft.number)+\"&customerId=\"+encodeURIComponent(draft.customerId)}"
@@ -197445,17 +197473,17 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 438,
+          "line": 454,
           "props": []
         },
         {
           "tag": "FormActions",
-          "line": 439,
+          "line": 455,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 439,
+          "line": 455,
           "props": [
             "variant=\"secondary\"",
             "onClick={closeEdit}"
@@ -197463,12 +197491,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 439,
+          "line": 455,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 439,
+          "line": 455,
           "props": [
             "disabled={saving||companyPending||Boolean(company.error)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)}",
             "onClick={()=>void save()}"
@@ -197476,12 +197504,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 439,
+          "line": 455,
           "props": []
         },
         {
           "tag": "AppShell",
-          "line": 441,
+          "line": 457,
           "props": [
             "title={existing?editing?kind+\" bearbeiten\":kind:title}",
             "titleIsUserContent={false}",
@@ -197500,7 +197528,7 @@
         },
         {
           "tag": "FormSheet",
-          "line": 442,
+          "line": 458,
           "props": [
             "workspace",
             "label={kind+\" bearbeiten\"}",
@@ -197512,7 +197540,7 @@
         },
         {
           "tag": "FormSheet",
-          "line": 442,
+          "line": 458,
           "props": [
             "workspace",
             "label={title}",
@@ -197526,7 +197554,7 @@
         },
         {
           "tag": "DocumentModal",
-          "line": 443,
+          "line": 459,
           "props": [
             "previewDraft={documentPreviewPayload(kind,draft,existing&&editing?documentKey:undefined)}",
             "pdfNumber={existing&&!editing?documentKey??draft.number:undefined}",
@@ -197536,7 +197564,7 @@
         },
         {
           "tag": "ActionSheet",
-          "line": 444,
+          "line": 460,
           "props": [
             "label=\"Weitere Aktionen\"",
             "open={moreOpen}",
@@ -197546,14 +197574,14 @@
         },
         {
           "tag": "div",
-          "line": 444,
+          "line": 460,
           "props": [
             "className=\"action-list\""
           ]
         },
         {
           "tag": "ActionRow",
-          "line": 445,
+          "line": 461,
           "props": [
             "icon=\"edit\"",
             "title=\"Bearbeiten\"",
@@ -197563,7 +197591,7 @@
         },
         {
           "tag": "ActionRow",
-          "line": 446,
+          "line": 462,
           "props": [
             "icon=\"copy\"",
             "title=\"Nummer kopieren\"",
@@ -197572,7 +197600,7 @@
         },
         {
           "tag": "ActionRow",
-          "line": 447,
+          "line": 463,
           "props": [
             "href={\"/zahlungen/neu?invoice=\"+encodeURIComponent(documentKey??draft.number)}",
             "icon=\"wallet\"",
@@ -197581,7 +197609,7 @@
         },
         {
           "tag": "ActionRow",
-          "line": 448,
+          "line": 464,
           "props": [
             "href={draft.projectId?\"/projekte/\"+encodeURIComponent(draft.projectId):\"/projekte/neu?customerId=\"+encodeURIComponent(draft.customerId??\"\")+\"&sourceOffer=\"+encodeURIComponent(draft.number)}",
             "icon=\"clock\"",
@@ -197590,7 +197618,7 @@
         },
         {
           "tag": "ActionRow",
-          "line": 449,
+          "line": 465,
           "props": [
             "href={draft.invoiceNumber?\"/rechnungen/\"+encodeURIComponent(draft.invoiceNumber):\"/rechnungen/neu?sourceOffer=\"+encodeURIComponent(documentKey??draft.number)}",
             "icon=\"receipt\"",
@@ -197599,7 +197627,7 @@
         },
         {
           "tag": "ActionRow",
-          "line": 450,
+          "line": 466,
           "props": [
             "onClick={()=>{setMoreOpen(false);setPreview(true)}}",
             "icon=\"file\"",
@@ -197609,7 +197637,7 @@
         },
         {
           "tag": "ActionRow",
-          "line": 451,
+          "line": 467,
           "props": [
             "href={\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)+\"/pdf\"}",
             "icon=\"file\"",
@@ -197618,7 +197646,7 @@
         },
         {
           "tag": "ActionRow",
-          "line": 452,
+          "line": 468,
           "props": [
             "disabled={demoDocument||actionBusy}",
             "onClick={()=>{recipientTouched.current=false;setRecipient(resolveCustomer(draft,directory)?.email??\"\");setMailSubject(kind+\" \"+draft.number);setMailMessage(\"Guten Tag\\n\\nIm Anhang findest du \"+(kind===\"Angebot\"?\"unser Angebot.\":\"unsere Rechnung.\")+(kind===\"Angebot\"?\" Über den sicheren Link kannst du das Angebot prüfen und beantworten.\":\"\")+\"\\n\\nFreundliche Grüsse\");setSendPurpose('document');setSendKey(crypto.randomUUID());setActionError(null);setMoreOpen(false);setSendOpen(true)}}",
@@ -197629,7 +197657,7 @@
         },
         {
           "tag": "ActionRow",
-          "line": 453,
+          "line": 469,
           "props": [
             "icon=\"clock\"",
             "title=\"Erinnerung\"",
@@ -197639,7 +197667,7 @@
         },
         {
           "tag": "ActionRow",
-          "line": 454,
+          "line": 470,
           "props": [
             "disabled={demoDocument||actionBusy}",
             "onClick={()=>{setSendPurpose('reminder');setSendKey(crypto.randomUUID());setActionError(null);setMoreOpen(false);setSendOpen(true)}}",
@@ -197650,7 +197678,18 @@
         },
         {
           "tag": "ActionRow",
-          "line": 455,
+          "line": 471,
+          "props": [
+            "disabled={actionBusy}",
+            "onClick={()=>{setActionError(null);setMoreOpen(false);setDiscardOpen(true)}}",
+            "icon=\"trash\"",
+            "title=\"Entwurf verwerfen\"",
+            "danger"
+          ]
+        },
+        {
+          "tag": "ActionRow",
+          "line": 472,
           "props": [
             "disabled={actionBusy}",
             "onClick={()=>void processAction('issue')}",
@@ -197660,7 +197699,7 @@
         },
         {
           "tag": "ActionRow",
-          "line": 456,
+          "line": 473,
           "props": [
             "disabled={actionBusy}",
             "onClick={()=>void reviseOffer()}",
@@ -197671,7 +197710,7 @@
         },
         {
           "tag": "ActionRow",
-          "line": 457,
+          "line": 474,
           "props": [
             "disabled={actionBusy}",
             "onClick={()=>void processAction('accept')}",
@@ -197681,7 +197720,7 @@
         },
         {
           "tag": "ActionRow",
-          "line": 457,
+          "line": 474,
           "props": [
             "disabled={actionBusy}",
             "onClick={()=>void processAction('decline')}",
@@ -197692,7 +197731,7 @@
         },
         {
           "tag": "ActionRow",
-          "line": 458,
+          "line": 475,
           "props": [
             "disabled={actionBusy}",
             "onClick={()=>{setAdjustmentKind(\"credit\");creditKey.current=crypto.randomUUID();setCreditAmount(\"\");setCreditReason(\"\");setActionError(null);setMoreOpen(false);setCreditOpen(true)}}",
@@ -197703,7 +197742,7 @@
         },
         {
           "tag": "ActionRow",
-          "line": 459,
+          "line": 476,
           "props": [
             "disabled={actionBusy}",
             "onClick={()=>{setAdjustmentKind('refund');setRefundDate(businessDate());creditKey.current=crypto.randomUUID();setCreditAmount('');setCreditReason('');setActionError(null);setMoreOpen(false);setCreditOpen(true)}}",
@@ -197714,7 +197753,7 @@
         },
         {
           "tag": "ActionRow",
-          "line": 460,
+          "line": 477,
           "props": [
             "disabled={actionBusy}",
             "onClick={()=>void processAction('cancel')}",
@@ -197725,17 +197764,17 @@
         },
         {
           "tag": "ErrorState",
-          "line": 461,
+          "line": 478,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 461,
+          "line": 478,
           "props": []
         },
         {
           "tag": "FormSheet",
-          "line": 462,
+          "line": 479,
           "props": [
             "label={adjustmentIsRefund?\"Rückerstattung erfassen\":\"Gutschrift erfassen\"}",
             "description={draft.number}",
@@ -197746,28 +197785,28 @@
         },
         {
           "tag": "form",
-          "line": 462,
+          "line": 479,
           "props": [
             "onSubmit={event=>{event.preventDefault();void bookCredit()}}"
           ]
         },
         {
           "tag": "div",
-          "line": 462,
+          "line": 479,
           "props": [
             "className=\"sheet-body\""
           ]
         },
         {
           "tag": "Field",
-          "line": 462,
+          "line": 479,
           "props": [
             "label=\"Betrag\""
           ]
         },
         {
           "tag": "Input",
-          "line": 462,
+          "line": 479,
           "props": [
             "type=\"number\"",
             "inputMode=\"decimal\"",
@@ -197781,14 +197820,14 @@
         },
         {
           "tag": "Field",
-          "line": 462,
+          "line": 479,
           "props": [
             "label=\"Interne Begründung\""
           ]
         },
         {
           "tag": "Textarea",
-          "line": 462,
+          "line": 479,
           "props": [
             "value={creditReason}",
             "onChange={event=>{setCreditReason(event.target.value);creditKey.current=crypto.randomUUID()}}",
@@ -197799,14 +197838,14 @@
         },
         {
           "tag": "Field",
-          "line": 462,
+          "line": 479,
           "props": [
             "label=\"Rückerstattungsdatum\""
           ]
         },
         {
           "tag": "Input",
-          "line": 462,
+          "line": 479,
           "props": [
             "type=\"date\"",
             "max={businessDate()}",
@@ -197817,32 +197856,32 @@
         },
         {
           "tag": "p",
-          "line": 462,
+          "line": 479,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 462,
+          "line": 479,
           "props": []
         },
         {
           "tag": "ErrorState",
-          "line": 462,
+          "line": 479,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 462,
+          "line": 479,
           "props": []
         },
         {
           "tag": "FormActions",
-          "line": 462,
+          "line": 479,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 462,
+          "line": 479,
           "props": [
             "type=\"button\"",
             "variant=\"secondary\"",
@@ -197852,12 +197891,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 462,
+          "line": 479,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 462,
+          "line": 479,
           "props": [
             "type=\"submit\"",
             "disabled={actionBusy||!creditAmount||creditReason.trim().length<3}"
@@ -197865,12 +197904,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 462,
+          "line": 479,
           "props": []
         },
         {
           "tag": "FormSheet",
-          "line": 463,
+          "line": 480,
           "props": [
             "label={sendingReminder?\"Zahlungserinnerung senden\":\"Dokument senden\"}",
             "description={kind+\" als PDF · \"+draft.number}",
@@ -197881,21 +197920,21 @@
         },
         {
           "tag": "div",
-          "line": 463,
+          "line": 480,
           "props": [
             "className=\"sheet-body\""
           ]
         },
         {
           "tag": "Field",
-          "line": 463,
+          "line": 480,
           "props": [
             "label=\"Empfänger\""
           ]
         },
         {
           "tag": "Input",
-          "line": 463,
+          "line": 480,
           "props": [
             "type=\"email\"",
             "value={recipient}",
@@ -197905,14 +197944,14 @@
         },
         {
           "tag": "Field",
-          "line": 463,
+          "line": 480,
           "props": [
             "label=\"Betreff\""
           ]
         },
         {
           "tag": "Input",
-          "line": 463,
+          "line": 480,
           "props": [
             "value={mailSubject}",
             "maxLength={180}",
@@ -197921,14 +197960,14 @@
         },
         {
           "tag": "Field",
-          "line": 463,
+          "line": 480,
           "props": [
             "label=\"Begleittext\""
           ]
         },
         {
           "tag": "Textarea",
-          "line": 463,
+          "line": 480,
           "props": [
             "value={mailMessage}",
             "maxLength={4000}",
@@ -197937,7 +197976,7 @@
         },
         {
           "tag": "Button",
-          "line": 463,
+          "line": 480,
           "props": [
             "variant=\"secondary\"",
             "onClick={()=>setPreview(true)}"
@@ -197945,39 +197984,39 @@
         },
         {
           "tag": "p",
-          "line": 463,
+          "line": 480,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 463,
+          "line": 480,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 463,
+          "line": 480,
           "props": []
         },
         {
           "tag": "ErrorState",
-          "line": 463,
+          "line": 480,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 463,
+          "line": 480,
           "props": []
         },
         {
           "tag": "FormActions",
-          "line": 463,
+          "line": 480,
           "props": [
             "sheet"
           ]
         },
         {
           "tag": "Button",
-          "line": 463,
+          "line": 480,
           "props": [
             "variant=\"secondary\"",
             "onClick={()=>setSendOpen(false)}"
@@ -197985,12 +198024,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 463,
+          "line": 480,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 463,
+          "line": 480,
           "props": [
             "disabled={actionBusy||!recipient||(!sendingReminder&&!mailSubject.trim())}",
             "onClick={()=>void sendDocument()}"
@@ -197998,513 +198037,608 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 463,
+          "line": 480,
+          "props": []
+        },
+        {
+          "tag": "FormSheet",
+          "line": 481,
+          "props": [
+            "label=\"Entwurf verwerfen\"",
+            "open={discardOpen}",
+            "busy={actionBusy}",
+            "onClose={()=>setDiscardOpen(false)}"
+          ]
+        },
+        {
+          "tag": "div",
+          "line": 481,
+          "props": [
+            "className=\"sheet-body\""
+          ]
+        },
+        {
+          "tag": "p",
+          "line": 481,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 481,
+          "props": []
+        },
+        {
+          "tag": "ErrorState",
+          "line": 481,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 481,
+          "props": []
+        },
+        {
+          "tag": "FormActions",
+          "line": 481,
+          "props": [
+            "sheet"
+          ]
+        },
+        {
+          "tag": "Button",
+          "line": 481,
+          "props": [
+            "variant=\"secondary\"",
+            "disabled={actionBusy}",
+            "onClick={()=>setDiscardOpen(false)}"
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 481,
+          "props": []
+        },
+        {
+          "tag": "Button",
+          "line": 481,
+          "props": [
+            "disabled={actionBusy}",
+            "onClick={()=>void discardDraft()}"
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 481,
           "props": []
         }
       ],
       "conditions": [
         {
-          "line": 265,
+          "line": 271,
           "expression": "kind===\"Angebot\""
         },
         {
-          "line": 266,
-          "expression": "!existing"
-        },
-        {
-          "line": 300,
-          "expression": "!sendOpen||recipientTouched.current"
-        },
-        {
-          "line": 300,
-          "expression": "email"
-        },
-        {
-          "line": 302,
-          "expression": "existing||dirty||company.loading||searchParams.get(\"sourceOffer\")"
-        },
-        {
-          "line": 304,
-          "expression": "kind===\"Rechnung\"&&!company.loading&&!company.error"
-        },
-        {
-          "line": 305,
-          "expression": "existing"
-        },
-        {
-          "line": 306,
-          "expression": "existing"
-        },
-        {
-          "line": 307,
+          "line": 272,
           "expression": "!existing"
         },
         {
           "line": 308,
-          "expression": "selectedProductId"
+          "expression": "!sendOpen||recipientTouched.current"
+        },
+        {
+          "line": 308,
+          "expression": "email"
         },
         {
           "line": 310,
-          "expression": "!selectedProductId||!product||initializedProduct.current===selectedProductId||dirty"
+          "expression": "existing||dirty||company.loading||searchParams.get(\"sourceOffer\")"
         },
         {
-          "line": 311,
-          "expression": "!existing"
-        },
-        {
-          "line": 313,
-          "expression": "!selectedCustomerId||initializedCustomer.current===selectedCustomerId"
+          "line": 312,
+          "expression": "kind===\"Rechnung\"&&!company.loading&&!company.error"
         },
         {
           "line": 313,
-          "expression": "customer"
+          "expression": "existing"
         },
         {
           "line": 314,
-          "expression": "kind===\"Rechnung\""
+          "expression": "existing"
         },
         {
           "line": 315,
-          "expression": "kind===\"Rechnung\""
+          "expression": "!existing"
         },
         {
-          "line": 317,
-          "expression": "!existing&&sourceOffer"
+          "line": 316,
+          "expression": "selectedProductId"
+        },
+        {
+          "line": 318,
+          "expression": "!selectedProductId||!product||initializedProduct.current===selectedProductId||dirty"
         },
         {
           "line": 319,
-          "expression": "sourceItem?.customer_id&&sourceOffer"
+          "expression": "!existing"
+        },
+        {
+          "line": 321,
+          "expression": "!selectedCustomerId||initializedCustomer.current===selectedCustomerId"
+        },
+        {
+          "line": 321,
+          "expression": "customer"
         },
         {
           "line": 322,
-          "expression": "sourceInvalid"
+          "expression": "kind===\"Rechnung\""
+        },
+        {
+          "line": 323,
+          "expression": "kind===\"Rechnung\""
         },
         {
           "line": 325,
-          "expression": "existing||!sourceOffer||!sourceItem||sourceError||company.loading||customersLoading||sourceCustomer.loading||sourceCustomer.error||initializedOffer.current===sourceOffer"
+          "expression": "!existing&&sourceOffer"
         },
         {
-          "line": 331,
-          "expression": "kind==='Rechnung'"
+          "line": 327,
+          "expression": "sourceItem?.customer_id&&sourceOffer"
+        },
+        {
+          "line": 330,
+          "expression": "sourceInvalid"
         },
         {
           "line": 333,
-          "expression": "!stored?.draft||!Array.isArray(stored.draft.positions)||!stored.draft.positions.length||stored.draft.id||stored.draft.number||['customer','number','date','due','vatRate','note'].some(key=>typeof (stored.draft as unknown as Record<string,unknown>)[key]!=='string')||stored.draft.positions.some(item=>!item||['id','description','quantity','price'].some(key=>typeof (item as unknown as Record<string,unknown>)[key]!=='string'))||stored.replay&&(typeof stored.replay.body!=='string'||typeof stored.replay.key!=='string')"
+          "expression": "existing||!sourceOffer||!sourceItem||sourceError||company.loading||customersLoading||sourceCustomer.loading||sourceCustomer.error||initializedOffer.current===sourceOffer"
         },
         {
-          "line": 336,
-          "expression": "kind==='Rechnung'&&sourceTimeEntriesParam&&true"
-        },
-        {
-          "line": 337,
-          "expression": "kind==='Rechnung'&&sourceExpenseParam&&true"
-        },
-        {
-          "line": 343,
-          "expression": "kind!==\"Rechnung\"||(!sourceTimeEntriesParam&&!sourceExpenseParam)||!true||billingLoading||timeSource.error||expenseSource.error||existing&&(documentLoad.loading||!draft.id)"
-        },
-        {
-          "line": 345,
-          "expression": "importedSources.current===key"
-        },
-        {
-          "line": 349,
-          "expression": "times.length!==sourceTimeEntriesParam.split(',').filter(Boolean).length||expenses.length!==sourceExpenseParam.split(',').filter(Boolean).length"
-        },
-        {
-          "line": 351,
-          "expression": "!customer||sources.some(i=>i.customer_id!==customer)||existing&&draft.customerId!==customer"
-        },
-        {
-          "line": 352,
-          "expression": "existing&&draft.status!=='draft'"
-        },
-        {
-          "line": 353,
-          "expression": "expenses.some(i=>i.currency!==(existing?draft.currency:expenses[0].currency))"
-        },
-        {
-          "line": 353,
-          "expression": "existing"
-        },
-        {
-          "line": 354,
-          "expression": "times.length&&(existing?draft.currency:expenses[0]?.currency??draft.currency)!=='CHF'"
-        },
-        {
-          "line": 354,
-          "expression": "existing"
-        },
-        {
-          "line": 358,
-          "expression": "existing"
-        },
-        {
-          "line": 359,
-          "expression": "e instanceof Error"
-        },
-        {
-          "line": 363,
-          "expression": "existing||!true"
-        },
-        {
-          "line": 365,
-          "expression": "selected&&((selected.name??draft.customer)!==draft.customer||selected.id!==draft.customerId)"
-        },
-        {
-          "line": 366,
-          "expression": "!draft.customer&&!draft.customerId&&first&&Object.keys(directory).length===1"
-        },
-        {
-          "line": 366,
-          "expression": "current.customer||current.customerId"
-        },
-        {
-          "line": 371,
-          "expression": "documentSavePending.current||companyPending||documentLoad.loading||documentLoad.error||customersLoading||customersError||sourceLoading||sourceError||billingLoading||billingError||!recovery.ready"
-        },
-        {
-          "line": 372,
-          "expression": "totals.error"
-        },
-        {
-          "line": 373,
-          "expression": "!resolveCustomer(draft,directory)"
-        },
-        {
-          "line": 374,
-          "expression": "company.error"
-        },
-        {
-          "line": 382,
-          "expression": "createRequest.current?.body!==requestBody"
-        },
-        {
-          "line": 383,
-          "expression": "!existing"
-        },
-        {
-          "line": 384,
-          "expression": "existing"
-        },
-        {
-          "line": 385,
-          "expression": "Number(response.item.total)!==totals.total"
-        },
-        {
-          "line": 390,
-          "expression": "existing"
-        },
-        {
-          "line": 391,
-          "expression": "existing"
-        },
-        {
-          "line": 395,
-          "expression": "error instanceof Error"
-        },
-        {
-          "line": 396,
-          "expression": "!documentSavePending.current"
-        },
-        {
-          "line": 399,
-          "expression": "kind===\"Rechnung\""
-        },
-        {
-          "line": 401,
-          "expression": "documentActionPending.current||documentSavePending.current"
-        },
-        {
-          "line": 401,
-          "expression": "kind===\"Rechnung\"&&action===\"issue\""
-        },
-        {
-          "line": 401,
-          "expression": "response.item.number!==number||typeof response.item.ready!==\"boolean\""
-        },
-        {
-          "line": 401,
-          "expression": "!response.item.ready"
-        },
-        {
-          "line": 401,
-          "expression": "e instanceof Error"
-        },
-        {
-          "line": 403,
-          "expression": "documentActionPending.current||documentSavePending.current"
-        },
-        {
-          "line": 403,
-          "expression": "revisionKey.current?.number!==sourceNumber"
-        },
-        {
-          "line": 403,
-          "expression": "!response.item?.number"
-        },
-        {
-          "line": 403,
-          "expression": "sourceNumber!==response.item.number"
-        },
-        {
-          "line": 403,
-          "expression": "error instanceof Error"
-        },
-        {
-          "line": 404,
-          "expression": "documentActionPending.current||documentSavePending.current"
-        },
-        {
-          "line": 404,
-          "expression": "adjustmentIsRefund"
-        },
-        {
-          "line": 404,
-          "expression": "adjustmentIsRefund"
-        },
-        {
-          "line": 404,
-          "expression": "adjustmentIsRefund"
-        },
-        {
-          "line": 404,
-          "expression": "e instanceof Error"
-        },
-        {
-          "line": 404,
-          "expression": "adjustmentIsRefund"
-        },
-        {
-          "line": 405,
-          "expression": "documentActionPending.current||documentSavePending.current"
-        },
-        {
-          "line": 405,
-          "expression": "sendPurpose===\"document\""
-        },
-        {
-          "line": 405,
-          "expression": "e instanceof Error"
-        },
-        {
-          "line": 407,
-          "expression": "actionBusy"
-        },
-        {
-          "line": 407,
-          "expression": "sendingReminder"
-        },
-        {
-          "line": 407,
-          "expression": "kind===\"Angebot\"&&draft.status===\"draft\""
-        },
-        {
-          "line": 410,
-          "expression": "existing"
-        },
-        {
-          "line": 411,
-          "expression": "existing&&!editing"
-        },
-        {
-          "line": 417,
-          "expression": "draftBaseline.current"
-        },
-        {
-          "line": 418,
-          "expression": "[`${kind} gespeichert.`,`${kind} erstellt.`,\"Status aktualisiert.\",\"Dokument als PDF versendet.\",\"Gutschrift erfasst.\",\"Rückerstattung erfasst.\",\"Zahlungserinnerung versendet.\",\"Nummer kopiert.\"].includes(toast)"
-        },
-        {
-          "line": 419,
-          "expression": "target===\"/rechnungen/\"+encodeURIComponent(documentKey??draft.number)"
-        },
-        {
-          "line": 429,
-          "expression": "customersLoading"
-        },
-        {
-          "line": 429,
-          "expression": "customersError"
-        },
-        {
-          "line": 429,
-          "expression": "sourceLoading"
-        },
-        {
-          "line": 429,
-          "expression": "sourceError"
-        },
-        {
-          "line": 429,
-          "expression": "billingLoading"
-        },
-        {
-          "line": 429,
-          "expression": "billingError"
-        },
-        {
-          "line": 429,
-          "expression": "documentLoad.loading"
-        },
-        {
-          "line": 429,
-          "expression": "documentLoad.error"
-        },
-        {
-          "line": 429,
-          "expression": "existing&&!editing"
-        },
-        {
-          "line": 432,
-          "expression": "kind===\"Angebot\"&&canWrite"
-        },
-        {
-          "line": 433,
-          "expression": "kind===\"Rechnung\""
-        },
-        {
-          "line": 437,
-          "expression": "!existing"
-        },
-        {
-          "line": 437,
-          "expression": "kind===\"Angebot\""
-        },
-        {
-          "line": 437,
-          "expression": "saving"
-        },
-        {
-          "line": 437,
-          "expression": "existing"
-        },
-        {
-          "line": 437,
-          "expression": "!existing"
-        },
-        {
-          "line": 437,
-          "expression": "existing"
-        },
-        {
-          "line": 437,
-          "expression": "!existing"
-        },
-        {
-          "line": 439,
-          "expression": "saving"
-        },
-        {
-          "line": 439,
-          "expression": "existing"
-        },
-        {
-          "line": 441,
-          "expression": "existing"
-        },
-        {
-          "line": 441,
-          "expression": "editing"
-        },
-        {
-          "line": 441,
-          "expression": "returnTo===\"/dashboard\""
-        },
-        {
-          "line": 441,
-          "expression": "kind===\"Angebot\""
-        },
-        {
-          "line": 441,
-          "expression": "existing&&!editing"
-        },
-        {
-          "line": 442,
-          "expression": "existing"
-        },
-        {
-          "line": 442,
-          "expression": "editing"
-        },
-        {
-          "line": 443,
-          "expression": "existing&&editing"
-        },
-        {
-          "line": 443,
-          "expression": "existing&&!editing"
-        },
-        {
-          "line": 443,
-          "expression": "kind===\"Angebot\""
-        },
-        {
-          "line": 448,
-          "expression": "draft.projectId"
-        },
-        {
-          "line": 448,
-          "expression": "draft.projectId"
-        },
-        {
-          "line": 449,
-          "expression": "draft.invoiceNumber"
-        },
-        {
-          "line": 449,
-          "expression": "draft.invoiceNumber"
-        },
-        {
-          "line": 452,
-          "expression": "kind===\"Angebot\""
-        },
-        {
-          "line": 452,
-          "expression": "kind===\"Angebot\""
-        },
-        {
-          "line": 452,
-          "expression": "demoDocument"
-        },
-        {
-          "line": 454,
-          "expression": "demoDocument"
-        },
-        {
-          "line": 455,
+          "line": 339,
           "expression": "kind==='Rechnung'"
         },
         {
-          "line": 462,
+          "line": 341,
+          "expression": "!stored?.draft||!Array.isArray(stored.draft.positions)||!stored.draft.positions.length||stored.draft.id||stored.draft.number||['customer','number','date','due','vatRate','note'].some(key=>typeof (stored.draft as unknown as Record<string,unknown>)[key]!=='string')||stored.draft.positions.some(item=>!item||['id','description','quantity','price'].some(key=>typeof (item as unknown as Record<string,unknown>)[key]!=='string'))||stored.replay&&(typeof stored.replay.body!=='string'||typeof stored.replay.key!=='string')"
+        },
+        {
+          "line": 344,
+          "expression": "kind==='Rechnung'&&sourceTimeEntriesParam&&true"
+        },
+        {
+          "line": 345,
+          "expression": "kind==='Rechnung'&&sourceExpenseParam&&true"
+        },
+        {
+          "line": 351,
+          "expression": "kind!==\"Rechnung\"||(!sourceTimeEntriesParam&&!sourceExpenseParam)||!true||billingLoading||timeSource.error||expenseSource.error||existing&&(documentLoad.loading||!draft.id)"
+        },
+        {
+          "line": 353,
+          "expression": "importedSources.current===key"
+        },
+        {
+          "line": 357,
+          "expression": "times.length!==sourceTimeEntriesParam.split(',').filter(Boolean).length||expenses.length!==sourceExpenseParam.split(',').filter(Boolean).length"
+        },
+        {
+          "line": 359,
+          "expression": "!customer||sources.some(i=>i.customer_id!==customer)||existing&&draft.customerId!==customer"
+        },
+        {
+          "line": 360,
+          "expression": "existing&&draft.status!=='draft'"
+        },
+        {
+          "line": 361,
+          "expression": "expenses.some(i=>i.currency!==(existing?draft.currency:expenses[0].currency))"
+        },
+        {
+          "line": 361,
+          "expression": "existing"
+        },
+        {
+          "line": 362,
+          "expression": "existing"
+        },
+        {
+          "line": 363,
+          "expression": "times.some(t=>(t.external_resource_id?t.price_currency:'CHF')!==currency)||expenses.some(e=>e.currency!==currency)"
+        },
+        {
+          "line": 363,
+          "expression": "t.external_resource_id"
+        },
+        {
+          "line": 365,
+          "expression": "t.description"
+        },
+        {
+          "line": 367,
+          "expression": "existing"
+        },
+        {
+          "line": 368,
+          "expression": "e instanceof Error"
+        },
+        {
+          "line": 372,
+          "expression": "existing||!true"
+        },
+        {
+          "line": 374,
+          "expression": "selected&&((selected.name??draft.customer)!==draft.customer||selected.id!==draft.customerId)"
+        },
+        {
+          "line": 375,
+          "expression": "!draft.customer&&!draft.customerId&&first&&Object.keys(directory).length===1"
+        },
+        {
+          "line": 375,
+          "expression": "current.customer||current.customerId"
+        },
+        {
+          "line": 380,
+          "expression": "documentSavePending.current||companyPending||documentLoad.loading||documentLoad.error||customersLoading||customersError||sourceLoading||sourceError||billingLoading||billingError||!recovery.ready"
+        },
+        {
+          "line": 381,
+          "expression": "totals.error"
+        },
+        {
+          "line": 382,
+          "expression": "!resolveCustomer(draft,directory)"
+        },
+        {
+          "line": 383,
+          "expression": "company.error"
+        },
+        {
+          "line": 391,
+          "expression": "createRequest.current?.body!==requestBody"
+        },
+        {
+          "line": 392,
+          "expression": "!existing"
+        },
+        {
+          "line": 393,
+          "expression": "existing"
+        },
+        {
+          "line": 394,
+          "expression": "Number(response.item.total)!==totals.total"
+        },
+        {
+          "line": 399,
+          "expression": "existing"
+        },
+        {
+          "line": 400,
+          "expression": "existing"
+        },
+        {
+          "line": 404,
+          "expression": "error instanceof Error"
+        },
+        {
+          "line": 405,
+          "expression": "!documentSavePending.current"
+        },
+        {
+          "line": 408,
+          "expression": "kind===\"Rechnung\""
+        },
+        {
+          "line": 410,
+          "expression": "documentActionPending.current||documentSavePending.current"
+        },
+        {
+          "line": 410,
+          "expression": "kind===\"Rechnung\"&&action===\"issue\""
+        },
+        {
+          "line": 410,
+          "expression": "response.item.number!==number||typeof response.item.ready!==\"boolean\""
+        },
+        {
+          "line": 410,
+          "expression": "!response.item.ready"
+        },
+        {
+          "line": 410,
+          "expression": "e instanceof Error"
+        },
+        {
+          "line": 412,
+          "expression": "documentActionPending.current||documentSavePending.current||!canWrite||kind!=='Rechnung'||draft.status!=='draft'||!draft.updatedAt"
+        },
+        {
+          "line": 414,
+          "expression": "discardKey.current?.revision!==draft.updatedAt"
+        },
+        {
+          "line": 414,
+          "expression": "result.item?.discarded!==true"
+        },
+        {
+          "line": 415,
+          "expression": "error instanceof Error"
+        },
+        {
+          "line": 419,
+          "expression": "documentActionPending.current||documentSavePending.current"
+        },
+        {
+          "line": 419,
+          "expression": "revisionKey.current?.number!==sourceNumber"
+        },
+        {
+          "line": 419,
+          "expression": "!response.item?.number"
+        },
+        {
+          "line": 419,
+          "expression": "sourceNumber!==response.item.number"
+        },
+        {
+          "line": 419,
+          "expression": "error instanceof Error"
+        },
+        {
+          "line": 420,
+          "expression": "documentActionPending.current||documentSavePending.current"
+        },
+        {
+          "line": 420,
           "expression": "adjustmentIsRefund"
         },
         {
-          "line": 462,
+          "line": 420,
           "expression": "adjustmentIsRefund"
         },
         {
-          "line": 462,
+          "line": 420,
           "expression": "adjustmentIsRefund"
         },
         {
-          "line": 462,
+          "line": 420,
+          "expression": "e instanceof Error"
+        },
+        {
+          "line": 420,
+          "expression": "adjustmentIsRefund"
+        },
+        {
+          "line": 421,
+          "expression": "documentActionPending.current||documentSavePending.current"
+        },
+        {
+          "line": 421,
+          "expression": "sendPurpose===\"document\""
+        },
+        {
+          "line": 421,
+          "expression": "e instanceof Error"
+        },
+        {
+          "line": 423,
           "expression": "actionBusy"
         },
         {
-          "line": 462,
+          "line": 423,
+          "expression": "sendingReminder"
+        },
+        {
+          "line": 423,
+          "expression": "kind===\"Angebot\"&&draft.status===\"draft\""
+        },
+        {
+          "line": 426,
+          "expression": "existing"
+        },
+        {
+          "line": 427,
+          "expression": "existing&&!editing"
+        },
+        {
+          "line": 433,
+          "expression": "draftBaseline.current"
+        },
+        {
+          "line": 434,
+          "expression": "[`${kind} gespeichert.`,`${kind} erstellt.`,\"Status aktualisiert.\",\"Dokument als PDF versendet.\",\"Gutschrift erfasst.\",\"Rückerstattung erfasst.\",\"Zahlungserinnerung versendet.\",\"Nummer kopiert.\"].includes(toast)"
+        },
+        {
+          "line": 435,
+          "expression": "target===\"/rechnungen/\"+encodeURIComponent(documentKey??draft.number)"
+        },
+        {
+          "line": 445,
+          "expression": "customersLoading"
+        },
+        {
+          "line": 445,
+          "expression": "customersError"
+        },
+        {
+          "line": 445,
+          "expression": "sourceLoading"
+        },
+        {
+          "line": 445,
+          "expression": "sourceError"
+        },
+        {
+          "line": 445,
+          "expression": "billingLoading"
+        },
+        {
+          "line": 445,
+          "expression": "billingError"
+        },
+        {
+          "line": 445,
+          "expression": "documentLoad.loading"
+        },
+        {
+          "line": 445,
+          "expression": "documentLoad.error"
+        },
+        {
+          "line": 445,
+          "expression": "existing&&!editing"
+        },
+        {
+          "line": 448,
+          "expression": "kind===\"Angebot\"&&canWrite"
+        },
+        {
+          "line": 449,
+          "expression": "kind===\"Rechnung\""
+        },
+        {
+          "line": 453,
+          "expression": "!existing"
+        },
+        {
+          "line": 453,
+          "expression": "kind===\"Angebot\""
+        },
+        {
+          "line": 453,
+          "expression": "saving"
+        },
+        {
+          "line": 453,
+          "expression": "existing"
+        },
+        {
+          "line": 453,
+          "expression": "!existing"
+        },
+        {
+          "line": 453,
+          "expression": "existing"
+        },
+        {
+          "line": 453,
+          "expression": "!existing"
+        },
+        {
+          "line": 455,
+          "expression": "saving"
+        },
+        {
+          "line": 455,
+          "expression": "existing"
+        },
+        {
+          "line": 457,
+          "expression": "existing"
+        },
+        {
+          "line": 457,
+          "expression": "editing"
+        },
+        {
+          "line": 457,
+          "expression": "returnTo===\"/dashboard\""
+        },
+        {
+          "line": 457,
+          "expression": "kind===\"Angebot\""
+        },
+        {
+          "line": 457,
+          "expression": "existing&&!editing"
+        },
+        {
+          "line": 458,
+          "expression": "existing"
+        },
+        {
+          "line": 458,
+          "expression": "editing"
+        },
+        {
+          "line": 459,
+          "expression": "existing&&editing"
+        },
+        {
+          "line": 459,
+          "expression": "existing&&!editing"
+        },
+        {
+          "line": 459,
+          "expression": "kind===\"Angebot\""
+        },
+        {
+          "line": 464,
+          "expression": "draft.projectId"
+        },
+        {
+          "line": 464,
+          "expression": "draft.projectId"
+        },
+        {
+          "line": 465,
+          "expression": "draft.invoiceNumber"
+        },
+        {
+          "line": 465,
+          "expression": "draft.invoiceNumber"
+        },
+        {
+          "line": 468,
+          "expression": "kind===\"Angebot\""
+        },
+        {
+          "line": 468,
+          "expression": "kind===\"Angebot\""
+        },
+        {
+          "line": 468,
+          "expression": "demoDocument"
+        },
+        {
+          "line": 470,
+          "expression": "demoDocument"
+        },
+        {
+          "line": 472,
+          "expression": "kind==='Rechnung'"
+        },
+        {
+          "line": 479,
           "expression": "adjustmentIsRefund"
         },
         {
-          "line": 463,
+          "line": 479,
+          "expression": "adjustmentIsRefund"
+        },
+        {
+          "line": 479,
+          "expression": "adjustmentIsRefund"
+        },
+        {
+          "line": 479,
+          "expression": "actionBusy"
+        },
+        {
+          "line": 479,
+          "expression": "adjustmentIsRefund"
+        },
+        {
+          "line": 480,
           "expression": "sendingReminder"
         },
         {
-          "line": 463,
+          "line": 480,
           "expression": "sendingReminder"
         },
         {
-          "line": 463,
+          "line": 480,
           "expression": "kind===\"Angebot\""
         }
       ]
@@ -198549,7 +198683,7 @@
       "key": "components/documents.tsx#useDocumentDraft",
       "file": "components/documents.tsx",
       "name": "useDocumentDraft",
-      "line": 156,
+      "line": 159,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -198561,7 +198695,7 @@
       "key": "components/documents.tsx#DocumentDraft",
       "file": "components/documents.tsx",
       "name": "DocumentDraft",
-      "line": 50,
+      "line": 53,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -199018,7 +199152,7 @@
       "key": "components/documents.tsx#createInitialDraft",
       "file": "components/documents.tsx",
       "name": "createInitialDraft",
-      "line": 95,
+      "line": 98,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -199026,7 +199160,7 @@
       "elements": [],
       "conditions": [
         {
-          "line": 96,
+          "line": 99,
           "expression": "kind===\"Rechnung\""
         }
       ]
@@ -199112,7 +199246,7 @@
       "key": "components/documents.tsx#useCustomerDirectory",
       "file": "components/documents.tsx",
       "name": "useCustomerDirectory",
-      "line": 88,
+      "line": 91,
       "classes": [],
       "apis": [
         "/api/customers?limit=50",
@@ -199123,15 +199257,15 @@
       "elements": [],
       "conditions": [
         {
-          "line": 89,
+          "line": 92,
           "expression": "enabled"
         },
         {
-          "line": 90,
+          "line": 93,
           "expression": "enabled&&selectedId&&true"
         },
         {
-          "line": 91,
+          "line": 94,
           "expression": "item&&!items.some(row=>row.id===item.id)"
         }
       ]
@@ -199206,7 +199340,7 @@
       "key": "components/documents.tsx#useDocumentCompany",
       "file": "components/documents.tsx",
       "name": "useDocumentCompany",
-      "line": 637,
+      "line": 660,
       "classes": [],
       "apis": [
         "/api/settings/company"
@@ -199220,7 +199354,7 @@
       "key": "components/documents.tsx#EMPTY_COMPANY",
       "file": "components/documents.tsx",
       "name": "EMPTY_COMPANY",
-      "line": 636,
+      "line": 659,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -199390,7 +199524,7 @@
       "key": "components/documents.tsx#useExistingDocument",
       "file": "components/documents.tsx",
       "name": "useExistingDocument",
-      "line": 235,
+      "line": 241,
       "classes": [],
       "apis": [
         "/api/documents",
@@ -199401,27 +199535,27 @@
       "elements": [],
       "conditions": [
         {
-          "line": 236,
+          "line": 242,
           "expression": "editing"
         },
         {
-          "line": 241,
+          "line": 247,
           "expression": "!documentKey"
         },
         {
-          "line": 245,
+          "line": 251,
           "expression": "!active"
         },
         {
-          "line": 245,
+          "line": 251,
           "expression": "!item"
         },
         {
-          "line": 246,
+          "line": 252,
           "expression": "active"
         },
         {
-          "line": 246,
+          "line": 252,
           "expression": "error instanceof Error"
         }
       ]
@@ -199430,7 +199564,7 @@
       "key": "components/documents.tsx#remoteDraftFromItem",
       "file": "components/documents.tsx",
       "name": "remoteDraftFromItem",
-      "line": 172,
+      "line": 176,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -199438,52 +199572,60 @@
       "elements": [],
       "conditions": [
         {
-          "line": 174,
+          "line": 178,
           "expression": "Array.isArray(item.items)"
         },
         {
-          "line": 178,
+          "line": 182,
           "expression": "kind===\"Angebot\""
-        },
-        {
-          "line": 179,
-          "expression": "dueDate"
         },
         {
           "line": 183,
+          "expression": "dueDate"
+        },
+        {
+          "line": 187,
           "expression": "Number.isFinite(days)"
         },
         {
-          "line": 196,
+          "line": 200,
           "expression": "kind===\"Angebot\""
         },
         {
-          "line": 200,
+          "line": 204,
           "expression": "Array.isArray(item.refunds)"
         },
         {
-          "line": 201,
+          "line": 205,
           "expression": "Array.isArray(item.credits)"
         },
         {
-          "line": 202,
+          "line": 206,
           "expression": "Array.isArray(item.reminders)"
         },
         {
-          "line": 204,
+          "line": 208,
           "expression": "['sending','sent','failed','uncertain','not_attempted'].includes(String(item.delivery_status))"
         },
         {
-          "line": 208,
+          "line": 212,
           "expression": "Array.isArray(item.revisions)"
         },
         {
-          "line": 228,
+          "line": 232,
           "expression": "Array.isArray(line.expense_ids)"
         },
         {
-          "line": 229,
+          "line": 233,
           "expression": "Array.isArray(line.time_entry_ids)"
+        },
+        {
+          "line": 234,
+          "expression": "line.price_base_quantity===60"
+        },
+        {
+          "line": 235,
+          "expression": "Array.isArray(line.time_allocations)"
         }
       ]
     },
@@ -199491,7 +199633,7 @@
       "key": "components/documents.tsx#dateOnly",
       "file": "components/documents.tsx",
       "name": "dateOnly",
-      "line": 109,
+      "line": 112,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -199499,7 +199641,7 @@
       "elements": [],
       "conditions": [
         {
-          "line": 111,
+          "line": 114,
           "expression": "/^\\d{4}-\\d{2}-\\d{2}$/.test(date)"
         }
       ]
@@ -199819,7 +199961,7 @@
       "key": "components/documents.tsx#editableDocumentSnapshot",
       "file": "components/documents.tsx",
       "name": "editableDocumentSnapshot",
-      "line": 252,
+      "line": 258,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -199831,7 +199973,7 @@
       "key": "components/documents.tsx#calculateDraft",
       "file": "components/documents.tsx",
       "name": "calculateDraft",
-      "line": 162,
+      "line": 165,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -199839,15 +199981,23 @@
       "elements": [],
       "conditions": [
         {
-          "line": 163,
+          "line": 166,
           "expression": "draft.total!==undefined&&!draft.calculation"
         },
         {
-          "line": 165,
+          "line": 168,
+          "expression": "item.timeAllocations?.length"
+        },
+        {
+          "line": 168,
+          "expression": "!Number.isInteger(quantity)||quantity<1||quantity!==item.timeAllocations.reduce((n,a)=>n+a.minutes,0)||quantity>(item.availableMinutes??144000)"
+        },
+        {
+          "line": 169,
           "expression": "draft.total!==undefined&&draft.calculation"
         },
         {
-          "line": 167,
+          "line": 171,
           "expression": "error instanceof Error"
         }
       ]
@@ -199856,7 +200006,7 @@
       "key": "components/documents.tsx#decimalInput",
       "file": "components/documents.tsx",
       "name": "decimalInput",
-      "line": 160,
+      "line": 163,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -199868,7 +200018,7 @@
       "key": "components/documents.tsx#cleanDiscount",
       "file": "components/documents.tsx",
       "name": "cleanDiscount",
-      "line": 161,
+      "line": 164,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -199876,11 +200026,11 @@
       "elements": [],
       "conditions": [
         {
-          "line": 161,
+          "line": 164,
           "expression": "!value||value.kind==='none'"
         },
         {
-          "line": 161,
+          "line": 164,
           "expression": "value.kind==='percent'"
         }
       ]
@@ -199889,7 +200039,7 @@
       "key": "components/documents.tsx#documentPayload",
       "file": "components/documents.tsx",
       "name": "documentPayload",
-      "line": 135,
+      "line": 138,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -199897,27 +200047,27 @@
       "elements": [],
       "conditions": [
         {
-          "line": 138,
+          "line": 141,
           "expression": "draft.discount?.kind==='none'"
         },
         {
-          "line": 138,
-          "expression": "draft.id"
-        },
-        {
-          "line": 140,
-          "expression": "draft.id"
-        },
-        {
           "line": 141,
+          "expression": "draft.id"
+        },
+        {
+          "line": 143,
+          "expression": "draft.id"
+        },
+        {
+          "line": 144,
           "expression": "kind===\"Rechnung\""
         },
         {
-          "line": 146,
+          "line": 149,
           "expression": "kind===\"Rechnung\""
         },
         {
-          "line": 147,
+          "line": 150,
           "expression": "kind===\"Angebot\""
         }
       ]
@@ -199926,7 +200076,7 @@
       "key": "components/documents.tsx#invoiceDueIso",
       "file": "components/documents.tsx",
       "name": "invoiceDueIso",
-      "line": 127,
+      "line": 130,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -199934,7 +200084,7 @@
       "elements": [],
       "conditions": [
         {
-          "line": 130,
+          "line": 133,
           "expression": "Number.isNaN(base.getTime()) || !Number.isFinite(amount)"
         }
       ]
@@ -199943,7 +200093,7 @@
       "key": "components/documents.tsx#numberValue",
       "file": "components/documents.tsx",
       "name": "numberValue",
-      "line": 99,
+      "line": 102,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -199951,8 +200101,33 @@
       "elements": [],
       "conditions": [
         {
-          "line": 102,
+          "line": 105,
           "expression": "Number.isFinite(parsed)"
+        }
+      ]
+    },
+    {
+      "key": "lib/client/backend.ts#apiDelete",
+      "file": "lib/client/backend.ts",
+      "name": "apiDelete",
+      "line": 191,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": [
+        {
+          "line": 193,
+          "expression": "body===undefined"
+        },
+        {
+          "line": 193,
+          "expression": "options.idempotencyKey"
+        },
+        {
+          "line": 193,
+          "expression": "body===undefined"
         }
       ]
     },
@@ -199960,7 +200135,7 @@
       "key": "components/documents.tsx#documentPresentation",
       "file": "components/documents.tsx",
       "name": "documentPresentation",
-      "line": 479,
+      "line": 497,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -199968,27 +200143,27 @@
       "elements": [],
       "conditions": [
         {
-          "line": 481,
+          "line": 499,
           "expression": "isInvoice&&draft.date&&draft.due"
         },
         {
-          "line": 482,
+          "line": 500,
           "expression": "isInvoice"
         },
         {
-          "line": 482,
+          "line": 500,
           "expression": "dueDate"
         },
         {
-          "line": 482,
+          "line": 500,
           "expression": "isInvoice"
         },
         {
-          "line": 483,
+          "line": 501,
           "expression": "isInvoice"
         },
         {
-          "line": 484,
+          "line": 502,
           "expression": "isInvoice"
         }
       ]
@@ -199997,7 +200172,7 @@
       "key": "components/documents.tsx#invoiceDueDate",
       "file": "components/documents.tsx",
       "name": "invoiceDueDate",
-      "line": 119,
+      "line": 122,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -200005,7 +200180,7 @@
       "elements": [],
       "conditions": [
         {
-          "line": 122,
+          "line": 125,
           "expression": "Number.isNaN(base.getTime()) || !Number.isFinite(amount)"
         }
       ]
@@ -200080,7 +200255,7 @@
       "key": "components/documents.tsx#useDocumentTotals",
       "file": "components/documents.tsx",
       "name": "useDocumentTotals",
-      "line": 169,
+      "line": 173,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -200092,7 +200267,7 @@
       "key": "components/documents.tsx#DocumentReadView",
       "file": "components/documents.tsx",
       "name": "DocumentReadView",
-      "line": 488,
+      "line": 506,
       "classes": [
         "document-detail-view",
         "document-detail-section",
@@ -200114,387 +200289,28 @@
       "elements": [
         {
           "tag": "div",
-          "line": 497,
+          "line": 515,
           "props": [
             "className=\"document-detail-view\""
           ]
         },
         {
           "tag": "section",
-          "line": 498,
+          "line": 516,
           "props": [
             "className=\"document-detail-section\""
           ]
         },
         {
           "tag": "div",
-          "line": 499,
+          "line": 517,
           "props": [
             "className=\"document-reference-row\""
           ]
         },
         {
           "tag": "strong",
-          "line": 499,
-          "props": []
-        },
-        {
-          "tag": "span",
-          "line": 499,
-          "props": []
-        },
-        {
-          "tag": "LocalizedText",
-          "line": 499,
-          "props": []
-        },
-        {
-          "tag": "div",
-          "line": 500,
-          "props": [
-            "className=\"document-customer-heading\""
-          ]
-        },
-        {
-          "tag": "h2",
-          "line": 500,
-          "props": []
-        },
-        {
-          "tag": "Link",
-          "line": 500,
-          "props": [
-            "href={\"/kunden/\"+encodeURIComponent(draft.customerId)}"
-          ]
-        },
-        {
-          "tag": "section",
-          "line": 502,
-          "props": [
-            "className=\"document-detail-section\""
-          ]
-        },
-        {
-          "tag": "MetricTiles",
-          "line": 502,
-          "props": [
-            "columns={2}"
-          ]
-        },
-        {
-          "tag": "MetricTile",
-          "line": 502,
-          "props": [
-            "label={hasClaim?\"Offener Betrag\":\"Total\"}",
-            "value={hasClaim?outstanding:totals.total}",
-            "currency={currency}"
-          ]
-        },
-        {
-          "tag": "MetricTile",
-          "line": 502,
-          "props": [
-            "label={isInvoice&&axes.payment?'Zahlung':'Status'}",
-            "value={<Status appearance=\"pill\" tone={isInvoice&&axes.payment?financialStatusTone(document,axes.payment):statusTone}>{isInvoice&&axes.payment?financialStatusText(axes.payment,'invoice'):statusLabel}</Status>}"
-          ]
-        },
-        {
-          "tag": "Status",
-          "line": 502,
-          "props": [
-            "appearance=\"pill\"",
-            "tone={isInvoice&&axes.payment?financialStatusTone(document,axes.payment):statusTone}"
-          ]
-        },
-        {
-          "tag": "section",
-          "line": 503,
-          "props": [
-            "className=\"document-facts\""
-          ]
-        },
-        {
-          "tag": "div",
-          "line": 504,
-          "props": []
-        },
-        {
-          "tag": "small",
-          "line": 504,
-          "props": []
-        },
-        {
-          "tag": "LocalizedText",
-          "line": 504,
-          "props": []
-        },
-        {
-          "tag": "b",
-          "line": 504,
-          "props": []
-        },
-        {
-          "tag": "div",
-          "line": 506,
-          "props": []
-        },
-        {
-          "tag": "small",
-          "line": 506,
-          "props": []
-        },
-        {
-          "tag": "LocalizedText",
-          "line": 506,
-          "props": []
-        },
-        {
-          "tag": "b",
-          "line": 506,
-          "props": []
-        },
-        {
-          "tag": "LocalizedText",
-          "line": 506,
-          "props": []
-        },
-        {
-          "tag": "div",
-          "line": 507,
-          "props": []
-        },
-        {
-          "tag": "small",
-          "line": 507,
-          "props": []
-        },
-        {
-          "tag": "LocalizedText",
-          "line": 507,
-          "props": []
-        },
-        {
-          "tag": "b",
-          "line": 507,
-          "props": []
-        },
-        {
-          "tag": "div",
-          "line": 507,
-          "props": []
-        },
-        {
-          "tag": "small",
-          "line": 507,
-          "props": []
-        },
-        {
-          "tag": "LocalizedText",
-          "line": 507,
-          "props": []
-        },
-        {
-          "tag": "b",
-          "line": 507,
-          "props": []
-        },
-        {
-          "tag": "Status",
-          "line": 507,
-          "props": [
-            "appearance=\"pill\"",
-            "tone={financialStatusTone(document,axes.due)}"
-          ]
-        },
-        {
-          "tag": "div",
-          "line": 507,
-          "props": []
-        },
-        {
-          "tag": "small",
-          "line": 507,
-          "props": []
-        },
-        {
-          "tag": "LocalizedText",
-          "line": 507,
-          "props": []
-        },
-        {
-          "tag": "Status",
-          "line": 507,
-          "props": [
-            "appearance=\"pill\"",
-            "tone=\"info\""
-          ]
-        },
-        {
-          "tag": "LocalizedText",
-          "line": 507,
-          "props": []
-        },
-        {
-          "tag": "div",
-          "line": 507,
-          "props": []
-        },
-        {
-          "tag": "small",
-          "line": 507,
-          "props": []
-        },
-        {
-          "tag": "LocalizedText",
-          "line": 507,
-          "props": []
-        },
-        {
-          "tag": "b",
-          "line": 507,
-          "props": []
-        },
-        {
-          "tag": "LocalizedText",
-          "line": 507,
-          "props": []
-        },
-        {
-          "tag": "div",
-          "line": 508,
-          "props": [
-            "className=\"document-payment-term\""
-          ]
-        },
-        {
-          "tag": "small",
-          "line": 508,
-          "props": []
-        },
-        {
-          "tag": "LocalizedText",
-          "line": 508,
-          "props": []
-        },
-        {
-          "tag": "b",
-          "line": 508,
-          "props": []
-        },
-        {
-          "tag": "LocalizedText",
-          "line": 508,
-          "props": []
-        },
-        {
-          "tag": "section",
-          "line": 510,
-          "props": [
-            "className=\"document-detail-section document-lines-section\""
-          ]
-        },
-        {
-          "tag": "SectionTitle",
-          "line": 511,
-          "props": [
-            "title=\"Positionen\""
-          ]
-        },
-        {
-          "tag": "div",
-          "line": 512,
-          "props": [
-            "className=\"document-read-table\""
-          ]
-        },
-        {
-          "tag": "div",
-          "line": 513,
-          "props": [
-            "className=\"document-read-head\"",
-            "aria-hidden=\"true\""
-          ]
-        },
-        {
-          "tag": "span",
-          "line": 513,
-          "props": []
-        },
-        {
-          "tag": "LocalizedText",
-          "line": 513,
-          "props": []
-        },
-        {
-          "tag": "span",
-          "line": 513,
-          "props": []
-        },
-        {
-          "tag": "LocalizedText",
-          "line": 513,
-          "props": []
-        },
-        {
-          "tag": "span",
-          "line": 513,
-          "props": []
-        },
-        {
-          "tag": "LocalizedText",
-          "line": 513,
-          "props": []
-        },
-        {
-          "tag": "span",
-          "line": 513,
-          "props": []
-        },
-        {
-          "tag": "LocalizedText",
-          "line": 513,
-          "props": []
-        },
-        {
-          "tag": "div",
-          "line": 514,
-          "props": [
-            "className=\"document-read-row\"",
-            "key={item.id}"
-          ]
-        },
-        {
-          "tag": "b",
-          "line": 515,
-          "props": []
-        },
-        {
-          "tag": "LocalizedText",
-          "line": 515,
-          "props": [
-            "verbatim={true}"
-          ]
-        },
-        {
-          "tag": "span",
-          "line": 516,
-          "props": []
-        },
-        {
-          "tag": "LocalizedText",
-          "line": 516,
-          "props": []
-        },
-        {
-          "tag": "small",
-          "line": 516,
-          "props": [
-            "className=\"document-mobile-price\""
-          ]
-        },
-        {
-          "tag": "LocalizedText",
-          "line": 516,
+          "line": 517,
           "props": []
         },
         {
@@ -200503,13 +200319,382 @@
           "props": []
         },
         {
-          "tag": "strong",
+          "tag": "LocalizedText",
+          "line": 517,
+          "props": []
+        },
+        {
+          "tag": "div",
+          "line": 518,
+          "props": [
+            "className=\"document-customer-heading\""
+          ]
+        },
+        {
+          "tag": "h2",
           "line": 518,
           "props": []
         },
         {
-          "tag": "DocumentTotals",
+          "tag": "Link",
+          "line": 518,
+          "props": [
+            "href={\"/kunden/\"+encodeURIComponent(draft.customerId)}"
+          ]
+        },
+        {
+          "tag": "section",
+          "line": 520,
+          "props": [
+            "className=\"document-detail-section\""
+          ]
+        },
+        {
+          "tag": "MetricTiles",
+          "line": 520,
+          "props": [
+            "columns={2}"
+          ]
+        },
+        {
+          "tag": "MetricTile",
+          "line": 520,
+          "props": [
+            "label={hasClaim?\"Offener Betrag\":\"Total\"}",
+            "value={hasClaim?outstanding:totals.total}",
+            "currency={currency}"
+          ]
+        },
+        {
+          "tag": "MetricTile",
+          "line": 520,
+          "props": [
+            "label={isInvoice&&axes.payment?'Zahlung':'Status'}",
+            "value={<Status appearance=\"pill\" tone={isInvoice&&axes.payment?financialStatusTone(document,axes.payment):statusTone}>{isInvoice&&axes.payment?financialStatusText(axes.payment,'invoice'):statusLabel}</Status>}"
+          ]
+        },
+        {
+          "tag": "Status",
+          "line": 520,
+          "props": [
+            "appearance=\"pill\"",
+            "tone={isInvoice&&axes.payment?financialStatusTone(document,axes.payment):statusTone}"
+          ]
+        },
+        {
+          "tag": "section",
           "line": 521,
+          "props": [
+            "className=\"document-facts\""
+          ]
+        },
+        {
+          "tag": "div",
+          "line": 522,
+          "props": []
+        },
+        {
+          "tag": "small",
+          "line": 522,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 522,
+          "props": []
+        },
+        {
+          "tag": "b",
+          "line": 522,
+          "props": []
+        },
+        {
+          "tag": "div",
+          "line": 524,
+          "props": []
+        },
+        {
+          "tag": "small",
+          "line": 524,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 524,
+          "props": []
+        },
+        {
+          "tag": "b",
+          "line": 524,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 524,
+          "props": []
+        },
+        {
+          "tag": "div",
+          "line": 525,
+          "props": []
+        },
+        {
+          "tag": "small",
+          "line": 525,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 525,
+          "props": []
+        },
+        {
+          "tag": "b",
+          "line": 525,
+          "props": []
+        },
+        {
+          "tag": "div",
+          "line": 525,
+          "props": []
+        },
+        {
+          "tag": "small",
+          "line": 525,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 525,
+          "props": []
+        },
+        {
+          "tag": "b",
+          "line": 525,
+          "props": []
+        },
+        {
+          "tag": "Status",
+          "line": 525,
+          "props": [
+            "appearance=\"pill\"",
+            "tone={financialStatusTone(document,axes.due)}"
+          ]
+        },
+        {
+          "tag": "div",
+          "line": 525,
+          "props": []
+        },
+        {
+          "tag": "small",
+          "line": 525,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 525,
+          "props": []
+        },
+        {
+          "tag": "Status",
+          "line": 525,
+          "props": [
+            "appearance=\"pill\"",
+            "tone=\"info\""
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 525,
+          "props": []
+        },
+        {
+          "tag": "div",
+          "line": 525,
+          "props": []
+        },
+        {
+          "tag": "small",
+          "line": 525,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 525,
+          "props": []
+        },
+        {
+          "tag": "b",
+          "line": 525,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 525,
+          "props": []
+        },
+        {
+          "tag": "div",
+          "line": 526,
+          "props": [
+            "className=\"document-payment-term\""
+          ]
+        },
+        {
+          "tag": "small",
+          "line": 526,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 526,
+          "props": []
+        },
+        {
+          "tag": "b",
+          "line": 526,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 526,
+          "props": []
+        },
+        {
+          "tag": "section",
+          "line": 528,
+          "props": [
+            "className=\"document-detail-section document-lines-section\""
+          ]
+        },
+        {
+          "tag": "SectionTitle",
+          "line": 529,
+          "props": [
+            "title=\"Positionen\""
+          ]
+        },
+        {
+          "tag": "div",
+          "line": 530,
+          "props": [
+            "className=\"document-read-table\""
+          ]
+        },
+        {
+          "tag": "div",
+          "line": 531,
+          "props": [
+            "className=\"document-read-head\"",
+            "aria-hidden=\"true\""
+          ]
+        },
+        {
+          "tag": "span",
+          "line": 531,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 531,
+          "props": []
+        },
+        {
+          "tag": "span",
+          "line": 531,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 531,
+          "props": []
+        },
+        {
+          "tag": "span",
+          "line": 531,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 531,
+          "props": []
+        },
+        {
+          "tag": "span",
+          "line": 531,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 531,
+          "props": []
+        },
+        {
+          "tag": "div",
+          "line": 532,
+          "props": [
+            "className=\"document-read-row\"",
+            "key={item.id}"
+          ]
+        },
+        {
+          "tag": "b",
+          "line": 533,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 533,
+          "props": [
+            "verbatim={true}"
+          ]
+        },
+        {
+          "tag": "span",
+          "line": 534,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 534,
+          "props": []
+        },
+        {
+          "tag": "small",
+          "line": 534,
+          "props": [
+            "className=\"document-mobile-price\""
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 534,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 534,
+          "props": []
+        },
+        {
+          "tag": "span",
+          "line": 535,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 535,
+          "props": []
+        },
+        {
+          "tag": "strong",
+          "line": 536,
+          "props": []
+        },
+        {
+          "tag": "DocumentTotals",
+          "line": 539,
           "props": [
             "draft={draft}",
             "totals={totals}"
@@ -200517,17 +200702,17 @@
         },
         {
           "tag": "p",
-          "line": 523,
+          "line": 541,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 523,
+          "line": 541,
           "props": []
         },
         {
           "tag": "MetricTile",
-          "line": 524,
+          "line": 542,
           "props": [
             "label=\"Kundenguthaben\"",
             "value={`${currency} ${money(creditBalance)}`}"
@@ -200535,7 +200720,7 @@
         },
         {
           "tag": "LocalizedElement",
-          "line": 525,
+          "line": 543,
           "props": [
             "as=\"section\"",
             "className=\"document-payment-facts\"",
@@ -200544,14 +200729,14 @@
         },
         {
           "tag": "SectionTitle",
-          "line": 525,
+          "line": 543,
           "props": [
             "title=\"Zahlungsstand\""
           ]
         },
         {
           "tag": "MetricTile",
-          "line": 526,
+          "line": 544,
           "props": [
             "label=\"Bereits bezahlt\"",
             "value={`${currency} ${money(Number(draft.paidAmount??0))}`}"
@@ -200559,7 +200744,7 @@
         },
         {
           "tag": "OfferHistory",
-          "line": 528,
+          "line": 546,
           "props": [
             "number={draft.number}",
             "canWrite={canWrite}"
@@ -200567,278 +200752,278 @@
         },
         {
           "tag": "DetailDisclosure",
-          "line": 529,
+          "line": 547,
           "props": [
             "label=\"Weitere Angaben\""
           ]
         },
         {
           "tag": "section",
-          "line": 530,
+          "line": 548,
           "props": [
             "className=\"document-detail-section\""
           ]
         },
         {
           "tag": "SectionTitle",
-          "line": 530,
+          "line": 548,
           "props": [
             "title=\"Gutschriften\""
           ]
         },
         {
           "tag": "p",
-          "line": 530,
+          "line": 548,
           "props": [
             "key={credit.number}"
           ]
         },
         {
           "tag": "b",
-          "line": 530,
+          "line": 548,
           "props": []
         },
         {
           "tag": "br",
-          "line": 530,
+          "line": 548,
           "props": []
         },
         {
           "tag": "section",
-          "line": 531,
+          "line": 549,
           "props": [
             "className=\"document-detail-section\""
           ]
         },
         {
           "tag": "SectionTitle",
-          "line": 531,
+          "line": 549,
           "props": [
             "title=\"Mahnhistorie\""
           ]
         },
         {
           "tag": "p",
-          "line": 531,
+          "line": 549,
           "props": [
             "key={reminder.id}"
           ]
         },
         {
           "tag": "b",
-          "line": 531,
+          "line": 549,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 531,
+          "line": 549,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 531,
+          "line": 549,
           "props": []
         },
         {
           "tag": "br",
-          "line": 531,
+          "line": 549,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 531,
+          "line": 549,
           "props": []
         },
         {
           "tag": "section",
-          "line": 532,
+          "line": 550,
           "props": [
             "className=\"document-detail-section\""
           ]
         },
         {
           "tag": "SectionTitle",
-          "line": 532,
+          "line": 550,
           "props": [
             "title=\"Rückerstattungen\""
           ]
         },
         {
           "tag": "p",
-          "line": 532,
+          "line": 550,
           "props": [
             "key={refund.id}"
           ]
         },
         {
           "tag": "br",
-          "line": 532,
+          "line": 550,
           "props": []
         },
         {
           "tag": "p",
-          "line": 533,
+          "line": 551,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 533,
+          "line": 551,
           "props": []
         },
         {
           "tag": "Link",
-          "line": 533,
+          "line": 551,
           "props": [
             "href={'/angebote/'+encodeURIComponent(draft.revisesOffer)}"
           ]
         },
         {
           "tag": "section",
-          "line": 534,
+          "line": 552,
           "props": [
             "className=\"document-detail-section\""
           ]
         },
         {
           "tag": "SectionTitle",
-          "line": 534,
+          "line": 552,
           "props": [
             "title=\"Überarbeitete Angebotsversionen\""
           ]
         },
         {
           "tag": "p",
-          "line": 534,
+          "line": 552,
           "props": [
             "key={revision.number}"
           ]
         },
         {
           "tag": "Link",
-          "line": 534,
+          "line": 552,
           "props": [
             "href={'/angebote/'+encodeURIComponent(revision.number)}"
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 534,
+          "line": 552,
           "props": []
         },
         {
           "tag": "p",
-          "line": 535,
+          "line": 553,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 535,
+          "line": 553,
           "props": []
         },
         {
           "tag": "Link",
-          "line": 535,
+          "line": 553,
           "props": [
             "href={\"/angebote/\"+encodeURIComponent(draft.sourceOffer)}"
           ]
         },
         {
           "tag": "p",
-          "line": 535,
+          "line": 553,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 535,
+          "line": 553,
           "props": []
         },
         {
           "tag": "Link",
-          "line": 535,
+          "line": 553,
           "props": [
             "href={\"/rechnungen/\"+encodeURIComponent(draft.invoiceNumber)}"
           ]
         },
         {
           "tag": "section",
-          "line": 536,
+          "line": 554,
           "props": [
             "className=\"document-detail-section\""
           ]
         },
         {
           "tag": "span",
-          "line": 536,
+          "line": 554,
           "props": [
             "className=\"eyebrow\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 536,
+          "line": 554,
           "props": []
         },
         {
           "tag": "p",
-          "line": 536,
+          "line": 554,
           "props": []
         }
       ],
       "conditions": [
         {
-          "line": 492,
+          "line": 510,
           "expression": "isInvoice&&draft.date&&draft.due"
         },
         {
-          "line": 494,
+          "line": 512,
           "expression": "dueDate"
         },
         {
-          "line": 500,
+          "line": 518,
           "expression": "draft.customerId"
         },
         {
-          "line": 502,
+          "line": 520,
           "expression": "hasClaim"
         },
         {
-          "line": 502,
+          "line": 520,
           "expression": "hasClaim"
         },
         {
-          "line": 502,
+          "line": 520,
           "expression": "isInvoice&&axes.payment"
         },
         {
-          "line": 502,
+          "line": 520,
           "expression": "isInvoice&&axes.payment"
         },
         {
-          "line": 502,
+          "line": 520,
           "expression": "isInvoice&&axes.payment"
         },
         {
-          "line": 504,
+          "line": 522,
           "expression": "type===\"Rechnung\""
         },
         {
-          "line": 505,
+          "line": 523,
           "expression": "type===\"Angebot\""
         },
         {
-          "line": 507,
+          "line": 525,
           "expression": "['paid','overpaid'].includes(axes.payment??'')&&draft.paidOn"
         },
         {
-          "line": 507,
+          "line": 525,
           "expression": "draft.deliveryStatus"
         },
         {
-          "line": 531,
+          "line": 549,
           "expression": "reminder.stage===1"
         },
         {
-          "line": 531,
+          "line": 549,
           "expression": "reminder.stage===2"
         }
       ]
@@ -201037,7 +201222,7 @@
       "key": "components/documents.tsx#isoToSwiss",
       "file": "components/documents.tsx",
       "name": "isoToSwiss",
-      "line": 114,
+      "line": 117,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -201045,7 +201230,7 @@
       "elements": [],
       "conditions": [
         {
-          "line": 116,
+          "line": 119,
           "expression": "parts.length===3"
         }
       ]
@@ -201079,7 +201264,7 @@
       "key": "components/documents.tsx#money",
       "file": "components/documents.tsx",
       "name": "money",
-      "line": 105,
+      "line": 108,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -201091,7 +201276,7 @@
       "key": "components/documents.tsx#lineAmount",
       "file": "components/documents.tsx",
       "name": "lineAmount",
-      "line": 170,
+      "line": 174,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -201103,7 +201288,7 @@
       "key": "components/documents.tsx#DocumentTotals",
       "file": "components/documents.tsx",
       "name": "DocumentTotals",
-      "line": 544,
+      "line": 562,
       "classes": [
         "invoice-totals"
       ],
@@ -201113,164 +201298,164 @@
       "elements": [
         {
           "tag": "ErrorState",
-          "line": 546,
+          "line": 564,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 546,
+          "line": 564,
           "props": []
         },
         {
           "tag": "div",
-          "line": 547,
+          "line": 565,
           "props": [
             "className=\"invoice-totals\""
           ]
         },
         {
           "tag": "span",
-          "line": 547,
+          "line": 565,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 547,
+          "line": 565,
           "props": []
         },
         {
           "tag": "b",
-          "line": 547,
+          "line": 565,
           "props": []
         },
         {
           "tag": "span",
-          "line": 548,
+          "line": 566,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 548,
+          "line": 566,
           "props": []
         },
         {
           "tag": "b",
-          "line": 548,
+          "line": 566,
           "props": []
         },
         {
           "tag": "span",
-          "line": 549,
+          "line": 567,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 549,
+          "line": 567,
           "props": []
         },
         {
           "tag": "b",
-          "line": 549,
+          "line": 567,
           "props": []
         },
         {
           "tag": "span",
-          "line": 550,
+          "line": 568,
           "props": [
             "key={index}"
           ]
         },
         {
           "tag": "span",
-          "line": 550,
+          "line": 568,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 550,
+          "line": 568,
           "props": []
         },
         {
           "tag": "b",
-          "line": 550,
+          "line": 568,
           "props": []
         },
         {
           "tag": "span",
-          "line": 550,
+          "line": 568,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 550,
+          "line": 568,
           "props": []
         },
         {
           "tag": "b",
-          "line": 550,
+          "line": 568,
           "props": []
         },
         {
           "tag": "span",
-          "line": 551,
+          "line": 569,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 551,
+          "line": 569,
           "props": []
         },
         {
           "tag": "b",
-          "line": 551,
+          "line": 569,
           "props": []
         },
         {
           "tag": "span",
-          "line": 552,
+          "line": 570,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 552,
+          "line": 570,
           "props": []
         },
         {
           "tag": "b",
-          "line": 552,
+          "line": 570,
           "props": []
         },
         {
           "tag": "strong",
-          "line": 553,
+          "line": 571,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 553,
+          "line": 571,
           "props": []
         },
         {
           "tag": "b",
-          "line": 553,
+          "line": 571,
           "props": []
         }
       ],
       "conditions": [
         {
-          "line": 546,
+          "line": 564,
           "expression": "totals.error"
         },
         {
-          "line": 547,
+          "line": 565,
           "expression": "c"
         },
         {
-          "line": 550,
+          "line": 568,
           "expression": "c"
         },
         {
-          "line": 550,
+          "line": 568,
           "expression": "g.exempt"
         }
       ]
@@ -202243,23 +202428,6 @@
       "conditions": []
     },
     {
-      "key": "lib/client/backend.ts#apiDelete",
-      "file": "lib/client/backend.ts",
-      "name": "apiDelete",
-      "line": 191,
-      "classes": [],
-      "apis": [],
-      "collections": [],
-      "widgets": [],
-      "elements": [],
-      "conditions": [
-        {
-          "line": 193,
-          "expression": "body===undefined"
-        }
-      ]
-    },
-    {
       "key": "lib/file-selection.ts#fileSelectionError",
       "file": "lib/file-selection.ts",
       "name": "fileSelectionError",
@@ -202669,7 +202837,7 @@
       "key": "components/documents.tsx#DocumentEditor",
       "file": "components/documents.tsx",
       "name": "DocumentEditor",
-      "line": 556,
+      "line": 574,
       "classes": [
         "invoice-workspace",
         "invoice-form",
@@ -202704,131 +202872,132 @@
         "add-note-action"
       ],
       "apis": [
+        "/api/time-entries/billing?",
         "/api/customers"
       ],
       "collections": [],
       "widgets": [
         {
           "tag": "Field",
-          "line": 594
+          "line": 616
         },
         {
           "tag": "Field",
-          "line": 599
+          "line": 621
         },
         {
           "tag": "Field",
-          "line": 600
+          "line": 622
         },
         {
           "tag": "Field",
-          "line": 601
+          "line": 623
         },
         {
           "tag": "Field",
-          "line": 604
+          "line": 626
         },
         {
           "tag": "FormSheet",
-          "line": 629
+          "line": 652
         },
         {
           "tag": "Field",
-          "line": 629
+          "line": 652
         },
         {
           "tag": "Field",
-          "line": 629
+          "line": 652
         },
         {
           "tag": "Field",
-          "line": 629
+          "line": 652
         },
         {
           "tag": "Field",
-          "line": 629
+          "line": 652
         },
         {
           "tag": "DiscountFields",
-          "line": 629
+          "line": 652
         },
         {
           "tag": "Field",
-          "line": 629
+          "line": 652
         },
         {
           "tag": "Field",
-          "line": 629
+          "line": 652
         },
         {
           "tag": "FormSheet",
-          "line": 630
+          "line": 653
         },
         {
           "tag": "DiscountFields",
-          "line": 630
+          "line": 653
         },
         {
           "tag": "Field",
-          "line": 631
+          "line": 654
         }
       ],
       "elements": [
         {
           "tag": "div",
-          "line": 587,
+          "line": 609,
           "props": [
             "className=\"invoice-workspace\""
           ]
         },
         {
           "tag": "section",
-          "line": 587,
+          "line": 609,
           "props": [
             "className=\"invoice-form\""
           ]
         },
         {
           "tag": "EmptyState",
-          "line": 587,
+          "line": 609,
           "props": [
             "title=\"Zuerst einen Kunden erfassen\""
           ]
         },
         {
           "tag": "FormActions",
-          "line": 587,
+          "line": 609,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 587,
+          "line": 609,
           "props": [
             "href=\"/kunden/neu\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 587,
+          "line": 609,
           "props": []
         },
         {
           "tag": "div",
-          "line": 590,
+          "line": 612,
           "props": [
             "className=\"invoice-workspace\""
           ]
         },
         {
           "tag": "section",
-          "line": 591,
+          "line": 613,
           "props": [
             "className={`invoice-form ${type===\"Angebot\"?\"offer-form\":\"\"}`}"
           ]
         },
         {
           "tag": "div",
-          "line": 592,
+          "line": 614,
           "props": [
             "hidden={step!==undefined&&step!==0}",
             "className=\"form-section customer-form-section\""
@@ -202836,29 +203005,29 @@
         },
         {
           "tag": "span",
-          "line": 593,
+          "line": 615,
           "props": [
             "className=\"compact-section-label\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 593,
+          "line": 615,
           "props": []
         },
         {
           "tag": "Field",
-          "line": 594,
+          "line": 616,
           "props": [
             "label=\"Kunde auswählen\""
           ]
         },
         {
           "tag": "DirectorySelect",
-          "line": 594,
+          "line": 616,
           "props": [
             "label=\"Kunde auswählen\"",
-            "disabled={lockedCustomer}",
+            "disabled={lockedCustomer||draft.positions.some(item=>Boolean(item.timeAllocations?.length))}",
             "required",
             "endpoint={\"/api/customers\"}",
             "value={draft.customerId??''}",
@@ -202867,7 +203036,7 @@
         },
         {
           "tag": "div",
-          "line": 596,
+          "line": 618,
           "props": [
             "hidden={step!==undefined&&step!==0&&step!==2}",
             "className=\"form-section\""
@@ -202875,24 +203044,24 @@
         },
         {
           "tag": "h2",
-          "line": 597,
+          "line": 619,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 597,
+          "line": 619,
           "props": []
         },
         {
           "tag": "div",
-          "line": 598,
+          "line": 620,
           "props": [
             "className=\"form-grid document-meta-grid\""
           ]
         },
         {
           "tag": "Field",
-          "line": 599,
+          "line": 621,
           "props": [
             "className=\"document-number-field\"",
             "label=\"Rechnungsnummer\""
@@ -202900,7 +203069,7 @@
         },
         {
           "tag": "Input",
-          "line": 599,
+          "line": 621,
           "props": [
             "value={draft.number}",
             "readOnly",
@@ -202909,21 +203078,21 @@
         },
         {
           "tag": "div",
-          "line": 600,
+          "line": 622,
           "props": [
             "hidden={step===2}"
           ]
         },
         {
           "tag": "Field",
-          "line": 600,
+          "line": 622,
           "props": [
             "label={type===\"Rechnung\" ? \"Rechnungsdatum\" : \"Angebotsdatum\"}"
           ]
         },
         {
           "tag": "Input",
-          "line": 600,
+          "line": 622,
           "props": [
             "type=\"date\"",
             "value={draft.date}",
@@ -202932,21 +203101,21 @@
         },
         {
           "tag": "div",
-          "line": 601,
+          "line": 623,
           "props": [
             "hidden={step===0}"
           ]
         },
         {
           "tag": "Field",
-          "line": 601,
+          "line": 623,
           "props": [
             "label={type===\"Rechnung\" ? \"Zahlungsfrist\" : \"Gültig bis\"}"
           ]
         },
         {
           "tag": "Select",
-          "line": 602,
+          "line": 624,
           "props": [
             "value={draft.due}",
             "onChange={e=>onChange({...draft,due:e.target.value})}"
@@ -202954,55 +203123,55 @@
         },
         {
           "tag": "option",
-          "line": 602,
+          "line": 624,
           "props": [
             "value={draft.due}"
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 602,
+          "line": 624,
           "props": []
         },
         {
           "tag": "option",
-          "line": 602,
+          "line": 624,
           "props": [
             "value=\"10\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 602,
+          "line": 624,
           "props": []
         },
         {
           "tag": "option",
-          "line": 602,
+          "line": 624,
           "props": [
             "value=\"30\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 602,
+          "line": 624,
           "props": []
         },
         {
           "tag": "option",
-          "line": 602,
+          "line": 624,
           "props": [
             "value=\"45\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 602,
+          "line": 624,
           "props": []
         },
         {
           "tag": "Input",
-          "line": 602,
+          "line": 624,
           "props": [
             "type=\"date\"",
             "value={draft.due}",
@@ -203011,29 +203180,29 @@
         },
         {
           "tag": "div",
-          "line": 604,
+          "line": 626,
           "props": [
             "hidden={step===0}"
           ]
         },
         {
           "tag": "Field",
-          "line": 604,
+          "line": 626,
           "props": [
             "label=\"MwSt.\""
           ]
         },
         {
           "tag": "Select",
-          "line": 604,
+          "line": 626,
           "props": [
             "value={draft.vatRate}",
-            "onChange={e=>onChange({...draft,vatRate:e.target.value,positions:draft.positions.map(item=>({...item,vatRate:e.target.value,taxExempt:false}))})}"
+            "onChange={e=>onChange({...draft,vatRate:e.target.value,positions:draft.positions.map(item=>item.priceBaseQuantity===60?item:({...item,vatRate:e.target.value,taxExempt:false}))})}"
           ]
         },
         {
           "tag": "option",
-          "line": 604,
+          "line": 626,
           "props": [
             "key={rate}",
             "value={rate}"
@@ -203041,7 +203210,7 @@
         },
         {
           "tag": "div",
-          "line": 607,
+          "line": 629,
           "props": [
             "hidden={step!==undefined&&step!==1}",
             "className=\"form-section\""
@@ -203049,7 +203218,7 @@
         },
         {
           "tag": "SectionTitle",
-          "line": 608,
+          "line": 630,
           "props": [
             "title=\"Positionen\"",
             "action={<LocalizedElement as=\"button\" className=\"icon-action\" type=\"button\" onClick={addPosition} aria-label=\"Position hinzufügen\"><Icon name=\"plus\" size={18}/></LocalizedElement>}"
@@ -203057,7 +203226,7 @@
         },
         {
           "tag": "LocalizedElement",
-          "line": 608,
+          "line": 630,
           "props": [
             "as=\"button\"",
             "className=\"icon-action\"",
@@ -203068,84 +203237,96 @@
         },
         {
           "tag": "Icon",
-          "line": 608,
+          "line": 630,
           "props": [
             "name=\"plus\"",
             "size={18}"
           ]
         },
         {
+          "tag": "ErrorState",
+          "line": 631,
+          "props": [
+            "onRetry={capacity.refresh}"
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 631,
+          "props": []
+        },
+        {
           "tag": "div",
-          "line": 609,
+          "line": 632,
           "props": [
             "className=\"line-items document-line-items\""
           ]
         },
         {
           "tag": "div",
-          "line": 610,
+          "line": 633,
           "props": [
             "className=\"line-head\""
           ]
         },
         {
           "tag": "span",
-          "line": 610,
+          "line": 633,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 610,
+          "line": 633,
           "props": []
         },
         {
           "tag": "span",
-          "line": 610,
+          "line": 633,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 610,
+          "line": 633,
           "props": []
         },
         {
           "tag": "span",
-          "line": 610,
+          "line": 633,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 610,
+          "line": 633,
           "props": []
         },
         {
           "tag": "span",
-          "line": 610,
+          "line": 633,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 610,
+          "line": 633,
           "props": []
         },
         {
           "tag": "span",
-          "line": 610,
+          "line": 633,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 610,
+          "line": 633,
           "props": []
         },
         {
           "tag": "span",
-          "line": 610,
+          "line": 633,
           "props": []
         },
         {
           "tag": "div",
-          "line": 613,
+          "line": 636,
           "props": [
             "className=\"document-line-item\"",
             "key={item.id}"
@@ -203153,7 +203334,7 @@
         },
         {
           "tag": "button",
-          "line": 614,
+          "line": 637,
           "props": [
             "className=\"mobile-position-summary\"",
             "type=\"button\"",
@@ -203162,54 +203343,59 @@
         },
         {
           "tag": "span",
-          "line": 615,
+          "line": 638,
           "props": []
         },
         {
           "tag": "b",
-          "line": 615,
+          "line": 638,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 615,
+          "line": 638,
           "props": [
             "verbatim={true}"
           ]
         },
         {
           "tag": "small",
-          "line": 615,
+          "line": 638,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 615,
+          "line": 638,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 615,
+          "line": 638,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 615,
+          "line": 638,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 638,
           "props": []
         },
         {
           "tag": "strong",
-          "line": 616,
+          "line": 639,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 616,
+          "line": 639,
           "props": []
         },
         {
           "tag": "Icon",
-          "line": 616,
+          "line": 639,
           "props": [
             "name=\"arrow\"",
             "size={16}"
@@ -203217,31 +203403,31 @@
         },
         {
           "tag": "label",
-          "line": 618,
+          "line": 641,
           "props": [
             "className=\"mobile-line-field description\""
           ]
         },
         {
           "tag": "span",
-          "line": 618,
+          "line": 641,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 618,
+          "line": 641,
           "props": []
         },
         {
           "tag": "b",
-          "line": 618,
+          "line": 641,
           "props": [
             "className=\"document-position-number\""
           ]
         },
         {
           "tag": "Input",
-          "line": 618,
+          "line": 641,
           "props": [
             "aria-label=\"Beschreibung\"",
             "value={item.description}",
@@ -203250,52 +203436,59 @@
         },
         {
           "tag": "label",
-          "line": 619,
+          "line": 642,
           "props": [
             "className=\"mobile-line-field\""
           ]
         },
         {
           "tag": "span",
-          "line": 619,
+          "line": 642,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 619,
+          "line": 642,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 642,
           "props": []
         },
         {
           "tag": "Input",
-          "line": 619,
+          "line": 642,
           "props": [
             "aria-label=\"Menge\"",
-            "inputMode=\"decimal\"",
+            "readOnly={Boolean(item.timeAllocations?.length&&(item.timeAllocations.length>1||capacity.loading||capacity.error))}",
+            "inputMode={item.priceBaseQuantity===60?\"numeric\":\"decimal\"}",
             "value={item.quantity}",
-            "onChange={e=>updatePosition(item.id,{quantity:e.target.value})}"
+            "onChange={e=>updatePosition(item.id,quantityPatch(item,e.target.value))}"
           ]
         },
         {
           "tag": "label",
-          "line": 620,
+          "line": 643,
           "props": [
             "className=\"mobile-line-field\""
           ]
         },
         {
           "tag": "span",
-          "line": 620,
+          "line": 643,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 620,
+          "line": 643,
           "props": []
         },
         {
           "tag": "Select",
-          "line": 620,
+          "line": 643,
           "props": [
+            "disabled={item.priceBaseQuantity===60}",
             "aria-label=\"Einheit\"",
             "value={item.unit??\"Stück\"}",
             "onChange={e=>updatePosition(item.id,{unit:e.target.value})}"
@@ -203303,7 +203496,7 @@
         },
         {
           "tag": "option",
-          "line": 620,
+          "line": 643,
           "props": [
             "key={unit}",
             "value={unit}"
@@ -203311,31 +203504,32 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 620,
+          "line": 643,
           "props": []
         },
         {
           "tag": "label",
-          "line": 621,
+          "line": 644,
           "props": [
             "className=\"mobile-line-field\""
           ]
         },
         {
           "tag": "span",
-          "line": 621,
+          "line": 644,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 621,
+          "line": 644,
           "props": []
         },
         {
           "tag": "Input",
-          "line": 621,
+          "line": 644,
           "props": [
             "aria-label=\"Einzelpreis\"",
+            "readOnly={item.priceBaseQuantity===60}",
             "inputMode=\"decimal\"",
             "value={item.price}",
             "onChange={e=>updatePosition(item.id,{price:e.target.value})}"
@@ -203343,43 +203537,43 @@
         },
         {
           "tag": "div",
-          "line": 622,
+          "line": 645,
           "props": [
             "className=\"mobile-line-total\""
           ]
         },
         {
           "tag": "span",
-          "line": 622,
+          "line": 645,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 622,
+          "line": 645,
           "props": []
         },
         {
           "tag": "b",
-          "line": 622,
+          "line": 645,
           "props": []
         },
         {
           "tag": "div",
-          "line": 623,
+          "line": 646,
           "props": [
             "className=\"document-line-actions\""
           ]
         },
         {
           "tag": "ActionsMenu",
-          "line": 623,
+          "line": 646,
           "props": [
             "label={'Position '+positionNumber(index)}"
           ]
         },
         {
           "tag": "ActionRow",
-          "line": 623,
+          "line": 646,
           "props": [
             "title=\"Bearbeiten\"",
             "icon=\"edit\"",
@@ -203388,7 +203582,7 @@
         },
         {
           "tag": "ActionRow",
-          "line": 623,
+          "line": 646,
           "props": [
             "title=\"Rabatt\"",
             "icon=\"edit\"",
@@ -203397,7 +203591,7 @@
         },
         {
           "tag": "ActionRow",
-          "line": 623,
+          "line": 646,
           "props": [
             "title=\"Duplizieren\"",
             "icon=\"copy\"",
@@ -203407,7 +203601,7 @@
         },
         {
           "tag": "ActionRow",
-          "line": 623,
+          "line": 646,
           "props": [
             "title=\"Nach oben\"",
             "icon=\"arrow\"",
@@ -203417,7 +203611,7 @@
         },
         {
           "tag": "ActionRow",
-          "line": 623,
+          "line": 646,
           "props": [
             "title=\"Nach unten\"",
             "icon=\"arrow\"",
@@ -203427,7 +203621,7 @@
         },
         {
           "tag": "ActionRow",
-          "line": 623,
+          "line": 646,
           "props": [
             "title=\"Entfernen\"",
             "icon=\"trash\"",
@@ -203437,31 +203631,31 @@
         },
         {
           "tag": "div",
-          "line": 627,
+          "line": 650,
           "props": [
             "className=\"document-discount-actions\""
           ]
         },
         {
           "tag": "p",
-          "line": 627,
+          "line": 650,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 627,
+          "line": 650,
           "props": []
         },
         {
           "tag": "ActionsMenu",
-          "line": 627,
+          "line": 650,
           "props": [
             "label=\"Rabattoptionen\""
           ]
         },
         {
           "tag": "ActionRow",
-          "line": 627,
+          "line": 650,
           "props": [
             "title=\"Gesamtrabatt\"",
             "icon=\"edit\"",
@@ -203470,7 +203664,7 @@
         },
         {
           "tag": "ActionRow",
-          "line": 627,
+          "line": 650,
           "props": [
             "title=\"Kundenrabatt übernehmen\"",
             "icon=\"check\"",
@@ -203479,7 +203673,7 @@
         },
         {
           "tag": "DocumentTotals",
-          "line": 627,
+          "line": 650,
           "props": [
             "draft={draft}",
             "totals={totals}"
@@ -203487,7 +203681,7 @@
         },
         {
           "tag": "FormSheet",
-          "line": 629,
+          "line": 652,
           "props": [
             "label={\"Position bearbeiten\"}",
             "description={item.description}",
@@ -203501,21 +203695,31 @@
         },
         {
           "tag": "div",
-          "line": 629,
+          "line": 652,
           "props": [
             "className=\"sheet-body mobile-position-fields\""
           ]
         },
         {
+          "tag": "p",
+          "line": 652,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 652,
+          "props": []
+        },
+        {
           "tag": "Field",
-          "line": 629,
+          "line": 652,
           "props": [
             "label=\"Beschreibung\""
           ]
         },
         {
           "tag": "Input",
-          "line": 629,
+          "line": 652,
           "props": [
             "value={item.description}",
             "onChange={e=>setPositionDraft({...item,description:e.target.value})}"
@@ -203523,43 +203727,45 @@
         },
         {
           "tag": "div",
-          "line": 629,
+          "line": 652,
           "props": []
         },
         {
           "tag": "Field",
-          "line": 629,
+          "line": 652,
           "props": [
-            "label=\"Menge\""
+            "label={item.priceBaseQuantity===60?\"Minuten\":\"Menge\"}"
           ]
         },
         {
           "tag": "Input",
-          "line": 629,
+          "line": 652,
           "props": [
-            "inputMode=\"decimal\"",
+            "readOnly={Boolean(item.timeAllocations?.length&&(item.timeAllocations.length>1||capacity.loading||capacity.error))}",
+            "inputMode={item.priceBaseQuantity===60?\"numeric\":\"decimal\"}",
             "value={item.quantity}",
-            "onChange={e=>setPositionDraft({...item,quantity:e.target.value})}"
+            "onChange={e=>setPositionDraft({...item,...quantityPatch(item,e.target.value)})}"
           ]
         },
         {
           "tag": "Field",
-          "line": 629,
+          "line": 652,
           "props": [
             "label=\"Einheit\""
           ]
         },
         {
           "tag": "Select",
-          "line": 629,
+          "line": 652,
           "props": [
+            "disabled={item.priceBaseQuantity===60}",
             "value={item.unit??\"Stück\"}",
             "onChange={e=>setPositionDraft({...item,unit:e.target.value})}"
           ]
         },
         {
           "tag": "option",
-          "line": 629,
+          "line": 652,
           "props": [
             "key={unit}",
             "value={unit}"
@@ -203567,20 +203773,21 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 629,
+          "line": 652,
           "props": []
         },
         {
           "tag": "Field",
-          "line": 629,
+          "line": 652,
           "props": [
             "label=\"Einzelpreis\""
           ]
         },
         {
           "tag": "Input",
-          "line": 629,
+          "line": 652,
           "props": [
+            "readOnly={item.priceBaseQuantity===60}",
             "inputMode=\"decimal\"",
             "value={item.price}",
             "onChange={e=>setPositionDraft({...item,price:e.target.value})}"
@@ -203588,7 +203795,7 @@
         },
         {
           "tag": "DiscountFields",
-          "line": 629,
+          "line": 652,
           "props": [
             "value={item.discount??{kind:'none'}}",
             "currency={draft.currency??'CHF'}",
@@ -203598,23 +203805,23 @@
         },
         {
           "tag": "Field",
-          "line": 629,
+          "line": 652,
           "props": [
             "label=\"MwSt.\""
           ]
         },
         {
           "tag": "Select",
-          "line": 629,
+          "line": 652,
           "props": [
             "value={item.vatRate??draft.vatRate}",
-            "disabled={item.taxExempt}",
+            "disabled={item.taxExempt||item.priceBaseQuantity===60}",
             "onChange={e=>setPositionDraft({...item,vatRate:e.target.value})}"
           ]
         },
         {
           "tag": "option",
-          "line": 629,
+          "line": 652,
           "props": [
             "key={rate}",
             "value={rate}"
@@ -203622,60 +203829,61 @@
         },
         {
           "tag": "Field",
-          "line": 629,
+          "line": 652,
           "props": [
             "label=\"Steuerbefreit\""
           ]
         },
         {
           "tag": "Input",
-          "line": 629,
+          "line": 652,
           "props": [
             "type=\"checkbox\"",
+            "disabled={item.priceBaseQuantity===60}",
             "checked={item.taxExempt??false}",
             "onChange={e=>setPositionDraft({...item,taxExempt:e.target.checked,...(e.target.checked?{vatRate:'0'}:{})})}"
           ]
         },
         {
           "tag": "ErrorState",
-          "line": 629,
+          "line": 652,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 629,
+          "line": 652,
           "props": []
         },
         {
           "tag": "div",
-          "line": 629,
+          "line": 652,
           "props": [
             "className=\"mobile-position-sheet-total\""
           ]
         },
         {
           "tag": "span",
-          "line": 629,
+          "line": 652,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 629,
+          "line": 652,
           "props": []
         },
         {
           "tag": "b",
-          "line": 629,
+          "line": 652,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 629,
+          "line": 652,
           "props": []
         },
         {
           "tag": "button",
-          "line": 629,
+          "line": 652,
           "props": [
             "className=\"text-action mobile-position-remove\"",
             "type=\"button\"",
@@ -203685,19 +203893,19 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 629,
+          "line": 652,
           "props": []
         },
         {
           "tag": "FormActions",
-          "line": 629,
+          "line": 652,
           "props": [
             "sheet"
           ]
         },
         {
           "tag": "Button",
-          "line": 629,
+          "line": 652,
           "props": [
             "variant=\"secondary\"",
             "onClick={closePosition}"
@@ -203705,12 +203913,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 629,
+          "line": 652,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 629,
+          "line": 652,
           "props": [
             "disabled={Boolean(positionTotals.error)}",
             "onClick={()=>{updatePosition(item.id,item);closePosition()}}"
@@ -203718,12 +203926,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 629,
+          "line": 652,
           "props": []
         },
         {
           "tag": "FormSheet",
-          "line": 630,
+          "line": 653,
           "props": [
             "label=\"Gesamtrabatt\"",
             "open={discountOpen}",
@@ -203733,14 +203941,14 @@
         },
         {
           "tag": "div",
-          "line": 630,
+          "line": 653,
           "props": [
             "className=\"sheet-body\""
           ]
         },
         {
           "tag": "DiscountFields",
-          "line": 630,
+          "line": 653,
           "props": [
             "value={discountDraft}",
             "currency={draft.currency??'CHF'}",
@@ -203750,17 +203958,17 @@
         },
         {
           "tag": "ErrorState",
-          "line": 630,
+          "line": 653,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 630,
+          "line": 653,
           "props": []
         },
         {
           "tag": "DocumentTotals",
-          "line": 630,
+          "line": 653,
           "props": [
             "draft={draft}",
             "totals={discountTotals}"
@@ -203768,14 +203976,14 @@
         },
         {
           "tag": "FormActions",
-          "line": 630,
+          "line": 653,
           "props": [
             "sheet"
           ]
         },
         {
           "tag": "Button",
-          "line": 630,
+          "line": 653,
           "props": [
             "variant=\"secondary\"",
             "onClick={()=>setDiscountOpen(false)}"
@@ -203783,12 +203991,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 630,
+          "line": 653,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 630,
+          "line": 653,
           "props": [
             "disabled={Boolean(discountTotals.error)}",
             "onClick={()=>{onChange({...draft,discount:discountDraft,discountOrigin:discountDraft.kind==='none'?'removed':discountOrigin});setDiscountOpen(false)}}"
@@ -203796,12 +204004,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 630,
+          "line": 653,
           "props": []
         },
         {
           "tag": "div",
-          "line": 631,
+          "line": 654,
           "props": [
             "hidden={step!==undefined&&step!==2}",
             "className=\"form-section optional-row document-note-section\""
@@ -203809,7 +204017,7 @@
         },
         {
           "tag": "button",
-          "line": 631,
+          "line": 654,
           "props": [
             "className=\"text-action add-note-action\"",
             "type=\"button\"",
@@ -203818,7 +204026,7 @@
         },
         {
           "tag": "Icon",
-          "line": 631,
+          "line": 654,
           "props": [
             "name=\"plus\"",
             "size={16}"
@@ -203826,12 +204034,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 631,
+          "line": 654,
           "props": []
         },
         {
           "tag": "SectionTitle",
-          "line": 631,
+          "line": 654,
           "props": [
             "title=\"Notiz\"",
             "action={!draft.note&&<button className=\"text-action\" type=\"button\" onClick={()=>setNoteOpen(false)}><LocalizedText>{\"Schliessen\"}</LocalizedText></button>}"
@@ -203839,7 +204047,7 @@
         },
         {
           "tag": "button",
-          "line": 631,
+          "line": 654,
           "props": [
             "className=\"text-action\"",
             "type=\"button\"",
@@ -203848,19 +204056,19 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 631,
+          "line": 654,
           "props": []
         },
         {
           "tag": "Field",
-          "line": 631,
+          "line": 654,
           "props": [
             "label=\"Text für den Kunden\""
           ]
         },
         {
           "tag": "Textarea",
-          "line": 631,
+          "line": 654,
           "props": [
             "autoFocus",
             "value={draft.note}",
@@ -203871,91 +204079,127 @@
       ],
       "conditions": [
         {
-          "line": 567,
+          "line": 585,
           "expression": "positionDraft"
         },
         {
-          "line": 567,
+          "line": 585,
           "expression": "l.id===positionDraft.id"
         },
         {
-          "line": 568,
+          "line": 586,
           "expression": "customer"
-        },
-        {
-          "line": 568,
-          "expression": "customer"
-        },
-        {
-          "line": 573,
-          "expression": "item.id===id"
-        },
-        {
-          "line": 577,
-          "expression": "typeof crypto!==\"undefined\"&&\"randomUUID\" in crypto"
-        },
-        {
-          "line": 582,
-          "expression": "draft.positions.length===1"
         },
         {
           "line": 586,
-          "expression": "names.length===0"
+          "expression": "customer"
         },
         {
           "line": 591,
+          "expression": "sourceIds"
+        },
+        {
+          "line": 591,
+          "expression": "draft.id"
+        },
+        {
+          "line": 592,
+          "expression": "item.timeAllocations?.length===1"
+        },
+        {
+          "line": 593,
+          "expression": "item.timeAllocations?.length===1"
+        },
+        {
+          "line": 595,
+          "expression": "item.id===id"
+        },
+        {
+          "line": 599,
+          "expression": "typeof crypto!==\"undefined\"&&\"randomUUID\" in crypto"
+        },
+        {
+          "line": 604,
+          "expression": "draft.positions.length===1"
+        },
+        {
+          "line": 608,
+          "expression": "names.length===0"
+        },
+        {
+          "line": 613,
           "expression": "type===\"Angebot\""
         },
         {
-          "line": 594,
+          "line": 616,
           "expression": "item"
         },
         {
-          "line": 594,
+          "line": 616,
           "expression": "type==='Rechnung'"
         },
         {
-          "line": 594,
+          "line": 616,
           "expression": "item.paymentDays==null"
         },
         {
-          "line": 597,
+          "line": 619,
           "expression": "step===2"
         },
         {
-          "line": 597,
+          "line": 619,
           "expression": "type===\"Angebot\""
         },
         {
-          "line": 600,
+          "line": 622,
           "expression": "type===\"Rechnung\""
         },
         {
-          "line": 601,
+          "line": 623,
           "expression": "type===\"Rechnung\""
         },
         {
-          "line": 602,
+          "line": 624,
           "expression": "type===\"Rechnung\""
         },
         {
-          "line": 629,
+          "line": 626,
+          "expression": "item.priceBaseQuantity===60"
+        },
+        {
+          "line": 642,
+          "expression": "item.priceBaseQuantity===60"
+        },
+        {
+          "line": 642,
+          "expression": "item.priceBaseQuantity===60"
+        },
+        {
+          "line": 652,
           "expression": "!item"
         },
         {
-          "line": 629,
+          "line": 652,
+          "expression": "item.priceBaseQuantity===60"
+        },
+        {
+          "line": 652,
+          "expression": "item.priceBaseQuantity===60"
+        },
+        {
+          "line": 652,
           "expression": "e.target.checked"
         },
         {
-          "line": 630,
+          "line": 653,
           "expression": "discountTotals.error"
         },
         {
-          "line": 630,
+          "line": 653,
           "expression": "discountDraft.kind==='none'"
         },
         {
-          "line": 631,
+          "line": 654,
           "expression": "!noteOpen"
         }
       ]
@@ -204071,7 +204315,7 @@
       "key": "components/documents.tsx#DiscountFields",
       "file": "components/documents.tsx",
       "name": "DiscountFields",
-      "line": 541,
+      "line": 559,
       "classes": [
         "document-discount-fields"
       ],
@@ -204080,31 +204324,31 @@
       "widgets": [
         {
           "tag": "Field",
-          "line": 542
+          "line": 560
         },
         {
           "tag": "Field",
-          "line": 542
+          "line": 560
         }
       ],
       "elements": [
         {
           "tag": "section",
-          "line": 542,
+          "line": 560,
           "props": [
             "className=\"document-discount-fields\""
           ]
         },
         {
           "tag": "Field",
-          "line": 542,
+          "line": 560,
           "props": [
             "label={label}"
           ]
         },
         {
           "tag": "Select",
-          "line": 542,
+          "line": 560,
           "props": [
             "value={value.kind}",
             "onChange={e=>onChange(e.target.value==='none'?{kind:'none'}:e.target.value==='percent'?{kind:'percent',value:'0'}:{kind:'fixed',value:'0',currency})}"
@@ -204112,50 +204356,50 @@
         },
         {
           "tag": "option",
-          "line": 542,
+          "line": 560,
           "props": [
             "value=\"none\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 542,
+          "line": 560,
           "props": []
         },
         {
           "tag": "option",
-          "line": 542,
+          "line": 560,
           "props": [
             "value=\"percent\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 542,
+          "line": 560,
           "props": []
         },
         {
           "tag": "option",
-          "line": 542,
+          "line": 560,
           "props": [
             "value=\"fixed\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 542,
+          "line": 560,
           "props": []
         },
         {
           "tag": "Field",
-          "line": 542,
+          "line": 560,
           "props": [
             "label={value.kind==='percent'?'Rabatt in Prozent':'Rabattbetrag'}"
           ]
         },
         {
           "tag": "Input",
-          "line": 542,
+          "line": 560,
           "props": [
             "inputMode=\"decimal\"",
             "value={value.value}",
@@ -204165,15 +204409,15 @@
       ],
       "conditions": [
         {
-          "line": 542,
+          "line": 560,
           "expression": "e.target.value==='none'"
         },
         {
-          "line": 542,
+          "line": 560,
           "expression": "e.target.value==='percent'"
         },
         {
-          "line": 542,
+          "line": 560,
           "expression": "value.kind==='percent'"
         }
       ]
@@ -204182,7 +204426,7 @@
       "key": "components/documents.tsx#DocumentReview",
       "file": "components/documents.tsx",
       "name": "DocumentReview",
-      "line": 469,
+      "line": 487,
       "classes": [
         "document-review",
         "form-section",
@@ -204194,21 +204438,21 @@
       "elements": [
         {
           "tag": "div",
-          "line": 471,
+          "line": 489,
           "props": [
             "className=\"document-review\""
           ]
         },
         {
           "tag": "section",
-          "line": 472,
+          "line": 490,
           "props": [
             "className=\"form-section\""
           ]
         },
         {
           "tag": "SectionTitle",
-          "line": 472,
+          "line": 490,
           "props": [
             "title=\"Kunde\"",
             "action={<Button variant=\"ghost\" icon=\"edit\" onClick={()=>onStep(0)}><LocalizedText>{\"Bearbeiten\"}</LocalizedText></Button>}"
@@ -204216,7 +204460,7 @@
         },
         {
           "tag": "Button",
-          "line": 472,
+          "line": 490,
           "props": [
             "variant=\"ghost\"",
             "icon=\"edit\"",
@@ -204225,34 +204469,34 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 472,
+          "line": 490,
           "props": []
         },
         {
           "tag": "strong",
-          "line": 472,
+          "line": 490,
           "props": []
         },
         {
           "tag": "p",
-          "line": 472,
+          "line": 490,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 472,
+          "line": 490,
           "props": []
         },
         {
           "tag": "section",
-          "line": 473,
+          "line": 491,
           "props": [
             "className=\"form-section\""
           ]
         },
         {
           "tag": "SectionTitle",
-          "line": 473,
+          "line": 491,
           "props": [
             "title=\"Positionen\"",
             "action={<Button variant=\"ghost\" icon=\"edit\" onClick={()=>onStep(1)}><LocalizedText>{\"Bearbeiten\"}</LocalizedText></Button>}"
@@ -204260,7 +204504,7 @@
         },
         {
           "tag": "Button",
-          "line": 473,
+          "line": 491,
           "props": [
             "variant=\"ghost\"",
             "icon=\"edit\"",
@@ -204269,53 +204513,58 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 473,
+          "line": 491,
           "props": []
         },
         {
           "tag": "div",
-          "line": 473,
+          "line": 491,
           "props": [
             "className=\"document-review-positions\""
           ]
         },
         {
           "tag": "div",
-          "line": 473,
+          "line": 491,
           "props": [
             "key={item.id}"
           ]
         },
         {
           "tag": "span",
-          "line": 473,
+          "line": 491,
           "props": []
         },
         {
           "tag": "b",
-          "line": 473,
+          "line": 491,
           "props": []
         },
         {
           "tag": "small",
-          "line": 473,
+          "line": 491,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 491,
           "props": []
         },
         {
           "tag": "strong",
-          "line": 473,
+          "line": 491,
           "props": []
         },
         {
           "tag": "section",
-          "line": 474,
+          "line": 492,
           "props": [
             "className=\"form-section\""
           ]
         },
         {
           "tag": "SectionTitle",
-          "line": 474,
+          "line": 492,
           "props": [
             "title={type===\"Angebot\"?\"Gültig bis\":\"Zahlungsbedingungen\"}",
             "action={<Button variant=\"ghost\" icon=\"edit\" onClick={()=>onStep(2)}><LocalizedText>{\"Bearbeiten\"}</LocalizedText></Button>}"
@@ -204323,7 +204572,7 @@
         },
         {
           "tag": "Button",
-          "line": 474,
+          "line": 492,
           "props": [
             "variant=\"ghost\"",
             "icon=\"edit\"",
@@ -204332,27 +204581,27 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 474,
+          "line": 492,
           "props": []
         },
         {
           "tag": "p",
-          "line": 474,
+          "line": 492,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 474,
+          "line": 492,
           "props": []
         },
         {
           "tag": "p",
-          "line": 474,
+          "line": 492,
           "props": []
         },
         {
           "tag": "DocumentTotals",
-          "line": 475,
+          "line": 493,
           "props": [
             "draft={draft}",
             "totals={totals}"
@@ -204361,15 +204610,15 @@
       ],
       "conditions": [
         {
-          "line": 472,
+          "line": 490,
           "expression": "type===\"Rechnung\""
         },
         {
-          "line": 474,
+          "line": 492,
           "expression": "type===\"Angebot\""
         },
         {
-          "line": 474,
+          "line": 492,
           "expression": "type===\"Rechnung\""
         }
       ]
@@ -204378,7 +204627,7 @@
       "key": "components/documents.tsx#documentPreviewPayload",
       "file": "components/documents.tsx",
       "name": "documentPreviewPayload",
-      "line": 155,
+      "line": 158,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -244950,7 +245199,7 @@
       "key": "components/documents.tsx#InvoiceEditor",
       "file": "components/documents.tsx",
       "name": "InvoiceEditor",
-      "line": 258,
+      "line": 264,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -244958,7 +245207,7 @@
       "elements": [
         {
           "tag": "DocumentPage",
-          "line": 259,
+          "line": 265,
           "props": [
             "kind=\"Rechnung\"",
             "existing={existing}",
@@ -251702,7 +251951,7 @@
             "meta={timeMetadata(item.description||item.project_name,item.project_name,item.employee_name,swissDate(item.started_at))+\" · \"+classificationMeta(item)}",
             "value={formatMinutes(Number(item.duration_minutes??0))+\" h\"}",
             "status={item.invoiced_invoice_id?\"Verrechnet\":item.billable&&!item.customer_id?\"Zuordnen\":item.approved?\"Freigegeben\":item.submitted_at?\"Zur Prüfung\":item.billable?\"Erfasst\":\"Intern\"}",
-            "selection={canInvoice&&!item.external_resource_id&&item.customer_id&&item.billable&&item.approved&&!item.invoiced_invoice_id?<Input type=\"checkbox\" aria-label=\"Zeit für Rechnung auswählen\" checked={selectedTimeIds.includes(item.id)} onChange={e=>setSelectedTimeIds(current=>e.target.checked?[...current,item.id]:current.filter(id=>id!==item.id))}/>:undefined}",
+            "selection={canInvoice&&(!item.external_resource_id||actor.data?.tenant?.plan==='pro')&&item.customer_id&&item.billable&&item.approved&&!item.invoiced_invoice_id?<Input type=\"checkbox\" aria-label=\"Zeit für Rechnung auswählen\" checked={selectedTimeIds.includes(item.id)} onChange={e=>setSelectedTimeIds(current=>e.target.checked?[...current,item.id]:current.filter(id=>id!==item.id))}/>:undefined}",
             "action={<>{item.external_resource_id&&item.approved&&canInvoice&&actor.data?.tenant?.plan==='pro'&&<TimePriceSource entryId={item.id} billable={item.billable===true}/>}{item.report_month&&<MonthlyTimeReport timeOnly={timeOnly} entry={item} readOnly={item.created_by_user_id!==actorId} canReview={canApprove&&item.created_by_user_id!==actorId&&!!item.submitted_at&&!item.approved}/>}{!item.report_month&&!item.invoiced_invoice_id&&!item.approved?(canApprove&&item.created_by_user_id!==actorId&&!!item.submitted_at?<button type=\"button\" className=\"text-action\" onClick={()=>void approveTime(item.id)}><LocalizedText>{\"Freigeben\"}</LocalizedText></button>:canRecord&&item.created_by_user_id===actorId&&!item.submitted_at?<button type=\"button\" className=\"text-action\" onClick={()=>void submitTime(item.id)}><LocalizedText>{\"Zur Prüfung\"}</LocalizedText></button>:undefined):undefined}</>}"
           ]
         },
@@ -253206,7 +253455,7 @@
         },
         {
           "line": 188,
-          "expression": "canInvoice&&!item.external_resource_id&&item.customer_id&&item.billable&&item.approved&&!item.invoiced_invoice_id"
+          "expression": "canInvoice&&(!item.external_resource_id||actor.data?.tenant?.plan==='pro')&&item.customer_id&&item.billable&&item.approved&&!item.invoiced_invoice_id"
         },
         {
           "line": 188,
@@ -257554,7 +257803,7 @@
     {
       "file": "components/documents.tsx",
       "name": "DocumentDraft",
-      "line": 50,
+      "line": 53,
       "usedBy": [
         "/angebote/[id]",
         "/angebote/neu",
@@ -257566,7 +257815,7 @@
     {
       "file": "components/documents.tsx",
       "name": "useCustomerDirectory",
-      "line": 88,
+      "line": 91,
       "usedBy": [
         "/angebote/[id]",
         "/angebote/neu",
@@ -257578,7 +257827,7 @@
     {
       "file": "components/documents.tsx",
       "name": "lineAmount",
-      "line": 170,
+      "line": 174,
       "usedBy": [
         "/angebote/[id]",
         "/angebote/neu",
@@ -257590,7 +257839,7 @@
     {
       "file": "components/documents.tsx",
       "name": "remoteDraftFromItem",
-      "line": 172,
+      "line": 176,
       "usedBy": [
         "/angebote/[id]",
         "/angebote/neu",
@@ -257602,7 +257851,7 @@
     {
       "file": "components/documents.tsx",
       "name": "useExistingDocument",
-      "line": 235,
+      "line": 241,
       "usedBy": [
         "/angebote/[id]",
         "/angebote/neu",
@@ -257614,7 +257863,7 @@
     {
       "file": "components/documents.tsx",
       "name": "OfferEditor",
-      "line": 254,
+      "line": 260,
       "usedBy": [
         "/angebote/[id]",
         "/angebote/neu"
@@ -257624,7 +257873,7 @@
     {
       "file": "components/documents.tsx",
       "name": "InvoiceEditor",
-      "line": 258,
+      "line": 264,
       "usedBy": [
         "/rechnungen/[id]",
         "/rechnungen/neu"
@@ -257634,7 +257883,7 @@
     {
       "file": "components/documents.tsx",
       "name": "DocumentPage",
-      "line": 262,
+      "line": 268,
       "usedBy": [
         "/angebote/[id]",
         "/angebote/neu",
@@ -257646,7 +257895,7 @@
     {
       "file": "components/documents.tsx",
       "name": "DocumentReview",
-      "line": 469,
+      "line": 487,
       "usedBy": [
         "/angebote/[id]",
         "/angebote/neu",
@@ -257658,7 +257907,7 @@
     {
       "file": "components/documents.tsx",
       "name": "DocumentReadView",
-      "line": 488,
+      "line": 506,
       "usedBy": [
         "/angebote/[id]",
         "/angebote/neu",
@@ -257670,7 +257919,7 @@
     {
       "file": "components/documents.tsx",
       "name": "DiscountFields",
-      "line": 541,
+      "line": 559,
       "usedBy": [
         "/angebote/[id]",
         "/angebote/neu",
@@ -257682,7 +257931,7 @@
     {
       "file": "components/documents.tsx",
       "name": "DocumentTotals",
-      "line": 544,
+      "line": 562,
       "usedBy": [
         "/angebote/[id]",
         "/angebote/neu",
@@ -257694,7 +257943,7 @@
     {
       "file": "components/documents.tsx",
       "name": "DocumentEditor",
-      "line": 556,
+      "line": 574,
       "usedBy": [
         "/angebote/[id]",
         "/angebote/neu",
@@ -257706,7 +257955,7 @@
     {
       "file": "components/documents.tsx",
       "name": "EMPTY_COMPANY",
-      "line": 636,
+      "line": 659,
       "usedBy": [
         "/angebote/[id]",
         "/angebote/neu",
@@ -257718,7 +257967,7 @@
     {
       "file": "components/documents.tsx",
       "name": "useDocumentCompany",
-      "line": 637,
+      "line": 660,
       "usedBy": [
         "/angebote/[id]",
         "/angebote/neu",

@@ -188,9 +188,9 @@ export async function apiPatch<T>(path:string,body:unknown,validate?:(value:unkn
   return mutationResult<T>(response,path,"Änderung konnte nicht gespeichert werden.",revision,"PATCH",validate);
 }
 
-export async function apiDelete<T>(path:string,body?:unknown):Promise<T>{
+export async function apiDelete<T>(path:string,body?:unknown,options:{idempotencyKey?:string}={}):Promise<T>{
   const revision=dataRevision([]);
-  const response=await fetchApi(path,{method:"DELETE",...(body===undefined?{}:{headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})});
+  const response=await fetchApi(path,{method:"DELETE",headers:{...(body===undefined?{}:{'Content-Type':'application/json'}),...(options.idempotencyKey?{'Idempotency-Key':options.idempotencyKey}:{})},...(body===undefined?{}:{body:JSON.stringify(body)})});
   return mutationResult<T>(response,path,"Löschen konnte nicht ausgeführt werden.",revision,"DELETE");
 }
 

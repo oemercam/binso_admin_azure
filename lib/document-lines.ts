@@ -2,8 +2,8 @@
 export const documentUnits = ['Stück', 'Stunden', 'Tage', 'Pauschal', 'Meter', 'm²', 'Kilometer'] as const;
 export function documentUnitOptions(current?:string){return current&&!documentUnits.some(unit=>unit===current)?[current,...documentUnits]:[...documentUnits];}
 export const positionNumber=(index:number)=>String(index+1).padStart(2,'0');
-type LinkedLine={id:string;expenseIds?:string[];timeEntryIds?:string[]};
-export function canDuplicateDocumentLine(line:LinkedLine){return !line.expenseIds?.length&&!line.timeEntryIds?.length;}
+type LinkedLine={id:string;expenseIds?:string[];timeEntryIds?:string[];timeAllocations?:readonly unknown[]};
+export function canDuplicateDocumentLine(line:LinkedLine){return !line.expenseIds?.length&&!line.timeEntryIds?.length&&!line.timeAllocations?.length;}
 export function moveDocumentLine<T extends LinkedLine>(lines:readonly T[],id:string,direction:-1|1):T[]{
  const index=lines.findIndex(line=>line.id===id),target=index+direction;
  if(index<0||target<0||target>=lines.length)return [...lines];

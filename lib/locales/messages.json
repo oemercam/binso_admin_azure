@@ -15842,5 +15842,45 @@
     "The selected minutes are already reserved. Please reload the remaining quantity.",
     "Les minutes sélectionnées sont déjà réservées. Recharge la quantité restante.",
     "I minuti selezionati sono già riservati. Ricarica la quantità rimanente."
+  ],
+  "Bitte gültige ganze Minuten innerhalb der verfügbaren Restmenge erfassen.": [
+    "Please enter valid whole minutes within the available remaining quantity.",
+    "Saisis des minutes entières valides dans la limite de la quantité restante disponible.",
+    "Inserisci minuti interi validi entro la quantità rimanente disponibile."
+  ],
+  "Verfügbare Minuten": [
+    "Available minutes",
+    "Minutes disponibles",
+    "Minuti disponibili"
+  ],
+  " / 60 min": [
+    " / 60 min",
+    " / 60 min",
+    " / 60 min"
+  ],
+  "Entwurf verwerfen": [
+    "Discard draft",
+    "Abandonner le brouillon",
+    "Scarta bozza"
+  ],
+  "Entwurf konnte nicht verworfen werden.": [
+    "The draft could not be discarded.",
+    "Le brouillon n’a pas pu être abandonné.",
+    "Impossibile scartare la bozza."
+  ],
+  "Der Entwurf wird archiviert. Reservierte Minuten werden freigegeben. Es wird keine Rechnung ausgestellt.": [
+    "The draft will be archived. Reserved minutes will be released. No invoice will be issued.",
+    "Le brouillon sera archivé. Les minutes réservées seront libérées. Aucune facture ne sera émise.",
+    "La bozza verrà archiviata. I minuti riservati verranno liberati. Non verrà emessa alcuna fattura."
+  ],
+  "/ 60 min": [
+    "/ 60 min",
+    "/ 60 min",
+    "/ 60 min"
+  ],
+  "Minuten": [
+    "Minutes",
+    "Minutes",
+    "Minuti"
   ]
 }
