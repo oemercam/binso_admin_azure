@@ -83,7 +83,8 @@ assert.equal(packageJson.scripts['security:scan'],'pnpm audit --prod --audit-lev
 assert.equal(packageJson.scripts['security:scan:all'],'node scripts/full-security-audit.mjs','Full dependency audit must use the exact advisory gate');
 await fs.access('scripts/full-security-audit.mjs');
 const fullAuditGate=await readPageFile('scripts/full-security-audit.mjs','utf8');
-assert.ok(fullAuditGate.includes('GHSA-VFJ7-8CJW-P6XM'),'Full dependency audit may tolerate only the documented unresolved dev-tool advisory');
+assert.ok(fullAuditGate.includes('checkAdvisories(report)'),'Full dependency audit validates structured failures');
+assert.doesNotMatch(fullAuditGate,/Temporary exact|2026-10-24|GHSA-VFJ7/i,'Removed vulnerable dependency cannot retain its former audit exception');
 
 await import("./repository-cleanliness-check.mjs");
 

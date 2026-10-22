@@ -88,11 +88,15 @@
   "pnpm": {
     "overrides": {
       "source-map-js": "1.2.2",
-      "exceljs>uuid": "11.1.1"
+      "exceljs>uuid": "11.1.1",
+      "@next/eslint-plugin-next>fast-glob": "-"
     },
     "onlyBuiltDependencies": [
       "unrs-resolver"
-    ]
+    ],
+    "patchedDependencies": {
+      "@next/eslint-plugin-next@16.3.8": "patches/@next__eslint-plugin-next@16.3.8.patch"
+    }
   },
   "browserslist": {
     "production": [

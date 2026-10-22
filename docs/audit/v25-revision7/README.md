@@ -13,7 +13,8 @@ fachliche, visuelle oder produktive Freigabe.
 | [Rollen und Zustände](route-role-states.csv) | 5588 geplante Rollen-/Zustandsfälle. Planung ist keine Ausführung. |
 | [Rollenfokus und Kennzahlen](route-role-kpi.csv) | Rollenabhängiger Seitenzweck und erreichbare Daten-/KPI-Owner; keine Berechnungs- oder Sichtfreigabe aus dem Importgraphen. |
 | [Implementierungsnachweise](evidence.json) | Quellhashgebundene Teilnachweise und explizite externe Blocker. Ergebnisnotizen allein erteilen keine Freigabe. |
-| [Tatsächlicher CI-Nachweis7bc770a4](ci-7bc770a4.json) | Verdichteter Originalreport inklusive Commit/Run/Artefakt/Reporthash; aktuelle Quellenänderungen benötigen neue Prüfungen. |
+| [Abgleich7bc/a9b](evidence-reconciliation.md) / [a9b-Report](ci-a9b7e1fc.json) | Getrennte tatsächliche Commit-/Run-/Artefaktnachweise; neue Quellen benötigen neue Prüfungen. |
+| [Priorisierte Restbewertung](completion-review.md) | Implementierungslücken, fehlende Abnahmen und externe Konfiguration getrennt. |
 
 ## Zentrale Implementierungspakete
 
@@ -39,7 +40,7 @@ fachliche, visuelle oder produktive Freigabe.
 
 ## Was ausdrücklich noch nicht nachgewiesen ist
 
-Der erfolgreiche vollständige Development-Lauf39691829176 auf7bc770a4 enthält
+Der erfolgreiche vollständige Development-Lauf39697429990 aufa9b7e1fc enthält
 beide funktionalen Browserjobs und alle sechs Responsive-Jobs sowie tatsächliche
 PostgreSQL-Parallelprüfungen. Der Compliance-Report bleibt `compliant:false`:
 0 fehlgeschlagene Checks bedeuten nicht573 unabhängige Klauselfreigaben. Er enthält
@@ -55,9 +56,11 @@ Zustellung/Bounces und externe Mailclients, genehmigte Domains/DNS/Push sowie
 ein kontrollierter echter Restore-Nachweis. Eine reine statische Abdeckung schliesst
 diese Punkte nicht. Die MwSt.-Auswertung ist keine vollständige Steuerdeklaration.
 
-Ein vorhandener hoher Entwicklungsabhängigkeitsbefund (`braces`, GHSA-vfj7-8cjw-p6xm)
-ist nicht behoben. Die bestehende eng begrenzte Ausnahme endet am24.10.2026 und
-wurde weder erweitert noch verlängert. Produktionsabhängigkeitsprüfungen bleiben.
+Der bisher offene Entwicklungsbefund `braces` wurde im aktuellen Folgequellbaum
+[ursächlich aus dem Next-Lintpfad entfernt](security-braces.md). Die Audit-Ausnahme
+ist entfernt; alle High-/Critical-Befunde bleiben blockierend. Lokale gezielte Tests,
+Frozen-Installation, Lint und Dependency-Audits bestehen. Neue vollständige Commit-CI
+ist für diesen Folgequellstand noch erforderlich; Main wurde dadurch nicht geändert.
 
 Alle Änderungen liegen auf `feat/v25-revision7`, Draft-PR307. Main, bestehende
 Sicherheitsarbeiten und andere offene PRs bleiben erhalten. Neue Migrationen wurden

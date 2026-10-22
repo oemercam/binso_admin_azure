@@ -160,49 +160,49 @@
       "status": "teilweise_implementiert",
       "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
       "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
-      "blocker": "Vollständige fachliche/visuelle/Geräte- und Providerabnahme offen; MwSt.-/Angebotsberichte und physische Retention-Anbindung fehlen. Mail-/Link-Backend isoliert geprüft, aktuelle HTTP-/UI-Abnahme offen."
+      "blocker": "Angebots-/informative MwSt.-Auswertung, privater Mail-/Link-Backend und begrenzte Retention sind implementiert. Historische Gutschriften enthalten keine belastbare Steueraufteilung; keine vollständige Steuerdeklaration behaupten. Produktive Retention-Scopes, echte Providerzustellung, rechtliche/fachliche und reale Geräteabnahme bleiben offen. CI a9b7e1fc qualifiziert nur diesen historischen Quellstand; geänderte Quellen benötigen neue Nachweise."
     },
     "R7-43-002": {
       "sourceTextSha256": "01e592cfef11fe3a4de63c810e30ecb14dcb92433c39b0bb1ea42ade6830f571",
       "status": "teilweise_implementiert",
       "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
       "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
-      "blocker": "Vollständige fachliche/visuelle/Geräte- und Providerabnahme offen; MwSt.-/Angebotsberichte und physische Retention-Anbindung fehlen. Mail-/Link-Backend isoliert geprüft, aktuelle HTTP-/UI-Abnahme offen."
+      "blocker": "Angebots-/informative MwSt.-Auswertung, privater Mail-/Link-Backend und begrenzte Retention sind implementiert. Historische Gutschriften enthalten keine belastbare Steueraufteilung; keine vollständige Steuerdeklaration behaupten. Produktive Retention-Scopes, echte Providerzustellung, rechtliche/fachliche und reale Geräteabnahme bleiben offen. CI a9b7e1fc qualifiziert nur diesen historischen Quellstand; geänderte Quellen benötigen neue Nachweise."
     },
     "R7-43-003": {
       "sourceTextSha256": "f6da52b94b9d5892f10c7ce01e0a566abba59129e9a04a498f03115ea771c1a3",
       "status": "teilweise_implementiert",
       "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
       "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
-      "blocker": "Vollständige fachliche/visuelle/Geräte- und Providerabnahme offen; MwSt.-/Angebotsberichte und physische Retention-Anbindung fehlen. Mail-/Link-Backend isoliert geprüft, aktuelle HTTP-/UI-Abnahme offen."
+      "blocker": "Angebots-/informative MwSt.-Auswertung, privater Mail-/Link-Backend und begrenzte Retention sind implementiert. Historische Gutschriften enthalten keine belastbare Steueraufteilung; keine vollständige Steuerdeklaration behaupten. Produktive Retention-Scopes, echte Providerzustellung, rechtliche/fachliche und reale Geräteabnahme bleiben offen. CI a9b7e1fc qualifiziert nur diesen historischen Quellstand; geänderte Quellen benötigen neue Nachweise."
     },
     "R7-43-004": {
       "sourceTextSha256": "820af352f27eff887d409d75f0064d6595b3d64ff2f66714c75c73b0c54acfe9",
       "status": "teilweise_implementiert",
       "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
       "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
-      "blocker": "Vollständige fachliche/visuelle/Geräte- und Providerabnahme offen; MwSt.-/Angebotsberichte und physische Retention-Anbindung fehlen. Mail-/Link-Backend isoliert geprüft, aktuelle HTTP-/UI-Abnahme offen."
+      "blocker": "Angebots-/informative MwSt.-Auswertung, privater Mail-/Link-Backend und begrenzte Retention sind implementiert. Historische Gutschriften enthalten keine belastbare Steueraufteilung; keine vollständige Steuerdeklaration behaupten. Produktive Retention-Scopes, echte Providerzustellung, rechtliche/fachliche und reale Geräteabnahme bleiben offen. CI a9b7e1fc qualifiziert nur diesen historischen Quellstand; geänderte Quellen benötigen neue Nachweise."
     },
     "R7-43-005": {
       "sourceTextSha256": "f302ab3455d23e2aebfe9abae1f0a0d6df43760952623f1aed3d6d29964f57a5",
       "status": "teilweise_implementiert",
       "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
       "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
-      "blocker": "Vollständige fachliche/visuelle/Geräte- und Providerabnahme offen; MwSt.-/Angebotsberichte und physische Retention-Anbindung fehlen. Mail-/Link-Backend isoliert geprüft, aktuelle HTTP-/UI-Abnahme offen."
+      "blocker": "Angebots-/informative MwSt.-Auswertung, privater Mail-/Link-Backend und begrenzte Retention sind implementiert. Historische Gutschriften enthalten keine belastbare Steueraufteilung; keine vollständige Steuerdeklaration behaupten. Produktive Retention-Scopes, echte Providerzustellung, rechtliche/fachliche und reale Geräteabnahme bleiben offen. CI a9b7e1fc qualifiziert nur diesen historischen Quellstand; geänderte Quellen benötigen neue Nachweise."
     },
     "R7-43-006": {
       "sourceTextSha256": "6ecb4c46add005e12b9fd770019d9c146e009fd74b8837a636b403fb0fa91dfc",
       "status": "teilweise_implementiert",
       "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
       "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
-      "blocker": "Vollständige fachliche/visuelle/Geräte- und Providerabnahme offen; MwSt.-/Angebotsberichte und physische Retention-Anbindung fehlen. Mail-/Link-Backend isoliert geprüft, aktuelle HTTP-/UI-Abnahme offen."
+      "blocker": "Angebots-/informative MwSt.-Auswertung, privater Mail-/Link-Backend und begrenzte Retention sind implementiert. Historische Gutschriften enthalten keine belastbare Steueraufteilung; keine vollständige Steuerdeklaration behaupten. Produktive Retention-Scopes, echte Providerzustellung, rechtliche/fachliche und reale Geräteabnahme bleiben offen. CI a9b7e1fc qualifiziert nur diesen historischen Quellstand; geänderte Quellen benötigen neue Nachweise."
     },
     "R7-43-007": {
       "sourceTextSha256": "bc7772c96d2717be2536167bb81490adec1b421da39c4d04857d428128b15e1a",
       "status": "teilweise_implementiert",
       "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
       "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
-      "blocker": "Vollständige fachliche/visuelle/Geräte- und Providerabnahme offen; MwSt.-/Angebotsberichte und physische Retention-Anbindung fehlen. Mail-/Link-Backend isoliert geprüft, aktuelle HTTP-/UI-Abnahme offen."
+      "blocker": "Angebots-/informative MwSt.-Auswertung, privater Mail-/Link-Backend und begrenzte Retention sind implementiert. Historische Gutschriften enthalten keine belastbare Steueraufteilung; keine vollständige Steuerdeklaration behaupten. Produktive Retention-Scopes, echte Providerzustellung, rechtliche/fachliche und reale Geräteabnahme bleiben offen. CI a9b7e1fc qualifiziert nur diesen historischen Quellstand; geänderte Quellen benötigen neue Nachweise."
     },
     "R7-43-008": {
       "sourceTextSha256": "7f9bbd76986aca52fc679aa689867d8aef58f62d3cfe6998887a3f2a30202252",
@@ -216,14 +216,14 @@
       ],
       "test": "Actual migrated DB and canonical document-list parity, role/tenant/Start, temporal and fractional-VAT negative cases passed. Migrated VAT-report positive/negative amount/date/archive/role/plan/tenant and CSV disclaimer cases passed.",
       "visualComparison": "New report UI browser cases added, not yet visually accepted.",
-      "blocker": "Allocated credit VAT/input-tax data and actual-data project profitability remain unavailable; current full CI, reference/device and financial acceptance pending."
+      "blocker": "Angebots-/informative MwSt.-Auswertung, privater Mail-/Link-Backend und begrenzte Retention sind implementiert. Historische Gutschriften enthalten keine belastbare Steueraufteilung; keine vollständige Steuerdeklaration behaupten. Produktive Retention-Scopes, echte Providerzustellung, rechtliche/fachliche und reale Geräteabnahme bleiben offen. CI a9b7e1fc qualifiziert nur diesen historischen Quellstand; geänderte Quellen benötigen neue Nachweise."
     },
     "R7-43-009": {
       "sourceTextSha256": "42e62a1191149d38124c2ec17ff6b4f8a576d13c97857a1fb5c4991c81e6c109",
       "status": "teilweise_implementiert",
       "test": "Reale migrierte DB-/PDF-Tests für Replay, Hash, Ersteller/Mandant/Rolle/Tarif, Ablauf und Unveränderlichkeit bestanden. Native HTTP- und neue Snapshot-Browserfälle ergänzt, aktuelle CI ausstehend.",
       "visualComparison": "Lokale gemeinsame PDF-Zoom-/Containmentprüfung einschliesslich CSS-Negativfall bestanden; Report-Seiten-/Geräteabnahme weiterhin offen.",
-      "blocker": "Vollständige fachliche/visuelle/Geräte- und Providerabnahme offen; MwSt.-/Angebotsberichte und physische Retention-Anbindung fehlen. Mail-/Link-Backend isoliert geprüft, aktuelle HTTP-/UI-Abnahme offen.",
+      "blocker": "Angebots-/informative MwSt.-Auswertung, privater Mail-/Link-Backend und begrenzte Retention sind implementiert. Historische Gutschriften enthalten keine belastbare Steueraufteilung; keine vollständige Steuerdeklaration behaupten. Produktive Retention-Scopes, echte Providerzustellung, rechtliche/fachliche und reale Geräteabnahme bleiben offen. CI a9b7e1fc qualifiziert nur diesen historischen Quellstand; geänderte Quellen benötigen neue Nachweise.",
       "implementation": "Gemeinsame Berichtsprojektion/PDF-Erzeugung und unveränderliche private Berichtskopie mit Ablauf, Scope-Revalidierung, Idempotenz und SHA-256. Vorschau und Download verwenden dieselben Bytes.",
       "sourceReferences": [
         "lib/server/report-document.ts",
@@ -237,7 +237,7 @@
       "status": "teilweise_implementiert",
       "test": "Reale migrierte DB-/PDF-Tests für Replay, Hash, Ersteller/Mandant/Rolle/Tarif, Ablauf und Unveränderlichkeit bestanden. Native HTTP- und neue Snapshot-Browserfälle ergänzt, aktuelle CI ausstehend.",
       "visualComparison": "Lokale gemeinsame PDF-Zoom-/Containmentprüfung einschliesslich CSS-Negativfall bestanden; Report-Seiten-/Geräteabnahme weiterhin offen.",
-      "blocker": "Vollständige fachliche/visuelle/Geräte- und Providerabnahme offen; MwSt.-/Angebotsberichte und physische Retention-Anbindung fehlen. Mail-/Link-Backend isoliert geprüft, aktuelle HTTP-/UI-Abnahme offen.",
+      "blocker": "Angebots-/informative MwSt.-Auswertung, privater Mail-/Link-Backend und begrenzte Retention sind implementiert. Historische Gutschriften enthalten keine belastbare Steueraufteilung; keine vollständige Steuerdeklaration behaupten. Produktive Retention-Scopes, echte Providerzustellung, rechtliche/fachliche und reale Geräteabnahme bleiben offen. CI a9b7e1fc qualifiziert nur diesen historischen Quellstand; geänderte Quellen benötigen neue Nachweise.",
       "implementation": "Gemeinsame Berichtsprojektion/PDF-Erzeugung und unveränderliche private Berichtskopie mit Ablauf, Scope-Revalidierung, Idempotenz und SHA-256. Vorschau und Download verwenden dieselben Bytes.",
       "sourceReferences": [
         "lib/server/report-document.ts",
@@ -259,7 +259,7 @@
       ],
       "test": "Reale migrierte DB und echte PDF-Bytes mit isoliertem Transport: Anhangsgleichheit, HTML-Escaping, Replay/Konflikt, Nichtkonfiguration, Fehler/Unklarheit, Rollen/Mandanten/Read-only und Grössenlimit bestanden. Gemeinsamer echter Graph-MIME-Renderer separat bestanden. Neue UI-/native HTTP-Fälle noch nicht am aktuellen Stand in CI bestanden.",
       "visualComparison": "Neue gemeinsame FormSheet-Komposition/Statusanzeige noch nicht visuell abgenommen.",
-      "blocker": "Kein echter Versand/Zustellnachweis freigegeben oder behauptet. Aktuelle UI-/HTTP-/Geräteabnahme, Provider-Nachweis und physische Retention-Anbindung bleiben offen; sicherer Freigabelink separat noch nicht implementiert."
+      "blocker": "Angebots-/informative MwSt.-Auswertung, privater Mail-/Link-Backend und begrenzte Retention sind implementiert. Historische Gutschriften enthalten keine belastbare Steueraufteilung; keine vollständige Steuerdeklaration behaupten. Produktive Retention-Scopes, echte Providerzustellung, rechtliche/fachliche und reale Geräteabnahme bleiben offen. CI a9b7e1fc qualifiziert nur diesen historischen Quellstand; geänderte Quellen benötigen neue Nachweise."
     },
     "R7-43-012": {
       "sourceTextSha256": "e649ea39ba7e878f166b5d1ce5b5b4c82701571f2c8ecfbfa3b0b60b5ca34fda",
@@ -274,28 +274,28 @@
       ],
       "test": "Reale migrierte DB mit binso_runtime: narrow lookup, keine breiten Reads/SQL-Writes, Original-PDF, Codeversand an feste Adresse, persistierte Fehlversuche/Sperre, Replay/Widerruf/Ablauf, Rollen-/Mandanten-/Herausgeberentzug, verschlüsselte Replay-Daten, unsicheres HTTP-Konfigurations-Rollback und sichtbare 20-Link-Grenze bestanden. Lokaler Edge-UI-Test mit synthetischer Code-API bestanden. Neue native HTTP-/private UI-Fälle in CI noch ausstehend.",
       "visualComparison": "Öffentliche Oberfläche aus vorhandenem AuthWorkspace/PDF-Owner abgeleitet; lokaler DE/Light/390-Screenshot gesichtet, keine Original- oder Gerätefreigabe.",
-      "blocker": "Keine echte Mail-/Zustell-/Gerätefreigabe. Aktuelle Gesamt-CI und vollständige fachliche/visuelle Abnahme sowie physische Retention-Anbindung fehlen."
+      "blocker": "Angebots-/informative MwSt.-Auswertung, privater Mail-/Link-Backend und begrenzte Retention sind implementiert. Historische Gutschriften enthalten keine belastbare Steueraufteilung; keine vollständige Steuerdeklaration behaupten. Produktive Retention-Scopes, echte Providerzustellung, rechtliche/fachliche und reale Geräteabnahme bleiben offen. CI a9b7e1fc qualifiziert nur diesen historischen Quellstand; geänderte Quellen benötigen neue Nachweise."
     },
     "R7-43-013": {
       "sourceTextSha256": "15f7661eab570ed043c71e3c706a0410c2c6c13d047b3ae0865ee8a45b8defac",
       "status": "teilweise_implementiert",
       "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
       "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
-      "blocker": "Vollständige fachliche/visuelle/Geräte- und Providerabnahme offen; MwSt.-/Angebotsberichte und physische Retention-Anbindung fehlen. Mail-/Link-Backend isoliert geprüft, aktuelle HTTP-/UI-Abnahme offen."
+      "blocker": "Angebots-/informative MwSt.-Auswertung, privater Mail-/Link-Backend und begrenzte Retention sind implementiert. Historische Gutschriften enthalten keine belastbare Steueraufteilung; keine vollständige Steuerdeklaration behaupten. Produktive Retention-Scopes, echte Providerzustellung, rechtliche/fachliche und reale Geräteabnahme bleiben offen. CI a9b7e1fc qualifiziert nur diesen historischen Quellstand; geänderte Quellen benötigen neue Nachweise."
     },
     "R7-43-014": {
       "sourceTextSha256": "148a498f94308c524d0f9831394f3ac96f7473dc95dd43f8cc85eb2b06527e19",
       "status": "teilweise_implementiert",
       "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
       "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
-      "blocker": "Vollständige fachliche/visuelle/Geräte- und Providerabnahme offen; MwSt.-/Angebotsberichte und physische Retention-Anbindung fehlen. Mail-/Link-Backend isoliert geprüft, aktuelle HTTP-/UI-Abnahme offen."
+      "blocker": "Angebots-/informative MwSt.-Auswertung, privater Mail-/Link-Backend und begrenzte Retention sind implementiert. Historische Gutschriften enthalten keine belastbare Steueraufteilung; keine vollständige Steuerdeklaration behaupten. Produktive Retention-Scopes, echte Providerzustellung, rechtliche/fachliche und reale Geräteabnahme bleiben offen. CI a9b7e1fc qualifiziert nur diesen historischen Quellstand; geänderte Quellen benötigen neue Nachweise."
     },
     "R7-43-015": {
       "sourceTextSha256": "42557c3e07a4fa7163c708ba6876b2f807abcece5e5ac748d232f8bfc5b46cb7",
       "status": "teilweise_implementiert",
       "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
       "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
-      "blocker": "Vollständige fachliche/visuelle/Geräte- und Providerabnahme offen; MwSt.-/Angebotsberichte und physische Retention-Anbindung fehlen. Mail-/Link-Backend isoliert geprüft, aktuelle HTTP-/UI-Abnahme offen."
+      "blocker": "Angebots-/informative MwSt.-Auswertung, privater Mail-/Link-Backend und begrenzte Retention sind implementiert. Historische Gutschriften enthalten keine belastbare Steueraufteilung; keine vollständige Steuerdeklaration behaupten. Produktive Retention-Scopes, echte Providerzustellung, rechtliche/fachliche und reale Geräteabnahme bleiben offen. CI a9b7e1fc qualifiziert nur diesen historischen Quellstand; geänderte Quellen benötigen neue Nachweise."
     },
     "R7-19-014": {
       "sourceTextSha256": "1f1598905505184582da4c1297c8e5cd406b404074ad8a88276fe8075b66817f",
@@ -434,7 +434,7 @@
         "docs/audit/v25-revision7/customer-consolidation.md"
       ],
       "status": "teilweise_implementiert",
-      "test": "Migrationstest mit tatsächlichem Repository/API und binso_runtime-RLS sowie Client-Quittungsprüfung bestanden; physische Parallel- und Browserprüfungen für CI vorbereitet, noch nicht ausgeführt.",
+      "test": "Isolierter Repository/API/RLS-Test sowie tatsächlicher PostgreSQL-Paralleltest im vollständigen Development-Lauf39697429990 auf a9b7e1fc bestanden; Browser-/Geräte-/Klauselabnahme nicht daraus ableiten.",
       "visualComparison": "Gemeinsame vorhandene Komponenten verwendet; aktuelle gerenderte Abnahme offen."
     },
     "R7-49-002": {
