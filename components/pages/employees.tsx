@@ -11,6 +11,7 @@ import {useProcessDraft} from "../use-process-draft";
 import {useDirtySnapshot} from "../use-dirty-snapshot";
 import {FormWizard} from "../form-wizard";
 import {Avatar} from "../avatar";
+import {EmploymentPeriods} from '../employment-periods';
 
 import { formatQuantity, timeMetadata } from "@/lib/display-format";
 import { formatCurrency } from "@/lib/financial-status";
@@ -56,7 +57,7 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
   const [address,setAddress]=useState("");
   const [status,setStatus]=useState("Aktiv");
   const [wizardStep,setWizardStep]=useState(0);
-  const [employeeTab,setEmployeeTab]=useState<"overview"|"time"|"expenses"|"documents">("overview");
+  const [employeeTab,setEmployeeTab]=useState<"overview"|"employment"|"time"|"expenses"|"documents">("overview");
   const [toast,setToast]=useState<string|null>(null);
   const recordQuery=useApiQuery<{item?:Record<string,unknown>;items?:Record<string,unknown>[]}>(existing&&employeeId?("/api/employees/"+encodeURIComponent(employeeId)):null);
   const loadingRecord=recordQuery.loading;
@@ -140,10 +141,12 @@ export function EmployeeForm({ existing = false, employeeId }: { existing?: bool
       <div className="desktop-detail-main">
     {existing && <DetailTabs role="tablist" label="Mitarbeiterbereiche">
       <button role="tab" aria-selected={activeEmployeeTab==="overview"} className={activeEmployeeTab==="overview"?"active":""} onClick={()=>setEmployeeTab("overview")}><LocalizedText>{"Übersicht"}</LocalizedText></button>
+      <button role="tab" aria-selected={activeEmployeeTab==="employment"} className={activeEmployeeTab==="employment"?"active":""} onClick={()=>setEmployeeTab('employment')}><LocalizedText>{'Anstellung'}</LocalizedText></button>
       {mayReadTime&&<button role="tab" aria-selected={activeEmployeeTab==="time"} className={activeEmployeeTab==="time"?"active":""} onClick={()=>setEmployeeTab("time")}><LocalizedText>{"Arbeitszeit"}</LocalizedText></button>}
       {mayReadExpenses&&<button role="tab" aria-selected={activeEmployeeTab==="expenses"} className={activeEmployeeTab==="expenses"?"active":""} onClick={()=>setEmployeeTab("expenses")}><LocalizedText>{"Spesen"}</LocalizedText></button>}
       <button role="tab" aria-selected={activeEmployeeTab==="documents"} className={activeEmployeeTab==="documents"?"active":""} onClick={()=>setEmployeeTab("documents")}><LocalizedText>{"Dokumente"}</LocalizedText></button>
     </DetailTabs>}
+    {existing&&employeeId&&activeEmployeeTab==='employment'&&<EmploymentPeriods employeeId={employeeId} mayWrite={tenantCan(tenantRole,'employees:write')} prefill={{startsOn:entryDate,endsOn:endDate,workloadPercent:load,weeklyHours,vacationDays,jobTitle:role,workLocation}}/>}
     {(!existing||activeEmployeeTab==="overview")&&<div className="form-page" inert={savingRecord}>
       {!editingRecord?<><dl className="detail-list">
         <div><dt><LocalizedText>{"E-Mail"}</LocalizedText></dt><dd>{email?<a href={contactHref("email",email)}>{email}</a>:<LocalizedText>Keine E-Mail hinterlegt</LocalizedText>}</dd></div>

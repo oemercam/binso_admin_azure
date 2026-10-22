@@ -26,12 +26,14 @@ function load(file){
 }
 const mock=(file,exports)=>overrides.set(path.resolve(file),exports),unavailable=()=>{throw Error('Unrelated platform operation must not be called');};
 const db=new PGlite({extensions:{pgcrypto}}),org=randomUUID(),other=randomUUID();
+// Match pg.PoolClient's result shape; PGlite names command counts affectedRows.
+const client={query:async(...args)=>{const result=await db.query(...args);return {...result,rowCount:result.rows.length||result.affectedRows||0};}};
 let session,auditFailure=false;
 const transaction=async(organizationId,userId,fn)=>{
  await db.exec('begin');try{
   await db.exec('set local role binso_runtime');
   await db.query("select set_config('app.organization_id',$1,true),set_config('app.user_id',$2,true),set_config('app.platform_operator','false',true)",[organizationId,userId]);
-  const result=await fn(db);await db.exec('commit');return result;
+  const result=await fn(client);await db.exec('commit');return result;
  }catch(error){await db.exec('rollback');throw error;}
 };
 mock('lib/server/db.ts',{withTenant:transaction,withPlatform:unavailable});
@@ -43,6 +45,7 @@ mock('lib/server/repositories/operator-customer-overview.ts',{operatorCustomerRe
 const realAudit=load('lib/server/audit.ts').audit;
 mock('lib/server/audit.ts',{audit:async(...args)=>{await realAudit(...args);if(auditFailure)throw Error('Synthetic audit outage');}});
 const routes=load('app/api/employees/route.ts'),detail=load('app/api/employees/[id]/route.ts');
+const employment=load('app/api/employees/[id]/employment/route.ts'),employmentDetail=load('app/api/employees/[id]/employment/[periodId]/route.ts');
 const {NextRequest}=require('next/server');
 const input={firstName:'Synthetic',lastName:'Employee',email:'',jobTitle:'Consultant',workloadPercent:80,weeklyHours:33.6,vacationDays:25,entryDate:'2026-01-01',endDate:'2026-12-31',workLocation:'Bern'};
 const request=(body,key=randomUUID(),method='POST')=>new NextRequest('https://employee.invalid/api/employees',{method,headers:{origin:'https://employee.invalid','content-type':'application/json','idempotency-key':key},body:JSON.stringify(body)});
@@ -78,6 +81,30 @@ try{
  assert.deepEqual(stored,{email:null,user_id:null,end_date:'2026-12-31',work_location:'Bern'});
  assert.equal((await db.query('select count(*)::int n from app_users')).rows[0].n,identityBefore,'No implicit app account or invitation');
  const second=await routes.POST(request({...input,lastName:'Second'}));assert.equal(second.status,201,'Multiple employees may have no email');
+ const periodInput={startsOn:'2026-01-01',endsOn:'2026-12-31',workloadPercent:80,weeklyHours:33.6,vacationDays:25,jobTitle:'Consultant',workLocation:'Bern'};
+ const createPeriod=(body,key=randomUUID(),employeeId=id)=>employment.POST(request(body,key),{params:Promise.resolve({id:employeeId})});
+ const periodKey=randomUUID(),periodResponse=await createPeriod(periodInput,periodKey);
+ assert.equal(periodResponse.status,201,await periodResponse.clone().text());const period=(await periodResponse.json()).item;
+ assert.equal((await (await createPeriod(periodInput,periodKey)).json()).item.id,period.id,'Employment retry returns the same revision');
+ assert.equal((await createPeriod({...periodInput,startsOn:'2026-06-01'})).status,400,'Overlapping employment is rejected');
+ assert.equal((await createPeriod({...periodInput,monthly_gross:1000})).status,400,'No payroll fields through employment API');
+ assert.equal((await createPeriod({...periodInput,startsOn:'2027-01-01',endsOn:null})).status,201,'Reentry is a separate period');
+ const revise=(body,key=randomUUID())=>employmentDetail.PATCH(request(body,key,'PATCH'),{params:Promise.resolve({id,periodId:period.period_id})});
+ const changeKey=randomUUID(),change={...periodInput,workLocation:'Basel',expectedRevision:1};
+ let changeResponse=await revise(change,changeKey);assert.equal(changeResponse.status,200,await changeResponse.clone().text());
+ assert.equal((await changeResponse.json()).item.revision,2);
+ assert.equal((await revise(change,changeKey)).status,200,'A lost revision response can be replayed');
+ assert.equal((await revise({...change,workLocation:'Stale'})).status,409,'A stale editor cannot overwrite the next revision');
+ let historyResponse=await employment.GET(new Request('https://employee.invalid/api/employees/'+id+'/employment'),{params:Promise.resolve({id})});
+ const history=(await historyResponse.json()).items;assert.equal(history.length,3);assert.equal(history.find(p=>p.id===period.id).work_location,'Bern');assert.equal(history.find(p=>p.id===period.id).is_current,false);
+ await assert.rejects(()=>transaction(org,session.userId,c=>c.query("update employee_employment_periods set work_location='Tampered' where id=$1",[period.id])),e=>e.code==='23514','Employment history cannot be edited in place');
+ await assert.rejects(()=>transaction(org,session.userId,c=>c.query("insert into employee_employment_periods(organization_id,employee_id,starts_on,ends_on,workload_percent,weekly_hours,vacation_days,job_title,created_by_user_id) values($1,$2,'2026-05-01','2026-05-02',80,33.6,25,'Overlap',$3)",[org,id,session.userId])),e=>e.code==='23514','Database prevents overlap independently of the route');
+ for(const role of ['finance','member','reader']){
+  act(role);assert.equal((await createPeriod(periodInput)).status,403);
+  assert.equal((await transaction(org,session.userId,c=>c.query('select id from employee_employment_periods where employee_id=$1',[id]))).rows.length,0,'Employment RLS rejects '+role);
+ }
+ act('owner');auditFailure=true;assert.equal((await revise({...periodInput,expectedRevision:2})).status,500);auditFailure=false;
+ assert.equal((await transaction(org,session.userId,c=>c.query('select revision from employee_employment_periods where period_id=$1 and is_current',[period.period_id]))).rows[0].revision,2,'Audit outage rolls supersede and new revision back together');
  for(const extra of [{user_id:randomUUID()},{organization_id:other},{role:'owner'},{iban:'CH-synthetic'},{monthly_gross:1000},{birthDate:'2000-01-01'},{child_allowance:100}]){
   assert.equal((await routes.POST(request({...input,...extra}))).status,400);
   assert.equal((await patch(id,{...input,...extra})).status,400,'Reject unsupported/sensitive fields before any write');
@@ -102,6 +129,8 @@ try{
  session={...session,organizationId:other,userId:foreign};
  assert.equal((await read(id)).status,404);assert.equal((await patch(id,input)).status,404);
  assert.equal((await transaction(other,foreign,c=>c.query('select id from employees where id=$1',[id]))).rows.length,0);
+ assert.equal((await transaction(other,foreign,c=>c.query('select id from employee_employment_periods where employee_id=$1',[id]))).rows.length,0);
+ assert.equal((await createPeriod(periodInput)).status,404,'Cross-tenant employment creation is rejected before mutation');
  assert.equal((await transaction('',foreign,c=>c.query('select id from employees where id=$1',[id]))).rows.length,0,'Contextless runtime cannot see employee');
  act('owner');
  await assert.rejects(()=>transaction(org,session.userId,c=>c.query("update employees set end_date='2000-01-01' where id=$1",[id])),e=>e.code==='23514','Database enforces dates independently of API');
@@ -115,4 +144,5 @@ try{
  assert.equal((await transaction(org,session.userId,c=>c.query('select count(*)::int n from employees'))).rows[0].n,employeeCount,'Failed create audit rolls back employee and replay receipt');
  session=null;assert.equal((await read(id)).status,401);
  console.log('Employee dossier: actual POST/PATCH/GET, optional email/account, persistence, replay/conflict, legacy field preservation, eight roles, plans, tenants/RLS, date constraints and atomic audit rollback passed.');
+ console.log('Employment: separate reentry, immutable revisions, replay/stale conflict, database overlap protection, restricted RLS and supersede/audit rollback passed; no payroll or identity mutation.');
 }finally{await db.close();}

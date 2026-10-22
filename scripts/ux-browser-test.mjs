@@ -331,6 +331,7 @@ try{
    else if(/^\/api\/documents\/[^/]+\/versions$/.test(p)){if(url.searchParams.has('version'))return route.fulfill({contentType:'application/pdf',body:fixturePdf});data={versions:[{version:1,number:offer.number,created_at:'2026-10-21T10:00:00Z'}],events:[],deliveries:[]};}
    else if(p==='/api/customers')data=customerListFixture(url.searchParams);
    else if(['/api/products','/api/employees','/api/expenses','/api/payments'].includes(p))data=recordListFixture(p.split('/')[2],url.searchParams);
+   else if(/^\/api\/employees\/[^/]+\/employment$/.test(p))data={items:[]};
    else if(p==='/api/reports'){
     if(url.searchParams.get('format')==='csv'){reportExports++;await new Promise(resolve=>setTimeout(resolve,150));if(failReportDownload)return route.fulfill({status:503,json:{message:'Synthetic report export unavailable'}});return route.fulfill({headers:{'Content-Type':'text/csv; charset=utf-8','Content-Disposition':'attachment; filename="binso-reports-fixture.csv"'},body:'"Kennzahl";"Wert";"Einheit"\r\n'});}
     data={period:{from:statisticToday.slice(0,7)+'-01',to:statisticToday},asOf:new Date().toISOString(),customers:{total:'2',added:'1'},projects:[{status:'active',count:'1'}],time:{hours:'12.5',billable_hours:'10',invoiced_hours:'5'},payments:[{currency:'CHF',amount:'200'}],expenses:[{currency:'CHF',amount:'50'}],employees:{total:'2',active:'2'}};
