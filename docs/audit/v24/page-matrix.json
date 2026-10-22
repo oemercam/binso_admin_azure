@@ -1,5 +1,5 @@
 {
-  "commit": "5f175c878758c9798cb421199397bfea21523aeb",
+  "commit": "5028b0a6dc6baf04539348fd0adb0512aa5b96bd",
   "method": "Existing TypeScript AST dependency inventory; conditional reachability is not runtime proof",
   "pages": [
     {

@@ -67,3 +67,14 @@ Die vorherige erfolgreiche d052a3be-CI ist dafür kein Nachweis.
 Reale Geräte, unabhängige Finanz-/Klauselabnahme und externer Zustellnachweis
 bleiben gesondert offen. Keine produktive Migration, keine Zahlung beim Provider,
 kein Merge und kein Deployment sind durch diese Tests freigegeben.
+
+## Erster nativer CI-Lauf und Ursachen
+
+Auf5028b0a6 bestanden die neuen echten HTTP-Überzahlungsfälle. Der anschliessende
+ältere Statusfall fand dieselbe bereits bezahlte Testrechnung vor. Die neue
+Sequenz verwendet nun eigene ausgestellte Testrechnungen; die alte Assertion
+bleibt unverändert. Der Paralleltest versuchte ausserdem, die von Migrationen
+angelegte Runtime-Rolle erneut zu provisionieren. Die strenge Ablehnung bleibt
+erhalten; der isolierte Test kopiert den geprüften Rechtevertrag stattdessen auf
+eine eigene temporäre Rolle ohne Superuser/RLS-Bypass und entfernt sie danach.
+Beide Fehler werden durch einen neuen CI-Lauf nachgewiesen, nicht übergangen.

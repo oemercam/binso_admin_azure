@@ -3,10 +3,10 @@ import {randomUUID} from 'node:crypto';
 
 /** Actual repository, refund ledger and metrics in disposable migrated databases.
  * Parallel=true requires independent physical transactions, never PGlite Promise concurrency. */
-export async function verifyInvoiceOverpayments({business,refunds,financial,metrics,cash,sql,transaction,session,createIssued,parallel=false}){
+export async function verifyInvoiceOverpayments({business,refunds,financial,metrics,cash,sql,transaction,session,createIssued,parallel=false,runtimeRole='binso_runtime'}){
  const org=session.organizationId,today=financial.businessDate(),minor=value=>Math.round(Number(value)*100);
  const run=(fn,actor=session)=>transaction(actor,c=>fn(c,actor));
- await run(async c=>{const role=(await c.query('select current_user as role,rolsuper,rolbypassrls from pg_roles where rolname=current_user')).rows[0];assert.equal(role.role,'binso_runtime');assert.equal(role.rolsuper,false);assert.equal(role.rolbypassrls,false);});
+ await run(async c=>{const role=(await c.query('select current_user as role,rolsuper,rolbypassrls from pg_roles where rolname=current_user')).rows[0];assert.ok(['binso_runtime','binso_receipt_fixture'].includes(runtimeRole));assert.equal(role.role,runtimeRole);assert.equal(role.rolsuper,false);assert.equal(role.rolbypassrls,false);});
  for(const amount of [0,-1,NaN,Infinity,0.001,financial.maxRecordedPayment+1])assert.equal(financial.paymentEntryIssue(amount,100),'amount_invalid');
  assert.equal(financial.paymentEntryIssue(101,100),'payment_exceeds_balance');
  assert.equal(financial.paymentEntryIssue(101,100,true,100),null);

@@ -284,8 +284,17 @@ try{
   if(finance.includes(role)){assert.equal(after.status,'sent');assert.equal(after.paid_amount,before.paid_amount);}
   else assert.deepEqual(after,before,'Forbidden role cannot issue invoice');
  }
+ const issued=createdInvoices.get('owner');
+ const invalidState=await write('POST','/api/documents/'+encodeURIComponent(issued.number)+'/status',{action:'accept'},'owner');
+ assert.equal(invalidState.status,409,'Invoice cannot use offer-only accept transition');
+ assert.equal((await pool.query('select status from invoices where id=$1',[issued.id])).rows[0].status,'sent');
  // Actual HTTP overpayment: explicit reviewed balances, all eight roles, replay
  // and foreign-tenant failures. No payment provider or bank transfer is invoked.
+ const receiptInvoices=new Map();
+ for(const role of finance){
+  const response=await fetch(base+'/api/documents',{method:'POST',headers:{cookie:cookies.get('0:'+role),origin:base,'content-type':'application/json','idempotency-key':'r7-http-isolated-invoice-'+role},body:JSON.stringify({kind:'invoice',customerId:customer.id,issueDate:'2026-10-09',dueDate:'2026-11-09',currency:'CHF',items:[{description:'Isolated actual-receipt contract',quantity:1,unitPrice:100,vatRate:8.1}]}),signal:AbortSignal.timeout(15000)});
+  assert.equal(response.status,201);const row=(await response.json()).item;assert.equal((await write('POST','/api/documents/'+encodeURIComponent(row.number)+'/status',{action:'issue'},role)).status,200);receiptInvoices.set(role,row);
+ }
  let receiptSequence=0;
  const postReceipt=async(body,role='owner',key='r7-http-receipt-'+(++receiptSequence),tenant=0)=>{
   const response=await fetch(base+'/api/payments',{method:'POST',headers:{cookie:cookies.get(tenant+':'+role),origin:base,'content-type':'application/json','idempotency-key':key},body:JSON.stringify(body),signal:AbortSignal.timeout(15000)});
@@ -293,7 +302,7 @@ try{
  };
  const receiptCount=async()=>(await pool.query('select count(*)::int n from payments where organization_id=$1',[organizations[0]])).rows[0].n;
  for(const role of roles){
-  const doc=createdInvoices.get(role)??createdInvoices.get('owner'),canonical=(await get('/api/documents/'+encodeURIComponent(doc.number),cookies.get('0:owner'))).data.item;
+  const doc=receiptInvoices.get(role)??receiptInvoices.get('owner'),canonical=(await get('/api/documents/'+encodeURIComponent(doc.number),cookies.get('0:owner'))).data.item;
   const total=Number(canonical.total),paid=Number(canonical.paid_amount),credit=Number(canonical.credit_amount??0),refund=Number(canonical.refund_amount??0),open=Math.max(0,Math.round((total-credit-paid+refund)*100)/100);
   const body={invoiceId:doc.id,paidOn:new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Zurich'}).format(new Date()),amount:Math.round((open+10)*100)/100,method:'bank',confirmOverpayment:true,expectedBalance:{openAmount:open,paidAmount:paid,creditAmount:credit,refundAmount:refund}};
   const before=await receiptCount();
@@ -310,10 +319,7 @@ try{
   const foreign=await postReceipt(body,role,'r7-http-foreign-'+role,1);assert.equal(foreign.status,400);assert.equal(foreign.data.error,'invoice_invalid');assert.equal(await receiptCount(),before+1);
  }
  console.log('Native HTTP confirmed overpayment: three finance roles succeed/replay once; five roles and cross-tenant access denied; malformed/stale confirmations, ordinary excess, precision and future dates blocked; independent status axes and unchanged invoice total passed.');
- const issued=createdInvoices.get('owner');
- const invalidState=await write('POST','/api/documents/'+encodeURIComponent(issued.number)+'/status',{action:'accept'},'owner');
- assert.equal(invalidState.status,409,'Invoice cannot use offer-only accept transition');
- assert.equal((await pool.query('select status from invoices where id=$1',[issued.id])).rows[0].status,'sent');
+
  for(const role of roles){
   const result=await write('PATCH','/api/settings/team/members/http-1-member',{role:'admin'},role);
   assert.equal(result.status,['owner','admin'].includes(role)?404:403,role+' foreign membership role change');
