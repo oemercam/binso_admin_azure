@@ -111,3 +111,12 @@ Grosse Restbefunde bleiben eigenständige Folgepakete.
 
 Kein Merge, keine Produktivmigration/Deployment, keine neuen externen Rechte,
 keine echten Kundenmails, keine Änderung anderer PRs und kein V26.
+
+### Erster Responsive-CI-Lauf
+
+Lauf39770194971 aufce239d32 stoppte nach den ersten DE/Light/1280px-
+Aufnahmen am erwarteten Formular-Verwerfschutz: Der neue Test wartete nach
+Abbrechen direkt auf ein geschlossenes geändertes Rabattformular. Er prüft jetzt
+zusätzlich den tatsächlich geforderten Bestätigungsdialog und verwirft erst nach
+ausdrücklichem Klick. Produktcode, Guard und Erwartungen an die Geometrie bleiben
+unverändert. Dieser fehlgeschlagene Lauf ist kein bestandener Paket12-Nachweis.

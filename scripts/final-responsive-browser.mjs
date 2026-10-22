@@ -55,7 +55,10 @@ export async function verifyFinalResponsiveSample({page,base,theme,locale,naviga
     const sheet=page.getByRole('dialog',{name:t('Gesamtrabatt'),exact:true});await sheet.waitFor();
     await selectAppOption(sheet.getByLabel(t('Rabattart'),{exact:true}),'percent');
     await sheet.getByLabel(t('Rabatt in Prozent'),{exact:true}).fill('5');await footer(sheet);await inspect();await capture(page,name+'-dialog');
-    await sheet.getByRole('button',{name:t('Abbrechen'),exact:true}).click();await sheet.waitFor({state:'hidden'});
+    await sheet.getByRole('button',{name:t('Abbrechen'),exact:true}).click();
+    const discard=page.getByRole('alertdialog');await discard.waitFor();
+    assert.equal(await sheet.isVisible(),true,'Dirty dialog stays open until the user confirms discarding changes');
+    await discard.getByRole('button',{name:t('Änderungen verwerfen'),exact:true}).click();await sheet.waitFor({state:'hidden'});
    }
    results.push({locale,theme,width,route,passed:true,geometry,browserZoom:'not-tested',physicalDevice:false});
   }
