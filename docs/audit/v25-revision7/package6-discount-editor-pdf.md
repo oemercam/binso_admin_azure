@@ -107,3 +107,26 @@ Erwartungen bleiben erhalten; zusätzlich wird ein Speicherversuch mit 101 %
 Rabatt ohne API-Schreibzugriff geprüft. `ux-regression-test.mjs` besteht lokal.
 Der korrigierte Browserfall bleibt bis zum erfolgreichen neuen CI-Lauf offen.
 Keine Produktlogik, Sicherheitsprüfung oder Pflichtprüfung wurde abgeschwächt.
+
+## Mobile Auswahl über dem Positionsdialog
+
+Am Korrekturcommit `37d382d1` bestand der vollständige Quality-Lauf
+[39764438813](https://github.com/oemercam/binso_admin_azure/actions/runs/39764438813)
+sowie CodeQL und Rechnungs-Readiness. Der Rabatt-Browserlauf
+[39764438831](https://github.com/oemercam/binso_admin_azure/actions/runs/39764438831)
+erreichte die mobile Positionsrabatt-Auswahl und scheiterte an abgefangenen
+Pointer-Ereignissen: das zentrale portallierte Menü lag auf100, der mobile
+Positionsdialog auf120. Der Desktopteil einschliesslich Speicher-/Replay-/
+Konfliktfällen und der ausdrückliche Kundenstandard waren bereits durchlaufen.
+
+Der vorhandene gemeinsame CSS-Owner ordnet das Auswahlmenü jetzt unterhalb
+der Bestätigungsebene190 auf189 ein. Keine erzwungenen Klicks, keine Änderung
+an Navigation, FAB, Finanzlogik oder Test-Erwartungen.
+
+Lokal mit tatsächlichem SelectControl und den vollständigen vorhandenen
+Designsystem-CSS-Ownern im installierten Edge/Chromium geprüft: vorher bei390px
+Pointerziel blockiert (Menü100/Sheet120), danach bei390px und1440px anklickbar
+mit tatsächlichem React-Wertwechsel auf `percent` (Menü189, Sheet120/80).
+CSS-Architektur und UX-Style-Gegenfälle erfolgreich. Dies ist eine gezielte
+Control-Prüfung, keine SSR-/Geräte-Gesamtabnahme; der unveränderte Paket-
+Browserworkflow bleibt am neuen Commit gesondert zu bestätigen.
