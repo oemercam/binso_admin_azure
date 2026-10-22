@@ -18,6 +18,7 @@ import {verifySensitiveAccessContract} from './sensitive-access-contract.mjs';
 import {verifyWageDefinitionContract} from './wage-definition-contract.mjs';
 import {verifyEmployeeFamilyContract} from './employee-family-contract.mjs';
 import {verifyAbsenceContract} from './absence-contract.mjs';
+import {verifyCommercialContract} from './commercial-contract-test.mjs';
 
 // Execute the actual routes, repository, authorization, SQL and audit against
 // migrated PostgreSQL/RLS. Replace only session/connection boundaries, never SQL.
@@ -188,6 +189,7 @@ try{
  await verifyWageDefinitionContract({load,db,transaction,org,other,act,request,employeeId:id,setAuditFailure:value=>{auditFailure=value;}});
  await verifyEmployeeFamilyContract({load,db,transaction,org,other,act,request,employeeId:id,setAuditFailure:value=>{auditFailure=value;}});
  await verifyAbsenceContract({load,db,transaction,org,other,act,request,setAuditFailure:value=>{auditFailure=value;}});
+ await verifyCommercialContract({load,db,transaction,org,other,act,request,setAuditFailure:value=>{auditFailure=value;}});
  invitationPlatformEnabled=true;
  try{await verifyInvitationContract({load,mock,db,transaction,org,other,act,request,setAuditFailure:value=>{auditFailure=value;}});}finally{invitationPlatformEnabled=false;}
  mock('lib/server/maintenance.ts',{maintenanceState:async()=>({enabled:false,endsAt:null})});
