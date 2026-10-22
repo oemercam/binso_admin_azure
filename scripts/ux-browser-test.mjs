@@ -303,6 +303,7 @@ try{
    else if(p==='/api/operator/announcements')data={items:[]};
    else if(p==='/api/operator/audit')data={items:[{id:'audit-one',createdAt:'2026-10-11T12:03:00Z',userName:'Fixture Operator',userEmail:'operator@example.invalid',action:'operator.entra_login',entityType:'platform_operator',entityId:'operator-one'},{id:'audit-two',createdAt:null,userName:null,userEmail:null,action:'system.check',entityType:null,entityId:null}]};
    else if(p==='/api/operator/tickets/ticket-one')data={item:{id:'ticket-one',tenant:{name:'Prüffirma AG'},status:'open',priority:'normal'},messages:[{id:'public',body:'Öffentliche Nachricht',author_type:'customer',created_at:'2026-10-09',internal:false},{id:'private',body:'Vertrauliche interne Notiz',author_type:'operator',created_at:'2026-10-09',internal:true}]};
+   else if(p==='/api/auth/sensitive-access')data={capabilities:[]};
    else if(p==='/api/auth/invitation')data={email:'eingeladen@example.invalid',organization:customer.name,existingAccount:false};
 
 

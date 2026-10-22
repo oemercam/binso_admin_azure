@@ -1,0 +1,66 @@
+import assert from 'node:assert/strict';
+import {randomUUID} from 'node:crypto';
+
+export async function verifySensitiveAccessContract({load,db,transaction,org,other,act,request,setAuditFailure}){
+ const route=load('app/api/settings/team/members/[userId]/sensitive-access/route.ts'),{requireSensitiveCapability}=load('lib/server/sensitive-access.ts');
+ const ownAccess=load('app/api/auth/sensitive-access/route.ts');
+ const sessions=(await db.query('select id,user_id,organization_id from auth_sessions')).rows;
+ const as=(role,organizationId=org,extra={})=>{const userId='employee-dossier-'+(organizationId===other?'foreign':role);return act(role,organizationId,{userId,sessionId:sessions.find(s=>s.user_id===userId&&s.organization_id===organizationId)?.id,...extra});};
+ const read=(role='hr')=>route.GET(new Request('https://employee.invalid/api/settings/team/members/employee-dossier-'+role+'/sensitive-access'),{params:Promise.resolve({userId:'employee-dossier-'+role})});
+ const write=(role,body,key=randomUUID())=>route.PATCH(request(body,key,'PATCH'),{params:Promise.resolve({userId:'employee-dossier-'+role})});
+ for(const role of ['owner','admin','hr','finance','project_manager','manager','member','reader']){
+  const session=as(role);await assert.rejects(()=>transaction(org,session.userId,c=>requireSensitiveCapability(session,'hr_sensitive:read',c)),e=>e.status===403,'No implicit new sensitive access for '+role);
+  assert.deepEqual((await (await ownAccess.GET()).json()).capabilities,[],'No implicit UI capability for '+role);
+ }
+ as('owner');let response=await read();assert.equal(response.status,200);const initial=(await response.json()).item;assert.deepEqual(initial.sensitive_grants,[]);
+ const grants=['hr_sensitive:read','hr_sensitive:write','family:read','payroll:read','payroll:write'],body={grants,expectedRevision:initial.sensitive_grants_version},key=randomUUID();
+ response=await write('hr',body,key);assert.equal(response.status,200,await response.clone().text());let current=(await response.json()).item;assert.equal(current.sensitive_grants_version,2);
+ assert.equal((await write('hr',body,key)).status,200,'Same grant request replays without another version');
+ assert.equal((await write('hr',body)).status,409,'Stale grant editor cannot overwrite rights');
+ const hr=as('hr');await transaction(org,hr.userId,c=>requireSensitiveCapability(hr,'family:read',c));
+ assert.deepEqual((await (await ownAccess.GET()).json()).capabilities.sort(),['family:read','hr_sensitive:read','hr_sensitive:write'],'Business UI exposes HR grants, not Pro payroll');
+ await assert.rejects(()=>transaction(org,hr.userId,c=>requireSensitiveCapability({...hr,organizationStatus:'read_only'},'hr_sensitive:write',c)),e=>e.status===403);
+ await db.query("update organizations set status='read_only' where id=$1",[org]);
+ await transaction(org,hr.userId,c=>requireSensitiveCapability(hr,'hr_sensitive:read',c));
+ await assert.rejects(()=>transaction(org,hr.userId,c=>requireSensitiveCapability(hr,'hr_sensitive:write',c)),e=>e.status===403,'Database read-only state is enforced even with a stale active session');
+ await db.query("update organizations set status='active' where id=$1",[org]);
+ await assert.rejects(()=>transaction(org,hr.userId,c=>requireSensitiveCapability(hr,'family:write',c)),e=>e.status===403,'Unselected family write remains denied');
+ assert.equal((await read()).status,403,'HR cannot manage its own grants');
+ assert.equal((await write('owner',{grants:['hr_sensitive:read'],expectedRevision:1})).status,403);
+ as('admin');assert.equal((await read('owner')).status,403,'Admin cannot manage owner grants');
+ as('owner');
+ for(const [role,grants] of [['hr',['payroll:read','payroll:payment']],['finance',['family:read']],['member',['payroll:read']],['hr',['family:write']],['hr',['unknown']],['hr',['family:read','family:read']]])assert.equal((await write(role,{grants,expectedRevision:role==='hr'?2:1})).status,400);
+ const financeBody={grants:['payroll:read','payroll:payment'],expectedRevision:1};assert.equal((await write('finance',financeBody)).status,200);
+ const finance=as('finance');await assert.rejects(()=>transaction(org,finance.userId,c=>requireSensitiveCapability(finance,'payroll:read',c)),e=>e.status===403,'Business grant configuration does not activate Pro payroll');
+ assert.equal((await read('finance')).status,403,'Payroll grant never grants team administration');
+ await db.query("update organization_subscriptions set plan='professional' where organization_id=$1",[org]);
+ await transaction(org,finance.userId,c=>requireSensitiveCapability(finance,'payroll:read',c));await assert.rejects(()=>transaction(org,finance.userId,c=>requireSensitiveCapability(finance,'family:read',c)),e=>e.status===403,'Explicit payroll access never implies family access');
+ await db.query("update organization_subscriptions set plan='business' where organization_id=$1",[org]);
+ as('hr');await db.query("update organization_subscriptions set plan='starter' where organization_id=$1",[org]);
+ await assert.rejects(()=>transaction(org,hr.userId,c=>requireSensitiveCapability(hr,'family:read',c)),e=>e.status===403,'Explicit HR rights cannot bypass Start module limits');
+ await db.query("update organization_subscriptions set plan='business' where organization_id=$1",[org]);
+ as('owner');const ownerSession=sessions.find(s=>s.user_id==='employee-dossier-owner').id;
+ await db.query("update auth_sessions set step_up_at=now()-interval '6 minutes' where id=$1",[ownerSession]);assert.equal((await write('hr',{grants:[],expectedRevision:2})).status,403);await db.query('update auth_sessions set step_up_at=now() where id=$1',[ownerSession]);
+ await assert.rejects(()=>transaction(org,'employee-dossier-owner',c=>c.query("update organization_memberships set sensitive_grants='{}' where organization_id=$1 and user_id='employee-dossier-hr'",[org])),e=>e.code==='42501','Raw SQL without the session proof cannot change grants');
+ await assert.rejects(()=>transaction(org,'employee-dossier-owner',async c=>{await c.query("select set_config('app.sensitive_grant_session',$1,true)",[sessions.find(s=>s.user_id==='employee-dossier-finance').id]);return c.query("update organization_memberships set sensitive_grants='{}' where organization_id=$1 and user_id='employee-dossier-hr'",[org]);}),e=>e.code==='42501','Another users proof is never accepted');
+ setAuditFailure(true);assert.equal((await write('hr',{grants:[],expectedRevision:2})).status,500);setAuditFailure(false);
+ assert.equal((await (await read()).json()).item.sensitive_grants_version,2,'Audit failure rolls rights and version back');
+ assert.equal((await write('hr',{grants:[],expectedRevision:2})).status,200);
+ await assert.rejects(()=>transaction(org,hr.userId,c=>requireSensitiveCapability(hr,'family:read',c)),e=>e.status===403,'Revocation applies even to a cached session object');
+ as('owner');response=await write('hr',{grants:['hr_sensitive:read'],expectedRevision:3});assert.equal(response.status,200);
+ const team=load('app/api/settings/team/members/[userId]/route.ts');
+ setAuditFailure(true);response=await team.PATCH(request({role:'finance',moduleProfile:'standard'},randomUUID(),'PATCH'),{params:Promise.resolve({userId:hr.userId})});assert.equal(response.status,500);setAuditFailure(false);
+ assert.deepEqual((await db.query('select sensitive_grants from organization_memberships where organization_id=$1 and user_id=$2',[org,hr.userId])).rows[0].sensitive_grants,['hr_sensitive:read'],'Failed role-change audit restores grants too');
+ response=await team.PATCH(request({role:'finance',moduleProfile:'standard'},randomUUID(),'PATCH'),{params:Promise.resolve({userId:hr.userId})});assert.equal(response.status,200,await response.clone().text());
+ const reset=(await db.query('select sensitive_grants,sensitive_grants_version from organization_memberships where organization_id=$1 and user_id=$2',[org,hr.userId])).rows[0];assert.deepEqual(reset.sensitive_grants,[]);assert.equal(reset.sensitive_grants_version,5,'Role change clears old grants and advances the revision');
+ response=await team.PATCH(request({role:'hr',moduleProfile:'standard'},randomUUID(),'PATCH'),{params:Promise.resolve({userId:hr.userId})});assert.equal(response.status,200);
+ assert.equal((await db.query('select id from auth_sessions where id=$1',[hr.sessionId])).rows.length,0,'Old authentication proof is revoked by role changes');
+ const renewed=randomUUID();await db.query("insert into auth_sessions(id,user_id,organization_id,token_hash,expires_at,step_up_at) values($1,$2,$3,$4,now()+interval '1 hour',now())",[renewed,hr.userId,org,'synthetic-'+renewed]);
+ as('owner',other);assert.equal((await read()).status,404);assert.equal((await write('hr',{grants:[],expectedRevision:5})).status,404);
+ as('owner',org,{organizationStatus:'read_only'});assert.equal((await write('hr',{grants:[],expectedRevision:5})).status,403);
+ as('owner');
+ await db.query("update organization_memberships set status='invited' where organization_id=$1 and user_id='employee-dossier-finance'",[org]);
+ assert.deepEqual((await db.query("select sensitive_grants from organization_memberships where organization_id=$1 and user_id='employee-dossier-finance'",[org])).rows[0].sensitive_grants,[],'Suspension/reset clears payroll access');
+ await db.query("update organization_memberships set status='active' where organization_id=$1 and user_id='employee-dossier-finance'",[org]);
+ console.log('Sensitive grants: default deny including owner/admin, explicit HR/family/payroll separation, role eligibility, current DB revocation, fresh session proof, stale/replay, role/status reset, tenant/read-only and atomic audit rollback passed. Self-service payslips remain a separate policy.');
+}

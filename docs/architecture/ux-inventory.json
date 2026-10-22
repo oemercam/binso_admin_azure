@@ -1057,6 +1057,35 @@
       ]
     },
     {
+      "route": "/api/auth/sensitive-access",
+      "file": "app/api/auth/sensitive-access/route.ts",
+      "methods": [
+        "GET"
+      ],
+      "imports": [
+        {
+          "local": "requireSession",
+          "target": "lib/server/session.ts",
+          "exported": "requireSession"
+        },
+        {
+          "local": "apiError",
+          "target": "lib/server/http.ts",
+          "exported": "apiError"
+        },
+        {
+          "local": "json",
+          "target": "lib/server/http.ts",
+          "exported": "json"
+        },
+        {
+          "local": "currentSensitiveCapabilities",
+          "target": "lib/server/sensitive-access.ts",
+          "exported": "currentSensitiveCapabilities"
+        }
+      ]
+    },
+    {
       "route": "/api/auth/session",
       "file": "app/api/auth/session/route.ts",
       "methods": [
@@ -6401,6 +6430,86 @@
       ]
     },
     {
+      "route": "/api/settings/team/members/[userId]/sensitive-access",
+      "file": "app/api/settings/team/members/[userId]/sensitive-access/route.ts",
+      "methods": [
+        "GET",
+        "PATCH"
+      ],
+      "imports": [
+        {
+          "local": "requireSession",
+          "target": "lib/server/session.ts",
+          "exported": "requireSession"
+        },
+        {
+          "local": "authorizeWorkforceManagement",
+          "target": "lib/server/workforce-access.ts",
+          "exported": "authorizeWorkforceManagement"
+        },
+        {
+          "local": "requireFreshAuthentication",
+          "target": "lib/server/fresh-authentication.ts",
+          "exported": "requireFreshAuthentication"
+        },
+        {
+          "local": "withTenant",
+          "target": "lib/server/db.ts",
+          "exported": "withTenant"
+        },
+        {
+          "local": "ApiError",
+          "target": "lib/server/http.ts",
+          "exported": "ApiError"
+        },
+        {
+          "local": "apiError",
+          "target": "lib/server/http.ts",
+          "exported": "apiError"
+        },
+        {
+          "local": "assertSameOrigin",
+          "target": "lib/server/http.ts",
+          "exported": "assertSameOrigin"
+        },
+        {
+          "local": "json",
+          "target": "lib/server/http.ts",
+          "exported": "json"
+        },
+        {
+          "local": "readJson",
+          "target": "lib/server/http.ts",
+          "exported": "readJson"
+        },
+        {
+          "local": "eligibleSensitiveCapabilities",
+          "target": "lib/sensitive-access.ts",
+          "exported": "eligibleSensitiveCapabilities"
+        },
+        {
+          "local": "sensitiveGrantIssue",
+          "target": "lib/sensitive-access.ts",
+          "exported": "sensitiveGrantIssue"
+        },
+        {
+          "local": "SensitiveCapability",
+          "target": "lib/sensitive-access.ts",
+          "exported": "SensitiveCapability"
+        },
+        {
+          "local": "idempotentBusiness",
+          "target": "lib/server/business-idempotency.ts",
+          "exported": "idempotentBusiness"
+        },
+        {
+          "local": "audit",
+          "target": "lib/server/audit.ts",
+          "exported": "audit"
+        }
+      ]
+    },
+    {
       "route": "/api/suppliers/[id]/bank",
       "file": "app/api/suppliers/[id]/bank/route.ts",
       "methods": [
@@ -6537,6 +6646,160 @@
           "local": "saveSupplierInvoice",
           "target": "lib/server/repositories/supplier-invoices.ts",
           "exported": "saveSupplierInvoice"
+        }
+      ]
+    },
+    {
+      "route": "/api/suppliers/[id]/resources/[resourceId]/assignments",
+      "file": "app/api/suppliers/[id]/resources/[resourceId]/assignments/route.ts",
+      "methods": [
+        "POST",
+        "PATCH"
+      ],
+      "imports": [
+        {
+          "local": "requireSession",
+          "target": "lib/server/session.ts",
+          "exported": "requireSession"
+        },
+        {
+          "local": "requireModuleEntitlement",
+          "target": "lib/server/plan-access.ts",
+          "exported": "requireModuleEntitlement"
+        },
+        {
+          "local": "withTenant",
+          "target": "lib/server/db.ts",
+          "exported": "withTenant"
+        },
+        {
+          "local": "apiError",
+          "target": "lib/server/http.ts",
+          "exported": "apiError"
+        },
+        {
+          "local": "assertSameOrigin",
+          "target": "lib/server/http.ts",
+          "exported": "assertSameOrigin"
+        },
+        {
+          "local": "json",
+          "target": "lib/server/http.ts",
+          "exported": "json"
+        },
+        {
+          "local": "readJson",
+          "target": "lib/server/http.ts",
+          "exported": "readJson"
+        },
+        {
+          "local": "writeExternalAssignment",
+          "target": "lib/server/repositories/external-resources.ts",
+          "exported": "writeExternalAssignment"
+        }
+      ]
+    },
+    {
+      "route": "/api/suppliers/[id]/resources/[resourceId]",
+      "file": "app/api/suppliers/[id]/resources/[resourceId]/route.ts",
+      "methods": [
+        "PATCH"
+      ],
+      "imports": [
+        {
+          "local": "requireSession",
+          "target": "lib/server/session.ts",
+          "exported": "requireSession"
+        },
+        {
+          "local": "requireModuleEntitlement",
+          "target": "lib/server/plan-access.ts",
+          "exported": "requireModuleEntitlement"
+        },
+        {
+          "local": "withTenant",
+          "target": "lib/server/db.ts",
+          "exported": "withTenant"
+        },
+        {
+          "local": "apiError",
+          "target": "lib/server/http.ts",
+          "exported": "apiError"
+        },
+        {
+          "local": "assertSameOrigin",
+          "target": "lib/server/http.ts",
+          "exported": "assertSameOrigin"
+        },
+        {
+          "local": "json",
+          "target": "lib/server/http.ts",
+          "exported": "json"
+        },
+        {
+          "local": "readJson",
+          "target": "lib/server/http.ts",
+          "exported": "readJson"
+        },
+        {
+          "local": "writeExternalResource",
+          "target": "lib/server/repositories/external-resources.ts",
+          "exported": "writeExternalResource"
+        }
+      ]
+    },
+    {
+      "route": "/api/suppliers/[id]/resources",
+      "file": "app/api/suppliers/[id]/resources/route.ts",
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "imports": [
+        {
+          "local": "requireSession",
+          "target": "lib/server/session.ts",
+          "exported": "requireSession"
+        },
+        {
+          "local": "requireModuleEntitlement",
+          "target": "lib/server/plan-access.ts",
+          "exported": "requireModuleEntitlement"
+        },
+        {
+          "local": "withTenant",
+          "target": "lib/server/db.ts",
+          "exported": "withTenant"
+        },
+        {
+          "local": "apiError",
+          "target": "lib/server/http.ts",
+          "exported": "apiError"
+        },
+        {
+          "local": "assertSameOrigin",
+          "target": "lib/server/http.ts",
+          "exported": "assertSameOrigin"
+        },
+        {
+          "local": "json",
+          "target": "lib/server/http.ts",
+          "exported": "json"
+        },
+        {
+          "local": "readJson",
+          "target": "lib/server/http.ts",
+          "exported": "readJson"
+        },
+        {
+          "local": "listExternalResources",
+          "target": "lib/server/repositories/external-resources.ts",
+          "exported": "listExternalResources"
+        },
+        {
+          "local": "writeExternalResource",
+          "target": "lib/server/repositories/external-resources.ts",
+          "exported": "writeExternalResource"
         }
       ]
     },
@@ -58210,6 +58473,10 @@
         "components/binso-ux.tsx#ActionsMenu",
         "components/binso-ux.tsx#RowActions",
         "components/binso-ux.tsx#FormSheet",
+        "components/sensitive-access.tsx#SensitiveAccess",
+        "components/sensitive-access.tsx#Access",
+        "components/ui.tsx#Toggle",
+        "components/sensitive-access.tsx#labels",
         "components/workforce-assignments.tsx#WorkforceAssignments",
         "components/workforce-assignments.tsx#Payload",
         "components/workforce-assignments.tsx#Assignment",
@@ -58449,6 +58716,12 @@
         "components/binso-ux.tsx#ActionsMenu",
         "components/binso-ux.tsx#RowActions",
         "components/binso-ux.tsx#FormSheet",
+        "components/sensitive-access.tsx#SensitiveAccess",
+        "components/sensitive-access.tsx#Access",
+        "lib/sensitive-access.ts#SensitiveCapability",
+        "lib/sensitive-access.ts#sensitiveCapabilities",
+        "components/ui.tsx#Toggle",
+        "components/sensitive-access.tsx#labels",
         "components/workforce-assignments.tsx#WorkforceAssignments",
         "config/plan-access.ts#isPlanId",
         "components/workforce-assignments.tsx#Payload",
@@ -58474,7 +58747,6 @@
         "components/privacy-consent.tsx#consentVersion",
         "components/privacy-consent.tsx#storePreferences",
         "components/privacy-consent.tsx#privacyPreferenceEvent",
-        "components/ui.tsx#Toggle",
         "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog",
         "components/password-input.tsx#PasswordInput",
         "components/pwa-register.tsx#PwaRegister",
@@ -58701,6 +58973,10 @@
         "components/binso-ux.tsx#ActionsMenu",
         "components/binso-ux.tsx#RowActions",
         "components/binso-ux.tsx#FormSheet",
+        "components/sensitive-access.tsx#SensitiveAccess",
+        "components/sensitive-access.tsx#Access",
+        "components/ui.tsx#Toggle",
+        "components/sensitive-access.tsx#labels",
         "components/workforce-assignments.tsx#WorkforceAssignments",
         "components/workforce-assignments.tsx#Payload",
         "components/workforce-assignments.tsx#Assignment",
@@ -58718,7 +58994,6 @@
         "components/privacy-consent.tsx#consentVersion",
         "components/privacy-consent.tsx#storePreferences",
         "components/privacy-consent.tsx#privacyPreferenceEvent",
-        "components/ui.tsx#Toggle",
         "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog",
         "components/password-input.tsx#PasswordInput",
         "components/pwa-register.tsx#PwaRegister",
@@ -58960,6 +59235,12 @@
         "components/binso-ux.tsx#ActionsMenu",
         "components/binso-ux.tsx#RowActions",
         "components/binso-ux.tsx#FormSheet",
+        "components/sensitive-access.tsx#SensitiveAccess",
+        "components/sensitive-access.tsx#Access",
+        "lib/sensitive-access.ts#SensitiveCapability",
+        "lib/sensitive-access.ts#sensitiveCapabilities",
+        "components/ui.tsx#Toggle",
+        "components/sensitive-access.tsx#labels",
         "components/workforce-assignments.tsx#WorkforceAssignments",
         "config/plan-access.ts#isPlanId",
         "components/workforce-assignments.tsx#Payload",
@@ -58983,7 +59264,6 @@
         "components/privacy-consent.tsx#consentVersion",
         "components/privacy-consent.tsx#storePreferences",
         "components/privacy-consent.tsx#privacyPreferenceEvent",
-        "components/ui.tsx#Toggle",
         "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog",
         "components/password-input.tsx#PasswordInput",
         "components/pwa-register.tsx#PwaRegister",
@@ -59869,52 +60149,52 @@
       "widgets": [
         {
           "tag": "ConfirmDialog",
-          "line": 52,
-          "component": "components/team-settings.tsx#TeamSettingsPage"
-        },
-        {
-          "tag": "FormSheet",
-          "line": 53,
-          "component": "components/team-settings.tsx#TeamSettingsPage"
-        },
-        {
-          "tag": "Field",
-          "line": 53,
-          "component": "components/team-settings.tsx#TeamSettingsPage"
-        },
-        {
-          "tag": "Field",
-          "line": 53,
-          "component": "components/team-settings.tsx#TeamSettingsPage"
-        },
-        {
-          "tag": "Field",
-          "line": 53,
-          "component": "components/team-settings.tsx#TeamSettingsPage"
-        },
-        {
-          "tag": "ConfirmDialog",
           "line": 54,
           "component": "components/team-settings.tsx#TeamSettingsPage"
         },
         {
-          "tag": "ConfirmDialog",
+          "tag": "FormSheet",
           "line": 55,
           "component": "components/team-settings.tsx#TeamSettingsPage"
         },
         {
+          "tag": "Field",
+          "line": 55,
+          "component": "components/team-settings.tsx#TeamSettingsPage"
+        },
+        {
+          "tag": "Field",
+          "line": 55,
+          "component": "components/team-settings.tsx#TeamSettingsPage"
+        },
+        {
+          "tag": "Field",
+          "line": 55,
+          "component": "components/team-settings.tsx#TeamSettingsPage"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 56,
+          "component": "components/team-settings.tsx#TeamSettingsPage"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 57,
+          "component": "components/team-settings.tsx#TeamSettingsPage"
+        },
+        {
           "tag": "FormSheet",
-          "line": 56,
+          "line": 58,
           "component": "components/team-settings.tsx#TeamSettingsPage"
         },
         {
           "tag": "Field",
-          "line": 56,
+          "line": 58,
           "component": "components/team-settings.tsx#TeamSettingsPage"
         },
         {
           "tag": "Field",
-          "line": 56,
+          "line": 58,
           "component": "components/team-settings.tsx#TeamSettingsPage"
         },
         {
@@ -60006,6 +60286,11 @@
           "tag": "Sheet",
           "line": 197,
           "component": "components/binso-ux.tsx#FormSheet"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 31,
+          "component": "components/sensitive-access.tsx#SensitiveAccess"
         },
         {
           "tag": "FormSheet",
@@ -79145,7 +79430,15 @@
         "components/pdf-preview.tsx#DocumentModal",
         "components/pdf-preview.tsx#DocumentPageViewer",
         "components/pdf-preview.tsx#DocumentPages",
-        "components/pdf-preview.tsx#PdfPage"
+        "components/pdf-preview.tsx#PdfPage",
+        "components/external-resources.tsx#ExternalResources",
+        "components/external-resources.tsx#Resource",
+        "components/external-resources.tsx#Assignment",
+        "components/external-resources.tsx#Attempt",
+        "components/directory-select.tsx#DirectorySelect",
+        "components/directory-select.tsx#Item",
+        "components/directory-select.tsx#Page",
+        "components/ui.tsx#Toggle"
       ],
       "pageRenderGraph": [
         "app/lieferanten/[id]/page.tsx#Page",
@@ -79408,7 +79701,19 @@
         "components/pdf-preview.tsx#DocumentPages",
         "lib/pdf-gestures.ts#boundPdfZoom",
         "lib/pdf-gestures.ts#pdfSwipePage",
-        "components/pdf-preview.tsx#PdfPage"
+        "components/pdf-preview.tsx#PdfPage",
+        "components/external-resources.tsx#ExternalResources",
+        "components/external-resources.tsx#Resource",
+        "components/external-resources.tsx#Assignment",
+        "lib/financial-status.ts#businessDate",
+        "components/external-resources.tsx#Attempt",
+        "lib/display-format.ts#formatTimestampDate",
+        "lib/display-format.ts#formatTimestamp",
+        "components/directory-select.tsx#DirectorySelect",
+        "components/directory-select.tsx#Item",
+        "components/directory-select.tsx#Page",
+        "lib/directory-query.ts#directoryQuery",
+        "components/ui.tsx#Toggle"
       ],
       "layoutRenderGraph": [
         "app/layout.tsx#RootLayout",
@@ -79425,7 +79730,6 @@
         "components/privacy-consent.tsx#consentVersion",
         "components/privacy-consent.tsx#storePreferences",
         "components/privacy-consent.tsx#privacyPreferenceEvent",
-        "components/ui.tsx#Toggle",
         "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog",
         "components/password-input.tsx#PasswordInput",
         "components/pwa-register.tsx#PwaRegister",
@@ -79660,6 +79964,14 @@
         "components/pdf-preview.tsx#DocumentPageViewer",
         "components/pdf-preview.tsx#DocumentPages",
         "components/pdf-preview.tsx#PdfPage",
+        "components/external-resources.tsx#ExternalResources",
+        "components/external-resources.tsx#Resource",
+        "components/external-resources.tsx#Assignment",
+        "components/external-resources.tsx#Attempt",
+        "components/directory-select.tsx#DirectorySelect",
+        "components/directory-select.tsx#Item",
+        "components/directory-select.tsx#Page",
+        "components/ui.tsx#Toggle",
         "components/font-preload.tsx#FontPreload",
         "components/theme-runtime.tsx#ThemeRuntime",
         "components/app-shell.tsx#AppShellLayout",
@@ -79671,7 +79983,6 @@
         "components/privacy-consent.tsx#consentVersion",
         "components/privacy-consent.tsx#storePreferences",
         "components/privacy-consent.tsx#privacyPreferenceEvent",
-        "components/ui.tsx#Toggle",
         "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog",
         "components/password-input.tsx#PasswordInput",
         "components/pwa-register.tsx#PwaRegister",
@@ -79941,6 +80252,18 @@
         "lib/pdf-gestures.ts#boundPdfZoom",
         "lib/pdf-gestures.ts#pdfSwipePage",
         "components/pdf-preview.tsx#PdfPage",
+        "components/external-resources.tsx#ExternalResources",
+        "components/external-resources.tsx#Resource",
+        "components/external-resources.tsx#Assignment",
+        "lib/financial-status.ts#businessDate",
+        "components/external-resources.tsx#Attempt",
+        "lib/display-format.ts#formatTimestampDate",
+        "lib/display-format.ts#formatTimestamp",
+        "components/directory-select.tsx#DirectorySelect",
+        "components/directory-select.tsx#Item",
+        "components/directory-select.tsx#Page",
+        "lib/directory-query.ts#directoryQuery",
+        "components/ui.tsx#Toggle",
         "app/layout.tsx#RootLayout",
         "lib/locales/config.ts#localeCookie",
         "components/font-preload.tsx#FontPreload",
@@ -79955,7 +80278,6 @@
         "components/privacy-consent.tsx#consentVersion",
         "components/privacy-consent.tsx#storePreferences",
         "components/privacy-consent.tsx#privacyPreferenceEvent",
-        "components/ui.tsx#Toggle",
         "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog",
         "components/password-input.tsx#PasswordInput",
         "components/pwa-register.tsx#PwaRegister",
@@ -80873,7 +81195,8 @@
         "/api/files/",
         "/api/files",
         "/api/documents/",
-        "/api/documents/preview"
+        "/api/documents/preview",
+        "/api/projects"
       ],
       "collections": [],
       "permission": "purchasing:read",
@@ -80881,21 +81204,11 @@
       "widgets": [
         {
           "tag": "FormSheet",
-          "line": 70,
-          "component": "components/pages/suppliers.tsx#SupplierForm"
-        },
-        {
-          "tag": "form",
-          "line": 71,
-          "component": "components/pages/suppliers.tsx#SupplierForm"
-        },
-        {
-          "tag": "Field",
           "line": 72,
           "component": "components/pages/suppliers.tsx#SupplierForm"
         },
         {
-          "tag": "Field",
+          "tag": "form",
           "line": 73,
           "component": "components/pages/suppliers.tsx#SupplierForm"
         },
@@ -80927,6 +81240,16 @@
         {
           "tag": "Field",
           "line": 79,
+          "component": "components/pages/suppliers.tsx#SupplierForm"
+        },
+        {
+          "tag": "Field",
+          "line": 80,
+          "component": "components/pages/suppliers.tsx#SupplierForm"
+        },
+        {
+          "tag": "Field",
+          "line": 81,
           "component": "components/pages/suppliers.tsx#SupplierForm"
         },
         {
@@ -81118,6 +81441,46 @@
           "tag": "DocumentPageViewer",
           "line": 127,
           "component": "components/pdf-preview.tsx#DocumentModal"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 53,
+          "component": "components/external-resources.tsx#ExternalResources"
+        },
+        {
+          "tag": "form",
+          "line": 54,
+          "component": "components/external-resources.tsx#ExternalResources"
+        },
+        {
+          "tag": "Field",
+          "line": 55,
+          "component": "components/external-resources.tsx#ExternalResources"
+        },
+        {
+          "tag": "Field",
+          "line": 56,
+          "component": "components/external-resources.tsx#ExternalResources"
+        },
+        {
+          "tag": "Field",
+          "line": 56,
+          "component": "components/external-resources.tsx#ExternalResources"
+        },
+        {
+          "tag": "Field",
+          "line": 57,
+          "component": "components/external-resources.tsx#ExternalResources"
+        },
+        {
+          "tag": "Field",
+          "line": 57,
+          "component": "components/external-resources.tsx#ExternalResources"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 61,
+          "component": "components/external-resources.tsx#ExternalResources"
         },
         {
           "tag": "FreshAuthenticationDialog",
@@ -81360,7 +81723,15 @@
         "components/pdf-preview.tsx#DocumentModal",
         "components/pdf-preview.tsx#DocumentPageViewer",
         "components/pdf-preview.tsx#DocumentPages",
-        "components/pdf-preview.tsx#PdfPage"
+        "components/pdf-preview.tsx#PdfPage",
+        "components/external-resources.tsx#ExternalResources",
+        "components/external-resources.tsx#Resource",
+        "components/external-resources.tsx#Assignment",
+        "components/external-resources.tsx#Attempt",
+        "components/directory-select.tsx#DirectorySelect",
+        "components/directory-select.tsx#Item",
+        "components/directory-select.tsx#Page",
+        "components/ui.tsx#Toggle"
       ],
       "pageRenderGraph": [
         "app/lieferanten/neu/page.tsx#Page",
@@ -81623,7 +81994,19 @@
         "components/pdf-preview.tsx#DocumentPages",
         "lib/pdf-gestures.ts#boundPdfZoom",
         "lib/pdf-gestures.ts#pdfSwipePage",
-        "components/pdf-preview.tsx#PdfPage"
+        "components/pdf-preview.tsx#PdfPage",
+        "components/external-resources.tsx#ExternalResources",
+        "components/external-resources.tsx#Resource",
+        "components/external-resources.tsx#Assignment",
+        "lib/financial-status.ts#businessDate",
+        "components/external-resources.tsx#Attempt",
+        "lib/display-format.ts#formatTimestampDate",
+        "lib/display-format.ts#formatTimestamp",
+        "components/directory-select.tsx#DirectorySelect",
+        "components/directory-select.tsx#Item",
+        "components/directory-select.tsx#Page",
+        "lib/directory-query.ts#directoryQuery",
+        "components/ui.tsx#Toggle"
       ],
       "layoutRenderGraph": [
         "app/layout.tsx#RootLayout",
@@ -81640,7 +82023,6 @@
         "components/privacy-consent.tsx#consentVersion",
         "components/privacy-consent.tsx#storePreferences",
         "components/privacy-consent.tsx#privacyPreferenceEvent",
-        "components/ui.tsx#Toggle",
         "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog",
         "components/password-input.tsx#PasswordInput",
         "components/pwa-register.tsx#PwaRegister",
@@ -81875,6 +82257,14 @@
         "components/pdf-preview.tsx#DocumentPageViewer",
         "components/pdf-preview.tsx#DocumentPages",
         "components/pdf-preview.tsx#PdfPage",
+        "components/external-resources.tsx#ExternalResources",
+        "components/external-resources.tsx#Resource",
+        "components/external-resources.tsx#Assignment",
+        "components/external-resources.tsx#Attempt",
+        "components/directory-select.tsx#DirectorySelect",
+        "components/directory-select.tsx#Item",
+        "components/directory-select.tsx#Page",
+        "components/ui.tsx#Toggle",
         "components/font-preload.tsx#FontPreload",
         "components/theme-runtime.tsx#ThemeRuntime",
         "components/app-shell.tsx#AppShellLayout",
@@ -81886,7 +82276,6 @@
         "components/privacy-consent.tsx#consentVersion",
         "components/privacy-consent.tsx#storePreferences",
         "components/privacy-consent.tsx#privacyPreferenceEvent",
-        "components/ui.tsx#Toggle",
         "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog",
         "components/password-input.tsx#PasswordInput",
         "components/pwa-register.tsx#PwaRegister",
@@ -82156,6 +82545,18 @@
         "lib/pdf-gestures.ts#boundPdfZoom",
         "lib/pdf-gestures.ts#pdfSwipePage",
         "components/pdf-preview.tsx#PdfPage",
+        "components/external-resources.tsx#ExternalResources",
+        "components/external-resources.tsx#Resource",
+        "components/external-resources.tsx#Assignment",
+        "lib/financial-status.ts#businessDate",
+        "components/external-resources.tsx#Attempt",
+        "lib/display-format.ts#formatTimestampDate",
+        "lib/display-format.ts#formatTimestamp",
+        "components/directory-select.tsx#DirectorySelect",
+        "components/directory-select.tsx#Item",
+        "components/directory-select.tsx#Page",
+        "lib/directory-query.ts#directoryQuery",
+        "components/ui.tsx#Toggle",
         "app/layout.tsx#RootLayout",
         "lib/locales/config.ts#localeCookie",
         "components/font-preload.tsx#FontPreload",
@@ -82170,7 +82571,6 @@
         "components/privacy-consent.tsx#consentVersion",
         "components/privacy-consent.tsx#storePreferences",
         "components/privacy-consent.tsx#privacyPreferenceEvent",
-        "components/ui.tsx#Toggle",
         "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog",
         "components/password-input.tsx#PasswordInput",
         "components/pwa-register.tsx#PwaRegister",
@@ -83088,7 +83488,8 @@
         "/api/files/",
         "/api/files",
         "/api/documents/",
-        "/api/documents/preview"
+        "/api/documents/preview",
+        "/api/projects"
       ],
       "collections": [],
       "permission": "purchasing:read",
@@ -83096,21 +83497,11 @@
       "widgets": [
         {
           "tag": "FormSheet",
-          "line": 70,
-          "component": "components/pages/suppliers.tsx#SupplierForm"
-        },
-        {
-          "tag": "form",
-          "line": 71,
-          "component": "components/pages/suppliers.tsx#SupplierForm"
-        },
-        {
-          "tag": "Field",
           "line": 72,
           "component": "components/pages/suppliers.tsx#SupplierForm"
         },
         {
-          "tag": "Field",
+          "tag": "form",
           "line": 73,
           "component": "components/pages/suppliers.tsx#SupplierForm"
         },
@@ -83142,6 +83533,16 @@
         {
           "tag": "Field",
           "line": 79,
+          "component": "components/pages/suppliers.tsx#SupplierForm"
+        },
+        {
+          "tag": "Field",
+          "line": 80,
+          "component": "components/pages/suppliers.tsx#SupplierForm"
+        },
+        {
+          "tag": "Field",
+          "line": 81,
           "component": "components/pages/suppliers.tsx#SupplierForm"
         },
         {
@@ -83333,6 +83734,46 @@
           "tag": "DocumentPageViewer",
           "line": 127,
           "component": "components/pdf-preview.tsx#DocumentModal"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 53,
+          "component": "components/external-resources.tsx#ExternalResources"
+        },
+        {
+          "tag": "form",
+          "line": 54,
+          "component": "components/external-resources.tsx#ExternalResources"
+        },
+        {
+          "tag": "Field",
+          "line": 55,
+          "component": "components/external-resources.tsx#ExternalResources"
+        },
+        {
+          "tag": "Field",
+          "line": 56,
+          "component": "components/external-resources.tsx#ExternalResources"
+        },
+        {
+          "tag": "Field",
+          "line": 56,
+          "component": "components/external-resources.tsx#ExternalResources"
+        },
+        {
+          "tag": "Field",
+          "line": 57,
+          "component": "components/external-resources.tsx#ExternalResources"
+        },
+        {
+          "tag": "Field",
+          "line": 57,
+          "component": "components/external-resources.tsx#ExternalResources"
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 61,
+          "component": "components/external-resources.tsx#ExternalResources"
         },
         {
           "tag": "FreshAuthenticationDialog",
@@ -85203,12 +85644,12 @@
       "widgets": [
         {
           "tag": "RecordsControls",
-          "line": 24,
+          "line": 25,
           "component": "components/pages/suppliers.tsx#SuppliersPage"
         },
         {
           "tag": "RecordsView",
-          "line": 25,
+          "line": 26,
           "component": "components/pages/suppliers.tsx#SuppliersPage"
         },
         {
@@ -207682,7 +208123,7 @@
       "key": "components/team-settings.tsx#TeamSettingsPage",
       "file": "components/team-settings.tsx",
       "name": "TeamSettingsPage",
-      "line": 24,
+      "line": 25,
       "classes": [
         "page-add-button",
         "responsive-create-action",
@@ -207704,49 +208145,49 @@
       "widgets": [
         {
           "tag": "ConfirmDialog",
-          "line": 52
-        },
-        {
-          "tag": "FormSheet",
-          "line": 53
-        },
-        {
-          "tag": "Field",
-          "line": 53
-        },
-        {
-          "tag": "Field",
-          "line": 53
-        },
-        {
-          "tag": "Field",
-          "line": 53
-        },
-        {
-          "tag": "ConfirmDialog",
           "line": 54
         },
         {
-          "tag": "ConfirmDialog",
+          "tag": "FormSheet",
           "line": 55
         },
         {
+          "tag": "Field",
+          "line": 55
+        },
+        {
+          "tag": "Field",
+          "line": 55
+        },
+        {
+          "tag": "Field",
+          "line": 55
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 56
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 57
+        },
+        {
           "tag": "FormSheet",
-          "line": 56
+          "line": 58
         },
         {
           "tag": "Field",
-          "line": 56
+          "line": 58
         },
         {
           "tag": "Field",
-          "line": 56
+          "line": 58
         }
       ],
       "elements": [
         {
           "tag": "AppShell",
-          "line": 47,
+          "line": 49,
           "props": [
             "title=\"Benutzer & Rollen\"",
             "subtitle=\"Zugänge, Rollen und Einladungen verwalten.\"",
@@ -207758,7 +208199,7 @@
         },
         {
           "tag": "Button",
-          "line": 47,
+          "line": 49,
           "props": [
             "icon=\"plus\"",
             "disabled={!data.capacityConfigured}",
@@ -207769,68 +208210,68 @@
         },
         {
           "tag": "span",
-          "line": 47,
+          "line": 49,
           "props": [
             "className=\"create-action-label\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 47,
+          "line": 49,
           "props": []
         },
         {
           "tag": "p",
-          "line": 48,
+          "line": 50,
           "props": [
             "className=\"settings-note\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 48,
+          "line": 50,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 48,
+          "line": 50,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 48,
+          "line": 50,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 48,
+          "line": 50,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 48,
+          "line": 50,
           "props": []
         },
         {
           "tag": "div",
-          "line": 49,
+          "line": 51,
           "props": [
             "className=\"settings-choice-list team-list\""
           ]
         },
         {
           "tag": "LoadingState",
-          "line": 49,
+          "line": 51,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 49,
+          "line": 51,
           "props": []
         },
         {
           "tag": "ErrorState",
-          "line": 49,
+          "line": 51,
           "props": [
             "onRetry={()=>void load()}",
             "retryLabel=\"Erneut laden\""
@@ -207838,12 +208279,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 49,
+          "line": 51,
           "props": []
         },
         {
           "tag": "button",
-          "line": 49,
+          "line": 51,
           "props": [
             "type=\"button\"",
             "key={m.user_id}",
@@ -207853,7 +208294,7 @@
         },
         {
           "tag": "Avatar",
-          "line": 49,
+          "line": 51,
           "props": [
             "name={m.name||m.email||\"\"}",
             "identity={m.user_id}"
@@ -207861,51 +208302,51 @@
         },
         {
           "tag": "div",
-          "line": 49,
+          "line": 51,
           "props": []
         },
         {
           "tag": "b",
-          "line": 49,
+          "line": 51,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 49,
+          "line": 51,
           "props": [
             "verbatim={!!(m.name||m.email)}"
           ]
         },
         {
           "tag": "small",
-          "line": 49,
+          "line": 51,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 49,
+          "line": 51,
           "props": []
         },
         {
           "tag": "small",
-          "line": 49,
+          "line": 51,
           "props": []
         },
         {
           "tag": "Status",
-          "line": 49,
+          "line": 51,
           "props": [
             "tone=\"success\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 49,
+          "line": 51,
           "props": []
         },
         {
           "tag": "Icon",
-          "line": 49,
+          "line": 51,
           "props": [
             "name=\"arrow\"",
             "size={17}"
@@ -207913,35 +208354,35 @@
         },
         {
           "tag": "EmptyState",
-          "line": 49,
+          "line": 51,
           "props": [
             "title=\"Keine Mitarbeitenden\""
           ]
         },
         {
           "tag": "section",
-          "line": 50,
+          "line": 52,
           "props": [
             "className=\"settings-section\""
           ]
         },
         {
           "tag": "SectionTitle",
-          "line": 50,
+          "line": 52,
           "props": [
             "title=\"Offene Einladungen\""
           ]
         },
         {
           "tag": "div",
-          "line": 50,
+          "line": 52,
           "props": [
             "className=\"settings-choice-list\""
           ]
         },
         {
           "tag": "div",
-          "line": 50,
+          "line": 52,
           "props": [
             "className=\"settings-static-row\"",
             "key={i.id}"
@@ -207949,41 +208390,41 @@
         },
         {
           "tag": "Icon",
-          "line": 50,
+          "line": 52,
           "props": [
             "name=\"mail\""
           ]
         },
         {
           "tag": "div",
-          "line": 50,
+          "line": 52,
           "props": []
         },
         {
           "tag": "b",
-          "line": 50,
+          "line": 52,
           "props": []
         },
         {
           "tag": "small",
-          "line": 50,
+          "line": 52,
           "props": []
         },
         {
           "tag": "Status",
-          "line": 50,
+          "line": 52,
           "props": [
             "tone=\"warning\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 50,
+          "line": 52,
           "props": []
         },
         {
           "tag": "ActionsMenu",
-          "line": 50,
+          "line": 52,
           "props": [
             "label=\"Einladungsaktionen\"",
             "busy={saving}"
@@ -207991,7 +208432,7 @@
         },
         {
           "tag": "ActionRow",
-          "line": 50,
+          "line": 52,
           "props": [
             "title=\"Einladung erneut senden\"",
             "icon=\"mail\"",
@@ -208000,7 +208441,7 @@
         },
         {
           "tag": "ActionRow",
-          "line": 50,
+          "line": 52,
           "props": [
             "danger",
             "title=\"Zurückziehen\"",
@@ -208010,7 +208451,7 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 52,
+          "line": 54,
           "props": [
             "open={!!resendId}",
             "busy={saving}",
@@ -208023,7 +208464,7 @@
         },
         {
           "tag": "FormSheet",
-          "line": 53,
+          "line": 55,
           "props": [
             "label={\"Mitarbeiter einladen\"}",
             "description={\"Zugang und Rolle können später geändert werden.\"}",
@@ -208037,21 +208478,21 @@
         },
         {
           "tag": "div",
-          "line": 53,
+          "line": 55,
           "props": [
             "className=\"form-grid\""
           ]
         },
         {
           "tag": "Field",
-          "line": 53,
+          "line": 55,
           "props": [
             "label=\"E-Mail\""
           ]
         },
         {
           "tag": "Input",
-          "line": 53,
+          "line": 55,
           "props": [
             "type=\"email\"",
             "value={email}",
@@ -208061,14 +208502,14 @@
         },
         {
           "tag": "Field",
-          "line": 53,
+          "line": 55,
           "props": [
             "label=\"Rolle\""
           ]
         },
         {
           "tag": "Select",
-          "line": 53,
+          "line": 55,
           "props": [
             "value={role}",
             "onChange={e=>setRole(e.target.value)}"
@@ -208076,98 +208517,98 @@
         },
         {
           "tag": "option",
-          "line": 53,
+          "line": 55,
           "props": [
             "value=\"member\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 53,
+          "line": 55,
           "props": []
         },
         {
           "tag": "option",
-          "line": 53,
+          "line": 55,
           "props": [
             "value=\"reader\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 53,
+          "line": 55,
           "props": []
         },
         {
           "tag": "option",
-          "line": 53,
+          "line": 55,
           "props": [
             "value=\"project_manager\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 53,
+          "line": 55,
           "props": []
         },
         {
           "tag": "option",
-          "line": 53,
+          "line": 55,
           "props": [
             "value=\"manager\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 53,
+          "line": 55,
           "props": []
         },
         {
           "tag": "option",
-          "line": 53,
+          "line": 55,
           "props": [
             "value=\"finance\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 53,
+          "line": 55,
           "props": []
         },
         {
           "tag": "option",
-          "line": 53,
+          "line": 55,
           "props": [
             "value=\"hr\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 53,
+          "line": 55,
           "props": []
         },
         {
           "tag": "option",
-          "line": 53,
+          "line": 55,
           "props": [
             "value=\"admin\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 53,
+          "line": 55,
           "props": []
         },
         {
           "tag": "Field",
-          "line": 53,
+          "line": 55,
           "props": [
             "label=\"Modulprofil\""
           ]
         },
         {
           "tag": "Select",
-          "line": 53,
+          "line": 55,
           "props": [
             "value={moduleProfile}",
             "onChange={e=>setModuleProfile(e.target.value as \"standard\"|\"time_only\")}"
@@ -208175,38 +208616,38 @@
         },
         {
           "tag": "option",
-          "line": 53,
+          "line": 55,
           "props": [
             "value=\"standard\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 53,
+          "line": 55,
           "props": []
         },
         {
           "tag": "option",
-          "line": 53,
+          "line": 55,
           "props": [
             "value=\"time_only\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 53,
+          "line": 55,
           "props": []
         },
         {
           "tag": "FormActions",
-          "line": 53,
+          "line": 55,
           "props": [
             "sheet"
           ]
         },
         {
           "tag": "Button",
-          "line": 53,
+          "line": 55,
           "props": [
             "variant=\"secondary\"",
             "disabled={saving}",
@@ -208215,12 +208656,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 53,
+          "line": 55,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 53,
+          "line": 55,
           "props": [
             "onClick={()=>void invite()}",
             "disabled={saving||!data.capacityConfigured||data.userLimit!==null&&occupied>=data.userLimit}"
@@ -208228,12 +208669,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 53,
+          "line": 55,
           "props": []
         },
         {
           "tag": "ConfirmDialog",
-          "line": 54,
+          "line": 56,
           "props": [
             "open={confirmRole}",
             "busy={saving}",
@@ -208246,7 +208687,7 @@
         },
         {
           "tag": "ConfirmDialog",
-          "line": 55,
+          "line": 57,
           "props": [
             "open={confirmDeactivate}",
             "busy={saving}",
@@ -208259,7 +208700,7 @@
         },
         {
           "tag": "FormSheet",
-          "line": 56,
+          "line": 58,
           "props": [
             "label={selected.name||selected.email||\"Mitarbeiter\"}",
             "description={selected.email||selected.user_id}",
@@ -208273,14 +208714,14 @@
         },
         {
           "tag": "Field",
-          "line": 56,
+          "line": 58,
           "props": [
             "label=\"Rolle\""
           ]
         },
         {
           "tag": "Select",
-          "line": 56,
+          "line": 58,
           "props": [
             "value={editRole}",
             "disabled={selected.role===\"owner\"}",
@@ -208289,110 +208730,110 @@
         },
         {
           "tag": "option",
-          "line": 56,
+          "line": 58,
           "props": [
             "value=\"member\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 56,
+          "line": 58,
           "props": []
         },
         {
           "tag": "option",
-          "line": 56,
+          "line": 58,
           "props": [
             "value=\"reader\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 56,
+          "line": 58,
           "props": []
         },
         {
           "tag": "option",
-          "line": 56,
+          "line": 58,
           "props": [
             "value=\"project_manager\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 56,
+          "line": 58,
           "props": []
         },
         {
           "tag": "option",
-          "line": 56,
+          "line": 58,
           "props": [
             "value=\"manager\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 56,
+          "line": 58,
           "props": []
         },
         {
           "tag": "option",
-          "line": 56,
+          "line": 58,
           "props": [
             "value=\"finance\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 56,
+          "line": 58,
           "props": []
         },
         {
           "tag": "option",
-          "line": 56,
+          "line": 58,
           "props": [
             "value=\"hr\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 56,
+          "line": 58,
           "props": []
         },
         {
           "tag": "option",
-          "line": 56,
+          "line": 58,
           "props": [
             "value=\"admin\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 56,
+          "line": 58,
           "props": []
         },
         {
           "tag": "option",
-          "line": 56,
+          "line": 58,
           "props": [
             "value=\"owner\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 56,
+          "line": 58,
           "props": []
         },
         {
           "tag": "Field",
-          "line": 56,
+          "line": 58,
           "props": [
             "label=\"Modulprofil\""
           ]
         },
         {
           "tag": "Select",
-          "line": 56,
+          "line": 58,
           "props": [
             "value={editProfile}",
             "onChange={e=>setEditProfile(e.target.value as \"standard\"|\"time_only\")}"
@@ -208400,31 +208841,41 @@
         },
         {
           "tag": "option",
-          "line": 56,
+          "line": 58,
           "props": [
             "value=\"standard\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 56,
+          "line": 58,
           "props": []
         },
         {
           "tag": "option",
-          "line": 56,
+          "line": 58,
           "props": [
             "value=\"time_only\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 56,
+          "line": 58,
           "props": []
         },
         {
           "tag": "ActionRow",
-          "line": 56,
+          "line": 58,
+          "props": [
+            "requiresWrite",
+            "icon=\"lock\"",
+            "title=\"Sensible Fachrechte\"",
+            "onClick={()=>{if(editRole!==selected.role||editProfile!==(selected.module_profile??\"standard\")){setToast(\"Bitte die Rollenänderung zuerst speichern oder verwerfen.\");return;}setSensitiveUser(selected.user_id);setSelected(null);}}"
+          ]
+        },
+        {
+          "tag": "ActionRow",
+          "line": 58,
           "props": [
             "danger",
             "icon=\"lock\"",
@@ -208434,14 +208885,14 @@
         },
         {
           "tag": "FormActions",
-          "line": 56,
+          "line": 58,
           "props": [
             "sheet"
           ]
         },
         {
           "tag": "Button",
-          "line": 56,
+          "line": 58,
           "props": [
             "variant=\"secondary\"",
             "disabled={saving}",
@@ -208450,12 +208901,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 56,
+          "line": 58,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 56,
+          "line": 58,
           "props": [
             "disabled={saving||selected.role===editRole&&(selected.module_profile??\"standard\")===(editRole===\"member\"?editProfile:\"standard\")}",
             "onClick={()=>setConfirmRole(true)}"
@@ -208463,12 +208914,20 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 56,
+          "line": 58,
           "props": []
         },
         {
+          "tag": "SensitiveAccess",
+          "line": 59,
+          "props": [
+            "userId={sensitiveUser}",
+            "onClose={()=>setSensitiveUser(null)}"
+          ]
+        },
+        {
           "tag": "Toast",
-          "line": 57,
+          "line": 60,
           "props": [
             "title={toast}",
             "tone={toast.includes(\"konnte\")?\"danger\":\"success\"}"
@@ -208476,133 +208935,137 @@
         },
         {
           "tag": "WorkforceAssignments",
-          "line": 58,
+          "line": 61,
           "props": []
         }
       ],
       "conditions": [
         {
-          "line": 33,
+          "line": 34,
           "expression": "e instanceof Error"
         },
         {
-          "line": 37,
+          "line": 38,
           "expression": "mutation.current||!email.trim()||!canManage||!data.capacityConfigured"
         },
         {
-          "line": 37,
+          "line": 38,
           "expression": "!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email.trim())"
         },
         {
-          "line": 37,
+          "line": 38,
           "expression": "role===\"member\""
         },
         {
-          "line": 37,
+          "line": 38,
           "expression": "inviteRequest.current?.body!==body"
         },
         {
-          "line": 37,
+          "line": 38,
           "expression": "role===\"member\""
         },
         {
-          "line": 37,
+          "line": 38,
           "expression": "result.ok!==true"
         },
         {
-          "line": 37,
+          "line": 38,
           "expression": "e instanceof Error"
         },
         {
-          "line": 41,
+          "line": 43,
           "expression": "mutation.current||!selected||selected.role==='owner'||!canManage"
         },
         {
-          "line": 41,
+          "line": 43,
           "expression": "e instanceof Error"
         },
         {
-          "line": 42,
+          "line": 44,
           "expression": "mutation.current||!selected||selected.role===\"owner\"||!canManage"
         },
         {
-          "line": 42,
+          "line": 44,
           "expression": "editRole===\"member\""
         },
         {
-          "line": 42,
+          "line": 44,
           "expression": "m.user_id===selected.user_id"
         },
         {
-          "line": 42,
+          "line": 44,
           "expression": "editRole===\"member\""
         },
         {
-          "line": 42,
+          "line": 44,
           "expression": "e instanceof Error"
         },
         {
-          "line": 43,
+          "line": 45,
           "expression": "!canManage||mutation.current"
         },
         {
-          "line": 43,
+          "line": 45,
           "expression": "e instanceof Error"
         },
         {
-          "line": 45,
+          "line": 47,
           "expression": "!canManage||!resendId||mutation.current"
         },
         {
-          "line": 45,
+          "line": 47,
           "expression": "resendRequest.current?.id!==resendId"
         },
         {
-          "line": 45,
+          "line": 47,
           "expression": "result.ok!==true"
         },
         {
-          "line": 45,
+          "line": 47,
           "expression": "error instanceof Error"
         },
         {
-          "line": 47,
+          "line": 49,
           "expression": "canManage"
         },
         {
-          "line": 48,
+          "line": 50,
           "expression": "!data.capacityConfigured"
         },
         {
-          "line": 48,
+          "line": 50,
           "expression": "data.userLimit===null"
         },
         {
-          "line": 48,
+          "line": 50,
           "expression": "data.plan===\"trial\""
         },
         {
-          "line": 49,
+          "line": 51,
           "expression": "loading"
         },
         {
-          "line": 49,
+          "line": 51,
           "expression": "loadError"
         },
         {
-          "line": 49,
+          "line": 51,
           "expression": "data.members.length"
         },
         {
-          "line": 50,
+          "line": 52,
           "expression": "new Date(i.expires_at)>new Date()"
         },
         {
-          "line": 56,
+          "line": 58,
+          "expression": "editRole!==selected.role||editProfile!==(selected.module_profile??\"standard\")"
+        },
+        {
+          "line": 58,
           "expression": "editRole===\"member\""
         },
         {
-          "line": 57,
+          "line": 60,
           "expression": "toast.includes(\"konnte\")"
         }
       ]
@@ -208611,7 +209074,7 @@
       "key": "components/team-settings.tsx#TeamPayload",
       "file": "components/team-settings.tsx",
       "name": "TeamPayload",
-      "line": 15,
+      "line": 16,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -208623,7 +209086,7 @@
       "key": "components/team-settings.tsx#Member",
       "file": "components/team-settings.tsx",
       "name": "Member",
-      "line": 13,
+      "line": 14,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -208635,7 +209098,7 @@
       "key": "components/team-settings.tsx#Invitation",
       "file": "components/team-settings.tsx",
       "name": "Invitation",
-      "line": 14,
+      "line": 15,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -208647,7 +209110,215 @@
       "key": "components/team-settings.tsx#roleLabel",
       "file": "components/team-settings.tsx",
       "name": "roleLabel",
-      "line": 23,
+      "line": 24,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": []
+    },
+    {
+      "key": "components/sensitive-access.tsx#SensitiveAccess",
+      "file": "components/sensitive-access.tsx",
+      "name": "SensitiveAccess",
+      "line": 16,
+      "classes": [
+        "settings-choice-list"
+      ],
+      "apis": [
+        "/api/settings/team/members/"
+      ],
+      "collections": [],
+      "widgets": [
+        {
+          "tag": "FormSheet",
+          "line": 31
+        }
+      ],
+      "elements": [
+        {
+          "tag": "FormSheet",
+          "line": 31,
+          "props": [
+            "open",
+            "onClose={onClose}",
+            "label=\"Sensible Fachrechte\"",
+            "busy={busy}",
+            "dirty={JSON.stringify([...grants].sort())!==original}"
+          ]
+        },
+        {
+          "tag": "p",
+          "line": 32,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 32,
+          "props": []
+        },
+        {
+          "tag": "LoadingState",
+          "line": 33,
+          "props": []
+        },
+        {
+          "tag": "ErrorState",
+          "line": 33,
+          "props": [
+            "onRetry={query.refresh}"
+          ]
+        },
+        {
+          "tag": "p",
+          "line": 33,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 33,
+          "props": []
+        },
+        {
+          "tag": "div",
+          "line": 33,
+          "props": [
+            "className=\"settings-choice-list\""
+          ]
+        },
+        {
+          "tag": "Toggle",
+          "line": 33,
+          "props": [
+            "key={capability}",
+            "label={labels[capability]}",
+            "checked={grants.includes(capability)}",
+            "disabled={busy}",
+            "onChange={()=>setGrants(current=>current.includes(capability)?current.filter(item=>item!==capability):[...current,capability])}"
+          ]
+        },
+        {
+          "tag": "ErrorState",
+          "line": 34,
+          "props": []
+        },
+        {
+          "tag": "FormActions",
+          "line": 35,
+          "props": [
+            "sheet"
+          ]
+        },
+        {
+          "tag": "Button",
+          "line": 35,
+          "props": [
+            "variant=\"secondary\"",
+            "disabled={busy}",
+            "onClick={onClose}"
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 35,
+          "props": []
+        },
+        {
+          "tag": "Button",
+          "line": 35,
+          "props": [
+            "requiresWrite",
+            "disabled={busy||JSON.stringify([...grants].sort())===original||query.loading||!!query.error||!revision||query.data?.item.status!=='active'||query.data.item.module_profile!=='standard'}",
+            "onClick={()=>void save()}"
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 35,
+          "props": []
+        }
+      ],
+      "conditions": [
+        {
+          "line": 19,
+          "expression": "!query.data?.item"
+        },
+        {
+          "line": 21,
+          "expression": "pending.current||!query.data"
+        },
+        {
+          "line": 24,
+          "expression": "attempt.current?.body!==serialized"
+        },
+        {
+          "line": 26,
+          "expression": "!result.item?.sensitive_grants_version"
+        },
+        {
+          "line": 28,
+          "expression": "cause instanceof Error"
+        },
+        {
+          "line": 33,
+          "expression": "query.loading"
+        },
+        {
+          "line": 33,
+          "expression": "query.error"
+        },
+        {
+          "line": 33,
+          "expression": "query.data?.item.status!=='active'||query.data.item.module_profile!=='standard'"
+        },
+        {
+          "line": 33,
+          "expression": "current.includes(capability)"
+        }
+      ]
+    },
+    {
+      "key": "components/sensitive-access.tsx#Access",
+      "file": "components/sensitive-access.tsx",
+      "name": "Access",
+      "line": 15,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": []
+    },
+    {
+      "key": "lib/sensitive-access.ts#SensitiveCapability",
+      "file": "lib/sensitive-access.ts",
+      "name": "SensitiveCapability",
+      "line": 4,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": []
+    },
+    {
+      "key": "lib/sensitive-access.ts#sensitiveCapabilities",
+      "file": "lib/sensitive-access.ts",
+      "name": "sensitiveCapabilities",
+      "line": 3,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": []
+    },
+    {
+      "key": "components/sensitive-access.tsx#labels",
+      "file": "components/sensitive-access.tsx",
+      "name": "labels",
+      "line": 10,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -215147,7 +215818,7 @@
       "key": "components/pages/suppliers.tsx#SupplierForm",
       "file": "components/pages/suppliers.tsx",
       "name": "SupplierForm",
-      "line": 31,
+      "line": 32,
       "classes": [
         "surface",
         "detail-list",
@@ -215162,18 +215833,10 @@
       "widgets": [
         {
           "tag": "FormSheet",
-          "line": 70
-        },
-        {
-          "tag": "form",
-          "line": 71
-        },
-        {
-          "tag": "Field",
           "line": 72
         },
         {
-          "tag": "Field",
+          "tag": "form",
           "line": 73
         },
         {
@@ -215199,12 +215862,20 @@
         {
           "tag": "Field",
           "line": 79
+        },
+        {
+          "tag": "Field",
+          "line": 80
+        },
+        {
+          "tag": "Field",
+          "line": 81
         }
       ],
       "elements": [
         {
           "tag": "AppShell",
-          "line": 65,
+          "line": 66,
           "props": [
             "title=\"Lieferant\"",
             "active=\"lieferanten\"",
@@ -215214,26 +215885,26 @@
         },
         {
           "tag": "LoadingState",
-          "line": 65,
+          "line": 66,
           "props": []
         },
         {
           "tag": "ErrorState",
-          "line": 65,
+          "line": 66,
           "props": [
             "onRetry={query.refresh}"
           ]
         },
         {
           "tag": "EmptyState",
-          "line": 65,
+          "line": 66,
           "props": [
             "title=\"Lieferant wurde nicht gefunden.\""
           ]
         },
         {
           "tag": "AppShell",
-          "line": 66,
+          "line": 67,
           "props": [
             "title={existing?draft.name:'Lieferant hinzufügen'}",
             "titleIsUserContent={existing}",
@@ -215246,14 +215917,14 @@
         },
         {
           "tag": "ActionsMenu",
-          "line": 66,
+          "line": 67,
           "props": [
             "label=\"Lieferantenaktionen\""
           ]
         },
         {
           "tag": "ActionRow",
-          "line": 66,
+          "line": 67,
           "props": [
             "requiresWrite",
             "icon=\"edit\"",
@@ -215263,50 +215934,50 @@
         },
         {
           "tag": "section",
-          "line": 67,
+          "line": 68,
           "props": [
             "className=\"surface\""
           ]
         },
         {
           "tag": "SectionTitle",
-          "line": 67,
+          "line": 68,
           "props": [
             "title=\"Stammdaten\""
           ]
         },
         {
           "tag": "dl",
-          "line": 67,
+          "line": 68,
           "props": [
             "className=\"detail-list\""
           ]
         },
         {
           "tag": "div",
-          "line": 67,
+          "line": 68,
           "props": [
             "key={label}"
           ]
         },
         {
           "tag": "dt",
-          "line": 67,
+          "line": 68,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 67,
+          "line": 68,
           "props": []
         },
         {
           "tag": "dd",
-          "line": 67,
+          "line": 68,
           "props": []
         },
         {
           "tag": "SupplierBank",
-          "line": 68,
+          "line": 69,
           "props": [
             "supplierId={supplierId}",
             "mayWrite={tenantCan(role,'bank:write',profile)}",
@@ -215315,15 +215986,22 @@
         },
         {
           "tag": "SupplierInvoices",
-          "line": 69,
+          "line": 70,
           "props": [
             "supplierId={supplierId}",
             "mayWrite={tenantCan(role,'purchasing:write',profile)}"
           ]
         },
         {
+          "tag": "ExternalResources",
+          "line": 71,
+          "props": [
+            "supplierId={supplierId}"
+          ]
+        },
+        {
           "tag": "FormSheet",
-          "line": 70,
+          "line": 72,
           "props": [
             "workspace",
             "open={editing}",
@@ -215335,7 +216013,7 @@
         },
         {
           "tag": "form",
-          "line": 71,
+          "line": 73,
           "props": [
             "id={formId}",
             "onSubmit={event=>{event.preventDefault();void save();}}"
@@ -215343,21 +216021,21 @@
         },
         {
           "tag": "div",
-          "line": 71,
+          "line": 73,
           "props": [
             "className=\"form-grid two\""
           ]
         },
         {
           "tag": "Field",
-          "line": 72,
+          "line": 74,
           "props": [
             "label=\"Lieferant\""
           ]
         },
         {
           "tag": "Input",
-          "line": 72,
+          "line": 74,
           "props": [
             "required",
             "maxLength={200}",
@@ -215367,14 +216045,14 @@
         },
         {
           "tag": "Field",
-          "line": 73,
+          "line": 75,
           "props": [
             "label=\"Kontakt\""
           ]
         },
         {
           "tag": "Input",
-          "line": 73,
+          "line": 75,
           "props": [
             "maxLength={200}",
             "value={draft.contactName}",
@@ -215383,14 +216061,14 @@
         },
         {
           "tag": "Field",
-          "line": 74,
+          "line": 76,
           "props": [
             "label=\"E-Mail\""
           ]
         },
         {
           "tag": "Input",
-          "line": 74,
+          "line": 76,
           "props": [
             "type=\"email\"",
             "maxLength={320}",
@@ -215400,14 +216078,14 @@
         },
         {
           "tag": "Field",
-          "line": 75,
+          "line": 77,
           "props": [
             "label=\"Telefon\""
           ]
         },
         {
           "tag": "Input",
-          "line": 75,
+          "line": 77,
           "props": [
             "type=\"tel\"",
             "maxLength={80}",
@@ -215417,14 +216095,14 @@
         },
         {
           "tag": "Field",
-          "line": 76,
+          "line": 78,
           "props": [
             "label=\"Adresse\""
           ]
         },
         {
           "tag": "Input",
-          "line": 76,
+          "line": 78,
           "props": [
             "maxLength={500}",
             "value={draft.address}",
@@ -215433,14 +216111,14 @@
         },
         {
           "tag": "Field",
-          "line": 77,
+          "line": 79,
           "props": [
             "label=\"UID\""
           ]
         },
         {
           "tag": "Input",
-          "line": 77,
+          "line": 79,
           "props": [
             "maxLength={80}",
             "value={draft.uid}",
@@ -215449,7 +216127,7 @@
         },
         {
           "tag": "Field",
-          "line": 78,
+          "line": 80,
           "props": [
             "label=\"Zahlungsfrist\"",
             "hint=\"Tage\""
@@ -215457,7 +216135,7 @@
         },
         {
           "tag": "Input",
-          "line": 78,
+          "line": 80,
           "props": [
             "required",
             "type=\"number\"",
@@ -215470,14 +216148,14 @@
         },
         {
           "tag": "Field",
-          "line": 79,
+          "line": 81,
           "props": [
             "label=\"Status\""
           ]
         },
         {
           "tag": "Select",
-          "line": 79,
+          "line": 81,
           "props": [
             "value={draft.status}",
             "onChange={event=>field('status',event.target.value)}"
@@ -215485,43 +216163,43 @@
         },
         {
           "tag": "option",
-          "line": 79,
+          "line": 81,
           "props": [
             "value=\"active\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 79,
+          "line": 81,
           "props": []
         },
         {
           "tag": "option",
-          "line": 79,
+          "line": 81,
           "props": [
             "value=\"inactive\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 79,
-          "props": []
-        },
-        {
-          "tag": "ErrorState",
           "line": 81,
           "props": []
         },
         {
+          "tag": "ErrorState",
+          "line": 83,
+          "props": []
+        },
+        {
           "tag": "FormActions",
-          "line": 82,
+          "line": 84,
           "props": [
             "sheet"
           ]
         },
         {
           "tag": "Button",
-          "line": 82,
+          "line": 84,
           "props": [
             "variant=\"secondary\"",
             "disabled={busy}",
@@ -215530,12 +216208,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 82,
+          "line": 84,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 82,
+          "line": 84,
           "props": [
             "requiresWrite",
             "type=\"submit\"",
@@ -215545,89 +216223,89 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 82,
+          "line": 84,
           "props": []
         }
       ],
       "conditions": [
         {
-          "line": 33,
-          "expression": "supplierId"
-        },
-        {
-          "line": 36,
+          "line": 34,
           "expression": "supplierId"
         },
         {
           "line": 37,
+          "expression": "supplierId"
+        },
+        {
+          "line": 38,
           "expression": "existing"
         },
         {
-          "line": 41,
+          "line": 42,
           "expression": "!query.data?.item||editing"
         },
         {
-          "line": 46,
+          "line": 47,
           "expression": "!value||Object.keys(blank).some(key=>typeof value[key as keyof Draft]!=='string'||value[key as keyof Draft].length>500)"
         },
         {
-          "line": 48,
+          "line": 49,
           "expression": "value.replay&&typeof value.replay.body==='string'&&value.replay.body.length<=8192&&typeof value.replay.key==='string'&&value.replay.key.length>=8&&value.replay.key.length<=128"
         },
         {
-          "line": 51,
+          "line": 52,
           "expression": "existing"
         },
         {
-          "line": 53,
+          "line": 54,
           "expression": "pending.current||existing&&(query.loading||query.error)||!existing&&!recovery.ready"
         },
         {
-          "line": 56,
-          "expression": "existing"
-        },
-        {
           "line": 57,
-          "expression": "attempt?.body===serialized"
+          "expression": "existing"
         },
         {
           "line": 58,
-          "expression": "!existing"
+          "expression": "attempt?.body===serialized"
         },
         {
           "line": 59,
-          "expression": "existing"
+          "expression": "!existing"
         },
         {
           "line": 60,
-          "expression": "!result.item?.id"
-        },
-        {
-          "line": 62,
-          "expression": "cause instanceof Error"
-        },
-        {
-          "line": 65,
-          "expression": "existing&&(query.loading||query.error||!query.data?.item)"
-        },
-        {
-          "line": 65,
-          "expression": "query.loading"
-        },
-        {
-          "line": 65,
-          "expression": "query.error"
-        },
-        {
-          "line": 66,
           "expression": "existing"
         },
         {
+          "line": 61,
+          "expression": "!result.item?.id"
+        },
+        {
+          "line": 63,
+          "expression": "cause instanceof Error"
+        },
+        {
           "line": 66,
+          "expression": "existing&&(query.loading||query.error||!query.data?.item)"
+        },
+        {
+          "line": 66,
+          "expression": "query.loading"
+        },
+        {
+          "line": 66,
+          "expression": "query.error"
+        },
+        {
+          "line": 67,
+          "expression": "existing"
+        },
+        {
+          "line": 67,
           "expression": "existing&&!editing"
         },
         {
-          "line": 70,
+          "line": 72,
           "expression": "existing"
         }
       ]
@@ -215636,7 +216314,7 @@
       "key": "components/pages/suppliers.tsx#Supplier",
       "file": "components/pages/suppliers.tsx",
       "name": "Supplier",
-      "line": 30,
+      "line": 31,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -215648,7 +216326,7 @@
       "key": "components/pages/suppliers.tsx#Draft",
       "file": "components/pages/suppliers.tsx",
       "name": "Draft",
-      "line": 28,
+      "line": 29,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -215660,7 +216338,7 @@
       "key": "components/pages/suppliers.tsx#blank",
       "file": "components/pages/suppliers.tsx",
       "name": "blank",
-      "line": 29,
+      "line": 30,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -216428,6 +217106,612 @@
       "conditions": []
     },
     {
+      "key": "components/external-resources.tsx#ExternalResources",
+      "file": "components/external-resources.tsx",
+      "name": "ExternalResources",
+      "line": 18,
+      "classes": [
+        "surface",
+        "technical-hint",
+        "action-list",
+        "assignment-row",
+        "form-grid",
+        "two"
+      ],
+      "apis": [
+        "/api/suppliers/",
+        "/api/projects"
+      ],
+      "collections": [],
+      "widgets": [
+        {
+          "tag": "FormSheet",
+          "line": 53
+        },
+        {
+          "tag": "form",
+          "line": 54
+        },
+        {
+          "tag": "Field",
+          "line": 55
+        },
+        {
+          "tag": "Field",
+          "line": 56
+        },
+        {
+          "tag": "Field",
+          "line": 56
+        },
+        {
+          "tag": "Field",
+          "line": 57
+        },
+        {
+          "tag": "Field",
+          "line": 57
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 61
+        }
+      ],
+      "elements": [
+        {
+          "tag": "section",
+          "line": 48,
+          "props": [
+            "className=\"surface\""
+          ]
+        },
+        {
+          "tag": "SectionTitle",
+          "line": 48,
+          "props": [
+            "title=\"Externe Ressourcen\"",
+            "action={<ActionsMenu label=\"Ressourcenaktionen\"><ActionRow requiresWrite icon=\"plus\" title=\"Externe Person hinzufügen\" onClick={()=>edit(null,'resource')}/></ActionsMenu>}"
+          ]
+        },
+        {
+          "tag": "ActionsMenu",
+          "line": 48,
+          "props": [
+            "label=\"Ressourcenaktionen\""
+          ]
+        },
+        {
+          "tag": "ActionRow",
+          "line": 48,
+          "props": [
+            "requiresWrite",
+            "icon=\"plus\"",
+            "title=\"Externe Person hinzufügen\"",
+            "onClick={()=>edit(null,'resource')}"
+          ]
+        },
+        {
+          "tag": "p",
+          "line": 49,
+          "props": [
+            "className=\"technical-hint\""
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 49,
+          "props": []
+        },
+        {
+          "tag": "LoadingState",
+          "line": 50,
+          "props": []
+        },
+        {
+          "tag": "ErrorState",
+          "line": 50,
+          "props": [
+            "onRetry={query.refresh}"
+          ]
+        },
+        {
+          "tag": "EmptyState",
+          "line": 50,
+          "props": [
+            "title=\"Keine externen Ressourcen\""
+          ]
+        },
+        {
+          "tag": "div",
+          "line": 50,
+          "props": [
+            "className=\"action-list\""
+          ]
+        },
+        {
+          "tag": "div",
+          "line": 50,
+          "props": [
+            "key={resource.id}",
+            "className=\"assignment-row\""
+          ]
+        },
+        {
+          "tag": "div",
+          "line": 50,
+          "props": []
+        },
+        {
+          "tag": "b",
+          "line": 50,
+          "props": []
+        },
+        {
+          "tag": "p",
+          "line": 50,
+          "props": []
+        },
+        {
+          "tag": "Status",
+          "line": 50,
+          "props": [
+            "tone={resource.active?'success':'neutral'}"
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 50,
+          "props": []
+        },
+        {
+          "tag": "ActionsMenu",
+          "line": 50,
+          "props": [
+            "label=\"Ressourcenaktionen\""
+          ]
+        },
+        {
+          "tag": "ActionRow",
+          "line": 50,
+          "props": [
+            "requiresWrite",
+            "icon=\"edit\"",
+            "title=\"Bearbeiten\"",
+            "onClick={()=>edit(resource,'resource')}"
+          ]
+        },
+        {
+          "tag": "ActionRow",
+          "line": 50,
+          "props": [
+            "requiresWrite",
+            "icon=\"plus\"",
+            "title=\"Einsatz hinzufügen\"",
+            "onClick={()=>edit(resource,'assignment')}"
+          ]
+        },
+        {
+          "tag": "SectionTitle",
+          "line": 51,
+          "props": [
+            "title=\"Externe Einsätze\""
+          ]
+        },
+        {
+          "tag": "div",
+          "line": 51,
+          "props": [
+            "className=\"action-list\""
+          ]
+        },
+        {
+          "tag": "div",
+          "line": 51,
+          "props": [
+            "key={assignment.id}",
+            "className=\"assignment-row\""
+          ]
+        },
+        {
+          "tag": "div",
+          "line": 51,
+          "props": []
+        },
+        {
+          "tag": "b",
+          "line": 51,
+          "props": []
+        },
+        {
+          "tag": "p",
+          "line": 51,
+          "props": []
+        },
+        {
+          "tag": "small",
+          "line": 51,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 51,
+          "props": []
+        },
+        {
+          "tag": "Status",
+          "line": 51,
+          "props": [
+            "tone={assignment.revoked_at||assignment.ends_on&&assignment.ends_on<businessDate()?'neutral':'info'}"
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 51,
+          "props": []
+        },
+        {
+          "tag": "ActionsMenu",
+          "line": 51,
+          "props": [
+            "label=\"Ressourcenaktionen\""
+          ]
+        },
+        {
+          "tag": "ActionRow",
+          "line": 51,
+          "props": [
+            "requiresWrite",
+            "danger",
+            "icon=\"close\"",
+            "title=\"Einsatz beenden\"",
+            "onClick={()=>{setError('');setAttempt(null);setRevoking(assignment)}}"
+          ]
+        },
+        {
+          "tag": "ErrorState",
+          "line": 52,
+          "props": []
+        },
+        {
+          "tag": "FormSheet",
+          "line": 53,
+          "props": [
+            "open={!!mode}",
+            "onClose={close}",
+            "label={mode==='assignment'?'Einsatz hinzufügen':selected?'Externe Person bearbeiten':'Externe Person hinzufügen'}",
+            "dirty={dirty}",
+            "busy={busy}"
+          ]
+        },
+        {
+          "tag": "form",
+          "line": 54,
+          "props": [
+            "id={formId}",
+            "onSubmit={event=>{event.preventDefault();void mutate();}}"
+          ]
+        },
+        {
+          "tag": "div",
+          "line": 54,
+          "props": [
+            "className=\"form-grid two\""
+          ]
+        },
+        {
+          "tag": "p",
+          "line": 55,
+          "props": []
+        },
+        {
+          "tag": "Field",
+          "line": 55,
+          "props": [
+            "label=\"Auftrag\""
+          ]
+        },
+        {
+          "tag": "DirectorySelect",
+          "line": 55,
+          "props": [
+            "label=\"Auftrag\"",
+            "required",
+            "endpoint=\"/api/projects\"",
+            "value={project}",
+            "onChange={setProject}"
+          ]
+        },
+        {
+          "tag": "Field",
+          "line": 56,
+          "props": [
+            "label=\"Beginn\""
+          ]
+        },
+        {
+          "tag": "Input",
+          "line": 56,
+          "props": [
+            "required",
+            "type=\"date\"",
+            "value={start}",
+            "onChange={event=>setStart(event.target.value)}"
+          ]
+        },
+        {
+          "tag": "Field",
+          "line": 56,
+          "props": [
+            "label=\"Ende\""
+          ]
+        },
+        {
+          "tag": "Input",
+          "line": 56,
+          "props": [
+            "type=\"date\"",
+            "min={start||undefined}",
+            "value={end}",
+            "onChange={event=>setEnd(event.target.value)}"
+          ]
+        },
+        {
+          "tag": "Field",
+          "line": 57,
+          "props": [
+            "label=\"Name\""
+          ]
+        },
+        {
+          "tag": "Input",
+          "line": 57,
+          "props": [
+            "required",
+            "maxLength={200}",
+            "value={name}",
+            "onChange={event=>setName(event.target.value)}"
+          ]
+        },
+        {
+          "tag": "Field",
+          "line": 57,
+          "props": [
+            "label=\"Funktion\""
+          ]
+        },
+        {
+          "tag": "Input",
+          "line": 57,
+          "props": [
+            "maxLength={160}",
+            "value={roleLabel}",
+            "onChange={event=>setRoleLabel(event.target.value)}"
+          ]
+        },
+        {
+          "tag": "Toggle",
+          "line": 57,
+          "props": [
+            "label=\"Aktiv\"",
+            "checked={active}",
+            "onChange={()=>setActive(value=>!value)}"
+          ]
+        },
+        {
+          "tag": "ErrorState",
+          "line": 58,
+          "props": []
+        },
+        {
+          "tag": "FormActions",
+          "line": 59,
+          "props": [
+            "sheet"
+          ]
+        },
+        {
+          "tag": "Button",
+          "line": 59,
+          "props": [
+            "variant=\"secondary\"",
+            "disabled={busy}",
+            "onClick={close}"
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 59,
+          "props": []
+        },
+        {
+          "tag": "Button",
+          "line": 59,
+          "props": [
+            "requiresWrite",
+            "type=\"submit\"",
+            "form={formId}",
+            "disabled={busy||mode==='resource'&&!selected&&!recovery.ready}"
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 59,
+          "props": []
+        },
+        {
+          "tag": "ConfirmDialog",
+          "line": 61,
+          "props": [
+            "open={!!revoking}",
+            "busy={busy}",
+            "title=\"Einsatz beenden?\"",
+            "message=\"Neue Erfassungen werden gesperrt. Bereits erfasste Zeiten und Nachweise bleiben erhalten.\"",
+            "confirmLabel=\"Einsatz beenden\"",
+            "onCancel={()=>setRevoking(null)}",
+            "onConfirm={()=>{if(revoking)void mutate(revoking)}}"
+          ]
+        }
+      ],
+      "conditions": [
+        {
+          "line": 24,
+          "expression": "!value||typeof value.name!=='string'||value.name.length>200||typeof value.roleLabel!=='string'||value.roleLabel.length>160||typeof value.active!=='boolean'"
+        },
+        {
+          "line": 26,
+          "expression": "value.replay&&typeof value.replay.body==='string'&&value.replay.body.length<=4096&&typeof value.replay.key==='string'&&value.replay.key.length>=8&&value.replay.key.length<=128&&value.replay.endpoint===endpoint"
+        },
+        {
+          "line": 32,
+          "expression": "mode==='resource'&&!selected"
+        },
+        {
+          "line": 34,
+          "expression": "pending.current||!revoke&&mode==='resource'&&!selected&&!recovery.ready"
+        },
+        {
+          "line": 37,
+          "expression": "revoke||mode==='assignment'"
+        },
+        {
+          "line": 37,
+          "expression": "resource"
+        },
+        {
+          "line": 38,
+          "expression": "revoke"
+        },
+        {
+          "line": 38,
+          "expression": "mode==='assignment'"
+        },
+        {
+          "line": 38,
+          "expression": "resource"
+        },
+        {
+          "line": 39,
+          "expression": "attempt?.body===serialized&&attempt.endpoint===target"
+        },
+        {
+          "line": 40,
+          "expression": "mode==='resource'&&!resource&&!revoke"
+        },
+        {
+          "line": 41,
+          "expression": "revoke||mode==='resource'&&resource"
+        },
+        {
+          "line": 42,
+          "expression": "!result.item?.id"
+        },
+        {
+          "line": 44,
+          "expression": "cause instanceof Error"
+        },
+        {
+          "line": 50,
+          "expression": "query.loading"
+        },
+        {
+          "line": 50,
+          "expression": "query.error"
+        },
+        {
+          "line": 50,
+          "expression": "!query.data?.items.length"
+        },
+        {
+          "line": 50,
+          "expression": "resource.active"
+        },
+        {
+          "line": 50,
+          "expression": "resource.active"
+        },
+        {
+          "line": 51,
+          "expression": "assignment.ends_on"
+        },
+        {
+          "line": 51,
+          "expression": "assignment.revoked_at||assignment.ends_on&&assignment.ends_on<businessDate()"
+        },
+        {
+          "line": 51,
+          "expression": "assignment.revoked_at||assignment.ends_on&&assignment.ends_on<businessDate()"
+        },
+        {
+          "line": 51,
+          "expression": "assignment.starts_on>businessDate()"
+        },
+        {
+          "line": 53,
+          "expression": "mode==='assignment'"
+        },
+        {
+          "line": 53,
+          "expression": "selected"
+        },
+        {
+          "line": 54,
+          "expression": "mode==='assignment'"
+        },
+        {
+          "line": 61,
+          "expression": "revoking"
+        }
+      ]
+    },
+    {
+      "key": "components/external-resources.tsx#Resource",
+      "file": "components/external-resources.tsx",
+      "name": "Resource",
+      "line": 15,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": []
+    },
+    {
+      "key": "components/external-resources.tsx#Assignment",
+      "file": "components/external-resources.tsx",
+      "name": "Assignment",
+      "line": 16,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": []
+    },
+    {
+      "key": "components/external-resources.tsx#Attempt",
+      "file": "components/external-resources.tsx",
+      "name": "Attempt",
+      "line": 17,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": []
+    },
+    {
+      "key": "lib/display-format.ts#formatTimestampDate",
+      "file": "lib/display-format.ts",
+      "name": "formatTimestampDate",
+      "line": 27,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": []
+    },
+    {
       "key": "app/lieferanten/neu/page.tsx#Page",
       "file": "app/lieferanten/neu/page.tsx",
       "name": "Page",
@@ -216467,24 +217751,24 @@
       "key": "components/pages/suppliers.tsx#SuppliersPage",
       "file": "components/pages/suppliers.tsx",
       "name": "SuppliersPage",
-      "line": 21,
+      "line": 22,
       "classes": [],
       "apis": [],
       "collections": [],
       "widgets": [
         {
           "tag": "RecordsControls",
-          "line": 24
+          "line": 25
         },
         {
           "tag": "RecordsView",
-          "line": 25
+          "line": 26
         }
       ],
       "elements": [
         {
           "tag": "AppShell",
-          "line": 24,
+          "line": 25,
           "props": [
             "title=\"Lieferanten\"",
             "active=\"lieferanten\"",
@@ -216493,7 +217777,7 @@
         },
         {
           "tag": "RecordsControls",
-          "line": 24,
+          "line": 25,
           "props": [
             "controller={data.controller}",
             "placeholder=\"Lieferanten suchen...\"",
@@ -216503,7 +217787,7 @@
         },
         {
           "tag": "CreateAction",
-          "line": 24,
+          "line": 25,
           "props": [
             "href=\"/lieferanten/neu\"",
             "label=\"Lieferant hinzufügen\""
@@ -216511,7 +217795,7 @@
         },
         {
           "tag": "RecordsView",
-          "line": 25,
+          "line": 26,
           "props": [
             "controller={data.controller}",
             "toolbarActions={false}",
@@ -216530,7 +217814,7 @@
         },
         {
           "tag": "RecordRow",
-          "line": 25,
+          "line": 26,
           "props": [
             "href={'/lieferanten/'+row[3]}",
             "icon=\"building\"",
@@ -219046,18 +220330,6 @@
       "file": "components/employment-periods.tsx",
       "name": "Period",
       "line": 11,
-      "classes": [],
-      "apis": [],
-      "collections": [],
-      "widgets": [],
-      "elements": [],
-      "conditions": []
-    },
-    {
-      "key": "lib/display-format.ts#formatTimestampDate",
-      "file": "lib/display-format.ts",
-      "name": "formatTimestampDate",
-      "line": 27,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -240711,6 +241983,8 @@
         "/angebote/neu",
         "/einstellungen/team",
         "/kunden",
+        "/lieferanten/[id]",
+        "/lieferanten/neu",
         "/rechnungen/[id]",
         "/rechnungen/neu",
         "/spesen/[id]",
@@ -240986,6 +242260,16 @@
         "/rechnungen/[id]",
         "/rechnungen/neu",
         "/zeit"
+      ],
+      "frameworkUsedBy": []
+    },
+    {
+      "file": "components/external-resources.tsx",
+      "name": "ExternalResources",
+      "line": 18,
+      "usedBy": [
+        "/lieferanten/[id]",
+        "/lieferanten/neu"
       ],
       "frameworkUsedBy": []
     },
@@ -242523,7 +243807,7 @@
     {
       "file": "components/pages/suppliers.tsx",
       "name": "SuppliersPage",
-      "line": 21,
+      "line": 22,
       "usedBy": [
         "/lieferanten"
       ],
@@ -242532,7 +243816,7 @@
     {
       "file": "components/pages/suppliers.tsx",
       "name": "SupplierForm",
-      "line": 31,
+      "line": 32,
       "usedBy": [
         "/lieferanten/[id]",
         "/lieferanten/neu"
@@ -243807,6 +245091,24 @@
       ]
     },
     {
+      "file": "components/sensitive-access.tsx",
+      "name": "labels",
+      "line": 10,
+      "usedBy": [
+        "/einstellungen/team"
+      ],
+      "frameworkUsedBy": []
+    },
+    {
+      "file": "components/sensitive-access.tsx",
+      "name": "SensitiveAccess",
+      "line": 16,
+      "usedBy": [
+        "/einstellungen/team"
+      ],
+      "frameworkUsedBy": []
+    },
+    {
       "file": "components/session-data-boundary.tsx",
       "name": "SessionDataBoundary",
       "line": 8,
@@ -244236,7 +245538,7 @@
     {
       "file": "components/team-settings.tsx",
       "name": "TeamSettingsPage",
-      "line": 24,
+      "line": 25,
       "usedBy": [
         "/einstellungen/team"
       ],

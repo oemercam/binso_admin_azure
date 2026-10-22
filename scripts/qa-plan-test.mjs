@@ -21,7 +21,7 @@ for(const width of [320,390,600,760,761,820,1024,1440,1920]){
 }
 assert(planChanges([],{level:'full'}).webkitWidths.includes(1024),'The release candidate must actually measure the desktop header in WebKit');
 const catalog=JSON.parse(await (await import('node:fs/promises')).readFile('docs/architecture/ux-inventory.json','utf8'));
-for(const file of ['components/pages/suppliers.tsx','lib/server/repositories/suppliers.ts','components/pages/employees.tsx','lib/server/repositories/employment.ts']){
+for(const file of ['components/sensitive-access.tsx','lib/server/sensitive-access.ts','app/api/auth/sensitive-access/route.ts','components/pages/suppliers.tsx','lib/server/repositories/suppliers.ts','components/pages/employees.tsx','lib/server/repositories/employment.ts']){
  assert.ok(planChanges([file],{level:'fast'}).suites.includes('employee-dossier-test'),'The shared isolated HR/supplier contract remains selected for '+file);
 }
 for(const route of ['/lieferanten','/lieferanten/neu','/lieferanten/supplier-one'])assert.ok(fullRoutes.includes(route),'Required coverage retains '+route);
