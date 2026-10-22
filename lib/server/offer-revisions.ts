@@ -23,6 +23,7 @@ export async function createOfferRevision(c:PoolClient,s:SessionUser,number:stri
   const today=businessDate();
   await c.query("update offer_public_links set revoked_at=now() where organization_id=$1 and version_id=$2 and revoked_at is null",[s.organizationId,historical.id]);
   await c.query("update quotes set status='draft',offer_version=offer_version+1,issue_date=$3,valid_until=$4,decision_at=null,decision_by_user_id=null,decision_note=null,updated_at=now() where organization_id=$1 and id=$2",[s.organizationId,source.id,today,addDays(new Date(today+'T12:00:00Z'),domainConfig.defaultOfferValidityDays).toISOString().slice(0,10)]);
+  if(source.calculation)await c.query("update quotes set calculation=jsonb_set(calculation,'{documentVersion}',to_jsonb(offer_version)) where id=$1 and organization_id=$2",[source.id,s.organizationId]);
   await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'offer.revision.created',entityType:'quote',entityId:source.id,metadata:{number,previousVersion:source.offer_version,version:source.offer_version+1,archivedVersionId:historical.id}});
   return (await listApiBusiness(c,s,'documents','kind=eq.offer&id=eq.'+source.id))[0];
  });

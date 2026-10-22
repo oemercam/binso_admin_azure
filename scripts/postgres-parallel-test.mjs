@@ -123,6 +123,7 @@ try{
  await pool.query((await fs.readFile('database/operations/provision-runtime-role.sql','utf8')).replaceAll('binso_runtime','binso_receipt_fixture'));
  try{
  const ledgerTransaction=(actor,fn)=>txn(async c=>{await c.query('set local role binso_receipt_fixture');await c.query("select set_config('app.organization_id',$1,true),set_config('app.user_id',$2,true)",[actor.organizationId,actor.userId]);return fn(c);});
+ await (await import('./discount-contract.mjs')).verifyDiscountPersistence({business,financial:await import(financialModuleUrl),sql:(...values)=>pool.query(...values),transaction:ledgerTransaction,session,parallel:true,issue:(c,s,number)=>process.changeDocumentStatus(c,s,number,'issue','')});
  const refunds=await import(await compile('lib/server/credit-notes.ts',{'./document-process':await compile('lib/server/document-process.ts',{'./offer-versions':versionsModule,'@/lib/qr-bill':qr,'@/lib/financial-status':financialModuleUrl,'@/lib/server/plan-access':planService,'./http':http,'./rbac':rbac,'./audit':audit}),'./business-idempotency':replay,'./rbac':rbac,'./plan-access':planService,'./http':http,'./audit':audit,'@/lib/financial-status':financialModuleUrl,'@/lib/money':(await import('./data-test-modules.mjs')).moneyModuleUrl}));
  const navigationModule=moduleUrl(await fs.readFile('lib/navigation.ts','utf8'));
  const setupModule=await compile('lib/action-readiness.ts',{'./navigation':navigationModule});

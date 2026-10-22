@@ -406,6 +406,25 @@ try{
  assert.equal((await pool.query("select count(*)::int n from offer_public_events where link_id=any($1::uuid[]) and kind in ('accepted','declined')",[links.map(link=>link.id)])).rows[0].n,1);
  assert.equal((await get('/api/documents/'+encodeURIComponent(capabilityQuote.quote_no)+'/versions?version=1',cookies.get('1:owner'))).status,404,'Foreign tenant cannot fetch the archived PDF');
  console.log('Real HTTP public offers: restricted runtime login, GET refusal, scoped capability lookup, atomic two-client acceptance/decline and archived-PDF tenant denial passed; no Graph credentials.');
+
+ // Package 5: actual HTTP validation and authoritative persisted discount totals.
+ const discountBody={kind:'invoice',customerId:customer.id,issueDate:'2026-10-22',dueDate:'2026-11-22',currency:'CHF',vatRate:8.1,discount:{kind:'percent',value:5},total:1,items:[{description:'Synthetic HTTP discount',quantity:2,unitPrice:500,vatRate:8.1,discount:{kind:'percent',value:10}}]};
+ const discountRequest=async(body,role='owner',tenant=0,method='POST',path='/api/documents',key=randomBytes(16).toString('hex'))=>{const response=await fetch(base+path,{method,headers:{cookie:cookies.get(tenant+':'+role),origin:base,'content-type':'application/json','idempotency-key':key},body:JSON.stringify(body),signal:AbortSignal.timeout(15000)});return {status:response.status,data:await response.json()};};
+ let discountInvoice;
+ for(const role of roles){const result=await discountRequest(discountBody,role);assert.equal(result.status,finance.includes(role)?201:403,'Native discounted invoice write '+role+': '+JSON.stringify(result.data));if(finance.includes(role)){assert.equal(Number(result.data.item.total),924.26,'Client total cannot override the central result');if(role==='owner')discountInvoice=result.data.item;}}
+ assert.equal((await discountRequest({...discountBody,discount:{kind:'percent',value:101}})).status,400);
+ assert.equal((await discountRequest({...discountBody,discount:{kind:'fixed',value:10,currency:'EUR'}})).status,400);
+ assert.equal((await discountRequest(discountBody,'owner',1)).status,400,'Foreign customer cannot be invoiced');
+ const discountSaveKey=randomBytes(16).toString('hex'),discountSave={...discountBody,number:discountInvoice.number,discount:{kind:'fixed',value:100,currency:'CHF'}};
+ const discountSaves=await Promise.all(Array.from({length:6},()=>discountRequest(discountSave,'owner',0,'PATCH','/api/documents/'+discountInvoice.number,discountSaveKey)));
+ assert.ok(discountSaves.every(result=>result.status===200&&Number(result.data.item.total)===864.80));
+ assert.equal(Number((await pool.query("select count(*) n from audit_events where entity_id=$1 and action='document.updated'",[discountInvoice.id])).rows[0].n),1);
+ assert.equal((await discountRequest({...discountSave,note:'Conflicting payload'},'owner',0,'PATCH','/api/documents/'+discountInvoice.number,discountSaveKey)).status,409);
+ assert.equal((await get('/api/documents/'+discountInvoice.number,cookies.get('1:owner'))).status,404);
+ const priorCustomerDiscount=(await pool.query('select discount from customers where id=$1',[customer.id])).rows[0].discount;
+ try{await pool.query('update customers set discount=5 where id=$1',[customer.id]);const proposal=await discountRequest({kind:'Rechnung',customerId:customer.id,date:'2026-10-22',currency:'CHF',output:'calculation',positions:[{description:'Synthetic proposal',quantity:2,price:500,vatRate:8.1}]},'owner',0,'POST','/api/documents/preview');assert.equal(proposal.status,200);assert.equal(Number(proposal.data.customerDiscountProposal.value),5);assert.equal(proposal.data.customerDiscountProposal.applied,false);assert.equal(proposal.data.calculation.discount.kind,'none');}
+ finally{await pool.query('update customers set discount=$2 where id=$1',[customer.id,priorCustomerDiscount]);}
+ console.log('Native HTTP discounts: all eight roles, tenant boundary, manipulated total, validation, six parallel PATCH retries, key conflict and explicit unapplied customer proposal passed.');
  const ownRows=await get('/api/customers',cookies.get('0:owner')),foreignRows=await get('/api/customers',cookies.get('1:owner'));
  const ownIds=new Set(ownRows.data.items.map(item=>item.id));assert.ok(!foreignRows.data.items.some(item=>ownIds.has(item.id)));
  await pool.query("update auth_sessions set expires_at=now()-interval '1 second' where user_id='http-0-owner'");assert.equal((await get('/api/customers',cookies.get('0:owner'))).status,401,'Expired real database session is denied');

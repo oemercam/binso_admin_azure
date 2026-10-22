@@ -15,7 +15,13 @@ P0/P1/P2 vollständig im Auftragsumfang; P3 ausgeschlossen. **Dieser Zwischensta
 
 [Paket 4: verbindlicher Rabatt- und Berechnungsvertrag](v25-discount-contract.md)
 legt Rabattbasis, Kundenstandard, Steuer-/Rundungsreihenfolge und numerische
-Sollfälle fest. Nur Fachvertrag; Rabattberechnung noch nicht implementiert.
+Sollfälle fest. Paket4 enthält ausschliesslich den Fachvertrag; Umsetzung und
+Nachweisstatus stehen im folgenden Paket5-Eintrag.
+
+[Paket 5: Rechen-Owner, API und Persistenz](../audit/v25-revision7/package5-discount-calculation.md)
+implementiert diesen Vertrag zentral für neue Dokumente und bestätigte Entwürfe.
+Der Paket-4-Eintrag bezeichnet den damaligen Dokumentationsumfang. Native aktuelle
+CI und spätere Bedienungsabnahme sind gesondert nachzuweisen; keine Produktionsfreigabe.
 
 [Anforderungen](../audit/v25-revision7/requirements.csv), [Routen/Rollen/Zustände](../audit/v25-revision7/route-role-states.csv), [Routen, Komponenten, APIs und Migrationen](../audit/v25-revision7/routes.json).
 Generator: scripts/revision7-inventory.mjs. Aktuell 56 Kapitel, 573 Satz-/Prüfklauseln, 78 Routen, 12 konkrete Operator-Varianten und 5588 geplante Route/Rolle/Zustand-Fälle. Zusammengesetzte Klauseln behalten den kompletten Originaltext; sie sind nicht pauschal bestanden.

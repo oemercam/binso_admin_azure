@@ -1,4 +1,5 @@
-import {moneyMinor} from "./money";
+import {moneyMinor,calculateDocument} from "./money";
+export {calculateDocument};
 /** Display state is derived; persisted legacy document states remain compatible. */
 export type FinancialDocument = {kind?:string;status?:string;total?:unknown;paid_amount?:unknown;credit_amount?:unknown;refund_amount?:unknown;due_date?:string|null;valid_until?:string|null;issue_date?:string|null;currency?:string;number?:string;customer?:{name?:string}|null};
 const cents=moneyMinor;

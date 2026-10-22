@@ -2,9 +2,9 @@ import { NextRequest } from "next/server";
 import { apiError, assertSameOrigin, cleanText, json, readJson } from "@/lib/server/http";
 import { tenantList, tenantListPage, tenantRpc } from "@/lib/server/database";
 
-type Line={unit?:unknown;description?:unknown;quantity?:unknown;unitPrice?:unknown;vatRate?:unknown;expenseIds?:unknown;timeEntryIds?:unknown};
+type Line={discount?:unknown;taxExempt?:unknown;unit?:unknown;description?:unknown;quantity?:unknown;unitPrice?:unknown;vatRate?:unknown;expenseIds?:unknown;timeEntryIds?:unknown};
 type DocumentBody={
-  sourceOffer?:unknown;kind?:unknown;customerName?:unknown;customerId?:unknown;number?:unknown;issueDate?:unknown;dueDate?:unknown;validUntil?:unknown;
+  discountOrigin?:unknown;discount?:unknown;calculationRevision?:unknown;sourceOffer?:unknown;kind?:unknown;customerName?:unknown;customerId?:unknown;number?:unknown;issueDate?:unknown;dueDate?:unknown;validUntil?:unknown;
   vatRate?:unknown;note?:unknown;currency?:unknown;items?:unknown;
 };
 
@@ -32,6 +32,8 @@ export async function POST(request:NextRequest){
     if(customers.length!==1) return json({error:"customer_not_found",message:"Kunde wurde nicht gefunden."},400);
 
     const items=rawItems.map(item=>({
+      discount:item.discount,
+      tax_exempt:item.taxExempt,
       description:cleanText(item.description,500),
       unit:cleanText(item.unit,40)||"Stück",
       quantity:Number(item.quantity),
@@ -45,6 +47,9 @@ export async function POST(request:NextRequest){
     }
 
     const result=await tenantRpc("create_document_atomic",{
+      p_discount:body.discount,
+      p_discount_origin:body.discountOrigin,
+      p_calculation_revision:body.calculationRevision,
       p_source_offer:cleanText(body.sourceOffer,80)||null,
       p_customer_id:customer.id,
       p_kind:kind,

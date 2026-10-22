@@ -59,7 +59,7 @@ export async function documentPdf(document:Row,liveCompany:Row,logo?:Buffer){
   pdf.moveTo(left,y+18).lineTo(right,y+18).strokeColor('#aaa').lineWidth(.5).stroke();pdf.y=y+28;};
  tableHead();
  for(const item of (document.items||[]) as Row[]){
-  const description=String(item.description||'');pdf.font('Liberation Sans').fontSize(10).fillColor('#111');
+  const discount=record(item.discount);const description=String(item.description||'')+(discount.kind&&discount.kind!=='none'?'\n'+t('Rabatt')+': '+String(discount.value)+(discount.kind==='percent'?' %':' '+String(discount.currency)):'');pdf.font('Liberation Sans').fontSize(10).fillColor('#111');
   const h=pdf.heightOfString(description,{width:235,lineGap:2});
   if(h<bottom-80&&pdf.y+Math.max(h,34)+12>bottom){pdf.addPage();tableHead();}
   // A repeated table header changes PDFKit's shared drawing state.
@@ -72,6 +72,16 @@ export async function documentPdf(document:Row,liveCompany:Row,logo?:Buffer){
  }
  ensure(98);const summary=(label:string,value:unknown,bold=false)=>{const y=pdf.y;pdf.font(bold?'Liberation Sans-Bold':'Liberation Sans').fontSize(bold?12:10).fillColor('#111').text(label,300,y,{width:145});pdf.text(money(value),459,y,{width:right-459,align:'right'});pdf.y=y+(bold?27:21)};
  pdf.moveTo(left,pdf.y).lineTo(right,pdf.y).strokeColor('#aaa').stroke();pdf.y+=14;
+ const calculation=record(document.calculation);
+ if(calculation.revision===1&&(record(calculation.discount).kind!=='none'||((calculation.lines??[]) as Row[]).some(line=>record(line.discount).kind!=='none')||((calculation.taxGroups??[]) as Row[]).some(group=>group.exempt)||((calculation.taxGroups??[]) as Row[]).length>1)){
+  summary(t('Betrag'),calculation.raw);
+  summary(t('Rabatt')+' '+t('Positionen'),'-'+String(calculation.positionDiscountDisplay));
+  const discount=record(calculation.discount);
+  summary(t('Gesamtrabatt')+(discount.kind==='percent'?' '+String(discount.value)+' %':''),'-'+String(calculation.discountDisplay));
+  for(const group of (calculation.taxGroups??[]) as Row[]){ensure(25);summary(t('MWST')+' '+String(group.rate)+' %'+(group.exempt?' · '+t('Steuerbefreit'):''),group.tax);}
+  if(calculation.positionRoundingCents!=='0')paragraph(t('Rundung')+' · '+t('Positionen')+': '+String(calculation.positionRoundingCents)+' × 0.01 '+String(document.currency),8);
+  if(calculation.discountRoundingCents!=='0')paragraph(t('Rundung')+' · '+t('Gesamtrabatt')+': '+String(calculation.discountRoundingCents)+' × 0.01 '+String(document.currency),8);
+ }
  summary(t('Zwischentotal'),document.subtotal);summary(t('MWST'),document.vat_amount??document.vat);summary(t('Gesamtbetrag')+' '+String(document.currency||'CHF'),total,true);
  // Validate before adding a page; an invalid setup never creates a phantom page.
  let bill:SwissQRBill|null=null,qrError='';

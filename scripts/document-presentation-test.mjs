@@ -204,3 +204,13 @@ console.log('QR debtor structured address, exact remaining amount, valid SCOR/in
 }
 
 assert.ok(!paidRead.includes("<button"),"Operational document content has no scattered PDF, copy or edit buttons; these actions belong to its existing menu");
+
+// Package 5: existing renderer consumes the persisted central result; no PDF arithmetic.
+const {calculateDocument}=await import(moneyModuleUrl);
+const discountLines=[{description:'Synthetic discount',quantity:2,unit_price:500,vat_rate:8.1,discount:{kind:'percent',value:10}}];
+const discountCalculation=calculateDocument(discountLines,'CHF',{kind:'percent',value:5});
+const discountPdf=await documentPdf({...data,status:'draft',paid_amount:0,total:Number(discountCalculation.total),subtotal:Number(discountCalculation.subtotal),vat_amount:Number(discountCalculation.vat),calculation:discountCalculation,items:discountLines.map((l,i)=>({...l,discount:discountCalculation.lines[i].discount,line_total:Number(discountCalculation.lines[i].net)}))},company.raw);
+const discountRendered=await getDocument({data:new Uint8Array(discountPdf),useSystemFonts:true}).promise;
+let discountText='';for(let i=1;i<=discountRendered.numPages;i++)discountText+=(await (await discountRendered.getPage(i)).getTextContent()).items.map(item=>item.str??'').join(' ');
+assert.match(discountText,/924.26/);assert.match(discountText,/69.26/);assert.match(discountText,/10.00/);assert.match(discountText,/5.00/);
+console.log('Central discount snapshot PDF: original unit price, both discount stages, tax group and authoritative total passed.');

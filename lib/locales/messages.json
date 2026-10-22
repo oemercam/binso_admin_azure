@@ -1,4 +1,119 @@
 {
+  "Rabatt": [
+    "Discount",
+    "Remise",
+    "Sconto"
+  ],
+  "Gesamtrabatt": [
+    "Document discount",
+    "Remise globale",
+    "Sconto totale"
+  ],
+  "Rundung": [
+    "Rounding adjustment",
+    "Écart d’arrondi",
+    "Rettifica di arrotondamento"
+  ],
+  "Steuerbefreit": [
+    "Tax exempt",
+    "Exonéré de TVA",
+    "Esente IVA"
+  ],
+  "Bitte die Rabatte des Angebots ausdrücklich übernehmen.": [
+    "Please explicitly confirm the discounts from the offer.",
+    "Veuillez confirmer explicitement les remises du devis.",
+    "Conferma esplicitamente gli sconti del preventivo."
+  ],
+  "Bitte den gespeicherten Rabatt ausdrücklich übernehmen oder entfernen.": [
+    "Please explicitly keep or remove the saved discount.",
+    "Veuillez conserver ou supprimer explicitement la remise enregistrée.",
+    "Conferma o rimuovi esplicitamente lo sconto salvato."
+  ],
+  "Bitte die gespeicherten Rabatte ausdrücklich übernehmen.": [
+    "Please explicitly confirm the saved discounts.",
+    "Veuillez confirmer explicitement les remises enregistrées.",
+    "Conferma esplicitamente gli sconti salvati."
+  ],
+  "Ungültige Berechnung.": [
+    "Invalid calculation.",
+    "Calcul non valide.",
+    "Calcolo non valido."
+  ],
+  "Ungültiger Rabatt.": [
+    "Invalid discount.",
+    "Remise non valide.",
+    "Sconto non valido."
+  ],
+  "Der Kundenrabatt wurde geändert. Bitte den Vorschlag erneut prüfen.": [
+    "The customer discount has changed. Please review the proposal again.",
+    "La remise client a changé. Veuillez vérifier à nouveau la proposition.",
+    "Lo sconto cliente è cambiato. Verifica nuovamente la proposta."
+  ],
+  "Bitte einen nichtnegativen Dezimalwert mit höchstens zwei Nachkommastellen eingeben.": [
+    "Please enter a nonnegative decimal with at most two decimal places.",
+    "Veuillez saisir un nombre décimal positif ou nul avec au maximum deux décimales.",
+    "Inserisci un valore decimale non negativo con al massimo due decimali."
+  ],
+  "Betrag ausserhalb des zulässigen Bereichs.": [
+    "Amount outside the permitted range.",
+    "Montant hors de la plage autorisée.",
+    "Importo fuori dall’intervallo consentito."
+  ],
+  "Die Auswahl «Kein Rabatt» darf keinen Wert enthalten.": [
+    "A no-discount selection must not contain a value.",
+    "Le choix sans remise ne doit contenir aucune valeur.",
+    "La scelta senza sconto non deve contenere un valore."
+  ],
+  "Bitte genau eine Rabattart angeben.": [
+    "Please specify exactly one discount type.",
+    "Veuillez indiquer exactement un type de remise.",
+    "Specifica esattamente un tipo di sconto."
+  ],
+  "Rabattwährung stimmt nicht mit der Dokumentwährung überein.": [
+    "The discount currency does not match the document currency.",
+    "La devise de la remise ne correspond pas à celle du document.",
+    "La valuta dello sconto non corrisponde a quella del documento."
+  ],
+  "Der Rabatt übersteigt die rabattfähige Bemessungsgrundlage.": [
+    "The discount exceeds the eligible amount.",
+    "La remise dépasse le montant admissible.",
+    "Lo sconto supera la base ammissibile."
+  ],
+  "Rundungsrest kann nicht verteilt werden.": [
+    "The rounding remainder cannot be allocated.",
+    "Le reste d’arrondi ne peut pas être réparti.",
+    "Il residuo di arrotondamento non può essere ripartito."
+  ],
+  "Ungültige Rundungszuteilung.": [
+    "Invalid rounding allocation.",
+    "Répartition des arrondis non valide.",
+    "Ripartizione degli arrotondamenti non valida."
+  ],
+  "Ungültige Währung oder Positionsanzahl.": [
+    "Invalid currency or number of line items.",
+    "Devise ou nombre de positions non valide.",
+    "Valuta o numero di posizioni non valido."
+  ],
+  "Ungültige Steuerbefreiung.": [
+    "Invalid tax exemption.",
+    "Exonération fiscale non valide.",
+    "Esenzione fiscale non valida."
+  ],
+  "Steuerbefreite Positionen benötigen Steuersatz 0.": [
+    "Tax-exempt line items require a zero tax rate.",
+    "Les positions exonérées nécessitent un taux de TVA nul.",
+    "Le posizioni esenti richiedono un’aliquota pari a zero."
+  ],
+  "Positionsbetrag ausserhalb des zulässigen Bereichs.": [
+    "Line amount outside the permitted range.",
+    "Montant de la position hors de la plage autorisée.",
+    "Importo della posizione fuori dall’intervallo consentito."
+  ],
+  "Dokumenttotal ausserhalb des zulässigen Bereichs.": [
+    "Document total outside the permitted range.",
+    "Total du document hors de la plage autorisée.",
+    "Totale del documento fuori dall’intervallo consentito."
+  ],
   "Auszahlungsdaten sind unvollständig.": [
     "Outflow data is incomplete.",
     "Les données de décaissement sont incomplètes.",

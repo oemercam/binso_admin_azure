@@ -1,7 +1,7 @@
 import {idempotentBusiness} from "../business-idempotency";
 import "server-only";
 import {offerTotalSql,offerStatusSql,invoiceCreditSql,invoiceRefundSql,invoicePaymentStatusSql,invoiceDueStatusSql,invoiceDisplayStatusSql} from "../document-amount-sql";
-import {businessDate,financialStatus,openAmount,invoiceStatusAxes,customerCredit,paymentEntryIssue,paymentBalance,samePaymentBalance,maxRecordedPayment} from "@/lib/financial-status";
+import {businessDate,financialStatus,openAmount,invoiceStatusAxes,customerCredit,paymentEntryIssue,paymentBalance,samePaymentBalance,maxRecordedPayment,calculateDocument} from "@/lib/financial-status";
 import { randomUUID } from "node:crypto";
 import type { PoolClient } from "pg";
 import { audit } from "../audit";
@@ -63,7 +63,7 @@ export async function listApiBusiness(c:PoolClient,s:SessionUser,table:string,ex
    if(kind&&kind!==k)continue;
    if(!tenantCan(s.role,k==='invoice'?'invoices:read':'sales:read'))continue;
    const lines=k==='invoice'?'invoice_lines':'quote_lines';
-   sources.push(`select d.id,d.customer_id,'${k}' kind,d.${no} number,d.status,${k==='offer'?'d.offer_version':'null::integer'} offer_version,${k==='offer'?'d.title':'null::text'} title,${k==='invoice'?'d.qr_reference':'null::text'} qr_reference,d.issue_date::text issue_date,${k==='invoice'?'d.due_date::text':'null::text'} due_date,${k==='offer'?'d.valid_until::text':'null::text'} valid_until,d.note,d.intro_text,d.issuer_snapshot,d.customer_snapshot,d.document_snapshot,${k==='invoice'?'d.payment_snapshot':"'{}'::jsonb"} payment_snapshot,d.currency,d.created_at,d.updated_at,${k==='invoice'?'d.paid_amount':'0::numeric'} paid_amount,
+   sources.push(`select d.id,d.customer_id,'${k}' kind,d.${no} number,d.status,${k==='offer'?'d.offer_version':'null::integer'} offer_version,${k==='offer'?'d.title':'null::text'} title,${k==='invoice'?'d.qr_reference':'null::text'} qr_reference,d.issue_date::text issue_date,${k==='invoice'?'d.due_date::text':'null::text'} due_date,${k==='offer'?'d.valid_until::text':'null::text'} valid_until,d.note,d.intro_text,d.calculation,d.issuer_snapshot,d.customer_snapshot,d.document_snapshot,${k==='invoice'?'d.payment_snapshot':"'{}'::jsonb"} payment_snapshot,d.currency,d.created_at,d.updated_at,${k==='invoice'?'d.paid_amount':'0::numeric'} paid_amount,
      ${k==='invoice'?invoiceCreditSql('d'):'0::numeric'} credit_amount,
      ${k==='invoice'?`(select v.status from document_deliveries v where v.organization_id=d.organization_id and v.kind='invoice' and v.document_id=d.id and v.purpose='document' order by v.created_at desc,v.id desc limit 1)`:'null::text'} delivery_status,
      ${k==='invoice'?`coalesce((select json_agg(json_build_object('number',n.credit_no,'date',n.credit_date::text,'amount',n.amount,'reason',n.reason) order by n.credit_date,n.created_at,n.id) from credit_notes n where n.organization_id=d.organization_id and n.invoice_id=d.id),'[]'::json)`:`'[]'::json`} credits,
@@ -76,12 +76,12 @@ export async function listApiBusiness(c:PoolClient,s:SessionUser,table:string,ex
      ${k==='offer'?`coalesce((select json_agg(json_build_object('number',q.quote_no,'status',q.status) order by q.created_at,q.id) from quotes q where q.revises_quote_id=d.id and q.organization_id=d.organization_id and q.archived_at is null),'[]'::json)`:`'[]'::json`} revisions,
      ${k==='offer'?`(select i.invoice_no from invoices i where i.source_quote_id=d.id and i.organization_id=d.organization_id and i.archived_at is null and i.status<>'cancelled' limit 1)`:'null::text'} invoice_number,
      ${k==='offer'?`(select p.id from projects p where p.source_quote_id=d.id and p.organization_id=d.organization_id and p.archived_at is null limit 1)`:'null::uuid'} project_id,
-     ${k==='invoice'?'d.subtotal':`coalesce((select round(sum(l.quantity*l.unit_price),2) from ${lines} l where l.${fk}=d.id and l.organization_id=d.organization_id),0)`} subtotal,
-     ${k==='invoice'?'d.vat_amount':`coalesce((select round(sum(l.quantity*l.unit_price*l.vat_rate/100),2) from ${lines} l where l.${fk}=d.id and l.organization_id=d.organization_id),0)`} vat_amount,
+     ${k==='invoice'?'d.subtotal':`coalesce((d.calculation->>'subtotal')::numeric,(select round(sum(l.quantity*l.unit_price),2) from ${lines} l where l.${fk}=d.id and l.organization_id=d.organization_id),0)`} subtotal,
+     ${k==='invoice'?'d.vat_amount':`coalesce((d.calculation->>'vat')::numeric,(select round(sum(l.quantity*l.unit_price*l.vat_rate/100),2) from ${lines} l where l.${fk}=d.id and l.organization_id=d.organization_id),0)`} vat_amount,
      ${k==='invoice'?'d.total_amount':offerTotalSql('d')} total,
      coalesce((select max(l.vat_rate) from ${lines} l where l.${fk}=d.id and l.organization_id=d.organization_id),0) vat_rate,
      json_build_object('name',c.name,'number',c.customer_no,'street',c.address,'postal_code',c.zip,'city',c.city,'country',c.country,'language',c.language) customer,
-     coalesce((select json_agg(json_build_object('id',l.id,'position',l.sort_order,'description',l.description,'quantity',l.quantity,'unit_price',l.unit_price,'unit',l.unit,'vat_rate',l.vat_rate,'line_total',l.quantity*l.unit_price,'expense_ids',${k==='invoice'?`coalesce((select json_agg(x.expense_id) from invoice_line_expenses x where x.invoice_line_id=l.id),'[]'::json)`:"'[]'::json"},'time_entry_ids',${k==='invoice'?`coalesce((select json_agg(x.time_entry_id) from invoice_line_time_entries x where x.invoice_line_id=l.id),'[]'::json)`:"'[]'::json"}) order by l.sort_order) from ${lines} l where l.${fk}=d.id and l.organization_id=d.organization_id),'[]'::json) items
+     coalesce((select json_agg(json_build_object('id',l.id,'position',l.sort_order,'description',l.description,'quantity',l.quantity,'unit_price',l.unit_price,'unit',l.unit,'vat_rate',l.vat_rate,'line_total',coalesce((d.calculation->'lines'->(l.sort_order-1)->>'net')::numeric,l.quantity*l.unit_price),'discount',d.calculation->'lines'->(l.sort_order-1)->'discount','tax_exempt',d.calculation->'lines'->(l.sort_order-1)->'tax_exempt','expense_ids',${k==='invoice'?`coalesce((select json_agg(x.expense_id) from invoice_line_expenses x where x.invoice_line_id=l.id),'[]'::json)`:"'[]'::json"},'time_entry_ids',${k==='invoice'?`coalesce((select json_agg(x.time_entry_id) from invoice_line_time_entries x where x.invoice_line_id=l.id),'[]'::json)`:"'[]'::json"}) order by l.sort_order) from ${lines} l where l.${fk}=d.id and l.organization_id=d.organization_id),'[]'::json) items
      from ${t} d join customers c on c.id=d.customer_id and c.organization_id=d.organization_id where d.organization_id=$1 and d.archived_at is null`);
   }
   if(!sources.length)throw new ApiError(403,'forbidden','Keine Berechtigung.');source=sources.join(' union all ');
@@ -171,6 +171,11 @@ export function translateBusinessWrite(table:string,data:Row,insert:boolean){
  return {target,data:out};
 }
 export async function mutateApiBusiness(c:PoolClient,s:SessionUser,operation:string,args:Row):Promise<unknown>{
+ if(operation==='update_document_atomic'&&(args.p_discount!==undefined||args.p_calculation_revision!==undefined||(Array.isArray(args.p_items)&&args.p_items.some((l:Row)=>l.discount!==undefined)))){
+  if(!tenantCan(s.role,args.p_kind==='invoice'?'invoices:write':'sales:write'))throw new ApiError(403,'forbidden','Keine Berechtigung.');
+  const body={...args};delete body.p_idempotency_key;
+  return idempotentBusiness(c,{organizationId:s.organizationId,userId:s.userId,operation:'document.update.'+args.p_kind,key:String(args.p_idempotency_key??''),body},()=>executeBusinessMutation(c,s,operation,{...args}));
+ }
  if(operation!=='create_document_atomic')return executeBusinessMutation(c,s,operation,{...args});
  if(!['invoice','offer'].includes(String(args.p_kind)))throw new ApiError(400,'kind_invalid','Ungültiger Dokumenttyp.');
  if(!tenantCan(s.role,args.p_kind==='invoice'?'invoices:write':'sales:write'))throw new ApiError(403,'forbidden','Keine Berechtigung.');
@@ -227,23 +232,25 @@ async function executeBusinessMutation(c:PoolClient,s:SessionUser,operation:stri
  const table=invoice?'invoices':'quotes',numberColumn=invoice?'invoice_no':'quote_no',lineTable=invoice?'invoice_lines':'quote_lines',parentColumn=invoice?'invoice_id':'quote_id';
  const vat=Number(args.p_vat_rate);if(!Number.isFinite(vat)||vat<0||vat>100)throw new ApiError(400,'vat_invalid','Ungültiger MwSt.-Satz.');
  if(!['CHF','EUR'].includes(String(args.p_currency)))throw new ApiError(400,'currency_invalid','Ungültige Währung.');
- const found=await c.query('select id from customers where id::text=$1 and organization_id=$2 and archived_at is null',[args.p_customer_id,s.organizationId]);
+ const found=await c.query('select id,discount from customers where id::text=$1 and organization_id=$2 and archived_at is null',[args.p_customer_id,s.organizationId]);
  if(!found.rowCount)throw new ApiError(400,'customer_invalid','Kunde wurde nicht gefunden.');
  let sourceQuoteId:string|null=null;
  if(invoice&&operation==='create_document_atomic'&&args.p_source_offer){
-  const quote=(await c.query("select id,status,customer_id,currency from quotes where organization_id=$1 and quote_no=$2 and archived_at is null for update",[s.organizationId,args.p_source_offer])).rows[0];
+  const quote=(await c.query("select id,status,customer_id,currency,calculation from quotes where organization_id=$1 and quote_no=$2 and archived_at is null for update",[s.organizationId,args.p_source_offer])).rows[0];
   if(!quote||quote.status!=='accepted'||quote.customer_id!==args.p_customer_id||quote.currency!==args.p_currency)throw new ApiError(409,'offer_not_accepted','Für die Rechnung muss ein angenommenes Angebot desselben Kunden und derselben Währung vorliegen.');
   if((await c.query('select id from invoices where organization_id=$1 and source_quote_id=$2 and archived_at is null and status<>\'cancelled\'',[s.organizationId,quote.id])).rowCount)throw new ApiError(409,'offer_already_invoiced','Aus diesem Angebot wurde bereits eine Rechnung erstellt.');
+  if(quote.calculation&&(quote.calculation.discount.kind!=='none'||quote.calculation.lines.some((l:Row)=>(l.discount as Row).kind!=='none'))&&(args.p_discount===undefined||(args.p_items as Row[]).some(l=>l.discount===undefined)))throw new ApiError(409,'discount_confirmation_required','Bitte die Rabatte des Angebots ausdrücklich übernehmen.');
   sourceQuoteId=quote.id;
  }
  let id:string;
  if(operation==='update_document_atomic'){
-  const existing=await c.query(`select id,status${invoice?',paid_amount':''} from ${table} where ${numberColumn}=$1 and organization_id=$2 and archived_at is null for update`,[args.p_current_number,s.organizationId]);
+  const existing=await c.query(`select id,status,calculation${invoice?',paid_amount':''} from ${table} where ${numberColumn}=$1 and organization_id=$2 and archived_at is null for update`,[args.p_current_number,s.organizationId]);
   if(args.p_number!==args.p_current_number)throw new ApiError(409,'number_immutable','Die bestehende Dokumentnummer kann nicht geändert werden.');
   const row=existing.rows[0];if(!row)throw new ApiError(404,'not_found','Dokument wurde nicht gefunden.');
   if(row.status!=='draft')throw new ApiError(409,'document_locked','Dieses Dokument kann nicht mehr geändert werden.');id=row.id;
+  if(row.calculation&&((row.calculation.discount?.kind!=='none'&&args.p_discount===undefined)||(row.calculation.lines.some((l:Row)=>(l.discount as Row)?.kind!=='none')&&(args.p_items as Row[]).some(l=>l.discount===undefined))||(row.calculation.lines.some((l:Row)=>l.tax_exempt===true)&&(args.p_items as Row[]).some(l=>l.tax_exempt===undefined))))throw new ApiError(409,'discount_confirmation_required','Bitte den gespeicherten Rabatt ausdrücklich übernehmen oder entfernen.');
   if((await c.query("select id from document_deliveries where organization_id=$1 and document_id=$2 and status in ('sending','uncertain','failed')",[s.organizationId,id])).rowCount)throw new ApiError(409,'delivery_pending','Ein Versand dieses Dokuments ist noch nicht bestätigt.');
-  await c.query(`update ${table} set ${numberColumn}=$1,customer_id=$2,issue_date=$3,${invoice?'due_date':'valid_until'}=$4,note=$5,currency=$6,updated_at=now() where id=$7 and organization_id=$8`,[args.p_number,args.p_customer_id,args.p_issue_date,invoice?args.p_due_date:args.p_valid_until,args.p_note,args.p_currency,id,s.organizationId]);
+  await c.query(`update ${table} set calculation=null,${numberColumn}=$1,customer_id=$2,issue_date=$3,${invoice?'due_date':'valid_until'}=$4,note=$5,currency=$6,updated_at=now() where id=$7 and organization_id=$8`,[args.p_number,args.p_customer_id,args.p_issue_date,invoice?args.p_due_date:args.p_valid_until,args.p_note,args.p_currency,id,s.organizationId]);
   if(invoice)await c.query("update expenses set invoiced_invoice_id=null where organization_id=$1 and invoiced_invoice_id=$2",[s.organizationId,id]);
   if(invoice)await c.query("update time_entries set invoiced_invoice_id=null where organization_id=$1 and invoiced_invoice_id=$2",[s.organizationId,id]);
   await c.query(`delete from ${lineTable} where ${parentColumn}=$1 and organization_id=$2`,[id,s.organizationId]);
@@ -274,7 +281,13 @@ async function executeBusinessMutation(c:PoolClient,s:SessionUser,operation:stri
    for(const row of linked.rows)await c.query('insert into invoice_line_time_entries(organization_id,invoice_line_id,time_entry_id) values($1,$2,$3)',[s.organizationId,inserted.rows[0].id,row.id]);
   }
  }
- if(invoice)await c.query(`update invoices set subtotal=x.subtotal,vat_amount=x.vat,total_amount=x.subtotal+x.vat from (select round(sum(quantity*unit_price),2) subtotal,round(sum(quantity*unit_price*vat_rate/100),2) vat from invoice_lines where invoice_id=$1 and organization_id=$2) x where invoices.id=$1 and invoices.organization_id=$2`,[id,s.organizationId]);
+ let calculation:ReturnType<typeof calculateDocument>;
+ try{calculation=calculateDocument((args.p_items as Row[]).map(l=>({quantity:l.quantity,unit_price:l.unit_price,vat_rate:l.vat_rate??vat,discount:l.discount,tax_exempt:l.tax_exempt})),String(args.p_currency),args.p_discount);}catch(error){throw new ApiError(400,'discount_invalid',error instanceof Error?error.message:'Ungültige Berechnung.');}
+ const origin=args.p_discount_origin??(calculation.discount.kind==='none'?'removed':'manual');
+ if(!['removed','manual','customer'].includes(String(origin))||(origin==='removed'&&calculation.discount.kind!=='none')||(origin==='customer'&&(calculation.discount.kind!=='percent'||Number(calculation.discount.value)!==Number(found.rows[0].discount))))throw new ApiError(400,'discount_origin_invalid','Der Kundenrabatt wurde geändert. Bitte den Vorschlag erneut prüfen.');
+ const documentVersion=invoice?1:Number((await c.query('select offer_version from quotes where id=$1 and organization_id=$2',[id,s.organizationId])).rows[0].offer_version);
+ const calculationSnapshot={...calculation,documentVersion,discountOrigin:origin,customerProposal:operation==='create_document_atomic'?{kind:'percent',value:String(found.rows[0].discount??0),applied:origin==='customer'}:undefined};
+ await c.query(`update ${table} set calculation=$3::jsonb${invoice?',subtotal=$4,vat_amount=$5,total_amount=$6':''} where id=$1 and organization_id=$2`,[id,s.organizationId,JSON.stringify(calculationSnapshot),...(invoice?[calculation.subtotal,calculation.vat,calculation.total]:[])]);
  await audit(c,{organizationId:s.organizationId,userId:s.userId,action:operation==='create_document_atomic'?'document.created':'document.updated',entityType:table,entityId:id});
  return (await listApiBusiness(c,s,'documents','id=eq.'+id))[0];
 }
