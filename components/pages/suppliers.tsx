@@ -16,6 +16,7 @@ import {useProcessDraft} from '../use-process-draft';
 import {allowDraftNavigation} from '../use-browser-back-guard';
 import {SupplierBank} from '../supplier-bank';
 import {SupplierInvoices} from '../supplier-invoices';
+import {ExternalResources} from '../external-resources';
 import {tenantCan} from '@/lib/permissions';
 
 export function SuppliersPage(){
@@ -67,6 +68,7 @@ export function SupplierForm({supplierId}:{supplierId?:string}){
   {!editing&&<section className="surface"><SectionTitle title="Stammdaten"/><dl className="detail-list">{[['Nr.',query.data?.item.supplier_no],['Kontakt',draft.contactName],['E-Mail',draft.email],['Telefon',draft.phone],['Adresse',draft.address],['UID',draft.uid],['Zahlungsfrist',draft.paymentDays]].filter(([,value])=>value).map(([label,value])=><div key={label}><dt><LocalizedText>{label}</LocalizedText></dt><dd>{value}</dd></div>)}</dl></section>}
   {!editing&&supplierId&&tenantCan(role,'bank:read',profile)&&<SupplierBank supplierId={supplierId} mayWrite={tenantCan(role,'bank:write',profile)} onSaved={query.refresh}/>}
   {!editing&&supplierId&&<SupplierInvoices supplierId={supplierId} mayWrite={tenantCan(role,'purchasing:write',profile)}/>}
+  {!editing&&supplierId&&['owner','admin'].includes(role)&&<ExternalResources supplierId={supplierId}/>}
   <FormSheet workspace open={editing} onClose={close} label={existing?'Lieferant bearbeiten':'Lieferant hinzufügen'} busy={busy} dirty={dirty}>
    <form id={formId} onSubmit={event=>{event.preventDefault();void save();}}><div className="form-grid two">
     <Field label="Lieferant"><Input required maxLength={200} value={draft.name} onChange={event=>field('name',event.target.value)}/></Field>

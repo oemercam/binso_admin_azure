@@ -333,6 +333,7 @@ try{
    else if(p==='/api/customers')data=customerListFixture(url.searchParams);
    else if(['/api/products','/api/employees','/api/suppliers','/api/expenses','/api/payments'].includes(p))data=recordListFixture(p.split('/')[2],url.searchParams);
    else if(/^\/api\/employees\/[^/]+\/employment$/.test(p))data={items:[]};
+   else if(/^\/api\/suppliers\/[^/]+\/resources$/.test(p))data={items:[],assignments:[]};
    else if(/^\/api\/suppliers\/[^/]+\/invoices$/.test(p))data={items:[]};
    else if(/^\/api\/suppliers\/[^/]+\/bank$/.test(p))data={item:{id:supplier.id,iban:null,revision:supplier.revision}};
    else if(p==='/api/reports'){

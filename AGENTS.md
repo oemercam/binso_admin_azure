@@ -202,3 +202,15 @@ commercial changes and unvalidated payroll stay closed. Existing tariffs,
 Identity, finance/document engines, mobile navigation and blue FAB remain.
 No merge, production migration, deployment, bank transfer, paid service or
 productive payroll without the separate applicable approval.
+
+## Confirmed V26 release and access decisions
+
+The user explicitly chose completing V26 before preparing its release. Preserve
+current prices and existing rights. New supplier/resource functions use the
+existing Business/Pro supplier module; payroll uses the existing Pro payroll
+module. No new paid add-ons or automatic subscription changes. The user approved
+explicit additional grants for new sensitive HR/family/payroll data: owner/admin
+roles do not inherit them automatically. Self-service payslips require a separate
+identity-bound policy. Implement these approved decisions without per-package
+confirmation; legal payroll validation and productive actions still need their
+actual evidence and applicable authorization.

@@ -44,4 +44,4 @@ Titel, Modul und Rollenzuordnung weiter aus `lib/modules.ts`/`permissions.ts`/`p
 
 ## Fachentscheidungen und sichere Fortsetzung
 
-F01–F10 der Planung bleiben sichtbar. Bis neuer Freigabe: keine Tarifänderung, keine zusätzliche sensible HR-/Payroll-/Familienexposition, keine abweichende Provisionierung, keine implizite Feiertags-/Lohn-/Steuerregel, keine neuen bezahlten Dienste. Existierende Mitarbeiter-Basisrechte werden erhalten; neue sensible Funktionen bleiben serverseitig gesperrt. Sichere Stamm-/Schnittstellenarbeit kann weitergehen.
+F01/F02 wurden nach der Planung ausdrücklich bestätigt: bestehende Preise/Bestandsmodule, zusätzliche HR-/Payroll-Fachgrants und separate eigene Lohnabrechnungen. Siehe tatsächlicher Fortschritt und Entscheidungsprotokoll in v26-execution.md. F03–F10 bleiben sichtbar. Keine abweichende Provisionierung, keine implizite Feiertags-/Lohn-/Steuerregel und keine neuen bezahlten Dienste. Existierende Mitarbeiter-Basisrechte werden erhalten; neue sensible Funktionen bleiben serverseitig gesperrt. Sichere Stamm-/Schnittstellenarbeit kann weitergehen.
