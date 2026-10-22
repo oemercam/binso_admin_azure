@@ -70,10 +70,14 @@ try{
  execFileSync('git',['update-index','--index-info'],{cwd:identityDir,input:index});
  git('-c','user.name=Isolated Fixture','-c','user.email=fixture@example.invalid','commit','-q','-m','Synthetic identity fixture');
  assert(Buffer.byteLength(git('ls-files','-z'))>1024*1024,'Exercise the original child-process buffer boundary');
- const expected=createHash('sha256');for(const file of ['app/page.tsx','package.json','ux-compliance/requirements.v1.json'])expected.update(file+'\0').update(fs.readFileSync(path.join(identityDir,file)));
+ const expected=createHash('sha256').update('BINSO-evidence-source-v2\0');for(const file of ['app/page.tsx','package.json','ux-compliance/requirements.v1.json'])expected.update(file+'\0').update(fs.readFileSync(path.join(identityDir,file)));
  const initial=readIdentity();assert.equal(initial.sourceDigest,expected.digest('hex'),'Evidence paths do not change the source digest');assert.equal(initial.registryVersion,'9.9.9');
  fs.mkdirSync(path.join(identityDir,'evidence'));fs.writeFileSync(path.join(identityDir,'evidence/untracked.json'),'new generated result');assert.equal(readIdentity().sourceDigest,initial.sourceDigest);
  fs.writeFileSync(path.join(identityDir,'app/page.tsx'),'changed source fixture');assert.notEqual(readIdentity().sourceDigest,initial.sourceDigest,'Source edits remain bound');
+ for(const file of ['database/migrations/new.sql','database/operations/rights.sql','patches/fixture.patch','.github/workflows/quality.yml','pnpm-workspace.yaml','tsconfig.json','proxy.ts','AGENTS.md']){
+  const previous=readIdentity().sourceDigest;fs.mkdirSync(path.dirname(path.join(identityDir,file)),{recursive:true});fs.writeFileSync(path.join(identityDir,file),'first critical source');const first=readIdentity().sourceDigest;
+  assert.notEqual(first,previous,'Actual Git collection binds a new critical input: '+file);fs.writeFileSync(path.join(identityDir,file),'changed critical source');const changed=readIdentity().sourceDigest;assert.notEqual(changed,first,'Actual critical file mutation invalidates evidence: '+file);git('add',file);assert.equal(readIdentity().sourceDigest,changed,'Staging cannot hide or change source identity: '+file);
+ }
  const beforeRegistry=readIdentity();fs.writeFileSync(path.join(identityDir,'ux-compliance/requirements.v1.json'),JSON.stringify({version:'9.9.10'}));const afterRegistry=readIdentity();assert.equal(afterRegistry.registryVersion,'9.9.10');assert.notEqual(afterRegistry.sourceDigest,beforeRegistry.sourceDigest,'A changed visual contract invalidates older evidence');
  fs.mkdirSync(path.join(identityDir,'components'));fs.writeFileSync(path.join(identityDir,'components/new.tsx'),'untracked source fixture');const untracked=readIdentity().sourceDigest;git('add','components/new.tsx');assert.equal(readIdentity().sourceDigest,untracked,'Untracked source is included before staging');
  fs.mkdirSync(path.join(identityDir,'docs/audit/v24'),{recursive:true});const beforeContract=readIdentity().sourceDigest;

@@ -1,7 +1,7 @@
 # Persönliche Angebots-Nachfass-Erinnerung
 
 Die bisher fehlende persönliche In-App-Erinnerung ist als vertikales Paket
-vorbereitet: bestehendes Angebotsdossier → «Erinnerung» → gemeinsames FormSheet mit
+vorbereitet: bestehendes Angebotsdossier → Drei-Punkte-Menü → «Erinnerung» → gemeinsames FormSheet mit
 Datum, Vorschau und ausdrücklicher Bestätigungscheckbox. Standard aus; keine neue
 Navigation, kein zusätzlicher Plus-Button, kein CSS- oder Formular-Parallelstandard.
 Beschriftung und Fehlermeldungen besitzen DE/EN/FR/IT-Katalogeinträge.

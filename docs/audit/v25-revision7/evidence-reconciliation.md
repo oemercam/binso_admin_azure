@@ -31,3 +31,22 @@ Das Register trennt deshalb `implementationStatus` von `acceptanceStatus`:
 `ungeprueft` bedeutet weder fehlende Implementierung noch erfolgreiche Abnahme.
 Ein quellhashgebundener Teilnachweis bleibt `teilweise_belegt`, bis alle Pflichten
 der jeweiligen zusammengesetzten Klausel nachgewiesen sind.
+
+## Geschlossene Lücke der Quellidentität
+
+Die bisherige Sammlung band Anwendung, Tests und ausgewählte Verträge, aber nicht
+direkt alle Migrationen, Betriebs-SQL, Patchdateien und Workflow-/Root-Konfigurationen.
+Ein ausschliesslich dort geänderter Stand durfte deshalb nicht über denselben
+Fingerprint mit früheren Nachweisen bewertet werden. Die zentrale Identität bindet
+diese tatsächlichen Git-Quellen nun ebenfalls, einschliesslich `proxy.ts`, der
+verbindlichen Anweisungen und des Originalreferenzpakets. Das V2-Protokoll ist
+ausdrücklich von der bisherigen Hashfolge getrennt; ältere Digests werden nicht
+nachträglich umgedeutet oder manuell ersetzt.
+
+Positive/negative Prüfungen laufen sowohl auf den tatsächlichen Repositorypfaden
+als auch in einem isolierten Git-Repository mit mehr als1MiB generierten
+Evidence-Pfaden. Schema-, Rechte-, Patch-, Workflow- und Konfigurationsänderungen
+ändern den Digest vor und nach Staging. Ergebnisarchive bleiben ausgeschlossen;
+die normative573-Klausel-Projektion bleibt gebunden. Gefälschte Klauseln,
+Prioritätsänderungen und veränderte Originalbytes bleiben ausdrücklich Fehler.
+Diese verbesserten Messregeln erteilen weiterhin keine fachliche Freigabe.

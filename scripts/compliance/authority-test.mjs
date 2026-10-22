@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import './identity-source-test.mjs';
 import fs from 'node:fs';
 import {revision7Authority,readRevision7Authority,partitionHistoricalRegistry,authorityPaths} from './authority.mjs';
 import {aggregate,currentApprovalCoverage} from './report.mjs';
