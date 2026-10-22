@@ -13,6 +13,10 @@ P0/P1/P2 vollständig im Auftragsumfang; P3 ausgeschlossen. **Dieser Zwischensta
 
 ## Register
 
+[Paket 4: verbindlicher Rabatt- und Berechnungsvertrag](v25-discount-contract.md)
+legt Rabattbasis, Kundenstandard, Steuer-/Rundungsreihenfolge und numerische
+Sollfälle fest. Nur Fachvertrag; Rabattberechnung noch nicht implementiert.
+
 [Anforderungen](../audit/v25-revision7/requirements.csv), [Routen/Rollen/Zustände](../audit/v25-revision7/route-role-states.csv), [Routen, Komponenten, APIs und Migrationen](../audit/v25-revision7/routes.json).
 Generator: scripts/revision7-inventory.mjs. Aktuell 56 Kapitel, 573 Satz-/Prüfklauseln, 78 Routen, 12 konkrete Operator-Varianten und 5588 geplante Route/Rolle/Zustand-Fälle. Zusammengesetzte Klauseln behalten den kompletten Originaltext; sie sind nicht pauschal bestanden.
 Das Register ist eine Vollständigkeitskontrolle, kein Beleg ausgeführter Tests. Noch nicht einzeln ausgeführte Zustands-/Rollen-/Visualfälle bleiben ausdrücklich nicht abgenommen.
