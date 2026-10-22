@@ -4200,15 +4200,18 @@
       "sourceTextSha256": "84f17733b64eb6641e32d9b9269ef7fcf7f6e1ac6520c70e3ce2f8fb4efe7de6",
       "sourceParagraph": "Registrierung in eigenständigen Vollbildschritten E-Mail → Passwort → Firmenname → E-Mail-Verifizierung → direkt starten, ohne Kreditkarte oder obligatorische 2FA. Ein Benutzerkonto gehört zu genau einem Unternehmen. Gemeinsamer Login für Owner, Admin, Finance, Member; Rollen nach Authentifizierung serverseitig bestimmen. Passkeys/WebAuthn mit Face ID/Touch ID bevorzugt, Passwort alternativ, TOTP freiwillig nachträglich, Recovery-Codes, sichere Sitzungen, Geräteübersicht, Sitzungen widerrufen, Passwortreset, sichere Wiederherstellung und Step-up bei kritischen Änderungen. Push-Number-Matching nur bei nachweislich verfügbarer, sicherer Identity-Provider-Funktion für externe SaaS-Kunden; keine improvisierte Push-Bestätigung. Inter-Schrift global, Überschriften 28/22/16 px, Body 14, Eingabe 16, Label 13, Button 15, Hilfe/Badge 12 px; 12px abgerundete Felder, 48px Höhe, 16px Padding. Original-Logo links und **rahmenlose Sprachauswahl `DE ˅` rechts**, ohne Globus/Button/Pill; DE/FR/IT/EN auf Auth, App und E-Mails.",
       "status": "nicht_abgenommen",
-      "implementationStatus": "ungeprueft",
+      "implementationStatus": "implementiert",
       "acceptanceStatus": "nicht_abgenommen",
       "sourceReferences": [
-        "lib/permissions.ts"
+        "app/api/auth/login/route.ts",
+        "lib/server/session.ts",
+        "scripts/api-tenant-postgres-test.mjs",
+        "scripts/registration-test.mjs"
       ],
-      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "implementation": "Gemeinsamer Login ermittelt aktive Mitgliedschaft und Rolle erst nach Passwortnachweis aus der Datenbank; keine vom Client gewählte Rolle. Auf diesem unveränderten Identity-Quellstand technisch geprüft.",
+      "test": "Quality39765711852 auf 38754fad7b2c1922653b725ad61d14de47cd6577: native HTTP-Prüfung aller acht Rollen, direkte Mandanten-IDs, Sessionablauf und eingeschränkte Runtime-Registrierung erfolgreich; vorhandene Codepfade unverändert.",
+      "visualComparison": "Keine neue visuelle Gesamtfreigabe; begrenzte Responsive-Stichprobe separat dokumentiert.",
+      "blocker": "Keine umfassende Identity-/Gerätefreigabe aus dieser einzelnen Backend-Klausel ableiten."
     },
     {
       "id": "R7-28-004",
@@ -5391,13 +5394,18 @@
       "sourceTextSha256": "2d1c6f87be682adea57dc37eafd0b3fbf5a1d175ec6f4cbf48c79289cd59126c",
       "sourceParagraph": "Tenant-Isolation, serverseitige Berechtigungen, sichere Sessions, Rate Limits, CSRF/XSS/Injection-Schutz, Audit, Secret-Management, sichere Uploads, Datenaufbewahrung/-löschung. Entwürfe/Autosave, Netzwerkunterbruch und Sitzungsablauf ohne stillen Datenverlust. Transaktionen und Idempotenz bei Rechnungen, Zahlungen, Einladungen, Versand, Angebotsannahmen und Timer. Monitoring, Alerts, datensparsame Logs, Backups, **Wiederherstellungstest**, Migrations-/Rollback-Plan, Performance und Barrierefreiheit (Kontrast, Tastatur, Screenreader, Touchflächen).",
       "status": "nicht_abgenommen",
-      "implementationStatus": "ungeprueft",
+      "implementationStatus": "teilweise_belegt",
       "acceptanceStatus": "nicht_abgenommen",
-      "sourceReferences": [],
-      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "sourceReferences": [
+        "lib/server/session.ts",
+        "app/api/files/[id]/download/route.ts",
+        "app/api/documents/[number]/send/route.ts",
+        "app/api/operator/monitoring/route.ts"
+      ],
+      "implementation": "Begrenzte P0-Stichprobe: Login/Sitzung, Rechnungszahlungen, Dateidownload, Dokumentversand und Betreiber-Monitoring. Rollen/RLS, private Dateien, sichere Zustände und Audit sind belegt; die zusammengesetzte Sicherheitsklausel ist damit nicht vollständig abgenommen.",
+      "test": "Quality39765711852: native Rollen-/Tenant-/Expiry-Gegenfälle, 158 anonyme Methoden, File- und Finanzintegrität sowie ClamAV-Gate erfolgreich. Neue Monitoring-Select-Policy separat mit observability-test geprüft.",
+      "visualComparison": "Keine neue visuelle Gesamtfreigabe; begrenzte Responsive-Stichprobe separat dokumentiert.",
+      "blocker": "Nicht geprüfte Schreib-/Operatorpfade, reale Retention/Löschung und externes Secret-/Betriebsmanagement bleiben separate Nachweise."
     },
     {
       "id": "R7-36-002",
@@ -5451,13 +5459,19 @@
       "sourceTextSha256": "dfb5300522013017374c3f5ee9b199308ee8ce487e30bf1af097b631d67ef89c",
       "sourceParagraph": "Tenant-Isolation, serverseitige Berechtigungen, sichere Sessions, Rate Limits, CSRF/XSS/Injection-Schutz, Audit, Secret-Management, sichere Uploads, Datenaufbewahrung/-löschung. Entwürfe/Autosave, Netzwerkunterbruch und Sitzungsablauf ohne stillen Datenverlust. Transaktionen und Idempotenz bei Rechnungen, Zahlungen, Einladungen, Versand, Angebotsannahmen und Timer. Monitoring, Alerts, datensparsame Logs, Backups, **Wiederherstellungstest**, Migrations-/Rollback-Plan, Performance und Barrierefreiheit (Kontrast, Tastatur, Screenreader, Touchflächen).",
       "status": "nicht_abgenommen",
-      "implementationStatus": "ungeprueft",
+      "implementationStatus": "teilweise_belegt",
       "acceptanceStatus": "nicht_abgenommen",
-      "sourceReferences": [],
-      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "sourceReferences": [
+        "lib/server/observability.ts",
+        "lib/server/repositories/observability.ts",
+        "database/migrations/0083_document_delivery_monitoring.sql",
+        "scripts/observability-test.mjs",
+        "scripts/production-monitoring-check.sh"
+      ],
+      "implementation": "Bestehendes Monitoring/Audit mit ehrlichen unbekannten Messwerten. Fast-Track ergänzt beide Versandledger in bestehenden Alarmen und nur lesenden Plattformzugriff. Keine Benachrichtigungsplattform oder automatische Versandklärung.",
+      "test": "observability-test lokal erfolgreich: isolierte Migrationen, Tenant-/Read-only-Grenzen, Statusabbildung, Demoausschluss, Alarm/Recovery, fehlende DB und veraltete Messwerte. Externe Ressourcengruppe lesend geprüft.",
+      "visualComparison": "Keine neue visuelle Gesamtfreigabe; begrenzte Responsive-Stichprobe separat dokumentiert.",
+      "blocker": "Keine Monitoring-Ressourcen im geprüften Produktions-Ressourcenkreis; freigegebene Alarmempfänger/Eskalation, tatsächlicher Restore, RPO/RTO und operativer Rollbacknachweis fehlen. Keine globale Ressourcenabwesenheit behauptet."
     },
     {
       "id": "R7-37-001",
@@ -6344,16 +6358,18 @@
       "sourceTextSha256": "c2574d1599455479f586c17afdbc6a4353871555d85ae3130c953bf83e2fd5bc",
       "sourceParagraph": "- Für alle vorhandenen Formulare und Geschäftsvorgänge prüfen: Erstellen → Speichern → serverseitige Bestätigung → Laden → Anzeigen → Bearbeiten → erneutes Speichern → Reload → Logout/Login → anderes Gerät bzw. neue Sitzung. Prüfen, dass UI-Anzeige, API-Antwort und persistierte Daten übereinstimmen.\n- Insbesondere Unternehmensprofil, Benutzerprofil, Sprachwahl, Sicherheitsmethoden, Mitarbeiter/Rollen/Einladungen, Kunden/Kontakte, Angebote/Positionen/Einheiten/Versionen, Rechnungen/Steuern/Bankdaten/QR, Zahlungen, Ausgaben, Projekte/Aufträge, Zeiteinträge/Timer, Dateien, Support, Benachrichtigungen, Einstellungen und Abonnements abdecken.\n- Validierungsregeln zwischen Frontend, Backend und Datenbank konsistent halten. Pflicht-, optionale und bedingte Felder eindeutig definieren. Fehler beim Speichern sichtbar machen; keine optimistische Erfolgsanzeige ohne abgesicherte Persistenz.\n- Fehlende Werte nicht als Null oder leere Strings kaschieren, wenn Datenverlust vorliegt. Versehentliches Überschreiben, Race Conditions, parallele Bearbeitung, Cache-Staleness, unvollständige DTO-Mappings, fehlerhafte Defaultwerte, Transaktionsgrenzen, fehlerhafte Migrationen und Datenbank-Constraints prüfen.\n- Bei Finanz- und Sicherheitsvorgängen atomare Transaktionen, Idempotenz, unveränderliche historische Dokumentversionen, Audit und mandantensichere Abfragen gewährleisten. Autorisierung für jeden Read/Write serverseitig prüfen; keine mandantenübergreifenden Zugriffe.\n- Eingaben bei Netzwerkunterbruch, Navigation, abgelaufener Sitzung und PWA-Neustart kontrolliert erhalten; keine unsichere lokale Speicherung sensibler Daten. Benutzer bei Konflikten verständlich führen und kein stilles Überschreiben zulassen.\n- Automatisierte Integrationstests mit Testdaten und realer Testdatenbank beziehungsweise isolierter Testumgebung; negative Tests für Rechte, Fremdmandanten, ungültige Felder und abgebrochene Requests. Keine echten Kundendaten oder produktiven E-Mails für Tests verwenden.",
       "status": "nicht_abgenommen",
-      "implementationStatus": "ungeprueft",
+      "implementationStatus": "teilweise_belegt",
       "acceptanceStatus": "nicht_abgenommen",
       "sourceReferences": [
-        "lib/server/provisioning.ts",
-        "app/api/auth/register/route.ts"
+        "scripts/api-tenant-postgres-test.mjs",
+        "scripts/api-auth-surface-test.mjs",
+        "lib/server/rbac.ts",
+        "lib/server/db.ts"
       ],
-      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "implementation": "Server-Autorisierung gezielt für fünf API-Bereiche bestätigt. Native positive und negative Rollen-/Tenant-Leseverträge sind vorhanden; keine neue vollständige Prüfung aller Schreibpfade.",
+      "test": "Quality39765711852: private GET-Inventarprüfung über acht Rollen, 80 tatsächliche zulässige Create-Fälle, fremde Kunden-PATCH/DELETE, 24 Tenant-to-Operator-Mutationsverbote und Sessionablauf bestanden.",
+      "visualComparison": "Keine neue visuelle Gesamtfreigabe; begrenzte Responsive-Stichprobe separat dokumentiert.",
+      "blocker": "Übrige Write-/Status-/Operator-Kombinationen bleiben ausserhalb dieser Stichprobe; neue Monitoring-Policy muss im aktuellen nativen CI mitlaufen."
     },
     {
       "id": "R7-38-039",
@@ -9071,13 +9087,18 @@
       "sourceTextSha256": "95363ffeebb366e62931246b2a5bbe2501c9143ad42729a0700212a2c9a01f8b",
       "sourceParagraph": "1. Aus aktuellem Repository alle Routen, Unterseiten, Tabs, Rollen, Bottom Sheets, Einstellungen, Adminansichten, Dokumente und Sonderzustände inventarisieren.\n2. **Jede** Seite auf UX, relevante Kennzahlen/Diagramme, Statusfarben, Filter, Navigation, Drei-Punkte-Aktionen, PDF/CSV, Rechte, Lade-/Fehler-/Leerzustände prüfen. Jede fachlich sinnvolle P0–P2-Verbesserung tatsächlich implementieren, nicht nur vorschlagen.\n3. Bestehende und neue Kennzahlen gegen Testdaten inkl. Nullwerten, Teilzahlungen, Storno, Gutschrift, Rollen und Mandantentrennung prüfen.\n4. End-to-End: Registrierung → Profilpersistenz/Avatar/Logo → Einladung/Anmeldung → Kunde → Angebot/Version/Versand/Tracking/Annahme → Auftrag/Timer/Zeitrapport → Rechnung/QR-Seite → Zahlung → Finanzbericht/CSV/PDF/Teilen. Fehler- und Wiederaufnahmefälle berücksichtigen.\n5. Visuelle Abnahme gebündelt auf iPhone Safari/PWA, Android und Desktop in Hell/Dunkelmodus; vorhandene Referenzscreens und Design-Tokens einhalten. Bestehende Bottom-Navigation und Floating-Plus-Button unverändert; nur nachgewiesene doppelte Safe-Area-Abstände korrigieren.\n6. Vollständige Abnahmematrix: Route, Funktion, P0/P1/P2, Ist, Soll, Änderung, Test, Resultat, verbleibender Blocker. Keine erfundenen Implementierungs- oder Deployment-Erfolge. Externe Provider-/DNS-/Secrets-Blocker explizit ausweisen.\n7. P3 nicht implementieren. Bestehende PR-/Review-/Security-/Deploymentfreigaben beachten. Gezielte Tests während Entwicklung, gebündelte Schlussprüfung; keine wiederholten kompletten Browser-Tests nach jeder Kleinigkeit. Produktivdeployment nur im erlaubten Rahmen.",
       "status": "nicht_abgenommen",
-      "implementationStatus": "ungeprueft",
+      "implementationStatus": "teilweise_belegt",
       "acceptanceStatus": "nicht_abgenommen",
-      "sourceReferences": [],
-      "implementation": "Teilfunktionen vorhanden; Klausel einzeln gegen Code und negative Fälle prüfen.",
-      "test": "offen",
-      "visualComparison": "offen; frühere PR305-Messung gilt nicht für geänderte Revision7-Screens",
-      "blocker": "Keine Gesamtfreigabe aus generiertem Inventar ableiten."
+      "sourceReferences": [
+        "lib/financial-status.ts",
+        "scripts/invoice-status-contract.mjs",
+        "scripts/invoice-overpayment-contract.mjs",
+        "scripts/migration-test.mjs"
+      ],
+      "implementation": "Bestehende Finanzprojektion trennt Rechnung/Teilzahlung/Fälligkeit, Gutschrift und tatsächliche Überzahlung/Refund. Kein Preis- oder Zahlungsverhalten im Fast-Track geändert.",
+      "test": "Quality39765711852: echte HTTP-Zahlungsrollen, falscher Mandant, stale/excess/precision/future negatives; sechs physische Replay-Verbindungen, Audit-Rollback, unverändertes Rechnungsvolumen. Aktueller gezielter migration-test zusätzlich erfolgreich.",
+      "visualComparison": "Keine neue visuelle Gesamtfreigabe; begrenzte Responsive-Stichprobe separat dokumentiert.",
+      "blocker": "Vollständige fachliche Modulabnahme, historische Sonderdaten und alle Geldfluss-/Steuerkonstellationen werden nicht aus diesen einzelnen Verträgen abgeleitet."
     },
     {
       "id": "R7-45-006",
@@ -10530,18 +10551,17 @@
       "requirement": "Keine Arbeit verlieren, Timer nicht verlieren, sichere lokale Draft-Wiederherstellung, keine ungesicherten sensiblen Daten im Cache.",
       "sourceTextSha256": "beb278fa30561ad0ff7133fc82732af801386ebda78f58e68514a1629507db19",
       "sourceParagraph": "Öffentliche Website, Identity, Workspace, Admin, Tablet, Mobile, PWA: zentrale 401/403/404/409/429/500/502/503, Offline, Wartung, abgelaufener Link, fehlgeschlagener Upload/Export/Versand, ungültiges Formular, Sessionablauf, Konflikt, langsame Verbindung. Klare lokalisierte Sprache, passende sichere Aktion (zurück, erneut versuchen, anmelden, Link erneuern), keine internen Stacktraces. 401 erhält beabsichtigtes Ziel und Entwürfe. Retry nur idempotent; bei Timeout erst serverseitigen Status klären. Keine Arbeit verlieren, Timer nicht verlieren, sichere lokale Draft-Wiederherstellung, keine ungesicherten sensiblen Daten im Cache. Global konsistente Skeletons statt Splash-Logos und Layoutsprünge. Error-Boundaries, datenschutzgerechtes Monitoring, Korrelations-ID für Support, Accessibility und Offline-/Wiederverbindungsprüfungen.",
-      "status": "teilweise_implementiert",
+      "status": "nicht_abgenommen",
       "implementationStatus": "teilweise_belegt",
-      "acceptanceStatus": "teilweise_implementiert",
+      "acceptanceStatus": "nicht_abgenommen",
       "sourceReferences": [
-        "lib/client/process-draft.ts",
         "components/use-process-draft.ts",
-        "components/documents.tsx"
+        "scripts/process-draft-test.mjs"
       ],
-      "implementation": "Sprach-Query vom Dokument-Entwurfskontext getrennt. Sichere Übernahme des neuesten noch gültigen Legacy-Schlüssels derselben Identität/Mandant/Rolle/Quelle; unveränderte Ablaufzeit. Verwerfen entfernt auch gleichartige Sprach-Aliasse.",
-      "test": "Draft-Regressionen für4 Sprachen, Quellen-/Benutzer-/Mandanten-/Rollenisolation, Wiedereinlesen/Schritt/Replay, Migration/TTL/Quota/Verwerfen und echten Session-Fence bestanden. Browserfall erzwingt Sprach-Query vor Reload; aktueller CI-Nachweis ausstehend.",
-      "visualComparison": "Keine Darstellungsänderung. Aktuelle tatsächliche Browser-Wiederherstellung noch nicht bestätigt.",
-      "blocker": "Vollständige sensible-Daten-/Geräte-/Abbruchabnahme und aktuelle Browserqualifikation ausstehend."
+      "implementation": "Vorhandene private Draft-Wiederherstellung behält Prozesswerte und Replay-Kennung, Session-/Mandantenwechsel verwerfen private Eingaben. Kein neuer Cache und keine Timer-Neuimplementierung.",
+      "test": "Quality39765711852: vorhandene Draft-Recovery-, Kontext-/Session-Fence- und sichere Browser-Storage-Verträge bestanden; sichere Editor-Persistenz im Paket6-Browser39765711820 erfolgreich.",
+      "visualComparison": "Keine neue visuelle Gesamtfreigabe; begrenzte Responsive-Stichprobe separat dokumentiert.",
+      "blocker": "Reale PWA-Hintergrund-/Tastatur-/Gerätewechsel und sämtliche Formulare sind damit nicht abschliessend abgenommen."
     },
     {
       "id": "R7-54-005",

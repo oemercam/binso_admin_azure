@@ -13,6 +13,9 @@ P0/P1/P2 vollständig im Auftragsumfang; P3 ausgeschlossen. **Dieser Zwischensta
 
 ## Register
 
+[Fast-Track Pakete7–12](../audit/v25-revision7/fast-track-final.md): begrenzte Provider-/Betriebs-/P0-Qualifikation und Responsive-Stichprobe. [Verifizierter Mail-Providervertrag](v25-mail-provider-contract.md). Paket8 und die Auflösung unklarer Versandzustände bleiben ohne autorisierten Providerbeleg extern blockiert. Paket6 ist auf38754fad in allen zugehörigen CI-Läufen erfolgreich qualifiziert.
+
+
 [Paket 4: verbindlicher Rabatt- und Berechnungsvertrag](v25-discount-contract.md)
 legt Rabattbasis, Kundenstandard, Steuer-/Rundungsreihenfolge und numerische
 Sollfälle fest. Paket4 enthält ausschliesslich den Fachvertrag; Umsetzung und

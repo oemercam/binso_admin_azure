@@ -1,3 +1,4 @@
+import {verifyFinalResponsiveSample} from './final-responsive-browser.mjs';
 import {verifyDocumentDiscountBrowser} from './document-discount-browser.mjs';
 import {verifyBusinessReadinessBrowser} from './business-readiness-browser.mjs';
 import {verifyAvatarBrowser} from './avatar-browser.mjs';
@@ -34,6 +35,9 @@ import {assertMobileHeaderTargets,assertChatTargets,assertOpaqueChrome,verifyHea
 // No request reaches a production system; unhandled fixture APIs fail closed.
 const engines=await import(process.env.BINSO_PLAYWRIGHT_MODULE?pathToFileURL(process.env.BINSO_PLAYWRIGHT_MODULE).href:'playwright');
 const output=process.env.BINSO_UX_OUTPUT??'/tmp/binso-ux-browser';
+const finalSample=process.env.BINSO_UX_FINAL_SAMPLE==='1';
+const finalLocale=process.env.BINSO_UX_FINAL_LOCALE??'de';
+if(!['de','en','fr','it'].includes(finalLocale)||!finalSample&&finalLocale!=='de')throw Error('Final sample locale requires the bounded final sample mode');
 const previewState=process.env.BINSO_UX_PREVIEW_STATE;
 if(previewState&&(previewState!=='error'||process.env.BINSO_UX_MATRIX_ONLY!=='1'))throw Error('Preview state requires the isolated matrix-only error case');
 // Keep period assertions valid as the real Swiss calendar advances; never freeze
@@ -268,7 +272,7 @@ try{
     if(p==='/api/time-entries/policy'){policyPosts++;return route.fulfill({status:409,json:{error:'independent_review_required',message:'Freigabe folgt der aktiven Teamzuordnung.'}});}
     if(p==='/api/settings/notifications'){notificationWrites++;preferencePosts++;await new Promise(resolve=>setTimeout(resolve,100));if(holdPreference)await new Promise(resolve=>{releasePreference=resolve;preferenceHeld();});return route.fulfill({status:(failNotificationWrite||failPreferences)?503:200,json:(failNotificationWrite||failPreferences)?{message:'Fixture notification unavailable'}:{ok:true}});}
     if(p.startsWith('/api/auth/sessions')){sessionDeletes++;return route.fulfill({json:{ok:true,revoked:1}});}
-    if(p==='/api/settings/profile'&&req.method()==='PATCH'){const body=JSON.parse(req.postData());if(body.theme)preferenceTheme=body.theme;return route.fulfill({json:{ok:true,item:{theme:preferenceTheme,language:'de'}}});}
+    if(p==='/api/settings/profile'&&req.method()==='PATCH'){const body=JSON.parse(req.postData());if(body.theme)preferenceTheme=body.theme;return route.fulfill({json:{ok:true,item:{theme:preferenceTheme,language:finalSample?finalLocale:'de'}}});}
     if(p==='/api/operator/logout')return route.fulfill({status:503,json:{message:'Fixture logout unavailable'}});
     if(p==='/api/auth/logout')return route.fulfill({json:{ok:true}});
     return route.fulfill({json:{ok:true,item:product,items:[],tracker:null}});
@@ -284,7 +288,7 @@ try{
    else if(p==='/api/notifications')data={items:[{id:'notification-one',kind:'document',title:'Neue Rechnung',body:'Prüffirma AG',href:'/rechnungen/RE-TEST-1',read_at:null,created_at:'2026-10-09T09:00:00Z'},{id:'notification-two',kind:'announcement',title:'Produktinformation',body:'Testinformation',read_at:'2026-10-08T10:00:00Z',created_at:'2026-10-08T09:00:00Z'}]};
    else if(p==='/api/time-entries/policy'){if(failPolicy)return route.fulfill({status:503,json:{message:'Fixture policy unavailable'}});data={time_approval_required:policyRequired};}
    else if(p==='/api/time-tracker')data={tracker:null};
-   else if(p==='/api/settings/profile')data={item:{id:'profile-one',display_name:'Test Person',first_name:'Test',last_name:'Person',phone:'',job_title:'ICT',theme:preferenceTheme,language:'de',avatar_url:null},email:'test@example.invalid'};
+   else if(p==='/api/settings/profile')data={item:{id:'profile-one',display_name:'Test Person',first_name:'Test',last_name:'Person',phone:'',job_title:'ICT',theme:preferenceTheme,language:finalSample?finalLocale:'de',avatar_url:null},email:'test@example.invalid'};
    else if(p==='/api/settings/company')data={item:{name:customer.name,city:'Bern',logo_url:null,email:'firma@example.invalid'}};
 
    else if(p==='/api/operator/payments')data={items:[{id:'operator-payment-one',paid_on:'2026-10-09',amount:79,currency:'CHF',status:'booked',reference:'Synthetic subscription',tenant:{name:'Prüffirma AG'}}]};
@@ -362,6 +366,11 @@ try{
   // WebKit cannot carry Next's old-document RSC prefetch scheduler across page.goto resets.
   const waitForScenarioReady=async target=>{if(new URL(target.url()).pathname==='/dev/ux-lab'&&process.env.BINSO_UX_SERVER_MODE==='dev')await waitForLabReady(target);else await target.waitForLoadState('networkidle');};
   const navigate=async(...args)=>{await waitForScenarioReady(page);assert.deepEqual(errors,[],'Runtime errors before scenario reset');const viewport=page.viewportSize();page.removeAllListeners("pageerror");await page.close();page=await trackedPage();await page.setViewportSize(viewport);const response=await page.goto(...args);await waitForScenarioReady(page);return response};
+  if(finalSample){
+   results.push(...await verifyFinalResponsiveSample({page,base,theme,locale:finalLocale,navigate:async url=>{await navigate(url);return page;},capture:(target,name)=>capture(target,{animations:'disabled',path:path.join(output,name+'.png'),fullPage:true}),output}));
+   assert.deepEqual(errors,[],'Final sample has no browser runtime errors');
+   await context.close();context=null;await browser.close();browser=null;continue;
+  }
   const routes=fullRoutes;
   await Promise.all((process.env.BINSO_UX_WIDTHS?.split(",").map(Number)??[1440,1024,820,430,375]).map(async width=>{
    console.log(`Checking ${theme} ${width}px`);
