@@ -47,6 +47,14 @@ export async function verifyFinalResponsiveSample({page,base,theme,locale,naviga
     await settle();await inspect();await capture(page,name+'-sidebar-toggled');
     await toggle.click();await page.waitForFunction(before=>document.querySelector('.desktop-navigation-toggle')?.getAttribute('aria-expanded')===before,expanded);await settle();
    }
+   if(route==='/kunden/customer-one'){
+    const development=page.locator('details.financial-snapshot');await development.locator('summary').click();
+    await development.getByRole('button',{name:t('Zeitverlauf anzeigen'),exact:true}).click();await settle();
+    const chart=development.locator('.bo-statistics-line').first();await chart.waitFor({state:'visible'});
+    const bounds=await chart.locator('xpath=ancestor::svg').boundingBox();
+    assert.ok(bounds.width>0&&bounds.height>0&&bounds.x>=0&&bounds.x+bounds.width<=width+1,'Expanded real chart fits the content viewport');
+    await inspect();await capture(page,name+'-chart');
+   }
    if(route==='/rechnungen/neu'){
     const form=page.getByRole('dialog',{name:t('Rechnung erstellen'),exact:true});await form.waitFor();await footer(form);
     await form.getByRole('button',{name:t('Weiter'),exact:true}).click();

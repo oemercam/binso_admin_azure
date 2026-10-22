@@ -120,3 +120,11 @@ Abbrechen direkt auf ein geschlossenes geändertes Rabattformular. Er prüft jet
 zusätzlich den tatsächlich geforderten Bestätigungsdialog und verwirft erst nach
 ausdrücklichem Klick. Produktcode, Guard und Erwartungen an die Geometrie bleiben
 unverändert. Dieser fehlgeschlagene Lauf ist kein bestandener Paket12-Nachweis.
+
+Die Stichprobe öffnet die vorhandene Kundenentwicklung und deren Zeitverlauf
+zusätzlich ausdrücklich, damit auch der tatsächliche SVG-Chart und seine
+Geometrie statt nur der geschlossenen Disclosure geprüft werden. Keine Änderung
+am Produktdiagramm. Die ersten1280px-Aufnahmen wurden lokal gesichtet: Dialog-
+Footer und Grundraster sichtbar; die Rechnungsliste zeigt eine Datums-Ellipse.
+Deren fachliche/visuelle Freigabe bleibt ein P2-Folgepunkt; keine pauschale
+Behauptung, sämtliche Tabelleninhalte seien vollständig ungekürzt sichtbar.
