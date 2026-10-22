@@ -63,6 +63,25 @@ assert.equal(locale.translateMessage('Seite 2 von 4','fr'),'Page 2 sur 4');
 assert.equal(locale.translateMessage('Schritt 1 von 3 · Prüfen','it'),'Passaggio 1 di 3 · Verifica');
 assert.equal(locale.translateMessage('Die Datei darf höchstens 10 MB gross sein.','en'),'The file must not exceed 10 MB.');
 const client=compile('lib/client/locale.tsx',{'@/lib/locales':locale});
+// Execute the actual invoice readiness notice, including its real locale context.
+{
+ const source=fs.readFileSync('components/documents.tsx','utf8'),ast=ts.createSourceFile('documents.tsx',source,99,true,4),notices=[];
+ const visit=node=>{if(ts.isJsxElement(node)&&node.openingElement.tagName.getText(ast)==='span'&&node.getText(ast).includes('{paymentIssue}'))notices.push(node);ts.forEachChild(node,visit);};visit(ast);
+ assert.equal(notices.length,1,'Exactly one actual readiness warning span');
+ const exports={},code=ts.transpileModule('export function ActualReadinessNotice({paymentIssue}){return '+notices[0].getText(ast)+';}',{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
+ Function('require','exports','LocalizedText',code)(require,exports,client.LocalizedText);
+ const qr=compile('lib/qr-bill.ts',{'swissqrbill/utils':await import('swissqrbill/utils')});
+ const company={name:'Synthetic Issuer',street:'Teststrasse',postal_code:'3000',city:'Bern'},before=structuredClone(company),issue=qr.invoicePaymentIssue(company);
+ assert.equal(issue,'Bitte zuerst die IBAN deiner Firma unter Einstellungen → Finanzen erfassen.');
+ for(const language of config.locales){
+  const actual=renderToStaticMarkup(React.createElement(client.LocaleProvider,{initialLocale:language},React.createElement(exports.ActualReadinessNotice,{paymentIssue:issue})));
+  const expected=renderToStaticMarkup(React.createElement('span',null,locale.translateMessage(issue,language)));
+  assert.equal(actual,expected,'Invoice readiness notice uses the selected language: '+language);
+  if(language!=='de')assert.notEqual(actual,renderToStaticMarkup(React.createElement('span',null,issue)),'Non-German warning is actually translated');
+ }
+ assert.deepEqual(company,before,'Presentation never modifies issuer/payment prerequisites');
+}
+
 for(const [language,confirmation,approval] of [
  ['en','Please confirm this security-sensitive action again.','You cannot approve your own time entries.'],
  ['fr','Veuillez confirmer à nouveau cette action sensible.','Vous ne pouvez pas approuver vos propres heures.'],

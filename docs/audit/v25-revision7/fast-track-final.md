@@ -134,3 +134,65 @@ des neuen Testadapters. Der Namespace-neutral korrigierte Locator wurde lokal
 im tatsächlichen Chromium mit alter Nulltreffermenge und neuer Geometriemessung
 reproduziert/geprüft. Kein Produktchart oder Geometriegate geändert. Der neue
 CI-Gesamtstand bleibt bis zum tatsächlichen Ergebnis offen.
+
+## Verifizierter Abschluss und neue Push-Grenze
+
+Auf dem veröffentlichten Commit759ab6e0 ist die Responsive-Stichprobe
+[39771885921](https://github.com/oemercam/binso_admin_azure/actions/runs/39771885921)
+erfolgreich: tatsächlich160 Fälle, DE/EN/FR/IT, Hell/Dunkel,1280/1440/1920/
+2560/3840px, vier Routen mit Sidebar, Dialog und geöffnetem Zeitverlauf.
+Das Artefakt wurde lokal gegen SHA256
+695b460211922bb6b6d5aad453eae85500264c9643a29f94004f79e0f771ab80
+geprüft. Zusätzlich wurden unter anderem FR/Dark/3840-Chart und
+EN/Light/1440-Dialog gesichtet. Kein echter Zoom oder physisches Gerät.
+
+Quality39771886024, CodeQL39771885933, Rabatt39771885987 und
+Readiness39771885887 sind an759ab6e0 erfolgreich. Avatar39771885906 war
+bei der letzten Prüfung noch im WebKit-Installationsschritt; Chromium bestanden.
+Aktuelle spätere Endzustände stehen im PR-Abschlussbericht und lokalen Ergebnis-JSON.
+
+Die neue ausdrückliche Nutzerstrategie gilt seit13:39Europe/Zurich:
+keine weiteren Pushes während lokaler Korrekturen, kein manueller Workflowstart,
+erneuter Push ausschliesslich nach ausdrücklicher Freigabe. Alle bis759ab6e0
+erfolgten Pushes liegen vor dieser Vorgabe. Keine Historie wird umgeschrieben.
+
+### Nur lokal: belegter Übersetzungsfehler im Readiness-Hinweis
+
+Die EN-Screenshot-Sichtung zeigte den deutschen IBAN-Hinweis. Die Übersetzung
+war bereits im zentralen Katalog vorhanden; der tatsächliche Hinweis-Span im
+Dokumenteditor umging LocalizedText. Er verwendet nun den vorhandenen Owner.
+Keine Änderung an Readiness-Prüfung, Bankdaten, Ausgabevoraussetzungen oder Summen.
+
+Der vorhandene localization-test extrahiert genau den tatsächlichen JSX-Hinweis,
+führt ihn mit echtem LocaleProvider aus und nutzt den echten QR-Readiness-Text.
+Er scheiterte vor der Korrektur erwartungsgemäss am deutschen FR-Text und besteht
+nachher in allen vier Sprachen. Unveränderte Firmendaten werden mitgeprüft.
+Gezieltes ESLint und Typecheck erfolgreich. Keine neue Browsermatrix, kein Build,
+kein vollständiger Security-/Quality-Neulauf. Lokale Foundation-Identität wird
+aktualisiert. Dieser Folgecommit bleibt ungepusht bis zur ausdrücklichen Freigabe;
+die grünen CI-Läufe von759ab6e0 qualifizieren diese neue lokale Darstellung noch
+nicht vollständig. Eine kleine Korrektur wird nicht als neue Gesamtfreigabe ausgegeben.
+
+### Abschliessender WebKit-Befund — kein automatischer Wiederholungslauf
+
+Avatar-Workflow39771885906 auf759ab6e0 endete mit cancelled. Chromium ist
+success; WebKit-Job119801183162 wurde im vorhandenen Schritt Install pinned
+browser abgebrochen. Der fachliche Avatar-Test wurde danach nicht ausgeführt.
+Betroffene Konfiguration: .github/workflows/avatar-profile.yml (unverändert),
+timeout-minutes20. Das Log zeigt von11:38UTC bis zum Abbruch11:57UTC langsame
+und ignorierte/wiederholte apt-Downloads von azure.archive.ubuntu.com,
+unter anderem libsoxr0, libvorbisenc2, libvpx9 und libunibreak5. Daraus wird
+kein Anwendungsdefekt oder bestandener WebKit-Test abgeleitet.
+
+Keine Timeout-Erhöhung, kein Abschwächen/Überspringen des Gates, kein neuer
+Workflowstart, kein weiterer Push und keine ungeprüfte Mirror-Umstellung.
+Die Installations-/Runner-Ursache ist vor dem nächsten freigegebenen einzelnen
+CI-Anlauf zu klären. Die fünf übrigen aktuellen Workflows sind success:
+Quality39771886024, CodeQL39771885933, Readiness39771885887,
+Rabatt39771885987 und Responsive39771885921 mit160 tatsächlich bestandenen Fällen.
+
+Der lokale Folgecommit enthält ausschliesslich den belegten Übersetzungsfix,
+den gezielten Red/Green-Regressionsnachweis und aktualisierte Dokumentation/
+Foundation-Identität. Arbeitsbaum nach Sicherung sauber, keine Produktionsaktion.
+Der PR verbleibt auf759ab6e0 und Draft. Ein Push des lokalen Folgecommits
+benötigt gemäss neuer ausdrücklicher Nutzervorgabe zuerst Freigabe.
