@@ -3,13 +3,13 @@ import sharp from 'sharp';
 import {createHash} from 'node:crypto';
 
 /** Actual profile components with isolated API fixtures; native HTTP/RLS is separate. */
-export async function verifyAvatarBrowser({page,context,base,capture}){
+export async function verifyAvatarBrowser({page,context,base,capture,navigate}){
  const bytes=await sharp({create:{width:1200,height:600,channels:3,background:'#234567'}}).png().toBuffer();
  const file={name:'synthetic-avatar.png',mimeType:'image/png',buffer:bytes};
  const expectedHash=createHash('sha256').update(bytes).digest('hex');
  // Observe the real FormData without replacing its body or response. WebKit's
  // request protocol can omit binary multipart bytes; this also checks their hash.
- await page.addInitScript(()=>{
+ await context.addInitScript(()=>{
   const original=window.fetch;window.__avatarUploadEvidence=[];
   window.fetch=async(input,init)=>{
    if(new URL(typeof input==='string'?input:input instanceof URL?input.href:input.url,location.href).pathname==='/api/files'&&init?.body instanceof FormData){
@@ -47,9 +47,10 @@ export async function verifyAvatarBrowser({page,context,base,capture}){
  const select=async(camera=false)=>{await page.locator(camera?'#profile-avatar-upload-camera':'#profile-avatar-upload').setInputFiles(file);const preview=page.getByRole('dialog',{name:'Profilbild prüfen',exact:true});await preview.waitFor();await page.waitForFunction(()=>document.querySelector('.avatar-crop-preview img')?.naturalWidth>0);return preview;};
  const confirm=preview=>preview.getByRole('button',{name:'Bild übernehmen',exact:true});
  const current=expected=>page.waitForFunction(value=>document.querySelector('.settings-profile .person-avatar img')?.getAttribute('src')===value,expected);
+ const reload=async()=>{await page.waitForLoadState('networkidle');await page.reload();await page.waitForLoadState('networkidle');};
  try{
   for(const width of [390,820,1440]){
-   avatar=old;verdict='clean';await page.setViewportSize({width,height:900});await page.goto(base+'/einstellungen/konto');await current(old);
+   avatar=old;verdict='clean';await page.setViewportSize({width,height:900});page=await navigate(base+'/einstellungen/konto');await current(old);
    const profileSize=await page.locator('.settings-profile .person-avatar').evaluate(el=>el.getBoundingClientRect().width);assert.ok(profileSize>=96&&profileSize<=112);
    const editor=await open();assert.equal(await editor.locator('#profile-avatar-upload-camera').getAttribute('capture'),'user');
    if(width===390){const count=uploads;await editor.locator('#profile-avatar-upload').setInputFiles({name:'unsupported.heic',mimeType:'image/heic',buffer:Buffer.from('unsupported fixture')});await editor.getByRole('alert').filter({hasText:'Bitte einen unterstützten Dateityp auswählen.'}).waitFor();assert.equal(uploads,count);assert.equal(avatar,old);}
@@ -64,13 +65,13 @@ export async function verifyAvatarBrowser({page,context,base,capture}){
    const response=page.waitForResponse(r=>new URL(r.url()).pathname==='/api/files'&&r.status()===201);await confirm(preview).evaluate(button=>{button.click();button.click()});await response;await preview.waitFor({state:'hidden'});await current(next);assert.deepEqual(crops.at(-1),{x:0,y:1,zoom:3});assert.equal(uploads,before+(width===390?2:1),'Same-frame confirmation makes only one upload');
    if(width===390)assert.equal(keys.at(-1),keys.at(-2),'Failed upload retries the same file/crop with the same key');
    await editor.getByRole('button',{name:'Abbrechen',exact:true}).click();await editor.waitFor({state:'hidden'});
-   await page.waitForFunction(value=>[...document.querySelectorAll('.avatar-button .person-avatar img')].some(img=>img.getAttribute('src')===value),next);await page.reload();await current(next);await capture(width+'-persisted');
+   await page.waitForFunction(value=>[...document.querySelectorAll('.avatar-button .person-avatar img')].some(img=>img.getAttribute('src')===value),next);await reload();await current(next);await capture(width+'-persisted');
   }
   // Quarantine never replaces the active image, even after explicit adoption.
-  avatar=old;verdict='pending';await page.goto(base+'/einstellungen/konto');await current(old);const editor=await open();let preview=await select();await confirm(preview).click();await preview.waitFor({state:'hidden'});await editor.getByRole('alert').filter({hasText:'Das Profilbild wartet auf die Sicherheitsprüfung.'}).waitFor();assert.equal(avatar,old);await editor.getByRole('button',{name:'Bild übernehmen',exact:true}).click();await editor.getByRole('alert').filter({hasText:'Das Profilbild ist noch nicht sicher freigegeben.'}).waitFor();assert.equal(avatar,old);
+  avatar=old;verdict='pending';page=await navigate(base+'/einstellungen/konto');await current(old);const editor=await open();let preview=await select();await confirm(preview).click();await preview.waitFor({state:'hidden'});await editor.getByRole('alert').filter({hasText:'Das Profilbild wartet auf die Sicherheitsprüfung.'}).waitFor();assert.equal(avatar,old);await editor.getByRole('button',{name:'Bild übernehmen',exact:true}).click();await editor.getByRole('alert').filter({hasText:'Das Profilbild ist noch nicht sicher freigegeben.'}).waitFor();assert.equal(avatar,old);
   verdict='clean';await editor.getByRole('button',{name:'Bild übernehmen',exact:true}).click();await current(next);
   failRemove=true;await editor.getByRole('button',{name:'Entfernen',exact:true}).click();await editor.getByRole('alert').filter({hasText:'Synthetic avatar removal unavailable'}).waitFor();assert.equal(avatar,next);failRemove=false;
-  const removed=page.waitForResponse(r=>new URL(r.url()).pathname==='/api/files/'+id&&r.request().method()==='DELETE'&&r.status()===200);await editor.getByRole('button',{name:'Entfernen',exact:true}).click();await removed;await page.waitForFunction(()=>!document.querySelector('.settings-profile .person-avatar img'));await editor.getByRole('button',{name:'Abbrechen',exact:true}).click();await page.reload();await page.locator('.settings-profile .person-avatar').getByText('SU',{exact:true}).waitFor();assert.equal(avatar,'');assert.equal(removals,2);await capture('removed-initials');
+  const removed=page.waitForResponse(r=>new URL(r.url()).pathname==='/api/files/'+id&&r.request().method()==='DELETE'&&r.status()===200);await editor.getByRole('button',{name:'Entfernen',exact:true}).click();await removed;await page.waitForFunction(()=>!document.querySelector('.settings-profile .person-avatar img'));await editor.getByRole('button',{name:'Abbrechen',exact:true}).click();await reload();await page.locator('.settings-profile .person-avatar').getByText('SU',{exact:true}).waitFor();assert.equal(avatar,'');assert.equal(removals,2);await capture('removed-initials');
  }catch(error){await capture('failure');throw error;}finally{for(const [pattern,handler] of registrations)await context.unroute(pattern,handler);}
  console.log('Avatar browser: camera input, adjustable crop, no upload on select/cancel, explicit/replayed confirmation, failure preserves old image, quarantine, replacement/removal, reload/header consistency and desktop/tablet/mobile/short-height geometry passed. Physical camera/PWA acceptance is separate.');
 }
