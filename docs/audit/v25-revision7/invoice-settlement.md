@@ -55,18 +55,19 @@ Produktions-, Geräte- oder vollständige fachliche Abnahme.
   `scripts/localization-test.mjs`, `scripts/localization-coverage-test.mjs`,
   Typecheck und gezieltes ESLint bestanden.
 
-## Noch auszuführende Nachweise dieser Änderung
+## Aktuelle CI-Nachweise
 
-Neue echte HTTP-Fälle für alle acht Rollen, Mandantentrennung, ungültige und
-veraltete Bestätigungen, Replay und serverseitige Statusfilter sind im bestehenden
-nativen CI-Test ergänzt. Ebenso sechs physische PostgreSQL-Verbindungen und
-Browserfälle für Standard-aus, erneute Bestätigung nach Saldenänderung und
-Guthabenanzeige. Erst ihr aktueller CI-Lauf qualifiziert diese neue Quelle.
-Die vorherige erfolgreiche d052a3be-CI ist dafür kein Nachweis.
+Full Development39726655822 auf1567eff4 ist erfolgreich: alle acht Browserjobs,
+Build, exakter ZIP-Smoke, Scanner, native HTTP-/RLS- und Sechs-Verbindungsprüfungen,
+Compliance-Development-Gate und abschliessende Quality. PR-Quality39726546798
+und CodeQL39726546806 sind ebenfalls erfolgreich. Der Originalreport ist gegen
+GitHub-Artefakt-SHA und den tatsächlichen Quell-Digest geprüft; siehe
+[Zusammenfassung](ci-1567eff4.json) und [Git-Blob-Abgleich](ci-1567eff4-source.json).
+Die vorherige erfolgreiche d052a3be-CI wird für diese Änderung nicht übernommen.
 
-Reale Geräte, unabhängige Finanz-/Klauselabnahme und externer Zustellnachweis
-bleiben gesondert offen. Keine produktive Migration, keine Zahlung beim Provider,
-kein Merge und kein Deployment sind durch diese Tests freigegeben.
+Reale Geräte, unabhängige Finanz-/Klausel-/Originalabnahme und externer
+Zustellnachweis bleiben offen. Kein produktiver Datenbankeingriff und kein
+Banktransfer sind durch die synthetischen Prüfungen nachgewiesen oder autorisiert.
 
 ## Erster nativer CI-Lauf und Ursachen
 
@@ -90,3 +91,6 @@ Rechnungswahl war nach Umstellung auf den Einzelabruf nicht mehr gesperrt. Der
 Nachfolger stellt die Lade-Sperre wieder her; Betrag/Notiz bleiben bearbeitbar.
 Der vorhandene Negativtest verzögert nun auch die tatsächliche Einzelabfrage.
 Keine neue vollständige Abnahme aus den vorherigen Teilergebnissen ableiten.
+
+Die oben dokumentierten Zwischenfehler sind im aktuellen1567eff4-Gesamtlauf
+behoben und positiv/negativ geprüft; sie werden nicht als übersprungene Tests behandelt.

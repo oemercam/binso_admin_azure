@@ -66,3 +66,7 @@ Produktions- sowie vollständigen Abhängigkeitsaudit ohne bekannte Schwachstell
 Die Produktionspaketierung und der Smoke-Test des exakten Artefakts bestehen.
 Dies schliesst weiterhin keinen Alert auf dem unveränderten Main und erteilt keine
 Produktions- oder vollständige Klauselfreigabe.
+
+Aktuelle Folgequalifikation: [1567eff4](ci-1567eff4.json), Full Development39726655822,
+PR-Quality39726546798 und CodeQL39726546806 erfolgreich. Alle verpflichtenden Gates
+bleiben aktiv; der Alert auf unverändertem Main wird nicht als geschlossen behauptet.

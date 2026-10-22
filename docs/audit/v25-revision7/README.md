@@ -4,6 +4,11 @@ Die unveränderte [vollständige Quelle](source.md) ist verbindlich. P0/P1/P2 si
 im Auftrag, P3 ist ausgeschlossen. Diese Ablage ersetzt keine ausdrückliche
 fachliche, visuelle oder produktive Freigabe.
 
+Aktuelle Codequalifikation: [1567eff4, Full Development39726655822](ci-1567eff4.json).
+Alle acht Browserjobs, native PostgreSQL-/RLS-/HTTP-/Parallelprüfungen und Gates
+sind erfolgreich. [868 Git-Blobs](ci-1567eff4-source.json) reproduzieren den
+Originalreport-Digest exakt. Die vollständige Klausel-/Fachabnahme bleibt offen.
+
 ## Vollständige Register
 
 | Register | Inhalt und tatsächliche Aussage |
@@ -14,7 +19,7 @@ fachliche, visuelle oder produktive Freigabe.
 | [Rollenfokus und Kennzahlen](route-role-kpi.csv) | Rollenabhängiger Seitenzweck und erreichbare Daten-/KPI-Owner; keine Berechnungs- oder Sichtfreigabe aus dem Importgraphen. |
 | [Implementierungsnachweise](evidence.json) | Quellhashgebundene Teilnachweise und explizite externe Blocker. Ergebnisnotizen allein erteilen keine Freigabe. |
 | [Abgleich7bc/a9b](evidence-reconciliation.md) / [a9b-Report](ci-a9b7e1fc.json) | Getrennte tatsächliche Commit-/Run-/Artefaktnachweise; neue Quellen benötigen neue Prüfungen. |
-| [Aktueller CI-Report](ci-d052a3be.json) / [Git-Blob-Abgleich](ci-d052a3be-source.json) | Full Development39715830625 auf d052a3be erfolgreich; 865 Quellen und 69 reine lokale Zeilenendenabweichungen konkret abgeglichen. |
+| [Historischer Zwischenstand](ci-d052a3be.json) / [Git-Blob-Abgleich](ci-d052a3be-source.json) | Full Development39715830625 auf d052a3be erfolgreich; 865 Quellen und 69 reine lokale Zeilenendenabweichungen konkret abgeglichen. |
 | [Priorisierte Restbewertung](completion-review.md) | Implementierungslücken, fehlende Abnahmen und externe Konfiguration getrennt. |
 
 ## Zentrale Implementierungspakete
@@ -46,7 +51,7 @@ fachliche, visuelle oder produktive Freigabe.
 
 ## Was ausdrücklich noch nicht nachgewiesen ist
 
-Der aktuelle erfolgreiche vollständige Development-Lauf39715830625 aufd052a3be enthält
+Der aktuelle erfolgreiche vollständige Development-Lauf39726655822 auf1567eff4 enthält
 beide funktionalen Browserjobs und alle sechs Responsive-Jobs sowie tatsächliche
 PostgreSQL-Parallelprüfungen. Der Compliance-Report bleibt `compliant:false`:
 0 fehlgeschlagene Checks bedeuten nicht573 unabhängige Klauselfreigaben. Er enthält
@@ -75,4 +80,7 @@ nur isoliert getestet. Merge, produktive Migrationen und Deployment benötigen e
 separate exakte Commit-Freigabe; kein Bypass und keine vorgetäuschte Vier-Augen-Abnahme.
 
 Neu in Fortsetzung: [Rechnungszahlung und Statusachsen](invoice-settlement.md).
-Die neue Quelle benötigt eigene CI; ältere grüne Nachweise qualifizieren sie nicht.
+Die neue Quelle besitzt eigene geprüfte CI; ältere grüne Nachweise werden dafür nicht verwendet.
+
+[Externe Nachweise und Freigaben](external-acceptance.md) sind getrennt von eigener
+Implementierungs- und automatisierbarer Abnahmearbeit dokumentiert.

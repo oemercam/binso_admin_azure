@@ -4461,9 +4461,9 @@
       "requirement": "Auf Übersicht kompakte Checkliste «Einrichtung abschliessen»: Pflicht/empfohlen/optional, Fortschritt, nur relevante Aufgaben, optional ausblendbar.",
       "sourceTextSha256": "9a8508511147cb777ccf3a47244c3e48b11e675df1bc977dee1dfc41c860097b",
       "sourceParagraph": "Auf Übersicht kompakte Checkliste «Einrichtung abschliessen»: Pflicht/empfohlen/optional, Fortschritt, nur relevante Aufgaben, optional ausblendbar. Zentraler serverseitiger Readiness-Service für Aktionen, verständliche Meldung fehlender Angaben, direkter Link zum richtigen Feld, Rückkehr zur unterbrochenen Aktion. Rechnung als Entwurf auch ohne komplette Firmenangaben; **Ausstellen/Versenden erst bei erfüllten Pflichtangaben**. QR-Zahlteil nur bei gültigen Bankdaten. Steuerpflicht und UID bedingt, Firmenlogo nicht verpflichtend. Regeln serverseitig erneut prüfen.",
-      "status": "teilweise_implementiert",
-      "implementationStatus": "teilweise_belegt",
-      "acceptanceStatus": "teilweise_implementiert",
+      "status": "nicht_implementiert",
+      "implementationStatus": "nicht_implementiert",
+      "acceptanceStatus": "nicht_implementiert",
       "sourceReferences": [
         "app/api/dashboard/route.ts",
         "components/pages/dashboard.tsx",
@@ -4585,9 +4585,9 @@
         "docs/audit/v25-revision7/invoice-settlement.md"
       ],
       "implementation": "Rechnungsachsen Dokument/Zahlung/Fälligkeit zentral in JavaScript und SQL; tatsächlicher letzter Versandnachweis getrennt. Ausdrücklich bestätigte echte Überzahlung mit vierfacher Saldenbindung, bestehendem Guthaben/Refund, Idempotenz/Audit/RLS; kontextgerechte Angebotsbezeichnung. Siehe invoice-settlement.md; keine pauschale Abnahme anderer Fachmodelle oder externer Zustellung.",
-      "test": "Lokale Migration, Status-SQL/JS, SSR/PDF, Statistik, Localization, UX, gezieltes Lint und Typecheck bestanden; aktuelle native HTTP/Parallel-/Browser-CI noch ausstehend.",
-      "visualComparison": "Gezielte echte SSR-Projektion; neue Browser-/Geräteabnahme noch offen.",
-      "blocker": "Aktuelle Gesamt-CI, individuelle Klausel-/Fachabnahme, reale Geräte und verifizierter Zustellkanal offen. Keine Produktionsmigration freigegeben."
+      "test": "Aktueller1567eff4-Full-Development39726655822 erfolgreich: native HTTP-Acht-Rollen-/RLS-/Sechs-Verbindungsfälle, SQL/JS-Statusparität, Audit-Rollback/Replay/Refund/Cash, aktuelle Chromium-/WebKit-Interaktionen; Lint/Typecheck, PDF/Statistik/Locale und alle bestehenden Gates.",
+      "visualComparison": "Aktuelle gerenderte Chromium-/WebKit-Messungen an1567eff4; keine vollständige individuelle Original-/Sprach-/physische Gerätefreigabe.",
+      "blocker": "Individuelle Klausel-/Fachabnahme, reale Geräte, weitere Fachmodell-Statusachsen und verifizierter Zustellkanal offen. Keine Produktionsmigration freigegeben."
     },
     {
       "id": "R7-30-002",
@@ -4610,9 +4610,9 @@
         "docs/audit/v25-revision7/invoice-settlement.md"
       ],
       "implementation": "Rechnungsachsen Dokument/Zahlung/Fälligkeit zentral in JavaScript und SQL; tatsächlicher letzter Versandnachweis getrennt. Ausdrücklich bestätigte echte Überzahlung mit vierfacher Saldenbindung, bestehendem Guthaben/Refund, Idempotenz/Audit/RLS; kontextgerechte Angebotsbezeichnung. Siehe invoice-settlement.md; keine pauschale Abnahme anderer Fachmodelle oder externer Zustellung.",
-      "test": "Lokale Migration, Status-SQL/JS, SSR/PDF, Statistik, Localization, UX, gezieltes Lint und Typecheck bestanden; aktuelle native HTTP/Parallel-/Browser-CI noch ausstehend.",
-      "visualComparison": "Gezielte echte SSR-Projektion; neue Browser-/Geräteabnahme noch offen.",
-      "blocker": "Aktuelle Gesamt-CI, individuelle Klausel-/Fachabnahme, reale Geräte und verifizierter Zustellkanal offen. Keine Produktionsmigration freigegeben."
+      "test": "Aktueller1567eff4-Full-Development39726655822 erfolgreich: native HTTP-Acht-Rollen-/RLS-/Sechs-Verbindungsfälle, SQL/JS-Statusparität, Audit-Rollback/Replay/Refund/Cash, aktuelle Chromium-/WebKit-Interaktionen; Lint/Typecheck, PDF/Statistik/Locale und alle bestehenden Gates.",
+      "visualComparison": "Aktuelle gerenderte Chromium-/WebKit-Messungen an1567eff4; keine vollständige individuelle Original-/Sprach-/physische Gerätefreigabe.",
+      "blocker": "Individuelle Klausel-/Fachabnahme, reale Geräte, weitere Fachmodell-Statusachsen und verifizierter Zustellkanal offen. Keine Produktionsmigration freigegeben."
     },
     {
       "id": "R7-30-003",
@@ -4635,9 +4635,9 @@
         "docs/audit/v25-revision7/invoice-settlement.md"
       ],
       "implementation": "Rechnungsachsen Dokument/Zahlung/Fälligkeit zentral in JavaScript und SQL; tatsächlicher letzter Versandnachweis getrennt. Ausdrücklich bestätigte echte Überzahlung mit vierfacher Saldenbindung, bestehendem Guthaben/Refund, Idempotenz/Audit/RLS; kontextgerechte Angebotsbezeichnung. Siehe invoice-settlement.md; keine pauschale Abnahme anderer Fachmodelle oder externer Zustellung.",
-      "test": "Lokale Migration, Status-SQL/JS, SSR/PDF, Statistik, Localization, UX, gezieltes Lint und Typecheck bestanden; aktuelle native HTTP/Parallel-/Browser-CI noch ausstehend.",
-      "visualComparison": "Gezielte echte SSR-Projektion; neue Browser-/Geräteabnahme noch offen.",
-      "blocker": "Aktuelle Gesamt-CI, individuelle Klausel-/Fachabnahme, reale Geräte und verifizierter Zustellkanal offen. Keine Produktionsmigration freigegeben."
+      "test": "Aktueller1567eff4-Full-Development39726655822 erfolgreich: native HTTP-Acht-Rollen-/RLS-/Sechs-Verbindungsfälle, SQL/JS-Statusparität, Audit-Rollback/Replay/Refund/Cash, aktuelle Chromium-/WebKit-Interaktionen; Lint/Typecheck, PDF/Statistik/Locale und alle bestehenden Gates.",
+      "visualComparison": "Aktuelle gerenderte Chromium-/WebKit-Messungen an1567eff4; keine vollständige individuelle Original-/Sprach-/physische Gerätefreigabe.",
+      "blocker": "Individuelle Klausel-/Fachabnahme, reale Geräte, weitere Fachmodell-Statusachsen und verifizierter Zustellkanal offen. Keine Produktionsmigration freigegeben."
     },
     {
       "id": "R7-30-004",
@@ -4694,9 +4694,9 @@
         "docs/audit/v25-revision7/invoice-settlement.md"
       ],
       "implementation": "Rechnungsachsen Dokument/Zahlung/Fälligkeit zentral in JavaScript und SQL; tatsächlicher letzter Versandnachweis getrennt. Ausdrücklich bestätigte echte Überzahlung mit vierfacher Saldenbindung, bestehendem Guthaben/Refund, Idempotenz/Audit/RLS; kontextgerechte Angebotsbezeichnung. Siehe invoice-settlement.md; keine pauschale Abnahme anderer Fachmodelle oder externer Zustellung.",
-      "test": "Lokale Migration, Status-SQL/JS, SSR/PDF, Statistik, Localization, UX, gezieltes Lint und Typecheck bestanden; aktuelle native HTTP/Parallel-/Browser-CI noch ausstehend.",
-      "visualComparison": "Gezielte echte SSR-Projektion; neue Browser-/Geräteabnahme noch offen.",
-      "blocker": "Aktuelle Gesamt-CI, individuelle Klausel-/Fachabnahme, reale Geräte und verifizierter Zustellkanal offen. Keine Produktionsmigration freigegeben."
+      "test": "Aktueller1567eff4-Full-Development39726655822 erfolgreich: native HTTP-Acht-Rollen-/RLS-/Sechs-Verbindungsfälle, SQL/JS-Statusparität, Audit-Rollback/Replay/Refund/Cash, aktuelle Chromium-/WebKit-Interaktionen; Lint/Typecheck, PDF/Statistik/Locale und alle bestehenden Gates.",
+      "visualComparison": "Aktuelle gerenderte Chromium-/WebKit-Messungen an1567eff4; keine vollständige individuelle Original-/Sprach-/physische Gerätefreigabe.",
+      "blocker": "Individuelle Klausel-/Fachabnahme, reale Geräte, weitere Fachmodell-Statusachsen und verifizierter Zustellkanal offen. Keine Produktionsmigration freigegeben."
     },
     {
       "id": "R7-31-001",
@@ -4906,9 +4906,9 @@
         "docs/audit/v25-revision7/invoice-settlement.md"
       ],
       "implementation": "Rechnungsachsen Dokument/Zahlung/Fälligkeit zentral in JavaScript und SQL; tatsächlicher letzter Versandnachweis getrennt. Ausdrücklich bestätigte echte Überzahlung mit vierfacher Saldenbindung, bestehendem Guthaben/Refund, Idempotenz/Audit/RLS; kontextgerechte Angebotsbezeichnung. Siehe invoice-settlement.md; keine pauschale Abnahme anderer Fachmodelle oder externer Zustellung.",
-      "test": "Lokale Migration, Status-SQL/JS, SSR/PDF, Statistik, Localization, UX, gezieltes Lint und Typecheck bestanden; aktuelle native HTTP/Parallel-/Browser-CI noch ausstehend.",
-      "visualComparison": "Gezielte echte SSR-Projektion; neue Browser-/Geräteabnahme noch offen.",
-      "blocker": "Aktuelle Gesamt-CI, individuelle Klausel-/Fachabnahme, reale Geräte und verifizierter Zustellkanal offen. Keine Produktionsmigration freigegeben."
+      "test": "Aktueller1567eff4-Full-Development39726655822 erfolgreich: native HTTP-Acht-Rollen-/RLS-/Sechs-Verbindungsfälle, SQL/JS-Statusparität, Audit-Rollback/Replay/Refund/Cash, aktuelle Chromium-/WebKit-Interaktionen; Lint/Typecheck, PDF/Statistik/Locale und alle bestehenden Gates.",
+      "visualComparison": "Aktuelle gerenderte Chromium-/WebKit-Messungen an1567eff4; keine vollständige individuelle Original-/Sprach-/physische Gerätefreigabe.",
+      "blocker": "Individuelle Klausel-/Fachabnahme, reale Geräte, weitere Fachmodell-Statusachsen und verifizierter Zustellkanal offen. Keine Produktionsmigration freigegeben."
     },
     {
       "id": "R7-31-013",

@@ -8,7 +8,7 @@ SHA256 `23bc8bffd954cabb0b265a723e9fde2a713ad42d4e7150a5cb2765c7c367a363`.
 | --- | --- | --- |
 | `7bc770a43bc3215ae5dba956dbb617c56d391c5c` | [Full Development39691829176](https://github.com/oemercam/binso_admin_azure/actions/runs/39691829176), erfolgreich; [Originalreport-Zusammenfassung](ci-7bc770a4.json) | Archiv, keine Freigabe später geänderter Quellen |
 | `a9b7e1fcdd0920fa9cb636ca535bdf9a96a2ebb6` | [Quality39697355253](https://github.com/oemercam/binso_admin_azure/actions/runs/39697355253), [CodeQL39697355232](https://github.com/oemercam/binso_admin_azure/actions/runs/39697355232), [Full Development39697429990](https://github.com/oemercam/binso_admin_azure/actions/runs/39697429990): erfolgreich | Neuester vollständig qualifizierter historischer Ausgangsstand; [hashgeprüfte Report-Zusammenfassung](ci-a9b7e1fc.json) |
-| Folgeänderungen einschliesslich braces-Korrektur | Gezielte aktuelle lokale Nachweise in [Sicherheitsbehebung](security-braces.md) | Neue Commit-CI erforderlich; nicht durch ältere grüne Läufe abgedeckt |
+| `1567eff4cf42830d58098be95022c73adeef1723` | [Full Development39726655822](https://github.com/oemercam/binso_admin_azure/actions/runs/39726655822), PR-Quality39726546798 und CodeQL39726546806 erfolgreich | Aktuelle Codequalifikation einschliesslich Überzahlung/Status/Ladezustand; [Originalreport](ci-1567eff4.json), keine573-Klausel-Freigabe |
 
 Zwischen7bc unda9b wurden unter anderem Übersetzungsgrenzen, gemeinsame Formatierung,
 Desktop-Header und die Bindung der Compliance-Klauseln korrigiert. Die Source-Digests
@@ -53,7 +53,7 @@ die normative573-Klausel-Projektion bleibt gebunden. Gefälschte Klauseln,
 Prioritätsänderungen und veränderte Originalbytes bleiben ausdrücklich Fehler.
 Diese verbesserten Messregeln erteilen weiterhin keine fachliche Freigabe.
 
-## Aktuelle Fortsetzung
+## Historische Zwischenqualifikation d052a3be
 
 Code-Commit `d052a3be539a0cf358f550a54eecb33e7c0451f2`, V2-CI-/Git-Blob-Digest
 `dddf66c6b614d9bd077720f3f3d70329de69714c46446f394accaf932eea3e19`:
@@ -65,7 +65,7 @@ Der vorherige Lauf39713295626 auf `d11a847b` ist fehlgeschlagen, seine grünen
 Teiljobs ersetzen die neue Gesamtprüfung nicht. Die isolierte Testrollenvorbereitung
 und die falsche Angebots-Datumsprojektion wurden gezielt korrigiert, nicht übersprungen.
 
-Der aktuelle native Checks-Job119619903410 besteht einschliesslich sechs physisch
+Der damalige native Checks-Job119619903410 besteht einschliesslich sechs physisch
 paralleler Reminder-Verarbeiter, Rollen-/RLS-Gegenfällen und vollständigem Audit.
 Nachträgliche reine Ergebnis-/Reviewnotizen ändern den Source-Digest nicht. Diese
 Quellgleichheit wird tatsächlich berechnet; ein Dokumentations-Head ist deshalb
@@ -80,3 +80,18 @@ ausschliesslich CRLF→LF bei ansonsten identischen Bytes nach. Keine andere
 Inhaltsabweichung wurde akzeptiert. Die unveränderten Originalbytes der Revision7
 bleiben separat geprüft. Keine pauschale Normalisierung, keine Massenänderung der
 Dateien, kein manuell eingesetzter Hash und keine Aufweichung des CI-Gates.
+
+## Aktueller geprüfter Folgequellstand1567eff4
+
+Der neue Full-Lauf ist vollständig erfolgreich. Der Originalreport nennt6001
+akzeptierte Messdateien,6825 Routen-Zuordnungen zu5993 unterschiedlichen Dateien,
+76/78 Routen,613 Einträge und keine fehlgeschlagenen Checks.573 Klauseln bleiben
+individuelle Review-Pflichten; compliant:false und productionAcceptance:false.
+
+Der [Git-Blob-Abgleich](ci-1567eff4-source.json) bindet alle868 relevanten Dateien
+an exakt e9fe648a99886d78bd8c3f600f54132a2ca31ca10476e61cbf85e59a437e1df6.
+Die69 älteren lokalen CRLF/LF-Unterschiede sind einzeln belegt, andere
+Inhaltsunterschiede:0. Der ursprüngliche Revision7-Quellhash bleibt unverändert.
+ZIP- und Report-SHA sowie Run/Artefakt sind in [ci-1567eff4.json](ci-1567eff4.json)
+festgehalten. Fehlgeschlagene Zwischenstände bleiben historische Fehlversuche;
+keine Messungen daraus werden in die aktuelle Freigabe kopiert.
