@@ -15807,5 +15807,40 @@
     "JPEG, PNG or WebP. Please export HEIC/HEIF as JPEG.",
     "JPEG, PNG ou WebP. Exporte les fichiers HEIC/HEIF au format JPEG.",
     "JPEG, PNG o WebP. Esporta i file HEIC/HEIF in formato JPEG."
+  ],
+  "Bitte gültige ganze Minuten und bestätigte Preisquellen auswählen.": [
+    "Please select valid whole minutes and confirmed price sources.",
+    "Sélectionne des minutes entières valides et des sources de prix confirmées.",
+    "Seleziona minuti interi validi e fonti di prezzo confermate."
+  ],
+  "Die ausgewählte Leistung oder Preisquelle ist nicht mehr verfügbar.": [
+    "The selected service or price source is no longer available.",
+    "La prestation ou la source de prix sélectionnée n’est plus disponible.",
+    "La prestazione o la fonte di prezzo selezionata non è più disponibile."
+  ],
+  "Leistungspreis und Rechnungswährung müssen übereinstimmen. Es erfolgt keine automatische Umrechnung.": [
+    "The service price and invoice currency must match. There is no automatic conversion.",
+    "La devise du prix de la prestation et celle de la facture doivent correspondre. Aucune conversion automatique n’est effectuée.",
+    "La valuta del prezzo della prestazione e quella della fattura devono corrispondere. Non viene effettuata alcuna conversione automatica."
+  ],
+  "Unterschiedliche Preis- oder Steuerregeln benötigen getrennte Positionen.": [
+    "Different price or tax rules require separate line items.",
+    "Des règles de prix ou de taxe différentes nécessitent des lignes distinctes.",
+    "Regole di prezzo o fiscali diverse richiedono righe separate."
+  ],
+  "Angezeigte Minuten, Preis und Steuer müssen der bestätigten Leistungsquelle entsprechen.": [
+    "The displayed minutes, price and tax must match the confirmed service source.",
+    "Les minutes, le prix et la taxe affichés doivent correspondre à la source de prestation confirmée.",
+    "I minuti, il prezzo e l’imposta visualizzati devono corrispondere alla fonte della prestazione confermata."
+  ],
+  "Bitte den aktuellen Rechnungsentwurf erneut laden.": [
+    "Please reload the current invoice draft.",
+    "Recharge le brouillon actuel de la facture.",
+    "Ricarica la bozza attuale della fattura."
+  ],
+  "Die gewählten Minuten sind bereits reserviert. Bitte die Restmenge neu laden.": [
+    "The selected minutes are already reserved. Please reload the remaining quantity.",
+    "Les minutes sélectionnées sont déjà réservées. Recharge la quantité restante.",
+    "I minuti selezionati sono già riservati. Ricarica la quantità rimanente."
   ]
 }

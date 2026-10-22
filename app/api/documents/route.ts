@@ -1,8 +1,11 @@
+import {requireSession} from '@/lib/server/session';
+import {authorize} from '@/lib/server/rbac';
+import {minuteAllocations} from '@/lib/server/repositories/business-api';
 import { NextRequest } from "next/server";
 import { apiError, assertSameOrigin, cleanText, json, readJson } from "@/lib/server/http";
 import { tenantList, tenantListPage, tenantRpc } from "@/lib/server/database";
 
-type Line={discount?:unknown;taxExempt?:unknown;unit?:unknown;description?:unknown;quantity?:unknown;unitPrice?:unknown;vatRate?:unknown;expenseIds?:unknown;timeEntryIds?:unknown};
+type Line={timeAllocations?:unknown;priceBaseQuantity?:unknown;discount?:unknown;taxExempt?:unknown;unit?:unknown;description?:unknown;quantity?:unknown;unitPrice?:unknown;vatRate?:unknown;expenseIds?:unknown;timeEntryIds?:unknown};
 type DocumentBody={
   discountOrigin?:unknown;discount?:unknown;calculationRevision?:unknown;sourceOffer?:unknown;kind?:unknown;customerName?:unknown;customerId?:unknown;number?:unknown;issueDate?:unknown;dueDate?:unknown;validUntil?:unknown;
   vatRate?:unknown;note?:unknown;currency?:unknown;items?:unknown;
@@ -27,11 +30,13 @@ export async function POST(request:NextRequest){
     const rawItems=Array.isArray(body.items)?body.items as Line[]:[];
     if(!kind||(!customerName&&!body.customerId)||!issueDate||rawItems.length===0||rawItems.length>100) return json({error:"invalid_document",message:"Dokumentangaben sind unvollständig."},400);
 
+    const session=await requireSession();authorize(session,kind==='invoice'?'invoices:write':'sales:write');
     const customers=await tenantList<{id:string}>("customers","id",(body.customerId?"id=eq."+encodeURIComponent(cleanText(body.customerId,80)):"name=eq."+encodeURIComponent(customerName))+"&limit=2");
     const customer=customers[0];
     if(customers.length!==1) return json({error:"customer_not_found",message:"Kunde wurde nicht gefunden."},400);
 
     const items=rawItems.map(item=>({
+      time_allocations:minuteAllocations(item.timeAllocations,true),price_base_quantity:item.priceBaseQuantity??1,
       discount:item.discount,
       tax_exempt:item.taxExempt,
       description:cleanText(item.description,500),

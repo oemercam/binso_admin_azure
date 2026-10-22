@@ -60,15 +60,16 @@ export async function documentPdf(document:Row,liveCompany:Row,logo?:Buffer){
  tableHead();
  for(const item of (document.items||[]) as Row[]){
   const discount=record(item.discount);const description=String(item.description||'')+(discount.kind&&discount.kind!=='none'?'\n'+t('Rabatt')+': '+String(discount.value)+(discount.kind==='percent'?' %':' '+String(discount.currency)):'');pdf.font('Liberation Sans').fontSize(10).fillColor('#111');
+  const minutePrice=Number(item.price_base_quantity)===60,rowHeight=minutePrice?48:34;
   const h=pdf.heightOfString(description,{width:235,lineGap:2});
-  if(h<bottom-80&&pdf.y+Math.max(h,34)+12>bottom){pdf.addPage();tableHead();}
+  if(h<bottom-80&&pdf.y+Math.max(h,rowHeight)+12>bottom){pdf.addPage();tableHead();}
   // A repeated table header changes PDFKit's shared drawing state.
   pdf.font('Liberation Sans').fontSize(10).fillColor('#111');
   const y=pdf.y,startPage=pdf.page;pdf.text(description,left,y,{width:235,lineGap:2});const after=pdf.y;
   const quantity=Number(item.quantity||0).toLocaleString(localeTags[locale],{maximumFractionDigits:3})+' '+String(item.unit||'');
-  const amount=item.line_total;
-  if(pdf.page===startPage){pdf.fontSize(9).text(quantity,291,y,{width:65,align:'right'});pdf.text(money(item.unit_price),366,y,{width:83,align:'right'});pdf.text(money(amount),459,y,{width:right-459,align:'right'});pdf.fontSize(8).fillColor('#555').text(t('MWST')+' '+Number(item.vat_rate||0).toLocaleString(localeTags[locale])+' %',366,y+15,{width:83,align:'right'});pdf.y=Math.max(after,y+34)+12;}
-  else{pdf.y=after;paragraph(`${quantity} × ${money(item.unit_price)} · ${t('MWST')} ${item.vat_rate}% · ${t('Betrag')} ${money(amount)}`,9);}
+  const amount=item.line_total,price=money(item.unit_price);
+  if(pdf.page===startPage){pdf.fontSize(9).text(quantity,291,y,{width:65,align:'right'});pdf.text(price,366,y,{width:83,align:'right'});pdf.text(money(amount),459,y,{width:right-459,align:'right'});if(minutePrice)pdf.fontSize(8).fillColor('#555').text('/ 60 min',366,y+13,{width:83,align:'right'});pdf.fontSize(8).fillColor('#555').text(t('MWST')+' '+Number(item.vat_rate||0).toLocaleString(localeTags[locale])+' %',366,y+(minutePrice?25:15),{width:83,align:'right'});pdf.y=Math.max(after,y+rowHeight)+12;}
+  else{pdf.y=after;paragraph(`${quantity} × ${price}${minutePrice?' / 60 min':''} · ${t('MWST')} ${item.vat_rate}% · ${t('Betrag')} ${money(amount)}`,9);}
  }
  ensure(98);const summary=(label:string,value:unknown,bold=false)=>{if(record(document.calculation).revision===1)ensure(bold?32:25);const y=pdf.y;pdf.font(bold?'Liberation Sans-Bold':'Liberation Sans').fontSize(bold?12:10).fillColor('#111').text(label,300,y,{width:145});pdf.text(money(value),459,y,{width:right-459,align:'right'});pdf.y=y+(bold?27:21)};
  pdf.moveTo(left,pdf.y).lineTo(right,pdf.y).strokeColor('#aaa').stroke();pdf.y+=14;

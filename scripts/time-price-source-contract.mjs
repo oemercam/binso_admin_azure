@@ -55,5 +55,7 @@ export async function verifyTimePriceSources({load,db,transaction,org,other,act,
  const finance=as('finance');await db.query('update auth_sessions set step_up_at=now() where id=$1',[finance.sessionId]);
  response=await bind({...newBody,expectedRevision:3});assert.equal(response.status,201,await response.clone().text());assert.equal((await response.json()).item.source_snapshot.unitPrice,'130.00','Finance can explicitly confirm the approved sales source');
  response=await bind({...purchaseBody,expectedRevision:2});assert.equal(response.status,201,await response.clone().text());assert.equal((await response.json()).item.source_snapshot.unitPrice,'80.00','Finance can explicitly confirm the approved purchase source');
+ const result={...f,saleSource:(await db.query("select id,source_snapshot from time_price_sources where organization_id=$1 and time_entry_id=$2 and side='sale' and is_current",[org,f.entryId])).rows[0]};
  console.log('Time price sources: actual dated approved purchase/sale binding, exact immutable snapshots and explicit revisions, no draft/contract auto-repricing, fresh/replay/stale/field/role/tenant/plan boundaries, deferred current-source integrity and audit rollback passed. No invoice calculation, partial allocation or FX conversion.');
+ return result;
 }

@@ -2,7 +2,7 @@ import {expenseClaimStatus,isExpensePaymentKind} from '@/lib/expense-payment';
 import {idempotentBusiness} from "../business-idempotency";
 import "server-only";
 import {offerTotalSql,offerStatusSql,invoiceCreditSql,invoiceRefundSql,invoicePaymentStatusSql,invoiceDueStatusSql,invoiceDisplayStatusSql} from "../document-amount-sql";
-import {businessDate,financialStatus,openAmount,invoiceStatusAxes,customerCredit,paymentEntryIssue,paymentBalance,samePaymentBalance,maxRecordedPayment,calculateDocument} from "@/lib/financial-status";
+import {businessDate,financialStatus,openAmount,invoiceStatusAxes,customerCredit,paymentEntryIssue,paymentBalance,samePaymentBalance,maxRecordedPayment,calculateDocument,moneyMinor} from "@/lib/financial-status";
 import { randomUUID } from "node:crypto";
 import type { PoolClient } from "pg";
 import { audit } from "../audit";
@@ -12,6 +12,7 @@ import { ownRecordOnly, tenantCan } from "@/lib/permissions";
 import type { SessionUser } from "../session";
 
 type Row=Record<string,unknown>;
+const mutationArgs=(args:Row):Row=>({...args,...(Array.isArray(args.p_items)?{p_items:args.p_items.map(line=>({...line}))}:{})});
 export const canonicalApiTables=new Set(['products','employees','expenses','documents','payments','customers','customer_contacts','time_entries','projects','support_tickets']);
 const sqlSources:Record<string,string>={
  projects:`select id,name,customer_id,status,source_quote_id,external_id,created_at from projects where organization_id=$1 and archived_at is null`,
@@ -82,7 +83,7 @@ export async function listApiBusiness(c:PoolClient,s:SessionUser,table:string,ex
      ${k==='invoice'?'d.total_amount':offerTotalSql('d')} total,
      coalesce((select max(l.vat_rate) from ${lines} l where l.${fk}=d.id and l.organization_id=d.organization_id),0) vat_rate,
      json_build_object('name',c.name,'number',c.customer_no,'street',c.address,'postal_code',c.zip,'city',c.city,'country',c.country,'language',c.language) customer,
-     coalesce((select json_agg(json_build_object('id',l.id,'position',l.sort_order,'description',l.description,'quantity',l.quantity,'unit_price',l.unit_price,'unit',l.unit,'vat_rate',l.vat_rate,'line_total',coalesce((d.calculation->'lines'->(l.sort_order-1)->>'net')::numeric,l.quantity*l.unit_price),'discount',d.calculation->'lines'->(l.sort_order-1)->'discount','tax_exempt',d.calculation->'lines'->(l.sort_order-1)->'tax_exempt','expense_ids',${k==='invoice'?`coalesce((select json_agg(x.expense_id) from invoice_line_expenses x where x.invoice_line_id=l.id),'[]'::json)`:"'[]'::json"},'time_entry_ids',${k==='invoice'?`coalesce((select json_agg(x.time_entry_id) from invoice_line_time_entries x where x.invoice_line_id=l.id),'[]'::json)`:"'[]'::json"}) order by l.sort_order) from ${lines} l where l.${fk}=d.id and l.organization_id=d.organization_id),'[]'::json) items
+     coalesce((select json_agg(json_build_object('id',l.id,'position',l.sort_order,'description',l.description,'quantity',l.quantity,'unit_price',l.unit_price,'unit',l.unit,'price_base_quantity',${k==='invoice'?'l.price_base_quantity':'1'},'vat_rate',l.vat_rate,'line_total',coalesce((d.calculation->'lines'->(l.sort_order-1)->>'net')::numeric,l.quantity*l.unit_price/${k==='invoice'?'l.price_base_quantity':'1'}),'discount',d.calculation->'lines'->(l.sort_order-1)->'discount','tax_exempt',d.calculation->'lines'->(l.sort_order-1)->'tax_exempt','expense_ids',${k==='invoice'?`coalesce((select json_agg(x.expense_id) from invoice_line_expenses x where x.invoice_line_id=l.id),'[]'::json)`:"'[]'::json"},'time_allocations',${k==='invoice'?`coalesce((select json_agg(json_build_object('time_entry_id',x.time_entry_id,'minutes',x.allocated_minutes,'price_source_id',x.price_source_id)) from invoice_line_time_entries x where x.invoice_line_id=l.id and x.allocated_minutes is not null),'[]'::json)`:"'[]'::json"},'time_entry_ids',${k==='invoice'?`coalesce((select json_agg(x.time_entry_id) from invoice_line_time_entries x where x.invoice_line_id=l.id and x.allocated_minutes is null),'[]'::json)`:"'[]'::json"}) order by l.sort_order) from ${lines} l where l.${fk}=d.id and l.organization_id=d.organization_id),'[]'::json) items
      from ${t} d join customers c on c.id=d.customer_id and c.organization_id=d.organization_id where d.organization_id=$1 and d.archived_at is null`);
   }
   if(!sources.length)throw new ApiError(403,'forbidden','Keine Berechtigung.');source=sources.join(' union all ');
@@ -175,16 +176,17 @@ export function translateBusinessWrite(table:string,data:Row,insert:boolean){
  return {target,data:out};
 }
 export async function mutateApiBusiness(c:PoolClient,s:SessionUser,operation:string,args:Row):Promise<unknown>{
+ if(operation==='discard_invoice_draft')return discardInvoiceDraft(c,s,args);
  if(operation==='update_document_atomic'&&(args.p_discount!==undefined||args.p_calculation_revision!==undefined||(Array.isArray(args.p_items)&&args.p_items.some((l:Row)=>l.discount!==undefined)))){
   if(!tenantCan(s.role,args.p_kind==='invoice'?'invoices:write':'sales:write'))throw new ApiError(403,'forbidden','Keine Berechtigung.');
   const body={...args};delete body.p_idempotency_key;
-  return idempotentBusiness(c,{organizationId:s.organizationId,userId:s.userId,operation:'document.update.'+args.p_kind,key:String(args.p_idempotency_key??''),body},()=>executeBusinessMutation(c,s,operation,{...args}));
+  return idempotentBusiness(c,{organizationId:s.organizationId,userId:s.userId,operation:'document.update.'+args.p_kind,key:String(args.p_idempotency_key??''),body},()=>executeBusinessMutation(c,s,operation,mutationArgs(args)));
  }
- if(operation!=='create_document_atomic')return executeBusinessMutation(c,s,operation,{...args});
+ if(operation!=='create_document_atomic')return executeBusinessMutation(c,s,operation,mutationArgs(args));
  if(!['invoice','offer'].includes(String(args.p_kind)))throw new ApiError(400,'kind_invalid','Ungültiger Dokumenttyp.');
  if(!tenantCan(s.role,args.p_kind==='invoice'?'invoices:write':'sales:write'))throw new ApiError(403,'forbidden','Keine Berechtigung.');
  const body={...args};delete body.p_idempotency_key;delete body.p_number;
- return idempotentBusiness(c,{organizationId:s.organizationId,userId:s.userId,operation:'document.create.'+args.p_kind,key:String(args.p_idempotency_key??''),body},()=>executeBusinessMutation(c,s,operation,{...args}));
+ return idempotentBusiness(c,{organizationId:s.organizationId,userId:s.userId,operation:'document.create.'+args.p_kind,key:String(args.p_idempotency_key??''),body},()=>executeBusinessMutation(c,s,operation,mutationArgs(args)));
 }
 async function executeBusinessMutation(c:PoolClient,s:SessionUser,operation:string,args:Row):Promise<unknown>{
  if(operation==='create_payment_idempotent'){
@@ -253,6 +255,7 @@ async function executeBusinessMutation(c:PoolClient,s:SessionUser,operation:stri
   const row=existing.rows[0];if(!row)throw new ApiError(404,'not_found','Dokument wurde nicht gefunden.');
   if(args.p_expected_updated_at!==undefined&&args.p_expected_updated_at!==row.document_revision)throw new ApiError(409,'document_changed','Dokument wurde inzwischen geändert. Bitte neu laden und Angaben prüfen.');
   if(row.status!=='draft')throw new ApiError(409,'document_locked','Dieses Dokument kann nicht mehr geändert werden.');id=row.id;
+  if(invoice){await lockInvoiceTimeSources(c,s,args.p_items as Row[],id);await c.query("delete from invoice_line_time_entries x using invoice_lines l where x.organization_id=$1 and l.organization_id=x.organization_id and l.id=x.invoice_line_id and l.invoice_id=$2 and x.allocated_minutes is not null",[s.organizationId,id]);}
   if(row.calculation&&((row.calculation.discount?.kind!=='none'&&args.p_discount===undefined)||(row.calculation.lines.some((l:Row)=>(l.discount as Row)?.kind!=='none')&&(args.p_items as Row[]).some(l=>l.discount===undefined))||(row.calculation.lines.some((l:Row)=>l.tax_exempt===true)&&(args.p_items as Row[]).some(l=>l.tax_exempt===undefined))))throw new ApiError(409,'discount_confirmation_required','Bitte den gespeicherten Rabatt ausdrücklich übernehmen oder entfernen.');
   if((await c.query("select id from document_deliveries where organization_id=$1 and document_id=$2 and status in ('sending','uncertain','failed')",[s.organizationId,id])).rowCount)throw new ApiError(409,'delivery_pending','Ein Versand dieses Dokuments ist noch nicht bestätigt.');
   await c.query(`update ${table} set calculation=null,${numberColumn}=$1,customer_id=$2,issue_date=$3,${invoice?'due_date':'valid_until'}=$4,note=$5,currency=$6,updated_at=now() where id=$7 and organization_id=$8`,[args.p_number,args.p_customer_id,args.p_issue_date,invoice?args.p_due_date:args.p_valid_until,args.p_note,args.p_currency,id,s.organizationId]);
@@ -264,14 +267,19 @@ async function executeBusinessMutation(c:PoolClient,s:SessionUser,operation:stri
   await c.query(`insert into ${table}(id,organization_id,external_id,${numberColumn},customer_id,${invoice?'':'title,'}issue_date,${invoice?'due_date':'valid_until'},status,note,currency,created_by_user_id)
    values($1,$2,$1::uuid::text,$3,$4,${invoice?'':'$3,'}$5,$6,'draft',$7,$8,$9)`,[id,s.organizationId,args.p_number,args.p_customer_id,args.p_issue_date,invoice?args.p_due_date:args.p_valid_until,args.p_note,args.p_currency,s.userId]);
  }
+ if(invoice&&operation!=='update_document_atomic')await lockInvoiceTimeSources(c,s,args.p_items as Row[],id);
  if(sourceQuoteId)await c.query("update invoices set source_quote_id=$3 where organization_id=$1 and id=$2",[s.organizationId,id,sourceQuoteId]);
  const claimedTime=new Set<string>(),claimedExpenses=new Set<string>();
  for(const raw of args.p_items as Row[]){for(const [field,claimed] of [["time_entry_ids",claimedTime],["expense_ids",claimedExpenses]] as const){for(const value of Array.isArray(raw[field])?raw[field] as unknown[]:[]){const id=String(value);if(claimed.has(id))throw new ApiError(409,"duplicate_service","Eine Leistung kann nur einmal auf einer Rechnung verrechnet werden.");claimed.add(id);}}}
+ for(const raw of args.p_items as Row[]){for(const allocation of minuteAllocations(raw.time_allocations)){if(claimedTime.has(allocation.time_entry_id))throw new ApiError(409,'duplicate_service','Eine Leistung kann nur einmal auf einer Rechnung verrechnet werden.');claimedTime.add(allocation.time_entry_id);}}
  let position=0;
  for(const raw of args.p_items as Row[]){
-  const lineVat=raw.vat_rate===undefined?vat:Number(raw.vat_rate);
+  if(raw.vat_rate===undefined)raw.vat_rate=vat;
+  await prepareMinuteLine(c,s,raw,args.p_customer_id,args.p_currency,invoice);
+  const lineVat=Number(raw.vat_rate);
   if(!Number.isFinite(lineVat)||lineVat<0||lineVat>100)throw new ApiError(400,'vat_invalid','Ungültiger MwSt.-Satz.');
-  const inserted=await c.query(`insert into ${lineTable}(organization_id,external_id,${parentColumn},sort_order,description,quantity,unit,unit_price,vat_rate) values($1,$2,$3,$4,$5,$6,$7,$8,$9) returning id`,[s.organizationId,randomUUID(),id,++position,raw.description,raw.quantity,String(raw.unit??"Stück").slice(0,40),raw.unit_price,lineVat]);
+  const inserted=await c.query(`insert into ${lineTable}(organization_id,external_id,${parentColumn},sort_order,description,quantity,unit,unit_price,vat_rate${invoice?",price_base_quantity":""}) values($1,$2,$3,$4,$5,$6,$7,$8,$9${invoice?",$10":""}) returning id`,[s.organizationId,randomUUID(),id,++position,raw.description,raw.quantity,String(raw.unit??"Stück").slice(0,40),raw.unit_price,lineVat,...(invoice?[raw.price_base_quantity]:[])]);
+  if(invoice)for(const allocation of minuteAllocations(raw.time_allocations))await c.query('insert into invoice_line_time_entries(organization_id,invoice_line_id,time_entry_id,allocated_minutes,price_source_id) values($1,$2,$3,$4,$5)',[s.organizationId,inserted.rows[0].id,allocation.time_entry_id,allocation.minutes,allocation.price_source_id]);
   if(invoice&&Array.isArray(raw.expense_ids)&&raw.expense_ids.length){
    const ids=raw.expense_ids.map(String).slice(0,100);
    const linked=await c.query("update expenses set invoiced_invoice_id=$3 where organization_id=$1 and id=any($2::uuid[]) and archived_at is null and customer_id=$4 and currency=$5 and billable=true and status in ('approved','posted') and (invoiced_invoice_id is null or invoiced_invoice_id=$3) returning id",[s.organizationId,ids,id,args.p_customer_id,args.p_currency]);
@@ -287,7 +295,8 @@ async function executeBusinessMutation(c:PoolClient,s:SessionUser,operation:stri
   }
  }
  let calculation:ReturnType<typeof calculateDocument>;
- try{calculation=calculateDocument((args.p_items as Row[]).map(l=>({quantity:l.quantity,unit_price:l.unit_price,vat_rate:l.vat_rate??vat,discount:l.discount,tax_exempt:l.tax_exempt})),String(args.p_currency),args.p_discount);}catch(error){throw new ApiError(400,'discount_invalid',error instanceof Error?error.message:'Ungültige Berechnung.');}
+ try{calculation=calculateDocument((args.p_items as Row[]).map(l=>({quantity:l.quantity,unit_price:l.unit_price,vat_rate:l.vat_rate??vat,discount:l.discount,tax_exempt:l.tax_exempt,price_base_quantity:l.price_base_quantity})),String(args.p_currency),args.p_discount);}catch(error){throw new ApiError(400,'discount_invalid',error instanceof Error?error.message:'Ungültige Berechnung.');}
+ calculation={...calculation,lines:calculation.lines.map((line,i)=>({...line,...((args.p_items as Row[])[i].time_allocation_sources?{time_allocations:(args.p_items as Row[])[i].time_allocation_sources}: {})}))};
  const origin=args.p_discount_origin??(calculation.discount.kind==='none'?'removed':'manual');
  if(!['removed','manual','customer'].includes(String(origin))||(origin==='removed'&&calculation.discount.kind!=='none')||(origin==='customer'&&(calculation.discount.kind!=='percent'||Number(calculation.discount.value)!==Number(found.rows[0].discount))))throw new ApiError(400,'discount_origin_invalid','Der Kundenrabatt wurde geändert. Bitte den Vorschlag erneut prüfen.');
  const documentVersion=invoice?1:Number((await c.query('select offer_version from quotes where id=$1 and organization_id=$2',[id,s.organizationId])).rows[0].offer_version);
@@ -295,4 +304,55 @@ async function executeBusinessMutation(c:PoolClient,s:SessionUser,operation:stri
  await c.query(`update ${table} set calculation=$3::jsonb${invoice?',subtotal=$4,vat_amount=$5,total_amount=$6':''} where id=$1 and organization_id=$2`,[id,s.organizationId,JSON.stringify(calculationSnapshot),...(invoice?[calculation.subtotal,calculation.vat,calculation.total]:[])]);
  await audit(c,{organizationId:s.organizationId,userId:s.userId,action:operation==='create_document_atomic'?'document.created':'document.updated',entityType:table,entityId:id});
  return (await listApiBusiness(c,s,'documents','id=eq.'+id))[0];
+}
+
+export type MinuteAllocation={time_entry_id:string;minutes:number;price_source_id:string};
+export function minuteAllocations(value:unknown,publicNames=false):MinuteAllocation[]{
+ if(value===undefined)return [];
+ if(!Array.isArray(value)||value.length>100)throw new ApiError(400,'minute_allocation_invalid','Bitte gültige ganze Minuten und bestätigte Preisquellen auswählen.');
+ const id=publicNames?'timeEntryId':'time_entry_id',source=publicNames?'priceSourceId':'price_source_id',seen=new Set<string>();
+ return value.map(raw=>{const a=raw as Row;if(!a||typeof a!=='object'||Array.isArray(a)||Object.keys(a).some(k=>![id,source,'minutes'].includes(k))||![a[id],a[source]].every(v=>typeof v==='string'&&/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v))||!Number.isInteger(a.minutes)||Number(a.minutes)<1||Number(a.minutes)>1440||seen.has(String(a[id]).toLowerCase()))throw new ApiError(400,'minute_allocation_invalid','Bitte gültige ganze Minuten und bestätigte Preisquellen auswählen.');seen.add(String(a[id]).toLowerCase());return {time_entry_id:String(a[id]).toLowerCase(),minutes:Number(a.minutes),price_source_id:String(a[source]).toLowerCase()};});
+}
+/** Acquire every old/new source in UUID order before changing draft reservations. */
+export async function lockInvoiceTimeSources(c:PoolClient,s:SessionUser,items:Row[],invoiceId:string){
+ const ids=items.flatMap(l=>[...(Array.isArray(l.time_entry_ids)?l.time_entry_ids.map(String):[]),...minuteAllocations(l.time_allocations).map(a=>a.time_entry_id)]);
+ await c.query(`select id from time_entries where organization_id=$1 and (id=any($2::uuid[]) or id in(select x.time_entry_id from invoice_line_time_entries x join invoice_lines l on l.organization_id=x.organization_id and l.id=x.invoice_line_id where x.organization_id=$1 and l.invoice_id=$3)) order by id for update`,[s.organizationId,[...new Set(ids)],invoiceId]);
+}
+export async function prepareMinuteLine(c:PoolClient,s:SessionUser,raw:Row,customerId:unknown,currency:unknown,invoice:boolean){
+ const allocations=minuteAllocations(raw.time_allocations);raw.time_allocations=allocations;delete raw.time_allocation_sources;
+ if(!allocations.length){if(raw.price_base_quantity!==undefined&&raw.price_base_quantity!==1)throw new ApiError(400,'minute_allocation_invalid','Bitte gültige ganze Minuten und bestätigte Preisquellen auswählen.');raw.price_base_quantity=1;return;}
+ if(!invoice||raw.price_base_quantity!==60||raw.unit!=='min'||Array.isArray(raw.time_entry_ids)&&raw.time_entry_ids.length||Array.isArray(raw.expense_ids)&&raw.expense_ids.length)throw new ApiError(400,'minute_allocation_invalid','Bitte gültige ganze Minuten und bestätigte Preisquellen auswählen.');
+ const sources:Row[]=[];let total=0;let first:Row|undefined;
+ for(const allocation of allocations){
+  const row=(await c.query(`select t.id,t.customer_id,t.recorded_duration_minutes,p.source_snapshot from time_entries t join time_price_sources p on p.organization_id=t.organization_id and p.time_entry_id=t.id where t.organization_id=$1 and t.id=$2 and p.id=$3 and p.side='sale' and p.is_current and t.external_resource_id is not null and t.approved and t.submitted_at is not null and t.billable and t.archived_at is null`,[s.organizationId,allocation.time_entry_id,allocation.price_source_id])).rows[0];
+  if(!row||row.customer_id!==customerId||allocation.minutes>row.recorded_duration_minutes)throw new ApiError(409,'minute_source_changed','Die ausgewählte Leistung oder Preisquelle ist nicht mehr verfügbar.');
+  const price=row.source_snapshot as Row;
+  if(price.currency!==currency)throw new ApiError(409,'minute_currency_mismatch','Leistungspreis und Rechnungswährung müssen übereinstimmen. Es erfolgt keine automatische Umrechnung.');
+  const signature=(p:Row)=>JSON.stringify([p.unitPrice,p.vatRate,p.taxTreatment,p.taxReason]);
+  if(first&&signature(first)!==signature(price))throw new ApiError(400,'minute_prices_differ','Unterschiedliche Preis- oder Steuerregeln benötigen getrennte Positionen.');first??=price;
+  total+=allocation.minutes;sources.push({...allocation,source_snapshot:price});
+ }
+ const decimal=(v:unknown)=>/^(0|[1-9]\d*)(\.\d{1,2})?$/.test(String(v));
+ if(Number(raw.quantity)!==total||!decimal(raw.unit_price)||!decimal(raw.vat_rate)||moneyMinor(raw.unit_price)!==moneyMinor(first!.unitPrice)||moneyMinor(raw.vat_rate)!==moneyMinor(first!.vatRate)||(raw.tax_exempt===true)!==(first!.taxTreatment!=='taxable'))throw new ApiError(409,'minute_price_mismatch','Angezeigte Minuten, Preis und Steuer müssen der bestätigten Leistungsquelle entsprechen.');
+ raw.quantity=total;raw.unit_price=first!.unitPrice;raw.vat_rate=first!.vatRate;raw.time_allocation_sources=sources;
+}
+
+async function discardInvoiceDraft(c:PoolClient,s:SessionUser,args:Row){
+ if(args.p_kind!=='invoice'||!tenantCan(s.role,'invoices:write',s.moduleProfile)||s.organizationStatus==='read_only')throw new ApiError(403,'forbidden','Keine Berechtigung.');
+ if(typeof args.p_expected_updated_at!=='string'||!args.p_expected_updated_at||typeof args.p_number!=='string')throw new ApiError(400,'document_revision_required','Bitte den aktuellen Rechnungsentwurf erneut laden.');
+ const member=(await c.query("select m.user_id from organization_memberships m join app_users u on u.id=m.user_id join organizations o on o.id=m.organization_id where m.organization_id=$1 and m.user_id=$2 and m.status='active' and m.module_profile='standard' and m.role in ('owner','admin','finance') and u.status='active' and o.status in ('trial','active','grace_period') for share of m",[s.organizationId,s.userId])).rows[0];
+ if(!member)throw new ApiError(403,'forbidden','Keine Berechtigung.');
+ return idempotentBusiness(c,{organizationId:s.organizationId,userId:s.userId,operation:'document.discard.invoice',key:String(args.p_idempotency_key??''),body:{number:args.p_number,revision:args.p_expected_updated_at}},async()=>{
+  const row=(await c.query('select id,status,updated_at::text revision from invoices where organization_id=$1 and invoice_no=$2 and archived_at is null for update',[s.organizationId,args.p_number])).rows[0];
+  if(!row)throw new ApiError(404,'not_found','Dokument wurde nicht gefunden.');
+  if(row.status!=='draft')throw new ApiError(409,'document_locked','Dieses Dokument kann nicht mehr geändert werden.');
+  if(row.revision!==args.p_expected_updated_at)throw new ApiError(409,'document_changed','Dokument wurde inzwischen geändert. Bitte neu laden und Angaben prüfen.');
+  if((await c.query('select 1 from invoice_versions where organization_id=$1 and invoice_id=$2 union all select 1 from payments where organization_id=$1 and invoice_id=$2 union all select 1 from document_deliveries where organization_id=$1 and document_id=$2 limit 1',[s.organizationId,row.id])).rowCount)throw new ApiError(409,'document_locked','Dieses Dokument kann nicht mehr geändert werden.');
+  await lockInvoiceTimeSources(c,s,[],row.id);
+  await c.query('update invoices set archived_at=now(),updated_at=now() where organization_id=$1 and id=$2',[s.organizationId,row.id]);
+  await c.query('update time_entries set invoiced_invoice_id=null where organization_id=$1 and invoiced_invoice_id=$2 and external_resource_id is null',[s.organizationId,row.id]);
+  await c.query('update expenses set invoiced_invoice_id=null where organization_id=$1 and invoiced_invoice_id=$2',[s.organizationId,row.id]);
+  await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'document.draft.discarded',entityType:'invoices',entityId:row.id});
+  return {id:row.id,number:args.p_number,discarded:true};
+ });
 }

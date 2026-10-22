@@ -2963,9 +2963,25 @@
       "file": "app/api/documents/[number]/route.ts",
       "methods": [
         "GET",
-        "PATCH"
+        "PATCH",
+        "DELETE"
       ],
       "imports": [
+        {
+          "local": "requireSession",
+          "target": "lib/server/session.ts",
+          "exported": "requireSession"
+        },
+        {
+          "local": "authorize",
+          "target": "lib/server/rbac.ts",
+          "exported": "authorize"
+        },
+        {
+          "local": "minuteAllocations",
+          "target": "lib/server/repositories/business-api.ts",
+          "exported": "minuteAllocations"
+        },
         {
           "local": "apiError",
           "target": "lib/server/http.ts",
@@ -3319,6 +3335,16 @@
       ],
       "imports": [
         {
+          "local": "minuteAllocations",
+          "target": "lib/server/repositories/business-api.ts",
+          "exported": "minuteAllocations"
+        },
+        {
+          "local": "prepareMinuteLine",
+          "target": "lib/server/repositories/business-api.ts",
+          "exported": "prepareMinuteLine"
+        },
+        {
           "local": "calculateDocument",
           "target": "lib/money.ts",
           "exported": "calculateDocument"
@@ -3393,6 +3419,21 @@
         "POST"
       ],
       "imports": [
+        {
+          "local": "requireSession",
+          "target": "lib/server/session.ts",
+          "exported": "requireSession"
+        },
+        {
+          "local": "authorize",
+          "target": "lib/server/rbac.ts",
+          "exported": "authorize"
+        },
+        {
+          "local": "minuteAllocations",
+          "target": "lib/server/repositories/business-api.ts",
+          "exported": "minuteAllocations"
+        },
         {
           "local": "apiError",
           "target": "lib/server/http.ts",
@@ -14551,10 +14592,10 @@
         "lib/money.ts#amount",
         "lib/money.ts#safeNumber",
         "lib/money.ts#centsOf",
+        "lib/money.ts#divided",
         "lib/money.ts#times",
         "lib/money.ts#discountOn",
         "lib/money.ts#zero",
-        "lib/money.ts#divided",
         "lib/money.ts#minus",
         "lib/money.ts#plus",
         "lib/money.ts#sum",
@@ -15230,10 +15271,10 @@
         "lib/money.ts#amount",
         "lib/money.ts#safeNumber",
         "lib/money.ts#centsOf",
+        "lib/money.ts#divided",
         "lib/money.ts#times",
         "lib/money.ts#discountOn",
         "lib/money.ts#zero",
-        "lib/money.ts#divided",
         "lib/money.ts#minus",
         "lib/money.ts#plus",
         "lib/money.ts#sum",
@@ -17368,10 +17409,10 @@
         "lib/money.ts#amount",
         "lib/money.ts#safeNumber",
         "lib/money.ts#centsOf",
+        "lib/money.ts#divided",
         "lib/money.ts#times",
         "lib/money.ts#discountOn",
         "lib/money.ts#zero",
-        "lib/money.ts#divided",
         "lib/money.ts#minus",
         "lib/money.ts#plus",
         "lib/money.ts#sum",
@@ -18047,10 +18088,10 @@
         "lib/money.ts#amount",
         "lib/money.ts#safeNumber",
         "lib/money.ts#centsOf",
+        "lib/money.ts#divided",
         "lib/money.ts#times",
         "lib/money.ts#discountOn",
         "lib/money.ts#zero",
-        "lib/money.ts#divided",
         "lib/money.ts#minus",
         "lib/money.ts#plus",
         "lib/money.ts#sum",
@@ -143495,10 +143536,10 @@
         "lib/money.ts#amount",
         "lib/money.ts#safeNumber",
         "lib/money.ts#centsOf",
+        "lib/money.ts#divided",
         "lib/money.ts#times",
         "lib/money.ts#discountOn",
         "lib/money.ts#zero",
-        "lib/money.ts#divided",
         "lib/money.ts#minus",
         "lib/money.ts#plus",
         "lib/money.ts#sum",
@@ -144174,10 +144215,10 @@
         "lib/money.ts#amount",
         "lib/money.ts#safeNumber",
         "lib/money.ts#centsOf",
+        "lib/money.ts#divided",
         "lib/money.ts#times",
         "lib/money.ts#discountOn",
         "lib/money.ts#zero",
-        "lib/money.ts#divided",
         "lib/money.ts#minus",
         "lib/money.ts#plus",
         "lib/money.ts#sum",
@@ -146312,10 +146353,10 @@
         "lib/money.ts#amount",
         "lib/money.ts#safeNumber",
         "lib/money.ts#centsOf",
+        "lib/money.ts#divided",
         "lib/money.ts#times",
         "lib/money.ts#discountOn",
         "lib/money.ts#zero",
-        "lib/money.ts#divided",
         "lib/money.ts#minus",
         "lib/money.ts#plus",
         "lib/money.ts#sum",
@@ -146991,10 +147032,10 @@
         "lib/money.ts#amount",
         "lib/money.ts#safeNumber",
         "lib/money.ts#centsOf",
+        "lib/money.ts#divided",
         "lib/money.ts#times",
         "lib/money.ts#discountOn",
         "lib/money.ts#zero",
-        "lib/money.ts#divided",
         "lib/money.ts#minus",
         "lib/money.ts#plus",
         "lib/money.ts#sum",
@@ -198565,6 +198606,10 @@
         },
         {
           "line": 75,
+          "expression": "priceBase!==1&&priceBase!==60"
+        },
+        {
+          "line": 75,
           "expression": "compare(base,nonnegative('999999999.99'))>BigInt(0)"
         },
         {
@@ -198586,6 +198631,10 @@
         {
           "line": 85,
           "expression": "subtotal+vat>BigInt('99999999999')"
+        },
+        {
+          "line": 88,
+          "expression": "l.priceBase===60"
         }
       ]
     },
@@ -198804,6 +198853,18 @@
       ]
     },
     {
+      "key": "lib/money.ts#divided",
+      "file": "lib/money.ts",
+      "name": "divided",
+      "line": 37,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": []
+    },
+    {
       "key": "lib/money.ts#times",
       "file": "lib/money.ts",
       "name": "times",
@@ -198845,18 +198906,6 @@
       "file": "lib/money.ts",
       "name": "zero",
       "line": 39,
-      "classes": [],
-      "apis": [],
-      "collections": [],
-      "widgets": [],
-      "elements": [],
-      "conditions": []
-    },
-    {
-      "key": "lib/money.ts#divided",
-      "file": "lib/money.ts",
-      "name": "divided",
-      "line": 37,
       "classes": [],
       "apis": [],
       "collections": [],

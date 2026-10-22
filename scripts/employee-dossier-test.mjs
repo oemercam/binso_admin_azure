@@ -1,3 +1,4 @@
+import {verifyMinuteAllocations} from './time-minute-allocation-contract.mjs';
 import {verifyTimePriceSources} from './time-price-source-contract.mjs';
 import {verifyExternalTimeContract} from './external-time-contract.mjs';
 import assert from 'node:assert/strict';
@@ -45,7 +46,7 @@ const db=new PGlite({extensions:{pgcrypto}}),org=randomUUID(),other=randomUUID()
 // Match pg.PoolClient's result shape; PGlite names command counts affectedRows.
 const client={query:async(...args)=>{const result=await db.query(...args);return {...result,rowCount:result.rows.length||result.affectedRows||0};}};
 let session,auditFailure=false,tenantDepth=0;
-const transaction=async(organizationId,userId,fn)=>{
+const transaction=async(organizationId,userId,fn,options={})=>{
  // PGlite has one connection. Emulate a separate nested READ transaction's
  // tenant GUCs with a savepoint, then restore the caller's context. Never use
  // this to claim native multi-connection write/concurrency coverage.
@@ -60,7 +61,7 @@ const transaction=async(organizationId,userId,fn)=>{
   }catch(error){await db.exec('rollback to savepoint '+savepoint);await db.exec('release savepoint '+savepoint);throw error;}
   finally{tenantDepth--;await db.query("select set_config('app.organization_id',$1,true),set_config('app.user_id',$2,true),set_config('app.platform_operator',$3,true)",[prior.org??'',prior.usr??'',prior.platform??'false']);}
  }
- tenantDepth++;await db.exec('begin');try{
+ tenantDepth++;await db.exec(options.isolation==='repeatable read'?'begin isolation level repeatable read':'begin');try{
   await db.exec('set local role binso_runtime');
   await db.query("select set_config('app.organization_id',$1,true),set_config('app.user_id',$2,true),set_config('app.platform_operator','false',true)",[organizationId,userId]);
   const result=await fn(client);await db.exec('commit');return result;
@@ -195,7 +196,8 @@ try{
  await verifyCommercialContract({load,db,transaction,org,other,act,request,setAuditFailure:value=>{auditFailure=value;}});
  await verifyContractDocuments({load,db,transaction,org,other,act,request,setAuditFailure:value=>{auditFailure=value;}});
  const timePriceFixture=await verifyExternalTimeContract({load,db,transaction,org,other,act,request,setAuditFailure:value=>{auditFailure=value;}});
- await verifyTimePriceSources({load,db,transaction,org,other,act,request,fixture:timePriceFixture,setAuditFailure:value=>{auditFailure=value;}});
+ const minuteFixture=await verifyTimePriceSources({load,db,transaction,org,other,act,request,fixture:timePriceFixture,setAuditFailure:value=>{auditFailure=value;}});
+ await verifyMinuteAllocations({load,db,transaction,org,other,act,request,fixture:minuteFixture,setAuditFailure:value=>{auditFailure=value;}});
  invitationPlatformEnabled=true;
  try{await verifyInvitationContract({load,mock,db,transaction,org,other,act,request,setAuditFailure:value=>{auditFailure=value;}});}finally{invitationPlatformEnabled=false;}
  mock('lib/server/maintenance.ts',{maintenanceState:async()=>({enabled:false,endsAt:null})});

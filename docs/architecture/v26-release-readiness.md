@@ -14,3 +14,5 @@ Stand22.10.2026: **nicht deploymentbereit**. Der Nutzer hat ausdrücklich vollst
 | Produktivfreigabe | Kein Push/Workflowstart/Merge/Deployment in bisherigen lokalen Entwicklungsblöcken. Der Nutzer möchte nach vollständigem V26 deployen. Konkreten Commit, bestandene Gates und verbleibende Risiken vor der gemäss AGENTS.md erforderlichen Freigabe des exakten SHAs vorlegen. |
 
 Ein grüner isolierter Kontrakt bedeutet weder vollständiges V26 noch Produktionsfreigabe. Fachlich oder extern blockierte Funktionen und tatsächlich noch nicht implementierte Pakete getrennt nachführen.
+
+P19-Ergänzung: Minutenreservierung, exakte anteilige Stundenpreisberechnung und PDF-Nachweis lokal gezielt geprüft (siehe Ausführungsregister). F06 bestätigt. P20-Oberfläche sowie ein echter paralleler Mehrverbindungsfall auf nativem PostgreSQL sind noch offen. Der PGlite-Einverbindungstest und die synthetisch gerenderte Testrechnung erfüllen diese Releasegates nicht. V26 weiterhin nicht deploymentbereit.
