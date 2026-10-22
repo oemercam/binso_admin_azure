@@ -305,6 +305,7 @@ try{
    else if(p==='/api/operator/tickets/ticket-one')data={item:{id:'ticket-one',tenant:{name:'Prüffirma AG'},status:'open',priority:'normal'},messages:[{id:'public',body:'Öffentliche Nachricht',author_type:'customer',created_at:'2026-10-09',internal:false},{id:'private',body:'Vertrauliche interne Notiz',author_type:'operator',created_at:'2026-10-09',internal:true}]};
    else if(p==='/api/auth/sensitive-access')data={capabilities:[]};
    else if(/^\/api\/employees\/[^/]+\/wages$/.test(p))data={items:[]};
+   else if(/^\/api\/employees\/[^/]+\/family$/.test(p))data={children:[],claims:[]};
    else if(p==='/api/auth/invitation')data={email:'eingeladen@example.invalid',organization:customer.name,existingAccount:false};
 
 
