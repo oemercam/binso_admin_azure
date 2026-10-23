@@ -7,6 +7,9 @@ import {matchesLocalizedRoute,waitForLocalizedRoute} from './localized-route-con
 import {waitForLabReady} from './shared-control-browser.mjs';
 import {measureListFrameBorders,verifyListFrameMeasurement} from './shared-control-browser.mjs';
 import {selectAppOption,appControlValue} from './app-select-browser.mjs';
+const periodNames={1:'Aktueller Monat',3:'Letzte 3 Monate',6:'Letzte 6 Monate',12:'Letzte 12 Monate'};
+async function chooseStatisticPeriod(page,scope,months){const control=scope.locator('.bo-period-control');if(await control.locator('.bo-period-mobile').isVisible()){await control.locator('.bo-period-mobile').click();const sheet=page.getByRole('dialog',{name:'Zeitraum',exact:true});await sheet.getByRole('radio',{name:periodNames[months],exact:true}).click();await sheet.waitFor({state:'hidden'});}else await control.getByRole('button',{name:periodNames[months],exact:true}).click();assert.equal(await control.locator('.bo-period-segments button[aria-pressed=true]').getAttribute('aria-label'),periodNames[months],'One active period follows the actual shared control');}
+async function openStatisticCalendar(page,scope){const control=scope.locator('.bo-period-control');if(await control.locator('.bo-period-mobile').isVisible()){await control.locator('.bo-period-mobile').click();await page.getByRole('dialog',{name:'Zeitraum',exact:true}).getByRole('radio',{name:'Individueller Zeitraum',exact:true}).click();}else await control.getByRole('button',{name:'Individueller Zeitraum',exact:true}).click();return page.getByRole('dialog',{name:'Zeitraum',exact:true});}
 async function openDocumentHistory(page){const details=page.locator('.document-detail-view details').filter({has:page.locator('summary',{hasText:'Weitere Angaben'})});await details.waitFor({state:'attached'});if(!await details.getAttribute('open'))await details.locator('summary').click();}
 async function assertReturnPosition(page,target){try{await page.waitForFunction(y=>Math.abs(scrollY-y)<=1,target);}catch(error){console.log('Return position mismatch',await page.evaluate(expected=>({expected,actual:scrollY,height:document.documentElement.scrollHeight,viewport:innerHeight,path:location.pathname}),target));throw error;}}
 async function chooseRecordFilter(page,value){await page.getByRole('button',{name:'Filter und Sortierung',exact:true}).click();const sheet=page.getByRole('dialog',{name:'Filter und Sortierung',exact:true});await selectAppOption(sheet.getByLabel('Status',{exact:true}), value);await sheet.getByRole('button',{name:'Anwenden',exact:true}).click();await sheet.waitFor({state:'hidden'});}
@@ -479,7 +482,7 @@ try{
       const header=await page.locator('.mobile-header').boundingBox();assert.ok(header&&header.y>=-1&&header.y<=1,`${route}: primary header stays visible while scrolling`);
       await page.evaluate(()=>window.scrollTo(0,0));await settleFrames(page);
     }
-    if(width<=760&&await page.locator('.mobile-header-detail .mobile-header-title').count()){const titleBox=await page.locator('.mobile-header-detail .mobile-header-title').boundingBox();assert.ok(titleBox&&Math.abs(titleBox.x+titleBox.width/2-width/2)<=1.5,`${route}: detail title is geometrically centered`);}
+    if(width<=760&&await page.locator('.mobile-header-detail .mobile-header-title').count()){const titleBox=await page.locator('.mobile-header-detail .mobile-header-title').boundingBox();if(await page.locator('.app-root[data-ux="master-v3"]').count()){const text=await page.locator('.mobile-header-title>span').first().boundingBox();assert.ok(text&&text.x>=16&&text.x<width/2,`${route}: Master V3 title is left aligned after the back control`);}else assert.ok(titleBox&&Math.abs(titleBox.x+titleBox.width/2-width/2)<=1.5,`${route}: detail title is geometrically centered`);}
     if(width<=760&&await page.locator('.mobile-back').count()){const back=page.locator('.mobile-back');assert.ok(await back.isVisible(),`${route}: detail back control is visible`);const icon=await back.locator('svg').boundingBox();assert.ok(icon&&icon.width>=18&&icon.height>=18&&icon.x>=0,`${route}: back icon is not clipped`);}
     if(!process.env.BINSO_UX_BASELINE&&['/dashboard','/finanzen'].includes(route)){
       const ready=await page.waitForFunction(({dashboard})=>{const metrics=document.querySelectorAll('.bo-cash-overview .bo-metric-tiles>.metric').length,actions=[...document.querySelectorAll('.app-section-dashboard .page-actions .bo-create-action')].filter(el=>el.checkVisibility()).length,legacyActions=document.querySelectorAll('.bo-quick-create-links>a').length,bars=document.querySelectorAll('.bo-overview-bars>button').length;return metrics===4&&(dashboard?actions===1:bars>0||!!document.querySelector('.bo-cash-overview .empty-state'))?{metrics,actions,legacyActions,bars,analysis:document.querySelectorAll('.bo-ring-chart,.bo-statistics').length}:null},{dashboard:route==='/dashboard'});
@@ -489,10 +492,10 @@ try{
       assert.equal(overview.analysis,0,'Detailed analysis is kept out of the compact original overview');
       if(route==='/dashboard'){assert.equal(overview.actions,1,'Dashboard has one page-owned creation trigger');assert.equal(overview.legacyActions,0,'Dashboard has no competing legacy quick links');}
       else{
-       const periods=page.locator('.bo-cash-overview .bo-statistics-periods');await periods.waitFor();assert.equal(await periods.getByRole('button').count(),5,'Shared 1/3/6/12-month and custom controls remain available');
-       const expectedFrom=new Date(Date.UTC(statisticYear,statisticMonth-6,1)).toISOString().slice(0,10),expected=expectedFrom.split('-').reverse().join('.')+' – '+statisticToday.split('-').reverse().join('.');
-       await periods.getByRole('button',{name:'6 M',exact:true}).click();await page.waitForFunction(expected=>document.querySelector('.bo-cash-overview .bo-statistics-dates')?.textContent===expected,expected);assert.equal(await periods.getByRole('button',{name:'6 M',exact:true}).getAttribute('aria-pressed'),'true','Displayed dates follow the selected inclusive range');
-       await periods.getByRole('button',{name:'1 M',exact:true}).click();await page.waitForFunction(()=>document.querySelector('.bo-cash-overview .bo-statistics-periods button')?.getAttribute('aria-pressed')==='true');
+       const overview=page.locator('.bo-cash-overview'),control=overview.locator('.bo-period-control');await control.waitFor();assert.equal(await control.locator('.bo-period-segments>button').count(),5,'Shared 1/3/6/12-month and custom controls remain available');
+       const expectedFrom=new Date(Date.UTC(statisticYear,statisticMonth-6,1)).toISOString().slice(0,10),format=day=>new Intl.DateTimeFormat('de-CH',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'}).format(new Date(day+'T12:00:00Z'));
+       await chooseStatisticPeriod(page,overview,6);assert.equal(await control.getAttribute('title'),format(expectedFrom)+' – '+format(statisticToday),'Compact caption reflects the same inclusive calendar window');assert.equal(await overview.locator('.bo-statistics-dates').count(),0,'No duplicate date line');
+       await chooseStatisticPeriod(page,overview,1);
       }
     }
     if(!process.env.BINSO_UX_BASELINE&&route==='/finanzen/analyse'){
@@ -762,7 +765,7 @@ try{
   for(const height of [568,400]){
     await page.setViewportSize({width:375,height});await page.waitForLoadState("networkidle");await navigate(base+'/zeit');await page.waitForLoadState('networkidle');const timerOrder=await page.locator('.timer-card').evaluate(el=>{const controls=el.querySelector('.timer-actions'),context=el.querySelector('.timer-project');return !!controls&&!!context&&!!(controls.compareDocumentPosition(context)&Node.DOCUMENT_POSITION_FOLLOWING)});assert.equal(timerOrder,true,'Timer controls precede customer and order assignment');
     assert.equal(await page.getByRole('button',{name:'Zeitfilter',exact:true}).count(),0,'Timer hides entry-only filters');
-    await page.getByRole('button',{name:'Manuell erfassen',exact:true}).filter({visible:true}).click();
+    await page.getByRole('button',{name:'Zeit erfassen',exact:true}).filter({visible:true}).click();
     const manual=page.getByRole('dialog',{name:'Zeit manuell erfassen'});await manual.waitFor();await manual.evaluate(async el=>{await Promise.all(el.getAnimations({subtree:true}).map(animation=>animation.finished.catch(()=>{})))});
     await manual.getByLabel('Beschreibung',{exact:true}).focus();
     const geometry=await manual.evaluate(el=>{const header=el.querySelector('.sheet-header').getBoundingClientRect(),footer=el.querySelector('.filter-sheet-actions').getBoundingClientRect();return {headerTop:header.top,footerBottom:footer.bottom,width:document.documentElement.scrollWidth,height:innerHeight}});
@@ -778,33 +781,31 @@ try{
    const overview=page.locator('.bo-cash-overview');
    assert.equal(await overview.locator('.metric').count(),4,'Finance opens the compact original overview');
    assert.equal(await overview.locator('.metric>strong').first().textContent(),'CHF 400.00');
-   await overview.getByRole('button',{name:'6 M',exact:true}).click();
+   await chooseStatisticPeriod(page,overview,6);
    assert.equal(await overview.locator('.metric>strong').first().textContent(),'CHF 640.00');
    assert.equal(await overview.locator('.metric>strong').nth(1).textContent(),'CHF 200.00','Snapshot balances stay independent of the selected period');
    assert.equal(await overview.locator('.bo-overview-bars>button').count(),6,'Six-month selection produces six actual month buckets');
    await overview.locator('.bo-overview-bars>button').last().click();assert.match(await overview.locator('output').textContent(),/CHF 400/);
-   await page.getByRole('navigation',{name:'Finanzen',exact:true}).getByRole('link',{name:'Analyse',exact:true}).click();await page.waitForLoadState('networkidle');
+   await overview.locator('.bo-overview-details>summary').click();await overview.getByRole('link',{name:'Finanzanalyse',exact:true}).click();await page.waitForLoadState('networkidle');
    const statistics=page.locator('.bo-statistics');
    await statistics.locator('.metric>strong').getByText('CHF 320.00',{exact:true}).waitFor();
    assert.equal(await statistics.locator('.bo-metric-tiles>.metric').count(),3);
-   for(const months of [1,3,6,12]){await statistics.getByRole('button',{name:months+' M',exact:true}).click();assert.equal(await statistics.getByRole('button',{name:months+' M',exact:true}).getAttribute('aria-pressed'),'true');assert.equal(await statistics.locator('.metric>strong').first().textContent(),months===1?'CHF 200.00':'CHF 320.00');}
-   await statistics.getByRole('button',{name:'Eigenen Statistikzeitraum wählen',exact:true}).click();
-   const periodSheet=page.getByRole('dialog',{name:'Statistikzeitraum',exact:true});
-   await periodSheet.getByLabel('Von *',{exact:true}).fill(previousStatisticFrom);await periodSheet.getByLabel('Bis *',{exact:true}).fill(previousStatisticTo);
+   for(const months of [1,3,6,12]){await chooseStatisticPeriod(page,statistics,months);assert.equal(await statistics.locator('.metric>strong').first().textContent(),months===1?'CHF 200.00':'CHF 320.00');}
+   const periodSheet=await openStatisticCalendar(page,statistics);
+   await periodSheet.getByLabel('Von',{exact:true}).fill(previousStatisticFrom);await periodSheet.getByLabel('Bis',{exact:true}).fill(previousStatisticTo);
    await capture(page,{animations:'disabled',path:path.join(output,`${theme}-430-period-sheet.png`)});
    await periodSheet.getByRole('button',{name:'Anwenden',exact:true}).click();
    assert.equal(await statistics.locator('.metric>strong').first().textContent(),'CHF 120.00');
    assert.equal(await statistics.locator('.metric>strong').nth(1).textContent(),'CHF 0.00','No invented historical outflows');
    assert.equal(await statistics.locator('.metric>strong').nth(2).textContent(),'CHF 120.00','Payment balance uses income minus recorded outflows');
    await page.locator('.financial-snapshot>summary').click();assert.ok((await page.locator('.financial-snapshot').innerText()).includes('20.00'),'Overdue receivables stay separate from the period cash ledger');
-   await page.getByRole('navigation',{name:'Finanzen',exact:true}).getByRole('link',{name:'Rechnungen',exact:true}).click();await waitForLocalizedRoute(page,base+"/rechnungen");await page.waitForLoadState('networkidle');
+   await page.locator('a[href="/rechnungen"]').filter({visible:true}).first().click();await waitForLocalizedRoute(page,base+"/rechnungen");await page.waitForLoadState('networkidle');
    await page.locator('.document-summary-row').filter({hasText:'RE-TEST-1'}).filter({visible:true}).first().waitFor();assert.ok(await page.locator('.document-summary-row').filter({hasText:'RE-TEST-1'}).filter({visible:true}).count()>0,'Analysis period does not filter the actual invoice list');
    await page.locator('a[href="/dashboard"]').filter({visible:true}).first().click();await waitForLocalizedRoute(page,base+"/dashboard");await page.waitForLoadState('networkidle');await page.locator('a[href="/finanzen"]').filter({visible:true}).first().click();await waitForLocalizedRoute(page,base+"/finanzen");await page.waitForLoadState('networkidle');
-   await page.getByRole('navigation',{name:'Finanzen',exact:true}).getByRole('link',{name:'Analyse',exact:true}).click();await page.waitForLoadState('networkidle');
+   await overview.locator('.bo-overview-details>summary').click();await overview.getByRole('link',{name:'Finanzanalyse',exact:true}).click();await page.waitForLoadState('networkidle');
    try{await page.locator('.bo-statistics .metric>strong').first().filter({hasText:/^CHF 120\.00$/}).waitFor();}catch(error){console.log('Period restore diagnostics',await page.locator('.bo-statistics .metric>strong').allTextContents(),await page.evaluate(()=>({...sessionStorage})),page.url());throw error;}
    assert.equal(await page.locator('.bo-statistics .metric>strong').first().textContent(),'CHF 120.00','Custom period survives actual same-tab navigation');
-   await page.locator('.bo-statistics').getByRole('button',{name:'Eigenen Statistikzeitraum wählen',exact:true}).click();
-   const emptySheet=page.getByRole('dialog',{name:'Statistikzeitraum',exact:true});await emptySheet.getByLabel('Von *',{exact:true}).fill('2020-01-01');await emptySheet.getByLabel('Bis *',{exact:true}).fill('2020-01-02');await emptySheet.getByRole('button',{name:'Anwenden',exact:true}).click();
+   const emptySheet=await openStatisticCalendar(page,page.locator('.bo-statistics'));await emptySheet.getByLabel('Von',{exact:true}).fill('2020-01-01');await emptySheet.getByLabel('Bis',{exact:true}).fill('2020-01-02');await emptySheet.getByRole('button',{name:'Anwenden',exact:true}).click();
    await page.getByText('Keine Entwicklung im Zeitraum',{exact:true}).waitFor();
    const emptyTrend=page.getByRole('button',{name:'Zeitverlauf anzeigen',exact:true});assert.equal(await emptyTrend.count(),0,'An empty period must not offer a meaningless trend toggle');
    assert.equal(await page.locator('.bo-statistics-line,.bo-statistics-point').count(),0,'An empty period renders no fabricated zero chart');
@@ -826,8 +827,8 @@ try{
   await verifyTimeWorkspace(page,{capture:width=>capture(page,{animations:'disabled',path:path.join(output,`${theme}-${width}-time-workspace-central.png`),fullPage:true})});
   }
   if(hasInteraction('time')){
-   await page.getByRole('button',{name:'Zeitfilter',exact:true}).click();let filter=page.getByRole('dialog',{name:'Zeitfilter',exact:true});await filter.getByLabel('Von',{exact:true}).fill('2099-01-01');await page.keyboard.press('Escape');assert.equal(await page.locator('.time-group').count(),1,'Cancelling a filter preserves the applied range');
-   await page.getByRole('button',{name:'Zeitfilter',exact:true}).click();filter=page.getByRole('dialog',{name:'Zeitfilter',exact:true});assert.equal(await appControlValue(filter.getByLabel('Von',{exact:true})),'','Discarded range is not applied');await filter.getByLabel('Von',{exact:true}).fill('2099-01-01');await filter.getByRole('button',{name:'Anwenden',exact:true}).click();assert.equal(await page.locator('.time-group').count(),0,'Applying updates the entries');
+   let filter=await openStatisticCalendar(page,page.locator('.app-root'));const initialFrom=await appControlValue(filter.getByLabel('Von',{exact:true}));await filter.getByLabel('Bis',{exact:true}).fill('2099-01-02');await filter.getByLabel('Von',{exact:true}).fill('2099-01-01');await page.keyboard.press('Escape');assert.equal(await page.locator('.time-group').count(),1,'Cancelling a filter preserves the applied range');
+   filter=await openStatisticCalendar(page,page.locator('.app-root'));assert.equal(await appControlValue(filter.getByLabel('Von',{exact:true})),initialFrom,'Discarded range is not applied');await filter.getByLabel('Bis',{exact:true}).fill('2099-01-02');await filter.getByLabel('Von',{exact:true}).fill('2099-01-01');await filter.getByRole('button',{name:'Anwenden',exact:true}).click();assert.equal(await page.locator('.time-group').count(),0,'Applying updates the entries');
    // Independent review is a server/DB invariant, never a user-disableable toggle.
    policyPosts=0;policyRequired=true;failPolicy=true;await navigate(base+'/einstellungen/zeiterfassung');await page.waitForLoadState('networkidle');
    await page.getByRole('alert').filter({hasText:'Fixture policy unavailable'}).waitFor();assert.equal(await page.getByText('Unabhängige Freigabe',{exact:true}).count(),0,'Failed policy read cannot claim a known approval state');
@@ -1104,7 +1105,7 @@ try{
    const group=page.locator('.time-group-head').first();assert.equal(await group.evaluate(el=>getComputedStyle(el).textAlign),'left','Time group does not inherit timer centering');
    const customerBox=await group.locator('b').boundingBox(),duration=await group.locator('strong').boundingBox(),chevron=await group.locator('svg').boundingBox();assert.ok(customerBox.x<duration.x&&duration.x<chevron.x,'Group duration and chevron are right aligned');assert.ok((await group.boundingBox()).height<=76,'Collapsed group is compact');
    await capture(page,{animations:'disabled',path:path.join(output,`${theme}-320-time-groups-final.png`)});
-   await page.getByRole('button',{name:'Manuell erfassen',exact:true}).click();const sheet=page.getByRole('dialog',{name:'Zeit manuell erfassen'});assert.equal(await sheet.getByRole('button',{name:'Speichern',exact:true}).count(),1);
+   await page.getByRole('button',{name:'Zeit erfassen',exact:true}).click();const sheet=page.getByRole('dialog',{name:'Zeit manuell erfassen'});assert.equal(await sheet.getByRole('button',{name:'Speichern',exact:true}).count(),1);
    await page.setViewportSize({width:320,height:400});await sheet.getByLabel('Beschreibung',{exact:true}).focus();await sheet.getByLabel('Beschreibung',{exact:true}).scrollIntoViewIfNeeded();const footer=await sheet.locator('.filter-sheet-actions').boundingBox(),header=await sheet.locator('.sheet-header').boundingBox();assert.ok(header.y>=0&&footer.y+footer.height<=401&&footer.x+footer.width<=321,'Manual time sheet keeps header and footer visible at keyboard-sized height');
    await capture(page,{animations:'disabled',path:path.join(output,`${theme}-320-400-manual-time-final.png`)});await page.keyboard.press('Escape');groupingFixture=false;
   }
@@ -1130,7 +1131,7 @@ try{
     assert.equal(await page.locator('.bottom-sheet').count(),0,'Header search is not a bottom sheet');
     assert.equal(await panel.getByRole('button',{name:'Abbrechen',exact:true}).filter({visible:true}).count(),width<=760?1:0,'Mobile search cancels beside the input; desktop uses the anchored close control');
     assert.equal(await panel.getByLabel('Suchen',{exact:true}).evaluate(el=>el===document.activeElement),true,'Search focuses its input');
-    const box=await panel.boundingBox(),bar=await header.boundingBox();assert.ok(box.x>=0&&box.x+box.width<=width+1,'Panel stays within viewport');if(width<=760){assert.ok(box.y<=1&&box.height>=739,'Mobile search owns a full view');assert.equal(await page.locator('.page-head h1').filter({visible:true}).textContent(),'Dein Überblick.');}else assert.ok(box.y>=bar.y+bar.height-1,'Desktop panel remains anchored under header');
+    const box=await panel.boundingBox(),bar=await header.boundingBox();assert.ok(box.x>=0&&box.x+box.width<=width+1,'Panel stays within viewport');if(width<=760){assert.ok(box.y<=1&&box.height>=739,'Mobile search owns a full view');assert.match(await page.locator('.page-head h1').filter({visible:true}).textContent(),/^Guten (Morgen|Tag|Abend)(, .+)?$/,'Dashboard keeps its actual profile/time greeting while search is open');}else assert.ok(box.y>=bar.y+bar.height-1,'Desktop panel remains anchored under header');
     assert.equal(await page.evaluate(()=>document.body.style.overflow),'clip');
     assert.equal(await panel.getByText('Mindestens zwei Zeichen eingeben.',{exact:true}).count(),0);
     // Request observation precedes route-handler entry in WebKit. Synchronize both
