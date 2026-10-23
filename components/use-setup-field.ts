@@ -9,6 +9,24 @@ export function useSetupField(allowed:readonly SetupField[],loaded:boolean,editi
  const field=candidate&&allowed.includes(candidate)?candidate:null;
  const opened=useRef<string|null>(null);
  useEffect(()=>{if(!field||!loaded||!canWrite||editing||opened.current===field)return;const frame=requestAnimationFrame(()=>{opened.current=field;beginEdit()});return()=>cancelAnimationFrame(frame)},[field,loaded,canWrite,editing,beginEdit]);
- useEffect(()=>{if(!editing||!field)return;const frame=requestAnimationFrame(()=>{const input=document.getElementById(setupFieldIds[field]);const target=input instanceof HTMLInputElement&&input.hidden?input.closest('.form-field')?.querySelector<HTMLElement>('button'):input;if(target){target.focus({preventScroll:true});target.scrollIntoView({block:'nearest'})}});return()=>cancelAnimationFrame(frame)},[editing,field]);
+ useEffect(()=>{
+  if(!editing||!field)return;
+  let frame:number,focused=false;
+  const scheduleFocus=()=>{
+   cancelAnimationFrame(frame);
+   frame=requestAnimationFrame(()=>{
+    if(focused)return;
+    const input=document.getElementById(setupFieldIds[field]);
+    const target=input instanceof HTMLInputElement&&input.hidden?input.closest('.form-field')?.querySelector<HTMLElement>('button'):input;
+    if(!target||target.closest('[inert]'))return;
+    target.focus({preventScroll:true});
+    if(document.activeElement===target){focused=true;target.scrollIntoView({block:'nearest'});}
+   });
+  };
+  // FormSheet mounts its portal after a microtask. Retry on the existing modal
+  // lifecycle event, after its focus trap has initialized, without polling.
+  window.addEventListener('binso-modal-open',scheduleFocus);scheduleFocus();
+  return()=>{cancelAnimationFrame(frame);window.removeEventListener('binso-modal-open',scheduleFocus)};
+ },[editing,field]);
  return {field,returnTo:field?safeAppPath(search.get('returnTo'),'/dashboard'):null};
 }

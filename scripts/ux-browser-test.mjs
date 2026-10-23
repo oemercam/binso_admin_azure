@@ -1041,7 +1041,7 @@ try{
   }
   if(hasInteraction('expenses')){
   failMutation=true;posts=0;uploads=0;
-  await page.waitForLoadState("networkidle");await navigate(base+'/spesen/neu');await page.waitForLoadState('networkidle');await page.getByLabel('Händler',{exact:true}).fill('SBB');await page.getByLabel('Betrag',{exact:true}).fill('89');await page.getByLabel('Bezahlt mit',{exact:true}).selectOption('company_card');
+  await page.waitForLoadState("networkidle");await navigate(base+'/spesen/neu');await page.waitForLoadState('networkidle');await page.getByLabel('Händler',{exact:true}).fill('SBB');await page.getByLabel('Betrag',{exact:true}).fill('89');await selectAppOption(page.getByLabel('Bezahlt mit',{exact:true}),'company_card');
   await page.locator('#expense-receipt-upload').setInputFiles({name:'receipt.png',mimeType:'image/png',buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jB1kAAAAASUVORK5CYII=','base64')});
   await page.waitForFunction(()=>[...document.querySelectorAll('button')].some(button=>button.textContent==='Einreichen'&&button.disabled));
   assert.equal(await page.getByRole('button',{name:'Einreichen',exact:true}).filter({visible:true}).first().isEnabled(),false,'Cannot submit while receipt recognition is running');
@@ -1206,13 +1206,18 @@ try{
    const headerReturn=await leaveSettings();await page.locator('.mobile-back').click();await waitForLocalizedRoute(page,base+'/einstellungen');await assertReturnPosition(page,headerReturn);
    const nativeReturn=await leaveSettings();await page.goBack();await waitForLocalizedRoute(page,base+'/einstellungen');await assertReturnPosition(page,nativeReturn);
    assert.equal(await page.locator('.settings-mobile-navigation').count(),0,'No redundant mobile hamburger/context strip');
-   await settingsContent.getByLabel('Einstellungen suchen',{exact:true}).fill('Abonnement');
-   assert.equal(await settingsContent.locator('.bo-settings-group').count(),1,'Settings search hides empty groups');
-   assert.equal(await settingsContent.locator('.bo-settings-group .action-row').count(),1,'Settings search retains only the matching authorized route');
-   const groupSurface=await settingsContent.locator('.bo-settings-group-body').evaluate(el=>({border:getComputedStyle(el).borderTopWidth,radius:getComputedStyle(el).borderTopLeftRadius,background:getComputedStyle(el).backgroundColor}));
+   const settingsNavigation=settingsContent.locator('.settings-overview'),guidePreference=settingsContent.getByRole('switch',{name:'Einrichtungshilfe anzeigen',exact:true});
+   const guideChecked=await guidePreference.isChecked();
+   await settingsNavigation.getByLabel('Einstellungen suchen',{exact:true}).fill('Abonnement');
+   assert.equal(await settingsNavigation.locator('.bo-settings-group').count(),1,'Settings search hides empty navigation groups');
+   assert.equal(await settingsNavigation.locator('.bo-settings-group .action-row').count(),1,'Settings search retains only the matching authorized route');
+   await settingsNavigation.getByRole('link',{name:'Abonnement',exact:true}).waitFor();
+   assert.equal(await guidePreference.isChecked(),guideChecked,'Searching destinations preserves the separate setup preference');
+   const groupSurface=await settingsNavigation.locator('.bo-settings-group-body').evaluate(el=>({border:getComputedStyle(el).borderTopWidth,radius:getComputedStyle(el).borderTopLeftRadius,background:getComputedStyle(el).backgroundColor}));
    assert.equal(groupSurface.border,'0px');assert.equal(groupSurface.radius,'0px');assert.notEqual(groupSurface.background,'rgba(0, 0, 0, 0)','Grouped settings have a real surface without an outline');
-   await settingsContent.getByLabel('Einstellungen suchen',{exact:true}).fill('no-such-setting');await settingsContent.getByText('Keine passenden Einstellungen',{exact:true}).waitFor();
-   await settingsContent.getByLabel('Einstellungen suchen',{exact:true}).fill('');assert.ok(await settingsContent.locator('.bo-settings-group').count()>=2,'Clearing search restores the groups');
+   await settingsNavigation.getByLabel('Einstellungen suchen',{exact:true}).fill('no-such-setting');await settingsNavigation.getByText('Keine passenden Einstellungen',{exact:true}).waitFor();
+   assert.equal(await settingsNavigation.locator('.bo-settings-group').count(),0,'A search without matches leaves no empty navigation groups');assert.equal(await guidePreference.isChecked(),guideChecked,'An empty search cannot change setup preferences');
+   await settingsNavigation.getByLabel('Einstellungen suchen',{exact:true}).fill('');assert.ok(await settingsNavigation.locator('.bo-settings-group').count()>=2,'Clearing search restores the groups');
    await capture(page,{animations:'disabled',path:path.join(output,`${theme}-390-grouped-settings.png`)});
 
    // Actual settings UI, controlled scanner verdicts; not a live antivirus-engine test.
@@ -1271,7 +1276,7 @@ try{
    await page.evaluate(()=>document.dispatchEvent(new Event('visibilitychange')));await settingsRead;await page.waitForLoadState('networkidle');
    assert.equal(await appControlValue(page.getByLabel('Rechnung – Einleitung',{exact:true})),'Unsaved settings survive revalidation','Background settings data cannot overwrite an edited form');
    await context.unroute('**/api/settings/documents',settingsFailure);
-   await verifyBusinessReadinessBrowser({page,context,navigate:url=>page.goto(url),base,invoice});
+   await verifyBusinessReadinessBrowser({page,context,navigate:url=>page.goto(url),base,invoice,capture:name=>capture(page,{animations:'disabled',path:path.join(output,`${theme}-390-readiness-${name}.png`)})});
    await page.setViewportSize({width:320,height:740});await navigate(base+'/einstellungen/benachrichtigungen');await page.waitForLoadState('networkidle');
    for(const row of await page.locator('.preference-row').all()){
     const geometry=await row.evaluate(el=>{const description=el.firstElementChild.getBoundingClientRect(),channels=el.querySelector('.preference-channels').getBoundingClientRect(),label=el.querySelector('.preference-channels label span').getBoundingClientRect();return {description,channels,label}});
