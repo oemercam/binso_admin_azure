@@ -106,6 +106,8 @@ export async function verifyNavigationPersistence(page,{base,capture=async()=>{}
   assert.equal(await page.locator('.settings-mobile-navigation').count(),0,'Phone settings use the overview without an extra hamburger');
   await page.locator('.mobile-back').click();await page.waitForURL(base+'/einstellungen');await page.waitForLoadState('networkidle');
   assert.equal(await page.locator('.settings-overview').getByRole('link',{name:'Sicherheit',exact:true}).count(),0,'Security remains in the personal account area');
+  // V4.1 settings is a detail header (back/title/actions), without a competing account avatar.
+  await page.locator('.mobile-back').click();await page.waitForURL(base+'/dashboard');await page.waitForLoadState('networkidle');
   await page.getByRole('button',{name:'Benutzerkonto',exact:true}).filter({visible:true}).click();
   const security=page.locator('.account-sheet').getByRole('link',{name:'Sicherheit',exact:true});await security.focus();await security.press('Enter');await page.waitForURL(url=>url.pathname==='/einstellungen/sicherheit');
   await page.getByRole('button',{name:'Passwort ändern',exact:true}).click();

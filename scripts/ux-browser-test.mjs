@@ -10,7 +10,7 @@ import {selectAppOption,appControlValue} from './app-select-browser.mjs';
 const periodNames={1:'Aktueller Monat',3:'Letzte 3 Monate',6:'Letzte 6 Monate',12:'Letzte 12 Monate'};
 async function chooseStatisticPeriod(page,scope,months){const control=scope.locator('.bo-period-control');if(await control.locator('.bo-period-mobile').isVisible()){await control.locator('.bo-period-mobile').click();const sheet=page.getByRole('dialog',{name:'Zeitraum',exact:true});await sheet.getByRole('radio',{name:periodNames[months],exact:true}).click();await sheet.waitFor({state:'detached'});await page.waitForFunction(()=>!document.documentElement.hasAttribute('data-modal-overlay'));}else await control.getByRole('button',{name:periodNames[months],exact:true}).click();assert.equal(await control.locator('.bo-period-segments button[aria-pressed=true]').getAttribute('aria-label'),periodNames[months],'One active period follows the actual shared control');}
 async function openStatisticCalendar(page,scope){const control=scope.locator('.bo-period-control');if(await control.locator('.bo-period-mobile').isVisible()){await control.locator('.bo-period-mobile').click();await page.getByRole('dialog',{name:'Zeitraum',exact:true}).getByRole('radio',{name:'Individueller Zeitraum',exact:true}).click();}else await control.getByRole('button',{name:'Individueller Zeitraum',exact:true}).click();return page.getByRole('dialog',{name:'Zeitraum',exact:true});}
-async function openDocumentHistory(page){const details=page.locator('.document-detail-view details').filter({has:page.locator('summary',{hasText:'Weitere Angaben'})});await details.waitFor({state:'attached'});if(!await details.getAttribute('open'))await details.locator('summary').click();}
+async function openDocumentHistory(page){const details=page.locator('.document-detail-view details').filter({has:page.locator('summary',{hasText:'Weitere Angaben'})});await details.waitFor({state:'attached'});if(await details.getAttribute('open')===null)await details.locator('summary').click();}
 async function assertReturnPosition(page,target){try{await page.waitForFunction(y=>Math.abs(scrollY-y)<=1,target);}catch(error){console.log('Return position mismatch',await page.evaluate(expected=>({expected,actual:scrollY,height:document.documentElement.scrollHeight,viewport:innerHeight,path:location.pathname}),target));throw error;}}
 async function chooseRecordFilter(page,value){await selectAppOption(page.getByRole('combobox',{name:'Filter',exact:true}),value);}
 import {verifyStableAppNavigation} from './app-workspace-browser.mjs';
@@ -821,7 +821,7 @@ try{
    const emptyTrend=page.getByRole('button',{name:'Zeitverlauf anzeigen',exact:true});assert.equal(await emptyTrend.count(),0,'An empty period must not offer a meaningless trend toggle');
    assert.equal(await page.locator('.bo-statistics-line,.bo-statistics-point').count(),0,'An empty period renders no fabricated zero chart');
    assert.equal(await page.locator('.bo-comparison-track>i').evaluateAll(nodes=>nodes.every(node=>parseFloat(getComputedStyle(node).width)===0)),true,'Zero cash renders empty comparison tracks');
-   const snapshot=page.locator('.bo-finance-analysis>.bo-data-disclosure').first();if(!await snapshot.getAttribute('open'))await snapshot.locator('summary').click();const overdueLink=snapshot.getByRole('link').filter({hasText:'Überfällig'});await overdueLink.focus();await overdueLink.press('Enter');await page.waitForURL(url=>url.pathname==='/rechnungen'&&url.searchParams.get('status')==='Überfällig');
+   const snapshot=page.locator('.bo-finance-analysis>.bo-data-disclosure').first();if(await snapshot.getAttribute('open')===null)await snapshot.locator('summary').click();const overdueLink=snapshot.getByRole('link').filter({hasText:'Überfällig'});await overdueLink.focus();await overdueLink.press('Enter');await page.waitForURL(url=>url.pathname==='/rechnungen'&&url.searchParams.get('status')==='Überfällig');
    await page.locator('.records-active-line').filter({hasText:'Überfällig'}).waitFor();
    await chooseRecordFilter(page,'Alle');assert.equal(new URL(page.url()).searchParams.has('status'),false,'A user filter change clears the consumed chart drilldown');
   }
@@ -1285,7 +1285,8 @@ try{
    await page.evaluate(()=>{window.__settingsRetryMarker='same-document'});failDocumentSettings=false;
    await page.getByRole('button',{name:'Erneut versuchen',exact:true}).click();await page.getByText('Synthetischer Rechnungstext',{exact:true}).waitFor();
    assert.equal(await page.evaluate(()=>window.__settingsRetryMarker),'same-document','Settings retry refetches the resource without reloading the app');
-   await openSettingsEditor(page);
+   // This document-settings owner retains its direct authorized edit control.
+   await page.getByRole('button',{name:'Bearbeiten',exact:true}).filter({visible:true}).click();
    await page.getByLabel('Rechnung – Einleitung',{exact:true}).fill('Unsaved settings survive revalidation');
    const settingsRead=page.waitForResponse(response=>new URL(response.url()).pathname==='/api/settings/documents');
    await page.evaluate(()=>document.dispatchEvent(new Event('visibilitychange')));await settingsRead;await page.waitForLoadState('networkidle');
