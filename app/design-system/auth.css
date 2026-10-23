@@ -28,7 +28,7 @@
 .auth-page{grid-template-columns:minmax(0,1fr);align-items:center}
 .auth-card{width:min(100%,440px);margin-inline:auto}
 .auth-card>.logo{margin-bottom:40px}
-.auth-workspace.auth-page{--app-accent:var(--app-action-accent);--control-label-font:13px;--control-label-weight:500;--control-font:16px;--control-h:48px;--control-radius:12px;--control-border:var(--auth-control-border);--button-radius:5px;display:flex;flex-direction:column;align-items:stretch;padding:28px clamp(20px,4vw,64px);gap:16px;--button-height:var(--access-control-height)}
+.auth-workspace.auth-page{--app-accent:var(--app-action-accent);--control-label-font:13px;--control-label-weight:500;--control-font:var(--type-control);--control-h:48px;--control-radius:12px;--control-border:var(--auth-control-border);--button-radius:5px;display:flex;flex-direction:column;align-items:stretch;padding:28px clamp(20px,4vw,64px);gap:16px;--button-height:var(--access-control-height)}
 .auth-workspace-header,.auth-workspace-footer{width:100%;max-width:1024px;margin-inline:auto;display:flex;align-items:center;justify-content:space-between;gap:20px}
 .auth-workspace-body{flex:none;display:grid;grid-template-columns:minmax(0,440px);justify-content:center;align-items:start;gap:0;width:100%;max-width:1024px;margin-inline:auto;padding-block:55px 65px}
 .auth-workspace-body>.auth-card{width:100%;max-width:440px;border:0;padding:20px 0 10px}
@@ -72,5 +72,5 @@
 }
 
 @media (pointer:coarse){
-.auth-workspace.auth-page{--control-font:16px}
+.auth-workspace.auth-page{--control-font:var(--type-control)}
 }

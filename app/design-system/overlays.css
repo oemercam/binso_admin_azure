@@ -277,7 +277,7 @@
 .header-panel{width:100%;height:100%;max-height:100%;border-radius:0;padding:var(--safe-top) max(var(--mobile-page-x),var(--safe-right)) max(16px,var(--safe-bottom)) max(var(--mobile-page-x),var(--safe-left));box-shadow:none}
 .header-panel-layer{inset:var(--dialog-viewport-top,0px) 0 auto;height:min(var(--dialog-available-height),100dvh);padding:0;justify-content:stretch;background:var(--color-bg)}
 .bottom-sheet .sheet-header .icon-button,.header-panel-heading .icon-button{border:0;border-radius:50%;background:var(--app-chrome)}
-.bottom-sheet,.header-panel,.confirm-dialog{--control-h:44px;--control-font:16px}
+.bottom-sheet,.header-panel,.confirm-dialog{--control-h:44px;--control-font:var(--type-control)}
 }
 .context-actions-inline,.context-action-group{
   display:flex;
