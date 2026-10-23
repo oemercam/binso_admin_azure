@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';import fs from 'node:fs';import {randomUUID} from 'node:crypto';import {NextRequest} from 'next/server.js';
 export async function verifySupplierInvoiceReview({load,db,transaction,org,other,act,request,setAuditFailure}){
- if(!(await db.query("select 1 from information_schema.tables where table_name='supplier_invoice_reviews'")).rowCount)await db.exec(fs.readFileSync('database/migrations/0104_supplier_invoice_reviews.sql','utf8'));
+ if(!(await db.query("select 1 from information_schema.tables where table_name='supplier_invoice_reviews'")).rows.length)await db.exec(fs.readFileSync('database/migrations/0104_supplier_invoice_reviews.sql','utf8'));
  const sessions=(await db.query("update auth_sessions set expires_at=now()+interval '1 hour',step_up_at=now() returning id,user_id,organization_id")).rows;
  const as=(role,tenant=org,extra={})=>{const userId='employee-dossier-'+(tenant===other?'foreign':role);return act(role,tenant,{userId,sessionId:sessions.find(a=>a.user_id===userId&&a.organization_id===tenant)?.id,...extra});};
  let invoice=(await db.query("select * from supplier_invoices where organization_id=$1 and supplier_invoice_no='SYNTHETIC-MATCH-120H'",[org])).rows[0];assert.ok(invoice&&invoice.status==='draft','Requires a preserved unapproved synthetic comparison fixture');

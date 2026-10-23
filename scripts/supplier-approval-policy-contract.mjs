@@ -14,7 +14,7 @@ export async function verifySupplierReadonly({load,db,org,act,request}){
 }
 export async function verifySupplierApprovalPolicy({load,db,transaction,org,other,act,request,setAuditFailure}){
  // This targeted runner extends only the preserved synthetic native database.
- if(!(await db.query("select 1 from information_schema.columns where table_name='organizations' and column_name='ap_approval_policy'")).rowCount)await db.exec(fs.readFileSync('database/migrations/0103_supplier_approval_policy.sql','utf8'));
+ if(!(await db.query("select 1 from information_schema.columns where table_name='organizations' and column_name='ap_approval_policy'")).rows.length)await db.exec(fs.readFileSync('database/migrations/0103_supplier_approval_policy.sql','utf8'));
  const sessions=(await db.query("update auth_sessions set expires_at=now()+interval '1 hour',step_up_at=now() returning id,user_id,organization_id")).rows;
  const as=(role,tenant=org,extra={})=>{const userId='employee-dossier-'+(tenant===other?'foreign':role);return act(role,tenant,{userId,sessionId:sessions.find(a=>a.user_id===userId&&a.organization_id===tenant)?.id,...extra});};
  const route=load('app/api/suppliers/approval-policy/route.ts'),pure=load('lib/supplier-approval-policy.ts');as('owner');let r=await route.GET();assert.equal(r.status,200);let current=(await r.json()).item;

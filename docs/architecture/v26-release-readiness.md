@@ -24,3 +24,15 @@ Readiness23.10.2026: Die Docker-/WSL-/Loopback-DB-Blockade ist behoben. Native P
 P23: nativer Einkaufsleistungs-/Rechnungsabgleich mit exakten zentralen Sollwerten und sichtbaren Nulltoleranz-Abweichungen implementiert/gezielt geprüft. Keine Freigabe oder Zahlung. F07-Prüfprozess nun fachlich bestätigt, Umsetzung P24 folgt gesondert. F03/F04-Grundlage darf mandantenspezifisch konfigurierbar vorbereitet werden; fehlender validierter Payrollanbieter/Parameter/Referenzfall bleibt konkrete Produktionssperre, kein Blocker für unabhängige Entwicklung.
 
 P24: AP-Regeln (Solo/optionale Vier-Augen-/währungsgetrennte Bruttogrenzen) sowie expliziter revisionsgebundener Freigabe-/Rückfragekern lokal implementiert. Tatsächliche Native-/RLS-/Audit-/Parallelitäts- und Desktop-/Mobile-Browsernachweise im Register. Keine Zahlung oder externe Benachrichtigung daraus. P25/P26 und übrige V26-Funktionen bleiben offen; kein vollständiger V26-Release.
+
+## Azure-Staging-Vorschau – 23.10.2026
+
+Der Nutzer beauftragt die Bereitstellung des sichtbaren Zwischenstands. Anwendungskandidat vor den Prüfeinrichtungs-Korrekturen: `48fafc2ba460afa22b80525ef9fc8ae2df25c11c`, Draft-PR [#310](https://github.com/oemercam/binso_admin_azure/pull/310). Dies ist eine isolierte Vorschau, keine vollständige V26-Abnahme oder Produktionsfreigabe.
+
+- Bestehender Azure-Slot `staging`: eigene synthetische Datenbank, eigene nicht privilegierte Runtime-Rolle, eigene Sitzungscookies und Verschlüsselung. Mail-/Stripe-/Produktionsblob-Zugang entfernt. Produktions-AppSettings auf unveränderte Werte geprüft. Keine Produktionsmigration, kein Slot-Swap.
+- Erster CI-Lauf: Linux-Kompilierung, CodeQL, Avatar, Dokumentrabatte, responsive Stichprobe und echte Scannerengine-Qualifikation erfolgreich. Quality/Readiness scheiterten an veralteten Testmodul-Zuordnungen, synthetischen Erstattungsdaten und fehlendem PDF-Ausgabeverzeichnis.
+- Korrekturen ausschliesslich an Prüfscripten/Fixtures: tatsächliche vorhandene Module laden, vollständige synthetische Zahlungsbelege, PGlite-Ergebnisadapter korrekt auswerten, PDF-Ausgabe atomar anlegen. Historische HR-Freigaben werden nicht in neue Demomandanten kopiert; zusätzliche Negativprüfung schützt diese Grenze. Keine Anwendungs-, Schema- oder Sicherheitsregeländerung.
+- Lokal tatsächlich bestanden: `business-readiness-test.mjs`, `employee-dossier-test.mjs` (einschliesslich V26-Absenz-/Minuten-/AP-Kontrakten), `offer-response-test.mjs`, vollständiger gezielter `migration-test.mjs`, Typecheck und ESLint der geänderten Dateien. Die nachgewiesenen Fehler wurden einzeln behoben; keine neue vollständige Browsermatrix.
+- Nach dem gebündelten Korrekturcommit: automatische GitHub-Pflichtprüfungen und exaktes Linux-Artefakt noch zu bestätigen. Deployment und HTTPS-/Login-Nachweis werden erst nach tatsächlicher Durchführung als bestanden ergänzt. Physische Geräte, vollständige Releaseabnahme und oben genannte funktionale/fachliche Produktionsblocker bleiben offen.
+
+Zugangsdaten und Datenbankarchive liegen ausserhalb des Repositories im privaten lokalen Evidenzverzeichnis; keine Geheimnisse im Commit.

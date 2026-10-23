@@ -1,3 +1,4 @@
+import {writeTestOutput} from './test-output.mjs';
 import assert from 'node:assert/strict';
 import {randomUUID,createHash} from 'node:crypto';
 import fs from 'node:fs';
@@ -42,7 +43,7 @@ export async function verifyMinuteAllocations({load,db,transaction,org,other,act
  const status=load('app/api/documents/[number]/status/route.ts'),transition=(number,action)=>status.POST(request({action}),{params:Promise.resolve({number})});
  response=await transition(c.number,'issue');assert.equal(response.status,200,await response.clone().text());assert.equal(await reserved(),120,'Issue does not double-reserve');
  const issuedCapacity=await billing.GET(new NextRequest('https://employee.invalid/api/time-entries/billing?'+new URLSearchParams({minuteAllocations:'1',ids:f.entryId,draft:c.number})));assert.deepEqual((await issuedCapacity.json()).items,[],'Issued invoice numbers never credit back reserved minutes');
- const frozen=(await db.query('select pdf,pdf_sha256 from invoice_versions where organization_id=$1 and invoice_id=$2',[org,c.id])).rows[0];assert.ok(frozen.pdf.length>1000);assert.equal(createHash('sha256').update(frozen.pdf).digest('hex'),frozen.pdf_sha256);fs.writeFileSync('../evidence/v26-minute-issued.pdf',Buffer.from(frozen.pdf));
+ const frozen=(await db.query('select pdf,pdf_sha256 from invoice_versions where organization_id=$1 and invoice_id=$2',[org,c.id])).rows[0];assert.ok(frozen.pdf.length>1000);assert.equal(createHash('sha256').update(frozen.pdf).digest('hex'),frozen.pdf_sha256);fs.mkdirSync('../evidence',{recursive:true});await writeTestOutput('../evidence/v26-minute-issued.pdf',Buffer.from(frozen.pdf));
  assert.equal((await update({...c,document_revision:(await (await read(c.number)).json()).item.document_revision},body(1))).status,409);
  assert.equal((await discard({...c,document_revision:(await (await read(c.number)).json()).item.document_revision})).status,409);
  const allocation=(await db.query('select invoice_line_id from invoice_line_time_entries where organization_id=$1 and time_entry_id=$2 and allocated_minutes=61',[org,f.entryId])).rows[0];

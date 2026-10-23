@@ -28,7 +28,8 @@ try{
  const rbac=await compile('lib/server/rbac.ts',{'@/lib/permissions':permissions});
  const qr=await compile('lib/qr-bill.ts',{'swissqrbill/utils':import.meta.resolve('swissqrbill/utils')});
  const replay=await compile('lib/server/business-idempotency.ts',{'./http':http});
- const business=await compile('lib/server/repositories/business-api.ts',{'../http':http,'../audit':audit,'../business-idempotency':replay,'../document-amount-sql':documentAmountSqlModuleUrl,'@/lib/financial-status':financialModuleUrl,'@/lib/permissions':permissions,'@/lib/qr-bill':qr});
+ const expensePayment=await compile('lib/expense-payment.ts');
+ const business=await compile('lib/server/repositories/business-api.ts',{'@/lib/expense-payment':expensePayment,'../http':http,'../audit':audit,'../business-idempotency':replay,'../document-amount-sql':documentAmountSqlModuleUrl,'@/lib/financial-status':financialModuleUrl,'@/lib/permissions':permissions,'@/lib/qr-bill':qr});
  globalThis.__readinessClient=client;
  const scopedDb=moduleUrl('export const withTenant=async(_org,_user,fn)=>fn(globalThis.__readinessClient); export const query=(...args)=>globalThis.__readinessClient.query(...args)');
  const plans=await compile('lib/server/plan-access.ts',{'@/lib/server/db':scopedDb,'@/config/plan-access':planAccessModuleUrl,'@/config/plans':planCatalogModuleUrl,'./http':http});

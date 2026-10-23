@@ -4,7 +4,9 @@ import type {PoolClient} from 'pg';
 import {ApiError} from '../../lib/server/http';
 export const demoTemplateId='00000000-0000-4000-8000-000000000099';
 // Fixed canonical tables, ordered by their foreign keys. No platform or authentication records are copied.
-const tables=['customers','employees','suppliers','products_services','quotes','quote_lines','projects','orders','contracts','invoices','invoice_lines','payments','credit_notes','invoice_refunds','expenses','time_entries','tasks','absences','payroll_runs','operating_costs','customer_contacts','supplier_invoices','accounting_entries','bank_transactions','vat_periods','business_documents','entity_notes','support_cases','support_messages','in_app_notifications','customer_activities'] as const;
+// Historical absences are not clonable: V26 requires a new identity-bound request,
+// employment revision and independent review. Never manufacture approvals or HR grants in the business demo.
+const tables=['customers','employees','suppliers','products_services','quotes','quote_lines','projects','orders','contracts','invoices','invoice_lines','payments','credit_notes','invoice_refunds','expenses','time_entries','tasks','payroll_runs','operating_costs','customer_contacts','supplier_invoices','accounting_entries','bank_transactions','vat_periods','business_documents','entity_notes','support_cases','support_messages','in_app_notifications','customer_activities'] as const;
 export async function seedDatabaseDemo(c:PoolClient,organizationId:string,userId:string,userEmail?:string){
  const target=await c.query('select is_demo from organizations where id=$1',[organizationId]);
  if(target.rows[0]?.is_demo!==true||organizationId===demoTemplateId)throw new ApiError(403,'demo_target_invalid','Ungültiger Demo-Mandant.');
@@ -79,8 +81,8 @@ export async function seedDemoScenarios(c:PoolClient,organizationId:string,userI
     values($1,$2,$3,$4,$5,$6,'bank','matched') on conflict(id) do nothing`,[id('payment-'+key),organizationId,'v24-payment-'+key,invoiceId,date(offset,10),paid]);
   }
   const costs=[3,7,11].includes(index)?100000:Math.round(total*0.2*100)/100;
-  await c.query(`insert into expenses(id,organization_id,external_id,customer_id,project_id,expense_date,description,category,quantity,unit_price,billable,status,reimbursed_at,reimbursement_reference,reimbursed_by_user_id,created_by_user_id)
-   values($1,$2,$3,$4,$5,$6,$7,'material',1,$8,false,'approved',$6::date::timestamp at time zone 'Europe/Zurich',$9,$10,$10) on conflict(id) do nothing`,[id('expense-'+period),organizationId,'v24-expense-'+period,customer.id,projectId,date(offset,12),costs===100000?'Demo: ausserordentliche Beschaffung / Verlustmonat':'Demo: monatliche Auslagen',costs,'V24-REIMBURSED-'+period,userId]);
+  await c.query(`insert into expenses(id,organization_id,external_id,customer_id,project_id,expense_date,description,category,quantity,unit_price,billable,status,reimbursed_at,reimbursement_reference,reimbursed_by_user_id,created_by_user_id,payment_kind,reimbursement_paid_on,reimbursement_amount,reimbursement_currency)
+   values($1,$2,$3,$4,$5,$6,$7,'material',1,$8,false,'approved',$6::date::timestamp at time zone 'Europe/Zurich',$9,$10,$10,'private',$6,$8,'CHF') on conflict(id) do nothing`,[id('expense-'+period),organizationId,'v24-expense-'+period,customer.id,projectId,date(offset,12),costs===100000?'Demo: ausserordentliche Beschaffung / Verlustmonat':'Demo: monatliche Auslagen',costs,'V24-REIMBURSED-'+period,userId]);
   await c.query(`insert into time_entries(id,organization_id,external_id,customer_id,project_id,person_name,worker_type,work_date,hours,description,billable,approved,sales_rate,internal_cost_rate,created_by_user_id)
    values($1,$2,$3,$4,$5,'Demo Team','employee',$6,12,'Demo: Mehraufwand',true,true,100,150,$7) on conflict(id) do nothing`,[id('time-'+period),organizationId,'v24-time-'+period,customer.id,projectId,date(offset,8),userId]);
  }
