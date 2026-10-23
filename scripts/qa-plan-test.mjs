@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {planChanges,fullRoutes,shouldRunBrowser,isDocumentationOnlyChange} from './qa-plan.mjs';
+import {planChanges,fullRoutes,webkitFullRoutes,shouldRunBrowser,isDocumentationOnlyChange} from './qa-plan.mjs';
 assert.deepEqual(planChanges(['components/product-form.tsx'],{level:'fast'}).routes,['/produkte','/produkte/product-one','/produkte/neu']);
 assert.equal(planChanges(['components/product-form.tsx']).level,'standard');
 for(const path of ['app/design-system/collections.css','components/ui.tsx','components/records.tsx','components/app-chrome.tsx','components/binso-ux.tsx','components/use-dialog-focus.ts']){const p=planChanges([path]);assert(p.global);for(const r of ['/dashboard','/kunden/neu','/rechnungen/RE-TEST-1','/support/ticket-one','/operator'])assert(p.routes.includes(r),path+': '+r);}
@@ -59,3 +59,5 @@ for(const level of ['fast','integration','standard','full'])
  assert.equal(shouldRunBrowser(level,['--browser','--no-browser']),false);
 
 for(const width of [2560,3840]){const wide=planChanges(["components/ui.tsx"],{level:"full"});assert.ok(wide.widths.includes(width));assert.ok(wide.webkitWidths.includes(width));}
+
+for(const route of ['/einstellungen/rechtliches',...['impressum','datenschutz','agb','auftragsbearbeitung','unterauftragsbearbeiter'].map(document=>'/einstellungen/rechtliches/'+document)])for(const routes of [fullRoutes,webkitFullRoutes])assert.ok(routes.includes(route),'Every current internal legal view must run in both browser engines: '+route);

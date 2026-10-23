@@ -42,6 +42,7 @@ try{
   for(const route of ['/?lang='+locale,'/dashboard?lang='+locale,'/operator?lang='+locale,'/wartung?lang='+locale,'/missing-localization-route?lang='+locale]){
    await page.waitForLoadState('networkidle');assert.deepEqual(faults,[],'No runtime failures before an isolated route reset');
    page.removeAllListeners('pageerror');await page.close();page=await trackedPage();
+   console.log('Localization route',locale,width,route);
    await page.goto(base+route,{waitUntil:'networkidle'});await page.locator('h1:visible').first().waitFor();
    // Public 404 is outside the locale-query matcher; the selected cookie remains authoritative.
    assert.equal(await page.locator('html').getAttribute('lang'),locale+'-CH');

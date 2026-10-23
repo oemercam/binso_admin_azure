@@ -25,9 +25,11 @@ function compile(file,deps={}){
  Function('require','exports',source)(name=>Object.hasOwn(deps,name)?deps[name]:require(name),output);return output;
 }
 const config=compile('lib/locales/config.ts');
-const locale=compile('lib/locales/index.ts',{'./config':config,'./messages.json':messages,'./templates.json':templates,'./plurals.json':JSON.parse(fs.readFileSync('lib/locales/plurals.json','utf8'))});
+const locale=compile('lib/locales/index.ts',{'./config':config,'./periods.json':JSON.parse(fs.readFileSync('lib/locales/periods.json','utf8')),'./messages.json':messages,'./templates.json':templates,'./plurals.json':JSON.parse(fs.readFileSync('lib/locales/plurals.json','utf8'))});
 for(const [language,expected] of [['de','Umsatz 2026'],['en','Revenue 2026'],['fr','Chiffre d’affaires 2026'],['it','Ricavi 2026']])assert.equal(locale.translateMessage('Umsatz 2026',language),expected,'Customer revenue headers translate the label while preserving the actual business year');
-assert.deepEqual(config.locales,['de','fr','it','en']);
+assert.deepEqual(config.locales,['de','fr','it','en','tr']);
+assert.equal(locale.translateMessage('Individueller Zeitraum','tr'),'Özel dönem');
+assert.equal(config.asLocale('tr-TR'),'tr');
 const financialDates=compile('lib/financial-status.ts',{'./money':compile('lib/money.ts')});
 for(const [language,expected] of Object.entries({de:'02.01.2026',fr:'02.01.2026',it:'02.01.2026',en:'02.01.2026'}))assert.equal(financialDates.formatDate('2026-01-02',config.localeTags[language]),expected,'Civil document dates use the chosen Swiss language without timezone day shifts');
 assert.equal(financialDates.formatDate('2026-01-02','en-US'),'01/02/2026','Explicit locale is honored rather than ignored');
@@ -116,13 +118,15 @@ Function('require','exports','LocalizedElement',ts.transpileModule(toggleSource,
 const settingsAst=ts.createSourceFile('settings.tsx',fs.readFileSync('components/pages/settings.tsx','utf8'),99,true,4),notificationExports={};
 const notificationSource=settingsAst.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='NotificationSettingsPage').getText(settingsAst);
 const wrapper=({children})=>React.createElement('div',null,children);
-Function('require','exports','useId','useRef','useState','useEffect','AppShell','ErrorState','LoadingState','SettingsGroup','LocalizedText','Toggle','notificationChannels',ts.transpileModule(notificationSource,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText)(require,notificationExports,React.useId,React.useRef,React.useState,React.useEffect,wrapper,wrapper,wrapper,wrapper,client.LocalizedText,toggleExports.Toggle,{email:true,push:false});
+const rowSource=ts.createSourceFile('binso-ux.tsx',fs.readFileSync('components/binso-ux.tsx','utf8'),99,true,4).statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='ListRow').getText();
+const rowExports={};Function('require','exports','LocalizedText','Status','Icon','Link',ts.transpileModule(rowSource,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText)(require,rowExports,client.LocalizedText,()=>null,()=>null,wrapper);
+Function('require','exports','Fragment','ListRow','useId','useRef','useState','useEffect','AppShell','ErrorState','LoadingState','SettingsGroup','LocalizedText','Toggle','notificationChannels',ts.transpileModule(notificationSource,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText)(require,notificationExports,React.Fragment,rowExports.ListRow,React.useId,React.useRef,React.useState,React.useEffect,wrapper,wrapper,wrapper,wrapper,client.LocalizedText,toggleExports.Toggle,{email:true,push:false});
 for(const language of config.locales){
  const markup=renderToStaticMarkup(React.createElement(client.LocaleProvider,{initialLocale:language},React.createElement(notificationExports.NotificationSettingsPage)));
  const labels=new Map([...markup.matchAll(/<(?:b|span) id="([^"]+)">([^<]+)<\/(?:b|span)>/g)].map(match=>[match[1],match[2]]));
  const switches=[...markup.matchAll(/<button[^>]*role="switch"[^>]*>/g)];assert.equal(switches.length,5);
- const names=switches.map(([tag])=>{assert.doesNotMatch(tag,/aria-label=/,'Do not shadow translated visible labels with a concatenated German name');const ids=tag.match(/aria-labelledby="([^"]+)"/)[1].split(' ');assert.equal(ids.length,2);return ids.map(id=>{assert.ok(labels.has(id),'Every naming reference exists in the actual page');return labels.get(id)}).join(' ')});
- assert.equal(names[0],locale.translateMessage('E-Mail',language)+' '+locale.translateMessage('Rechnungen',language));
+ const names=switches.map(([tag])=>{assert.doesNotMatch(tag,/aria-label=/,'Do not shadow translated visible labels with a concatenated German name');const ids=tag.match(/aria-labelledby="([^"]+)"/)[1].split(' ');assert.equal(ids.length,1,'Compact preference uses its one complete visible naming reference');return ids.map(id=>{assert.ok(labels.has(id),'Every naming reference exists in the actual page');return labels.get(id)}).join(' ')});
+ assert.equal(names[0],locale.translateMessage('Rechnungen',language)+' · '+locale.translateMessage('E-Mail',language));
  assert.equal(new Set(names).size,5,'Every preference has a unique channel and topic');
 }
 for(const checked of [false,true]){
@@ -195,7 +199,7 @@ for(const language of config.locales){
 // Render actual legal documents with the shared owner: anchors cannot change
 // by UI language, existing deep links and the untouched document text survive.
 {
- const legal=compile('components/legal-page.tsx',{'@/lib/client/locale':client,'next/link':({children,...props})=>element('a',props,children),'@/components/marketing':{MarketingHeader:()=>null,MarketingFooter:()=>null}});
+ const legal=compile('components/legal-page.tsx',{'@/lib/client/locale':client,'next/link':({children,...props})=>element('a',props,children),'@/components/marketing':{MarketingHeader:()=>element('header',{'data-public-marketing':true}),MarketingFooter:()=>element('footer',{'data-public-marketing':true})}});
  const legalConfig=compile('config/legal.ts');
  for(const file of ['impressum','datenschutz','agb','auftragsbearbeitung','unterauftragsbearbeiter']){
   const page=compile('app/'+file+'/page.tsx',{'@/lib/client/locale':client,'@/components/legal-page':legal,'@/config/legal':legalConfig,'next/link':({children,...props})=>element('a',props,children)}).default;
@@ -205,6 +209,12 @@ for(const language of config.locales){
    const ids=[...markup.matchAll(/<section[^>]* id="([^"]+)"/g)].map(match=>match[1]);assert.ok(ids.length>=2);assert.equal(new Set(ids).size,ids.length,'No duplicate legal anchors');
    if(baseline)assert.deepEqual(ids,baseline,'Section URLs stay stable across UI languages');else baseline=ids;
    for(const [,id] of markup.matchAll(/href="#([^"]+)"/g))assert.ok(ids.includes(id),'Every table-of-contents link has a real section');
+   const internal=renderToStaticMarkup(element(client.LocaleProvider,{initialLocale:language},React.cloneElement(page(),{surface:'app'})));
+   assert.ok(!internal.includes('data-public-marketing'),'Internal legal reading never includes marketing chrome');
+   const article=text=>text.match(/<article[^>]*>([\s\S]*?)<\/article>/)?.[1].replace(/<[^>]*>/g,'');
+   assert.equal(article(internal),article(markup),'Public and internal legal clauses remain identical');
+   assert.ok(internal.includes('app-legal-page'));
+   assert.deepEqual([...internal.matchAll(/<section[^>]* id="([^"]+)"/g)].map(match=>match[1]),ids,'Internal and public anchors are identical');
    if(file==='impressum')assert.ok(ids.includes('kontakt'),'Existing contact deep link preserved');
    if(ids.length>=5){assert.ok(markup.includes('<details class="legal-toc">'));assert.ok(markup.includes(locale.translateMessage('Inhaltsverzeichnis',language)));}
    else assert.ok(!markup.includes('class="legal-toc"'),'Short documents need no redundant contents control');
@@ -213,3 +223,12 @@ for(const language of config.locales){
  }
  console.log('Actual legal documents: stable unique TOC anchors, preserved contact deep link, translated control labels, short-document omission and unchanged version dates passed. Legal language/substance approval remains separate.');
 }
+
+// V5: short closed trigger, full native language names in every option.
+for(const language of config.locales)for(const compact of [false,true]){
+ const switcher=compile('components/locale-switcher.tsx',{'./select-control':{SelectControl:({displayValue,children,...props})=>React.createElement('select',{'data-caption':displayValue,value:props.value,onChange(){},'aria-label':props['aria-label']},children)},'@/lib/client/locale':client,'@/lib/client/use-language-preference':{useLanguagePreference:()=>({locale:language,save(){},busy:false,error:null})},'@/lib/locales':locale,'./ui':{ErrorState:()=>null}});
+ const html=renderToStaticMarkup(React.createElement(client.LocaleProvider,{initialLocale:language},React.createElement(switcher.LocaleSwitcher,{compact})));
+ assert.ok(html.includes('data-caption="'+language.toUpperCase()+'"'),'V5 selected language uses its short code; native options stay complete: '+language);
+ for(const code of config.locales)assert.ok(html.includes(config.localeNames[code]),'Existing language option retained: '+code);
+}
+console.log('Language selector V5: five short triggers and full native option names passed; persistence owner unchanged.');

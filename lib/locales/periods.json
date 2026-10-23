@@ -1,0 +1,534 @@
+{
+ "Bitte zuerst die IBAN deiner Firma unter Einstellungen → Finanzen erfassen.": {
+  "fr": "Veuillez d’abord saisir l’IBAN de l’entreprise sous Paramètres → Finances.",
+  "tr": "Önce Ayarlar → Finans bölümünde şirketinizin IBAN bilgisini girin.",
+  "en": "Please enter your company’s IBAN under Settings → Finance first.",
+  "it": "Prima inserisci l’IBAN aziendale in Impostazioni → Finanze.",
+  "de": "Bitte zuerst die IBAN deiner Firma unter Einstellungen → Finanzen erfassen."
+ },
+ "Verlauf: laufender und elf vorherige Kalendermonate.": {
+  "de": "Verlauf: laufender und elf vorherige Kalendermonate.",
+  "fr": "Évolution : mois en cours et onze mois calendaires précédents.",
+  "it": "Andamento: mese corrente e undici mesi di calendario precedenti.",
+  "en": "Trend: current calendar month and the eleven preceding months.",
+  "tr": "Gelişim: içinde bulunulan takvim ayı ve önceki on bir ay."
+ },
+ "Diagramm: letzte 12 Kalendermonate im ausgewählten Zeitraum. Kennzahlen: gesamter Zeitraum.": {
+  "de": "Diagramm: letzte 12 Kalendermonate im ausgewählten Zeitraum. Kennzahlen: gesamter Zeitraum.",
+  "fr": "Graphique : 12 derniers mois calendaires de la période. Indicateurs : période entière.",
+  "it": "Grafico: ultimi 12 mesi di calendario del periodo. Indicatori: intero periodo.",
+  "en": "Chart: last 12 calendar months within the selected period. Metrics: full period.",
+  "tr": "Grafik: seçilen dönemdeki son 12 takvim ayı. Göstergeler: dönemin tamamı."
+ },
+ "Monatskürzel": {
+  "de": "M",
+  "fr": "m",
+  "it": "m",
+  "en": "mo",
+  "tr": "ay"
+ },
+ "Beide Tage sind eingeschlossen.": {
+  "de": "Beide Tage sind eingeschlossen.",
+  "fr": "Les deux dates sont incluses.",
+  "it": "Entrambi i giorni sono inclusi.",
+  "en": "Both dates are inclusive.",
+  "tr": "Her iki tarih de dâhildir."
+ },
+ "Zeitraum": {
+  "de": "Zeitraum",
+  "fr": "Période",
+  "it": "Periodo",
+  "en": "Period",
+  "tr": "Dönem"
+ },
+ "Zeitraum auswählen": {
+  "de": "Zeitraum auswählen",
+  "fr": "Choisir la période",
+  "it": "Seleziona periodo",
+  "en": "Select period",
+  "tr": "Dönem seç"
+ },
+ "Aktueller Monat": {
+  "de": "Aktueller Monat",
+  "fr": "Mois en cours",
+  "it": "Mese corrente",
+  "en": "Current month",
+  "tr": "Bu ay"
+ },
+ "Letzte 3 Monate": {
+  "de": "Letzte 3 Monate",
+  "fr": "3 derniers mois",
+  "it": "Ultimi 3 mesi",
+  "en": "Last 3 months",
+  "tr": "Son 3 ay"
+ },
+ "Letzte 6 Monate": {
+  "de": "Letzte 6 Monate",
+  "fr": "6 derniers mois",
+  "it": "Ultimi 6 mesi",
+  "en": "Last 6 months",
+  "tr": "Son 6 ay"
+ },
+ "Letzte 12 Monate": {
+  "de": "Letzte 12 Monate",
+  "fr": "12 derniers mois",
+  "it": "Ultimi 12 mesi",
+  "en": "Last 12 months",
+  "tr": "Son 12 ay"
+ },
+ "Individueller Zeitraum": {
+  "de": "Individueller Zeitraum",
+  "fr": "Période personnalisée",
+  "it": "Periodo personalizzato",
+  "en": "Custom period",
+  "tr": "Özel dönem"
+ },
+ "Kalendermonate bis heute, einschliesslich beider Tage.": {
+  "de": "Kalendermonate bis heute, einschliesslich beider Tage.",
+  "fr": "Mois calendaires jusqu’à aujourd’hui, deux dates incluses.",
+  "it": "Mesi di calendario fino a oggi, entrambi i giorni inclusi.",
+  "en": "Calendar months through today, both dates inclusive.",
+  "tr": "Bugüne kadar takvim ayları; her iki tarih dâhil."
+ },
+ "Alle Zeiten": {
+  "de": "Alle Zeiten",
+  "fr": "Toutes les dates",
+  "it": "Tutte le date",
+  "en": "All dates",
+  "tr": "Tüm tarihler"
+ },
+ "Von": {
+  "de": "Von",
+  "fr": "Du",
+  "it": "Dal",
+  "en": "From",
+  "tr": "Başlangıç"
+ },
+ "Bis": {
+  "de": "Bis",
+  "fr": "Au",
+  "it": "Al",
+  "en": "To",
+  "tr": "Bitiş"
+ },
+ "Anwenden": {
+  "de": "Anwenden",
+  "fr": "Appliquer",
+  "it": "Applica",
+  "en": "Apply",
+  "tr": "Uygula"
+ },
+ "Abbrechen": {
+  "de": "Abbrechen",
+  "fr": "Annuler",
+  "it": "Annulla",
+  "en": "Cancel",
+  "tr": "İptal"
+ },
+ "Schliessen": {
+  "de": "Schliessen",
+  "fr": "Fermer",
+  "it": "Chiudi",
+  "en": "Close",
+  "tr": "Kapat"
+ },
+ "Kalender": {
+  "de": "Kalender",
+  "fr": "Calendrier",
+  "it": "Calendario",
+  "en": "Calendar",
+  "tr": "Takvim"
+ },
+ "Bitte einen gültigen Zeitraum wählen. Beginn darf nicht nach Ende liegen.": {
+  "de": "Bitte einen gültigen Zeitraum wählen. Beginn darf nicht nach Ende liegen.",
+  "fr": "Choisissez une période valide. Le début doit précéder ou correspondre à la fin.",
+  "it": "Scegli un periodo valido. L’inizio non può essere successivo alla fine.",
+  "en": "Choose a valid period. The start must not be after the end.",
+  "tr": "Geçerli bir dönem seçin. Başlangıç bitişten sonra olamaz."
+ },
+ "Bitte einen Zeitraum von höchstens einem Jahr wählen.": {
+  "de": "Bitte einen Zeitraum von höchstens einem Jahr wählen.",
+  "fr": "Choisissez une période d’un an maximum.",
+  "it": "Scegli un periodo di massimo un anno.",
+  "en": "Choose a period of at most one year.",
+  "tr": "En fazla bir yıllık dönem seçin."
+ },
+ "Listenwerkzeuge": {
+  "de": "Listenwerkzeuge",
+  "fr": "Outils de liste",
+  "it": "Strumenti elenco",
+  "en": "List tools",
+  "tr": "Liste araçları"
+ },
+ "Filter und Sortierung": {
+  "de": "Filter und Sortierung",
+  "fr": "Filtres et tri",
+  "it": "Filtri e ordinamento",
+  "en": "Filter and sort",
+  "tr": "Filtre ve sıralama"
+ },
+ "Sortieren": {
+  "de": "Sortieren",
+  "en": "Sort",
+  "fr": "Trier",
+  "it": "Ordina",
+  "tr": "Sırala"
+ },
+ "Sortieren nach": {
+  "de": "Sortieren nach",
+  "en": "Sort by",
+  "fr": "Trier par",
+  "it": "Ordina per",
+  "tr": "Sıralama ölçütü"
+ },
+ "Filtern nach": {
+  "de": "Filtern nach",
+  "en": "Filter by",
+  "fr": "Filtrer par",
+  "it": "Filtra per",
+  "tr": "Filtre ölçütü"
+ },
+ "Filter": {
+  "de": "Filter",
+  "en": "Filter",
+  "fr": "Filtre",
+  "it": "Filtro",
+  "tr": "Filtre"
+ },
+ "Sortierung": {
+  "de": "Sortierung",
+  "en": "Sort order",
+  "fr": "Tri",
+  "it": "Ordinamento",
+  "tr": "Sıralama"
+ },
+ "Filter zurücksetzen": {
+  "de": "Filter zurücksetzen",
+  "en": "Reset filter",
+  "fr": "Réinitialiser le filtre",
+  "it": "Reimposta filtro",
+  "tr": "Filtreyi sıfırla"
+ },
+ "Sortierung zurücksetzen": {
+  "de": "Sortierung zurücksetzen",
+  "en": "Reset sorting",
+  "fr": "Réinitialiser le tri",
+  "it": "Reimposta ordinamento",
+  "tr": "Sıralamayı sıfırla"
+ },
+ "Zurücksetzen": {
+  "de": "Zurücksetzen",
+  "en": "Reset",
+  "fr": "Réinitialiser",
+  "it": "Reimposta",
+  "tr": "Sıfırla"
+ },
+ "Aufsteigend": {
+  "de": "Aufsteigend",
+  "en": "Ascending",
+  "fr": "Croissant",
+  "it": "Crescente",
+  "tr": "Artan"
+ },
+ "Absteigend": {
+  "de": "Absteigend",
+  "en": "Descending",
+  "fr": "Décroissant",
+  "it": "Decrescente",
+  "tr": "Azalan"
+ },
+ "Standard": {
+  "de": "Standard",
+  "en": "Default",
+  "fr": "Par défaut",
+  "it": "Predefinito",
+  "tr": "Varsayılan"
+ },
+ "A–Z": {
+  "de": "A–Z",
+  "en": "A–Z",
+  "fr": "A–Z",
+  "it": "A–Z",
+  "tr": "A–Z"
+ },
+ "Z–A": {
+  "de": "Z–A",
+  "en": "Z–A",
+  "fr": "Z–A",
+  "it": "Z–A",
+  "tr": "Z–A"
+ },
+ "von": {
+  "de": "von",
+  "en": "of",
+  "fr": "sur",
+  "it": "di",
+  "tr": "/"
+ },
+ "Fortsetzen": {
+  "de": "Fortsetzen",
+  "en": "Continue",
+  "fr": "Continuer",
+  "it": "Continua",
+  "tr": "Devam et"
+ },
+ "Rechtliches": {
+  "de": "Rechtliches",
+  "en": "Legal",
+  "fr": "Informations légales",
+  "it": "Informazioni legali",
+  "tr": "Yasal bilgiler"
+ },
+ "Nicht hinterlegt": {
+  "de": "Nicht hinterlegt",
+  "en": "Not provided",
+  "fr": "Non renseigné",
+  "it": "Non indicato",
+  "tr": "Belirtilmedi"
+ },
+ "Anmeldung & Sicherheit": {
+  "de": "Anmeldung & Sicherheit",
+  "fr": "Connexion et sécurité",
+  "it": "Accesso e sicurezza",
+  "en": "Sign-in & security",
+  "tr": "Giriş ve güvenlik"
+ },
+ "Analysewerkzeuge": {
+  "de": "Analysewerkzeuge",
+  "fr": "Outils d’analyse",
+  "it": "Strumenti di analisi",
+  "en": "Analysis tools",
+  "tr": "Analiz araçları"
+ },
+ "Keine Finanzdaten verfügbar": {
+  "de": "Keine Finanzdaten verfügbar",
+  "fr": "Aucune donnée financière disponible",
+  "it": "Nessun dato finanziario disponibile",
+  "en": "No financial data available",
+  "tr": "Finansal veri yok"
+ },
+ "Offen: aktueller Forderungsbestand inklusive überfälliger Beträge, unabhängig vom Zeitraumfilter.": {
+  "de": "Offen: aktueller Forderungsbestand inklusive überfälliger Beträge, unabhängig vom Zeitraumfilter.",
+  "fr": "Ouvert : créances actuelles, y compris les montants échus, indépendamment de la période sélectionnée.",
+  "it": "Aperto: crediti attuali, inclusi gli importi scaduti, indipendentemente dal periodo selezionato.",
+  "en": "Open: current receivables including overdue amounts, independent of the selected period.",
+  "tr": "Açık: seçili dönemden bağımsız olarak vadesi geçmiş tutarlar dahil güncel alacaklar."
+ },
+ "Rechnungsbestand: beglichene und ausstehende Rechnungsanteile.": {
+  "de": "Rechnungsbestand: beglichene und ausstehende Rechnungsanteile.",
+  "fr": "Encours de factures : parts réglées et restant dues.",
+  "it": "Situazione fatture: quote saldate e ancora dovute.",
+  "en": "Invoice balance: settled and outstanding portions.",
+  "tr": "Fatura durumu: ödenen ve ödenmemiş kısımlar."
+ },
+ "Saldo: Eingänge abzüglich Ausgaben, kein Bankkontostand.": {
+  "de": "Saldo: Eingänge abzüglich Ausgaben, kein Bankkontostand.",
+  "fr": "Solde : encaissements moins décaissements, pas un solde bancaire.",
+  "it": "Saldo: entrate meno uscite, non un saldo bancario.",
+  "en": "Balance: receipts minus outflows, not a bank balance.",
+  "tr": "Bakiye: tahsilatlar eksi ödemeler; banka bakiyesi değildir."
+ },
+ "Finanzanalyse": {
+  "de": "Finanzanalyse",
+  "fr": "Analyse financière",
+  "it": "Analisi finanziaria",
+  "en": "Financial analysis",
+  "tr": "Finansal analiz"
+ },
+ "Einnahmen": {
+  "de": "Einnahmen",
+  "fr": "Recettes",
+  "it": "Entrate",
+  "en": "Income",
+  "tr": "Gelirler"
+ },
+ "Ausgaben": {
+  "de": "Ausgaben",
+  "fr": "Dépenses",
+  "it": "Uscite",
+  "en": "Expenditure",
+  "tr": "Giderler"
+ },
+ "Saldo": {
+  "de": "Saldo",
+  "fr": "Solde",
+  "it": "Saldo",
+  "en": "Balance",
+  "tr": "Bakiye"
+ },
+ "Offen": {
+  "de": "Offen",
+  "fr": "Ouvert",
+  "it": "Aperto",
+  "en": "Open",
+  "tr": "Açık"
+ },
+ "Forderungen": {
+  "de": "Forderungen",
+  "fr": "Créances",
+  "it": "Crediti",
+  "en": "Receivables",
+  "tr": "Alacaklar"
+ },
+ "Angebote": {
+  "de": "Angebote",
+  "fr": "Devis",
+  "it": "Offerte",
+  "en": "Quotes",
+  "tr": "Teklifler"
+ },
+ "Finanzentwicklung": {
+  "de": "Finanzentwicklung",
+  "fr": "Évolution financière",
+  "it": "Andamento finanziario",
+  "en": "Financial trend",
+  "tr": "Finansal gelişim"
+ },
+ "Rechnungsbestand": {
+  "de": "Rechnungsbestand",
+  "fr": "État des factures",
+  "it": "Situazione fatture",
+  "en": "Invoice balance",
+  "tr": "Fatura durumu"
+ },
+ "Bezahlt": {
+  "de": "Bezahlt",
+  "fr": "Payé",
+  "it": "Pagato",
+  "en": "Paid",
+  "tr": "Ödendi"
+ },
+ "Überfällig": {
+  "de": "Überfällig",
+  "fr": "En retard",
+  "it": "Scaduto",
+  "en": "Overdue",
+  "tr": "Vadesi geçmiş"
+ },
+ "Entwurf": {
+  "de": "Entwurf",
+  "fr": "Brouillon",
+  "it": "Bozza",
+  "en": "Draft",
+  "tr": "Taslak"
+ },
+ "Versendet": {
+  "de": "Versendet",
+  "fr": "Envoyé",
+  "it": "Inviato",
+  "en": "Sent",
+  "tr": "Gönderildi"
+ },
+ "Angenommen": {
+  "de": "Angenommen",
+  "fr": "Accepté",
+  "it": "Accettato",
+  "en": "Accepted",
+  "tr": "Kabul edildi"
+ },
+ "Abgelehnt": {
+  "de": "Abgelehnt",
+  "fr": "Refusé",
+  "it": "Rifiutato",
+  "en": "Rejected",
+  "tr": "Reddedildi"
+ },
+ "Abgelaufen": {
+  "de": "Abgelaufen",
+  "fr": "Expiré",
+  "it": "Scaduto",
+  "en": "Expired",
+  "tr": "Süresi doldu"
+ },
+ "Überarbeitet": {
+  "de": "Überarbeitet",
+  "fr": "Révisé",
+  "it": "Rivisto",
+  "en": "Revised",
+  "tr": "Revize edildi"
+ },
+ "Storniert": {
+  "de": "Storniert",
+  "fr": "Annulé",
+  "it": "Annullato",
+  "en": "Cancelled",
+  "tr": "İptal edildi"
+ },
+ "Kundenguthaben": {
+  "de": "Kundenguthaben",
+  "fr": "Avoir client",
+  "it": "Credito cliente",
+  "en": "Customer credit",
+  "tr": "Müşteri bakiyesi"
+ },
+ "Vergleich": {
+  "de": "Vergleich",
+  "fr": "Comparaison",
+  "it": "Confronto",
+  "en": "Comparison",
+  "tr": "Karşılaştırma"
+ },
+ "Stand": {
+  "de": "Stand",
+  "fr": "État au",
+  "it": "Situazione al",
+  "en": "As of",
+  "tr": "Tarih"
+ },
+ "Datenhinweise": {
+  "de": "Datenhinweise",
+  "fr": "Notes sur les données",
+  "it": "Note sui dati",
+  "en": "Data notes",
+  "tr": "Veri bilgileri"
+ },
+ "Suche": {
+  "de": "Suche",
+  "fr": "Recherche",
+  "it": "Ricerca",
+  "en": "Search",
+  "tr": "Ara"
+ },
+ "Benachrichtigungen": {
+  "de": "Benachrichtigungen",
+  "fr": "Notifications",
+  "it": "Notifiche",
+  "en": "Notifications",
+  "tr": "Bildirimler"
+ },
+ "Benutzerkonto": {
+  "de": "Benutzerkonto",
+  "fr": "Compte utilisateur",
+  "it": "Account utente",
+  "en": "User account",
+  "tr": "Kullanıcı hesabı"
+ },
+ "Keine Berichtsdaten verfügbar": {
+  "de": "Keine Berichtsdaten verfügbar",
+  "fr": "Aucune donnée de rapport disponible",
+  "it": "Nessun dato disponibile per il rapporto",
+  "en": "No report data available",
+  "tr": "Rapor verisi yok"
+ },
+ "Entwürfe": {
+  "de": "Entwürfe",
+  "fr": "Brouillons",
+  "it": "Bozze",
+  "en": "Drafts",
+  "tr": "Taslaklar"
+ },
+ "binso.ch ↗": {
+  "de": "binso.ch ↗",
+  "fr": "binso.ch ↗",
+  "it": "binso.ch ↗",
+  "en": "binso.ch ↗",
+  "tr": "binso.ch ↗"
+ },
+ "Für diese Rechtsübersetzung liegt kein Freigabenachweis vor.": {
+  "de": "Für diese Rechtsübersetzung liegt kein Freigabenachweis vor.",
+  "fr": "Aucune preuve de validation de cette traduction juridique n’est disponible.",
+  "it": "Non è disponibile una conferma di approvazione di questa traduzione legale.",
+  "en": "No approval record is available for this legal translation.",
+  "tr": "Bu hukuki çeviri için onay kaydı bulunmamaktadır."
+ }
+}

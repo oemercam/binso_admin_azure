@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
 import {fileURLToPath} from 'node:url';
+import {execFileSync} from 'node:child_process';
 import ts from 'typescript';
 import {navigationRules} from './design-system.mjs';
 const require=createRequire(import.meta.url),postcss=require(require.resolve('postcss',{paths:[require.resolve('next')]}));
@@ -50,8 +51,16 @@ if(process.argv[1]===fileURLToPath(import.meta.url)){
  const reference=JSON.parse(fs.readFileSync('docs/assets/20261020/authorized-navigation-reference.json','utf8'));
  const read=file=>fs.readFileSync(file,'utf8'),current=navigationFoundation(read);
  assert.deepEqual(navigationAccess(read),reference.access,'Approved role-filtered destinations and access checks remain exact');
- assert.equal(current.icons,reference.baseIcons,'Existing navigation icons remain unchanged');
- assert.deepEqual(current,reference.snapshot,'Stable app navigation matches its explicitly generated approved source contract');
+ // V4 adds a sort icon and updates the filter glyph, neither of which is used
+ // by navigation. Bind every other icon AND the SVG renderer to the original
+ // immutable reference, rather than replacing its approved hash with today's.
+ const iconSource=source=>{const ast=ts.createSourceFile('ui.tsx',withoutLocalization(source),99,true,4);return {ast,node:ast.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='Icon')};};
+ const original=execFileSync('git',['show',reference.base+':components/ui.tsx'],{encoding:'utf8'});
+ const frozen=iconSource(original);assert.equal(hash([frozen.node.getText(frozen.ast)]),reference.baseIcons,'The historical icon source still matches the approved reference');
+ const protectedIcons=source=>{const {ast,node}=iconSource(source);const transformed=ts.transform(node,[context=>root=>{const visit=child=>ts.isVariableDeclaration(child)&&child.name.getText(ast)==='paths'&&ts.isObjectLiteralExpression(child.initializer)?ts.factory.updateVariableDeclaration(child,child.name,child.exclamationToken,child.type,ts.factory.updateObjectLiteralExpression(child.initializer,child.initializer.properties.filter(property=>!['filter','sort'].includes(property.name?.getText(ast).replaceAll('"',''))))):ts.visitEachChild(child,visit,context);return ts.visitNode(root,visit);}]);try{return ts.createPrinter().printNode(ts.EmitHint.Unspecified,transformed.transformed[0],ast);}finally{transformed.dispose();}};
+ assert.equal(protectedIcons(read('components/ui.tsx')),protectedIcons(original),'Every protected icon and the common SVG renderer remain unchanged');
+ const tampered=read('components/ui.tsx').replace('M3 11.5 12 4l9 7.5','M3 11.5 12 5l9 7.5');assert.notEqual(protectedIcons(tampered),protectedIcons(original),'Changing the actual home icon remains a failing counterexample');
+ assert.deepEqual({...current,icons:reference.snapshot.icons},reference.snapshot,'Stable app navigation matches its approved source contract; protected icons are independently compared above');
  assert.doesNotMatch(read('components/app-shell.tsx'),/navCompact|setNavCompact/,'Scroll never hides app navigation labels');
  for(const [from,to] of [['background:var(--color-bg)','background:#f3f3f5'],['border-radius:0','border-radius:30px'],['backdrop-filter:none','backdrop-filter:blur(18px)'],['box-shadow:none','box-shadow:0 3px 12px rgba(0,0,0,.2)'],['opacity:1','opacity:0']]){
   assert.ok(read('app/design-system/navigation.css').includes(from),'Negative control edits an actual declaration');

@@ -1,4 +1,7 @@
 "use client";
+import type {MetricTrend} from '@/lib/kpi-trend';
+import {useLocale} from '@/lib/client/locale';
+import {localeTags} from '@/lib/locales';
 import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
 import {usePageAccess} from "@/lib/client/page-access";
 import {fieldInputHint} from "@/lib/form-input-hints";
@@ -52,7 +55,8 @@ export function Icon({ name, size = 20 }: { name: string; size?: number }) {
     moon: <><path d="M20 15.5A8 8 0 1 1 8.5 4 6.5 6.5 0 0 0 20 15.5Z"/></>,
     sun: <><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></>,
     logout: <><path d="M10 17l5-5-5-5M15 12H3"/><path d="M14 3h6v18h-6"/></>,
-    filter: <><path d="M4 6h16M7 12h10M10 18h4"/></>,
+    filter: <><path d="M4 4h16v3l-6 6v6l-4 2v-8L4 7V4Z"/></>,
+    sort: <><path d="M8 4v16m-4-4 4 4 4-4M16 20V4m-4 4 4-4 4 4"/></>,
     mail: <><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></>,
     upload: <><path d="M12 16V4M7 9l5-5 5 5"/><path d="M5 20h14"/></>,
     pause: <><path d="M9 5v14M15 5v14"/></>,
@@ -120,8 +124,9 @@ export function IconButton({ label, icon, onClick, className="", ...ariaProps }:
   return <LocalizedElement as="button" {...ariaProps} className={["icon-button",className].filter(Boolean).join(" ")} type="button" aria-label={label} onClick={onClick}><Icon name={icon}/></LocalizedElement>;
 }
 
-export function Metric({ label, value, hint, icon }: { label: React.ReactNode; value: React.ReactNode; hint?: string; icon?: string }) {
-  return <div className="metric"><div className="metric-top"><FormLabel><LocalizedText>{label}</LocalizedText></FormLabel>{icon && <Icon name={icon} size={18}/>}</div><strong>{value}</strong>{hint && <small><LocalizedText>{hint}</LocalizedText></small>}</div>;
+export function Metric({ label, value, hint, icon, trend }: { label: React.ReactNode; value: React.ReactNode; hint?: string; icon?: string; trend?:MetricTrend }) {
+  const {locale}=useLocale();
+  return <div className="metric"><div className="metric-top"><FormLabel><LocalizedText>{label}</LocalizedText></FormLabel>{trend?<span className="metric-trend" data-tone={trend.tone} title={trend.label} aria-label={trend.percent===null?trend.label:(trend.percent>=0?"+":"−")+Math.abs(trend.percent).toLocaleString(localeTags[locale],{maximumFractionDigits:1})+"% · "+trend.label}>{trend.percent===null?"–":<><span aria-hidden="true">{trend.percent>0?"↗":trend.percent<0?"↘":"→"}</span>{Math.abs(trend.percent).toLocaleString(localeTags[locale],{maximumFractionDigits:1})}%</>}</span>:icon && <Icon name={icon} size={18}/>}</div><strong>{value}</strong>{hint && <small><LocalizedText>{hint}</LocalizedText></small>}</div>;
 }
 
 export function SectionTitle({ title, action, desktopOnly=false }: { title: string; action?: React.ReactNode;desktopOnly?:boolean }) {
@@ -179,6 +184,8 @@ export function Field({ label, children, className = "",allowReadOnlyInput=false
 export function EmptyState({title,description}:{title:string;description?:string}) {
   return <div className="empty-state" data-empty-state="compact" role="status"><p><LocalizedText>{title}</LocalizedText></p>{description&&<p><LocalizedText>{description}</LocalizedText></p>}</div>;
 }
+
+export function ProgressBar({value,max,label}:{value:number;max:number;label:string}){return <LocalizedElement as="progress" className="bo-progress" aria-label={label} value={Math.max(0,Math.min(value,max))} max={Math.max(1,max)}/>;}
 
 export function Toggle({ checked = false, label, labelledBy, onChange,disabled=false,busy=false }: { checked?: boolean; label: string;labelledBy?:string; onChange?: () => void;disabled?:boolean;busy?:boolean }) {
   return <LocalizedElement as="button" className={`toggle ${checked ? "is-on" : ""}`} disabled={disabled||busy} aria-busy={busy||undefined} type="button" role="switch" aria-checked={checked} aria-labelledby={labelledBy} aria-label={labelledBy?undefined:label} onClick={onChange}><span/></LocalizedElement>;

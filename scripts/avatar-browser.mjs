@@ -1,3 +1,4 @@
+import {openSettingsEditor} from './shared-control-browser.mjs';
 import assert from 'node:assert/strict';
 import sharp from 'sharp';
 import {createHash} from 'node:crypto';
@@ -43,7 +44,7 @@ export async function verifyAvatarBrowser({page,context,base,capture,navigate}){
  };
  const registrations=[['**/api/settings/profile',profile],['**/api/files/*/download',image],['**/api/files',upload],['**/api/files/'+id,mutate]];
  for(const [pattern,handler] of registrations)await context.route(pattern,handler);
- const open=async()=>{await page.getByRole('button',{name:'Bearbeiten',exact:true}).filter({visible:true}).first().click();const editor=page.getByRole('dialog',{name:'Persönliche Daten bearbeiten',exact:true});await editor.waitFor();return editor;};
+ const open=async()=>{await openSettingsEditor(page);const editor=page.getByRole('dialog',{name:'Persönliche Daten bearbeiten',exact:true});await editor.waitFor();return editor;};
  const select=async(camera=false)=>{await page.locator(camera?'#profile-avatar-upload-camera':'#profile-avatar-upload').setInputFiles(file);const preview=page.getByRole('dialog',{name:'Profilbild prüfen',exact:true});await preview.waitFor();await page.waitForFunction(()=>document.querySelector('.avatar-crop-preview img')?.naturalWidth>0);return preview;};
  const confirm=preview=>preview.getByRole('button',{name:'Bild übernehmen',exact:true});
  const current=expected=>page.waitForFunction(value=>document.querySelector('.settings-profile .person-avatar img')?.getAttribute('src')===value,expected);
@@ -51,7 +52,7 @@ export async function verifyAvatarBrowser({page,context,base,capture,navigate}){
  try{
   for(const width of [390,820,1440]){
    avatar=old;verdict='clean';await page.setViewportSize({width,height:900});page=await navigate(base+'/einstellungen/konto');await current(old);
-   const profileSize=await page.locator('.settings-profile .person-avatar').evaluate(el=>el.getBoundingClientRect().width);assert.ok(profileSize>=96&&profileSize<=112);
+   const profileSize=await page.locator('.settings-profile .person-avatar').evaluate(el=>el.getBoundingClientRect().width);assert.ok(profileSize>=52&&profileSize<=64,'V5 compact profile identity must remain within the approved 52–64px range: '+profileSize);
    const editor=await open();assert.equal(await editor.locator('#profile-avatar-upload-camera').getAttribute('capture'),'user');
    if(width===390){const count=uploads;await editor.locator('#profile-avatar-upload').setInputFiles({name:'unsupported.heic',mimeType:'image/heic',buffer:Buffer.from('unsupported fixture')});await editor.getByRole('alert').filter({hasText:'Bitte einen unterstützten Dateityp auswählen.'}).waitFor();assert.equal(uploads,count);assert.equal(avatar,old);}
    const before=uploads;let preview=await select(true);assert.equal(uploads,before,'Camera/file selection cannot upload');

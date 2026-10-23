@@ -8,7 +8,7 @@ async function assertFilterTrigger(trigger,expanded){
 /** Exercise actual shared controls without saving entries or changing timer state. */
 export async function verifyTimeWorkspace(page,{capture}){
  const search=page.getByRole('searchbox',{name:'Zeiteinträge suchen',exact:true});
- const trigger=page.getByRole('button',{name:'Zeitfilter',exact:true});
+ const trigger=page.getByRole('button',{name:'Listenwerkzeuge',exact:true});
  await assertFilterTrigger(trigger,false);
  const original=await search.inputValue(),groups=await page.locator('.time-group').count();
  assert.ok(groups>0,'Search regression starts with actual populated groups');
@@ -26,8 +26,16 @@ export async function verifyTimeWorkspace(page,{capture}){
  await summary.press('Space');
  assert.equal((await group.getAttribute('open'))!==null,open!==null,'Space restores the original disclosure state');
  await trigger.focus();await trigger.press('Enter');
- const dialog=page.getByRole('dialog',{name:'Zeitfilter',exact:true});await dialog.waitFor();
+ const tools=page.getByRole('dialog',{name:'Listenwerkzeuge',exact:true});await tools.waitFor();
  await assertFilterTrigger(trigger,true);
+ assert.equal(await tools.evaluate(el=>el.contains(document.activeElement)),true,'Tools move focus into the central action dialog');
+ await page.keyboard.press('Escape');await tools.waitFor({state:'hidden'});
+ await assertFilterTrigger(trigger,false);
+ assert.equal(await trigger.evaluate(el=>el===document.activeElement),true,'Tools return focus to their invoking control');
+ await trigger.press('Enter');await tools.waitFor();
+ await tools.getByRole('button',{name:'Filter und Sortierung',exact:true}).click();
+ const dialog=page.getByRole('dialog',{name:'Zeitfilter',exact:true});await dialog.waitFor();
+ await tools.waitFor({state:'hidden'});
  assert.equal(await dialog.evaluate(el=>el.contains(document.activeElement)),true,'Filter moves focus into the dialog');
  await page.keyboard.press('Escape');await dialog.waitFor({state:'hidden'});
  await assertFilterTrigger(trigger,false);

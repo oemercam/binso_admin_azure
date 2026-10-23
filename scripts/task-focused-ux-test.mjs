@@ -58,8 +58,8 @@ console.log('Navigation cache TTL/domain/session/bounds, required contact valida
 
 const orientationPermissions=moduleUrl(await fs.readFile('lib/permissions.ts','utf8')),orientationPlans=planAccessModuleUrl;
 const {pageOrientation}=await import(moduleUrl((await fs.readFile('lib/page-orientation.ts','utf8')).replace("'./permissions'",JSON.stringify(orientationPermissions)).replace("'@/config/plan-access'",JSON.stringify(orientationPlans))));
-for(const route of ['/dashboard','/kunden','/zeit','/finanzen','/finanzen/analyse','/einstellungen','/einstellungen/konto']){assert.equal(typeof pageOrientation(route),'string');assert.equal(pageOrientation(route,true),undefined,'Editing keeps its usable space');}
-for(const route of ['/kunden/neu','/kunden/id','/kunden/id/bearbeiten','/support/id','/rechnungen/neu','/login','constructor'])assert.equal(pageOrientation(route),undefined,'No generic caption on records, chats, forms or unknown routes');
+for(const route of ['/dashboard','/kunden','/zeit','/finanzen','/einstellungen','/einstellungen/konto']){assert.equal(typeof pageOrientation(route),'string');assert.equal(pageOrientation(route,true),undefined,'Editing keeps its usable space');}
+for(const route of ['/finanzen/analyse','/kunden/neu','/kunden/id','/kunden/id/bearbeiten','/support/id','/rechnungen/neu','/login','constructor'])assert.equal(pageOrientation(route),undefined,'No generic caption on records, chats, forms or unknown routes');
 console.log('Exact page orientation routes and compact edit/detail/chat exclusions passed.');
 
 // Execute the production lifecycle observer with deferred authoritative reads.

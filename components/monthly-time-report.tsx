@@ -1,5 +1,5 @@
 "use client";
-import {useRef,useState} from 'react';
+import {useRef,useState,type ReactNode} from 'react';
 import {apiPost,apiPatch} from '@/lib/client/backend';
 import {DirectorySelect} from './directory-select';
 import {businessDate} from '@/lib/financial-status';
@@ -9,7 +9,7 @@ import {EntityFiles} from './entity-files';
 import {Button,Field,Input,Textarea,ErrorState,FormActions} from './ui';
 
 type Entry={id:string;report_month?:string|null;duration_minutes?:number|null;customer_id?:string|null;customer_name?:string|null;project_id?:string|null;project_name?:string|null;description?:string|null;submitted_at?:string|null;approved?:boolean;review_note?:string|null};
-export function MonthlyTimeReport({entry,readOnly=false,canReview=false,timeOnly=false}:{timeOnly?:boolean;entry?:Entry;readOnly?:boolean;canReview?:boolean}){
+export function MonthlyTimeReport({entry,readOnly=false,canReview=false,timeOnly=false,trigger,headerActions}:{headerActions?:ReactNode;trigger?:(open:()=>void)=>ReactNode;timeOnly?:boolean;entry?:Entry;readOnly?:boolean;canReview?:boolean}){
  const [open,setOpen]=useState(false),[id,setId]=useState(entry?.id??''),[month,setMonth]=useState(entry?.report_month?.slice(0,7)??businessDate().slice(0,7)),[hours,setHours]=useState(entry?String(Number(entry.duration_minutes??0)/60):''),[customer,setCustomer]=useState(entry?.customer_id??''),[project,setProject]=useState(entry?.project_id??''),[description,setDescription]=useState(entry?.description??''),[busy,setBusy]=useState(false),[error,setError]=useState('');const pending=useRef(false),replay=useRef<string>('');const [baseline,setBaseline]=useState(()=>JSON.stringify([entry?.report_month?.slice(0,7)??businessDate().slice(0,7),entry?String(Number(entry.duration_minutes??0)/60):'',entry?.customer_id??'',entry?.project_id??'',entry?.description??'']));
  const [reviewNote,setReviewNote]=useState('');
  const review=async(action:'approve'|'reject')=>{if(!entry||pending.current)return;if(action==='reject'&&!reviewNote.trim()){setError('Bitte eine Begründung eingeben.');return;}pending.current=true;setBusy(true);setError('');try{await apiPatch('/api/time-entries/'+encodeURIComponent(entry.id),{action,note:reviewNote});setOpen(false)}catch(e){setError(e instanceof Error?e.message:'Prüfung konnte nicht gespeichert werden.')}finally{pending.current=false;setBusy(false)}};
@@ -26,7 +26,7 @@ export function MonthlyTimeReport({entry,readOnly=false,canReview=false,timeOnly
    if(submit){await apiPatch('/api/time-entries/'+encodeURIComponent(saved),{action:'submit'});setOpen(false);if(!entry){setId('');setHours('');setCustomer('');setProject('');setDescription('');replay.current='';setBaseline(JSON.stringify([month,'','','','']));}}
   }catch(e){setError(e instanceof Error?e.message:'Monatsrapport konnte nicht gespeichert werden.');}finally{pending.current=false;setBusy(false)}
  };
- return <><Button requiresWrite={!entry} variant="secondary" onClick={()=>setOpen(true)}><LocalizedText>{entry?'Rapport':'Monatsrapport'}</LocalizedText></Button><FormSheet label="Monatsrapport" open={open} onClose={()=>setOpen(false)} busy={busy} dirty={!!reviewNote||!locked&&JSON.stringify([month,hours,customer,project,description])!==baseline}>
+ return <>{trigger?trigger(()=>setOpen(true)):<Button requiresWrite={!entry} variant="secondary" onClick={()=>setOpen(true)}><LocalizedText>{entry?'Rapport':'Monatsrapport'}</LocalizedText></Button>}<FormSheet headerActions={headerActions} label="Monatsrapport" open={open} onClose={()=>setOpen(false)} busy={busy} dirty={!!reviewNote||!locked&&JSON.stringify([month,hours,customer,project,description])!==baseline}>
  <p className="technical-hint"><LocalizedText>{'Gesamtstunden des Monats erfassen und den unterschriebenen Stundenrapport als Nachweis hochladen. Bereits erfasste Einzelzeiten dürfen nicht nochmals enthalten sein.'}</LocalizedText></p>
  <Field label="Monat"><Input type="month" required disabled={!!id} value={month} onChange={e=>setMonth(e.target.value)}/></Field>
  <Field label="Kunde"><DirectorySelect label="Kunde" selectedLabel={entry?.customer_name??undefined} required disabled={!!id} endpoint={timeOnly?"/api/time-entries/options?kind=customers":"/api/customers"} value={customer} onChange={value=>{setCustomer(value);setProject('')}}/></Field>

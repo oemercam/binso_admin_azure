@@ -1,5 +1,5 @@
 "use client";
-import {useRef,useState} from 'react';
+import {useRef,useState,type ReactNode} from 'react';
 import {apiGetFile,apiPost} from '@/lib/client/backend';
 import {useLocale} from '@/lib/client/locale';
 import {ActionsMenu,ActionRow} from './binso-ux';
@@ -12,7 +12,7 @@ import type {ClientSession} from '@/lib/client/session-cache';
 import {tenantCan} from '@/lib/permissions';
 
 /** One transport/download/viewer owner for authorized report variants. */
-export function ReportActions({query,disabled=false,onTimeReport}:{query:string;disabled?:boolean;onTimeReport?:()=>void}){
+export function ReportActions({query,disabled=false,onTimeReport,header=false,tools=false,extraActions,label="Berichtsaktionen",caption}:{query:string;disabled?:boolean;onTimeReport?:()=>void;header?:boolean;tools?:boolean;extraActions?:ReactNode;label?:string;caption?:string}){
  const {locale}=useLocale(),pending=useRef(false),[busy,setBusy]=useState(false),[error,setError]=useState(''),[preview,setPreview]=useState<Blob|null>(null);
  const preparation=useRef<{query:string;locale:string;key:string}|null>(null);
  const [mail,setMail]=useState<{id:string;blob:Blob}|null>(null),session=useApiQuery<ClientSession>('/api/auth/session').data;
@@ -36,5 +36,5 @@ export function ReportActions({query,disabled=false,onTimeReport}:{query:string;
   }catch(issue){setError(issue instanceof Error?issue.message:'Daten konnten nicht geladen werden.')}
   finally{pending.current=false;setBusy(false)}
  };
- return <><ActionsMenu label="Berichtsaktionen" busy={busy}><ActionRow title="PDF ansehen" icon="file" disabled={disabled||busy} onClick={()=>void run('pdf')}/><ActionRow title="CSV exportieren" icon="download" disabled={disabled||busy} onClick={()=>void run('csv')}/>{canSend&&<><ActionRow title="Per E-Mail senden" icon="mail" disabled={disabled||busy} onClick={()=>void run('mail')}/><ActionRow title="Freigabelink" icon="lock" disabled={disabled||busy} onClick={()=>void run('share')}/></>}{onTimeReport&&<ActionRow title="Zeitrapport" icon="time" disabled={disabled||busy} onClick={onTimeReport}/>}</ActionsMenu>{error&&<ErrorState>{error}</ErrorState>}{preview&&<DocumentModal title="Berichte" fileBlob={preview} fileName="binso-report" onClose={()=>setPreview(null)}/>} {mail&&<ReportMailSheet {...mail} onClose={()=>setMail(null)}/>} {share&&<ReportShareSheet id={share} onClose={()=>setShare(null)}/>}</>;
+ return <><ActionsMenu header={header} tools={tools} label={label} busy={busy}>{caption&&<p className="bo-report-period">{caption}</p>}{extraActions}<ActionRow title="PDF ansehen" icon="file" disabled={disabled||busy} onClick={()=>void run('pdf')}/><ActionRow title="CSV exportieren" icon="download" disabled={disabled||busy} onClick={()=>void run('csv')}/>{canSend&&<><ActionRow title="Per E-Mail senden" icon="mail" disabled={disabled||busy} onClick={()=>void run('mail')}/><ActionRow title="Freigabelink" icon="lock" disabled={disabled||busy} onClick={()=>void run('share')}/></>}{onTimeReport&&<ActionRow title="Zeitrapport" icon="time" disabled={disabled||busy} onClick={onTimeReport}/>}</ActionsMenu>{error&&<ErrorState>{error}</ErrorState>}{preview&&<DocumentModal title="Berichte" fileBlob={preview} fileName="binso-report" onClose={()=>setPreview(null)}/>} {mail&&<ReportMailSheet {...mail} onClose={()=>setMail(null)}/>} {share&&<ReportShareSheet id={share} onClose={()=>setShare(null)}/>}</>;
 }

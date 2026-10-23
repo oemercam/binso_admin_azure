@@ -1,16 +1,17 @@
 "use client";
-import {useRef,useState} from 'react';
 import Link from 'next/link';
+import {useRef,useState} from 'react';
 import type {SetupGuide} from '@/lib/action-readiness';
 import {useApiQuery} from '@/lib/client/use-api-query';
 import {apiPatch} from '@/lib/client/backend';
 import {usePageAccess} from '@/lib/client/page-access';
 import {LocalizedText} from '@/lib/client/locale';
 import {ListRow,SettingsGroup} from './binso-ux';
-import {SectionTitle,LoadingState,ErrorState,Toggle} from './ui';
+import {LoadingState,ErrorState,Toggle,ProgressBar} from './ui';
 export function SetupGuideView({item}:{item:SetupGuide}){
- if(item.dismissed||item.tasks.every(task=>task.complete))return null;
- return <section className="bo-workspace-section"><SectionTitle title="Einrichtung abschliessen" action={<Link href="/einstellungen"><LocalizedText>{"Einstellungen"}</LocalizedText></Link>}/><p><LocalizedText>{"Für das Ausstellen von Rechnungen. Entwürfe sind auch vorher möglich."}</LocalizedText></p><p><LocalizedText>{"Pflichtangaben"}</LocalizedText>: {item.requiredComplete} / {item.requiredTotal}</p>{item.tasks.map(task=><ListRow key={task.id} href={task.href} title={task.title} meta={task.importance==='required'?'Pflicht':task.importance==='recommended'?'Empfohlen':'Optional'} status={task.complete?'Erledigt':'Offen'} tone={task.complete?'success':'neutral'}/>)}</section>;
+ const next=item.tasks.find(task=>task.importance==='required'&&!task.complete);
+ if(item.dismissed||item.requiredComplete>=item.requiredTotal||!next)return null;
+ return <Link href={next.href} className="bo-setup-card"><div className="bo-setup-card-head"><h2><LocalizedText>{'Einrichtung abschliessen'}</LocalizedText></h2><span>{item.requiredComplete}{' '}<LocalizedText>{'von'}</LocalizedText>{' '}{item.requiredTotal}</span></div><ProgressBar value={item.requiredComplete} max={item.requiredTotal} label="Pflichtangaben"/><div className="bo-setup-card-next"><span><LocalizedText>{next.title}</LocalizedText></span><span><LocalizedText>{'Fortsetzen'}</LocalizedText>{' ›'}</span></div></Link>;
 }
 export function SetupGuidePreference(){
  const {hasPermission}=usePageAccess();
@@ -29,5 +30,5 @@ export function SetupGuidePreference(){
   catch(reason){setError(reason instanceof Error?reason.message:'Einstellung konnte nicht gespeichert werden.');}
   finally{pending.current=false;setBusy(false)}
  };
- return <SettingsGroup title="Einrichtung"><ListRow title="Einrichtungshilfe anzeigen" meta="Persönliche Anzeige auf der Übersicht" value={<Toggle label="Einrichtungshilfe anzeigen" checked={!dismissed} busy={busy} disabled={!item.editable} onChange={()=>void change()}/>}/>{error&&<ErrorState>{error}</ErrorState>}</SettingsGroup>;
+ return <SettingsGroup title="Einrichtung"><ListRow information title="Einrichtungshilfe anzeigen" meta="Persönliche Anzeige auf der Übersicht" value={<Toggle label="Einrichtungshilfe anzeigen" checked={!dismissed} busy={busy} disabled={!item.editable} onChange={()=>void change()}/>}/>{error&&<ErrorState>{error}</ErrorState>}</SettingsGroup>;
 }

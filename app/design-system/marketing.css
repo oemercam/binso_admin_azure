@@ -344,9 +344,9 @@
 .privacy-settings-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
 .locale-switcher{display:flex;align-items:center;gap:10px;color:var(--app-secondary);font-size:var(--type-label);min-width:0}
 .locale-switcher>.app-select-control{width:auto;max-width:170px}
-.locale-switcher .app-select-trigger{min-height:38px;height:38px;width:auto;max-width:170px;border-radius:var(--app-control-radius);background:var(--app-surface)}
+.locale-switcher .app-select-trigger{min-height:44px;height:44px;width:auto;max-width:170px;padding:0 8px;gap:6px;border:0;border-radius:0;background:transparent;box-shadow:none;color:var(--app-text);font-size:var(--type-label);white-space:nowrap}
 .locale-switcher.is-compact>span:not(.app-select-control){position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
-.locale-switcher.is-compact .app-select-trigger{max-width:80px;min-height:44px;height:44px;font-size:var(--type-label);padding:0 8px;border:0;border-radius:0;background:transparent;box-shadow:none;color:var(--app-text)}
+.locale-switcher.is-compact .app-select-trigger{max-width:170px}
 .locale-switcher.is-compact .app-select-trigger:hover{background:transparent;color:var(--app-action-accent)}
 .locale-switcher.is-compact .app-select-trigger:focus-visible{outline:2px solid var(--app-action-accent);outline-offset:2px}
 .account-sheet>.locale-switcher{padding:12px 4px;justify-content:space-between}
@@ -364,8 +364,8 @@
 .marketing-actions>.button{display:none}
 }
 @media (max-width:760px){
-.marketing-actions>.locale-switcher{display:none}
-.marketing-mobile-actions>.locale-switcher{justify-content:space-between;padding:6px 2px}
+.marketing-actions>.locale-switcher{display:flex}
+
 .marketing-header{
     height:calc(54px + var(--safe-top));
     padding-top:var(--safe-top);
@@ -634,3 +634,11 @@
     padding:40px 24px;
   }
 }
+
+/* V5 internal legal reading surface reuses the public document content. */
+.app-legal-page{max-width:none;padding:0;margin:0}
+.app-legal-page .legal-hero{margin:12px 0 16px}
+.app-legal-page .legal-hero .eyebrow{display:none}
+.app-legal-page .legal-content{max-width:900px}
+.app-legal-page .legal-content section{padding-block:16px}
+.app-legal-page .legal-content :is(p,li,dd){font-size:var(--type-body);line-height:1.6}

@@ -1,4 +1,23 @@
 /* BINso One / analytics — one owner for base, states and responsive behavior. */
+/* Approved overview reference: scoped to the mobile dashboard only. */
+@media(max-width:760px){
+ .bo-dashboard-overview{display:grid;gap:12px;min-width:0}
+ .bo-dashboard-overview>.bo-workspace-section,.bo-dashboard-overview>.bo-cash-overview{margin:0}
+ .bo-dashboard-overview>.bo-workspace-section,.bo-dashboard-overview .bo-cash-trend{border:1px solid var(--color-line);border-radius:var(--shape-panel);padding:14px;background:var(--color-bg);min-width:0}
+ .bo-dashboard-overview .section-title{margin:0 0 10px;min-height:0}
+ .bo-dashboard-overview .section-title h2{font-size:var(--type-body);line-height:1.4}
+ .bo-dashboard-overview .bo-cash-overview>.metrics-grid{grid-auto-rows:1fr;gap:10px;margin:0 0 12px;align-items:stretch}
+ .bo-dashboard-overview .bo-metric-tiles .metric{border:1px solid var(--color-line);border-radius:var(--shape-panel);padding:14px;min-height:116px;background:var(--color-bg)}
+ .bo-dashboard-overview .metric-top{align-items:flex-start;gap:6px;font-size:var(--type-label);overflow-wrap:anywhere}
+ .bo-dashboard-overview .bo-metric-tiles .metric strong{font-weight:600;line-height:1.25;margin-top:10px}
+ .bo-dashboard-overview .metric-money{gap:2px}
+ .bo-dashboard-overview .bo-metric-tiles .metric>small{font-size:var(--type-metadata);line-height:1.4}
+ .bo-dashboard-overview .document-summary-row{min-height:54px;padding-block:10px;gap:4px 10px}
+ .bo-dashboard-overview .document-summary-row b{font-size:var(--type-body);font-weight:500}
+ .bo-dashboard-overview .document-summary-row small{font-size:var(--type-metadata);line-height:1.4}
+ .bo-dashboard-overview .bo-overview-bars{margin-block:12px 0}
+ .bo-dashboard-overview .bo-overview-explanation{margin-bottom:0;font-size:var(--type-metadata)}
+}
 .metrics-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;border:0}
 .metrics-grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
 .metric{min-width:0;min-height:0;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}
@@ -41,7 +60,7 @@
 .bo-ring-chart svg{width:var(--chart-ring-size);height:var(--chart-ring-size);flex:none;overflow:visible}
 .bo-ring-chart circle{stroke-width:var(--chart-ring-width);transition:stroke-dasharray var(--motion-base) var(--motion-ease)}
 .bo-ring-details{display:grid;gap:var(--field-label-gap);min-width:0;flex:1;font-size:var(--type-label)}
-.bo-ring-details button{display:grid;grid-template-columns:8px minmax(0,1fr) auto;align-items:center;gap:var(--field-label-gap);min-height:var(--touch);padding:0;border:0;background:transparent;color:inherit;text-align:left}
+.bo-ring-details :is(button,.bo-ring-status){display:grid;grid-template-columns:8px minmax(0,1fr) auto;align-items:center;gap:var(--field-label-gap);min-height:var(--touch);padding:0;border:0;background:transparent;color:inherit;text-align:left}
 .bo-ring-details i{width:8px;height:8px;border-radius:50%}
 .bo-ring-details output{color:var(--color-muted);font-variant-numeric:tabular-nums}
 .bo-statistics-notice summary{cursor:pointer;min-height:var(--touch);display:flex;align-items:center}
@@ -128,3 +147,122 @@
 .bo-ring-total>span{font-size:var(--type-label);color:var(--color-muted)}
 .bo-ring-total>strong{display:block;text-align:start;font-size:var(--type-subtitle);font-variant-numeric:tabular-nums}
 @media(max-width:480px){.bo-ring-chart{flex-wrap:wrap}.bo-ring-details{flex:1 1 100%}.bo-ring-details button{grid-template-columns:8px minmax(0,1fr) minmax(0,max-content)}.bo-ring-details strong{overflow-wrap:anywhere;min-width:0}}
+
+/* Dashboard KPIs share compact geometry on mobile and desktop. */
+.bo-dashboard-overview .bo-cash-overview>.metrics-grid{grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-rows:1fr;align-items:stretch;gap:10px;margin-bottom:12px}
+.bo-dashboard-overview .bo-metric-tiles .metric{padding:12px;min-height:94px;border:1px solid var(--color-line);border-radius:var(--shape-panel);background:var(--color-bg);display:flex;flex-direction:column;justify-content:space-between;gap:10px}
+.bo-dashboard-overview .bo-metric-tiles .metric strong{font-size:var(--type-subtitle);line-height:1.3;margin:0;letter-spacing:-.3px}
+.bo-dashboard-overview .metric-money{display:inline-flex;flex-direction:row;align-items:baseline;gap:4px;white-space:nowrap}
+.bo-dashboard-overview .metric-money-currency{font-size:var(--type-metadata);font-weight:400;color:var(--color-muted)}
+.bo-dashboard-overview .metric-top{font-size:var(--kpi-label-font);line-height:1.4;align-items:center}
+.bo-dashboard-overview .bo-overview-details{margin-block:0}
+.bo-dashboard-overview .bo-overview-details>summary{font-size:var(--type-label);color:var(--color-muted);font-weight:400}
+.bo-dashboard-overview .bo-overview-details>p{font-size:var(--type-label);color:var(--color-muted);line-height:1.5;margin:0 0 12px}
+.bo-dashboard-overview .bo-overview-bars>button{gap:8px}
+.bo-dashboard-overview .bo-overview-bars small{white-space:nowrap;font-size:var(--type-metadata)}
+@media(max-width:760px){
+ .bo-dashboard-overview .bo-cash-overview>.metrics-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .bo-dashboard-overview .bo-metric-tiles .metric strong{font-size:var(--kpi-value-font)}
+ .bo-dashboard-overview .bo-overview-bars{gap:8px}
+ .bo-dashboard-overview .bo-overview-bar-track{height:88px}
+}
+
+.bo-dashboard-overview .document-summary-row.is-information{height:46px;min-height:46px;padding-block:0;gap:12px}
+.bo-dashboard-overview .document-summary-row.is-information b{font-weight:400}
+
+@media(min-width:761px){
+ .bo-dashboard-overview{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;min-width:0}
+ .bo-dashboard-overview>.bo-cash-overview{grid-column:1/-1;margin-block:0}
+ .bo-dashboard-overview>.bo-workspace-section{margin:0;padding:14px;border:1px solid var(--color-line);border-radius:var(--shape-panel);min-width:0}
+ .bo-dashboard-overview .bo-overview-bar-track{height:88px}
+ .bo-dashboard-overview .section-title{margin-bottom:10px}
+}
+@media(min-width:761px) and (max-width:1100px){.bo-dashboard-overview{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Existing compact KPI geometry, opted into by the finance overview on mobile. */
+@media(max-width:760px){
+ .bo-finance-workspace .bo-cash-overview{margin-block:0}
+ .bo-finance-workspace .bo-cash-overview>.metrics-grid{grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:1fr;align-items:stretch;gap:10px;margin-block:12px}
+ .bo-finance-workspace .bo-metric-tiles .metric{padding:12px;min-height:94px;border:1px solid var(--color-line);border-radius:var(--shape-panel);background:var(--color-bg);display:flex;flex-direction:column;justify-content:space-between;gap:10px}
+ .bo-finance-workspace .bo-metric-tiles .metric strong{font-size:var(--kpi-value-font);line-height:1.3;margin:0;letter-spacing:-.3px}
+ .bo-finance-workspace .metric-money{display:inline-flex;flex-direction:row;align-items:baseline;gap:4px;white-space:nowrap}
+ .bo-finance-workspace .metric-money-currency{font-size:var(--type-metadata);font-weight:400;color:var(--color-muted)}
+ .bo-finance-workspace .metric-top{font-size:var(--kpi-label-font);line-height:1.4;align-items:center}
+ .bo-finance-workspace .bo-cash-trend{padding:14px;border:1px solid var(--color-line);border-radius:var(--shape-panel)}
+ .bo-finance-workspace .bo-overview-bar-track{height:88px}
+ .bo-finance-workspace .bo-overview-bars{gap:8px;margin-block:12px 0}
+ .bo-finance-workspace .bo-overview-bars>button{gap:8px}
+ .bo-finance-workspace .bo-overview-bars small{white-space:nowrap;font-size:var(--type-metadata)}
+ .bo-finance-workspace .bo-overview-details>summary{font-size:var(--type-label);font-weight:400;color:var(--color-muted)}
+ .bo-finance-workspace .bo-overview-details>p{font-size:var(--type-label);line-height:1.5;color:var(--color-muted)}
+ .bo-finance-workspace .empty-state{padding-block:8px;margin-block:0;min-height:0}
+ .bo-finance-workspace .bo-statistics-periods{justify-content:flex-start;gap:2px}
+ .bo-finance-workspace .bo-statistics-periods button{min-height:44px}
+}
+
+:is(.app-root[data-ux="master-v3"] .bo-cash-overview,.bo-statistics)[data-compact]>.metrics-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-rows:1fr;gap:12px;align-items:stretch;margin-block:12px 16px}
+:is(.app-root[data-ux="master-v3"] .bo-cash-overview,.bo-statistics)[data-compact] .metric{display:flex;flex-direction:column;justify-content:space-between;gap:12px;padding:var(--ux-card-inset);min-height:104px;border:1px solid var(--color-line);border-radius:var(--shape-panel);background:var(--color-bg)}
+:is(.app-root[data-ux="master-v3"] .bo-cash-overview,.bo-statistics)[data-compact] .metric-top{display:flex;align-items:center;gap:8px;font-size:var(--kpi-label-font);line-height:1.4}
+:is(.app-root[data-ux="master-v3"] .bo-cash-overview,.bo-statistics)[data-compact] .metric strong{font-size:var(--kpi-value-font);line-height:1.25;font-weight:600;margin:0}
+:is(.app-root[data-ux="master-v3"] .bo-cash-overview,.bo-statistics)[data-compact] .metric-money{display:inline-flex;flex-direction:row;align-items:baseline;gap:4px;white-space:nowrap}
+:is(.app-root[data-ux="master-v3"] .bo-cash-overview,.bo-statistics)[data-compact] .metric-money-currency{font-size:var(--type-metadata);font-weight:400;color:var(--color-muted)}
+.app-root[data-ux="master-v3"] .bo-cash-trend{padding:var(--ux-card-inset);border:1px solid var(--color-line);border-radius:var(--shape-panel);margin-top:16px}
+.bo-chart-legend{display:flex;align-items:center;gap:6px;font-size:var(--type-metadata);color:var(--color-muted);margin:0 0 12px}
+.bo-chart-legend>span{display:block;width:8px;height:8px;border-radius:var(--shape-mark);background:var(--app-action-accent)}
+.bo-chart-legend>span[data-category="income"]{background:var(--ux-chart-income)}
+.bo-overview-bars[data-category="income"] .bo-overview-bar-track>i{background:var(--ux-chart-income)}
+.bo-overview-bars[data-category="revenue"] .bo-overview-bar-track>i{background:var(--app-action-accent)}
+.app-root[data-ux="master-v3"] .bo-overview-bars{gap:12px;margin-block:12px 0}
+.app-root[data-ux="master-v3"] .bo-overview-bars small{white-space:normal;overflow:visible;text-overflow:clip;font-size:var(--type-metadata);line-height:1.45;overflow-wrap:anywhere}
+.app-root[data-ux="master-v3"] .bo-overview-bar-track{height:100px}
+.app-root[data-ux="master-v3"] .bo-overview-bars[data-signed] .bo-overview-bar-track{height:140px}
+@media(max-width:1199px){:is(.app-root[data-ux="master-v3"] .bo-cash-overview,.bo-statistics)[data-compact]>.metrics-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){
+ :is(.app-root[data-ux="master-v3"] .bo-cash-overview,.bo-statistics)[data-compact]>.metrics-grid{gap:12px}
+ :is(.app-root[data-ux="master-v3"] .bo-cash-overview,.bo-statistics)[data-compact] .metric{min-height:104px}
+ :is(.app-root[data-ux="master-v3"] .bo-cash-overview,.bo-statistics)[data-compact] .metric strong{font-size:var(--kpi-value-font)}
+ .app-root[data-ux="master-v3"] .bo-overview-bars{gap:8px}
+}
+/* Global V3.3 period control; narrow tablets use the same sheet as mobile. */
+.bo-period-control{width:fit-content;max-width:100%;min-width:0}
+.bo-period-segments{display:flex;align-items:center;gap:4px;max-width:100%;flex-wrap:wrap}
+.bo-period-segments>button,.bo-period-mobile{min-height:44px;padding:8px 12px;border:0;border-radius:var(--app-control-radius);background:transparent;color:var(--color-fg);font:inherit;font-size:var(--type-label);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.bo-period-segments>button{min-width:52px}
+.bo-period-segments>button[aria-pressed=true]{color:var(--app-action-accent);background:var(--app-accent-soft)}
+.bo-period-control button:focus-visible,.bo-period-options button:focus-visible{outline:2px solid var(--app-action-accent);outline-offset:2px}
+.bo-period-mobile{display:none;max-width:100%;font-weight:500;padding-inline:0}
+.bo-period-mobile>span,.bo-period-segments>button>span{overflow-wrap:anywhere;min-width:0}
+.bo-period-options{display:grid;gap:12px;padding-block:8px}
+.bo-period-options [role=radiogroup]{display:grid}
+.bo-period-options [role=radio]{min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:start;padding:8px 0;border:0;border-bottom:1px solid var(--color-line);font:inherit;background:transparent;color:var(--color-fg);cursor:pointer}
+.bo-period-options [role=radio][aria-checked=true]{color:var(--app-action-accent)}
+.bo-period-definition{font-size:var(--type-metadata);color:var(--color-muted);margin:0}
+@media(max-width:1023px){.bo-period-mobile{display:inline-flex}.bo-period-segments{display:none}}
+
+/* Final V1: the same KPI/card owners, with one compact cash comparison. */
+.bo-finance-analysis{display:grid;gap:12px;margin-block:0;overflow:visible}
+.bo-finance-analysis>.metrics-grid{margin-block:0}
+.bo-finance-analysis>.records-search-row{margin-bottom:0}
+.bo-comparison-card{min-width:0;border:1px solid var(--color-line);border-radius:var(--shape-panel);padding:var(--ux-card-inset);background:var(--color-bg)}
+.bo-comparison-card>header,.bo-comparison-row>div:first-child,.bo-comparison-card>footer{display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:0}
+.bo-comparison-card h2{font-size:var(--type-body);font-weight:600;margin:0}
+.bo-comparison-card>header>span{font-size:var(--type-metadata);color:var(--color-muted);text-align:end;overflow-wrap:anywhere;max-width:55%}
+.bo-comparison-row{display:grid;gap:8px;margin-top:14px;font-size:var(--type-label)}
+.bo-comparison-row strong,.bo-comparison-card>footer strong{font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.bo-comparison-track{height:8px;border-radius:var(--shape-small);background:var(--color-line);overflow:hidden}
+.bo-comparison-track>i{display:block;width:clamp(0%,var(--bar-value),100%);height:100%;border-radius:inherit}
+.bo-comparison-card>footer{border-top:1px solid var(--color-line);margin-top:14px;padding-top:12px;font-size:var(--type-label)}
+.bo-finance-analysis>.bo-data-disclosure{margin:0;border:1px solid var(--color-line);border-radius:var(--shape-panel);padding:0 var(--ux-card-inset)}
+.bo-finance-analysis>.bo-data-disclosure>summary{min-height:48px;gap:8px;font-size:var(--type-label)}
+.bo-disclosure-value{margin-inline-start:auto;font-size:var(--type-label);font-weight:500;font-variant-numeric:tabular-nums;white-space:nowrap}
+.bo-data-disclosure[data-controlled]>summary::after{content:'⌄';transform:none;font-size:var(--accordion-chevron-size);color:var(--color-muted)}
+.bo-data-disclosure[data-controlled][open]>summary::after{transform:rotate(180deg)}
+.bo-analysis-asof{margin:8px 0;font-size:var(--type-metadata);color:var(--color-muted)}
+.bo-ring-chart[data-compact]{--chart-ring-size:90px;--chart-ring-width:10px;gap:12px;padding-block:8px}
+.bo-ring-chart[data-compact] .bo-ring-total{font-size:var(--type-metadata)}
+.bo-ring-chart[data-compact] .bo-ring-details{font-size:var(--type-metadata);gap:0}
+.bo-ring-chart[data-compact] output{display:none}
+.bo-ring-chart[data-compact] .bo-ring-status strong{display:flex;align-items:baseline;gap:6px;font-size:var(--type-metadata)}
+.bo-statistics-warning{background:var(--chart-warning)}
+.bo-analysis-notes{font-size:var(--type-label);color:var(--color-muted);line-height:1.5}
+@media(max-width:380px){.bo-ring-chart[data-compact]{flex-wrap:wrap}.bo-ring-chart[data-compact] .bo-ring-details{flex-basis:100%}.bo-comparison-card>header{align-items:flex-start}.bo-finance-analysis .metric-top{gap:4px;flex-wrap:wrap}.bo-finance-analysis .metric-trend{margin-inline-start:auto}}

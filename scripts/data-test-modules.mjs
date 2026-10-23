@@ -13,6 +13,6 @@ let localeModule;
 export async function localeTestModuleUrl(){
  if(localeModule)return localeModule;
  const config=moduleUrl(await fs.readFile('lib/locales/config.ts','utf8'));
- localeModule=moduleUrl((await fs.readFile('lib/locales/index.ts','utf8')).replace("import catalogue from './messages.json';",'const catalogue='+await fs.readFile('lib/locales/messages.json','utf8')+';').replace('import pluralCatalogue from "./plurals.json";','const pluralCatalogue='+await fs.readFile('lib/locales/plurals.json','utf8')+';').replace('import templateCatalogue from "./templates.json";','const templateCatalogue='+await fs.readFile('lib/locales/templates.json','utf8')+';').replaceAll('"./config"',JSON.stringify(config)));
+ localeModule=moduleUrl((await fs.readFile('lib/locales/index.ts','utf8')).replace("import catalogue from './messages.json';",'const catalogue='+await fs.readFile('lib/locales/messages.json','utf8')+';').replace("import periodCatalogue from './periods.json';",'const periodCatalogue='+await fs.readFile('lib/locales/periods.json','utf8')+';').replace('import pluralCatalogue from "./plurals.json";','const pluralCatalogue='+await fs.readFile('lib/locales/plurals.json','utf8')+';').replace('import templateCatalogue from "./templates.json";','const templateCatalogue='+await fs.readFile('lib/locales/templates.json','utf8')+';').replaceAll('"./config"',JSON.stringify(config)));
  return localeModule;
 }

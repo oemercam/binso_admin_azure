@@ -91,7 +91,11 @@ export async function verifyNavigationPersistence(page,{base,capture=async()=>{}
    if(railVisible){
     const settings=page.locator('.settings-context-navigation');await settings.getByRole('link',{name:'Darstellung',exact:true}).click();await page.waitForURL(base+'/einstellungen/darstellung');assert.equal(await settings.locator('a[aria-current="page"]').getAttribute('href'),'/einstellungen/darstellung','Visible settings siblings announce the current page');
    }else{
-    await page.locator('.mobile-back,.desktop-back').filter({visible:true}).click();await page.waitForURL(base+'/einstellungen');await page.locator('.settings-overview').getByRole('link',{name:'Darstellung',exact:true}).click();await page.waitForURL(base+'/einstellungen/darstellung');
+    await page.locator('.mobile-back,.desktop-back').filter({visible:true}).click();await page.waitForURL(base+'/einstellungen');await page.waitForLoadState('networkidle');
+    assert.equal(await page.locator('.settings-overview').getByRole('link',{name:'Darstellung',exact:true}).count(),0,'V4.1 company settings do not duplicate personal preferences');
+    await page.getByRole('button',{name:'Benutzerkonto',exact:true}).filter({visible:true}).click();
+    await page.locator('.account-sheet').getByRole('link',{name:'Darstellung',exact:true}).click();await page.waitForURL(url=>url.pathname==='/einstellungen/darstellung');
+    assert.equal(new URL(page.url()).searchParams.get('accountReturn'),'/einstellungen?panel=account','Personal preferences preserve the invoking account menu');
    }
    await page.getByRole('radiogroup',{name:'Darstellung',exact:true}).waitFor({state:'visible'});assert.ok(await page.getByRole('radiogroup',{name:'Darstellung',exact:true}).isVisible(),'Existing appearance control remains reachable');
    await capture('settings-desktop-'+width);
@@ -100,8 +104,12 @@ export async function verifyNavigationPersistence(page,{base,capture=async()=>{}
   await page.goto(base+'/einstellungen/konto');await page.waitForLoadState('networkidle');
   assert.equal(await page.locator('.settings-context-navigation').isVisible(),false,'Desktop settings rail stays out of the phone flow');
   assert.equal(await page.locator('.settings-mobile-navigation').count(),0,'Phone settings use the overview without an extra hamburger');
-  await page.locator('.mobile-back').click();await page.waitForURL(base+'/einstellungen');
-  const security=page.locator('.settings-overview').getByRole('link',{name:'Sicherheit',exact:true});await security.focus();await security.press('Enter');await page.waitForURL(base+'/einstellungen/sicherheit');
+  await page.locator('.mobile-back').click();await page.waitForURL(base+'/einstellungen');await page.waitForLoadState('networkidle');
+  assert.equal(await page.locator('.settings-overview').getByRole('link',{name:'Sicherheit',exact:true}).count(),0,'Security remains in the personal account area');
+  // V4.1 settings is a detail header (back/title/actions), without a competing account avatar.
+  await page.locator('.mobile-back').click();await page.waitForURL(base+'/dashboard');await page.waitForLoadState('networkidle');
+  await page.getByRole('button',{name:'Benutzerkonto',exact:true}).filter({visible:true}).click();
+  const security=page.locator('.account-sheet').getByRole('link',{name:'Sicherheit',exact:true});await security.focus();await security.press('Enter');await page.waitForURL(url=>url.pathname==='/einstellungen/sicherheit');
   await page.getByRole('button',{name:'Passwort ändern',exact:true}).click();
   const password=page.getByRole('dialog',{name:'Passwort ändern',exact:true});
   assert.equal(await password.locator('input[type="password"]').count(),3,'Existing current/new/confirm password fields stay in the real shared form');

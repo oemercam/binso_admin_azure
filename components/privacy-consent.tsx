@@ -3,8 +3,9 @@
 import {LocalizedText} from "@/lib/client/locale";
 import Link from "next/link";
 import {useEffect,useState} from "react";
-import {Button,SectionTitle,Status,Toggle,ErrorState} from "@/components/ui";
+import {Button,Toggle,ErrorState} from "@/components/ui";
 import {useDialogFocus} from '@/components/use-dialog-focus';
+import {ActionRow,SettingsGroup,ListRow} from "@/components/binso-ux";
 import {AppShell} from "@/components/app-shell";
 
 export const privacyPreferenceKey="binso.privacy.preferences.v1";
@@ -94,24 +95,13 @@ export function PrivacySettingsPage(){
     window.setTimeout(()=>setSaved(false),2200);
   };
 
-  return <AppShell title="Datenschutz & Cookies" subtitle="Technisch notwendige Funktionen und optionale Performance-Messung." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
-    <section className="surface security-card">
-      <SectionTitle title="Technisch notwendig"/>
-      <div className="context-block"><Status tone="success"><LocalizedText>{"Immer aktiv"}</LocalizedText></Status><b><LocalizedText>{"Anmeldung, Sicherheit und Einstellungen"}</LocalizedText></b><span><LocalizedText>{"Diese Speichermechanismen sind für Sessions, Kontoschutz und Benutzereinstellungen erforderlich und können nicht deaktiviert werden."}</LocalizedText></span></div>
-    </section>
-    <section className="surface security-card">
-      <SectionTitle title="Performance-Messung"/>
-      <div className="context-block"><Status tone={performance?"success":"neutral"}><LocalizedText>{performance?"Erlaubt":"Aus"}</LocalizedText></Status><b><LocalizedText>{"Web-Vitals"}</LocalizedText></b><span><LocalizedText>{"Optional werden technische Kennzahlen wie Ladezeit und Darstellungsstabilität sowie eine gekürzte Route erfasst. Keine Werbung und kein Cross-Site-Tracking."}</LocalizedText></span></div>
-      <div className="privacy-settings-actions">
-        <Toggle label="Performance-Messung" checked={performance} onChange={()=>save(!performance)}/>
-      </div>
+  return <AppShell title="Datenschutz & Cookies" active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
+    <SettingsGroup title="Technisch notwendig"><ListRow information title="Anmeldung & Sicherheit" meta="" value={<LocalizedText>{"Immer aktiv"}</LocalizedText>}/></SettingsGroup>
+    <SettingsGroup title="Optional"><ListRow information title="Performance-Messung" meta="" value={<Toggle label="Performance-Messung" checked={performance} onChange={()=>save(!performance)}/>}/>
+      <details className="bo-data-disclosure"><summary><LocalizedText>{"Datenhinweise"}</LocalizedText></summary><p className="settings-note"><LocalizedText>{"Optional werden technische Kennzahlen wie Ladezeit und Darstellungsstabilität sowie eine gekürzte Route erfasst. Keine Werbung und kein Cross-Site-Tracking."}</LocalizedText></p></details>
       {saveError&&<ErrorState><LocalizedText>{saveError}</LocalizedText></ErrorState>}
       {saved&&<p className="settings-note" role="status"><LocalizedText>{"Datenschutz-Einstellung gespeichert."}</LocalizedText></p>}
-    </section>
-    <section className="surface security-card">
-      <SectionTitle title="Weitere Informationen"/>
-      <p className="settings-note"><LocalizedText>{"Details zur Datenbearbeitung und zu eingesetzten Dienstleistern findest du in der Datenschutzerklärung und der Unterauftragsbearbeiter-Liste."}</LocalizedText></p>
-      <div className="privacy-settings-actions"><Button href="/datenschutz" variant="secondary"><LocalizedText>{"Datenschutzerklärung"}</LocalizedText></Button><Button href="/unterauftragsbearbeiter" variant="secondary"><LocalizedText>{"Unterauftragsbearbeiter"}</LocalizedText></Button></div>
-    </section>
+    </SettingsGroup>
+    <SettingsGroup title="Rechtliches"><ActionRow href="/einstellungen/rechtliches/datenschutz" icon="file" title="Datenschutzerklärung"/><ActionRow href="/einstellungen/rechtliches/unterauftragsbearbeiter" icon="users" title="Unterauftragsbearbeiter"/></SettingsGroup>
   </AppShell>;
 }

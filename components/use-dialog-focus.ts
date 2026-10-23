@@ -91,7 +91,10 @@ export function useDialogFocus(open: boolean, onClose: () => void, headerPanel=f
       if(modalStack.length&&trigger?.isConnected&&modalStack.at(-1)?.contains(trigger))trigger.focus({preventScroll:true});
       if(!modalStack.length){
         document.documentElement.style.removeProperty("--dialog-viewport-height");document.documentElement.style.removeProperty("--dialog-viewport-top");
-        if (trigger?.isConnected) trigger.focus({preventScroll:true});
+        // An action menu may unmount its row after opening the next sheet.
+        // Retain the last stable page trigger for that modal handoff.
+        const returnTrigger=trigger?.isConnected?trigger:triggerRef.current;
+        if (returnTrigger?.isConnected) returnTrigger.focus({preventScroll:true});
       }
       unlockScroll();
     };

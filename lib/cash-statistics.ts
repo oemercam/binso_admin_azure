@@ -12,3 +12,10 @@ export function hasFinancialHistory(data:CashStatisticsData):boolean{
  if(data.incomplete||!data.financial||![data.payments,data.outflows,data.refunds,data.financial.revenueEvents].every(Array.isArray))return true;
  return [data.payments,data.outflows,data.refunds,data.financial.revenueEvents].some(rows=>rows!.length>0)||[data.financial.snapshot.paid,data.financial.snapshot.open,data.financial.snapshot.overdue,data.financial.snapshot.credit_balance].some(value=>value==null||value===''||!Number.isFinite(Number(value))||Number(value)!==0);
 }
+
+/** Presentation-only normalization; signed ledger values remain untouched. */
+export function comparisonBarWidths(income:number,costs:number){
+ const positive=(value:number)=>Number.isFinite(value)?Math.max(0,value):0;
+ const received=positive(income),paid=positive(costs),maximum=Math.max(received,paid);
+ return {income:maximum?received/maximum*100:0,costs:maximum?paid/maximum*100:0};
+}

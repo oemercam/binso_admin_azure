@@ -95,6 +95,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          fetch-depth: 0 # Immutable navigation comparisons need historical source objects.
       - uses: ./.github/actions/setup-node
       - run: pnpm release:check
       - run: pnpm test
@@ -149,6 +150,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          fetch-depth: 0 # Immutable navigation comparisons need historical source objects.
       - uses: ./.github/actions/setup-node
       - name: Restore Next compiler cache (never a completed build)
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
@@ -207,6 +209,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          fetch-depth: 0 # Immutable navigation comparisons need historical source objects.
       - uses: ./.github/actions/setup-node
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
@@ -227,6 +230,7 @@ jobs:
         env:
           ENGINE: ${{ matrix.engine }}
         run: |
+          bash scripts/prepare-browser-host.sh
           npm install --prefix "$RUNNER_TEMP/binso-browser" --no-package-lock --ignore-scripts playwright@1.62.1 axe-core@4.11.0
           if [ "$ENGINE" = chromium ]; then
             node "$RUNNER_TEMP/binso-browser/node_modules/playwright/cli.js" install --with-deps --only-shell chromium
@@ -378,6 +382,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          fetch-depth: 0 # Immutable navigation comparisons need historical source objects.
       - uses: ./.github/actions/setup-node
       - name: Collect current browser measurements
         continue-on-error: true # Missing evidence is reported; the final quality job still blocks failed browsers.
@@ -432,6 +437,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          fetch-depth: 0 # Immutable navigation comparisons need historical source objects.
       - uses: ./.github/actions/setup-node
       - name: Validate sidecar ARM template without provisioning
         run: az bicep build --file infrastructure/scanner/sidecar.bicep --stdout > "$RUNNER_TEMP/scanner-template.json"
@@ -529,6 +535,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          fetch-depth: 0 # Immutable navigation comparisons need historical source objects.
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24

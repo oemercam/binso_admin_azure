@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "routes": [
+    {
+      "limitation": "Neue authentifizierte Kunden-Rechtsansicht nach UX Master V5; requireSession, Dokument-Whitelist und unveränderte öffentliche Artikel. Vollständige Rollen-/Geräteabnahme offen.",
+      "file": "app/einstellungen/rechtliches/page.tsx",
+      "source": "docs/architecture/ux-master-v5/source.md",
+      "status": "nicht_abgenommen",
+      "states": [
+        "Fehler",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "authorization": "lib/server/session.ts"
+    },
+    {
+      "limitation": "Neue authentifizierte Kunden-Rechtsansicht nach UX Master V5; requireSession, Dokument-Whitelist und unveränderte öffentliche Artikel. Vollständige Rollen-/Geräteabnahme offen.",
+      "file": "app/einstellungen/rechtliches/[document]/page.tsx",
+      "source": "docs/architecture/ux-master-v5/source.md",
+      "status": "nicht_abgenommen",
+      "states": [
+        "Fehler",
+        "Speichern/Reload/neue Sitzung"
+      ],
+      "authorization": "lib/server/session.ts"
+    }
+  ]
+}

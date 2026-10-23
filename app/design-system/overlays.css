@@ -277,7 +277,7 @@
 .header-panel{width:100%;height:100%;max-height:100%;border-radius:0;padding:var(--safe-top) max(var(--mobile-page-x),var(--safe-right)) max(16px,var(--safe-bottom)) max(var(--mobile-page-x),var(--safe-left));box-shadow:none}
 .header-panel-layer{inset:var(--dialog-viewport-top,0px) 0 auto;height:min(var(--dialog-available-height),100dvh);padding:0;justify-content:stretch;background:var(--color-bg)}
 .bottom-sheet .sheet-header .icon-button,.header-panel-heading .icon-button{border:0;border-radius:50%;background:var(--app-chrome)}
-.bottom-sheet,.header-panel,.confirm-dialog{--control-h:44px;--control-font:16px}
+.bottom-sheet,.header-panel,.confirm-dialog{--control-h:44px;--control-font:var(--type-control)}
 }
 .context-actions-inline,.context-action-group{
   display:flex;
@@ -371,3 +371,10 @@
 .sheet-form-footer .mobile-sticky-save{display:flex;justify-content:flex-end;gap:var(--field-group-gap);width:100%}
 .sheet-form-footer .mobile-sticky-save>.button{width:auto;min-width:120px;white-space:normal;min-height:48px;height:auto}
 @media(max-width:760px){.sheet-form-footer .mobile-sticky-save>.button{flex:1;width:0;min-width:0}}
+
+.bo-report-period{font-size:var(--type-metadata);line-height:1.45;color:var(--color-muted);margin:0;padding:8px 12px}
+.sheet-header>div:first-child{flex:1;min-width:0}
+@media(min-width:761px) and (max-width:1023px){
+ .bo-period-sheet{align-items:flex-end;padding:0}
+ .bo-period-sheet .bottom-sheet{margin:0;border-radius:var(--radius-sheet) var(--radius-sheet) 0 0;border-bottom:0;max-height:calc(var(--dialog-available-height) - var(--dialog-edge-gap))}
+}

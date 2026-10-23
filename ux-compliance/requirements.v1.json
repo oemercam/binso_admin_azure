@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "1.5.0",
+  "version": "1.5.1",
   "baselineCommit": "b398ff7400eb1b2ea90016c25e596261d58c822b",
   "sourceCompleteness": "The owner ZIP dated 2026-10-15 is the binding visual source. Imported historical V21/V22 entries remain traceability evidence and cannot override it; complete historical approval artifacts remain unavailable.",
   "conflicts": [
@@ -22,8 +22,8 @@
     {
       "id": "PRIMARY-KPI-COUNT",
       "earlier": "V24 section 8: four primary financial KPIs; existing central foundation; additional metrics behind More",
-      "later": "19 October collected owner UX: focused cash analysis, income, recorded outflows and payment balance; receivables separately on demand",
-      "resolution": "Exactly three primary cash-analysis metrics on /finanzen/analyse; exactly four compact CashOverview metrics; three supplementary customer-development metrics. Keep strict per-view counts, financial semantics, shared MetricTiles and measured negative controls.",
+      "later": "23 October Finance Final V1: four compact KPIs (income, outflows, balance, current receivables) and two horizontal comparison bars; details on demand",
+      "resolution": "Exactly four primary cash-analysis metrics on /finanzen/analyse; exactly four compact CashOverview metrics; unchanged three supplementary customer-development metrics. Keep strict per-view counts, financial semantics, shared MetricTiles and measured negative controls.",
       "supersededResolution": "V24 contract applied; no weakening of exact domain counts or navigation protection"
     }
   ],
@@ -307,22 +307,22 @@
     },
     {
       "id": "UX-LAY-003",
-      "description": "Desktop: globale Suche, optional laufender Timer, Glocke und Profil rechts; fachliche Aktionen im Seitenbereich",
+      "description": "V4: globale Header-Aktionen und getrennte Detailverwaltung",
       "routes": [
         "customer-app"
       ],
       "componentTypes": [
         "HeaderPanel"
       ],
-      "expected": "Sichtbarer Desktop-Header: Suche/Glocke/Profil in definierter Reihenfolge, keine Timeranzeige im Header; keine zusätzlichen fachlichen Aktionen",
+      "expected": "V4: globaler Desktop-Header mit Suche/Glocke/Profil; keine Timeranzeige und keine Seitenmenüs auf Übersichts-/Listenseiten; Objektverwaltung im Detailheader",
       "owner": "HeaderPanel",
       "method": "browser",
       "testCase": "TC-UX-LAY-003",
       "adapter": "header-actions",
       "priority": "P1",
-      "acceptance": "Sichtbarer Desktop-Header: Suche/Glocke/Profil in definierter Reihenfolge, keine Timeranzeige im Header; keine zusätzlichen fachlichen Aktionen",
+      "acceptance": "V4: globaler Desktop-Header mit Suche/Glocke/Profil; keine Timeranzeige und keine Seitenmenüs auf Übersichts-/Listenseiten; Objektverwaltung im Detailheader",
       "automation": "automatic",
-      "provenance": "Nutzerauftrag 15.10.2026: docs/audit/v24/white-workspaces-request.md Abschnitt 4; reference/IMPLEMENTIERUNG.md. Ersetzt die ältere Nur-Glocke/Avatar-Vorgabe; Navigation unverändert.",
+      "provenance": "Nutzerauftrag vom 23.10.2026: docs/architecture/ux-master-v4/source.md, Kapitel 3–8. Ersetzt die V3-Ausnahme für Seitenmenüs im globalen Übersichtsheader; unveränderte Rechte und Aktionshandler.",
       "review": null,
       "expectedCases": [
         {"route":"/dashboard","width":1024,"theme":"light","engine":"chromium","state":"normal"},
@@ -946,15 +946,15 @@
       "componentTypes": [
         "CashStatistics"
       ],
-      "expected": "Drei Cash-Kernwerte in der Finanzanalyse (Einnahmen, Ausgaben, Zahlungssaldo), vier Kennzahlen in CashOverview, drei in der Kundenentwicklung; gemeinsame MetricTiles, Forderungen separat auf Abruf",
+      "expected": "Finance Final V1: vier Kennzahlen in der Finanzanalyse (Einnahmen, Ausgaben, Saldo, aktueller Forderungsbestand), vier in CashOverview, unverändert drei in der Kundenentwicklung; gemeinsame MetricTiles, Zusatzinformationen auf Abruf",
       "owner": "CashStatistics",
       "method": "browser",
       "testCase": "TC-UX-FIN-001",
       "adapter": "primary-kpis",
       "priority": "P1",
-      "acceptance": "Drei Cash-Kernwerte in der Finanzanalyse (Einnahmen, Ausgaben, Zahlungssaldo), vier Kennzahlen in CashOverview, drei in der Kundenentwicklung; gemeinsame MetricTiles, Forderungen separat auf Abruf",
+      "acceptance": "Finance Final V1: vier Kennzahlen in der Finanzanalyse (Einnahmen, Ausgaben, Saldo, aktueller Forderungsbestand), vier in CashOverview, unverändert drei in der Kundenentwicklung; gemeinsame MetricTiles, Zusatzinformationen auf Abruf",
       "automation": "automatic",
-      "provenance": "Collected owner UX approved for implementation on 19 October 2026; docs/architecture/ux-app-standardization.md and reference-foundation.md supersede the older V24 four-analysis-metric rule; production acceptance remains open",
+      "provenance": "23 October Finance Final V1; docs/architecture/finance-analysis-final-v1/source.md supersedes the former three-analysis-metric rule. Historical navigation and financial calculations remain protected; production acceptance remains open",
       "review": null,
       "expectedCases": [
         {"route":"/dashboard","width":390,"theme":"light","engine":"chromium","state":"normal"},
@@ -994,22 +994,22 @@
     },
     {
       "id": "UX-FIN-002",
-      "description": "Einnahmen/Ausgaben als Zeitreihen",
+      "description": "Einnahmen/Ausgaben nach freigegebener Auswertungsform",
       "routes": [
         "customer-app"
       ],
       "componentTypes": [
         "CashStatistics"
       ],
-      "expected": "Zwei getrennte Datenreihen als Linien mit Datum, Nullachse, Legende und auswählbaren Werten",
+      "expected": "Finance Final V1: zwei horizontale 8px-Vergleichsbalken mit Werten, gemeinsamem Zeitraum und Saldo in der Finanzanalyse; vorhandene Linien mit Datum, Nullachse, Legende und auswählbaren Werten auf sonstigen Zeitreihenansichten beibehalten",
       "owner": "CashStatistics",
       "method": "browser",
       "testCase": "TC-UX-FIN-002",
       "adapter": "cash-series",
       "priority": "P1",
-      "acceptance": "Zwei getrennte Datenreihen als Linien mit Datum, Nullachse, Legende und auswählbaren Werten",
+      "acceptance": "Finance Final V1: zwei horizontale 8px-Vergleichsbalken mit Werten, gemeinsamem Zeitraum und Saldo in der Finanzanalyse; vorhandene Linien mit Datum, Nullachse, Legende und auswählbaren Werten auf sonstigen Zeitreihenansichten beibehalten",
       "automation": "automatic",
-      "provenance": "V24 section 8: lines encode time; grouped bars retained only for categorical charts",
+      "provenance": "23 October Finance Final V1, docs/architecture/finance-analysis-final-v1/source.md: horizontal income/outflow comparison; unchanged existing time-series contracts elsewhere",
       "review": null,
       "expectedCases": [
         {"route":"/finanzen/analyse","width":390,"theme":"light","engine":"chromium","state":"normal"},
@@ -1056,22 +1056,22 @@
     },
     {
       "id": "UX-FIN-004",
-      "description": "Zeiträume 1/3/6/12 Monate",
+      "description": "V3.3: kompakte zentrale Kalenderperioden mit responsiver Auswahl",
       "routes": [
         "customer-app"
       ],
       "componentTypes": [
         "Statistics"
       ],
-      "expected": "Alle vier Zeitraum-Buttons vorhanden",
+      "expected": "V3.3: zentrale Auswahl mit 1/3/6/12 Kalendermonaten und individueller Auswahl; genau ein aktiver Zeitraum; Mobile eine Auswahlzeile, Desktop Segmente",
       "owner": "Statistics",
       "method": "browser",
       "testCase": "TC-UX-FIN-004",
       "adapter": "periods",
       "priority": "P1",
-      "acceptance": "Alle vier Zeitraum-Buttons vorhanden",
+      "acceptance": "V3.3: zentrale Auswahl mit 1/3/6/12 Kalendermonaten und individueller Auswahl; genau ein aktiver Zeitraum; Mobile eine Auswahlzeile, Desktop Segmente",
       "automation": "automatic",
-      "provenance": "Current UX compliance instruction; approved UX summary where referenced",
+      "provenance": "Nutzerauftrag UX Master V3.3: globaler Zeitraumfilter in dieser Unterhaltung; ersetzt dauerhaft sichtbare mobile Textlinks durch Auswahlzeile und Bottom Sheet, ab 1024 px Segmente und Kalender-Popover.",
       "review": null,
       "expectedCases": [
         {"route":"/finanzen/analyse","width":390,"theme":"light","engine":"chromium","state":"normal"},

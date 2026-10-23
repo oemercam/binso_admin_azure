@@ -271,7 +271,7 @@
 }
 
 /* Reference profile identity; original editable data stays in the shared form. */
-.settings-profile{display:flex;flex-direction:column;align-items:center;text-align:center;padding-block:24px;border:0}
+.settings-profile{display:flex;align-items:center;gap:12px;text-align:left;padding-block:12px;border:0}
 .settings-profile>div{min-width:0;max-width:100%;overflow-wrap:anywhere}
 
 /* Settings content adapts to its own width; the primary shell stays at 760/761. */
@@ -289,3 +289,19 @@
 .subscription-detail-grid>.surface+.surface{border-left:0;border-top:1px solid var(--color-line)}
 .context-block{min-width:0;overflow-wrap:anywhere}
 }
+
+.app-root[data-ux="master-v3"] .settings-overview{max-width:100%;display:grid;gap:16px}
+.app-root[data-ux="master-v3"] .settings-overview>nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+.app-root[data-ux="master-v3"] .settings-overview .bo-settings-group{margin:0;border:1px solid var(--color-line);border-radius:var(--shape-panel);padding:var(--ux-card-inset)}
+.app-root[data-ux="master-v3"] .bo-settings-group h2{font-size:var(--ux-card-title);line-height:1.35}
+.app-root[data-ux="master-v3"] .settings-list{border-top:0}
+.app-root[data-ux="master-v3"] .settings-list .action-row{min-height:var(--ux-row-height);height:var(--ux-row-height);padding-block:0}
+.app-root[data-ux="master-v3"] .settings-list .action-row>span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.app-root[data-ux="master-v3"] .preference-row{min-height:var(--ux-row-height);padding-block:8px}
+.app-root[data-ux="master-v3"] .preference-row>div>small{display:none}
+@media(max-width:760px){.app-root[data-ux="master-v3"] .settings-overview>nav{grid-template-columns:minmax(0,1fr);gap:12px}}
+
+/* V4.1: master data wraps below its label, independently of financial rows. */
+.settings-master-data>div{display:flex;flex-direction:column;align-items:flex-start;gap:4px;min-height:48px;padding-block:10px}
+.settings-master-data dd{margin:0;text-align:left;max-width:100%;overflow-wrap:anywhere}
+.settings-master-data dt{color:var(--color-muted);font-size:var(--type-metadata)}

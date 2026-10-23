@@ -8,7 +8,7 @@ import {searchSources,type SearchItem} from "@/lib/search";
 import {useState} from "react";
 import {usePageAccess} from "@/lib/client/page-access";
 import {Avatar} from "./avatar";
-import {ActionRow,SettingsGroup} from "./binso-ux";
+import {ActionRow,SettingsGroup,ListSearch} from "./binso-ux";
 import {settingsGroups} from "./settings-navigation";
 import {Button, Toast, EmptyState, Icon, LoadingState, ErrorState} from "./ui";
 
@@ -26,7 +26,7 @@ export function SearchPanel({query,onQuery,items,loading,error,onClose,recent=[]
  const visible=items.filter(item=>access.canOpen(item.href)&&(selected==="all"||item.type===selected));
  const groups=Array.from(new Set(visible.map(item=>item.type)));
  return <div className="global-search">
-  <div className="header-search-controls"><div className="searchbox" role="search"><Icon name="search"/><LocalizedElement as="input" aria-label="Suchen" autoFocus value={query} onChange={e=>onQuery(e.target.value)} placeholder="Suchen…" onKeyDown={event=>{if(event.key==="Enter")onRemember?.(query)}}/>{query&&<LocalizedElement as="button" className="search-clear" type="button" aria-label="Suche löschen" onClick={()=>onQuery("")}><Icon name="close" size={15}/></LocalizedElement>}</div><button type="button" className="header-search-cancel" onClick={onClose}><LocalizedText>{"Abbrechen"}</LocalizedText></button></div>
+  <div className="header-search-controls"><ListSearch value={query} onChange={onQuery} placeholder="Suchen…" ariaLabel="Suchen" autoFocus onCommit={()=>onRemember?.(query)}/><button type="button" className="header-search-cancel" onClick={onClose}><LocalizedText>{"Abbrechen"}</LocalizedText></button></div>
   <LocalizedElement as="div" className="chips header-search-scopes" aria-label="Suchbereiche"><button type="button" className={selected==="all"?"active":""} aria-pressed={selected==="all"} onClick={()=>setScope("all")}><LocalizedText>{"Alle"}</LocalizedText></button>{sources.map(source=><button type="button" key={source.type} className={selected===source.type?"active":""} aria-pressed={selected===source.type} onClick={()=>setScope(source.type)}>{source.type}</button>)}</LocalizedElement>
   <div className="search-results">
    {!query.trim()&&onUndoRecent&&<Toast inline tone="info" title="Suchverlauf gelöscht." actionLabel="Rückgängig" onAction={onUndoRecent}/>}
@@ -58,9 +58,8 @@ export function AccountPanel({profile,logoutBusy,onLogout,onClose}:{profile:{nam
  const origin=safeAppPath(params.get("accountReturn"),pathname);
  const target=new URL(origin,"https://binso.invalid");target.searchParams.set("panel","account");
  const back=target.pathname+target.search;
- return <div className="account-sheet"><div className="account-sheet-profile"><Avatar name={profile.name} identity={profile.identity} src={profile.avatar} size="large"/><div><b><LocalizedText verbatim={!!profile.name}>{profile.name||"Persönliches Konto"}</LocalizedText></b><small><LocalizedText verbatim={!!profile.identity}>{profile.identity||"Persönliches Konto"}</LocalizedText></small></div></div>
+ return <div className="account-sheet"><div className="account-sheet-profile"><Avatar name={profile.name} identity={profile.identity} src={profile.avatar} size="small"/><div><b><LocalizedText verbatim={!!profile.name}>{profile.name||"Persönliches Konto"}</LocalizedText></b><small><LocalizedText verbatim={!!profile.identity}>{profile.identity||"Persönliches Konto"}</LocalizedText></small></div></div>
   <LocaleSwitcher persist="tenant"/><SettingsGroup title="Persönlich"><div>{settingsGroups[0].rows.filter(([href])=>href!=="/einstellungen/sprache").map(([href,icon,title])=><PanelLink key={href} href={href+"?accountReturn="+encodeURIComponent(back)} icon={icon} title={href==="/einstellungen/konto"?"Mein Profil":title} onClose={onClose}/>)}</div></SettingsGroup>
-  <SettingsGroup title="Unternehmen"><div className="action-list"><PanelLink href="/einstellungen" icon="settings" title="Unternehmenseinstellungen" onClose={onClose}/></div></SettingsGroup>
   <SettingsGroup title="Sitzung"><div className="action-list"><ActionRow icon="logout" title={logoutBusy?"Wird abgemeldet…":"Abmelden"} disabled={logoutBusy} onClick={onLogout}/></div></SettingsGroup>
  </div>;
 }

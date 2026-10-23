@@ -9,9 +9,18 @@ export async function measureListFrameBorders(page){
  }));
 }
 
+/** Query and read KPI borders atomically, without carrying handles across a rerender. */
+export async function measureMetricDividers(page){
+ return page.evaluate(()=>[...document.querySelectorAll('.metric,.finance-flow-primary,.finance-flow-result,.finance-flow-costs,.finance-flow-costs>div')].map(el=>({left:getComputedStyle(el).borderLeftWidth,compact:!!el.closest(':is(.app-root[data-ux="master-v3"] .bo-cash-overview,.bo-finance-analysis)[data-compact]')})));
+}
+
+export async function measureOpenSectionShapes(page){
+ return page.evaluate(()=>[...document.querySelectorAll('.page-container :is(.surface,.detail-card,.timer-card,.invoice-form)')].flatMap(el=>{const css=getComputedStyle(el),box=el.getBoundingClientRect();return box.width>0&&box.height>0&&!['hidden','collapse'].includes(css.visibility)?[{radius:css.borderRadius,compactTimeCard:el.matches('.app-root[data-ux="master-v3"] .page-container[data-section="zeit"] .time-section')&&matchMedia('(max-width:760px)').matches}]:[]}));
+}
+
 /** Real-browser countercases: detached snapshots, live borders and hidden tables. */
 export async function verifyListFrameMeasurement(page){
- await page.setContent('<div class="records" style="width:200px;height:40px">Old list</div><div class="desktop-record-table" style="display:none;border:1px solid">Hidden table</div>');
+ await page.setContent('<main class="page-container"><div class="records metric surface" style="width:200px;height:40px">Old list</div><div class="desktop-record-table" style="display:none;border:1px solid">Hidden table</div></main>');
  const detached=await page.locator('.records').elementHandle();
  try{
   await page.evaluate(()=>{const next=document.querySelector('.records').cloneNode(true);document.querySelector('.records').replaceWith(next);});
@@ -22,26 +31,31 @@ export async function verifyListFrameMeasurement(page){
   assert.equal((await measureListFrameBorders(page))[0].top,'1px','A real leading separator remains a failing measurement');
   await page.locator('.records').evaluate(el=>{el.style.borderTop='0';el.style.borderBottom='1px solid';});
   assert.equal((await measureListFrameBorders(page))[0].bottom,'1px','A real terminal separator remains a failing measurement');
+  assert.deepEqual(await measureMetricDividers(page),[{left:'0px',compact:false}],'KPI measurement queries the connected replacement in the same DOM turn');
+  await page.locator('.metric').evaluate(el=>{el.style.borderLeft='1px solid';});
+  assert.deepEqual(await measureMetricDividers(page),[{left:'1px',compact:false}],'A real noncompact KPI divider remains visible to the strict zero-border assertion');
+  assert.deepEqual(await measureOpenSectionShapes(page),[{radius:'0px',compactTimeCard:false}],'Section measurement reads the connected replacement');
+  await page.locator('.surface').evaluate(el=>{el.style.borderRadius='7px';});
+  assert.deepEqual(await measureOpenSectionShapes(page),[{radius:'7px',compactTimeCard:false}],'A real incorrect section radius remains visible to the strict shape assertion');
  }finally{await detached.dispose();}
 }
 
-/** Revision7 chapter19: closed fields share one geometry across surfaces.
+/** Closed fields retain the shared geometry; Master V5 uses 44px desktop app controls and 48px mobile fields.
  * Textareas and checkbox/radio controls have their own semantic geometry. */
 export async function assertCanonicalClosedFields(page,route=''){
- const fields=page.locator('.form-field>.form-control:not(textarea):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),.form-field .app-select-trigger').filter({visible:true});
- for(const control of await fields.all()){
-  const geometry=await control.evaluate(el=>{const css=getComputedStyle(el);return {height:el.getBoundingClientRect().height,padding:css.paddingLeft,radius:css.borderRadius,font:css.fontSize};});
-  assert.equal(geometry.height,48,route+': canonical closed field height');
+ const fields=await page.evaluate(()=>[...document.querySelectorAll('.form-field>.form-control:not(textarea):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),.form-field .app-select-trigger')].flatMap(el=>{const css=getComputedStyle(el),box=el.getBoundingClientRect();return box.width>0&&box.height>0&&!['hidden','collapse'].includes(css.visibility)?[{height:box.height,padding:css.paddingLeft,radius:css.borderRadius,font:css.fontSize,compactDesktop:!!el.closest('.app-root[data-ux="master-v3"]')&&matchMedia('(min-width:761px)').matches}]:[]}));
+ for(const geometry of fields){
+  assert.equal(geometry.height,geometry.compactDesktop?44:48,route+': canonical closed field height');
   assert.equal(geometry.padding,'16px',route+': canonical field inset');
   assert.equal(geometry.radius,'12px',route+': canonical field radius');
-  assert.equal(geometry.font,'16px',route+': canonical field text');
+  assert.equal(geometry.font,'14px',route+': canonical field text');
  }
 }
 
 export async function verifyCanonicalFieldRegression(page){
  const field=page.locator('.form-field>.form-control:not(textarea):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"])').filter({visible:true}).first();assert.ok(await field.count(),'A real closed field is required for the negative controls');
  const original=await field.getAttribute('style');
- for(const [properties,message] of [[{'height':'40px','min-height':'40px'},/canonical closed field height/],[{'padding-left':'11px'},/canonical field inset/],[{'border-radius':'7px'},/canonical field radius/],[{'font-size':'14px'},/canonical field text/]]){
+ for(const [properties,message] of [[{'height':'40px','min-height':'40px'},/canonical closed field height/],[{'padding-left':'11px'},/canonical field inset/],[{'border-radius':'7px'},/canonical field radius/],[{'font-size':'13px'},/canonical field text/]]){
   try{await field.evaluate((el,properties)=>{for(const [key,value] of Object.entries(properties))el.style.setProperty(key,value,'important');},properties);await assert.rejects(()=>assertCanonicalClosedFields(page),message);}
   finally{await field.evaluate((el,value)=>value===null?el.removeAttribute('style'):el.setAttribute('style',value),original);}
  }
@@ -155,4 +169,13 @@ export async function verifyHeaderTargetRegression(page){
 export async function waitForLabReady(page){
  await page.locator('main.ux-lab[data-hydrated="true"]').waitFor({state:'visible'});
  await page.evaluate(()=>document.fonts.ready);
+}
+
+/** V4.1 settings edit action belongs to the visible detail header on every viewport. */
+export async function openSettingsEditor(page){
+ const header=page.locator('.mobile-header,.bo-detail-commandbar').filter({visible:true});
+ await header.getByRole('button',{name:'Weitere Aktionen',exact:true}).click();
+ const actions=page.getByRole('dialog',{name:'Weitere Aktionen',exact:true});
+ await actions.waitFor({state:'visible'});
+ await actions.getByRole('button',{name:'Bearbeiten',exact:true}).click();
 }

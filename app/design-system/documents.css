@@ -406,3 +406,10 @@
 .document-discount-actions{display:flex;align-items:center;justify-content:flex-end;gap:var(--button-gap);margin-top:var(--field-group-gap)}
 .document-discount-actions p{margin:0;flex:1;color:var(--color-muted);font-size:var(--type-metadata)}
 .invoice-totals b{white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums}
+
+/* Opt-in informational rows; entity/document lists retain their detail pattern. */
+.document-summary-row.is-information{height:46px;min-height:46px;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:1fr;padding-block:0;gap:12px;align-items:center}
+.document-summary-row.is-information>b{grid-column:1;grid-row:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:var(--type-body);font-weight:400}
+.document-summary-row.is-information>.document-summary-amount{grid-column:2;grid-row:1;align-self:center;justify-self:end}
+.document-summary-row.is-information .document-summary-amount>strong{white-space:nowrap;font-size:var(--type-body);font-weight:500}
+.document-summary-row.is-information>small{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}

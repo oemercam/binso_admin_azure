@@ -39,6 +39,7 @@ jobs:
         run: pnpm build
       - name: Install pinned Chromium
         run: |
+          bash scripts/prepare-browser-host.sh
           npm install --prefix "$RUNNER_TEMP/binso-browser" --no-package-lock --ignore-scripts playwright@1.62.1
           node "$RUNNER_TEMP/binso-browser/node_modules/playwright/cli.js" install --with-deps --only-shell chromium
       - name: Focused discount editor desktop and mobile browser check
