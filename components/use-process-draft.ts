@@ -6,7 +6,9 @@ import {useDataRevision} from '@/lib/client/use-api-query';
 
 /** One recovery owner: identity checked before reading; session fences clear it. */
 export function useProcessDraft<T>({process:rawProcess,value,dirty,enabled,onRestore}:{process:string;value:T;dirty:boolean;enabled:boolean;onRestore:(value:T)=>void}){
- const process=canonicalDraftProcess(rawProcess);
+ // Next's server transform injects process.env guards around effects. Keep the
+ // process name distinct from that global so SSR never reads env on a string.
+ const draftProcess=canonicalDraftProcess(rawProcess);
  // Query revalidation on focus/visibility is not an identity change. Only the
  // private-session fence can revoke this draft's authenticated ownership.
  const revision=useDataRevision([]);
@@ -23,14 +25,14 @@ export function useProcessDraft<T>({process:rawProcess,value,dirty,enabled,onRes
   let active=true;
   void readClientSession().then(session=>{
    if(!active)return;
-   const key=session.authenticated&&!session.tenant?.readOnly&&session.user?.id&&session.tenant?.id&&session.tenant.role?draftScope(session.user.id,session.tenant.id,session.tenant.role,process):null;
+   const key=session.authenticated&&!session.tenant?.readOnly&&session.user?.id&&session.tenant?.id&&session.tenant.role?draftScope(session.user.id,session.tenant.id,session.tenant.role,draftProcess):null;
    // Missing authenticated identity never grants access to a saved draft.
-   setState({process,revision,key,ready:true});
-  }).catch(()=>{if(active)setState({process,revision,key:null,ready:true})});
+   setState({process:draftProcess,revision,key,ready:true});
+  }).catch(()=>{if(active)setState({process:draftProcess,revision,key:null,ready:true})});
   return()=>{active=false};
- },[enabled,process,revision]);
- const key=state?.process===process&&state.revision===revision?state.key:null;
- const ready=!enabled||Boolean(state?.process===process&&state.revision===revision&&state.ready);
+ },[enabled,draftProcess,revision]);
+ const key=state?.process===draftProcess&&state.revision===revision?state.key:null;
+ const ready=!enabled||Boolean(state?.process===draftProcess&&state.revision===revision&&state.ready);
  useEffect(()=>{
   if(!enabled||!ready||!key||restored.current===key)return;
   restored.current=key;discarded.current=false;

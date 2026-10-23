@@ -1,7 +1,34 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import {moduleUrl} from './data-test-modules.mjs';
+import swc from 'next/dist/build/swc/index.js';
 const drafts=await import(moduleUrl(await fs.readFile('lib/client/process-draft.ts','utf8')));
+// Exercise Next's real production server transform: effects must be skipped on
+// SSR without resolving its injected process.env guard against a draft name.
+await swc.loadBindings();
+const hookSource=await fs.readFile('components/use-process-draft.ts','utf8');
+const ssrReact=moduleUrl(`export const useState=value=>[value,()=>{}],useRef=value=>({current:value}),useCallback=value=>value;export function useEffect(){throw Error('SSR must not run an effect')}`);
+const ssrSession=moduleUrl(`export function readClientSession(){throw Error('SSR must not read browser identity')}`);
+const ssrRevision=moduleUrl(`export const useDataRevision=()=> 'synthetic-ssr';`);
+async function serverHook(source){
+ const compiled=await swc.transform(source,{filename:'components/use-process-draft.ts',isModule:true,jsc:{parser:{syntax:'typescript',tsx:false},target:'es2022'},optimizeServerReact:{optimize_use_state:false}});
+ assert.match(compiled.code,/__NEXT_PRIVATE_MINIMIZE_MACRO_FALSE/,'Use the actual Next SSR optimization that caused the regression');
+ let code=compiled.code;
+ for(const [specifier,target] of Object.entries({'react':ssrReact,'@/lib/client/session-cache':ssrSession,'@/lib/client/process-draft':moduleUrl(await fs.readFile('lib/client/process-draft.ts','utf8')),'@/lib/client/use-api-query':ssrRevision}))code=code.replaceAll(JSON.stringify(specifier),JSON.stringify(target)).replaceAll("'"+specifier+"'",JSON.stringify(target));
+ return (await import(moduleUrl(code))).useProcessDraft;
+}
+const macroBefore=process.env.__NEXT_PRIVATE_MINIMIZE_MACRO_FALSE;
+try{
+ delete process.env.__NEXT_PRIVATE_MINIMIZE_MACRO_FALSE;
+ const render=await serverHook(hookSource);
+ for(const enabled of [false,true]){
+  const result=render({process:'supplier:create',value:{name:'Synthetic supplier'},dirty:false,enabled,onRestore(){throw Error('SSR must not restore a browser draft')}});
+  assert.equal(result.ready,!enabled);result.persist({name:'Preserved'});result.clear();
+ }
+ const broken=await serverHook(hookSource.replaceAll(/\bdraftProcess\b/g,'process'));
+ assert.throws(()=>broken({process:'supplier:create',value:{},dirty:false,enabled:false,onRestore(){}}),TypeError,'Red control: a local process binding reproduces the production SSR failure');
+}finally{if(macroBefore===undefined)delete process.env.__NEXT_PRIVATE_MINIMIZE_MACRO_FALSE;else process.env.__NEXT_PRIVATE_MINIMIZE_MACRO_FALSE=macroBefore;}
+console.log('Production SSR draft recovery: actual Next transform passes; shadowed-process red control fails as expected.');
 const entries=new Map(),storage={get length(){return entries.size},key:i=>[...entries.keys()][i]??null,getItem:k=>entries.get(k)??null,setItem:(k,v)=>entries.set(k,v),removeItem:k=>entries.delete(k)};
 const key=drafts.draftScope('user-a','tenant-a','owner','invoice');
 const value={draft:{note:'Unfinished invoice'},step:2,replay:{key:'same-key',body:'same-payload'}};
