@@ -15882,5 +15882,140 @@
     "Minutes",
     "Minutes",
     "Minuti"
+  ],
+  "Leistungen abgleichen": [
+    "Match services",
+    "Rapprocher les prestations",
+    "Confronta prestazioni"
+  ],
+  "Leistungsbeginn": [
+    "Service period start",
+    "Début de la période de prestation",
+    "Inizio del periodo di prestazione"
+  ],
+  "Leistungsende": [
+    "Service period end",
+    "Fin de la période de prestation",
+    "Fine del periodo di prestazione"
+  ],
+  "Letzter Abgleich": [
+    "Latest comparison",
+    "Dernier rapprochement",
+    "Ultimo confronto"
+  ],
+  "Abgleich speichern": [
+    "Save comparison",
+    "Enregistrer le rapprochement",
+    "Salva confronto"
+  ],
+  "Abgleich ist veraltet. Bitte die aktuelle Revision erneut abgleichen.": [
+    "The comparison is outdated. Please compare the current revision again.",
+    "Le rapprochement est obsolète. Rapproche à nouveau la révision actuelle.",
+    "Il confronto non è più attuale. Confronta nuovamente la revisione corrente."
+  ],
+  "Abgleich ohne ungeklärte Abweichungen": [
+    "Comparison without unresolved differences",
+    "Rapprochement sans écarts non résolus",
+    "Confronto senza scostamenti irrisolti"
+  ],
+  "Ungeklärte Abweichungen": [
+    "Unresolved differences",
+    "Écarts non résolus",
+    "Scostamenti irrisolti"
+  ],
+  "Der Abgleich dokumentiert Abweichungen. Er gibt keine Rechnung frei und löst keine Zahlung aus.": [
+    "The comparison records differences. It does not approve an invoice or initiate a payment.",
+    "Le rapprochement documente les écarts. Il ne valide aucune facture et ne déclenche aucun paiement.",
+    "Il confronto documenta gli scostamenti. Non approva fatture né avvia pagamenti."
+  ],
+  "Erwartet": [
+    "Expected",
+    "Attendu",
+    "Previsto"
+  ],
+  "Keine bestätigten Einkaufsquellen in diesem Zeitraum": [
+    "No confirmed purchase sources in this period",
+    "Aucune source d’achat confirmée dans cette période",
+    "Nessuna fonte di acquisto confermata in questo periodo"
+  ],
+  "Mehr als 100 Quellen. Bitte den Zeitraum eingrenzen.": [
+    "More than 100 sources. Please narrow the period.",
+    "Plus de 100 sources. Réduis la période.",
+    "Più di 100 fonti. Restringi il periodo."
+  ],
+  "Minuten gemäss Lieferantenrechnung": [
+    "Minutes stated on the supplier invoice",
+    "Minutes indiquées sur la facture fournisseur",
+    "Minuti indicati nella fattura fornitore"
+  ],
+  "Stundensatz gemäss Lieferantenrechnung": [
+    "Hourly rate stated on the supplier invoice",
+    "Tarif horaire indiqué sur la facture fournisseur",
+    "Tariffa oraria indicata nella fattura fornitore"
+  ],
+  "Bitte ganze Minuten gemäss Lieferantenrechnung erfassen.": [
+    "Please enter the whole minutes stated on the supplier invoice.",
+    "Saisis les minutes entières indiquées sur la facture fournisseur.",
+    "Inserisci i minuti interi indicati nella fattura fornitore."
+  ],
+  "Abgleich konnte nicht gespeichert werden.": [
+    "The comparison could not be saved.",
+    "Le rapprochement n’a pas pu être enregistré.",
+    "Impossibile salvare il confronto."
+  ],
+  "Bitte einen gültigen Leistungszeitraum von höchstens einem Jahr auswählen.": [
+    "Please select a valid service period of no more than one year.",
+    "Sélectionne une période de prestation valide d’un an au maximum.",
+    "Seleziona un periodo di prestazione valido di massimo un anno."
+  ],
+  "Für den Vertragsabgleich fehlt die Finanz- oder Vertragsberechtigung.": [
+    "Financial or contract permission is missing for this comparison.",
+    "L’autorisation financière ou contractuelle manque pour ce rapprochement.",
+    "Manca l’autorizzazione finanziaria o contrattuale per questo confronto."
+  ],
+  "Bitte Rechnungsrevision, ganze Minuten und bestätigte Einkaufsquellen auswählen.": [
+    "Please select the invoice revision, whole minutes and confirmed purchase sources.",
+    "Sélectionne la révision de la facture, les minutes entières et les sources d’achat confirmées.",
+    "Seleziona la revisione della fattura, i minuti interi e le fonti di acquisto confermate."
+  ],
+  "Angabe fehlt": [
+    "Missing information",
+    "Information manquante",
+    "Informazione mancante"
+  ],
+  "Geprüfter Beleg": [
+    "Checked receipt",
+    "Justificatif vérifié",
+    "Giustificativo verificato"
+  ],
+  "Beleg noch in Quarantäne": [
+    "Receipt still in quarantine",
+    "Justificatif encore en quarantaine",
+    "Giustificativo ancora in quarantena"
+  ],
+  "Einheitliche Vertragskondition": [
+    "Consistent contract condition",
+    "Condition contractuelle uniforme",
+    "Condizione contrattuale uniforme"
+  ],
+  "Unterschiedliche Vertragskonditionen": [
+    "Different contract conditions",
+    "Conditions contractuelles différentes",
+    "Condizioni contrattuali diverse"
+  ],
+  "Bestätigte Einkaufsquelle": [
+    "Confirmed purchase source",
+    "Source d’achat confirmée",
+    "Fonte di acquisto confermata"
+  ],
+  "Einkaufsquelle": [
+    "Purchase source",
+    "Source d’achat",
+    "Fonte di acquisto"
+  ],
+  "Getrennte Vertragspositionen erforderlich": [
+    "Separate contract lines required",
+    "Lignes contractuelles distinctes requises",
+    "Sono necessarie righe contrattuali separate"
   ]
 }

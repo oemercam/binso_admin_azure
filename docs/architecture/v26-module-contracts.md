@@ -97,3 +97,12 @@ F06 ist ausdrücklich bestätigt (Minuten/exakte Stundenpreisanteile/kein FX; Fr
 ### P20 — UI-Übergabe
 
 DocumentEditor bleibt der einzige Rechnungsowner. timeAllocations/priceBaseQuantity werden in Save, Preview und Reload erhalten. Neue externe Quellen sind einzelne Minutenpositionen mit bestätigtem Stundenpreis/Steuer, Währung und Basis60; kein Einkaufspreistransfer. Billing-GET mit draft=Nummer zeigt die Kapazität einschliesslich eigener Reservation ausschliesslich für einen sichtbaren unarchivierten Draft, keine Mengenfreigabe. Clientänderung erhält Source-ID und ganze Minuten; Serverguards bestimmen das tatsächliche Ergebnis. Ausgestellte/stornierte Zuordnungen bleiben auch bei Abfrage ihrer Nummer belegt. Controlled discard verwendet bestehende DELETE-/FormSheet-/Retryowner. Native Mehrverbindungs- und echte Browserabnahme bleiben offen.
+
+
+## Bestätigte Ergänzungen23.10.2026
+
+F07: Solo-Owner-Selbstfreigabe für AP, optionale unabhängige Vier-Augen-Prüfung bei mehreren Benutzern, konfigurierbare währungsgetrennte Betragsgrenzen, null automatische Abweichungstoleranz und keine Zahlung durch Freigabe. Verbindlicher [AP-Vertrag](v26-ap-approval-contract.md). Dies ändert keine unabhängige Freigabe externer Zeitnachweise.
+
+F03/F04: Nutzer bestätigt eine mandantenfähige konfigurierbare Grundlage statt einheitlicher Firmenregeln. Ferienanspruch muss gesetzliche Mindestvorgaben und anwendbare Verträge/GAV/Reglemente berücksichtigen; Feiertage richten sich nach dem massgeblichen Arbeitsort und anwendbaren kantonalen/lokalen Regeln. Überträge, Korrekturen und Stichtage werden historisiert, kein pauschaler automatischer Verfall. Gesetzliche Parameter und individuelle Regelstände brauchen fachliche Nachweise; keine unbestätigten Werte einbauen.
+
+Payroll: unterschiedliche Lohn-/Anstellungsmodelle, Versicherungen, Kinder-/Ausbildungszulagen, Quellensteuer und individuelle Parameter modular am bestehenden Owner vorbereiten. Noch kein validierter Schweizer Anbieter gewählt; keine erfundenen Beitragssätze, Steuerregeln oder Providerintegration. Fehlende validierte Parameter/Referenzfälle blockieren produktive Berechnung, Lohnabrechnungsfreigabe und Auszahlung serverseitig. Bestehende Identity/Rollen/Audit/Dokumente/Time wiederverwenden. Unabhängige V26-Funktionen können ohne diese Entscheidungen weitergehen.

@@ -7341,6 +7341,66 @@
       ]
     },
     {
+      "route": "/api/suppliers/[id]/invoices/[invoiceId]/match",
+      "file": "app/api/suppliers/[id]/invoices/[invoiceId]/match/route.ts",
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "imports": [
+        {
+          "local": "requireSession",
+          "target": "lib/server/session.ts",
+          "exported": "requireSession"
+        },
+        {
+          "local": "authorize",
+          "target": "lib/server/rbac.ts",
+          "exported": "authorize"
+        },
+        {
+          "local": "requireModuleEntitlement",
+          "target": "lib/server/plan-access.ts",
+          "exported": "requireModuleEntitlement"
+        },
+        {
+          "local": "withTenant",
+          "target": "lib/server/db.ts",
+          "exported": "withTenant"
+        },
+        {
+          "local": "apiError",
+          "target": "lib/server/http.ts",
+          "exported": "apiError"
+        },
+        {
+          "local": "assertSameOrigin",
+          "target": "lib/server/http.ts",
+          "exported": "assertSameOrigin"
+        },
+        {
+          "local": "json",
+          "target": "lib/server/http.ts",
+          "exported": "json"
+        },
+        {
+          "local": "readJson",
+          "target": "lib/server/http.ts",
+          "exported": "readJson"
+        },
+        {
+          "local": "supplierMatchState",
+          "target": "lib/server/repositories/supplier-invoice-matches.ts",
+          "exported": "supplierMatchState"
+        },
+        {
+          "local": "saveSupplierMatch",
+          "target": "lib/server/repositories/supplier-invoice-matches.ts",
+          "exported": "saveSupplierMatch"
+        }
+      ]
+    },
+    {
       "route": "/api/suppliers/[id]/invoices",
       "file": "app/api/suppliers/[id]/invoices/route.ts",
       "methods": [
@@ -84258,6 +84318,8 @@
         "components/supplier-invoices.tsx#Invoice",
         "components/supplier-invoices.tsx#Draft",
         "components/supplier-invoices.tsx#blank",
+        "components/supplier-invoices.tsx#SupplierInvoiceMatch",
+        "components/supplier-invoices.tsx#Match",
         "components/entity-files.tsx#EntityFiles",
         "components/entity-files.tsx#Attachment",
         "components/binso-ux.tsx#ListRow",
@@ -84521,6 +84583,36 @@
         "components/supplier-invoices.tsx#Draft",
         "components/supplier-invoices.tsx#blank",
         "lib/financial-status.ts#formatCurrency",
+        "components/supplier-invoices.tsx#SupplierInvoiceMatch",
+        "lib/financial-status.ts#businessDate",
+        "components/supplier-invoices.tsx#Match",
+        "lib/supplier-invoice-match.ts#SupplierMatchInput",
+        "lib/supplier-invoice-match.ts#compareSupplierInvoice",
+        "lib/supplier-invoice-match.ts#SupplierMatchDifference",
+        "lib/money.ts#moneyMinor",
+        "lib/money.ts#safeNumber",
+        "lib/money.ts#roundTo",
+        "lib/money.ts#Decimal",
+        "lib/money.ts#power10",
+        "lib/money.ts#decimal",
+        "lib/money.ts#fraction",
+        "lib/money.ts#Fraction",
+        "lib/money.ts#calculateDocument",
+        "lib/money.ts#normalizeDiscount",
+        "lib/money.ts#Discount",
+        "lib/money.ts#nonnegative",
+        "lib/money.ts#compare",
+        "lib/money.ts#amount",
+        "lib/money.ts#centsOf",
+        "lib/money.ts#divided",
+        "lib/money.ts#times",
+        "lib/money.ts#discountOn",
+        "lib/money.ts#zero",
+        "lib/money.ts#minus",
+        "lib/money.ts#plus",
+        "lib/money.ts#sum",
+        "lib/money.ts#allocate",
+        "lib/money.ts#exact",
         "components/entity-files.tsx#EntityFiles",
         "lib/file-associations.ts#fileRelations",
         "components/entity-files.tsx#Attachment",
@@ -84539,7 +84631,6 @@
         "components/external-resources.tsx#ExternalResources",
         "components/external-resources.tsx#Resource",
         "components/external-resources.tsx#Assignment",
-        "lib/financial-status.ts#businessDate",
         "components/external-resources.tsx#Attempt",
         "lib/display-format.ts#formatTimestampDate",
         "lib/display-format.ts#formatTimestamp",
@@ -84791,6 +84882,8 @@
         "components/supplier-invoices.tsx#Invoice",
         "components/supplier-invoices.tsx#Draft",
         "components/supplier-invoices.tsx#blank",
+        "components/supplier-invoices.tsx#SupplierInvoiceMatch",
+        "components/supplier-invoices.tsx#Match",
         "components/entity-files.tsx#EntityFiles",
         "components/entity-files.tsx#Attachment",
         "components/binso-ux.tsx#ListRow",
@@ -85071,6 +85164,36 @@
         "components/supplier-invoices.tsx#Draft",
         "components/supplier-invoices.tsx#blank",
         "lib/financial-status.ts#formatCurrency",
+        "components/supplier-invoices.tsx#SupplierInvoiceMatch",
+        "lib/financial-status.ts#businessDate",
+        "components/supplier-invoices.tsx#Match",
+        "lib/supplier-invoice-match.ts#SupplierMatchInput",
+        "lib/supplier-invoice-match.ts#compareSupplierInvoice",
+        "lib/supplier-invoice-match.ts#SupplierMatchDifference",
+        "lib/money.ts#moneyMinor",
+        "lib/money.ts#safeNumber",
+        "lib/money.ts#roundTo",
+        "lib/money.ts#Decimal",
+        "lib/money.ts#power10",
+        "lib/money.ts#decimal",
+        "lib/money.ts#fraction",
+        "lib/money.ts#Fraction",
+        "lib/money.ts#calculateDocument",
+        "lib/money.ts#normalizeDiscount",
+        "lib/money.ts#Discount",
+        "lib/money.ts#nonnegative",
+        "lib/money.ts#compare",
+        "lib/money.ts#amount",
+        "lib/money.ts#centsOf",
+        "lib/money.ts#divided",
+        "lib/money.ts#times",
+        "lib/money.ts#discountOn",
+        "lib/money.ts#zero",
+        "lib/money.ts#minus",
+        "lib/money.ts#plus",
+        "lib/money.ts#sum",
+        "lib/money.ts#allocate",
+        "lib/money.ts#exact",
         "components/entity-files.tsx#EntityFiles",
         "lib/file-associations.ts#fileRelations",
         "components/entity-files.tsx#Attachment",
@@ -85089,7 +85212,6 @@
         "components/external-resources.tsx#ExternalResources",
         "components/external-resources.tsx#Resource",
         "components/external-resources.tsx#Assignment",
-        "lib/financial-status.ts#businessDate",
         "components/external-resources.tsx#Attempt",
         "lib/display-format.ts#formatTimestampDate",
         "lib/display-format.ts#formatTimestamp",
@@ -85146,8 +85268,13 @@
         68,
         78,
         81,
+        84,
+        85,
+        86,
         87,
         88,
+        89,
+        90,
         91,
         92,
         94,
@@ -85192,16 +85319,22 @@
         140,
         141,
         142,
+        147,
         148,
         149,
         150,
         151,
         152,
         154,
+        155,
+        156,
         157,
         158,
         159,
         160,
+        161,
+        162,
+        163,
         164,
         165,
         166,
@@ -85215,6 +85348,7 @@
         177,
         178,
         179,
+        180,
         181,
         182,
         183,
@@ -85770,13 +85904,21 @@
         1064,
         1065,
         1066,
+        1069,
+        1070,
+        1071,
         1077,
         1078,
         1079,
         1080,
         1085,
+        1106,
+        1107,
         1108,
         1121,
+        1128,
+        1129,
+        1130,
         1131,
         1132,
         1133,
@@ -86193,36 +86335,16 @@
         },
         {
           "tag": "FormSheet",
-          "line": 40,
-          "component": "components/supplier-invoices.tsx#SupplierInvoices"
-        },
-        {
-          "tag": "FormSheet",
-          "line": 41,
-          "component": "components/supplier-invoices.tsx#SupplierInvoices"
-        },
-        {
-          "tag": "form",
-          "line": 42,
-          "component": "components/supplier-invoices.tsx#SupplierInvoices"
-        },
-        {
-          "tag": "Field",
-          "line": 43,
-          "component": "components/supplier-invoices.tsx#SupplierInvoices"
-        },
-        {
-          "tag": "Field",
           "line": 44,
           "component": "components/supplier-invoices.tsx#SupplierInvoices"
         },
         {
-          "tag": "Field",
+          "tag": "FormSheet",
           "line": 45,
           "component": "components/supplier-invoices.tsx#SupplierInvoices"
         },
         {
-          "tag": "Field",
+          "tag": "form",
           "line": 46,
           "component": "components/supplier-invoices.tsx#SupplierInvoices"
         },
@@ -86245,6 +86367,51 @@
           "tag": "Field",
           "line": 50,
           "component": "components/supplier-invoices.tsx#SupplierInvoices"
+        },
+        {
+          "tag": "Field",
+          "line": 51,
+          "component": "components/supplier-invoices.tsx#SupplierInvoices"
+        },
+        {
+          "tag": "Field",
+          "line": 52,
+          "component": "components/supplier-invoices.tsx#SupplierInvoices"
+        },
+        {
+          "tag": "Field",
+          "line": 53,
+          "component": "components/supplier-invoices.tsx#SupplierInvoices"
+        },
+        {
+          "tag": "Field",
+          "line": 54,
+          "component": "components/supplier-invoices.tsx#SupplierInvoices"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 81,
+          "component": "components/supplier-invoices.tsx#SupplierInvoiceMatch"
+        },
+        {
+          "tag": "Field",
+          "line": 84,
+          "component": "components/supplier-invoices.tsx#SupplierInvoiceMatch"
+        },
+        {
+          "tag": "Field",
+          "line": 84,
+          "component": "components/supplier-invoices.tsx#SupplierInvoiceMatch"
+        },
+        {
+          "tag": "Field",
+          "line": 89,
+          "component": "components/supplier-invoices.tsx#SupplierInvoiceMatch"
+        },
+        {
+          "tag": "Field",
+          "line": 89,
+          "component": "components/supplier-invoices.tsx#SupplierInvoiceMatch"
         },
         {
           "tag": "ListSearch",
@@ -86551,6 +86718,8 @@
         "components/supplier-invoices.tsx#Invoice",
         "components/supplier-invoices.tsx#Draft",
         "components/supplier-invoices.tsx#blank",
+        "components/supplier-invoices.tsx#SupplierInvoiceMatch",
+        "components/supplier-invoices.tsx#Match",
         "components/entity-files.tsx#EntityFiles",
         "components/entity-files.tsx#Attachment",
         "components/binso-ux.tsx#ListRow",
@@ -86814,6 +86983,36 @@
         "components/supplier-invoices.tsx#Draft",
         "components/supplier-invoices.tsx#blank",
         "lib/financial-status.ts#formatCurrency",
+        "components/supplier-invoices.tsx#SupplierInvoiceMatch",
+        "lib/financial-status.ts#businessDate",
+        "components/supplier-invoices.tsx#Match",
+        "lib/supplier-invoice-match.ts#SupplierMatchInput",
+        "lib/supplier-invoice-match.ts#compareSupplierInvoice",
+        "lib/supplier-invoice-match.ts#SupplierMatchDifference",
+        "lib/money.ts#moneyMinor",
+        "lib/money.ts#safeNumber",
+        "lib/money.ts#roundTo",
+        "lib/money.ts#Decimal",
+        "lib/money.ts#power10",
+        "lib/money.ts#decimal",
+        "lib/money.ts#fraction",
+        "lib/money.ts#Fraction",
+        "lib/money.ts#calculateDocument",
+        "lib/money.ts#normalizeDiscount",
+        "lib/money.ts#Discount",
+        "lib/money.ts#nonnegative",
+        "lib/money.ts#compare",
+        "lib/money.ts#amount",
+        "lib/money.ts#centsOf",
+        "lib/money.ts#divided",
+        "lib/money.ts#times",
+        "lib/money.ts#discountOn",
+        "lib/money.ts#zero",
+        "lib/money.ts#minus",
+        "lib/money.ts#plus",
+        "lib/money.ts#sum",
+        "lib/money.ts#allocate",
+        "lib/money.ts#exact",
         "components/entity-files.tsx#EntityFiles",
         "lib/file-associations.ts#fileRelations",
         "components/entity-files.tsx#Attachment",
@@ -86832,7 +87031,6 @@
         "components/external-resources.tsx#ExternalResources",
         "components/external-resources.tsx#Resource",
         "components/external-resources.tsx#Assignment",
-        "lib/financial-status.ts#businessDate",
         "components/external-resources.tsx#Attempt",
         "lib/display-format.ts#formatTimestampDate",
         "lib/display-format.ts#formatTimestamp",
@@ -87084,6 +87282,8 @@
         "components/supplier-invoices.tsx#Invoice",
         "components/supplier-invoices.tsx#Draft",
         "components/supplier-invoices.tsx#blank",
+        "components/supplier-invoices.tsx#SupplierInvoiceMatch",
+        "components/supplier-invoices.tsx#Match",
         "components/entity-files.tsx#EntityFiles",
         "components/entity-files.tsx#Attachment",
         "components/binso-ux.tsx#ListRow",
@@ -87364,6 +87564,36 @@
         "components/supplier-invoices.tsx#Draft",
         "components/supplier-invoices.tsx#blank",
         "lib/financial-status.ts#formatCurrency",
+        "components/supplier-invoices.tsx#SupplierInvoiceMatch",
+        "lib/financial-status.ts#businessDate",
+        "components/supplier-invoices.tsx#Match",
+        "lib/supplier-invoice-match.ts#SupplierMatchInput",
+        "lib/supplier-invoice-match.ts#compareSupplierInvoice",
+        "lib/supplier-invoice-match.ts#SupplierMatchDifference",
+        "lib/money.ts#moneyMinor",
+        "lib/money.ts#safeNumber",
+        "lib/money.ts#roundTo",
+        "lib/money.ts#Decimal",
+        "lib/money.ts#power10",
+        "lib/money.ts#decimal",
+        "lib/money.ts#fraction",
+        "lib/money.ts#Fraction",
+        "lib/money.ts#calculateDocument",
+        "lib/money.ts#normalizeDiscount",
+        "lib/money.ts#Discount",
+        "lib/money.ts#nonnegative",
+        "lib/money.ts#compare",
+        "lib/money.ts#amount",
+        "lib/money.ts#centsOf",
+        "lib/money.ts#divided",
+        "lib/money.ts#times",
+        "lib/money.ts#discountOn",
+        "lib/money.ts#zero",
+        "lib/money.ts#minus",
+        "lib/money.ts#plus",
+        "lib/money.ts#sum",
+        "lib/money.ts#allocate",
+        "lib/money.ts#exact",
         "components/entity-files.tsx#EntityFiles",
         "lib/file-associations.ts#fileRelations",
         "components/entity-files.tsx#Attachment",
@@ -87382,7 +87612,6 @@
         "components/external-resources.tsx#ExternalResources",
         "components/external-resources.tsx#Resource",
         "components/external-resources.tsx#Assignment",
-        "lib/financial-status.ts#businessDate",
         "components/external-resources.tsx#Attempt",
         "lib/display-format.ts#formatTimestampDate",
         "lib/display-format.ts#formatTimestamp",
@@ -87439,8 +87668,13 @@
         68,
         78,
         81,
+        84,
+        85,
+        86,
         87,
         88,
+        89,
+        90,
         91,
         92,
         94,
@@ -87485,16 +87719,22 @@
         140,
         141,
         142,
+        147,
         148,
         149,
         150,
         151,
         152,
         154,
+        155,
+        156,
         157,
         158,
         159,
         160,
+        161,
+        162,
+        163,
         164,
         165,
         166,
@@ -87508,6 +87748,7 @@
         177,
         178,
         179,
+        180,
         181,
         182,
         183,
@@ -88063,13 +88304,21 @@
         1064,
         1065,
         1066,
+        1069,
+        1070,
+        1071,
         1077,
         1078,
         1079,
         1080,
         1085,
+        1106,
+        1107,
         1108,
         1121,
+        1128,
+        1129,
+        1130,
         1131,
         1132,
         1133,
@@ -88486,36 +88735,16 @@
         },
         {
           "tag": "FormSheet",
-          "line": 40,
-          "component": "components/supplier-invoices.tsx#SupplierInvoices"
-        },
-        {
-          "tag": "FormSheet",
-          "line": 41,
-          "component": "components/supplier-invoices.tsx#SupplierInvoices"
-        },
-        {
-          "tag": "form",
-          "line": 42,
-          "component": "components/supplier-invoices.tsx#SupplierInvoices"
-        },
-        {
-          "tag": "Field",
-          "line": 43,
-          "component": "components/supplier-invoices.tsx#SupplierInvoices"
-        },
-        {
-          "tag": "Field",
           "line": 44,
           "component": "components/supplier-invoices.tsx#SupplierInvoices"
         },
         {
-          "tag": "Field",
+          "tag": "FormSheet",
           "line": 45,
           "component": "components/supplier-invoices.tsx#SupplierInvoices"
         },
         {
-          "tag": "Field",
+          "tag": "form",
           "line": 46,
           "component": "components/supplier-invoices.tsx#SupplierInvoices"
         },
@@ -88538,6 +88767,51 @@
           "tag": "Field",
           "line": 50,
           "component": "components/supplier-invoices.tsx#SupplierInvoices"
+        },
+        {
+          "tag": "Field",
+          "line": 51,
+          "component": "components/supplier-invoices.tsx#SupplierInvoices"
+        },
+        {
+          "tag": "Field",
+          "line": 52,
+          "component": "components/supplier-invoices.tsx#SupplierInvoices"
+        },
+        {
+          "tag": "Field",
+          "line": 53,
+          "component": "components/supplier-invoices.tsx#SupplierInvoices"
+        },
+        {
+          "tag": "Field",
+          "line": 54,
+          "component": "components/supplier-invoices.tsx#SupplierInvoices"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 81,
+          "component": "components/supplier-invoices.tsx#SupplierInvoiceMatch"
+        },
+        {
+          "tag": "Field",
+          "line": 84,
+          "component": "components/supplier-invoices.tsx#SupplierInvoiceMatch"
+        },
+        {
+          "tag": "Field",
+          "line": 84,
+          "component": "components/supplier-invoices.tsx#SupplierInvoiceMatch"
+        },
+        {
+          "tag": "Field",
+          "line": 89,
+          "component": "components/supplier-invoices.tsx#SupplierInvoiceMatch"
+        },
+        {
+          "tag": "Field",
+          "line": 89,
+          "component": "components/supplier-invoices.tsx#SupplierInvoiceMatch"
         },
         {
           "tag": "ListSearch",
@@ -227416,7 +227690,7 @@
       "key": "components/supplier-invoices.tsx#SupplierInvoices",
       "file": "components/supplier-invoices.tsx",
       "name": "SupplierInvoices",
-      "line": 15,
+      "line": 17,
       "classes": [
         "surface",
         "technical-hint",
@@ -227432,30 +227706,14 @@
       "widgets": [
         {
           "tag": "FormSheet",
-          "line": 40
-        },
-        {
-          "tag": "FormSheet",
-          "line": 41
-        },
-        {
-          "tag": "form",
-          "line": 42
-        },
-        {
-          "tag": "Field",
-          "line": 43
-        },
-        {
-          "tag": "Field",
           "line": 44
         },
         {
-          "tag": "Field",
+          "tag": "FormSheet",
           "line": 45
         },
         {
-          "tag": "Field",
+          "tag": "form",
           "line": 46
         },
         {
@@ -227473,19 +227731,35 @@
         {
           "tag": "Field",
           "line": 50
+        },
+        {
+          "tag": "Field",
+          "line": 51
+        },
+        {
+          "tag": "Field",
+          "line": 52
+        },
+        {
+          "tag": "Field",
+          "line": 53
+        },
+        {
+          "tag": "Field",
+          "line": 54
         }
       ],
       "elements": [
         {
           "tag": "section",
-          "line": 36,
+          "line": 39,
           "props": [
             "className=\"surface\""
           ]
         },
         {
           "tag": "SectionTitle",
-          "line": 37,
+          "line": 40,
           "props": [
             "title=\"Eingangsrechnungen\"",
             "action={mayWrite?<ActionsMenu label=\"Eingangsrechnungen\"><ActionRow requiresWrite icon=\"plus\" title=\"Eingangsrechnungsentwurf\" onClick={()=>edit(null)}/></ActionsMenu>:undefined}"
@@ -227493,14 +227767,14 @@
         },
         {
           "tag": "ActionsMenu",
-          "line": 37,
+          "line": 40,
           "props": [
             "label=\"Eingangsrechnungen\""
           ]
         },
         {
           "tag": "ActionRow",
-          "line": 37,
+          "line": 40,
           "props": [
             "requiresWrite",
             "icon=\"plus\"",
@@ -227510,45 +227784,45 @@
         },
         {
           "tag": "p",
-          "line": 38,
+          "line": 41,
           "props": [
             "className=\"technical-hint\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 38,
+          "line": 41,
           "props": []
         },
         {
           "tag": "LoadingState",
-          "line": 39,
+          "line": 42,
           "props": []
         },
         {
           "tag": "ErrorState",
-          "line": 39,
+          "line": 42,
           "props": [
             "onRetry={query.refresh}"
           ]
         },
         {
           "tag": "EmptyState",
-          "line": 39,
+          "line": 42,
           "props": [
             "title=\"Keine Eingangsrechnungen\""
           ]
         },
         {
           "tag": "div",
-          "line": 39,
+          "line": 42,
           "props": [
             "className=\"action-list\""
           ]
         },
         {
           "tag": "div",
-          "line": 39,
+          "line": 42,
           "props": [
             "key={invoice.id}",
             "className=\"assignment-row\""
@@ -227556,54 +227830,54 @@
         },
         {
           "tag": "div",
-          "line": 39,
+          "line": 42,
           "props": []
         },
         {
           "tag": "b",
-          "line": 39,
+          "line": 42,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 39,
+          "line": 42,
           "props": []
         },
         {
           "tag": "p",
-          "line": 39,
+          "line": 42,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 39,
+          "line": 42,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 39,
+          "line": 42,
           "props": []
         },
         {
           "tag": "span",
-          "line": 39,
+          "line": 42,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 39,
+          "line": 42,
           "props": []
         },
         {
           "tag": "ActionsMenu",
-          "line": 39,
+          "line": 42,
           "props": [
             "label=\"Eingangsrechnungen\""
           ]
         },
         {
           "tag": "ActionRow",
-          "line": 39,
+          "line": 42,
           "props": [
             "icon=\"file\"",
             "title=\"Belege\"",
@@ -227612,7 +227886,16 @@
         },
         {
           "tag": "ActionRow",
-          "line": 39,
+          "line": 42,
+          "props": [
+            "icon=\"receipt\"",
+            "title=\"Leistungen abgleichen\"",
+            "onClick={()=>setMatching({invoice,scope})}"
+          ]
+        },
+        {
+          "tag": "ActionRow",
+          "line": 42,
           "props": [
             "requiresWrite",
             "icon=\"edit\"",
@@ -227621,8 +227904,19 @@
           ]
         },
         {
+          "tag": "SupplierInvoiceMatch",
+          "line": 43,
+          "props": [
+            "key={scope+matching.invoice.id}",
+            "supplierId={supplierId}",
+            "invoice={matching.invoice}",
+            "mayWrite={mayWrite&&matching.invoice.status==='draft'}",
+            "onClose={()=>setMatching(null)}"
+          ]
+        },
+        {
           "tag": "FormSheet",
-          "line": 40,
+          "line": 44,
           "props": [
             "open",
             "onClose={()=>setReceipts(null)}",
@@ -227631,7 +227925,7 @@
         },
         {
           "tag": "EntityFiles",
-          "line": 40,
+          "line": 44,
           "props": [
             "purpose=\"supplier_invoice_receipt\"",
             "entityId={receipts.id}",
@@ -227641,7 +227935,7 @@
         },
         {
           "tag": "FormSheet",
-          "line": 41,
+          "line": 45,
           "props": [
             "open={open}",
             "onClose={()=>setOpen(false)}",
@@ -227652,7 +227946,7 @@
         },
         {
           "tag": "form",
-          "line": 42,
+          "line": 46,
           "props": [
             "id={formId}",
             "onSubmit={event=>{event.preventDefault();void save();}}"
@@ -227660,21 +227954,21 @@
         },
         {
           "tag": "div",
-          "line": 42,
+          "line": 46,
           "props": [
             "className=\"form-grid two\""
           ]
         },
         {
           "tag": "Field",
-          "line": 43,
+          "line": 47,
           "props": [
             "label=\"Rechnungsnummer\""
           ]
         },
         {
           "tag": "Input",
-          "line": 43,
+          "line": 47,
           "props": [
             "maxLength={120}",
             "value={draft.number}",
@@ -227683,14 +227977,14 @@
         },
         {
           "tag": "Field",
-          "line": 44,
+          "line": 48,
           "props": [
             "label=\"Währung\""
           ]
         },
         {
           "tag": "Select",
-          "line": 44,
+          "line": 48,
           "props": [
             "value={draft.currency}",
             "onChange={event=>field('currency',event.target.value)}"
@@ -227698,40 +227992,40 @@
         },
         {
           "tag": "option",
-          "line": 44,
+          "line": 48,
           "props": [
             "value=\"\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 44,
+          "line": 48,
           "props": []
         },
         {
           "tag": "option",
-          "line": 44,
+          "line": 48,
           "props": [
             "value=\"CHF\""
           ]
         },
         {
           "tag": "option",
-          "line": 44,
+          "line": 48,
           "props": [
             "value=\"EUR\""
           ]
         },
         {
           "tag": "Field",
-          "line": 45,
+          "line": 49,
           "props": [
             "label=\"Rechnungsdatum\""
           ]
         },
         {
           "tag": "Input",
-          "line": 45,
+          "line": 49,
           "props": [
             "type=\"date\"",
             "value={draft.invoiceDate}",
@@ -227740,14 +228034,14 @@
         },
         {
           "tag": "Field",
-          "line": 46,
+          "line": 50,
           "props": [
             "label=\"Fällig am\""
           ]
         },
         {
           "tag": "Input",
-          "line": 46,
+          "line": 50,
           "props": [
             "type=\"date\"",
             "min={draft.invoiceDate||undefined}",
@@ -227757,14 +228051,14 @@
         },
         {
           "tag": "Field",
-          "line": 47,
+          "line": 51,
           "props": [
             "label=\"Nettobetrag\""
           ]
         },
         {
           "tag": "Input",
-          "line": 47,
+          "line": 51,
           "props": [
             "inputMode=\"decimal\"",
             "value={draft.netAmount}",
@@ -227773,14 +228067,14 @@
         },
         {
           "tag": "Field",
-          "line": 48,
+          "line": 52,
           "props": [
             "label=\"MwSt.-Betrag\""
           ]
         },
         {
           "tag": "Input",
-          "line": 48,
+          "line": 52,
           "props": [
             "inputMode=\"decimal\"",
             "value={draft.vatAmount}",
@@ -227789,14 +228083,14 @@
         },
         {
           "tag": "Field",
-          "line": 49,
+          "line": 53,
           "props": [
             "label=\"Gesamtbetrag\""
           ]
         },
         {
           "tag": "Input",
-          "line": 49,
+          "line": 53,
           "props": [
             "inputMode=\"decimal\"",
             "value={draft.totalAmount}",
@@ -227805,14 +228099,14 @@
         },
         {
           "tag": "Field",
-          "line": 50,
+          "line": 54,
           "props": [
             "label=\"Notiz\""
           ]
         },
         {
           "tag": "Input",
-          "line": 50,
+          "line": 54,
           "props": [
             "maxLength={2000}",
             "value={draft.note}",
@@ -227821,19 +228115,19 @@
         },
         {
           "tag": "ErrorState",
-          "line": 52,
+          "line": 56,
           "props": []
         },
         {
           "tag": "FormActions",
-          "line": 53,
+          "line": 57,
           "props": [
             "sheet"
           ]
         },
         {
           "tag": "Button",
-          "line": 53,
+          "line": 57,
           "props": [
             "variant=\"secondary\"",
             "disabled={busy}",
@@ -227842,12 +228136,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 53,
+          "line": 57,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 53,
+          "line": 57,
           "props": [
             "requiresWrite",
             "type=\"submit\"",
@@ -227857,57 +228151,57 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 53,
+          "line": 57,
           "props": []
         }
       ],
       "conditions": [
         {
-          "line": 21,
+          "line": 24,
           "expression": "invoice"
         },
         {
-          "line": 26,
+          "line": 29,
           "expression": "pending.current"
         },
         {
-          "line": 28,
+          "line": 31,
           "expression": "selected"
         },
         {
-          "line": 29,
+          "line": 32,
           "expression": "attempt.current?.body!==serialized"
         },
         {
-          "line": 31,
+          "line": 34,
           "expression": "!result.item?.id"
         },
         {
-          "line": 33,
+          "line": 36,
           "expression": "cause instanceof Error"
         },
         {
-          "line": 37,
+          "line": 40,
           "expression": "mayWrite"
         },
         {
-          "line": 39,
+          "line": 42,
           "expression": "query.loading"
         },
         {
-          "line": 39,
+          "line": 42,
           "expression": "query.error"
         },
         {
-          "line": 39,
+          "line": 42,
           "expression": "!query.data?.items.length"
         },
         {
-          "line": 39,
+          "line": 42,
           "expression": "invoice.total_amount===null"
         },
         {
-          "line": 39,
+          "line": 42,
           "expression": "invoice.currency"
         }
       ]
@@ -227916,7 +228210,7 @@
       "key": "components/supplier-invoices.tsx#Invoice",
       "file": "components/supplier-invoices.tsx",
       "name": "Invoice",
-      "line": 12,
+      "line": 14,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -227928,7 +228222,7 @@
       "key": "components/supplier-invoices.tsx#Draft",
       "file": "components/supplier-invoices.tsx",
       "name": "Draft",
-      "line": 13,
+      "line": 15,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -227940,7 +228234,481 @@
       "key": "components/supplier-invoices.tsx#blank",
       "file": "components/supplier-invoices.tsx",
       "name": "blank",
-      "line": 14,
+      "line": 16,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": []
+    },
+    {
+      "key": "components/supplier-invoices.tsx#SupplierInvoiceMatch",
+      "file": "components/supplier-invoices.tsx",
+      "name": "SupplierInvoiceMatch",
+      "line": 63,
+      "classes": [
+        "sheet-body",
+        "form-grid",
+        "two",
+        "action-list",
+        "assignment-row",
+        "form-check",
+        "form-section"
+      ],
+      "apis": [
+        "/api/suppliers/"
+      ],
+      "collections": [],
+      "widgets": [
+        {
+          "tag": "FormSheet",
+          "line": 81
+        },
+        {
+          "tag": "Field",
+          "line": 84
+        },
+        {
+          "tag": "Field",
+          "line": 84
+        },
+        {
+          "tag": "Field",
+          "line": 89
+        },
+        {
+          "tag": "Field",
+          "line": 89
+        }
+      ],
+      "elements": [
+        {
+          "tag": "FormSheet",
+          "line": 81,
+          "props": [
+            "open",
+            "label=\"Leistungen abgleichen\"",
+            "description={invoice.supplier_invoice_no??''}",
+            "busy={busy}",
+            "onClose={onClose}",
+            "dirty={Boolean(selection.length||minutes||price)&&savedBody!==JSON.stringify({from,until,selection,minutes,price})}"
+          ]
+        },
+        {
+          "tag": "div",
+          "line": 82,
+          "props": [
+            "className=\"sheet-body\""
+          ]
+        },
+        {
+          "tag": "p",
+          "line": 83,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 83,
+          "props": []
+        },
+        {
+          "tag": "div",
+          "line": 84,
+          "props": [
+            "className=\"form-grid two\""
+          ]
+        },
+        {
+          "tag": "Field",
+          "line": 84,
+          "props": [
+            "label=\"Leistungsbeginn\""
+          ]
+        },
+        {
+          "tag": "Input",
+          "line": 84,
+          "props": [
+            "type=\"date\"",
+            "value={from}",
+            "onChange={e=>{setFrom(e.target.value);setSelection([]);}}"
+          ]
+        },
+        {
+          "tag": "Field",
+          "line": 84,
+          "props": [
+            "label=\"Leistungsende\""
+          ]
+        },
+        {
+          "tag": "Input",
+          "line": 84,
+          "props": [
+            "type=\"date\"",
+            "value={until}",
+            "min={from}",
+            "onChange={e=>{setUntil(e.target.value);setSelection([]);}}"
+          ]
+        },
+        {
+          "tag": "LoadingState",
+          "line": 85,
+          "props": []
+        },
+        {
+          "tag": "ErrorState",
+          "line": 85,
+          "props": [
+            "onRetry={query.refresh}"
+          ]
+        },
+        {
+          "tag": "p",
+          "line": 86,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 86,
+          "props": []
+        },
+        {
+          "tag": "EmptyState",
+          "line": 87,
+          "props": [
+            "title=\"Keine bestätigten Einkaufsquellen in diesem Zeitraum\""
+          ]
+        },
+        {
+          "tag": "div",
+          "line": 87,
+          "props": [
+            "className=\"action-list\""
+          ]
+        },
+        {
+          "tag": "label",
+          "line": 87,
+          "props": [
+            "key={source.price_source_id}",
+            "className=\"assignment-row form-check\""
+          ]
+        },
+        {
+          "tag": "Input",
+          "line": 87,
+          "props": [
+            "type=\"checkbox\"",
+            "disabled={!mayWrite||busy}",
+            "checked={selection.includes(source.price_source_id)}",
+            "onChange={e=>setSelection(v=>e.target.checked?[...v,source.price_source_id]:v.filter(id=>id!==source.price_source_id))}"
+          ]
+        },
+        {
+          "tag": "span",
+          "line": 87,
+          "props": []
+        },
+        {
+          "tag": "br",
+          "line": 87,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 87,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 87,
+          "props": []
+        },
+        {
+          "tag": "div",
+          "line": 89,
+          "props": [
+            "className=\"form-grid two\""
+          ]
+        },
+        {
+          "tag": "Field",
+          "line": 89,
+          "props": [
+            "label=\"Minuten gemäss Lieferantenrechnung\""
+          ]
+        },
+        {
+          "tag": "Input",
+          "line": 89,
+          "props": [
+            "inputMode=\"numeric\"",
+            "value={minutes}",
+            "onChange={e=>setMinutes(e.target.value)}"
+          ]
+        },
+        {
+          "tag": "Field",
+          "line": 89,
+          "props": [
+            "label=\"Stundensatz gemäss Lieferantenrechnung\""
+          ]
+        },
+        {
+          "tag": "Input",
+          "line": 89,
+          "props": [
+            "inputMode=\"decimal\"",
+            "value={price}",
+            "onChange={e=>setPrice(e.target.value)}"
+          ]
+        },
+        {
+          "tag": "section",
+          "line": 90,
+          "props": [
+            "className=\"form-section\""
+          ]
+        },
+        {
+          "tag": "SectionTitle",
+          "line": 90,
+          "props": [
+            "title=\"Letzter Abgleich\""
+          ]
+        },
+        {
+          "tag": "p",
+          "line": 90,
+          "props": []
+        },
+        {
+          "tag": "p",
+          "line": 90,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 90,
+          "props": []
+        },
+        {
+          "tag": "p",
+          "line": 90,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 90,
+          "props": []
+        },
+        {
+          "tag": "p",
+          "line": 90,
+          "props": [
+            "key={d.code}"
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 90,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 90,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 90,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 90,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 90,
+          "props": []
+        },
+        {
+          "tag": "ErrorState",
+          "line": 91,
+          "props": []
+        },
+        {
+          "tag": "FormActions",
+          "line": 92,
+          "props": [
+            "sheet"
+          ]
+        },
+        {
+          "tag": "Button",
+          "line": 92,
+          "props": [
+            "variant=\"secondary\"",
+            "disabled={busy}",
+            "onClick={onClose}"
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 92,
+          "props": []
+        },
+        {
+          "tag": "Button",
+          "line": 92,
+          "props": [
+            "disabled={busy||query.loading||Boolean(query.error)||!selection.length||!minutes||!price}",
+            "onClick={()=>void save()}"
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 92,
+          "props": []
+        }
+      ],
+      "conditions": [
+        {
+          "line": 69,
+          "expression": "from&&until"
+        },
+        {
+          "line": 70,
+          "expression": "saved"
+        },
+        {
+          "line": 72,
+          "expression": "pending.current"
+        },
+        {
+          "line": 73,
+          "expression": "!/^\\d+$/.test(minutes)"
+        },
+        {
+          "line": 75,
+          "expression": "attempt.current?.body!==serialized"
+        },
+        {
+          "line": 76,
+          "expression": "!response.item?.id"
+        },
+        {
+          "line": 77,
+          "expression": "cause instanceof Error"
+        },
+        {
+          "line": 85,
+          "expression": "query.loading"
+        },
+        {
+          "line": 85,
+          "expression": "query.error"
+        },
+        {
+          "line": 87,
+          "expression": "!query.data?.sources.length"
+        },
+        {
+          "line": 87,
+          "expression": "e.target.checked"
+        },
+        {
+          "line": 90,
+          "expression": "latest.stale"
+        },
+        {
+          "line": 90,
+          "expression": "latest.result.ready"
+        }
+      ]
+    },
+    {
+      "key": "components/supplier-invoices.tsx#Match",
+      "file": "components/supplier-invoices.tsx",
+      "name": "Match",
+      "line": 62,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": []
+    },
+    {
+      "key": "lib/supplier-invoice-match.ts#SupplierMatchInput",
+      "file": "lib/supplier-invoice-match.ts",
+      "name": "SupplierMatchInput",
+      "line": 3,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": []
+    },
+    {
+      "key": "lib/supplier-invoice-match.ts#compareSupplierInvoice",
+      "file": "lib/supplier-invoice-match.ts",
+      "name": "compareSupplierInvoice",
+      "line": 10,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": [
+        {
+          "line": 13,
+          "expression": "!first"
+        },
+        {
+          "line": 15,
+          "expression": "input.sources.some(s=>s.price.currency!==first.currency||s.price.contractId!==first.contractId||moneyMinor(s.price.unitPrice)!==moneyMinor(first.unitPrice)||moneyMinor(s.price.vatRate)!==moneyMinor(first.vatRate)||s.price.taxTreatment!==first.taxTreatment)"
+        },
+        {
+          "line": 19,
+          "expression": "input.claimed.minutes!==minutes"
+        },
+        {
+          "line": 20,
+          "expression": "moneyMinor(input.claimed.unitPrice)!==moneyMinor(first.unitPrice)"
+        },
+        {
+          "line": 21,
+          "expression": "input.invoice.currency!==first.currency"
+        },
+        {
+          "line": 22,
+          "expression": "actual===null||moneyMinor(actual)!==moneyMinor(expected)"
+        },
+        {
+          "line": 23,
+          "expression": "!input.invoice[field]"
+        },
+        {
+          "line": 24,
+          "expression": "!input.receipts.length"
+        },
+        {
+          "line": 25,
+          "expression": "input.receipts.some(f=>f.scanStatus!=='clean')"
+        }
+      ]
+    },
+    {
+      "key": "lib/supplier-invoice-match.ts#SupplierMatchDifference",
+      "file": "lib/supplier-invoice-match.ts",
+      "name": "SupplierMatchDifference",
+      "line": 8,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -261419,7 +262187,27 @@
     {
       "file": "components/supplier-invoices.tsx",
       "name": "SupplierInvoices",
-      "line": 15,
+      "line": 17,
+      "usedBy": [
+        "/lieferanten/[id]",
+        "/lieferanten/neu"
+      ],
+      "frameworkUsedBy": []
+    },
+    {
+      "file": "components/supplier-invoices.tsx",
+      "name": "Match",
+      "line": 62,
+      "usedBy": [
+        "/lieferanten/[id]",
+        "/lieferanten/neu"
+      ],
+      "frameworkUsedBy": []
+    },
+    {
+      "file": "components/supplier-invoices.tsx",
+      "name": "SupplierInvoiceMatch",
+      "line": 63,
       "usedBy": [
         "/lieferanten/[id]",
         "/lieferanten/neu"

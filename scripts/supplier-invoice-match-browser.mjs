@@ -1,0 +1,20 @@
+import assert from 'node:assert/strict';
+import path from 'node:path';
+export async function verifySupplierMatchBrowser({c,page,context,base,output,token}){
+ const fixture=(await c.query("select id,supplier_id,invoice_date::text,version from supplier_invoices where supplier_invoice_no='SYNTHETIC-MATCH-120H' and status='draft'")).rows[0];assert.ok(fixture);
+ const period=(await c.query('select min(period_start)::text start,max(period_end)::text end from supplier_invoice_matches where invoice_id=$1',[fixture.id])).rows[0];
+ const endpoint='/api/suppliers/'+fixture.supplier_id+'/invoices/'+fixture.id+'/match';
+ for(const route of ['/api/suppliers/'+fixture.supplier_id,'/api/suppliers/'+fixture.supplier_id+'/invoices',endpoint+'?'+new URLSearchParams({from:period.start,until:period.end})]){const r=await fetch(base+route,{headers:{cookie:'binso_v26_native_session='+token},signal:AbortSignal.timeout(60000)});assert.equal(r.status,200,await r.text());}
+ await page.goto(base+'/lieferanten/'+fixture.supplier_id);await page.getByText('SYNTHETIC-MATCH-120H',{exact:true}).waitFor();await page.waitForLoadState('networkidle');const consent=page.getByRole('dialog',{name:'Datenschutz-Einstellungen',exact:true});if(await consent.isVisible()){await consent.getByRole('button',{name:'Alle ablehnen',exact:true}).click();await consent.waitFor({state:'hidden'});}
+ const open=async()=>{const row=page.locator('.assignment-row').filter({has:page.getByText('SYNTHETIC-MATCH-120H',{exact:true})});await row.getByRole('button').click();await page.getByRole('button',{name:'Leistungen abgleichen',exact:true}).click();const sheet=page.getByRole('dialog',{name:'Leistungen abgleichen',exact:true});await sheet.waitFor();return sheet;};
+ for(const width of [1440,390]){
+  await page.setViewportSize({width,height:900});const sheet=await open();
+  await sheet.getByLabel('Leistungsbeginn',{exact:true}).fill(period.start);await sheet.getByLabel('Leistungsende',{exact:true}).fill(period.end);await sheet.getByRole('checkbox').first().waitFor();await page.waitForLoadState('networkidle');
+  const boxes=sheet.getByRole('checkbox');assert.ok(await boxes.count()>=20);assert.equal(await sheet.locator('input[type="checkbox"]:checked').count(),0,'No source silently selected');
+  if(width===1440){await boxes.first().check();await sheet.getByLabel('Minuten gemäss Lieferantenrechnung',{exact:true}).fill('360');await sheet.getByLabel('Stundensatz gemäss Lieferantenrechnung',{exact:true}).fill('80.00');const saved=page.waitForResponse(r=>r.url().endsWith(endpoint)&&r.request().method()==='POST');await sheet.getByRole('button',{name:'Abgleich speichern',exact:true}).click();const response=await saved;assert.equal(response.status(),201,await response.text());const result=(await response.json()).item;assert.equal(result.result.ready,false);assert.ok(result.result.differences.some(d=>d.code==='currency'));await sheet.getByText('Ungeklärte Abweichungen',{exact:true}).waitFor();await page.waitForLoadState('networkidle');}
+  await page.screenshot({path:path.join(output,'match-'+width+'.png'),fullPage:true});const bounds=await sheet.boundingBox();assert.ok(bounds.y>=0&&bounds.y+bounds.height<=901,'Sheet fits viewport');assert.ok(await sheet.locator('[data-sheet-dismiss]').isVisible());assert.ok(await sheet.getByRole('button',{name:'Abgleich speichern',exact:true}).isVisible());
+  await sheet.locator('[data-sheet-dismiss]').click();await sheet.waitFor({state:'hidden'});
+ }
+ const state=await context.request.get(base+endpoint+'?'+new URLSearchParams({from:period.start,until:period.end}));assert.equal(state.status(),200);assert.equal((await state.json()).matches[0].input_snapshot.claimed.minutes,360,'Stored comparison survives reopening');assert.equal((await c.query('select status,version from supplier_invoices where id=$1',[fixture.id])).rows[0].status,'draft');
+ console.log('PASS AP native browser: actual cookie/runtime DB, explicit source choice/save, visible zero-tolerance differences, persisted evidence after reopening, desktop/mobile sheet/actions; invoice remains draft. No approval/payment, physical device or production-build claim.');
+}
