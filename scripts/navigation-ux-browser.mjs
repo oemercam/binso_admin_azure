@@ -91,7 +91,7 @@ export async function verifyNavigationPersistence(page,{base,capture=async()=>{}
    if(railVisible){
     const settings=page.locator('.settings-context-navigation');await settings.getByRole('link',{name:'Darstellung',exact:true}).click();await page.waitForURL(base+'/einstellungen/darstellung');assert.equal(await settings.locator('a[aria-current="page"]').getAttribute('href'),'/einstellungen/darstellung','Visible settings siblings announce the current page');
    }else{
-    await page.locator('.mobile-back,.desktop-back').filter({visible:true}).click();await page.waitForURL(base+'/einstellungen');
+    await page.locator('.mobile-back,.desktop-back').filter({visible:true}).click();await page.waitForURL(base+'/einstellungen');await page.waitForLoadState('networkidle');
     assert.equal(await page.locator('.settings-overview').getByRole('link',{name:'Darstellung',exact:true}).count(),0,'V4.1 company settings do not duplicate personal preferences');
     await page.getByRole('button',{name:'Benutzerkonto',exact:true}).filter({visible:true}).click();
     await page.locator('.account-sheet').getByRole('link',{name:'Darstellung',exact:true}).click();await page.waitForURL(url=>url.pathname==='/einstellungen/darstellung');
@@ -104,7 +104,7 @@ export async function verifyNavigationPersistence(page,{base,capture=async()=>{}
   await page.goto(base+'/einstellungen/konto');await page.waitForLoadState('networkidle');
   assert.equal(await page.locator('.settings-context-navigation').isVisible(),false,'Desktop settings rail stays out of the phone flow');
   assert.equal(await page.locator('.settings-mobile-navigation').count(),0,'Phone settings use the overview without an extra hamburger');
-  await page.locator('.mobile-back').click();await page.waitForURL(base+'/einstellungen');
+  await page.locator('.mobile-back').click();await page.waitForURL(base+'/einstellungen');await page.waitForLoadState('networkidle');
   assert.equal(await page.locator('.settings-overview').getByRole('link',{name:'Sicherheit',exact:true}).count(),0,'Security remains in the personal account area');
   await page.getByRole('button',{name:'Benutzerkonto',exact:true}).filter({visible:true}).click();
   const security=page.locator('.account-sheet').getByRole('link',{name:'Sicherheit',exact:true});await security.focus();await security.press('Enter');await page.waitForURL(url=>url.pathname==='/einstellungen/sicherheit');

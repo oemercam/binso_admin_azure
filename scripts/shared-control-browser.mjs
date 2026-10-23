@@ -11,7 +11,7 @@ export async function measureListFrameBorders(page){
 
 /** Query and read KPI borders atomically, without carrying handles across a rerender. */
 export async function measureMetricDividers(page){
- return page.evaluate(()=>[...document.querySelectorAll('.metric,.finance-flow-primary,.finance-flow-result,.finance-flow-costs,.finance-flow-costs>div')].map(el=>({left:getComputedStyle(el).borderLeftWidth,compact:!!el.closest('.app-root[data-ux="master-v3"] :is(.bo-cash-overview,.bo-finance-analysis)[data-compact]')})));
+ return page.evaluate(()=>[...document.querySelectorAll('.metric,.finance-flow-primary,.finance-flow-result,.finance-flow-costs,.finance-flow-costs>div')].map(el=>({left:getComputedStyle(el).borderLeftWidth,compact:!!el.closest(':is(.app-root[data-ux="master-v3"] .bo-cash-overview,.bo-finance-analysis)[data-compact]')})));
 }
 
 export async function measureOpenSectionShapes(page){
