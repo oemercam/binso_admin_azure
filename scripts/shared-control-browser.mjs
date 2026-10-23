@@ -1,5 +1,30 @@
 import assert from 'node:assert/strict';
 
+/** Resolve visibility and styles in one DOM turn: a rerender can detach locator handles. */
+export async function measureListFrameBorders(page){
+ return page.evaluate(()=>[...document.querySelectorAll('.records,.desktop-record-table')].flatMap(el=>{
+  const css=getComputedStyle(el),rect=el.getBoundingClientRect();
+  return el.isConnected&&rect.width>0&&rect.height>0&&css.visibility!=='hidden'&&css.visibility!=='collapse'
+   ?[{top:css.borderTopWidth,bottom:css.borderBottomWidth}]:[];
+ }));
+}
+
+/** Real-browser countercases: detached snapshots, live borders and hidden tables. */
+export async function verifyListFrameMeasurement(page){
+ await page.setContent('<div class="records" style="width:200px;height:40px">Old list</div><div class="desktop-record-table" style="display:none;border:1px solid">Hidden table</div>');
+ const detached=await page.locator('.records').elementHandle();
+ try{
+  await page.evaluate(()=>{const next=document.querySelector('.records').cloneNode(true);document.querySelector('.records').replaceWith(next);});
+  const stale=await detached.evaluate(el=>({top:getComputedStyle(el).borderTopWidth,bottom:getComputedStyle(el).borderBottomWidth}));
+  if(page.context().browser().browserType().name()==='chromium')assert.deepEqual(stale,{top:'',bottom:''},'Chromium detached locator snapshots have no computed border styles');
+  assert.deepEqual(await measureListFrameBorders(page),[{top:'0px',bottom:'0px'}],'Measure the connected replacement, excluding the hidden table');
+  await page.locator('.records').evaluate(el=>{el.style.borderTop='1px solid';});
+  assert.equal((await measureListFrameBorders(page))[0].top,'1px','A real leading separator remains a failing measurement');
+  await page.locator('.records').evaluate(el=>{el.style.borderTop='0';el.style.borderBottom='1px solid';});
+  assert.equal((await measureListFrameBorders(page))[0].bottom,'1px','A real terminal separator remains a failing measurement');
+ }finally{await detached.dispose();}
+}
+
 /** Revision7 chapter19: closed fields share one geometry across surfaces.
  * Textareas and checkbox/radio controls have their own semantic geometry. */
 export async function assertCanonicalClosedFields(page,route=''){
