@@ -11,11 +11,12 @@ try{if((await fetch(base+'/api/health')).ok)throw Error('Merge browser port occu
 const auth=await createUiAuthFixture(),launch=qaBrowserServer(port,{...process.env,...auth.env}),server=spawn(process.execPath,launch.args,{stdio:['ignore','pipe','pipe'],env:launch.env});let logs='',browser;server.stdout.on('data',v=>logs+=v);server.stderr.on('data',v=>logs+=v);
 const source='0dcd8673-f466-4d52-9a81-a65455d6e986',target='fedcedcb-ad50-4941-a078-c322dc471829',revision='a'.repeat(64);
 const messages=JSON.parse(await fs.readFile('lib/locales/messages.json','utf8'));
+const periodMessages=JSON.parse(await fs.readFile('lib/locales/periods.json','utf8'));
 try{
  for(let i=0;;i++){try{if((await fetch(base+'/api/health')).ok)break;}catch{}if(i>120||server.exitCode!==null)throw Error(logs);await new Promise(r=>setTimeout(r,250));}
  browser=await engines[engine].launch({headless:true,...(engine==='chromium'&&process.env.BINSO_CHROMIUM_EXECUTABLE?{executablePath:process.env.BINSO_CHROMIUM_EXECUTABLE}:{})});const results=[];
  for(const {theme,width,locale} of [{theme:'light',width:390,locale:'en'},{theme:'dark',width:390,locale:'fr'},{theme:'light',width:1440,locale:'it'},{theme:'dark',width:1440,locale:'de'}]){
-  const text=value=>locale==='de'?value:messages[value][{en:0,fr:1,it:2}[locale]];
+  const text=value=>periodMessages[value]?.[locale]??(locale==='de'?value:messages[value][{en:0,fr:1,it:2}[locale]]);
   const context=await browser.newContext({serviceWorkers:'block',viewport:{width,height:780}});await context.addCookies(auth.cookies.map(cookie=>({...cookie,url:base})));await context.addInitScript(theme=>{localStorage.setItem('binso.theme.mode',theme);localStorage.setItem('binso.privacy.preferences.v1',JSON.stringify({essential:true,performance:false}));},theme);
   const page=await context.newPage(),keys=[];let writes=0,statusReads=0,directoryPhase='success',releaseDirectory,receivedDirectory;
   const directoryPending=new Promise(resolve=>releaseDirectory=resolve),directoryReceived=new Promise(resolve=>receivedDirectory=resolve);
@@ -44,7 +45,7 @@ try{
   });
   await page.goto(base+'/kunden?lang='+locale);
   if(width>=1024){await page.getByRole('heading',{name:text('Kunden'),exact:true}).waitFor();assert.equal(await page.locator('.desktop-appbar .workspace-location').count(),0,'Revision7 keeps the title in the content instead of repeating workspace breadcrumbs');assert.equal(await page.locator('.desktop-appbar .desktop-navigation-toggle').isVisible(),true,'Desktop navigation remains available');}
-  await page.getByRole('button',{name:text('Kundenaktionen'),exact:true}).click();directoryPhase='fail';await page.getByRole('button',{name:text('Dubletten zusammenführen'),exact:true}).click();const dialog=page.getByRole('dialog',{name:text('Kundendubletten zusammenführen'),exact:true});await dialog.waitFor();
+  await page.getByRole('button',{name:text('Listenwerkzeuge'),exact:true}).click();directoryPhase='fail';await page.getByRole('button',{name:text('Dubletten zusammenführen'),exact:true}).click();const dialog=page.getByRole('dialog',{name:text('Kundendubletten zusammenführen'),exact:true});await dialog.waitFor();
   await dialog.getByRole('combobox',{name:text('Dublette'),exact:true}).click();
   const popup=page.locator('.app-select-popup');await popup.getByText(text('Die Anfrage konnte nicht verarbeitet werden.'),{exact:true}).waitFor();
   directoryPhase='hold';await popup.getByRole('button',{name:text('Erneut versuchen'),exact:true}).click();await directoryReceived;
