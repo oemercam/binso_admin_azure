@@ -14,9 +14,13 @@ export async function measureMetricDividers(page){
  return page.evaluate(()=>[...document.querySelectorAll('.metric,.finance-flow-primary,.finance-flow-result,.finance-flow-costs,.finance-flow-costs>div')].map(el=>({left:getComputedStyle(el).borderLeftWidth,compact:!!el.closest('.app-root[data-ux="master-v3"] .bo-cash-overview[data-compact]')})));
 }
 
+export async function measureOpenSectionShapes(page){
+ return page.evaluate(()=>[...document.querySelectorAll('.page-container :is(.surface,.detail-card,.timer-card,.invoice-form)')].flatMap(el=>{const css=getComputedStyle(el),box=el.getBoundingClientRect();return box.width>0&&box.height>0&&!['hidden','collapse'].includes(css.visibility)?[{radius:css.borderRadius,compactTimeCard:el.matches('.app-root[data-ux="master-v3"] .page-container[data-section="zeit"] .time-section')&&matchMedia('(max-width:760px)').matches}]:[]}));
+}
+
 /** Real-browser countercases: detached snapshots, live borders and hidden tables. */
 export async function verifyListFrameMeasurement(page){
- await page.setContent('<div class="records metric" style="width:200px;height:40px">Old list</div><div class="desktop-record-table" style="display:none;border:1px solid">Hidden table</div>');
+ await page.setContent('<main class="page-container"><div class="records metric surface" style="width:200px;height:40px">Old list</div><div class="desktop-record-table" style="display:none;border:1px solid">Hidden table</div></main>');
  const detached=await page.locator('.records').elementHandle();
  try{
   await page.evaluate(()=>{const next=document.querySelector('.records').cloneNode(true);document.querySelector('.records').replaceWith(next);});
@@ -30,15 +34,17 @@ export async function verifyListFrameMeasurement(page){
   assert.deepEqual(await measureMetricDividers(page),[{left:'0px',compact:false}],'KPI measurement queries the connected replacement in the same DOM turn');
   await page.locator('.metric').evaluate(el=>{el.style.borderLeft='1px solid';});
   assert.deepEqual(await measureMetricDividers(page),[{left:'1px',compact:false}],'A real noncompact KPI divider remains visible to the strict zero-border assertion');
+  assert.deepEqual(await measureOpenSectionShapes(page),[{radius:'0px',compactTimeCard:false}],'Section measurement reads the connected replacement');
+  await page.locator('.surface').evaluate(el=>{el.style.borderRadius='7px';});
+  assert.deepEqual(await measureOpenSectionShapes(page),[{radius:'7px',compactTimeCard:false}],'A real incorrect section radius remains visible to the strict shape assertion');
  }finally{await detached.dispose();}
 }
 
 /** Closed fields retain the shared geometry; approved Master V3 uses 42px desktop controls.
  * Textareas and checkbox/radio controls have their own semantic geometry. */
 export async function assertCanonicalClosedFields(page,route=''){
- const fields=page.locator('.form-field>.form-control:not(textarea):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),.form-field .app-select-trigger').filter({visible:true});
- for(const control of await fields.all()){
-  const geometry=await control.evaluate(el=>{const css=getComputedStyle(el);return {height:el.getBoundingClientRect().height,padding:css.paddingLeft,radius:css.borderRadius,font:css.fontSize,compactDesktop:!!el.closest('.app-root[data-ux="master-v3"]')&&matchMedia('(min-width:761px)').matches};});
+ const fields=await page.evaluate(()=>[...document.querySelectorAll('.form-field>.form-control:not(textarea):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),.form-field .app-select-trigger')].flatMap(el=>{const css=getComputedStyle(el),box=el.getBoundingClientRect();return box.width>0&&box.height>0&&!['hidden','collapse'].includes(css.visibility)?[{height:box.height,padding:css.paddingLeft,radius:css.borderRadius,font:css.fontSize,compactDesktop:!!el.closest('.app-root[data-ux="master-v3"]')&&matchMedia('(min-width:761px)').matches}]:[]}));
+ for(const geometry of fields){
   assert.equal(geometry.height,geometry.compactDesktop?42:48,route+': canonical closed field height');
   assert.equal(geometry.padding,'16px',route+': canonical field inset');
   assert.equal(geometry.radius,'12px',route+': canonical field radius');

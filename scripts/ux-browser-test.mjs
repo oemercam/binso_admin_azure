@@ -5,7 +5,7 @@ import {verifyAvatarBrowser} from './avatar-browser.mjs';
 import {createUiAuthFixture} from './ui-auth-fixture.mjs';
 import {matchesLocalizedRoute,waitForLocalizedRoute} from './localized-route-contract.mjs';
 import {waitForLabReady} from './shared-control-browser.mjs';
-import {measureListFrameBorders,verifyListFrameMeasurement,measureMetricDividers} from './shared-control-browser.mjs';
+import {measureListFrameBorders,verifyListFrameMeasurement,measureMetricDividers,measureOpenSectionShapes} from './shared-control-browser.mjs';
 import {selectAppOption,appControlValue} from './app-select-browser.mjs';
 const periodNames={1:'Aktueller Monat',3:'Letzte 3 Monate',6:'Letzte 6 Monate',12:'Letzte 12 Monate'};
 async function chooseStatisticPeriod(page,scope,months){const control=scope.locator('.bo-period-control');if(await control.locator('.bo-period-mobile').isVisible()){await control.locator('.bo-period-mobile').click();const sheet=page.getByRole('dialog',{name:'Zeitraum',exact:true});await sheet.getByRole('radio',{name:periodNames[months],exact:true}).click();await sheet.waitFor({state:'hidden'});}else await control.getByRole('button',{name:periodNames[months],exact:true}).click();assert.equal(await control.locator('.bo-period-segments button[aria-pressed=true]').getAttribute('aria-label'),periodNames[months],'One active period follows the actual shared control');}
@@ -449,9 +449,10 @@ try{
      const listFrames=await measureListFrameBorders(page);
      if(!listFrames.every(frame=>frame.top==='0px'&&frame.bottom==='0px'))await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${width}-list-frame-error.png`)});
      assert.ok(listFrames.every(frame=>frame.top==='0px'&&frame.bottom==='0px'),`${route} ${theme} ${width}px: list containers have no duplicate leading or terminal separator ${JSON.stringify(listFrames)}`);
-     for(const table of await page.locator('.desktop-record-table').filter({visible:true}).all()){
-      const header=table.locator('.desktop-record-head,.operator-table-head');if(await header.count())assert.equal(await header.evaluate(el=>getComputedStyle(el).borderBottomWidth),'1px','The actual table heading retains its row separator');
-      const rows=table.locator('.desktop-record-row,.operator-table-row');const count=await rows.count();if(count){assert.equal(await rows.last().evaluate(el=>getComputedStyle(el).borderBottomWidth),'0px','The final table entry has no terminal line');if(count>1)assert.equal(await rows.first().evaluate(el=>getComputedStyle(el).borderBottomWidth),'1px','Separators between actual table entries remain');}
+     const tables=await page.evaluate(()=>[...document.querySelectorAll('.desktop-record-table')].flatMap(el=>{const box=el.getBoundingClientRect();if(!box.width||!box.height||['hidden','collapse'].includes(getComputedStyle(el).visibility))return [];const headers=el.querySelectorAll('.desktop-record-head,.operator-table-head'),rows=el.querySelectorAll('.desktop-record-row,.operator-table-row');return [{headerCount:headers.length,header:headers.length?getComputedStyle(headers[0]).borderBottomWidth:null,rowCount:rows.length,first:rows.length?getComputedStyle(rows[0]).borderBottomWidth:null,last:rows.length?getComputedStyle(rows[rows.length-1]).borderBottomWidth:null}]}));
+     for(const table of tables){
+      if(table.headerCount){assert.equal(table.headerCount,1,'A record table has one heading');assert.equal(table.header,'1px','The actual table heading retains its row separator');}
+      if(table.rowCount){assert.equal(table.last,'0px','The final table entry has no terminal line');if(table.rowCount>1)assert.equal(table.first,'1px','Separators between actual table entries remain');}
      }
     }
     if(!process.env.BINSO_UX_BASELINE){await assertOpaqueChrome(page);await assertPresentationControls(page);if(width===390&&['/dashboard','/einstellungen/darstellung'].includes(route))await verifyPresentationControlRegression(page);if(width<=760)await assertMobileHeaderTargets(page);}
@@ -461,8 +462,8 @@ try{
       assert.ok(appearance.controls.every(control=>control.radius==='12px'),`${route}: shared app field corners ${JSON.stringify(appearance.controls)}`);
       assert.ok(appearance.groups.every(group=>group.border==='0px'&&group.background===(theme==='light'?'rgb(255, 255, 255)':'rgb(0, 0, 0)')),`${route}: grouped app surfaces in both themes`);
     }
-    for(const create of await page.locator('.bo-create-action').filter({visible:true}).all()){
-      const shape=await create.evaluate(el=>{const c=getComputedStyle(el),r=el.getBoundingClientRect(),label=el.querySelector('.create-action-label'),short=el.querySelector('.create-action-short');return {width:r.width,height:r.height,radius:c.borderRadius,background:c.backgroundColor,label:!!label?.getClientRects().length,short:!!short?.checkVisibility()&&short.getBoundingClientRect().width>0&&short.getBoundingClientRect().right<=r.right}});
+    const creationShapes=await page.evaluate(()=>[...document.querySelectorAll('.bo-create-action')].flatMap(el=>{const c=getComputedStyle(el),r=el.getBoundingClientRect();if(!r.width||!r.height||['hidden','collapse'].includes(c.visibility))return [];const label=el.querySelector('.create-action-label'),short=el.querySelector('.create-action-short');return [{width:r.width,height:r.height,radius:c.borderRadius,background:c.backgroundColor,label:!!label?.getClientRects().length,short:!!short?.checkVisibility()&&short.getBoundingClientRect().width>0&&short.getBoundingClientRect().right<=r.right}]}));
+    for(const shape of creationShapes){
       if(width>=761){assert.ok(shape.label,`${route}: desktop creation keeps its visible label`);assert.equal(shape.radius,'5px','Desktop creation follows the original control shape');assert.equal(shape.background,theme==='light'?'rgb(37, 102, 189)':'rgb(72, 167, 255)');}
       else{assert.equal(shape.label,false,'Mobile creation uses its icon');assert.equal(shape.short,false,'No competing text inside the round action');assert.ok(shape.width>=44&&shape.height>=44,'Creation keeps its touch target');assert.equal(shape.radius,'50%','Approved mobile creation is circular');}
     }
@@ -472,17 +473,15 @@ try{
       assert.equal(direction,compact?'row':width<=760?'column-reverse':'row',`${route} ${width}px: compact KPIs keep CHF beside the amount; existing other KPI arrangements remain`);
     }
     assert.ok(geometry.sort.every(size=>size<=44),`${route}: sorting control is too wide`);
-    const compactCards=page.locator('.app-root[data-ux="master-v3"] .bo-cash-overview[data-compact] .metric');
-    if(await compactCards.count()){
-      const cards=await page.evaluate(()=>[...document.querySelectorAll('.app-root[data-ux="master-v3"] .bo-cash-overview[data-compact] .metric')].map(el=>{const box=el.getBoundingClientRect(),style=getComputedStyle(el);return {height:box.height,padding:style.padding,borders:[style.borderTopWidth,style.borderRightWidth,style.borderBottomWidth,style.borderLeftWidth]}}));
+    const cards=await page.evaluate(()=>[...document.querySelectorAll('.app-root[data-ux="master-v3"] .bo-cash-overview[data-compact] .metric')].map(el=>{const box=el.getBoundingClientRect(),style=getComputedStyle(el);return {height:box.height,padding:style.padding,borders:[style.borderTopWidth,style.borderRightWidth,style.borderBottomWidth,style.borderLeftWidth]}}));
+    if(cards.length){
       assert.equal(cards.length,4,`${route}: all four compact KPI cards participate in the geometry check`);
       assert.ok(cards.every(card=>card.borders.every(border=>border==='1px')&&Math.abs(card.height-cards[0].height)<1&&card.padding===cards[0].padding),`${route}: approved compact KPI cards have equal heights, padding and thin borders`);
     }
     const otherMetricDividers=(await measureMetricDividers(page)).filter(metric=>!metric.compact);
     assert.ok(otherMetricDividers.every(metric=>parseFloat(metric.left)===0),`${route} ${theme} ${width}px: other metrics retain their existing divider contract ${JSON.stringify(otherMetricDividers)}`);
-    for(const section of await page.locator('.page-container :is(.surface,.detail-card,.timer-card,.invoice-form)').filter({visible:true}).all()){
-      const sectionShape=await section.evaluate(el=>({radius:getComputedStyle(el).borderRadius,compactTimeCard:el.matches('.app-root[data-ux="master-v3"] .page-container[data-section="zeit"] .time-section')&&matchMedia('(max-width:760px)').matches}));
-      assert.equal(sectionShape.radius,sectionShape.compactTimeCard?'14px':'0px',`${route}: approved mobile time cards retain the shared radius; other open sections retain their existing shape`);
+    for(const sectionShape of await measureOpenSectionShapes(page)){
+      assert.equal(sectionShape.radius,sectionShape.compactTimeCard?'14px':'0px',`${route} ${theme} ${width}px: approved mobile time cards retain the shared radius; other open sections retain their existing shape ${JSON.stringify(sectionShape)}`);
     }
     if(!process.env.BINSO_UX_BASELINE&&width<=760){for(const toolbar of await page.locator('.toolbar:has(.searchbox):has(.filter-button)').all()){const search=await toolbar.locator('.searchbox').boundingBox(),filter=await toolbar.locator('.filter-button').boundingBox(),tabs=await toolbar.locator('.chips').boundingBox();assert.ok(filter.x>search.x&&Math.abs(filter.y-search.y)<2&&Math.abs(filter.height-search.height)<2,'Search and filter share a row and height');assert.ok(!tabs||tabs.y>=search.y+search.height,'Status tabs occupy their own row')}}
     if(!process.env.BINSO_UX_BASELINE&&width<=760&&await page.locator('.app-root:not(.app-preview)').count()&&!route.startsWith('/operator')&&!route.startsWith('/support/')){
