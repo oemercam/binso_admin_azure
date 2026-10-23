@@ -7,7 +7,11 @@ assert.equal(requirements.sourceSha256,createHash('sha256').update(source).diges
 assert.deepEqual([...new Set(requirements.requirements.map(x=>x.chapter))],Array.from({length:56},(_,i)=>i+1),'No master chapter may disappear');
 assert.equal(new Set(requirements.requirements.map(x=>x.id)).size,requirements.requirements.length);
 const walk=d=>fs.readdirSync(d,{withFileTypes:true}).flatMap(x=>x.isDirectory()?walk(path.join(d,x.name)):[path.join(d,x.name).replaceAll('\\','/')]);
-assert.deepEqual(routes.routes.map(x=>x.file).sort(),walk('app').filter(x=>x.endsWith('/page.tsx')).sort(),'Every actual route is accounted for');
+// Preserve the V25 snapshot and explicitly account for subsequent V26 routes.
+const additions=JSON.parse(fs.readFileSync('docs/architecture/v26-route-additions.json')).routes;
+for(const row of additions){assert.equal(row.status,'nicht_abgenommen');assert.ok(fs.existsSync(row.source));assert.ok(fs.existsSync(row.authorization));assert.ok(row.states.includes('Fehler'));assert.ok(row.states.includes('Speichern/Reload/neue Sitzung'));assert.ok(!routes.routes.some(prior=>prior.file===row.file),'V26 supplement cannot override a V25 route');}
+assert.equal(new Set([...routes.routes,...additions].map(row=>row.file)).size,routes.routes.length+additions.length);
+assert.deepEqual([...routes.routes,...additions].map(x=>x.file).sort(),walk('app').filter(x=>x.endsWith('/page.tsx')).sort(),'Every actual route is accounted for');
 for(const row of requirements.requirements){assert.ok(row.requirement);assert.ok(!/^\d+\.$/.test(row.requirement),'List numbering is not a separate acceptance requirement');assert.ok(row.status);assert.ok(['ungeprueft','teilweise_belegt','implementiert','nicht_implementiert','extern_blockiert'].includes(row.implementationStatus),'Unknown acceptance cannot silently mean missing implementation');assert.equal(row.acceptanceStatus,row.status,'Implementation finding and acceptance remain separate');if(row.status==='abgenommen'){assert.ok(row.test&&!/offen|pending/i.test(row.test));assert.ok(row.visualComparison&&!/offen|pending/i.test(row.visualComparison));}}
 for(const row of routes.routes){assert.ok(row.roles.length);assert.ok(row.states.includes('Fehler'));assert.ok(row.states.includes('Speichern/Reload/neue Sitzung'));assert.ok(row.kpiAssessment);}
 for(const route of ['/offline','/operator/login'])assert.equal(routes.routes.find(row=>row.route===route).surface,'public','Public error/login surfaces must not be misclassified as tenant-only');
