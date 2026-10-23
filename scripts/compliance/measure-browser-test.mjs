@@ -73,12 +73,21 @@ try{
  assert.equal((await checkHeader(normalActions,'header-breakpoint'))[0].status,'passed','The desktop criterion includes the exact 1024px breakpoint');
  await page.setViewportSize({width:1023,height:1000});
  assert.equal((await checkHeader(normalActions+'<button>Mobile</button>','header-mobile')).length,0,'The desktop criterion starts at 1024px');
- // Counts are view-specific; the latest cash analysis never permits the retired fourth KPI.
+ // Finance Final V1 supersedes the October 19 analysis count; customer counts stay unchanged.
  const kpis=async(route,owner,count)=>{await page.goto('https://metric-fixture.invalid'+route);await page.setContent('<section class="'+owner+'"><div class="bo-metric-tiles">'+Array.from({length:count},(_,i)=>'<div class="metric">Metric '+i+'</div>').join('')+'</div></section>');const evidence=await measureCompliance(page,{output,route,theme:'light',width:page.viewportSize().width,state:'kpis-'+count,engine});const checks=evidence.checks.filter(check=>check.id==='UX-FIN-001');assert.equal(checks.length,1,'The actual KPI owner must emit evidence');return checks[0].status;};
- assert.equal(await kpis('/finanzen/analyse','bo-statistics',3),'passed');
- for(const count of [2,4])assert.equal(await kpis('/finanzen/analyse','bo-statistics',count),'failed','Missing or retired extra analysis KPIs stay blocking');
+ assert.equal(await kpis('/finanzen/analyse','bo-statistics',4),'passed');
+ for(const count of [2,3,5])assert.equal(await kpis('/finanzen/analyse','bo-statistics',count),'failed','Missing or additional analysis KPIs stay blocking');
  for(const route of ['/dashboard','/finanzen']){assert.equal(await kpis(route,'bo-cash-overview',4),'passed');for(const count of [3,5])assert.equal(await kpis(route,'bo-cash-overview',count),'failed','The compact overview retains its exact four metrics');}
  assert.equal(await kpis('/kunden/customer-one','bo-statistics',3),'passed');assert.equal(await kpis('/kunden/customer-one','bo-statistics',4),'failed');
+ const comparisonCheck=async({missing=false,extra=false,empty=false,balance=true,period=true,height=8}={})=>{
+  await page.goto('https://metric-fixture.invalid/finanzen/analyse');
+  const tones=missing?['positive']:extra?['positive','negative','positive']:['positive','negative'];
+  await page.setContent('<section class="bo-statistics bo-finance-analysis"><section class="bo-comparison-card"><header><span>'+(period?'Oktober 2026':'')+'</span></header>'+tones.map(tone=>'<div class="bo-comparison-row"><strong>'+(empty?'':'CHF 0.00')+'</strong><div class="bo-comparison-track" style="height:'+height+'px"><i class="bo-statistics-'+tone+'"></i></div></div>').join('')+'<footer>'+(balance?'<strong>CHF 0.00</strong>':'')+'</footer></section></section>');
+  const evidence=await measureCompliance(page,{output,route:'/finanzen/analyse',theme:'light',width:page.viewportSize().width,state:'comparison-'+JSON.stringify({missing,extra,empty,balance,period,height}),engine});
+  return evidence.checks.find(check=>check.id==='UX-FIN-002').status;
+ };
+ assert.equal(await comparisonCheck(),'passed','A real zero-value comparison remains valid');
+ for(const broken of [{missing:true},{extra:true},{empty:true},{balance:false},{period:false},{height:14}])assert.equal(await comparisonCheck(broken),'failed','Incomplete or oversized comparison remains blocking: '+JSON.stringify(broken));
  // V3.3: one mobile caption, desktop segments, exactly one active calendar
  // period. The old permanently visible mobile links cannot satisfy this gate.
  const periodFixture=({selected=1,duplicate=false,missing=false,old=false,wrongMode=false}={})=>`<style>.bo-period-mobile{display:block}.bo-period-segments{display:none}@media(min-width:1024px){.bo-period-mobile{display:none}.bo-period-segments{display:block}}${wrongMode?'.bo-period-mobile{display:block!important}.bo-period-segments{display:block!important}':''}</style><section class="bo-statistics">${old?'<div class="bo-statistics-periods">1 M 3 M 6 M 12 M</div>':`<div class="bo-period-control"><button class="bo-period-mobile" aria-haspopup="dialog">Oktober 2026</button><div class="bo-period-segments">${[1,3,6,12].filter(n=>!missing||n!==6).map(n=>`<button aria-pressed="${n===selected||duplicate&&n===3}">${n} M</button>`).join('')}<button aria-haspopup="dialog" aria-pressed="${selected==='custom'}">Calendar</button></div></div>`}</section>`;

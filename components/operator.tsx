@@ -338,6 +338,9 @@ function CustomersView() {
 
 function OperatorCustomerDetail({tenantId}:{tenantId:string}) {
   const canRestrict=useOperatorPermission("restrictions:manage");
+  // Header registration updates OperatorPage. Preserve the action identity on
+  // that parent render so ContextActions does not register another update.
+  const restrictionAction=useMemo(()=><ActionRow title="Einschränken" icon="lock" href="/operator/sperrungen"/>,[]);
 
 
   const resource=useApiQuery<{overview?:Record<string,unknown>;tickets?:Array<Record<string,unknown>>;audit?:Array<Record<string,unknown>>}>("/api/operator/customers/"+encodeURIComponent(tenantId));
@@ -366,7 +369,7 @@ function OperatorCustomerDetail({tenantId}:{tenantId:string}) {
   const access=overview.access as {billing?:boolean;support?:boolean;restrictions?:boolean;audit?:boolean}|undefined;
 
   return <>
-    {canRestrict&&<ContextActions mobile={false}><ActionRow title="Einschränken" icon="lock" href="/operator/sperrungen"/></ContextActions>}
+    {canRestrict&&<ContextActions mobile={false}>{restrictionAction}</ContextActions>}
     <div className="operator-customer-hero">
       <div className="operator-customer-main"><span className="record-avatar large">{String(tenant.name??"K").slice(0,1)}</span><div><h2>{String(tenant.name??"Kunde")}</h2><p>{String(tenant.uid??"Keine UID")} <LocalizedText>{tenant.city?"· "+String(tenant.city):""}</LocalizedText></p></div></div>
       <div className="operator-customer-actions"><Status tone={accountStatus==="active"?"success":"warning"}>{operatorStatus(accountStatus)}</Status><Button variant="secondary" disabled><LocalizedText>{"Support-Zugriff nicht verfügbar"}</LocalizedText></Button></div>

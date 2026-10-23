@@ -470,12 +470,12 @@ try{
       else{assert.equal(shape.label,false,'Mobile creation uses its icon');assert.equal(shape.short,false,'No competing text inside the round action');assert.ok(shape.width>=44&&shape.height>=44,'Creation keeps its touch target');assert.equal(shape.radius,'50%','Approved mobile creation is circular');}
     }
     // Snapshot values in one browser task: query hydration can replace metric nodes between awaited locator calls.
-    const moneyDirections=await page.evaluate(()=>[...document.querySelectorAll('.metric-money')].filter(el=>el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden').map(el=>({direction:getComputedStyle(el).flexDirection,compact:!!el.closest('.app-root[data-ux="master-v3"] .bo-cash-overview[data-compact]')})));
+    const moneyDirections=await page.evaluate(()=>[...document.querySelectorAll('.metric-money')].filter(el=>el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden').map(el=>({direction:getComputedStyle(el).flexDirection,compact:!!el.closest('.app-root[data-ux="master-v3"] :is(.bo-cash-overview,.bo-finance-analysis)[data-compact]')})));
     for(const {direction,compact} of moneyDirections){
       assert.equal(direction,compact?'row':width<=760?'column-reverse':'row',`${route} ${width}px: compact KPIs keep CHF beside the amount; existing other KPI arrangements remain`);
     }
     assert.ok(geometry.sort.every(size=>size<=44),`${route}: sorting control is too wide`);
-    const cards=await page.evaluate(()=>[...document.querySelectorAll('.app-root[data-ux="master-v3"] .bo-cash-overview[data-compact] .metric')].map(el=>{const box=el.getBoundingClientRect(),style=getComputedStyle(el);return {height:box.height,padding:style.padding,borders:[style.borderTopWidth,style.borderRightWidth,style.borderBottomWidth,style.borderLeftWidth]}}));
+    const cards=await page.evaluate(()=>[...document.querySelectorAll('.app-root[data-ux="master-v3"] :is(.bo-cash-overview,.bo-finance-analysis)[data-compact] .metric')].map(el=>{const box=el.getBoundingClientRect(),style=getComputedStyle(el);return {height:box.height,padding:style.padding,borders:[style.borderTopWidth,style.borderRightWidth,style.borderBottomWidth,style.borderLeftWidth]}}));
     if(cards.length){
       assert.equal(cards.length,4,`${route}: all four compact KPI cards participate in the geometry check`);
       assert.ok(cards.every(card=>card.borders.every(border=>border==='1px')&&Math.abs(card.height-cards[0].height)<1&&card.padding===cards[0].padding),`${route}: approved compact KPI cards have equal heights, padding and thin borders`);
@@ -796,7 +796,7 @@ try{
    await overview.locator('.bo-overview-bars>button').last().click();assert.match(await overview.locator('output').textContent(),/CHF 400/);
    await overview.locator('.bo-overview-details>summary').click();await overview.getByRole('link',{name:'Finanzanalyse',exact:true}).click();await page.waitForLoadState('networkidle');
    const statistics=page.locator('.bo-statistics');
-   await statistics.locator('.metric>strong').getByText('CHF 200.00',{exact:true}).waitFor();
+   await statistics.locator('.bo-metric-tiles>.metric').filter({has:page.getByText('Einnahmen',{exact:true})}).locator(':scope>strong').getByText('CHF 200.00',{exact:true}).waitFor();
    assert.equal(await statistics.locator('.bo-metric-tiles>.metric').count(),4);
    for(const months of [1,3,6,12]){await chooseStatisticPeriod(page,statistics,months);assert.equal(await statistics.locator('.metric>strong').first().textContent(),months===1?'CHF 200.00':'CHF 320.00');}
    const periodSheet=await openStatisticCalendar(page,statistics);

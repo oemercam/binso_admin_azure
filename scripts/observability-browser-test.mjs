@@ -27,6 +27,7 @@ async function navigateOperator(page,route){
 }
 const observeErrors=observedPage=>{
  observedPage.on('pageerror',error=>{errors.push(error.message);console.log('Uncaught operator browser error',{url:observedPage.url(),message:error.message,stack:error.stack});});
+ observedPage.on('console',message=>{if(/Maximum update depth|react\.dev\/errors\/185|Minified React error #185/.test(message.text())){errors.push(message.text());console.log('Operator render loop',{url:observedPage.url(),message:message.text()});}});
  observedPage.on('requestfailed',request=>{const target=new URL(request.url());if(target.searchParams.has('_rsc'))console.log('Failed operator RSC request',{route:target.pathname,prefetch:request.headers()['next-router-prefetch']==='1',failure:request.failure()?.errorText});});
 };
 try{
