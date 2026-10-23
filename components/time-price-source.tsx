@@ -1,5 +1,5 @@
 "use client";
-import {useEffect,useRef,useState} from 'react';
+import {useEffect,useRef,useState,type ReactElement} from 'react';
 import {apiGet,apiPost} from '@/lib/client/backend';
 import {useApiQuery,useDataRevision} from '@/lib/client/use-api-query';
 import {localeTags} from '@/lib/locales/config';
@@ -15,7 +15,7 @@ type PriceState={time:{id:string;version:number;work_date:string;customer_id:str
 type Condition={id:string;condition_id:string;revision:number;status:string;resource_id:string|null;starts_on:string;ends_on:string|null;unit:string|null;unit_price:string|null;currency:string|null;vat_rate:string|null;tax_treatment:string|null;tax_reason:string|null};
 type ContractDetail={item:{id:string;version:number;name:string};conditions:Condition[]};
 /** One source chooser for both financial sides; calculations stay in the finance owner. */
-export function TimePriceSource({entryId,billable}:{entryId:string;billable:boolean}){
+export function TimePriceSource({entryId,billable,trigger}:{entryId:string;billable:boolean;trigger?:ReactElement<{onClick?:()=>void}>}){
  const {locale}=useLocale(),t=useTranslation();
  const scope=useDataRevision([]),sequence=useRef(0),busy=useRef(false);
  const [open,setOpen]=useState(false),[side,setSide]=useState<Side>(billable?'sale':'purchase'),[state,setState]=useState<PriceState|null>(null),[error,setError]=useState<string|null>(null),[loading,setLoading]=useState(false),[saving,setSaving]=useState(false);
@@ -37,7 +37,8 @@ export function TimePriceSource({entryId,billable}:{entryId:string;billable:bool
   const serialized=JSON.stringify(body),attempt=replay?.body===serialized?replay:{body:serialized,key:crypto.randomUUID()};setReplay(attempt);busy.current=true;setSaving(true);setError(null);
   try{await apiPost('/api/time-entries/'+encodeURIComponent(entryId)+'/pricing',body,{idempotencyKey:attempt.key});close()}catch(e){setError(e instanceof Error?e.message:'Preisquelle konnte nicht gespeichert werden.')}finally{busy.current=false;setSaving(false)}
  };
- return <><button type="button" className="text-action" onClick={launch}><LocalizedText>{"Preisquelle"}</LocalizedText></button><FormSheet label="Preisquelle bestätigen" description="Einkauf und Verkauf werden getrennt gespeichert. Es wird keine Rechnung erzeugt." open={open} onClose={close} busy={saving} dirty={!!selection}>
+ const Trigger=trigger?.type;
+ return <>{trigger&&Trigger?<Trigger {...trigger.props} onClick={launch}/>:<button type="button" className="text-action" onClick={launch}><LocalizedText>{"Preisquelle"}</LocalizedText></button>}<FormSheet label="Preisquelle bestätigen" description="Einkauf und Verkauf werden getrennt gespeichert. Es wird keine Rechnung erzeugt." open={open} onClose={close} busy={saving} dirty={!!selection}>
   <Field label="Richtung"><Select value={side} disabled={saving} onChange={e=>void load(e.target.value as Side)}><option value="sale" disabled={!billable}><LocalizedText>{"Verkauf"}</LocalizedText></option><option value="purchase"><LocalizedText>{"Einkauf"}</LocalizedText></option></Select></Field>
   {loading&&<LoadingState/>}{error&&<ErrorState>{error}</ErrorState>}{error&&state&&<Button variant="secondary" disabled={saving} onClick={()=>void load(side)}><LocalizedText>{"Erneut versuchen"}</LocalizedText></Button>}
   {!loading&&!state&&<Button variant="secondary" onClick={()=>void load(side)}><LocalizedText>{"Erneut versuchen"}</LocalizedText></Button>}

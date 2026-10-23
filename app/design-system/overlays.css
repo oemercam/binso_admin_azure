@@ -371,3 +371,10 @@
 .sheet-form-footer .mobile-sticky-save{display:flex;justify-content:flex-end;gap:var(--field-group-gap);width:100%}
 .sheet-form-footer .mobile-sticky-save>.button{width:auto;min-width:120px;white-space:normal;min-height:48px;height:auto}
 @media(max-width:760px){.sheet-form-footer .mobile-sticky-save>.button{flex:1;width:0;min-width:0}}
+
+.bo-report-period{font-size:var(--type-metadata);line-height:1.45;color:var(--color-muted);margin:0;padding:8px 12px}
+.sheet-header>div:first-child{flex:1;min-width:0}
+@media(min-width:761px) and (max-width:1023px){
+ .bo-period-sheet{align-items:flex-end;padding:0}
+ .bo-period-sheet .bottom-sheet{margin:0;border-radius:var(--radius-sheet) var(--radius-sheet) 0 0;border-bottom:0;max-height:calc(var(--dialog-available-height) - var(--dialog-edge-gap))}
+}

@@ -38,10 +38,11 @@ export function financeMetrics(data:FinancePeriodData,bounds:PeriodBounds){
 
 /** Platform subscriptions retain their separate contract-value metric; cash,
  * dates and precision use the same rules as tenant finance. */
-export function platformFinanceInsights(data:FinancePeriodData&{subscriptions?:Row[]},range:string,today:string){
- const bounds=financeWindow(range==='three'?'currentThree':range==='year'?'rollingYear':range,'','',today);
+export function platformFinanceInsights(data:FinancePeriodData&{subscriptions?:Row[]},range:string,today:string,period?:{from:string;to:string}){
+ const bounds=period?financeWindow('custom',period.from,period.to,today):financeWindow(range==='three'?'currentThree':range==='year'?'rollingYear':range,'','',today);
  const cash=financeMetrics({payments:data.payments,operatingCosts:data.operatingCosts},bounds);
  const platformRevenue=sumMoney((data.subscriptions??[]).filter(row=>inFinancePeriod(row.created_at,bounds)).map(row=>row.monthly_revenue_chf));
- const monthly=buildFinanceMonths({payments:data.payments},bounds,12).items.map(item=>({label:new Date(item.key+'-01T12:00:00').toLocaleDateString('de-CH',{month:'short'}),value:item.income}));
- return {volume:cash.income,platformRevenue,costs:cash.operating,result:sumMoney([platformRevenue,-cash.operating]),monthly};
+ const chart=buildFinanceMonths({payments:data.payments},bounds,12);
+ const monthly=chart.items.map(item=>({label:new Date(item.key+'-01T12:00:00').toLocaleDateString('de-CH',{month:'short'}),value:item.income}));
+ return {volume:cash.income,platformRevenue,costs:cash.operating,result:sumMoney([platformRevenue,-cash.operating]),monthly,monthlyTruncated:chart.truncated};
 }

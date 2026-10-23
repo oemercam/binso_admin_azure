@@ -1,4 +1,5 @@
-{
+{ "Rapportaktionen":["Report actions","Actions du rapport","Azioni del rapporto"],
+ "Saldo":["Balance","Solde","Saldo"],
   "Vertrag öffnen": ["Open contract","Ouvrir le contrat","Apri contratto"],
   "Ressource": ["Resource","Ressource","Risorsa"],
   "Für diese Preisquelle fehlt die Berechtigung.": ["You do not have permission for this price source.","Vous n’avez pas l’autorisation pour cette source de prix.","Non disponi del permesso per questa fonte di prezzo."],
@@ -16043,5 +16044,21 @@
   "Ein aktueller Abgleich ohne ungeklärte Abweichungen ist erforderlich.": ["A current match without unresolved differences is required.","Un rapprochement actuel sans écart non résolu est nécessaire.","È necessario un abbinamento attuale senza scostamenti irrisolti."],
   "Vier-Augen-Regel oder Betragsgrenze verhindert diese Freigabe.": ["Independent approval or an amount limit prevents this approval.","L’indépendance requise ou une limite de montant empêche cette approbation.","L’indipendenza richiesta o un limite di importo impedisce questa approvazione."],
   "Eine Rückfrage ist offen. Bitte den Entwurf überarbeiten und erneut abgleichen.": ["An inquiry is open. Revise the draft and match it again.","Une demande reste ouverte. Corrigez le brouillon et effectuez un nouveau rapprochement.","È aperta una richiesta. Correggi la bozza ed esegui nuovamente l’abbinamento."],
-  "Rückfrage": ["Inquiry","Demande de clarification","Richiesta di chiarimento"]
+  "Rückfrage": ["Inquiry","Demande de clarification","Richiesta di chiarimento"],
+  "Guten Morgen": ["Good morning","Bonjour","Buongiorno"],
+  "Guten Tag": ["Good afternoon","Bonjour","Buongiorno"],
+  "Guten Abend": ["Good evening","Bonsoir","Buonasera"],
+  "Dein Unternehmen auf einen Blick": ["Your business at a glance","Votre entreprise en un coup d’œil","La tua azienda a colpo d’occhio"],
+  "Zeitfreigaben": ["Time approvals","Validations des heures","Approvazioni ore"],
+  "Spesenfreigaben": ["Expense approvals","Validations des frais","Approvazioni spese"],
+  "Eingänge": ["Incoming payments","Encaissements","Incassi"],
+  "Details zu den Kennzahlen": ["Metric details","Détails des indicateurs","Dettagli degli indicatori"],
+  "Offene Aufgaben": ["Open tasks","Tâches ouvertes","Attività aperte"],
+  "Vergleich": ["Comparison","Comparaison","Confronto"],
+  "Keine vergleichbaren Vorperiodendaten": ["No comparable previous-period data","Aucune donnée comparable pour la période précédente","Nessun dato comparabile del periodo precedente"],
+  "Rechnungen nach Gutschriften": ["Invoices after credit notes","Factures après notes de crédit","Fatture al netto delle note di credito"],
+  "Zeitaktionen": ["Time actions","Actions de temps","Azioni del tempo"],
+  "Trends benötigen eine nichtnull Vergleichsbasis. Fehlende Vergleiche werden mit einem Strich dargestellt.": ["Trends require a nonzero comparison baseline. Missing comparisons appear as a dash.","Les tendances nécessitent une base de comparaison non nulle. Un tiret indique une comparaison indisponible.","Le tendenze richiedono una base di confronto diversa da zero. Un trattino indica confronti non disponibili."],
+  "Umsatz: fakturiertes Volumen inklusive MwSt. nach Gutschriften. Eingänge: erfasste Zahlungen nach Rückerstattungen. Ausgaben: nachgewiesene Auszahlungen. Saldo: Eingänge abzüglich Ausgaben, kein Bankkontostand.": ["Revenue: invoiced volume including VAT after credit notes. Incoming payments: recorded payments after refunds. Expenses: verified outflows. Balance: incoming payments minus expenses, not a bank balance.","Chiffre d’affaires : volume facturé TTC après notes de crédit. Encaissements : paiements enregistrés après remboursements. Dépenses : décaissements justifiés. Solde : encaissements moins dépenses, et non le solde bancaire.","Ricavi: volume fatturato IVA inclusa al netto delle note di credito. Incassi: pagamenti registrati al netto dei rimborsi. Uscite: pagamenti comprovati. Saldo: incassi meno uscite, non il saldo bancario."],
+  "Umsatz: fakturiertes Volumen inklusive MwSt. nach Gutschriften. Ohne Rechnungsdaten werden Einnahmen gezeigt. Offen und überfällig: aktueller Forderungsbestand, unabhängig vom Zeitraumfilter. Ausgaben: nachgewiesene Auszahlungen im gewählten Zeitraum.": ["Revenue: invoiced volume including VAT after credit notes. Without invoice data, incoming payments are shown. Open and overdue: current receivables, independent of the period filter. Expenses: verified outflows during the selected period.","Chiffre d’affaires : volume facturé TTC après notes de crédit. En l’absence de factures, les encaissements sont affichés. Ouvert et échu : créances actuelles, indépendamment du filtre de période. Dépenses : décaissements justifiés pendant la période sélectionnée.","Ricavi: volume fatturato IVA inclusa al netto delle note di credito. Senza dati delle fatture sono mostrati gli incassi. Aperto e scaduto: crediti attuali, indipendenti dal filtro temporale. Uscite: pagamenti comprovati nel periodo selezionato."]
 }

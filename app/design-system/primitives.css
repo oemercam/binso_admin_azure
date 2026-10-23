@@ -364,3 +364,17 @@ input:not([type="checkbox"]):not([type="radio"]),
 }
 
 .section-title-actions{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:var(--field-label-gap);margin-inline-start:auto;max-width:100%;min-width:0}
+
+/* One visible clear affordance; keep the existing native search input semantics. */
+.searchbox input[type="search"]::-webkit-search-cancel-button,.searchbox input[type="search"]::-webkit-search-decoration{-webkit-appearance:none;appearance:none}
+.searchbox input[type="search"]::-ms-clear{display:none;width:0;height:0}
+.bo-progress{display:block;width:100%;height:4px;margin-block:8px;appearance:none;border:0;border-radius:var(--shape-mark);overflow:hidden;background:var(--color-line);color:var(--app-action-accent)}
+.bo-progress::-webkit-progress-bar{background:var(--color-line)}
+.bo-progress::-webkit-progress-value{background:var(--app-action-accent)}
+.bo-progress::-moz-progress-bar{background:var(--app-action-accent)}
+.metric-trend{display:inline-flex;align-items:center;justify-content:flex-end;gap:3px;white-space:nowrap;font-size:var(--type-metadata);font-weight:500;font-variant-numeric:tabular-nums}
+.metric-trend[data-tone="positive"]{color:var(--status-success-fg)}
+.metric-trend[data-tone="negative"]{color:var(--status-danger-fg)}
+.metric-trend[data-tone="neutral"]{color:var(--color-muted)}
+
+.bo-setup-progress .bo-progress{margin-bottom:8px}

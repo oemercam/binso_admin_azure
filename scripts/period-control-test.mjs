@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import {moduleUrl,moneyModuleUrl} from './data-test-modules.mjs';
+const source=(await fs.readFile('lib/finance-periods.ts','utf8')).replace('"./money"',JSON.stringify(moneyModuleUrl));
+const {platformFinanceInsights}=await import(moduleUrl(source));
+const data={payments:[{payment_date:'2026-10-01',amount:'0.10'},{payment_date:'2026-10-23',amount:'0.20'},{payment_date:'2026-10-24',amount:'999'}],subscriptions:[{created_at:'2026-10-01',monthly_revenue_chf:'25'}],operatingCosts:[{cost_date:'2026-10-23',amount:'10'}]};
+const actual=platformFinanceInsights(data,'custom','2026-10-23',{from:'2026-10-01',to:'2026-10-23'});
+assert.equal(actual.volume,0.3,'Inclusive selected dates reach the existing decimal cash aggregation');
+assert.equal(actual.costs,10);assert.equal(actual.platformRevenue,25);assert.equal(actual.result,15);
+assert.equal(actual.monthly.reduce((sum,row)=>sum+row.value,0),actual.volume,'Chart and KPI use the same bounds');
+assert.equal(platformFinanceInsights(data,'month','2026-10-23').volume,999.3,'Legacy callers retain their explicit calendar-month contract');
+assert.equal(platformFinanceInsights(data,'custom','2026-10-23',{from:'2020-01-01',to:'2026-10-23'}).monthlyTruncated,true,'Long platform charts disclose their existing 12-month limit');
+assert.equal(actual.monthlyTruncated,false);
+const messages=JSON.parse(await fs.readFile('lib/locales/periods.json','utf8'));
+for(const [key,translations] of Object.entries(messages))for(const locale of ['de','fr','it','en','tr'])assert.ok(typeof translations[locale]==='string'&&translations[locale].trim(),key+': '+locale);
+console.log('Period control: platform cash/chart window adapter preserves calculations and inclusive bounds; five-language period catalogue complete.');

@@ -8,7 +8,7 @@ import {searchSources,type SearchItem} from "@/lib/search";
 import {useState} from "react";
 import {usePageAccess} from "@/lib/client/page-access";
 import {Avatar} from "./avatar";
-import {ActionRow,SettingsGroup} from "./binso-ux";
+import {ActionRow,SettingsGroup,ListSearch} from "./binso-ux";
 import {settingsGroups} from "./settings-navigation";
 import {Button, Toast, EmptyState, Icon, LoadingState, ErrorState} from "./ui";
 
@@ -26,7 +26,7 @@ export function SearchPanel({query,onQuery,items,loading,error,onClose,recent=[]
  const visible=items.filter(item=>access.canOpen(item.href)&&(selected==="all"||item.type===selected));
  const groups=Array.from(new Set(visible.map(item=>item.type)));
  return <div className="global-search">
-  <div className="header-search-controls"><div className="searchbox" role="search"><Icon name="search"/><LocalizedElement as="input" aria-label="Suchen" autoFocus value={query} onChange={e=>onQuery(e.target.value)} placeholder="Suchen…" onKeyDown={event=>{if(event.key==="Enter")onRemember?.(query)}}/>{query&&<LocalizedElement as="button" className="search-clear" type="button" aria-label="Suche löschen" onClick={()=>onQuery("")}><Icon name="close" size={15}/></LocalizedElement>}</div><button type="button" className="header-search-cancel" onClick={onClose}><LocalizedText>{"Abbrechen"}</LocalizedText></button></div>
+  <div className="header-search-controls"><ListSearch value={query} onChange={onQuery} placeholder="Suchen…" ariaLabel="Suchen" autoFocus onCommit={()=>onRemember?.(query)}/><button type="button" className="header-search-cancel" onClick={onClose}><LocalizedText>{"Abbrechen"}</LocalizedText></button></div>
   <LocalizedElement as="div" className="chips header-search-scopes" aria-label="Suchbereiche"><button type="button" className={selected==="all"?"active":""} aria-pressed={selected==="all"} onClick={()=>setScope("all")}><LocalizedText>{"Alle"}</LocalizedText></button>{sources.map(source=><button type="button" key={source.type} className={selected===source.type?"active":""} aria-pressed={selected===source.type} onClick={()=>setScope(source.type)}>{source.type}</button>)}</LocalizedElement>
   <div className="search-results">
    {!query.trim()&&onUndoRecent&&<Toast inline tone="info" title="Suchverlauf gelöscht." actionLabel="Rückgängig" onAction={onUndoRecent}/>}

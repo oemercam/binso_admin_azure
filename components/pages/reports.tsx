@@ -7,21 +7,25 @@ import {offerDecisionTotals,type ReportSummary} from '@/lib/report-export';
 import {ReportActions} from '../report-actions';
 import {TimeReportSheet} from '../time-report';
 import {businessDate,formatCurrency,financialStatusText,financialStatusTone} from '@/lib/financial-status';
-import {RingChart} from '../statistics';
+import {useStatisticPeriod} from '@/lib/client/statistic-period';
+import {statisticBounds} from '@/lib/statistics-period';
+import {StatisticPeriodPicker,RingChart} from '../statistics';
 import {AppShell} from '../app-shell';
-import {FilterSheet,MetricTiles,MetricTile,WorkspaceSection} from '../binso-ux';
-import {Button,Field,Input,Select,ErrorState,LoadingState,EmptyState,SectionTitle,Status, FormActions} from '../ui';
+import {MetricTiles,MetricTile,WorkspaceSection} from '../binso-ux';
+import {ErrorState,LoadingState,EmptyState,SectionTitle,Status} from '../ui';
 import {projectStatusLabels as projectLabels} from '@/lib/projects';
 export function ReportsPage(){
- const {locale}=useLocale(),[period,setPeriod]=useState({months:'1',from:businessDate().slice(0,7)+'-01',to:businessDate()}),[draft,setDraft]=useState(period),[open,setOpen]=useState(false);
- const query=new URLSearchParams(period),resource=useApiQuery<ReportSummary>('/api/reports?'+query.toString()),data=resource.data;
+ const {locale}=useLocale(),[selectedPeriod,setPeriod]=useStatisticPeriod('reports'),period=selectedPeriod!;
+ const bounds=statisticBounds(period,businessDate())!;
+ const reportPeriod={months:'custom',from:bounds.from,to:bounds.to};
+ const query=new URLSearchParams(reportPeriod),resource=useApiQuery<ReportSummary>('/api/reports?'+query.toString()),data=resource.data;
  const hasAccess=!!data&&[data.customers,data.projects,data.time,data.payments,data.expenses,data.expenseCategories,data.employees,data.invoices,data.offers,data.vat].some(value=>value!=null);
  const decisions=offerDecisionTotals(data?.offers??[]);
  const [timeOpen,setTimeOpen]=useState(false);
- const date=(value:string)=>new Intl.DateTimeFormat(localeTags[locale],{dateStyle:'short',timeZone:'UTC'}).format(new Date(value+'T12:00:00Z'));
+
  const number=(value:string)=>Number(value).toLocaleString(localeTags[locale],{maximumFractionDigits:2});
- return <AppShell title="Berichte" active="berichte" subtitle={data?date(data.period.from)+' – '+date(data.period.to):undefined}>
-  <WorkspaceSection><SectionTitle title="Berichtszeitraum" action={<><Button icon="filter" variant="secondary" ariaLabel="Zeitraum" aria-haspopup="dialog" aria-expanded={open} onClick={()=>{setDraft(period);setOpen(true)}}/>{hasAccess&&<ReportActions query={query.toString()} onTimeReport={data?.time?()=>setTimeOpen(true):undefined}/>}</>}/></WorkspaceSection>
+ return <AppShell title="Berichte" active="berichte">
+  <WorkspaceSection><StatisticPeriodPicker period={period} onChange={setPeriod} maxDays={366}/><SectionTitle title="Berichtszeitraum" action={<>{hasAccess&&<ReportActions query={query.toString()} onTimeReport={data?.time?()=>setTimeOpen(true):undefined}/>}</>}/></WorkspaceSection>
   {resource.error?<ErrorState onRetry={resource.refresh}>{resource.error}</ErrorState>:resource.loading?<LoadingState/>:data&&<>
    {!hasAccess&&<EmptyState title="Keine Berichtsdaten verfügbar" description="Für diese Rolle und diesen Plan sind keine Berichtsdaten freigegeben."/>}
    {(data.customers||data.projects||data.employees)&&<WorkspaceSection><SectionTitle title="Aktueller Bestand"/><p><LocalizedText>Stand</LocalizedText>: {new Intl.DateTimeFormat(localeTags[locale],{dateStyle:"short",timeStyle:"short",timeZone:"Europe/Zurich"}).format(new Date(data.asOf))}</p><MetricTiles columns={2}>{data.customers&&<MetricTile label="Kunden gesamt" value={number(data.customers.total)}/>} {data.employees&&<MetricTile label="Aktive Mitarbeiter" value={number(data.employees.active)}/>} {data.projects&&<MetricTile label="Aufträge" value={number(String(data.projects.reduce((sum,item)=>sum+Number(item.count),0)))}/>}</MetricTiles>{data.projects&&data.projects.length>0&&<dl className="detail-list">{data.projects.map(item=><div key={item.status}><dt><LocalizedText>{projectLabels[item.status]??item.status}</LocalizedText></dt><dd>{number(item.count)}</dd></div>)}</dl>}</WorkspaceSection>}
@@ -35,7 +39,6 @@ export function ReportsPage(){
    {data.expenseCategories&&<WorkspaceSection><SectionTitle title="Genehmigte Spesen nach Kategorie"/><p><LocalizedText>Nach Belegdatum, einschliesslich noch nicht erstatteter Spesen. Kein Zahlungsabfluss und keine vollständige Kostenrechnung.</LocalizedText></p>{data.expenseCategories.length?<dl className="detail-list">{data.expenseCategories.map(item=><div key={JSON.stringify([item.currency,item.category])}><dt>{item.category}</dt><dd>{formatCurrency(item.amount,item.currency,localeTags[locale])}</dd></div>)}</dl>:<EmptyState title="Keine genehmigten Spesen im Zeitraum"/>}</WorkspaceSection>}
    <WorkspaceSection>{(data.payments||data.expenses)&&<p><LocalizedText>Zahlungseingänge nach Rückerstattungen sind kein Bankkontostand.</LocalizedText> <LocalizedText>Zahlungsbeträge enthalten ausschliesslich verbuchte Zahlungseingänge und erfasste Spesenerstattungen. Andere Kosten und Löhne sind darin nicht enthalten.</LocalizedText></p>}</WorkspaceSection>
   </>}
-  {timeOpen&&<TimeReportSheet period={period} onClose={()=>setTimeOpen(false)}/>}
-  <FilterSheet label="Berichtszeitraum" open={open} onClose={()=>setOpen(false)}><Field allowReadOnlyInput label="Zeitraum"><Select value={draft.months} onChange={event=>setDraft({...draft,months:event.target.value})}><option value="1"><LocalizedText>Dieser Monat</LocalizedText></option><option value="3"><LocalizedText>3 Monate</LocalizedText></option><option value="6"><LocalizedText>6 Monate</LocalizedText></option><option value="12"><LocalizedText>12 Monate</LocalizedText></option><option value="custom"><LocalizedText>Eigener Zeitraum</LocalizedText></option></Select></Field>{draft.months==='custom'&&<><Field allowReadOnlyInput label="Von"><Input type="date" value={draft.from} onChange={event=>setDraft({...draft,from:event.target.value})}/></Field><Field allowReadOnlyInput label="Bis"><Input type="date" value={draft.to} onChange={event=>setDraft({...draft,to:event.target.value})}/></Field></>}<FormActions sheet><Button variant="secondary" onClick={()=>setOpen(false)}><LocalizedText>Abbrechen</LocalizedText></Button><Button onClick={()=>{setPeriod(draft);setOpen(false)}}><LocalizedText>Anwenden</LocalizedText></Button></FormActions></FilterSheet>
+  {timeOpen&&<TimeReportSheet period={reportPeriod} onClose={()=>setTimeOpen(false)}/>}
  </AppShell>;
 }

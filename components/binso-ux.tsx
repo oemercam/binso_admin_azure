@@ -3,6 +3,8 @@
 import {LocalizedText,LocalizedElement,useLocale} from "@/lib/client/locale";
 import {localeTags} from '@/lib/locales/config';
 import { Children, Fragment, isValidElement, cloneElement, useState, useRef, useEffect, useLayoutEffect, useContext, useId, type ReactNode, type CSSProperties } from "react";
+import type {MetricTrend} from '@/lib/kpi-trend';
+import {HeaderPanel} from './header-panel';
 import {WorkspaceActionContext} from '@/lib/client/workspace-actions';
 import Link from "next/link";
 import {useRouter} from "next/navigation";
@@ -90,9 +92,11 @@ export function MetricTiles({ children, columns=4, desktopOnly=false }: { childr
   return <div className="metrics-grid bo-metric-tiles" data-desktop-only={desktopOnly||undefined} style={{"--metric-columns":columns} as CSSProperties}>{children}</div>;
 }
 
-export function MetricTile({ label, value, hint, currency }: { label: ReactNode; value: ReactNode; hint?:string; currency?:string; compactMoney?:boolean }) {
+export function MetricTile({ label, value, hint, currency, icon, trend,compactMoney=false }: { label: ReactNode; value: ReactNode; hint?:string; currency?:string; compactMoney?:boolean; icon?:string;trend?:MetricTrend }) {
   const {locale}=useLocale();
-  return <Metric label={label} value={currency&&typeof value==='number'?<span className="metric-money"><span className="metric-money-currency">{currency}</span>{" "}<span>{value.toLocaleString(localeTags[locale],{minimumFractionDigits:2,maximumFractionDigits:2})}</span></span>:value} hint={hint}/>;
+  const full=typeof value==='number'?value.toLocaleString(localeTags[locale],{minimumFractionDigits:2,maximumFractionDigits:2}):'';
+  const amount=compactMoney&&full.length>12&&typeof value==='number'?value.toLocaleString(localeTags[locale],{notation:'compact',maximumFractionDigits:2}):full;
+  return <Metric trend={trend} icon={icon} label={label} value={currency&&typeof value==='number'?<span className="metric-money" title={currency+" "+full} aria-label={currency+" "+full}><span className="metric-money-currency">{currency}</span>{" "}<span>{amount}</span></span>:value} hint={hint}/>;
 }
 
 /** Open workspace sections share page spacing without adding nested card chrome. */
@@ -118,10 +122,11 @@ export function DetailTabs({children,label,role,panelId,appearance="line"}:{chil
  })}</LocalizedElement>;
 }
 
-export function ListSearch({ value, onChange, placeholder = "Suchen ...", ariaLabel = placeholder }: {
-  value: string; onChange: (value: string) => void; placeholder?: string; ariaLabel?:string;
+export function ListSearch({ value, onChange, placeholder = "Suchen ...", ariaLabel = placeholder,autoFocus=false,onCommit }: {
+  value: string; onChange: (value: string) => void; placeholder?: string; ariaLabel?:string;autoFocus?:boolean;onCommit?:()=>void;
 }) {
-  return <label className="searchbox"><Icon name="search" size={19}/><LocalizedElement as="input" type="search" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} aria-label={ariaLabel}/>{value&&<Button variant="ghost" icon="close" ariaLabel="Suche leeren" className="search-clear" onClick={()=>onChange("")}/>}</label>;
+  const input=useRef<HTMLInputElement>(null);
+  return <label className="searchbox"><Icon name="search" size={19}/><LocalizedElement as="input" ref={input} autoFocus={autoFocus} onKeyDown={event=>{if(event.key==="Enter")onCommit?.()}} type="search" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} aria-label={ariaLabel}/>{value&&<Button variant="ghost" icon="close" ariaLabel="Suche leeren" className="search-clear" onClick={()=>{onChange("");input.current?.focus()}}/>}</label>;
 }
 
 export function RowActions({ label = "Weitere Aktionen", onClick, disabled = false }: { label?: string; onClick: () => void; disabled?: boolean }) {
@@ -146,10 +151,10 @@ function sheetForm(child:ReactNode):ReactNode{
  return cloneElement(child,{className:[child.props.className,"sheet-form-layout"].filter(Boolean).join(" "),children:<><div className="sheet-form-content">{content}</div><div className="sheet-form-footer">{actions}</div></>});
 }
 
-type SheetProps={label:string;lang?:string;ariaLabel?:string;description?:string;open:boolean;onClose:()=>void;children:ReactNode;busy?:boolean;className?:string;layerClassName?:string;actions?:ReactNode;dirty?:boolean;wizard?:boolean;workspace?:boolean;onBrowserBack?:()=>void;closeLabel?:string;discardText?:{title:string;message:string;cancelLabel:string;confirmLabel:string}};
+type SheetProps={headerActions?:ReactNode;label:string;lang?:string;ariaLabel?:string;description?:string;open:boolean;onClose:()=>void;children:ReactNode;busy?:boolean;className?:string;layerClassName?:string;actions?:ReactNode;dirty?:boolean;wizard?:boolean;workspace?:boolean;onBrowserBack?:()=>void;closeLabel?:string;discardText?:{title:string;message:string;cancelLabel:string;confirmLabel:string}};
 /** One focus/viewport/header/scroll/footer contract for all sheet families.
  * Only the sole open form may clear page-wide recovery; nested editors preserve their parent's draft. */
-function Sheet({label,lang,description,open,onClose,children,busy=false,className="",layerClassName="",ariaLabel,actions,kind,dirty,wizard=false,onBrowserBack,closeLabel="Schliessen",discardText}:SheetProps&{kind:"action"|"form"|"filter"}){
+function Sheet({label,lang,description,open,onClose,children,busy=false,className="",layerClassName="",ariaLabel,actions,kind,dirty,wizard=false,onBrowserBack,closeLabel="Schliessen",discardText,headerActions}:SheetProps&{kind:"action"|"form"|"filter"}){
  const router=useRouter();
  const [destination,setDestination]=useState<string|null>(null);
  const [mounted,setMounted]=useState(false);
@@ -189,7 +194,7 @@ function Sheet({label,lang,description,open,onClose,children,busy=false,classNam
   else if(isValidElement<{className?:string;children?:ReactNode}>(child)&&child.props.className?.split(/\s+/).includes("sheet-body"))body.push(cloneElement(child,{className:child.props.className.replace(/\bsheet-body\b/g,"").trim()}));
   else body.push(sheetForm(child));
  }
- const content=<LocalizedElement as="section" ref={dialogRef} tabIndex={-1} className={`bottom-sheet ${className}`.trim()} lang={lang} data-sheet-kind={kind} data-unsaved={isDirty||busy||undefined} data-wizard={wizard||undefined} role="dialog" aria-modal={true} aria-label={ariaLabel??label} onInvalidCapture={event=>{if(!ownsEvent(event.target))return;if(event.target instanceof Element){const details=event.target.closest("details");if(details instanceof HTMLDetailsElement)details.open=true}}} onInputCapture={event=>{if(ownsEvent(event.target))setChanged(sheetValues(dialogRef.current)!==baseline.current)}} onChangeCapture={event=>{if(ownsEvent(event.target))setChanged(sheetValues(dialogRef.current)!==baseline.current)}} onClickCapture={event=>{if(!ownsEvent(event.target))return;const button=event.target instanceof Element?event.target.closest('button'):null;if(button&&button.dataset.sheetDismiss==='true'){event.preventDefault();event.stopPropagation();requestClose()}}}><><div className="sheet-handle"/><header className="sheet-header"><div><h2><LocalizedText>{label}</LocalizedText></h2>{description&&<p><LocalizedText>{description}</LocalizedText></p>}</div><LocalizedElement as="button" type="button" className="icon-button" aria-label={closeLabel} disabled={busy} onClick={requestClose}><Icon name="close"/></LocalizedElement></header></><div className="sheet-body" inert={kind==="form"&&busy}>{body}</div>{actions?<FormActions sheet>{actions}</FormActions>:footers}</LocalizedElement>;
+ const content=<LocalizedElement as="section" ref={dialogRef} tabIndex={-1} className={`bottom-sheet ${className}`.trim()} lang={lang} data-sheet-kind={kind} data-unsaved={isDirty||busy||undefined} data-wizard={wizard||undefined} role="dialog" aria-modal={true} aria-label={ariaLabel??label} onInvalidCapture={event=>{if(!ownsEvent(event.target))return;if(event.target instanceof Element){const details=event.target.closest("details");if(details instanceof HTMLDetailsElement)details.open=true}}} onInputCapture={event=>{if(ownsEvent(event.target))setChanged(sheetValues(dialogRef.current)!==baseline.current)}} onChangeCapture={event=>{if(ownsEvent(event.target))setChanged(sheetValues(dialogRef.current)!==baseline.current)}} onClickCapture={event=>{if(!ownsEvent(event.target))return;const button=event.target instanceof Element?event.target.closest('button'):null;if(button&&button.dataset.sheetDismiss==='true'){event.preventDefault();event.stopPropagation();requestClose()}}}><><div className="sheet-handle"/><header className="sheet-header"><div><h2><LocalizedText>{label}</LocalizedText></h2>{description&&<p><LocalizedText>{description}</LocalizedText></p>}</div>{headerActions}<LocalizedElement as="button" type="button" className="icon-button" aria-label={closeLabel} disabled={busy} onClick={requestClose}><Icon name="close"/></LocalizedElement></header></><div className="sheet-body" inert={kind==="form"&&busy}>{body}</div>{actions?<FormActions sheet>{actions}</FormActions>:footers}</LocalizedElement>;
  const confirmation=<ConfirmDialog open={discard} closeLabel={closeLabel} title={discardText?.title??"Änderungen verwerfen?"} message={discardText?.message??"Deine Änderungen sind noch nicht gespeichert und gehen verloren."} cancelLabel={discardText?.cancelLabel??"Weiter bearbeiten"} confirmLabel={discardText?.confirmLabel??"Änderungen verwerfen"} onCancel={()=>{setDiscard(false);setBackDiscard(false);setDestination(null)}} onConfirm={()=>{if(document.querySelectorAll('[data-sheet-kind="form"]').length<=1)window.dispatchEvent(new Event("binso-draft-discard"));setDiscard(false);if(destination){const url=new URL(destination);setDestination(null);allowDraftNavigation();if(url.origin===window.location.origin)router.push(url.pathname+url.search+url.hash);else window.location.assign(url.href)}else if(backDiscard){setBackDiscard(false);leaveBack()}else onClose()}}/>;
  return createPortal(<><div className={`sheet-layer ${layerClassName}`.trim()} onMouseDown={event=>{if(event.target===event.currentTarget)requestClose()}}>{content}</div>{confirmation}</>,document.body);
 }
@@ -198,18 +203,18 @@ export function FormSheet({workspace,...props}:SheetProps){return <Sheet {...pro
 export function FilterSheet(props:SheetProps){return <Sheet {...props} kind="filter"/>}
 
 /** The same compact action sheet is used for entity editors on every viewport. */
-export function ActionsMenu({label, children, busy=false}: {label:string;children:ReactNode;busy?:boolean}) {
-  const [open,setOpen]=useState(false);
-  const [closeRequested,setCloseRequested]=useState(false);
-  // An async action must retain the overlay while busy: a second tap must not
-  // reach the underlying page after the first tap started a download or upload.
-  useEffect(()=>{if(!closeRequested||busy)return;const frame=requestAnimationFrame(()=>{setOpen(false);setCloseRequested(false)});return()=>cancelAnimationFrame(frame)},[closeRequested,busy]);
-  return <><RowActions label={label} disabled={busy} onClick={()=>setOpen(true)}/><ActionSheet label={label} open={open} busy={busy} onClose={()=>{setCloseRequested(false);setOpen(false)}}><div className="action-list" onClick={event=>{if(!busy&&event.target instanceof Element&&event.target.closest("button,a"))setCloseRequested(true)}}>{children}</div></ActionSheet></>;
+export function ActionsMenu({label,children,busy=false,header=false}:{label:string;children:ReactNode;busy?:boolean;header?:boolean}){
+ const [open,setOpen]=useState(false),[closeRequested,setCloseRequested]=useState(false),[desktop,setDesktop]=useState(false);
+ useEffect(()=>{if(!header)return;const media=window.matchMedia('(min-width:761px)'),update=()=>setDesktop(media.matches);update();media.addEventListener('change',update);return()=>media.removeEventListener('change',update)},[header]);
+ useEffect(()=>{if(!closeRequested||busy)return;const frame=requestAnimationFrame(()=>{setOpen(false);setCloseRequested(false)});return()=>cancelAnimationFrame(frame)},[closeRequested,busy]);
+ const close=()=>{if(!busy){setCloseRequested(false);setOpen(false)}};
+ const content=<div className="action-list" onClick={event=>{if(!busy&&event.target instanceof Element&&event.target.closest('button,a'))setCloseRequested(true)}}>{children}</div>;
+ return <><RowActions label={label} disabled={busy} onClick={()=>setOpen(true)}/>{header&&desktop?open&&<HeaderPanel kind="actions" label={label} onClose={close}>{content}</HeaderPanel>:<ActionSheet label={label} open={open} busy={busy} onClose={close}>{content}</ActionSheet>}</>;
 }
 
 /** Canonical two-line row shared by entity and financial lists. */
-export function ListRow({href,onClick,title,meta,value,valueLabel,status,tone="neutral",compact=false,translateTitle=true}:{translateTitle?:boolean;href?:string;onClick?:()=>void;title:ReactNode;meta:ReactNode;value?:ReactNode;valueLabel?:string;status?:string;tone?:"success"|"warning"|"danger"|"neutral"|"info";compact?:boolean;valuePlacement?:"separate"|"metadata"}){
- const content=<><b><LocalizedText verbatim={!translateTitle}>{title}</LocalizedText></b><small>{meta}</small>{status&&<Status appearance="pill" tone={tone}>{status}</Status>}{value!=null&&<span className="document-summary-amount">{valueLabel&&<small><LocalizedText>{valueLabel}</LocalizedText></small>}<strong>{value}</strong></span>}{(href||onClick)&&!status&&value==null&&<span className="record-chevron"><Icon name="arrow" size={12}/></span>}</>;
- const className=`document-summary-row${value!=null?" has-value":""}${compact?" is-compact":""}`;
+export function ListRow({href,onClick,title,meta,value,valueLabel,status,tone="neutral",compact=false,information=false,translateTitle=true}:{translateTitle?:boolean;href?:string;onClick?:()=>void;title:ReactNode;meta:ReactNode;value?:ReactNode;valueLabel?:string;status?:string;tone?:"success"|"warning"|"danger"|"neutral"|"info";compact?:boolean;information?:boolean;valuePlacement?:"separate"|"metadata"}){
+ const content=<><b><LocalizedText verbatim={!translateTitle}>{title}</LocalizedText></b><small className={information?"sr-only":undefined}>{meta}</small>{status&&<Status appearance="pill" tone={tone}>{status}</Status>}{value!=null&&<span className="document-summary-amount">{valueLabel&&<small><LocalizedText>{valueLabel}</LocalizedText></small>}<strong>{value}</strong></span>}{(href||onClick)&&!status&&value==null&&<span className="record-chevron"><Icon name="arrow" size={12}/></span>}</>;
+ const className=`document-summary-row${value!=null?" has-value":""}${compact?" is-compact":""}${information?" is-information":""}`;
  return href?<Link href={href} className={className}>{content}</Link>:onClick?<button type="button" onClick={onClick} className={className}>{content}</button>:<div className={className}>{content}</div>;
 }

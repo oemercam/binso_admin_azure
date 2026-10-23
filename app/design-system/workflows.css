@@ -731,3 +731,29 @@ a{-webkit-tap-highlight-color:transparent}
 .expense-summary{display:grid;gap:12px}
 .expense-summary h2,.expense-summary p{margin:0}
 .expense-summary-amount{font-size:var(--type-large-heading);font-variant-numeric:tabular-nums}
+
+/* Mobile time workspace: existing tracker controls without decorative geometry. */
+@media(max-width:760px){
+ .page-container[data-section="zeit"] .timer-display{width:100%;height:auto;min-height:74px;margin:8px 0 12px;text-align:left;place-items:start}
+ .page-container[data-section="zeit"] .timer-display::before{content:none;animation:none}
+ .page-container[data-section="zeit"] .timer-display>div{gap:4px}
+ .page-container[data-section="zeit"] .timer-display strong{font-size:var(--timer-value-size);font-weight:500;line-height:1.2}
+ .page-container[data-section="zeit"] .timer-actions{gap:8px;margin-bottom:16px}
+ .page-container[data-section="zeit"] .timer-actions>.button{min-height:44px}
+ .page-container[data-section="zeit"] .timer-project{gap:12px}
+ .page-container[data-section="zeit"] .time-layout{gap:16px}
+ .page-container[data-section="zeit"] .time-section{padding:14px;border:1px solid var(--color-line);border-radius:var(--shape-panel)}
+ .page-container[data-section="zeit"] .time-group-head{min-height:46px;padding-block:8px}
+}
+
+@media(max-width:760px){
+ .page-container[data-section="zeit"]>.tabs{margin-top:0;margin-bottom:12px}
+ .page-container[data-section="zeit"] .time-overview-section>.section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+ .page-container[data-section="zeit"] .time-overview-section>.section-title .section-title-actions>strong{font-size:var(--type-body);font-weight:500;line-height:1.4;white-space:nowrap}
+}
+.app-root[data-ux="master-v3"] .time-group-head>div{display:flex;align-items:baseline;gap:8px;min-width:0}
+.app-root[data-ux="master-v3"] .time-group-head>div>b,.app-root[data-ux="master-v3"] .time-group-head>div>small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.app-root[data-ux="master-v3"] .timer-display{width:100%;height:auto;min-height:74px;margin:8px 0 12px;text-align:left;place-items:start}
+.app-root[data-ux="master-v3"] .timer-display::before{content:none;animation:none}
+.app-root[data-ux="master-v3"] .timer-display>div{gap:4px}
+.app-root[data-ux="master-v3"] .timer-display strong{font-weight:500;line-height:1.2}

@@ -7,7 +7,7 @@ import {matchesRecordChip,listStatusOverride} from "@/lib/list-filter";
 import Link from "next/link";
 import { Children, cloneElement, isValidElement, useEffect, useMemo, useState, useId, useRef, type ReactNode, type CSSProperties } from "react";
 import {EmptyState, Icon, Status, LoadingState, ErrorState, Button, Field, Select, Input} from "./ui";
-import { ListRow, FilterSheet, ListSearch, DetailTabs } from "./binso-ux";
+import { ListRow, FilterSheet, ListSearch, DetailTabs, FormSheet } from "./binso-ux";
 import {Avatar} from "./avatar";
 
 /** Domain columns differ; table/row/cell semantics and ownership stay central. */
@@ -197,14 +197,18 @@ export function RecordsView({
 
 export function RecordRow({
   href,
+  onClick,
   title,
   meta,
   value,
   status,
   personIdentity,
   compact=false,
+  information=false,
+  inlineMeta,
 }: {
   href?: string;
+  onClick?:()=>void;
   icon?: string;
   title: string;
   meta: string;
@@ -212,19 +216,23 @@ export function RecordRow({
   status?: string;
   personIdentity?:string;
   compact?:boolean;
+  information?:boolean;
+  inlineMeta?:string;
 
 }) {
-  return <ListRow translateTitle={false} compact={compact} href={href} title={personIdentity?<span className="person-record"><Avatar name={title} identity={personIdentity}/><span>{title}</span></span>:title} meta={meta} value={value} status={status} tone={status?tone(status):"neutral"}/>;
+  return <ListRow translateTitle={false} compact={compact} information={information} onClick={onClick} href={href} title={personIdentity?<span className="person-record"><Avatar name={title} identity={personIdentity}/><span>{title}</span></span>:inlineMeta?<span className="record-inline-identity"><span>{title}</span><small>{inlineMeta}</small></span>:title} meta={meta} value={value} status={status} tone={status?tone(status):"neutral"}/>;
 }
 
 /** Group disclosure owns structure only; callers retain domain totals, filters and permissions. */
-export function TimeEntryGroup({title,subtitle,value,children,titleVerbatim=false,subtitleVerbatim=false}:{title:string;subtitle:string;value:string;children:ReactNode;titleVerbatim?:boolean;subtitleVerbatim?:boolean}){
- return <details className="time-group"><summary className="time-group-head"><div><b><LocalizedText verbatim={titleVerbatim}>{title}</LocalizedText></b><small><LocalizedText verbatim={subtitleVerbatim}>{subtitle}</LocalizedText></small></div><strong>{value}</strong><Icon name="down" size={16}/></summary><div className="time-record-list">{children}</div></details>;
+export function TimeEntryGroup({title,subtitle,value,children,titleVerbatim=false,subtitleVerbatim=false,expanded=false}:{title:string;subtitle:string;value:string;children:ReactNode;titleVerbatim?:boolean;subtitleVerbatim?:boolean;expanded?:boolean}){
+ return <details className="time-group" open={expanded||undefined}><summary className="time-group-head"><div><b><LocalizedText verbatim={titleVerbatim}>{title}</LocalizedText></b><small><LocalizedText verbatim={subtitleVerbatim}>{subtitle}</LocalizedText></small></div><strong>{value}</strong><Icon name="down" size={16}/></summary><div className="time-record-list">{children}</div></details>;
 }
 
 /** Employee ledgers and the time module share the same information layout. */
-export function TimeEntryRow({title,meta,value,status,selection,action}:{title:string;meta:string;value:string;status?:string;selection?:React.ReactNode;action?:React.ReactNode}){
- return <div><RecordRow title={title} meta={meta} value={value} status={status}/>{(selection||action)&&<div className="record-controls">{selection&&<label>{selection}<span><LocalizedText>{"Für Rechnung auswählen"}</LocalizedText></span></label>}{action}</div>}</div>;
+export function TimeEntryRow({title,meta,value,status,selection,action,onOpen,onClick,information=false}:{information?:boolean;onOpen?:()=>void;onClick?:()=>void;title:string;meta:string;value:string;status?:string;selection?:React.ReactNode;action?:React.ReactNode}){
+ const [detailOpen,setDetailOpen]=useState(false);
+ if(information)return <><RecordRow information title={title} meta={meta} value={value} onClick={onClick??onOpen??(()=>setDetailOpen(true))}/><FormSheet open={detailOpen} onClose={()=>setDetailOpen(false)} label="Zeiteintrag" actions={action}><RecordRow title={title} meta={meta} value={value} status={status}/>{selection&&<label>{selection}<span><LocalizedText>{"Für Rechnung auswählen"}</LocalizedText></span></label>}</FormSheet></>;
+ return <div><RecordRow onClick={onClick??onOpen} title={title} meta={meta} value={value} status={status}/>{(selection||action)&&<div className="record-controls">{selection&&<label>{selection}<span><LocalizedText>{"Für Rechnung auswählen"}</LocalizedText></span></label>}{action}</div>}</div>;
 }
 
 /** The table owns its responsive tracks; callers supply only the column count. */

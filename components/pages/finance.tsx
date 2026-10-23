@@ -1,5 +1,10 @@
 "use client";
 
+import {useState,type ReactNode} from "react";
+import {usePageAccess} from '@/lib/client/page-access';
+import {ReportActions} from '../report-actions';
+import {businessDate,formatDate} from '@/lib/financial-status';
+import {statisticBounds,type StatisticPeriod} from '@/lib/statistics-period';
 import {LocalizedText} from "@/lib/client/locale";
 import { DocumentList, DocumentSummaryRow, FinanceTabs, type DocumentListItem } from "../document-list";
 import { formatCurrency } from "@/lib/financial-status";
@@ -40,19 +45,24 @@ export function InvoicesPage(){return <FinancialDocumentsPage kind="invoice"/>;}
 
 export type FinancialSummary={invoices:Array<{currency:string;open_count:number;overdue_count:number;draft_count:number;open_amount:number;revenue:number}>;offers:{draft_count:number;actionable_count:number}|null;time:{hours:number;ready_hours:number;invoiced_hours:number}|null};
 
-export function FinancePage(){
+function FinanceWorkspace({compact,children}:{compact:boolean;children:ReactNode}){return compact?<div className="bo-finance-workspace">{children}</div>:<>{children}</>;}
+
+export function FinancePage({compactMobile=true}:{compactMobile?:boolean}={}){
+ const [period,setPeriod]=useState<StatisticPeriod>({months:1,from:'',to:''}),access=usePageAccess();
+ const bounds=statisticBounds(period,businessDate())!;
+ const reportQuery=new URLSearchParams({months:'custom',from:bounds.from,to:bounds.to}).toString();
  const query=useApiQuery<FinancialSummary&{documents:DocumentListItem[];cash:CashStatisticsData|null}>("/api/finance/overview?include=workspace&view=cash");
  const summary=query.data,items=summary?.documents??[];
  const overdue=items.filter(item=>item.kind==='invoice'&&financialStatus(item)==='overdue');
- return <AppShell title="Finanzen" active="finanzen"><FinanceTabs/>{query.loading?<LoadingState><LocalizedText>{"Finanzen werden geladen …"}</LocalizedText></LoadingState>:query.error?<ErrorState onRetry={query.refresh}><LocalizedText>{query.error}</LocalizedText></ErrorState>:<>
-  {summary?.cash&&<CashOverview data={summary.cash}/>}
-  {!summary?.cash&&summary?.invoices.map(item=><section className="bo-workspace-section" key={item.currency}><SectionTitle title="Forderungen"/><ListRow href="/rechnungen?status=Offen" title="Offene Forderungen" meta={item.currency} value={formatCurrency(item.open_amount,item.currency)}/></section>)}
-  {summary?.offers&&<section className="bo-workspace-section"><SectionTitle title="Angebote"/><ListRow href="/angebote?status=Entwurf" title="Entwürfe" meta="Noch nicht versendet" value={String(summary.offers.draft_count)}/><ListRow href="/angebote" title="Aktive Vorgänge" meta="Angebote mit nächstem Schritt" value={String(summary.offers.actionable_count)}/></section>}
-  {summary?.time&&<section className="bo-workspace-section"><SectionTitle title="Arbeitszeit"/><ListRow href="/zeit?tab=entries" title="Zur Abrechnung bereit" meta="Freigegeben und noch nicht verrechnet" value={Number(summary.time.ready_hours).toLocaleString('de-CH',{maximumFractionDigits:2})+' h'}/></section>}
+ return <AppShell title="Finanzen" active="finanzen" headerActions={compactMobile&&access.hasPermission?.("reports:read")?<ReportActions header query={reportQuery} caption={formatDate(bounds.from)+" – "+formatDate(bounds.to)}/>:undefined}><FinanceWorkspace compact={compactMobile}>{!compactMobile&&<FinanceTabs/>}{query.loading?<LoadingState><LocalizedText>{"Finanzen werden geladen …"}</LocalizedText></LoadingState>:query.error?<ErrorState onRetry={query.refresh}><LocalizedText>{query.error}</LocalizedText></ErrorState>:<>
+  {summary?.cash&&<CashOverview data={summary.cash} compact={compactMobile} onPeriodChange={setPeriod}/>}
+  {!summary?.cash&&summary?.invoices.map(item=><section className="bo-workspace-section" key={item.currency}><SectionTitle title="Forderungen"/><ListRow information={compactMobile} href="/rechnungen?status=Offen" title="Offene Forderungen" meta={item.currency} value={formatCurrency(item.open_amount,item.currency)}/></section>)}
+  {summary?.offers&&<section className="bo-workspace-section"><SectionTitle title="Angebote"/><ListRow information={compactMobile} href="/angebote?status=Entwurf" title="Entwürfe" meta="Noch nicht versendet" value={String(summary.offers.draft_count)}/><ListRow information={compactMobile} href="/angebote" title="Aktive Vorgänge" meta="Angebote mit nächstem Schritt" value={String(summary.offers.actionable_count)}/></section>}
+  {summary?.time&&<section className="bo-workspace-section"><SectionTitle title="Arbeitszeit"/><ListRow information={compactMobile} href="/zeit?tab=entries" title="Zur Abrechnung bereit" meta="Freigegeben und noch nicht verrechnet" value={Number(summary.time.ready_hours).toLocaleString('de-CH',{maximumFractionDigits:2})+' h'}/></section>}
   {!summary?.cash&&!summary?.invoices.length&&!summary?.offers&&!summary?.time&&<EmptyState title="Keine Finanzinformationen für diesen Zugriff verfügbar"/>}
   {summary?.cash&&!!summary.invoices.filter(item=>item.currency!=='CHF').length&&<section className="bo-workspace-section"><SectionTitle title="Offene Forderungen"/>{summary.invoices.filter(item=>item.currency!=='CHF').map(item=><p key={item.currency}>{formatCurrency(item.open_amount,item.currency)}</p>)}</section>}
   {overdue.length>0&&<section className="bo-workspace-section"><SectionTitle title="Handlungsbedarf"/>{overdue.slice(0,5).map(item=><DocumentSummaryRow key={item.id} item={item} compact/>)}</section>}
- </>}</AppShell>;
+ </>}</FinanceWorkspace></AppShell>;
 }
 
-export function DocumentsHubPage(){return <FinancePage/>;}
+export function DocumentsHubPage(){return <FinancePage compactMobile={false}/>;}

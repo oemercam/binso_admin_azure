@@ -1,12 +1,16 @@
 "use client";
 import {LocalizedText,LocalizedElement,useTranslation,useLocale} from "@/lib/client/locale";
 import {localeTags} from '@/lib/locales/config';
-import {useEffect,useId,useState} from 'react';
-import {FilterSheet,MetricTiles,MetricTile} from './binso-ux';
-import {Button,Field,Icon,Input,ErrorState, FormActions} from './ui';
+import {useId,useState} from 'react';
+import {MetricTiles,MetricTile} from './binso-ux';
+import {Button} from './ui';
 import {sumMoney} from '@/lib/money';
 import {businessDate,formatCurrency} from '@/lib/financial-status';
-import {aggregateStatistics,lineChartCoordinates,statisticBounds,statisticPeriods,type StatisticBucket,type StatisticEvent,type StatisticPeriod} from '@/lib/statistics-period';
+import {aggregateStatistics,lineChartCoordinates,statisticBounds,type StatisticBucket,type StatisticEvent,type StatisticPeriod} from '@/lib/statistics-period';
+
+import {StatisticPeriodPicker} from './statistic-period-picker';
+export {StatisticPeriodPicker} from './statistic-period-picker';
+import {useStatisticPeriod} from '@/lib/client/statistic-period';
 
 export type Series={key:string;label:string;tone:'positive'|'negative'|'neutral'};
 export type RingPart={key:string;label:string;tone:Series['tone'];value:number;href?:string};
@@ -43,13 +47,12 @@ export function LineChart({buckets,series,selected,onSelect,value}:{buckets:read
 /** One period control, signed line chart and shared KPI renderer. */
 export function Statistics({title,subtitle,events,series,metrics,currency='CHF',storageKey,notice,metricKeys=[],composition,defaultTrendVisible,hideHeading=false}:{hideHeading?:boolean;title:string;subtitle:string;events:readonly StatisticEvent[];series:readonly Series[];metrics:(totals:Record<string,number>)=>readonly Metric[];currency?:string;storageKey:string;notice?:string;metricKeys?:readonly string[];composition?:{label:string;parts:readonly RingPart[]};defaultTrendVisible?:boolean}){
  const id=useId(),{locale}=useLocale();
- const [period,setPeriod]=useState<StatisticPeriod>({months:6,from:'',to:''});
- const [restored,setRestored]=useState(false),[selected,setSelected]=useState<string|null>(null);
+ const [storedPeriod,setPeriod]=useStatisticPeriod(storageKey,{months:6,from:'',to:''});
+ const period=storedPeriod!;
+ const [selected,setSelected]=useState<string|null>(null);
  const [showTrend,setShowTrend]=useState(defaultTrendVisible??!composition);
  const [showMoreMetrics,setShowMoreMetrics]=useState(false);
  const today=businessDate();
- useEffect(()=>{let saved:StatisticPeriod|undefined;try{saved=JSON.parse(sessionStorage.getItem('binso.statistics:'+storageKey)??'null')??undefined;}catch{}let active=true;queueMicrotask(()=>{if(!active)return;if(saved&&statisticBounds(saved,businessDate()))setPeriod(saved);setRestored(true)});return()=>{active=false}},[storageKey]);
- useEffect(()=>{if(restored)try{sessionStorage.setItem('binso.statistics:'+storageKey,JSON.stringify(period))}catch{}},[period,restored,storageKey]);
  const bounds=statisticBounds(period,today);
  const aggregated=aggregateStatistics(events,bounds??{from:'',to:''},[...new Set([...series.map(item=>item.key),...metricKeys])]);
  const active=aggregated.buckets.find(bucket=>bucket.key===selected),kpis=metrics(aggregated.totals);
@@ -59,7 +62,6 @@ export function Statistics({title,subtitle,events,series,metrics,currency='CHF',
  const choose=(next:StatisticPeriod)=>{setPeriod(next);setSelected(null)};
  return <section className="bo-statistics" aria-labelledby={id}>
   <header className="bo-statistics-heading"><div className={hideHeading?"visually-hidden":undefined}><h2 id={id}><LocalizedText>{title}</LocalizedText></h2>{subtitle&&<p><LocalizedText>{subtitle}</LocalizedText></p>}</div><StatisticPeriodPicker period={period} onChange={choose}/></header>
-  <p className="bo-statistics-dates">{bounds?.from.split('-').reverse().join('.')} – {bounds?.to.split('-').reverse().join('.')}</p>
   <MetricTiles columns={Math.min(4,Math.max(2,kpis.length)) as 2|3|4}>{kpis.slice(0,4).map(metric=><MetricTile key={metric.label} label={metric.label} value={metric.format==='number'?value(metric.value,'number'):metric.value} currency={metric.format==='number'?undefined:currency} hint={metric.hint}/>)}</MetricTiles>
   {kpis.length>4&&<><Button variant="ghost" aria-expanded={showMoreMetrics} aria-controls={id+'-more-metrics'} onClick={()=>setShowMoreMetrics(value=>!value)}><LocalizedText>{showMoreMetrics?'Weniger anzeigen':'Mehr anzeigen'}</LocalizedText></Button><div id={id+'-more-metrics'} hidden={!showMoreMetrics}><MetricTiles>{kpis.slice(4).map(metric=><MetricTile key={metric.label} label={metric.label} value={metric.format==='number'?value(metric.value,'number'):metric.value} currency={metric.format==='number'?undefined:currency} hint={metric.hint}/>)}</MetricTiles></div></>}
   {notice&&<details className="bo-statistics-notice"><summary><LocalizedText>{"Datenhinweise"}</LocalizedText></summary><p><LocalizedText>{notice}</LocalizedText></p></details>}
@@ -71,14 +73,4 @@ export function Statistics({title,subtitle,events,series,metrics,currency='CHF',
   {(showTrend||!hasTrend)&&<p className="bo-statistics-detail" role="status"><LocalizedText>{active?active.label+': '+series.map(item=>item.label+' '+value(active.values[item.key])).join(' · '):hasTrend?'Datenpunkt auswählen für Details.':'Keine Entwicklung im Zeitraum'}</LocalizedText></p>}
 
  </section>;
-}
-
-/** One period control for customer, finance and ledger charts. Inclusive validation. */
-export function StatisticPeriodPicker({period,onChange}:{period:StatisticPeriod;onChange:(period:StatisticPeriod)=>void}){
- const [open,setOpen]=useState(false),[draft,setDraft]=useState(period);
- const today=businessDate(),bounds=statisticBounds(period,today),pending=statisticBounds(draft,today);
- const choose=onChange;
- return <><LocalizedElement as="div" className="bo-statistics-periods" role="group" aria-label="Statistikzeitraum">{statisticPeriods.map(months=><button type="button" key={months} aria-pressed={period.months===months} onClick={()=>choose({...period,months})}>{months}<LocalizedText>{" M"}</LocalizedText></button>)}<LocalizedElement as="button" type="button" aria-label="Eigenen Statistikzeitraum wählen" aria-pressed={period.months==='custom'} onClick={()=>{setDraft(period.months==='custom'?period:{months:'custom',from:bounds?.from??today,to:bounds?.to??today});setOpen(true)}}><Icon name="calendar" size={18}/></LocalizedElement></LocalizedElement>
-  <FilterSheet label="Statistikzeitraum" open={open} onClose={()=>setOpen(false)}><p><LocalizedText>{"Beide Tage sind eingeschlossen."}</LocalizedText></p><div className="form-grid two"><Field allowReadOnlyInput label="Von *"><Input type="date" required min="1900-01-01" max={draft.to||'9998-12-31'} value={draft.from} onChange={event=>setDraft({...draft,months:'custom',from:event.target.value})}/></Field><Field allowReadOnlyInput label="Bis *"><Input type="date" required min={draft.from||'1900-01-01'} max="9998-12-31" value={draft.to} onChange={event=>setDraft({...draft,months:'custom',to:event.target.value})}/></Field></div>{!pending&&<ErrorState><LocalizedText>{"Bitte einen gültigen Zeitraum wählen. Beginn darf nicht nach Ende liegen."}</LocalizedText></ErrorState>}<FormActions sheet><Button variant="secondary" onClick={()=>setOpen(false)}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button disabled={!pending} onClick={()=>{choose({...draft,months:'custom'});setOpen(false)}}><LocalizedText>{"Anwenden"}</LocalizedText></Button></FormActions></FilterSheet>
- </>;
 }

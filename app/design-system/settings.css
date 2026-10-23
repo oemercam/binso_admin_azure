@@ -289,3 +289,14 @@
 .subscription-detail-grid>.surface+.surface{border-left:0;border-top:1px solid var(--color-line)}
 .context-block{min-width:0;overflow-wrap:anywhere}
 }
+
+.app-root[data-ux="master-v3"] .settings-overview{max-width:100%;display:grid;gap:16px}
+.app-root[data-ux="master-v3"] .settings-overview>nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+.app-root[data-ux="master-v3"] .settings-overview .bo-settings-group{margin:0;border:1px solid var(--color-line);border-radius:var(--shape-panel);padding:var(--ux-card-inset)}
+.app-root[data-ux="master-v3"] .bo-settings-group h2{font-size:var(--ux-card-title);line-height:1.35}
+.app-root[data-ux="master-v3"] .settings-list{border-top:0}
+.app-root[data-ux="master-v3"] .settings-list .action-row{min-height:var(--ux-row-height);height:var(--ux-row-height);padding-block:0}
+.app-root[data-ux="master-v3"] .settings-list .action-row>span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.app-root[data-ux="master-v3"] .preference-row{min-height:var(--ux-row-height);padding-block:8px}
+.app-root[data-ux="master-v3"] .preference-row>div>small{display:none}
+@media(max-width:760px){.app-root[data-ux="master-v3"] .settings-overview>nav{grid-template-columns:minmax(0,1fr);gap:12px}}

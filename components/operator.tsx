@@ -2,7 +2,9 @@
 import {asLocale} from '@/lib/locales/config';
 import {LocalizedText,LocalizedElement,useTranslation,useLocale} from "@/lib/client/locale";
 import {LocaleSwitcher} from "./locale-switcher";
-import {RingChart} from "./statistics";
+import {useStatisticPeriod} from '@/lib/client/statistic-period';
+import {statisticBounds} from '@/lib/statistics-period';
+import {StatisticPeriodPicker,RingChart} from "./statistics";
 import {formatDateTime} from "@/lib/display-format";
 import {supportReference} from "@/lib/support-reference";
 import {MaintenanceControl} from "./maintenance-control";
@@ -387,17 +389,14 @@ function OperatorFinanceView(){
   const data=resource.data??{};
   const error=resource.error,refresh=resource.refresh;
 
-  const [range,setRange]=useState("month");
-  const [filterOpen,setFilterOpen]=useState(false),[draftRange,setDraftRange]=useState("month");
+  const [selectedPeriod,setPeriod]=useStatisticPeriod('operator-finance'),period=selectedPeriod!;
   if(resource.loading||error)return <OperatorLoadState loading={resource.loading} error={error} onRetry={refresh}/>;
-
-  const ranges:Record<string,{label:string}>={month:{label:"Dieser Monat"},last:{label:"Letzter Monat"},three:{label:"3 Monate"},year:{label:"12 Monate"},previous:{label:"Letztes Jahr"}};
-  const {volume,platformRevenue,costs,result,monthly}=platformFinanceInsights(data,range,businessDate()),max=Math.max(1,...monthly.map(x=>x.value));
+  const bounds=statisticBounds(period,businessDate())!;
+  const {volume,platformRevenue,costs,result,monthly,monthlyTruncated}=platformFinanceInsights(data,'custom',businessDate(),bounds),max=Math.max(1,...monthly.map(x=>x.value));
   return <div className="operator-finance">
-    <SectionTitle title={ranges[range].label} action={<LocalizedElement as="button" type="button" className="icon-button records-filter-action" aria-label="Zeitraum filtern" onClick={()=>{setDraftRange(range);setFilterOpen(true)}}><Icon name="filter" size={20}/></LocalizedElement>}/>
-    <FilterSheet label="Zeitraum" open={filterOpen} onClose={()=>setFilterOpen(false)} actions={<><Button variant="secondary" onClick={()=>setDraftRange("month")}><LocalizedText>{"Zurücksetzen"}</LocalizedText></Button><Button onClick={()=>{setRange(draftRange);setFilterOpen(false)}}><LocalizedText>{"Anwenden"}</LocalizedText></Button></>}><Field label="Zeitraum"><Select value={draftRange} onChange={event=>setDraftRange(event.target.value)}>{Object.entries(ranges).map(([key,x])=><option key={key} value={key}><LocalizedText>{x.label}</LocalizedText></option>)}</Select></Field></FilterSheet>
+    <StatisticPeriodPicker period={period} onChange={setPeriod}/>
     <div className="operator-payment-insights"><PaymentInsight label="Kundenzahlungen" value={"CHF "+volume.toLocaleString("de-CH",{minimumFractionDigits:2})} kind="trend" bars={monthly.map(x=>max?x.value/max*100:0)}/><PaymentInsight label="Plattformumsatz" value={"CHF "+platformRevenue.toLocaleString("de-CH",{minimumFractionDigits:2})} kind="number"/><PaymentInsight label="Betriebskosten" value={"CHF "+costs.toLocaleString("de-CH",{minimumFractionDigits:2})} kind="number"/></div>
-    <section className="finance-analysis"><SectionTitle title="Finanzentwicklung"/>{monthly.some(x=>x.value>0)?<div className="finance-month-bars">{monthly.map(x=><div key={x.label}><i style={{"--bar-value":`${x.value>0?x.value/max*100:0}%`} as CSSProperties}/><b><LocalizedText>{x.label}</LocalizedText></b><small><LocalizedText>{"CHF "}</LocalizedText>{x.value.toLocaleString("de-CH",{maximumFractionDigits:0})}</small></div>)}</div>:<EmptyState  title="Keine Kundenzahlungen im gewählten Zeitraum" />}</section>
+    <section className="finance-analysis"><SectionTitle title="Finanzentwicklung"/>{monthlyTruncated&&<p><LocalizedText>{"Diagramm: letzte 12 Kalendermonate im ausgewählten Zeitraum. Kennzahlen: gesamter Zeitraum."}</LocalizedText></p>}{monthly.some(x=>x.value>0)?<div className="finance-month-bars">{monthly.map(x=><div key={x.label}><i style={{"--bar-value":`${x.value>0?x.value/max*100:0}%`} as CSSProperties}/><b><LocalizedText>{x.label}</LocalizedText></b><small><LocalizedText>{"CHF "}</LocalizedText>{x.value.toLocaleString("de-CH",{maximumFractionDigits:0})}</small></div>)}</div>:<EmptyState  title="Keine Kundenzahlungen im gewählten Zeitraum" />}</section>
     <div className="finance-breakdown"><section><h3><LocalizedText>{"Zusammenfassung"}</LocalizedText></h3><div><span><LocalizedText>{"Betriebskosten gesamt"}</LocalizedText></span><strong><LocalizedText>{"CHF "+costs.toLocaleString("de-CH",{minimumFractionDigits:2})}</LocalizedText></strong></div><div><span><LocalizedText>{"Plattformumsatz"}</LocalizedText></span><strong><LocalizedText>{"CHF "+platformRevenue.toLocaleString("de-CH",{minimumFractionDigits:2})}</LocalizedText></strong></div><div><span><LocalizedText>{"Ergebnis"}</LocalizedText></span><strong><LocalizedText>{"CHF "+result.toLocaleString("de-CH",{minimumFractionDigits:2})}</LocalizedText></strong></div></section><section><h3><LocalizedText>{"Datenbasis"}</LocalizedText></h3><p><LocalizedText>{"Kundenzahlungen, Plattformumsatz und Betriebskosten werden nach dem gewählten Zeitraum ausgewertet."}</LocalizedText></p></section></div>
   </div>
 }
@@ -433,7 +432,7 @@ function PaymentsView() {
     </div>
     <WorkspaceSection className="operator-table-card">
       <SectionTitle title="Kundenzahlungen"/>
-      <p className="technical-hint"><LocalizedText>{"Erfasste Plattformzahlungen. Kennzahl und Verlauf enthalten CHF; weitere Währungen bleiben in der Liste getrennt."}</LocalizedText></p>
+      <p className="technical-hint"><LocalizedText>{"Erfasste Plattformzahlungen. Kennzahl und Verlauf enthalten CHF; weitere Währungen bleiben in der Liste getrennt."}</LocalizedText>{" "}<LocalizedText>{"Verlauf: laufender und elf vorherige Kalendermonate."}</LocalizedText></p>
       <RecordsControls inline controller={controller} placeholder="Zahlungen suchen..." chips={chips} columns={columns}/>
       <RecordsView controller={controller} items={rows} placeholder="Zahlungen suchen..." chips={chips} columns={columns} toolbarActions={false} showCount={false} countLabel="Zahlungen" emptyLabel={()=>'Noch keine Kundenzahlungen'}>{row=><RecordRow compact title={row[1]} meta={[row[0],row[4]].join(' · ')} value={row[2]} status={row[3]}/>}</RecordsView>
     </WorkspaceSection>

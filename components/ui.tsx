@@ -1,4 +1,7 @@
 "use client";
+import type {MetricTrend} from '@/lib/kpi-trend';
+import {useLocale} from '@/lib/client/locale';
+import {localeTags} from '@/lib/locales';
 import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
 import {usePageAccess} from "@/lib/client/page-access";
 import {fieldInputHint} from "@/lib/form-input-hints";
@@ -120,8 +123,9 @@ export function IconButton({ label, icon, onClick, className="", ...ariaProps }:
   return <LocalizedElement as="button" {...ariaProps} className={["icon-button",className].filter(Boolean).join(" ")} type="button" aria-label={label} onClick={onClick}><Icon name={icon}/></LocalizedElement>;
 }
 
-export function Metric({ label, value, hint, icon }: { label: React.ReactNode; value: React.ReactNode; hint?: string; icon?: string }) {
-  return <div className="metric"><div className="metric-top"><FormLabel><LocalizedText>{label}</LocalizedText></FormLabel>{icon && <Icon name={icon} size={18}/>}</div><strong>{value}</strong>{hint && <small><LocalizedText>{hint}</LocalizedText></small>}</div>;
+export function Metric({ label, value, hint, icon, trend }: { label: React.ReactNode; value: React.ReactNode; hint?: string; icon?: string; trend?:MetricTrend }) {
+  const {locale}=useLocale();
+  return <div className="metric"><div className="metric-top"><FormLabel><LocalizedText>{label}</LocalizedText></FormLabel>{trend?<span className="metric-trend" data-tone={trend.tone} title={trend.label} aria-label={trend.percent===null?trend.label:(trend.percent>=0?"+":"−")+Math.abs(trend.percent).toLocaleString(localeTags[locale],{maximumFractionDigits:1})+"% · "+trend.label}>{trend.percent===null?"–":<><span aria-hidden="true">{trend.percent>0?"↗":trend.percent<0?"↘":"→"}</span>{Math.abs(trend.percent).toLocaleString(localeTags[locale],{maximumFractionDigits:1})}%</>}</span>:icon && <Icon name={icon} size={18}/>}</div><strong>{value}</strong>{hint && <small><LocalizedText>{hint}</LocalizedText></small>}</div>;
 }
 
 export function SectionTitle({ title, action, desktopOnly=false }: { title: string; action?: React.ReactNode;desktopOnly?:boolean }) {
@@ -179,6 +183,8 @@ export function Field({ label, children, className = "",allowReadOnlyInput=false
 export function EmptyState({title,description}:{title:string;description?:string}) {
   return <div className="empty-state" data-empty-state="compact" role="status"><p><LocalizedText>{title}</LocalizedText></p>{description&&<p><LocalizedText>{description}</LocalizedText></p>}</div>;
 }
+
+export function ProgressBar({value,max,label}:{value:number;max:number;label:string}){return <LocalizedElement as="progress" className="bo-progress" aria-label={label} value={Math.max(0,Math.min(value,max))} max={Math.max(1,max)}/>;}
 
 export function Toggle({ checked = false, label, labelledBy, onChange,disabled=false,busy=false }: { checked?: boolean; label: string;labelledBy?:string; onChange?: () => void;disabled?:boolean;busy?:boolean }) {
   return <LocalizedElement as="button" className={`toggle ${checked ? "is-on" : ""}`} disabled={disabled||busy} aria-busy={busy||undefined} type="button" role="switch" aria-checked={checked} aria-labelledby={labelledBy} aria-label={labelledBy?undefined:label} onClick={onChange}><span/></LocalizedElement>;

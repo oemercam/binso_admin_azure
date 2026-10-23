@@ -335,3 +335,34 @@ html{scroll-behavior:auto}
 @media (pointer:coarse){
 :root{--button-height:var(--touch);--control-h:48px;--control-font:16px;--desktop-action-h:var(--touch)}
 }
+
+/* Master V3 — staged on the five approved customer workspaces only.
+   Navigation/FAB geometry tokens deliberately retain their existing owners. */
+:root{
+ --ux-page-inset:32px;
+ --ux-card-inset:20px;
+ --ux-section-title:19px;
+ --ux-card-title:16px;
+ --ux-page-title:28px;
+ --ux-row-height:46px;
+ --ux-chart-income:#16A34A;
+ --ux-chart-expense:#DC2626;
+}
+.app-root[data-ux="master-v3"]{
+ --workspace-sidebar-width:232px;
+ --content-max:1440px;
+ --desktop-header-h:64px;
+ --body-font-size:14px;
+ --body-line-height:1.55;
+ --page-heading-size:var(--ux-page-title);
+ --page-heading-line-height:1.2;
+ --section-title-font:var(--ux-section-title);
+ --control-h:42px;
+}
+@media(max-width:760px){
+ .app-root[data-ux="master-v3"]{--ux-page-inset:16px;--ux-card-inset:16px;--ux-page-title:23px;--body-font-size:15px;--body-line-height:1.5;--type-body:15px;--control-h:44px}
+}
+@media(min-width:761px) and (max-width:1199px){
+ .app-root[data-ux="master-v3"]{--ux-page-inset:24px;--ux-card-inset:20px}
+}
+@media(min-width:1920px){.app-root[data-ux="master-v3"]{--ux-page-inset:40px}}

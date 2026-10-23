@@ -23,7 +23,7 @@ import Link from "next/link";
 import {Monitor} from "lucide-react";
 import { saveTheme, type ThemeMode } from "@/lib/client/theme";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useId, useRef, useState } from "react";
+import { Fragment, useEffect, useId, useRef, useState } from "react";
 import { AppShell } from "../app-shell";
 import { apiGet, apiDelete,apiPatch, apiPost, apiUpload, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 import { plans as subscriptionPlans } from "@/lib/plans";
@@ -383,7 +383,7 @@ export function NotificationSettingsPage() {
   return <AppShell title="Benachrichtigungen" subtitle="Bestimme, wie Binso One dich informiert." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
     {error&&<ErrorState><LocalizedText>{error}</LocalizedText></ErrorState>}
     {!ready&&!error&&<LoadingState><LocalizedText>{"Einstellungen werden geladen …"}</LocalizedText></LoadingState>}
-    <SettingsGroup title="Zustellung"><section className="preference-table">{rows.map(([title,text],index)=><div className="preference-row" key={title}><div><b id={labels+index}><LocalizedText>{title}</LocalizedText></b><small><LocalizedText>{text}</LocalizedText></small></div><div className="preference-channels">{(["email","push"] as const).filter(channel=>notificationChannels[channel]).map(channel=><label key={channel}><span id={labels+index+channel}><LocalizedText>{channel==="email"?"E-Mail":"Push"}</LocalizedText></span><Toggle labelledBy={labels+index+channel+" "+labels+index} checked={prefs[title][channel]} disabled={!ready} busy={saving.includes(title+channel)} onChange={()=>void toggle(title,channel)} label={`${channel==="email"?"E-Mail":"Push"} ${title}`}/></label>)}</div></div>)}</section></SettingsGroup>
+    <SettingsGroup title="Zustellung">{rows.map(([title,text],index)=><Fragment key={title}>{(["email","push"] as const).filter(channel=>notificationChannels[channel]).map(channel=><ListRow information key={title+channel} title={<span id={labels+index+channel}><LocalizedText>{title}</LocalizedText> · <LocalizedText>{channel==="email"?"E-Mail":"Push"}</LocalizedText></span>} meta={text} value={<Toggle labelledBy={labels+index+channel} checked={prefs[title][channel]} disabled={!ready} busy={saving.includes(title+channel)} onChange={()=>void toggle(title,channel)} label={title}/>}/>)}</Fragment>)}</SettingsGroup>
   </AppShell>;
 }
 

@@ -163,6 +163,7 @@ html[data-theme="dark"] .searchbox>input{height:100%;min-width:0;padding:0;borde
 .bo-data-disclosure>summary::after{content:"+";font-size:var(--type-section);color:var(--color-muted)}
 .bo-data-disclosure[open]>summary::after{content:"−"}
 .bo-data-disclosure>summary::-webkit-details-marker{display:none}
+.bo-setup-guide-summary{margin:0 0 8px;color:var(--color-muted);font-size:var(--type-body);line-height:1.5}
 .record-identity{display:flex;align-items:center;gap:var(--record-identity-gap);min-width:0}
 .record-identity>.person-avatar{width:var(--record-identity-size);height:var(--record-identity-size);flex:none}
 .record-identity>span{min-width:0}
@@ -373,3 +374,19 @@ html[data-theme="dark"] .searchbox>input{height:100%;min-width:0;padding:0;borde
 .records-active-filters:has(>.filter-chip){display:flex;flex-wrap:wrap;gap:8px}
 
 .searchbox>.search-clear{flex:none;width:var(--touch);height:var(--touch);min-width:var(--touch);padding:0}
+
+/* Reusable desktop action slot; mobile actions belong to the shared header. */
+.bo-desktop-actions{display:contents}
+@media(max-width:760px){
+ .bo-desktop-actions{display:none}
+ .page-container[data-section="kunden"] .records-search-row{grid-template-columns:minmax(0,1fr) 44px;gap:8px}
+ .page-container[data-section="kunden"] .records-search-row>.searchbox{height:44px;min-height:44px}
+ .page-container[data-section="kunden"] .records-search-row>.records-filter-action{width:44px;height:44px;min-height:44px}
+ .page-container[data-section="kunden"] .records-sort-control{display:none}
+ .page-container[data-section="kunden"] .document-summary-row.is-information>.status{grid-column:2;grid-row:1;white-space:nowrap}
+}
+
+.record-inline-identity{display:flex;align-items:baseline;gap:8px;min-width:0}
+.record-inline-identity>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.record-inline-identity>small{font-size:var(--type-metadata);font-weight:400;color:var(--color-muted);max-width:34%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.app-root[data-ux="master-v3"] .desktop-record-row>[role="cell"].align-right{white-space:nowrap;overflow-wrap:normal}

@@ -15,7 +15,7 @@ export async function GET(){try{
 export async function PATCH(request:NextRequest){try{
  assertSameOrigin(request);const session=await requireOperatorSession();authorizeOperator(session,'platform:read');
  const body=await readJson<{language?:unknown}>(request,1024);
- if(!body||Array.isArray(body)||typeof body.language!=='string'||!['de','fr','it','en'].includes(body.language)||Object.keys(body).some(key=>key!=='language'))throw new ApiError(400,'language_invalid','Bitte eine verfügbare Sprache wählen.');
+ if(!body||Array.isArray(body)||typeof body.language!=='string'||!['de','fr','it','en','tr'].includes(body.language)||Object.keys(body).some(key=>key!=='language'))throw new ApiError(400,'language_invalid','Bitte eine verfügbare Sprache wählen.');
  const item=await withPlatform(async c=>{
   const previous=(await c.query("select language from platform_operator_assignments where user_id=$1 and status='active' for update",[session.userId])).rows[0];
   if(!previous)throw new ApiError(403,'forbidden','Keine Berechtigung.');
