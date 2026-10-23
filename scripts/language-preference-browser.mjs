@@ -60,7 +60,7 @@ async function verifyNotificationPreference(page,{base,locale,text}){
  await page.route('**/api/settings/notifications',handler);
  try{
   await page.goto(base+'/einstellungen/benachrichtigungen?lang='+locale,{waitUntil:'networkidle'});
-  const control=page.getByRole('switch',{name:text('E-Mail',locale)+' '+text('Rechnungen',locale),exact:true});
+  const control=page.getByRole('switch',{name:text('Rechnungen',locale)+' · '+text('E-Mail',locale),exact:true});
   await control.waitFor();assert.equal(await control.isEnabled(),true);assert.equal(await control.getAttribute('aria-checked'),'true');
   await control.click();await page.getByRole('alert').getByText(text('Einstellung konnte nicht gespeichert werden.',locale),{exact:true}).waitFor();
   assert.equal(await control.getAttribute('aria-checked'),'true','Failure never displays an unsaved setting');assert.equal(updates,1);
