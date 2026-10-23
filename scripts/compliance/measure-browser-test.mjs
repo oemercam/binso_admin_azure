@@ -40,8 +40,10 @@ try{
  const notification='<button class="desktop-notification-button">Bell</button>',avatar='<button class="avatar-button">Account</button>',search='<button class="desktop-global-search" aria-label="Search">Search</button>';
  const normalActions=search+notification+avatar;
  const header=(actions,location='')=>`<div class="desktop-appbar">${location}<button class="desktop-navigation-toggle" aria-controls="customer-desktop-navigation">Navigation</button><div class="desktop-appbar-actions">${actions}</div></div>`;
- const checkHeader=async(actions,state,location)=>{
-  await page.setContent(header(actions,location));
+ await page.route('https://metric-fixture.invalid/**',route=>route.fulfill({contentType:'text/html',body:'<!doctype html><html><body></body></html>'}));
+ const checkHeader=async(actions,state,location,{route,master=false}={})=>{
+  if(route)await page.goto('https://metric-fixture.invalid'+route);
+  await page.setContent(master?'<div data-ux="master-v3">'+header(actions,location)+'</div>':header(actions,location));
   const evidence=await measureCompliance(page,{output,route:'/dashboard',theme:'light',width:page.viewportSize().width,state,engine});
   return evidence.checks.filter(c=>c.id==='UX-LAY-003');
  };
@@ -58,17 +60,34 @@ try{
  assert.equal((await checkHeader(search+search+notification+avatar,'header-duplicate-search'))[0].status,'failed','Duplicate allowed roles remain blocking');
  assert.equal((await checkHeader(notification+avatar,'header-missing-search'))[0].status,'failed','The approved global search is required, not just permitted');
  assert.equal((await checkHeader(normalActions+'<button hidden>Hidden</button>','header-hidden'))[0].status,'passed','Hidden controls are excluded from visible actions');
+ const menu='<button class="bo-row-actions" aria-label="Seitenaktionen">More</button>';
+ for(const route of ['/kunden','/finanzen','/zeit']){
+  const scope={route,master:true};
+  assert.equal((await checkHeader(menu+normalActions,'v3-menu',undefined,scope))[0].status,'passed','V3 approves one existing page-menu owner before the global controls');
+  for(const actions of [menu+menu+normalActions,normalActions+menu,menu+normalActions+'<button>Extra</button>'])assert.equal((await checkHeader(actions,'v3-invalid-menu',undefined,scope))[0].status,'failed','Duplicate, misplaced or additional actions stay blocking');
+ }
+ assert.equal((await checkHeader(menu+normalActions,'unapproved-menu',undefined,{route:'/projekte',master:true}))[0].status,'failed','The V3 page-menu exception cannot authorize another route');
+ assert.equal((await checkHeader(menu+normalActions,'missing-v3-owner',undefined,{route:'/kunden'}))[0].status,'failed','A class alone cannot authorize the page-menu exception');
+ await page.goto('https://metric-fixture.invalid/dashboard');
  await page.setViewportSize({width:1024,height:1000});
  assert.equal((await checkHeader(normalActions,'header-breakpoint'))[0].status,'passed','The desktop criterion includes the exact 1024px breakpoint');
  await page.setViewportSize({width:1023,height:1000});
  assert.equal((await checkHeader(normalActions+'<button>Mobile</button>','header-mobile')).length,0,'The desktop criterion starts at 1024px');
  // Counts are view-specific; the latest cash analysis never permits the retired fourth KPI.
- await page.route('https://metric-fixture.invalid/**',route=>route.fulfill({contentType:'text/html',body:'<!doctype html><html><body></body></html>'}));
  const kpis=async(route,owner,count)=>{await page.goto('https://metric-fixture.invalid'+route);await page.setContent('<section class="'+owner+'"><div class="bo-metric-tiles">'+Array.from({length:count},(_,i)=>'<div class="metric">Metric '+i+'</div>').join('')+'</div></section>');const evidence=await measureCompliance(page,{output,route,theme:'light',width:page.viewportSize().width,state:'kpis-'+count,engine});const checks=evidence.checks.filter(check=>check.id==='UX-FIN-001');assert.equal(checks.length,1,'The actual KPI owner must emit evidence');return checks[0].status;};
  assert.equal(await kpis('/finanzen/analyse','bo-statistics',3),'passed');
  for(const count of [2,4])assert.equal(await kpis('/finanzen/analyse','bo-statistics',count),'failed','Missing or retired extra analysis KPIs stay blocking');
  for(const route of ['/dashboard','/finanzen']){assert.equal(await kpis(route,'bo-cash-overview',4),'passed');for(const count of [3,5])assert.equal(await kpis(route,'bo-cash-overview',count),'failed','The compact overview retains its exact four metrics');}
  assert.equal(await kpis('/kunden/customer-one','bo-statistics',3),'passed');assert.equal(await kpis('/kunden/customer-one','bo-statistics',4),'failed');
+ // V3.3: one mobile caption, desktop segments, exactly one active calendar
+ // period. The old permanently visible mobile links cannot satisfy this gate.
+ const periodFixture=({selected=1,duplicate=false,missing=false,old=false,wrongMode=false}={})=>`<style>.bo-period-mobile{display:block}.bo-period-segments{display:none}@media(min-width:1024px){.bo-period-mobile{display:none}.bo-period-segments{display:block}}${wrongMode?'.bo-period-mobile{display:block!important}.bo-period-segments{display:block!important}':''}</style><section class="bo-statistics">${old?'<div class="bo-statistics-periods">1 M 3 M 6 M 12 M</div>':`<div class="bo-period-control"><button class="bo-period-mobile" aria-haspopup="dialog">Oktober 2026</button><div class="bo-period-segments">${[1,3,6,12].filter(n=>!missing||n!==6).map(n=>`<button aria-pressed="${n===selected||duplicate&&n===3}">${n} M</button>`).join('')}<button aria-haspopup="dialog" aria-pressed="${selected==='custom'}">Calendar</button></div></div>`}</section>`;
+ for(const width of [390,768,1024,1440]){
+  await page.setViewportSize({width,height:1000});
+  const periodCheck=async options=>{await page.setContent(periodFixture(options));const evidence=await measureCompliance(page,{output,route:'/finanzen/analyse',theme:'light',width,state:'period-'+JSON.stringify(options),engine});return evidence.checks.find(c=>c.id==='UX-FIN-004').status;};
+  for(const selected of [1,3,6,12,'custom'])assert.equal(await periodCheck({selected}),'passed','Every supported selection has one active period and the correct responsive control');
+  for(const options of [{selected:0},{duplicate:true},{missing:true},{old:true},{wrongMode:true}])assert.equal(await periodCheck(options),'failed','Missing, duplicate or incorrectly rendered period controls remain blocking');
+ }
  for(const width of [390,1100,1440])for(const theme of ['light','dark']){
   await page.setViewportSize({width,height:1000});
   const background=theme==='light'?'#fff':'#000',oldSurface=theme==='light'?'#f5f6f8':'#141414';

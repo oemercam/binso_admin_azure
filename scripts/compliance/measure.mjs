@@ -65,10 +65,13 @@ export async function measureCompliance(page,{output,route,theme,width,state='no
   for(const el of all('.mobile-header'))add('HDR-001',getComputedStyle(el).backdropFilter==='none'?'passed':'failed',{backdropFilter:getComputedStyle(el).backdropFilter,background:getComputedStyle(el).backgroundColor,rect:rect(el)},'.mobile-header');
   for(const el of all('.desktop-appbar-actions'))if(innerWidth>=1024){
    const actions=[...el.querySelectorAll('button,a')].filter(visible);
-   const kind=x=>x.matches('button.desktop-global-search[aria-label]')&&x.getAttribute('aria-label').trim()?'search':x.matches('button.desktop-notification-button')?'notification':x.matches('button.avatar-button')?'account':'unexpected';
+   // V3 explicitly moves the existing page menu into the header on these
+   // approved pages. This does not permit arbitrary business controls elsewhere.
+   const approvedPageMenu=['/kunden','/finanzen','/zeit'].includes(location.pathname)&&el.closest('[data-ux="master-v3"]');
+   const kind=x=>approvedPageMenu&&x.matches('button.bo-row-actions[aria-label]')&&x.getAttribute('aria-label').trim()?'page-menu':x.matches('button.desktop-global-search[aria-label]')&&x.getAttribute('aria-label').trim()?'search':x.matches('button.desktop-notification-button')?'notification':x.matches('button.avatar-button')?'account':'unexpected';
    const roles=actions.map(kind),unexpected=actions.filter(x=>kind(x)==='unexpected');
    const outside=[...el.closest('.desktop-appbar').querySelectorAll('button,a')].filter(visible).filter(x=>!el.contains(x)&&!x.matches('button.desktop-navigation-toggle[aria-controls="customer-desktop-navigation"]'));
-   const validOrder=roles.join(',')==='search,notification,account';
+   const validOrder=roles.join(',')==='search,notification,account'||approvedPageMenu&&roles.join(',')==='page-menu,search,notification,account';
    const redundantLocation=[...el.closest('.desktop-appbar').querySelectorAll('.workspace-location')].filter(visible);
    add('LAY-003',validOrder&&!unexpected.length&&!outside.length&&!redundantLocation.length?'passed':'failed',{visibleActions:actions.length,roles,unexpectedActions:[...unexpected,...outside].map(item),redundantLocation:redundantLocation.map(item),rects:actions.map(item)},'.desktop-appbar-actions');
   }
@@ -79,7 +82,13 @@ export async function measureCompliance(page,{output,route,theme,width,state='no
    const count=el.querySelector(':scope > .bo-metric-tiles')?.querySelectorAll(':scope > .metric').length??0;const expectedKpis=location.pathname==='/finanzen/analyse'||location.pathname.startsWith('/kunden/')?3:4;add('FIN-001',count===expectedKpis?'passed':'failed',{count,expected:expectedKpis,contract:'19 October approval: three cash-analysis/customer-development metrics; four overview metrics'},'.bo-metric-tiles');
    const legend=el.querySelector('.bo-statistics-legend')?.textContent??'';const groups=[...el.querySelectorAll('.bo-statistics-line')].map(x=>x.points.numberOfItems);if(['/dashboard','/finanzen','/finanzen/analyse'].includes(location.pathname))add('FIN-002',legend.includes('Einnahmen')&&legend.includes('Ausgaben')&&groups.length===2&&groups.every(n=>n>0)?'passed':'failed',{income:legend.includes('Einnahmen'),expenses:legend.includes('Ausgaben'),linePointCounts:groups},'.bo-statistics');
    const color=tone=>{const node=el.querySelector('.bo-statistics-'+tone);return node?getComputedStyle(node).backgroundColor:null};const positive=color('positive'),negative=color('negative');const rgb=value=>(value??'').match(/[\d.]+/g)?.map(Number)??[];const p=rgb(positive),n=rgb(negative);if(['/dashboard','/finanzen','/finanzen/analyse'].includes(location.pathname))add('FIN-003',p[1]>p[0]&&p[1]>p[2]&&n[0]>n[1]&&n[0]>n[2]?'passed':'failed',{positive,negative},'.bo-statistics-positive,.bo-statistics-negative');
-   const periods=[...el.querySelectorAll('.bo-statistics-periods button')].map(b=>b.textContent.trim()).filter(Boolean);add('FIN-004',['1 M','3 M','6 M','12 M'].every(t=>periods.includes(t))?'passed':'failed',{periods},'.bo-statistics-periods');
+   const control=el.querySelector('.bo-period-control'),segments=control?.querySelector('.bo-period-segments'),mobile=control?.querySelector('.bo-period-mobile');
+   const presets=segments?[...segments.querySelectorAll('button:not([aria-haspopup])')]:[],calendar=segments?.querySelector('button[aria-haspopup="dialog"]');
+   const active=segments?[...segments.querySelectorAll('button[aria-pressed="true"]')]:[];
+   const periods=presets.map(b=>Number(b.textContent.trim().split(/\s+/)[0]));
+   const mode=innerWidth<1024?'mobile':'desktop';
+   const valid=periods.length===4&&periods.every((n,i)=>n===[1,3,6,12][i])&&active.length===1&&!!calendar&&!!mobile&&mobile.getAttribute('aria-haspopup')==='dialog'&&!!mobile.textContent.trim()&&(mode==='mobile'?visible(mobile)&&!visible(segments):visible(segments)&&!visible(mobile));
+   add('FIN-004',valid?'passed':'failed',{periods,active:active.length,mode,mobileVisible:!!mobile&&visible(mobile),segmentsVisible:!!segments&&visible(segments),calendar:!!calendar},'.bo-period-control');
    const token='--color-bg';
    const probe=document.createElement('span');probe.style.backgroundColor=`var(${token})`;document.body.append(probe);const expected=getComputedStyle(probe).backgroundColor;probe.remove();const actual=getComputedStyle(el).backgroundColor;
    add('FIN-010',actual===expected?'passed':'failed',{actual,expected,token,approval:'2026-10-15 ZIP: open workspace at every viewport; Dark uses derived canvas tokens without visual approval'},'.bo-statistics');

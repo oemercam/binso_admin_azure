@@ -307,22 +307,22 @@
     },
     {
       "id": "UX-LAY-003",
-      "description": "Desktop: globale Suche, optional laufender Timer, Glocke und Profil rechts; fachliche Aktionen im Seitenbereich",
+      "description": "Desktop: globale Suche, Glocke und Profil; zentrales Seitenmenü auf den freigegebenen V3-Seiten",
       "routes": [
         "customer-app"
       ],
       "componentTypes": [
         "HeaderPanel"
       ],
-      "expected": "Sichtbarer Desktop-Header: Suche/Glocke/Profil in definierter Reihenfolge, keine Timeranzeige im Header; keine zusätzlichen fachlichen Aktionen",
+      "expected": "Desktop-Header: Suche/Glocke/Profil in definierter Reihenfolge; V3 erlaubt davor ein zentrales Seitenmenü auf Kunden, Finanzen und Zeit; keine Timeranzeige oder weiteren fachlichen Aktionen",
       "owner": "HeaderPanel",
       "method": "browser",
       "testCase": "TC-UX-LAY-003",
       "adapter": "header-actions",
       "priority": "P1",
-      "acceptance": "Sichtbarer Desktop-Header: Suche/Glocke/Profil in definierter Reihenfolge, keine Timeranzeige im Header; keine zusätzlichen fachlichen Aktionen",
+      "acceptance": "Desktop-Header: Suche/Glocke/Profil in definierter Reihenfolge; V3 erlaubt davor ein zentrales Seitenmenü auf Kunden, Finanzen und Zeit; keine Timeranzeige oder weiteren fachlichen Aktionen",
       "automation": "automatic",
-      "provenance": "Nutzerauftrag 15.10.2026: docs/audit/v24/white-workspaces-request.md Abschnitt 4; reference/IMPLEMENTIERUNG.md. Ersetzt die ältere Nur-Glocke/Avatar-Vorgabe; Navigation unverändert.",
+      "provenance": "Nutzerauftrag UX Master V3 in dieser Unterhaltung: Seitenaktionen ausschliesslich im Header. Eng begrenzte Ausnahme auf Kunden, Finanzen und Zeit; alle übrigen Vorgaben aus docs/audit/v24/white-workspaces-request.md Abschnitt 4 bleiben erhalten.",
       "review": null,
       "expectedCases": [
         {"route":"/dashboard","width":1024,"theme":"light","engine":"chromium","state":"normal"},
@@ -1056,22 +1056,22 @@
     },
     {
       "id": "UX-FIN-004",
-      "description": "Zeiträume 1/3/6/12 Monate",
+      "description": "V3.3: kompakte zentrale Kalenderperioden mit responsiver Auswahl",
       "routes": [
         "customer-app"
       ],
       "componentTypes": [
         "Statistics"
       ],
-      "expected": "Alle vier Zeitraum-Buttons vorhanden",
+      "expected": "V3.3: zentrale Auswahl mit 1/3/6/12 Kalendermonaten und individueller Auswahl; genau ein aktiver Zeitraum; Mobile eine Auswahlzeile, Desktop Segmente",
       "owner": "Statistics",
       "method": "browser",
       "testCase": "TC-UX-FIN-004",
       "adapter": "periods",
       "priority": "P1",
-      "acceptance": "Alle vier Zeitraum-Buttons vorhanden",
+      "acceptance": "V3.3: zentrale Auswahl mit 1/3/6/12 Kalendermonaten und individueller Auswahl; genau ein aktiver Zeitraum; Mobile eine Auswahlzeile, Desktop Segmente",
       "automation": "automatic",
-      "provenance": "Current UX compliance instruction; approved UX summary where referenced",
+      "provenance": "Nutzerauftrag UX Master V3.3: globaler Zeitraumfilter in dieser Unterhaltung; ersetzt dauerhaft sichtbare mobile Textlinks durch Auswahlzeile und Bottom Sheet, ab 1024 px Segmente und Kalender-Popover.",
       "review": null,
       "expectedCases": [
         {"route":"/finanzen/analyse","width":390,"theme":"light","engine":"chromium","state":"normal"},
