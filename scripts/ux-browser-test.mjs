@@ -1182,7 +1182,7 @@ try{
     await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${width}-appearance-rows.png`)});
     await choices.getByRole('radio',{name:theme==='light'?/^Hell/:/^Dunkel/}).click();await page.waitForLoadState('networkidle');
     await navigate(base+'/einstellungen/sprache');await page.waitForLoadState('networkidle');
-    assert.deepEqual(await page.getByLabel('Sprache',{exact:true}).locator('..').locator('select option').evaluateAll(options=>options.map(option=>option.value)),['de','fr','it','en'],'Dedicated language route exposes the complete translated language catalogue');
+    assert.deepEqual(await page.getByLabel('Sprache',{exact:true}).locator('..').locator('select option').evaluateAll(options=>options.map(option=>option.value)),['de','fr','it','en','tr'],'Shared language selection includes Turkish for the five-language period control');
    }
    await page.setViewportSize({width:390,height:740});await navigate(base+'/einstellungen/konto');await page.waitForLoadState('networkidle');
    await page.getByRole('button',{name:'Bearbeiten',exact:true}).filter({visible:true}).click();
