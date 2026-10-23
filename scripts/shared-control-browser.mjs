@@ -25,13 +25,13 @@ export async function verifyListFrameMeasurement(page){
  }finally{await detached.dispose();}
 }
 
-/** Revision7 chapter19: closed fields share one geometry across surfaces.
+/** Closed fields retain the shared geometry; approved Master V3 uses 42px desktop controls.
  * Textareas and checkbox/radio controls have their own semantic geometry. */
 export async function assertCanonicalClosedFields(page,route=''){
  const fields=page.locator('.form-field>.form-control:not(textarea):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),.form-field .app-select-trigger').filter({visible:true});
  for(const control of await fields.all()){
-  const geometry=await control.evaluate(el=>{const css=getComputedStyle(el);return {height:el.getBoundingClientRect().height,padding:css.paddingLeft,radius:css.borderRadius,font:css.fontSize};});
-  assert.equal(geometry.height,48,route+': canonical closed field height');
+  const geometry=await control.evaluate(el=>{const css=getComputedStyle(el);return {height:el.getBoundingClientRect().height,padding:css.paddingLeft,radius:css.borderRadius,font:css.fontSize,compactDesktop:!!el.closest('.app-root[data-ux="master-v3"]')&&matchMedia('(min-width:761px)').matches};});
+  assert.equal(geometry.height,geometry.compactDesktop?42:48,route+': canonical closed field height');
   assert.equal(geometry.padding,'16px',route+': canonical field inset');
   assert.equal(geometry.radius,'12px',route+': canonical field radius');
   assert.equal(geometry.font,'16px',route+': canonical field text');

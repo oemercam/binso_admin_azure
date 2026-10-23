@@ -127,9 +127,9 @@ console.log('Apple and PWA installation icons use the Binso One artwork with One
 
 // Period controls moved from individual pages to the single statistics owner.
 {
- const statistics=await fs.readFile('components/statistics.tsx','utf8');
- assert(statistics.includes('statisticPeriods.map'), 'All statistics consume central month presets');
- assert(statistics.includes('type="date" required')&&statistics.includes('Eigenen Statistikzeitraum wählen'), 'Actual date controls and calendar action exist');
+ const statistics=await fs.readFile('components/statistics.tsx','utf8'),picker=await fs.readFile('components/statistic-period-picker.tsx','utf8');
+ assert(picker.includes('statisticPeriods.map')&&statistics.includes('<StatisticPeriodPicker'), 'All statistics consume the shared month-preset control');
+ assert(picker.includes('type="date" required')&&picker.includes("t('Individueller Zeitraum')")&&picker.includes('<FilterSheet')&&picker.includes('<HeaderPanel'), 'Shared date controls retain mobile sheet and desktop calendar actions');
  assert(statistics.includes('aggregateStatistics')&&statistics.includes('metrics(aggregated.totals)'), 'KPIs and bars share aggregation');
  for(const page of ['components/pages/dashboard.tsx','components/pages/finance.tsx'])assert((await fs.readFile(page,'utf8')).includes('CashOverview'), page+' renders the compact central cash overview');
  console.log('Finance and dashboard consume one statistics owner with required custom dates and shared KPI/chart aggregation.');
