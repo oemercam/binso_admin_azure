@@ -6,17 +6,16 @@
  .bo-dashboard-overview>.bo-workspace-section,.bo-dashboard-overview .bo-cash-trend{border:1px solid var(--color-line);border-radius:var(--shape-panel);padding:14px;background:var(--color-bg);min-width:0}
  .bo-dashboard-overview .section-title{margin:0 0 10px;min-height:0}
  .bo-dashboard-overview .section-title h2{font-size:var(--type-body);line-height:1.4}
- .bo-dashboard-overview .bo-cash-overview>.metrics-grid{grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:1fr;gap:10px;margin:0 0 12px;align-items:stretch}
+ .bo-dashboard-overview .bo-cash-overview>.metrics-grid{grid-auto-rows:1fr;gap:10px;margin:0 0 12px;align-items:stretch}
  .bo-dashboard-overview .bo-metric-tiles .metric{border:1px solid var(--color-line);border-radius:var(--shape-panel);padding:14px;min-height:116px;background:var(--color-bg)}
  .bo-dashboard-overview .metric-top{align-items:flex-start;gap:6px;font-size:var(--type-label);overflow-wrap:anywhere}
- .bo-dashboard-overview .bo-metric-tiles .metric strong{font-size:var(--type-subtitle);font-weight:600;line-height:1.25;margin-top:10px}
+ .bo-dashboard-overview .bo-metric-tiles .metric strong{font-weight:600;line-height:1.25;margin-top:10px}
  .bo-dashboard-overview .metric-money{gap:2px}
  .bo-dashboard-overview .bo-metric-tiles .metric>small{font-size:var(--type-metadata);line-height:1.4}
  .bo-dashboard-overview .document-summary-row{min-height:54px;padding-block:10px;gap:4px 10px}
  .bo-dashboard-overview .document-summary-row b{font-size:var(--type-body);font-weight:500}
  .bo-dashboard-overview .document-summary-row small{font-size:var(--type-metadata);line-height:1.4}
  .bo-dashboard-overview .bo-overview-bars{margin-block:12px 0}
- .bo-dashboard-overview .bo-overview-bar-track{height:96px}
  .bo-dashboard-overview .bo-overview-explanation{margin-bottom:0;font-size:var(--type-metadata)}
 }
 .metrics-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;border:0}
@@ -226,7 +225,6 @@
 }
 /* Global V3.3 period control; narrow tablets use the same sheet as mobile. */
 .bo-period-control{width:fit-content;max-width:100%;min-width:0}
-.bo-period-mobile{display:none}
 .bo-period-segments{display:flex;align-items:center;gap:4px;max-width:100%;flex-wrap:wrap}
 .bo-period-segments>button,.bo-period-mobile{min-height:44px;padding:8px 12px;border:0;border-radius:var(--app-control-radius);background:transparent;color:var(--color-fg);font:inherit;font-size:var(--type-label);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px}
 .bo-period-segments>button{min-width:52px}
