@@ -1,6 +1,9 @@
 import assert from 'node:assert/strict';
 import {matchesLocalizedRoute} from './localized-route-contract.mjs';
-export async function verifyBusinessReadinessBrowser({page,context,navigate,base,invoice,capture=async()=>{}}){
+export async function verifyBusinessReadinessBrowser({page,context,navigate:originalNavigate,resetPage,base,invoice,capture=async()=>{}}){
+ // Reuse the caller's asserted document reset when embedded in the UX suite.
+ // Real recovery links still navigate within one page and retain their assertions.
+ const navigate=async url=>{if(resetPage)page=await resetPage(url);else await originalNavigate(url);};
  let dismissed=false,failPreference=true,failSettings=true,preferenceWrites=0,issuePosts=0,draftWrites=0;
  let record={...invoice,status:'draft',paid_amount:0,credit_amount:0,refund_amount:0};
  let company={name:'Readiness UI Company',street:'Hauptstrasse',postal_code:'3000',city:'Bern',country_code:'CH',iban:'',qr_iban:'',payment_terms_days:20,vat_rate:8.1};
@@ -25,7 +28,7 @@ export async function verifyBusinessReadinessBrowser({page,context,navigate,base
   // A remaining optional task keeps the guide visible even after required banking setup.
   company.iban='';await navigate(base+'/dashboard');await page.getByText('Einrichtung abschliessen',{exact:true}).waitFor();await navigate(base+'/einstellungen');
   const preference=page.getByRole('switch',{name:'Einrichtungshilfe anzeigen',exact:true});await preference.waitFor();assert.equal(await preference.getAttribute('aria-checked'),'true');await preference.click();await page.getByRole('alert').filter({hasText:'Synthetic setup preference unavailable'}).waitFor();assert.equal(await preference.getAttribute('aria-checked'),'true','Failed preference writes never fake success');
-  failPreference=false;await preference.click();await page.waitForFunction(()=>document.querySelector('[role=switch][aria-label="Einrichtungshilfe anzeigen"]')?.getAttribute('aria-checked')==='false');await page.reload();assert.equal(await preference.getAttribute('aria-checked'),'false','Preference survives reload');await navigate(base+'/dashboard');await page.waitForLoadState('networkidle');assert.equal(await page.getByText('Einrichtung abschliessen',{exact:true}).count(),0,'Dismissed guide is hidden on a fresh overview');assert.equal(preferenceWrites,2);
+  failPreference=false;await preference.click();await page.waitForFunction(()=>document.querySelector('[role=switch][aria-label="Einrichtungshilfe anzeigen"]')?.getAttribute('aria-checked')==='false');if(resetPage)await navigate(page.url());else await page.reload();const persistedPreference=page.getByRole('switch',{name:'Einrichtungshilfe anzeigen',exact:true});assert.equal(await persistedPreference.getAttribute('aria-checked'),'false','Preference survives reload');await navigate(base+'/dashboard');await page.waitForLoadState('networkidle');assert.equal(await page.getByText('Einrichtung abschliessen',{exact:true}).count(),0,'Dismissed guide is hidden on a fresh overview');assert.equal(preferenceWrites,2);
  }catch(error){console.log('Readiness focus at failure',await page.evaluate(()=>({path:location.pathname,field:document.activeElement?.id,tag:document.activeElement?.tagName,dialogs:[...document.querySelectorAll('[aria-modal="true"]')].map(el=>({role:el.getAttribute('role'),label:el.getAttribute('aria-label'),containsFocus:el.contains(document.activeElement)}))})));await capture('failure');throw error;}finally{for(const [pattern,handler] of registrations)await context.unroute(pattern,handler);}
  console.log('Readiness browser: incomplete draft save, blocked issue, exact-field focus, settings preservation/return without auto-issue, explicit retry and persisted/failing personal preference passed.');
 }
