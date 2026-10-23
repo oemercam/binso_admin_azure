@@ -5,6 +5,7 @@ import {verifyAvatarBrowser} from './avatar-browser.mjs';
 import {createUiAuthFixture} from './ui-auth-fixture.mjs';
 import {matchesLocalizedRoute,waitForLocalizedRoute} from './localized-route-contract.mjs';
 import {waitForLabReady} from './shared-control-browser.mjs';
+import {measureListFrameBorders,verifyListFrameMeasurement} from './shared-control-browser.mjs';
 import {selectAppOption,appControlValue} from './app-select-browser.mjs';
 async function openDocumentHistory(page){const details=page.locator('.document-detail-view details').filter({has:page.locator('summary',{hasText:'Weitere Angaben'})});await details.waitFor({state:'attached'});if(!await details.getAttribute('open'))await details.locator('summary').click();}
 async function assertReturnPosition(page,target){try{await page.waitForFunction(y=>Math.abs(scrollY-y)<=1,target);}catch(error){console.log('Return position mismatch',await page.evaluate(expected=>({expected,actual:scrollY,height:document.documentElement.scrollHeight,viewport:innerHeight,path:location.pathname}),target));throw error;}}
@@ -374,6 +375,7 @@ try{
    return route.fulfill({status:data?200:503,json:data??{message:'UI fixture unavailable'}});
   });
   const trackedPage=async()=>{const next=await context.newPage();next.on('pageerror',error=>{if(process.env.BINSO_UX_DEBUG)console.log('PAGE ERROR',error.stack);errors.push(next.url()+': '+error.message)});if(process.env.BINSO_UX_DEBUG)next.on('requestfailed',req=>console.log('FAILED REQUEST',req.url(),req.failure()));return next};
+  const listFrameProbe=await context.newPage();try{await verifyListFrameMeasurement(listFrameProbe);}finally{await listFrameProbe.close();}
   let page=await trackedPage();
   // Hard fixture resets use a new document; real Link navigation stays on the same page.
   // WebKit cannot carry Next's old-document RSC prefetch scheduler across page.goto resets.
@@ -441,8 +443,9 @@ try{
     assert.ok(geometry.scroll<=width+1&&geometry.body<=width+1,`${theme} ${width} ${route}: horizontal overflow ${JSON.stringify(geometry)}`);
     if(!process.env.BINSO_UX_BASELINE&&width<=760){await assertFlatMobileNavigation(page);if(route==='/dashboard'&&width===390&&!process.env.BINSO_UX_FIXTURE_CASE)await verifyFlatNavigationAdversaries(page);}
     if(!process.env.BINSO_UX_BASELINE){
-     const listFrames=await page.locator('.records,.desktop-record-table').filter({visible:true}).evaluateAll(nodes=>nodes.map(el=>({top:getComputedStyle(el).borderTopWidth,bottom:getComputedStyle(el).borderBottomWidth})));
-     assert.ok(listFrames.every(frame=>frame.top==='0px'&&frame.bottom==='0px'),`${route}: list containers have no duplicate leading or terminal separator`);
+     const listFrames=await measureListFrameBorders(page);
+     if(!listFrames.every(frame=>frame.top==='0px'&&frame.bottom==='0px'))await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${width}-list-frame-error.png`)});
+     assert.ok(listFrames.every(frame=>frame.top==='0px'&&frame.bottom==='0px'),`${route} ${theme} ${width}px: list containers have no duplicate leading or terminal separator ${JSON.stringify(listFrames)}`);
      for(const table of await page.locator('.desktop-record-table').filter({visible:true}).all()){
       const header=table.locator('.desktop-record-head,.operator-table-head');if(await header.count())assert.equal(await header.evaluate(el=>getComputedStyle(el).borderBottomWidth),'1px','The actual table heading retains its row separator');
       const rows=table.locator('.desktop-record-row,.operator-table-row');const count=await rows.count();if(count){assert.equal(await rows.last().evaluate(el=>getComputedStyle(el).borderBottomWidth),'0px','The final table entry has no terminal line');if(count>1)assert.equal(await rows.first().evaluate(el=>getComputedStyle(el).borderBottomWidth),'1px','Separators between actual table entries remain');}
