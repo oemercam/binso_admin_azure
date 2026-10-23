@@ -5,7 +5,7 @@ import {verifyAvatarBrowser} from './avatar-browser.mjs';
 import {createUiAuthFixture} from './ui-auth-fixture.mjs';
 import {matchesLocalizedRoute,waitForLocalizedRoute} from './localized-route-contract.mjs';
 import {waitForLabReady} from './shared-control-browser.mjs';
-import {measureListFrameBorders,verifyListFrameMeasurement} from './shared-control-browser.mjs';
+import {measureListFrameBorders,verifyListFrameMeasurement,measureMetricDividers} from './shared-control-browser.mjs';
 import {selectAppOption,appControlValue} from './app-select-browser.mjs';
 const periodNames={1:'Aktueller Monat',3:'Letzte 3 Monate',6:'Letzte 6 Monate',12:'Letzte 12 Monate'};
 async function chooseStatisticPeriod(page,scope,months){const control=scope.locator('.bo-period-control');if(await control.locator('.bo-period-mobile').isVisible()){await control.locator('.bo-period-mobile').click();const sheet=page.getByRole('dialog',{name:'Zeitraum',exact:true});await sheet.getByRole('radio',{name:periodNames[months],exact:true}).click();await sheet.waitFor({state:'hidden'});}else await control.getByRole('button',{name:periodNames[months],exact:true}).click();assert.equal(await control.locator('.bo-period-segments button[aria-pressed=true]').getAttribute('aria-label'),periodNames[months],'One active period follows the actual shared control');}
@@ -467,18 +467,19 @@ try{
       else{assert.equal(shape.label,false,'Mobile creation uses its icon');assert.equal(shape.short,false,'No competing text inside the round action');assert.ok(shape.width>=44&&shape.height>=44,'Creation keeps its touch target');assert.equal(shape.radius,'50%','Approved mobile creation is circular');}
     }
     // Snapshot values in one browser task: query hydration can replace metric nodes between awaited locator calls.
-    const moneyDirections=await page.locator('.metric-money').evaluateAll(nodes=>nodes.filter(el=>el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden').map(el=>({direction:getComputedStyle(el).flexDirection,compact:!!el.closest('.app-root[data-ux="master-v3"] .bo-cash-overview[data-compact]')})));
+    const moneyDirections=await page.evaluate(()=>[...document.querySelectorAll('.metric-money')].filter(el=>el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden').map(el=>({direction:getComputedStyle(el).flexDirection,compact:!!el.closest('.app-root[data-ux="master-v3"] .bo-cash-overview[data-compact]')})));
     for(const {direction,compact} of moneyDirections){
       assert.equal(direction,compact?'row':width<=760?'column-reverse':'row',`${route} ${width}px: compact KPIs keep CHF beside the amount; existing other KPI arrangements remain`);
     }
     assert.ok(geometry.sort.every(size=>size<=44),`${route}: sorting control is too wide`);
     const compactCards=page.locator('.app-root[data-ux="master-v3"] .bo-cash-overview[data-compact] .metric');
     if(await compactCards.count()){
-      const cards=await compactCards.evaluateAll(nodes=>nodes.map(el=>{const box=el.getBoundingClientRect(),style=getComputedStyle(el);return {height:box.height,padding:style.padding,borders:[style.borderTopWidth,style.borderRightWidth,style.borderBottomWidth,style.borderLeftWidth]}}));
+      const cards=await page.evaluate(()=>[...document.querySelectorAll('.app-root[data-ux="master-v3"] .bo-cash-overview[data-compact] .metric')].map(el=>{const box=el.getBoundingClientRect(),style=getComputedStyle(el);return {height:box.height,padding:style.padding,borders:[style.borderTopWidth,style.borderRightWidth,style.borderBottomWidth,style.borderLeftWidth]}}));
+      assert.equal(cards.length,4,`${route}: all four compact KPI cards participate in the geometry check`);
       assert.ok(cards.every(card=>card.borders.every(border=>border==='1px')&&Math.abs(card.height-cards[0].height)<1&&card.padding===cards[0].padding),`${route}: approved compact KPI cards have equal heights, padding and thin borders`);
     }
-    const otherMetricDividers=await page.locator('.metric,.finance-flow-primary,.finance-flow-result,.finance-flow-costs,.finance-flow-costs>div').evaluateAll(nodes=>nodes.filter(el=>!el.closest('.app-root[data-ux="master-v3"] .bo-cash-overview[data-compact]')).map(el=>getComputedStyle(el).borderLeftWidth));
-    assert.ok(otherMetricDividers.every(size=>parseFloat(size)===0),`${route}: other metrics retain their existing divider contract`);
+    const otherMetricDividers=(await measureMetricDividers(page)).filter(metric=>!metric.compact);
+    assert.ok(otherMetricDividers.every(metric=>parseFloat(metric.left)===0),`${route} ${theme} ${width}px: other metrics retain their existing divider contract ${JSON.stringify(otherMetricDividers)}`);
     for(const section of await page.locator('.page-container :is(.surface,.detail-card,.timer-card,.invoice-form)').filter({visible:true}).all()){
       const sectionShape=await section.evaluate(el=>({radius:getComputedStyle(el).borderRadius,compactTimeCard:el.matches('.app-root[data-ux="master-v3"] .page-container[data-section="zeit"] .time-section')&&matchMedia('(max-width:760px)').matches}));
       assert.equal(sectionShape.radius,sectionShape.compactTimeCard?'14px':'0px',`${route}: approved mobile time cards retain the shared radius; other open sections retain their existing shape`);

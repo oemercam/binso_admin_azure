@@ -9,9 +9,14 @@ export async function measureListFrameBorders(page){
  }));
 }
 
+/** Query and read KPI borders atomically, without carrying handles across a rerender. */
+export async function measureMetricDividers(page){
+ return page.evaluate(()=>[...document.querySelectorAll('.metric,.finance-flow-primary,.finance-flow-result,.finance-flow-costs,.finance-flow-costs>div')].map(el=>({left:getComputedStyle(el).borderLeftWidth,compact:!!el.closest('.app-root[data-ux="master-v3"] .bo-cash-overview[data-compact]')})));
+}
+
 /** Real-browser countercases: detached snapshots, live borders and hidden tables. */
 export async function verifyListFrameMeasurement(page){
- await page.setContent('<div class="records" style="width:200px;height:40px">Old list</div><div class="desktop-record-table" style="display:none;border:1px solid">Hidden table</div>');
+ await page.setContent('<div class="records metric" style="width:200px;height:40px">Old list</div><div class="desktop-record-table" style="display:none;border:1px solid">Hidden table</div>');
  const detached=await page.locator('.records').elementHandle();
  try{
   await page.evaluate(()=>{const next=document.querySelector('.records').cloneNode(true);document.querySelector('.records').replaceWith(next);});
@@ -22,6 +27,9 @@ export async function verifyListFrameMeasurement(page){
   assert.equal((await measureListFrameBorders(page))[0].top,'1px','A real leading separator remains a failing measurement');
   await page.locator('.records').evaluate(el=>{el.style.borderTop='0';el.style.borderBottom='1px solid';});
   assert.equal((await measureListFrameBorders(page))[0].bottom,'1px','A real terminal separator remains a failing measurement');
+  assert.deepEqual(await measureMetricDividers(page),[{left:'0px',compact:false}],'KPI measurement queries the connected replacement in the same DOM turn');
+  await page.locator('.metric').evaluate(el=>{el.style.borderLeft='1px solid';});
+  assert.deepEqual(await measureMetricDividers(page),[{left:'1px',compact:false}],'A real noncompact KPI divider remains visible to the strict zero-border assertion');
  }finally{await detached.dispose();}
 }
 
