@@ -173,7 +173,7 @@ export async function waitForLabReady(page){
 
 /** V4.1 settings edit action belongs to the visible detail header on every viewport. */
 export async function openSettingsEditor(page){
- const header=page.locator('.mobile-header,.desktop-appbar').filter({visible:true});
+ const header=page.locator('.mobile-header,.bo-detail-commandbar').filter({visible:true});
  await header.getByRole('button',{name:'Weitere Aktionen',exact:true}).click();
  const actions=page.getByRole('dialog',{name:'Weitere Aktionen',exact:true});
  await actions.waitFor({state:'visible'});
