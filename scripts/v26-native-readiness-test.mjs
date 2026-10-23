@@ -1,3 +1,5 @@
+import {verifySupplierApprovalPolicy} from './supplier-approval-policy-contract.mjs';
+import {verifySupplierInvoiceReview} from './supplier-invoice-review-contract.mjs';
 import {verifySupplierInvoiceMatch} from './supplier-invoice-match-contract.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';import path from 'node:path';import {createRequire} from 'node:module';import {randomUUID,randomBytes} from 'node:crypto';import ts from 'typescript';import pg from 'pg';
@@ -39,5 +41,6 @@ try{
  const lock=await pool.connect();await lock.query('begin');await lock.query('select id from time_entries where id=$1 for update',[f.entryId]);const pending=[route.POST(request(body)),route.POST(request(body))];let waiting=0;
  try{for(let i=0;i<100;i++){waiting=(await db.query("select count(*)::int n from pg_stat_activity where application_name='binso-v26-readiness' and wait_event_type='Lock'")).rows[0].n;if(waiting>=2)break;await new Promise(r=>setTimeout(r,50));}assert.ok(waiting>=2,'Both distinct database connections must be simultaneously blocked, rather than a serial mock');}finally{await lock.query('commit');lock.release();}
  const results=await Promise.all(pending);assert.deepEqual(results.map(r=>r.status).sort(),[201,409]);const reserved=(await db.query('select sum(allocated_minutes)::int n from invoice_line_time_entries where time_entry_id=$1',[f.entryId])).rows[0].n;assert.equal(reserved,80,'Only one80-minute reservation fits the120-minute source');const win=await results.find(r=>r.status===201).json();assert.equal((await detail.DELETE(request({expectedUpdatedAt:win.item.document_revision},randomUUID(),'DELETE'),{params:Promise.resolve({number:win.item.number})})).status,200);assert.equal((await db.query('select count(*)::int n from invoice_line_time_entries where time_entry_id=$1',[f.entryId])).rows[0].n,0);console.log('PASS: two native blocked connections,80+80 against120 -> one201/one409,80 reserved, explicit draft discard restores120 available.');
- await verifyMinuteAllocations({...common,fixture:priced});await verifySupplierInvoiceMatch({...common,fixture:priced});console.log('Native V26 targeted readiness contracts passed. Browser, full release CI and business completion remain separate.');
+ await verifyMinuteAllocations({...common,fixture:priced});await verifySupplierInvoiceMatch({...common,fixture:priced});
+ await verifySupplierApprovalPolicy(common);await verifySupplierInvoiceReview(common);console.log('Native V26 targeted readiness contracts passed. Browser, full release CI and business completion remain separate.');
 }finally{await pool.end();}

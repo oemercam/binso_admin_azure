@@ -1,3 +1,5 @@
+import {verifySupplierApprovalPolicy} from './supplier-approval-policy-contract.mjs';
+import {verifySupplierInvoiceReview} from './supplier-invoice-review-contract.mjs';
 import {verifySupplierInvoiceMatch} from './supplier-invoice-match-contract.mjs';
 import {verifyMinuteAllocations} from './time-minute-allocation-contract.mjs';
 import {verifyTimePriceSources} from './time-price-source-contract.mjs';
@@ -200,6 +202,7 @@ try{
  const minuteFixture=await verifyTimePriceSources({load,db,transaction,org,other,act,request,fixture:timePriceFixture,setAuditFailure:value=>{auditFailure=value;}});
  await verifyMinuteAllocations({load,db,transaction,org,other,act,request,fixture:minuteFixture,setAuditFailure:value=>{auditFailure=value;}});
  await verifySupplierInvoiceMatch({load,db,transaction,org,other,act,request,setAuditFailure:value=>{auditFailure=value;},fixture:minuteFixture});
+ await verifySupplierApprovalPolicy({load,db,transaction,org,other,act,request,setAuditFailure:value=>{auditFailure=value;}});await verifySupplierInvoiceReview({load,db,transaction,org,other,act,request,setAuditFailure:value=>{auditFailure=value;}});
  invitationPlatformEnabled=true;
  try{await verifyInvitationContract({load,mock,db,transaction,org,other,act,request,setAuditFailure:value=>{auditFailure=value;}});}finally{invitationPlatformEnabled=false;}
  mock('lib/server/maintenance.ts',{maintenanceState:async()=>({enabled:false,endsAt:null})});

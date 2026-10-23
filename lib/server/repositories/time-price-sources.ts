@@ -26,7 +26,7 @@ async function performance(c:PoolClient,s:SessionUser,id:string,write=false){
 export async function timePriceState(c:PoolClient,s:SessionUser,id:string,side:TimePriceSide){
  await permission(c,s,side);const time=await performance(c,s,id);
  const item=(await c.query(`select ${fields} from time_price_sources where organization_id=$1 and time_entry_id=$2 and side=$3 and is_current`,[s.organizationId,time.id,side])).rows[0]??null;
- const allocated=(await c.query('select 1 from invoice_line_time_entries where organization_id=$1 and time_entry_id=$2 limit 1',[s.organizationId,time.id])).rowCount!==0;
+ const allocated=(await c.query("select 1 from invoice_line_time_entries where organization_id=$1 and time_entry_id=$2 union all select 1 from supplier_invoice_review_sources where organization_id=$1 and time_entry_id=$2 and $3='purchase' limit 1",[s.organizationId,time.id,side])).rowCount!==0;
  return {time,item,allocated};
 }
 export async function bindTimePriceSource(c:PoolClient,s:SessionUser,id:string,input:unknown,key:string){
@@ -38,7 +38,7 @@ export async function bindTimePriceSource(c:PoolClient,s:SessionUser,id:string,i
  return idempotentBusiness(c,{organizationId:s.organizationId,userId:s.userId,operation:'time.price.bind',key,body:{id,...b}},async()=>{
   const current=(await c.query('select id,revision from time_price_sources where organization_id=$1 and time_entry_id=$2 and side=$3 and is_current',[s.organizationId,time.id,side])).rows[0];
   if(time.version!==b.expectedTimeRevision||(current?.revision??0)!==b.expectedRevision)throw new ApiError(409,'price_source_changed','Die Leistung oder Preisbindung wurde geändert. Bitte erneut prüfen.');
-  if((await c.query('select 1 from invoice_line_time_entries where organization_id=$1 and time_entry_id=$2 limit 1',[s.organizationId,time.id])).rowCount)throw new ApiError(409,'price_source_locked','Bereits zugeordnete Leistungen behalten ihre gespeicherte Preisquelle.');
+  if((await c.query("select 1 from invoice_line_time_entries where organization_id=$1 and time_entry_id=$2 union all select 1 from supplier_invoice_review_sources where organization_id=$1 and time_entry_id=$2 and $3='purchase' limit 1",[s.organizationId,time.id,side])).rowCount)throw new ApiError(409,'price_source_locked','Bereits zugeordnete Leistungen behalten ihre gespeicherte Preisquelle.');
   const source=await approvedContractCondition(c,s,{contractId:String(b.contractId),conditionId:String(b.conditionId),date:String(time.work_date),side,customerId:side==='sale'?time.customer_id:null,supplierId:side==='purchase'?time.supplier_id:null,projectId:time.project_id,resourceId:time.external_resource_id});
   if(source.unit!=='hour')throw new ApiError(409,'price_unit_mismatch','Diese Stundenleistung benötigt einen ausdrücklich freigegebenen Stundensatz.');
   if(source.contractVersion!==b.expectedContractVersion||source.conditionRevisionId!==b.expectedConditionRevisionId)throw new ApiError(409,'price_source_changed','Die Leistung oder Preisbindung wurde geändert. Bitte erneut prüfen.');

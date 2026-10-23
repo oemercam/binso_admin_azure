@@ -7401,6 +7401,61 @@
       ]
     },
     {
+      "route": "/api/suppliers/[id]/invoices/[invoiceId]/review",
+      "file": "app/api/suppliers/[id]/invoices/[invoiceId]/review/route.ts",
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "imports": [
+        {
+          "local": "requireSession",
+          "target": "lib/server/session.ts",
+          "exported": "requireSession"
+        },
+        {
+          "local": "requireModuleEntitlement",
+          "target": "lib/server/plan-access.ts",
+          "exported": "requireModuleEntitlement"
+        },
+        {
+          "local": "withTenant",
+          "target": "lib/server/db.ts",
+          "exported": "withTenant"
+        },
+        {
+          "local": "apiError",
+          "target": "lib/server/http.ts",
+          "exported": "apiError"
+        },
+        {
+          "local": "assertSameOrigin",
+          "target": "lib/server/http.ts",
+          "exported": "assertSameOrigin"
+        },
+        {
+          "local": "json",
+          "target": "lib/server/http.ts",
+          "exported": "json"
+        },
+        {
+          "local": "readJson",
+          "target": "lib/server/http.ts",
+          "exported": "readJson"
+        },
+        {
+          "local": "supplierInvoiceReviews",
+          "target": "lib/server/repositories/supplier-invoice-reviews.ts",
+          "exported": "supplierInvoiceReviews"
+        },
+        {
+          "local": "reviewSupplierInvoice",
+          "target": "lib/server/repositories/supplier-invoice-reviews.ts",
+          "exported": "reviewSupplierInvoice"
+        }
+      ]
+    },
+    {
       "route": "/api/suppliers/[id]/invoices",
       "file": "app/api/suppliers/[id]/invoices/route.ts",
       "methods": [
@@ -7676,6 +7731,61 @@
           "local": "writeSupplier",
           "target": "lib/server/repositories/suppliers.ts",
           "exported": "writeSupplier"
+        }
+      ]
+    },
+    {
+      "route": "/api/suppliers/approval-policy",
+      "file": "app/api/suppliers/approval-policy/route.ts",
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "imports": [
+        {
+          "local": "requireSession",
+          "target": "lib/server/session.ts",
+          "exported": "requireSession"
+        },
+        {
+          "local": "requireModuleEntitlement",
+          "target": "lib/server/plan-access.ts",
+          "exported": "requireModuleEntitlement"
+        },
+        {
+          "local": "withTenant",
+          "target": "lib/server/db.ts",
+          "exported": "withTenant"
+        },
+        {
+          "local": "apiError",
+          "target": "lib/server/http.ts",
+          "exported": "apiError"
+        },
+        {
+          "local": "assertSameOrigin",
+          "target": "lib/server/http.ts",
+          "exported": "assertSameOrigin"
+        },
+        {
+          "local": "json",
+          "target": "lib/server/http.ts",
+          "exported": "json"
+        },
+        {
+          "local": "readJson",
+          "target": "lib/server/http.ts",
+          "exported": "readJson"
+        },
+        {
+          "local": "supplierApprovalPolicy",
+          "target": "lib/server/repositories/supplier-approval-policy.ts",
+          "exported": "supplierApprovalPolicy"
+        },
+        {
+          "local": "saveSupplierApprovalPolicy",
+          "target": "lib/server/repositories/supplier-approval-policy.ts",
+          "exported": "saveSupplierApprovalPolicy"
         }
       ]
     },
@@ -84320,6 +84430,9 @@
         "components/supplier-invoices.tsx#blank",
         "components/supplier-invoices.tsx#SupplierInvoiceMatch",
         "components/supplier-invoices.tsx#Match",
+        "components/supplier-invoices.tsx#SupplierInvoiceReview",
+        "components/supplier-invoices.tsx#SupplierApprovalPolicy",
+        "components/supplier-invoices.tsx#SupplierApprovalPolicyEditor",
         "components/entity-files.tsx#EntityFiles",
         "components/entity-files.tsx#Attachment",
         "components/binso-ux.tsx#ListRow",
@@ -84613,6 +84726,11 @@
         "lib/money.ts#sum",
         "lib/money.ts#allocate",
         "lib/money.ts#exact",
+        "components/supplier-invoices.tsx#SupplierInvoiceReview",
+        "components/supplier-invoices.tsx#SupplierApprovalPolicy",
+        "lib/supplier-approval-policy.ts#APApprovalPolicy",
+        "components/supplier-invoices.tsx#SupplierApprovalPolicyEditor",
+        "lib/supplier-approval-policy.ts#apApprovalRoles",
         "components/entity-files.tsx#EntityFiles",
         "lib/file-associations.ts#fileRelations",
         "components/entity-files.tsx#Attachment",
@@ -84884,6 +85002,9 @@
         "components/supplier-invoices.tsx#blank",
         "components/supplier-invoices.tsx#SupplierInvoiceMatch",
         "components/supplier-invoices.tsx#Match",
+        "components/supplier-invoices.tsx#SupplierInvoiceReview",
+        "components/supplier-invoices.tsx#SupplierApprovalPolicy",
+        "components/supplier-invoices.tsx#SupplierApprovalPolicyEditor",
         "components/entity-files.tsx#EntityFiles",
         "components/entity-files.tsx#Attachment",
         "components/binso-ux.tsx#ListRow",
@@ -85194,6 +85315,11 @@
         "lib/money.ts#sum",
         "lib/money.ts#allocate",
         "lib/money.ts#exact",
+        "components/supplier-invoices.tsx#SupplierInvoiceReview",
+        "components/supplier-invoices.tsx#SupplierApprovalPolicy",
+        "lib/supplier-approval-policy.ts#APApprovalPolicy",
+        "components/supplier-invoices.tsx#SupplierApprovalPolicyEditor",
+        "lib/supplier-approval-policy.ts#apApprovalRoles",
         "components/entity-files.tsx#EntityFiles",
         "lib/file-associations.ts#fileRelations",
         "components/entity-files.tsx#Attachment",
@@ -86167,6 +86293,7 @@
         "/api/time-tracker",
         "/api/operator/preferences",
         "/api/suppliers/",
+        "/api/suppliers/approval-policy",
         "/api/files?",
         "/api/files/",
         "/api/files",
@@ -86335,41 +86462,16 @@
         },
         {
           "tag": "FormSheet",
-          "line": 44,
-          "component": "components/supplier-invoices.tsx#SupplierInvoices"
-        },
-        {
-          "tag": "FormSheet",
-          "line": 45,
-          "component": "components/supplier-invoices.tsx#SupplierInvoices"
-        },
-        {
-          "tag": "form",
-          "line": 46,
-          "component": "components/supplier-invoices.tsx#SupplierInvoices"
-        },
-        {
-          "tag": "Field",
-          "line": 47,
-          "component": "components/supplier-invoices.tsx#SupplierInvoices"
-        },
-        {
-          "tag": "Field",
-          "line": 48,
-          "component": "components/supplier-invoices.tsx#SupplierInvoices"
-        },
-        {
-          "tag": "Field",
           "line": 49,
           "component": "components/supplier-invoices.tsx#SupplierInvoices"
         },
         {
-          "tag": "Field",
+          "tag": "FormSheet",
           "line": 50,
           "component": "components/supplier-invoices.tsx#SupplierInvoices"
         },
         {
-          "tag": "Field",
+          "tag": "form",
           "line": 51,
           "component": "components/supplier-invoices.tsx#SupplierInvoices"
         },
@@ -86389,29 +86491,84 @@
           "component": "components/supplier-invoices.tsx#SupplierInvoices"
         },
         {
+          "tag": "Field",
+          "line": 55,
+          "component": "components/supplier-invoices.tsx#SupplierInvoices"
+        },
+        {
+          "tag": "Field",
+          "line": 56,
+          "component": "components/supplier-invoices.tsx#SupplierInvoices"
+        },
+        {
+          "tag": "Field",
+          "line": 57,
+          "component": "components/supplier-invoices.tsx#SupplierInvoices"
+        },
+        {
+          "tag": "Field",
+          "line": 58,
+          "component": "components/supplier-invoices.tsx#SupplierInvoices"
+        },
+        {
+          "tag": "Field",
+          "line": 59,
+          "component": "components/supplier-invoices.tsx#SupplierInvoices"
+        },
+        {
           "tag": "FormSheet",
+          "line": 128,
+          "component": "components/supplier-invoices.tsx#SupplierInvoiceMatch"
+        },
+        {
+          "tag": "Field",
+          "line": 131,
+          "component": "components/supplier-invoices.tsx#SupplierInvoiceMatch"
+        },
+        {
+          "tag": "Field",
+          "line": 131,
+          "component": "components/supplier-invoices.tsx#SupplierInvoiceMatch"
+        },
+        {
+          "tag": "Field",
+          "line": 136,
+          "component": "components/supplier-invoices.tsx#SupplierInvoiceMatch"
+        },
+        {
+          "tag": "Field",
+          "line": 136,
+          "component": "components/supplier-invoices.tsx#SupplierInvoiceMatch"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 97,
+          "component": "components/supplier-invoices.tsx#SupplierInvoiceReview"
+        },
+        {
+          "tag": "Field",
+          "line": 102,
+          "component": "components/supplier-invoices.tsx#SupplierInvoiceReview"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 70,
+          "component": "components/supplier-invoices.tsx#SupplierApprovalPolicy"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 79,
+          "component": "components/supplier-invoices.tsx#SupplierApprovalPolicyEditor"
+        },
+        {
+          "tag": "Field",
           "line": 81,
-          "component": "components/supplier-invoices.tsx#SupplierInvoiceMatch"
+          "component": "components/supplier-invoices.tsx#SupplierApprovalPolicyEditor"
         },
         {
           "tag": "Field",
-          "line": 84,
-          "component": "components/supplier-invoices.tsx#SupplierInvoiceMatch"
-        },
-        {
-          "tag": "Field",
-          "line": 84,
-          "component": "components/supplier-invoices.tsx#SupplierInvoiceMatch"
-        },
-        {
-          "tag": "Field",
-          "line": 89,
-          "component": "components/supplier-invoices.tsx#SupplierInvoiceMatch"
-        },
-        {
-          "tag": "Field",
-          "line": 89,
-          "component": "components/supplier-invoices.tsx#SupplierInvoiceMatch"
+          "line": 83,
+          "component": "components/supplier-invoices.tsx#SupplierApprovalPolicyEditor"
         },
         {
           "tag": "ListSearch",
@@ -86720,6 +86877,9 @@
         "components/supplier-invoices.tsx#blank",
         "components/supplier-invoices.tsx#SupplierInvoiceMatch",
         "components/supplier-invoices.tsx#Match",
+        "components/supplier-invoices.tsx#SupplierInvoiceReview",
+        "components/supplier-invoices.tsx#SupplierApprovalPolicy",
+        "components/supplier-invoices.tsx#SupplierApprovalPolicyEditor",
         "components/entity-files.tsx#EntityFiles",
         "components/entity-files.tsx#Attachment",
         "components/binso-ux.tsx#ListRow",
@@ -87013,6 +87173,11 @@
         "lib/money.ts#sum",
         "lib/money.ts#allocate",
         "lib/money.ts#exact",
+        "components/supplier-invoices.tsx#SupplierInvoiceReview",
+        "components/supplier-invoices.tsx#SupplierApprovalPolicy",
+        "lib/supplier-approval-policy.ts#APApprovalPolicy",
+        "components/supplier-invoices.tsx#SupplierApprovalPolicyEditor",
+        "lib/supplier-approval-policy.ts#apApprovalRoles",
         "components/entity-files.tsx#EntityFiles",
         "lib/file-associations.ts#fileRelations",
         "components/entity-files.tsx#Attachment",
@@ -87284,6 +87449,9 @@
         "components/supplier-invoices.tsx#blank",
         "components/supplier-invoices.tsx#SupplierInvoiceMatch",
         "components/supplier-invoices.tsx#Match",
+        "components/supplier-invoices.tsx#SupplierInvoiceReview",
+        "components/supplier-invoices.tsx#SupplierApprovalPolicy",
+        "components/supplier-invoices.tsx#SupplierApprovalPolicyEditor",
         "components/entity-files.tsx#EntityFiles",
         "components/entity-files.tsx#Attachment",
         "components/binso-ux.tsx#ListRow",
@@ -87594,6 +87762,11 @@
         "lib/money.ts#sum",
         "lib/money.ts#allocate",
         "lib/money.ts#exact",
+        "components/supplier-invoices.tsx#SupplierInvoiceReview",
+        "components/supplier-invoices.tsx#SupplierApprovalPolicy",
+        "lib/supplier-approval-policy.ts#APApprovalPolicy",
+        "components/supplier-invoices.tsx#SupplierApprovalPolicyEditor",
+        "lib/supplier-approval-policy.ts#apApprovalRoles",
         "components/entity-files.tsx#EntityFiles",
         "lib/file-associations.ts#fileRelations",
         "components/entity-files.tsx#Attachment",
@@ -88567,6 +88740,7 @@
         "/api/time-tracker",
         "/api/operator/preferences",
         "/api/suppliers/",
+        "/api/suppliers/approval-policy",
         "/api/files?",
         "/api/files/",
         "/api/files",
@@ -88735,41 +88909,16 @@
         },
         {
           "tag": "FormSheet",
-          "line": 44,
-          "component": "components/supplier-invoices.tsx#SupplierInvoices"
-        },
-        {
-          "tag": "FormSheet",
-          "line": 45,
-          "component": "components/supplier-invoices.tsx#SupplierInvoices"
-        },
-        {
-          "tag": "form",
-          "line": 46,
-          "component": "components/supplier-invoices.tsx#SupplierInvoices"
-        },
-        {
-          "tag": "Field",
-          "line": 47,
-          "component": "components/supplier-invoices.tsx#SupplierInvoices"
-        },
-        {
-          "tag": "Field",
-          "line": 48,
-          "component": "components/supplier-invoices.tsx#SupplierInvoices"
-        },
-        {
-          "tag": "Field",
           "line": 49,
           "component": "components/supplier-invoices.tsx#SupplierInvoices"
         },
         {
-          "tag": "Field",
+          "tag": "FormSheet",
           "line": 50,
           "component": "components/supplier-invoices.tsx#SupplierInvoices"
         },
         {
-          "tag": "Field",
+          "tag": "form",
           "line": 51,
           "component": "components/supplier-invoices.tsx#SupplierInvoices"
         },
@@ -88789,29 +88938,84 @@
           "component": "components/supplier-invoices.tsx#SupplierInvoices"
         },
         {
+          "tag": "Field",
+          "line": 55,
+          "component": "components/supplier-invoices.tsx#SupplierInvoices"
+        },
+        {
+          "tag": "Field",
+          "line": 56,
+          "component": "components/supplier-invoices.tsx#SupplierInvoices"
+        },
+        {
+          "tag": "Field",
+          "line": 57,
+          "component": "components/supplier-invoices.tsx#SupplierInvoices"
+        },
+        {
+          "tag": "Field",
+          "line": 58,
+          "component": "components/supplier-invoices.tsx#SupplierInvoices"
+        },
+        {
+          "tag": "Field",
+          "line": 59,
+          "component": "components/supplier-invoices.tsx#SupplierInvoices"
+        },
+        {
           "tag": "FormSheet",
+          "line": 128,
+          "component": "components/supplier-invoices.tsx#SupplierInvoiceMatch"
+        },
+        {
+          "tag": "Field",
+          "line": 131,
+          "component": "components/supplier-invoices.tsx#SupplierInvoiceMatch"
+        },
+        {
+          "tag": "Field",
+          "line": 131,
+          "component": "components/supplier-invoices.tsx#SupplierInvoiceMatch"
+        },
+        {
+          "tag": "Field",
+          "line": 136,
+          "component": "components/supplier-invoices.tsx#SupplierInvoiceMatch"
+        },
+        {
+          "tag": "Field",
+          "line": 136,
+          "component": "components/supplier-invoices.tsx#SupplierInvoiceMatch"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 97,
+          "component": "components/supplier-invoices.tsx#SupplierInvoiceReview"
+        },
+        {
+          "tag": "Field",
+          "line": 102,
+          "component": "components/supplier-invoices.tsx#SupplierInvoiceReview"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 70,
+          "component": "components/supplier-invoices.tsx#SupplierApprovalPolicy"
+        },
+        {
+          "tag": "FormSheet",
+          "line": 79,
+          "component": "components/supplier-invoices.tsx#SupplierApprovalPolicyEditor"
+        },
+        {
+          "tag": "Field",
           "line": 81,
-          "component": "components/supplier-invoices.tsx#SupplierInvoiceMatch"
+          "component": "components/supplier-invoices.tsx#SupplierApprovalPolicyEditor"
         },
         {
           "tag": "Field",
-          "line": 84,
-          "component": "components/supplier-invoices.tsx#SupplierInvoiceMatch"
-        },
-        {
-          "tag": "Field",
-          "line": 84,
-          "component": "components/supplier-invoices.tsx#SupplierInvoiceMatch"
-        },
-        {
-          "tag": "Field",
-          "line": 89,
-          "component": "components/supplier-invoices.tsx#SupplierInvoiceMatch"
-        },
-        {
-          "tag": "Field",
-          "line": 89,
-          "component": "components/supplier-invoices.tsx#SupplierInvoiceMatch"
+          "line": 83,
+          "component": "components/supplier-invoices.tsx#SupplierApprovalPolicyEditor"
         },
         {
           "tag": "ListSearch",
@@ -227690,7 +227894,7 @@
       "key": "components/supplier-invoices.tsx#SupplierInvoices",
       "file": "components/supplier-invoices.tsx",
       "name": "SupplierInvoices",
-      "line": 17,
+      "line": 18,
       "classes": [
         "surface",
         "technical-hint",
@@ -227706,34 +227910,14 @@
       "widgets": [
         {
           "tag": "FormSheet",
-          "line": 44
-        },
-        {
-          "tag": "FormSheet",
-          "line": 45
-        },
-        {
-          "tag": "form",
-          "line": 46
-        },
-        {
-          "tag": "Field",
-          "line": 47
-        },
-        {
-          "tag": "Field",
-          "line": 48
-        },
-        {
-          "tag": "Field",
           "line": 49
         },
         {
-          "tag": "Field",
+          "tag": "FormSheet",
           "line": 50
         },
         {
-          "tag": "Field",
+          "tag": "form",
           "line": 51
         },
         {
@@ -227747,34 +227931,54 @@
         {
           "tag": "Field",
           "line": 54
+        },
+        {
+          "tag": "Field",
+          "line": 55
+        },
+        {
+          "tag": "Field",
+          "line": 56
+        },
+        {
+          "tag": "Field",
+          "line": 57
+        },
+        {
+          "tag": "Field",
+          "line": 58
+        },
+        {
+          "tag": "Field",
+          "line": 59
         }
       ],
       "elements": [
         {
           "tag": "section",
-          "line": 39,
+          "line": 42,
           "props": [
             "className=\"surface\""
           ]
         },
         {
           "tag": "SectionTitle",
-          "line": 40,
+          "line": 43,
           "props": [
             "title=\"Eingangsrechnungen\"",
-            "action={mayWrite?<ActionsMenu label=\"Eingangsrechnungen\"><ActionRow requiresWrite icon=\"plus\" title=\"Eingangsrechnungsentwurf\" onClick={()=>edit(null)}/></ActionsMenu>:undefined}"
+            "action={<ActionsMenu label=\"Eingangsrechnungen\">{mayWrite&&<ActionRow requiresWrite icon=\"plus\" title=\"Eingangsrechnungsentwurf\" onClick={()=>edit(null)}/>}<ActionRow icon=\"settings\" title=\"Freigaberegeln\" onClick={()=>setPolicyOpen(true)}/></ActionsMenu>}"
           ]
         },
         {
           "tag": "ActionsMenu",
-          "line": 40,
+          "line": 43,
           "props": [
             "label=\"Eingangsrechnungen\""
           ]
         },
         {
           "tag": "ActionRow",
-          "line": 40,
+          "line": 43,
           "props": [
             "requiresWrite",
             "icon=\"plus\"",
@@ -227783,46 +227987,55 @@
           ]
         },
         {
+          "tag": "ActionRow",
+          "line": 43,
+          "props": [
+            "icon=\"settings\"",
+            "title=\"Freigaberegeln\"",
+            "onClick={()=>setPolicyOpen(true)}"
+          ]
+        },
+        {
           "tag": "p",
-          "line": 41,
+          "line": 44,
           "props": [
             "className=\"technical-hint\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 41,
+          "line": 44,
           "props": []
         },
         {
           "tag": "LoadingState",
-          "line": 42,
+          "line": 45,
           "props": []
         },
         {
           "tag": "ErrorState",
-          "line": 42,
+          "line": 45,
           "props": [
             "onRetry={query.refresh}"
           ]
         },
         {
           "tag": "EmptyState",
-          "line": 42,
+          "line": 45,
           "props": [
             "title=\"Keine Eingangsrechnungen\""
           ]
         },
         {
           "tag": "div",
-          "line": 42,
+          "line": 45,
           "props": [
             "className=\"action-list\""
           ]
         },
         {
           "tag": "div",
-          "line": 42,
+          "line": 45,
           "props": [
             "key={invoice.id}",
             "className=\"assignment-row\""
@@ -227830,54 +228043,54 @@
         },
         {
           "tag": "div",
-          "line": 42,
+          "line": 45,
           "props": []
         },
         {
           "tag": "b",
-          "line": 42,
+          "line": 45,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 42,
+          "line": 45,
           "props": []
         },
         {
           "tag": "p",
-          "line": 42,
+          "line": 45,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 42,
+          "line": 45,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 42,
+          "line": 45,
           "props": []
         },
         {
           "tag": "span",
-          "line": 42,
+          "line": 45,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 42,
+          "line": 45,
           "props": []
         },
         {
           "tag": "ActionsMenu",
-          "line": 42,
+          "line": 45,
           "props": [
             "label=\"Eingangsrechnungen\""
           ]
         },
         {
           "tag": "ActionRow",
-          "line": 42,
+          "line": 45,
           "props": [
             "icon=\"file\"",
             "title=\"Belege\"",
@@ -227886,7 +228099,16 @@
         },
         {
           "tag": "ActionRow",
-          "line": 42,
+          "line": 45,
+          "props": [
+            "icon=\"check\"",
+            "title=\"Rechnung prüfen\"",
+            "onClick={()=>setReviewing({invoice,scope})}"
+          ]
+        },
+        {
+          "tag": "ActionRow",
+          "line": 45,
           "props": [
             "icon=\"receipt\"",
             "title=\"Leistungen abgleichen\"",
@@ -227895,7 +228117,7 @@
         },
         {
           "tag": "ActionRow",
-          "line": 42,
+          "line": 45,
           "props": [
             "requiresWrite",
             "icon=\"edit\"",
@@ -227905,7 +228127,7 @@
         },
         {
           "tag": "SupplierInvoiceMatch",
-          "line": 43,
+          "line": 46,
           "props": [
             "key={scope+matching.invoice.id}",
             "supplierId={supplierId}",
@@ -227915,8 +228137,29 @@
           ]
         },
         {
+          "tag": "SupplierInvoiceReview",
+          "line": 47,
+          "props": [
+            "key={scope+reviewing.invoice.id}",
+            "supplierId={supplierId}",
+            "invoice={reviewing.invoice}",
+            "mayWrite={mayWrite}",
+            "onClose={()=>setReviewing(null)}",
+            "onSaved={()=>{setReviewing(null);query.refresh();}}",
+            "onMatch={()=>{setMatching({invoice:reviewing.invoice,scope});setReviewing(null);}}"
+          ]
+        },
+        {
+          "tag": "SupplierApprovalPolicy",
+          "line": 48,
+          "props": [
+            "key={scope}",
+            "onClose={()=>setPolicyOpen(false)}"
+          ]
+        },
+        {
           "tag": "FormSheet",
-          "line": 44,
+          "line": 49,
           "props": [
             "open",
             "onClose={()=>setReceipts(null)}",
@@ -227925,7 +228168,7 @@
         },
         {
           "tag": "EntityFiles",
-          "line": 44,
+          "line": 49,
           "props": [
             "purpose=\"supplier_invoice_receipt\"",
             "entityId={receipts.id}",
@@ -227935,7 +228178,7 @@
         },
         {
           "tag": "FormSheet",
-          "line": 45,
+          "line": 50,
           "props": [
             "open={open}",
             "onClose={()=>setOpen(false)}",
@@ -227946,7 +228189,7 @@
         },
         {
           "tag": "form",
-          "line": 46,
+          "line": 51,
           "props": [
             "id={formId}",
             "onSubmit={event=>{event.preventDefault();void save();}}"
@@ -227954,21 +228197,21 @@
         },
         {
           "tag": "div",
-          "line": 46,
+          "line": 51,
           "props": [
             "className=\"form-grid two\""
           ]
         },
         {
           "tag": "Field",
-          "line": 47,
+          "line": 52,
           "props": [
             "label=\"Rechnungsnummer\""
           ]
         },
         {
           "tag": "Input",
-          "line": 47,
+          "line": 52,
           "props": [
             "maxLength={120}",
             "value={draft.number}",
@@ -227977,14 +228220,14 @@
         },
         {
           "tag": "Field",
-          "line": 48,
+          "line": 53,
           "props": [
             "label=\"Währung\""
           ]
         },
         {
           "tag": "Select",
-          "line": 48,
+          "line": 53,
           "props": [
             "value={draft.currency}",
             "onChange={event=>field('currency',event.target.value)}"
@@ -227992,40 +228235,40 @@
         },
         {
           "tag": "option",
-          "line": 48,
+          "line": 53,
           "props": [
             "value=\"\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 48,
+          "line": 53,
           "props": []
         },
         {
           "tag": "option",
-          "line": 48,
+          "line": 53,
           "props": [
             "value=\"CHF\""
           ]
         },
         {
           "tag": "option",
-          "line": 48,
+          "line": 53,
           "props": [
             "value=\"EUR\""
           ]
         },
         {
           "tag": "Field",
-          "line": 49,
+          "line": 54,
           "props": [
             "label=\"Rechnungsdatum\""
           ]
         },
         {
           "tag": "Input",
-          "line": 49,
+          "line": 54,
           "props": [
             "type=\"date\"",
             "value={draft.invoiceDate}",
@@ -228034,14 +228277,14 @@
         },
         {
           "tag": "Field",
-          "line": 50,
+          "line": 55,
           "props": [
             "label=\"Fällig am\""
           ]
         },
         {
           "tag": "Input",
-          "line": 50,
+          "line": 55,
           "props": [
             "type=\"date\"",
             "min={draft.invoiceDate||undefined}",
@@ -228051,14 +228294,14 @@
         },
         {
           "tag": "Field",
-          "line": 51,
+          "line": 56,
           "props": [
             "label=\"Nettobetrag\""
           ]
         },
         {
           "tag": "Input",
-          "line": 51,
+          "line": 56,
           "props": [
             "inputMode=\"decimal\"",
             "value={draft.netAmount}",
@@ -228067,14 +228310,14 @@
         },
         {
           "tag": "Field",
-          "line": 52,
+          "line": 57,
           "props": [
             "label=\"MwSt.-Betrag\""
           ]
         },
         {
           "tag": "Input",
-          "line": 52,
+          "line": 57,
           "props": [
             "inputMode=\"decimal\"",
             "value={draft.vatAmount}",
@@ -228083,14 +228326,14 @@
         },
         {
           "tag": "Field",
-          "line": 53,
+          "line": 58,
           "props": [
             "label=\"Gesamtbetrag\""
           ]
         },
         {
           "tag": "Input",
-          "line": 53,
+          "line": 58,
           "props": [
             "inputMode=\"decimal\"",
             "value={draft.totalAmount}",
@@ -228099,14 +228342,14 @@
         },
         {
           "tag": "Field",
-          "line": 54,
+          "line": 59,
           "props": [
             "label=\"Notiz\""
           ]
         },
         {
           "tag": "Input",
-          "line": 54,
+          "line": 59,
           "props": [
             "maxLength={2000}",
             "value={draft.note}",
@@ -228115,19 +228358,19 @@
         },
         {
           "tag": "ErrorState",
-          "line": 56,
+          "line": 61,
           "props": []
         },
         {
           "tag": "FormActions",
-          "line": 57,
+          "line": 62,
           "props": [
             "sheet"
           ]
         },
         {
           "tag": "Button",
-          "line": 57,
+          "line": 62,
           "props": [
             "variant=\"secondary\"",
             "disabled={busy}",
@@ -228136,12 +228379,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 57,
+          "line": 62,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 57,
+          "line": 62,
           "props": [
             "requiresWrite",
             "type=\"submit\"",
@@ -228151,58 +228394,58 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 57,
+          "line": 62,
           "props": []
         }
       ],
       "conditions": [
         {
-          "line": 24,
+          "line": 27,
           "expression": "invoice"
         },
         {
-          "line": 29,
+          "line": 32,
           "expression": "pending.current"
         },
         {
-          "line": 31,
+          "line": 34,
           "expression": "selected"
         },
         {
-          "line": 32,
+          "line": 35,
           "expression": "attempt.current?.body!==serialized"
         },
         {
-          "line": 34,
+          "line": 37,
           "expression": "!result.item?.id"
         },
         {
-          "line": 36,
+          "line": 39,
           "expression": "cause instanceof Error"
         },
         {
-          "line": 40,
-          "expression": "mayWrite"
-        },
-        {
-          "line": 42,
+          "line": 45,
           "expression": "query.loading"
         },
         {
-          "line": 42,
+          "line": 45,
           "expression": "query.error"
         },
         {
-          "line": 42,
+          "line": 45,
           "expression": "!query.data?.items.length"
         },
         {
-          "line": 42,
+          "line": 45,
           "expression": "invoice.total_amount===null"
         },
         {
-          "line": 42,
+          "line": 45,
           "expression": "invoice.currency"
+        },
+        {
+          "line": 45,
+          "expression": "invoice.v26_review_id"
         }
       ]
     },
@@ -228210,7 +228453,7 @@
       "key": "components/supplier-invoices.tsx#Invoice",
       "file": "components/supplier-invoices.tsx",
       "name": "Invoice",
-      "line": 14,
+      "line": 15,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -228222,7 +228465,7 @@
       "key": "components/supplier-invoices.tsx#Draft",
       "file": "components/supplier-invoices.tsx",
       "name": "Draft",
-      "line": 15,
+      "line": 16,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -228234,7 +228477,7 @@
       "key": "components/supplier-invoices.tsx#blank",
       "file": "components/supplier-invoices.tsx",
       "name": "blank",
-      "line": 16,
+      "line": 17,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -228246,7 +228489,7 @@
       "key": "components/supplier-invoices.tsx#SupplierInvoiceMatch",
       "file": "components/supplier-invoices.tsx",
       "name": "SupplierInvoiceMatch",
-      "line": 63,
+      "line": 110,
       "classes": [
         "sheet-body",
         "form-grid",
@@ -228263,29 +228506,29 @@
       "widgets": [
         {
           "tag": "FormSheet",
-          "line": 81
+          "line": 128
         },
         {
           "tag": "Field",
-          "line": 84
+          "line": 131
         },
         {
           "tag": "Field",
-          "line": 84
+          "line": 131
         },
         {
           "tag": "Field",
-          "line": 89
+          "line": 136
         },
         {
           "tag": "Field",
-          "line": 89
+          "line": 136
         }
       ],
       "elements": [
         {
           "tag": "FormSheet",
-          "line": 81,
+          "line": 128,
           "props": [
             "open",
             "label=\"Leistungen abgleichen\"",
@@ -228297,38 +228540,38 @@
         },
         {
           "tag": "div",
-          "line": 82,
+          "line": 129,
           "props": [
             "className=\"sheet-body\""
           ]
         },
         {
           "tag": "p",
-          "line": 83,
+          "line": 130,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 83,
+          "line": 130,
           "props": []
         },
         {
           "tag": "div",
-          "line": 84,
+          "line": 131,
           "props": [
             "className=\"form-grid two\""
           ]
         },
         {
           "tag": "Field",
-          "line": 84,
+          "line": 131,
           "props": [
             "label=\"Leistungsbeginn\""
           ]
         },
         {
           "tag": "Input",
-          "line": 84,
+          "line": 131,
           "props": [
             "type=\"date\"",
             "value={from}",
@@ -228337,14 +228580,14 @@
         },
         {
           "tag": "Field",
-          "line": 84,
+          "line": 131,
           "props": [
             "label=\"Leistungsende\""
           ]
         },
         {
           "tag": "Input",
-          "line": 84,
+          "line": 131,
           "props": [
             "type=\"date\"",
             "value={until}",
@@ -228354,43 +228597,43 @@
         },
         {
           "tag": "LoadingState",
-          "line": 85,
+          "line": 132,
           "props": []
         },
         {
           "tag": "ErrorState",
-          "line": 85,
+          "line": 132,
           "props": [
             "onRetry={query.refresh}"
           ]
         },
         {
           "tag": "p",
-          "line": 86,
+          "line": 133,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 86,
+          "line": 133,
           "props": []
         },
         {
           "tag": "EmptyState",
-          "line": 87,
+          "line": 134,
           "props": [
             "title=\"Keine bestätigten Einkaufsquellen in diesem Zeitraum\""
           ]
         },
         {
           "tag": "div",
-          "line": 87,
+          "line": 134,
           "props": [
             "className=\"action-list\""
           ]
         },
         {
           "tag": "label",
-          "line": 87,
+          "line": 134,
           "props": [
             "key={source.price_source_id}",
             "className=\"assignment-row form-check\""
@@ -228398,7 +228641,7 @@
         },
         {
           "tag": "Input",
-          "line": 87,
+          "line": 134,
           "props": [
             "type=\"checkbox\"",
             "disabled={!mayWrite||busy}",
@@ -228408,41 +228651,41 @@
         },
         {
           "tag": "span",
-          "line": 87,
+          "line": 134,
           "props": []
         },
         {
           "tag": "br",
-          "line": 87,
+          "line": 134,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 87,
+          "line": 134,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 87,
+          "line": 134,
           "props": []
         },
         {
           "tag": "div",
-          "line": 89,
+          "line": 136,
           "props": [
             "className=\"form-grid two\""
           ]
         },
         {
           "tag": "Field",
-          "line": 89,
+          "line": 136,
           "props": [
             "label=\"Minuten gemäss Lieferantenrechnung\""
           ]
         },
         {
           "tag": "Input",
-          "line": 89,
+          "line": 136,
           "props": [
             "inputMode=\"numeric\"",
             "value={minutes}",
@@ -228451,14 +228694,14 @@
         },
         {
           "tag": "Field",
-          "line": 89,
+          "line": 136,
           "props": [
             "label=\"Stundensatz gemäss Lieferantenrechnung\""
           ]
         },
         {
           "tag": "Input",
-          "line": 89,
+          "line": 136,
           "props": [
             "inputMode=\"decimal\"",
             "value={price}",
@@ -228467,90 +228710,90 @@
         },
         {
           "tag": "section",
-          "line": 90,
+          "line": 137,
           "props": [
             "className=\"form-section\""
           ]
         },
         {
           "tag": "SectionTitle",
-          "line": 90,
+          "line": 137,
           "props": [
             "title=\"Letzter Abgleich\""
           ]
         },
         {
           "tag": "p",
-          "line": 90,
+          "line": 137,
           "props": []
         },
         {
           "tag": "p",
-          "line": 90,
+          "line": 137,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 90,
+          "line": 137,
           "props": []
         },
         {
           "tag": "p",
-          "line": 90,
+          "line": 137,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 90,
+          "line": 137,
           "props": []
         },
         {
           "tag": "p",
-          "line": 90,
+          "line": 137,
           "props": [
             "key={d.code}"
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 90,
+          "line": 137,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 90,
+          "line": 137,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 90,
+          "line": 137,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 90,
+          "line": 137,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 90,
+          "line": 137,
           "props": []
         },
         {
           "tag": "ErrorState",
-          "line": 91,
+          "line": 138,
           "props": []
         },
         {
           "tag": "FormActions",
-          "line": 92,
+          "line": 139,
           "props": [
             "sheet"
           ]
         },
         {
           "tag": "Button",
-          "line": 92,
+          "line": 139,
           "props": [
             "variant=\"secondary\"",
             "disabled={busy}",
@@ -228559,12 +228802,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 92,
+          "line": 139,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 92,
+          "line": 139,
           "props": [
             "disabled={busy||query.loading||Boolean(query.error)||!selection.length||!minutes||!price}",
             "onClick={()=>void save()}"
@@ -228572,61 +228815,61 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 92,
+          "line": 139,
           "props": []
         }
       ],
       "conditions": [
         {
-          "line": 69,
+          "line": 116,
           "expression": "from&&until"
         },
         {
-          "line": 70,
+          "line": 117,
           "expression": "saved"
         },
         {
-          "line": 72,
+          "line": 119,
           "expression": "pending.current"
         },
         {
-          "line": 73,
+          "line": 120,
           "expression": "!/^\\d+$/.test(minutes)"
         },
         {
-          "line": 75,
+          "line": 122,
           "expression": "attempt.current?.body!==serialized"
         },
         {
-          "line": 76,
+          "line": 123,
           "expression": "!response.item?.id"
         },
         {
-          "line": 77,
+          "line": 124,
           "expression": "cause instanceof Error"
         },
         {
-          "line": 85,
+          "line": 132,
           "expression": "query.loading"
         },
         {
-          "line": 85,
+          "line": 132,
           "expression": "query.error"
         },
         {
-          "line": 87,
+          "line": 134,
           "expression": "!query.data?.sources.length"
         },
         {
-          "line": 87,
+          "line": 134,
           "expression": "e.target.checked"
         },
         {
-          "line": 90,
+          "line": 137,
           "expression": "latest.stale"
         },
         {
-          "line": 90,
+          "line": 137,
           "expression": "latest.result.ready"
         }
       ]
@@ -228635,7 +228878,7 @@
       "key": "components/supplier-invoices.tsx#Match",
       "file": "components/supplier-invoices.tsx",
       "name": "Match",
-      "line": 62,
+      "line": 109,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -228709,6 +228952,494 @@
       "file": "lib/supplier-invoice-match.ts",
       "name": "SupplierMatchDifference",
       "line": 8,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": []
+    },
+    {
+      "key": "components/supplier-invoices.tsx#SupplierInvoiceReview",
+      "file": "components/supplier-invoices.tsx",
+      "name": "SupplierInvoiceReview",
+      "line": 88,
+      "classes": [
+        "form-section"
+      ],
+      "apis": [
+        "/api/suppliers/"
+      ],
+      "collections": [],
+      "widgets": [
+        {
+          "tag": "FormSheet",
+          "line": 97
+        },
+        {
+          "tag": "Field",
+          "line": 102
+        }
+      ],
+      "elements": [
+        {
+          "tag": "FormSheet",
+          "line": 97,
+          "props": [
+            "open",
+            "label=\"Rechnung prüfen\"",
+            "description={invoice.supplier_invoice_no??''}",
+            "busy={busy}",
+            "dirty={!!note}",
+            "onClose={onClose}"
+          ]
+        },
+        {
+          "tag": "p",
+          "line": 98,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 98,
+          "props": []
+        },
+        {
+          "tag": "LoadingState",
+          "line": 99,
+          "props": []
+        },
+        {
+          "tag": "ErrorState",
+          "line": 99,
+          "props": [
+            "onRetry={query.refresh}"
+          ]
+        },
+        {
+          "tag": "p",
+          "line": 100,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 100,
+          "props": []
+        },
+        {
+          "tag": "Button",
+          "line": 101,
+          "props": [
+            "variant=\"secondary\"",
+            "disabled={busy||!!note}",
+            "onClick={onMatch}"
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 101,
+          "props": []
+        },
+        {
+          "tag": "Field",
+          "line": 102,
+          "props": [
+            "label=\"Begründung oder Rückfrage\""
+          ]
+        },
+        {
+          "tag": "Textarea",
+          "line": 102,
+          "props": [
+            "maxLength={2000}",
+            "disabled={busy}",
+            "value={note}",
+            "onChange={e=>setNote(e.target.value)}"
+          ]
+        },
+        {
+          "tag": "section",
+          "line": 103,
+          "props": [
+            "className=\"form-section\""
+          ]
+        },
+        {
+          "tag": "SectionTitle",
+          "line": 103,
+          "props": [
+            "title=\"Prüfverlauf\""
+          ]
+        },
+        {
+          "tag": "div",
+          "line": 103,
+          "props": [
+            "key={r.id}"
+          ]
+        },
+        {
+          "tag": "b",
+          "line": 103,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 103,
+          "props": []
+        },
+        {
+          "tag": "p",
+          "line": 103,
+          "props": []
+        },
+        {
+          "tag": "ErrorState",
+          "line": 104,
+          "props": []
+        },
+        {
+          "tag": "FormActions",
+          "line": 105,
+          "props": [
+            "sheet"
+          ]
+        },
+        {
+          "tag": "Button",
+          "line": 105,
+          "props": [
+            "variant=\"secondary\"",
+            "disabled={busy}",
+            "onClick={onClose}"
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 105,
+          "props": []
+        },
+        {
+          "tag": "Button",
+          "line": 105,
+          "props": [
+            "requiresWrite",
+            "variant=\"secondary\"",
+            "disabled={busy||note.trim().length<10}",
+            "onClick={()=>void save('query')}"
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 105,
+          "props": []
+        },
+        {
+          "tag": "Button",
+          "line": 105,
+          "props": [
+            "requiresWrite",
+            "disabled={busy||!state?.mayApprove}",
+            "onClick={()=>void save('approve')}"
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 105,
+          "props": []
+        }
+      ],
+      "conditions": [
+        {
+          "line": 93,
+          "expression": "pending.current||!query.data"
+        },
+        {
+          "line": 94,
+          "expression": "decision==='approve'"
+        },
+        {
+          "line": 94,
+          "expression": "attempt.current?.body!==serialized"
+        },
+        {
+          "line": 94,
+          "expression": "!response.item?.id"
+        },
+        {
+          "line": 94,
+          "expression": "e instanceof Error"
+        },
+        {
+          "line": 99,
+          "expression": "query.loading"
+        },
+        {
+          "line": 99,
+          "expression": "query.error"
+        },
+        {
+          "line": 100,
+          "expression": "state.queryUnresolved"
+        },
+        {
+          "line": 100,
+          "expression": "state.mayApprove"
+        }
+      ]
+    },
+    {
+      "key": "components/supplier-invoices.tsx#SupplierApprovalPolicy",
+      "file": "components/supplier-invoices.tsx",
+      "name": "SupplierApprovalPolicy",
+      "line": 67,
+      "classes": [],
+      "apis": [
+        "/api/suppliers/approval-policy"
+      ],
+      "collections": [],
+      "widgets": [
+        {
+          "tag": "FormSheet",
+          "line": 70
+        }
+      ],
+      "elements": [
+        {
+          "tag": "SupplierApprovalPolicyEditor",
+          "line": 69,
+          "props": [
+            "key={query.data.item.revision}",
+            "initial={query.data.item}",
+            "canConfigure={query.data.canConfigure}",
+            "onClose={onClose}"
+          ]
+        },
+        {
+          "tag": "FormSheet",
+          "line": 70,
+          "props": [
+            "open",
+            "label=\"Freigaberegeln\"",
+            "onClose={onClose}"
+          ]
+        },
+        {
+          "tag": "ErrorState",
+          "line": 70,
+          "props": [
+            "onRetry={query.refresh}"
+          ]
+        },
+        {
+          "tag": "LoadingState",
+          "line": 70,
+          "props": []
+        }
+      ],
+      "conditions": [
+        {
+          "line": 69,
+          "expression": "query.data&&!query.loading&&!query.error"
+        },
+        {
+          "line": 70,
+          "expression": "query.error"
+        }
+      ]
+    },
+    {
+      "key": "lib/supplier-approval-policy.ts#APApprovalPolicy",
+      "file": "lib/supplier-approval-policy.ts",
+      "name": "APApprovalPolicy",
+      "line": 3,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": []
+    },
+    {
+      "key": "components/supplier-invoices.tsx#SupplierApprovalPolicyEditor",
+      "file": "components/supplier-invoices.tsx",
+      "name": "SupplierApprovalPolicyEditor",
+      "line": 72,
+      "classes": [
+        "form-section",
+        "form-grid",
+        "two"
+      ],
+      "apis": [
+        "/api/suppliers/approval-policy"
+      ],
+      "collections": [],
+      "widgets": [
+        {
+          "tag": "FormSheet",
+          "line": 79
+        },
+        {
+          "tag": "Field",
+          "line": 81
+        },
+        {
+          "tag": "Field",
+          "line": 83
+        }
+      ],
+      "elements": [
+        {
+          "tag": "FormSheet",
+          "line": 79,
+          "props": [
+            "open",
+            "label=\"Freigaberegeln\"",
+            "busy={busy}",
+            "onClose={onClose}",
+            "dirty={JSON.stringify(policy)!==JSON.stringify(initial.policy)}"
+          ]
+        },
+        {
+          "tag": "p",
+          "line": 80,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 80,
+          "props": []
+        },
+        {
+          "tag": "Field",
+          "line": 81,
+          "props": [
+            "label=\"Unabhängige Vier-Augen-Prüfung bei mehreren Benutzern\""
+          ]
+        },
+        {
+          "tag": "Checkbox",
+          "line": 81,
+          "props": [
+            "disabled={!canConfigure||busy}",
+            "checked={policy.fourEyes}",
+            "onChange={e=>setPolicy(p=>({...p,fourEyes:e.target.checked}))}"
+          ]
+        },
+        {
+          "tag": "p",
+          "line": 82,
+          "props": []
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 82,
+          "props": []
+        },
+        {
+          "tag": "section",
+          "line": 83,
+          "props": [
+            "className=\"form-section\"",
+            "key={role}"
+          ]
+        },
+        {
+          "tag": "SectionTitle",
+          "line": 83,
+          "props": [
+            "title={roleLabels[role]}"
+          ]
+        },
+        {
+          "tag": "div",
+          "line": 83,
+          "props": [
+            "className=\"form-grid two\""
+          ]
+        },
+        {
+          "tag": "Field",
+          "line": 83,
+          "props": [
+            "key={currency}",
+            "label={currency}"
+          ]
+        },
+        {
+          "tag": "Input",
+          "line": 83,
+          "props": [
+            "inputMode=\"decimal\"",
+            "disabled={!canConfigure||busy}",
+            "value={policy.limits[role+'_'+currency]??''}",
+            "onChange={e=>setPolicy(p=>{const limits={...p.limits},key=role+'_'+currency,value=e.target.value.replace(',','.');if(value)limits[key]=value;else delete limits[key];return {...p,limits};})}"
+          ]
+        },
+        {
+          "tag": "ErrorState",
+          "line": 84,
+          "props": []
+        },
+        {
+          "tag": "FormActions",
+          "line": 84,
+          "props": [
+            "sheet"
+          ]
+        },
+        {
+          "tag": "Button",
+          "line": 84,
+          "props": [
+            "variant=\"secondary\"",
+            "disabled={busy}",
+            "onClick={onClose}"
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 84,
+          "props": []
+        },
+        {
+          "tag": "Button",
+          "line": 84,
+          "props": [
+            "disabled={busy}",
+            "onClick={()=>void save()}"
+          ]
+        },
+        {
+          "tag": "LocalizedText",
+          "line": 84,
+          "props": []
+        }
+      ],
+      "conditions": [
+        {
+          "line": 75,
+          "expression": "pending.current"
+        },
+        {
+          "line": 76,
+          "expression": "attempt.current?.body!==serialized"
+        },
+        {
+          "line": 76,
+          "expression": "e instanceof Error"
+        },
+        {
+          "line": 83,
+          "expression": "value"
+        }
+      ]
+    },
+    {
+      "key": "lib/supplier-approval-policy.ts#apApprovalRoles",
+      "file": "lib/supplier-approval-policy.ts",
+      "name": "apApprovalRoles",
+      "line": 2,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -262187,7 +262918,37 @@
     {
       "file": "components/supplier-invoices.tsx",
       "name": "SupplierInvoices",
-      "line": 17,
+      "line": 18,
+      "usedBy": [
+        "/lieferanten/[id]",
+        "/lieferanten/neu"
+      ],
+      "frameworkUsedBy": []
+    },
+    {
+      "file": "components/supplier-invoices.tsx",
+      "name": "SupplierApprovalPolicy",
+      "line": 67,
+      "usedBy": [
+        "/lieferanten/[id]",
+        "/lieferanten/neu"
+      ],
+      "frameworkUsedBy": []
+    },
+    {
+      "file": "components/supplier-invoices.tsx",
+      "name": "SupplierApprovalPolicyEditor",
+      "line": 72,
+      "usedBy": [
+        "/lieferanten/[id]",
+        "/lieferanten/neu"
+      ],
+      "frameworkUsedBy": []
+    },
+    {
+      "file": "components/supplier-invoices.tsx",
+      "name": "SupplierInvoiceReview",
+      "line": 88,
       "usedBy": [
         "/lieferanten/[id]",
         "/lieferanten/neu"
@@ -262197,7 +262958,7 @@
     {
       "file": "components/supplier-invoices.tsx",
       "name": "Match",
-      "line": 62,
+      "line": 109,
       "usedBy": [
         "/lieferanten/[id]",
         "/lieferanten/neu"
@@ -262207,7 +262968,7 @@
     {
       "file": "components/supplier-invoices.tsx",
       "name": "SupplierInvoiceMatch",
-      "line": 63,
+      "line": 110,
       "usedBy": [
         "/lieferanten/[id]",
         "/lieferanten/neu"

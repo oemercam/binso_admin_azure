@@ -8,7 +8,7 @@ import {audit} from '../audit';
 import {idempotentBusiness} from '../business-idempotency';
 import {moneyMinor} from '@/lib/money';
 
-const columns='id,supplier_id,supplier_invoice_no,invoice_date::text,due_date::text,net_amount,vat_amount,total_amount,currency,status,note,version';
+const columns='id,supplier_id,supplier_invoice_no,invoice_date::text,due_date::text,net_amount,vat_amount,total_amount,currency,status,note,version,v26_review_id';
 async function supplier(c:PoolClient,s:SessionUser,id:string){if(!(await c.query('select id from suppliers where organization_id=$1 and id::text=$2 and archived_at is null',[s.organizationId,id])).rows.length)throw new ApiError(404,'not_found','Lieferant wurde nicht gefunden.');}
 export async function listSupplierInvoices(c:PoolClient,s:SessionUser,supplierId:string){
  authorize(s,'purchasing:read');await supplier(c,s,supplierId);
