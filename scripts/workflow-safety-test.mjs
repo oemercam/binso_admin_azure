@@ -13,6 +13,7 @@ for(const file of ['quality.yml','avatar-profile.yml','document-discounts.yml','
 }
 const browserHost=fs.readFileSync('scripts/prepare-browser-host.sh','utf8');
 assert(browserHost.includes('https://archive.ubuntu.com/ubuntu'));
+assert(browserHost.includes('/etc/apt/apt-mirrors.txt'),'Hosted Ubuntu mirror+file sources must be prepared too');
 assert(!/AllowUnauthenticated|AllowInsecureRepositories|Verify-Peer.*false|trusted=yes/.test(browserHost),'Mirror reliability cannot bypass package or TLS verification');
 for(const name of ['checks','ux-compliance']){
  const checkout=workflows['quality.yml'].jobs[name].steps.find(step=>step.uses?.startsWith('actions/checkout@'));
