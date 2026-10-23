@@ -214,3 +214,46 @@ roles do not inherit them automatically. Self-service payslips require a separat
 identity-bound policy. Implement these approved decisions without per-package
 confirmation; legal payroll validation and productive actions still need their
 actual evidence and applicable authorization.
+
+## Current UX Master V4 (23 October 2026)
+
+The user explicitly adopted docs/architecture/ux-master-v4/source.md and the two
+filter/sorting reference screenshots. V4 supersedes conflicting V3/V3.3 action,
+header and selection rules. Preview only: no push, merge, production migration or
+deployment is authorized in this implementation block. Existing bottom navigation
+and blue floating plus remain unchanged. Simple sorting and status filters use
+anchored dropdowns at their own icons on every viewport; complex filters may keep
+the existing mobile sheet. Separate active-state rows reset only their own filter
+or sort, preserving search and the other selection. No obsolete V3 header-menu
+exception or mobile sorting-sheet assertion may override this newer approval.
+Keep financial, tenant, permission, historical document, mail/outbox and integrity
+checks. docs/architecture/ux-master-v4/implementation-status.md records actual
+implementation/evidence gaps; a source inventory never grants visual acceptance.
+
+## UX Master V4.1 (23 October 2026)
+
+The byte-preserved docs/architecture/ux-master-v4-1/source.md and contract.md
+record the latest scoped request. Full native language names were explicitly
+confirmed by the user. The supplied source is truncated in chapter 25; do not
+invent its tail. implementation-status.md records the time-boxed partial result,
+not global acceptance. Preserve all release gates, navigation/FAB and business
+logic. No push, merge or deployment is authorized by this implementation block.
+
+## Finance analysis Final V1 (23 October 2026)
+
+The byte-preserved docs/architecture/finance-analysis-final-v1/source.md and
+contract.md supersede the older finance-analysis presentation. Preserve existing
+ledger calculations and status/filter meanings; current receivables have no
+historical comparison snapshot. implementation-status.md records actual local
+checks and remaining drilldown/reference/Admin limitations. No GitHub push,
+merge, production write or deployment is authorized.
+
+## UX Master V5 (23 October 2026)
+
+The byte-preserved docs/architecture/ux-master-v5/source.md and contract.md are
+the newest UX authority; chapters 28–36 take precedence, including short language
+triggers with full native option names. Preserve navigation/FAB and every
+financial/security/tenant/consent boundary. Reuse existing legal clauses and
+version IDs; missing translation approval is not permission to invent legal
+text. The implementation-status records the partial 15-minute result and open
+Admin/route/legal approval gaps. No GitHub or production actions authorized.

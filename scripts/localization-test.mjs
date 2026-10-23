@@ -199,7 +199,7 @@ for(const language of config.locales){
 // Render actual legal documents with the shared owner: anchors cannot change
 // by UI language, existing deep links and the untouched document text survive.
 {
- const legal=compile('components/legal-page.tsx',{'@/lib/client/locale':client,'next/link':({children,...props})=>element('a',props,children),'@/components/marketing':{MarketingHeader:()=>null,MarketingFooter:()=>null}});
+ const legal=compile('components/legal-page.tsx',{'@/lib/client/locale':client,'next/link':({children,...props})=>element('a',props,children),'@/components/marketing':{MarketingHeader:()=>element('header',{'data-public-marketing':true}),MarketingFooter:()=>element('footer',{'data-public-marketing':true})}});
  const legalConfig=compile('config/legal.ts');
  for(const file of ['impressum','datenschutz','agb','auftragsbearbeitung','unterauftragsbearbeiter']){
   const page=compile('app/'+file+'/page.tsx',{'@/lib/client/locale':client,'@/components/legal-page':legal,'@/config/legal':legalConfig,'next/link':({children,...props})=>element('a',props,children)}).default;
@@ -209,6 +209,12 @@ for(const language of config.locales){
    const ids=[...markup.matchAll(/<section[^>]* id="([^"]+)"/g)].map(match=>match[1]);assert.ok(ids.length>=2);assert.equal(new Set(ids).size,ids.length,'No duplicate legal anchors');
    if(baseline)assert.deepEqual(ids,baseline,'Section URLs stay stable across UI languages');else baseline=ids;
    for(const [,id] of markup.matchAll(/href="#([^"]+)"/g))assert.ok(ids.includes(id),'Every table-of-contents link has a real section');
+   const internal=renderToStaticMarkup(element(client.LocaleProvider,{initialLocale:language},React.cloneElement(page(),{surface:'app'})));
+   assert.ok(!internal.includes('data-public-marketing'),'Internal legal reading never includes marketing chrome');
+   const article=text=>text.match(/<article[^>]*>([\s\S]*?)<\/article>/)?.[1].replace(/<[^>]*>/g,'');
+   assert.equal(article(internal),article(markup),'Public and internal legal clauses remain identical');
+   assert.ok(internal.includes('app-legal-page'));
+   assert.deepEqual([...internal.matchAll(/<section[^>]* id="([^"]+)"/g)].map(match=>match[1]),ids,'Internal and public anchors are identical');
    if(file==='impressum')assert.ok(ids.includes('kontakt'),'Existing contact deep link preserved');
    if(ids.length>=5){assert.ok(markup.includes('<details class="legal-toc">'));assert.ok(markup.includes(locale.translateMessage('Inhaltsverzeichnis',language)));}
    else assert.ok(!markup.includes('class="legal-toc"'),'Short documents need no redundant contents control');
@@ -217,3 +223,12 @@ for(const language of config.locales){
  }
  console.log('Actual legal documents: stable unique TOC anchors, preserved contact deep link, translated control labels, short-document omission and unchanged version dates passed. Legal language/substance approval remains separate.');
 }
+
+// V5: short closed trigger, full native language names in every option.
+for(const language of config.locales)for(const compact of [false,true]){
+ const switcher=compile('components/locale-switcher.tsx',{'./select-control':{SelectControl:({displayValue,children,...props})=>React.createElement('select',{'data-caption':displayValue,value:props.value,onChange(){},'aria-label':props['aria-label']},children)},'@/lib/client/locale':client,'@/lib/client/use-language-preference':{useLanguagePreference:()=>({locale:language,save(){},busy:false,error:null})},'@/lib/locales':locale,'./ui':{ErrorState:()=>null}});
+ const html=renderToStaticMarkup(React.createElement(client.LocaleProvider,{initialLocale:language},React.createElement(switcher.LocaleSwitcher,{compact})));
+ assert.ok(html.includes('data-caption="'+language.toUpperCase()+'"'),'V5 selected language uses its short code; native options stay complete: '+language);
+ for(const code of config.locales)assert.ok(html.includes(config.localeNames[code]),'Existing language option retained: '+code);
+}
+console.log('Language selector V5: five short triggers and full native option names passed; persistence owner unchanged.');

@@ -1,5 +1,5 @@
 'use client';
-import {useEffect,useRef,useState} from 'react';
+import {useEffect,useRef,useState,type ReactNode} from 'react';
 import {readClientSession} from '@/lib/client/session-cache';
 import {useApiQuery,useDataRevision} from '@/lib/client/use-api-query';
 import {apiPost} from '@/lib/client/backend';
@@ -22,8 +22,8 @@ function ArchiveSheet({onClose}:{onClose:()=>void}){
   {selected&&<ConfirmDialog open busy={busy} title="Kunde wiederherstellen?" message="Der Kunde wird mit seinen bisherigen Daten wieder sichtbar. Bestehende Dokumente bleiben unverändert." confirmLabel="Wiederherstellen" onCancel={()=>{if(!pending.current)setSelected(null)}} onConfirm={()=>void restore()}/>}
  </FormSheet>;
 }
-export function CustomerDataActions({header=false}:{header?:boolean}={}){
+export function CustomerDataActions({header=false,tools=false,filterAction}:{header?:boolean;tools?:boolean;filterAction?:ReactNode}={}){
  const revision=useDataRevision([]),[allowed,setAllowed]=useState(false),[open,setOpen]=useState(false),[merge,setMerge]=useState(false);
  useEffect(()=>{let active=true;readClientSession().then(session=>{if(active){setOpen(false);setMerge(false);setAllowed(session.authenticated&&!session.tenant?.readOnly&&tenantCan(session.tenant?.role??'','customers:delete',session.tenant?.moduleProfile));}}).catch(()=>{if(active){setAllowed(false);setOpen(false);setMerge(false)}});return()=>{active=false};},[revision]);
- return <><CustomerImportControl header={header} onOpenArchive={allowed?()=>setOpen(true):undefined} onOpenMerge={allowed?()=>setMerge(true):undefined}/>{allowed&&open&&<ArchiveSheet key={revision} onClose={()=>setOpen(false)}/>} {allowed&&merge&&<CustomerMergeSheet key={revision} onClose={()=>setMerge(false)}/>}</>;
+ return <><CustomerImportControl header={header} tools={tools} extraActions={filterAction} onOpenArchive={allowed?()=>setOpen(true):undefined} onOpenMerge={allowed?()=>setMerge(true):undefined}/>{allowed&&open&&<ArchiveSheet key={revision} onClose={()=>setOpen(false)}/>} {allowed&&merge&&<CustomerMergeSheet key={revision} onClose={()=>setMerge(false)}/>}</>;
 }

@@ -1,4 +1,5 @@
 "use client";
+import {WorkspaceActionContext} from '@/lib/client/workspace-actions';
 import {asLocale} from '@/lib/locales/config';
 import {LocalizedText,LocalizedElement,useTranslation,useLocale} from "@/lib/client/locale";
 import {LocaleSwitcher} from "./locale-switcher";
@@ -10,14 +11,14 @@ import {supportReference} from "@/lib/support-reference";
 import {MaintenanceControl} from "./maintenance-control";
 import {MonitoringPanel} from "./monitoring";
 import {useApiQuery} from "@/lib/client/use-api-query";
-import {ActionRow, ActionSheet, CreateAction, FilterSheet, FormSheet, MetricTiles, MetricTile, WorkspaceSection,DetailTabs} from "./binso-ux";
+import {ContextActions, ActionsMenu, ActionRow, ActionSheet, CreateAction, FilterSheet, FormSheet, MetricTiles, MetricTile, WorkspaceSection,DetailTabs} from "./binso-ux";
 import {DataTable, DataTableHead, DataTableRow, RecordsView, RecordsControls, RecordRow, useRecordsController} from "./records";
 import ConfirmDialog from "./confirm-dialog";
 
 import Link from "next/link";
 import {HeaderPanel} from "./header-panel";
 import {Avatar} from "./avatar";
-import { createContext, useContext, useEffect, useMemo, useState, useRef, type CSSProperties } from "react";
+import { createContext, useContext, useEffect, useCallback, useMemo, useState, useRef, type CSSProperties } from "react";
 import { useRouter } from "next/navigation";
 import {AppHeader,MobileDock} from "./app-chrome";
 import {DesktopNavigationToggle,useDesktopNavigation} from "./desktop-navigation";
@@ -123,6 +124,8 @@ function useOperatorCustomers(){
 
 
 export function OperatorPage({ section = "", identity, role="platform_owner" }: { section?: string;identity?:{name:string;email:string}|null;role?:OperatorRole|"readonly" }) {
+  const [detailActions,setDetailActions]=useState<{id:string;content:React.ReactNode}|null>(null);
+  const registerDetailActions=useCallback((id:string,content:React.ReactNode|null)=>setDetailActions(previous=>content?{id,content}:previous?.id===id?null:previous),[]);
   const {navigationCollapsed,toggleNavigation}=useDesktopNavigation();
   const translate=useTranslation(),{choose}=useLocale();
   const preferences=useApiQuery<{item:{language:string|null}}>('/api/operator/preferences');
@@ -131,6 +134,7 @@ export function OperatorPage({ section = "", identity, role="platform_owner" }: 
   const key = section.split("/")[0] || "";
   const detail = section.split("/")[1] || "";
   const title = useMemo(() => operatorNav.find(([slug]) => slug === key)?.[1] ?? "Dashboard", [key]);
+  const detailTitle=key==="kunden"?"Kundendetails":key==="tickets"?"Ticketdetails":title;
   const [mobileMore,setMobileMore]=useState(false);
   const [accountOpen,setAccountOpen]=useState(false);
   const [createOpen,setCreateOpen]=useState(false);
@@ -141,7 +145,7 @@ export function OperatorPage({ section = "", identity, role="platform_owner" }: 
 
   const allowed=canOpenOperatorSection(role,section);
   const canCreate=allowed&&!detail&&((key==="sperrungen"&&operatorCan(role,"restrictions:manage"))||(key==="ankuendigungen"&&operatorCan(role,"announcements:manage")));
-  return <OperatorAccess.Provider value={role}><div className="operator-root" data-navigation-collapsed={navigationCollapsed||undefined} >
+  return <WorkspaceActionContext.Provider value={registerDetailActions}><OperatorAccess.Provider value={role}><div className="operator-root" data-navigation-collapsed={navigationCollapsed||undefined} >
     <aside id="operator-desktop-navigation" className="operator-sidebar">
       <Link prefetch={false} href="/operator"><Logo dark compact={navigationCollapsed}/></Link>
       <nav className="operator-sidebar-groups">{operatorNavGroups.map(group=><div className="operator-sidebar-group" key={group.label}><span className="operator-nav-label"><LocalizedText>{group.label}</LocalizedText></span>{group.slugs.map(slug=>{const item=operatorNav.find(([candidate])=>candidate===slug);if(!item)return null;const [,label,icon]=item;return <Link prefetch={false} aria-label={translate(label)} title={translate(label)} aria-current={slug===key?"page":undefined} className={slug===key?"active":""} href={slug ? `/operator/${slug}` : "/operator"} key={slug}><Icon name={icon}/><span><LocalizedText>{label}</LocalizedText></span></Link>})}</div>)}</nav>
@@ -152,7 +156,7 @@ export function OperatorPage({ section = "", identity, role="platform_owner" }: 
         <DesktopNavigationToggle collapsed={navigationCollapsed} onToggle={toggleNavigation} controls="operator-desktop-navigation"/>
         {detail?<Link href={"/operator/"+key} className="mobile-back" aria-label="Zur Liste"><Icon name="back"/></Link>:key===""?<Link href="/operator" className="mobile-header-brand" aria-label="Zum Admin-Dashboard"><Logo compact/><span>One</span></Link>:<span className="operator-section-label"><LocalizedText>{title}</LocalizedText></span>}
         <span className="operator-header-desktop-label"><LocalizedText>{"Admin"}</LocalizedText></span>
-      </>} actionClassName="operator-user" actions={<>{false}<Link prefetch={false} className="icon-button operator-home-link" href="/dashboard" aria-label="Zur App"><Icon name="home" size={18}/></Link><LocalizedElement as="button" className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={()=>{setMobileMore(false);setAccountOpen(true)}}><Avatar name={identity?.name} identity={identity?.email}/></LocalizedElement></>}/>
+      </>} actionClassName="operator-user" actions={detail?(detailActions?<ActionsMenu header label="Kundenaktionen">{detailActions.content}</ActionsMenu>:undefined):<>{false}<Link prefetch={false} className="icon-button operator-home-link" href="/dashboard" aria-label="Zur App"><Icon name="home" size={18}/></Link><LocalizedElement as="button" className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={()=>{setMobileMore(false);setAccountOpen(true)}}><Avatar name={identity?.name} identity={identity?.email}/></LocalizedElement></>}>{detail&&<h1 className="operator-detail-title"><LocalizedText>{detailTitle}</LocalizedText></h1>}</AppHeader>
 
       <div className="operator-page-head"><PageHeading leading={detail?<Button href={"/operator/"+key} variant="ghost" className="icon-button desktop-back" icon="back" ariaLabel={key==="tickets"?"Zur Ticketliste":"Zur Kundenliste"}/>:undefined} title={detail ? (key === "tickets" ? "Ticketdetails" : key === "kunden" ? "Kundendetails" : title) : title} description={operatorSubtitle(key, detail)} action={canCreate?<CreateAction label={key==="sperrungen"?"Einschränkung erstellen":"Ankündigung erstellen"} onClick={()=>setCreateOpen(true)}/>:undefined}/></div>
       {accountOpen&&<HeaderPanel kind="account" label="Konto" onClose={()=>setAccountOpen(false)} headerSelector=".operator-app-header" backgroundSelector=".operator-sidebar,.operator-main > :not(.operator-app-header)"><div className="account-sheet"><div className="account-sheet-profile"><Avatar size="large"/><div><b><LocalizedText verbatim={!!identity?.name}>{identity?.name||"One Admin"}</LocalizedText></b><small><LocalizedText>{identity?.email||"Administration"}</LocalizedText></small></div></div><LocaleSwitcher persist="operator"/><div className="action-list"><ActionRow href="/dashboard" icon="home" title="Zum Kundenportal" description="Binso One öffnen" onClick={()=>setAccountOpen(false)}/><ActionRow icon="logout" title="Abmelden" disabled={logoutBusy} onClick={()=>void logout()}/></div>{logoutError&&<ErrorState><LocalizedText>{logoutError}</LocalizedText></ErrorState>}</div></HeaderPanel>}
@@ -179,7 +183,7 @@ export function OperatorPage({ section = "", identity, role="platform_owner" }: 
         key === "audit" ? <AuditView/> :
         <OperatorDashboard/>}</div>
     </main>
-  </div></OperatorAccess.Provider>;
+  </div></OperatorAccess.Provider></WorkspaceActionContext.Provider>;
 }
 
 function operatorSubtitle(key: string, detail: string) {
@@ -362,9 +366,10 @@ function OperatorCustomerDetail({tenantId}:{tenantId:string}) {
   const access=overview.access as {billing?:boolean;support?:boolean;restrictions?:boolean;audit?:boolean}|undefined;
 
   return <>
+    {canRestrict&&<ContextActions mobile={false}><ActionRow title="Einschränken" icon="lock" href="/operator/sperrungen"/></ContextActions>}
     <div className="operator-customer-hero">
       <div className="operator-customer-main"><span className="record-avatar large">{String(tenant.name??"K").slice(0,1)}</span><div><h2>{String(tenant.name??"Kunde")}</h2><p>{String(tenant.uid??"Keine UID")} <LocalizedText>{tenant.city?"· "+String(tenant.city):""}</LocalizedText></p></div></div>
-      <div className="operator-customer-actions"><Status tone={accountStatus==="active"?"success":"warning"}>{operatorStatus(accountStatus)}</Status><Button variant="secondary" disabled><LocalizedText>{"Support-Zugriff nicht verfügbar"}</LocalizedText></Button>{canRestrict&&<Button href="/operator/sperrungen" variant="danger"><LocalizedText>{"Einschränken"}</LocalizedText></Button>}</div>
+      <div className="operator-customer-actions"><Status tone={accountStatus==="active"?"success":"warning"}>{operatorStatus(accountStatus)}</Status><Button variant="secondary" disabled><LocalizedText>{"Support-Zugriff nicht verfügbar"}</LocalizedText></Button></div>
     </div>
     <div className="operator-customer-metrics"><Metric label="Plan" value={operatorPlan(plan)} hint={overview.monthly_contract_value==null?"Vertragswert: "+(access?.billing?"Keine Daten":"Keine Berechtigung"):"Vertragswert: "+moneyChf(Number(overview.monthly_contract_value))+" / Monat"} icon="card"/><Metric label="Benutzer" value={String(users)+" / "+String(userLimit===null?"∞":userLimit||"—")} hint={userLimit===null?"Unbegrenzte Benutzer":userLimit?String(Math.max(0,userLimit-users))+" Plätze frei":"Limit nicht verfügbar"} icon="users"/><Metric label="Offene Tickets" value={openTickets===null?"—":String(openTickets)} hint={access?.support?"Aktuelle Anfragen":"Keine Berechtigung"} icon="support"/><Metric label="Kundenzahlungen" value={overview.payments_total==null?"—":moneyChf(Number(overview.payments_total))} hint={access?.billing?"Erfasste CHF-Plattformzahlungen":"Keine Berechtigung"} icon="wallet"/></div>
     <div className="operator-customer-grid">

@@ -13,7 +13,6 @@ const descriptions:Readonly<Record<string,string>>={
  "/spesen":"Ausgaben und Belege erfassen und verwalten.",
  "/belege":"Belege erfassen und verwalten.",
  "/finanzen":"Umsatz, offene Forderungen und Zahlungen im Blick.",
- "/finanzen/analyse":"Finanzentwicklung nach Zeitraum auswerten.",
  "/berichte":"Geschäftszahlen auswerten und Berichte erstellen.",
  "/mitarbeiter":"Mitarbeiter und ihre Geschäftsdaten verwalten.",
  "/support":"Support-Anfragen erstellen und Antworten verfolgen.",

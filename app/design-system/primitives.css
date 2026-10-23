@@ -334,6 +334,12 @@ input:not([type="checkbox"]):not([type="radio"]),
 .app-select-option[data-active="true"]{outline:2px solid var(--app-action-accent);outline-offset:-2px}
 .app-select-option[aria-disabled="true"]{opacity:.5;cursor:not-allowed}
 .app-select-option[hidden]{display:none}
+.records-choice-popup{padding:8px;border-radius:var(--shape-panel);box-shadow:none}
+.records-choice-title{position:sticky;top:-8px;z-index:1;padding:8px 12px;font-size:var(--type-label);font-weight:600;color:var(--color-fg);background:var(--color-bg)}
+.records-choice-popup .app-select-option{border:0;border-radius:0;min-height:44px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--color-fg)}
+.records-choice-popup .app-select-option[aria-selected="true"]{background:transparent;color:var(--color-fg)}
+.records-choice-popup .app-select-option[aria-selected="true"]>span{color:var(--app-action-accent)}
+.records-choice-popup .app-select-option[data-active="true"]{outline:0;background:var(--color-subtle)}
 .app-select-search{display:flex;flex-wrap:wrap;gap:var(--field-label-gap);padding:8px}
 .app-select-search>.form-control,.app-select-search>[role="alert"]{width:100%}
 @keyframes select-reveal{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:translateY(0)}}
@@ -372,9 +378,14 @@ input:not([type="checkbox"]):not([type="radio"]),
 .bo-progress::-webkit-progress-bar{background:var(--color-line)}
 .bo-progress::-webkit-progress-value{background:var(--app-action-accent)}
 .bo-progress::-moz-progress-bar{background:var(--app-action-accent)}
-.metric-trend{display:inline-flex;align-items:center;justify-content:flex-end;gap:3px;white-space:nowrap;font-size:var(--type-metadata);font-weight:500;font-variant-numeric:tabular-nums}
+.metric-trend{display:inline-flex;align-items:center;justify-content:flex-end;gap:3px;white-space:nowrap;font-size:var(--kpi-trend-font);font-weight:500;font-variant-numeric:tabular-nums}
 .metric-trend[data-tone="positive"]{color:var(--status-success-fg)}
 .metric-trend[data-tone="negative"]{color:var(--status-danger-fg)}
 .metric-trend[data-tone="neutral"]{color:var(--color-muted)}
 
 .bo-setup-progress .bo-progress{margin-bottom:8px}
+
+/* V5: language options use the shared portal and full native names. */
+.locale-choice-popup .app-select-option{min-height:44px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-radius:0;background:transparent;color:var(--color-fg)}
+.locale-choice-popup .app-select-option>span{color:var(--app-action-accent)}
+.locale-choice-popup .app-select-option[data-active="true"]{background:var(--app-accent-soft)}

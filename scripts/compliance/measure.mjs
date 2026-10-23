@@ -58,20 +58,18 @@ export async function measureCompliance(page,{output,route,theme,width,state='no
   for(const el of all('.toolbar:has(.searchbox):has(.filter-button),.record-controls,.records-inline-controls')){
    const search=all('.searchbox').find(x=>el.contains(x)),filter=el.querySelector('.filter-button,.records-filter-action');const tabs=el.querySelector('.chips,.tabs');
    if(innerWidth<=760&&search&&filter&&visible(filter)){const a=rect(search),b=rect(filter),t=tabs&&visible(tabs)?rect(tabs):null;add('CTL-001',b.x>=a.right-2&&Math.abs(a.y-b.y)<=2&&Math.abs(a.height-b.height)<=2&&(!t||t.y>=a.bottom-1)?'passed':'failed',{search:a,filter:b,tabs:t},'.toolbar,.record-controls,.records-inline-controls');}
-   const sort=[...el.querySelectorAll('.records-sort-control [role=combobox],select[aria-label*=Sort],button[aria-label*=Sort]:not(.records-filter-action,.filter-button,.filter-chip)')].filter(visible);
+   const sort=[...el.querySelectorAll('.records-sort-control [role=combobox],select[aria-label*=Sort],button[aria-label*=Sort]:not(.records-filter-action,.filter-button,.filter-chip,.records-reset)')].filter(visible);
    add('CTL-003',sort.length<=1?'passed':'failed',{visibleSorts:sort.length,controls:sort.map(item)},'.record-controls,.records-inline-controls');
   }
   for(const el of all('.tabs,.chips')){const c=getComputedStyle(el);add('CTL-002',el.scrollWidth<=el.clientWidth+1||['auto','scroll'].includes(c.overflowX)?'passed':'failed',{clientWidth:el.clientWidth,scrollWidth:el.scrollWidth,overflowX:c.overflowX},'.tabs,.chips');}
   for(const el of all('.mobile-header'))add('HDR-001',getComputedStyle(el).backdropFilter==='none'?'passed':'failed',{backdropFilter:getComputedStyle(el).backdropFilter,background:getComputedStyle(el).backgroundColor,rect:rect(el)},'.mobile-header');
   for(const el of all('.desktop-appbar-actions'))if(innerWidth>=1024){
    const actions=[...el.querySelectorAll('button,a')].filter(visible);
-   // V3 explicitly moves the existing page menu into the header on these
-   // approved pages. This does not permit arbitrary business controls elsewhere.
-   const approvedPageMenu=['/kunden','/finanzen','/zeit'].includes(location.pathname)&&el.closest('[data-ux="master-v3"]');
-   const kind=x=>approvedPageMenu&&x.matches('button.bo-row-actions[aria-label]')&&x.getAttribute('aria-label').trim()?'page-menu':x.matches('button.desktop-global-search[aria-label]')&&x.getAttribute('aria-label').trim()?'search':x.matches('button.desktop-notification-button')?'notification':x.matches('button.avatar-button')?'account':'unexpected';
+   // V4: page management stays outside the global overview/list header.
+   const kind=x=>x.matches('button.desktop-global-search[aria-label]')&&x.getAttribute('aria-label').trim()?'search':x.matches('button.desktop-notification-button')?'notification':x.matches('button.avatar-button')?'account':'unexpected';
    const roles=actions.map(kind),unexpected=actions.filter(x=>kind(x)==='unexpected');
    const outside=[...el.closest('.desktop-appbar').querySelectorAll('button,a')].filter(visible).filter(x=>!el.contains(x)&&!x.matches('button.desktop-navigation-toggle[aria-controls="customer-desktop-navigation"]'));
-   const validOrder=roles.join(',')==='search,notification,account'||approvedPageMenu&&roles.join(',')==='page-menu,search,notification,account';
+   const validOrder=roles.join(',')==='search,notification,account';
    const redundantLocation=[...el.closest('.desktop-appbar').querySelectorAll('.workspace-location')].filter(visible);
    add('LAY-003',validOrder&&!unexpected.length&&!outside.length&&!redundantLocation.length?'passed':'failed',{visibleActions:actions.length,roles,unexpectedActions:[...unexpected,...outside].map(item),redundantLocation:redundantLocation.map(item),rects:actions.map(item)},'.desktop-appbar-actions');
   }

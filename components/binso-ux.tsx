@@ -7,6 +7,7 @@ import type {MetricTrend} from '@/lib/kpi-trend';
 import {HeaderPanel} from './header-panel';
 import {WorkspaceActionContext} from '@/lib/client/workspace-actions';
 import Link from "next/link";
+import {SlidersHorizontal} from "lucide-react";
 import {useRouter} from "next/navigation";
 import { createPortal } from "react-dom";
 import { useDialogFocus } from "./use-dialog-focus";
@@ -82,10 +83,10 @@ export function DetailSections({summary,facts,records,extra}:{summary:ReactNode;
 }
 
 /** Supplementary facts stay accessible without crowding a mobile dossier. */
-export function DetailDisclosure({label,children}:{label:string;children:ReactNode}){
- const [open,setOpen]=useState(false),touched=useRef(false);
- useLayoutEffect(()=>{const media=window.matchMedia('(min-width:761px)'),update=()=>{if(!touched.current)setOpen(media.matches)};update();media.addEventListener('change',update);return()=>media.removeEventListener('change',update)},[]);
- return <details className="bo-data-disclosure" open={open} onToggle={event=>{const next=event.currentTarget.open;if(next!==open){touched.current=true;setOpen(next)}}}><summary><LocalizedText>{label}</LocalizedText></summary><div>{children}</div></details>;
+export function DetailDisclosure({label,children,open:controlledOpen,onOpenChange,summaryValue}:{label:string;children:ReactNode;open?:boolean;onOpenChange?:(open:boolean)=>void;summaryValue?:ReactNode}){
+ const [localOpen,setOpen]=useState(false),touched=useRef(false),open=controlledOpen??localOpen;
+ useLayoutEffect(()=>{if(controlledOpen!==undefined)return;const media=window.matchMedia('(min-width:761px)'),update=()=>{if(!touched.current)setOpen(media.matches)};update();media.addEventListener('change',update);return()=>media.removeEventListener('change',update)},[controlledOpen]);
+ return <details className="bo-data-disclosure" data-controlled={controlledOpen!==undefined||undefined} open={open} onToggle={event=>{const next=event.currentTarget.open;if(next!==open){touched.current=true;if(controlledOpen===undefined)setOpen(next);onOpenChange?.(next)}}}><summary><LocalizedText>{label}</LocalizedText>{summaryValue!==undefined&&<span className="bo-disclosure-value">{summaryValue}</span>}</summary><div>{children}</div></details>;
 }
 
 export function MetricTiles({ children, columns=4, desktopOnly=false }: { children: ReactNode;columns?:2|3|4;desktopOnly?:boolean }) {
@@ -203,13 +204,13 @@ export function FormSheet({workspace,...props}:SheetProps){return <Sheet {...pro
 export function FilterSheet(props:SheetProps){return <Sheet {...props} kind="filter"/>}
 
 /** The same compact action sheet is used for entity editors on every viewport. */
-export function ActionsMenu({label,children,busy=false,header=false}:{label:string;children:ReactNode;busy?:boolean;header?:boolean}){
+export function ActionsMenu({label,children,busy=false,header=false,tools=false}:{label:string;children:ReactNode;busy?:boolean;header?:boolean;tools?:boolean}){
  const [open,setOpen]=useState(false),[closeRequested,setCloseRequested]=useState(false),[desktop,setDesktop]=useState(false);
- useEffect(()=>{if(!header)return;const media=window.matchMedia('(min-width:761px)'),update=()=>setDesktop(media.matches);update();media.addEventListener('change',update);return()=>media.removeEventListener('change',update)},[header]);
+ useEffect(()=>{if(!header&&!tools)return;const media=window.matchMedia('(min-width:761px)'),update=()=>setDesktop(media.matches);update();media.addEventListener('change',update);return()=>media.removeEventListener('change',update)},[header,tools]);
  useEffect(()=>{if(!closeRequested||busy)return;const frame=requestAnimationFrame(()=>{setOpen(false);setCloseRequested(false)});return()=>cancelAnimationFrame(frame)},[closeRequested,busy]);
  const close=()=>{if(!busy){setCloseRequested(false);setOpen(false)}};
  const content=<div className="action-list" onClick={event=>{if(!busy&&event.target instanceof Element&&event.target.closest('button,a'))setCloseRequested(true)}}>{children}</div>;
- return <><RowActions label={label} disabled={busy} onClick={()=>setOpen(true)}/>{header&&desktop?open&&<HeaderPanel kind="actions" label={label} onClose={close}>{content}</HeaderPanel>:<ActionSheet label={label} open={open} busy={busy} onClose={close}>{content}</ActionSheet>}</>;
+ return <>{tools?<LocalizedElement as="button" type="button" className="icon-button records-filter-action records-tools-action" aria-label={label} aria-haspopup="dialog" aria-expanded={open} disabled={busy} onClick={()=>setOpen(true)}><SlidersHorizontal size={20} aria-hidden="true"/></LocalizedElement>:<RowActions label={label} disabled={busy} onClick={()=>setOpen(true)}/>}{(header||tools)&&desktop?open&&<HeaderPanel kind="actions" label={label} onClose={close}>{content}</HeaderPanel>:<ActionSheet label={label} open={open} busy={busy} onClose={close}>{content}</ActionSheet>}</>;
 }
 
 /** Canonical two-line row shared by entity and financial lists. */

@@ -1,4 +1,5 @@
 "use client";
+import Link from 'next/link';
 import {useRef,useState} from 'react';
 import type {SetupGuide} from '@/lib/action-readiness';
 import {useApiQuery} from '@/lib/client/use-api-query';
@@ -6,11 +7,11 @@ import {apiPatch} from '@/lib/client/backend';
 import {usePageAccess} from '@/lib/client/page-access';
 import {LocalizedText} from '@/lib/client/locale';
 import {ListRow,SettingsGroup} from './binso-ux';
-import {SectionTitle,LoadingState,ErrorState,Toggle,ProgressBar} from './ui';
+import {LoadingState,ErrorState,Toggle,ProgressBar} from './ui';
 export function SetupGuideView({item}:{item:SetupGuide}){
  const next=item.tasks.find(task=>task.importance==='required'&&!task.complete);
  if(item.dismissed||item.requiredComplete>=item.requiredTotal||!next)return null;
- return <section className="bo-workspace-section bo-setup-progress"><SectionTitle title="Einrichtung abschliessen"/><p className="bo-setup-guide-summary"><LocalizedText>{'Pflichtangaben'}</LocalizedText>: {item.requiredComplete} / {item.requiredTotal}</p><ProgressBar value={item.requiredComplete} max={item.requiredTotal} label="Pflichtangaben"/><ListRow information href={next.href} title={next.title} meta="Nächster Schritt"/></section>;
+ return <Link href={next.href} className="bo-setup-card"><div className="bo-setup-card-head"><h2><LocalizedText>{'Einrichtung abschliessen'}</LocalizedText></h2><span>{item.requiredComplete}{' '}<LocalizedText>{'von'}</LocalizedText>{' '}{item.requiredTotal}</span></div><ProgressBar value={item.requiredComplete} max={item.requiredTotal} label="Pflichtangaben"/><div className="bo-setup-card-next"><span><LocalizedText>{next.title}</LocalizedText></span><span><LocalizedText>{'Fortsetzen'}</LocalizedText>{' ›'}</span></div></Link>;
 }
 export function SetupGuidePreference(){
  const {hasPermission}=usePageAccess();

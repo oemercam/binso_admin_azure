@@ -69,7 +69,7 @@ export function MarketingHeader() {
         <Link href="/#funktionen" onClick={() => setOpen(false)}><LocalizedText>{"Funktionen "}</LocalizedText><Icon name="arrow"/></Link>
         <Link href="/preise" onClick={() => setOpen(false)}><LocalizedText>{"Preise "}</LocalizedText><Icon name="arrow"/></Link>
       </nav>
-      <div className="marketing-mobile-actions"><LocaleSwitcher/>
+      <div className="marketing-mobile-actions">
         <Button href="/login" variant="secondary"><LocalizedText>{"Anmelden"}</LocalizedText></Button>
         <Button href="/registrieren"><LocalizedText>{"14 Tage kostenlos testen"}</LocalizedText></Button>
       </div>
@@ -84,26 +84,13 @@ export function MarketingHeader() {
 }
 
 export function MarketingFooter() {
-  return <footer className="marketing-footer">
-    <div><Logo/><LocaleSwitcher/><p><LocalizedText>{"Business-Software für Schweizer KMU."}</LocalizedText></p></div>
-    <div className="footer-links">
-      <Link href="/produkt"><LocalizedText>{"Produkt"}</LocalizedText></Link>
-      <Link href="/#funktionen"><LocalizedText>{"Funktionen"}</LocalizedText></Link>
-      <Link href="/impressum#kontakt"><LocalizedText>{"Kontakt"}</LocalizedText></Link>
-      <Link href="/support"><LocalizedText>{"Support"}</LocalizedText></Link>
-      <Link href="/preise"><LocalizedText>{"Preise"}</LocalizedText></Link>
-      <Link href="/registrieren"><LocalizedText>{"14 Tage kostenlos testen"}</LocalizedText></Link>
-      <Link href="/login"><LocalizedText>{"Anmelden"}</LocalizedText></Link>
-      <Link href="/impressum"><LocalizedText>{"Impressum"}</LocalizedText></Link>
-      <Link href="/datenschutz"><LocalizedText>{"Datenschutz"}</LocalizedText></Link>
-      <Link href="/agb"><LocalizedText>{"AGB"}</LocalizedText></Link>
-      <Link href="/auftragsbearbeitung"><LocalizedText>{"DPA"}</LocalizedText></Link>
-      <Link href="/unterauftragsbearbeiter"><LocalizedText>{"Unterauftragsbearbeiter"}</LocalizedText></Link>
-      <LocalizedElement as="a" href="https://ch.linkedin.com/company/binsogmbh" target="_blank" rel="noreferrer" aria-label="Binso auf LinkedIn"><LocalizedText>{"LinkedIn"}</LocalizedText></LocalizedElement>
-      <PrivacySettingsButton/>
-    </div>
-    <small>© 2026 <a href="https://binso.ch" target="_blank" rel="noreferrer"><LocalizedText>{"Binso GmbH"}</LocalizedText></a><LocalizedText>{" · Weissbadstrasse 8b · 9050 Appenzell · Schweiz · CHE-173.401.068"}</LocalizedText></small>
-  </footer>;
+ return <footer className="marketing-footer"><div className="footer-links">
+  <Link href="/impressum"><LocalizedText>Impressum</LocalizedText></Link>
+  <Link href="/datenschutz"><LocalizedText>Datenschutz</LocalizedText></Link>
+  <Link href="/agb"><LocalizedText>AGB</LocalizedText></Link>
+  <PrivacySettingsButton/>
+  <Link href="/impressum#kontakt"><LocalizedText>Kontakt</LocalizedText></Link>
+ </div><small>© 2026 <LocalizedText>Binso GmbH</LocalizedText>{" · "}<a href="https://binso.ch" target="_blank" rel="noreferrer"><LocalizedText verbatim>{"binso.ch ↗"}</LocalizedText></a></small></footer>;
 }
 
 const productViews=[['dashboard','Übersicht'],['customers','Kunden'],['offers','Angebote'],['invoices','Rechnungen'],['payments','Zahlungen'],['time','Zeiterfassung']] as const;

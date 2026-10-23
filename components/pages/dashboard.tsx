@@ -23,11 +23,11 @@ export function DashboardOverview({data}:{data:DashboardData|undefined}){
  const recent=(data?.recent??data?.invoices??[]).slice(0,3);
  const work=data?.work,snapshot=data?.canFinance?data.cash?.financial?.snapshot:undefined;
  const tasks=<div className="bo-overview-task-grid">
-  {data?.setup&&<SetupGuideView item={data.setup}/>}
   {(work?.timeReviews!=null||work?.expenseReviews!=null||snapshot)&&<section className="bo-workspace-section"><SectionTitle title="Offene Aufgaben"/>{snapshot&&<><ListRow information href="/rechnungen?status=Offen" title="Forderungen" meta="Aktueller Bestand einschliesslich überfälliger Beträge" value={formatCurrency(Number(snapshot.open)+Number(snapshot.overdue))}/><ListRow information href="/rechnungen?status=Überfällig" title="Überfällig" meta="Aktueller Bestand" value={formatCurrency(Number(snapshot.overdue))}/></>}{work?.timeReviews!=null&&<ListRow information href="/zeit?tab=entries&review=1" title="Zeitfreigaben" meta="Eingereichte Einträge anderer Mitarbeiter" value={String(work.timeReviews)}/ >}{work?.expenseReviews!=null&&<ListRow information href="/spesen?status=Eingereicht&review=1" title="Spesenfreigaben" meta="Eingereichte Belege anderer Mitarbeiter" value={String(work.expenseReviews)}/>}</section>}
   {attention.length>0&&<section className="bo-workspace-section"><SectionTitle title="Handlungsbedarf"/><div className="recent-invoices">{attention.map(item=><DocumentSummaryRow key={item.id} item={item} customerHeading compact/>)}</div></section>}
  </div>;
  return <div className="bo-dashboard-overview">
+  {data?.setup&&<SetupGuideView item={data.setup}/>}
   {data?.canFinance&&data.cash?<CashOverview data={data.cash} dashboard afterMetrics={tasks}/>:tasks}
   <div className="bo-overview-secondary">
    {(data?.stats?.customer_count!=null||data?.stats?.project_count!=null||data?.stats?.employee_count!=null)&&<section className="bo-workspace-section"><SectionTitle title="Unternehmen"/>{data.stats.customer_count!=null&&<ListRow information href="/kunden" title="Kunden" meta="Sichtbarer Kundenbestand" value={String(data.stats.customer_count)}/ >}{data.stats.employee_count!=null&&<ListRow information href="/mitarbeiter" title="Mitarbeiter" meta="Aktive Mitarbeiter" value={String(data.stats.employee_count)}/ >}{data.stats.project_count!=null&&<ListRow information href="/projekte?status=Aktiv" title="Aufträge" meta="Aktive, berechtigte Aufträge" value={String(data.stats.project_count)}/>}</section>}

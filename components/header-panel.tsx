@@ -26,7 +26,7 @@ export function HeaderPanel({kind,label,onClose,children,headerSelector,backgrou
    setMobile(mobile);
    const header=document.querySelector(headerSelector??(mobile?".mobile-header":".desktop-appbar"));
    const rect=header?.getBoundingClientRect();
-   const candidate=(kind==="period"?header:kind==="actions"?header?.querySelector<HTMLElement>(".bo-row-actions"):trigger.current)?.getBoundingClientRect();
+   const candidate=(kind==="period"?header:kind==="actions"?(header?.querySelector<HTMLElement>(".bo-row-actions")??trigger.current):trigger.current)?.getBoundingClientRect();
    const anchor=candidate&&candidate.width>0&&candidate.height>0?candidate:undefined;
    setPlacement({top:Math.max(0,(kind==="actions"||kind==="period")?(anchor?.bottom??rect?.bottom??64)+8:rect?.bottom??64),right:mobile?0:Math.min(Math.max(16,window.innerWidth-436),Math.max(16,window.innerWidth-(anchor?.right??window.innerWidth-16)))});
   };

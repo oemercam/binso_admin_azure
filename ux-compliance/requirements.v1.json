@@ -307,22 +307,22 @@
     },
     {
       "id": "UX-LAY-003",
-      "description": "Desktop: globale Suche, Glocke und Profil; zentrales Seitenmenü auf den freigegebenen V3-Seiten",
+      "description": "V4: globale Header-Aktionen und getrennte Detailverwaltung",
       "routes": [
         "customer-app"
       ],
       "componentTypes": [
         "HeaderPanel"
       ],
-      "expected": "Desktop-Header: Suche/Glocke/Profil in definierter Reihenfolge; V3 erlaubt davor ein zentrales Seitenmenü auf Kunden, Finanzen und Zeit; keine Timeranzeige oder weiteren fachlichen Aktionen",
+      "expected": "V4: globaler Desktop-Header mit Suche/Glocke/Profil; keine Timeranzeige und keine Seitenmenüs auf Übersichts-/Listenseiten; Objektverwaltung im Detailheader",
       "owner": "HeaderPanel",
       "method": "browser",
       "testCase": "TC-UX-LAY-003",
       "adapter": "header-actions",
       "priority": "P1",
-      "acceptance": "Desktop-Header: Suche/Glocke/Profil in definierter Reihenfolge; V3 erlaubt davor ein zentrales Seitenmenü auf Kunden, Finanzen und Zeit; keine Timeranzeige oder weiteren fachlichen Aktionen",
+      "acceptance": "V4: globaler Desktop-Header mit Suche/Glocke/Profil; keine Timeranzeige und keine Seitenmenüs auf Übersichts-/Listenseiten; Objektverwaltung im Detailheader",
       "automation": "automatic",
-      "provenance": "Nutzerauftrag UX Master V3 in dieser Unterhaltung: Seitenaktionen ausschliesslich im Header. Eng begrenzte Ausnahme auf Kunden, Finanzen und Zeit; alle übrigen Vorgaben aus docs/audit/v24/white-workspaces-request.md Abschnitt 4 bleiben erhalten.",
+      "provenance": "Nutzerauftrag vom 23.10.2026: docs/architecture/ux-master-v4/source.md, Kapitel 3–8. Ersetzt die V3-Ausnahme für Seitenmenüs im globalen Übersichtsheader; unveränderte Rechte und Aktionshandler.",
       "review": null,
       "expectedCases": [
         {"route":"/dashboard","width":1024,"theme":"light","engine":"chromium","state":"normal"},

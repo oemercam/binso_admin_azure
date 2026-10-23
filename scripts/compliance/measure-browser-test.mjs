@@ -63,7 +63,7 @@ try{
  const menu='<button class="bo-row-actions" aria-label="Seitenaktionen">More</button>';
  for(const route of ['/kunden','/finanzen','/zeit']){
   const scope={route,master:true};
-  assert.equal((await checkHeader(menu+normalActions,'v3-menu',undefined,scope))[0].status,'passed','V3 approves one existing page-menu owner before the global controls');
+  assert.equal((await checkHeader(menu+normalActions,'v3-menu',undefined,scope))[0].status,'failed','V4 keeps page management out of overview/list headers');
   for(const actions of [menu+menu+normalActions,normalActions+menu,menu+normalActions+'<button>Extra</button>'])assert.equal((await checkHeader(actions,'v3-invalid-menu',undefined,scope))[0].status,'failed','Duplicate, misplaced or additional actions stay blocking');
  }
  assert.equal((await checkHeader(menu+normalActions,'unapproved-menu',undefined,{route:'/projekte',master:true}))[0].status,'failed','The V3 page-menu exception cannot authorize another route');
@@ -112,7 +112,7 @@ try{
  assert.equal((await sortCheck(sortControl,'sort-filter-and-one-choice'))[0].status,'passed','The combined filter action is not a second sort selector; hidden native value model is not a visible control');
  assert.equal((await sortCheck(sortControl+sortControl,'sort-two-choices'))[0].status,'failed','Two actual sort selectors remain blocking');
  assert.equal((await sortCheck(sortControl+'<button aria-label="Sortieren">Extra</button>','sort-extra-unowned-choice'))[0].status,'failed','An additional sort action outside its canonical owner remains blocking');
- assert.equal((await sortCheck(sortControl+'<button class="filter-chip" aria-label="Sortierung zurücksetzen">Reset</button>','sort-reset-chip'))[0].status,'passed','An active-filter reset is not another sort selector');
+ assert.equal((await sortCheck(sortControl+'<button class="records-reset" aria-label="Sortierung zurücksetzen">Reset</button>','sort-reset-chip'))[0].status,'passed','An active-filter reset is not another sort selector');
  // Verify cascade pruning against browser-computed values, not source matching.
  const originalCss='.probe{color:red;padding:4px;border-radius:8px;transition:opacity 100ms}.probe,.other{color:blue;transition:transform 100ms}.probe:hover{color:green}@media(max-width:760px){.probe{padding:8px}.probe,.other{padding:12px}}';
  const prunedCss=parseCss(originalCss);assert.ok(pruneSuperseded(prunedCss).length>0);

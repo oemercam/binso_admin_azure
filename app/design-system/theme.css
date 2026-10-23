@@ -17,8 +17,8 @@
   --mobile-value-tracking:-.8px;
   --workspace-title-weight:600;
   --workspace-row-weight:500;
-  --workspace-value-size:25px;
-  --workspace-value-weight:500;
+  --workspace-value-size:20px;
+  --workspace-value-weight:600;
   --timer-value-size:44px;
   --app-canvas:#fff;
   --app-surface:#fff;
@@ -50,7 +50,7 @@
   --chart-compact-height:130px;
   --kpi-padding:14px;
   --action-row-height:48px;
-  --section-title-font:16px;
+  --section-title-font:14px;
   color-scheme:light;
   --color-bg:#fff;
   --color-fg:#000;
@@ -127,7 +127,7 @@
   --desktop-action-gap:8px;
 
   --mobile-page-x:clamp(16px,4.55vw,20px);
-  --mobile-header-h:52px;
+  --mobile-header-h:56px;
   --mobile-nav-h:68px;
   --mobile-page-top:14px;
   --mobile-page-head-gap:16px;
@@ -140,19 +140,25 @@
   --touch:44px;
 
   --header-avatar-size:34px;
+  --kpi-value-font:20px;
+  --kpi-label-font:12px;
+  --kpi-trend-font:11px;
+  --app-header-icon-size:20px;
+  --accordion-chevron-size:18px;
   --profile-avatar-size:104px;
   --control-focus-width:2px;
-  --chart-positive:#57cc91;
+  --chart-positive:#16a34a;
   --chart-overview:#5687c7;
   --message-incoming-bg:#f1f5fa;
-  --chart-negative:#f07881;
-  --chart-neutral:#a2a8b3;
+  --chart-negative:#dc2626;
+  --chart-warning:#ea580c;
+  --chart-neutral:#2563eb;
   --chart-ring-size:112px;
   --chart-ring-width:10px;
   --control-h:48px;
   --control-h-mobile:48px;
-  --control-font:16px;
-  --control-font-mobile:16px;
+  --control-font:14px;
+  --control-font-mobile:14px;
   --control-label-font:var(--type-label);
   --control-label-weight:500;
   --heading-content-gap:12px;
@@ -182,7 +188,7 @@
   --safe-right:env(safe-area-inset-right,0px);
   --safe-bottom:env(safe-area-inset-bottom,0px);
   --safe-left:env(safe-area-inset-left,0px);
-  --type-subheading:16px;
+  --type-subheading:14px;
   --type-label:13px;
   --type-metadata:12px;
   --shape-group:12px;
@@ -190,11 +196,11 @@
   --shape-control-mobile:8px;
   --type-body:14px;
   --type-control:14px;
-  --type-desktop-heading:22px;
+  --type-desktop-heading:18px;
   --type-display-small:30px;
   --type-body-large:15px;
   --shape-mark:2px;
-  --type-section:16px;
+  --type-section:14px;
   --shape-overlay:16px;
   --type-auth-display:28px;
   --shape-group-small:10px;
@@ -203,10 +209,10 @@
   --shape-panel:14px;
   --shape-small:6px;
   --shape-kbd:3px;
-  --type-mobile-heading:22px;
+  --type-mobile-heading:18px;
   --shape-compact:4px;
   --shape-control-desktop:5px;
-  --type-mobile-detail:22px;
+  --type-mobile-detail:18px;
   --shape-feature:24px;
   --record-row-min:86px;
   --record-identity-size:38px;
@@ -333,7 +339,7 @@ html{scroll-behavior:auto}
 }
 
 @media (pointer:coarse){
-:root{--button-height:var(--touch);--control-h:48px;--control-font:16px;--desktop-action-h:var(--touch)}
+:root{--button-height:var(--touch);--control-h:48px;--control-font:14px;--desktop-action-h:var(--touch)}
 }
 
 /* Master V3 — staged on the five approved customer workspaces only.
@@ -341,9 +347,9 @@ html{scroll-behavior:auto}
 :root{
  --ux-page-inset:32px;
  --ux-card-inset:20px;
- --ux-section-title:19px;
- --ux-card-title:16px;
- --ux-page-title:28px;
+ --ux-section-title:14px;
+ --ux-card-title:14px;
+ --ux-page-title:18px;
  --ux-row-height:46px;
  --ux-chart-income:#16A34A;
  --ux-chart-expense:#DC2626;
@@ -360,7 +366,7 @@ html{scroll-behavior:auto}
  --control-h:42px;
 }
 @media(max-width:760px){
- .app-root[data-ux="master-v3"]{--ux-page-inset:16px;--ux-card-inset:16px;--ux-page-title:23px;--body-font-size:15px;--body-line-height:1.5;--type-body:15px;--control-h:44px}
+ .app-root[data-ux="master-v3"]{--ux-page-inset:16px;--ux-card-inset:16px;--ux-page-title:18px;--body-font-size:14px;--body-line-height:1.5;--type-body:14px;--control-h:44px}
 }
 @media(min-width:761px) and (max-width:1199px){
  .app-root[data-ux="master-v3"]{--ux-page-inset:24px;--ux-card-inset:20px}
