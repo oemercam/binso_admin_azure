@@ -40,22 +40,22 @@ export async function verifyListFrameMeasurement(page){
  }finally{await detached.dispose();}
 }
 
-/** Closed fields retain the shared geometry; approved Master V3 uses 42px desktop controls.
+/** Closed fields retain the shared geometry; Master V5 uses 44px app controls.
  * Textareas and checkbox/radio controls have their own semantic geometry. */
 export async function assertCanonicalClosedFields(page,route=''){
- const fields=await page.evaluate(()=>[...document.querySelectorAll('.form-field>.form-control:not(textarea):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),.form-field .app-select-trigger')].flatMap(el=>{const css=getComputedStyle(el),box=el.getBoundingClientRect();return box.width>0&&box.height>0&&!['hidden','collapse'].includes(css.visibility)?[{height:box.height,padding:css.paddingLeft,radius:css.borderRadius,font:css.fontSize,compactDesktop:!!el.closest('.app-root[data-ux="master-v3"]')&&matchMedia('(min-width:761px)').matches}]:[]}));
+ const fields=await page.evaluate(()=>[...document.querySelectorAll('.form-field>.form-control:not(textarea):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),.form-field .app-select-trigger')].flatMap(el=>{const css=getComputedStyle(el),box=el.getBoundingClientRect();return box.width>0&&box.height>0&&!['hidden','collapse'].includes(css.visibility)?[{height:box.height,padding:css.paddingLeft,radius:css.borderRadius,font:css.fontSize,compactApp:!!el.closest('.app-root[data-ux="master-v3"]')}]:[]}));
  for(const geometry of fields){
-  assert.equal(geometry.height,geometry.compactDesktop?42:48,route+': canonical closed field height');
+  assert.equal(geometry.height,geometry.compactApp?44:48,route+': canonical closed field height');
   assert.equal(geometry.padding,'16px',route+': canonical field inset');
   assert.equal(geometry.radius,'12px',route+': canonical field radius');
-  assert.equal(geometry.font,'16px',route+': canonical field text');
+  assert.equal(geometry.font,'14px',route+': canonical field text');
  }
 }
 
 export async function verifyCanonicalFieldRegression(page){
  const field=page.locator('.form-field>.form-control:not(textarea):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"])').filter({visible:true}).first();assert.ok(await field.count(),'A real closed field is required for the negative controls');
  const original=await field.getAttribute('style');
- for(const [properties,message] of [[{'height':'40px','min-height':'40px'},/canonical closed field height/],[{'padding-left':'11px'},/canonical field inset/],[{'border-radius':'7px'},/canonical field radius/],[{'font-size':'14px'},/canonical field text/]]){
+ for(const [properties,message] of [[{'height':'40px','min-height':'40px'},/canonical closed field height/],[{'padding-left':'11px'},/canonical field inset/],[{'border-radius':'7px'},/canonical field radius/],[{'font-size':'13px'},/canonical field text/]]){
   try{await field.evaluate((el,properties)=>{for(const [key,value] of Object.entries(properties))el.style.setProperty(key,value,'important');},properties);await assert.rejects(()=>assertCanonicalClosedFields(page),message);}
   finally{await field.evaluate((el,value)=>value===null?el.removeAttribute('style'):el.setAttribute('style',value),original);}
  }
@@ -169,4 +169,13 @@ export async function verifyHeaderTargetRegression(page){
 export async function waitForLabReady(page){
  await page.locator('main.ux-lab[data-hydrated="true"]').waitFor({state:'visible'});
  await page.evaluate(()=>document.fonts.ready);
+}
+
+/** V4.1 settings edit action belongs to the visible detail header on every viewport. */
+export async function openSettingsEditor(page){
+ const header=page.locator('.mobile-header,.desktop-appbar').filter({visible:true});
+ await header.getByRole('button',{name:'Weitere Aktionen',exact:true}).click();
+ const actions=page.getByRole('dialog',{name:'Weitere Aktionen',exact:true});
+ await actions.waitFor({state:'visible'});
+ await actions.getByRole('button',{name:'Bearbeiten',exact:true}).click();
 }

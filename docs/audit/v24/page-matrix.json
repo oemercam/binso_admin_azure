@@ -5180,7 +5180,7 @@
           "physical Android PWA"
         ]
       },
-      "status": "Offen",
+      "status": "nicht geprüft",
       "evidence": [],
       "cause": "New V5 internal legal route; local checks do not grant global acceptance",
       "correction": "Complete role, locale, responsive and visual acceptance"
@@ -5332,7 +5332,7 @@
           "physical Android PWA"
         ]
       },
-      "status": "Offen",
+      "status": "nicht geprüft",
       "evidence": [],
       "cause": "New V5 internal legal route; local checks do not grant global acceptance",
       "correction": "Complete role, locale, responsive and visual acceptance"

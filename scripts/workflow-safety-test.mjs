@@ -6,6 +6,11 @@ const directory='.github/workflows';
 const setup=yaml.load(fs.readFileSync('.github/actions/setup-node/action.yml','utf8'));
 for(const step of setup.runs.steps)if(step.uses)assert(/@[a-f0-9]{40}$/.test(step.uses),'Pinned composite dependency');
 const workflows=Object.fromEntries(fs.readdirSync(directory).filter(f=>f.endsWith('.yml')).map(f=>[f,yaml.load(fs.readFileSync(directory+'/'+f,'utf8'))]));
+for(const name of ['checks','ux-compliance']){
+ const checkout=workflows['quality.yml'].jobs[name].steps.find(step=>step.uses?.startsWith('actions/checkout@'));
+ assert.equal(checkout.with['fetch-depth'],0,'Immutable navigation reference checks require real historical source in '+name);
+ assert.equal(checkout.with['persist-credentials'],false,'Historical source access cannot persist credentials');
+}
 // Evaluate the actual event expressions over synthetic contexts; no credentials,
 // service calls, deployment, mail or database operation is executed by this test.
 const evaluate=(expression,github,inputs={})=>Function('github','inputs','return ('+expression.replace(/^\$\{\{\s*|\s*\}\}$/g,'')+')')(github,inputs);

@@ -7,7 +7,7 @@ import {createRequire} from 'node:module';
 import ts from 'typescript';
 import {navigationRules} from './design-system.mjs';
 const require=createRequire(import.meta.url),postcss=require(require.resolve('postcss',{paths:[require.resolve('next')]}));
-// Every real settings subpage must remain discoverable in the shared catalogue.
+// V5 moves language selection to the shared header; retain its legacy deep link.
 // This catches the previous overview, which omitted account/security/appearance.
 const settingsSource=fs.readFileSync('components/settings-navigation.tsx','utf8');
 const settingsAst=ts.createSourceFile('settings.tsx',settingsSource,99,true,4);
@@ -21,7 +21,10 @@ function collectSettings(node){
 }
 collectSettings(settingsAst);
 const settingsRoutes=fs.readdirSync('app/einstellungen',{withFileTypes:true}).filter(entry=>entry.isDirectory()&&fs.existsSync('app/einstellungen/'+entry.name+'/page.tsx')).map(entry=>'/einstellungen/'+entry.name);
-assert.deepEqual(destinations.toSorted(),settingsRoutes.toSorted(),'Settings catalogue covers every actual subpage exactly once');
+assert.ok(settingsRoutes.includes('/einstellungen/sprache'),'The existing language deep link remains available');
+assert.ok(!destinations.includes('/einstellungen/sprache'),'V5 exposes language in the shared header without a duplicate settings entry');
+assert.match(fs.readFileSync('app/einstellungen/sprache/page.tsx','utf8'),/LanguageSettingsPage/,'Legacy language route retains its actual settings implementation');
+assert.deepEqual(destinations.toSorted(),settingsRoutes.filter(route=>route!=='/einstellungen/sprache').toSorted(),'Settings catalogue covers every current subpage exactly once except the explicit V5 language deep link');
 assert.match(settingsSource,/access\.canOpen\(href\)/,'Settings catalogue retains route permission filtering');
 const currentNavigation=fs.readFileSync('app/design-system/navigation.css','utf8');
 assert.throws(()=>currentNavigationRead(()=>currentNavigation.replace('(max-width:760px)','(max-width:1100px)'))('app/design-system/navigation.css'),/mobile dock owner|Tablet/,'Restoring the old tablet dock must fail');

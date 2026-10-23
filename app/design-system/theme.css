@@ -145,7 +145,7 @@
   --kpi-trend-font:11px;
   --app-header-icon-size:20px;
   --accordion-chevron-size:18px;
-  --profile-avatar-size:104px;
+  --profile-avatar-size:60px;
   --control-focus-width:2px;
   --chart-positive:#16a34a;
   --chart-overview:#5687c7;
@@ -363,7 +363,7 @@ html{scroll-behavior:auto}
  --page-heading-size:var(--ux-page-title);
  --page-heading-line-height:1.2;
  --section-title-font:var(--ux-section-title);
- --control-h:42px;
+ --control-h:44px;
 }
 @media(max-width:760px){
  .app-root[data-ux="master-v3"]{--ux-page-inset:16px;--ux-card-inset:16px;--ux-page-title:18px;--body-font-size:14px;--body-line-height:1.5;--type-body:14px;--control-h:44px}
