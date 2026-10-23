@@ -24,3 +24,13 @@ Admin-interne Rechtsseiten und Admin-Rollenabnahme; komplette Migration sämtlic
 Die öffentliche Rechtsquelle und bisherige Zustimmungs-/Consent-Versionen wurden nicht geändert. Nur lokale Vorschau; kein Push, Merge, Deployment und keine produktiven Datenänderungen.
 
 Nachprüfung: Integrationsarchitektur in der isolierten Quellkopie mit beiden neuen Rechtsrouten bestanden (Importzyklen, Barrel-Schutz, vollständige Routenmatrix). Öffentliche Datenschutzseite zusätzlich ohne Sitzung per HTTP mit Status 200, öffentlicher Shell und unveränderter Version 2026-10-05.2 geprüft.
+
+## Release-Vorbereitung nach ausdrücklichem Deployment-Auftrag
+
+Der nachfolgende Nutzerauftrag hebt den lokalen GitHub-/Deployment-Stopp für die Release-Vorbereitung auf. PR #312 bündelt die bisherigen Änderungen; die Ergebnisse des ursprünglichen 15-Minuten-Blocks oben bleiben historische Einzelbefunde.
+
+Die Release-Nachprüfung korrigiert die Profilidentität auf den in V5 vorgegebenen Bereich (60 px), verwendet 44 px für zentrale App-Eingaben und bewahrt den letzten verbundenen Seiten-Trigger beim Wechsel vom Werkzeugmenü in ein Sheet. Die tatsächliche lokale Zeitansicht bestätigt Escape und Fokusrückkehr zu Listenwerkzeuge ohne Änderung der gespeicherten Testzeit.
+
+Routenregister und Komponentenabhängigkeiten sind aktualisiert. Die beiden neuen Rechtsrouten bleiben `nicht geprüft` beziehungsweise `nicht_abgenommen`; alle fünf Artikel und die Übersicht sind zusätzlich im vollständigen Chromium-/WebKit-Plan enthalten. Der Sprach-Deep-Link bleibt erreichbar, während sein doppelter Katalogeintrag gemäss V5 entfällt. Der eingefrorene Navigationsvergleich bleibt unverändert; die CI erhält die dafür notwendige historische Git-Quelle.
+
+Der vollständige Linux-Lauf für 8ff6eddf bestätigt Release-Verträge, gesamte pnpm-Testkette, Compliance-Gegenprüfungen, isolierte PostgreSQL-Nebenläufigkeit, Lint, CSS, Typprüfung und Abhängigkeitsprüfungen. Build, echte Scanner-Qualifizierung, Rechnungsausstellung und Rabatte sind ebenfalls bestätigt. Browsermatrix und eine gezielte Desktop-Selektorkorrektur befinden sich noch in Qualifizierung; dies ist noch keine Release- oder vollständige V5-Abnahme. Keine fachliche, Rollen-, Mandanten-, Mail-, Finanz- oder Sicherheitsprüfung wurde abgeschaltet.
